@@ -99,7 +99,7 @@ std::unique_ptr<WApplication> createApplication(const WEnvironment& env)
 
     // il faut compiler
     //app->require("https://github.com/geotiffjs/geotiff.js");
-    app->require("/geotiff.bundle.js");
+    //app->require("/geotiff.bundle.js");
 
     // finalement je n'utilise pas olGeoTiff
     // app->require("https://data.eox.at/geotiff.js-blog/04_multiband/olGeoTiff_07.js");
