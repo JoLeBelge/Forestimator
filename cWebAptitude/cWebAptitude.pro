@@ -13,9 +13,16 @@ LIBS = -lgdal -lwthttp -lwt -lboost_system -lboost_iostreams -lboost_thread -lbo
 
 INCLUDEPATH += $$PWD/../carteApt/
 
+
+contains(pl,serveur) {
+LIBS += -L$$PWD/usr/include/gdal/ -lgdal
+INCLUDEPATH += $$PWD/../../../usr/include/gdal/
+DEPENDPATH += $$PWD/../../../usr/include/gdal/
+} else {
 LIBS += -L$$PWD/usr/include/gdal/ -lgdal
 INCLUDEPATH += $$PWD/../../../../../../usr/include/gdal/
 DEPENDPATH += $$PWD/../../../../../../usr/include/gdal/
+}
 
 SOURCES += main.cpp \
     wopenlayers.cpp \
