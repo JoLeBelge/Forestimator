@@ -18,6 +18,8 @@ contains(pl,serveur) {
 LIBS += -L$$PWD/usr/include/gdal/ -lgdal
 INCLUDEPATH += $$PWD/../../../usr/include/gdal/
 DEPENDPATH += $$PWD/../../../usr/include/gdal/
+# sur le serveur je dois lui préciser ou est cette librairie
+LIBS += -L$$PWD/../../../../../../../../../usr/lib/x86_64-linux-gnu/ -lsqlite3
 } else {
 LIBS += -L$$PWD/usr/include/gdal/ -lgdal
 INCLUDEPATH += $$PWD/../../../../../../usr/include/gdal/
