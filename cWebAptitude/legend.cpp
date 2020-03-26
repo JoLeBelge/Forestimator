@@ -36,7 +36,7 @@ void legend::createUI()
     mDetAptFEE->toggleStyleClass("table-striped",true);
 
     mInfoT = mParent->addWidget(cpp14::make_unique<WTable>());
-    mInfoT->setHeaderCount(1);
+    mInfoT->setHeaderCount(2);
     mInfoT->setWidth(Wt::WLength("90%"));
     mInfoT->toggleStyleClass("table-striped",true);
 
@@ -55,6 +55,15 @@ void legend::vider()
     mDetAptFEE->clear();
     mAptAllEss->clear();
     mLegendIndiv->clear();
+}
+
+void legend::titreInfoRaster(){
+    mInfoT->elementAt(0, 0)->setColumnSpan(2);
+    mInfoT->elementAt(0, 0)->setContentAlignment(AlignmentFlag::Top | AlignmentFlag::Center);
+    mInfoT->elementAt(0, 0)->setPadding(10);
+    WText *titre = mDetAptFEE->elementAt(0,0)->addWidget(cpp14::make_unique<WText>("<h4>Description de la station forestière </h4>"));
+    mInfoT->elementAt(1, 0)->addWidget(cpp14::make_unique<WText>("Raster"));
+    mInfoT->elementAt(1, 1)->addWidget(cpp14::make_unique<WText>("Valeur"));
 }
 
 void legend::add1InfoRaster(std::vector<std::string> aV){
@@ -79,7 +88,7 @@ void legend::detailCalculAptFEE(ST * aST){
     mDetAptFEE->elementAt(row, 0)->setColumnSpan(2);
     mDetAptFEE->elementAt(row, 0)->setContentAlignment(AlignmentFlag::Top | AlignmentFlag::Center);
     mDetAptFEE->elementAt(row, 0)->setPadding(10);
-    WText *titre = mDetAptFEE->elementAt(row,0)->addWidget(cpp14::make_unique<WText>("<h4>Détermination de l'aptitude FEE pour "+Ess->Nom()+"</h4>"));
+    WText *titre = mDetAptFEE->elementAt(row,0)->addWidget(cpp14::make_unique<WText>("<h4>Détail de la détermination de l'aptitude FEE pour "+Ess->Nom()+"</h4>"));
     row++;
     mDetAptFEE->elementAt(row, 0)->addWidget(cpp14::make_unique<WText>("Aptitude bioclimatique"));
     mDetAptFEE->elementAt(row, 1)->addWidget(cpp14::make_unique<WText>(aST->mDico->code2AptFull(Ess->getApt(aST->mZBIO))));

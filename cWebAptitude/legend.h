@@ -38,6 +38,7 @@ public:
     legend(groupLayers *aGL,WContainerWidget *parent);//
     void createUI();
     void vider();
+    void titreInfoRaster();
     void add1InfoRaster(std::vector<std::string> aV);
     void detailCalculAptFEE(ST *aST);
     void afficheLegendeIndiv(Layer * l);

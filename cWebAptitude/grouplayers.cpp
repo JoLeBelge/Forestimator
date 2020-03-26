@@ -139,8 +139,8 @@ void groupLayers::extractInfo(double x, double y){
     mLegend->vider();
 
     // tableau des informations globales - durant ce round, l'objet ST est modifié
-    mLegend->mInfoT->elementAt(0, 0)->addWidget(cpp14::make_unique<WText>("Raster"));
-    mLegend->mInfoT->elementAt(0, 1)->addWidget(cpp14::make_unique<WText>("Valeur"));
+    mLegend->titreInfoRaster();
+
     for (Layer& l : mVLs){
         //if (l.IsActive()) l.displayInfo(x,y,mInfoW);
         if (l.Type()==KK | l.Type()==Thematique | l.IsActive()){
