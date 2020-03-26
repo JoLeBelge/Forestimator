@@ -9,3 +9,6 @@ build-WebAptitude/main.o
 build-WebAptitude/Makefile
 build-WebAptitude/.qmake.stash
 build-WebAptitude/WebAptitude
+build-WebAptitude/data/BDpath.txt
+build-WebAptitude/data/addOLraster.js.tmp
+build-WebAptitude/data/exempleOL/

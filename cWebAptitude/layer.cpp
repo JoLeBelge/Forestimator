@@ -94,7 +94,7 @@ void Layer::displayLayer(){
     default:
     {
         std::stringstream ss;
-        std::string aFileIn("/home/lisein/Documents/carteApt/tutoWtANDOpenlayer/cWebAptitude/data/add_layer2.js");
+        std::string aFileIn(mDico->Files()->at("addOLraster"));
         std::ifstream in(aFileIn);
         std::string aTmp(aFileIn+".tmp");
         std::ofstream out(aTmp);

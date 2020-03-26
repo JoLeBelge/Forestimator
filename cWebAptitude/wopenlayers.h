@@ -22,29 +22,26 @@
 #include <sys/stat.h>
 #include <fstream>
 #include <boost/algorithm/string/replace.hpp>
+#include "cdicoapt.h"
 
 using namespace Wt;
 
 class WOpenLayers: public WContainerWidget
 {
 public:
-  WOpenLayers(WContainerWidget *parent);
+    WOpenLayers(WContainerWidget *parent, cDicoApt * aDico);
 
-  void addAptMap(std::string aCodeEs="HE",std::string aCodeClassifST="FEE");
+    void giveFocus(bool b){
+        // fonctionne pas pour le moment
+        //std::cout << "\n\n\n focus pour la carte " << std::endl;
+        setFocus(b);
+    }
 
-  void displayMap(std::string aNomCarteJS, bool isVisible=1);
-
-  void giveFocus(bool b){
-      //std::cout << "\n\n\n focus pour la carte " << std::endl;
-      setFocus(b);
-  }
-
-  // signal Essence + integer pour choix FEE (1) et CS (2)
-   //Wt::Signal<std::string,int> AptEss_;
-   JSignal<double,double>& xy() { return xy_; }
-   JSlot slot;
-   void setJS_click();
-   JSignal<double, double>  xy_;
+    cDicoApt * mDico;
+    JSignal<double,double>& xy() { return xy_; }
+    JSlot slot;
+    void setJS_click();
+    JSignal<double, double>  xy_;
 };
 
 #endif // WOPENLAYERS_H

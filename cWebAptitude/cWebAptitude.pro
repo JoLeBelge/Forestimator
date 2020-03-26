@@ -11,7 +11,7 @@ QMAKE_CXX = g++-7
 
 LIBS = -lgdal -lwthttp -lwt -lboost_system -lboost_iostreams -lboost_thread -lboost_filesystem -lboost_program_options -lwtdbo -lwtdbosqlite3 -lcrypt -pthread
 
-INCLUDEPATH += $$PWD/../../tutoGDAL/carteApt/
+INCLUDEPATH += $$PWD/../carteApt/
 
 LIBS += -L$$PWD/usr/include/gdal/ -lgdal
 INCLUDEPATH += $$PWD/../../../../../../usr/include/gdal/
@@ -20,7 +20,7 @@ DEPENDPATH += $$PWD/../../../../../../usr/include/gdal/
 SOURCES += main.cpp \
     wopenlayers.cpp \
     cwebaptitude.cpp \
-    ../../tutoGDAL/carteApt/cdicoapt.cpp \
+    ../carteApt/cdicoapt.cpp \
     layer.cpp \
     grouplayers.cpp \
     legend.cpp
@@ -28,7 +28,7 @@ SOURCES += main.cpp \
 HEADERS += \
     wopenlayers.h \
     cwebaptitude.h \
-    ../../tutoGDAL/carteApt/cdicoapt.h \
+    ../carteApt/cdicoapt.h \
     layer.h \
     grouplayers.h \
     legend.h

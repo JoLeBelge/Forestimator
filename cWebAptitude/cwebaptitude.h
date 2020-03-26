@@ -27,28 +27,29 @@ public:
   cWebAptitude(Wt::WApplication* app);
   WOpenLayers * mMap;
 private:
-  std::map<std::string,cEss>  mMEss;
+  //std::map<std::string,cEss>  mMEss;
   Wt::WApplication* m_app;
   cDicoApt * mDico;
 
-  Wt::WTable                 *mClassifTable;
+  /*Wt::WTable                 *mClassifTable;
   std::string currentClassifST; // 2 modes de classification des stations forestières ; FEE et CS
   std::vector<WText *> clasLabels_;
   void changeClassClick(WText *t);
   void changeRasterClick(WText *t);
   void gotXY(double x, double y);
+  */
   //Wt::Signal<std::string>& changeClass() { return changeClass_; }
   //Wt::Signal<std::string> changeClass_;
 
   // la table qui liste toutes les essences. pour le moment c'est une table.
-  Wt::WTable                 *mEssTable;
+  //Wt::WTable                 *mEssTable;
   // une manière de savoir qu'elle est l'essence active; s'inspirer de l'onglet "langague"
-  std::string currentEssCode;
+  //std::string currentEssCode;
   //int currentEssIndex;
-  void changeEssClick(WText *t);
+  //void changeEssClick(WText *t);
  // Wt::Signal<std::string>& changeEss() { return changeEss_; }
  // Wt::Signal<std::string> changeEss_;
-  std::vector<WText *> essLabels_; // ce sont les labels qui sont dans le tableau
+  //std::vector<WText *> essLabels_; // ce sont les labels qui sont dans le tableau
     groupLayers * mGroupL;
 
 

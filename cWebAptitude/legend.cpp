@@ -1,7 +1,7 @@
 #include "legend.h"
 
 
-legend::legend(groupLayers *aGL, WContainerWidget *parent):mGL(aGL),mParent(parent)
+legend::legend(groupLayers *aGL, WContainerWidget *parent):mGL(aGL),mParent(parent),mDico(aGL->Dico())
 {
     createUI();
 }
@@ -25,6 +25,16 @@ void legend::createUI()
     titre_->setInline(0);
     titre_->setPadding(10,Wt::Side::Bottom | Wt::Side::Top);
 
+    mAptAllEss = mParent->addWidget(cpp14::make_unique<WTable>());
+    mAptAllEss->setHeaderCount(1);
+    mAptAllEss->setWidth(Wt::WLength("90%"));
+    mAptAllEss->toggleStyleClass("table-striped",true);
+
+    mDetAptFEE = mParent->addWidget(cpp14::make_unique<WTable>());
+    mDetAptFEE->setHeaderCount(1);
+    mDetAptFEE->setWidth(Wt::WLength("90%"));
+    mDetAptFEE->toggleStyleClass("table-striped",true);
+
     mInfoT = mParent->addWidget(cpp14::make_unique<WTable>());
     mInfoT->setHeaderCount(1);
     mInfoT->setWidth(Wt::WLength("90%"));
@@ -35,15 +45,6 @@ void legend::createUI()
     mLegendIndiv->setWidth(Wt::WLength("90%"));
     mLegendIndiv->toggleStyleClass("table-striped",true);
 
-    mDetAptFEE = mParent->addWidget(cpp14::make_unique<WTable>());
-    mDetAptFEE->setHeaderCount(1);
-    mDetAptFEE->setWidth(Wt::WLength("90%"));
-    mDetAptFEE->toggleStyleClass("table-striped",true);
-
-    mAptAllEss = mParent->addWidget(cpp14::make_unique<WTable>());
-    mAptAllEss->setHeaderCount(1);
-    mAptAllEss->setWidth(Wt::WLength("90%"));
-    mAptAllEss->toggleStyleClass("table-striped",true);
 
     setMargin(20);
 }
@@ -154,7 +155,6 @@ void legend::afficheAptAllEss(){
             }
         }
 
-       // int nbCol=std::min((int O.size()),1)+std::min(T.size(),1)+std::min(TE.size(),1)+std::min(E.size(),1);
         int nbCol(4);
         int row(0),column(0);
         mAptAllEss->elementAt(row, 0)->setColumnSpan(nbCol);
@@ -169,7 +169,7 @@ void legend::afficheAptAllEss(){
                 mAptAllEss->elementAt(row, column)->addWidget(cpp14::make_unique<WText>(kv.first));
                 mAptAllEss->elementAt(row, column)->setStyleClass("O");
                 mAptAllEss->elementAt(row, column)->setToolTip(mGL->Dico()->accroEss2Nom(kv.first));
-               mAptAllEss->elementAt(row, column)->setContentAlignment(AlignmentFlag::Center);
+                mAptAllEss->elementAt(row, column)->setContentAlignment(AlignmentFlag::Center);
                 row++;
             }
             column++;
@@ -182,6 +182,11 @@ void legend::afficheAptAllEss(){
                 mAptAllEss->elementAt(row, column)->addWidget(cpp14::make_unique<WText>(kv.first));
                 //mAptAllEss->elementAt(row, column)->decorationStyle().setBackgroundColor(WColor(col.mR,col.mG,col.mB));
                 mAptAllEss->elementAt(row, column)->setToolTip(mGL->Dico()->accroEss2Nom(kv.first));
+                // pour le moment, si double aptitude, celle-ci est visible dans le tooltip
+                if (kv.second!=2) {
+                    mAptAllEss->elementAt(row, column)->setToolTip( mAptAllEss->elementAt(row, column)->toolTip()+ " - " +WString::fromUTF8(mDico->code2AptFull(kv.second)));
+                    mAptAllEss->elementAt(row, column)->decorationStyle().setForegroundColor(WColor("gray"));
+                }
                 mAptAllEss->elementAt(row, column)->setStyleClass("T");
                 mAptAllEss->elementAt(row, column)->setContentAlignment(AlignmentFlag::Center);
                 row++;
@@ -195,6 +200,11 @@ void legend::afficheAptAllEss(){
                 mAptAllEss->elementAt(row, column)->addWidget(cpp14::make_unique<WText>(kv.first));
                 mAptAllEss->elementAt(row, column)->setStyleClass("TE");
                 mAptAllEss->elementAt(row, column)->setToolTip(mGL->Dico()->accroEss2Nom(kv.first));
+                // pour le moment, si double aptitude, celle-ci est visible dans le tooltip
+                if (kv.second!=3) {
+                    mAptAllEss->elementAt(row, column)->setToolTip( mAptAllEss->elementAt(row, column)->toolTip()+ " - " +WString::fromUTF8(mDico->code2AptFull(kv.second)));
+                    mAptAllEss->elementAt(row, column)->decorationStyle().setForegroundColor(WColor("gray"));
+                }
                 mAptAllEss->elementAt(row, column)->setContentAlignment(AlignmentFlag::Center);
                 row++;
             }
@@ -207,6 +217,11 @@ void legend::afficheAptAllEss(){
                 mAptAllEss->elementAt(row, column)->addWidget(cpp14::make_unique<WText>(kv.first));
                 mAptAllEss->elementAt(row, column)->setStyleClass("E");
                 mAptAllEss->elementAt(row, column)->setToolTip(mGL->Dico()->accroEss2Nom(kv.first));
+                // pour le moment, si double aptitude, celle-ci est visible dans le tooltip
+                if (kv.second!=4) {
+                    mAptAllEss->elementAt(row, column)->setToolTip( mAptAllEss->elementAt(row, column)->toolTip()+ " - " +WString::fromUTF8(mDico->code2AptFull(kv.second)));
+                    mAptAllEss->elementAt(row, column)->decorationStyle().setForegroundColor(WColor("gray"));
+                }
                 mAptAllEss->elementAt(row, column)->setContentAlignment(AlignmentFlag::Center);
 
                 //WImage * i1 = new WImage("data/img/E.png",mAptAllEss->elementAt(row, column));

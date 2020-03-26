@@ -4,12 +4,16 @@
 #include <map>
 #include <string>
 #include <iostream>
+#include <fstream>
 #include <vector>
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/range/adaptor/map.hpp>
 #include "boost/filesystem.hpp"
+#include <unistd.h>
 
 enum TypeCarte {Apt, Potentiel, Station1, Habitats,NH,NT,Topo,AE,SS,ZBIO,CSArdenne,CSLorraine};
+
+std::string loadBDpath();
 
 TypeCarte str2TypeCarte(const std::string& str);
 

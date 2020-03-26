@@ -50,6 +50,7 @@ private:
     Wt::WContainerWidget     * mParent;
     groupLayers*mGL;
     Wt::WText                  *titre_;
+    cDicoApt * mDico;
 
 };
 

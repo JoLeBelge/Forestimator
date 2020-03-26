@@ -1,6 +1,6 @@
 #include "cdicoapt.h"
 
-std::string dirBD("/home/lisein/Documents/carteApt/tutoGDAL/carteApt/data/aptitudeEssDB.db");
+std::string dirBD("/home/lisein/Documents/carteApt/Forestimator/carteApt/data/aptitudeEssDB.db");
 
 cDicoApt::cDicoApt(std::string aBDFile):mBDpath(aBDFile)
 {
@@ -9,6 +9,7 @@ cDicoApt::cDicoApt(std::string aBDFile):mBDpath(aBDFile)
     rc = sqlite3_open(mBDpath.c_str(), &db_);
     if( rc ) {
         fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db_));
+          std::cout << " mBDpath " << mBDpath << std::endl;
     } else {
         // dico Ess Nom -- code
         sqlite3_stmt * stmt;
@@ -80,7 +81,16 @@ cDicoApt::cDicoApt(std::string aBDFile):mBDpath(aBDFile)
                 Dico_station[aA].emplace(std::make_pair(aB,aC));
             }
         }
+
+        // changer la requete en fonction de la machine sur laquelle est installé l'appli
+        char userName[20];
+        getlogin_r(userName,sizeof(userName));
+        std::string s(userName);
+        if (s=="lisein"){
+        SQLstring="SELECT Code,Dir2,Nom,Type,NomComplet FROM fichiersGIS;";
+        } else {
         SQLstring="SELECT Code,Dir,Nom,Type,NomComplet FROM fichiersGIS;";
+        }
         sqlite3_prepare( db_, SQLstring.c_str(), -1, &stmt, NULL );
         while(sqlite3_step(stmt) == SQLITE_ROW)
         {
@@ -213,13 +223,13 @@ cDicoApt::cDicoApt(std::string aBDFile):mBDpath(aBDFile)
     }
 
     std::cout << "\nDico code essence --> nom essence francais a "<< Dico_code2NomFR.size() << " elements" << std::endl;
-    std::cout << "Dico code NH --> nom NH a "<< Dico_NH.size() << " elements" << std::endl;
+    /*std::cout << "Dico code NH --> nom NH a "<< Dico_NH.size() << " elements" << std::endl;
     std::cout << "Dico code NT --> nom NT a "<< Dico_NT.size() << " elements" << std::endl;
     std::cout << "Dico code NTNH --> nom NH a "<< Dico_code2NTNH.size() << " elements" << std::endl;
     std::cout << "Dico code Zbio --> nom Zone bioclim a "<< Dico_ZBIO.size() << " elements" << std::endl;
     std::cout << "Dico code station --> nom station a "<< Dico_station.size() << " elements" << std::endl;
     std::cout << "Dico code couche SIG --> chemin d'accès a "<< Dico_GISfile.size() << " elements" << std::endl;
-    std::cout << "Dico aptitude --> code aptitude a "<< Dico_Apt.size() << " elements" << std::endl;
+    std::cout << "Dico aptitude --> code aptitude a "<< Dico_Apt.size() << " elements" << std::endl;*/
     std::cout << "done" << std::endl ;
 
     /*for (auto & p : colors){
@@ -373,7 +383,7 @@ std::map<int,color> cDicoApt::getDicoRasterCol(cKKCS * aKK){
         if (aKK->IsFact()){ SQLstring="SELECT DISTINCT cat_id,col FROM dico_echelleFact;";}
         if (aKK->IsPot()){ SQLstring="SELECT DISTINCT N_cat_pot,col FROM dico_echellePotentiel;";}
         if (aKK->IsHabitat()){ SQLstring="SELECT id,col FROM dico_habitat;";}
-        std::cout << SQLstring << std::endl;
+
         sqlite3_prepare( db_, SQLstring.c_str(), -1, &stmt, NULL );//preparing the statement
         while(sqlite3_step(stmt) == SQLITE_ROW)
         {
@@ -655,7 +665,7 @@ cKKCS::cKKCS(std::string aCode,cDicoApt * aDico):mCode(aCode),mNom(aDico->codeKK
 
     if(!mHabitat){
         mEchelleCS=aDico->getKKCS(mNomCol);
-        std::cout << this->summary() << std::endl;
+        //std::cout << this->summary() << std::endl;
     } else {
         mHabitats=aDico->getHabitatCS(mNomCol);
     }
@@ -717,4 +727,22 @@ TypeCarte str2TypeCarte(const std::string& str)
     else if(str == "ZBIO") return ZBIO;
     else if(str == "CSArdenne") return CSArdenne;
     else if(str == "CSLorraine") return CSLorraine;
+}
+
+
+std::string loadBDpath()
+{
+    std::string aRes;
+    // changer chemin d'accès en fonction de la machine sur laquelle tourne l'app. pour pas devoir modifier en local et se priver des avantages de git
+    char userName[20];
+    getlogin_r(userName,sizeof(userName));
+    std::string s(userName);
+    if (s=="lisein"){
+    aRes="/home/lisein/Documents/carteApt/Forestimator/carteApt/data/aptitudeEssDB.db";
+    } else {
+    aRes="/data1/Forestimator/carteApt/data/aptitudeEssDB.db";
+    }
+    //std::ifstream File("./data/BDpath.txt");
+    //File >> aRes;
+    return aRes;
 }
