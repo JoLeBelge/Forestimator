@@ -101,7 +101,6 @@ class cEss
 public:
     cEss(std::string aCodeEs,cDicoApt * aDico);
 
-
     //effectue la confrontation Apt Zbio et AptHydroTrophiue si hierarchique = true, sinon renvoie l'aptitude de l'écogramme
     int getApt(int aCodeNT,int aCodeNH, int aZbio,bool hierachique=true);
     // retourne l'aptitude global de la zone bioclimatique

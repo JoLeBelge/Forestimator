@@ -219,7 +219,8 @@ cDicoApt::cDicoApt(std::string aBDFile):mBDpath(aBDFile)
             }
         }
 
-
+        sqlite3_finalize(stmt);
+        sqlite3_close(db_);
     }
 
     std::cout << "\nDico code essence --> nom essence francais a "<< Dico_code2NomFR.size() << " elements" << std::endl;
@@ -261,6 +262,8 @@ std::map<int,std::map<std::string,int>> cDicoApt::getFEEApt(std::string aCodeEs)
                 }
             }
         }
+        sqlite3_finalize(stmt);
+        sqlite3_close(db_);
 
     }
     return aRes;
@@ -288,6 +291,8 @@ std::map<int,int> cDicoApt::getZBIOApt(std::string aCodeEs){
                 }
             }
         }
+        sqlite3_finalize(stmt);
+        sqlite3_close(db_);
     }
     return aRes;
 }
