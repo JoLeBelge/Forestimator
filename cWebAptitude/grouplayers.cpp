@@ -4,7 +4,7 @@
 const TypeClassifST cl[] = { FEE, CS };
 std::vector<std::string> classes = {"Fichier Ecologique des Essences", "Catalogue des Stations"};
 
-groupLayers::groupLayers(cDicoApt * aDico, WContainerWidget *parent, WContainerWidget *infoW):mDico(aDico),mTypeClassifST(FEE),mInfoW(infoW)
+groupLayers::groupLayers(cDicoApt * aDico, WContainerWidget *parent, WContainerWidget *infoW, WOpenLayers *aMap):mDico(aDico),mTypeClassifST(FEE),mInfoW(infoW),mMap(aMap),mParent(parent)
 {
     setOverflow(Wt::Overflow::Auto);
     setPadding(20);
@@ -131,10 +131,8 @@ void groupLayers::changeClassClick(WText *t)
 }
 
 void groupLayers::extractInfo(double x, double y){
-    // vider la fenetre info. le clear() ne suffit pas
-    /*for (auto & w : mInfoW->children()){
-    mInfoW->removeChild(w);
-    }*/
+
+
     mStation->vider();
     mLegend->vider();
 
@@ -158,6 +156,18 @@ void groupLayers::extractInfo(double x, double y){
     // tableau des aptitudes pour toutes les essences
     mLegend->afficheAptAllEss();
 
+    Wt::WAnimation animation(Wt::AnimationEffect::Fade,
+                             Wt::TimingFunction::Linear,
+                             1000);
+
+    mLegend->animateShow(animation); // marche pas...
+    mMap->animateShow(animation);
+
+    // je voulais faire une animation du curseur, echec. mais j'utiliser les animationShow maintenant
+    //usleep(10000);
+    //mMap->decorationStyle().setCursor(Cursor::Arrow);
+    //mParent->decorationStyle().setCursor(Cursor::Auto);
+    //mParent->decorationStyle().set
 }
 
 std::map<std::string,int> groupLayers::apts(){

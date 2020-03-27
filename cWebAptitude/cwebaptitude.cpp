@@ -62,7 +62,7 @@ cWebAptitude::cWebAptitude(Wt::WApplication* app)
 
     // creation de l'objet grouplayer
     //mGroupL =addWidget(cpp14::make_unique<groupLayers>(mDico,this));
-    auto groupL = Wt::cpp14::make_unique<groupLayers>(mDico,this,infoW_);
+    auto groupL = Wt::cpp14::make_unique<groupLayers>(mDico,this,infoW_,mMap);
     mGroupL = groupL.get();
     // je ne parviens pas à faire le connect correctement, je dois me tromper quelque part.
     mGroupL->focusMap().connect(mMap,&WOpenLayers::giveFocus);

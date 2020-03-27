@@ -114,7 +114,6 @@ void legend::detailCalculAptFEE(ST * aST){
     }
 }
 
-
 void legend::afficheLegendeIndiv(Layer * l){
 
     if (l->Type()!=Externe){

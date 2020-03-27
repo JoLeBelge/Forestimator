@@ -8,7 +8,9 @@
 #include "layer.h"
 #include "legend.h"
 #include <fstream>
+#include "wopenlayers.h"
 
+class WOpenLayers;
 class Layer;
 class groupLayers;
 class legend;
@@ -53,7 +55,7 @@ private:
 class groupLayers: public WContainerWidget
 {
 public:
-    groupLayers(cDicoApt * aDico,WContainerWidget *parent,WContainerWidget *infoW);
+    groupLayers(cDicoApt * aDico,WContainerWidget *parent,WContainerWidget *infoW,WOpenLayers * aMap);
     void clickOnName(std::string aCode);
     void changeClassClick(WText *t);
     void update(std::string aCode);
@@ -100,6 +102,11 @@ private:
     Wt::Signal<bool> focusOnMap_;
 
     WContainerWidget * mInfoW;
+
+    // pour changer le curseur quand on clique
+    WOpenLayers * mMap;
+    // bof finalement c'est mieux le conteneur parent
+    Wt::WContainerWidget     * mParent;
 };
 
 #endif // GROUPLAYERS_H
