@@ -327,7 +327,10 @@ std::map<int,std::string> cDicoApt::getDicoRaster(std::string aCode){
                 aRes.emplace(std::make_pair(aA,aB));
             }
         }
+        sqlite3_finalize(stmt);
+        sqlite3_close(db_);
     }
+
     return aRes;
 }
 
@@ -366,6 +369,8 @@ std::map<int,color> cDicoApt::getDicoRasterCol(std::string aCode){
                 aRes.emplace(std::make_pair(aA,getColor(aB)));
             }
         }
+        sqlite3_finalize(stmt);
+        sqlite3_close(db_);
     }
     return aRes;
 }
@@ -394,7 +399,8 @@ std::map<int,color> cDicoApt::getDicoRasterCol(cKKCS * aKK){
                 aRes.emplace(std::make_pair(aA,getColor(aB)));
             }
         }
-
+        sqlite3_finalize(stmt);
+        sqlite3_close(db_);
     }
     return aRes;
 }
@@ -423,6 +429,8 @@ std::map<int,std::map<int,int>> cDicoApt::getCSApt(std::string aCodeEs){
                 }
             }
         }
+        sqlite3_finalize(stmt);
+        sqlite3_close(db_);
     }
     return aRes;
 }
@@ -449,6 +457,8 @@ std::map<int,std::map<int,int>> cDicoApt::getKKCS(std::string aColName){
                 }
             }
         }
+        sqlite3_finalize(stmt);
+        sqlite3_close(db_);
     }
     return aRes;
 }
@@ -505,6 +515,8 @@ std::map<int,std::map<int,std::vector<std::string>>> cDicoApt::getHabitatCS(std:
                 }
             }
         }
+        sqlite3_finalize(stmt);
+        sqlite3_close(db_);
     }
     return aRes;
 }
@@ -557,6 +569,8 @@ std::map<int,std::map<int,int>> cDicoApt::getRisqueTopo(std::string aCodeEs){
                     aRes[10].emplace(std::make_pair(topo+1,codeRisque));
                 }
         }
+        sqlite3_finalize(stmt);
+        sqlite3_close(db_);
     }
     return aRes;
 }

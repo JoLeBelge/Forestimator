@@ -204,4 +204,5 @@ mZBIO=666;
 mTOPO=666;
 mActiveEss=0;
 HaveEss=0;
+mSt=666;
 }
