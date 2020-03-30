@@ -40,6 +40,7 @@ class Layer
 {
 public:
     Layer(groupLayers * aGroupL, std::string aCode,WText * PWText,TypeLayer aType=Apti);
+    Layer(groupLayers * aGroupL, cEss aEss ,WText * PWText);
 
     //void clickOnName(std::string aCode);
     void displayLayer();

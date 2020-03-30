@@ -28,11 +28,11 @@ Layer::Layer(groupLayers * aGroupL, std::string aCode, WText *PWText, TypeLayer 
         mText->setText(mLabel);
         mPathTif=mKK->NomCarte();
         if (mKK->IsHabitat()){
-             mDicoVal=mDico->id2Hab();
+            mDicoVal=mDico->id2Hab();
         } else if (mKK->IsFact()){
             mDicoVal=mDico->echelleFactNom() ;
         } else if (mKK->IsPot()){
-             mDicoVal=mDico->echellePotCat() ;
+            mDicoVal=mDico->echellePotCat() ;
         }
         mDicoCol=mKK->getDicoCol();
         break;
@@ -46,7 +46,7 @@ Layer::Layer(groupLayers * aGroupL, std::string aCode, WText *PWText, TypeLayer 
         mDicoCol=mRI->getDicoCol();
         break;
     case Externe:
-       if (mCode=="IGN"){
+        if (mCode=="IGN"){
             mLabel="Carte topographique IGN";
             mText->setText(mLabel);
             mPathTif="";
@@ -67,6 +67,25 @@ Layer::Layer(groupLayers * aGroupL, std::string aCode, WText *PWText, TypeLayer 
 
     //mText->addChild();
 
+    setActive(false);
+}
+
+Layer::Layer(groupLayers * aGroupL, cEss aEss, WText *PWText):
+    mDico(aGroupL->Dico())
+  ,mGroupL(aGroupL)
+  ,mCode(aEss.Code())
+  ,mText(PWText)
+  ,mType(Apti)
+  ,mDicoVal(0)
+  ,mDicoCol(0)
+{
+    // construction de l'essence
+    mEss= new cEss(aEss);
+    mLabel=mEss->Code() + " - "+ mEss->Nom();
+    mText->setText(mLabel);
+    mDicoVal=mDico->code2AptFull();
+    mDicoCol=mDico->codeApt2col();
+    mText->clicked().connect(std::bind(&groupLayers::clickOnName, mGroupL, mCode));
     setActive(false);
 }
 
@@ -94,7 +113,7 @@ void Layer::displayLayer(){
     default:
     {
         std::stringstream ss;
-        std::string aFileIn(mDico->Files()->at("addOLraster"));
+        std::string aFileIn(mDico->File("addOLraster"));
         std::ifstream in(aFileIn);
         std::string aTmp(aFileIn+".tmp");
         std::ofstream out(aTmp);
@@ -147,19 +166,19 @@ std::vector<std::string> Layer::displayInfo(double x, double y){
     std::string val("");
     // on va affichier uniquement les informations de la couches d'apt qui est sélectionnée, et de toutes les couches thématiques (FEE et CS)
     if (mType==KK | mType==Thematique | this->IsActive()){
-    // 1 extraction de la valeur
-    int aVal=getValue(x,y);
-    if (mCode=="NT"){ mGroupL->mStation->mNT=aVal;}
-    if (mCode=="NH"){ mGroupL->mStation->mNH=aVal;}
-    if (mCode=="ZBIO"){ mGroupL->mStation->mZBIO=aVal;}
-    if (mCode=="Topo"){ mGroupL->mStation->mTOPO=aVal;}
-    if (mCode.substr(0,2)=="CS" && aVal!=0){
-        //std::cout << "totoooo \n\n\n" << std::endl;
-        mGroupL->mStation->mSt=aVal;}
-    //std::cout << " la valeur de la couche " << mLabel << " est de " << aVal << std::endl;
-    if(mDicoVal->find(aVal)!=mDicoVal->end()){
-        val=mDicoVal->at(aVal);
-    }
+        // 1 extraction de la valeur
+        int aVal=getValue(x,y);
+        if (mCode=="NT"){ mGroupL->mStation->mNT=aVal;}
+        if (mCode=="NH"){ mGroupL->mStation->mNH=aVal;}
+        if (mCode=="ZBIO"){ mGroupL->mStation->mZBIO=aVal;}
+        if (mCode=="Topo"){ mGroupL->mStation->mTOPO=aVal;}
+        if (mCode.substr(0,2)=="CS" && aVal!=0){
+            //std::cout << "totoooo \n\n\n" << std::endl;
+            mGroupL->mStation->mSt=aVal;}
+        //std::cout << " la valeur de la couche " << mLabel << " est de " << aVal << std::endl;
+        if(mDicoVal->find(aVal)!=mDicoVal->end()){
+            val=mDicoVal->at(aVal);
+        }
     }
 
     if (mType==Apt && this->IsActive()){
@@ -176,36 +195,36 @@ int Layer::getValue(double x, double y){
 
     int aRes(0);
     if (mType!=Externe){
-    // gdal
-    GDALAllRegister();
+        // gdal
+        GDALAllRegister();
 
-    mGDALDat = (GDALDataset *) GDALOpen( getPathTif().c_str(), GA_ReadOnly );
-    if( mGDALDat == NULL )
-    {
-        std::cout << "je n'ai pas lu l'image " << getPathTif() << std::endl;
-    } else {
-    mBand = mGDALDat->GetRasterBand( 1 );
+        mGDALDat = (GDALDataset *) GDALOpen( getPathTif().c_str(), GA_ReadOnly );
+        if( mGDALDat == NULL )
+        {
+            std::cout << "je n'ai pas lu l'image " << getPathTif() << std::endl;
+        } else {
+            mBand = mGDALDat->GetRasterBand( 1 );
 
-    double transform[6];
-    mGDALDat->GetGeoTransform(transform);
-    double xOrigin = transform[0];
-    double yOrigin = transform[3];
-    double pixelWidth = transform[1];
-    double pixelHeight = -transform[5];
+            double transform[6];
+            mGDALDat->GetGeoTransform(transform);
+            double xOrigin = transform[0];
+            double yOrigin = transform[3];
+            double pixelWidth = transform[1];
+            double pixelHeight = -transform[5];
 
-    int col = int((x - xOrigin) / pixelWidth);
-    int row = int((yOrigin - y ) / pixelHeight);
+            int col = int((x - xOrigin) / pixelWidth);
+            int row = int((yOrigin - y ) / pixelHeight);
 
-    if (col<mBand->GetXSize() && row < mBand->GetYSize()){
-    float *scanPix;
-    scanPix = (float *) CPLMalloc( sizeof( float ) * 1 );
-    // lecture du pixel
-    mBand->RasterIO( GF_Read, col, row, 1, 1, scanPix, 1,1, GDT_Float32, 0, 0 );
-    aRes=scanPix[0];
+            if (col<mBand->GetXSize() && row < mBand->GetYSize()){
+                float *scanPix;
+                scanPix = (float *) CPLMalloc( sizeof( float ) * 1 );
+                // lecture du pixel
+                mBand->RasterIO( GF_Read, col, row, 1, 1, scanPix, 1,1, GDT_Float32, 0, 0 );
+                aRes=scanPix[0];
 
-    GDALClose( mGDALDat );
-    }
-    }
+                GDALClose( mGDALDat );
+            }
+        }
     }
     return aRes;
 }

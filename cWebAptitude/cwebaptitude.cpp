@@ -18,7 +18,7 @@ cWebAptitude::cWebAptitude(Wt::WApplication* app)
     WContainerWidget * titreCont_ = titreCont.get();
        WText * titre = titreCont_->addWidget(cpp14::make_unique<WText>("Stations forestières et Aptitude des Essences"));
     titreCont_->setContentAlignment(AlignmentFlag::Center| AlignmentFlag::Middle);
-    titre->decorationStyle().font().setSize(FontSize::XLarge);
+    titre->decorationStyle().font().setSize(FontSize::Medium);
     titre->decorationStyle().setForegroundColor(WColor(192,192,192));
     // le set padding ne fonctionne que si je désactive le inline
     titre->setInline(0);
@@ -27,10 +27,9 @@ cWebAptitude::cWebAptitude(Wt::WApplication* app)
     auto pane = Wt::cpp14::make_unique<Wt::WContainerWidget>();
     WContainerWidget * pane_ = pane.get();
 
-    Wt::WLayout * toto;
     auto hLayout = pane_->setLayout(Wt::cpp14::make_unique<Wt::WHBoxLayout>());
 
-    pane_->setHeight("65%"); // oui ça ca marche bien! reste plus qu'à empêcher la carte de s'escamoter.
+    pane_->setHeight("60%"); // oui ça ca marche bien! reste plus qu'à empêcher la carte de s'escamoter.
     // non pas d'overflow pour la carte, qui est dans pane_
     pane_->setOverflow(Wt::Overflow::Visible);
 
@@ -66,6 +65,9 @@ cWebAptitude::cWebAptitude(Wt::WApplication* app)
     mGroupL = groupL.get();
     // je ne parviens pas à faire le connect correctement, je dois me tromper quelque part.
     mGroupL->focusMap().connect(mMap,&WOpenLayers::giveFocus);
+
+    // maintenant que tout les objets sont crées, je ferme la connection avec la BD sqlite3, plus propre
+    mDico->closeConnection();
 
     mMap->clicked().connect(mMap->slot);
     mMap->xy().connect(std::bind(&groupLayers::extractInfo,mGroupL, std::placeholders::_1,std::placeholders::_2));

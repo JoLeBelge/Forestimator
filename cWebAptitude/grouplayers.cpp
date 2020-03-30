@@ -68,8 +68,11 @@ groupLayers::groupLayers(cDicoApt * aDico, WContainerWidget *parent, WContainerW
         cEss ess(pair.first,mDico);
         if (ess.hasApt()){
             WText *label;
+
             label = mEssTable->elementAt(row,col)->addWidget(cpp14::make_unique<WText>(""));
-            Layer aL(this,pair.first,label);
+            //Layer aL(this,pair.first,label);
+            // constructeur pour type Apti pour ne pas créer deux fois l'essence d'affilé, ouverture et fermeture de la DB un peu sensible
+            Layer aL(this,ess,label);
             mVLs.push_back(aL);
             row++;
             if (row % 17 == 0){col++;row=0;}

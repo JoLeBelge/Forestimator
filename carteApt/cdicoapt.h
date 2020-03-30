@@ -1,6 +1,10 @@
 #ifndef CDICOAPT_H
 #define CDICOAPT_H
 #include <sqlite3.h>
+//#include <Wt/Dbo/backend/Sqlite3.h>
+//#include <Wt/Dbo/Session.h>
+//#include <Wt/Dbo/Dbo.h>
+//#include <Wt/Dbo/SqlConnection.h>
 #include <map>
 #include <string>
 #include <iostream>
@@ -10,6 +14,8 @@
 #include <boost/range/adaptor/map.hpp>
 #include "boost/filesystem.hpp"
 #include <unistd.h>
+
+//using namespace Wt::Dbo;
 
 enum TypeCarte {Apt, Potentiel, Station1, Habitats,NH,NT,Topo,AE,SS,ZBIO,CSArdenne,CSLorraine};
 
@@ -184,6 +190,7 @@ class cDicoApt
 public:
     // charger les dicos depuis BD SQL
     cDicoApt(std::string aBDFile);
+    void closeConnection();
     std::map<int,std::string> * ZBIO(){return  &Dico_ZBIO;}
     std::map<std::string,std::string>  * Files(){return  &Dico_GISfile;}
     // code carte vers type carte code : NH.tif
@@ -268,6 +275,12 @@ public:
     std::string accroEss2Nom(std::string aCode){
         std::string aRes("");
         if (Dico_code2NomFR.find(aCode)!=Dico_code2NomFR.end()){aRes=Dico_code2NomFR.at(aCode);}
+        return aRes;
+    }
+
+    std::string File(std::string aCode){
+        std::string aRes("");
+        if (Dico_GISfile.find(aCode)!=Dico_GISfile.end()){aRes=Dico_GISfile.at(aCode);}
         return aRes;
     }
 
@@ -371,7 +384,7 @@ public:
     }
 private:
     std::string mBDpath;
-    sqlite3 *db_;
+
     //code ess vers nom français
     std::map<std::string,std::string> Dico_code2NomFR;
     // code essence 2 code groupe "feuillus" vs "Resineux
@@ -412,5 +425,8 @@ private:
     std::map<int,std::string>  Dico_topo;
 
     std::map<int,color> Dico_codeApt2col;
+
+    sqlite3 *db_;
+
 };
 #endif // CDICOAPT_H

@@ -9,9 +9,11 @@ QT += sql
 QMAKE_CC = gcc-7
 QMAKE_CXX = g++-7
 
-LIBS = -lgdal -lwthttp -lwt -lboost_system -lboost_iostreams -lboost_thread -lboost_filesystem -lboost_program_options -lwtdbo -lwtdbosqlite3 -lcrypt -pthread
+#
+LIBS = -lgdal -lwthttp -lwt -lboost_system -lboost_iostreams -lboost_thread -lboost_filesystem -lboost_program_options -lcrypt -pthread -lwtdbo -lwtdbosqlite3
 
 INCLUDEPATH += $$PWD/../carteApt/
+
 
 
 contains(pl,serveur) {
@@ -19,7 +21,7 @@ LIBS += -L$$PWD/usr/include/gdal/ -lgdal
 INCLUDEPATH += $$PWD/../../../usr/include/gdal/
 DEPENDPATH += $$PWD/../../../usr/include/gdal/
 # sur le serveur je dois lui préciser ou est cette librairie
-LIBS += -L$$PWD/../../../usr/lib/x86_64-linux-gnu/ -lsqlite3
+LIBS += -L$$PWD/../../../usr/lib/x86_64-linux-gnu/ -lsqlite3 SQLITE_THREADSAFE=1
 } else {
 LIBS += -L$$PWD/usr/include/gdal/ -lgdal
 INCLUDEPATH += $$PWD/../../../../../../usr/include/gdal/

@@ -4,7 +4,7 @@ WOpenLayers::WOpenLayers(WContainerWidget *parent, cDicoApt *aDico):xy_(this,"1.
 {
   resize(640, 480);
   setId("map");//sans ça le script js ne sert à rien car ne vise aucun objet cible
-  std::ifstream t(mDico->Files()->at("initOL"));
+  std::ifstream t(mDico->File("initOL"));
   std::stringstream ss;
   ss << t.rdbuf();
   doJavaScript(ss.str());

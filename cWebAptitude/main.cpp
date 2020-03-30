@@ -124,6 +124,8 @@ std::unique_ptr<WApplication> createApplication(const WEnvironment& env)
     //Wt::WLeafletMap aLM;
     //aLM.panTo();
 
+
+
     return app;
 }
 
