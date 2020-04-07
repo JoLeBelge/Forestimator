@@ -1,6 +1,10 @@
 build-carteApt/
+carteApt/data/aptitudeEssDB.db-wal
+carteApt/data/aptitudeEssDB.db-shm
 build-WebAptitude/Tuiles
 build-WebAptitude/wopenlayers.o
+build-WebAptitude/parcellaire.o
+build-WebAptitude/wt_config.xmlOLD
 build-WebAptitude/cwebaptitude.o
 build-WebAptitude/cdicoapt.o
 build-WebAptitude/grouplayers.o
