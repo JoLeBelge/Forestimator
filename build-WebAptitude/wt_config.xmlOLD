@@ -1,6 +1,0 @@
-
- <server>
-<application-settings>
-<progressive-bootstrap>true</progressive-bootstrap>
-</application-settings>
- </server>
