@@ -22,7 +22,7 @@ cWebAptitude::cWebAptitude(Wt::WApplication* app)
     titre->decorationStyle().setForegroundColor(WColor(192,192,192));
     // le set padding ne fonctionne que si je désactive le inline
     titre->setInline(0);
-    titre->setPadding(25,Wt::Side::Bottom | Wt::Side::Top);
+    titre->setPadding(0,Wt::Side::Bottom | Wt::Side::Top);
 
     auto pane = Wt::cpp14::make_unique<Wt::WContainerWidget>();
     WContainerWidget * pane_ = pane.get();
@@ -36,8 +36,29 @@ cWebAptitude::cWebAptitude(Wt::WApplication* app)
     auto infoW = Wt::cpp14::make_unique<Wt::WContainerWidget>();
     Wt::WContainerWidget * infoW_ = infoW.get();
     infoW_->setOverflow(Wt::Overflow::Auto);
-     infoW_->setWidth("30%");
-     //infoW_->setHeight("50%");
+    infoW_->setWidth("30%");
+
+    // creation d'un menum popup
+
+    // Create a stack where the contents will be located.
+    auto contents = Wt::cpp14::make_unique<Wt::WStackedWidget>();
+
+    Wt::WMenu *menu = infoW_->addNew<Wt::WMenu>(contents.get());
+    menu->setStyleClass("nav nav-pills nav-stacked");
+    menu->setWidth("100%");
+
+    // Add menu items using the default lazy loading policy.
+
+    auto legendCont = Wt::cpp14::make_unique<Wt::WContainerWidget>();
+    auto PACont = Wt::cpp14::make_unique<Wt::WContainerWidget>();
+    //WMenuItem * Wt::WMenu::addItem ( const WString & text, T * target, void(V::*)() method )
+    //WMenuItem * legendMenuIt = menu->addItem("Légende", Wt::cpp14::make_unique<Wt::WContainerWidget>());
+
+
+
+    //menu->addItem("Téléchargement", Wt::cpp14::make_unique<Wt::WTextArea>("Téléchargement : to come soon"));
+    infoW_->addWidget(std::move(contents));
+
     auto map = Wt::cpp14::make_unique<WOpenLayers>(this,mDico);
     mMap= map.get();
     mMap->setWidth("70%");
@@ -61,10 +82,18 @@ cWebAptitude::cWebAptitude(Wt::WApplication* app)
 
     // creation de l'objet grouplayer
     //mGroupL =addWidget(cpp14::make_unique<groupLayers>(mDico,this));
-    auto groupL = Wt::cpp14::make_unique<groupLayers>(mDico,this,infoW_,mMap);
+
+
+    //auto groupL = Wt::cpp14::make_unique<groupLayers>(mDico,this,infoW_,mMap);
+    auto groupL = Wt::cpp14::make_unique<groupLayers>(mDico,this,legendCont.get(),mMap);
+    WMenuItem * legendMenuIt = menu->addItem("Légende", std::move(legendCont));
     mGroupL = groupL.get();
+    auto uPtrPA = Wt::cpp14::make_unique<parcellaire>(PACont.get(),mGroupL);
+    mPA = uPtrPA.get();
     // je ne parviens pas à faire le connect correctement, je dois me tromper quelque part.
     mGroupL->focusMap().connect(mMap,&WOpenLayers::giveFocus);
+
+    WMenuItem * PAmenuIt = menu->addItem("Plan d'amménagement", std::move(PACont));
 
     // maintenant que tout les objets sont crées, je ferme la connection avec la BD sqlite3, plus propre
     mDico->closeConnection();

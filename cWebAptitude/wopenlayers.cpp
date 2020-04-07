@@ -17,10 +17,10 @@ void WOpenLayers::setJS_click(){
     slot.setJavaScript
            ("function getXY(evt){"
             "var e = window.event;"
-            "console.log('window event '+ e.x + ',' +e.y);"
+            //"console.log('window event '+ e.x + ',' +e.y);"
             "var f = map.getEventCoordinate(e);"
            // "var n = f[0];"
-            "console.log('suspence...'+f);"
+           // "console.log('suspence...'+f);"
             "if (f != null) {"
             + xy_.createCall({"f[0]","f[1]"}) +
             "}}"

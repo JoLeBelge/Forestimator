@@ -487,6 +487,50 @@ void cApliCarteApt::toPol(std::string input, std::string output)
     GDALClose( poDS );
 }
 
+
+void cApliCarteApt::shptoGeoJSON(std::string input, std::string output)
+{
+    std::cout << " shptoGeoJSON " << std::endl;
+    const char *inputPath=input.c_str();
+    const char *outPath=output.c_str();
+    //GDALDataset *pInputRaster;
+    GDALDriver  *shpDriver,*jsonDriver;
+    GDALAllRegister();
+
+    //OGRSpatialReference  * spatialReference=new OGRSpatialReference;
+    //spatialReference->importFromEPSG(31370);
+
+    // datasource
+
+    jsonDriver =GetGDALDriverManager()->GetDriverByName("GeoJSON");
+
+    if( jsonDriver == NULL )
+    {
+        printf( "%s driver not available.\n", "GeoJSON" );
+        exit( 1 );
+    }
+
+    GDALDataset * DS;
+
+    //DS = GDALOpen( inputPath, GDAL_OF_VECTOR, NULL, NULL, NULL );
+    DS =  (GDALDataset*) GDALOpenEx( inputPath, GDAL_OF_VECTOR, NULL, NULL, NULL );
+    if( DS == NULL )
+    {
+        printf( "Open failed.\n" );
+        exit( 1 );
+    }
+    char **papszOptions = NULL;
+
+    GDALDataset * DS2;
+    DS2 = jsonDriver->CreateCopy(outPath, DS, FALSE, papszOptions,NULL, NULL );
+
+
+    GDALClose( DS );
+    GDALClose( DS2 );
+
+}
+
+
 void cApliCarteApt::toPNG(std::string input, std::string output,TypeCarte aType){
     //std::cout << " to png " << std::endl;
     const char *inputPath=input.c_str();

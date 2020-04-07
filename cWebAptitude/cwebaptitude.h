@@ -2,6 +2,7 @@
 #define CWEBAPTITUDE_H
 
 #include "grouplayers.h"
+#include "parcellaire.h"
 #include <Wt/WContainerWidget.h>
 #include <Wt/WVBoxLayout.h>
 #include <Wt/WHBoxLayout.h>
@@ -11,6 +12,8 @@
 #include <Wt/WWidget.h>
 #include <Wt/WTable.h>
 #include <Wt/WLayout.h>
+#include <Wt/WMenu.h>
+#include <Wt/WTextArea.h>
 //#include <Wt/WLabel.h>
 #include "wopenlayers.h"
 #include "cdicoapt.h"
@@ -51,6 +54,7 @@ private:
  // Wt::Signal<std::string> changeEss_;
   //std::vector<WText *> essLabels_; // ce sont les labels qui sont dans le tableau
     groupLayers * mGroupL;
+    parcellaire * mPA;
 
 
 };

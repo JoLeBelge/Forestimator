@@ -55,9 +55,21 @@ source.changed();
 source.refresh();
 */
 // ol n'aime pas que je fasse une liste de plusieur groupe de couche, mais un seul groupe ça fonctionne bien.
+
+if (typeof parcellaire !== 'undefined') {
+    // the variable is defined
+    groupe = new ol.layer.Group({
+		'title': 'parcellaire',
+		attributions: 'Gembloux Agro-Bio Tech',
+		 layers:[apt2, parcellaire]});
+} else {
 groupe = new ol.layer.Group({
 		'title': 'aptitude',
 		attributions: 'Gembloux Agro-Bio Tech',
 		layers:[IGN, apt2, communes]});
 IGN.setVisible(false);
+}
 map.setLayerGroup(groupe);
+
+
+

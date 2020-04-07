@@ -152,6 +152,7 @@ void Layer::displayLayer(){
 
         in.open(aFileIn+".tmp");
         ss << in.rdbuf();
+        in.close();
         mText->doJavaScript(ss.str());
 
         break;
@@ -215,6 +216,9 @@ int Layer::getValue(double x, double y){
             int col = int((x - xOrigin) / pixelWidth);
             int row = int((yOrigin - y ) / pixelHeight);
 
+            //std::cout << " x : " << x << " x Origin " << xOrigin << " pixelwidth " << pixelWidth << " col " << col << std::endl;
+            //std::cout << " y : " << y << " y Origin " << yOrigin << " pixelHeigh " << pixelHeight <<  " row " << row << std::endl;
+
             if (col<mBand->GetXSize() && row < mBand->GetYSize()){
                 float *scanPix;
                 scanPix = (float *) CPLMalloc( sizeof( float ) * 1 );
@@ -228,6 +232,86 @@ int Layer::getValue(double x, double y){
     }
     return aRes;
 }
+
+std::map<std::string,int> Layer::computeStatOnPolyg(OGRGeometry *poGeom){
+     std::cout << " groupLayers::computeStatOnPolyg " << std::endl;
+    std::map<std::string,int> aRes;
+
+    if (mType!=Externe){
+        // préparation du containeur du résultat
+        for (auto &kv : *mDicoVal){
+           aRes.emplace(std::make_pair(kv.second,0));
+        }
+        int nbPix(0);
+
+        OGREnvelope ext;
+        poGeom->getEnvelope(&ext);
+        double width((ext.MaxX-ext.MinX)), height((ext.MaxY-ext.MinY));
+        // std::cout << " x " << width<< " y " << height << std::endl;
+
+        // gdal
+        GDALAllRegister();
+        mGDALDat = (GDALDataset *) GDALOpen( getPathTif().c_str(), GA_ReadOnly );
+        if( mGDALDat == NULL )
+        {
+            std::cout << "je n'ai pas lu l'image " << getPathTif() << std::endl;
+        } else {
+            mBand = mGDALDat->GetRasterBand( 1 );
+
+            double transform[6];
+            mGDALDat->GetGeoTransform(transform);
+            double xOrigin = transform[0];
+            double yOrigin = transform[3];
+            double pixelWidth = transform[1];
+            double pixelHeight = -transform[5];
+
+            //determine dimensions of the tile
+            int xSize = round(width/pixelWidth);
+            int ySize = round(height/pixelHeight);
+            int xOffset = int((ext.MinX - xOrigin) / pixelWidth);
+            int yOffset = int((yOrigin - ext.MaxY ) / pixelHeight);
+
+            std::cout << " xSize " << xSize << " , ySize " << ySize << " xOffset " << xOffset << " yOffset " << yOffset << std::endl;
+
+            float *scanline;
+            scanline = (float *) CPLMalloc( sizeof( float ) * xSize );
+            // boucle sur chaque ligne
+            for ( int row = 0; row < ySize; row++ )
+            {
+                // lecture
+                mBand->RasterIO( GF_Read, xOffset, row+yOffset, xSize, 1, scanline, xSize,1, GDT_Float32, 0, 0 );
+                // boucle sur scanline et garder les pixels qui sont dans le polygone
+                for (int col = 0; col <  xSize; col++)
+                {
+                    double posX(ext.MinX+col*pixelWidth),posY(ext.MaxY-row*pixelWidth);
+                    OGRPoint op1(posX,posY);
+                    if ( op1.Within(poGeom)){
+                        //std::cout << "j'ai un pixel dans le polygone " << std::endl;
+                         double aVal=scanline[ col ];
+                         if (mDicoVal->find(aVal)!=mDicoVal->end()){
+                             // et les no data dans tout ça??? il faut les prendre en compte également! les ajouter dans le dictionnaire? dangereux aussi
+                             aRes.at(mDicoVal->at(aVal))++;
+                             nbPix++;
+                         }
+                         if (mDicoVal->find(aVal)==mDicoVal->end() &&aVal==0) nbPix++;
+                    }
+
+                }
+            }
+
+            // maintenant on calcule les pourcentage
+            if (nbPix>0){
+                for (auto & kv : aRes){
+                    kv.second=(100*kv.second)/nbPix;
+                }
+
+            }
+        }
+    }
+    return aRes;
+}
+
+
 
 std::string Layer::getPathTif(){
     std::string aRes;

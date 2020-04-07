@@ -8,6 +8,9 @@ using namespace std;
 
 int main(int argc, char *argv[])
 {
+
+
+
     // lecture de toutes les table dictionnaires
     cDicoApt dico(dirBD);
     std::map<std::string,cEss> aMEss;
@@ -43,6 +46,12 @@ int main(int argc, char *argv[])
 
     cApliCarteApt aACA(&dico);
 
+    aACA.shptoGeoJSON("/home/lisein/Documents/carteApt/autres/epioux_parcellaire.shp","/home/lisein/Documents/carteApt/autres/test.geojson");
+
+
+
+if (0){
+
     /*cEss HE=aMEss.at("HE");
     //std::cout << HE.printRisque() ;
     aACA.carteAptFEE(&HE,HE.NomCarteAptFEE());
@@ -74,13 +83,17 @@ int main(int argc, char *argv[])
         //aACA.compressTif(kv.second.NomCarte());
     }
 
+}
+
+
     // compression gdal des cartes input
-    for (auto & kv : *dico.Files()){
+    /*for (auto & kv : *dico.Files()){
         std::string path=kv.second;
         if (path.substr(path.size()-3,path.size())=="tif"){
             aACA.compressTif(path);
             }
         }
+        */
 
     // creation des tuiles pour les stations : ce n'est plus nécessaire, gérer par objet "RasterInfo"
 /*

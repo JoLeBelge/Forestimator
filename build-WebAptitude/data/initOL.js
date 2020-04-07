@@ -57,7 +57,7 @@ var createTextStyle = function(feature, resolution, dom) {
 	});
 };
 
-var myDom = {
+myDom = {
 	text: "Normal",
 	align: "center",
 	baseline: "middle",
@@ -205,6 +205,7 @@ parcelles = new ol.layer.Tile({
 	})
 });
 
+
 var commune_src = new ol.source.Vector({
 	format: new ol.format.GeoJSON(),
 	url: function(extent) {
@@ -216,7 +217,14 @@ var commune_src = new ol.source.Vector({
 	strategy: ol.loadingstrategy.bbox
 });
 
-var style = new ol.style.Style({
+ /*
+ var commune_src = new ol.source.Vector({
+	format: new ol.format.GeoJSON(),
+	url: 'tmp/wt2Kjmcd-epioux_parcellaire.geojson'
+});
+*  */
+
+style = new ol.style.Style({
 	text: new Text({
 		font: 'bold 11px "Open Sans", "Arial Unicode MS", "sans-serif"',
 		placement: 'line',
@@ -228,6 +236,7 @@ var style = new ol.style.Style({
 	  })
 });
 
+
 communes = new ol.layer.Vector({
 	crossOrigin: 'null',
 	title: 'Communes',
@@ -236,6 +245,22 @@ communes = new ol.layer.Vector({
 	style: polygonStyleFunction
 });
 
+/*
+communes = new ol.layer.Vector({
+    title: 'Communes',
+	extent: extent,
+	source: commune_src,
+    style:new ol.style.Style({
+	  stroke: new ol.style.Stroke({
+		color: 'blue',
+		width: 20
+	  }),
+    fill: new ol.style.Fill({
+      color: 'rgba(0, 0, 255, 0.1)'
+    })
+	  })
+});
+*/
 
 layers = [
 	new ol.layer.Group({
@@ -260,23 +285,17 @@ var overlay = new ol.Overlay({
 		duration: 250
 	}
 });
-/*
-closer.onclick = function() {
-	overlay.setPosition(undefined);
-	closer.blur();
-	return false;
-};*/
+
 
 var _view = new ol.View({
-	projection: projection,
-	//center: [173532, 139254],//fac Gbx
-	//center: [223993, 86882],//scolyte somewhere
+	projection: projection,	
 	center: [217200, 50100],//epioux
 	extent: extent,
 	zoom: 7,
 	minZoom: 0,
 	maxZoom: 8
 })
+
 
 // create map here
 
@@ -291,6 +310,7 @@ map = new ol.Map({
 	overlays: [overlay],
 	view: _view
 });
+
 
 IGN.setVisible(true);
 parcelles.setVisible(false);
@@ -328,9 +348,9 @@ function getCoordinates(e) {
 }
 * */
 
-// maintenant je vais essayer de faire communiquer cette fction avec c++
+// maintenant je vais essayer de faire communiquer cette fction avec c++ -- ok c'est geré par copenlayer directement.
 
-
+/*
 map.on('click', function(evt){
 	console.log("evt pixel");
     console.info(evt.pixel);
@@ -346,6 +366,7 @@ map.on('click', function(evt){
     var lon = coords[0];
     //var lonlat = ol.proj.transform(evt.coordinate, 'EPSG:31', 'EPSG:31370');
 });
+* */
 
 /*
 function test(){

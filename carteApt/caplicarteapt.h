@@ -38,6 +38,8 @@ public:
     //clip avec l'extent d'un polygone
     void cropImWithPol(std::string inputRaster, std::string inputVector, std::string aOut);
     void toPol(std::string input, std::string output);
+
+    void shptoGeoJSON(std::string input, std::string output);
 private:
 private:
     cDicoApt * dico;

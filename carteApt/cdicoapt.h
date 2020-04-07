@@ -1,10 +1,12 @@
 #ifndef CDICOAPT_H
 #define CDICOAPT_H
 #include <sqlite3.h>
+
 //#include <Wt/Dbo/backend/Sqlite3.h>
 //#include <Wt/Dbo/Session.h>
 //#include <Wt/Dbo/Dbo.h>
 //#include <Wt/Dbo/SqlConnection.h>
+
 #include <map>
 #include <string>
 #include <iostream>

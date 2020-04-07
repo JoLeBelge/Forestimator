@@ -49,6 +49,7 @@ public:
     Wt::WTable                 *mAptAllEss;
 private:
     Wt::WContainerWidget     * mParent;
+    //Wt::WWidget     * mParent;
     groupLayers*mGL;
     Wt::WText                  *titre_;
     cDicoApt * mDico;

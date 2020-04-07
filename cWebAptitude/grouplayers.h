@@ -9,6 +9,8 @@
 #include "legend.h"
 #include <fstream>
 #include "wopenlayers.h"
+#include "ogrsf_frmts.h"
+#include "gdal_utils.h"
 
 class WOpenLayers;
 class Layer;
@@ -76,6 +78,10 @@ public:
         return aRes;
     }
 
+    std::map<std::string,std::map<std::string,int>> computeStatGlob(OGRLayer * lay);
+    // void car on ajoute les résulats à la table d'attribut de la couche
+    void computeStatOnPolyg(OGRLayer * lay);
+
     // ne fait pas ce que je veux, il faut apparemment utiliser des anchor pour faire du bookmarking / hashtag
     Wt::Signal<bool>& focusMap(){
         //std::cout << "focus map () dans grouplayer done \n\n\n" << std::endl;
@@ -102,6 +108,7 @@ private:
     Wt::Signal<bool> focusOnMap_;
 
     WContainerWidget * mInfoW;
+    //WWidget * mInfoW;
 
     // pour changer le curseur quand on clique
     WOpenLayers * mMap;

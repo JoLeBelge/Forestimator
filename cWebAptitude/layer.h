@@ -9,6 +9,7 @@
 #include "grouplayers.h"
 #include <boost/algorithm/string/replace.hpp>
 
+
 #include "cpl_conv.h" // for CPLMalloc()
 // pour les vecteurs
 #include "ogrsf_frmts.h"
@@ -46,6 +47,9 @@ public:
     void displayLayer();
 
     std::vector<std::string> displayInfo(double x, double y);
+    // clé : la valeur au format légende (ex ; Optimum). Valeur ; pourcentage pour ce polygone
+    std::map<std::string,int> computeStatOnPolyg(OGRGeometry * poGeom);
+
     // raster value
     int getValue(double x, double y);
     // signification pour ce raster value

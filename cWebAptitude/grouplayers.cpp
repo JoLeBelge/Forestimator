@@ -145,7 +145,7 @@ void groupLayers::extractInfo(double x, double y){
     for (Layer& l : mVLs){
         //if (l.IsActive()) l.displayInfo(x,y,mInfoW);
         if (l.Type()==KK | l.Type()==Thematique | l.IsActive()){
-        mLegend->add1InfoRaster(l.displayInfo(x,y));
+            mLegend->add1InfoRaster(l.displayInfo(x,y));
         }
     }
 
@@ -153,7 +153,7 @@ void groupLayers::extractInfo(double x, double y){
     for (Layer& l : mVLs){
         // on a bien une essence active et on est en mode FEE
         if ( l.IsActive() && l.Type()==Apt && mTypeClassifST==FEE){
-        mLegend->detailCalculAptFEE(mStation);
+            mLegend->detailCalculAptFEE(mStation);
         }
     }
     // tableau des aptitudes pour toutes les essences
@@ -173,33 +173,103 @@ void groupLayers::extractInfo(double x, double y){
     //mParent->decorationStyle().set
 }
 
+
+// clé 1 ; nom de la couche. clé2 : la valeur au format légende (ex ; Optimum). Valeur ; pourcentage pour ce polygone
+std::map<std::string,std::map<std::string,int>> groupLayers::computeStatGlob(OGRLayer * lay){
+     std::cout << " groupLayers::computeStatGlob " << std::endl;
+    std::map<std::string,std::map<std::string,int>> aRes;
+
+    // union de tout les polygones du shp
+    OGRFeature *poFeature;
+    OGRGeometry * poGeom;
+    lay->ResetReading();
+    //int i(0);
+    OGRGeometry * multi = OGRGeometryFactory::createGeometry(wkbMultiPolygon);
+
+    char **ppszCont = NULL;
+    while( (poFeature = lay->GetNextFeature()) != NULL )
+    {
+        poFeature->GetGeometryRef()->closeRings();
+        poFeature->GetGeometryRef()->exportToWkt(ppszCont);
+        multi->importFromWkt(ppszCont);
+
+        /*if (i==0) {poGeom= poFeature->GetGeometryRef()->clone();}
+        else{
+        std::cout << " union " << std::endl;
+        poGeom->Union(poFeature->GetGeometryRef());
+        lay->getUnionCascaded()
+        }
+        i++;
+                */
+
+    }
+
+    multi->UnionCascaded();
+
+    for (Layer& l : mVLs){
+        if (l.Type()!=Externe && l.Type()==Apt && l.getCode()=="HE"){
+        // clé : la valeur au format légende (ex ; Optimum). Valeur ; pourcentage pour ce polygone
+        std::map<std::string,int> stat = l.computeStatOnPolyg(poGeom);
+        aRes.emplace(std::make_pair(l.getCode(),stat));
+        }
+    }
+    std::cout << " done " << std::endl;
+    return aRes;
+}
+
+void groupLayers::computeStatOnPolyg(OGRLayer * lay){
+
+    for (Layer& l : mVLs){
+
+        if ( l.Type()==Apt ){
+            // défini le nouveau champ à ajouter à la table d'attribut
+            OGRFieldDefn oFLD(l.getCode().c_str(),  OFTString);//OGRFieldType
+            //oFLD.Set(cs.GetBuffer(0), OFTReal, 0, 0, OJUndefined);
+            //OGRField oField; oField.String = "tata";
+            oFLD.SetDefault("tata");
+            lay->CreateField(&oFLD);
+
+            OGRFeature *poFeature;
+            lay->ResetReading();
+            while( (poFeature = lay->GetNextFeature()) != NULL )
+            {
+                // clé : la valeur au format légende (ex ; Optimum). Valeur ; pourcentage pour ce polygone
+                OGRGeometry * poGeom = poFeature->GetGeometryRef();
+                std::map<std::string,int> stat = l.computeStatOnPolyg(poGeom);
+                // on met un résumé des stat dans le champ nouvellement créé
+                poFeature->SetField(l.getCode().c_str(), "toto");
+            }
+        }
+    }
+}
+
 std::map<std::string,int> groupLayers::apts(){
     std::map<std::string,int> aRes;
     switch (mTypeClassifST){
     case FEE:
-    if (mStation->readyFEE()){
-    for (Layer l : mVLs){
-        if (l.Type()==Apt){
-        // j'ai deux solution pour avoir les aptitudes ; soit je lis la valeur du raster apt, soit je recalcule l'aptitude avec les variables environnementales
-       cEss  * Ess= l.Ess();
-       int apt = Ess->getFinalApt(mStation->mNT,mStation->mNH, mStation->mZBIO, mStation->mTOPO);
-        aRes.emplace(std::make_pair(Ess->Code(),apt));
+        if (mStation->readyFEE()){
+            for (Layer l : mVLs){
+                if (l.Type()==Apt){
+                    // j'ai deux solution pour avoir les aptitudes ; soit je lis la valeur du raster apt, soit je recalcule l'aptitude avec les variables environnementales
+                    cEss  * Ess= l.Ess();
+                    int apt = Ess->getFinalApt(mStation->mNT,mStation->mNH, mStation->mZBIO, mStation->mTOPO);
+                    aRes.emplace(std::make_pair(Ess->Code(),apt));
+                }
+            }
         }
-    }
-    }
         break;
     case CS:
         if (mStation->readyCS()){
-        for (Layer l : mVLs){
-            if (l.Type()==Apt){
-            // j'ai deux solution pour avoir les aptitudes ; soit je lis la valeur du raster apt, soit je recalcule l'aptitude avec les variables environnementales
-           cEss  * Ess= l.Ess();
-           int apt = Ess->getApt(mStation->mZBIO, mStation->mSt);
-           if (apt!=0) aRes.emplace(std::make_pair(Ess->Code(),apt));
-           }
+            for (Layer l : mVLs){
+                if (l.Type()==Apt){
+                    // j'ai deux solution pour avoir les aptitudes ; soit je lis la valeur du raster apt, soit je recalcule l'aptitude avec les variables environnementales
+                    cEss  * Ess= l.Ess();
+                    int apt = Ess->getApt(mStation->mZBIO, mStation->mSt);
+                    if (apt!=0) aRes.emplace(std::make_pair(Ess->Code(),apt));
+                }
+            }
         }
-        }
-       break;
+        break;
     }
     return aRes;
 }
@@ -211,11 +281,13 @@ ST::ST(cDicoApt * aDico):mDico(aDico),mNT(666),mNH(666),mZBIO(666),mTOPO(666),mA
 
 void ST::vider()
 {
-mNT=666;
-mNH=666;
-mZBIO=666;
-mTOPO=666;
-mActiveEss=0;
-HaveEss=0;
-mSt=666;
+    mNT=666;
+    mNH=666;
+    mZBIO=666;
+    mTOPO=666;
+    mActiveEss=0;
+    HaveEss=0;
+    mSt=666;
 }
+
+

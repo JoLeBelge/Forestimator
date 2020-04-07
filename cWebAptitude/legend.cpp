@@ -18,12 +18,13 @@ void legend::createUI()
     this->addStyleClass("table form-inline");
     this->setStyleClass("table form-inline");
 
-    titre_ = mParent->addWidget(cpp14::make_unique<WText>("Légende"));
+   /* titre_ = mParent->addWidget(cpp14::make_unique<WText>("Légende"));
     titre_->decorationStyle().font().setSize(FontSize::Large);
     titre_->decorationStyle().setForegroundColor(WColor(192,192,192));
     // le set padding ne fonctionne que si je désactive le inline
     titre_->setInline(0);
     titre_->setPadding(10,Wt::Side::Bottom | Wt::Side::Top);
+    */
 
     mAptAllEss = mParent->addWidget(cpp14::make_unique<WTable>());
     mAptAllEss->setHeaderCount(1);
