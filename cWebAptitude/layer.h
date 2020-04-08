@@ -49,6 +49,7 @@ public:
     std::vector<std::string> displayInfo(double x, double y);
     // clé : la valeur au format légende (ex ; Optimum). Valeur ; pourcentage pour ce polygone
     std::map<std::string,int> computeStatOnPolyg(OGRGeometry * poGeom);
+    GDALDataset * rasterizeGeom(OGRGeometry *poGeom);
 
     // raster value
     int getValue(double x, double y);

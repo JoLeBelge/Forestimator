@@ -23,6 +23,12 @@ public:
     // conversion shp esri vers geoJson
     bool toGeoJson();
     void display();
+    // effectue des vérification du shp (polygone, src)
+    void checkShp();
+    // merge de tout les polygones pour avoir une géométrie globale
+    void computeGlobalGeom();
+    // rasterize une géométrie
+    //void rasterizeGeom(OGRGeometry *poGeom);
     void computeStat();
     void upload();
     void clickUploadBt();
@@ -44,6 +50,8 @@ private:
     groupLayers * mGL;
     cDicoApt  * mDico;
     double centerX,centerY;
+
+    OGRGeometry *poGeomGlobale;
 };
 
 #endif // PARCELLAIRE_H

@@ -267,3 +267,5 @@ void parcellaire::computeStat(){
     }
     std::cout << " ..done " << std::endl;
 }
+
+

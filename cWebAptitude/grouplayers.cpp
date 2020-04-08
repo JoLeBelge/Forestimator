@@ -176,41 +176,72 @@ void groupLayers::extractInfo(double x, double y){
 
 // clé 1 ; nom de la couche. clé2 : la valeur au format légende (ex ; Optimum). Valeur ; pourcentage pour ce polygone
 std::map<std::string,std::map<std::string,int>> groupLayers::computeStatGlob(OGRLayer * lay){
-     std::cout << " groupLayers::computeStatGlob " << std::endl;
+    std::cout << " groupLayers::computeStatGlob " << std::endl;
     std::map<std::string,std::map<std::string,int>> aRes;
 
     // union de tout les polygones du shp
     OGRFeature *poFeature;
+    //OGRPolygon * poGeom;
     OGRGeometry * poGeom;
-    lay->ResetReading();
-    //int i(0);
-    OGRGeometry * multi = OGRGeometryFactory::createGeometry(wkbMultiPolygon);
+    OGRGeometry * poGeom2;
+    OGRMultiPolygon *multi = new OGRMultiPolygon();
+    OGRErr err;
+    OGRMultiPolygon *poGeomM;
 
-    char **ppszCont = NULL;
+
+
+    lay->ResetReading();
     while( (poFeature = lay->GetNextFeature()) != NULL )
     {
-        poFeature->GetGeometryRef()->closeRings();
-        poFeature->GetGeometryRef()->exportToWkt(ppszCont);
-        multi->importFromWkt(ppszCont);
 
-        /*if (i==0) {poGeom= poFeature->GetGeometryRef()->clone();}
-        else{
-        std::cout << " union " << std::endl;
-        poGeom->Union(poFeature->GetGeometryRef());
-        lay->getUnionCascaded()
+        switch (poFeature->GetGeometryRef()->getGeometryType()){
+        case wkbPolygon:
+        {
+            poGeom=poFeature->GetGeometryRef();
+            poGeom->closeRings();
+            poGeom = poGeom->Buffer(0.0);
+            //poGeom->Simplify(1.0);
+            err = multi->addGeometry(poGeom);
+        break;
         }
-        i++;
-                */
+        case wkbMultiPolygon:
+        {
+           poGeomM= poFeature->GetGeometryRef()->toMultiPolygon();
+            int n(poGeomM->getNumGeometries());
+            for (int i(0);i<n;i++){
+                poGeom=poGeomM->getGeometryRef(i);
+                //if (poFeature->GetGeometryRef()->getGeometryType()==wkbPolygon)
+                err = multi->addGeometry(poGeom);
+            }
+        break;
+        }
+        default:
+            std::cout << "Geometrie " << poFeature->GetFID() << ", type de geometrie non pris en charge ; " << poFeature->GetGeometryRef()->getGeometryName() << std::endl;
+        break;
+        }
+
+
+        if (err!=OGRERR_NONE){
+            std::cout << "problem avec ajout de la geometrie " << poFeature->GetFID() << ", erreur : " << err <<  std::endl;
+        }
 
     }
 
-    multi->UnionCascaded();
+    poGeom2 = multi->UnionCascaded();
+    poGeom2 =poGeom2->Buffer(1.0);// ça marche bien on dirait! je sais pas si c'est le buffer 1 ou le simplify 1 qui enlève les inner ring (hole) qui restent.
+    poGeom =poGeom2->Simplify(1.0);
+
+    //OGRPolygon * pol=poGeom2->toPolygon();
+
+    //std::ofstream out("/home/lisein/Documents/carteApt/Forestimator/build-WebAptitude/tmp/test.geojson");
+    //out << poGeom->exportToJson();
+    //out.close();
 
     for (Layer& l : mVLs){
         if (l.Type()!=Externe && l.Type()==Apt && l.getCode()=="HE"){
-        // clé : la valeur au format légende (ex ; Optimum). Valeur ; pourcentage pour ce polygone
-        std::map<std::string,int> stat = l.computeStatOnPolyg(poGeom);
-        aRes.emplace(std::make_pair(l.getCode(),stat));
+            // clé : la valeur au format légende (ex ; Optimum). Valeur ; pourcentage pour ce polygone
+            std::map<std::string,int> stat = l.computeStatOnPolyg(poGeom);
+            aRes.emplace(std::make_pair(l.getCode(),stat));
         }
     }
     std::cout << " done " << std::endl;
