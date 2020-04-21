@@ -1,0 +1,27 @@
+
+ <server>
+    <application-settings
+       location="/home/lisein/Documents/carteApt/Forestimator/build-WebAptitude/WebAptitude">
+
+<session-management>
+	    <timeout>30000</timeout>
+	   <user-agents type="ajax" mode="black-list">
+  <user-agent>.*Crappy browser.*</user-agent> 
+    </user-agents>
+     <plain-ajax-sessions-ratio-limit>1</plain-ajax-sessions-ratio-limit>
+
+    <ajax-puzzle>true</ajax-puzzle>
+
+	    
+</session-management>
+<progressive-bootstrap>true</progressive-bootstrap>
+</application-settings>
+
+<head-matter>  
+	<meta name="viewport" content="width=device-width, initial-scale=1"/> 
+</head-matter> 
+
+ </server>
+
+
+
