@@ -166,7 +166,7 @@ std::vector<std::string> Layer::displayInfo(double x, double y){
     aRes.push_back(getLegendLabel());
     std::string val("");
     // on va affichier uniquement les informations de la couches d'apt qui est sélectionnée, et de toutes les couches thématiques (FEE et CS)
-    if (mType==KK | mType==Thematique | this->IsActive()){
+    if ((mType==KK )| (mType==Thematique) |( this->IsActive())){
         // 1 extraction de la valeur
         int aVal=getValue(x,y);
         if (mCode=="NT"){ mGroupL->mStation->mNT=aVal;}
@@ -182,7 +182,7 @@ std::vector<std::string> Layer::displayInfo(double x, double y){
         }
     }
 
-    if (mType==Apt && this->IsActive()){
+    if ((mType==Apti) && (this->IsActive())){
         mGroupL->mStation->mActiveEss=mEss;
         mGroupL->mStation->HaveEss=1;
     }
@@ -225,7 +225,7 @@ int Layer::getValue(double x, double y){
                 // lecture du pixel
                 mBand->RasterIO( GF_Read, col, row, 1, 1, scanPix, 1,1, GDT_Float32, 0, 0 );
                 aRes=scanPix[0];
-
+                CPLFree(scanPix);
                 GDALClose( mGDALDat );
             }
         }
@@ -234,7 +234,7 @@ int Layer::getValue(double x, double y){
 }
 
 std::map<std::string,int> Layer::computeStatOnPolyg(OGRGeometry *poGeom){
-    std::cout << " groupLayers::computeStatOnPolyg " << std::endl;
+    //std::cout << " groupLayers::computeStatOnPolyg " << std::endl;
     std::map<std::string,int> aRes;
 
     if (mType!=Externe){
@@ -244,8 +244,8 @@ std::map<std::string,int> Layer::computeStatOnPolyg(OGRGeometry *poGeom){
         }
         int nbPix(0);
 
-        GDALDataset * ds = Layer::rasterizeGeom(poGeom);
-        GDALClose(ds);
+        // c'est mon masque au format raster
+        GDALDataset * mask = Layer::rasterizeGeom(poGeom);
 
         OGREnvelope ext;
         poGeom->getEnvelope(&ext);
@@ -274,32 +274,34 @@ std::map<std::string,int> Layer::computeStatOnPolyg(OGRGeometry *poGeom){
             int xOffset = int((ext.MinX - xOrigin) / pixelWidth);
             int yOffset = int((yOrigin - ext.MaxY ) / pixelHeight);
 
-            std::cout << " xSize " << xSize << " , ySize " << ySize << " xOffset " << xOffset << " yOffset " << yOffset << std::endl;
-
-            float *scanline;
+            float *scanline, *scanlineMask;
             scanline = (float *) CPLMalloc( sizeof( float ) * xSize );
+            scanlineMask = (float *) CPLMalloc( sizeof( float ) * xSize );
             // boucle sur chaque ligne
             for ( int row = 0; row < ySize; row++ )
             {
                 // lecture
                 mBand->RasterIO( GF_Read, xOffset, row+yOffset, xSize, 1, scanline, xSize,1, GDT_Float32, 0, 0 );
+                // lecture du masque
+                mask->GetRasterBand(1)->RasterIO( GF_Read, 0, row, xSize, 1, scanlineMask, xSize,1, GDT_Float32, 0, 0 );
                 // boucle sur scanline et garder les pixels qui sont dans le polygone
                 for (int col = 0; col <  xSize; col++)
                 {
+                    // élégant mais trop lent!!
                     //OGRPoint op1(ext.MinX+col*pixelWidth,ext.MaxY-row*pixelWidth);
-
-
-                    //if ( op1.Intersect(poGeom)){
-                    //std::cout << "j'ai un pixel dans le polygone " << std::endl;
-                    double aVal=scanline[ col ];
-                    if (mDicoVal->find(aVal)!=mDicoVal->end()){
-                        // et les no data dans tout ça??? il faut les prendre en compte également! les ajouter dans le dictionnaire? dangereux aussi
-                        aRes.at(mDicoVal->at(aVal))++;
-                        nbPix++;
-                    } else if (aVal==0) {nbPix++;}
-                    //}
+                    //if ( op1.Intersect(poGeom)/ within()){
+                    if (scanlineMask[col]==255){
+                        double aVal=scanline[ col ];
+                        if (mDicoVal->find(aVal)!=mDicoVal->end()){
+                            aRes.at(mDicoVal->at(aVal))++;
+                            nbPix++;
+                            // et les no data dans tout ça??? il faut les prendre en compte également! les ajouter dans le dictionnaire? dangereux aussi
+                        } else if (aVal==0) {nbPix++;}
+                    }
                 }
             }
+            CPLFree(scanline);
+            CPLFree(scanlineMask);
 
             // maintenant on calcule les pourcentage
             if (nbPix>0){
@@ -309,6 +311,8 @@ std::map<std::string,int> Layer::computeStatOnPolyg(OGRGeometry *poGeom){
 
             }
         }
+        GDALClose(mask);
+
     }
     return aRes;
 }
@@ -348,40 +352,35 @@ std::string Layer::getLegendLabel(){
 
 GDALDataset * Layer::rasterizeGeom(OGRGeometry *poGeom){
 
-    std::string output2("/home/lisein/Documents/carteApt/Forestimator/build-WebAptitude/tmp/testshp.shp");
-    const char *out2=output2.c_str();
-    std::cout << " Layer::rasterizeGeom " << std::endl;
+    std::string output("/home/lisein/Documents/carteApt/Forestimator/build-WebAptitude/tmp/tmp");
+    const char *out=output.c_str();
+    //std::cout << " Layer::rasterizeGeom " << std::endl;
     GDALAllRegister();
     GDALDriver *pDriver;
-    GDALDataset *pRaster, * pShp;
+    GDALDataset *pRaster=NULL, * pShp;
 
     if (mType!=Externe){
         OGRSpatialReference  * spatialReference=new OGRSpatialReference;
         OGRErr err;
         err=spatialReference->importFromEPSG(31370);
-        if (err!=OGRERR_NONE){
-            std::cout << "spatialReference->importFromEPSG(31370), erreur : " << err <<  std::endl;
-        }
-
         char *src;
         spatialReference->exportToWkt(&src);
 
         // driver et dataset shp -- creation depuis la géométrie
         GDALDriver *pShpDriver = GetGDALDriverManager()->GetDriverByName("ESRI Shapefile");
-        std::cout << " create shp dataset " << std::endl;
-        pShp = pShpDriver->Create( out2, 0, 0, 0, GDT_Unknown, NULL );
-        std::cout << " create layer " << std::endl;
+        //std::cout << " create shp dataset " << std::endl;
+        pShp = pShpDriver->Create( "/vsimem/blahblah.shp", 0, 0, 0, GDT_Unknown, NULL );
+        //std::cout << " create layer " << std::endl;
         // pas nécessaire pShp->SetProjection(src);
         OGRLayer * lay = pShp->CreateLayer("toto",spatialReference,wkbPolygon,NULL);
         OGRFeature * feat = new OGRFeature(lay->GetLayerDefn());
         feat->SetGeometry(poGeom);
-        std::cout << " create feature " << std::endl;
+        //std::cout << " create feature " << std::endl;
         lay->CreateFeature(feat);
 
         // driver et dataset raster in memory
         const char *pszFormat = "MEM";
         pDriver = GetGDALDriverManager()->GetDriverByName(pszFormat);
-
         if( pDriver == NULL )
         {
             printf( "%s driver not available.\n", pszFormat );
@@ -397,38 +396,29 @@ GDALDataset * Layer::rasterizeGeom(OGRGeometry *poGeom){
             {
                 std::cout << "je n'ai pas lu l'image " << getPathTif() << std::endl;
             } else {
-
                 double transform[6];
                 mGDALDat->GetGeoTransform(transform);
                 GDALClose(mGDALDat);
-                //double xOrigin = transform[0];
-                //double yOrigin = transform[3];
                 double pixelWidth = transform[1];
                 double pixelHeight = -transform[5];
-
                 //determine dimensions of the tile
                 int xSize = round(width/pixelWidth);
                 int ySize = round(height/pixelHeight);
 
                 double tr2[6];
-
                 tr2[0]=ext.MinX;
                 tr2[3]=ext.MaxY;
                 tr2[1]=transform[1];
                 tr2[2]=transform[2];
                 tr2[4]=transform[4];
                 tr2[5]=transform[5];
-
-                // création du raster en mémoire
-                //std::cout << " create imMem raster " << std::endl;
-
+                // création du raster en mémoire - on dois lui donner un out mais il ne l'utile pas car MEM driver
                 pRaster = pDriver->Create(out, xSize, ySize, 1, GDT_Byte,NULL);
                 pRaster->SetGeoTransform(tr2);
                 pRaster->SetProjection(src);
                 //std::cout << " rasterize " << std::endl;
                 GDALRasterize(NULL,pRaster,pShp,NULL,NULL);
             }
-
         }
         GDALClose(pShp);
     }

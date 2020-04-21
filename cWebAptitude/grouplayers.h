@@ -11,6 +11,7 @@
 #include "wopenlayers.h"
 #include "ogrsf_frmts.h"
 #include "gdal_utils.h"
+#include <Wt/WProgressBar.h>
 
 class WOpenLayers;
 class Layer;
@@ -57,7 +58,8 @@ private:
 class groupLayers: public WContainerWidget
 {
 public:
-    groupLayers(cDicoApt * aDico,WContainerWidget *parent,WContainerWidget *infoW,WOpenLayers * aMap);
+    groupLayers(cDicoApt * aDico,WContainerWidget *parent,WContainerWidget *infoW,WOpenLayers * aMap, Wt::WApplication* app);
+    ~groupLayers(){std::cout << " destructeur de group layer " << std::endl;}
     void clickOnName(std::string aCode);
     void changeClassClick(WText *t);
     void update(std::string aCode);
@@ -78,7 +80,7 @@ public:
         return aRes;
     }
 
-    std::map<std::string,std::map<std::string,int>> computeStatGlob(OGRLayer * lay);
+    std::map<std::string,std::map<std::string,int>> computeStatGlob(OGRGeometry *poGeomGlobale);
     // void car on ajoute les résulats à la table d'attribut de la couche
     void computeStatOnPolyg(OGRLayer * lay);
 
@@ -92,6 +94,8 @@ public:
     // retourne les aptitudes des essences pour une position donnée (click sur la carte)
     //key ; code essence. Value ; code aptitude
     std::map<std::string,int> apts();
+
+    Wt::WProgressBar *mPBar;
 
 private:
     TypeClassifST mTypeClassifST;
@@ -114,6 +118,8 @@ private:
     WOpenLayers * mMap;
     // bof finalement c'est mieux le conteneur parent
     Wt::WContainerWidget     * mParent;
+    // pour faire un processEvent, seul moyen de refresh de la progressbar.
+    Wt::WApplication* m_app;
 };
 
 #endif // GROUPLAYERS_H

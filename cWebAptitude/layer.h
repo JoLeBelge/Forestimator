@@ -57,7 +57,7 @@ public:
     std::string getValueTxt(double x, double y);
     // crop du raster avec un shp parcellaire
     bool cropIm(std::string aOut);
-    int setActive(bool b=true){
+    void setActive(bool b=true){
         // ici je peux également changer le style du rendu du label
         mActive=b;
         mText->setStyleClass(mActive ? "currentEss" : "ess");

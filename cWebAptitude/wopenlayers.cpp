@@ -1,6 +1,6 @@
 #include "wopenlayers.h"
 
-WOpenLayers::WOpenLayers(WContainerWidget *parent, cDicoApt *aDico):xy_(this,"1.0"),mDico(aDico)
+WOpenLayers::WOpenLayers(cDicoApt *aDico):xy_(this,"1.0"),mDico(aDico)
 {
   resize(640, 480);
   setId("map");//sans ça le script js ne sert à rien car ne vise aucun objet cible

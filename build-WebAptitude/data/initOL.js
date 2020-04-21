@@ -103,7 +103,7 @@ projection = new ol.proj.Projection({
 });
 
 extent = [42247, 21148, 295176, 167719];// full RW
-ol.proj.get('EPSG:31370').setExtent(extent);
+//ol.proj.get('EPSG:31370').setExtent(extent);
 
 var resolutions = new Array(22);
 var startResolution = (extent[2]-extent[0]) / 512;

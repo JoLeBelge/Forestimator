@@ -4,7 +4,7 @@
 const TypeClassifST cl[] = { FEE, CS };
 std::vector<std::string> classes = {"Fichier Ecologique des Essences", "Catalogue des Stations"};
 
-groupLayers::groupLayers(cDicoApt * aDico, WContainerWidget *parent, WContainerWidget *infoW, WOpenLayers *aMap):mDico(aDico),mTypeClassifST(FEE),mInfoW(infoW),mMap(aMap),mParent(parent)
+groupLayers::groupLayers(cDicoApt * aDico, WContainerWidget *parent, WContainerWidget *infoW, WOpenLayers *aMap, WApplication *app):mDico(aDico),mTypeClassifST(FEE),mInfoW(infoW),mMap(aMap),mParent(parent),mPBar(NULL),m_app(app)
 {
     setOverflow(Wt::Overflow::Auto);
     setPadding(20);
@@ -144,7 +144,7 @@ void groupLayers::extractInfo(double x, double y){
 
     for (Layer& l : mVLs){
         //if (l.IsActive()) l.displayInfo(x,y,mInfoW);
-        if (l.Type()==KK | l.Type()==Thematique | l.IsActive()){
+        if ((l.Type()==KK )| (l.Type()==Thematique )|( l.IsActive())){
             mLegend->add1InfoRaster(l.displayInfo(x,y));
         }
     }
@@ -152,7 +152,7 @@ void groupLayers::extractInfo(double x, double y){
     // tableau du détail du calcul de l'aptitude d'une essence pour FEE
     for (Layer& l : mVLs){
         // on a bien une essence active et on est en mode FEE
-        if ( l.IsActive() && l.Type()==Apt && mTypeClassifST==FEE){
+        if ( l.IsActive() && l.Type()==Apti && mTypeClassifST==FEE){
             mLegend->detailCalculAptFEE(mStation);
         }
     }
@@ -175,75 +175,21 @@ void groupLayers::extractInfo(double x, double y){
 
 
 // clé 1 ; nom de la couche. clé2 : la valeur au format légende (ex ; Optimum). Valeur ; pourcentage pour ce polygone
-std::map<std::string,std::map<std::string,int>> groupLayers::computeStatGlob(OGRLayer * lay){
+std::map<std::string,std::map<std::string,int>> groupLayers::computeStatGlob(OGRGeometry *poGeomGlobale){
     std::cout << " groupLayers::computeStatGlob " << std::endl;
     std::map<std::string,std::map<std::string,int>> aRes;
 
-    // union de tout les polygones du shp
-    OGRFeature *poFeature;
-    //OGRPolygon * poGeom;
-    OGRGeometry * poGeom;
-    OGRGeometry * poGeom2;
-    OGRMultiPolygon *multi = new OGRMultiPolygon();
-    OGRErr err;
-    OGRMultiPolygon *poGeomM;
-
-
-
-    lay->ResetReading();
-    while( (poFeature = lay->GetNextFeature()) != NULL )
-    {
-
-        switch (poFeature->GetGeometryRef()->getGeometryType()){
-        case wkbPolygon:
-        {
-            poGeom=poFeature->GetGeometryRef();
-            poGeom->closeRings();
-            poGeom = poGeom->Buffer(0.0);
-            //poGeom->Simplify(1.0);
-            err = multi->addGeometry(poGeom);
-        break;
-        }
-        case wkbMultiPolygon:
-        {
-           poGeomM= poFeature->GetGeometryRef()->toMultiPolygon();
-            int n(poGeomM->getNumGeometries());
-            for (int i(0);i<n;i++){
-                poGeom=poGeomM->getGeometryRef(i);
-                //if (poFeature->GetGeometryRef()->getGeometryType()==wkbPolygon)
-                err = multi->addGeometry(poGeom);
-            }
-        break;
-        }
-        default:
-            std::cout << "Geometrie " << poFeature->GetFID() << ", type de geometrie non pris en charge ; " << poFeature->GetGeometryRef()->getGeometryName() << std::endl;
-        break;
-        }
-
-
-        if (err!=OGRERR_NONE){
-            std::cout << "problem avec ajout de la geometrie " << poFeature->GetFID() << ", erreur : " << err <<  std::endl;
-        }
-
-    }
-
-    poGeom2 = multi->UnionCascaded();
-    poGeom2 =poGeom2->Buffer(1.0);// ça marche bien on dirait! je sais pas si c'est le buffer 1 ou le simplify 1 qui enlève les inner ring (hole) qui restent.
-    poGeom =poGeom2->Simplify(1.0);
-
-    //OGRPolygon * pol=poGeom2->toPolygon();
-
-    //std::ofstream out("/home/lisein/Documents/carteApt/Forestimator/build-WebAptitude/tmp/test.geojson");
-    //out << poGeom->exportToJson();
-    //out.close();
-
     for (Layer& l : mVLs){
-        if (l.Type()!=Externe && l.Type()==Apt && l.getCode()=="HE"){
+        if (l.Type()!=Externe && l.Type()==Apti){
             // clé : la valeur au format légende (ex ; Optimum). Valeur ; pourcentage pour ce polygone
-            std::map<std::string,int> stat = l.computeStatOnPolyg(poGeom);
+            std::map<std::string,int> stat = l.computeStatOnPolyg(poGeomGlobale);
             aRes.emplace(std::make_pair(l.getCode(),stat));
+            mPBar->setValue(mPBar->value() + 1);
+            m_app->processEvents();
+            //std::cout << " progress bar a une valeur de " << mPBar->value() << std::endl;
         }
     }
+     mPBar->setValue(mPBar->maximum());
     std::cout << " done " << std::endl;
     return aRes;
 }
@@ -252,7 +198,7 @@ void groupLayers::computeStatOnPolyg(OGRLayer * lay){
 
     for (Layer& l : mVLs){
 
-        if ( l.Type()==Apt ){
+        if ( l.Type()==Apti ){
             // défini le nouveau champ à ajouter à la table d'attribut
             OGRFieldDefn oFLD(l.getCode().c_str(),  OFTString);//OGRFieldType
             //oFLD.Set(cs.GetBuffer(0), OFTReal, 0, 0, OJUndefined);
@@ -280,7 +226,7 @@ std::map<std::string,int> groupLayers::apts(){
     case FEE:
         if (mStation->readyFEE()){
             for (Layer l : mVLs){
-                if (l.Type()==Apt){
+                if (l.Type()==Apti){
                     // j'ai deux solution pour avoir les aptitudes ; soit je lis la valeur du raster apt, soit je recalcule l'aptitude avec les variables environnementales
                     cEss  * Ess= l.Ess();
                     int apt = Ess->getFinalApt(mStation->mNT,mStation->mNH, mStation->mZBIO, mStation->mTOPO);
@@ -292,7 +238,7 @@ std::map<std::string,int> groupLayers::apts(){
     case CS:
         if (mStation->readyCS()){
             for (Layer l : mVLs){
-                if (l.Type()==Apt){
+                if (l.Type()==Apti){
                     // j'ai deux solution pour avoir les aptitudes ; soit je lis la valeur du raster apt, soit je recalcule l'aptitude avec les variables environnementales
                     cEss  * Ess= l.Ess();
                     int apt = Ess->getApt(mStation->mZBIO, mStation->mSt);

@@ -46,7 +46,6 @@ void legend::createUI()
     mLegendIndiv->setWidth(Wt::WLength("90%"));
     mLegendIndiv->toggleStyleClass("table-striped",true);
 
-
     setMargin(20);
 }
 
@@ -62,7 +61,8 @@ void legend::titreInfoRaster(){
     mInfoT->elementAt(0, 0)->setColumnSpan(2);
     mInfoT->elementAt(0, 0)->setContentAlignment(AlignmentFlag::Top | AlignmentFlag::Center);
     mInfoT->elementAt(0, 0)->setPadding(10);
-    WText *titre = mInfoT->elementAt(0,0)->addWidget(cpp14::make_unique<WText>("<h4>Description de la station forestière </h4>"));
+    //WText *titre = mInfoT->elementAt(0,0)->addWidget(cpp14::make_unique<WText>("<h4>Description de la station forestière </h4>"));
+    mInfoT->elementAt(0,0)->addWidget(cpp14::make_unique<WText>("<h4>Description de la station forestière </h4>"));
     mInfoT->elementAt(1, 0)->addWidget(cpp14::make_unique<WText>("Raster"));
     mInfoT->elementAt(1, 1)->addWidget(cpp14::make_unique<WText>("Valeur"));
 }
@@ -71,7 +71,8 @@ void legend::add1InfoRaster(std::vector<std::string> aV){
 
     if (aV.size()>1 && aV.at(1)!=""){
         int row=mInfoT->rowCount();
-        auto t1 = mInfoT->elementAt(row, 0)->addWidget(cpp14::make_unique<WText>(aV.at(0)));
+        //auto t1 = mInfoT->elementAt(row, 0)->addWidget(cpp14::make_unique<WText>(aV.at(0)));
+        mInfoT->elementAt(row, 0)->addWidget(cpp14::make_unique<WText>(aV.at(0)));
         auto t2 =mInfoT->elementAt(row, 1)->addWidget(cpp14::make_unique<WText>(aV.at(1)));
 
         if (aV.size()>2 && aV.at(2)=="bold"){
@@ -89,7 +90,8 @@ void legend::detailCalculAptFEE(ST * aST){
     mDetAptFEE->elementAt(row, 0)->setColumnSpan(2);
     mDetAptFEE->elementAt(row, 0)->setContentAlignment(AlignmentFlag::Top | AlignmentFlag::Center);
     mDetAptFEE->elementAt(row, 0)->setPadding(10);
-    WText *titre = mDetAptFEE->elementAt(row,0)->addWidget(cpp14::make_unique<WText>("<h4>Détail de la détermination de l'aptitude FEE pour "+Ess->Nom()+"</h4>"));
+    //WText *titre = mDetAptFEE->elementAt(row,0)->addWidget(cpp14::make_unique<WText>("<h4>Détail de la détermination de l'aptitude FEE pour "+Ess->Nom()+"</h4>"));
+    mDetAptFEE->elementAt(row,0)->addWidget(cpp14::make_unique<WText>("<h4>Détail de la détermination de l'aptitude FEE pour "+Ess->Nom()+"</h4>"));
     row++;
     mDetAptFEE->elementAt(row, 0)->addWidget(cpp14::make_unique<WText>("Aptitude bioclimatique"));
     mDetAptFEE->elementAt(row, 1)->addWidget(cpp14::make_unique<WText>(aST->mDico->code2AptFull(Ess->getApt(aST->mZBIO))));
@@ -125,7 +127,8 @@ void legend::afficheLegendeIndiv(Layer * l){
         mLegendIndiv->elementAt(row, 0)->setColumnSpan(2);
         mLegendIndiv->elementAt(row, 0)->setContentAlignment(AlignmentFlag::Top | AlignmentFlag::Center);
         mLegendIndiv->elementAt(row, 0)->setPadding(10);
-        WText *titre = mLegendIndiv->elementAt(row,0)->addWidget(cpp14::make_unique<WText>("<h4>"+l->getLegendLabel()+"</h4>"));
+        //WText *titre = mLegendIndiv->elementAt(row,0)->addWidget(cpp14::make_unique<WText>("<h4>"+l->getLegendLabel()+"</h4>"));
+        mLegendIndiv->elementAt(row,0)->addWidget(cpp14::make_unique<WText>("<h4>"+l->getLegendLabel()+"</h4>"));
         row++;
         for (auto kv : *l->mDicoVal){
             color col = l->getColor(kv.first);
@@ -169,7 +172,8 @@ void legend::afficheAptAllEss(){
         mAptAllEss->elementAt(row, 0)->setColumnSpan(nbCol);
         mAptAllEss->elementAt(row, 0)->setContentAlignment(AlignmentFlag::Top | AlignmentFlag::Center);
         mAptAllEss->elementAt(row, 0)->setPadding(10);
-        WText *titre = mAptAllEss->elementAt(row,0)->addWidget(cpp14::make_unique<WText>("<h4>Aptitude "+ mGL->TypeClasStr()+"</h4>"));
+        //WText *titre = mAptAllEss->elementAt(row,0)->addWidget(cpp14::make_unique<WText>("<h4>Aptitude "+ mGL->TypeClasStr()+"</h4>"));
+        mAptAllEss->elementAt(row,0)->addWidget(cpp14::make_unique<WText>("<h4>Aptitude "+ mGL->TypeClasStr()+"</h4>"));
         row++;
         color col(0,0,0);
         if (O.size()>1){

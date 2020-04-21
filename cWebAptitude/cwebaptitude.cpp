@@ -7,6 +7,14 @@ cWebAptitude::cWebAptitude(Wt::WApplication* app)
     : WContainerWidget()
 {
     m_app = app;
+
+    //app->removeMetaHeader(MetaHeaderType::Meta, "viewport");
+    //app->addMetaHeader("viewport", "width=device-width, initial-scale=1");
+    // fonctionne que avec progressive bootstrap
+    //m_app->addMetaHeader(Wt::MetaHeaderType::HttpHeader, "viewport", "width=device-width, initial-scale=1");
+
+    // std::cout << " wenvi ajax 2 " <<m_app->environment().ajax() << std::endl;
+    // this->enableAjax();
     std::string aBD=loadBDpath();
     mDico=new cDicoApt(aBD);
     setOverflow(Wt::Overflow::Auto);
@@ -59,7 +67,7 @@ cWebAptitude::cWebAptitude(Wt::WApplication* app)
     //menu->addItem("Téléchargement", Wt::cpp14::make_unique<Wt::WTextArea>("Téléchargement : to come soon"));
     infoW_->addWidget(std::move(contents));
 
-    auto map = Wt::cpp14::make_unique<WOpenLayers>(this,mDico);
+    auto map = Wt::cpp14::make_unique<WOpenLayers>(mDico);
     mMap= map.get();
     mMap->setWidth("70%");
     //mMap->setHeight("50%"); // ca ca met la taille de la carte à 50 du conteneur dans le layout, donc c'est pas bon
@@ -85,15 +93,21 @@ cWebAptitude::cWebAptitude(Wt::WApplication* app)
 
 
     //auto groupL = Wt::cpp14::make_unique<groupLayers>(mDico,this,infoW_,mMap);
-    auto groupL = Wt::cpp14::make_unique<groupLayers>(mDico,this,legendCont.get(),mMap);
-    WMenuItem * legendMenuIt = menu->addItem("Légende", std::move(legendCont));
+    auto groupL = Wt::cpp14::make_unique<groupLayers>(mDico,this,legendCont.get(),mMap,m_app);
+    //WMenuItem * legendMenuIt = menu->addItem("Légende", std::move(legendCont));
+    menu->addItem("Légende", std::move(legendCont));
     mGroupL = groupL.get();
-    auto uPtrPA = Wt::cpp14::make_unique<parcellaire>(PACont.get(),mGroupL);
-    mPA = uPtrPA.get();
+    std::cout << "construction unique ptr parcellaire " << std::endl;
+    // unique _ptr est détruit à la fin de la création de l'objet, doit etre déplacé avec move pour donner sa propriété à un autre objet pour ne pas être détruit
+    //auto uPtrPA = Wt::cpp14::make_unique<parcellaire>(PACont.get(),mGroupL,m_app);
+    //std::cout << "get pointeur mPA";
+    //mPA = uPtrPA.get();
+    mPA = new parcellaire(PACont.get(),mGroupL,m_app);
     // je ne parviens pas à faire le connect correctement, je dois me tromper quelque part.
     mGroupL->focusMap().connect(mMap,&WOpenLayers::giveFocus);
 
-    WMenuItem * PAmenuIt = menu->addItem("Plan d'amménagement", std::move(PACont));
+    //WMenuItem * PAmenuIt = menu->addItem("Plan d'amménagement", std::move(PACont));
+    menu->addItem("Plan d'amménagement", std::move(PACont));
 
     // maintenant que tout les objets sont crées, je ferme la connection avec la BD sqlite3, plus propre
     mDico->closeConnection();
@@ -109,4 +123,5 @@ cWebAptitude::cWebAptitude(Wt::WApplication* app)
     layout->addWidget(std::move(titreCont), 0);
     layout->addWidget(std::move(pane), 0);
     layout->addWidget(std::move(groupL), 1); // si 1, laisse la place aux deux autres partie du layout car stretch, mais pas beau.
+    std::cout << "toto " << std::endl;
 }

@@ -29,7 +29,7 @@ using namespace Wt;
 class WOpenLayers: public WContainerWidget
 {
 public:
-    WOpenLayers(WContainerWidget *parent, cDicoApt * aDico);
+    WOpenLayers( cDicoApt * aDico);
 
     void giveFocus(bool b){
         // fonctionne pas pour le moment

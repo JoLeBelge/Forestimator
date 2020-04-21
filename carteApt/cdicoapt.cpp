@@ -799,7 +799,7 @@ bool cEss::hasRisqueComp(int zbio,int topo){
     bool aRes(0);
     int risque=getRisque(zbio,topo);
     int catRisque=mDico->risqueCat(risque);
-    if (catRisque==1 | catRisque==3){aRes=1;}
+    if ((catRisque==1) | (catRisque==3)){aRes=1;}
     return aRes;
 }
 
@@ -866,14 +866,16 @@ std::string cRasterInfo::NomFile(){
 
 TypeCarte str2TypeCarte(const std::string& str)
 {
-    if(str == "NH") return NH;
-    else if(str == "NT") return NT;
-    else if(str == "Topo") return Topo;
-    else if(str == "AE") return AE;
-    else if(str == "SS") return SS;
-    else if(str == "ZBIO") return ZBIO;
-    else if(str == "CSArdenne") return CSArdenne;
-    else if(str == "CSLorraine") return CSLorraine;
+    TypeCarte aRes=SS;
+    if(str == "NH") aRes=NH;
+    else if(str == "NT") aRes=NT;
+    else if(str == "Topo") aRes=Topo;
+    else if(str == "AE") aRes=AE;
+    else if(str == "SS") aRes=SS;
+    else if(str == "ZBIO") aRes=ZBIO;
+    else if(str == "CSArdenne") aRes=CSArdenne;
+    else if(str == "CSLorraine") aRes=CSLorraine;
+    return aRes;
 }
 
 
