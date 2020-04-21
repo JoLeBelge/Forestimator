@@ -44,9 +44,8 @@ public:
 private:
 
     // Full path ; là ou est sauvé le shp localement, mName ; le nom du shp tels qu'il était chez le client
-    //std::string mFullPath, mName,mClientName;
-    std::string mClientName;
-    std::string * mJSfile;
+    std::string mFullPath, mName,mClientName;
+    std::string mJSfile;
     Wt::WContainerWidget     * mParent;
     Wt::WFileUpload *fu;
     Wt::WPushButton *uploadButton;
@@ -58,7 +57,6 @@ private:
 
     OGRGeometry *poGeomGlobale;
 
-    Wt::Signal<> upload_;
 };
 
 #endif // PARCELLAIRE_H

@@ -174,7 +174,7 @@ std::vector<std::string> Layer::displayInfo(double x, double y){
         if (mCode=="ZBIO"){ mGroupL->mStation->mZBIO=aVal;}
         if (mCode=="Topo"){ mGroupL->mStation->mTOPO=aVal;}
         if (mCode.substr(0,2)=="CS" && aVal!=0){
-            //std::cout << "totoooo \n\n\n" << std::endl;
+
             mGroupL->mStation->mSt=aVal;}
         //std::cout << " la valeur de la couche " << mLabel << " est de " << aVal << std::endl;
         if(mDicoVal->find(aVal)!=mDicoVal->end()){

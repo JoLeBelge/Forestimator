@@ -24,19 +24,15 @@ apt2 = new ol.layer.Tile({
 			if (coordinate === null) return undefined;
 			// TMS Style URL
 			var z = coordinate[0];
-			//var x = coordinate[1]+1;
 			//mais y est négatif, donc je pense que le +1 est préjudiciable, non?
-			//var y = coordinate[2]+1;
-			//var x = coordinate[1]+1;
 			var x = coordinate[1]+1;
-			// celon la version de ol, y=-coordinate[2] ou y = + coordinate[2] +1!!.
-			var y = (coordinate[2]+1);		
+			// celon la version de ol, y=-coordinate[2] (ol 4) ou y = + coordinate[2] +1 (ol 6)!!.
+			var y = -coordinate[2]		
 			var _x = String(x);
 			var _y = String(y);
 
 			// la signification du z chez moi est inversée; plus le z est petit, plus les raster sont résolu.
 			var myZ = ["5","4","3","2","1",""];
-			//var myZ = ["","1","2","3","4","5"];
 			var _z=myZ[z];
 			
 			if(z>=3){

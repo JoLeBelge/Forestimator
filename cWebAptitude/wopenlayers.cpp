@@ -10,6 +10,7 @@ WOpenLayers::WOpenLayers(cDicoApt *aDico):xy_(this,"1.0"),mDico(aDico)
   doJavaScript(ss.str());
   //std::cout << " js Ref " << jsRef() << std::endl;
   setJS_click();
+
 }
 
 // permet de récuper les coodonnées de la carte dans wt lors d'un click dessus

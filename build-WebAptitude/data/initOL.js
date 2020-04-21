@@ -103,7 +103,7 @@ projection = new ol.proj.Projection({
 });
 
 extent = [42247, 21148, 295176, 167719];// full RW
-//ol.proj.get('EPSG:31370').setExtent(extent);
+ol.proj.get('EPSG:31370').setExtent(extent);
 
 var resolutions = new Array(22);
 var startResolution = (extent[2]-extent[0]) / 512;
@@ -128,6 +128,7 @@ var o2018 = new ol.layer.Tile({
 	extent: extent,
 	title: 'Orthophoto 2018',
 	source: new ol.source.TileWMS({
+		 preload: Infinity,
 		title: 'Ortho 2018',
 		url: 'https://gxgfservcarto.gxabt.ulg.ac.be/cgi-bin/map',
 		crossOrigin: 'null',
@@ -266,7 +267,6 @@ layers = [
 	new ol.layer.Group({
 		'title': 'Fonds de carte',
 		layers:[ IGN ] //
-		//layers:[ o2016, pansharpIR, pansharpRGB, IGN ]
 	}),
 	new ol.layer.Group({
 		'title': 'Limites administratives',
@@ -315,7 +315,6 @@ map = new ol.Map({
 IGN.setVisible(true);
 parcelles.setVisible(false);
 
-
 // pas implémenté dans ol3! bien ben c'est ce que je dois implémenter moi-meme dans wt? oui, avec les checksbox, une pour chaque essences forestières
 //var layerSwitcher = new ol.control.LayerSwitcher();
 //map.addControl(layerSwitcher);
@@ -332,49 +331,4 @@ function centrer_com(){
 
 }
 
-/*
-var options = {
-    onSelect: test,
-};
-*/
-/*
-var selectEt = new ol.control.MousePosition(communes, options);
-map.addControl(selectEt);
-
-function getCoordinates(e) {
- // this should work
- var lonlat = map.getLonLatFromViewPortPx(e.xy);
- console.log("You clicked near " + lonlat.lat + " N, " + lonlat.lon + " E");                           
-}
-* */
-
-// maintenant je vais essayer de faire communiquer cette fction avec c++ -- ok c'est geré par copenlayer directement.
-
-/*
-map.on('click', function(evt){
-	console.log("evt pixel");
-    console.info(evt.pixel);
-    //console.info(map.getPixelFromCoordinate(evt.coordinate));
-    //console.info(ol.proj.toLonLat(evt.coordinate));
-    //var lonlat = map.getLonLatFromCoordinate(evt.coordinate);
-    console.log("evt coordinate");
-    console.info(evt.coordinate);
-    //var UV = map.getPixelFromCoordinate(evt.coordinate);
-    var lonlat = ol.proj.toLonLat(evt.coordinate);
-    var coords = ol.proj.toLonLat(evt.coordinate);
-    var lat = coords[1];
-    var lon = coords[0];
-    //var lonlat = ol.proj.transform(evt.coordinate, 'EPSG:31', 'EPSG:31370');
-});
-* */
-
-/*
-function test(){
-            var e = map.events;
-            var n = e.coordinate[1];
-            console.log('toto encore?');
-}*/
-
-// un "écouteur qui lie l'action de click avec une fonction
-//map.on('click', getXY)
 
