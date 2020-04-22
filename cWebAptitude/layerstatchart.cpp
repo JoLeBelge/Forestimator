@@ -75,8 +75,8 @@ Wt::WContainerWidget * layerStatChart::getChart(){
     //std::cout << "config la position des labels" << std::endl;
     // Configure location and type of labels.
    //aChart->setDisplayLabels(Chart::LabelOption::Outside |
-                            Chart::LabelOption::TextLabel |
-                            Chart::LabelOption::TextPercentage);
+    //                        Chart::LabelOption::TextLabel |
+    //                        Chart::LabelOption::TextPercentage);
     // Enable a 3D and shadow effect.
     aChart->setPerspectiveEnabled(true, 0.2);
     aChart->setShadowEnabled(true);
