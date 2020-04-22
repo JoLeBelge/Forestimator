@@ -19,7 +19,7 @@ LIBS = -lgdal -lwthttp -lwt -lboost_system -lboost_iostreams -lboost_thread -lbo
 INCLUDEPATH += $$PWD/../carteApt/
 
 
-#qmake ../cWebAptitude/cWebAptitude.pro pl=server avant de lancer make
+#qmake -makefile ../cWebAptitude/cWebAptitude.pro pl=server avant de lancer make sur debian server
 contains(pl,serveur) {
 LIBS += -L$$PWD/usr/include/gdal/ -lgdal
 INCLUDEPATH += $$PWD/../../../usr/include/gdal/
