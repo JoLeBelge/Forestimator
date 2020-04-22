@@ -13,8 +13,33 @@ cWebAptitude::cWebAptitude(Wt::WApplication* app)
     setOverflow(Wt::Overflow::Auto);
     setPadding(20);
     setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Middle);
-    this->addStyleClass("table form-inline");
-    this->setStyleClass("table form-inline");
+    //this->addStyleClass("table form-inline");
+    //this->setStyleClass("table form-inline");
+    // création d'un stack pour les différentes pages du sites
+    // page 1 ; autécologie
+    // page 2 ; statistique parcellaire
+
+
+    Wt::WStackedWidget * topStack  = this->addNew<Wt::WStackedWidget>();
+    Wt::WContainerWidget * page1 = topStack->addNew<Wt::WContainerWidget>();
+    Wt::WContainerWidget * page2 = topStack->addNew<Wt::WContainerWidget>();
+    //topStack->setCurrentIndex();
+    Wt::WPushButton *retourButton = page2->addWidget(cpp14::make_unique<Wt::WPushButton>("Retour"));
+    //retourButton->setLink(Wt::WLink(Wt::LinkType::InternalPath, "/Aptitude"));
+    //retourButton->clicked().connect([&] {topStack->setCurrentIndex(0);});// avec &, ne tue pas la session mais en recrée une. avec =, tue et recrée, c'est car le lambda copie plein de variable dont this, ça fout la merde
+    // non c'est pas la faute du lambda, c'est les internal path qui font qu'une nouvelle session est créée.
+    retourButton->clicked().connect([&topStack] {topStack->setCurrentIndex(0);});
+    //en fait ça fout la mrd quand j'upload un shp ; démarre une nouvelle session...
+
+
+    // le menu n'est pas ajouté à un widget, donc ne sera pas visible. C'est le but.
+    /*Wt::WMenu *topMenu = this->addNew<Wt::WMenu>(topStack);
+    //Wt::WContainerWidget page1 = topStack->addNew<Wt::WContainerWidget>();
+    Wt::WMenuItem * page1 =topMenu->addItem("p1", Wt::cpp14::make_unique<Wt::WContainerWidget>());
+    page1->setLink(Wt::WLink(Wt::LinkType::InternalPath, "/Aptitude"));
+    Wt::WMenuItem * page2 =topMenu->addItem("p2", Wt::cpp14::make_unique<Wt::WContainerWidget>());
+    page2->setLink(Wt::WLink(Wt::LinkType::InternalPath, "/StatistiqueParcellaire"));*/
+
     auto titreCont = Wt::cpp14::make_unique<Wt::WContainerWidget>();
     WContainerWidget * titreCont_ = titreCont.get();
        WText * titre = titreCont_->addWidget(cpp14::make_unique<WText>("Stations forestières et Aptitude des Essences"));
@@ -86,7 +111,8 @@ cWebAptitude::cWebAptitude(Wt::WApplication* app)
     // unique _ptr est détruit à la fin de la création de l'objet, doit etre déplacé avec move pour donner sa propriété à un autre objet pour ne pas être détruit
     //auto uPtrPA = Wt::cpp14::make_unique<parcellaire>(PACont.get(),mGroupL,m_app);
     //mPA = uPtrPA.get();
-    mPA = new parcellaire(PACont.get(),mGroupL,m_app);
+    mPA = new parcellaire(PACont.get(),mGroupL,m_app,topStack,page2);
+
     // je ne parviens pas à faire le connect correctement, je dois me tromper quelque part.
     mGroupL->focusMap().connect(mMap,&WOpenLayers::giveFocus);
 
@@ -98,10 +124,11 @@ cWebAptitude::cWebAptitude(Wt::WApplication* app)
     mMap->clicked().connect(mMap->slot);
     mMap->xy().connect(std::bind(&groupLayers::extractInfo,mGroupL, std::placeholders::_1,std::placeholders::_2));
     // je divise la fenetre en 2 dans la hauteur pour mettre la carte à droite et à gauche une fenetre avec les infos des couches
-    auto layout = this->setLayout(Wt::cpp14::make_unique<Wt::WVBoxLayout>());
+    //auto layout = this->setLayout(Wt::cpp14::make_unique<Wt::WVBoxLayout>());
+    auto layout = page1->setLayout(Wt::cpp14::make_unique<Wt::WVBoxLayout>());
     // hlayout c'est lié à pane
     hLayout->addWidget(std::move(map), 0);
-    //hLayout-> wiget, int stretch, WFlagAlignement
+    //hLayout-> widget, int stretch, WFlagAlignement
     hLayout->addWidget(std::move(infoW), 1);
     layout->addWidget(std::move(titreCont), 0);
     layout->addWidget(std::move(pane), 0);

@@ -2,60 +2,62 @@
 
 //https://www.quora.com/What-are-the-risks-associated-with-the-use-of-lambda-functions-in-C-11
 
-parcellaire::parcellaire(WContainerWidget *parent, groupLayers *aGL, Wt::WApplication* app):mParent(parent),mGL(aGL),centerX(0.0),centerY(0.0),mClientName(""),mJSfile(""),mName(""),mFullPath(""),m_app(app),fu(NULL),msg(NULL),uploadButton(NULL)
+parcellaire::parcellaire(WContainerWidget *parent, groupLayers *aGL, Wt::WApplication* app, WStackedWidget *aTopStack, WContainerWidget *statW):mParent(parent),mStatW(statW),mGL(aGL),centerX(0.0),centerY(0.0),mClientName(""),mJSfile(""),mName(""),mFullPath(""),m_app(app),fu(NULL),msg(NULL),uploadButton(NULL),mTopStack(aTopStack),computeStatButton(NULL),visuStatButton(NULL)
 {
-    this->addStyleClass("table form-inline");
     mDico=aGL->Dico();
     mJSfile=  aGL->Dico()->File("addOLgeojson");
 
-    mParent->setContentAlignment(AlignmentFlag::Top | AlignmentFlag::Left);
-    // organiser les éléments dans un layout vbox, ou dans un tableau pour ne pas devoir faire un layout (j'aime pas la syntaxe)
-    //addWidget(Wt::cpp14::make_unique<Wt::WBreak>());    // insert a line break
-    mParent->setOffsets(20);
-    mParent->setPadding(20);
+    mParent->setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Left);
+
+    mParent->setMargin(20,Wt::Side::Bottom | Wt::Side::Top);
     mParent->setInline(0);
-    Wt::WTable * tab =  mParent->addWidget(cpp14::make_unique<Wt::WTable>());
 
-    int row(0);
+    mParent->addWidget(cpp14::make_unique<WText>("<h4>Charger votre parcellaire</h4>"));
+    fu =mParent->addNew<Wt::WFileUpload>();
 
-    // boutton pour l'upload du shp
-    //auto cont1 = mParent->addNew<Wt::WContainerWidget>();
+    mParent->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
 
-    tab->elementAt(row,0)->addWidget(cpp14::make_unique<WText>("<h4>Charger votre parcellaire</h4>"));
-    row++;
-    //cont1->addWidget(cpp14::make_unique<WText>("<h4>Charger votre parcellaire</h4>"));
-    //fu =cont1->addNew<Wt::WFileUpload>();
-    fu =tab->elementAt(row,0)->addWidget(cpp14::make_unique<Wt::WFileUpload>());
-    row++;
     fu->setFileTextSize(500); // Set the maximum file size to 50 kB.
     fu->setFilters(".shp, .shx, .dbf, .qpj, .prj, .cpg");
     fu->setMultiple(true);
+    fu->setInline(0);
+    //fu->setMargin(20,Wt::Side::Bottom | Wt::Side::Top); // si le parent a des marges et est inline(0) et que je met l'enfant à inline, l'enfant a des marges également
 
-    msg = tab->elementAt(row,0)->addWidget(cpp14::make_unique<Wt::WText>());
-    row++;
-    uploadButton = tab->elementAt(row,0)->addWidget(cpp14::make_unique<Wt::WPushButton>("Télécharger"));
-    row++;
+    msg = mParent->addWidget(cpp14::make_unique<Wt::WText>());
+    msg->setInline(0);
+    mParent->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
+
+    uploadButton = mParent->addWidget(cpp14::make_unique<Wt::WPushButton>("Télécharger"));
+    mParent->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
+
     uploadButton->disable();
+    uploadButton->setInline(0);
 
+    mParent->addWidget(cpp14::make_unique<WText>("<h4>Calcul de statistique</h4>"));
+    mParent->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
 
-    // React to a file upload problem.
-    fu->fileTooLarge().connect([=] {
-        msg->setText("Le fichier est trop volumineux.");
-    });
-    //auto cont3 = mParent->addNew<Wt::WContainerWidget>();
-    tab->elementAt(row,0)->addWidget(cpp14::make_unique<WText>("<h4>Calcul de statistique</h4>"));
-    row++;
+    computeStatButton = mParent->addWidget(cpp14::make_unique<Wt::WPushButton>("Calcul"));
+    computeStatButton->setInline(0);
+    computeStatButton->disable();
+    mParent->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
 
-    Wt::WPushButton *computeStatButton = tab->elementAt(row,0)->addWidget(cpp14::make_unique<Wt::WPushButton>("Calcul"));
-    //computeStatButton->clicked().connect(std::bind(&parcellaire::computeStat,this));
     mGL->mPBar = mParent->addNew<Wt::WContainerWidget>()->addNew<Wt::WProgressBar>();
+    mParent->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
     mGL->mPBar->setRange(0, 50);
     mGL->mPBar->setValue(0);
+    mGL->mPBar->setInline(0);
 
+    visuStatButton = mParent->addWidget(cpp14::make_unique<Wt::WPushButton>("Visualiser les statistiques"));
+    visuStatButton->setInline(0);
+    visuStatButton->disable();
+    //visuStatButton->setLink(Wt::WLink(Wt::LinkType::InternalPath, "/StatistiqueParcellaire"));
+
+    fu->fileTooLarge().connect([=] { msg->setText("Le fichier est trop volumineux.");});
     fu->changed().connect(this,&parcellaire::fuChanged);
     fu->uploaded().connect(this,&parcellaire::upload);
     uploadButton->clicked().connect(this ,&parcellaire::clickUploadBt);
     computeStatButton->clicked().connect(this,&parcellaire::computeStat);
+    visuStatButton->clicked().connect(this,&parcellaire::visuStat);
 }
 
 parcellaire::~parcellaire(){
@@ -232,7 +234,7 @@ void parcellaire::display(){
         std::ifstream in(aFileIn);
         std::string aTmp(aFileIn+".tmp");
         std::ofstream out(aTmp);
-        // remplace l'url des tuiles par celui de l'essence actuelle:
+
         std::string aFind1("NAME");
         std::string line;
         std::string aReplace(geoJsonRelName());
@@ -271,6 +273,8 @@ void parcellaire::fuChanged(){
 
 void parcellaire::upload(){
     //std::cout << "upload commence.. " ;
+    computeStatButton->disable();
+    visuStatButton->disable();
     cleanShpFile();
     boost::filesystem::path p(fu->clientFileName().toUTF8()), p2(this->fu->spoolFileName());
     this->mClientName = p.stem().c_str();
@@ -283,13 +287,15 @@ void parcellaire::upload(){
         boost::filesystem::path a(file.clientFileName());
         boost::filesystem::rename(file.spoolFileName(),mFullPath+a.extension().c_str());
         //std::cout << "réception " << mFullPath+a.extension().c_str() << std::endl;
-        if ((a.extension().string()==".shp") | (a.extension().string()==".shx" )| (a.extension().string()==".dbf")) nbFiles++;
+        if ((a.extension().string()==".shp") | (a.extension().string()==".shx" )| (a.extension().string()==".dbf") | (a.extension().string()==".qpj") | (a.extension().string()==".prj")) nbFiles++;
     }
 
     // ici je converti en json et affichage dans ol
-    if (nbFiles==3){
+    if (nbFiles==5){
         msg->setText("Téléchargement du shp effectué avec succès.");
-        if (toGeoJson()){ display();}
+        if (toGeoJson()){
+            computeStatButton->enable();
+            display();}
     } else {
         msg->setText("Veillez sélectionner les 6 fichiers du shapefile.");
         cleanShpFile();
@@ -299,16 +305,50 @@ void parcellaire::upload(){
 void parcellaire::computeStat(){
     std::cout << " parcellaire::computeStat()... " ;
     mGL->mPBar->setValue(0);
-
     std::map<std::string,std::map<std::string,int>> stat= mGL->computeStatGlob(poGeomGlobale);
+    mGL->mPBar->setValue(0);
+    visuStatButton->enable();
+    std::cout << " ..done " << std::endl;
+}
 
-    /*for (auto kv : stat){
-        std::cout << "\n statistique pour la couche " << kv.first << std::endl;
-        for (auto kv2 : kv.second){
-            std::cout << kv2.first  << " --> " << kv2.second << "%" << std::endl;
-        }
-    }*/
 
+void parcellaire::visuStat(){
+    std::cout << " parcellaire::visuStat()... " ;
+    mGL->mPBar->setValue(0);
+    mStatW->clear();
+    mStatW->setOverflow(Wt::Overflow::Auto);
+    // premier lay pour mettre titre et boutton de "retour"
+    auto layout = mStatW->setLayout(Wt::cpp14::make_unique<Wt::WVBoxLayout>());
+    auto contTitre = Wt::cpp14::make_unique<Wt::WContainerWidget>();
+    WContainerWidget * contTitre_ = contTitre.get();
+    contTitre->addWidget(cpp14::make_unique<WText>("<h4>Statistique globale pour "+ mClientName+ "</h4>"));
+    Wt::WPushButton * retourButton = contTitre_->addWidget(cpp14::make_unique<Wt::WPushButton>("Retour"));
+    //retourButton->setLink(Wt::WLink(Wt::LinkType::InternalPath, "/Aptitude"));
+    //retourButton->clicked().connect([&] {topStack->setCurrentIndex(0);});// avec &, ne tue pas la session mais en recrée une. avec =, tue et recrée, c'est car le lambda copie plein de variable dont this, ça fout la merde
+    // non c'est pas la faute du lambda, c'est les internal path qui font qu'une nouvelle session est créée.
+    retourButton->clicked().connect([this] {mTopStack->setCurrentIndex(0);});
+
+    auto contCharts = Wt::cpp14::make_unique<Wt::WContainerWidget>();
+    WContainerWidget * contCharts_ = contCharts.get();
+    Wt::WGridLayout * grid = contCharts_->setLayout(Wt::cpp14::make_unique<Wt::WGridLayout>());
+
+    int nbChart=mGL->ptrVLStat().size();
+    int nbColumn=std::min(2,int(std::sqrt(nbChart)));
+    int row(0),column(0);
+    for (layerStatChart * chart : mGL->ptrVLStat()) {
+            //std::cout << " row " << row << " , col " << column << std::endl;
+            grid->addWidget(std::unique_ptr<Wt::WContainerWidget>(chart->getChart()), row, column);
+            column++;
+            if (column>nbColumn){row++;column=0;}
+
+            mGL->mPBar->setValue(mGL->mPBar->value()+(50.0/double(nbChart)));
+            mGL->m_app->processEvents();
+    }
+
+    layout->addWidget(std::move(contTitre), 0);
+    layout->addWidget(std::move(contCharts), 1);
+
+    mTopStack->setCurrentIndex(1);
     mGL->mPBar->setValue(0);
     std::cout << " ..done " << std::endl;
 }

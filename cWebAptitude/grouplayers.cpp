@@ -180,13 +180,20 @@ std::map<std::string,std::map<std::string,int>> groupLayers::computeStatGlob(OGR
     std::map<std::string,std::map<std::string,int>> aRes;
 
     for (Layer& l : mVLs){
-        if (l.Type()!=Externe && l.Type()==Apti){
+        if (l.Type()!=Externe ){//&& l.Type()==Apti){
             // clé : la valeur au format légende (ex ; Optimum). Valeur ; pourcentage pour ce polygone
             std::map<std::string,int> stat = l.computeStatOnPolyg(poGeomGlobale);
+
+           /* for (auto & kv : stat){
+                std::cout << " key " << kv.first << ", val " << kv.second << std::endl;
+            }*/
+            // c'est parcellaire:: qui doit gerer l'affichage des layerStatChart
+            layerStatChart* aLayStatChart=new layerStatChart(&l,stat);
+            mVLStat.push_back(aLayStatChart);
+
             aRes.emplace(std::make_pair(l.getCode(),stat));
             mPBar->setValue(mPBar->value() + 1);
             m_app->processEvents();
-            //std::cout << " progress bar a une valeur de " << mPBar->value() << std::endl;
         }
     }
      mPBar->setValue(mPBar->maximum());
@@ -250,6 +257,13 @@ std::map<std::string,int> groupLayers::apts(){
     }
     return aRes;
 }
+
+
+/* parcellaire s'en charge
+void groupLayers::visuStat(){
+
+
+}*/
 
 ST::ST(cDicoApt * aDico):mDico(aDico),mNT(666),mNH(666),mZBIO(666),mTOPO(666),mActiveEss(0),HaveEss(0),mSt(0)
 {

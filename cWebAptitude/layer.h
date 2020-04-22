@@ -36,7 +36,6 @@ enum TypeLayer {Apti
                };
 
 
-
 class Layer
 {
 public:
@@ -80,6 +79,32 @@ public:
                 aRes=mDicoCol->at(aCode);}
         return aRes;
     }
+
+    color getColor(std::string aStrCode){
+        int aCode(0);
+        bool test(0);
+        color aRes(255,255,255);
+        std::map<int, std::string>::iterator it = mDicoVal->begin();
+        // Iterate through the map
+        while(it != mDicoVal->end())
+        {
+            // Check if value of this entry matches with given value
+            if(it->second == aStrCode)
+            {
+                // Yes found
+                test = true;
+                // Push the key in given map
+                aCode=it->first;
+            }
+            // Go to next entry in map
+            it++;
+        }
+        //if (!test) std::cout << " warn, pas de label correspondant à " << aStrCode << " dans le dictionnaire des valeurs de cette layer" << std::endl;
+        if (!test & aStrCode=="Sans données"){ }else
+        {aRes=getColor(aCode);}
+        return aRes;
+    }
+
     cEss * Ess(){return mEss;}
 private:
     bool mActive;

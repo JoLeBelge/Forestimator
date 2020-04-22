@@ -12,12 +12,14 @@
 #include "ogrsf_frmts.h"
 #include "gdal_utils.h"
 #include <Wt/WProgressBar.h>
+#include "layerstatchart.h"
 
 class WOpenLayers;
 class Layer;
 class groupLayers;
 class legend;
 class ST;
+class layerStatChart;
 
 enum TypeClassifST {FEE
                     ,CS
@@ -80,7 +82,9 @@ public:
         return aRes;
     }
 
+    // clé 1 ; nom de la couche. clé2 : la valeur au format légende (ex ; Optimum). Valeur ; pourcentage pour ce polygone
     std::map<std::string,std::map<std::string,int>> computeStatGlob(OGRGeometry *poGeomGlobale);
+    //void visuStat();
     // void car on ajoute les résulats à la table d'attribut de la couche
     void computeStatOnPolyg(OGRLayer * lay);
 
@@ -96,6 +100,19 @@ public:
     std::map<std::string,int> apts();
 
     Wt::WProgressBar *mPBar;
+    // pour faire un processEvent, seul moyen de refresh de la progressbar.
+    Wt::WApplication* m_app;
+
+    std::vector<layerStatChart*> ptrVLStat() {return mVLStat;}
+
+    /*
+    std::vector<layerStatChart> VLStat() {
+        std::vector<layerStatChart> aRes;
+        for (auto & ptr : mVLStat){
+            aRes.push_back(ptr);
+        }
+        return aRes;}
+        */
 
 private:
     TypeClassifST mTypeClassifST;
@@ -118,8 +135,9 @@ private:
     WOpenLayers * mMap;
     // bof finalement c'est mieux le conteneur parent
     Wt::WContainerWidget     * mParent;
-    // pour faire un processEvent, seul moyen de refresh de la progressbar.
-    Wt::WApplication* m_app;
+
+
+    std::vector<layerStatChart*> mVLStat;
 };
 
 #endif // GROUPLAYERS_H

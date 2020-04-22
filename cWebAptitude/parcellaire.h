@@ -9,11 +9,15 @@
 #include <Wt/WPushButton.h>
 #include <Wt/WText.h>
 #include <Wt/WProgressBar.h>
+#include <Wt/WSignal.h>
+#include <Wt/WEnvironment.h>
+#include <Wt/WGridLayout.h>
 
 #include "boost/filesystem.hpp"
 //#include <boost/bind.hpp>
 //#include <boost/function.hpp>
-//#include <functional>
+#include <functional> //--> pour bind
+#include <iostream>
 
 // objet qui comprend le shp d'un parcellaire DNF que l'on va afficher dans openlayer
 // cet objet contient également l'interface graphique wt avec les bouttons qui permettent de charger le shp, les bouttons pour démarrer les calcul, ect
@@ -21,7 +25,7 @@
 class parcellaire: public WContainerWidget
 {
 public:
-    parcellaire(WContainerWidget *parent, groupLayers * aGL, Wt::WApplication* app);
+    parcellaire(WContainerWidget *parent, groupLayers * aGL, Wt::WApplication* app,Wt::WStackedWidget * aTopStack,WContainerWidget * statW);
     ~parcellaire();
     void cleanShpFile();
     // conversion shp esri vers geoJson
@@ -34,6 +38,7 @@ public:
     // rasterize une géométrie
     //void rasterizeGeom(OGRGeometry *poGeom);
     void computeStat();
+    void visuStat();
     void upload();
     void clickUploadBt();
     void fuChanged();
@@ -41,14 +46,17 @@ public:
     std::string geoJsonName();
     std::string geoJsonRelName();
 
+    Wt::Signal<int>& changePage() { return page_; }
+
 private:
 
     // Full path ; là ou est sauvé le shp localement, mName ; le nom du shp tels qu'il était chez le client
     std::string mFullPath, mName,mClientName;
     std::string mJSfile;
     Wt::WContainerWidget     * mParent;
+    Wt::WContainerWidget * mStatW;
     Wt::WFileUpload *fu;
-    Wt::WPushButton *uploadButton;
+    Wt::WPushButton *uploadButton,*computeStatButton, *visuStatButton;
     Wt::WApplication* m_app;
     Wt::WText * msg;
     groupLayers * mGL;
@@ -56,6 +64,9 @@ private:
     double centerX,centerY;
 
     OGRGeometry *poGeomGlobale;
+
+    Wt::Signal<int> page_;
+    Wt::WStackedWidget * mTopStack;
 
 };
 
