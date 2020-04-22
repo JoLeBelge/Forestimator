@@ -108,6 +108,7 @@ bool parcellaire::toGeoJson(){
     if( jsonDriver == NULL )
     {
         printf( "%s driver not available.\n", "GeoJSON" );
+        msg->setText("GeoJSO driver not available!");
         aRes=false;
 
     } else {
@@ -193,7 +194,6 @@ void parcellaire::computeGlobalGeom(OGRLayer * lay){
         if (err!=OGRERR_NONE){
             std::cout << "problem avec ajout de la geometrie " << poFeature->GetFID() << ", erreur : " << err <<  std::endl;
         }
-
     }
 
     poGeom2 = multi->UnionCascaded();

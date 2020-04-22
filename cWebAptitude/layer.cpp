@@ -349,10 +349,9 @@ std::string Layer::getLegendLabel(){
     return aRes;
 }
 
-
 GDALDataset * Layer::rasterizeGeom(OGRGeometry *poGeom){
 
-    std::string output("/home/lisein/Documents/carteApt/Forestimator/build-WebAptitude/tmp/tmp");
+    std::string output(mDico->File("TMPDIR")+"tmp");
     const char *out=output.c_str();
     //std::cout << " Layer::rasterizeGeom " << std::endl;
     GDALAllRegister();

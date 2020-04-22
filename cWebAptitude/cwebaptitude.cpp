@@ -10,6 +10,7 @@ cWebAptitude::cWebAptitude(Wt::WApplication* app)
 
     std::string aBD=loadBDpath();
     mDico=new cDicoApt(aBD);
+
     setOverflow(Wt::Overflow::Auto);
     setPadding(20);
     setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Middle);
@@ -24,11 +25,11 @@ cWebAptitude::cWebAptitude(Wt::WApplication* app)
     Wt::WContainerWidget * page1 = topStack->addNew<Wt::WContainerWidget>();
     Wt::WContainerWidget * page2 = topStack->addNew<Wt::WContainerWidget>();
     //topStack->setCurrentIndex();
-    Wt::WPushButton *retourButton = page2->addWidget(cpp14::make_unique<Wt::WPushButton>("Retour"));
+    //Wt::WPushButton *retourButton = page2->addWidget(cpp14::make_unique<Wt::WPushButton>("Retour"));
     //retourButton->setLink(Wt::WLink(Wt::LinkType::InternalPath, "/Aptitude"));
     //retourButton->clicked().connect([&] {topStack->setCurrentIndex(0);});// avec &, ne tue pas la session mais en recrée une. avec =, tue et recrée, c'est car le lambda copie plein de variable dont this, ça fout la merde
     // non c'est pas la faute du lambda, c'est les internal path qui font qu'une nouvelle session est créée.
-    retourButton->clicked().connect([&topStack] {topStack->setCurrentIndex(0);});
+    //retourButton->clicked().connect([&topStack] {topStack->setCurrentIndex(0);});
     //en fait ça fout la mrd quand j'upload un shp ; démarre une nouvelle session...
 
 
@@ -49,6 +50,8 @@ cWebAptitude::cWebAptitude(Wt::WApplication* app)
     // le set padding ne fonctionne que si je désactive le inline
     titre->setInline(0);
     titre->setPadding(0,Wt::Side::Bottom | Wt::Side::Top);
+
+
 
     auto pane = Wt::cpp14::make_unique<Wt::WContainerWidget>();
     WContainerWidget * pane_ = pane.get();
@@ -82,9 +85,11 @@ cWebAptitude::cWebAptitude(Wt::WApplication* app)
     //menu->addItem("Téléchargement", Wt::cpp14::make_unique<Wt::WTextArea>("Téléchargement : to come soon"));
     infoW_->addWidget(std::move(contents));
 
+
     auto map = Wt::cpp14::make_unique<WOpenLayers>(mDico);
     mMap= map.get();
     mMap->setWidth("70%");
+
     //mMap->setHeight("50%"); // ca ca met la taille de la carte à 50 du conteneur dans le layout, donc c'est pas bon
 
     color col= mDico->Apt2col(2);

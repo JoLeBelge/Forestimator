@@ -44,7 +44,8 @@ Wt::WContainerWidget * layerStatChart::getChart(){
     aRes->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
     table->setMargin(10, Side::Top | Side::Bottom);
     table->setMargin(WLength::Auto, Side::Left | Side::Right);
-    //table->setSortingEnabled(2,true);
+    table->setSortingEnabled(1,false);
+    table->setSortingEnabled(0,false);// pas très utile
     table->setModel(mModel);
     table->setColumnWidth(0, 200);
     table->setColumnWidth(1, 150);
@@ -61,8 +62,7 @@ Wt::WContainerWidget * layerStatChart::getChart(){
     //std::cout << "change la couleur" << std::endl;
     int row = 0;
     for (auto & kv : mStat){
-
-        std::string aCodeStr(kv.first);
+          std::string aCodeStr(kv.first);
           //std::cout << " row " <<  row << ", " << aCodeStr<< std::endl;
         color col(mLay->getColor(aCodeStr));
        // std::cout << "got color" << std::endl;
@@ -76,11 +76,11 @@ Wt::WContainerWidget * layerStatChart::getChart(){
                             Chart::LabelOption::TextLabel |
                             Chart::LabelOption::TextPercentage);
     // Enable a 3D and shadow effect.
-    aChart->setPerspectiveEnabled(true, 0.2);
-    aChart->setShadowEnabled(true);
+    //aChart->setPerspectiveEnabled(true, 0.2);
+    //aChart->setShadowEnabled(true);
 
     if (mStat.size()>1) {aChart->setExplode(rowAtMax, 0.3);}  // Explode l'élément majoritaire
-    aChart->resize(500, 300);    // WPaintedWidget must be given an explicit size.
+    aChart->resize(400, 400);    // WPaintedWidget must be given an explicit size.
     aChart->setMargin(10, Side::Top | Side::Bottom); // Add margin vertically.
     aChart->setMargin(WLength::Auto, Side::Left | Side::Right); // Center horizontally.
     } else {
