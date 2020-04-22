@@ -36,6 +36,8 @@ Wt::WContainerWidget * layerStatChart::getChart(){
     // crée un smart ptr pour un chart vide
     Wt:WContainerWidget * aRes= new Wt::WContainerWidget();
     aRes->setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Center);
+    aRes->setInline(0);
+    aRes->setOverflow(Wt::Overflow::Auto);
 
     aRes->addWidget(cpp14::make_unique<WText>("<h4>"+mLay->getLegendLabel()+"</h4>"));
     aRes->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
@@ -72,17 +74,18 @@ Wt::WContainerWidget * layerStatChart::getChart(){
     }
     //std::cout << "config la position des labels" << std::endl;
     // Configure location and type of labels.
-    aChart->setDisplayLabels(Chart::LabelOption::Outside |
+   //aChart->setDisplayLabels(Chart::LabelOption::Outside |
                             Chart::LabelOption::TextLabel |
                             Chart::LabelOption::TextPercentage);
     // Enable a 3D and shadow effect.
-    //aChart->setPerspectiveEnabled(true, 0.2);
-    //aChart->setShadowEnabled(true);
+    aChart->setPerspectiveEnabled(true, 0.2);
+    aChart->setShadowEnabled(true);
 
-    if (mStat.size()>1) {aChart->setExplode(rowAtMax, 0.3);}  // Explode l'élément majoritaire
-    aChart->resize(400, 400);    // WPaintedWidget must be given an explicit size.
-    aChart->setMargin(10, Side::Top | Side::Bottom); // Add margin vertically.
-    aChart->setMargin(WLength::Auto, Side::Left | Side::Right); // Center horizontally.
+    //if (mStat.size()>1) {aChart->setExplode(rowAtMax, 0.1);}  // Explode l'élément majoritaire WARN, le camembert sort du graphique, bug
+    aChart->resize(300, 300);    // WPaintedWidget must be given an explicit size.
+    aChart->setMargin(20, Side::Top | Side::Bottom); // Add margin vertically.
+    //aChart->setMargin(WLength::Auto, Side::Left | Side::Right); // Center horizontally. il faut mettre des marges, qui sont comtpée au départ du cammembert, pour mettre les label
+    aChart->setMargin(50, Side::Left | Side::Right);
     } else {
       aRes->addWidget(cpp14::make_unique<WText>("Pas de statistique pour cette couche"));
     }
