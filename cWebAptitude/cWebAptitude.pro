@@ -41,7 +41,8 @@ SOURCES += main.cpp \
     grouplayers.cpp \
     legend.cpp \
     parcellaire.cpp \
-    layerstatchart.cpp
+    layerstatchart.cpp \
+    uploadcarte.cpp
 
 HEADERS += \
     wopenlayers.h \
@@ -51,4 +52,5 @@ HEADERS += \
     grouplayers.h \
     legend.h \
     parcellaire.h \
-    layerstatchart.h
+    layerstatchart.h \
+    uploadcarte.h

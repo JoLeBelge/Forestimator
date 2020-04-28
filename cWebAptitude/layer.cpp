@@ -13,7 +13,7 @@ Layer::Layer(groupLayers * aGroupL, std::string aCode, WText *PWText, TypeLayer 
 {
     // constructeur qui dépend du type de layer
     switch (mType) {
-    case Apti:
+    case TypeLayer::Apti:
         // construction de l'essence
         mEss=new cEss(mCode,mDico);
         mLabel=mEss->Code() + " - "+ mEss->Nom();
@@ -21,7 +21,7 @@ Layer::Layer(groupLayers * aGroupL, std::string aCode, WText *PWText, TypeLayer 
         mDicoVal=mDico->code2AptFull();
         mDicoCol=mDico->codeApt2col();
         break;
-    case KK:
+    case TypeLayer::KK:
         // construction de la caractéristique stationnelle
         mKK=new cKKCS(mCode,mDico);
         mLabel= "Catalogue de Station - "+ mKK->Nom();
@@ -36,7 +36,7 @@ Layer::Layer(groupLayers * aGroupL, std::string aCode, WText *PWText, TypeLayer 
         }
         mDicoCol=mKK->getDicoCol();
         break;
-    case Thematique:
+    case TypeLayer::Thematique:
         // creation de l'objet cRasterInfo
         mRI= new cRasterInfo(mCode,mDico);
         mLabel= mRI->Nom();
@@ -45,7 +45,7 @@ Layer::Layer(groupLayers * aGroupL, std::string aCode, WText *PWText, TypeLayer 
         mDicoVal=mRI->getDicoVal();
         mDicoCol=mRI->getDicoCol();
         break;
-    case Externe:
+    case TypeLayer::Externe:
         if (mCode=="IGN"){
             mLabel="Carte topographique IGN";
             mText->setText(mLabel);
@@ -75,7 +75,7 @@ Layer::Layer(groupLayers * aGroupL, cEss aEss, WText *PWText):
   ,mGroupL(aGroupL)
   ,mCode(aEss.Code())
   ,mText(PWText)
-  ,mType(Apti)
+  ,mType(TypeLayer::Apti)
   ,mDicoVal(0)
   ,mDicoCol(0)
 {
@@ -103,7 +103,7 @@ void Layer::clickOnName(std::string aCode){
 void Layer::displayLayer(){
 
     switch (mType) {
-    case Externe:
+    case TypeLayer::Externe:
     {
         std::string JScommand("groupe = new ol.layer.Group({layers:[TOREPLACE, communes]});TOREPLACE.setVisible(true);map.setLayerGroup(groupe);");
         boost::replace_all(JScommand,"TOREPLACE",mCode);
@@ -124,17 +124,17 @@ void Layer::displayLayer(){
         std::string Replace1(""),Replace2("");
 
         switch (mType) {
-        case Apti:
+        case TypeLayer::Apti:
             switch (mGroupL->TypeClas()) {
             case FEE: Replace1="FEE_"+mCode;Replace2="aptitudeFEE_"+mCode;break;
             case CS: Replace1="CS_"+mCode;Replace2="aptitudeCS_"+mCode;break;
             }
             break;
-        case KK:
+        case TypeLayer::KK:
             Replace1="KK_CS_"+mCode;
             Replace2=Replace1;
             break;
-        case Thematique:
+        case TypeLayer::Thematique:
             Replace1=mRI->NomTuile();
             Replace2=mRI->NomFile();
         default:
@@ -166,7 +166,7 @@ std::vector<std::string> Layer::displayInfo(double x, double y){
     aRes.push_back(getLegendLabel());
     std::string val("");
     // on va affichier uniquement les informations de la couches d'apt qui est sélectionnée, et de toutes les couches thématiques (FEE et CS)
-    if ((mType==KK )| (mType==Thematique) |( this->IsActive())){
+    if ((mType==TypeLayer::KK )| (mType==TypeLayer::Thematique) |( this->IsActive())){
         // 1 extraction de la valeur
         int aVal=getValue(x,y);
         if (mCode=="NT"){ mGroupL->mStation->mNT=aVal;}
@@ -182,7 +182,7 @@ std::vector<std::string> Layer::displayInfo(double x, double y){
         }
     }
 
-    if ((mType==Apti) && (this->IsActive())){
+    if ((mType==TypeLayer::Apti) && (this->IsActive())){
         mGroupL->mStation->mActiveEss=mEss;
         mGroupL->mStation->HaveEss=1;
     }
@@ -195,7 +195,7 @@ std::vector<std::string> Layer::displayInfo(double x, double y){
 int Layer::getValue(double x, double y){
 
     int aRes(0);
-    if (mType!=Externe){
+    if (mType!=TypeLayer::Externe){
         // gdal
         GDALAllRegister();
 
@@ -237,7 +237,7 @@ std::map<std::string,int> Layer::computeStatOnPolyg(OGRGeometry *poGeom){
     //std::cout << " groupLayers::computeStatOnPolyg " << std::endl;
     std::map<std::string,int> aRes;
 
-    if (mType!=Externe){
+    if (mType!=TypeLayer::Externe){
         // préparation du containeur du résultat
         for (auto &kv : *mDicoVal){
             aRes.emplace(std::make_pair(kv.second,0));
@@ -322,7 +322,7 @@ std::map<std::string,int> Layer::computeStatOnPolyg(OGRGeometry *poGeom){
 std::string Layer::getPathTif(){
     std::string aRes;
     switch (mType) {
-    case Apti:
+    case TypeLayer::Apti:
         switch (mGroupL->TypeClas()) {
         case FEE: aRes=mEss->NomCarteAptFEE();break;
         case CS: aRes=mEss->NomCarteAptCS();break;
@@ -337,7 +337,7 @@ std::string Layer::getPathTif(){
 std::string Layer::getLegendLabel(){
     std::string aRes;
     switch (mType) {
-    case Apti:
+    case TypeLayer::Apti:
         switch (mGroupL->TypeClas()) {
         case FEE: aRes="Aptitude FEE du "+mLabel;break;
         case CS: aRes="Aptitude CS du "+mLabel;break;
@@ -345,6 +345,37 @@ std::string Layer::getLegendLabel(){
         break;
     default:
         aRes=mLabel;
+    }
+    return aRes;
+}
+
+
+std::vector<std::string> Layer::getCode(std::string aMode){
+    std::vector<std::string> aRes;
+    switch (mType) {
+    case TypeLayer::Apti:
+        switch (mGroupL->TypeClas()) {
+        case FEE: aRes={mCode,"FEE"};break;
+        case CS: aRes={mCode,"CS"};break;
+        }
+        break;
+    default:
+        aRes={mCode,""};
+    }
+    return aRes;
+}
+
+std::string Layer::getPathTif(std::string aMode){
+    std::string aRes;
+    switch (mType) {
+    case TypeLayer::Apti:{
+        if (aMode=="FEE") {aRes=mEss->NomCarteAptFEE();}
+        if (aMode=="CS") {aRes=mEss->NomCarteAptCS();}
+        break;
+    }
+    default:{
+        aRes=mPathTif;
+    }
     }
     return aRes;
 }
@@ -358,7 +389,7 @@ GDALDataset * Layer::rasterizeGeom(OGRGeometry *poGeom){
     GDALDriver *pDriver;
     GDALDataset *pRaster=NULL, * pShp;
 
-    if (mType!=Externe){
+    if (mType!=TypeLayer::Externe){
         OGRSpatialReference  * spatialReference=new OGRSpatialReference;
         OGRErr err;
         err=spatialReference->importFromEPSG(31370);
@@ -422,5 +453,15 @@ GDALDataset * Layer::rasterizeGeom(OGRGeometry *poGeom){
         GDALClose(pShp);
     }
     return pRaster;
+}
+
+
+rasterFiles::rasterFiles(std::string aPathTif):mPathTif(aPathTif),mPathQml(""){
+    //boost::filesystem::path p(mPathTif);
+    // détermine si il y a un fichier de symbologie associé
+    std::string aPathQml = mPathTif.substr(0,mPathTif.size()-3)+"qml";
+    if (exists(aPathQml)){
+        mPathQml=aPathQml;
+    }
 }
 

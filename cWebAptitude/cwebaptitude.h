@@ -3,6 +3,7 @@
 
 #include "grouplayers.h"
 #include "parcellaire.h"
+#include "uploadcarte.h"
 #include <Wt/WContainerWidget.h>
 #include <Wt/WVBoxLayout.h>
 #include <Wt/WHBoxLayout.h>
@@ -55,6 +56,7 @@ private:
   //std::vector<WText *> essLabels_; // ce sont les labels qui sont dans le tableau
     groupLayers * mGroupL;
     parcellaire * mPA;
+    uploadCarte * mUpload;
 
 
 };

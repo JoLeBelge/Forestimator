@@ -2,7 +2,10 @@
 
 //https://www.quora.com/What-are-the-risks-associated-with-the-use-of-lambda-functions-in-C-11
 
-parcellaire::parcellaire(WContainerWidget *parent, groupLayers *aGL, Wt::WApplication* app, WStackedWidget *aTopStack, WContainerWidget *statW):mParent(parent),mStatW(statW),mGL(aGL),centerX(0.0),centerY(0.0),mClientName(""),mJSfile(""),mName(""),mFullPath(""),m_app(app),fu(NULL),msg(NULL),uploadButton(NULL),mTopStack(aTopStack),computeStatButton(NULL),visuStatButton(NULL)
+parcellaire::parcellaire(WContainerWidget *parent, groupLayers *aGL, Wt::WApplication* app, WStackedWidget *aTopStack, WContainerWidget *statW):mParent(parent),mStatW(statW),mGL(aGL),centerX(0.0),centerY(0.0),mClientName(""),mJSfile(""),mName(""),mFullPath(""),m_app(app),fu(NULL),msg(NULL),uploadButton(NULL),mTopStack(aTopStack)
+                ,computeStatButton(NULL)
+                ,visuStatButton(NULL)
+                ,hasValidShp(0)
 {
     mDico=aGL->Dico();
     mJSfile=  aGL->Dico()->File("addOLgeojson");
@@ -41,7 +44,7 @@ parcellaire::parcellaire(WContainerWidget *parent, groupLayers *aGL, Wt::WApplic
     computeStatButton->disable();
     mParent->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
 
-    mGL->mPBar = mParent->addNew<Wt::WContainerWidget>()->addNew<Wt::WProgressBar>();
+    mGL->mPBar = mParent->addNew<Wt::WProgressBar>();
     mParent->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
     mGL->mPBar->setRange(0, 50);
     mGL->mPBar->setValue(0);
@@ -124,6 +127,7 @@ bool parcellaire::toGeoJson(){
             // layer
             OGRLayer * lay = DS->GetLayer(0);
             computeGlobalGeom(lay);
+
             //std::cout << lay->GetName() << std::endl;
 
 
@@ -140,9 +144,8 @@ bool parcellaire::toGeoJson(){
 
             GDALDataset * DS2;
             DS2 = jsonDriver->CreateCopy(outPath, DS, FALSE, papszOptions,NULL, NULL );
-
-            GDALClose( DS );
             GDALClose( DS2 );
+            GDALClose( DS );
 
         }}
 
@@ -163,19 +166,25 @@ void parcellaire::computeGlobalGeom(OGRLayer * lay){
     OGRMultiPolygon *poGeomM;
 
     lay->ResetReading();
+    int nbValidPol(0);
     while( (poFeature = lay->GetNextFeature()) != NULL )
     {
+        // allez les gros bourrin
 
+        //OGRGeometry * tmp=OGRGeometryFactory::forceTo((poFeature->GetGeometryRef()));
+        poFeature->GetGeometryRef()->flattenTo2D();
         switch (poFeature->GetGeometryRef()->getGeometryType()){
-        case wkbPolygon:
+        case (wkbPolygon):
         {
             poGeom=poFeature->GetGeometryRef();
             poGeom->closeRings();
             poGeom = poGeom->Buffer(0.0);
             //poGeom->Simplify(1.0);
             err = multi->addGeometry(poGeom);
+            if (err==OGRERR_NONE) nbValidPol++;
             break;
         }
+
         case wkbMultiPolygon:
         {
             poGeomM= poFeature->GetGeometryRef()->toMultiPolygon();
@@ -184,11 +193,13 @@ void parcellaire::computeGlobalGeom(OGRLayer * lay){
                 poGeom=poGeomM->getGeometryRef(i);
                 //if (poFeature->GetGeometryRef()->getGeometryType()==wkbPolygon)
                 err = multi->addGeometry(poGeom);
+                if (err==OGRERR_NONE) nbValidPol++;
             }
             break;
         }
         default:
-            std::cout << "Geometrie " << poFeature->GetFID() << ", type de geometrie non pris en charge ; " << poFeature->GetGeometryRef()->getGeometryName() << std::endl;
+            std::cout << "Geometrie " << poFeature->GetFID() << ", type de geometrie non pris en charge ; " << poFeature->GetGeometryRef()->getGeometryName() << ", id " << poFeature->GetGeometryRef()->getGeometryType()<< std::endl;
+
             break;
         }
         if (err!=OGRERR_NONE){
@@ -196,7 +207,9 @@ void parcellaire::computeGlobalGeom(OGRLayer * lay){
         }
     }
 
-    poGeom2 = multi->UnionCascaded();
+    // test si
+    if (nbValidPol>0){poGeom2 = multi->UnionCascaded();
+
     poGeom2 =poGeom2->Buffer(1.0);// ça marche bien on dirait! je sais pas si c'est le buffer 1 ou le simplify 1 qui enlève les inner ring (hole) qui restent.
     poGeomGlobale =poGeom2->Simplify(1.0);
 
@@ -217,6 +230,8 @@ void parcellaire::computeGlobalGeom(OGRLayer * lay){
 
         centerX=aPt->getX();
         centerY=aPt->getY();
+    }
+
     }
 
     delete multi;
@@ -275,6 +290,7 @@ void parcellaire::upload(){
     //std::cout << "upload commence.. " ;
     computeStatButton->disable();
     visuStatButton->disable();
+    hasValidShp=false;
     cleanShpFile();
     boost::filesystem::path p(fu->clientFileName().toUTF8()), p2(this->fu->spoolFileName());
     this->mClientName = p.stem().c_str();
@@ -290,17 +306,20 @@ void parcellaire::upload(){
         //solution ; copy! de toute manière tmp/ est pugé souvent
         boost::filesystem::copy(file.spoolFileName(),mFullPath+a.extension().c_str());
         //std::cout << "réception " << mFullPath+a.extension().c_str() << std::endl;
-        if ((a.extension().string()==".shp") | (a.extension().string()==".shx" )| (a.extension().string()==".dbf") | (a.extension().string()==".qpj") | (a.extension().string()==".prj")) nbFiles++;
+        //if ((a.extension().string()==".shp") | (a.extension().string()==".shx" )| (a.extension().string()==".dbf") | (a.extension().string()==".qpj") | (a.extension().string()==".prj")) nbFiles++;
+        if ((a.extension().string()==".shp") | (a.extension().string()==".shx" )| (a.extension().string()==".dbf")) nbFiles++;
+
     }
 
     // ici je converti en json et affichage dans ol
-    if (nbFiles==5){
+    if (nbFiles==3){
         msg->setText("Téléchargement du shp effectué avec succès.");
         if (toGeoJson()){
+            hasValidShp=true;
             computeStatButton->enable();
             display();}
     } else {
-        msg->setText("Veillez sélectionner les 6 fichiers du shapefile.");
+        msg->setText("Veillez sélectionner les 3 fichiers du shapefile (shp, shx et dbf).");
         cleanShpFile();
     }
 }

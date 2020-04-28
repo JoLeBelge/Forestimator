@@ -119,7 +119,7 @@ void legend::detailCalculAptFEE(ST * aST){
 
 void legend::afficheLegendeIndiv(Layer * l){
 
-    if (l->Type()!=Externe){
+    if (l->Type()!=TypeLayer::Externe){
         // vider la légende et afficher la légende personnelle de la couche active
         //std::cout << " je vais afficher la légende personnalisée pour " <<l->getLegendLabel() <<std::endl;
         vider();

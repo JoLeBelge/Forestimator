@@ -26,20 +26,41 @@ using namespace Wt;
 class groupLayers;
 class Layer;
 class color;
+class rasterFiles; // une classe dédiée uniquemnent à l'export et au clip des couches. Layer ne convient pas car contient une grosse partie pour l'affichage (tuiles et autre) et surtout qu'il y a deux couches par layer pour les apti
 
-// ça va être un peu batard vu que je vais mélanger divers type de layer
 
-enum TypeLayer {Apti
+inline bool exists (const std::string& name){
+    struct stat buffer;
+    return (stat (name.c_str(), &buffer) == 0);
+};
+
+
+
+enum class TypeLayer {Apti
                 ,KK // les cartes dérivées des CS
-                ,Thematique // toutes les autres ; NH NT ZBIO IGN
+                ,Thematique // toutes les autres ; NH NT ZBIO
                 ,Externe // toutes les cartes qui ne sont pas en local ; carte IGN pour commencer
                };
 
 
+class rasterFiles{
+
+public:
+    rasterFiles(std::string aPathTif);
+    std::string tif(){return mPathTif;}
+    std::string symbology(){return mPathQml;}
+    bool hasSymbology(){return mPathQml!="";}
+private:
+    std::string mPathTif, mPathQml;
+    // pour exporter le dictionnaire dans un fichier texte si nécessaire
+    std::map<int, std::string> mDicoVal;
+};
+
+// ça va être un peu batard vu que je vais mélanger divers type de layer
 class Layer
 {
 public:
-    Layer(groupLayers * aGroupL, std::string aCode,WText * PWText,TypeLayer aType=Apti);
+    Layer(groupLayers * aGroupL, std::string aCode,WText * PWText,TypeLayer aType=TypeLayer::Apti);
     Layer(groupLayers * aGroupL, cEss aEss ,WText * PWText);
 
     //void clickOnName(std::string aCode);
@@ -65,6 +86,12 @@ public:
     std::string getCode(){return mCode;}
     std::string getPathTif();
     std::string getLegendLabel();
+    std::string getShortLabel(){return mLabel;}
+
+    // à cause de ma superbe idée de merde de mettre deux couches raster par layer, je dois surcharger ces méthodes pour pouvoir spécifier le mode Fee vs Cs
+    std::vector<std::string> getCode(std::string aMode);
+    std::string getPathTif(std::string aMode);
+
     TypeLayer Type(){return mType;}
 
     // le dictionnaire des valeurs raster vers leur signification.

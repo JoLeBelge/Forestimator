@@ -5,6 +5,13 @@
 #include <Wt/WTabWidget.h>
 #include <Wt/WStackedWidget.h>
 #include <Wt/WSignal.h>
+#include <Wt/WIconPair.h>
+#include <Wt/WText.h>
+#include <Wt/WTree.h>
+#include <Wt/WTreeTable.h>
+#include <Wt/WTreeTableNode.h>
+#include <Wt/WCheckBox.h>
+
 #include "layer.h"
 #include "legend.h"
 #include <fstream>
@@ -20,12 +27,16 @@ class groupLayers;
 class legend;
 class ST;
 class layerStatChart;
+class rasterFiles;
+//class WCheckBox;
+enum class TypeLayer;
 
 enum TypeClassifST {FEE
                     ,CS
                    };
 
 using namespace Wt;
+
 
 class ST{
 public:
@@ -53,7 +64,6 @@ public:
     // catalogue de station
     int mSt;
 private:
-
 
 };
 
@@ -105,14 +115,37 @@ public:
 
     std::vector<layerStatChart*> ptrVLStat() {return mVLStat;}
 
-    /*
-    std::vector<layerStatChart> VLStat() {
-        std::vector<layerStatChart> aRes;
-        for (auto & ptr : mVLStat){
-            aRes.push_back(ptr);
+
+
+    // une map qui permet de lister les couches selectionnées.
+    // vu que pour les apt j'ai deux couches possibles, cs et fee, la clé est un vecteur de deux elements , le premier le code layer, le deuxième le mode FEEvsCS
+    // value ; boolean pour dire si la couche est sélectionnée par l'utilisateur
+    std::map<std::vector<std::string>,bool> mSelectedLayers;
+    // une map de pointeur vers checkbox qui est liée aux couches selectionnée
+    std::map<std::vector<std::string>,Wt::WCheckBox*> mLayersCBox;
+
+    void SelectLayer(bool select,std::string aCode, std::string aMode="");
+    void SelectLayerGroup(bool select,TypeLayer aType,std::string aMode="");
+    int numSelectedLayer(){
+        int aRes(0);
+        for (auto & kv: mSelectedLayers){
+            if (kv.second==true){aRes++;}
         }
-        return aRes;}
-        */
+        return aRes;
+    }
+    bool isSelected(std::string aCode, std::string aMode=""){
+        bool aRes(0);
+        std::vector<std::string> aKey={aCode,aMode};
+        if (mSelectedLayers.find(aKey)!=mSelectedLayers.end()){
+            aRes=mSelectedLayers.at(aKey);
+        }
+        return aRes;
+    }
+    // retourne l'arbre avec listing des cartes regroupées par groupes (Apt FEE, ect)
+    Wt::WContainerWidget * getLayersTree();
+    std::vector<rasterFiles> getSelectedRaster();
+
+
 
 private:
     TypeClassifST mTypeClassifST;

@@ -22,8 +22,13 @@ cWebAptitude::cWebAptitude(Wt::WApplication* app)
 
 
     Wt::WStackedWidget * topStack  = this->addNew<Wt::WStackedWidget>();
+    // page principale
     Wt::WContainerWidget * page1 = topStack->addNew<Wt::WContainerWidget>();
+    // page de statistique
     Wt::WContainerWidget * page2 = topStack->addNew<Wt::WContainerWidget>();
+    // page de téléchargement : non je n'ouvre pas une page pour ça
+    //Wt::WContainerWidget * page3 = topStack->addNew<Wt::WContainerWidget>();
+
     //topStack->setCurrentIndex();
     //Wt::WPushButton *retourButton = page2->addWidget(cpp14::make_unique<Wt::WPushButton>("Retour"));
     //retourButton->setLink(Wt::WLink(Wt::LinkType::InternalPath, "/Aptitude"));
@@ -122,6 +127,14 @@ cWebAptitude::cWebAptitude(Wt::WApplication* app)
     mGroupL->focusMap().connect(mMap,&WOpenLayers::giveFocus);
 
     menu->addItem("Plan d'amménagement", std::move(PACont));
+
+    auto UploadCont = Wt::cpp14::make_unique<Wt::WContainerWidget>();
+    mUpload = new uploadCarte(UploadCont.get(),mGroupL, mPA,m_app);
+    menu->addItem("Téléchargement", std::move(UploadCont));
+
+    /*WMenuItem * telechargement = menu->addItem("Téléchargement", std::move(page3));
+    telechargement->setLink();
+    telechargement->clicked().connect()// changer de page.*/
 
     // maintenant que tout les objets sont crées, je ferme la connection avec la BD sqlite3, plus propre
     mDico->closeConnection();

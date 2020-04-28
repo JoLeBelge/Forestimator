@@ -43,6 +43,8 @@ public:
     void clickUploadBt();
     void fuChanged();
 
+    bool hasShp(){return hasValidShp;}
+
     std::string geoJsonName();
     std::string geoJsonRelName();
 
@@ -62,6 +64,7 @@ private:
     groupLayers * mGL;
     cDicoApt  * mDico;
     double centerX,centerY;
+    bool hasValidShp;
 
     OGRGeometry *poGeomGlobale;
 
