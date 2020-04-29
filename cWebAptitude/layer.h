@@ -75,7 +75,7 @@ public:
 
     std::vector<std::string> displayInfo(double x, double y);
     // clé : la valeur au format légende (ex ; Optimum). Valeur ; pourcentage pour ce polygone
-    std::map<std::string,int> computeStatOnPolyg(OGRGeometry * poGeom);
+    std::map<std::string,int> computeStatOnPolyg(OGRGeometry * poGeom, std::string aMode="FEE");
     GDALDataset * rasterizeGeom(OGRGeometry *poGeom);
 
     // raster value
@@ -98,6 +98,7 @@ public:
     // à cause de ma superbe idée de merde de mettre deux couches raster par layer, je dois surcharger ces méthodes pour pouvoir spécifier le mode Fee vs Cs
     std::vector<std::string> getCode(std::string aMode);
     std::string getPathTif(std::string aMode);
+    std::string getLegendLabel(std::string aMode);
 
     TypeLayer Type(){return mType;}
 
@@ -138,7 +139,7 @@ public:
         {aRes=getColor(aCode);}
         return aRes;
     }
-
+    cDicoApt * Dico(){return mDico;}
     cEss * Ess(){return mEss;}
 private:
     bool mActive;

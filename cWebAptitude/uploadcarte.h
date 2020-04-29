@@ -1,9 +1,8 @@
 #ifndef UPLOADCARTE_H
 #define UPLOADCARTE_H
 #include "parcellaire.h"
-#include "Wt/WResource.h"
 #include "Wt/WFileResource.h"
-#include "Wt/Http/Response.h"
+
 
 // sert a préparer le téléchargement par l'utilisateur de cartes, soit en plein, soit croppées avec un shp parcellaire.
 // il faut donc que l'utilisateur puisse choisir tout cela (listing via groupLayers ; même genre de tableau que grouplayers avec des checkbox en plus)

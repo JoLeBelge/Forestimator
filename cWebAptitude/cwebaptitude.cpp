@@ -128,9 +128,9 @@ cWebAptitude::cWebAptitude(Wt::WApplication* app)
 
     menu->addItem("Plan d'amménagement", std::move(PACont));
 
-    auto UploadCont = Wt::cpp14::make_unique<Wt::WContainerWidget>();
-    mUpload = new uploadCarte(UploadCont.get(),mGroupL, mPA,m_app);
-    menu->addItem("Téléchargement", std::move(UploadCont));
+    //auto UploadCont = Wt::cpp14::make_unique<Wt::WContainerWidget>();
+    //mUpload = new uploadCarte(UploadCont.get(),mGroupL, mPA,m_app);
+    //menu->addItem("Téléchargement", std::move(UploadCont));
 
     /*WMenuItem * telechargement = menu->addItem("Téléchargement", std::move(page3));
     telechargement->setLink();

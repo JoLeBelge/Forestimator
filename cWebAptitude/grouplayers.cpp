@@ -82,8 +82,9 @@ groupLayers::groupLayers(cDicoApt * aDico, WContainerWidget *parent, WContainerW
     mLegend = new legend(this,infoW);
     mStation = new ST(mDico);
 
-    // on l'affiche ailleur que dans GL cet objet
+    // création des arbres pour sélection des couches - ces objets sont affiché ailleur
     mSelect4Stat= new selectLayers4Stat(this);
+    mSelect4Download= new selectLayers4Download(this);
 }
 
 void groupLayers::update(std::string aCode){
@@ -179,24 +180,24 @@ void groupLayers::extractInfo(double x, double y){
 // clé 1 ; nom de la couche. clé2 : la valeur au format légende (ex ; Optimum). Valeur ; pourcentage pour ce polygone
 std::map<std::string,std::map<std::string,int>> groupLayers::computeStatGlob(OGRGeometry *poGeomGlobale){
     std::cout << " groupLayers::computeStatGlob " << std::endl;
+    mVLStat.clear();
     std::map<std::string,std::map<std::string,int>> aRes;
 
-    for (Layer& l : mVLs){
-        if (l.Type()!=TypeLayer::Externe ){//&& l.Type()==Apti){
-            // clé : la valeur au format légende (ex ; Optimum). Valeur ; pourcentage pour ce polygone
-            std::map<std::string,int> stat = l.computeStatOnPolyg(poGeomGlobale);
+    // il faut filtrer sur les couches sélectionnées et gerer un changement de mode FEE/CS pour les layers aptitude.
+    for (auto &kv: getSelectedLayer4Stat() ){
+        Layer * l=kv.second;
+        std::string aMode=kv.first.at(1);
 
-            /* for (auto & kv : stat){
-                std::cout << " key " << kv.first << ", val " << kv.second << std::endl;
-            }*/
-            // c'est parcellaire:: qui doit gerer l'affichage des layerStatChart
-            layerStatChart* aLayStatChart=new layerStatChart(&l,stat);
-            mVLStat.push_back(aLayStatChart);
+        // clé : la valeur au format légende (ex ; Optimum). Valeur ; pourcentage pour ce polygone
+        std::map<std::string,int> stat = l->computeStatOnPolyg(poGeomGlobale,aMode);
 
-            aRes.emplace(std::make_pair(l.getCode(),stat));
-            mPBar->setValue(mPBar->value() + 1);
-            m_app->processEvents();
-        }
+        // c'est parcellaire:: qui doit gerer l'affichage des layerStatChart
+        layerStatChart* aLayStatChart=new layerStatChart(l,stat,aMode);
+        mVLStat.push_back(aLayStatChart);
+
+        aRes.emplace(std::make_pair(l->getCode(),stat));
+        mPBar->setValue(mPBar->value() + 1);
+        m_app->processEvents();
     }
     mPBar->setValue(mPBar->maximum());
     std::cout << " done " << std::endl;
@@ -205,28 +206,34 @@ std::map<std::string,std::map<std::string,int>> groupLayers::computeStatGlob(OGR
 
 void groupLayers::computeStatOnPolyg(OGRLayer * lay){
 
-    for (Layer& l : mVLs){
+     for (auto &kv: getSelectedLayer4Stat() ){
+         Layer * l=kv.second;
+         std::string aMode=kv.first.at(1);
 
-        if ( l.Type()==TypeLayer::Apti ){
             // défini le nouveau champ à ajouter à la table d'attribut
-            OGRFieldDefn oFLD(l.getCode().c_str(),  OFTString);//OGRFieldType
+            //OGRFieldDefn oFLD(l.getCode().c_str(),  OFTString);//OGRFieldType
+            OGRFieldDefn oFLD(l->getCode().c_str(),  OFTInteger);//OFTInteger64
             //oFLD.Set(cs.GetBuffer(0), OFTReal, 0, 0, OJUndefined);
             //OGRField oField; oField.String = "tata";
-            oFLD.SetDefault("tata");
+            oFLD.SetDefault(0);
             lay->CreateField(&oFLD);
-
             OGRFeature *poFeature;
             lay->ResetReading();
             while( (poFeature = lay->GetNextFeature()) != NULL )
             {
                 // clé : la valeur au format légende (ex ; Optimum). Valeur ; pourcentage pour ce polygone
                 OGRGeometry * poGeom = poFeature->GetGeometryRef();
-                std::map<std::string,int> stat = l.computeStatOnPolyg(poGeom);
+                poGeom->flattenTo2D();
+                //std::map<std::string,int> stat = l->computeStatOnPolyg(poGeom,aMode);
+                layerStat ls(l,l->computeStatOnPolyg(poGeom,aMode),aMode);
                 // on met un résumé des stat dans le champ nouvellement créé
-                poFeature->SetField(l.getCode().c_str(), "toto");
+                std::cout << "po Feature " << poFeature->GetFID() << ", valeur pour optimum et tolérance  - essence " << l->getCode() << " : " <<  ls.getO(true) << std::endl;
+                poFeature->SetField(l->getCode().c_str(), ls.getO(true));
+                //poFeature->SetField(); This method has only an effect on the in-memory feature object. If this object comes from a layer and the modifications must be serialized back to the datasource, OGR_L_SetFeature()
+                lay->SetFeature(poFeature);
             }
+
         }
-    }
 }
 
 std::map<std::string,int> groupLayers::apts(){
@@ -262,8 +269,72 @@ std::map<std::string,int> groupLayers::apts(){
 
 selectLayers4Stat::selectLayers4Stat(groupLayers * aGL):mGL(aGL){
     std::cout << "creation de selectLayers4Stat " << std::endl;
-    // creation du vecteur permettant la selection des couches (pour upload, calcul stat, écriture stat dans shp)
+    // ça ce sont les membres de SelectLayer
     mVpLs=aGL->getVpLs();
+    nbMax=10;
+    mParent= mGL;
+    // pour l'instant ; uniquement les aptitudes FEE
+    for (Layer * l : mVpLs){
+        if (l->Type()!=TypeLayer::Externe){
+            if (l->Type()==TypeLayer::Apti){
+                std::vector<std::string> aKey2={l->getCode(),"FEE"};
+                bool b(0);
+                if (l->getCode()=="HE"|| l->getCode()=="CS" || l->getCode()=="CP" || l->getCode()=="EP" || l->getCode()=="DO" || l->getCode()=="ME"){b=true;}
+                mSelectedLayers.emplace(std::make_pair(aKey2,b));
+                mLayersCBox.emplace(std::make_pair(aKey2,new Wt::WCheckBox()));
+            }
+        }
+    }
+
+    cont = new Wt::WContainerWidget();
+    cont->setOverflow(Wt::Overflow::Auto);
+    treeTable = cont->addWidget(cpp14::make_unique<WTreeTable>());
+    treeTable->resize(300, 250);
+    treeTable->setStyleClass("tree");
+    treeTable->tree()->setSelectionMode(SelectionMode::Extended);
+    treeTable->addColumn("", 20); // colonne pour les checkbox
+    auto root = cpp14::make_unique<WTreeTableNode>("Carte d'aptitudes FEE");
+    treeTable->setTreeRoot(std::move(root), "Raster");
+
+    for (auto kv : mSelectedLayers){
+        // une méthode pour récupérer un ptr vers le layer depuis le code aCode+aMode
+        Layer * l = getLayerPtr(kv.first);
+        std::string aCode(l->getCode());
+        auto node1 = cpp14::make_unique<WTreeTableNode>(l->getShortLabel());
+        auto node1_ = node1.get();
+        treeTable->treeRoot()->addChildNode(std::move(node1));
+        WCheckBox * check1_ = mLayersCBox.at(std::vector<std::string> {aCode,"FEE"});
+        if (isSelected(l->getCode(),"FEE")){check1_->setChecked();}
+        check1_->changed().connect([=]{SelectLayer(check1_->isChecked(),aCode,"FEE");});
+        node1_->setColumnWidget(1, std::unique_ptr<Wt::WCheckBox>(check1_));
+    }
+    treeTable->treeRoot()->expand();
+}
+
+Layer* selectLayers::getLayerPtr(std::vector<std::string> aCode){
+    Layer*  aRes=NULL;
+    for (Layer * l : mVpLs){
+        if (l->getCode()==aCode.at(0)){aRes=l;}
+    }
+    return aRes;
+}
+
+std::map<std::vector<std::string>,Layer*> selectLayers::getSelectedLayer(){
+    std::map<std::vector<std::string>,Layer*> aRes;
+    for (auto kv : mSelectedLayers){
+        if (kv.second){
+            aRes.emplace(std::make_pair(kv.first,getLayerPtr(kv.first)));
+        }
+    }
+    return aRes;
+}
+
+selectLayers4Download::selectLayers4Download(groupLayers * aGL):mGL(aGL){
+    std::cout << "creation de selectLayers4Download " << std::endl;
+    // ça ce sont les membres de SelectLayer
+    mVpLs=aGL->getVpLs();
+    nbMax=75;
+    mParent= mGL;
 
     for (Layer * l : mVpLs){
         if (l->Type()!=TypeLayer::Externe){
@@ -326,7 +397,7 @@ selectLayers4Stat::selectLayers4Stat(groupLayers * aGL):mGL(aGL){
     checkKK_->changed().connect([=]{SelectLayerGroup(checkKK_->isChecked(),TypeLayer::KK,"");});
     grKK->setColumnWidget(1, std::move(checkKK));
 
-    for (Layer * l : mGL->getVpLs()){
+    for (Layer * l : mVpLs){
         std::string aCode=l->getCode();
         switch (l->Type()){
         case TypeLayer::Apti:{
@@ -389,12 +460,32 @@ selectLayers4Stat::selectLayers4Stat(groupLayers * aGL):mGL(aGL){
 void selectLayers::SelectLayer(bool select,std::string aCode, std::string aMode){
 
     std::vector<std::string> aKey={aCode,aMode};
-    if (mSelectedLayers.find(aKey)!=mSelectedLayers.end()){
-        mSelectedLayers.at(aKey)=select;
-        mLayersCBox.at(aKey)->setChecked(select);
+    if ((!select) |(nbMax>(numSelectedLayer()))){
+        if (mSelectedLayers.find(aKey)!=mSelectedLayers.end()){
+            mSelectedLayers.at(aKey)=select;
+            mLayersCBox.at(aKey)->setChecked(select);
+        } else {
+            std::cout << "je ne trouve pas la couche qui a le code " << aCode << " et le mode " << aMode << std::endl;
+        }
     } else {
-        std::cout << "je ne trouve pas la couche qui a le code " << aCode << " et le mode " << aMode << std::endl;
+        // faire apparaitre un message à l'utilisateur, maximum nbMax
+        auto messageBox =
+                mParent->addChild(Wt::cpp14::make_unique<Wt::WMessageBox>(
+                                      "Sélection des couches",
+                                      "<p>Vous avez atteint le maximun de " + std::to_string(nbMax)+ " couches</p>"
+                                                                                                     "<p>Veillez déselectionner une couche avant d'en sélectionner une nouvelle</p>",
+                                      Wt::Icon::Information,
+                                      Wt::StandardButton::Ok));
+
+        messageBox->setModal(false);
+        messageBox->buttonClicked().connect([=] {
+            mParent->removeChild(messageBox);
+        });
+        messageBox->show();
+        // changer le status de la checkbox, remettre à false
+        if (select) mLayersCBox.at(aKey)->setChecked(false);
     }
+
     std::cout << "nombre de couches sélectionnées " << numSelectedLayer() << std::endl;
     // pourrait envoyer un signal au widget upload pour transmettre le nombre de couches sélectionnées pour affichage
 }

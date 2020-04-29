@@ -11,6 +11,7 @@
 #include <Wt/WTreeTable.h>
 #include <Wt/WTreeTableNode.h>
 #include <Wt/WCheckBox.h>
+#include <Wt/WMessageBox.h>
 
 #include "layer.h"
 #include "legend.h"
@@ -76,7 +77,15 @@ public:
     selectLayers(){}
     // retourne l'arbre avec listing des cartes regroupées par groupes (Apt FEE, ect)
     std::vector<rasterFiles> getSelectedRaster();
+    std::map<std::vector<std::string>,Layer*> getSelectedLayer();
     WContainerWidget * affiche(){return cont;}
+    int numSelectedLayer(){
+        int aRes(0);
+        for (auto & kv: mSelectedLayers){
+            if (kv.second==true){aRes++;}
+        }
+        return aRes;
+    }
 protected: // les classes qui héritent peuvent avoir accès
 
     // une map qui permet de lister les couches selectionnées.
@@ -86,15 +95,11 @@ protected: // les classes qui héritent peuvent avoir accès
     // une map de pointeur vers checkbox qui est liée aux couches selectionnée
     std::map<std::vector<std::string>,Wt::WCheckBox*> mLayersCBox;
 
+    Layer* getLayerPtr(std::vector<std::string> aCode);
+
     void SelectLayer(bool select,std::string aCode, std::string aMode="");
     void SelectLayerGroup(bool select,TypeLayer aType,std::string aMode="");
-    int numSelectedLayer(){
-        int aRes(0);
-        for (auto & kv: mSelectedLayers){
-            if (kv.second==true){aRes++;}
-        }
-        return aRes;
-    }
+
     bool isSelected(std::string aCode, std::string aMode=""){
         bool aRes(0);
         std::vector<std::string> aKey={aCode,aMode};
@@ -105,16 +110,23 @@ protected: // les classes qui héritent peuvent avoir accès
     }
     std::vector<Layer*> mVpLs;// je vais faire une copie de ce vecteur , qui existera en 3 exemplaires donc (2 select layer + 1 grouplayer).mauvais idée non?
     WContainerWidget * cont;
+    int nbMax;
+    Wt::WContainerWidget * mParent;// il en faut un pour les messages box
 };
 
 class selectLayers4Stat : public selectLayers{
 public:
     selectLayers4Stat(groupLayers * aGL);
-
 private:
       Wt::WTreeTable * treeTable;
       groupLayers * mGL;
-
+};
+class selectLayers4Download : public selectLayers{
+public:
+    selectLayers4Download(groupLayers * aGL);
+private:
+      Wt::WTreeTable * treeTable;
+      groupLayers * mGL;
 };
 
 class groupLayers: public WContainerWidget
@@ -173,9 +185,14 @@ public:
      return aRes;
     }
 
-    std::vector<rasterFiles> getSelect4Download(){return mSelect4Stat->getSelectedRaster();}
+    std::vector<rasterFiles> getSelect4Download(){return mSelect4Download->getSelectedRaster();}
     std::vector<rasterFiles> getSelect4Stat(){return mSelect4Stat->getSelectedRaster();}
     WContainerWidget * afficheSelect4Stat(){return mSelect4Stat->affiche();}
+    WContainerWidget * afficheSelect4Download(){return mSelect4Download->affiche();}
+    int getNumSelect4Stat(){return mSelect4Stat->numSelectedLayer();}
+    int getNumSelect4Download(){return mSelect4Download->numSelectedLayer();}
+    std::map<std::vector<std::string>,Layer*> getSelectedLayer4Stat(){return mSelect4Stat->getSelectedLayer();}
+    std::map<std::vector<std::string>,Layer*> getSelectedLayer4Download(){return mSelect4Download->getSelectedLayer();}
 
 private:
     TypeClassifST mTypeClassifST;
@@ -202,6 +219,7 @@ private:
 
     std::vector<layerStatChart*> mVLStat;
     selectLayers4Stat * mSelect4Stat;
+    selectLayers4Download * mSelect4Download;
 };
 
 #endif // GROUPLAYERS_H

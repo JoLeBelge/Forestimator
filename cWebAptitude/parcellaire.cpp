@@ -3,9 +3,9 @@
 //https://www.quora.com/What-are-the-risks-associated-with-the-use-of-lambda-functions-in-C-11
 
 parcellaire::parcellaire(WContainerWidget *parent, groupLayers *aGL, Wt::WApplication* app, WStackedWidget *aTopStack, WContainerWidget *statW):mParent(parent),mStatW(statW),mGL(aGL),centerX(0.0),centerY(0.0),mClientName(""),mJSfile(""),mName(""),mFullPath(""),m_app(app),fu(NULL),msg(NULL),uploadButton(NULL),mTopStack(aTopStack)
-                ,computeStatButton(NULL)
-                ,visuStatButton(NULL)
-                ,hasValidShp(0)
+  ,computeStatButton(NULL)
+  ,visuStatButton(NULL)
+  ,hasValidShp(0)
 {
     mDico=aGL->Dico();
     mJSfile=  aGL->Dico()->File("addOLgeojson");
@@ -14,14 +14,14 @@ parcellaire::parcellaire(WContainerWidget *parent, groupLayers *aGL, Wt::WApplic
 
     mParent->setMargin(20,Wt::Side::Bottom | Wt::Side::Top);
     mParent->setInline(0);
-
+    mParent->addWidget(cpp14::make_unique<Wt::WText>(tr("infoParcellaire")));
     mParent->addWidget(cpp14::make_unique<WText>("<h4>Charger votre parcellaire</h4>"));
     fu =mParent->addNew<Wt::WFileUpload>();
 
     mParent->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
 
-    fu->setFileTextSize(500); // Set the maximum file size to 50 kB.
-    fu->setFilters(".shp, .shx, .dbf, .qpj, .prj, .cpg");
+    fu->setFileTextSize(2000); // Set the maximum file size to 50 kB.
+    fu->setFilters(".shp, .shx, .dbf, .prj");
     fu->setMultiple(true);
     fu->setInline(0);
     //fu->setMargin(20,Wt::Side::Bottom | Wt::Side::Top); // si le parent a des marges et est inline(0) et que je met l'enfant à inline, l'enfant a des marges également
@@ -38,6 +38,13 @@ parcellaire::parcellaire(WContainerWidget *parent, groupLayers *aGL, Wt::WApplic
 
     mParent->addWidget(cpp14::make_unique<WText>("<h4>Calcul de statistique</h4>"));
     mParent->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
+    mParent->addWidget(cpp14::make_unique<Wt::WText>(tr("infoCalculStat")));
+    mParent->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
+    mCB_fusionOT= mParent->addWidget(Wt::cpp14::make_unique<Wt::WCheckBox>(tr("cb_fusionAptOT")));
+    mCB_fusionOT->setInline(0);
+    mParent->addWidget(cpp14::make_unique<Wt::WText>(tr("infoChoixLayerStat")));
+    mParent->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
+    mParent->addWidget(std::unique_ptr<Wt::WContainerWidget>(mGL->afficheSelect4Stat()));
 
     computeStatButton = mParent->addWidget(cpp14::make_unique<Wt::WPushButton>("Calcul"));
     computeStatButton->setInline(0);
@@ -46,21 +53,29 @@ parcellaire::parcellaire(WContainerWidget *parent, groupLayers *aGL, Wt::WApplic
 
     mGL->mPBar = mParent->addNew<Wt::WProgressBar>();
     mParent->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
-    mGL->mPBar->setRange(0, 50);
+    mGL->mPBar->setRange(0, mGL->getNumSelect4Stat());
     mGL->mPBar->setValue(0);
     mGL->mPBar->setInline(0);
+    mParent->addWidget(cpp14::make_unique<Wt::WText>(tr("infoVisuStat")));
+    mParent->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
 
     visuStatButton = mParent->addWidget(cpp14::make_unique<Wt::WPushButton>("Visualiser les statistiques"));
     visuStatButton->setInline(0);
     visuStatButton->disable();
+
+
+    downloadShpBt = mParent->addWidget(cpp14::make_unique<Wt::WPushButton>("Télécharger le shp"));
+    downloadShpBt->setInline(0);
+    downloadShpBt->disable();
     //visuStatButton->setLink(Wt::WLink(Wt::LinkType::InternalPath, "/StatistiqueParcellaire"));
 
-    fu->fileTooLarge().connect([=] { msg->setText("Le fichier est trop volumineux.");});
+    fu->fileTooLarge().connect([=] { msg->setText("Le fichier est trop volumineux (max 2000ko).");});
     fu->changed().connect(this,&parcellaire::fuChanged);
     fu->uploaded().connect(this,&parcellaire::upload);
     uploadButton->clicked().connect(this ,&parcellaire::clickUploadBt);
     computeStatButton->clicked().connect(this,&parcellaire::computeStat);
     visuStatButton->clicked().connect(this,&parcellaire::visuStat);
+    downloadShpBt->clicked().connect(this,&parcellaire::exportStatAndDownloadShp);
 }
 
 parcellaire::~parcellaire(){
@@ -74,6 +89,9 @@ parcellaire::~parcellaire(){
     //delete mGL;
     //delete mDico;
     delete poGeomGlobale;
+    delete visuStatButton;
+    delete downloadShpBt;
+    delete  mCB_fusionOT;
 }
 
 void   parcellaire::cleanShpFile(){
@@ -210,27 +228,27 @@ void parcellaire::computeGlobalGeom(OGRLayer * lay){
     // test si
     if (nbValidPol>0){poGeom2 = multi->UnionCascaded();
 
-    poGeom2 =poGeom2->Buffer(1.0);// ça marche bien on dirait! je sais pas si c'est le buffer 1 ou le simplify 1 qui enlève les inner ring (hole) qui restent.
-    poGeomGlobale =poGeom2->Simplify(1.0);
+        poGeom2 =poGeom2->Buffer(1.0);// ça marche bien on dirait! je sais pas si c'est le buffer 1 ou le simplify 1 qui enlève les inner ring (hole) qui restent.
+        poGeomGlobale =poGeom2->Simplify(1.0);
 
-    //OGRPolygon * pol=poGeom2->toPolygon();
-    //std::ofstream out("/home/lisein/Documents/carteApt/Forestimator/build-WebAptitude/tmp/test.geojson");
-    //out << poGeom->exportToJson();
-    //out.close();
-    OGRPoint * aPt=NULL;
-    err = poGeomGlobale->Centroid(aPt);
-    if (err!=OGRERR_NONE){
-        std::cout << "problem avec le calcul du centroid, erreur : " << err <<  std::endl;
-        OGREnvelope ext;
-        poGeomGlobale->getEnvelope(&ext);
-        centerX= (ext.MaxX+ext.MinX)/2;
-        centerY= (ext.MaxY+ext.MinY)/2;
-    } else {
+        //OGRPolygon * pol=poGeom2->toPolygon();
+        //std::ofstream out("/home/lisein/Documents/carteApt/Forestimator/build-WebAptitude/tmp/test.geojson");
+        //out << poGeom->exportToJson();
+        //out.close();
+        OGRPoint * aPt=NULL;
+        err = poGeomGlobale->Centroid(aPt);
+        if (err!=OGRERR_NONE){
+            std::cout << "problem avec le calcul du centroid, erreur : " << err <<  std::endl;
+            OGREnvelope ext;
+            poGeomGlobale->getEnvelope(&ext);
+            centerX= (ext.MaxX+ext.MinX)/2;
+            centerY= (ext.MaxY+ext.MinY)/2;
+        } else {
 
 
-        centerX=aPt->getX();
-        centerY=aPt->getY();
-    }
+            centerX=aPt->getX();
+            centerY=aPt->getY();
+        }
 
     }
 
@@ -308,7 +326,6 @@ void parcellaire::upload(){
         //std::cout << "réception " << mFullPath+a.extension().c_str() << std::endl;
         //if ((a.extension().string()==".shp") | (a.extension().string()==".shx" )| (a.extension().string()==".dbf") | (a.extension().string()==".qpj") | (a.extension().string()==".prj")) nbFiles++;
         if ((a.extension().string()==".shp") | (a.extension().string()==".shx" )| (a.extension().string()==".dbf")) nbFiles++;
-
     }
 
     // ici je converti en json et affichage dans ol
@@ -326,10 +343,32 @@ void parcellaire::upload(){
 
 void parcellaire::computeStat(){
     std::cout << " parcellaire::computeStat()... " ;
+    mGL->mPBar->setMaximum(mGL->getNumSelect4Stat());
     mGL->mPBar->setValue(0);
     std::map<std::string,std::map<std::string,int>> stat= mGL->computeStatGlob(poGeomGlobale);
     mGL->mPBar->setValue(0);
     visuStatButton->enable();
+
+    // ici j'ouvre le shp
+    std::cout << " prépare le calcul sur chacun des polygones ... " ;
+    std::string input(mFullPath+ ".shp");
+    const char *inputPath=input.c_str();
+    GDALAllRegister();
+    GDALDataset * DS;
+
+
+    DS =  (GDALDataset*) GDALOpenEx( inputPath, GDAL_OF_VECTOR | GDAL_OF_UPDATE, NULL, NULL, NULL );
+    if( DS == NULL )
+    {
+        printf( "Open failed.\n" );
+    } else {
+        // layer
+        OGRLayer * lay = DS->GetLayer(0);
+        mGL->computeStatOnPolyg(lay);
+        // sauve le résultat
+        GDALClose( DS );
+        downloadShpBt->enable();
+    }
     std::cout << " ..done " << std::endl;
 }
 
@@ -355,16 +394,17 @@ void parcellaire::visuStat(){
     Wt::WGridLayout * grid = contCharts_->setLayout(Wt::cpp14::make_unique<Wt::WGridLayout>());
 
     int nbChart=mGL->ptrVLStat().size();
+    mGL->mPBar->setMaximum(nbChart);
     int nbColumn=std::min(2,int(std::sqrt(nbChart)));
     int row(0),column(0);
     for (layerStatChart * chart : mGL->ptrVLStat()) {
-            //std::cout << " row " << row << " , col " << column << std::endl;
-            grid->addWidget(std::unique_ptr<Wt::WContainerWidget>(chart->getChart()), row, column);
-            column++;
-            if (column>nbColumn){row++;column=0;}
+        //std::cout << " row " << row << " , col " << column << std::endl;
+        grid->addWidget(std::unique_ptr<Wt::WContainerWidget>(chart->getChart()), row, column);
+        column++;
+        if (column>nbColumn){row++;column=0;}
 
-            mGL->mPBar->setValue(mGL->mPBar->value()+(50.0/double(nbChart)));
-            mGL->m_app->processEvents();
+        mGL->mPBar->setValue(mGL->mPBar->value()+1);
+        mGL->m_app->processEvents();
     }
 
     layout->addWidget(std::move(contTitre), 0);
@@ -377,3 +417,10 @@ void parcellaire::visuStat(){
 
 std::string parcellaire::geoJsonName(){return mFullPath + ".geojson";}
 std::string parcellaire::geoJsonRelName(){ return "tmp/" + mName +".geojson";}
+
+void parcellaire::exportStatAndDownloadShp(){
+
+    //WFileResource *fileResource = new Wt::WFileResource("plain/text", );
+    //fileResource->suggestFileName(mName+"_statForestimator");
+    //m_app->redirect(fileResource->url());
+}

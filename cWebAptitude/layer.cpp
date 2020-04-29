@@ -233,7 +233,7 @@ int Layer::getValue(double x, double y){
     return aRes;
 }
 
-std::map<std::string,int> Layer::computeStatOnPolyg(OGRGeometry *poGeom){
+std::map<std::string,int> Layer::computeStatOnPolyg(OGRGeometry *poGeom, std::string aMode){
     //std::cout << " groupLayers::computeStatOnPolyg " << std::endl;
     std::map<std::string,int> aRes;
 
@@ -254,10 +254,10 @@ std::map<std::string,int> Layer::computeStatOnPolyg(OGRGeometry *poGeom){
 
         // gdal
         GDALAllRegister();
-        mGDALDat = (GDALDataset *) GDALOpen( getPathTif().c_str(), GA_ReadOnly );
+        mGDALDat = (GDALDataset *) GDALOpen( getPathTif(aMode).c_str(), GA_ReadOnly );
         if( mGDALDat == NULL )
         {
-            std::cout << "je n'ai pas lu l'image " << getPathTif() << std::endl;
+            std::cout << "je n'ai pas lu l'image " << getPathTif(aMode) << std::endl;
         } else {
             mBand = mGDALDat->GetRasterBand( 1 );
 
@@ -349,13 +349,27 @@ std::string Layer::getLegendLabel(){
     return aRes;
 }
 
+std::string Layer::getLegendLabel(std::string aMode){
+   std::string aRes;
+    switch (mType) {
+    case TypeLayer::Apti:{
+        if (aMode=="FEE") aRes="Aptitude FEE du "+mLabel;
+        if (aMode=="CS")  aRes="Aptitude CS du "+mLabel;
+        }
+        break;
+    default:
+        aRes=mLabel;
+    }
+    return aRes;
+}
+
 
 std::vector<std::string> Layer::getCode(std::string aMode){
     std::vector<std::string> aRes;
     switch (mType) {
     case TypeLayer::Apti:{
         if (aMode=="FEE") aRes={mCode,"FEE"};
-        if (aMode=="FEE")  aRes={mCode,"CS"};
+        if (aMode=="CS")  aRes={mCode,"CS"};
         }
         break;
     default:

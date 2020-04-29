@@ -11,4 +11,14 @@ Sélectionnez ci-dessus les couches pour lesquelles vous désirez ajouter les st
  
  <message id="cb_decoupeShp">Découper les cartes avec l'emprise du shp</message>
 
+ <message id="infoParcellaire">Chargez un shapefile au format ESRI afin d'effectuer le calcul de statistique pour les aptitudes des essences (Fichier Ecologique des Essences) qui seront ajoutées dans la table d'attribut de votre shapefile. Vous pouvez également télécharger les cartes qui vous intéresse sur l'emprise de votre shapefile.</message>
+
+<message id="infoChoixLayerStat">Vous pouvez choisir dans le tableau ci-dessous les essences pour lesquelles vous souhaitez effectuer le calcul de statistique.</message>
+
+<message id="infoCalculStat">Par défaut, le calcul de statistique sur les cartes d'aptitude détermine la proportion de surface pour laquelle l'essence est strictement en Optimum. Vous avez néanmoins le choix avec l'option ci-dessous de calculer la proportion de surface pour laquelle l'essence est en optimum ou en tolérance.</message>
+
+<message id="cb_fusionAptOT">Calcul de la proportion de surface en Optimum ou en Tolérance</message>
+
+<message id="infoVisuStat">La visualisation des statistiques permet un affichage des proportions de surface pour chaque classe d'aptitude. Pour l'instant, il s'agit uniquement des statistiques pour l'ensemble de tout les polygones de votre shapefile.</message>
+
 </messages>

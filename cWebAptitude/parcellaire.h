@@ -12,6 +12,7 @@
 #include <Wt/WSignal.h>
 #include <Wt/WEnvironment.h>
 #include <Wt/WGridLayout.h>
+#include "Wt/WFileResource.h"
 
 #include "boost/filesystem.hpp"
 //#include <boost/bind.hpp>
@@ -50,6 +51,8 @@ public:
 
     Wt::Signal<int>& changePage() { return page_; }
 
+    void exportStatAndDownloadShp();
+
 private:
 
     // Full path ; là ou est sauvé le shp localement, mName ; le nom du shp tels qu'il était chez le client
@@ -58,7 +61,7 @@ private:
     Wt::WContainerWidget     * mParent;
     Wt::WContainerWidget * mStatW;
     Wt::WFileUpload *fu;
-    Wt::WPushButton *uploadButton,*computeStatButton, *visuStatButton;
+    Wt::WPushButton *uploadButton,*computeStatButton, *visuStatButton, *downloadShpBt;
     Wt::WApplication* m_app;
     Wt::WText * msg;
     groupLayers * mGL;
@@ -70,6 +73,8 @@ private:
 
     Wt::Signal<int> page_;
     Wt::WStackedWidget * mTopStack;
+
+    Wt::WCheckBox *mCB_fusionOT;
 
 };
 
