@@ -109,7 +109,7 @@ void layerStatChart::simplifieStat(){
 
         tot+=autres;
         // correction de l'erreur d'arrondi si elle est de 2 pct max
-        if (tot>97 & tot <100) { autres+= 100-tot; tot=100;}
+        if ((tot>97) & (tot <100)) { autres+= 100-tot; tot=100;}
         aStatSimple.emplace(std::make_pair("Autre",autres));
     }
     // ajout pct pour no data - certaine couche l'on déjà, d'autre pas.

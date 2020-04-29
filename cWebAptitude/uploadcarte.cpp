@@ -9,7 +9,7 @@ uploadCarte::uploadCarte(WContainerWidget *parent, groupLayers * aGL, parcellair
     mParent->addWidget(cpp14::make_unique<Wt::WText>(tr("infoTelechargement")));
 
     mParent->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
-    mParent->addWidget(std::unique_ptr<Wt::WContainerWidget>(mGL->getLayersTree()));
+    mParent->addWidget(std::unique_ptr<Wt::WContainerWidget>(mGL->afficheSelect4Stat()));
     mParent->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
 
     mParent->addWidget(cpp14::make_unique<WText>("<h4>Télécharger le parcellaire</h4>"));
@@ -28,6 +28,8 @@ uploadCarte::uploadCarte(WContainerWidget *parent, groupLayers * aGL, parcellair
     uploadBtRaster->setInline(0);
 
     uploadBtShp->clicked().connect(this ,&uploadCarte::uploadShp);
+
+
     uploadBtRaster->clicked().connect(this ,&uploadCarte::uploadRaster);
 }
 
@@ -42,23 +44,11 @@ void uploadCarte::uploadShp(){
 }
 void uploadCarte::uploadRaster(){
     // la liste des raster
-    std::vector<rasterFiles> r =mGL->getSelectedRaster();
+    std::vector<rasterFiles> r=mGL->getSelect4Download();
+    rasterFiles raster=r.at(0);
 
-    // un premier test sans le crop, plus simple donc
-
-    for (rasterFiles & raster : r){
-        //std::shared_ptr<WFileResource> Resource = std::make_shared<WFileResource>(raster.tif());
-
-    //https://redmine.webtoolkit.eu/boards/2/topics/16160
-        std::string url(raster.tif());
-        //Wt::WLink link = Wt::WLink(Resource);
-        //link.setUrl(url);
-        //link.setTarget(Wt::LinkTarget::NewWindow);
-        m_app->redirect(url);
-
-        // link ; accèpte uniquement Wressource, pas WFileRessource.
-        // m_app redirect ; url
-    }
-
-
+    std::cout << "fichier  "<<raster.tif()<< std::endl;
+    WFileResource *fileResource = new Wt::WFileResource("plain/text", raster.tif());
+    fileResource->suggestFileName("tata.tif");
+    m_app->redirect(fileResource->url());
 }

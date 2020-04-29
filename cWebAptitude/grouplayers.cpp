@@ -78,29 +78,12 @@ groupLayers::groupLayers(cDicoApt * aDico, WContainerWidget *parent, WContainerW
             if (row % 17 == 0){col++;row=0;}
         }
     }
-    // creation du vecteur permettant la selection des couches (pour upload, calcul stat, écriture stat dans shp)
-    for (auto l : mVLs){
-        if (l.Type()!=TypeLayer::Externe){
-            if (l.Type()==TypeLayer::Apti){
-                std::vector<std::string> aKey1={l.getCode(),"CS"};
-                std::vector<std::string> aKey2={l.getCode(),"FEE"};
-                // default ; on ne veux pas les apt CS
-                mSelectedLayers.emplace(std::make_pair(aKey1,false));
-                mSelectedLayers.emplace(std::make_pair(aKey2,true));
-                mLayersCBox.emplace(std::make_pair(aKey1,new Wt::WCheckBox()));
-                mLayersCBox.emplace(std::make_pair(aKey2,new Wt::WCheckBox()));
-            } else {
-                std::vector<std::string> aKey1={l.getCode(),""};
-                mSelectedLayers.emplace(std::make_pair(aKey1,true));
-                mLayersCBox.emplace(std::make_pair(aKey1,new Wt::WCheckBox()));
-            }
-        }
-    }
-
-
     // création de la légende (vide pour le moment)
     mLegend = new legend(this,infoW);
     mStation = new ST(mDico);
+
+    // on l'affiche ailleur que dans GL cet objet
+    mSelect4Stat= new selectLayers4Stat(this);
 }
 
 void groupLayers::update(std::string aCode){
@@ -277,12 +260,33 @@ std::map<std::string,int> groupLayers::apts(){
     return aRes;
 }
 
-Wt::WContainerWidget * groupLayers::getLayersTree(){
-    //std::cout << "creation du conteneur de " << std::endl;
-    Wt::WContainerWidget * cont = new Wt::WContainerWidget;
+selectLayers4Stat::selectLayers4Stat(groupLayers * aGL):mGL(aGL){
+    std::cout << "creation de selectLayers4Stat " << std::endl;
+    // creation du vecteur permettant la selection des couches (pour upload, calcul stat, écriture stat dans shp)
+    mVpLs=aGL->getVpLs();
+
+    for (Layer * l : mVpLs){
+        if (l->Type()!=TypeLayer::Externe){
+            if (l->Type()==TypeLayer::Apti){
+                std::vector<std::string> aKey1={l->getCode(),"CS"};
+                std::vector<std::string> aKey2={l->getCode(),"FEE"};
+                // default ; on ne veux pas les apt CS
+                mSelectedLayers.emplace(std::make_pair(aKey1,false));
+                mSelectedLayers.emplace(std::make_pair(aKey2,true));
+                mLayersCBox.emplace(std::make_pair(aKey1,new Wt::WCheckBox()));
+                mLayersCBox.emplace(std::make_pair(aKey2,new Wt::WCheckBox()));
+            } else {
+                std::vector<std::string> aKey1={l->getCode(),""};
+                mSelectedLayers.emplace(std::make_pair(aKey1,true));
+                mLayersCBox.emplace(std::make_pair(aKey1,new Wt::WCheckBox()));
+            }
+        }
+    }
+
+    cont = new Wt::WContainerWidget();
     cont->setOverflow(Wt::Overflow::Auto);
-    Wt::WTreeTable * treeTable = cont->addWidget(cpp14::make_unique<WTreeTable>());
-    //treeTable->resize(250, 600);
+    treeTable = cont->addWidget(cpp14::make_unique<WTreeTable>());
+    treeTable->resize(300, 500);
     treeTable->setStyleClass("tree");
     treeTable->tree()->setSelectionMode(SelectionMode::Extended);
     treeTable->addColumn("", 20); // colonne pour les checkbox
@@ -290,7 +294,6 @@ Wt::WContainerWidget * groupLayers::getLayersTree(){
     treeTable->setTreeRoot(std::move(root), "Raster");
 
     // création des groupes de couches avec checkbox qui permet de toutes les selectionner en un click
-
     // aptitude FEE
     auto grAptFEE = cpp14::make_unique<WTreeTableNode>("Aptitudes FEE");
     WTreeTableNode *grAptFEE_ = grAptFEE.get();
@@ -323,22 +326,22 @@ Wt::WContainerWidget * groupLayers::getLayersTree(){
     checkKK_->changed().connect([=]{SelectLayerGroup(checkKK_->isChecked(),TypeLayer::KK,"");});
     grKK->setColumnWidget(1, std::move(checkKK));
 
-    for (Layer& l : mVLs){
-        std::string aCode=l.getCode();
-        switch (l.Type()){
+    for (Layer * l : mGL->getVpLs()){
+        std::string aCode=l->getCode();
+        switch (l->Type()){
         case TypeLayer::Apti:{
-            auto node1 = cpp14::make_unique<WTreeTableNode>(l.getShortLabel());
+            auto node1 = cpp14::make_unique<WTreeTableNode>(l->getShortLabel());
             auto node1_ = node1.get();
             grAptFEE_->addChildNode(std::move(node1));
             //std::unique_ptr<WCheckBox> check1 = cpp14::make_unique<WCheckBox>();
             //WCheckBox * check1_ = check1.get();
             WCheckBox * check1_ = mLayersCBox.at(std::vector<std::string> {aCode,"FEE"});
-            if (isSelected(l.getCode(),"FEE")){check1_->setChecked();}
+            if (isSelected(l->getCode(),"FEE")){check1_->setChecked();}
             // avec bind, check is checked ; est toujours à false.
             //check->changed().connect(std::bind(&groupLayers::SelectLayer,this,check->isChecked(),l.getCode(),"FEE"));
             check1_->changed().connect([=]{SelectLayer(check1_->isChecked(),aCode,"FEE");});
             node1_->setColumnWidget(1, std::unique_ptr<Wt::WCheckBox>(check1_));
-            auto node2 = cpp14::make_unique<WTreeTableNode>(l.getShortLabel());
+            auto node2 = cpp14::make_unique<WTreeTableNode>(l->getShortLabel());
             auto node2_ = node2.get();
             grAptCS_->addChildNode(std::move(node2));
             //std::unique_ptr<WCheckBox> check2 = cpp14::make_unique<WCheckBox>();
@@ -351,24 +354,27 @@ Wt::WContainerWidget * groupLayers::getLayersTree(){
             break;
         }
         case TypeLayer::Thematique:{
-            auto node1 = cpp14::make_unique<WTreeTableNode>(l.getShortLabel());
+            auto node1 = cpp14::make_unique<WTreeTableNode>(l->getShortLabel());
             auto node1_ = node1.get();
             grSt_->addChildNode(std::move(node1));
             WCheckBox * check1_ = mLayersCBox.at(std::vector<std::string> {aCode,""});
-            if (isSelected(l.getCode())){check1_->setChecked();}
+            if (isSelected(l->getCode())){check1_->setChecked();}
             check1_->changed().connect([=]{SelectLayer(check1_->isChecked(),aCode);});
             node1_->setColumnWidget(1, std::unique_ptr<Wt::WCheckBox>(check1_));
             break;
         }
         case TypeLayer::KK:{
-            auto node1 = cpp14::make_unique<WTreeTableNode>(l.getShortLabel());
+            auto node1 = cpp14::make_unique<WTreeTableNode>(l->getShortLabel());
             auto node1_ = node1.get();
             grKK_->addChildNode(std::move(node1));
             WCheckBox * check1_ = mLayersCBox.at(std::vector<std::string> {aCode,""});
-            if (isSelected(l.getCode())){check1_->setChecked();}
+            if (isSelected(l->getCode())){check1_->setChecked();}
             check1_->changed().connect([=]{SelectLayer(check1_->isChecked(),aCode);});
             node1_->setColumnWidget(1, std::unique_ptr<Wt::WCheckBox>(check1_));
             break;
+        }
+        default:{
+
         }
         }
     }
@@ -378,11 +384,9 @@ Wt::WContainerWidget * groupLayers::getLayersTree(){
     treeTable->treeRoot()->addChildNode(std::move(grSt));
     treeTable->treeRoot()->addChildNode(std::move(grKK));
     treeTable->treeRoot()->expand();
-
-    return cont;
 }
 
-void groupLayers::SelectLayer(bool select,std::string aCode, std::string aMode){
+void selectLayers::SelectLayer(bool select,std::string aCode, std::string aMode){
 
     std::vector<std::string> aKey={aCode,aMode};
     if (mSelectedLayers.find(aKey)!=mSelectedLayers.end()){
@@ -391,36 +395,37 @@ void groupLayers::SelectLayer(bool select,std::string aCode, std::string aMode){
     } else {
         std::cout << "je ne trouve pas la couche qui a le code " << aCode << " et le mode " << aMode << std::endl;
     }
+    std::cout << "nombre de couches sélectionnées " << numSelectedLayer() << std::endl;
     // pourrait envoyer un signal au widget upload pour transmettre le nombre de couches sélectionnées pour affichage
 }
 
-void groupLayers::SelectLayerGroup(bool select,TypeLayer aType,std::string aMode){
-    for (Layer& l : mVLs){
-        if (l.Type()==aType){
-            SelectLayer(select,l.getCode(),aMode);
+void selectLayers::SelectLayerGroup(bool select,TypeLayer aType,std::string aMode){
+    for (Layer * l : mVpLs){
+        if (l->Type()==aType){
+            SelectLayer(select,l->getCode(),aMode);
         }
     }
-    //std::cout << "nombre de couches sélectionnées " << numSelectedLayer() << std::endl;
+    std::cout << "nombre de couches sélectionnées " << numSelectedLayer() << std::endl;
 }
 
 
 // pour envoyer la liste des raster à uploadcarte
-std::vector<rasterFiles> groupLayers::getSelectedRaster(){
+std::vector<rasterFiles> selectLayers::getSelectedRaster(){
     std::vector<rasterFiles> aRes;
-
-    for (Layer& l : mVLs){
-        switch (l.Type()){
+    for (Layer * l : mVpLs){
+        switch (l->Type()){
         case TypeLayer::Apti:{
-            if (isSelected(l.getCode(),"FEE")) aRes.push_back(rasterFiles(l.getPathTif("FEE")));
-            if (isSelected(l.getCode(),"CS")) aRes.push_back(rasterFiles(l.getPathTif("CS")));
+            if (isSelected(l->getCode(),"FEE")) aRes.push_back(rasterFiles(l->getPathTif("FEE")));
+            if (isSelected(l->getCode(),"CS")) aRes.push_back(rasterFiles(l->getPathTif("CS")));
             break;
         }
         default:{
-            if (isSelected(l.getCode())) aRes.push_back(rasterFiles(l.getPathTif()));
+            if (isSelected(l->getCode())) aRes.push_back(rasterFiles(l->getPathTif()));
             break;
         }
         }
     }
+    return aRes;
 }
 
 

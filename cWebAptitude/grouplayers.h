@@ -28,6 +28,9 @@ class legend;
 class ST;
 class layerStatChart;
 class rasterFiles;
+class selectLayers;
+class selectLayers4Stat;
+class selectLayers4Download;
 //class WCheckBox;
 enum class TypeLayer;
 
@@ -64,6 +67,53 @@ public:
     // catalogue de station
     int mSt;
 private:
+
+};
+
+
+class selectLayers : public WContainerWidget{
+public:
+    selectLayers(){}
+    // retourne l'arbre avec listing des cartes regroupées par groupes (Apt FEE, ect)
+    std::vector<rasterFiles> getSelectedRaster();
+    WContainerWidget * affiche(){return cont;}
+protected: // les classes qui héritent peuvent avoir accès
+
+    // une map qui permet de lister les couches selectionnées.
+    // vu que pour les apt j'ai deux couches possibles, cs et fee, la clé est un vecteur de deux elements , le premier le code layer, le deuxième le mode FEEvsCS
+    // value ; boolean pour dire si la couche est sélectionnée par l'utilisateur
+    std::map<std::vector<std::string>,bool> mSelectedLayers;
+    // une map de pointeur vers checkbox qui est liée aux couches selectionnée
+    std::map<std::vector<std::string>,Wt::WCheckBox*> mLayersCBox;
+
+    void SelectLayer(bool select,std::string aCode, std::string aMode="");
+    void SelectLayerGroup(bool select,TypeLayer aType,std::string aMode="");
+    int numSelectedLayer(){
+        int aRes(0);
+        for (auto & kv: mSelectedLayers){
+            if (kv.second==true){aRes++;}
+        }
+        return aRes;
+    }
+    bool isSelected(std::string aCode, std::string aMode=""){
+        bool aRes(0);
+        std::vector<std::string> aKey={aCode,aMode};
+        if (mSelectedLayers.find(aKey)!=mSelectedLayers.end()){
+            aRes=mSelectedLayers.at(aKey);
+        }
+        return aRes;
+    }
+    std::vector<Layer*> mVpLs;// je vais faire une copie de ce vecteur , qui existera en 3 exemplaires donc (2 select layer + 1 grouplayer).mauvais idée non?
+    WContainerWidget * cont;
+};
+
+class selectLayers4Stat : public selectLayers{
+public:
+    selectLayers4Stat(groupLayers * aGL);
+
+private:
+      Wt::WTreeTable * treeTable;
+      groupLayers * mGL;
 
 };
 
@@ -115,37 +165,17 @@ public:
 
     std::vector<layerStatChart*> ptrVLStat() {return mVLStat;}
 
-
-
-    // une map qui permet de lister les couches selectionnées.
-    // vu que pour les apt j'ai deux couches possibles, cs et fee, la clé est un vecteur de deux elements , le premier le code layer, le deuxième le mode FEEvsCS
-    // value ; boolean pour dire si la couche est sélectionnée par l'utilisateur
-    std::map<std::vector<std::string>,bool> mSelectedLayers;
-    // une map de pointeur vers checkbox qui est liée aux couches selectionnée
-    std::map<std::vector<std::string>,Wt::WCheckBox*> mLayersCBox;
-
-    void SelectLayer(bool select,std::string aCode, std::string aMode="");
-    void SelectLayerGroup(bool select,TypeLayer aType,std::string aMode="");
-    int numSelectedLayer(){
-        int aRes(0);
-        for (auto & kv: mSelectedLayers){
-            if (kv.second==true){aRes++;}
-        }
-        return aRes;
+    std::vector<Layer*> getVpLs(){
+     std::vector<Layer*> aRes;
+     for (auto & l : mVLs){
+         aRes.push_back(&l);
+     }
+     return aRes;
     }
-    bool isSelected(std::string aCode, std::string aMode=""){
-        bool aRes(0);
-        std::vector<std::string> aKey={aCode,aMode};
-        if (mSelectedLayers.find(aKey)!=mSelectedLayers.end()){
-            aRes=mSelectedLayers.at(aKey);
-        }
-        return aRes;
-    }
-    // retourne l'arbre avec listing des cartes regroupées par groupes (Apt FEE, ect)
-    Wt::WContainerWidget * getLayersTree();
-    std::vector<rasterFiles> getSelectedRaster();
 
-
+    std::vector<rasterFiles> getSelect4Download(){return mSelect4Stat->getSelectedRaster();}
+    std::vector<rasterFiles> getSelect4Stat(){return mSelect4Stat->getSelectedRaster();}
+    WContainerWidget * afficheSelect4Stat(){return mSelect4Stat->affiche();}
 
 private:
     TypeClassifST mTypeClassifST;
@@ -171,6 +201,7 @@ private:
 
 
     std::vector<layerStatChart*> mVLStat;
+    selectLayers4Stat * mSelect4Stat;
 };
 
 #endif // GROUPLAYERS_H

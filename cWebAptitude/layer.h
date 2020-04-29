@@ -47,6 +47,13 @@ class rasterFiles{
 
 public:
     rasterFiles(std::string aPathTif);
+    // constructeur par copie et par déplacement ; indispensible si j'utilise les objets dans un vecteur. http://www-h.eng.cam.ac.uk/help/tpl/languages/C++/morevectormemory.html
+    rasterFiles(const rasterFiles &rf){
+        mPathTif=rf.mPathTif;
+        mPathQml=rf.mPathQml;
+    }
+    rasterFiles(rasterFiles&& rf) noexcept {mPathTif=rf.mPathTif;mPathQml=rf.mPathQml;}
+
     std::string tif(){return mPathTif;}
     std::string symbology(){return mPathQml;}
     bool hasSymbology(){return mPathQml!="";}
@@ -127,7 +134,7 @@ public:
             it++;
         }
         //if (!test) std::cout << " warn, pas de label correspondant à " << aStrCode << " dans le dictionnaire des valeurs de cette layer" << std::endl;
-        if (!test & aStrCode=="Sans données"){ }else
+        if ((!test) & (aStrCode=="Sans données")){ }else
         {aRes=getColor(aCode);}
         return aRes;
     }

@@ -353,10 +353,9 @@ std::string Layer::getLegendLabel(){
 std::vector<std::string> Layer::getCode(std::string aMode){
     std::vector<std::string> aRes;
     switch (mType) {
-    case TypeLayer::Apti:
-        switch (mGroupL->TypeClas()) {
-        case FEE: aRes={mCode,"FEE"};break;
-        case CS: aRes={mCode,"CS"};break;
+    case TypeLayer::Apti:{
+        if (aMode=="FEE") aRes={mCode,"FEE"};
+        if (aMode=="FEE")  aRes={mCode,"CS"};
         }
         break;
     default:
@@ -457,6 +456,7 @@ GDALDataset * Layer::rasterizeGeom(OGRGeometry *poGeom){
 
 
 rasterFiles::rasterFiles(std::string aPathTif):mPathTif(aPathTif),mPathQml(""){
+     // <-- initialize with the map's default c'tor
     //boost::filesystem::path p(mPathTif);
     // détermine si il y a un fichier de symbologie associé
     std::string aPathQml = mPathTif.substr(0,mPathTif.size()-3)+"qml";
