@@ -7,6 +7,7 @@ build-WebAptitude/parcellaire.o
 build-WebAptitude/wt_config.xmlOLD
 build-WebAptitude/cwebaptitude.o
 build-WebAptitude/cdicoapt.o
+build-WebAptitude/libzippp.o
 build-WebAptitude/grouplayers.o
 build-WebAptitude/layer.o
 build-WebAptitude/legend.o
