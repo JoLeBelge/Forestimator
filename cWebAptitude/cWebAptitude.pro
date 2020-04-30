@@ -22,8 +22,8 @@ INCLUDEPATH += $$PWD/../carteApt/
 #LIBS += -L$$PWD/../../../../../../usr/local/lib -lzippp_static#INCLUDEPATH += $$PWD/../../../../../../usr/local/include/libzippp/
 #DEPENDPATH += $$PWD/../../../../../../usr/local/include/libzippp/
 
-INCLUDEPATH += $$PWD/libzippp/src/
-DEPENDPATH += $$PWD/libzippp/src/
+INCLUDEPATH += $$PWD/libzipp/src
+DEPENDPATH += $$PWD/libzipp/src
 
 #qmake -makefile ../cWebAptitude/cWebAptitude.pro pl=server avant de lancer make sur debian server
 contains(pl,serveur) {
