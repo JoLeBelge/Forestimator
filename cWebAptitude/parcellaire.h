@@ -16,7 +16,7 @@
 
 #include "boost/filesystem.hpp"
 #include <functional> //--> pour bind
-#include "libzippp.h"
+#include "./libzippp/src/libzippp.h"
 using namespace libzippp;
 
 // objet qui comprend le shp d'un parcellaire DNF que l'on va afficher dans openlayer
