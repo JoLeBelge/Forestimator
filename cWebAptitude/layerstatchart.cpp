@@ -128,7 +128,8 @@ int layerStat::getO(bool mergeOT){
             for (auto & kv2 : *mLay->mDicoVal){
                 if (kv2.second==kv.first){codeApt=kv2.first;}
             }
-            if (mLay->Dico()->AptContraignante(codeApt)<3) aRes+=kv.second;
+            int aptContr=mLay->Dico()->AptContraignante(codeApt);
+            if (mergeOT) {if (aptContr<3) aRes+=kv.second;} else { if (aptContr<2) aRes+=kv.second; }
         }}
         else {
             std::cout << " problem, on me demande de calculer la proportion d'optimum pour une carte qui n'est pas une carte d'aptitude" << std::endl;
