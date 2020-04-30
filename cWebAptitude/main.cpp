@@ -49,7 +49,7 @@ std::unique_ptr<WApplication> createApplication(const WEnvironment& env)
     std::unique_ptr<WApplication> app
             = cpp14::make_unique<WApplication>(env);
     // charge le xml avec tout le texte qui sera chargé via la fonction tr()
-    app->messageResourceBundle().use(WApplication::appRoot() + "./data/forestimator");
+    app->messageResourceBundle().use(app->appRoot() + "./data/forestimator");
     app->setTitle("Forestimator");
     // thème bootstrap 3
     auto theme = std::make_shared<Wt::WBootstrapTheme>();
