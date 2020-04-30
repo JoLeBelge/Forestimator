@@ -14,16 +14,23 @@ QMAKE_CXX = g++-7
 
 
 #
-LIBS = -lgdal -lwthttp -lwt -lboost_system -lboost_iostreams -lboost_thread -lboost_filesystem -lboost_program_options -lcrypt -pthread -lwtdbo -lwtdbosqlite3
+LIBS = -lgdal -lwthttp -lwt -lboost_system -lboost_iostreams -lboost_thread -lboost_filesystem -lboost_program_options -lcrypt -pthread -lwtdbo -lwtdbosqlite3 -lzip #-lzippp_static
 
 INCLUDEPATH += $$PWD/../carteApt/
 
+# libzippp version https://github.com/ctabin/libzippp
+#LIBS += -L$$PWD/../../../../../../usr/local/lib -lzippp_static#INCLUDEPATH += $$PWD/../../../../../../usr/local/include/libzippp/
+#DEPENDPATH += $$PWD/../../../../../../usr/local/include/libzippp/
+
+INCLUDEPATH += $$PWD/libzippp/src/
+DEPENDPATH += $$PWD/libzippp/src/
 
 #qmake -makefile ../cWebAptitude/cWebAptitude.pro pl=server avant de lancer make sur debian server
 contains(pl,serveur) {
 LIBS += -L$$PWD/usr/include/gdal/ -lgdal
 INCLUDEPATH += $$PWD/../../../usr/include/gdal/
 DEPENDPATH += $$PWD/../../../usr/include/gdal/
+
 # sur le serveur je dois lui préciser ou est cette librairie
 LIBS += -L$$PWD/../../../usr/lib/x86_64-linux-gnu/ -lsqlite3
 } else {
@@ -31,6 +38,7 @@ LIBS += -L$$PWD/../../../usr/include/ -lsqlite3
 LIBS += -L$$PWD/usr/include/gdal/ -lgdal
 INCLUDEPATH += $$PWD/../../../../../../usr/include/gdal/
 DEPENDPATH += $$PWD/../../../../../../usr/include/gdal/
+
 }
 
 SOURCES += main.cpp \
@@ -42,7 +50,8 @@ SOURCES += main.cpp \
     legend.cpp \
     parcellaire.cpp \
     layerstatchart.cpp \
-    uploadcarte.cpp
+    uploadcarte.cpp \
+    libzippp/src/libzippp.cpp
 
 HEADERS += \
     wopenlayers.h \
@@ -53,4 +62,5 @@ HEADERS += \
     legend.h \
     parcellaire.h \
     layerstatchart.h \
-    uploadcarte.h
+    uploadcarte.h \
+    libzippp/src/libzippp.h

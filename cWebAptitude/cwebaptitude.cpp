@@ -14,17 +14,16 @@ cWebAptitude::cWebAptitude(Wt::WApplication* app)
     setOverflow(Wt::Overflow::Auto);
     setPadding(20);
     setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Middle);
-    //this->addStyleClass("table form-inline");
-    //this->setStyleClass("table form-inline");
+
     // création d'un stack pour les différentes pages du sites
     // page 1 ; autécologie
     // page 2 ; statistique parcellaire
 
-
     Wt::WStackedWidget * topStack  = this->addNew<Wt::WStackedWidget>();
     // page principale
     Wt::WContainerWidget * page1 = topStack->addNew<Wt::WContainerWidget>();
-    // page de statistique
+    //page1->setInline(0);
+    // page de statistique - ne sert à rien pour le moment
     Wt::WContainerWidget * page2 = topStack->addNew<Wt::WContainerWidget>();
     // page de téléchargement : non je n'ouvre pas une page pour ça
     //Wt::WContainerWidget * page3 = topStack->addNew<Wt::WContainerWidget>();
@@ -37,15 +36,6 @@ cWebAptitude::cWebAptitude(Wt::WApplication* app)
     //retourButton->clicked().connect([&topStack] {topStack->setCurrentIndex(0);});
     //en fait ça fout la mrd quand j'upload un shp ; démarre une nouvelle session...
 
-
-    // le menu n'est pas ajouté à un widget, donc ne sera pas visible. C'est le but.
-    /*Wt::WMenu *topMenu = this->addNew<Wt::WMenu>(topStack);
-    //Wt::WContainerWidget page1 = topStack->addNew<Wt::WContainerWidget>();
-    Wt::WMenuItem * page1 =topMenu->addItem("p1", Wt::cpp14::make_unique<Wt::WContainerWidget>());
-    page1->setLink(Wt::WLink(Wt::LinkType::InternalPath, "/Aptitude"));
-    Wt::WMenuItem * page2 =topMenu->addItem("p2", Wt::cpp14::make_unique<Wt::WContainerWidget>());
-    page2->setLink(Wt::WLink(Wt::LinkType::InternalPath, "/StatistiqueParcellaire"));*/
-
     auto titreCont = Wt::cpp14::make_unique<Wt::WContainerWidget>();
     WContainerWidget * titreCont_ = titreCont.get();
        WText * titre = titreCont_->addWidget(cpp14::make_unique<WText>("Stations forestières et Aptitude des Essences"));
@@ -57,7 +47,6 @@ cWebAptitude::cWebAptitude(Wt::WApplication* app)
     titre->setPadding(0,Wt::Side::Bottom | Wt::Side::Top);
 
 
-
     auto pane = Wt::cpp14::make_unique<Wt::WContainerWidget>();
     WContainerWidget * pane_ = pane.get();
 
@@ -66,6 +55,7 @@ cWebAptitude::cWebAptitude(Wt::WApplication* app)
     pane_->setHeight("60%"); // oui ça ca marche bien! reste plus qu'à empêcher la carte de s'escamoter.
     // non pas d'overflow pour la carte, qui est dans pane_
     pane_->setOverflow(Wt::Overflow::Visible);
+    //pane_->setOverflow(Wt::Overflow::Auto);
 
     auto infoW = Wt::cpp14::make_unique<Wt::WContainerWidget>();
     Wt::WContainerWidget * infoW_ = infoW.get();
@@ -89,7 +79,6 @@ cWebAptitude::cWebAptitude(Wt::WApplication* app)
 
     //menu->addItem("Téléchargement", Wt::cpp14::make_unique<Wt::WTextArea>("Téléchargement : to come soon"));
     infoW_->addWidget(std::move(contents));
-
 
     auto map = Wt::cpp14::make_unique<WOpenLayers>(mDico);
     mMap= map.get();
@@ -132,18 +121,14 @@ cWebAptitude::cWebAptitude(Wt::WApplication* app)
     //mUpload = new uploadCarte(UploadCont.get(),mGroupL, mPA,m_app);
     //menu->addItem("Téléchargement", std::move(UploadCont));
 
-    /*WMenuItem * telechargement = menu->addItem("Téléchargement", std::move(page3));
-    telechargement->setLink();
-    telechargement->clicked().connect()// changer de page.*/
-
     // maintenant que tout les objets sont crées, je ferme la connection avec la BD sqlite3, plus propre
     mDico->closeConnection();
 
     mMap->clicked().connect(mMap->slot);
     mMap->xy().connect(std::bind(&groupLayers::extractInfo,mGroupL, std::placeholders::_1,std::placeholders::_2));
     // je divise la fenetre en 2 dans la hauteur pour mettre la carte à droite et à gauche une fenetre avec les infos des couches
-    //auto layout = this->setLayout(Wt::cpp14::make_unique<Wt::WVBoxLayout>());
-    auto layout = page1->setLayout(Wt::cpp14::make_unique<Wt::WVBoxLayout>());
+    auto layout = this->setLayout(Wt::cpp14::make_unique<Wt::WVBoxLayout>());
+   // auto layout = page1->setLayout(Wt::cpp14::make_unique<Wt::WVBoxLayout>());// c'est étrange, quand je met le layout dans la page 1, ça n'a pas le même rendu (car pas dans un topstack)
     // hlayout c'est lié à pane
     hLayout->addWidget(std::move(map), 0);
     //hLayout-> widget, int stretch, WFlagAlignement

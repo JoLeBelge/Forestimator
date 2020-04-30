@@ -74,7 +74,7 @@ private:
 
 class selectLayers : public WContainerWidget{
 public:
-    selectLayers(){}
+    selectLayers(Wt::WContainerWidget * aParent, std::vector<Layer*> aVpLs,int aMax):mParent(aParent),mVpLs(aVpLs),nbMax(aMax){}
     // retourne l'arbre avec listing des cartes regroupées par groupes (Apt FEE, ect)
     std::vector<rasterFiles> getSelectedRaster();
     std::map<std::vector<std::string>,Layer*> getSelectedLayer();

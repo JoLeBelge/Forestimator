@@ -56,12 +56,14 @@ parcellaire::parcellaire(WContainerWidget *parent, groupLayers *aGL, Wt::WApplic
     mGL->mPBar->setRange(0, mGL->getNumSelect4Stat());
     mGL->mPBar->setValue(0);
     mGL->mPBar->setInline(0);
-    mParent->addWidget(cpp14::make_unique<Wt::WText>(tr("infoVisuStat")));
+    /*mParent->addWidget(cpp14::make_unique<Wt::WText>(tr("infoVisuStat")));
     mParent->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
 
     visuStatButton = mParent->addWidget(cpp14::make_unique<Wt::WPushButton>("Visualiser les statistiques"));
     visuStatButton->setInline(0);
     visuStatButton->disable();
+    est buggé pour le moment
+    */
 
 
     downloadShpBt = mParent->addWidget(cpp14::make_unique<Wt::WPushButton>("Télécharger le shp"));
@@ -74,8 +76,8 @@ parcellaire::parcellaire(WContainerWidget *parent, groupLayers *aGL, Wt::WApplic
     fu->uploaded().connect(this,&parcellaire::upload);
     uploadButton->clicked().connect(this ,&parcellaire::clickUploadBt);
     computeStatButton->clicked().connect(this,&parcellaire::computeStat);
-    visuStatButton->clicked().connect(this,&parcellaire::visuStat);
-    downloadShpBt->clicked().connect(this,&parcellaire::exportStatAndDownloadShp);
+    //visuStatButton->clicked().connect(this,&parcellaire::visuStat);
+    downloadShpBt->clicked().connect(this,&parcellaire::downloadShp);
 }
 
 parcellaire::~parcellaire(){
@@ -307,7 +309,7 @@ void parcellaire::fuChanged(){
 void parcellaire::upload(){
     //std::cout << "upload commence.. " ;
     computeStatButton->disable();
-    visuStatButton->disable();
+    //visuStatButton->disable();
     hasValidShp=false;
     cleanShpFile();
     boost::filesystem::path p(fu->clientFileName().toUTF8()), p2(this->fu->spoolFileName());
@@ -347,7 +349,7 @@ void parcellaire::computeStat(){
     mGL->mPBar->setValue(0);
     std::map<std::string,std::map<std::string,int>> stat= mGL->computeStatGlob(poGeomGlobale);
     mGL->mPBar->setValue(0);
-    visuStatButton->enable();
+    //visuStatButton->enable();
 
     // ici j'ouvre le shp
     std::cout << " prépare le calcul sur chacun des polygones ... " ;
@@ -372,11 +374,12 @@ void parcellaire::computeStat(){
     std::cout << " ..done " << std::endl;
 }
 
-
 void parcellaire::visuStat(){
     std::cout << " parcellaire::visuStat()... " ;
     mGL->mPBar->setValue(0);
+    std::cout << " CLEAR  mStaW... " ;
     mStatW->clear();
+    std::cout << " done... " ;
     mStatW->setOverflow(Wt::Overflow::Auto);
     // premier lay pour mettre titre et boutton de "retour"
     auto layout = mStatW->setLayout(Wt::cpp14::make_unique<Wt::WVBoxLayout>());
@@ -387,18 +390,24 @@ void parcellaire::visuStat(){
     //retourButton->setLink(Wt::WLink(Wt::LinkType::InternalPath, "/Aptitude"));
     //retourButton->clicked().connect([&] {topStack->setCurrentIndex(0);});// avec &, ne tue pas la session mais en recrée une. avec =, tue et recrée, c'est car le lambda copie plein de variable dont this, ça fout la merde
     // non c'est pas la faute du lambda, c'est les internal path qui font qu'une nouvelle session est créée.
-    retourButton->clicked().connect([this] {mTopStack->setCurrentIndex(0);});
+    std::cout << " config retour button "<< std::endl;
+    //retourButton->clicked().connect(this,mTopStack->setCurrentIndex(0);});
+    retourButton->clicked().connect([=] {mTopStack->setCurrentIndex(0);});
+    std::cout << " done "<< std::endl;
 
     auto contCharts = Wt::cpp14::make_unique<Wt::WContainerWidget>();
     WContainerWidget * contCharts_ = contCharts.get();
     Wt::WGridLayout * grid = contCharts_->setLayout(Wt::cpp14::make_unique<Wt::WGridLayout>());
 
     int nbChart=mGL->ptrVLStat().size();
+    std::cout << " nb Chart "<< nbChart << std::endl;
     mGL->mPBar->setMaximum(nbChart);
     int nbColumn=std::min(2,int(std::sqrt(nbChart)));
     int row(0),column(0);
-    for (layerStatChart * chart : mGL->ptrVLStat()) {
-        //std::cout << " row " << row << " , col " << column << std::endl;
+    // mauvaise manière de boucler sur un pointer!!!
+    //for (layerStatChart * chart : mGL->ptrVLStat()) {
+    for (const auto & chart : mGL->ptrVLStat()) {
+        std::cout << " row " << row << " , col " << column << std::endl;
         grid->addWidget(std::unique_ptr<Wt::WContainerWidget>(chart->getChart()), row, column);
         column++;
         if (column>nbColumn){row++;column=0;}
@@ -409,7 +418,7 @@ void parcellaire::visuStat(){
 
     layout->addWidget(std::move(contTitre), 0);
     layout->addWidget(std::move(contCharts), 1);
-
+    std::cout << " change tostack index... " ;
     mTopStack->setCurrentIndex(1);
     mGL->mPBar->setValue(0);
     std::cout << " ..done " << std::endl;
@@ -418,9 +427,19 @@ void parcellaire::visuStat(){
 std::string parcellaire::geoJsonName(){return mFullPath + ".geojson";}
 std::string parcellaire::geoJsonRelName(){ return "tmp/" + mName +".geojson";}
 
-void parcellaire::exportStatAndDownloadShp(){
+void parcellaire::downloadShp(){
 
-    //WFileResource *fileResource = new Wt::WFileResource("plain/text", );
-    //fileResource->suggestFileName(mName+"_statForestimator");
-    //m_app->redirect(fileResource->url());
+    // créer une nouvelle archive et y mettre tout les fichiers du shp
+    // attention, pour l'instant l'archive crée n'est pas supprimée
+    ZipArchive* zf = new ZipArchive(mFullPath+".zip");
+    zf->open(ZipArchive::WRITE);
+    zf->addFile(mClientName+"_statForestimator.shp",mFullPath+".shp");
+    zf->addFile(mClientName+"_statForestimator.dbf",mFullPath+".dbf");
+    zf->addFile(mClientName+"_statForestimator.shx",mFullPath+".shx");
+    zf->close();
+    delete zf;
+
+    WFileResource *fileResource = new Wt::WFileResource("plain/text",mFullPath+".zip");
+    fileResource->suggestFileName(mClientName+"_statForestimator.zip");
+    m_app->redirect(fileResource->url());
 }

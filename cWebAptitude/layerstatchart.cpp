@@ -33,13 +33,15 @@ layerStatChart::layerStatChart(Layer *aLay, std::map<std::string, int> aStat, st
 
 Wt::WContainerWidget * layerStatChart::getChart(){
     // crée un smart ptr pour un chart vide
-Wt:WContainerWidget * aRes= new Wt::WContainerWidget();
+    std::cout << " creation d'un chart " << std::endl;
+    Wt:WContainerWidget * aRes= new Wt::WContainerWidget();
     aRes->setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Center);
     aRes->setInline(0);
     aRes->setOverflow(Wt::Overflow::Auto);
 
     aRes->addWidget(cpp14::make_unique<WText>("<h4>"+mLay->getLegendLabel()+"</h4>"));
     aRes->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
+    std::cout << " statsimple : " << mStatSimple.size() << " elem " << std::endl;
     if (mStatSimple.size()>0){
         WTableView* table =aRes->addWidget(cpp14::make_unique<WTableView>());
         aRes->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
@@ -47,6 +49,7 @@ Wt:WContainerWidget * aRes= new Wt::WContainerWidget();
         table->setMargin(WLength::Auto, Side::Left | Side::Right);
         table->setSortingEnabled(1,false);
         table->setSortingEnabled(0,false);// pas très utile
+        std::cout << "set model " << std::endl;
         table->setModel(mModel);
         table->setColumnWidth(0, 200);
         table->setColumnWidth(1, 150);
@@ -60,7 +63,7 @@ Wt:WContainerWidget * aRes= new Wt::WContainerWidget();
         aChart->setDataColumn(1);      // Set the column that holds the data.
 
         // changer la couleur
-        //std::cout << "change la couleur" << std::endl;
+        std::cout << "change la couleur" << std::endl;
         int row = 0;
         for (auto & kv : mStatSimple){
             std::string aCodeStr(kv.first);
@@ -105,7 +108,6 @@ void layerStat::simplifieStat(){
         }
     }
     if (autres>0) {
-
         tot+=autres;
         // correction de l'erreur d'arrondi si elle est de 2 pct max
         if ((tot>97) & (tot <100)) { autres+= 100-tot; tot=100;}

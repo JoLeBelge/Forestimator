@@ -19,7 +19,7 @@ class layerStat : public Wt::WContainerWidget
 {
 public:
     layerStat(Layer * aLay,std::map<std::string,int> aStat, std::string aMode);
-    layerStat():mLay(NULL){} //constructeur vide
+    //layerStat():mLay(NULL){} //constructeur vide
     void simplifieStat();
     int getO(bool mergeOT=false);// proportion en optimum
 protected:
@@ -33,7 +33,7 @@ class layerStatChart : public layerStat
 {
 public:
     layerStatChart(Layer * aLay,std::map<std::string,int> aStat, std::string aMode);
-    layerStatChart():mLay(NULL),mTable(NULL),mChart(NULL){} //constructeur vide
+    //layerStatChart():mLay(NULL),mTable(NULL),mChart(NULL){} //constructeur vide
     Wt::WContainerWidget * getChart();
     Chart::WPieChart * mChart;
 private:

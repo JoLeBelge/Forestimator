@@ -180,6 +180,11 @@ void groupLayers::extractInfo(double x, double y){
 // clé 1 ; nom de la couche. clé2 : la valeur au format légende (ex ; Optimum). Valeur ; pourcentage pour ce polygone
 std::map<std::string,std::map<std::string,int>> groupLayers::computeStatGlob(OGRGeometry *poGeomGlobale){
     std::cout << " groupLayers::computeStatGlob " << std::endl;
+    // clear d'un vecteur de pointeur, c'est mal.
+    for (auto p : mVLStat)
+       {
+         delete p;
+       }
     mVLStat.clear();
     std::map<std::string,std::map<std::string,int>> aRes;
 
@@ -193,7 +198,7 @@ std::map<std::string,std::map<std::string,int>> groupLayers::computeStatGlob(OGR
 
         // c'est parcellaire:: qui doit gerer l'affichage des layerStatChart
         layerStatChart* aLayStatChart=new layerStatChart(l,stat,aMode);
-        mVLStat.push_back(aLayStatChart);
+        mVLStat.emplace_back(aLayStatChart);
 
         aRes.emplace(std::make_pair(l->getCode(),stat));
         mPBar->setValue(mPBar->value() + 1);
@@ -206,34 +211,34 @@ std::map<std::string,std::map<std::string,int>> groupLayers::computeStatGlob(OGR
 
 void groupLayers::computeStatOnPolyg(OGRLayer * lay){
 
-     for (auto &kv: getSelectedLayer4Stat() ){
-         Layer * l=kv.second;
-         std::string aMode=kv.first.at(1);
+    for (auto &kv: getSelectedLayer4Stat() ){
+        Layer * l=kv.second;
+        std::string aMode=kv.first.at(1);
 
-            // défini le nouveau champ à ajouter à la table d'attribut
-            //OGRFieldDefn oFLD(l.getCode().c_str(),  OFTString);//OGRFieldType
-            OGRFieldDefn oFLD(l->getCode().c_str(),  OFTInteger);//OFTInteger64
-            //oFLD.Set(cs.GetBuffer(0), OFTReal, 0, 0, OJUndefined);
-            //OGRField oField; oField.String = "tata";
-            oFLD.SetDefault(0);
+        // défini le nouveau champ à ajouter à la table d'attribut - vérifie qu'il n'existe pas préhalablement
+        if (lay->FindFieldIndex(l->getCode().c_str(),0)==-1){
+            OGRFieldDefn oFLD(l->getCode().c_str(),  OFTInteger);
+            oFLD.SetJustify(OGRJustification::OJLeft);
+            //oFLD.SetDefault(0);
             lay->CreateField(&oFLD);
-            OGRFeature *poFeature;
-            lay->ResetReading();
-            while( (poFeature = lay->GetNextFeature()) != NULL )
-            {
-                // clé : la valeur au format légende (ex ; Optimum). Valeur ; pourcentage pour ce polygone
-                OGRGeometry * poGeom = poFeature->GetGeometryRef();
-                poGeom->flattenTo2D();
-                //std::map<std::string,int> stat = l->computeStatOnPolyg(poGeom,aMode);
-                layerStat ls(l,l->computeStatOnPolyg(poGeom,aMode),aMode);
-                // on met un résumé des stat dans le champ nouvellement créé
-                std::cout << "po Feature " << poFeature->GetFID() << ", valeur pour optimum et tolérance  - essence " << l->getCode() << " : " <<  ls.getO(true) << std::endl;
-                poFeature->SetField(l->getCode().c_str(), ls.getO(true));
-                //poFeature->SetField(); This method has only an effect on the in-memory feature object. If this object comes from a layer and the modifications must be serialized back to the datasource, OGR_L_SetFeature()
-                lay->SetFeature(poFeature);
-            }
-
         }
+
+        OGRFeature *poFeature;
+        lay->ResetReading();
+        while( (poFeature = lay->GetNextFeature()) != NULL )
+        {
+            // clé : la valeur au format légende (ex ; Optimum). Valeur ; pourcentage pour ce polygone
+            OGRGeometry * poGeom = poFeature->GetGeometryRef();
+            poGeom->flattenTo2D();
+            //std::map<std::string,int> stat = l->computeStatOnPolyg(poGeom,aMode);
+            layerStat ls(l,l->computeStatOnPolyg(poGeom,aMode),aMode);
+            // on met un résumé des stat dans le champ nouvellement créé
+            poFeature->SetField(l->getCode().c_str(), ls.getO(true));
+            //poFeature->SetField(); This method has only an effect on the in-memory feature object. If this object comes from a layer and the modifications must be serialized back to the datasource, OGR_L_SetFeature()
+            lay->SetFeature(poFeature);
+        }
+
+    }
 }
 
 std::map<std::string,int> groupLayers::apts(){
@@ -267,12 +272,9 @@ std::map<std::string,int> groupLayers::apts(){
     return aRes;
 }
 
-selectLayers4Stat::selectLayers4Stat(groupLayers * aGL):mGL(aGL){
+selectLayers4Stat::selectLayers4Stat(groupLayers * aGL):mGL(aGL),selectLayers(aGL,aGL->getVpLs(),10){
     std::cout << "creation de selectLayers4Stat " << std::endl;
-    // ça ce sont les membres de SelectLayer
-    mVpLs=aGL->getVpLs();
-    nbMax=10;
-    mParent= mGL;
+
     // pour l'instant ; uniquement les aptitudes FEE
     for (Layer * l : mVpLs){
         if (l->Type()!=TypeLayer::Externe){
@@ -329,13 +331,8 @@ std::map<std::vector<std::string>,Layer*> selectLayers::getSelectedLayer(){
     return aRes;
 }
 
-selectLayers4Download::selectLayers4Download(groupLayers * aGL):mGL(aGL){
+selectLayers4Download::selectLayers4Download(groupLayers * aGL):mGL(aGL),selectLayers(aGL,aGL->getVpLs(),75){
     std::cout << "creation de selectLayers4Download " << std::endl;
-    // ça ce sont les membres de SelectLayer
-    mVpLs=aGL->getVpLs();
-    nbMax=75;
-    mParent= mGL;
-
     for (Layer * l : mVpLs){
         if (l->Type()!=TypeLayer::Externe){
             if (l->Type()==TypeLayer::Apti){

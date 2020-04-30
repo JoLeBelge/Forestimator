@@ -15,10 +15,9 @@
 #include "Wt/WFileResource.h"
 
 #include "boost/filesystem.hpp"
-//#include <boost/bind.hpp>
-//#include <boost/function.hpp>
 #include <functional> //--> pour bind
-#include <iostream>
+#include "libzippp.h"
+using namespace libzippp;
 
 // objet qui comprend le shp d'un parcellaire DNF que l'on va afficher dans openlayer
 // cet objet contient également l'interface graphique wt avec les bouttons qui permettent de charger le shp, les bouttons pour démarrer les calcul, ect
@@ -51,7 +50,7 @@ public:
 
     Wt::Signal<int>& changePage() { return page_; }
 
-    void exportStatAndDownloadShp();
+    void downloadShp();
 
 private:
 
