@@ -97,7 +97,7 @@ protected: // les classes qui héritent peuvent avoir accès
 
     Layer* getLayerPtr(std::vector<std::string> aCode);
 
-    void SelectLayer(bool select,std::string aCode, std::string aMode="");
+    void SelectLayer(bool select,std::string aCode, std::string aMode="",bool afficheMsg=true);
     void SelectLayerGroup(bool select,TypeLayer aType,std::string aMode="");
 
     bool isSelected(std::string aCode, std::string aMode=""){
@@ -158,7 +158,7 @@ public:
     std::map<std::string,std::map<std::string,int>> computeStatGlob(OGRGeometry *poGeomGlobale);
     //void visuStat();
     // void car on ajoute les résulats à la table d'attribut de la couche
-    void computeStatOnPolyg(OGRLayer * lay);
+    void computeStatOnPolyg(OGRLayer * lay, bool mergeOT=0);
 
     // ne fait pas ce que je veux, il faut apparemment utiliser des anchor pour faire du bookmarking / hashtag
     Wt::Signal<bool>& focusMap(){

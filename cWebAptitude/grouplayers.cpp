@@ -209,7 +209,7 @@ std::map<std::string,std::map<std::string,int>> groupLayers::computeStatGlob(OGR
     return aRes;
 }
 
-void groupLayers::computeStatOnPolyg(OGRLayer * lay){
+void groupLayers::computeStatOnPolyg(OGRLayer * lay,bool mergeOT){
 
     for (auto &kv: getSelectedLayer4Stat() ){
         Layer * l=kv.second;
@@ -233,11 +233,10 @@ void groupLayers::computeStatOnPolyg(OGRLayer * lay){
             //std::map<std::string,int> stat = l->computeStatOnPolyg(poGeom,aMode);
             layerStat ls(l,l->computeStatOnPolyg(poGeom,aMode),aMode);
             // on met un résumé des stat dans le champ nouvellement créé
-            poFeature->SetField(l->getCode().c_str(), ls.getO(true));
+            poFeature->SetField(l->getCode().c_str(), ls.getO(mergeOT));
             //poFeature->SetField(); This method has only an effect on the in-memory feature object. If this object comes from a layer and the modifications must be serialized back to the datasource, OGR_L_SetFeature()
             lay->SetFeature(poFeature);
         }
-
     }
 }
 
@@ -345,7 +344,7 @@ selectLayers4Download::selectLayers4Download(groupLayers * aGL):mGL(aGL),selectL
                 mLayersCBox.emplace(std::make_pair(aKey2,new Wt::WCheckBox()));
             } else {
                 std::vector<std::string> aKey1={l->getCode(),""};
-                mSelectedLayers.emplace(std::make_pair(aKey1,true));
+                mSelectedLayers.emplace(std::make_pair(aKey1,false));
                 mLayersCBox.emplace(std::make_pair(aKey1,new Wt::WCheckBox()));
             }
         }
@@ -454,7 +453,7 @@ selectLayers4Download::selectLayers4Download(groupLayers * aGL):mGL(aGL),selectL
     treeTable->treeRoot()->expand();
 }
 
-void selectLayers::SelectLayer(bool select,std::string aCode, std::string aMode){
+void selectLayers::SelectLayer(bool select, std::string aCode, std::string aMode, bool afficheMsg){
 
     std::vector<std::string> aKey={aCode,aMode};
     if ((!select) |(nbMax>(numSelectedLayer()))){
@@ -466,6 +465,9 @@ void selectLayers::SelectLayer(bool select,std::string aCode, std::string aMode)
         }
     } else {
         // faire apparaitre un message à l'utilisateur, maximum nbMax
+        // changer le status de la checkbox, remettre à false
+        if (select) mLayersCBox.at(aKey)->setChecked(false);
+        if (afficheMsg){
         auto messageBox =
                 mParent->addChild(Wt::cpp14::make_unique<Wt::WMessageBox>(
                                       "Sélection des couches",
@@ -479,8 +481,8 @@ void selectLayers::SelectLayer(bool select,std::string aCode, std::string aMode)
             mParent->removeChild(messageBox);
         });
         messageBox->show();
-        // changer le status de la checkbox, remettre à false
-        if (select) mLayersCBox.at(aKey)->setChecked(false);
+        }
+
     }
 
     std::cout << "nombre de couches sélectionnées " << numSelectedLayer() << std::endl;

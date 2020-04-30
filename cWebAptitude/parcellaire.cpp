@@ -65,11 +65,13 @@ parcellaire::parcellaire(WContainerWidget *parent, groupLayers *aGL, Wt::WApplic
     est buggé pour le moment
     */
 
-
     downloadShpBt = mParent->addWidget(cpp14::make_unique<Wt::WPushButton>("Télécharger le shp"));
     downloadShpBt->setInline(0);
     downloadShpBt->disable();
     //visuStatButton->setLink(Wt::WLink(Wt::LinkType::InternalPath, "/StatistiqueParcellaire"));
+    mParent->addWidget(cpp14::make_unique<Wt::WText>(tr("infoDownloadClippedRaster")));
+    mParent->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
+    mParent->addWidget(std::unique_ptr<Wt::WContainerWidget>(mGL->afficheSelect4Download()));
 
     fu->fileTooLarge().connect([=] { msg->setText("Le fichier est trop volumineux (max 2000ko).");});
     fu->changed().connect(this,&parcellaire::fuChanged);
@@ -366,7 +368,7 @@ void parcellaire::computeStat(){
     } else {
         // layer
         OGRLayer * lay = DS->GetLayer(0);
-        mGL->computeStatOnPolyg(lay);
+        mGL->computeStatOnPolyg(lay,mCB_fusionOT->isChecked());
         // sauve le résultat
         GDALClose( DS );
         downloadShpBt->enable();

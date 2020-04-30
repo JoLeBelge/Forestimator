@@ -21,4 +21,10 @@ Sélectionnez ci-dessus les couches pour lesquelles vous désirez ajouter les st
 
 <message id="infoVisuStat">La visualisation des statistiques permet un affichage des proportions de surface pour chaque classe d'aptitude. Pour l'instant, il s'agit uniquement des statistiques pour l'ensemble de tout les polygones de votre shapefile.</message>
 
+<message id="infoDownloadClippedRaster">
+<h4>Télécharger les couches géographique au format raster - TO COME SOON</h4>
+Vous pouvez télécharger les cartes listées ci-dessous qui seront découpées sur l'emprise de votres shapefile.
+</message>
+
+
 </messages>
