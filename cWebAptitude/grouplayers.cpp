@@ -492,7 +492,7 @@ void selectLayers::SelectLayer(bool select, std::string aCode, std::string aMode
 void selectLayers::SelectLayerGroup(bool select,TypeLayer aType,std::string aMode){
     for (Layer * l : mVpLs){
         if (l->Type()==aType){
-            SelectLayer(select,l->getCode(),aMode);
+            SelectLayer(select,l->getCode(),aMode,false);
         }
     }
     std::cout << "nombre de couches sélectionnées " << numSelectedLayer() << std::endl;
