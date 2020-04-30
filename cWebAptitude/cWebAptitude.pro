@@ -22,9 +22,6 @@ INCLUDEPATH += $$PWD/../carteApt/
 #LIBS += -L$$PWD/../../../../../../usr/local/lib -lzippp_static#INCLUDEPATH += $$PWD/../../../../../../usr/local/include/libzippp/
 #DEPENDPATH += $$PWD/../../../../../../usr/local/include/libzippp/
 
-INCLUDEPATH += $$PWD/libzipp/src
-DEPENDPATH += $$PWD/libzipp/src
-
 #qmake -makefile ../cWebAptitude/cWebAptitude.pro pl=server avant de lancer make sur debian server
 contains(pl,serveur) {
 LIBS += -L$$PWD/usr/include/gdal/ -lgdal
@@ -33,11 +30,16 @@ DEPENDPATH += $$PWD/../../../usr/include/gdal/
 
 # sur le serveur je dois lui préciser ou est cette librairie
 LIBS += -L$$PWD/../../../usr/lib/x86_64-linux-gnu/ -lsqlite3
+
+INCLUDEPATH += $$PWD/../cWebAptitude/libzipp/src
+DEPENDPATH += $$PWD/../cWebAptitude/libzipp/src
 } else {
 LIBS += -L$$PWD/../../../usr/include/ -lsqlite3
 LIBS += -L$$PWD/usr/include/gdal/ -lgdal
 INCLUDEPATH += $$PWD/../../../../../../usr/include/gdal/
 DEPENDPATH += $$PWD/../../../../../../usr/include/gdal/
+INCLUDEPATH += $$PWD/libzipp/src
+DEPENDPATH += $$PWD/libzipp/src
 
 }
 
