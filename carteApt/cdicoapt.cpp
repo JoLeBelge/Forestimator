@@ -807,7 +807,7 @@ cKKCS::cKKCS(std::string aCode,cDicoApt * aDico):mCode(aCode),mNom(aDico->codeKK
   ,mNomCol(aDico->codeKK2NomCol()->at(aCode)),mType(Potentiel)
   ,mHabitat(false)
 {
-
+    //std::cout << "constructeur KKCS , mCode " << mCode << std::endl;
     if (mCode=="Habitat"){mHabitat=true;mType=Habitats;}
 
     if(!mHabitat){
@@ -817,6 +817,7 @@ cKKCS::cKKCS(std::string aCode,cDicoApt * aDico):mCode(aCode),mNom(aDico->codeKK
         mHabitats=aDico->getHabitatCS(mNomCol);
     }
     mDicoCol=mDico->getDicoRasterCol(this);
+    //std::cout << "done " << std::endl;
 }
 
 std::string cKKCS::NomCarte(){return mDico->File("OUTDIR")+"KK_CS_"+mCode+".tif";}

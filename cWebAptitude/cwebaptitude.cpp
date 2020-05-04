@@ -113,7 +113,7 @@ cWebAptitude::cWebAptitude(Wt::WApplication* app)
     mPA = new parcellaire(PACont.get(),mGroupL,m_app,topStack,page2);
 
     // je ne parviens pas à faire le connect correctement, je dois me tromper quelque part.
-    mGroupL->focusMap().connect(mMap,&WOpenLayers::giveFocus);
+    //mGroupL->focusMap().connect(mMap,&WOpenLayers::giveFocus);
 
     menu->addItem("Plan d'amménagement", std::move(PACont));
 

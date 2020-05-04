@@ -293,7 +293,7 @@ var _view = new ol.View({
 	extent: extent,
 	zoom: 7,
 	minZoom: 0,
-	maxZoom: 8
+	maxZoom: 10
 })
 
 

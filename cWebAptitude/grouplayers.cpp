@@ -6,6 +6,7 @@ std::vector<std::string> classes = {"Fichier Ecologique des Essences", "Catalogu
 
 groupLayers::groupLayers(cDicoApt * aDico, WContainerWidget *parent, WContainerWidget *infoW, WOpenLayers *aMap, WApplication *app):mDico(aDico),mTypeClassifST(FEE),mInfoW(infoW),mMap(aMap),mParent(parent),mPBar(NULL),m_app(app)
 {
+    std::cout << "constructeur GL \n\n\n" << std::endl;
     setOverflow(Wt::Overflow::Auto);
     setPadding(20);
     setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Middle);
@@ -18,18 +19,19 @@ groupLayers::groupLayers(cDicoApt * aDico, WContainerWidget *parent, WContainerW
     mOtherTable->setWidth("80%");
 
     // carte IGN
-    WText *label;
-    label = mOtherTable->elementAt(row,col)->addWidget(cpp14::make_unique<WText>(""));
-    Layer aL(this,"IGN",label,TypeLayer::Externe);
-    mVLs.push_back(aL);
+    WText *label = mOtherTable->elementAt(row,col)->addWidget(cpp14::make_unique<WText>(""));
+    //Layer aL(this,"IGN",label,TypeLayer::Externe);
+    mVLs.push_back(Layer(this,"IGN",label,TypeLayer::Externe));
     row++;
     if (row % 6 == 0){col++;row=0;}
     // creation des layers pour les KK du CS
     for (auto & pair : *mDico->codeKK2Nom()){
         WText *label;
         label = mOtherTable->elementAt(row,col)->addWidget(cpp14::make_unique<WText>(""));
-        Layer aL(this,pair.first,label,TypeLayer::KK);
-        mVLs.push_back(aL);
+        //Layer aL(this,pair.first,label,TypeLayer::KK);
+        mVLs.push_back(Layer(this,pair.first,label,TypeLayer::KK));
+        std::string aCode=pair.first;
+        label->clicked().connect([this,aCode]{clickOnName(aCode);});
         row++;
         if (row % 6 == 0){col++;row=0;}
     }
@@ -85,27 +87,36 @@ groupLayers::groupLayers(cDicoApt * aDico, WContainerWidget *parent, WContainerW
     // création des arbres pour sélection des couches - ces objets sont affiché ailleur
     mSelect4Stat= new selectLayers4Stat(this);
     mSelect4Download= new selectLayers4Download(this);
+    std::cout << "done" << std::endl;
 }
 
 void groupLayers::update(std::string aCode){
-    //std::cout << " group Layers je vais faire un update du rendu visuel de chacun des label de couche \n\n\n" << std::endl;
+    std::cout << " group Layers je vais faire un update du rendu visuel de chacun des label de couche \n\n\n" << std::endl;
     // désactiver toutes les couches actives et changer le rendu du label
     for (Layer & l : mVLs){
         l.setActive(aCode==l.getCode());
     }
+    std::cout << "update done " << std::endl;
 }
 
 void groupLayers::clickOnName(std::string aCode){
+
+    std::cout << " j'ai cliqué sur un label " << aCode <<  "\n\n"<< std::endl;
 
     // udpate du rendu visuel de tout les labels de couches -- cela se situe au niveau du grouplayer
     update(aCode);
 
     // ajouter la couche à la carte
-    for (Layer& l : mVLs){
+    for (Layer const & l : mVLs){
         if (l.IsActive()){
-            l.displayLayer();
-            mLegend->afficheLegendeIndiv(&l);
+            //l.displayLayer();
+            // test ; retourner le code js qui sera utilisé par la map
+            //mMap->doJavaScript(l.displayLayer());
+            std::cout << l.displayLayer() << std::endl;
+            m_app->doJavaScript(l.displayLayer());
+           // mLegend->afficheLegendeIndiv(&l);
         }
+
     }
 
 

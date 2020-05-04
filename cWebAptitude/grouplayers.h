@@ -161,9 +161,10 @@ public:
     void computeStatOnPolyg(OGRLayer * lay, bool mergeOT=0);
 
     // ne fait pas ce que je veux, il faut apparemment utiliser des anchor pour faire du bookmarking / hashtag
-    Wt::Signal<bool>& focusMap(){
+   /* Wt::Signal<bool>& focusMap(){
         //std::cout << "focus map () dans grouplayer done \n\n\n" << std::endl;
         return focusOnMap_;}
+        */
     ST * mStation;
     std::vector<Layer> * Layers(){return & mVLs;}
 
@@ -206,7 +207,7 @@ private:
     Wt::WTable                 *mOtherTable;
     legend * mLegend;
 
-    Wt::Signal<bool> focusOnMap_;
+    //Wt::Signal<bool> focusOnMap_;
 
     WContainerWidget * mInfoW;
     //WWidget * mInfoW;

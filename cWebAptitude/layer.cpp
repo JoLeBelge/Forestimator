@@ -7,10 +7,13 @@ Layer::Layer(groupLayers * aGroupL, std::string aCode, WText *PWText, TypeLayer 
   ,mCode(aCode)
   ,mText(PWText)
   ,mType(aType)
-  ,mDicoVal(0)
-  ,mDicoCol(0)
-
+  ,mDicoVal(NULL)
+  //,mDicoCol(NULL)
+  ,mRI(NULL)
+  ,mEss(NULL)
+  ,mKK(NULL)
 {
+    //std::cout << "constructeur layer " << std::endl;
     // constructeur qui dépend du type de layer
     switch (mType) {
     case TypeLayer::Apti:
@@ -53,22 +56,35 @@ Layer::Layer(groupLayers * aGroupL, std::string aCode, WText *PWText, TypeLayer 
         }
     }
 
-    // ici ça bugge pk????? je pense qu'il crée un nouveau objet Layer depuis rien et c'est une mauvaise idée en fait
-    // le connect et le bind fonctionne pour des objets dérivés des classes wt, mais ici mon layer n'est pas une classe wt donc ça bug
-    mText->clicked().connect(std::bind(&groupLayers::clickOnName, mGroupL, mCode));
-    //mText->clicked().connect(this, &Layer::clickOnName);
-
-    // ajout d'un ancrage qui permet de remonter la page vers le haut, càd la carte
-    //Wt::WLink link = Wt::WLink("/WebAptitude");
-    //link.setTarget(Wt::LinkTarget::NewWindow);
-
-    //std::unique_ptr<Wt::WAnchor> anchor = Wt::cpp14::make_unique<Wt::WAnchor>(link);
-    //WAnchor * bookmark = new WAnchor( WLink( WLink::InternalPath, "/" ), "toto");
-
-    //mText->addChild();
-
+    // reconstruit l'objet GroupLayer! petit rigolo va !!-->
+    //mText->clicked().connect(std::bind(&groupLayers::clickOnName, mGroupL, mCode));
+    //mText->clicked().connect([=]{mGroupL->clickOnName(mCode);});
+    //check1_->changed().connect([=]{SelectLayer(check1_->isChecked(),aCode,"FEE");});
     setActive(false);
+    //std::cout << "done" << std::endl;
 }
+
+
+Layer::~Layer(){
+    //std::cout << "destrutor layer" << std::endl;
+    // delete ; only with new
+    mDicoVal=NULL;
+    //mDicoCol=NULL;
+    mGroupL=NULL;
+    mDico=NULL;
+    //delete mText;
+    mText=NULL;
+
+    // créé avec new, donc je baque avec delte? et le constructeur numéro2, il utilise new mais pas dans l'objet layer.
+    delete mEss;
+    delete mKK;
+    delete mRI;
+    mEss=NULL;
+    mKK=NULL;
+    mRI=NULL;
+}
+
+
 
 Layer::Layer(groupLayers * aGroupL, cEss aEss, WText *PWText):
     mDico(aGroupL->Dico())
@@ -77,7 +93,10 @@ Layer::Layer(groupLayers * aGroupL, cEss aEss, WText *PWText):
   ,mText(PWText)
   ,mType(TypeLayer::Apti)
   ,mDicoVal(0)
-  ,mDicoCol(0)
+  //,mDicoCol(0)
+  ,mRI(NULL)
+  ,mEss(NULL)
+  ,mKK(NULL)
 {
     // construction de l'essence
     mEss= new cEss(aEss);
@@ -85,7 +104,7 @@ Layer::Layer(groupLayers * aGroupL, cEss aEss, WText *PWText):
     mText->setText(mLabel);
     mDicoVal=mDico->code2AptFull();
     mDicoCol=mDico->codeApt2col();
-    mText->clicked().connect(std::bind(&groupLayers::clickOnName, mGroupL, mCode));
+    //mText->clicked().connect(std::bind(&groupLayers::clickOnName, mGroupL, mCode));
     setActive(false);
 }
 
@@ -100,14 +119,16 @@ void Layer::clickOnName(std::string aCode){
 }
 */
 
-void Layer::displayLayer(){
+std::string Layer::displayLayer() const{
 
+    std::string aRes;
     switch (mType) {
     case TypeLayer::Externe:
     {
         std::string JScommand("groupe = new ol.layer.Group({layers:[TOREPLACE, communes]});TOREPLACE.setVisible(true);map.setLayerGroup(groupe);");
         boost::replace_all(JScommand,"TOREPLACE",mCode);
-        mText->doJavaScript(JScommand);
+        aRes=JScommand;
+        //mText->doJavaScript(JScommand);
         break;
     }
     default:
@@ -153,12 +174,15 @@ void Layer::displayLayer(){
         in.open(aFileIn+".tmp");
         ss << in.rdbuf();
         in.close();
-        mText->doJavaScript(ss.str());
-
+        //mText->setId("toto"+mCode);
+        // plutôt lancer les script via un JSlot de mapol? mais avant ça fonctionnai quand même...
+        //mText->doJavaScript(ss.str());// c'est peut-être plutôt la carte qui dois faire le doJavascript, pas le label text...
+        aRes=ss.str();
         break;
     }
 
     }
+    return aRes;
 }
 
 std::vector<std::string> Layer::displayInfo(double x, double y){
@@ -199,12 +223,12 @@ int Layer::getValue(double x, double y){
         // gdal
         GDALAllRegister();
 
-        mGDALDat = (GDALDataset *) GDALOpen( getPathTif().c_str(), GA_ReadOnly );
+        GDALDataset  * mGDALDat = (GDALDataset *) GDALOpen( getPathTif().c_str(), GA_ReadOnly );
         if( mGDALDat == NULL )
         {
             std::cout << "je n'ai pas lu l'image " << getPathTif() << std::endl;
         } else {
-            mBand = mGDALDat->GetRasterBand( 1 );
+            GDALRasterBand * mBand = mGDALDat->GetRasterBand( 1 );
 
             double transform[6];
             mGDALDat->GetGeoTransform(transform);
@@ -227,6 +251,7 @@ int Layer::getValue(double x, double y){
                 aRes=scanPix[0];
                 CPLFree(scanPix);
                 GDALClose( mGDALDat );
+               mBand=NULL;
             }
         }
     }
@@ -254,12 +279,12 @@ std::map<std::string,int> Layer::computeStatOnPolyg(OGRGeometry *poGeom, std::st
 
         // gdal
         GDALAllRegister();
-        mGDALDat = (GDALDataset *) GDALOpen( getPathTif(aMode).c_str(), GA_ReadOnly );
+        GDALDataset  * mGDALDat = (GDALDataset *) GDALOpen( getPathTif(aMode).c_str(), GA_ReadOnly );
         if( mGDALDat == NULL )
         {
             std::cout << "je n'ai pas lu l'image " << getPathTif(aMode) << std::endl;
         } else {
-            mBand = mGDALDat->GetRasterBand( 1 );
+            GDALRasterBand * mBand = mGDALDat->GetRasterBand( 1 );
 
             double transform[6];
             mGDALDat->GetGeoTransform(transform);
@@ -310,8 +335,11 @@ std::map<std::string,int> Layer::computeStatOnPolyg(OGRGeometry *poGeom, std::st
                 }
 
             }
+        mBand=NULL;
         }
         GDALClose(mask);
+        GDALClose(mGDALDat);
+
 
     }
     return aRes;
@@ -434,7 +462,7 @@ GDALDataset * Layer::rasterizeGeom(OGRGeometry *poGeom){
             poGeom->getEnvelope(&ext);
             double width((ext.MaxX-ext.MinX)), height((ext.MaxY-ext.MinY));
 
-            mGDALDat = (GDALDataset *) GDALOpen( getPathTif().c_str(), GA_ReadOnly );
+            GDALDataset * mGDALDat = (GDALDataset *) GDALOpen( getPathTif().c_str(), GA_ReadOnly );
             if( mGDALDat == NULL )
             {
                 std::cout << "je n'ai pas lu l'image " << getPathTif() << std::endl;
