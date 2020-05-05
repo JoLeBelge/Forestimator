@@ -129,6 +129,7 @@ void Layer::clickOnName(std::string aCode){
 void Layer::displayLayer() const{
 
     std::cout << "display layer " << std::endl;
+    std::cout << "number of layer in the group " << mGroupL->mVLs.size() << std::endl;
     //std::string aRes;
     switch (mType) {
     case TypeLayer::Externe:
