@@ -133,7 +133,10 @@ class groupLayers: public WContainerWidget
 {
 public:
     groupLayers(cDicoApt * aDico,WContainerWidget *parent,WContainerWidget *infoW,WOpenLayers * aMap, Wt::WApplication* app);
-    ~groupLayers(){std::cout << " destructeur de group layer " << std::endl;}
+    ~groupLayers();
+    groupLayers(const groupLayers &gl){
+        std::cout << "construct by copy group layer -- should never happend\n\n\n" << std::endl;
+    }
     void clickOnName(std::string aCode);
     void changeClassClick(WText *t);
     void update(std::string aCode);
@@ -161,11 +164,13 @@ public:
     void computeStatOnPolyg(OGRLayer * lay, bool mergeOT=0);
 
     // ne fait pas ce que je veux, il faut apparemment utiliser des anchor pour faire du bookmarking / hashtag
-    Wt::Signal<bool>& focusMap(){
+   /* Wt::Signal<bool>& focusMap(){
         //std::cout << "focus map () dans grouplayer done \n\n\n" << std::endl;
         return focusOnMap_;}
+        */
     ST * mStation;
-    std::vector<Layer> * Layers(){return & mVLs;}
+    std::vector<Layer *> Layers(){return mVLs;}
+    std::vector<Layer*> getVpLs(){ return mVLs;}
 
     // retourne les aptitudes des essences pour une position donnée (click sur la carte)
     //key ; code essence. Value ; code aptitude
@@ -177,13 +182,7 @@ public:
 
     std::vector<layerStatChart*> ptrVLStat() {return mVLStat;}
 
-    std::vector<Layer*> getVpLs(){
-     std::vector<Layer*> aRes;
-     for (auto & l : mVLs){
-         aRes.push_back(&l);
-     }
-     return aRes;
-    }
+
 
     std::vector<rasterFiles> getSelect4Download(){return mSelect4Download->getSelectedRaster();}
     std::vector<rasterFiles> getSelect4Stat(){return mSelect4Stat->getSelectedRaster();}
@@ -193,12 +192,12 @@ public:
     int getNumSelect4Download(){return mSelect4Download->numSelectedLayer();}
     std::map<std::vector<std::string>,Layer*> getSelectedLayer4Stat(){return mSelect4Stat->getSelectedLayer();}
     std::map<std::vector<std::string>,Layer*> getSelectedLayer4Download(){return mSelect4Download->getSelectedLayer();}
-
+     std::vector<Layer *> mVLs;
 private:
     TypeClassifST mTypeClassifST;
     std::string currentClassifST; // 2 modes de classification des stations forestières ; FEE et CS
     std::vector<WText *> clasLabels_;
-    std::vector<Layer> mVLs;
+
     cDicoApt * mDico;
 
     Wt::WTable                 *mEssTable;
@@ -206,7 +205,7 @@ private:
     Wt::WTable                 *mOtherTable;
     legend * mLegend;
 
-    Wt::Signal<bool> focusOnMap_;
+    //Wt::Signal<bool> focusOnMap_;
 
     WContainerWidget * mInfoW;
     //WWidget * mInfoW;

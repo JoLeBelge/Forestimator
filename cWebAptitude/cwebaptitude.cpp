@@ -63,7 +63,6 @@ cWebAptitude::cWebAptitude(Wt::WApplication* app)
     infoW_->setWidth("30%");
 
     // creation d'un menum popup
-
     // Create a stack where the contents will be located.
     auto contents = Wt::cpp14::make_unique<Wt::WStackedWidget>();
 
@@ -102,19 +101,20 @@ cWebAptitude::cWebAptitude(Wt::WApplication* app)
     T.setBackgroundColor(WColor(col.mR,col.mG,col.mB));
     app->styleSheet().addRule(".E", T);
 
-    auto groupL = Wt::cpp14::make_unique<groupLayers>(mDico,this,legendCont.get(),mMap,m_app);
-    //WMenuItem * legendMenuIt = menu->addItem("Légende", std::move(legendCont));
+    // à nouveau, ça provoque un dangling ptr si je passe par un unique_ptr, au lieu de ça je fait un conteneur unique_ptr et le groupLayer est créé avec un new et rempli le conteneur parent
+    // comme pour le bug dans parcellaire
+    //auto groupL = Wt::cpp14::make_unique<groupLayers>(mDico,this,legendCont.get(),mMap,m_app);
+
+    auto GLCont = Wt::cpp14::make_unique<Wt::WContainerWidget>();
+    mGroupL = new groupLayers(mDico,GLCont.get(),legendCont.get(),mMap,m_app);
+
     menu->addItem("Légende", std::move(legendCont));
-    mGroupL = groupL.get();
 
     // unique _ptr est détruit à la fin de la création de l'objet, doit etre déplacé avec move pour donner sa propriété à un autre objet pour ne pas être détruit
     //auto uPtrPA = Wt::cpp14::make_unique<parcellaire>(PACont.get(),mGroupL,m_app);
     //mPA = uPtrPA.get();
+
     mPA = new parcellaire(PACont.get(),mGroupL,m_app,topStack,page2);
-
-    // je ne parviens pas à faire le connect correctement, je dois me tromper quelque part.
-    mGroupL->focusMap().connect(mMap,&WOpenLayers::giveFocus);
-
     menu->addItem("Plan d'amménagement", std::move(PACont));
 
     //auto UploadCont = Wt::cpp14::make_unique<Wt::WContainerWidget>();
@@ -124,8 +124,10 @@ cWebAptitude::cWebAptitude(Wt::WApplication* app)
     // maintenant que tout les objets sont crées, je ferme la connection avec la BD sqlite3, plus propre
     mDico->closeConnection();
 
-    mMap->clicked().connect(mMap->slot);
+    //mMap->clicked().connect(mMap->slot);
+    mMap->doubleClicked().connect(mMap->slot); // et dans wt_config, mettre à 500 milliseconde au lieu de 200
     mMap->xy().connect(std::bind(&groupLayers::extractInfo,mGroupL, std::placeholders::_1,std::placeholders::_2));
+    mMap->setToolTip(tr("tooltipMap"));
     // je divise la fenetre en 2 dans la hauteur pour mettre la carte à droite et à gauche une fenetre avec les infos des couches
     auto layout = this->setLayout(Wt::cpp14::make_unique<Wt::WVBoxLayout>());
    // auto layout = page1->setLayout(Wt::cpp14::make_unique<Wt::WVBoxLayout>());// c'est étrange, quand je met le layout dans la page 1, ça n'a pas le même rendu (car pas dans un topstack)
@@ -135,6 +137,6 @@ cWebAptitude::cWebAptitude(Wt::WApplication* app)
     hLayout->addWidget(std::move(infoW), 1);
     layout->addWidget(std::move(titreCont), 0);
     layout->addWidget(std::move(pane), 0);
-    layout->addWidget(std::move(groupL), 1); // si 1, laisse la place aux deux autres partie du layout car stretch, mais pas beau.
-
+    //layout->addWidget(std::move(groupL), 1); // si 1, laisse la place aux deux autres partie du layout car stretch, mais pas beau.
+    layout->addWidget(std::move(GLCont), 1);
 }

@@ -37,28 +37,30 @@ inline bool exists (const std::string& name){
 
 
 enum class TypeLayer {Apti
-                ,KK // les cartes dérivées des CS
-                ,Thematique // toutes les autres ; NH NT ZBIO
-                ,Externe // toutes les cartes qui ne sont pas en local ; carte IGN pour commencer
-               };
+                      ,KK // les cartes dérivées des CS
+                      ,Thematique // toutes les autres ; NH NT ZBIO
+                      ,Externe // toutes les cartes qui ne sont pas en local ; carte IGN pour commencer
+                     };
 
 
 class rasterFiles{
 
 public:
-    rasterFiles(std::string aPathTif);
-    // constructeur par copie et par déplacement ; indispensible si j'utilise les objets dans un vecteur. http://www-h.eng.cam.ac.uk/help/tpl/languages/C++/morevectormemory.html
+    rasterFiles(std::string aPathTif,std::string aCode);
+    // constructeur par copie et par déplacement ; indispensable si j'utilise les objets dans un vecteur. http://www-h.eng.cam.ac.uk/help/tpl/languages/C++/morevectormemory.html
     rasterFiles(const rasterFiles &rf){
         mPathTif=rf.mPathTif;
         mPathQml=rf.mPathQml;
+        mCode=rf.mCode;
     }
-    rasterFiles(rasterFiles&& rf) noexcept {mPathTif=rf.mPathTif;mPathQml=rf.mPathQml;}
+    rasterFiles(rasterFiles&& rf) noexcept {mPathTif=rf.mPathTif;mPathQml=rf.mPathQml; mCode=rf.mCode;}
 
-    std::string tif(){return mPathTif;}
-    std::string symbology(){return mPathQml;}
-    bool hasSymbology(){return mPathQml!="";}
+    std::string code() const{return mCode;}
+    std::string tif() const{return mPathTif;}
+    std::string symbology() const{return mPathQml;}
+    bool hasSymbology() const{return mPathQml!="";}
 private:
-    std::string mPathTif, mPathQml;
+    std::string mPathTif, mPathQml, mCode;
     // pour exporter le dictionnaire dans un fichier texte si nécessaire
     std::map<int, std::string> mDicoVal;
 };
@@ -70,8 +72,70 @@ public:
     Layer(groupLayers * aGroupL, std::string aCode,WText * PWText,TypeLayer aType=TypeLayer::Apti);
     Layer(groupLayers * aGroupL, cEss aEss ,WText * PWText);
 
+    // constructeur par copie et par déplacement ; indispensable si j'utilise les objets dans un vecteur. http://www-h.eng.cam.ac.uk/help/tpl/languages/C++/morevectormemory.html
+
+    Layer(const Layer &lay){
+        //std::cout << "construct by copy layer " << std::endl;
+        mActive=lay.mActive;
+        mGroupL=lay.mGroupL;
+        mType=lay.mType;
+        mEss=NULL;
+        mKK=NULL;
+        mRI=NULL;
+        mDico=lay.mDico;
+        mText=lay.mText;
+        mLabel=lay.mLabel;
+        mPathTif=lay.mPathTif;
+        mDirTuile=lay.mDirTuile;
+        mCode=lay.mCode;
+        mDicoCol=lay.mDicoCol;
+        mDicoVal=lay.mDicoVal;
+        switch (mType) {
+        case TypeLayer::Apti:
+            mEss=new cEss(mCode,mDico);
+            break;
+        case TypeLayer::KK:
+            mKK=new cKKCS(mCode,mDico);
+            break;
+        case TypeLayer::Thematique:
+            mRI= new cRasterInfo(mCode,mDico);
+            break;
+        }
+    }
+    Layer(Layer&& lay) noexcept {
+        //std::cout << "construct by move layer " << std::endl;
+        mActive=lay.mActive;
+        mGroupL=lay.mGroupL;
+        mType=lay.mType;
+        mEss=NULL;
+        mKK=NULL;
+        mRI=NULL;
+        mDico=lay.mDico;
+        mText=lay.mText;
+        mLabel=lay.mLabel;
+        mPathTif=lay.mPathTif;
+        mDirTuile=lay.mDirTuile;
+        mCode=lay.mCode;
+        mDicoCol=lay.mDicoCol;
+        mDicoVal=lay.mDicoVal;
+        switch (mType) {
+        case TypeLayer::Apti:
+            mEss=new cEss(mCode,mDico);
+            break;
+        case TypeLayer::KK:
+            mKK=new cKKCS(mCode,mDico);
+            break;
+        case TypeLayer::Thematique:
+            mRI= new cRasterInfo(mCode,mDico);
+            break;
+        }
+    }
+
+    ~Layer();
+
     //void clickOnName(std::string aCode);
-    void displayLayer();
+    void displayLayer() const;
+    //std::string displayLayer() const;
 
     std::vector<std::string> displayInfo(double x, double y);
     // clé : la valeur au format légende (ex ; Optimum). Valeur ; pourcentage pour ce polygone
@@ -89,33 +153,35 @@ public:
         mActive=b;
         mText->setStyleClass(mActive ? "currentEss" : "ess");
     }
-    bool IsActive(){return mActive;}
+    bool IsActive() const {return mActive;}
     std::string getCode(){return mCode;}
     std::string getPathTif();
-    std::string getLegendLabel();
-    std::string getShortLabel(){return mLabel;}
+    std::string getLegendLabel() const;
+    std::string getShortLabel() const {return mLabel;}
 
     // à cause de ma superbe idée de merde de mettre deux couches raster par layer, je dois surcharger ces méthodes pour pouvoir spécifier le mode Fee vs Cs
     std::vector<std::string> getCode(std::string aMode);
     std::string getPathTif(std::string aMode);
     std::string getLegendLabel(std::string aMode);
 
-    TypeLayer Type(){return mType;}
+    TypeLayer Type() const {return mType;}
 
     // le dictionnaire des valeurs raster vers leur signification.
     std::map<int, std::string> * mDicoVal;
 
     // le dictionnaire des valeurs raster vers leur couleur, pour la légende
-    std::map<int, color> * mDicoCol;
+   // std::map<int, color> * mDicoCol;
+    // ce n'est plus un pointeur
+    std::map<int, color> mDicoCol;
 
-    color getColor(int aCode){
+    color getColor(int aCode) const{
         color aRes(0,0,0);
-            if (mDicoCol && mDicoCol->find(aCode)!=mDicoCol->end()){
-                aRes=mDicoCol->at(aCode);}
+        if (mDicoCol.find(aCode)!=mDicoCol.end()){
+            aRes=mDicoCol.at(aCode);}
         return aRes;
     }
 
-    color getColor(std::string aStrCode){
+    color getColor(std::string aStrCode) const{
         int aCode(0);
         bool test(0);
         color aRes(255,255,255);
@@ -148,7 +214,6 @@ private:
     cEss * mEss;
     cKKCS * mKK;
     cRasterInfo * mRI;
-    Wt::WCheckBox *mCheck;
     cDicoApt * mDico;
     WText * mText; // ça c'est le lien entre l'objet et l'affichage dans la page web
     // le texte affiché dans le Wtext
@@ -156,11 +221,10 @@ private:
     std::string mPathTif;
     std::string mDirTuile;
     std::string mCode;
-    //std::string mCodeTuile;
 
-
-    GDALDataset  * mGDALDat;
-    GDALRasterBand * mBand;
+    // je crois que c'est mieux que ce ne soit pas des membres de l'objet
+    //GDALDataset  * mGDALDat;
+    //GDALRasterBand * mBand;
 };
 
 #endif // LAYER_H

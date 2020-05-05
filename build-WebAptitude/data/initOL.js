@@ -293,7 +293,7 @@ var _view = new ol.View({
 	extent: extent,
 	zoom: 7,
 	minZoom: 0,
-	maxZoom: 8
+	maxZoom: 10
 })
 
 
@@ -303,6 +303,7 @@ map = new ol.Map({
 	controls: ol.control.defaults().extend([
 	  new ol.control.ScaleLine()
 	]),
+ 	interactions : ol.interaction.defaults({doubleClickZoom :false}),
 	renderer: 'canvas',
 	//renderer: 'webgl',
 	layers: layers,

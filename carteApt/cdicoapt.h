@@ -57,7 +57,7 @@ public:
     std::string NomTuile();
     TypeCarte Type(){return mType;}
     std::map<int, std::string> * getDicoVal(){return &mDicoVal;}
-    std::map<int, color> * getDicoCol(){return &mDicoCol;}
+    std::map<int, color>  getDicoCol(){return mDicoCol;}
 private:
     TypeCarte mType;
     cDicoApt * mDico;
@@ -75,6 +75,10 @@ class cKKCS
 {
 public:
     cKKCS(std::string aCode,cDicoApt * aDico);
+    ~cKKCS(){
+        //std::cout << " destructeur  KKCS " << std::endl;
+        mDico=NULL;
+    }
     std::string Nom(){return mNom;}
     bool IsHabitat(){return mHabitat;}
     bool IsFact(){return (mCode!="Pot_norm" && !mHabitat);}
@@ -85,7 +89,7 @@ public:
     std::string NomDirTuile();
     int getEchelle(int aZbio,int aSTId);
     int getHab(int aZbio,int aSTId);
-    std::map<int, color> * getDicoCol(){return &mDicoCol;}
+    std::map<int, color> getDicoCol(){return mDicoCol;}
     TypeCarte Type(){return mType;}
 private:
     TypeCarte mType;
@@ -219,7 +223,7 @@ public:
 
     std::map<int,std::string>  * topo(){return  &Dico_topo;}
 
-    std::map<int, color>  * codeApt2col(){return  &Dico_codeApt2col;}
+    std::map<int, color>  codeApt2col(){return  Dico_codeApt2col;}
 
     color Apt2col(int aCode){
         color aRes(0,0,0);

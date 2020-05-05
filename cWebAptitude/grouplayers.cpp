@@ -4,46 +4,63 @@
 const TypeClassifST cl[] = { FEE, CS };
 std::vector<std::string> classes = {"Fichier Ecologique des Essences", "Catalogue des Stations"};
 
-groupLayers::groupLayers(cDicoApt * aDico, WContainerWidget *parent, WContainerWidget *infoW, WOpenLayers *aMap, WApplication *app):mDico(aDico),mTypeClassifST(FEE),mInfoW(infoW),mMap(aMap),mParent(parent),mPBar(NULL),m_app(app)
+groupLayers::groupLayers(cDicoApt * aDico, WContainerWidget *parent, WContainerWidget *infoW, WOpenLayers *aMap, WApplication *app):
+    mDico(aDico)
+  ,mTypeClassifST(FEE)
+  ,mInfoW(infoW)
+  ,mMap(aMap)
+  ,mParent(parent)
+  ,mPBar(NULL)
+  ,m_app(app)
+  ,mEssTable(NULL)
+  ,mClassifTable(NULL)
+  ,mOtherTable(NULL)
+  ,mLegend(NULL)
+  ,mSelect4Stat(NULL)
+  ,mSelect4Download(NULL)
 {
-    setOverflow(Wt::Overflow::Auto);
-    setPadding(20);
-    setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Middle);
+    std::cout << "constructeur GL " << std::endl;
+    mParent->setOverflow(Wt::Overflow::Auto);
+    mParent->setPadding(20);
+    mParent->setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Middle);
     this->addStyleClass("table form-inline");
     this->setStyleClass("table form-inline");
     // creation de la table listant les cartes thématiques - catalogue station,pot sylvicole, NH, NT, AE, ect
-    mOtherTable = addWidget(cpp14::make_unique<Wt::WTable>());
+    mOtherTable = mParent->addWidget(cpp14::make_unique<Wt::WTable>());
     int row(0),col(0);
 
     mOtherTable->setWidth("80%");
 
     // carte IGN
-    WText *label;
-    label = mOtherTable->elementAt(row,col)->addWidget(cpp14::make_unique<WText>(""));
-    Layer aL(this,"IGN",label,TypeLayer::Externe);
-    mVLs.push_back(aL);
+    WText *label = mOtherTable->elementAt(row,col)->addWidget(cpp14::make_unique<WText>(""));
+    label->clicked().connect([this]{clickOnName("IGN");});
+    mVLs.push_back(new Layer(this,"IGN",label,TypeLayer::Externe));
     row++;
     if (row % 6 == 0){col++;row=0;}
     // creation des layers pour les KK du CS
     for (auto & pair : *mDico->codeKK2Nom()){
         WText *label;
         label = mOtherTable->elementAt(row,col)->addWidget(cpp14::make_unique<WText>(""));
-        Layer aL(this,pair.first,label,TypeLayer::KK);
-        mVLs.push_back(aL);
+        mVLs.push_back(new Layer(this,pair.first,label,TypeLayer::KK));
+        std::string aCode=pair.first;
+        label->clicked().connect([this,aCode]{clickOnName(aCode);});
         row++;
         if (row % 6 == 0){col++;row=0;}
     }
     // ajout des cartes "FEE" ; NT NH Topo AE SS
+
     for (auto & pair : *mDico->RasterType()){
         WText *label;
         label = mOtherTable->elementAt(row,col)->addWidget(cpp14::make_unique<WText>(""));
-        Layer aL(this,pair.first,label,TypeLayer::Thematique);
+        Layer  * aL= new Layer(this,pair.first,label,TypeLayer::Thematique);
+        std::string aCode=pair.first;
+        label->clicked().connect([this,aCode]{clickOnName(aCode);});
         mVLs.push_back(aL);
         row++;
         if (row % 6 == 0){col++;row=0;}
     }
 
-    mClassifTable = addWidget(cpp14::make_unique<Wt::WTable>());
+    mClassifTable = mParent->addWidget(cpp14::make_unique<Wt::WTable>());
     for (int i = 0; i < 2; ++i) {
         WText *t = mClassifTable->elementAt(0,i)->addWidget(cpp14::make_unique<WText>(classes[i]));
         mClassifTable->elementAt(0,i)->setContentAlignment(AlignmentFlag::Center| AlignmentFlag::Middle);
@@ -58,7 +75,7 @@ groupLayers::groupLayers(cDicoApt * aDico, WContainerWidget *parent, WContainerW
     mClassifTable->setHeight(75); // ça plus le setContentAlig
 
     // creation de la table listant les essences
-    mEssTable = addWidget(cpp14::make_unique<Wt::WTable>());
+    mEssTable = mParent->addWidget(cpp14::make_unique<Wt::WTable>());
     row=0;col=0;
 
     mEssTable->setWidth("80%");
@@ -68,16 +85,17 @@ groupLayers::groupLayers(cDicoApt * aDico, WContainerWidget *parent, WContainerW
         cEss ess(pair.first,mDico);
         if (ess.hasApt()){
             WText *label;
-
             label = mEssTable->elementAt(row,col)->addWidget(cpp14::make_unique<WText>(""));
-            //Layer aL(this,pair.first,label);
             // constructeur pour type Apti pour ne pas créer deux fois l'essence d'affilé, ouverture et fermeture de la DB un peu sensible
-            Layer aL(this,ess,label);
+            Layer * aL=new Layer(this,ess,label);
             mVLs.push_back(aL);
+            std::string aCode=pair.first;
+            label->clicked().connect([this,aCode]{clickOnName(aCode);});
             row++;
             if (row % 17 == 0){col++;row=0;}
         }
     }
+
     // création de la légende (vide pour le moment)
     mLegend = new legend(this,infoW);
     mStation = new ST(mDico);
@@ -85,32 +103,55 @@ groupLayers::groupLayers(cDicoApt * aDico, WContainerWidget *parent, WContainerW
     // création des arbres pour sélection des couches - ces objets sont affiché ailleur
     mSelect4Stat= new selectLayers4Stat(this);
     mSelect4Download= new selectLayers4Download(this);
+
+    std::cout << "done" << std::endl;
+}
+
+groupLayers::~groupLayers(){
+    std::cout << "destructeur de group layer " << std::endl;
+    delete mLegend;
+    delete mStation;
+    delete mSelect4Stat;
+    delete mSelect4Download;
+    mPBar=NULL;
+    m_app=NULL;
+    mEssTable=NULL;
+    mClassifTable=NULL;
+    mOtherTable=NULL;
+    mVLs.clear();
 }
 
 void groupLayers::update(std::string aCode){
     //std::cout << " group Layers je vais faire un update du rendu visuel de chacun des label de couche \n\n\n" << std::endl;
     // désactiver toutes les couches actives et changer le rendu du label
-    for (Layer & l : mVLs){
-        l.setActive(aCode==l.getCode());
+    for (Layer * l : mVLs){
+        l->setActive(aCode==l->getCode());
     }
+    //std::cout << "number of layer in the group " << mVLs.size() << std::endl;
+    //std::cout << "update done " << std::endl;
 }
 
 void groupLayers::clickOnName(std::string aCode){
 
+    //std::cout << " j'ai cliqué sur un label " << aCode <<  "\n\n"<< std::endl;
     // udpate du rendu visuel de tout les labels de couches -- cela se situe au niveau du grouplayer
     update(aCode);
 
     // ajouter la couche à la carte
-    for (Layer& l : mVLs){
-        if (l.IsActive()){
-            l.displayLayer();
-            mLegend->afficheLegendeIndiv(&l);
+    for (Layer * l : mVLs){
+        if (l->IsActive()){
+            l->displayLayer();
+
+            //std::cout << " j'ai selectionné " << l->getCode() <<  "\n\n"<< std::endl;
+            // test ; retourner le code js qui sera utilisé par la map
+            //mMap->doJavaScript(l.displayLayer());
+            //std::cout << l.displayLayer() << std::endl;
+            //m_app->doJavaScript(l.displayLayer());
+            mLegend->afficheLegendeIndiv(l);
         }
+
     }
 
-
-    // donner le focus à la carte en envoyant un signal. mais ce n'est pas ça que je veux moi.
-    //focusOnMap_.emit(true);
 }
 
 void groupLayers::changeClassClick(WText *t)
@@ -131,8 +172,8 @@ void groupLayers::changeClassClick(WText *t)
     }
 
     // ajouter la couche à la carte
-    for (Layer& l : mVLs){
-        if (l.IsActive()) l.displayLayer();
+    for (Layer * l : mVLs){
+        if (l->IsActive()) l->displayLayer();
     }
 }
 
@@ -145,17 +186,17 @@ void groupLayers::extractInfo(double x, double y){
     // tableau des informations globales - durant ce round, l'objet ST est modifié
     mLegend->titreInfoRaster();
 
-    for (Layer& l : mVLs){
+    for (Layer * l : mVLs){
         //if (l.IsActive()) l.displayInfo(x,y,mInfoW);
-        if ((l.Type()==TypeLayer::KK )| (l.Type()==TypeLayer::Thematique )|( l.IsActive())){
-            mLegend->add1InfoRaster(l.displayInfo(x,y));
+        if ((l->Type()==TypeLayer::KK )| (l->Type()==TypeLayer::Thematique )|( l->IsActive())){
+            mLegend->add1InfoRaster(l->displayInfo(x,y));
         }
     }
 
     // tableau du détail du calcul de l'aptitude d'une essence pour FEE
-    for (Layer& l : mVLs){
+    for (Layer * l : mVLs){
         // on a bien une essence active et on est en mode FEE
-        if ( l.IsActive() && l.Type()==TypeLayer::Apti && mTypeClassifST==FEE){
+        if ( l->IsActive() && l->Type()==TypeLayer::Apti && mTypeClassifST==FEE){
             mLegend->detailCalculAptFEE(mStation);
         }
     }
@@ -182,9 +223,9 @@ std::map<std::string,std::map<std::string,int>> groupLayers::computeStatGlob(OGR
     std::cout << " groupLayers::computeStatGlob " << std::endl;
     // clear d'un vecteur de pointeur, c'est mal.
     for (auto p : mVLStat)
-       {
-         delete p;
-       }
+    {
+        delete p;
+    }
     mVLStat.clear();
     std::map<std::string,std::map<std::string,int>> aRes;
 
@@ -245,10 +286,10 @@ std::map<std::string,int> groupLayers::apts(){
     switch (mTypeClassifST){
     case FEE:
         if (mStation->readyFEE()){
-            for (Layer l : mVLs){
-                if (l.Type()==TypeLayer::Apti){
+            for (Layer * l : mVLs){
+                if (l->Type()==TypeLayer::Apti){
                     // j'ai deux solution pour avoir les aptitudes ; soit je lis la valeur du raster apt, soit je recalcule l'aptitude avec les variables environnementales
-                    cEss  * Ess= l.Ess();
+                    cEss  * Ess= l->Ess();
                     int apt = Ess->getFinalApt(mStation->mNT,mStation->mNH, mStation->mZBIO, mStation->mTOPO);
                     aRes.emplace(std::make_pair(Ess->Code(),apt));
                 }
@@ -257,10 +298,10 @@ std::map<std::string,int> groupLayers::apts(){
         break;
     case CS:
         if (mStation->readyCS()){
-            for (Layer l : mVLs){
-                if (l.Type()==TypeLayer::Apti){
+            for (Layer * l : mVLs){
+                if (l->Type()==TypeLayer::Apti){
                     // j'ai deux solution pour avoir les aptitudes ; soit je lis la valeur du raster apt, soit je recalcule l'aptitude avec les variables environnementales
-                    cEss  * Ess= l.Ess();
+                    cEss  * Ess= l->Ess();
                     int apt = Ess->getApt(mStation->mZBIO, mStation->mSt);
                     if (apt!=0) aRes.emplace(std::make_pair(Ess->Code(),apt));
                 }
@@ -330,7 +371,7 @@ std::map<std::vector<std::string>,Layer*> selectLayers::getSelectedLayer(){
     return aRes;
 }
 
-selectLayers4Download::selectLayers4Download(groupLayers * aGL):mGL(aGL),selectLayers(aGL,aGL->getVpLs(),75){
+selectLayers4Download::selectLayers4Download(groupLayers * aGL):mGL(aGL),selectLayers(aGL,aGL->getVpLs(),25){
     std::cout << "creation de selectLayers4Download " << std::endl;
     for (Layer * l : mVpLs){
         if (l->Type()!=TypeLayer::Externe){
@@ -339,7 +380,7 @@ selectLayers4Download::selectLayers4Download(groupLayers * aGL):mGL(aGL),selectL
                 std::vector<std::string> aKey2={l->getCode(),"FEE"};
                 // default ; on ne veux pas les apt CS
                 mSelectedLayers.emplace(std::make_pair(aKey1,false));
-                mSelectedLayers.emplace(std::make_pair(aKey2,true));
+                mSelectedLayers.emplace(std::make_pair(aKey2,false));
                 mLayersCBox.emplace(std::make_pair(aKey1,new Wt::WCheckBox()));
                 mLayersCBox.emplace(std::make_pair(aKey2,new Wt::WCheckBox()));
             } else {
@@ -353,7 +394,7 @@ selectLayers4Download::selectLayers4Download(groupLayers * aGL):mGL(aGL),selectL
     cont = new Wt::WContainerWidget();
     cont->setOverflow(Wt::Overflow::Auto);
     treeTable = cont->addWidget(cpp14::make_unique<WTreeTable>());
-    treeTable->resize(300, 500);
+    treeTable->resize(300, 250);
     treeTable->setStyleClass("tree");
     treeTable->tree()->setSelectionMode(SelectionMode::Extended);
     treeTable->addColumn("", 20); // colonne pour les checkbox
@@ -382,7 +423,7 @@ selectLayers4Download::selectLayers4Download(groupLayers * aGL):mGL(aGL),selectL
     WTreeTableNode *grSt_ = grSt.get();
     std::unique_ptr<WCheckBox> checkSt = cpp14::make_unique<WCheckBox>();
     WCheckBox * checkSt_ = checkSt.get();
-    checkAptCS_->changed().connect([=]{SelectLayerGroup(checkSt_->isChecked(),TypeLayer::Thematique,"");});
+    checkSt_->changed().connect([=]{SelectLayerGroup(checkSt_->isChecked(),TypeLayer::Thematique,"");});
     grSt->setColumnWidget(1, std::move(checkSt));
 
     // habitats, potentiel sylvicole
@@ -468,19 +509,19 @@ void selectLayers::SelectLayer(bool select, std::string aCode, std::string aMode
         // changer le status de la checkbox, remettre à false
         if (select) mLayersCBox.at(aKey)->setChecked(false);
         if (afficheMsg){
-        auto messageBox =
-                mParent->addChild(Wt::cpp14::make_unique<Wt::WMessageBox>(
-                                      "Sélection des couches",
-                                      "<p>Vous avez atteint le maximun de " + std::to_string(nbMax)+ " couches</p>"
-                                                                                                     "<p>Veillez déselectionner une couche avant d'en sélectionner une nouvelle</p>",
-                                      Wt::Icon::Information,
-                                      Wt::StandardButton::Ok));
+            auto messageBox =
+                    mParent->addChild(Wt::cpp14::make_unique<Wt::WMessageBox>(
+                                          "Sélection des couches",
+                                          "<p>Vous avez atteint le maximun de " + std::to_string(nbMax)+ " couches</p>"
+                                                                                                         "<p>Veillez déselectionner une couche avant d'en sélectionner une nouvelle</p>",
+                                          Wt::Icon::Information,
+                                          Wt::StandardButton::Ok));
 
-        messageBox->setModal(false);
-        messageBox->buttonClicked().connect([=] {
-            mParent->removeChild(messageBox);
-        });
-        messageBox->show();
+            messageBox->setModal(false);
+            messageBox->buttonClicked().connect([=] {
+                mParent->removeChild(messageBox);
+            });
+            messageBox->show();
         }
 
     }
@@ -504,12 +545,12 @@ std::vector<rasterFiles> selectLayers::getSelectedRaster(){
     for (Layer * l : mVpLs){
         switch (l->Type()){
         case TypeLayer::Apti:{
-            if (isSelected(l->getCode(),"FEE")) aRes.push_back(rasterFiles(l->getPathTif("FEE")));
-            if (isSelected(l->getCode(),"CS")) aRes.push_back(rasterFiles(l->getPathTif("CS")));
+            if (isSelected(l->getCode(),"FEE")) aRes.push_back(rasterFiles(l->getPathTif("FEE"),"Aptitude_"+l->getCode()+"_FEE"));
+            if (isSelected(l->getCode(),"CS")) aRes.push_back(rasterFiles(l->getPathTif("CS"),"Aptitude_"+l->getCode()+"_CS"));
             break;
         }
         default:{
-            if (isSelected(l->getCode())) aRes.push_back(rasterFiles(l->getPathTif()));
+            if (isSelected(l->getCode())) aRes.push_back(rasterFiles(l->getPathTif(),l->getCode()));
             break;
         }
         }
