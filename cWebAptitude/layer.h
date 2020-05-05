@@ -73,7 +73,7 @@ public:
     // constructeur par copie et par déplacement ; indispensable si j'utilise les objets dans un vecteur. http://www-h.eng.cam.ac.uk/help/tpl/languages/C++/morevectormemory.html
 
     Layer(const Layer &lay){
-        //std::cout << "construct by copy layer " << std::endl;
+        std::cout << "construct by copy layer " << std::endl;
         mActive=lay.mActive;
         mGroupL=lay.mGroupL;
         mType=lay.mType;
@@ -101,7 +101,7 @@ public:
         }
     }
     Layer(Layer&& lay) noexcept {
-        //std::cout << "construct by move layer " << std::endl;
+        std::cout << "construct by move layer " << std::endl;
         mActive=lay.mActive;
         mGroupL=lay.mGroupL;
         mType=lay.mType;
@@ -132,8 +132,8 @@ public:
     ~Layer();
 
     //void clickOnName(std::string aCode);
-    //void displayLayer() const;
-    std::string displayLayer() const;
+    void displayLayer() const;
+    //std::string displayLayer() const;
 
     std::vector<std::string> displayInfo(double x, double y);
     // clé : la valeur au format légende (ex ; Optimum). Valeur ; pourcentage pour ce polygone
@@ -154,15 +154,15 @@ public:
     bool IsActive() const {return mActive;}
     std::string getCode(){return mCode;}
     std::string getPathTif();
-    std::string getLegendLabel();
-    std::string getShortLabel(){return mLabel;}
+    std::string getLegendLabel() const;
+    std::string getShortLabel() const {return mLabel;}
 
     // à cause de ma superbe idée de merde de mettre deux couches raster par layer, je dois surcharger ces méthodes pour pouvoir spécifier le mode Fee vs Cs
     std::vector<std::string> getCode(std::string aMode);
     std::string getPathTif(std::string aMode);
     std::string getLegendLabel(std::string aMode);
 
-    TypeLayer Type(){return mType;}
+    TypeLayer Type() const {return mType;}
 
     // le dictionnaire des valeurs raster vers leur signification.
     std::map<int, std::string> * mDicoVal;
@@ -172,14 +172,14 @@ public:
     // ce n'est plus un pointeur
     std::map<int, color> mDicoCol;
 
-    color getColor(int aCode){
+    color getColor(int aCode) const{
         color aRes(0,0,0);
         if (mDicoCol.find(aCode)!=mDicoCol.end()){
             aRes=mDicoCol.at(aCode);}
         return aRes;
     }
 
-    color getColor(std::string aStrCode){
+    color getColor(std::string aStrCode) const{
         int aCode(0);
         bool test(0);
         color aRes(255,255,255);

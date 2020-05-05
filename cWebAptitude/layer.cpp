@@ -13,7 +13,7 @@ Layer::Layer(groupLayers * aGroupL, std::string aCode, WText *PWText, TypeLayer 
   ,mEss(NULL)
   ,mKK(NULL)
 {
-    //std::cout << "constructeur layer " << std::endl;
+    std::cout << "constructeur layer " << std::endl;
     // constructeur qui dépend du type de layer
     switch (mType) {
     case TypeLayer::Apti:
@@ -58,15 +58,21 @@ Layer::Layer(groupLayers * aGroupL, std::string aCode, WText *PWText, TypeLayer 
 
     // reconstruit l'objet GroupLayer! petit rigolo va !!-->
     //mText->clicked().connect(std::bind(&groupLayers::clickOnName, mGroupL, mCode));
-    //mText->clicked().connect([=]{mGroupL->clickOnName(mCode);});
-    //check1_->changed().connect([=]{SelectLayer(check1_->isChecked(),aCode,"FEE");});
+    // ici ça bug
+  /*  mText->clicked().connect([this]{
+        std::cout << " tataa " << std::endl;
+        //mGroupL->clickOnName("IGN");
+        //mGroupL est dangling!!
+        std::cout << "number of layer in the group " << mGroupL->mVLs.size() << std::endl;
+    });
+    */
+
     setActive(false);
     //std::cout << "done" << std::endl;
 }
 
-
 Layer::~Layer(){
-    //std::cout << "destrutor layer" << std::endl;
+    std::cout << "destrutor layer" << std::endl;
     // delete ; only with new
     mDicoVal=NULL;
     //mDicoCol=NULL;
@@ -104,7 +110,7 @@ Layer::Layer(groupLayers * aGroupL, cEss aEss, WText *PWText):
     mText->setText(mLabel);
     mDicoVal=mDico->code2AptFull();
     mDicoCol=mDico->codeApt2col();
-    //mText->clicked().connect(std::bind(&groupLayers::clickOnName, mGroupL, mCode));
+    mText->clicked().connect(std::bind(&groupLayers::clickOnName, mGroupL, mCode));
     setActive(false);
 }
 
@@ -119,16 +125,18 @@ void Layer::clickOnName(std::string aCode){
 }
 */
 
-std::string Layer::displayLayer() const{
+//std::string Layer::displayLayer() const{
+void Layer::displayLayer() const{
 
-    std::string aRes;
+    std::cout << "display layer " << std::endl;
+    //std::string aRes;
     switch (mType) {
     case TypeLayer::Externe:
     {
         std::string JScommand("groupe = new ol.layer.Group({layers:[TOREPLACE, communes]});TOREPLACE.setVisible(true);map.setLayerGroup(groupe);");
         boost::replace_all(JScommand,"TOREPLACE",mCode);
-        aRes=JScommand;
-        //mText->doJavaScript(JScommand);
+        //aRes=JScommand;
+        mText->doJavaScript(JScommand);
         break;
     }
     default:
@@ -156,8 +164,8 @@ std::string Layer::displayLayer() const{
             Replace2=Replace1;
             break;
         case TypeLayer::Thematique:
-            Replace1=mRI->NomTuile();
-            Replace2=mRI->NomFile();
+            if (!mRI) {Replace1=mRI->NomTuile();}
+            if (!mRI) {Replace2=mRI->NomFile();}
         default:
             break;
         }
@@ -177,12 +185,14 @@ std::string Layer::displayLayer() const{
         //mText->setId("toto"+mCode);
         // plutôt lancer les script via un JSlot de mapol? mais avant ça fonctionnai quand même...
         //mText->doJavaScript(ss.str());// c'est peut-être plutôt la carte qui dois faire le doJavascript, pas le label text...
-        aRes=ss.str();
+        //aRes=ss.str();
+        std::cout << ss.str() << std::endl;
         break;
     }
 
     }
-    return aRes;
+    std::cout << "done " << std::endl;
+    //return aRes;
 }
 
 std::vector<std::string> Layer::displayInfo(double x, double y){
@@ -362,7 +372,7 @@ std::string Layer::getPathTif(){
     return aRes;
 }
 
-std::string Layer::getLegendLabel(){
+std::string Layer::getLegendLabel() const{
     std::string aRes;
     switch (mType) {
     case TypeLayer::Apti:

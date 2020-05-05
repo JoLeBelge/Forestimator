@@ -117,7 +117,7 @@ void legend::detailCalculAptFEE(ST * aST){
     }
 }
 
-void legend::afficheLegendeIndiv(Layer * l){
+void legend::afficheLegendeIndiv(const Layer * l){
 
     if (l->Type()!=TypeLayer::Externe){
         // vider la légende et afficher la légende personnelle de la couche active
