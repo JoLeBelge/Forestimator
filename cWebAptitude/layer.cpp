@@ -1,6 +1,5 @@
 #include "layer.h"
 
-
 Layer::Layer(groupLayers * aGroupL, std::string aCode, WText *PWText, TypeLayer aType):
     mDico(aGroupL->Dico())
   ,mGroupL(aGroupL)
@@ -13,7 +12,7 @@ Layer::Layer(groupLayers * aGroupL, std::string aCode, WText *PWText, TypeLayer 
   ,mEss(NULL)
   ,mKK(NULL)
 {
-    std::cout << "constructeur layer " << std::endl;
+    //std::cout << "constructeur layer " << std::endl;
     // constructeur qui dépend du type de layer
     switch (mType) {
     case TypeLayer::Apti:
@@ -72,7 +71,7 @@ Layer::Layer(groupLayers * aGroupL, std::string aCode, WText *PWText, TypeLayer 
 }
 
 Layer::~Layer(){
-    std::cout << "destrutor layer" << std::endl;
+    //std::cout << "destrutor layer" << std::endl;
     // delete ; only with new
     mDicoVal=NULL;
     //mDicoCol=NULL;
@@ -128,8 +127,8 @@ void Layer::clickOnName(std::string aCode){
 //std::string Layer::displayLayer() const{
 void Layer::displayLayer() const{
 
-    std::cout << "display layer " << std::endl;
-    std::cout << "number of layer in the group " << mGroupL->mVLs.size() << std::endl;
+    //std::cout << "display layer " << std::endl;
+    //std::cout << "number of layer in the group " << mGroupL->mVLs.size() << std::endl;
     //std::string aRes;
     switch (mType) {
     case TypeLayer::Externe:
@@ -165,8 +164,8 @@ void Layer::displayLayer() const{
             Replace2=Replace1;
             break;
         case TypeLayer::Thematique:
-            if (!mRI) {Replace1=mRI->NomTuile();}
-            if (!mRI) {Replace2=mRI->NomFile();}
+            if (mRI) {Replace1=mRI->NomTuile();}
+            if (mRI) {Replace2=mRI->NomFile();}
         default:
             break;
         }
@@ -185,14 +184,14 @@ void Layer::displayLayer() const{
         in.close();
         //mText->setId("toto"+mCode);
         // plutôt lancer les script via un JSlot de mapol? mais avant ça fonctionnai quand même...
-        //mText->doJavaScript(ss.str());// c'est peut-être plutôt la carte qui dois faire le doJavascript, pas le label text...
+        mText->doJavaScript(ss.str());// c'est peut-être plutôt la carte qui dois faire le doJavascript, pas le label text...
         //aRes=ss.str();
-        std::cout << ss.str() << std::endl;
+        //std::cout << ss.str() << std::endl;
         break;
     }
 
     }
-    std::cout << "done " << std::endl;
+    //std::cout << "done " << std::endl;
     //return aRes;
 }
 
@@ -508,7 +507,7 @@ GDALDataset * Layer::rasterizeGeom(OGRGeometry *poGeom){
 }
 
 
-rasterFiles::rasterFiles(std::string aPathTif):mPathTif(aPathTif),mPathQml(""){
+rasterFiles::rasterFiles(std::string aPathTif,std::string aCode):mPathTif(aPathTif),mPathQml(""),mCode(aCode){
      // <-- initialize with the map's default c'tor
     //boost::filesystem::path p(mPathTif);
     // détermine si il y a un fichier de symbologie associé

@@ -46,19 +46,21 @@ enum class TypeLayer {Apti
 class rasterFiles{
 
 public:
-    rasterFiles(std::string aPathTif);
+    rasterFiles(std::string aPathTif,std::string aCode);
     // constructeur par copie et par déplacement ; indispensable si j'utilise les objets dans un vecteur. http://www-h.eng.cam.ac.uk/help/tpl/languages/C++/morevectormemory.html
     rasterFiles(const rasterFiles &rf){
         mPathTif=rf.mPathTif;
         mPathQml=rf.mPathQml;
+        mCode=rf.mCode;
     }
-    rasterFiles(rasterFiles&& rf) noexcept {mPathTif=rf.mPathTif;mPathQml=rf.mPathQml;}
+    rasterFiles(rasterFiles&& rf) noexcept {mPathTif=rf.mPathTif;mPathQml=rf.mPathQml; mCode=rf.mCode;}
 
-    std::string tif(){return mPathTif;}
-    std::string symbology(){return mPathQml;}
-    bool hasSymbology(){return mPathQml!="";}
+    std::string code() const{return mCode;}
+    std::string tif() const{return mPathTif;}
+    std::string symbology() const{return mPathQml;}
+    bool hasSymbology() const{return mPathQml!="";}
 private:
-    std::string mPathTif, mPathQml;
+    std::string mPathTif, mPathQml, mCode;
     // pour exporter le dictionnaire dans un fichier texte si nécessaire
     std::map<int, std::string> mDicoVal;
 };
@@ -73,7 +75,7 @@ public:
     // constructeur par copie et par déplacement ; indispensable si j'utilise les objets dans un vecteur. http://www-h.eng.cam.ac.uk/help/tpl/languages/C++/morevectormemory.html
 
     Layer(const Layer &lay){
-        std::cout << "construct by copy layer " << std::endl;
+        //std::cout << "construct by copy layer " << std::endl;
         mActive=lay.mActive;
         mGroupL=lay.mGroupL;
         mType=lay.mType;
@@ -101,7 +103,7 @@ public:
         }
     }
     Layer(Layer&& lay) noexcept {
-        std::cout << "construct by move layer " << std::endl;
+        //std::cout << "construct by move layer " << std::endl;
         mActive=lay.mActive;
         mGroupL=lay.mGroupL;
         mType=lay.mType;

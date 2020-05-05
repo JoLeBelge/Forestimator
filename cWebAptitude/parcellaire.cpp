@@ -1,17 +1,19 @@
 #include "parcellaire.h"
 
+
+int globSurfMax(1000);// en ha
 //https://www.quora.com/What-are-the-risks-associated-with-the-use-of-lambda-functions-in-C-11
 
 parcellaire::parcellaire(WContainerWidget *parent, groupLayers *aGL, Wt::WApplication* app, WStackedWidget *aTopStack, WContainerWidget *statW):mParent(parent),mStatW(statW),mGL(aGL),centerX(0.0),centerY(0.0),mClientName(""),mJSfile(""),mName(""),mFullPath(""),m_app(app),fu(NULL),msg(NULL),uploadButton(NULL),mTopStack(aTopStack)
   ,computeStatButton(NULL)
   ,visuStatButton(NULL)
   ,hasValidShp(0)
+  ,downloadRasterBt(NULL)
 {
     mDico=aGL->Dico();
     mJSfile=  aGL->Dico()->File("addOLgeojson");
 
     mParent->setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Left);
-
     mParent->setMargin(20,Wt::Side::Bottom | Wt::Side::Top);
     mParent->setInline(0);
     mParent->addWidget(cpp14::make_unique<Wt::WText>(tr("infoParcellaire")));
@@ -72,6 +74,11 @@ parcellaire::parcellaire(WContainerWidget *parent, groupLayers *aGL, Wt::WApplic
     mParent->addWidget(cpp14::make_unique<Wt::WText>(tr("infoDownloadClippedRaster")));
     mParent->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
     mParent->addWidget(std::unique_ptr<Wt::WContainerWidget>(mGL->afficheSelect4Download()));
+    mParent->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
+
+    downloadRasterBt = mParent->addWidget(cpp14::make_unique<Wt::WPushButton>("Télécharger les cartes"));
+    downloadRasterBt->setInline(0);
+    downloadRasterBt->disable();
 
     fu->fileTooLarge().connect([=] { msg->setText("Le fichier est trop volumineux (max 2000ko).");});
     fu->changed().connect(this,&parcellaire::fuChanged);
@@ -80,22 +87,23 @@ parcellaire::parcellaire(WContainerWidget *parent, groupLayers *aGL, Wt::WApplic
     computeStatButton->clicked().connect(this,&parcellaire::computeStat);
     //visuStatButton->clicked().connect(this,&parcellaire::visuStat);
     downloadShpBt->clicked().connect(this,&parcellaire::downloadShp);
+    downloadRasterBt->clicked().connect(this,&parcellaire::downloadRaster);
 }
 
 parcellaire::~parcellaire(){
     //std::cout << "destructeur de parcellaire" << std::endl;
     cleanShpFile();
-    //delete mParent;
-    delete fu;
-    delete uploadButton;
-    //delete m_app;
-    delete msg;
-    //delete mGL;
-    //delete mDico;
+    mParent=NULL;
+    fu=NULL;
+    uploadButton=NULL;
+    m_app=NULL;
+    msg=NULL;
+    mGL=NULL;
+    mDico=NULL;
     delete poGeomGlobale;
-    delete visuStatButton;
-    delete downloadShpBt;
-    delete  mCB_fusionOT;
+    visuStatButton=NULL;
+    downloadShpBt=NULL;
+    mCB_fusionOT=NULL;
 }
 
 void   parcellaire::cleanShpFile(){
@@ -148,11 +156,9 @@ bool parcellaire::toGeoJson(){
         } else {
             // layer
             OGRLayer * lay = DS->GetLayer(0);
-            computeGlobalGeom(lay);
+            if (computeGlobalGeom(lay)){
 
             //std::cout << lay->GetName() << std::endl;
-
-
             char **papszOptions = NULL; // il faut utiliser le driver GeoJSONSeq si je veux pouvoir utiliser les options ci-dessous
             //papszOptions = CSLSetNameValue( papszOptions, "ATTRIBUTES_SKIP", "YES" );
             //papszOptions = CSLSetNameValue( papszOptions, "WRITE_BBOX", "YES" );
@@ -163,12 +169,14 @@ bool parcellaire::toGeoJson(){
     //papszOptions = CSLSetNameValue( papszOptions, "RFC7946", "YES" );
     std::cout << "papszOptions " <<papszOptions << std::endl;
     */
-
             GDALDataset * DS2;
             DS2 = jsonDriver->CreateCopy(outPath, DS, FALSE, papszOptions,NULL, NULL );
             GDALClose( DS2 );
             GDALClose( DS );
-
+            } else {
+                aRes=0;
+                msg->setText("vérifiez que la surface totale de vos parcelles est bien inférieur à " + std::to_string(globSurfMax));
+            }
         }}
 
     //std::cout << " done " << std::endl;
@@ -176,8 +184,8 @@ bool parcellaire::toGeoJson(){
     return aRes;
 }
 
-void parcellaire::computeGlobalGeom(OGRLayer * lay){
-
+bool parcellaire::computeGlobalGeom(OGRLayer * lay){
+    bool aRes(0);
     // union de tout les polygones du shp
     OGRFeature *poFeature;
     //OGRPolygon * poGeom;
@@ -233,8 +241,11 @@ void parcellaire::computeGlobalGeom(OGRLayer * lay){
     if (nbValidPol>0){poGeom2 = multi->UnionCascaded();
 
         poGeom2 =poGeom2->Buffer(1.0);// ça marche bien on dirait! je sais pas si c'est le buffer 1 ou le simplify 1 qui enlève les inner ring (hole) qui restent.
-        poGeomGlobale =poGeom2->Simplify(1.0);
 
+        // devrait je pense eêtre créé avec new, car si je ferme le dataset qui contient le layer, poGeomGlobal fait une fuite
+        poGeomGlobale =poGeom2->Simplify(1.0);
+        int aSurfha=OGR_G_GetArea(poGeomGlobale)/10000;
+        if (aSurfha<globSurfMax){
         //OGRPolygon * pol=poGeom2->toPolygon();
         //std::ofstream out("/home/lisein/Documents/carteApt/Forestimator/build-WebAptitude/tmp/test.geojson");
         //out << poGeom->exportToJson();
@@ -249,14 +260,17 @@ void parcellaire::computeGlobalGeom(OGRLayer * lay){
             centerY= (ext.MaxY+ext.MinY)/2;
         } else {
 
-
             centerX=aPt->getX();
             centerY=aPt->getY();
         }
+        aRes=1;
 
+    }
     }
 
     delete multi;
+
+    return aRes;
 }
 
 void parcellaire::display(){
@@ -311,6 +325,8 @@ void parcellaire::fuChanged(){
 void parcellaire::upload(){
     //std::cout << "upload commence.. " ;
     computeStatButton->disable();
+    downloadRasterBt->disable();
+
     //visuStatButton->disable();
     hasValidShp=false;
     cleanShpFile();
@@ -338,6 +354,7 @@ void parcellaire::upload(){
         if (toGeoJson()){
             hasValidShp=true;
             computeStatButton->enable();
+            downloadRasterBt->enable();
             display();}
     } else {
         msg->setText("Veillez sélectionner les 3 fichiers du shapefile (shp, shx et dbf).");
@@ -444,4 +461,91 @@ void parcellaire::downloadShp(){
     WFileResource *fileResource = new Wt::WFileResource("plain/text",mFullPath+".zip");
     fileResource->suggestFileName(mClientName+"_statForestimator.zip");
     m_app->redirect(fileResource->url());
+    // quand est-ce que je supprime fileResource? l'objet wt et les fichiers?
+    // pas simple on dirai : https://redmine.webtoolkit.eu/boards/2/topics/16990?r=16992#message-16992
 }
+
+void parcellaire::downloadRaster(){
+
+    // crée l'archive
+    ZipArchive* zf = new ZipArchive(mFullPath+"_raster.zip");
+    zf->open(ZipArchive::WRITE);
+    // crop les raster selectionnés
+
+    std::vector<rasterFiles> vRs=mGL->getSelect4Download();
+    mGL->mPBar->setValue(0);
+    mGL->mPBar->setMaximum(vRs.size());
+    for (const rasterFiles & r : vRs){
+        std::string aCroppedRFile=mFullPath+"_"+r.code()+".tif";
+        mGL->mPBar->setToolTip("découpe de la carte " + r.code() + "...");
+        if (cropImWithShp(r.tif(),aCroppedRFile)){
+           zf->addFile(mClientName+"_"+r.code()+".tif",aCroppedRFile);
+           if (r.hasSymbology()){zf->addFile(mClientName+"_"+r.code()+".qml",r.symbology());}
+        }
+        mGL->mPBar->setValue(mGL->mPBar->value()+1);
+        m_app->processEvents();
+    }
+    mGL->mPBar->setToolTip("");
+    zf->close();
+    delete zf;
+
+    WFileResource *fileResource = new Wt::WFileResource("plain/text",mFullPath+"_raster.zip");
+    fileResource->suggestFileName(mClientName+"_raster.zip");
+    m_app->redirect(fileResource->url());
+}
+
+
+bool parcellaire::cropImWithShp(std::string inputRaster, std::string aOut){
+    bool aRes(0);
+    std::cout << " cropImWithShp" << std::endl;
+    if (exists(inputRaster)){
+
+        // enveloppe de la géométrie globale
+        OGREnvelope ext;
+        poGeomGlobale->getEnvelope(&ext);
+        double width((ext.MaxX-ext.MinX)), height((ext.MaxY-ext.MinY));
+
+        const char *inputPath=inputRaster.c_str();
+        const char *cropPath=aOut.c_str();
+        GDALDataset *pInputRaster, *pCroppedRaster;
+        GDALDriver *pDriver;
+        const char *pszFormat = "GTiff";
+        pDriver = GetGDALDriverManager()->GetDriverByName(pszFormat);
+        pInputRaster = (GDALDataset*) GDALOpen(inputPath, GA_ReadOnly);
+        double transform[6], tr1[6];
+        pInputRaster->GetGeoTransform(transform);
+        pInputRaster->GetGeoTransform(tr1);
+        //adjust top left coordinates
+        transform[0] = ext.MinX;
+        transform[3] = ext.MaxY;
+        //determine dimensions of the new (cropped) raster in cells
+        int xSize = round(width/transform[1]);
+        int ySize = round(height/transform[1]);
+        //std::cout << "xSize " << xSize << ", ySize " << ySize << std::endl;
+        //create the new (cropped) dataset
+        pCroppedRaster = pDriver->Create(cropPath, xSize, ySize, 1, GDT_Byte, NULL); //or something similar
+        pCroppedRaster->SetProjection( pInputRaster->GetProjectionRef() );
+        pCroppedRaster->SetGeoTransform( transform );
+
+        int xOffset=round((transform[0]-tr1[0])/tr1[1]);
+        int yOffset=round((transform[3]-tr1[3])/tr1[5]);
+        float *scanline;
+        scanline = (float *) CPLMalloc( sizeof( float ) * xSize );
+        // boucle sur chaque ligne
+        for ( int row = 0; row < ySize; row++ )
+        {
+            // lecture
+            pInputRaster->GetRasterBand(1)->RasterIO( GF_Read, xOffset, row+yOffset, xSize, 1, scanline, xSize,1, GDT_Float32, 0, 0 );
+            // écriture
+            pCroppedRaster->GetRasterBand(1)->RasterIO( GF_Write, 0, row, xSize,1, scanline, xSize, 1,GDT_Float32, 0, 0 );
+        }
+        CPLFree(scanline);
+        if( pCroppedRaster != NULL ){GDALClose( (GDALDatasetH) pCroppedRaster );}
+        GDALClose(pInputRaster);
+        aRes=1;
+    } else {
+        std::cout << " attention, un des fichiers input n'existe pas : " << inputRaster << std::endl;
+    }
+    return aRes;
+}
+

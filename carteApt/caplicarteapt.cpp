@@ -630,7 +630,7 @@ void cApliCarteApt::toPNG(std::string input, std::string output,TypeCarte aType)
                 // chaud
                 if (aVal==3) {dico->colors.at("rouge").set(aRes1,aRes2,aRes3);}
                 // fond de vallon
-                if (aVal==3) {dico->colors.at("noir").set(aRes1,aRes2,aRes3);}
+                if (aVal==4) {dico->colors.at("noir").set(aRes1,aRes2,aRes3);}
                 break;
             }
             case SS:{

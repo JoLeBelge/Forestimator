@@ -34,7 +34,7 @@ public:
     // effectue des vérification du shp (polygone, src)
     void checkShp();
     // merge de tout les polygones pour avoir une géométrie globale
-    void computeGlobalGeom(OGRLayer * lay);
+    bool computeGlobalGeom(OGRLayer * lay);
     // rasterize une géométrie
     //void rasterizeGeom(OGRGeometry *poGeom);
     void computeStat();
@@ -51,6 +51,8 @@ public:
     Wt::Signal<int>& changePage() { return page_; }
 
     void downloadShp();
+    void downloadRaster();
+    bool cropImWithShp(std::string inputRaster, std::string aOut);
 
 private:
 
@@ -60,16 +62,14 @@ private:
     Wt::WContainerWidget     * mParent;
     Wt::WContainerWidget * mStatW;
     Wt::WFileUpload *fu;
-    Wt::WPushButton *uploadButton,*computeStatButton, *visuStatButton, *downloadShpBt;
+    Wt::WPushButton *uploadButton,*computeStatButton, *visuStatButton, *downloadShpBt, *downloadRasterBt;
     Wt::WApplication* m_app;
     Wt::WText * msg;
     groupLayers * mGL;
     cDicoApt  * mDico;
     double centerX,centerY;
     bool hasValidShp;
-
     OGRGeometry *poGeomGlobale;
-
     Wt::Signal<int> page_;
     Wt::WStackedWidget * mTopStack;
 

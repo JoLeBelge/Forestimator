@@ -723,7 +723,7 @@ cEss::cEss(std::string aCodeEs,cDicoApt * aDico):mCode(aCodeEs),mNomFR(aDico->co
 
 //effectue la confrontation Apt Zbio et AptHydroTrophiue
 int cEss::getApt(int aCodeNT, int aCodeNH, int aZbio, bool hierachique){
-    int aRes(0);
+    int aRes(11); // indéterminé
     //int codeNTNH= mDico->NTNH()->at("h"+std::to_string(aCodeNH)+"t"+std::to_string(aCodeNT));
     std::string codeNTNH= "h"+std::to_string(aCodeNH)+"t"+std::to_string(aCodeNT);
     if (mEcoVal.find(aZbio)!=mEcoVal.end()){
@@ -734,6 +734,7 @@ int cEss::getApt(int aCodeNT, int aCodeNH, int aZbio, bool hierachique){
         }
     }
     // confrontation de l'aptitude de l'écogramme avec celui de la zone bioclim et choix du plus contraignant
+    // attention, si pas d'aptitude hydro-trophique, aRes
     if (hierachique && mAptZbio.find(aZbio)!=mAptZbio.end()){
         int aZbioApt= mAptZbio.at(aZbio);
         if (mDico->AptContraignante(aRes)<mDico->AptContraignante(aZbioApt)){
