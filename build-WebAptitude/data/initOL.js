@@ -163,10 +163,27 @@ IGN = new ol.layer.Tile({
 	})
 });
 
+// pour la couche vectorielle de point qui permet d'afficher un point ou l'utilisateur double click pour avoir le descriptif
+source = new ol.source.Vector({
+format: new ol.format.GeoJSON(),
+projection: projection});
 
 extent=[42250.0001199999969685,21170.0001200000115205,295170.0001199999824166,167700.0001200000115205];
 res_zbio=[320,160,80,40,20,10];
 
+station = new ol.layer.Vector({
+  	source: source,
+	extent: extent,
+	style: new ol.style.Style({
+      	image: new ol.style.Circle({
+        radius: 5,
+        //fill: new ol.style.Fill({color: 'black'}),
+        stroke: new ol.style.Stroke({
+          color: [128,0,128], width: 3
+        })
+      })
+    })
+});
 
 /*
 // apt2 il affiche le numéro du tile en fonction du paramétrage e tileGrid (origin, origins, resolutions ect) --> bon pour le debugging
@@ -270,7 +287,7 @@ layers = [
 	}),
 	new ol.layer.Group({
 		'title': 'Limites administratives',
-		layers:[ parcelles,	communes ]
+		layers:[ station, parcelles,	communes ]
 	})
 ];
 

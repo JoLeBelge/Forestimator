@@ -31,11 +31,14 @@ class WOpenLayers: public WContainerWidget
 public:
     WOpenLayers( cDicoApt * aDico);
 
-    void giveFocus(bool b){
+    ~WOpenLayers(){std::cout << "destructeur de wopenlayers " << std::endl;}
+
+   /* void giveFocus(bool b){
         // fonctionne pas pour le moment
         //std::cout << "\n\n\n focus pour la carte " << std::endl;
         setFocus(b);
     }
+    */
 
     cDicoApt * mDico;
     JSignal<double,double>& xy() { return xy_; }

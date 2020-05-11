@@ -126,8 +126,7 @@ void groupLayers::update(std::string aCode){
     // désactiver toutes les couches actives et changer le rendu du label
     for (Layer * l : mVLs){
         l->setActive(aCode==l->getCode());
-    }
-    //std::cout << "number of layer in the group " << mVLs.size() << std::endl;
+    } 
     //std::cout << "update done " << std::endl;
 }
 
@@ -141,17 +140,9 @@ void groupLayers::clickOnName(std::string aCode){
     for (Layer * l : mVLs){
         if (l->IsActive()){
             l->displayLayer();
-
-            //std::cout << " j'ai selectionné " << l->getCode() <<  "\n\n"<< std::endl;
-            // test ; retourner le code js qui sera utilisé par la map
-            //mMap->doJavaScript(l.displayLayer());
-            //std::cout << l.displayLayer() << std::endl;
-            //m_app->doJavaScript(l.displayLayer());
             mLegend->afficheLegendeIndiv(l);
         }
-
     }
-
 }
 
 void groupLayers::changeClassClick(WText *t)
@@ -179,7 +170,7 @@ void groupLayers::changeClassClick(WText *t)
 
 void groupLayers::extractInfo(double x, double y){
 
-
+    //std::cout << "groupLayers ; extractInfo " << std::endl;
     mStation->vider();
     mLegend->vider();
 
@@ -187,8 +178,7 @@ void groupLayers::extractInfo(double x, double y){
     mLegend->titreInfoRaster();
 
     for (Layer * l : mVLs){
-        //if (l.IsActive()) l.displayInfo(x,y,mInfoW);
-        if ((l->Type()==TypeLayer::KK )| (l->Type()==TypeLayer::Thematique )|( l->IsActive())){
+        if (((l->Type()==TypeLayer::KK )| (l->Type()==TypeLayer::Thematique )) | (( l->IsActive()) & (l->Type()!=TypeLayer::Externe))){
             mLegend->add1InfoRaster(l->displayInfo(x,y));
         }
     }

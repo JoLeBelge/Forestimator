@@ -1,7 +1,7 @@
 #include "parcellaire.h"
 
 
-int globSurfMax(1000);// en ha
+int globSurfMax(2500);// en ha
 //https://www.quora.com/What-are-the-risks-associated-with-the-use-of-lambda-functions-in-C-11
 
 parcellaire::parcellaire(WContainerWidget *parent, groupLayers *aGL, Wt::WApplication* app, WStackedWidget *aTopStack, WContainerWidget *statW):mParent(parent),mStatW(statW),mGL(aGL),centerX(0.0),centerY(0.0),mClientName(""),mJSfile(""),mName(""),mFullPath(""),m_app(app),fu(NULL),msg(NULL),uploadButton(NULL),mTopStack(aTopStack)
@@ -175,7 +175,7 @@ bool parcellaire::toGeoJson(){
             GDALClose( DS );
             } else {
                 aRes=0;
-                msg->setText("vérifiez que la surface totale de vos parcelles est bien inférieur à " + std::to_string(globSurfMax));
+                msg->setText("vérifiez que la surface totale de vos parcelles est bien inférieur à " + std::to_string(globSurfMax) + " ha.");
             }
         }}
 

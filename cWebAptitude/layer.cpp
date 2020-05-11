@@ -109,7 +109,8 @@ Layer::Layer(groupLayers * aGroupL, cEss aEss, WText *PWText):
     mText->setText(mLabel);
     mDicoVal=mDico->code2AptFull();
     mDicoCol=mDico->codeApt2col();
-    mText->clicked().connect(std::bind(&groupLayers::clickOnName, mGroupL, mCode));
+    // c'est dans l'objet GL que toutes les connexion au label sont gerée
+    //mText->clicked().connect(std::bind(&groupLayers::clickOnName, mGroupL, mCode));
     setActive(false);
 }
 
@@ -124,18 +125,20 @@ void Layer::clickOnName(std::string aCode){
 }
 */
 
-//std::string Layer::displayLayer() const{
 void Layer::displayLayer() const{
 
     //std::cout << "display layer " << std::endl;
-    //std::cout << "number of layer in the group " << mGroupL->mVLs.size() << std::endl;
-    //std::string aRes;
+
     switch (mType) {
     case TypeLayer::Externe:
     {
-        std::string JScommand("groupe = new ol.layer.Group({layers:[TOREPLACE, communes]});TOREPLACE.setVisible(true);map.setLayerGroup(groupe);");
+        std::string aFileIn(mDico->File("displayExternLayer"));
+        std::ifstream in(aFileIn);
+        std::stringstream ss;
+        ss << in.rdbuf();
+        in.close();
+        std::string JScommand(ss.str());
         boost::replace_all(JScommand,"TOREPLACE",mCode);
-        //aRes=JScommand;
         mText->doJavaScript(JScommand);
         break;
     }
@@ -181,18 +184,15 @@ void Layer::displayLayer() const{
 
         in.open(aFileIn+".tmp");
         ss << in.rdbuf();
-        in.close();
-        //mText->setId("toto"+mCode);
-        // plutôt lancer les script via un JSlot de mapol? mais avant ça fonctionnai quand même...
+        in.close();  
         mText->doJavaScript(ss.str());// c'est peut-être plutôt la carte qui dois faire le doJavascript, pas le label text...
-        //aRes=ss.str();
         //std::cout << ss.str() << std::endl;
         break;
     }
 
     }
     //std::cout << "done " << std::endl;
-    //return aRes;
+
 }
 
 std::vector<std::string> Layer::displayInfo(double x, double y){
@@ -207,11 +207,12 @@ std::vector<std::string> Layer::displayInfo(double x, double y){
         if (mCode=="NH"){ mGroupL->mStation->mNH=aVal;}
         if (mCode=="ZBIO"){ mGroupL->mStation->mZBIO=aVal;}
         if (mCode=="Topo"){ mGroupL->mStation->mTOPO=aVal;}
-        if (mCode.substr(0,2)=="CS" && aVal!=0){
 
-            mGroupL->mStation->mSt=aVal;}
+        // station du CS
+        if (mCode.substr(0,2)=="CS" && aVal!=0){
+        mGroupL->mStation->mSt=aVal;}
         //std::cout << " la valeur de la couche " << mLabel << " est de " << aVal << std::endl;
-        if(mDicoVal->find(aVal)!=mDicoVal->end()){
+        if((mDicoVal!=NULL) && (mDicoVal->find(aVal)!=mDicoVal->end())){
             val=mDicoVal->at(aVal);
         }
     }

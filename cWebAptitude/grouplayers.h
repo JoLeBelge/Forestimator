@@ -134,9 +134,9 @@ class groupLayers: public WContainerWidget
 public:
     groupLayers(cDicoApt * aDico,WContainerWidget *parent,WContainerWidget *infoW,WOpenLayers * aMap, Wt::WApplication* app);
     ~groupLayers();
-    groupLayers(const groupLayers &gl){
+    /*groupLayers(const groupLayers &gl){
         std::cout << "construct by copy group layer -- should never happend\n\n\n" << std::endl;
-    }
+    }*/
     void clickOnName(std::string aCode);
     void changeClassClick(WText *t);
     void update(std::string aCode);
