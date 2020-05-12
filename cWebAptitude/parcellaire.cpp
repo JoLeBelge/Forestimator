@@ -158,21 +158,21 @@ bool parcellaire::toGeoJson(){
             OGRLayer * lay = DS->GetLayer(0);
             if (computeGlobalGeom(lay)){
 
-            //std::cout << lay->GetName() << std::endl;
-            char **papszOptions = NULL; // il faut utiliser le driver GeoJSONSeq si je veux pouvoir utiliser les options ci-dessous
-            //papszOptions = CSLSetNameValue( papszOptions, "ATTRIBUTES_SKIP", "YES" );
-            //papszOptions = CSLSetNameValue( papszOptions, "WRITE_BBOX", "YES" );
-            /*papszOptions = CSLSetNameValue( papszOptions, "COORDINATE_PRECISION", "2" );
+                //std::cout << lay->GetName() << std::endl;
+                char **papszOptions = NULL; // il faut utiliser le driver GeoJSONSeq si je veux pouvoir utiliser les options ci-dessous
+                //papszOptions = CSLSetNameValue( papszOptions, "ATTRIBUTES_SKIP", "YES" );
+                //papszOptions = CSLSetNameValue( papszOptions, "WRITE_BBOX", "YES" );
+                /*papszOptions = CSLSetNameValue( papszOptions, "COORDINATE_PRECISION", "2" );
     std::cout << "papszOptions " <<papszOptions << std::endl;
     papszOptions = CSLSetNameValue( papszOptions, "SIGNIFICANT_FIGURES", "5" );
      std::cout << "papszOptions " <<papszOptions << std::endl;
     //papszOptions = CSLSetNameValue( papszOptions, "RFC7946", "YES" );
     std::cout << "papszOptions " <<papszOptions << std::endl;
     */
-            GDALDataset * DS2;
-            DS2 = jsonDriver->CreateCopy(outPath, DS, FALSE, papszOptions,NULL, NULL );
-            GDALClose( DS2 );
-            GDALClose( DS );
+                GDALDataset * DS2;
+                DS2 = jsonDriver->CreateCopy(outPath, DS, FALSE, papszOptions,NULL, NULL );
+                GDALClose( DS2 );
+                GDALClose( DS );
             } else {
                 aRes=0;
                 msg->setText("vérifiez que la surface totale de vos parcelles est bien inférieur à " + std::to_string(globSurfMax) + " ha.");
@@ -246,26 +246,26 @@ bool parcellaire::computeGlobalGeom(OGRLayer * lay){
         poGeomGlobale =poGeom2->Simplify(1.0);
         int aSurfha=OGR_G_GetArea(poGeomGlobale)/10000;
         if (aSurfha<globSurfMax){
-        //OGRPolygon * pol=poGeom2->toPolygon();
-        //std::ofstream out("/home/lisein/Documents/carteApt/Forestimator/build-WebAptitude/tmp/test.geojson");
-        //out << poGeom->exportToJson();
-        //out.close();
-        OGRPoint * aPt=NULL;
-        err = poGeomGlobale->Centroid(aPt);
-        if (err!=OGRERR_NONE){
-            std::cout << "problem avec le calcul du centroid, erreur : " << err <<  std::endl;
-            OGREnvelope ext;
-            poGeomGlobale->getEnvelope(&ext);
-            centerX= (ext.MaxX+ext.MinX)/2;
-            centerY= (ext.MaxY+ext.MinY)/2;
-        } else {
+            //OGRPolygon * pol=poGeom2->toPolygon();
+            //std::ofstream out("/home/lisein/Documents/carteApt/Forestimator/build-WebAptitude/tmp/test.geojson");
+            //out << poGeom->exportToJson();
+            //out.close();
+            OGRPoint * aPt=NULL;
+            err = poGeomGlobale->Centroid(aPt);
+            if (err!=OGRERR_NONE){
+                std::cout << "problem avec le calcul du centroid, erreur : " << err <<  std::endl;
+                OGREnvelope ext;
+                poGeomGlobale->getEnvelope(&ext);
+                centerX= (ext.MaxX+ext.MinX)/2;
+                centerY= (ext.MaxY+ext.MinY)/2;
+            } else {
 
-            centerX=aPt->getX();
-            centerY=aPt->getY();
+                centerX=aPt->getX();
+                centerY=aPt->getY();
+            }
+            aRes=1;
+
         }
-        aRes=1;
-
-    }
     }
 
     delete multi;
@@ -357,7 +357,7 @@ void parcellaire::upload(){
             downloadRasterBt->enable();
             display();
             mGL->mMap->setToolTip(tr("tooltipMap2"));
-            }
+        }
     } else {
         msg->setText("Veillez sélectionner les 3 fichiers du shapefile (shp, shx et dbf).");
         cleanShpFile();
@@ -458,24 +458,27 @@ void parcellaire::computeStatAndVisuSelectedPol(int aId){
     {
         printf( "Open failed.\n" );
     } else {
+        mGL->mMap->decorationStyle().setCursor(Cursor::Wait);
+        mGL->mMap->refresh();
         // layer
         OGRLayer * lay = DS->GetLayer(0);
         OGRFeature *poFeature;
-            bool find(0);
+        bool find(0);
         while( (poFeature = lay->GetNextFeature()) != NULL )
         {
-           if (poFeature->GetFID()==aId){
-            OGRGeometry * poGeom = poFeature->GetGeometryRef();
-            poGeom->closeRings();
-            poGeom->flattenTo2D();
-            mGL->computeStatGlob(poGeom);
-            find=1;
-            break;
-           }
+            if (poFeature->GetFID()==aId){
+                OGRGeometry * poGeom = poFeature->GetGeometryRef();
+                poGeom->closeRings();
+                poGeom->flattenTo2D();
+                mGL->computeStatGlob(poGeom);
+                find=1;
+                break;
+            }
         }
 
         GDALClose( DS );
         if (find) {visuStat("<h4>Statistique pour polygone FID " + std::to_string(aId) + " de " + mClientName+ "</h4>");}
+        mGL->mMap->decorationStyle().setCursor(Cursor::Auto);
     }
 
 }
@@ -516,8 +519,8 @@ void parcellaire::downloadRaster(){
         std::string aCroppedRFile=mFullPath+"_"+r.code()+".tif";
         mGL->mPBar->setToolTip("découpe de la carte " + r.code() + "...");
         if (cropImWithShp(r.tif(),aCroppedRFile)){
-           zf->addFile(mClientName+"_"+r.code()+".tif",aCroppedRFile);
-           if (r.hasSymbology()){zf->addFile(mClientName+"_"+r.code()+".qml",r.symbology());}
+            zf->addFile(mClientName+"_"+r.code()+".tif",aCroppedRFile);
+            if (r.hasSymbology()){zf->addFile(mClientName+"_"+r.code()+".qml",r.symbology());}
         }
         mGL->mPBar->setValue(mGL->mPBar->value()+1);
         m_app->processEvents();

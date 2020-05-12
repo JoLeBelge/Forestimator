@@ -19,6 +19,7 @@ apt2 = new ol.layer.Tile({
 	minZoom:0,
 	map:map
 		}),
+	tilePixelRatio: 2,
 		tileUrlFunction: function (coordinate) {
 
 			if (coordinate === null) return undefined;

@@ -214,8 +214,6 @@ void groupLayers::extractInfo(double x, double y){
 // clé 1 ; nom de la couche. clé2 : la valeur au format légende (ex ; Optimum). Valeur ; pourcentage pour ce polygone
 void groupLayers::computeStatGlob(OGRGeometry *poGeomGlobale){
     std::cout << " groupLayers::computeStatGlob " << std::endl;
-    mMap->decorationStyle().setCursor(Cursor::Wait);
-    m_app->processEvents();
 
     // clear d'un vecteur de pointeur, c'est mal.
     for (auto p : mVLStat)
@@ -241,8 +239,7 @@ void groupLayers::computeStatGlob(OGRGeometry *poGeomGlobale){
         mPBar->setValue(mPBar->value() + 1);
         m_app->processEvents();
     }
-    mPBar->setValue(mPBar->maximum());
-    mMap->decorationStyle().setCursor(Cursor::Auto);
+    mPBar->setValue(mPBar->maximum()); 
     //std::cout << " done " << std::endl;
     //return aRes;
 }
