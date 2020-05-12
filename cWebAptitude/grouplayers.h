@@ -75,9 +75,12 @@ private:
 class selectLayers : public WContainerWidget{
 public:
     selectLayers(Wt::WContainerWidget * aParent, std::vector<Layer*> aVpLs,int aMax):mParent(aParent),mVpLs(aVpLs),nbMax(aMax){}
-    // retourne l'arbre avec listing des cartes regroupées par groupes (Apt FEE, ect)
+
     std::vector<rasterFiles> getSelectedRaster();
     std::map<std::vector<std::string>,Layer*> getSelectedLayer();
+    // cas particulier ou je veux toutes les couches, qu'elles soient selectionnées ou pas
+    std::map<std::vector<std::string>,Layer*> getAllLayer();
+    // retourne l'arbre avec listing des cartes regroupées par groupes (Apt FEE, ect)
     WContainerWidget * affiche(){return cont;}
     int numSelectedLayer(){
         int aRes(0);
@@ -183,6 +186,7 @@ public:
 
     std::vector<layerStatChart*> ptrVLStat() {return mVLStat;}
 
+
     std::vector<rasterFiles> getSelect4Download(){return mSelect4Download->getSelectedRaster();}
     std::vector<rasterFiles> getSelect4Stat(){return mSelect4Stat->getSelectedRaster();}
     WContainerWidget * afficheSelect4Stat(){return mSelect4Stat->affiche();}
@@ -191,7 +195,11 @@ public:
     int getNumSelect4Download(){return mSelect4Download->numSelectedLayer();}
     std::map<std::vector<std::string>,Layer*> getSelectedLayer4Stat(){return mSelect4Stat->getSelectedLayer();}
     std::map<std::vector<std::string>,Layer*> getSelectedLayer4Download(){return mSelect4Download->getSelectedLayer();}
-     std::vector<Layer *> mVLs;
+    std::map<std::vector<std::string>,Layer*> getAllLayer(){return mSelect4Download->getAllLayer();}
+    std::vector<Layer *> mVLs;
+
+    // pour changer le curseur quand on clique - public pour avoir accès depuis parcellaire
+    WOpenLayers * mMap;
 private:
     TypeClassifST mTypeClassifST;
     std::string currentClassifST; // 2 modes de classification des stations forestières ; FEE et CS
@@ -209,8 +217,6 @@ private:
     WContainerWidget * mInfoW;
     //WWidget * mInfoW;
 
-    // pour changer le curseur quand on clique
-    WOpenLayers * mMap;
     // bof finalement c'est mieux le conteneur parent
     Wt::WContainerWidget     * mParent;
 

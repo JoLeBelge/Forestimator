@@ -12,6 +12,7 @@ WOpenLayers::WOpenLayers(cDicoApt *aDico):xy_(this,"1.0"),mDico(aDico),polygId_(
   //std::cout << " js Ref " << jsRef() << std::endl;
   setJS_click();
   setJS_selectPolygone();
+  setToolTip(tr("tooltipMap1"));
 
 }
 

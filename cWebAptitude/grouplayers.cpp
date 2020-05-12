@@ -211,10 +211,12 @@ void groupLayers::extractInfo(double x, double y){
     //mParent->decorationStyle().set
 }
 
-
 // clé 1 ; nom de la couche. clé2 : la valeur au format légende (ex ; Optimum). Valeur ; pourcentage pour ce polygone
 void groupLayers::computeStatGlob(OGRGeometry *poGeomGlobale){
     std::cout << " groupLayers::computeStatGlob " << std::endl;
+    mMap->decorationStyle().setCursor(Cursor::Wait);
+    m_app->processEvents();
+
     // clear d'un vecteur de pointeur, c'est mal.
     for (auto p : mVLStat)
     {
@@ -224,25 +226,24 @@ void groupLayers::computeStatGlob(OGRGeometry *poGeomGlobale){
     //std::map<std::string,std::map<std::string,int>> aRes;
 
     // il faut filtrer sur les couches sélectionnées et gerer un changement de mode FEE/CS pour les layers aptitude.
-    // non, pour les statistiques globales, on prend toutes les couches
-    for (auto &kv: getSelectedLayer4Stat() ){
+    // non, pour les statistiques globales, on prend toutes les couches - bof trop long et surtout, trop de camemberts - je prends celles pour download
+    //for (auto &kv: getAllLayer() ){
+    for (auto &kv: getSelectedLayer4Download() ){
         Layer * l=kv.second;
         std::string aMode=kv.first.at(1);
-
         // clé : la valeur au format légende (ex ; Optimum). Valeur ; pourcentage pour ce polygone
         std::map<std::string,int> stat = l->computeStatOnPolyg(poGeomGlobale,aMode);
-
         // c'est parcellaire:: qui doit gerer l'affichage des layerStatChart
         //layerStatChart* aLayStatChart=new layerStatChart(l,stat,aMode);
         //mVLStat.emplace_back(aLayStatChart);
         mVLStat.push_back(new layerStatChart(l,stat,aMode));
-
         //aRes.emplace(std::make_pair(l->getCode(),stat));
         mPBar->setValue(mPBar->value() + 1);
         m_app->processEvents();
     }
     mPBar->setValue(mPBar->maximum());
-    std::cout << " done " << std::endl;
+    mMap->decorationStyle().setCursor(Cursor::Auto);
+    //std::cout << " done " << std::endl;
     //return aRes;
 }
 
@@ -364,6 +365,14 @@ std::map<std::vector<std::string>,Layer*> selectLayers::getSelectedLayer(){
         if (kv.second){
             aRes.emplace(std::make_pair(kv.first,getLayerPtr(kv.first)));
         }
+    }
+    return aRes;
+}
+
+std::map<std::vector<std::string>,Layer*> selectLayers::getAllLayer(){
+    std::map<std::vector<std::string>,Layer*> aRes;
+    for (auto kv : mSelectedLayers){
+            aRes.emplace(std::make_pair(kv.first,getLayerPtr(kv.first)));
     }
     return aRes;
 }

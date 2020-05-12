@@ -355,7 +355,9 @@ void parcellaire::upload(){
             hasValidShp=true;
             computeStatButton->enable();
             downloadRasterBt->enable();
-            display();}
+            display();
+            mGL->mMap->setToolTip(tr("tooltipMap2"));
+            }
     } else {
         msg->setText("Veillez sélectionner les 3 fichiers du shapefile (shp, shx et dbf).");
         cleanShpFile();
@@ -364,6 +366,7 @@ void parcellaire::upload(){
 
 void parcellaire::computeStat(){
     std::cout << " parcellaire::computeStat()... " ;
+
     mGL->mPBar->setMaximum(mGL->getNumSelect4Stat());
     mGL->mPBar->setValue(0);
     //std::map<std::string,std::map<std::string,int>> stat= mGL->computeStatGlob(poGeomGlobale);
@@ -393,18 +396,18 @@ void parcellaire::computeStat(){
     std::cout << " ..done " << std::endl;
 }
 
-void parcellaire::visuStat(){
+void parcellaire::visuStat(std::string aTitle){
     std::cout << " parcellaire::visuStat()... " ;
     mGL->mPBar->setValue(0);
-    std::cout << " CLEAR  mStaW... " ;
+    //std::cout << " CLEAR  mStaW... " ;
     mStatW->clear();
-    std::cout << " done... " ;
+    //std::cout << " done... " ;
     mStatW->setOverflow(Wt::Overflow::Auto);
     // premier lay pour mettre titre et boutton de "retour"
     auto layout = mStatW->setLayout(Wt::cpp14::make_unique<Wt::WVBoxLayout>());
     auto contTitre = Wt::cpp14::make_unique<Wt::WContainerWidget>();
     WContainerWidget * contTitre_ = contTitre.get();
-    contTitre->addWidget(cpp14::make_unique<WText>("<h4>Statistique globale pour "+ mClientName+ "</h4>"));
+    contTitre->addWidget(cpp14::make_unique<WText>(aTitle));
     Wt::WPushButton * retourButton = contTitre_->addWidget(cpp14::make_unique<Wt::WPushButton>("Retour"));
     //retourButton->setLink(Wt::WLink(Wt::LinkType::InternalPath, "/Aptitude"));
     //retourButton->clicked().connect([&] {topStack->setCurrentIndex(0);});// avec &, ne tue pas la session mais en recrée une. avec =, tue et recrée, c'est car le lambda copie plein de variable dont this, ça fout la merde
@@ -412,14 +415,14 @@ void parcellaire::visuStat(){
     std::cout << " config retour button "<< std::endl;
     //retourButton->clicked().connect(this,mTopStack->setCurrentIndex(0);});
     retourButton->clicked().connect([=] {mTopStack->setCurrentIndex(0);});
-    std::cout << " done "<< std::endl;
+    //std::cout << " done "<< std::endl;
 
     auto contCharts = Wt::cpp14::make_unique<Wt::WContainerWidget>();
     WContainerWidget * contCharts_ = contCharts.get();
     Wt::WGridLayout * grid = contCharts_->setLayout(Wt::cpp14::make_unique<Wt::WGridLayout>());
 
     int nbChart=mGL->ptrVLStat().size();
-    std::cout << " nb Chart "<< nbChart << std::endl;
+    //std::cout << " nb Chart "<< nbChart << std::endl;
     mGL->mPBar->setMaximum(nbChart);
     int nbColumn=std::min(2,int(std::sqrt(nbChart)));
     int row(0),column(0);
@@ -434,7 +437,6 @@ void parcellaire::visuStat(){
         mGL->mPBar->setValue(mGL->mPBar->value()+1);
         mGL->m_app->processEvents();
     }
-
     layout->addWidget(std::move(contTitre), 0);
     layout->addWidget(std::move(contCharts), 1);
     std::cout << " change tostack index... " ;
@@ -473,7 +475,7 @@ void parcellaire::computeStatAndVisuSelectedPol(int aId){
         }
 
         GDALClose( DS );
-        if (find) {visuStat();}
+        if (find) {visuStat("<h4>Statistique pour polygone FID " + std::to_string(aId) + " de " + mClientName+ "</h4>");}
     }
 
 }

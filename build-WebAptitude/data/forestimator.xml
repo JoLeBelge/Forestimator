@@ -23,11 +23,13 @@ Sélectionnez ci-dessus les couches pour lesquelles vous désirez ajouter les st
 
 <message id="infoDownloadClippedRaster">
 <h4>Télécharger les couches géographique au format raster</h4>
-Vous pouvez télécharger les cartes listées ci-dessous qui seront découpées sur l'emprise de votre shapefile.
+Vous pouvez télécharger les cartes listées ci-dessous qui seront découpées sur l'emprise de votre shapefile. Une visualisation des statistiques de ces couches pour un polygone donné est également possible en appuyant sur le polygone en gardant la touche shift enfoncée.
 </message>
 
 
-<message id="tooltipMap">double cliquez sur une station pour afficher sa description dans l'onglet légende.</message>
+<message id="tooltipMap1">double cliquez sur une station pour afficher sa description dans l'onglet légende.</message>
+
+<message id="tooltipMap2">double cliquez sur une station pour afficher sa description dans l'onglet légende. Enfoncer la touche shift et cliquez sur un polygone de votre shapefile pour afficher les statistiques. </message>
 
 
 </messages>

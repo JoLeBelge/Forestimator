@@ -130,16 +130,15 @@ cWebAptitude::cWebAptitude(Wt::WApplication* app)
     mMap->doubleClicked().connect([=]{itLegend->select();});
     // et dans wt_config, mettre à 500 milliseconde au lieu de 200 pour le double click
     mMap->xy().connect(std::bind(&groupLayers::extractInfo,mGroupL, std::placeholders::_1,std::placeholders::_2));
-    mMap->setToolTip(tr("tooltipMap"));
 
     // pour l'instant, double click
     //mMap->doubleClicked().connect(mMap->slot2);
 
     mMap->clicked().connect(std::bind(&WOpenLayers::filterMouseEvent,mMap,std::placeholders::_1));
-    //mMap->polygId().connect(std::bind(&parcellaire::computeStatAndVisuSelectedPol,mPA, std::placeholders::_1));
+    mMap->polygId().connect(std::bind(&parcellaire::computeStatAndVisuSelectedPol,mPA, std::placeholders::_1));
     // je divise la fenetre en 2 dans la hauteur pour mettre la carte à droite et à gauche une fenetre avec les infos des couches
-    auto layout = this->setLayout(Wt::cpp14::make_unique<Wt::WVBoxLayout>());
-    //auto layout = page1->setLayout(Wt::cpp14::make_unique<Wt::WVBoxLayout>());// c'est étrange, quand je met le layout dans la page 1, ça n'a pas le même rendu (car pas dans un topstack)
+    //auto layout = this->setLayout(Wt::cpp14::make_unique<Wt::WVBoxLayout>());
+    auto layout = page1->setLayout(Wt::cpp14::make_unique<Wt::WVBoxLayout>());// c'est étrange, quand je met le layout dans la page 1, ça n'a pas le même rendu (car pas dans un topstack)
     // hlayout c'est lié à pane
     hLayout->addWidget(std::move(map), 0);
     //hLayout-> widget, int stretch, WFlagAlignement
