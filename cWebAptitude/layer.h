@@ -100,6 +100,7 @@ public:
         case TypeLayer::Thematique:
             mRI= new cRasterInfo(mCode,mDico);
             break;
+        default:{}
         }
     }
     Layer(Layer&& lay) noexcept {
@@ -128,6 +129,7 @@ public:
         case TypeLayer::Thematique:
             mRI= new cRasterInfo(mCode,mDico);
             break;
+        default:{}
         }
     }
 

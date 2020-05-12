@@ -19,13 +19,14 @@ if (typeof apt2 !== 'undefined') {
     groupe = new ol.layer.Group({
 		'title': 'parcellaire',
 		attributions: 'Gembloux Agro-Bio Tech',
-		 layers:[apt2, parcellaire]});
+		 layers:[apt2, parcellaire, station]});
    
 } else {
 groupe = new ol.layer.Group({
 		'title': 'parcellaire',
 		attributions: 'Gembloux Agro-Bio Tech',
-		layers:[IGN, parcellaire]});
+		layers:[IGN, parcellaire, station]});
 IGN.setVisible(true);
 }
 map.setLayerGroup(groupe);
+//lays4select=[parcellaire];

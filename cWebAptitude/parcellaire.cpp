@@ -1,7 +1,7 @@
 #include "parcellaire.h"
 
 
-int globSurfMax(1000);// en ha
+int globSurfMax(2500);// en ha
 //https://www.quora.com/What-are-the-risks-associated-with-the-use-of-lambda-functions-in-C-11
 
 parcellaire::parcellaire(WContainerWidget *parent, groupLayers *aGL, Wt::WApplication* app, WStackedWidget *aTopStack, WContainerWidget *statW):mParent(parent),mStatW(statW),mGL(aGL),centerX(0.0),centerY(0.0),mClientName(""),mJSfile(""),mName(""),mFullPath(""),m_app(app),fu(NULL),msg(NULL),uploadButton(NULL),mTopStack(aTopStack)
@@ -175,7 +175,7 @@ bool parcellaire::toGeoJson(){
             GDALClose( DS );
             } else {
                 aRes=0;
-                msg->setText("vérifiez que la surface totale de vos parcelles est bien inférieur à " + std::to_string(globSurfMax));
+                msg->setText("vérifiez que la surface totale de vos parcelles est bien inférieur à " + std::to_string(globSurfMax) + " ha.");
             }
         }}
 
@@ -366,7 +366,8 @@ void parcellaire::computeStat(){
     std::cout << " parcellaire::computeStat()... " ;
     mGL->mPBar->setMaximum(mGL->getNumSelect4Stat());
     mGL->mPBar->setValue(0);
-    std::map<std::string,std::map<std::string,int>> stat= mGL->computeStatGlob(poGeomGlobale);
+    //std::map<std::string,std::map<std::string,int>> stat= mGL->computeStatGlob(poGeomGlobale);
+    mGL->computeStatGlob(poGeomGlobale);
     mGL->mPBar->setValue(0);
     //visuStatButton->enable();
 
@@ -376,7 +377,6 @@ void parcellaire::computeStat(){
     const char *inputPath=input.c_str();
     GDALAllRegister();
     GDALDataset * DS;
-
 
     DS =  (GDALDataset*) GDALOpenEx( inputPath, GDAL_OF_VECTOR | GDAL_OF_UPDATE, NULL, NULL, NULL );
     if( DS == NULL )
@@ -425,7 +425,7 @@ void parcellaire::visuStat(){
     int row(0),column(0);
     // mauvaise manière de boucler sur un pointer!!!
     //for (layerStatChart * chart : mGL->ptrVLStat()) {
-    for (const auto & chart : mGL->ptrVLStat()) {
+    for (layerStatChart * chart : mGL->ptrVLStat()) {
         std::cout << " row " << row << " , col " << column << std::endl;
         grid->addWidget(std::unique_ptr<Wt::WContainerWidget>(chart->getChart()), row, column);
         column++;
@@ -441,6 +441,41 @@ void parcellaire::visuStat(){
     mTopStack->setCurrentIndex(1);
     mGL->mPBar->setValue(0);
     std::cout << " ..done " << std::endl;
+}
+
+// si je click sur un polygone dans ol, calcule les stat et affiche dans une nouvelle page
+void parcellaire::computeStatAndVisuSelectedPol(int aId){
+    std::cout << " computeStatAndVisuSelectedPol  , id " << aId << std::endl;
+    std::string input(mFullPath+ ".shp");
+    const char *inputPath=input.c_str();
+    GDALAllRegister();
+    GDALDataset * DS;
+
+    DS =  (GDALDataset*) GDALOpenEx( inputPath, GDAL_OF_VECTOR | GDAL_OF_UPDATE, NULL, NULL, NULL );
+    if( DS == NULL )
+    {
+        printf( "Open failed.\n" );
+    } else {
+        // layer
+        OGRLayer * lay = DS->GetLayer(0);
+        OGRFeature *poFeature;
+            bool find(0);
+        while( (poFeature = lay->GetNextFeature()) != NULL )
+        {
+           if (poFeature->GetFID()==aId){
+            OGRGeometry * poGeom = poFeature->GetGeometryRef();
+            poGeom->closeRings();
+            poGeom->flattenTo2D();
+            mGL->computeStatGlob(poGeom);
+            find=1;
+            break;
+           }
+        }
+
+        GDALClose( DS );
+        if (find) {visuStat();}
+    }
+
 }
 
 std::string parcellaire::geoJsonName(){return mFullPath + ".geojson";}

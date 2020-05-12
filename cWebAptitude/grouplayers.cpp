@@ -126,8 +126,7 @@ void groupLayers::update(std::string aCode){
     // désactiver toutes les couches actives et changer le rendu du label
     for (Layer * l : mVLs){
         l->setActive(aCode==l->getCode());
-    }
-    //std::cout << "number of layer in the group " << mVLs.size() << std::endl;
+    } 
     //std::cout << "update done " << std::endl;
 }
 
@@ -141,17 +140,9 @@ void groupLayers::clickOnName(std::string aCode){
     for (Layer * l : mVLs){
         if (l->IsActive()){
             l->displayLayer();
-
-            //std::cout << " j'ai selectionné " << l->getCode() <<  "\n\n"<< std::endl;
-            // test ; retourner le code js qui sera utilisé par la map
-            //mMap->doJavaScript(l.displayLayer());
-            //std::cout << l.displayLayer() << std::endl;
-            //m_app->doJavaScript(l.displayLayer());
             mLegend->afficheLegendeIndiv(l);
         }
-
     }
-
 }
 
 void groupLayers::changeClassClick(WText *t)
@@ -179,7 +170,7 @@ void groupLayers::changeClassClick(WText *t)
 
 void groupLayers::extractInfo(double x, double y){
 
-
+    //std::cout << "groupLayers ; extractInfo " << std::endl;
     mStation->vider();
     mLegend->vider();
 
@@ -187,8 +178,7 @@ void groupLayers::extractInfo(double x, double y){
     mLegend->titreInfoRaster();
 
     for (Layer * l : mVLs){
-        //if (l.IsActive()) l.displayInfo(x,y,mInfoW);
-        if ((l->Type()==TypeLayer::KK )| (l->Type()==TypeLayer::Thematique )|( l->IsActive())){
+        if (((l->Type()==TypeLayer::KK )| (l->Type()==TypeLayer::Thematique )) | (( l->IsActive()) & (l->Type()!=TypeLayer::Externe))){
             mLegend->add1InfoRaster(l->displayInfo(x,y));
         }
     }
@@ -207,8 +197,12 @@ void groupLayers::extractInfo(double x, double y){
                              Wt::TimingFunction::Linear,
                              1000);
 
-    mLegend->animateShow(animation); // marche pas...
-    mMap->animateShow(animation);
+    // si je double clique très vite deux fois, l'animation numéro deux sera reportée à plus tard (buggy)
+    //mLegend->animateShow(animation); // marche pas... car mLegend est une classe qui hérite d'un conteneur mais ce conteneur n'est pas affiché, tout les objets sont dans le conteneur appelé à tord "Parent"
+    mLegend->mParent->animateShow(animation);
+    //mLegend->mParent->show();
+    //mMap->animateShow(animation);// ça ça donne envie de vomir
+
 
     // je voulais faire une animation du curseur, echec. mais j'utiliser les animationShow maintenant
     //usleep(10000);
@@ -219,7 +213,7 @@ void groupLayers::extractInfo(double x, double y){
 
 
 // clé 1 ; nom de la couche. clé2 : la valeur au format légende (ex ; Optimum). Valeur ; pourcentage pour ce polygone
-std::map<std::string,std::map<std::string,int>> groupLayers::computeStatGlob(OGRGeometry *poGeomGlobale){
+void groupLayers::computeStatGlob(OGRGeometry *poGeomGlobale){
     std::cout << " groupLayers::computeStatGlob " << std::endl;
     // clear d'un vecteur de pointeur, c'est mal.
     for (auto p : mVLStat)
@@ -227,9 +221,10 @@ std::map<std::string,std::map<std::string,int>> groupLayers::computeStatGlob(OGR
         delete p;
     }
     mVLStat.clear();
-    std::map<std::string,std::map<std::string,int>> aRes;
+    //std::map<std::string,std::map<std::string,int>> aRes;
 
     // il faut filtrer sur les couches sélectionnées et gerer un changement de mode FEE/CS pour les layers aptitude.
+    // non, pour les statistiques globales, on prend toutes les couches
     for (auto &kv: getSelectedLayer4Stat() ){
         Layer * l=kv.second;
         std::string aMode=kv.first.at(1);
@@ -238,16 +233,17 @@ std::map<std::string,std::map<std::string,int>> groupLayers::computeStatGlob(OGR
         std::map<std::string,int> stat = l->computeStatOnPolyg(poGeomGlobale,aMode);
 
         // c'est parcellaire:: qui doit gerer l'affichage des layerStatChart
-        layerStatChart* aLayStatChart=new layerStatChart(l,stat,aMode);
-        mVLStat.emplace_back(aLayStatChart);
+        //layerStatChart* aLayStatChart=new layerStatChart(l,stat,aMode);
+        //mVLStat.emplace_back(aLayStatChart);
+        mVLStat.push_back(new layerStatChart(l,stat,aMode));
 
-        aRes.emplace(std::make_pair(l->getCode(),stat));
+        //aRes.emplace(std::make_pair(l->getCode(),stat));
         mPBar->setValue(mPBar->value() + 1);
         m_app->processEvents();
     }
     mPBar->setValue(mPBar->maximum());
     std::cout << " done " << std::endl;
-    return aRes;
+    //return aRes;
 }
 
 void groupLayers::computeStatOnPolyg(OGRLayer * lay,bool mergeOT){
@@ -270,6 +266,7 @@ void groupLayers::computeStatOnPolyg(OGRLayer * lay,bool mergeOT){
         {
             // clé : la valeur au format légende (ex ; Optimum). Valeur ; pourcentage pour ce polygone
             OGRGeometry * poGeom = poFeature->GetGeometryRef();
+            poGeom->closeRings();
             poGeom->flattenTo2D();
             //std::map<std::string,int> stat = l->computeStatOnPolyg(poGeom,aMode);
             layerStat ls(l,l->computeStatOnPolyg(poGeom,aMode),aMode);

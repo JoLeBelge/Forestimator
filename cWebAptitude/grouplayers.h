@@ -134,9 +134,9 @@ class groupLayers: public WContainerWidget
 public:
     groupLayers(cDicoApt * aDico,WContainerWidget *parent,WContainerWidget *infoW,WOpenLayers * aMap, Wt::WApplication* app);
     ~groupLayers();
-    groupLayers(const groupLayers &gl){
+    /*groupLayers(const groupLayers &gl){
         std::cout << "construct by copy group layer -- should never happend\n\n\n" << std::endl;
-    }
+    }*/
     void clickOnName(std::string aCode);
     void changeClassClick(WText *t);
     void update(std::string aCode);
@@ -158,7 +158,8 @@ public:
     }
 
     // clé 1 ; nom de la couche. clé2 : la valeur au format légende (ex ; Optimum). Valeur ; pourcentage pour ce polygone
-    std::map<std::string,std::map<std::string,int>> computeStatGlob(OGRGeometry *poGeomGlobale);
+    //std::map<std::string,std::map<std::string,int>>
+    void computeStatGlob(OGRGeometry *poGeomGlobale);
     //void visuStat();
     // void car on ajoute les résulats à la table d'attribut de la couche
     void computeStatOnPolyg(OGRLayer * lay, bool mergeOT=0);
@@ -181,8 +182,6 @@ public:
     Wt::WApplication* m_app;
 
     std::vector<layerStatChart*> ptrVLStat() {return mVLStat;}
-
-
 
     std::vector<rasterFiles> getSelect4Download(){return mSelect4Download->getSelectedRaster();}
     std::vector<rasterFiles> getSelect4Stat(){return mSelect4Stat->getSelectedRaster();}
