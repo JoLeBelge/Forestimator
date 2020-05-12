@@ -39,7 +39,7 @@ Wt::WContainerWidget * layerStatChart::getChart(){
     aRes->setInline(0);
     aRes->setOverflow(Wt::Overflow::Auto);
 
-    aRes->addWidget(cpp14::make_unique<WText>("<h4>"+mLay->getLegendLabel()+"</h4>"));
+   // aRes->addWidget(cpp14::make_unique<WText>("<h4>"+mLay->getLegendLabel()+"</h4>"));
     aRes->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
     std::cout << " statsimple : " << mStatSimple.size() << " elem " << std::endl;
     if (mStatSimple.size()>0){
@@ -68,9 +68,9 @@ Wt::WContainerWidget * layerStatChart::getChart(){
         for (auto & kv : mStatSimple){
             std::string aCodeStr(kv.first);
             //std::cout << " row " <<  row << ", " << aCodeStr<< std::endl;
-            color col(mLay->getColor(aCodeStr));
+            //color col(mLay->getColor(aCodeStr));
             // std::cout << "got color" << std::endl;
-            aChart->setBrush(row,Wt::WBrush(Wt::WColor(col.mR,col.mG,col.mB)));
+            //aChart->setBrush(row,Wt::WBrush(Wt::WColor(col.mR,col.mG,col.mB)));
             //std::cout << "brush setted " << std::endl;
             row++;
         }
@@ -118,6 +118,8 @@ void layerStat::simplifieStat(){
         mStatSimple.emplace(std::make_pair("Sans données",100-tot));
     }
 
+    std::cout << "simplify stat , mStatSimple size " << mStatSimple.size() << std::endl;
+
 }
 
 int layerStat::getO(bool mergeOT){
@@ -138,7 +140,6 @@ int layerStat::getO(bool mergeOT){
     }
 
 layerStat::layerStat(Layer * aLay,std::map<std::string,int> aStat, std::string aMode):mLay(aLay),mStat(aStat),mMode(aMode){
-
     simplifieStat();
 }
 

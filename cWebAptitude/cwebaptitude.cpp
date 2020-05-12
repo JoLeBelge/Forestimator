@@ -108,7 +108,8 @@ cWebAptitude::cWebAptitude(Wt::WApplication* app)
     auto GLCont = Wt::cpp14::make_unique<Wt::WContainerWidget>();
     mGroupL = new groupLayers(mDico,GLCont.get(),legendCont.get(),mMap,m_app);
 
-    menu->addItem("Légende", std::move(legendCont));
+    WMenuItem * itLegend = menu->addItem("Légende", std::move(legendCont));
+
 
     // unique _ptr est détruit à la fin de la création de l'objet, doit etre déplacé avec move pour donner sa propriété à un autre objet pour ne pas être détruit
     //auto uPtrPA = Wt::cpp14::make_unique<parcellaire>(PACont.get(),mGroupL,m_app);
@@ -124,13 +125,21 @@ cWebAptitude::cWebAptitude(Wt::WApplication* app)
     // maintenant que tout les objets sont crées, je ferme la connection avec la BD sqlite3, plus propre
     mDico->closeConnection();
 
-    //mMap->clicked().connect(mMap->slot);
-    mMap->doubleClicked().connect(mMap->slot); // et dans wt_config, mettre à 500 milliseconde au lieu de 200
+    mMap->doubleClicked().connect(mMap->slot);
+    // reviens sur l'onglet légende si on est sur l'onglet parcellaire
+    mMap->doubleClicked().connect([=]{itLegend->select();});
+    // et dans wt_config, mettre à 500 milliseconde au lieu de 200 pour le double click
     mMap->xy().connect(std::bind(&groupLayers::extractInfo,mGroupL, std::placeholders::_1,std::placeholders::_2));
     mMap->setToolTip(tr("tooltipMap"));
+
+    // pour l'instant, double click
+    //mMap->doubleClicked().connect(mMap->slot2);
+
+    mMap->clicked().connect(std::bind(&WOpenLayers::filterMouseEvent,mMap,std::placeholders::_1));
+    //mMap->polygId().connect(std::bind(&parcellaire::computeStatAndVisuSelectedPol,mPA, std::placeholders::_1));
     // je divise la fenetre en 2 dans la hauteur pour mettre la carte à droite et à gauche une fenetre avec les infos des couches
     auto layout = this->setLayout(Wt::cpp14::make_unique<Wt::WVBoxLayout>());
-   // auto layout = page1->setLayout(Wt::cpp14::make_unique<Wt::WVBoxLayout>());// c'est étrange, quand je met le layout dans la page 1, ça n'a pas le même rendu (car pas dans un topstack)
+    //auto layout = page1->setLayout(Wt::cpp14::make_unique<Wt::WVBoxLayout>());// c'est étrange, quand je met le layout dans la page 1, ça n'a pas le même rendu (car pas dans un topstack)
     // hlayout c'est lié à pane
     hLayout->addWidget(std::move(map), 0);
     //hLayout-> widget, int stretch, WFlagAlignement

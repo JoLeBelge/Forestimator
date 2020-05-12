@@ -129,6 +129,7 @@ public:
         case TypeLayer::Thematique:
             mRI= new cRasterInfo(mCode,mDico);
             break;
+        default:{}
         }
     }
 

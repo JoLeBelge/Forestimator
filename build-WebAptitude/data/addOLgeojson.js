@@ -29,3 +29,4 @@ groupe = new ol.layer.Group({
 IGN.setVisible(true);
 }
 map.setLayerGroup(groupe);
+//lays4select=[parcellaire];

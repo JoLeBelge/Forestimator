@@ -47,8 +47,10 @@ public:
     Wt::WTable                 *mDetAptFEE;
     Wt::WTable                 *mLegendIndiv;
     Wt::WTable                 *mAptAllEss;
-private:
+
     Wt::WContainerWidget     * mParent;
+private:
+
     //Wt::WWidget     * mParent;
     groupLayers*mGL;
     Wt::WText                  *titre_;

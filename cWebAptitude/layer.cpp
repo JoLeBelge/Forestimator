@@ -350,8 +350,6 @@ std::map<std::string,int> Layer::computeStatOnPolyg(OGRGeometry *poGeom, std::st
         }
         GDALClose(mask);
         GDALClose(mGDALDat);
-
-
     }
     return aRes;
 }

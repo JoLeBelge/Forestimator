@@ -176,14 +176,18 @@ station = new ol.layer.Vector({
 	extent: extent,
 	style: new ol.style.Style({
       	image: new ol.style.Circle({
-        radius: 5,
+        radius: 7,
         //fill: new ol.style.Fill({color: 'black'}),
         stroke: new ol.style.Stroke({
-          color: [128,0,128], width: 3
+          color: [128,0,128], width: 4
         })
       })
     })
 });
+
+
+
+//var selectElement = document.getElementById('type');
 
 /*
 // apt2 il affiche le numéro du tile en fonction du paramétrage e tileGrid (origin, origins, resolutions ect) --> bon pour le debugging
@@ -349,4 +353,16 @@ function centrer_com(){
 
 }
 
+featuresSelect = new ol.Collection();
+var selectAltClick = new ol.interaction.Select({
+  condition: function(mapBrowserEvent) {
+    return ol.events.condition.click(mapBrowserEvent) && ol.events.condition.shiftKeyOnly(mapBrowserEvent);
+  },
+ toggleCondition: ol.events.condition.never,
+ //layers: lays4select,
+ features: featuresSelect
+});
+
+map.addInteraction(selectAltClick);
+//selectAltClick.on('select', function (e) {console.log(featuresSelect.item(0).getId());});
 

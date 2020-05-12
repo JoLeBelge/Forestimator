@@ -43,6 +43,8 @@ public:
     void clickUploadBt();
     void fuChanged();
 
+    void computeStatAndVisuSelectedPol(int aId);
+
     bool hasShp(){return hasValidShp;}
 
     std::string geoJsonName();
