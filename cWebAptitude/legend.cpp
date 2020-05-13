@@ -13,18 +13,9 @@ legend::legend(WContainerWidget *parent):mParent(parent)
 
 void legend::createUI()
 {
-    setPadding(10);
-    this->setContentAlignment(AlignmentFlag::Left);
-    this->addStyleClass("table form-inline");
-    this->setStyleClass("table form-inline");
-
-   /* titre_ = mParent->addWidget(cpp14::make_unique<WText>("Légende"));
-    titre_->decorationStyle().font().setSize(FontSize::Large);
-    titre_->decorationStyle().setForegroundColor(WColor(192,192,192));
-    // le set padding ne fonctionne que si je désactive le inline
-    titre_->setInline(0);
-    titre_->setPadding(10,Wt::Side::Bottom | Wt::Side::Top);
-    */
+    mParent->setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Left);
+    mParent->setMargin(20,Wt::Side::Bottom | Wt::Side::Top);
+    mParent->setInline(0);// si pas inline, pas de scrollbar pour l'overflow!
 
     mAptAllEss = mParent->addWidget(cpp14::make_unique<WTable>());
     mAptAllEss->setHeaderCount(1);
@@ -45,8 +36,6 @@ void legend::createUI()
     mLegendIndiv->setHeaderCount(1);
     mLegendIndiv->setWidth(Wt::WLength("90%"));
     mLegendIndiv->toggleStyleClass("table-striped",true);
-
-    setMargin(20);
 }
 
 void legend::vider()

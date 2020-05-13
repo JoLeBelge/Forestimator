@@ -36,7 +36,7 @@ groupLayers::groupLayers(cDicoApt * aDico, WContainerWidget *parent, WContainerW
     label->clicked().connect([this]{clickOnName("IGN");});
     mVLs.push_back(new Layer(this,"IGN",label,TypeLayer::Externe));
     row++;
-    if (row % 6 == 0){col++;row=0;}
+    //if (row % 6 == 0){col++;row=0;}
     // creation des layers pour les KK du CS
     for (auto & pair : *mDico->codeKK2Nom()){
         WText *label;
@@ -45,7 +45,7 @@ groupLayers::groupLayers(cDicoApt * aDico, WContainerWidget *parent, WContainerW
         std::string aCode=pair.first;
         label->clicked().connect([this,aCode]{clickOnName(aCode);});
         row++;
-        if (row % 6 == 0){col++;row=0;}
+        //if (row % 6 == 0){col++;row=0;}
     }
     // ajout des cartes "FEE" ; NT NH Topo AE SS
 
@@ -57,7 +57,7 @@ groupLayers::groupLayers(cDicoApt * aDico, WContainerWidget *parent, WContainerW
         label->clicked().connect([this,aCode]{clickOnName(aCode);});
         mVLs.push_back(aL);
         row++;
-        if (row % 6 == 0){col++;row=0;}
+        //if (row % 6 == 0){col++;row=0;}
     }
 
     mClassifTable = mParent->addWidget(cpp14::make_unique<Wt::WTable>());
@@ -92,7 +92,7 @@ groupLayers::groupLayers(cDicoApt * aDico, WContainerWidget *parent, WContainerW
             std::string aCode=pair.first;
             label->clicked().connect([this,aCode]{clickOnName(aCode);});
             row++;
-            if (row % 17 == 0){col++;row=0;}
+           // if (row % 17 == 0){col++;row=0;}
         }
     }
 
@@ -199,22 +199,14 @@ void groupLayers::extractInfo(double x, double y){
 
     // si je double clique très vite deux fois, l'animation numéro deux sera reportée à plus tard (buggy)
     //mLegend->animateShow(animation); // marche pas... car mLegend est une classe qui hérite d'un conteneur mais ce conteneur n'est pas affiché, tout les objets sont dans le conteneur appelé à tord "Parent"
+    //mLegend->mParent->resize("100%","100%");// j'ai changé le contenu du parent
     mLegend->mParent->animateShow(animation);
-    //mLegend->mParent->show();
-    //mMap->animateShow(animation);// ça ça donne envie de vomir
 
-
-    // je voulais faire une animation du curseur, echec. mais j'utiliser les animationShow maintenant
-    //usleep(10000);
-    //mMap->decorationStyle().setCursor(Cursor::Arrow);
-    //mParent->decorationStyle().setCursor(Cursor::Auto);
-    //mParent->decorationStyle().set
 }
 
 // clé 1 ; nom de la couche. clé2 : la valeur au format légende (ex ; Optimum). Valeur ; pourcentage pour ce polygone
 void groupLayers::computeStatGlob(OGRGeometry *poGeomGlobale){
     std::cout << " groupLayers::computeStatGlob " << std::endl;
-
     // clear d'un vecteur de pointeur, c'est mal.
     for (auto p : mVLStat)
     {

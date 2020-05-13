@@ -29,7 +29,11 @@ Vous pouvez télécharger les cartes listées ci-dessous qui seront découpées 
 
 <message id="tooltipMap1">double cliquez sur une station pour afficher sa description dans l'onglet légende.</message>
 
-<message id="tooltipMap2">double cliquez sur une station pour afficher sa description dans l'onglet légende. Enfoncer la touche shift et cliquez sur un polygone de votre shapefile pour afficher les statistiques. </message>
+<message id="tooltipMap2">double cliquez sur une station pour afficher sa description dans l'onglet légende. Enfoncer la touche shift et cliquez sur un polygone de votre shapefile pour afficher les statistiques. Les couches sélectionnées sous la section "Télécharger les couches géographique au format raster" de l'onglet parcellaire feront l'objet d'une synthèse sur cette surface. </message>
+
+<message id="infoDansVisuStat">Les statistiques sont calculées pour les couches sélectionnées dans la section "Télécharger les couches géographique au format raster" de l'onglet parcellaire. </message>
+
+<message id="toolTipActiveLayer">Cliquez sur l'onglet légende pour visualiser la signification des couleurs pour cette carte. </message>
 
 
 </messages>

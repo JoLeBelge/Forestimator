@@ -48,21 +48,25 @@ cWebAptitude::cWebAptitude(Wt::WApplication* app)
 
     auto hLayout = pane_->setLayout(Wt::cpp14::make_unique<Wt::WHBoxLayout>());
 
-    pane_->setHeight("60%"); // oui ça ca marche bien! reste plus qu'à empêcher la carte de s'escamoter.
+    pane_->setHeight("100%"); // oui ça ca marche bien! reste plus qu'à empêcher la carte de s'escamoter.
     // non pas d'overflow pour la carte, qui est dans pane_
     pane_->setOverflow(Wt::Overflow::Visible);
     //pane_->setOverflow(Wt::Overflow::Auto);
 
     auto infoW = Wt::cpp14::make_unique<Wt::WContainerWidget>();
     Wt::WContainerWidget * infoW_ = infoW.get();
+    Wt::WVBoxLayout * vLayoutInfoW = infoW_->setLayout(Wt::cpp14::make_unique<Wt::WVBoxLayout>());
     infoW_->setOverflow(Wt::Overflow::Auto);
     infoW_->setWidth("30%");
 
     // creation d'un menum popup
     // Create a stack where the contents will be located.
     auto contents = Wt::cpp14::make_unique<Wt::WStackedWidget>();
+    std::unique_ptr<Wt::WMenu> menu_ =Wt::cpp14::make_unique<Wt::WMenu>(contents.get());
+    Wt::WMenu *menu = menu_.get();
+    //Wt::WMenu *menu = infoW_->addNew<Wt::WMenu>(contents.get());
 
-    Wt::WMenu *menu = infoW_->addNew<Wt::WMenu>(contents.get());
+
     menu->setStyleClass("nav nav-pills nav-stacked");
     menu->setWidth("100%");
 
@@ -73,7 +77,8 @@ cWebAptitude::cWebAptitude(Wt::WApplication* app)
     //WMenuItem * Wt::WMenu::addItem ( const WString & text, T * target, void(V::*)() method )
 
     //menu->addItem("Téléchargement", Wt::cpp14::make_unique<Wt::WTextArea>("Téléchargement : to come soon"));
-    infoW_->addWidget(std::move(contents));
+    //infoW_->addWidget(std::move(contents));
+
 
     auto map = Wt::cpp14::make_unique<WOpenLayers>(mDico);
     mMap= map.get();
@@ -103,10 +108,9 @@ cWebAptitude::cWebAptitude(Wt::WApplication* app)
 
     auto GLCont = Wt::cpp14::make_unique<Wt::WContainerWidget>();
     mGroupL = new groupLayers(mDico,GLCont.get(),legendCont.get(),mMap,m_app);
+    WMenuItem * itAffichage = menu->addItem("Afficher une carte", std::move(GLCont));
 
     WMenuItem * itLegend = menu->addItem("Légende", std::move(legendCont));
-
-
     // unique _ptr est détruit à la fin de la création de l'objet, doit etre déplacé avec move pour donner sa propriété à un autre objet pour ne pas être détruit
     //auto uPtrPA = Wt::cpp14::make_unique<parcellaire>(PACont.get(),mGroupL,m_app);
     //mPA = uPtrPA.get();
@@ -114,9 +118,8 @@ cWebAptitude::cWebAptitude(Wt::WApplication* app)
     mPA = new parcellaire(PACont.get(),mGroupL,m_app,topStack,page2);
     menu->addItem("Plan d'amménagement", std::move(PACont));
 
-    //auto UploadCont = Wt::cpp14::make_unique<Wt::WContainerWidget>();
-    //mUpload = new uploadCarte(UploadCont.get(),mGroupL, mPA,m_app);
-    //menu->addItem("Téléchargement", std::move(UploadCont));
+    vLayoutInfoW->addWidget(std::move(menu_));
+    vLayoutInfoW->addWidget(std::move(contents));
 
     // maintenant que tout les objets sont crées, je ferme la connection avec la BD sqlite3, plus propre
     mDico->closeConnection();
@@ -127,20 +130,14 @@ cWebAptitude::cWebAptitude(Wt::WApplication* app)
     // et dans wt_config, mettre à 500 milliseconde au lieu de 200 pour le double click
     mMap->xy().connect(std::bind(&groupLayers::extractInfo,mGroupL, std::placeholders::_1,std::placeholders::_2));
 
-    // pour l'instant, double click
-    //mMap->doubleClicked().connect(mMap->slot2);
-
     mMap->clicked().connect(std::bind(&WOpenLayers::filterMouseEvent,mMap,std::placeholders::_1));
     mMap->polygId().connect(std::bind(&parcellaire::computeStatAndVisuSelectedPol,mPA, std::placeholders::_1));
     // je divise la fenetre en 2 dans la hauteur pour mettre la carte à droite et à gauche une fenetre avec les infos des couches
     auto layout = page1->setLayout(Wt::cpp14::make_unique<Wt::WVBoxLayout>());
     // hlayout c'est lié à pane
     hLayout->addWidget(std::move(map), 0);
-    //hLayout-> widget, int stretch, WFlagAlignement
     hLayout->addWidget(std::move(infoW), 1);
     layout->addWidget(std::move(titreCont), 0);
     layout->addWidget(std::move(pane), 0);
-    //layout->addWidget(std::move(groupL), 1); // si 1, laisse la place aux deux autres partie du layout car stretch, mais pas beau.
-    layout->addWidget(std::move(GLCont), 1);
 
 }

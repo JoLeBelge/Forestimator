@@ -412,6 +412,9 @@ void parcellaire::visuStat(std::string aTitle){
     WContainerWidget * contTitre_ = contTitre.get();
     contTitre->addWidget(cpp14::make_unique<WText>(aTitle));
     Wt::WPushButton * retourButton = contTitre_->addWidget(cpp14::make_unique<Wt::WPushButton>("Retour"));
+    contTitre_->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
+    contTitre->addWidget(cpp14::make_unique<WText>(tr("infoDansVisuStat")));
+    // de toute manière c'est pas facile d'utiliser des internal pas pour des pages comme StatW qui sont ouverte par un évenement autre que un click sur boutton
     //retourButton->setLink(Wt::WLink(Wt::LinkType::InternalPath, "/Aptitude"));
     //retourButton->clicked().connect([&] {topStack->setCurrentIndex(0);});// avec &, ne tue pas la session mais en recrée une. avec =, tue et recrée, c'est car le lambda copie plein de variable dont this, ça fout la merde
     // non c'est pas la faute du lambda, c'est les internal path qui font qu'une nouvelle session est créée.
