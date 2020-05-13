@@ -89,6 +89,13 @@ Layer::~Layer(){
     mRI=NULL;
 }
 
+void Layer::setActive(bool b){
+    // ici je peux également changer le style du rendu du label
+    mActive=b;
+    mText->setStyleClass(mActive ? "currentEss" : "ess");
+    if (mActive) {mText->setToolTip(WString::tr("toolTipActiveLayer"));} else {mText->setToolTip("");}
+}
+
 
 
 Layer::Layer(groupLayers * aGroupL, cEss aEss, WText *PWText):

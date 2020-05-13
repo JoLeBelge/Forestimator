@@ -33,15 +33,15 @@ layerStatChart::layerStatChart(Layer *aLay, std::map<std::string, int> aStat, st
 
 Wt::WContainerWidget * layerStatChart::getChart(){
     // crée un smart ptr pour un chart vide
-    std::cout << " creation d'un chart " << std::endl;
+    //std::cout << " creation d'un chart " << std::endl;
     Wt:WContainerWidget * aRes= new Wt::WContainerWidget();
     aRes->setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Center);
     aRes->setInline(0);
     aRes->setOverflow(Wt::Overflow::Auto);
 
-   // aRes->addWidget(cpp14::make_unique<WText>("<h4>"+mLay->getLegendLabel()+"</h4>"));
+    aRes->addWidget(cpp14::make_unique<WText>("<h4>"+mLay->getLegendLabel()+"</h4>"));
     aRes->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
-    std::cout << " statsimple : " << mStatSimple.size() << " elem " << std::endl;
+    //std::cout << " statsimple : " << mStatSimple.size() << " elem " << std::endl;
     if (mStatSimple.size()>0){
         WTableView* table =aRes->addWidget(cpp14::make_unique<WTableView>());
         aRes->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
@@ -49,7 +49,7 @@ Wt::WContainerWidget * layerStatChart::getChart(){
         table->setMargin(WLength::Auto, Side::Left | Side::Right);
         table->setSortingEnabled(1,false);
         table->setSortingEnabled(0,false);// pas très utile
-        std::cout << "set model " << std::endl;
+        //std::cout << "set model " << std::endl;
         table->setModel(mModel);
         table->setColumnWidth(0, 200);
         table->setColumnWidth(1, 150);
@@ -63,14 +63,14 @@ Wt::WContainerWidget * layerStatChart::getChart(){
         aChart->setDataColumn(1);      // Set the column that holds the data.
 
         // changer la couleur
-        std::cout << "change la couleur" << std::endl;
+        //std::cout << "change la couleur" << std::endl;
         int row = 0;
         for (auto & kv : mStatSimple){
             std::string aCodeStr(kv.first);
             //std::cout << " row " <<  row << ", " << aCodeStr<< std::endl;
-            //color col(mLay->getColor(aCodeStr));
+            color col(mLay->getColor(aCodeStr));
             // std::cout << "got color" << std::endl;
-            //aChart->setBrush(row,Wt::WBrush(Wt::WColor(col.mR,col.mG,col.mB)));
+            aChart->setBrush(row,Wt::WBrush(Wt::WColor(col.mR,col.mG,col.mB)));
             //std::cout << "brush setted " << std::endl;
             row++;
         }
@@ -117,9 +117,6 @@ void layerStat::simplifieStat(){
     if (tot<97 & tot>5){
         mStatSimple.emplace(std::make_pair("Sans données",100-tot));
     }
-
-    std::cout << "simplify stat , mStatSimple size " << mStatSimple.size() << std::endl;
-
 }
 
 int layerStat::getO(bool mergeOT){

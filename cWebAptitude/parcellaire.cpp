@@ -158,21 +158,21 @@ bool parcellaire::toGeoJson(){
             OGRLayer * lay = DS->GetLayer(0);
             if (computeGlobalGeom(lay)){
 
-            //std::cout << lay->GetName() << std::endl;
-            char **papszOptions = NULL; // il faut utiliser le driver GeoJSONSeq si je veux pouvoir utiliser les options ci-dessous
-            //papszOptions = CSLSetNameValue( papszOptions, "ATTRIBUTES_SKIP", "YES" );
-            //papszOptions = CSLSetNameValue( papszOptions, "WRITE_BBOX", "YES" );
-            /*papszOptions = CSLSetNameValue( papszOptions, "COORDINATE_PRECISION", "2" );
+                //std::cout << lay->GetName() << std::endl;
+                char **papszOptions = NULL; // il faut utiliser le driver GeoJSONSeq si je veux pouvoir utiliser les options ci-dessous
+                //papszOptions = CSLSetNameValue( papszOptions, "ATTRIBUTES_SKIP", "YES" );
+                //papszOptions = CSLSetNameValue( papszOptions, "WRITE_BBOX", "YES" );
+                /*papszOptions = CSLSetNameValue( papszOptions, "COORDINATE_PRECISION", "2" );
     std::cout << "papszOptions " <<papszOptions << std::endl;
     papszOptions = CSLSetNameValue( papszOptions, "SIGNIFICANT_FIGURES", "5" );
      std::cout << "papszOptions " <<papszOptions << std::endl;
     //papszOptions = CSLSetNameValue( papszOptions, "RFC7946", "YES" );
     std::cout << "papszOptions " <<papszOptions << std::endl;
     */
-            GDALDataset * DS2;
-            DS2 = jsonDriver->CreateCopy(outPath, DS, FALSE, papszOptions,NULL, NULL );
-            GDALClose( DS2 );
-            GDALClose( DS );
+                GDALDataset * DS2;
+                DS2 = jsonDriver->CreateCopy(outPath, DS, FALSE, papszOptions,NULL, NULL );
+                GDALClose( DS2 );
+                GDALClose( DS );
             } else {
                 aRes=0;
                 msg->setText("vérifiez que la surface totale de vos parcelles est bien inférieur à " + std::to_string(globSurfMax) + " ha.");
@@ -246,26 +246,26 @@ bool parcellaire::computeGlobalGeom(OGRLayer * lay){
         poGeomGlobale =poGeom2->Simplify(1.0);
         int aSurfha=OGR_G_GetArea(poGeomGlobale)/10000;
         if (aSurfha<globSurfMax){
-        //OGRPolygon * pol=poGeom2->toPolygon();
-        //std::ofstream out("/home/lisein/Documents/carteApt/Forestimator/build-WebAptitude/tmp/test.geojson");
-        //out << poGeom->exportToJson();
-        //out.close();
-        OGRPoint * aPt=NULL;
-        err = poGeomGlobale->Centroid(aPt);
-        if (err!=OGRERR_NONE){
-            std::cout << "problem avec le calcul du centroid, erreur : " << err <<  std::endl;
-            OGREnvelope ext;
-            poGeomGlobale->getEnvelope(&ext);
-            centerX= (ext.MaxX+ext.MinX)/2;
-            centerY= (ext.MaxY+ext.MinY)/2;
-        } else {
+            //OGRPolygon * pol=poGeom2->toPolygon();
+            //std::ofstream out("/home/lisein/Documents/carteApt/Forestimator/build-WebAptitude/tmp/test.geojson");
+            //out << poGeom->exportToJson();
+            //out.close();
+            OGRPoint * aPt=NULL;
+            err = poGeomGlobale->Centroid(aPt);
+            if (err!=OGRERR_NONE){
+                std::cout << "problem avec le calcul du centroid, erreur : " << err <<  std::endl;
+                OGREnvelope ext;
+                poGeomGlobale->getEnvelope(&ext);
+                centerX= (ext.MaxX+ext.MinX)/2;
+                centerY= (ext.MaxY+ext.MinY)/2;
+            } else {
 
-            centerX=aPt->getX();
-            centerY=aPt->getY();
+                centerX=aPt->getX();
+                centerY=aPt->getY();
+            }
+            aRes=1;
+
         }
-        aRes=1;
-
-    }
     }
 
     delete multi;
@@ -321,7 +321,6 @@ void parcellaire::fuChanged(){
     uploadButton->enable();
 }
 
-
 void parcellaire::upload(){
     //std::cout << "upload commence.. " ;
     computeStatButton->disable();
@@ -355,7 +354,9 @@ void parcellaire::upload(){
             hasValidShp=true;
             computeStatButton->enable();
             downloadRasterBt->enable();
-            display();}
+            display();
+            mGL->mMap->setToolTip(tr("tooltipMap2"));
+        }
     } else {
         msg->setText("Veillez sélectionner les 3 fichiers du shapefile (shp, shx et dbf).");
         cleanShpFile();
@@ -364,6 +365,7 @@ void parcellaire::upload(){
 
 void parcellaire::computeStat(){
     std::cout << " parcellaire::computeStat()... " ;
+
     mGL->mPBar->setMaximum(mGL->getNumSelect4Stat());
     mGL->mPBar->setValue(0);
     //std::map<std::string,std::map<std::string,int>> stat= mGL->computeStatGlob(poGeomGlobale);
@@ -393,33 +395,40 @@ void parcellaire::computeStat(){
     std::cout << " ..done " << std::endl;
 }
 
-void parcellaire::visuStat(){
+void parcellaire::visuStat(std::string aTitle){
     std::cout << " parcellaire::visuStat()... " ;
     mGL->mPBar->setValue(0);
-    std::cout << " CLEAR  mStaW... " ;
+    //std::cout << " CLEAR  mStaW... " ;
     mStatW->clear();
-    std::cout << " done... " ;
+    //std::cout << " done... " ;
     mStatW->setOverflow(Wt::Overflow::Auto);
+    // un set layout dans un widget qui a déjà un layout en parent, ça peut être bien (cas de page1 ; comportement voulu) ou pas (page2 aka statW ; pas bien)
+    // je crée un containeur qui contiendra la page et ça regle mon problème
+    Wt::WContainerWidget *cont = mStatW->addNew<Wt::WContainerWidget>();
     // premier lay pour mettre titre et boutton de "retour"
-    auto layout = mStatW->setLayout(Wt::cpp14::make_unique<Wt::WVBoxLayout>());
+    Wt::WVBoxLayout * layout =  cont->setLayout(Wt::cpp14::make_unique<Wt::WVBoxLayout>());
+    //Wt::WVBoxLayout * layout = mStatW->setLayout(Wt::cpp14::make_unique<Wt::WVBoxLayout>());
     auto contTitre = Wt::cpp14::make_unique<Wt::WContainerWidget>();
     WContainerWidget * contTitre_ = contTitre.get();
-    contTitre->addWidget(cpp14::make_unique<WText>("<h4>Statistique globale pour "+ mClientName+ "</h4>"));
+    contTitre->addWidget(cpp14::make_unique<WText>(aTitle));
     Wt::WPushButton * retourButton = contTitre_->addWidget(cpp14::make_unique<Wt::WPushButton>("Retour"));
+    contTitre_->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
+    contTitre->addWidget(cpp14::make_unique<WText>(tr("infoDansVisuStat")));
+    // de toute manière c'est pas facile d'utiliser des internal pas pour des pages comme StatW qui sont ouverte par un évenement autre que un click sur boutton
     //retourButton->setLink(Wt::WLink(Wt::LinkType::InternalPath, "/Aptitude"));
     //retourButton->clicked().connect([&] {topStack->setCurrentIndex(0);});// avec &, ne tue pas la session mais en recrée une. avec =, tue et recrée, c'est car le lambda copie plein de variable dont this, ça fout la merde
     // non c'est pas la faute du lambda, c'est les internal path qui font qu'une nouvelle session est créée.
     std::cout << " config retour button "<< std::endl;
     //retourButton->clicked().connect(this,mTopStack->setCurrentIndex(0);});
     retourButton->clicked().connect([=] {mTopStack->setCurrentIndex(0);});
-    std::cout << " done "<< std::endl;
+    //std::cout << " done "<< std::endl;
 
     auto contCharts = Wt::cpp14::make_unique<Wt::WContainerWidget>();
     WContainerWidget * contCharts_ = contCharts.get();
     Wt::WGridLayout * grid = contCharts_->setLayout(Wt::cpp14::make_unique<Wt::WGridLayout>());
 
     int nbChart=mGL->ptrVLStat().size();
-    std::cout << " nb Chart "<< nbChart << std::endl;
+    //std::cout << " nb Chart "<< nbChart << std::endl;
     mGL->mPBar->setMaximum(nbChart);
     int nbColumn=std::min(2,int(std::sqrt(nbChart)));
     int row(0),column(0);
@@ -427,16 +436,16 @@ void parcellaire::visuStat(){
     //for (layerStatChart * chart : mGL->ptrVLStat()) {
     for (layerStatChart * chart : mGL->ptrVLStat()) {
         std::cout << " row " << row << " , col " << column << std::endl;
+        if (chart->deserveChart()){
         grid->addWidget(std::unique_ptr<Wt::WContainerWidget>(chart->getChart()), row, column);
         column++;
         if (column>nbColumn){row++;column=0;}
-
+        }
         mGL->mPBar->setValue(mGL->mPBar->value()+1);
         mGL->m_app->processEvents();
     }
-
     layout->addWidget(std::move(contTitre), 0);
-    layout->addWidget(std::move(contCharts), 1);
+    layout->addWidget(std::move(contCharts), 0);
     std::cout << " change tostack index... " ;
     mTopStack->setCurrentIndex(1);
     mGL->mPBar->setValue(0);
@@ -456,24 +465,27 @@ void parcellaire::computeStatAndVisuSelectedPol(int aId){
     {
         printf( "Open failed.\n" );
     } else {
+        mGL->mMap->decorationStyle().setCursor(Cursor::Wait);
+        mGL->mMap->refresh();
         // layer
         OGRLayer * lay = DS->GetLayer(0);
         OGRFeature *poFeature;
-            bool find(0);
+        bool find(0);
         while( (poFeature = lay->GetNextFeature()) != NULL )
         {
-           if (poFeature->GetFID()==aId){
-            OGRGeometry * poGeom = poFeature->GetGeometryRef();
-            poGeom->closeRings();
-            poGeom->flattenTo2D();
-            mGL->computeStatGlob(poGeom);
-            find=1;
-            break;
-           }
+            if (poFeature->GetFID()==aId){
+                OGRGeometry * poGeom = poFeature->GetGeometryRef();
+                poGeom->closeRings();
+                poGeom->flattenTo2D();
+                mGL->computeStatGlob(poGeom);
+                find=1;
+                break;
+            }
         }
 
         GDALClose( DS );
-        if (find) {visuStat();}
+        if (find) {visuStat("<h4>Statistique pour polygone FID " + std::to_string(aId) + " de " + mClientName+ "</h4>");}
+        mGL->mMap->decorationStyle().setCursor(Cursor::Auto);
     }
 
 }
@@ -514,8 +526,8 @@ void parcellaire::downloadRaster(){
         std::string aCroppedRFile=mFullPath+"_"+r.code()+".tif";
         mGL->mPBar->setToolTip("découpe de la carte " + r.code() + "...");
         if (cropImWithShp(r.tif(),aCroppedRFile)){
-           zf->addFile(mClientName+"_"+r.code()+".tif",aCroppedRFile);
-           if (r.hasSymbology()){zf->addFile(mClientName+"_"+r.code()+".qml",r.symbology());}
+            zf->addFile(mClientName+"_"+r.code()+".tif",aCroppedRFile);
+            if (r.hasSymbology()){zf->addFile(mClientName+"_"+r.code()+".qml",r.symbology());}
         }
         mGL->mPBar->setValue(mGL->mPBar->value()+1);
         m_app->processEvents();

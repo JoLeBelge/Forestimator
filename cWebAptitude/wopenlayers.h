@@ -44,6 +44,12 @@ public:
         }
     }
 
+    virtual void layoutSizeChanged(int width, int height)
+    {
+        WContainerWidget::layoutSizeChanged(width, height);
+        // Force a recalculation of the map viewport size. This should be called when third-party code changes the size of the map viewport
+        doJavaScript("map.updateSize();");
+    }
     cDicoApt * mDico;
     JSignal<double,double>& xy() { return xy_; }
     JSlot slot;

@@ -38,7 +38,7 @@ public:
     // rasterize une géométrie
     //void rasterizeGeom(OGRGeometry *poGeom);
     void computeStat();
-    void visuStat();
+    void visuStat(std::string aTitle);
     void upload();
     void clickUploadBt();
     void fuChanged();

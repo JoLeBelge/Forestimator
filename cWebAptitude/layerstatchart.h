@@ -19,6 +19,14 @@ class layerStat : public Wt::WContainerWidget
 {
 public:
     layerStat(Layer * aLay,std::map<std::string,int> aStat, std::string aMode);
+    layerStat(const layerStat &ls){
+        std::cout << "construct by copy layerStat " << std::endl;
+        mLay=ls.mLay;
+        mStat=ls.mStat;
+        mStatSimple=ls.mStatSimple;
+        mMode=ls.mMode;
+    }
+
     //layerStat():mLay(NULL){} //constructeur vide
     void simplifieStat();
     int getO(bool mergeOT=false);// proportion en optimum
@@ -33,18 +41,25 @@ class layerStatChart : public layerStat
 {
 public:
     layerStatChart(Layer * aLay,std::map<std::string,int> aStat, std::string aMode);
-    //layerStatChart():mLay(NULL),mTable(NULL),mChart(NULL){} //constructeur vide
+    layerStatChart(const layerStatChart &ls):layerStat(ls){
+        std::cout << "construct by copy layerStatChart " << std::endl;
+        mModel=ls.mModel;
+        rowAtMax=ls.rowAtMax;
+        mTable=ls.mTable;
+        mChart=ls.mChart;
+    }
     Wt::WContainerWidget * getChart();
     Chart::WPieChart * mChart;
+    bool deserveChart(){return mStatSimple.size()>0;}
 private:
     std::shared_ptr<WStandardItemModel> mModel;
-    Layer * mLay;
+    //Layer * mLay;
     //WStandardItemModel * mModel;
     WTableView * mTable;
-    std::map<std::string, int> mStat;
-    std::map<std::string, int> mStatSimple;
+    //std::map<std::string, int> mStat;
+    //std::map<std::string, int> mStatSimple;
     int rowAtMax;
-    std::string mMode; // fee vs cs
+    //std::string mMode; // fee vs cs
 
 };
 

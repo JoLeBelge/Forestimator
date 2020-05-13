@@ -330,7 +330,8 @@ map = new ol.Map({
 	layers: layers,
 	target: 'map',
 	overlays: [overlay],
-	view: _view
+	view: _view,
+	pixelRatio: 1
 });
 
 

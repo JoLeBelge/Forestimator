@@ -6,6 +6,8 @@
 #include <Wt/WText.h>
 #include "cdicoapt.h"
 #include <Wt/WLabel.h>
+#include <Wt/WWidget.h>
+#include <Wt/WString.h>
 #include "grouplayers.h"
 #include <boost/algorithm/string/replace.hpp>
 
@@ -16,6 +18,7 @@
 #include "gdal_utils.h"
 
 using namespace Wt;
+
 
 /* C'est réellement la classe d'objet qui est au centre des différentes technologies et techniques ;
  * -gdal
@@ -150,11 +153,7 @@ public:
     std::string getValueTxt(double x, double y);
     // crop du raster avec un shp parcellaire
     bool cropIm(std::string aOut);
-    void setActive(bool b=true){
-        // ici je peux également changer le style du rendu du label
-        mActive=b;
-        mText->setStyleClass(mActive ? "currentEss" : "ess");
-    }
+    void setActive(bool b=true);
     bool IsActive() const {return mActive;}
     std::string getCode(){return mCode;}
     std::string getPathTif();
@@ -223,10 +222,6 @@ private:
     std::string mPathTif;
     std::string mDirTuile;
     std::string mCode;
-
-    // je crois que c'est mieux que ce ne soit pas des membres de l'objet
-    //GDALDataset  * mGDALDat;
-    //GDALRasterBand * mBand;
 };
 
 #endif // LAYER_H
