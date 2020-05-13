@@ -146,6 +146,7 @@ void Layer::displayLayer() const{
         in.close();
         std::string JScommand(ss.str());
         boost::replace_all(JScommand,"TOREPLACE",mCode);
+        std::cout << JScommand << std::endl;
         mText->doJavaScript(JScommand);
         break;
     }
