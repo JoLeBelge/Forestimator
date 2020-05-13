@@ -4,11 +4,8 @@ WOpenLayers::WOpenLayers(cDicoApt *aDico):xy_(this,"1.0"),mDico(aDico),polygId_(
 {
   setPadding(0);
   setMargin(0);
-  resize(640, 480);
-  //setMinimumSize(640,480);
-  //setMaximumSize(640,480);// ne prend que la moitié en largeur de mon écran sur mon pc
-  //resize("100%","100%");// ça provoque un resize automatique en hauteur en fonction de la taille du contenu de la légende... foireux quoi
-
+  // pour que layoutSizeChange fonctionne
+  setLayoutSizeAware(1);
 
   setId("map");//sans ça le script js ne sert à rien car ne vise aucun objet cible
   std::ifstream t(mDico->File("initOL"));
@@ -20,7 +17,6 @@ WOpenLayers::WOpenLayers(cDicoApt *aDico):xy_(this,"1.0"),mDico(aDico),polygId_(
   setJS_selectPolygone();
   setToolTip(tr("tooltipMap1"));
 
-  //setJavaScriptMember("wtResize", "function(self, width, height) {  }");
 }
 
 // permet de récuper les coodonnées de la carte dans wt lors d'un click dessus + dessine un point là ou l'utilisateur a cliqué
@@ -28,9 +24,9 @@ void WOpenLayers::setJS_click(){
     slot.setJavaScript
            ("function getXY(owt,evt){"
             "var e =  evt || window.event;"
-            "console.log(evt);"
+            //"console.log(evt);"
             //"var f = map.getCoordinateFromPixel(map.getEventPixel(evt));"
-            "map.updateSize();" // Force a recalculation of the map viewport size. This should be called when third-party code changes the size of the map viewport
+
             "var f = map.getEventCoordinate(e);"
             // source ; c'est la source pour la couche de point "station", càd celle qui affiche là ou l'utilisateur à double-cliqué
             "source.clear();"

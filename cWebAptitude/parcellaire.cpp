@@ -321,7 +321,6 @@ void parcellaire::fuChanged(){
     uploadButton->enable();
 }
 
-
 void parcellaire::upload(){
     //std::cout << "upload commence.. " ;
     computeStatButton->disable();
@@ -403,8 +402,12 @@ void parcellaire::visuStat(std::string aTitle){
     mStatW->clear();
     //std::cout << " done... " ;
     mStatW->setOverflow(Wt::Overflow::Auto);
+    // un set layout dans un widget qui a déjà un layout en parent, ça peut être bien (cas de page1 ; comportement voulu) ou pas (page2 aka statW ; pas bien)
+    // je crée un containeur qui contiendra la page et ça regle mon problème
+    Wt::WContainerWidget *cont = mStatW->addNew<Wt::WContainerWidget>();
     // premier lay pour mettre titre et boutton de "retour"
-    auto layout = mStatW->setLayout(Wt::cpp14::make_unique<Wt::WVBoxLayout>());
+    Wt::WVBoxLayout * layout =  cont->setLayout(Wt::cpp14::make_unique<Wt::WVBoxLayout>());
+    //Wt::WVBoxLayout * layout = mStatW->setLayout(Wt::cpp14::make_unique<Wt::WVBoxLayout>());
     auto contTitre = Wt::cpp14::make_unique<Wt::WContainerWidget>();
     WContainerWidget * contTitre_ = contTitre.get();
     contTitre->addWidget(cpp14::make_unique<WText>(aTitle));
@@ -430,15 +433,16 @@ void parcellaire::visuStat(std::string aTitle){
     //for (layerStatChart * chart : mGL->ptrVLStat()) {
     for (layerStatChart * chart : mGL->ptrVLStat()) {
         std::cout << " row " << row << " , col " << column << std::endl;
+        if (chart->deserveChart()){
         grid->addWidget(std::unique_ptr<Wt::WContainerWidget>(chart->getChart()), row, column);
         column++;
         if (column>nbColumn){row++;column=0;}
-
+        }
         mGL->mPBar->setValue(mGL->mPBar->value()+1);
         mGL->m_app->processEvents();
     }
     layout->addWidget(std::move(contTitre), 0);
-    layout->addWidget(std::move(contCharts), 1);
+    layout->addWidget(std::move(contCharts), 0);
     std::cout << " change tostack index... " ;
     mTopStack->setCurrentIndex(1);
     mGL->mPBar->setValue(0);

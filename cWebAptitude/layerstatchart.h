@@ -50,6 +50,7 @@ public:
     }
     Wt::WContainerWidget * getChart();
     Chart::WPieChart * mChart;
+    bool deserveChart(){return mStatSimple.size()>0;}
 private:
     std::shared_ptr<WStandardItemModel> mModel;
     //Layer * mLay;
