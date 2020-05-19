@@ -15,8 +15,6 @@ cDicoApt::cDicoApt(std::string aBDFile):mBDpath(aBDFile)
 
     }*/
 
-
-
    /* backend::Sqlite3 sqlite3(mBDpath);
     Session session;
     //setConnection (std::unique_ptr< SqlConnection > connection)
@@ -59,7 +57,7 @@ cDicoApt::cDicoApt(std::string aBDFile):mBDpath(aBDFile)
             }
         }
 
-        SQLstring="SELECT raster_val,NH FROM dico_raster_nh;";
+        SQLstring="SELECT raster_val,NH,posEco FROM dico_raster_nh;";
         sqlite3_reset(stmt);
         sqlite3_prepare_v2( db_, SQLstring.c_str(), -1, &stmt, NULL );
         while(sqlite3_step(stmt) == SQLITE_ROW)
@@ -68,6 +66,8 @@ cDicoApt::cDicoApt(std::string aBDFile):mBDpath(aBDFile)
                 std::string aA=std::string( (char *)sqlite3_column_text( stmt, 1 ) );
                 int aB=sqlite3_column_int( stmt, 0 );
                 Dico_NH.emplace(std::make_pair(aB,aA));
+                if (sqlite3_column_type(stmt, 2)!=SQLITE_NULL){ Dico_NHposEco.emplace(std::make_pair(aB,sqlite3_column_int( stmt, 2 )));}
+
             }
         }
 
@@ -154,7 +154,7 @@ cDicoApt::cDicoApt(std::string aBDFile):mBDpath(aBDFile)
             }
         }
 
-        SQLstring="SELECT Code_Aptitude,Num,Equiv2Code,OrdreContrainte,Aptitude,col FROM dico_apt;";
+        SQLstring="SELECT Code_Aptitude,Num,Equiv2Code,OrdreContrainte,Aptitude,col,surcote,souscote FROM dico_apt;";
         sqlite3_reset(stmt);
         sqlite3_prepare_v2( db_, SQLstring.c_str(), -1, &stmt, NULL );
         while(sqlite3_step(stmt) == SQLITE_ROW)
@@ -166,12 +166,17 @@ cDicoApt::cDicoApt(std::string aBDFile):mBDpath(aBDFile)
                 int aD=sqlite3_column_int( stmt, 3 );
                 std::string aE=std::string( (char *)sqlite3_column_text( stmt, 4 ) );
                 std::string aF=std::string( (char *)sqlite3_column_text( stmt, 5 ) );
+                 int aG=sqlite3_column_int( stmt, 6 );
+                 int aH=sqlite3_column_int( stmt, 7 );
                 Dico_Apt.emplace(std::make_pair(aA,aB));
                 Dico_code2Apt.emplace(std::make_pair(aB,aA));
                 Dico_AptDouble2AptContr.emplace(std::make_pair(aB,aC));
                 Dico_Apt2OrdreContr.emplace(std::make_pair(aB,aD));
                 Dico_code2AptFull.emplace(std::make_pair(aB,aE));
                 Dico_codeApt2col.emplace(std::make_pair(aB,getColor(aF)));
+
+                Dico_AptSurcote.emplace(std::make_pair(aB,aG));
+                Dico_AptSouscote.emplace(std::make_pair(aB,aH));
             }
         }
         SQLstring="SELECT Code,Nom,NomCol FROM dico_caracteristiqueCS;";
@@ -723,7 +728,10 @@ cEss::cEss(std::string aCodeEs,cDicoApt * aDico):mCode(aCodeEs),mNomFR(aDico->co
 
 //effectue la confrontation Apt Zbio et AptHydroTrophiue
 int cEss::getApt(int aCodeNT, int aCodeNH, int aZbio, bool hierachique){
-    int aRes(11); // indéterminé
+    int aRes(12); // indéterminé zone batie ; par défaut
+    if (aCodeNT==0 && aCodeNH!=0){aRes=11;}
+    if (mAptZbio.find(aZbio)==mAptZbio.end()){aRes=11;}// hors belgique ; Indéterminé mais pas zone batie
+
     //int codeNTNH= mDico->NTNH()->at("h"+std::to_string(aCodeNH)+"t"+std::to_string(aCodeNT));
     std::string codeNTNH= "h"+std::to_string(aCodeNH)+"t"+std::to_string(aCodeNT);
     if (mEcoVal.find(aZbio)!=mEcoVal.end()){
@@ -897,3 +905,22 @@ std::string loadBDpath()
     //File >> aRes;
     return aRes;
 }
+
+
+ST::ST(cDicoApt * aDico):mDico(aDico),mNT(666),mNH(666),mZBIO(666),mTOPO(666),mActiveEss(0),HaveEss(0),mSt(0)
+{
+
+}
+
+void ST::vider()
+{
+    mNT=666;
+    mNH=666;
+    mZBIO=666;
+    mTOPO=666;
+    mActiveEss=0;
+    HaveEss=0;
+    mSt=666;
+}
+
+

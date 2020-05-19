@@ -41,37 +41,6 @@ enum TypeClassifST {FEE
 
 using namespace Wt;
 
-
-class ST{
-public:
-    ST(cDicoApt * aDico);
-    void vider();
-    std::string NH(){ return mDico->NH(mNH);}
-    std::string NT(){ return mDico->NT(mNT);}
-    std::string TOPO(){ return mDico->TOPO(mTOPO);}
-    std::string ZBIO(){ return mDico->ZBIO(mZBIO);}
-    std::string STATION(){return mDico->station(mZBIO,mSt);}
-
-    bool hasNH(){ return mDico->NH()->find(mNH)!=mDico->NH()->end();}
-    bool hasNT(){ return mDico->NT()->find(mNT)!=mDico->NT()->end();}
-    bool hasZBIO(){ return mDico->ZBIO()->find(mZBIO)!=mDico->ZBIO()->end();}
-    bool hasTOPO(){ return mDico->topo()->find(mTOPO)!=mDico->topo()->end();}
-    bool hasST(){ return mDico->station(mZBIO,mSt)!="not found";}
-    bool readyFEE(){ return hasNH() && hasNT() && hasZBIO() && hasTOPO();}
-    bool readyCS(){ return hasZBIO() && hasST();}
-    bool hasEss(){ return HaveEss;}
-
-    int mNH,mNT,mZBIO,mTOPO;
-    bool HaveEss;
-    cEss * mActiveEss; // l'essence qui intéresse l'utilisateur
-    cDicoApt * mDico;
-    // catalogue de station
-    int mSt;
-private:
-
-};
-
-
 class selectLayers : public WContainerWidget{
 public:
     selectLayers(Wt::WContainerWidget * aParent, std::vector<Layer*> aVpLs,int aMax):mParent(aParent),mVpLs(aVpLs),nbMax(aMax){}

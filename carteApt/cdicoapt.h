@@ -31,6 +31,7 @@ class cDicoApt;
 class cEss; // avec les aptitudes de l'essence
 class cKKCS; // ce qui caractérise les stations ; potentiel sylvicole, facteur écologique, risques
 class cRasterInfo; // ça aurait du être une classe mère ou membre de cEss et cKKCS mais je l'implémente après, c'est pour avoir les info à propose des rasters FEE ; NT, NH, Topo, AE, SS
+class ST;
 
 class color
 {
@@ -180,7 +181,7 @@ public:
     // savoir si il faut utiliser la situation topo comme facteur de compensation ou d'aggravation
     bool hasRisqueComp(int zbio,int topo);
 
-
+    cDicoApt * Dico(){return mDico;}
     std::string printRisque();
 
     TypeCarte Type(){return mType;}
@@ -242,6 +243,13 @@ public:
         if (Dico_NH.find(aCode)!=Dico_NH.end()){aRes=Dico_NH.at(aCode);}
         return aRes;
     }
+
+    int posEcoNH(int aCode){
+        int aRes(0);
+        if (Dico_NHposEco.find(aCode)!=Dico_NHposEco.end()){aRes=Dico_NHposEco.at(aCode);}
+        return aRes;
+    }
+
     std::string ZBIO(int aCode){
         std::string aRes("not found");
         if (Dico_ZBIO.find(aCode)!=Dico_ZBIO.end()){aRes=Dico_ZBIO.at(aCode);}
@@ -326,14 +334,14 @@ public:
     // on améliore l'aptitude car facteur de compensation
 
     int AptSurcote(int aCode){
-        int aRes(AptContraignante(aCode));
-        if (aRes>1){aRes--;}
+        int aRes(aCode);
+        if (Dico_AptSurcote.find(aCode)!=Dico_AptSurcote.end()){aRes=Dico_AptSurcote.at(aCode);}
         return aRes;
     }
     // on dégrade l'aptitude car facteur agravant
     int AptSouscote(int aCode){
-        int aRes(AptContraignante(aCode));
-        if (aRes<4){aRes++;}
+        int aRes(aCode);
+        if (Dico_AptSouscote.find(aCode)!=Dico_AptSouscote.end()){aRes=Dico_AptSouscote.at(aCode);}
         return aRes;
     }
     /* int AptCorrig(int aCode){
@@ -360,7 +368,7 @@ public:
     }
 
     int orderContrainteApt(int aCode){
-        int aRes(11);
+        int aRes(12);
         if (Dico_Apt2OrdreContr.find(aCode)!=Dico_Apt2OrdreContr.end()){aRes=Dico_Apt2OrdreContr.at(aCode);}
         return aRes;
     }
@@ -404,6 +412,8 @@ private:
     std::map<std::string,std::string>  Dico_RasterNomComplet;
     std::map<int,std::string>  Dico_ZBIO;
     std::map<int,std::string>  Dico_NH;
+    // code NH vers position Y dans l'écogramme
+   std::map<int,int>  Dico_NHposEco;
     std::map<int,std::string>  Dico_NT;
     std::map<int,std::string>  Dico_code2NTNH;
     std::map<std::string,int>  Dico_NTNH2Code;
@@ -411,6 +421,8 @@ private:
     std::map<int,std::string>  Dico_code2Apt;
     std::map<int,std::string> Dico_code2AptFull;
     std::map<int,int>  Dico_AptDouble2AptContr;
+    std::map<int,int>  Dico_AptSouscote;
+    std::map<int,int>  Dico_AptSurcote;
     // les codes aptitudes sont classé dans un ordre fonction de la contrainte, permet de comparer deux aptitude
     std::map<int,int>  Dico_Apt2OrdreContr;
     // clé 1 : zbio, clé 2: id station,value ; nom de la sation cartograhique
@@ -433,6 +445,35 @@ private:
     std::map<int,color> Dico_codeApt2col;
 
     sqlite3 *db_;
+
+};
+
+class ST{
+public:
+    ST(cDicoApt * aDico);
+    void vider();
+    std::string NH(){ return mDico->NH(mNH);}
+    std::string NT(){ return mDico->NT(mNT);}
+    std::string TOPO(){ return mDico->TOPO(mTOPO);}
+    std::string ZBIO(){ return mDico->ZBIO(mZBIO);}
+    std::string STATION(){return mDico->station(mZBIO,mSt);}
+
+    bool hasNH(){ return (mDico->NH()->find(mNH)!=mDico->NH()->end()) && mNH!=0;}
+    bool hasNT(){ return mDico->NT()->find(mNT)!=mDico->NT()->end();}
+    bool hasZBIO(){ return mDico->ZBIO()->find(mZBIO)!=mDico->ZBIO()->end();}
+    bool hasTOPO(){ return mDico->topo()->find(mTOPO)!=mDico->topo()->end();}
+    bool hasST(){ return mDico->station(mZBIO,mSt)!="not found";}
+    bool readyFEE(){ return hasNH() && hasNT() && hasZBIO() && hasTOPO();}
+    bool readyCS(){ return hasZBIO() && hasST();}
+    bool hasEss(){ return HaveEss;}
+
+    int mNH,mNT,mZBIO,mTOPO;
+    bool HaveEss;
+    cEss * mActiveEss; // l'essence qui intéresse l'utilisateur
+    cDicoApt * mDico;
+    // catalogue de station
+    int mSt;
+private:
 
 };
 #endif // CDICOAPT_H

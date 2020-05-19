@@ -22,6 +22,7 @@ class cApliCarteApt
 {
 public:
     cApliCarteApt(cDicoApt * aDico);
+    ~cApliCarteApt();
     void carteAptFEE(cEss * aEss, std::string aOut, bool force=false);
     void carteAptCS(cEss * aEss, std::string aOut, bool force=false);
     void carteKKCS(cKKCS * aKK, std::string aOut, bool force=false);

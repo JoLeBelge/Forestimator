@@ -77,6 +77,21 @@ cApliCarteApt::cApliCarteApt(cDicoApt *aDico):dico(aDico)
     CS10Band = poDatCS10->GetRasterBand( 1 );
 }
 
+
+cApliCarteApt::~cApliCarteApt()
+{
+    std::cout << "destructeur de c appli Carte Apt " << std::endl;
+    if( poDatCS1 != NULL ){GDALClose( poDatCS1 );}
+    if( poDatCS2 != NULL ){GDALClose( poDatCS2 );}
+    if( poDatCS3 != NULL ){GDALClose( poDatCS3 );}
+    if( poDatCS10 != NULL ){GDALClose( poDatCS10 );}
+    if( poDatTopo != NULL ){GDALClose( poDatTopo );}
+    if( poDatNH != NULL ){GDALClose( poDatNH);}
+    if( poDatNT != NULL ){GDALClose(poDatNT);}
+    if( poDatZBIO != NULL ){GDALClose( poDatZBIO);}
+}
+
+
 void cApliCarteApt::carteAptFEE(cEss * aEss, std::string aOut, bool force)
 {
     if (aEss->hasFEEApt() && (!exists(aOut) | force)){
@@ -167,7 +182,11 @@ void cApliCarteApt::carteAptFEE(cEss * aEss, std::string aOut, bool force)
 
             if (row%step==0){std::cout<< std::endl;}
         }
-
+        CPLFree(scanline);
+        CPLFree(scanlineNT);
+        CPLFree(scanlineNH);
+        CPLFree(scanlineZBIO);
+        CPLFree(scanlineTopo);
         /* Once we're done, close properly the dataset */
         if( poDstDS != NULL ){ GDALClose( (GDALDatasetH) poDstDS );}
 
@@ -407,6 +426,7 @@ void cApliCarteApt::cropIm(std::string input, std::string output, double topLeft
         pCroppedRaster->GetRasterBand(1)->RasterIO( GF_Write, 0, row, xSize,1, scanline, xSize, 1,GDT_Float32, 0, 0 );
     }
     if( pCroppedRaster != NULL ){GDALClose( (GDALDatasetH) pCroppedRaster );}
+    GDALClose( pInputRaster );
 }
 
 void cApliCarteApt::cropImWithPol(std::string inputRaster, std::string inputVector, std::string aOut){
@@ -483,8 +503,9 @@ void cApliCarteApt::toPol(std::string input, std::string output)
     GDALDataset *poDS2;
     //poDS2=GDALVectorTranslate(outPath2,NULL,1,tmp,NULL,NULL);
     */
-
+    delete spatialReference;
     GDALClose( poDS );
+    GDALClose(pInputRaster);
 }
 
 
@@ -581,7 +602,6 @@ void cApliCarteApt::toPNG(std::string input, std::string output,TypeCarte aType)
     scanline = (float *) CPLMalloc( sizeof( float ) *   aX);
     scanline2 = (float *) CPLMalloc( sizeof( float ) *   aX);
     scanline3 = (float *) CPLMalloc( sizeof( float ) *   aX);
-
     scanline4 = (float *) CPLMalloc( sizeof( float ) *   aX);
 
     // boucle sur les pixels
@@ -603,13 +623,19 @@ void cApliCarteApt::toPNG(std::string input, std::string output,TypeCarte aType)
             case Apt:{
                 aVal=dico->AptContraignante(aVal);
                 // optimum
-                if (aVal==1) {dico->colors.at("O").set(aRes1,aRes2,aRes3);}
+                if (aVal==1) {dico->getColor("O").set(aRes1,aRes2,aRes3);}
                 // tolérance
-                if (aVal==2) {dico->colors.at("T").set(aRes1,aRes2,aRes3);}
+                if (aVal==2) {dico->getColor("T").set(aRes1,aRes2,aRes3);}
                 // tol élargie
-                if (aVal==3) {dico->colors.at("TE").set(aRes1,aRes2,aRes3);}
+                if (aVal==3) {dico->getColor("TE").set(aRes1,aRes2,aRes3);}
                 // exclusion
-                if (aVal==4) {dico->colors.at("E").set(aRes1,aRes2,aRes3);}
+                if (aVal==4) {dico->getColor("E").set(aRes1,aRes2,aRes3);}
+                // zone batie
+                if (aVal==12) {dico->getColor("grisc1").set(aRes1,aRes2,aRes3);}
+                // indeterminé
+                if (aVal==11) {dico->getColor("grisc1").set(aRes1,aRes2,aRes3);}
+
+                //Apt2col permettrai de résumer tout ça en une ligne
                 break;
             }
 
@@ -737,9 +763,14 @@ void cApliCarteApt::toPNG(std::string input, std::string output,TypeCarte aType)
         maskBand->RasterIO( GF_Write, 0, row, aX, 1, scanline4, aX, 1,GDT_Float32, 0, 0 );
     }
 
+
     // maintenant je crée une copy png du résultat
     pOutRaster = pDriverPNG->CreateCopy(out, pTmpRaster, FALSE, NULL, NULL, NULL);
 
+    CPLFree(scanline);
+    CPLFree(scanline2);
+    CPLFree(scanline3);
+    CPLFree(scanline4);
     GDALClose( pTmpRaster );
     GDALClose( pOutRaster );
     GDALClose( pInputRaster );

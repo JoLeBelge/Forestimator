@@ -552,22 +552,3 @@ std::vector<rasterFiles> selectLayers::getSelectedRaster(){
     }
     return aRes;
 }
-
-
-ST::ST(cDicoApt * aDico):mDico(aDico),mNT(666),mNH(666),mZBIO(666),mTOPO(666),mActiveEss(0),HaveEss(0),mSt(0)
-{
-
-}
-
-void ST::vider()
-{
-    mNT=666;
-    mNH=666;
-    mZBIO=666;
-    mTOPO=666;
-    mActiveEss=0;
-    HaveEss=0;
-    mSt=666;
-}
-
-

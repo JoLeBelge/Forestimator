@@ -155,12 +155,13 @@ void Layer::displayLayer() const{
         std::stringstream ss;
         std::string aFileIn(mDico->File("addOLraster"));
         std::ifstream in(aFileIn);
-        std::string aTmp(aFileIn+".tmp");
-        std::ofstream out(aTmp);
+        ss << in.rdbuf();
+        in.close();
+        std::string JScommand(ss.str());
         // remplace l'url des tuiles par celui de l'essence actuelle:
         std::string aFind1("CODE1");
         std::string aFind2("CODE2");
-        std::string line;
+        //std::string line;
         std::string Replace1(""),Replace2("");
 
         switch (mType) {
@@ -181,7 +182,9 @@ void Layer::displayLayer() const{
             break;
         }
 
-        while (getline(in, line))
+        boost::replace_all(JScommand,aFind1,Replace1);
+        boost::replace_all(JScommand,aFind2,Replace2);
+      /*  while (getline(in, line))
         {
             boost::replace_all(line,aFind1,Replace1);
             boost::replace_all(line,aFind2,Replace2);
@@ -193,11 +196,11 @@ void Layer::displayLayer() const{
         in.open(aFileIn+".tmp");
         ss << in.rdbuf();
         in.close();  
-        mText->doJavaScript(ss.str());// c'est peut-être plutôt la carte qui dois faire le doJavascript, pas le label text...
+        */
+        mText->doJavaScript(JScommand);// c'est peut-être plutôt la carte qui dois faire le doJavascript, pas le label text...
         //std::cout << ss.str() << std::endl;
         break;
     }
-
     }
     //std::cout << "done " << std::endl;
 

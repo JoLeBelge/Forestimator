@@ -14,6 +14,8 @@ parcellaire = new ol.layer.Vector({
 	  })
 });
 
+// c'est pas correct, car si c'est la carte IGN qui est visible mais que la couche apt2 a été défine auparavent, ça ne va pas afficher la carte IGN.
+
 if (typeof apt2 !== 'undefined') {
     // the variable is defined
     groupe = new ol.layer.Group({
