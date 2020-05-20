@@ -41,7 +41,7 @@ public:
     void toPol(std::string input, std::string output);
 
     void shptoGeoJSON(std::string input, std::string output);
-private:
+
 private:
     cDicoApt * dico;
     // toute les couches ont la même résolution et le même extend.

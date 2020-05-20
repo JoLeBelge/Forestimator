@@ -3,6 +3,9 @@
 #include "cdicoapt.h"
 #include "caplicarteapt.h"
 
+#include "cdicocarteph.h"
+#include "capplicarteph.h"
+
 
 using namespace std;
 
@@ -10,6 +13,7 @@ int main(int argc, char *argv[])
 {
 
 
+    cAppliCartepH aAPH=cAppliCartepH();
 
     // lecture de toutes les table dictionnaires
     cDicoApt dico(dirBD);
@@ -57,7 +61,7 @@ int main(int argc, char *argv[])
     //aACA.createTile(HE.NomCarteAptFEE(),HE.NomDirTuileAptFEE(),Apt,true);
 
 
-if (1){
+if (0){
 
 /*
 

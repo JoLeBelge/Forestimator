@@ -104,11 +104,11 @@ void cApliCarteApt::carteAptFEE(cEss * aEss, std::string aOut, bool force)
         if( poDriver == NULL )
             exit( 1 );
         papszMetadata = poDriver->GetMetadata();
-        if( CSLFetchBoolean( papszMetadata, GDAL_DCAP_CREATE, FALSE ) )
+        /*if( CSLFetchBoolean( papszMetadata, GDAL_DCAP_CREATE, FALSE ) )
             printf( "Driver %s supports Create() method.\n", pszFormat );
         if( CSLFetchBoolean( papszMetadata, GDAL_DCAP_CREATECOPY, FALSE ) )
             printf( "Driver %s supports CreateCopy() method.\n", pszFormat );
-
+        */
         //std::string destFile("/home/lisein/Documents/carteApt/tutoGDAL/output/test.tif");
 
         // 2 méthodes de création; createCopy() et creaty(). create plus complexe. ne fonctionne pas avec tout les drivers
