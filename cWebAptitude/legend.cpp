@@ -135,11 +135,13 @@ void legend::afficheLegendeIndiv(const Layer * l){
         mLegendIndiv->elementAt(row,0)->addWidget(cpp14::make_unique<WText>("<h4>"+l->getLegendLabel()+"</h4>"));
         row++;
         for (auto kv : *l->mDicoVal){
+            if (l->hasColor(kv.first)){
             color col = l->getColor(kv.first);
             mLegendIndiv->elementAt(row, 0)->addWidget(cpp14::make_unique<WText>(kv.second));
             mLegendIndiv->elementAt(row, 1)->setWidth("40%");
             mLegendIndiv->elementAt(row, 1)->decorationStyle().setBackgroundColor(WColor(col.mR,col.mG,col.mB));
             row++;
+            }
         }
     }
 }

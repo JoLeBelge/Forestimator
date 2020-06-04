@@ -31,7 +31,7 @@ cAppliCartepH::cAppliCartepH()
     x=ZBIOBand->GetXSize();
     y=ZBIOBand->GetYSize();
 
-    std::string aOut(dico->File("OUTDIR")+"cartepH2020");
+    std::string aOut(dico->File("OUTDIR")+"cartepH2020.tif");
     cartepH(aOut);
 
 }

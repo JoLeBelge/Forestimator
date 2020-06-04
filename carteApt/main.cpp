@@ -1,5 +1,3 @@
-
-
 #include "cdicoapt.h"
 #include "caplicarteapt.h"
 
@@ -12,9 +10,7 @@ using namespace std;
 int main(int argc, char *argv[])
 {
 
-
-    cAppliCartepH aAPH=cAppliCartepH();
-
+    //cAppliCartepH aAPH=cAppliCartepH();
     // lecture de toutes les table dictionnaires
     cDicoApt dico(dirBD);
     std::map<std::string,cEss> aMEss;
@@ -103,6 +99,9 @@ if (0){
         */
 
     //aACA.tiletoPNG("/home/lisein/Documents/carteApt/tutoWtANDOpenlayer/build-WebAptitude/test");
+
+    // creation des tuiles pour le MNH photogrammétrique qui est en 2 mètres de résolution -- pas comme les autres cartes!
+     //aACA.createTile("/home/lisein/Documents/carteApt/GIS/mnh_2019.tif","/home/lisein/Documents/carteApt/Forestimator/build-WebAptitude/Tuiles/MNH2019",MNH2019,true);
 
     return 0;
 }

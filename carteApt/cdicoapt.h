@@ -19,13 +19,27 @@
 
 //using namespace Wt::Dbo;
 
-enum TypeCarte {Apt, Potentiel, Station1, Habitats,NH,NT,Topo,AE,SS,ZBIO,CSArdenne,CSLorraine};
+enum TypeCarte {Apt, Potentiel, Station1, Habitats,NH,NT,Topo,AE,SS,ZBIO,CSArdenne,CSLorraine,MNH2019};
+
+enum class TypeVar {Classe,
+                    Continu
+                     };
+
+enum class TypeLayer {Apti // aptitude des essences
+                      ,KK // les cartes dérivées des CS
+                      ,Thematique // lié à la description de la station ; NH NT ZBIO
+                      ,Externe // toutes les cartes qui ne sont pas en local ; carte IGN pour commencer
+                      ,Peuplement // description du peuplement en place
+                     };
 
 std::string loadBDpath();
 
 TypeCarte str2TypeCarte(const std::string& str);
+TypeVar str2TypeVar(const std::string& str);
+TypeLayer str2TypeLayer(const std::string& str);
 
 extern std::string dirBD;
+class WMSinfo;
 class color;
 class cDicoApt;
 class cEss; // avec les aptitudes de l'essence
@@ -33,10 +47,24 @@ class cKKCS; // ce qui caractérise les stations ; potentiel sylvicole, facteur 
 class cRasterInfo; // ça aurait du être une classe mère ou membre de cEss et cKKCS mais je l'implémente après, c'est pour avoir les info à propose des rasters FEE ; NT, NH, Topo, AE, SS
 class ST;
 
+class WMSinfo
+{
+   public:
+    WMSinfo():mUrl(""),mLayerName("toto"){}
+    WMSinfo(std::string url,std::string layer):mUrl(url),mLayerName(layer){}
+    std::string mUrl, mLayerName;
+};
+
 class color
 {
 public:
     color(int R,int G,int B):mR(R),mG(G),mB(B){}
+    color(std::string aHex){
+        // j'enlève le diaise qui semble ne pas convenir
+        const char* c=aHex.substr(1,aHex.size()).c_str();
+        sscanf(c, "%02x%02x%02x", &mR, &mG, &mB);
+        //std::cout << std::to_string(mR) << ";" <<std::to_string(mG) << ";" <<std::to_string(mB) << std::endl;
+    }
     int mR,mG,mB;
     void set(int &R,int &G,int &B){
         R=mR;
@@ -59,8 +87,14 @@ public:
     TypeCarte Type(){return mType;}
     std::map<int, std::string> * getDicoVal(){return &mDicoVal;}
     std::map<int, color>  getDicoCol(){return mDicoCol;}
+
+    TypeVar getTypeVar() const{return mTypeVar;}
+    TypeLayer getCatLayer() const{return mTypeLayer;}
+
 private:
     TypeCarte mType;
+    TypeVar mTypeVar; // var continue ou discontinue, pour le calcul de statistique
+    TypeLayer mTypeLayer;
     cDicoApt * mDico;
     std::string mCode, mNom,mPathRaster;
     // le dictionnaire des valeurs raster vers leur signification.
@@ -202,6 +236,8 @@ public:
     std::map<std::string,std::string>  * Files(){return  &Dico_GISfile;}
     // code carte vers type carte code : NH.tif
     std::map<std::string,std::string>  * RasterType(){return  &Dico_RasterType;}
+    std::map<std::string,std::string>  * RasterVar(){return  &Dico_RasterVar;}
+    std::map<std::string,std::string>  * RasterLayer(){return  &Dico_RasterLayer;}
     std::map<std::string,std::string>  * RasterNom(){return  &Dico_RasterNomComplet;}
     std::map<std::string,std::string>  * code2Nom(){return  &Dico_code2NomFR;}
     std::map<int,std::string>  * NH(){return  &Dico_NH;}
@@ -373,6 +409,24 @@ public:
         return aRes;
     }
 
+    // hauteur en mètres de la couche MNH2019 que j'ai convertie en 8bits
+    double H(int aVal){
+        double aRes(0.0);
+        if (aVal<255 && aVal>0){aRes=aVal/5;}
+        return aVal;
+    }
+
+    bool hasWMSinfo(std::string aCode){
+        return Dico_WMS.find(aCode)!=Dico_WMS.end();
+    }
+    WMSinfo getWMSinfo(std::string aCode){
+        WMSinfo aRes;
+        if (Dico_WMS.find(aCode)!=Dico_WMS.end()){
+            aRes=Dico_WMS.at(aCode);
+        };
+        return aRes;
+    }
+
     std::map<int,std::map<std::string,int>> getFEEApt(std::string aCodeEs);
     std::map<int,int> getZBIOApt(std::string aCodeEs);
     std::map<int,std::map<int,int>> getRisqueTopo(std::string aCodeEs);
@@ -409,7 +463,13 @@ private:
 
     std::map<std::string,std::string>  Dico_GISfile;
     std::map<std::string,std::string>  Dico_RasterType;
+    // continu vs classe
+    std::map<std::string,std::string>  Dico_RasterVar;
+    // description peuplement vs description station
+    std::map<std::string,std::string>  Dico_RasterLayer;
     std::map<std::string,std::string>  Dico_RasterNomComplet;
+    // key ; code le la couche layer. value ; les infos nécessaire pour charger le wms
+    std::map<std::string,WMSinfo>  Dico_WMS;
     std::map<int,std::string>  Dico_ZBIO;
     std::map<int,std::string>  Dico_NH;
     // code NH vers position Y dans l'écogramme
