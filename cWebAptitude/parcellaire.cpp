@@ -283,13 +283,16 @@ void parcellaire::display(){
         std::string aFileIn(mJSfile);
 
         std::ifstream in(aFileIn);
-        std::string aTmp(aFileIn+".tmp");
-        std::ofstream out(aTmp);
+        //std::string aTmp(aFileIn+".tmp");
+        //std::ofstream out(aTmp);
+        ss << in.rdbuf();
+        in.close();
+        std::string JScommand(ss.str());
 
         std::string aFind1("NAME");
-        std::string line;
+        //std::string line;
         std::string aReplace(geoJsonRelName());
-        while (getline(in, line))
+        /*while (getline(in, line))
         {
             boost::replace_all(line,aFind1,aReplace);
             out << line << "\n";
@@ -302,7 +305,9 @@ void parcellaire::display(){
         in.close();
         boost::filesystem::remove(aFileIn+".tmp");
         //std::cout << " do js script " << std::endl;
-        mParent->doJavaScript(ss.str());
+        */
+        boost::replace_all(JScommand,aFind1,aReplace);
+        mParent->doJavaScript(JScommand);
         // centrer la map sur le shp
         mParent->doJavaScript("map.getView().setCenter(["+std::to_string(centerX)+","+std::to_string(centerY)+" ]);");
     } else {

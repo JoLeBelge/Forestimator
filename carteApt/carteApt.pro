@@ -6,7 +6,9 @@ TARGET = carteApt
 
 SOURCES += main.cpp \
            cdicoapt.cpp \
-    caplicarteapt.cpp
+    caplicarteapt.cpp \
+    cdicocarteph.cpp \
+    capplicarteph.cpp
 
 LIBS += -lgdal -lsqlite3 -lboost_system -lboost_filesystem
 
@@ -26,5 +28,7 @@ DEPENDPATH += $$PWD/../../../../../../../../../usr/lib/x86_64-linux-gnu
 
 HEADERS += \
     cdicoapt.h \
-    caplicarteapt.h
+    caplicarteapt.h \
+    cdicocarteph.h \
+    capplicarteph.h
 

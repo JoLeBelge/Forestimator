@@ -5,6 +5,7 @@ if (typeof parcellaire !== 'undefined') {
 		'title': 'parcellaire',
 		attributions: 'Gembloux Agro-Bio Tech',
 		 layers:[TOREPLACE, parcellaire, station]});
+TOREPLACE.setVisible(true);
 } else {
 groupe = new ol.layer.Group({
 		'title': 'aptitude',

@@ -23,6 +23,7 @@
 #include <sys/stat.h>
 #include <fstream>
 #include <boost/algorithm/string/replace.hpp>
+#include "ecogrammeEss.h"
 
 
 class legend;
@@ -48,10 +49,11 @@ public:
     Wt::WTable                 *mLegendIndiv;
     Wt::WTable                 *mAptAllEss;
 
+    EcogrammeEss       *mEcoEss;
+
     Wt::WContainerWidget     * mParent;
 private:
-
-    //Wt::WWidget     * mParent;
+    Wt::WContainerWidget     * mContEco;
     groupLayers*mGL;
     Wt::WText                  *titre_;
     cDicoApt * mDico;

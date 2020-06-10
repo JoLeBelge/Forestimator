@@ -39,11 +39,7 @@ inline bool exists (const std::string& name){
 
 
 
-enum class TypeLayer {Apti
-                      ,KK // les cartes dérivées des CS
-                      ,Thematique // toutes les autres ; NH NT ZBIO
-                      ,Externe // toutes les cartes qui ne sont pas en local ; carte IGN pour commencer
-                     };
+
 
 
 class rasterFiles{
@@ -72,7 +68,7 @@ private:
 class Layer
 {
 public:
-    Layer(groupLayers * aGroupL, std::string aCode,WText * PWText,TypeLayer aType=TypeLayer::Apti);
+    Layer(groupLayers * aGroupL, std::string aCode, WText * PWText, TypeLayer aType=TypeLayer::Apti);
     Layer(groupLayers * aGroupL, cEss aEss ,WText * PWText);
 
     // constructeur par copie et par déplacement ; indispensable si j'utilise les objets dans un vecteur. http://www-h.eng.cam.ac.uk/help/tpl/languages/C++/morevectormemory.html
@@ -93,6 +89,7 @@ public:
         mCode=lay.mCode;
         mDicoCol=lay.mDicoCol;
         mDicoVal=lay.mDicoVal;
+        mTypeVar=lay.mTypeVar;
         switch (mType) {
         case TypeLayer::Apti:
             mEss=new cEss(mCode,mDico);
@@ -122,6 +119,7 @@ public:
         mCode=lay.mCode;
         mDicoCol=lay.mDicoCol;
         mDicoVal=lay.mDicoVal;
+        mTypeVar=lay.mTypeVar;
         switch (mType) {
         case TypeLayer::Apti:
             mEss=new cEss(mCode,mDico);
@@ -155,7 +153,13 @@ public:
     bool cropIm(std::string aOut);
     void setActive(bool b=true);
     bool IsActive() const {return mActive;}
-    std::string getCode(){return mCode;}
+    std::string getCode() const{return mCode;}
+
+    std::string getFieldName() const{
+        std::string aRes=mCode;
+        if (aRes=="MNH2019"){aRes="TreeCover";}
+        return aRes;
+    }
     std::string getPathTif();
     std::string getLegendLabel() const;
     std::string getShortLabel() const {return mLabel;}
@@ -166,6 +170,7 @@ public:
     std::string getLegendLabel(std::string aMode);
 
     TypeLayer Type() const {return mType;}
+    TypeVar Var() const {return mTypeVar;}
 
     // le dictionnaire des valeurs raster vers leur signification.
     std::map<int, std::string> * mDicoVal;
@@ -175,6 +180,12 @@ public:
     // ce n'est plus un pointeur
     std::map<int, color> mDicoCol;
 
+
+    bool hasColor(int aCode) const{
+        bool aRes(0);
+        if (mDicoCol.find(aCode)!=mDicoCol.end()){aRes=true;}
+        return aRes;
+    }
     color getColor(int aCode) const{
         color aRes(0,0,0);
         if (mDicoCol.find(aCode)!=mDicoCol.end()){
@@ -212,6 +223,7 @@ private:
     bool mActive;
     groupLayers * mGroupL;
     TypeLayer mType;
+    TypeVar mTypeVar;
     cEss * mEss;
     cKKCS * mKK;
     cRasterInfo * mRI;

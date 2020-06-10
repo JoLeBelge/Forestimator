@@ -11,6 +11,13 @@
 using namespace Wt;
 using namespace Wt::Chart;
 
+
+
+#include <iomanip>
+
+std::string dToStr(double d);
+std::string nth_letter(int n);
+
 class layerStat;
 class layerStatChart;
 
@@ -25,16 +32,20 @@ public:
         mStat=ls.mStat;
         mStatSimple=ls.mStatSimple;
         mMode=ls.mMode;
+        mTypeVar=ls.mTypeVar;
     }
 
-    //layerStat():mLay(NULL){} //constructeur vide
     void simplifieStat();
     int getO(bool mergeOT=false);// proportion en optimum
+
+    int getFieldVal(bool mergeOT=false);
 protected:
     Layer * mLay;
+    // key ; classe ou valeur, val ; nombre d'occurence
     std::map<std::string, int> mStat;
     std::map<std::string, int> mStatSimple;
     std::string mMode; // fee vs cs
+    TypeVar mTypeVar; // pour distinguer le type de variable, continue (MNH) ou classes (aptitude)
 };
 
 class layerStatChart : public layerStat

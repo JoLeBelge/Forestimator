@@ -14,19 +14,21 @@ parcellaire = new ol.layer.Vector({
 	  })
 });
 
+// c'est pas correct, car si c'est la carte IGN qui est visible mais que la couche apt2 a été défine auparavent, ça ne va pas afficher la carte IGN.
+
 if (typeof apt2 !== 'undefined') {
     // the variable is defined
     groupe = new ol.layer.Group({
 		'title': 'parcellaire',
 		attributions: 'Gembloux Agro-Bio Tech',
-		 layers:[apt2, parcellaire, station]});
-   
+		 layers:[apt2,IGN, parcellaire, station]});
+if (IGN.getVisible()) {apt2.setVisible(false);}
 } else {
 groupe = new ol.layer.Group({
 		'title': 'parcellaire',
 		attributions: 'Gembloux Agro-Bio Tech',
 		layers:[IGN, parcellaire, station]});
-IGN.setVisible(true);
 }
+
 map.setLayerGroup(groupe);
 //lays4select=[parcellaire];

@@ -77,6 +77,21 @@ cApliCarteApt::cApliCarteApt(cDicoApt *aDico):dico(aDico)
     CS10Band = poDatCS10->GetRasterBand( 1 );
 }
 
+
+cApliCarteApt::~cApliCarteApt()
+{
+    std::cout << "destructeur de c appli Carte Apt " << std::endl;
+    if( poDatCS1 != NULL ){GDALClose( poDatCS1 );}
+    if( poDatCS2 != NULL ){GDALClose( poDatCS2 );}
+    if( poDatCS3 != NULL ){GDALClose( poDatCS3 );}
+    if( poDatCS10 != NULL ){GDALClose( poDatCS10 );}
+    if( poDatTopo != NULL ){GDALClose( poDatTopo );}
+    if( poDatNH != NULL ){GDALClose( poDatNH);}
+    if( poDatNT != NULL ){GDALClose(poDatNT);}
+    if( poDatZBIO != NULL ){GDALClose( poDatZBIO);}
+}
+
+
 void cApliCarteApt::carteAptFEE(cEss * aEss, std::string aOut, bool force)
 {
     if (aEss->hasFEEApt() && (!exists(aOut) | force)){
@@ -89,11 +104,11 @@ void cApliCarteApt::carteAptFEE(cEss * aEss, std::string aOut, bool force)
         if( poDriver == NULL )
             exit( 1 );
         papszMetadata = poDriver->GetMetadata();
-        if( CSLFetchBoolean( papszMetadata, GDAL_DCAP_CREATE, FALSE ) )
+        /*if( CSLFetchBoolean( papszMetadata, GDAL_DCAP_CREATE, FALSE ) )
             printf( "Driver %s supports Create() method.\n", pszFormat );
         if( CSLFetchBoolean( papszMetadata, GDAL_DCAP_CREATECOPY, FALSE ) )
             printf( "Driver %s supports CreateCopy() method.\n", pszFormat );
-
+        */
         //std::string destFile("/home/lisein/Documents/carteApt/tutoGDAL/output/test.tif");
 
         // 2 méthodes de création; createCopy() et creaty(). create plus complexe. ne fonctionne pas avec tout les drivers
@@ -167,7 +182,11 @@ void cApliCarteApt::carteAptFEE(cEss * aEss, std::string aOut, bool force)
 
             if (row%step==0){std::cout<< std::endl;}
         }
-
+        CPLFree(scanline);
+        CPLFree(scanlineNT);
+        CPLFree(scanlineNH);
+        CPLFree(scanlineZBIO);
+        CPLFree(scanlineTopo);
         /* Once we're done, close properly the dataset */
         if( poDstDS != NULL ){ GDALClose( (GDALDatasetH) poDstDS );}
 
@@ -407,6 +426,7 @@ void cApliCarteApt::cropIm(std::string input, std::string output, double topLeft
         pCroppedRaster->GetRasterBand(1)->RasterIO( GF_Write, 0, row, xSize,1, scanline, xSize, 1,GDT_Float32, 0, 0 );
     }
     if( pCroppedRaster != NULL ){GDALClose( (GDALDatasetH) pCroppedRaster );}
+    GDALClose( pInputRaster );
 }
 
 void cApliCarteApt::cropImWithPol(std::string inputRaster, std::string inputVector, std::string aOut){
@@ -483,8 +503,9 @@ void cApliCarteApt::toPol(std::string input, std::string output)
     GDALDataset *poDS2;
     //poDS2=GDALVectorTranslate(outPath2,NULL,1,tmp,NULL,NULL);
     */
-
+    delete spatialReference;
     GDALClose( poDS );
+    GDALClose(pInputRaster);
 }
 
 
@@ -581,7 +602,6 @@ void cApliCarteApt::toPNG(std::string input, std::string output,TypeCarte aType)
     scanline = (float *) CPLMalloc( sizeof( float ) *   aX);
     scanline2 = (float *) CPLMalloc( sizeof( float ) *   aX);
     scanline3 = (float *) CPLMalloc( sizeof( float ) *   aX);
-
     scanline4 = (float *) CPLMalloc( sizeof( float ) *   aX);
 
     // boucle sur les pixels
@@ -603,102 +623,128 @@ void cApliCarteApt::toPNG(std::string input, std::string output,TypeCarte aType)
             case Apt:{
                 aVal=dico->AptContraignante(aVal);
                 // optimum
-                if (aVal==1) {dico->colors.at("O").set(aRes1,aRes2,aRes3);}
+                if (aVal==1) {dico->getColor("O").set(aRes1,aRes2,aRes3);}
                 // tolérance
-                if (aVal==2) {dico->colors.at("T").set(aRes1,aRes2,aRes3);}
+                if (aVal==2) {dico->getColor("T").set(aRes1,aRes2,aRes3);}
                 // tol élargie
-                if (aVal==3) {dico->colors.at("TE").set(aRes1,aRes2,aRes3);}
+                if (aVal==3) {dico->getColor("TE").set(aRes1,aRes2,aRes3);}
                 // exclusion
-                if (aVal==4) {dico->colors.at("E").set(aRes1,aRes2,aRes3);}
+                if (aVal==4) {dico->getColor("E").set(aRes1,aRes2,aRes3);}
+                // zone batie
+                if (aVal==12) {dico->getColor("grisc1").set(aRes1,aRes2,aRes3);}
+                // indeterminé
+                if (aVal==11) {dico->getColor("grisc1").set(aRes1,aRes2,aRes3);}
+                if (aVal==0) {mask=0;}
+
+                //Apt2col permettrai de résumer tout ça en une ligne
                 break;
             }
 
             case AE:{
                 // pas d'apport
-                if (aVal==1) {dico->colors.at("grisc0").set(aRes1,aRes2,aRes3);}
+                if (aVal==1) {dico->getColor("grisc0").set(aRes1,aRes2,aRes3);}
                 // apport var
-                if (aVal==2) {dico->colors.at("bleum2").set(aRes1,aRes2,aRes3);}
+                if (aVal==2) {dico->getColor("bleum2").set(aRes1,aRes2,aRes3);}
                 // apport perm
-                if (aVal==3) {dico->colors.at("bleuf").set(aRes1,aRes2,aRes3);}
+                if (aVal==3) {dico->getColor("bleuf").set(aRes1,aRes2,aRes3);}
+                if (aVal==0) {mask=0;}
                 break;
             }
             case Topo:{
                 // froid
-                if (aVal==1) {dico->colors.at("bleuf").set(aRes1,aRes2,aRes3);}
+                if (aVal==1) {dico->getColor("bleuf").set(aRes1,aRes2,aRes3);}
                 // plateau et faible pente
-                if (aVal==2) {dico->colors.at("grisc0").set(aRes1,aRes2,aRes3);}
+                if (aVal==2) {dico->getColor("grisc0").set(aRes1,aRes2,aRes3);}
                 // chaud
-                if (aVal==3) {dico->colors.at("rouge").set(aRes1,aRes2,aRes3);}
+                if (aVal==3) {dico->getColor("rouge").set(aRes1,aRes2,aRes3);}
                 // fond de vallon
-                if (aVal==4) {dico->colors.at("noir").set(aRes1,aRes2,aRes3);}
+                if (aVal==4) {dico->getColor("noir").set(aRes1,aRes2,aRes3);}
+                if (aVal==0) {mask=0;}
                 break;
             }
             case SS:{
                 // froid
-                if (aVal==1) {dico->colors.at("bleuf").set(aRes1,aRes2,aRes3);}
+                if (aVal==1) {dico->getColor("bleuf").set(aRes1,aRes2,aRes3);}
                 // neutre
-                if (aVal==2) {dico->colors.at("grisc0").set(aRes1,aRes2,aRes3);}
+                if (aVal==2) {dico->getColor("grisc0").set(aRes1,aRes2,aRes3);}
                 // chaud
-                if (aVal==3) {dico->colors.at("rouge").set(aRes1,aRes2,aRes3);}
+                if (aVal==3) {dico->getColor("rouge").set(aRes1,aRes2,aRes3);}
+                if (aVal==0) {mask=0;}
                 break;
             }
 
             case NT:{
 
-                if (aVal==7) {dico->colors.at("ntm3").set(aRes1,aRes2,aRes3);}
-                if (aVal==8) {dico->colors.at("ntm2").set(aRes1,aRes2,aRes3);}
-                if (aVal==9) {dico->colors.at("ntm1").set(aRes1,aRes2,aRes3);}
-                if (aVal==10) {dico->colors.at("nt0").set(aRes1,aRes2,aRes3);}
-                if (aVal==11) {dico->colors.at("nt1").set(aRes1,aRes2,aRes3);}
-                if (aVal==12) {dico->colors.at("nt2").set(aRes1,aRes2,aRes3);}
+                if (aVal==7) {dico->getColor("ntm3").set(aRes1,aRes2,aRes3);}
+                if (aVal==8) {dico->getColor("ntm2").set(aRes1,aRes2,aRes3);}
+                if (aVal==9) {dico->getColor("ntm1").set(aRes1,aRes2,aRes3);}
+                if (aVal==10) {dico->getColor("nt0").set(aRes1,aRes2,aRes3);}
+                if (aVal==11) {dico->getColor("nt1").set(aRes1,aRes2,aRes3);}
+                if (aVal==12) {dico->getColor("nt2").set(aRes1,aRes2,aRes3);}
+                if (aVal==0) {mask=0;}
                 break;
             }
 
             case NH:{
-                if (aVal==7) {dico->colors.at("nhm4").set(aRes1,aRes2,aRes3);}
-                if (aVal==7) {dico->colors.at("nhm3").set(aRes1,aRes2,aRes3);}
-                if (aVal==8) {dico->colors.at("nhm2").set(aRes1,aRes2,aRes3);}
-                if (aVal==9) {dico->colors.at("nhm1").set(aRes1,aRes2,aRes3);}
-                if (aVal==10) {dico->colors.at("nh0").set(aRes1,aRes2,aRes3);}
-                if (aVal==11) {dico->colors.at("nh1").set(aRes1,aRes2,aRes3);}
-                if (aVal==12) {dico->colors.at("nh2").set(aRes1,aRes2,aRes3);}
-                if (aVal==13) {dico->colors.at("nh3").set(aRes1,aRes2,aRes3);}
-                if (aVal==14) {dico->colors.at("nh4").set(aRes1,aRes2,aRes3);}
-                if (aVal==15) {dico->colors.at("nh5").set(aRes1,aRes2,aRes3);}
+                if (aVal==7) {dico->getColor("nhm4").set(aRes1,aRes2,aRes3);}
+                if (aVal==7) {dico->getColor("nhm3").set(aRes1,aRes2,aRes3);}
+                if (aVal==8) {dico->getColor("nhm2").set(aRes1,aRes2,aRes3);}
+                if (aVal==9) {dico->getColor("nhm1").set(aRes1,aRes2,aRes3);}
+                if (aVal==10) {dico->getColor("nh0").set(aRes1,aRes2,aRes3);}
+                if (aVal==11) {dico->getColor("nh1").set(aRes1,aRes2,aRes3);}
+                if (aVal==12) {dico->getColor("nh2").set(aRes1,aRes2,aRes3);}
+                if (aVal==13) {dico->getColor("nh3").set(aRes1,aRes2,aRes3);}
+                if (aVal==14) {dico->getColor("nh4").set(aRes1,aRes2,aRes3);}
+                if (aVal==15) {dico->getColor("nh5").set(aRes1,aRes2,aRes3);}
 
-                if (aVal==16) {dico->colors.at("grisc0").set(aRes1,aRes2,aRes3);}
-                if (aVal==17) {dico->colors.at("grisc1").set(aRes1,aRes2,aRes3);}
-                if (aVal==18) {dico->colors.at("noir").set(aRes1,aRes2,aRes3);}
+                if (aVal==16) {dico->getColor("grisc0").set(aRes1,aRes2,aRes3);}
+                if (aVal==17) {dico->getColor("grisc1").set(aRes1,aRes2,aRes3);}
+                if (aVal==18) {dico->getColor("noir").set(aRes1,aRes2,aRes3);}
+                if (aVal==0) {mask=0;}
                 break;
             }
 
             case Potentiel:{
                 // faible
-                if (aVal==1) {dico->colors.at("faible").set(aRes1,aRes2,aRes3);}
+                if (aVal==1) {dico->getColor("faible").set(aRes1,aRes2,aRes3);}
                 // moyen
-                if (aVal==2) {dico->colors.at("moyen").set(aRes1,aRes2,aRes3);}
+                if (aVal==2) {dico->getColor("moyen").set(aRes1,aRes2,aRes3);}
                 // élevé
-                if (aVal==3) {dico->colors.at("eleve").set(aRes1,aRes2,aRes3);}
+                if (aVal==3) {dico->getColor("eleve").set(aRes1,aRes2,aRes3);}
+                if (aVal==0) {mask=0;}
                 break;
             }
 
             case ZBIO:{
-                if (aVal==3) {dico->colors.at("mauvec1").set(aRes1,aRes2,aRes3);}
-                if (aVal==5) {dico->colors.at("mauvec2").set(aRes1,aRes2,aRes3);}
+                if (aVal==3) {dico->getColor("mauvec1").set(aRes1,aRes2,aRes3);}
+                if (aVal==5) {dico->getColor("mauvec2").set(aRes1,aRes2,aRes3);}
 
-                if (aVal==10) {dico->colors.at("O").set(aRes1,aRes2,aRes3);}
-                if (aVal==1) {dico->colors.at("vertc1").set(aRes1,aRes2,aRes3);}
-                if (aVal==2) {dico->colors.at("vertc2").set(aRes1,aRes2,aRes3);}
+                if (aVal==10) {dico->getColor("O").set(aRes1,aRes2,aRes3);}
+                if (aVal==1) {dico->getColor("vertc1").set(aRes1,aRes2,aRes3);}
+                if (aVal==2) {dico->getColor("vertc2").set(aRes1,aRes2,aRes3);}
 
-                if (aVal==4) {dico->colors.at("bleum2").set(aRes1,aRes2,aRes3);}
-                if (aVal==8) {dico->colors.at("nh5").set(aRes1,aRes2,aRes3);}
-                if (aVal==6) {dico->colors.at("vertcaca").set(aRes1,aRes2,aRes3);}
+                if (aVal==4) {dico->getColor("bleum2").set(aRes1,aRes2,aRes3);}
+                if (aVal==8) {dico->getColor("nh5").set(aRes1,aRes2,aRes3);}
+                if (aVal==6) {dico->getColor("vertcaca").set(aRes1,aRes2,aRes3);}
 
-                if (aVal==7) {dico->colors.at("rouge").set(aRes1,aRes2,aRes3);}
+                if (aVal==7) {dico->getColor("rouge").set(aRes1,aRes2,aRes3);}
 
-                if (aVal==9) {dico->colors.at("bleuf").set(aRes1,aRes2,aRes3);}
-
+                if (aVal==9) {dico->getColor("bleuf").set(aRes1,aRes2,aRes3);}
+                if (aVal==0) {mask=0;}
                 break;
+            }
+
+            case MNH2019:{
+                //double aVald = scanline[ col ];
+                // int H=(aVald/100)+1; // +1 car les hauteurs commencent à 0 mais mes couleurs commencent à 0
+                //int H=(aVald/100);
+
+                if (aVal==255) {mask=0;} else {
+                  int H=dico->H(aVal);
+                  if (H>35){H=35;} // ma palette de couleur s'arrête à 35 m;
+                  dico->getColor(std::to_string(H-1)).set(aRes1,aRes2,aRes3);
+                }
+
             }
 
             case Station1: case Habitats: case CSArdenne: case CSLorraine:{
@@ -719,6 +765,8 @@ void cApliCarteApt::toPNG(std::string input, std::string output,TypeCarte aType)
                 if (aVal==16) {aRes1=76; aRes2=188;aRes3=138;}
                 if (aVal==17) {aRes1=138; aRes2=219;aRes3=250;}
                 if (aVal==18) {aRes1=215; aRes2=222;aRes3=216;}
+
+                if (aVal==0) {mask=0;}
                 break;
             }
                 // fin select case Type rendu visuel
@@ -737,9 +785,14 @@ void cApliCarteApt::toPNG(std::string input, std::string output,TypeCarte aType)
         maskBand->RasterIO( GF_Write, 0, row, aX, 1, scanline4, aX, 1,GDT_Float32, 0, 0 );
     }
 
+
     // maintenant je crée une copy png du résultat
     pOutRaster = pDriverPNG->CreateCopy(out, pTmpRaster, FALSE, NULL, NULL, NULL);
 
+    CPLFree(scanline);
+    CPLFree(scanline2);
+    CPLFree(scanline3);
+    CPLFree(scanline4);
     GDALClose( pTmpRaster );
     GDALClose( pOutRaster );
     GDALClose( pInputRaster );

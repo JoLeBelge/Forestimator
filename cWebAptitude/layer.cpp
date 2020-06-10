@@ -11,8 +11,9 @@ Layer::Layer(groupLayers * aGroupL, std::string aCode, WText *PWText, TypeLayer 
   ,mRI(NULL)
   ,mEss(NULL)
   ,mKK(NULL)
+  ,mTypeVar(TypeVar::Classe)
 {
-    //std::cout << "constructeur layer " << std::endl;
+    // std::cout << "constructeur layer " << std::endl;
     // constructeur qui dépend du type de layer
     switch (mType) {
     case TypeLayer::Apti:
@@ -38,7 +39,7 @@ Layer::Layer(groupLayers * aGroupL, std::string aCode, WText *PWText, TypeLayer 
         }
         mDicoCol=mKK->getDicoCol();
         break;
-    case TypeLayer::Thematique:
+    case (TypeLayer::Thematique):
         // creation de l'objet cRasterInfo
         mRI= new cRasterInfo(mCode,mDico);
         mLabel= mRI->Nom();
@@ -46,6 +47,8 @@ Layer::Layer(groupLayers * aGroupL, std::string aCode, WText *PWText, TypeLayer 
         mPathTif=mRI->NomCarte();
         mDicoVal=mRI->getDicoVal();
         mDicoCol=mRI->getDicoCol();
+        mTypeVar=mRI->getTypeVar();
+        mType=mRI->getCatLayer(); // on change le type, met à peuplement si nécessaire
         break;
     case TypeLayer::Externe:
         if (mCode=="IGN"){
@@ -109,6 +112,7 @@ Layer::Layer(groupLayers * aGroupL, cEss aEss, WText *PWText):
   ,mRI(NULL)
   ,mEss(NULL)
   ,mKK(NULL)
+  ,mTypeVar(TypeVar::Classe)
 {
     // construction de l'essence
     mEss= new cEss(aEss);
@@ -134,7 +138,23 @@ void Layer::clickOnName(std::string aCode){
 
 void Layer::displayLayer() const{
 
+    std::string JScommand;
     //std::cout << "display layer " << std::endl;
+    if (mDico->hasWMSinfo(this->getCode())){
+
+        WMSinfo wms=mDico->getWMSinfo(this->getCode());
+        std::string aFileIn(mDico->File("displayWMS"));
+        std::ifstream in(aFileIn);
+        std::stringstream ss;
+        ss << in.rdbuf();
+        in.close();
+        JScommand=ss.str();
+        boost::replace_all(JScommand,"MYTITLE",this->getLegendLabel());
+        boost::replace_all(JScommand,"MYLAYER",wms.mLayerName);
+        boost::replace_all(JScommand,"MYURL",wms.mUrl);
+       // std::cout << JScommand << std::endl;
+
+    } else {
 
     switch (mType) {
     case TypeLayer::Externe:
@@ -144,10 +164,10 @@ void Layer::displayLayer() const{
         std::stringstream ss;
         ss << in.rdbuf();
         in.close();
-        std::string JScommand(ss.str());
+        JScommand=ss.str();
         boost::replace_all(JScommand,"TOREPLACE",mCode);
-        std::cout << JScommand << std::endl;
-        mText->doJavaScript(JScommand);
+        //std::cout << JScommand << std::endl;
+
         break;
     }
     default:
@@ -155,12 +175,13 @@ void Layer::displayLayer() const{
         std::stringstream ss;
         std::string aFileIn(mDico->File("addOLraster"));
         std::ifstream in(aFileIn);
-        std::string aTmp(aFileIn+".tmp");
-        std::ofstream out(aTmp);
+        ss << in.rdbuf();
+        in.close();
+        JScommand=ss.str();
         // remplace l'url des tuiles par celui de l'essence actuelle:
         std::string aFind1("CODE1");
         std::string aFind2("CODE2");
-        std::string line;
+        //std::string line;
         std::string Replace1(""),Replace2("");
 
         switch (mType) {
@@ -180,25 +201,14 @@ void Layer::displayLayer() const{
         default:
             break;
         }
-
-        while (getline(in, line))
-        {
-            boost::replace_all(line,aFind1,Replace1);
-            boost::replace_all(line,aFind2,Replace2);
-            out << line << "\n";
-        }
-        in.close();
-        out.close();
-
-        in.open(aFileIn+".tmp");
-        ss << in.rdbuf();
-        in.close();  
-        mText->doJavaScript(ss.str());// c'est peut-être plutôt la carte qui dois faire le doJavascript, pas le label text...
-        //std::cout << ss.str() << std::endl;
+        boost::replace_all(JScommand,aFind1,Replace1);
+        boost::replace_all(JScommand,aFind2,Replace2);
         break;
     }
-
     }
+    }
+    mText->doJavaScript(JScommand);// c'est peut-être plutôt la carte qui dois faire le doJavascript, pas le label text...
+
     //std::cout << "done " << std::endl;
 
 }
@@ -336,6 +346,7 @@ std::map<std::string,int> Layer::computeStatOnPolyg(OGRGeometry *poGeom, std::st
                     //if ( op1.Intersect(poGeom)/ within()){
                     if (scanlineMask[col]==255){
                         double aVal=scanline[ col ];
+
                         if (mDicoVal->find(aVal)!=mDicoVal->end()){
                             aRes.at(mDicoVal->at(aVal))++;
                             nbPix++;
@@ -348,12 +359,12 @@ std::map<std::string,int> Layer::computeStatOnPolyg(OGRGeometry *poGeom, std::st
             CPLFree(scanlineMask);
 
             // maintenant on calcule les pourcentage
-            if (nbPix>0){
+            /*if (nbPix>0){
                 for (auto & kv : aRes){
                     kv.second=(100*kv.second)/nbPix;
                 }
+            }*/
 
-            }
         mBand=NULL;
         }
         GDALClose(mask);

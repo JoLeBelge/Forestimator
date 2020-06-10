@@ -116,7 +116,7 @@ cWebAptitude::cWebAptitude(Wt::WApplication* app)
     //mPA = uPtrPA.get();
 
     mPA = new parcellaire(PACont.get(),mGroupL,m_app,topStack,page2);
-    menu->addItem("Plan d'amménagement", std::move(PACont));
+    menu->addItem("Plan d'aménagement", std::move(PACont));
 
     vLayoutInfoW->addWidget(std::move(menu_));
     vLayoutInfoW->addWidget(std::move(contents));

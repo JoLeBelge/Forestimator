@@ -48,10 +48,12 @@ groupLayers::groupLayers(cDicoApt * aDico, WContainerWidget *parent, WContainerW
         //if (row % 6 == 0){col++;row=0;}
     }
     // ajout des cartes "FEE" ; NT NH Topo AE SS
+    // également pour l'instant les cartes description du peuplement en place
 
     for (auto & pair : *mDico->RasterType()){
         WText *label;
         label = mOtherTable->elementAt(row,col)->addWidget(cpp14::make_unique<WText>(""));
+
         Layer  * aL= new Layer(this,pair.first,label,TypeLayer::Thematique);
         std::string aCode=pair.first;
         label->clicked().connect([this,aCode]{clickOnName(aCode);});
@@ -243,8 +245,8 @@ void groupLayers::computeStatOnPolyg(OGRLayer * lay,bool mergeOT){
         std::string aMode=kv.first.at(1);
 
         // défini le nouveau champ à ajouter à la table d'attribut - vérifie qu'il n'existe pas préhalablement
-        if (lay->FindFieldIndex(l->getCode().c_str(),0)==-1){
-            OGRFieldDefn oFLD(l->getCode().c_str(),  OFTInteger);
+        if (lay->FindFieldIndex(l->getFieldName().c_str(),0)==-1){
+            OGRFieldDefn oFLD(l->getFieldName().c_str(),  OFTInteger);
             oFLD.SetJustify(OGRJustification::OJLeft);
             //oFLD.SetDefault(0);
             lay->CreateField(&oFLD);
@@ -261,7 +263,7 @@ void groupLayers::computeStatOnPolyg(OGRLayer * lay,bool mergeOT){
             //std::map<std::string,int> stat = l->computeStatOnPolyg(poGeom,aMode);
             layerStat ls(l,l->computeStatOnPolyg(poGeom,aMode),aMode);
             // on met un résumé des stat dans le champ nouvellement créé
-            poFeature->SetField(l->getCode().c_str(), ls.getO(mergeOT));
+            poFeature->SetField(l->getFieldName().c_str(), ls.getFieldVal(mergeOT));
             //poFeature->SetField(); This method has only an effect on the in-memory feature object. If this object comes from a layer and the modifications must be serialized back to the datasource, OGR_L_SetFeature()
             lay->SetFeature(poFeature);
         }
@@ -312,8 +314,19 @@ selectLayers4Stat::selectLayers4Stat(groupLayers * aGL):mGL(aGL),selectLayers(aG
                 mSelectedLayers.emplace(std::make_pair(aKey2,b));
                 mLayersCBox.emplace(std::make_pair(aKey2,new Wt::WCheckBox()));
             }
+
+            if (l->Type()==TypeLayer::Peuplement){
+                std::vector<std::string> aKey2={l->getCode(),""};
+                mSelectedLayers.emplace(std::make_pair(aKey2,true));
+                mLayersCBox.emplace(std::make_pair(aKey2,new Wt::WCheckBox()));
+            }
+
         }
     }
+
+
+
+
 
     cont = new Wt::WContainerWidget();
     cont->setOverflow(Wt::Overflow::Auto);
@@ -322,21 +335,73 @@ selectLayers4Stat::selectLayers4Stat(groupLayers * aGL):mGL(aGL),selectLayers(aG
     treeTable->setStyleClass("tree");
     treeTable->tree()->setSelectionMode(SelectionMode::Extended);
     treeTable->addColumn("", 20); // colonne pour les checkbox
-    auto root = cpp14::make_unique<WTreeTableNode>("Carte d'aptitudes FEE");
-    treeTable->setTreeRoot(std::move(root), "Raster");
+
+
+    auto root = cpp14::make_unique<WTreeTableNode>("Tous");
+    treeTable->setTreeRoot(std::move(root), "");
+
+    // création des groupes de couches avec checkbox qui permet de toutes les selectionner en un click
+    // aptitude FEE
+    auto grAptFEE = cpp14::make_unique<WTreeTableNode>("Aptitudes FEE");
+    WTreeTableNode *grAptFEE_ = grAptFEE.get();
+    std::unique_ptr<WCheckBox> checkAptFEE = cpp14::make_unique<WCheckBox>();
+    WCheckBox * checkAptFEE_ = checkAptFEE.get();
+    checkAptFEE_->changed().connect([=]{SelectLayerGroup(checkAptFEE_->isChecked(),TypeLayer::Apti,"FEE");});
+    grAptFEE->setColumnWidget(1, std::move(checkAptFEE));
+
+    // aptitude CS
+    /*
+    auto grAptCS = cpp14::make_unique<WTreeTableNode>("Aptitudes CS");
+    WTreeTableNode *grAptCS_ = grAptCS.get();
+    std::unique_ptr<WCheckBox> checkAptCS = cpp14::make_unique<WCheckBox>();
+    WCheckBox * checkAptCS_ = checkAptCS.get();
+    checkAptCS_->changed().connect([=]{SelectLayerGroup(checkAptCS_->isChecked(),TypeLayer::Apti,"CS");});
+    grAptCS->setColumnWidget(1, std::move(checkAptCS));
+    */
+
+    // description du peuplement
+    auto grPeup = cpp14::make_unique<WTreeTableNode>("Description du peuplement");
+    WTreeTableNode *grPeup_ = grPeup.get();
+    std::unique_ptr<WCheckBox> checkPeup = cpp14::make_unique<WCheckBox>();
+    WCheckBox * checkPeup_ = checkPeup.get();
+    checkPeup_->changed().connect([=]{SelectLayerGroup(checkPeup_->isChecked(),TypeLayer::Peuplement,"");});
+    grPeup->setColumnWidget(1, std::move(checkPeup));
 
     for (auto kv : mSelectedLayers){
         // une méthode pour récupérer un ptr vers le layer depuis le code aCode+aMode
         Layer * l = getLayerPtr(kv.first);
         std::string aCode(l->getCode());
-        auto node1 = cpp14::make_unique<WTreeTableNode>(l->getShortLabel());
-        auto node1_ = node1.get();
-        treeTable->treeRoot()->addChildNode(std::move(node1));
-        WCheckBox * check1_ = mLayersCBox.at(std::vector<std::string> {aCode,"FEE"});
-        if (isSelected(l->getCode(),"FEE")){check1_->setChecked();}
-        check1_->changed().connect([=]{SelectLayer(check1_->isChecked(),aCode,"FEE");});
-        node1_->setColumnWidget(1, std::unique_ptr<Wt::WCheckBox>(check1_));
+
+        switch (l->Type()){
+        case TypeLayer::Apti:{
+            auto node1 = cpp14::make_unique<WTreeTableNode>(l->getShortLabel());
+            auto node1_ = node1.get();
+            grAptFEE_->addChildNode(std::move(node1));
+            WCheckBox * check1_ = mLayersCBox.at(std::vector<std::string> {aCode,"FEE"});
+            if (isSelected(l->getCode(),"FEE")){check1_->setChecked();}
+            check1_->changed().connect([=]{SelectLayer(check1_->isChecked(),aCode,"FEE");});
+            node1_->setColumnWidget(1, std::unique_ptr<Wt::WCheckBox>(check1_));
+            break;
+        }
+        case TypeLayer::Peuplement:{
+            auto node1 = cpp14::make_unique<WTreeTableNode>(l->getShortLabel());
+            auto node1_ = node1.get();
+            grPeup_->addChildNode(std::move(node1));
+            WCheckBox * check1_ = mLayersCBox.at(std::vector<std::string> {aCode,""});
+            if (isSelected(l->getCode())){check1_->setChecked();}
+            check1_->changed().connect([=]{SelectLayer(check1_->isChecked(),aCode);});
+            node1_->setColumnWidget(1, std::unique_ptr<Wt::WCheckBox>(check1_));
+            break;
+        }
+        default:{
+break;
+        }
+        }
     }
+
+    treeTable->treeRoot()->addChildNode(std::move(grAptFEE));
+    //treeTable->treeRoot()->addChildNode(std::move(grAptCS));
+    treeTable->treeRoot()->addChildNode(std::move(grPeup));
     treeTable->treeRoot()->expand();
 }
 
@@ -429,6 +494,14 @@ selectLayers4Download::selectLayers4Download(groupLayers * aGL):mGL(aGL),selectL
     checkKK_->changed().connect([=]{SelectLayerGroup(checkKK_->isChecked(),TypeLayer::KK,"");});
     grKK->setColumnWidget(1, std::move(checkKK));
 
+    // description du peuplement
+    auto grPeup = cpp14::make_unique<WTreeTableNode>("Description du peuplement");
+    WTreeTableNode *grPeup_ = grPeup.get();
+    std::unique_ptr<WCheckBox> checkPeup = cpp14::make_unique<WCheckBox>();
+    WCheckBox * checkPeup_ = checkPeup.get();
+    checkPeup_->changed().connect([=]{SelectLayerGroup(checkPeup_->isChecked(),TypeLayer::Peuplement,"");});
+    grPeup->setColumnWidget(1, std::move(checkPeup));
+
     for (Layer * l : mVpLs){
         std::string aCode=l->getCode();
         switch (l->Type()){
@@ -476,6 +549,16 @@ selectLayers4Download::selectLayers4Download(groupLayers * aGL):mGL(aGL),selectL
             node1_->setColumnWidget(1, std::unique_ptr<Wt::WCheckBox>(check1_));
             break;
         }
+        case TypeLayer::Peuplement:{
+            auto node1 = cpp14::make_unique<WTreeTableNode>(l->getShortLabel());
+            auto node1_ = node1.get();
+            grPeup_->addChildNode(std::move(node1));
+            WCheckBox * check1_ = mLayersCBox.at(std::vector<std::string> {aCode,""});
+            if (isSelected(l->getCode())){check1_->setChecked();}
+            check1_->changed().connect([=]{SelectLayer(check1_->isChecked(),aCode);});
+            node1_->setColumnWidget(1, std::unique_ptr<Wt::WCheckBox>(check1_));
+            break;
+        }
         default:{
 
         }
@@ -486,6 +569,7 @@ selectLayers4Download::selectLayers4Download(groupLayers * aGL):mGL(aGL),selectL
     treeTable->treeRoot()->addChildNode(std::move(grAptCS));
     treeTable->treeRoot()->addChildNode(std::move(grSt));
     treeTable->treeRoot()->addChildNode(std::move(grKK));
+    treeTable->treeRoot()->addChildNode(std::move(grPeup));
     treeTable->treeRoot()->expand();
 }
 
@@ -552,22 +636,3 @@ std::vector<rasterFiles> selectLayers::getSelectedRaster(){
     }
     return aRes;
 }
-
-
-ST::ST(cDicoApt * aDico):mDico(aDico),mNT(666),mNH(666),mZBIO(666),mTOPO(666),mActiveEss(0),HaveEss(0),mSt(0)
-{
-
-}
-
-void ST::vider()
-{
-    mNT=666;
-    mNH=666;
-    mZBIO=666;
-    mTOPO=666;
-    mActiveEss=0;
-    HaveEss=0;
-    mSt=666;
-}
-
-

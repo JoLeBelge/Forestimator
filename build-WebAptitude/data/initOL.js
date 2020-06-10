@@ -143,7 +143,6 @@ var o2018 = new ol.layer.Tile({
 	})
 });
 
-//var IGN = new ol.layer.Tile({
 
 IGN = new ol.layer.Tile({
 	extent: extent,

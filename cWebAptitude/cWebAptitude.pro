@@ -54,7 +54,8 @@ SOURCES += main.cpp \
     parcellaire.cpp \
     layerstatchart.cpp \
     uploadcarte.cpp \
-    libzippp/src/libzippp.cpp
+    libzippp/src/libzippp.cpp \
+    ecogrammeEss.cpp
 
 HEADERS += \
     wopenlayers.h \
@@ -66,4 +67,5 @@ HEADERS += \
     parcellaire.h \
     layerstatchart.h \
     uploadcarte.h \
-    libzippp/src/libzippp.h
+    libzippp/src/libzippp.h \
+    ecogrammeEss.h
