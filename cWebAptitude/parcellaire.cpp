@@ -14,31 +14,33 @@ parcellaire::parcellaire(WContainerWidget *parent, groupLayers *aGL, Wt::WApplic
     mJSfile=  aGL->Dico()->File("addOLgeojson");
 
     mParent->setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Left);
-    mParent->setMargin(20,Wt::Side::Bottom | Wt::Side::Top);
+    //mParent->setMargin(20,Wt::Side::Bottom | Wt::Side::Top);
     mParent->setInline(0);
-    mParent->addWidget(cpp14::make_unique<Wt::WText>(tr("infoParcellaire")));
+    mParent->addWidget(cpp14::make_unique<WText>("<h3>Etape 1 : Sélectionner une thématique</h3>"));
+    //mParent->addWidget(cpp14::make_unique<Wt::WText>(tr("infoParcellaire")));
+    mParent->addWidget(cpp14::make_unique<Wt::WText>("dans la liste des Couches"));
+    mParent->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
     mParent->addWidget(cpp14::make_unique<WText>("<h4>Charger votre parcellaire</h4>"));
     fu =mParent->addNew<Wt::WFileUpload>();
-
-    mParent->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
-
     fu->setFileTextSize(2000); // Set the maximum file size to 50 kB.
     fu->setFilters(".shp, .shx, .dbf, .prj");
     fu->setMultiple(true);
     fu->setInline(0);
+	fu->addStyleClass("btn-file");
     //fu->setMargin(20,Wt::Side::Bottom | Wt::Side::Top); // si le parent a des marges et est inline(0) et que je met l'enfant à inline, l'enfant a des marges également
 
     msg = mParent->addWidget(cpp14::make_unique<Wt::WText>());
     msg->setInline(0);
-    mParent->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
+    //mParent->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
 
-    uploadButton = mParent->addWidget(cpp14::make_unique<Wt::WPushButton>("Télécharger"));
+    uploadButton = mParent->addWidget(cpp14::make_unique<Wt::WPushButton>("Envoyer"));
+    uploadButton->setStyleClass("btn btn-success");
     mParent->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
 
     uploadButton->disable();
     uploadButton->setInline(0);
 
-    mParent->addWidget(cpp14::make_unique<WText>("<h4>Calcul de statistique</h4>"));
+    mParent->addWidget(cpp14::make_unique<WText>("<h3>Etape 2 : Sélectionner l'analyse</h3>"));
     mParent->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
     mParent->addWidget(cpp14::make_unique<Wt::WText>(tr("infoCalculStat")));
     mParent->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
@@ -46,9 +48,12 @@ parcellaire::parcellaire(WContainerWidget *parent, groupLayers *aGL, Wt::WApplic
     mCB_fusionOT->setInline(0);
     mParent->addWidget(cpp14::make_unique<Wt::WText>(tr("infoChoixLayerStat")));
     mParent->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
-    mParent->addWidget(std::unique_ptr<Wt::WContainerWidget>(mGL->afficheSelect4Stat()));
+    auto * div_4stat = mParent->addWidget(std::unique_ptr<Wt::WContainerWidget>(mGL->afficheSelect4Stat()));
+    div_4stat->addStyleClass("div_4stat");
 
+    mParent->addWidget(cpp14::make_unique<WText>("<h3>Etape 3 : Excécuter l'analyse</h3>"));
     computeStatButton = mParent->addWidget(cpp14::make_unique<Wt::WPushButton>("Calcul"));
+    computeStatButton->setStyleClass("btn btn-success");
     computeStatButton->setInline(0);
     computeStatButton->disable();
     mParent->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
@@ -66,8 +71,10 @@ parcellaire::parcellaire(WContainerWidget *parent, groupLayers *aGL, Wt::WApplic
     visuStatButton->disable();
     est buggé pour le moment
     */
-
+    mParent->addWidget(cpp14::make_unique<WText>("<h3>Etape 4 : Exporter le résultat</h3>"));
     downloadShpBt = mParent->addWidget(cpp14::make_unique<Wt::WPushButton>("Télécharger le shp"));
+    downloadShpBt->setStyleClass("btn btn-success");
+    downloadShpBt->setWidth(150);
     downloadShpBt->setInline(0);
     downloadShpBt->disable();
     //visuStatButton->setLink(Wt::WLink(Wt::LinkType::InternalPath, "/StatistiqueParcellaire"));
@@ -77,6 +84,8 @@ parcellaire::parcellaire(WContainerWidget *parent, groupLayers *aGL, Wt::WApplic
     mParent->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
 
     downloadRasterBt = mParent->addWidget(cpp14::make_unique<Wt::WPushButton>("Télécharger les cartes"));
+    downloadRasterBt->setStyleClass("btn btn-success");
+    downloadRasterBt->setWidth(200);
     downloadRasterBt->setInline(0);
     downloadRasterBt->disable();
 
@@ -245,6 +254,7 @@ bool parcellaire::computeGlobalGeom(OGRLayer * lay){
         // devrait je pense eêtre créé avec new, car si je ferme le dataset qui contient le layer, poGeomGlobal fait une fuite
         poGeomGlobale =poGeom2->Simplify(1.0);
         int aSurfha=OGR_G_GetArea(poGeomGlobale)/10000;
+        printf("aSurfha=%d",aSurfha);
         if (aSurfha<globSurfMax){
             //OGRPolygon * pol=poGeom2->toPolygon();
             //std::ofstream out("/home/lisein/Documents/carteApt/Forestimator/build-WebAptitude/tmp/test.geojson");

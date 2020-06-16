@@ -25,10 +25,12 @@ enum class TypeVar {Classe,
                     Continu
                      };
 
-enum class TypeLayer {Apti // aptitude des essences
-                      ,KK // les cartes dérivées des CS
+enum class TypeLayer { //Apti // Apti enlevé ! -> FEE et CS
+                       KK // les cartes dérivées des CS
                       ,Thematique // lié à la description de la station ; NH NT ZBIO
                       ,Externe // toutes les cartes qui ne sont pas en local ; carte IGN pour commencer
+                      ,FEE
+                      ,CS
                       ,Peuplement // description du peuplement en place
                      };
 

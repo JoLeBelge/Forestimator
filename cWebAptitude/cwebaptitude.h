@@ -1,6 +1,7 @@
 #ifndef CWEBAPTITUDE_H
 #define CWEBAPTITUDE_H
 
+#include <iostream>
 #include "grouplayers.h"
 #include "parcellaire.h"
 #include "uploadcarte.h"
@@ -15,6 +16,7 @@
 #include <Wt/WLayout.h>
 #include <Wt/WMenu.h>
 #include <Wt/WTextArea.h>
+#include <Wt/WNavigationBar.h>
 //#include <Wt/WLabel.h>
 #include "wopenlayers.h"
 #include "cdicoapt.h"
@@ -29,7 +31,39 @@ public:
   /*!\brief Instantiate a new form example.
    */
   cWebAptitude(Wt::WApplication* app);
+
+  /*~cWebAptitude(){
+    std::cout << "destructeur de cWebAptitude " << std::endl;
+
+
+    //m_app=NULL;
+
+    printf("Delete mGroupL cweb\n");
+    //delete mGroupL;
+    printf("Delete mPa cweb\n");
+    //if(mPA) delete mPA;
+    printf("Delete mUpload cweb\n");
+    if(mUpload) mUpload=NULL;
+
+
+    printf("Delete ... cweb\n");
+    stack_info=NULL;
+    menuitem2_analyse=NULL;
+
+    printf("Delete mMap cweb\n");
+    //if(mMap) delete mMap;
+    mMap=NULL;
+    printf("Delete mDico cweb\n");
+    //if(mDico) delete mDico;
+    mDico=NULL;
+    printf("Delete m_app cweb\n");
+    m_app=NULL;
+    printf("cWeb done\n");
+  }*/
+
   WOpenLayers * mMap;
+  WStackedWidget * stack_info;
+  WMenuItem * menuitem2_analyse;
 private:
   //std::map<std::string,cEss>  mMEss;
   Wt::WApplication* m_app;

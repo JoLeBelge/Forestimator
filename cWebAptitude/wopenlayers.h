@@ -33,7 +33,11 @@ class WOpenLayers: public WContainerWidget
 public:
     WOpenLayers( cDicoApt * aDico);
 
-    ~WOpenLayers(){std::cout << "destructeur de wopenlayers " << std::endl;}
+    /*WOpenLayers(){
+        printf("destructor wopenlayer\n");
+        //mDico=NULL;
+    }*/
+
 
     // pas simple d'impletemter ses signaux, voir https://redmine.webtoolkit.eu/boards/2/topics/12782?r=12807#message-12807
 

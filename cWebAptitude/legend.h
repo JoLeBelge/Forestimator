@@ -25,7 +25,6 @@
 #include <boost/algorithm/string/replace.hpp>
 #include "ecogrammeEss.h"
 
-
 class legend;
 class groupLayers;
 class ST;
@@ -44,15 +43,16 @@ public:
     void detailCalculAptFEE(ST *aST);
     void afficheLegendeIndiv(const Layer *l);
     void afficheAptAllEss();
+    Wt::WText				   *mTitle;
     Wt::WTable                 *mInfoT;
     Wt::WTable                 *mDetAptFEE;
     Wt::WTable                 *mLegendIndiv;
     Wt::WTable                 *mAptAllEss;
 
-    EcogrammeEss       *mEcoEss;
-
     Wt::WContainerWidget     * mParent;
+    EcogrammeEss       *mEcoEss;
 private:
+
     Wt::WContainerWidget     * mContEco;
     groupLayers*mGL;
     Wt::WText                  *titre_;

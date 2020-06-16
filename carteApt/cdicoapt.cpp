@@ -938,9 +938,9 @@ TypeVar str2TypeVar(const std::string& str){
 
 TypeLayer str2TypeLayer(const std::string& str)
 {
-    TypeLayer aRes=TypeLayer::Apti;
-    if(str == "Station") aRes=TypeLayer::Thematique;
-    else if(str == "Peuplement") aRes=TypeLayer::Peuplement;
+    TypeLayer aRes=TypeLayer::Thematique;
+    //else if(str == "Station") aRes=TypeLayer::Thematique;
+    if(str == "Peuplement") aRes=TypeLayer::Peuplement;
     return aRes;
 }
 
