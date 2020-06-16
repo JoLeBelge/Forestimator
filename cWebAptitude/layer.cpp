@@ -16,7 +16,8 @@ Layer::Layer(groupLayers * aGroupL, std::string aCode, WText *PWText, TypeLayer 
     // std::cout << "constructeur layer " << std::endl;
     // constructeur qui dépend du type de layer
     switch (mType) {
-    case TypeLayer::Apti:
+    case TypeLayer::FEE:
+    case TypeLayer::CS:
         // construction de l'essence
         mEss=new cEss(mCode,mDico);
         mLabel=mEss->Code() + " - "+ mEss->Nom();
@@ -39,7 +40,7 @@ Layer::Layer(groupLayers * aGroupL, std::string aCode, WText *PWText, TypeLayer 
         }
         mDicoCol=mKK->getDicoCol();
         break;
-    case (TypeLayer::Thematique):
+    case TypeLayer::Thematique:
         // creation de l'objet cRasterInfo
         mRI= new cRasterInfo(mCode,mDico);
         mLabel= mRI->Nom();
@@ -48,7 +49,7 @@ Layer::Layer(groupLayers * aGroupL, std::string aCode, WText *PWText, TypeLayer 
         mDicoVal=mRI->getDicoVal();
         mDicoCol=mRI->getDicoCol();
         mTypeVar=mRI->getTypeVar();
-        mType=mRI->getCatLayer(); // on change le type, met à peuplement si nécessaire
+        mType=mRI->getCatLayer();
         break;
     case TypeLayer::Externe:
         if (mCode=="IGN"){
@@ -101,30 +102,6 @@ void Layer::setActive(bool b){
 
 
 
-Layer::Layer(groupLayers * aGroupL, cEss aEss, WText *PWText):
-    mDico(aGroupL->Dico())
-  ,mGroupL(aGroupL)
-  ,mCode(aEss.Code())
-  ,mText(PWText)
-  ,mType(TypeLayer::Apti)
-  ,mDicoVal(0)
-  //,mDicoCol(0)
-  ,mRI(NULL)
-  ,mEss(NULL)
-  ,mKK(NULL)
-  ,mTypeVar(TypeVar::Classe)
-{
-    // construction de l'essence
-    mEss= new cEss(aEss);
-    mLabel=mEss->Code() + " - "+ mEss->Nom();
-    mText->setText(mLabel);
-    mDicoVal=mDico->code2AptFull();
-    mDicoCol=mDico->codeApt2col();
-    // c'est dans l'objet GL que toutes les connexion au label sont gerée
-    //mText->clicked().connect(std::bind(&groupLayers::clickOnName, mGroupL, mCode));
-    setActive(false);
-}
-
 /*
 void Layer::clickOnName(std::string aCode){
     std::cout << " j'ai cliqué sur " << aCode << " \n\n\n" << std::endl;
@@ -156,60 +133,55 @@ void Layer::displayLayer() const{
 
     } else {
 
-    switch (mType) {
-    case TypeLayer::Externe:
-    {
-        std::string aFileIn(mDico->File("displayExternLayer"));
-        std::ifstream in(aFileIn);
-        std::stringstream ss;
-        ss << in.rdbuf();
-        in.close();
-        JScommand=ss.str();
-        boost::replace_all(JScommand,"TOREPLACE",mCode);
-        //std::cout << JScommand << std::endl;
-
-        break;
-    }
-    default:
-    {
-        std::stringstream ss;
-        std::string aFileIn(mDico->File("addOLraster"));
-        std::ifstream in(aFileIn);
-        ss << in.rdbuf();
-        in.close();
-        JScommand=ss.str();
-        // remplace l'url des tuiles par celui de l'essence actuelle:
-        std::string aFind1("CODE1");
-        std::string aFind2("CODE2");
-        //std::string line;
-        std::string Replace1(""),Replace2("");
-
         switch (mType) {
-        case TypeLayer::Apti:
-            switch (mGroupL->TypeClas()) {
-            case FEE: Replace1="FEE_"+mCode;Replace2="aptitudeFEE_"+mCode;break;
-            case CS: Replace1="CS_"+mCode;Replace2="aptitudeCS_"+mCode;break;
-            }
-            break;
-        case TypeLayer::KK:
-            Replace1="KK_CS_"+mCode;
-            Replace2=Replace1;
-            break;
-        case TypeLayer::Thematique:
-            if (mRI) {Replace1=mRI->NomTuile();}
-            if (mRI) {Replace2=mRI->NomFile();}
-        default:
+        case TypeLayer::Externe:
+        {
+            std::string aFileIn(mDico->File("displayExternLayer"));
+            std::ifstream in(aFileIn);
+            std::stringstream ss;
+            ss << in.rdbuf();
+            in.close();
+            JScommand=ss.str();
+            boost::replace_all(JScommand,"TOREPLACE",mCode);
+            //std::cout << JScommand << std::endl;
             break;
         }
-        boost::replace_all(JScommand,aFind1,Replace1);
-        boost::replace_all(JScommand,aFind2,Replace2);
-        break;
-    }
-    }
+        default:
+        {
+            std::stringstream ss;
+            std::string aFileIn(mDico->File("addOLraster"));
+            std::ifstream in(aFileIn);
+            ss << in.rdbuf();
+            in.close();
+            JScommand=ss.str();
+            // remplace l'url des tuiles par celui de l'essence actuelle:
+            std::string aFind1("CODE1");
+            std::string aFind2("CODE2");
+            //std::string line;
+            std::string Replace1(""),Replace2("");
+
+            switch (mType) {
+            case TypeLayer::CS:
+                Replace1="CS_"+mCode;Replace2="aptitudeCS_"+mCode;break;
+            case TypeLayer::FEE:
+                Replace1="FEE_"+mCode;Replace2="aptitudeFEE_"+mCode;break;
+            case TypeLayer::KK:
+                Replace1="KK_CS_"+mCode;
+                Replace2=Replace1;
+                break;
+            case TypeLayer::Thematique:
+                if (mRI) {Replace1=mRI->NomTuile();}
+                if (mRI) {Replace2=mRI->NomFile();}
+            default:
+                break;
+            }
+            boost::replace_all(JScommand,aFind1,Replace1);
+            boost::replace_all(JScommand,aFind2,Replace2);
+            break;
+        }
+        }
     }
     mText->doJavaScript(JScommand);// c'est peut-être plutôt la carte qui dois faire le doJavascript, pas le label text...
-
-    //std::cout << "done " << std::endl;
 
 }
 
@@ -235,7 +207,7 @@ std::vector<std::string> Layer::displayInfo(double x, double y){
         }
     }
 
-    if ((mType==TypeLayer::Apti) && (this->IsActive())){
+    if ((mType==TypeLayer::FEE || mType==TypeLayer::CS) && (this->IsActive())){
         mGroupL->mStation->mActiveEss=mEss;
         mGroupL->mStation->HaveEss=1;
     }
@@ -346,7 +318,6 @@ std::map<std::string,int> Layer::computeStatOnPolyg(OGRGeometry *poGeom, std::st
                     //if ( op1.Intersect(poGeom)/ within()){
                     if (scanlineMask[col]==255){
                         double aVal=scanline[ col ];
-
                         if (mDicoVal->find(aVal)!=mDicoVal->end()){
                             aRes.at(mDicoVal->at(aVal))++;
                             nbPix++;
@@ -364,7 +335,6 @@ std::map<std::string,int> Layer::computeStatOnPolyg(OGRGeometry *poGeom, std::st
                     kv.second=(100*kv.second)/nbPix;
                 }
             }*/
-
         mBand=NULL;
         }
         GDALClose(mask);
@@ -378,12 +348,10 @@ std::map<std::string,int> Layer::computeStatOnPolyg(OGRGeometry *poGeom, std::st
 std::string Layer::getPathTif(){
     std::string aRes;
     switch (mType) {
-    case TypeLayer::Apti:
-        switch (mGroupL->TypeClas()) {
-        case FEE: aRes=mEss->NomCarteAptFEE();break;
-        case CS: aRes=mEss->NomCarteAptCS();break;
-        }
-        break;
+    case TypeLayer::FEE:
+        aRes=mEss->NomCarteAptFEE();break;
+    case TypeLayer::CS:
+        aRes=mEss->NomCarteAptCS();break;
     default:
         aRes=mPathTif;
     }
@@ -393,12 +361,10 @@ std::string Layer::getPathTif(){
 std::string Layer::getLegendLabel() const{
     std::string aRes;
     switch (mType) {
-    case TypeLayer::Apti:
-        switch (mGroupL->TypeClas()) {
-        case FEE: aRes="Aptitude FEE du "+mLabel;break;
-        case CS: aRes="Aptitude CS du "+mLabel;break;
-        }
-        break;
+    case TypeLayer::FEE:
+        aRes="Aptitude FEE du "+mLabel;break;
+    case TypeLayer::CS:
+        aRes="Aptitude CS du "+mLabel;break;
     default:
         aRes=mLabel;
     }
@@ -408,11 +374,10 @@ std::string Layer::getLegendLabel() const{
 std::string Layer::getLegendLabel(std::string aMode){
    std::string aRes;
     switch (mType) {
-    case TypeLayer::Apti:{
-        if (aMode=="FEE") aRes="Aptitude FEE du "+mLabel;
-        if (aMode=="CS")  aRes="Aptitude CS du "+mLabel;
-        }
-        break;
+    case TypeLayer::FEE:
+        aRes="Aptitude FEE du "+mLabel;break;
+    case TypeLayer::CS:
+        aRes="Aptitude CS du "+mLabel;break;
     default:
         aRes=mLabel;
     }
@@ -423,11 +388,10 @@ std::string Layer::getLegendLabel(std::string aMode){
 std::vector<std::string> Layer::getCode(std::string aMode){
     std::vector<std::string> aRes;
     switch (mType) {
-    case TypeLayer::Apti:{
-        if (aMode=="FEE") aRes={mCode,"FEE"};
-        if (aMode=="CS")  aRes={mCode,"CS"};
-        }
-        break;
+    case TypeLayer::FEE:
+        aRes={mCode,"FEE"};break;
+    case TypeLayer::CS:
+        aRes={mCode,"CS"};break;
     default:
         aRes={mCode,""};
     }
@@ -437,14 +401,13 @@ std::vector<std::string> Layer::getCode(std::string aMode){
 std::string Layer::getPathTif(std::string aMode){
     std::string aRes;
     switch (mType) {
-    case TypeLayer::Apti:{
-        if (aMode=="FEE") {aRes=mEss->NomCarteAptFEE();}
-        if (aMode=="CS") {aRes=mEss->NomCarteAptCS();}
-        break;
-    }
-    default:{
+    case TypeLayer::FEE:
+        aRes=mEss->NomCarteAptFEE();break;
+    case TypeLayer::CS:
+        aRes=mEss->NomCarteAptCS();break;
+    default:
         aRes=mPathTif;
-    }
+
     }
     return aRes;
 }
