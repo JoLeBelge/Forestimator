@@ -79,7 +79,9 @@ groupLayers::groupLayers(cDicoApt * aDico, WContainerWidget *parent, WContainerW
         label = node1_->addChildNode(Wt::cpp14::make_unique<Wt::WTreeNode>(""))->label();
         Layer  * aL= new Layer(this,pair.first,label,TypeLayer::Thematique);
         std::string aCode=pair.first;
-        label->clicked().connect([this,aCode]{clickOnName(aCode,TypeLayer::Thematique);});
+        // un peu bidouille mais le typelayer de MNH est peuplement et il est redéfini dans le constructeur de layer
+        TypeLayer type= aL->Type();
+        label->clicked().connect([this,aCode,type]{clickOnName(aCode,type);});
         mVLs.push_back(aL);
         //row++;
         //if (row % 6 == 0){col++;row=0;}
