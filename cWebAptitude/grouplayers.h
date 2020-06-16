@@ -33,7 +33,7 @@ class selectLayers;
 class selectLayers4Stat;
 class selectLayers4Download;
 //class WCheckBox;
-enum class TypeLayer;
+//enum class TypeLayer;
 
 enum TypeClassifST {FEE
                     ,CS
@@ -105,13 +105,13 @@ class groupLayers: public WContainerWidget
 {
 public:
     groupLayers(cDicoApt * aDico,WContainerWidget *parent,WContainerWidget *infoW,WOpenLayers * aMap, Wt::WApplication* app);
-    ~groupLayers();
+    //~groupLayers();
     /*groupLayers(const groupLayers &gl){
         std::cout << "construct by copy group layer -- should never happend\n\n\n" << std::endl;
     }*/
-    void clickOnName(std::string aCode);
+    void clickOnName(std::string aCode, TypeLayer type);
     void changeClassClick(WText *t);
-    void update(std::string aCode);
+    void update(std::string aCode, TypeLayer type);
     // click de l'utilisateur sur la carte pour extraire les valeurs des raster pour une position donnée
     void extractInfo(double x, double y);
     cDicoApt * Dico(){return mDico;}
@@ -142,7 +142,7 @@ public:
         return focusOnMap_;}
         */
     ST * mStation;
-    std::vector<Layer *> Layers(){return mVLs;}
+    std::vector<Layer *> Layers(){ return mVLs;}
     std::vector<Layer*> getVpLs(){ return mVLs;}
 
     // retourne les aptitudes des essences pour une position donnée (click sur la carte)

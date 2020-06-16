@@ -38,10 +38,6 @@ inline bool exists (const std::string& name){
 };
 
 
-
-
-
-
 class rasterFiles{
 
 public:
@@ -68,7 +64,7 @@ private:
 class Layer
 {
 public:
-    Layer(groupLayers * aGroupL, std::string aCode, WText * PWText, TypeLayer aType=TypeLayer::Apti);
+    Layer(groupLayers * aGroupL, std::string aCode,WText * PWText,TypeLayer aType);
     Layer(groupLayers * aGroupL, cEss aEss ,WText * PWText);
 
     // constructeur par copie et par déplacement ; indispensable si j'utilise les objets dans un vecteur. http://www-h.eng.cam.ac.uk/help/tpl/languages/C++/morevectormemory.html
@@ -89,18 +85,18 @@ public:
         mCode=lay.mCode;
         mDicoCol=lay.mDicoCol;
         mDicoVal=lay.mDicoVal;
-        mTypeVar=lay.mTypeVar;
         switch (mType) {
-        case TypeLayer::Apti:
-            mEss=new cEss(mCode,mDico);
-            break;
-        case TypeLayer::KK:
-            mKK=new cKKCS(mCode,mDico);
-            break;
-        case TypeLayer::Thematique:
-            mRI= new cRasterInfo(mCode,mDico);
-            break;
-        default:{}
+            case TypeLayer::FEE:
+            case TypeLayer::CS:
+                mEss=new cEss(mCode,mDico);
+                break;
+            case TypeLayer::KK:
+                mKK=new cKKCS(mCode,mDico);
+                break;
+            case TypeLayer::Thematique:
+                mRI= new cRasterInfo(mCode,mDico);
+                break;
+            default:{}
         }
     }
     Layer(Layer&& lay) noexcept {
@@ -119,18 +115,18 @@ public:
         mCode=lay.mCode;
         mDicoCol=lay.mDicoCol;
         mDicoVal=lay.mDicoVal;
-        mTypeVar=lay.mTypeVar;
         switch (mType) {
-        case TypeLayer::Apti:
-            mEss=new cEss(mCode,mDico);
-            break;
-        case TypeLayer::KK:
-            mKK=new cKKCS(mCode,mDico);
-            break;
-        case TypeLayer::Thematique:
-            mRI= new cRasterInfo(mCode,mDico);
-            break;
-        default:{}
+            case TypeLayer::FEE:
+            case TypeLayer::CS:
+                mEss=new cEss(mCode,mDico);
+                break;
+            case TypeLayer::KK:
+                mKK=new cKKCS(mCode,mDico);
+                break;
+            case TypeLayer::Thematique:
+                mRI= new cRasterInfo(mCode,mDico);
+                break;
+            default:{}
         }
     }
 
