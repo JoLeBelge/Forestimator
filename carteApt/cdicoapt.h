@@ -72,7 +72,9 @@ public:
         B=mB;
     }
     std::string cat(){ return " R:" + std::to_string(mR)+", G:"+std::to_string(mG)+", B"+std::to_string(mB);}
+    std::string cat2(){ return std::to_string(mR)+" "+std::to_string(mG)+" "+std::to_string(mB);}
 };
+
 
 class cRasterInfo
 {
@@ -195,6 +197,10 @@ public:
     std::string NomCarteAptCS();
     std::string shortNomCarteAptCS();
     std::string NomDirTuileAptCS();
+
+    std::string NomMapServerLayer();
+    std::string NomMapServerLayerFull();
+
     // aptitude ecograme : clé chaine charactère ; c'est la combinaison ntxnh du genre "A2p5" ou "Mm4
     std::map<int,std::map<std::string,int>> mEcoVal;
     // aptitude pour chaque zone bioclim
@@ -222,7 +228,7 @@ public:
 private:
     TypeCarte mType;
     cDicoApt * mDico;
-    std::string mCode, mNomFR, mF_R;
+    std::string mCode, mNomFR, mF_R,mPrefix;
 };
 
 // toute les informations/ dico que j'ai besoin pour le soft
@@ -328,6 +334,12 @@ public:
         return aRes;
     }
 
+    std::string accroEss2prefix(std::string aCode){
+        std::string aRes("");
+        if (Dico_code2prefix.find(aCode)!=Dico_code2prefix.end()){aRes=Dico_code2prefix.at(aCode);}
+        return aRes;
+    }
+
     std::string File(std::string aCode){
         std::string aRes("");
         if (Dico_GISfile.find(aCode)!=Dico_GISfile.end()){aRes=Dico_GISfile.at(aCode);}
@@ -413,7 +425,7 @@ public:
     double H(int aVal){
         double aRes(0.0);
         if (aVal<255 && aVal>0){aRes=aVal/5;}
-        return aVal;
+        return aRes;
     }
 
     bool hasWMSinfo(std::string aCode){
@@ -455,6 +467,7 @@ private:
 
     //code ess vers nom français
     std::map<std::string,std::string> Dico_code2NomFR;
+    std::map<std::string,std::string> Dico_code2prefix;
     // code essence 2 code groupe "feuillus" vs "Resineux
     std::map<std::string,std::string> Dico_F_R;
     std::map<std::string,std::string>  Dico_codeSt2Habitat;

@@ -57,7 +57,7 @@ int main(int argc, char *argv[])
     //aACA.createTile(HE.NomCarteAptFEE(),HE.NomDirTuileAptFEE(),Apt,true);
 
 
-if (0){
+if (1){
 
 /*
 
@@ -65,9 +65,10 @@ if (0){
         aACA.createTile(kv.second.NomCarte(),kv.second.NomDirTuile(),kv.second.Type());
     }
 */
+    std::string aFileCodeMS("/home/lisein/Documents/carteApt/autres/mapserver/mapFEE.map");
     for (auto & kv : aMEss){
         //std::string aOut=dico.Files()->at("OUTDIR")+"aptitudeFEE_"+kv.first+".tif";
-        aACA.carteAptFEE(&kv.second,kv.second.NomCarteAptFEE(),true);
+        //aACA.carteAptFEE(&kv.second,kv.second.NomCarteAptFEE(),true);
         //aOut=dico.Files()->at("OUTDIR")+"aptitudeCS_"+kv.first+".tif";
         //aACA.carteAptCS(&kv.second,kv.second.NomCarteAptCS(),false);
 
@@ -76,8 +77,10 @@ if (0){
         //aACA.compressTif(kv.second.NomCarteAptFEE());
 
         // creation des tuiles png pour utilisation dans openlayer
-        aACA.createTile(kv.second.NomCarteAptFEE(),kv.second.NomDirTuileAptFEE(),Apt,true);
-        //aACA.createTile(kv.second.NomCarteAptCS(),kv.second.NomDirTuileAptCS(),Apt);
+        //aACA.createTile(kv.second.NomCarteAptFEE(),kv.second.NomDirTuileAptFEE(),Apt,true);
+       // aACA.createTile(kv.second.NomCarteAptCS(),kv.second.NomDirTuileAptCS(),Apt);
+
+        aACA.codeMapServer(kv.second.NomCarteAptFEE(),kv.second.NomMapServerLayer(),kv.second.NomMapServerLayerFull(),aFileCodeMS,Apt);
     }
 
     /*

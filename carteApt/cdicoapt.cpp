@@ -32,7 +32,7 @@ cDicoApt::cDicoApt(std::string aBDFile):mBDpath(aBDFile)
     } else {
         // dico Ess Nom -- code
         sqlite3_stmt * stmt;
-        std::string SQLstring="SELECT Ess_FR,Code_FR FROM dico_essences ORDER BY Ess_FR DESC;";
+        std::string SQLstring="SELECT Ess_FR,Code_FR,prefix FROM dico_essences ORDER BY Ess_FR DESC;";
         //std::tuple<std::string, std::string> t =session.query<std::tuple<std::string, std::string>>(SQLstring);
         sqlite3_prepare_v2( db_, SQLstring.c_str(), -1, &stmt, NULL );//preparing the statement
         while(sqlite3_step(stmt) == SQLITE_ROW)
@@ -40,8 +40,9 @@ cDicoApt::cDicoApt(std::string aBDFile):mBDpath(aBDFile)
             if (sqlite3_column_type(stmt, 0)!=SQLITE_NULL && sqlite3_column_type(stmt, 1)!=SQLITE_NULL){
                 std::string aNomEs=std::string( (char *)sqlite3_column_text( stmt, 0 ) );
                 std::string aCodeEs=std::string( (char *)sqlite3_column_text( stmt, 1 ) );
+                std::string aPrefix=std::string( (char *)sqlite3_column_text( stmt, 2 ) );
                 Dico_code2NomFR.emplace(std::make_pair(aCodeEs,aNomEs));
-                //Dico_code2NomFR.emplace(std::make_pair(a.first,a.second));
+                Dico_code2prefix.emplace(std::make_pair(aCodeEs,aPrefix));
             }
         }
 
@@ -749,14 +750,15 @@ void cDicoApt::closeConnection(){
     }
 }
 
-cEss::cEss(std::string aCodeEs,cDicoApt * aDico):mCode(aCodeEs),mNomFR(aDico->code2Nom()->at(aCodeEs)),mDico(aDico)
-  ,mType(Apt){
+cEss::cEss(std::string aCodeEs,cDicoApt * aDico):mCode(aCodeEs),mNomFR(aDico->accroEss2Nom(aCodeEs)),mDico(aDico)
+  ,mType(Apt),mPrefix(aDico->accroEss2prefix(aCodeEs)){
     //std::cout << "creation de l'essence " << mNomFR << std::endl;
     // le souci c'est que je me connecte 4 fois à la BD pour chaque essence, est-ce bien propre comme manière de faire?
     mEcoVal=aDico->getFEEApt(mCode);
     mAptCS=aDico->getCSApt(mCode);
     mAptZbio=aDico->getZBIOApt(mCode);
     mRisqueTopo=aDico->getRisqueTopo(mCode);
+
 }
 
 //effectue la confrontation Apt Zbio et AptHydroTrophiue
@@ -836,6 +838,8 @@ std::string cEss::NomCarteAptCS(){return mDico->File("OUTDIR")+"aptitudeCS_"+mCo
 std::string cEss::NomDirTuileAptCS(){return mDico->File("OUTDIR2")+"CS_"+mCode;}
 std::string cEss::shortNomCarteAptCS(){return "aptitudeCS_"+mCode+".tif";}
 
+std::string cEss::NomMapServerLayer(){return "Aptitude_FEE_"+mCode;}
+std::string cEss::NomMapServerLayerFull(){return "Aptitude "+mPrefix+mNomFR;}
 
 bool cEss::hasRisqueComp(int zbio,int topo){
     bool aRes(0);

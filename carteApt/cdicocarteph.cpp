@@ -98,6 +98,22 @@ cDicoCartepH::cDicoCartepH(std::string aBDFile):mBDpath(aBDFile)
             }
         }
 
+        SQLstring="SELECT INDEX_SOL,pts_typologie FROM dico_siglePedo_pts;";
+
+        sqlite3_reset(stmt);
+        sqlite3_prepare_v2( db_, SQLstring.c_str(), -1, &stmt, NULL );
+        while(sqlite3_step(stmt) == SQLITE_ROW)
+        {
+            if (sqlite3_column_type(stmt, 0)!=SQLITE_NULL && sqlite3_column_type(stmt, 1)!=SQLITE_NULL){
+
+                  int aA=sqlite3_column_int( stmt, 0 );
+                  int aB=sqlite3_column_int( stmt, 1 );
+                  Dico_IndexSiglePed2PTS.emplace(std::make_pair(aA,aB));
+            }
+        }
+
+
+
         sqlite3_finalize(stmt);
     }
 
