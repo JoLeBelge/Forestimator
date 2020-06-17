@@ -132,15 +132,10 @@ public:
     // clé 1 ; nom de la couche. clé2 : la valeur au format légende (ex ; Optimum). Valeur ; pourcentage pour ce polygone
     //std::map<std::string,std::map<std::string,int>>
     void computeStatGlob(OGRGeometry *poGeomGlobale);
-    //void visuStat();
+
     // void car on ajoute les résulats à la table d'attribut de la couche
     void computeStatOnPolyg(OGRLayer * lay, bool mergeOT=0);
 
-    // ne fait pas ce que je veux, il faut apparemment utiliser des anchor pour faire du bookmarking / hashtag
-   /* Wt::Signal<bool>& focusMap(){
-        //std::cout << "focus map () dans grouplayer done \n\n\n" << std::endl;
-        return focusOnMap_;}
-        */
     ST * mStation;
     std::vector<Layer *> Layers(){ return mVLs;}
     std::vector<Layer*> getVpLs(){ return mVLs;}
@@ -176,15 +171,13 @@ private:
 
     cDicoApt * mDico;
 
-    Wt::WTable                 *mEssTable;
-    Wt::WTable                 *mClassifTable;
-    Wt::WTable                 *mOtherTable;
+    //Wt::WTable                 *mEssTable;
+    //Wt::WTable                 *mClassifTable;
+    //Wt::WTable                 *mOtherTable;
     legend * mLegend;
 
-    //Wt::Signal<bool> focusOnMap_;
 
     WContainerWidget * mInfoW;
-    //WWidget * mInfoW;
 
     // bof finalement c'est mieux le conteneur parent
     Wt::WContainerWidget     * mParent;

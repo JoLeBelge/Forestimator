@@ -65,10 +65,8 @@ class Layer
 {
 public:
     Layer(groupLayers * aGroupL, std::string aCode,WText * PWText,TypeLayer aType);
-    Layer(groupLayers * aGroupL, cEss aEss ,WText * PWText);
 
     // constructeur par copie et par déplacement ; indispensable si j'utilise les objets dans un vecteur. http://www-h.eng.cam.ac.uk/help/tpl/languages/C++/morevectormemory.html
-
     Layer(const Layer &lay){
         //std::cout << "construct by copy layer " << std::endl;
         mActive=lay.mActive;

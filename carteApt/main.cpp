@@ -59,16 +59,20 @@ int main(int argc, char *argv[])
 
 if (1){
 
-/*
 
+     std::string aFileCodeMS("/home/lisein/Documents/carteApt/autres/mapserver/mapThematiqueFEE.map");
     for (auto & kv : aMRs){
-        aACA.createTile(kv.second.NomCarte(),kv.second.NomDirTuile(),kv.second.Type());
+        //aACA.createTile(kv.second.NomCarte(),kv.second.NomDirTuile(),kv.second.Type());
+        cRasterInfo RI= kv.second;
+         aACA.codeMapServer(RI.NomFileWithExt(),RI.Code(),RI.Nom(),aFileCodeMS,RI.getDicoVal(),RI.getDicoCol());
     }
-*/
-    std::string aFileCodeMS("/home/lisein/Documents/carteApt/autres/mapserver/mapFEE.map");
+
+
     for (auto & kv : aMEss){
         //std::string aOut=dico.Files()->at("OUTDIR")+"aptitudeFEE_"+kv.first+".tif";
-            aACA.carteAptFEE(&kv.second,kv.second.NomCarteAptFEE(),true);
+
+        //aACA.carteAptFEE(&kv.second,kv.second.NomCarteAptFEE(),true);
+
         //aOut=dico.Files()->at("OUTDIR")+"aptitudeCS_"+kv.first+".tif";
         //aACA.carteAptCS(&kv.second,kv.second.NomCarteAptCS(),false);
 
@@ -80,15 +84,24 @@ if (1){
         //aACA.createTile(kv.second.NomCarteAptFEE(),kv.second.NomDirTuileAptFEE(),Apt,true);
        // aACA.createTile(kv.second.NomCarteAptCS(),kv.second.NomDirTuileAptCS(),Apt);
 
-        aACA.codeMapServer(kv.second.NomCarteAptFEE(),kv.second.NomMapServerLayer(),kv.second.NomMapServerLayerFull(),aFileCodeMS,Apt);
-    }
+        //DicoVal=dico->code2AptFull();
+        //DicoCol=dico->codeApt2col();
+        //aACA.codeMapServer(kv.second.shortNomCarteAptFEE(),kv.second.NomMapServerLayer(),kv.second.NomMapServerLayerFull(),aFileCodeMS,Apt);
+         /*if (exists(kv.second.NomCarteAptFEE())){
+          * std::string aFileCodeMS("/home/lisein/Documents/carteApt/autres/mapserver/mapCS.map");
+            aACA.codeMapServer(kv.second.shortNomCarteAptCS(),kv.second.NomMapServerLayerCS(),kv.second.NomMapServerLayerFull(),aFileCodeMS,Apt);
+         }*/
+         }
 
-    /*
+/*
     for (auto & kv : aMKKs){
-        aACA.carteKKCS(&kv.second,kv.second.NomCarte(),false);
-        aACA.createTile(kv.second.NomCarte(),kv.second.NomDirTuile(),kv.second.Type());
+        //aACA.carteKKCS(&kv.second,kv.second.NomCarte(),false);
+        //aACA.createTile(kv.second.NomCarte(),kv.second.NomDirTuile(),kv.second.Type());
         //aACA.compressTif(kv.second.NomCarte());
-    }*/
+         cKKCS KK=kv.second;
+         aACA.codeMapServer(KK.shortNomCarte(),KK.NomMapServerLayer(),KK.NomMapServerLayerFull(),aFileCodeMS,);
+    }
+    */
 
 }
 

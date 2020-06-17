@@ -19,6 +19,8 @@ inline bool exists (const std::string& name){
     return (stat (name.c_str(), &buffer) == 0);
 };
 
+std::string removeAccents(std::string aStr);
+
 class color;
 
 
@@ -43,7 +45,7 @@ public:
     void toPNG(std::string input, std::string output,TypeCarte aType=Apt);
 
     // creation du code de rendu de mapserver pour une couche donnée
-    void codeMapServer(std::string inputData, string layerName, string layerFullName, std::string output, TypeCarte aType=Apt);
+    void codeMapServer(std::string inputData, string layerName, string layerFullName, std::string output, std::map<int, string> *DicoVal, std::map<int, color> DicoCol);
     void tiletoPNG(std::string aDir,TypeCarte aType=Apt);
     void cropIm(std::string input, std::string output, double topLeftX, double topLeftY,double width, double height);
     //clip avec l'extent d'un polygone

@@ -17,6 +17,13 @@ Layer::Layer(groupLayers * aGroupL, std::string aCode, WText *PWText, TypeLayer 
     // constructeur qui dépend du type de layer
     switch (mType) {
     case TypeLayer::FEE:
+        // construction de l'essence
+        mEss=new cEss(mCode,mDico);
+        mLabel=mEss->Code() + " - "+ mEss->Nom();
+        mText->setText(mLabel);
+        mDicoVal=mDico->code2AptFull();
+        mDicoCol=mDico->codeApt2col();
+        break;
     case TypeLayer::CS:
         // construction de l'essence
         mEss=new cEss(mCode,mDico);
@@ -31,13 +38,7 @@ Layer::Layer(groupLayers * aGroupL, std::string aCode, WText *PWText, TypeLayer 
         mLabel= "Catalogue de Station - "+ mKK->Nom();
         mText->setText(mLabel);
         mPathTif=mKK->NomCarte();
-        if (mKK->IsHabitat()){
-            mDicoVal=mDico->id2Hab();
-        } else if (mKK->IsFact()){
-            mDicoVal=mDico->echelleFactNom() ;
-        } else if (mKK->IsPot()){
-            mDicoVal=mDico->echellePotCat() ;
-        }
+        mDicoVal=mKK->getDicoValPtr();
         mDicoCol=mKK->getDicoCol();
         break;
     case TypeLayer::Thematique:
@@ -59,16 +60,6 @@ Layer::Layer(groupLayers * aGroupL, std::string aCode, WText *PWText, TypeLayer 
         }
     }
 
-    // reconstruit l'objet GroupLayer! petit rigolo va !!-->
-    //mText->clicked().connect(std::bind(&groupLayers::clickOnName, mGroupL, mCode));
-    // ici ça bug
-  /*  mText->clicked().connect([this]{
-        std::cout << " tataa " << std::endl;
-        //mGroupL->clickOnName("IGN");
-        //mGroupL est dangling!!
-        std::cout << "number of layer in the group " << mGroupL->mVLs.size() << std::endl;
-    });
-    */
 
     setActive(false);
     //std::cout << "done" << std::endl;
@@ -100,18 +91,6 @@ void Layer::setActive(bool b){
     if (mActive) {mText->setToolTip(WString::tr("toolTipActiveLayer"));} else {mText->setToolTip("");}
 }
 
-
-
-/*
-void Layer::clickOnName(std::string aCode){
-    std::cout << " j'ai cliqué sur " << aCode << " \n\n\n" << std::endl;
-    // udpate du rendu visuel de tout les labels de couches -- cela se situe au niveau du grouplayer
-    //mGroupL->update(mCode);
-    // ajouter la couche à la carte
-    //displayLayer();
-    //setActive(true);
-}
-*/
 
 void Layer::displayLayer() const{
 
@@ -158,6 +137,20 @@ void Layer::displayLayer() const{
             boost::replace_all(JScommand,"MYURL","https://gxgfservcarto.gxabt.ulg.ac.be/cgi-bin/aptitude_fee");
             break;
         }
+        case TypeLayer::CS:{
+            std::string aFileIn(mDico->File("displayWMS"));
+            std::ifstream in(aFileIn);
+            std::stringstream ss;
+            ss << in.rdbuf();
+            in.close();
+            JScommand=ss.str();
+            boost::replace_all(JScommand,"MYTITLE",this->getLegendLabel());
+            boost::replace_all(JScommand,"MYLAYER",this->NomMapServerLayer());
+            boost::replace_all(JScommand,"MYURL"," http://gxgfservcarto.gxabt.ulg.ac.be/cgi-bin/aptitude_cs");
+            break;
+        }
+
+
         default:
         {
             std::stringstream ss;

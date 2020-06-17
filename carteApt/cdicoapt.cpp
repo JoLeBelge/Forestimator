@@ -841,6 +841,8 @@ std::string cEss::shortNomCarteAptCS(){return "aptitudeCS_"+mCode+".tif";}
 std::string cEss::NomMapServerLayer(){return "Aptitude_FEE_"+mCode;}
 std::string cEss::NomMapServerLayerFull(){return "Aptitude "+mPrefix+mNomFR;}
 
+std::string cEss::NomMapServerLayerCS(){return "Aptitude_CS_"+mCode;}
+
 bool cEss::hasRisqueComp(int zbio,int topo){
     bool aRes(0);
     int risque=getRisque(zbio,topo);
@@ -863,12 +865,24 @@ cKKCS::cKKCS(std::string aCode,cDicoApt * aDico):mCode(aCode),mNom(aDico->codeKK
         mHabitats=aDico->getHabitatCS(mNomCol);
     }
     mDicoCol=mDico->getDicoRasterCol(this);
+
+
+    if (IsHabitat()){
+        mDicoVal=*mDico->id2Hab();
+    } else if (IsFact()){
+        mDicoVal=*mDico->echelleFactNom() ;
+    } else if (IsPot()){
+        mDicoVal=*mDico->echellePotCat() ;
+    }
     //std::cout << "done " << std::endl;
 }
 
 std::string cKKCS::NomCarte(){return mDico->File("OUTDIR")+"KK_CS_"+mCode+".tif";}
+std::string cKKCS::shortNomCarte(){return "KK_CS_"+mCode+".tif";}
 std::string cKKCS::NomDirTuile(){return mDico->File("OUTDIR2")+"KK_CS_"+mCode;}
 
+std::string cKKCS::NomMapServerLayer(){return "KK_CS_"+mCode;}
+std::string cKKCS::NomMapServerLayerFull(){return "Description stationnelle - "+mNom;}
 
 int cKKCS::getEchelle(int aZbio,int aSTId){
     int aRes(0);
@@ -911,6 +925,9 @@ std::string cRasterInfo::NomDirTuile(){return mDico->File("OUTDIR2")+NomTuile();
 std::string cRasterInfo::NomFile(){
     boost::filesystem::path p(mPathRaster);
     return p.stem().c_str();}
+std::string cRasterInfo::NomFileWithExt(){
+    boost::filesystem::path p(mPathRaster);
+    return p.filename().c_str();}
 
 
 TypeCarte str2TypeCarte(const std::string& str)

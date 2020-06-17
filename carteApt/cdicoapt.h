@@ -83,6 +83,7 @@ class cRasterInfo
 public:
     cRasterInfo(std::string aCode,cDicoApt * aDico);
     std::string NomFile(); // nom du fichier tiff sans l'extension
+    std::string NomFileWithExt();
     std::string Nom(){return mNom;}
     std::string Code(){return mCode;}
     std::string NomCarte(){return mPathRaster;}// retourne le chemin d'accès complêt
@@ -125,10 +126,16 @@ public:
     std::string summary(){return "Potentiel et risque liés au stations : " +mCode + " , "+ mNom + " , "+ mNomCol
                 +  " Echelle risque/pot zbio 1 station 1 : " + std::to_string(getEchelle(1,1));}
     std::string NomCarte();
+    std::string shortNomCarte();
     std::string NomDirTuile();
+    std::string NomMapServerLayer();
+    std::string NomMapServerLayerFull();
+
     int getEchelle(int aZbio,int aSTId);
     int getHab(int aZbio,int aSTId);
     std::map<int, color> getDicoCol(){return mDicoCol;}
+    std::map<int, std::string> getDicoVal(){return mDicoVal;}
+    std::map<int, std::string> * getDicoValPtr(){return &mDicoVal;}
     TypeCarte Type(){return mType;}
 private:
     TypeCarte mType;
@@ -142,6 +149,8 @@ private:
     // bon pour les habitats ce n'est pas la même structure de donnée, mais je vais tout de même utiliser cet objet aussi
     std::map<int,std::map<int,std::vector<std::string>>> mHabitats;
 
+    // le dictionnaire des valeurs raster vers leur signification.
+    std::map<int, std::string> mDicoVal;
     // le dictionnaire des valeurs raster vers leur signification.
     std::map<int, color> mDicoCol;
 };
@@ -201,7 +210,9 @@ public:
     std::string NomDirTuileAptCS();
 
     std::string NomMapServerLayer();
-    std::string NomMapServerLayerFull();
+    std::string NomMapServerLayerFull();//pour FEE et CS
+    std::string NomMapServerLayerCS();
+
 
     // aptitude ecograme : clé chaine charactère ; c'est la combinaison ntxnh du genre "A2p5" ou "Mm4
     std::map<int,std::map<std::string,int>> mEcoVal;
@@ -227,6 +238,7 @@ public:
     std::string printRisque();
 
     TypeCarte Type(){return mType;}
+
 private:
     TypeCarte mType;
     cDicoApt * mDico;

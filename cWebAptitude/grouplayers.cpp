@@ -1,6 +1,5 @@
 #include "grouplayers.h"
 
-//const char *cl[] = { "FEE", "CS" };
 const TypeClassifST cl[] = { FEE, CS };
 std::vector<std::string> classes = {"Fichier Ecologique des Essences", "Catalogue des Stations"};
 
@@ -12,27 +11,14 @@ groupLayers::groupLayers(cDicoApt * aDico, WContainerWidget *parent, WContainerW
   ,mParent(parent)
   ,mPBar(NULL)
   ,m_app(app)
-  ,mEssTable(NULL)
-  ,mClassifTable(NULL)
-  ,mOtherTable(NULL)
   ,mLegend(NULL)
   ,mSelect4Stat(NULL)
   ,mSelect4Download(NULL)
 {
     //std::cout << "constructeur GL " << std::endl;
     mParent->setOverflow(Wt::Overflow::Visible);
-    //mParent->setPadding(20);
     mParent->setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Middle);
-    //this->addStyleClass("table form-inline");
-    //this->setStyleClass("table form-inline");
     mParent->addWidget(cpp14::make_unique<WText>( tr("coucheStep1")));
-
-
-    // creation de la table listant les cartes thématiques - catalogue station,pot sylvicole, NH, NT, AE, ect
-    //mOtherTable = mParent->addWidget(cpp14::make_unique<Wt::WTable>());
-    //int row(0),col(0);
-
-    //mOtherTable->setWidth("80%");
 
 	/* Liste cartes 1	*/
 	std::unique_ptr<Wt::WTree> tree = Wt::cpp14::make_unique<Wt::WTree>();
@@ -52,30 +38,23 @@ groupLayers::groupLayers(cDicoApt * aDico, WContainerWidget *parent, WContainerW
 
     // carte IGN
    	WText *label = node1_->addChildNode(Wt::cpp14::make_unique<Wt::WTreeNode>(""))->label();
-    //WText *label = mOtherTable->elementAt(row,col)->addWidget(cpp14::make_unique<WText>(""));
     label->clicked().connect([this]{clickOnName("IGN",TypeLayer::Externe);});
     label->setTextAlignment(Wt::AlignmentFlag::Left);
     mVLs.push_back(new Layer(this,"IGN",label,TypeLayer::Externe));
-    //row++;
-    //std::cout << "go" << std::endl;
-    //if (row % 6 == 0){col++;row=0;}
+
     // creation des layers pour les KK du CS
     for (auto & pair : *mDico->codeKK2Nom()){
         WText *label;
-        //label = mOtherTable->elementAt(row,col)->addWidget(cpp14::make_unique<WText>(""));
        	label = node1_->addChildNode(Wt::cpp14::make_unique<Wt::WTreeNode>(""))->label();
         mVLs.push_back(new Layer(this,pair.first,label,TypeLayer::KK));
         std::string aCode=pair.first;
         label->clicked().connect([this,aCode]{clickOnName(aCode,TypeLayer::KK);});
-        //row++;
-        //if (row % 6 == 0){col++;row=0;}
     }
     //std::cout << "d0" << std::endl;
     // ajout des cartes "FEE" ; NT NH Topo AE SS
 
     for (auto & pair : *mDico->RasterType()){
         WText *label;
-        //label = mOtherTable->elementAt(row,col)->addWidget(cpp14::make_unique<WText>(""));
         label = node1_->addChildNode(Wt::cpp14::make_unique<Wt::WTreeNode>(""))->label();
         Layer  * aL= new Layer(this,pair.first,label,TypeLayer::Thematique);
         std::string aCode=pair.first;
@@ -83,12 +62,9 @@ groupLayers::groupLayers(cDicoApt * aDico, WContainerWidget *parent, WContainerW
         TypeLayer type= aL->Type();
         label->clicked().connect([this,aCode,type]{clickOnName(aCode,type);});
         mVLs.push_back(aL);
-        //row++;
-        //if (row % 6 == 0){col++;row=0;}
     }
     //std::cout << "d1" << std::endl;
     node1_->expand();
-
 
     auto node2 = Wt::cpp14::make_unique<Wt::WTreeNode>("Fichier Ecologique des Essences");
 	auto node2_ = tree->treeRoot()->addChildNode(std::move(node2));
@@ -99,34 +75,24 @@ groupLayers::groupLayers(cDicoApt * aDico, WContainerWidget *parent, WContainerW
     // creation des layers pour les essences qui ont des aptitudes
     for (auto & pair : *mDico->code2Nom()){
         cEss ess(pair.first,mDico);
-        //if (ess.hasApt()){
         //std::cout << "fee" << std::endl;
         if (ess.hasFEEApt()){
             WText *label;
-            //label = mEssTable->elementAt(row,col)->addWidget(cpp14::make_unique<WText>(""));
+
             label = node2_->addChildNode(Wt::cpp14::make_unique<Wt::WTreeNode>(""))->label();
 			Layer  * aL= new Layer(this,pair.first,label,TypeLayer::FEE);
-            // constructeur pour type Apti pour ne pas créer deux fois l'essence d'affilé, ouverture et fermeture de la DB un peu sensible
-            //Layer * aL=new Layer(this,ess,label);
             mVLs.push_back(aL);
             std::string aCode=pair.first;
             label->clicked().connect([this,aCode]{clickOnName(aCode,TypeLayer::FEE);});
-            //row++;
-           // if (row % 17 == 0){col++;row=0;}
         }
         //std::cout << "cs" << std::endl;
         if (ess.hasCSApt()){
             WText *label;
-            //label = mEssTable->elementAt(row,col)->addWidget(cpp14::make_unique<WText>(""));
             label = node3_->addChildNode(Wt::cpp14::make_unique<Wt::WTreeNode>(""))->label();
 			Layer  * aL= new Layer(this,pair.first,label,TypeLayer::CS);
-            // constructeur pour type Apti pour ne pas créer deux fois l'essence d'affilé, ouverture et fermeture de la DB un peu sensible
-            //Layer * aL=new Layer(this,ess,label);
             mVLs.push_back(aL);
             std::string aCode=pair.first;
             label->clicked().connect([this,aCode]{clickOnName(aCode,TypeLayer::CS);});
-            //row++;
-           // if (row % 17 == 0){col++;row=0;}
         }
         
     }
@@ -164,9 +130,6 @@ groupLayers::groupLayers(cDicoApt * aDico, WContainerWidget *parent, WContainerW
     mLegend=NULL;
     printf("nulled mMap GL\n");
     mPBar=NULL;
-    mEssTable=NULL;
-    mClassifTable=NULL;
-    mOtherTable=NULL;
     mVLs.clear();
 }*/
 
