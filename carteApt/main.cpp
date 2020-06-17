@@ -68,7 +68,7 @@ if (1){
     std::string aFileCodeMS("/home/lisein/Documents/carteApt/autres/mapserver/mapFEE.map");
     for (auto & kv : aMEss){
         //std::string aOut=dico.Files()->at("OUTDIR")+"aptitudeFEE_"+kv.first+".tif";
-        //aACA.carteAptFEE(&kv.second,kv.second.NomCarteAptFEE(),true);
+            aACA.carteAptFEE(&kv.second,kv.second.NomCarteAptFEE(),true);
         //aOut=dico.Files()->at("OUTDIR")+"aptitudeCS_"+kv.first+".tif";
         //aACA.carteAptCS(&kv.second,kv.second.NomCarteAptCS(),false);
 

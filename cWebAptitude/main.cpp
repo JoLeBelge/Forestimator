@@ -33,8 +33,6 @@
 #include <Wt/WToolBar.h>
 #include <Wt/WTemplate.h>
 #include <Wt/WString.h>
-#include <Wt/WCheckBox.h>
-#include <Wt/WLeafletMap.h>
 #include <sys/stat.h>
 
 /* attention, je n'ai jamais réussi à paramètrer deux docroot donc je dois tout mettre dans un seul et unique!
@@ -45,35 +43,8 @@
  * ./WebAptitude --deploy-path=/ --docroot "/home/lisein/Documents/carteApt/Forestimator/build-WebAptitude;favicon.ico,/resources,/style,/tmp,/data,/Tuiles" --http-port 80 --http-addr 0.0.0.0
 */
 
-cWebAptitude * _webapt;
 
 using namespace std;
-
-
-
-/*
- * Redirections en fonction du internal path
- *
- */
-void handlePathChange(Wt::WStackedWidget *stack)
-{
-    Wt::WApplication *app = Wt::WApplication::instance();
-    printf("path change\n");
-    // TODO corriger les affichages
-    if (app->internalPath() == "/presentation")
-		std::cout << "presentation " << std::endl;
-    else if (app->internalPath() == "/cartographie"){
-		stack->setCurrentIndex(1);
-		_webapt->stack_info->setCurrentIndex(2);
-		_webapt->menuitem2_analyse->setHidden(true);	
-	}else if (app->internalPath() == "/analyse"){
-		stack->setCurrentIndex(1);
-		_webapt->stack_info->setCurrentIndex(1);
-		_webapt->menuitem2_analyse->setHidden(false);	
-		_webapt->menuitem2_analyse->select();
-    }else
-		stack->setCurrentIndex(0);
-}
 
 
 std::unique_ptr<WApplication> createApplication(const WEnvironment& env)
@@ -140,63 +111,11 @@ std::unique_ptr<WApplication> createApplication(const WEnvironment& env)
 	// CSS custom pour faire beau
 	app->useStyleSheet("style/style.css");
 
-    
-	auto layout = app->root()->setLayout(Wt::cpp14::make_unique<Wt::WVBoxLayout>());
-	std::cout << "s1 " << std::endl;
-	
-	Wt::WStackedWidget *stack  = layout->addWidget(Wt::cpp14::make_unique<Wt::WStackedWidget>());
-	
-    std::unique_ptr<cWebAptitude> WebApt = Wt::cpp14::make_unique<cWebAptitude>(app.get());
-    //_webapt = new cWebAptitude(app.get()); // TODO dangling :)
-    _webapt = WebApt.get();
-
-	/*	HOME PAGE	*/
-	auto container_home = Wt::cpp14::make_unique<Wt::WContainerWidget>();
-	container_home->setStyleClass("home_div");
-	container_home->setOverflow(Wt::Overflow::Auto);
-	container_home->setMargin(Wt::WLength::Auto);
-	container_home->setMargin(20,Wt::Side::Top);
-	container_home->addNew<Wt::WText>("<h1 style='color:white;height: 37px;font-size: 3em;max-width: 800px;text-align: center;'>Forestimator</h1>");
-	container_home->decorationStyle().setBackgroundImage(Wt::WLink("resources/bg.png"), None);
-	// add menu as push buttons!
-	Wt::WPushButton *b_pres  = container_home->addWidget(Wt::cpp14::make_unique<Wt::WPushButton>("Présentation"));
-	container_home->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
-	Wt::WPushButton *b_carto = container_home->addWidget(Wt::cpp14::make_unique<Wt::WPushButton>("Cartographie"));
-	container_home->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
-	Wt::WPushButton *b_anal  = container_home->addWidget(Wt::cpp14::make_unique<Wt::WPushButton>("Analyse"));
-	container_home->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
-	Wt::WPushButton *b_simu  = container_home->addWidget(Wt::cpp14::make_unique<Wt::WPushButton>("Simulation"));
-	container_home->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
-	b_pres->setStyleClass("btn btn-success");
-	b_carto->setStyleClass("btn btn-success");
-	b_anal->setStyleClass("btn btn-success");
-	b_simu->setStyleClass("btn btn-success");
-	b_pres ->setLink(Wt::WLink(Wt::LinkType::InternalPath, "/presentation"));
-	b_carto->setLink(Wt::WLink(Wt::LinkType::InternalPath, "/cartographie"));
-	b_anal ->setLink(Wt::WLink(Wt::LinkType::InternalPath, "/analyse"));
-	b_simu ->setLink(Wt::WLink(Wt::LinkType::InternalPath, "/simulation"));
-	
-	WContainerWidget *c_img1 = container_home->addWidget(Wt::cpp14::make_unique<Wt::WContainerWidget>());
-	Wt::WImage *img1 = c_img1->addNew<Wt::WImage>(Wt::WLink("resources/uliege.png"));
-	img1->setAlternateText("ULiege logo");
-	c_img1->addStyleClass("logo_left");
-
-	WContainerWidget *c_img2 = container_home->addWidget(Wt::cpp14::make_unique<Wt::WContainerWidget>());
-	Wt::WImage *img2 = c_img2->addNew<Wt::WImage>(Wt::WLink("resources/fpb.png"));
-	c_img2->addStyleClass("logo_right");
-	/*	FIN HOME PAGE	*/	
-	
-
-	stack->addWidget(std::move(container_home));
-    stack->addWidget(std::move(WebApt));
-	stack->setCurrentIndex(0);
-	
     app->enableUpdates();
-    
-    app->internalPathChanged().connect([=] {
-    	handlePathChange(stack);
-	});
-    handlePathChange(stack); // force first route
+
+    auto layout = app->root()->setLayout(Wt::cpp14::make_unique<Wt::WVBoxLayout>());
+    std::unique_ptr<cWebAptitude> WebApt = Wt::cpp14::make_unique<cWebAptitude>(app.get());
+    layout->addWidget(std::move(WebApt), 0);
 
     return app;
 }

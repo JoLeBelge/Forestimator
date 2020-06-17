@@ -146,6 +146,18 @@ void Layer::displayLayer() const{
             //std::cout << JScommand << std::endl;
             break;
         }
+        case TypeLayer::FEE:{
+            std::string aFileIn(mDico->File("displayWMS"));
+            std::ifstream in(aFileIn);
+            std::stringstream ss;
+            ss << in.rdbuf();
+            in.close();
+            JScommand=ss.str();
+            boost::replace_all(JScommand,"MYTITLE",this->getLegendLabel());
+            boost::replace_all(JScommand,"MYLAYER",this->NomMapServerLayer());
+            boost::replace_all(JScommand,"MYURL","https://gxgfservcarto.gxabt.ulg.ac.be/cgi-bin/aptitude_fee");
+            break;
+        }
         default:
         {
             std::stringstream ss;
@@ -163,8 +175,6 @@ void Layer::displayLayer() const{
             switch (mType) {
             case TypeLayer::CS:
                 Replace1="CS_"+mCode;Replace2="aptitudeCS_"+mCode;break;
-            case TypeLayer::FEE:
-                Replace1="FEE_"+mCode;Replace2="aptitudeFEE_"+mCode;break;
             case TypeLayer::KK:
                 Replace1="KK_CS_"+mCode;
                 Replace2=Replace1;
@@ -182,7 +192,7 @@ void Layer::displayLayer() const{
         }
     }
     mText->doJavaScript(JScommand);// c'est peut-être plutôt la carte qui dois faire le doJavascript, pas le label text...
-
+    //std::cout << JScommand << std::endl;
 }
 
 std::vector<std::string> Layer::displayInfo(double x, double y){
@@ -485,6 +495,26 @@ GDALDataset * Layer::rasterizeGeom(OGRGeometry *poGeom){
         GDALClose(pShp);
     }
     return pRaster;
+}
+
+std::string Layer::NomMapServerLayer()const{
+    std::string aRes;
+    switch (mType) {
+    case TypeLayer::FEE:
+        aRes="Aptitude_FEE_"+mCode;
+         break;
+    case TypeLayer::CS:
+        aRes="Aptitude_CS_"+mCode;
+        break;
+    case TypeLayer::Thematique:
+       aRes=mCode;
+       break;
+    default:
+        aRes=mCode;
+    }
+    return aRes;
+
+
 }
 
 

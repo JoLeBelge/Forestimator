@@ -13,7 +13,7 @@ legend::legend(WContainerWidget *parent):mParent(parent)
 
 void legend::createUI()
 {
-    mTitle = mParent->addWidget(cpp14::make_unique<WText>("<i>Aucune légende à afficher pour l'instant. Veuillez d'abord sélectionner une couche...</i>"));
+    mTitle = mParent->addWidget(cpp14::make_unique<WText>(WString::tr("legendMsg")));
 
     mParent->setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Left);
     mParent->setMargin(1,Wt::Side::Bottom | Wt::Side::Top);
@@ -47,7 +47,7 @@ void legend::createUI()
 void legend::vider()
 {
 	//mTitle->setStyleClass("nonvisible");
-	mTitle->setText("<h3>Légende de la carte :</h3>");
+    mTitle->setText(WString::tr("legendTitre"));
     mInfoT->clear();
     mDetAptFEE->clear();
     mAptAllEss->clear();

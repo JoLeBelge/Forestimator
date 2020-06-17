@@ -19,13 +19,13 @@ groupLayers::groupLayers(cDicoApt * aDico, WContainerWidget *parent, WContainerW
   ,mSelect4Stat(NULL)
   ,mSelect4Download(NULL)
 {
-    std::cout << "constructeur GL " << std::endl;
+    //std::cout << "constructeur GL " << std::endl;
     mParent->setOverflow(Wt::Overflow::Visible);
     //mParent->setPadding(20);
     mParent->setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Middle);
     //this->addStyleClass("table form-inline");
     //this->setStyleClass("table form-inline");
-    mParent->addWidget(cpp14::make_unique<WText>("<h3>Etape 1 : Sélectionnez une thématique</h3>"));
+    mParent->addWidget(cpp14::make_unique<WText>( tr("coucheStep1")));
 
 
     // creation de la table listant les cartes thématiques - catalogue station,pot sylvicole, NH, NT, AE, ect
@@ -39,7 +39,7 @@ groupLayers::groupLayers(cDicoApt * aDico, WContainerWidget *parent, WContainerW
 	tree->setSelectionMode(Wt::SelectionMode::Extended);
 	tree->addStyleClass("tree_left");
 	//auto folderIcon = Wt::cpp14::make_unique<Wt::WIconPair>("icons/yellow-folder-closed.png", "icons/yellow-folder-open.png", false);
-	std::cout << "g1" << std::endl;
+    //std::cout << "g1" << std::endl;
     auto main_node = Wt::cpp14::make_unique<Wt::WTreeNode>("Couches"); // std::move(folderIcon) // pour mettre des icones ouvert/fermé !
 	tree->setTreeRoot(std::move(main_node));
 	tree->treeRoot()->label()->setTextFormat(Wt::TextFormat::Plain);
@@ -48,7 +48,7 @@ groupLayers::groupLayers(cDicoApt * aDico, WContainerWidget *parent, WContainerW
 	auto node1_ = tree->treeRoot()->addChildNode(std::move(node1));
 	node1_->addStyleClass("tree_node");
 	tree->treeRoot()->expand();
-	std::cout << "g2" << std::endl;
+    //std::cout << "g2" << std::endl;
 
     // carte IGN
    	WText *label = node1_->addChildNode(Wt::cpp14::make_unique<Wt::WTreeNode>(""))->label();
@@ -57,7 +57,7 @@ groupLayers::groupLayers(cDicoApt * aDico, WContainerWidget *parent, WContainerW
     label->setTextAlignment(Wt::AlignmentFlag::Left);
     mVLs.push_back(new Layer(this,"IGN",label,TypeLayer::Externe));
     //row++;
-	std::cout << "go" << std::endl;
+    //std::cout << "go" << std::endl;
     //if (row % 6 == 0){col++;row=0;}
     // creation des layers pour les KK du CS
     for (auto & pair : *mDico->codeKK2Nom()){
@@ -70,7 +70,7 @@ groupLayers::groupLayers(cDicoApt * aDico, WContainerWidget *parent, WContainerW
         //row++;
         //if (row % 6 == 0){col++;row=0;}
     }
-    std::cout << "d0" << std::endl;
+    //std::cout << "d0" << std::endl;
     // ajout des cartes "FEE" ; NT NH Topo AE SS
 
     for (auto & pair : *mDico->RasterType()){
@@ -86,26 +86,10 @@ groupLayers::groupLayers(cDicoApt * aDico, WContainerWidget *parent, WContainerW
         //row++;
         //if (row % 6 == 0){col++;row=0;}
     }
-	std::cout << "d1" << std::endl;
+    //std::cout << "d1" << std::endl;
     node1_->expand();
 
-    /*mClassifTable = mParent->addWidget(cpp14::make_unique<Wt::WTable>());
-    for (int i = 0; i < 2; ++i) {
-        WText *t = mClassifTable->elementAt(0,i)->addWidget(cpp14::make_unique<WText>(classes[i]));
-        mClassifTable->elementAt(0,i)->setContentAlignment(AlignmentFlag::Center| AlignmentFlag::Middle);
-        t->setMargin(5);
-        t->clicked().connect(std::bind(&groupLayers::changeClassClick, this, t));
-        bool isCurrent = i==0;
-        //choisi un des deux style
-        t->setStyleClass(isCurrent ? "currentEss" : "ess");
-        clasLabels_.push_back(t);
-    }
-    //mClassifTable->setOffsets(100);
-    //mClassifTable->setHeight(75); // ça plus le setContentAlig*/
-    // creation de la table listant les essences
-    //mEssTable = mParent->addWidget(cpp14::make_unique<Wt::WTable>());
-    //row=0;col=0;
-    //mEssTable->setWidth("80%");
+
     auto node2 = Wt::cpp14::make_unique<Wt::WTreeNode>("Fichier Ecologique des Essences");
 	auto node2_ = tree->treeRoot()->addChildNode(std::move(node2));
 	auto node3 = Wt::cpp14::make_unique<Wt::WTreeNode>("Catalogue des Stations");
@@ -146,11 +130,11 @@ groupLayers::groupLayers(cDicoApt * aDico, WContainerWidget *parent, WContainerW
         }
         
     }
-    std::cout << "done nodeitem" << std::endl;
+    //std::cout << "done nodeitem" << std::endl;
 	mParent->addWidget(std::move(tree));
 	
-    mParent->addWidget(cpp14::make_unique<WText>("<h3>Etape 2 : Zoomer sur la zone d'intéret</h3>"));
-    mParent->addWidget(cpp14::make_unique<WText>("<h3>Etape 3 : Exporter la couche thématique</h3>"));
+    mParent->addWidget(cpp14::make_unique<WText>(tr("coucheStep2")));
+    mParent->addWidget(cpp14::make_unique<WText>(tr("coucheStep3")));
     WPushButton * bExportTiff = mParent->addWidget(cpp14::make_unique<WPushButton>("Télécharger"));
     bExportTiff->disable();
     // TODO on click event
@@ -164,7 +148,7 @@ groupLayers::groupLayers(cDicoApt * aDico, WContainerWidget *parent, WContainerW
     mSelect4Stat= new selectLayers4Stat(this);
     mSelect4Download= new selectLayers4Download(this);
 
-    std::cout << "done" << std::endl;
+    //std::cout << "done" << std::endl;
 }
 
 /*groupLayers::~groupLayers(){
@@ -298,7 +282,7 @@ void groupLayers::computeStatGlob(OGRGeometry *poGeomGlobale){
         m_app->processEvents();
     }
     mPBar->setValue(mPBar->maximum()); 
-    //std::cout << " done " << std::endl;
+    std::cout << " done " << std::endl;
     //return aRes;
 }
 
@@ -366,7 +350,7 @@ std::map<std::string,int> groupLayers::apts(){
 }
 
 selectLayers4Stat::selectLayers4Stat(groupLayers * aGL):mGL(aGL),selectLayers(aGL,aGL->getVpLs(),10){
-    std::cout << "creation de selectLayers4Stat " << std::endl;
+    //std::cout << "creation de selectLayers4Stat " << std::endl;
 
     // pour l'instant ; uniquement les aptitudes FEE
     for (Layer * l : mVpLs){
@@ -466,7 +450,7 @@ selectLayers4Stat::selectLayers4Stat(groupLayers * aGL):mGL(aGL),selectLayers(aG
     //treeTable->treeRoot()->addChildNode(std::move(grAptCS));
     treeTable->treeRoot()->addChildNode(std::move(grPeup));
     treeTable->treeRoot()->expand();
-    printf("4stat done");
+    //printf("4stat done");
 }
 
 Layer* selectLayers::getLayerPtr(std::vector<std::string> aCode){
@@ -496,7 +480,7 @@ std::map<std::vector<std::string>,Layer*> selectLayers::getAllLayer(){
 }
 
 selectLayers4Download::selectLayers4Download(groupLayers * aGL):mGL(aGL),selectLayers(aGL,aGL->getVpLs(),25){
-    std::cout << "creation de selectLayers4Download " << std::endl;
+    //std::cout << "creation de selectLayers4Download " << std::endl;
     for (Layer * l : mVpLs){
         if (l->Type()!=TypeLayer::Externe){
             if (l->Type()==TypeLayer::FEE || l->Type()==TypeLayer::CS){

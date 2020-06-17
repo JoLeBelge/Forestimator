@@ -304,7 +304,7 @@ cDicoApt::cDicoApt(std::string aBDFile):mBDpath(aBDFile)
        std::cout << " createur du Dico" << std::endl;
    }*/
 
-    std::cout << "\nDico code essence --> nom essence francais a "<< Dico_code2NomFR.size() << " elements" << std::endl;
+    std::cout << "Dico code essence --> nom essence francais a "<< Dico_code2NomFR.size() << " elements \n" << std::endl;
     /*std::cout << "Dico code NH --> nom NH a "<< Dico_NH.size() << " elements" << std::endl;
     std::cout << "Dico code NT --> nom NT a "<< Dico_NT.size() << " elements" << std::endl;
     std::cout << "Dico code NTNH --> nom NH a "<< Dico_code2NTNH.size() << " elements" << std::endl;
@@ -312,7 +312,7 @@ cDicoApt::cDicoApt(std::string aBDFile):mBDpath(aBDFile)
     std::cout << "Dico code station --> nom station a "<< Dico_station.size() << " elements" << std::endl;
     std::cout << "Dico code couche SIG --> chemin d'accès a "<< Dico_GISfile.size() << " elements" << std::endl;
     std::cout << "Dico aptitude --> code aptitude a "<< Dico_Apt.size() << " elements" << std::endl;*/
-    std::cout << "done" << std::endl ;
+    //std::cout << "done" << std::endl ;
 
     /*for (auto & p : colors){
         std::cout << " couleur " << p.first << " : " << p.second.cat() << std::endl;
@@ -930,7 +930,6 @@ TypeCarte str2TypeCarte(const std::string& str)
 TypeVar str2TypeVar(const std::string& str){
     TypeVar aRes=TypeVar::Classe;
     if(str == "Continu") {
-        std::cout << " j'ai une classe  continue!!!\n\n\n" << std::endl;
         aRes=TypeVar::Continu;
     }
     return aRes;

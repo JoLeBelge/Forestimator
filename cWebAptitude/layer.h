@@ -160,6 +160,8 @@ public:
     std::string getLegendLabel() const;
     std::string getShortLabel() const {return mLabel;}
 
+    std::string NomMapServerLayer()const;
+
     // à cause de ma superbe idée de merde de mettre deux couches raster par layer, je dois surcharger ces méthodes pour pouvoir spécifier le mode Fee vs Cs
     std::vector<std::string> getCode(std::string aMode);
     std::string getPathTif(std::string aMode);

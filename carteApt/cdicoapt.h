@@ -162,7 +162,7 @@ public:
         bool aRes(1);
         if (mAptCS.size()==0) {
             aRes=0;
-            std::cout << "essence " << mNomFR << " n'as pas d'aptitude pour CS" << std::endl;
+            //std::cout << "essence " << mNomFR << " n'as pas d'aptitude pour CS" << std::endl;
         }
         return aRes;
     }
@@ -170,7 +170,7 @@ public:
         bool aRes(1);
         if (mEcoVal.size()==0) {
             aRes=0;
-            std::cout << "essence " << mNomFR << " n'as pas d'aptitude pour FEE" << std::endl;
+            //std::cout << "essence " << mNomFR << " n'as pas d'aptitude pour FEE" << std::endl;
         }
         return aRes;
     }
