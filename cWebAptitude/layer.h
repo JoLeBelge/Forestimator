@@ -155,7 +155,7 @@ public:
         return aRes;
     }
     std::string getPathTif();
-    std::string getLegendLabel() const;
+    std::string getLegendLabel(bool escapeChar=true) const;
     std::string getShortLabel() const {return mLabel;}
 
     std::string NomMapServerLayer()const;

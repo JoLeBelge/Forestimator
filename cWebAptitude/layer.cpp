@@ -105,10 +105,11 @@ void Layer::displayLayer() const{
         ss << in.rdbuf();
         in.close();
         JScommand=ss.str();
-        boost::replace_all(JScommand,"MYTITLE",this->getLegendLabel());
+        boost::replace_all(JScommand,"MYTITLE",this->getLegendLabel(true));
+
         boost::replace_all(JScommand,"MYLAYER",wms.mLayerName);
         boost::replace_all(JScommand,"MYURL",wms.mUrl);
-       // std::cout << JScommand << std::endl;
+        std::cout << JScommand << std::endl;
 
     } else {
 
@@ -361,7 +362,7 @@ std::string Layer::getPathTif(){
     return aRes;
 }
 
-std::string Layer::getLegendLabel() const{
+std::string Layer::getLegendLabel(bool escapeChar) const{
     std::string aRes;
     switch (mType) {
     case TypeLayer::FEE:
@@ -371,6 +372,11 @@ std::string Layer::getLegendLabel() const{
     default:
         aRes=mLabel;
     }
+
+    if (escapeChar) {
+        boost::replace_all(aRes,"'","\\'"); // javascript bug si jamais l'apostrophe n'est pas escapée
+    }
+
     return aRes;
 }
 
