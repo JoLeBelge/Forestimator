@@ -39,7 +39,7 @@ Wt:WContainerWidget * aRes= new Wt::WContainerWidget();
     aRes->setInline(0);
     aRes->setOverflow(Wt::Overflow::Auto);
 
-    aRes->addWidget(cpp14::make_unique<WText>("<h4>"+mLay->getLegendLabel()+"</h4>"));
+    aRes->addWidget(cpp14::make_unique<WText>("<h4>"+mLay->getLegendLabel(false)+"</h4>"));
     aRes->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
     //std::cout << " statsimple : " << mStatSimple.size() << " elem " << std::endl;
     if (mStatSimple.size()>0){
