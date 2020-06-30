@@ -275,8 +275,7 @@ cDicoApt::cDicoApt(std::string aBDFile):mBDpath(aBDFile)
 
     }
 
-
-    std::cout << "Dico code essence --> nom essence francais a "<< Dico_code2NomFR.size() << " elements \n" << std::endl;
+    //std::cout << "Dico code essence --> nom essence francais a "<< Dico_code2NomFR.size() << " elements \n" << std::endl;
     /*std::cout << "Dico code NH --> nom NH a "<< Dico_NH.size() << " elements" << std::endl;
     std::cout << "Dico code NT --> nom NT a "<< Dico_NT.size() << " elements" << std::endl;
     std::cout << "Dico code NTNH --> nom NH a "<< Dico_code2NTNH.size() << " elements" << std::endl;

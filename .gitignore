@@ -15,6 +15,7 @@ build-WebAptitude/main.o
 build-WebAptitude/layerstatchart.o
 build-WebAptitude/uploadcarte.o
 build-WebAptitude/ecogrammeEss.o
+build-WebAptitude/stackinfoptr.o
 build-WebAptitude/Makefile
 build-WebAptitude/.qmake.stash
 build-WebAptitude/WebAptitude

@@ -13,6 +13,7 @@
 #include <Wt/WCheckBox.h>
 #include <Wt/WMessageBox.h>
 
+#include "stackinfoptr.h"
 #include "layer.h"
 #include "legend.h"
 #include <fstream>
@@ -32,6 +33,7 @@ class rasterFiles;
 class selectLayers;
 class selectLayers4Stat;
 class selectLayers4Download;
+class stackInfoPtr;
 //class WCheckBox;
 //enum class TypeLayer;
 
@@ -105,7 +107,7 @@ private:
 class groupLayers: public WContainerWidget
 {
 public:
-    groupLayers(cDicoApt * aDico,WContainerWidget *parent,WContainerWidget *infoW,WOpenLayers * aMap, Wt::WApplication* app);
+    groupLayers(cDicoApt * aDico,WOpenLayers * aMap, Wt::WApplication* app,stackInfoPtr * aStackInfoPtr);
     //~groupLayers();
     /*groupLayers(const groupLayers &gl){
         std::cout << "construct by copy group layer -- should never happend\n\n\n" << std::endl;
@@ -181,8 +183,7 @@ private:
     legend * mLegend;
 
 
-    WContainerWidget * mInfoW;
-
+    stackInfoPtr *  mStackInfoPtr;
     // bof finalement c'est mieux le conteneur parent
     Wt::WContainerWidget     * mParent;
 
