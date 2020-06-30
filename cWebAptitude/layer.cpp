@@ -92,100 +92,37 @@ void Layer::setActive(bool b){
 }
 
 
-void Layer::displayLayer() const{
-
+void Layer::displayLayer() const{ 
     std::string JScommand;
     //std::cout << "display layer " << std::endl;
-    if (mDico->hasWMSinfo(this->getCode())){
-
-        WMSinfo wms=mDico->getWMSinfo(this->getCode());
+    if (this->Type()==TypeLayer::Externe) {
+        std::string aFileIn(mDico->File("displayExternLayer"));
+        std::ifstream in(aFileIn);
+        std::stringstream ss;
+        ss << in.rdbuf();
+        in.close();
+        JScommand=ss.str();
+        boost::replace_all(JScommand,"TOREPLACE",mCode);
+    } else {
         std::string aFileIn(mDico->File("displayWMS"));
         std::ifstream in(aFileIn);
         std::stringstream ss;
         ss << in.rdbuf();
         in.close();
         JScommand=ss.str();
-        boost::replace_all(JScommand,"MYTITLE",this->getLegendLabel(true));
+        boost::replace_all(JScommand,"MYTITLE",this->getLegendLabel());
 
-        boost::replace_all(JScommand,"MYLAYER",wms.mLayerName);
-        boost::replace_all(JScommand,"MYURL",wms.mUrl);
-        std::cout << JScommand << std::endl;
+        if (mDico->hasWMSinfo(this->getCode())){
+            WMSinfo wms=mDico->getWMSinfo(this->getCode());
+            boost::replace_all(JScommand,"MYLAYER",wms.mLayerName);
+            boost::replace_all(JScommand,"MYURL",wms.mUrl);
 
-    } else {
-
-        switch (mType) {
-        case TypeLayer::Externe:
-        {
-            std::string aFileIn(mDico->File("displayExternLayer"));
-            std::ifstream in(aFileIn);
-            std::stringstream ss;
-            ss << in.rdbuf();
-            in.close();
-            JScommand=ss.str();
-            boost::replace_all(JScommand,"TOREPLACE",mCode);
-            //std::cout << JScommand << std::endl;
-            break;
-        }
-        case TypeLayer::FEE:{
-            std::string aFileIn(mDico->File("displayWMS"));
-            std::ifstream in(aFileIn);
-            std::stringstream ss;
-            ss << in.rdbuf();
-            in.close();
-            JScommand=ss.str();
-            boost::replace_all(JScommand,"MYTITLE",this->getLegendLabel());
+        } else {
             boost::replace_all(JScommand,"MYLAYER",this->NomMapServerLayer());
-            boost::replace_all(JScommand,"MYURL","https://gxgfservcarto.gxabt.ulg.ac.be/cgi-bin/aptitude_fee");
-            break;
-        }
-        case TypeLayer::CS:{
-            std::string aFileIn(mDico->File("displayWMS"));
-            std::ifstream in(aFileIn);
-            std::stringstream ss;
-            ss << in.rdbuf();
-            in.close();
-            JScommand=ss.str();
-            boost::replace_all(JScommand,"MYTITLE",this->getLegendLabel());
-            boost::replace_all(JScommand,"MYLAYER",this->NomMapServerLayer());
-            boost::replace_all(JScommand,"MYURL"," http://gxgfservcarto.gxabt.ulg.ac.be/cgi-bin/aptitude_cs");
-            break;
-        }
-
-
-        default:
-        {
-            std::stringstream ss;
-            std::string aFileIn(mDico->File("addOLraster"));
-            std::ifstream in(aFileIn);
-            ss << in.rdbuf();
-            in.close();
-            JScommand=ss.str();
-            // remplace l'url des tuiles par celui de l'essence actuelle:
-            std::string aFind1("CODE1");
-            std::string aFind2("CODE2");
-            //std::string line;
-            std::string Replace1(""),Replace2("");
-
-            switch (mType) {
-            case TypeLayer::CS:
-                Replace1="CS_"+mCode;Replace2="aptitudeCS_"+mCode;break;
-            case TypeLayer::KK:
-                Replace1="KK_CS_"+mCode;
-                Replace2=Replace1;
-                break;
-            case TypeLayer::Thematique:
-                if (mRI) {Replace1=mRI->NomTuile();}
-                if (mRI) {Replace2=mRI->NomFile();}
-            default:
-                break;
-            }
-            boost::replace_all(JScommand,aFind1,Replace1);
-            boost::replace_all(JScommand,aFind2,Replace2);
-            break;
-        }
+            boost::replace_all(JScommand,"MYURL",this->MapServerURL());
         }
     }
-    mText->doJavaScript(JScommand);// c'est peut-être plutôt la carte qui dois faire le doJavascript, pas le label text...
+    mText->doJavaScript(JScommand);
     //std::cout << JScommand << std::endl;
 }
 
@@ -204,7 +141,7 @@ std::vector<std::string> Layer::displayInfo(double x, double y){
 
         // station du CS
         if (mCode.substr(0,2)=="CS" && aVal!=0){
-        mGroupL->mStation->mSt=aVal;}
+            mGroupL->mStation->mSt=aVal;}
         //std::cout << " la valeur de la couche " << mLabel << " est de " << aVal << std::endl;
         if((mDicoVal!=NULL) && (mDicoVal->find(aVal)!=mDicoVal->end())){
             val=mDicoVal->at(aVal);
@@ -256,7 +193,7 @@ int Layer::getValue(double x, double y){
                 aRes=scanPix[0];
                 CPLFree(scanPix);
                 GDALClose( mGDALDat );
-               mBand=NULL;
+                mBand=NULL;
             }
         }
     }
@@ -339,7 +276,7 @@ std::map<std::string,int> Layer::computeStatOnPolyg(OGRGeometry *poGeom, std::st
                     kv.second=(100*kv.second)/nbPix;
                 }
             }*/
-        mBand=NULL;
+            mBand=NULL;
         }
         GDALClose(mask);
         GDALClose(mGDALDat);
@@ -381,7 +318,7 @@ std::string Layer::getLegendLabel(bool escapeChar) const{
 }
 
 std::string Layer::getLegendLabel(std::string aMode){
-   std::string aRes;
+    std::string aRes;
     switch (mType) {
     case TypeLayer::FEE:
         aRes="Aptitude FEE du "+mLabel;break;
@@ -501,24 +438,43 @@ std::string Layer::NomMapServerLayer()const{
     switch (mType) {
     case TypeLayer::FEE:
         aRes="Aptitude_FEE_"+mCode;
-         break;
+        break;
     case TypeLayer::CS:
         aRes="Aptitude_CS_"+mCode;
         break;
     case TypeLayer::Thematique:
-       aRes=mCode;
-       break;
+        aRes=mCode;
+        break;
     default:
         aRes=mCode;
     }
     return aRes;
+}
 
-
+std::string Layer::MapServerURL()const{
+    std::string aRes;
+    switch (mType) {
+    case TypeLayer::FEE:
+        aRes="https://gxgfservcarto.gxabt.ulg.ac.be/cgi-bin/aptitude_fee";
+        break;
+    case TypeLayer::CS:
+        aRes="https://gxgfservcarto.gxabt.ulg.ac.be/cgi-bin/aptitude_cs";
+        break;
+    case TypeLayer::Thematique:
+        aRes="https://gxgfservcarto.gxabt.ulg.ac.be/cgi-bin/station_fee";
+        break;
+    case TypeLayer::KK:
+        aRes="https://gxgfservcarto.gxabt.ulg.ac.be/cgi-bin/station_cs";
+        break;
+    default:
+        aRes=mCode;
+    }
+    return aRes;
 }
 
 
 rasterFiles::rasterFiles(std::string aPathTif,std::string aCode):mPathTif(aPathTif),mPathQml(""),mCode(aCode){
-     // <-- initialize with the map's default c'tor
+    // <-- initialize with the map's default c'tor
     //boost::filesystem::path p(mPathTif);
     // détermine si il y a un fichier de symbologie associé
     std::string aPathQml = mPathTif.substr(0,mPathTif.size()-3)+"qml";

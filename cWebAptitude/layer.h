@@ -79,7 +79,7 @@ public:
         mText=lay.mText;
         mLabel=lay.mLabel;
         mPathTif=lay.mPathTif;
-        mDirTuile=lay.mDirTuile;
+        //mDirTuile=lay.mDirTuile;
         mCode=lay.mCode;
         mDicoCol=lay.mDicoCol;
         mDicoVal=lay.mDicoVal;
@@ -109,7 +109,7 @@ public:
         mText=lay.mText;
         mLabel=lay.mLabel;
         mPathTif=lay.mPathTif;
-        mDirTuile=lay.mDirTuile;
+        //mDirTuile=lay.mDirTuile;
         mCode=lay.mCode;
         mDicoCol=lay.mDicoCol;
         mDicoVal=lay.mDicoVal;
@@ -132,7 +132,6 @@ public:
 
     //void clickOnName(std::string aCode);
     void displayLayer() const;
-    //std::string displayLayer() const;
 
     std::vector<std::string> displayInfo(double x, double y);
     // clé : la valeur au format légende (ex ; Optimum). Valeur ; pourcentage pour ce polygone
@@ -159,6 +158,8 @@ public:
     std::string getShortLabel() const {return mLabel;}
 
     std::string NomMapServerLayer()const;
+    std::string MapServerURL()const;
+
 
     // à cause de ma superbe idée de merde de mettre deux couches raster par layer, je dois surcharger ces méthodes pour pouvoir spécifier le mode Fee vs Cs
     std::vector<std::string> getCode(std::string aMode);
@@ -228,7 +229,7 @@ private:
     // le texte affiché dans le Wtext
     std::string mLabel;
     std::string mPathTif;
-    std::string mDirTuile;
+    //std::string mDirTuile;
     std::string mCode;
 };
 

@@ -71,7 +71,7 @@ if (1){
     for (auto & kv : aMEss){
         //std::string aOut=dico.Files()->at("OUTDIR")+"aptitudeFEE_"+kv.first+".tif";
 
-        aACA.carteAptFEE(&kv.second,kv.second.NomCarteAptFEE(),true);
+        //aACA.carteAptFEE(&kv.second,kv.second.NomCarteAptFEE(),true);
 
         //aOut=dico.Files()->at("OUTDIR")+"aptitudeCS_"+kv.first+".tif";
         //aACA.carteAptCS(&kv.second,kv.second.NomCarteAptCS(),false);
@@ -93,15 +93,15 @@ if (1){
          }*/
          }
 
-/*
+    std::string aFileCodeMS("/home/lisein/Documents/carteApt/autres/mapserver/mapKKCS.map");
     for (auto & kv : aMKKs){
         //aACA.carteKKCS(&kv.second,kv.second.NomCarte(),false);
         //aACA.createTile(kv.second.NomCarte(),kv.second.NomDirTuile(),kv.second.Type());
         //aACA.compressTif(kv.second.NomCarte());
          cKKCS KK=kv.second;
-         aACA.codeMapServer(KK.shortNomCarte(),KK.NomMapServerLayer(),KK.NomMapServerLayerFull(),aFileCodeMS,);
+         aACA.codeMapServer(KK.shortNomCarte(),KK.NomMapServerLayer(),KK.NomMapServerLayerFull(),aFileCodeMS, KK.getDicoValPtr(),KK.getDicoCol());
     }
-    */
+
 
 }
 

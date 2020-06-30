@@ -27,10 +27,10 @@ enum class TypeVar {Classe,
 
 enum class TypeLayer { //Apti // Apti enlevé ! -> FEE et CS
                        KK // les cartes dérivées des CS
-                      ,Thematique // lié à la description de la station ; NH NT ZBIO
+                      ,Thematique // lié à la description de la station, approche FEE ; NH NT ZBIO
                       ,Externe // toutes les cartes qui ne sont pas en local ; carte IGN pour commencer
-                      ,FEE
-                      ,CS
+                      ,FEE // aptitude
+                      ,CS // aptitude
                       ,Peuplement // description du peuplement en place
                      };
 
