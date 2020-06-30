@@ -12,6 +12,8 @@ cAppliCartepH::cAppliCartepH()
 
     GDALAllRegister();
 
+    //cartePTS(aTPSpath);
+
     poDatZBIO = (GDALDataset *) GDALOpen( aZBIOpath.c_str(), GA_ReadOnly );
     if( poDatZBIO == NULL )
     {
@@ -33,6 +35,8 @@ cAppliCartepH::cAppliCartepH()
 
     std::string aOut(dico->File("OUTDIR")+"cartepH2020.tif");
     cartepH(aOut);
+
+    //}
 
 }
 
@@ -121,4 +125,80 @@ void cAppliCartepH::cartepH(std::string aOut, bool force){
         std::cout << aOut << " existe déjà " << std::endl;
     }
 
+}
+
+
+void cAppliCartepH::cartePTS(std::string aOut, bool force){
+
+     if ((!exists(aOut) | force)){
+    std::cout << "creation de la carte des PTS sur base du dico sigle pédo --> classe pts" << std::endl;
+    std::string aCNSWpath(dico->File("CNSW"));
+     GDALDataset  * poDatCNSW = (GDALDataset *) GDALOpen( aCNSWpath.c_str(), GA_ReadOnly );
+    if( poDatCNSW == NULL )
+    {
+        std::cout << "je n'ai pas lu le fichier " << aCNSWpath << std::endl;
+    }
+
+    const char *pszFormat = "GTiff";
+    GDALDriver *poDriver;
+    poDriver = GetGDALDriverManager()->GetDriverByName(pszFormat);
+    if( poDriver == NULL )
+        exit( 1 );
+
+    const char * destFile=aOut.c_str();
+    char **papszOptions = NULL;
+    papszOptions = CSLSetNameValue( papszOptions, "COMPRESS", "DEFLATE" );
+    GDALDataset* poDstDS = poDriver->CreateCopy( destFile, poDatCNSW, FALSE, papszOptions,NULL, NULL );
+    GDALRasterBand *outBand, * inBand;
+    outBand = poDstDS->GetRasterBand(1);
+    std::cout << "copy of raster done" << std::endl;
+    inBand = poDatCNSW->GetRasterBand(1);
+
+x =inBand->GetXSize();
+y = inBand->GetYSize();
+
+    float *scanlineCNSW;
+    scanlineCNSW = (float *) CPLMalloc( sizeof( float ) * x );
+    float *scanline;
+    scanline = (float *) CPLMalloc( sizeof( float ) * x );
+    // boucle sur les pixels
+    for ( int row = 0; row < y; row++ )
+    {
+        // je ne sais pas pourquoi mais c'est obligé de lire les valeur en float 32 et de les écrires avec le flag FLOAT32 alors que moi je ne manipule que des 8bit
+
+        inBand->RasterIO( GF_Read, 0, row, x, 1, scanlineCNSW, x,1, GDT_Float32, 0, 0 );
+        // iterate on pixels in row
+        for (int col = 0; col < x; col++)
+        {
+
+
+            int pts(0);
+            int cnsw = scanlineCNSW[ col ];
+            // un test pour tenter de gagner de la vitesse de temps de calcul - masque pour travailler que sur la RW
+            if (cnsw!=0){
+                //std::cout << " cnsw sigle pedo = " << cnsw << std::endl;
+                pts = dico->getPTS(cnsw);
+                 //std::cout << " pts = = " << pts << std::endl;
+            }
+            if ((col%astep==0) && row%astep==0){
+                std::cout << ".." ;
+
+            }
+            scanline[ col ] = pts;
+        }
+        // écriture du résultat dans le fichier de destination
+
+        outBand->RasterIO( GF_Write, 0, row, x, 1, scanline, x, 1,GDT_Float32, 0, 0 );
+        if (row%astep==0){std::cout<< std::endl;}
+    }
+    CPLFree(scanline);
+    CPLFree(scanlineCNSW);
+
+    if( poDstDS != NULL ){ GDALClose( (GDALDatasetH) poDstDS );}
+    if( poDatCNSW != NULL ){ GDALClose( (GDALDatasetH) poDatCNSW );}
+    std::cout << " done " << std::endl;
+
+     } else {
+         std::cout << " la carte des PTS " << aOut << " existe, use force pour écraser " << std::endl;
+     }
 }

@@ -25,7 +25,7 @@ using namespace libzippp;
 class parcellaire: public WContainerWidget
 {
 public:
-    parcellaire(WContainerWidget *parent, groupLayers * aGL, Wt::WApplication* app,Wt::WStackedWidget * aTopStack,WContainerWidget * statW);
+    parcellaire(WContainerWidget *parent, groupLayers * aGL, Wt::WApplication* app,WContainerWidget * statW);
     ~parcellaire();
     void cleanShpFile();
     // conversion shp esri vers geoJson
@@ -50,11 +50,15 @@ public:
     std::string geoJsonName();
     std::string geoJsonRelName();
 
-    Wt::Signal<int>& changePage() { return page_; }
+    //Wt::Signal<int>& changePage() { return page_; }
 
     void downloadShp();
     void downloadRaster();
     bool cropImWithShp(std::string inputRaster, std::string aOut);
+
+    // update au moment ou on bascule sur la version expert ou non expert
+    void update();
+
 
 private:
 
@@ -62,6 +66,7 @@ private:
     std::string mFullPath, mName,mClientName;
     std::string mJSfile;
     Wt::WContainerWidget     * mParent;
+     Wt::WContainerWidget     * mContSelect4D, * mContSelect4Stat;
     Wt::WContainerWidget * mStatW;
     Wt::WFileUpload *fu;
     Wt::WPushButton *uploadButton,*computeStatButton, *visuStatButton, *downloadShpBt, *downloadRasterBt;
@@ -72,8 +77,8 @@ private:
     double centerX,centerY;
     bool hasValidShp;
     OGRGeometry *poGeomGlobale;
-    Wt::Signal<int> page_;
-    Wt::WStackedWidget * mTopStack;
+    //Wt::Signal<int> page_;
+    //Wt::WStackedWidget * mTopStack;
 
     Wt::WCheckBox *mCB_fusionOT;
 

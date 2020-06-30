@@ -10,6 +10,7 @@
 // pour les vecteurs
 #include "ogrsf_frmts.h"
 #include "gdal_utils.h"
+#include <fstream>
 
 using namespace std;
 
@@ -17,6 +18,14 @@ inline bool exists (const std::string& name){
     struct stat buffer;
     return (stat (name.c_str(), &buffer) == 0);
 };
+
+std::string removeAccents(std::string aStr);
+
+class color;
+
+
+// creation du code mapserver pour une classe de couleur avec un label et une valeur de pixel associée
+std::string MSClass(std::string label, std::string expression, color col);
 
 class cApliCarteApt
 {
@@ -34,6 +43,9 @@ public:
 
     //conversion aptitude geotif to jpg pour utilisation dans openlayer (après tuilage avec gdal_retile)
     void toPNG(std::string input, std::string output,TypeCarte aType=Apt);
+
+    // creation du code de rendu de mapserver pour une couche donnée
+    void codeMapServer(std::string inputData, string layerName, string layerFullName, std::string output, std::map<int, string> *DicoVal, std::map<int, color> DicoCol);
     void tiletoPNG(std::string aDir,TypeCarte aType=Apt);
     void cropIm(std::string input, std::string output, double topLeftX, double topLeftY,double width, double height);
     //clip avec l'extent d'un polygone

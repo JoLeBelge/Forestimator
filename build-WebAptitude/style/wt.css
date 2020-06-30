@@ -1,6 +1,6 @@
 /* CSS Document */
 
-@import url("../reset.css");
+/*@import url("../reset.css");*/
 
 body {
 	color: #333333;
@@ -54,8 +54,9 @@ h4 {
 	font-size: 1.5em;
 	line-height: 1.8;
 	border-top : 1px solid  #528B12;
-	padding-bottom:10px;
-	margin-top:15px;
+	padding-bottom:0px;
+	margin-top:10px;
+	margin-bottom:0px;
 	color: #528B12;
 	display: block;
 	}
@@ -65,31 +66,33 @@ h4.example {
 	}
 	
 h2 {
-	background:#70BD1A url(main_page_banner_small.jpg) no-repeat left top;
+	background:#70BD1A no-repeat left top;
 	font-size: 1.6em;
 	font-weight:600;
-	letter-spacing:2px;
-	line-height: 1.8;
+	//letter-spacing:2px;
+	//line-height: 1.8;
 	//padding:5px;
-	padding-left:30px;
+	//padding-left:30px;
 	margin-top:5px;
-	margin-bottom:15px;
+	margin-bottom:5px;
 	color: #FFFFFF;
 	height:78px;
 	}
 	
 h3 {
-	background:#70BD1A url(main_page_banner_small2.jpg) no-repeat right top;
+	background:#70BD1A right top;
 	font-size: 1.6em;
 	font-weight:600;
-	letter-spacing:2px;
-	line-height: 1.8;
-	padding-left:30px;
-	padding-bottom:0px;
-	padding-top:0px;
-	margin:0px;
+	//letter-spacing:2px;
+	//line-height: 1.8;
+	//padding-left:30px;
+    padding-bottom:5px;
+	padding-top:5px;
+	margin-bottom: 5px;
+	margin-top: 0px;
+	//margin:0px;
 	color: #FFFFFF;
-	height:52px;
+    //height:52px;
 	display:block;
 	}		
 

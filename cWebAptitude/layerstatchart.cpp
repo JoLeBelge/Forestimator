@@ -196,7 +196,7 @@ void layerStat::simplifieStat(){
 
 int layerStat::getFieldVal(bool mergeOT){
     unsigned int aRes(0);
-    if (mLay->Type()==TypeLayer::Apti){
+    if (mLay->Type()==TypeLayer::FEE || mLay->Type()==TypeLayer::CS){
         aRes=getO(mergeOT);
     } else if (mLay->getCode()=="MNH2019"){
         int nbPixTreeCover(0);
@@ -214,7 +214,7 @@ int layerStat::getFieldVal(bool mergeOT){
 
 int layerStat::getO(bool mergeOT){
     unsigned int aRes(0);
-    if (mLay->Type()==TypeLayer::Apti){
+    if (mLay->Type()==TypeLayer::FEE || mLay->Type()==TypeLayer::CS){
         // il faudrait plutôt faire le calcul sur les statistique mStat, car StatSimple peut avoir regroupé des classe trop peu représentées!
         // mais attention alors car le % n'est pas encore calculé, c'est le nombre de pixels.
         for (auto & kv : mStatSimple){

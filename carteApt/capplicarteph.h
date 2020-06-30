@@ -20,6 +20,9 @@ public:
     cAppliCartepH();
     ~cAppliCartepH();
     void cartepH(std::string aOut, bool force=true);
+
+    // je recrée un raster PTS car celui que j'ai fait avec gdal depuis le shp PTS n'est pas le même que celui de FR en utilisant la table qui lie chaque sigle pédo à un PTS
+    void cartePTS(std::string aOut, bool force=true);
 private:
     int x,y;
 

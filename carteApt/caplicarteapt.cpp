@@ -740,9 +740,9 @@ void cApliCarteApt::toPNG(std::string input, std::string output,TypeCarte aType)
                 //int H=(aVald/100);
 
                 if (aVal==255) {mask=0;} else {
-                  int H=dico->H(aVal);
-                  if (H>35){H=35;} // ma palette de couleur s'arrête à 35 m;
-                  dico->getColor(std::to_string(H-1)).set(aRes1,aRes2,aRes3);
+                    int H=dico->H(aVal);
+                    if (H>35){H=35;} // ma palette de couleur s'arrête à 35 m;
+                    dico->getColor(std::to_string(H-1)).set(aRes1,aRes2,aRes3);
                 }
 
             }
@@ -885,3 +885,71 @@ void cApliCarteApt::compressTif(std::string input){
     }
 }
 
+
+void cApliCarteApt::codeMapServer(std::string inputData, std::string layerName, std::string layerFullName, std::string output, std::map<int, string> * DicoVal, std::map<int, color> DicoCol){
+    std::cout << " code MapServer " << std::endl;
+
+    std::string aCMS=std::string("LAYER\n")
+            +std::string("  NAME \"")+ layerName +std::string("\"\n")+
+            std::string("   TYPE RASTER\n")+
+            std::string("   STATUS ON\n") +
+            std::string("   MAXSCALEDENOM 200000.00\n") +
+            std::string("   PROJECTION\n") +
+            std::string("      \"init=epsg:31370\"\n")+
+            std::string("   END\n")+
+            std::string("   DATA \"")+inputData+std::string("\" \n")+
+            std::string("   PROCESSING \"BANDS=1\" \n")+
+            std::string("   CLASSITEM \"[pixel]\" \n");
+
+    for (auto kv : *DicoVal){
+
+        if (DicoCol.find(kv.first)!=DicoCol.end()){
+            color col = DicoCol.at(kv.first);
+            aCMS+=MSClass(kv.second,std::to_string(kv.first),col);
+        }
+    }
+
+    aCMS+=std::string(" METADATA\n")+
+            // ici je peux mettre des accents dans le nom, et une balise description de la couche
+            std::string("      \"wms_title\"           \"")+layerFullName+std::string("\"\n")+
+            std::string("      \"wms_srs\"             \"EPSG:31370\"\n")+
+            std::string("   END\n")+
+            std::string("   TEMPLATE \"../template.html\"\n")+
+            std::string("END\n");
+
+
+    // on écrit le résultat dans le fichier de sortie
+
+    std::ofstream outfile;
+
+    outfile.open(output, std::ios_base::app); // append instead of overwrite
+    outfile << aCMS;
+    outfile.close();
+
+}
+
+
+
+std::string MSClass(std::string label, std::string expression, color col){
+
+    std::string aRes=
+            std::string("   CLASS \n")+
+            std::string("      NAME \"")+removeAccents(label)+std::string("\"\n")+
+            std::string("      EXPRESSION \"")+expression + std::string("\"\n")+
+            std::string("      STYLE \n")+
+            std::string("          COLOR ")+ col.cat2() + std::string("\n ")+
+            std::string("      END\n")+
+            std::string("   END\n");
+    return aRes;
+}
+
+
+std::string removeAccents(std::string aStr){
+    boost::replace_all(aStr, "é", "e");
+    boost::replace_all(aStr, "è", "e");
+    boost::replace_all(aStr, "ê", "e");
+    boost::replace_all(aStr, "ï", "i");
+    boost::replace_all(aStr, "î", "i");
+    boost::replace_all(aStr, "â", "a");
+    return aStr;
+}

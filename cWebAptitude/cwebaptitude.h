@@ -1,6 +1,7 @@
 #ifndef CWEBAPTITUDE_H
 #define CWEBAPTITUDE_H
 
+#include <iostream>
 #include "grouplayers.h"
 #include "parcellaire.h"
 #include "uploadcarte.h"
@@ -15,12 +16,16 @@
 #include <Wt/WLayout.h>
 #include <Wt/WMenu.h>
 #include <Wt/WTextArea.h>
+#include <Wt/WNavigationBar.h>
 //#include <Wt/WLabel.h>
 #include "wopenlayers.h"
 #include "cdicoapt.h"
 //#include <boost/range/adaptor/map.hpp>
 //#include <boost/range/adaptors.hpp>
 //#include <boost/foreach.hpp>
+
+#include <Wt/WIntValidator.h>
+#include <Wt/WLineEdit.h>
 using namespace Wt;
 
 class cWebAptitude : public WContainerWidget
@@ -29,7 +34,47 @@ public:
   /*!\brief Instantiate a new form example.
    */
   cWebAptitude(Wt::WApplication* app);
+
+  void handlePathChange();
+  void login();//pour accès au mode expert
+
+  /*~cWebAptitude(){
+    std::cout << "destructeur de cWebAptitude " << std::endl;
+
+
+    //m_app=NULL;
+
+    printf("Delete mGroupL cweb\n");
+    //delete mGroupL;
+    printf("Delete mPa cweb\n");
+    //if(mPA) delete mPA;
+    printf("Delete mUpload cweb\n");
+    if(mUpload) mUpload=NULL;
+
+
+    printf("Delete ... cweb\n");
+    stack_info=NULL;
+    menuitem2_analyse=NULL;
+
+    printf("Delete mMap cweb\n");
+    //if(mMap) delete mMap;
+    mMap=NULL;
+    printf("Delete mDico cweb\n");
+    //if(mDico) delete mDico;
+    mDico=NULL;
+    printf("Delete m_app cweb\n");
+    m_app=NULL;
+    printf("cWeb done\n");
+  }*/
+
   WOpenLayers * mMap;
+  WStackedWidget * stack_info;
+
+  WMenuItem * menuitem_presentation,* menuitem_carto, * menuitem_analyse;
+  WMenuItem * menuitem2_analyse,* menuitem2_cartes,*menuitem2_legend;
+
+  Wt::WStackedWidget * top_stack;// celui qui navige entre la page de garde (home), la page de présentation et les volets analyse/carto
+  Wt::WStackedWidget * sub_stack;// celui qui navige entre la carte et la page de visu des résultats d'analyse sur un parcellaire
 private:
   //std::map<std::string,cEss>  mMEss;
   Wt::WApplication* m_app;

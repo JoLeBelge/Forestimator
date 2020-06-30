@@ -31,6 +31,12 @@ public:
     }
     double toDouble(std::string aStr);
 
+    int getPTS(int aSolIndex){
+        int aRes(0);
+        if (Dico_IndexSiglePed2PTS.find(aSolIndex)!=Dico_IndexSiglePed2PTS.end()){aRes=Dico_IndexSiglePed2PTS.at(aSolIndex);}
+        return aRes;
+    }
+
 private:
     std::string mBDpath;
     sqlite3 *db_;
@@ -39,6 +45,7 @@ private:
     std::map<int,std::string> Dico_codeRN2Nom;
     std::map<int,std::string> Dico_PTS;
     std::map<int,int> Dico_Zbio2RN;
+    std::map<int,int> Dico_IndexSiglePed2PTS;
     std::map<int,double> Dico_PTS2pH;
     std::map<std::vector<int>,double> Dico_PTSetRN2pH;
     std::map<std::string,std::string>  Dico_GISfile;

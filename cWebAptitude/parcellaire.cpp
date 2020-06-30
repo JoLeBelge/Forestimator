@@ -4,51 +4,58 @@
 int globSurfMax(2500);// en ha
 //https://www.quora.com/What-are-the-risks-associated-with-the-use-of-lambda-functions-in-C-11
 
-parcellaire::parcellaire(WContainerWidget *parent, groupLayers *aGL, Wt::WApplication* app, WStackedWidget *aTopStack, WContainerWidget *statW):mParent(parent),mStatW(statW),mGL(aGL),centerX(0.0),centerY(0.0),mClientName(""),mJSfile(""),mName(""),mFullPath(""),m_app(app),fu(NULL),msg(NULL),uploadButton(NULL),mTopStack(aTopStack)
+parcellaire::parcellaire(WContainerWidget *parent, groupLayers *aGL, Wt::WApplication* app, WContainerWidget *statW):mParent(parent),mGL(aGL),centerX(0.0),centerY(0.0),mClientName(""),mJSfile(""),mName(""),mFullPath(""),m_app(app),fu(NULL),msg(NULL),uploadButton(NULL)
+  //,mTopStack(aTopStack)
   ,computeStatButton(NULL)
   ,visuStatButton(NULL)
   ,hasValidShp(0)
   ,downloadRasterBt(NULL)
+  ,mStatW(statW)
 {
     mDico=aGL->Dico();
     mJSfile=  aGL->Dico()->File("addOLgeojson");
 
     mParent->setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Left);
-    mParent->setMargin(20,Wt::Side::Bottom | Wt::Side::Top);
+    //mParent->setMargin(20,Wt::Side::Bottom | Wt::Side::Top);
     mParent->setInline(0);
-    mParent->addWidget(cpp14::make_unique<Wt::WText>(tr("infoParcellaire")));
-    mParent->addWidget(cpp14::make_unique<WText>("<h4>Charger votre parcellaire</h4>"));
+    mParent->addWidget(cpp14::make_unique<WText>(tr("anaStep1")));
+    //mParent->addWidget(cpp14::make_unique<Wt::WText>(tr("infoParcellaire")));
+
     fu =mParent->addNew<Wt::WFileUpload>();
-
-    mParent->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
-
     fu->setFileTextSize(2000); // Set the maximum file size to 50 kB.
     fu->setFilters(".shp, .shx, .dbf, .prj");
     fu->setMultiple(true);
     fu->setInline(0);
+	fu->addStyleClass("btn-file");
     //fu->setMargin(20,Wt::Side::Bottom | Wt::Side::Top); // si le parent a des marges et est inline(0) et que je met l'enfant à inline, l'enfant a des marges également
 
     msg = mParent->addWidget(cpp14::make_unique<Wt::WText>());
     msg->setInline(0);
-    mParent->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
+    //mParent->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
 
-    uploadButton = mParent->addWidget(cpp14::make_unique<Wt::WPushButton>("Télécharger"));
+    uploadButton = mParent->addWidget(cpp14::make_unique<Wt::WPushButton>("Envoyer"));
+    uploadButton->setStyleClass("btn btn-success");
     mParent->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
 
     uploadButton->disable();
     uploadButton->setInline(0);
 
-    mParent->addWidget(cpp14::make_unique<WText>("<h4>Calcul de statistique</h4>"));
-    mParent->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
-    mParent->addWidget(cpp14::make_unique<Wt::WText>(tr("infoCalculStat")));
+    mParent->addWidget(cpp14::make_unique<WText>(tr("anaStep2")));
+    //mParent->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
+    //mParent->addWidget(cpp14::make_unique<Wt::WText>(tr("infoCalculStat")));
     mParent->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
     mCB_fusionOT= mParent->addWidget(Wt::cpp14::make_unique<Wt::WCheckBox>(tr("cb_fusionAptOT")));
     mCB_fusionOT->setInline(0);
-    mParent->addWidget(cpp14::make_unique<Wt::WText>(tr("infoChoixLayerStat")));
+    mCB_fusionOT->setToolTip(tr("infoCalculStat"));
+    //mParent->addWidget(cpp14::make_unique<Wt::WText>(tr("infoChoixLayerStat")));
     mParent->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
-    mParent->addWidget(std::unique_ptr<Wt::WContainerWidget>(mGL->afficheSelect4Stat()));
+    mContSelect4Stat= mParent->addWidget(cpp14::make_unique<Wt::WContainerWidget>());
+    //auto * div_4stat = mParent->addWidget(std::unique_ptr<Wt::WContainerWidget>(mGL->afficheSelect4Stat()));
+    mContSelect4Stat->addStyleClass("div_4stat");
 
+    mParent->addWidget(cpp14::make_unique<WText>(tr("anaStep3")));
     computeStatButton = mParent->addWidget(cpp14::make_unique<Wt::WPushButton>("Calcul"));
+    computeStatButton->setStyleClass("btn btn-success");
     computeStatButton->setInline(0);
     computeStatButton->disable();
     mParent->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
@@ -58,25 +65,24 @@ parcellaire::parcellaire(WContainerWidget *parent, groupLayers *aGL, Wt::WApplic
     mGL->mPBar->setRange(0, mGL->getNumSelect4Stat());
     mGL->mPBar->setValue(0);
     mGL->mPBar->setInline(0);
-    /*mParent->addWidget(cpp14::make_unique<Wt::WText>(tr("infoVisuStat")));
-    mParent->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
 
-    visuStatButton = mParent->addWidget(cpp14::make_unique<Wt::WPushButton>("Visualiser les statistiques"));
-    visuStatButton->setInline(0);
-    visuStatButton->disable();
-    est buggé pour le moment
-    */
-
+    mParent->addWidget(cpp14::make_unique<WText>(tr("anaStep4")));
     downloadShpBt = mParent->addWidget(cpp14::make_unique<Wt::WPushButton>("Télécharger le shp"));
+    downloadShpBt->setStyleClass("btn btn-success");
+    downloadShpBt->setWidth(150);
     downloadShpBt->setInline(0);
     downloadShpBt->disable();
-    //visuStatButton->setLink(Wt::WLink(Wt::LinkType::InternalPath, "/StatistiqueParcellaire"));
-    mParent->addWidget(cpp14::make_unique<Wt::WText>(tr("infoDownloadClippedRaster")));
+
+    //mParent->addWidget(cpp14::make_unique<Wt::WText>(tr("infoDownloadClippedRaster")));
     mParent->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
-    mParent->addWidget(std::unique_ptr<Wt::WContainerWidget>(mGL->afficheSelect4Download()));
+    mContSelect4D= mParent->addWidget(cpp14::make_unique<Wt::WContainerWidget>());
+
+    //mParent->addWidget(std::unique_ptr<Wt::WContainerWidget>(mGL->afficheSelect4Download()));
     mParent->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
 
     downloadRasterBt = mParent->addWidget(cpp14::make_unique<Wt::WPushButton>("Télécharger les cartes"));
+    downloadRasterBt->setStyleClass("btn btn-success");
+    downloadRasterBt->setWidth(200);
     downloadRasterBt->setInline(0);
     downloadRasterBt->disable();
 
@@ -85,9 +91,11 @@ parcellaire::parcellaire(WContainerWidget *parent, groupLayers *aGL, Wt::WApplic
     fu->uploaded().connect(this,&parcellaire::upload);
     uploadButton->clicked().connect(this ,&parcellaire::clickUploadBt);
     computeStatButton->clicked().connect(this,&parcellaire::computeStat);
-    //visuStatButton->clicked().connect(this,&parcellaire::visuStat);
     downloadShpBt->clicked().connect(this,&parcellaire::downloadShp);
     downloadRasterBt->clicked().connect(this,&parcellaire::downloadRaster);
+
+    // rempli les 2 conteneurs qui présentent les selectLayers
+    update();
 }
 
 parcellaire::~parcellaire(){
@@ -245,6 +253,7 @@ bool parcellaire::computeGlobalGeom(OGRLayer * lay){
         // devrait je pense eêtre créé avec new, car si je ferme le dataset qui contient le layer, poGeomGlobal fait une fuite
         poGeomGlobale =poGeom2->Simplify(1.0);
         int aSurfha=OGR_G_GetArea(poGeomGlobale)/10000;
+        printf("aSurfha=%d",aSurfha);
         if (aSurfha<globSurfMax){
             //OGRPolygon * pol=poGeom2->toPolygon();
             //std::ofstream out("/home/lisein/Documents/carteApt/Forestimator/build-WebAptitude/tmp/test.geojson");
@@ -416,17 +425,9 @@ void parcellaire::visuStat(std::string aTitle){
     auto contTitre = Wt::cpp14::make_unique<Wt::WContainerWidget>();
     WContainerWidget * contTitre_ = contTitre.get();
     contTitre->addWidget(cpp14::make_unique<WText>(aTitle));
-    Wt::WPushButton * retourButton = contTitre_->addWidget(cpp14::make_unique<Wt::WPushButton>("Retour"));
-    contTitre_->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
+    //Wt::WPushButton * retourButton = contTitre_->addWidget(cpp14::make_unique<Wt::WPushButton>("Retour"));
+    //contTitre_->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
     contTitre->addWidget(cpp14::make_unique<WText>(tr("infoDansVisuStat")));
-    // de toute manière c'est pas facile d'utiliser des internal pas pour des pages comme StatW qui sont ouverte par un évenement autre que un click sur boutton
-    //retourButton->setLink(Wt::WLink(Wt::LinkType::InternalPath, "/Aptitude"));
-    //retourButton->clicked().connect([&] {topStack->setCurrentIndex(0);});// avec &, ne tue pas la session mais en recrée une. avec =, tue et recrée, c'est car le lambda copie plein de variable dont this, ça fout la merde
-    // non c'est pas la faute du lambda, c'est les internal path qui font qu'une nouvelle session est créée.
-    std::cout << " config retour button "<< std::endl;
-    //retourButton->clicked().connect(this,mTopStack->setCurrentIndex(0);});
-    retourButton->clicked().connect([=] {mTopStack->setCurrentIndex(0);});
-    //std::cout << " done "<< std::endl;
 
     auto contCharts = Wt::cpp14::make_unique<Wt::WContainerWidget>();
     WContainerWidget * contCharts_ = contCharts.get();
@@ -451,10 +452,11 @@ void parcellaire::visuStat(std::string aTitle){
     }
     layout->addWidget(std::move(contTitre), 0);
     layout->addWidget(std::move(contCharts), 0);
-    std::cout << " change tostack index... " ;
-    mTopStack->setCurrentIndex(1);
+    //std::cout << " change tostack index... " ;
+    //mTopStack->setCurrentIndex(1);
     mGL->mPBar->setValue(0);
     std::cout << " ..done " << std::endl;
+    m_app->setInternalPath("/resultat",true);
 }
 
 // si je click sur un polygone dans ol, calcule les stat et affiche dans une nouvelle page
@@ -600,4 +602,13 @@ bool parcellaire::cropImWithShp(std::string inputRaster, std::string aOut){
     }
     return aRes;
 }
+
+void parcellaire::update(){
+    mContSelect4Stat->clear();
+    mContSelect4D->clear();
+    mContSelect4Stat->addWidget(std::unique_ptr<Wt::WContainerWidget>(mGL->afficheSelect4Stat()));
+    mContSelect4D->addWidget(std::unique_ptr<Wt::WContainerWidget>(mGL->afficheSelect4Download()));
+}
+
+
 

@@ -10,7 +10,7 @@ apt2  = new ol.layer.Tile({
 		params: {
 		  'LAYERS': 'MYLAYER',
 		  'TILED': true,
-		  'FORMAT': 'image/jpeg'
+		  'FORMAT': 'image/png'
 		},
 		tileGrid: tileGrid,
 		serverType: 'mapserver',

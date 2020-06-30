@@ -16,7 +16,15 @@ Layer::Layer(groupLayers * aGroupL, std::string aCode, WText *PWText, TypeLayer 
     // std::cout << "constructeur layer " << std::endl;
     // constructeur qui dépend du type de layer
     switch (mType) {
-    case TypeLayer::Apti:
+    case TypeLayer::FEE:
+        // construction de l'essence
+        mEss=new cEss(mCode,mDico);
+        mLabel=mEss->Code() + " - "+ mEss->Nom();
+        mText->setText(mLabel);
+        mDicoVal=mDico->code2AptFull();
+        mDicoCol=mDico->codeApt2col();
+        break;
+    case TypeLayer::CS:
         // construction de l'essence
         mEss=new cEss(mCode,mDico);
         mLabel=mEss->Code() + " - "+ mEss->Nom();
@@ -30,16 +38,10 @@ Layer::Layer(groupLayers * aGroupL, std::string aCode, WText *PWText, TypeLayer 
         mLabel= "Catalogue de Station - "+ mKK->Nom();
         mText->setText(mLabel);
         mPathTif=mKK->NomCarte();
-        if (mKK->IsHabitat()){
-            mDicoVal=mDico->id2Hab();
-        } else if (mKK->IsFact()){
-            mDicoVal=mDico->echelleFactNom() ;
-        } else if (mKK->IsPot()){
-            mDicoVal=mDico->echellePotCat() ;
-        }
+        mDicoVal=mKK->getDicoValPtr();
         mDicoCol=mKK->getDicoCol();
         break;
-    case (TypeLayer::Thematique):
+    case TypeLayer::Thematique:
         // creation de l'objet cRasterInfo
         mRI= new cRasterInfo(mCode,mDico);
         mLabel= mRI->Nom();
@@ -48,7 +50,7 @@ Layer::Layer(groupLayers * aGroupL, std::string aCode, WText *PWText, TypeLayer 
         mDicoVal=mRI->getDicoVal();
         mDicoCol=mRI->getDicoCol();
         mTypeVar=mRI->getTypeVar();
-        mType=mRI->getCatLayer(); // on change le type, met à peuplement si nécessaire
+        mType=mRI->getCatLayer();
         break;
     case TypeLayer::Externe:
         if (mCode=="IGN"){
@@ -58,16 +60,6 @@ Layer::Layer(groupLayers * aGroupL, std::string aCode, WText *PWText, TypeLayer 
         }
     }
 
-    // reconstruit l'objet GroupLayer! petit rigolo va !!-->
-    //mText->clicked().connect(std::bind(&groupLayers::clickOnName, mGroupL, mCode));
-    // ici ça bug
-  /*  mText->clicked().connect([this]{
-        std::cout << " tataa " << std::endl;
-        //mGroupL->clickOnName("IGN");
-        //mGroupL est dangling!!
-        std::cout << "number of layer in the group " << mGroupL->mVLs.size() << std::endl;
-    });
-    */
 
     setActive(false);
     //std::cout << "done" << std::endl;
@@ -100,65 +92,10 @@ void Layer::setActive(bool b){
 }
 
 
-
-Layer::Layer(groupLayers * aGroupL, cEss aEss, WText *PWText):
-    mDico(aGroupL->Dico())
-  ,mGroupL(aGroupL)
-  ,mCode(aEss.Code())
-  ,mText(PWText)
-  ,mType(TypeLayer::Apti)
-  ,mDicoVal(0)
-  //,mDicoCol(0)
-  ,mRI(NULL)
-  ,mEss(NULL)
-  ,mKK(NULL)
-  ,mTypeVar(TypeVar::Classe)
-{
-    // construction de l'essence
-    mEss= new cEss(aEss);
-    mLabel=mEss->Code() + " - "+ mEss->Nom();
-    mText->setText(mLabel);
-    mDicoVal=mDico->code2AptFull();
-    mDicoCol=mDico->codeApt2col();
-    // c'est dans l'objet GL que toutes les connexion au label sont gerée
-    //mText->clicked().connect(std::bind(&groupLayers::clickOnName, mGroupL, mCode));
-    setActive(false);
-}
-
-/*
-void Layer::clickOnName(std::string aCode){
-    std::cout << " j'ai cliqué sur " << aCode << " \n\n\n" << std::endl;
-    // udpate du rendu visuel de tout les labels de couches -- cela se situe au niveau du grouplayer
-    //mGroupL->update(mCode);
-    // ajouter la couche à la carte
-    //displayLayer();
-    //setActive(true);
-}
-*/
-
-void Layer::displayLayer() const{
-
+void Layer::displayLayer() const{ 
     std::string JScommand;
     //std::cout << "display layer " << std::endl;
-    if (mDico->hasWMSinfo(this->getCode())){
-
-        WMSinfo wms=mDico->getWMSinfo(this->getCode());
-        std::string aFileIn(mDico->File("displayWMS"));
-        std::ifstream in(aFileIn);
-        std::stringstream ss;
-        ss << in.rdbuf();
-        in.close();
-        JScommand=ss.str();
-        boost::replace_all(JScommand,"MYTITLE",this->getLegendLabel());
-        boost::replace_all(JScommand,"MYLAYER",wms.mLayerName);
-        boost::replace_all(JScommand,"MYURL",wms.mUrl);
-       // std::cout << JScommand << std::endl;
-
-    } else {
-
-    switch (mType) {
-    case TypeLayer::Externe:
-    {
+    if (this->Type()==TypeLayer::Externe) {
         std::string aFileIn(mDico->File("displayExternLayer"));
         std::ifstream in(aFileIn);
         std::stringstream ss;
@@ -166,51 +103,27 @@ void Layer::displayLayer() const{
         in.close();
         JScommand=ss.str();
         boost::replace_all(JScommand,"TOREPLACE",mCode);
-        //std::cout << JScommand << std::endl;
-
-        break;
-    }
-    default:
-    {
-        std::stringstream ss;
-        std::string aFileIn(mDico->File("addOLraster"));
+    } else {
+        std::string aFileIn(mDico->File("displayWMS"));
         std::ifstream in(aFileIn);
+        std::stringstream ss;
         ss << in.rdbuf();
         in.close();
         JScommand=ss.str();
-        // remplace l'url des tuiles par celui de l'essence actuelle:
-        std::string aFind1("CODE1");
-        std::string aFind2("CODE2");
-        //std::string line;
-        std::string Replace1(""),Replace2("");
+        boost::replace_all(JScommand,"MYTITLE",this->getLegendLabel());
 
-        switch (mType) {
-        case TypeLayer::Apti:
-            switch (mGroupL->TypeClas()) {
-            case FEE: Replace1="FEE_"+mCode;Replace2="aptitudeFEE_"+mCode;break;
-            case CS: Replace1="CS_"+mCode;Replace2="aptitudeCS_"+mCode;break;
-            }
-            break;
-        case TypeLayer::KK:
-            Replace1="KK_CS_"+mCode;
-            Replace2=Replace1;
-            break;
-        case TypeLayer::Thematique:
-            if (mRI) {Replace1=mRI->NomTuile();}
-            if (mRI) {Replace2=mRI->NomFile();}
-        default:
-            break;
+        if (mDico->hasWMSinfo(this->getCode())){
+            WMSinfo wms=mDico->getWMSinfo(this->getCode());
+            boost::replace_all(JScommand,"MYLAYER",wms.mLayerName);
+            boost::replace_all(JScommand,"MYURL",wms.mUrl);
+
+        } else {
+            boost::replace_all(JScommand,"MYLAYER",this->NomMapServerLayer());
+            boost::replace_all(JScommand,"MYURL",this->MapServerURL());
         }
-        boost::replace_all(JScommand,aFind1,Replace1);
-        boost::replace_all(JScommand,aFind2,Replace2);
-        break;
     }
-    }
-    }
-    mText->doJavaScript(JScommand);// c'est peut-être plutôt la carte qui dois faire le doJavascript, pas le label text...
-
-    //std::cout << "done " << std::endl;
-
+    mText->doJavaScript(JScommand);
+    //std::cout << JScommand << std::endl;
 }
 
 std::vector<std::string> Layer::displayInfo(double x, double y){
@@ -228,14 +141,14 @@ std::vector<std::string> Layer::displayInfo(double x, double y){
 
         // station du CS
         if (mCode.substr(0,2)=="CS" && aVal!=0){
-        mGroupL->mStation->mSt=aVal;}
+            mGroupL->mStation->mSt=aVal;}
         //std::cout << " la valeur de la couche " << mLabel << " est de " << aVal << std::endl;
         if((mDicoVal!=NULL) && (mDicoVal->find(aVal)!=mDicoVal->end())){
             val=mDicoVal->at(aVal);
         }
     }
 
-    if ((mType==TypeLayer::Apti) && (this->IsActive())){
+    if ((mType==TypeLayer::FEE || mType==TypeLayer::CS) && (this->IsActive())){
         mGroupL->mStation->mActiveEss=mEss;
         mGroupL->mStation->HaveEss=1;
     }
@@ -280,7 +193,7 @@ int Layer::getValue(double x, double y){
                 aRes=scanPix[0];
                 CPLFree(scanPix);
                 GDALClose( mGDALDat );
-               mBand=NULL;
+                mBand=NULL;
             }
         }
     }
@@ -346,7 +259,6 @@ std::map<std::string,int> Layer::computeStatOnPolyg(OGRGeometry *poGeom, std::st
                     //if ( op1.Intersect(poGeom)/ within()){
                     if (scanlineMask[col]==255){
                         double aVal=scanline[ col ];
-
                         if (mDicoVal->find(aVal)!=mDicoVal->end()){
                             aRes.at(mDicoVal->at(aVal))++;
                             nbPix++;
@@ -364,8 +276,7 @@ std::map<std::string,int> Layer::computeStatOnPolyg(OGRGeometry *poGeom, std::st
                     kv.second=(100*kv.second)/nbPix;
                 }
             }*/
-
-        mBand=NULL;
+            mBand=NULL;
         }
         GDALClose(mask);
         GDALClose(mGDALDat);
@@ -378,41 +289,41 @@ std::map<std::string,int> Layer::computeStatOnPolyg(OGRGeometry *poGeom, std::st
 std::string Layer::getPathTif(){
     std::string aRes;
     switch (mType) {
-    case TypeLayer::Apti:
-        switch (mGroupL->TypeClas()) {
-        case FEE: aRes=mEss->NomCarteAptFEE();break;
-        case CS: aRes=mEss->NomCarteAptCS();break;
-        }
-        break;
+    case TypeLayer::FEE:
+        aRes=mEss->NomCarteAptFEE();break;
+    case TypeLayer::CS:
+        aRes=mEss->NomCarteAptCS();break;
     default:
         aRes=mPathTif;
     }
     return aRes;
 }
 
-std::string Layer::getLegendLabel() const{
+std::string Layer::getLegendLabel(bool escapeChar) const{
     std::string aRes;
     switch (mType) {
-    case TypeLayer::Apti:
-        switch (mGroupL->TypeClas()) {
-        case FEE: aRes="Aptitude FEE du "+mLabel;break;
-        case CS: aRes="Aptitude CS du "+mLabel;break;
-        }
-        break;
+    case TypeLayer::FEE:
+        aRes="Aptitude FEE du "+mLabel;break;
+    case TypeLayer::CS:
+        aRes="Aptitude CS du "+mLabel;break;
     default:
         aRes=mLabel;
     }
+
+    if (escapeChar) {
+        boost::replace_all(aRes,"'","\\'"); // javascript bug si jamais l'apostrophe n'est pas escapée
+    }
+
     return aRes;
 }
 
 std::string Layer::getLegendLabel(std::string aMode){
-   std::string aRes;
+    std::string aRes;
     switch (mType) {
-    case TypeLayer::Apti:{
-        if (aMode=="FEE") aRes="Aptitude FEE du "+mLabel;
-        if (aMode=="CS")  aRes="Aptitude CS du "+mLabel;
-        }
-        break;
+    case TypeLayer::FEE:
+        aRes="Aptitude FEE du "+mLabel;break;
+    case TypeLayer::CS:
+        aRes="Aptitude CS du "+mLabel;break;
     default:
         aRes=mLabel;
     }
@@ -423,11 +334,10 @@ std::string Layer::getLegendLabel(std::string aMode){
 std::vector<std::string> Layer::getCode(std::string aMode){
     std::vector<std::string> aRes;
     switch (mType) {
-    case TypeLayer::Apti:{
-        if (aMode=="FEE") aRes={mCode,"FEE"};
-        if (aMode=="CS")  aRes={mCode,"CS"};
-        }
-        break;
+    case TypeLayer::FEE:
+        aRes={mCode,"FEE"};break;
+    case TypeLayer::CS:
+        aRes={mCode,"CS"};break;
     default:
         aRes={mCode,""};
     }
@@ -437,14 +347,13 @@ std::vector<std::string> Layer::getCode(std::string aMode){
 std::string Layer::getPathTif(std::string aMode){
     std::string aRes;
     switch (mType) {
-    case TypeLayer::Apti:{
-        if (aMode=="FEE") {aRes=mEss->NomCarteAptFEE();}
-        if (aMode=="CS") {aRes=mEss->NomCarteAptCS();}
-        break;
-    }
-    default:{
+    case TypeLayer::FEE:
+        aRes=mEss->NomCarteAptFEE();break;
+    case TypeLayer::CS:
+        aRes=mEss->NomCarteAptCS();break;
+    default:
         aRes=mPathTif;
-    }
+
     }
     return aRes;
 }
@@ -524,9 +433,48 @@ GDALDataset * Layer::rasterizeGeom(OGRGeometry *poGeom){
     return pRaster;
 }
 
+std::string Layer::NomMapServerLayer()const{
+    std::string aRes;
+    switch (mType) {
+    case TypeLayer::FEE:
+        aRes="Aptitude_FEE_"+mCode;
+        break;
+    case TypeLayer::CS:
+        aRes="Aptitude_CS_"+mCode;
+        break;
+    case TypeLayer::Thematique:
+        aRes=mCode;
+        break;
+    default:
+        aRes=mCode;
+    }
+    return aRes;
+}
+
+std::string Layer::MapServerURL()const{
+    std::string aRes;
+    switch (mType) {
+    case TypeLayer::FEE:
+        aRes="https://gxgfservcarto.gxabt.ulg.ac.be/cgi-bin/aptitude_fee";
+        break;
+    case TypeLayer::CS:
+        aRes="https://gxgfservcarto.gxabt.ulg.ac.be/cgi-bin/aptitude_cs";
+        break;
+    case TypeLayer::Thematique:
+        aRes="https://gxgfservcarto.gxabt.ulg.ac.be/cgi-bin/station_fee";
+        break;
+    case TypeLayer::KK:
+        aRes="https://gxgfservcarto.gxabt.ulg.ac.be/cgi-bin/station_cs";
+        break;
+    default:
+        aRes=mCode;
+    }
+    return aRes;
+}
+
 
 rasterFiles::rasterFiles(std::string aPathTif,std::string aCode):mPathTif(aPathTif),mPathQml(""),mCode(aCode){
-     // <-- initialize with the map's default c'tor
+    // <-- initialize with the map's default c'tor
     //boost::filesystem::path p(mPathTif);
     // détermine si il y a un fichier de symbologie associé
     std::string aPathQml = mPathTif.substr(0,mPathTif.size()-3)+"qml";

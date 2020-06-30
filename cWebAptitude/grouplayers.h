@@ -33,7 +33,7 @@ class selectLayers;
 class selectLayers4Stat;
 class selectLayers4Download;
 //class WCheckBox;
-enum class TypeLayer;
+//enum class TypeLayer;
 
 enum TypeClassifST {FEE
                     ,CS
@@ -41,10 +41,11 @@ enum TypeClassifST {FEE
 
 using namespace Wt;
 
+extern bool ModeExpert;
+
 class selectLayers : public WContainerWidget{
 public:
     selectLayers(Wt::WContainerWidget * aParent, std::vector<Layer*> aVpLs,int aMax):mParent(aParent),mVpLs(aVpLs),nbMax(aMax){}
-
     std::vector<rasterFiles> getSelectedRaster();
     std::map<std::vector<std::string>,Layer*> getSelectedLayer();
     // cas particulier ou je veux toutes les couches, qu'elles soient selectionnées ou pas
@@ -105,13 +106,16 @@ class groupLayers: public WContainerWidget
 {
 public:
     groupLayers(cDicoApt * aDico,WContainerWidget *parent,WContainerWidget *infoW,WOpenLayers * aMap, Wt::WApplication* app);
-    ~groupLayers();
+    //~groupLayers();
     /*groupLayers(const groupLayers &gl){
         std::cout << "construct by copy group layer -- should never happend\n\n\n" << std::endl;
     }*/
-    void clickOnName(std::string aCode);
+    void clickOnName(std::string aCode, TypeLayer type);
     void changeClassClick(WText *t);
-    void update(std::string aCode);
+
+    // update du rendu du nom de la couche qui est sélectionnée
+    void update(std::string aCode, TypeLayer type);
+    void updateGL();
     // click de l'utilisateur sur la carte pour extraire les valeurs des raster pour une position donnée
     void extractInfo(double x, double y);
     cDicoApt * Dico(){return mDico;}
@@ -132,17 +136,12 @@ public:
     // clé 1 ; nom de la couche. clé2 : la valeur au format légende (ex ; Optimum). Valeur ; pourcentage pour ce polygone
     //std::map<std::string,std::map<std::string,int>>
     void computeStatGlob(OGRGeometry *poGeomGlobale);
-    //void visuStat();
+
     // void car on ajoute les résulats à la table d'attribut de la couche
     void computeStatOnPolyg(OGRLayer * lay, bool mergeOT=0);
 
-    // ne fait pas ce que je veux, il faut apparemment utiliser des anchor pour faire du bookmarking / hashtag
-   /* Wt::Signal<bool>& focusMap(){
-        //std::cout << "focus map () dans grouplayer done \n\n\n" << std::endl;
-        return focusOnMap_;}
-        */
     ST * mStation;
-    std::vector<Layer *> Layers(){return mVLs;}
+    std::vector<Layer *> Layers(){ return mVLs;}
     std::vector<Layer*> getVpLs(){ return mVLs;}
 
     // retourne les aptitudes des essences pour une position donnée (click sur la carte)
@@ -176,15 +175,13 @@ private:
 
     cDicoApt * mDico;
 
-    Wt::WTable                 *mEssTable;
-    Wt::WTable                 *mClassifTable;
-    Wt::WTable                 *mOtherTable;
+    //Wt::WTable                 *mEssTable;
+    //Wt::WTable                 *mClassifTable;
+    //Wt::WTable                 *mOtherTable;
     legend * mLegend;
 
-    //Wt::Signal<bool> focusOnMap_;
 
     WContainerWidget * mInfoW;
-    //WWidget * mInfoW;
 
     // bof finalement c'est mieux le conteneur parent
     Wt::WContainerWidget     * mParent;

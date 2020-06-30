@@ -25,10 +25,12 @@ enum class TypeVar {Classe,
                     Continu
                      };
 
-enum class TypeLayer {Apti // aptitude des essences
-                      ,KK // les cartes dérivées des CS
-                      ,Thematique // lié à la description de la station ; NH NT ZBIO
+enum class TypeLayer { //Apti // Apti enlevé ! -> FEE et CS
+                       KK // les cartes dérivées des CS
+                      ,Thematique // lié à la description de la station, approche FEE ; NH NT ZBIO
                       ,Externe // toutes les cartes qui ne sont pas en local ; carte IGN pour commencer
+                      ,FEE // aptitude
+                      ,CS // aptitude
                       ,Peuplement // description du peuplement en place
                      };
 
@@ -72,13 +74,16 @@ public:
         B=mB;
     }
     std::string cat(){ return " R:" + std::to_string(mR)+", G:"+std::to_string(mG)+", B"+std::to_string(mB);}
+    std::string cat2(){ return std::to_string(mR)+" "+std::to_string(mG)+" "+std::to_string(mB);}
 };
+
 
 class cRasterInfo
 {
 public:
     cRasterInfo(std::string aCode,cDicoApt * aDico);
     std::string NomFile(); // nom du fichier tiff sans l'extension
+    std::string NomFileWithExt();
     std::string Nom(){return mNom;}
     std::string Code(){return mCode;}
     std::string NomCarte(){return mPathRaster;}// retourne le chemin d'accès complêt
@@ -121,10 +126,16 @@ public:
     std::string summary(){return "Potentiel et risque liés au stations : " +mCode + " , "+ mNom + " , "+ mNomCol
                 +  " Echelle risque/pot zbio 1 station 1 : " + std::to_string(getEchelle(1,1));}
     std::string NomCarte();
+    std::string shortNomCarte();
     std::string NomDirTuile();
+    std::string NomMapServerLayer();
+    std::string NomMapServerLayerFull();
+
     int getEchelle(int aZbio,int aSTId);
     int getHab(int aZbio,int aSTId);
     std::map<int, color> getDicoCol(){return mDicoCol;}
+    std::map<int, std::string> getDicoVal(){return mDicoVal;}
+    std::map<int, std::string> * getDicoValPtr(){return &mDicoVal;}
     TypeCarte Type(){return mType;}
 private:
     TypeCarte mType;
@@ -138,6 +149,8 @@ private:
     // bon pour les habitats ce n'est pas la même structure de donnée, mais je vais tout de même utiliser cet objet aussi
     std::map<int,std::map<int,std::vector<std::string>>> mHabitats;
 
+    // le dictionnaire des valeurs raster vers leur signification.
+    std::map<int, std::string> mDicoVal;
     // le dictionnaire des valeurs raster vers leur signification.
     std::map<int, color> mDicoCol;
 };
@@ -158,7 +171,7 @@ public:
         bool aRes(1);
         if (mAptCS.size()==0) {
             aRes=0;
-            std::cout << "essence " << mNomFR << " n'as pas d'aptitude pour CS" << std::endl;
+            //std::cout << "essence " << mNomFR << " n'as pas d'aptitude pour CS" << std::endl;
         }
         return aRes;
     }
@@ -166,7 +179,7 @@ public:
         bool aRes(1);
         if (mEcoVal.size()==0) {
             aRes=0;
-            std::cout << "essence " << mNomFR << " n'as pas d'aptitude pour FEE" << std::endl;
+            //std::cout << "essence " << mNomFR << " n'as pas d'aptitude pour FEE" << std::endl;
         }
         return aRes;
     }
@@ -195,6 +208,12 @@ public:
     std::string NomCarteAptCS();
     std::string shortNomCarteAptCS();
     std::string NomDirTuileAptCS();
+
+    std::string NomMapServerLayer();
+    std::string NomMapServerLayerFull();//pour FEE et CS
+    std::string NomMapServerLayerCS();
+
+
     // aptitude ecograme : clé chaine charactère ; c'est la combinaison ntxnh du genre "A2p5" ou "Mm4
     std::map<int,std::map<std::string,int>> mEcoVal;
     // aptitude pour chaque zone bioclim
@@ -219,10 +238,11 @@ public:
     std::string printRisque();
 
     TypeCarte Type(){return mType;}
+
 private:
     TypeCarte mType;
     cDicoApt * mDico;
-    std::string mCode, mNomFR, mF_R;
+    std::string mCode, mNomFR, mF_R,mPrefix;
 };
 
 // toute les informations/ dico que j'ai besoin pour le soft
@@ -232,6 +252,7 @@ public:
     // charger les dicos depuis BD SQL
     cDicoApt(std::string aBDFile);
     void closeConnection();
+    int openConnection();
     std::map<int,std::string> * ZBIO(){return  &Dico_ZBIO;}
     std::map<std::string,std::string>  * Files(){return  &Dico_GISfile;}
     // code carte vers type carte code : NH.tif
@@ -328,6 +349,12 @@ public:
         return aRes;
     }
 
+    std::string accroEss2prefix(std::string aCode){
+        std::string aRes("");
+        if (Dico_code2prefix.find(aCode)!=Dico_code2prefix.end()){aRes=Dico_code2prefix.at(aCode);}
+        return aRes;
+    }
+
     std::string File(std::string aCode){
         std::string aRes("");
         if (Dico_GISfile.find(aCode)!=Dico_GISfile.end()){aRes=Dico_GISfile.at(aCode);}
@@ -413,7 +440,7 @@ public:
     double H(int aVal){
         double aRes(0.0);
         if (aVal<255 && aVal>0){aRes=aVal/5;}
-        return aVal;
+        return aRes;
     }
 
     bool hasWMSinfo(std::string aCode){
@@ -455,6 +482,7 @@ private:
 
     //code ess vers nom français
     std::map<std::string,std::string> Dico_code2NomFR;
+    std::map<std::string,std::string> Dico_code2prefix;
     // code essence 2 code groupe "feuillus" vs "Resineux
     std::map<std::string,std::string> Dico_F_R;
     std::map<std::string,std::string>  Dico_codeSt2Habitat;

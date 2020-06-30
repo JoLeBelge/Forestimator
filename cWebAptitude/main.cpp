@@ -33,21 +33,25 @@
 #include <Wt/WToolBar.h>
 #include <Wt/WTemplate.h>
 #include <Wt/WString.h>
-#include <Wt/WCheckBox.h>
-#include <Wt/WLeafletMap.h>
 #include <sys/stat.h>
 
-// attention, je n'ai jamais réussi à paramètrer deux docroot donc je dois tout mettre dans un seul et unique!
-// ./WebAptitude --http-address=0.0.0.0 --http-port=8085 --deploy-path=/WebAptitude --docroot="/home/lisein/Documents/carteApt/tutoWtANDOpenlayer/build-WebAptitude/"
+/* attention, je n'ai jamais réussi à paramètrer deux docroot donc je dois tout mettre dans un seul et unique!
+ *
+ * ./WebAptitude --http-address=0.0.0.0 --http-port=8085 --deploy-path=/WebAptitude --docroot="./" --config="/home/lisein/Documents/carteApt/Forestimator/build-WebAptitude/wt_config.xml"
+ * Current arg :
+ * ./WebAptitude --deploy-path=/ --docroot "/data1/Forestimator/build-WebAptitude;favicon.ico,/resources,/style,/tmp,/data,/Tuiles" --http-port 80 --http-addr 0.0.0.0
+ * ./WebAptitude --deploy-path=/ --docroot "/home/lisein/Documents/carteApt/Forestimator/build-WebAptitude;favicon.ico,/resources,/style,/tmp,/data,/Tuiles" --http-port 80 --http-addr 0.0.0.0
+*/
 
-//./WebAptitude --http-address=0.0.0.0 --http-port=8085 --deploy-path=/WebAptitude --docroot="./" --config="/home/lisein/Documents/carteApt/Forestimator/build-WebAptitude/wt_config.xml"
 
 using namespace std;
 
+
 std::unique_ptr<WApplication> createApplication(const WEnvironment& env)
 {
-    std::unique_ptr<WApplication> app
-            = cpp14::make_unique<WApplication>(env);
+    printf("createApplication\n");
+
+    std::unique_ptr<WApplication> app = cpp14::make_unique<WApplication>(env);
     // charge le xml avec tout le texte qui sera chargé via la fonction tr()
     //app->appRoot()std::cout << "app->docRoot() " << app->docRoot() << std::endl;
     app->messageResourceBundle().use(app->docRoot() + "/data/forestimator");
@@ -72,7 +76,6 @@ std::unique_ptr<WApplication> createApplication(const WEnvironment& env)
     app->useStyleSheet("style/form.css");
     app->useStyleSheet("resources/themes/polished/wt.css");
     //app->useStyleSheet("https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v6.2.1/css/ol.css");
-
 
     WCssDecorationStyle EssStyle;
     EssStyle.font().setSize(FontSize::Medium);
@@ -105,24 +108,18 @@ std::unique_ptr<WApplication> createApplication(const WEnvironment& env)
     app->useStyleSheet("data/js/v6.3.1-dist/ol.css");
     app->require("data/js/proj4js-2.6.1/dist/proj4.js");
     app->require("data/js/proj4js-2.6.1/dist/proj4-src.js");
-
-    // finalement je n'utilise pas olGeoTiff, je n'en ai pas besoin en tout cas pour le moment
-    // app->require("https://data.eox.at/geotiff.js-blog/04_multiband/olGeoTiff_07.js");
-    // app->require("https://data.eox.at/geotiff.js-blog/04_multiband/dist/plotty.min.js");
-    //app->require("https://data.eox.at/geotiff.js-blog/04_multiband/dist/nouislider.js");
-    //app->require("https://data.eox.at/geotiff.js-blog/04_multiband/dist/geotiffjs/geotiff.browserify.js");
-    //app->require("https://data.eox.at/geotiff.js-blog/04_multiband/dist/ol-debug.js");
-    //app->require("https://github.com/walkermatt/ol-layerswitcher/tree/master/src/ol-layerswitcher.js");
-
-    auto layout = app->root()->setLayout(Wt::cpp14::make_unique<Wt::WVBoxLayout>());
-    std::unique_ptr<cWebAptitude> WebApt = Wt::cpp14::make_unique<cWebAptitude>(app.get());
-
-    layout->addWidget(std::move(WebApt), 0);
+	// CSS custom pour faire beau
+	app->useStyleSheet("style/style.css");
 
     app->enableUpdates();
 
+    auto layout = app->root()->setLayout(Wt::cpp14::make_unique<Wt::WVBoxLayout>());
+    std::unique_ptr<cWebAptitude> WebApt = Wt::cpp14::make_unique<cWebAptitude>(app.get());
+    layout->addWidget(std::move(WebApt), 0);
+
     return app;
 }
+
 
 int main(int argc, char **argv)
 {

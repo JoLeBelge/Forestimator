@@ -38,10 +38,6 @@ inline bool exists (const std::string& name){
 };
 
 
-
-
-
-
 class rasterFiles{
 
 public:
@@ -68,11 +64,9 @@ private:
 class Layer
 {
 public:
-    Layer(groupLayers * aGroupL, std::string aCode, WText * PWText, TypeLayer aType=TypeLayer::Apti);
-    Layer(groupLayers * aGroupL, cEss aEss ,WText * PWText);
+    Layer(groupLayers * aGroupL, std::string aCode,WText * PWText,TypeLayer aType);
 
     // constructeur par copie et par déplacement ; indispensable si j'utilise les objets dans un vecteur. http://www-h.eng.cam.ac.uk/help/tpl/languages/C++/morevectormemory.html
-
     Layer(const Layer &lay){
         //std::cout << "construct by copy layer " << std::endl;
         mActive=lay.mActive;
@@ -85,22 +79,22 @@ public:
         mText=lay.mText;
         mLabel=lay.mLabel;
         mPathTif=lay.mPathTif;
-        mDirTuile=lay.mDirTuile;
+        //mDirTuile=lay.mDirTuile;
         mCode=lay.mCode;
         mDicoCol=lay.mDicoCol;
         mDicoVal=lay.mDicoVal;
-        mTypeVar=lay.mTypeVar;
         switch (mType) {
-        case TypeLayer::Apti:
-            mEss=new cEss(mCode,mDico);
-            break;
-        case TypeLayer::KK:
-            mKK=new cKKCS(mCode,mDico);
-            break;
-        case TypeLayer::Thematique:
-            mRI= new cRasterInfo(mCode,mDico);
-            break;
-        default:{}
+            case TypeLayer::FEE:
+            case TypeLayer::CS:
+                mEss=new cEss(mCode,mDico);
+                break;
+            case TypeLayer::KK:
+                mKK=new cKKCS(mCode,mDico);
+                break;
+            case TypeLayer::Thematique:
+                mRI= new cRasterInfo(mCode,mDico);
+                break;
+            default:{}
         }
     }
     Layer(Layer&& lay) noexcept {
@@ -115,22 +109,22 @@ public:
         mText=lay.mText;
         mLabel=lay.mLabel;
         mPathTif=lay.mPathTif;
-        mDirTuile=lay.mDirTuile;
+        //mDirTuile=lay.mDirTuile;
         mCode=lay.mCode;
         mDicoCol=lay.mDicoCol;
         mDicoVal=lay.mDicoVal;
-        mTypeVar=lay.mTypeVar;
         switch (mType) {
-        case TypeLayer::Apti:
-            mEss=new cEss(mCode,mDico);
-            break;
-        case TypeLayer::KK:
-            mKK=new cKKCS(mCode,mDico);
-            break;
-        case TypeLayer::Thematique:
-            mRI= new cRasterInfo(mCode,mDico);
-            break;
-        default:{}
+            case TypeLayer::FEE:
+            case TypeLayer::CS:
+                mEss=new cEss(mCode,mDico);
+                break;
+            case TypeLayer::KK:
+                mKK=new cKKCS(mCode,mDico);
+                break;
+            case TypeLayer::Thematique:
+                mRI= new cRasterInfo(mCode,mDico);
+                break;
+            default:{}
         }
     }
 
@@ -138,7 +132,6 @@ public:
 
     //void clickOnName(std::string aCode);
     void displayLayer() const;
-    //std::string displayLayer() const;
 
     std::vector<std::string> displayInfo(double x, double y);
     // clé : la valeur au format légende (ex ; Optimum). Valeur ; pourcentage pour ce polygone
@@ -161,8 +154,12 @@ public:
         return aRes;
     }
     std::string getPathTif();
-    std::string getLegendLabel() const;
+    std::string getLegendLabel(bool escapeChar=true) const;
     std::string getShortLabel() const {return mLabel;}
+
+    std::string NomMapServerLayer()const;
+    std::string MapServerURL()const;
+
 
     // à cause de ma superbe idée de merde de mettre deux couches raster par layer, je dois surcharger ces méthodes pour pouvoir spécifier le mode Fee vs Cs
     std::vector<std::string> getCode(std::string aMode);
@@ -232,7 +229,7 @@ private:
     // le texte affiché dans le Wtext
     std::string mLabel;
     std::string mPathTif;
-    std::string mDirTuile;
+    //std::string mDirTuile;
     std::string mCode;
 };
 

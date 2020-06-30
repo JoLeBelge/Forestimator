@@ -13,11 +13,11 @@ legend::legend(WContainerWidget *parent):mParent(parent)
 
 void legend::createUI()
 {
+    mTitle = mParent->addWidget(cpp14::make_unique<WText>(WString::tr("legendMsg")));
+
     mParent->setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Left);
     mParent->setMargin(1,Wt::Side::Bottom | Wt::Side::Top);
     mParent->setInline(0);// si pas inline Et bizarrement si pas de setMargin autre que 0, pas de scrollbar pour l'overflow!
-
-    //layout = mParent->setLayout(Wt::cpp14::make_unique<Wt::WVBoxLayout>());
 
     mAptAllEss = mParent->addWidget(cpp14::make_unique<WTable>());
     mAptAllEss->setHeaderCount(1);
@@ -46,6 +46,8 @@ void legend::createUI()
 
 void legend::vider()
 {
+	//mTitle->setStyleClass("nonvisible");
+    mTitle->setText(WString::tr("legendTitre"));
     mInfoT->clear();
     mDetAptFEE->clear();
     mAptAllEss->clear();
@@ -111,14 +113,7 @@ void legend::detailCalculAptFEE(ST * aST){
         mDetAptFEE->elementAt(row, 0)->addWidget(cpp14::make_unique<WText>("Aptitude Finale :"));
         mDetAptFEE->elementAt(row, 1)->addWidget(cpp14::make_unique<WText>(aST->mDico->code2AptFull(Ess->corrigAptRisqueTopo(apt,aST->mTOPO,aST->mZBIO))));
     }
-
-    //auto layout = mContEco->setLayout(Wt::cpp14::make_unique<Wt::WVBoxLayout>());
-    //layout->addWidget(Wt::cpp14::make_unique<EcogrammeEss>(Ess,aST->mZBIO), 1);
-    //mParent->resize(WLength::Auto, 150);
-    //std::unique_ptr<EcogrammeEss> eco = Wt::cpp14::make_unique<EcogrammeEss>(Ess,aST,mParent);
-    //layout->addWidget(std::move(eco),0);
     mEcoEss = mContEco->addWidget(Wt::cpp14::make_unique<EcogrammeEss>(Ess,aST));
-
 }
 
 void legend::afficheLegendeIndiv(const Layer * l){
@@ -136,11 +131,11 @@ void legend::afficheLegendeIndiv(const Layer * l){
         row++;
         for (auto kv : *l->mDicoVal){
             if (l->hasColor(kv.first)){
-            color col = l->getColor(kv.first);
-            mLegendIndiv->elementAt(row, 0)->addWidget(cpp14::make_unique<WText>(kv.second));
-            mLegendIndiv->elementAt(row, 1)->setWidth("40%");
-            mLegendIndiv->elementAt(row, 1)->decorationStyle().setBackgroundColor(WColor(col.mR,col.mG,col.mB));
-            row++;
+                color col = l->getColor(kv.first);
+                mLegendIndiv->elementAt(row, 0)->addWidget(cpp14::make_unique<WText>(kv.second));
+                mLegendIndiv->elementAt(row, 1)->setWidth("40%");
+                mLegendIndiv->elementAt(row, 1)->decorationStyle().setBackgroundColor(WColor(col.mR,col.mG,col.mB));
+                row++;
             }
         }
     }
