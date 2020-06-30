@@ -3,17 +3,17 @@
 const TypeClassifST cl[] = { FEE, CS };
 std::vector<std::string> classes = {"Fichier Ecologique des Essences", "Catalogue des Stations"};
 
-groupLayers::groupLayers(cDicoApt * aDico, WContainerWidget *parent, WContainerWidget *infoW, WOpenLayers *aMap, WApplication *app):
+groupLayers::groupLayers(cDicoApt * aDico, WOpenLayers *aMap, WApplication *app, stackInfoPtr * aStackInfoPtr):
     mDico(aDico)
   ,mTypeClassifST(FEE)
-  ,mInfoW(infoW)
   ,mMap(aMap)
-  ,mParent(parent)
+  ,mParent(aStackInfoPtr->mGroupLayerW)
   ,mPBar(NULL)
   ,m_app(app)
   ,mLegend(NULL)
   ,mSelect4Stat(NULL)
   ,mSelect4Download(NULL)
+  ,mStackInfoPtr(aStackInfoPtr)
 {
     //std::cout << "constructeur GL " << std::endl;
     mParent->setOverflow(Wt::Overflow::Visible);
@@ -25,7 +25,7 @@ groupLayers::groupLayers(cDicoApt * aDico, WContainerWidget *parent, WContainerW
 
     /*   AUTRES ONLGETS de la stack   */
     // création de la légende (vide pour le moment)
-    mLegend = new legend(this,mInfoW);
+    mLegend = new legend(this, mStackInfoPtr->mLegendW);
     mStation = new ST(mDico);
 
     //std::cout << "done" << std::endl;
@@ -100,6 +100,9 @@ void groupLayers::extractInfo(double x, double y){
     //std::cout << "groupLayers ; extractInfo " << std::endl;
     mStation->vider();
     mLegend->vider();
+
+    mStackInfoPtr->menuitem2_legend->select();
+    mStackInfoPtr->stack_info->setCurrentIndex(0);
 
     // tableau des informations globales - durant ce round, l'objet ST est modifié
     mLegend->titreInfoRaster();
@@ -356,7 +359,7 @@ std::map<std::vector<std::string>,Layer*> selectLayers::getAllLayer(){
 }
 
 selectLayers4Download::selectLayers4Download(groupLayers * aGL):mGL(aGL),selectLayers(aGL,aGL->getVpLs(),25){
-    std::cout << "creation de selectLayers4Download " << std::endl;
+    //std::cout << "creation de selectLayers4Download " << std::endl;
     for (Layer * l : mVpLs){
         if (l->Type()!=TypeLayer::Externe){
             if (l->Type()==TypeLayer::FEE || l->Type()==TypeLayer::CS){

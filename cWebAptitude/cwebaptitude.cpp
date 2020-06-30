@@ -5,9 +5,11 @@ bool ModeExpert(0);
 cWebAptitude::cWebAptitude(WApplication* app)
     : WContainerWidget()
 {
+    ModeExpert=0;// un peu sale comme procédé, car le login d'un expert va mettre la var Globale ModeExpert=1 et toutes les nouvelles instances de l'application (d'autre utilisateurs) vont également être en mode expert lool. Solution; remettre la var à 0 lors de chaque nouvelle app
     m_app = app;
     std::string aBD=loadBDpath();
     mDico=new cDicoApt(aBD);
+    mStackInfoPtr=new stackInfoPtr();
 
     std::unique_ptr<WContainerWidget> container_2 = cpp14::make_unique<WContainerWidget>();
     WVBoxLayout * layoutGlobal = container_2->setLayout(cpp14::make_unique<WVBoxLayout>());
@@ -60,8 +62,6 @@ cWebAptitude::cWebAptitude(WApplication* app)
     navigation->setResponsive(true);
     navigation->addStyleClass("carto_menu");
 
-
-
     // Setup a Left-aligned menu. Remplace le menu de droite.
     auto left_menu = cpp14::make_unique<WMenu>();
     auto left_menu_ = navigation->addMenu(std::move(left_menu));
@@ -111,19 +111,21 @@ cWebAptitude::cWebAptitude(WApplication* app)
 
     /* 	SOUS-MENU droite    */
     // Create a stack where the contents will be located.
-    stack_info = layout_info->addWidget(cpp14::make_unique<WStackedWidget>());
-    stack_info->setOverflow(Overflow::Auto);
+    mStackInfoPtr->stack_info = layout_info->addWidget(cpp14::make_unique<WStackedWidget>());
+    mStackInfoPtr->stack_info->setOverflow(Overflow::Auto);
     std::unique_ptr<WMenu> menu_ = cpp14::make_unique<WMenu>();
     WMenu * right_menu = navigation->addMenu(std::move(menu_), Wt::AlignmentFlag::Right);
-    menuitem2_cartes = right_menu->addItem("Couches");
-    menuitem2_legend = right_menu->addItem("Légende");
-    menuitem2_analyse = right_menu->addItem("Analyse");
-    menuitem2_cartes->clicked().connect([=] {stack_info->setCurrentIndex(2);});
-    menuitem2_legend->clicked().connect([=] {stack_info->setCurrentIndex(0);});
-    menuitem2_analyse->clicked().connect([=] {stack_info->setCurrentIndex(1);});
+    mStackInfoPtr->menuitem2_cartes = right_menu->addItem("Couches");
+    mStackInfoPtr->menuitem2_legend = right_menu->addItem("Légende");
+    mStackInfoPtr->menuitem2_analyse = right_menu->addItem("Analyse");
+    mStackInfoPtr->menuitem2_cartes->clicked().connect([=] {mStackInfoPtr->stack_info->setCurrentIndex(2);});
+    mStackInfoPtr->menuitem2_legend->clicked().connect([=] {mStackInfoPtr->stack_info->setCurrentIndex(0);});
+    mStackInfoPtr->menuitem2_analyse->clicked().connect([=] {mStackInfoPtr->stack_info->setCurrentIndex(1);});
     
-    auto content_legend = stack_info->addWidget(cpp14::make_unique<WContainerWidget>());
-    auto content_analyse = stack_info->addWidget(cpp14::make_unique<WContainerWidget>());
+    //auto content_legend = mStackInfoPtr->stack_info->addWidget(cpp14::make_unique<WContainerWidget>());
+    mStackInfoPtr->mLegendW = mStackInfoPtr->stack_info->addWidget(cpp14::make_unique<WContainerWidget>());
+
+    auto content_analyse = mStackInfoPtr->stack_info->addWidget(cpp14::make_unique<WContainerWidget>());
 
     /*	MAPS	*/
     printf("create map\n");
@@ -148,17 +150,19 @@ cWebAptitude::cWebAptitude(WApplication* app)
     T.setBackgroundColor(WColor(col.mR,col.mG,col.mB));
     app->styleSheet().addRule(".E", T);
 
-    auto content_GL = stack_info->addWidget(cpp14::make_unique<WContainerWidget>());
-    content_GL->setStyleClass("content_GL");
+    //auto content_GL = stack_info->addWidget(cpp14::make_unique<WContainerWidget>());
+    mStackInfoPtr->mGroupLayerW= mStackInfoPtr->stack_info->addWidget(cpp14::make_unique<WContainerWidget>());
+    //content_GL->setStyleClass("content_GL");
+    mStackInfoPtr->mGroupLayerW->setStyleClass("content_GL");
 
     /* CHARGE ONGLET COUCHES & LEGENDE */
-    printf("create GL\n");
-    mGroupL = new groupLayers(mDico,content_GL,content_legend,mMap,m_app);
+    //printf("create GL\n");
+    mGroupL = new groupLayers(mDico,mMap,m_app,mStackInfoPtr);
 
     /* CHARGE ONGLET ANALYSES */
-    printf("create PA\n");
+    //printf("create PA\n");
     mPA = new parcellaire(content_analyse,mGroupL,m_app,page_camembert);
-    std::cout << "PA done" << std::endl;
+
 
     // first route TODO check si necessaire
     /* redondant avec appel num 1 de handlepathchange()
@@ -187,7 +191,10 @@ cWebAptitude::cWebAptitude(WApplication* app)
     /*	ACTIONS		*/
     mMap->doubleClicked().connect(mMap->slot);
     // reviens sur l'onglet légende si on est sur l'onglet parcellaire
-    mMap->doubleClicked().connect([=]{menuitem2_legend->select();}); //itLegend - comportement bizare, des fois la légende s'affiche au dessus de grouplayer
+   /* mMap->doubleClicked().connect([this]{mStackInfoPtr->menuitem2_legend->select();
+         // select ; ne fait pas bien son job, bug car affiche à la fois le conteneur légende et en dessous le conteneur stack de group layer. Il faut donc en plus la ligne suivante
+    mStackInfoPtr->stack_info->setCurrentIndex(0);});
+    */
     // et dans wt_config, mettre à 500 milliseconde au lieu de 200 pour le double click
     mMap->xy().connect(std::bind(&groupLayers::extractInfo,mGroupL, std::placeholders::_1,std::placeholders::_2));
 
@@ -221,56 +228,53 @@ cWebAptitude::cWebAptitude(WApplication* app)
  */
 void cWebAptitude::handlePathChange()
 {
-    printf("path change\n");
-    std::cout << "m_app->internalPath() " << m_app->internalPath() << std::endl;
+    //printf("path change\n");
+    //std::cout << "m_app->internalPath() " << m_app->internalPath() << std::endl;
     // TODO corriger les affichages
     if (m_app->internalPath() == "/presentation"){
-        std::cout << "presentation " << std::endl;
         // pour l'instant, n'existe pas, on retourne à home
         top_stack->setCurrentIndex(0);
     }else if (m_app->internalPath() == "/home"){
         top_stack->setCurrentIndex(0);
     }else if (m_app->internalPath() == "/cartographie"){
         top_stack->setCurrentIndex(1);
-        stack_info->setCurrentIndex(2);
+        mStackInfoPtr->stack_info->setCurrentIndex(2);
 
         menuitem_presentation->removeStyleClass("active");
         menuitem_carto->addStyleClass("active");
         menuitem_analyse->removeStyleClass("active");
 
-        menuitem2_analyse->setHidden(true);
-        menuitem2_legend->setHidden(false);
-        menuitem2_cartes->setHidden(false);
+         mStackInfoPtr->menuitem2_analyse->setHidden(true);
+         mStackInfoPtr->menuitem2_legend->setHidden(false);
+         mStackInfoPtr->menuitem2_cartes->setHidden(false);
         sub_stack->setCurrentIndex(0);
     }else if (m_app->internalPath() == "/analyse"){
         top_stack->setCurrentIndex(1);
-        stack_info->setCurrentIndex(1);
+         mStackInfoPtr->stack_info->setCurrentIndex(1);
 
         menuitem_presentation->removeStyleClass("active");
         menuitem_carto->removeStyleClass("active");
         menuitem_analyse->addStyleClass("active");
 
-        menuitem2_analyse->setHidden(false);
-        menuitem2_legend->setHidden(false);
-        menuitem2_cartes->setHidden(false);
-        menuitem2_analyse->select();
+         mStackInfoPtr->menuitem2_analyse->setHidden(false);
+         mStackInfoPtr->menuitem2_legend->setHidden(false);
+         mStackInfoPtr->menuitem2_cartes->setHidden(false);
+         mStackInfoPtr->menuitem2_analyse->select();
         sub_stack->setCurrentIndex(0);
     }else if (m_app->internalPath() == "/resultat"){
         top_stack->setCurrentIndex(1);
         sub_stack->setCurrentIndex(1);
 
-
         menuitem_presentation->removeStyleClass("active");
         menuitem_carto->removeStyleClass("active");
         menuitem_analyse->removeStyleClass("active");
 
-        menuitem2_analyse->setHidden(true);
-        menuitem2_legend->setHidden(true);
-        menuitem2_cartes->setHidden(true);
+         mStackInfoPtr->menuitem2_analyse->setHidden(true);
+         mStackInfoPtr->menuitem2_legend->setHidden(true);
+         mStackInfoPtr->menuitem2_cartes->setHidden(true);
 
     }else{
         //
-
         std::cout << "m_app->internalPath() " << m_app->internalPath() << std::endl;
         std::cout << "internal path pas geré dans le handler " << m_app->internalPath() << std::endl;
     }

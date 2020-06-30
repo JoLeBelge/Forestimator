@@ -445,6 +445,9 @@ std::string Layer::NomMapServerLayer()const{
     case TypeLayer::Thematique:
         aRes=mCode;
         break;
+    case TypeLayer::KK:
+        aRes="KK_CS_"+mCode;
+        break;
     default:
         aRes=mCode;
     }

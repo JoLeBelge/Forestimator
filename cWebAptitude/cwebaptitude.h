@@ -5,6 +5,7 @@
 #include "grouplayers.h"
 #include "parcellaire.h"
 #include "uploadcarte.h"
+#include "stackinfoptr.h"
 #include <Wt/WContainerWidget.h>
 #include <Wt/WVBoxLayout.h>
 #include <Wt/WHBoxLayout.h>
@@ -68,10 +69,9 @@ public:
   }*/
 
   WOpenLayers * mMap;
-  WStackedWidget * stack_info;
 
   WMenuItem * menuitem_presentation,* menuitem_carto, * menuitem_analyse;
-  WMenuItem * menuitem2_analyse,* menuitem2_cartes,*menuitem2_legend;
+
 
   Wt::WStackedWidget * top_stack;// celui qui navige entre la page de garde (home), la page de présentation et les volets analyse/carto
   Wt::WStackedWidget * sub_stack;// celui qui navige entre la carte et la page de visu des résultats d'analyse sur un parcellaire
@@ -79,6 +79,8 @@ private:
   //std::map<std::string,cEss>  mMEss;
   Wt::WApplication* m_app;
   cDicoApt * mDico;
+
+  stackInfoPtr * mStackInfoPtr;
 
   /*Wt::WTable                 *mClassifTable;
   std::string currentClassifST; // 2 modes de classification des stations forestières ; FEE et CS
