@@ -1,9 +1,6 @@
 #include "cwebaptitude.h"
 
-
-//const char *cl[] = { "FEE", "CS" };
-//std::vector<std::string> classes = {"Fichier Ecologique des Essences", "Catalogue des Stations"};
-//extern std::vector<std::string> classes;
+bool ModeExpert(0);
 
 cWebAptitude::cWebAptitude(WApplication* app)
     : WContainerWidget()
@@ -59,14 +56,27 @@ cWebAptitude::cWebAptitude(WApplication* app)
 
     /*	NAVIGATION BAR	*/
     auto navigation = layoutGlobal->addWidget(cpp14::make_unique<WNavigationBar>());
-    navigation->setTitle("   <strong>Forestimator</strong>   ", WLink(LinkType::InternalPath, "/home"));
+    //navigation->setTitle("   <strong>Forestimator</strong>   ", WLink(LinkType::InternalPath, "/home"));
     navigation->setResponsive(true);
     navigation->addStyleClass("carto_menu");
+
+
+
     // Setup a Left-aligned menu. Remplace le menu de droite.
     auto left_menu = cpp14::make_unique<WMenu>();
     auto left_menu_ = navigation->addMenu(std::move(left_menu));
-    menuitem_presentation = left_menu_->addItem("Présentation");
+    // Create a popup submenu pour retour à la page de présentation ou accès au mode expert
+    auto popupPtr = Wt::cpp14::make_unique<Wt::WPopupMenu>();
+    auto popup = popupPtr.get();
+    menuitem_presentation = popup->addItem("Présentation");
     menuitem_presentation->setLink(WLink(LinkType::InternalPath, "/presentation"));
+    WMenuItem * menuitem_login = popup->addItem("Mode expert");
+    menuitem_login->clicked().connect([=] {this->login();});
+    auto item = Wt::cpp14::make_unique<Wt::WMenuItem>("Forestimator");
+    item->setMenu(std::move(popupPtr));
+    left_menu_->addItem(std::move(item));
+    //menuitem_presentation = left_menu_->addItem("Présentation");
+    //menuitem_presentation->setLink(WLink(LinkType::InternalPath, "/presentation"));
     menuitem_carto = left_menu_->addItem("Cartographie");
     menuitem_carto->setLink(WLink(LinkType::InternalPath, "/cartographie"));
     menuitem_analyse = left_menu_->addItem("Analyse");
@@ -177,7 +187,7 @@ cWebAptitude::cWebAptitude(WApplication* app)
     /*	ACTIONS		*/
     mMap->doubleClicked().connect(mMap->slot);
     // reviens sur l'onglet légende si on est sur l'onglet parcellaire
-    mMap->doubleClicked().connect([=]{menuitem2_legend->select();}); //itLegend
+    mMap->doubleClicked().connect([=]{menuitem2_legend->select();}); //itLegend - comportement bizare, des fois la légende s'affiche au dessus de grouplayer
     // et dans wt_config, mettre à 500 milliseconde au lieu de 200 pour le double click
     mMap->xy().connect(std::bind(&groupLayers::extractInfo,mGroupL, std::placeholders::_1,std::placeholders::_2));
 
@@ -266,3 +276,68 @@ void cWebAptitude::handlePathChange()
     }
 }
 
+
+void cWebAptitude::login(){
+
+
+    Wt::WDialog * dialogPtr =  this->addChild(Wt::cpp14::make_unique<Wt::WDialog>("Se connecter en mode expert"));
+
+    Wt::WPushButton *ok =
+            dialogPtr->footer()->addNew<Wt::WPushButton>("Connexion");
+    ok->setDefault(true);
+
+    Wt::WPushButton * annuler =
+            dialogPtr->footer()->addNew<Wt::WPushButton>("Annuler");
+    annuler->setDefault(false);
+
+    Wt::WLineEdit * username = dialogPtr->contents()->addNew<Wt::WLineEdit>();
+    username->setPlaceholderText("Utilisateur");
+    dialogPtr->contents()->addNew<Wt::WBreak>();
+    Wt::WLineEdit * password = dialogPtr->contents()->addNew<Wt::WLineEdit>();
+    password->setPlaceholderText("Mot de passe");
+    dialogPtr->contents()->addNew<Wt::WBreak>();
+    Wt::WText *out = dialogPtr->contents()->addNew<Wt::WText>("");
+    out->addStyleClass("help-block");
+    //username->setValidator(std::make_shared<Wt::WIntValidator>(0, 130));
+    /*
+       * Accept the dialog
+       */
+    ok->clicked().connect([=] {
+        // controle du contenu username et password
+        if (password->text()=="gefgef" & username->text() =="gef"){
+        ModeExpert=1;
+        // je recrée les essences donc j'ai besoin d'une connection à la BD
+        mDico->openConnection();
+        // update grouplayer
+        mGroupL->updateGL();
+        mDico->closeConnection();
+        mPA->update();
+
+        auto messageBox = dialogPtr->addChild(Wt::cpp14::make_unique<Wt::WMessageBox>(
+                                      "Mode Expert",
+                                      "<p> Mode expert activé, vous avez accès aux information liées aux catalogues de station (aptitudes, potentiel sylvicole, habitats)</p>",
+                                      Wt::Icon::Information,
+                                      Wt::StandardButton::Ok));
+
+        messageBox->setModal(false);
+        messageBox->buttonClicked().connect([=] {
+            dialogPtr->removeChild(messageBox);
+        });
+        messageBox->show();
+
+        dialogPtr->accept();
+        } else {
+            out->setText("Utilisateur et/ou mot de passe invalide.");
+        }
+    });
+
+    if (ModeExpert){
+        ok->disable();
+        username->hide();
+        password->hide();
+        out->setText("Mode Expert déjà actif.");
+    }
+
+    annuler->clicked().connect([=]{dialogPtr->reject();});
+    dialogPtr->show();
+}

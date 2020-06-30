@@ -56,12 +56,17 @@ public:
     void downloadRaster();
     bool cropImWithShp(std::string inputRaster, std::string aOut);
 
+    // update au moment ou on bascule sur la version expert ou non expert
+    void update();
+
+
 private:
 
     // Full path ; là ou est sauvé le shp localement, mName ; le nom du shp tels qu'il était chez le client
     std::string mFullPath, mName,mClientName;
     std::string mJSfile;
     Wt::WContainerWidget     * mParent;
+     Wt::WContainerWidget     * mContSelect4D, * mContSelect4Stat;
     Wt::WContainerWidget * mStatW;
     Wt::WFileUpload *fu;
     Wt::WPushButton *uploadButton,*computeStatButton, *visuStatButton, *downloadShpBt, *downloadRasterBt;

@@ -49,8 +49,9 @@ parcellaire::parcellaire(WContainerWidget *parent, groupLayers *aGL, Wt::WApplic
     mCB_fusionOT->setToolTip(tr("infoCalculStat"));
     //mParent->addWidget(cpp14::make_unique<Wt::WText>(tr("infoChoixLayerStat")));
     mParent->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
-    auto * div_4stat = mParent->addWidget(std::unique_ptr<Wt::WContainerWidget>(mGL->afficheSelect4Stat()));
-    div_4stat->addStyleClass("div_4stat");
+    mContSelect4Stat= mParent->addWidget(cpp14::make_unique<Wt::WContainerWidget>());
+    //auto * div_4stat = mParent->addWidget(std::unique_ptr<Wt::WContainerWidget>(mGL->afficheSelect4Stat()));
+    mContSelect4Stat->addStyleClass("div_4stat");
 
     mParent->addWidget(cpp14::make_unique<WText>(tr("anaStep3")));
     computeStatButton = mParent->addWidget(cpp14::make_unique<Wt::WPushButton>("Calcul"));
@@ -74,7 +75,9 @@ parcellaire::parcellaire(WContainerWidget *parent, groupLayers *aGL, Wt::WApplic
 
     //mParent->addWidget(cpp14::make_unique<Wt::WText>(tr("infoDownloadClippedRaster")));
     mParent->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
-    mParent->addWidget(std::unique_ptr<Wt::WContainerWidget>(mGL->afficheSelect4Download()));
+    mContSelect4D= mParent->addWidget(cpp14::make_unique<Wt::WContainerWidget>());
+
+    //mParent->addWidget(std::unique_ptr<Wt::WContainerWidget>(mGL->afficheSelect4Download()));
     mParent->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
 
     downloadRasterBt = mParent->addWidget(cpp14::make_unique<Wt::WPushButton>("Télécharger les cartes"));
@@ -90,6 +93,9 @@ parcellaire::parcellaire(WContainerWidget *parent, groupLayers *aGL, Wt::WApplic
     computeStatButton->clicked().connect(this,&parcellaire::computeStat);
     downloadShpBt->clicked().connect(this,&parcellaire::downloadShp);
     downloadRasterBt->clicked().connect(this,&parcellaire::downloadRaster);
+
+    // rempli les 2 conteneurs qui présentent les selectLayers
+    update();
 }
 
 parcellaire::~parcellaire(){
@@ -596,4 +602,13 @@ bool parcellaire::cropImWithShp(std::string inputRaster, std::string aOut){
     }
     return aRes;
 }
+
+void parcellaire::update(){
+    mContSelect4Stat->clear();
+    mContSelect4D->clear();
+    mContSelect4Stat->addWidget(std::unique_ptr<Wt::WContainerWidget>(mGL->afficheSelect4Stat()));
+    mContSelect4D->addWidget(std::unique_ptr<Wt::WContainerWidget>(mGL->afficheSelect4Download()));
+}
+
+
 

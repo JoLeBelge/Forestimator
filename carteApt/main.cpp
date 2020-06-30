@@ -60,18 +60,18 @@ int main(int argc, char *argv[])
 if (1){
 
 
-     std::string aFileCodeMS("/home/lisein/Documents/carteApt/autres/mapserver/mapThematiqueFEE.map");
+    /* std::string aFileCodeMS("/home/lisein/Documents/carteApt/autres/mapserver/mapThematiqueFEE.map");
     for (auto & kv : aMRs){
         //aACA.createTile(kv.second.NomCarte(),kv.second.NomDirTuile(),kv.second.Type());
         cRasterInfo RI= kv.second;
          aACA.codeMapServer(RI.NomFileWithExt(),RI.Code(),RI.Nom(),aFileCodeMS,RI.getDicoVal(),RI.getDicoCol());
-    }
+    }*/
 
 
     for (auto & kv : aMEss){
         //std::string aOut=dico.Files()->at("OUTDIR")+"aptitudeFEE_"+kv.first+".tif";
 
-        //aACA.carteAptFEE(&kv.second,kv.second.NomCarteAptFEE(),true);
+        aACA.carteAptFEE(&kv.second,kv.second.NomCarteAptFEE(),true);
 
         //aOut=dico.Files()->at("OUTDIR")+"aptitudeCS_"+kv.first+".tif";
         //aACA.carteAptCS(&kv.second,kv.second.NomCarteAptCS(),false);

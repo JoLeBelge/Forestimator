@@ -5,31 +5,7 @@ std::string dirBD("/home/lisein/Documents/carteApt/Forestimator/carteApt/data/ap
 cDicoApt::cDicoApt(std::string aBDFile):mBDpath(aBDFile)
 {
 
-    //int rc;
-    /*if(  sqlite3_config(SQLITE_CONFIG_MULTITHREAD)) {
-       std::cout << "totooooo" << std::endl;
-
-    }
-    if(  sqlite3_config( SQLITE_CONFIG_SERIALIZED)) {
-       std::cout << "totooooo" << std::endl;
-
-    }*/
-
-    /* backend::Sqlite3 sqlite3(mBDpath);
-    Session session;
-    //setConnection (std::unique_ptr< SqlConnection > connection)
-    session.setConnection(sqlite3);
-    */
-    int rc;
-
-    std::cout << "chargement des dictionnaires de la BD ..." ;
-    //db_->Sqlite3(mBDpath);
-
-    rc = sqlite3_open_v2(mBDpath.c_str(), &db_,SQLITE_OPEN_READONLY,NULL);
-    if( rc ) {
-        fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db_));
-        std::cout << " mBDpath " << mBDpath << std::endl;
-    } else {
+    if (openConnection()){} else {
         // dico Ess Nom -- code
         sqlite3_stmt * stmt;
         std::string SQLstring="SELECT Ess_FR,Code_FR,prefix FROM dico_essences ORDER BY Ess_FR DESC;";
@@ -298,11 +274,7 @@ cDicoApt::cDicoApt(std::string aBDFile):mBDpath(aBDFile)
         sqlite3_finalize(stmt);
 
     }
-    /* rc = sqlite3_close_v2(db_);
-   if( rc ) {
-       fprintf(stderr, "Can't close database: %s\n", sqlite3_errmsg(db_));
-       std::cout << " createur du Dico" << std::endl;
-   }*/
+
 
     std::cout << "Dico code essence --> nom essence francais a "<< Dico_code2NomFR.size() << " elements \n" << std::endl;
     /*std::cout << "Dico code NH --> nom NH a "<< Dico_NH.size() << " elements" << std::endl;
@@ -321,14 +293,7 @@ cDicoApt::cDicoApt(std::string aBDFile):mBDpath(aBDFile)
 
 std::map<int,std::map<std::string,int>> cDicoApt::getFEEApt(std::string aCodeEs){
     std::map<int,std::map<std::string,int>> aRes;
-    /*  int rc;
-    sqlite3 *db_;
-   rc = sqlite3_open_v2(mBDpath.c_str(), &db_,SQLITE_OPEN_READONLY,NULL);
-   if( rc ) {
-       fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db_));
-       std::cout << " mBDpath " << mBDpath << std::endl;
-   } else {
-   */
+
     sqlite3_stmt * stmt;
     std::string SQLstring="SELECT CodeNTNH,'1','2','3','4','5','6','7','8','9','10' FROM AptFEE WHERE CODE_ESSENCE='"+ aCodeEs+"';";
     boost::replace_all(SQLstring, "'", "\"");
@@ -347,27 +312,11 @@ std::map<int,std::map<std::string,int>> cDicoApt::getFEEApt(std::string aCodeEs)
         }
     }
     sqlite3_finalize(stmt);
-    /*   rc = sqlite3_close_v2(db_);
-        if( rc ) {
-            fprintf(stderr, "Can't close database: %s\n", sqlite3_errmsg(db_));
-            std::cout << " getFEEApt" << std::endl;
-        }
-    }
-    */
     return aRes;
 }
 
 std::map<int,int> cDicoApt::getZBIOApt(std::string aCodeEs){
     std::map<int,int> aRes;
-    /*  sqlite3 *db_;
-    int rc;
-   rc = sqlite3_open_v2(mBDpath.c_str(), &db_,SQLITE_OPEN_READONLY,NULL);
-   if( rc ) {
-       fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db_));
-       std::cout << " mBDpath " << mBDpath << std::endl;
-   } else {
-   */
-
     sqlite3_stmt * stmt;
     std::string SQLstring="SELECT '1','2','3','4','5','6','7','8','9','10' FROM AptFEE_ZBIO WHERE CODE_ESSENCE='"+ aCodeEs+"';";
     boost::replace_all(SQLstring, "'", "\"");
@@ -385,27 +334,13 @@ std::map<int,int> cDicoApt::getZBIOApt(std::string aCodeEs){
     }
     sqlite3_finalize(stmt);
 
-    /* }
-   rc = sqlite3_close_v2(db_);
-   if( rc ) {
-       fprintf(stderr, "Can't close database: %s\n", sqlite3_errmsg(db_));
-       std::cout << "getZbioApt" << std::endl;
-   }
-   */
     return aRes;
 }
 
 
 std::map<int,std::string> cDicoApt::getDicoRaster(std::string aCode){
     std::map<int,std::string> aRes;
-    /* sqlite3 *db_;
-    int rc;
-   rc = sqlite3_open_v2(mBDpath.c_str(), &db_,SQLITE_OPEN_READONLY,NULL);
-   if( rc ) {
-       fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db_));
-       std::cout << " mBDpath " << mBDpath << std::endl;
-   } else {
-   */
+
     sqlite3_stmt * stmt;
     std::string SQLstring="SELECT nom_dico, nom_field_raster, nom_field_value, condition FROM fichiersGIS WHERE Code='"+ aCode+"';";
     //std::cout << SQLstring << std::endl;
@@ -436,26 +371,12 @@ std::map<int,std::string> cDicoApt::getDicoRaster(std::string aCode){
     }
     sqlite3_finalize(stmt);
 
-    /* }
-   rc = sqlite3_close_v2(db_);
-   if( rc ) {
-       fprintf(stderr, "Can't close database: %s\n", sqlite3_errmsg(db_));
-       std::cout << "getDicoRaster" << std::endl;
-   }*/
-
     return aRes;
 }
 
 std::map<int,color> cDicoApt::getDicoRasterCol(std::string aCode){
     std::map<int,color> aRes;
-    /* sqlite3 *db_;
-    int rc;
-   rc = sqlite3_open_v2(mBDpath.c_str(), &db_,SQLITE_OPEN_READONLY,NULL);
-   if( rc ) {
-       fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db_));
-       std::cout << " mBDpath " << mBDpath << std::endl;
-   } else {
-   */
+
     sqlite3_stmt * stmt;
     std::string SQLstring="SELECT nom_dico, nom_field_raster, nom_field_value, condition FROM fichiersGIS WHERE Code='"+ aCode+"';";
     //std::cout << SQLstring << std::endl;
@@ -488,27 +409,13 @@ std::map<int,color> cDicoApt::getDicoRasterCol(std::string aCode){
     }
     sqlite3_finalize(stmt);
 
-    /* }
-   rc = sqlite3_close_v2(db_);
-   if( rc ) {
-       fprintf(stderr, "Can't close database: %s\n", sqlite3_errmsg(db_));
-       std::cout << "getDicoRasterCol(acode)" << std::endl;
-   }
-   */
     return aRes;
 }
 
 
 std::map<int,color> cDicoApt::getDicoRasterCol(cKKCS * aKK){
     std::map<int,color> aRes;
-    /* sqlite3 *db_;
-    int rc;
-    rc = sqlite3_open_v2(mBDpath.c_str(), &db_,SQLITE_OPEN_READONLY,NULL);
-    if( rc ) {
-        fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db_));
-        std::cout << " mBDpath " << mBDpath << std::endl;
-    } else {
-    */
+
     sqlite3_stmt * stmt;
     std::string SQLstring("");
     if (aKK->IsFact()){ SQLstring="SELECT DISTINCT cat_id,col FROM dico_echelleFact;";}
@@ -527,27 +434,13 @@ std::map<int,color> cDicoApt::getDicoRasterCol(cKKCS * aKK){
     }
     sqlite3_finalize(stmt);
 
-    /*}
-    rc = sqlite3_close_v2(db_);
-    if( rc ) {
-        fprintf(stderr, "Can't close database: %s\n", sqlite3_errmsg(db_));
-        std::cout << "getDicoRasterCol(KK)" << std::endl;
-    }
-    */
     return aRes;
 }
 
 
 std::map<int,std::map<int,int>> cDicoApt::getCSApt(std::string aCodeEs){
     std::map<int,std::map<int,int>> aRes;
-    /*sqlite3 *db_;
-    int rc;
-    rc = sqlite3_open_v2(mBDpath.c_str(), &db_,SQLITE_OPEN_READONLY,NULL);
-    if( rc ) {
-        fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db_));
-        std::cout << " mBDpath " << mBDpath << std::endl;
-    } else {
-    */
+
     sqlite3_stmt * stmt;
     // boucle sur tout les identifiants de zbio mais attention, les catalogues de station ne couvrent pas tout donc vérif si ND
     for(auto&& zbio : Dico_ZBIO | boost::adaptors::map_keys){
@@ -602,26 +495,12 @@ std::map<int,std::map<int,int>> cDicoApt::getKKCS(std::string aColName){
     }
     sqlite3_finalize(stmt);
 
-    /* }
-    rc = sqlite3_close_v2(db_);
-    if( rc ) {
-        fprintf(stderr, "Can't close database: %s\n", sqlite3_errmsg(db_));
-        std::cout << "getKKCS" << std::endl;
-    }
-    */
     return aRes;
 }
 
 std::map<int,std::map<int,std::vector<std::string>>> cDicoApt::getHabitatCS(std::string aColName){
     std::map<int,std::map<int,std::vector<std::string>>> aRes;
-    /* sqlite3 *db_;
-    int rc;
-    rc = sqlite3_open_v2(mBDpath.c_str(), &db_,SQLITE_OPEN_READONLY,NULL);
-    if( rc ) {
-        fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db_));
-        std::cout << " mBDpath " << mBDpath << std::endl;
-    } else {
-    */
+
     sqlite3_stmt * stmt;
     // boucle sur tout les identifiants de zbio mais attention, les catalogues de station ne couvrent pas tout donc vérif si ND
     for(auto&& zbio : Dico_ZBIO | boost::adaptors::map_keys){
@@ -740,6 +619,20 @@ std::map<int,std::map<int,int>> cDicoApt::getRisqueTopo(std::string aCodeEs){
     }
     */
     return aRes;
+}
+
+int cDicoApt::openConnection(){
+int rc;
+
+std::cout << "chargement des dictionnaires de la BD ..." ;
+//db_->Sqlite3(mBDpath);
+
+rc = sqlite3_open_v2(mBDpath.c_str(), &db_,SQLITE_OPEN_READONLY,NULL);
+if( rc ) {
+    fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db_));
+    std::cout << " mBDpath " << mBDpath << std::endl;
+}
+return rc;
 }
 
 void cDicoApt::closeConnection(){

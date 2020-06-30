@@ -41,10 +41,11 @@ enum TypeClassifST {FEE
 
 using namespace Wt;
 
+extern bool ModeExpert;
+
 class selectLayers : public WContainerWidget{
 public:
     selectLayers(Wt::WContainerWidget * aParent, std::vector<Layer*> aVpLs,int aMax):mParent(aParent),mVpLs(aVpLs),nbMax(aMax){}
-
     std::vector<rasterFiles> getSelectedRaster();
     std::map<std::vector<std::string>,Layer*> getSelectedLayer();
     // cas particulier ou je veux toutes les couches, qu'elles soient selectionnées ou pas
@@ -111,7 +112,10 @@ public:
     }*/
     void clickOnName(std::string aCode, TypeLayer type);
     void changeClassClick(WText *t);
+
+    // update du rendu du nom de la couche qui est sélectionnée
     void update(std::string aCode, TypeLayer type);
+    void updateGL();
     // click de l'utilisateur sur la carte pour extraire les valeurs des raster pour une position donnée
     void extractInfo(double x, double y);
     cDicoApt * Dico(){return mDico;}

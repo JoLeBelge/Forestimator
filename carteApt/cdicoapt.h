@@ -252,6 +252,7 @@ public:
     // charger les dicos depuis BD SQL
     cDicoApt(std::string aBDFile);
     void closeConnection();
+    int openConnection();
     std::map<int,std::string> * ZBIO(){return  &Dico_ZBIO;}
     std::map<std::string,std::string>  * Files(){return  &Dico_GISfile;}
     // code carte vers type carte code : NH.tif

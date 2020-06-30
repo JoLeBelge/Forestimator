@@ -23,6 +23,9 @@
 //#include <boost/range/adaptor/map.hpp>
 //#include <boost/range/adaptors.hpp>
 //#include <boost/foreach.hpp>
+
+#include <Wt/WIntValidator.h>
+#include <Wt/WLineEdit.h>
 using namespace Wt;
 
 class cWebAptitude : public WContainerWidget
@@ -33,6 +36,7 @@ public:
   cWebAptitude(Wt::WApplication* app);
 
   void handlePathChange();
+  void login();//pour accès au mode expert
 
   /*~cWebAptitude(){
     std::cout << "destructeur de cWebAptitude " << std::endl;
