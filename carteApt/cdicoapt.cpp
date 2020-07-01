@@ -402,6 +402,7 @@ std::map<int,color> cDicoApt::getDicoRasterCol(std::string aCode){
             int aA=sqlite3_column_int( stmt, 0 );
             std::string aB("");
             if (sqlite3_column_type(stmt, 1)!=SQLITE_NULL ) {aB=std::string( (char *)sqlite3_column_text( stmt, 1 ) );}
+
             //if (aCode=="MNH2019"){ std::cout << " ajout dans dicoCol " << aA << " , col " << aB << std::endl;}
             aRes.emplace(std::make_pair(aA,getColor(aB)));
         }
@@ -821,7 +822,6 @@ std::string cRasterInfo::NomFileWithExt(){
     boost::filesystem::path p(mPathRaster);
     return p.filename().c_str();}
 
-
 TypeCarte str2TypeCarte(const std::string& str)
 {
     TypeCarte aRes=SS;
@@ -833,6 +833,7 @@ TypeCarte str2TypeCarte(const std::string& str)
     else if(str == "ZBIO") aRes=ZBIO;
     else if(str == "CSArdenne") aRes=CSArdenne;
     else if(str == "CSLorraine") aRes=CSLorraine;
+    else if(str == "Composition") aRes=Composition;
     return aRes;
 }
 

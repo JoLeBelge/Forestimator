@@ -1,6 +1,9 @@
 #ifndef LAYERSTATCHART_H
 #define LAYERSTATCHART_H
 #include <Wt/Chart/WPieChart.h>
+#include <Wt/Chart/WCartesianChart.h>
+#include <Wt/WItemDelegate.h>
+#include <Wt/Chart/WDataSeries.h>
 #include <Wt/WApplication.h>
 #include <Wt/WContainerWidget.h>
 #include <Wt/WEnvironment.h>

@@ -19,7 +19,7 @@
 
 //using namespace Wt::Dbo;
 
-enum TypeCarte {Apt, Potentiel, Station1, Habitats,NH,NT,Topo,AE,SS,ZBIO,CSArdenne,CSLorraine,MNH2019};
+enum TypeCarte {Apt, Potentiel, Station1, Habitats,NH,NT,Topo,AE,SS,ZBIO,CSArdenne,CSLorraine,MNH2019,Composition};
 
 enum class TypeVar {Classe,
                     Continu
@@ -474,7 +474,10 @@ public:
 
     color getColor(std::string aCode){
         color aRes(0,0,0);
+        if (aCode.substr(0,1)=="#") {aRes=color(aCode);}
+        else {
         if (colors.find(aCode)!=colors.end()){aRes=colors.at(aCode);}
+        }
         return aRes;
     }
 private:
