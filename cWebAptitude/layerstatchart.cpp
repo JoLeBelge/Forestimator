@@ -43,25 +43,34 @@ Wt:WContainerWidget * aRes= new Wt::WContainerWidget();
     aRes->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
     //std::cout << " statsimple : " << mStatSimple.size() << " elem " << std::endl;
     if (mStatSimple.size()>0){
-        WTableView* table =aRes->addWidget(cpp14::make_unique<WTableView>());
-        aRes->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
-        table->setMargin(10, Side::Top | Side::Bottom);
-        table->setMargin(WLength::Auto, Side::Left | Side::Right);
-        table->setSortingEnabled(1,false);
-        table->setSortingEnabled(0,false);// pas très utile
-        //std::cout << "set model " << std::endl;
-        table->setModel(mModel);
-        table->setColumnWidth(0, 200);
-        table->setColumnWidth(1, 150);
-        table->setRowHeight(28);
-        table->setHeaderHeight(28);
-        table->setWidth(200 + 150 + 14+2);
-        // seulement un chart pour les variables discontinues
+
         if (mTypeVar==TypeVar::Classe){
+            WTableView* table =aRes->addWidget(cpp14::make_unique<WTableView>());
+            aRes->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
+            table->setMargin(10, Side::Top | Side::Bottom);
+            table->setMargin(WLength::Auto, Side::Left | Side::Right);
+
+            table->setSortingEnabled(1,false);
+            table->setSortingEnabled(0,false);// pas très utile
+            table->setAlternatingRowColors(true);
+            //std::cout << "set model " << std::endl;
+            table->setModel(mModel);
+            // delegate ; met à 0 mes valeurs de pct dans la colonne, mais pour les labels de pct dans le graph ça fonctionne
+            //std::shared_ptr<WItemDelegate> delegate = std::make_shared<WItemDelegate>();
+            //delegate->setTextFormat("%.0f");
+            //table->setItemDelegate(delegate);
+            table->setColumnWidth(0, 200);
+            table->setColumnWidth(1, 150);
+            table->setRowHeight(28);
+            table->setHeaderHeight(28);
+            table->setWidth(200 + 150 + 14+2);
+            // seulement un chart pour les variables discontinues
             Chart::WPieChart * aChart  =aRes->addWidget(cpp14::make_unique<Chart::WPieChart>());
             aChart->setModel(mModel);       // Set the model.
             aChart->setLabelsColumn(0);    // Set the column that holds the labels.
             aChart->setDataColumn(1);      // Set the column that holds the data.
+
+
 
             // changer la couleur
             //std::cout << "change la couleur" << std::endl;
@@ -72,17 +81,23 @@ Wt:WContainerWidget * aRes= new Wt::WContainerWidget();
                 color col(mLay->getColor(aCodeStr));
                 // std::cout << "got color" << std::endl;
                 aChart->setBrush(row,Wt::WBrush(Wt::WColor(col.mR,col.mG,col.mB)));
+
+                //mModel->item(row,0)->;
+
                 //std::cout << "brush setted " << std::endl;
                 row++;
             }
             //std::cout << "config la position des labels" << std::endl;
             // Configure location and type of labels.
-            //aChart->setDisplayLabels(Chart::LabelOption::Outside |
-            //                        Chart::LabelOption::TextLabel |
-            //                        Chart::LabelOption::TextPercentage);
+            if (mStatSimple.size()>3)
+            aChart->setDisplayLabels(Chart::LabelOption::Outside |
+                                    //Chart::LabelOption::TextLabel); |
+                                   Chart::LabelOption::TextPercentage);
             // Enable a 3D and shadow effect.
             aChart->setPerspectiveEnabled(true, 0.2);
             aChart->setShadowEnabled(true);
+            aChart->setPlotAreaPadding(20, Side::Left | Side::Top | Side::Bottom|Side::Right);
+            //aChart->setPlotAreaPadding(120, Side::Right);
 
             //if (mStat.size()>1) {aChart->setExplode(rowAtMax, 0.1);}  // Explode l'élément majoritaire WARN, le camembert sort du graphique, bug
             aChart->resize(300, 300);    // WPaintedWidget must be given an explicit size.
@@ -90,6 +105,52 @@ Wt:WContainerWidget * aRes= new Wt::WContainerWidget();
             //aChart->setMargin(WLength::Auto, Side::Left | Side::Right); // Center horizontally. il faut mettre des marges, qui sont comtpée au départ du cammembert, pour mettre les label
             aChart->setMargin(50, Side::Left | Side::Right);
         }
+        if (mTypeVar==TypeVar::Continu){
+
+            // pour MNH seulement, pour l'instant  - recrée un vecteur stat, puis un model
+            int nbPix(0);
+            for (auto & kv : mStat){
+                nbPix+=kv.second;
+            }
+            // je dois mettre et la hauteur en double, et le pct car sinon imprécision d'arrondi
+            std::map<double, double> aStat;
+            for (auto & kv : mStat){
+                double h(std::stod(kv.first));
+                if (h>3.0 && h<45){
+                    aStat.emplace(std::make_pair(std::stod(kv.first),(100.0*kv.second)/nbPix));
+                }
+            }
+
+            std::shared_ptr<WStandardItemModel> model = std::make_shared<WStandardItemModel>();
+            // Configure the header.
+            model->insertColumns(model->columnCount(), 2);
+            // Set data in the model.
+            model->insertRows(model->rowCount(), aStat.size());
+            int row = 0;
+            for (auto & kv : aStat){
+                //clé : la valeur au format légende (ex ; Optimum). Valeur ; pourcentage pour ce polygone
+                model->setData(  row, 0, kv.first);
+                model->setData(  row, 1, kv.second);
+                row++;
+            }
+
+            Chart::WCartesianChart *aChart = aRes->addWidget(cpp14::make_unique<Chart::WCartesianChart>());
+            //aChart->setBackground(WColor(220, 220, 220));
+            aChart->setModel(model);
+            aChart->setXSeriesColumn(0);
+            aChart->setLegendEnabled(true);
+            aChart->setType(Chart::ChartType::Scatter);
+
+            auto s = cpp14::make_unique<Chart::WDataSeries>(1, Chart::SeriesType::Curve);
+            s->setShadow(WShadow(3, 3, WColor(0, 0, 0, 127), 3));
+            aChart->addSeries(std::move(s));
+
+            aChart->resize(300, 300);    // WPaintedWidget must be given an explicit size.
+            aChart->setMargin(20, Side::Top | Side::Bottom); // Add margin vertically.
+            //aChart->setMargin(WLength::Auto, Side::Left | Side::Right); // Center horizontally. il faut mettre des marges, qui sont comtpée au départ du cammembert, pour mettre les label
+            aChart->setMargin(50, Side::Left | Side::Right);
+        }
+
 
     } else {
         aRes->addWidget(cpp14::make_unique<WText>("Pas de statistique pour cette couche"));
@@ -138,15 +199,19 @@ void layerStat::simplifieStat(){
         break;}
 
     case TypeVar::Continu:{
+
+        // pour l'instant, copie juste le mStat
+        mStatSimple=mStat;
+
         // regroupe les valeurs en 10 groupes avec le mm nombre d'occurence
         // classer les occurences par valeur de hauteur car la map n'est pas trié par ordre de  hauteur car 11.0 et avant 2 ou 20.0, tri 'alphabétique' des chiffres.
-
+        /*
         std::map<double, int> aStatOrdered;
         for (auto & kv : mStat){
             aStatOrdered.emplace(std::make_pair(std::stod(kv.first),kv.second));
         }
 
-        int nbClasse(10);
+
         int occurenceCumul(0);
         std::string curLimHaute("");
         double seuil(nbPix/nbClasse);
@@ -165,7 +230,7 @@ void layerStat::simplifieStat(){
                         mStatSimple.emplace(curLimHaute,(100*occurenceCumul)/nbPix);
                         numClasCur++;
                         mStatSimple.emplace(nth_letter(numClasCur)+ " " +dToStr(kv.first),(100*kv.second)/nbPix);
-                         numClasCur++;
+                        numClasCur++;
                         occurenceCumul=0;
                     } else {
                         mStatSimple.emplace(nth_letter(numClasCur)+ " " +dToStr(kv.first),(100*kv.second)/nbPix);
@@ -182,6 +247,7 @@ void layerStat::simplifieStat(){
         if (occurenceCumul>0){
             mStatSimple.emplace(curLimHaute,(100*occurenceCumul)/nbPix);
         }
+        */
 
         /*for (auto & kv : mStatSimple){
             std::cout << " limite haute : " << kv.first << " , " << kv.second << "%" << std::endl;
