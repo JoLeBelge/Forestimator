@@ -43,12 +43,12 @@ parcellaire::parcellaire(WContainerWidget *parent, groupLayers *aGL, Wt::WApplic
     mParent->addWidget(cpp14::make_unique<WText>(tr("anaStep2")));
     //mParent->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
     //mParent->addWidget(cpp14::make_unique<Wt::WText>(tr("infoCalculStat")));
-    mParent->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
+    //mParent->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
     mCB_fusionOT= mParent->addWidget(Wt::cpp14::make_unique<Wt::WCheckBox>(tr("cb_fusionAptOT")));
     mCB_fusionOT->setInline(0);
     mCB_fusionOT->setToolTip(tr("infoCalculStat"));
     //mParent->addWidget(cpp14::make_unique<Wt::WText>(tr("infoChoixLayerStat")));
-    mParent->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
+    //mParent->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
     mContSelect4Stat= mParent->addWidget(cpp14::make_unique<Wt::WContainerWidget>());
     //auto * div_4stat = mParent->addWidget(std::unique_ptr<Wt::WContainerWidget>(mGL->afficheSelect4Stat()));
     mContSelect4Stat->addStyleClass("div_4stat");

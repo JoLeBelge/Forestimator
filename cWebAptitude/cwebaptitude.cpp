@@ -11,14 +11,20 @@ cWebAptitude::cWebAptitude(WApplication* app)
     mDico=new cDicoApt(aBD);
     mStackInfoPtr=new stackInfoPtr();
 
+    addStyleClass("cWebAptitude");
+    setMargin(0);
+    setPadding(0);
     std::unique_ptr<WContainerWidget> container_2 = cpp14::make_unique<WContainerWidget>();
     WVBoxLayout * layoutGlobal = container_2->setLayout(cpp14::make_unique<WVBoxLayout>());
+    layoutGlobal->setContentsMargins(0,0,0,0);
 
     container_2->setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Middle);
-    container_2->setStyleClass("carto_div");
+    container_2->addStyleClass("carto_div");
 
     WVBoxLayout * layout = setLayout(Wt::cpp14::make_unique<Wt::WVBoxLayout>());
+    layout->setContentsMargins(0,0,0,0);
     top_stack  = layout->addWidget(Wt::cpp14::make_unique<Wt::WStackedWidget>());
+    top_stack->setMargin(0);
 
     /*	HOME PAGE	*/
     auto container_home = Wt::cpp14::make_unique<Wt::WContainerWidget>();
@@ -95,6 +101,7 @@ cWebAptitude::cWebAptitude(WApplication* app)
 
     /* MAP div */
     auto layout_carto = page_carto->setLayout(cpp14::make_unique<WHBoxLayout>());
+    page_carto->layout()->setContentsMargins(0,0,0,0);
 
     //std::unique_ptr<WContainerWidget> page_carto = layoutGlobal->addWidget(cpp14::make_unique<WContainerWidget>());
     //auto layout_carto = page_carto->setLayout(cpp14::make_unique<WHBoxLayout>());
@@ -104,15 +111,18 @@ cWebAptitude::cWebAptitude(WApplication* app)
     /* Partie droite couches-légende-analyse */
     auto content_info = cpp14::make_unique<WContainerWidget>();
     WContainerWidget * content_info_ = content_info.get();
-    WVBoxLayout * layout_info = content_info_->setLayout(cpp14::make_unique<WVBoxLayout>());
+    //WVBoxLayout * layout_info = content_info_->setLayout(cpp14::make_unique<WVBoxLayout>());
     content_info_->setOverflow(Overflow::Auto);
-    content_info_->setWidth("400px"); // TODO CSS resize @min-width
-    content_info_->setMinimumSize(400,0);
+    content_info_->setWidth("30%"); // TODO CSS resize @min-width
+    //content_info_->setMinimumSize(400,0);
+    content_info_->addStyleClass("content_info");
 
     /* 	SOUS-MENU droite    */
     // Create a stack where the contents will be located.
-    mStackInfoPtr->stack_info = layout_info->addWidget(cpp14::make_unique<WStackedWidget>());
-    mStackInfoPtr->stack_info->setOverflow(Overflow::Auto);
+    //mStackInfoPtr->stack_info = layout_info->addWidget(cpp14::make_unique<WStackedWidget>());
+    mStackInfoPtr->stack_info = content_info_->addWidget(cpp14::make_unique<WStackedWidget>());
+    //mStackInfoPtr->stack_info->setOverflow(Overflow::Auto);
+    mStackInfoPtr->stack_info->addStyleClass("content_info_stack");
     std::unique_ptr<WMenu> menu_ = cpp14::make_unique<WMenu>();
     WMenu * right_menu = navigation->addMenu(std::move(menu_), Wt::AlignmentFlag::Right);
     mStackInfoPtr->menuitem2_cartes = right_menu->addItem("Couches");
@@ -126,6 +136,7 @@ cWebAptitude::cWebAptitude(WApplication* app)
     mStackInfoPtr->mLegendW = mStackInfoPtr->stack_info->addWidget(cpp14::make_unique<WContainerWidget>());
 
     auto content_analyse = mStackInfoPtr->stack_info->addWidget(cpp14::make_unique<WContainerWidget>());
+    content_analyse->addStyleClass("content_analyse");
 
     /*	MAPS	*/
     printf("create map\n");
