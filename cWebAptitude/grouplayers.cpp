@@ -257,13 +257,15 @@ selectLayers4Stat::selectLayers4Stat(groupLayers * aGL):mGL(aGL),selectLayers(aG
     cont = new Wt::WContainerWidget();
     cont->setOverflow(Wt::Overflow::Auto);
     treeTable = cont->addWidget(cpp14::make_unique<WTreeTable>());
-    treeTable->resize(300, 250);
+    //treeTable->resize(300, 250);
+    treeTable->setHeight(241);
     treeTable->setStyleClass("tree");
+    treeTable->addStyleClass("tree_left");
     treeTable->tree()->setSelectionMode(SelectionMode::Extended);
     treeTable->addColumn("", 20); // colonne pour les checkbox
 
     auto root = cpp14::make_unique<WTreeTableNode>("Tous");
-    treeTable->setTreeRoot(std::move(root), "");
+    treeTable->setTreeRoot(std::move(root), "Couches");
 
     // création des groupes de couches avec checkbox qui permet de toutes les selectionner en un click
     // aptitude FEE
@@ -386,12 +388,15 @@ selectLayers4Download::selectLayers4Download(groupLayers * aGL):mGL(aGL),selectL
     cont = new Wt::WContainerWidget();
     cont->setOverflow(Wt::Overflow::Auto);
     treeTable = cont->addWidget(cpp14::make_unique<WTreeTable>());
-    treeTable->resize(300, 250);
+    //treeTable->resize(300, 250);
+    treeTable->setHeight(241);
     treeTable->setStyleClass("tree");
+    treeTable->addStyleClass("tree_left");
     treeTable->tree()->setSelectionMode(SelectionMode::Extended);
     treeTable->addColumn("", 20); // colonne pour les checkbox
     auto root = cpp14::make_unique<WTreeTableNode>("Tous");
     treeTable->setTreeRoot(std::move(root), "Raster");
+
 
     // création des groupes de couches avec checkbox qui permet de toutes les selectionner en un click
     // aptitude FEE

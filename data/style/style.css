@@ -17,6 +17,9 @@
 }
 .tree_left{
 	text-align:left;
+	border: solid;
+	border-width: thin;
+	border-color: #76cc76;
 }
 .tree_node{
 	font-weight: bold;
@@ -37,4 +40,30 @@
 }
 .div_4stat{
     margin-bottom: 5px;
+}
+
+.checkbox span{
+	vertical-align: -moz-middle-with-baseline;
+}
+
+
+
+/* Differents Div imbriqués */
+.layout_main{
+
+}
+
+.cWebAptitude{
+
+}
+
+.content_info{
+	padding: 6px 0px 6px 0px;
+	margin: 0px;
+}
+.content_info_stack{
+
+}
+.content_analyse{
+
 }

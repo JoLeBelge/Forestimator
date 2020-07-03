@@ -40,6 +40,7 @@
  * ./WebAptitude --http-address=0.0.0.0 --http-port=8085 --deploy-path=/WebAptitude --docroot="./" --config="/home/lisein/Documents/carteApt/Forestimator/build-WebAptitude/wt_config.xml"
  * Current arg :
  * ./WebAptitude --deploy-path=/ --docroot "/data1/Forestimator/build-WebAptitude;favicon.ico,/resources,/style,/tmp,/data,/Tuiles" --http-port 80 --http-addr 0.0.0.0
+ * sudo ./WebAptitude --deploy-path=/ --docroot "/home/sam/master_chatmetaleux/Forestimator/data;favicon.ico,/resources,/style,/tmp,/data,/Tuiles" --http-port 80 --http-addr 0.0.0.0
  * ./WebAptitude --deploy-path=/ --docroot "/home/lisein/Documents/carteApt/Forestimator/build-WebAptitude;favicon.ico,/resources,/style,/tmp,/data,/Tuiles" --http-port 80 --http-addr 0.0.0.0
 */
 
@@ -116,6 +117,9 @@ std::unique_ptr<WApplication> createApplication(const WEnvironment& env)
     auto layout = app->root()->setLayout(Wt::cpp14::make_unique<Wt::WVBoxLayout>());
     std::unique_ptr<cWebAptitude> WebApt = Wt::cpp14::make_unique<cWebAptitude>(app.get());
     layout->addWidget(std::move(WebApt), 0);
+    //layout->setContentsMargins(0,0,0,0);
+    //app->root()->setPadding(0);
+    app->root()->addStyleClass("layout_main");
 
     return app;
 }

@@ -1,4 +1,0 @@
-
-[submodule "cWebAptitude/libzippp"]
-	path = cWebAptitude/libzippp
-	url = https://github.com/ctabin/libzippp
