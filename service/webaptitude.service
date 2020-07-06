@@ -1,0 +1,11 @@
+[Unit]
+Description=Server WEB Forestimator de Jo Lisein.
+
+[Service]
+Type=simple
+#ExecStart=/data1/Forestimator/build-WebAptitude/WebAptitude --docroot /data1/Forestimator/build-WebAptitude --http-port 82 --http-addr 0.0.0.0
+ExecStart=/bin/bash /data1/Forestimator/service/webaptitude.sh
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
