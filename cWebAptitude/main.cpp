@@ -41,7 +41,7 @@
  * Current arg :
  * ./WebAptitude --deploy-path=/ --docroot "/data1/Forestimator/build-WebAptitude;favicon.ico,/resources,/style,/tmp,/data,/Tuiles" --http-port 80 --http-addr 0.0.0.0
  * sudo ./WebAptitude --deploy-path=/ --docroot "/home/sam/master_chatmetaleux/Forestimator/data;favicon.ico,/resources,/style,/tmp,/data,/Tuiles" --http-port 80 --http-addr 0.0.0.0
- * ./WebAptitude --deploy-path=/ --docroot "/home/lisein/Documents/carteApt/Forestimator/build-WebAptitude;favicon.ico,/resources,/style,/tmp,/data,/Tuiles" --http-port 80 --http-addr 0.0.0.0
+ * ./WebAptitude --deploy-path=/ --docroot "/home/lisein/Documents/carteApt/Forestimator/data/;/favicon.ico,/js,/jslib,/resources,/style,/tmp,/data,/Tuiles" --http-port 8085 --http-addr 0.0.0.0
 */
 
 
@@ -55,7 +55,7 @@ std::unique_ptr<WApplication> createApplication(const WEnvironment& env)
     std::unique_ptr<WApplication> app = cpp14::make_unique<WApplication>(env);
     // charge le xml avec tout le texte qui sera chargé via la fonction tr()
     //app->appRoot()std::cout << "app->docRoot() " << app->docRoot() << std::endl;
-    app->messageResourceBundle().use(app->docRoot() + "/data/forestimator");
+    app->messageResourceBundle().use(app->docRoot() + "/forestimator");
     app->setTitle("Forestimator");
     // thème bootstrap 3
     auto theme = std::make_shared<Wt::WBootstrapTheme>();
@@ -103,12 +103,12 @@ std::unique_ptr<WApplication> createApplication(const WEnvironment& env)
     // init the OpenLayers javascript api
     // avec ol 6, la carte met du temps à s'afficher. je reste à ol 4 pour le moment.
     //std::string ol("https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v6.2.1/build/ol.js");
-    //std::string ol("data/js/v6.3.1-dist/ol.js");
-    std::string ol("data/js/ol4.6.4-debug.js");
+    //std::string ol("jslib/v6.3.1-dist/ol.js");
+    std::string ol("jslib/ol4.6.4-debug.js");
     app->require(ol);
-    app->useStyleSheet("data/js/v6.3.1-dist/ol.css");
-    app->require("data/js/proj4js-2.6.1/dist/proj4.js");
-    app->require("data/js/proj4js-2.6.1/dist/proj4-src.js");
+    app->useStyleSheet("jslib/v6.3.1-dist/ol.css");
+    app->require("jslib/proj4js-2.6.1/dist/proj4.js");
+    app->require("jslib/proj4js-2.6.1/dist/proj4-src.js");
 	// CSS custom pour faire beau
 	app->useStyleSheet("style/style.css");
 
