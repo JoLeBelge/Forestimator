@@ -264,12 +264,12 @@ selectLayers4Stat::selectLayers4Stat(groupLayers * aGL):mGL(aGL),selectLayers(aG
     treeTable->tree()->setSelectionMode(SelectionMode::Extended);
     treeTable->addColumn("", 20); // colonne pour les checkbox
 
-    auto root = cpp14::make_unique<WTreeTableNode>("Tous");
+    auto root = cpp14::make_unique<WTreeTableNode>(tr("groupeCoucheAll"));
     treeTable->setTreeRoot(std::move(root), "Couches");
 
     // création des groupes de couches avec checkbox qui permet de toutes les selectionner en un click
     // aptitude FEE
-    auto grAptFEE = cpp14::make_unique<WTreeTableNode>("Aptitudes FEE");
+    auto grAptFEE = cpp14::make_unique<WTreeTableNode>(tr("groupeCoucheAptFEE"));
     WTreeTableNode *grAptFEE_ = grAptFEE.get();
     std::unique_ptr<WCheckBox> checkAptFEE = cpp14::make_unique<WCheckBox>();
     WCheckBox * checkAptFEE_ = checkAptFEE.get();
@@ -287,7 +287,7 @@ selectLayers4Stat::selectLayers4Stat(groupLayers * aGL):mGL(aGL),selectLayers(aG
     */
 
     // description du peuplement
-    auto grPeup = cpp14::make_unique<WTreeTableNode>("Description du peuplement");
+    auto grPeup = cpp14::make_unique<WTreeTableNode>(tr("groupeCouchePeup"));
     WTreeTableNode *grPeup_ = grPeup.get();
     std::unique_ptr<WCheckBox> checkPeup = cpp14::make_unique<WCheckBox>();
     WCheckBox * checkPeup_ = checkPeup.get();
@@ -394,13 +394,13 @@ selectLayers4Download::selectLayers4Download(groupLayers * aGL):mGL(aGL),selectL
     treeTable->addStyleClass("tree_left");
     treeTable->tree()->setSelectionMode(SelectionMode::Extended);
     treeTable->addColumn("", 20); // colonne pour les checkbox
-    auto root = cpp14::make_unique<WTreeTableNode>("Tous");
+    auto root = cpp14::make_unique<WTreeTableNode>(tr("groupeCoucheAll"));
     treeTable->setTreeRoot(std::move(root), "Raster");
 
 
     // création des groupes de couches avec checkbox qui permet de toutes les selectionner en un click
     // aptitude FEE
-    auto grAptFEE = cpp14::make_unique<WTreeTableNode>("Aptitudes FEE");
+    auto grAptFEE = cpp14::make_unique<WTreeTableNode>(tr("groupeCoucheAptFEE"));
     WTreeTableNode *grAptFEE_ = grAptFEE.get();
     std::unique_ptr<WCheckBox> checkAptFEE = cpp14::make_unique<WCheckBox>();
     WCheckBox * checkAptFEE_ = checkAptFEE.get();
@@ -409,7 +409,7 @@ selectLayers4Download::selectLayers4Download(groupLayers * aGL):mGL(aGL),selectL
 
     // aptitude CS
 
-    auto grAptCS = cpp14::make_unique<WTreeTableNode>("Aptitudes CS");
+    auto grAptCS = cpp14::make_unique<WTreeTableNode>(tr("groupeCoucheAptCS"));
     WTreeTableNode *grAptCS_ = grAptCS.get();
     std::unique_ptr<WCheckBox> checkAptCS = cpp14::make_unique<WCheckBox>();
     WCheckBox * checkAptCS_ = checkAptCS.get();
@@ -417,25 +417,23 @@ selectLayers4Download::selectLayers4Download(groupLayers * aGL):mGL(aGL),selectL
     grAptCS->setColumnWidget(1, std::move(checkAptCS));
 
     // habitats, potentiel sylvicole
-    auto grKK = cpp14::make_unique<WTreeTableNode>("Habitats et potentiel sylvicole");
+    auto grKK = cpp14::make_unique<WTreeTableNode>(tr("groupeCoucheKKCS"));
     WTreeTableNode *grKK_ = grKK.get();
     std::unique_ptr<WCheckBox> checkKK = cpp14::make_unique<WCheckBox>();
     WCheckBox * checkKK_ = checkKK.get();
     checkKK_->changed().connect([=]{SelectLayerGroup(checkKK_->isChecked(),TypeLayer::KK,"");});
     grKK->setColumnWidget(1, std::move(checkKK));
 
-
     // diagnostic Stationnel
-    auto grSt = cpp14::make_unique<WTreeTableNode>("Cartes diagnostic stationnel");
+    auto grSt = cpp14::make_unique<WTreeTableNode>(tr("groupeCoucheThem"));
     WTreeTableNode *grSt_ = grSt.get();
     std::unique_ptr<WCheckBox> checkSt = cpp14::make_unique<WCheckBox>();
     WCheckBox * checkSt_ = checkSt.get();
     checkSt_->changed().connect([=]{SelectLayerGroup(checkSt_->isChecked(),TypeLayer::Thematique,"");});
     grSt->setColumnWidget(1, std::move(checkSt));
 
-
     // description du peuplement
-    auto grPeup = cpp14::make_unique<WTreeTableNode>("Description du peuplement");
+    auto grPeup = cpp14::make_unique<WTreeTableNode>(tr("groupeCouchePeup"));
     WTreeTableNode *grPeup_ = grPeup.get();
     std::unique_ptr<WCheckBox> checkPeup = cpp14::make_unique<WCheckBox>();
     WCheckBox * checkPeup_ = checkPeup.get();
@@ -607,15 +605,18 @@ void groupLayers::updateGL(){
     tree->addStyleClass("tree_left");
     //auto folderIcon = Wt::cpp14::make_unique<Wt::WIconPair>("icons/yellow-folder-closed.png", "icons/yellow-folder-open.png", false);
     //std::cout << "g1" << std::endl;
-    auto main_node = Wt::cpp14::make_unique<Wt::WTreeNode>("Couches"); // std::move(folderIcon) // pour mettre des icones ouvert/fermé !
+    auto main_node = Wt::cpp14::make_unique<Wt::WTreeNode>(tr("groupeCoucheAll")); // std::move(folderIcon) // pour mettre des icones ouvert/fermé !
     tree->setTreeRoot(std::move(main_node));
     tree->treeRoot()->label()->setTextFormat(Wt::TextFormat::Plain);
     tree->treeRoot()->setLoadPolicy(Wt::ContentLoading::NextLevel);
-    auto node1 = Wt::cpp14::make_unique<Wt::WTreeNode>("Couches thématiques");
+    auto node1 = Wt::cpp14::make_unique<Wt::WTreeNode>(tr("groupeCoucheThem"));
     auto node1_ = tree->treeRoot()->addChildNode(std::move(node1));
     node1_->addStyleClass("tree_node");
     tree->treeRoot()->expand();
-    //std::cout << "g2" << std::endl;
+
+    auto node0 = Wt::cpp14::make_unique<Wt::WTreeNode>(tr("groupeCouchePeup"));
+    auto node0_ = tree->treeRoot()->addChildNode(std::move(node0));
+    node0_->addStyleClass("tree_node");
 
     // carte IGN
     WText *label = node1_->addChildNode(Wt::cpp14::make_unique<Wt::WTreeNode>(""))->label();
@@ -633,12 +634,12 @@ void groupLayers::updateGL(){
             label->clicked().connect([this,aCode]{clickOnName(aCode,TypeLayer::KK);});
         }
     }
-    //std::cout << "d0" << std::endl;
+
     // ajout des cartes "FEE" ; NT NH Topo AE SS
 
     for (auto & pair : *mDico->RasterType()){
         // si pas mode expert, on n'utilise pas les couches du catalogue de station
-        if (ModeExpert || pair.first.substr(0,2)!="CS"){
+        if ((ModeExpert || pair.first.substr(0,2)!="CS") && mDico->rasterCat(pair.first)!="Peuplement"){
             WText *label;
             label = node1_->addChildNode(Wt::cpp14::make_unique<Wt::WTreeNode>(""))->label();
             Layer  * aL= new Layer(this,pair.first,label,TypeLayer::Thematique);
@@ -649,14 +650,33 @@ void groupLayers::updateGL(){
             mVLs.push_back(aL);
         }
     }
-    //std::cout << "d1" << std::endl;
+
     node1_->expand();
 
-    auto node2 = Wt::cpp14::make_unique<Wt::WTreeNode>("Fichier Ecologique des Essences");
+    for (auto & pair : *mDico->RasterType()){
+        // couche catégorie peuplements
+        if (mDico->rasterCat(pair.first)=="Peuplement"){
+            WText *label;
+            label = node0_->addChildNode(Wt::cpp14::make_unique<Wt::WTreeNode>(""))->label();
+            Layer  * aL= new Layer(this,pair.first,label,TypeLayer::Thematique);
+            std::string aCode=pair.first;
+            // un peu bidouille mais le typelayer de MNH est peuplement et il est redéfini dans le constructeur de layer
+            TypeLayer type= aL->Type();
+            label->clicked().connect([this,aCode,type]{clickOnName(aCode,type);});
+            mVLs.push_back(aL);
+        }
+    }
+
+    node0_->expand();
+
+
+
+
+    auto node2 = Wt::cpp14::make_unique<Wt::WTreeNode>(tr("groupeCoucheAptFEE"));
     auto node2_ = tree->treeRoot()->addChildNode(std::move(node2));
     node2_->addStyleClass("tree_node");
 
-    auto node3 = Wt::cpp14::make_unique<Wt::WTreeNode>("Catalogue des Stations");
+    auto node3 = Wt::cpp14::make_unique<Wt::WTreeNode>(tr("groupeCoucheAptCS"));
     auto node3_ = node3.get();
     node3_->addStyleClass("tree_node");
     if (ModeExpert){

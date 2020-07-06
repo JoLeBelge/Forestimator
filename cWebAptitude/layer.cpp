@@ -95,7 +95,7 @@ void Layer::setActive(bool b){
 void Layer::displayLayer() const{ 
     std::string JScommand;
     //std::cout << "display layer " << std::endl;
-    if (this->Type()==TypeLayer::Externe) {
+    if (this->Type()==TypeLayer::Externe && !mDico->hasWMSinfo(this->getCode())) {
         std::string aFileIn(mDico->File("displayExternLayer"));
         std::ifstream in(aFileIn);
         std::stringstream ss;

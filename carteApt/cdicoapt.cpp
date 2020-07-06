@@ -850,9 +850,9 @@ TypeLayer str2TypeLayer(const std::string& str)
     TypeLayer aRes=TypeLayer::Thematique;
     //else if(str == "Station") aRes=TypeLayer::Thematique;
     if(str == "Peuplement") aRes=TypeLayer::Peuplement;
+    if(str == "Externe") aRes=TypeLayer::Externe;
     return aRes;
 }
-
 
 std::string loadBDpath()
 {

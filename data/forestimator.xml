@@ -48,6 +48,17 @@ Vous pouvez télécharger les cartes listées ci-dessous qui seront découpées 
 <message id="anaStep3"><h3>3 : Excécuter l'analyse</h3></message>
 <message id="anaStep4"><h3>4 : Exporter le résultat</h3></message>
 
+<!-label dans le treelist de couches ->
+<message id="groupeCoucheAll">Couches</message>
+<message id="groupeCoucheThem">Conditions stationnelles</message>
+<message id="groupeCouchePeup">Cartographie des peuplements</message>
+<message id="groupeCoucheAptFEE">Aptitude des essences</message>
+<message id="groupeCoucheAptCS">Aptitude des essences (Catalogue de stations)</message>
+<message id="groupeCoucheKKCS">Habitats et potentiel sylvicole</message>
+
+
+
+
 
 
 

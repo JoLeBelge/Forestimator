@@ -349,6 +349,12 @@ public:
         return aRes;
     }
 
+    std::string rasterCat(std::string aCode){
+        std::string aRes("");
+        if (Dico_RasterLayer.find(aCode)!=Dico_RasterLayer.end()){aRes=Dico_RasterLayer.at(aCode);}
+        return aRes;
+    }
+
     std::string accroEss2prefix(std::string aCode){
         std::string aRes("");
         if (Dico_code2prefix.find(aCode)!=Dico_code2prefix.end()){aRes=Dico_code2prefix.at(aCode);}
