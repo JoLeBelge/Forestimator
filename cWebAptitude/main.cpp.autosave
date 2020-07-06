@@ -41,7 +41,7 @@
  * Current arg :
  * ./WebAptitude --deploy-path=/ --docroot "/data1/Forestimator/build-WebAptitude;favicon.ico,/resources,/style,/tmp,/data,/Tuiles" --http-port 80 --http-addr 0.0.0.0
  * sudo ./WebAptitude --deploy-path=/ --docroot "/home/sam/master_chatmetaleux/Forestimator/data;favicon.ico,/resources,/style,/tmp,/data,/Tuiles" --http-port 80 --http-addr 0.0.0.0
- * ./WebAptitude --deploy-path=/ --docroot "/home/lisein/Documents/carteApt/Forestimator/build-WebAptitude;favicon.ico,/resources,/style,/tmp,/data,/Tuiles" --http-port 80 --http-addr 0.0.0.0
+ * ./WebAptitude --deploy-path=/ --docroot "/home/lisein/Documents/carteApt/Forestimator/data/;/favicon.ico,/js,/jslib,/resources,/style,/tmp,/data,/Tuiles" --http-port 8085 --http-addr 0.0.0.0
 */
 
 
