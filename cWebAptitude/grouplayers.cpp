@@ -14,11 +14,24 @@ groupLayers::groupLayers(cDicoApt * aDico, WOpenLayers *aMap, WApplication *app,
   ,mSelect4Stat(NULL)
   ,mSelect4Download(NULL)
   ,mStackInfoPtr(aStackInfoPtr)
+  ,mapExtent_(this,"1.0")
 {
     //std::cout << "constructeur GL " << std::endl;
     mParent->setOverflow(Wt::Overflow::Visible);
     mParent->setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Middle);
     mParent->addWidget(cpp14::make_unique<WText>( tr("coucheStep1")));
+
+    slot.setJavaScript("function toto(e) {"
+                       "var extent = map.getView().calculateExtent(map.getSize());"
+                       "var bottomLeft = ol.extent.getBottomLeft(extent);"
+                       "var topRight =ol.extent.getTopRight(extent);"
+                       "if (bottomLeft != null) {"
+                       + mapExtent_.createCall({"topRight[0]","topRight[1]","bottomLeft[0]","bottomLeft[1]"})
+                       + "}}"
+                       );
+    // on exécute une première fois le script js pour initialiser l'enveloppe mapExtent
+    //slot.exec();plus nécessaire
+    this->getMapExtendSignal().connect(std::bind(&groupLayers::updateMapExtentAndCropIm,this, std::placeholders::_1,std::placeholders::_2,std::placeholders::_3,std::placeholders::_4));
 
     updateGL();
     // TODO on click event
@@ -109,8 +122,23 @@ void groupLayers::extractInfo(double x, double y){
 
     for (Layer * l : mVLs){
         if (((l->Type()==TypeLayer::KK )| (l->Type()==TypeLayer::Thematique )) | (( l->IsActive()) & (l->Type()!=TypeLayer::Externe))){
-            mLegend->add1InfoRaster(l->displayInfo(x,y));
+
+            std::vector<std::string> layerLabelAndValue=l->displayInfo(x,y);
+            mLegend->add1InfoRaster(layerLabelAndValue);
+
+            if (( l->IsActive())){
+                // affiche une popup pour indiquer la valeur pour cette couche
+
+                // attention, il faut escaper les caractères à problèmes du genre apostrophe
+                boost::replace_all(layerLabelAndValue.at(1),"'","\\'"); // javascript bug si jamais l'apostrophe n'est pas escapée
+                mParent->doJavaScript("content.innerHTML = '<p>"+layerLabelAndValue.at(0)+":</p><code>"+ layerLabelAndValue.at(1)+ "</code>';"
+                                      +"var coordinate = ["+std::to_string(x) + ","+ std::to_string(y) +"];"
+                                      +"overlay.setPosition(coordinate);"
+                                      );
+            }
+
         }
+
     }
 
     // tableau du détail du calcul de l'aptitude d'une essence pour FEE
@@ -174,10 +202,18 @@ void groupLayers::computeStatOnPolyg(OGRLayer * lay,bool mergeOT){
 
         // défini le nouveau champ à ajouter à la table d'attribut - vérifie qu'il n'existe pas préhalablement
         if (lay->FindFieldIndex(l->getFieldName().c_str(),0)==-1){
-            OGRFieldDefn oFLD(l->getFieldName().c_str(),  OFTInteger);
-            oFLD.SetJustify(OGRJustification::OJLeft);
-            //oFLD.SetDefault(0);
-            lay->CreateField(&oFLD);
+
+            OGRFieldDefn * oFLD(NULL);
+            if (l->getFieldType()=="int"){
+                oFLD= new OGRFieldDefn(l->getFieldName().c_str(),  OFTInteger);
+            }
+            if (l->getFieldType()=="str"){
+                oFLD= new OGRFieldDefn(l->getFieldName().c_str(),  OFTString);
+            }
+
+            oFLD->SetJustify(OGRJustification::OJLeft);
+
+            lay->CreateField(oFLD);
         }
 
         OGRFeature *poFeature;
@@ -191,7 +227,15 @@ void groupLayers::computeStatOnPolyg(OGRLayer * lay,bool mergeOT){
             //std::map<std::string,int> stat = l->computeStatOnPolyg(poGeom,aMode);
             layerStat ls(l,l->computeStatOnPolyg(poGeom,aMode),aMode);
             // on met un résumé des stat dans le champ nouvellement créé
-            poFeature->SetField(l->getFieldName().c_str(), ls.getFieldVal(mergeOT));
+            if (l->getFieldType()=="int"){
+                poFeature->SetField(l->getFieldName().c_str(), ls.getFieldVal(mergeOT));
+            }
+            if (l->getFieldType()=="str"){
+
+                std::cout << "set field "<< l->getFieldName() << " to " <<    ls.getFieldValStr() << std::endl;
+                poFeature->SetField(l->getFieldName().c_str(), ls.getFieldValStr().c_str());
+            }
+
             //poFeature->SetField(); This method has only an effect on the in-memory feature object. If this object comes from a layer and the modifications must be serialized back to the datasource, OGR_L_SetFeature()
             lay->SetFeature(poFeature);
         }
@@ -576,18 +620,7 @@ void selectLayers::SelectLayerGroup(bool select,TypeLayer aType,std::string aMod
 std::vector<rasterFiles> selectLayers::getSelectedRaster(){
     std::vector<rasterFiles> aRes;
     for (Layer * l : mVpLs){
-        switch (l->Type()){
-        case TypeLayer::FEE:
-            aRes.push_back(rasterFiles(l->getPathTif("FEE"),"Aptitude_"+l->getCode()+"_FEE"));
-            break;
-        case TypeLayer::CS:
-            aRes.push_back(rasterFiles(l->getPathTif("CS"),"Aptitude_"+l->getCode()+"_CS"));
-            break;
-        default:
-            if (isSelected(l->getCode())) aRes.push_back(rasterFiles(l->getPathTif(),l->getCode()));
-            break;
-
-        }
+        aRes.push_back(l->getRasterfile());
     }
     return aRes;
 }
@@ -660,7 +693,7 @@ void groupLayers::updateGL(){
             label = node0_->addChildNode(Wt::cpp14::make_unique<Wt::WTreeNode>(""))->label();
             Layer  * aL= new Layer(this,pair.first,label,TypeLayer::Thematique);
             std::string aCode=pair.first;
-            // un peu bidouille mais le typelayer de MNH est peuplement et il est redéfini dans le constructeur de layer
+            // un peu bidouille mais le typelayer de MNH et le masque forestier sont peuplement et il est redéfini dans le constructeur de layer
             TypeLayer type= aL->Type();
             label->clicked().connect([this,aCode,type]{clickOnName(aCode,type);});
             mVLs.push_back(aL);
@@ -668,9 +701,6 @@ void groupLayers::updateGL(){
     }
 
     node0_->expand();
-
-
-
 
     auto node2 = Wt::cpp14::make_unique<Wt::WTreeNode>(tr("groupeCoucheAptFEE"));
     auto node2_ = tree->treeRoot()->addChildNode(std::move(node2));
@@ -714,8 +744,12 @@ void groupLayers::updateGL(){
     mParent->addWidget(cpp14::make_unique<WText>(tr("coucheStep2")));
     mParent->addWidget(cpp14::make_unique<WText>(tr("coucheStep3")));
     WPushButton * bExportTiff = mParent->addWidget(cpp14::make_unique<WPushButton>("Télécharger"));
-    bExportTiff->disable();
+    //bExportTiff->disable();
 
+    // pour l'instant tout passe par le slot JS qui renvoi un extent valide avant d'effectuer le crop et l'envoi de la carte à l'utilisateur
+    // c'est pour éviter que l'extent ne soit pas "à jour" avant le crop
+    bExportTiff->clicked().connect(this->slot);
+    //bExportTiff->clicked().connect(this,&groupLayers::updateMapExtentAndCropIm);
 
     // création des arbres pour sélection des couches - ces objets sont affiché ailleur
     if (mSelect4Download) delete mSelect4Download;
@@ -724,6 +758,114 @@ void groupLayers::updateGL(){
     mSelect4Stat= new selectLayers4Stat(this);
     mSelect4Download= new selectLayers4Download(this);
 
+}
+
+Layer * groupLayers::getActiveLay(){
+    Layer * aRes=NULL;
+    for (Layer * l : mVLs){
+        if (( l->IsActive())){aRes=l;break;}
+    }
+    return aRes;
+}
+
+void groupLayers::exportLayMapView(){
+
+    std::cout << "exportLayMapView " << std::endl;
+
+    Layer * l=getActiveLay();// attention, si on vient d'ouvrir le soft, aucune layer n'est actives!! gerer les ptr null
+    if (l && l->Type()!=TypeLayer::Externe){
+        // crop layer and download
+
+        // crée l'archive
+        std::string archiveFileName = mDico->File("TMPDIR")+"/"+l->getCode()+".zip";
+        std::string aCroppedRFile = mDico->File("TMPDIR")+"/"+l->getCode()+"_crop.tif";
+        std::string mClientName=l->getCode()+"_crop";
+        rasterFiles r= l->getRasterfile();
+        if ( cropIm(l->getPathTif(), aCroppedRFile, mMapExtent)){
+            ZipArchive* zf = new ZipArchive(archiveFileName);
+            zf->open(ZipArchive::WRITE);
+            // pour bien faire; choisir un nom qui soit unique, pour éviter conflict si plusieurs utilisateurs croppent la mm carte en mm temps
+            zf->addFile(mClientName+".tif",aCroppedRFile);
+            if (r.hasSymbology()){zf->addFile(mClientName+".qml",r.symbology());}
+            m_app->processEvents();
+            zf->close();
+            delete zf;
+            WFileResource *fileResource = new Wt::WFileResource("plain/text",archiveFileName);
+            fileResource->suggestFileName(mClientName+".zip");
+            m_app->redirect(fileResource->url());
+        }
+
+    }else {
+        Wt::WMessageBox * messageBox = this->addChild(Wt::cpp14::make_unique<Wt::WMessageBox>(
+                                                          "Erreur",
+                                                          "<p> Cette couche ne peut être téléchargé, veillez essayer avec une autres couche.</p>",
+                                                          Wt::Icon::Critical,
+                                                          Wt::StandardButton::Ok));
+
+        messageBox->setModal(false);
+        messageBox->buttonClicked().connect([=] {
+            this->removeChild(messageBox);
+        });
+        messageBox->show();
+    }
+}
+
+
+bool cropIm(std::string inputRaster, std::string aOut, OGREnvelope ext){
+    bool aRes(0);
+    std::cout << " cropIm" << std::endl;
+    GDALAllRegister();
+    if (exists(inputRaster)){
+        double width((ext.MaxX-ext.MinX)), height((ext.MaxY-ext.MinY));
+        const char *inputPath=inputRaster.c_str();
+        const char *cropPath=aOut.c_str();
+        GDALDataset *pInputRaster, *pCroppedRaster;
+        GDALDriver *pDriver;
+        const char *pszFormat = "GTiff";
+        pDriver = GetGDALDriverManager()->GetDriverByName(pszFormat);
+        pInputRaster = (GDALDataset*) GDALOpen(inputPath, GA_ReadOnly);
+        double transform[6], tr1[6];
+        pInputRaster->GetGeoTransform(transform);
+        pInputRaster->GetGeoTransform(tr1);
+        //adjust top left coordinates
+        transform[0] = ext.MinX;
+        transform[3] = ext.MaxY;
+        //determine dimensions of the new (cropped) raster in cells
+        int xSize = round(width/transform[1]);
+        int ySize = round(height/transform[1]);
+        //std::cout << "xSize " << xSize << ", ySize " << ySize << std::endl;
+        //create the new (cropped) dataset
+        if (xSize>0 && ySize>0 && xSize <25000 && ySize<25000){
+            pCroppedRaster = pDriver->Create(cropPath, xSize, ySize, 1, GDT_Byte, NULL); //or something similar
+
+            pCroppedRaster->SetProjection( pInputRaster->GetProjectionRef() );
+            pCroppedRaster->SetGeoTransform( transform );
+
+            int xOffset=round((transform[0]-tr1[0])/tr1[1]);
+            int yOffset=round((transform[3]-tr1[3])/tr1[5]);
+            float *scanline;
+            scanline = (float *) CPLMalloc( sizeof( float ) * xSize );
+            // boucle sur chaque ligne
+            for ( int row = 0; row < ySize; row++ )
+            {
+                // lecture
+                pInputRaster->GetRasterBand(1)->RasterIO( GF_Read, xOffset, row+yOffset, xSize, 1, scanline, xSize,1, GDT_Float32, 0, 0 );
+                // écriture
+                pCroppedRaster->GetRasterBand(1)->RasterIO( GF_Write, 0, row, xSize,1, scanline, xSize, 1,GDT_Float32, 0, 0 );
+            }
+            CPLFree(scanline);
+
+            aRes=1;
+        } else {
+            std::cout << " crop du raster a échoué: taille pas correcte " << std::endl;
+        }
+
+        if( pCroppedRaster != NULL ){GDALClose( (GDALDatasetH) pCroppedRaster );}
+        GDALClose(pInputRaster);
+    } else {
+        std::cout << " attention, un des fichiers input n'existe pas : " << inputRaster << std::endl;
+    }
+    return aRes;
 }
 
 

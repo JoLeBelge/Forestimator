@@ -944,12 +944,4 @@ std::string MSClass(std::string label, std::string expression, color col){
 }
 
 
-std::string removeAccents(std::string aStr){
-    boost::replace_all(aStr, "é", "e");
-    boost::replace_all(aStr, "è", "e");
-    boost::replace_all(aStr, "ê", "e");
-    boost::replace_all(aStr, "ï", "i");
-    boost::replace_all(aStr, "î", "i");
-    boost::replace_all(aStr, "â", "a");
-    return aStr;
-}
+

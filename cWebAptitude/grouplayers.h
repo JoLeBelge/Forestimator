@@ -22,6 +22,8 @@
 #include "gdal_utils.h"
 #include <Wt/WProgressBar.h>
 #include "layerstatchart.h"
+#include "Wt/WFileResource.h"
+#include "./libzippp/src/libzippp.h"
 
 class WOpenLayers;
 class Layer;
@@ -37,13 +39,17 @@ class stackInfoPtr;
 //class WCheckBox;
 //enum class TypeLayer;
 
+
 enum TypeClassifST {FEE
                     ,CS
                    };
 
 using namespace Wt;
+using namespace libzippp;
 
 extern bool ModeExpert;
+
+bool cropIm(std::string inputRaster, std::string aOut, OGREnvelope ext);
 
 class selectLayers : public WContainerWidget{
 public:
@@ -135,6 +141,8 @@ public:
         return aRes;
     }
 
+    void exportLayMapView();
+
     // clé 1 ; nom de la couche. clé2 : la valeur au format légende (ex ; Optimum). Valeur ; pourcentage pour ce polygone
     //std::map<std::string,std::map<std::string,int>>
     void computeStatGlob(OGRGeometry *poGeomGlobale);
@@ -146,6 +154,7 @@ public:
     std::vector<Layer *> Layers(){ return mVLs;}
     std::vector<Layer*> getVpLs(){ return mVLs;}
 
+    Layer * getActiveLay();
     // retourne les aptitudes des essences pour une position donnée (click sur la carte)
     //key ; code essence. Value ; code aptitude
     std::map<std::string,int> apts();
@@ -182,15 +191,30 @@ private:
     //Wt::WTable                 *mOtherTable;
     legend * mLegend;
 
-
     stackInfoPtr *  mStackInfoPtr;
     // bof finalement c'est mieux le conteneur parent
     Wt::WContainerWidget     * mParent;
 
-
     std::vector<layerStatChart*> mVLStat;
     selectLayers4Stat * mSelect4Stat;
     selectLayers4Download * mSelect4Download;
+
+    JSignal<double, double, double, double>& getMapExtendSignal(){return mapExtent_; }
+    JSlot slot;
+    JSignal<double, double, double, double>  mapExtent_;
+    OGREnvelope mMapExtent;
+    void updateMapExtentAndCropIm(double topX, double topY, double bottomX, double bottomY){
+      updateMapExtent(topX, topY, bottomX, bottomY);
+      exportLayMapView();
+    }
+
+    void updateMapExtent(double topX, double topY, double bottomX, double bottomY){
+        mMapExtent.MaxX=topX;
+        mMapExtent.MaxY=topY;
+        mMapExtent.MinX=bottomX;
+        mMapExtent.MinY=bottomY;
+        std::cout << "updateMapExtent grouplayer" << std::endl;
+    }
 };
 
 #endif // GROUPLAYERS_H

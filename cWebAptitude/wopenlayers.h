@@ -26,6 +26,9 @@
 #include <boost/algorithm/string/replace.hpp>
 #include "cdicoapt.h"
 
+#include "ogrsf_frmts.h"
+#include "gdal_utils.h"
+
 using namespace Wt;
 
 class WOpenLayers: public WContainerWidget
@@ -48,6 +51,8 @@ public:
         }
     }
 
+
+
     virtual void layoutSizeChanged(int width, int height)
     {
         WContainerWidget::layoutSizeChanged(width, height);
@@ -57,14 +62,15 @@ public:
     cDicoApt * mDico;
     JSignal<double,double>& xy() { return xy_; }
     JSlot slot;
-    void setJS_click();
     JSignal<double, double>  xy_;
 
     JSignal<int>& polygId() { return polygId_; }
     JSlot slot2;
-    void setJS_selectPolygone();
+
     JSignal<int>  polygId_;
+
     static constexpr const char *clickWithShift_label = "toto";
+
 };
 
 #endif // WOPENLAYERS_H

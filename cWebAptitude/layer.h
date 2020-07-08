@@ -11,7 +11,6 @@
 #include "grouplayers.h"
 #include <boost/algorithm/string/replace.hpp>
 
-
 #include "cpl_conv.h" // for CPLMalloc()
 // pour les vecteurs
 #include "ogrsf_frmts.h"
@@ -41,6 +40,7 @@ inline bool exists (const std::string& name){
 class rasterFiles{
 
 public:
+    rasterFiles();
     rasterFiles(std::string aPathTif,std::string aCode);
     // constructeur par copie et par déplacement ; indispensable si j'utilise les objets dans un vecteur. http://www-h.eng.cam.ac.uk/help/tpl/languages/C++/morevectormemory.html
     rasterFiles(const rasterFiles &rf){
@@ -143,7 +143,7 @@ public:
     // signification pour ce raster value
     std::string getValueTxt(double x, double y);
     // crop du raster avec un shp parcellaire
-    bool cropIm(std::string aOut);
+    //bool cropIm(std::string aOut);
     void setActive(bool b=true);
     bool IsActive() const {return mActive;}
     std::string getCode() const{return mCode;}
@@ -151,14 +151,25 @@ public:
     std::string getFieldName() const{
         std::string aRes=mCode;
         if (aRes=="MNH2019"){aRes="TreeCover";}
+        if (aRes=="MF"){aRes="MasqForet";}
+        if (aRes=="COMPO"){aRes="Compo";}
         return aRes;
     }
+    std::string getFieldType() const{
+        std::string aRes("int");
+        if (mCode=="COMPO"){aRes="str";}
+        return aRes;
+    }
+
     std::string getPathTif();
     std::string getLegendLabel(bool escapeChar=true) const;
     std::string getShortLabel() const {return mLabel;}
 
     std::string NomMapServerLayer()const;
     std::string MapServerURL()const;
+
+    // les info utile pour manipuler les fichiers (avec une méthode pour sélectionner le fichier de symbologie Qgis)
+    rasterFiles getRasterfile();
 
 
     // à cause de ma superbe idée de merde de mettre deux couches raster par layer, je dois surcharger ces méthodes pour pouvoir spécifier le mode Fee vs Cs

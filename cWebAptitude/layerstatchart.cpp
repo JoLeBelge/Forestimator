@@ -108,17 +108,21 @@ Wt:WContainerWidget * aRes= new Wt::WContainerWidget();
         if (mTypeVar==TypeVar::Continu){
 
             // pour MNH seulement, pour l'instant  - recrée un vecteur stat, puis un model
-            int nbPix(0);
-            for (auto & kv : mStat){
-                nbPix+=kv.second;
-            }
+
             // je dois mettre et la hauteur en double, et le pct car sinon imprécision d'arrondi
             std::map<double, double> aStat;
             for (auto & kv : mStat){
-                double h(std::stod(kv.first));
-                if (h>3.0 && h<45){
-                    aStat.emplace(std::make_pair(std::stod(kv.first),(100.0*kv.second)/nbPix));
+                try {
+                    double h(std::stod(kv.first));
+                    if (h>3.0 && h<45){
+                        aStat.emplace(std::make_pair(std::stod(kv.first),(100.0*kv.second)/mNbPix));
+
+                    }
                 }
+                catch (const std::invalid_argument& ia) {
+                    std::cerr << "Invalid argument pour stod getChart: " << ia.what() << '\n';
+                }
+
             }
 
             std::shared_ptr<WStandardItemModel> model = std::make_shared<WStandardItemModel>();
@@ -161,18 +165,18 @@ Wt:WContainerWidget * aRes= new Wt::WContainerWidget();
 
 void layerStat::simplifieStat(){
 
-    int nbPix(0);
+    mNbPix=0;
     for (auto & kv : mStat){
-        nbPix+=kv.second;
+        mNbPix+=kv.second;
     }
 
     switch (mTypeVar){
     case TypeVar::Classe:{
 
         // calcul des pourcentages au lieu du nombre de pixel
-        if (nbPix>0){
+        if (mNbPix>0){
             for (auto & kv : mStat){
-                kv.second=(100*kv.second)/nbPix;
+                kv.second=(100*kv.second)/mNbPix;
             }
         }
 
@@ -192,10 +196,13 @@ void layerStat::simplifieStat(){
             if ((tot>97) & (tot <100)) { autres+= 100-tot; tot=100;}
             mStatSimple.emplace(std::make_pair("Autre",autres));
         }
+
+        /* redondant, j'ajoute déjà des no data lors du calcul
         // ajout pct pour no data - certaine couche l'on déjà, d'autre pas.
         if (tot<97 & tot>5){
             mStatSimple.emplace(std::make_pair("Sans données",100-tot));
         }
+        */
         break;}
 
     case TypeVar::Continu:{
@@ -266,17 +273,46 @@ int layerStat::getFieldVal(bool mergeOT){
         aRes=getO(mergeOT);
     } else if (mLay->getCode()=="MNH2019"){
         int nbPixTreeCover(0);
-        int nbPix(0);
         for (auto & kv : mStat){
+            try {
             if (std::stod(kv.first)>2.0){nbPixTreeCover+=kv.second;}
-            nbPix+=kv.second;
+            }
+            catch (const std::invalid_argument& ia) {
+                  std::cerr << "Invalid argument: " << ia.what() << '\n';
+             }
         }
-        aRes=(100*nbPixTreeCover)/nbPix;
+        aRes=(100*nbPixTreeCover)/mNbPix;
+    } else if (mLay->getCode()=="MF"){
+        int nbPixTreeCover(0);
+        // mStat ne contient pas la même chose si la couche est de type continu ou classe. pour Classe, c'est déjà des pcts
+        for (auto & kv : mStat){
+            //std::cout << kv.first << " nb pix " << kv.second << std::endl;
+            if (kv.first=="Foret"){;aRes=kv.second;}
+        }
+        //aRes=(100*nbPixTreeCover)/mNbPix;
     } else {
         std::cout << "  pas de méthode pour remplir le champ de la table d'attribut pour le layer " << mLay->getLegendLabel() << std::endl;
     }
     return aRes;
 }
+
+std::string layerStat::getFieldValStr(){
+
+   std::string aRes("");
+   if (mLay->getCode()=="COMPO"){
+       // on concatene toutes les essences
+       for (auto & kv : mStat){
+           std::cout << "getFieldValStr kv.first " << kv.first << " kv.second " << kv.second << std::endl;
+          // déjà sous forme de pct int pct=(100*kv.second)/mNbPix;
+          if (kv.second>1){aRes+=getAbbreviation(kv.first)+":"+std::to_string(kv.second)+"% ";}
+       }
+
+    } else {
+        std::cout << "  pas de méthode pour remplir le champ STRING de la table d'attribut pour le layer " << mLay->getLegendLabel() << std::endl;
+    }
+    return aRes;
+}
+
 
 int layerStat::getO(bool mergeOT){
     unsigned int aRes(0);
@@ -298,7 +334,6 @@ int layerStat::getO(bool mergeOT){
 }
 
 layerStat::layerStat(Layer * aLay, std::map<std::string,int> aStat, std::string aMode):mLay(aLay),mStat(aStat),mMode(aMode),mTypeVar(aLay->Var()){
-
     simplifieStat();
 }
 
@@ -320,4 +355,33 @@ std::string  nth_letter(int n)
     return aRes;
 }
 
+std::string getAbbreviation(std::string str)
+{
+   std::string aRes("");
+   std::vector<std::string> words;
+   std::string word("");
+   for (auto x : str)
+   {
+       if (x == ' ' | x=='/')
+       {
+           word=removeAccents(word);// si je n'enlève pas les accents maintenant, les accents sont codé sur deux charachtère et en gardant les 2 premiers du mot je tronque l'accent en deux ce qui donne ququch d'illisible type ?
+           if (word.size()>1){words.push_back(word);}
+           //std::cout << "word is " << word << std::endl;
+           word = "";
+       }
+       else
+       {
+           word = word + x;
+       }
+   }
+   // pour le dernier mot :
+    word=removeAccents(word);
+   if (word.size()>1){words.push_back(word);}
+   //std::cout << "word is " << word << std::endl;
 
+   for (auto w : words){
+      aRes+=w.substr(0,2);
+   }
+   //aRes=removeAccents(aRes);
+   return aRes;
+}

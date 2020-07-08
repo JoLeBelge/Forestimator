@@ -209,6 +209,8 @@ std::map<std::string,int> Layer::computeStatOnPolyg(OGRGeometry *poGeom, std::st
         for (auto &kv : *mDicoVal){
             aRes.emplace(std::make_pair(kv.second,0));
         }
+        // création d'une classe nd? quitte à la supprimer par après si pas d'occurence de nd
+        aRes.emplace(std::make_pair("ND",0));
         int nbPix(0);
 
         // c'est mon masque au format raster
@@ -263,7 +265,10 @@ std::map<std::string,int> Layer::computeStatOnPolyg(OGRGeometry *poGeom, std::st
                             aRes.at(mDicoVal->at(aVal))++;
                             nbPix++;
                             // et les no data dans tout ça??? il faut les prendre en compte également! les ajouter dans le dictionnaire? dangereux aussi
-                        } else if (aVal==0) {nbPix++;}
+                            //} else if (aVal==0) {nbPix++;}
+                        } else {
+                            aRes.at("ND")++;
+                            nbPix++;}// ben oui sinon si les nodata n'ont pas la valeur 0 ça ne va pas (cas du masque forestier)
                     }
                 }
             }
@@ -473,6 +478,26 @@ std::string Layer::MapServerURL()const{
         aRes=mCode;
     }
     return aRes;
+}
+
+rasterFiles Layer::getRasterfile(){
+
+    //rasterFiles aRes;
+    switch (this->Type()){
+    case TypeLayer::FEE:{
+        rasterFiles aRes(getPathTif("FEE"),"Aptitude_"+getCode()+"_FEE");
+        return aRes;
+    }
+    case TypeLayer::CS:{
+        rasterFiles aRes(rasterFiles(getPathTif("CS"),"Aptitude_"+getCode()+"_CS"));
+        return aRes;
+    }
+    default:{
+        rasterFiles aRes(getPathTif(),getCode());
+        return aRes;
+    }
+    }
+
 }
 
 

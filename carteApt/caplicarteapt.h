@@ -19,7 +19,7 @@ inline bool exists (const std::string& name){
     return (stat (name.c_str(), &buffer) == 0);
 };
 
-std::string removeAccents(std::string aStr);
+
 
 class color;
 

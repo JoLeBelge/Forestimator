@@ -200,7 +200,7 @@ cWebAptitude::cWebAptitude(WApplication* app)
     mDico->closeConnection();
 
     /*	ACTIONS		*/
-    mMap->doubleClicked().connect(mMap->slot);
+
     // reviens sur l'onglet légende si on est sur l'onglet parcellaire
    /* mMap->doubleClicked().connect([this]{mStackInfoPtr->menuitem2_legend->select();
          // select ; ne fait pas bien son job, bug car affiche à la fois le conteneur légende et en dessous le conteneur stack de group layer. Il faut donc en plus la ligne suivante
@@ -209,11 +209,15 @@ cWebAptitude::cWebAptitude(WApplication* app)
     // et dans wt_config, mettre à 500 milliseconde au lieu de 200 pour le double click
     mMap->xy().connect(std::bind(&groupLayers::extractInfo,mGroupL, std::placeholders::_1,std::placeholders::_2));
 
-    mMap->clicked().connect(std::bind(&WOpenLayers::filterMouseEvent,mMap,std::placeholders::_1));
     mMap->polygId().connect(std::bind(&parcellaire::computeStatAndVisuSelectedPol,mPA, std::placeholders::_1));
     
+
+
+    //mMap->getMapExtendSignal().connect(std::bind(&WOpenLayers::updateMapExtend,mMap,std::placeholders::_1,std::placeholders::_2,std::placeholders::_3,std::placeholders::_4));
+
     // je divise la fenetre en 2 dans la largeur pour mettre la carte à gauche et à droite une fenetre avec les infos des couches
     layout_carto->addWidget(std::move(map), 0);
+
     layout_carto->addWidget(std::move(content_info), 1);
 
     top_stack->addWidget(std::move(container_home));

@@ -26,7 +26,7 @@ parcellaire::parcellaire(WContainerWidget *parent, groupLayers *aGL, Wt::WApplic
     fu->setFilters(".shp, .shx, .dbf, .prj");
     fu->setMultiple(true);
     fu->setInline(0);
-	fu->addStyleClass("btn-file");
+    fu->addStyleClass("btn-file");
     //fu->setMargin(20,Wt::Side::Bottom | Wt::Side::Top); // si le parent a des marges et est inline(0) et que je met l'enfant à inline, l'enfant a des marges également
 
     msg = mParent->addWidget(cpp14::make_unique<Wt::WText>());
@@ -443,9 +443,9 @@ void parcellaire::visuStat(std::string aTitle){
     for (layerStatChart * chart : mGL->ptrVLStat()) {
         std::cout << " row " << row << " , col " << column << std::endl;
         if (chart->deserveChart()){
-        grid->addWidget(std::unique_ptr<Wt::WContainerWidget>(chart->getChart()), row, column);
-        column++;
-        if (column>nbColumn){row++;column=0;}
+            grid->addWidget(std::unique_ptr<Wt::WContainerWidget>(chart->getChart()), row, column);
+            column++;
+            if (column>nbColumn){row++;column=0;}
         }
         mGL->mPBar->setValue(mGL->mPBar->value()+1);
         mGL->m_app->processEvents();
@@ -509,6 +509,8 @@ void parcellaire::downloadShp(){
     zf->addFile(mClientName+"_statForestimator.shp",mFullPath+".shp");
     zf->addFile(mClientName+"_statForestimator.dbf",mFullPath+".dbf");
     zf->addFile(mClientName+"_statForestimator.shx",mFullPath+".shx");
+    if (exists(mFullPath+".prj"))  zf->addFile(mClientName+"_statForestimator.prj",mFullPath+".prj");
+
     zf->close();
     delete zf;
 
@@ -552,54 +554,11 @@ void parcellaire::downloadRaster(){
 bool parcellaire::cropImWithShp(std::string inputRaster, std::string aOut){
     bool aRes(0);
     std::cout << " cropImWithShp" << std::endl;
-    if (exists(inputRaster)){
 
-        // enveloppe de la géométrie globale
-        OGREnvelope ext;
-        poGeomGlobale->getEnvelope(&ext);
-        double width((ext.MaxX-ext.MinX)), height((ext.MaxY-ext.MinY));
-
-        const char *inputPath=inputRaster.c_str();
-        const char *cropPath=aOut.c_str();
-        GDALDataset *pInputRaster, *pCroppedRaster;
-        GDALDriver *pDriver;
-        const char *pszFormat = "GTiff";
-        pDriver = GetGDALDriverManager()->GetDriverByName(pszFormat);
-        pInputRaster = (GDALDataset*) GDALOpen(inputPath, GA_ReadOnly);
-        double transform[6], tr1[6];
-        pInputRaster->GetGeoTransform(transform);
-        pInputRaster->GetGeoTransform(tr1);
-        //adjust top left coordinates
-        transform[0] = ext.MinX;
-        transform[3] = ext.MaxY;
-        //determine dimensions of the new (cropped) raster in cells
-        int xSize = round(width/transform[1]);
-        int ySize = round(height/transform[1]);
-        //std::cout << "xSize " << xSize << ", ySize " << ySize << std::endl;
-        //create the new (cropped) dataset
-        pCroppedRaster = pDriver->Create(cropPath, xSize, ySize, 1, GDT_Byte, NULL); //or something similar
-        pCroppedRaster->SetProjection( pInputRaster->GetProjectionRef() );
-        pCroppedRaster->SetGeoTransform( transform );
-
-        int xOffset=round((transform[0]-tr1[0])/tr1[1]);
-        int yOffset=round((transform[3]-tr1[3])/tr1[5]);
-        float *scanline;
-        scanline = (float *) CPLMalloc( sizeof( float ) * xSize );
-        // boucle sur chaque ligne
-        for ( int row = 0; row < ySize; row++ )
-        {
-            // lecture
-            pInputRaster->GetRasterBand(1)->RasterIO( GF_Read, xOffset, row+yOffset, xSize, 1, scanline, xSize,1, GDT_Float32, 0, 0 );
-            // écriture
-            pCroppedRaster->GetRasterBand(1)->RasterIO( GF_Write, 0, row, xSize,1, scanline, xSize, 1,GDT_Float32, 0, 0 );
-        }
-        CPLFree(scanline);
-        if( pCroppedRaster != NULL ){GDALClose( (GDALDatasetH) pCroppedRaster );}
-        GDALClose(pInputRaster);
-        aRes=1;
-    } else {
-        std::cout << " attention, un des fichiers input n'existe pas : " << inputRaster << std::endl;
-    }
+    // enveloppe de la géométrie globale
+    OGREnvelope ext;
+    poGeomGlobale->getEnvelope(&ext);
+    aRes=cropIm(inputRaster, aOut, ext);
     return aRes;
 }
 

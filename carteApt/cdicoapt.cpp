@@ -393,7 +393,7 @@ std::map<int,color> cDicoApt::getDicoRasterCol(std::string aCode){
     }
     SQLstring="SELECT "+field_raster+", col FROM "+ nom_dico ;
     if (cond!=""){ SQLstring=SQLstring+" WHERE "+cond+";";} else {SQLstring=SQLstring+";";}
-    //std::cout << SQLstring << std::endl;
+     //if (aCode=="MF"){std::cout << SQLstring << "\n\n" << std::endl;}
     sqlite3_reset(stmt);
     sqlite3_prepare_v2( db_, SQLstring.c_str(), -1, &stmt, NULL );//preparing the statement
     while(sqlite3_step(stmt) == SQLITE_ROW)
@@ -403,7 +403,7 @@ std::map<int,color> cDicoApt::getDicoRasterCol(std::string aCode){
             std::string aB("");
             if (sqlite3_column_type(stmt, 1)!=SQLITE_NULL ) {aB=std::string( (char *)sqlite3_column_text( stmt, 1 ) );}
 
-            //if (aCode=="MNH2019"){ std::cout << " ajout dans dicoCol " << aA << " , col " << aB << std::endl;}
+           // if (aCode=="MF"){ std::cout << " ajout dans dicoCol " << aA << " , col " << aB << std::endl;}
             aRes.emplace(std::make_pair(aA,getColor(aB)));
         }
     }
@@ -888,4 +888,12 @@ void ST::vider()
     mSt=666;
 }
 
-
+std::string removeAccents(std::string aStr){
+    boost::replace_all(aStr, "é", "e");
+    boost::replace_all(aStr, "è", "e");
+    boost::replace_all(aStr, "ê", "e");
+    boost::replace_all(aStr, "ï", "i");
+    boost::replace_all(aStr, "î", "i");
+    boost::replace_all(aStr, "â", "a");
+    return aStr;
+}

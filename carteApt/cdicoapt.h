@@ -36,6 +36,8 @@ enum class TypeLayer { //Apti // Apti enlevé ! -> FEE et CS
 
 std::string loadBDpath();
 
+std::string removeAccents(std::string aStr);
+
 TypeCarte str2TypeCarte(const std::string& str);
 TypeVar str2TypeVar(const std::string& str);
 TypeLayer str2TypeLayer(const std::string& str);
