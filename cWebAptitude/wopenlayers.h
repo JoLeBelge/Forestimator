@@ -54,11 +54,12 @@ public:
     }
 
     void TouchStart(){
+        //std::cout << " touch start " << touchLength <<  std::endl;
         timer = clock();
     }
 
     void TouchEnd(){
-        clock_t touchLength = clock(); - timer;
+        clock_t touchLength = clock() - timer;
         std::cout << " la durée du touch est de " << touchLength <<  std::endl;
 
         if (touchLength>1){
