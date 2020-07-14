@@ -54,7 +54,6 @@ public:
     }
 
     void TouchStart(){
-        //std::cout << " touch start " << touchLength <<  std::endl;
         timer = clock();
     }
 
@@ -62,7 +61,7 @@ public:
         clock_t touchLength = clock() - timer;
         std::cout << " la durée du touch est de " << touchLength <<  std::endl;
 
-        if (touchLength>1){
+        if ((float)touchLength/CLOCKS_PER_SEC>1.0){
             slot.exec();
         }
     }

@@ -323,7 +323,7 @@ void cWebAptitude::login(){
        */
     ok->clicked().connect([=] {
         // controle du contenu username et password
-        if (password->text()=="gefgef" & username->text() =="gef"){
+        if (password->text()=="gef" & username->text() =="gef"){
         ModeExpert=1;
         // je recrée les essences donc j'ai besoin d'une connection à la BD
         mDico->openConnection();
