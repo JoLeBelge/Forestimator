@@ -113,7 +113,10 @@ void legend::detailCalculAptFEE(ST * aST){
         mDetAptFEE->elementAt(row, 0)->addWidget(cpp14::make_unique<WText>("Aptitude Finale :"));
         mDetAptFEE->elementAt(row, 1)->addWidget(cpp14::make_unique<WText>(aST->mDico->code2AptFull(Ess->corrigAptRisqueTopo(apt,aST->mTOPO,aST->mZBIO))));
     }
+    // un titre pour l'écogramme
+    mContEco->addWidget(cpp14::make_unique<WText>(tr("titreEcogramme")));
     mEcoEss = mContEco->addWidget(Wt::cpp14::make_unique<EcogrammeEss>(Ess,aST));
+    mContEco->addWidget(cpp14::make_unique<WText>(tr("legendEcogramme")));
 }
 
 void legend::afficheLegendeIndiv(const Layer * l){

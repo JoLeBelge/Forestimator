@@ -95,15 +95,15 @@ void Layer::setActive(bool b){
 void Layer::displayLayer() const{ 
     std::string JScommand;
     //std::cout << "display layer " << std::endl;
-    if (this->Type()==TypeLayer::Externe && !mDico->hasWMSinfo(this->getCode())) {
+    /*if (this->Type()==TypeLayer::Externe && !mDico->hasWMSinfo(this->getCode())) {
         std::string aFileIn(mDico->File("displayExternLayer"));
         std::ifstream in(aFileIn);
         std::stringstream ss;
         ss << in.rdbuf();
         in.close();
         JScommand=ss.str();
-        boost::replace_all(JScommand,"TOREPLACE",mCode);
-    } else {
+        boost::replace_all(JScommand,"TOREPLACE",mCode); */
+    //if (this->Type()==TypeLayer::Externe && !mDico->hasWMSinfo(this->getCode())) {
         std::string aFileIn(mDico->File("displayWMS"));
         std::ifstream in(aFileIn);
         std::stringstream ss;
@@ -121,14 +121,14 @@ void Layer::displayLayer() const{
             boost::replace_all(JScommand,"MYLAYER",this->NomMapServerLayer());
             boost::replace_all(JScommand,"MYURL",this->MapServerURL());
         }
-    }
+   // }
     mText->doJavaScript(JScommand);
     //std::cout << JScommand << std::endl;
 }
 
 std::vector<std::string> Layer::displayInfo(double x, double y){
     std::vector<std::string> aRes;
-    aRes.push_back(getLegendLabel());
+    aRes.push_back(getLegendLabel(false));
     std::string val("");
     // on va affichier uniquement les informations de la couches d'apt qui est sélectionnée, et de toutes les couches thématiques (FEE et CS)
     if ((mType==TypeLayer::KK )| (mType==TypeLayer::Thematique) |( this->IsActive())){

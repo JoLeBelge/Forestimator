@@ -56,6 +56,10 @@ Vous pouvez télécharger les cartes listées ci-dessous qui seront découpées 
 <message id="groupeCoucheAptCS">Aptitude des essences (Catalogue de stations)</message>
 <message id="groupeCoucheKKCS">Habitats et potentiel sylvicole</message>
 
+<message id="titreEcogramme"><h4>Ecogramme : aptitude hydrotrophique pour cette zone bioclimatique</h4></message>
+<message id="legendEcogramme">L'abscisse représente les niveaux trophiques, allant du plus acide à gauche vers les sols carbonatés à droite. L'ordonnée représente le gradient hydrique, avec les stations sèches en haut, humide en bas, et à régime hydrique alternatif sur l'encart à part en bas.</message>
+
+
 
 
 

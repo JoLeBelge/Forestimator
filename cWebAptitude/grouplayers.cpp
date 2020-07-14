@@ -114,8 +114,9 @@ void groupLayers::extractInfo(double x, double y){
     mStation->vider();
     mLegend->vider();
 
-    mStackInfoPtr->menuitem2_legend->select();
-    mStackInfoPtr->stack_info->setCurrentIndex(0);
+    // maintenant on n'affiche plus la légende automatiquement, , pL n'aime pas
+    //mStackInfoPtr->menuitem2_legend->select();
+    //mStackInfoPtr->stack_info->setCurrentIndex(0);
 
     // tableau des informations globales - durant ce round, l'objet ST est modifié
     mLegend->titreInfoRaster();
@@ -128,9 +129,9 @@ void groupLayers::extractInfo(double x, double y){
 
             if (( l->IsActive())){
                 // affiche une popup pour indiquer la valeur pour cette couche
-
                 // attention, il faut escaper les caractères à problèmes du genre apostrophe
                 boost::replace_all(layerLabelAndValue.at(1),"'","\\'"); // javascript bug si jamais l'apostrophe n'est pas escapée
+                boost::replace_all(layerLabelAndValue.at(0),"'","\\'");
                 mParent->doJavaScript("content.innerHTML = '<p>"+layerLabelAndValue.at(0)+":</p><code>"+ layerLabelAndValue.at(1)+ "</code>';"
                                       +"var coordinate = ["+std::to_string(x) + ","+ std::to_string(y) +"];"
                                       +"overlay.setPosition(coordinate);"
@@ -151,7 +152,7 @@ void groupLayers::extractInfo(double x, double y){
     // tableau des aptitudes pour toutes les essences
     mLegend->afficheAptAllEss();
 
-    Wt::WAnimation animation(Wt::AnimationEffect::Fade,
+   /* Wt::WAnimation animation(Wt::AnimationEffect::Fade,
                              Wt::TimingFunction::Linear,
                              1000);
 
@@ -159,6 +160,7 @@ void groupLayers::extractInfo(double x, double y){
     //mLegend->animateShow(animation); // marche pas... car mLegend est une classe qui hérite d'un conteneur mais ce conteneur n'est pas affiché, tout les objets sont dans le conteneur appelé à tord "Parent"
     //mLegend->mParent->resize("100%","100%");// j'ai changé le contenu du parent
     mLegend->mParent->animateShow(animation);
+    */
 
 }
 
@@ -652,10 +654,12 @@ void groupLayers::updateGL(){
     node0_->addStyleClass("tree_node");
 
     // carte IGN
+    /* maintenant elle est dans la liste des cartes via la BD
     WText *label = node1_->addChildNode(Wt::cpp14::make_unique<Wt::WTreeNode>(""))->label();
     label->clicked().connect([this]{clickOnName("IGN",TypeLayer::Externe);});
     label->setTextAlignment(Wt::AlignmentFlag::Left);
     mVLs.push_back(new Layer(this,"IGN",label,TypeLayer::Externe));
+    */
 
     // creation des layers pour les KK du CS
     if (ModeExpert){

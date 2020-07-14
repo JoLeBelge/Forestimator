@@ -29,6 +29,8 @@
 #include "ogrsf_frmts.h"
 #include "gdal_utils.h"
 
+#include <ctime>
+
 using namespace Wt;
 
 class WOpenLayers: public WContainerWidget
@@ -51,7 +53,18 @@ public:
         }
     }
 
+    void TouchStart(){
+        timer = clock();
+    }
 
+    void TouchEnd(){
+        clock_t touchLength = clock(); - timer;
+        std::cout << " la durée du touch est de " << touchLength <<  std::endl;
+
+        if (touchLength>1){
+            slot.exec();
+        }
+    }
 
     virtual void layoutSizeChanged(int width, int height)
     {
@@ -70,6 +83,8 @@ public:
     JSignal<int>  polygId_;
 
     static constexpr const char *clickWithShift_label = "toto";
+
+    clock_t timer;
 
 };
 

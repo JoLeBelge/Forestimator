@@ -29,7 +29,8 @@ void EcogrammeEss::paintEvent(Wt::WPaintDevice *paintDevice){
         if (codeNH!=0){
         for (auto kvNT : *mDico->NT()){
             int codeNT=kvNT.first;
-            int apt=mEss->getApt(codeNT,codeNH,mST->mZBIO);
+            // on veut l'aptitude hydro-trophique, pas celle hierarchique Bioclim/HydroTroph.
+            int apt=mEss->getApt(codeNT,codeNH,mST->mZBIO,false);
             color colApt=mDico->Apt2col(apt);
             int R,G,B;
             colApt.set(R,G,B);

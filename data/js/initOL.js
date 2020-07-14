@@ -143,8 +143,7 @@ var o2018 = new ol.layer.Tile({
 	})
 });
 
-
-IGN = new ol.layer.Tile({
+activeLayer = new ol.layer.Tile({
 	extent: extent,
 	title: 'Fond topographique IGN',
 	source: new ol.source.TileWMS({
@@ -161,6 +160,7 @@ IGN = new ol.layer.Tile({
 		serverType: 'mapserver',
 	})
 });
+
 
 // pour la couche vectorielle de point qui permet d'afficher un point ou l'utilisateur double click pour avoir le descriptif
 source = new ol.source.Vector({
@@ -231,7 +231,7 @@ var commune_src = new ol.source.Vector({
 	format: new ol.format.GeoJSON(),
 	url: function(extent) {
 	  return 'https://gxgfservcarto.gxabt.ulg.ac.be/cgi-bin/scolyte_shp?' +
-		  'SERVICE=WFS&version=2.0.0&request=GetFeature&typename=communes&' +
+		  'SERVICE=WFS&version=2.0.0&request=GetFeature&typename=communes_rw&' +
 		  'outputFormat=geojson&srsname=EPSG:31370&' +
 		  'bbox=' + extent.join(',') + ',EPSG:31370';
 	},
@@ -286,11 +286,11 @@ communes = new ol.layer.Vector({
 layers = [
 	new ol.layer.Group({
 		'title': 'Fonds de carte',
-		layers:[ IGN ] //
+		layers:[ activeLayer ] //
 	}),
 	new ol.layer.Group({
 		'title': 'Limites administratives',
-		layers:[ station, parcelles,	communes ]
+		layers:[ station, parcelles, communes ]
 	})
 ];
 
@@ -335,7 +335,7 @@ map = new ol.Map({
 });
 
 
-IGN.setVisible(true);
+activeLayer.setVisible(true);
 parcelles.setVisible(false);
 
 // pas implémenté dans ol3! bien ben c'est ce que je dois implémenter moi-meme dans wt? oui, avec les checksbox, une pour chaque essences forestières

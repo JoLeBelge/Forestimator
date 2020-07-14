@@ -1,4 +1,4 @@
-apt2  = new ol.layer.Tile({
+activeLayer  = new ol.layer.Tile({
 	extent: extent,
 	title: 'MYTITLE',
 	source: new ol.source.TileWMS({
@@ -23,12 +23,12 @@ if (typeof parcellaire !== 'undefined') {
     groupe = new ol.layer.Group({
 		'title': 'parcellaire',
 		attributions: 'Gembloux Agro-Bio Tech',
-		 layers:[apt2, parcellaire, station]});
+		 layers:[activeLayer, parcellaire, station]});
 } else {
 groupe = new ol.layer.Group({
 		'title': 'aptitude',
 		attributions: 'Gembloux Agro-Bio Tech',
-		layers:[IGN, apt2, communes, station]});
-IGN.setVisible(false);
+		layers:[activeLayer, communes, station]});
+
 }
 map.setLayerGroup(groupe);
