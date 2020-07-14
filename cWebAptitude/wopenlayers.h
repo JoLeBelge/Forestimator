@@ -59,10 +59,10 @@ public:
 
     void TouchEnd(){
         clock_t touchLength = clock() - timer;
-        double touchL = (float)touchLength/CLOCKS_PER_SEC>1.0;
+        float touchL = (float)touchLength/CLOCKS_PER_SEC;
         std::cout << " la durée du touch est de " << touchLength << " soit " << touchL << " seconde " << std::endl;
 
-        if (touchL>1.0){
+        if (touchL>0.1){
              std::cout << " execute slot  " << std::endl;
             slot.exec();
         }
