@@ -367,16 +367,6 @@ var selectAltClick = new ol.interaction.Select({
 map.addInteraction(selectAltClick);
 //selectAltClick.on('select', function (e) {console.log(featuresSelect.item(0).getId());});
 
-/* ce code est dans wt c++ maintenant
-map.on('singleclick', function(evt) {
-  var coordinate = evt.coordinate;
-  var lonlat = ol.proj.transform(coordinate,'EPSG:31370','EPSG:4326');
-  var hdms = ol.coordinate.toStringHDMS(lonlat);
-  console.log(hdms);
-  //content.innerHTML = '<p>You clicked here:</p><code>' + hdms + '</code>';
-  overlay.setPosition(coordinate);
-});
-*/
 
 /**
  * Add a click handler to hide the popup.

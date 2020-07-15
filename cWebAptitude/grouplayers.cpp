@@ -110,6 +110,7 @@ void groupLayers::changeClassClick(WText *t)
 
 void groupLayers::extractInfo(double x, double y){
 
+    if(!isnan(x) && !isnan(y)){
     std::cout << "groupLayers ; extractInfo " << std::endl;
     mStation->vider();
     mLegend->vider();
@@ -162,6 +163,11 @@ void groupLayers::extractInfo(double x, double y){
     mLegend->mParent->animateShow(animation);
     */
 
+
+    mMap->updateView();
+    }else {
+        std::cout << "x et y ne sont pas des nombres , pas bien " << std::endl;
+    }
 }
 
 // clé 1 ; nom de la couche. clé2 : la valeur au format légende (ex ; Optimum). Valeur ; pourcentage pour ce polygone

@@ -33,7 +33,7 @@ WOpenLayers::WOpenLayers(cDicoApt *aDico):xy_(this,"1.0"),mDico(aDico),polygId_(
      slot.setJavaScript
                 ("function getXY(owt,evt){"
                  "var e =  evt || window.event;"
-                 //"console.log(evt);"
+                 "console.log(evt);"
                  //"var f = map.getCoordinateFromPixel(map.getEventPixel(evt));"
 
                  "var f = map.getEventCoordinate(e);"
@@ -56,6 +56,22 @@ WOpenLayers::WOpenLayers(cDicoApt *aDico):xy_(this,"1.0"),mDico(aDico),polygId_(
              "if (featuresSelect.item(0).getId() !== null) {"+ polygId_.createCall({"featuresSelect.item(0).getId()"}) + "}"
                                                                                                                          "}}};"
              );
+
+   /* slot3.setJavaScript
+               ("function getXY(owt,evt){"
+                "var e =  evt || window.event;"
+                //"console.log(evt);"
+                //"var f = map.getCoordinateFromPixel(map.getEventPixel(evt));"
+
+                "var f = map.getEventCoordinate(e);"
+                // source ; c'est la source pour la couche de point "station", càd celle qui affiche là ou l'utilisateur à double-cliqué
+                "source.clear();"
+                "source.addFeature(new ol.Feature({geometry: new ol.geom.Point([f[0], f[1]])}));"
+                "if (f != null) {"
+                + xy_.createCall({"f[0]","f[1]"}) +
+               "}}"
+                );
+                */
 
 
     // actions
