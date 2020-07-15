@@ -57,21 +57,17 @@ WOpenLayers::WOpenLayers(cDicoApt *aDico):xy_(this,"1.0"),mDico(aDico),polygId_(
                                                                                                                          "}}};"
              );
 
-   /* slot3.setJavaScript
-               ("function getXY(owt,evt){"
-                "var e =  evt || window.event;"
-                //"console.log(evt);"
-                //"var f = map.getCoordinateFromPixel(map.getEventPixel(evt));"
-
-                "var f = map.getEventCoordinate(e);"
-                // source ; c'est la source pour la couche de point "station", càd celle qui affiche là ou l'utilisateur à double-cliqué
-                "source.clear();"
-                "source.addFeature(new ol.Feature({geometry: new ol.geom.Point([f[0], f[1]])}));"
-                "if (f != null) {"
-                + xy_.createCall({"f[0]","f[1]"}) +
-               "}}"
+    slot3.setJavaScript
+               ("function toto(event){"
+                "var touch = event.changedTouches[0];"
+                 "startX = touch.clientX;"
+                " startY = touch.clientY;"
+                "console.log(startX);"
+                "console.log(startY);"
+                + xy_.createCall({"startX","startY"}) +
+               "}"
                 );
-                */
+
 
 
     // actions

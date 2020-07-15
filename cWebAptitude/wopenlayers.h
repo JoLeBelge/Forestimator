@@ -74,7 +74,7 @@ public:
 
         if (touchLength.count()>400){
             std::cout << " execute slot  " << std::endl;
-            slot.exec();
+            slot3.exec();
         }
     }
 
@@ -98,6 +98,8 @@ public:
 
     //clock_t timer;
     milliseconds timer;
+
+     JSlot slot3;
 
 };
 
