@@ -110,7 +110,7 @@ void groupLayers::changeClassClick(WText *t)
 
 void groupLayers::extractInfo(double x, double y){
 
-    if(!isnan(x) && !isnan(y)){
+    if(!isnan(x) && !isnan(y) && !(x==0 && y==0)){
     std::cout << "groupLayers ; extractInfo " << x << " , " << y << std::endl;
     mStation->vider();
     mLegend->vider();
