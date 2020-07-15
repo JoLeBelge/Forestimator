@@ -29,7 +29,10 @@
 #include "ogrsf_frmts.h"
 #include "gdal_utils.h"
 
-#include <ctime>
+//#include <ctime>
+#include <chrono>
+
+using namespace std::chrono;
 
 using namespace Wt;
 
@@ -54,16 +57,19 @@ public:
     }
 
     void TouchStart(){
-        timer = clock();
+        timer = duration_cast< milliseconds >(system_clock::now().time_since_epoch());
+    }
+    void TouchMoved(){
+        timer = duration_cast< milliseconds >(system_clock::now().time_since_epoch());
     }
 
     void TouchEnd(){
-        clock_t touchLength = clock() - timer;
-        float touchL = (float)touchLength/CLOCKS_PER_SEC;
-        std::cout << " la durée du touch est de " << touchLength << " soit " << touchL << " seconde " << std::endl;
+        milliseconds touchLength = duration_cast< milliseconds >(system_clock::now().time_since_epoch()) - timer;
+        //float touchL = (float)touchLength/CLOCKS_PER_SEC;
+        std::cout << " la durée du touch est de " << touchLength.count() << std::endl;//<< " soit " << touchL << " seconde " << std::endl;
 
-        if (touchL>0.1){
-             std::cout << " execute slot  " << std::endl;
+        if (touchLength.count()>500){
+            std::cout << " execute slot  " << std::endl;
             slot.exec();
         }
     }
@@ -86,7 +92,8 @@ public:
 
     static constexpr const char *clickWithShift_label = "toto";
 
-    clock_t timer;
+    //clock_t timer;
+    milliseconds timer;
 
 };
 
