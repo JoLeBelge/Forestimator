@@ -110,7 +110,7 @@ void groupLayers::changeClassClick(WText *t)
 
 void groupLayers::extractInfo(double x, double y){
 
-    //std::cout << "groupLayers ; extractInfo " << std::endl;
+    std::cout << "groupLayers ; extractInfo " << std::endl;
     mStation->vider();
     mLegend->vider();
 
@@ -135,11 +135,11 @@ void groupLayers::extractInfo(double x, double y){
                 mParent->doJavaScript("content.innerHTML = '<p>"+layerLabelAndValue.at(0)+":</p><code>"+ layerLabelAndValue.at(1)+ "</code>';"
                                       +"var coordinate = ["+std::to_string(x) + ","+ std::to_string(y) +"];"
                                       +"overlay.setPosition(coordinate);"
+                                      +"overlay.setPosition(coordinate);"
                                       );
             }
 
         }
-
     }
 
     // tableau du détail du calcul de l'aptitude d'une essence pour FEE

@@ -68,7 +68,7 @@ public:
         //float touchL = (float)touchLength/CLOCKS_PER_SEC;
         std::cout << " la durée du touch est de " << touchLength.count() << std::endl;//<< " soit " << touchL << " seconde " << std::endl;
 
-        if (touchLength.count()>500){
+        if (touchLength.count()>400){
             std::cout << " execute slot  " << std::endl;
             slot.exec();
         }
