@@ -61,12 +61,17 @@ WOpenLayers::WOpenLayers(cDicoApt *aDico):xy_(this,"1.0"),mDico(aDico),polygId_(
                ("function toto(event){"
                 "if (event != null) {"
                 "var touch = event.originalEvent.changedTouches[0];"
-                 "startX = touch.clientX;"
-                " startY = touch.clientY;"
+                "startX = touch.clientX;"
+                "startY = touch.clientY;"
                 "console.log(startX);"
                 "console.log(startY);"
                 + xy_.createCall({"startX","startY"}) +
-               "}}"
+               "} else {"
+               "startX =5000;"
+               "startY =5000;"
+                + xy_.createCall({"startX","startY"}) +
+               "}"
+                "}"
                 );
        //    "} else { console.log('no event');"
 
