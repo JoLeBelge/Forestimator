@@ -60,15 +60,15 @@ WOpenLayers::WOpenLayers(cDicoApt *aDico):xy_(this,"1.0"),mDico(aDico),polygId_(
     slot3.setJavaScript
                ("function toto(event){"
                 "if (event != null) {"
-                "var touch = event.changedTouches[0];"
+                "var touch = event.originalEvent.changedTouches[0];"
                  "startX = touch.clientX;"
                 " startY = touch.clientY;"
                 "console.log(startX);"
                 "console.log(startY);"
                 + xy_.createCall({"startX","startY"}) +
-                "} else { console.log('no event')"
                "}"
                 );
+       //    "} else { console.log('no event');"
 
 
 

@@ -464,6 +464,9 @@ void parcellaire::visuStat(std::string aTitle){
 // si je click sur un polygone dans ol, calcule les stat et affiche dans une nouvelle page
 void parcellaire::computeStatAndVisuSelectedPol(int aId){
     std::cout << " computeStatAndVisuSelectedPol  , id " << aId << std::endl;
+    m_app->loadingIndicator()->setMessage("calcul des statistiques pour ce polygone");
+    m_app->loadingIndicator()->show();
+
     std::string input(mFullPath+ ".shp");
     const char *inputPath=input.c_str();
     GDALAllRegister();
@@ -496,6 +499,7 @@ void parcellaire::computeStatAndVisuSelectedPol(int aId){
         if (find) {visuStat("<h4>Statistique pour polygone FID " + std::to_string(aId) + " de " + mClientName+ "</h4>");}
         mGL->mMap->decorationStyle().setCursor(Cursor::Auto);
     }
+    m_app->loadingIndicator()->hide();
 
 }
 
