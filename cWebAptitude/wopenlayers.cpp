@@ -68,11 +68,11 @@ WOpenLayers::WOpenLayers(cDicoApt *aDico):xy_(this,"1.0"),mDico(aDico),polygId_(
                 "console.log(startY);"
                 + xy_.createCall({"startX","startY"}) +
                "} else {"
-               "var touch = window.event.originalEvent.changedTouches[0];"
-               "startX = touch.clientX;"
-               "startY = touch.clientY;"
-              // "startX =5000;"
-              // "startY =5000;"
+               //"var touch = window.event.originalEvent.changedTouches[0];"
+               //"startX = touch.clientX;"
+               //"startY = touch.clientY;"
+               "startX =5000;"
+               "startY =5000;"
                 + xy_.createCall({"startX","startY"}) +
                "}"
                 "}"
