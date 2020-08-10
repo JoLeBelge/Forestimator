@@ -78,7 +78,7 @@ WOpenLayers::WOpenLayers(cDicoApt *aDico):xy_(this,"1.0"),mDico(aDico),polygId_(
 
 
     // actions
-    //this->doubleClicked().connect(this->slot);
+    this->doubleClicked().connect(this->slot);
     // pour une portabilité sur tablette et smartphone ; si long click (long press - tap event), même effet que double click
     //https://www.cssscript.com/handle-long-press-tap-event-in-javascript-long-press-js/
 
@@ -87,6 +87,11 @@ WOpenLayers::WOpenLayers(cDicoApt *aDico):xy_(this,"1.0"),mDico(aDico),polygId_(
     touchMoved().connect(this, &WOpenLayers::TouchMoved);
     touchEnded().connect(this, &WOpenLayers::TouchEnd);
     //mMap->mouseDragged().connect(mMap->slot3);//plusieur slot sur le meme objet wt ça fou la mrd , une sorte de concurence car seulement un fonctionne au final
+
+    // prevent default actions
+    touchStarted().preventDefaultAction(true);
+    touchMoved().preventDefaultAction(true);
+    touchEnded().preventDefaultAction(true);
 
     this->clicked().connect(std::bind(&WOpenLayers::filterMouseEvent,this,std::placeholders::_1));
 }
