@@ -64,7 +64,8 @@ WOpenLayers::WOpenLayers(cDicoApt *aDico):xy_(this,"1.0"),mDico(aDico),polygId_(
                 // fonctionne mais une fois sur 20, la plupart du temps la fonction a un event qui est null donc rien ne se passe
                 //"var touch = evt.originalEvent.changedTouches[0];"
 
-                "if (touch != null) {"
+                //"if (touch != null) {"
+                "if (evt.button === 0 || window.TouchEvent && evt instanceof TouchEvent) {"
                 "startX = touch.clientX;"
                 "startY = touch.clientY;"
                 "console.log(startX);"
