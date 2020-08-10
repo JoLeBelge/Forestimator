@@ -58,8 +58,9 @@ WOpenLayers::WOpenLayers(cDicoApt *aDico):xy_(this,"1.0"),mDico(aDico),polygId_(
              );
 
     slot3.setJavaScript
-               ("function toto(event){"
+               ("function toto(evt){"
                 "if (event != null) {"
+                // fonctionne mais une fois sur 20, la plupart du temps la fonction a un event qui est null donc rien ne se passe
                 "var touch = event.originalEvent.changedTouches[0];"
                 "startX = touch.clientX;"
                 "startY = touch.clientY;"
