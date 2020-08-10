@@ -379,11 +379,32 @@ closer.onclick = function() {
 };
 
 
-touch = Touch();
+
+if (typeof Touch !== 'undefined' &&
+    typeof TouchEvent !== 'undefined' &&
+    Touch.length === 1 &&
+    TouchEvent.length === 1) {
+      
+touch = new Touch({
+      identifier: 42,
+      target: document.body,
+      clientX: 200,
+      clientY: 200,
+      screenX: 300,
+      screenY: 300,
+      pageX: 250,
+      pageY: 250,
+      radiusX: 2.5,
+      radiusY: 2.5,
+      rotationAngle: 10,
+      force: 0.5,
+    });
+
 map.addEventListener("touchstart",  handleStart);
 function handleStart(evt) {
  // evt.preventDefault();
   touch = evt.originalEvent.changedTouches[0];	   
+}
 }
 
 
