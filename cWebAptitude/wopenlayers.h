@@ -69,14 +69,16 @@ public:
         timer = duration_cast< milliseconds >(system_clock::now().time_since_epoch());
     }
 
-    void TouchEnd(){
+    void TouchEnd(WTouchEvent t){
         milliseconds touchLength = duration_cast< milliseconds >(system_clock::now().time_since_epoch()) - timer;
         //float touchL = (float)touchLength/CLOCKS_PER_SEC;
         std::cout << " la durée du touch est de " << touchLength.count() << std::endl;//<< " soit " << touchL << " seconde " << std::endl;
 
         if (touchLength.count()>200){
-            std::cout << " execute slot  " << std::endl;
-            slot3.exec();
+            //std::cout << " execute slot  " << std::endl;
+            //slot3.exec();
+            Wt::Touch touch = t.touches()[0];
+            std::cout << " touch est de " << touch.screen().x << std::endl;
         }
     }
 
