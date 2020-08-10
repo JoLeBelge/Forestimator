@@ -399,12 +399,12 @@ touch = new Touch({
       rotationAngle: 10,
       force: 0.5,
     });
+}
 
 map.addEventListener("touchstart",  handleStart);
 function handleStart(evt) {
  // evt.preventDefault();
   touch = evt.originalEvent.changedTouches[0];	   
-}
 }
 
 
