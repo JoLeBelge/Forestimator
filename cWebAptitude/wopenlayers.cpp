@@ -66,7 +66,7 @@ WOpenLayers::WOpenLayers(cDicoApt *aDico):xy_(this,"1.0"),mDico(aDico),polygId_(
                 "console.log(startX);"
                 "console.log(startY);"
                 + xy_.createCall({"startX","startY"}) +
-               "}"
+               "}}"
                 );
        //    "} else { console.log('no event');"
 
