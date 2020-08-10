@@ -93,7 +93,8 @@ WOpenLayers::WOpenLayers(cDicoApt *aDico):xy_(this,"1.0"),mDico(aDico),polygId_(
     // il faudrait que je mesure le temps entre touchstart et touchend pour décider s'il s'agit d'un long touch ou pas
     touchStarted().connect(this, &WOpenLayers::TouchStart);
     touchMoved().connect(this, &WOpenLayers::TouchMoved);
-    touchEnded().connect(this, &WOpenLayers::TouchEnd);
+    //touchEnded().connect(this, &WOpenLayers::TouchEnd);
+    touchEnded().connect(std::bind(&WOpenLayers::TouchEnd,this, std::placeholders::_1));
     //mMap->mouseDragged().connect(mMap->slot3);//plusieur slot sur le meme objet wt ça fou la mrd , une sorte de concurence car seulement un fonctionne au final
 
     // prevent default actions
