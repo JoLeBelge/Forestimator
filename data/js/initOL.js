@@ -379,6 +379,7 @@ closer.onclick = function() {
 };
 
 
+touch = Touch();
 map.addEventListener("touchstart",  handleStart);
 function handleStart(evt) {
   evt.preventDefault();
