@@ -382,8 +382,8 @@ closer.onclick = function() {
 touch = Touch();
 map.addEventListener("touchstart",  handleStart);
 function handleStart(evt) {
-  evt.preventDefault();
-  window.touch = evt.originalEvent.changedTouches[0];	   
+ // evt.preventDefault();
+  touch = evt.originalEvent.changedTouches[0];	   
 }
 
 
