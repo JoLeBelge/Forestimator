@@ -45,7 +45,6 @@ WOpenLayers::WOpenLayers(cDicoApt *aDico):xy_(this,"1.0"),mDico(aDico),polygId_(
                 "}}"
                  );
 
-
     slot2.setJavaScript
             /*("selectAltClick.on('select', function (e) {console.log(featuresSelect.item(0).getId());"
                             "if (featuresSelect.item(0).getId() != null) {"+ polygId_.createCall({"featuresSelect.item(0).getId()"}) + "}"
@@ -58,30 +57,32 @@ WOpenLayers::WOpenLayers(cDicoApt *aDico):xy_(this,"1.0"),mDico(aDico),polygId_(
              );
 
     slot3.setJavaScript
-               ("function toto(event){"
-                "if (event != null) {"
-                "var touch = event.changedTouches[0];"
-                 "startX = touch.clientX;"
-                " startY = touch.clientY;"
-                "console.log(startX);"
-                "console.log(startY);"
-                + xy_.createCall({"startX","startY"}) +
-                "} else { console.log('no event')"
-               "}"
+               ("function projection(x,y){"
+                "var f = map.getCoordinateFromPixel([x,y]);"
+                 "source.addFeature(new ol.Feature({geometry: new ol.geom.Point([f[0], f[1]])}));"
+                // source ; c'est la source pour la couche de point "station", càd celle qui affiche là ou l'utilisateur à double-cliqué
+                "source.clear();"
+                "source.addFeature(new ol.Feature({geometry: new ol.geom.Point([f[0], f[1]])}));"
+                "if (f != null) {"
+                + xy_.createCall({"f[0]","f[1]"}) +
+                "}"
                 );
-
-
 
     // actions
     this->doubleClicked().connect(this->slot);
+
     // pour une portabilité sur tablette et smartphone ; si long click (long press - tap event), même effet que double click
     //https://www.cssscript.com/handle-long-press-tap-event-in-javascript-long-press-js/
 
     // il faudrait que je mesure le temps entre touchstart et touchend pour décider s'il s'agit d'un long touch ou pas
     touchStarted().connect(this, &WOpenLayers::TouchStart);
     touchMoved().connect(this, &WOpenLayers::TouchMoved);
-    touchEnded().connect(this, &WOpenLayers::TouchEnd);
-    //mMap->mouseDragged().connect(mMap->slot3);//plusieur slot sur le meme objet wt ça fou la mrd , une sorte de concurence car seulement un fonctionne au final
+    touchEnded().connect(std::bind(&WOpenLayers::TouchEnd,this, std::placeholders::_1));
+
+    // prevent default actions
+    touchStarted().preventDefaultAction(true);
+    touchMoved().preventDefaultAction(true);
+    touchEnded().preventDefaultAction(true);
 
     this->clicked().connect(std::bind(&WOpenLayers::filterMouseEvent,this,std::placeholders::_1));
 }

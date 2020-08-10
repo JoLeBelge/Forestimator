@@ -50,7 +50,6 @@ public:
         doJavaScript("activeLayer.getSource().changed();");
     }
 
-
     // pas simple d'impletemter ses signaux, voir https://redmine.webtoolkit.eu/boards/2/topics/12782?r=12807#message-12807
 
     void filterMouseEvent(WMouseEvent event){
@@ -62,21 +61,21 @@ public:
 
     void TouchStart(){
         timer = duration_cast< milliseconds >(system_clock::now().time_since_epoch());
-       // std::cout << " execute slot dans touchStart  " << std::endl;
-         slot3.exec();
     }
     void TouchMoved(){
         timer = duration_cast< milliseconds >(system_clock::now().time_since_epoch());
     }
 
-    void TouchEnd(){
+    void TouchEnd(WTouchEvent t){
         milliseconds touchLength = duration_cast< milliseconds >(system_clock::now().time_since_epoch()) - timer;
-        //float touchL = (float)touchLength/CLOCKS_PER_SEC;
-        std::cout << " la durée du touch est de " << touchLength.count() << std::endl;//<< " soit " << touchL << " seconde " << std::endl;
-
-        if (touchLength.count()>400){
-            std::cout << " execute slot  " << std::endl;
-            slot3.exec();
+        //std::cout << " la durée du touch est de " << touchLength.count() << std::endl;//<< " soit " << touchL << " seconde " << std::endl;
+        if (touchLength.count()>100){
+            std::cout << "number of changedTouches " << t.changedTouches().size() << std::endl;
+            if (t.changedTouches().size()>0){
+            Wt::Touch touch = t.changedTouches()[0];
+            //std::cout << " touch est de " << touch.screen().x << std::endl;
+            slot3.exec(std::to_string(touch.window().x),std::to_string(touch.window().y));
+            }
         }
     }
 

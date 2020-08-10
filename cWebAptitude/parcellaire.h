@@ -13,6 +13,7 @@
 #include <Wt/WEnvironment.h>
 #include <Wt/WGridLayout.h>
 #include "Wt/WFileResource.h"
+#include "Wt/WLoadingIndicator.h"
 
 #include "boost/filesystem.hpp"
 #include <functional> //--> pour bind

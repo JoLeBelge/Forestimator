@@ -378,4 +378,3 @@ closer.onclick = function() {
   return false;
 };
 
-
