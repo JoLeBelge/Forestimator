@@ -62,7 +62,7 @@ public:
 
     void TouchStart(){
         timer = duration_cast< milliseconds >(system_clock::now().time_since_epoch());
-        std::cout << " execute slot dans touchStart  " << std::endl;
+       // std::cout << " execute slot dans touchStart  " << std::endl;
          slot3.exec();
     }
     void TouchMoved(){
