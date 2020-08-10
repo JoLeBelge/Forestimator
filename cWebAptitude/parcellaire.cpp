@@ -2,6 +2,7 @@
 
 
 int globSurfMax(2500);// en ha
+int globVolMaxShp(5000);// en ko
 //https://www.quora.com/What-are-the-risks-associated-with-the-use-of-lambda-functions-in-C-11
 
 parcellaire::parcellaire(WContainerWidget *parent, groupLayers *aGL, Wt::WApplication* app, WContainerWidget *statW):mParent(parent),mGL(aGL),centerX(0.0),centerY(0.0),mClientName(""),mJSfile(""),mName(""),mFullPath(""),m_app(app),fu(NULL),msg(NULL),uploadButton(NULL)
@@ -22,7 +23,8 @@ parcellaire::parcellaire(WContainerWidget *parent, groupLayers *aGL, Wt::WApplic
     //mParent->addWidget(cpp14::make_unique<Wt::WText>(tr("infoParcellaire")));
 
     fu =mParent->addNew<Wt::WFileUpload>();
-    fu->setFileTextSize(2000); // Set the maximum file size to 50 kB.
+    fu->setFileTextSize(2000); // Set the maximum file size to 2000 kB. il faut également changer param max-request-size dans wt_config
+
     fu->setFilters(".shp, .shx, .dbf, .prj");
     fu->setMultiple(true);
     fu->setInline(0);

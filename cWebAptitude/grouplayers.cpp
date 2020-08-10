@@ -240,7 +240,7 @@ void groupLayers::computeStatOnPolyg(OGRLayer * lay,bool mergeOT){
             }
             if (l->getFieldType()=="str"){
 
-                std::cout << "set field "<< l->getFieldName() << " to " <<    ls.getFieldValStr() << std::endl;
+                //std::cout << "set field "<< l->getFieldName() << " to " <<    ls.getFieldValStr() << std::endl;
                 poFeature->SetField(l->getFieldName().c_str(), ls.getFieldValStr().c_str());
             }
 

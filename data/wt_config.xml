@@ -23,6 +23,8 @@
 <head-matter>  
 	<meta name="viewport" content="width=device-width, initial-scale=1"/> 
 </head-matter> 
+<!-- cette valeur dois être augmentée si l'utilisateur peut uploader des fichiers, sinon peux pas charger des shp de 2 Go -->
+<max-request-size>2000</max-request-size>
 
  </server>
 

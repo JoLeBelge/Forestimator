@@ -278,12 +278,12 @@ int layerStat::getFieldVal(bool mergeOT){
             if (std::stod(kv.first)>2.0){nbPixTreeCover+=kv.second;}
             }
             catch (const std::invalid_argument& ia) {
-                  std::cerr << "Invalid argument: " << ia.what() << '\n';
-             }
+                // je retire le cout car sinon me pourris les logs
+                  //std::cerr << "layerStat::getFieldVal pour MNH 2019 - Invalid argument: " << ia.what() << '\n';
+            }
         }
         aRes=(100*nbPixTreeCover)/mNbPix;
     } else if (mLay->getCode()=="MF"){
-        int nbPixTreeCover(0);
         // mStat ne contient pas la même chose si la couche est de type continu ou classe. pour Classe, c'est déjà des pcts
         for (auto & kv : mStat){
             //std::cout << kv.first << " nb pix " << kv.second << std::endl;
@@ -302,7 +302,7 @@ std::string layerStat::getFieldValStr(){
    if (mLay->getCode()=="COMPO"){
        // on concatene toutes les essences
        for (auto & kv : mStat){
-           std::cout << "getFieldValStr kv.first " << kv.first << " kv.second " << kv.second << std::endl;
+           //std::cout << "getFieldValStr kv.first " << kv.first << " kv.second " << kv.second << std::endl;
           // déjà sous forme de pct int pct=(100*kv.second)/mNbPix;
           if (kv.second>1){aRes+=getAbbreviation(kv.first)+":"+std::to_string(kv.second)+"% ";}
        }
