@@ -63,7 +63,7 @@ public:
     void TouchStart(){
         timer = duration_cast< milliseconds >(system_clock::now().time_since_epoch());
        // std::cout << " execute slot dans touchStart  " << std::endl;
-         slot3.exec();
+       //  slot3.exec();
     }
     void TouchMoved(){
         timer = duration_cast< milliseconds >(system_clock::now().time_since_epoch());
@@ -74,7 +74,7 @@ public:
         //float touchL = (float)touchLength/CLOCKS_PER_SEC;
         std::cout << " la durée du touch est de " << touchLength.count() << std::endl;//<< " soit " << touchL << " seconde " << std::endl;
 
-        if (touchLength.count()>400){
+        if (touchLength.count()>200){
             std::cout << " execute slot  " << std::endl;
             slot3.exec();
         }
