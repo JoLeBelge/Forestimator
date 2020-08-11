@@ -86,7 +86,8 @@ WOpenLayers::WOpenLayers(cDicoApt *aDico):xy_(this,"1.0"),mDico(aDico),polygId_(
 
 
     // actions
-    this->doubleClicked().connect(this->slot);
+    //this->doubleClicked().connect(this->slot);
+    this->doubleClicked().connect(std::bind(&WOpenLayers::tmp,this, std::placeholders::_1));
     // pour une portabilité sur tablette et smartphone ; si long click (long press - tap event), même effet que double click
     //https://www.cssscript.com/handle-long-press-tap-event-in-javascript-long-press-js/
 

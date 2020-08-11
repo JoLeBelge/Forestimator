@@ -50,6 +50,10 @@ public:
         doJavaScript("activeLayer.getSource().changed();");
     }
 
+    void tmp(WMouseEvent evt){
+        std::cout << " essai de récupérer event double click dans c++ " << evt.window().x << std::endl;
+        slot.exec();
+    }
 
     // pas simple d'impletemter ses signaux, voir https://redmine.webtoolkit.eu/boards/2/topics/12782?r=12807#message-12807
 
@@ -77,8 +81,11 @@ public:
         if (touchLength.count()>200){
             //std::cout << " execute slot  " << std::endl;
             //slot3.exec();
-            Wt::Touch touch = t.touches()[0];
+            std::cout << "number of changedTouches " << t.changedTouches().size() << std::endl;
+            if (t.changedTouches().size()>0){
+            Wt::Touch touch = t.changedTouches()[0];
             std::cout << " touch est de " << touch.screen().x << std::endl;
+            }
         }
     }
 
