@@ -18,6 +18,7 @@
 #include <Wt/WMenu.h>
 #include <Wt/WTextArea.h>
 #include <Wt/WNavigationBar.h>
+#include <Wt/WOverlayLoadingIndicator.h>
 //#include <Wt/WLabel.h>
 #include "wopenlayers.h"
 #include "cdicoapt.h"

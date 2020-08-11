@@ -69,8 +69,8 @@ public:
     void TouchEnd(WTouchEvent t){
         milliseconds touchLength = duration_cast< milliseconds >(system_clock::now().time_since_epoch()) - timer;
         //std::cout << " la durée du touch est de " << touchLength.count() << std::endl;//<< " soit " << touchL << " seconde " << std::endl;
-        if (touchLength.count()>50){
-            std::cout << "number of changedTouches " << t.changedTouches().size() << std::endl;
+        if (touchLength.count()>100){
+            //std::cout << "number of changedTouches " << t.changedTouches().size() << std::endl;
             if (t.changedTouches().size()>0){
             Wt::Touch touch = t.changedTouches()[0];
             //std::cout << " touch est de " << touch.screen().x << std::endl;

@@ -378,3 +378,9 @@ closer.onclick = function() {
   return false;
 };
 
+closer.ontouch = function() {
+  overlay.setPosition(undefined);
+  closer.blur();
+  return false;
+};
+

@@ -109,3 +109,14 @@
       .ol-popup-closer:after {
         content: "✖";
       }
+
+.loading-indicator{
+background: white;
+border: 3px solid #333333;
+z-index: 10001; visibility: visible;
+position: absolute; left: 50%; top: 50%;
+margin-left: -50px; margin-top: -40px;
+width: 150px; height: 150px;
+font-family: arial,sans-serif;
+text-align: center
+}
