@@ -1,5 +1,6 @@
 #include "layerstatchart.h"
 
+int seuilClasseMinoritaire(2); // en dessous de ce seuil, les classes sont regroupées dans la catégorie "Autre"
 layerStatChart::layerStatChart(Layer *aLay, std::map<std::string, int> aStat, std::string aMode):layerStat(aLay,aStat,aMode),mTable(NULL),rowAtMax(0)
 {
 
@@ -183,7 +184,7 @@ void layerStat::simplifieStat(){
         int autres(0);
         int tot(0);
         for (auto & kv : mStat){
-            if (kv.second>5){
+            if (kv.second>seuilClasseMinoritaire){
                 mStatSimple.emplace(kv);
                 tot+=kv.second;
             } else {

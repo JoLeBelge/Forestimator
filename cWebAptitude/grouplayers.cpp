@@ -784,6 +784,8 @@ void groupLayers::exportLayMapView(){
 
     Layer * l=getActiveLay();// attention, si on vient d'ouvrir le soft, aucune layer n'est actives!! gerer les ptr null
     if (l && l->Type()!=TypeLayer::Externe){
+        m_app->loadingIndicator()->setMessage(tr("LoadingI3"));
+        m_app->loadingIndicator()->show();
         // crop layer and download
 
         // crée l'archive
@@ -804,6 +806,8 @@ void groupLayers::exportLayMapView(){
             fileResource->suggestFileName(mClientName+".zip");
             m_app->redirect(fileResource->url());
         }
+        m_app->loadingIndicator()->hide();
+        m_app->loadingIndicator()->setMessage(tr("defaultLoadingI"));
 
     }else {
         Wt::WMessageBox * messageBox = this->addChild(Wt::cpp14::make_unique<Wt::WMessageBox>(

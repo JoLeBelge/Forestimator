@@ -382,6 +382,8 @@ void parcellaire::upload(){
 void parcellaire::computeStat(){
     std::cout << " parcellaire::computeStat()... " ;
 
+    m_app->loadingIndicator()->setMessage(tr("LoadingI2"));
+    m_app->loadingIndicator()->show();
     mGL->mPBar->setMaximum(mGL->getNumSelect4Stat());
     mGL->mPBar->setValue(0);
     //std::map<std::string,std::map<std::string,int>> stat= mGL->computeStatGlob(poGeomGlobale);
@@ -408,6 +410,8 @@ void parcellaire::computeStat(){
         GDALClose( DS );
         downloadShpBt->enable();
     }
+    m_app->loadingIndicator()->hide();
+    m_app->loadingIndicator()->setMessage(tr("defaultLoadingI"));
     std::cout << " ..done " << std::endl;
 }
 
@@ -464,7 +468,7 @@ void parcellaire::visuStat(std::string aTitle){
 // si je click sur un polygone dans ol, calcule les stat et affiche dans une nouvelle page
 void parcellaire::computeStatAndVisuSelectedPol(int aId){
     std::cout << " computeStatAndVisuSelectedPol  , id " << aId << std::endl;
-    m_app->loadingIndicator()->setMessage("calcul des statistiques pour ce polygone");
+    m_app->loadingIndicator()->setMessage(tr("LoadingI1"));
     m_app->loadingIndicator()->show();
 
     std::string input(mFullPath+ ".shp");
@@ -477,8 +481,8 @@ void parcellaire::computeStatAndVisuSelectedPol(int aId){
     {
         printf( "Open failed.\n" );
     } else {
-        mGL->mMap->decorationStyle().setCursor(Cursor::Wait);
-        mGL->mMap->refresh();
+        //mGL->mMap->decorationStyle().setCursor(Cursor::Wait); plus nécessaire maintenant que j'utilise le loading indicator
+        //mGL->mMap->refresh();
         // layer
         OGRLayer * lay = DS->GetLayer(0);
         OGRFeature *poFeature;
@@ -497,9 +501,10 @@ void parcellaire::computeStatAndVisuSelectedPol(int aId){
 
         GDALClose( DS );
         if (find) {visuStat("<h4>Statistique pour polygone FID " + std::to_string(aId) + " de " + mClientName+ "</h4>");}
-        mGL->mMap->decorationStyle().setCursor(Cursor::Auto);
+        //mGL->mMap->decorationStyle().setCursor(Cursor::Auto);
     }
     m_app->loadingIndicator()->hide();
+    m_app->loadingIndicator()->setMessage(tr("defaultLoadingI"));
 
 }
 
@@ -529,12 +534,17 @@ void parcellaire::downloadShp(){
 
 void parcellaire::downloadRaster(){
 
+    std::vector<rasterFiles> vRs=mGL->getSelect4Download();
+    if (vRs.size()>0){
+
+    m_app->loadingIndicator()->setMessage(tr("LoadingI4"));
+    m_app->loadingIndicator()->show();
     // crée l'archive
     ZipArchive* zf = new ZipArchive(mFullPath+"_raster.zip");
     zf->open(ZipArchive::WRITE);
     // crop les raster selectionnés
 
-    std::vector<rasterFiles> vRs=mGL->getSelect4Download();
+
     mGL->mPBar->setValue(0);
     mGL->mPBar->setMaximum(vRs.size());
     for (const rasterFiles & r : vRs){
@@ -550,10 +560,27 @@ void parcellaire::downloadRaster(){
     mGL->mPBar->setToolTip("");
     zf->close();
     delete zf;
+    m_app->loadingIndicator()->hide();
+    m_app->loadingIndicator()->setMessage(tr("defaultLoadingI"));
 
     WFileResource *fileResource = new Wt::WFileResource("plain/text",mFullPath+"_raster.zip");
     fileResource->suggestFileName(mClientName+"_raster.zip");
     m_app->redirect(fileResource->url());
+
+    } else {
+        auto messageBox =
+                mParent->addChild(Wt::cpp14::make_unique<Wt::WMessageBox>(
+                                      "Sélection des couches à exporter",
+                                      "<p>Aucune cartes sélectionnée. Veuillez selectionner les couches à exporter à l'étape numéro 4 de l'onglet analyse</p>",
+                                      Wt::Icon::Information,
+                                      Wt::StandardButton::Ok));
+
+        messageBox->setModal(false);
+        messageBox->buttonClicked().connect([=] {
+            mParent->removeChild(messageBox);
+        });
+        messageBox->show();
+    }
 }
 
 

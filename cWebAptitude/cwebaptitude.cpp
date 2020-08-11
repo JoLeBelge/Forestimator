@@ -7,6 +7,9 @@ cWebAptitude::cWebAptitude(WApplication* app)
 {
     ModeExpert=0;// un peu sale comme procédé, car le login d'un expert va mettre la var Globale ModeExpert=1 et toutes les nouvelles instances de l'application (d'autre utilisateurs) vont également être en mode expert lool. Solution; remettre la var à 0 lors de chaque nouvelle app
     m_app = app;
+    m_app->setLoadingIndicator(cpp14::make_unique<Wt::WOverlayLoadingIndicator>());
+     m_app->loadingIndicator()->setMessage(tr("defaultLoadingI"));
+    //m_app->loadingIndicator()->setStyleClass("loading-indicator"); // c'est moche, je vais laisser Sam gerer ça
     std::string aBD=loadBDpath();
     mDico=new cDicoApt(aBD);
     mStackInfoPtr=new stackInfoPtr();

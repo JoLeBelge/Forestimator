@@ -33,9 +33,6 @@ WOpenLayers::WOpenLayers(cDicoApt *aDico):xy_(this,"1.0"),mDico(aDico),polygId_(
      slot.setJavaScript
                 ("function getXY(owt,evt){"
                  "var e =  evt || window.event;"
-                 "console.log(evt);"
-                 //"var f = map.getCoordinateFromPixel(map.getEventPixel(evt));"
-
                  "var f = map.getEventCoordinate(e);"
                  // source ; c'est la source pour la couche de point "station", càd celle qui affiche là ou l'utilisateur à double-cliqué
                  "source.clear();"
@@ -46,14 +43,8 @@ WOpenLayers::WOpenLayers(cDicoApt *aDico):xy_(this,"1.0"),mDico(aDico),polygId_(
                  );
 
     slot2.setJavaScript
-            /*("selectAltClick.on('select', function (e) {console.log(featuresSelect.item(0).getId());"
-                            "if (featuresSelect.item(0).getId() != null) {"+ polygId_.createCall({"featuresSelect.item(0).getId()"}) + "}"
-                            "});"
-                            );*/
-
-            ("function (e) {if (featuresSelect.getLength() > 0) {if (featuresSelect.item(0) !== 'undefined') {"
-             "if (featuresSelect.item(0).getId() !== null) {"+ polygId_.createCall({"featuresSelect.item(0).getId()"}) + "}"
-                                                                                                                         "}}};"
+            ("function () {if (featuresSelect.getLength() > 0) {if (featuresSelect.item(0) !== 'undefined') {"
+             "if (featuresSelect.item(0).getId() !== null) {"+ polygId_.createCall({"featuresSelect.item(0).getId()"}) + "}"                                                                                                     "}}};"
              );
 
     slot3.setJavaScript
@@ -69,12 +60,12 @@ WOpenLayers::WOpenLayers(cDicoApt *aDico):xy_(this,"1.0"),mDico(aDico),polygId_(
                 );
 
     // actions
+
     this->doubleClicked().connect(this->slot);
+    // click sur un polygone
+    this->clicked().connect(std::bind(&WOpenLayers::filterMouseEvent,this,std::placeholders::_1));
 
-    // pour une portabilité sur tablette et smartphone ; si long click (long press - tap event), même effet que double click
-    //https://www.cssscript.com/handle-long-press-tap-event-in-javascript-long-press-js/
-
-    // il faudrait que je mesure le temps entre touchstart et touchend pour décider s'il s'agit d'un long touch ou pas
+    // mesure du temps entre touchstart et touchend pour savoir si c'est un longpress
     touchStarted().connect(this, &WOpenLayers::TouchStart);
     touchMoved().connect(this, &WOpenLayers::TouchMoved);
     touchEnded().connect(std::bind(&WOpenLayers::TouchEnd,this, std::placeholders::_1));
@@ -84,7 +75,7 @@ WOpenLayers::WOpenLayers(cDicoApt *aDico):xy_(this,"1.0"),mDico(aDico),polygId_(
     touchMoved().preventDefaultAction(true);
     touchEnded().preventDefaultAction(true);
 
-    this->clicked().connect(std::bind(&WOpenLayers::filterMouseEvent,this,std::placeholders::_1));
+
 }
 
 

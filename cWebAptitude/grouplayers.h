@@ -12,6 +12,7 @@
 #include <Wt/WTreeTableNode.h>
 #include <Wt/WCheckBox.h>
 #include <Wt/WMessageBox.h>
+#include <Wt/WLoadingIndicator.h>
 
 #include "stackinfoptr.h"
 #include "layer.h"
