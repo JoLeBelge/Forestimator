@@ -65,7 +65,7 @@ WOpenLayers::WOpenLayers(cDicoApt *aDico):xy_(this,"1.0"),mDico(aDico),polygId_(
                 "source.addFeature(new ol.Feature({geometry: new ol.geom.Point([f[0], f[1]])}));"
                 "if (f != null) {"
                 + xy_.createCall({"f[0]","f[1]"}) +
-                "}"
+                "}}"
                 );
 
     // actions
