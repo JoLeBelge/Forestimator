@@ -45,7 +45,6 @@ WOpenLayers::WOpenLayers(cDicoApt *aDico):xy_(this,"1.0"),mDico(aDico),polygId_(
                 "}}"
                  );
 
-
     slot2.setJavaScript
             /*("selectAltClick.on('select', function (e) {console.log(featuresSelect.item(0).getId());"
                             "if (featuresSelect.item(0).getId() != null) {"+ polygId_.createCall({"featuresSelect.item(0).getId()"}) + "}"
@@ -58,43 +57,27 @@ WOpenLayers::WOpenLayers(cDicoApt *aDico):xy_(this,"1.0"),mDico(aDico),polygId_(
              );
 
     slot3.setJavaScript
-               ("function toto(evt){"
-                //"if (event != null) {"
-                //if (e.button === 0 || window.TouchEvent && e instanceof TouchEvent) {
-                // fonctionne mais une fois sur 20, la plupart du temps la fonction a un event qui est null donc rien ne se passe
-                //"var touch = evt.originalEvent.changedTouches[0];"
-
-                //"if (touch != null) {"
-                "if (evt!= null) {"
-                "startX = touch.clientX;"
-                "startY = touch.clientY;"
-                "console.log(startX);"
-                "console.log(startY);"
-                + xy_.createCall({"startX","startY"}) +
-               "} else {"
-               //"var touch = window.event.originalEvent.changedTouches[0];"
-               //"startX = touch.clientX;"
-               //"startY = touch.clientY;"
-               "startX =5000;"
-               "startY =5000;"
-                + xy_.createCall({"startX","startY"}) +
-               "}"
+               ("function projection(x,y){"
+                "var f = map.getCoordinateFromPixel([x,y]);"
+                 "source.addFeature(new ol.Feature({geometry: new ol.geom.Point([f[0], f[1]])}));"
+                // source ; c'est la source pour la couche de point "station", càd celle qui affiche là ou l'utilisateur à double-cliqué
+                "source.clear();"
+                "source.addFeature(new ol.Feature({geometry: new ol.geom.Point([f[0], f[1]])}));"
+                "if (f != null) {"
+                + xy_.createCall({"f[0]","f[1]"}) +
                 "}"
                 );
-       //    "} else { console.log('no event');"
 
     // actions
-    //this->doubleClicked().connect(this->slot);
-    this->doubleClicked().connect(std::bind(&WOpenLayers::tmp,this, std::placeholders::_1));
+    this->doubleClicked().connect(this->slot);
+
     // pour une portabilité sur tablette et smartphone ; si long click (long press - tap event), même effet que double click
     //https://www.cssscript.com/handle-long-press-tap-event-in-javascript-long-press-js/
 
     // il faudrait que je mesure le temps entre touchstart et touchend pour décider s'il s'agit d'un long touch ou pas
     touchStarted().connect(this, &WOpenLayers::TouchStart);
     touchMoved().connect(this, &WOpenLayers::TouchMoved);
-    //touchEnded().connect(this, &WOpenLayers::TouchEnd);
     touchEnded().connect(std::bind(&WOpenLayers::TouchEnd,this, std::placeholders::_1));
-    //mMap->mouseDragged().connect(mMap->slot3);//plusieur slot sur le meme objet wt ça fou la mrd , une sorte de concurence car seulement un fonctionne au final
 
     // prevent default actions
     touchStarted().preventDefaultAction(true);

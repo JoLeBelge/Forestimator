@@ -59,14 +59,8 @@ public:
         }
     }
 
-    void tmp(WMouseEvent t){
-        slot.exec("null","dblclick");
-    }
-
     void TouchStart(){
         timer = duration_cast< milliseconds >(system_clock::now().time_since_epoch());
-       // std::cout << " execute slot dans touchStart  " << std::endl;
-       //  slot3.exec();
     }
     void TouchMoved(){
         timer = duration_cast< milliseconds >(system_clock::now().time_since_epoch());
@@ -74,17 +68,13 @@ public:
 
     void TouchEnd(WTouchEvent t){
         milliseconds touchLength = duration_cast< milliseconds >(system_clock::now().time_since_epoch()) - timer;
-        //float touchL = (float)touchLength/CLOCKS_PER_SEC;
-        std::cout << " la durée du touch est de " << touchLength.count() << std::endl;//<< " soit " << touchL << " seconde " << std::endl;
-
+        //std::cout << " la durée du touch est de " << touchLength.count() << std::endl;//<< " soit " << touchL << " seconde " << std::endl;
         if (touchLength.count()>100){
-            //std::cout << " execute slot  " << std::endl;
-            //slot3.exec();
             std::cout << "number of changedTouches " << t.changedTouches().size() << std::endl;
             if (t.changedTouches().size()>0){
             Wt::Touch touch = t.changedTouches()[0];
             //std::cout << " touch est de " << touch.screen().x << std::endl;
-            slot3.exec("null","touchend");
+            slot3.exec(std::to_string(touch.window().x),std::to_string(touch.window().y));
             }
         }
     }
