@@ -65,7 +65,7 @@ WOpenLayers::WOpenLayers(cDicoApt *aDico):xy_(this,"1.0"),mDico(aDico),polygId_(
                 //"var touch = evt.originalEvent.changedTouches[0];"
 
                 //"if (touch != null) {"
-                "if (evt.button === 0 || window.TouchEvent && evt instanceof TouchEvent) {"
+                "if (evt!= null) {"
                 "startX = touch.clientX;"
                 "startY = touch.clientY;"
                 "console.log(startX);"
@@ -82,8 +82,6 @@ WOpenLayers::WOpenLayers(cDicoApt *aDico):xy_(this,"1.0"),mDico(aDico),polygId_(
                 "}"
                 );
        //    "} else { console.log('no event');"
-
-
 
     // actions
     //this->doubleClicked().connect(this->slot);

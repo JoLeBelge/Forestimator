@@ -50,11 +50,6 @@ public:
         doJavaScript("activeLayer.getSource().changed();");
     }
 
-    void tmp(WMouseEvent evt){
-        std::cout << " essai de récupérer event double click dans c++ " << evt.window().x << std::endl;
-        slot.exec();
-    }
-
     // pas simple d'impletemter ses signaux, voir https://redmine.webtoolkit.eu/boards/2/topics/12782?r=12807#message-12807
 
     void filterMouseEvent(WMouseEvent event){
@@ -62,6 +57,10 @@ public:
             // ici j'aimerai que le JS slot2 fonctionne et envoi sa réponse
             slot2.exec();
         }
+    }
+
+    void tmp(WMouseEvent t){
+        slot.exec("null","dblclick");
     }
 
     void TouchStart(){
@@ -78,13 +77,14 @@ public:
         //float touchL = (float)touchLength/CLOCKS_PER_SEC;
         std::cout << " la durée du touch est de " << touchLength.count() << std::endl;//<< " soit " << touchL << " seconde " << std::endl;
 
-        if (touchLength.count()>200){
+        if (touchLength.count()>100){
             //std::cout << " execute slot  " << std::endl;
             //slot3.exec();
             std::cout << "number of changedTouches " << t.changedTouches().size() << std::endl;
             if (t.changedTouches().size()>0){
             Wt::Touch touch = t.changedTouches()[0];
-            std::cout << " touch est de " << touch.screen().x << std::endl;
+            //std::cout << " touch est de " << touch.screen().x << std::endl;
+            slot3.exec("null","touchend");
             }
         }
     }
