@@ -821,6 +821,8 @@ void groupLayers::exportLayMapView(){
             });
             messageBox->show();
         }
+        m_app->loadingIndicator()->hide();
+        m_app->loadingIndicator()->setMessage(tr("defaultLoadingI"));
 
         m_app->loadingIndicator()->hide();
         m_app->loadingIndicator()->setMessage(tr("defaultLoadingI"));

@@ -74,5 +74,6 @@ WOpenLayers::WOpenLayers(cDicoApt *aDico):xy_(this,"1.0"),mDico(aDico),polygId_(
     touchStarted().preventDefaultAction(true);
     touchMoved().preventDefaultAction(true);
     touchEnded().preventDefaultAction(true);
+
 }
 
