@@ -371,16 +371,12 @@ map.addInteraction(selectAltClick);
 /**
  * Add a click handler to hide the popup.
  * @return {boolean} Don't follow the href.
- */
+ */ 
+// pas bonne compatibilité tablette car le touch sur le closer va questionner la carte sur la station ou on clique, mm si en dessous du popup.
 closer.onclick = function() {
   overlay.setPosition(undefined);
   closer.blur();
   return false;
 };
 
-closer.ontouch = function() {
-  overlay.setPosition(undefined);
-  closer.blur();
-  return false;
-};
 

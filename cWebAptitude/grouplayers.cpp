@@ -3,6 +3,8 @@
 const TypeClassifST cl[] = { FEE, CS };
 std::vector<std::string> classes = {"Fichier Ecologique des Essences", "Catalogue des Stations"};
 
+int maxSizePix4Export(30000);
+
 groupLayers::groupLayers(cDicoApt * aDico, WOpenLayers *aMap, WApplication *app, stackInfoPtr * aStackInfoPtr):
     mDico(aDico)
   ,mTypeClassifST(FEE)
@@ -794,6 +796,7 @@ void groupLayers::exportLayMapView(){
         std::string mClientName=l->getCode()+"_crop";
         rasterFiles r= l->getRasterfile();
         if ( cropIm(l->getPathTif(), aCroppedRFile, mMapExtent)){
+            std::cout << "create archive pour raster croppé " << std::endl;
             ZipArchive* zf = new ZipArchive(archiveFileName);
             zf->open(ZipArchive::WRITE);
             // pour bien faire; choisir un nom qui soit unique, pour éviter conflict si plusieurs utilisateurs croppent la mm carte en mm temps
@@ -805,7 +808,20 @@ void groupLayers::exportLayMapView(){
             WFileResource *fileResource = new Wt::WFileResource("plain/text",archiveFileName);
             fileResource->suggestFileName(mClientName+".zip");
             m_app->redirect(fileResource->url());
+        } else {
+            Wt::WMessageBox * messageBox = this->addChild(Wt::cpp14::make_unique<Wt::WMessageBox>(
+                                                              "Erreur",
+                                                              "<p> Cette couche ne peut être découpée sur cette emprise, essayer avec une zone plus petite.</p>",
+                                                              Wt::Icon::Critical,
+                                                              Wt::StandardButton::Ok));
+
+            messageBox->setModal(false);
+            messageBox->buttonClicked().connect([=] {
+                this->removeChild(messageBox);
+            });
+            messageBox->show();
         }
+
         m_app->loadingIndicator()->hide();
         m_app->loadingIndicator()->setMessage(tr("defaultLoadingI"));
 
@@ -830,7 +846,7 @@ bool cropIm(std::string inputRaster, std::string aOut, OGREnvelope ext){
     std::cout << " cropIm" << std::endl;
     GDALAllRegister();
     if (exists(inputRaster)){
-        double width((ext.MaxX-ext.MinX)), height((ext.MaxY-ext.MinY));
+
         const char *inputPath=inputRaster.c_str();
         const char *cropPath=aOut.c_str();
         GDALDataset *pInputRaster, *pCroppedRaster;
@@ -841,6 +857,26 @@ bool cropIm(std::string inputRaster, std::string aOut, OGREnvelope ext){
         double transform[6], tr1[6];
         pInputRaster->GetGeoTransform(transform);
         pInputRaster->GetGeoTransform(tr1);
+
+        OGREnvelope extGlob=OGREnvelope();
+        extGlob.MaxY=transform[3];
+        extGlob.MinX=transform[0];
+        extGlob.MinY=transform[3]+transform[5]*pInputRaster->GetRasterBand(1)->GetYSize();
+        extGlob.MaxX=transform[0]+transform[1]*pInputRaster->GetRasterBand(1)->GetXSize();
+
+        //std::cout << ext.MinX << " , " << ext.MaxX << " , " << ext.MinY << " , " << ext.MaxY << " avant intersect " << std::endl;
+        // garder l'intersect des 2 extend
+        ext.Intersect(extGlob);
+        //std::cout << ext.MinX << " , " << ext.MaxX << " , " << ext.MinY << " , " << ext.MaxY << " après intersect " << std::endl;
+
+        if (extGlob.MinX==ext.MinX && extGlob.MaxX==ext.MaxX && extGlob.MinY==ext.MinY && extGlob.MaxY==ext.MaxY){
+            //std::cout << "je vais faire une copie de tout le raster plutôt que de le cropper " << std::endl;
+            //pInputRaster->
+            pDriver->CopyFiles(cropPath,inputPath);
+            aRes=1;
+        } else {
+        double width((ext.MaxX-ext.MinX)), height((ext.MaxY-ext.MinY));
+
         //adjust top left coordinates
         transform[0] = ext.MinX;
         transform[3] = ext.MaxY;
@@ -849,7 +885,7 @@ bool cropIm(std::string inputRaster, std::string aOut, OGREnvelope ext){
         int ySize = round(height/transform[1]);
         //std::cout << "xSize " << xSize << ", ySize " << ySize << std::endl;
         //create the new (cropped) dataset
-        if (xSize>0 && ySize>0 && xSize <25000 && ySize<25000){
+        if (xSize>0 && ySize>0 && xSize < maxSizePix4Export && ySize<maxSizePix4Export){
             pCroppedRaster = pDriver->Create(cropPath, xSize, ySize, 1, GDT_Byte, NULL); //or something similar
 
             pCroppedRaster->SetProjection( pInputRaster->GetProjectionRef() );
@@ -870,18 +906,17 @@ bool cropIm(std::string inputRaster, std::string aOut, OGREnvelope ext){
             CPLFree(scanline);
 
             aRes=1;
+            if( pCroppedRaster != NULL ){GDALClose( (GDALDatasetH) pCroppedRaster );}
+
         } else {
             std::cout << " crop du raster a échoué: taille pas correcte " << std::endl;
         }
 
-        if( pCroppedRaster != NULL ){GDALClose( (GDALDatasetH) pCroppedRaster );}
+        }
+
         GDALClose(pInputRaster);
     } else {
         std::cout << " attention, un des fichiers input n'existe pas : " << inputRaster << std::endl;
     }
     return aRes;
 }
-
-
-
-

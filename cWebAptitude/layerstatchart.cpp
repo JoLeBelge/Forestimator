@@ -24,7 +24,7 @@ layerStatChart::layerStatChart(Layer *aLay, std::map<std::string, int> aStat, st
     for (auto & kv : mStatSimple){
         //clé : la valeur au format légende (ex ; Optimum). Valeur ; pourcentage pour ce polygone
         mModel->setData(  row, 0, WString(kv.first));
-        //mModel->setData(  row, 1, WString("Blueberry"), ItemDataRole::ToolTip);
+        mModel->setData(  row, 1, WString(kv.first), ItemDataRole::ToolTip);
         mModel->setData(  row, 1, kv.second);
         if (kv.second>aMax) {aMax=kv.second; rowAtMax=row;}
         row++;
@@ -71,40 +71,32 @@ Wt:WContainerWidget * aRes= new Wt::WContainerWidget();
             aChart->setLabelsColumn(0);    // Set the column that holds the labels.
             aChart->setDataColumn(1);      // Set the column that holds the data.
 
+            aChart->setPlotAreaPadding(0, Side::Left | Side::Top | Side::Bottom|Side::Right);
 
-
-            // changer la couleur
-            //std::cout << "change la couleur" << std::endl;
-            int row = 0;
+            int row(0);
             for (auto & kv : mStatSimple){
                 std::string aCodeStr(kv.first);
-                //std::cout << " row " <<  row << ", " << aCodeStr<< std::endl;
                 color col(mLay->getColor(aCodeStr));
                 // std::cout << "got color" << std::endl;
                 aChart->setBrush(row,Wt::WBrush(Wt::WColor(col.mR,col.mG,col.mB)));
-
-                //mModel->item(row,0)->;
-
-                //std::cout << "brush setted " << std::endl;
                 row++;
             }
-            //std::cout << "config la position des labels" << std::endl;
-            // Configure location and type of labels.
-            if (mStatSimple.size()>3)
-            aChart->setDisplayLabels(Chart::LabelOption::Outside |
+
+            // Configure location and type of labels. Plus nécessaire, j'ai mis des tooltips
+            /*if (mStatSimple.size()>3){ aChart->setDisplayLabels(Chart::LabelOption::Outside |
                                     //Chart::LabelOption::TextLabel); |
-                                   Chart::LabelOption::TextPercentage);
+                                   //Chart::LabelOption::TextPercentage);
+            aChart->setMargin(20, Side::Top | Side::Bottom); // Add margin vertically.
+            //  il faut mettre des marges, qui sont comtpée au départ du cammembert, pour mettre les label
+            aChart->setMargin(50, Side::Left | Side::Right);
+            }*/
             // Enable a 3D and shadow effect.
             aChart->setPerspectiveEnabled(true, 0.2);
             aChart->setShadowEnabled(true);
-            aChart->setPlotAreaPadding(20, Side::Left | Side::Top | Side::Bottom|Side::Right);
-            //aChart->setPlotAreaPadding(120, Side::Right);
-
+            //aChart->setPlotAreaPadding(20, Side::Left | Side::Top | Side::Bottom|Side::Right);
             //if (mStat.size()>1) {aChart->setExplode(rowAtMax, 0.1);}  // Explode l'élément majoritaire WARN, le camembert sort du graphique, bug
             aChart->resize(300, 300);    // WPaintedWidget must be given an explicit size.
-            aChart->setMargin(20, Side::Top | Side::Bottom); // Add margin vertically.
-            //aChart->setMargin(WLength::Auto, Side::Left | Side::Right); // Center horizontally. il faut mettre des marges, qui sont comtpée au départ du cammembert, pour mettre les label
-            aChart->setMargin(50, Side::Left | Side::Right);
+
         }
         if (mTypeVar==TypeVar::Continu){
 
