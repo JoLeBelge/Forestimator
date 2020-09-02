@@ -824,9 +824,6 @@ void groupLayers::exportLayMapView(){
         m_app->loadingIndicator()->hide();
         m_app->loadingIndicator()->setMessage(tr("defaultLoadingI"));
 
-        m_app->loadingIndicator()->hide();
-        m_app->loadingIndicator()->setMessage(tr("defaultLoadingI"));
-
     }else {
         Wt::WMessageBox * messageBox = this->addChild(Wt::cpp14::make_unique<Wt::WMessageBox>(
                                                           "Erreur",
