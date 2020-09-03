@@ -13,11 +13,18 @@ legend::legend(WContainerWidget *parent):mParent(parent)
 
 void legend::createUI()
 {
-    mTitle = mParent->addWidget(cpp14::make_unique<WText>(WString::tr("legendMsg")));
+    //mTitle = mParent->addWidget(cpp14::make_unique<WText>(WString::tr("legendMsg")));
 
     mParent->setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Left);
     mParent->setMargin(1,Wt::Side::Bottom | Wt::Side::Top);
     mParent->setInline(0);// si pas inline Et bizarrement si pas de setMargin autre que 0, pas de scrollbar pour l'overflow!
+
+    // bouton retour
+    WPushButton * retour = mParent->addWidget(Wt::cpp14::make_unique<WPushButton>("Retour"));
+    retour->addStyleClass("btn btn-info");
+    //retour->setLink(WLink(LinkType::InternalPath, "/analyse"));
+    retour->clicked().connect([=]{mGL->mStackInfoPtr->stack_info->setCurrentIndex(2);;});
+
 
     mAptAllEss = mParent->addWidget(cpp14::make_unique<WTable>());
     mAptAllEss->setHeaderCount(1);
@@ -38,20 +45,17 @@ void legend::createUI()
     mInfoT->setWidth(Wt::WLength("90%"));
     mInfoT->toggleStyleClass("table-striped",true);
 
-    mLegendIndiv= mParent->addWidget(cpp14::make_unique<WTable>());
-    mLegendIndiv->setHeaderCount(1);
-    mLegendIndiv->setWidth(Wt::WLength("90%"));
-    mLegendIndiv->toggleStyleClass("table-striped",true);
+
 }
 
 void legend::vider()
 {
 	//mTitle->setStyleClass("nonvisible");
-    mTitle->setText(WString::tr("legendTitre"));
+    //mTitle->setText(WString::tr("legendTitre"));
     mInfoT->clear();
     mDetAptFEE->clear();
     mAptAllEss->clear();
-    mLegendIndiv->clear();
+
     mContEco->clear();
 }
 
@@ -119,7 +123,7 @@ void legend::detailCalculAptFEE(ST * aST){
     mContEco->addWidget(cpp14::make_unique<WText>(tr("legendEcogramme")));
 }
 
-void legend::afficheLegendeIndiv(const Layer * l){
+/*void legend::afficheLegendeIndiv(const Layer * l){
 
     if (l->Type()!=TypeLayer::Externe){
         // vider la légende et afficher la légende personnelle de la couche active
@@ -142,7 +146,7 @@ void legend::afficheLegendeIndiv(const Layer * l){
             }
         }
     }
-}
+}*/
 
 void legend::afficheAptAllEss(){
 

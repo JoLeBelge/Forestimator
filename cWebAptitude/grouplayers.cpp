@@ -5,7 +5,7 @@ std::vector<std::string> classes = {"Fichier Ecologique des Essences", "Catalogu
 
 int maxSizePix4Export(30000);
 
-groupLayers::groupLayers(cDicoApt * aDico, WOpenLayers *aMap, WApplication *app, stackInfoPtr * aStackInfoPtr):
+groupLayers::groupLayers(cDicoApt * aDico, WOpenLayers *aMap, AuthApplication *app, stackInfoPtr * aStackInfoPtr):
     mDico(aDico)
   ,mTypeClassifST(FEE)
   ,mMap(aMap)
@@ -17,11 +17,14 @@ groupLayers::groupLayers(cDicoApt * aDico, WOpenLayers *aMap, WApplication *app,
   ,mSelect4Download(NULL)
   ,mStackInfoPtr(aStackInfoPtr)
   ,mapExtent_(this,"1.0")
+  ,mapExtent2_(this,"2.0")
+  ,slot(this)
+  ,slot_extent(this)
 {
     //std::cout << "constructeur GL " << std::endl;
     mParent->setOverflow(Wt::Overflow::Visible);
     mParent->setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Middle);
-    mParent->addWidget(cpp14::make_unique<WText>( tr("coucheStep1")));
+
 
     slot.setJavaScript("function toto(e) {"
                        "var extent = map.getView().calculateExtent(map.getSize());"
@@ -34,6 +37,12 @@ groupLayers::groupLayers(cDicoApt * aDico, WOpenLayers *aMap, WApplication *app,
     // on exécute une première fois le script js pour initialiser l'enveloppe mapExtent
     //slot.exec();plus nécessaire
     this->getMapExtendSignal().connect(std::bind(&groupLayers::updateMapExtentAndCropIm,this, std::placeholders::_1,std::placeholders::_2,std::placeholders::_3,std::placeholders::_4));
+
+    slot_extent.setJavaScript("function () {"
+                              "var centre = map.getView().getCenter();"
+                              "var z = map.getView().getZoom();"
+                              + mapExtent2_.createCall({"centre[0]","centre[1]","z"}) + "}");
+    this->getMapCenterSignal().connect(std::bind(&groupLayers::saveExtent,this, std::placeholders::_1,std::placeholders::_2,std::placeholders::_3));
 
     updateGL();
     // TODO on click event
@@ -81,7 +90,7 @@ void groupLayers::clickOnName(std::string aCode, TypeLayer type){
     for (Layer * l : mVLs){
         if (l->IsActive() && type==l->Type()){
             l->displayLayer();
-            mLegend->afficheLegendeIndiv(l);
+            updateLegende(l);
             break;
         }
     }
@@ -116,10 +125,19 @@ void groupLayers::extractInfo(double x, double y){
     std::cout << "groupLayers ; extractInfo " << x << " , " << y << std::endl;
     mStation->vider();
     mLegend->vider();
+    int cur_index = mStackInfoPtr->stack_info->currentIndex(); // pour savoir où on en est
 
-    // maintenant on n'affiche plus la légende automatiquement, , pL n'aime pas
+    // maintenant on n'affiche plus la légende automatiquement, , pL n'aime pas. Pas grave on le fait quand meme !
     //mStackInfoPtr->menuitem2_legend->select();
-    //mStackInfoPtr->stack_info->setCurrentIndex(0);
+    mStackInfoPtr->stack_info->setCurrentIndex(0);
+
+    // bouton retour
+    WPushButton * retour = mLegend->addWidget(Wt::cpp14::make_unique<WPushButton>("Retour"));
+    retour->addStyleClass("btn btn-info");
+
+    retour->clicked().connect([=]{
+        mStackInfoPtr->stack_info->setCurrentIndex(cur_index);
+    });
 
     // tableau des informations globales - durant ce round, l'objet ST est modifié
     mLegend->titreInfoRaster();
@@ -642,6 +660,21 @@ void groupLayers::updateGL(){
     mVLs.clear();
     mParent->clear();
 
+    auto legendCombo = mParent->addWidget(cpp14::make_unique<WCheckBox>(tr("legendCheckbox")));
+    legendCombo->changed().connect([this]{
+        if(mLegendDiv->isVisible())
+            mLegendDiv->hide();
+        else
+            mLegendDiv->show();
+    });
+    mLegendDiv = mParent->addWidget(cpp14::make_unique<WContainerWidget>());
+    mLegendDiv->hide();
+    mTitle = mLegendDiv->addWidget(cpp14::make_unique<WText>(WString::tr("legendMsg")));
+    mLegendIndiv = mLegendDiv->addWidget(cpp14::make_unique<WTable>());
+    mLegendIndiv->setHeaderCount(1);
+    mLegendIndiv->setWidth(Wt::WLength("90%"));
+    mLegendIndiv->toggleStyleClass("table-striped",true);
+
     /* Liste cartes 1	*/
     std::unique_ptr<Wt::WTree> tree = Wt::cpp14::make_unique<Wt::WTree>();
     tree->setSelectionMode(Wt::SelectionMode::Extended);
@@ -752,8 +785,36 @@ void groupLayers::updateGL(){
 
     }
     //std::cout << "done nodeitem" << std::endl;
+    mParent->addWidget(cpp14::make_unique<WText>(tr("coucheStep1")));
     mParent->addWidget(std::move(tree));
     mParent->addWidget(cpp14::make_unique<WText>(tr("coucheStep2")));
+
+    // add user extents if connected
+    printf("isloggedin?\n");
+    if(m_app->isLoggedIn()){
+        WPushButton * button_e = mParent->addWidget(cpp14::make_unique<WPushButton>(tr("afficher_extent")));
+        button_e->clicked().connect([=] {
+            if(mExtentDiv->isVisible())
+                mExtentDiv->hide();
+            else
+                mExtentDiv->show();
+        });
+        button_e->addStyleClass("btn btn-info");
+        printf("mextentdiv\n");
+        mExtentDiv = mParent->addWidget(cpp14::make_unique<WContainerWidget>());
+        mExtentDiv->setMargin(15,Wt::Side::Left);
+        mExtentDiv->setMargin(15,Wt::Side::Right);
+        mExtentDiv->addStyleClass("div_extent");
+        mExtentDiv->hide();
+        loadExtents(m_app->getUser().id());
+
+
+
+    }
+    else{
+        printf("non connecté\n");
+    }
+
     mParent->addWidget(cpp14::make_unique<WText>(tr("coucheStep3")));
     WPushButton * bExportTiff = mParent->addWidget(cpp14::make_unique<WPushButton>("Télécharger"));
     //bExportTiff->disable();
@@ -771,6 +832,36 @@ void groupLayers::updateGL(){
     mSelect4Download= new selectLayers4Download(this);
 
 }
+
+void groupLayers::updateLegende(const Layer * l){
+    mLegendIndiv->clear();
+
+    if (l->Type()!=TypeLayer::Externe){
+        // vider la légende et afficher la légende personnelle de la couche active
+        //std::cout << " je vais afficher la légende personnalisée pour " <<l->getLegendLabel() <<std::endl;
+        //vider();
+        mTitle->setText(WString::tr("legendTitre"));
+        int row(0);
+        mLegendIndiv->elementAt(row, 0)->setColumnSpan(2);
+        mLegendIndiv->elementAt(row, 0)->setContentAlignment(AlignmentFlag::Top | AlignmentFlag::Center);
+        mLegendIndiv->elementAt(row, 0)->setPadding(10);
+        //WText *titre = mLegendIndiv->elementAt(row,0)->addWidget(cpp14::make_unique<WText>("<h4>"+l->getLegendLabel()+"</h4>"));
+        mLegendIndiv->elementAt(row,0)->addWidget(cpp14::make_unique<WText>("<h4>"+l->getLegendLabel()+"</h4>"));
+        row++;
+        for (auto kv : *l->mDicoVal){
+            if (l->hasColor(kv.first)){
+                color col = l->getColor(kv.first);
+                mLegendIndiv->elementAt(row, 0)->addWidget(cpp14::make_unique<WText>(kv.second));
+                mLegendIndiv->elementAt(row, 1)->setWidth("40%");
+                mLegendIndiv->elementAt(row, 1)->decorationStyle().setBackgroundColor(WColor(col.mR,col.mG,col.mB));
+                row++;
+            }
+        }
+    }else {
+        mTitle->setText(WString::tr("legendMsg"));
+    }
+}
+
 
 Layer * groupLayers::getActiveLay(){
     Layer * aRes=NULL;
@@ -821,6 +912,7 @@ void groupLayers::exportLayMapView(){
             });
             messageBox->show();
         }
+
         m_app->loadingIndicator()->hide();
         m_app->loadingIndicator()->setMessage(tr("defaultLoadingI"));
 
@@ -906,16 +998,126 @@ bool cropIm(std::string inputRaster, std::string aOut, OGREnvelope ext){
 
             aRes=1;
             if( pCroppedRaster != NULL ){GDALClose( (GDALDatasetH) pCroppedRaster );}
-
         } else {
             std::cout << " crop du raster a échoué: taille pas correcte " << std::endl;
         }
 
         }
-
         GDALClose(pInputRaster);
     } else {
         std::cout << " attention, un des fichiers input n'existe pas : " << inputRaster << std::endl;
     }
     return aRes;
+}
+
+/*
+ * Fonctions pour gérer les extents sauvé dans DB
+ *
+ */
+int groupLayers::openConnection(){
+    int rc;
+    std::string db_path = m_app->docRoot() + "/extents.db";
+    std::cout << "chargement db extents..." << std::endl;
+    rc = sqlite3_open_v2(db_path.c_str(), &db_,SQLITE_OPEN_READWRITE, NULL);
+    if( rc ) {
+        fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db_));
+        std::cout << " db_path " << db_path << std::endl;
+    }
+    return rc;
+}
+
+void groupLayers::closeConnection(){
+
+    int rc = sqlite3_close_v2(db_);
+    if( rc ) {
+        fprintf(stderr, "Can't close database: %s\n\n\n", sqlite3_errmsg(db_));
+    }
+}
+
+void groupLayers::loadExtents(std::string id){
+    openConnection();
+    printf("loadextent\n");
+    mExtentDiv->clear();
+
+    sqlite3_stmt * stmt;
+    std::string SQLstring="SELECT centre_x,centre_y,zoom,name,id FROM user_extent WHERE id_user="+id; // std::to_string(id);
+    sqlite3_prepare_v2( db_, SQLstring.c_str(), -1, &stmt, NULL );//preparing the statement
+    while(sqlite3_step(stmt) == SQLITE_ROW)
+    {
+        std::string cx=std::string( (char *)sqlite3_column_text(stmt, 0));
+        std::string cy=std::string( (char *)sqlite3_column_text(stmt, 1));
+        std::string z=std::string( (char *)sqlite3_column_text(stmt, 2));
+        std::string n=std::string( (char *)sqlite3_column_text(stmt, 3));
+        std::string id_extent=std::string( (char *)sqlite3_column_text(stmt, 4));
+        /*std::cout << " value 1 : " << cx << std::endl;
+        std::cout << " value 2 : " << cy << std::endl;
+        std::cout << " value 3 : " << z << std::endl;*/
+        WPushButton *bp = mExtentDiv->addNew<Wt::WPushButton>(n);
+        bp->setInline(1);
+        bp->clicked().connect([=]{
+            mParent->doJavaScript("map.getView().setCenter(["+cx+","+cy+" ]);");
+            mParent->doJavaScript("map.getView().setZoom("+z+");");
+        });
+        WAnchor *del = mExtentDiv->addNew<Wt::WAnchor>(WLink(""),"(x)");
+        del->clicked().connect([=]{
+            WDialog * dialogPtr =  mParent->addChild(Wt::cpp14::make_unique<Wt::WDialog>(tr("extent_del_comfirm")));
+            WPushButton *ok = dialogPtr->footer()->addNew<Wt::WPushButton>("Supprimer");
+            ok->setDefault(false);
+            ok->clicked().connect([=]{
+                printf("delete extent");
+                deleteExtent(id_extent);
+                dialogPtr->reject();
+            });
+
+            WPushButton * annuler = dialogPtr->footer()->addNew<Wt::WPushButton>("Annuler");
+            annuler->setDefault(true);
+            annuler->clicked().connect([=]{dialogPtr->reject();});
+
+            dialogPtr->show();
+        });
+    }
+    closeConnection();
+
+    // boutons pour enregistrer l'extent courant
+    mExtentDiv->addNew<Wt::WBreak>();
+    tb_extent_name = mExtentDiv->addWidget(cpp14::make_unique<WLineEdit>());
+    tb_extent_name->setInline(1);
+    tb_extent_name->setPlaceholderText("Nom de l'emprise...");
+    tb_extent_name->setWidth("200px");
+    tb_extent_name->addStyleClass("extent_inline");
+    WPushButton * button_s = mExtentDiv->addWidget(cpp14::make_unique<WPushButton>(tr("sauver_extent")));
+    button_s->addStyleClass("btn btn-success");
+    button_s->setInline(1);
+    button_s->addStyleClass("extent_inline extent_margin");
+    button_s->clicked().connect(this->slot_extent);
+
+    std::cout << " fin loadExtent " << std::endl;
+}
+
+void groupLayers::saveExtent(double c_x, double c_y, double zoom){
+    openConnection();
+
+    std::string id = m_app->getUser().id();
+    std::string n = tb_extent_name->text().toUTF8();
+    boost::replace_all(n,"'","");
+    std::string cx=std::to_string((int)c_x);
+    std::string cy=std::to_string((int)c_y);
+    std::string z=std::to_string((int)zoom);
+    std::string sql = "INSERT INTO user_extent (id_user,centre_x,centre_y,zoom,name) VALUES ("+id+","+cx+","+cy+","+z+",'"+n+"')";
+    std::cout << sql << std::endl;
+    sqlite3_exec(db_, sql.c_str(),NULL,NULL,NULL);
+
+    closeConnection();
+    loadExtents(id);
+}
+
+void groupLayers::deleteExtent(std::string id){
+    openConnection();
+
+    std::string sql = "DELETE FROM user_extent WHERE id="+id;
+    std::cout << sql << std::endl;
+    sqlite3_exec(db_, sql.c_str(),NULL,NULL,NULL);
+
+    closeConnection();
+    loadExtents(id);
 }

@@ -1,6 +1,7 @@
 #ifndef GROUPLAYERS_H
 #define GROUPLAYERS_H
 
+#pragma once
 #include <Wt/WContainerWidget.h>
 #include <Wt/WTabWidget.h>
 #include <Wt/WStackedWidget.h>
@@ -25,6 +26,10 @@
 #include "layerstatchart.h"
 #include "Wt/WFileResource.h"
 #include "./libzippp/src/libzippp.h"
+#include <sqlite3.h>
+#include <string.h>
+
+#include "auth.h"
 
 class WOpenLayers;
 class Layer;
@@ -52,6 +57,7 @@ extern bool ModeExpert;
 
 bool cropIm(std::string inputRaster, std::string aOut, OGREnvelope ext);
 
+
 class selectLayers : public WContainerWidget{
 public:
     selectLayers(Wt::WContainerWidget * aParent, std::vector<Layer*> aVpLs,int aMax):mParent(aParent),mVpLs(aVpLs),nbMax(aMax){}
@@ -68,6 +74,8 @@ public:
         }
         return aRes;
     }
+
+
 protected: // les classes qui héritent peuvent avoir accès
 
     // une map qui permet de lister les couches selectionnées.
@@ -114,7 +122,7 @@ private:
 class groupLayers: public WContainerWidget
 {
 public:
-    groupLayers(cDicoApt * aDico,WOpenLayers * aMap, Wt::WApplication* app,stackInfoPtr * aStackInfoPtr);
+    groupLayers(cDicoApt * aDico,WOpenLayers * aMap, AuthApplication* app,stackInfoPtr * aStackInfoPtr);
     //~groupLayers();
     /*groupLayers(const groupLayers &gl){
         std::cout << "construct by copy group layer -- should never happend\n\n\n" << std::endl;
@@ -162,7 +170,7 @@ public:
 
     Wt::WProgressBar *mPBar;
     // pour faire un processEvent, seul moyen de refresh de la progressbar.
-    Wt::WApplication* m_app;
+    AuthApplication* m_app;
 
     std::vector<layerStatChart*> ptrVLStat() {return mVLStat;}
 
@@ -177,9 +185,24 @@ public:
     std::map<std::vector<std::string>,Layer*> getSelectedLayer4Download(){return mSelect4Download->getSelectedLayer();}
     std::map<std::vector<std::string>,Layer*> getAllLayer(){return mSelect4Download->getAllLayer();}
     std::vector<Layer *> mVLs;
+    void closeConnection();
+    int openConnection();
+    void loadExtents(std::string id);
 
     // pour changer le curseur quand on clique - public pour avoir accès depuis parcellaire
     WOpenLayers * mMap;
+
+    // gestion de la légende de la carte
+    void updateLegende(const Layer * l);
+    Wt::WContainerWidget * mLegendDiv;
+    Wt::WContainerWidget * mExtentDiv;
+    Wt::WLineEdit * tb_extent_name;
+    Wt::WText * mTitle;
+    Wt::WTable * mLegendIndiv;
+    stackInfoPtr * mStackInfoPtr;
+
+    void saveExtent(double c_x, double c_y, double zoom);
+    void deleteExtent(std::string id);
 private:
     TypeClassifST mTypeClassifST;
     std::string currentClassifST; // 2 modes de classification des stations forestières ; FEE et CS
@@ -191,8 +214,8 @@ private:
     //Wt::WTable                 *mClassifTable;
     //Wt::WTable                 *mOtherTable;
     legend * mLegend;
+    sqlite3 *db_;
 
-    stackInfoPtr *  mStackInfoPtr;
     // bof finalement c'est mieux le conteneur parent
     Wt::WContainerWidget     * mParent;
 
@@ -216,6 +239,10 @@ private:
         mMapExtent.MinY=bottomY;
         std::cout << "updateMapExtent grouplayer" << std::endl;
     }
+
+    JSlot slot_extent;
+    JSignal<double, double, double>& getMapCenterSignal(){return mapExtent2_; }
+    JSignal<double, double, double>  mapExtent2_;
 };
 
 #endif // GROUPLAYERS_H

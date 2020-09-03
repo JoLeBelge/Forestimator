@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="UTF8"?>
-<messages>
-
+<messages xmlns:if="Wt.WTemplate.conditions"
+	  nplurals="2"
+	  plural="n == 1 ? 0 : 1">
+<!-- Note : certain message doivent être devant car sinon ils n'overload pas celui de base en anglais... -->
+  
+      
+  
+  
+  
 <message id="infoTelechargement">
 Plusieurs possibilités vous sont proposées. Vous avez la possibilité de télécharger votre shapefile précédemment chargé via l'onget "Plan d'Aménagement". Les statistiques calculées pour les couches (exemple ; couches d'aptitude) seront disponibles dans la table d'attribut. Vous avez la possibilité de téléchargement les couches raster pour uniquement sur l'étendue de votre zone d'intérêt, c'est-à-dire l'emprise du shapefile que vous avez chargé. Vous pouvez également télécharger les couches raster sur l'ensemble de la Région Wallonne, mais la taille des fichiers sera conséquente.
 </message>
@@ -36,19 +43,22 @@ Vous pouvez télécharger les cartes listées ci-dessous qui seront découpées 
 <message id="toolTipActiveLayer">Cliquez sur l'onglet légende pour visualiser la signification des couleurs pour cette carte. </message>
 
 <message id="legendMsg"><i>Aucune légende à afficher pour l'instant. Veuillez d'abord sélectionner une couche ou cliquer sur une station pour afficher sa description...</i> </message>
-
 <message id="legendTitre"><h3>Légende de la carte :</h3> </message>
+<message id="legendCheckbox">Afficher la légende</message>
 
-<message id="coucheStep1"><h3>1 : Sélectionner une thématique</h3> </message>
-<message id="coucheStep2"><h3>2 : Définir une zone d'intérêt</h3> </message>
-<message id="coucheStep3"><h3>3 : Exporter la couche thématique</h3></message>
+<message id="coucheStep1"><h3>1 : Sélectionner une couche</h3> </message>
+<message id="coucheStep2"><h3>2 : Sélectionner une zone d'intérêt</h3> </message>
+<message id="coucheStep3"><h3>3 : Exporter l'extrait de la couche thématique</h3></message>
+<message id="afficher_extent">Emprises...</message>
+<message id="sauver_extent">Enregistrer</message>
+<message id="extent_del_comfirm">Voulez-vous supprimer cette emprise ?</message>
 
 <message id="anaStep1"><h3>1 : Sélectionner une couche de référence</h3></message>
 <message id="anaStep2"><h3>2 : Sélectionner l'analyse</h3></message>
 <message id="anaStep3"><h3>3 : Excécuter l'analyse</h3></message>
 <message id="anaStep4"><h3>4 : Exporter le résultat</h3></message>
 
-<!-label dans le treelist de couches ->
+<!--label dans le treelist de couches -->
 <message id="groupeCoucheAll">Couches</message>
 <message id="groupeCoucheThem">Conditions stationnelles</message>
 <message id="groupeCouchePeup">Cartographie des peuplements</message>
@@ -65,11 +75,236 @@ Vous pouvez télécharger les cartes listées ci-dessous qui seront découpées 
 <message id="LoadingI3">Découpage de la carte selectionnée sur l'emprise actuelle</message>
 <message id="LoadingI4">Découpage de(s) carte(s) sur l'emprise du parcellaire</message>
 
+<message id="page_presentation">
+<div class="form">
+  <p>
+    <h3>Presentation de Forestimator et explication des outils</h3>
+  </p>
+  <p>
+    <h4>Page Cartographie</h4>
+  </p>
+  	<p>bla lba lbal</p><p>bla bal la</p>
+  <h4>Page Analyse</h4>
+	<p>bla bla balb lab</p>
+	<p>azdk aoze oazd</p>
+</div>
+</message>
 
 
+<message id="bouton_retour_parcelaire"><div class="bouton_retour">${retour class="btn-info"}</div></message>
+
+<message id="Wt.WMessageBox.Cancel">Annuler</message>
+
+  <message id="Wt.Auth.passwdqc.reason-short">
+    Trop court
+  </message>
+  <message id="Wt.Auth.passwdqc.reason-long">
+    Trop long
+  </message>
+  <message id="Wt.Auth.passwdqc.reason-simpleshort">
+    Pas assez de caractères différents ou spéciaux pour cette longueur
+  </message>
+  <message id="Wt.Auth.passwdqc.reason-simple">
+    Pas assez de caractères différents ou spéciaux
+  </message>
+  <message id="Wt.Auth.passwdqc.reason-personal">
+    Basé sur des informations personelles
+  </message>
+  <message id="Wt.Auth.passwdqc.reason-word">
+    Basé sur un mot du dictionaire
+  </message>
+  <message id="Wt.Auth.passwdqc.reason-seq">
+    Mot de passe trop basique
+  </message>
+
+<!-- LoginWidget -->
+
+  <message id="Wt.Auth.login-form-title">Connexion</message>
+  <message id="Wt.Auth.login-form-info"></message>
+  <message id="Wt.Auth.user-name">Nom d'utilisateur</message>
+  <message id="Wt.Auth.user-name-info">Entrer votre nom d'utilisateur</message>
+  <message id="Wt.Auth.user-name-invalid">Invalide</message>
+  <message id="Wt.Auth.email">Adresse email</message>
+  <message id="Wt.Auth.email-info">Entrer votre adresse email</message>
+  <message id="Wt.Auth.optional-email-info">
+    Entrer votre adresse email (optionel)
+  </message>
+  <message id="Wt.Auth.password">Mot de passe</message>
+  <message id="Wt.Auth.password-info">Entrer votre mot de passe</message>
+  <message id="Wt.Auth.remember-me">Se souvenir de moi</message>
+  <message id="Wt.Auth.remember-me-info.days">
+    <plural case="0">Keeps login for one day</plural>
+    <plural case="1">Keeps login for {1} days</plural>
+  </message>
+  <message id="Wt.Auth.login">Connexion</message>
+  <message id="Wt.Auth.remember-me-info.weeks">
+    <plural case="0">Keeps login for one week</plural>
+    <plural case="1">Rester connecté pendant {1} semaines</plural>
+  </message>
+  <message id="Wt.Auth.lost-password">Mot de passe oublié ?</message>
+  <message id="Wt.Auth.register">S'inscrire</message>
+  
+  <message id="Wt.Auth.logout">Se déconnecter</message>
+  <message id="Wt.Auth.throttle-retry">Re-essayer dans {1}s</message>
+
+  <!-- RegistrationWidget -->
+
+  <message id="Wt.Auth.registration-form-title">Inscription</message>
+  <message id="Wt.Auth.registration-form-info">Veuillez compléter les informations pour vous enregistrer.</message>
+  <message id="Wt.Auth.password-registration">S'enregistrer avec un nom d'utilisateur et un mot de passe :</message>
+  <message id="Wt.Auth.oauth-registration">Register with an identity provider:</message>
+  <message id="Wt.Auth.or-oauth-registration">Or, register with an identity provider:</message>
+  <message id="Wt.Auth.valid">Valide</message>
+  <message id="Wt.Auth.choose-password">Choisir un mot de passe</message>
+  <message id="Wt.Auth.choose-password-info">Choisir un mot de passe</message>
+  <message id="Wt.Auth.repeat-password">Répéter le mot de passe</message>
+  <message id="Wt.Auth.repeat-password-info">Répéter le mot de passe</message>
+  <message id="Wt.Auth.email-invalid">Adresse email invalide</message>
+  <message id="Wt.Auth.email-exists">Adresse email déjà utilisée</message>
+  <message id="Wt.Auth.oauth">Your external account</message>
+  <message id="Wt.Auth.oauth-info">Choose one of your accounts</message>
+  <message id="Wt.Auth.user-name-exists">Ce nom d'utilisateur existe déjà</message>
+  <message id="Wt.Auth.confirm-is-you">Ce nom d'utilisateur existe déjà, est-ce vous?</message>
+  <message id="Wt.Auth.user-name-tooshort">Nombre de caractères min. {1}</message>
+  <message id="Wt.Auth.password-tooshort">Nombre de caractères min. {1}</message>
+  <message id="Wt.Auth.passwords-dont-match">Les mots de passes sont différents</message>
+  <message id="Wt.Auth.registration">Inscription</message>
+
+  <message id="Wt.Auth.error-user-invalid">Inscription échouée.</message>
+  <message id="Wt.Auth.email-unverified">Veuillez comfirmer votre compte via l'email envoyé.</message>
+  <message id="Wt.Auth.confirm-email-first">
+    <h5>Bienvenue!</h5>
+
+    Voius pourez vous connecter dès que vous aurez validé votre compte via l'email que nous vous avons envoyé !
+  </message>
+
+  <!-- PasswordPromptDialog -->
+
+  <message id="Wt.Auth.enter-password">Entrer votre mot de passe</message>
+  <message id="Wt.Auth.password-prompt-form-title">Entrer votre mot de passe</message>
+  <message id="Wt.Auth.password-prompt-form-info"></message>
+  <message id="Wt.Auth.password-invalid">Mot de passe invalide</message>
+
+  <!-- UpdatePasswordWidget -->
+
+  <message id="Wt.Auth.updatepassword">Modifier le mot de passe</message>
+  <message id="Wt.Auth.update-password-form-title">Modifier le mot de passe</message>
+  <message id="Wt.Auth.update-password-form-info">Entrer un nouveau mot de passe ci-dessous</message>
+
+  <!-- LostPasswordDialog -->
+
+  <message id="Wt.Auth.lostpassword">Vous avez oublié votre mot de passe ?</message>
+  <message id="Wt.Auth.lost-password-form-title">Récupérer votre mot de passe</message>
+  <message id="Wt.Auth.lost-password-form-info">Veuillez entrer votre adresse email pour recevoir les instructions pour récupérer votre mot de passe.</message>
+  <message id="Wt.Auth.send">Envoyer</message>
+
+  <!-- Message boxes -->
+
+  <message id="Wt.Auth.error">Erreur</message>
+  <message id="Wt.Auth.notice">Notice</message>
+
+  <!-- Emails -->
+
+  <message id="Wt.Auth.confirmmail.subject">Forestimator : Activation de votre compte</message>
+
+  <message id="Wt.Auth.confirmmail.body">
+Bonjour {1},
+
+Merci de vous être enregistré sur le site web Forestimator.
+
+Pour terminer votre inscription, vous devez activer votre compte en cliquant sur le lien ci-dessous ou en faisant un copier-coller du lien dans votre navigateur.
+ 
+{3}
 
 
+A bientôt sur http://forestimator.gembloux.ulg.ac.be
+  </message>
+
+  <message id="Wt.Auth.confirmmail.htmlbody">
+    <h3>Bonjour {1},</h3>
+
+    <p>Merci de vous être enregistré sur le site web Forestimator.</p>
+
+    <p>Pour terminer votre inscription, vous devez activer votre compte en cliquant sur le lien ci-dessous ou en faisant un copier-coller du lien dans votre navigateur.</p>
+ 
+    <p>Lien d'activation : <a href="{3}">cliquer ici pour activer votre compte</a></p>
+    
+    <b>{3}</b>
+
+	<p>A bientôt sur <a href="http://forestimator.gembloux.ulg.ac.be/">Forestimator</a></p>
+  </message>
+
+  <message id="Wt.Auth.lostpasswordmail.subject">Forestimator : récupération de mot de passe</message>
+
+  <message id="Wt.Auth.lostpasswordmail.body">
+Bonjour {1},
+
+This mail has been sent to you, because someone (presumably you?)
+indicated that he wishes to choose a new password, because the current
+password escapes his mind.
+
+If you requested this, then choose a new password by clicking on the
+following link or copying the URL into your browser. If you didn't
+request this, you can safely ignore and discard this email.
+ 
+Please copy and paste the following URL into your browser: (Note: be
+sure to copy the entire URL, including any part of it which goes onto
+a second line.)
+ 
+{3} 
 
 
+  </message>
+
+  <message id="Wt.Auth.lostpasswordmail.htmlbody">
+    <h3>Hello {1},</h3>
+
+    <p>This mail has been sent to you, because someone (presumably
+    you?)  indicated that he wishes to choose a new password, because
+    the current password escapes his mind.</p>
+
+    <p>If you requested this, then choose a new password by clicking
+    on the following link or copying the URL into your browser. If you
+    didn't request this, you can safely ignore and discard this
+    email.</p>
+ 
+    <p>Please <a href="{3}">click here to choose a new password</a> or
+    copy and paste the following URL into your browser: <i>(Note: be
+    sure to copy the entire URL, including any part of it which goes
+    onto a second line.)</i></p>
+    
+    <b>{3}</b>
+
+  </message>
+  <message id="Wt.Auth.template.login">
+    <div class="span8 offset2 Wt-auth-login">
+      <legend>${tr:Wt.Auth.login-form-title}</legend>
+      <p>${tr:Wt.Auth.login-form-info}</p>
+
+      <div class="form-horizontal">
+	${<if:passwords>}
+	  ${block:Wt.Auth.field2 user-name user-name-label}
+	  ${block:Wt.Auth.field password}
+	  ${block:Wt.Auth.field remember-me}
+	${</if:passwords>}
+
+	${<if:oauth>}
+	  <div class="control-group">
+	    <div class="controls">
+	      <p>Or login using:</p>
+	      ${icons}
+	    </div>
+	  </div>
+	${</if:oauth>}
+
+	<div class="form-actions">
+	  <p>${login class="btn-primary"}</p>
+	  <p>${lost-password class="btn-link"} ${sep}
+	  ${register class="btn-link"}</p>
+	  <p><button class="btn btn-info" onClick="$('.Wt-auth-login-container').removeClass('visible').addClass('nonvisible');">Annuler</button></p>
+	</div>
+      </div>
+    </div>
+  </message>
 
 </messages>

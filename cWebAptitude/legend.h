@@ -41,12 +41,12 @@ public:
     void titreInfoRaster();
     void add1InfoRaster(std::vector<std::string> aV);
     void detailCalculAptFEE(ST *aST);
-    void afficheLegendeIndiv(const Layer *l);
+    //void afficheLegendeIndiv(const Layer *l);
     void afficheAptAllEss();
-    Wt::WText				   *mTitle;
+
     Wt::WTable                 *mInfoT;
     Wt::WTable                 *mDetAptFEE;
-    Wt::WTable                 *mLegendIndiv;
+
     Wt::WTable                 *mAptAllEss;
 
     Wt::WContainerWidget     * mParent;

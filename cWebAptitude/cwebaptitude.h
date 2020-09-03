@@ -1,11 +1,13 @@
 #ifndef CWEBAPTITUDE_H
 #define CWEBAPTITUDE_H
-
+#pragma once
 #include <iostream>
 #include "grouplayers.h"
 #include "parcellaire.h"
 #include "uploadcarte.h"
 #include "stackinfoptr.h"
+#include "auth.h"
+//#include "main.h"
 #include <Wt/WContainerWidget.h>
 #include <Wt/WVBoxLayout.h>
 #include <Wt/WHBoxLayout.h>
@@ -28,14 +30,17 @@
 
 #include <Wt/WIntValidator.h>
 #include <Wt/WLineEdit.h>
-using namespace Wt;
 
-class cWebAptitude : public WContainerWidget
+//using namespace Wt;
+
+class AuthApplication;
+
+class cWebAptitude : public Wt::WContainerWidget
 {
 public:
   /*!\brief Instantiate a new form example.
    */
-  cWebAptitude(Wt::WApplication* app);
+  cWebAptitude(AuthApplication *app, Wt::Auth::AuthWidget* authWidget_);
 
   void handlePathChange();
   void login();//pour accès au mode expert
@@ -71,16 +76,18 @@ public:
 
   WOpenLayers * mMap;
 
-  WMenuItem * menuitem_presentation,* menuitem_carto, * menuitem_analyse;
-
-
+  //WMenuItem * menuitem_presentation,* menuitem_carto, * menuitem_analyse;
+  Wt::WNavigationBar * navigation;
   Wt::WStackedWidget * top_stack;// celui qui navige entre la page de garde (home), la page de présentation et les volets analyse/carto
   Wt::WStackedWidget * sub_stack;// celui qui navige entre la carte et la page de visu des résultats d'analyse sur un parcellaire
+  Wt::Auth::AuthWidget* authWidget;
+  Wt::WPushButton *b_login;
+  groupLayers * mGroupL;
 private:
   //std::map<std::string,cEss>  mMEss;
-  Wt::WApplication* m_app;
+  //Wt::WApplication* m_app;
+  AuthApplication * m_app;
   cDicoApt * mDico;
-
   stackInfoPtr * mStackInfoPtr;
 
   /*Wt::WTable                 *mClassifTable;
@@ -102,7 +109,7 @@ private:
  // Wt::Signal<std::string>& changeEss() { return changeEss_; }
  // Wt::Signal<std::string> changeEss_;
   //std::vector<WText *> essLabels_; // ce sont les labels qui sont dans le tableau
-    groupLayers * mGroupL;
+
     parcellaire * mPA;
     uploadCarte * mUpload;
 

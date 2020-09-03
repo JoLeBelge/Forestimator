@@ -53,7 +53,7 @@ h1 {
 h4 {
 	font-size: 1.5em;
 	line-height: 1.8;
-	border-top : 1px solid  #528B12;
+	//border-top : 1px solid  #528B12;
 	padding-bottom:0px;
 	margin-top:10px;
 	margin-bottom:0px;
@@ -80,7 +80,7 @@ h2 {
 	}
 	
 h3 {
-	background:#70BD1A right top;
+	//background:#70BD1A right top;
 	font-size: 1.6em;
 	font-weight:600;
 	//letter-spacing:2px;
@@ -91,7 +91,7 @@ h3 {
 	margin-bottom: 5px;
 	margin-top: 0px;
 	//margin:0px;
-	color: #FFFFFF;
+	//color: #FFFFFF;
     //height:52px;
 	display:block;
 	}		

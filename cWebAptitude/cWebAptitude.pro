@@ -9,7 +9,7 @@ CONFIG += c++11
 
 # la compilation sous debian avec gcc-8 m'a montré un bug dans la boucle de création des groupes écologiques. je spécifie donc que c'est avec le compilateur g++-7 qu'il faut compiler le soft
 # update ; maintenant le code est compatible avec gcc 5 et 9
-QMAKE_CC = gcc-7
+QMAKE_CC = gcc-9
 QMAKE_CXX = g++-9
 
 
@@ -45,6 +45,9 @@ DEPENDPATH += $$PWD/libzipp/src/
 }
 
 SOURCES += main.cpp \
+    Session.cpp \
+    User.cpp \
+    auth.cpp \
     wopenlayers.cpp \
     cwebaptitude.cpp \
     ../carteApt/cdicoapt.cpp \
@@ -59,6 +62,10 @@ SOURCES += main.cpp \
     stackinfoptr.cpp
 
 HEADERS += \
+    Session.h \
+    User.h \
+    auth.h \
+    main.h \
     wopenlayers.h \
     cwebaptitude.h \
     ../carteApt/cdicoapt.h \

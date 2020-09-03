@@ -312,7 +312,7 @@ var _view = new ol.View({
 	projection: projection,	
 	center: [217200, 50100],//epioux
 	extent: extent,
-	zoom: 7,
+	zoom: 9,
 	minZoom: 0,
 	maxZoom: 10
 })
@@ -371,8 +371,13 @@ map.addInteraction(selectAltClick);
 /**
  * Add a click handler to hide the popup.
  * @return {boolean} Don't follow the href.
+<<<<<<< Updated upstream
  */ 
 // pas bonne compatibilité tablette car le touch sur le closer va questionner la carte sur la station ou on clique, mm si en dessous du popup.
+=======
+ */
+ // pas bonne compatibilité tablette car le touch sur le closer va questionner la carte sur la station ou on clique, mm si en dessous du popup.
+>>>>>>> Stashed changes
 closer.onclick = function() {
   overlay.setPosition(undefined);
   closer.blur();

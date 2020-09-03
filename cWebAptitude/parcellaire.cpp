@@ -116,7 +116,7 @@ parcellaire::~parcellaire(){
     mCB_fusionOT=NULL;
 }
 
-void   parcellaire::cleanShpFile(){
+void parcellaire::cleanShpFile(){
     //std::cout << "clean shp files ..." ;
     std::vector<boost::filesystem::path> aFiles;
     // supprime les éventuels fichiers shp chargé
@@ -422,6 +422,12 @@ void parcellaire::visuStat(std::string aTitle){
     mStatW->clear();
     //std::cout << " done... " ;
     mStatW->setOverflow(Wt::Overflow::Auto);
+
+    // bouton retour
+    auto * tpl = mStatW->addWidget(cpp14::make_unique<Wt::WTemplate>(tr("bouton_retour_parcelaire")));
+    WPushButton * retour = tpl->bindWidget("retour", Wt::cpp14::make_unique<WPushButton>("Retour"));
+    retour->setLink(WLink(LinkType::InternalPath, "/analyse"));
+
     // un set layout dans un widget qui a déjà un layout en parent, ça peut être bien (cas de page1 ; comportement voulu) ou pas (page2 aka statW ; pas bien)
     // je crée un containeur qui contiendra la page et ça regle mon problème
     Wt::WContainerWidget *cont = mStatW->addNew<Wt::WContainerWidget>();

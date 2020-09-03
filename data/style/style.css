@@ -9,33 +9,56 @@
 	margin:10px;
 }
 
+.carto_menu{
+	background-image: url('../resources/DJI_0497_navbar.JPG');
+	background-size: cover;
+}
 .carto_menu a{
 	text-decoration: none;
 }
 .carto_menu span{
-	font-size: medium;
+	font-size: larger;
 }
+.navbar-default .navbar-brand a:hover{
+    color: white;	
+}
+.navbar-default .navbar-brand span:hover{
+    color: white;	
+}
+.navbar-default .navbar-brand {
+    color: white;
+}
+.navbar-default .navbar-nav li a {
+    padding: 0px 0px 1px 0px;
+	margin: 0;
+}
+.navbar-right{
+	margin-bottom: -6px;
+}
+
 .tree_left{
 	text-align:left;
-	border: solid;
+	/*border: solid;
 	border-width: thin;
-	border-color: #76cc76;
+	border-color: #76cc76;*/
 }
 .tree_node{
 	font-weight: bold;
 }
-
+.visible{
+	display:block;
+}
 .nonvisible{
 	display:none;
 }
 .logo_left{
 	float:left;
-    top: 20px;
+    top: 38px;
 	position: relative;
 }
 .logo_right{
 	float:right;
-    top: 20px;
+    top: 38px;
 	position: relative;
 }
 .div_4stat{
@@ -119,4 +142,50 @@ margin-left: -50px; margin-top: -40px;
 width: 150px; height: 150px;
 font-family: arial,sans-serif;
 text-align: center
+}
+
+
+
+.Wt-auth-login-container
+{
+	//display: none;
+	position: absolute;
+	z-index: 1;
+	top: 200px;
+	float: right;
+	width: 100%;
+}
+.Wt-auth-login{
+	width: 50%;
+	background-color: white; //#d8ecd6;
+	max-width: 600px;
+	margin: auto;
+	padding-left: 15px;
+	padding-right: 15px;
+	border: green solid 1px;
+}
+
+input[type="checkbox"] {
+  margin: 0;
+}
+
+
+.bouton_retour{
+	float:right;
+	position:absolute;
+	top: 15px;
+}
+
+.div_extent{
+	background-color: #eeeeee;
+	margin:5px 15px 0px 15px;
+}
+.extent_inline{
+	display:inline;
+}
+.extent_margin{
+	margin: 0px 0px 0px 5px;
+}
+.navbar-nav .active a{
+	padding-bottom: 1px;
 }

@@ -357,13 +357,14 @@ span.Wt-disabled, fieldset.Wt-disabled legend {
  */
 .Wt-icon {
     display: inline-block;
-    margin-right: 8px;
+    margin: 5px;
     background-repeat: no-repeat;
     background-position: center left;
-    width: 16px;
-    height: 16px;
+    width: 40px;
+    height: 40px;
     line-height: 16px;
     vertical-align: text-top;
+    background-size: cover;
 }
 
 .Wt-chkbox {
