@@ -7,7 +7,7 @@
 
   AuthApplication::AuthApplication(const Wt::WEnvironment& env)
     : Wt::WApplication(env),
-      session_(appRoot() + "auth.db")
+      session_(docRoot() + "/auth.db")
   {
     setTitle("Forestimator");
     // thème bootstrap 3
