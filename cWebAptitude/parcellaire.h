@@ -14,6 +14,7 @@
 #include <Wt/WGridLayout.h>
 #include "Wt/WFileResource.h"
 #include "Wt/WLoadingIndicator.h"
+#include "statwindow.h"
 
 #include "boost/filesystem.hpp"
 #include <functional> //--> pour bind
@@ -26,7 +27,7 @@ using namespace libzippp;
 class parcellaire: public WContainerWidget
 {
 public:
-    parcellaire(WContainerWidget *parent, groupLayers * aGL, Wt::WApplication* app,WContainerWidget * statW);
+    parcellaire(WContainerWidget *parent, groupLayers * aGL, Wt::WApplication* app,statWindow * statW);
     ~parcellaire();
     void cleanShpFile();
     // conversion shp esri vers geoJson
@@ -39,7 +40,7 @@ public:
     // rasterize une géométrie
     //void rasterizeGeom(OGRGeometry *poGeom);
     void computeStat();
-    void visuStat(std::string aTitle);
+    void visuStat(OGRFeature *poFeature);
     void upload();
     void clickUploadBt();
     void fuChanged();
@@ -67,8 +68,8 @@ private:
     std::string mFullPath, mName,mClientName;
     std::string mJSfile;
     Wt::WContainerWidget     * mParent;
-     Wt::WContainerWidget     * mContSelect4D, * mContSelect4Stat;
-    Wt::WContainerWidget * mStatW;
+    Wt::WContainerWidget     * mContSelect4D, * mContSelect4Stat;
+    statWindow * mStatW;
     Wt::WFileUpload *fu;
     Wt::WPushButton *uploadButton,*computeStatButton, *visuStatButton, *downloadShpBt, *downloadRasterBt;
     Wt::WApplication* m_app;
@@ -76,10 +77,12 @@ private:
     groupLayers * mGL;
     cDicoApt  * mDico;
     double centerX,centerY;
+    OGREnvelope mParcellaireExtent;
     bool hasValidShp;
     OGRGeometry *poGeomGlobale;
     //Wt::Signal<int> page_;
     //Wt::WStackedWidget * mTopStack;
+
 
     Wt::WCheckBox *mCB_fusionOT;
 

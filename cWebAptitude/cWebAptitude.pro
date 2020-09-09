@@ -59,7 +59,8 @@ SOURCES += main.cpp \
     uploadcarte.cpp \
     libzippp/src/libzippp.cpp \
     ecogrammeEss.cpp \
-    stackinfoptr.cpp
+    stackinfoptr.cpp \
+    statwindow.cpp
 
 HEADERS += \
     Session.h \
@@ -77,4 +78,5 @@ HEADERS += \
     uploadcarte.h \
     libzippp/src/libzippp.h \
     ecogrammeEss.h \
-    stackinfoptr.h
+    stackinfoptr.h \
+    statwindow.h

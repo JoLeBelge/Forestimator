@@ -212,8 +212,10 @@ void groupLayers::computeStatGlob(OGRGeometry *poGeomGlobale){
         // c'est parcellaire:: qui doit gerer l'affichage des layerStatChart
         //layerStatChart* aLayStatChart=new layerStatChart(l,stat,aMode);
         //mVLStat.emplace_back(aLayStatChart);
-        mVLStat.push_back(new layerStatChart(l,stat,aMode));
-        //aRes.emplace(std::make_pair(l->getCode(),stat));
+        //OGREnvelope env;
+        //poGeomGlobale->getEnvelope(&env);
+        mVLStat.push_back(new layerStatChart(l,stat,aMode,poGeomGlobale));
+
         mPBar->setValue(mPBar->value() + 1);
         m_app->processEvents();
     }

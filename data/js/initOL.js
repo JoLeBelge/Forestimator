@@ -317,7 +317,6 @@ var _view = new ol.View({
 	maxZoom: 10
 })
 
-
 // create map here
 
 map = new ol.Map({

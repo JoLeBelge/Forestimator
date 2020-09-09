@@ -27,6 +27,7 @@
 //#include <boost/range/adaptor/map.hpp>
 //#include <boost/range/adaptors.hpp>
 //#include <boost/foreach.hpp>
+#include "statwindow.h"
 
 #include <Wt/WIntValidator.h>
 #include <Wt/WLineEdit.h>

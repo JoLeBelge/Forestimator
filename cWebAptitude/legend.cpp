@@ -45,7 +45,6 @@ void legend::createUI()
     mInfoT->setWidth(Wt::WLength("90%"));
     mInfoT->toggleStyleClass("table-striped",true);
 
-
 }
 
 void legend::vider()

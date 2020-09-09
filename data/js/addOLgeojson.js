@@ -11,7 +11,8 @@ parcellaire = new ol.layer.Vector({
     fill: new ol.style.Fill({
       color: 'rgba(0, 0, 255, 0.1)'
     })
-	  })
+	  }),
+	extent: [MINX,MINY,MAXX,MAXY],
 });
 
 // c'est pas correct, car si c'est la carte IGN qui est visible mais que la couche apt2 a été défine auparavent, ça ne va pas afficher la carte IGN.
@@ -26,3 +27,4 @@ parcellaire = new ol.layer.Vector({
 
 map.setLayerGroup(groupe);
 //lays4select=[parcellaire];
+

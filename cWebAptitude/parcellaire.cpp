@@ -5,7 +5,7 @@ int globSurfMax(2500);// en ha
 int globVolMaxShp(5000);// en ko
 //https://www.quora.com/What-are-the-risks-associated-with-the-use-of-lambda-functions-in-C-11
 
-parcellaire::parcellaire(WContainerWidget *parent, groupLayers *aGL, Wt::WApplication* app, WContainerWidget *statW):mParent(parent),mGL(aGL),centerX(0.0),centerY(0.0),mClientName(""),mJSfile(""),mName(""),mFullPath(""),m_app(app),fu(NULL),msg(NULL),uploadButton(NULL)
+parcellaire::parcellaire(WContainerWidget *parent, groupLayers *aGL, Wt::WApplication* app, statWindow *statW):mParent(parent),mGL(aGL),centerX(0.0),centerY(0.0),mClientName(""),mJSfile(""),mName(""),mFullPath(""),m_app(app),fu(NULL),msg(NULL),uploadButton(NULL)
   //,mTopStack(aTopStack)
   ,computeStatButton(NULL)
   ,visuStatButton(NULL)
@@ -261,19 +261,15 @@ bool parcellaire::computeGlobalGeom(OGRLayer * lay){
             //std::ofstream out("/home/lisein/Documents/carteApt/Forestimator/build-WebAptitude/tmp/test.geojson");
             //out << poGeom->exportToJson();
             //out.close();
-            OGRPoint * aPt=NULL;
+            /*OGRPoint * aPt=NULL;
             err = poGeomGlobale->Centroid(aPt);
             if (err!=OGRERR_NONE){
                 std::cout << "problem avec le calcul du centroid, erreur : " << err <<  std::endl;
-                OGREnvelope ext;
-                poGeomGlobale->getEnvelope(&ext);
-                centerX= (ext.MaxX+ext.MinX)/2;
-                centerY= (ext.MaxY+ext.MinY)/2;
-            } else {
+                */
+                poGeomGlobale->getEnvelope(&mParcellaireExtent);
+                centerX= (mParcellaireExtent.MaxX+mParcellaireExtent.MinX)/2;
+                centerY= (mParcellaireExtent.MaxY+mParcellaireExtent.MinY)/2;
 
-                centerX=aPt->getX();
-                centerY=aPt->getY();
-            }
             aRes=1;
 
         }
@@ -318,6 +314,13 @@ void parcellaire::display(){
         //std::cout << " do js script " << std::endl;
         */
         boost::replace_all(JScommand,aFind1,aReplace);
+
+        // extent du parcellaire
+        boost::replace_all(JScommand,"MAXX",std::to_string(mParcellaireExtent.MaxX));
+        boost::replace_all(JScommand,"MAXY",std::to_string(mParcellaireExtent.MaxY));
+        boost::replace_all(JScommand,"MINX",std::to_string(mParcellaireExtent.MinX));
+        boost::replace_all(JScommand,"MINY",std::to_string(mParcellaireExtent.MinY));
+
         mParent->doJavaScript(JScommand);
         // centrer la map sur le shp
         mParent->doJavaScript("map.getView().setCenter(["+std::to_string(centerX)+","+std::to_string(centerY)+" ]);");
@@ -415,58 +418,26 @@ void parcellaire::computeStat(){
     std::cout << " ..done " << std::endl;
 }
 
-void parcellaire::visuStat(std::string aTitle){
+void parcellaire::visuStat(OGRFeature *poFeature){
     std::cout << " parcellaire::visuStat()... " ;
     mGL->mPBar->setValue(0);
-    //std::cout << " CLEAR  mStaW... " ;
-    mStatW->clear();
-    //std::cout << " done... " ;
-    mStatW->setOverflow(Wt::Overflow::Auto);
+    mStatW->vider();
+    mStatW->titre("<h4>Statistique pour polygone FID " + std::to_string(poFeature->GetFID()) + " de " + mClientName+ "</h4>");
 
-    // bouton retour
-    auto * tpl = mStatW->addWidget(cpp14::make_unique<Wt::WTemplate>(tr("bouton_retour_parcelaire")));
-    WPushButton * retour = tpl->bindWidget("retour", Wt::cpp14::make_unique<WPushButton>("Retour"));
-    retour->setLink(WLink(LinkType::InternalPath, "/analyse"));
-
-    // un set layout dans un widget qui a déjà un layout en parent, ça peut être bien (cas de page1 ; comportement voulu) ou pas (page2 aka statW ; pas bien)
-    // je crée un containeur qui contiendra la page et ça regle mon problème
-    Wt::WContainerWidget *cont = mStatW->addNew<Wt::WContainerWidget>();
-    // premier lay pour mettre titre et boutton de "retour"
-    Wt::WVBoxLayout * layout =  cont->setLayout(Wt::cpp14::make_unique<Wt::WVBoxLayout>());
-    //Wt::WVBoxLayout * layout = mStatW->setLayout(Wt::cpp14::make_unique<Wt::WVBoxLayout>());
-    auto contTitre = Wt::cpp14::make_unique<Wt::WContainerWidget>();
-    WContainerWidget * contTitre_ = contTitre.get();
-    contTitre->addWidget(cpp14::make_unique<WText>(aTitle));
-    //Wt::WPushButton * retourButton = contTitre_->addWidget(cpp14::make_unique<Wt::WPushButton>("Retour"));
-    //contTitre_->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
-    contTitre->addWidget(cpp14::make_unique<WText>(tr("infoDansVisuStat")));
-
-    auto contCharts = Wt::cpp14::make_unique<Wt::WContainerWidget>();
-    WContainerWidget * contCharts_ = contCharts.get();
-    Wt::WGridLayout * grid = contCharts_->setLayout(Wt::cpp14::make_unique<Wt::WGridLayout>());
-
-    int nbChart=mGL->ptrVLStat().size();
-    //std::cout << " nb Chart "<< nbChart << std::endl;
-    mGL->mPBar->setMaximum(nbChart);
-    int nbColumn=std::min(2,int(std::sqrt(nbChart)));
-    int row(0),column(0);
-    // mauvaise manière de boucler sur un pointer!!!
-    //for (layerStatChart * chart : mGL->ptrVLStat()) {
+    mStatW->generateGenCarte(poFeature);
     for (layerStatChart * chart : mGL->ptrVLStat()) {
-        std::cout << " row " << row << " , col " << column << std::endl;
         if (chart->deserveChart()){
-            grid->addWidget(std::unique_ptr<Wt::WContainerWidget>(chart->getChart()), row, column);
-            column++;
-            if (column>nbColumn){row++;column=0;}
+
+            if (chart->Lay()->Type()==TypeLayer::FEE | chart->Lay()->Type()==TypeLayer::CS){
+            mStatW->add1Aptitude(chart);
+            } else {
+            mStatW->add1layerStat(chart->getChart());
+
+            }
+
         }
-        mGL->mPBar->setValue(mGL->mPBar->value()+1);
-        mGL->m_app->processEvents();
+
     }
-    layout->addWidget(std::move(contTitre), 0);
-    layout->addWidget(std::move(contCharts), 0);
-    //std::cout << " change tostack index... " ;
-    //mTopStack->setCurrentIndex(1);
-    mGL->mPBar->setValue(0);
     std::cout << " ..done " << std::endl;
     m_app->setInternalPath("/resultat",true);
 }
@@ -506,7 +477,7 @@ void parcellaire::computeStatAndVisuSelectedPol(int aId){
         }
 
         GDALClose( DS );
-        if (find) {visuStat("<h4>Statistique pour polygone FID " + std::to_string(aId) + " de " + mClientName+ "</h4>");}
+        if (find) {visuStat(poFeature);}
         //mGL->mMap->decorationStyle().setCursor(Cursor::Auto);
     }
     m_app->loadingIndicator()->hide();

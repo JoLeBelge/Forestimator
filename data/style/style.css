@@ -189,3 +189,7 @@ input[type="checkbox"] {
 .navbar-nav .active a{
 	padding-bottom: 1px;
 }
+
+.statWindow{
+display:block;
+}

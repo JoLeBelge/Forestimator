@@ -64,6 +64,7 @@ private:
 class Layer
 {
 public:
+    Layer(std::string aCode,cDicoApt * aDico,TypeLayer aType);
     Layer(groupLayers * aGroupL, std::string aCode,WText * PWText,TypeLayer aType);
 
     // constructeur par copie et par déplacement ; indispensable si j'utilise les objets dans un vecteur. http://www-h.eng.cam.ac.uk/help/tpl/languages/C++/morevectormemory.html

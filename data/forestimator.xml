@@ -74,6 +74,8 @@ Vous pouvez télécharger les cartes listées ci-dessous qui seront découpées 
 <message id="LoadingI2">calcul des statistiques pour le parcellaire et ajout dans la table d'attribut</message>
 <message id="LoadingI3">Découpage de la carte selectionnée sur l'emprise actuelle</message>
 <message id="LoadingI4">Découpage de(s) carte(s) sur l'emprise du parcellaire</message>
+<message id="StatWTitreTabApt"><h4>Tableau des aptitudes des essences </h4></message>
+
 
 <message id="page_presentation">
 <div class="form">

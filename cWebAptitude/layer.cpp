@@ -1,5 +1,65 @@
 #include "layer.h"
 
+// j'ai besoin d'un objet layer pour faire des cartes statiques dans la fenetre pour les stat, mais ces objets sont totalement lié à groupLayer ET à un WText, donc sont encombrant. Je crée un constructeur "allégé" pour une utilisation plus souple
+Layer::Layer(std::string aCode,cDicoApt * aDico,TypeLayer aType):
+    mDico(aDico)
+  ,mGroupL(NULL)
+  ,mCode(aCode)
+  ,mText(NULL)
+  ,mType(aType)
+  ,mDicoVal(NULL)
+  ,mRI(NULL)
+  ,mEss(NULL)
+  ,mKK(NULL)
+  ,mTypeVar(TypeVar::Classe){
+
+    switch (mType) {
+    case TypeLayer::FEE:
+        // construction de l'essence
+        mEss=new cEss(mCode,mDico);
+        mLabel=mEss->Code() + " - "+ mEss->Nom();
+        //mText->setText(mLabel);
+        mDicoVal=mDico->code2AptFull();
+        mDicoCol=mDico->codeApt2col();
+        break;
+    case TypeLayer::CS:
+        // construction de l'essence
+        mEss=new cEss(mCode,mDico);
+        mLabel=mEss->Code() + " - "+ mEss->Nom();
+        //mText->setText(mLabel);
+        mDicoVal=mDico->code2AptFull();
+        mDicoCol=mDico->codeApt2col();
+        break;
+    case TypeLayer::KK:
+        // construction de la caractéristique stationnelle
+        mKK=new cKKCS(mCode,mDico);
+        mLabel= "Catalogue de Station - "+ mKK->Nom();
+        //mText->setText(mLabel);
+        mPathTif=mKK->NomCarte();
+        mDicoVal=mKK->getDicoValPtr();
+        mDicoCol=mKK->getDicoCol();
+        break;
+    case TypeLayer::Thematique:
+        // creation de l'objet cRasterInfo
+        mRI= new cRasterInfo(mCode,mDico);
+        mLabel= mRI->Nom();
+        //mText->setText(mLabel);
+        mPathTif=mRI->NomCarte();
+        mDicoVal=mRI->getDicoVal();
+        mDicoCol=mRI->getDicoCol();
+        mTypeVar=mRI->getTypeVar();
+        mType=mRI->getCatLayer();
+        break;
+    case TypeLayer::Externe:
+        if (mCode=="IGN"){
+            mLabel="Carte topographique IGN";
+            //mText->setText(mLabel);
+            mPathTif="";
+        }
+    }
+
+}
+
 Layer::Layer(groupLayers * aGroupL, std::string aCode, WText *PWText, TypeLayer aType):
     mDico(aGroupL->Dico())
   ,mGroupL(aGroupL)
