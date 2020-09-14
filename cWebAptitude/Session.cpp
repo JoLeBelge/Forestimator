@@ -29,7 +29,21 @@ void Session::configureAuth()
   verifier->addHashFunction(cpp14::make_unique<Auth::BCryptHashFunction>(7));
   myPasswordService.setVerifier(std::move(verifier));
   myPasswordService.setAttemptThrottlingEnabled(true);
-  myPasswordService.setStrengthValidator(cpp14::make_unique<Auth::PasswordStrengthValidator>());
+  //myPasswordService.setStrengthValidator(cpp14::make_unique<Auth::PasswordStrengthValidator>());
+
+  // paramètrer le validateur de password
+
+  std::unique_ptr<Auth::PasswordStrengthValidator> validator= cpp14::make_unique<Auth::PasswordStrengthValidator>();
+  /* Relax these a bit -- it's not the main point of this example */
+  //validator->setMinimumPassPhraseWords(Wt::Auth::PasswordStrengthValidator::Disabled);
+  validator->setMinimumLength(Wt::Auth::PasswordStrengthType::OneCharClass, 4);
+  validator->setMinimumLength(Wt::Auth::PasswordStrengthType::TwoCharClass, 4);
+  validator->setMinimumLength(Wt::Auth::PasswordStrengthType::ThreeCharClass, 4);
+  validator->setMinimumLength(Wt::Auth::PasswordStrengthType::FourCharClass, 4);
+
+  myPasswordService.setStrengthValidator(std::move(validator));
+
+
 
   /*if (Auth::GoogleService::configured())
     myOAuthServices.push_back(cpp14::make_unique<Auth::GoogleService>(myAuthService));
@@ -50,6 +64,7 @@ Session::Session(const std::string& sqliteDb)
 
   setConnection(std::move(connection));
 
+  // la classe User c'est moi qui la défini, les infos de cette classe sont dans la table user
   mapClass<User>("user");
   mapClass<AuthInfo>("auth_info");
   mapClass<AuthInfo::AuthIdentityType>("auth_identity");
@@ -75,6 +90,7 @@ dbo::ptr<User> Session::user() const
 {
   if (login_.loggedIn()) {
     dbo::ptr<AuthInfo> authInfo = users_->find(login_.user());
+
     return authInfo->user();
   } else
     return dbo::ptr<User>();

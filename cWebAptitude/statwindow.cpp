@@ -43,7 +43,8 @@ void statWindow::add1Aptitude(layerStatChart * lstat){
         mAptTable->elementAt(0, 0)->setPadding(10);
         mAptTable->elementAt(1, 0)->addWidget(cpp14::make_unique<WText>("Essence"));
         mAptTable->elementAt(1, 1)->addWidget(cpp14::make_unique<WText>("Aptitude"));
-        mAptTable->elementAt(0, 1)->setContentAlignment(AlignmentFlag::Top | AlignmentFlag::Center);
+        mAptTable->elementAt(1, 0)->setContentAlignment(AlignmentFlag::Top | AlignmentFlag::Center);
+        mAptTable->elementAt(1, 1)->setContentAlignment(AlignmentFlag::Top | AlignmentFlag::Center);
         row=2;
     }
 
@@ -57,7 +58,6 @@ void statWindow::add1layerStat(Wt::WContainerWidget * layerStat){
     addWidget(std::unique_ptr<Wt::WContainerWidget>(layerStat));
     //mContStatIndiv->addWidget(std::unique_ptr<Wt::WContainerWidget>(layerStat));
 }
-
 
 void statWindow::vider()
 {

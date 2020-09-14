@@ -9,36 +9,36 @@
   
   
 <message id="infoTelechargement">
-Plusieurs possibilités vous sont proposées. Vous avez la possibilité de télécharger votre shapefile précédemment chargé via l'onget "Plan d'Aménagement". Les statistiques calculées pour les couches (exemple ; couches d'aptitude) seront disponibles dans la table d'attribut. Vous avez la possibilité de téléchargement les couches raster pour uniquement sur l'étendue de votre zone d'intérêt, c'est-à-dire l'emprise du shapefile que vous avez chargé. Vous pouvez également télécharger les couches raster sur l'ensemble de la Région Wallonne, mais la taille des fichiers sera conséquente.
+Plusieurs possibilités vous sont proposées. Vous avez la possibilité de télécharger votre shapefile précédemment chargé via l'onget "Plan d'Aménagement". Les statistiques calculées pour les couches (exemple : couches d'aptitude) seront disponibles dans la table d'attribut. Vous avez la possibilité de téléchargement les couches raster correspondant uniquement à l'étendue de votre zone d'intérêt, c'est-à-dire l'emprise du shapefile que vous avez chargé. Vous pouvez également télécharger les couches raster sur l'ensemble de la Région Wallonne, mais la taille des fichiers sera alors conséquente.
 </message>
  <message id="infoTelechargementShp">
-Sélectionnez ci-dessus les couches pour lesquelles vous désirez ajouter les statistiques dans la table d'attribut de votre shapefile. Ensuite, appuyer sur le boutton de téléchargement.</message>
+Sélectionnez ci-dessus les couches pour lesquelles vous désirez ajouter les statistiques dans la table d'attribut de votre shapefile. Ensuite, appuyez sur le bouton de téléchargement.</message>
 
-  <message id="infoTelechargementRaster">Sélectionnez ci-dessus les couches que vous désirez télécharger. Il est préférable de découper la couche sur l'emprise d'un shapefile que vous aurez préhalablement chargé via l'onglet "plan d'aménagement".</message>
+  <message id="infoTelechargementRaster">Sélectionnez ci-dessus les couches que vous désirez télécharger. Il est préférable de découper la couche sur l'emprise d'un shapefile que vous aurez préalablement chargé via l'onglet "plan d'aménagement".</message>
  
  <message id="cb_decoupeShp">Découper les cartes avec l'emprise du shp</message>
 
- <message id="infoParcellaire">Chargez un shapefile au format ESRI afin d'effectuer le calcul de statistique pour les aptitudes des essences (Fichier Ecologique des Essences) qui seront ajoutées dans la table d'attribut de votre shapefile. Vous pouvez également télécharger les cartes qui vous intéresse sur l'emprise de votre shapefile.</message>
+ <message id="infoParcellaire">Chargez un shapefile au format ESRI afin d'effectuer le calcul de statistique pour les aptitudes des essences (Fichier Ecologique des Essences) qui seront ajoutées dans la table d'attribut de votre shapefile. Vous pouvez également télécharger les cartes qui vous intéressent sur l'emprise de votre shapefile.</message>
 
 <message id="infoChoixLayerStat">Vous pouvez choisir dans le tableau ci-dessous les essences pour lesquelles vous souhaitez effectuer le calcul de statistique.</message>
 
-<message id="infoCalculStat">Par défaut, le calcul de statistique sur les cartes d'aptitude détermine la proportion de surface pour laquelle l'essence est strictement en Optimum. Vous avez néanmoins le choix avec l'option ci-dessous de calculer la proportion de surface pour laquelle l'essence est en optimum ou en tolérance.</message>
+<message id="infoCalculStat">Par défaut, le calcul de statistique sur les cartes d'aptitude détermine la proportion de surface pour laquelle l'essence est strictement en Optimum. Vous avez néanmoins le choix avec l'option ci-dessous de calculer la proportion de surface pour laquelle l'essence est en Optimum ou en Tolérance.</message>
 
 <message id="cb_fusionAptOT">Calcul de la proportion de surface en Optimum ou en Tolérance</message>
 
-<message id="infoVisuStat">La visualisation des statistiques permet un affichage des proportions de surface pour chaque classe d'aptitude. Pour l'instant, il s'agit uniquement des statistiques pour l'ensemble de tout les polygones de votre shapefile.</message>
+<message id="infoVisuStat">La visualisation des statistiques permet un affichage des proportions de surface pour chaque classe d'aptitude. Pour l'instant, il s'agit uniquement des statistiques pour l'ensemble de tous les polygones de votre shapefile.</message>
 
 <message id="infoDownloadClippedRaster">
-<h4>Télécharger les couches géographique au format raster</h4>
-Vous pouvez télécharger les cartes listées ci-dessous qui seront découpées sur l'emprise de votre shapefile. Une visualisation des statistiques de ces couches pour un polygone donné est également possible en appuyant sur le polygone en gardant la touche shift enfoncée.
+<h4>Télécharger les couches géographiques au format raster</h4>
+Vous pouvez télécharger les cartes listées ci-dessous qui seront découpées sur l'emprise de votre shapefile. Une visualisation des statistiques de ces couches pour un polygone donné est également possible en appuyant sur le polygone tout en gardant la touche shift enfoncée.
 </message>
 
 
-<message id="tooltipMap1">double cliquez sur une station pour afficher sa description dans l'onglet légende.</message>
+<message id="tooltipMap1">Double cliquez sur une station pour afficher sa description dans l'onglet légende.</message>
 
-<message id="tooltipMap2">double cliquez sur une station pour afficher sa description dans l'onglet légende. Enfoncer la touche shift et cliquez sur un polygone de votre shapefile pour afficher les statistiques. Les couches sélectionnées sous la section "Télécharger les couches géographique au format raster" de l'onglet parcellaire feront l'objet d'une synthèse sur cette surface. </message>
+<message id="tooltipMap2">Double cliquez sur une station pour afficher sa description dans l'onglet légende. Enfoncez la touche shift et cliquez sur un polygone de votre shapefile pour afficher les statistiques. Les couches sélectionnées sous la section "Télécharger les couches géographiques au format raster" de l'onglet parcellaire feront l'objet d'une synthèse sur cette surface. </message>
 
-<message id="infoDansVisuStat">Les statistiques sont calculées pour les couches sélectionnées dans la section "Télécharger les couches géographique au format raster" de l'onglet parcellaire. </message>
+<message id="infoDansVisuStat">Les statistiques sont calculées pour les couches sélectionnées dans la section "Télécharger les couches géographiques au format raster" de l'onglet parcellaire. </message>
 
 <message id="toolTipActiveLayer">Cliquez sur l'onglet légende pour visualiser la signification des couleurs pour cette carte. </message>
 
@@ -70,8 +70,8 @@ Vous pouvez télécharger les cartes listées ci-dessous qui seront découpées 
 <message id="legendEcogramme">L'abscisse représente les niveaux trophiques, allant du plus acide à gauche vers les sols carbonatés à droite. L'ordonnée représente le gradient hydrique, avec les stations sèches en haut, humide en bas, et à régime hydrique alternatif sur l'encart à part en bas.</message>
 
 <message id="defaultLoadingI">Chargement...</message>
-<message id="LoadingI1">calcul des statistiques pour ce polygone</message>
-<message id="LoadingI2">calcul des statistiques pour le parcellaire et ajout dans la table d'attribut</message>
+<message id="LoadingI1">Calcul des statistiques pour ce polygone</message>
+<message id="LoadingI2">Calcul des statistiques pour le parcellaire et ajout dans la table d'attribut</message>
 <message id="LoadingI3">Découpage de la carte selectionnée sur l'emprise actuelle</message>
 <message id="LoadingI4">Découpage de(s) carte(s) sur l'emprise du parcellaire</message>
 <message id="StatWTitreTabApt"><h4>Tableau des aptitudes des essences </h4></message>
@@ -80,7 +80,7 @@ Vous pouvez télécharger les cartes listées ci-dessous qui seront découpées 
 <message id="page_presentation">
 <div class="form">
   <p>
-    <h3>Presentation de Forestimator et explication des outils</h3>
+    <h3>Présentation de Forestimator et explication des outils</h3>
   </p>
   <p>
     <h4>Page Cartographie</h4>
@@ -110,10 +110,10 @@ Vous pouvez télécharger les cartes listées ci-dessous qui seront découpées 
     Pas assez de caractères différents ou spéciaux
   </message>
   <message id="Wt.Auth.passwdqc.reason-personal">
-    Basé sur des informations personelles
+    Basé sur des informations personnelles
   </message>
   <message id="Wt.Auth.passwdqc.reason-word">
-    Basé sur un mot du dictionaire
+    Basé sur un mot du dictionnaire
   </message>
   <message id="Wt.Auth.passwdqc.reason-seq">
     Mot de passe trop basique
@@ -124,15 +124,15 @@ Vous pouvez télécharger les cartes listées ci-dessous qui seront découpées 
   <message id="Wt.Auth.login-form-title">Connexion</message>
   <message id="Wt.Auth.login-form-info"></message>
   <message id="Wt.Auth.user-name">Nom d'utilisateur</message>
-  <message id="Wt.Auth.user-name-info">Entrer votre nom d'utilisateur</message>
+  <message id="Wt.Auth.user-name-info">Entrez votre nom d'utilisateur</message>
   <message id="Wt.Auth.user-name-invalid">Invalide</message>
   <message id="Wt.Auth.email">Adresse email</message>
-  <message id="Wt.Auth.email-info">Entrer votre adresse email</message>
+  <message id="Wt.Auth.email-info">Entrez votre adresse email</message>
   <message id="Wt.Auth.optional-email-info">
-    Entrer votre adresse email (optionel)
+    Entrez votre adresse email (optionnel)
   </message>
   <message id="Wt.Auth.password">Mot de passe</message>
-  <message id="Wt.Auth.password-info">Entrer votre mot de passe</message>
+  <message id="Wt.Auth.password-info">Entrez votre mot de passe</message>
   <message id="Wt.Auth.remember-me">Se souvenir de moi</message>
   <message id="Wt.Auth.remember-me-info.days">
     <plural case="0">Keeps login for one day</plural>
@@ -169,7 +169,7 @@ Vous pouvez télécharger les cartes listées ci-dessous qui seront découpées 
   <message id="Wt.Auth.confirm-is-you">Ce nom d'utilisateur existe déjà, est-ce vous?</message>
   <message id="Wt.Auth.user-name-tooshort">Nombre de caractères min. {1}</message>
   <message id="Wt.Auth.password-tooshort">Nombre de caractères min. {1}</message>
-  <message id="Wt.Auth.passwords-dont-match">Les mots de passes sont différents</message>
+  <message id="Wt.Auth.passwords-dont-match">Les mots de passe sont différents</message>
   <message id="Wt.Auth.registration">Inscription</message>
 
   <message id="Wt.Auth.error-user-invalid">Inscription échouée.</message>
@@ -177,7 +177,7 @@ Vous pouvez télécharger les cartes listées ci-dessous qui seront découpées 
   <message id="Wt.Auth.confirm-email-first">
     <h5>Bienvenue!</h5>
 
-    Voius pourez vous connecter dès que vous aurez validé votre compte via l'email que nous vous avons envoyé !
+    Vous pourrez vous connecter dès que vous aurez validé votre compte via l'email que nous vous avons envoyé !
   </message>
 
   <!-- PasswordPromptDialog -->

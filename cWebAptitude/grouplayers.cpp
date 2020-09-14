@@ -1036,6 +1036,24 @@ void groupLayers::closeConnection(){
     }
 }
 
+
+bool groupLayers::getExpertModeForUser(std::string id){
+
+    openConnection();
+    printf("get Expert Mode For User\n");
+    bool aRes(0);
+    sqlite3_stmt * stmt;
+    std::string SQLstring="SELECT ModeExpert FROM user_expert WHERE id_user="+id+";";
+    sqlite3_prepare_v2( db_, SQLstring.c_str(), -1, &stmt, NULL );//preparing the statement
+    while(sqlite3_step(stmt) == SQLITE_ROW)
+    {
+        if (sqlite3_column_type(stmt, 0)!=SQLITE_NULL){
+        aRes=sqlite3_column_int(stmt, 0);
+        }
+    }
+    return aRes;
+}
+
 void groupLayers::loadExtents(std::string id){
     openConnection();
     printf("loadextent\n");

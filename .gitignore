@@ -5,3 +5,5 @@ carteApt/data/aptitudeEssDB.db-shm
 cWebAptitude/cWebAptitude.pro.user.*
 cWebAptitude/cWebAptitude.pro.user
 data/tmp
+data/auth.db
+data/extents.db

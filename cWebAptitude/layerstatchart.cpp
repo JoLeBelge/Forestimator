@@ -354,6 +354,32 @@ layerStat::layerStat(Layer * aLay, std::map<std::string,int> aStat, std::string 
 
 
 olOneLay::olOneLay(Layer * aLay, OGRGeometry *poGeom):mLay(aLay){
+
+    // export de la géométrie dans un fichier externe unique
+    //char * c=;
+    //char tmpfile[] =mLay->Dico()->File("TMPDIR")+"/geojson_XXXXXX";
+    std::string name0 = std::tmpnam(nullptr);
+    std::string name1 = name0.substr(5,name0.size()-5);
+    std::string aOut = mLay->Dico()->File("TMPDIR")+"/"+name1;
+
+    //std::string name1 = mktemp('geomXXXXX');
+    //std::string name1 = "geomTMP.geojson";
+    //std::string aOut=mLay->Dico()->File("TMPDIR")+"/"+name1;
+    std::cout << aOut << " fichier tmp " << std::endl;
+    char * t=poGeom->exportToJson();
+    std::ofstream ofs (aOut, std::ofstream::out);
+    std::string a="{"
+                  "'type': 'FeatureCollection',"
+                  "'name': 'wt7fxhEi-epioux_sample',"
+                  "'crs': { 'type': 'name', 'properties': { 'name': 'urn:ogc:def:crs:EPSG::31370' } },"
+                  "'features': ["
+                    "{ 'type': 'Feature', 'geometry':";
+    boost::replace_all(a,"'","\"");
+    ofs << a;
+    ofs << t;
+    ofs << "}]}";
+    ofs.close();
+
     std::string JScommand;
     setWidth("40%");
     setMinimumSize(400,0);
@@ -383,32 +409,15 @@ olOneLay::olOneLay(Layer * aLay, OGRGeometry *poGeom):mLay(aLay){
     // remplacer l'extent et le centre de la carte
     OGREnvelope ext;
     poGeom->getEnvelope(&ext);
-    boost::replace_all(JScommand,"MAXX",std::to_string(ext.MaxX));
-    boost::replace_all(JScommand,"MAXY",std::to_string(ext.MaxY));
-    boost::replace_all(JScommand,"MINX",std::to_string(ext.MinX));
-    boost::replace_all(JScommand,"MINY",std::to_string(ext.MinY));
+    boost::replace_all(JScommand,"MAXX",std::to_string(ext.MaxX+10));
+    boost::replace_all(JScommand,"MAXY",std::to_string(ext.MaxY+10));
+    boost::replace_all(JScommand,"MINX",std::to_string(ext.MinX-10));
+    boost::replace_all(JScommand,"MINY",std::to_string(ext.MinY-10));
 
     boost::replace_all(JScommand,"CENTERX",std::to_string(ext.MinX+((ext.MaxX-ext.MinX)/2)));
     boost::replace_all(JScommand,"CENTERY",std::to_string(ext.MinY+((ext.MaxY-ext.MinY)/2)));
 
-    //char * c=;
-    //std::string name1 = mktemp('geomXXXXX');
-    std::string name1 = "geomTMP.geojson";
-    std::string aOut=mLay->Dico()->File("TMPDIR")+"/"+name1;
-    //std::cout << aOut << " fichier tmp " << std::endl;
-    char * t=poGeom->exportToJson();
-    std::ofstream ofs (aOut, std::ofstream::out);
-    std::string a="{"
-                  "'type': 'FeatureCollection',"
-                  "'name': 'wt7fxhEi-epioux_sample',"
-                  "'crs': { 'type': 'name', 'properties': { 'name': 'urn:ogc:def:crs:EPSG::31370' } },"
-                  "'features': ["
-                    "{ 'type': 'Feature', 'geometry':";
-    boost::replace_all(a,"'","\"");
-    ofs << a;
-    ofs << t;
-    ofs << "}]}";
-    ofs.close();
+
 
     boost::replace_all(JScommand,"NAME","tmp/" + name1);
     //std::cout << JScommand << std::endl;

@@ -187,6 +187,7 @@ public:
     std::vector<Layer *> mVLs;
     void closeConnection();
     int openConnection();
+    bool getExpertModeForUser(std::string id);
     void loadExtents(std::string id);
 
     // pour changer le curseur quand on clique - public pour avoir accès depuis parcellaire

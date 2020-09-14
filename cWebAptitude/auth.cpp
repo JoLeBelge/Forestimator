@@ -96,6 +96,10 @@
   void AuthApplication::authEvent() {
       if (session_.login().loggedIn()) {
           const Wt::Auth::User& u = session_.login().user();
+
+          //dbo::ptr<User> u2= session_.user();
+          ModeExpert= cwebapt->mGroupL->getExpertModeForUser(u.id());
+
           log("notice")
                   << "User " << u.id()
                   << " (" << u.identity(Wt::Auth::Identity::LoginName) << ")"
