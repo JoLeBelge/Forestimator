@@ -1049,8 +1049,9 @@ bool groupLayers::getExpertModeForUser(std::string id){
     {
         if (sqlite3_column_type(stmt, 0)!=SQLITE_NULL){
         aRes=sqlite3_column_int(stmt, 0);
-        }
+        } else {std::cout << "je ne parviens pas à lire la table user_expert " << std::endl;  }
     }
+    std::cout << "mode expert est à " << aRes << std::endl;
     return aRes;
 }
 
