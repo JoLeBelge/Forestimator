@@ -22,7 +22,7 @@ void Session::configureAuth()
 {
   myAuthService.setAuthTokensEnabled(true, "logincookie");
   myAuthService.setEmailVerificationEnabled(true);
-  myAuthService.setEmailVerificationRequired(true);
+  //myAuthService.setEmailVerificationRequired(true);
 
   std::unique_ptr<Auth::PasswordVerifier> verifier
       = cpp14::make_unique<Auth::PasswordVerifier>();
@@ -32,9 +32,7 @@ void Session::configureAuth()
   //myPasswordService.setStrengthValidator(cpp14::make_unique<Auth::PasswordStrengthValidator>());
 
   // paramètrer le validateur de password
-
   std::unique_ptr<Auth::PasswordStrengthValidator> validator= cpp14::make_unique<Auth::PasswordStrengthValidator>();
-  /* Relax these a bit -- it's not the main point of this example */
   //validator->setMinimumPassPhraseWords(Wt::Auth::PasswordStrengthValidator::Disabled);
   validator->setMinimumLength(Wt::Auth::PasswordStrengthType::OneCharClass, 4);
   validator->setMinimumLength(Wt::Auth::PasswordStrengthType::TwoCharClass, 4);
@@ -42,8 +40,6 @@ void Session::configureAuth()
   validator->setMinimumLength(Wt::Auth::PasswordStrengthType::FourCharClass, 4);
 
   myPasswordService.setStrengthValidator(std::move(validator));
-
-
 
   /*if (Auth::GoogleService::configured())
     myOAuthServices.push_back(cpp14::make_unique<Auth::GoogleService>(myAuthService));

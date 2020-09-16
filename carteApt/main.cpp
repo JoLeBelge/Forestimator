@@ -4,6 +4,9 @@
 #include "cdicocarteph.h"
 #include "capplicarteph.h"
 
+// écrire double dans cout avec 2 décimales
+#include <iomanip>
+
 
 using namespace std;
 
@@ -13,6 +16,7 @@ int main(int argc, char *argv[])
     //cAppliCartepH aAPH=cAppliCartepH();
     // lecture de toutes les table dictionnaires
     cDicoApt dico(dirBD);
+     cApliCarteApt aACA(&dico);
     std::map<std::string,cEss> aMEss;
     std::map<std::string,cKKCS> aMKKs;
     std::map<std::string,cRasterInfo> aMRs;
@@ -28,7 +32,38 @@ int main(int argc, char *argv[])
     // topo, nh, nt, ect
     for (auto & pair : *dico.RasterType()){
         aMRs.emplace(std::make_pair(pair.first,cRasterInfo(pair.first,&dico)));
+
+        if (pair.first=="MNT"){
+            cRasterInfo RI(pair.first,&dico);
+            std::string aFileCodeMS("/home/lisein/Documents/carteApt/autres/mapserver/mapThematiqueFEE.map");
+            aACA.codeMapServer(RI.NomFileWithExt(),RI.Code(),RI.Nom(),aFileCodeMS,RI.getDicoVal(),RI.getDicoCol());
+        }
     }
+
+
+
+
+    /*
+    std::ofstream ofs ("./dico_colGrey.txt", std::ofstream::out | std::ofstream::trunc);
+    // creation de ma palette de couleur grise pour MNT
+    for (int i(0);i<255;i++){
+        ofs << "g"<<i << "," <<i << "," << i << "," << i << std::endl;
+    }
+    ofs.close();
+
+    ofs =std::ofstream("./dico_MNT.txt", std::ofstream::out | std::ofstream::trunc);
+    ofs << std::fixed;
+    ofs << std::setprecision(1);
+    // creation du dictionnaire MNT
+    for (int i(0);i<7001;i++){
+        // une nouvelle couleur tout les 3 mètres
+        std::string col("");
+        if ((i % 30)==0){ col="g"+std::to_string(i/30);}
+    ofs <<i << "," <<double(i/10.0)<< "," << col << std::endl;
+    }
+
+    ofs.close();
+    */
 
 /*
     cEss EP=aMEss.at("EP");
@@ -45,7 +80,7 @@ int main(int argc, char *argv[])
      }
      */
 
-    cApliCarteApt aACA(&dico);
+
 
     //aACA.shptoGeoJSON("/home/lisein/Documents/carteApt/autres/epioux_parcellaire.shp","/home/lisein/Documents/carteApt/autres/test.geojson");
 
@@ -99,8 +134,9 @@ if (1){
         //aACA.createTile(kv.second.NomCarte(),kv.second.NomDirTuile(),kv.second.Type());
         //aACA.compressTif(kv.second.NomCarte());
          cKKCS KK=kv.second;
-         aACA.codeMapServer(KK.shortNomCarte(),KK.NomMapServerLayer(),KK.NomMapServerLayerFull(),aFileCodeMS, KK.getDicoValPtr(),KK.getDicoCol());
+         //aACA.codeMapServer(KK.shortNomCarte(),KK.NomMapServerLayer(),KK.NomMapServerLayerFull(),aFileCodeMS, KK.getDicoValPtr(),KK.getDicoCol());
     }
+
 
 
 }
@@ -118,6 +154,8 @@ if (1){
 
     // creation des tuiles pour le MNH photogrammétrique qui est en 2 mètres de résolution -- pas comme les autres cartes!
      //aACA.createTile("/home/lisein/Documents/carteApt/GIS/mnh_2019.tif","/home/lisein/Documents/carteApt/Forestimator/build-WebAptitude/Tuiles/MNH2019",MNH2019,true);
+
+
 
     return 0;
 }

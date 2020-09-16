@@ -97,8 +97,7 @@
       if (session_.login().loggedIn()) {
           const Wt::Auth::User& u = session_.login().user();
 
-          //dbo::ptr<User> u2= session_.user();
-          ModeExpert= cwebapt->mGroupL->getExpertModeForUser(u.id());
+          bool modeExpert= cwebapt->mGroupL->getExpertModeForUser(u.id());
 
           log("notice")
                   << "User " << u.id()
@@ -108,7 +107,7 @@
               cwebapt->b_login->setText("Se déconnecter");
               std::string JScommand("$('.Wt-auth-login-container').removeClass('visible').addClass('nonvisible');");
               doJavaScript(JScommand);
-              cwebapt->mGroupL->updateGL();
+              cwebapt->mGroupL->updateGL(modeExpert);
           }
       } else{
           log("notice") << "User logged out.";

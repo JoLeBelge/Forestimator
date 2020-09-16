@@ -59,7 +59,7 @@ public:
     bool cropImWithShp(std::string inputRaster, std::string aOut);
 
     // update au moment ou on bascule sur la version expert ou non expert
-    void update();
+    //void update();
 
 
 private:

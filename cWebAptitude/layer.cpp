@@ -11,7 +11,10 @@ Layer::Layer(std::string aCode,cDicoApt * aDico,TypeLayer aType):
   ,mRI(NULL)
   ,mEss(NULL)
   ,mKK(NULL)
-  ,mTypeVar(TypeVar::Classe){
+  ,mTypeVar(TypeVar::Classe)
+  ,mExpert(0)
+  ,mIsVisible(1)
+{
 
     switch (mType) {
     case TypeLayer::FEE:
@@ -29,6 +32,7 @@ Layer::Layer(std::string aCode,cDicoApt * aDico,TypeLayer aType):
         //mText->setText(mLabel);
         mDicoVal=mDico->code2AptFull();
         mDicoCol=mDico->codeApt2col();
+        setExpert(1);
         break;
     case TypeLayer::KK:
         // construction de la caractéristique stationnelle
@@ -38,6 +42,7 @@ Layer::Layer(std::string aCode,cDicoApt * aDico,TypeLayer aType):
         mPathTif=mKK->NomCarte();
         mDicoVal=mKK->getDicoValPtr();
         mDicoCol=mKK->getDicoCol();
+        setExpert(1);
         break;
     case TypeLayer::Thematique:
         // creation de l'objet cRasterInfo
@@ -49,13 +54,14 @@ Layer::Layer(std::string aCode,cDicoApt * aDico,TypeLayer aType):
         mDicoCol=mRI->getDicoCol();
         mTypeVar=mRI->getTypeVar();
         mType=mRI->getCatLayer();
+        setExpert(mRI->Expert());
         break;
-    case TypeLayer::Externe:
+    /*case TypeLayer::Externe: les cartes de type externe sont créé à partir de cRasterInfo (type thématique qui est écrasé en fonction du cRasterInfo)
         if (mCode=="IGN"){
             mLabel="Carte topographique IGN";
             //mText->setText(mLabel);
             mPathTif="";
-        }
+        }*/
     }
 
 }
@@ -72,6 +78,8 @@ Layer::Layer(groupLayers * aGroupL, std::string aCode, WText *PWText, TypeLayer 
   ,mEss(NULL)
   ,mKK(NULL)
   ,mTypeVar(TypeVar::Classe)
+  ,mExpert(0)
+  ,mIsVisible(1)
 {
     // std::cout << "constructeur layer " << std::endl;
     // constructeur qui dépend du type de layer
@@ -91,6 +99,7 @@ Layer::Layer(groupLayers * aGroupL, std::string aCode, WText *PWText, TypeLayer 
         mText->setText(mLabel);
         mDicoVal=mDico->code2AptFull();
         mDicoCol=mDico->codeApt2col();
+        mExpert=1;
         break;
     case TypeLayer::KK:
         // construction de la caractéristique stationnelle
@@ -100,6 +109,7 @@ Layer::Layer(groupLayers * aGroupL, std::string aCode, WText *PWText, TypeLayer 
         mPathTif=mKK->NomCarte();
         mDicoVal=mKK->getDicoValPtr();
         mDicoCol=mKK->getDicoCol();
+        mExpert=1;
         break;
     case TypeLayer::Thematique:
         // creation de l'objet cRasterInfo
@@ -111,13 +121,8 @@ Layer::Layer(groupLayers * aGroupL, std::string aCode, WText *PWText, TypeLayer 
         mDicoCol=mRI->getDicoCol();
         mTypeVar=mRI->getTypeVar();
         mType=mRI->getCatLayer();
+        mExpert=mRI->Expert();
         break;
-    case TypeLayer::Externe:
-        if (mCode=="IGN"){
-            mLabel="Carte topographique IGN";
-            mText->setText(mLabel);
-            mPathTif="";
-        }
     }
 
 
@@ -155,15 +160,7 @@ void Layer::setActive(bool b){
 void Layer::displayLayer() const{ 
     std::string JScommand;
     //std::cout << "display layer " << std::endl;
-    /*if (this->Type()==TypeLayer::Externe && !mDico->hasWMSinfo(this->getCode())) {
-        std::string aFileIn(mDico->File("displayExternLayer"));
-        std::ifstream in(aFileIn);
-        std::stringstream ss;
-        ss << in.rdbuf();
-        in.close();
-        JScommand=ss.str();
-        boost::replace_all(JScommand,"TOREPLACE",mCode); */
-    //if (this->Type()==TypeLayer::Externe && !mDico->hasWMSinfo(this->getCode())) {
+
         std::string aFileIn(mDico->File("displayWMS"));
         std::ifstream in(aFileIn);
         std::stringstream ss;
@@ -260,7 +257,7 @@ int Layer::getValue(double x, double y){
     return aRes;
 }
 
-std::map<std::string,int> Layer::computeStatOnPolyg(OGRGeometry *poGeom, std::string aMode){
+std::map<std::string,int> Layer::computeStatOnPolyg(OGRGeometry *poGeom){
     //std::cout << " groupLayers::computeStatOnPolyg " << std::endl;
     std::map<std::string,int> aRes;
 
@@ -283,10 +280,10 @@ std::map<std::string,int> Layer::computeStatOnPolyg(OGRGeometry *poGeom, std::st
 
         // gdal
         GDALAllRegister();
-        GDALDataset  * mGDALDat = (GDALDataset *) GDALOpen( getPathTif(aMode).c_str(), GA_ReadOnly );
+        GDALDataset  * mGDALDat = (GDALDataset *) GDALOpen( getPathTif().c_str(), GA_ReadOnly );
         if( mGDALDat == NULL )
         {
-            std::cout << "je n'ai pas lu l'image " << getPathTif(aMode) << std::endl;
+            std::cout << "je n'ai pas lu l'image " << getPathTif() << std::endl;
         } else {
             GDALRasterBand * mBand = mGDALDat->GetRasterBand( 1 );
 
@@ -405,20 +402,6 @@ std::vector<std::string> Layer::getCode(std::string aMode){
         aRes={mCode,"CS"};break;
     default:
         aRes={mCode,""};
-    }
-    return aRes;
-}
-
-std::string Layer::getPathTif(std::string aMode){
-    std::string aRes;
-    switch (mType) {
-    case TypeLayer::FEE:
-        aRes=mEss->NomCarteAptFEE();break;
-    case TypeLayer::CS:
-        aRes=mEss->NomCarteAptCS();break;
-    default:
-        aRes=mPathTif;
-
     }
     return aRes;
 }
@@ -545,11 +528,11 @@ rasterFiles Layer::getRasterfile(){
     //rasterFiles aRes;
     switch (this->Type()){
     case TypeLayer::FEE:{
-        rasterFiles aRes(getPathTif("FEE"),"Aptitude_"+getCode()+"_FEE");
+        rasterFiles aRes(getPathTif(),"Aptitude_"+getCode()+"_FEE");
         return aRes;
     }
     case TypeLayer::CS:{
-        rasterFiles aRes(rasterFiles(getPathTif("CS"),"Aptitude_"+getCode()+"_CS"));
+        rasterFiles aRes(rasterFiles(getPathTif(),"Aptitude_"+getCode()+"_CS"));
         return aRes;
     }
     default:{

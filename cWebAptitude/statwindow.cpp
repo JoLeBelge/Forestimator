@@ -27,10 +27,6 @@ statWindow::statWindow(cDicoApt *aDico):mDico(aDico)
     mAptTable->setWidth(Wt::WLength("90%"));
     mAptTable->toggleStyleClass("table-striped",true);
 
-    // création de la carte IGN, nécessaire pour pouvoir l'afficher dans la carte générale
-    auto labelBidon_ = cpp14::make_unique<WText>();
-    WText * labelBidon = labelBidon_.get();
-
     mIGN = new Layer("IGN",mDico,TypeLayer::Externe);
 }
 

@@ -747,6 +747,16 @@ void cApliCarteApt::toPNG(std::string input, std::string output,TypeCarte aType)
 
             }
 
+            // MNT en 16 bits, gain de 10, offset 0
+            case MNT16b:{
+                if (aVal==255) {mask=0;} else {
+                    int H=dico->mnt(aVal);
+
+                    dico->getColor(std::to_string(H-1)).set(aRes1,aRes2,aRes3);
+                }
+
+            }
+
             case Station1: case Habitats: case CSArdenne: case CSLorraine:{
                 // j'ouvre le fichier de style qgis et je converti le code couleur en code RGB pour les stations ardennes
                 if (aVal==1) {aRes1=4; aRes2=6;aRes3=2;}
@@ -893,7 +903,7 @@ void cApliCarteApt::codeMapServer(std::string inputData, std::string layerName, 
             +std::string("  NAME \"")+ layerName +std::string("\"\n")+
             std::string("   TYPE RASTER\n")+
             std::string("   STATUS ON\n") +
-            std::string("   MAXSCALEDENOM 200000.00\n") +
+            //std::string("   MAXSCALEDENOM 200000.00\n") +
             std::string("   PROJECTION\n") +
             std::string("      \"init=epsg:31370\"\n")+
             std::string("   END\n")+
@@ -902,11 +912,21 @@ void cApliCarteApt::codeMapServer(std::string inputData, std::string layerName, 
             std::string("   CLASSITEM \"[pixel]\" \n");
 
     for (auto kv : *DicoVal){
-
+        /*
         if (DicoCol.find(kv.first)!=DicoCol.end()){
             color col = DicoCol.at(kv.first);
             aCMS+=MSClass(kv.second,std::to_string(kv.first),col);
+        }*/
+
+        // pour mnt, je dois mettre des expressions qui couvrent un range de valeur. attention, il faudra alors enlever les guillemets qui entoure l'expression!!
+        if (DicoCol.find(kv.first)!=DicoCol.end()){
+            color col = DicoCol.at(kv.first);
+            std::string expression="([pixel] > "+std::to_string(kv.first)+" AND [pixel] <= "+std::to_string(kv.first+30)+")";
+            aCMS+=MSClass(kv.second,expression,col);
         }
+        // je modifie à la main les premières et dernières classes et j'enlève les guillemets. même pas besoin de faire restart apache, le fichier .map est lu à chaque requête
+
+
     }
 
     aCMS+=std::string(" METADATA\n")+

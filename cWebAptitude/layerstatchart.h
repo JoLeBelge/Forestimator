@@ -71,13 +71,12 @@ private:
 class layerStat : public Wt::WContainerWidget
 {
 public:
-    layerStat(Layer * aLay,std::map<std::string,int> aStat, std::string aMode);
+    layerStat(Layer * aLay,std::map<std::string,int> aStat);
     layerStat(const layerStat &ls){
         std::cout << "construct by copy layerStat " << std::endl;
         mLay=ls.mLay;
         mStat=ls.mStat;
         mStatSimple=ls.mStatSimple;
-        mMode=ls.mMode;
         mTypeVar=ls.mTypeVar;
         mNbPix=ls.mNbPix;
     }
@@ -107,7 +106,7 @@ protected:
 class layerStatChart : public layerStat
 {
 public:
-    layerStatChart(Layer * aLay, std::map<std::string,int> aStat, std::string aMode, OGRGeometry * poGeom);
+    layerStatChart(Layer * aLay, std::map<std::string,int> aStat, OGRGeometry * poGeom);
     layerStatChart(const layerStatChart &ls):layerStat(ls){
         std::cout << "construct by copy layerStatChart " << std::endl;
         mModel=ls.mModel;

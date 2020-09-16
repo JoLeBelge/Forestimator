@@ -1,7 +1,7 @@
 #include "grouplayers.h"
 
-const TypeClassifST cl[] = { FEE, CS };
-std::vector<std::string> classes = {"Fichier Ecologique des Essences", "Catalogue des Stations"};
+//const TypeClassifST cl[] = { FEE, CS };
+//std::vector<std::string> classes = {"Fichier Ecologique des Essences", "Catalogue des Stations"};
 
 int maxSizePix4Export(30000);
 
@@ -10,7 +10,7 @@ groupLayers::groupLayers(cDicoApt * aDico, WOpenLayers *aMap, AuthApplication *a
   ,mTypeClassifST(FEE)
   ,mMap(aMap)
   ,mParent(aStackInfoPtr->mGroupLayerW)
-  ,mPBar(NULL)
+  //,mPBar(NULL)
   ,m_app(app)
   ,mLegend(NULL)
   ,mSelect4Stat(NULL)
@@ -25,7 +25,6 @@ groupLayers::groupLayers(cDicoApt * aDico, WOpenLayers *aMap, AuthApplication *a
     mParent->setOverflow(Wt::Overflow::Visible);
     mParent->setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Middle);
 
-
     slot.setJavaScript("function toto(e) {"
                        "var extent = map.getView().calculateExtent(map.getSize());"
                        "var bottomLeft = ol.extent.getBottomLeft(extent);"
@@ -34,8 +33,7 @@ groupLayers::groupLayers(cDicoApt * aDico, WOpenLayers *aMap, AuthApplication *a
                        + mapExtent_.createCall({"topRight[0]","topRight[1]","bottomLeft[0]","bottomLeft[1]"})
                        + "}}"
                        );
-    // on exécute une première fois le script js pour initialiser l'enveloppe mapExtent
-    //slot.exec();plus nécessaire
+
     this->getMapExtendSignal().connect(std::bind(&groupLayers::updateMapExtentAndCropIm,this, std::placeholders::_1,std::placeholders::_2,std::placeholders::_3,std::placeholders::_4));
 
     slot_extent.setJavaScript("function () {"
@@ -44,15 +42,185 @@ groupLayers::groupLayers(cDicoApt * aDico, WOpenLayers *aMap, AuthApplication *a
                               + mapExtent2_.createCall({"centre[0]","centre[1]","z"}) + "}");
     this->getMapCenterSignal().connect(std::bind(&groupLayers::saveExtent,this, std::placeholders::_1,std::placeholders::_2,std::placeholders::_3));
 
-    updateGL();
-    // TODO on click event
+
+    auto legendCombo = mParent->addWidget(cpp14::make_unique<WCheckBox>(tr("legendCheckbox")));
+    legendCombo->changed().connect([this]{
+        if(mLegendDiv->isVisible())
+            mLegendDiv->hide();
+        else
+            mLegendDiv->show();
+    });
+    mLegendDiv = mParent->addWidget(cpp14::make_unique<WContainerWidget>());
+    mLegendDiv->hide();
+    mTitle = mLegendDiv->addWidget(cpp14::make_unique<WText>(WString::tr("legendMsg")));
+    mLegendIndiv = mLegendDiv->addWidget(cpp14::make_unique<WTable>());
+    mLegendIndiv->setHeaderCount(1);
+    mLegendIndiv->setWidth(Wt::WLength("90%"));
+    mLegendIndiv->toggleStyleClass("table-striped",true);
+
+    /* Liste cartes 1	*/
+    std::unique_ptr<Wt::WTree> tree = Wt::cpp14::make_unique<Wt::WTree>();
+    tree->setSelectionMode(Wt::SelectionMode::Extended);
+    tree->addStyleClass("tree_left");
+    //auto folderIcon = Wt::cpp14::make_unique<Wt::WIconPair>("icons/yellow-folder-closed.png", "icons/yellow-folder-open.png", false);
+
+    auto main_node = Wt::cpp14::make_unique<Wt::WTreeNode>(tr("groupeCoucheAll")); // std::move(folderIcon) // pour mettre des icones ouvert/fermé !
+    tree->setTreeRoot(std::move(main_node));
+    tree->treeRoot()->label()->setTextFormat(Wt::TextFormat::Plain);
+    tree->treeRoot()->setLoadPolicy(Wt::ContentLoading::NextLevel);
+    auto node1 = Wt::cpp14::make_unique<Wt::WTreeNode>(tr("groupeCoucheThem"));
+    auto node1_ = tree->treeRoot()->addChildNode(std::move(node1));
+    node1_->addStyleClass("tree_node");
+    tree->treeRoot()->expand();
+
+    auto node0 = Wt::cpp14::make_unique<Wt::WTreeNode>(tr("groupeCouchePeup"));
+    auto node0_ = tree->treeRoot()->addChildNode(std::move(node0));
+    node0_->addStyleClass("tree_node");
+
+    // creation des layers pour les KK du CS
+
+        for (auto & pair : *mDico->codeKK2Nom()){
+            Wt::WTreeNode * n = node1_->addChildNode(Wt::cpp14::make_unique<Wt::WTreeNode>(""));
+            WText *label=n->label();
+            Layer  * aL= new Layer(this,pair.first,label,TypeLayer::KK);
+            std::string aCode=pair.first;
+            label->clicked().connect([this,aCode]{clickOnName(aCode,TypeLayer::KK);});
+            aL->changeExpertMode().connect(n,&Wt::WTreeNode::setNodeVisible);
+            mVLs.push_back(aL);
+        }
+
+    // ajout des cartes "FEE" ; NT NH Topo AE SS
+
+    for (auto & pair : *mDico->RasterType()){
+         if (mDico->rasterCat(pair.first)!="Peuplement"){
+        Wt::WTreeNode * n = node1_->addChildNode(Wt::cpp14::make_unique<Wt::WTreeNode>(""));
+        WText *label=n->label();
+        Layer  * aL= new Layer(this,pair.first,label,TypeLayer::Thematique);
+        std::string aCode=pair.first;
+        // un peu bidouille mais le typelayer de MNH est peuplement et il est redéfini dans le constructeur de layer
+        TypeLayer type= aL->Type();
+        label->clicked().connect([this,aCode,type]{clickOnName(aCode,type);});
+        aL->changeExpertMode().connect(n,&Wt::WTreeNode::setNodeVisible);
+        mVLs.push_back(aL);
+         }
+    }
+
+    node1_->expand();
+
+    for (auto & pair : *mDico->RasterType()){
+        // couche catégorie peuplements
+        if (mDico->rasterCat(pair.first)=="Peuplement"){
+            Wt::WTreeNode * n = node0_->addChildNode(Wt::cpp14::make_unique<Wt::WTreeNode>(""));
+            WText *label=n->label();
+            Layer  * aL= new Layer(this,pair.first,label,TypeLayer::Thematique);
+            std::string aCode=pair.first;
+            // un peu bidouille mais le typelayer de MNH et le masque forestier sont peuplement et il est redéfini dans le constructeur de layer
+            TypeLayer type= aL->Type();
+            label->clicked().connect([this,aCode,type]{clickOnName(aCode,type);});
+            aL->changeExpertMode().connect(n,&Wt::WTreeNode::setNodeVisible);
+            mVLs.push_back(aL);
+        }
+    }
+
+    node0_->expand();
+
+    auto node2 = Wt::cpp14::make_unique<Wt::WTreeNode>(tr("groupeCoucheAptFEE"));
+    auto node2_ = tree->treeRoot()->addChildNode(std::move(node2));
+    node2_->addStyleClass("tree_node");
+
+    auto node3 = Wt::cpp14::make_unique<Wt::WTreeNode>(tr("groupeCoucheAptCS"));
+    auto node3_ = node3.get();
+    node3_->addStyleClass("tree_node");
+    node3_ = tree->treeRoot()->addChildNode(std::move(node3));
+    // ici je  vais devoir rendre ce noeuds invisible si mode normal
+    this->changeExpertMode().connect(node3_,&Wt::WTreeNode::setNodeVisible);
+
+    // creation des layers pour les essences qui ont des aptitudes
+    for (auto & pair : *mDico->code2Nom()){
+        cEss ess(pair.first,mDico);
+        //std::cout << "fee" << std::endl;
+        if (ess.hasFEEApt()){
+
+            Wt::WTreeNode * n = node2_->addChildNode(Wt::cpp14::make_unique<Wt::WTreeNode>(""));
+            WText *label=n->label();
+            Layer  * aL= new Layer(this,pair.first,label,TypeLayer::FEE);
+            std::string aCode=pair.first;
+            label->clicked().connect([this,aCode]{clickOnName(aCode,TypeLayer::FEE);});
+            aL->changeExpertMode().connect(n,&Wt::WTreeNode::setNodeVisible);
+            mVLs.push_back(aL);
+        }
+
+        if (ess.hasCSApt()){
+            Wt::WTreeNode * n = node3_->addChildNode(Wt::cpp14::make_unique<Wt::WTreeNode>(""));
+            WText *label=n->label();
+            Layer  * aL= new Layer(this,pair.first,label,TypeLayer::CS);
+            mVLs.push_back(aL);
+            std::string aCode=pair.first;
+            label->clicked().connect([this,aCode]{clickOnName(aCode,TypeLayer::CS);});
+            aL->changeExpertMode().connect(n,&Wt::WTreeNode::setNodeVisible);
+        }
+    }
+
+    mParent->addWidget(cpp14::make_unique<WText>(tr("coucheStep1")));
+    mParent->addWidget(std::move(tree));
+    mParent->addWidget(cpp14::make_unique<WText>(tr("coucheStep2")));
+
+    // add user extents if connected
+    /*
+    printf("isloggedin?\n");
+    if(m_app->isLoggedIn()){
+        WPushButton * button_e = mParent->addWidget(cpp14::make_unique<WPushButton>(tr("afficher_extent")));
+        button_e->clicked().connect([=] {
+            if(mExtentDiv->isVisible())
+                mExtentDiv->hide();
+            else
+                mExtentDiv->show();
+        });
+        button_e->addStyleClass("btn btn-info");
+        printf("mextentdiv\n");
+        mExtentDiv = mParent->addWidget(cpp14::make_unique<WContainerWidget>());
+        mExtentDiv->setMargin(15,Wt::Side::Left);
+        mExtentDiv->setMargin(15,Wt::Side::Right);
+        mExtentDiv->addStyleClass("div_extent");
+        mExtentDiv->hide();
+        loadExtents(m_app->getUser().id());
+    }*/
+
+    mExtentDivGlob = mParent->addWidget(cpp14::make_unique<WContainerWidget>());
+    WPushButton * button_e = mExtentDivGlob->addWidget(cpp14::make_unique<WPushButton>(tr("afficher_extent")));
+    button_e->clicked().connect([=] {
+        if(mExtentDiv->isVisible())
+            mExtentDiv->hide();
+        else
+            mExtentDiv->show();
+    });
+    button_e->addStyleClass("btn btn-info");
+    printf("mextentdiv\n");
+    mExtentDiv = mExtentDivGlob->addWidget(cpp14::make_unique<WContainerWidget>());
+    mExtentDiv->setMargin(15,Wt::Side::Left);
+    mExtentDiv->setMargin(15,Wt::Side::Right);
+    mExtentDiv->addStyleClass("div_extent");
+    mExtentDiv->hide();
+
+    mParent->addWidget(cpp14::make_unique<WText>(tr("coucheStep3")));
+    WPushButton * bExportTiff = mParent->addWidget(cpp14::make_unique<WPushButton>("Télécharger"));
+
+    // pour l'instant tout passe par le slot JS qui renvoi un extent valide avant d'effectuer le crop et l'envoi de la carte à l'utilisateur
+    // c'est pour éviter que l'extent ne soit pas "à jour" avant le crop
+    bExportTiff->clicked().connect(this->slot);
+    //bExportTiff->clicked().connect(this,&groupLayers::updateMapExtentAndCropIm);
+
+    mSelect4Stat= new selectLayers4Stat(this);
+    mSelect4Download= new selectLayers4Download(this);
 
     /*   AUTRES ONLGETS de la stack   */
     // création de la légende (vide pour le moment)
     mLegend = new legend(this, mStackInfoPtr->mLegendW);
     mStation = new ST(mDico);
 
-    //std::cout << "done" << std::endl;
+    // updateGL pour cacher les couches expert
+    updateGL();
+
 }
 
 /*groupLayers::~groupLayers(){
@@ -86,9 +254,12 @@ void groupLayers::clickOnName(std::string aCode, TypeLayer type){
     // udpate du rendu visuel de tout les labels de couches -- cela se situe au niveau du grouplayer
     update(aCode, type);
 
+    // changer le mode CS vs FEE de grouplayer, utilse pour le tableau d'aptitude
+    if (type == TypeLayer::CS){ mTypeClassifST=TypeClassifST::CS;}
+    if (type == TypeLayer::FEE){ mTypeClassifST=TypeClassifST::FEE;}
     // ajouter la couche à la carte
     for (Layer * l : mVLs){
-        if (l->IsActive() && type==l->Type()){
+        if (l->IsActive()){ //&& type==l->Type()){
             l->displayLayer();
             updateLegende(l);
             break;
@@ -96,84 +267,59 @@ void groupLayers::clickOnName(std::string aCode, TypeLayer type){
     }
 }
 
-void groupLayers::changeClassClick(WText *t)
-{
-
-    //std::cout << "change classif station, actuellement " << currentClassifST << ", on veux mettre " << t->text().toUTF8() << "\n" << std::endl;
-    int index(0);
-    for (auto i : clasLabels_) {
-        // ouch vicieux ça
-        WText *l = i;
-        //std::cout <<"   l  est pointeur vers " << i->text().toUTF8() << std::endl;
-        // prefix match, e.g. en matches en-us.
-        bool isCurrent = t->text().toUTF8()==l->text().toUTF8();
-        if (isCurrent) { mTypeClassifST = cl[index];}
-        //choisi un des deux style
-        l->setStyleClass(isCurrent ? "currentEss" : "ess");
-        index++;
-    }
-
-    // ajouter la couche à la carte
-    for (Layer * l : mVLs){
-        if (l->IsActive()) l->displayLayer();
-    }
-}
-
 void groupLayers::extractInfo(double x, double y){
 
     if(!isnan(x) && !isnan(y) && !(x==0 && y==0)){
-    std::cout << "groupLayers ; extractInfo " << x << " , " << y << std::endl;
-    mStation->vider();
-    mLegend->vider();
-    int cur_index = mStackInfoPtr->stack_info->currentIndex(); // pour savoir où on en est
+        std::cout << "groupLayers ; extractInfo " << x << " , " << y << std::endl;
+        mStation->vider();
+        mLegend->vider();
+        int cur_index = mStackInfoPtr->stack_info->currentIndex(); // pour savoir où on en est
 
-    // maintenant on n'affiche plus la légende automatiquement, , pL n'aime pas. Pas grave on le fait quand meme !
-    //mStackInfoPtr->menuitem2_legend->select();
-    mStackInfoPtr->stack_info->setCurrentIndex(0);
+        mStackInfoPtr->stack_info->setCurrentIndex(0);
 
-    // bouton retour
-    WPushButton * retour = mLegend->addWidget(Wt::cpp14::make_unique<WPushButton>("Retour"));
-    retour->addStyleClass("btn btn-info");
+        // bouton retour
+        WPushButton * retour = mLegend->addWidget(Wt::cpp14::make_unique<WPushButton>("Retour"));
+        retour->addStyleClass("btn btn-info");
 
-    retour->clicked().connect([=]{
-        mStackInfoPtr->stack_info->setCurrentIndex(cur_index);
-    });
+        retour->clicked().connect([=]{
+            mStackInfoPtr->stack_info->setCurrentIndex(cur_index);
+        });
 
-    // tableau des informations globales - durant ce round, l'objet ST est modifié
-    mLegend->titreInfoRaster();
+        // tableau des informations globales - durant ce round, l'objet ST est modifié
+        mLegend->titreInfoRaster();
 
-    for (Layer * l : mVLs){
-        if (((l->Type()==TypeLayer::KK )| (l->Type()==TypeLayer::Thematique )) | (( l->IsActive()) & (l->Type()!=TypeLayer::Externe))){
+        for (Layer * l : mVLs){
+            if (((l->Type()==TypeLayer::KK )| (l->Type()==TypeLayer::Thematique )) | (( l->IsActive()) & (l->Type()!=TypeLayer::Externe))){
 
-            std::vector<std::string> layerLabelAndValue=l->displayInfo(x,y);
-            mLegend->add1InfoRaster(layerLabelAndValue);
+                std::vector<std::string> layerLabelAndValue=l->displayInfo(x,y);
+                mLegend->add1InfoRaster(layerLabelAndValue);
 
-            if (( l->IsActive())){
-                // affiche une popup pour indiquer la valeur pour cette couche
-                // attention, il faut escaper les caractères à problèmes du genre apostrophe
-                boost::replace_all(layerLabelAndValue.at(1),"'","\\'"); // javascript bug si jamais l'apostrophe n'est pas escapée
-                boost::replace_all(layerLabelAndValue.at(0),"'","\\'");
-                mParent->doJavaScript("content.innerHTML = '<p>"+layerLabelAndValue.at(0)+":</p><code>"+ layerLabelAndValue.at(1)+ "</code>';"
-                                      +"var coordinate = ["+std::to_string(x) + ","+ std::to_string(y) +"];"
-                                      +"overlay.setPosition(coordinate);"
-                                      +"overlay.setPosition(coordinate);"
-                                      );
+                if (( l->IsActive())){
+                    // affiche une popup pour indiquer la valeur pour cette couche
+                    // attention, il faut escaper les caractères à problèmes du genre apostrophe
+                    boost::replace_all(layerLabelAndValue.at(1),"'","\\'"); // javascript bug si jamais l'apostrophe n'est pas escapée
+                    boost::replace_all(layerLabelAndValue.at(0),"'","\\'");
+                    mParent->doJavaScript("content.innerHTML = '<p>"+layerLabelAndValue.at(0)+":</p><code>"+ layerLabelAndValue.at(1)+ "</code>';"
+                                          +"var coordinate = ["+std::to_string(x) + ","+ std::to_string(y) +"];"
+                                          +"overlay.setPosition(coordinate);"
+                                          +"overlay.setPosition(coordinate);"
+                                          );
+                }
+
             }
-
         }
-    }
 
-    // tableau du détail du calcul de l'aptitude d'une essence pour FEE
-    for (Layer * l : mVLs){
-        // on a bien une essence active et on est en mode FEE
-        if ( l->IsActive() && l->Type()==TypeLayer::FEE && mTypeClassifST==FEE){
-            mLegend->detailCalculAptFEE(mStation);
+        // tableau du détail du calcul de l'aptitude d'une essence pour FEE
+        for (Layer * l : mVLs){
+            // on a bien une essence active et on est en mode FEE
+            if ( l->IsActive() && l->Type()==TypeLayer::FEE && mTypeClassifST==FEE){
+                mLegend->detailCalculAptFEE(mStation);
+            }
         }
-    }
-    // tableau des aptitudes pour toutes les essences
-    mLegend->afficheAptAllEss();
+        // tableau des aptitudes pour toutes les essences
+        mLegend->afficheAptAllEss();
 
-   /* Wt::WAnimation animation(Wt::AnimationEffect::Fade,
+        /* Wt::WAnimation animation(Wt::AnimationEffect::Fade,
                              Wt::TimingFunction::Linear,
                              1000);
 
@@ -184,7 +330,7 @@ void groupLayers::extractInfo(double x, double y){
     */
 
 
-    mMap->updateView();
+        mMap->updateView();
     }else {
         std::cout << "x et y ne sont pas des nombres , pas bien " << std::endl;
     }
@@ -199,36 +345,28 @@ void groupLayers::computeStatGlob(OGRGeometry *poGeomGlobale){
         delete p;
     }
     mVLStat.clear();
-    //std::map<std::string,std::map<std::string,int>> aRes;
 
-    // il faut filtrer sur les couches sélectionnées et gerer un changement de mode FEE/CS pour les layers aptitude.
-    // non, pour les statistiques globales, on prend toutes les couches - bof trop long et surtout, trop de camemberts - je prends celles pour download
-    //for (auto &kv: getAllLayer() ){
-    for (auto &kv: getSelectedLayer4Download() ){
-        Layer * l=kv.second;
-        std::string aMode=kv.first.at(1);
+    // pour les statistiques globales, on prend toutes les couches selectionnées par select4Download
+
+    for (auto & l: getSelectedLayer4Download() ){
+
+
         // clé : la valeur au format légende (ex ; Optimum). Valeur ; pourcentage pour ce polygone
-        std::map<std::string,int> stat = l->computeStatOnPolyg(poGeomGlobale,aMode);
-        // c'est parcellaire:: qui doit gerer l'affichage des layerStatChart
-        //layerStatChart* aLayStatChart=new layerStatChart(l,stat,aMode);
-        //mVLStat.emplace_back(aLayStatChart);
-        //OGREnvelope env;
-        //poGeomGlobale->getEnvelope(&env);
-        mVLStat.push_back(new layerStatChart(l,stat,aMode,poGeomGlobale));
+        std::map<std::string,int> stat = l->computeStatOnPolyg(poGeomGlobale);
 
-        mPBar->setValue(mPBar->value() + 1);
-        m_app->processEvents();
+        mVLStat.push_back(new layerStatChart(l,stat,poGeomGlobale));
+
+        //mPBar->setValue(mPBar->value() + 1);
+        //m_app->processEvents();
     }
-    mPBar->setValue(mPBar->maximum());
-    std::cout << " done " << std::endl;
+    //mPBar->setValue(mPBar->maximum());
+
     //return aRes;
 }
 
 void groupLayers::computeStatOnPolyg(OGRLayer * lay,bool mergeOT){
 
-    for (auto &kv: getSelectedLayer4Stat() ){
-        Layer * l=kv.second;
-        std::string aMode=kv.first.at(1);
+    for (auto & l : getSelectedLayer4Stat() ){
 
         // défini le nouveau champ à ajouter à la table d'attribut - vérifie qu'il n'existe pas préhalablement
         if (lay->FindFieldIndex(l->getFieldName().c_str(),0)==-1){
@@ -255,7 +393,7 @@ void groupLayers::computeStatOnPolyg(OGRLayer * lay,bool mergeOT){
             poGeom->closeRings();
             poGeom->flattenTo2D();
             //std::map<std::string,int> stat = l->computeStatOnPolyg(poGeom,aMode);
-            layerStat ls(l,l->computeStatOnPolyg(poGeom,aMode),aMode);
+            layerStat ls(l,l->computeStatOnPolyg(poGeom));
             // on met un résumé des stat dans le champ nouvellement créé
             if (l->getFieldType()=="int"){
                 poFeature->SetField(l->getFieldName().c_str(), ls.getFieldVal(mergeOT));
@@ -303,545 +441,29 @@ std::map<std::string,int> groupLayers::apts(){
     return aRes;
 }
 
-selectLayers4Stat::selectLayers4Stat(groupLayers * aGL):mGL(aGL),selectLayers(aGL,aGL->getVpLs(),10){
-    //std::cout << "creation de selectLayers4Stat " << std::endl;
+void groupLayers::updateGL(bool expertMode){
 
-    // pour l'instant ; uniquement les aptitudes FEE
-    for (Layer * l : mVpLs){
-        if (l->Type()!=TypeLayer::Externe){
-            if (l->Type()==TypeLayer::FEE || l->Type()==TypeLayer::CS){
-                std::vector<std::string> aKey2={l->getCode(),"FEE"};
-                bool b(0);
-                //printf("getcode: %s\n",l->getCode().c_str());
-                if (l->getCode()=="HE"|| l->getCode()=="CS" || l->getCode()=="CP" || l->getCode()=="EP" || l->getCode()=="DO" || l->getCode()=="ME"){b=true;}
-                mSelectedLayers.emplace(std::make_pair(aKey2,b));
-                mLayersCBox.emplace(std::make_pair(aKey2,new Wt::WCheckBox()));
-            }
-
-            if (l->Type()==TypeLayer::Peuplement){
-                std::vector<std::string> aKey2={l->getCode(),""};
-                //printf("getcodeP : %s\n",l->getCode().c_str());
-                mSelectedLayers.emplace(std::make_pair(aKey2,true));
-                mLayersCBox.emplace(std::make_pair(aKey2,new Wt::WCheckBox()));
-            }
-
-        }
+    // boucle sur les layers et envoi du signal pour cacher ou rendre visible les checkbox
+    for (Layer * l : mVLs){
+       l->ExpertMode(expertMode);
     }
+    // pour cacher les noeuds racines , celui "aptitude CS"
+    expertMode_.emit(expertMode);
 
-    cont = new Wt::WContainerWidget();
-    cont->setOverflow(Wt::Overflow::Auto);
-    treeTable = cont->addWidget(cpp14::make_unique<WTreeTable>());
-    //treeTable->resize(300, 250);
-    treeTable->setHeight(241);
-    treeTable->setStyleClass("tree");
-    treeTable->addStyleClass("tree_left");
-    treeTable->tree()->setSelectionMode(SelectionMode::Extended);
-    treeTable->addColumn("", 20); // colonne pour les checkbox
-
-    auto root = cpp14::make_unique<WTreeTableNode>(tr("groupeCoucheAll"));
-    treeTable->setTreeRoot(std::move(root), "Couches");
-
-    // création des groupes de couches avec checkbox qui permet de toutes les selectionner en un click
-    // aptitude FEE
-    auto grAptFEE = cpp14::make_unique<WTreeTableNode>(tr("groupeCoucheAptFEE"));
-    WTreeTableNode *grAptFEE_ = grAptFEE.get();
-    std::unique_ptr<WCheckBox> checkAptFEE = cpp14::make_unique<WCheckBox>();
-    WCheckBox * checkAptFEE_ = checkAptFEE.get();
-    checkAptFEE_->changed().connect([=]{SelectLayerGroup(checkAptFEE_->isChecked(),TypeLayer::FEE,"FEE");});
-    grAptFEE->setColumnWidget(1, std::move(checkAptFEE));
-
-    // aptitude CS
-    /*
-    auto grAptCS = cpp14::make_unique<WTreeTableNode>("Aptitudes CS");
-    WTreeTableNode *grAptCS_ = grAptCS.get();
-    std::unique_ptr<WCheckBox> checkAptCS = cpp14::make_unique<WCheckBox>();
-    WCheckBox * checkAptCS_ = checkAptCS.get();
-    checkAptCS_->changed().connect([=]{SelectLayerGroup(checkAptCS_->isChecked(),TypeLayer::Apti,"CS");});
-    grAptCS->setColumnWidget(1, std::move(checkAptCS));
-    */
-
-    // description du peuplement
-    auto grPeup = cpp14::make_unique<WTreeTableNode>(tr("groupeCouchePeup"));
-    WTreeTableNode *grPeup_ = grPeup.get();
-    std::unique_ptr<WCheckBox> checkPeup = cpp14::make_unique<WCheckBox>();
-    WCheckBox * checkPeup_ = checkPeup.get();
-    checkPeup_->changed().connect([=]{SelectLayerGroup(checkPeup_->isChecked(),TypeLayer::Peuplement,"");});
-    grPeup->setColumnWidget(1, std::move(checkPeup));
-
-    for (auto kv : mSelectedLayers){
-        // une méthode pour récupérer un ptr vers le layer depuis le code aCode+aMode
-        Layer * l = getLayerPtr(kv.first);
-        std::string aCode(l->getCode());
-
-        switch (l->Type()){
-        case TypeLayer::CS:
-        case TypeLayer::FEE:{
-            auto node1 = cpp14::make_unique<WTreeTableNode>(l->getShortLabel());
-            auto node1_ = node1.get();
-            grAptFEE_->addChildNode(std::move(node1));
-            WCheckBox * check1_ = mLayersCBox.at(std::vector<std::string> {aCode,"FEE"});
-            if (isSelected(l->getCode(),"FEE")){check1_->setChecked();}
-            check1_->changed().connect([=]{SelectLayer(check1_->isChecked(),aCode,"FEE");});
-            node1_->setColumnWidget(1, std::unique_ptr<Wt::WCheckBox>(check1_));
-            break;
-        }
-        case TypeLayer::Peuplement:{
-            auto node1 = cpp14::make_unique<WTreeTableNode>(l->getShortLabel());
-            auto node1_ = node1.get();
-            grPeup_->addChildNode(std::move(node1));
-            WCheckBox * check1_ = mLayersCBox.at(std::vector<std::string> {aCode,""});
-            if (isSelected(l->getCode())){check1_->setChecked();}
-            check1_->changed().connect([=]{SelectLayer(check1_->isChecked(),aCode);});
-            node1_->setColumnWidget(1, std::unique_ptr<Wt::WCheckBox>(check1_));
-            break;
-        }
-        default:{
-            break;
-        }
-        }
-    }
-
-    treeTable->treeRoot()->addChildNode(std::move(grAptFEE));
-    //treeTable->treeRoot()->addChildNode(std::move(grAptCS));
-    treeTable->treeRoot()->addChildNode(std::move(grPeup));
-    treeTable->treeRoot()->expand();
-    //printf("4stat done");
-}
-
-Layer* selectLayers::getLayerPtr(std::vector<std::string> aCode){
-    Layer*  aRes=NULL;
-    for (Layer * l : mVpLs){
-        if (l->getCode()==aCode.at(0)){aRes=l;}
-    }
-    return aRes;
-}
-
-std::map<std::vector<std::string>,Layer*> selectLayers::getSelectedLayer(){
-    std::map<std::vector<std::string>,Layer*> aRes;
-    for (auto kv : mSelectedLayers){
-        if (kv.second){
-            aRes.emplace(std::make_pair(kv.first,getLayerPtr(kv.first)));
-        }
-    }
-    return aRes;
-}
-
-std::map<std::vector<std::string>,Layer*> selectLayers::getAllLayer(){
-    std::map<std::vector<std::string>,Layer*> aRes;
-    for (auto kv : mSelectedLayers){
-        aRes.emplace(std::make_pair(kv.first,getLayerPtr(kv.first)));
-    }
-    return aRes;
-}
-
-selectLayers4Download::selectLayers4Download(groupLayers * aGL):mGL(aGL),selectLayers(aGL,aGL->getVpLs(),25){
-    //std::cout << "creation de selectLayers4Download " << std::endl;
-    for (Layer * l : mVpLs){
-        if (l->Type()!=TypeLayer::Externe){
-            if (l->Type()==TypeLayer::FEE || l->Type()==TypeLayer::CS){
-
-
-                std::vector<std::string> aKey2={l->getCode(),"FEE"};
-
-                //if (ModeExpert){
-                std::vector<std::string> aKey1={l->getCode(),"CS"};
-                // default ; on ne veux pas les apt CS
-                mSelectedLayers.emplace(std::make_pair(aKey1,false));
-                mLayersCBox.emplace(std::make_pair(aKey1,new Wt::WCheckBox()));
-                //}
-                mSelectedLayers.emplace(std::make_pair(aKey2,false));
-                mLayersCBox.emplace(std::make_pair(aKey2,new Wt::WCheckBox()));
-            } else {
-                std::vector<std::string> aKey1={l->getCode(),""};
-                mSelectedLayers.emplace(std::make_pair(aKey1,false));
-                mLayersCBox.emplace(std::make_pair(aKey1,new Wt::WCheckBox()));
-            }
-        }
-    }
-
-    cont = new Wt::WContainerWidget();
-    cont->setOverflow(Wt::Overflow::Auto);
-    treeTable = cont->addWidget(cpp14::make_unique<WTreeTable>());
-    //treeTable->resize(300, 250);
-    treeTable->setHeight(241);
-    treeTable->setStyleClass("tree");
-    treeTable->addStyleClass("tree_left");
-    treeTable->tree()->setSelectionMode(SelectionMode::Extended);
-    treeTable->addColumn("", 20); // colonne pour les checkbox
-    auto root = cpp14::make_unique<WTreeTableNode>(tr("groupeCoucheAll"));
-    treeTable->setTreeRoot(std::move(root), "Raster");
-
-
-    // création des groupes de couches avec checkbox qui permet de toutes les selectionner en un click
-    // aptitude FEE
-    auto grAptFEE = cpp14::make_unique<WTreeTableNode>(tr("groupeCoucheAptFEE"));
-    WTreeTableNode *grAptFEE_ = grAptFEE.get();
-    std::unique_ptr<WCheckBox> checkAptFEE = cpp14::make_unique<WCheckBox>();
-    WCheckBox * checkAptFEE_ = checkAptFEE.get();
-    checkAptFEE_->changed().connect([=]{SelectLayerGroup(checkAptFEE_->isChecked(),TypeLayer::FEE,"FEE");});
-    grAptFEE->setColumnWidget(1, std::move(checkAptFEE));
-
-    // aptitude CS
-
-    auto grAptCS = cpp14::make_unique<WTreeTableNode>(tr("groupeCoucheAptCS"));
-    WTreeTableNode *grAptCS_ = grAptCS.get();
-    std::unique_ptr<WCheckBox> checkAptCS = cpp14::make_unique<WCheckBox>();
-    WCheckBox * checkAptCS_ = checkAptCS.get();
-    checkAptCS_->changed().connect([=]{SelectLayerGroup(checkAptCS_->isChecked(),TypeLayer::CS,"CS");});
-    grAptCS->setColumnWidget(1, std::move(checkAptCS));
-
-    // habitats, potentiel sylvicole
-    auto grKK = cpp14::make_unique<WTreeTableNode>(tr("groupeCoucheKKCS"));
-    WTreeTableNode *grKK_ = grKK.get();
-    std::unique_ptr<WCheckBox> checkKK = cpp14::make_unique<WCheckBox>();
-    WCheckBox * checkKK_ = checkKK.get();
-    checkKK_->changed().connect([=]{SelectLayerGroup(checkKK_->isChecked(),TypeLayer::KK,"");});
-    grKK->setColumnWidget(1, std::move(checkKK));
-
-    // diagnostic Stationnel
-    auto grSt = cpp14::make_unique<WTreeTableNode>(tr("groupeCoucheThem"));
-    WTreeTableNode *grSt_ = grSt.get();
-    std::unique_ptr<WCheckBox> checkSt = cpp14::make_unique<WCheckBox>();
-    WCheckBox * checkSt_ = checkSt.get();
-    checkSt_->changed().connect([=]{SelectLayerGroup(checkSt_->isChecked(),TypeLayer::Thematique,"");});
-    grSt->setColumnWidget(1, std::move(checkSt));
-
-    // description du peuplement
-    auto grPeup = cpp14::make_unique<WTreeTableNode>(tr("groupeCouchePeup"));
-    WTreeTableNode *grPeup_ = grPeup.get();
-    std::unique_ptr<WCheckBox> checkPeup = cpp14::make_unique<WCheckBox>();
-    WCheckBox * checkPeup_ = checkPeup.get();
-    checkPeup_->changed().connect([=]{SelectLayerGroup(checkPeup_->isChecked(),TypeLayer::Peuplement,"");});
-    grPeup->setColumnWidget(1, std::move(checkPeup));
-
-    //std::cout << " loop on layers in select layer 4 download"<< std::endl;
-    for (Layer * l : mVpLs){
-        std::string aCode=l->getCode();
-        switch (l->Type()){
-        case TypeLayer::FEE:{
-            auto node1 = cpp14::make_unique<WTreeTableNode>(l->getShortLabel());
-            auto node1_ = node1.get();
-            grAptFEE_->addChildNode(std::move(node1));
-            if (mLayersCBox.find(std::vector<std::string> {aCode,"FEE"})!=mLayersCBox.end()){
-                WCheckBox * check1_ = mLayersCBox.at(std::vector<std::string> {aCode,"FEE"});
-                if (isSelected(l->getCode(),"FEE")){check1_->setChecked();}
-                check1_->changed().connect([=]{SelectLayer(check1_->isChecked(),aCode,"FEE");});
-                node1_->setColumnWidget(1, std::unique_ptr<Wt::WCheckBox>(check1_));
-            } else {
-                std::cout << "pas bon " << std::endl;
-            }
-            break;
-        }
-        case TypeLayer::CS:{
-            if (ModeExpert){
-                auto node2 = cpp14::make_unique<WTreeTableNode>(l->getShortLabel());
-                auto node2_ = node2.get();
-                grAptCS_->addChildNode(std::move(node2));
-                WCheckBox * check2_ = mLayersCBox.at(std::vector<std::string> {aCode,"CS"});
-                check2_->changed().connect([=]{SelectLayer(check2_->isChecked(),aCode,"CS");});
-                node2_->setColumnWidget(1, std::unique_ptr<Wt::WCheckBox>(check2_));
-                break;
-            }
-        }
-        case TypeLayer::Thematique:{
-            auto node1 = cpp14::make_unique<WTreeTableNode>(l->getShortLabel());
-            auto node1_ = node1.get();
-            grSt_->addChildNode(std::move(node1));
-            WCheckBox * check1_ = mLayersCBox.at(std::vector<std::string> {aCode,""});
-            if (isSelected(l->getCode())){check1_->setChecked();}
-            check1_->changed().connect([=]{SelectLayer(check1_->isChecked(),aCode);});
-            node1_->setColumnWidget(1, std::unique_ptr<Wt::WCheckBox>(check1_));
-            break;
-        }
-        case TypeLayer::KK:{
-            if (ModeExpert){
-                auto node1 = cpp14::make_unique<WTreeTableNode>(l->getShortLabel());
-                auto node1_ = node1.get();
-                grKK_->addChildNode(std::move(node1));
-                WCheckBox * check1_ = mLayersCBox.at(std::vector<std::string> {aCode,""});
-                if (isSelected(l->getCode())){check1_->setChecked();}
-                check1_->changed().connect([=]{SelectLayer(check1_->isChecked(),aCode);});
-                node1_->setColumnWidget(1, std::unique_ptr<Wt::WCheckBox>(check1_));
-                break;
-            }
-        }
-        case TypeLayer::Peuplement:{
-            auto node1 = cpp14::make_unique<WTreeTableNode>(l->getShortLabel());
-            auto node1_ = node1.get();
-            grPeup_->addChildNode(std::move(node1));
-            WCheckBox * check1_ = mLayersCBox.at(std::vector<std::string> {aCode,""});
-            if (isSelected(l->getCode())){check1_->setChecked();}
-            check1_->changed().connect([=]{SelectLayer(check1_->isChecked(),aCode);});
-            node1_->setColumnWidget(1, std::unique_ptr<Wt::WCheckBox>(check1_));
-            break;
-        }
-        default:{
-
-        }
-        }
-    }
-
-    treeTable->treeRoot()->addChildNode(std::move(grAptFEE));
-    if (ModeExpert) treeTable->treeRoot()->addChildNode(std::move(grAptCS));
-    treeTable->treeRoot()->addChildNode(std::move(grSt));
-    if (ModeExpert) treeTable->treeRoot()->addChildNode(std::move(grKK));
-    treeTable->treeRoot()->addChildNode(std::move(grPeup));
-    treeTable->treeRoot()->expand();
-}
-
-
-void selectLayers::SelectLayer(bool select, std::string aCode, std::string aMode, bool afficheMsg){
-
-    std::vector<std::string> aKey={aCode,aMode};
-    if ((!select) |(nbMax>(numSelectedLayer()))){
-        if (mSelectedLayers.find(aKey)!=mSelectedLayers.end()){
-            mSelectedLayers.at(aKey)=select;
-            mLayersCBox.at(aKey)->setChecked(select);
-        } else {
-            std::cout << "je ne trouve pas la couche qui a le code " << aCode << " et le mode " << aMode << std::endl;
-        }
-    } else {
-        // faire apparaitre un message à l'utilisateur, maximum nbMax
-        // changer le status de la checkbox, remettre à false
-        if (select) mLayersCBox.at(aKey)->setChecked(false);
-        if (afficheMsg){
-            auto messageBox =
-                    mParent->addChild(Wt::cpp14::make_unique<Wt::WMessageBox>(
-                                          "Sélection des couches",
-                                          "<p>Vous avez atteint le maximun de " + std::to_string(nbMax)+ " couches</p>"
-                                                                                                         "<p>Veillez déselectionner une couche avant d'en sélectionner une nouvelle</p>",
-                                          Wt::Icon::Information,
-                                          Wt::StandardButton::Ok));
-
-            messageBox->setModal(false);
-            messageBox->buttonClicked().connect([=] {
-                mParent->removeChild(messageBox);
-            });
-            messageBox->show();
-        }
-
-    }
-    //std::cout << "nombre de couches sélectionnées " << numSelectedLayer() << std::endl;
-    // pourrait envoyer un signal au widget upload pour transmettre le nombre de couches sélectionnées pour affichage
-}
-
-/*
-void selectLayers::updateSL(std::vector<Layer *> aVpLs){
-    mVpLs=aVpLs;
-    mSelectedLayers.clear();
-    for (auto kv :mLayersCBox){
-        delete kv.second;
-    }
-    std::cout << "done update SL" << std::endl;
-}
-*/
-
-void selectLayers::SelectLayerGroup(bool select,TypeLayer aType,std::string aMode){
-    for (Layer * l : mVpLs){
-        if (l->Type()==aType){
-            SelectLayer(select,l->getCode(),aMode,false);
-        }
-    }
-    //std::cout << "nombre de couches sélectionnées " << numSelectedLayer() << std::endl;
-}
-
-
-// pour envoyer la liste des raster à uploadcarte
-std::vector<rasterFiles> selectLayers::getSelectedRaster(){
-    std::vector<rasterFiles> aRes;
-    for (Layer * l : mVpLs){
-        aRes.push_back(l->getRasterfile());
-    }
-    return aRes;
-}
-
-void groupLayers::updateGL(){
-
-    // clear
-    for (auto p :  mVLs) { delete p; }
-    mVLs.clear();
-    mParent->clear();
-
-    auto legendCombo = mParent->addWidget(cpp14::make_unique<WCheckBox>(tr("legendCheckbox")));
-    legendCombo->changed().connect([this]{
-        if(mLegendDiv->isVisible())
-            mLegendDiv->hide();
-        else
-            mLegendDiv->show();
-    });
-    mLegendDiv = mParent->addWidget(cpp14::make_unique<WContainerWidget>());
-    mLegendDiv->hide();
-    mTitle = mLegendDiv->addWidget(cpp14::make_unique<WText>(WString::tr("legendMsg")));
-    mLegendIndiv = mLegendDiv->addWidget(cpp14::make_unique<WTable>());
-    mLegendIndiv->setHeaderCount(1);
-    mLegendIndiv->setWidth(Wt::WLength("90%"));
-    mLegendIndiv->toggleStyleClass("table-striped",true);
-
-    /* Liste cartes 1	*/
-    std::unique_ptr<Wt::WTree> tree = Wt::cpp14::make_unique<Wt::WTree>();
-    tree->setSelectionMode(Wt::SelectionMode::Extended);
-    tree->addStyleClass("tree_left");
-    //auto folderIcon = Wt::cpp14::make_unique<Wt::WIconPair>("icons/yellow-folder-closed.png", "icons/yellow-folder-open.png", false);
-    //std::cout << "g1" << std::endl;
-    auto main_node = Wt::cpp14::make_unique<Wt::WTreeNode>(tr("groupeCoucheAll")); // std::move(folderIcon) // pour mettre des icones ouvert/fermé !
-    tree->setTreeRoot(std::move(main_node));
-    tree->treeRoot()->label()->setTextFormat(Wt::TextFormat::Plain);
-    tree->treeRoot()->setLoadPolicy(Wt::ContentLoading::NextLevel);
-    auto node1 = Wt::cpp14::make_unique<Wt::WTreeNode>(tr("groupeCoucheThem"));
-    auto node1_ = tree->treeRoot()->addChildNode(std::move(node1));
-    node1_->addStyleClass("tree_node");
-    tree->treeRoot()->expand();
-
-    auto node0 = Wt::cpp14::make_unique<Wt::WTreeNode>(tr("groupeCouchePeup"));
-    auto node0_ = tree->treeRoot()->addChildNode(std::move(node0));
-    node0_->addStyleClass("tree_node");
-
-    // carte IGN
-    /* maintenant elle est dans la liste des cartes via la BD
-    WText *label = node1_->addChildNode(Wt::cpp14::make_unique<Wt::WTreeNode>(""))->label();
-    label->clicked().connect([this]{clickOnName("IGN",TypeLayer::Externe);});
-    label->setTextAlignment(Wt::AlignmentFlag::Left);
-    mVLs.push_back(new Layer(this,"IGN",label,TypeLayer::Externe));
-    */
-
-    // creation des layers pour les KK du CS
-    if (ModeExpert){
-        for (auto & pair : *mDico->codeKK2Nom()){
-            WText *label;
-            label = node1_->addChildNode(Wt::cpp14::make_unique<Wt::WTreeNode>(""))->label();
-            mVLs.push_back(new Layer(this,pair.first,label,TypeLayer::KK));
-            std::string aCode=pair.first;
-            label->clicked().connect([this,aCode]{clickOnName(aCode,TypeLayer::KK);});
-        }
-    }
-
-    // ajout des cartes "FEE" ; NT NH Topo AE SS
-
-    for (auto & pair : *mDico->RasterType()){
-        // si pas mode expert, on n'utilise pas les couches du catalogue de station
-        if ((ModeExpert || pair.first.substr(0,2)!="CS") && mDico->rasterCat(pair.first)!="Peuplement"){
-            WText *label;
-            label = node1_->addChildNode(Wt::cpp14::make_unique<Wt::WTreeNode>(""))->label();
-            Layer  * aL= new Layer(this,pair.first,label,TypeLayer::Thematique);
-            std::string aCode=pair.first;
-            // un peu bidouille mais le typelayer de MNH est peuplement et il est redéfini dans le constructeur de layer
-            TypeLayer type= aL->Type();
-            label->clicked().connect([this,aCode,type]{clickOnName(aCode,type);});
-            mVLs.push_back(aL);
-        }
-    }
-
-    node1_->expand();
-
-    for (auto & pair : *mDico->RasterType()){
-        // couche catégorie peuplements
-        if (mDico->rasterCat(pair.first)=="Peuplement"){
-            WText *label;
-            label = node0_->addChildNode(Wt::cpp14::make_unique<Wt::WTreeNode>(""))->label();
-            Layer  * aL= new Layer(this,pair.first,label,TypeLayer::Thematique);
-            std::string aCode=pair.first;
-            // un peu bidouille mais le typelayer de MNH et le masque forestier sont peuplement et il est redéfini dans le constructeur de layer
-            TypeLayer type= aL->Type();
-            label->clicked().connect([this,aCode,type]{clickOnName(aCode,type);});
-            mVLs.push_back(aL);
-        }
-    }
-
-    node0_->expand();
-
-    auto node2 = Wt::cpp14::make_unique<Wt::WTreeNode>(tr("groupeCoucheAptFEE"));
-    auto node2_ = tree->treeRoot()->addChildNode(std::move(node2));
-    node2_->addStyleClass("tree_node");
-
-    auto node3 = Wt::cpp14::make_unique<Wt::WTreeNode>(tr("groupeCoucheAptCS"));
-    auto node3_ = node3.get();
-    node3_->addStyleClass("tree_node");
-    if (ModeExpert){
-        node3_ = tree->treeRoot()->addChildNode(std::move(node3));
-    }
-
-    // creation des layers pour les essences qui ont des aptitudes
-    for (auto & pair : *mDico->code2Nom()){
-        cEss ess(pair.first,mDico);
-        //std::cout << "fee" << std::endl;
-        if (ess.hasFEEApt()){
-            WText *label;
-
-            label = node2_->addChildNode(Wt::cpp14::make_unique<Wt::WTreeNode>(""))->label();
-            Layer  * aL= new Layer(this,pair.first,label,TypeLayer::FEE);
-            mVLs.push_back(aL);
-            std::string aCode=pair.first;
-            label->clicked().connect([this,aCode]{clickOnName(aCode,TypeLayer::FEE);});
-        }
-        //std::cout << "cs" << std::endl;
-        if (ModeExpert){
-            if (ess.hasCSApt()){
-                WText *label;
-                label = node3_->addChildNode(Wt::cpp14::make_unique<Wt::WTreeNode>(""))->label();
-                Layer  * aL= new Layer(this,pair.first,label,TypeLayer::CS);
-                mVLs.push_back(aL);
-                std::string aCode=pair.first;
-                label->clicked().connect([this,aCode]{clickOnName(aCode,TypeLayer::CS);});
-            }
-        }
-
-    }
-    //std::cout << "done nodeitem" << std::endl;
-    mParent->addWidget(cpp14::make_unique<WText>(tr("coucheStep1")));
-    mParent->addWidget(std::move(tree));
-    mParent->addWidget(cpp14::make_unique<WText>(tr("coucheStep2")));
-
-    // add user extents if connected
-    printf("isloggedin?\n");
     if(m_app->isLoggedIn()){
-        WPushButton * button_e = mParent->addWidget(cpp14::make_unique<WPushButton>(tr("afficher_extent")));
-        button_e->clicked().connect([=] {
-            if(mExtentDiv->isVisible())
-                mExtentDiv->hide();
-            else
-                mExtentDiv->show();
-        });
-        button_e->addStyleClass("btn btn-info");
-        printf("mextentdiv\n");
-        mExtentDiv = mParent->addWidget(cpp14::make_unique<WContainerWidget>());
-        mExtentDiv->setMargin(15,Wt::Side::Left);
-        mExtentDiv->setMargin(15,Wt::Side::Right);
-        mExtentDiv->addStyleClass("div_extent");
-        mExtentDiv->hide();
-        loadExtents(m_app->getUser().id());
-
-
-
+    loadExtents(m_app->getUser().id());
+    mExtentDivGlob->show();
+    } else {
+      mExtentDivGlob->hide();
     }
-    else{
-        printf("non connecté\n");
-    }
-
-    mParent->addWidget(cpp14::make_unique<WText>(tr("coucheStep3")));
-    WPushButton * bExportTiff = mParent->addWidget(cpp14::make_unique<WPushButton>("Télécharger"));
-    //bExportTiff->disable();
-
-    // pour l'instant tout passe par le slot JS qui renvoi un extent valide avant d'effectuer le crop et l'envoi de la carte à l'utilisateur
-    // c'est pour éviter que l'extent ne soit pas "à jour" avant le crop
-    bExportTiff->clicked().connect(this->slot);
-    //bExportTiff->clicked().connect(this,&groupLayers::updateMapExtentAndCropIm);
-
-    // création des arbres pour sélection des couches - ces objets sont affiché ailleur
-    if (mSelect4Download) delete mSelect4Download;
-    if (mSelect4Stat) delete mSelect4Stat;
-
-    mSelect4Stat= new selectLayers4Stat(this);
-    mSelect4Download= new selectLayers4Download(this);
 
 }
 
 void groupLayers::updateLegende(const Layer * l){
+    // vider la légende et afficher la légende personnelle de la couche active
     mLegendIndiv->clear();
-
     if (l->Type()!=TypeLayer::Externe){
-        // vider la légende et afficher la légende personnelle de la couche active
-        //std::cout << " je vais afficher la légende personnalisée pour " <<l->getLegendLabel() <<std::endl;
-        //vider();
+
         mTitle->setText(WString::tr("legendTitre"));
         int row(0);
         mLegendIndiv->elementAt(row, 0)->setColumnSpan(2);
@@ -863,7 +485,6 @@ void groupLayers::updateLegende(const Layer * l){
         mTitle->setText(WString::tr("legendMsg"));
     }
 }
-
 
 Layer * groupLayers::getActiveLay(){
     Layer * aRes=NULL;
@@ -968,41 +589,41 @@ bool cropIm(std::string inputRaster, std::string aOut, OGREnvelope ext){
             pDriver->CopyFiles(cropPath,inputPath);
             aRes=1;
         } else {
-        double width((ext.MaxX-ext.MinX)), height((ext.MaxY-ext.MinY));
+            double width((ext.MaxX-ext.MinX)), height((ext.MaxY-ext.MinY));
 
-        //adjust top left coordinates
-        transform[0] = ext.MinX;
-        transform[3] = ext.MaxY;
-        //determine dimensions of the new (cropped) raster in cells
-        int xSize = round(width/transform[1]);
-        int ySize = round(height/transform[1]);
-        //std::cout << "xSize " << xSize << ", ySize " << ySize << std::endl;
-        //create the new (cropped) dataset
-        if (xSize>0 && ySize>0 && xSize < maxSizePix4Export && ySize<maxSizePix4Export){
-            pCroppedRaster = pDriver->Create(cropPath, xSize, ySize, 1, GDT_Byte, NULL); //or something similar
+            //adjust top left coordinates
+            transform[0] = ext.MinX;
+            transform[3] = ext.MaxY;
+            //determine dimensions of the new (cropped) raster in cells
+            int xSize = round(width/transform[1]);
+            int ySize = round(height/transform[1]);
+            //std::cout << "xSize " << xSize << ", ySize " << ySize << std::endl;
+            //create the new (cropped) dataset
+            if (xSize>0 && ySize>0 && xSize < maxSizePix4Export && ySize<maxSizePix4Export){
+                pCroppedRaster = pDriver->Create(cropPath, xSize, ySize, 1, GDT_Byte, NULL); //or something similar
 
-            pCroppedRaster->SetProjection( pInputRaster->GetProjectionRef() );
-            pCroppedRaster->SetGeoTransform( transform );
+                pCroppedRaster->SetProjection( pInputRaster->GetProjectionRef() );
+                pCroppedRaster->SetGeoTransform( transform );
 
-            int xOffset=round((transform[0]-tr1[0])/tr1[1]);
-            int yOffset=round((transform[3]-tr1[3])/tr1[5]);
-            float *scanline;
-            scanline = (float *) CPLMalloc( sizeof( float ) * xSize );
-            // boucle sur chaque ligne
-            for ( int row = 0; row < ySize; row++ )
-            {
-                // lecture
-                pInputRaster->GetRasterBand(1)->RasterIO( GF_Read, xOffset, row+yOffset, xSize, 1, scanline, xSize,1, GDT_Float32, 0, 0 );
-                // écriture
-                pCroppedRaster->GetRasterBand(1)->RasterIO( GF_Write, 0, row, xSize,1, scanline, xSize, 1,GDT_Float32, 0, 0 );
+                int xOffset=round((transform[0]-tr1[0])/tr1[1]);
+                int yOffset=round((transform[3]-tr1[3])/tr1[5]);
+                float *scanline;
+                scanline = (float *) CPLMalloc( sizeof( float ) * xSize );
+                // boucle sur chaque ligne
+                for ( int row = 0; row < ySize; row++ )
+                {
+                    // lecture
+                    pInputRaster->GetRasterBand(1)->RasterIO( GF_Read, xOffset, row+yOffset, xSize, 1, scanline, xSize,1, GDT_Float32, 0, 0 );
+                    // écriture
+                    pCroppedRaster->GetRasterBand(1)->RasterIO( GF_Write, 0, row, xSize,1, scanline, xSize, 1,GDT_Float32, 0, 0 );
+                }
+                CPLFree(scanline);
+
+                aRes=1;
+                if( pCroppedRaster != NULL ){GDALClose( (GDALDatasetH) pCroppedRaster );}
+            } else {
+                std::cout << " crop du raster a échoué: taille pas correcte " << std::endl;
             }
-            CPLFree(scanline);
-
-            aRes=1;
-            if( pCroppedRaster != NULL ){GDALClose( (GDALDatasetH) pCroppedRaster );}
-        } else {
-            std::cout << " crop du raster a échoué: taille pas correcte " << std::endl;
-        }
 
         }
         GDALClose(pInputRaster);
@@ -1048,7 +669,7 @@ bool groupLayers::getExpertModeForUser(std::string id){
     while(sqlite3_step(stmt) == SQLITE_ROW)
     {
         if (sqlite3_column_type(stmt, 0)!=SQLITE_NULL){
-        aRes=sqlite3_column_int(stmt, 0);
+            aRes=sqlite3_column_int(stmt, 0);
         } else {std::cout << "je ne parviens pas à lire la table user_expert " << std::endl;  }
     }
     std::cout << "mode expert est à " << aRes << std::endl;
@@ -1142,3 +763,12 @@ void groupLayers::deleteExtent(std::string id){
     closeConnection();
     loadExtents(id);
 }
+
+std::vector<rasterFiles> groupLayers::getSelect4Download(){return mSelect4Download->getSelectedRaster();}
+std::vector<rasterFiles> groupLayers::getSelect4Stat(){return mSelect4Stat->getSelectedRaster();}
+
+int groupLayers::getNumSelect4Stat(){return mSelect4Stat->numSelectedLayer();}
+int groupLayers::getNumSelect4Download(){return mSelect4Download->numSelectedLayer();}
+std::vector<Layer *>groupLayers::getSelectedLayer4Stat(){return mSelect4Stat->getSelectedLayer();}
+std::vector<Layer *> groupLayers::getSelectedLayer4Download(){return mSelect4Download->getSelectedLayer();}
+//std::vector<Layer *> groupLayers::getAllLayer(){return mSelect4Download->getAllLayer();}

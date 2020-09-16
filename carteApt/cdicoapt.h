@@ -19,7 +19,7 @@
 
 //using namespace Wt::Dbo;
 
-enum TypeCarte {Apt, Potentiel, Station1, Habitats,NH,NT,Topo,AE,SS,ZBIO,CSArdenne,CSLorraine,MNH2019,Composition};
+enum TypeCarte {Apt, Potentiel, Station1, Habitats,NH,NT,Topo,AE,SS,ZBIO,CSArdenne,CSLorraine,MNH2019,Composition,MNT16b};
 
 enum class TypeVar {Classe,
                     Continu
@@ -77,6 +77,10 @@ public:
     }
     std::string cat(){ return " R:" + std::to_string(mR)+", G:"+std::to_string(mG)+", B"+std::to_string(mB);}
     std::string cat2(){ return std::to_string(mR)+" "+std::to_string(mG)+" "+std::to_string(mB);}
+    std::string catHex(){
+            unsigned long hex= ((mR & 0xff) << 16) + ((mG & 0xff) << 8) + (mB & 0xff);
+            return "#"+std::to_string(hex);
+        }
 };
 
 
@@ -97,6 +101,7 @@ public:
 
     TypeVar getTypeVar() const{return mTypeVar;}
     TypeLayer getCatLayer() const{return mTypeLayer;}
+    bool Expert() const{return mExpert;}
 
 private:
     TypeCarte mType;
@@ -109,6 +114,8 @@ private:
 
     // le dictionnaire des valeurs raster vers leur signification.
     std::map<int, color> mDicoCol;
+    // pour distinguer les cartes qui sont accèssible à tous ou pas
+    bool mExpert;
 };
 
 
@@ -262,6 +269,7 @@ public:
     std::map<std::string,std::string>  * RasterVar(){return  &Dico_RasterVar;}
     std::map<std::string,std::string>  * RasterLayer(){return  &Dico_RasterLayer;}
     std::map<std::string,std::string>  * RasterNom(){return  &Dico_RasterNomComplet;}
+    std::map<std::string,bool>  * RasterExpert(){return  &Dico_RasterExpert;}
     std::map<std::string,std::string>  * code2Nom(){return  &Dico_code2NomFR;}
     std::map<int,std::string>  * NH(){return  &Dico_NH;}
     std::map<int,std::string>  * NT(){return  &Dico_NT;}
@@ -451,6 +459,12 @@ public:
         return aRes;
     }
 
+    // hauteur en mètres de la couche MNT que j'ai convertie en 16bits
+    double mnt(int aVal){
+        double aRes(aVal/10);
+        return aRes;
+    }
+
     bool hasWMSinfo(std::string aCode){
         return Dico_WMS.find(aCode)!=Dico_WMS.end();
     }
@@ -507,6 +521,7 @@ private:
     // description peuplement vs description station
     std::map<std::string,std::string>  Dico_RasterLayer;
     std::map<std::string,std::string>  Dico_RasterNomComplet;
+     std::map<std::string,bool>  Dico_RasterExpert;
     // key ; code le la couche layer. value ; les infos nécessaire pour charger le wms
     std::map<std::string,WMSinfo>  Dico_WMS;
     std::map<int,std::string>  Dico_ZBIO;

@@ -9,7 +9,6 @@ cDicoApt::cDicoApt(std::string aBDFile):mBDpath(aBDFile)
         // dico Ess Nom -- code
         sqlite3_stmt * stmt;
         std::string SQLstring="SELECT Ess_FR,Code_FR,prefix FROM dico_essences ORDER BY Ess_FR DESC;";
-        //std::tuple<std::string, std::string> t =session.query<std::tuple<std::string, std::string>>(SQLstring);
         sqlite3_prepare_v2( db_, SQLstring.c_str(), -1, &stmt, NULL );//preparing the statement
         while(sqlite3_step(stmt) == SQLITE_ROW)
         {
@@ -92,9 +91,9 @@ cDicoApt::cDicoApt(std::string aBDFile):mBDpath(aBDFile)
         getlogin_r(userName,sizeof(userName));
         std::string s(userName);
         if (s=="lisein"){
-            SQLstring="SELECT Code,Dir2,Nom,Type,NomComplet,Categorie,TypeVar FROM fichiersGIS;";
+            SQLstring="SELECT Code,Dir2,Nom,Type,NomComplet,Categorie,TypeVar, expert FROM fichiersGIS;";
         } else {
-            SQLstring="SELECT Code,Dir,Nom,Type,NomComplet,Categorie,TypeVar FROM fichiersGIS;";
+            SQLstring="SELECT Code,Dir,Nom,Type,NomComplet,Categorie,TypeVar, expert FROM fichiersGIS;";
         }
         sqlite3_reset(stmt);
         sqlite3_prepare_v2( db_, SQLstring.c_str(), -1, &stmt, NULL );
@@ -116,6 +115,9 @@ cDicoApt::cDicoApt(std::string aBDFile):mBDpath(aBDFile)
                     Dico_RasterNomComplet.emplace(std::make_pair(aA,aE));
                     Dico_RasterLayer.emplace(std::make_pair(aA,aF));
                     Dico_RasterVar.emplace(std::make_pair(aA,aG));
+                    bool expert(0);
+                    if (sqlite3_column_type(stmt, 7)!=SQLITE_NULL) {expert=sqlite3_column_int( stmt, 7 );}
+                    Dico_RasterExpert.emplace(std::make_pair(aA,expert));
                 }
             }
         }
@@ -133,7 +135,6 @@ cDicoApt::cDicoApt(std::string aBDFile):mBDpath(aBDFile)
             }
         }
 
-
         SQLstring="SELECT Col,R,G,B FROM dico_color;";
         sqlite3_reset(stmt);
         sqlite3_prepare_v2( db_, SQLstring.c_str(), -1, &stmt, NULL );
@@ -141,6 +142,20 @@ cDicoApt::cDicoApt(std::string aBDFile):mBDpath(aBDFile)
         {
             if (sqlite3_column_type(stmt, 0)!=SQLITE_NULL && sqlite3_column_type(stmt, 1)!=SQLITE_NULL && sqlite3_column_type(stmt, 2)!=SQLITE_NULL&& sqlite3_column_type(stmt, 3)!=SQLITE_NULL){
 
+                std::string aA=std::string( (char *)sqlite3_column_text( stmt, 0 ));
+                int R=sqlite3_column_int( stmt, 1 );
+                int G=sqlite3_column_int( stmt, 2 );
+                int B=sqlite3_column_int( stmt, 3 );
+                colors.emplace(std::make_pair(aA,color(R,G,B)));
+            }
+        }
+        // palette des gris faite maison
+        SQLstring="SELECT Col,R,G,B FROM dico_colGrey;";
+        sqlite3_reset(stmt);
+        sqlite3_prepare_v2( db_, SQLstring.c_str(), -1, &stmt, NULL );
+        while(sqlite3_step(stmt) == SQLITE_ROW)
+        {
+            if (sqlite3_column_type(stmt, 0)!=SQLITE_NULL && sqlite3_column_type(stmt, 1)!=SQLITE_NULL && sqlite3_column_type(stmt, 2)!=SQLITE_NULL&& sqlite3_column_type(stmt, 3)!=SQLITE_NULL){
                 std::string aA=std::string( (char *)sqlite3_column_text( stmt, 0 ));
                 int R=sqlite3_column_int( stmt, 1 );
                 int G=sqlite3_column_int( stmt, 2 );
@@ -276,18 +291,6 @@ cDicoApt::cDicoApt(std::string aBDFile):mBDpath(aBDFile)
     }
 
     //std::cout << "Dico code essence --> nom essence francais a "<< Dico_code2NomFR.size() << " elements \n" << std::endl;
-    /*std::cout << "Dico code NH --> nom NH a "<< Dico_NH.size() << " elements" << std::endl;
-    std::cout << "Dico code NT --> nom NT a "<< Dico_NT.size() << " elements" << std::endl;
-    std::cout << "Dico code NTNH --> nom NH a "<< Dico_code2NTNH.size() << " elements" << std::endl;
-    std::cout << "Dico code Zbio --> nom Zone bioclim a "<< Dico_ZBIO.size() << " elements" << std::endl;
-    std::cout << "Dico code station --> nom station a "<< Dico_station.size() << " elements" << std::endl;
-    std::cout << "Dico code couche SIG --> chemin d'accès a "<< Dico_GISfile.size() << " elements" << std::endl;
-    std::cout << "Dico aptitude --> code aptitude a "<< Dico_Apt.size() << " elements" << std::endl;*/
-    //std::cout << "done" << std::endl ;
-
-    /*for (auto & p : colors){
-        std::cout << " couleur " << p.first << " : " << p.second.cat() << std::endl;
-    }*/
 }
 
 std::map<int,std::map<std::string,int>> cDicoApt::getFEEApt(std::string aCodeEs){
@@ -393,7 +396,7 @@ std::map<int,color> cDicoApt::getDicoRasterCol(std::string aCode){
     }
     SQLstring="SELECT "+field_raster+", col FROM "+ nom_dico ;
     if (cond!=""){ SQLstring=SQLstring+" WHERE "+cond+";";} else {SQLstring=SQLstring+";";}
-     //if (aCode=="MF"){std::cout << SQLstring << "\n\n" << std::endl;}
+    //if (aCode=="MF"){std::cout << SQLstring << "\n\n" << std::endl;}
     sqlite3_reset(stmt);
     sqlite3_prepare_v2( db_, SQLstring.c_str(), -1, &stmt, NULL );//preparing the statement
     while(sqlite3_step(stmt) == SQLITE_ROW)
@@ -403,7 +406,7 @@ std::map<int,color> cDicoApt::getDicoRasterCol(std::string aCode){
             std::string aB("");
             if (sqlite3_column_type(stmt, 1)!=SQLITE_NULL ) {aB=std::string( (char *)sqlite3_column_text( stmt, 1 ) );}
 
-           // if (aCode=="MF"){ std::cout << " ajout dans dicoCol " << aA << " , col " << aB << std::endl;}
+            // if (aCode=="MF"){ std::cout << " ajout dans dicoCol " << aA << " , col " << aB << std::endl;}
             aRes.emplace(std::make_pair(aA,getColor(aB)));
         }
     }
@@ -459,25 +462,12 @@ std::map<int,std::map<int,int>> cDicoApt::getCSApt(std::string aCodeEs){
     }
     sqlite3_finalize(stmt);
 
-    /*}
-    rc = sqlite3_close_v2(db_);
-    if( rc ) {
-        fprintf(stderr, "Can't close database: %s\n", sqlite3_errmsg(db_));
-        std::cout << "getCSApt" << std::endl;
-    }*/
     return aRes;
 }
 
 std::map<int,std::map<int,int>> cDicoApt::getKKCS(std::string aColName){
     std::map<int,std::map<int,int>> aRes;
-    /*sqlite3 *db_;
-    int rc;
-    rc = sqlite3_open_v2(mBDpath.c_str(), &db_,SQLITE_OPEN_READONLY,NULL);
-    if( rc ) {
-        fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db_));
-        std::cout << " mBDpath " << mBDpath << std::endl;
-    } else {
-    */
+
     sqlite3_stmt * stmt;
     // boucle sur tout les identifiants de zbio mais attention, les catalogues de station ne couvrent pas tout donc vérif si ND
     for(auto&& zbio : Dico_ZBIO | boost::adaptors::map_keys){
@@ -548,26 +538,12 @@ std::map<int,std::map<int,std::vector<std::string>>> cDicoApt::getHabitatCS(std:
     }
     sqlite3_finalize(stmt);
 
-    /*}
-    rc = sqlite3_close_v2(db_);
-    if( rc ) {
-        fprintf(stderr, "Can't close database: %s\n", sqlite3_errmsg(db_));
-        std::cout << "getHabitatCS" << std::endl;
-    }
-    */
     return aRes;
 }
 
 std::map<int,std::map<int,int>> cDicoApt::getRisqueTopo(std::string aCodeEs){
     std::map<int,std::map<int,int>> aRes;
-    /*sqlite3 *db_;
-    int rc;
-    rc = sqlite3_open_v2(mBDpath.c_str(), &db_,SQLITE_OPEN_READONLY,NULL);
-    if( rc ) {
-        fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db_));
-        std::cout << " mBDpath " << mBDpath << std::endl;
-    } else {
-    */
+
     sqlite3_stmt * stmt;
     // hors Ardenne
     std::string SQLstring="SELECT Secteurfroid,Secteurneutre,Secteurchaud,fond_Vallee FROM Risque_topoFEE WHERE Code_Fr='"+ aCodeEs+"';";
@@ -610,29 +586,21 @@ std::map<int,std::map<int,int>> cDicoApt::getRisqueTopo(std::string aCodeEs){
             }
     }
     sqlite3_finalize(stmt);
-
-    /*}
-    rc = sqlite3_close_v2(db_);
-    if( rc ) {
-        fprintf(stderr, "Can't close database: %s\n", sqlite3_errmsg(db_));
-        std::cout << "getRisqueTopo" << std::endl;
-    }
-    */
     return aRes;
 }
 
 int cDicoApt::openConnection(){
-int rc;
+    int rc;
 
-std::cout << "chargement des dictionnaires de la BD ..." ;
-//db_->Sqlite3(mBDpath);
+    std::cout << "chargement des dictionnaires de la BD ..." ;
+    //db_->Sqlite3(mBDpath);
 
-rc = sqlite3_open_v2(mBDpath.c_str(), &db_,SQLITE_OPEN_READONLY,NULL);
-if( rc ) {
-    fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db_));
-    std::cout << " mBDpath " << mBDpath << std::endl;
-}
-return rc;
+    rc = sqlite3_open_v2(mBDpath.c_str(), &db_,SQLITE_OPEN_READONLY,NULL);
+    if( rc ) {
+        fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db_));
+        std::cout << " mBDpath " << mBDpath << std::endl;
+    }
+    return rc;
 }
 
 void cDicoApt::closeConnection(){
@@ -646,12 +614,10 @@ void cDicoApt::closeConnection(){
 cEss::cEss(std::string aCodeEs,cDicoApt * aDico):mCode(aCodeEs),mNomFR(aDico->accroEss2Nom(aCodeEs)),mDico(aDico)
   ,mType(Apt),mPrefix(aDico->accroEss2prefix(aCodeEs)){
     //std::cout << "creation de l'essence " << mNomFR << std::endl;
-    // le souci c'est que je me connecte 4 fois à la BD pour chaque essence, est-ce bien propre comme manière de faire?
     mEcoVal=aDico->getFEEApt(mCode);
     mAptCS=aDico->getCSApt(mCode);
     mAptZbio=aDico->getZBIOApt(mCode);
     mRisqueTopo=aDico->getRisqueTopo(mCode);
-
 }
 
 //effectue la confrontation Apt Zbio et AptHydroTrophiue
@@ -803,9 +769,10 @@ int cKKCS::getHab(int aZbio,int aSTId){
     return aRes;
 }
 
-cRasterInfo::cRasterInfo(std::string aCode,cDicoApt * aDico):mDico(aDico),mCode(aCode){
+cRasterInfo::cRasterInfo(std::string aCode,cDicoApt * aDico):mDico(aDico),mCode(aCode),mExpert(0){
     mNom=mDico->RasterNom()->at(mCode);
     mPathRaster=mDico->File(mCode);
+    mExpert=mDico->RasterExpert()->at(mCode);
     mType =str2TypeCarte(mDico->RasterType()->at(mCode));
     mTypeVar =str2TypeVar(mDico->RasterVar()->at(mCode));
     mTypeLayer =str2TypeLayer(mDico->RasterLayer()->at(mCode));

@@ -71,6 +71,8 @@ public:
     Layer(const Layer &lay){
         //std::cout << "construct by copy layer " << std::endl;
         mActive=lay.mActive;
+        mExpert=lay.mExpert;
+        mIsVisible=lay.mIsVisible;
         mGroupL=lay.mGroupL;
         mType=lay.mType;
         mEss=NULL;
@@ -101,6 +103,8 @@ public:
     Layer(Layer&& lay) noexcept {
         //std::cout << "construct by move layer " << std::endl;
         mActive=lay.mActive;
+        mExpert=lay.mExpert;
+        mIsVisible=lay.mIsVisible;
         mGroupL=lay.mGroupL;
         mType=lay.mType;
         mEss=NULL;
@@ -136,7 +140,7 @@ public:
 
     std::vector<std::string> displayInfo(double x, double y);
     // clé : la valeur au format légende (ex ; Optimum). Valeur ; pourcentage pour ce polygone
-    std::map<std::string,int> computeStatOnPolyg(OGRGeometry * poGeom, std::string aMode="FEE");
+    std::map<std::string,int> computeStatOnPolyg(OGRGeometry * poGeom);
     GDALDataset * rasterizeGeom(OGRGeometry *poGeom);
 
     // raster value
@@ -172,10 +176,7 @@ public:
     // les info utile pour manipuler les fichiers (avec une méthode pour sélectionner le fichier de symbologie Qgis)
     rasterFiles getRasterfile();
 
-
-    // à cause de ma superbe idée de merde de mettre deux couches raster par layer, je dois surcharger ces méthodes pour pouvoir spécifier le mode Fee vs Cs
     std::vector<std::string> getCode(std::string aMode);
-    std::string getPathTif(std::string aMode);
     std::string getLegendLabel(std::string aMode);
 
     TypeLayer Type() const {return mType;}
@@ -189,6 +190,30 @@ public:
     // ce n'est plus un pointeur
     std::map<int, color> mDicoCol;
 
+    // signal pour cacher les nodes qui sont en mode expert
+    Wt::Signal<bool>& changeExpertMode() { return expertMode_; }
+    Wt::Signal<bool> expertMode_;
+    void ExpertMode(bool GlobalExpertMode){
+        // va envoyer le signal à setNodeVisible
+        if (GlobalExpertMode) {
+            mIsVisible=1;
+        } else {
+            if (mExpert) {
+            mIsVisible=0;
+            } else {
+            mIsVisible=1;
+            }
+        }
+         expertMode_.emit(mIsVisible);
+    }
+    // utilisé dans les construteurs pour changer en un coup mIsVisible et mExpert
+    void setExpert(bool expert){
+        mExpert=expert;
+        mIsVisible=!expert;
+    }
+    // pour savoir distinguer mode expert et mode normal au niveau de chaque layer
+    bool mIsVisible;
+    bool isVisible(){return mIsVisible;}
 
     bool hasColor(int aCode) const{
         bool aRes(0);
@@ -230,6 +255,8 @@ public:
     cEss * Ess(){return mEss;}
 private:
     bool mActive;
+    // les couches sont taggées comme étant expert ou non expert
+    bool mExpert;
     groupLayers * mGroupL;
     TypeLayer mType;
     TypeVar mTypeVar;

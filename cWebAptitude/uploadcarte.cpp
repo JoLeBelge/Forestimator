@@ -9,7 +9,7 @@ uploadCarte::uploadCarte(WContainerWidget *parent, groupLayers * aGL, parcellair
     mParent->addWidget(cpp14::make_unique<Wt::WText>(tr("infoTelechargement")));
 
     mParent->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
-    mParent->addWidget(std::unique_ptr<Wt::WContainerWidget>(mGL->afficheSelect4Stat()));
+    //mParent->addWidget(std::unique_ptr<Wt::WContainerWidget>(mGL->afficheSelect4Stat()));
     mParent->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
 
     mParent->addWidget(cpp14::make_unique<WText>("<h4>Télécharger le parcellaire</h4>"));

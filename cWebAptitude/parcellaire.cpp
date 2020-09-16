@@ -13,6 +13,7 @@ parcellaire::parcellaire(WContainerWidget *parent, groupLayers *aGL, Wt::WApplic
   ,downloadRasterBt(NULL)
   ,mStatW(statW)
 {
+    //std::cout << "creation parcellaire " << std::endl;
     mDico=aGL->Dico();
     mJSfile=  aGL->Dico()->File("addOLgeojson");
 
@@ -62,11 +63,13 @@ parcellaire::parcellaire(WContainerWidget *parent, groupLayers *aGL, Wt::WApplic
     computeStatButton->disable();
     mParent->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
 
-    mGL->mPBar = mParent->addNew<Wt::WProgressBar>();
+    /*mGL->mPBar = mParent->addNew<Wt::WProgressBar>();
     mParent->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
+
     mGL->mPBar->setRange(0, mGL->getNumSelect4Stat());
     mGL->mPBar->setValue(0);
     mGL->mPBar->setInline(0);
+    */
 
     mParent->addWidget(cpp14::make_unique<WText>(tr("anaStep4")));
     downloadShpBt = mParent->addWidget(cpp14::make_unique<Wt::WPushButton>("Télécharger le shp"));
@@ -79,7 +82,6 @@ parcellaire::parcellaire(WContainerWidget *parent, groupLayers *aGL, Wt::WApplic
     mParent->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
     mContSelect4D= mParent->addWidget(cpp14::make_unique<Wt::WContainerWidget>());
 
-    //mParent->addWidget(std::unique_ptr<Wt::WContainerWidget>(mGL->afficheSelect4Download()));
     mParent->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
 
     downloadRasterBt = mParent->addWidget(cpp14::make_unique<Wt::WPushButton>("Télécharger les cartes"));
@@ -96,8 +98,8 @@ parcellaire::parcellaire(WContainerWidget *parent, groupLayers *aGL, Wt::WApplic
     downloadShpBt->clicked().connect(this,&parcellaire::downloadShp);
     downloadRasterBt->clicked().connect(this,&parcellaire::downloadRaster);
 
-    // rempli les 2 conteneurs qui présentent les selectLayers
-    update();
+    mContSelect4Stat->addWidget(std::unique_ptr<selectLayers4Stat>(mGL->mSelect4Stat));
+    mContSelect4D->addWidget(std::unique_ptr<selectLayers4Download>(mGL->mSelect4Download));
 }
 
 parcellaire::~parcellaire(){
@@ -175,9 +177,7 @@ bool parcellaire::toGeoJson(){
                 /*papszOptions = CSLSetNameValue( papszOptions, "COORDINATE_PRECISION", "2" );
     std::cout << "papszOptions " <<papszOptions << std::endl;
     papszOptions = CSLSetNameValue( papszOptions, "SIGNIFICANT_FIGURES", "5" );
-     std::cout << "papszOptions " <<papszOptions << std::endl;
-    //papszOptions = CSLSetNameValue( papszOptions, "RFC7946", "YES" );
-    std::cout << "papszOptions " <<papszOptions << std::endl;
+
     */
                 GDALDataset * DS2;
                 DS2 = jsonDriver->CreateCopy(outPath, DS, FALSE, papszOptions,NULL, NULL );
@@ -257,21 +257,11 @@ bool parcellaire::computeGlobalGeom(OGRLayer * lay){
         int aSurfha=OGR_G_GetArea(poGeomGlobale)/10000;
         printf("aSurfha=%d",aSurfha);
         if (aSurfha<globSurfMax){
-            //OGRPolygon * pol=poGeom2->toPolygon();
-            //std::ofstream out("/home/lisein/Documents/carteApt/Forestimator/build-WebAptitude/tmp/test.geojson");
-            //out << poGeom->exportToJson();
-            //out.close();
-            /*OGRPoint * aPt=NULL;
-            err = poGeomGlobale->Centroid(aPt);
-            if (err!=OGRERR_NONE){
-                std::cout << "problem avec le calcul du centroid, erreur : " << err <<  std::endl;
-                */
-                poGeomGlobale->getEnvelope(&mParcellaireExtent);
-                centerX= (mParcellaireExtent.MaxX+mParcellaireExtent.MinX)/2;
-                centerY= (mParcellaireExtent.MaxY+mParcellaireExtent.MinY)/2;
+            poGeomGlobale->getEnvelope(&mParcellaireExtent);
+            centerX= (mParcellaireExtent.MaxX+mParcellaireExtent.MinX)/2;
+            centerY= (mParcellaireExtent.MaxY+mParcellaireExtent.MinY)/2;
 
             aRes=1;
-
         }
     }
 
@@ -290,29 +280,14 @@ void parcellaire::display(){
         std::string aFileIn(mJSfile);
 
         std::ifstream in(aFileIn);
-        //std::string aTmp(aFileIn+".tmp");
-        //std::ofstream out(aTmp);
         ss << in.rdbuf();
         in.close();
         std::string JScommand(ss.str());
 
         std::string aFind1("NAME");
-        //std::string line;
-        std::string aReplace(geoJsonRelName());
-        /*while (getline(in, line))
-        {
-            boost::replace_all(line,aFind1,aReplace);
-            out << line << "\n";
-        }
-        in.close();
-        out.close();
 
-        in.open(aFileIn+".tmp");
-        ss << in.rdbuf();
-        in.close();
-        boost::filesystem::remove(aFileIn+".tmp");
-        //std::cout << " do js script " << std::endl;
-        */
+        std::string aReplace(geoJsonRelName());
+
         boost::replace_all(JScommand,aFind1,aReplace);
 
         // extent du parcellaire
@@ -387,11 +362,12 @@ void parcellaire::computeStat(){
 
     m_app->loadingIndicator()->setMessage(tr("LoadingI2"));
     m_app->loadingIndicator()->show();
-    mGL->mPBar->setMaximum(mGL->getNumSelect4Stat());
+    /*mGL->mPBar->setMaximum(mGL->getNumSelect4Stat());
     mGL->mPBar->setValue(0);
     //std::map<std::string,std::map<std::string,int>> stat= mGL->computeStatGlob(poGeomGlobale);
     mGL->computeStatGlob(poGeomGlobale);
     mGL->mPBar->setValue(0);
+    */
     //visuStatButton->enable();
 
     // ici j'ouvre le shp
@@ -420,7 +396,7 @@ void parcellaire::computeStat(){
 
 void parcellaire::visuStat(OGRFeature *poFeature){
     std::cout << " parcellaire::visuStat()... " ;
-    mGL->mPBar->setValue(0);
+    //mGL->mPBar->setValue(0);
     mStatW->vider();
     mStatW->titre("<h4>Statistique pour polygone FID " + std::to_string(poFeature->GetFID()) + " de " + mClientName+ "</h4>");
 
@@ -429,9 +405,9 @@ void parcellaire::visuStat(OGRFeature *poFeature){
         if (chart->deserveChart()){
 
             if (chart->Lay()->Type()==TypeLayer::FEE | chart->Lay()->Type()==TypeLayer::CS){
-            mStatW->add1Aptitude(chart);
+                mStatW->add1Aptitude(chart);
             } else {
-            mStatW->add1layerStat(chart->getChart());
+                mStatW->add1layerStat(chart->getChart());
 
             }
 
@@ -514,35 +490,35 @@ void parcellaire::downloadRaster(){
     std::vector<rasterFiles> vRs=mGL->getSelect4Download();
     if (vRs.size()>0){
 
-    m_app->loadingIndicator()->setMessage(tr("LoadingI4"));
-    m_app->loadingIndicator()->show();
-    // crée l'archive
-    ZipArchive* zf = new ZipArchive(mFullPath+"_raster.zip");
-    zf->open(ZipArchive::WRITE);
-    // crop les raster selectionnés
+        m_app->loadingIndicator()->setMessage(tr("LoadingI4"));
+        m_app->loadingIndicator()->show();
+        // crée l'archive
+        ZipArchive* zf = new ZipArchive(mFullPath+"_raster.zip");
+        zf->open(ZipArchive::WRITE);
+        // crop les raster selectionnés
 
 
-    mGL->mPBar->setValue(0);
-    mGL->mPBar->setMaximum(vRs.size());
-    for (const rasterFiles & r : vRs){
-        std::string aCroppedRFile=mFullPath+"_"+r.code()+".tif";
-        mGL->mPBar->setToolTip("découpe de la carte " + r.code() + "...");
-        if (cropImWithShp(r.tif(),aCroppedRFile)){
-            zf->addFile(mClientName+"_"+r.code()+".tif",aCroppedRFile);
-            if (r.hasSymbology()){zf->addFile(mClientName+"_"+r.code()+".qml",r.symbology());}
+        //mGL->mPBar->setValue(0);
+        //mGL->mPBar->setMaximum(vRs.size());
+        for (const rasterFiles & r : vRs){
+            std::string aCroppedRFile=mFullPath+"_"+r.code()+".tif";
+            //mGL->mPBar->setToolTip("découpe de la carte " + r.code() + "...");
+            if (cropImWithShp(r.tif(),aCroppedRFile)){
+                zf->addFile(mClientName+"_"+r.code()+".tif",aCroppedRFile);
+                if (r.hasSymbology()){zf->addFile(mClientName+"_"+r.code()+".qml",r.symbology());}
+            }
+            //mGL->mPBar->setValue(mGL->mPBar->value()+1);
+            //m_app->processEvents();
         }
-        mGL->mPBar->setValue(mGL->mPBar->value()+1);
-        m_app->processEvents();
-    }
-    mGL->mPBar->setToolTip("");
-    zf->close();
-    delete zf;
-    m_app->loadingIndicator()->hide();
-    m_app->loadingIndicator()->setMessage(tr("defaultLoadingI"));
+       // mGL->mPBar->setToolTip("");
+        zf->close();
+        delete zf;
+        m_app->loadingIndicator()->hide();
+        m_app->loadingIndicator()->setMessage(tr("defaultLoadingI"));
 
-    WFileResource *fileResource = new Wt::WFileResource("plain/text",mFullPath+"_raster.zip");
-    fileResource->suggestFileName(mClientName+"_raster.zip");
-    m_app->redirect(fileResource->url());
+        WFileResource *fileResource = new Wt::WFileResource("plain/text",mFullPath+"_raster.zip");
+        fileResource->suggestFileName(mClientName+"_raster.zip");
+        m_app->redirect(fileResource->url());
 
     } else {
         auto messageBox =
@@ -571,13 +547,3 @@ bool parcellaire::cropImWithShp(std::string inputRaster, std::string aOut){
     aRes=cropIm(inputRaster, aOut, ext);
     return aRes;
 }
-
-void parcellaire::update(){
-    mContSelect4Stat->clear();
-    mContSelect4D->clear();
-    mContSelect4Stat->addWidget(std::unique_ptr<Wt::WContainerWidget>(mGL->afficheSelect4Stat()));
-    mContSelect4D->addWidget(std::unique_ptr<Wt::WContainerWidget>(mGL->afficheSelect4Download()));
-}
-
-
-

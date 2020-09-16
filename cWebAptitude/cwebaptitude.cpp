@@ -2,12 +2,12 @@
 #include "cwebaptitude.h"
 //#include "auth.h"
 
-bool ModeExpert(0);
+//bool ModeExpert(0);
 
 cWebAptitude::cWebAptitude(AuthApplication *app, Auth::AuthWidget* authWidget_)
     : WContainerWidget(),authWidget(authWidget_)
 {
-    ModeExpert=0;// un peu sale comme procédé, car le login d'un expert va mettre la var Globale ModeExpert=1 et toutes les nouvelles instances de l'application (d'autre utilisateurs) vont également être en mode expert lool. Solution; remettre la var à 0 lors de chaque nouvelle app
+    //ModeExpert=0;// un peu sale comme procédé, car le login d'un expert va mettre la var Globale ModeExpert=1 et toutes les nouvelles instances de l'application (d'autre utilisateurs) vont également être en mode expert lool. Solution; remettre la var à 0 lors de chaque nouvelle app
     m_app = app;
     m_app->setLoadingIndicator(cpp14::make_unique<Wt::WOverlayLoadingIndicator>());
      m_app->loadingIndicator()->setMessage(tr("defaultLoadingI"));
@@ -182,7 +182,6 @@ cWebAptitude::cWebAptitude(AuthApplication *app, Auth::AuthWidget* authWidget_)
     //printf("create PA\n");
     mPA = new parcellaire(content_analyse,mGroupL,m_app,page_camembert);
 
-
     // maintenant que tout les objets sont crées, je ferme la connection avec la BD sqlite3, plus propre
     mDico->closeConnection();
 
@@ -255,70 +254,4 @@ void cWebAptitude::handlePathChange()
     // TODO css min-size [menu_analyse] display:none if width<900
     // TODO css @media-width<1200 -> map 60%  @media-width<900 -> [div stack] display:blocks et overflow:auto [map] width:90%  [linfo] min-height: 600px;
 
-}
-
-
-void cWebAptitude::login(){
-
-
-    Wt::WDialog * dialogPtr =  this->addChild(Wt::cpp14::make_unique<Wt::WDialog>("Se connecter en mode expert"));
-
-    Wt::WPushButton *ok =
-            dialogPtr->footer()->addNew<Wt::WPushButton>("Connexion");
-    ok->setDefault(true);
-
-    Wt::WPushButton * annuler =
-            dialogPtr->footer()->addNew<Wt::WPushButton>("Annuler");
-    annuler->setDefault(false);
-
-    Wt::WLineEdit * username = dialogPtr->contents()->addNew<Wt::WLineEdit>();
-    username->setPlaceholderText("Utilisateur");
-    dialogPtr->contents()->addNew<Wt::WBreak>();
-    Wt::WLineEdit * password = dialogPtr->contents()->addNew<Wt::WLineEdit>();
-    password->setPlaceholderText("Mot de passe");
-    dialogPtr->contents()->addNew<Wt::WBreak>();
-    Wt::WText *out = dialogPtr->contents()->addNew<Wt::WText>("");
-    out->addStyleClass("help-block");
-    //username->setValidator(std::make_shared<Wt::WIntValidator>(0, 130));
-    /*
-       * Accept the dialog
-       */
-    ok->clicked().connect([=] {
-        // controle du contenu username et password
-        if (password->text()=="gef" & username->text() =="gef"){
-        ModeExpert=1;
-        // je recrée les essences donc j'ai besoin d'une connection à la BD
-        mDico->openConnection();
-        // update grouplayer
-        mGroupL->updateGL();
-        mDico->closeConnection();
-        mPA->update();
-
-        auto messageBox = dialogPtr->addChild(Wt::cpp14::make_unique<Wt::WMessageBox>(
-                                      "Mode Expert",
-                                      "<p> Mode expert activé, vous avez accès aux information liées aux catalogues de station (aptitudes, potentiel sylvicole, habitats)</p>",
-                                      Wt::Icon::Information,
-                                      Wt::StandardButton::Ok));
-
-        messageBox->setModal(false);
-        messageBox->buttonClicked().connect([=] {
-            dialogPtr->removeChild(messageBox);
-        });
-        messageBox->show();
-
-        dialogPtr->accept();
-        } else {
-            out->setText("Utilisateur et/ou mot de passe invalide.");
-        }
-    });
-
-    if (ModeExpert){
-        ok->disable();
-        username->hide();
-        password->hide();
-        out->setText("Mode Expert déjà actif.");
-    }
-
-    annuler->clicked().connect([=]{dialogPtr->reject();});
-    dialogPtr->show();
 }

@@ -17,6 +17,7 @@ QMAKE_CXX = g++-8
 LIBS = -lgdal -lwthttp -lwt -lboost_system -lboost_iostreams -lboost_thread -lboost_filesystem -lboost_program_options -lcrypt -pthread -lwtdbo -lwtdbosqlite3 -lzip #-lzippp_static
 
 INCLUDEPATH += $$PWD/../carteApt/
+INCLUDEPATH += $$PWD/auth/
 
 # libzippp version https://github.com/ctabin/libzippp
 #LIBS += -L$$PWD/../../../../../../usr/local/lib -lzippp_static#INCLUDEPATH += $$PWD/../../../../../../usr/local/include/libzippp/
@@ -45,9 +46,9 @@ DEPENDPATH += $$PWD/libzipp/src/
 }
 
 SOURCES += main.cpp \
-    Session.cpp \
-    User.cpp \
-    auth.cpp \
+    auth/Session.cpp \
+    auth/User.cpp \
+    auth/auth.cpp \
     wopenlayers.cpp \
     cwebaptitude.cpp \
     ../carteApt/cdicoapt.cpp \
@@ -60,12 +61,13 @@ SOURCES += main.cpp \
     libzippp/src/libzippp.cpp \
     ecogrammeEss.cpp \
     stackinfoptr.cpp \
-    statwindow.cpp
+    statwindow.cpp \
+    selectlayers.cpp
 
 HEADERS += \
-    Session.h \
-    User.h \
-    auth.h \
+    auth/Session.h \
+    auth/User.h \
+    auth/auth.h \
     main.h \
     wopenlayers.h \
     cwebaptitude.h \
@@ -79,4 +81,5 @@ HEADERS += \
     libzippp/src/libzippp.h \
     ecogrammeEss.h \
     stackinfoptr.h \
-    statwindow.h
+    statwindow.h \
+    selectlayers.h

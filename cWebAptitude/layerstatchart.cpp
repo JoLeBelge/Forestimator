@@ -1,7 +1,7 @@
 #include "layerstatchart.h"
 
 int seuilClasseMinoritaire(2); // en dessous de ce seuil, les classes sont regroupées dans la catégorie "Autre"
-layerStatChart::layerStatChart(Layer *aLay, std::map<std::string, int> aStat, std::string aMode, OGRGeometry *poGeom):layerStat(aLay,aStat,aMode),mTable(NULL),rowAtMax(0),mGeom(poGeom)
+layerStatChart::layerStatChart(Layer *aLay, std::map<std::string, int> aStat, OGRGeometry *poGeom):layerStat(aLay,aStat),mTable(NULL),rowAtMax(0),mGeom(poGeom)
 {
 
     //std::cout << "création d'un layer StatChart pour " << mLay->getLegendLabel() << std::endl;
@@ -115,22 +115,24 @@ Wt:WContainerWidget * aRes= new Wt::WContainerWidget();
         }
         if (mTypeVar==TypeVar::Continu){
 
-            // pour MNH seulement, pour l'instant  - recrée un vecteur stat, puis un model
-
+            // pour MNH et MNT, pour l'instant  - recrée un vecteur stat, puis un model
+             std::map<double, double> aStat;
             // je dois mettre et la hauteur en double, et le pct car sinon imprécision d'arrondi
-            std::map<double, double> aStat;
+
             for (auto & kv : mStat){
                 try {
                     double h(std::stod(kv.first));
+
+                     if (mLay->getCode()=="MNH2019"){
                     if (h>3.0 && h<45){
                         aStat.emplace(std::make_pair(std::stod(kv.first),(100.0*kv.second)/mNbPix));
 
                     }
+                     } else {aStat.emplace(std::make_pair(std::stod(kv.first),(100.0*kv.second)/mNbPix));}
                 }
                 catch (const std::invalid_argument& ia) {
                     std::cerr << "Invalid argument pour stod getChart: " << ia.what() << '\n';
                 }
-
             }
 
             std::shared_ptr<WStandardItemModel> model = std::make_shared<WStandardItemModel>();
@@ -348,7 +350,7 @@ int layerStat::getO(bool mergeOT){
     return aRes;
 }
 
-layerStat::layerStat(Layer * aLay, std::map<std::string,int> aStat, std::string aMode):mLay(aLay),mStat(aStat),mMode(aMode),mTypeVar(aLay->Var()){
+layerStat::layerStat(Layer * aLay, std::map<std::string,int> aStat):mLay(aLay),mStat(aStat),mTypeVar(aLay->Var()){
     simplifieStat();
 }
 
