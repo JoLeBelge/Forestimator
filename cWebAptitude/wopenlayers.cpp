@@ -8,6 +8,7 @@ WOpenLayers::WOpenLayers(cDicoApt *aDico):xy_(this,"1.0"),mDico(aDico),polygId_(
     setLayoutSizeAware(1);
 
     setId("map");//sans ça le script js ne sert à rien car ne vise aucun objet cible
+    if (!exists(mDico->File("initOL"))){ std::cout << "\n\n\n pas trouvé initOL.js (" <<mDico->File("initOL") << " ), ça va planter!!! \n\n\n"<< std::endl;}
     std::ifstream t(mDico->File("initOL"));
     std::stringstream ss;
     ss << t.rdbuf();
