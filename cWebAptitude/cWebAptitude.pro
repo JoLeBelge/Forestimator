@@ -23,7 +23,7 @@ INCLUDEPATH += $$PWD/auth/
 #LIBS += -L$$PWD/../../../../../../usr/local/lib -lzippp_static#INCLUDEPATH += $$PWD/../../../../../../usr/local/include/libzippp/
 #DEPENDPATH += $$PWD/../../../../../../usr/local/include/libzippp/
 
-#qmake -makefile ../cWebAptitude/cWebAptitude.pro pl=server avant de lancer make sur debian server
+#qmake -makefile ../cWebAptitude/cWebAptitude.pro pl=serveur avant de lancer make sur debian server
 contains(pl,serveur) {
 LIBS += -L$$PWD/usr/include/gdal/ -lgdal
 INCLUDEPATH += $$PWD/../../../usr/include/gdal/
