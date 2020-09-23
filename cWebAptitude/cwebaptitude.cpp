@@ -99,6 +99,7 @@ cWebAptitude::cWebAptitude(AuthApplication *app, Auth::AuthWidget* authWidget_)
     statWindow * page_camembert = sub_stack->addNew<statWindow>(mDico);
     //WContainerWidget * page_camembert = sub_stack->addNew<WContainerWidget>();
     auto * page_presentation = sub_stack->addNew<WContainerWidget>();
+    page_presentation->addWidget(cpp14::make_unique<presentationPage>());
     page_presentation->addWidget(cpp14::make_unique<Wt::WTemplate>(WString::tr("page_presentation")));
 
     /* MAP div */

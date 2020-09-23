@@ -414,8 +414,14 @@ void parcellaire::visuStat(OGRFeature *poFeature){
         }
 
     }
+
+    // creation de la ressource pour le rapport pdf
+
+
     std::cout << " ..done " << std::endl;
     m_app->setInternalPath("/resultat",true);
+    auto pdf = std::make_shared<ReportResource>(mStatW);
+    mStatW->createPdfBut->setLink(WLink(pdf));
 }
 
 // si je click sur un polygone dans ol, calcule les stat et affiche dans une nouvelle page

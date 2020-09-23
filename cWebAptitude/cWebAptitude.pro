@@ -14,7 +14,7 @@ QMAKE_CXX = g++-8
 
 
 #
-LIBS = -lgdal -lwthttp -lwt -lboost_system -lboost_iostreams -lboost_thread -lboost_filesystem -lboost_program_options -lcrypt -pthread -lwtdbo -lwtdbosqlite3 -lzip #-lzippp_static
+LIBS = -lgdal -lwthttp -lwt -lboost_system -lboost_iostreams -lboost_thread -lboost_filesystem -lboost_program_options -lcrypt -pthread -lwtdbo -lwtdbosqlite3 -lzip -lhpdf
 
 INCLUDEPATH += $$PWD/../carteApt/
 INCLUDEPATH += $$PWD/auth/
@@ -62,7 +62,8 @@ SOURCES += main.cpp \
     ecogrammeEss.cpp \
     stackinfoptr.cpp \
     statwindow.cpp \
-    selectlayers.cpp
+    selectlayers.cpp \
+    presentationpage.cpp
 
 HEADERS += \
     auth/Session.h \
@@ -82,4 +83,5 @@ HEADERS += \
     ecogrammeEss.h \
     stackinfoptr.h \
     statwindow.h \
-    selectlayers.h
+    selectlayers.h \
+    presentationpage.h

@@ -77,6 +77,7 @@ selectLayers4Download::selectLayers4Download(groupLayers * aGL){
     for (Layer * l : mVpLs){
         if (l->Type()!=TypeLayer::Externe){
             bool selected(0);
+            if ((l->Type()==TypeLayer::FEE) && (l->getCode()=="HE"| l->getCode()=="CS" | l->getCode()=="CP" | l->getCode()=="EP" | l->getCode()=="DO" | l->getCode()=="ME")){ selected=1;}
             if (l->Type()==TypeLayer::Peuplement) { selected=1;}
 
             mSelectedLayers.emplace(std::make_pair(l,selected));

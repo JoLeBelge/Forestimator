@@ -223,7 +223,8 @@ groupLayers::groupLayers(cDicoApt * aDico, WOpenLayers *aMap, AuthApplication *a
 
 }
 
-/*groupLayers::~groupLayers(){
+/*
+groupLayers::~groupLayers(){
     std::cout << "destructeur de group layer " << std::endl;
     delete mLegend;
     delete mStation;
@@ -235,9 +236,9 @@ groupLayers::groupLayers(cDicoApt * aDico, WOpenLayers *aMap, AuthApplication *a
     mDico=NULL;
     mLegend=NULL;
     printf("nulled mMap GL\n");
-    mPBar=NULL;
     mVLs.clear();
-}*/
+}
+*/
 
 void groupLayers::update(std::string aCode, TypeLayer type){
     //std::cout << " group Layers je vais faire un update du rendu visuel de chacun des label de couche \n\n\n" << std::endl;

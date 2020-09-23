@@ -32,6 +32,8 @@
 #include <Wt/WIntValidator.h>
 #include <Wt/WLineEdit.h>
 
+#include "presentationpage.h"
+
 //using namespace Wt;
 
 class AuthApplication;

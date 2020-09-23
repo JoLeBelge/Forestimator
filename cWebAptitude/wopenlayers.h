@@ -29,7 +29,6 @@
 #include "ogrsf_frmts.h"
 #include "gdal_utils.h"
 
-//#include <ctime>
 #include <chrono>
 #include "layer.h"
 

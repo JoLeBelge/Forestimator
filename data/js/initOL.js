@@ -103,7 +103,8 @@ projection = new ol.proj.Projection({
 });
 
 extent = [42247, 21148, 295176, 167719];// full RW
-ol.proj.get('EPSG:31370').setExtent(extent);
+//ol.proj.get('EPSG:31370').setExtent(extent);
+// ol 6 va pas
 
 var resolutions = new Array(22);
 var startResolution = (extent[2]-extent[0]) / 512;
@@ -383,4 +384,3 @@ closer.ontouch = function() {
   closer.blur();
   return false;
 };
-

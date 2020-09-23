@@ -596,10 +596,17 @@ int cDicoApt::openConnection(){
     //db_->Sqlite3(mBDpath);
 
     rc = sqlite3_open_v2(mBDpath.c_str(), &db_,SQLITE_OPEN_READONLY,NULL);
-    if( rc ) {
+    // The 31 result codes are defined in sqlite3.h
+    //SQLITE_ERROR (1)
+    if( rc!=0) {
         fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db_));
         std::cout << " mBDpath " << mBDpath << std::endl;
+        std::cout << "result code : " << rc << std::endl;
     }
+    //SQLITE_BUSY (5)
+    //SQLITE_CANTOPEN (14)
+    //SQLITE_OK (0)
+
     return rc;
 }
 
