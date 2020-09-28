@@ -44,6 +44,7 @@ parcellaire::parcellaire(WContainerWidget *parent, groupLayers *aGL, Wt::WApplic
     uploadButton->setInline(0);
 
     mParent->addWidget(cpp14::make_unique<WText>(tr("anaStep2")));
+    /*
     //mParent->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
     //mParent->addWidget(cpp14::make_unique<Wt::WText>(tr("infoCalculStat")));
     //mParent->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
@@ -52,16 +53,16 @@ parcellaire::parcellaire(WContainerWidget *parent, groupLayers *aGL, Wt::WApplic
     mCB_fusionOT->setToolTip(tr("infoCalculStat"));
     //mParent->addWidget(cpp14::make_unique<Wt::WText>(tr("infoChoixLayerStat")));
     //mParent->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
-    mContSelect4Stat= mParent->addWidget(cpp14::make_unique<Wt::WContainerWidget>());
+    mContSelect4Stat= anaSimp_->addWidget(cpp14::make_unique<Wt::WContainerWidget>());
     //auto * div_4stat = mParent->addWidget(std::unique_ptr<Wt::WContainerWidget>(mGL->afficheSelect4Stat()));
     mContSelect4Stat->addStyleClass("div_4stat");
 
-    mParent->addWidget(cpp14::make_unique<WText>(tr("anaStep3")));
-    computeStatButton = mParent->addWidget(cpp14::make_unique<Wt::WPushButton>("Calcul"));
+    anaSimp_->addWidget(cpp14::make_unique<WText>(tr("anaStep3")));
+    computeStatButton = anaSimp_->addWidget(cpp14::make_unique<Wt::WPushButton>("Calcul"));
     computeStatButton->setStyleClass("btn btn-success");
     computeStatButton->setInline(0);
     computeStatButton->disable();
-    mParent->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
+    anaSimp_->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
 
     /*mGL->mPBar = mParent->addNew<Wt::WProgressBar>();
     mParent->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
@@ -69,20 +70,24 @@ parcellaire::parcellaire(WContainerWidget *parent, groupLayers *aGL, Wt::WApplic
     mGL->mPBar->setRange(0, mGL->getNumSelect4Stat());
     mGL->mPBar->setValue(0);
     mGL->mPBar->setInline(0);
-    */
 
-    mParent->addWidget(cpp14::make_unique<WText>(tr("anaStep4")));
-    downloadShpBt = mParent->addWidget(cpp14::make_unique<Wt::WPushButton>("Télécharger le shp"));
+
+    anaSimp_->addWidget(cpp14::make_unique<WText>(tr("anaStep4")));
+    downloadShpBt =anaSimp_->addWidget(cpp14::make_unique<Wt::WPushButton>("Télécharger le shp"));
     downloadShpBt->setStyleClass("btn btn-success");
     downloadShpBt->setWidth(150);
     downloadShpBt->setInline(0);
     downloadShpBt->disable();
 
-    //mParent->addWidget(cpp14::make_unique<Wt::WText>(tr("infoDownloadClippedRaster")));
-    mParent->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
-    mContSelect4D= mParent->addWidget(cpp14::make_unique<Wt::WContainerWidget>());
+    //mParent->addWidget(cpp14::make_unique<Wt::WText>(tr("info)));
+    anaDetail_->addWidget(cpp14::make_unique<Wt::WText>(tr("infoAnalyseDet")));
+    //mParent->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
 
-    mParent->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
+    anaDetail_->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
+
+     */
+
+    mContSelect4D= mParent->addWidget(cpp14::make_unique<Wt::WContainerWidget>());
 
     downloadRasterBt = mParent->addWidget(cpp14::make_unique<Wt::WPushButton>("Télécharger les cartes"));
     downloadRasterBt->setStyleClass("btn btn-success");
@@ -94,12 +99,14 @@ parcellaire::parcellaire(WContainerWidget *parent, groupLayers *aGL, Wt::WApplic
     fu->changed().connect(this,&parcellaire::fuChanged);
     fu->uploaded().connect(this,&parcellaire::upload);
     uploadButton->clicked().connect(this ,&parcellaire::clickUploadBt);
-    computeStatButton->clicked().connect(this,&parcellaire::computeStat);
-    downloadShpBt->clicked().connect(this,&parcellaire::downloadShp);
+    //computeStatButton->clicked().connect(this,&parcellaire::computeStat);
+    //downloadShpBt->clicked().connect(this,&parcellaire::downloadShp);
     downloadRasterBt->clicked().connect(this,&parcellaire::downloadRaster);
 
-    mContSelect4Stat->addWidget(std::unique_ptr<selectLayers4Stat>(mGL->mSelect4Stat));
+    //mContSelect4Stat->addWidget(std::unique_ptr<selectLayers4Stat>(mGL->mSelect4Stat));
     mContSelect4D->addWidget(std::unique_ptr<selectLayers4Download>(mGL->mSelect4Download));
+
+
 }
 
 parcellaire::~parcellaire(){
@@ -420,8 +427,8 @@ void parcellaire::visuStat(OGRFeature *poFeature){
 
     std::cout << " ..done " << std::endl;
     m_app->setInternalPath("/resultat",true);
-    auto pdf = std::make_shared<ReportResource>(mStatW);
-    mStatW->createPdfBut->setLink(WLink(pdf));
+    //auto pdf = std::make_shared<ReportResource>(mStatW);
+    //mStatW->createPdfBut->setLink(WLink(pdf));
 }
 
 // si je click sur un polygone dans ol, calcule les stat et affiche dans une nouvelle page

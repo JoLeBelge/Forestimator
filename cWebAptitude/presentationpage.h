@@ -5,15 +5,17 @@
 #include <Wt/WAnimation.h>
 #include <Wt/WText.h>
 #include <Wt/WTimer.h>
+#include <Wt/WTemplate.h>
 
 using namespace Wt;
 
-class presentationPage : public Wt::WStackedWidget
+class presentationPage : public Wt::WContainerWidget
 {
 public:
     presentationPage();
 
     void bannerAnimation();
+    Wt::WStackedWidget * adsBanner;
 };
 
 #endif // PRESENTATIONPAGE_H

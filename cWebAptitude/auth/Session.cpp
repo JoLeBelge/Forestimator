@@ -71,10 +71,11 @@ Session::Session(const std::string& sqliteDb)
     std::cerr << "Created database." << std::endl;
   } catch (std::exception& e) {
     std::cerr << e.what() << std::endl;
-    std::cerr << "Using existing database";
+    std::cerr << "Using existing database\n";
   }
 
   users_ = cpp14::make_unique<UserDatabase>(*this);
+  std::cout << " user created \n" << std::endl;
 }
 
 Auth::AbstractUserDatabase& Session::users()

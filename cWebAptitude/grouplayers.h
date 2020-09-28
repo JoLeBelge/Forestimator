@@ -107,7 +107,9 @@ public:
 
     std::vector<rasterFiles> getSelect4Download();
     std::vector<rasterFiles> getSelect4Stat();
-    WContainerWidget * afficheSelect4Stat();
+
+    // 28 septembre 2020 , Philippe lache l'affaire et on retire les analyses simples qui portent sur l'ajout d'une colonne du shp
+    //WContainerWidget * afficheSelect4Stat();
     WContainerWidget * afficheSelect4Download();
     int getNumSelect4Stat();
     int getNumSelect4Download();

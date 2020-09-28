@@ -70,6 +70,7 @@
     // init the OpenLayers javascript api
     // avec ol 6, la carte met du temps à s'afficher. je reste à ol 4 pour le moment.
     //std::string ol("https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v6.2.1/build/ol.js");
+    // finalement le 6 fonctionee parfaitement, alors pourquoi rester au 4
     std::string ol("jslib/v6.3.1-dist/ol.js");
     //std::string ol("jslib/ol4.6.4-debug.js");
     require(ol);
@@ -77,11 +78,11 @@
     require("jslib/proj4js-2.6.1/dist/proj4.js");
     require("jslib/proj4js-2.6.1/dist/proj4-src.js");
 
-    // ajout d'un control print pour sauver en jpg les cartes ol
-    require("jslib/ol-ext.min.js");
-    require("jslib/FileSaver.js/dist/FileSaver.js");
+    // ajout d'un control print pour sauver en jpg les cartes ol - non plutôt voir les exemples récents de ol pour l'export
+    //require("jslib/ol-ext.min.js");
+    //require("jslib/FileSaver.js/dist/FileSaver.js");
+    //useStyleSheet("jslib/ol-ext.min.css");
 
-    useStyleSheet("jslib/ol-ext.min.css");
     // CSS custom pour faire beau
     useStyleSheet("style/style.css");
 

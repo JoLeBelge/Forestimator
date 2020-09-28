@@ -17,11 +17,14 @@ statWindow::statWindow(cDicoApt *aDico):mDico(aDico)
     WPushButton * retour = tpl->bindWidget("retour", Wt::cpp14::make_unique<WPushButton>("Retour"));
     retour->setLink(WLink(LinkType::InternalPath, "/analyse"));
 
-    auto * tpl2 = contTitre_->addWidget(cpp14::make_unique<Wt::WTemplate>(tr("bouton_retour_parcelaire")));
+    /*
+     *ON met cette partie en standby
+     * auto * tpl2 = contTitre_->addWidget(cpp14::make_unique<Wt::WTemplate>(tr("bouton_retour_parcelaire")));
     createPdfBut = tpl2->bindWidget("retour", Wt::cpp14::make_unique<WPushButton>("Pdf"));
 
     auto pdf = std::make_shared<ReportResource>(this);
     createPdfBut->setLink(WLink(pdf));
+    */
     //createPdfBut->clicked().connect(this,&statWindow::export2pdf);
 
     mCarteGenCont = addWidget(cpp14::make_unique<WContainerWidget>());

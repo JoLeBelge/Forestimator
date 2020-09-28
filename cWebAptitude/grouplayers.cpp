@@ -13,7 +13,7 @@ groupLayers::groupLayers(cDicoApt * aDico, WOpenLayers *aMap, AuthApplication *a
   //,mPBar(NULL)
   ,m_app(app)
   ,mLegend(NULL)
-  ,mSelect4Stat(NULL)
+  //,mSelect4Stat(NULL)
   ,mSelect4Download(NULL)
   ,mStackInfoPtr(aStackInfoPtr)
   ,mapExtent_(this,"1.0")
@@ -127,6 +127,7 @@ groupLayers::groupLayers(cDicoApt * aDico, WOpenLayers *aMap, AuthApplication *a
     auto node2 = Wt::cpp14::make_unique<Wt::WTreeNode>(tr("groupeCoucheAptFEE"));
     auto node2_ = tree->treeRoot()->addChildNode(std::move(node2));
     node2_->addStyleClass("tree_node");
+    node2_->expand();
 
     auto node3 = Wt::cpp14::make_unique<Wt::WTreeNode>(tr("groupeCoucheAptCS"));
     auto node3_ = node3.get();
@@ -210,7 +211,7 @@ groupLayers::groupLayers(cDicoApt * aDico, WOpenLayers *aMap, AuthApplication *a
     bExportTiff->clicked().connect(this->slot);
     //bExportTiff->clicked().connect(this,&groupLayers::updateMapExtentAndCropIm);
 
-    mSelect4Stat= new selectLayers4Stat(this);
+    //mSelect4Stat= new selectLayers4Stat(this);
     mSelect4Download= new selectLayers4Download(this);
 
     /*   AUTRES ONLGETS de la stack   */
@@ -220,7 +221,7 @@ groupLayers::groupLayers(cDicoApt * aDico, WOpenLayers *aMap, AuthApplication *a
 
     // updateGL pour cacher les couches expert
     updateGL();
-
+    //std::cout << "done " << std::endl;
 }
 
 /*

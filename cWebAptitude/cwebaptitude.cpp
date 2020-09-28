@@ -14,6 +14,21 @@ cWebAptitude::cWebAptitude(AuthApplication *app, Auth::AuthWidget* authWidget_)
     //m_app->loadingIndicator()->setStyleClass("loading-indicator"); // c'est moche, je vais laisser Sam gerer ça
     std::string aBD=loadBDpath();
     mDico=new cDicoApt(aBD);
+    color col= mDico->Apt2col(2);
+    WCssDecorationStyle T;
+    T.setForegroundColor(WColor("black"));
+    //T.setBackgroundImage("data/img/T.png");
+    T.setBackgroundColor(WColor(col.mR,col.mG,col.mB));
+    app->styleSheet().addRule(".T", T);
+    col=mDico->Apt2col(1);
+    T.setBackgroundColor(WColor(col.mR,col.mG,col.mB));
+    app->styleSheet().addRule(".O", T);
+    col=mDico->Apt2col(3);
+    T.setBackgroundColor(WColor(col.mR,col.mG,col.mB));
+    app->styleSheet().addRule(".TE", T);
+    col=mDico->Apt2col(4);
+    T.setBackgroundColor(WColor(col.mR,col.mG,col.mB));
+    app->styleSheet().addRule(".E", T);
     mStackInfoPtr=new stackInfoPtr();
 
     addStyleClass("cWebAptitude");
@@ -98,9 +113,8 @@ cWebAptitude::cWebAptitude(AuthApplication *app, Auth::AuthWidget* authWidget_)
     // page de statistique
     statWindow * page_camembert = sub_stack->addNew<statWindow>(mDico);
     //WContainerWidget * page_camembert = sub_stack->addNew<WContainerWidget>();
-    auto * page_presentation = sub_stack->addNew<WContainerWidget>();
-    page_presentation->addWidget(cpp14::make_unique<presentationPage>());
-    page_presentation->addWidget(cpp14::make_unique<Wt::WTemplate>(WString::tr("page_presentation")));
+    sub_stack->addNew<presentationPage>();
+
 
     /* MAP div */
     auto layout_carto = page_carto->setLayout(cpp14::make_unique<WHBoxLayout>());
@@ -154,21 +168,7 @@ cWebAptitude::cWebAptitude(AuthApplication *app, Auth::AuthWidget* authWidget_)
     mMap->setWidth("70%");
     mMap->setMinimumSize(400,0);
     mMap->setOverflow(Overflow::Visible);
-    color col= mDico->Apt2col(2);
-    WCssDecorationStyle T;
-    T.setForegroundColor(WColor("black"));
-    //T.setBackgroundImage("data/img/T.png");
-    T.setBackgroundColor(WColor(col.mR,col.mG,col.mB));
-    app->styleSheet().addRule(".T", T);
-    col=mDico->Apt2col(1);
-    T.setBackgroundColor(WColor(col.mR,col.mG,col.mB));
-    app->styleSheet().addRule(".O", T);
-    col=mDico->Apt2col(3);
-    T.setBackgroundColor(WColor(col.mR,col.mG,col.mB));
-    app->styleSheet().addRule(".TE", T);
-    col=mDico->Apt2col(4);
-    T.setBackgroundColor(WColor(col.mR,col.mG,col.mB));
-    app->styleSheet().addRule(".E", T);
+
 
     //auto content_GL = stack_info->addWidget(cpp14::make_unique<WContainerWidget>());
     mStackInfoPtr->mGroupLayerW= mStackInfoPtr->stack_info->addWidget(cpp14::make_unique<WContainerWidget>());
