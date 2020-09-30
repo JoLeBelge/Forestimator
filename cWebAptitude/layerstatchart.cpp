@@ -211,6 +211,7 @@ void layerStat::simplifieStat(){
             tot+=autres;
             // correction de l'erreur d'arrondi si elle est de 2 pct max
             if ((tot>97) & (tot <100)) { autres+= 100-tot; tot=100;}
+            std::cout << "ajout classe autre dans simplify stat " << autres << ", layer " << mLay->getLegendLabel() << std::endl;
             mStatSimple.emplace(std::make_pair("Autre",autres));
         }
 
@@ -481,6 +482,8 @@ void batonnetApt::paintEvent(Wt::WPaintDevice *paintDevice){
     Wt::WPainter painter(paintDevice);
     int xcumul(0);
     for (auto & kv : mLayStat->StatSimple()){
+
+        std::cout << "batonnet Aptitude " << kv.first << " " << kv.second << std::endl;
 
         std::string aCodeStr(kv.first);
         color col(mLayStat->Lay()->getColor(aCodeStr));

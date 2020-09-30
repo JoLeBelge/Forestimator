@@ -27,7 +27,8 @@ using namespace libzippp;
 class parcellaire: public WContainerWidget
 {
 public:
-    parcellaire(WContainerWidget *parent, groupLayers * aGL, Wt::WApplication* app,statWindow * statW);
+    //parcellaire(WContainerWidget *parent, groupLayers * aGL, Wt::WApplication* app,statWindow * statW);
+    parcellaire(groupLayers * aGL, Wt::WApplication* app,statWindow * statW);
     ~parcellaire();
     void cleanShpFile();
     // conversion shp esri vers geoJson
@@ -66,12 +67,11 @@ private:
 
     // Full path ; là ou est sauvé le shp localement, mName ; le nom du shp tels qu'il était chez le client
     std::string mFullPath, mName,mClientName;
-    std::string mJSfile;
-    Wt::WContainerWidget     * mParent;
+    //Wt::WContainerWidget     * mParent;
     Wt::WContainerWidget     * mContSelect4D, * mContSelect4Stat;
     statWindow * mStatW;
     Wt::WFileUpload *fu;
-    Wt::WPushButton *uploadButton,*computeStatButton, *visuStatButton, *downloadShpBt, *downloadRasterBt;
+    Wt::WPushButton  *downloadRasterBt;//*uploadButton,*visuStatButton *computeStatButton, *downloadShpBt,
     Wt::WApplication* m_app;
     Wt::WText * msg;
     groupLayers * mGL;
@@ -82,7 +82,6 @@ private:
     OGRGeometry *poGeomGlobale;
     //Wt::Signal<int> page_;
     //Wt::WStackedWidget * mTopStack;
-
 
     Wt::WCheckBox *mCB_fusionOT;
 

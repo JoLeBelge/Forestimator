@@ -158,8 +158,6 @@ cWebAptitude::cWebAptitude(AuthApplication *app, Auth::AuthWidget* authWidget_)
     
     mStackInfoPtr->mLegendW = mStackInfoPtr->stack_info->addWidget(cpp14::make_unique<WContainerWidget>());
 
-    auto content_analyse = mStackInfoPtr->stack_info->addWidget(cpp14::make_unique<WContainerWidget>());
-    content_analyse->addStyleClass("content_analyse");
 
     /*	MAPS	*/
     printf("create map\n");
@@ -170,9 +168,7 @@ cWebAptitude::cWebAptitude(AuthApplication *app, Auth::AuthWidget* authWidget_)
     mMap->setOverflow(Overflow::Visible);
 
 
-    //auto content_GL = stack_info->addWidget(cpp14::make_unique<WContainerWidget>());
     mStackInfoPtr->mGroupLayerW= mStackInfoPtr->stack_info->addWidget(cpp14::make_unique<WContainerWidget>());
-    //content_GL->setStyleClass("content_GL");
     mStackInfoPtr->mGroupLayerW->setStyleClass("content_GL");
 
     /* CHARGE ONGLET COUCHES & LEGENDE */
@@ -181,7 +177,9 @@ cWebAptitude::cWebAptitude(AuthApplication *app, Auth::AuthWidget* authWidget_)
 
     /* CHARGE ONGLET ANALYSES */
     //printf("create PA\n");
-    mPA = new parcellaire(content_analyse,mGroupL,m_app,page_camembert);
+    //mPA = new parcellaire(content_analyse,mGroupL,m_app,page_camembert);
+    mPA = mStackInfoPtr->stack_info->addWidget(cpp14::make_unique<parcellaire>(mGroupL,m_app,page_camembert));
+    mPA->addStyleClass("content_analyse");
 
     // maintenant que tout les objets sont crées, je ferme la connection avec la BD sqlite3, plus propre
     mDico->closeConnection();
@@ -230,13 +228,13 @@ void cWebAptitude::handlePathChange()
         top_stack->setCurrentIndex(0);
     }else if (m_app->internalPath() == "/cartographie"){
         top_stack->setCurrentIndex(1);
-        mStackInfoPtr->stack_info->setCurrentIndex(2);
+        mStackInfoPtr->stack_info->setCurrentIndex(1);
         mStackInfoPtr->menuitem_cartes->select();
         sub_stack->setCurrentIndex(0);
         navigation->setTitle("   <strong>Forestimator - cartographie</strong>   ");
     }else if (m_app->internalPath() == "/analyse"){
         top_stack->setCurrentIndex(1);
-        mStackInfoPtr->stack_info->setCurrentIndex(1);
+        mStackInfoPtr->stack_info->setCurrentIndex(2);
         mStackInfoPtr->menuitem_analyse->select();
         sub_stack->setCurrentIndex(0);
         navigation->setTitle("   <strong>Forestimator - analyse</strong>   ");

@@ -309,7 +309,7 @@ Cette application web de cartographie permet une visualisation des informations 
  </p>
  
     <p>
-    <h4>Page Cartographie : Visualisation, consultation et téléchargement</h4>
+    <h4>Page Cartographie : Visualisation et téléchargement</h4>
 
 <h5>Visualiser une carte</h5>
 
@@ -326,10 +326,10 @@ L'action de double cliquer sur une position de la carte (rond mauve sur la figur
 Les cartes aux format raster peuvent être découpées sur l'emprise de votre choix. L'emprise est celle affichée dans la page cartographie et peut-être modifiée en effectuant un zoom ou un dézoom et en effectuant des déplacements en vue de centrer la carte sur une zone qui rentient votre intérêt.
 La carte et un fichier de symbologie (signification des codes couleurs) utilisable dans le logiciel <b>QGIS</b> sont téléchargables en cliquant sur le boutton de téléchargement situé tout en bas de l'encart de droite.
 
-<h5>Affichage de la description d'une station</h5>
+<h4>Page Analyse ponctuelle : description d'une station</h4>
 
 C'est bien là que se situe tout l'intérêt des outils de consultation des informations cartographiques utiles aux forestiers ; <b>disposer en un (double) click du résumé de la description d'une station et du peuplement en place</b>. 
-Ainsi, un double click sur une position de la carte va permettre l'affichage dans l'encart de droite de la carte d'indentité de cette station.
+Ainsi, un double click sur une position de la carte va permettre l'affichage, dans la page d'analyse ponctuelle, de la carte d'indentité de cette station.
 Premièrement, le tableau d'aptitude pour cette station est présenté. Les essences sont représentées par leur accronymes et sont classées dans 4 colonnes qui correspondent aux 4 aptitudes ; optimum (en vert foncé), tolérance (en vert clair), tolérance élargie (en orange) et exclusion (en rouge).
 <div>
 <img src="img/tableApt.png" alt="pour une station donnée, le tableau d'aptitude des essences" width="350px"/>
@@ -350,9 +350,8 @@ Lors d'un double-click sur une station, si la carte affichée est une carte d'ap
 </p>
 
   <p>	
-  <h4>Page Analyse</h4>
+  <h4>Page Analyse Surfacique : statistique sur une surface d'intérêt</h4>
 La description d'une station sous forme de position ponctuelle suit une méthodologie relativement directe, dans la mesure ou les caractéristiques sont lues sur chacunes des cartes pour cette position donnée. Par contre, un aménagiste qui souhaite obtenir une synthèse des caractéristiques stationnelles et des peuplements en place pour une surface donnée, représentant tantôt une parcelle, tantôt un massif dans son ensemble, dois passer par une phase de calcul des statistiques pour cette surface. Des outils d'analyses sont implémentés dans Forestimator et permettent de répondre aux besoins les plus récurrents des cartographes forestiers.
-Deux types d'analyses sont proposées et nécéssitent à l'utilisateur d'importer la couche shapefile de polygones délimitant sa ou ses zones d'intérêts.  
 
 <h3>Importer un shapefile</h3>
 
@@ -365,54 +364,13 @@ Une fois le shapefile importé vers Forestimator, celui-ci apparaitra en bleu su
 Lorsque votre shapefile est importé dans l'application web Forestimator, celui-ci s'affiche en bleu sur la carte. 
 </div>
 
-<!--
-<h3>Les deux types d'analyses</h3>
-
-Deux modules distincts de Forestimator permettent d'effectuer d'une part une analyse globale et synthétique pour l'ensemble des parcelles du shapefile, et d'autre part une analyse fine et plus détaillée mais exclusivement pour un seul polygone du shapefile.
-
-<h3>Analyse synthétique et export des statistiques dans la table d'attribut du shapefile</h3>
-
-Ces analyses synthétiques portent uniquement sur les cartes d'aptitudes des essences et sur la description des peuplements en place. La sélection des cartes pour lesquelles les statistiques seront calculées pour <font color="blue">chaques parcelles du shapefile </font> s'effectue en cochant les cases à cocher situées sous la rubrique intitulée <b>"2 : Sélectionner l'analyse"</b>.
-<div>
- <img src="img/analyse1.png" alt="Sélection des cartes pour lesquelles les statistiques sont calculées" width="450px"  />
- <br></br>
-L'analyse synthétique s'effectue pour les cartes qui sont cochées dans la rubrique <b>"2 : Sélectionner l'analyse"</b>. 
-</div>
-
-Le calcul des statistique est déclenchée par le boutton sous la rubrique <b>"3 : Excécuter l'analyse</b>. Pour chaque cartes sélectionnées, un nouveau champs est créé dans la table d'attribut du shapefile et les statistiques y sont enregistrées. Pour les cartes d'aptitude des essences, le pourcentage en surface du polygone pour laquelle l'essence est en optimum est calculée. Il est possible de calculer la proportion de surface en optimum ou en tolérance, ce choix s'effectuant via la case à cocher dans la rubrique 2. Pour les cartes de descriptions des peuplements en place, les statistiques calculées varient pour chaque informations. La carte du masque forêt est syntéthisée par la proportion de surface en forêt, le modèle numérique de hauteur renseigne la proportion en surface de la végétation ayant une hauteur de minimum 3 mètres au dessus du sol et enfin, la carte de composition des essences forestières sera résumée par un chiffre de proportion de chaque essences suivi de l'accronyme de l'essence. 
- <br></br>
-
-<div>
-<table class="table table-striped" width="70%">
-
-	<thead>
-		<td>Nom de la carte</td>
-		<td>Nom du champs </td>
-		<td>signification</td>
-		<td>exemple</td>
-	</thead>
-	<tr>
-		<td>Carte des essences</td>
-		<td>Compo</td>
-		<td>proportion en surface des différentes essences</td>
-		<td>Aure:6% Ep:29% He:57% Me:5%</td>
-	</tr>
-	<tr>
-		<td>Carte d’aptitude</td>
-		<td>Abbréviation de l’essence</td>
-		<td>pourcentage de la zone pour laquelle l’essence est en optimum OU en optimum et en tolérance</td>
-		<td>90</td>
-	</tr>
-</table>
-Résumé de la méthode utilisée pour la synthèse des cartes et l'export des statistiques dans un nouveau champs du shapefile.
-</div>
-
-Une fois les analyses effectuées, le shapefile dont la table d'attribut contient les nouveaux champs est téléchargé via le boutton sous la bubrique <b>4 : Exporter le résultat</b>.
--->
-
 <h3>Analyse pour un polygone unique et génération d'un rapport sous forme visuelle</h3>
 
-Une analyse plus détaillée est effectué pour un seul polygone du shapefile. Les statistiques pour chaque couches ne sont pas synthétisées mais présentées sous forme de tableau. La sélection des couches pour le module d'analyses détaillées s'effectue en cochant les cases à cocher dans la rubrique  
+Une analyse détaillée est effectuée pour un seul polygone du shapefile. La sélection des couches pour lesquelles seront effectuées les analyses détaillées s'effectue en cochant les cases à cocher situées sous la rubrique intitulée <b>"2 : Sélectionner l'analyse"</b>.
+
+Le calcul des statistique est réalisé en effectuant <b>un click droit sur le polygone de votre choix</b>, tout en maintenant enfoncé la touche contrôle. Une page de résultat affiche alors les résultats en trois sections distinctes : une carte de localisation générale, le tableau d'aptitude des essences et une dernière section qui présente, pour ce polygone donné, les cartes de description des conditions stationnelles et des caractéristique du peuplement en place. Un tableau de statistiques accompagne chacune des cartes individuelles.
+
+
 
 </p>
 </div>

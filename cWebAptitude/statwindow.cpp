@@ -77,7 +77,7 @@ void statWindow::vider()
 }
 
 void statWindow::generateGenCarte(OGRFeature * poFeature){
-
+      std::cout << "statWindow::generateGenCarte()" << std::endl;
      mCarteGenCont->addWidget(cpp14::make_unique<olOneLay>(mIGN,poFeature->GetGeometryRef()));
 }
 

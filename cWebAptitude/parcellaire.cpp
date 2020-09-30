@@ -5,45 +5,43 @@ int globSurfMax(2500);// en ha
 int globVolMaxShp(5000);// en ko
 //https://www.quora.com/What-are-the-risks-associated-with-the-use-of-lambda-functions-in-C-11
 
-parcellaire::parcellaire(WContainerWidget *parent, groupLayers *aGL, Wt::WApplication* app, statWindow *statW):mParent(parent),mGL(aGL),centerX(0.0),centerY(0.0),mClientName(""),mJSfile(""),mName(""),mFullPath(""),m_app(app),fu(NULL),msg(NULL),uploadButton(NULL)
+parcellaire::parcellaire(groupLayers *aGL, Wt::WApplication* app, statWindow *statW):mGL(aGL),centerX(0.0),centerY(0.0),mClientName(""),mName(""),mFullPath(""),m_app(app),fu(NULL),msg(NULL)
+  //,uploadButton(NULL)
   //,mTopStack(aTopStack)
-  ,computeStatButton(NULL)
-  ,visuStatButton(NULL)
+  //,computeStatButton(NULL)
+  //,visuStatButton(NULL)
   ,hasValidShp(0)
   ,downloadRasterBt(NULL)
   ,mStatW(statW)
 {
     //std::cout << "creation parcellaire " << std::endl;
     mDico=aGL->Dico();
-    mJSfile=  aGL->Dico()->File("addOLgeojson");
 
-    mParent->setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Left);
-    //mParent->setMargin(20,Wt::Side::Bottom | Wt::Side::Top);
-    mParent->setInline(0);
-    mParent->addWidget(cpp14::make_unique<WText>(tr("anaStep1")));
+    setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Left);
+    setInline(0);
+
+    addWidget(cpp14::make_unique<WText>(tr("anaStep1")));
     //mParent->addWidget(cpp14::make_unique<Wt::WText>(tr("infoParcellaire")));
 
-    fu =mParent->addNew<Wt::WFileUpload>();
+    fu =addNew<Wt::WFileUpload>();
     fu->setFileTextSize(2000); // Set the maximum file size to 2000 kB. il faut également changer param max-request-size dans wt_config
 
     fu->setFilters(".shp, .shx, .dbf, .prj");
     fu->setMultiple(true);
     fu->setInline(0);
     fu->addStyleClass("btn-file");
+    addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
     //fu->setMargin(20,Wt::Side::Bottom | Wt::Side::Top); // si le parent a des marges et est inline(0) et que je met l'enfant à inline, l'enfant a des marges également
 
-    msg = mParent->addWidget(cpp14::make_unique<Wt::WText>());
+    msg = addWidget(cpp14::make_unique<Wt::WText>());
     msg->setInline(0);
-    //mParent->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
 
-    uploadButton = mParent->addWidget(cpp14::make_unique<Wt::WPushButton>("Envoyer"));
-    uploadButton->setStyleClass("btn btn-success");
-    mParent->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
+    //uploadButton = mParent->addWidget(cpp14::make_unique<Wt::WPushButton>("Envoyer"));
+    //uploadButton->setStyleClass("btn btn-success");
 
-    uploadButton->disable();
-    uploadButton->setInline(0);
-
-    mParent->addWidget(cpp14::make_unique<WText>(tr("anaStep2")));
+    //uploadButton->disable();
+    //uploadButton->setInline(0);
+    addWidget(cpp14::make_unique<WText>(tr("anaStep2")));
     /*
     //mParent->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
     //mParent->addWidget(cpp14::make_unique<Wt::WText>(tr("infoCalculStat")));
@@ -85,11 +83,11 @@ parcellaire::parcellaire(WContainerWidget *parent, groupLayers *aGL, Wt::WApplic
 
     anaDetail_->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
 
-     */
+    */
 
-    mContSelect4D= mParent->addWidget(cpp14::make_unique<Wt::WContainerWidget>());
+    mContSelect4D= addWidget(cpp14::make_unique<Wt::WContainerWidget>());
 
-    downloadRasterBt = mParent->addWidget(cpp14::make_unique<Wt::WPushButton>("Télécharger les cartes"));
+    downloadRasterBt = addWidget(cpp14::make_unique<Wt::WPushButton>("Télécharger les cartes"));
     downloadRasterBt->setStyleClass("btn btn-success");
     downloadRasterBt->setWidth(200);
     downloadRasterBt->setInline(0);
@@ -98,30 +96,27 @@ parcellaire::parcellaire(WContainerWidget *parent, groupLayers *aGL, Wt::WApplic
     fu->fileTooLarge().connect([=] { msg->setText("Le fichier est trop volumineux (max 2000ko).");});
     fu->changed().connect(this,&parcellaire::fuChanged);
     fu->uploaded().connect(this,&parcellaire::upload);
-    uploadButton->clicked().connect(this ,&parcellaire::clickUploadBt);
+    //uploadButton->clicked().connect(this ,&parcellaire::clickUploadBt);
     //computeStatButton->clicked().connect(this,&parcellaire::computeStat);
     //downloadShpBt->clicked().connect(this,&parcellaire::downloadShp);
     downloadRasterBt->clicked().connect(this,&parcellaire::downloadRaster);
 
     //mContSelect4Stat->addWidget(std::unique_ptr<selectLayers4Stat>(mGL->mSelect4Stat));
     mContSelect4D->addWidget(std::unique_ptr<selectLayers4Download>(mGL->mSelect4Download));
-
-
 }
 
 parcellaire::~parcellaire(){
     //std::cout << "destructeur de parcellaire" << std::endl;
     cleanShpFile();
-    mParent=NULL;
     fu=NULL;
-    uploadButton=NULL;
+    //uploadButton=NULL;
     m_app=NULL;
     msg=NULL;
     mGL=NULL;
     mDico=NULL;
     delete poGeomGlobale;
-    visuStatButton=NULL;
-    downloadShpBt=NULL;
+    //visuStatButton=NULL;
+    //downloadShpBt=NULL;
     mCB_fusionOT=NULL;
 }
 
@@ -280,11 +275,12 @@ bool parcellaire::computeGlobalGeom(OGRLayer * lay){
 void parcellaire::display(){
     //std::cout << " parcellaire::display " << std::endl;
     boost::system::error_code ec;
-    if (boost::filesystem::exists(mJSfile,ec)){
+    std::string JSfile(mDico->File("addOLgeojson"));
+    if (boost::filesystem::exists(JSfile,ec)){
         assert(!ec);
         std::cout << " ... " << std::endl;
         std::stringstream ss;
-        std::string aFileIn(mJSfile);
+        std::string aFileIn(JSfile);
 
         std::ifstream in(aFileIn);
         ss << in.rdbuf();
@@ -303,28 +299,31 @@ void parcellaire::display(){
         boost::replace_all(JScommand,"MINX",std::to_string(mParcellaireExtent.MinX));
         boost::replace_all(JScommand,"MINY",std::to_string(mParcellaireExtent.MinY));
 
-        mParent->doJavaScript(JScommand);
+        doJavaScript(JScommand);
         // centrer la map sur le shp
-        mParent->doJavaScript("map.getView().setCenter(["+std::to_string(centerX)+","+std::to_string(centerY)+" ]);");
+        doJavaScript("map.getView().setCenter(["+std::to_string(centerX)+","+std::to_string(centerY)+" ]);");
     } else {
         std::cout << " ne trouve pas le fichier script de js " << std::endl;
     }
     //std::cout << " done " << std::endl;
 }
 
+/*
 void parcellaire::clickUploadBt(){
     uploadButton->disable();
     fu->upload();
     uploadButton->enable();
-}
+}*/
 
 void parcellaire::fuChanged(){
-    uploadButton->enable();
+    // si on a changé le contenu, on tente de le télécharger
+    fu->upload();
+    //uploadButton->enable();
 }
 
 void parcellaire::upload(){
     //std::cout << "upload commence.. " ;
-    computeStatButton->disable();
+    //computeStatButton->disable();
     downloadRasterBt->disable();
 
     //visuStatButton->disable();
@@ -353,7 +352,7 @@ void parcellaire::upload(){
         msg->setText("Téléchargement du shp effectué avec succès.");
         if (toGeoJson()){
             hasValidShp=true;
-            computeStatButton->enable();
+            //computeStatButton->enable();
             downloadRasterBt->enable();
             display();
             mGL->mMap->setToolTip(tr("tooltipMap2"));
@@ -394,7 +393,7 @@ void parcellaire::computeStat(){
         mGL->computeStatOnPolyg(lay,mCB_fusionOT->isChecked());
         // sauve le résultat
         GDALClose( DS );
-        downloadShpBt->enable();
+        //downloadShpBt->enable();
     }
     m_app->loadingIndicator()->hide();
     m_app->loadingIndicator()->setMessage(tr("defaultLoadingI"));
@@ -535,7 +534,7 @@ void parcellaire::downloadRaster(){
 
     } else {
         auto messageBox =
-                mParent->addChild(Wt::cpp14::make_unique<Wt::WMessageBox>(
+                addChild(Wt::cpp14::make_unique<Wt::WMessageBox>(
                                       "Sélection des couches à exporter",
                                       "<p>Aucune cartes sélectionnée. Veuillez selectionner les couches à exporter à l'étape numéro 4 de l'onglet analyse</p>",
                                       Wt::Icon::Information,
@@ -543,7 +542,7 @@ void parcellaire::downloadRaster(){
 
         messageBox->setModal(false);
         messageBox->buttonClicked().connect([=] {
-            mParent->removeChild(messageBox);
+            removeChild(messageBox);
         });
         messageBox->show();
     }
