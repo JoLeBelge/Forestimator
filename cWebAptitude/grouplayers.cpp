@@ -216,7 +216,7 @@ groupLayers::groupLayers(cDicoApt * aDico, WOpenLayers *aMap, AuthApplication *a
 
     /*   AUTRES ONLGETS de la stack   */
     // création de la légende (vide pour le moment)
-    mLegend = new legend(this, mStackInfoPtr->mLegendW);
+    mLegend = new simplepoint(this, mStackInfoPtr->mSimplepointW);
     mStation = new ST(mDico);
 
     // updateGL pour cacher les couches expert
@@ -269,23 +269,30 @@ void groupLayers::clickOnName(std::string aCode, TypeLayer type){
     }
 }
 
+/**
+ * @brief groupLayers::extractInfo Affiche les stat d'un point clicqué sur la map.
+ * @param x
+ * @param y
+ */
 void groupLayers::extractInfo(double x, double y){
 
     if(!isnan(x) && !isnan(y) && !(x==0 && y==0)){
+        // allow only if la page est simplepoint ???
+        //if (m_app->internalPath() != "/point") return;
+
         std::cout << "groupLayers ; extractInfo " << x << " , " << y << std::endl;
         mStation->vider();
         mLegend->vider();
-        int cur_index = mStackInfoPtr->stack_info->currentIndex(); // pour savoir où on en est
 
+        /*int cur_index = mStackInfoPtr->stack_info->currentIndex(); // pour savoir où on en est
         mStackInfoPtr->stack_info->setCurrentIndex(0);
-
         // bouton retour
         WPushButton * retour = mLegend->addWidget(Wt::cpp14::make_unique<WPushButton>("Retour"));
         retour->addStyleClass("btn btn-info");
 
         retour->clicked().connect([=]{
             mStackInfoPtr->stack_info->setCurrentIndex(cur_index);
-        });
+        });*/
 
         // tableau des informations globales - durant ce round, l'objet ST est modifié
         mLegend->titreInfoRaster();

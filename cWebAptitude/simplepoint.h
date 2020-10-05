@@ -25,17 +25,17 @@
 #include <boost/algorithm/string/replace.hpp>
 #include "ecogrammeEss.h"
 
-class legend;
+class simplepoint;
 class groupLayers;
 class ST;
 class Layer;
 using namespace Wt;
 class color;
 
-class legend: public WContainerWidget
+class simplepoint: public WContainerWidget
 {
 public:
-    legend(groupLayers *aGL,WContainerWidget *parent);//
+    simplepoint(groupLayers *aGL,WContainerWidget *parent);//
     void createUI();
     void vider();
     void titreInfoRaster();

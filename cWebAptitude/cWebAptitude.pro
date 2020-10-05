@@ -49,12 +49,12 @@ SOURCES += main.cpp \
     auth/Session.cpp \
     auth/User.cpp \
     auth/auth.cpp \
+    simplepoint.cpp \
     wopenlayers.cpp \
     cwebaptitude.cpp \
     ../carteApt/cdicoapt.cpp \
     layer.cpp \
     grouplayers.cpp \
-    legend.cpp \
     parcellaire.cpp \
     layerstatchart.cpp \
     uploadcarte.cpp \
@@ -70,12 +70,12 @@ HEADERS += \
     auth/User.h \
     auth/auth.h \
     main.h \
+    simplepoint.h \
     wopenlayers.h \
     cwebaptitude.h \
     ../carteApt/cdicoapt.h \
     layer.h \
     grouplayers.h \
-    legend.h \
     parcellaire.h \
     layerstatchart.h \
     uploadcarte.h \

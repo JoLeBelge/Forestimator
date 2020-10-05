@@ -58,6 +58,9 @@ Vous pouvez télécharger les cartes listées ci-dessous qui seront découpées 
 <message id="anaStep3"><h3>3 : Excécuter l'analyse</h3></message>
 <message id="anaStep4"><h3>4 : Exporter le résultat</h3></message>
 
+<!-- label page anayle simple -->
+<message id="sp_infoclic"><i>Veuillez double-cliquer dans la carte pour afficher les infos ponctuelles à cet endroit.</i></message>
+
 <!--label dans le treelist de couches -->
 <message id="groupeCoucheAll">Couches</message>
 <message id="groupeCoucheThem">Conditions stationnelles</message>
@@ -309,71 +312,68 @@ Cette application web de cartographie permet une visualisation des informations 
  </p>
  
     <p>
-    <h4>Page Cartographie : Visualisation et téléchargement</h4>
+<h4 onClick="$('#part1').toggle();" style="cursor:pointer;">Page Cartographie : Visualisation et téléchargement</h4>
+<div id="part1" style="display:none;">
+	<h5>Visualiser une carte</h5>
+	Le choix de la carte à afficher s'effectue en cliquant sur son nom dans l'encart de droite de la page "cartographie". La légende (signification des couleurs) est consultable en cochant la case à cocher en haut de cet encadré, mais à tout moment, un double click sur une position en particulier de la carte ouvre une fenêtre qui renseigne la signification de la carte pour cet endroit donné. 
+	<div>
+	 <img src="img/popupLegende.png" alt="fenêtre popup qui renseigne la valeur en un point donné" width="350px"  />
+	</div>
+	<br></br>
+	L'action de double cliquer sur une position de la carte (rond mauve sur la figure) ouvre une fenêtre qui renseigne la valeur pour cette position.
+	 
+	<h5>Télécharger une carte</h5>
 
-<h5>Visualiser une carte</h5>
-
-Le choix de la carte à afficher s'effectue en cliquant sur son nom dans l'encart de droite de la page "cartographie". La légende (signification des couleurs) est consultable en cochant la case à cocher en haut de cet encadré, mais à tout moment, un double click sur une position en particulier de la carte ouvre une fenêtre qui renseigne la signification de la carte pour cet endroit donné. 
-
-<div>
- <img src="img/popupLegende.png" alt="fenêtre popup qui renseigne la valeur en un point donné" width="350px"  />
-</div>
- <br></br>
-L'action de double cliquer sur une position de la carte (rond mauve sur la figure) ouvre une fenêtre qui renseigne la valeur pour cette position.
- 
-<h5>Télécharger une carte</h5>
-
-Les cartes aux format raster peuvent être découpées sur l'emprise de votre choix. L'emprise est celle affichée dans la page cartographie et peut-être modifiée en effectuant un zoom ou un dézoom et en effectuant des déplacements en vue de centrer la carte sur une zone qui rentient votre intérêt.
-La carte et un fichier de symbologie (signification des codes couleurs) utilisable dans le logiciel <b>QGIS</b> sont téléchargables en cliquant sur le boutton de téléchargement situé tout en bas de l'encart de droite.
-
-<h4>Page Analyse ponctuelle : description d'une station</h4>
-
-C'est bien là que se situe tout l'intérêt des outils de consultation des informations cartographiques utiles aux forestiers ; <b>disposer en un (double) click du résumé de la description d'une station et du peuplement en place</b>. 
-Ainsi, un double click sur une position de la carte va permettre l'affichage, dans la page d'analyse ponctuelle, de la carte d'indentité de cette station.
-Premièrement, le tableau d'aptitude pour cette station est présenté. Les essences sont représentées par leur accronymes et sont classées dans 4 colonnes qui correspondent aux 4 aptitudes ; optimum (en vert foncé), tolérance (en vert clair), tolérance élargie (en orange) et exclusion (en rouge).
-<div>
-<img src="img/tableApt.png" alt="pour une station donnée, le tableau d'aptitude des essences" width="350px"/>
- 
- <br></br>
-Le tableau d'aptitude, qui apparait lorsqu'on double-click sur une station, renseigne l'aptitude pour toutes les essences forestières. Une info-bulle s'affiche lorsqu'on pointe la souris sur les codes essences en deux lettre et affiche le nom complêt de l'essence forestière. Les code essences sont affichés en gris dans le cas d'une double aptitude (ex; Tolérance/Tolérance élargie pour le Hêtre), cette double aptitude est renseignée dans l'info-bulle qui s'affiche lorsqu'on déplace la souris sur le code essence.
+	Les cartes aux format raster peuvent être découpées sur l'emprise de votre choix. L'emprise est celle affichée dans la page cartographie et peut-être modifiée en effectuant un zoom ou un dézoom et en effectuant des déplacements en vue de centrer la carte sur une zone qui rentient votre intérêt.
+	La carte et un fichier de symbologie (signification des codes couleurs) utilisable dans le logiciel <b>QGIS</b> sont téléchargables en cliquant sur le boutton de téléchargement situé tout en bas de l'encart de droite.
 </div>
 
-Deuxièmement, les caractéristiques stationnelles et du peuplement en place pour la position sélectionnée vont être énumerée dans un tableau s'intitulant "Description de la station forestière".  
+<h4 onClick="$('#part2').toggle();" style="cursor:pointer;">Page Analyse ponctuelle : description d'une station</h4>
+<div id="part2" style="display:none;">
+	C'est bien là que se situe tout l'intérêt des outils de consultation des informations cartographiques utiles aux forestiers ; <b>disposer en un (double) click du résumé de la description d'une station et du peuplement en place</b>. 
+	Ainsi, un double click sur une position de la carte va permettre l'affichage, dans la page d'analyse ponctuelle, de la carte d'indentité de cette station.
+	Premièrement, le tableau d'aptitude pour cette station est présenté. Les essences sont représentées par leur accronymes et sont classées dans 4 colonnes qui correspondent aux 4 aptitudes ; optimum (en vert foncé), tolérance (en vert clair), tolérance élargie (en orange) et exclusion (en rouge).
+	<div>
+		<img src="img/tableApt.png" alt="pour une station donnée, le tableau d'aptitude des essences" width="350px"/> 
+	 	<br></br>
+		Le tableau d'aptitude, qui apparait lorsqu'on double-click sur une station, renseigne l'aptitude pour toutes les essences forestières. Une info-bulle s'affiche lorsqu'on pointe la souris sur les codes essences en deux lettre et affiche le nom complêt de l'essence forestière. Les code essences sont affichés en gris dans le cas d'une double aptitude (ex; Tolérance/Tolérance élargie pour le Hêtre), cette double aptitude est renseignée dans l'info-bulle qui s'affiche lorsqu'on déplace la souris sur le code essence.
+	</div>
 
-Enfin, si la carte affichée est une carte d'aptitude pour l'une des essences, une section suplémentaire s'affichera et renseignera le cheminement effectué pour la détermination de l'aptitude de l'essence. L'aptitude des essences est en effet fonction de l'aptitude bioclimatique d'une part, de l'aptitude hydro-trophique d'autre part et des éventuels facteurs de compensation liés à la topographie. Nous renvoyons l'utilisateur vers le guide méthodologique du <a href="https://www.fichierecologique.be">Fichier Ecologique des Essences (FEE)</a>, qui se trouve sous la rubrique aide du site <a href="https://www.fichierecologique.be">www.fichierecologique.be</a>. C'est dans cette section qu'est également présenté l'écogramme de l'espèce pour laquelle la carte d'aptitude est affichée, avec un rectangle mauve situant la station au sein de cet écogramme et de la niche écologique de l'essence.
-<div>
- <img src="img/ecogramme.png" alt="position de la station en mauve dans l'écogramme de l'essence" width="200px"  />
- <br></br>
-Lors d'un double-click sur une station, si la carte affichée est une carte d'aptitude, la niche écologique de l'essence ainsi que la position de la station dans l'écogramme (station représentée par le carré mauve) sont également renseignés.
+	Deuxièmement, les caractéristiques stationnelles et du peuplement en place pour la position sélectionnée vont être énumerée dans un tableau s'intitulant "Description de la station forestière".  
+
+	Enfin, si la carte affichée est une carte d'aptitude pour l'une des essences, une section suplémentaire s'affichera et renseignera le cheminement effectué pour la détermination de l'aptitude de l'essence. L'aptitude des essences est en effet fonction de l'aptitude bioclimatique d'une part, de l'aptitude hydro-trophique d'autre part et des éventuels facteurs de compensation liés à la topographie. Nous renvoyons l'utilisateur vers le guide méthodologique du <a href="https://www.fichierecologique.be">Fichier Ecologique des Essences (FEE)</a>, qui se trouve sous la rubrique aide du site <a href="https://www.fichierecologique.be">www.fichierecologique.be</a>. C'est dans cette section qu'est également présenté l'écogramme de l'espèce pour laquelle la carte d'aptitude est affichée, avec un rectangle mauve situant la station au sein de cet écogramme et de la niche écologique de l'essence.
+	<div>
+		<img src="img/ecogramme.png" alt="position de la station en mauve dans l'écogramme de l'essence" width="200px"  />
+	 	<br></br>
+		Lors d'un double-click sur une station, si la carte affichée est une carte d'aptitude, la niche écologique de l'essence ainsi que la position de la station dans l'écogramme (station représentée par le carré mauve) sont également renseignés.
+	</div>
 </div>
+  
+<h4 onClick="$('#part3').toggle();" style="cursor:pointer;">Page Analyse Surfacique : statistique sur une surface d'intérêt</h4>
+<div id="part3" style="display:none;">
+	La description d'une station sous forme de position ponctuelle suit une méthodologie relativement directe, dans la mesure ou les caractéristiques sont lues sur chacunes des cartes pour cette position donnée. Par contre, un aménagiste qui souhaite obtenir une synthèse des caractéristiques stationnelles et des peuplements en place pour une surface donnée, représentant tantôt une parcelle, tantôt un massif dans son ensemble, dois passer par une phase de calcul des statistiques pour cette surface. Des outils d'analyses sont implémentés dans Forestimator et permettent de répondre aux besoins les plus récurrents des cartographes forestiers.
 
-</p>
+	<h3>Importer un shapefile</h3>
 
-  <p>	
-  <h4>Page Analyse Surfacique : statistique sur une surface d'intérêt</h4>
-La description d'une station sous forme de position ponctuelle suit une méthodologie relativement directe, dans la mesure ou les caractéristiques sont lues sur chacunes des cartes pour cette position donnée. Par contre, un aménagiste qui souhaite obtenir une synthèse des caractéristiques stationnelles et des peuplements en place pour une surface donnée, représentant tantôt une parcelle, tantôt un massif dans son ensemble, dois passer par une phase de calcul des statistiques pour cette surface. Des outils d'analyses sont implémentés dans Forestimator et permettent de répondre aux besoins les plus récurrents des cartographes forestiers.
+	L'encart de droite sous la page "analyse" permet à l'utilisateur de sélectionner sur son ordinateur les 4 fichiers (.shp, .shx, .dbf, et .prj) constituant le shapefile de polygones définissant sa zone d'intérêt. Le shapefile dois obligatoirement contenir un ou des polygones, dois impérativement être en système de projection Belge Lambert 72 et la surface totale des polygones ne dois pas excéder 2500 hectares.
+	Une fois le shapefile importé vers Forestimator, celui-ci apparaitra en bleu sur la carte.
 
-<h3>Importer un shapefile</h3>
+	<div>
+		<img src="img/importShp.png" alt="importer un shapefile de polygone dans Forestimator pour y effectuer des analyses surfaciques" width="350px"  />
+	 	<br></br>
+		Lorsque votre shapefile est importé dans l'application web Forestimator, celui-ci s'affiche en bleu sur la carte. 
+	</div>
 
-L'encart de droite sous la page "analyse" permet à l'utilisateur de sélectionner sur son ordinateur les 4 fichiers (.shp, .shx, .dbf, et .prj) constituant le shapefile de polygones définissant sa zone d'intérêt. Le shapefile dois obligatoirement contenir un ou des polygones, dois impérativement être en système de projection Belge Lambert 72 et la surface totale des polygones ne dois pas excéder 2500 hectares.
-Une fois le shapefile importé vers Forestimator, celui-ci apparaitra en bleu sur la carte.
+	<h3>Analyse pour un polygone unique et génération d'un rapport sous forme visuelle</h3>
 
-<div>
- <img src="img/importShp.png" alt="importer un shapefile de polygone dans Forestimator pour y effectuer des analyses surfaciques" width="350px"  />
- <br></br>
-Lorsque votre shapefile est importé dans l'application web Forestimator, celui-ci s'affiche en bleu sur la carte. 
+	Une analyse détaillée est effectuée pour un seul polygone du shapefile. La sélection des couches pour lesquelles seront effectuées les analyses détaillées s'effectue en cochant les cases à cocher situées sous la rubrique intitulée <b>"2 : Sélectionner l'analyse"</b>.
+
+	Le calcul des statistique est réalisé en effectuant <b>un click droit sur le polygone de votre choix</b>, tout en maintenant enfoncé la touche contrôle. Une page de résultat affiche alors les résultats en trois sections distinctes : une carte de localisation générale, le tableau d'aptitude des essences et une dernière section qui présente, pour ce polygone donné, les cartes de description des conditions stationnelles et des caractéristique du peuplement en place. Un tableau de statistiques accompagne chacune des cartes individuelles.
+
 </div>
-
-<h3>Analyse pour un polygone unique et génération d'un rapport sous forme visuelle</h3>
-
-Une analyse détaillée est effectuée pour un seul polygone du shapefile. La sélection des couches pour lesquelles seront effectuées les analyses détaillées s'effectue en cochant les cases à cocher situées sous la rubrique intitulée <b>"2 : Sélectionner l'analyse"</b>.
-
-Le calcul des statistique est réalisé en effectuant <b>un click droit sur le polygone de votre choix</b>, tout en maintenant enfoncé la touche contrôle. Une page de résultat affiche alors les résultats en trois sections distinctes : une carte de localisation générale, le tableau d'aptitude des essences et une dernière section qui présente, pour ce polygone donné, les cartes de description des conditions stationnelles et des caractéristique du peuplement en place. Un tableau de statistiques accompagne chacune des cartes individuelles.
-
-
-
 </p>
 </div>
+
 </message>
 
 
