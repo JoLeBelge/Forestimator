@@ -193,3 +193,72 @@ input[type="checkbox"] {
 .statWindow{
 display:block;
 }
+
+.collapse_pres{
+	cursor:pointer;
+	background-image:url('/resources/folded.png');
+	background-repeat: no-repeat;
+	width: max-content;
+	padding-left: 15px;
+	margin: auto;
+	background-position-y: 10px;
+}
+
+
+.fold {
+	display: none;
+	padding: 10px;
+	//width: 280px;
+	//height: 80px;
+	//color: #999;
+	-webkit-transition: all 0.3s linear;
+	-moz-transition: all 0.3s linear;
+	transition: all 0.3s linear;
+}
+
+.unfolder { display: none; }
+
+.toggle-label {
+	cursor: pointer;
+	border-radius: 5px;
+	font-size: 1.5em;
+	line-height: 1.8;
+	padding-bottom: 0px;
+	margin: auto;
+	width: max-content;
+	color: #528B12;
+	display: block;
+}
+.unfold-icon, .fold-icon {
+  color: #999; 
+  width: 15px;
+  height: 15px;
+  display: inline-block;
+  background-position-y: 5px;
+}
+.unfold-icon {
+	background-image:url('/resources/folded.png');
+	background-repeat: no-repeat;
+}
+.fold-icon {
+	background-image:url('/resources/unfolded.png');
+	background-repeat: no-repeat;
+}	
+.unfolder ~ .fold {
+  display: none;
+}
+.unfolder ~ label .fold-icon {
+  display: none;
+}
+
+.unfolder:checked ~ .fold {
+  display: block;
+}
+.unfolder:checked ~ label .fold-icon {
+  display: inline-block;
+}
+.unfolder:checked ~ label .unfold-icon {
+  display: none;
+}
+
+
