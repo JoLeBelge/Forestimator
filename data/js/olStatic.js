@@ -27,10 +27,11 @@ var activePolygon1 = new ol.layer.Vector({
 	  stroke: new ol.style.Stroke({
 		color: 'yellow',
 		width: 3
-	  }),
-    fill: new ol.style.Fill({
-      color: 'rgba(0, 0, 255, 0.1)'
-    })
+	  })//,
+	// il ne faut pas de remplissage sinon on ne vois pas bien la carte
+    //fill: new ol.style.Fill({
+    //  color: 'rgba(0, 0, 255, 0.1)'
+    //})
 	  }),
 	extent: [MINX,MINY,MAXX,MAXY]
 });

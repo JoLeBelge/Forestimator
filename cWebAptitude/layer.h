@@ -29,13 +29,20 @@ class groupLayers;
 class Layer;
 class color;
 class rasterFiles; // une classe dédiée uniquemnent à l'export et au clip des couches. Layer ne convient pas car contient une grosse partie pour l'affichage (tuiles et autre) et surtout qu'il y a deux couches par layer pour les apti
-
+class basicStat;
 
 inline bool exists (const std::string& name){
     struct stat buffer;
     return (stat (name.c_str(), &buffer) == 0);
-};
+}
 
+class basicStat{
+public:
+    basicStat():min(0),max(0),mean(0){}
+    basicStat(std::map<double,int> aMapValandFrequ);
+   private:
+    double min,max,mean;
+};
 
 class rasterFiles{
 
@@ -142,6 +149,9 @@ public:
     // clé : la valeur au format légende (ex ; Optimum). Valeur ; pourcentage pour ce polygone
     std::map<std::string,int> computeStatOnPolyg(OGRGeometry * poGeom);
     GDALDataset * rasterizeGeom(OGRGeometry *poGeom);
+
+    basicStat computeBasicStatOnPolyg(OGRGeometry * poGeom);
+    std::string summaryStat(OGRGeometry * poGeom);
 
     // raster value
     int getValue(double x, double y);

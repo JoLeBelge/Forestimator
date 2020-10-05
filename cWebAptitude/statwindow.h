@@ -45,10 +45,11 @@ private:
 
     Wt::WVBoxLayout * layout;
 
-
-
     std::vector<WContainerWidget *> mVContStatIndiv;
+    // pour la carte de localisation
     Layer * mIGN;
+    // pour les information générales
+    Layer * mMNT, * mZBIO;
 
 };
 

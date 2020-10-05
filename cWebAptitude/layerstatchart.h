@@ -82,6 +82,7 @@ public:
     }
 
     void simplifieStat();
+    std::string summaryStat();
     int getO(bool mergeOT=false);// proportion en optimum
 
     int getFieldVal(bool mergeOT=false);

@@ -56,7 +56,7 @@ Layer::Layer(std::string aCode,cDicoApt * aDico,TypeLayer aType):
         mType=mRI->getCatLayer();
         setExpert(mRI->Expert());
         break;
-    /*case TypeLayer::Externe: les cartes de type externe sont créé à partir de cRasterInfo (type thématique qui est écrasé en fonction du cRasterInfo)
+        /*case TypeLayer::Externe: les cartes de type externe sont créé à partir de cRasterInfo (type thématique qui est écrasé en fonction du cRasterInfo)
         }*/
     }
 
@@ -157,24 +157,24 @@ void Layer::displayLayer() const{
     std::string JScommand;
     //std::cout << "display layer " << std::endl;
 
-        std::string aFileIn(mDico->File("displayWMS"));
-        std::ifstream in(aFileIn);
-        std::stringstream ss;
-        ss << in.rdbuf();
-        in.close();
-        JScommand=ss.str();
-        boost::replace_all(JScommand,"MYTITLE",this->getLegendLabel());
+    std::string aFileIn(mDico->File("displayWMS"));
+    std::ifstream in(aFileIn);
+    std::stringstream ss;
+    ss << in.rdbuf();
+    in.close();
+    JScommand=ss.str();
+    boost::replace_all(JScommand,"MYTITLE",this->getLegendLabel());
 
-        if (mDico->hasWMSinfo(this->getCode())){
-            WMSinfo wms=mDico->getWMSinfo(this->getCode());
-            boost::replace_all(JScommand,"MYLAYER",wms.mLayerName);
-            boost::replace_all(JScommand,"MYURL",wms.mUrl);
+    if (mDico->hasWMSinfo(this->getCode())){
+        WMSinfo wms=mDico->getWMSinfo(this->getCode());
+        boost::replace_all(JScommand,"MYLAYER",wms.mLayerName);
+        boost::replace_all(JScommand,"MYURL",wms.mUrl);
 
-        } else {
-            boost::replace_all(JScommand,"MYLAYER",this->NomMapServerLayer());
-            boost::replace_all(JScommand,"MYURL",this->MapServerURL());
-        }
-   // }
+    } else {
+        boost::replace_all(JScommand,"MYLAYER",this->NomMapServerLayer());
+        boost::replace_all(JScommand,"MYURL",this->MapServerURL());
+    }
+    // }
     mText->doJavaScript(JScommand);
     //std::cout << JScommand << std::endl;
 }
@@ -550,3 +550,124 @@ rasterFiles::rasterFiles(std::string aPathTif,std::string aCode):mPathTif(aPathT
     }
 }
 
+basicStat::basicStat(std::map<double,int> aMapValandFrequ):mean(0),max(0),min(0){
+    bool test(0);
+    int tot(0);
+    for (auto kv : aMapValandFrequ){
+        mean += kv.first*kv.second;
+        tot+=kv.second;
+
+        if (test) {
+            if (kv.first>max) {max=kv.first;}
+            if (kv.first<min) {min=kv.first;}
+
+        } else {
+            max=kv.first;
+            min=kv.first;
+            test=1;
+        }
+    }
+    mean=mean/tot;
+
+}
+
+// pour les couches des variables continues
+basicStat Layer::computeBasicStatOnPolyg(OGRGeometry * poGeom){
+    basicStat aRes();
+    std::map<double,int> aMapValandFrequ;
+
+    if (mTypeVar==TypeVar::Continu){
+        // préparation du containeur du résultat
+        for (auto &kv : *mDicoVal){
+            try {
+               aMapValandFrequ.emplace(std::make_pair(std::stod(kv.second),0));
+            }
+            catch (const std::invalid_argument& ia) {
+                std::cerr << "Invalid argument pour stod computeBasicStatOnPolyg: " << ia.what() << '\n';
+            }
+        }
+
+        // c'est mon masque au format raster
+        GDALDataset * mask = Layer::rasterizeGeom(poGeom);
+
+        OGREnvelope ext;
+        poGeom->getEnvelope(&ext);
+        double width((ext.MaxX-ext.MinX)), height((ext.MaxY-ext.MinY));
+        // std::cout << " x " << width<< " y " << height << std::endl;
+
+        // gdal
+        GDALAllRegister();
+        GDALDataset  * mGDALDat = (GDALDataset *) GDALOpen( getPathTif().c_str(), GA_ReadOnly );
+        if( mGDALDat == NULL )
+        {
+            std::cout << "je n'ai pas lu l'image " << getPathTif() << std::endl;
+        } else {
+            GDALRasterBand * mBand = mGDALDat->GetRasterBand( 1 );
+
+            double transform[6];
+            mGDALDat->GetGeoTransform(transform);
+            double xOrigin = transform[0];
+            double yOrigin = transform[3];
+            double pixelWidth = transform[1];
+            double pixelHeight = -transform[5];
+
+            //determine dimensions of the tile
+            int xSize = round(width/pixelWidth);
+            int ySize = round(height/pixelHeight);
+            int xOffset = int((ext.MinX - xOrigin) / pixelWidth);
+            int yOffset = int((yOrigin - ext.MaxY ) / pixelHeight);
+
+            float *scanline, *scanlineMask;
+            scanline = (float *) CPLMalloc( sizeof( float ) * xSize );
+            scanlineMask = (float *) CPLMalloc( sizeof( float ) * xSize );
+            // boucle sur chaque ligne
+            for ( int row = 0; row < ySize; row++ )
+            {
+                // lecture
+                mBand->RasterIO( GF_Read, xOffset, row+yOffset, xSize, 1, scanline, xSize,1, GDT_Float32, 0, 0 );
+                // lecture du masque
+                mask->GetRasterBand(1)->RasterIO( GF_Read, 0, row, xSize, 1, scanlineMask, xSize,1, GDT_Float32, 0, 0 );
+                // boucle sur scanline et garder les pixels qui sont dans le polygone
+                for (int col = 0; col <  xSize; col++)
+                {
+                    // élégant mais trop lent!!
+                    //OGRPoint op1(ext.MinX+col*pixelWidth,ext.MaxY-row*pixelWidth);
+                    //if ( op1.Intersect(poGeom)/ within()){
+                    if (scanlineMask[col]==255){
+                        double aVal=scanline[ col ];
+                        if (mDicoVal->find(aVal)!=mDicoVal->end()){
+
+                            try {
+                               aMapValandFrequ.at(std::stod(mDicoVal->at(aVal)))++;
+                            }
+                            catch (const std::invalid_argument& ia) {
+                                std::cerr << "Invalid argument pour stod computeBasicStatOnPolyg, part2: " << ia.what() << '\n';
+                            }
+
+                        }   }
+                }
+            }
+            CPLFree(scanline);
+            CPLFree(scanlineMask);
+
+
+            mBand=NULL;
+        }
+        GDALClose(mask);
+        GDALClose(mGDALDat);
+    }
+
+    if (aMapValandFrequ.size()>0) {aRes= basicStat(aMapValandFrequ);}
+    return aRes;
+
+}
+
+// pour les couches des variables de classe
+std::string Layer::summaryStat(OGRGeometry * poGeom){
+
+    std::map<std::string,int> computeStatOnPolyg(poGeom);
+    // on arrange la map par ordre d'importance
+
+
+
+}

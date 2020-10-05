@@ -10,7 +10,7 @@ statWindow::statWindow(cDicoApt *aDico):mDico(aDico)
 
     WContainerWidget * contTitre_ =  addWidget(Wt::cpp14::make_unique<Wt::WContainerWidget>());
     mTitre = contTitre_->addWidget(cpp14::make_unique<WText>());
-     mTitre->setId("statWindowTitre");
+    mTitre->setId("statWindowTitre");
     contTitre_->addWidget(cpp14::make_unique<WText>(tr("infoDansVisuStat")));
     // bouton retour
     auto * tpl = contTitre_->addWidget(cpp14::make_unique<Wt::WTemplate>(tr("bouton_retour_parcelaire")));
@@ -29,6 +29,9 @@ statWindow::statWindow(cDicoApt *aDico):mDico(aDico)
 
     mCarteGenCont = addWidget(cpp14::make_unique<WContainerWidget>());
     mCarteGenCont->setId("carteGenStat");
+    mCarteGenCont->setInline(0);
+    mCarteGenCont->setOverflow(Wt::Overflow::Auto);
+
 
     mAptTable = addWidget(cpp14::make_unique<WTable>());
     mAptTable->setId("AptitudeTable");
@@ -39,6 +42,8 @@ statWindow::statWindow(cDicoApt *aDico):mDico(aDico)
     mAptTable->toggleStyleClass("table-striped",true);
 
     mIGN = new Layer("IGN",mDico,TypeLayer::Thematique);
+    mMNT = new Layer("MNT",mDico,TypeLayer::Thematique);
+    mZBIO = new Layer("ZBIO",mDico,TypeLayer::Thematique);
 }
 
 void statWindow::add1Aptitude(layerStatChart * lstat){
@@ -78,8 +83,25 @@ void statWindow::vider()
 }
 
 void statWindow::generateGenCarte(OGRFeature * poFeature){
-      std::cout << "statWindow::generateGenCarte()" << std::endl;
-     mCarteGenCont->addWidget(cpp14::make_unique<olOneLay>(mIGN,poFeature->GetGeometryRef()));
+     std::cout << "statWindow::generateGenCarte()" << std::endl;
+     WVBoxLayout * layoutV =mCarteGenCont->setLayout(cpp14::make_unique<WVBoxLayout>());
+     layoutV->addWidget(cpp14::make_unique<WText>("<h4>Apperçu</h4>"));
+     //aRes->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
+     WContainerWidget * aContCarte = layoutV->addWidget(cpp14::make_unique<WContainerWidget>());
+     WHBoxLayout * layoutH = aContCarte->setLayout(cpp14::make_unique<WHBoxLayout>());
+     // ajout de la carte pour cette couche
+     layoutH->addWidget(cpp14::make_unique<olOneLay>(mIGN,poFeature->GetGeometryRef()),0);
+     // description générale ; lecture des attribut du polygone?calcul de pente, zone bioclim, et élévation
+     WContainerWidget * aContInfo = layoutH->addWidget(cpp14::make_unique<WContainerWidget>());
+     // je refais les calculs pour les couches qui m'intéressent
+     basicStat statMNT= mMNT->computeBasicStatOnPolyg(poFeature->GetGeometryRef());
+
+     aContInfo->addWidget(cpp14::make_unique<WText>("Zone bioclimatique : " + mZBIO->summaryStat(poFeature->GetGeometryRef())));
+     aContInfo->addWidget(cpp14::make_unique<WBreak>());
+     aContInfo->addWidget(cpp14::make_unique<WText>("Relief"));
+
+
+
 }
 
 void statWindow::export2pdf(){

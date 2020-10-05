@@ -339,6 +339,24 @@ std::string layerStat::getFieldValStr(){
     return aRes;
 }
 
+std::string layerStat::summaryStat(){
+    std::string aRes("");
+    if (mLay->mTypeVar==TypeVar::Continu){
+        // on concatene toutes les essences
+        for (auto & kv : mStat){
+
+            if (kv.second>1){
+                aRes+=kv.first+":"+std::to_string(kv.second)+"% ";
+            }
+        }
+
+    } else {
+        std::cout << "  summaryStat sur une couche de variable de classes? " << mLay->getLegendLabel() << std::endl;
+    }
+    return aRes;
+
+}
+
 
 int layerStat::getO(bool mergeOT){
     unsigned int aRes(0);
@@ -435,6 +453,7 @@ olOneLay::olOneLay(Layer * aLay, OGRGeometry *poGeom):mLay(aLay){
     boost::replace_all(JScommand,"NAME","tmp/" + name1);
     //std::cout << JScommand << std::endl;
     this->doJavaScript(JScommand);
+
 }
 
 
