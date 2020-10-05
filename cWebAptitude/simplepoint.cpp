@@ -1,4 +1,4 @@
-#include "legend.h"
+#include "simplepoint.h"
 
 
 legend::legend(groupLayers *aGL, WContainerWidget *parent):mGL(aGL),mParent(parent),mDico(aGL->Dico())

@@ -54,7 +54,7 @@ SOURCES += main.cpp \
     ../carteApt/cdicoapt.cpp \
     layer.cpp \
     grouplayers.cpp \
-    legend.cpp \
+    simplepoint.cpp \
     parcellaire.cpp \
     layerstatchart.cpp \
     uploadcarte.cpp \
@@ -75,7 +75,7 @@ HEADERS += \
     ../carteApt/cdicoapt.h \
     layer.h \
     grouplayers.h \
-    legend.h \
+    simplepoint.h \
     parcellaire.h \
     layerstatchart.h \
     uploadcarte.h \

@@ -17,7 +17,7 @@
 
 #include "stackinfoptr.h"
 #include "layer.h"
-#include "legend.h"
+#include "simplepoint.h"
 #include <fstream>
 #include "wopenlayers.h"
 #include "ogrsf_frmts.h"
