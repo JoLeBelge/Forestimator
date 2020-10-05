@@ -34,7 +34,7 @@
 class WOpenLayers;
 class Layer;
 class groupLayers;
-class legend;
+class simplepoint;
 class ST;
 class layerStatChart;
 class rasterFiles;
@@ -147,7 +147,7 @@ private:
     TypeClassifST mTypeClassifST; // 2 modes de classification des stations forestières ; FEE et CS. important de savoir le mode pour savoir quel tableau d'aptitude afficher quand on double-click sur une station
 
     cDicoApt * mDico;
-    legend * mLegend;
+    simplepoint * mLegend;
     sqlite3 *db_;
 
     // bof finalement c'est mieux le conteneur parent

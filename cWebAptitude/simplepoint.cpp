@@ -1,17 +1,17 @@
 #include "simplepoint.h"
 
 
-legend::legend(groupLayers *aGL, WContainerWidget *parent):mGL(aGL),mParent(parent),mDico(aGL->Dico())
+simplepoint::simplepoint(groupLayers *aGL, WContainerWidget *parent):mGL(aGL),mParent(parent),mDico(aGL->Dico())
 {
     createUI();
 }
 /*
-legend::legend(WContainerWidget *parent):mParent(parent)
+simplepoint::legend(WContainerWidget *parent):mParent(parent)
 {
     createUI();
 }*/
 
-void legend::createUI()
+void simplepoint::createUI()
 {
     //mTitle = mParent->addWidget(cpp14::make_unique<WText>(WString::tr("legendMsg")));
 
@@ -19,12 +19,12 @@ void legend::createUI()
     mParent->setMargin(1,Wt::Side::Bottom | Wt::Side::Top);
     mParent->setInline(0);// si pas inline Et bizarrement si pas de setMargin autre que 0, pas de scrollbar pour l'overflow!
 
-    // bouton retour
+    /*// bouton retour
     WPushButton * retour = mParent->addWidget(Wt::cpp14::make_unique<WPushButton>("Retour"));
     retour->addStyleClass("btn btn-info");
     //retour->setLink(WLink(LinkType::InternalPath, "/analyse"));
-    retour->clicked().connect([=]{mGL->mStackInfoPtr->stack_info->setCurrentIndex(2);;});
-
+    retour->clicked().connect([=]{mGL->mStackInfoPtr->stack_info->setCurrentIndex(2);;});*/
+    mParent->addWidget(cpp14::make_unique<WText>(tr("sp_infoclic")));
 
     mAptAllEss = mParent->addWidget(cpp14::make_unique<WTable>());
     mAptAllEss->setHeaderCount(1);
@@ -47,7 +47,7 @@ void legend::createUI()
 
 }
 
-void legend::vider()
+void simplepoint::vider()
 {
 	//mTitle->setStyleClass("nonvisible");
     //mTitle->setText(WString::tr("legendTitre"));
@@ -58,17 +58,17 @@ void legend::vider()
     mContEco->clear();
 }
 
-void legend::titreInfoRaster(){
+void simplepoint::titreInfoRaster(){
     mInfoT->elementAt(0, 0)->setColumnSpan(2);
     mInfoT->elementAt(0, 0)->setContentAlignment(AlignmentFlag::Top | AlignmentFlag::Center);
     mInfoT->elementAt(0, 0)->setPadding(10);
     //WText *titre = mInfoT->elementAt(0,0)->addWidget(cpp14::make_unique<WText>("<h4>Description de la station forestière </h4>"));
     mInfoT->elementAt(0,0)->addWidget(cpp14::make_unique<WText>("<h4>Description de la station forestière </h4>"));
-    mInfoT->elementAt(1, 0)->addWidget(cpp14::make_unique<WText>("Raster"));
+    mInfoT->elementAt(1, 0)->addWidget(cpp14::make_unique<WText>("Rasteur"));
     mInfoT->elementAt(1, 1)->addWidget(cpp14::make_unique<WText>("Valeur"));
 }
 
-void legend::add1InfoRaster(std::vector<std::string> aV){
+void simplepoint::add1InfoRaster(std::vector<std::string> aV){
 
     if (aV.size()>1 && aV.at(1)!=""){
         int row=mInfoT->rowCount();
@@ -83,7 +83,7 @@ void legend::add1InfoRaster(std::vector<std::string> aV){
     }
 }
 
-void legend::detailCalculAptFEE(ST * aST){
+void simplepoint::detailCalculAptFEE(ST * aST){
 
     cEss  * Ess= aST->mActiveEss;
     //std::cout << " je vais afficher le détail du calcul de l'aptitude FEE pour " <<Ess->Nom() <<std::endl;
@@ -122,7 +122,7 @@ void legend::detailCalculAptFEE(ST * aST){
     mContEco->addWidget(cpp14::make_unique<WText>(tr("legendEcogramme")));
 }
 
-/*void legend::afficheLegendeIndiv(const Layer * l){
+/*void simplepoint::afficheLegendeIndiv(const Layer * l){
 
     if (l->Type()!=TypeLayer::Externe){
         // vider la légende et afficher la légende personnelle de la couche active
@@ -147,7 +147,7 @@ void legend::detailCalculAptFEE(ST * aST){
     }
 }*/
 
-void legend::afficheAptAllEss(){
+void simplepoint::afficheAptAllEss(){
 
     std::map<std::string, int> Apts = mGL->apts();
     if (Apts.size()>1){

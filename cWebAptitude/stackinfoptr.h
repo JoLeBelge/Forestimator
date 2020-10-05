@@ -12,12 +12,12 @@ using namespace Wt;
 class stackInfoPtr
 {
 public:
-    stackInfoPtr():stack_info(NULL),mLegendW(NULL),mGroupLayerW(NULL),menuitem_analyse(NULL),menuitem_cartes(NULL),menuitem_legend(NULL){}
+    stackInfoPtr():stack_info(NULL),mSimplepointW(NULL),mGroupLayerW(NULL),menuitem_analyse(NULL),menuitem_cartes(NULL),menuitem_legend(NULL){}
 
     WStackedWidget * stack_info; // cause que je dois changer de current index après avoir mis à jour la légende que je clique sur une station
-    WContainerWidget * mLegendW;
+    WContainerWidget * mSimplepointW;
     WContainerWidget * mGroupLayerW;
-    WMenuItem * menuitem_analyse,* menuitem_cartes,*menuitem_legend,*menuitem_presentation;
+    WMenuItem * menuitem_analyse,* menuitem_cartes,*menuitem_legend,*menuitem_presentation,*menuitem_simplepoint;
 };
 
 #endif // STACKINFOPTR_H

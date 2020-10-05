@@ -1,11 +1,11 @@
 
 .home_div {
 	text-align:center;
-	width: 800px;
+	width: 1000px;
 	height: 400px;
 }
 .home_div a,button{
-	width: 130px;
+	width: 150px;
 	margin:10px;
 }
 
@@ -53,12 +53,12 @@
 }
 .logo_left{
 	float:left;
-    top: 38px;
+    top: 68px;
 	position: relative;
 }
 .logo_right{
 	float:right;
-    top: 38px;
+    top: 68px;
 	position: relative;
 }
 .div_4stat{

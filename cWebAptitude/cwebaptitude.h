@@ -28,6 +28,7 @@
 //#include <boost/range/adaptors.hpp>
 //#include <boost/foreach.hpp>
 #include "statwindow.h"
+#include "simplepoint.h"
 
 #include <Wt/WIntValidator.h>
 #include <Wt/WLineEdit.h>
@@ -90,6 +91,7 @@ private:
     stackInfoPtr * mStackInfoPtr;
 
     parcellaire * mPA;
+    simplepoint * mSP;
     uploadCarte * mUpload;
 
 };
