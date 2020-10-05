@@ -146,7 +146,7 @@ cDicoApt::cDicoApt(std::string aBDFile):mBDpath(aBDFile)
                 int R=sqlite3_column_int( stmt, 1 );
                 int G=sqlite3_column_int( stmt, 2 );
                 int B=sqlite3_column_int( stmt, 3 );
-                colors.emplace(std::make_pair(aA,color(R,G,B)));
+                colors.emplace(std::make_pair(aA,color(R,G,B,aA)));
             }
         }
         // palette des gris faite maison
@@ -160,7 +160,7 @@ cDicoApt::cDicoApt(std::string aBDFile):mBDpath(aBDFile)
                 int R=sqlite3_column_int( stmt, 1 );
                 int G=sqlite3_column_int( stmt, 2 );
                 int B=sqlite3_column_int( stmt, 3 );
-                colors.emplace(std::make_pair(aA,color(R,G,B)));
+                colors.emplace(std::make_pair(aA,color(R,G,B,aA)));
             }
         }
 
@@ -174,7 +174,7 @@ cDicoApt::cDicoApt(std::string aBDFile):mBDpath(aBDFile)
                 int aA=sqlite3_column_int( stmt, 0 );
                 std::string aB=std::string( (char *)sqlite3_column_text( stmt, 1 ));
                 //std::cout << aA << ";";
-                colors.emplace(std::make_pair(std::to_string(aA),color(aB)));
+                colors.emplace(std::make_pair(std::to_string(aA),color(aB,std::to_string(aA))));
             }
         }
 
@@ -286,8 +286,35 @@ cDicoApt::cDicoApt(std::string aBDFile):mBDpath(aBDFile)
             }
         }
 
-        sqlite3_finalize(stmt);
+        // j'aimerai charger toutes les couleurs que j'ai dans le dictionnaire, y compris les couleurs qui sont dans le dictionnaire des couches ex composition, affin que je puisse créer un style pour chaque couleur et l'appliquer au Model dans layerstatchart
+        SQLstring="SELECT DISTINCT nom_dico FROM fichiersGIS WHERE nom_dico IS NOT NULL;";
+        sqlite3_reset(stmt);
+        sqlite3_prepare_v2( db_, SQLstring.c_str(), -1, &stmt, NULL );
+        while(sqlite3_step(stmt) == SQLITE_ROW)
+        {
+            if (sqlite3_column_type(stmt, 0)!=SQLITE_NULL){
+                std::string nom_dico=std::string( (char *)sqlite3_column_text( stmt, 0 ) );
+                SQLstring="SELECT col FROM "+ nom_dico +";";
+                std::cout << SQLstring << std::endl;
 
+                sqlite3_stmt * stmt2;
+                sqlite3_prepare_v2( db_, SQLstring.c_str(), -1, &stmt2, NULL );
+                while(sqlite3_step(stmt2) == SQLITE_ROW)
+                {
+                    if (sqlite3_column_type(stmt2, 0)!=SQLITE_NULL){
+                        std::string col=std::string( (char *)sqlite3_column_text( stmt2, 0 ) );
+                        // soit c'est un identifiant de couleur que j'ai déjà dans mon dictionnaire, soit c'est un code hexadécimal
+                         std::cout << " couleur " << col << std::endl;
+                        if (colors.find(col)==colors.end()){
+                            std::cout << " ajout dans dico " << std::endl;
+                            colors.emplace(std::make_pair(col,color(col)));
+                        }
+                    }
+                }
+                sqlite3_finalize(stmt2);
+            }
+        }
+        sqlite3_finalize(stmt);
     }
 
     //std::cout << "Dico code essence --> nom essence francais a "<< Dico_code2NomFR.size() << " elements \n" << std::endl;

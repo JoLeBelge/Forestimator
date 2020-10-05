@@ -57,10 +57,6 @@ Layer::Layer(std::string aCode,cDicoApt * aDico,TypeLayer aType):
         setExpert(mRI->Expert());
         break;
     /*case TypeLayer::Externe: les cartes de type externe sont créé à partir de cRasterInfo (type thématique qui est écrasé en fonction du cRasterInfo)
-        if (mCode=="IGN"){
-            mLabel="Carte topographique IGN";
-            //mText->setText(mLabel);
-            mPathTif="";
         }*/
     }
 

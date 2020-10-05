@@ -32,7 +32,7 @@ var activePolygon1 = new ol.layer.Vector({
       color: 'rgba(0, 0, 255, 0.1)'
     })
 	  }),
-	extent: [MINX,MINY,MAXX,MAXY],
+	extent: [MINX,MINY,MAXX,MAXY]
 });
 
 
@@ -71,7 +71,10 @@ interactions: ol.interaction.defaults({
     pointer: false,
     select: false
 }),
-   	control: [],
+   	controls: ol.control.defaults({
+        attribution : false,
+        zoom : false,
+    }),
 	renderer: 'canvas',
 	layers: Layers1,
 	target: 'MYID',
@@ -79,9 +82,12 @@ interactions: ol.interaction.defaults({
 	pixelRatio: 1
 });
 
-mapStat.getView().fit(activePolygon1.getExtent(),mapStat.getSize());
+//mapStat.getView().fit(activePolygon1.getExtent(),mapStat.getSize());
+mapStat.getView().fit([MINX,MINY,MAXX,MAXY],mapStat.getSize());
+
 //mapStat.getView().fit(mapStat.getView().get(extent),mapStat.getSize());
 
-// puis je change max and min zoom pour plus que la carte ne puisse bouger
-mapStat.getView().setMaxZoom(mapStat.getView().getZoom());
-mapStat.getView().setMinZoom(mapStat.getView().getZoom());
+// puis je change max and min zoom pour plus que la carte ne puisse bouger - plus utile maintenant que j'ai enlever les boutton zoom
+//mapStat.getView().setMaxZoom(mapStat.getView().getZoom());
+//mapStat.getView().setMinZoom(mapStat.getView().getZoom());
+

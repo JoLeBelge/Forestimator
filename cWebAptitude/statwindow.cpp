@@ -8,9 +8,9 @@ statWindow::statWindow(cDicoApt *aDico):mDico(aDico)
     setOverflow(Overflow::Auto);
     addStyleClass("statWindow");
 
-
     WContainerWidget * contTitre_ =  addWidget(Wt::cpp14::make_unique<Wt::WContainerWidget>());
     mTitre = contTitre_->addWidget(cpp14::make_unique<WText>());
+     mTitre->setId("statWindowTitre");
     contTitre_->addWidget(cpp14::make_unique<WText>(tr("infoDansVisuStat")));
     // bouton retour
     auto * tpl = contTitre_->addWidget(cpp14::make_unique<Wt::WTemplate>(tr("bouton_retour_parcelaire")));
@@ -31,13 +31,14 @@ statWindow::statWindow(cDicoApt *aDico):mDico(aDico)
     mCarteGenCont->setId("carteGenStat");
 
     mAptTable = addWidget(cpp14::make_unique<WTable>());
+    mAptTable->setId("AptitudeTable");
     mAptTable->setHeaderCount(1);
     mAptTable->columnAt(0)->setWidth("60%");
 
     mAptTable->setWidth(Wt::WLength("90%"));
     mAptTable->toggleStyleClass("table-striped",true);
 
-    mIGN = new Layer("IGN",mDico,TypeLayer::Externe);
+    mIGN = new Layer("IGN",mDico,TypeLayer::Thematique);
 }
 
 void statWindow::add1Aptitude(layerStatChart * lstat){
