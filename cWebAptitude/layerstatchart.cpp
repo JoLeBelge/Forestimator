@@ -14,6 +14,7 @@ layerStatChart::layerStatChart(Layer *aLay, std::map<std::string, int> aStat, OG
     //mModel->setHeaderData(0, WString(mLay->getLegendLabel()));
     mModel->setHeaderData(0, "Catégories");
     mModel->setHeaderData(1, WString("Proportions"));
+    //mModel->setHeaderData(2, WString("Code couleur"));
 
     // Set data in the model.
     mModel->insertRows(mModel->rowCount(), mStatSimple.size());
@@ -26,6 +27,11 @@ layerStatChart::layerStatChart(Layer *aLay, std::map<std::string, int> aStat, OG
         mModel->setData(  row, 0, WString(kv.first));
         mModel->setData(  row, 1, WString(kv.first), ItemDataRole::ToolTip);
         mModel->setData(  row, 1, kv.second);
+        //mModel->setData(  row, 2, WString(""));
+        // ça me retourne la couleur, moi j'aimerai le nom de cette couleur qui est utilisé pour l'ajout d'un style dans la styleClass de l'application
+        color col=mLay->getColor(kv.first);
+        mModel->itemFromIndex(mModel->index(row,1))->setStyleClass(col.getStyleNameShort());
+
         if (kv.second>aMax) {aMax=kv.second; rowAtMax=row;}
         row++;
     }
@@ -33,9 +39,9 @@ layerStatChart::layerStatChart(Layer *aLay, std::map<std::string, int> aStat, OG
 }
 
 Wt::WContainerWidget * layerStatChart::getChart(){
-    // crée un smart ptr pour un chart vide
+
     //std::cout << " creation d'un chart " << std::endl;
-Wt:WContainerWidget * aRes= new Wt::WContainerWidget();
+    Wt::WContainerWidget * aRes= new Wt::WContainerWidget();
 
     aRes->setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Center);
     aRes->setInline(0);
@@ -50,12 +56,12 @@ Wt:WContainerWidget * aRes= new Wt::WContainerWidget();
     // ajout de la carte pour cette couche
     layoutH->addWidget(cpp14::make_unique<olOneLay>(mLay,mGeom),0);
 
-     WContainerWidget * aContTableAndPie = layoutH->addWidget(cpp14::make_unique<WContainerWidget>());
-     aContTableAndPie->setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Center);
-     aContTableAndPie->setInline(0);
-     aContTableAndPie->setOverflow(Wt::Overflow::Auto);
+    WContainerWidget * aContTableAndPie = layoutH->addWidget(cpp14::make_unique<WContainerWidget>());
+    aContTableAndPie->setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Center);
+    //aContTableAndPie->setInline(0);
+    aContTableAndPie->setOverflow(Wt::Overflow::Auto);
 
-     WVBoxLayout * layoutV2 = aContTableAndPie->setLayout(cpp14::make_unique<WVBoxLayout>());
+    WVBoxLayout * layoutV2 = aContTableAndPie->setLayout(cpp14::make_unique<WVBoxLayout>());
 
     //std::cout << " statsimple : " << mStatSimple.size() << " elem " << std::endl;
     if (mStatSimple.size()>0){
@@ -65,12 +71,13 @@ Wt:WContainerWidget * aRes= new Wt::WContainerWidget();
             //aRes->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
             table->setMargin(10, Side::Top | Side::Bottom);
             table->setMargin(WLength::Auto, Side::Left | Side::Right);
-
+            table->setAlternatingRowColors(0);
             table->setSortingEnabled(1,false);
             table->setSortingEnabled(0,false);// pas très utile
-            table->setAlternatingRowColors(true);
+            //table->setAlternatingRowColors(true); // si je met à true , va overrider les couleurs que j'ai notée dans la colonne 3 du model qui sert de légende
             //std::cout << "set model " << std::endl;
             table->setModel(mModel);
+
             // delegate ; met à 0 mes valeurs de pct dans la colonne, mais pour les labels de pct dans le graph ça fonctionne
             //std::shared_ptr<WItemDelegate> delegate = std::make_shared<WItemDelegate>();
             //delegate->setTextFormat("%.0f");
@@ -81,6 +88,7 @@ Wt:WContainerWidget * aRes= new Wt::WContainerWidget();
             table->setHeaderHeight(28);
             table->setWidth(200 + 150 + 14+2);
             // seulement un chart pour les variables discontinues
+            /*
             Chart::WPieChart * aChart  =layoutV2->addWidget(cpp14::make_unique<Chart::WPieChart>());
             aChart->setModel(mModel);       // Set the model.
             aChart->setLabelsColumn(0);    // Set the column that holds the labels.
@@ -104,31 +112,31 @@ Wt:WContainerWidget * aRes= new Wt::WContainerWidget();
             aChart->setMargin(20, Side::Top | Side::Bottom); // Add margin vertically.
             //  il faut mettre des marges, qui sont comtpée au départ du cammembert, pour mettre les label
             aChart->setMargin(50, Side::Left | Side::Right);
-            }*/
+
             // Enable a 3D and shadow effect.
             aChart->setPerspectiveEnabled(true, 0.2);
             aChart->setShadowEnabled(true);
             //aChart->setPlotAreaPadding(20, Side::Left | Side::Top | Side::Bottom|Side::Right);
             //if (mStat.size()>1) {aChart->setExplode(rowAtMax, 0.1);}  // Explode l'élément majoritaire WARN, le camembert sort du graphique, bug
             aChart->resize(300, 300);    // WPaintedWidget must be given an explicit size.
-
+            }*/
         }
         if (mTypeVar==TypeVar::Continu){
 
             // pour MNH et MNT, pour l'instant  - recrée un vecteur stat, puis un model
-             std::map<double, double> aStat;
+            std::map<double, double> aStat;
             // je dois mettre et la hauteur en double, et le pct car sinon imprécision d'arrondi
 
             for (auto & kv : mStat){
                 try {
                     double h(std::stod(kv.first));
 
-                     if (mLay->getCode()=="MNH2019"){
-                    if (h>3.0 && h<45){
-                        aStat.emplace(std::make_pair(std::stod(kv.first),(100.0*kv.second)/mNbPix));
+                    if (mLay->getCode()=="MNH2019"){
+                        if (h>3.0 && h<45){
+                            aStat.emplace(std::make_pair(std::stod(kv.first),(100.0*kv.second)/mNbPix));
 
-                    }
-                     } else {aStat.emplace(std::make_pair(std::stod(kv.first),(100.0*kv.second)/mNbPix));}
+                        }
+                    } else {aStat.emplace(std::make_pair(std::stod(kv.first),(100.0*kv.second)/mNbPix));}
                 }
                 catch (const std::invalid_argument& ia) {
                     std::cerr << "Invalid argument pour stod getChart: " << ia.what() << '\n';
@@ -175,7 +183,7 @@ Wt:WContainerWidget * aRes= new Wt::WContainerWidget();
 
 
 Wt::WContainerWidget * layerStatChart::getBarStat(){
-    Wt:WContainerWidget * aRes= new Wt::WContainerWidget();
+Wt:WContainerWidget * aRes= new Wt::WContainerWidget();
     aRes->addWidget(cpp14::make_unique<batonnetApt>(this));
     return aRes;
 }
@@ -189,11 +197,11 @@ void layerStat::simplifieStat(){
 
     switch (mTypeVar){
     case TypeVar::Classe:{
-
         // calcul des pourcentages au lieu du nombre de pixel
         if (mNbPix>0){
             for (auto & kv : mStat){
-                kv.second=(100*kv.second)/mNbPix;
+                double pct = (100.0*kv.second)/mNbPix;
+                kv.second=round(pct);
             }
         }
 
@@ -211,7 +219,7 @@ void layerStat::simplifieStat(){
             tot+=autres;
             // correction de l'erreur d'arrondi si elle est de 2 pct max
             if ((tot>97) & (tot <100)) { autres+= 100-tot; tot=100;}
-            std::cout << "ajout classe autre dans simplify stat " << autres << ", layer " << mLay->getLegendLabel() << std::endl;
+            //std::cout << "ajout classe autre dans simplify stat " << autres << ", layer " << mLay->getLegendLabel() << std::endl;
             mStatSimple.emplace(std::make_pair("Autre",autres));
         }
 
@@ -368,7 +376,7 @@ olOneLay::olOneLay(Layer * aLay, OGRGeometry *poGeom):mLay(aLay){
     //std::string name1 = mktemp('geomXXXXX');
     //std::string name1 = "geomTMP.geojson";
     //std::string aOut=mLay->Dico()->File("TMPDIR")+"/"+name1;
-    std::cout << aOut << " fichier tmp " << std::endl;
+    //std::cout << aOut << " fichier tmp " << std::endl;
     char * t=poGeom->exportToJson();
     std::ofstream ofs (aOut, std::ofstream::out);
     std::string a="{"
@@ -376,7 +384,7 @@ olOneLay::olOneLay(Layer * aLay, OGRGeometry *poGeom):mLay(aLay){
                   "'name': 'wt7fxhEi-epioux_sample',"
                   "'crs': { 'type': 'name', 'properties': { 'name': 'urn:ogc:def:crs:EPSG::31370' } },"
                   "'features': ["
-                    "{ 'type': 'Feature', 'geometry':";
+                  "{ 'type': 'Feature', 'geometry':";
     boost::replace_all(a,"'","\"");
     ofs << a;
     ofs << t;
@@ -385,8 +393,9 @@ olOneLay::olOneLay(Layer * aLay, OGRGeometry *poGeom):mLay(aLay){
 
     std::string JScommand;
     setWidth("40%");
-    setMinimumSize(400,0);
-    setOverflow(Overflow::Visible);
+    setMinimumSize(300,300);
+    //setOverflow(Overflow::Visible);
+    setOverflow(Overflow::Auto);
     std::string aFileIn(mLay->Dico()->File("staticMap"));
     std::ifstream in(aFileIn);
     std::stringstream ss;
@@ -412,15 +421,16 @@ olOneLay::olOneLay(Layer * aLay, OGRGeometry *poGeom):mLay(aLay){
     // remplacer l'extent et le centre de la carte
     OGREnvelope ext;
     poGeom->getEnvelope(&ext);
-    boost::replace_all(JScommand,"MAXX",std::to_string(ext.MaxX+10));
-    boost::replace_all(JScommand,"MAXY",std::to_string(ext.MaxY+10));
-    boost::replace_all(JScommand,"MINX",std::to_string(ext.MinX-10));
-    boost::replace_all(JScommand,"MINY",std::to_string(ext.MinY-10));
+    // agrandir un peu l'extend de la carte car sinon le polygone peut-être partiellement visible seulemement
+    int bufX = (ext.MaxX-ext.MinX)/3;
+    int bufY = (ext.MaxY-ext.MinY)/3;
+    boost::replace_all(JScommand,"MAXX",std::to_string(ext.MaxX+bufX));
+    boost::replace_all(JScommand,"MAXY",std::to_string(ext.MaxY+bufX));
+    boost::replace_all(JScommand,"MINX",std::to_string(ext.MinX-bufY));
+    boost::replace_all(JScommand,"MINY",std::to_string(ext.MinY-bufY));
 
     boost::replace_all(JScommand,"CENTERX",std::to_string(ext.MinX+((ext.MaxX-ext.MinX)/2)));
     boost::replace_all(JScommand,"CENTERY",std::to_string(ext.MinY+((ext.MaxY-ext.MinY)/2)));
-
-
 
     boost::replace_all(JScommand,"NAME","tmp/" + name1);
     //std::cout << JScommand << std::endl;
@@ -483,7 +493,7 @@ void batonnetApt::paintEvent(Wt::WPaintDevice *paintDevice){
     int xcumul(0);
     for (auto & kv : mLayStat->StatSimple()){
 
-        std::cout << "batonnet Aptitude " << kv.first << " " << kv.second << std::endl;
+        //std::cout << "batonnet Aptitude " << kv.first << " " << kv.second << std::endl;
 
         std::string aCodeStr(kv.first);
         color col(mLayStat->Lay()->getColor(aCodeStr));
