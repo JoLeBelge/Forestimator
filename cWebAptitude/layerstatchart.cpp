@@ -341,11 +341,11 @@ std::string layerStat::getFieldValStr(){
 
 std::string layerStat::summaryStat(){
     std::string aRes("");
-    if (mLay->mTypeVar==TypeVar::Continu){
+    if (mLay->Var()==TypeVar::Classe){
         // on concatene toutes les essences
         for (auto & kv : mStat){
-
             if (kv.second>1){
+                if (kv.second==100){ aRes+=kv.first;}
                 aRes+=kv.first+":"+std::to_string(kv.second)+"% ";
             }
         }
@@ -440,11 +440,11 @@ olOneLay::olOneLay(Layer * aLay, OGRGeometry *poGeom):mLay(aLay){
     OGREnvelope ext;
     poGeom->getEnvelope(&ext);
     // agrandir un peu l'extend de la carte car sinon le polygone peut-être partiellement visible seulemement
-    int bufX = (ext.MaxX-ext.MinX)/3;
-    int bufY = (ext.MaxY-ext.MinY)/3;
+    int bufX = (ext.MaxX-ext.MinX);
+    int bufY = (ext.MaxY-ext.MinY);
     boost::replace_all(JScommand,"MAXX",std::to_string(ext.MaxX+bufX));
-    boost::replace_all(JScommand,"MAXY",std::to_string(ext.MaxY+bufX));
-    boost::replace_all(JScommand,"MINX",std::to_string(ext.MinX-bufY));
+    boost::replace_all(JScommand,"MAXY",std::to_string(ext.MaxY+bufY));
+    boost::replace_all(JScommand,"MINX",std::to_string(ext.MinX-bufX));
     boost::replace_all(JScommand,"MINY",std::to_string(ext.MinY-bufY));
 
     boost::replace_all(JScommand,"CENTERX",std::to_string(ext.MinX+((ext.MaxX-ext.MinX)/2)));
@@ -453,7 +453,7 @@ olOneLay::olOneLay(Layer * aLay, OGRGeometry *poGeom):mLay(aLay){
     boost::replace_all(JScommand,"NAME","tmp/" + name1);
     //std::cout << JScommand << std::endl;
     this->doJavaScript(JScommand);
-
+    if (mLay->getCode()=="IGN"){std::cout << JScommand << std::endl;}
 }
 
 

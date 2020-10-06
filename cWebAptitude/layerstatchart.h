@@ -92,6 +92,7 @@ public:
 
     std::map<std::string, int> StatSimple(){return mStatSimple;}
     std::map<std::string, int> Stat(){return mStat;}
+    TypeVar mTypeVar; // pour distinguer le type de variable, continue (MNH) ou classes (aptitude)
 
 protected:
     Layer * mLay;
@@ -101,7 +102,7 @@ protected:
 
     int mNbPix;
     std::string mMode; // fee vs cs
-    TypeVar mTypeVar; // pour distinguer le type de variable, continue (MNH) ou classes (aptitude)
+
 };
 
 class layerStatChart : public layerStat

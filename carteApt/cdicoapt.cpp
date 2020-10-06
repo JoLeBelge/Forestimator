@@ -295,7 +295,6 @@ cDicoApt::cDicoApt(std::string aBDFile):mBDpath(aBDFile)
             if (sqlite3_column_type(stmt, 0)!=SQLITE_NULL){
                 std::string nom_dico=std::string( (char *)sqlite3_column_text( stmt, 0 ) );
                 SQLstring="SELECT col FROM "+ nom_dico +";";
-                std::cout << SQLstring << std::endl;
 
                 sqlite3_stmt * stmt2;
                 sqlite3_prepare_v2( db_, SQLstring.c_str(), -1, &stmt2, NULL );
@@ -304,9 +303,7 @@ cDicoApt::cDicoApt(std::string aBDFile):mBDpath(aBDFile)
                     if (sqlite3_column_type(stmt2, 0)!=SQLITE_NULL){
                         std::string col=std::string( (char *)sqlite3_column_text( stmt2, 0 ) );
                         // soit c'est un identifiant de couleur que j'ai déjà dans mon dictionnaire, soit c'est un code hexadécimal
-                         std::cout << " couleur " << col << std::endl;
                         if (colors.find(col)==colors.end()){
-                            std::cout << " ajout dans dico " << std::endl;
                             colors.emplace(std::make_pair(col,color(col)));
                         }
                     }

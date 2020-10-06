@@ -40,7 +40,7 @@ class basicStat{
 public:
     basicStat():min(0),max(0),mean(0){}
     basicStat(std::map<double,int> aMapValandFrequ);
-   private:
+   //private:
     double min,max,mean;
 };
 

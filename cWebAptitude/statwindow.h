@@ -13,6 +13,8 @@
 class ReportResource;
 class statWindow;
 
+std::string roundDouble(double d, int precisionVal=1);
+
 namespace {
     void HPDF_STDCALL error_handler(HPDF_STATUS error_no, HPDF_STATUS detail_no,
                void *user_data) {
@@ -49,7 +51,7 @@ private:
     // pour la carte de localisation
     Layer * mIGN;
     // pour les information générales
-    Layer * mMNT, * mZBIO;
+    Layer * mMNT, * mZBIO, * mPente;
 
 };
 

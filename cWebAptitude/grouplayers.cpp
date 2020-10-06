@@ -328,17 +328,6 @@ void groupLayers::extractInfo(double x, double y){
         // tableau des aptitudes pour toutes les essences
         mLegend->afficheAptAllEss();
 
-        /* Wt::WAnimation animation(Wt::AnimationEffect::Fade,
-                             Wt::TimingFunction::Linear,
-                             1000);
-
-    // si je double clique très vite deux fois, l'animation numéro deux sera reportée à plus tard (buggy)
-    //mLegend->animateShow(animation); // marche pas... car mLegend est une classe qui hérite d'un conteneur mais ce conteneur n'est pas affiché, tout les objets sont dans le conteneur appelé à tord "Parent"
-    //mLegend->mParent->resize("100%","100%");// j'ai changé le contenu du parent
-    mLegend->mParent->animateShow(animation);
-    */
-
-
         mMap->updateView();
     }else {
         std::cout << "x et y ne sont pas des nombres , pas bien " << std::endl;

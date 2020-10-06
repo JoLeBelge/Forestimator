@@ -68,20 +68,15 @@
     styleSheet().addRule(".bold", BoldStyle);
 
     // init the OpenLayers javascript api
-    // avec ol 6, la carte met du temps à s'afficher. je reste à ol 4 pour le moment.
-    //std::string ol("https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v6.2.1/build/ol.js");
-    // finalement le 6 fonctionee parfaitement, alors pourquoi rester au 4
-    std::string ol("jslib/v6.3.1-dist/ol.js");
+
+    //std::string ol("jslib/v6.3.1-dist/ol.js");
+    std::string ol("jslib/v6.4.3-dist/ol.js");
+    // la version 6.4 de ol fonctionne mais ne parvient pas a sélectionner correctement les polygones du shp avec shiftKeyOnly
     //std::string ol("jslib/ol4.6.4-debug.js");
     require(ol);
-    useStyleSheet("jslib/v6.3.1-dist/ol.css");
+    useStyleSheet("jslib/v6.4.3-dist/ol.css");
     require("jslib/proj4js-2.6.1/dist/proj4.js");
     require("jslib/proj4js-2.6.1/dist/proj4-src.js");
-
-    // ajout d'un control print pour sauver en jpg les cartes ol - non plutôt voir les exemples récents de ol pour l'export
-    //require("jslib/ol-ext.min.js");
-    //require("jslib/FileSaver.js/dist/FileSaver.js");
-    //useStyleSheet("jslib/ol-ext.min.css");
 
     // CSS custom pour faire beau
     useStyleSheet("style/style.css");
@@ -94,8 +89,7 @@
 
     std::unique_ptr<cWebAptitude> WebApt = Wt::cpp14::make_unique<cWebAptitude>(this, authWidget_);
     cwebapt = layout->addWidget(std::move(WebApt), 0);
-    //layout->setContentsMargins(0,0,0,0);
-    //root()->setPadding(0);
+
     root()->addStyleClass("layout_main");
     loaded_=true;
   }

@@ -7,11 +7,12 @@ parcellaire = new ol.layer.Vector({
 	  stroke: new ol.style.Stroke({
 		color: 'blue',
 		width: 2
-	  }),
-    fill: new ol.style.Fill({
-      color: 'rgba(0, 0, 255, 0.1)'
-    })
-	  }),
+	  })//,
+// plus de fill car on utilise cette couche dans le rapport d'analyse surfacique, on ne veux pas de couleur au dessus de la couleur des cartes
+    //fill: new ol.style.Fill({
+    //  color: 'rgba(0, 0, 255, 0.1)'
+    //})
+		  }),
 	extent: [MINX,MINY,MAXX,MAXY],
 });
 
@@ -23,6 +24,6 @@ groupe = new ol.layer.Group({
 	});
 
 map.setLayerGroup(groupe);
-map.getView().fit(parcellaire.getExtent(),map.getSize());
+//map.getView().fit(parcellaire.getExtent());
 
 

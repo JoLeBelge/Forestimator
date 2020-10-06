@@ -44,6 +44,7 @@ statWindow::statWindow(cDicoApt *aDico):mDico(aDico)
     mIGN = new Layer("IGN",mDico,TypeLayer::Thematique);
     mMNT = new Layer("MNT",mDico,TypeLayer::Thematique);
     mZBIO = new Layer("ZBIO",mDico,TypeLayer::Thematique);
+    mPente = new Layer("slope",mDico,TypeLayer::Thematique);
 }
 
 void statWindow::add1Aptitude(layerStatChart * lstat){
@@ -83,7 +84,7 @@ void statWindow::vider()
 }
 
 void statWindow::generateGenCarte(OGRFeature * poFeature){
-     std::cout << "statWindow::generateGenCarte()" << std::endl;
+
      WVBoxLayout * layoutV =mCarteGenCont->setLayout(cpp14::make_unique<WVBoxLayout>());
      layoutV->addWidget(cpp14::make_unique<WText>("<h4>Apperçu</h4>"));
      //aRes->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
@@ -95,14 +96,29 @@ void statWindow::generateGenCarte(OGRFeature * poFeature){
      WContainerWidget * aContInfo = layoutH->addWidget(cpp14::make_unique<WContainerWidget>());
      // je refais les calculs pour les couches qui m'intéressent
      basicStat statMNT= mMNT->computeBasicStatOnPolyg(poFeature->GetGeometryRef());
+     basicStat statPente= mPente->computeBasicStatOnPolyg(poFeature->GetGeometryRef());
 
      aContInfo->addWidget(cpp14::make_unique<WText>("Zone bioclimatique : " + mZBIO->summaryStat(poFeature->GetGeometryRef())));
      aContInfo->addWidget(cpp14::make_unique<WBreak>());
      aContInfo->addWidget(cpp14::make_unique<WText>("Relief"));
-
-
+     aContInfo->addWidget(cpp14::make_unique<WBreak>());
+     aContInfo->addWidget(cpp14::make_unique<WText>("Altitude maximum : "+ roundDouble(statMNT.max) + "m"));
+     aContInfo->addWidget(cpp14::make_unique<WBreak>());
+     aContInfo->addWidget(cpp14::make_unique<WText>("Altitude moyenne : "+ roundDouble(statMNT.mean)+ "m"));
+     aContInfo->addWidget(cpp14::make_unique<WBreak>());
+     aContInfo->addWidget(cpp14::make_unique<WText>("Altitude maximum : "+ roundDouble(statMNT.min)+ "m"));
+     aContInfo->addWidget(cpp14::make_unique<WBreak>());
+     aContInfo->addWidget(cpp14::make_unique<WText>("Pente moyenne : "+ roundDouble(statPente.mean)+ "%"));
+     aContInfo->addWidget(cpp14::make_unique<WBreak>());
 
 }
+
+std::string roundDouble(double d, int precisionVal){
+
+   return std::to_string(d).substr(0, std::to_string(d).find(".") + precisionVal + 1);
+}
+
+
 
 void statWindow::export2pdf(){
      std::cout << "statWindow::export2pdf()" << std::endl;

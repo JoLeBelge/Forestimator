@@ -33,7 +33,12 @@ int main(int argc, char *argv[])
     for (auto & pair : *dico.RasterType()){
         aMRs.emplace(std::make_pair(pair.first,cRasterInfo(pair.first,&dico)));
 
-        if (pair.first=="MNT"){
+        /*if (pair.first=="MNT"){
+            cRasterInfo RI(pair.first,&dico);
+            std::string aFileCodeMS("/home/lisein/Documents/carteApt/autres/mapserver/mapThematiqueFEE.map");
+            aACA.codeMapServer(RI.NomFileWithExt(),RI.Code(),RI.Nom(),aFileCodeMS,RI.getDicoVal(),RI.getDicoCol());
+        }*/
+        if (pair.first=="slope"){
             cRasterInfo RI(pair.first,&dico);
             std::string aFileCodeMS("/home/lisein/Documents/carteApt/autres/mapserver/mapThematiqueFEE.map");
             aACA.codeMapServer(RI.NomFileWithExt(),RI.Code(),RI.Nom(),aFileCodeMS,RI.getDicoVal(),RI.getDicoCol());

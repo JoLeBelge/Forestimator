@@ -60,7 +60,7 @@ var view1 = new ol.View({
 
 // create map here
 
-var mapStat = new ol.Map({
+mapStat = new ol.Map({
    	//interaction: [],
 interactions: ol.interaction.defaults({
     doubleClickZoom :false,
@@ -84,11 +84,15 @@ interactions: ol.interaction.defaults({
 });
 
 //mapStat.getView().fit(activePolygon1.getExtent(),mapStat.getSize());
-mapStat.getView().fit([MINX,MINY,MAXX,MAXY],mapStat.getSize());
+//mapStat.getView().setConstrainResolution(true);
+mapStat.getView().fit([MINX,MINY,MAXX,MAXY]);
 
-//mapStat.getView().fit(mapStat.getView().get(extent),mapStat.getSize());
+// les paramètres pour getView fit n'ont pas l'air d'avoir un effet...
+//        {
+//	size: mapStat.getSize(),
+//	padding: [10,10,10,10], }
+//			);
 
-// puis je change max and min zoom pour plus que la carte ne puisse bouger - plus utile maintenant que j'ai enlever les boutton zoom
-//mapStat.getView().setMaxZoom(mapStat.getView().getZoom());
-//mapStat.getView().setMinZoom(mapStat.getView().getZoom());
+
+
 

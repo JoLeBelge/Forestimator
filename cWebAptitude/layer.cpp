@@ -557,7 +557,9 @@ basicStat::basicStat(std::map<double,int> aMapValandFrequ):mean(0),max(0),min(0)
         mean += kv.first*kv.second;
         tot+=kv.second;
 
+         if (kv.second>1){
         if (test) {
+
             if (kv.first>max) {max=kv.first;}
             if (kv.first<min) {min=kv.first;}
 
@@ -566,6 +568,7 @@ basicStat::basicStat(std::map<double,int> aMapValandFrequ):mean(0),max(0),min(0)
             min=kv.first;
             test=1;
         }
+         }
     }
     mean=mean/tot;
 
@@ -573,7 +576,7 @@ basicStat::basicStat(std::map<double,int> aMapValandFrequ):mean(0),max(0),min(0)
 
 // pour les couches des variables continues
 basicStat Layer::computeBasicStatOnPolyg(OGRGeometry * poGeom){
-    basicStat aRes();
+    std::cout << "compute BasicStat On Polyg" << std::endl;
     std::map<double,int> aMapValandFrequ;
 
     if (mTypeVar==TypeVar::Continu){
@@ -657,17 +660,15 @@ basicStat Layer::computeBasicStatOnPolyg(OGRGeometry * poGeom){
         GDALClose(mGDALDat);
     }
 
-    if (aMapValandFrequ.size()>0) {aRes= basicStat(aMapValandFrequ);}
-    return aRes;
+    if (aMapValandFrequ.size()>0) {return basicStat(aMapValandFrequ);} else {return  basicStat();}
 
 }
 
 // pour les couches des variables de classe
 std::string Layer::summaryStat(OGRGeometry * poGeom){
 
-    std::map<std::string,int> computeStatOnPolyg(poGeom);
-    // on arrange la map par ordre d'importance
-
-
+    std::cout << "summary stat" << std::endl;
+    layerStat ls(this,computeStatOnPolyg(poGeom));
+    return ls.summaryStat();
 
 }

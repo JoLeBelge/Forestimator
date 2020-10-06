@@ -19,7 +19,6 @@ cWebAptitude::cWebAptitude(AuthApplication *app, Auth::AuthWidget* authWidget_)
         WCssDecorationStyle styleBgrd;
         styleBgrd.setBackgroundColor(WColor(col.mR,col.mG,col.mB));
         if (col.dark()){styleBgrd.setForegroundColor(WColor("white"));}
-        std::cout << "creation d'un style avec background color " << col.getStyleName() << std::endl;
         app->styleSheet().addRule(col.getStyleName(), styleBgrd);
     }
 
