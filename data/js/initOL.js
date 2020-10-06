@@ -308,7 +308,7 @@ map = new ol.Map({
 	controls: ol.control.defaults().extend([
 	  new ol.control.ScaleLine()
 	]),
- 	interactions : ol.interaction.defaults({doubleClickZoom :false, shiftDragZoom: false}),
+ 	interactions : ol.interaction.defaults({doubleClickZoom :false}),//, shiftDragZoom: false}),
 	renderer: 'canvas',
 	//renderer: 'webgl',
 	layers: layers,

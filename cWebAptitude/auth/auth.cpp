@@ -69,8 +69,8 @@
 
     // init the OpenLayers javascript api
 
-    //std::string ol("jslib/v6.3.1-dist/ol.js");
-    std::string ol("jslib/v6.4.3-dist/ol.js");
+    std::string ol("jslib/v6.3.1-dist/ol.js");
+    //std::string ol("jslib/v6.4.3-dist/ol.js");
     // la version 6.4 de ol fonctionne mais ne parvient pas a sélectionner correctement les polygones du shp avec shiftKeyOnly
     //std::string ol("jslib/ol4.6.4-debug.js");
     require(ol);

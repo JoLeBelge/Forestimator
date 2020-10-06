@@ -24,6 +24,4 @@ groupe = new ol.layer.Group({
 	});
 
 map.setLayerGroup(groupe);
-//map.getView().fit(parcellaire.getExtent());
-
-
+map.getView().fit(parcellaire.getExtent());
