@@ -340,7 +340,8 @@ var selectAltClick = new ol.interaction.Select({
   },
  toggleCondition: ol.events.condition.never,
  //layers: lays4select,
- features: featuresSelect
+ features: featuresSelect,
+// style : null
 });
 
 map.addInteraction(selectAltClick);

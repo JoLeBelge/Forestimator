@@ -45,9 +45,13 @@ WOpenLayers::WOpenLayers(cDicoApt *aDico):xy_(this,"1.0"),mDico(aDico),polygId_(
 
     slot2.setJavaScript
             ("function () {if (featuresSelect.getLength() > 0) {if (featuresSelect.item(0) !== 'undefined') {"
-             "if (featuresSelect.item(0).getId() !== null) {"+ polygId_.createCall({"featuresSelect.item(0).getId()"}) + "}"
-              "}}};"
+             "if (featuresSelect.item(0).getId() !== null) {"+ polygId_.createCall({"featuresSelect.item(0).getId()"}) +
+             "console.log(featuresSelect.item(0).getId());"
+             "}"
+             "}}};"
              );
+
+
     //"featuresSelect.clear();" pour vider la sélection
 
     slot3.setJavaScript

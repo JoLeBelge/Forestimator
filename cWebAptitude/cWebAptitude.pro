@@ -63,7 +63,8 @@ SOURCES += main.cpp \
     stackinfoptr.cpp \
     statwindow.cpp \
     selectlayers.cpp \
-    presentationpage.cpp
+    presentationpage.cpp \
+    cnsw.cpp
 
 HEADERS += \
     auth/Session.h \
@@ -84,4 +85,5 @@ HEADERS += \
     stackinfoptr.h \
     statwindow.h \
     selectlayers.h \
-    presentationpage.h
+    presentationpage.h \
+    cnsw.h
