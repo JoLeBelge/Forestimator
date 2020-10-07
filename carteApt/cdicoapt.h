@@ -1,12 +1,6 @@
 #ifndef CDICOAPT_H
 #define CDICOAPT_H
 #include <sqlite3.h>
-
-//#include <Wt/Dbo/backend/Sqlite3.h>
-//#include <Wt/Dbo/Session.h>
-//#include <Wt/Dbo/Dbo.h>
-//#include <Wt/Dbo/SqlConnection.h>
-
 #include <map>
 #include <string>
 #include <iostream>
@@ -17,7 +11,6 @@
 #include "boost/filesystem.hpp"
 #include <unistd.h>
 #include <cmath>
-//using namespace Wt::Dbo;
 
 enum TypeCarte {Apt, Potentiel, Station1, Habitats,NH,NT,Topo,AE,SS,ZBIO,CSArdenne,CSLorraine,MNH2019,Composition,MNT16b};
 
@@ -316,6 +309,8 @@ public:
     std::map<int,std::string>  * topo(){return  &Dico_topo;}
 
     std::map<int, color>  codeApt2col(){return  Dico_codeApt2col;}
+
+    std::string BDpath(){return mBDpath;}
 
     color Apt2col(int aCode){
         color aRes(0,0,0);

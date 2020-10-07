@@ -312,6 +312,7 @@ cDicoApt::cDicoApt(std::string aBDFile):mBDpath(aBDFile)
             }
         }
         sqlite3_finalize(stmt);
+
     }
 
     //std::cout << "Dico code essence --> nom essence francais a "<< Dico_code2NomFR.size() << " elements \n" << std::endl;

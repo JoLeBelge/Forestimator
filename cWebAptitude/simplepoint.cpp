@@ -41,7 +41,8 @@ void simplepoint::createUI()
     mContEco->setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Center);
 
     mInfoT = mParent->addWidget(cpp14::make_unique<WTable>());
-    mInfoT->setHeaderCount(2);
+    //mInfoT->setHeaderCount(2);
+    mInfoT->setHeaderCount(1);
     mInfoT->setWidth(Wt::WLength("90%"));
     mInfoT->toggleStyleClass("table-striped",true);
 
@@ -64,8 +65,8 @@ void simplepoint::titreInfoRaster(){
     mInfoT->elementAt(0, 0)->setPadding(10);
     //WText *titre = mInfoT->elementAt(0,0)->addWidget(cpp14::make_unique<WText>("<h4>Description de la station forestière </h4>"));
     mInfoT->elementAt(0,0)->addWidget(cpp14::make_unique<WText>("<h4>Description de la station forestière </h4>"));
-    mInfoT->elementAt(1, 0)->addWidget(cpp14::make_unique<WText>("Rasteur"));
-    mInfoT->elementAt(1, 1)->addWidget(cpp14::make_unique<WText>("Valeur"));
+   // mInfoT->elementAt(1, 0)->addWidget(cpp14::make_unique<WText>("Couche"));
+   //mInfoT->elementAt(1, 1)->addWidget(cpp14::make_unique<WText>("Valeur"));
 }
 
 void simplepoint::add1InfoRaster(std::vector<std::string> aV){

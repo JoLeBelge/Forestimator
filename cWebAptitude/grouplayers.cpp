@@ -13,6 +13,7 @@ groupLayers::groupLayers(cDicoApt * aDico, WOpenLayers *aMap, AuthApplication *a
   //,mPBar(NULL)
   ,m_app(app)
   ,mLegend(NULL)
+  ,mPedo(NULL)
   //,mSelect4Stat(NULL)
   ,mSelect4Download(NULL)
   ,mStackInfoPtr(aStackInfoPtr)
@@ -22,6 +23,9 @@ groupLayers::groupLayers(cDicoApt * aDico, WOpenLayers *aMap, AuthApplication *a
   ,slot_extent(this)
 {
     //std::cout << "constructeur GL " << std::endl;
+
+    mPedo= new cnsw(mDico->BDpath());
+
     mParent->setOverflow(Wt::Overflow::Visible);
     mParent->setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Middle);
 
@@ -284,6 +288,7 @@ void groupLayers::extractInfo(double x, double y){
         mStation->vider();
         mLegend->vider();
 
+
         /*int cur_index = mStackInfoPtr->stack_info->currentIndex(); // pour savoir où on en est
         mStackInfoPtr->stack_info->setCurrentIndex(0);
         // bouton retour
@@ -296,6 +301,9 @@ void groupLayers::extractInfo(double x, double y){
 
         // tableau des informations globales - durant ce round, l'objet ST est modifié
         mLegend->titreInfoRaster();
+        mLegend->add1InfoRaster(mPedo->displayInfo(x,y,PEDO::DRAINAGE));
+        mLegend->add1InfoRaster(mPedo->displayInfo(x,y,PEDO::PROFONDEUR));
+        mLegend->add1InfoRaster(mPedo->displayInfo(x,y,PEDO::TEXTURE));
 
         for (Layer * l : mVLs){
             if (((l->Type()==TypeLayer::KK )| (l->Type()==TypeLayer::Thematique )) | (( l->IsActive()) & (l->Type()!=TypeLayer::Externe))){
@@ -334,7 +342,6 @@ void groupLayers::extractInfo(double x, double y){
     }
 }
 
-// clé 1 ; nom de la couche. clé2 : la valeur au format légende (ex ; Optimum). Valeur ; pourcentage pour ce polygone
 void groupLayers::computeStatGlob(OGRGeometry *poGeomGlobale){
     std::cout << " groupLayers::computeStatGlob " << std::endl;
     // clear d'un vecteur de pointeur, c'est mal.

@@ -42,7 +42,7 @@ Vous pouvez télécharger les cartes listées ci-dessous qui seront découpées 
 
 <message id="toolTipActiveLayer">Cliquez sur l'onglet légende pour visualiser la signification des couleurs pour cette carte. </message>
 
-<message id="legendMsg"><i>Aucune légende à afficher pour l'instant. Veuillez d'abord sélectionner une couche ou cliquer sur une station pour afficher sa description...</i> </message>
+<message id="legendMsg"><i>Aucune légende à afficher pour cette carte.</i> </message>
 <message id="legendTitre"><h3>Légende de la carte :</h3> </message>
 <message id="legendCheckbox">Afficher la légende</message>
 

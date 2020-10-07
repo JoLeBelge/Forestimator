@@ -30,6 +30,7 @@
 #include <string.h>
 #include "auth.h"
 #include "selectlayers.h"
+#include "cnsw.h"
 
 class WOpenLayers;
 class Layer;
@@ -143,12 +144,15 @@ public:
 
     // signal pour cacher les nodes qui sont en mode expert
     Wt::Signal<bool>& changeExpertMode() { return expertMode_; }
+
+
 private:
     TypeClassifST mTypeClassifST; // 2 modes de classification des stations forestières ; FEE et CS. important de savoir le mode pour savoir quel tableau d'aptitude afficher quand on double-click sur une station
 
     cDicoApt * mDico;
     simplepoint * mLegend;
     sqlite3 *db_;
+    cnsw *mPedo;
 
     // bof finalement c'est mieux le conteneur parent
     Wt::WContainerWidget     * mParent;
