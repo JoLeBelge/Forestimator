@@ -522,7 +522,7 @@ void parcellaire::downloadRaster(){
             //mGL->mPBar->setValue(mGL->mPBar->value()+1);
             //m_app->processEvents();
         }
-       // mGL->mPBar->setToolTip("");
+        // mGL->mPBar->setToolTip("");
         zf->close();
         delete zf;
         m_app->loadingIndicator()->hide();
@@ -535,10 +535,10 @@ void parcellaire::downloadRaster(){
     } else {
         auto messageBox =
                 addChild(Wt::cpp14::make_unique<Wt::WMessageBox>(
-                                      "Sélection des couches à exporter",
-                                      "<p>Aucune cartes sélectionnée. Veuillez selectionner les couches à exporter à l'étape numéro 4 de l'onglet analyse</p>",
-                                      Wt::Icon::Information,
-                                      Wt::StandardButton::Ok));
+                             "Sélection des couches à exporter",
+                             "<p>Aucune cartes sélectionnée. Veuillez selectionner les couches à exporter à l'étape numéro 4 de l'onglet analyse</p>",
+                             Wt::Icon::Information,
+                             Wt::StandardButton::Ok));
 
         messageBox->setModal(false);
         messageBox->buttonClicked().connect([=] {
@@ -558,4 +558,40 @@ bool parcellaire::cropImWithShp(std::string inputRaster, std::string aOut){
     poGeomGlobale->getEnvelope(&ext);
     aRes=cropIm(inputRaster, aOut, ext);
     return aRes;
+}
+
+void parcellaire::selectPolygon(double x, double y){
+    if(!isnan(x) && !isnan(y) && !(x==0 && y==0)){
+        std::cout << "parcellaire::selectPolygon " << std::endl;
+        std::string input(mFullPath+ ".shp");
+        const char *inputPath=input.c_str();
+        GDALAllRegister();
+        GDALDataset * DS;
+
+        DS =  (GDALDataset*) GDALOpenEx( inputPath, GDAL_OF_VECTOR | GDAL_OF_UPDATE, NULL, NULL, NULL );
+        if( DS == NULL )
+        {
+            printf( "Open failed.\n" );
+        } else {
+
+            // layer
+            OGRLayer * lay = DS->GetLayer(0);
+            OGRFeature *poFeature;
+
+            OGRPoint pt(x,y);
+            pt.assignSpatialReference(lay->GetSpatialRef());
+            //bool find(0);
+            while( (poFeature = lay->GetNextFeature()) != NULL )
+            {
+                OGRGeometry * poGeom = poFeature->GetGeometryRef();
+                poGeom->closeRings();
+                poGeom->flattenTo2D();
+                if ( pt.Within(poGeom)){
+                    computeStatAndVisuSelectedPol(poFeature->GetFID());
+                    break;
+                }
+            }
+        }
+        GDALClose( DS );
+    }
 }

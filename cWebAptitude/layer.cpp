@@ -15,7 +15,7 @@ Layer::Layer(std::string aCode,cDicoApt * aDico,TypeLayer aType):
   ,mExpert(0)
   ,mIsVisible(1)
 {
-
+    //std::cout << "création de layer en dehors de wt pour " << aCode << std::endl;
     switch (mType) {
     case TypeLayer::FEE:
         // construction de l'essence
@@ -77,7 +77,7 @@ Layer::Layer(groupLayers * aGroupL, std::string aCode, WText *PWText, TypeLayer 
   ,mExpert(0)
   ,mIsVisible(1)
 {
-    // std::cout << "constructeur layer " << std::endl;
+    //std::cout << "création de layer pour " << aCode << std::endl;
     // constructeur qui dépend du type de layer
     switch (mType) {
     case TypeLayer::FEE:

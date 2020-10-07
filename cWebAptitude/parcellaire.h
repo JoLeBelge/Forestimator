@@ -46,6 +46,8 @@ public:
     void clickUploadBt();
     void fuChanged();
 
+    void selectPolygon(double x, double y);
+
     void computeStatAndVisuSelectedPol(int aId);
 
     bool hasShp(){return hasValidShp;}

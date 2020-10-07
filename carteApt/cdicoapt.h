@@ -341,6 +341,34 @@ public:
         return aRes;
     }
 
+    std::string RasterNom(std::string aCode){
+        std::string aRes("not found");
+        if (Dico_RasterNomComplet.find(aCode)!=Dico_RasterNomComplet.end()){aRes=Dico_RasterNomComplet.at(aCode);}
+        return aRes;
+    }
+    bool RasterExpert(std::string aCode){
+        bool aRes(0);
+        if (Dico_RasterExpert.find(aCode)!=Dico_RasterExpert.end()){aRes=Dico_RasterExpert.at(aCode);}
+        return aRes;
+    }
+    std::string RasterType(std::string aCode){
+        std::string aRes("not found");
+        if (Dico_RasterType.find(aCode)!=Dico_RasterType.end()){aRes=Dico_RasterType.at(aCode);}
+        return aRes;
+    }
+    std::string RasterVar(std::string aCode){
+        std::string aRes("not found");
+        if (Dico_RasterVar.find(aCode)!=Dico_RasterVar.end()){aRes=Dico_RasterVar.at(aCode);}
+        return aRes;
+    }
+    std::string RasterLayer(std::string aCode){
+        std::string aRes("not found");
+        if (Dico_RasterLayer.find(aCode)!=Dico_RasterLayer.end()){aRes=Dico_RasterLayer.at(aCode);}
+        return aRes;
+    }
+
+
+
     std::string ZBIO(int aCode){
         std::string aRes("not found");
         if (Dico_ZBIO.find(aCode)!=Dico_ZBIO.end()){aRes=Dico_ZBIO.at(aCode);}

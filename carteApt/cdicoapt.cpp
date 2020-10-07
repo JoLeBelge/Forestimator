@@ -801,12 +801,12 @@ int cKKCS::getHab(int aZbio,int aSTId){
 }
 
 cRasterInfo::cRasterInfo(std::string aCode,cDicoApt * aDico):mDico(aDico),mCode(aCode),mExpert(0){
-    mNom=mDico->RasterNom()->at(mCode);
+    mNom=mDico->RasterNom(mCode);
     mPathRaster=mDico->File(mCode);
-    mExpert=mDico->RasterExpert()->at(mCode);
-    mType =str2TypeCarte(mDico->RasterType()->at(mCode));
-    mTypeVar =str2TypeVar(mDico->RasterVar()->at(mCode));
-    mTypeLayer =str2TypeLayer(mDico->RasterLayer()->at(mCode));
+    mExpert=mDico->RasterExpert(mCode);
+    mType =str2TypeCarte(mDico->RasterType(mCode));
+    mTypeVar =str2TypeVar(mDico->RasterVar(mCode));
+    mTypeLayer =str2TypeLayer(mDico->RasterLayer(mCode));
     mDicoVal=mDico->getDicoRaster(mCode);
     mDicoCol=mDico->getDicoRasterCol(mCode);
 }

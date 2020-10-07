@@ -55,7 +55,7 @@ public:
     void filterMouseEvent(WMouseEvent event){
         if (event.modifiers().test(Wt::KeyboardModifier::Shift)){
             // ici j'aimerai que le JS slot2 fonctionne et envoi sa réponse
-            slot2.exec();
+            slot2.exec(std::to_string(event.widget().x),std::to_string(event.widget().y));
         }
     }
 
@@ -89,11 +89,15 @@ public:
     JSignal<double,double>& xy() { return xy_; }
     JSlot slot;
     JSignal<double, double>  xy_;
+    // signaux pour selectionner un polygone du parcellaire au moment du shift+click
+    // ol 4 gérais cet aspect bien mais sous le 6 il y a un bug à cause de la condition shiftOnly donc on migre tout vers c++
+    JSignal<double, double>  xySelect_;
+    JSignal<double,double>& xySelect() { return xySelect_; }
 
-    JSignal<int>& polygId() { return polygId_; }
     JSlot slot2;
 
-    JSignal<int>  polygId_;
+    //JSignal<int>& polygId() { return polygId_; }
+    //JSignal<int>  polygId_;
 
     static constexpr const char *clickWithShift_label = "toto";
 

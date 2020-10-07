@@ -308,7 +308,7 @@ map = new ol.Map({
 	controls: ol.control.defaults().extend([
 	  new ol.control.ScaleLine()
 	]),
- 	interactions : ol.interaction.defaults({doubleClickZoom :false}),//, shiftDragZoom: false}),
+ 	interactions : ol.interaction.defaults({doubleClickZoom :false, shiftDragZoom: false, dragPan: false}),
 	renderer: 'canvas',
 	//renderer: 'webgl',
 	layers: layers,
@@ -332,21 +332,6 @@ function centrer_com(){
 	
 	_view.fit(_tab_com[selek.selectedIndex], {padding: [10, 10, 10, 10],constrainResolution: false});
 }
-
-featuresSelect = new ol.Collection();
-var selectAltClick = new ol.interaction.Select({
-  condition: function(mapBrowserEvent) {
-    return ol.events.condition.click(mapBrowserEvent) && ol.events.condition.shiftKeyOnly(mapBrowserEvent);
-  },
- toggleCondition: ol.events.condition.never,
- //layers: lays4select,
- features: featuresSelect,
-// style : null
-});
-
-map.addInteraction(selectAltClick);
-//selectAltClick.on('select', function (e) {console.log(featuresSelect.item(0).getId());});
-
 
 /**
  * Add a click handler to hide the popup.

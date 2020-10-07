@@ -1,6 +1,6 @@
 #include "wopenlayers.h"
 
-WOpenLayers::WOpenLayers(cDicoApt *aDico):xy_(this,"1.0"),mDico(aDico),polygId_(this,"1"),slot(this),slot2(this)
+WOpenLayers::WOpenLayers(cDicoApt *aDico):xy_(this,"1.0"),mDico(aDico),slot(this),slot2(this),xySelect_(this,"2.0")//,polygId_(this,"1")
 {
     setPadding(0);
     setMargin(0);
@@ -43,16 +43,21 @@ WOpenLayers::WOpenLayers(cDicoApt *aDico):xy_(this,"1.0"),mDico(aDico),polygId_(
                 "}}"
                  );
 
-    slot2.setJavaScript
+   /* slot2.setJavaScript
             ("function () {if (featuresSelect.getLength() > 0) {if (featuresSelect.item(0) !== 'undefined') {"
              "if (featuresSelect.item(0).getId() !== null) {"+ polygId_.createCall({"featuresSelect.item(0).getId()"}) +
              "console.log(featuresSelect.item(0).getId());"
              "}"
              "}}};"
-             );
+             );*/
 
-
-    //"featuresSelect.clear();" pour vider la sélection
+    slot2.setJavaScript
+               ("function (x,y){"
+                "var f = map.getCoordinateFromPixel([x,y]);"
+                "if (f != null) {"
+                + xySelect_.createCall({"f[0]","f[1]"}) +
+                "}}"
+                );
 
     slot3.setJavaScript
                ("function projection(x,y){"
