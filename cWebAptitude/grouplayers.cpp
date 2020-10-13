@@ -13,7 +13,6 @@ groupLayers::groupLayers(cDicoApt * aDico, WOpenLayers *aMap, AuthApplication *a
   //,mPBar(NULL)
   ,m_app(app)
   ,mLegend(NULL)
-  ,mPedo(NULL)
   //,mSelect4Stat(NULL)
   ,mSelect4Download(NULL)
   ,mStackInfoPtr(aStackInfoPtr)
@@ -23,8 +22,6 @@ groupLayers::groupLayers(cDicoApt * aDico, WOpenLayers *aMap, AuthApplication *a
   ,slot_extent(this)
 {
     //std::cout << "constructeur GL " << std::endl;
-
-    mPedo= new cnsw(mDico->BDpath());
 
     mParent->setOverflow(Wt::Overflow::Visible);
     mParent->setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Middle);
@@ -301,9 +298,12 @@ void groupLayers::extractInfo(double x, double y){
 
         // tableau des informations globales - durant ce round, l'objet ST est modifié
         mLegend->titreInfoRaster();
-        mLegend->add1InfoRaster(mPedo->displayInfo(x,y,PEDO::DRAINAGE));
-        mLegend->add1InfoRaster(mPedo->displayInfo(x,y,PEDO::PROFONDEUR));
-        mLegend->add1InfoRaster(mPedo->displayInfo(x,y,PEDO::TEXTURE));
+        // la création d'un objet ptPedo évite de devoir lire à plusieur reprise la cnsw
+        ptPedo ptPed=ptPedo(mDico->mPedo,x,y);
+
+        mLegend->add1InfoRaster(ptPed.displayInfo(PEDO::DRAINAGE));
+        mLegend->add1InfoRaster(ptPed.displayInfo(PEDO::PROFONDEUR));
+        mLegend->add1InfoRaster(ptPed.displayInfo(PEDO::TEXTURE));
 
         for (Layer * l : mVLs){
             if (((l->Type()==TypeLayer::KK )| (l->Type()==TypeLayer::Thematique )) | (( l->IsActive()) & (l->Type()!=TypeLayer::Externe))){

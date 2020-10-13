@@ -15,14 +15,6 @@ class statWindow;
 
 std::string roundDouble(double d, int precisionVal=1);
 
-namespace {
-    void HPDF_STDCALL error_handler(HPDF_STATUS error_no, HPDF_STATUS detail_no,
-               void *user_data) {
-    fprintf(stderr, "libharu error: error_no=%04X, detail_no=%d\n",
-        (unsigned int) error_no, (int) detail_no);
-    }
-}
-
 
 class statWindow : public Wt::WContainerWidget
 {

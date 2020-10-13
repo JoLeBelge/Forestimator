@@ -98,10 +98,11 @@ void statWindow::generateGenCarte(OGRFeature * poFeature){
      basicStat statMNT= mMNT->computeBasicStatOnPolyg(poFeature->GetGeometryRef());
      basicStat statPente= mPente->computeBasicStatOnPolyg(poFeature->GetGeometryRef());
 
-     aContInfo->addWidget(cpp14::make_unique<WText>("Zone bioclimatique : " + mZBIO->summaryStat(poFeature->GetGeometryRef())));
-     aContInfo->addWidget(cpp14::make_unique<WBreak>());
-     aContInfo->addWidget(cpp14::make_unique<WText>("Relief"));
-     aContInfo->addWidget(cpp14::make_unique<WBreak>());
+     aContInfo->addWidget(cpp14::make_unique<WText>("<h5>Zone bioclimatique</h5>"));
+
+     aContInfo->addWidget(cpp14::make_unique<WText>(mZBIO->summaryStat(poFeature->GetGeometryRef())));
+
+     aContInfo->addWidget(cpp14::make_unique<WText>("<h5>Relief</h5>"));
      aContInfo->addWidget(cpp14::make_unique<WText>("Altitude maximum : "+ roundDouble(statMNT.max) + "m"));
      aContInfo->addWidget(cpp14::make_unique<WBreak>());
      aContInfo->addWidget(cpp14::make_unique<WText>("Altitude moyenne : "+ roundDouble(statMNT.mean)+ "m"));
@@ -111,11 +112,25 @@ void statWindow::generateGenCarte(OGRFeature * poFeature){
      aContInfo->addWidget(cpp14::make_unique<WText>("Pente moyenne : "+ roundDouble(statPente.mean)+ "%"));
      aContInfo->addWidget(cpp14::make_unique<WBreak>());
 
+
+     // analyse pédo surfacique
+     surfPedo statPedo(mDico->mPedo,poFeature->GetGeometryRef());
+     aContInfo->addWidget(cpp14::make_unique<WText>("<h5>Pédologie</h5>"));
+     aContInfo->addWidget(cpp14::make_unique<WText>("Texture : "+ statPedo.getSummary(PEDO::TEXTURE)));
+     aContInfo->addWidget(cpp14::make_unique<WBreak>());
+     aContInfo->addWidget(cpp14::make_unique<WText>("Drainage : "+ statPedo.getSummary(PEDO::DRAINAGE)));
+     aContInfo->addWidget(cpp14::make_unique<WBreak>());
+     aContInfo->addWidget(cpp14::make_unique<WText>("Profondeur : "+ statPedo.getSummary(PEDO::PROFONDEUR)));
+     aContInfo->addWidget(cpp14::make_unique<WBreak>());
+
+
 }
 
 std::string roundDouble(double d, int precisionVal){
-
-   return std::to_string(d).substr(0, std::to_string(d).find(".") + precisionVal + 1);
+    std::string aRes("");
+    if (precisionVal>0){aRes=std::to_string(d).substr(0, std::to_string(d).find(".") + precisionVal + 1);}
+    else  {aRes=std::to_string(d+0.5).substr(0, std::to_string(d).find("."));}
+   return aRes;
 }
 
 

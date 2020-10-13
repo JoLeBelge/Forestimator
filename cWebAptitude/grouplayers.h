@@ -152,7 +152,6 @@ private:
     cDicoApt * mDico;
     simplepoint * mLegend;
     sqlite3 *db_;
-    cnsw *mPedo;
 
     // bof finalement c'est mieux le conteneur parent
     Wt::WContainerWidget     * mParent;

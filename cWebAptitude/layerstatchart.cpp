@@ -345,8 +345,8 @@ std::string layerStat::summaryStat(){
         // on concatene toutes les essences
         for (auto & kv : mStat){
             if (kv.second>1){
-                if (kv.second==100){ aRes+=kv.first;}
-                aRes+=kv.first+":"+std::to_string(kv.second)+"% ";
+                if (kv.second>99){ aRes+=kv.first;}
+                aRes+=kv.first+": "+std::to_string(kv.second)+"% ";
             }
         }
 

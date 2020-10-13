@@ -91,7 +91,7 @@ private:
     stackInfoPtr * mStackInfoPtr;
 
     parcellaire * mPA;
-    simplepoint * mSP;
+    //simplepoint * mSP;// c'est groupGL qui s'en charge
     uploadCarte * mUpload;
 
 };

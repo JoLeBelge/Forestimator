@@ -20,6 +20,7 @@ cWebAptitude::cWebAptitude(AuthApplication *app, Auth::AuthWidget* authWidget_)
         styleBgrd.setBackgroundColor(WColor(col.mR,col.mG,col.mB));
         if (col.dark()){styleBgrd.setForegroundColor(WColor("white"));}
         app->styleSheet().addRule(col.getStyleName(), styleBgrd);
+       // std::cout << col.getStyleName() << "{" << styleBgrd.cssText() << "}" <<  std::endl;;
     }
 
     mStackInfoPtr=new stackInfoPtr();

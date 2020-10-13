@@ -6,6 +6,9 @@ cDicoApt::cDicoApt(std::string aBDFile):mBDpath(aBDFile)
 {
 
     if (openConnection()){} else {
+
+        mPedo= new cnsw(db_);
+
         // dico Ess Nom -- code
         sqlite3_stmt * stmt;
         std::string SQLstring="SELECT Ess_FR,Code_FR,prefix FROM dico_essences ORDER BY Ess_FR DESC;";

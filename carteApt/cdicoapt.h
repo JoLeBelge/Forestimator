@@ -11,6 +11,7 @@
 #include "boost/filesystem.hpp"
 #include <unistd.h>
 #include <cmath>
+#include  "cnsw.h"
 
 enum TypeCarte {Apt, Potentiel, Station1, Habitats,NH,NT,Topo,AE,SS,ZBIO,CSArdenne,CSLorraine,MNH2019,Composition,MNT16b};
 
@@ -43,6 +44,8 @@ class cEss; // avec les aptitudes de l'essence
 class cKKCS; // ce qui caractérise les stations ; potentiel sylvicole, facteur écologique, risques
 class cRasterInfo; // ça aurait du être une classe mère ou membre de cEss et cKKCS mais je l'implémente après, c'est pour avoir les info à propose des rasters FEE ; NT, NH, Topo, AE, SS
 class ST;
+class cnsw;
+
 
 class WMSinfo
 {
@@ -277,6 +280,9 @@ class cDicoApt
 public:
     // charger les dicos depuis BD SQL
     cDicoApt(std::string aBDFile);
+
+    cnsw * mPedo;
+
     void closeConnection();
     int openConnection();
     std::map<int,std::string> * ZBIO(){return  &Dico_ZBIO;}

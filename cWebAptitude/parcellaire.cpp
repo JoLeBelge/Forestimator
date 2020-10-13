@@ -446,8 +446,6 @@ void parcellaire::computeStatAndVisuSelectedPol(int aId){
     {
         printf( "Open failed.\n" );
     } else {
-        //mGL->mMap->decorationStyle().setCursor(Cursor::Wait); plus nécessaire maintenant que j'utilise le loading indicator
-        //mGL->mMap->refresh();
         // layer
         OGRLayer * lay = DS->GetLayer(0);
         OGRFeature *poFeature;
@@ -466,7 +464,6 @@ void parcellaire::computeStatAndVisuSelectedPol(int aId){
 
         GDALClose( DS );
         if (find) {visuStat(poFeature);}
-        //mGL->mMap->decorationStyle().setCursor(Cursor::Auto);
     }
     m_app->loadingIndicator()->hide();
     m_app->loadingIndicator()->setMessage(tr("defaultLoadingI"));

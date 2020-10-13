@@ -36,9 +36,9 @@ Vous pouvez télécharger les cartes listées ci-dessous qui seront découpées 
 
 <message id="tooltipMap1">Double cliquez sur une station pour afficher sa description dans l'onglet légende.</message>
 
-<message id="tooltipMap2">Double cliquez sur une station pour afficher sa description dans l'onglet légende. Enfoncez la touche shift et cliquez sur un polygone de votre shapefile pour afficher les statistiques. Les couches sélectionnées sous la section "Télécharger les couches géographiques au format raster" de l'onglet parcellaire feront l'objet d'une synthèse sur cette surface. </message>
+<message id="tooltipMap2">Double cliquez sur une station pour afficher sa description dans l'onglet "Info Ponctuelle". Enfoncez la touche shift et cliquez sur un polygone de votre shapefile pour afficher les statistiques. Les couches sélectionnées dans la section "Analyse" feront l'objet d'une synthèse sur cette surface. </message>
 
-<message id="infoDansVisuStat">Les statistiques sont calculées pour les couches sélectionnées dans la section "Télécharger les couches géographiques au format raster" de l'onglet parcellaire. </message>
+<message id="infoDansVisuStat">Les statistiques sont calculées pour les couches sélectionnées dans la section "Analyse". </message>
 
 <message id="toolTipActiveLayer">Cliquez sur l'onglet légende pour visualiser la signification des couleurs pour cette carte. </message>
 
@@ -392,5 +392,43 @@ Cette application web de cartographie permet une visualisation des informations 
 
 </message>
 
+
+<message id="report.analyse.point">
+<div>
+      <h1>Forestimator : analyse ponctuelle</h1>
+
+      <style>
+	span.special {
+	  color: #FF0000;
+	  font-weight: bold;
+	}
+
+	#main_table {
+	  font-size: 8pt;
+	  margin-left: auto;
+	  margin-right: auto;
+	}
+
+	#main_table .special {
+	  color: #FF0000;
+	}
+
+	#main_table th {
+	  border-bottom: 1px solid black;
+	}
+	
+	.E{background-color:rgb(255,0,0);}
+	.O{background-color:rgb(36,84,4);}
+	.T{background-color:rgb(103,206,34);}
+	.TE{background-color:rgb(239,161,25);}
+
+      </style>
+
+<div>
+${AptTable}
+</div>
+<div>${InfoT}</div>
+    </div>
+  </message>
 
 </messages>

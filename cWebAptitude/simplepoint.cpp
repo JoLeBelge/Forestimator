@@ -1,7 +1,10 @@
 #include "simplepoint.h"
 
 
-simplepoint::simplepoint(groupLayers *aGL, WContainerWidget *parent):mGL(aGL),mParent(parent),mDico(aGL->Dico())
+simplepoint::simplepoint(groupLayers *aGL, WContainerWidget *parent):mGL(aGL)
+  ,mParent(parent)
+  ,mDico(aGL->Dico())
+  ,createPdfBut(NULL)
 {
     createUI();
 }
@@ -25,6 +28,8 @@ void simplepoint::createUI()
     //retour->setLink(WLink(LinkType::InternalPath, "/analyse"));
     retour->clicked().connect([=]{mGL->mStackInfoPtr->stack_info->setCurrentIndex(2);;});*/
     mParent->addWidget(cpp14::make_unique<WText>(tr("sp_infoclic")));
+    createPdfBut = mParent->addWidget(Wt::cpp14::make_unique<WPushButton>("Export pdf"));
+    createPdfBut->clicked().connect(this,&simplepoint::export2pdf);
 
     mAptAllEss = mParent->addWidget(cpp14::make_unique<WTable>());
     mAptAllEss->setHeaderCount(1);
@@ -74,7 +79,7 @@ void simplepoint::add1InfoRaster(std::vector<std::string> aV){
     if (aV.size()>1 && aV.at(1)!=""){
         int row=mInfoT->rowCount();
         //auto t1 = mInfoT->elementAt(row, 0)->addWidget(cpp14::make_unique<WText>(aV.at(0)));
-        mInfoT->elementAt(row, 0)->addWidget(cpp14::make_unique<WText>(aV.at(0)));
+        mInfoT->elementAt(row, 0)->addWidget(cpp14::make_unique<WText>(WString::fromUTF8(aV.at(0))));
         auto t2 =mInfoT->elementAt(row, 1)->addWidget(cpp14::make_unique<WText>(aV.at(1)));
 
         if (aV.size()>2 && aV.at(2)=="bold"){
@@ -206,7 +211,8 @@ void simplepoint::afficheAptAllEss(){
                 // pour le moment, si double aptitude, celle-ci est visible dans le tooltip
                 if (kv.second!=2) {
                     mAptAllEss->elementAt(row, column)->setToolTip( mAptAllEss->elementAt(row, column)->toolTip()+ " - " +WString::fromUTF8(mDico->code2AptFull(kv.second)));
-                    mAptAllEss->elementAt(row, column)->decorationStyle().setForegroundColor(WColor("gray"));
+                    //mAptAllEss->elementAt(row, column)->decorationStyle().setForegroundColor(WColor("gray"));
+                    mAptAllEss->elementAt(row, column)->decorationStyle().setForegroundColor(WColor(120,120,120));
                 }
                 mAptAllEss->elementAt(row, column)->setStyleClass("T");
                 mAptAllEss->elementAt(row, column)->setContentAlignment(AlignmentFlag::Center);
@@ -224,7 +230,8 @@ void simplepoint::afficheAptAllEss(){
                 // pour le moment, si double aptitude, celle-ci est visible dans le tooltip
                 if (kv.second!=3) {
                     mAptAllEss->elementAt(row, column)->setToolTip( mAptAllEss->elementAt(row, column)->toolTip()+ " - " +WString::fromUTF8(mDico->code2AptFull(kv.second)));
-                    mAptAllEss->elementAt(row, column)->decorationStyle().setForegroundColor(WColor("gray"));
+                    //mAptAllEss->elementAt(row, column)->decorationStyle().setForegroundColor(WColor("gray"));
+                    mAptAllEss->elementAt(row, column)->decorationStyle().setForegroundColor(WColor(120,120,120));
                 }
                 mAptAllEss->elementAt(row, column)->setContentAlignment(AlignmentFlag::Center);
                 row++;
@@ -254,4 +261,54 @@ void simplepoint::afficheAptAllEss(){
             row=0;
         }
     }
+}
+
+void simplepoint::export2pdf(){
+    std::cout << "simplepoint::export2pdf()" << std::endl;
+    // création du pdf
+    HPDF_Doc pdf = HPDF_New(error_handler, 0);
+    HPDF_UseUTFEncodings(pdf);
+
+
+    HPDF_Page page = HPDF_AddPage(pdf);
+    HPDF_Page_SetSize(page, HPDF_PAGE_SIZE_A4, HPDF_PAGE_PORTRAIT);
+
+    Wt::Render::WPdfRenderer renderer(pdf, page);
+    renderer.setMargin(2.54);
+    renderer.setDpi(96);
+    // post sur l'export des widgets vers pdf - pas super clair mais informatif
+    //https://redmine.webtoolkit.eu/boards/2/topics/14392?r=14462#message-14462
+
+    // pbl avec les template, c'est le bind dois recevoir un unique ptr, et donc détruit les objets qu'on lui bind = segmentation fault
+
+    std::ostringstream o;
+    mAptAllEss->htmlText(o);
+    Wt::WString tpl = tr("report.analyse.point");
+    std::string tp = tpl.toUTF8();
+    boost::replace_all(tp,"${AptTable}",o.str());
+    // vider le oss
+    o.str("");
+    o.clear();
+    mInfoT->htmlText(o);
+    boost::replace_all(tp,"${InfoT}",o.str());
+
+    //std::cout << tp << std::endl;
+    // en créant le WString avec charencoding local il ne met plus d'erreur dans la console mais ça n'empèche que le résultat est décevant, les accents ne passent pas dans le pdf
+    // pbl d'encodage , vérifier p-e l'encodage de ostringstream?
+    renderer.render(Wt::WString(tp,Wt::CharEncoding::UTF8));
+
+
+    std::string name0 = std::tmpnam(nullptr);
+    std::string name1 = name0.substr(5,name0.size()-5);
+    std::string aOut = mDico->File("TMPDIR")+"/"+name1+".pdf";
+
+    HPDF_SaveToFile(pdf,aOut.c_str());
+    HPDF_Free(pdf);
+    WFileResource *fileResource = new Wt::WFileResource("plain/text",aOut);
+    fileResource->suggestFileName("Forestimator-info-ponctuelle.pdf");
+    mGL->m_app->redirect(fileResource->url());
+
+    // maintenant il faut rediriger l'application vers le lien de la ressource
+    // mGL->m_app->redirect(pdf->url());
+
 }

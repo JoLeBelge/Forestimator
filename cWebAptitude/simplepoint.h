@@ -24,6 +24,12 @@
 #include <fstream>
 #include <boost/algorithm/string/replace.hpp>
 #include "ecogrammeEss.h"
+#include <hpdf.h>
+#include <Wt/WResource.h>
+#include <Wt/Http/Request.h>
+#include <Wt/Http/Response.h>
+#include <Wt/Render/WPdfRenderer.h>
+#include "iostream"
 
 class simplepoint;
 class groupLayers;
@@ -32,10 +38,18 @@ class Layer;
 using namespace Wt;
 class color;
 
+namespace {
+    void HPDF_STDCALL error_handler(HPDF_STATUS error_no, HPDF_STATUS detail_no,
+               void *user_data) {
+    fprintf(stderr, "libharu error: error_no=%04X, detail_no=%d\n",
+        (unsigned int) error_no, (int) detail_no);
+    }
+}
+
 class simplepoint: public WContainerWidget
 {
 public:
-    simplepoint(groupLayers *aGL,WContainerWidget *parent);//
+    simplepoint(groupLayers *aGL,WContainerWidget *parent);
     void createUI();
     void vider();
     void titreInfoRaster();
@@ -43,6 +57,7 @@ public:
     void detailCalculAptFEE(ST *aST);
     //void afficheLegendeIndiv(const Layer *l);
     void afficheAptAllEss();
+    void export2pdf();
 
     Wt::WTable                 *mInfoT;
     Wt::WTable                 *mDetAptFEE;
@@ -50,6 +65,7 @@ public:
     Wt::WTable                 *mAptAllEss;
 
     Wt::WContainerWidget     * mParent;
+    WPushButton * createPdfBut;
     EcogrammeEss       *mEcoEss;
 private:
 
@@ -59,5 +75,6 @@ private:
     cDicoApt * mDico;
 
 };
+
 
 #endif // LEGEND_H
