@@ -12,36 +12,36 @@ using namespace Wt;
 
 namespace {
 
-  Auth::AuthService myAuthService;
-  Auth::PasswordService myPasswordService(myAuthService);
-  //std::vector<std::unique_ptr<Auth::OAuthService>> myOAuthServices;
+Auth::AuthService myAuthService;
+Auth::PasswordService myPasswordService(myAuthService);
+//std::vector<std::unique_ptr<Auth::OAuthService>> myOAuthServices;
 
 }
 
 void Session::configureAuth()
 {
-  myAuthService.setAuthTokensEnabled(true, "logincookie");
-  myAuthService.setEmailVerificationEnabled(true);
-  //myAuthService.setEmailVerificationRequired(true);
+    myAuthService.setAuthTokensEnabled(true, "logincookie");
+    myAuthService.setEmailVerificationEnabled(true);
+    //myAuthService.setEmailVerificationRequired(true);
 
-  std::unique_ptr<Auth::PasswordVerifier> verifier
-      = cpp14::make_unique<Auth::PasswordVerifier>();
-  verifier->addHashFunction(cpp14::make_unique<Auth::BCryptHashFunction>(7));
-  myPasswordService.setVerifier(std::move(verifier));
-  myPasswordService.setAttemptThrottlingEnabled(true);
-  //myPasswordService.setStrengthValidator(cpp14::make_unique<Auth::PasswordStrengthValidator>());
+    std::unique_ptr<Auth::PasswordVerifier> verifier
+            = cpp14::make_unique<Auth::PasswordVerifier>();
+    verifier->addHashFunction(cpp14::make_unique<Auth::BCryptHashFunction>(7));
+    myPasswordService.setVerifier(std::move(verifier));
+    myPasswordService.setAttemptThrottlingEnabled(true);
+    //myPasswordService.setStrengthValidator(cpp14::make_unique<Auth::PasswordStrengthValidator>());
 
-  // paramètrer le validateur de password
-  std::unique_ptr<Auth::PasswordStrengthValidator> validator= cpp14::make_unique<Auth::PasswordStrengthValidator>();
-  //validator->setMinimumPassPhraseWords(Wt::Auth::PasswordStrengthValidator::Disabled);
-  validator->setMinimumLength(Wt::Auth::PasswordStrengthType::OneCharClass, 4);
-  validator->setMinimumLength(Wt::Auth::PasswordStrengthType::TwoCharClass, 4);
-  validator->setMinimumLength(Wt::Auth::PasswordStrengthType::ThreeCharClass, 4);
-  validator->setMinimumLength(Wt::Auth::PasswordStrengthType::FourCharClass, 4);
+    // paramètrer le validateur de password
+    std::unique_ptr<Auth::PasswordStrengthValidator> validator= cpp14::make_unique<Auth::PasswordStrengthValidator>();
+    //validator->setMinimumPassPhraseWords(Wt::Auth::PasswordStrengthValidator::Disabled);
+    validator->setMinimumLength(Wt::Auth::PasswordStrengthType::OneCharClass, 4);
+    validator->setMinimumLength(Wt::Auth::PasswordStrengthType::TwoCharClass, 4);
+    validator->setMinimumLength(Wt::Auth::PasswordStrengthType::ThreeCharClass, 4);
+    validator->setMinimumLength(Wt::Auth::PasswordStrengthType::FourCharClass, 4);
 
-  myPasswordService.setStrengthValidator(std::move(validator));
+    myPasswordService.setStrengthValidator(std::move(validator));
 
-  /*if (Auth::GoogleService::configured())
+    /*if (Auth::GoogleService::configured())
     myOAuthServices.push_back(cpp14::make_unique<Auth::GoogleService>(myAuthService));
 
   if (Auth::FacebookService::configured())
@@ -54,60 +54,64 @@ void Session::configureAuth()
 
 Session::Session(const std::string& sqliteDb)
 {
-  auto connection = cpp14::make_unique<Dbo::backend::Sqlite3>(sqliteDb);
+    std::cout << "new Session()" << std::endl;
+    auto connection = cpp14::make_unique<Dbo::backend::Sqlite3>(sqliteDb);
 
-  connection->setProperty("show-queries", "true");
+    connection->setProperty("show-queries", "false");
 
-  setConnection(std::move(connection));
+    setConnection(std::move(connection));
 
-  // la classe User c'est moi qui la défini, les infos de cette classe sont dans la table user
-  mapClass<User>("user");
-  mapClass<AuthInfo>("auth_info");
-  mapClass<AuthInfo::AuthIdentityType>("auth_identity");
-  mapClass<AuthInfo::AuthTokenType>("auth_token");
+    // la classe User c'est moi qui la défini, les infos de cette classe sont dans la table user
+    mapClass<User>("user");
+    mapClass<AuthInfo>("auth_info");
+    mapClass<AuthInfo::AuthIdentityType>("auth_identity");
+    mapClass<AuthInfo::AuthTokenType>("auth_token");
 
-  try {
-    createTables();
-    std::cerr << "Created database." << std::endl;
-  } catch (std::exception& e) {
-    std::cerr << e.what() << std::endl;
-    std::cerr << "Using existing database\n";
-  }
+    try {
+        createTables();
+        std::cout << "Created database." << std::endl;
+    } catch (std::exception& e) {
+        //std::cerr << e.what() << std::endl;
+        std::cout << "Using existing database...";
+    }
 
-  users_ = cpp14::make_unique<UserDatabase>(*this);
-  std::cout << " user created \n" << std::endl;
+    users_ = cpp14::make_unique<UserDatabase>(*this);
+    std::cout << "done\n" << std::endl;
 }
 
 Auth::AbstractUserDatabase& Session::users()
 {
-  return *users_;
+    return *users_;
 }
 
 dbo::ptr<User> Session::user() const
 {
-  if (login_.loggedIn()) {
-    dbo::ptr<AuthInfo> authInfo = users_->find(login_.user());
-
-    return authInfo->user();
-  } else
-    return dbo::ptr<User>();
+    std::cout << "get user()..." << std::endl;
+    if (login_.loggedIn()) {
+        dbo::ptr<AuthInfo> authInfo = users_->find(login_.user());
+        std::cout << "connected\n" << std::endl;
+        return authInfo->user();
+    } else{
+        std::cout << "not connected\n" << std::endl;
+        return dbo::ptr<User>();
+    }
 }
 
 const Auth::AuthService& Session::auth()
 {
-  return myAuthService;
+    return myAuthService;
 }
 
 const Auth::AbstractPasswordService& Session::passwordAuth()
 {
-  return myPasswordService;
+    return myPasswordService;
 }
 
 const std::vector<const Auth::OAuthService *> Session::oAuth()
 {
-  std::vector<const Auth::OAuthService *> result;
-  /*for (auto &auth : myOAuthServices) {
+    std::vector<const Auth::OAuthService *> result;
+    /*for (auto &auth : myOAuthServices) {
     result.push_back(auth.get());
   }*/
-  return result;
+    return result;
 }

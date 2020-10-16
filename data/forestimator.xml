@@ -431,4 +431,9 @@ ${AptTable}
     </div>
   </message>
 
+<message id="report.analyse.test">
+<p style="font-family: 'DejaVuSans'">élève, fenêtre, âme</p>
+</message>
+
+
 </messages>

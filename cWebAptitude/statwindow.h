@@ -28,7 +28,7 @@ public:
     void add1layerStat(Wt::WContainerWidget * layerStat);
     void generateGenCarte(OGRFeature *poFeature);
 
-    void export2pdf();
+    void export2pdf(std::string img);
 
     WText * mTitre;
     WTable * mAptTable;
@@ -45,6 +45,9 @@ private:
     // pour les information générales
     Layer * mMNT, * mZBIO, * mPente;
 
+    /*  Signal pour récupérer l'image en base float pour générer un PDF     */
+    JSlot slotImgPDF;
+    JSignal<std::string>  sigImgPDF;
 };
 
 
@@ -52,49 +55,52 @@ private:
 class ReportResource : public Wt::WResource
 {
 public:
-    ReportResource(statWindow * aSW)
-        : WResource()
+    ReportResource(statWindow * aSW, std::string img): WResource()
     {
-    suggestFileName("report.pdf");
+        suggestFileName("report.pdf");
 
-    std::ostringstream o;
+        std::ostringstream o;
 
-    if (aSW->mAptTable!=NULL) {aSW->mAptTable->htmlText(o);}
+        if (aSW->mAptTable!=NULL) {aSW->mAptTable->htmlText(o);}
 
-    strHTML = o.str();
-    //aSW->mTitre->text();
-    //strHTML=aSW->mTitre->text().toUTF8();
-    //strHTML=Wt::WText::tr("page_presentation").toUTF8();
-    std::cout <<  strHTML << std::endl;
+        strHTML = o.str();
+        std::string s = "<br><img src=\"";
+        s+=img.c_str();
+        s+="\">";
+        strHTML+= s;
+        //aSW->mTitre->text();
+        //strHTML=aSW->mTitre->text().toUTF8();
+        //strHTML=Wt::WText::tr("page_presentation").toUTF8();
+        std::cout <<  strHTML << std::endl;
 
     }
 
     virtual ~ReportResource()
     {
-    beingDeleted();
+        beingDeleted();
     }
 
     virtual void handleRequest(const Wt::Http::Request& request,
                                Wt::Http::Response& response)
     {
 
-    std::cout << " handleRequest of reportRessource " << std::endl;
-    response.setMimeType("application/pdf");
+        std::cout << " handleRequest of reportRessource " << std::endl;
+        response.setMimeType("application/pdf");
 
-    HPDF_Doc pdf = HPDF_New(error_handler, 0);
+        HPDF_Doc pdf = HPDF_New(error_handler, 0);
 
-    // Note: UTF-8 encoding (for TrueType fonts) is only available since libharu 2.3.0 !
-    HPDF_UseUTFEncodings(pdf);
+        // Note: UTF-8 encoding (for TrueType fonts) is only available since libharu 2.3.0 !
+        HPDF_UseUTFEncodings(pdf);
 
-    renderReport(pdf);
+        renderReport(pdf);
 
-    HPDF_SaveToStream(pdf);
-    unsigned int size = HPDF_GetStreamSize(pdf);
-    HPDF_BYTE *buf = new HPDF_BYTE[size];
-    HPDF_ReadFromStream (pdf, buf, &size);
-    HPDF_Free(pdf);
-    response.out().write((char*)buf, size);
-    delete[] buf;
+        HPDF_SaveToStream(pdf);
+        unsigned int size = HPDF_GetStreamSize(pdf);
+        HPDF_BYTE *buf = new HPDF_BYTE[size];
+        HPDF_ReadFromStream (pdf, buf, &size);
+        HPDF_Free(pdf);
+        response.out().write((char*)buf, size);
+        delete[] buf;
     }
 
 private:
@@ -107,13 +113,13 @@ private:
 
     void renderPdf(const Wt::WString& html, HPDF_Doc pdf)
     {
-    HPDF_Page page = HPDF_AddPage(pdf);
-    HPDF_Page_SetSize(page, HPDF_PAGE_SIZE_A4, HPDF_PAGE_PORTRAIT);
+        HPDF_Page page = HPDF_AddPage(pdf);
+        HPDF_Page_SetSize(page, HPDF_PAGE_SIZE_A4, HPDF_PAGE_PORTRAIT);
 
-    Wt::Render::WPdfRenderer renderer(pdf, page);
-    renderer.setMargin(2.54);
-    renderer.setDpi(96);
-    renderer.render(html);
+        Wt::Render::WPdfRenderer renderer(pdf, page);
+        renderer.setMargin(2.54);
+        renderer.setDpi(96);
+        renderer.render(html);
     }
 };
 

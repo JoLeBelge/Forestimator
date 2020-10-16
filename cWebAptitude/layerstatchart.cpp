@@ -181,9 +181,8 @@ Wt::WContainerWidget * layerStatChart::getChart(){
     return aRes;
 }
 
-
 Wt::WContainerWidget * layerStatChart::getBarStat(){
-Wt:WContainerWidget * aRes= new Wt::WContainerWidget();
+    Wt::WContainerWidget * aRes= new Wt::WContainerWidget();
     aRes->addWidget(cpp14::make_unique<batonnetApt>(this));
     return aRes;
 }
@@ -357,7 +356,6 @@ std::string layerStat::summaryStat(){
 
 }
 
-
 int layerStat::getO(bool mergeOT){
     unsigned int aRes(0);
     if (mLay->Type()==TypeLayer::FEE || mLay->Type()==TypeLayer::CS){
@@ -380,7 +378,6 @@ int layerStat::getO(bool mergeOT){
 layerStat::layerStat(Layer * aLay, std::map<std::string,int> aStat):mLay(aLay),mStat(aStat),mTypeVar(aLay->Var()){
     simplifieStat();
 }
-
 
 olOneLay::olOneLay(Layer * aLay, OGRGeometry *poGeom):mLay(aLay){
 
@@ -455,8 +452,6 @@ olOneLay::olOneLay(Layer * aLay, OGRGeometry *poGeom):mLay(aLay){
     this->doJavaScript(JScommand);
     if (mLay->getCode()=="IGN"){std::cout << JScommand << std::endl;}
 }
-
-
 
 std::string dToStr(double d){
     std::ostringstream streamObj;

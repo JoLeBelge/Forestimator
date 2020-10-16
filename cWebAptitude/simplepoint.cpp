@@ -264,6 +264,27 @@ void simplepoint::afficheAptAllEss(){
 }
 
 void simplepoint::export2pdf(){
+
+    HPDF_Doc pdf = HPDF_New(error_handler, 0);
+    HPDF_UseUTFEncodings(pdf); // enables UTF-8 encoding with true type fonts
+    HPDF_SetCurrentEncoder(pdf, "UTF-8");
+    HPDF_Page page = HPDF_AddPage(pdf);
+    HPDF_Page_SetSize(page, HPDF_PAGE_SIZE_A4, HPDF_PAGE_PORTRAIT);
+
+    Render::WPdfRenderer renderer(pdf, page);
+    renderer.setMargin(2.54);
+    renderer.setDpi(96);
+    renderer.addFontCollection("/usr/share/fonts/truetype",true);
+
+    Wt::WString ss = tr("report.analyse.test");
+    renderer.render(ss);
+
+    HPDF_SaveToFile(pdf, "./hello.pdf");
+    HPDF_Free(pdf);
+
+}
+
+void simplepoint::export2pdf1(){
     std::cout << "simplepoint::export2pdf()" << std::endl;
     // création du pdf
     HPDF_Doc pdf = HPDF_New(error_handler, 0);

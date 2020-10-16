@@ -7,6 +7,7 @@
 cWebAptitude::cWebAptitude(AuthApplication *app, Auth::AuthWidget* authWidget_)
     : WContainerWidget(),authWidget(authWidget_)
 {
+    std::cout << "cWebApt\n" << std::endl;
     //ModeExpert=0;// un peu sale comme procédé, car le login d'un expert va mettre la var Globale ModeExpert=1 et toutes les nouvelles instances de l'application (d'autre utilisateurs) vont également être en mode expert lool. Solution; remettre la var à 0 lors de chaque nouvelle app
     m_app = app;
     m_app->setLoadingIndicator(cpp14::make_unique<Wt::WOverlayLoadingIndicator>());
@@ -43,7 +44,7 @@ cWebAptitude::cWebAptitude(AuthApplication *app, Auth::AuthWidget* authWidget_)
     /*	HOME PAGE	*/
     auto container_home = Wt::cpp14::make_unique<Wt::WContainerWidget>();
     container_home->setStyleClass("home_div");
-    container_home->setOverflow(Wt::Overflow::Auto);
+    //container_home->setOverflow(Wt::Overflow::Auto);
     container_home->setMargin(Wt::WLength::Auto);
     container_home->setMargin(20,Wt::Side::Top);
     container_home->addNew<Wt::WText>("<h1 style='color:white;height: 37px;font-size: 3em;max-width: 1000px;text-align: center;'>Forestimator</h1>");
@@ -244,9 +245,9 @@ void cWebAptitude::handlePathChange()
         sub_stack->setCurrentIndex(1);
     }else if (m_app->internalPath() == "/parametres"){
         m_app->doJavaScript("alert('Pas encore implémenté...')");
-
+    }else if (m_app->internalPath() == "/"){
+        // do nothing
     }else{
-        //
         std::cout << "m_app->internalPath() " << m_app->internalPath() << std::endl;
         std::cout << "internal path pas geré dans le handler " << m_app->internalPath() << std::endl;
     }
