@@ -114,7 +114,7 @@ parcellaire::~parcellaire(){
     msg=NULL;
     mGL=NULL;
     mDico=NULL;
-    delete poGeomGlobale;
+    //delete poGeomGlobale; // fait planter l'appli !!
     //visuStatButton=NULL;
     //downloadShpBt=NULL;
     mCB_fusionOT=NULL;

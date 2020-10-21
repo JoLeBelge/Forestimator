@@ -1,6 +1,6 @@
 #include "statwindow.h"
 
-statWindow::statWindow(cDicoApt *aDico):mDico(aDico)
+statWindow::statWindow(cDicoApt *aDico):mDico(aDico), sigImgPDF(this,"pdf"), slotImgPDF(this)
 {
     setId("statWindow");
     setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Left);
@@ -16,13 +16,27 @@ statWindow::statWindow(cDicoApt *aDico):mDico(aDico)
     auto * tpl = contTitre_->addWidget(cpp14::make_unique<Wt::WTemplate>(tr("bouton_retour_parcelaire")));
     WPushButton * retour = tpl->bindWidget("retour", Wt::cpp14::make_unique<WPushButton>("Retour"));
     retour->setLink(WLink(LinkType::InternalPath, "/analyse"));
+    // bouton export PDF
+    createPdfBut = contTitre_->addWidget(cpp14::make_unique<WPushButton>("Export PDF"));
+    createPdfBut->clicked().connect(this->slotImgPDF);
+    //sigImgPDF.connect(std::bind(&statWindow::export2pdf,this, std::placeholders::_1));
+    sigImgPDF.connect(this, &statWindow::export2pdf);
+    slotImgPDF.setJavaScript("function () {"
+                             "var mapCanvas = document.createElement('canvas');"
+                             "var size = map.getSize();"
+                             "mapCanvas.width = size[0];"
+                             "mapCanvas.height = size[1];"
+                             "var mapContext = mapCanvas.getContext('2d');"
+                             "var canvas = document.querySelectorAll('.ol-viewport canvas');"
+                             "mapContext.drawImage(canvas[1], 0, 0);"
+                             "var img = 'E'+mapCanvas.toDataURL();"
+                             "img=img.substr(0,15);"
+                             "console.log(img);"
+                             "var a = 5;"
+                             + sigImgPDF.createCall({"img"}) + "}");
 
-    /*
-     *ON met cette partie en standby
-     * auto * tpl2 = contTitre_->addWidget(cpp14::make_unique<Wt::WTemplate>(tr("bouton_retour_parcelaire")));
-    createPdfBut = tpl2->bindWidget("retour", Wt::cpp14::make_unique<WPushButton>("Pdf"));
 
-    auto pdf = std::make_shared<ReportResource>(this);
+    /*auto pdf = std::make_shared<ReportResource>(this);
     createPdfBut->setLink(WLink(pdf));
     */
     //createPdfBut->clicked().connect(this,&statWindow::export2pdf);
@@ -31,7 +45,6 @@ statWindow::statWindow(cDicoApt *aDico):mDico(aDico)
     mCarteGenCont->setId("carteGenStat");
     mCarteGenCont->setInline(0);
     mCarteGenCont->setOverflow(Wt::Overflow::Auto);
-
 
     mAptTable = addWidget(cpp14::make_unique<WTable>());
     mAptTable->setId("AptitudeTable");
@@ -66,6 +79,7 @@ void statWindow::add1Aptitude(layerStatChart * lstat){
     mAptTable->elementAt(row, 1)->addWidget(std::unique_ptr<Wt::WContainerWidget>(lstat->getBarStat()));
     mAptTable->elementAt(row, 1)->setContentAlignment(AlignmentFlag::Top | AlignmentFlag::Center);
 }
+
 void statWindow::add1layerStat(Wt::WContainerWidget * layerStat){
     mVContStatIndiv.push_back(layerStat);
     addWidget(std::unique_ptr<Wt::WContainerWidget>(layerStat));
@@ -86,7 +100,7 @@ void statWindow::vider()
 void statWindow::generateGenCarte(OGRFeature * poFeature){
 
      WVBoxLayout * layoutV =mCarteGenCont->setLayout(cpp14::make_unique<WVBoxLayout>());
-     layoutV->addWidget(cpp14::make_unique<WText>("<h4>Apperçu</h4>"));
+     layoutV->addWidget(cpp14::make_unique<WText>("<h4>Aperçu</h4>"));
      //aRes->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
      WContainerWidget * aContCarte = layoutV->addWidget(cpp14::make_unique<WContainerWidget>());
      WHBoxLayout * layoutH = aContCarte->setLayout(cpp14::make_unique<WHBoxLayout>());
@@ -134,7 +148,11 @@ std::string roundDouble(double d, int precisionVal){
 }
 
 
-void statWindow::export2pdf(){
-     std::cout << "statWindow::export2pdf()" << std::endl;
+
+
+
+void statWindow::export2pdf(std::string img){
+    //std::cout << "statWindow::export2pdf() " << img.c_str() << std::endl;
+    std::cout << "statWindow::export2pdf() " << img << std::endl;
 
 }

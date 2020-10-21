@@ -28,7 +28,7 @@ public:
     void add1layerStat(Wt::WContainerWidget * layerStat);
     void generateGenCarte(OGRFeature *poFeature);
 
-    void export2pdf();
+    void export2pdf(std::string img);
 
     WText * mTitre;
     WTable * mAptTable;
@@ -45,7 +45,9 @@ private:
     // pour les information générales
     Layer * mMNT, * mZBIO, * mPente;
 
+    /*  Signal pour récupérer l'image en base float pour générer un PDF     */
+    JSlot slotImgPDF;
+    JSignal<std::string>  sigImgPDF;
 };
-
 
 #endif // STATWINDOW_H

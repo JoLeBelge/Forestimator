@@ -17,9 +17,9 @@ groupLayers::groupLayers(cDicoApt * aDico, WOpenLayers *aMap, AuthApplication *a
   ,mSelect4Download(NULL)
   ,mStackInfoPtr(aStackInfoPtr)
   ,mapExtent_(this,"1.0")
-  ,mapExtent2_(this,"2.0")
+  ,sigMapCenter(this,"2.0")
   ,slot(this)
-  ,slot_extent(this)
+  ,slotMapCenter(this)
 {
     //std::cout << "constructeur GL " << std::endl;
 
@@ -37,11 +37,11 @@ groupLayers::groupLayers(cDicoApt * aDico, WOpenLayers *aMap, AuthApplication *a
 
     this->getMapExtendSignal().connect(std::bind(&groupLayers::updateMapExtentAndCropIm,this, std::placeholders::_1,std::placeholders::_2,std::placeholders::_3,std::placeholders::_4));
 
-    slot_extent.setJavaScript("function () {"
+    slotMapCenter.setJavaScript("function () {"
                               "var centre = map.getView().getCenter();"
                               "var z = map.getView().getZoom();"
-                              + mapExtent2_.createCall({"centre[0]","centre[1]","z"}) + "}");
-    this->getMapCenterSignal().connect(std::bind(&groupLayers::saveExtent,this, std::placeholders::_1,std::placeholders::_2,std::placeholders::_3));
+                              + sigMapCenter.createCall({"centre[0]","centre[1]","z"}) + "}");
+    this->sigMapCenter.connect(std::bind(&groupLayers::saveExtent,this, std::placeholders::_1,std::placeholders::_2,std::placeholders::_3));
 
 
     auto legendCombo = mParent->addWidget(cpp14::make_unique<WCheckBox>(tr("legendCheckbox")));
@@ -639,13 +639,13 @@ bool cropIm(std::string inputRaster, std::string aOut, OGREnvelope ext){
 }
 
 /*
- * Fonctions pour gérer les extents sauvé dans DB
+ * Fonctions pour gérer les extents sauvés dans DB
  *
  */
 int groupLayers::openConnection(){
     int rc;
     std::string db_path = m_app->docRoot() + "/extents.db";
-    std::cout << "chargement db extents..." << std::endl;
+    //std::cout << "..." << std::endl;
     rc = sqlite3_open_v2(db_path.c_str(), &db_,SQLITE_OPEN_READWRITE, NULL);
     if( rc ) {
         fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db_));
@@ -666,7 +666,7 @@ void groupLayers::closeConnection(){
 bool groupLayers::getExpertModeForUser(std::string id){
 
     openConnection();
-    printf("get Expert Mode For User\n");
+    printf("get Expert Mode For User...");
     bool aRes(0);
     sqlite3_stmt * stmt;
     std::string SQLstring="SELECT ModeExpert FROM user_expert WHERE id_user="+id+";";
@@ -685,7 +685,7 @@ bool groupLayers::getExpertModeForUser(std::string id){
 
 void groupLayers::loadExtents(std::string id){
     openConnection();
-    printf("loadextent\n");
+    printf("loadextents...");
     mExtentDiv->clear();
 
     sqlite3_stmt * stmt;
@@ -713,7 +713,7 @@ void groupLayers::loadExtents(std::string id){
             WPushButton *ok = dialogPtr->footer()->addNew<Wt::WPushButton>("Supprimer");
             ok->setDefault(false);
             ok->clicked().connect([=]{
-                printf("delete extent");
+                printf("delete extent\n");
                 deleteExtent(id_extent);
                 dialogPtr->reject();
             });
@@ -738,9 +738,9 @@ void groupLayers::loadExtents(std::string id){
     button_s->addStyleClass("btn btn-success");
     button_s->setInline(1);
     button_s->addStyleClass("extent_inline extent_margin");
-    button_s->clicked().connect(this->slot_extent);
+    button_s->clicked().connect(this->slotMapCenter);
 
-    std::cout << " fin loadExtent " << std::endl;
+    std::cout << "done" << std::endl;
 }
 
 void groupLayers::saveExtent(double c_x, double c_y, double zoom){

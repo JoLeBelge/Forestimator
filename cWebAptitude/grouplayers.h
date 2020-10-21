@@ -178,9 +178,9 @@ private:
         std::cout << "updateMapExtent grouplayer" << std::endl;
     }
 
-    JSlot slot_extent;
-    JSignal<double, double, double>& getMapCenterSignal(){return mapExtent2_; }
-    JSignal<double, double, double>  mapExtent2_;
+    /*  Signal pour sauver l'extent de la map dans la DB pour un user connecté     */
+    JSlot slotMapCenter;
+    JSignal<double, double, double>  sigMapCenter;
 };
 
 #endif // GROUPLAYERS_H

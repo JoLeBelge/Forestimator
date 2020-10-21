@@ -20,10 +20,10 @@
 	font-size: larger;
 }
 .navbar-default .navbar-brand a:hover{
-    color: white;	
+    /*color: white;	*/
 }
 .navbar-default .navbar-brand span:hover{
-    color: white;	
+    /*color: white;	*/
 }
 .navbar-default .navbar-brand {
     color: white;

@@ -17,11 +17,16 @@
 			</user-agents>
 		 	<plain-ajax-sessions-ratio-limit>1</plain-ajax-sessions-ratio-limit>
 			<ajax-puzzle>true</ajax-puzzle>
+			<reload-is-new-session>true</reload-is-new-session>
 		</session-management>
 		<!--  par défaut 200, trop rapide, on y arrive pas-->
 		<double-click-timeout>500</double-click-timeout>
 
 		<progressive-bootstrap>true</progressive-bootstrap>
+		
+		<!--<session-id-cookie>false</session-id-cookie>
+        <cookie-checks>false</cookie-checks>-->
+		
 	</application-settings>
 
 	<head-matter>
