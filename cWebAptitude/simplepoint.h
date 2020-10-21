@@ -30,6 +30,7 @@
 #include <Wt/Http/Response.h>
 #include <Wt/Render/WPdfRenderer.h>
 #include "iostream"
+#include <Wt/WRasterImage.h>
 
 class simplepoint;
 class groupLayers;

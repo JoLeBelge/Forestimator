@@ -427,8 +427,25 @@ Cette application web de cartographie permet une visualisation des informations 
 <div>
 ${AptTable}
 </div>
-<div>${InfoT}</div>
-    </div>
-  </message>
+
+<div>
+<h2>Liste des accronymes des essences </h2>
+${legendAcro}
+</div>
+
+<div>
+${InfoT}
+</div>
+
+<div>
+${EcoEss}
+</div>
+
+</div>
+ 
+</message>
+
+
+<message id="titre-InfoTableAna-point"> <h4>Description de la station forestière </h4></message>
 
 </messages>

@@ -134,19 +134,7 @@ std::string roundDouble(double d, int precisionVal){
 }
 
 
-
 void statWindow::export2pdf(){
      std::cout << "statWindow::export2pdf()" << std::endl;
-    //std::ostream o
-    //std::ostringstream o;
-    //this->htmlText(o);
-    //std::stringstream ss;
-    //ss << o.rdbuf();
-    //std::string myString = o.str();
 
-    //std::cout << myString << std::endl;
-    auto pdf = std::make_shared<ReportResource>(this);
-    //pdf->ren
-
-    //m_app->redirect(pdf->url());
 }

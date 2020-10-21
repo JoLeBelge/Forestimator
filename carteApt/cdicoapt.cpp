@@ -36,7 +36,7 @@ cDicoApt::cDicoApt(std::string aBDFile):mBDpath(aBDFile)
             }
         }
 
-        SQLstring="SELECT raster_val,NH,posEco FROM dico_raster_nh;";
+        SQLstring="SELECT raster_val,NH,posEco, id_groupNH FROM dico_raster_nh;";
         sqlite3_reset(stmt);
         sqlite3_prepare_v2( db_, SQLstring.c_str(), -1, &stmt, NULL );
         while(sqlite3_step(stmt) == SQLITE_ROW)
@@ -44,9 +44,10 @@ cDicoApt::cDicoApt(std::string aBDFile):mBDpath(aBDFile)
             if (sqlite3_column_type(stmt, 0)!=SQLITE_NULL && sqlite3_column_type(stmt, 1)!=SQLITE_NULL){
                 std::string aA=std::string( (char *)sqlite3_column_text( stmt, 1 ) );
                 int aB=sqlite3_column_int( stmt, 0 );
+
                 Dico_NH.emplace(std::make_pair(aB,aA));
                 if (sqlite3_column_type(stmt, 2)!=SQLITE_NULL){ Dico_NHposEco.emplace(std::make_pair(aB,sqlite3_column_int( stmt, 2 )));}
-
+                if (sqlite3_column_type(stmt, 3)!=SQLITE_NULL){Dico_rasterNH2groupe.emplace(std::make_pair(aB,sqlite3_column_int( stmt, 3 )));}
             }
         }
 
@@ -200,6 +201,7 @@ cDicoApt::cDicoApt(std::string aBDFile):mBDpath(aBDFile)
                 Dico_AptDouble2AptContr.emplace(std::make_pair(aB,aC));
                 Dico_Apt2OrdreContr.emplace(std::make_pair(aB,aD));
                 Dico_code2AptFull.emplace(std::make_pair(aB,aE));
+                Dico_AptFull2AptAcro.emplace(std::make_pair(aE,aA));
                 Dico_codeApt2col.emplace(std::make_pair(aB,getColor(aF)));
 
                 Dico_AptSurcote.emplace(std::make_pair(aB,aG));

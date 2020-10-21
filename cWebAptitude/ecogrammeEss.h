@@ -14,6 +14,7 @@
 #include <Wt/WAbstractArea.h>
 #include "cdicoapt.h"
 #include <Wt/WRectArea.h>
+#include <Wt/WRasterImage.h>
 
 
 class EcogrammeEss : public Wt::WPaintedWidget
@@ -28,14 +29,17 @@ public:
         std::cout << "\n\n\n SIZE CHANGED " << width << " " << height << std::endl;
         WPaintedWidget::layoutSizeChanged(width, height);
     }
+
+    void draw(Wt::WPainter *painter);
+    //void draw(Wt::WPaintDevice* paintDevice);
 private:
     cEss * mEss;
     cDicoApt *mDico;
     //int mZbio,pixPerLevel;
     ST  * mST;
+    int pixPerLevel,Width;
     //Wt::WContainerWidget * mParent;
     void paintEvent(Wt::WPaintDevice *paintDevice);
-
 };
 
 #endif // ECOGRAMMEESS_H

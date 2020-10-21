@@ -5,7 +5,7 @@ CONFIG -= qt
 QT -= gui
 QT += sql
 
-CONFIG += c++11
+#CONFIG += c++11
 
 # la compilation sous debian avec gcc-8 m'a montré un bug dans la boucle de création des groupes écologiques. je spécifie donc que c'est avec le compilateur g++-7 qu'il faut compiler le soft
 # update ; maintenant le code est compatible avec gcc 5 et 9. mais sur le serveur c'est gcc 8 pas 9, le 9 n'est pas installé. En plus 8 fonctionne très bien
@@ -64,7 +64,7 @@ SOURCES += main.cpp \
     statwindow.cpp \
     selectlayers.cpp \
     presentationpage.cpp \
-    cnsw.cpp
+    ../carteApt/cnsw.cpp
 
 HEADERS += \
     auth/Session.h \
@@ -86,4 +86,4 @@ HEADERS += \
     statwindow.h \
     selectlayers.h \
     presentationpage.h \
-    cnsw.h
+    ../carteApt/cnsw.h
