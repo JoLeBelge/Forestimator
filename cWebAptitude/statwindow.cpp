@@ -100,7 +100,7 @@ void statWindow::generateGenCarte(OGRFeature * poFeature){
      // need to set it here after initialization of the map id !
      slotImgPDF.setJavaScript("function () {"
                               "var mapCanvas = document.createElement('canvas');"
-                              "var size = mapStat"+static_map_1->id()+".getSize();"
+                              "var size = mapStat"+olStatic->id()+".getSize();"
                               "mapCanvas.width = size[0];"
                               "mapCanvas.height = size[1];"
                               "var mapContext = mapCanvas.getContext('2d');"
@@ -114,7 +114,7 @@ void statWindow::generateGenCarte(OGRFeature * poFeature){
                               "  img=img.substr(0,120000);"
                               "}"
                               + sigImgPDF.createCall({"img","l"}) + "}");
-     olStatic->setId("olCarteGenerale");
+     //olStatic->setId("olCarteGenerale");
 
      // description générale ; lecture des attribut du polygone?calcul de pente, zone bioclim, et élévation
      WContainerWidget * aContInfo = layoutH->addWidget(cpp14::make_unique<WContainerWidget>());

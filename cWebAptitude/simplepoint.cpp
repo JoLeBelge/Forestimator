@@ -309,8 +309,8 @@ void simplepoint::export2pdf(){
    // boost::replace_all(tp,"${EcoEss}",o.str());
     // export de l'image de l'écogramme
 
-    Wt::WRasterImage pngImage("png", WLength(400), WLength(400));
-    pngImage.clear();
+    //Wt::WRasterImage pngImage("png", WLength(400), WLength(400));
+    //pngImage.clear();
     //pngImage.addFontCollection("/usr/share/fonts/truetype",true);
 
     //pngImage.addFontCollection("/usr/share/fonts/truetype",true);
@@ -341,7 +341,7 @@ void simplepoint::export2pdf(){
     WRectF rect(0, 0, 100, 100);
     Wt::WPointF * pf=new Wt::WPointF(0,0);
     pngImage.drawText(rect,Wt::AlignmentFlag::Left,Wt::TextFlag::SingleLine, WString::fromUTF8("Arch Linux"),pf);
-    */
+
     //painter.end();
 
     //mEcoEss->draw(&p);
@@ -353,6 +353,7 @@ void simplepoint::export2pdf(){
    // pngImage.done();
     pngImage.write(f);
     f.close();
+     */
 
     Wt::WString ws(tp,Wt::CharEncoding::UTF8);
     renderer.render(ws);
