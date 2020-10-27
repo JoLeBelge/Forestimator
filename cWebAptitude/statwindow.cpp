@@ -137,8 +137,6 @@ void statWindow::generateGenCarte(OGRFeature * poFeature){
      aContInfo->addWidget(cpp14::make_unique<WBreak>());
      aContInfo->addWidget(cpp14::make_unique<WText>("Profondeur : "+ statPedo.getSummary(PEDO::PROFONDEUR)));
      aContInfo->addWidget(cpp14::make_unique<WBreak>());
-
-
 }
 
 std::string roundDouble(double d, int precisionVal){
@@ -158,6 +156,6 @@ void statWindow::export2pdf(std::string img){
 
     // pourquoi la carte ne passe pas bien/de manière complête en html? c'est parce que ce n'est pas du html mais du js?
     mCarteGenCont->htmlText(o);
-    wkhtml(o.str());
+    //wkhtml(o.str());
 
 }

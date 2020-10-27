@@ -48,7 +48,39 @@ private:
 };
 
 
+// une carte statique mais généré au format img en local (server side) car ol ça commence à fair ch*
 
+#include <Wt/WBrush.h>
+#include <Wt/WColor.h>
+#include <Wt/WContainerWidget.h>
+#include <Wt/WPaintDevice.h>
+#include <Wt/WPaintedWidget.h>
+#include <Wt/WPainter.h>
+
+class PaintingImagesWidget : public Wt::WPaintedWidget
+{
+public:
+    PaintingImagesWidget()
+        : WPaintedWidget()
+    {
+    resize(639, 1310);  // Provide a default size.
+    }
+
+protected:
+
+};
+
+class  staticMap
+{
+public:
+    // constructeur ; a besoin d'un extend et de quoi créer la variable js de la carte, donc pointer vers le layer
+    staticMap(Layer * aLay,OGRGeometry *poGeom);
+
+private:
+    Layer * mLay;
+    std::string mFileName;
+
+};
 
 // une carte statique , donc sans interaction avec l'utilisateur
 class  olOneLay: public Wt::WContainerWidget

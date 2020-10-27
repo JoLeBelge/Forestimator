@@ -310,19 +310,22 @@ void simplepoint::export2pdf(){
    // boost::replace_all(tp,"${EcoEss}",o.str());
     // export de l'image de l'écogramme
 
-
-
-    Wt::WRasterImage pngImage("png", 400, 400);
+    Wt::WRasterImage pngImage("png", WLength(400), WLength(400));
+    pngImage.clear();
+    //pngImage.addFontCollection("/usr/share/fonts/truetype",true);
 
     //pngImage.addFontCollection("/usr/share/fonts/truetype",true);
 
     // bug constaté ; https://redmine.webtoolkit.eu/issues/7769
+    //Wt::WPainter::Image image("img/ecogramme.png", 639, 354);
 
+    //pngImage.drawImage();
     //Wt::WPainter p(&pngImage);
-    pngImage.drawLine(1,1,300,300);
+    //pngImage.drawLine(1,1,300,300);
 
+    /*
     for (int i(0);i<400;i++){
-    //pngImage.setPixel(i,i,WColor(100,100,100));
+    pngImage.setPixel(i,i,WColor(100,100,100));
 
     std::cout << " position i " << i << "," << i << std::endl;
     std::cout << pngImage.getPixel(i,i).name().toUTF8() << std::endl;
@@ -333,9 +336,13 @@ void simplepoint::export2pdf(){
     painterFont.setSize(16);
     painterFont.setFamily(WFont::Family::SansSerif);
 
-    WPainter painter(&pngImage);
-    painter.setFont(painterFont);
-    painter.drawText(10, 10, 125, 50,Wt::AlignmentFlag::Left, WString::fromUTF8("Arch Linux"));
+    //WPainter painter(&pngImage);
+    //WPainter *  painter= pngImage.painter();
+    //painter->setFont(painterFont);
+    WRectF rect(0, 0, 100, 100);
+    Wt::WPointF * pf=new Wt::WPointF(0,0);
+    pngImage.drawText(rect,Wt::AlignmentFlag::Left,Wt::TextFlag::SingleLine, WString::fromUTF8("Arch Linux"),pf);
+    */
     //painter.end();
 
     //mEcoEss->draw(&p);
@@ -346,7 +353,6 @@ void simplepoint::export2pdf(){
     std::cout << "Write ecogramme in a png" << std::endl;
    // pngImage.done();
     pngImage.write(f);
-
     f.close();
 
     Wt::WString ws(tp,Wt::CharEncoding::UTF8);

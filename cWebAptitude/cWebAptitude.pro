@@ -14,7 +14,8 @@ QMAKE_CXX = g++-8
 
 
 #
-LIBS = -lgdal -lwthttp -lwt -lboost_system -lboost_iostreams -lboost_thread -lboost_filesystem -lboost_program_options -lcrypt -pthread -lwtdbo -lwtdbosqlite3 -lzip -lhpdf -lwkhtmltox
+LIBS = -lgdal -lwthttp -lwt -lboost_system -lboost_iostreams -lboost_thread -lboost_filesystem -lboost_program_options -lcrypt -pthread -lwtdbo -lwtdbosqlite3 -lzip -lhpdf
+#-lwkhtmltox
 
 INCLUDEPATH += $$PWD/../carteApt/
 INCLUDEPATH += $$PWD/auth/
@@ -65,7 +66,7 @@ SOURCES += main.cpp \
     selectlayers.cpp \
     presentationpage.cpp \
     ../carteApt/cnsw.cpp \
-    wkhtml/wkhtmlutil.cpp
+ #   wkhtml/wkhtmlutil.cpp
 
 HEADERS += \
     auth/Session.h \
@@ -88,4 +89,4 @@ HEADERS += \
     selectlayers.h \
     presentationpage.h \
     ../carteApt/cnsw.h \
-    wkhtml/wkhtmlutil.h
+  #  wkhtml/wkhtmlutil.h

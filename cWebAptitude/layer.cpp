@@ -161,7 +161,6 @@ void Layer::setActive(bool b){
 void Layer::displayLayer() const{ 
     std::string JScommand;
     //std::cout << "display layer " << std::endl;
-    wms2jpg();
 
     std::string aFileIn(mDico->File("displayWMS"));
     std::ifstream in(aFileIn);
@@ -680,8 +679,8 @@ std::string Layer::summaryStat(OGRGeometry * poGeom){
 }
 
 
-//bool Layer::wms2jpg(OGREnvelope extent,double aGsd){
-bool Layer::wms2jpg() const{
+bool Layer::wms2jpg(OGREnvelope extent,std::string aOut) const{
+//bool Layer::wms2jpg() const{
 
     std::cout << "Layer::wms2jpg()" << std::endl;
     bool aRes(0);
@@ -709,6 +708,9 @@ bool Layer::wms2jpg() const{
                                           */
 
         //const char *connStr = "<GDAL_WMS>"
+
+        std::string layerName=mWMSLayerName;
+        boost::replace_all(layerName," ","%20");
         const char *connStr = CPLSPrintf("<GDAL_WMS>"
                                          "<Service name=\"WMS\">"
                                          "<Version>1.1.1</Version>"
@@ -719,12 +721,12 @@ bool Layer::wms2jpg() const{
                                          "<Styles></Styles>"
                                          "</Service>"
                                          "<DataWindow>"
-                                         "<UpperLeftX>200000.00</UpperLeftX>"
-                                         "<UpperLeftY>100000.00</UpperLeftY>"
-                                         "<LowerRightX>201000.00</LowerRightX>"
-                                         "<LowerRightY>99000.00</LowerRightY>"
-                                         "<SizeX>500</SizeX>"
-                                         "<SizeY>500</SizeY>"
+                                         "<UpperLeftX>%f</UpperLeftX>"
+                                         "<UpperLeftY>%f</UpperLeftY>"
+                                         "<LowerRightX>%f</LowerRightX>"
+                                         "<LowerRightY>%f</LowerRightY>"
+                                         "<SizeX>1000</SizeX>"
+                                         "<SizeY>1000</SizeY>"
                                          "</DataWindow>"
                                          "<Projection>EPSG:31370</Projection>"
                                          "<BandsCount>3</BandsCount>"
@@ -732,7 +734,11 @@ bool Layer::wms2jpg() const{
                                          "<ZeroBlockOnServerException>true</ZeroBlockOnServerException>"
                                          "</GDAL_WMS>",
                                          mUrl.c_str(),
-                                         mWMSLayerName.c_str()
+                                         mWMSLayerName.c_str(),
+                                         extent.MinX,
+                                         extent.MaxY,
+                                         extent.MaxX,
+                                         extent.MinY
                                          );
 
         std::cout << connStr << std::endl;
@@ -742,7 +748,7 @@ bool Layer::wms2jpg() const{
 
         if( pDS != NULL ){
 
-            std::cout << " X size is " << pDS->GetRasterBand( 1 )->GetXSize() << " , Y size is " << pDS->GetRasterBand( 1 )->GetYSize()<< std::endl;
+            //std::cout << " X size is " << pDS->GetRasterBand( 1 )->GetXSize() << " , Y size is " << pDS->GetRasterBand( 1 )->GetYSize()<< std::endl;
 
             // conversion vers jpg
             GDALDataset *pOutRaster;
@@ -755,7 +761,7 @@ bool Layer::wms2jpg() const{
                 exit( 1 );
             }
 
-            pOutRaster = pDriverPNG->CreateCopy( "/home/lisein/Documents/carteApt/Forestimator/data/tmp/toto.png", pDS, FALSE, NULL,NULL, NULL );
+            pOutRaster = pDriverPNG->CreateCopy( aOut.c_str(), pDS, FALSE, NULL,NULL, NULL );
             if( pOutRaster != NULL ){ GDALClose( pOutRaster );}
             GDALClose( pDS );
         }

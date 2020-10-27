@@ -10,7 +10,7 @@
 #include <Wt/WApplication.h>
 //#include "iostream"
 
-#include "wkhtml/wkhtmlutil.h"
+//#include "wkhtml/wkhtmlutil.h"
 
 class ReportResource;
 class statWindow;

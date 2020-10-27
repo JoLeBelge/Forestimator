@@ -447,6 +447,37 @@ olOneLay::olOneLay(Layer * aLay, OGRGeometry *poGeom):mLay(aLay){
     if (mLay->getCode()=="IGN"){std::cout << JScommand << std::endl;}
 }
 
+staticMap::staticMap(Layer * aLay, OGRGeometry *poGeom):mLay(aLay),WPaintedWidget(){
+
+
+    resize(639, 1310);  // Provide a default size.
+    std::string name0 = std::tmpnam(nullptr);
+    std::string name1 = name0.substr(5,name0.size()-5);
+    mFileName = mLay->Dico()->File("TMPDIR")+"/"+name1+".pgn";
+
+    OGREnvelope ext;
+    poGeom->getEnvelope(&ext);
+    // agrandir un peu l'extend de la carte car sinon le polygone peut-être partiellement visible seulemement
+    int buf = (ext.MaxX-ext.MinX)/3;
+    ext.MaxX+=buf;
+    ext.MaxY+=buf;
+    ext.MinX-=buf;
+    ext.MinY-=buf;
+    // d'abord transformer la couche wms en image locale, puis réouvrir et y rasteriser le polygone
+    if (mLay->wms2jpg(ext,mFileName)) {
+
+        // rasterizer le polygone avec les outils Wt?(draw curve)?
+        GDALAllRegister();
+
+        GDALDataset  * poDS = (GDALDataset *) GDALOpen( mFileName.c_str(), GA_Update );
+        if (poDS!=NULL){
+
+
+        }
+    }
+
+}
+
 std::string dToStr(double d){
     std::ostringstream streamObj;
     // Set Fixed -Point Notation
