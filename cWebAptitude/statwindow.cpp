@@ -96,7 +96,7 @@ void statWindow::generateGenCarte(OGRFeature * poFeature){
      WContainerWidget * aContCarte = layoutV->addWidget(cpp14::make_unique<WContainerWidget>());
      WHBoxLayout * layoutH = aContCarte->setLayout(cpp14::make_unique<WHBoxLayout>());
      // ajout de la carte pour cette couche
-     static_map_1 = layoutH->addWidget(cpp14::make_unique<olOneLay>(mIGN,poFeature->GetGeometryRef()),0);
+     olStatic = layoutH->addWidget(cpp14::make_unique<olOneLay>(mIGN,poFeature->GetGeometryRef()),0);
      // need to set it here after initialization of the map id !
      slotImgPDF.setJavaScript("function () {"
                               "var mapCanvas = document.createElement('canvas');"
@@ -114,6 +114,7 @@ void statWindow::generateGenCarte(OGRFeature * poFeature){
                               "  img=img.substr(0,120000);"
                               "}"
                               + sigImgPDF.createCall({"img","l"}) + "}");
+     olStatic->setId("olCarteGenerale");
 
      // description générale ; lecture des attribut du polygone?calcul de pente, zone bioclim, et élévation
      WContainerWidget * aContInfo = layoutH->addWidget(cpp14::make_unique<WContainerWidget>());
@@ -157,7 +158,6 @@ std::string roundDouble(double d, int precisionVal){
 }
 
 
-
 void statWindow::export2pdf(std::string img, int length){
     std::cout << "statWindow::export2pdf() size :" << length << "; ind=" << chunkImgPDFind << std::endl;
 
@@ -177,7 +177,7 @@ void statWindow::export2pdf(std::string img, int length){
         if(chunkImgPDFind<chunkImgPDF){
             doJavaScript(
                  "var mapCanvas = document.createElement('canvas');"
-                 "var size = mapStat"+static_map_1->id()+".getSize();"
+                 "var size = mapStat"+olStatic->id()+".getSize();"
                  "mapCanvas.width = size[0];"
                  "mapCanvas.height = size[1];"
                  "var mapContext = mapCanvas.getContext('2d');"
@@ -214,7 +214,7 @@ void statWindow::export2pdf(std::string img, int length){
     mAptTable->htmlText(o);
     Wt::WString tpl = tr("report.statwindow");
     std::string tp = tpl.toUTF8();
-    //boost::replace_all(tp,"${AptTable}",o.str());
+    //boost::replace_all(tp,"${AptTable}",o.str()); // c'est buggé donc juste desactive pour instant...
     boost::replace_all(tp,"${carte_static_1}",strImgPDF);
 
     std::cout << tp << std::endl;
@@ -232,18 +232,4 @@ void statWindow::export2pdf(std::string img, int length){
     WFileResource *fileResource = new Wt::WFileResource("plain/text",aOut);
     fileResource->suggestFileName("Forestimator-info-parcelaire.pdf");
     mApp->redirect(fileResource->url());
-
-
-    //std::ostream o
-    //std::ostringstream o;
-    //this->htmlText(o);
-    //std::stringstream ss;
-    //ss << o.rdbuf();
-    //std::string myString = o.str();
-
-    //std::cout << myString << std::endl;
-    //auto pdf = std::make_shared<ReportResource>(this, img);
-    //pdf->ren
-
-    //m_app->redirect(pdf->url());
 }

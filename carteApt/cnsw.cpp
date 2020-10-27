@@ -374,19 +374,19 @@ surfPedo::surfPedo(cnsw * dico, OGRGeometry *poGeom ):mDico(dico){
     for (auto kv : VDText){
         if (kv.second>1){
             if (kv.second>99.0){ dTexture+=kv.first;}
-            dTexture+=kv.first+": "+roundDouble(kv.second,0)+"% ";
+            dTexture+=kv.first+": "+mDico->roundDouble(kv.second,0)+"% ";
         }
     }
     for (auto kv : VDDrainage){
         if (kv.second>1){
             if (kv.second>99.0){ dDrainage+=kv.first;}
-            dDrainage+=kv.first+": "+roundDouble(kv.second,0)+"% ";
+            dDrainage+=kv.first+": "+mDico->roundDouble(kv.second,0)+"% ";
         }
     }
     for (auto kv : VDProf){
         if (kv.second>1){
             if (kv.second>99.0){ dProf+=kv.first;}
-            dProf+=kv.first+": "+roundDouble(kv.second,0)+"% ";
+            dProf+=kv.first+": "+mDico->roundDouble(kv.second,0)+"% ";
         }
     }
 }
@@ -412,3 +412,9 @@ std::string surfPedo::getSummary(PEDO p){
 }
 
 
+std::string dicoPedo::roundDouble(double d, int precisionVal){
+    std::string aRes("");
+    if (precisionVal>0){aRes=std::to_string(d).substr(0, std::to_string(d).find(".") + precisionVal + 1);}
+    else  {aRes=std::to_string(d+0.5).substr(0, std::to_string(d).find("."));}
+   return aRes;
+}

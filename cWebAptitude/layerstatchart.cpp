@@ -182,8 +182,10 @@ Wt::WContainerWidget * layerStatChart::getChart(){
 }
 
 Wt::WContainerWidget * layerStatChart::getBarStat(){
-    Wt::WContainerWidget * aRes= new Wt::WContainerWidget();
-    aRes->addWidget(cpp14::make_unique<batonnetApt>(this));
+
+Wt:WContainerWidget * aRes= new Wt::WContainerWidget();
+    aRes->addWidget(cpp14::make_unique<batonnetApt>(this,mLay->Dico()->Dico_AptFull2AptAcro));
+
     return aRes;
 }
 
@@ -418,16 +420,8 @@ olOneLay::olOneLay(Layer * aLay, OGRGeometry *poGeom):mLay(aLay){
     in.close();
     JScommand=ss.str();
     boost::replace_all(JScommand,"MYTITLE",mLay->getLegendLabel());
-
-    if (mLay->Dico()->hasWMSinfo(mLay->getCode())){
-        WMSinfo wms=mLay->Dico()->getWMSinfo(mLay->getCode());
-        boost::replace_all(JScommand,"MYLAYER",wms.mLayerName);
-        boost::replace_all(JScommand,"MYURL",wms.mUrl);
-
-    } else {
-        boost::replace_all(JScommand,"MYLAYER",mLay->NomMapServerLayer());
-        boost::replace_all(JScommand,"MYURL",mLay->MapServerURL());
-    }
+    boost::replace_all(JScommand,"MYLAYER",mLay->mWMSLayerName);
+    boost::replace_all(JScommand,"MYURL",mLay->mUrl);
 
     // remplacer l'identifiant du conteneur
     boost::replace_all(JScommand,"MYID",this->id());
@@ -521,7 +515,16 @@ void batonnetApt::paintEvent(Wt::WPaintDevice *paintDevice){
         rectPtr->setCursor(Wt::Cursor::IBeam);
         this->addArea(std::move(rectPtr));
 
+        // dessiner le code d'aptitude si il y a la place pour (seuil à 5 %)
+        if (kv.second>5){
+        std::string codeApt="";
+        if (aptFull2aptAcro.find(kv.first)!=aptFull2aptAcro.end()){codeApt=aptFull2aptAcro.at(kv.first);}
+        // je dois choisir entre Wt::AlignmentFlag::Middle et Wt::AlignmentFlag::Center, alors je prend middle et je change les coordonnées du box pour centrer
+        painter.drawText(xcumul+width/2, 0, width, mH,Wt::AlignmentFlag::Middle,Wt::TextFlag::SingleLine,codeApt);
+        }
         //std::cout <<  aCodeStr << ", batonnet de longeur " << width  << ", % de " << kv.second << std::endl;
         xcumul=xcumul+width;
     }
 }
+
+cDicoApt * layerStat::Dico(){return mLay->Dico();}

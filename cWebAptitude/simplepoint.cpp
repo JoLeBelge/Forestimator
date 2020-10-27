@@ -28,6 +28,7 @@ void simplepoint::createUI()
     //retour->setLink(WLink(LinkType::InternalPath, "/analyse"));
     retour->clicked().connect([=]{mGL->mStackInfoPtr->stack_info->setCurrentIndex(2);;});*/
     mParent->addWidget(cpp14::make_unique<WText>(tr("sp_infoclic")));
+    mParent->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
     createPdfBut = mParent->addWidget(Wt::cpp14::make_unique<WPushButton>("Export pdf"));
     createPdfBut->clicked().connect(this,&simplepoint::export2pdf);
 
@@ -68,8 +69,7 @@ void simplepoint::titreInfoRaster(){
     mInfoT->elementAt(0, 0)->setColumnSpan(2);
     mInfoT->elementAt(0, 0)->setContentAlignment(AlignmentFlag::Top | AlignmentFlag::Center);
     mInfoT->elementAt(0, 0)->setPadding(10);
-    //WText *titre = mInfoT->elementAt(0,0)->addWidget(cpp14::make_unique<WText>("<h4>Description de la station forestière </h4>"));
-    mInfoT->elementAt(0,0)->addWidget(cpp14::make_unique<WText>("<h4>Description de la station forestière </h4>"));
+    mInfoT->elementAt(0,0)->addWidget(cpp14::make_unique<WText>(tr("titre-InfoTableAna-point")));
    // mInfoT->elementAt(1, 0)->addWidget(cpp14::make_unique<WText>("Couche"));
    //mInfoT->elementAt(1, 1)->addWidget(cpp14::make_unique<WText>("Valeur"));
 }
@@ -263,28 +263,8 @@ void simplepoint::afficheAptAllEss(){
     }
 }
 
+
 void simplepoint::export2pdf(){
-
-    HPDF_Doc pdf = HPDF_New(error_handler, 0);
-    HPDF_UseUTFEncodings(pdf); // enables UTF-8 encoding with true type fonts
-    HPDF_SetCurrentEncoder(pdf, "UTF-8");
-    HPDF_Page page = HPDF_AddPage(pdf);
-    HPDF_Page_SetSize(page, HPDF_PAGE_SIZE_A4, HPDF_PAGE_PORTRAIT);
-
-    Render::WPdfRenderer renderer(pdf, page);
-    renderer.setMargin(2.54);
-    renderer.setDpi(96);
-    renderer.addFontCollection("/usr/share/fonts/truetype",true);
-
-    Wt::WString ss = tr("report.analyse.test");
-    renderer.render(ss);
-
-    HPDF_SaveToFile(pdf, "./hello.pdf");
-    HPDF_Free(pdf);
-
-}
-
-void simplepoint::export2pdf1(){
     std::cout << "simplepoint::export2pdf()" << std::endl;
     // création du pdf
     HPDF_Doc pdf = HPDF_New(error_handler, 0);
@@ -295,9 +275,10 @@ void simplepoint::export2pdf1(){
     Wt::Render::WPdfRenderer renderer(pdf, page);
     renderer.setMargin(2.54);
     renderer.setDpi(96);
-    // post sur l'export des widgets vers pdf - pas super clair mais informatif
-    //https://redmine.webtoolkit.eu/boards/2/topics/14392?r=14462#message-14462
+    renderer.addFontCollection("/usr/share/fonts/truetype",true);
+    renderer.useStyleSheet("style/bootstrap-theme.min.css");// fonctionne pas, le parsing ne va pas pour ce css.
 
+    //std::cout << renderer.getStyleSheetParseErrors() << std::endl;
     // pbl avec les template, c'est le bind dois recevoir un unique ptr, et donc détruit les objets qu'on lui bind = segmentation fault
 
     std::ostringstream o;
@@ -311,11 +292,64 @@ void simplepoint::export2pdf1(){
     mInfoT->htmlText(o);
     boost::replace_all(tp,"${InfoT}",o.str());
 
-    //std::cout << tp << std::endl;
-    // en créant le WString avec charencoding local il ne met plus d'erreur dans la console mais ça n'empèche que le résultat est décevant, les accents ne passent pas dans le pdf
-    // pbl d'encodage , vérifier p-e l'encodage de ostringstream?
-    renderer.render(Wt::WString(tp,Wt::CharEncoding::UTF8));
+    Wt::WTable * legendAcroEs= new Wt::WTable();
+    int row(0);
+    for (auto kv : *mGL->Dico()->code2Nom() ){
+        legendAcroEs->elementAt(row, 0)->addWidget(cpp14::make_unique<WText>(kv.first));
+        legendAcroEs->elementAt(row, 1)->addWidget(cpp14::make_unique<WText>(kv.second));
+        row++;
+    }
+    o.str("");
+    o.clear();
+    legendAcroEs->htmlText(o);
+    boost::replace_all(tp,"${legendAcro}",o.str());
+    o.str("");
+    o.clear();
+   // mEcoEss->htmlText(o); ça bug, hélas.
+   // boost::replace_all(tp,"${EcoEss}",o.str());
+    // export de l'image de l'écogramme
 
+
+
+    Wt::WRasterImage pngImage("png", 400, 400);
+
+    //pngImage.addFontCollection("/usr/share/fonts/truetype",true);
+
+    // bug constaté ; https://redmine.webtoolkit.eu/issues/7769
+
+    //Wt::WPainter p(&pngImage);
+    pngImage.drawLine(1,1,300,300);
+
+    for (int i(0);i<400;i++){
+    //pngImage.setPixel(i,i,WColor(100,100,100));
+
+    std::cout << " position i " << i << "," << i << std::endl;
+    std::cout << pngImage.getPixel(i,i).name().toUTF8() << std::endl;
+    std::cout << pngImage.getPixel(i,i).red() << std::endl;
+    }
+
+    WFont painterFont;
+    painterFont.setSize(16);
+    painterFont.setFamily(WFont::Family::SansSerif);
+
+    WPainter painter(&pngImage);
+    painter.setFont(painterFont);
+    painter.drawText(10, 10, 125, 50,Wt::AlignmentFlag::Left, WString::fromUTF8("Arch Linux"));
+    //painter.end();
+
+    //mEcoEss->draw(&p);
+    std::string name01 = std::tmpnam(nullptr);
+    std::string name11 = name01.substr(5,name01.size()-5);
+    std::string aEcoPng = mDico->File("TMPDIR")+"/"+name11+".png";
+    std::ofstream f(aEcoPng, std::ios::out | std::ios::binary);
+    std::cout << "Write ecogramme in a png" << std::endl;
+   // pngImage.done();
+    pngImage.write(f);
+
+    f.close();
+
+    Wt::WString ws(tp,Wt::CharEncoding::UTF8);
+    renderer.render(ws);
 
     std::string name0 = std::tmpnam(nullptr);
     std::string name1 = name0.substr(5,name0.size()-5);
@@ -323,11 +357,9 @@ void simplepoint::export2pdf1(){
 
     HPDF_SaveToFile(pdf,aOut.c_str());
     HPDF_Free(pdf);
-    WFileResource *fileResource = new Wt::WFileResource("plain/text",aOut);
+    WFileResource *fileResource = new Wt::WFileResource("application/pdf",aOut);
     fileResource->suggestFileName("Forestimator-info-ponctuelle.pdf");
-    mGL->m_app->redirect(fileResource->url());
 
-    // maintenant il faut rediriger l'application vers le lien de la ressource
-    // mGL->m_app->redirect(pdf->url());
+    mGL->m_app->redirect(fileResource->url());
 
 }

@@ -18,9 +18,7 @@
 #include <unistd.h>
 #include <cmath>
 #include <sqlite3.h>
-//#include "statwindow.h"
 
-extern std::string roundDouble(double d, int precisionVal);
 
 // toutes les map des dictionnaires pédo et les accesseurs
 class dicoPedo;
@@ -81,6 +79,8 @@ public:
         if (mPhase.find(aCode)!=mPhase.end()){aRes=mPhase.at(aCode);}
         return aRes;
     }
+
+    std::string roundDouble(double d, int precisionVal);
 
     // la description de la profondeur dépend des valeurs de toutes les phase
     std::string Profondeur(int aCode){

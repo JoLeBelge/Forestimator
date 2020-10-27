@@ -17,16 +17,16 @@ enum TypeCarte {Apt, Potentiel, Station1, Habitats,NH,NT,Topo,AE,SS,ZBIO,CSArden
 
 enum class TypeVar {Classe,
                     Continu
-                     };
+                   };
 
 enum class TypeLayer { //Apti // Apti enlevé ! -> FEE et CS
-                       KK // les cartes dérivées des CS
-                      ,Thematique // lié à la description de la station, approche FEE ; NH NT ZBIO
-                      ,Externe // toutes les cartes qui ne sont pas en local ; carte IGN pour commencer
-                      ,FEE // aptitude
-                      ,CS // aptitude
-                      ,Peuplement // description du peuplement en place
-                     };
+    KK // les cartes dérivées des CS
+    ,Thematique // lié à la description de la station, approche FEE ; NH NT ZBIO
+    ,Externe // toutes les cartes qui ne sont pas en local ; carte IGN pour commencer
+    ,FEE // aptitude
+    ,CS // aptitude
+    ,Peuplement // description du peuplement en place
+};
 
 std::string loadBDpath();
 
@@ -49,10 +49,10 @@ class cnsw;
 
 class WMSinfo
 {
-   public:
-    WMSinfo():mUrl(""),mLayerName("toto"){}
-    WMSinfo(std::string url,std::string layer):mUrl(url),mLayerName(layer){}
-    std::string mUrl, mLayerName;
+public:
+    WMSinfo():mUrl(""),mWMSLayerName("toto"){}
+    WMSinfo(std::string url,std::string layer):mUrl(url),mWMSLayerName(layer){}
+    std::string mUrl, mWMSLayerName;
 };
 
 class color
@@ -68,7 +68,7 @@ public:
     }
     color(std::string aHex){
         const char* c=aHex.substr(1,aHex.size()).c_str();
-          // j'enlève le diaise qui semble ne pas convenir pour le nom de style il faut également s'assurer que le code ne commence pas par un numéro.
+        // j'enlève le diaise qui semble ne pas convenir pour le nom de style il faut également s'assurer que le code ne commence pas par un numéro.
         mStyleClassName=aHex.substr(1,aHex.size());
         if (isdigit(mStyleClassName[0])){ mStyleClassName="a"+mStyleClassName;}
         sscanf(c, "%02x%02x%02x", &mR, &mG, &mB);
@@ -89,14 +89,14 @@ public:
         if (hsp<170) {mDark=true;} else {mDark=false;}
     }
 
-     bool dark(){return mDark;}
+    bool dark(){return mDark;}
 
     std::string cat(){ return " R:" + std::to_string(mR)+", G:"+std::to_string(mG)+", B"+std::to_string(mB);}
     std::string cat2(){ return std::to_string(mR)+" "+std::to_string(mG)+" "+std::to_string(mB);}
     std::string catHex(){
-            unsigned long hex= ((mR & 0xff) << 16) + ((mG & 0xff) << 8) + (mB & 0xff);
-            return "#"+std::to_string(hex);
-        }
+        unsigned long hex= ((mR & 0xff) << 16) + ((mG & 0xff) << 8) + (mB & 0xff);
+        return "#"+std::to_string(hex);
+    }
     std::string getStyleName(){return "."+mStyleClassName;}
     std::string getStyleNameShort(){return mStyleClassName;}
     std::string mStyleClassName;
@@ -341,6 +341,23 @@ public:
         if (Dico_NHposEco.find(aCode)!=Dico_NHposEco.end()){aRes=Dico_NHposEco.at(aCode);}
         return aRes;
     }
+    int rasterNH2Gr(int aCode){
+        int aRes(0);
+        if (Dico_rasterNH2groupe.find(aCode)!=Dico_rasterNH2groupe.end()){aRes=Dico_rasterNH2groupe.at(aCode);}
+        return aRes;
+    }
+
+    std::vector<int> NHGr(){
+        std::vector<int> aRes ;
+        for (auto kv : Dico_rasterNH2groupe){
+            int gr = kv.second;
+            std::vector<int>::iterator it = std::find(aRes.begin(), aRes.end(), gr);
+            if (it == aRes.end()){
+                aRes.push_back(gr);
+            }
+        }
+        return aRes;
+    }
 
     std::string RasterNom(std::string aCode){
         std::string aRes("not found");
@@ -521,10 +538,10 @@ public:
     bool hasWMSinfo(std::string aCode){
         return Dico_WMS.find(aCode)!=Dico_WMS.end();
     }
-    WMSinfo getWMSinfo(std::string aCode){
-        WMSinfo aRes;
+    WMSinfo * getWMSinfo(std::string aCode){
+        WMSinfo * aRes;
         if (Dico_WMS.find(aCode)!=Dico_WMS.end()){
-            aRes=Dico_WMS.at(aCode);
+            aRes=&Dico_WMS.at(aCode);
         };
         return aRes;
     }
@@ -551,10 +568,12 @@ public:
         color aRes(0,0,0);
         if (aCode.substr(0,1)=="#") {aRes=color(aCode);}
         else {
-        if (colors.find(aCode)!=colors.end()){aRes=colors.at(aCode);}
+            if (colors.find(aCode)!=colors.end()){aRes=colors.at(aCode);}
         }
         return aRes;
     }
+
+    std::map<std::string,std::string>  Dico_AptFull2AptAcro;// j'en ai besoin dans les batonnetApt
 private:
     std::string mBDpath;
 
@@ -574,18 +593,21 @@ private:
     // description peuplement vs description station
     std::map<std::string,std::string>  Dico_RasterLayer;
     std::map<std::string,std::string>  Dico_RasterNomComplet;
-     std::map<std::string,bool>  Dico_RasterExpert;
+    std::map<std::string,bool>  Dico_RasterExpert;
     // key ; code le la couche layer. value ; les infos nécessaire pour charger le wms
     std::map<std::string,WMSinfo>  Dico_WMS;
     std::map<int,std::string>  Dico_ZBIO;
     std::map<int,std::string>  Dico_NH;
+    // c'est dans mes analyses phyto que j'ai besoin de grouper les niveaux hydriques en groupe
+    std::map<int,int>  Dico_rasterNH2groupe;
     // code NH vers position Y dans l'écogramme
-   std::map<int,int>  Dico_NHposEco;
+    std::map<int,int>  Dico_NHposEco;
     std::map<int,std::string>  Dico_NT;
     std::map<int,std::string>  Dico_code2NTNH;
     std::map<std::string,int>  Dico_NTNH2Code;
     std::map<std::string,int>  Dico_Apt;
-    std::map<int,std::string>  Dico_code2Apt;
+    std::map<int,std::string>  Dico_code2Apt;// apt sous forme d'acro, O, T, TE, ect
+
     std::map<int,std::string> Dico_code2AptFull;
     std::map<int,int>  Dico_AptDouble2AptContr;
     std::map<int,int>  Dico_AptSouscote;

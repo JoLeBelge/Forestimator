@@ -31,8 +31,8 @@ class batonnetApt;
 class batonnetApt : public Wt::WPaintedWidget
 {
 public:
-    batonnetApt(layerStat * alayStat)
-        : WPaintedWidget(),mLayStat(alayStat),mW(500),mH(40)
+    batonnetApt(layerStat * alayStat,std::map<std::string,std::string>  Dico_AptFull2AptAcro)
+        : WPaintedWidget(),mLayStat(alayStat),mW(500),mH(40),aptFull2aptAcro(Dico_AptFull2AptAcro)
     {
     resize(mW, mH);
     update();
@@ -43,6 +43,7 @@ protected:
 
 private:
     layerStat * mLayStat;
+    std::map<std::string,std::string> aptFull2aptAcro;
     int mW,mH;
 };
 
@@ -93,7 +94,7 @@ public:
     std::map<std::string, int> StatSimple(){return mStatSimple;}
     std::map<std::string, int> Stat(){return mStat;}
     TypeVar mTypeVar; // pour distinguer le type de variable, continue (MNH) ou classes (aptitude)
-
+    cDicoApt * Dico();//{return mLay->Dico();}
 protected:
     Layer * mLay;
     // key ; classe ou valeur, val ; nombre d'occurence

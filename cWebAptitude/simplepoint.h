@@ -30,6 +30,7 @@
 #include <Wt/Http/Response.h>
 #include <Wt/Render/WPdfRenderer.h>
 #include "iostream"
+#include <Wt/WRasterImage.h>
 
 class simplepoint;
 class groupLayers;
@@ -58,7 +59,6 @@ public:
     //void afficheLegendeIndiv(const Layer *l);
     void afficheAptAllEss();
     void export2pdf();
-    void export2pdf1();
 
     Wt::WTable                 *mInfoT;
     Wt::WTable                 *mDetAptFEE;
