@@ -50,9 +50,9 @@ class cnsw;
 class WMSinfo
 {
 public:
-    WMSinfo():mUrl(""),mLayerName("toto"){}
-    WMSinfo(std::string url,std::string layer):mUrl(url),mLayerName(layer){}
-    std::string mUrl, mLayerName;
+    WMSinfo():mUrl(""),mWMSLayerName("toto"){}
+    WMSinfo(std::string url,std::string layer):mUrl(url),mWMSLayerName(layer){}
+    std::string mUrl, mWMSLayerName;
 };
 
 class color
@@ -538,10 +538,10 @@ public:
     bool hasWMSinfo(std::string aCode){
         return Dico_WMS.find(aCode)!=Dico_WMS.end();
     }
-    WMSinfo getWMSinfo(std::string aCode){
-        WMSinfo aRes;
+    WMSinfo * getWMSinfo(std::string aCode){
+        WMSinfo * aRes;
         if (Dico_WMS.find(aCode)!=Dico_WMS.end()){
-            aRes=Dico_WMS.at(aCode);
+            aRes=&Dico_WMS.at(aCode);
         };
         return aRes;
     }

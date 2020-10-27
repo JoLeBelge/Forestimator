@@ -420,16 +420,8 @@ olOneLay::olOneLay(Layer * aLay, OGRGeometry *poGeom):mLay(aLay){
     in.close();
     JScommand=ss.str();
     boost::replace_all(JScommand,"MYTITLE",mLay->getLegendLabel());
-
-    if (mLay->Dico()->hasWMSinfo(mLay->getCode())){
-        WMSinfo wms=mLay->Dico()->getWMSinfo(mLay->getCode());
-        boost::replace_all(JScommand,"MYLAYER",wms.mLayerName);
-        boost::replace_all(JScommand,"MYURL",wms.mUrl);
-
-    } else {
-        boost::replace_all(JScommand,"MYLAYER",mLay->NomMapServerLayer());
-        boost::replace_all(JScommand,"MYURL",mLay->MapServerURL());
-    }
+    boost::replace_all(JScommand,"MYLAYER",mLay->mWMSLayerName);
+    boost::replace_all(JScommand,"MYURL",mLay->mUrl);
 
     // remplacer l'identifiant du conteneur
     boost::replace_all(JScommand,"MYID",this->id());

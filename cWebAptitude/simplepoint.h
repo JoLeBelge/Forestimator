@@ -59,7 +59,6 @@ public:
     //void afficheLegendeIndiv(const Layer *l);
     void afficheAptAllEss();
     void export2pdf();
-    void export2pdf1();
 
     Wt::WTable                 *mInfoT;
     Wt::WTable                 *mDetAptFEE;

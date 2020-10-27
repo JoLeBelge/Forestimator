@@ -60,6 +60,9 @@ Layer::Layer(std::string aCode,cDicoApt * aDico,TypeLayer aType):
         }*/
     }
 
+    mUrl=MapServerURL();
+    mWMSLayerName=NomMapServerLayer();
+
 }
 
 Layer::Layer(groupLayers * aGroupL, std::string aCode, WText *PWText, TypeLayer aType):
@@ -121,6 +124,8 @@ Layer::Layer(groupLayers * aGroupL, std::string aCode, WText *PWText, TypeLayer 
         break;
     }
 
+    mUrl=MapServerURL();
+    mWMSLayerName=NomMapServerLayer();
 
     setActive(false);
     //std::cout << "done" << std::endl;
@@ -156,6 +161,7 @@ void Layer::setActive(bool b){
 void Layer::displayLayer() const{ 
     std::string JScommand;
     //std::cout << "display layer " << std::endl;
+    wms2jpg();
 
     std::string aFileIn(mDico->File("displayWMS"));
     std::ifstream in(aFileIn);
@@ -164,17 +170,8 @@ void Layer::displayLayer() const{
     in.close();
     JScommand=ss.str();
     boost::replace_all(JScommand,"MYTITLE",this->getLegendLabel());
-
-    if (mDico->hasWMSinfo(this->getCode())){
-        WMSinfo wms=mDico->getWMSinfo(this->getCode());
-        boost::replace_all(JScommand,"MYLAYER",wms.mLayerName);
-        boost::replace_all(JScommand,"MYURL",wms.mUrl);
-
-    } else {
-        boost::replace_all(JScommand,"MYLAYER",this->NomMapServerLayer());
-        boost::replace_all(JScommand,"MYURL",this->MapServerURL());
-    }
-    // }
+    boost::replace_all(JScommand,"MYLAYER",mWMSLayerName);
+    boost::replace_all(JScommand,"MYURL",mUrl);
     mText->doJavaScript(JScommand);
     //std::cout << JScommand << std::endl;
 }
@@ -479,6 +476,9 @@ GDALDataset * Layer::rasterizeGeom(OGRGeometry *poGeom){
 
 std::string Layer::NomMapServerLayer()const{
     std::string aRes;
+    if (mDico->hasWMSinfo(this->getCode())){
+          aRes=mDico->getWMSinfo(this->getCode())->mWMSLayerName;
+    }else{
     switch (mType) {
     case TypeLayer::FEE:
         aRes="Aptitude_FEE_"+mCode;
@@ -495,11 +495,16 @@ std::string Layer::NomMapServerLayer()const{
     default:
         aRes=mCode;
     }
+    }
     return aRes;
 }
 
 std::string Layer::MapServerURL()const{
     std::string aRes;
+    if (mDico->hasWMSinfo(this->getCode())){
+          aRes=mDico->getWMSinfo(this->getCode())->mUrl;
+    }else{
+
     switch (mType) {
     case TypeLayer::FEE:
         aRes="https://gxgfservcarto.gxabt.ulg.ac.be/cgi-bin/aptitude_fee";
@@ -515,6 +520,7 @@ std::string Layer::MapServerURL()const{
         break;
     default:
         aRes=mCode;
+    }
     }
     return aRes;
 }
@@ -557,18 +563,18 @@ basicStat::basicStat(std::map<double,int> aMapValandFrequ):mean(0),max(0),min(0)
         mean += kv.first*kv.second;
         tot+=kv.second;
 
-         if (kv.second>1){
-        if (test) {
+        if (kv.second>1){
+            if (test) {
 
-            if (kv.first>max) {max=kv.first;}
-            if (kv.first<min) {min=kv.first;}
+                if (kv.first>max) {max=kv.first;}
+                if (kv.first<min) {min=kv.first;}
 
-        } else {
-            max=kv.first;
-            min=kv.first;
-            test=1;
+            } else {
+                max=kv.first;
+                min=kv.first;
+                test=1;
+            }
         }
-         }
     }
     mean=mean/tot;
 
@@ -583,7 +589,7 @@ basicStat Layer::computeBasicStatOnPolyg(OGRGeometry * poGeom){
         // préparation du containeur du résultat
         for (auto &kv : *mDicoVal){
             try {
-               aMapValandFrequ.emplace(std::make_pair(std::stod(kv.second),0));
+                aMapValandFrequ.emplace(std::make_pair(std::stod(kv.second),0));
             }
             catch (const std::invalid_argument& ia) {
                 std::cerr << "Invalid argument pour stod computeBasicStatOnPolyg: " << ia.what() << '\n';
@@ -641,7 +647,7 @@ basicStat Layer::computeBasicStatOnPolyg(OGRGeometry * poGeom){
                         if (mDicoVal->find(aVal)!=mDicoVal->end()){
 
                             try {
-                               aMapValandFrequ.at(std::stod(mDicoVal->at(aVal)))++;
+                                aMapValandFrequ.at(std::stod(mDicoVal->at(aVal)))++;
                             }
                             catch (const std::invalid_argument& ia) {
                                 std::cerr << "Invalid argument pour stod computeBasicStatOnPolyg, part2: " << ia.what() << '\n';
@@ -671,4 +677,88 @@ std::string Layer::summaryStat(OGRGeometry * poGeom){
     layerStat ls(this,computeStatOnPolyg(poGeom));
     return ls.summaryStat();
 
+}
+
+
+//bool Layer::wms2jpg(OGREnvelope extent,double aGsd){
+bool Layer::wms2jpg() const{
+
+    std::cout << "Layer::wms2jpg()" << std::endl;
+    bool aRes(0);
+
+        GDALAllRegister();
+
+        /*
+        const char *connStr = CPLSPrintf("<GDAL_WMS><Service name=\"WMS\">"
+                "<ServerUrl>%s</ServerUrl></Service><DataWindow>"
+                "<UpperLeftX>%f</UpperLeftX><UpperLeftY>%f</UpperLeftY>"
+                "<LowerRightX>%f</LowerRightX><LowerRightY>%f</LowerRightY>"
+                "<TileLevel>%d</TileLevel><TileCountX>1</TileCountX>"
+                "<TileCountY>1</TileCountY><YOrigin>top</YOrigin></DataWindow>"
+                "<Projection>EPSG:31370</Projection><BlockSizeX>256</BlockSizeX>"
+                "<BlockSizeY>256</BlockSizeY><BandsCount>%d</BandsCount>"
+                "<Cache><Type>file</Type>"
+                "</Cache><ZeroBlockHttpCodes>204,404</ZeroBlockHttpCodes></GDAL_WMS>",
+                                             wms.mUrl.c_str(), extent.MinX,
+                                             extent.MaxY, extent.MaxX,
+                                             extent.MinY, z_max,
+                                            // y_origin_top ? "top" : "bottom",
+                                             3);
+                                         //, cacheExpires,
+                                          //   cacheMaxSize);
+                                          */
+
+        //const char *connStr = "<GDAL_WMS>"
+        const char *connStr = CPLSPrintf("<GDAL_WMS>"
+                                         "<Service name=\"WMS\">"
+                                         "<Version>1.1.1</Version>"
+                                         "<ServerUrl>%s?</ServerUrl>"
+                                         "<SRS>EPSG:31370</SRS>"
+                                         "<ImageFormat>image/jpeg</ImageFormat>"
+                                         "<Layers>%s</Layers>"
+                                         "<Styles></Styles>"
+                                         "</Service>"
+                                         "<DataWindow>"
+                                         "<UpperLeftX>200000.00</UpperLeftX>"
+                                         "<UpperLeftY>100000.00</UpperLeftY>"
+                                         "<LowerRightX>201000.00</LowerRightX>"
+                                         "<LowerRightY>99000.00</LowerRightY>"
+                                         "<SizeX>500</SizeX>"
+                                         "<SizeY>500</SizeY>"
+                                         "</DataWindow>"
+                                         "<Projection>EPSG:31370</Projection>"
+                                         "<BandsCount>3</BandsCount>"
+                                         "<ZeroBlockHttpCodes>204,404</ZeroBlockHttpCodes>"
+                                         "<ZeroBlockOnServerException>true</ZeroBlockOnServerException>"
+                                         "</GDAL_WMS>",
+                                         mUrl.c_str(),
+                                         mWMSLayerName.c_str()
+                                         );
+
+        std::cout << connStr << std::endl;
+
+        GDALDataset *pDS = static_cast<GDALDataset*>(GDALOpenEx(
+                                                         connStr, GDAL_OF_RASTER, nullptr, nullptr, nullptr));
+
+        if( pDS != NULL ){
+
+            std::cout << " X size is " << pDS->GetRasterBand( 1 )->GetXSize() << " , Y size is " << pDS->GetRasterBand( 1 )->GetYSize()<< std::endl;
+
+            // conversion vers jpg
+            GDALDataset *pOutRaster;
+            GDALDriver *pDriverPNG;
+            const char *pszFormat2 = "PNG";
+            pDriverPNG = GetGDALDriverManager()->GetDriverByName(pszFormat2);
+            if( pDriverPNG == NULL )
+            {
+                printf( "%s driver not available.\n", pszFormat2 );
+                exit( 1 );
+            }
+
+            pOutRaster = pDriverPNG->CreateCopy( "/home/lisein/Documents/carteApt/Forestimator/data/tmp/toto.png", pDS, FALSE, NULL,NULL, NULL );
+            if( pOutRaster != NULL ){ GDALClose( pOutRaster );}
+            GDALClose( pDS );
+        }
+
+    return aRes;
 }

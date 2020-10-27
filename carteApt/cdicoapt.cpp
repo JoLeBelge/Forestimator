@@ -4,7 +4,7 @@ std::string dirBD("/home/lisein/Documents/carteApt/Forestimator/carteApt/data/ap
 
 cDicoApt::cDicoApt(std::string aBDFile):mBDpath(aBDFile)
 {
-
+    //std::cout << "constructeur cDicoApt" << std::endl;
     if (openConnection()){} else {
 
         mPedo= new cnsw(db_);

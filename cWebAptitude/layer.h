@@ -68,7 +68,7 @@ private:
 };
 
 // ça va être un peu batard vu que je vais mélanger divers type de layer
-class Layer
+class Layer : public WMSinfo
 {
 public:
     Layer(std::string aCode,cDicoApt * aDico,TypeLayer aType);
@@ -93,6 +93,8 @@ public:
         mCode=lay.mCode;
         mDicoCol=lay.mDicoCol;
         mDicoVal=lay.mDicoVal;
+        mUrl=lay.mUrl;
+        mWMSLayerName=lay.mWMSLayerName;
         switch (mType) {
             case TypeLayer::FEE:
             case TypeLayer::CS:
@@ -125,6 +127,8 @@ public:
         mCode=lay.mCode;
         mDicoCol=lay.mDicoCol;
         mDicoVal=lay.mDicoVal;
+        mUrl=lay.mUrl;
+        mWMSLayerName=lay.mWMSLayerName;
         switch (mType) {
             case TypeLayer::FEE:
             case TypeLayer::CS:
@@ -152,6 +156,11 @@ public:
 
     basicStat computeBasicStatOnPolyg(OGRGeometry * poGeom);
     std::string summaryStat(OGRGeometry * poGeom);
+
+    // j'envisage d'utiliser gdal pour la création de carte static (raster wms + un shapefile dessiné par dessus)
+    // tente de convertir le wms de la couche au format raster
+    //bool wms2jpg(OGREnvelope extent, double aGsd);
+    bool wms2jpg() const;
 
     // raster value
     int getValue(double x, double y);
@@ -263,6 +272,7 @@ public:
     }
     cDicoApt * Dico(){return mDico;}
     cEss * Ess(){return mEss;}
+        //WMSinfo * mWMS;
 private:
     bool mActive;
     // les couches sont taggées comme étant expert ou non expert
@@ -280,6 +290,7 @@ private:
     std::string mPathTif;
     //std::string mDirTuile;
     std::string mCode;
+
 };
 
 #endif // LAYER_H

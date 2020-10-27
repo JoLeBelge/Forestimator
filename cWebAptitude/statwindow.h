@@ -10,6 +10,8 @@
 #include <Wt/WApplication.h>
 //#include "iostream"
 
+#include "wkhtml/wkhtmlutil.h"
+
 class ReportResource;
 class statWindow;
 
@@ -48,6 +50,7 @@ private:
     /*  Signal pour récupérer l'image en base float pour générer un PDF     */
     JSlot slotImgPDF;
     JSignal<std::string>  sigImgPDF;
+
 };
 
 #endif // STATWINDOW_H

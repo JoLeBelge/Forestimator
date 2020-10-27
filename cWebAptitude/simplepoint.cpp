@@ -263,28 +263,8 @@ void simplepoint::afficheAptAllEss(){
     }
 }
 
+
 void simplepoint::export2pdf(){
-
-    HPDF_Doc pdf = HPDF_New(error_handler, 0);
-    HPDF_UseUTFEncodings(pdf); // enables UTF-8 encoding with true type fonts
-    HPDF_SetCurrentEncoder(pdf, "UTF-8");
-    HPDF_Page page = HPDF_AddPage(pdf);
-    HPDF_Page_SetSize(page, HPDF_PAGE_SIZE_A4, HPDF_PAGE_PORTRAIT);
-
-    Render::WPdfRenderer renderer(pdf, page);
-    renderer.setMargin(2.54);
-    renderer.setDpi(96);
-    renderer.addFontCollection("/usr/share/fonts/truetype",true);
-
-    Wt::WString ss = tr("report.analyse.test");
-    renderer.render(ss);
-
-    HPDF_SaveToFile(pdf, "./hello.pdf");
-    HPDF_Free(pdf);
-
-}
-
-void simplepoint::export2pdf1(){
     std::cout << "simplepoint::export2pdf()" << std::endl;
     // création du pdf
     HPDF_Doc pdf = HPDF_New(error_handler, 0);
@@ -331,16 +311,24 @@ void simplepoint::export2pdf1(){
     // export de l'image de l'écogramme
 
 
-    Wt::WRasterImage pngImage("jpeg", 0, 0);
+
+    Wt::WRasterImage pngImage("png", 400, 400);
+
+    //pngImage.addFontCollection("/usr/share/fonts/truetype",true);
 
     // bug constaté ; https://redmine.webtoolkit.eu/issues/7769
 
     //Wt::WPainter p(&pngImage);
+    pngImage.drawLine(1,1,300,300);
+
     for (int i(0);i<400;i++){
-    pngImage.setPixel(i,i,WColor("red"));
+    //pngImage.setPixel(i,i,WColor(100,100,100));
+
     std::cout << " position i " << i << "," << i << std::endl;
     std::cout << pngImage.getPixel(i,i).name().toUTF8() << std::endl;
+    std::cout << pngImage.getPixel(i,i).red() << std::endl;
     }
+
     WFont painterFont;
     painterFont.setSize(16);
     painterFont.setFamily(WFont::Family::SansSerif);
@@ -348,23 +336,21 @@ void simplepoint::export2pdf1(){
     WPainter painter(&pngImage);
     painter.setFont(painterFont);
     painter.drawText(10, 10, 125, 50,Wt::AlignmentFlag::Left, WString::fromUTF8("Arch Linux"));
-
+    //painter.end();
 
     //mEcoEss->draw(&p);
     std::string name01 = std::tmpnam(nullptr);
     std::string name11 = name01.substr(5,name01.size()-5);
-    std::string aEcoPng = mDico->File("TMPDIR")+"/"+name11+".jpg";
+    std::string aEcoPng = mDico->File("TMPDIR")+"/"+name11+".png";
     std::ofstream f(aEcoPng, std::ios::out | std::ios::binary);
     std::cout << "Write ecogramme in a png" << std::endl;
+   // pngImage.done();
     pngImage.write(f);
 
-    //f << 1;
     f.close();
 
     Wt::WString ws(tp,Wt::CharEncoding::UTF8);
     renderer.render(ws);
-
-
 
     std::string name0 = std::tmpnam(nullptr);
     std::string name1 = name0.substr(5,name0.size()-5);

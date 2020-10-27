@@ -105,7 +105,8 @@ void statWindow::generateGenCarte(OGRFeature * poFeature){
      WContainerWidget * aContCarte = layoutV->addWidget(cpp14::make_unique<WContainerWidget>());
      WHBoxLayout * layoutH = aContCarte->setLayout(cpp14::make_unique<WHBoxLayout>());
      // ajout de la carte pour cette couche
-     layoutH->addWidget(cpp14::make_unique<olOneLay>(mIGN,poFeature->GetGeometryRef()),0);
+     olOneLay * olStatic =layoutH->addWidget(cpp14::make_unique<olOneLay>(mIGN,poFeature->GetGeometryRef()),0);
+     olStatic->setId("olCarteGenerale");
      // description générale ; lecture des attribut du polygone?calcul de pente, zone bioclim, et élévation
      WContainerWidget * aContInfo = layoutH->addWidget(cpp14::make_unique<WContainerWidget>());
      // je refais les calculs pour les couches qui m'intéressent
@@ -148,11 +149,15 @@ std::string roundDouble(double d, int precisionVal){
 }
 
 
-
-
-
 void statWindow::export2pdf(std::string img){
     //std::cout << "statWindow::export2pdf() " << img.c_str() << std::endl;
     std::cout << "statWindow::export2pdf() " << img << std::endl;
+
+    // test wkhtml
+    std::ostringstream o;
+
+    // pourquoi la carte ne passe pas bien/de manière complête en html? c'est parce que ce n'est pas du html mais du js?
+    mCarteGenCont->htmlText(o);
+    wkhtml(o.str());
 
 }
