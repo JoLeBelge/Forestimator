@@ -90,7 +90,7 @@ cWebAptitude::cWebAptitude(AuthApplication *app, Auth::AuthWidget* authWidget_)
     c_img1->addStyleClass("logo_left");
 
     WContainerWidget *c_img2 = container_home->addWidget(Wt::cpp14::make_unique<Wt::WContainerWidget>());
-    Wt::WImage *img2 = c_img2->addNew<Wt::WImage>(Wt::WLink("resources/fpb.png"));
+    c_img2->addNew<Wt::WImage>(Wt::WLink("resources/fpb.png"));
     c_img2->addStyleClass("logo_right");
     /*	FIN HOME PAGE	*/
 
@@ -110,7 +110,7 @@ cWebAptitude::cWebAptitude(AuthApplication *app, Auth::AuthWidget* authWidget_)
     // page principale
     WContainerWidget * page_carto = sub_stack->addNew<WContainerWidget>();
     // page de statistique
-    statWindow * page_camembert = sub_stack->addNew<statWindow>(mDico);
+    statWindow * page_camembert = sub_stack->addNew<statWindow>(mDico, m_app);
     //WContainerWidget * page_camembert = sub_stack->addNew<WContainerWidget>();
     sub_stack->addNew<presentationPage>();
 
@@ -247,6 +247,7 @@ void cWebAptitude::handlePathChange()
         m_app->doJavaScript("alert('Pas encore implémenté...')");
     }else if (m_app->internalPath() == "/"){
         // do nothing
+    }else if (m_app->internalPath() == "/export_pdf"){
     }else{
         std::cout << "m_app->internalPath() " << m_app->internalPath() << std::endl;
         std::cout << "internal path pas geré dans le handler " << m_app->internalPath() << std::endl;

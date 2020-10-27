@@ -41,5 +41,10 @@ int main(int argc, char **argv)
 
 std::unique_ptr<Wt::WApplication> createAuthApplication(const Wt::WEnvironment &env)
 {
-  return Wt::cpp14::make_unique<AuthApplication>(env);
+    std::cout << env.internalPath() << " " << env.deploymentPath() << std::endl;
+    std::cout << env.getParameter("a0") << std::endl;
+    std::cout << env.getParameter("a1") << std::endl;
+    //if(env.internalPath()="")
+
+    return Wt::cpp14::make_unique<AuthApplication>(env);
 }

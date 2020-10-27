@@ -289,8 +289,6 @@ void simplepoint::export2pdf1(){
     // création du pdf
     HPDF_Doc pdf = HPDF_New(error_handler, 0);
     HPDF_UseUTFEncodings(pdf);
-
-
     HPDF_Page page = HPDF_AddPage(pdf);
     HPDF_Page_SetSize(page, HPDF_PAGE_SIZE_A4, HPDF_PAGE_PORTRAIT);
 

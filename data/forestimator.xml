@@ -436,4 +436,41 @@ ${AptTable}
 </message>
 
 
+<message id="report.statwindow">
+	<div>
+		  <h1>Forestimator : analyse parcelaire</h1>
+
+		  <style>
+		span.special {
+		  color: #FF0000;
+		  font-weight: bold;
+		}
+
+		#main_table {
+		  font-size: 8pt;
+		  margin-left: auto;
+		  margin-right: auto;
+		}
+
+		#main_table .special {
+		  color: #FF0000;
+		}
+
+		#main_table th {
+		  border-bottom: 1px solid black;
+		}
+		
+		  </style>
+
+		<div><img src="${carte_static_1}"/></div>
+		<div>
+		${AptTable}
+		</div>
+		<div>${InfoT}</div>
+	</div>
+</message>
+
+
+
+
 </messages>

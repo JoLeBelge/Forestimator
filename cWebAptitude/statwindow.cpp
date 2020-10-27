@@ -1,6 +1,6 @@
 #include "statwindow.h"
 
-statWindow::statWindow(cDicoApt *aDico):mDico(aDico), sigImgPDF(this,"pdf"), slotImgPDF(this)
+statWindow::statWindow(cDicoApt *aDico, AuthApplication *app):mDico(aDico), mApp(app), sigImgPDF(this,"pdf"), slotImgPDF(this)
 {
     setId("statWindow");
     setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Left);
@@ -19,22 +19,13 @@ statWindow::statWindow(cDicoApt *aDico):mDico(aDico), sigImgPDF(this,"pdf"), slo
     // bouton export PDF
     createPdfBut = contTitre_->addWidget(cpp14::make_unique<WPushButton>("Export PDF"));
     createPdfBut->clicked().connect(this->slotImgPDF);
+    //createPdfBut->setLink(WLink(LinkType::InternalPath, "/export_pdf"));
     //sigImgPDF.connect(std::bind(&statWindow::export2pdf,this, std::placeholders::_1));
     sigImgPDF.connect(this, &statWindow::export2pdf);
-    slotImgPDF.setJavaScript("function () {"
-                             "var mapCanvas = document.createElement('canvas');"
-                             "var size = map.getSize();"
-                             "mapCanvas.width = size[0];"
-                             "mapCanvas.height = size[1];"
-                             "var mapContext = mapCanvas.getContext('2d');"
-                             "var canvas = document.querySelectorAll('.ol-viewport canvas');"
-                             "mapContext.drawImage(canvas[1], 0, 0);"
-                             "var img = 'E'+mapCanvas.toDataURL();"
-                             "img=img.substr(0,15);"
-                             "console.log(img);"
-                             "var a = 5;"
-                             + sigImgPDF.createCall({"img"}) + "}");
 
+    // 75k,100k,112.5k,120k ok
+    // 125k,122.5k KO
+    // "img=img.substr(0,122500);"
 
     /*auto pdf = std::make_shared<ReportResource>(this);
     createPdfBut->setLink(WLink(pdf));
@@ -105,7 +96,25 @@ void statWindow::generateGenCarte(OGRFeature * poFeature){
      WContainerWidget * aContCarte = layoutV->addWidget(cpp14::make_unique<WContainerWidget>());
      WHBoxLayout * layoutH = aContCarte->setLayout(cpp14::make_unique<WHBoxLayout>());
      // ajout de la carte pour cette couche
-     layoutH->addWidget(cpp14::make_unique<olOneLay>(mIGN,poFeature->GetGeometryRef()),0);
+     static_map_1 = layoutH->addWidget(cpp14::make_unique<olOneLay>(mIGN,poFeature->GetGeometryRef()),0);
+     // need to set it here after initialization of the map id !
+     slotImgPDF.setJavaScript("function () {"
+                              "var mapCanvas = document.createElement('canvas');"
+                              "var size = mapStat"+static_map_1->id()+".getSize();"
+                              "mapCanvas.width = size[0];"
+                              "mapCanvas.height = size[1];"
+                              "var mapContext = mapCanvas.getContext('2d');"
+                              "var canvas = document.querySelectorAll('.ol-viewport canvas');"
+                              "mapContext.drawImage(canvas[1], 0, 0);"
+                              "var img = ''+mapCanvas.toDataURL();"
+                              "console.log('length of img text='+img.length);"
+                              "var l=img.length;"
+                              "var maxiter=0;"
+                              "if(img.length>120000){"
+                              "  img=img.substr(0,120000);"
+                              "}"
+                              + sigImgPDF.createCall({"img","l"}) + "}");
+
      // description générale ; lecture des attribut du polygone?calcul de pente, zone bioclim, et élévation
      WContainerWidget * aContInfo = layoutH->addWidget(cpp14::make_unique<WContainerWidget>());
      // je refais les calculs pour les couches qui m'intéressent
@@ -149,9 +158,82 @@ std::string roundDouble(double d, int precisionVal){
 
 
 
-void statWindow::export2pdf(std::string img){
-    //std::cout << "statWindow::export2pdf() " << img.c_str() << std::endl;
-    std::cout << "statWindow::export2pdf() " << img << std::endl;
+void statWindow::export2pdf(std::string img, int length){
+    std::cout << "statWindow::export2pdf() size :" << length << "; ind=" << chunkImgPDFind << std::endl;
+
+    if(length>120000){
+        if(chunkImgPDF==0){
+            chunkImgPDF=length/120000;
+            if(length%120000>0)chunkImgPDF++;
+            chunkImgPDFind=1;
+            std::cout << "statWindow::export2pdf() chunks :" << chunkImgPDF << std::endl;
+            strImgPDF=img;
+        }else{
+            strImgPDF=strImgPDF+img;
+            chunkImgPDFind++;
+            std::cout << "statWindow::export2pdf() chunks ind :" << chunkImgPDFind << std::endl;
+        }
+
+        if(chunkImgPDFind<chunkImgPDF){
+            doJavaScript(
+                 "var mapCanvas = document.createElement('canvas');"
+                 "var size = mapStat"+static_map_1->id()+".getSize();"
+                 "mapCanvas.width = size[0];"
+                 "mapCanvas.height = size[1];"
+                 "var mapContext = mapCanvas.getContext('2d');"
+                 "var canvas = document.querySelectorAll('.ol-viewport canvas');"
+                 "mapContext.drawImage(canvas[1], 0, 0);"
+                 "var img = ''+mapCanvas.toDataURL();"
+                 "var l=img.length;"
+                 "img=img.substr("+std::to_string(chunkImgPDFind*120000)+",120000);"
+                 "Wt.emit('statWindow','pdf',img,l);");
+            return;
+        }else {
+            chunkImgPDF=0;      // reset
+            chunkImgPDFind=0;   // reset
+        }
+    }else{
+        strImgPDF=img;
+    }
+
+    // création du pdf
+    HPDF_Doc pdf = HPDF_New(error_handler, 0);
+    HPDF_UseUTFEncodings(pdf);
+    HPDF_SetCurrentEncoder(pdf, "UTF-8");
+    HPDF_Page page = HPDF_AddPage(pdf);
+    HPDF_Page_SetSize(page, HPDF_PAGE_SIZE_A4, HPDF_PAGE_PORTRAIT);
+
+    Wt::Render::WPdfRenderer renderer(pdf, page);
+    renderer.setMargin(2.54);
+    renderer.setDpi(96);
+    renderer.addFontCollection("/usr/share/fonts/truetype",true);
+    // post sur l'export des widgets vers pdf - pas super clair mais informatif
+    //https://redmine.webtoolkit.eu/boards/2/topics/14392?r=14462#message-14462
+
+    std::ostringstream o;
+    mAptTable->htmlText(o);
+    Wt::WString tpl = tr("report.statwindow");
+    std::string tp = tpl.toUTF8();
+    //boost::replace_all(tp,"${AptTable}",o.str());
+    boost::replace_all(tp,"${carte_static_1}",strImgPDF);
+
+    std::cout << tp << std::endl;
+    // en créant le WString avec charencoding local il ne met plus d'erreur dans la console mais ça n'empèche que le résultat est décevant, les accents ne passent pas dans le pdf
+    // pbl d'encodage , vérifier p-e l'encodage de ostringstream?
+    //renderer.render(Wt::WString(tp,Wt::CharEncoding::UTF8));
+    renderer.render(tp);
+
+    std::string name0 = std::tmpnam(nullptr);
+    std::string name1 = name0.substr(5,name0.size()-5);
+    std::string aOut = mDico->File("TMPDIR")+"/"+name1+".pdf";
+
+    HPDF_SaveToFile(pdf,aOut.c_str());
+    HPDF_Free(pdf);
+    WFileResource *fileResource = new Wt::WFileResource("plain/text",aOut);
+    fileResource->suggestFileName("Forestimator-info-parcelaire.pdf");
+    mApp->redirect(fileResource->url());
+
+
     //std::ostream o
     //std::ostringstream o;
     //this->htmlText(o);

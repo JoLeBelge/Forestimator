@@ -2,6 +2,7 @@
 #define STATWINDOW_H
 #include "grouplayers.h"
 #include "layerstatchart.h"
+#include "auth/auth.h"
 #include <hpdf.h>
 #include <Wt/WResource.h>
 #include <Wt/Http/Request.h>
@@ -20,7 +21,7 @@ class statWindow : public Wt::WContainerWidget
 {
 public:
     // a besoin du dictionnaire pour créer le layer qui contient la carte IGN pour faire la carte de situation globale
-    statWindow(cDicoApt * aDico);
+    statWindow(cDicoApt * aDico, AuthApplication *app);
 
     void vider();
     void titre(std::string aTitre){mTitre->setText(aTitre);}
@@ -28,7 +29,7 @@ public:
     void add1layerStat(Wt::WContainerWidget * layerStat);
     void generateGenCarte(OGRFeature *poFeature);
 
-    void export2pdf(std::string img);
+    void export2pdf(std::string img, int length);
 
     WText * mTitre;
     WTable * mAptTable;
@@ -36,6 +37,7 @@ public:
     WContainerWidget * mCarteGenCont;
 private:
     cDicoApt * mDico;
+    AuthApplication * mApp;
 
     Wt::WVBoxLayout * layout;
 
@@ -45,9 +47,14 @@ private:
     // pour les information générales
     Layer * mMNT, * mZBIO, * mPente;
 
+    olOneLay *static_map_1;
+
     /*  Signal pour récupérer l'image en base float pour générer un PDF     */
     JSlot slotImgPDF;
-    JSignal<std::string>  sigImgPDF;
+    JSignal<std::string, int>  sigImgPDF;
+    int chunkImgPDF=0;
+    int chunkImgPDFind=0;
+    std::string strImgPDF;
 };
 
 
