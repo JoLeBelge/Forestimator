@@ -447,10 +447,8 @@ olOneLay::olOneLay(Layer * aLay, OGRGeometry *poGeom):mLay(aLay){
     if (mLay->getCode()=="IGN"){std::cout << JScommand << std::endl;}
 }
 
-staticMap::staticMap(Layer * aLay, OGRGeometry *poGeom):mLay(aLay),WPaintedWidget(){
+staticMap::staticMap(Layer * aLay, OGRGeometry *poGeom):mLay(aLay){
 
-
-    resize(639, 1310);  // Provide a default size.
     std::string name0 = std::tmpnam(nullptr);
     std::string name1 = name0.substr(5,name0.size()-5);
     mFileName = mLay->Dico()->File("TMPDIR")+"/"+name1+".pgn";
@@ -471,7 +469,8 @@ staticMap::staticMap(Layer * aLay, OGRGeometry *poGeom):mLay(aLay),WPaintedWidge
 
         GDALDataset  * poDS = (GDALDataset *) GDALOpen( mFileName.c_str(), GA_Update );
         if (poDS!=NULL){
-
+            //utiliser magick++ pour dessiner sur l'image
+            //poGeom->
 
         }
     }
