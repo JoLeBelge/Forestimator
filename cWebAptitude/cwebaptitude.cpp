@@ -247,7 +247,6 @@ void cWebAptitude::handlePathChange()
         m_app->doJavaScript("alert('Pas encore implémenté...')");
     }else if (m_app->internalPath() == "/"){
         // do nothing
-    }else if (m_app->internalPath() == "/export_pdf"){
     }else{
         std::cout << "m_app->internalPath() " << m_app->internalPath() << std::endl;
         std::cout << "internal path pas geré dans le handler " << m_app->internalPath() << std::endl;

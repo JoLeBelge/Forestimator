@@ -30,7 +30,7 @@ void simplepoint::createUI()
     mParent->addWidget(cpp14::make_unique<WText>(tr("sp_infoclic")));
     mParent->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
     createPdfBut = mParent->addWidget(Wt::cpp14::make_unique<WPushButton>("Export pdf"));
-    createPdfBut->clicked().connect(this,&simplepoint::export2pdf);
+    createPdfBut->clicked().connect(this,&simplepoint::export2pdfTitreDialog);
 
     mAptAllEss = mParent->addWidget(cpp14::make_unique<WTable>());
     mAptAllEss->setHeaderCount(1);
@@ -47,6 +47,7 @@ void simplepoint::createUI()
     mContEco->setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Center);
 
     mInfoT = mParent->addWidget(cpp14::make_unique<WTable>());
+    mInfoT->setId("infoT");
     //mInfoT->setHeaderCount(2);
     mInfoT->setHeaderCount(1);
     mInfoT->setWidth(Wt::WLength("90%"));
@@ -56,7 +57,7 @@ void simplepoint::createUI()
 
 void simplepoint::vider()
 {
-	//mTitle->setStyleClass("nonvisible");
+    //mTitle->setStyleClass("nonvisible");
     //mTitle->setText(WString::tr("legendTitre"));
     mInfoT->clear();
     mDetAptFEE->clear();
@@ -70,8 +71,8 @@ void simplepoint::titreInfoRaster(){
     mInfoT->elementAt(0, 0)->setContentAlignment(AlignmentFlag::Top | AlignmentFlag::Center);
     mInfoT->elementAt(0, 0)->setPadding(10);
     mInfoT->elementAt(0,0)->addWidget(cpp14::make_unique<WText>(tr("titre-InfoTableAna-point")));
-   // mInfoT->elementAt(1, 0)->addWidget(cpp14::make_unique<WText>("Couche"));
-   //mInfoT->elementAt(1, 1)->addWidget(cpp14::make_unique<WText>("Valeur"));
+    // mInfoT->elementAt(1, 0)->addWidget(cpp14::make_unique<WText>("Couche"));
+    //mInfoT->elementAt(1, 1)->addWidget(cpp14::make_unique<WText>("Valeur"));
 }
 
 void simplepoint::add1InfoRaster(std::vector<std::string> aV){
@@ -127,31 +128,6 @@ void simplepoint::detailCalculAptFEE(ST * aST){
     mEcoEss = mContEco->addWidget(Wt::cpp14::make_unique<EcogrammeEss>(Ess,aST));
     mContEco->addWidget(cpp14::make_unique<WText>(tr("legendEcogramme")));
 }
-
-/*void simplepoint::afficheLegendeIndiv(const Layer * l){
-
-    if (l->Type()!=TypeLayer::Externe){
-        // vider la légende et afficher la légende personnelle de la couche active
-        //std::cout << " je vais afficher la légende personnalisée pour " <<l->getLegendLabel() <<std::endl;
-        vider();
-        int row(0);
-        mLegendIndiv->elementAt(row, 0)->setColumnSpan(2);
-        mLegendIndiv->elementAt(row, 0)->setContentAlignment(AlignmentFlag::Top | AlignmentFlag::Center);
-        mLegendIndiv->elementAt(row, 0)->setPadding(10);
-        //WText *titre = mLegendIndiv->elementAt(row,0)->addWidget(cpp14::make_unique<WText>("<h4>"+l->getLegendLabel()+"</h4>"));
-        mLegendIndiv->elementAt(row,0)->addWidget(cpp14::make_unique<WText>("<h4>"+l->getLegendLabel()+"</h4>"));
-        row++;
-        for (auto kv : *l->mDicoVal){
-            if (l->hasColor(kv.first)){
-                color col = l->getColor(kv.first);
-                mLegendIndiv->elementAt(row, 0)->addWidget(cpp14::make_unique<WText>(kv.second));
-                mLegendIndiv->elementAt(row, 1)->setWidth("40%");
-                mLegendIndiv->elementAt(row, 1)->decorationStyle().setBackgroundColor(WColor(col.mR,col.mG,col.mB));
-                row++;
-            }
-        }
-    }
-}*/
 
 void simplepoint::afficheAptAllEss(){
 
@@ -264,40 +240,73 @@ void simplepoint::afficheAptAllEss(){
 }
 
 
-void simplepoint::export2pdf(){
+void simplepoint::export2pdfTitreDialog(){
+// TITRE
+// modal dialog ; devrait bloquer l'app jusqu'à ce que l'utilisateur clique
+WText * titre=new WText();
+Wt::WDialog * dialog = this->addChild(Wt::cpp14::make_unique<Wt::WDialog>("Titre du rapport pdf"));
+Wt::WLabel *label = dialog->contents()->addNew<Wt::WLabel>("Titre: ");
+Wt::WLineEdit *edit =dialog->contents()->addNew<Wt::WLineEdit>();
+edit->setText(tr("report.analyse.point.titre"));
+label->setBuddy(edit);
+dialog->contents()->addStyleClass("form-group");
+Wt::WPushButton *ok =
+        dialog->footer()->addNew<Wt::WPushButton>("OK");
+ok->setDefault(true);
+ok->clicked().connect([=] {
+    dialog->accept();
+});
+
+dialog->finished().connect([=] {
+    //titre->setText(edit->text());
+    export2pdf(edit->text().toUTF8());
+    removeChild(dialog);
+});
+dialog->show();
+}
+
+void simplepoint::export2pdf(std::string titre){
     std::cout << "simplepoint::export2pdf()" << std::endl;
     // création du pdf
     HPDF_Doc pdf = HPDF_New(error_handler, 0);
+
     HPDF_UseUTFEncodings(pdf);
     HPDF_Page page = HPDF_AddPage(pdf);
     HPDF_Page_SetSize(page, HPDF_PAGE_SIZE_A4, HPDF_PAGE_PORTRAIT);
+    HPDF_SetCompressionMode(pdf, HPDF_COMP_ALL);// sinon pdf fait 5 Mo pour rien du tout
 
-    Wt::Render::WPdfRenderer renderer(pdf, page);
-    renderer.setMargin(2.54);
-    renderer.setDpi(96);
-    renderer.addFontCollection("/usr/share/fonts/truetype",true);
-    renderer.useStyleSheet("style/bootstrap-theme.min.css");// fonctionne pas, le parsing ne va pas pour ce css.
+    MyRenderer renderer(pdf, page,titre);
 
-    //std::cout << renderer.getStyleSheetParseErrors() << std::endl;
-    // pbl avec les template, c'est le bind dois recevoir un unique ptr, et donc détruit les objets qu'on lui bind = segmentation fault
-
-    std::ostringstream o;
-    mAptAllEss->htmlText(o);
     Wt::WString tpl = tr("report.analyse.point");
     std::string tp = tpl.toUTF8();
+    std::ostringstream o;
+
+    //renderer.addFontCollection("/usr/share/fonts/truetype",true); plus nécessaire si compilé avec pango
+
+    boost::replace_all(tp,"TITRE_REPPORT",titre);
+
+    // RENDU TABLE d'APTITUDE
+    mAptAllEss->htmlText(o);
     boost::replace_all(tp,"${AptTable}",o.str());
+
+    // RENDU TABLES AVEC DESCRIPTION DE LA STATION
     // vider le oss
     o.str("");
     o.clear();
     mInfoT->htmlText(o);
     boost::replace_all(tp,"${InfoT}",o.str());
 
+    // RENDU LISTE D'ACCRONYME des ESSENCES
+
     Wt::WTable * legendAcroEs= new Wt::WTable();
+    legendAcroEs->setId("legendAcroEs"); // dans le template html j'ai un style défini pour l'objet ayant cet id
     int row(0);
+    int col(0);
     for (auto kv : *mGL->Dico()->code2Nom() ){
-        legendAcroEs->elementAt(row, 0)->addWidget(cpp14::make_unique<WText>(kv.first));
-        legendAcroEs->elementAt(row, 1)->addWidget(cpp14::make_unique<WText>(kv.second));
+        legendAcroEs->elementAt(row, col)->addWidget(cpp14::make_unique<WText>(kv.first));
+        legendAcroEs->elementAt(row, col+1)->addWidget(cpp14::make_unique<WText>(kv.second));
         row++;
+        if (row>20){row=0;col=col+2;}
     }
     o.str("");
     o.clear();
@@ -305,68 +314,65 @@ void simplepoint::export2pdf(){
     boost::replace_all(tp,"${legendAcro}",o.str());
     o.str("");
     o.clear();
-   // mEcoEss->htmlText(o); ça bug, hélas.
-   // boost::replace_all(tp,"${EcoEss}",o.str());
-    // export de l'image de l'écogramme
 
-    //Wt::WRasterImage pngImage("png", WLength(400), WLength(400));
-    //pngImage.clear();
-    //pngImage.addFontCollection("/usr/share/fonts/truetype",true);
 
-    //pngImage.addFontCollection("/usr/share/fonts/truetype",true);
+    // RENDU CARTE ACTIVE AVEC POSITION de la STATION
 
-    // bug constaté ; https://redmine.webtoolkit.eu/issues/7769
-    //Wt::WPainter::Image image("img/ecogramme.png", 639, 354);
+    OGRPoint pt = mGL->mStation->getPoint();
+    staticMap sm(mGL->getActiveLay(),&pt);
+    boost::replace_all(tp,"PATH_CARTE",sm.getFileName());
+    boost::replace_all(tp,"TITRE_CARTE",mGL->getActiveLay()->getLegendLabel(0));
 
-    //pngImage.drawImage();
-    //Wt::WPainter p(&pngImage);
-    //pngImage.drawLine(1,1,300,300);
+    if (mGL->mStation->ecogramme()){
 
-    /*
-    for (int i(0);i<400;i++){
-    pngImage.setPixel(i,i,WColor(100,100,100));
+        // RENDU ECOGRAMME
+        std::cout << "Write ecogramme in a png" << std::endl;
 
-    std::cout << " position i " << i << "," << i << std::endl;
-    std::cout << pngImage.getPixel(i,i).name().toUTF8() << std::endl;
-    std::cout << pngImage.getPixel(i,i).red() << std::endl;
+        // export de l'image de l'écogramme
+        // bug constaté ; https://redmine.webtoolkit.eu/issues/7769
+        // pour ma part j'ai réinstallé Graphicmagick puis cela fonctionnais
+        int aEcoWidth(750);
+        int aHeigth(aEcoWidth*15.0/7.0);
+
+        Wt::WRasterImage pngImage("png", WLength(aEcoWidth), WLength(aHeigth));
+        Wt::WPainter::Image image("/home/lisein/Documents/carteApt/Forestimator/data/img/ecogrammeAxes.png","/home/lisein/Documents/carteApt/Forestimator/data/img/ecogrammeAxes.png");//, aEcoWidth, aHeigth);
+        //pngImage.drawImage(0,0,);
+        //Wt::WPainter::Image()
+
+        std::string name01 = std::tmpnam(nullptr);
+        std::string name11 = name01.substr(5,name01.size()-5);
+        std::string aEcoPng = mDico->File("TMPDIR")+"/"+name11+".png";
+        std::ofstream f(aEcoPng, std::ios::out | std::ios::binary);
+        WPainter painter(&pngImage);
+        Wt::WRectF destinationRect = Wt::WRectF(0.0,0.0,aEcoWidth, aHeigth);
+        painter.drawImage(destinationRect,image);
+        // il faut adapter la méthode draw pour lui donner en argument optionnel la taille de l'image et la position x0,y0à partir de laquelle on dessine
+        mEcoEss->draw(&painter, aEcoWidth,239,332);
+        pngImage.done();
+        pngImage.write(f);
+        f.close();
+        // ajout dans le pdf
+        std::string baliseEco = tr("report.eco").toUTF8();
+        boost::replace_all(baliseEco,"PATH_ECO",aEcoPng);
+        boost::replace_all(baliseEco,"TITRE_ECO","Ecogramme - "+mGL->mStation->mActiveEss->Nom());
+
+        boost::replace_all(tp,"REPORT_ECO",baliseEco);
+
+    } else {
+        boost::replace_all(tp,"REPORT_ECO","");
     }
 
-    WFont painterFont;
-    painterFont.setSize(16);
-    painterFont.setFamily(WFont::Family::SansSerif);
+    renderer.render(tp);
 
-    //WPainter painter(&pngImage);
-    //WPainter *  painter= pngImage.painter();
-    //painter->setFont(painterFont);
-    WRectF rect(0, 0, 100, 100);
-    Wt::WPointF * pf=new Wt::WPointF(0,0);
-    pngImage.drawText(rect,Wt::AlignmentFlag::Left,Wt::TextFlag::SingleLine, WString::fromUTF8("Arch Linux"),pf);
-
-    //painter.end();
-
-    //mEcoEss->draw(&p);
-    std::string name01 = std::tmpnam(nullptr);
-    std::string name11 = name01.substr(5,name01.size()-5);
-    std::string aEcoPng = mDico->File("TMPDIR")+"/"+name11+".png";
-    std::ofstream f(aEcoPng, std::ios::out | std::ios::binary);
-    std::cout << "Write ecogramme in a png" << std::endl;
-   // pngImage.done();
-    pngImage.write(f);
-    f.close();
-     */
-
-    Wt::WString ws(tp,Wt::CharEncoding::UTF8);
-    renderer.render(ws);
-
+    // création du fichier pdf
     std::string name0 = std::tmpnam(nullptr);
     std::string name1 = name0.substr(5,name0.size()-5);
     std::string aOut = mDico->File("TMPDIR")+"/"+name1+".pdf";
-
     HPDF_SaveToFile(pdf,aOut.c_str());
     HPDF_Free(pdf);
     WFileResource *fileResource = new Wt::WFileResource("application/pdf",aOut);
-    fileResource->suggestFileName("Forestimator-info-ponctuelle.pdf");
+    boost::replace_all(titre," ","-");
+    fileResource->suggestFileName(titre+".pdf");
 
     mGL->m_app->redirect(fileResource->url());
-
 }

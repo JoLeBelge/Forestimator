@@ -407,13 +407,14 @@ void parcellaire::visuStat(OGRFeature *poFeature){
     mStatW->titre("<h4>Statistique pour polygone FID " + std::to_string(poFeature->GetFID()) + " de " + mClientName+ "</h4>");
 
     mStatW->generateGenCarte(poFeature);
+    std::cout << " genCarte done... " ;
     for (layerStatChart * chart : mGL->ptrVLStat()) {
         if (chart->deserveChart()){
 
             if (chart->Lay()->Type()==TypeLayer::FEE | chart->Lay()->Type()==TypeLayer::CS){
                 mStatW->add1Aptitude(chart);
             } else {
-                mStatW->add1layerStat(chart->getChart());
+                mStatW->add1layerStat(chart);
 
             }
 

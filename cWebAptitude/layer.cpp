@@ -679,38 +679,16 @@ std::string Layer::summaryStat(OGRGeometry * poGeom){
 }
 
 
-bool Layer::wms2jpg(OGREnvelope extent,std::string aOut) const{
-//bool Layer::wms2jpg() const{
+bool Layer::wms2jpg(OGREnvelope extent, int aSx, int aSy, std::string aOut) const{
 
-    std::cout << "Layer::wms2jpg()" << std::endl;
+    //std::cout << "Layer::wms2jpg()" << std::endl;
     bool aRes(0);
 
         GDALAllRegister();
-
-        /*
-        const char *connStr = CPLSPrintf("<GDAL_WMS><Service name=\"WMS\">"
-                "<ServerUrl>%s</ServerUrl></Service><DataWindow>"
-                "<UpperLeftX>%f</UpperLeftX><UpperLeftY>%f</UpperLeftY>"
-                "<LowerRightX>%f</LowerRightX><LowerRightY>%f</LowerRightY>"
-                "<TileLevel>%d</TileLevel><TileCountX>1</TileCountX>"
-                "<TileCountY>1</TileCountY><YOrigin>top</YOrigin></DataWindow>"
-                "<Projection>EPSG:31370</Projection><BlockSizeX>256</BlockSizeX>"
-                "<BlockSizeY>256</BlockSizeY><BandsCount>%d</BandsCount>"
-                "<Cache><Type>file</Type>"
-                "</Cache><ZeroBlockHttpCodes>204,404</ZeroBlockHttpCodes></GDAL_WMS>",
-                                             wms.mUrl.c_str(), extent.MinX,
-                                             extent.MaxY, extent.MaxX,
-                                             extent.MinY, z_max,
-                                            // y_origin_top ? "top" : "bottom",
-                                             3);
-                                         //, cacheExpires,
-                                          //   cacheMaxSize);
-                                          */
-
-        //const char *connStr = "<GDAL_WMS>"
-
         std::string layerName=mWMSLayerName;
+        // urlify le nom de couche, enlever les espaces
         boost::replace_all(layerName," ","%20");
+
         const char *connStr = CPLSPrintf("<GDAL_WMS>"
                                          "<Service name=\"WMS\">"
                                          "<Version>1.1.1</Version>"
@@ -725,8 +703,8 @@ bool Layer::wms2jpg(OGREnvelope extent,std::string aOut) const{
                                          "<UpperLeftY>%f</UpperLeftY>"
                                          "<LowerRightX>%f</LowerRightX>"
                                          "<LowerRightY>%f</LowerRightY>"
-                                         "<SizeX>1000</SizeX>"
-                                         "<SizeY>1000</SizeY>"
+                                         "<SizeX>%d</SizeX>"
+                                         "<SizeY>%d</SizeY>"
                                          "</DataWindow>"
                                          "<Projection>EPSG:31370</Projection>"
                                          "<BandsCount>3</BandsCount>"
@@ -734,14 +712,16 @@ bool Layer::wms2jpg(OGREnvelope extent,std::string aOut) const{
                                          "<ZeroBlockOnServerException>true</ZeroBlockOnServerException>"
                                          "</GDAL_WMS>",
                                          mUrl.c_str(),
-                                         mWMSLayerName.c_str(),
+                                         layerName.c_str(),
                                          extent.MinX,
                                          extent.MaxY,
                                          extent.MaxX,
-                                         extent.MinY
+                                         extent.MinY,
+                                         aSx,
+                                         aSy
                                          );
 
-        std::cout << connStr << std::endl;
+        //std::cout << connStr << std::endl;
 
         GDALDataset *pDS = static_cast<GDALDataset*>(GDALOpenEx(
                                                          connStr, GDAL_OF_RASTER, nullptr, nullptr, nullptr));
@@ -764,7 +744,8 @@ bool Layer::wms2jpg(OGREnvelope extent,std::string aOut) const{
             pOutRaster = pDriverPNG->CreateCopy( aOut.c_str(), pDS, FALSE, NULL,NULL, NULL );
             if( pOutRaster != NULL ){ GDALClose( pOutRaster );}
             GDALClose( pDS );
-        }
 
+            aRes=1;
+        }
     return aRes;
 }

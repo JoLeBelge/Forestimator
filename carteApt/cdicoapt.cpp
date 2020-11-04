@@ -890,6 +890,7 @@ void ST::vider()
     mActiveEss=0;
     HaveEss=0;
     mSt=666;
+    hasFEEApt=0;
 }
 
 std::string removeAccents(std::string aStr){

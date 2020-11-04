@@ -38,6 +38,7 @@ class ST;
 class Layer;
 using namespace Wt;
 class color;
+class MyRenderer; // dérivé de classe WPdfRenderer pour laquelle on ajoute des footers, voir https://redmine.webtoolkit.eu/boards/2/topics/14334
 
 namespace {
     void HPDF_STDCALL error_handler(HPDF_STATUS error_no, HPDF_STATUS detail_no,
@@ -58,7 +59,8 @@ public:
     void detailCalculAptFEE(ST *aST);
     //void afficheLegendeIndiv(const Layer *l);
     void afficheAptAllEss();
-    void export2pdf();
+    void export2pdf(std::string titre);
+    void export2pdfTitreDialog();
 
     Wt::WTable                 *mInfoT;
     Wt::WTable                 *mDetAptFEE;
@@ -76,6 +78,45 @@ private:
     cDicoApt * mDico;
 
 };
+
+class MyRenderer : public Wt::Render::WPdfRenderer {
+
+public:
+
+  MyRenderer(HPDF_Doc pdf, HPDF_Page page,std::string aTitle): WPdfRenderer{pdf, page},pdf_{pdf},mytitle(aTitle)
+  {
+    setMargin(2.54, Wt::Side::Left | Wt::Side::Right | Wt::Side::Bottom);
+    setMargin(2.54, Wt::Side::Top);
+    //setMargin(3.54, Wt::Side::Top); // la mesure est en cm, donc j'ai laissé 1,5 centimètre de header
+    setDpi(96);
+    //renderHeader(currentPage()); pas de header sur page 1
+  }
+
+  HPDF_Page createPage ( int pageNum)
+  {
+    setMargin(3.54, Wt::Side::Top);
+    HPDF_Page newPage = WPdfRenderer::createPage(pageNum);       // then just pass back to the original render::createpage
+    renderHeader(newPage,pageNum);
+    return newPage;   // And return as normal
+  }
+
+  void renderHeader(HPDF_Page page, int pageNum) {
+    WPdfRenderer headerFooterRenderer{pdf_, page};
+    headerFooterRenderer.setMargin(1.54);
+    setDpi(96);
+   /* headerFooterRenderer.render(Wt::WString(
+        "<p style=\"text-align: center; margin-top: 0;\">Header</p>"
+        "<div style=\"height: 840px;\"></div>"
+        "<p style=\"text-align: center; margin-bottom: 0;\">Footer</p>"));*/
+    headerFooterRenderer.render(Wt::WString("<p style=\"text-align: center; margin-top: 0; font-size: 8pt;\">"+mytitle+", page "+ std::to_string(pageNum+1) +"</p>"));
+  }
+
+private:
+  std::string mytitle;
+  HPDF_Doc pdf_;
+
+};
+
 
 
 #endif // LEGEND_H

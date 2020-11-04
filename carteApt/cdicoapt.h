@@ -655,6 +655,12 @@ public:
     bool readyFEE(){ return hasNH() && hasNT() && hasZBIO() && hasTOPO();}
     bool readyCS(){ return hasZBIO() && hasST();}
     bool hasEss(){ return HaveEss;}
+    double getX(){return x;}
+    double getY(){return y;}
+    void setX(double a){x=a;}
+    void setY(double a){y=a;}
+    void setHasFEEApt(bool a){hasFEEApt=a;}
+    bool ecogramme(){return hasFEEApt;}
 
     int mNH,mNT,mZBIO,mTOPO;
     bool HaveEss;
@@ -662,7 +668,14 @@ public:
     cDicoApt * mDico;
     // catalogue de station
     int mSt;
+
+    OGRPoint getPoint(){
+        OGRPoint pt(x,y);
+        return pt;}
 private:
+    bool hasFEEApt;// pour savoir si l'écogramme est dessiné ou pas
+
+    double x,y;
 
 };
 #endif // CDICOAPT_H

@@ -39,9 +39,6 @@ int wkhtml(std::string html) {
 
     wkhtmltoimage_set_phase_changed_callback(c, phase_changed);
 
-
-
-
     wkhtmltoimage_set_warning_callback(c, warning);
 
      Perform the actual conversion */

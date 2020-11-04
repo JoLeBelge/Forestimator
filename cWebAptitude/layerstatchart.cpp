@@ -38,7 +38,7 @@ layerStatChart::layerStatChart(Layer *aLay, std::map<std::string, int> aStat, OG
 
 }
 
-Wt::WContainerWidget * layerStatChart::getChart(){
+Wt::WContainerWidget * layerStatChart::getChart(bool forRenderingInPdf){
 
     //std::cout << " creation d'un chart " << std::endl;
     Wt::WContainerWidget * aRes= new Wt::WContainerWidget();
@@ -47,14 +47,23 @@ Wt::WContainerWidget * layerStatChart::getChart(){
     aRes->setInline(0);
     aRes->setOverflow(Wt::Overflow::Auto);
 
-
     WVBoxLayout * layoutV = aRes->setLayout(cpp14::make_unique<WVBoxLayout>());
     layoutV->addWidget(cpp14::make_unique<WText>("<h4>"+mLay->getLegendLabel(false)+"</h4>"));
     //aRes->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
     WContainerWidget * aCont = layoutV->addWidget(cpp14::make_unique<WContainerWidget>());
     WHBoxLayout * layoutH = aCont->setLayout(cpp14::make_unique<WHBoxLayout>());
     // ajout de la carte pour cette couche
-    layoutH->addWidget(cpp14::make_unique<olOneLay>(mLay,mGeom),0);
+    //layoutH->addWidget(cpp14::make_unique<olOneLay>(mLay,mGeom),0);
+    staticMap sm(mLay,mGeom);
+    // ça fonctionne mais je ne gère pas bien la taille de l'image dans le conteneur, pour l'instant la taille de l'image affichée est celle de l'image sur le disque
+
+    if (forRenderingInPdf){
+    Wt::WImage * im =layoutH->addWidget(cpp14::make_unique<Wt::WImage>(sm.getWLink()),0);
+    im->resize(350,350);
+    } else {
+        Wt::WImage * im =layoutH->addWidget(cpp14::make_unique<Wt::WImage>(sm.getWLinkRel()),0);
+        im->resize(350,350);
+    }
 
     WContainerWidget * aContTableAndPie = layoutH->addWidget(cpp14::make_unique<WContainerWidget>());
     aContTableAndPie->setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Center);
@@ -64,6 +73,7 @@ Wt::WContainerWidget * layerStatChart::getChart(){
     WVBoxLayout * layoutV2 = aContTableAndPie->setLayout(cpp14::make_unique<WVBoxLayout>());
 
     //std::cout << " statsimple : " << mStatSimple.size() << " elem " << std::endl;
+    if (!forRenderingInPdf){
     if (mStatSimple.size()>0){
 
         if (mTypeVar==TypeVar::Classe){
@@ -87,39 +97,6 @@ Wt::WContainerWidget * layerStatChart::getChart(){
             table->setRowHeight(28);
             table->setHeaderHeight(28);
             table->setWidth(200 + 150 + 14+2);
-            // seulement un chart pour les variables discontinues
-            /*
-            Chart::WPieChart * aChart  =layoutV2->addWidget(cpp14::make_unique<Chart::WPieChart>());
-            aChart->setModel(mModel);       // Set the model.
-            aChart->setLabelsColumn(0);    // Set the column that holds the labels.
-            aChart->setDataColumn(1);      // Set the column that holds the data.
-
-            aChart->setPlotAreaPadding(0, Side::Left | Side::Top | Side::Bottom|Side::Right);
-
-            int row(0);
-            for (auto & kv : mStatSimple){
-                std::string aCodeStr(kv.first);
-                color col(mLay->getColor(aCodeStr));
-                // std::cout << "got color" << std::endl;
-                aChart->setBrush(row,Wt::WBrush(Wt::WColor(col.mR,col.mG,col.mB)));
-                row++;
-            }
-
-            // Configure location and type of labels. Plus nécessaire, j'ai mis des tooltips
-            /*if (mStatSimple.size()>3){ aChart->setDisplayLabels(Chart::LabelOption::Outside |
-                                    //Chart::LabelOption::TextLabel); |
-                                   //Chart::LabelOption::TextPercentage);
-            aChart->setMargin(20, Side::Top | Side::Bottom); // Add margin vertically.
-            //  il faut mettre des marges, qui sont comtpée au départ du cammembert, pour mettre les label
-            aChart->setMargin(50, Side::Left | Side::Right);
-
-            // Enable a 3D and shadow effect.
-            aChart->setPerspectiveEnabled(true, 0.2);
-            aChart->setShadowEnabled(true);
-            //aChart->setPlotAreaPadding(20, Side::Left | Side::Top | Side::Bottom|Side::Right);
-            //if (mStat.size()>1) {aChart->setExplode(rowAtMax, 0.1);}  // Explode l'élément majoritaire WARN, le camembert sort du graphique, bug
-            aChart->resize(300, 300);    // WPaintedWidget must be given an explicit size.
-            }*/
         }
         if (mTypeVar==TypeVar::Continu){
 
@@ -176,6 +153,7 @@ Wt::WContainerWidget * layerStatChart::getChart(){
 
     } else {
         layoutH->addWidget(cpp14::make_unique<WText>("Pas de statistique pour cette couche"));
+    }
     }
 
     return aRes;
@@ -444,37 +422,136 @@ olOneLay::olOneLay(Layer * aLay, OGRGeometry *poGeom):mLay(aLay){
     boost::replace_all(JScommand,"NAME","tmp/" + name1);
     //std::cout << JScommand << std::endl;
     this->doJavaScript(JScommand);
-    if (mLay->getCode()=="IGN"){std::cout << JScommand << std::endl;}
+    //if (mLay->getCode()=="IGN"){std::cout << JScommand << std::endl;}
 }
 
-staticMap::staticMap(Layer * aLay, OGRGeometry *poGeom):mLay(aLay){
-
+staticMap::staticMap(Layer * aLay, OGRGeometry *poGeom):mLay(aLay),mSx(700),mSy(700),ext(NULL){
+    std::cout << "staticMap::staticMap" << std::endl;
     std::string name0 = std::tmpnam(nullptr);
     std::string name1 = name0.substr(5,name0.size()-5);
-    mFileName = mLay->Dico()->File("TMPDIR")+"/"+name1+".pgn";
+    mFileName = mLay->Dico()->File("TMPDIR")+"/"+name1+".png";
+    // nécessaire pour Wlink
+    mFileNameRel = "tmp/"+name1+".png";
 
-    OGREnvelope ext;
-    poGeom->getEnvelope(&ext);
-    // agrandir un peu l'extend de la carte car sinon le polygone peut-être partiellement visible seulemement
-    int buf = (ext.MaxX-ext.MinX)/3;
-    ext.MaxX+=buf;
-    ext.MaxY+=buf;
-    ext.MinX-=buf;
-    ext.MinY-=buf;
-    // d'abord transformer la couche wms en image locale, puis réouvrir et y rasteriser le polygone
-    if (mLay->wms2jpg(ext,mFileName)) {
-
-        // rasterizer le polygone avec les outils Wt?(draw curve)?
-        GDALAllRegister();
-
-        GDALDataset  * poDS = (GDALDataset *) GDALOpen( mFileName.c_str(), GA_Update );
-        if (poDS!=NULL){
-            //utiliser magick++ pour dessiner sur l'image
-            //poGeom->
-
-        }
+    ext= new OGREnvelope;
+    poGeom->getEnvelope(ext);
+    // si la géométrie est un point, alors j'agrandi déjà de 40 mètres sinon division par 0== bug
+    if (ext->MaxX-ext->MinX<10) {
+    double bufPt(200);
+    ext->MaxX+=bufPt;
+    ext->MaxY+=bufPt;
+    ext->MinX-=bufPt;
+    ext->MinY-=bufPt;
     }
+    // agrandir un peu l'extend de la carte car sinon le polygone peut-être partiellement visible seulemement
+    int buf = (ext->MaxX-ext->MinX)/5;
+    ext->MaxX+=buf;
+    ext->MaxY+=buf;
+    ext->MinX-=buf;
+    ext->MinY-=buf;
 
+    // taille de l'emprise de l'image
+    mWx=ext->MaxX-ext->MinX;
+    mWy=ext->MaxY-ext->MinY;
+    // on rectifie la taille de l'image en pixel en fonction de la forme de la zone
+    mSy=(double)mSx*(mWy/mWx);
+
+    // d'abord transformer la couche wms en image locale, puis réouvrir et y dessiner le polygone
+    if (mLay->wms2jpg(*ext,mSx,mSy,mFileName)) {
+
+        //utiliser magick++ pour dessiner sur l'image
+        //Magick::InitializeMagick("/usr/local/lib/");
+        Magick::InitializeMagick(NULL);
+        Magick::Image im(mFileName);
+
+        //std::list<Magick::Drawable> drawList;
+
+        drawList.push_back(Magick::DrawableStrokeColor("yellow"));
+        drawList.push_back(Magick::DrawableStrokeWidth(3));
+        drawList.push_back(Magick::DrawableFillColor("yellow"));
+        //drawList.push_back(Magick::DrawableFillOpacity(0));
+        drawList.push_back(Magick::DrawablePointSize(1.0));
+
+
+
+        switch (poGeom->getGeometryType()){
+        case (wkbPolygon):
+        {
+            OGRPolygon * pol =poGeom->toPolygon();
+            drawPol(pol);
+            break;
+        }
+        case wkbMultiPolygon:
+        {
+            OGRMultiPolygon * mulP = poGeom->toMultiPolygon();
+            int n(mulP->getNumGeometries());
+            for (int i(0);i<n;i++){
+                OGRGeometry * subGeom=mulP->getGeometryRef(i);
+                if (subGeom->getGeometryType()==wkbPolygon){
+                    OGRPolygon * pol =subGeom->toPolygon();
+                    drawPol(pol);
+                }
+            }
+
+            break;
+        }
+        // pour la carte générée pour analyse point, on ne dessine pas un polygone mais un cercle autour du point
+        case wkbPoint:
+        {
+            OGRPoint * pt = poGeom->toPoint();
+            // arg 3 et 4 pas intuitif, c'est la position ou doit se trouver le périmètre du cercle, pas du tout le radius ou autre
+            drawList.push_back(Magick::DrawableCircle(xGeo2Im(pt->getX()),yGeo2Im(pt->getY()), xGeo2Im(pt->getX())-10,yGeo2Im(pt->getY())));
+
+            break;
+        }
+
+        default:
+            std::cout << "Geometrie " << poGeom->getGeometryName() << " non pris en charge " << std::endl;
+
+            break;
+        }
+
+        // Draw everything using completed drawing list
+        im.draw(drawList);
+        im.write(mFileName);
+    }
+}
+
+void staticMap::drawPol(OGRPolygon * pol){
+    OGRPoint ptTemp1, ptTemp2;
+    pol->getExteriorRing()->getNumPoints();
+    int NumberOfVertices = pol->getExteriorRing()->getNumPoints();
+    for ( int k = 0; k < NumberOfVertices-1; k++ )
+    {
+        pol->getExteriorRing()->getPoint(k,&ptTemp1);
+        pol->getExteriorRing()->getPoint(k+1,&ptTemp2);
+        drawList.push_back(Magick::DrawableLine(xGeo2Im(ptTemp1.getX()),yGeo2Im(ptTemp1.getY()),xGeo2Im(ptTemp2.getX()),yGeo2Im(ptTemp2.getY())));
+    }
+    // ajout segment final
+    pol->getExteriorRing()->getPoint(0,&ptTemp1);
+    pol->getExteriorRing()->getPoint(NumberOfVertices-1,&ptTemp2);
+    drawList.push_back(Magick::DrawableLine(xGeo2Im(ptTemp1.getX()),yGeo2Im(ptTemp1.getY()),xGeo2Im(ptTemp2.getX()),yGeo2Im(ptTemp2.getY())));
+
+    for (int c(0);c<pol->getNumInteriorRings();c++){
+        int NumberOfVertices =pol->getInteriorRing(c)->getNumPoints();;
+        for ( int k = 0; k < NumberOfVertices-1; k++ )
+        {
+            pol->getInteriorRing(c)->getPoint(k,&ptTemp1);
+            pol->getInteriorRing(c)->getPoint(k+1,&ptTemp2);
+            drawList.push_back(Magick::DrawableLine(xGeo2Im(ptTemp1.getX()),yGeo2Im(ptTemp1.getY()),xGeo2Im(ptTemp2.getX()),yGeo2Im(ptTemp2.getY())));
+        }
+        // ajout segment final
+        pol->getInteriorRing(c)->getPoint(0,&ptTemp1);
+        pol->getInteriorRing(c)->getPoint(NumberOfVertices-1,&ptTemp2);
+        drawList.push_back(Magick::DrawableLine(xGeo2Im(ptTemp1.getX()),yGeo2Im(ptTemp1.getY()),xGeo2Im(ptTemp2.getX()),yGeo2Im(ptTemp2.getY())));
+    }
+}
+
+double staticMap::xGeo2Im(double x){
+    return mSx*(x-ext->MinX)/mWx;
+}
+double staticMap::yGeo2Im(double y){
+    return mSy-(mSy*(y-ext->MinY)/mWy);
 }
 
 std::string dToStr(double d){
@@ -547,10 +624,10 @@ void batonnetApt::paintEvent(Wt::WPaintDevice *paintDevice){
 
         // dessiner le code d'aptitude si il y a la place pour (seuil à 5 %)
         if (kv.second>5){
-        std::string codeApt="";
-        if (aptFull2aptAcro.find(kv.first)!=aptFull2aptAcro.end()){codeApt=aptFull2aptAcro.at(kv.first);}
-        // je dois choisir entre Wt::AlignmentFlag::Middle et Wt::AlignmentFlag::Center, alors je prend middle et je change les coordonnées du box pour centrer
-        painter.drawText(xcumul+width/2, 0, width, mH,Wt::AlignmentFlag::Middle,Wt::TextFlag::SingleLine,codeApt);
+            std::string codeApt="";
+            if (aptFull2aptAcro.find(kv.first)!=aptFull2aptAcro.end()){codeApt=aptFull2aptAcro.at(kv.first);}
+            // je dois choisir entre Wt::AlignmentFlag::Middle et Wt::AlignmentFlag::Center, alors je prend middle et je change les coordonnées du box pour centrer
+            painter.drawText(xcumul+width/2, 0, width, mH,Wt::AlignmentFlag::Middle,Wt::TextFlag::SingleLine,codeApt);
         }
         //std::cout <<  aCodeStr << ", batonnet de longeur " << width  << ", % de " << kv.second << std::endl;
         xcumul=xcumul+width;

@@ -31,7 +31,10 @@ public:
     }
 
     void draw(Wt::WPainter *painter);
-    //void draw(Wt::WPaintDevice* paintDevice);
+
+    // pour dessiner dans une image pour export dans pdf ; choix de la largeur de l'image
+    void draw(Wt::WPainter *painter, int aWidth, int x0,int y0);
+
 private:
     cEss * mEss;
     cDicoApt *mDico;

@@ -392,10 +392,11 @@ Cette application web de cartographie permet une visualisation des informations 
 
 </message>
 
+<message id="report.analyse.point.titre">Forestimator : analyse ponctuelle</message>
 
 <message id="report.analyse.point">
 <div>
-      <h1>Forestimator : analyse ponctuelle</h1>
+      <h1>TITRE_REPPORT</h1>
 
       <style>
 	span.special {
@@ -403,8 +404,13 @@ Cette application web de cartographie permet une visualisation des informations 
 	  font-weight: bold;
 	}
 
-	#main_table {
+	#legendAcroEs {
 	  font-size: 8pt;
+	  margin-left: auto;
+	  margin-right: auto;
+	}
+	#infoT {
+	  font-size: 10pt;
 	  margin-left: auto;
 	  margin-right: auto;
 	}
@@ -425,28 +431,42 @@ Cette application web de cartographie permet une visualisation des informations 
       </style>
 
 <div>
+<h2>TITRE_CARTE </h2>
+<img src="PATH_CARTE" style="width:350.0px;height:350.0px;margin:0px 3px 0px 3px;" />
+<!--LEGEND_CARTE si je veux la légende couleur il faut ajouter de manière automatique les couleurs dans les styles ci-dessus, je le ferai ultérieurement-->
+</div>
+
+<P style="page-break-before: always"/>
+<div>
 ${AptTable}
 </div>
 
 <div>
 <h2>Liste des accronymes des essences </h2>
 ${legendAcro}
-</div>
+</div> 
 
+<P style="page-break-before: always"/>
 <div>
 ${InfoT}
 </div>
 
-<div>
-${EcoEss}
-</div>
+REPORT_ECO
 
 </div>
  
 </message>
 
 
-<message id="titre-InfoTableAna-point"> <h4>Description de la station forestière </h4></message>
+<message id="report.eco"> 
+<P style="page-break-before: always"/>
+<div>
+<h2>TITRE_ECO </h2>
+<img src="PATH_ECO" style="width:350.0px;height:600.0px;margin:0px 3px 0px 3px;" />
+</div></message>
+
+
+<message id="titre-InfoTableAna-point"> <h4>Description de la station forestière</h4></message>
 
 <message id="report.analyse.test">
 <p style="font-family: 'DejaVuSans'">élève, fenêtre, âme</p>
@@ -479,7 +499,7 @@ ${EcoEss}
 		
 		  </style>
 
-		<div><img src="${carte_static_1}"/></div>
+		<!--<div><img src="${carte_static_1}"/></div> j'ai eu un bug lors du rendu je pense que c'est à cause de l'image carte_stat_1 donc je commente pour un temps-->
 		<div>
 		${AptTable}
 		</div>

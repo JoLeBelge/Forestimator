@@ -1,6 +1,6 @@
 #include "statwindow.h"
 
-statWindow::statWindow(cDicoApt *aDico, AuthApplication *app):mDico(aDico), mApp(app), sigImgPDF(this,"pdf"), slotImgPDF(this)
+statWindow::statWindow(cDicoApt *aDico, AuthApplication *app):mDico(aDico), mApp(app)//, sigImgPDF(this,"pdf"), slotImgPDF(this)
 {
     setId("statWindow");
     setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Left);
@@ -18,10 +18,10 @@ statWindow::statWindow(cDicoApt *aDico, AuthApplication *app):mDico(aDico), mApp
     retour->setLink(WLink(LinkType::InternalPath, "/analyse"));
     // bouton export PDF
     createPdfBut = contTitre_->addWidget(cpp14::make_unique<WPushButton>("Export PDF"));
-    createPdfBut->clicked().connect(this->slotImgPDF);
-    //createPdfBut->setLink(WLink(LinkType::InternalPath, "/export_pdf"));
+    //createPdfBut->clicked().connect(this->slotImgPDF);
+
     //sigImgPDF.connect(std::bind(&statWindow::export2pdf,this, std::placeholders::_1));
-    sigImgPDF.connect(this, &statWindow::export2pdf);
+    //sigImgPDF.connect(this, &statWindow::export2pdf);
 
     // 75k,100k,112.5k,120k ok
     // 125k,122.5k KO
@@ -30,7 +30,7 @@ statWindow::statWindow(cDicoApt *aDico, AuthApplication *app):mDico(aDico), mApp
     /*auto pdf = std::make_shared<ReportResource>(this);
     createPdfBut->setLink(WLink(pdf));
     */
-    //createPdfBut->clicked().connect(this,&statWindow::export2pdf);
+    createPdfBut->clicked().connect(this,&statWindow::export2pdf);
 
     mCarteGenCont = addWidget(cpp14::make_unique<WContainerWidget>());
     mCarteGenCont->setId("carteGenStat");
@@ -44,6 +44,9 @@ statWindow::statWindow(cDicoApt *aDico, AuthApplication *app):mDico(aDico), mApp
 
     mAptTable->setWidth(Wt::WLength("90%"));
     mAptTable->toggleStyleClass("table-striped",true);
+
+    mAllStatIndivCont = addWidget(cpp14::make_unique<WContainerWidget>());
+    mAllStatIndivCont->setId("AllStatIndividuelle");
 
     mIGN = new Layer("IGN",mDico,TypeLayer::Thematique);
     mMNT = new Layer("MNT",mDico,TypeLayer::Thematique);
@@ -71,9 +74,12 @@ void statWindow::add1Aptitude(layerStatChart * lstat){
     mAptTable->elementAt(row, 1)->setContentAlignment(AlignmentFlag::Top | AlignmentFlag::Center);
 }
 
-void statWindow::add1layerStat(Wt::WContainerWidget * layerStat){
+void statWindow::add1layerStat(layerStatChart * layerStat){
+     std::cout << "statWindow::add1layerStat" << std::endl;
     mVContStatIndiv.push_back(layerStat);
-    addWidget(std::unique_ptr<Wt::WContainerWidget>(layerStat));
+    // ici ça à l'air de se compliquer car je transforme un ptr layerStat en std::unique_ptr<Wt::WContainerWidget> et cela à l'air de rendre le raw pointer dandling, il sera par la suite deleted dans groupLayer et là segfault
+    // donc il faut rester sur la solution qui fait que layerStat crée un chart pour l'affichage, puis crée un autre contenu pour le rendu
+    mAllStatIndivCont->addWidget(std::unique_ptr<Wt::WContainerWidget>(layerStat->getChart()));
     //mContStatIndiv->addWidget(std::unique_ptr<Wt::WContainerWidget>(layerStat));
 }
 
@@ -81,24 +87,29 @@ void statWindow::vider()
 {
     mCarteGenCont->clear();
     mAptTable->clear();
-    for (WContainerWidget * p :  mVContStatIndiv){
-        removeWidget(p);
-    }
+    mAllStatIndivCont->clear();
+
+    /*for (layerStatChart * p :  mVContStatIndiv){
+        //removeWidget(p);
+        delete p;
+    }*/
     mVContStatIndiv.clear();
     mTitre->setText("toto");
 }
 
 void statWindow::generateGenCarte(OGRFeature * poFeature){
-
      WVBoxLayout * layoutV =mCarteGenCont->setLayout(cpp14::make_unique<WVBoxLayout>());
      layoutV->addWidget(cpp14::make_unique<WText>("<h4>Aperçu</h4>"));
      //aRes->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
      WContainerWidget * aContCarte = layoutV->addWidget(cpp14::make_unique<WContainerWidget>());
      WHBoxLayout * layoutH = aContCarte->setLayout(cpp14::make_unique<WHBoxLayout>());
      // ajout de la carte pour cette couche
-     olStatic = layoutH->addWidget(cpp14::make_unique<olOneLay>(mIGN,poFeature->GetGeometryRef()),0);
+     //olStatic = layoutH->addWidget(cpp14::make_unique<olOneLay>(mIGN,poFeature->GetGeometryRef()),0);
+     staticMap sm(mIGN,poFeature->GetGeometryRef());
+     Wt::WImage * im =layoutH->addWidget(cpp14::make_unique<Wt::WImage>(sm.getWLinkRel()),0);
+     im->resize(350,"100%");
      // need to set it here after initialization of the map id !
-     slotImgPDF.setJavaScript("function () {"
+    /* slotImgPDF.setJavaScript("function () {"
                               "var mapCanvas = document.createElement('canvas');"
                               "var size = mapStat"+olStatic->id()+".getSize();"
                               "mapCanvas.width = size[0];"
@@ -115,6 +126,7 @@ void statWindow::generateGenCarte(OGRFeature * poFeature){
                               "}"
                               + sigImgPDF.createCall({"img","l"}) + "}");
      //olStatic->setId("olCarteGenerale");
+     */
 
      // description générale ; lecture des attribut du polygone?calcul de pente, zone bioclim, et élévation
      WContainerWidget * aContInfo = layoutH->addWidget(cpp14::make_unique<WContainerWidget>());
@@ -124,6 +136,7 @@ void statWindow::generateGenCarte(OGRFeature * poFeature){
 
      aContInfo->addWidget(cpp14::make_unique<WText>("<h5>Zone bioclimatique</h5>"));
 
+     std::cout << "statWindow::generateGenCarte ---" << std::endl;
      aContInfo->addWidget(cpp14::make_unique<WText>(mZBIO->summaryStat(poFeature->GetGeometryRef())));
 
      aContInfo->addWidget(cpp14::make_unique<WText>("<h5>Relief</h5>"));
@@ -135,7 +148,6 @@ void statWindow::generateGenCarte(OGRFeature * poFeature){
      aContInfo->addWidget(cpp14::make_unique<WBreak>());
      aContInfo->addWidget(cpp14::make_unique<WText>("Pente moyenne : "+ roundDouble(statPente.mean)+ "%"));
      aContInfo->addWidget(cpp14::make_unique<WBreak>());
-
 
      // analyse pédo surfacique
      surfPedo statPedo(mDico->mPedo,poFeature->GetGeometryRef());
@@ -156,7 +168,7 @@ std::string roundDouble(double d, int precisionVal){
 }
 
 
-void statWindow::export2pdf(std::string img, int length){
+/*void statWindow::export2pdf(std::string img, int length){
     std::cout << "statWindow::export2pdf() size :" << length << "; ind=" << chunkImgPDFind << std::endl;
 
     if(length>120000){
@@ -193,7 +205,8 @@ void statWindow::export2pdf(std::string img, int length){
     }else{
         strImgPDF=img;
     }
-
+    */
+void statWindow::export2pdf(){
     // création du pdf
     HPDF_Doc pdf = HPDF_New(error_handler, 0);
     HPDF_UseUTFEncodings(pdf);
@@ -201,8 +214,6 @@ void statWindow::export2pdf(std::string img, int length){
     HPDF_Page page = HPDF_AddPage(pdf);
     HPDF_Page_SetSize(page, HPDF_PAGE_SIZE_A4, HPDF_PAGE_PORTRAIT);
 
-
-    // pourquoi la carte ne passe pas bien/de manière complête en html? c'est parce que ce n'est pas du html mais du js?
     //mCarteGenCont->htmlText(o);
     //wkhtml(o.str());
 
@@ -212,18 +223,26 @@ void statWindow::export2pdf(std::string img, int length){
     renderer.addFontCollection("/usr/share/fonts/truetype",true);
     // post sur l'export des widgets vers pdf - pas super clair mais informatif
     //https://redmine.webtoolkit.eu/boards/2/topics/14392?r=14462#message-14462
-
-    std::ostringstream o;
-    mAptTable->htmlText(o);
     Wt::WString tpl = tr("report.statwindow");
     std::string tp = tpl.toUTF8();
-    //boost::replace_all(tp,"${AptTable}",o.str()); // c'est buggé donc juste desactive pour instant...
-    boost::replace_all(tp,"${carte_static_1}",strImgPDF);
 
-    std::cout << tp << std::endl;
-    // en créant le WString avec charencoding local il ne met plus d'erreur dans la console mais ça n'empèche que le résultat est décevant, les accents ne passent pas dans le pdf
-    // pbl d'encodage , vérifier p-e l'encodage de ostringstream?
-    //renderer.render(Wt::WString(tp,Wt::CharEncoding::UTF8));
+// cette boucle fait crasher wt avec un g is null de javascript, à la fin de la méthode. Je sais pas pourquoi.
+  /* for (layerStatChart * stat :VStatIndiv()){
+        std::ostringstream o;
+        //if (VStatIndiv().size()>0){
+        // ça ça fait crasher mais pas
+        stat->getChart(1)->htmlText(o);
+        // pas cette ligne
+        //stat->getChart(1);
+        //boost::replace_all(tp,"${InfoT}",o.str());
+        o.str("");
+        o.clear();
+    }*/
+    //boost::replace_all(tp,"${InfoT}",o.str());
+
+    //boost::replace_all(tp,"${AptTable}",o.str()); // c'est buggé donc juste desactive pour instant...
+    //boost::replace_all(tp,"${carte_static_1}",strImgPDF);
+
     renderer.render(tp);
 
     std::string name0 = std::tmpnam(nullptr);
@@ -232,7 +251,15 @@ void statWindow::export2pdf(std::string img, int length){
 
     HPDF_SaveToFile(pdf,aOut.c_str());
     HPDF_Free(pdf);
+
     WFileResource *fileResource = new Wt::WFileResource("plain/text",aOut);
     fileResource->suggestFileName("Forestimator-info-parcelaire.pdf");
     mApp->redirect(fileResource->url());
+
+}
+
+
+void statWindow::renderPdf(Wt::Render::WPdfRenderer * renderer){
+    std::cout << "statWindow::render" << std::endl;
+
 }

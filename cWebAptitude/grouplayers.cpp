@@ -167,27 +167,6 @@ groupLayers::groupLayers(cDicoApt * aDico, WOpenLayers *aMap, AuthApplication *a
     mParent->addWidget(std::move(tree));
     mParent->addWidget(cpp14::make_unique<WText>(tr("coucheStep2")));
 
-    // add user extents if connected
-    /*
-    printf("isloggedin?\n");
-    if(m_app->isLoggedIn()){
-        WPushButton * button_e = mParent->addWidget(cpp14::make_unique<WPushButton>(tr("afficher_extent")));
-        button_e->clicked().connect([=] {
-            if(mExtentDiv->isVisible())
-                mExtentDiv->hide();
-            else
-                mExtentDiv->show();
-        });
-        button_e->addStyleClass("btn btn-info");
-        printf("mextentdiv\n");
-        mExtentDiv = mParent->addWidget(cpp14::make_unique<WContainerWidget>());
-        mExtentDiv->setMargin(15,Wt::Side::Left);
-        mExtentDiv->setMargin(15,Wt::Side::Right);
-        mExtentDiv->addStyleClass("div_extent");
-        mExtentDiv->hide();
-        loadExtents(m_app->getUser().id());
-    }*/
-
     mExtentDivGlob = mParent->addWidget(cpp14::make_unique<WContainerWidget>());
     WPushButton * button_e = mExtentDivGlob->addWidget(cpp14::make_unique<WPushButton>(tr("afficher_extent")));
     button_e->clicked().connect([=] {
@@ -283,6 +262,8 @@ void groupLayers::extractInfo(double x, double y){
 
         std::cout << "groupLayers ; extractInfo " << x << " , " << y << std::endl;
         mStation->vider();
+        mStation->setX(x);
+        mStation->setY(y);
         mLegend->vider();
 
 
@@ -330,7 +311,10 @@ void groupLayers::extractInfo(double x, double y){
         for (Layer * l : mVLs){
             // on a bien une essence active et on est en mode FEE
             if ( l->IsActive() && l->Type()==TypeLayer::FEE && mTypeClassifST==FEE){
+                // on note la chose dans l'objet ecogramme, car la classe simplepoint va devoir savoir si il y a un ecogramme à export en jpg ou non
+                mStation->setHasFEEApt(1);
                 mLegend->detailCalculAptFEE(mStation);
+
             }
         }
         // tableau des aptitudes pour toutes les essences
@@ -344,12 +328,13 @@ void groupLayers::extractInfo(double x, double y){
 
 void groupLayers::computeStatGlob(OGRGeometry *poGeomGlobale){
     std::cout << " groupLayers::computeStatGlob " << std::endl;
-    // clear d'un vecteur de pointeur, c'est mal.
+    // clear d'un vecteur de pointeur, c'est mal. d'ailleurs ça bug si on calcule plusieur fois des stat dans la mm session, à regler donc
     for (auto p : mVLStat)
     {
         delete p;
     }
     mVLStat.clear();
+    std::cout << " mVLStat.cleared " << std::endl;
 
     // pour les statistiques globales, on prend toutes les couches selectionnées par select4Download
 
@@ -495,6 +480,14 @@ Layer * groupLayers::getActiveLay(){
     Layer * aRes=NULL;
     for (Layer * l : mVLs){
         if (( l->IsActive())){aRes=l;break;}
+    }
+    // au lancement de l'appli, aucune couche n'est active
+    if (aRes==NULL){
+        for (Layer * l : mVLs){
+            if (( l->getCode()=="IGN")){aRes=l;
+                l->setActive();
+                break;}
+        }
     }
     return aRes;
 }

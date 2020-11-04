@@ -157,9 +157,8 @@ public:
     basicStat computeBasicStatOnPolyg(OGRGeometry * poGeom);
     std::string summaryStat(OGRGeometry * poGeom);
 
-    // j'envisage d'utiliser gdal pour la création de carte static (raster wms + un shapefile dessiné par dessus)
-    // tente de convertir le wms de la couche au format raster
-    bool wms2jpg(OGREnvelope extent,std::string aOut) const;
+    // convertior le wms de la couche au format image en local
+    bool wms2jpg(OGREnvelope extent,int aSx,int aSy,std::string aOut) const;
 
     // raster value
     int getValue(double x, double y);
