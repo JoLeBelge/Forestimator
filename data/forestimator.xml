@@ -342,26 +342,31 @@ Cette application web de cartographie permet une visualisation des informations 
 <div style="margin:auto;">
 	<input id="toggle2" class="unfolder" type="checkbox"/>
 	<label for="toggle2" class="toggle-label">
-		<span class="unfold-icon"></span><span class="fold-icon"></span>Page Analyse ponctuelle : description d'une station  <span class="unfold-icon"></span><span class="fold-icon"></span>
+		<span class="unfold-icon"></span><span class="fold-icon"></span>Page info ponctuelle : description d'une station  <span class="unfold-icon"></span><span class="fold-icon"></span>
 	</label>
 	<div id="part2" class="fold">
-		C'est bien là que se situe tout l'intérêt des outils de consultation des informations cartographiques utiles aux forestiers ; <b>disposer en un (double) click du résumé de la description d'une station et du peuplement en place</b>. 
-		Ainsi, un double click sur une position de la carte va permettre l'affichage, dans la page d'analyse ponctuelle, de la carte d'indentité de cette station.
+		C'est bien là que se situe tout l'intérêt des outils de consultation des informations cartographiques utiles aux forestiers ; <b>disposer en un (double) click de la description synthétique d'une station et du peuplement en place</b>. 
+		Ainsi, un double click sur une position de la carte va permettre l'affichage, dans la page d'info ponctuelle, de la carte d'indentité de cette station.
 		Premièrement, le tableau d'aptitude pour cette station est présenté. Les essences sont représentées par leur accronymes et sont classées dans 4 colonnes qui correspondent aux 4 aptitudes ; optimum (en vert foncé), tolérance (en vert clair), tolérance élargie (en orange) et exclusion (en rouge).
 		<div>
 			<img src="img/tableApt.png" alt="pour une station donnée, le tableau d'aptitude des essences" width="350px"/> 
 		 	<br></br>
-			Le tableau d'aptitude, qui apparait lorsqu'on double-click sur une station, renseigne l'aptitude pour toutes les essences forestières. Une info-bulle s'affiche lorsqu'on pointe la souris sur les codes essences en deux lettre et affiche le nom complêt de l'essence forestière. Les code essences sont affichés en gris dans le cas d'une double aptitude (ex; Tolérance/Tolérance élargie pour le Hêtre), cette double aptitude est renseignée dans l'info-bulle qui s'affiche lorsqu'on déplace la souris sur le code essence.
+			Le tableau d'aptitude, qui apparait lorsqu'on double-click sur une station, renseigne l'aptitude pour toutes les essences forestières. Une info-bulle s'affiche lorsqu'on pointe la souris sur les codes essences en deux lettre et affiche le nom complêt de l'essence forestière. Les code essences sont affichés en gris dans le cas d'une <u>double aptitude</u> (ex; Tolérance/Tolérance élargie pour le Hêtre), cette double aptitude est renseignée dans l'info-bulle qui s'affiche lorsqu'on déplace la souris sur le code essence.
 		</div>
+		<br></br>
 
-		Deuxièmement, les caractéristiques stationnelles et du peuplement en place pour la position sélectionnée vont être énumerée dans un tableau s'intitulant "Description de la station forestière".  
-
+		Deuxièmement, les caractéristiques stationnelles et du peuplement en place pour la station sélectionnée vont être énumerées dans un tableau s'intitulant "Description de la station forestière".  
+<br></br>
 		Enfin, si la carte affichée est une carte d'aptitude pour l'une des essences, une section suplémentaire s'affichera et renseignera le cheminement effectué pour la détermination de l'aptitude de l'essence. L'aptitude des essences est en effet fonction de l'aptitude bioclimatique d'une part, de l'aptitude hydro-trophique d'autre part et des éventuels facteurs de compensation liés à la topographie. Nous renvoyons l'utilisateur vers le guide méthodologique du <a href="https://www.fichierecologique.be">Fichier Ecologique des Essences (FEE)</a>, qui se trouve sous la rubrique aide du site <a href="https://www.fichierecologique.be">www.fichierecologique.be</a>. C'est dans cette section qu'est également présenté l'écogramme de l'espèce pour laquelle la carte d'aptitude est affichée, avec un rectangle mauve situant la station au sein de cet écogramme et de la niche écologique de l'essence.
 		<div>
 			<img src="img/ecogramme.png" alt="position de la station en mauve dans l'écogramme de l'essence" width="200px"  />
 		 	<br></br>
 			Lors d'un double-click sur une station, si la carte affichée est une carte d'aptitude, la niche écologique de l'essence ainsi que la position de la station dans l'écogramme (station représentée par le carré mauve) sont également renseignés.
 		</div>
+		<h3>Génération d'un rapport</h3>
+
+		Les résultats de l'analyse ponctuelles peuvent être obtenus sous forme d'un document pdf que l'utilisateur peut télécharger au moyen du boutton <br>export pdf</br>.
+
 	</div>
 </div>
 
@@ -388,8 +393,11 @@ Cette application web de cartographie permet une visualisation des informations 
 
 		Une analyse détaillée est effectuée pour un seul polygone du shapefile. La sélection des couches pour lesquelles seront effectuées les analyses détaillées s'effectue en cochant les cases à cocher situées sous la rubrique intitulée <b>"2 : Sélectionner l'analyse"</b>.
 
-		Le calcul des statistique est réalisé en effectuant <b>un click droit sur le polygone de votre choix</b>, tout en maintenant enfoncé la touche contrôle. Une page de résultat affiche alors les résultats en trois sections distinctes : une carte de localisation générale, le tableau d'aptitude des essences et une dernière section qui présente, pour ce polygone donné, les cartes de description des conditions stationnelles et des caractéristique du peuplement en place. Un tableau de statistiques accompagne chacune des cartes individuelles.
-		
+		Le calcul des statistique est réalisé en effectuant <b>un click droit sur le polygone de votre choix</b>, tout en maintenent enfoncé <b>la touche contrôle</b>. Une page de résultat affiche alors les résultats en trois sections distinctes : une carte de localisation générale ainsi qu'une description de la topographie et de la pédologie de cette zone d'intérêt, le tableau d'aptitude des essences et une dernière section qui présente, pour ce polygone donné, les cartes de description des conditions stationnelles et des caractéristique du peuplement en place. Un tableau de statistiques accompagne chacune des cartes individuelles.
+
+<h3>Téléchargement d'un ensemble de cartes sur l'emprise du shapefile</h3>
+
+		Les utilisateurs désireux d'effectuer la mise en page de carte par eux-même, voir d'effectuer des calculs propres à des besoins spécifiques, peuvent télécharger un ensemble de cartes sur l'emprise de leur shapefile. Le boutton <b>Télécharger les cartes</b> permet un découpage simultané de toutes les cartes sélectionnées pour l'analyse surfacique et leur téléchargement sous forme d'une archive compressée.
 	</div>
 </div>
 </p>

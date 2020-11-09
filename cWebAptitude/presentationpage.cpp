@@ -4,7 +4,7 @@ int nbAds(5); // Ads = advertising
 // creation d'une bannières de pub (ads banner) pour faire défiler des informations descriptives du sites
 presentationPage::presentationPage()
 {
-
+    /*
     adsBanner = addNew<WStackedWidget>();
     // chargement des contenus de la bannière
     for (int i(1); i<nbAds+1;i++){
@@ -18,6 +18,7 @@ presentationPage::presentationPage()
    timer->setInterval(std::chrono::seconds(7));
    timer->timeout().connect(this, &presentationPage::bannerAnimation);
    timer->start();
+   */
 
    setContentAlignment(AlignmentFlag::Left);
    setOverflow(Wt::Overflow::Auto);
