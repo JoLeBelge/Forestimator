@@ -17,22 +17,18 @@ QMAKE_CXX = g++-8
 LIBS = -lgdal -lwthttp -lwt -lboost_system -lboost_iostreams -lboost_thread -lboost_filesystem -lboost_program_options -lcrypt -pthread -lwtdbo -lwtdbosqlite3 -lzip -lhpdf
 #LIBS += -lwkhtmltox
 
-# marre de wt et de openlayer, je tente plus bas-niveaux mais plus flexible
+# utilisation de GM ; fonctionne bien, mais un peu chiant à parametrer pour la compilation sur le serveur. Donc je retire et j'utilise WRasterImage (wrapper pour GM en fait)
 #https://stackoverflow.com/questions/33659208/using-magick-in-qt-creator
 #QMAKE_CXXFLAGS += $(shell Magick++-config --cppflags --cxxflags)
-
 #QMAKE_CXXFLAGS += $(shell MagickCore-config --cppflags --cxxflags)
-
 #QMAKE_CXXFLAGS += -I/usr/local/include/GraphicsMagick -pthread
-
 #LIBS += $(shell Magick++-config --ldflags --libs)
 #LIBS += $(shell MagickCore-config --ldflags --libs)
-
+# j'ai fait tourner le shell dans la console et il m'a retourné la ligne ci-dessous, que j'utilise directement plutôt que la ligne ci-dessus
 #LIBS += -L/usr/local/lib -lGraphicsMagick++ -lGraphicsMagick -ljbig -lwebp -lwebpmux -llcms2 -ltiff -lfreetype -ljpeg -lpng16 -lwmflite -lXext -lSM -lICE -lX11 -llzma -lbz2 -lxml2 -lz -lzstd -lm -lpthread -lgomp
 
-
 #INCLUDEPATH +=/usr/local/include/GraphicsMagick/
-#INCLUDEPATH +=/usr/include/GraphicsMagick/
+
 
 INCLUDEPATH += $$PWD/../carteApt/
 INCLUDEPATH += $$PWD/auth/
