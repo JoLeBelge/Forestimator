@@ -876,7 +876,7 @@ std::string loadBDpath()
 }
 
 
-ST::ST(cDicoApt * aDico):mDico(aDico),mNT(666),mNH(666),mZBIO(666),mTOPO(666),mActiveEss(0),HaveEss(0),mSt(0)
+ST::ST(cDicoApt * aDico):mDico(aDico),mNT(666),mNH(666),mZBIO(666),mTOPO(666),mActiveEss(0),HaveEss(0),mSt(0),mEmpty(1)
 {
 
 }
@@ -891,6 +891,7 @@ void ST::vider()
     HaveEss=0;
     mSt=666;
     hasFEEApt=0;
+    mEmpty=1;
 }
 
 std::string removeAccents(std::string aStr){

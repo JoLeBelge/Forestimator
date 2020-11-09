@@ -4,10 +4,15 @@
 	  plural="n == 1 ? 0 : 1">
 <!-- Note : certain message doivent être devant car sinon ils n'overload pas celui de base en anglais... -->
   
-      
-  
-  
-  
+ <message id="titre.presentation">   <strong>Forestimator - présentation</strong> </message>
+ <message id="titre.carto">   <strong>Forestimator - cartographie</strong> </message>
+ <message id="titre.ana.surf">    <strong>Forestimator - analyse</strong>  </message>
+ <message id="titre.ana.point">   <strong>Forestimator - info ponctuelle</strong>  </message>
+
+ <message id="ana.point.titre">  Forestimator - info ponctuelle </message>
+ <message id="ana.point.error.exportpdf.noStation"> Aucune analyse ponctuelle à exporter en pdf  </message>
+
+
 <message id="infoTelechargement">
 Plusieurs possibilités vous sont proposées. Vous avez la possibilité de télécharger votre shapefile précédemment chargé via l'onget "Plan d'Aménagement". Les statistiques calculées pour les couches (exemple : couches d'aptitude) seront disponibles dans la table d'attribut. Vous avez la possibilité de téléchargement les couches raster correspondant uniquement à l'étendue de votre zone d'intérêt, c'est-à-dire l'emprise du shapefile que vous avez chargé. Vous pouvez également télécharger les couches raster sur l'ensemble de la Région Wallonne, mais la taille des fichiers sera alors conséquente.
 </message>
@@ -446,7 +451,7 @@ ${AptTable}
 ${legendAcro}
 </div> 
 
-<P style="page-break-before: always"/>
+<!--<P style="page-break-before: always"/>-->
 <div>
 ${InfoT}
 </div>
@@ -463,7 +468,11 @@ REPORT_ECO
 <div>
 <h2>TITRE_ECO </h2>
 <img src="PATH_ECO" style="width:350.0px;height:600.0px;margin:0px 3px 0px 3px;" />
-</div></message>
+</div>
+<div>
+detAptFEE
+</div>
+</message>
 
 
 <message id="titre-InfoTableAna-point"> <h4>Description de la station forestière</h4></message>

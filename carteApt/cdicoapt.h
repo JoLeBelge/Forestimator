@@ -660,7 +660,9 @@ public:
     void setX(double a){x=a;}
     void setY(double a){y=a;}
     void setHasFEEApt(bool a){hasFEEApt=a;}
+    void setOK(){mEmpty=0;}
     bool ecogramme(){return hasFEEApt;}
+    bool isOK(){return !mEmpty;}
 
     int mNH,mNT,mZBIO,mTOPO;
     bool HaveEss;
@@ -669,10 +671,12 @@ public:
     // catalogue de station
     int mSt;
 
+
     OGRPoint getPoint(){
         OGRPoint pt(x,y);
         return pt;}
 private:
+    bool mEmpty;
     bool hasFEEApt;// pour savoir si l'écogramme est dessiné ou pas
 
     double x,y;

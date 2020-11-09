@@ -84,6 +84,7 @@ public:
         WContainerWidget::layoutSizeChanged(width, height);
         // Force a recalculation of the map viewport size. This should be called when third-party code changes the size of the map viewport
         doJavaScript("map.updateSize();");
+       // std::cout << "layoutSizeChanged de wopenlayers \n\n\n" << std::endl;
     }
     cDicoApt * mDico;
     JSignal<double,double>& xy() { return xy_; }

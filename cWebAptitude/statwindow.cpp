@@ -17,7 +17,10 @@ statWindow::statWindow(cDicoApt *aDico, AuthApplication *app):mDico(aDico), mApp
     WPushButton * retour = tpl->bindWidget("retour", Wt::cpp14::make_unique<WPushButton>("Retour"));
     retour->setLink(WLink(LinkType::InternalPath, "/analyse"));
     // bouton export PDF
+    if (0){
     createPdfBut = contTitre_->addWidget(cpp14::make_unique<WPushButton>("Export PDF"));
+    createPdfBut->clicked().connect(this,&statWindow::export2pdf);
+    }
     //createPdfBut->clicked().connect(this->slotImgPDF);
 
     //sigImgPDF.connect(std::bind(&statWindow::export2pdf,this, std::placeholders::_1));
@@ -30,7 +33,7 @@ statWindow::statWindow(cDicoApt *aDico, AuthApplication *app):mDico(aDico), mApp
     /*auto pdf = std::make_shared<ReportResource>(this);
     createPdfBut->setLink(WLink(pdf));
     */
-    createPdfBut->clicked().connect(this,&statWindow::export2pdf);
+
 
     mCarteGenCont = addWidget(cpp14::make_unique<WContainerWidget>());
     mCarteGenCont->setId("carteGenStat");
@@ -214,13 +217,10 @@ void statWindow::export2pdf(){
     HPDF_Page page = HPDF_AddPage(pdf);
     HPDF_Page_SetSize(page, HPDF_PAGE_SIZE_A4, HPDF_PAGE_PORTRAIT);
 
-    //mCarteGenCont->htmlText(o);
-    //wkhtml(o.str());
-
     Wt::Render::WPdfRenderer renderer(pdf, page);
     renderer.setMargin(2.54);
     renderer.setDpi(96);
-    renderer.addFontCollection("/usr/share/fonts/truetype",true);
+
     // post sur l'export des widgets vers pdf - pas super clair mais informatif
     //https://redmine.webtoolkit.eu/boards/2/topics/14392?r=14462#message-14462
     Wt::WString tpl = tr("report.statwindow");

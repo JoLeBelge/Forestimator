@@ -65,9 +65,10 @@ public:
     //Wt::WLink getWLink(){return Wt::WLink(mFileNameRel);}
     // le pdf renderer il aime pas les chemin en relatif pour les image
     Wt::WLink getWLinkRel(){return Wt::WLink(mFileNameRel);}
-     Wt::WLink getWLink(){return Wt::WLink(mFileName);}
+    Wt::WLink getWLink(){return Wt::WLink(mFileName);}
 
     void drawPol(OGRPolygon * pol);
+    void drawScaleLine(Magick::Image *im);
     std::list<Magick::Drawable> drawList;
 
 private:

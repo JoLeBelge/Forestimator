@@ -219,7 +219,7 @@ void cWebAptitude::handlePathChange()
         top_stack->setCurrentIndex(1);
         mStackInfoPtr->menuitem_presentation->select();
         sub_stack->setCurrentIndex(2);
-        navigation->setTitle("   <strong>Forestimator - présentation</strong>   ");
+        navigation->setTitle(tr("titre.presentation"));
     }else if (m_app->internalPath() == "/home"){
         top_stack->setCurrentIndex(0);
     }else if (m_app->internalPath() == "/cartographie"){
@@ -227,19 +227,19 @@ void cWebAptitude::handlePathChange()
         mStackInfoPtr->stack_info->setCurrentIndex(1);
         mStackInfoPtr->menuitem_cartes->select();
         sub_stack->setCurrentIndex(0);
-        navigation->setTitle("   <strong>Forestimator - cartographie</strong>   ");
+        navigation->setTitle(tr("titre.carto"));
     }else if (m_app->internalPath() == "/analyse"){
         top_stack->setCurrentIndex(1);
         mStackInfoPtr->stack_info->setCurrentIndex(2);
         mStackInfoPtr->menuitem_analyse->select();
         sub_stack->setCurrentIndex(0);
-        navigation->setTitle("   <strong>Forestimator - analyse</strong>   ");
+        navigation->setTitle(tr("titre.ana.surf"));
     }else if (m_app->internalPath() == "/point"){
         top_stack->setCurrentIndex(1);
         mStackInfoPtr->stack_info->setCurrentIndex(0);
         mStackInfoPtr->menuitem_simplepoint->select();
         sub_stack->setCurrentIndex(0);
-        navigation->setTitle("   <strong>Forestimator - info ponctuelle</strong>   ");
+        navigation->setTitle(tr("titre.ana.point"));
     }else if (m_app->internalPath() == "/resultat"){
         top_stack->setCurrentIndex(1);
         sub_stack->setCurrentIndex(1);

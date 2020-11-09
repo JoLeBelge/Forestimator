@@ -241,28 +241,45 @@ void simplepoint::afficheAptAllEss(){
 
 
 void simplepoint::export2pdfTitreDialog(){
-// TITRE
-// modal dialog ; devrait bloquer l'app jusqu'à ce que l'utilisateur clique
-WText * titre=new WText();
-Wt::WDialog * dialog = this->addChild(Wt::cpp14::make_unique<Wt::WDialog>("Titre du rapport pdf"));
-Wt::WLabel *label = dialog->contents()->addNew<Wt::WLabel>("Titre: ");
-Wt::WLineEdit *edit =dialog->contents()->addNew<Wt::WLineEdit>();
-edit->setText(tr("report.analyse.point.titre"));
-label->setBuddy(edit);
-dialog->contents()->addStyleClass("form-group");
-Wt::WPushButton *ok =
-        dialog->footer()->addNew<Wt::WPushButton>("OK");
-ok->setDefault(true);
-ok->clicked().connect([=] {
-    dialog->accept();
-});
 
-dialog->finished().connect([=] {
-    //titre->setText(edit->text());
-    export2pdf(edit->text().toUTF8());
-    removeChild(dialog);
-});
-dialog->show();
+    // check si l'utilisateur à bien double-cliqué sur une station
+    if (mGL->mStation->isOK()){
+
+        // TITRE
+        WText * titre=new WText();
+        Wt::WDialog * dialog = this->addChild(Wt::cpp14::make_unique<Wt::WDialog>("Titre du rapport pdf"));
+        Wt::WLabel *label = dialog->contents()->addNew<Wt::WLabel>("Titre: ");
+        Wt::WLineEdit *edit =dialog->contents()->addNew<Wt::WLineEdit>();
+        edit->setText(tr("report.analyse.point.titre"));
+        label->setBuddy(edit);
+        dialog->contents()->addStyleClass("form-group");
+        Wt::WPushButton *ok =
+                dialog->footer()->addNew<Wt::WPushButton>("OK");
+        ok->setDefault(true);
+        ok->clicked().connect([=] {
+            dialog->accept();
+        });
+
+        dialog->finished().connect([=] {
+            //titre->setText(edit->text());
+            export2pdf(edit->text().toUTF8());
+            removeChild(dialog);
+        });
+        dialog->show();
+    }else{
+    // pas de station donc pas d'export
+        WMessageBox * messageBox =addChild(Wt::cpp14::make_unique<Wt::WMessageBox>(tr("ana.point.titre"),
+                                                                                   tr("ana.point.error.exportpdf.noStation"),
+                                                                                   Wt::Icon::Information,
+                                                                                   Wt::StandardButton::Ok));
+
+        messageBox->buttonClicked().connect([=] {
+            removeChild(messageBox);
+        });
+        messageBox->show();
+
+    }
+
 }
 
 void simplepoint::export2pdf(std::string titre){
@@ -326,28 +343,26 @@ void simplepoint::export2pdf(std::string titre){
     if (mGL->mStation->ecogramme()){
 
         // RENDU ECOGRAMME
-        std::cout << "Write ecogramme in a png" << std::endl;
-
-        // export de l'image de l'écogramme
-        // bug constaté ; https://redmine.webtoolkit.eu/issues/7769
+        // export de l'image de l'écogramme - bug constaté ; https://redmine.webtoolkit.eu/issues/7769
         // pour ma part j'ai réinstallé Graphicmagick puis cela fonctionnais
         int aEcoWidth(750);
         int aHeigth(aEcoWidth*15.0/7.0);
 
         Wt::WRasterImage pngImage("png", WLength(aEcoWidth), WLength(aHeigth));
-        Wt::WPainter::Image image("/home/lisein/Documents/carteApt/Forestimator/data/img/ecogrammeAxes.png","/home/lisein/Documents/carteApt/Forestimator/data/img/ecogrammeAxes.png");//, aEcoWidth, aHeigth);
-        //pngImage.drawImage(0,0,);
-        //Wt::WPainter::Image()
-
         std::string name01 = std::tmpnam(nullptr);
         std::string name11 = name01.substr(5,name01.size()-5);
         std::string aEcoPng = mDico->File("TMPDIR")+"/"+name11+".png";
         std::ofstream f(aEcoPng, std::ios::out | std::ios::binary);
         WPainter painter(&pngImage);
+
+        std::string ecoBgPath=mDico->File("docroot")+"img/ecogrammeAxes.png";
+        if (exists(ecoBgPath)){
+        Wt::WPainter::Image ecoBg(ecoBgPath,ecoBgPath);
         Wt::WRectF destinationRect = Wt::WRectF(0.0,0.0,aEcoWidth, aHeigth);
-        painter.drawImage(destinationRect,image);
-        // il faut adapter la méthode draw pour lui donner en argument optionnel la taille de l'image et la position x0,y0à partir de laquelle on dessine
-        mEcoEss->draw(&painter, aEcoWidth,239,332);
+        painter.drawImage(destinationRect,ecoBg);
+        }
+        // pour determiner ces positions, j'ai fixé aEcoWidth à 750, j'ai fait tourné le code, puis j'ai ouvert l'image et mesuré les positions
+        mEcoEss->draw(&painter,292,332,700,1240,1330);
         pngImage.done();
         pngImage.write(f);
         f.close();
@@ -355,6 +370,10 @@ void simplepoint::export2pdf(std::string titre){
         std::string baliseEco = tr("report.eco").toUTF8();
         boost::replace_all(baliseEco,"PATH_ECO",aEcoPng);
         boost::replace_all(baliseEco,"TITRE_ECO","Ecogramme - "+mGL->mStation->mActiveEss->Nom());
+        mDetAptFEE->htmlText(o);
+        boost::replace_all(baliseEco,"detAptFEE",o.str());
+        o.str("");
+        o.clear();
 
         boost::replace_all(tp,"REPORT_ECO",baliseEco);
 

@@ -471,9 +471,6 @@ staticMap::staticMap(Layer * aLay, OGRGeometry *poGeom):mLay(aLay),mSx(700),mSy(
         drawList.push_back(Magick::DrawableFillColor("yellow"));
         //drawList.push_back(Magick::DrawableFillOpacity(0));
         drawList.push_back(Magick::DrawablePointSize(1.0));
-
-
-
         switch (poGeom->getGeometryType()){
         case (wkbPolygon):
         {
@@ -513,8 +510,44 @@ staticMap::staticMap(Layer * aLay, OGRGeometry *poGeom):mLay(aLay),mSx(700),mSy(
 
         // Draw everything using completed drawing list
         im.draw(drawList);
+        drawList.clear();
+        drawScaleLine(&im);
+
         im.write(mFileName);
+
+
     }
+}
+
+void staticMap::drawScaleLine(Magick::Image * im){
+
+    drawList.push_back(Magick::DrawableStrokeColor("black"));
+    drawList.push_back(Magick::DrawableStrokeWidth(4));
+    drawList.push_back(Magick::DrawableFillColor("black"));
+    drawList.push_back(Magick::DrawablePointSize(30.0));
+    // determiner la taille appropriée en m de la scaleline
+    // on veux que la scaleline fasse au max 0.75 de l'image
+    int mul(10);
+    int maxLength= (double) mWx *0.75;
+    while ((maxLength / mul)>10){
+        mul=mul*10;
+    }
+    int l= ((int) maxLength/mul)*mul;
+
+    std::string label(std::to_string(l)+" m");
+
+    double x0= ((double)mSx)*0.1;
+    double y0= ((double)mSy)*0.9;
+    drawList.push_back(Magick::DrawableText(x0,y0,label));
+
+    double y02= y0+40;
+    int length= ((double)l*mSx)/mWx;
+    drawList.push_back(Magick::DrawableLine(x0,y02,x0+length,y02));
+    // les délimitation de la scalebar
+    int a(10);
+    drawList.push_back(Magick::DrawableLine(x0,y02-a,x0,y02+a));
+    drawList.push_back(Magick::DrawableLine(x0+length,y02-a,x0+length,y02+a));
+    im->draw(drawList);
 }
 
 void staticMap::drawPol(OGRPolygon * pol){

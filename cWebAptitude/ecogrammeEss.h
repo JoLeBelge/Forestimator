@@ -16,6 +16,8 @@
 #include <Wt/WRectArea.h>
 #include <Wt/WRasterImage.h>
 
+void reduire(Wt::WRectF * aRect,int prop);
+
 
 class EcogrammeEss : public Wt::WPaintedWidget
 {
@@ -33,7 +35,8 @@ public:
     void draw(Wt::WPainter *painter);
 
     // pour dessiner dans une image pour export dans pdf ; choix de la largeur de l'image
-    void draw(Wt::WPainter *painter, int aWidth, int x0,int y0);
+    //xy0 ; position en haut à gauche pour ecogramme principal. xy1 ; en bas à droite, pour eco principal
+    void draw(Wt::WPainter *painter, int x0, int y0, int x1, int y1, int yrha0);
 
 private:
     cEss * mEss;

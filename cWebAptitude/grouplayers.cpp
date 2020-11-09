@@ -262,10 +262,10 @@ void groupLayers::extractInfo(double x, double y){
 
         std::cout << "groupLayers ; extractInfo " << x << " , " << y << std::endl;
         mStation->vider();
+        mStation->setOK();
         mStation->setX(x);
         mStation->setY(y);
         mLegend->vider();
-
 
         /*int cur_index = mStackInfoPtr->stack_info->currentIndex(); // pour savoir où on en est
         mStackInfoPtr->stack_info->setCurrentIndex(0);
