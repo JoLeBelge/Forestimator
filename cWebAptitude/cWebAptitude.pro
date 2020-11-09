@@ -27,10 +27,11 @@ QMAKE_CXXFLAGS += -I/usr/local/include/GraphicsMagick -pthread
 #LIBS += $(shell Magick++-config --ldflags --libs)
 #LIBS += $(shell MagickCore-config --ldflags --libs)
 
-LIBS += -L/usr/local/lib -lGraphicsMagick++ -lGraphicsMagick -ljbig -lwebp -lwebpmux -llcms2 -ltiff -lfreetype -ljpeg -lpng16 -lwmflite -lXext -lSM -lICE -lX11 -llzma -lbz2 -lxml2 -lz -lzstd -lm -lpthread -lgomp
+#LIBS += -L/usr/local/lib -lGraphicsMagick++ -lGraphicsMagick -ljbig -lwebp -lwebpmux -llcms2 -ltiff -lfreetype -ljpeg -lpng16 -lwmflite -lXext -lSM -lICE -lX11 -llzma -lbz2 -lxml2 -lz -lzstd -lm -lpthread -lgomp
 
 
-INCLUDEPATH +=/usr/local/include/GraphicsMagick/
+#INCLUDEPATH +=/usr/local/include/GraphicsMagick/
+#INCLUDEPATH +=/usr/include/GraphicsMagick/
 
 INCLUDEPATH += $$PWD/../carteApt/
 INCLUDEPATH += $$PWD/auth/

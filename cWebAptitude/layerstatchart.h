@@ -11,13 +11,11 @@
 #include <Wt/WStandardItem.h>
 #include <Wt/WTableView.h>
 #include "layer.h"
-#include "Magick++.h"
+//#include "Magick++.h"
 //#include <Wt/WRasterImage.h>
 
 using namespace Wt;
 using namespace Wt::Chart;
-
-
 
 #include <iomanip>
 
@@ -67,9 +65,10 @@ public:
     Wt::WLink getWLinkRel(){return Wt::WLink(mFileNameRel);}
     Wt::WLink getWLink(){return Wt::WLink(mFileName);}
 
-    void drawPol(OGRPolygon * pol);
-    void drawScaleLine(Magick::Image *im);
-    std::list<Magick::Drawable> drawList;
+    void drawPol(OGRPolygon * pol, Wt::WPainter * painter);
+    //void drawPol(OGRPolygon * pol);
+    //void drawScaleLine(Magick::Image *im);
+   // std::list<Magick::Drawable> drawList;
 
 private:
     Layer * mLay;

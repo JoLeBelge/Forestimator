@@ -1,0 +1,9 @@
+dépendances wt pour webAptitude ; 
+
+sudo apt install libgraphicsmagick++1-dev
+sudo apt install libpango1.0-dev 
+
+libharu ; compiler depuis les sources.
+
+compilation wt ; 
+cmake -DWT_WRASTERIMAGE_IMPLEMENTATION="GraphicsMagick" ..

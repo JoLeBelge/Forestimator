@@ -459,7 +459,64 @@ staticMap::staticMap(Layer * aLay, OGRGeometry *poGeom):mLay(aLay),mSx(700),mSy(
     // d'abord transformer la couche wms en image locale, puis réouvrir et y dessiner le polygone
     if (mLay->wms2jpg(*ext,mSx,mSy,mFileName)) {
 
-        //utiliser magick++ pour dessiner sur l'image
+        // création d'un wrasterImage et copier dedans l'image existante
+        Wt::WRasterImage pngImage("png", mSx, mSy);
+        WPainter painter(&pngImage);
+        Wt::WPainter::Image imInit(mFileName,mFileName);
+        Wt::WRectF destinationRect = Wt::WRectF(0.0,0.0,mSx, mSy);
+        painter.drawImage(destinationRect,imInit);
+        Wt::WPen pen0(Wt::WColor(Wt::StandardColor::Yellow));
+        pen0.setWidth(3);
+        painter.setPen(pen0);
+
+        switch (poGeom->getGeometryType()){
+        case (wkbPolygon):
+        {
+            OGRPolygon * pol =poGeom->toPolygon();
+            drawPol(pol,&painter);
+            break;
+        }
+        case wkbMultiPolygon:
+        {
+            OGRMultiPolygon * mulP = poGeom->toMultiPolygon();
+            int n(mulP->getNumGeometries());
+            for (int i(0);i<n;i++){
+                OGRGeometry * subGeom=mulP->getGeometryRef(i);
+                if (subGeom->getGeometryType()==wkbPolygon){
+                    OGRPolygon * pol =subGeom->toPolygon();
+                    drawPol(pol, &painter);
+                }
+            }
+
+            break;
+        }
+        // pour la carte générée pour analyse point, on ne dessine pas un polygone mais un cercle autour du point
+        case wkbPoint:
+        {
+            OGRPoint * pt = poGeom->toPoint();
+            // arg 3 et 4 pas intuitif, c'est la position ou doit se trouver le périmètre du cercle, pas du tout le radius ou autre
+            //drawList.push_back(Magick::DrawableCircle(xGeo2Im(pt->getX()),yGeo2Im(pt->getY()), xGeo2Im(pt->getX())-10,yGeo2Im(pt->getY())));
+            int x=xGeo2Im(pt->getX());
+            int y=yGeo2Im(pt->getY());
+            int buf(30);
+            Wt::WRectF rect(x-buf,y-buf,2*buf,2*buf);
+            painter.drawEllipse(rect);
+            break;
+        }
+
+        default:
+            std::cout << "Geometrie " << poGeom->getGeometryName() << " non pris en charge " << std::endl;
+
+            break;
+        }
+        pngImage.done();
+        std::ofstream f(mFileName, std::ios::out | std::ios::binary);
+        pngImage.write(f);
+        f.close();
+
+        //utiliser magick++ pour dessiner sur l'image ; fonctionne bien mais compiler webaptitude sur le serveur avec graphickmagick c'est galère; je vais utiliser RasterImage à la place
+
+        /*
         //Magick::InitializeMagick("/usr/local/lib/");
         Magick::InitializeMagick(NULL);
         Magick::Image im(mFileName);
@@ -514,11 +571,47 @@ staticMap::staticMap(Layer * aLay, OGRGeometry *poGeom):mLay(aLay),mSx(700),mSy(
         drawScaleLine(&im);
 
         im.write(mFileName);
+        */
 
 
     }
 }
 
+void staticMap::drawPol(OGRPolygon * pol, WPainter *painter){
+    OGRPoint ptTemp1, ptTemp2;
+    std::vector<Wt::WLineF> aVLines;
+    int NumberOfVertices = pol->getExteriorRing()->getNumPoints();
+    for ( int k = 0; k < NumberOfVertices-1; k++ )
+    {
+        pol->getExteriorRing()->getPoint(k,&ptTemp1);
+        pol->getExteriorRing()->getPoint(k+1,&ptTemp2);
+        aVLines.push_back(WLineF(xGeo2Im(ptTemp1.getX()),yGeo2Im(ptTemp1.getY()),xGeo2Im(ptTemp2.getX()),yGeo2Im(ptTemp2.getY())));
+    }
+    // ajout segment final
+    pol->getExteriorRing()->getPoint(0,&ptTemp1);
+    pol->getExteriorRing()->getPoint(NumberOfVertices-1,&ptTemp2);
+    aVLines.push_back(WLineF(xGeo2Im(ptTemp1.getX()),yGeo2Im(ptTemp1.getY()),xGeo2Im(ptTemp2.getX()),yGeo2Im(ptTemp2.getY())));
+
+    for (int c(0);c<pol->getNumInteriorRings();c++){
+        int NumberOfVertices =pol->getInteriorRing(c)->getNumPoints();;
+        for ( int k = 0; k < NumberOfVertices-1; k++ )
+        {
+            pol->getInteriorRing(c)->getPoint(k,&ptTemp1);
+            pol->getInteriorRing(c)->getPoint(k+1,&ptTemp2);
+            aVLines.push_back(WLineF(xGeo2Im(ptTemp1.getX()),yGeo2Im(ptTemp1.getY()),xGeo2Im(ptTemp2.getX()),yGeo2Im(ptTemp2.getY())));
+        }
+        // ajout segment final
+        pol->getInteriorRing(c)->getPoint(0,&ptTemp1);
+        pol->getInteriorRing(c)->getPoint(NumberOfVertices-1,&ptTemp2);
+        aVLines.push_back(WLineF(xGeo2Im(ptTemp1.getX()),yGeo2Im(ptTemp1.getY()),xGeo2Im(ptTemp2.getX()),yGeo2Im(ptTemp2.getY())));
+    }
+
+    painter->drawLines(aVLines);
+}
+
+
+// méthode utilisant magick++
+/*
 void staticMap::drawScaleLine(Magick::Image * im){
 
     drawList.push_back(Magick::DrawableStrokeColor("black"));
@@ -549,8 +642,9 @@ void staticMap::drawScaleLine(Magick::Image * im){
     drawList.push_back(Magick::DrawableLine(x0+length,y02-a,x0+length,y02+a));
     im->draw(drawList);
 }
+*/
 
-void staticMap::drawPol(OGRPolygon * pol){
+/*void staticMap::drawPol(OGRPolygon * pol){
     OGRPoint ptTemp1, ptTemp2;
     pol->getExteriorRing()->getNumPoints();
     int NumberOfVertices = pol->getExteriorRing()->getNumPoints();
@@ -579,6 +673,7 @@ void staticMap::drawPol(OGRPolygon * pol){
         drawList.push_back(Magick::DrawableLine(xGeo2Im(ptTemp1.getX()),yGeo2Im(ptTemp1.getY()),xGeo2Im(ptTemp2.getX()),yGeo2Im(ptTemp2.getY())));
     }
 }
+*/
 
 double staticMap::xGeo2Im(double x){
     return mSx*(x-ext->MinX)/mWx;
