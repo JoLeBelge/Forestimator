@@ -7,3 +7,21 @@ libharu ; compiler depuis les sources.
 
 compilation wt ; 
 cmake -DWT_WRASTERIMAGE_IMPLEMENTATION="GraphicsMagick" ..
+
+hélas WRasterImage est foireux, image dédoublée et avec couleur mauvâtre. ce doit être le problème de QuantumDepth qui est mal paramètré. 
+
+Sur ma machine si je change les paramètres de cmake pour wt GM_INCLUDE_DIR, GM_LIB et GM_PREFIX de 
+
+/usr/include/GraphicsMagick
+/usr/lib/libGraphicsMagick.so
+/usr/include/GraphicsMagick
+
+à 
+/usr/local/include/GraphicsMagick
+/usr/local/lib/libGraphicsMagick.so
+/usr/local/include/GraphicsMagick
+
+le problème est reglé. Donc si je comprend bien il faut compiler GM depuis les sources
+
+hg clone http://hg.code.sf.net/p/graphicsmagick/code/ GM
+

@@ -22,7 +22,8 @@ LIBS = -lgdal -lwthttp -lwt -lboost_system -lboost_iostreams -lboost_thread -lbo
 #QMAKE_CXXFLAGS += $(shell Magick++-config --cppflags --cxxflags)
 
 #QMAKE_CXXFLAGS += $(shell MagickCore-config --cppflags --cxxflags)
-QMAKE_CXXFLAGS += -I/usr/local/include/GraphicsMagick -pthread
+
+#QMAKE_CXXFLAGS += -I/usr/local/include/GraphicsMagick -pthread
 
 #LIBS += $(shell Magick++-config --ldflags --libs)
 #LIBS += $(shell MagickCore-config --ldflags --libs)
