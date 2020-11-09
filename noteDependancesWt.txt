@@ -23,5 +23,6 @@ Sur ma machine si je change les paramètres de cmake pour wt GM_INCLUDE_DIR, GM_
 
 le problème est reglé. Donc si je comprend bien il faut compiler GM depuis les sources
 
+apt install mercurial
 hg clone http://hg.code.sf.net/p/graphicsmagick/code/ GM
 
