@@ -791,10 +791,14 @@ std::string getHtml(LayerMTD * lMTD){
         std::string html="<h4>Version  </h4>" +lMTD->Vers();
         if (isValidHtml(html)){aRes+=html;}
     }
+    if (lMTD->CopyR()!=""){
+        std::string html="<h4>Copyright </h4>" +lMTD->CopyR();
+        if (isValidHtml(html)){aRes+=html;}
+    }
     if (lMTD->VRefs().size()>0){
          std::string html="<h4>Référence  </h4>" ;
     for (std::string ref : lMTD->VRefs()){
-        if (isValidHtml(ref)){html+="<p>"+ref+"</p><p>&nbsp;</p>";}
+        if (isValidHtml(ref)){html+="<p>"+ref+"</p>";}
     }
     aRes+=html;
     }

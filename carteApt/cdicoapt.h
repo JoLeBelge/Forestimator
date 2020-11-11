@@ -65,15 +65,17 @@ public:
     void setDescr(std::string aDesc){mDescr=aDesc;}
     void setVersion(std::string aV){mVersion=aV;}
     void addRef(std::string aVRef){mVRefs.push_back(aVRef);}
+    void setCopyR(std::string a){mCopyR=a;}
     std::string Nom(){return mNom;}
     std::string Descr(){return mDescr;}
     std::string Vers(){return mVersion;}
     std::string Projet(){return mProjet;}
+    std::string CopyR(){return mCopyR;}
     std::vector<std::string> VRefs(){return mVRefs;}
     //std::string getHtml(); je fait une fonction dans grouplayer pour ne pas avoir de dépendance wt dans le dicoApt (utilisé par ailleurs dans des projets non-wt)
 private:
     std::vector<std::string> mVRefs;
-    std::string mProjet, mDescr,mVersion, mNom;
+    std::string mProjet, mDescr,mVersion, mNom,mCopyR;
 };
 
 class color

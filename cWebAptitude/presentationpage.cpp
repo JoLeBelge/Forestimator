@@ -44,6 +44,7 @@ presentationPage::presentationPage(cDicoApt *aDico):mDico(aDico)
 
    for( auto kv : *mDico->layerMTD()){
        LayerMTD lMTD=kv.second;
+       //std::cout << "ajout lMTD dans sous menu présentation " << lMTD.Nom() << std::endl;
        auto item = std::make_unique<Wt::WMenuItem>(lMTD.Nom(), cpp14::make_unique<Wt::WText>(getHtml(&lMTD)));
        auto item_ = subMenu_->addItem(std::move(item));
    }

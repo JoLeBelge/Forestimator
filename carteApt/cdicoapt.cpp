@@ -139,7 +139,7 @@ cDicoApt::cDicoApt(std::string aBDFile):mBDpath(aBDFile)
             }
         }
 
-        SQLstring="SELECT Code, id_projet, description, version, id_reference, Nom FROM carteMTD;";
+        SQLstring="SELECT Code, id_projet, description, version, id_reference, Nom, copyrigth FROM carteMTD;";
         sqlite3_reset(stmt);
         sqlite3_prepare_v2( db_, SQLstring.c_str(), -1, &stmt, NULL );
         while(sqlite3_step(stmt) == SQLITE_ROW)
@@ -180,6 +180,8 @@ cDicoApt::cDicoApt(std::string aBDFile):mBDpath(aBDFile)
                     }
                 }
                 if (sqlite3_column_type(stmt, 5)!=SQLITE_NULL ){lMTD.setNom(std::string( (char *)sqlite3_column_text( stmt, 5 ) ));}
+                if (sqlite3_column_type(stmt, 6)!=SQLITE_NULL ){lMTD.setCopyR(std::string( (char *)sqlite3_column_text( stmt, 6 ) ));}
+                //std::cout << " done layerMTD " << lMTD.Nom() << std::endl;
                 Dico_layerMTD.emplace(std::make_pair(aA,lMTD));
             }
         }
