@@ -53,6 +53,9 @@ using namespace libzippp;
 
 bool cropIm(std::string inputRaster, std::string aOut, OGREnvelope ext);
 
+std::string getHtml(LayerMTD * lMTD);
+bool isValidHtml(std::string text);
+
 class groupLayers: public WContainerWidget
 {
 public:
@@ -62,6 +65,7 @@ public:
         std::cout << "construct by copy group layer -- should never happend\n\n\n" << std::endl;
     }*/
     void clickOnName(std::string aCode, TypeLayer type);
+
 
     // update du rendu du nom de la couche qui est sélectionnée
     void update(std::string aCode, TypeLayer type);

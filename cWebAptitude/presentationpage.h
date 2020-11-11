@@ -6,16 +6,18 @@
 #include <Wt/WText.h>
 #include <Wt/WTimer.h>
 #include <Wt/WTemplate.h>
+#include "cdicoapt.h"
+#include "grouplayers.h"
 
 using namespace Wt;
 
 class presentationPage : public Wt::WContainerWidget
 {
 public:
-    presentationPage();
-
-    void bannerAnimation();
-    Wt::WStackedWidget * adsBanner;
+    presentationPage(cDicoApt * aDico);
+    cDicoApt * mDico;
+    //void bannerAnimation();
+    //Wt::WStackedWidget * adsBanner;
 };
 
 #endif // PRESENTATIONPAGE_H

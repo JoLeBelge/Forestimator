@@ -3,8 +3,7 @@
 	  nplurals="2"
 	  plural="n == 1 ? 0 : 1">
 <!-- Note : certain message doivent être devant car sinon ils n'overload pas celui de base en anglais... -->
-  
- <message id="titre.presentation">   <strong>Forestimator - présentation</strong> </message>
+<message id="titre.presentation">   <strong>Forestimator - présentation</strong> </message>
  <message id="titre.carto">   <strong>Forestimator - cartographie</strong> </message>
  <message id="titre.ana.surf">    <strong>Forestimator - analyse</strong>  </message>
  <message id="titre.ana.point">   <strong>Forestimator - info ponctuelle</strong>  </message>

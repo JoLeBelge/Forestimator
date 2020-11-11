@@ -38,9 +38,9 @@ groupLayers::groupLayers(cDicoApt * aDico, WOpenLayers *aMap, AuthApplication *a
     this->getMapExtendSignal().connect(std::bind(&groupLayers::updateMapExtentAndCropIm,this, std::placeholders::_1,std::placeholders::_2,std::placeholders::_3,std::placeholders::_4));
 
     slotMapCenter.setJavaScript("function () {"
-                              "var centre = map.getView().getCenter();"
-                              "var z = map.getView().getZoom();"
-                              + sigMapCenter.createCall({"centre[0]","centre[1]","z"}) + "}");
+                                "var centre = map.getView().getCenter();"
+                                "var z = map.getView().getZoom();"
+                                + sigMapCenter.createCall({"centre[0]","centre[1]","z"}) + "}");
     this->sigMapCenter.connect(std::bind(&groupLayers::saveExtent,this, std::placeholders::_1,std::placeholders::_2,std::placeholders::_3));
 
 
@@ -80,30 +80,30 @@ groupLayers::groupLayers(cDicoApt * aDico, WOpenLayers *aMap, AuthApplication *a
 
     // creation des layers pour les KK du CS
 
-        for (auto & pair : *mDico->codeKK2Nom()){
-            Wt::WTreeNode * n = node1_->addChildNode(Wt::cpp14::make_unique<Wt::WTreeNode>(""));
-            WText *label=n->label();
-            Layer  * aL= new Layer(this,pair.first,label,TypeLayer::KK);
-            std::string aCode=pair.first;
-            label->clicked().connect([this,aCode]{clickOnName(aCode,TypeLayer::KK);});
-            aL->changeExpertMode().connect(n,&Wt::WTreeNode::setNodeVisible);
-            mVLs.push_back(aL);
-        }
+    for (auto & pair : *mDico->codeKK2Nom()){
+        Wt::WTreeNode * n = node1_->addChildNode(Wt::cpp14::make_unique<Wt::WTreeNode>(""));
+        WText *label=n->label();
+        Layer  * aL= new Layer(this,pair.first,label,TypeLayer::KK);
+        std::string aCode=pair.first;
+        label->clicked().connect([this,aCode]{clickOnName(aCode,TypeLayer::KK);});
+        aL->changeExpertMode().connect(n,&Wt::WTreeNode::setNodeVisible);
+        mVLs.push_back(aL);
+    }
 
     // ajout des cartes "FEE" ; NT NH Topo AE SS
 
     for (auto & pair : *mDico->RasterType()){
-         if (mDico->rasterCat(pair.first)!="Peuplement"){
-        Wt::WTreeNode * n = node1_->addChildNode(Wt::cpp14::make_unique<Wt::WTreeNode>(""));
-        WText *label=n->label();
-        Layer  * aL= new Layer(this,pair.first,label,TypeLayer::Thematique);
-        std::string aCode=pair.first;
-        // un peu bidouille mais le typelayer de MNH est peuplement et il est redéfini dans le constructeur de layer
-        TypeLayer type= aL->Type();
-        label->clicked().connect([this,aCode,type]{clickOnName(aCode,type);});
-        aL->changeExpertMode().connect(n,&Wt::WTreeNode::setNodeVisible);
-        mVLs.push_back(aL);
-         }
+        if (mDico->rasterCat(pair.first)!="Peuplement"){
+            Wt::WTreeNode * n = node1_->addChildNode(Wt::cpp14::make_unique<Wt::WTreeNode>(""));
+            WText *label=n->label();
+            Layer  * aL= new Layer(this,pair.first,label,TypeLayer::Thematique);
+            std::string aCode=pair.first;
+            // un peu bidouille mais le typelayer de MNH est peuplement et il est redéfini dans le constructeur de layer
+            TypeLayer type= aL->Type();
+            label->clicked().connect([this,aCode,type]{clickOnName(aCode,type);});
+            aL->changeExpertMode().connect(n,&Wt::WTreeNode::setNodeVisible);
+            mVLs.push_back(aL);
+        }
     }
 
     node1_->expand();
@@ -435,16 +435,16 @@ void groupLayers::updateGL(bool expertMode){
 
     // boucle sur les layers et envoi du signal pour cacher ou rendre visible les checkbox
     for (Layer * l : mVLs){
-       l->ExpertMode(expertMode);
+        l->ExpertMode(expertMode);
     }
     // pour cacher les noeuds racines , celui "aptitude CS"
     expertMode_.emit(expertMode);
 
     if(m_app->isLoggedIn()){
-    loadExtents(m_app->getUser().id());
-    mExtentDivGlob->show();
+        loadExtents(m_app->getUser().id());
+        mExtentDivGlob->show();
     } else {
-      mExtentDivGlob->hide();
+        mExtentDivGlob->hide();
     }
 
 }
@@ -772,3 +772,40 @@ int groupLayers::getNumSelect4Download(){return mSelect4Download->numSelectedLay
 std::vector<Layer *>groupLayers::getSelectedLayer4Stat(){return mSelect4Stat->getSelectedLayer();}
 std::vector<Layer *> groupLayers::getSelectedLayer4Download(){return mSelect4Download->getSelectedLayer();}
 //std::vector<Layer *> groupLayers::getAllLayer(){return mSelect4Download->getAllLayer();}
+
+
+// crée le html en vérifiant que chaque membre de layerMTD soit bien un code html valide
+std::string getHtml(LayerMTD * lMTD){
+
+    std::string aRes("");
+    aRes+="<h3><strong>"+lMTD->Nom()+"</strong></h3>";
+    if (lMTD->Projet()!=""){
+        std::string html="<h4>Projet </h4>" +lMTD->Projet();
+        if (isValidHtml(html)){aRes+=html;}
+    }
+    if (lMTD->Descr()!=""){
+        std::string html="<h4>Description </h4>" +lMTD->Descr();
+        if (isValidHtml(html)){aRes+=html;}
+    }
+    if (lMTD->Vers()!=""){
+        std::string html="<h4>Version  </h4>" +lMTD->Vers();
+        if (isValidHtml(html)){aRes+=html;}
+    }
+    if (lMTD->VRefs().size()>0){
+         std::string html="<h4>Référence  </h4>" ;
+    for (std::string ref : lMTD->VRefs()){
+        if (isValidHtml(ref)){html+="<p>"+ref+"</p><p>&nbsp;</p>"";}
+    }
+    aRes+=html;
+    }
+    return aRes;
+}
+
+bool isValidHtml(std::string text){
+    bool aRes(0);
+    Wt::WText t(text);
+    if (t.textFormat() ==Wt::TextFormat::XHTML){ aRes=1;} else {
+        std::cout << " attention, le texte " << text << " n'est pas un code html valide " << std::endl;
+    }
+    return aRes;
+}

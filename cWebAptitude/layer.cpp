@@ -2,7 +2,7 @@
 
 // j'ai besoin d'un objet layer pour faire des cartes statiques dans la fenetre pour les stat, mais ces objets sont totalement lié à groupLayer ET à un WText, donc sont encombrant. Je crée un constructeur "allégé" pour une utilisation plus souple
 Layer::Layer(std::string aCode,cDicoApt * aDico,TypeLayer aType):
-    mDico(aDico)
+   mDico(aDico)
   ,mGroupL(NULL)
   ,mCode(aCode)
   ,mText(NULL)
@@ -66,7 +66,7 @@ Layer::Layer(std::string aCode,cDicoApt * aDico,TypeLayer aType):
 }
 
 Layer::Layer(groupLayers * aGroupL, std::string aCode, WText *PWText, TypeLayer aType):
-    mDico(aGroupL->Dico())
+   mDico(aGroupL->Dico())
   ,mGroupL(aGroupL)
   ,mCode(aCode)
   ,mText(PWText)

@@ -2,13 +2,10 @@
 #include "cwebaptitude.h"
 //#include "auth.h"
 
-//bool ModeExpert(0);
-
 cWebAptitude::cWebAptitude(AuthApplication *app, Auth::AuthWidget* authWidget_)
     : WContainerWidget(),authWidget(authWidget_)
 {
     std::cout << "cWebApt\n" << std::endl;
-    //ModeExpert=0;// un peu sale comme procédé, car le login d'un expert va mettre la var Globale ModeExpert=1 et toutes les nouvelles instances de l'application (d'autre utilisateurs) vont également être en mode expert lool. Solution; remettre la var à 0 lors de chaque nouvelle app
     m_app = app;
     m_app->setLoadingIndicator(cpp14::make_unique<Wt::WOverlayLoadingIndicator>());
      m_app->loadingIndicator()->setMessage(tr("defaultLoadingI"));
@@ -112,7 +109,7 @@ cWebAptitude::cWebAptitude(AuthApplication *app, Auth::AuthWidget* authWidget_)
     // page de statistique
     statWindow * page_camembert = sub_stack->addNew<statWindow>(mDico, m_app);
     //WContainerWidget * page_camembert = sub_stack->addNew<WContainerWidget>();
-    sub_stack->addNew<presentationPage>();
+    sub_stack->addNew<presentationPage>(mDico);
 
 
     /* MAP div */

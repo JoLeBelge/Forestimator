@@ -30,6 +30,8 @@ class Layer;
 class color;
 class rasterFiles; // une classe dédiée uniquemnent à l'export et au clip des couches. Layer ne convient pas car contient une grosse partie pour l'affichage (tuiles et autre) et surtout qu'il y a deux couches par layer pour les apti
 class basicStat;
+class LayerMTD;
+
 
 inline bool exists (const std::string& name){
     struct stat buffer;
@@ -66,6 +68,7 @@ private:
     // pour exporter le dictionnaire dans un fichier texte si nécessaire
     std::map<int, std::string> mDicoVal;
 };
+
 
 // ça va être un peu batard vu que je vais mélanger divers type de layer
 class Layer : public WMSinfo
@@ -201,10 +204,7 @@ public:
 
     // le dictionnaire des valeurs raster vers leur signification.
     std::map<int, std::string> * mDicoVal;
-
     // le dictionnaire des valeurs raster vers leur couleur, pour la légende
-   // std::map<int, color> * mDicoCol;
-    // ce n'est plus un pointeur
     std::map<int, color> mDicoCol;
 
     // signal pour cacher les nodes qui sont en mode expert

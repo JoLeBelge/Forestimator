@@ -45,6 +45,7 @@ class cKKCS; // ce qui caractérise les stations ; potentiel sylvicole, facteur 
 class cRasterInfo; // ça aurait du être une classe mère ou membre de cEss et cKKCS mais je l'implémente après, c'est pour avoir les info à propose des rasters FEE ; NT, NH, Topo, AE, SS
 class ST;
 class cnsw;
+class LayerMTD;
 
 
 class WMSinfo
@@ -53,6 +54,26 @@ public:
     WMSinfo():mUrl(""),mWMSLayerName("toto"){}
     WMSinfo(std::string url,std::string layer):mUrl(url),mWMSLayerName(layer){}
     std::string mUrl, mWMSLayerName;
+};
+
+// pour afficher en html ou pdf les informations relatives aux couches, aux stations des cs, au méthodologies (genre calcul de hdom)
+class LayerMTD{
+public:
+    LayerMTD(){}
+    void setNom(std::string aNom){mNom=aNom;}
+    void setProjet(std::string aProj){mProjet=aProj;}
+    void setDescr(std::string aDesc){mDescr=aDesc;}
+    void setVersion(std::string aV){mVersion=aV;}
+    void addRef(std::string aVRef){mVRefs.push_back(aVRef);}
+    std::string Nom(){return mNom;}
+    std::string Descr(){return mDescr;}
+    std::string Vers(){return mVersion;}
+    std::string Projet(){return mProjet;}
+    std::vector<std::string> VRefs(){return mVRefs;}
+    //std::string getHtml(); je fait une fonction dans grouplayer pour ne pas avoir de dépendance wt dans le dicoApt (utilisé par ailleurs dans des projets non-wt)
+private:
+    std::vector<std::string> mVRefs;
+    std::string mProjet, mDescr,mVersion, mNom;
 };
 
 class color
@@ -573,6 +594,17 @@ public:
         return aRes;
     }
 
+    bool hasMTD(std::string aLayerCode){
+        return Dico_layerMTD.find(aLayerCode)!=Dico_layerMTD.end();
+    }
+    LayerMTD getLayerMTD(std::string aCode){
+        LayerMTD aRes;
+        if (Dico_layerMTD.find(aCode)!=Dico_layerMTD.end()){aRes=Dico_layerMTD.at(aCode);}
+         return aRes;
+    }
+
+    std::map<std::string,LayerMTD> * layerMTD(){return &Dico_layerMTD;}
+
     std::map<std::string,std::string>  Dico_AptFull2AptAcro;// j'en ai besoin dans les batonnetApt
 private:
     std::string mBDpath;
@@ -586,6 +618,7 @@ private:
     std::map<int,std::string>  Dico_id2Habitat;
     std::map<std::string,int> Dico_codeSt2idHab;
 
+    std::map<std::string,LayerMTD>  Dico_layerMTD;
     std::map<std::string,std::string>  Dico_GISfile;
     std::map<std::string,std::string>  Dico_RasterType;
     // continu vs classe
