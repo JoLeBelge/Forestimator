@@ -794,7 +794,7 @@ std::string getHtml(LayerMTD * lMTD){
     if (lMTD->VRefs().size()>0){
          std::string html="<h4>Référence  </h4>" ;
     for (std::string ref : lMTD->VRefs()){
-        if (isValidHtml(ref)){html+="<p>"+ref+"</p><p>&nbsp;</p>"";}
+        if (isValidHtml(ref)){html+="<p>"+ref+"</p><p>&nbsp;</p>";}
     }
     aRes+=html;
     }
