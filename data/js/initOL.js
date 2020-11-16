@@ -106,6 +106,8 @@ extent = [42247, 21148, 295176, 167719];// full RW
 ol.proj.get('EPSG:31370').setExtent(extent);
 // ol 6 va pas. Si si ol 6.4.3 ça roule sans problème, et l'échelle est bonne avec ol.proj.proj4.register(proj4)+ ol.proj.get('EPSG:31370').setExtent(extent);
 
+/*
+le tileGrid est une astuce assez lourde à mettre en place pour le chargement de tuile png ou raster stockées sur le server (carte des scolyte) --> nous on a plus besoin de cette approche
 var resolutions = new Array(22);
 var startResolution = (extent[2]-extent[0]) / 512;
 for (var i = 0, ii = resolutions.length; i < ii; ++i) {
@@ -116,6 +118,7 @@ tileGrid = new ol.tilegrid.TileGrid({
 	resolutions: resolutions,
 	tileSize: [512, 512]
 });
+*/
 //console.log(resolutions);
 
 //var res_ndvi=[384.02176,192.01088,96.00544,48.00272,24.00136,12.00068,6.00034,3.00017];
@@ -125,25 +128,7 @@ var extend_previous=[110345.3375329999980750,-25250.0562959999988379, 301972.300
 //var extend_ndvi=[38824.4511019999990822,19513.5278680000010354, 296527.3037289999774657,171984.5151900000055321];
 var extend_ndvi=[39166.5026720000023488,19513.5278680000010354, 296527.3037289999774657,171984.5151900000055321];
 
-var o2018 = new ol.layer.Tile({
-	extent: extent,
-	title: 'Orthophoto 2018',
-	source: new ol.source.TileWMS({
-		 preload: Infinity,
-		title: 'Ortho 2018',
-		url: 'https://gxgfservcarto.gxabt.ulg.ac.be/cgi-bin/map',
-		crossOrigin: 'null',
-		attributions: 'Â© CartoWeb.be & Geoportail.wallonie.be',
-		params: {
-		  'LAYERS': 'RGB_2018 0.25',
-		  'TILED': true,
-		  'FORMAT': 'image/jpeg'
-		},
-		tileGrid: tileGrid,
-		serverType: 'mapserver',
-	})
-});
-
+/*
 activeLayer = new ol.layer.Tile({
 	extent: extent,
 	title: 'Fond topographique IGN',
@@ -157,11 +142,31 @@ activeLayer = new ol.layer.Tile({
 		  'TILED': true,
 		  'FORMAT': 'image/jpeg'
 		},
-		tileGrid: tileGrid,
+		//tileGrid: tileGrid,
+		projection: 'EPSG:31370',
 		serverType: 'mapserver',
 	})
 });
+*/
 
+activeLayer = new ol.layer.Tile({
+	extent: extent,
+	title: 'Fond topographique IGN',
+	source: new ol.source.TileWMS({
+		title: 'carto Web',
+		url: 'https://wms.ngi.be/cartoweb/service',
+		crossOrigin: 'null',
+		attributions: 'CartoWeb.be',
+		params: {
+		  'LAYERS': 'cartoweb_topo',
+		  'TILED': false,
+		  'FORMAT': 'image/png'
+		},
+		//tileGrid: tileGrid,
+		projection: 'EPSG:31370',
+		//serverType: 'mapserver',
+	})
+});
 
 // pour la couche vectorielle de point qui permet d'afficher un point ou l'utilisateur double click pour avoir le descriptif
 source = new ol.source.Vector({
@@ -185,30 +190,7 @@ station = new ol.layer.Vector({
     })
 });
 
-
-
 //var selectElement = document.getElementById('type');
-
-/*
-// apt2 il affiche le numéro du tile en fonction du paramétrage e tileGrid (origin, origins, resolutions ect) --> bon pour le debugging
-var apt2 = new ol.layer.Tile({
-	preload: 0,
-	title: 'Carte aptitude',
-	source: new ol.source.TileDebug({
-		crossOrigin: null,
-		extent: extent,
-		projection:projection,
-		tileGrid: new ol.tilegrid.TileGrid({
-		//tileGrid: new ol.source.TileDebug({
-	extent: extent,
-	resolutions: res_zbio,
-	origin: [extent[0], extent[3]],
-	tileSize: [512, 512],
-	map:map
-		})
-	})
-});
-*/
 
 parcelles = new ol.layer.Tile({
 	title: 'Cadastre',
@@ -223,7 +205,8 @@ parcelles = new ol.layer.Tile({
 			'TILED': true,
 			'FORMAT': 'image/jpeg'},
 		serverType: 'mapserver',
-		tileGrid: tileGrid
+		//tileGrid: tileGrid
+		projection: 'EPSG:31370',
 	})
 });
 

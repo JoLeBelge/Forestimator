@@ -6,14 +6,15 @@ activeLayer  = new ol.layer.Tile({
 		title: 'MYTITLE',
 		url: 'MYURL',
 		crossOrigin: 'null',
-		attributions: 'Gembloux ABT',
+		attributions: 'MYATTRIBUTION',
 		params: {
 		  'LAYERS': 'MYLAYER',
-		  'TILED': true,
+		  'TILED': false, // avant était à true mais ça faisait bugger cartoweb_topo
 		  'FORMAT': 'image/png'
 		},
-		tileGrid: tileGrid,
-		serverType: 'mapserver',
+		//tileGrid: tileGrid,
+		projection: 'EPSG:31370',
+		//serverType: 'mapserver',
 	})
 });
 
@@ -22,12 +23,12 @@ if (typeof parcellaire !== 'undefined') {
     // the variable is defined
     groupe = new ol.layer.Group({
 		'title': 'parcellaire',
-		attributions: 'Gembloux Agro-Bio Tech',
+		//attributions: 'Gembloux Agro-Bio Tech',
 		 layers:[activeLayer, parcellaire, station]});
 } else {
 groupe = new ol.layer.Group({
 		'title': 'aptitude',
-		attributions: 'Gembloux Agro-Bio Tech',
+		//attributions: 'Gembloux Agro-Bio Tech',
 		layers:[activeLayer, communes, station]});
 
 }

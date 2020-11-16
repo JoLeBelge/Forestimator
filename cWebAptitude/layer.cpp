@@ -171,6 +171,7 @@ void Layer::displayLayer() const{
     boost::replace_all(JScommand,"MYTITLE",this->getLegendLabel());
     boost::replace_all(JScommand,"MYLAYER",mWMSLayerName);
     boost::replace_all(JScommand,"MYURL",mUrl);
+    boost::replace_all(JScommand,"MYATTRIBUTION",mWMSattribution);
     mText->doJavaScript(JScommand);
     //std::cout << JScommand << std::endl;
 }

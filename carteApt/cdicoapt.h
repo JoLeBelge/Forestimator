@@ -52,8 +52,8 @@ class WMSinfo
 {
 public:
     WMSinfo():mUrl(""),mWMSLayerName("toto"){}
-    WMSinfo(std::string url,std::string layer):mUrl(url),mWMSLayerName(layer){}
-    std::string mUrl, mWMSLayerName;
+    WMSinfo(std::string url,std::string layer, std::string attribution=""):mUrl(url),mWMSLayerName(layer),mWMSattribution(attribution){}
+    std::string mUrl, mWMSLayerName, mWMSattribution;
 };
 
 // pour afficher en html ou pdf les informations relatives aux couches, aux stations des cs, au méthodologies (genre calcul de hdom)
