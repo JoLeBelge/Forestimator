@@ -5,13 +5,15 @@ CONFIG -= qt
 QT -= gui
 QT += sql
 
+#QMAKE_CXXFLAGS += -ggdb3 # pour utiliser valgrind et pointer la ligne du code qui va pas
+QMAKE_CXXFLAGS += -g
+
 #CONFIG += c++11
 
 # la compilation sous debian avec gcc-8 m'a montré un bug dans la boucle de création des groupes écologiques. je spécifie donc que c'est avec le compilateur g++-7 qu'il faut compiler le soft
 # update ; maintenant le code est compatible avec gcc 5 et 9. mais sur le serveur c'est gcc 8 pas 9, le 9 n'est pas installé. En plus 8 fonctionne très bien
 QMAKE_CC = gcc-8
 QMAKE_CXX = g++-8
-
 
 #
 LIBS = -lgdal -lwthttp -lwt -lboost_system -lboost_iostreams -lboost_thread -lboost_filesystem -lboost_program_options -lcrypt -pthread -lwtdbo -lwtdbosqlite3 -lzip -lhpdf
@@ -54,9 +56,14 @@ LIBS += -L$$PWD/../../../usr/include/ -lsqlite3
 LIBS += -L$$PWD/usr/include/gdal/ -lgdal
 INCLUDEPATH += $$PWD/../../../../../../usr/include/gdal/
 DEPENDPATH += $$PWD/../../../../../../usr/include/gdal/
+
+# test de setRefence, gdal 3
+#LIBS += -L$$PWD/usr/local/include/gdal/ -lgdal
+#INCLUDEPATH += $$PWD/../../../../../../usr/localinclude/gdal/
+#DEPENDPATH += $$PWD/../../../../../../usr/localinclude/gdal/
+
 INCLUDEPATH += $$PWD/libzipp/src/
 DEPENDPATH += $$PWD/libzipp/src/
-
 }
 
 SOURCES += main.cpp \
@@ -80,6 +87,7 @@ SOURCES += main.cpp \
     presentationpage.cpp \
     ../carteApt/cnsw.cpp \
  #   wkhtml/wkhtmlutil.cpp
+    lstatcontchart.cpp
 
 HEADERS += \
     auth/Session.h \
@@ -103,3 +111,4 @@ HEADERS += \
     presentationpage.h \
     ../carteApt/cnsw.h \
  #   wkhtml/wkhtmlutil.h
+    lstatcontchart.h

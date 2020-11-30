@@ -21,36 +21,41 @@ presentationPage::presentationPage(cDicoApt *aDico):mDico(aDico)
    */
 
     // création d'un menu à gauche, co dans wt widget gallery
-   Wt::WHBoxLayout * hLayout = setLayout(std::make_unique<Wt::WHBoxLayout>());
-   hLayout->setContentsMargins(0, 0, 0, 0);
+    Wt::WHBoxLayout * hLayout = setLayout(std::make_unique<Wt::WHBoxLayout>());
+    hLayout->setContentsMargins(0, 0, 0, 0);
 
-   std::unique_ptr<Wt::WStackedWidget> subStack = std::make_unique<Wt::WStackedWidget>();
-   subStack->addStyleClass("contents");
-   subStack->setContentAlignment(AlignmentFlag::Left);
-   subStack->setOverflow(Wt::Overflow::Auto);
+    std::unique_ptr<Wt::WStackedWidget> subStack = std::make_unique<Wt::WStackedWidget>();
+    subStack->addStyleClass("contents");
+    subStack->setContentAlignment(AlignmentFlag::Left);
+    subStack->setOverflow(Wt::Overflow::Auto);
 
-   auto subMenu = std::make_unique<Wt::WMenu>(subStack.get());
-   auto subMenu_ = subMenu.get();
-   subMenu_->addStyleClass("nav-pills nav-stacked submenu");
-   subMenu_->setWidth(200);
+    auto subMenu = std::make_unique<Wt::WMenu>(subStack.get());
+    auto subMenu_ = subMenu.get();
+    subMenu_->addStyleClass("nav-pills nav-stacked submenu submenuPresentation");
+    subMenu_->setWidth(200);
 
-   subMenu_->setInternalPathEnabled();
-   subMenu_->setInternalBasePath("/presentation");
+    subMenu_->setInternalPathEnabled("/presentation");// bah ça à l'air de bien fonctionner quand mm
 
-   //addWidget(cpp14::make_unique<Wt::WTemplate>(WString::tr("page_presentation")));
-   // introduction forestimator
-   auto item = std::make_unique<Wt::WMenuItem>("Forestimator : présentation", cpp14::make_unique<Wt::WText>(WString::tr("page_presentation")));
-   auto item_ = subMenu_->addItem(std::move(item));
+    // probleme https://redmine.webtoolkit.eu/boards/2/topics/1206, j'ai plein de session qui se lancent quand je veux accèder à l'internal path d'une documentation
 
-   for( auto kv : *mDico->layerMTD()){
-       LayerMTD lMTD=kv.second;
-       //std::cout << "ajout lMTD dans sous menu présentation " << lMTD.Nom() << std::endl;
-       auto item = std::make_unique<Wt::WMenuItem>(lMTD.Nom(), cpp14::make_unique<Wt::WText>(getHtml(&lMTD)));
-       auto item_ = subMenu_->addItem(std::move(item));
-   }
+    //addWidget(cpp14::make_unique<Wt::WTemplate>(WString::tr("page_presentation")));
+    // introduction forestimator
+    std::unique_ptr<Wt::WMenuItem> item = std::make_unique<Wt::WMenuItem>("Forestimator : présentation", cpp14::make_unique<Wt::WText>(WString::tr("page_presentation")));
+    subMenu_->addItem(std::move(item));
+    std::unique_ptr<Wt::WMenuItem> item2 = std::make_unique<Wt::WMenuItem>("Crédit et contact", cpp14::make_unique<Wt::WText>(WString::tr("page_presentation.credit")));
+    subMenu_->addItem(std::move(item2));
 
-   hLayout->addWidget(std::move(subMenu));
-   hLayout->addWidget(std::move(subStack),1);
+
+
+    for( auto kv : *mDico->layerMTD()){
+        LayerMTD lMTD=kv.second;
+        //std::cout << "ajout lMTD dans sous menu présentation " << lMTD.Nom() << std::endl;
+        std::unique_ptr<Wt::WMenuItem> item = std::make_unique<Wt::WMenuItem>(lMTD.Label(), cpp14::make_unique<Wt::WText>(getHtml(&lMTD)));
+        subMenu_->addItem(std::move(item));
+    }
+
+    hLayout->addWidget(std::move(subMenu));
+    hLayout->addWidget(std::move(subStack),1);
 
 }
 

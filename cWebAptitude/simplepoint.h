@@ -83,24 +83,37 @@ class MyRenderer : public Wt::Render::WPdfRenderer {
 
 public:
 
-  MyRenderer(HPDF_Doc pdf, HPDF_Page page,std::string aTitle): WPdfRenderer{pdf, page},pdf_{pdf},mytitle(aTitle)
+  MyRenderer(HPDF_Doc pdf, HPDF_Page page,std::string aTitle,cDicoApt * aDico): WPdfRenderer{pdf, page},pdf_{pdf},mytitle(aTitle),mDico(aDico)
   {
     setMargin(2.54, Wt::Side::Left | Wt::Side::Right | Wt::Side::Bottom);
-    setMargin(2.54, Wt::Side::Top);
-    //setMargin(3.54, Wt::Side::Top); // la mesure est en cm, donc j'ai laissé 1,5 centimètre de header
+    //setMargin(2.54, Wt::Side::Top);
+    setMargin(2.54, Wt::Side::Top); // la mesure est en cm, donc j'ai laissé 1 centimètre de header
     setDpi(96);
-    //renderHeader(currentPage()); pas de header sur page 1
+
+    struct tm* to;
+    time_t t;
+    t = time(NULL);
+    to = localtime(&t);
+    strftime(datename, sizeof(datename), "%Y-%m-%d", to);
+
+    // header sur page 1
+    renderHeader(page,0);
+
   }
 
   HPDF_Page createPage ( int pageNum)
   {
-    setMargin(3.54, Wt::Side::Top);
+    //setMargin(3.54, Wt::Side::Top);
+    setMargin(2.54, Wt::Side::Top);
     HPDF_Page newPage = WPdfRenderer::createPage(pageNum);       // then just pass back to the original render::createpage
+
+
     renderHeader(newPage,pageNum);
     return newPage;   // And return as normal
   }
 
   void renderHeader(HPDF_Page page, int pageNum) {
+    // je vais ajouter la bannière de Forestimator et la date en + du num de page
     WPdfRenderer headerFooterRenderer{pdf_, page};
     headerFooterRenderer.setMargin(1.54);
     setDpi(96);
@@ -108,12 +121,24 @@ public:
         "<p style=\"text-align: center; margin-top: 0;\">Header</p>"
         "<div style=\"height: 840px;\"></div>"
         "<p style=\"text-align: center; margin-bottom: 0;\">Footer</p>"));*/
-    headerFooterRenderer.render(Wt::WString("<p style=\"text-align: center; margin-top: 0; font-size: 8pt;\">"+mytitle+", page "+ std::to_string(pageNum+1) +"</p>"));
+    /*
+    std::string baliseBannierePdf = Wt::WString::tr("report.ban").toUTF8();
+    boost::replace_all(baliseBannierePdf,"PATH",mDico->File("docroot"));
+    headerFooterRenderer.render(baliseBannierePdf);
+      ça fonctionne mais c'est pas très beau... */
+
+    WPdfRenderer r2{pdf_, page};
+    r2.setMargin(1.54);
+    r2.render(Wt::WString("<p style=\"text-align: center; margin-top: 0; font-size: 8pt;\"> Forestimator - "+mytitle+", "+  datename+", page "+ std::to_string(pageNum+1) + "</p>"));
+
+
   }
 
 private:
   std::string mytitle;
   HPDF_Doc pdf_;
+  cDicoApt * mDico;
+  char datename[32];
 
 };
 

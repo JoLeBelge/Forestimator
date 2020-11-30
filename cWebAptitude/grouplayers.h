@@ -31,6 +31,7 @@
 #include "auth.h"
 #include "selectlayers.h"
 #include "cnsw.h"
+#include "lstatcontchart.h"
 
 class WOpenLayers;
 class Layer;
@@ -38,11 +39,14 @@ class groupLayers;
 class simplepoint;
 class ST;
 class layerStatChart;
+class lStatContChart;
 class rasterFiles;
 class selectLayers;
 class selectLayers4Stat;
 class selectLayers4Download;
 class stackInfoPtr;
+
+class groupStat;
 
 enum TypeClassifST {FEE
                     ,CS
@@ -56,16 +60,44 @@ bool cropIm(std::string inputRaster, std::string aOut, OGREnvelope ext);
 std::string getHtml(LayerMTD * lMTD);
 bool isValidHtml(std::string text);
 
-class groupLayers: public WContainerWidget
+// groupLayers héritera de cette classe , ça me permet d'avoir un meilleur visu des membres dédiés aux clacul des statistiques de surface
+class groupStat{
+public:
+    groupStat(){}
+    ~groupStat(){clearStat();}
+    std::vector<layerStatChart*> ptrVLStat() {return mVLStat;}
+    std::vector<lStatContChart*> ptrVLStatCont() {return mVLStatCont;}
+protected:
+    // un vecteur pour les statistique des cartes variables de classes (majoritaire)
+    std::vector<layerStatChart*> mVLStat;
+    // un autre pour les statistique des cartes variables continu (à commencer à MNH)
+    std::vector<lStatContChart*> mVLStatCont;
+
+    void clearStat(){
+        // clear d'un vecteur de pointeur, c'est mal. d'ailleurs ça bug si on calcule plusieur fois des stat dans la mm session, à regler donc
+        for (auto p : mVLStat)
+        {
+            delete p;
+        }
+        for (auto p : mVLStatCont)
+        {
+            delete p;
+        }
+        mVLStatCont.clear();
+        mVLStat.clear();
+    }
+
+};
+
+class groupLayers: public WContainerWidget, public groupStat
 {
 public:
     groupLayers(cDicoApt * aDico,WOpenLayers * aMap, AuthApplication* app,stackInfoPtr * aStackInfoPtr);
-    //~groupLayers();
+    ~groupLayers();
     /*groupLayers(const groupLayers &gl){
         std::cout << "construct by copy group layer -- should never happend\n\n\n" << std::endl;
     }*/
     void clickOnName(std::string aCode, TypeLayer type);
-
 
     // update du rendu du nom de la couche qui est sélectionnée
     void update(std::string aCode, TypeLayer type);
@@ -96,10 +128,10 @@ public:
     void computeStatOnPolyg(OGRLayer * lay, bool mergeOT=0);
 
     ST * mStation;
-    std::vector<Layer *> Layers(){ return mVLs;}
-    std::vector<Layer*> getVpLs(){ return mVLs;}
+    std::vector<std::shared_ptr<Layer>> Layers(){ return mVLs;}
+    std::vector<std::shared_ptr<Layer>> getVpLs(){ return mVLs;}
 
-    Layer * getActiveLay();
+    std::shared_ptr<Layer> getActiveLay();
     // retourne les aptitudes des essences pour une position donnée (click sur la carte)
     //key ; code essence. Value ; code aptitude
     std::map<std::string,int> apts();
@@ -107,8 +139,6 @@ public:
     //Wt::WProgressBar *mPBar;
     // pour faire un processEvent, seul moyen de refresh de la progressbar.
     AuthApplication* m_app;
-
-    std::vector<layerStatChart*> ptrVLStat() {return mVLStat;}
 
     std::vector<rasterFiles> getSelect4Download();
     std::vector<rasterFiles> getSelect4Stat();
@@ -118,10 +148,10 @@ public:
     WContainerWidget * afficheSelect4Download();
     int getNumSelect4Stat();
     int getNumSelect4Download();
-    std::vector<Layer *> getSelectedLayer4Stat();
-    std::vector<Layer *> getSelectedLayer4Download();
+    std::vector<std::shared_ptr<Layer>> getSelectedLayer4Stat();
+    std::vector<std::shared_ptr<Layer>> getSelectedLayer4Download();
     //std::vector<Layer *> getAllLayer();
-    std::vector<Layer *> mVLs;
+    std::vector<std::shared_ptr<Layer>> mVLs;
     void closeConnection();
     int openConnection();
     bool getExpertModeForUser(std::string id);
@@ -131,7 +161,7 @@ public:
     WOpenLayers * mMap;
 
     // gestion de la légende de la carte
-    void updateLegende(const Layer * l);
+    void updateLegende(const std::shared_ptr<Layer> l);
     Wt::WContainerWidget * mLegendDiv;
     Wt::WContainerWidget * mExtentDivGlob; // le glob contient le boutton et le extentDiv
     Wt::WContainerWidget * mExtentDiv;
@@ -149,6 +179,7 @@ public:
     // signal pour cacher les nodes qui sont en mode expert
     Wt::Signal<bool>& changeExpertMode() { return expertMode_; }
 
+    OGREnvelope * getMapExtent(){return & mMapExtent;}
 
 private:
     TypeClassifST mTypeClassifST; // 2 modes de classification des stations forestières ; FEE et CS. important de savoir le mode pour savoir quel tableau d'aptitude afficher quand on double-click sur une station
@@ -159,9 +190,6 @@ private:
 
     // bof finalement c'est mieux le conteneur parent
     Wt::WContainerWidget     * mParent;
-
-    std::vector<layerStatChart*> mVLStat;
-
     JSignal<double, double, double, double>& getMapExtendSignal(){return mapExtent_; }
     JSlot slot;
     JSignal<double, double, double, double>  mapExtent_;
@@ -186,5 +214,6 @@ private:
     JSlot slotMapCenter;
     JSignal<double, double, double>  sigMapCenter;
 };
+
 
 #endif // GROUPLAYERS_H

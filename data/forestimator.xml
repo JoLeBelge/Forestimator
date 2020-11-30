@@ -44,7 +44,7 @@ Vous pouvez télécharger les cartes listées ci-dessous qui seront découpées 
 
 <message id="infoDansVisuStat">Les statistiques sont calculées pour les couches sélectionnées dans la section "Analyse". </message>
 
-<message id="toolTipActiveLayer">Cliquez sur l'onglet légende pour visualiser la signification des couleurs pour cette carte. </message>
+<message id="toolTipActiveLayer">Cliquez sur la case à cocher <b>Afficher la légende</b> ci-dessus pour visualiser la signification des couleurs de cette carte. </message>
 
 <message id="legendMsg"><i>Aucune légende à afficher pour cette carte.</i> </message>
 <message id="legendTitre"><h3>Légende de la carte :</h3> </message>
@@ -364,7 +364,7 @@ Cette application web de cartographie permet une visualisation des informations 
 		</div>
 		<h3>Génération d'un rapport</h3>
 
-		Les résultats de l'analyse ponctuelles peuvent être obtenus sous forme d'un document pdf que l'utilisateur peut télécharger au moyen du boutton <br>export pdf</br>.
+		Les résultats de l'analyse ponctuelles peuvent être obtenus sous forme d'un document pdf que l'utilisateur peut télécharger au moyen du boutton <b>export pdf</b>.
 
 	</div>
 </div>
@@ -404,7 +404,22 @@ Cette application web de cartographie permet une visualisation des informations 
 
 </message>
 
-<message id="report.analyse.point.titre">Forestimator : analyse ponctuelle</message>
+
+<message id="page_presentation.credit"> 
+Le développement de ce site internet est financé par l'Accord-cadre de recherches et vulgarisation forestières.
+Le contenu cartographiques est en grande partie issue des recherches menées au sein de l'unité de <a href="https://www.gembloux.ulg.ac.be/gestion-des-ressources-forestieres/">Gestion des Ressources Forestières</a> de Gembloux Agro-Bio Tech (ULiège).
+<br></br>
+<br></br>
+Personne de contact : Lejeune Philippe <font color="blue">p.lejeune@uliege.be</font>.
+<br></br>
+<br></br>
+Réalisation : Lisein Jonathan <font color="blue">liseinjon@hotmail.com</font> et Samuel Quevauvillers.
+</message>
+
+<message id="report.analyse.surf.hdom.t">Hauteur dominante calculé sur le MNH</message>
+
+
+<message id="report.analyse.point.titre">Analyse ponctuelle</message>
 
 <message id="report.analyse.point">
 <div>
@@ -446,6 +461,9 @@ Cette application web de cartographie permet une visualisation des informations 
 <h2>TITRE_CARTE </h2>
 <img src="PATH_CARTE" style="width:350.0px;height:350.0px;margin:0px 3px 0px 3px;" />
 <!--LEGEND_CARTE si je veux la légende couleur il faut ajouter de manière automatique les couleurs dans les styles ci-dessus, je le ferai ultérieurement-->
+<br></br>
+Position de la station (Belge Lambert 72) : 
+POSITION_PTX, POSITION_PTY.
 </div>
 
 <P style="page-break-before: always"/>
@@ -523,6 +541,8 @@ detAptFEE
 	</div>
 </message>
 
+
+<message id="report.ban"><img src="PATH/resources/DJI_0497_navbar.JPG" width="500px"  border-radius="30px" /></message>
 
 
 

@@ -35,6 +35,8 @@
 	<!-- cette valeur dois être augmentée si l'utilisateur peut uploader des fichiers, sinon peux pas charger des shp de 2 Go -->
 	<max-request-size>20000</max-request-size>
 	<max-formdata-size>20000</max-formdata-size>
+
+  <!--<max-memory-request-size>5000</max-memory-request-size>-->
  </server>
 
 

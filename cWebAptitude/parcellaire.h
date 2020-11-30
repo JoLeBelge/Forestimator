@@ -38,6 +38,7 @@ public:
     void checkShp();
     // merge de tout les polygones pour avoir une géométrie globale
     bool computeGlobalGeom(OGRLayer * lay);
+    bool checkSRC();
     // rasterize une géométrie
     //void rasterizeGeom(OGRGeometry *poGeom);
     void computeStat();
@@ -51,6 +52,8 @@ public:
     void computeStatAndVisuSelectedPol(int aId);
 
     bool hasShp(){return hasValidShp;}
+
+    //void readShp();
 
     std::string geoJsonName();
     std::string geoJsonRelName();
@@ -81,7 +84,8 @@ private:
     double centerX,centerY;
     OGREnvelope mParcellaireExtent;
     bool hasValidShp;
-    OGRGeometry *poGeomGlobale;
+    OGRGeometry * poGeomGlobale;
+
     //Wt::Signal<int> page_;
     //Wt::WStackedWidget * mTopStack;
 

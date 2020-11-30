@@ -38,13 +38,13 @@ enum class PEDO { DRAINAGE,
                   PROFONDEUR
                 };
 
-class dicoPedo
+class dicoPedo : public std::enable_shared_from_this<dicoPedo>
 {
 
 public:
     // deux constructeur ; un qui recoit un pointeur vers un BD déjà ouverte, l'autre qui reçcois le chemin d'accès et qui l'ouvre
-    dicoPedo(std::string aBDFile);
-    dicoPedo(sqlite3 * db);
+   // dicoPedo(std::string aBDFile);
+    dicoPedo(sqlite3 *db);
 
     void loadInfo();
     void closeConnection();
@@ -132,9 +132,10 @@ class cnsw : public dicoPedo
 {
 public:
     cnsw(std::string aBDFile);
-    cnsw(sqlite3 * db);
+    cnsw(sqlite3 *db);
     std::vector<std::string> displayInfo(double x, double y,PEDO p);
 
+     // void loadCNSW(); j'avais testé l'action d'ouvrir une seule fois la couche (dataset est membre de cnsw) pour voir l'impact sur les ressources en mémoire du soft
     // extractInfo
     std::string getValue(double x, double y, PEDO p);
     // analyse surfacique ; retourne une map avec clé=sigle pédo et valeur=pourcentage en surface pour ce sigle
@@ -148,12 +149,12 @@ private:
 
 class ptPedo{
 public:
-    ptPedo(dicoPedo * dico, int aIdSigle);
-    ptPedo(cnsw *dico, double x, double y);
+    ptPedo(std::shared_ptr<dicoPedo> dico, int aIdSigle);
+    ptPedo(std::shared_ptr<cnsw> dico, double x, double y);
     std::vector<std::string> displayInfo(PEDO p);
 
 private:
-    dicoPedo * mDico;
+    std::shared_ptr<dicoPedo> mDico;
     int idSigle;
     std::string dDrainage,dTexture,dProf; // d pour description
 };
@@ -161,13 +162,13 @@ private:
 // analyse surfacique
 class surfPedo{
 public:
-    surfPedo(cnsw *dico, OGRGeometry *poGeom );
+    surfPedo(std::shared_ptr<dicoPedo> dico, OGRGeometry *poGeom );
 
     std::string getSummary(PEDO p);
 
 
 private:
-    dicoPedo * mDico;
+    std::shared_ptr<dicoPedo> mDico;
     std::map<int,double> propSurf;
     std::string dDrainage,dTexture,dProf;
 };

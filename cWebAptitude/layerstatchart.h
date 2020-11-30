@@ -11,8 +11,6 @@
 #include <Wt/WStandardItem.h>
 #include <Wt/WTableView.h>
 #include "layer.h"
-//#include "Magick++.h"
-//#include <Wt/WRasterImage.h>
 
 using namespace Wt;
 using namespace Wt::Chart;
@@ -25,8 +23,7 @@ std::string getAbbreviation(std::string str);
 
 class layerStat;
 class layerStatChart;
-class olOneLay;
-// pour
+//class olOneLay;// plus utilisé, remplacé par staticMap
 class staticMap;
 class batonnetApt;
 
@@ -56,7 +53,7 @@ class  staticMap
 {
 public:
     // constructeur ; a besoin d'un extend et de quoi créer la variable js de la carte, donc pointer vers le layer
-    staticMap(Layer * aLay,OGRGeometry *poGeom);
+    staticMap(std::shared_ptr<Layer> aLay,OGRGeometry *poGeom, OGREnvelope * env=NULL);
     double xGeo2Im(double x);
     double yGeo2Im(double y);
     std::string getFileName(){return mFileName;}
@@ -66,12 +63,12 @@ public:
     Wt::WLink getWLink(){return Wt::WLink(mFileName);}
 
     void drawPol(OGRPolygon * pol, Wt::WPainter * painter);
-    //void drawPol(OGRPolygon * pol);
-    //void drawScaleLine(Magick::Image *im);
-   // std::list<Magick::Drawable> drawList;
+    // ajoute un polygone par après, l'image existe déjà
+    void addPols(std::vector<OGRPolygon *> vpol, Wt::WColor col= Wt::StandardColor::DarkYellow);
+    void drawScaleLine(WPainter *painter);
 
 private:
-    Layer * mLay;
+    std::shared_ptr<Layer> mLay;
     std::string mFileName,mFileNameRel;
     OGREnvelope * ext;
     // taille de l'image en pixel
@@ -81,6 +78,7 @@ private:
 };
 
 // une carte statique , donc sans interaction avec l'utilisateur
+/*
 class  olOneLay: public Wt::WContainerWidget
 {
 public:
@@ -98,19 +96,20 @@ public:
 private:
     Layer * mLay;
 };
+*/
 // va contenir le titre, le tableau et le pie chart pour permettre une visualisation des statistiques calculé pour chacune des couches, typiquement les aptitudes des essences
 class layerStat
 {
 public:
-    layerStat(Layer * aLay,std::map<std::string,int> aStat);
-    layerStat(const layerStat &ls){
+    layerStat(std::shared_ptr<Layer> aLay,std::map<std::string,int> aStat);
+   /* layerStat(const layerStat &ls){
         std::cout << "construct by copy layerStat " << std::endl;
         mLay=ls.mLay;
         mStat=ls.mStat;
         mStatSimple=ls.mStatSimple;
         mTypeVar=ls.mTypeVar;
         mNbPix=ls.mNbPix;
-    }
+    }*/
 
     void simplifieStat();
     std::string summaryStat();
@@ -119,51 +118,45 @@ public:
     int getFieldVal(bool mergeOT=false);
     std::string getFieldValStr();
 
-    Layer * Lay(){return mLay;}
+    std::shared_ptr<Layer> Lay(){return mLay;}
 
     std::map<std::string, int> StatSimple(){return mStatSimple;}
     std::map<std::string, int> Stat(){return mStat;}
     TypeVar mTypeVar; // pour distinguer le type de variable, continue (MNH) ou classes (aptitude)
     cDicoApt * Dico();//{return mLay->Dico();}
 protected:
-    Layer * mLay;
+    std::shared_ptr<Layer> mLay;
     // key ; classe ou valeur, val ; nombre d'occurence
     std::map<std::string, int> mStat;
     std::map<std::string, int> mStatSimple;
 
     int mNbPix;
     std::string mMode; // fee vs cs
-
 };
 
 class layerStatChart : public layerStat
 {
 public:
-    layerStatChart(Layer * aLay, std::map<std::string,int> aStat, OGRGeometry * poGeom);
-    layerStatChart(const layerStatChart &ls):layerStat(ls){
+    layerStatChart(std::shared_ptr<Layer> aLay, std::map<std::string,int> aStat, OGRGeometry * poGeom);
+    /*layerStatChart(const layerStatChart &ls):layerStat(ls){
         std::cout << "construct by copy layerStatChart " << std::endl;
-        mModel=ls.mModel;
+        mModel=std::move(ls.mModel);
         rowAtMax=ls.rowAtMax;
         mTable=ls.mTable;
         mChart=ls.mChart;
-    }
-    // chart ; une carte individuelle + tableau + pie Chart
-    Wt::WContainerWidget * getChart(bool forRenderingInPdf=0);
+    }*/
+    // chart ; une carte individuelle + tableau
+    std::unique_ptr<WContainerWidget> getChart(bool forRenderingInPdf=0);
     // barstat; pour aptitude, les statistiques des aptitudes résumées sous forme de battonnet
-    Wt::WContainerWidget * getBarStat();
-    Chart::WPieChart * mChart;
+    std::unique_ptr<WContainerWidget> getBarStat();
     bool deserveChart(){return mStatSimple.size()>0;}
 private:
-    std::shared_ptr<WStandardItemModel> mModel;
-    //Layer * mLay;
-
-    WTableView * mTable;
+    std::unique_ptr<WStandardItemModel> mModel; // est partagé avec le conteneur de résultat qui est envoyé à la fenetre statwindow
+    //WTableView * mTable;
     int rowAtMax;
-
-    // j'ai besoin d'une enveloppe carto pour la carte statique openlayer
-    //OGREnvelope mExt;
+    // j'ai besoin de la géometrie pour la carte statique openlayer
     OGRGeometry * mGeom;
-
 };
+
 
 #endif // LAYERSTATCHART_H

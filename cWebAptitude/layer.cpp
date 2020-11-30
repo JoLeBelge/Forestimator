@@ -2,7 +2,7 @@
 
 // j'ai besoin d'un objet layer pour faire des cartes statiques dans la fenetre pour les stat, mais ces objets sont totalement lié à groupLayer ET à un WText, donc sont encombrant. Je crée un constructeur "allégé" pour une utilisation plus souple
 Layer::Layer(std::string aCode,cDicoApt * aDico,TypeLayer aType):
-   mDico(aDico)
+    mDico(aDico)
   ,mGroupL(NULL)
   ,mCode(aCode)
   ,mText(NULL)
@@ -66,7 +66,7 @@ Layer::Layer(std::string aCode,cDicoApt * aDico,TypeLayer aType):
 }
 
 Layer::Layer(groupLayers * aGroupL, std::string aCode, WText *PWText, TypeLayer aType):
-   mDico(aGroupL->Dico())
+    mDico(aGroupL->Dico())
   ,mGroupL(aGroupL)
   ,mCode(aCode)
   ,mText(PWText)
@@ -184,6 +184,7 @@ std::vector<std::string> Layer::displayInfo(double x, double y){
     if ((mType==TypeLayer::KK )| (mType==TypeLayer::Thematique) |( this->IsActive())){
         // 1 extraction de la valeur
         int aVal=getValue(x,y);
+
         if (mCode=="NT"){ mGroupL->mStation->mNT=aVal;}
         if (mCode=="NH"){ mGroupL->mStation->mNH=aVal;}
         if (mCode=="ZBIO"){ mGroupL->mStation->mZBIO=aVal;}
@@ -253,7 +254,6 @@ int Layer::getValue(double x, double y){
 std::map<std::string,int> Layer::computeStatOnPolyg(OGRGeometry *poGeom){
     //std::cout << " groupLayers::computeStatOnPolyg " << std::endl;
     std::map<std::string,int> aRes;
-
     if (mType!=TypeLayer::Externe){
         // préparation du containeur du résultat
         for (auto &kv : *mDicoVal){
@@ -264,15 +264,14 @@ std::map<std::string,int> Layer::computeStatOnPolyg(OGRGeometry *poGeom){
         int nbPix(0);
 
         // c'est mon masque au format raster
-        GDALDataset * mask = Layer::rasterizeGeom(poGeom);
+        GDALDataset * mask = rasterizeGeom(poGeom);
 
+        if (mask!=NULL){
         OGREnvelope ext;
         poGeom->getEnvelope(&ext);
         double width((ext.MaxX-ext.MinX)), height((ext.MaxY-ext.MinY));
         // std::cout << " x " << width<< " y " << height << std::endl;
 
-        // gdal
-        GDALAllRegister();
         GDALDataset  * mGDALDat = (GDALDataset *) GDALOpen( getPathTif().c_str(), GA_ReadOnly );
         if( mGDALDat == NULL )
         {
@@ -331,10 +330,11 @@ std::map<std::string,int> Layer::computeStatOnPolyg(OGRGeometry *poGeom){
                     kv.second=(100*kv.second)/nbPix;
                 }
             }*/
-            mBand=NULL;
+            //mBand=NULL;
         }
         GDALClose(mask);
         GDALClose(mGDALDat);
+        }
     }
     return aRes;
 }
@@ -399,12 +399,13 @@ std::vector<std::string> Layer::getCode(std::string aMode){
     return aRes;
 }
 
+// création d'un raster masque pour un polygone. Valeur de 255 pour l'intérieur du polygone
 GDALDataset * Layer::rasterizeGeom(OGRGeometry *poGeom){
 
     std::string output(mDico->File("TMPDIR")+"tmp");
     const char *out=output.c_str();
     //std::cout << " Layer::rasterizeGeom " << std::endl;
-    GDALAllRegister();
+
     GDALDriver *pDriver;
     GDALDataset *pRaster=NULL, * pShp;
 
@@ -412,13 +413,13 @@ GDALDataset * Layer::rasterizeGeom(OGRGeometry *poGeom){
         OGRSpatialReference  * spatialReference=new OGRSpatialReference;
         OGRErr err;
         err=spatialReference->importFromEPSG(31370);
-        char *src;
-        spatialReference->exportToWkt(&src);
+        char * src;
+        //spatialReference->exportToWkt(&src);
 
         // driver et dataset shp -- creation depuis la géométrie
         GDALDriver *pShpDriver = GetGDALDriverManager()->GetDriverByName("ESRI Shapefile");
         //std::cout << " create shp dataset " << std::endl;
-        pShp = pShpDriver->Create( "/vsimem/blahblah.shp", 0, 0, 0, GDT_Unknown, NULL );
+        pShp = pShpDriver->Create("/vsimem/blahblah.shp", 0, 0, 0, GDT_Unknown, NULL );
         //std::cout << " create layer " << std::endl;
         // pas nécessaire pShp->SetProjection(src);
         OGRLayer * lay = pShp->CreateLayer("toto",spatialReference,wkbPolygon,NULL);
@@ -427,8 +428,12 @@ GDALDataset * Layer::rasterizeGeom(OGRGeometry *poGeom){
         //std::cout << " create feature " << std::endl;
         lay->CreateFeature(feat);
 
+        delete spatialReference;
+        delete feat;
+
+
         // driver et dataset raster in memory
-        const char *pszFormat = "MEM";
+       const char *pszFormat = "MEM";
         pDriver = GetGDALDriverManager()->GetDriverByName(pszFormat);
         if( pDriver == NULL )
         {
@@ -440,14 +445,16 @@ GDALDataset * Layer::rasterizeGeom(OGRGeometry *poGeom){
             poGeom->getEnvelope(&ext);
             double width((ext.MaxX-ext.MinX)), height((ext.MaxY-ext.MinY));
 
-            GDALDataset * mGDALDat = (GDALDataset *) GDALOpen( getPathTif().c_str(), GA_ReadOnly );
+
+            // openshared pour pouvoir fermer
+            GDALDataset * mGDALDat = (GDALDataset *) GDALOpenShared( getPathTif().c_str(), GA_ReadOnly );
             if( mGDALDat == NULL )
             {
                 std::cout << "je n'ai pas lu l'image " << getPathTif() << std::endl;
             } else {
                 double transform[6];
                 mGDALDat->GetGeoTransform(transform);
-                GDALClose(mGDALDat);
+
                 double pixelWidth = transform[1];
                 double pixelHeight = -transform[5];
                 //determine dimensions of the tile
@@ -464,11 +471,18 @@ GDALDataset * Layer::rasterizeGeom(OGRGeometry *poGeom){
                 // création du raster en mémoire - on dois lui donner un out mais il ne l'utile pas car MEM driver
                 pRaster = pDriver->Create(out, xSize, ySize, 1, GDT_Byte,NULL);
                 pRaster->SetGeoTransform(tr2);
-                pRaster->SetProjection(src);
+                //pRaster->SetProjection(src);
+
+               // on en avait besoin que pour l'extent et resol
+                //pRaster->SetSpatialRef(mGDALDat->GetSpatialRef());
+                pRaster->SetProjection(mGDALDat->GetProjectionRef());
+                GDALClose(mGDALDat);
+
                 //std::cout << " rasterize " << std::endl;
                 GDALRasterize(NULL,pRaster,pShp,NULL,NULL);
             }
         }
+        //delete src;
         GDALClose(pShp);
     }
     return pRaster;
@@ -477,24 +491,24 @@ GDALDataset * Layer::rasterizeGeom(OGRGeometry *poGeom){
 std::string Layer::NomMapServerLayer()const{
     std::string aRes;
     if (mDico->hasWMSinfo(this->getCode())){
-          aRes=mDico->getWMSinfo(this->getCode())->mWMSLayerName;
+        aRes=mDico->getWMSinfo(this->getCode())->mWMSLayerName;
     }else{
-    switch (mType) {
-    case TypeLayer::FEE:
-        aRes="Aptitude_FEE_"+mCode;
-        break;
-    case TypeLayer::CS:
-        aRes="Aptitude_CS_"+mCode;
-        break;
-    case TypeLayer::Thematique:
-        aRes=mCode;
-        break;
-    case TypeLayer::KK:
-        aRes="KK_CS_"+mCode;
-        break;
-    default:
-        aRes=mCode;
-    }
+        switch (mType) {
+        case TypeLayer::FEE:
+            aRes="Aptitude_FEE_"+mCode;
+            break;
+        case TypeLayer::CS:
+            aRes="Aptitude_CS_"+mCode;
+            break;
+        case TypeLayer::Thematique:
+            aRes=mCode;
+            break;
+        case TypeLayer::KK:
+            aRes="KK_CS_"+mCode;
+            break;
+        default:
+            aRes=mCode;
+        }
     }
     return aRes;
 }
@@ -502,25 +516,25 @@ std::string Layer::NomMapServerLayer()const{
 std::string Layer::MapServerURL()const{
     std::string aRes;
     if (mDico->hasWMSinfo(this->getCode())){
-          aRes=mDico->getWMSinfo(this->getCode())->mUrl;
+        aRes=mDico->getWMSinfo(this->getCode())->mUrl;
     }else{
 
-    switch (mType) {
-    case TypeLayer::FEE:
-        aRes="https://gxgfservcarto.gxabt.ulg.ac.be/cgi-bin/aptitude_fee";
-        break;
-    case TypeLayer::CS:
-        aRes="https://gxgfservcarto.gxabt.ulg.ac.be/cgi-bin/aptitude_cs";
-        break;
-    case TypeLayer::Thematique:
-        aRes="https://gxgfservcarto.gxabt.ulg.ac.be/cgi-bin/station_fee";
-        break;
-    case TypeLayer::KK:
-        aRes="https://gxgfservcarto.gxabt.ulg.ac.be/cgi-bin/station_cs";
-        break;
-    default:
-        aRes=mCode;
-    }
+        switch (mType) {
+        case TypeLayer::FEE:
+            aRes="https://gxgfservcarto.gxabt.ulg.ac.be/cgi-bin/aptitude_fee";
+            break;
+        case TypeLayer::CS:
+            aRes="https://gxgfservcarto.gxabt.ulg.ac.be/cgi-bin/aptitude_cs";
+            break;
+        case TypeLayer::Thematique:
+            aRes="https://gxgfservcarto.gxabt.ulg.ac.be/cgi-bin/station_fee";
+            break;
+        case TypeLayer::KK:
+            aRes="https://gxgfservcarto.gxabt.ulg.ac.be/cgi-bin/station_cs";
+            break;
+        default:
+            aRes=mCode;
+        }
     }
     return aRes;
 }
@@ -556,12 +570,15 @@ rasterFiles::rasterFiles(std::string aPathTif,std::string aCode):mPathTif(aPathT
     }
 }
 
-basicStat::basicStat(std::map<double,int> aMapValandFrequ):mean(0),max(0),min(0){
+basicStat::basicStat(std::map<double,int> aMapValandFrequ):mean(0),max(0),min(0),nb(0){
     bool test(0);
-    int tot(0);
+    std::vector<double> v;
     for (auto kv : aMapValandFrequ){
         mean += kv.first*kv.second;
-        tot+=kv.second;
+        nb+=kv.second;
+
+        // pour pouvoir calculer l'écart type
+        for (int i(0) ; i<kv.second;i++){v.push_back(kv.first);}
 
         if (kv.second>1){
             if (test) {
@@ -576,8 +593,36 @@ basicStat::basicStat(std::map<double,int> aMapValandFrequ):mean(0),max(0),min(0)
             }
         }
     }
-    mean=mean/tot;
+    mean=mean/nb;
 
+    double sq_sum = std::inner_product(v.begin(), v.end(), v.begin(), 0.0);
+    stdev = std::sqrt(sq_sum / nb - mean * mean);
+}
+
+basicStat::basicStat(std::vector<double> v):mean(0),max(0),min(0),nb(0){
+    bool test(0);
+    for (double val : v){
+        mean += val;
+        nb++;
+        if (test) {
+            if (val>max) {max=val;}
+            if (val<min) {min=val;}
+        } else {
+            max=val;
+            min=val;
+            test=1;
+        }
+    }
+    mean=mean/nb;
+    double sq_sum = std::inner_product(v.begin(), v.end(), v.begin(), 0.0);
+    stdev = std::sqrt(sq_sum / nb - mean * mean);
+}
+
+std::string roundDouble(double d, int precisionVal){
+    std::string aRes("");
+    if (precisionVal>0){aRes=std::to_string(d).substr(0, std::to_string(d).find(".") + precisionVal + 1);}
+    else  {aRes=std::to_string(d+0.5).substr(0, std::to_string(d).find("."));}
+   return aRes;
 }
 
 // pour les couches des variables continues
@@ -672,81 +717,72 @@ basicStat Layer::computeBasicStatOnPolyg(OGRGeometry * poGeom){
 
 // pour les couches des variables de classe
 std::string Layer::summaryStat(OGRGeometry * poGeom){
-
     std::cout << "summary stat" << std::endl;
-    layerStat ls(this,computeStatOnPolyg(poGeom));
+    layerStat ls(shared_from_this(),computeStatOnPolyg(poGeom));
     return ls.summaryStat();
-
 }
 
 
-bool Layer::wms2jpg(OGREnvelope extent, int aSx, int aSy, std::string aOut) const{
+bool Layer::wms2jpg(OGREnvelope  * extent, int aSx, int aSy, std::string aOut) const{
 
-    //std::cout << "Layer::wms2jpg()" << std::endl;
+    std::cout << "Layer::wms2jpg()" << std::endl;
     bool aRes(0);
+    std::string layerName=mWMSLayerName;
+    // urlify le nom de couche, enlever les espaces
+    boost::replace_all(layerName," ","%20");
+    const char *connStr = CPLSPrintf("<GDAL_WMS>"
+                                     "<Service name=\"WMS\">"
+                                     "<Version>1.1.1</Version>"
+                                     "<ServerUrl>%s?</ServerUrl>"
+                                     "<SRS>EPSG:31370</SRS>"
+                                     "<ImageFormat>image/jpeg</ImageFormat>"
+                                     "<Layers>%s</Layers>"
+                                     "<Styles></Styles>"
+                                     "</Service>"
+                                     "<DataWindow>"
+                                     "<UpperLeftX>%f</UpperLeftX>"
+                                     "<UpperLeftY>%f</UpperLeftY>"
+                                     "<LowerRightX>%f</LowerRightX>"
+                                     "<LowerRightY>%f</LowerRightY>"
+                                     "<SizeX>%d</SizeX>"
+                                     "<SizeY>%d</SizeY>"
+                                     "</DataWindow>"
+                                     "<Projection>EPSG:31370</Projection>"
+                                     "<BandsCount>3</BandsCount>"
+                                     "<ZeroBlockHttpCodes>204,404</ZeroBlockHttpCodes>"
+                                     "<ZeroBlockOnServerException>true</ZeroBlockOnServerException>"
+                                     "</GDAL_WMS>",
+                                     mUrl.c_str(),
+                                     layerName.c_str(),
+                                     extent->MinX,
+                                     extent->MaxY,
+                                     extent->MaxX,
+                                     extent->MinY,
+                                     aSx,
+                                     aSy
+                                     );
 
-        GDALAllRegister();
-        std::string layerName=mWMSLayerName;
-        // urlify le nom de couche, enlever les espaces
-        boost::replace_all(layerName," ","%20");
+    //"<Cache><Type>file</Type><Expires>%d</Expires></Cache>"
+    //std::cout << connStr << std::endl;
+    GDALDataset *pDS = static_cast<GDALDataset*>(GDALOpenEx(connStr, GDAL_OF_RASTER, nullptr, nullptr, nullptr));
+    if( pDS != NULL ){
 
-        const char *connStr = CPLSPrintf("<GDAL_WMS>"
-                                         "<Service name=\"WMS\">"
-                                         "<Version>1.1.1</Version>"
-                                         "<ServerUrl>%s?</ServerUrl>"
-                                         "<SRS>EPSG:31370</SRS>"
-                                         "<ImageFormat>image/jpeg</ImageFormat>"
-                                         "<Layers>%s</Layers>"
-                                         "<Styles></Styles>"
-                                         "</Service>"
-                                         "<DataWindow>"
-                                         "<UpperLeftX>%f</UpperLeftX>"
-                                         "<UpperLeftY>%f</UpperLeftY>"
-                                         "<LowerRightX>%f</LowerRightX>"
-                                         "<LowerRightY>%f</LowerRightY>"
-                                         "<SizeX>%d</SizeX>"
-                                         "<SizeY>%d</SizeY>"
-                                         "</DataWindow>"
-                                         "<Projection>EPSG:31370</Projection>"
-                                         "<BandsCount>3</BandsCount>"
-                                         "<ZeroBlockHttpCodes>204,404</ZeroBlockHttpCodes>"
-                                         "<ZeroBlockOnServerException>true</ZeroBlockOnServerException>"
-                                         "</GDAL_WMS>",
-                                         mUrl.c_str(),
-                                         layerName.c_str(),
-                                         extent.MinX,
-                                         extent.MaxY,
-                                         extent.MaxX,
-                                         extent.MinY,
-                                         aSx,
-                                         aSy
-                                         );
-
-        //std::cout << connStr << std::endl;
-
-        GDALDataset *pDS = static_cast<GDALDataset*>(GDALOpenEx(
-                                                         connStr, GDAL_OF_RASTER, nullptr, nullptr, nullptr));
-
-        if( pDS != NULL ){
-
-            //std::cout << " X size is " << pDS->GetRasterBand( 1 )->GetXSize() << " , Y size is " << pDS->GetRasterBand( 1 )->GetYSize()<< std::endl;
-
-            // conversion vers jpg
-            GDALDataset *pOutRaster;
-            GDALDriver *pDriverPNG;
-            const char *pszFormat2 = "PNG";
-            pDriverPNG = GetGDALDriverManager()->GetDriverByName(pszFormat2);
-            if( pDriverPNG == NULL )
-            {
-                printf( "%s driver not available.\n", pszFormat2 );
-                exit( 1 );
-            }
-
-            pOutRaster = pDriverPNG->CreateCopy( aOut.c_str(), pDS, FALSE, NULL,NULL, NULL );
-            if( pOutRaster != NULL ){ GDALClose( pOutRaster );}
-            GDALClose( pDS );
-
-            aRes=1;
+        //std::cout << " X size is " << pDS->GetRasterBand( 1 )->GetXSize() << " , Y size is " << pDS->GetRasterBand( 1 )->GetYSize()<< std::endl;
+        // conversion vers jpg
+        GDALDataset *pOutRaster;
+        GDALDriver *pDriverPNG;
+        const char *pszFormat2 = "PNG";
+        pDriverPNG = GetGDALDriverManager()->GetDriverByName(pszFormat2);
+        if( pDriverPNG == NULL )
+        {
+            printf( "%s driver not available.\n", pszFormat2 );
+            exit( 1 );
         }
+        pOutRaster = pDriverPNG->CreateCopy( aOut.c_str(),pDS,FALSE, NULL,NULL, NULL );
+        if( pOutRaster != NULL ){ GDALClose( pOutRaster );}
+        GDALClose(pDS);
+        //GDALClose( (GDALDatasetH) pDS);
+        aRes=1;
+    }
     return aRes;
 }

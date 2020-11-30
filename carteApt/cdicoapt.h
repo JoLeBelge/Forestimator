@@ -61,12 +61,14 @@ class LayerMTD{
 public:
     LayerMTD(){}
     void setNom(std::string aNom){mNom=aNom;}
+    void setLabel(std::string a){mShortName=a;}
     void setProjet(std::string aProj){mProjet=aProj;}
     void setDescr(std::string aDesc){mDescr=aDesc;}
     void setVersion(std::string aV){mVersion=aV;}
     void addRef(std::string aVRef){mVRefs.push_back(aVRef);}
     void setCopyR(std::string a){mCopyR=a;}
     std::string Nom(){return mNom;}
+    std::string Label(){return mShortName;}
     std::string Descr(){return mDescr;}
     std::string Vers(){return mVersion;}
     std::string Projet(){return mProjet;}
@@ -75,12 +77,13 @@ public:
     //std::string getHtml(); je fait une fonction dans grouplayer pour ne pas avoir de dépendance wt dans le dicoApt (utilisé par ailleurs dans des projets non-wt)
 private:
     std::vector<std::string> mVRefs;
-    std::string mProjet, mDescr,mVersion, mNom,mCopyR;
+    std::string mProjet, mDescr,mVersion, mNom,mCopyR,mShortName;
 };
 
 class color
 {
 public:
+    ~color(){}
     color(int R,int G,int B,std::string name="toto"):mR(R),mG(G),mB(B),mStyleClassName(name){isDark();}
     color(std::string aHex,std::string name):mStyleClassName(name){
         // j'enlève le diaise qui semble ne pas convenir
@@ -304,7 +307,7 @@ public:
     // charger les dicos depuis BD SQL
     cDicoApt(std::string aBDFile);
 
-    cnsw * mPedo;
+    std::shared_ptr<cnsw> mPedo;
 
     void closeConnection();
     int openConnection();
@@ -407,8 +410,6 @@ public:
         if (Dico_RasterLayer.find(aCode)!=Dico_RasterLayer.end()){aRes=Dico_RasterLayer.at(aCode);}
         return aRes;
     }
-
-
 
     std::string ZBIO(int aCode){
         std::string aRes("not found");
@@ -596,14 +597,14 @@ public:
         return aRes;
     }
 
-    bool hasMTD(std::string aLayerCode){
+    /*bool hasMTD(std::string aLayerCode){
         return Dico_layerMTD.find(aLayerCode)!=Dico_layerMTD.end();
     }
     LayerMTD getLayerMTD(std::string aCode){
         LayerMTD aRes;
         if (Dico_layerMTD.find(aCode)!=Dico_layerMTD.end()){aRes=Dico_layerMTD.at(aCode);}
          return aRes;
-    }
+    }*/
 
     std::map<std::string,LayerMTD> * layerMTD(){return &Dico_layerMTD;}
 
@@ -668,7 +669,8 @@ private:
 
     std::map<int,color> Dico_codeApt2col;
 
-    sqlite3 *db_;
+    sqlite3 **db_;
+    sqlite3 * ptDb_;
 
 };
 

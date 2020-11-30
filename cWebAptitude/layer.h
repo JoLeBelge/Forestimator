@@ -16,6 +16,8 @@
 #include "ogrsf_frmts.h"
 #include "gdal_utils.h"
 
+#include <numeric>
+
 using namespace Wt;
 
 
@@ -32,6 +34,7 @@ class rasterFiles; // une classe dédiée uniquemnent à l'export et au clip des
 class basicStat;
 class LayerMTD;
 
+std::string roundDouble(double d, int precisionVal=1);
 
 inline bool exists (const std::string& name){
     struct stat buffer;
@@ -40,10 +43,19 @@ inline bool exists (const std::string& name){
 
 class basicStat{
 public:
-    basicStat():min(0),max(0),mean(0){}
+
+    basicStat():min(0),max(0),mean(0),stdev(0),nb(0){}
     basicStat(std::map<double,int> aMapValandFrequ);
-   //private:
-    double min,max,mean;
+    basicStat(std::vector<double> v);
+    std::string getMin(){return roundDouble(min);}
+    std::string getMax(){return roundDouble(max);}
+    std::string getMean(){return roundDouble(mean);}
+    std::string getNb(){return std::to_string(nb);}
+    std::string getSd(){return roundDouble(stdev);}
+    std::string getCV(){if (mean!=0) {return roundDouble(100.0*stdev/mean)+"%";} else { return "-1";};}
+   private:
+    double min,max,mean,stdev;
+    int nb;
 };
 
 class rasterFiles{
@@ -71,13 +83,14 @@ private:
 
 
 // ça va être un peu batard vu que je vais mélanger divers type de layer
-class Layer : public WMSinfo
+class Layer : public WMSinfo, public std::enable_shared_from_this<Layer>
 {
 public:
     Layer(std::string aCode,cDicoApt * aDico,TypeLayer aType);
     Layer(groupLayers * aGroupL, std::string aCode,WText * PWText,TypeLayer aType);
 
     // constructeur par copie et par déplacement ; indispensable si j'utilise les objets dans un vecteur. http://www-h.eng.cam.ac.uk/help/tpl/languages/C++/morevectormemory.html
+    /*
     Layer(const Layer &lay){
         //std::cout << "construct by copy layer " << std::endl;
         mActive=lay.mActive;
@@ -145,7 +158,7 @@ public:
                 break;
             default:{}
         }
-    }
+    }*/
 
     ~Layer();
 
@@ -160,8 +173,8 @@ public:
     basicStat computeBasicStatOnPolyg(OGRGeometry * poGeom);
     std::string summaryStat(OGRGeometry * poGeom);
 
-    // convertior le wms de la couche au format image en local
-    bool wms2jpg(OGREnvelope extent,int aSx,int aSy,std::string aOut) const;
+    // convertir le wms de la couche au format image en local
+    bool wms2jpg(OGREnvelope *extent, int aSx, int aSy, std::string aOut) const;
 
     // raster value
     int getValue(double x, double y);

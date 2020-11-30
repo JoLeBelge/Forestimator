@@ -15,17 +15,17 @@ selectLayers4Stat::selectLayers4Stat(groupLayers * aGL){
         checkB->changed().connect([=]{SelectLayerGroup(checkB->isChecked(),kv.first);});
         n->setColumnWidget(1, std::unique_ptr<Wt::WCheckBox>(checkB));
 
-        if (kv.first == TypeLayer::FEE | kv.first == TypeLayer::Peuplement ){
+        if ((kv.first == TypeLayer::FEE) | (kv.first == TypeLayer::Peuplement )){
             treeTable->treeRoot()->addChildNode(std::unique_ptr<Wt::WTreeTableNode>(n));
         }
     }
 
     // création des noeuds pour chaque couche et de sa checkbox et ajout dans le treetable dans le bon groupe de couche
-    for (Layer * l : mVpLs){
+    for (std::shared_ptr<Layer> l : mVpLs){
 
         if ((l->Type()!=TypeLayer::Externe) && (l->Type()==TypeLayer::FEE | l->Type()==TypeLayer::Peuplement)){
             bool selected(0);
-            if (l->getCode()=="HE"| l->getCode()=="CS" | l->getCode()=="CP" | l->getCode()=="EP" | l->getCode()=="DO" | l->getCode()=="ME"){ selected=1;}
+            if ((l->getCode()=="HE")| (l->getCode()=="CS") | (l->getCode()=="CP") | (l->getCode()=="EP") | (l->getCode()=="DO") | (l->getCode()=="ME")){ selected=1;}
 
             mSelectedLayers.emplace(std::make_pair(l,selected));
             // checkBox
@@ -44,8 +44,8 @@ selectLayers4Stat::selectLayers4Stat(groupLayers * aGL){
     }
 }
 
-std::vector<Layer *> selectLayers::getSelectedLayer(){
-    std::vector<Layer*> aRes;
+std::vector<std::shared_ptr<Layer>> selectLayers::getSelectedLayer(){
+    std::vector<std::shared_ptr<Layer>> aRes;
     for (auto kv : mSelectedLayers){
         if (kv.second){
             aRes.push_back(kv.first);
@@ -74,7 +74,7 @@ selectLayers4Download::selectLayers4Download(groupLayers * aGL){
     }
 
     // création des noeuds pour chaque couche et de sa checkbox et ajout dans le treetable dans le bon groupe de couche
-    for (Layer * l : mVpLs){
+    for (std::shared_ptr<Layer> l : mVpLs){
         if (l->Type()!=TypeLayer::Externe){
             bool selected(0);
             if ((l->Type()==TypeLayer::FEE) && (l->getCode()=="HE"| l->getCode()=="CS" | l->getCode()=="CP" | l->getCode()=="EP" | l->getCode()=="DO" | l->getCode()=="ME")){ selected=1;}
@@ -97,7 +97,7 @@ selectLayers4Download::selectLayers4Download(groupLayers * aGL){
     }
 }
 
-void selectLayers::SelectLayer(bool select,Layer* l,bool afficheMsg){
+void selectLayers::SelectLayer(bool select,std::shared_ptr<Layer> l,bool afficheMsg){
 
     if ((!select) |(nbMax>(numSelectedLayer()))){
         if (mSelectedLayers.find(l)!=mSelectedLayers.end()){
@@ -134,7 +134,7 @@ void selectLayers::SelectLayer(bool select,Layer* l,bool afficheMsg){
 }
 
 void selectLayers::SelectLayerGroup(bool select,TypeLayer aType){
-    for (Layer * l : mVpLs){
+    for (std::shared_ptr<Layer> l : mVpLs){
         if (l->Type()==aType){
             SelectLayer(select,l,false);
         }
@@ -145,7 +145,7 @@ void selectLayers::SelectLayerGroup(bool select,TypeLayer aType){
 // pour envoyer la liste des raster à uploadcarte
 std::vector<rasterFiles> selectLayers::getSelectedRaster(){
     std::vector<rasterFiles> aRes;
-    for (Layer * l : mVpLs){
+    for (std::shared_ptr<Layer> l : mVpLs){
         aRes.push_back(l->getRasterfile());
     }
     return aRes;

@@ -6,6 +6,7 @@ cWebAptitude::cWebAptitude(AuthApplication *app, Auth::AuthWidget* authWidget_)
     : WContainerWidget(),authWidget(authWidget_)
 {
     std::cout << "cWebApt\n" << std::endl;
+    GDALAllRegister();
     m_app = app;
     m_app->setLoadingIndicator(cpp14::make_unique<Wt::WOverlayLoadingIndicator>());
      m_app->loadingIndicator()->setMessage(tr("defaultLoadingI"));
@@ -100,17 +101,15 @@ cWebAptitude::cWebAptitude(AuthApplication *app, Auth::AuthWidget* authWidget_)
     /*
      * Création d'un stack sous la barre de navigation
      * 0 : map et couche et legende et analyse
-     * 1 : statistique parcellaire
-     * 2 : présentation
+     * 1 : présentation
+     * 2 : statistique parcellaire
      */
     sub_stack  = layoutGlobal->addWidget(cpp14::make_unique<WStackedWidget>());
     // page principale
     WContainerWidget * page_carto = sub_stack->addNew<WContainerWidget>();
-    // page de statistique
-    statWindow * page_camembert = sub_stack->addNew<statWindow>(mDico, m_app);
+
     //WContainerWidget * page_camembert = sub_stack->addNew<WContainerWidget>();
     sub_stack->addNew<presentationPage>(mDico);
-
 
     /* MAP div */
     auto layout_carto = page_carto->setLayout(cpp14::make_unique<WHBoxLayout>());
@@ -165,7 +164,7 @@ cWebAptitude::cWebAptitude(AuthApplication *app, Auth::AuthWidget* authWidget_)
     mStackInfoPtr->mGroupLayerW->setStyleClass("content_GL");
 
     /*	MAPS	*/
-    printf("create map\n");
+    std::cout << "create map" << std::endl;
     auto map = cpp14::make_unique<WOpenLayers>(mDico);
     mMap = map.get();
     mMap->setWidth("70%");
@@ -173,8 +172,10 @@ cWebAptitude::cWebAptitude(AuthApplication *app, Auth::AuthWidget* authWidget_)
     mMap->setOverflow(Overflow::Visible);
 
     /* CHARGE ONGLET COUCHES & SIMPLEPOINT */
-    //printf("create GL\n");
+    printf("create GL\n");
     mGroupL = new groupLayers(mDico,mMap,m_app,mStackInfoPtr);
+
+    statWindow * page_camembert = sub_stack->addNew<statWindow>(mGroupL);
 
     /* CHARGE ONGLET ANALYSES */
     //printf("create PA\n");
@@ -212,10 +213,13 @@ cWebAptitude::cWebAptitude(AuthApplication *app, Auth::AuthWidget* authWidget_)
  */
 void cWebAptitude::handlePathChange()
 {
-    if (m_app->internalPath() == "/presentation"){
+
+
+    std::size_t found = m_app->internalPath().find("/presentation");
+    if (m_app->internalPath() == "/presentation" | found!=std::string::npos){
         top_stack->setCurrentIndex(1);
         mStackInfoPtr->menuitem_presentation->select();
-        sub_stack->setCurrentIndex(2);
+        sub_stack->setCurrentIndex(1);
         navigation->setTitle(tr("titre.presentation"));
     }else if (m_app->internalPath() == "/home"){
         top_stack->setCurrentIndex(0);
@@ -239,7 +243,7 @@ void cWebAptitude::handlePathChange()
         navigation->setTitle(tr("titre.ana.point"));
     }else if (m_app->internalPath() == "/resultat"){
         top_stack->setCurrentIndex(1);
-        sub_stack->setCurrentIndex(1);
+        sub_stack->setCurrentIndex(2);
     }else if (m_app->internalPath() == "/parametres"){
         m_app->doJavaScript("alert('Pas encore implémenté...')");
     }else if (m_app->internalPath() == "/"){

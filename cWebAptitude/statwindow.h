@@ -15,18 +15,20 @@
 class statWindow;
 
 
-std::string roundDouble(double d, int precisionVal=1);
+
 
 class statWindow : public Wt::WContainerWidget
 {
 public:
     // a besoin du dictionnaire pour créer le layer qui contient la carte IGN pour faire la carte de situation globale
-    statWindow(cDicoApt * aDico, AuthApplication *app);
+    statWindow(groupLayers * aGL);
 
     void vider();
     void titre(std::string aTitre){mTitre->setText(aTitre);}
     void add1Aptitude(layerStatChart * lstat);
     void add1layerStat(layerStatChart *layerStat);
+    void add1layerStat(lStatContChart *lStatCont);
+    void genIndivCarteAndAptT();
     void generateGenCarte(OGRFeature *poFeature);
 
     //void export2pdf(std::string img, int length);
@@ -39,18 +41,17 @@ public:
     WContainerWidget * mCarteGenCont;
     WContainerWidget * mAllStatIndivCont;
 
-    std::vector<layerStatChart *> VStatIndiv(){return mVContStatIndiv;}
 private:
     cDicoApt * mDico;
     AuthApplication * mApp;
+    groupLayers*mGL;
 
     Wt::WVBoxLayout * layout;
 
-    std::vector<layerStatChart *> mVContStatIndiv;
     // pour la carte de localisation
-    Layer * mIGN;
+    std::shared_ptr<Layer> mIGN;
     // pour les information générales
-    Layer * mMNT, * mZBIO, * mPente;
+    std::shared_ptr<Layer> mMNT, mZBIO, mPente;
 
     //olOneLay *olStatic;
 

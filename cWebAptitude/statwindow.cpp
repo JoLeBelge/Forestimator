@@ -1,7 +1,8 @@
 #include "statwindow.h"
 
-statWindow::statWindow(cDicoApt *aDico, AuthApplication *app):mDico(aDico), mApp(app)//, sigImgPDF(this,"pdf"), slotImgPDF(this)
+statWindow::statWindow(groupLayers * aGL):mDico(aGL->Dico()), mApp(aGL->m_app),mGL(aGL)//, sigImgPDF(this,"pdf"), slotImgPDF(this)
 {
+    std::cout << "statWindow::statWindow" << std::endl;
     setId("statWindow");
     setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Left);
     setMargin(1,Wt::Side::Bottom | Wt::Side::Top);
@@ -51,10 +52,30 @@ statWindow::statWindow(cDicoApt *aDico, AuthApplication *app):mDico(aDico), mApp
     mAllStatIndivCont = addWidget(cpp14::make_unique<WContainerWidget>());
     mAllStatIndivCont->setId("AllStatIndividuelle");
 
-    mIGN = new Layer("IGN",mDico,TypeLayer::Thematique);
-    mMNT = new Layer("MNT",mDico,TypeLayer::Thematique);
-    mZBIO = new Layer("ZBIO",mDico,TypeLayer::Thematique);
-    mPente = new Layer("slope",mDico,TypeLayer::Thematique);
+    mIGN= std::make_shared<Layer>("IGN",mDico,TypeLayer::Thematique);
+    mMNT= std::make_shared<Layer>("MNT",mDico,TypeLayer::Thematique);
+    mZBIO = std::make_shared<Layer>("ZBIO",mDico,TypeLayer::Thematique);
+    mPente= std::make_shared<Layer>("slope",mDico,TypeLayer::Thematique);
+}
+
+void statWindow::genIndivCarteAndAptT(){
+    for (layerStatChart * chart : mGL->ptrVLStat()) {
+        if (chart->deserveChart()){
+
+            if (chart->Lay()->Type()==TypeLayer::FEE | chart->Lay()->Type()==TypeLayer::CS){
+                add1Aptitude(chart);
+            } else {
+                add1layerStat(chart);
+            }
+        }
+    }
+
+    for (lStatContChart * chart : mGL->ptrVLStatCont()) {
+        if (chart->deserveChart()){
+                add1layerStat(chart);
+        }
+    }
+
 }
 
 void statWindow::add1Aptitude(layerStatChart * lstat){
@@ -73,17 +94,21 @@ void statWindow::add1Aptitude(layerStatChart * lstat){
 
     mAptTable->elementAt(row, 0)->addWidget(cpp14::make_unique<WText>(lstat->Lay()->getLegendLabel()));
     // ajout de la barre de statistique
-    mAptTable->elementAt(row, 1)->addWidget(std::unique_ptr<Wt::WContainerWidget>(lstat->getBarStat()));
+    mAptTable->elementAt(row, 1)->addWidget(lstat->getBarStat());
     mAptTable->elementAt(row, 1)->setContentAlignment(AlignmentFlag::Top | AlignmentFlag::Center);
 }
 
 void statWindow::add1layerStat(layerStatChart * layerStat){
      std::cout << "statWindow::add1layerStat" << std::endl;
-    mVContStatIndiv.push_back(layerStat);
     // ici ça à l'air de se compliquer car je transforme un ptr layerStat en std::unique_ptr<Wt::WContainerWidget> et cela à l'air de rendre le raw pointer dandling, il sera par la suite deleted dans groupLayer et là segfault
     // donc il faut rester sur la solution qui fait que layerStat crée un chart pour l'affichage, puis crée un autre contenu pour le rendu
-    mAllStatIndivCont->addWidget(std::unique_ptr<Wt::WContainerWidget>(layerStat->getChart()));
+    mAllStatIndivCont->addWidget(layerStat->getChart());
     //mContStatIndiv->addWidget(std::unique_ptr<Wt::WContainerWidget>(layerStat));
+    std::cout << "statWindow::add1layerStat done" << std::endl;
+}
+void statWindow::add1layerStat(lStatContChart *lStatCont){
+    std::cout << "statWindow::add1layerStat lStatContChart " << std::endl;
+    mAllStatIndivCont->addWidget(lStatCont->getResult());
 }
 
 void statWindow::vider()
@@ -91,12 +116,6 @@ void statWindow::vider()
     mCarteGenCont->clear();
     mAptTable->clear();
     mAllStatIndivCont->clear();
-
-    /*for (layerStatChart * p :  mVContStatIndiv){
-        //removeWidget(p);
-        delete p;
-    }*/
-    mVContStatIndiv.clear();
     mTitre->setText("toto");
 }
 
@@ -109,8 +128,8 @@ void statWindow::generateGenCarte(OGRFeature * poFeature){
      // ajout de la carte pour cette couche
      //olStatic = layoutH->addWidget(cpp14::make_unique<olOneLay>(mIGN,poFeature->GetGeometryRef()),0);
      staticMap sm(mIGN,poFeature->GetGeometryRef());
-     Wt::WImage * im =layoutH->addWidget(cpp14::make_unique<Wt::WImage>(sm.getWLinkRel()),0);
-     im->resize(350,"100%");
+     //Wt::WImage * im =layoutH->addWidget(cpp14::make_unique<Wt::WImage>(sm.getWLinkRel()),0);
+     //im->resize(350,"100%");
      // need to set it here after initialization of the map id !
     /* slotImgPDF.setJavaScript("function () {"
                               "var mapCanvas = document.createElement('canvas');"
@@ -133,7 +152,10 @@ void statWindow::generateGenCarte(OGRFeature * poFeature){
 
      // description générale ; lecture des attribut du polygone?calcul de pente, zone bioclim, et élévation
      WContainerWidget * aContInfo = layoutH->addWidget(cpp14::make_unique<WContainerWidget>());
+
+    // la mémoire du soft augmente de +-4mo par itération de calcul polygone avec le code ci-dessous
      // je refais les calculs pour les couches qui m'intéressent
+
      basicStat statMNT= mMNT->computeBasicStatOnPolyg(poFeature->GetGeometryRef());
      basicStat statPente= mPente->computeBasicStatOnPolyg(poFeature->GetGeometryRef());
 
@@ -143,16 +165,17 @@ void statWindow::generateGenCarte(OGRFeature * poFeature){
      aContInfo->addWidget(cpp14::make_unique<WText>(mZBIO->summaryStat(poFeature->GetGeometryRef())));
 
      aContInfo->addWidget(cpp14::make_unique<WText>("<h5>Relief</h5>"));
-     aContInfo->addWidget(cpp14::make_unique<WText>("Altitude maximum : "+ roundDouble(statMNT.max) + "m"));
+     aContInfo->addWidget(cpp14::make_unique<WText>("Altitude maximum : "+ statMNT.getMax() + "m"));
      aContInfo->addWidget(cpp14::make_unique<WBreak>());
-     aContInfo->addWidget(cpp14::make_unique<WText>("Altitude moyenne : "+ roundDouble(statMNT.mean)+ "m"));
+     aContInfo->addWidget(cpp14::make_unique<WText>("Altitude moyenne : "+ statMNT.getMean()+ "m"));
      aContInfo->addWidget(cpp14::make_unique<WBreak>());
-     aContInfo->addWidget(cpp14::make_unique<WText>("Altitude maximum : "+ roundDouble(statMNT.min)+ "m"));
+     aContInfo->addWidget(cpp14::make_unique<WText>("Altitude maximum : "+ statMNT.getMin()+ "m"));
      aContInfo->addWidget(cpp14::make_unique<WBreak>());
-     aContInfo->addWidget(cpp14::make_unique<WText>("Pente moyenne : "+ roundDouble(statPente.mean)+ "%"));
+     aContInfo->addWidget(cpp14::make_unique<WText>("Pente moyenne : "+ statPente.getMean()+ "%"));
      aContInfo->addWidget(cpp14::make_unique<WBreak>());
 
      // analyse pédo surfacique
+
      surfPedo statPedo(mDico->mPedo,poFeature->GetGeometryRef());
      aContInfo->addWidget(cpp14::make_unique<WText>("<h5>Pédologie</h5>"));
      aContInfo->addWidget(cpp14::make_unique<WText>("Texture : "+ statPedo.getSummary(PEDO::TEXTURE)));
@@ -163,12 +186,7 @@ void statWindow::generateGenCarte(OGRFeature * poFeature){
      aContInfo->addWidget(cpp14::make_unique<WBreak>());
 }
 
-std::string roundDouble(double d, int precisionVal){
-    std::string aRes("");
-    if (precisionVal>0){aRes=std::to_string(d).substr(0, std::to_string(d).find(".") + precisionVal + 1);}
-    else  {aRes=std::to_string(d+0.5).substr(0, std::to_string(d).find("."));}
-   return aRes;
-}
+
 
 
 /*void statWindow::export2pdf(std::string img, int length){

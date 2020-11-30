@@ -1,18 +1,31 @@
 #include "cnsw.h"
 
+/*
 cnsw::cnsw(std::string aBDFile):dicoPedo(aBDFile)
 {
+}*/
 
+cnsw::cnsw(sqlite3 *db):dicoPedo(db){
+ //loadCNSW();
 }
 
-cnsw::cnsw(sqlite3 * db):dicoPedo(db){
+/*
+void cnsw::loadCNSW(){
+      GDALAllRegister();
+      const char *inputPath= mShpPath.c_str();
+      GDALDataset * mDS; mDS= GDALDataset::Open(inputPath, GDAL_OF_VECTOR | GDAL_OF_READONLY);
+      if( mDS == NULL )
+      {
+          std::cout << inputPath << " : " ;
+          printf( " cnsw::loadCNSW : Open failed." );
+      }
 
-}
+}*/
 
 std::vector<std::string> cnsw::displayInfo(double x, double y,PEDO p){
     std::vector<std::string> aRes;
     int sol=getIndexSol(x,y);
-    ptPedo ptPed=ptPedo(this,sol);
+    ptPedo ptPed=ptPedo(shared_from_this(),sol);
 
     if (sol!=-1){
         switch (p) {
@@ -34,7 +47,6 @@ std::vector<std::string> cnsw::displayInfo(double x, double y,PEDO p){
             if (p!="/"){aRes.push_back(p);}
             break;
         }
-
         }
     }
     return aRes;
@@ -43,7 +55,6 @@ std::vector<std::string> cnsw::displayInfo(double x, double y,PEDO p){
 std::map<int,double> cnsw::anaSurface(OGRGeometry *poGeom){
     std::map<int,double> aRes;
     const char *inputPath= mShpPath.c_str();
-    GDALAllRegister();
     GDALDataset * DS;
 
     DS =  (GDALDataset*) GDALOpenEx( inputPath, GDAL_OF_VECTOR | GDAL_OF_UPDATE, NULL, NULL, NULL );
@@ -53,18 +64,17 @@ std::map<int,double> cnsw::anaSurface(OGRGeometry *poGeom){
         std::cout << inputPath << " : " ;
         printf( "Open failed." );
     } else {
-
         // layer
         OGRLayer * lay = DS->GetLayer(0);
         OGRFeature *poFeature;
-
+        //lay->ResetReading();
         lay->SetSpatialFilter(poGeom);
 
         while( (poFeature = lay->GetNextFeature()) != NULL )
         {
             int solId=poFeature->GetFieldAsInteger("INDEX_SOL");
             if (poFeature->GetGeometryRef()->Within(poGeom)) {
-                std::cout  << " intersection des deux géométries " << std::endl;
+                //std::cout  << " intersection des deux géométries " << std::endl;
 
                 OGRMultiPolygon * pol =poFeature->GetGeometryRef()->toMultiPolygon();
                 if (aRes.find(solId)==aRes.end()){ aRes.emplace(solId,pol->get_Area());} else {
@@ -74,7 +84,7 @@ std::map<int,double> cnsw::anaSurface(OGRGeometry *poGeom){
             } else {
 
                 if (poFeature->GetGeometryRef()->Intersect(poGeom)) {
-                    std::cout  << " intersection des deux géométries " << std::endl;
+                   // std::cout  << " intersection des deux géométries " << std::endl;
                     OGRMultiPolygon* pol = poFeature->GetGeometryRef()->Intersection(poGeom)->toMultiPolygon();
                     if (aRes.find(solId)==aRes.end()){ aRes.emplace(solId,pol->get_Area());} else {
                         aRes.at(solId)+=pol->get_Area();
@@ -97,54 +107,46 @@ std::map<int,double> cnsw::anaSurface(OGRGeometry *poGeom){
     return aRes;
 }
 
-
-
 int cnsw::getIndexSol(double x, double y){
     int aRes(-1);
     if(!isnan(x) && !isnan(y) && !(x==0 && y==0)){
         //std::cout << "cnsw::getIndexSol " << std::endl;
-
         const char *inputPath= mShpPath.c_str();
-        GDALAllRegister();
-        GDALDataset * DS;
-
-        DS =  (GDALDataset*) GDALOpenEx( inputPath, GDAL_OF_VECTOR | GDAL_OF_UPDATE, NULL, NULL, NULL );
-
-        if( DS == NULL )
+        GDALDataset * mDS; mDS= GDALDataset::Open(inputPath, GDAL_OF_VECTOR | GDAL_OF_READONLY);
+        if( mDS == NULL )
         {
             std::cout << inputPath << " : " ;
-            printf( "Open failed." );
-        } else {
-
+            printf( " cnsw::loadCNSW : Open failed." );
+        } else{
             // layer
-            OGRLayer * lay = DS->GetLayer(0);
+            OGRLayer * lay = mDS->GetLayer(0);
             OGRFeature *poFeature;
-
             OGRPoint pt(x,y);
-            pt.assignSpatialReference(lay->GetSpatialRef());
+
+           // OGRSpatialReference * georef =lay->GetSpatialRef();
+            //lay->ResetReading();
+            // cause memory leak! still reachable in loss record
+            //pt.assignSpatialReference(lay->GetSpatialRef()); ne semble pas nécessaire au bon fonctionnement
 
             lay->SetSpatialFilter(&pt);
-
-            while( (poFeature = lay->GetNextFeature()) != NULL )
+            //The returned feature becomes the responsibility of the caller to delete with OGRFeature::DestroyFeature().
+            //while( (poFeature = lay->GetNextFeature()) != NULL )
+            poFeature = lay->GetNextFeature();
+            if  (poFeature!= NULL )
             {
-                //aRes=poFeature->GetFID();
                 aRes=poFeature->GetFieldAsInteger("INDEX_SOL");
-                break;
-                //OGRGeometry * poGeom = poFeature->GetGeometryRef();
-                /* if ( pt.Within(poGeom)){
-                    aRes=poFeature->GetFID();
-                    break;
-                }*/
+                OGRFeature::DestroyFeature(poFeature);
+                //break;
             }
+            //lay->SetSpatialFilter(NULL);
         }
-        GDALClose( DS );
+        GDALClose(mDS);
     }
     return aRes;
 }
 
-dicoPedo::dicoPedo(sqlite3 * db):db_(db),mBDpath("jesaispas"){
-    std::cout << "dicoPedo::dicoPedo " << std::endl;
-
+dicoPedo::dicoPedo(sqlite3 *db):db_(db),mBDpath("jesaispas"){
+    //std::cout << "dicoPedo::dicoPedo " << std::endl;
     loadInfo();
 }
 
@@ -187,7 +189,7 @@ void dicoPedo::loadInfo(){
         }
     }
 
-    sqlite3_reset(stmt);
+    sqlite3_finalize(stmt);
     SQLstring="SELECT MAT_TEXT, DESCR  FROM b_texture;";
     sqlite3_prepare_v2( db_, SQLstring.c_str(), -1, &stmt, NULL );
     while(sqlite3_step(stmt) == SQLITE_ROW)
@@ -198,7 +200,7 @@ void dicoPedo::loadInfo(){
             mTexture.emplace(std::make_pair(code,desc));
         }
     }
-    sqlite3_reset(stmt);
+    sqlite3_finalize(stmt);
     SQLstring="SELECT  DESCR,PHASE_1, PHASE_2, PHASE_3, PHASE_4, PHASE_5, PHASE_6, PHASE_7  FROM i_phase;";
     sqlite3_prepare_v2( db_, SQLstring.c_str(), -1, &stmt, NULL );
     while(sqlite3_step(stmt) == SQLITE_ROW)
@@ -219,7 +221,7 @@ void dicoPedo::loadInfo(){
 
     }
 
-    sqlite3_reset(stmt);
+    sqlite3_finalize(stmt);
     SQLstring="SELECT TEXTURE,DRAINAGE, DESCR  FROM c_drainage;";
     sqlite3_prepare_v2( db_, SQLstring.c_str(), -1, &stmt, NULL );
     while(sqlite3_step(stmt) == SQLITE_ROW)
@@ -254,22 +256,19 @@ void dicoPedo::loadInfo(){
             mShpPath= fs::path(std::string( (char *)sqlite3_column_text( stmt, 0 ) )+"/"+std::string( (char *)sqlite3_column_text( stmt, 1 ) ));
         }
     }
-
     sqlite3_finalize(stmt);
 }
 
-
-
-
+/*
 dicoPedo::dicoPedo(std::string aBDFile):mBDpath(aBDFile),db_(NULL){
-    std::cout << "dicoPedo::dicoPedo " << mBDpath << std::endl;
+    //std::cout << "dicoPedo::dicoPedo " << mBDpath << std::endl;
 
     if (openConnection()){} else {
 
         loadInfo();
     }
     closeConnection();
-}
+}*/
 
 int dicoPedo::openConnection(){
     int rc;
@@ -297,15 +296,13 @@ void dicoPedo::closeConnection(){
     }
 }
 
-ptPedo::ptPedo(dicoPedo * dico,int aIdSigle):mDico(dico),idSigle(aIdSigle){
-
-    mDico= dico;
+ptPedo::ptPedo(std::shared_ptr<dicoPedo> dico,int aIdSigle):mDico(dico),idSigle(aIdSigle){
     dTexture=mDico->Texture(idSigle);
     dDrainage=mDico->Drainage(idSigle);
     dProf = mDico->Profondeur(idSigle);
 }
 
-ptPedo::ptPedo(cnsw * dico, double x,double y):mDico(dico){
+ptPedo::ptPedo(std::shared_ptr<cnsw> dico, double x,double y):mDico(dico){
     idSigle=dico->getIndexSol(x,y);
     dTexture=mDico->Texture(idSigle);
     dDrainage=mDico->Drainage(idSigle);
@@ -340,7 +337,7 @@ std::vector<std::string> ptPedo::displayInfo(PEDO p){
 }
 
 
-surfPedo::surfPedo(cnsw * dico, OGRGeometry *poGeom ):mDico(dico){
+surfPedo::surfPedo(std::shared_ptr<dicoPedo> dico, OGRGeometry *poGeom ):mDico(dico){
     propSurf=dico->anaSurface(poGeom);
 
     // synthèse des statistiques dans 3 chaines de charactères

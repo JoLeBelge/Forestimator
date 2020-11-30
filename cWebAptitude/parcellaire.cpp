@@ -1,8 +1,7 @@
 #include "parcellaire.h"
 
-
 int globSurfMax(2500);// en ha
-int globVolMaxShp(5000);// en ko
+int globVolMaxShp(10000);// en ko // n'as pas l'air de fonctionner comme je le souahite
 //https://www.quora.com/What-are-the-risks-associated-with-the-use-of-lambda-functions-in-C-11
 
 parcellaire::parcellaire(groupLayers *aGL, Wt::WApplication* app, statWindow *statW):mGL(aGL),centerX(0.0),centerY(0.0),mClientName(""),mName(""),mFullPath(""),m_app(app),fu(NULL),msg(NULL)
@@ -13,9 +12,12 @@ parcellaire::parcellaire(groupLayers *aGL, Wt::WApplication* app, statWindow *st
   ,hasValidShp(0)
   ,downloadRasterBt(NULL)
   ,mStatW(statW)
+
 {
     //std::cout << "creation parcellaire " << std::endl;
     mDico=aGL->Dico();
+    GDALAllRegister();
+    mParcellaireExtent.MinX=0;mParcellaireExtent.MinY=0;mParcellaireExtent.MaxX=0;mParcellaireExtent.MaxY=0;
 
     setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Left);
     setInline(0);
@@ -24,7 +26,7 @@ parcellaire::parcellaire(groupLayers *aGL, Wt::WApplication* app, statWindow *st
     //mParent->addWidget(cpp14::make_unique<Wt::WText>(tr("infoParcellaire")));
 
     fu =addNew<Wt::WFileUpload>();
-    fu->setFileTextSize(2000); // Set the maximum file size to 2000 kB. il faut également changer param max-request-size dans wt_config
+    fu->setFileTextSize(globVolMaxShp); // Set the maximum file size to 2000 kB. il faut également changer param max-request-size dans wt_config
 
     fu->setFilters(".shp, .shx, .dbf, .prj");
     fu->setMultiple(true);
@@ -93,7 +95,7 @@ parcellaire::parcellaire(groupLayers *aGL, Wt::WApplication* app, statWindow *st
     downloadRasterBt->setInline(0);
     downloadRasterBt->disable();
 
-    fu->fileTooLarge().connect([=] { msg->setText("Le fichier est trop volumineux (max 2000ko).");});
+    fu->fileTooLarge().connect([=] { msg->setText("Le fichier est trop volumineux (max "+std::to_string(globVolMaxShp)+".");});
     fu->changed().connect(this,&parcellaire::fuChanged);
     fu->uploaded().connect(this,&parcellaire::upload);
     //uploadButton->clicked().connect(this ,&parcellaire::clickUploadBt);
@@ -139,71 +141,121 @@ void parcellaire::cleanShpFile(){
 bool parcellaire::toGeoJson(){
     bool aRes=true;
     std::cout << " parcellaire::toGeoJson() ... " ;
-    std::string input(mFullPath+ ".shp"), output(geoJsonName().c_str());
+    std::string  output(geoJsonName().c_str());
+    const char *outPath=output.c_str();
+    std::string input(mFullPath+ ".shp");
     const char *inputPath=input.c_str();
+    //GDALDataset * mDS =  (GDALDataset*) GDALOpenEx( inputPath, GDAL_OF_VECTOR | GDAL_OF_READONLY, NULL, NULL, NULL );
+    GDALDatasetH hSrcDS  = GDALOpenEx( inputPath, GDAL_OF_VECTOR | GDAL_OF_READONLY, NULL, NULL, NULL );
+
+    char** papszArgv = nullptr;
+    papszArgv = CSLAddString(papszArgv, "-a_srs"); // target src without reprojection
+    papszArgv = CSLAddString(papszArgv, "EPSG:31370");
+    GDALVectorTranslateOptions * option = GDALVectorTranslateOptionsNew(papszArgv, nullptr);
+    if( option ){
+         std::cout << "options correctement parsées " << std::endl;
+        GDALDatasetH hOutDS = GDALVectorTranslate(outPath,nullptr,1,&hSrcDS,option,nullptr);
+        if( hOutDS ){
+             std::cout << "devrait etre bien , sauvé sur " <<output << std::endl;
+            // OGRLayer * lay = hOutDS.GetLayer(0);
+            // computeGlobalGeom(lay);
+            GDALClose(hOutDS);
+            GDALClose(GDALOpenEx(outPath, GDAL_OF_VECTOR,nullptr, nullptr, nullptr));
+        }
+    }
+    GDALVectorTranslateOptionsFree(option);
+    GDALClose(hSrcDS);
+
+    // ok maintenant je réouvre pour calculer la géométrie globale
+     GDALDataset * DS =  (GDALDataset*) GDALOpenEx( outPath, GDAL_OF_VECTOR | GDAL_OF_READONLY, NULL, NULL, NULL );
+     if( DS != NULL )
+     {
+         OGRLayer * lay = DS->GetLayer(0);
+         if (computeGlobalGeom(lay)){
+
+         } else {
+             aRes=0;
+             msg->setText("vérifiez que la surface totale de vos parcelles est bien inférieur à " + std::to_string(globSurfMax) + " ha.");
+         }
+     }
+     GDALClose(DS);
+    return aRes;
+}
+
+/*bool parcellaire::toGeoJson(){
+    bool aRes=true;
+    std::cout << " parcellaire::toGeoJson() ... " ;
+    // changer le src pour le mettre à 31370
+    checkSRC();
+
+    std::string  output(geoJsonName().c_str());
     const char *outPath=output.c_str();
     GDALDriver  *jsonDriver;
-    GDALAllRegister();
-
-    //std::cout << "input shp : " << inputPath << " , output " << outPath << std::endl;
-    //OGRSpatialReference  * spatialReference=new OGRSpatialReference;
-    //spatialReference->importFromEPSG(31370);
-
     // datasource
     jsonDriver =GetGDALDriverManager()->GetDriverByName("GeoJSON");
-
     if( jsonDriver == NULL )
     {
         printf( "%s driver not available.\n", "GeoJSON" );
         msg->setText("GeoJSO driver not available!");
         aRes=false;
-
     } else {
-        GDALDataset * DS;
+        std::string input(mFullPath+ ".shp");
+        const char *inputPath=input.c_str();
+        GDALDataset * mDS =  (GDALDataset*) GDALOpenEx( inputPath, GDAL_OF_VECTOR | GDAL_OF_READONLY, NULL, NULL, NULL );
 
-        DS =  (GDALDataset*) GDALOpenEx( inputPath, GDAL_OF_VECTOR, NULL, NULL, NULL );
-        if( DS == NULL )
+        if( mDS != NULL )
         {
-            printf( "Open failed.\n" );
-            aRes=false;
-
-        } else {
-            // layer
-            OGRLayer * lay = DS->GetLayer(0);
+            OGRLayer * lay = mDS->GetLayer(0);
             if (computeGlobalGeom(lay)){
-
-                //std::cout << lay->GetName() << std::endl;
-                char **papszOptions = NULL; // il faut utiliser le driver GeoJSONSeq si je veux pouvoir utiliser les options ci-dessous
-                //papszOptions = CSLSetNameValue( papszOptions, "ATTRIBUTES_SKIP", "YES" );
-                //papszOptions = CSLSetNameValue( papszOptions, "WRITE_BBOX", "YES" );
-                /*papszOptions = CSLSetNameValue( papszOptions, "COORDINATE_PRECISION", "2" );
-    std::cout << "papszOptions " <<papszOptions << std::endl;
-    papszOptions = CSLSetNameValue( papszOptions, "SIGNIFICANT_FIGURES", "5" );
-
-    */
                 GDALDataset * DS2;
-                DS2 = jsonDriver->CreateCopy(outPath, DS, FALSE, papszOptions,NULL, NULL );
+                DS2 = jsonDriver->CreateCopy(outPath, mDS, FALSE, NULL,NULL, NULL );
+                OGRSpatialReference  * spatialReference=new OGRSpatialReference;
+                OGRErr err =spatialReference->importFromEPSG(31370);
+                //char * src;
+                //spatialReference->exportToWkt(&src);
+
+                //DS2->SetProjection(src);
+
+                //std::cout << " err " << DS2->SetSpatialRef(spatialReference) << std::endl;
                 GDALClose( DS2 );
-                GDALClose( DS );
+
             } else {
                 aRes=0;
                 msg->setText("vérifiez que la surface totale de vos parcelles est bien inférieur à " + std::to_string(globSurfMax) + " ha.");
             }
+        GDALClose(mDS);
         }}
 
     //std::cout << " done " << std::endl;
 
     return aRes;
+}*/
+
+bool parcellaire::checkSRC(){
+    //std::cout << "input shp : " << inputPath << " , output " << outPath << std::endl;
+    OGRSpatialReference  * spatialReference=new OGRSpatialReference;
+    spatialReference->importFromEPSG(31370);
+    char * src;
+    spatialReference->exportToWkt(&src);
+    std::string input(mFullPath+ ".shp");
+    const char *inputPath=input.c_str();
+    GDALDataset * mDS =  (GDALDataset*) GDALOpenEx( inputPath, GDAL_OF_VECTOR | GDAL_OF_UPDATE, NULL, NULL, NULL );
+    if (mDS!=NULL){
+        mDS->SetProjection(src); // si pas exactement 31370, openlayer ne va pas afficher la carte
+    }
+    GDALClose(mDS);
+    delete spatialReference;
 }
 
 bool parcellaire::computeGlobalGeom(OGRLayer * lay){
+    std::cout << "computeGlobalGeom " << std::endl;
     bool aRes(0);
     // union de tout les polygones du shp
     OGRFeature *poFeature;
     //OGRPolygon * poGeom;
     OGRGeometry * poGeom;
     OGRGeometry * poGeom2;
-    OGRMultiPolygon *multi = new OGRMultiPolygon();
+    std::unique_ptr<OGRMultiPolygon> multi = std::make_unique<OGRMultiPolygon>();
     OGRErr err;
     OGRMultiPolygon *poGeomM;
 
@@ -211,8 +263,6 @@ bool parcellaire::computeGlobalGeom(OGRLayer * lay){
     int nbValidPol(0);
     while( (poFeature = lay->GetNextFeature()) != NULL )
     {
-        // allez les gros bourrin
-
         //OGRGeometry * tmp=OGRGeometryFactory::forceTo((poFeature->GetGeometryRef()));
         poFeature->GetGeometryRef()->flattenTo2D();
         switch (poFeature->GetGeometryRef()->getGeometryType()){
@@ -233,6 +283,8 @@ bool parcellaire::computeGlobalGeom(OGRLayer * lay){
             int n(poGeomM->getNumGeometries());
             for (int i(0);i<n;i++){
                 poGeom=poGeomM->getGeometryRef(i);
+                poGeom->closeRings();
+                poGeom = poGeom->Buffer(0.0);
                 //if (poFeature->GetGeometryRef()->getGeometryType()==wkbPolygon)
                 err = multi->addGeometry(poGeom);
                 if (err==OGRERR_NONE) nbValidPol++;
@@ -247,16 +299,16 @@ bool parcellaire::computeGlobalGeom(OGRLayer * lay){
         if (err!=OGRERR_NONE){
             std::cout << "problem avec ajout de la geometrie " << poFeature->GetFID() << ", erreur : " << err <<  std::endl;
         }
+        OGRFeature::DestroyFeature(poFeature);
     }
 
     // test si
     if (nbValidPol>0){poGeom2 = multi->UnionCascaded();
 
         poGeom2 =poGeom2->Buffer(1.0);// ça marche bien on dirait! je sais pas si c'est le buffer 1 ou le simplify 1 qui enlève les inner ring (hole) qui restent.
-
         // devrait je pense eêtre créé avec new, car si je ferme le dataset qui contient le layer, poGeomGlobal fait une fuite
-        poGeomGlobale =poGeom2->Simplify(1.0);
-        int aSurfha=OGR_G_GetArea(poGeomGlobale)/10000;
+        poGeomGlobale = poGeom2->Simplify(1.0);
+        int aSurfha=OGR_G_Area(poGeomGlobale)/10000;
         printf("aSurfha=%d",aSurfha);
         if (aSurfha<globSurfMax){
             poGeomGlobale->getEnvelope(&mParcellaireExtent);
@@ -266,8 +318,6 @@ bool parcellaire::computeGlobalGeom(OGRLayer * lay){
             aRes=1;
         }
     }
-
-    delete multi;
 
     return aRes;
 }
@@ -363,6 +413,21 @@ void parcellaire::upload(){
     }
 }
 
+/*
+void parcellaire::readShp(){
+    std::string input(mFullPath+ ".shp");
+    const char *inputPath=input.c_str();
+
+    GDALDataset * mDS; =  (GDALDataset*) GDALOpenEx( inputPath, GDAL_OF_VECTOR | GDAL_OF_READONLY, NULL, NULL, NULL );
+    if( mDS == NULL )
+    {
+        printf( "parcellaire::readShp() Open failed.\n" );
+    } else {
+         printf( "parcellaire::readShp() Success.\n" );
+    }
+}
+*/
+
 void parcellaire::computeStat(){
     std::cout << " parcellaire::computeStat()... " ;
 
@@ -377,23 +442,17 @@ void parcellaire::computeStat(){
     //visuStatButton->enable();
 
     // ici j'ouvre le shp
-    std::cout << " prépare le calcul sur chacun des polygones ... " ;
+    //std::cout << " prépare le calcul sur chacun des polygones ... " ;
     std::string input(mFullPath+ ".shp");
     const char *inputPath=input.c_str();
-    GDALAllRegister();
-    GDALDataset * DS;
-
-    DS =  (GDALDataset*) GDALOpenEx( inputPath, GDAL_OF_VECTOR | GDAL_OF_UPDATE, NULL, NULL, NULL );
-    if( DS == NULL )
+    GDALDataset * mDS =  (GDALDataset*) GDALOpenEx( inputPath, GDAL_OF_VECTOR | GDAL_OF_READONLY, NULL, NULL, NULL );
+    if( mDS != NULL )
     {
-        printf( "Open failed.\n" );
-    } else {
         // layer
-        OGRLayer * lay = DS->GetLayer(0);
+        OGRLayer * lay = mDS->GetLayer(0);
         mGL->computeStatOnPolyg(lay,mCB_fusionOT->isChecked());
-        // sauve le résultat
-        GDALClose( DS );
         //downloadShpBt->enable();
+        GDALClose(mDS);
     }
     m_app->loadingIndicator()->hide();
     m_app->loadingIndicator()->setMessage(tr("defaultLoadingI"));
@@ -408,6 +467,8 @@ void parcellaire::visuStat(OGRFeature *poFeature){
 
     mStatW->generateGenCarte(poFeature);
     std::cout << " genCarte done... " ;
+
+    mStatW->genIndivCarteAndAptT();
     for (layerStatChart * chart : mGL->ptrVLStat()) {
         if (chart->deserveChart()){
 
@@ -415,15 +476,17 @@ void parcellaire::visuStat(OGRFeature *poFeature){
                 mStatW->add1Aptitude(chart);
             } else {
                 mStatW->add1layerStat(chart);
-
             }
-
         }
+    }
 
+    for (lStatContChart * chart : mGL->ptrVLStatCont()) {
+        if (chart->deserveChart()){
+            mStatW->add1layerStat(chart);
+        }
     }
 
     // creation de la ressource pour le rapport pdf
-
 
     std::cout << " ..done " << std::endl;
     m_app->setInternalPath("/resultat",true);
@@ -436,19 +499,13 @@ void parcellaire::computeStatAndVisuSelectedPol(int aId){
     std::cout << " computeStatAndVisuSelectedPol  , id " << aId << std::endl;
     m_app->loadingIndicator()->setMessage(tr("LoadingI1"));
     m_app->loadingIndicator()->show();
-
     std::string input(mFullPath+ ".shp");
     const char *inputPath=input.c_str();
-    GDALAllRegister();
-    GDALDataset * DS;
-
-    DS =  (GDALDataset*) GDALOpenEx( inputPath, GDAL_OF_VECTOR | GDAL_OF_UPDATE, NULL, NULL, NULL );
-    if( DS == NULL )
+    GDALDataset * mDS =  (GDALDataset*) GDALOpenEx( inputPath, GDAL_OF_VECTOR | GDAL_OF_READONLY, NULL, NULL, NULL );
+    if( mDS != NULL )
     {
-        printf( "Open failed.\n" );
-    } else {
         // layer
-        OGRLayer * lay = DS->GetLayer(0);
+        OGRLayer * lay = mDS->GetLayer(0);
         OGRFeature *poFeature;
         bool find(0);
         while( (poFeature = lay->GetNextFeature()) != NULL )
@@ -456,19 +513,17 @@ void parcellaire::computeStatAndVisuSelectedPol(int aId){
             if (poFeature->GetFID()==aId){
                 OGRGeometry * poGeom = poFeature->GetGeometryRef();
                 poGeom->closeRings();
-                poGeom->flattenTo2D();
+                poGeom->flattenTo2D();// sinon la géométrie est genre polygone3D et pas pris en charge dans staticMap par ex
                 mGL->computeStatGlob(poGeom);
                 find=1;
                 break;
             }
         }
-
-        GDALClose( DS );
         if (find) {visuStat(poFeature);}
+        GDALClose(mDS);
     }
     m_app->loadingIndicator()->hide();
     m_app->loadingIndicator()->setMessage(tr("defaultLoadingI"));
-
 }
 
 std::string parcellaire::geoJsonName(){return mFullPath + ".geojson";}
@@ -563,22 +618,16 @@ void parcellaire::selectPolygon(double x, double y){
         std::cout << "parcellaire::selectPolygon " << std::endl;
         std::string input(mFullPath+ ".shp");
         const char *inputPath=input.c_str();
-        GDALAllRegister();
-        GDALDataset * DS;
-
-        DS =  (GDALDataset*) GDALOpenEx( inputPath, GDAL_OF_VECTOR | GDAL_OF_UPDATE, NULL, NULL, NULL );
-        if( DS == NULL )
+        GDALDataset * mDS =  (GDALDataset*) GDALOpenEx( inputPath, GDAL_OF_VECTOR | GDAL_OF_READONLY, NULL, NULL, NULL );
+        if( mDS != NULL )
         {
-            printf( "Open failed.\n" );
-        } else {
-
             // layer
-            OGRLayer * lay = DS->GetLayer(0);
+            OGRLayer * lay = mDS->GetLayer(0);
             OGRFeature *poFeature;
+            lay->ResetReading();
 
             OGRPoint pt(x,y);
-            pt.assignSpatialReference(lay->GetSpatialRef());
-            //bool find(0);
+            //pt.assignSpatialReference(lay->GetSpatialRef());
             while( (poFeature = lay->GetNextFeature()) != NULL )
             {
                 OGRGeometry * poGeom = poFeature->GetGeometryRef();
@@ -589,7 +638,7 @@ void parcellaire::selectPolygon(double x, double y){
                     break;
                 }
             }
-        }
-        GDALClose( DS );
+            GDALClose(mDS);
+        } else { std::cout << "select Polygone mDS is null " << std::endl;}
     }
 }

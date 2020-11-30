@@ -22,11 +22,6 @@ void simplepoint::createUI()
     mParent->setMargin(1,Wt::Side::Bottom | Wt::Side::Top);
     mParent->setInline(0);// si pas inline Et bizarrement si pas de setMargin autre que 0, pas de scrollbar pour l'overflow!
 
-    /*// bouton retour
-    WPushButton * retour = mParent->addWidget(Wt::cpp14::make_unique<WPushButton>("Retour"));
-    retour->addStyleClass("btn btn-info");
-    //retour->setLink(WLink(LinkType::InternalPath, "/analyse"));
-    retour->clicked().connect([=]{mGL->mStackInfoPtr->stack_info->setCurrentIndex(2);;});*/
     mParent->addWidget(cpp14::make_unique<WText>(tr("sp_infoclic")));
     mParent->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
     createPdfBut = mParent->addWidget(Wt::cpp14::make_unique<WPushButton>("Export pdf"));
@@ -48,11 +43,9 @@ void simplepoint::createUI()
 
     mInfoT = mParent->addWidget(cpp14::make_unique<WTable>());
     mInfoT->setId("infoT");
-    //mInfoT->setHeaderCount(2);
     mInfoT->setHeaderCount(1);
     mInfoT->setWidth(Wt::WLength("90%"));
     mInfoT->toggleStyleClass("table-striped",true);
-
 }
 
 void simplepoint::vider()
@@ -62,8 +55,7 @@ void simplepoint::vider()
     mInfoT->clear();
     mDetAptFEE->clear();
     mAptAllEss->clear();
-
-    mContEco->clear();
+    mContEco->clear();  
 }
 
 void simplepoint::titreInfoRaster(){
@@ -246,7 +238,6 @@ void simplepoint::export2pdfTitreDialog(){
     if (mGL->mStation->isOK()){
 
         // TITRE
-        WText * titre=new WText();
         Wt::WDialog * dialog = this->addChild(Wt::cpp14::make_unique<Wt::WDialog>("Titre du rapport pdf"));
         Wt::WLabel *label = dialog->contents()->addNew<Wt::WLabel>("Titre: ");
         Wt::WLineEdit *edit =dialog->contents()->addNew<Wt::WLineEdit>();
@@ -261,7 +252,6 @@ void simplepoint::export2pdfTitreDialog(){
         });
 
         dialog->finished().connect([=] {
-            //titre->setText(edit->text());
             export2pdf(edit->text().toUTF8());
             removeChild(dialog);
         });
@@ -292,7 +282,7 @@ void simplepoint::export2pdf(std::string titre){
     HPDF_Page_SetSize(page, HPDF_PAGE_SIZE_A4, HPDF_PAGE_PORTRAIT);
     HPDF_SetCompressionMode(pdf, HPDF_COMP_ALL);// sinon pdf fait 5 Mo pour rien du tout
 
-    MyRenderer renderer(pdf, page,titre);
+    MyRenderer renderer(pdf, page,titre,mDico);
 
     Wt::WString tpl = tr("report.analyse.point");
     std::string tp = tpl.toUTF8();
@@ -336,9 +326,14 @@ void simplepoint::export2pdf(std::string titre){
     // RENDU CARTE ACTIVE AVEC POSITION de la STATION
 
     OGRPoint pt = mGL->mStation->getPoint();
+
+    // je peux pas utiliser le membre mapextent de GL car celui-ci ne se met à jours que lorsqu'on télécharge une carte sur l'emprise courante...
+    //staticMap sm(mGL->getActiveLay(),&pt,mGL->getMapExtent());
     staticMap sm(mGL->getActiveLay(),&pt);
     boost::replace_all(tp,"PATH_CARTE",sm.getFileName());
     boost::replace_all(tp,"TITRE_CARTE",mGL->getActiveLay()->getLegendLabel(0));
+    boost::replace_all(tp,"POSITION_PTX",roundDouble(mGL->mStation->getX(),1));
+    boost::replace_all(tp,"POSITION_PTY",roundDouble(mGL->mStation->getY(),1));
 
     if (mGL->mStation->ecogramme()){
 
