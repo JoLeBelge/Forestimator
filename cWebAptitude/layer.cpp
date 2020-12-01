@@ -213,9 +213,6 @@ int Layer::getValue(double x, double y){
 
     int aRes(0);
     if (mType!=TypeLayer::Externe){
-        // gdal
-        GDALAllRegister();
-
         GDALDataset  * mGDALDat = (GDALDataset *) GDALOpen( getPathTif().c_str(), GA_ReadOnly );
         if( mGDALDat == NULL )
         {
@@ -721,7 +718,6 @@ std::string Layer::summaryStat(OGRGeometry * poGeom){
     layerStat ls(shared_from_this(),computeStatOnPolyg(poGeom));
     return ls.summaryStat();
 }
-
 
 bool Layer::wms2jpg(OGREnvelope  * extent, int aSx, int aSy, std::string aOut) const{
 

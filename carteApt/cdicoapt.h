@@ -112,7 +112,7 @@ public:
     void isDark(){
         double hsp = 0.299 * pow(mR,2) + 0.587 * pow(mG,2) + 0.114 * pow(mB,2);
         //if (hsp<127.5) {mDark=true;} else {mDark=false;}
-        if (hsp<170) {mDark=true;} else {mDark=false;}
+        if (hsp<210) {mDark=true;} else {mDark=false;}
     }
 
     bool dark(){return mDark;}

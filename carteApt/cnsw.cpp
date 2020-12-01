@@ -296,7 +296,7 @@ void dicoPedo::closeConnection(){
     }
 }
 
-ptPedo::ptPedo(std::shared_ptr<dicoPedo> dico,int aIdSigle):mDico(dico),idSigle(aIdSigle){
+ptPedo::ptPedo(std::shared_ptr<cnsw> dico, int aIdSigle):mDico(dico),idSigle(aIdSigle){
     dTexture=mDico->Texture(idSigle);
     dDrainage=mDico->Drainage(idSigle);
     dProf = mDico->Profondeur(idSigle);
@@ -337,7 +337,7 @@ std::vector<std::string> ptPedo::displayInfo(PEDO p){
 }
 
 
-surfPedo::surfPedo(std::shared_ptr<dicoPedo> dico, OGRGeometry *poGeom ):mDico(dico){
+surfPedo::surfPedo(std::shared_ptr<cnsw> dico, OGRGeometry *poGeom ):mDico(dico){
     propSurf=dico->anaSurface(poGeom);
 
     // synthèse des statistiques dans 3 chaines de charactères

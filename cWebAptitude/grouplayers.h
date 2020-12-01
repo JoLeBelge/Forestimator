@@ -56,6 +56,8 @@ using namespace Wt;
 using namespace libzippp;
 
 bool cropIm(std::string inputRaster, std::string aOut, OGREnvelope ext);
+// pour la comparaison de deux enveloppes lors du crop d'une image
+double getArea(OGREnvelope * env);
 
 std::string getHtml(LayerMTD * lMTD);
 bool isValidHtml(std::string text);

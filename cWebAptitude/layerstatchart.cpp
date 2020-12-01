@@ -4,8 +4,8 @@ int seuilClasseMinoritaire(2); // en dessous de ce seuil, les classes sont regro
 layerStatChart::layerStatChart(std::shared_ptr<Layer> aLay, std::map<std::string, int> aStat, OGRGeometry *poGeom):layerStat(aLay,aStat),rowAtMax(0),mGeom(poGeom)
 {
 
-    //std::cout << "création d'un layer StatChart pour " << mLay->getLegendLabel() << std::endl;
-    mModel = std::make_unique<WStandardItemModel>();
+    std::cout << "création d'un layer StatChart pour " << mLay->getLegendLabel() << std::endl;
+    mModel = std::make_shared<WStandardItemModel>();
     // pas sur que j'ai besoin de spécifier le proto
     //mModel->setItemPrototype(cpp14::make_unique<WStandardItem>());
 
@@ -38,11 +38,17 @@ layerStatChart::layerStatChart(std::shared_ptr<Layer> aLay, std::map<std::string
 
 }
 
+bool layerStatChart::deserveChart(){
+    bool aRes=mStatSimple.size()>0;
+    if (!aRes){ std::cout << "la couche " << mLay->getLegendLabel() << " ne mérite pas de graphique pour ses statistiques " << std::endl;}
+    return aRes;
+}
+
 std::unique_ptr<WContainerWidget> layerStatChart::getChart(bool forRenderingInPdf){
 
     //std::cout << " creation d'un chart " << std::endl;
     std::unique_ptr<WContainerWidget> aRes= std::make_unique<Wt::WContainerWidget>();
-    /*
+
     aRes->setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Center);
     aRes->setInline(0);
     aRes->setOverflow(Wt::Overflow::Auto);
@@ -69,8 +75,6 @@ std::unique_ptr<WContainerWidget> layerStatChart::getChart(bool forRenderingInPd
     aContTableAndPie->setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Center);
     //aContTableAndPie->setInline(0);
     aContTableAndPie->setOverflow(Wt::Overflow::Auto);
-
-    //WVBoxLayout * layoutV2 = aContTableAndPie->setLayout(cpp14::make_unique<WVBoxLayout>());
 
     //std::cout << " statsimple : " << mStatSimple.size() << " elem " << std::endl;
     if (!forRenderingInPdf){
@@ -156,7 +160,7 @@ std::unique_ptr<WContainerWidget> layerStatChart::getChart(bool forRenderingInPd
             layoutH->addWidget(cpp14::make_unique<WText>("Pas de statistique pour cette couche"));
         }
     }
-    */
+
     return std::move(aRes);
 }
 
@@ -462,11 +466,10 @@ staticMap::staticMap(std::shared_ptr<Layer> aLay, OGRGeometry *poGeom, OGREnvelo
     // on rectifie la taille de l'image en pixel en fonction de la forme de la zone
     mSy=(double)mSx*(mWy/mWx);
 
-    std::cout << ext->MinX << ", " << ext->MinY << ", " << ext->MaxX << ", " << ext->MaxY << std::endl;
-    bool a=mLay->wms2jpg(ext,mSx,mSy,mFileName);
+    //std::cout << ext->MinX << ", " << ext->MinY << ", " << ext->MaxX << ", " << ext->MaxY << std::endl;
+
     // d'abord transformer la couche wms en image locale, puis réouvrir et y dessiner le polygone
-    /*
-    if (mLay->wms2jpg(*ext,mSx,mSy,mFileName)) {
+    if (mLay->wms2jpg(ext,mSx,mSy,mFileName)) {
 
         // création d'un wrasterImage et copier dedans l'image existante
         Wt::WRasterImage pngImage("png", mSx, mSy);
@@ -524,10 +527,7 @@ staticMap::staticMap(std::shared_ptr<Layer> aLay, OGRGeometry *poGeom, OGREnvelo
         std::ofstream f(mFileName, std::ios::out | std::ios::binary);
         pngImage.write(f);
         f.close();
-
-
     }
-    */
 }
 
 void staticMap::drawPol(OGRPolygon * pol, WPainter *painter){

@@ -8,11 +8,6 @@ simplepoint::simplepoint(groupLayers *aGL, WContainerWidget *parent):mGL(aGL)
 {
     createUI();
 }
-/*
-simplepoint::legend(WContainerWidget *parent):mParent(parent)
-{
-    createUI();
-}*/
 
 void simplepoint::createUI()
 {

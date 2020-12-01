@@ -38,7 +38,7 @@ enum class PEDO { DRAINAGE,
                   PROFONDEUR
                 };
 
-class dicoPedo : public std::enable_shared_from_this<dicoPedo>
+class dicoPedo
 {
 
 public:
@@ -128,7 +128,7 @@ private:
 
 };
 
-class cnsw : public dicoPedo
+class cnsw : public std::enable_shared_from_this<cnsw>,public dicoPedo
 {
 public:
     cnsw(std::string aBDFile);
@@ -149,12 +149,12 @@ private:
 
 class ptPedo{
 public:
-    ptPedo(std::shared_ptr<dicoPedo> dico, int aIdSigle);
+    ptPedo(std::shared_ptr<cnsw> dico, int aIdSigle);
     ptPedo(std::shared_ptr<cnsw> dico, double x, double y);
     std::vector<std::string> displayInfo(PEDO p);
 
 private:
-    std::shared_ptr<dicoPedo> mDico;
+    std::shared_ptr<cnsw> mDico;
     int idSigle;
     std::string dDrainage,dTexture,dProf; // d pour description
 };
@@ -162,13 +162,12 @@ private:
 // analyse surfacique
 class surfPedo{
 public:
-    surfPedo(std::shared_ptr<dicoPedo> dico, OGRGeometry *poGeom );
+    surfPedo( std::shared_ptr<cnsw> dico, OGRGeometry *poGeom );
 
     std::string getSummary(PEDO p);
 
-
 private:
-    std::shared_ptr<dicoPedo> mDico;
+     std::shared_ptr<cnsw> mDico;
     std::map<int,double> propSurf;
     std::string dDrainage,dTexture,dProf;
 };

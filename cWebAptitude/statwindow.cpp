@@ -61,7 +61,6 @@ statWindow::statWindow(groupLayers * aGL):mDico(aGL->Dico()), mApp(aGL->m_app),m
 void statWindow::genIndivCarteAndAptT(){
     for (layerStatChart * chart : mGL->ptrVLStat()) {
         if (chart->deserveChart()){
-
             if (chart->Lay()->Type()==TypeLayer::FEE | chart->Lay()->Type()==TypeLayer::CS){
                 add1Aptitude(chart);
             } else {
@@ -75,7 +74,6 @@ void statWindow::genIndivCarteAndAptT(){
                 add1layerStat(chart);
         }
     }
-
 }
 
 void statWindow::add1Aptitude(layerStatChart * lstat){
@@ -98,8 +96,7 @@ void statWindow::add1Aptitude(layerStatChart * lstat){
     mAptTable->elementAt(row, 1)->setContentAlignment(AlignmentFlag::Top | AlignmentFlag::Center);
 }
 
-void statWindow::add1layerStat(layerStatChart * layerStat){
-     std::cout << "statWindow::add1layerStat" << std::endl;
+void statWindow::add1layerStat(layerStatChart * layerStat){  
     // ici ça à l'air de se compliquer car je transforme un ptr layerStat en std::unique_ptr<Wt::WContainerWidget> et cela à l'air de rendre le raw pointer dandling, il sera par la suite deleted dans groupLayer et là segfault
     // donc il faut rester sur la solution qui fait que layerStat crée un chart pour l'affichage, puis crée un autre contenu pour le rendu
     mAllStatIndivCont->addWidget(layerStat->getChart());
@@ -107,7 +104,6 @@ void statWindow::add1layerStat(layerStatChart * layerStat){
     std::cout << "statWindow::add1layerStat done" << std::endl;
 }
 void statWindow::add1layerStat(lStatContChart *lStatCont){
-    std::cout << "statWindow::add1layerStat lStatContChart " << std::endl;
     mAllStatIndivCont->addWidget(lStatCont->getResult());
 }
 
@@ -126,10 +122,9 @@ void statWindow::generateGenCarte(OGRFeature * poFeature){
      WContainerWidget * aContCarte = layoutV->addWidget(cpp14::make_unique<WContainerWidget>());
      WHBoxLayout * layoutH = aContCarte->setLayout(cpp14::make_unique<WHBoxLayout>());
      // ajout de la carte pour cette couche
-     //olStatic = layoutH->addWidget(cpp14::make_unique<olOneLay>(mIGN,poFeature->GetGeometryRef()),0);
      staticMap sm(mIGN,poFeature->GetGeometryRef());
-     //Wt::WImage * im =layoutH->addWidget(cpp14::make_unique<Wt::WImage>(sm.getWLinkRel()),0);
-     //im->resize(350,"100%");
+     Wt::WImage * im =layoutH->addWidget(cpp14::make_unique<Wt::WImage>(sm.getWLinkRel()),0);
+     im->resize(350,"100%");
      // need to set it here after initialization of the map id !
     /* slotImgPDF.setJavaScript("function () {"
                               "var mapCanvas = document.createElement('canvas');"

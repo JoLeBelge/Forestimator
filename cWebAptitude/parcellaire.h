@@ -32,15 +32,14 @@ public:
     ~parcellaire();
     void cleanShpFile();
     // conversion shp esri vers geoJson
-    bool toGeoJson();
+    bool to31370AndGeoJson();
     void display();
     // effectue des vérification du shp (polygone, src)
     void checkShp();
-    // merge de tout les polygones pour avoir une géométrie globale
-    bool computeGlobalGeom(OGRLayer * lay);
-    bool checkSRC();
-    // rasterize une géométrie
-    //void rasterizeGeom(OGRGeometry *poGeom);
+    // merge de tout les polygones pour avoir une géométrie globale et y calculer la surface totale
+    bool computeGlobalGeom();
+
+    // computeStat est l'ancienne version qui ajoutait un champ au shp - OLD
     void computeStat();
     void visuStat(OGRFeature *poFeature);
     void upload();
@@ -53,30 +52,21 @@ public:
 
     bool hasShp(){return hasValidShp;}
 
-    //void readShp();
-
     std::string geoJsonName();
     std::string geoJsonRelName();
-
-    //Wt::Signal<int>& changePage() { return page_; }
 
     void downloadShp();
     void downloadRaster();
     bool cropImWithShp(std::string inputRaster, std::string aOut);
 
-    // update au moment ou on bascule sur la version expert ou non expert
-    //void update();
-
-
 private:
 
     // Full path ; là ou est sauvé le shp localement, mName ; le nom du shp tels qu'il était chez le client
     std::string mFullPath, mName,mClientName;
-    //Wt::WContainerWidget     * mParent;
-    Wt::WContainerWidget     * mContSelect4D, * mContSelect4Stat;
+    Wt::WContainerWidget * mContSelect4D;
     statWindow * mStatW;
     Wt::WFileUpload *fu;
-    Wt::WPushButton  *downloadRasterBt;//*uploadButton,*visuStatButton *computeStatButton, *downloadShpBt,
+    Wt::WPushButton  *downloadRasterBt;
     Wt::WApplication* m_app;
     Wt::WText * msg;
     groupLayers * mGL;
@@ -85,12 +75,6 @@ private:
     OGREnvelope mParcellaireExtent;
     bool hasValidShp;
     OGRGeometry * poGeomGlobale;
-
-    //Wt::Signal<int> page_;
-    //Wt::WStackedWidget * mTopStack;
-
-    Wt::WCheckBox *mCB_fusionOT;
-
 };
 
 #endif // PARCELLAIRE_H

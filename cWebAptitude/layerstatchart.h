@@ -149,10 +149,9 @@ public:
     std::unique_ptr<WContainerWidget> getChart(bool forRenderingInPdf=0);
     // barstat; pour aptitude, les statistiques des aptitudes résumées sous forme de battonnet
     std::unique_ptr<WContainerWidget> getBarStat();
-    bool deserveChart(){return mStatSimple.size()>0;}
+    bool deserveChart();
 private:
-    std::unique_ptr<WStandardItemModel> mModel; // est partagé avec le conteneur de résultat qui est envoyé à la fenetre statwindow
-    //WTableView * mTable;
+    std::shared_ptr<WStandardItemModel> mModel; // est partagé avec le conteneur de résultat qui est envoyé à la fenetre statwindow
     int rowAtMax;
     // j'ai besoin de la géometrie pour la carte statique openlayer
     OGRGeometry * mGeom;

@@ -40,7 +40,7 @@ public:
        mDistFrequ.clear();
     }
     std::shared_ptr<Layer> Lay(){return mLay;}
-    bool deserveChart(){return mStat.size()>0;}
+    bool deserveChart();
     cDicoApt * Dico();
 
     // pour hdom

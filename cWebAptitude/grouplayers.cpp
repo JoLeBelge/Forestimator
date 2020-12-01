@@ -315,12 +315,11 @@ void groupLayers::computeStatGlob(OGRGeometry *poGeomGlobale){
     clearStat();
 
     // pour les statistiques globales, on prend toutes les couches selectionnées par select4Download
-
     for (auto & l: getSelectedLayer4Download() ){
 
         if (l->getCode()=="MNH2019"){
             // calcul de Hdom
-           mVLStatCont.push_back(new lStatContChart(l,poGeomGlobale,TypeStat::HDOM));
+          // mVLStatCont.push_back(new lStatContChart(l,poGeomGlobale,TypeStat::HDOM));
 
         } else if(l->getCode()=="COMPO"){
             // calcul des probabilités de présence pour les 9 sp?
@@ -330,7 +329,6 @@ void groupLayers::computeStatGlob(OGRGeometry *poGeomGlobale){
             // clé : la valeur au format légende (ex ; Optimum). Valeur ; pourcentage pour ce polygone
 
             std::map<std::string,int> stat = l->computeStatOnPolyg(poGeomGlobale);
-
             mVLStat.push_back(new layerStatChart(l,stat,poGeomGlobale));
         }
 
@@ -338,7 +336,6 @@ void groupLayers::computeStatGlob(OGRGeometry *poGeomGlobale){
         //m_app->processEvents();
     }
     //mPBar->setValue(mPBar->maximum());
-
     //return aRes;
 }
 
@@ -434,7 +431,6 @@ void groupLayers::updateGL(bool expertMode){
     } else {
         mExtentDivGlob->hide();
     }
-
 }
 
 void groupLayers::updateLegende(const std::shared_ptr<Layer> l){
@@ -514,7 +510,6 @@ void groupLayers::exportLayMapView(){
                                                               "<p> Cette couche ne peut être découpée sur cette emprise, essayer avec une zone plus petite.</p>",
                                                               Wt::Icon::Critical,
                                                               Wt::StandardButton::Ok));
-
             messageBox->setModal(false);
             messageBox->buttonClicked().connect([=] {
                 this->removeChild(messageBox);
@@ -563,15 +558,15 @@ bool cropIm(std::string inputRaster, std::string aOut, OGREnvelope ext){
         extGlob.MinX=transform[0];
         extGlob.MinY=transform[3]+transform[5]*pInputRaster->GetRasterBand(1)->GetYSize();
         extGlob.MaxX=transform[0]+transform[1]*pInputRaster->GetRasterBand(1)->GetXSize();
-
-        //std::cout << ext.MinX << " , " << ext.MaxX << " , " << ext.MinY << " , " << ext.MaxY << " avant intersect " << std::endl;
         // garder l'intersect des 2 extend
         ext.Intersect(extGlob);
         //std::cout << ext.MinX << " , " << ext.MaxX << " , " << ext.MinY << " , " << ext.MaxY << " après intersect " << std::endl;
+        // test si la différence entre le raster en entier et le raster croppé est significative, si non on va copier tout au lieu de cropper
 
-        if (extGlob.MinX==ext.MinX && extGlob.MaxX==ext.MaxX && extGlob.MinY==ext.MinY && extGlob.MaxY==ext.MaxY){
-            //std::cout << "je vais faire une copie de tout le raster plutôt que de le cropper " << std::endl;
-            //pInputRaster->
+        //if (extGlob.MinX==ext.MinX && extGlob.MaxX==ext.MaxX && extGlob.MinY==ext.MinY && extGlob.MaxY==ext.MaxY){
+        // si 80% ou plus, on garde toute l'image
+        if (getArea(&ext)/getArea(&extGlob)>0.8){
+            std::cout << "copie de toute l'image" << std::endl;
             pDriver->CopyFiles(cropPath,inputPath);
             aRes=1;
         } else {
@@ -618,6 +613,10 @@ bool cropIm(std::string inputRaster, std::string aOut, OGREnvelope ext){
         std::cout << " attention, un des fichiers input n'existe pas : " << inputRaster << std::endl;
     }
     return aRes;
+}
+
+double getArea(OGREnvelope * env){
+    return (double) (env->MaxX-env->MinX)*(env->MaxY-env->MinY);
 }
 
 /*

@@ -13,7 +13,6 @@ lStatContChart::lStatContChart(std::shared_ptr<Layer> aLay, OGRGeometry * poGeom
     case TypeStat::HDOM:
         predictHdom(); // va calculer mStat et mVaddPol qui sont les hexagones à dessiner sur l'image statique
         mDistFrequ=computeDistrH();
-        //computeDistrH();
         break;
     default:
         break;
@@ -90,15 +89,15 @@ std::vector<std::pair<std::string,double>> lStatContChart::computeDistrH(){
         {
             if (*it <= seuilClasses.at(0))
             {
-               clasOcc.at(0)++;
+                clasOcc.at(0)++;
             } else if (*it> seuilClasses.at(seuilClasses.size()-1)){
-            clasOcc.at(clasOcc.size()-1)++;
+                clasOcc.at(clasOcc.size()-1)++;
             } else {
-                 for (int i(0) ; i+1 < seuilClasses.size() ; i++){
-                     if (*it > seuilClasses.at(i) && *it <= seuilClasses.at(i+1)){
+                for (int i(0) ; i+1 < seuilClasses.size() ; i++){
+                    if (*it > seuilClasses.at(i) && *it <= seuilClasses.at(i+1)){
                         clasOcc.at(i+1)++;
-                     }
-                 }
+                    }
+                }
             }
         }
 
@@ -111,13 +110,13 @@ std::vector<std::pair<std::string,double>> lStatContChart::computeDistrH(){
         std::string aRange("<3m");
         aRes.push_back(std::make_pair(aRange,((double)clasOcc.at(0)/((double)nbPix))));
         for (int i(0) ; i+1 < seuilClasses.size() ; i++){
-        aRange=roundDouble(seuilClasses.at(i),0)+"m-"+roundDouble(seuilClasses.at(i+1),0)+"m";
-        aRes.push_back(std::make_pair(aRange,((double)clasOcc.at(i+1)/((double)nbPix))));
-         }
+            aRange=roundDouble(seuilClasses.at(i),0)+"m-"+roundDouble(seuilClasses.at(i+1),0)+"m";
+            aRes.push_back(std::make_pair(aRange,((double)clasOcc.at(i+1)/((double)nbPix))));
+        }
         aRange=">51m";
         aRes.push_back(std::make_pair(aRange,((double)clasOcc.at(clasOcc.size()-1)/((double)nbPix))));
 
-        }
+    }
 
     return aRes;
 }
@@ -165,39 +164,43 @@ void lStatContChart::predictHdom(){
             int xOffsetMask = int((ext.MinX - xOriginMask) / pixelWidth);
             int yOffsetMask = int((yOriginMask - ext.MaxY ) / pixelHeight);
 
-            float *scanline, *scanlineMask;
-            scanline = (float *) CPLMalloc( sizeof( float ) * xSize );
-            scanlineMask = (float *) CPLMalloc( sizeof( float ) * xSize );
+            float *scanPix,*scanPixMask;
+            scanPix = (float *) CPLMalloc( sizeof( float ) * 1 );;
+            scanPixMask = (float *) CPLMalloc( sizeof( float ) * 1 );
+            //scanline = (float *) CPLMalloc( sizeof( float ) * xSize );
+            //scanlineMask = (float *) CPLMalloc( sizeof( float ) * xSize );
             std::vector<double> aVHs;
             // boucle sur chaque ligne
-            for ( int row = 0; row < ySize; row++ )
+            for ( int row = 0; row < ySize; row++)
             {
-                // check effet de bord, pas correctement geré ; les centroide d'hexagone en bordure droite et gauche du masque ne peuvent être lue car la requete dépase la taille du masque
-                // une solution serait de lire pixel par pixel au lieu de ligne par ligne, mais pour le moment je laisse ça à plus tard
-                if (xOffsetMask+xSize <mask->GetRasterBand(1)->GetXSize() && row+yOffsetMask < mask->GetRasterBand(1)->GetYSize()){
-                    //std::cout << " ligne sur MNH; xOffset " << xOffset << " yOffset " << row+yOffset << std::endl;
-                    // lecture MNH
-                    mBand->RasterIO( GF_Read, xOffset, row+yOffset, xSize, 1, scanline, xSize,1, GDT_Float32, 0, 0 );
-                    // lecture du masque
-                    mask->GetRasterBand(1)->RasterIO( GF_Read, xOffsetMask , row+yOffsetMask, xSize, 1, scanlineMask, xSize,1, GDT_Float32, 0, 0 );
-                    // boucle sur scanline et garder les pixels qui sont ET dans le mask ET dans l'hexagone
-                    // colorier ces pixels et sauver le masque pour contrôler que ça fonctionne?
-                    for (int col = 0; col <  xSize; col++)
-                    {
-                        if (scanlineMask[col]==255){
+                for (int col = 0; col <  xSize; col++)
+                {
+                    // check effet de bord, pas correctement geré ; les centroide d'hexagone en bordure droite et gauche du masque ne peuvent être lue car la requete dépase la taille du masque
+                    // une solution serait de lire pixel par pixel au lieu de ligne par ligne, mais pour le moment je laisse ça à plus tard
+                    if (xOffsetMask+col<mask->GetRasterBand(1)->GetXSize() && row+yOffsetMask < mask->GetRasterBand(1)->GetYSize()){
+                        std::cout << " pos sur MNH; x " << col+xOffset << ", y" << row+yOffset << std::endl;
+
+                        std::cout << " pos sur Mask; x " << col+xOffsetMask << ", y" << row+yOffsetMask << std::endl;
+                        // lecture MNH
+                        mBand->RasterIO( GF_Read,                   col+xOffset,    row+yOffset,    1, 1,   scanPix, 1,1, GDT_Float32, 0, 0 );
+                        // lecture du masque
+                        mask->GetRasterBand(1)->RasterIO( GF_Read, col+xOffsetMask , row+yOffsetMask, 1, 1, scanPixMask, 1,1, GDT_Float32, 0, 0 );
+                        // Garder les pixels qui sont ET dans le mask ET dans l'hexagone
+                        // colorier ces pixels et sauver le masque pour contrôler que ça fonctionne?
+                        if (scanPixMask[col]==255){
                             OGRPoint pt(ext.MinX+col*pixelWidth,ext.MaxY-row*pixelWidth);
                             // check que le pixel est bien dans l'hexagone
                             if ( pt.Intersect(hex)){
-                                double aVal=scanline[ col ];
+                                double aVal=scanPix[ col ];
                                 // appliquer gain et offset et ajouter au vecteur
                                 aVHs.push_back(Dico()->H(aVal));
-                            }
                         }
                     }
                 }
+                }
             }
-            CPLFree(scanline);
-            CPLFree(scanlineMask);
+            CPLFree(scanPix);
+            CPLFree(scanPixMask);
             // prediction de Hdom si suffisament de valeur (si hexagone en bordure de polygone, pas l'hexa complêt)
             double surf=aVHs.size()*pixelWidth*pixelHeight;
             //std::cout << "surface nid abeille ; " << surf << std::endl;
@@ -213,10 +216,16 @@ void lStatContChart::predictHdom(){
     mStat=aRes;
 }
 
+bool lStatContChart::deserveChart(){
+    bool aRes=mStat.size()>0;
+    if (!aRes){ std::cout << "la couche " << mLay->getLegendLabel() << " ne mérite pas de graphique pour ses statistiques " << std::endl;}
+    return aRes;
+}
+
 std::unique_ptr<WContainerWidget> lStatContChart::getResult(){
     std::cout << "lStatContChart::getResult() " << std::endl;
     std::unique_ptr<WContainerWidget> aRes= std::make_unique<Wt::WContainerWidget>();
-    /*
+
     aRes->setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Center);
     aRes->setInline(0);
     aRes->setOverflow(Wt::Overflow::Auto);
@@ -239,10 +248,10 @@ std::unique_ptr<WContainerWidget> lStatContChart::getResult(){
     Wt::WImage * im =layoutH->addWidget(cpp14::make_unique<Wt::WImage>(sm.getWLinkRel()),0);
     im->resize(350,350);
 
-    //WContainerWidget * aContTable = layoutH->addWidget(cpp14::make_unique<WContainerWidget>());
-    //aContTable->setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Center);
-    //aContTable->setOverflow(Wt::Overflow::Auto);
-    WTable * table =layoutH->addWidget(cpp14::make_unique<WTable>());
+    WContainerWidget * aContTable = layoutH->addWidget(cpp14::make_unique<WContainerWidget>());
+    aContTable->setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Center);
+    aContTable->setOverflow(Wt::Overflow::Auto);
+    WTable * table =aContTable->addWidget(cpp14::make_unique<WTable>());
 
     table->elementAt(0, 0)->setColumnSpan(2);
     table->elementAt(0, 0)->setContentAlignment(AlignmentFlag::Top | AlignmentFlag::Center);
@@ -273,13 +282,13 @@ std::unique_ptr<WContainerWidget> lStatContChart::getResult(){
     table->elementAt(c, 0)->setPadding(10);
     table->elementAt(c,0)->addWidget(cpp14::make_unique<WText>("Répartition de la surface par classe de hauteur"));
     for (std::pair<std::string, double> p : mDistFrequ){
-    c++;
-    table->elementAt(c, 0)->addWidget(cpp14::make_unique<WText>(p.first));
-    table->elementAt(c, 1)->addWidget(cpp14::make_unique<WText>(roundDouble(100.0*p.second,0)+"%"));
+        c++;
+        table->elementAt(c, 0)->addWidget(cpp14::make_unique<WText>(p.first));
+        table->elementAt(c, 1)->addWidget(cpp14::make_unique<WText>(roundDouble(100.0*p.second,0)+"%"));
     }
-    */
+
     return std::move(aRes);
-     std::cout << "lStatContChart::getResult() done" << std::endl;
+    std::cout << "lStatContChart::getResult() done" << std::endl;
 }
 
 // modèle de prédiction de hdom depuis MNH2019
@@ -366,7 +375,7 @@ std::vector<OGRPolygon *> hexGeombin(GDALDataset *mask){
         ring->closeRings();
         //std::cout << " ring done "<< std::endl;
         hex->addRingDirectly(ring);
-       // delete ring;
+        // delete ring;
         /* pour vérification dans Qgis
         char *toto;
         toto = hex.exportToJson();
