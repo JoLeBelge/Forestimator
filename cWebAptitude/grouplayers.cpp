@@ -296,7 +296,7 @@ void groupLayers::extractInfo(double x, double y){
             if ( l->IsActive() && l->Type()==TypeLayer::FEE && mTypeClassifST==FEE){
                 // on note la chose dans l'objet ecogramme, car la classe simplepoint va devoir savoir si il y a un ecogramme à export en jpg ou non
                 mStation->setHasFEEApt(1);
-                //mLegend->detailCalculAptFEE(mStation);
+                mLegend->detailCalculAptFEE(mStation);
 
             }
         }

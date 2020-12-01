@@ -42,7 +42,7 @@ parcellaire::parcellaire(groupLayers *aGL, Wt::WApplication* app, statWindow *st
     downloadRasterBt->setInline(0);
     downloadRasterBt->disable();
 
-    fu->fileTooLarge().connect([=] { msg->setText("Le fichier est trop volumineux (max "+std::to_string(globVolMaxShp)+".");});
+    fu->fileTooLarge().connect([=] { msg->setText("Le fichier est trop volumineux (max "+std::to_string(globVolMaxShp)+"Ko).");});
     fu->changed().connect(this,&parcellaire::fuChanged);
     fu->uploaded().connect(this,&parcellaire::upload);
 
