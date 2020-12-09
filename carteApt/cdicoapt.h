@@ -607,7 +607,7 @@ public:
         return aRes;
     }
     bool lay4Stat(std::string aLayerCode){
-        bool aRes(0);
+        bool aRes(1);
         if (Dico_RasterStat.find(aLayerCode)!=Dico_RasterStat.end()){aRes=Dico_RasterStat.at(aLayerCode);}
         return aRes;
     }
