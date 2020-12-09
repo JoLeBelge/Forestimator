@@ -409,7 +409,7 @@ std::vector<std::string> Layer::getCode(std::string aMode){
 // création d'un raster masque pour un polygone. Valeur de 255 pour l'intérieur du polygone
 GDALDataset * Layer::rasterizeGeom(OGRGeometry *poGeom){
 
-    std::string output(mDico->File("TMPDIR")+"tmp");
+    std::string output(mDico->File("TMPDIR")+"tmp.tif");
     const char *out=output.c_str();
     //std::cout << " Layer::rasterizeGeom " << std::endl;
 
@@ -417,11 +417,12 @@ GDALDataset * Layer::rasterizeGeom(OGRGeometry *poGeom){
     GDALDataset *pRaster=NULL, * pShp;
 
     if (mType!=TypeLayer::Externe){
-        OGRSpatialReference  * spatialReference=new OGRSpatialReference;
-        OGRErr err;
-        err=spatialReference->importFromEPSG(31370);
-        char * src;
+        //OGRSpatialReference  * spatialReference=new OGRSpatialReference;
+        //OGRErr err;
+        //err=spatialReference->importFromEPSG(31370);
+        //char * src;
         //spatialReference->exportToWkt(&src);
+        //spatialReference->importFromProj4("+proj=lcc +lat_1=51.16666723333333 +lat_2=49.8333339 +lat_0=90 +lon_0=4.367486666666666 +x_0=150000.013 +y_0=5400088.438 +ellps=intl +towgs84=-106.869,52.2978,-103.724,0.3366,-0.457,1.8422,-1.2747 +units=m +no_defs");
 
         // driver et dataset shp -- creation depuis la géométrie
         GDALDriver *pShpDriver = GetGDALDriverManager()->GetDriverByName("ESRI Shapefile");
@@ -429,15 +430,18 @@ GDALDataset * Layer::rasterizeGeom(OGRGeometry *poGeom){
         pShp = pShpDriver->Create("/vsimem/blahblah.shp", 0, 0, 0, GDT_Unknown, NULL );
         //std::cout << " create layer " << std::endl;
         // pas nécessaire pShp->SetProjection(src);
-        OGRLayer * lay = pShp->CreateLayer("toto",spatialReference,wkbPolygon,NULL);
+        // ici ç'est un peu la mrd car proj4 ne gere pas bien BL72, différence entre serveur et local ; 120 m
+        // enfin je dis proj4 mais c'est peut-être gdal hein
+        //OGRLayer * lay = pShp->CreateLayer("toto",spatialReference,wkbPolygon,NULL);
+        // he bien c'est le comble, sur le serveur j'arrive à avoir le comportement adéquat si JE NE MET PAS de src. j'ai des warnings mais tout vas mieux!!
+        OGRLayer * lay = pShp->CreateLayer("toto",nullptr,wkbPolygon,NULL);
         OGRFeature * feat = new OGRFeature(lay->GetLayerDefn());
         feat->SetGeometry(poGeom);
         //std::cout << " create feature " << std::endl;
         lay->CreateFeature(feat);
 
-        delete spatialReference;
+        //delete spatialReference;
         delete feat;
-
 
         // driver et dataset raster in memory
         const char *pszFormat = "MEM";
@@ -452,8 +456,7 @@ GDALDataset * Layer::rasterizeGeom(OGRGeometry *poGeom){
             poGeom->getEnvelope(&ext);
             double width((ext.MaxX-ext.MinX)), height((ext.MaxY-ext.MinY));
 
-
-            // openshared pour pouvoir fermer
+            // openshared pour pouvoir fermer - n'importe quoi ça va pas
             GDALDataset * mGDALDat = (GDALDataset *) GDALOpenShared( getPathTif().c_str(), GA_ReadOnly );
             if( mGDALDat == NULL )
             {
@@ -476,9 +479,9 @@ GDALDataset * Layer::rasterizeGeom(OGRGeometry *poGeom){
                 tr2[4]=transform[4];
                 tr2[5]=transform[5];
                 // création du raster en mémoire - on dois lui donner un out mais il ne l'utile pas car MEM driver
+                //pRaster = pDriver->Create(out, xSize, ySize, 1, GDT_Byte,NULL);
                 pRaster = pDriver->Create(out, xSize, ySize, 1, GDT_Byte,NULL);
                 pRaster->SetGeoTransform(tr2);
-                //pRaster->SetProjection(src);
 
                 // on en avait besoin que pour l'extent et resol
                 //pRaster->SetSpatialRef(mGDALDat->GetSpatialRef());
@@ -487,6 +490,7 @@ GDALDataset * Layer::rasterizeGeom(OGRGeometry *poGeom){
 
                 //std::cout << " rasterize " << std::endl;
                 GDALRasterize(NULL,pRaster,pShp,NULL,NULL);
+
             }
         }
         //delete src;

@@ -132,6 +132,19 @@ void lStatContChart::predictHdom(){
     // découpe du masque en grille d'hexagone
     mVaddPol=hexGeombin(mask);
 
+    // sauver sur disk pour vérification
+    const char *pszFormat = "GTiff";
+    GDALDriver * pDriver = GetGDALDriverManager()->GetDriverByName(pszFormat);
+    if( pDriver != NULL )
+    {
+        std::string output(mLay->Dico()->File("TMPDIR")+"tmp.tif");
+        const char *out=output.c_str();
+        GDALDataset  * outM = pDriver->CreateCopy(out,mask,FALSE, NULL,NULL, NULL );
+        if( outM != NULL ){ GDALClose( outM );}
+    } else {
+        std::cout << "pas chargé le driver tif" << std::endl;
+    }
+
     GDALDataset  * DS = (GDALDataset *) GDALOpen( mLay->getPathTif().c_str(), GA_ReadOnly );
     if( DS == NULL )
     {
@@ -321,6 +334,9 @@ double predHdom(std::vector<double> aVHs){
     return aRes;
 }
 
+
+// cette fonctione ne fonctionne pas de manière identique sur le serveur qu'en local chez moi.
+// chez moi ; 99 point. serveur ; 66 points, et manifestement pas au même endroit
 std::vector<OGRPoint> hexbin(GDALDataset * mask){
     //std::cout << " hexbin sur le masque "<< std::endl;
     std::vector<OGRPoint> aRes;
@@ -335,6 +351,8 @@ std::vector<OGRPoint> hexbin(GDALDataset * mask){
     double MinY=transform[3]+transform[5]*mask->GetRasterBand(1)->GetYSize();
     double MaxX=transform[0]+transform[1]*mask->GetRasterBand(1)->GetXSize();
 
+    //std::cout << " MaxY " <<MaxY << " MinX " <<MinX << " MinY " <<MinY << " MaxX " << MaxX << std::endl;
+    //int c(0);
     double xOrigin = transform[0];
     double yOrigin = transform[3];
     double pixelWidth = transform[1];
@@ -357,7 +375,9 @@ std::vector<OGRPoint> hexbin(GDALDataset * mask){
                 // lecture du pixel
                 mask->GetRasterBand(1)->RasterIO( GF_Read, col, row, 1, 1, scanPix, 1,1, GDT_Float32, 0, 0 );
                 int maskVal=scanPix[0];
+               // c++;
                 if (maskVal==255){
+
                     OGRPoint pt(x, y);
                     aRes.push_back(pt);
                     //std::cout << pt.getX() << "," << pt.getY() << std::endl;
@@ -365,6 +385,8 @@ std::vector<OGRPoint> hexbin(GDALDataset * mask){
             }
         }
     }
+    //std::cout << " c =" << c << ".." << std::endl;
+    //std::cout << " hexbin generate " << aRes.size() << "points" << std::endl;
     return aRes;
 }
 
@@ -398,8 +420,9 @@ std::vector<OGRPolygon *> hexGeombin(GDALDataset *mask){
         aRes[c]=hex;
         c++;
     }
+    //std::cout << "hexGeombin generate " << aRes.size() << " hexagones" << std::endl;
     return aRes;
-    std::cout << "done " << std::endl;
+
 }
 
 cDicoApt * lStatContChart::Dico(){return mLay->Dico();}
