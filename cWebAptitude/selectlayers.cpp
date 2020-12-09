@@ -145,8 +145,12 @@ void selectLayers::SelectLayerGroup(bool select,TypeLayer aType){
 // pour envoyer la liste des raster à uploadcarte
 std::vector<rasterFiles> selectLayers::getSelectedRaster(){
     std::vector<rasterFiles> aRes;
-    for (std::shared_ptr<Layer> l : mVpLs){
+    for (std::shared_ptr<Layer> l : getSelectedLayer()){
+        // long story, la couche compo n'est pas une couche mais un ensemble de couche qu'on affiche dans le select4Download pour pouvoir faire des analyses sur toutes les cartes de compo
+        // donc on ne veux pas télécharger juste le raster caché derrière la couche compo qui est d'ailleur l'ancienne carte de composition (1 raster pour toutes les ess)
+        if (l->getCode()!="COMPO"){
         aRes.push_back(l->getRasterfile());
+        }
     }
     return aRes;
 }

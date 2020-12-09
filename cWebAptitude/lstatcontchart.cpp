@@ -133,6 +133,7 @@ void lStatContChart::predictHdom(){
     mVaddPol=hexGeombin(mask);
 
     // sauver sur disk pour vérification
+    /*
     const char *pszFormat = "GTiff";
     GDALDriver * pDriver = GetGDALDriverManager()->GetDriverByName(pszFormat);
     if( pDriver != NULL )
@@ -144,6 +145,7 @@ void lStatContChart::predictHdom(){
     } else {
         std::cout << "pas chargé le driver tif" << std::endl;
     }
+    */
 
     GDALDataset  * DS = (GDALDataset *) GDALOpen( mLay->getPathTif().c_str(), GA_ReadOnly );
     if( DS == NULL )

@@ -47,6 +47,7 @@ parcellaire::parcellaire(groupLayers *aGL, Wt::WApplication* app, statWindow *st
     fu->uploaded().connect(this,&parcellaire::upload);
 
     downloadRasterBt->clicked().connect(this,&parcellaire::downloadRaster);
+    // ouu je pense que c'est mal, car si j'appui sur boutton télécharger les cartes, il me dis que toutes les cartes sont sélectionnées
     mContSelect4D->addWidget(std::unique_ptr<selectLayers4Download>(mGL->mSelect4Download));
 }
 
@@ -421,7 +422,11 @@ void parcellaire::downloadRaster(){
         m_app->loadingIndicator()->hide();
         m_app->loadingIndicator()->setMessage(tr("defaultLoadingI"));
 
-         std::unique_ptr<WFileResource> fileResource = std::make_unique<Wt::WFileResource>("plain/text",mFullPath+"_raster.zip");
+        // bof ça marche paaaaas avec unique ptr, je sais pas pk wt renvoi vers une page "nothing to say about that"
+        //std::unique_ptr<WFileResource> fileResource = cpp14::make_unique<Wt::WFileResource>("plain/text",mFullPath+"_raster.zip");
+        //WFileResource * fileResource_ = fileResource->get();
+
+        WFileResource * fileResource = new Wt::WFileResource("plain/text",mFullPath+"_raster.zip");
         fileResource->suggestFileName(mClientName+"_raster.zip");
         m_app->redirect(fileResource->url());
 
@@ -429,7 +434,8 @@ void parcellaire::downloadRaster(){
         auto messageBox =
                 addChild(Wt::cpp14::make_unique<Wt::WMessageBox>(
                              "Sélection des couches à exporter",
-                             "<p>Aucune cartes sélectionnée. Veuillez selectionner les couches à exporter à l'étape numéro 4 de l'onglet analyse</p>",
+                              tr("download.lay.error.noLay")
+                             ,
                              Wt::Icon::Information,
                              Wt::StandardButton::Ok));
 

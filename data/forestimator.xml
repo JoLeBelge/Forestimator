@@ -419,7 +419,6 @@ Réalisation : Lisein Jonathan <font color="blue">liseinjon@hotmail.com</font> e
 <message id="report.analyse.surf.hdom.t">Hauteur dominante calculé sur le MNH</message>
 <message id="report.analyse.surf.compo.t">Composition</message>
 
-
 <message id="report.analyse.point.titre">Analyse ponctuelle</message>
 
 <message id="report.analyse.point">
@@ -545,6 +544,7 @@ detAptFEE
 
 <message id="report.ban"><img src="PATH/resources/DJI_0497_navbar.JPG" width="500px"  border-radius="30px" /></message>
 
+<message id="download.lay.error.noLay"><p>Aucune cartes sélectionnée. Veuillez selectionner les couches à exporter à l'étape numéro 2 de la page analyse</p></message>
 
 
 </messages>

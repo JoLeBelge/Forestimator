@@ -204,7 +204,6 @@ groupLayers::groupLayers(cDicoApt * aDico, WOpenLayers *aMap, AuthApplication *a
     //std::cout << "done " << std::endl;
 }
 
-
 groupLayers::~groupLayers(){
     std::cout << "destructeur de group layer " << std::endl;
     delete mLegend;
@@ -515,7 +514,8 @@ void groupLayers::exportLayMapView(){
             zf->close();
             delete zf;
             // le fileressources sera détruit au moment de la destruction GroupL
-            std::unique_ptr<WFileResource> fileResource = std::make_unique<Wt::WFileResource>("plain/text",archiveFileName);
+            //std::unique_ptr<WFileResource> fileResource = std::make_unique<Wt::WFileResource>("plain/text",archiveFileName);
+            WFileResource * fileResource = new Wt::WFileResource("plain/text",archiveFileName);
             fileResource->suggestFileName(mClientName+".zip");
             m_app->redirect(fileResource->url());
         } else {
