@@ -379,7 +379,7 @@ void simplepoint::export2pdf(std::string titre){
     std::string aOut = mDico->File("TMPDIR")+"/"+name1+".pdf";
     HPDF_SaveToFile(pdf,aOut.c_str());
     HPDF_Free(pdf);
-    WFileResource *fileResource = new Wt::WFileResource("application/pdf",aOut);
+     std::unique_ptr<WFileResource> fileResource = std::make_unique<Wt::WFileResource>("application/pdf",aOut);
     boost::replace_all(titre," ","-");
     fileResource->suggestFileName(titre+".pdf");
 

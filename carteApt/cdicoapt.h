@@ -231,11 +231,16 @@ public:
         return aRes;
     }
     bool hasFEEApt(){
-        bool aRes(1);
-        if (mEcoVal.size()==0) {
+        bool aRes(0);
+        // maintenant j'initialise EcoVal comme une map de 10 elem vide
+       /* if (mEcoVal.size()==0) {
             aRes=0;
             //std::cout << "essence " << mNomFR << " n'as pas d'aptitude pour FEE" << std::endl;
-        }
+        }*/
+        if (mEcoVal.size()>0 && mEcoVal.at(1).size()>0) {
+                    aRes=1;
+                    //std::cout << "essence " << mNomFR << " n'as pas d'aptitude pour FEE" << std::endl;
+         }
         return aRes;
     }
 
@@ -596,6 +601,16 @@ public:
         }
         return aRes;
     }
+    bool lay4Visu(std::string aLayerCode){
+        bool aRes(0);
+        if (Dico_RasterVisu.find(aLayerCode)!=Dico_RasterVisu.end()){aRes=Dico_RasterVisu.at(aLayerCode);}
+        return aRes;
+    }
+    bool lay4Stat(std::string aLayerCode){
+        bool aRes(0);
+        if (Dico_RasterStat.find(aLayerCode)!=Dico_RasterStat.end()){aRes=Dico_RasterStat.at(aLayerCode);}
+        return aRes;
+    }
 
     /*bool hasMTD(std::string aLayerCode){
         return Dico_layerMTD.find(aLayerCode)!=Dico_layerMTD.end();
@@ -626,6 +641,8 @@ private:
     std::map<std::string,std::string>  Dico_RasterType;
     // continu vs classe
     std::map<std::string,std::string>  Dico_RasterVar;
+    std::map<std::string,bool>  Dico_RasterVisu;// les couches que l'on peux visualiser dans la partie carto
+    std::map<std::string,bool>  Dico_RasterStat;// les couches sur lesquelles on peut calculer des statistiques
     // description peuplement vs description station
     std::map<std::string,std::string>  Dico_RasterLayer;
     std::map<std::string,std::string>  Dico_RasterNomComplet;

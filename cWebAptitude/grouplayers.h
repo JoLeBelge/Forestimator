@@ -40,6 +40,7 @@ class simplepoint;
 class ST;
 class layerStatChart;
 class lStatContChart;
+class lStatCompoChart;
 class rasterFiles;
 class selectLayers;
 class selectLayers4Stat;
@@ -59,6 +60,9 @@ bool cropIm(std::string inputRaster, std::string aOut, OGREnvelope ext);
 // pour la comparaison de deux enveloppes lors du crop d'une image
 double getArea(OGREnvelope * env);
 
+// retourne le dataset sur l'enveloppe d'un polygone
+GDALDataset * getDSonEnv(std::string inputRaster, OGRGeometry *poGeom);
+
 std::string getHtml(LayerMTD * lMTD);
 bool isValidHtml(std::string text);
 
@@ -69,11 +73,13 @@ public:
     ~groupStat(){clearStat();}
     std::vector<layerStatChart*> ptrVLStat() {return mVLStat;}
     std::vector<lStatContChart*> ptrVLStatCont() {return mVLStatCont;}
+    std::unique_ptr<lStatCompoChart> mCompo;
 protected:
     // un vecteur pour les statistique des cartes variables de classes (majoritaire)
     std::vector<layerStatChart*> mVLStat;
     // un autre pour les statistique des cartes variables continu (à commencer à MNH)
     std::vector<lStatContChart*> mVLStatCont;
+
 
     void clearStat(){
         // clear d'un vecteur de pointeur, c'est mal. d'ailleurs ça bug si on calcule plusieur fois des stat dans la mm session, à regler donc
@@ -87,6 +93,7 @@ protected:
         }
         mVLStatCont.clear();
         mVLStat.clear();
+        mCompo.reset();
     }
 
 };
@@ -175,7 +182,7 @@ public:
     void saveExtent(double c_x, double c_y, double zoom);
     void deleteExtent(std::string id);
 
-    selectLayers4Stat * mSelect4Stat;
+    //selectLayers4Stat * mSelect4Stat;
     selectLayers4Download * mSelect4Download;
 
     // signal pour cacher les nodes qui sont en mode expert

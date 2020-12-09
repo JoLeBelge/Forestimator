@@ -93,15 +93,14 @@ cDicoApt::cDicoApt(std::string aBDFile):mBDpath(aBDFile),ptDb_(NULL)
             }
         }
         sqlite3_finalize(stmt);
-
         // changer la requete en fonction de la machine sur laquelle est installé l'appli
         char userName[20];
         getlogin_r(userName,sizeof(userName));
         std::string s(userName);
         if (s=="lisein"){
-            SQLstring="SELECT Code,Dir2,Nom,Type,NomComplet,Categorie,TypeVar, expert FROM fichiersGIS;";
+            SQLstring="SELECT Code,Dir2,Nom,Type,NomComplet,Categorie,TypeVar, expert, visu, stat FROM fichiersGIS;";
         } else {
-            SQLstring="SELECT Code,Dir,Nom,Type,NomComplet,Categorie,TypeVar, expert FROM fichiersGIS;";
+            SQLstring="SELECT Code,Dir,Nom,Type,NomComplet,Categorie,TypeVar, expert, visu, stat FROM fichiersGIS;";
         }
 
         sqlite3_prepare_v2( *db_, SQLstring.c_str(), -1, &stmt, NULL );
@@ -126,6 +125,8 @@ cDicoApt::cDicoApt(std::string aBDFile):mBDpath(aBDFile),ptDb_(NULL)
                     bool expert(0);
                     if (sqlite3_column_type(stmt, 7)!=SQLITE_NULL) {expert=sqlite3_column_int( stmt, 7 );}
                     Dico_RasterExpert.emplace(std::make_pair(aA,expert));
+                    if (sqlite3_column_type(stmt, 8)!=SQLITE_NULL) { Dico_RasterVisu.emplace(std::make_pair(aA,sqlite3_column_int( stmt, 8 )));;}
+                    if (sqlite3_column_type(stmt, 9)!=SQLITE_NULL) { Dico_RasterStat.emplace(std::make_pair(aA,sqlite3_column_int( stmt, 9 )));;}
                 }
             }
         }
@@ -377,7 +378,7 @@ std::map<int,std::map<std::string,int>> cDicoApt::getFEEApt(std::string aCodeEs)
     std::map<int,std::map<std::string,int>> aRes;
 
     for (int i(1);i<11;i++){
-    aRes.emplace(std::make_pair(i,std::map<std::string,int>()));
+        aRes.emplace(std::make_pair(i,std::map<std::string,int>()));
     }
 
     sqlite3_stmt * stmt=NULL;
@@ -650,7 +651,7 @@ std::map<int,std::map<int,int>> cDicoApt::getRisqueTopo(std::string aCodeEs){
     SQLstring="SELECT SF_Ardenne,Secteurneutre,Secteurchaud,FV_Ardenne FROM Risque_topoFEE WHERE Code_Fr='"+ aCodeEs+"';";
     boost::replace_all(SQLstring, "'", "\"");
     //std::cout << SQLstring << std::endl;
-   sqlite3_finalize(stmt);
+    sqlite3_finalize(stmt);
     sqlite3_prepare_v2( *db_, SQLstring.c_str(), -1, &stmt, NULL );//preparing the statement
     // il peut y avoir des null dans les données, dans ce cas  le risque hors ardenne est identique au risque en ardenne
     while(sqlite3_step(stmt) == SQLITE_ROW)

@@ -17,9 +17,7 @@ lStatContChart::lStatContChart(std::shared_ptr<Layer> aLay, OGRGeometry * poGeom
     default:
         break;
     }
-
 }
-
 
 // le probleme des map c'est qu'elles sont ordonnées automatiquement avec leur clé, je veux pas.
 std::vector<std::pair<std::string,double>> lStatContChart::computeDistrH(){
@@ -37,7 +35,6 @@ std::vector<std::pair<std::string,double>> lStatContChart::computeDistrH(){
     mGeom->getEnvelope(&ext);
     double width((ext.MaxX-ext.MinX)), height((ext.MaxY-ext.MinY));
 
-    GDALAllRegister();
     GDALDataset  * mGDALDat = (GDALDataset *) GDALOpen( mLay->getPathTif().c_str(), GA_ReadOnly );
     if( mGDALDat == NULL )
     {
@@ -109,13 +106,12 @@ std::vector<std::pair<std::string,double>> lStatContChart::computeDistrH(){
         // std::cout << " nombre de hauteur ;  " << nbPix<< std::endl;
         std::string aRange("<3m");
         aRes.push_back(std::make_pair(aRange,((double)clasOcc.at(0)/((double)nbPix))));
-        for (int i(0) ; i+1 < seuilClasses.size() ; i++){
+        for (int i(1) ; i+1 < seuilClasses.size() ; i++){
             aRange=roundDouble(seuilClasses.at(i),0)+"m-"+roundDouble(seuilClasses.at(i+1),0)+"m";
-            aRes.push_back(std::make_pair(aRange,((double)clasOcc.at(i+1)/((double)nbPix))));
+            aRes.push_back(std::make_pair(aRange,((double)clasOcc.at(i)/((double)nbPix))));
         }
         aRange=">51m";
         aRes.push_back(std::make_pair(aRange,((double)clasOcc.at(clasOcc.size()-1)/((double)nbPix))));
-
     }
 
     return aRes;
@@ -123,95 +119,108 @@ std::vector<std::pair<std::string,double>> lStatContChart::computeDistrH(){
 
 
 void lStatContChart::predictHdom(){
-    std::cout << " predict Hdom depuis MNH2019" << std::endl;
+    //std::cout << " predict Hdom depuis MNH2019" << std::endl;
     std::vector<double> aRes;
 
     // masque au format raster
     GDALDataset * mask = mLay->rasterizeGeom(mGeom);
     double transform2[6];
     mask->GetGeoTransform(transform2);
-    double xOriginMask = transform2[0];
-    double yOriginMask = transform2[3];
     double pixelWidth = transform2[1];
     double pixelHeight = -transform2[5];
 
     // découpe du masque en grille d'hexagone
     mVaddPol=hexGeombin(mask);
 
-    GDALDataset  * mGDALDat = (GDALDataset *) GDALOpen( mLay->getPathTif().c_str(), GA_ReadOnly );
-    if( mGDALDat == NULL )
+    GDALDataset  * DS = (GDALDataset *) GDALOpen( mLay->getPathTif().c_str(), GA_ReadOnly );
+    if( DS == NULL )
     {
         std::cout << "je n'ai pas lu l'image " <<  mLay->getPathTif() << std::endl;
     } else {
-        GDALRasterBand * mBand = mGDALDat->GetRasterBand( 1 );
 
         double transform[6];
-        mGDALDat->GetGeoTransform(transform);
-        double xOrigin = transform[0];
-        double yOrigin = transform[3];// max Y
+        DS->GetGeoTransform(transform);
 
+        int c(0);
+        std::vector<int> toRm;
         for (OGRPolygon  * hex : mVaddPol){
-            //dimention du carré contenanl l'hexagone dans son entièretée
+
             OGREnvelope ext;
             hex->getEnvelope(&ext);
-            double width((ext.MaxX-ext.MinX)), height((ext.MaxY-ext.MinY));
-            int xSize = round(width/pixelWidth);
-            int ySize = round(height/pixelHeight);
-            // offset pour la carte
-            int xOffset = int((ext.MinX - xOrigin) / pixelWidth);
-            int yOffset = int((yOrigin - ext.MaxY ) / pixelHeight);
-            // offset pour le masque
-            int xOffsetMask = int((ext.MinX - xOriginMask) / pixelWidth);
-            int yOffsetMask = int((yOriginMask - ext.MaxY ) / pixelHeight);
+            char** papszArgv = nullptr;
+            papszArgv = CSLAddString(papszArgv, "-projwin"); //Selects a subwindow from the source image for copying but with the corners given in georeferenced coordinate
+            papszArgv = CSLAddString(papszArgv, std::to_string(ext.MinX).c_str());
+            papszArgv = CSLAddString(papszArgv, std::to_string(ext.MaxY).c_str());
+            papszArgv = CSLAddString(papszArgv, std::to_string(ext.MaxX).c_str());
+            papszArgv = CSLAddString(papszArgv, std::to_string(ext.MinY).c_str());
 
-            float *scanPix,*scanPixMask;
-            scanPix = (float *) CPLMalloc( sizeof( float ) * 1 );;
-            scanPixMask = (float *) CPLMalloc( sizeof( float ) * 1 );
-            //scanline = (float *) CPLMalloc( sizeof( float ) * xSize );
-            //scanlineMask = (float *) CPLMalloc( sizeof( float ) * xSize );
-            std::vector<double> aVHs;
-            // boucle sur chaque ligne
-            for ( int row = 0; row < ySize; row++)
-            {
-                for (int col = 0; col <  xSize; col++)
-                {
-                    // check effet de bord, pas correctement geré ; les centroide d'hexagone en bordure droite et gauche du masque ne peuvent être lue car la requete dépase la taille du masque
-                    // une solution serait de lire pixel par pixel au lieu de ligne par ligne, mais pour le moment je laisse ça à plus tard
-                    if (xOffsetMask+col<mask->GetRasterBand(1)->GetXSize() && row+yOffsetMask < mask->GetRasterBand(1)->GetYSize()){
-                        std::cout << " pos sur MNH; x " << col+xOffset << ", y" << row+yOffset << std::endl;
-
-                        std::cout << " pos sur Mask; x " << col+xOffsetMask << ", y" << row+yOffsetMask << std::endl;
-                        // lecture MNH
-                        mBand->RasterIO( GF_Read,                   col+xOffset,    row+yOffset,    1, 1,   scanPix, 1,1, GDT_Float32, 0, 0 );
+            GDALTranslateOptions * option = GDALTranslateOptionsNew(papszArgv,nullptr);
+            if (option){
+                //std::cout <<" options parsées " << std::endl;
+                GDALDatasetH DSmnhCrop = GDALTranslate("/vsimem/out",DS,option,nullptr);
+                GDALDatasetH DSMaskCrop = GDALTranslate("/vsimem/out",mask,option,nullptr);
+                if (DSmnhCrop && DSMaskCrop){
+                    // j'ai toujours 2 raster a ouvrir conjointement
+                    GDALDataset * MNH= GDALDataset::FromHandle(DSmnhCrop);
+                    GDALDataset * MaskCrop= GDALDataset::FromHandle(DSMaskCrop);
+                    float *scanline, *scanlineMask;
+                    int xSize=MNH->GetRasterBand(1)->GetXSize();
+                    int ySize=MNH->GetRasterBand(1)->GetYSize();
+                    scanline = (float *) CPLMalloc( sizeof( float ) * xSize );
+                    scanlineMask = (float *) CPLMalloc( sizeof( float ) * xSize );
+                    std::vector<double> aVHs;
+                    // boucle sur chaque ligne
+                    for ( int row = 0; row < ySize; row++ )
+                    {
+                        // lecture
+                        MNH->GetRasterBand(1)->RasterIO( GF_Read, 0, row, xSize, 1, scanline, xSize,1, GDT_Float32, 0, 0 );
                         // lecture du masque
-                        mask->GetRasterBand(1)->RasterIO( GF_Read, col+xOffsetMask , row+yOffsetMask, 1, 1, scanPixMask, 1,1, GDT_Float32, 0, 0 );
-                        // Garder les pixels qui sont ET dans le mask ET dans l'hexagone
-                        // colorier ces pixels et sauver le masque pour contrôler que ça fonctionne?
-                        if (scanPixMask[col]==255){
-                            OGRPoint pt(ext.MinX+col*pixelWidth,ext.MaxY-row*pixelWidth);
-                            // check que le pixel est bien dans l'hexagone
-                            if ( pt.Intersect(hex)){
-                                double aVal=scanPix[ col ];
-                                // appliquer gain et offset et ajouter au vecteur
-                                aVHs.push_back(Dico()->H(aVal));
+                        MaskCrop->GetRasterBand(1)->RasterIO( GF_Read, 0, row, xSize, 1, scanlineMask, xSize,1, GDT_Float32, 0, 0 );
+                        // boucle sur scanline et garder les pixels qui sont dans le polygone
+                        for (int col = 0; col <  xSize; col++)
+                        {
+                            if (scanlineMask[col]==255){
+                                OGRPoint pt(ext.MinX+col*pixelWidth,ext.MaxY-row*pixelWidth);
+                                // check que le pixel est bien dans l'hexagone
+                                if ( pt.Intersect(hex)){
+                                    double aVal=scanline[ col ];
+                                    aVHs.push_back(Dico()->H(aVal));
+                                }
+                            }
                         }
                     }
-                }
+                    CPLFree(scanline);
+                    CPLFree(scanlineMask);
+                    GDALClose(MNH);
+                    GDALClose(MaskCrop);
+
+                    // prediction de Hdom si suffisament de valeur (si hexagone en bordure de polygone, pas l'hexa complêt)
+                    double surf=aVHs.size()*pixelWidth*pixelHeight;
+                    //std::cout << "surface nid abeille ; " << surf << std::endl;
+                    // seuil de 800 m2
+                    if (surf>800){
+                        double hdom=predHdom(aVHs);
+                        aRes.push_back(hdom);
+                    } else {
+                        // retirer l'hexagone de la liste
+                        toRm.push_back(c);
+                    }
+
                 }
             }
-            CPLFree(scanPix);
-            CPLFree(scanPixMask);
-            // prediction de Hdom si suffisament de valeur (si hexagone en bordure de polygone, pas l'hexa complêt)
-            double surf=aVHs.size()*pixelWidth*pixelHeight;
-            //std::cout << "surface nid abeille ; " << surf << std::endl;
-            // seuil de 800 m2
-            if (surf>800){
-                double hdom=predHdom(aVHs);
-                aRes.push_back(hdom);
-            }
+            GDALTranslateOptionsFree(option);
+            // hexagone suivant
+            c++;
         }
+        // trié en sens décroissant pour retirer les hexagones les plus loin dans le vecteur sans changer la positions des autres elem à retirer
+        std::sort(toRm.begin(), toRm.end(), std::greater<>());
+        for (int i:toRm){
+            //std::cout << "enlever element " << i << " sur " << mVaddPol.size() << std::endl;
+            OGRGeometryFactory::destroyGeometry(mVaddPol.at(i));
+            mVaddPol.erase(mVaddPol.begin() + i);
+        }
+        GDALClose(DS);
         GDALClose(mask);
-        GDALClose(mGDALDat);
     }
     mStat=aRes;
 }
@@ -263,18 +272,23 @@ std::unique_ptr<WContainerWidget> lStatContChart::getResult(){
     int c(1);
     table->elementAt(c, 0)->addWidget(cpp14::make_unique<WText>("Moyenne"));
     table->elementAt(c, 1)->addWidget(cpp14::make_unique<WText>(bs.getMean()));
+    table->elementAt(c, 1)->setPadding(10,Wt::Side::Left);
     c++;
     table->elementAt(c, 0)->addWidget(cpp14::make_unique<WText>("Coefficient de variation"));
     table->elementAt(c, 1)->addWidget(cpp14::make_unique<WText>(bs.getCV()));
+    table->elementAt(c, 1)->setPadding(10,Wt::Side::Left);
     c++;
     table->elementAt(c, 0)->addWidget(cpp14::make_unique<WText>("Maximum"));
     table->elementAt(c, 1)->addWidget(cpp14::make_unique<WText>(bs.getMax()));
+    table->elementAt(c, 1)->setPadding(10,Wt::Side::Left);
     c++;
     table->elementAt(c, 0)->addWidget(cpp14::make_unique<WText>("Minimum"));
     table->elementAt(c, 1)->addWidget(cpp14::make_unique<WText>(bs.getMin()));
+    table->elementAt(c, 1)->setPadding(10,Wt::Side::Left);
     c++;
     table->elementAt(c, 0)->addWidget(cpp14::make_unique<WText>("Nombre de Hdom mesuré (surface de 0.1 ha)"));
     table->elementAt(c, 1)->addWidget(cpp14::make_unique<WText>(bs.getNb()));
+    table->elementAt(c, 1)->setPadding(10,Wt::Side::Left);
     c++;
     // maintenant un tableau avec proportion par classe de hauteur;
     table->elementAt(c, 0)->setColumnSpan(2);
@@ -285,10 +299,11 @@ std::unique_ptr<WContainerWidget> lStatContChart::getResult(){
         c++;
         table->elementAt(c, 0)->addWidget(cpp14::make_unique<WText>(p.first));
         table->elementAt(c, 1)->addWidget(cpp14::make_unique<WText>(roundDouble(100.0*p.second,0)+"%"));
+        table->elementAt(c, 1)->setPadding(10,Wt::Side::Left);
     }
 
     return std::move(aRes);
-    std::cout << "lStatContChart::getResult() done" << std::endl;
+    //std::cout << "lStatContChart::getResult() done" << std::endl;
 }
 
 // modèle de prédiction de hdom depuis MNH2019
@@ -354,8 +369,7 @@ std::vector<OGRPoint> hexbin(GDALDataset * mask){
 }
 
 std::vector<OGRPolygon *> hexGeombin(GDALDataset *mask){
-    std::cout << " hexGeombin sur le masque "<< std::endl;
-
+    //std::cout << " hexGeombin sur le masque "<< std::endl;
     std::vector<OGRPoint> VCentreHexagone=hexbin(mask);
     std::vector<OGRPolygon *> aRes(VCentreHexagone.size());
     int c(0);
@@ -436,4 +450,116 @@ bool InsideHexagonB(float x0, float y0, float x, float y,float d)
 
     return true;
 }*/
+
+lStatCompoChart::lStatCompoChart(groupLayers * aGL, OGRGeometry * poGeom):mGeom(poGeom),mDico(aGL->Dico()){
+    for (std::shared_ptr<Layer> l:aGL->getVpLs()){
+        // on reconnais que c'est une carte de composition avec la taille du code et son préfix compo
+        if(l->getCode().substr(0,5)=="COMPO" && l->getCode().size()==6){
+            mVLay.push_back(l);
+        }
+    }
+}
+
+
+std::unique_ptr<WContainerWidget> lStatCompoChart::getResult(){
+    std::cout << "lStatCompoChart::getResult() " << std::endl;
+    std::unique_ptr<WContainerWidget> aRes= std::make_unique<Wt::WContainerWidget>();
+
+    aRes->setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Center);
+    aRes->setInline(0);
+    aRes->setOverflow(Wt::Overflow::Auto);
+
+    WVBoxLayout * layoutV = aRes->setLayout(cpp14::make_unique<WVBoxLayout>());
+    layoutV->addWidget(cpp14::make_unique<WText>("<h4>Composition</h4>"));
+
+    WContainerWidget * aContTable = layoutV->addWidget(cpp14::make_unique<WContainerWidget>());
+    aContTable->setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Center);
+    aContTable->setOverflow(Wt::Overflow::Auto);
+    WTable * table =aContTable->addWidget(cpp14::make_unique<WTable>());
+
+    table->elementAt(0, 0)->setColumnSpan(2);
+    table->elementAt(0, 0)->setContentAlignment(AlignmentFlag::Top | AlignmentFlag::Center);
+    table->elementAt(0, 0)->setPadding(10);
+    table->elementAt(0,0)->addWidget(cpp14::make_unique<WText>(Wt::WString::tr("report.analyse.surf.compo.t")));
+
+    int c(0);
+    for (std::shared_ptr<Layer> l:mVLay){
+        c++;
+        // je vais utiliser une autre fonction qui lit la couche all_sp qui sert de masque, pour gerer les nd des différentes cartes.
+        // basicStat stat= l->computeBasicStatOnPolyg(mGeom);
+        basicStat stat=computeStatWithMasq(l,mGeom);
+        table->elementAt(c, 0)->addWidget(cpp14::make_unique<WText>(l->getLegendLabel(false)));
+        table->elementAt(c, 1)->addWidget(cpp14::make_unique<WText>(stat.getMean()+"%"));
+        table->elementAt(c, 1)->setPadding(10,Wt::Side::Left);
+    }
+    return std::move(aRes);
+}
+
+// j'ai fait cette méthode car le calcul des stat sur les cartes de présence nécessite de charger la carte all_sp qui sert de masque. Sans ce masque je ne sais pas si j'ai 0 pour une ess car prob présence =0 ou si c'est un no data
+basicStat lStatCompoChart::computeStatWithMasq(std::shared_ptr<Layer> aLay, OGRGeometry * poGeom){
+    std::map<double,int> aMapValandFrequ;
+    for (auto &kv : *aLay->mDicoVal){
+        try {
+            aMapValandFrequ.emplace(std::make_pair(std::stod(kv.second),0));
+        }
+        catch (const std::invalid_argument& ia) {
+            std::cerr << "Invalid argument pour stod lStatCompoChart::computeStatWithMasq: " << ia.what() << '\n';
+        }
+    }
+    // masque du polygone au format raster
+    GDALDataset * maskPol = aLay->rasterizeGeom(mGeom);
+    // retourner un DS pour la géométrie donnée
+    GDALDataset * compo = getDSonEnv(aLay->getPathTif(),mGeom);
+    GDALDataset * allEss = getDSonEnv(mDico->File("COMPOALL"),mGeom);
+
+    /*
+    std::cout << "maskPol " << maskPol->GetRasterXSize() << ", " <<  maskPol->GetRasterYSize() << std::endl;
+    std::cout << "compo " << compo->GetRasterXSize() << ", " <<  compo->GetRasterYSize() << std::endl;
+    std::cout << "allEss " << allEss->GetRasterXSize() << ", " << allEss->GetRasterYSize() << std::endl;
+    */
+    //determine dimensions of the tile
+    int xSize = maskPol->GetRasterXSize();
+    int ySize = maskPol->GetRasterYSize();
+
+    float *scanline, *scanlineMask, *scanlineAllEss;
+    scanline = (float *) CPLMalloc( sizeof( float ) * xSize );
+    scanlineMask = (float *) CPLMalloc( sizeof( float ) * xSize );
+    scanlineAllEss = (float *) CPLMalloc( sizeof( float ) * xSize );
+
+    for ( int row = 0; row < ySize; row++ )
+    {
+        maskPol->GetRasterBand(1)->RasterIO( GF_Read, 0, row, xSize, 1, scanlineMask, xSize,1, GDT_Float32, 0, 0 );
+        compo->GetRasterBand(1)->RasterIO( GF_Read, 0, row, xSize, 1, scanline, xSize,1, GDT_Float32, 0, 0 );
+        allEss->GetRasterBand(1)->RasterIO( GF_Read, 0, row, xSize, 1,scanlineAllEss, xSize,1, GDT_Float32, 0, 0 );
+        // boucle sur scanline et garder les pixels qui sont dans le polygone
+        for (int col = 0; col <  xSize; col++)
+        {
+            if (scanlineMask[col]==255){
+                // test si la carte all_ess a une valeur pour cette position
+                if (scanlineAllEss[col]>0){
+                    double aVal=scanline[ col ];
+                    //std::cout << " j'ai une valeur de prob de frequ de " << aVal << " et une val " << scanlineAllEss[col] << " pour la carte all_ess.tif " << std::endl;
+                    if (aLay->mDicoVal->find(aVal)!=aLay->mDicoVal->end()){
+                        try {
+                            aMapValandFrequ.at(std::stod(aLay->mDicoVal->at(aVal)))++;
+                        }
+                        catch (const std::invalid_argument& ia) {
+                            std::cerr << "Invalid argument pour stod lStatCompoChart::computeStatWithMasq, part2: " << ia.what() << '\n';
+                        }
+                    }
+                }
+            }
+        }
+    }
+    CPLFree(scanline);
+    CPLFree(scanlineMask);
+    CPLFree(scanlineAllEss);
+
+    if (maskPol!=NULL){GDALClose(maskPol);}
+    if (compo!=NULL){GDALClose(compo);}
+    if (allEss!=NULL){GDALClose(allEss);}
+
+    if (aMapValandFrequ.size()>0) {return basicStat(aMapValandFrequ);} else {return  basicStat();}
+}
+
 

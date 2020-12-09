@@ -370,20 +370,22 @@ surfPedo::surfPedo(std::shared_ptr<cnsw> dico, OGRGeometry *poGeom ):mDico(dico)
 
     for (auto kv : VDText){
         if (kv.second>1){
-            if (kv.second>99.0){ dTexture+=kv.first;}
+            if (kv.second>99.0){ dTexture+=kv.first; break;} else {
             dTexture+=kv.first+": "+mDico->roundDouble(kv.second,0)+"% ";
+            }
         }
     }
     for (auto kv : VDDrainage){
         if (kv.second>1){
-            if (kv.second>99.0){ dDrainage+=kv.first;}
-            dDrainage+=kv.first+": "+mDico->roundDouble(kv.second,0)+"% ";
+            if (kv.second>99.0){ dDrainage+=kv.first; break;} else {
+            dDrainage+=kv.first+": "+mDico->roundDouble(kv.second,0)+"% ";}
         }
     }
     for (auto kv : VDProf){
         if (kv.second>1){
-            if (kv.second>99.0){ dProf+=kv.first;}
+            if (kv.second>99.0){ dProf+=kv.first;break;} else {
             dProf+=kv.first+": "+mDico->roundDouble(kv.second,0)+"% ";
+            }
         }
     }
 }

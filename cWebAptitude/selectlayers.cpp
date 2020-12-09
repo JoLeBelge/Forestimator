@@ -75,7 +75,7 @@ selectLayers4Download::selectLayers4Download(groupLayers * aGL){
 
     // création des noeuds pour chaque couche et de sa checkbox et ajout dans le treetable dans le bon groupe de couche
     for (std::shared_ptr<Layer> l : mVpLs){
-        if (l->Type()!=TypeLayer::Externe){
+        if (l->Type()!=TypeLayer::Externe && l->l4Stat()){
             bool selected(0);
             if ((l->Type()==TypeLayer::FEE) && (l->getCode()=="HE"| l->getCode()=="CS" | l->getCode()=="CP" | l->getCode()=="EP" | l->getCode()=="DO" | l->getCode()=="ME")){ selected=1;}
             if (l->Type()==TypeLayer::Peuplement) { selected=1;}

@@ -35,7 +35,6 @@ statWindow::statWindow(groupLayers * aGL):mDico(aGL->Dico()), mApp(aGL->m_app),m
     createPdfBut->setLink(WLink(pdf));
     */
 
-
     mCarteGenCont = addWidget(cpp14::make_unique<WContainerWidget>());
     mCarteGenCont->setId("carteGenStat");
     mCarteGenCont->setInline(0);
@@ -73,6 +72,10 @@ void statWindow::genIndivCarteAndAptT(){
         if (chart->deserveChart()){
                 add1layerStat(chart);
         }
+    }
+
+    if (mGL->mCompo){
+        mAllStatIndivCont->addWidget(mGL->mCompo->getResult());
     }
 }
 
@@ -148,8 +151,7 @@ void statWindow::generateGenCarte(OGRFeature * poFeature){
      // description générale ; lecture des attribut du polygone?calcul de pente, zone bioclim, et élévation
      WContainerWidget * aContInfo = layoutH->addWidget(cpp14::make_unique<WContainerWidget>());
 
-    // la mémoire du soft augmente de +-4mo par itération de calcul polygone avec le code ci-dessous
-     // je refais les calculs pour les couches qui m'intéressent
+      // je refais les calculs pour les couches qui m'intéressent
 
      basicStat statMNT= mMNT->computeBasicStatOnPolyg(poFeature->GetGeometryRef());
      basicStat statPente= mPente->computeBasicStatOnPolyg(poFeature->GetGeometryRef());
@@ -160,13 +162,13 @@ void statWindow::generateGenCarte(OGRFeature * poFeature){
      aContInfo->addWidget(cpp14::make_unique<WText>(mZBIO->summaryStat(poFeature->GetGeometryRef())));
 
      aContInfo->addWidget(cpp14::make_unique<WText>("<h5>Relief</h5>"));
-     aContInfo->addWidget(cpp14::make_unique<WText>("Altitude maximum : "+ statMNT.getMax() + "m"));
+     aContInfo->addWidget(cpp14::make_unique<WText>("Altitude maximum : "+ statMNT.getMax() + " m"));
      aContInfo->addWidget(cpp14::make_unique<WBreak>());
-     aContInfo->addWidget(cpp14::make_unique<WText>("Altitude moyenne : "+ statMNT.getMean()+ "m"));
+     aContInfo->addWidget(cpp14::make_unique<WText>("Altitude moyenne : "+ statMNT.getMean()+ " m"));
      aContInfo->addWidget(cpp14::make_unique<WBreak>());
-     aContInfo->addWidget(cpp14::make_unique<WText>("Altitude maximum : "+ statMNT.getMin()+ "m"));
+     aContInfo->addWidget(cpp14::make_unique<WText>("Altitude maximum : "+ statMNT.getMin()+ " m"));
      aContInfo->addWidget(cpp14::make_unique<WBreak>());
-     aContInfo->addWidget(cpp14::make_unique<WText>("Pente moyenne : "+ statPente.getMean()+ "%"));
+     aContInfo->addWidget(cpp14::make_unique<WText>("Pente moyenne : "+ statPente.getMean()+ " %"));
      aContInfo->addWidget(cpp14::make_unique<WBreak>());
 
      // analyse pédo surfacique
@@ -265,7 +267,7 @@ void statWindow::export2pdf(){
     HPDF_SaveToFile(pdf,aOut.c_str());
     HPDF_Free(pdf);
 
-    WFileResource *fileResource = new Wt::WFileResource("plain/text",aOut);
+     std::unique_ptr<WFileResource> fileResource = std::make_unique<Wt::WFileResource>("plain/text",aOut);
     fileResource->suggestFileName("Forestimator-info-parcelaire.pdf");
     mApp->redirect(fileResource->url());
 

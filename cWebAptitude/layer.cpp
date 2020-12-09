@@ -14,6 +14,8 @@ Layer::Layer(std::string aCode,cDicoApt * aDico,TypeLayer aType):
   ,mTypeVar(TypeVar::Classe)
   ,mExpert(0)
   ,mIsVisible(1)
+  ,mLay4Stat(1)
+  ,mLay4Visu(1)
 {
     //std::cout << "création de layer en dehors de wt pour " << aCode << std::endl;
     switch (mType) {
@@ -62,6 +64,8 @@ Layer::Layer(std::string aCode,cDicoApt * aDico,TypeLayer aType):
 
     mUrl=MapServerURL();
     mWMSLayerName=NomMapServerLayer();
+    mLay4Stat=mDico->lay4Stat(mCode);
+    mLay4Visu=mDico->lay4Visu(mCode);
 
 }
 
@@ -79,6 +83,8 @@ Layer::Layer(groupLayers * aGroupL, std::string aCode, WText *PWText, TypeLayer 
   ,mTypeVar(TypeVar::Classe)
   ,mExpert(0)
   ,mIsVisible(1)
+  ,mLay4Stat(1)
+  ,mLay4Visu(1)
 {
     //std::cout << "création de layer pour " << aCode << std::endl;
     // constructeur qui dépend du type de layer
@@ -126,6 +132,8 @@ Layer::Layer(groupLayers * aGroupL, std::string aCode, WText *PWText, TypeLayer 
 
     mUrl=MapServerURL();
     mWMSLayerName=NomMapServerLayer();
+    mLay4Stat=mDico->lay4Stat(mCode);
+    mLay4Visu=mDico->lay4Visu(mCode);
 
     setActive(false);
     //std::cout << "done" << std::endl;
@@ -153,8 +161,10 @@ Layer::~Layer(){
 void Layer::setActive(bool b){
     // ici je peux également changer le style du rendu du label
     mActive=b;
-    mText->setStyleClass(mActive ? "currentEss" : "ess");
-    if (mActive) {mText->setToolTip(WString::tr("toolTipActiveLayer"));} else {mText->setToolTip("");}
+    if (mText!=NULL){
+        mText->setStyleClass(mActive ? "currentEss" : "ess");
+        if (mActive) {mText->setToolTip(WString::tr("toolTipActiveLayer"));} else {mText->setToolTip("");}
+    }
 }
 
 
@@ -264,73 +274,73 @@ std::map<std::string,int> Layer::computeStatOnPolyg(OGRGeometry *poGeom){
         GDALDataset * mask = rasterizeGeom(poGeom);
 
         if (mask!=NULL){
-        OGREnvelope ext;
-        poGeom->getEnvelope(&ext);
-        double width((ext.MaxX-ext.MinX)), height((ext.MaxY-ext.MinY));
-        // std::cout << " x " << width<< " y " << height << std::endl;
+            OGREnvelope ext;
+            poGeom->getEnvelope(&ext);
+            double width((ext.MaxX-ext.MinX)), height((ext.MaxY-ext.MinY));
+            // std::cout << " x " << width<< " y " << height << std::endl;
 
-        GDALDataset  * mGDALDat = (GDALDataset *) GDALOpen( getPathTif().c_str(), GA_ReadOnly );
-        if( mGDALDat == NULL )
-        {
-            std::cout << "je n'ai pas lu l'image " << getPathTif() << std::endl;
-        } else {
-            GDALRasterBand * mBand = mGDALDat->GetRasterBand( 1 );
-
-            double transform[6];
-            mGDALDat->GetGeoTransform(transform);
-            double xOrigin = transform[0];
-            double yOrigin = transform[3];
-            double pixelWidth = transform[1];
-            double pixelHeight = -transform[5];
-
-            //determine dimensions of the tile
-            int xSize = round(width/pixelWidth);
-            int ySize = round(height/pixelHeight);
-            int xOffset = int((ext.MinX - xOrigin) / pixelWidth);
-            int yOffset = int((yOrigin - ext.MaxY ) / pixelHeight);
-
-            float *scanline, *scanlineMask;
-            scanline = (float *) CPLMalloc( sizeof( float ) * xSize );
-            scanlineMask = (float *) CPLMalloc( sizeof( float ) * xSize );
-            // boucle sur chaque ligne
-            for ( int row = 0; row < ySize; row++ )
+            GDALDataset  * mGDALDat = (GDALDataset *) GDALOpen( getPathTif().c_str(), GA_ReadOnly );
+            if( mGDALDat == NULL )
             {
-                // lecture
-                mBand->RasterIO( GF_Read, xOffset, row+yOffset, xSize, 1, scanline, xSize,1, GDT_Float32, 0, 0 );
-                // lecture du masque
-                mask->GetRasterBand(1)->RasterIO( GF_Read, 0, row, xSize, 1, scanlineMask, xSize,1, GDT_Float32, 0, 0 );
-                // boucle sur scanline et garder les pixels qui sont dans le polygone
-                for (int col = 0; col <  xSize; col++)
+                std::cout << "je n'ai pas lu l'image " << getPathTif() << std::endl;
+            } else {
+                GDALRasterBand * mBand = mGDALDat->GetRasterBand( 1 );
+
+                double transform[6];
+                mGDALDat->GetGeoTransform(transform);
+                double xOrigin = transform[0];
+                double yOrigin = transform[3];
+                double pixelWidth = transform[1];
+                double pixelHeight = -transform[5];
+
+                //determine dimensions of the tile
+                int xSize = round(width/pixelWidth);
+                int ySize = round(height/pixelHeight);
+                int xOffset = int((ext.MinX - xOrigin) / pixelWidth);
+                int yOffset = int((yOrigin - ext.MaxY ) / pixelHeight);
+
+                float *scanline, *scanlineMask;
+                scanline = (float *) CPLMalloc( sizeof( float ) * xSize );
+                scanlineMask = (float *) CPLMalloc( sizeof( float ) * xSize );
+                // boucle sur chaque ligne
+                for ( int row = 0; row < ySize; row++ )
                 {
-                    // élégant mais trop lent!!
-                    //OGRPoint op1(ext.MinX+col*pixelWidth,ext.MaxY-row*pixelWidth);
-                    //if ( op1.Intersect(poGeom)/ within()){
-                    if (scanlineMask[col]==255){
-                        double aVal=scanline[ col ];
-                        if (mDicoVal->find(aVal)!=mDicoVal->end()){
-                            aRes.at(mDicoVal->at(aVal))++;
-                            nbPix++;
-                            // et les no data dans tout ça??? il faut les prendre en compte également! les ajouter dans le dictionnaire? dangereux aussi
-                            //} else if (aVal==0) {nbPix++;}
-                        } else {
-                            aRes.at("ND")++;
-                            nbPix++;}// ben oui sinon si les nodata n'ont pas la valeur 0 ça ne va pas (cas du masque forestier)
+                    // lecture
+                    mBand->RasterIO( GF_Read, xOffset, row+yOffset, xSize, 1, scanline, xSize,1, GDT_Float32, 0, 0 );
+                    // lecture du masque
+                    mask->GetRasterBand(1)->RasterIO( GF_Read, 0, row, xSize, 1, scanlineMask, xSize,1, GDT_Float32, 0, 0 );
+                    // boucle sur scanline et garder les pixels qui sont dans le polygone
+                    for (int col = 0; col <  xSize; col++)
+                    {
+                        // élégant mais trop lent!!
+                        //OGRPoint op1(ext.MinX+col*pixelWidth,ext.MaxY-row*pixelWidth);
+                        //if ( op1.Intersect(poGeom)/ within()){
+                        if (scanlineMask[col]==255){
+                            double aVal=scanline[ col ];
+                            if (mDicoVal->find(aVal)!=mDicoVal->end()){
+                                aRes.at(mDicoVal->at(aVal))++;
+                                nbPix++;
+                                // et les no data dans tout ça??? il faut les prendre en compte également! les ajouter dans le dictionnaire? dangereux aussi
+                                //} else if (aVal==0) {nbPix++;}
+                            } else {
+                                aRes.at("ND")++;
+                                nbPix++;}// ben oui sinon si les nodata n'ont pas la valeur 0 ça ne va pas (cas du masque forestier)
+                        }
                     }
                 }
-            }
-            CPLFree(scanline);
-            CPLFree(scanlineMask);
+                CPLFree(scanline);
+                CPLFree(scanlineMask);
 
-            // maintenant on calcule les pourcentage
-            /*if (nbPix>0){
+                // maintenant on calcule les pourcentage
+                /*if (nbPix>0){
                 for (auto & kv : aRes){
                     kv.second=(100*kv.second)/nbPix;
                 }
             }*/
-            //mBand=NULL;
-        }
-        GDALClose(mask);
-        GDALClose(mGDALDat);
+                //mBand=NULL;
+            }
+            GDALClose(mask);
+            GDALClose(mGDALDat);
         }
     }
     return aRes;
@@ -430,7 +440,7 @@ GDALDataset * Layer::rasterizeGeom(OGRGeometry *poGeom){
 
 
         // driver et dataset raster in memory
-       const char *pszFormat = "MEM";
+        const char *pszFormat = "MEM";
         pDriver = GetGDALDriverManager()->GetDriverByName(pszFormat);
         if( pDriver == NULL )
         {
@@ -470,7 +480,7 @@ GDALDataset * Layer::rasterizeGeom(OGRGeometry *poGeom){
                 pRaster->SetGeoTransform(tr2);
                 //pRaster->SetProjection(src);
 
-               // on en avait besoin que pour l'extent et resol
+                // on en avait besoin que pour l'extent et resol
                 //pRaster->SetSpatialRef(mGDALDat->GetSpatialRef());
                 pRaster->SetProjection(mGDALDat->GetProjectionRef());
                 GDALClose(mGDALDat);
@@ -619,7 +629,7 @@ std::string roundDouble(double d, int precisionVal){
     std::string aRes("");
     if (precisionVal>0){aRes=std::to_string(d).substr(0, std::to_string(d).find(".") + precisionVal + 1);}
     else  {aRes=std::to_string(d+0.5).substr(0, std::to_string(d).find("."));}
-   return aRes;
+    return aRes;
 }
 
 // pour les couches des variables continues
@@ -646,8 +656,6 @@ basicStat Layer::computeBasicStatOnPolyg(OGRGeometry * poGeom){
         double width((ext.MaxX-ext.MinX)), height((ext.MaxY-ext.MinY));
         // std::cout << " x " << width<< " y " << height << std::endl;
 
-        // gdal
-        GDALAllRegister();
         GDALDataset  * mGDALDat = (GDALDataset *) GDALOpen( getPathTif().c_str(), GA_ReadOnly );
         if( mGDALDat == NULL )
         {
@@ -694,8 +702,8 @@ basicStat Layer::computeBasicStatOnPolyg(OGRGeometry * poGeom){
                             catch (const std::invalid_argument& ia) {
                                 std::cerr << "Invalid argument pour stod computeBasicStatOnPolyg, part2: " << ia.what() << '\n';
                             }
-
-                        }   }
+                        }
+                    }
                 }
             }
             CPLFree(scanline);
@@ -714,14 +722,14 @@ basicStat Layer::computeBasicStatOnPolyg(OGRGeometry * poGeom){
 
 // pour les couches des variables de classe
 std::string Layer::summaryStat(OGRGeometry * poGeom){
-    std::cout << "summary stat" << std::endl;
+    //std::cout << "summary stat" << std::endl;
     layerStat ls(shared_from_this(),computeStatOnPolyg(poGeom));
     return ls.summaryStat();
 }
 
 bool Layer::wms2jpg(OGREnvelope  * extent, int aSx, int aSy, std::string aOut) const{
 
-    std::cout << "Layer::wms2jpg()" << std::endl;
+    //std::cout << "Layer::wms2jpg()" << std::endl;
     bool aRes(0);
     std::string layerName=mWMSLayerName;
     // urlify le nom de couche, enlever les espaces

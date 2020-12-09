@@ -48,7 +48,7 @@ void uploadCarte::uploadRaster(){
     rasterFiles raster=r.at(0);
 
     std::cout << "fichier  "<<raster.tif()<< std::endl;
-    WFileResource *fileResource = new Wt::WFileResource("plain/text", raster.tif());
+     std::unique_ptr<WFileResource> fileResource = std::make_unique<Wt::WFileResource>("plain/text", raster.tif());
     fileResource->suggestFileName("tata.tif");
     m_app->redirect(fileResource->url());
 }

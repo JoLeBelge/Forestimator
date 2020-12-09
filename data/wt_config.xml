@@ -26,15 +26,17 @@
 		
 		<!--<session-id-cookie>false</session-id-cookie>
         <cookie-checks>false</cookie-checks>-->
+
+	<!-- cette valeur dois être augmentée si l'utilisateur peut uploader des fichiers, sinon peux pas charger des shp de 2 Go -->
+	<max-request-size>20000</max-request-size>
+	<max-formdata-size>20000</max-formdata-size>
 		
 	</application-settings>
 
 	<head-matter>
 		<meta name="viewport" content="width=device-width, initial-scale=1"/> 
 	</head-matter> 
-	<!-- cette valeur dois être augmentée si l'utilisateur peut uploader des fichiers, sinon peux pas charger des shp de 2 Go -->
-	<max-request-size>20000</max-request-size>
-	<max-formdata-size>20000</max-formdata-size>
+
 
   <!--<max-memory-request-size>5000</max-memory-request-size>-->
  </server>

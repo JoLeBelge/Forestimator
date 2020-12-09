@@ -384,7 +384,7 @@ void parcellaire::downloadShp(){
     zf->close();
     delete zf;
 
-    WFileResource *fileResource = new Wt::WFileResource("plain/text",mFullPath+".zip");
+     std::unique_ptr<WFileResource> fileResource = std::make_unique<Wt::WFileResource>("plain/text",mFullPath+".zip");
     fileResource->suggestFileName(mClientName+"_statForestimator.zip");
     m_app->redirect(fileResource->url());
     // quand est-ce que je supprime fileResource? et l'archive? l'objet wt et les fichiers?
@@ -402,7 +402,6 @@ void parcellaire::downloadRaster(){
         ZipArchive* zf = new ZipArchive(mFullPath+"_raster.zip");
         zf->open(ZipArchive::WRITE);
         // crop les raster selectionnés
-
 
         //mGL->mPBar->setValue(0);
         //mGL->mPBar->setMaximum(vRs.size());
@@ -422,7 +421,7 @@ void parcellaire::downloadRaster(){
         m_app->loadingIndicator()->hide();
         m_app->loadingIndicator()->setMessage(tr("defaultLoadingI"));
 
-        WFileResource *fileResource = new Wt::WFileResource("plain/text",mFullPath+"_raster.zip");
+         std::unique_ptr<WFileResource> fileResource = std::make_unique<Wt::WFileResource>("plain/text",mFullPath+"_raster.zip");
         fileResource->suggestFileName(mClientName+"_raster.zip");
         m_app->redirect(fileResource->url());
 

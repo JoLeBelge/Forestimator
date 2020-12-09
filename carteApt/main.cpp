@@ -37,11 +37,18 @@ int main(int argc, char *argv[])
             cRasterInfo RI(pair.first,&dico);
             std::string aFileCodeMS("/home/lisein/Documents/carteApt/autres/mapserver/mapThematiqueFEE.map");
             aACA.codeMapServer(RI.NomFileWithExt(),RI.Code(),RI.Nom(),aFileCodeMS,RI.getDicoVal(),RI.getDicoCol());
-        }*/
+        }
         if (pair.first=="slope"){
             cRasterInfo RI(pair.first,&dico);
             std::string aFileCodeMS("/home/lisein/Documents/carteApt/autres/mapserver/mapThematiqueFEE.map");
             aACA.codeMapServer(RI.NomFileWithExt(),RI.Code(),RI.Nom(),aFileCodeMS,RI.getDicoVal(),RI.getDicoCol());
+        }*/
+
+        if(pair.first.substr(0,5)=="COMPO" && pair.first.size()==6){
+            cRasterInfo RI(pair.first,&dico);
+            std::string aFileCodeMS("/home/lisein/Documents/carteApt/autres/mapserver/compo.map");
+            aACA.codeMapServer(RI.NomFileWithExt(),RI.Code(),RI.Nom(),aFileCodeMS,RI.getDicoVal(),RI.getDicoCol());
+
         }
     }
 

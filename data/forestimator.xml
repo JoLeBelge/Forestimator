@@ -417,6 +417,7 @@ Réalisation : Lisein Jonathan <font color="blue">liseinjon@hotmail.com</font> e
 </message>
 
 <message id="report.analyse.surf.hdom.t">Hauteur dominante calculé sur le MNH</message>
+<message id="report.analyse.surf.compo.t">Composition</message>
 
 
 <message id="report.analyse.point.titre">Analyse ponctuelle</message>

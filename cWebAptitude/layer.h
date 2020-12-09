@@ -283,11 +283,15 @@ public:
     }
     cDicoApt * Dico(){return mDico;}
     cEss * Ess(){return mEss;}
+    bool l4Stat(){return mLay4Stat;}
         //WMSinfo * mWMS;
 private:
     bool mActive;
     // les couches sont taggées comme étant expert ou non expert
     bool mExpert;
+    // est ce une couche qu'on veux pouvoir visulaliser, qu'on veux pouvoir calculer des stats dessus?
+    bool mLay4Visu;
+    bool mLay4Stat;
     groupLayers * mGroupL;
     TypeLayer mType;
     TypeVar mTypeVar;

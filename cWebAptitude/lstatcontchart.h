@@ -11,6 +11,9 @@
 #include "layer.h"
 //#include "grouplayers.h"
 class lStatContChart; // similaire à layerSatChart mais dédié au var continue type hdom prédit
+class lStatCompoChart; // différent des 2 autres lstat chart cart va devoir utiliser plusieurs layers.
+
+class basicStat; // forward declaration
 
 // renvoie une grille de point, centre d'hexagone
 std::vector<OGRPoint> hexbin(GDALDataset * mask);
@@ -34,7 +37,7 @@ class lStatContChart {
 public:
     lStatContChart(std::shared_ptr<Layer> aLay, OGRGeometry * poGeom, TypeStat aType);
     ~lStatContChart(){
-       for (OGRPolygon * pol: mVaddPol) delete pol;
+       for (OGRPolygon * pol: mVaddPol) OGRGeometryFactory::destroyGeometry(pol);
        mVaddPol.clear();
        mStat.clear();
        mDistFrequ.clear();
@@ -47,7 +50,6 @@ public:
     void predictHdom();
     //std::map<std::string, double> computeDistrH();
     std::vector<std::pair<std::string,double>> computeDistrH();
-
     // equivalent de getChart, conteneur qui sera affiché dans la page de statistique
     std::unique_ptr<Wt::WContainerWidget> getResult();
 
@@ -61,5 +63,18 @@ private:
     std::vector<OGRPolygon *> mVaddPol;
     int mNbOccurence;
     TypeStat mType;
+};
+
+class lStatCompoChart{
+public:
+    lStatCompoChart(groupLayers * aGL, OGRGeometry * poGeom);
+
+    basicStat computeStatWithMasq(std::shared_ptr<Layer> aLay, OGRGeometry * poGeom);
+    // equivalent de getChart, conteneur qui sera affiché dans la page de statistique
+    std::unique_ptr<Wt::WContainerWidget> getResult();
+private:
+    std::vector<std::shared_ptr<Layer>> mVLay;
+    OGRGeometry * mGeom;
+    cDicoApt * mDico;
 };
 #endif // LSTATCONTCHART_H

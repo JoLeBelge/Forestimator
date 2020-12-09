@@ -85,7 +85,7 @@ groupLayers::groupLayers(cDicoApt * aDico, WOpenLayers *aMap, AuthApplication *a
 
     // ajout des cartes "FEE" ; NT NH Topo AE SS
     for (auto & pair : *mDico->RasterType()){
-        if (mDico->rasterCat(pair.first)!="Peuplement"){
+        if (mDico->rasterCat(pair.first)!="Peuplement" && mDico->lay4Visu(pair.first)){
             Wt::WTreeNode * n = node1_->addChildNode(Wt::cpp14::make_unique<Wt::WTreeNode>(""));
             WText *label=n->label();
             std::shared_ptr<Layer> aL=std::make_shared<Layer>(this,pair.first,label,TypeLayer::Thematique);
@@ -102,7 +102,7 @@ groupLayers::groupLayers(cDicoApt * aDico, WOpenLayers *aMap, AuthApplication *a
 
     for (auto & pair : *mDico->RasterType()){
         // couche catégorie peuplements
-        if (mDico->rasterCat(pair.first)=="Peuplement"){
+        if (mDico->rasterCat(pair.first)=="Peuplement" && mDico->lay4Visu(pair.first)){
             Wt::WTreeNode * n = node0_->addChildNode(Wt::cpp14::make_unique<Wt::WTreeNode>(""));
             WText *label=n->label();
             std::shared_ptr<Layer> aL=std::make_shared<Layer>(this,pair.first,label,TypeLayer::Thematique);
@@ -115,6 +115,13 @@ groupLayers::groupLayers(cDicoApt * aDico, WOpenLayers *aMap, AuthApplication *a
         }
     }
 
+    // c'est ici que je crée toute mes couches, donc je vais également créer celles qui ne servent pas à être visualisé (slope et compo) mais bien à calculer des stat.
+   for (auto & pair : *mDico->RasterType()){
+       if(!mDico->lay4Visu(pair.first)){
+          std::shared_ptr<Layer> aL=std::make_shared<Layer>(pair.first,mDico,TypeLayer::Thematique);
+          mVLs.push_back(aL);
+       }
+   }
     node0_->expand();
 
     auto node2 = Wt::cpp14::make_unique<Wt::WTreeNode>(tr("groupeCoucheAptFEE"));
@@ -223,7 +230,7 @@ void groupLayers::update(std::string aCode, TypeLayer type){
 
 void groupLayers::clickOnName(std::string aCode, TypeLayer type){
 
-    //std::cout << " j'ai cliqué sur un label " << aCode <<  "\n\n"<< std::endl;
+    std::cout << " j'ai cliqué sur un label " << aCode <<  "\n\n"<< std::endl;
     // udpate du rendu visuel de tout les labels de couches -- cela se situe au niveau du grouplayer
     update(aCode, type);
 
@@ -271,8 +278,11 @@ void groupLayers::extractInfo(double x, double y){
         for (std::shared_ptr<Layer> l : mVLs){
             if (((l->Type()==TypeLayer::KK )| (l->Type()==TypeLayer::Thematique )) | (( l->IsActive()) & (l->Type()!=TypeLayer::Externe))){
             if (l->isVisible()){
+
                 std::vector<std::string> layerLabelAndValue=l->displayInfo(x,y);
+                if (l->l4Stat()){
                 mLegend->add1InfoRaster(layerLabelAndValue);
+                }
 
                 if (( l->IsActive())){
                      // affiche une popup pour indiquer la valeur pour cette couche
@@ -319,17 +329,18 @@ void groupLayers::computeStatGlob(OGRGeometry *poGeomGlobale){
 
         if (l->getCode()=="MNH2019"){
             // calcul de Hdom
-          // mVLStatCont.push_back(new lStatContChart(l,poGeomGlobale,TypeStat::HDOM));
+           mVLStatCont.push_back(new lStatContChart(l,poGeomGlobale,TypeStat::HDOM));
 
         } else if(l->getCode()=="COMPO"){
-            // calcul des probabilités de présence pour les 9 sp?
-
+            // calcul des probabilités de présence pour les 9 sp.
+            mCompo = std::make_unique<lStatCompoChart>(this,poGeomGlobale);
         } else {
 
+            if (l->l4Stat()){
             // clé : la valeur au format légende (ex ; Optimum). Valeur ; pourcentage pour ce polygone
-
             std::map<std::string,int> stat = l->computeStatOnPolyg(poGeomGlobale);
             mVLStat.push_back(new layerStatChart(l,stat,poGeomGlobale));
+            }
         }
 
         //mPBar->setValue(mPBar->value() + 1);
@@ -339,6 +350,7 @@ void groupLayers::computeStatGlob(OGRGeometry *poGeomGlobale){
     //return aRes;
 }
 
+/*
 void groupLayers::computeStatOnPolyg(OGRLayer * lay,bool mergeOT){
 
     for (auto & l : getSelectedLayer4Stat() ){
@@ -384,6 +396,7 @@ void groupLayers::computeStatOnPolyg(OGRLayer * lay,bool mergeOT){
         }
     }
 }
+*/
 
 std::map<std::string,int> groupLayers::apts(){
     std::map<std::string,int> aRes;
@@ -501,7 +514,8 @@ void groupLayers::exportLayMapView(){
             m_app->processEvents();
             zf->close();
             delete zf;
-            WFileResource *fileResource = new Wt::WFileResource("plain/text",archiveFileName);
+            // le fileressources sera détruit au moment de la destruction GroupL
+            std::unique_ptr<WFileResource> fileResource = std::make_unique<Wt::WFileResource>("plain/text",archiveFileName);
             fileResource->suggestFileName(mClientName+".zip");
             m_app->redirect(fileResource->url());
         } else {
@@ -753,11 +767,11 @@ void groupLayers::deleteExtent(std::string id){
 }
 
 std::vector<rasterFiles> groupLayers::getSelect4Download(){return mSelect4Download->getSelectedRaster();}
-std::vector<rasterFiles> groupLayers::getSelect4Stat(){return mSelect4Stat->getSelectedRaster();}
+//std::vector<rasterFiles> groupLayers::getSelect4Stat(){return mSelect4Stat->getSelectedRaster();}
 
-int groupLayers::getNumSelect4Stat(){return mSelect4Stat->numSelectedLayer();}
+//int groupLayers::getNumSelect4Stat(){return mSelect4Stat->numSelectedLayer();}
 int groupLayers::getNumSelect4Download(){return mSelect4Download->numSelectedLayer();}
-std::vector<std::shared_ptr<Layer>>groupLayers::getSelectedLayer4Stat(){return mSelect4Stat->getSelectedLayer();}
+//std::vector<std::shared_ptr<Layer>>groupLayers::getSelectedLayer4Stat(){return mSelect4Stat->getSelectedLayer();}
 std::vector<std::shared_ptr<Layer>> groupLayers::getSelectedLayer4Download(){return mSelect4Download->getSelectedLayer();}
 //std::vector<Layer *> groupLayers::getAllLayer(){return mSelect4Download->getAllLayer();}
 
@@ -800,4 +814,38 @@ bool isValidHtml(std::string text){
         std::cout << " attention, le texte " << text << " n'est pas un code html valide " << std::endl;
     }
     return aRes;
+}
+
+
+GDALDataset * getDSonEnv(std::string inputRaster, OGRGeometry * poGeom){
+    OGREnvelope ext;
+    poGeom->getEnvelope(&ext);
+    GDALDataset * aRes=NULL;
+    GDALDataset  * DS = (GDALDataset *) GDALOpen( inputRaster.c_str(), GA_ReadOnly );
+    if( DS == NULL )
+    {
+        std::cout << "je n'ai pas lu l'image " <<  inputRaster << std::endl;
+    } else {
+    char** papszArgv = nullptr;
+    papszArgv = CSLAddString(papszArgv, "-projwin"); //Selects a subwindow from the source image for copying but with the corners given in georeferenced coordinate
+    papszArgv = CSLAddString(papszArgv, std::to_string(ext.MinX).c_str());
+    papszArgv = CSLAddString(papszArgv, std::to_string(ext.MaxY).c_str());
+    papszArgv = CSLAddString(papszArgv, std::to_string(ext.MaxX).c_str());
+    papszArgv = CSLAddString(papszArgv, std::to_string(ext.MinY).c_str());
+
+    GDALTranslateOptions * option = GDALTranslateOptionsNew(papszArgv,nullptr);
+    if (option){
+        //std::cout <<" options parsées " << std::endl;
+        GDALDatasetH DScrop = GDALTranslate("/vsimem/out",DS,option,nullptr);
+
+        if (DScrop ){
+            // j'ai toujours 2 raster a ouvrir conjointement
+            aRes = GDALDataset::FromHandle(DScrop);
+        }
+    }
+
+    GDALTranslateOptionsFree(option);
+    GDALClose(DS);
+   }
+   return aRes;
 }

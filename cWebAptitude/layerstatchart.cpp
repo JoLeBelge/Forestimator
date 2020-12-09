@@ -4,7 +4,7 @@ int seuilClasseMinoritaire(2); // en dessous de ce seuil, les classes sont regro
 layerStatChart::layerStatChart(std::shared_ptr<Layer> aLay, std::map<std::string, int> aStat, OGRGeometry *poGeom):layerStat(aLay,aStat),rowAtMax(0),mGeom(poGeom)
 {
 
-    std::cout << "création d'un layer StatChart pour " << mLay->getLegendLabel() << std::endl;
+    //std::cout << "création d'un layer StatChart pour " << mLay->getLegendLabel() << std::endl;
     mModel = std::make_shared<WStandardItemModel>();
     // pas sur que j'ai besoin de spécifier le proto
     //mModel->setItemPrototype(cpp14::make_unique<WStandardItem>());
@@ -329,8 +329,9 @@ std::string layerStat::summaryStat(){
         // on concatene toutes les essences
         for (auto & kv : mStat){
             if (kv.second>1){
-                if (kv.second>99){ aRes+=kv.first;}
+                if (kv.second>99){ aRes+=kv.first;break;} else {
                 aRes+=kv.first+": "+std::to_string(kv.second)+"% ";
+                }
             }
         }
 
@@ -433,7 +434,7 @@ olOneLay::olOneLay(Layer * aLay, OGRGeometry *poGeom):mLay(aLay){
 */
 
 staticMap::staticMap(std::shared_ptr<Layer> aLay, OGRGeometry *poGeom, OGREnvelope *env):mLay(aLay),mSx(700),mSy(700),ext(env){
-    std::cout << "staticMap::staticMap" << std::endl;
+    //std::cout << "staticMap::staticMap" << std::endl;
     std::string name0 = std::tmpnam(nullptr);
     std::string name1 = name0.substr(5,name0.size()-5);
     mFileName = mLay->Dico()->File("TMPDIR")+"/"+name1+".png";
