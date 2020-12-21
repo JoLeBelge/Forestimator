@@ -36,7 +36,6 @@ groupLayers::groupLayers(cDicoApt * aDico, WOpenLayers *aMap, AuthApplication *a
                                 + sigMapCenter.createCall({"centre[0]","centre[1]","z"}) + "}");
     this->sigMapCenter.connect(std::bind(&groupLayers::saveExtent,this, std::placeholders::_1,std::placeholders::_2,std::placeholders::_3));
 
-
     auto legendCombo = mParent->addWidget(cpp14::make_unique<WCheckBox>(tr("legendCheckbox")));
     legendCombo->changed().connect([this]{
         if(mLegendDiv->isVisible())
@@ -88,7 +87,7 @@ groupLayers::groupLayers(cDicoApt * aDico, WOpenLayers *aMap, AuthApplication *a
         if (mDico->rasterCat(pair.first)!="Peuplement" && mDico->lay4Visu(pair.first)){
             Wt::WTreeNode * n = node1_->addChildNode(Wt::cpp14::make_unique<Wt::WTreeNode>(""));
             WText *label=n->label();
-            std::shared_ptr<Layer> aL=std::make_shared<Layer>(this,pair.first,label,TypeLayer::Thematique);
+            std::shared_ptr<Layer> aL=std::make_shared<Layer>(this,pair.first,label,TypeLayer::Station);
             std::string aCode=pair.first;
             // un peu bidouille mais le typelayer de MNH est peuplement et il est redéfini dans le constructeur de layer
             TypeLayer type= aL->Type();
@@ -105,7 +104,7 @@ groupLayers::groupLayers(cDicoApt * aDico, WOpenLayers *aMap, AuthApplication *a
         if (mDico->rasterCat(pair.first)=="Peuplement" && mDico->lay4Visu(pair.first)){
             Wt::WTreeNode * n = node0_->addChildNode(Wt::cpp14::make_unique<Wt::WTreeNode>(""));
             WText *label=n->label();
-            std::shared_ptr<Layer> aL=std::make_shared<Layer>(this,pair.first,label,TypeLayer::Thematique);
+            std::shared_ptr<Layer> aL=std::make_shared<Layer>(this,pair.first,label,TypeLayer::Station);
             std::string aCode=pair.first;
             // un peu bidouille mais le typelayer de MNH et le masque forestier sont peuplement et il est redéfini dans le constructeur de layer
             TypeLayer type= aL->Type();
@@ -114,11 +113,11 @@ groupLayers::groupLayers(cDicoApt * aDico, WOpenLayers *aMap, AuthApplication *a
             mVLs.push_back(aL);
         }
     }
-
+    std::cout << " carte pas faites pour être vue" << std::endl;
     // c'est ici que je crée toute mes couches, donc je vais également créer celles qui ne servent pas à être visualisé (slope et compo) mais bien à calculer des stat.
    for (auto & pair : *mDico->RasterType()){
        if(!mDico->lay4Visu(pair.first)){
-          std::shared_ptr<Layer> aL=std::make_shared<Layer>(pair.first,mDico,TypeLayer::Thematique);
+          std::shared_ptr<Layer> aL=std::make_shared<Layer>(pair.first,mDico,TypeLayer::Station);
           mVLs.push_back(aL);
        }
    }
@@ -201,7 +200,7 @@ groupLayers::groupLayers(cDicoApt * aDico, WOpenLayers *aMap, AuthApplication *a
 
     // updateGL pour cacher les couches expert
     updateGL();
-    //std::cout << "done " << std::endl;
+    std::cout << "done " << std::endl;
 }
 
 groupLayers::~groupLayers(){
@@ -229,13 +228,14 @@ void groupLayers::update(std::string aCode, TypeLayer type){
 
 void groupLayers::clickOnName(std::string aCode, TypeLayer type){
 
-    std::cout << " j'ai cliqué sur un label " << aCode <<  "\n\n"<< std::endl;
+    //std::cout << " j'ai cliqué sur un label " << aCode <<  "\n\n"<< std::endl;
     // udpate du rendu visuel de tout les labels de couches -- cela se situe au niveau du grouplayer
     update(aCode, type);
 
     // changer le mode CS vs FEE de grouplayer, utilse pour le tableau d'aptitude
-    if (type == TypeLayer::CS){ mTypeClassifST=TypeClassifST::CS;}
-    if (type == TypeLayer::FEE){ mTypeClassifST=TypeClassifST::FEE;}
+    if (type == TypeLayer::CS | type == TypeLayer::KK | aCode.substr(0,2)=="CS"){ mTypeClassifST=TypeClassifST::CS;} else
+    { mTypeClassifST=TypeClassifST::FEE;}
+
     // ajouter la couche à la carte
     for (std::shared_ptr<Layer> l : mVLs){
         if (l->IsActive()){ //&& type==l->Type()){
@@ -275,14 +275,12 @@ void groupLayers::extractInfo(double x, double y){
         mLegend->add1InfoRaster(ptPed.displayInfo(PEDO::TEXTURE));
 
         for (std::shared_ptr<Layer> l : mVLs){
-            if (((l->Type()==TypeLayer::KK )| (l->Type()==TypeLayer::Thematique )) | (( l->IsActive()) & (l->Type()!=TypeLayer::Externe))){
+            if (((l->Type()==TypeLayer::KK )| (l->Type()==TypeLayer::Station )) | (( l->IsActive()) & (l->Type()!=TypeLayer::Externe))){
             if (l->isVisible()){
-
                 std::vector<std::string> layerLabelAndValue=l->displayInfo(x,y);
                 if (l->l4Stat()){
                 mLegend->add1InfoRaster(layerLabelAndValue);
                 }
-
                 if (( l->IsActive())){
                      // affiche une popup pour indiquer la valeur pour cette couche
                     // attention, il faut escaper les caractères à problèmes du genre apostrophe
@@ -298,7 +296,6 @@ void groupLayers::extractInfo(double x, double y){
             }
             }
         }
-
         // tableau du détail du calcul de l'aptitude d'une essence pour FEE
         for (std::shared_ptr<Layer> l : mVLs){
             // on a bien une essence active et on est en mode FEE
@@ -309,8 +306,10 @@ void groupLayers::extractInfo(double x, double y){
 
             }
         }
+
         // tableau des aptitudes pour toutes les essences
        mLegend->afficheAptAllEss();
+
 
         mMap->updateView();
     }else {
@@ -403,9 +402,9 @@ std::map<std::string,int> groupLayers::apts(){
     case FEE:
         if (mStation->readyFEE()){
             for (std::shared_ptr<Layer> l : mVLs){
-                if (l->Type()==TypeLayer::FEE || l->Type()==TypeLayer::CS){
+                if (l->Type()==TypeLayer::FEE ){//|| l->Type()==TypeLayer::CS){
                     // j'ai deux solution pour avoir les aptitudes ; soit je lis la valeur du raster apt, soit je recalcule l'aptitude avec les variables environnementales
-                    cEss  * Ess= l->Ess();
+                    std::shared_ptr<cEss> Ess= l->Ess();
                     int apt = Ess->getFinalApt(mStation->mNT,mStation->mNH, mStation->mZBIO, mStation->mTOPO);
                     aRes.emplace(std::make_pair(Ess->Code(),apt));
                 }
@@ -415,9 +414,9 @@ std::map<std::string,int> groupLayers::apts(){
     case CS:
         if (mStation->readyCS()){
             for (std::shared_ptr<Layer> l : mVLs){
-                if (l->Type()==TypeLayer::FEE || l->Type()==TypeLayer::CS){
+                if ( l->Type()==TypeLayer::CS){//l->Type()==TypeLayer::FEE ||
                     // j'ai deux solution pour avoir les aptitudes ; soit je lis la valeur du raster apt, soit je recalcule l'aptitude avec les variables environnementales
-                    cEss  * Ess= l->Ess();
+                    std::shared_ptr<cEss> Ess= l->Ess();
                     int apt = Ess->getApt(mStation->mZBIO, mStation->mSt);
                     if (apt!=0) aRes.emplace(std::make_pair(Ess->Code(),apt));
                 }
@@ -484,6 +483,14 @@ std::shared_ptr<Layer> groupLayers::getActiveLay(){
                 l->setActive();
                 break;}
         }
+    }
+    return aRes;
+}
+
+std::shared_ptr<Layer> groupLayers::getLay(std::string aCode){
+    std::shared_ptr<Layer> aRes=NULL;
+    for (std::shared_ptr<Layer> l : mVLs){
+        if (( l->getCode()==aCode)){aRes=l;break;}
     }
     return aRes;
 }

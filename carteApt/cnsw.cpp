@@ -340,7 +340,6 @@ std::vector<std::string> ptPedo::displayInfo(PEDO p){
 surfPedo::surfPedo(std::shared_ptr<cnsw> dico, OGRGeometry *poGeom ):mDico(dico){
     propSurf=dico->anaSurface(poGeom);
 
-    // synthèse des statistiques dans 3 chaines de charactères
     std::map<std::string, double> VDDrainage;
     std::map<std::string, double> VDText;
     std::map<std::string, double> VDProf;
@@ -406,6 +405,46 @@ std::string surfPedo::getSummary(PEDO p){
             break;
         }
 
+    }
+    return aRes;
+}
+
+std::pair<std::string,double> surfPedo::getMajTexture(){
+    std::pair<std::string,double> aRes= std::make_pair("",0);
+    // 1) plusieurs sigle pedo peuvent avoir la mm Texture - on regroupe les sigles par text
+    std::map<std::string,double> aVSigleTs;
+    for (auto  kv : propSurf){
+        std::string sText = mDico->TextureSigle(kv.first);
+        if (aVSigleTs.find(sText)!=aVSigleTs.end()){ aVSigleTs.at(sText)+=kv.second;} else {
+            aVSigleTs.emplace(std::make_pair(sText,kv.second));
+        }
+    }
+    // trouver le sigle majoritaire en surface
+    double aMax(0);
+    for (auto & kv : aVSigleTs){
+        if (kv.second>aMax){
+        aMax=kv.second;
+        aRes=kv;}
+    }
+    return aRes;
+}
+
+std::pair<std::string,double> surfPedo::getMajDrainage(){
+    std::pair<std::string,double> aRes= std::make_pair("",0);
+    // 1) plusieurs sigle pedo peuvent avoir le MM drainage - on regroupe les sigles
+    std::map<std::string,double> aVSigleDs;
+    for (auto  kv : propSurf){
+        std::string sD= mDico->DrainageSigle(kv.first);
+        if (aVSigleDs.find(sD)!=aVSigleDs.end()){ aVSigleDs.at(sD)+=kv.second;} else {
+            aVSigleDs.emplace(std::make_pair(sD,kv.second));
+        }
+    }
+    // trouver le sigle majoritaire en surface
+    double aMax(0);
+    for (auto & kv : aVSigleDs){
+        if (kv.second>aMax){
+        aMax=kv.second;
+        aRes=kv;}
     }
     return aRes;
 }

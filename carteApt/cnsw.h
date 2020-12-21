@@ -49,6 +49,11 @@ public:
     void loadInfo();
     void closeConnection();
     int openConnection();
+    std::string sIdToSigleStr(int aCode){
+        std::string aRes("/");
+        if (sigleIdToSigleStr.find(aCode)!=sigleIdToSigleStr.end()){aRes=sigleIdToSigleStr.at(aCode);}
+        return aRes;
+    }
 
     std::string Texture(std::string aCode){
         std::string aRes("/");
@@ -61,6 +66,19 @@ public:
         if (sToTexture.find(aCode)!=sToTexture.end()){aRes=Texture(sToTexture.at(aCode));}
         return aRes;
     }
+    std::string TextureSigle(int aCode){
+        std::string aRes("");
+        if (sToTexture.find(aCode)!=sToTexture.end()){aRes=sToTexture.at(aCode);}
+        return aRes;
+    }
+
+    std::string DrainageSigle(int aCode){
+        std::string aRes("");
+        if (sToDrainage.find(aCode)!=sToDrainage.end()){aRes=sToDrainage.at(aCode);}
+        return aRes;
+    }
+
+
 
     std::string Drainage(std::string aText,std::string aDrainage){
         std::string aRes("/");
@@ -166,10 +184,22 @@ public:
 
     std::string getSummary(PEDO p);
 
+    // retourne le symbole de Texture majoritaire ainsi que sa proportion en surface
+    std::pair<std::string,double> getMajTexture();
+    // retourne le symbole de Drainage majoritaire ainsi que sa proportion en surface
+    std::pair<std::string,double> getMajDrainage();
+
+    void catPropSurf(){
+        std::cout << "surfPedo details;\n";
+        for (auto kv : propSurf){
+            std::cout << "sigle " << mDico->sIdToSigleStr(kv.first) << ", porportion surf " << kv.second << std::endl;
+        }
+    }
 private:
      std::shared_ptr<cnsw> mDico;
     std::map<int,double> propSurf;
     std::string dDrainage,dTexture,dProf;
+
 };
 
 #endif // CNSW_H

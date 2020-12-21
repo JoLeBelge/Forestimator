@@ -141,6 +141,8 @@ public:
     std::vector<std::shared_ptr<Layer>> getVpLs(){ return mVLs;}
 
     std::shared_ptr<Layer> getActiveLay();
+
+     std::shared_ptr<Layer> getLay(std::string aCode);
     // retourne les aptitudes des essences pour une position donnée (click sur la carte)
     //key ; code essence. Value ; code aptitude
     std::map<std::string,int> apts();

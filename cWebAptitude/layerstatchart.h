@@ -65,6 +65,8 @@ public:
     void drawPol(OGRPolygon * pol, Wt::WPainter * painter);
     // ajoute un polygone par après, l'image existe déjà
     void addPols(std::vector<OGRPolygon *> vpol, Wt::WColor col= Wt::StandardColor::DarkYellow);
+    // ajout d'un logo en bas à doite - consigne IGN
+    void addImg(std::string afileName);
     void drawScaleLine(WPainter *painter);
 
 private:

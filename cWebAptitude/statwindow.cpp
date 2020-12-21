@@ -51,10 +51,10 @@ statWindow::statWindow(groupLayers * aGL):mDico(aGL->Dico()), mApp(aGL->m_app),m
     mAllStatIndivCont = addWidget(cpp14::make_unique<WContainerWidget>());
     mAllStatIndivCont->setId("AllStatIndividuelle");
 
-    mIGN= std::make_shared<Layer>("IGN",mDico,TypeLayer::Thematique);
-    mMNT= std::make_shared<Layer>("MNT",mDico,TypeLayer::Thematique);
-    mZBIO = std::make_shared<Layer>("ZBIO",mDico,TypeLayer::Thematique);
-    mPente= std::make_shared<Layer>("slope",mDico,TypeLayer::Thematique);
+    mIGN= std::make_shared<Layer>("IGN",mDico,TypeLayer::Station);
+    mMNT= std::make_shared<Layer>("MNT",mDico,TypeLayer::Station);
+    mZBIO = std::make_shared<Layer>("ZBIO",mDico,TypeLayer::Station);
+    mPente= std::make_shared<Layer>("slope",mDico,TypeLayer::Station);
 }
 
 void statWindow::genIndivCarteAndAptT(){
@@ -267,7 +267,8 @@ void statWindow::export2pdf(){
     HPDF_SaveToFile(pdf,aOut.c_str());
     HPDF_Free(pdf);
 
-     std::unique_ptr<WFileResource> fileResource = std::make_unique<Wt::WFileResource>("plain/text",aOut);
+     //std::unique_ptr<WFileResource> fileResource = std::make_unique<Wt::WFileResource>("plain/text",aOut);
+     WFileResource *fileResource = new Wt::WFileResource("application/pdf",aOut);
     fileResource->suggestFileName("Forestimator-info-parcelaire.pdf");
     mApp->redirect(fileResource->url());
 

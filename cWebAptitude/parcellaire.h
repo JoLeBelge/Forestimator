@@ -55,7 +55,7 @@ public:
     std::string geoJsonName();
     std::string geoJsonRelName();
 
-    void downloadShp();
+    //void downloadShp();
     void downloadRaster();
     bool cropImWithShp(std::string inputRaster, std::string aOut);
 

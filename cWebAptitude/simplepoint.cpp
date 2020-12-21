@@ -79,7 +79,7 @@ void simplepoint::add1InfoRaster(std::vector<std::string> aV){
 
 void simplepoint::detailCalculAptFEE(ST * aST){
 
-    cEss  * Ess= aST->mActiveEss;
+    std::shared_ptr<cEss> Ess= aST->mActiveEss;
     //std::cout << " je vais afficher le détail du calcul de l'aptitude FEE pour " <<Ess->Nom() <<std::endl;
     int row(0);
     mDetAptFEE->elementAt(row, 0)->setColumnSpan(2);
@@ -112,7 +112,7 @@ void simplepoint::detailCalculAptFEE(ST * aST){
     }
     // un titre pour l'écogramme
     mContEco->addWidget(cpp14::make_unique<WText>(tr("titreEcogramme")));
-    mEcoEss = mContEco->addWidget(Wt::cpp14::make_unique<EcogrammeEss>(Ess,aST));
+    mEcoEss = mContEco->addWidget(Wt::cpp14::make_unique<EcogrammeEss>(Ess.get(),aST));
     mContEco->addWidget(cpp14::make_unique<WText>(tr("legendEcogramme")));
 }
 
@@ -317,24 +317,24 @@ void simplepoint::export2pdf(std::string titre){
     o.str("");
     o.clear();
 
-
     // RENDU CARTE ACTIVE AVEC POSITION de la STATION
 
     OGRPoint pt = mGL->mStation->getPoint();
 
     // je peux pas utiliser le membre mapextent de GL car celui-ci ne se met à jours que lorsqu'on télécharge une carte sur l'emprise courante...
     //staticMap sm(mGL->getActiveLay(),&pt,mGL->getMapExtent());
-    staticMap sm(mGL->getActiveLay(),&pt);
+    staticMap sm(mGL->getLay("IGN"),&pt);
+    // ajout du logo IGN. ajout des crédits ; toujours les mêmes, en dur.
+    sm.addImg(mDico->File("logoIGN"));
     boost::replace_all(tp,"PATH_CARTE",sm.getFileName());
-    boost::replace_all(tp,"TITRE_CARTE",mGL->getActiveLay()->getLegendLabel(0));
+    boost::replace_all(tp,"TITRE_CARTE",mGL->getLay("IGN")->getLegendLabel(0));
     boost::replace_all(tp,"POSITION_PTX",roundDouble(mGL->mStation->getX(),1));
     boost::replace_all(tp,"POSITION_PTY",roundDouble(mGL->mStation->getY(),1));
 
     if (mGL->mStation->ecogramme()){
-
         // RENDU ECOGRAMME
         // export de l'image de l'écogramme - bug constaté ; https://redmine.webtoolkit.eu/issues/7769
-        // pour ma part j'ai réinstallé Graphicmagick puis cela fonctionnais
+        // pour ma part j'ai compilé Graphicmagick puis cela fonctionnais
         int aEcoWidth(750);
         int aHeigth(aEcoWidth*15.0/7.0);
 
@@ -379,7 +379,9 @@ void simplepoint::export2pdf(std::string titre){
     std::string aOut = mDico->File("TMPDIR")+"/"+name1+".pdf";
     HPDF_SaveToFile(pdf,aOut.c_str());
     HPDF_Free(pdf);
-     std::unique_ptr<WFileResource> fileResource = std::make_unique<Wt::WFileResource>("application/pdf",aOut);
+    //std::unique_ptr<WFileResource> fileResource = std::make_unique<Wt::WFileResource>("application/pdf",aOut);
+    // std:: unique fonctionne pas, renvoi un "nothing to say about that" dans le navigateur
+    WFileResource *fileResource = new Wt::WFileResource("application/pdf",aOut);
     boost::replace_all(titre," ","-");
     fileResource->suggestFileName(titre+".pdf");
 

@@ -47,8 +47,9 @@ void uploadCarte::uploadRaster(){
     std::vector<rasterFiles> r=mGL->getSelect4Download();
     rasterFiles raster=r.at(0);
 
-    std::cout << "fichier  "<<raster.tif()<< std::endl;
-     std::unique_ptr<WFileResource> fileResource = std::make_unique<Wt::WFileResource>("plain/text", raster.tif());
+    std::cout << "fichier  "<<raster.getPathTif()<< std::endl;
+     WFileResource *fileResource = new Wt::WFileResource("plain/text", raster.getPathTif());
+     //std::unique_ptr<WFileResource> fileResource = std::make_unique<Wt::WFileResource>("plain/text", raster.getPathTif());
     fileResource->suggestFileName("tata.tif");
     m_app->redirect(fileResource->url());
 }

@@ -64,9 +64,7 @@ public:
 
     Wt::WTable                 *mInfoT;
     Wt::WTable                 *mDetAptFEE;
-
     Wt::WTable                 *mAptAllEss;
-
     Wt::WContainerWidget     * mParent;
     WPushButton * createPdfBut;
     EcogrammeEss       *mEcoEss;

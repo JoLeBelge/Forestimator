@@ -44,7 +44,7 @@ Vous pouvez télécharger les cartes listées ci-dessous qui seront découpées 
 
 <message id="infoDansVisuStat">Les statistiques sont calculées pour les couches sélectionnées dans la section "Analyse". </message>
 
-<message id="toolTipActiveLayer">Cliquez sur la case à cocher <b>Afficher la légende</b> ci-dessus pour visualiser la signification des couleurs de cette carte. </message>
+<message id="toolTipActiveLayer">Cliquez sur la case à cocher "Afficher la légende" ci-dessus pour visualiser la signification des couleurs de cette carte. </message>
 
 <message id="legendMsg"><i>Aucune légende à afficher pour cette carte.</i> </message>
 <message id="legendTitre"><h3>Légende de la carte :</h3> </message>
@@ -462,6 +462,7 @@ Réalisation : Lisein Jonathan <font color="blue">liseinjon@hotmail.com</font> e
 <img src="PATH_CARTE" style="width:350.0px;height:350.0px;margin:0px 3px 0px 3px;" />
 <!--LEGEND_CARTE si je veux la légende couleur il faut ajouter de manière automatique les couleurs dans les styles ci-dessus, je le ferai ultérieurement-->
 <br></br>
+Copyright ; © CartoWeb.be – IGN/NGI.
 Position de la station (Belge Lambert 72) : 
 POSITION_PTX, POSITION_PTY.
 </div>

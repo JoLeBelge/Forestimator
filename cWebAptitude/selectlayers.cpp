@@ -170,7 +170,7 @@ selectLayers::selectLayers(){
     treeTable->treeRoot()->expand();
 
     mLayerGroupNode.emplace(std::make_pair(TypeLayer::KK,new WTreeTableNode(tr("groupeCoucheKKCS"))));
-    mLayerGroupNode.emplace(std::make_pair(TypeLayer::Thematique,new WTreeTableNode(tr("groupeCoucheThem"))));
+    mLayerGroupNode.emplace(std::make_pair(TypeLayer::Station,new WTreeTableNode(tr("groupeCoucheThem"))));
     mLayerGroupNode.emplace(std::make_pair(TypeLayer::FEE,new WTreeTableNode(tr("groupeCoucheAptFEE"))));
     mLayerGroupNode.emplace(std::make_pair(TypeLayer::CS,new WTreeTableNode(tr("groupeCoucheAptCS"))));
     mLayerGroupNode.emplace(std::make_pair(TypeLayer::Peuplement,new WTreeTableNode(tr("groupeCouchePeup"))));

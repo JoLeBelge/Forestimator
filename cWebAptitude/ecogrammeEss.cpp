@@ -10,7 +10,7 @@ EcogrammeEss::EcogrammeEss(cEss * aEss, ST * aStation):mEss(aEss),mDico(aEss->Di
     //resize(pixPerLevel*7, pixPerLevel*15);   // Provide a default size. non sinon ne se resize pas.
 
     Width= this->width().toPixels();
-    std::cout << "ecogrammeEss width" << Width << std::endl;
+    //std::cout << "ecogrammeEss width" << Width << std::endl;
     //int Height= paintDevice->height().toPixels();
     pixPerLevel=Width/7;
 }

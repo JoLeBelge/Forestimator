@@ -97,55 +97,60 @@ cDicoApt::cDicoApt(std::string aBDFile):mBDpath(aBDFile),ptDb_(NULL)
         char userName[20];
         getlogin_r(userName,sizeof(userName));
         std::string s(userName);
-        if (s=="lisein"){
-            SQLstring="SELECT Code,Dir2,Nom,Type,NomComplet,Categorie,TypeVar, expert, visu, stat FROM fichiersGIS;";
-        } else {
-            SQLstring="SELECT Code,Dir,Nom,Type,NomComplet,Categorie,TypeVar, expert, visu, stat FROM fichiersGIS;";
-        }
-
-        sqlite3_prepare_v2( *db_, SQLstring.c_str(), -1, &stmt, NULL );
-        while(sqlite3_step(stmt) == SQLITE_ROW)
+        // j'ai fini par organiser les fichiers GIS en deux tables ; une spécifique pour les cartes d'aptitudes (ça permettra à terme de restructure la classe layer qui contient des cEss ou cRasterInfo beurk on mettra tout en rasterInfo
+        for (std::string table : std::vector<std::string>{"layerApt","fichiersGIS"})
         {
-            if (sqlite3_column_type(stmt, 0)!=SQLITE_NULL && sqlite3_column_type(stmt, 1)!=SQLITE_NULL){
+            if (s=="lisein"){
+                SQLstring="SELECT Code,Dir2,Nom,Type,NomComplet,Categorie,TypeVar, expert, visu, stat FROM "+table+";";
+            } else {
+                SQLstring="SELECT Code,Dir,Nom,Type,NomComplet,Categorie,TypeVar, expert, visu, stat FROM "+table+";";
+            }
+            //std::cout << SQLstring << std::endl;
 
-                std::string aA=std::string( (char *)sqlite3_column_text( stmt, 0 ) );
-                std::string aB=std::string( (char *)sqlite3_column_text( stmt, 1 ) );
-                std::string aC=std::string( (char *)sqlite3_column_text( stmt, 2 ) );
-                Dico_GISfile.emplace(std::make_pair(aA,aB+"/"+aC));
+            sqlite3_prepare_v2( *db_, SQLstring.c_str(), -1, &stmt, NULL );
+            while(sqlite3_step(stmt) == SQLITE_ROW)
+            {
+                if (sqlite3_column_type(stmt, 0)!=SQLITE_NULL && sqlite3_column_type(stmt, 1)!=SQLITE_NULL){
 
-                if ( sqlite3_column_type(stmt, 3)!=SQLITE_NULL && sqlite3_column_type(stmt, 4)!=SQLITE_NULL && sqlite3_column_type(stmt, 5)!=SQLITE_NULL && sqlite3_column_type(stmt, 6)!=SQLITE_NULL){
-                    std::string aD=std::string( (char *)sqlite3_column_text( stmt, 3 ) );
-                    std::string aE=std::string( (char *)sqlite3_column_text( stmt, 4 ) );
-                    std::string aF=std::string( (char *)sqlite3_column_text( stmt, 5 ) );
-                    std::string aG=std::string( (char *)sqlite3_column_text( stmt, 6 ) );
-                    Dico_RasterType.emplace(std::make_pair(aA,aD));
-                    Dico_RasterNomComplet.emplace(std::make_pair(aA,aE));
-                    Dico_RasterLayer.emplace(std::make_pair(aA,aF));
-                    Dico_RasterVar.emplace(std::make_pair(aA,aG));
-                    bool expert(0);
-                    if (sqlite3_column_type(stmt, 7)!=SQLITE_NULL) {expert=sqlite3_column_int( stmt, 7 );}
-                    Dico_RasterExpert.emplace(std::make_pair(aA,expert));
-                    if (sqlite3_column_type(stmt, 8)!=SQLITE_NULL) { Dico_RasterVisu.emplace(std::make_pair(aA,sqlite3_column_int( stmt, 8 )));;}
-                    if (sqlite3_column_type(stmt, 9)!=SQLITE_NULL) { Dico_RasterStat.emplace(std::make_pair(aA,sqlite3_column_int( stmt, 9 )));;}
+                    std::string aA=std::string( (char *)sqlite3_column_text( stmt, 0 ) );
+                    std::string aB=std::string( (char *)sqlite3_column_text( stmt, 1 ) );
+                    std::string aC=std::string( (char *)sqlite3_column_text( stmt, 2 ) );
+                    Dico_GISfile.emplace(std::make_pair(aA,aB+"/"+aC));
+                    Dico_RasterTable.emplace(std::make_pair(aA,table));
+                    if ( sqlite3_column_type(stmt, 3)!=SQLITE_NULL && sqlite3_column_type(stmt, 4)!=SQLITE_NULL && sqlite3_column_type(stmt, 5)!=SQLITE_NULL && sqlite3_column_type(stmt, 6)!=SQLITE_NULL){
+                        std::string aD=std::string( (char *)sqlite3_column_text( stmt, 3 ) );
+                        std::string aE=std::string( (char *)sqlite3_column_text( stmt, 4 ) );
+                        std::string aF=std::string( (char *)sqlite3_column_text( stmt, 5 ) );
+                        std::string aG=std::string( (char *)sqlite3_column_text( stmt, 6 ) );
+                        Dico_RasterType.emplace(std::make_pair(aA,aD));
+                        Dico_RasterNomComplet.emplace(std::make_pair(aA,aE));
+                        Dico_RasterCategorie.emplace(std::make_pair(aA,aF));
+                        Dico_RasterVar.emplace(std::make_pair(aA,aG));
+                        bool expert(0);
+                        if (sqlite3_column_type(stmt, 7)!=SQLITE_NULL) {expert=sqlite3_column_int( stmt, 7 );}
+                        Dico_RasterExpert.emplace(std::make_pair(aA,expert));
+                        if (sqlite3_column_type(stmt, 8)!=SQLITE_NULL) { Dico_RasterVisu.emplace(std::make_pair(aA,sqlite3_column_int( stmt, 8 )));;}
+                        if (sqlite3_column_type(stmt, 9)!=SQLITE_NULL) { Dico_RasterStat.emplace(std::make_pair(aA,sqlite3_column_int( stmt, 9 )));;}
+                    }
                 }
             }
-        }
-        sqlite3_finalize(stmt);
-        SQLstring="SELECT Code,WMSurl,WMSlayer, WMSattribution FROM fichiersGIS WHERE WMSurl IS NOT NULL;";
+            sqlite3_finalize(stmt);
+            SQLstring="SELECT Code,WMSurl,WMSlayer, WMSattribution FROM "+table+" WHERE WMSurl IS NOT NULL;";
 
-        sqlite3_prepare_v2( *db_, SQLstring.c_str(), -1, &stmt, NULL );
-        while(sqlite3_step(stmt) == SQLITE_ROW)
-        {
-            if (sqlite3_column_type(stmt, 0)!=SQLITE_NULL && sqlite3_column_type(stmt, 1)!=SQLITE_NULL && sqlite3_column_type(stmt, 2)!=SQLITE_NULL){
-                std::string aA=std::string( (char *)sqlite3_column_text( stmt, 0 ) );
-                std::string aB=std::string( (char *)sqlite3_column_text( stmt, 1 ) );
-                std::string aC=std::string( (char *)sqlite3_column_text( stmt, 2 ) );
-                std::string attribution("Gembloux Agro-Bio Tech");
-                if (sqlite3_column_type(stmt, 3)!=SQLITE_NULL) {attribution=std::string( (char *)sqlite3_column_text(stmt, 3 ));}
-                Dico_WMS.emplace(std::make_pair(aA,WMSinfo(aB,aC,attribution)));
+            sqlite3_prepare_v2( *db_, SQLstring.c_str(), -1, &stmt, NULL );
+            while(sqlite3_step(stmt) == SQLITE_ROW)
+            {
+                if (sqlite3_column_type(stmt, 0)!=SQLITE_NULL && sqlite3_column_type(stmt, 1)!=SQLITE_NULL && sqlite3_column_type(stmt, 2)!=SQLITE_NULL){
+                    std::string aA=std::string( (char *)sqlite3_column_text( stmt, 0 ) );
+                    std::string aB=std::string( (char *)sqlite3_column_text( stmt, 1 ) );
+                    std::string aC=std::string( (char *)sqlite3_column_text( stmt, 2 ) );
+                    std::string attribution("Gembloux Agro-Bio Tech");
+                    if (sqlite3_column_type(stmt, 3)!=SQLITE_NULL) {attribution=std::string( (char *)sqlite3_column_text(stmt, 3 ));}
+                    Dico_WMS.emplace(std::make_pair(aA,WMSinfo(aB,aC,attribution)));
+                }
             }
+            sqlite3_finalize(stmt);
         }
-        sqlite3_finalize(stmt);
         SQLstring="SELECT Code, id_projet, description, version, id_reference, Nom, copyrigth,ordre, NomShort FROM carteMTD;";
 
         sqlite3_prepare_v2( *db_, SQLstring.c_str(), -1, &stmt, NULL );
@@ -370,6 +375,11 @@ cDicoApt::cDicoApt(std::string aBDFile):mBDpath(aBDFile),ptDb_(NULL)
         sqlite3_finalize(stmt);
 
     }
+
+    // je crée toutes les essences de la classe essence
+    for (auto & pair : *code2Nom()){
+        mVEss.emplace(std::make_pair(pair.first,std::make_shared<cEss>(pair.first,this)));
+    }
     std::cout << "done " << std::endl;
     //std::cout << "Dico code essence --> nom essence francais a "<< Dico_code2NomFR.size() << " elements \n" << std::endl;
 }
@@ -431,7 +441,7 @@ std::map<int,std::string> cDicoApt::getDicoRaster(std::string aCode){
     std::map<int,std::string> aRes;
 
     sqlite3_stmt * stmt;
-    std::string SQLstring="SELECT nom_dico, nom_field_raster, nom_field_value, condition FROM fichiersGIS WHERE Code='"+ aCode+"';";
+    std::string SQLstring="SELECT nom_dico, nom_field_raster, nom_field_value, condition FROM "+RasterTable(aCode)+" WHERE Code='"+ aCode+"';";
     //std::cout << SQLstring << std::endl;
     sqlite3_prepare_v2( *db_, SQLstring.c_str(), -1, &stmt, NULL );//preparing the statement
     // une seule ligne
@@ -467,7 +477,7 @@ std::map<int,color> cDicoApt::getDicoRasterCol(std::string aCode){
     std::map<int,color> aRes;
 
     sqlite3_stmt * stmt;
-    std::string SQLstring="SELECT nom_dico, nom_field_raster, nom_field_value, condition FROM fichiersGIS WHERE Code='"+ aCode+"';";
+    std::string SQLstring="SELECT nom_dico, nom_field_raster, nom_field_value, condition FROM "+RasterTable(aCode)+"WHERE Code='"+ aCode+"';";
     //std::cout << SQLstring << std::endl;
     sqlite3_prepare_v2( *db_, SQLstring.c_str(), -1, &stmt, NULL );//preparing the statement
     // une seule ligne
@@ -705,6 +715,20 @@ void cDicoApt::closeConnection(){
     }
 }
 
+bool cDicoApt::hasWMSinfo(std::string aCode){
+    return Dico_WMS.find(aCode)!=Dico_WMS.end();
+}
+
+WMSinfo * cDicoApt::getWMSinfo(std::string aCode){
+    WMSinfo * aRes;
+    if (Dico_WMS.find(aCode)!=Dico_WMS.end()){
+        aRes=&Dico_WMS.at(aCode);
+    };
+    return aRes;
+}
+
+std::map<std::string,LayerMTD> * cDicoApt::layerMTD(){return &Dico_layerMTD;}
+
 cEss::cEss(std::string aCodeEs,cDicoApt * aDico):mCode(aCodeEs),mNomFR(aDico->accroEss2Nom(aCodeEs)),mDico(aDico)
   ,mType(Apt),mPrefix(aDico->accroEss2prefix(aCodeEs)){
     //std::cout << "creation de l'essence " << mNomFR << std::endl;
@@ -865,25 +889,6 @@ int cKKCS::getHab(int aZbio,int aSTId){
     return aRes;
 }
 
-cRasterInfo::cRasterInfo(std::string aCode,cDicoApt * aDico):mDico(aDico),mCode(aCode),mExpert(0){
-    mNom=mDico->RasterNom(mCode);
-    mPathRaster=mDico->File(mCode);
-    mExpert=mDico->RasterExpert(mCode);
-    mType =str2TypeCarte(mDico->RasterType(mCode));
-    mTypeVar =str2TypeVar(mDico->RasterVar(mCode));
-    mTypeLayer =str2TypeLayer(mDico->RasterLayer(mCode));
-    mDicoVal=mDico->getDicoRaster(mCode);
-    mDicoCol=mDico->getDicoRasterCol(mCode);
-}
-
-//std::string cRasterInfo::NomTuile(){return mCode;}
-//std::string cRasterInfo::NomDirTuile(){return mDico->File("OUTDIR2")+NomTuile();}
-std::string cRasterInfo::NomFile(){
-    boost::filesystem::path p(mPathRaster);
-    return p.stem().c_str();}
-std::string cRasterInfo::NomFileWithExt(){
-    boost::filesystem::path p(mPathRaster);
-    return p.filename().c_str();}
 
 TypeCarte str2TypeCarte(const std::string& str)
 {
@@ -910,10 +915,13 @@ TypeVar str2TypeVar(const std::string& str){
 
 TypeLayer str2TypeLayer(const std::string& str)
 {
-    TypeLayer aRes=TypeLayer::Thematique;
-    //else if(str == "Station") aRes=TypeLayer::Thematique;
+    TypeLayer aRes=TypeLayer::Station;
+    if(str == "Station") aRes=TypeLayer::Station;
     if(str == "Peuplement") aRes=TypeLayer::Peuplement;
     if(str == "Externe") aRes=TypeLayer::Externe;
+    if(str == "FEE") aRes=TypeLayer::FEE;
+    if(str == "CS") aRes=TypeLayer::CS;
+    if(str == "KK") aRes=TypeLayer::KK;
     return aRes;
 }
 
@@ -935,7 +943,7 @@ std::string loadBDpath()
 }
 
 
-ST::ST(cDicoApt * aDico):mDico(aDico),mNT(666),mNH(666),mZBIO(666),mTOPO(666),mActiveEss(0),HaveEss(0),mSt(0),mEmpty(1)
+ST::ST(cDicoApt * aDico):mDico(aDico),mNT(666),mNH(666),mZBIO(666),mTOPO(666),mActiveEss(NULL),HaveEss(0),mSt(0),mEmpty(1)
 {
 
 }
@@ -946,7 +954,6 @@ void ST::vider()
     mNH=666;
     mZBIO=666;
     mTOPO=666;
-    mActiveEss=0;
     HaveEss=0;
     mSt=666;
     hasFEEApt=0;

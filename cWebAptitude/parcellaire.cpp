@@ -371,6 +371,7 @@ void parcellaire::computeStatAndVisuSelectedPol(int aId){
 std::string parcellaire::geoJsonName(){return mFullPath + ".geojson";}
 std::string parcellaire::geoJsonRelName(){ return "tmp/" + mName +".geojson";}
 
+/*
 void parcellaire::downloadShp(){
 
     // créer une nouvelle archive et y mettre tout les fichiers du shp
@@ -385,12 +386,15 @@ void parcellaire::downloadShp(){
     zf->close();
     delete zf;
 
-     std::unique_ptr<WFileResource> fileResource = std::make_unique<Wt::WFileResource>("plain/text",mFullPath+".zip");
-    fileResource->suggestFileName(mClientName+"_statForestimator.zip");
+     //std::unique_ptr<WFileResource> fileResource = std::make_unique<Wt::WFileResource>("plain/text",mFullPath+".zip");
+     WFileResource *fileResource = new Wt::WFileResource("plain/text",mFullPath+".zip");
+     fileResource->suggestFileName(mClientName+"_statForestimator.zip");
     m_app->redirect(fileResource->url());
     // quand est-ce que je supprime fileResource? et l'archive? l'objet wt et les fichiers?
     // pas simple on dirai : https://redmine.webtoolkit.eu/boards/2/topics/16990?r=16992#message-16992
+    //https://redmine.webtoolkit.eu/boards/2/topics/11758?r=11774
 }
+*/
 
 void parcellaire::downloadRaster(){
 
@@ -407,11 +411,11 @@ void parcellaire::downloadRaster(){
         //mGL->mPBar->setValue(0);
         //mGL->mPBar->setMaximum(vRs.size());
         for (const rasterFiles & r : vRs){
-            std::string aCroppedRFile=mFullPath+"_"+r.code()+".tif";
+            std::string aCroppedRFile=mFullPath+"_"+r.Code()+".tif";
             //mGL->mPBar->setToolTip("découpe de la carte " + r.code() + "...");
-            if (cropImWithShp(r.tif(),aCroppedRFile)){
-                zf->addFile(mClientName+"_"+r.code()+".tif",aCroppedRFile);
-                if (r.hasSymbology()){zf->addFile(mClientName+"_"+r.code()+".qml",r.symbology());}
+            if (cropImWithShp(r.getPathTif(),aCroppedRFile)){
+                zf->addFile(mClientName+"_"+r.Code()+".tif",aCroppedRFile);
+                if (r.hasSymbology()){zf->addFile(mClientName+"_"+r.Code()+".qml",r.symbology());}
             }
             //mGL->mPBar->setValue(mGL->mPBar->value()+1);
             //m_app->processEvents();

@@ -564,7 +564,7 @@ void staticMap::drawPol(OGRPolygon * pol, WPainter *painter){
 
 // ajouter toute la liste de polygone en 1 coup sinon trop long lecture - écriture de l'image
 void staticMap::addPols(std::vector<OGRPolygon *> vpol, Wt::WColor col){
-    std::cout << "staticMap::addPols " << std::endl;
+    //std::cout << "staticMap::addPols " << std::endl;
     // création d'un wrasterImage et copier dedans l'image existante
     Wt::WRasterImage pngImage("png", mSx, mSy);
     WPainter painter(&pngImage);
@@ -584,6 +584,33 @@ void staticMap::addPols(std::vector<OGRPolygon *> vpol, Wt::WColor col){
     std::ofstream f(mFileName, std::ios::out | std::ios::binary);
     pngImage.write(f);
     f.close();
+}
+
+void staticMap::addImg(std::string afileName){
+    std::cout << "staticMap::addImg" << std::endl;
+    // création d'un wrasterImage et copier dedans l'image existante
+    if (exists(afileName)){
+
+    // image static map
+    Wt::WRasterImage pngImage("png", mSx, mSy);
+    WPainter painter(&pngImage);
+    Wt::WPainter::Image imInit(mFileName,mFileName);
+    Wt::WRectF destinationRect = Wt::WRectF(0.0,0.0,mSx, mSy);
+    painter.drawImage(destinationRect,imInit);
+
+    // ajout d'un logo
+    Wt::WPainter::Image imLogo(afileName,afileName);
+    Wt::WRectF destinationRectLogo = Wt::WRectF(mSx*9.0/10.0,mSy*9.0/10.0,mSx/10, mSy/10);
+    painter.drawImage(destinationRectLogo,imLogo);
+
+    pngImage.done();
+    std::ofstream f(mFileName, std::ios::out | std::ios::binary);
+    pngImage.write(f);
+    f.close();
+    } else {
+        std::cout << "staticMap::addImg, je ne trouve pas l'image " << afileName << std::endl;
+    }
+
 }
 
 void staticMap::drawScaleLine(WPainter *painter){

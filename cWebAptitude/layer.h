@@ -30,57 +30,9 @@ using namespace Wt;
 class groupLayers;
 class Layer;
 class color;
-class rasterFiles; // une classe dédiée uniquemnent à l'export et au clip des couches. Layer ne convient pas car contient une grosse partie pour l'affichage (tuiles et autre) et surtout qu'il y a deux couches par layer pour les apti
-class basicStat;
+class rasterFiles; // une classe dédiée uniquemnent à l'export et au clip des couches. Layer ne convient pas car contient une grosse partie pour l'affichage (tuiles et autre)
 class LayerMTD;
-
-std::string roundDouble(double d, int precisionVal=1);
-
-inline bool exists (const std::string& name){
-    struct stat buffer;
-    return (stat (name.c_str(), &buffer) == 0);
-}
-
-class basicStat{
-public:
-
-    basicStat():min(0),max(0),mean(0),stdev(0),nb(0){}
-    basicStat(std::map<double,int> aMapValandFrequ);
-    basicStat(std::vector<double> v);
-    std::string getMin(){return roundDouble(min);}
-    std::string getMax(){return roundDouble(max);}
-    std::string getMean(){return roundDouble(mean);}
-    std::string getNb(){return std::to_string(nb);}
-    std::string getSd(){return roundDouble(stdev);}
-    std::string getCV(){if (mean!=0) {return roundDouble(100.0*stdev/mean)+"%";} else { return "-1";};}
-   private:
-    double min,max,mean,stdev;
-    int nb;
-};
-
-class rasterFiles{
-
-public:
-    rasterFiles();
-    rasterFiles(std::string aPathTif,std::string aCode);
-    // constructeur par copie et par déplacement ; indispensable si j'utilise les objets dans un vecteur. http://www-h.eng.cam.ac.uk/help/tpl/languages/C++/morevectormemory.html
-    rasterFiles(const rasterFiles &rf){
-        mPathTif=rf.mPathTif;
-        mPathQml=rf.mPathQml;
-        mCode=rf.mCode;
-    }
-    rasterFiles(rasterFiles&& rf) noexcept {mPathTif=rf.mPathTif;mPathQml=rf.mPathQml; mCode=rf.mCode;}
-
-    std::string code() const{return mCode;}
-    std::string tif() const{return mPathTif;}
-    std::string symbology() const{return mPathQml;}
-    bool hasSymbology() const{return mPathQml!="";}
-private:
-    std::string mPathTif, mPathQml, mCode;
-    // pour exporter le dictionnaire dans un fichier texte si nécessaire
-    std::map<int, std::string> mDicoVal;
-};
-
+class basicStat;
 
 // ça va être un peu batard vu que je vais mélanger divers type de layer
 class Layer : public WMSinfo, public std::enable_shared_from_this<Layer>
@@ -199,7 +151,7 @@ public:
         return aRes;
     }
 
-    std::string getPathTif();
+    std::string getPathTif(){return mPathTif;}
     std::string getLegendLabel(bool escapeChar=true) const;
     std::string getShortLabel() const {return mLabel;}
 
@@ -282,7 +234,9 @@ public:
         return aRes;
     }
     cDicoApt * Dico(){return mDico;}
-    cEss * Ess(){return mEss;}
+    //cEss * Ess(){return mEss;}
+
+    std::shared_ptr<cEss> Ess(){return mDico->getEss(mCode);}
     bool l4Stat(){return mLay4Stat;}
         //WMSinfo * mWMS;
 private:

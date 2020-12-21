@@ -17,7 +17,7 @@ Layer::Layer(std::string aCode,cDicoApt * aDico,TypeLayer aType):
   ,mLay4Stat(1)
   ,mLay4Visu(1)
 {
-    //std::cout << "création de layer en dehors de wt pour " << aCode << std::endl;
+     //std::cout << "création de layer (sans wt) pour " << aCode << std::endl;
     switch (mType) {
     case TypeLayer::FEE:
         // construction de l'essence
@@ -26,6 +26,7 @@ Layer::Layer(std::string aCode,cDicoApt * aDico,TypeLayer aType):
         //mText->setText(mLabel);
         mDicoVal=mDico->code2AptFull();
         mDicoCol=mDico->codeApt2col();
+       mPathTif=mEss->NomCarteAptFEE();
         break;
     case TypeLayer::CS:
         // construction de l'essence
@@ -35,6 +36,7 @@ Layer::Layer(std::string aCode,cDicoApt * aDico,TypeLayer aType):
         mDicoVal=mDico->code2AptFull();
         mDicoCol=mDico->codeApt2col();
         setExpert(1);
+        mPathTif=mEss->NomCarteAptCS();
         break;
     case TypeLayer::KK:
         // construction de la caractéristique stationnelle
@@ -46,12 +48,12 @@ Layer::Layer(std::string aCode,cDicoApt * aDico,TypeLayer aType):
         mDicoCol=mKK->getDicoCol();
         setExpert(1);
         break;
-    case TypeLayer::Thematique:
+    case TypeLayer::Station:
         // creation de l'objet cRasterInfo
         mRI= new cRasterInfo(mCode,mDico);
         mLabel= mRI->Nom();
         //mText->setText(mLabel);
-        mPathTif=mRI->NomCarte();
+        mPathTif=mRI->getPathTif();
         mDicoVal=mRI->getDicoVal();
         mDicoCol=mRI->getDicoCol();
         mTypeVar=mRI->getTypeVar();
@@ -66,7 +68,7 @@ Layer::Layer(std::string aCode,cDicoApt * aDico,TypeLayer aType):
     mWMSLayerName=NomMapServerLayer();
     mLay4Stat=mDico->lay4Stat(mCode);
     mLay4Visu=mDico->lay4Visu(mCode);
-
+    mActive=0;
 }
 
 Layer::Layer(groupLayers * aGroupL, std::string aCode, WText *PWText, TypeLayer aType):
@@ -96,6 +98,7 @@ Layer::Layer(groupLayers * aGroupL, std::string aCode, WText *PWText, TypeLayer 
         mText->setText(mLabel);
         mDicoVal=mDico->code2AptFull();
         mDicoCol=mDico->codeApt2col();
+        mPathTif=mEss->NomCarteAptFEE();
         break;
     case TypeLayer::CS:
         // construction de l'essence
@@ -104,6 +107,7 @@ Layer::Layer(groupLayers * aGroupL, std::string aCode, WText *PWText, TypeLayer 
         mText->setText(mLabel);
         mDicoVal=mDico->code2AptFull();
         mDicoCol=mDico->codeApt2col();
+        mPathTif=mEss->NomCarteAptCS();
         mExpert=1;
         break;
     case TypeLayer::KK:
@@ -116,12 +120,12 @@ Layer::Layer(groupLayers * aGroupL, std::string aCode, WText *PWText, TypeLayer 
         mDicoCol=mKK->getDicoCol();
         mExpert=1;
         break;
-    case TypeLayer::Thematique:
+    case TypeLayer::Station:
         // creation de l'objet cRasterInfo
         mRI= new cRasterInfo(mCode,mDico);
         mLabel= mRI->Nom();
         mText->setText(mLabel);
-        mPathTif=mRI->NomCarte();
+        mPathTif=mRI->getPathTif();
         mDicoVal=mRI->getDicoVal();
         mDicoCol=mRI->getDicoCol();
         mTypeVar=mRI->getTypeVar();
@@ -163,7 +167,7 @@ void Layer::setActive(bool b){
     mActive=b;
     if (mText!=NULL){
         mText->setStyleClass(mActive ? "currentEss" : "ess");
-        if (mActive) {mText->setToolTip(WString::tr("toolTipActiveLayer"));} else {mText->setToolTip("");}
+        if (mActive) {mText->setToolTip(WString::tr("toolTipActiveLayer"));} else {mText->setToolTip(getLegendLabel(0));}
     }
 }
 
@@ -191,10 +195,9 @@ std::vector<std::string> Layer::displayInfo(double x, double y){
     aRes.push_back(getLegendLabel(false));
     std::string val("");
     // on va affichier uniquement les informations de la couches d'apt qui est sélectionnée, et de toutes les couches thématiques (FEE et CS)
-    if ((mType==TypeLayer::KK )| (mType==TypeLayer::Thematique) |( this->IsActive())){
+    if ((mType==TypeLayer::KK )| (mType==TypeLayer::Station) |( this->IsActive())){
         // 1 extraction de la valeur
         int aVal=getValue(x,y);
-
         if (mCode=="NT"){ mGroupL->mStation->mNT=aVal;}
         if (mCode=="NH"){ mGroupL->mStation->mNH=aVal;}
         if (mCode=="ZBIO"){ mGroupL->mStation->mZBIO=aVal;}
@@ -210,7 +213,8 @@ std::vector<std::string> Layer::displayInfo(double x, double y){
     }
 
     if ((mType==TypeLayer::FEE || mType==TypeLayer::CS) && (this->IsActive())){
-        mGroupL->mStation->mActiveEss=mEss;
+
+        mGroupL->mStation->mActiveEss=mDico->getEss(mCode);
         mGroupL->mStation->HaveEss=1;
     }
 
@@ -342,21 +346,6 @@ std::map<std::string,int> Layer::computeStatOnPolyg(OGRGeometry *poGeom){
             GDALClose(mask);
             GDALClose(mGDALDat);
         }
-    }
-    return aRes;
-}
-
-
-
-std::string Layer::getPathTif(){
-    std::string aRes;
-    switch (mType) {
-    case TypeLayer::FEE:
-        aRes=mEss->NomCarteAptFEE();break;
-    case TypeLayer::CS:
-        aRes=mEss->NomCarteAptCS();break;
-    default:
-        aRes=mPathTif;
     }
     return aRes;
 }
@@ -511,7 +500,7 @@ std::string Layer::NomMapServerLayer()const{
         case TypeLayer::CS:
             aRes="Aptitude_CS_"+mCode;
             break;
-        case TypeLayer::Thematique:
+        case TypeLayer::Station:
             aRes=mCode;
             break;
         case TypeLayer::KK:
@@ -537,7 +526,7 @@ std::string Layer::MapServerURL()const{
         case TypeLayer::CS:
             aRes="https://gxgfservcarto.gxabt.ulg.ac.be/cgi-bin/aptitude_cs";
             break;
-        case TypeLayer::Thematique:
+        case TypeLayer::Station:
             aRes="https://gxgfservcarto.gxabt.ulg.ac.be/cgi-bin/station_fee";
             break;
         case TypeLayer::KK:
@@ -568,72 +557,6 @@ rasterFiles Layer::getRasterfile(){
     }
     }
 
-}
-
-
-rasterFiles::rasterFiles(std::string aPathTif,std::string aCode):mPathTif(aPathTif),mPathQml(""),mCode(aCode){
-    // <-- initialize with the map's default c'tor
-    //boost::filesystem::path p(mPathTif);
-    // détermine si il y a un fichier de symbologie associé
-    std::string aPathQml = mPathTif.substr(0,mPathTif.size()-3)+"qml";
-    if (exists(aPathQml)){
-        mPathQml=aPathQml;
-    }
-}
-
-basicStat::basicStat(std::map<double,int> aMapValandFrequ):mean(0),max(0),min(0),nb(0){
-    bool test(0);
-    std::vector<double> v;
-    for (auto kv : aMapValandFrequ){
-        mean += kv.first*kv.second;
-        nb+=kv.second;
-
-        // pour pouvoir calculer l'écart type
-        for (int i(0) ; i<kv.second;i++){v.push_back(kv.first);}
-
-        if (kv.second>1){
-            if (test) {
-
-                if (kv.first>max) {max=kv.first;}
-                if (kv.first<min) {min=kv.first;}
-
-            } else {
-                max=kv.first;
-                min=kv.first;
-                test=1;
-            }
-        }
-    }
-    mean=mean/nb;
-
-    double sq_sum = std::inner_product(v.begin(), v.end(), v.begin(), 0.0);
-    stdev = std::sqrt(sq_sum / nb - mean * mean);
-}
-
-basicStat::basicStat(std::vector<double> v):mean(0),max(0),min(0),nb(0){
-    bool test(0);
-    for (double val : v){
-        mean += val;
-        nb++;
-        if (test) {
-            if (val>max) {max=val;}
-            if (val<min) {min=val;}
-        } else {
-            max=val;
-            min=val;
-            test=1;
-        }
-    }
-    mean=mean/nb;
-    double sq_sum = std::inner_product(v.begin(), v.end(), v.begin(), 0.0);
-    stdev = std::sqrt(sq_sum / nb - mean * mean);
-}
-
-std::string roundDouble(double d, int precisionVal){
-    std::string aRes("");
-    if (precisionVal>0){aRes=std::to_string(d).substr(0, std::to_string(d).find(".") + precisionVal + 1);}
-    else  {aRes=std::to_string(d+0.5).substr(0, std::to_string(d).find("."));}
-    return aRes;
 }
 
 // pour les couches des variables continues
