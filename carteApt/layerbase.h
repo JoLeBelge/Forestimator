@@ -74,6 +74,8 @@ public:
     std::string getNb(){return std::to_string(nb);}
     std::string getSd(){return roundDouble(stdev);}
     std::string getCV(){if (mean!=0) {return roundDouble(100.0*stdev/mean)+"%";} else { return "-1";};}
+
+    double getMeanDbl(){return mean;}
    private:
     double min,max,mean,stdev;
     int nb;
@@ -125,6 +127,12 @@ public:
     std::string symbology() const{return mPathQml;}
     bool hasSymbology() const{return mPathQml!="";}
     rasterFiles getRasterfile();
+
+    // méthode GDAL
+    int getValue(double x, double y);
+    // rasterfile, pas de dictionnaire
+    basicStat computeBasicStatOnPolyg(OGRGeometry * poGeom);
+    GDALDataset * rasterizeGeom(OGRGeometry *poGeom);
 protected:
     std::string mPathRaster, mPathQml, mCode;
 };
@@ -133,6 +141,7 @@ class cRasterInfo : public rasterFiles
 {
 public:
     cRasterInfo(std::string aCode,cDicoApt * aDico);
+
     std::string NomFile(); // nom du fichier tiff sans l'extension
     std::string NomFileWithExt();
     std::string Nom(){return mNom;}
@@ -169,8 +178,6 @@ public:
 
     layerBase(std::string aCode,cDicoApt * aDico);
 
-    // méthode GDAL
-    int getValue(double x, double y);
 
     // stat sur un polygone ; deux retour possible, une map avec clé = valeur raster, une map avec clé = signification string
     // clé ; signification du code raster. Val ; nombre d'occurence
@@ -179,7 +186,7 @@ public:
     std::map<int,double> computeStat2(OGRGeometry * poGeom);
     // retourne la valeur majoritaire sur le polygone ainsi que son prct en surface
     std::pair<int,double> valMajoritaire(OGRGeometry * poGeom);
-    GDALDataset * rasterizeGeom(OGRGeometry *poGeom);
+
     // ça c'est pour les couches variables continues
     basicStat computeBasicStatOnPolyg(OGRGeometry * poGeom);
 };

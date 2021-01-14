@@ -20,7 +20,6 @@
 #include <Wt/WApplication.h>
 #include <Wt/WEnvironment.h>
 #include <Wt/Auth/AuthWidget.h>
-#include <Wt/WApplication.h>
 #include <Wt/WContainerWidget.h>
 #include <Wt/WMenuItem.h>
 #include <Wt/WTabWidget.h>
@@ -41,6 +40,7 @@
 #include <Wt/WString.h>
 #include <sys/stat.h>
 
+#include "api/stationdescresource.h"
 
 
 class cWebAptitude; // forward declaration

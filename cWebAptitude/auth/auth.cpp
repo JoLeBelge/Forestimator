@@ -9,9 +9,6 @@ AuthApplication::AuthApplication(const Wt::WEnvironment& env)
     : Wt::WApplication(env),
       session_(docRoot() + "/auth.db")
 {
-    // dispatch resources;
-
-
     // charge le xml avec tout le texte qui sera chargé via la fonction tr()
     messageResourceBundle().use(docRoot() + "/forestimator");
 

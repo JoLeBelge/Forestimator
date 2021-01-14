@@ -62,7 +62,7 @@ void rasterFiles::checkForQml(){
 }
 
 rasterFiles rasterFiles::getRasterfile(){
-        return rasterFiles(mPathRaster,mCode);
+    return rasterFiles(mPathRaster,mCode);
 }
 
 cRasterInfo::cRasterInfo(std::string aCode,cDicoApt * aDico):rasterFiles(aDico->File(aCode),aCode),mDico(aDico),mExpert(0){
@@ -86,43 +86,43 @@ std::string cRasterInfo::NomFileWithExt(){
 
 layerBase::layerBase(std::string aCode,cDicoApt * aDico):cRasterInfo(aCode,aDico)
 {
- //std::cout << "layerbase constructor " << std::endl;
+    //std::cout << "layerbase constructor " << std::endl;
 
 }
 
-int layerBase::getValue(double x, double y){
+int rasterFiles::getValue(double x, double y){
 
     int aRes(0);
-    if (mType!=TypeLayer::Externe){
-        GDALDataset  * mGDALDat = (GDALDataset *) GDALOpen( getPathTif().c_str(), GA_ReadOnly );
-        if( mGDALDat == NULL )
-        {
-            std::cout << "je n'ai pas lu l'image " << getPathTif() << std::endl;
-        } else {
-            GDALRasterBand * mBand = mGDALDat->GetRasterBand( 1 );
+    //if (mType!=TypeLayer::Externe){
+    GDALDataset  * mGDALDat = (GDALDataset *) GDALOpen( getPathTif().c_str(), GA_ReadOnly );
+    if( mGDALDat == NULL )
+    {
+        std::cout << "je n'ai pas lu l'image " << getPathTif() << std::endl;
+    } else {
+        GDALRasterBand * mBand = mGDALDat->GetRasterBand( 1 );
 
-            double transform[6];
-            mGDALDat->GetGeoTransform(transform);
-            double xOrigin = transform[0];
-            double yOrigin = transform[3];
-            double pixelWidth = transform[1];
-            double pixelHeight = -transform[5];
+        double transform[6];
+        mGDALDat->GetGeoTransform(transform);
+        double xOrigin = transform[0];
+        double yOrigin = transform[3];
+        double pixelWidth = transform[1];
+        double pixelHeight = -transform[5];
 
-            int col = int((x - xOrigin) / pixelWidth);
-            int row = int((yOrigin - y ) / pixelHeight);
+        int col = int((x - xOrigin) / pixelWidth);
+        int row = int((yOrigin - y ) / pixelHeight);
 
-            if (col<mBand->GetXSize() && row < mBand->GetYSize()){
-                float *scanPix;
-                scanPix = (float *) CPLMalloc( sizeof( float ) * 1 );
-                // lecture du pixel
-                mBand->RasterIO( GF_Read, col, row, 1, 1, scanPix, 1,1, GDT_Float32, 0, 0 );
-                aRes=scanPix[0];
-                CPLFree(scanPix);
-                GDALClose( mGDALDat );
-                mBand=NULL;
-            }
+        if (col<mBand->GetXSize() && row < mBand->GetYSize()){
+            float *scanPix;
+            scanPix = (float *) CPLMalloc( sizeof( float ) * 1 );
+            // lecture du pixel
+            mBand->RasterIO( GF_Read, col, row, 1, 1, scanPix, 1,1, GDT_Float32, 0, 0 );
+            aRes=scanPix[0];
+            CPLFree(scanPix);
+            GDALClose( mGDALDat );
+            mBand=NULL;
         }
     }
+    //}
     return aRes;
 }
 
@@ -273,7 +273,7 @@ std::map<int,double> layerBase::computeStat2(OGRGeometry * poGeom){
                             if (aRes.find(aVal)!=aRes.end()){
                                 aRes.at(aVal)++;
                             } else {
-                              if (aRes.find(-1)==aRes.end()){   aRes.emplace(-1,0);}
+                                if (aRes.find(-1)==aRes.end()){   aRes.emplace(-1,0);}
                                 aRes.at(-1)++;
                             }
                         }
@@ -287,82 +287,82 @@ std::map<int,double> layerBase::computeStat2(OGRGeometry * poGeom){
         }
         // calcul des pct
         if (nbPix!=0){
-        for (auto  kv : aRes){
-            aRes.at(kv.first)=100.0*aRes.at(kv.first)/((double) nbPix);
-        }
+            for (auto  kv : aRes){
+                aRes.at(kv.first)=100.0*aRes.at(kv.first)/((double) nbPix);
+            }
         }
     }
     return aRes;
 }
 
 // création d'un raster masque pour un polygone. Valeur de 255 pour l'intérieur du polygone
-GDALDataset * layerBase::rasterizeGeom(OGRGeometry *poGeom){
+GDALDataset * rasterFiles::rasterizeGeom(OGRGeometry *poGeom){
 
-    std::string output(mDico->File("TMPDIR")+"tmp.tif");
+    std::string output("/vsimem/tmp.tif");
     const char *out=output.c_str();
     GDALDriver *pDriver;
     GDALDataset *pRaster=NULL, * pShp;
 
-    if (mType!=TypeLayer::Externe){
-        // driver et dataset shp -- creation depuis la géométrie
-        GDALDriver *pShpDriver = GetGDALDriverManager()->GetDriverByName("ESRI Shapefile");
-        pShp = pShpDriver->Create("/vsimem/blahblah.shp", 0, 0, 0, GDT_Unknown, NULL );
-        // he bien c'est le comble, sur le serveur j'arrive à avoir le comportement adéquat si JE NE MET PAS de src. j'ai des warnings mais tout vas mieux!!
-        OGRLayer * lay = pShp->CreateLayer("toto",nullptr,wkbPolygon,NULL);
+    //if (mType!=TypeLayer::Externe){
+    // driver et dataset shp -- creation depuis la géométrie
+    GDALDriver *pShpDriver = GetGDALDriverManager()->GetDriverByName("ESRI Shapefile");
+    pShp = pShpDriver->Create("/vsimem/blahblah.shp", 0, 0, 0, GDT_Unknown, NULL );
+    // he bien c'est le comble, sur le serveur j'arrive à avoir le comportement adéquat si JE NE MET PAS de src. j'ai des warnings mais tout vas mieux!!
+    OGRLayer * lay = pShp->CreateLayer("toto",nullptr,wkbPolygon,NULL);
 
-        OGRFeature * feat = new OGRFeature(lay->GetLayerDefn());
-        feat->SetGeometry(poGeom);
+    OGRFeature * feat = new OGRFeature(lay->GetLayerDefn());
+    feat->SetGeometry(poGeom);
 
-        lay->CreateFeature(feat);
-        delete feat;
-        const char *pszFormat = "MEM";
-        // sauver le masque pour vérification
-        //const char *pszFormat = "GTiff";
+    lay->CreateFeature(feat);
+    delete feat;
+    const char *pszFormat = "MEM";
+    // sauver le masque pour vérification
+    //const char *pszFormat = "GTiff";
 
-        pDriver = GetGDALDriverManager()->GetDriverByName(pszFormat);
-        if( pDriver == NULL )
+    pDriver = GetGDALDriverManager()->GetDriverByName(pszFormat);
+    if( pDriver == NULL )
+    {
+        printf( "%s driver not available.\n", pszFormat );
+    } else {
+
+        OGREnvelope ext;
+        poGeom->getEnvelope(&ext);
+        double width((ext.MaxX-ext.MinX)), height((ext.MaxY-ext.MinY));
+
+        GDALDataset * mGDALDat = (GDALDataset *) GDALOpen( getPathTif().c_str(), GA_ReadOnly );
+        if( mGDALDat == NULL )
         {
-            printf( "%s driver not available.\n", pszFormat );
+            std::cout << "je n'ai pas lu l'image " << getPathTif() << std::endl;
         } else {
+            double transform[6];
+            mGDALDat->GetGeoTransform(transform);
 
-            OGREnvelope ext;
-            poGeom->getEnvelope(&ext);
-            double width((ext.MaxX-ext.MinX)), height((ext.MaxY-ext.MinY));
+            double pixelWidth = transform[1];
+            double pixelHeight = -transform[5];
+            //determine dimensions of the tile
+            int xSize = round(width/pixelWidth);
+            int ySize = round(height/pixelHeight);
 
-            GDALDataset * mGDALDat = (GDALDataset *) GDALOpen( getPathTif().c_str(), GA_ReadOnly );
-            if( mGDALDat == NULL )
-            {
-                std::cout << "je n'ai pas lu l'image " << getPathTif() << std::endl;
-            } else {
-                double transform[6];
-                mGDALDat->GetGeoTransform(transform);
+            double tr2[6];
+            tr2[0]=ext.MinX;
+            tr2[3]=ext.MaxY;
+            tr2[1]=transform[1];
+            tr2[2]=transform[2];
+            tr2[4]=transform[4];
+            tr2[5]=transform[5];
+            // création du raster en mémoire - on dois lui donner un out mais il ne l'utile pas car MEM driver
 
-                double pixelWidth = transform[1];
-                double pixelHeight = -transform[5];
-                //determine dimensions of the tile
-                int xSize = round(width/pixelWidth);
-                int ySize = round(height/pixelHeight);
+            pRaster = pDriver->Create(out, xSize, ySize, 1, GDT_Byte,NULL);
+            pRaster->SetGeoTransform(tr2);
 
-                double tr2[6];
-                tr2[0]=ext.MinX;
-                tr2[3]=ext.MaxY;
-                tr2[1]=transform[1];
-                tr2[2]=transform[2];
-                tr2[4]=transform[4];
-                tr2[5]=transform[5];
-                // création du raster en mémoire - on dois lui donner un out mais il ne l'utile pas car MEM driver
-
-                pRaster = pDriver->Create(out, xSize, ySize, 1, GDT_Byte,NULL);
-                pRaster->SetGeoTransform(tr2);
-
-                // on en avait besoin que pour l'extent et resol
-                pRaster->SetProjection(mGDALDat->GetProjectionRef());
-                GDALClose(mGDALDat);
-                GDALRasterize(NULL,pRaster,pShp,NULL,NULL);
-            }
+            // on en avait besoin que pour l'extent et resol
+            pRaster->SetProjection(mGDALDat->GetProjectionRef());
+            GDALClose(mGDALDat);
+            GDALRasterize(NULL,pRaster,pShp,NULL,NULL);
         }
-        GDALClose(pShp);
     }
+    GDALClose(pShp);
+    //}
     return pRaster;
 }
 
@@ -371,7 +371,7 @@ std::string roundDouble(double d, int precisionVal){
     if (precisionVal>0){aRes=std::to_string(d).substr(0, std::to_string(d).find(".") + precisionVal + 1);}
     else  {
         aRes=std::to_string(d+0.5).substr(0, std::to_string(d+0.5).find("."));}
-      return aRes;
+    return aRes;
 }
 
 // pour les couches des variables continues
@@ -456,6 +456,75 @@ basicStat layerBase::computeBasicStatOnPolyg(OGRGeometry * poGeom){
         GDALClose(mask);
         GDALClose(mGDALDat);
     }
+
+    if (aMapValandFrequ.size()>0) {return basicStat(aMapValandFrequ);} else {return  basicStat();}
+
+}
+
+basicStat rasterFiles::computeBasicStatOnPolyg(OGRGeometry * poGeom){
+    //std::cout << "rasterFile computeBasicStat" << std::endl;
+    std::map<double,int> aMapValandFrequ;
+
+    // c'est mon masque au format raster
+    GDALDataset * mask = rasterizeGeom(poGeom);
+
+    OGREnvelope ext;
+    poGeom->getEnvelope(&ext);
+    double width((ext.MaxX-ext.MinX)), height((ext.MaxY-ext.MinY));
+    // std::cout << " x " << width<< " y " << height << std::endl;
+
+    GDALDataset  * mGDALDat = (GDALDataset *) GDALOpen( getPathTif().c_str(), GA_ReadOnly );
+    if( mGDALDat == NULL )
+    {
+        std::cout << "je n'ai pas lu l'image " << getPathTif() << std::endl;
+    } else {
+
+        GDALRasterBand * mBand = mGDALDat->GetRasterBand( 1 );
+
+        double transform[6];
+        mGDALDat->GetGeoTransform(transform);
+        double xOrigin = transform[0];
+        double yOrigin = transform[3];
+        double pixelWidth = transform[1];
+        double pixelHeight = -transform[5];
+
+        //determine dimensions of the tile
+        int xSize = round(width/pixelWidth);
+        int ySize = round(height/pixelHeight);
+        int xOffset = int((ext.MinX - xOrigin) / pixelWidth);
+        int yOffset = int((yOrigin - ext.MaxY ) / pixelHeight);
+
+        float *scanline, *scanlineMask;
+        scanline = (float *) CPLMalloc( sizeof( float ) * xSize );
+        scanlineMask = (float *) CPLMalloc( sizeof( float ) * xSize );
+        // boucle sur chaque ligne
+        for ( int row = 0; row < ySize; row++ )
+        {
+            // lecture
+            mBand->RasterIO( GF_Read, xOffset, row+yOffset, xSize, 1, scanline, xSize,1, GDT_Float32, 0, 0 );
+            // lecture du masque
+            mask->GetRasterBand(1)->RasterIO( GF_Read, 0, row, xSize, 1, scanlineMask, xSize,1, GDT_Float32, 0, 0 );
+            // boucle sur scanline et garder les pixels qui sont dans le polygone
+            for (int col = 0; col <  xSize; col++)
+            {
+                // élégant mais trop lent!!
+                //OGRPoint op1(ext.MinX+col*pixelWidth,ext.MaxY-row*pixelWidth);
+                //if ( op1.Intersect(poGeom)/ within()){
+                if (scanlineMask[col]==255){
+                    double aVal=scanline[ col ];
+                    if (aMapValandFrequ.find(aVal)!=aMapValandFrequ.end()){aMapValandFrequ.at(aVal)++;} else {
+                        aMapValandFrequ.emplace(std::make_pair(aVal,1));}
+
+                }
+            }
+        }
+        CPLFree(scanline);
+        CPLFree(scanlineMask);
+
+        mBand=NULL;
+    }
+    GDALClose(mask);
+    GDALClose(mGDALDat);
 
     if (aMapValandFrequ.size()>0) {return basicStat(aMapValandFrequ);} else {return  basicStat();}
 

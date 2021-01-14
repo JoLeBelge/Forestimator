@@ -88,7 +88,8 @@ SOURCES += main.cpp \
     ../carteApt/cnsw.cpp \
     ../carteApt/layerbase.cpp \
  #   wkhtml/wkhtmlutil.cpp
-    lstatcontchart.cpp
+    lstatcontchart.cpp \
+    api/stationdescresource.cpp
 
 HEADERS += \
     auth/Session.h \
@@ -113,4 +114,5 @@ HEADERS += \
     ../carteApt/cnsw.h \
     ../carteApt/layerbase.h \
  #   wkhtml/wkhtmlutil.h
-    lstatcontchart.h
+    lstatcontchart.h \
+    api/stationdescresource.h
