@@ -27,9 +27,42 @@
 		<!--<session-id-cookie>false</session-id-cookie>
         <cookie-checks>false</cookie-checks>-->
 
-	<!-- cette valeur dois être augmentée si l'utilisateur peut uploader des fichiers, sinon peux pas charger des shp de 2 Go -->
-	<max-request-size>20000</max-request-size>
-	<max-formdata-size>20000</max-formdata-size>
+		<!-- cette valeur dois être augmentée si l'utilisateur peut uploader des fichiers, sinon peux pas charger des shp de 2 Go -->
+		<max-request-size>20000</max-request-size>
+		<max-formdata-size>20000</max-formdata-size>
+		
+		<!-- Logger configuration
+		   This configures the logger. With the default configuration,
+		   everything except for debugging messages are logged.
+
+		   The configuration is a string that defines rules for
+		   enabling or disabling certain logging. It is a white-space
+		   delimited list of rules, and each rule is of the form:
+
+			 [-]level : enables (or disables) logging of messages of
+			 the given level; '*' is a wild-card that matches all
+			 levels
+
+			 [-]level:scope : enables (or disables) logging of
+			 messages of the given level and scope; '*' is a wild-card
+			 that matches all levels or scopes.  The default
+			 configuration is "* -debug", i.e. by default everything
+			 is logged, except for "debug" messages.
+
+		   Some other examples:
+
+			 "* -debug debug:wthttp": logs everything, including
+			 debugging messages of scope "wthttp", but no other
+			 debugging messages.
+
+			 "* -info -debug": disables logging of info messages
+			 in addition to debugging messages.
+
+		   Note debugging messages are only emitted when debugging
+		   has been enabled while building Wt.
+		  -->
+		<log-config>-info -debug</log-config>
+
 		
 	</application-settings>
 
