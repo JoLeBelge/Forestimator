@@ -122,7 +122,7 @@ void selectLayers::SelectLayer(bool select,std::shared_ptr<Layer> l,bool affiche
                                  Wt::Icon::Information,
                                  Wt::StandardButton::Ok));
 
-            messageBox->setModal(false);
+            messageBox->setModal(true);
             messageBox->buttonClicked().connect([=] {
                 removeChild(messageBox);
             });

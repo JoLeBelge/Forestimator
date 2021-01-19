@@ -7,39 +7,60 @@
 
 #include <iostream>
 
+#include "cdicoapt.h"
+
 
 class stationDescResource : public Wt::WResource
 {
 public:
-  virtual void handleRequest(const Wt::Http::Request &request,
-                             Wt::Http::Response &response) override
-  {
-    response.setMimeType("text/plain");
+   stationDescResource(cDicoApt * adico):mDico(adico){}
 
-    response.out() << "Request path:\n"
-                   << request.path() << "\n\n";
+   virtual void handleRequest(const Wt::Http::Request &request,
+                              Wt::Http::Response &response) override
+   {
+     response.setMimeType("text/plain");
 
-    auto pathInfo = request.pathInfo();
-    if (pathInfo.empty())
-      pathInfo = "(empty)";
-    response.out() << "Request path info:\n"
-                   << pathInfo << "\n\n";
+     response.out() << "Request path:\n"
+                    << request.path() << "\n\n";
 
-    response.out() << "Request URL parameters\n"
-                      "----------------------\n";
+     auto pathInfo = request.pathInfo();
+     if (pathInfo.empty())
+       pathInfo = "(empty)";
+     response.out() << "Request path info:\n"
+                    << pathInfo << "\n\n";
 
-    auto params = request.urlParams();
+     response.out() << "Request URL parameters\n"
+                       "----------------------\n";
 
-    if (params.empty())
-      response.out() << "(empty)\n";
+     auto params = request.urlParams();
 
-    for (const auto &param : params) {
-      const auto &name = param.first;
-      const auto &value = param.second;
-      response.out() << name << ": " << value << '\n';
-    }
-  }
+     if (params.empty())
+       response.out() << "(empty)\n";
 
+     for (const auto &param : params) {
+
+       const auto &name = param.first;
+       if (name=="tool") {mParamTool=param.second;}
+       if (name=="toolarg") {mParamArgs=param.second;}
+       if (name=="polygon") {mParamPolyg=param.second;}
+
+       const auto &value = param.second;
+       response.out() << name << ": " << value << '\n';
+     }
+
+     response.out() << "Réponse\n"
+                       "----------------------\n";
+     response.out << geoservice();
+   }
+
+   std::string geoservice();
+   bool checkTool();
+   bool checkPolyg();
+
+
+private:
+    cDicoApt * mDico;
+    std::string mParamTool, mParamArgs,mParamPolyg;
 };
 
 #endif // STATIONDESCRESOURCE_H

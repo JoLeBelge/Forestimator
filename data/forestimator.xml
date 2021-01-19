@@ -503,11 +503,6 @@ detAptFEE
 
 <message id="titre-InfoTableAna-point"> <h4>Description de la station forestière</h4></message>
 
-<message id="report.analyse.test">
-<p style="font-family: 'DejaVuSans'">élève, fenêtre, âme</p>
-</message>
-
-
 <message id="report.statwindow">
 	<div>
 		  <h1>Forestimator : analyse parcelaire</h1>

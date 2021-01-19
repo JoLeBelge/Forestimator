@@ -22,22 +22,19 @@
 
 int main(int argc, char **argv)
 {
-
-    stationDescResource resource;
+    // ici, créé mon dictionnaire et le mettre sous forme de membre dans resource
+    std::string aBD=loadBDpath();
+    cDicoApt *Dico=new cDicoApt(aBD);
+    stationDescResource resource(Dico);
   try {
     Wt::WServer server{argc, argv, WTHTTP_CONFIGURATION};
 
-    // le probleme quand on combine l'application + des resources, c'est que pour activer l'application, il faut obligatoirement entre la racine de l'adresse
-    //http://localhost:8085/ --> ok, j'ai forestimator
-    //http://localhost:8085/presentation --> not found grr ça va pas du coup
-    server.addResource(&resource, "${tool}/args/${toolarg}/polygon/${pol}");
-    server.addResource(&resource, "${tool}/polygon/${pol}");
-
+    // faire attention à ce que les ressources soient disponibles sur une url commencant par API/ ou équivalent, si non conflit entre l'application et les dataressource
+    server.addResource(&resource, "API/${tool}/args/${toolarg}/polygon/${pol}");
+    server.addResource(&resource, "API/${tool}/polygon/${pol}");
     server.addEntryPoint(Wt::EntryPointType::Application, createAuthApplication);
 
     Session::configureAuth();
-
-
 
     server.run();
   } catch (Wt::WServer::Exception& e) {

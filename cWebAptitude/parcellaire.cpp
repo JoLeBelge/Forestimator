@@ -443,7 +443,7 @@ void parcellaire::downloadRaster(){
                              Wt::Icon::Information,
                              Wt::StandardButton::Ok));
 
-        messageBox->setModal(false);
+        messageBox->setModal(true);
         messageBox->buttonClicked().connect([=] {
             removeChild(messageBox);
         });

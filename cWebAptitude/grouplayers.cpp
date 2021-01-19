@@ -531,7 +531,7 @@ void groupLayers::exportLayMapView(){
                                                               "<p> Cette couche ne peut être découpée sur cette emprise, essayer avec une zone plus petite.</p>",
                                                               Wt::Icon::Critical,
                                                               Wt::StandardButton::Ok));
-            messageBox->setModal(false);
+            messageBox->setModal(true);
             messageBox->buttonClicked().connect([=] {
                 this->removeChild(messageBox);
             });
@@ -548,7 +548,7 @@ void groupLayers::exportLayMapView(){
                                                           Wt::Icon::Critical,
                                                           Wt::StandardButton::Ok));
 
-        messageBox->setModal(false);
+        messageBox->setModal(true);
         messageBox->buttonClicked().connect([=] {
             this->removeChild(messageBox);
         });
