@@ -93,7 +93,6 @@ void AuthApplication::authEvent() {
     if(!loaded_)return;
     if (session_.login().loggedIn()) {
         const Wt::Auth::User& u = session_.login().user();
-        bool modeExpert= cwebapt->mGroupL->getExpertModeForUser(u.id());
         log("notice")
                 << "User " << u.id()
                 << " (" << u.identity(Wt::Auth::Identity::LoginName) << ")"
@@ -102,7 +101,7 @@ void AuthApplication::authEvent() {
             cwebapt->b_login->setText("Se déconnecter");
             std::string JScommand("$('.Wt-auth-login-container').removeClass('visible').addClass('nonvisible');");
             doJavaScript(JScommand);
-            cwebapt->mGroupL->updateGL(modeExpert);
+            cwebapt->mGroupL->updateGL();
         }
     } else{
         log("notice") << "User logged out.";

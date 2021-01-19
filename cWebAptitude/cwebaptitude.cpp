@@ -209,7 +209,7 @@ cWebAptitude::cWebAptitude(AuthApplication *app, Auth::AuthWidget* authWidget_)
 
 /*
  * Redirections en fonction du internal path
- *
+ * (ne pas oublier de compléter dans le main.cpp si internalpath changés - S.Q.)
  */
 void cWebAptitude::handlePathChange()
 {

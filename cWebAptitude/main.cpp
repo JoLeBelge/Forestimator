@@ -27,11 +27,10 @@ int main(int argc, char **argv)
   try {
     Wt::WServer server{argc, argv, WTHTTP_CONFIGURATION};
 
-    // le probleme quand on combine l'application + des resources, c'est que pour activer l'application, il faut obligatoirement entre la racine de l'adresse
-    //http://localhost:8085/ --> ok, j'ai forestimator
-    //http://localhost:8085/presentation --> not found grr ça va pas du coup
-    server.addResource(&resource, "${tool}/args/${toolarg}/polygon/${pol}");
-    server.addResource(&resource, "${tool}/polygon/${pol}");
+    // set first ressources with sub-folder /api/
+    // then add entry point for the web site
+    server.addResource(&resource, "/api/${tool}/args/${toolarg}/polygon/${pol}");
+    server.addResource(&resource, "/api/${tool}/polygon/${pol}");
 
     server.addEntryPoint(Wt::EntryPointType::Application, createAuthApplication);
 
@@ -54,7 +53,28 @@ std::unique_ptr<Wt::WApplication> createAuthApplication(const Wt::WEnvironment &
     //std::cout << env.internalPath() << " " << env.deploymentPath() << std::endl;
     //std::cout << env.getParameter("a0") << std::endl;
     //std::cout << env.getParameter("a1") << std::endl;
-    //if(env.internalPath()="")
+    if (env.internalPath() == "/presentation"){
+        ;
+    }else if (env.internalPath() == "/home"){
+        ;
+    }else if (env.internalPath() == "/cartographie"){
+        ;
+    }else if (env.internalPath() == "/analyse"){
+        ;
+    }else if (env.internalPath() == "/point"){
+        ;
+    }else if (env.internalPath() == "/resultat"){
+        ;
+    }else if (env.internalPath() == "/parametres"){
+        ;
+    }else if (env.internalPath() == "/" || env.internalPath() == ""){
+        ;
+    }else{
+        std::cout << "internal path pas geré : " << env.internalPath() << std::endl;
+        auto app404 = Wt::cpp14::make_unique<Wt::WApplication>(env);
+        app404->setInternalPathValid(false);
+        return app404;
+    }
 
     return Wt::cpp14::make_unique<AuthApplication>(env);
 }
