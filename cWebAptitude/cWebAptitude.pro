@@ -28,7 +28,6 @@ LIBS = -lgdal -lwthttp -lwt -lboost_system -lboost_iostreams -lboost_thread -lbo
 #LIBS += $(shell MagickCore-config --ldflags --libs)
 # j'ai fait tourner le shell dans la console et il m'a retourné la ligne ci-dessous, que j'utilise directement plutôt que la ligne ci-dessus
 #LIBS += -L/usr/local/lib -lGraphicsMagick++ -lGraphicsMagick -ljbig -lwebp -lwebpmux -llcms2 -ltiff -lfreetype -ljpeg -lpng16 -lwmflite -lXext -lSM -lICE -lX11 -llzma -lbz2 -lxml2 -lz -lzstd -lm -lpthread -lgomp
-
 #INCLUDEPATH +=/usr/local/include/GraphicsMagick/
 
 

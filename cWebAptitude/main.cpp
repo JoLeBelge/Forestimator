@@ -29,9 +29,11 @@ int main(int argc, char **argv)
   try {
     Wt::WServer server{argc, argv, WTHTTP_CONFIGURATION};
 
-    // faire attention à ce que les ressources soient disponibles sur une url commencant par API/ ou équivalent, si non conflit entre l'application et les dataressource
-    server.addResource(&resource, "API/${tool}/args/${toolarg}/polygon/${pol}");
-    server.addResource(&resource, "API/${tool}/polygon/${pol}");
+    // set first ressources with sub-folder /api/
+    // then add entry point for the web site
+    server.addResource(&resource, "/api/${tool}/args/${toolarg}/polygon/${pol}");
+    server.addResource(&resource, "/api/${tool}/polygon/${pol}");
+
     server.addEntryPoint(Wt::EntryPointType::Application, createAuthApplication);
 
     Session::configureAuth();
@@ -51,7 +53,28 @@ std::unique_ptr<Wt::WApplication> createAuthApplication(const Wt::WEnvironment &
     //std::cout << env.internalPath() << " " << env.deploymentPath() << std::endl;
     //std::cout << env.getParameter("a0") << std::endl;
     //std::cout << env.getParameter("a1") << std::endl;
-    //if(env.internalPath()="")
+    if (env.internalPath() == "/presentation"){
+        ;
+    }else if (env.internalPath() == "/home"){
+        ;
+    }else if (env.internalPath() == "/cartographie"){
+        ;
+    }else if (env.internalPath() == "/analyse"){
+        ;
+    }else if (env.internalPath() == "/point"){
+        ;
+    }else if (env.internalPath() == "/resultat"){
+        ;
+    }else if (env.internalPath() == "/parametres"){
+        ;
+    }else if (env.internalPath() == "/" || env.internalPath() == ""){
+        ;
+    }else{
+        std::cout << "internal path pas geré : " << env.internalPath() << std::endl;
+        auto app404 = Wt::cpp14::make_unique<Wt::WApplication>(env);
+        app404->setInternalPathValid(false);
+        return app404;
+    }
 
     return Wt::cpp14::make_unique<AuthApplication>(env);
 }

@@ -111,7 +111,7 @@ public:
     // update du rendu du nom de la couche qui est sélectionnée
     void update(std::string aCode, TypeLayer type);
     // update pour passer du mode expert au mode non expert et vice et versa
-    void updateGL(bool expertMode=0);
+    void updateGL();
     // click de l'utilisateur sur la carte pour extraire les valeurs des raster pour une position donnée
     void extractInfo(double x, double y);
     cDicoApt * Dico(){return mDico;}

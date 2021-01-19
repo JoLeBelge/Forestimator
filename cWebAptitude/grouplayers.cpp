@@ -427,7 +427,16 @@ std::map<std::string,int> groupLayers::apts(){
     return aRes;
 }
 
-void groupLayers::updateGL(bool expertMode){
+void groupLayers::updateGL(){
+    bool expertMode=0;
+
+    if(m_app->isLoggedIn()){
+        loadExtents(m_app->getUser().id());
+        mExtentDivGlob->show();
+        expertMode=getExpertModeForUser(m_app->getUser().id());
+    } else {
+        mExtentDivGlob->hide();
+    }
 
     // boucle sur les layers et envoi du signal pour cacher ou rendre visible les checkbox
     for (std::shared_ptr<Layer> l : mVLs){
@@ -436,12 +445,7 @@ void groupLayers::updateGL(bool expertMode){
     // pour cacher les noeuds racines , celui "aptitude CS"
     expertMode_.emit(expertMode);
 
-    if(m_app->isLoggedIn()){
-        loadExtents(m_app->getUser().id());
-        mExtentDivGlob->show();
-    } else {
-        mExtentDivGlob->hide();
-    }
+
 }
 
 void groupLayers::updateLegende(const std::shared_ptr<Layer> l){
