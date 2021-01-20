@@ -1,11 +1,11 @@
 #include "selectlayers.h"
 
-
+/*
 selectLayers4Stat::selectLayers4Stat(groupLayers * aGL){
     //std::cout << "creation de selectLayers4Stat " << std::endl;
 
     mGL=aGL;
-    mVpLs=aGL->getVpLs();
+    mVpLs=aGL->Layers();
     nbMax=10;
 
     // ajout des noeuds racine des groupes de couches et création de la checkbox pour le groupe
@@ -23,9 +23,9 @@ selectLayers4Stat::selectLayers4Stat(groupLayers * aGL){
     // création des noeuds pour chaque couche et de sa checkbox et ajout dans le treetable dans le bon groupe de couche
     for (std::shared_ptr<Layer> l : mVpLs){
 
-        if ((l->Type()!=TypeLayer::Externe) && (l->Type()==TypeLayer::FEE | l->Type()==TypeLayer::Peuplement)){
+        if ((l->getCatLayer()!=TypeLayer::Externe) && (l->getCatLayer()==TypeLayer::FEE | l->getCatLayer()==TypeLayer::Peuplement)){
             bool selected(0);
-            if ((l->getCode()=="HE")| (l->getCode()=="CS") | (l->getCode()=="CP") | (l->getCode()=="EP") | (l->getCode()=="DO") | (l->getCode()=="ME")){ selected=1;}
+            if ((l->Code()=="HE_FEE")| (l->Code()=="CS_FEE") | (l->Code()=="CP_FEE") | (l->Code()=="EP_FEE") | (l->Code()=="DO_FEE") | (l->Code()=="ME_FEE")){ selected=1;}
 
             mSelectedLayers.emplace(std::make_pair(l,selected));
             // checkBox
@@ -39,12 +39,13 @@ selectLayers4Stat::selectLayers4Stat(groupLayers * aGL){
             mLayersNode.emplace(std::make_pair(l,n));
             n->setColumnWidget(1, std::unique_ptr<Wt::WCheckBox>(checkB));
             // ajout au noeux racine opportun
-            mLayerGroupNode.at(l->Type())->addChildNode(std::unique_ptr<Wt::WTreeTableNode>(n));
+            mLayerGroupNode.at(l->getCatLayer())->addChildNode(std::unique_ptr<Wt::WTreeTableNode>(n));
         }
     }
 }
+*/
 
-std::vector<std::shared_ptr<Layer>> selectLayers::getSelectedLayer(){
+std::vector<std::shared_ptr<Layer>> baseSelectLayers::getSelectedLayer(){
     std::vector<std::shared_ptr<Layer>> aRes;
     for (auto kv : mSelectedLayers){
         if (kv.second){
@@ -54,10 +55,10 @@ std::vector<std::shared_ptr<Layer>> selectLayers::getSelectedLayer(){
     return aRes;
 }
 
-selectLayers4Download::selectLayers4Download(groupLayers * aGL){
+selectLayers::selectLayers(groupLayers * aGL){
 
     mGL=aGL;
-    mVpLs=aGL->getVpLs();
+    mVpLs=aGL->Layers();
     nbMax=25;
 
     // ajout des noeuds racine des groupes de couches et création de la checkbox pour le groupe
@@ -75,10 +76,11 @@ selectLayers4Download::selectLayers4Download(groupLayers * aGL){
 
     // création des noeuds pour chaque couche et de sa checkbox et ajout dans le treetable dans le bon groupe de couche
     for (std::shared_ptr<Layer> l : mVpLs){
-        if (l->Type()!=TypeLayer::Externe && l->l4Stat()){
+        if (l->getCatLayer()!=TypeLayer::Externe && l->l4Stat()){
             bool selected(0);
-            if ((l->Type()==TypeLayer::FEE) && (l->getCode()=="HE"| l->getCode()=="CS" | l->getCode()=="CP" | l->getCode()=="EP" | l->getCode()=="DO" | l->getCode()=="ME")){ selected=1;}
-            if (l->Type()==TypeLayer::Peuplement) { selected=1;}
+            //if ((l->getCatLayer()==TypeLayer::FEE) && (l->Code()=="HE"| l->Code()=="CS" | l->Code()=="CP" | l->Code()=="EP" | l->Code()=="DO" | l->Code()=="ME")){ selected=1;}
+            if ((l->Code()=="HE_FEE")| (l->Code()=="CS_FEE") | (l->Code()=="CP_FEE") | (l->Code()=="EP_FEE") | (l->Code()=="DO_FEE") | (l->Code()=="ME_FEE")){ selected=1;}
+            if (l->getCatLayer()==TypeLayer::Peuplement) { selected=1;}
 
             mSelectedLayers.emplace(std::make_pair(l,selected));
             // checkBox
@@ -92,12 +94,12 @@ selectLayers4Download::selectLayers4Download(groupLayers * aGL){
             mLayersNode.emplace(std::make_pair(l,n));
             n->setColumnWidget(1, std::unique_ptr<Wt::WCheckBox>(checkB));
             // ajout au noeux racine opportun
-            mLayerGroupNode.at(l->Type())->addChildNode(std::unique_ptr<Wt::WTreeTableNode>(n));
+            mLayerGroupNode.at(l->getCatLayer())->addChildNode(std::unique_ptr<Wt::WTreeTableNode>(n));
         }
     }
 }
 
-void selectLayers::SelectLayer(bool select,std::shared_ptr<Layer> l,bool afficheMsg){
+void baseSelectLayers::SelectLayer(bool select,std::shared_ptr<Layer> l,bool afficheMsg){
 
     if ((!select) |(nbMax>(numSelectedLayer()))){
         if (mSelectedLayers.find(l)!=mSelectedLayers.end()){
@@ -133,9 +135,9 @@ void selectLayers::SelectLayer(bool select,std::shared_ptr<Layer> l,bool affiche
     //std::cout << "nombre de couches sélectionnées " << numSelectedLayer() << std::endl;
 }
 
-void selectLayers::SelectLayerGroup(bool select,TypeLayer aType){
+void baseSelectLayers::SelectLayerGroup(bool select,TypeLayer aType){
     for (std::shared_ptr<Layer> l : mVpLs){
-        if (l->Type()==aType){
+        if (l->getCatLayer()==aType){
             SelectLayer(select,l,false);
         }
     }
@@ -143,19 +145,19 @@ void selectLayers::SelectLayerGroup(bool select,TypeLayer aType){
 
 
 // pour envoyer la liste des raster à uploadcarte
-std::vector<rasterFiles> selectLayers::getSelectedRaster(){
+std::vector<rasterFiles> baseSelectLayers::getSelectedRaster(){
     std::vector<rasterFiles> aRes;
     for (std::shared_ptr<Layer> l : getSelectedLayer()){
         // long story, la couche compo n'est pas une couche mais un ensemble de couche qu'on affiche dans le select4Download pour pouvoir faire des analyses sur toutes les cartes de compo
         // donc on ne veux pas télécharger juste le raster caché derrière la couche compo qui est d'ailleur l'ancienne carte de composition (1 raster pour toutes les ess)
-        if (l->getCode()!="COMPO"){
+        if (l->Code()!="COMPO"){
         aRes.push_back(l->getRasterfile());
         }
     }
     return aRes;
 }
 
-selectLayers::selectLayers(){
+baseSelectLayers::baseSelectLayers(){
 
     setOverflow(Wt::Overflow::Auto);
     treeTable = addWidget(cpp14::make_unique<WTreeTable>());

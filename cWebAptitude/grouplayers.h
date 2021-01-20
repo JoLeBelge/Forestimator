@@ -6,8 +6,8 @@
 #include <Wt/WTabWidget.h>
 #include <Wt/WStackedWidget.h>
 #include <Wt/WSignal.h>
-#include <Wt/WIconPair.h>
 #include <Wt/WText.h>
+#include <Wt/WTable.h>
 #include <Wt/WTree.h>
 #include <Wt/WTreeTable.h>
 #include <Wt/WTreeTableNode.h>
@@ -20,17 +20,14 @@
 #include "simplepoint.h"
 #include <fstream>
 #include "wopenlayers.h"
-#include "ogrsf_frmts.h"
-#include "gdal_utils.h"
+
 #include <Wt/WProgressBar.h>
 #include "layerstatchart.h"
 #include "Wt/WFileResource.h"
 #include "./libzippp/src/libzippp.h"
-#include <sqlite3.h>
 #include <string.h>
 #include "auth.h"
 #include "selectlayers.h"
-#include "cnsw.h"
 #include "lstatcontchart.h"
 
 class WOpenLayers;
@@ -42,9 +39,9 @@ class layerStatChart;
 class lStatContChart;
 class lStatCompoChart;
 class rasterFiles;
-class selectLayers;
+class baseSelectLayers;
 class selectLayers4Stat;
-class selectLayers4Download;
+class selectLayers;
 class stackInfoPtr;
 
 class groupStat;
@@ -138,11 +135,9 @@ public:
 
     ST * mStation;
     std::vector<std::shared_ptr<Layer>> Layers(){ return mVLs;}
-    std::vector<std::shared_ptr<Layer>> getVpLs(){ return mVLs;}
-
     std::shared_ptr<Layer> getActiveLay();
 
-     std::shared_ptr<Layer> getLay(std::string aCode);
+    std::shared_ptr<Layer> getLay(std::string aCode);
     // retourne les aptitudes des essences pour une position donnée (click sur la carte)
     //key ; code essence. Value ; code aptitude
     std::map<std::string,int> apts();
@@ -152,17 +147,17 @@ public:
     AuthApplication* m_app;
 
     std::vector<rasterFiles> getSelect4Download();
-    std::vector<rasterFiles> getSelect4Stat();
+    //std::vector<rasterFiles> getSelect4Stat();
 
     // 28 septembre 2020 , Philippe lache l'affaire et on retire les analyses simples qui portent sur l'ajout d'une colonne du shp
     //WContainerWidget * afficheSelect4Stat();
     WContainerWidget * afficheSelect4Download();
-    int getNumSelect4Stat();
+    //int getNumSelect4Stat();
     int getNumSelect4Download();
-    std::vector<std::shared_ptr<Layer>> getSelectedLayer4Stat();
+    //std::vector<std::shared_ptr<Layer>> getSelectedLayer4Stat();
     std::vector<std::shared_ptr<Layer>> getSelectedLayer4Download();
-    //std::vector<Layer *> getAllLayer();
-    std::vector<std::shared_ptr<Layer>> mVLs;
+
+
     void closeConnection();
     int openConnection();
     bool getExpertModeForUser(std::string id);
@@ -185,7 +180,7 @@ public:
     void deleteExtent(std::string id);
 
     //selectLayers4Stat * mSelect4Stat;
-    selectLayers4Download * mSelect4Download;
+    selectLayers * mSelectLayers;
 
     // signal pour cacher les nodes qui sont en mode expert
     Wt::Signal<bool>& changeExpertMode() { return expertMode_; }
@@ -193,10 +188,12 @@ public:
     OGREnvelope * getMapExtent(){return & mMapExtent;}
 
 private:
+
+    std::vector<std::shared_ptr<Layer>> mVLs;
     TypeClassifST mTypeClassifST; // 2 modes de classification des stations forestières ; FEE et CS. important de savoir le mode pour savoir quel tableau d'aptitude afficher quand on double-click sur une station
 
     cDicoApt * mDico;
-    simplepoint * mLegend;
+    simplepoint * mAnaPoint;
     sqlite3 *db_;
 
     // bof finalement c'est mieux le conteneur parent

@@ -3,23 +3,24 @@
 //#include "auth.h"
 
 cWebAptitude::cWebAptitude(AuthApplication *app, Auth::AuthWidget* authWidget_)
-    : WContainerWidget(),authWidget(authWidget_)
+    : WContainerWidget(),authWidget(authWidget_),mDico(app->getDico())
 {
     std::cout << "cWebApt\n" << std::endl;
     GDALAllRegister();
     m_app = app;
     m_app->setLoadingIndicator(cpp14::make_unique<Wt::WOverlayLoadingIndicator>());
-     m_app->loadingIndicator()->setMessage(tr("defaultLoadingI"));
+    m_app->loadingIndicator()->setMessage(tr("defaultLoadingI"));
     //m_app->loadingIndicator()->setStyleClass("loading-indicator"); // c'est moche, je vais laisser Sam gerer ça
-    std::string aBD=loadBDpath();
-    mDico=new cDicoApt(aBD);
+    //std::string aBD=loadBDpath();
+    //mDico=new cDicoApt(aBD);
+
     for (auto kv : mDico->colors){
         color col= kv.second;
         WCssDecorationStyle styleBgrd;
         styleBgrd.setBackgroundColor(WColor(col.mR,col.mG,col.mB));
         if (col.dark()){styleBgrd.setForegroundColor(WColor("white"));}
         app->styleSheet().addRule(col.getStyleName(), styleBgrd);
-       // std::cout << col.getStyleName() << "{" << styleBgrd.cssText() << "}" <<  std::endl;;
+        //std::cout << col.getStyleName() << "{" << styleBgrd.cssText() << "}" <<  std::endl;;
     }
 
     mStackInfoPtr=new stackInfoPtr();
@@ -173,18 +174,17 @@ cWebAptitude::cWebAptitude(AuthApplication *app, Auth::AuthWidget* authWidget_)
 
     /* CHARGE ONGLET COUCHES & SIMPLEPOINT */
     printf("create GL\n");
+    //mDico->openConnection();
     mGroupL = new groupLayers(mDico,mMap,m_app,mStackInfoPtr);
+    //mDico->closeConnection();// avant, GL et stat windows avaient tout deux besoin d'ouvrir la connection du dico pour créer des layers
 
     statWindow * page_camembert = sub_stack->addNew<statWindow>(mGroupL);
 
     /* CHARGE ONGLET ANALYSES */
     //printf("create PA\n");
-    //mPA = new parcellaire(content_analyse,mGroupL,m_app,page_camembert);
+
     mPA = mStackInfoPtr->stack_info->addWidget(cpp14::make_unique<parcellaire>(mGroupL,m_app,page_camembert)); // index 2
     mPA->addStyleClass("content_analyse");
-
-    // maintenant que tout les objets sont crées, je ferme la connection avec la BD sqlite3, plus propre
-    mDico->closeConnection();
 
     /*	ACTIONS	: on connect les events aux méthodes	*/
     // dans wt_config, mettre à 500 milliseconde au lieu de 200 pour le double click
@@ -204,7 +204,7 @@ cWebAptitude::cWebAptitude(AuthApplication *app, Auth::AuthWidget* authWidget_)
     m_app->internalPathChanged().connect(this, &cWebAptitude::handlePathChange);
 
     // force first route
-    handlePathChange(); // force first route
+    handlePathChange();
 }
 
 /*

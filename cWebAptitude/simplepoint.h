@@ -17,6 +17,7 @@
 #include <Wt/WPopupMenu.h>
 #include <Wt/WPushButton.h>
 #include <Wt/WText.h>
+#include <Wt/WLabel.h>
 #include <Wt/WToolBar.h>
 #include <Wt/WTemplate.h>
 #include <Wt/WString.h>

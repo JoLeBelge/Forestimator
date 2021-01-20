@@ -51,16 +51,16 @@ statWindow::statWindow(groupLayers * aGL):mDico(aGL->Dico()), mApp(aGL->m_app),m
     mAllStatIndivCont = addWidget(cpp14::make_unique<WContainerWidget>());
     mAllStatIndivCont->setId("AllStatIndividuelle");
 
-    mIGN= std::make_shared<Layer>("IGN",mDico,TypeLayer::Station);
-    mMNT= std::make_shared<Layer>("MNT",mDico,TypeLayer::Station);
-    mZBIO = std::make_shared<Layer>("ZBIO",mDico,TypeLayer::Station);
-    mPente= std::make_shared<Layer>("slope",mDico,TypeLayer::Station);
+    mIGN= mDico->getLayerBase("IGN");
+    mMNT= mDico->getLayerBase("MNT");
+    mZBIO = mDico->getLayerBase("ZBIO");
+    mPente= mDico->getLayerBase("slope");
 }
 
 void statWindow::genIndivCarteAndAptT(){
     for (layerStatChart * chart : mGL->ptrVLStat()) {
         if (chart->deserveChart()){
-            if (chart->Lay()->Type()==TypeLayer::FEE | chart->Lay()->Type()==TypeLayer::CS){
+            if (chart->Lay()->getCatLayer()==TypeLayer::FEE | chart->Lay()->getCatLayer()==TypeLayer::CS){
                 add1Aptitude(chart);
             } else {
                 add1layerStat(chart);

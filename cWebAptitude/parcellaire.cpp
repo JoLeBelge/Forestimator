@@ -48,7 +48,7 @@ parcellaire::parcellaire(groupLayers *aGL, Wt::WApplication* app, statWindow *st
 
     downloadRasterBt->clicked().connect(this,&parcellaire::downloadRaster);
     // ouu je pense que c'est mal, car si j'appui sur boutton télécharger les cartes, il me dis que toutes les cartes sont sélectionnées
-    mContSelect4D->addWidget(std::unique_ptr<selectLayers4Download>(mGL->mSelect4Download));
+    mContSelect4D->addWidget(std::unique_ptr<baseSelectLayers>(mGL->mSelectLayers));
 }
 
 parcellaire::~parcellaire(){
@@ -292,35 +292,6 @@ void parcellaire::upload(){
         cleanShpFile();
     }
 }
-
-/*
-void parcellaire::computeStat(){
-    std::cout << " parcellaire::computeStat()... " ;
-
-    m_app->loadingIndicator()->setMessage(tr("LoadingI2"));
-    m_app->loadingIndicator()->show();
-
-    //visuStatButton->enable();
-
-    // ici j'ouvre le shp
-    //std::cout << " prépare le calcul sur chacun des polygones ... " ;
-    std::string input(mFullPath+ ".shp");
-    const char *inputPath=input.c_str();
-    GDALDataset * mDS =  (GDALDataset*) GDALOpenEx( inputPath, GDAL_OF_VECTOR | GDAL_OF_READONLY, NULL, NULL, NULL );
-    if( mDS != NULL )
-    {
-        // layer
-        OGRLayer * lay = mDS->GetLayer(0);
-        mGL->computeStatOnPolyg(lay,mCB_fusionOT->isChecked());
-        //downloadShpBt->enable();
-        GDALClose(mDS);
-    }
-    m_app->loadingIndicator()->hide();
-    m_app->loadingIndicator()->setMessage(tr("defaultLoadingI"));
-    std::cout << " ..done " << std::endl;
-}  
-*/
-
 
 void parcellaire::visuStat(OGRFeature *poFeature){
     std::cout << " parcellaire::visuStat()... " ;

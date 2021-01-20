@@ -25,7 +25,7 @@ cDicoApt::cDicoApt(std::string aBDFile):mBDpath(aBDFile),ptDb_(NULL)
                 std::string aNomEs=std::string( (char *)sqlite3_column_text( stmt, 0 ) );
                 std::string aCodeEs=std::string( (char *)sqlite3_column_text( stmt, 1 ) );
                 std::string aPrefix=std::string( (char *)sqlite3_column_text( stmt, 2 ) );
-                Dico_code2NomFR.emplace(std::make_pair(aCodeEs,aNomEs));
+                Dico_codeEs2NomFR.emplace(std::make_pair(aCodeEs,aNomEs));
                 Dico_code2prefix.emplace(std::make_pair(aCodeEs,aPrefix));
             }
         }
@@ -97,7 +97,7 @@ cDicoApt::cDicoApt(std::string aBDFile):mBDpath(aBDFile),ptDb_(NULL)
         char userName[20];
         getlogin_r(userName,sizeof(userName));
         std::string s(userName);
-        // j'ai fini par organiser les fichiers GIS en deux tables ; une spécifique pour les cartes d'aptitudes (ça permettra à terme de restructure la classe layer qui contient des cEss ou cRasterInfo beurk on mettra tout en rasterInfo
+        // j'ai fini par organiser les fichiers GIS en deux tables ; une spécifique pour les cartes d'aptitudes (ça permettra à terme de restructure la classe layer qui contient des cEss ou layerbase beurk on mettra tout en layerbase
         for (std::string table : std::vector<std::string>{"layerApt","fichiersGIS"})
         {
             if (s=="lisein"){
@@ -374,12 +374,20 @@ cDicoApt::cDicoApt(std::string aBDFile):mBDpath(aBDFile),ptDb_(NULL)
         }
         sqlite3_finalize(stmt);
 
+
+        // toutes les essences de la classe essence
+        for (auto & pair : *codeEs2Nom()){
+            mVEss.emplace(std::make_pair(pair.first,std::make_shared<cEss>(pair.first,this)));
+        }
+        // toutes les layerbase
+        for (auto & pair : Dico_RasterType){
+            mVlayerBase.emplace(std::make_pair(pair.first,std::make_shared<layerBase>(pair.first,this)));
+        }
+        closeConnection();
     }
 
-    // je crée toutes les essences de la classe essence
-    for (auto & pair : *code2Nom()){
-        mVEss.emplace(std::make_pair(pair.first,std::make_shared<cEss>(pair.first,this)));
-    }
+
+
     std::cout << "done " << std::endl;
     //std::cout << "Dico code essence --> nom essence francais a "<< Dico_code2NomFR.size() << " elements \n" << std::endl;
 }
@@ -477,7 +485,7 @@ std::map<int,color> cDicoApt::getDicoRasterCol(std::string aCode){
     std::map<int,color> aRes;
 
     sqlite3_stmt * stmt;
-    std::string SQLstring="SELECT nom_dico, nom_field_raster, nom_field_value, condition FROM "+RasterTable(aCode)+"WHERE Code='"+ aCode+"';";
+    std::string SQLstring="SELECT nom_dico, nom_field_raster, nom_field_value, condition FROM "+RasterTable(aCode)+" WHERE Code='"+ aCode+"';";
     //std::cout << SQLstring << std::endl;
     sqlite3_prepare_v2( *db_, SQLstring.c_str(), -1, &stmt, NULL );//preparing the statement
     // une seule ligne
@@ -493,7 +501,7 @@ std::map<int,color> cDicoApt::getDicoRasterCol(std::string aCode){
     }
     SQLstring="SELECT "+field_raster+", col FROM "+ nom_dico ;
     if (cond!=""){ SQLstring=SQLstring+" WHERE "+cond+";";} else {SQLstring=SQLstring+";";}
-    //if (aCode=="MF"){std::cout << SQLstring << "\n\n" << std::endl;}
+    //std::cout << SQLstring << "\n\n" << std::endl;
     sqlite3_finalize(stmt);
     sqlite3_prepare_v2( *db_, SQLstring.c_str(), -1, &stmt, NULL );//preparing the statement
     while(sqlite3_step(stmt) == SQLITE_ROW)
@@ -688,7 +696,7 @@ std::map<int,std::map<int,int>> cDicoApt::getRisqueTopo(std::string aCodeEs){
 int cDicoApt::openConnection(){
     int rc;
 
-    std::cout << "chargement des dictionnaires de la BD ..." ;
+    std::cout << "ouvre connexion avec BD dictionnaire ..." ;
     //db_->Sqlite3(mBDpath);
     rc = sqlite3_open_v2(mBDpath.c_str(), db_,SQLITE_OPEN_READONLY,NULL);
     // The 31 result codes are defined in sqlite3.h
@@ -858,7 +866,7 @@ cKKCS::cKKCS(std::string aCode,cDicoApt * aDico):mCode(aCode),mNom(aDico->codeKK
 
 std::string cKKCS::NomCarte(){return mDico->File("OUTDIR")+"KK_CS_"+mCode+".tif";}
 std::string cKKCS::shortNomCarte(){return "KK_CS_"+mCode+".tif";}
-std::string cKKCS::NomDirTuile(){return mDico->File("OUTDIR2")+"KK_CS_"+mCode;}
+//std::string cKKCS::NomDirTuile(){return mDico->File("OUTDIR2")+"KK_CS_"+mCode;}
 
 std::string cKKCS::NomMapServerLayer(){return "KK_CS_"+mCode;}
 std::string cKKCS::NomMapServerLayerFull(){return "Description stationnelle - "+mNom;}

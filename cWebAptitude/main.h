@@ -46,8 +46,8 @@
 
 //class AuthApplication;
 
-std::unique_ptr<Wt::WApplication> createAuthApplication(const Wt::WEnvironment &env);
-std::unique_ptr<Wt::WApplication> createForestimatorAPI(const Wt::WEnvironment &env);
+std::unique_ptr<Wt::WApplication> createAuthApplication(const Wt::WEnvironment &env, cDicoApt * dico);
+
 int main(int argc, char **argv);
 
 #endif // MAIN_H

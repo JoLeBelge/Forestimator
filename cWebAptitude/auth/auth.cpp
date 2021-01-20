@@ -5,9 +5,9 @@
 using namespace std;
 using namespace Wt;
 
-AuthApplication::AuthApplication(const Wt::WEnvironment& env)
+AuthApplication::AuthApplication(const Wt::WEnvironment& env, cDicoApt *dico)
     : Wt::WApplication(env),
-      session_(docRoot() + "/auth.db")
+      session_(docRoot() + "/auth.db"),mDico(dico)
 {
     // charge le xml avec tout le texte qui sera chargé via la fonction tr()
     messageResourceBundle().use(docRoot() + "/forestimator");

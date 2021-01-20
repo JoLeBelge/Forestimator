@@ -477,9 +477,9 @@ bool InsideHexagonB(float x0, float y0, float x, float y,float d)
 }*/
 
 lStatCompoChart::lStatCompoChart(groupLayers * aGL, OGRGeometry * poGeom):mGeom(poGeom),mDico(aGL->Dico()){
-    for (std::shared_ptr<Layer> l:aGL->getVpLs()){
+    for (std::shared_ptr<Layer> l:aGL->Layers()){
         // on reconnais que c'est une carte de composition avec la taille du code et son préfix compo
-        if(l->getCode().substr(0,5)=="COMPO" && l->getCode().size()==6){
+        if(l->Code().substr(0,5)=="COMPO" && l->Code().size()==6){
             mVLay.push_back(l);
         }
     }
@@ -523,7 +523,7 @@ std::unique_ptr<WContainerWidget> lStatCompoChart::getResult(){
 // j'ai fait cette méthode car le calcul des stat sur les cartes de présence nécessite de charger la carte all_sp qui sert de masque. Sans ce masque je ne sais pas si j'ai 0 pour une ess car prob présence =0 ou si c'est un no data
 basicStat lStatCompoChart::computeStatWithMasq(std::shared_ptr<Layer> aLay, OGRGeometry * poGeom){
     std::map<double,int> aMapValandFrequ;
-    for (auto &kv : *aLay->mDicoVal){
+    for (auto &kv : aLay->getDicoVal()){
         try {
             aMapValandFrequ.emplace(std::make_pair(std::stod(kv.second),0));
         }
@@ -564,9 +564,9 @@ basicStat lStatCompoChart::computeStatWithMasq(std::shared_ptr<Layer> aLay, OGRG
                 if (scanlineAllEss[col]>0){
                     double aVal=scanline[ col ];
                     //std::cout << " j'ai une valeur de prob de frequ de " << aVal << " et une val " << scanlineAllEss[col] << " pour la carte all_ess.tif " << std::endl;
-                    if (aLay->mDicoVal->find(aVal)!=aLay->mDicoVal->end()){
+                    if (aLay->getDicoVal().find(aVal)!=aLay->getDicoVal().end()){
                         try {
-                            aMapValandFrequ.at(std::stod(aLay->mDicoVal->at(aVal)))++;
+                            aMapValandFrequ.at(std::stod(aLay->getDicoVal().at(aVal)))++;
                         }
                         catch (const std::invalid_argument& ia) {
                             std::cerr << "Invalid argument pour stod lStatCompoChart::computeStatWithMasq, part2: " << ia.what() << '\n';

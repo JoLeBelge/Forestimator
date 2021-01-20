@@ -19,7 +19,7 @@ using namespace Wt::Chart;
 
 std::string dToStr(double d);
 std::string nth_letter(int n);
-std::string getAbbreviation(std::string str);
+
 
 class layerStat;
 class layerStatChart;
@@ -53,7 +53,7 @@ class  staticMap
 {
 public:
     // constructeur ; a besoin d'un extend et de quoi créer la variable js de la carte, donc pointer vers le layer
-    staticMap(std::shared_ptr<Layer> aLay,OGRGeometry *poGeom, OGREnvelope * env=NULL);
+    staticMap(std::shared_ptr<layerBase> aLay,OGRGeometry *poGeom, OGREnvelope * env=NULL);
     double xGeo2Im(double x);
     double yGeo2Im(double y);
     std::string getFileName(){return mFileName;}
@@ -70,7 +70,7 @@ public:
     void drawScaleLine(WPainter *painter);
 
 private:
-    std::shared_ptr<Layer> mLay;
+    std::shared_ptr<layerBase> mLay;
     std::string mFileName,mFileNameRel;
     OGREnvelope * ext;
     // taille de l'image en pixel
@@ -100,41 +100,6 @@ private:
 };
 */
 // va contenir le titre, le tableau et le pie chart pour permettre une visualisation des statistiques calculé pour chacune des couches, typiquement les aptitudes des essences
-class layerStat
-{
-public:
-    layerStat(std::shared_ptr<Layer> aLay,std::map<std::string,int> aStat);
-   /* layerStat(const layerStat &ls){
-        std::cout << "construct by copy layerStat " << std::endl;
-        mLay=ls.mLay;
-        mStat=ls.mStat;
-        mStatSimple=ls.mStatSimple;
-        mTypeVar=ls.mTypeVar;
-        mNbPix=ls.mNbPix;
-    }*/
-
-    void simplifieStat();
-    std::string summaryStat();
-    int getO(bool mergeOT=false);// proportion en optimum
-
-    int getFieldVal(bool mergeOT=false);
-    std::string getFieldValStr();
-
-    std::shared_ptr<Layer> Lay(){return mLay;}
-
-    std::map<std::string, int> StatSimple(){return mStatSimple;}
-    std::map<std::string, int> Stat(){return mStat;}
-    TypeVar mTypeVar; // pour distinguer le type de variable, continue (MNH) ou classes (aptitude)
-    cDicoApt * Dico();//{return mLay->Dico();}
-protected:
-    std::shared_ptr<Layer> mLay;
-    // key ; classe ou valeur, val ; nombre d'occurence
-    std::map<std::string, int> mStat;
-    std::map<std::string, int> mStatSimple;
-
-    int mNbPix;
-    std::string mMode; // fee vs cs
-};
 
 class layerStatChart : public layerStat
 {

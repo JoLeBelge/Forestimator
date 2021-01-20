@@ -1,12 +1,14 @@
 #include "stationdescresource.h"
 
 std::string stationDescResource::geoservice(){
+    std::string aRes("");
     if (checkTool()){
         if (checkPolyg()){
 
 
         }
     }
+    return aRes;
 }
 
 bool stationDescResource::checkTool(){
@@ -17,5 +19,13 @@ bool stationDescResource::checkTool(){
    //1) compo ; plusieurs carte
    //2) aptitude des essences principales, plusieurs cartes également
    //if (mDico->RasterNom()
-
+    return aRes;
 }
+
+bool stationDescResource::checkPolyg(){
+   bool aRes(0);
+
+
+    return aRes;
+}
+

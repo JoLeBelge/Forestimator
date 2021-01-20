@@ -2,14 +2,14 @@
 #define SELECTLAYERS_H
 #include "grouplayers.h"
 
+class baseSelectLayers;
+//class selectLayers4Stat;
 class selectLayers;
-class selectLayers4Stat;
-class selectLayers4Download;
 class rasterFiles;
 
-class selectLayers : public WContainerWidget{
+class baseSelectLayers : public WContainerWidget{
 public:
-    selectLayers();
+    baseSelectLayers();
     std::vector<rasterFiles> getSelectedRaster();
     std::vector<std::shared_ptr<Layer>> getSelectedLayer();
 
@@ -49,15 +49,17 @@ protected: // les classes qui héritent en mode public peuvent avoir accès
 
 };
 
-class selectLayers4Stat : public selectLayers{
+/*
+class selectLayers4Stat : public baseSelectLayers{
 public:
     selectLayers4Stat(groupLayers * aGL);
 private:
-
 };
-class selectLayers4Download : public selectLayers{
+*/
+
+class selectLayers : public baseSelectLayers{
 public:
-    selectLayers4Download(groupLayers * aGL);
+    selectLayers(groupLayers * aGL);
 private:
 
 };

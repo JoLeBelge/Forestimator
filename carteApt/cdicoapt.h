@@ -13,6 +13,7 @@
 #include <cmath>
 #include  "cnsw.h"
 #include "layerbase.h"
+#include "color.h"
 
 std::string loadBDpath();
 
@@ -23,7 +24,7 @@ extern std::string dirBD;
 
 class color;
 class cDicoApt;
-class cRasterInfo; // ça aurait du être une classe mère ou membre de cEss et cKKCS mais je l'implémente après, c'est pour avoir les info à propose des rasters FEE ; NT, NH, Topo, AE, SS
+class layerBase; // ça aurait du être une classe mère ou membre de cEss et cKKCS mais je l'implémente après, c'est pour avoir les info à propose des rasters FEE ; NT, NH, Topo, AE, SS
 class ST;
 class cnsw;
 class WMSinfo;
@@ -32,54 +33,7 @@ class LayerMTD;
 class cEss;
 class cKKCS;
 
-class color
-{
-public:
-    ~color(){}
-    color(int R,int G,int B,std::string name="toto"):mR(R),mG(G),mB(B),mStyleClassName(name){isDark();}
-    color(std::string aHex,std::string name):mStyleClassName(name){
-        // j'enlève le diaise qui semble ne pas convenir
-        const char* c=aHex.substr(1,aHex.size()).c_str();
-        sscanf(c, "%02x%02x%02x", &mR, &mG, &mB);
-        //std::cout << std::to_string(mR) << ";" <<std::to_string(mG) << ";" <<std::to_string(mB) << std::endl;
-        isDark();
-    }
-    color(std::string aHex){
-        const char* c=aHex.substr(1,aHex.size()).c_str();
-        // j'enlève le diaise qui semble ne pas convenir pour le nom de style il faut également s'assurer que le code ne commence pas par un numéro.
-        mStyleClassName=aHex.substr(1,aHex.size());
-        if (isdigit(mStyleClassName[0])){ mStyleClassName="a"+mStyleClassName;}
-        sscanf(c, "%02x%02x%02x", &mR, &mG, &mB);
-        //std::cout << std::to_string(mR) << ";" <<std::to_string(mG) << ";" <<std::to_string(mB) << std::endl;
-        isDark();
-    }
-    int mR,mG,mB;
-    void set(int &R,int &G,int &B){
-        R=mR;
-        G=mG;
-        B=mB;
-        isDark();
-    }
 
-    void isDark(){
-        double hsp = 0.299 * pow(mR,2) + 0.587 * pow(mG,2) + 0.114 * pow(mB,2);
-        //if (hsp<127.5) {mDark=true;} else {mDark=false;}
-        if (hsp<210) {mDark=true;} else {mDark=false;}
-    }
-
-    bool dark(){return mDark;}
-
-    std::string cat(){ return " R:" + std::to_string(mR)+", G:"+std::to_string(mG)+", B"+std::to_string(mB);}
-    std::string cat2(){ return std::to_string(mR)+" "+std::to_string(mG)+" "+std::to_string(mB);}
-    std::string catHex(){
-        unsigned long hex= ((mR & 0xff) << 16) + ((mG & 0xff) << 8) + (mB & 0xff);
-        return "#"+std::to_string(hex);
-    }
-    std::string getStyleName(){return "."+mStyleClassName;}
-    std::string getStyleNameShort(){return mStyleClassName;}
-    std::string mStyleClassName;
-    bool mDark;
-};
 
 // toute les informations/ dico que j'ai besoin pour le soft
 class cDicoApt
@@ -100,7 +54,7 @@ public:
     std::map<std::string,std::string>  * RasterCategorie(){return  &Dico_RasterCategorie;}
     std::map<std::string,std::string>  * RasterNom(){return  &Dico_RasterNomComplet;}
     std::map<std::string,bool>  * RasterExpert(){return  &Dico_RasterExpert;}
-    std::map<std::string,std::string>  * code2Nom(){return  &Dico_code2NomFR;}
+    std::map<std::string,std::string>  * codeEs2Nom(){return  &Dico_codeEs2NomFR;}
     std::map<int,std::string>  * NH(){return  &Dico_NH;}
     std::map<int,std::string>  * NT(){return  &Dico_NT;}
     std::map<int,std::string>  * code2NTNH(){return  &Dico_code2NTNH;}
@@ -235,7 +189,7 @@ public:
 
     std::string accroEss2Nom(std::string aCode){
         std::string aRes("");
-        if (Dico_code2NomFR.find(aCode)!=Dico_code2NomFR.end()){aRes=Dico_code2NomFR.at(aCode);}
+        if (Dico_codeEs2NomFR.find(aCode)!=Dico_codeEs2NomFR.end()){aRes=Dico_codeEs2NomFR.at(aCode);}
         return aRes;
     }
 
@@ -416,11 +370,22 @@ public:
         return aRes;
     }
 
+    std::map<std::string,std::shared_ptr<layerBase>> VlayerBase(){return mVlayerBase;}
+
+    std::shared_ptr<layerBase> getLayerBase(std::string aCode){
+        std::shared_ptr<layerBase> aRes=NULL;
+        if (mVlayerBase.find(aCode)!=mVlayerBase.end()){aRes=mVlayerBase.at(aCode);} else {
+            std::cout << " getLayerBase de cdicoapt, création d'une layerbase vide attention " << std::endl;
+            aRes= std::make_shared<layerBase>("toto",this);
+        }
+        return aRes;
+    }
+
 private:
     std::string mBDpath;
 
     //code ess vers nom français
-    std::map<std::string,std::string> Dico_code2NomFR;
+    std::map<std::string,std::string> Dico_codeEs2NomFR;
     std::map<std::string,std::string> Dico_code2prefix;
     // code essence 2 code groupe "feuillus" vs "Resineux
     std::map<std::string,std::string> Dico_F_R;
@@ -482,6 +447,7 @@ private:
 
     // clé ; code ess. val ; pointeur vers essence
     std::map<std::string,std::shared_ptr<cEss>> mVEss;
+    std::map<std::string,std::shared_ptr<layerBase>> mVlayerBase;
 
 
 

@@ -48,15 +48,17 @@ class cWebAptitude; // forward declaration
 class AuthApplication : public Wt::WApplication
 {
 public:
-    AuthApplication(const Wt::WEnvironment& env);
+    AuthApplication(const Wt::WEnvironment& env, cDicoApt * dico);
     void authEvent();
     bool isLoggedIn();
     void logout();
     Wt::Auth::User getUser();
+    cDicoApt * getDico(){return mDico;}
 
     Wt::Auth::AuthWidget* authWidget_;
     cWebAptitude * cwebapt;
 private:
+    cDicoApt * mDico;
     Session session_;
     bool loaded_=false; // sert à éviter que void authEvent ne crash si refresh la page et que user connecté...
 };

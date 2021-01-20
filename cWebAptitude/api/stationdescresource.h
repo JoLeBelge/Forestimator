@@ -50,7 +50,7 @@ public:
 
      response.out() << "Réponse\n"
                        "----------------------\n";
-     response.out << geoservice();
+     response.out() << geoservice();
    }
 
    std::string geoservice();

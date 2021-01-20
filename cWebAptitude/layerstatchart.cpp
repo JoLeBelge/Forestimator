@@ -1,6 +1,5 @@
 #include "layerstatchart.h"
 
-int seuilClasseMinoritaire(2); // en dessous de ce seuil, les classes sont regroupées dans la catégorie "Autre"
 layerStatChart::layerStatChart(std::shared_ptr<Layer> aLay, std::map<std::string, int> aStat, OGRGeometry *poGeom):layerStat(aLay,aStat),rowAtMax(0),mGeom(poGeom)
 {
 
@@ -40,7 +39,7 @@ layerStatChart::layerStatChart(std::shared_ptr<Layer> aLay, std::map<std::string
 
 bool layerStatChart::deserveChart(){
     bool aRes=mStatSimple.size()>0;
-    if (!aRes){ std::cout << "la couche " << mLay->getLegendLabel() << " ne mérite pas de graphique pour ses statistiques " << std::endl;}
+    if (!aRes){ std::cout << "la couche " << mLay->Nom() << " ne mérite pas de graphique pour ses statistiques " << std::endl;}
     return aRes;
 }
 
@@ -113,7 +112,7 @@ std::unique_ptr<WContainerWidget> layerStatChart::getChart(bool forRenderingInPd
                     try {
                         double h(std::stod(kv.first));
 
-                        if (mLay->getCode()=="MNH2019"){
+                        if (mLay->Code()=="MNH2019"){
                             if (h>3.0 && h<45){
                                 aStat.emplace(std::make_pair(std::stod(kv.first),(100.0*kv.second)/mNbPix));
 
@@ -170,199 +169,6 @@ std::unique_ptr<Wt::WContainerWidget> layerStatChart::getBarStat(){
     aRes->addWidget(cpp14::make_unique<batonnetApt>(this,mLay->Dico()->Dico_AptFull2AptAcro));
 
     return std::move(aRes);
-}
-
-void layerStat::simplifieStat(){
-
-    mNbPix=0;
-    for (auto & kv : mStat){
-        mNbPix+=kv.second;
-    }
-
-    switch (mTypeVar){
-    case TypeVar::Classe:{
-        // calcul des pourcentages au lieu du nombre de pixel
-        if (mNbPix>0){
-            for (auto & kv : mStat){
-                double pct = (100.0*kv.second)/mNbPix;
-                kv.second=round(pct);
-            }
-        }
-
-        int autres(0);
-        int tot(0);
-        for (auto & kv : mStat){
-            if (kv.second>seuilClasseMinoritaire){
-                mStatSimple.emplace(kv);
-                tot+=kv.second;
-            } else {
-                autres+=kv.second;
-            }
-        }
-        if (autres>0) {
-            tot+=autres;
-            // correction de l'erreur d'arrondi si elle est de 2 pct max
-            if ((tot>97) & (tot <100)) { autres+= 100-tot; tot=100;}
-            //std::cout << "ajout classe autre dans simplify stat " << autres << ", layer " << mLay->getLegendLabel() << std::endl;
-            mStatSimple.emplace(std::make_pair("Autre",autres));
-        }
-
-        /* redondant, j'ajoute déjà des no data lors du calcul
-        // ajout pct pour no data - certaine couche l'on déjà, d'autre pas.
-        if (tot<97 & tot>5){
-            mStatSimple.emplace(std::make_pair("Sans données",100-tot));
-        }
-        */
-        break;}
-
-    case TypeVar::Continu:{
-
-        // pour l'instant, copie juste le mStat
-        mStatSimple=mStat;
-
-        // regroupe les valeurs en 10 groupes avec le mm nombre d'occurence
-        // classer les occurences par valeur de hauteur car la map n'est pas trié par ordre de  hauteur car 11.0 et avant 2 ou 20.0, tri 'alphabétique' des chiffres.
-        /*
-        std::map<double, int> aStatOrdered;
-        for (auto & kv : mStat){
-            aStatOrdered.emplace(std::make_pair(std::stod(kv.first),kv.second));
-        }
-
-
-        int occurenceCumul(0);
-        std::string curLimHaute("");
-        double seuil(nbPix/nbClasse);
-        int numClasCur(1);
-        for (auto & kv : aStatOrdered){
-            //std::cout << "hauteur " << kv.first << " , pixels " << kv.second << std::endl;
-            if (kv.second!=0){
-                if (kv.second<seuil){
-
-                    occurenceCumul+=kv.second;
-                    curLimHaute=nth_letter(numClasCur)+ " " + dToStr(kv.first);
-                    //std::cout << " curLimHaute = " << curLimHaute << std::endl;
-
-                } else {
-                    if (occurenceCumul>0){
-                        mStatSimple.emplace(curLimHaute,(100*occurenceCumul)/nbPix);
-                        numClasCur++;
-                        mStatSimple.emplace(nth_letter(numClasCur)+ " " +dToStr(kv.first),(100*kv.second)/nbPix);
-                        numClasCur++;
-                        occurenceCumul=0;
-                    } else {
-                        mStatSimple.emplace(nth_letter(numClasCur)+ " " +dToStr(kv.first),(100*kv.second)/nbPix);
-                    }
-                }
-                if (occurenceCumul>seuil){
-                    mStatSimple.emplace(curLimHaute,(100*occurenceCumul)/nbPix);
-                    numClasCur++;
-                    occurenceCumul=0;
-                }
-            }
-        }
-
-        if (occurenceCumul>0){
-            mStatSimple.emplace(curLimHaute,(100*occurenceCumul)/nbPix);
-        }
-        */
-
-        /*for (auto & kv : mStatSimple){
-            std::cout << " limite haute : " << kv.first << " , " << kv.second << "%" << std::endl;
-
-        }*/
-
-        break;
-    }
-    }
-
-}
-
-int layerStat::getFieldVal(bool mergeOT){
-    unsigned int aRes(0);
-    if (mLay->Type()==TypeLayer::FEE || mLay->Type()==TypeLayer::CS){
-        aRes=getO(mergeOT);
-    } else if (mLay->getCode()=="MNH2019"){
-        int nbPixTreeCover(0);
-        for (auto & kv : mStat){
-            try {
-                if (std::stod(kv.first)>2.0){nbPixTreeCover+=kv.second;}
-            }
-            catch (const std::invalid_argument& ia) {
-                // je retire le cout car sinon me pourris les logs
-                //std::cerr << "layerStat::getFieldVal pour MNH 2019 - Invalid argument: " << ia.what() << '\n';
-            }
-        }
-        aRes=(100*nbPixTreeCover)/mNbPix;
-    } else if (mLay->getCode()=="MF"){
-        // mStat ne contient pas la même chose si la couche est de type continu ou classe. pour Classe, c'est déjà des pcts
-        for (auto & kv : mStat){
-            //std::cout << kv.first << " nb pix " << kv.second << std::endl;
-            if (kv.first=="Foret"){;aRes=kv.second;}
-        }
-        //aRes=(100*nbPixTreeCover)/mNbPix;
-    } else {
-        std::cout << "  pas de méthode pour remplir le champ de la table d'attribut pour le layer " << mLay->getLegendLabel() << std::endl;
-    }
-    return aRes;
-}
-
-std::string layerStat::getFieldValStr(){
-
-    std::string aRes("");
-    if (mLay->getCode()=="COMPO"){
-        // on concatene toutes les essences
-        for (auto & kv : mStat){
-            //std::cout << "getFieldValStr kv.first " << kv.first << " kv.second " << kv.second << std::endl;
-            // déjà sous forme de pct int pct=(100*kv.second)/mNbPix;
-            if (kv.second>1){aRes+=getAbbreviation(kv.first)+":"+std::to_string(kv.second)+"% ";}
-        }
-
-    } else {
-        std::cout << "  pas de méthode pour remplir le champ STRING de la table d'attribut pour le layer " << mLay->getLegendLabel() << std::endl;
-    }
-    return aRes;
-}
-
-std::string layerStat::summaryStat(){
-    std::string aRes("");
-    if (mLay->Var()==TypeVar::Classe){
-        // on concatene toutes les essences
-        for (auto & kv : mStat){
-            if (kv.second>1){
-                if (kv.second>99){ aRes+=kv.first;break;} else {
-                aRes+=kv.first+": "+std::to_string(kv.second)+"% ";
-                }
-            }
-        }
-
-    } else {
-        std::cout << "  summaryStat sur une couche de variable de classes? " << mLay->getLegendLabel() << std::endl;
-    }
-    return aRes;
-
-}
-
-int layerStat::getO(bool mergeOT){
-    unsigned int aRes(0);
-    if (mLay->Type()==TypeLayer::FEE || mLay->Type()==TypeLayer::CS){
-        // il faudrait plutôt faire le calcul sur les statistique mStat, car StatSimple peut avoir regroupé des classe trop peu représentées!
-        // mais attention alors car le % n'est pas encore calculé, c'est le nombre de pixels.
-        for (auto & kv : mStatSimple){
-            int codeApt(666);
-            for (auto & kv2 : *mLay->mDicoVal){
-                if (kv2.second==kv.first){codeApt=kv2.first;}
-            }
-            int aptContr=mLay->Dico()->AptContraignante(codeApt);
-            if (mergeOT) {if (aptContr<3) aRes+=kv.second;} else { if (aptContr<2) aRes+=kv.second; }
-        }}
-    else {
-        std::cout << " problem, on me demande de calculer la proportion d'optimum pour une carte qui n'est pas une carte d'aptitude" << std::endl;
-    }
-    return aRes;
-}
-
-layerStat::layerStat(std::shared_ptr<Layer> aLay, std::map<std::string,int> aStat):mLay(aLay),mStat(aStat),mTypeVar(aLay->Var()){
-    simplifieStat();
 }
 
 /*
@@ -433,7 +239,7 @@ olOneLay::olOneLay(Layer * aLay, OGRGeometry *poGeom):mLay(aLay){
 }
 */
 
-staticMap::staticMap(std::shared_ptr<Layer> aLay, OGRGeometry *poGeom, OGREnvelope *env):mLay(aLay),mSx(700),mSy(700),ext(env){
+staticMap::staticMap(std::shared_ptr<layerBase> aLay, OGRGeometry *poGeom, OGREnvelope *env):mLay(aLay),mSx(700),mSy(700),ext(env){
     //std::cout << "staticMap::staticMap" << std::endl;
     std::string name0 = std::tmpnam(nullptr);
     std::string name1 = name0.substr(5,name0.size()-5);
@@ -672,36 +478,6 @@ std::string  nth_letter(int n)
     return aRes;
 }
 
-std::string getAbbreviation(std::string str)
-{
-    std::string aRes("");
-    std::vector<std::string> words;
-    std::string word("");
-    for (auto x : str)
-    {
-        if (x == ' ' | x=='/')
-        {
-            word=removeAccents(word);// si je n'enlève pas les accents maintenant, les accents sont codé sur deux charachtère et en gardant les 2 premiers du mot je tronque l'accent en deux ce qui donne ququch d'illisible type ?
-            if (word.size()>1){words.push_back(word);}
-            //std::cout << "word is " << word << std::endl;
-            word = "";
-        }
-        else
-        {
-            word = word + x;
-        }
-    }
-    // pour le dernier mot :
-    word=removeAccents(word);
-    if (word.size()>1){words.push_back(word);}
-    //std::cout << "word is " << word << std::endl;
-
-    for (auto w : words){
-        aRes+=w.substr(0,2);
-    }
-    //aRes=removeAccents(aRes);
-    return aRes;
-}
 
 void batonnetApt::paintEvent(Wt::WPaintDevice *paintDevice){
     Wt::WPainter painter(paintDevice);
@@ -734,4 +510,4 @@ void batonnetApt::paintEvent(Wt::WPaintDevice *paintDevice){
     }
 }
 
-cDicoApt * layerStat::Dico(){return mLay->Dico();}
+

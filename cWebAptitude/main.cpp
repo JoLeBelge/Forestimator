@@ -34,7 +34,7 @@ int main(int argc, char **argv)
     server.addResource(&resource, "/api/${tool}/args/${toolarg}/polygon/${pol}");
     server.addResource(&resource, "/api/${tool}/polygon/${pol}");
 
-    server.addEntryPoint(Wt::EntryPointType::Application, createAuthApplication);
+    server.addEntryPoint(Wt::EntryPointType::Application, std::bind(&createAuthApplication,std::placeholders::_1, Dico));
 
     Session::configureAuth();
 
@@ -48,7 +48,7 @@ int main(int argc, char **argv)
   }
 }
 
-std::unique_ptr<Wt::WApplication> createAuthApplication(const Wt::WEnvironment &env)
+std::unique_ptr<Wt::WApplication> createAuthApplication(const Wt::WEnvironment &env, cDicoApt *dico)
 {
     //std::cout << env.internalPath() << " " << env.deploymentPath() << std::endl;
     //std::cout << env.getParameter("a0") << std::endl;
@@ -76,5 +76,5 @@ std::unique_ptr<Wt::WApplication> createAuthApplication(const Wt::WEnvironment &
         return app404;
     }
 
-    return Wt::cpp14::make_unique<AuthApplication>(env);
+    return Wt::cpp14::make_unique<AuthApplication>(env,dico);
 }

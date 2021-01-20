@@ -114,4 +114,5 @@ HEADERS += \
     ../carteApt/layerbase.h \
  #   wkhtml/wkhtmlutil.h
     lstatcontchart.h \
-    api/stationdescresource.h
+    api/stationdescresource.h \
+    ../carteApt/color.h

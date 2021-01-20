@@ -49,9 +49,9 @@ private:
     Wt::WVBoxLayout * layout;
 
     // pour la carte de localisation
-    std::shared_ptr<Layer> mIGN;
+    std::shared_ptr<layerBase> mIGN;
     // pour les information générales
-    std::shared_ptr<Layer> mMNT, mZBIO, mPente;
+    std::shared_ptr<layerBase> mMNT, mZBIO, mPente;
 
     //olOneLay *olStatic;
 

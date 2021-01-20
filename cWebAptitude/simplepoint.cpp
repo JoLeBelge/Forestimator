@@ -304,7 +304,7 @@ void simplepoint::export2pdf(std::string titre){
     legendAcroEs->setId("legendAcroEs"); // dans le template html j'ai un style défini pour l'objet ayant cet id
     int row(0);
     int col(0);
-    for (auto kv : *mGL->Dico()->code2Nom() ){
+    for (auto kv : *mGL->Dico()->codeEs2Nom() ){
         legendAcroEs->elementAt(row, col)->addWidget(cpp14::make_unique<WText>(kv.first));
         legendAcroEs->elementAt(row, col+1)->addWidget(cpp14::make_unique<WText>(kv.second));
         row++;

@@ -8,7 +8,10 @@
 #include "ogrsf_frmts.h"
 #include "gdal_utils.h"
 #include <numeric>
+#include "color.h"
 
+
+std::string getAbbreviation(std::string str);
 // dans Forestimator, un gros problème, c'est le fait que j'ai ma classe layer qui soiet strictement liée à Wt et à Forestimator (via grouplayer)
 // J'aurai du avoir une classe mère qui soie indépendante de Wt et me permette de faire des stats sur des cartes, exactement comme j'en ai besoin maintenant pour stationDescriptor
 // je tente donc de faire ça en repartant de cRasterInfo qui était un bon début
@@ -20,13 +23,13 @@ class basicStat;
 class cEss; // avec les aptitudes de l'essence
 class cKKCS; // ce qui caractérise les stations ; potentiel sylvicole, facteur écologique, risques
 
+class color;
 
 class rasterFiles; // une classe dédiée uniquemnent à l'export et au clip des couches.
 // rasterinfo hérite de rasterFile
-class cRasterInfo;
-// layerBase hérite de rasterInfo
 class layerBase;
-// le mieux aurai été de n'avoir que 2 classe, une +- = à rasterFile et une = à layerbase, mais vu que j'avais fait ça comme un cochon et que je vais pas tout changer d'un coup, j'en laisse 3
+
+class layerStat;
 
 // ça c'était utilisé pour le calcul des carte apt, des tuiles et du code mapserveur
 enum TypeCarte {Apt, Potentiel, Station1, Habitats,NH,NT,Topo,AE,SS,ZBIO,CSArdenne,CSLorraine,MNH2019,Composition,MNT16b};
@@ -48,7 +51,7 @@ enum class TypeLayer {
 
 // forward dec
 class cDicoApt;
-class color;
+
 
 
 inline bool exists (const std::string& name){
@@ -84,7 +87,10 @@ public:
 
 class WMSinfo
 {
-public:
+    public:
+    std::string WMSLayerName()const{return mWMSLayerName;}
+    std::string WMSURL()const{return mUrl;}
+
     WMSinfo():mUrl(""),mWMSLayerName("toto"){}
     WMSinfo(std::string url,std::string layer, std::string attribution=""):mUrl(url),mWMSLayerName(layer),mWMSattribution(attribution){}
     std::string mUrl, mWMSLayerName, mWMSattribution;
@@ -109,7 +115,6 @@ public:
     std::string Projet(){return mProjet;}
     std::string CopyR(){return mCopyR;}
     std::vector<std::string> VRefs(){return mVRefs;}
-    //std::string getHtml(); je fait une fonction dans grouplayer pour ne pas avoir de dépendance wt dans le dicoApt (utilisé par ailleurs dans des projets non-wt)
 private:
     std::vector<std::string> mVRefs;
     std::string mProjet, mDescr,mVersion, mNom,mCopyR,mShortName;
@@ -120,8 +125,6 @@ public:
     rasterFiles(std::string aPathTif,std::string aCode);
     std::string Code() const{return mCode;}
     void checkForQml();
-    // ma classe rasterInfo hérite de rf mais ne sais pas l'instantier correctement dans la liste d'instantiation car dois questionner le dico pour savoir le chemin d'accès
-    //void lateConstructor(std::string aPathTif,std::string aCode);
     // retourne le chemin d'accès complêt
     std::string getPathTif() const{return mPathRaster;}
     std::string symbology() const{return mPathQml;}
@@ -137,22 +140,57 @@ protected:
     std::string mPathRaster, mPathQml, mCode;
 };
 
-class cRasterInfo : public rasterFiles
+class layerBase : public rasterFiles, public WMSinfo, public std::enable_shared_from_this<layerBase>
 {
 public:
-    cRasterInfo(std::string aCode,cDicoApt * aDico);
+    layerBase(std::string aCode,cDicoApt * aDico);
+    layerBase(std::shared_ptr<layerBase> aLB);
 
     std::string NomFile(); // nom du fichier tiff sans l'extension
     std::string NomFileWithExt();
+    // provisoirement, le nom = le label = le short label
     std::string Nom(){return mNom;}
+    std::string getLegendLabel(bool escapeChar=true) const;
+    std::string getShortLabel() const {return mNom;}
+
     TypeCarte TypeCart(){return mTypeCarte;}
-    std::map<int, std::string> * getDicoVal(){return &mDicoVal;}
+    std::map<int, std::string> getDicoVal(){return mDicoVal;}
     std::map<int, color>  getDicoCol(){return mDicoCol;}
 
     TypeVar getTypeVar() const{return mTypeVar;}
     TypeLayer getCatLayer() const{return mType;}
     bool Expert() const{return mExpert;}
     void catSummary(){std::cout << "RasterInfo ; Code " << mCode << " , Nom " << mNom << ", raser " << mPathRaster << ", dictionnaire valeurs de " << mDicoVal.size() << " elements " << std::endl;}
+
+    // stat sur un polygone ; deux retour possible, une map avec clé = valeur raster, une map avec clé = signification string
+    // clé ; signification du code raster. Val ; nombre d'occurence
+    std::map<std::string,int> computeStat1(OGRGeometry * poGeom);
+    // clé ; val raster. val ; pct. Comment gerer les no data? code int -1?
+    std::map<int,double> computeStat2(OGRGeometry * poGeom);
+    // retourne la valeur majoritaire sur le polygone ainsi que son prct en surface
+    std::pair<int,double> valMajoritaire(OGRGeometry * poGeom);
+
+     std::string summaryStat(OGRGeometry * poGeom);
+
+    // ça c'est pour les couches variables continues
+    basicStat computeBasicStatOnPolyg(OGRGeometry * poGeom);
+
+    bool hasColor(int aCode) const{
+        bool aRes(0);
+        if (mDicoCol.find(aCode)!=mDicoCol.end()){aRes=true;}
+        return aRes;
+    }
+    color getColor(int aCode) const{
+        color aRes(0,0,0);
+        if (mDicoCol.find(aCode)!=mDicoCol.end()){
+            aRes=mDicoCol.at(aCode);}
+        return aRes;
+    }
+    color getColor(std::string aStrCode) const;
+    cDicoApt * Dico(){return mDico;}
+
+    // convertir le wms de la couche au format image en local
+    bool wms2jpg(OGREnvelope *extent, int aSx, int aSy, std::string aOut) const;
 
 protected:
     TypeCarte mTypeCarte;
@@ -169,27 +207,34 @@ protected:
     bool mExpert;
 };
 
-
-
-
-class layerBase : public cRasterInfo
+class layerStat
 {
 public:
+    layerStat(std::shared_ptr<layerBase> aLay,std::map<std::string,int> aStat);
 
-    layerBase(std::string aCode,cDicoApt * aDico);
+    void simplifieStat();
+    std::string summaryStat();
+    int getO(bool mergeOT=false);// proportion en optimum
 
+    //int getFieldVal(bool mergeOT=false);
+    //std::string getFieldValStr();
 
-    // stat sur un polygone ; deux retour possible, une map avec clé = valeur raster, une map avec clé = signification string
-    // clé ; signification du code raster. Val ; nombre d'occurence
-    std::map<std::string,int> computeStat1(OGRGeometry * poGeom);
-    // clé ; val raster. val ; pct. Comment gerer les no data? code int -1?
-    std::map<int,double> computeStat2(OGRGeometry * poGeom);
-    // retourne la valeur majoritaire sur le polygone ainsi que son prct en surface
-    std::pair<int,double> valMajoritaire(OGRGeometry * poGeom);
+    std::shared_ptr<layerBase> Lay(){return mLay;}
 
-    // ça c'est pour les couches variables continues
-    basicStat computeBasicStatOnPolyg(OGRGeometry * poGeom);
+    std::map<std::string, int> StatSimple(){return mStatSimple;}
+    std::map<std::string, int> Stat(){return mStat;}
+    TypeVar mTypeVar; // pour distinguer le type de variable, continue (MNH) ou classes (aptitude)
+    cDicoApt * Dico();//{return mLay->Dico();}
+protected:
+    std::shared_ptr<layerBase> mLay;
+    // key ; classe ou valeur, val ; nombre d'occurence
+    std::map<std::string, int> mStat;
+    std::map<std::string, int> mStatSimple;
+
+    int mNbPix;
+    std::string mMode; // fee vs cs
 };
+
 
 
 class cKKCS
@@ -208,7 +253,7 @@ public:
                 +  " Echelle risque/pot zbio 1 station 1 : " + std::to_string(getEchelle(1,1));}
     std::string NomCarte();
     std::string shortNomCarte();
-    std::string NomDirTuile();
+
     std::string NomMapServerLayer();
     std::string NomMapServerLayerFull();
 

@@ -8,8 +8,8 @@ groupLayers::groupLayers(cDicoApt * aDico, WOpenLayers *aMap, AuthApplication *a
   ,mMap(aMap)
   ,mParent(aStackInfoPtr->mGroupLayerW)
   ,m_app(app)
-  ,mLegend(NULL)
-  ,mSelect4Download(NULL)
+  ,mAnaPoint(NULL)
+  ,mSelectLayers(NULL)
   ,mStackInfoPtr(aStackInfoPtr)
   ,mapExtent_(this,"1.0")
   ,sigMapCenter(this,"2.0")
@@ -70,63 +70,9 @@ groupLayers::groupLayers(cDicoApt * aDico, WOpenLayers *aMap, AuthApplication *a
     auto node0_ = tree->treeRoot()->addChildNode(std::move(node0));
     node0_->addStyleClass("tree_node");
 
-    // creation des layers pour les KK du CS
-
-    for (auto & pair : *mDico->codeKK2Nom()){
-        Wt::WTreeNode * n = node1_->addChildNode(Wt::cpp14::make_unique<Wt::WTreeNode>(""));
-        WText *label=n->label();
-        std::shared_ptr<Layer> aL=std::make_shared<Layer>(this,pair.first,label,TypeLayer::KK);
-        std::string aCode=pair.first;
-        label->clicked().connect([this,aCode]{clickOnName(aCode,TypeLayer::KK);});
-        aL->changeExpertMode().connect(n,&Wt::WTreeNode::setNodeVisible);
-        mVLs.push_back(aL);
-    }
-
-    // ajout des cartes "FEE" ; NT NH Topo AE SS
-    for (auto & pair : *mDico->RasterType()){
-        if (mDico->rasterCat(pair.first)!="Peuplement" && mDico->lay4Visu(pair.first)){
-            Wt::WTreeNode * n = node1_->addChildNode(Wt::cpp14::make_unique<Wt::WTreeNode>(""));
-            WText *label=n->label();
-            std::shared_ptr<Layer> aL=std::make_shared<Layer>(this,pair.first,label,TypeLayer::Station);
-            std::string aCode=pair.first;
-            // un peu bidouille mais le typelayer de MNH est peuplement et il est redéfini dans le constructeur de layer
-            TypeLayer type= aL->Type();
-            label->clicked().connect([this,aCode,type]{clickOnName(aCode,type);});
-            aL->changeExpertMode().connect(n,&Wt::WTreeNode::setNodeVisible);
-            mVLs.push_back(aL);
-        }
-    }
-
-    node1_->expand();
-
-    for (auto & pair : *mDico->RasterType()){
-        // couche catégorie peuplements
-        if (mDico->rasterCat(pair.first)=="Peuplement" && mDico->lay4Visu(pair.first)){
-            Wt::WTreeNode * n = node0_->addChildNode(Wt::cpp14::make_unique<Wt::WTreeNode>(""));
-            WText *label=n->label();
-            std::shared_ptr<Layer> aL=std::make_shared<Layer>(this,pair.first,label,TypeLayer::Station);
-            std::string aCode=pair.first;
-            // un peu bidouille mais le typelayer de MNH et le masque forestier sont peuplement et il est redéfini dans le constructeur de layer
-            TypeLayer type= aL->Type();
-            label->clicked().connect([this,aCode,type]{clickOnName(aCode,type);});
-            aL->changeExpertMode().connect(n,&Wt::WTreeNode::setNodeVisible);
-            mVLs.push_back(aL);
-        }
-    }
-    std::cout << " carte pas faites pour être vue" << std::endl;
-    // c'est ici que je crée toute mes couches, donc je vais également créer celles qui ne servent pas à être visualisé (slope et compo) mais bien à calculer des stat.
-   for (auto & pair : *mDico->RasterType()){
-       if(!mDico->lay4Visu(pair.first)){
-          std::shared_ptr<Layer> aL=std::make_shared<Layer>(pair.first,mDico,TypeLayer::Station);
-          mVLs.push_back(aL);
-       }
-   }
-    node0_->expand();
-
     auto node2 = Wt::cpp14::make_unique<Wt::WTreeNode>(tr("groupeCoucheAptFEE"));
     auto node2_ = tree->treeRoot()->addChildNode(std::move(node2));
     node2_->addStyleClass("tree_node");
-    node2_->expand();
 
     auto node3 = Wt::cpp14::make_unique<Wt::WTreeNode>(tr("groupeCoucheAptCS"));
     auto node3_ = node3.get();
@@ -135,31 +81,68 @@ groupLayers::groupLayers(cDicoApt * aDico, WOpenLayers *aMap, AuthApplication *a
     // ici je  vais devoir rendre ce noeuds invisible si mode normal
     this->changeExpertMode().connect(node3_,&Wt::WTreeNode::setNodeVisible);
 
-    // creation des layers pour les essences qui ont des aptitudes
-    for (auto & pair : *mDico->code2Nom()){
-        cEss ess(pair.first,mDico);
-        //std::cout << "fee" << std::endl;
-        if (ess.hasFEEApt()){
+    // creation des layers pour les KK du CS
+/*
+    for (auto & pair : *mDico->codeKK2Nom()){
+        Wt::WTreeNode * n = node1_->addChildNode(Wt::cpp14::make_unique<Wt::WTreeNode>(""));
+        WText *label=n->label();
+        std::shared_ptr<Layer> aL=std::make_shared<Layer>(this,pair.first,label,TypeLayer::KK);
+        std::string aCode=pair.first;
+        label->clicked().connect([this,aCode]{clickOnName(aCode,TypeLayer::KK);});
+        aL->changeExpertMode().connect(n,&Wt::WTreeNode::setNodeVisible);
+        mVLs.push_back(aL);
+    }*/
 
-            Wt::WTreeNode * n = node2_->addChildNode(Wt::cpp14::make_unique<Wt::WTreeNode>(""));
-            WText *label=n->label();
-            std::shared_ptr<Layer> aL=std::make_shared<Layer>(this,pair.first,label,TypeLayer::FEE);
-            std::string aCode=pair.first;
-            label->clicked().connect([this,aCode]{clickOnName(aCode,TypeLayer::FEE);});
-            aL->changeExpertMode().connect(n,&Wt::WTreeNode::setNodeVisible);
-            mVLs.push_back(aL);
+    // ajout des cartes "FEE" ; NT NH Topo AE SS
+    for (auto & pair :mDico->VlayerBase()){
+        std::shared_ptr<layerBase> aLB=pair.second;
+
+        if (mDico->lay4Visu(pair.first)){
+        // 1) création du mWtText pour cette couche
+         WText * wtext=NULL;
+         Wt::WTreeNode * n=NULL;
+        switch (aLB->getCatLayer()) {
+        case (TypeLayer::Station):{
+            n = node1_->addChildNode(Wt::cpp14::make_unique<Wt::WTreeNode>(""));
+            wtext=n->label();
+            break;}
+        case (TypeLayer::Externe):{
+            n = node1_->addChildNode(Wt::cpp14::make_unique<Wt::WTreeNode>(""));
+            wtext=n->label();
+            break;}
+        case TypeLayer::Peuplement:{
+            n = node0_->addChildNode(Wt::cpp14::make_unique<Wt::WTreeNode>(""));
+            wtext=n->label();
+            break;}
+        case TypeLayer::FEE:{
+            n = node2_->addChildNode(Wt::cpp14::make_unique<Wt::WTreeNode>(""));
+            wtext=n->label();
+            break;}
+        case TypeLayer::CS:{
+            n = node3_->addChildNode(Wt::cpp14::make_unique<Wt::WTreeNode>(""));
+            wtext=n->label();
+            break;}
+        default:
+            break;
         }
+        // 2) création de la couche
+        std::shared_ptr<Layer> aL=std::make_shared<Layer>(this,aLB,wtext);
+        // 3) ajout des interactions
+        TypeLayer type= aL->getCatLayer();
+        std::string aCode=aL->Code();
+        wtext->clicked().connect([this,aCode,type]{clickOnName(aCode,type);});
+        aL->changeExpertMode().connect(n,&Wt::WTreeNode::setNodeVisible);
+        mVLs.push_back(aL);
 
-        if (ess.hasCSApt()){
-            Wt::WTreeNode * n = node3_->addChildNode(Wt::cpp14::make_unique<Wt::WTreeNode>(""));
-            WText *label=n->label();
-            std::shared_ptr<Layer> aL=std::make_shared<Layer>(this,pair.first,label,TypeLayer::CS);
-            mVLs.push_back(aL);
-            std::string aCode=pair.first;
-            label->clicked().connect([this,aCode]{clickOnName(aCode,TypeLayer::CS);});
-            aL->changeExpertMode().connect(n,&Wt::WTreeNode::setNodeVisible);
+        }else {
+            mVLs.push_back(std::make_shared<Layer>(this,aLB));
         }
     }
+
+    node0_->expand();
+    node1_->expand();
+    node2_->expand();
+    node3_->expand();
 
     mParent->addWidget(cpp14::make_unique<WText>(tr("coucheStep1")));
     mParent->addWidget(std::move(tree));
@@ -191,12 +174,11 @@ groupLayers::groupLayers(cDicoApt * aDico, WOpenLayers *aMap, AuthApplication *a
     //bExportTiff->clicked().connect(this,&groupLayers::updateMapExtentAndCropIm);
 
     //mSelect4Stat= new selectLayers4Stat(this);
-    mSelect4Download= new selectLayers4Download(this);
+    mSelectLayers= new selectLayers(this);
+    mStation = new ST(mDico);
 
     /*   AUTRES ONLGETS de la stack   */
-    // création de la légende (vide pour le moment)
-    mLegend = new simplepoint(this, mStackInfoPtr->mSimplepointW);
-    mStation = new ST(mDico);
+    mAnaPoint = new simplepoint(this, mStackInfoPtr->mSimplepointW);
 
     // updateGL pour cacher les couches expert
     updateGL();
@@ -205,14 +187,14 @@ groupLayers::groupLayers(cDicoApt * aDico, WOpenLayers *aMap, AuthApplication *a
 
 groupLayers::~groupLayers(){
     std::cout << "destructeur de group layer " << std::endl;
-    delete mLegend;
+    delete mAnaPoint;
     delete mStation;
     //delete mSelect4Stat;
-    delete mSelect4Download;
+    delete mSelectLayers;
     mMap=NULL;
     m_app=NULL;
     mDico=NULL;
-    mLegend=NULL;  
+    mAnaPoint=NULL;
     mVLs.clear();
 }
 
@@ -221,7 +203,7 @@ void groupLayers::update(std::string aCode, TypeLayer type){
     //std::cout << " group Layers je vais faire un update du rendu visuel de chacun des label de couche \n\n\n" << std::endl;
     // désactiver toutes les couches actives et changer le rendu du label
     for (std::shared_ptr<Layer> l : mVLs){
-        l->setActive(aCode==l->getCode() && type==l->Type());
+        l->setActive(aCode==l->Code() && type==l->getCatLayer());
     }
     //std::cout << "update done " << std::endl;
 }
@@ -231,6 +213,9 @@ void groupLayers::clickOnName(std::string aCode, TypeLayer type){
     //std::cout << " j'ai cliqué sur un label " << aCode <<  "\n\n"<< std::endl;
     // udpate du rendu visuel de tout les labels de couches -- cela se situe au niveau du grouplayer
     update(aCode, type);
+
+    // cacher la fenetre popup
+    mParent->doJavaScript("overlay.setVisible(0);");
 
     // changer le mode CS vs FEE de grouplayer, utilse pour le tableau d'aptitude
     if (type == TypeLayer::CS | type == TypeLayer::KK | aCode.substr(0,2)=="CS"){ mTypeClassifST=TypeClassifST::CS;} else
@@ -264,22 +249,22 @@ void groupLayers::extractInfo(double x, double y){
         mStation->setOK();
         mStation->setX(x);
         mStation->setY(y);
-        mLegend->vider();
+        mAnaPoint->vider();
 
         // tableau des informations globales - durant ce round, l'objet ST est modifié
-        mLegend->titreInfoRaster();
+        mAnaPoint->titreInfoRaster();
 
         ptPedo ptPed=ptPedo(mDico->mPedo,x,y);
-        mLegend->add1InfoRaster(ptPed.displayInfo(PEDO::DRAINAGE));
-        mLegend->add1InfoRaster(ptPed.displayInfo(PEDO::PROFONDEUR));
-        mLegend->add1InfoRaster(ptPed.displayInfo(PEDO::TEXTURE));
+        mAnaPoint->add1InfoRaster(ptPed.displayInfo(PEDO::DRAINAGE));
+        mAnaPoint->add1InfoRaster(ptPed.displayInfo(PEDO::PROFONDEUR));
+        mAnaPoint->add1InfoRaster(ptPed.displayInfo(PEDO::TEXTURE));
 
         for (std::shared_ptr<Layer> l : mVLs){
-            if (((l->Type()==TypeLayer::KK )| (l->Type()==TypeLayer::Station )) | (( l->IsActive()) & (l->Type()!=TypeLayer::Externe))){
+            if (((l->getCatLayer()==TypeLayer::KK )| (l->getCatLayer()==TypeLayer::Station )) | (( l->IsActive()) & (l->getCatLayer()!=TypeLayer::Externe))){
             if (l->isVisible()){
                 std::vector<std::string> layerLabelAndValue=l->displayInfo(x,y);
                 if (l->l4Stat()){
-                mLegend->add1InfoRaster(layerLabelAndValue);
+                mAnaPoint->add1InfoRaster(layerLabelAndValue);
                 }
                 if (( l->IsActive())){
                      // affiche une popup pour indiquer la valeur pour cette couche
@@ -299,16 +284,16 @@ void groupLayers::extractInfo(double x, double y){
         // tableau du détail du calcul de l'aptitude d'une essence pour FEE
         for (std::shared_ptr<Layer> l : mVLs){
             // on a bien une essence active et on est en mode FEE
-            if ( l->IsActive() && l->Type()==TypeLayer::FEE && mTypeClassifST==FEE){
+            if ( l->IsActive() && l->getCatLayer()==TypeLayer::FEE && mTypeClassifST==FEE){
                 // on note la chose dans l'objet ecogramme, car la classe simplepoint va devoir savoir si il y a un ecogramme à export en jpg ou non
                 mStation->setHasFEEApt(1);
-                mLegend->detailCalculAptFEE(mStation);
+                mAnaPoint->detailCalculAptFEE(mStation);
 
             }
         }
 
         // tableau des aptitudes pour toutes les essences
-       mLegend->afficheAptAllEss();
+       mAnaPoint->afficheAptAllEss();
 
 
         mMap->updateView();
@@ -325,18 +310,18 @@ void groupLayers::computeStatGlob(OGRGeometry *poGeomGlobale){
     // pour les statistiques globales, on prend toutes les couches selectionnées par select4Download
     for (auto & l: getSelectedLayer4Download() ){
 
-        if (l->getCode()=="MNH2019"){
+        if (l->Code()=="MNH2019"){
             // calcul de Hdom
            mVLStatCont.push_back(new lStatContChart(l,poGeomGlobale,TypeStat::HDOM));
 
-        } else if(l->getCode()=="COMPO"){
+        } else if(l->Code()=="COMPO"){
             // calcul des probabilités de présence pour les 9 sp.
             mCompo = std::make_unique<lStatCompoChart>(this,poGeomGlobale);
         } else {
 
             if (l->l4Stat()){
             // clé : la valeur au format légende (ex ; Optimum). Valeur ; pourcentage pour ce polygone
-            std::map<std::string,int> stat = l->computeStatOnPolyg(poGeomGlobale);
+            std::map<std::string,int> stat = l->computeStat1(poGeomGlobale);
             mVLStat.push_back(new layerStatChart(l,stat,poGeomGlobale));
             }
         }
@@ -348,53 +333,6 @@ void groupLayers::computeStatGlob(OGRGeometry *poGeomGlobale){
     //return aRes;
 }
 
-/*
-void groupLayers::computeStatOnPolyg(OGRLayer * lay,bool mergeOT){
-
-    for (auto & l : getSelectedLayer4Stat() ){
-
-        // défini le nouveau champ à ajouter à la table d'attribut - vérifie qu'il n'existe pas préhalablement
-        if (lay->FindFieldIndex(l->getFieldName().c_str(),0)==-1){
-
-            OGRFieldDefn * oFLD(NULL);
-            if (l->getFieldType()=="int"){
-                oFLD= new OGRFieldDefn(l->getFieldName().c_str(),  OFTInteger);
-            }
-            if (l->getFieldType()=="str"){
-                oFLD= new OGRFieldDefn(l->getFieldName().c_str(),  OFTString);
-            }
-
-            oFLD->SetJustify(OGRJustification::OJLeft);
-
-            lay->CreateField(oFLD);
-        }
-
-        OGRFeature *poFeature;
-        lay->ResetReading();
-        while( (poFeature = lay->GetNextFeature()) != NULL )
-        {
-            // clé : la valeur au format légende (ex ; Optimum). Valeur ; pourcentage pour ce polygone
-            OGRGeometry * poGeom = poFeature->GetGeometryRef();
-            poGeom->closeRings();
-            poGeom->flattenTo2D();
-            //std::map<std::string,int> stat = l->computeStatOnPolyg(poGeom,aMode);
-            layerStat ls(l,l->computeStatOnPolyg(poGeom));
-            // on met un résumé des stat dans le champ nouvellement créé
-            if (l->getFieldType()=="int"){
-                poFeature->SetField(l->getFieldName().c_str(), ls.getFieldVal(mergeOT));
-            }
-            if (l->getFieldType()=="str"){
-
-                //std::cout << "set field "<< l->getFieldName() << " to " <<    ls.getFieldValStr() << std::endl;
-                poFeature->SetField(l->getFieldName().c_str(), ls.getFieldValStr().c_str());
-            }
-
-            //poFeature->SetField(); This method has only an effect on the in-memory feature object. If this object comes from a layer and the modifications must be serialized back to the datasource, OGR_L_SetFeature()
-            lay->SetFeature(poFeature);
-        }
-    }
-}
-*/
 
 std::map<std::string,int> groupLayers::apts(){
     std::map<std::string,int> aRes;
@@ -402,7 +340,7 @@ std::map<std::string,int> groupLayers::apts(){
     case FEE:
         if (mStation->readyFEE()){
             for (std::shared_ptr<Layer> l : mVLs){
-                if (l->Type()==TypeLayer::FEE ){//|| l->Type()==TypeLayer::CS){
+                if (l->getCatLayer()==TypeLayer::FEE ){//|| l->Type()==TypeLayer::CS){
                     // j'ai deux solution pour avoir les aptitudes ; soit je lis la valeur du raster apt, soit je recalcule l'aptitude avec les variables environnementales
                     std::shared_ptr<cEss> Ess= l->Ess();
                     int apt = Ess->getFinalApt(mStation->mNT,mStation->mNH, mStation->mZBIO, mStation->mTOPO);
@@ -414,7 +352,7 @@ std::map<std::string,int> groupLayers::apts(){
     case CS:
         if (mStation->readyCS()){
             for (std::shared_ptr<Layer> l : mVLs){
-                if ( l->Type()==TypeLayer::CS){//l->Type()==TypeLayer::FEE ||
+                if ( l->getCatLayer()==TypeLayer::CS){//l->Type()==TypeLayer::FEE ||
                     // j'ai deux solution pour avoir les aptitudes ; soit je lis la valeur du raster apt, soit je recalcule l'aptitude avec les variables environnementales
                     std::shared_ptr<cEss> Ess= l->Ess();
                     int apt = Ess->getApt(mStation->mZBIO, mStation->mSt);
@@ -451,17 +389,16 @@ void groupLayers::updateGL(){
 void groupLayers::updateLegende(const std::shared_ptr<Layer> l){
     // vider la légende et afficher la légende personnelle de la couche active
     mLegendIndiv->clear();
-    if (l->Type()!=TypeLayer::Externe){
+    if (l->getCatLayer()!=TypeLayer::Externe){
 
         mTitle->setText(WString::tr("legendTitre"));
         int row(0);
         mLegendIndiv->elementAt(row, 0)->setColumnSpan(2);
         mLegendIndiv->elementAt(row, 0)->setContentAlignment(AlignmentFlag::Top | AlignmentFlag::Center);
         mLegendIndiv->elementAt(row, 0)->setPadding(10);
-        //WText *titre = mLegendIndiv->elementAt(row,0)->addWidget(cpp14::make_unique<WText>("<h4>"+l->getLegendLabel()+"</h4>"));
         mLegendIndiv->elementAt(row,0)->addWidget(cpp14::make_unique<WText>("<h4>"+l->getLegendLabel()+"</h4>"));
         row++;
-        for (auto kv : *l->mDicoVal){
+        for (auto kv : l->getDicoVal()){
             if (l->hasColor(kv.first)){
                 color col = l->getColor(kv.first);
                 mLegendIndiv->elementAt(row, 0)->addWidget(cpp14::make_unique<WText>(kv.second));
@@ -483,7 +420,7 @@ std::shared_ptr<Layer> groupLayers::getActiveLay(){
     // au lancement de l'appli, aucune couche n'est active
     if (aRes==NULL){
         for (std::shared_ptr<Layer>l : mVLs){
-            if (( l->getCode()=="IGN")){aRes=l;
+            if (( l->Code()=="IGN")){aRes=l;
                 l->setActive();
                 break;}
         }
@@ -494,7 +431,7 @@ std::shared_ptr<Layer> groupLayers::getActiveLay(){
 std::shared_ptr<Layer> groupLayers::getLay(std::string aCode){
     std::shared_ptr<Layer> aRes=NULL;
     for (std::shared_ptr<Layer> l : mVLs){
-        if (( l->getCode()==aCode)){aRes=l;break;}
+        if (( l->Code()==aCode)){aRes=l;break;}
     }
     return aRes;
 }
@@ -504,15 +441,15 @@ void groupLayers::exportLayMapView(){
     std::cout << "exportLayMapView " << std::endl;
 
     std::shared_ptr<Layer> l=getActiveLay();// attention, si on vient d'ouvrir le soft, aucune layer n'est actives!! gerer les ptr null
-    if (l && l->Type()!=TypeLayer::Externe){
+    if (l && l->getCatLayer()!=TypeLayer::Externe){
         m_app->loadingIndicator()->setMessage(tr("LoadingI3"));
         m_app->loadingIndicator()->show();
         // crop layer and download
 
         // crée l'archive
-        std::string archiveFileName = mDico->File("TMPDIR")+"/"+l->getCode()+".zip";
-        std::string aCroppedRFile = mDico->File("TMPDIR")+"/"+l->getCode()+"_crop.tif";
-        std::string mClientName=l->getCode()+"_crop";
+        std::string archiveFileName = mDico->File("TMPDIR")+"/"+l->Code()+".zip";
+        std::string aCroppedRFile = mDico->File("TMPDIR")+"/"+l->Code()+"_crop.tif";
+        std::string mClientName=l->Code()+"_crop";
         rasterFiles r= l->getRasterfile();
         if ( cropIm(l->getPathTif(), aCroppedRFile, mMapExtent)){
             std::cout << "create archive pour raster croppé " << std::endl;
@@ -777,13 +714,13 @@ void groupLayers::deleteExtent(std::string id){
     loadExtents(id);
 }
 
-std::vector<rasterFiles> groupLayers::getSelect4Download(){return mSelect4Download->getSelectedRaster();}
+std::vector<rasterFiles> groupLayers::getSelect4Download(){return mSelectLayers->getSelectedRaster();}
 //std::vector<rasterFiles> groupLayers::getSelect4Stat(){return mSelect4Stat->getSelectedRaster();}
 
 //int groupLayers::getNumSelect4Stat(){return mSelect4Stat->numSelectedLayer();}
-int groupLayers::getNumSelect4Download(){return mSelect4Download->numSelectedLayer();}
+int groupLayers::getNumSelect4Download(){return mSelectLayers->numSelectedLayer();}
 //std::vector<std::shared_ptr<Layer>>groupLayers::getSelectedLayer4Stat(){return mSelect4Stat->getSelectedLayer();}
-std::vector<std::shared_ptr<Layer>> groupLayers::getSelectedLayer4Download(){return mSelect4Download->getSelectedLayer();}
+std::vector<std::shared_ptr<Layer>> groupLayers::getSelectedLayer4Download(){return mSelectLayers->getSelectedLayer();}
 //std::vector<Layer *> groupLayers::getAllLayer(){return mSelect4Download->getAllLayer();}
 
 

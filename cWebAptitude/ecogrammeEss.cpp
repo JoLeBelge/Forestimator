@@ -20,21 +20,13 @@ void EcogrammeEss::paintEvent(Wt::WPaintDevice *paintDevice){
     for (int i(0); i<this->areas().size();i++){
         this->removeArea(this->area(i));
     }
-    std::cout << "create painter" << std::endl;
+    //std::cout << "create painter" << std::endl;
     Wt::WPainter painter(paintDevice);
 
     draw(&painter);
     update();          // Trigger a repaint.
     //std::cout << "done \n" << std::endl;
 }
-/*
-void EcogrammeEss::draw(Wt::WPainter *painter){
-    std::cout << "EcogrammeEss::paintEvent on an exterior painter" << std::endl;
-    Wt::WPaintDevice * pd =painter->device();
-    draw(pd);
-
-}
-*/
 
 void EcogrammeEss::draw(Wt::WPainter *painter){
 
