@@ -54,7 +54,7 @@ Layer::Layer(groupLayers * aGroupL, std::shared_ptr<layerBase> aLB, WText * PWTe
    ,mLay4Stat(1)
    ,mLay4Visu(1)
  {
-     std::cout << "création de layer en copiant layerbase " << aLB->Code() << std::endl;
+     //std::cout << "création de layer en copiant layerbase " << aLB->Code() << std::endl;
      mLabel=mNom;
      mWtText->setText(mLabel);
      mLay4Stat=mDico->lay4Stat(mCode);

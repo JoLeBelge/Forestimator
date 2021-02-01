@@ -371,6 +371,10 @@ public:
     }
 
     std::map<std::string,std::shared_ptr<layerBase>> VlayerBase(){return mVlayerBase;}
+     bool hasLayerBase(std::string aCode){
+         if (mVlayerBase.find(aCode)!=mVlayerBase.end()){return 1;} else {return 0;}
+     }
+
 
     std::shared_ptr<layerBase> getLayerBase(std::string aCode){
         std::shared_ptr<layerBase> aRes=NULL;

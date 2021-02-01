@@ -17,7 +17,7 @@ public:
     WStackedWidget * stack_info; // cause que je dois changer de current index après avoir mis à jour la légende que je clique sur une station
     WContainerWidget * mSimplepointW;
     WContainerWidget * mGroupLayerW;
-    WMenuItem * menuitem_analyse,* menuitem_cartes,*menuitem_legend,*menuitem_presentation,*menuitem_simplepoint;
+    WMenuItem * menuitem_analyse,* menuitem_cartes,*menuitem_legend,*menuitem_documentation,*menuitem_simplepoint;
 };
 
 #endif // STACKINFOPTR_H

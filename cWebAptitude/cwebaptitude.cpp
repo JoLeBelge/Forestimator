@@ -49,7 +49,7 @@ cWebAptitude::cWebAptitude(AuthApplication *app, Auth::AuthWidget* authWidget_)
     container_home->addNew<Wt::WText>("<h1 style='color:white;height: 37px;font-size: 3em;max-width: 1000px;text-align: center;'>Forestimator</h1>");
     container_home->decorationStyle().setBackgroundImage(Wt::WLink("resources/DJI_0497_3.png"), None);
     // add menu as push buttons!
-    Wt::WPushButton *b_pres  = container_home->addWidget(Wt::cpp14::make_unique<Wt::WPushButton>("Présentation"));
+    Wt::WPushButton *b_pres  = container_home->addWidget(Wt::cpp14::make_unique<Wt::WPushButton>("Documentation"));
     container_home->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
     Wt::WPushButton *b_carto = container_home->addWidget(Wt::cpp14::make_unique<Wt::WPushButton>("Cartographie"));
     container_home->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
@@ -64,7 +64,7 @@ cWebAptitude::cWebAptitude(AuthApplication *app, Auth::AuthWidget* authWidget_)
     b_anal ->setStyleClass("btn btn-success");
     b_login->setStyleClass("btn btn-success");
     b_point->setStyleClass("btn btn-success");
-    b_pres ->setLink(Wt::WLink(Wt::LinkType::InternalPath, "/presentation"));
+    b_pres ->setLink(Wt::WLink(Wt::LinkType::InternalPath, "/documentation"));
     b_carto->setLink(Wt::WLink(Wt::LinkType::InternalPath, "/cartographie"));
     b_anal ->setLink(Wt::WLink(Wt::LinkType::InternalPath, "/analyse"));
     b_point->setLink(Wt::WLink(Wt::LinkType::InternalPath, "/point"));
@@ -144,9 +144,9 @@ cWebAptitude::cWebAptitude(AuthApplication *app, Auth::AuthWidget* authWidget_)
     auto bh = right_menu->addItem("resources/purchasing_management_icon_149886.png","");
     bh->setLink(WLink(LinkType::InternalPath, "/home"));
     bh->setToolTip("Accueil");
-    mStackInfoPtr->menuitem_presentation = right_menu->addItem("resources/problem_analysis_icon_149897.png","");
-    mStackInfoPtr->menuitem_presentation->setLink(WLink(LinkType::InternalPath, "/presentation"));
-    mStackInfoPtr->menuitem_presentation->setToolTip("Présentation");
+    mStackInfoPtr->menuitem_documentation = right_menu->addItem("resources/problem_analysis_icon_149897.png","");
+    mStackInfoPtr->menuitem_documentation->setLink(WLink(LinkType::InternalPath, "/documentation"));
+    mStackInfoPtr->menuitem_documentation->setToolTip("Documentation");
     mStackInfoPtr->menuitem_cartes = right_menu->addItem("resources/layers_filled_icon_149920.png","");
     mStackInfoPtr->menuitem_cartes->setLink(WLink(LinkType::InternalPath, "/cartographie"));
     mStackInfoPtr->menuitem_cartes->setToolTip("Cartographie");
@@ -156,8 +156,10 @@ cWebAptitude::cWebAptitude(AuthApplication *app, Auth::AuthWidget* authWidget_)
     mStackInfoPtr->menuitem_analyse = right_menu->addItem("resources/data_analysis_icon_149953.png","");
     mStackInfoPtr->menuitem_analyse->setLink(WLink(LinkType::InternalPath, "/analyse"));
     mStackInfoPtr->menuitem_analyse->setToolTip("Analyse");
-    right_menu->addItem("resources/configuration_center_icon_149956.png","")
+    // pas encore implémenté
+    /*right_menu->addItem("resources/configuration_center_icon_149956.png","")
             ->setLink(WLink(LinkType::InternalPath, "/parametres"));
+            */
     
 
     mStackInfoPtr->mSimplepointW = mStackInfoPtr->stack_info->addWidget(cpp14::make_unique<WContainerWidget>()); // index 0
@@ -215,10 +217,10 @@ void cWebAptitude::handlePathChange()
 {
 
 
-    std::size_t found = m_app->internalPath().find("/presentation");
-    if (m_app->internalPath() == "/presentation" | found!=std::string::npos){
+    std::size_t found = m_app->internalPath().find("/documentation");
+    if (m_app->internalPath() == "/documentation" | found!=std::string::npos){
         top_stack->setCurrentIndex(1);
-        mStackInfoPtr->menuitem_presentation->select();
+        mStackInfoPtr->menuitem_documentation->select();
         sub_stack->setCurrentIndex(1);
         navigation->setTitle(tr("titre.presentation"));
     }else if (m_app->internalPath() == "/home"){

@@ -36,6 +36,9 @@ parcellaire::parcellaire(groupLayers *aGL, Wt::WApplication* app, statWindow *st
 
     mContSelect4D= addWidget(cpp14::make_unique<Wt::WContainerWidget>());
 
+    addWidget(cpp14::make_unique<WText>(tr("anaStep3")));
+
+
     downloadRasterBt = addWidget(cpp14::make_unique<Wt::WPushButton>("Télécharger les cartes"));
     downloadRasterBt->setStyleClass("btn btn-success");
     downloadRasterBt->setWidth(200);
@@ -88,6 +91,26 @@ bool parcellaire::to31370AndGeoJson(){
     const char *outPath=output.c_str();
     std::string input(mFullPath+ ".shp");
     const char *inputPath=input.c_str();
+    // 0) suppression des polygones foireux - radical mais c'est l'utilisateur qui doit gérer ses propres merdes
+    GDALDataset * DS =  (GDALDataset*) GDALOpenEx( inputPath, GDAL_OF_VECTOR | GDAL_OF_UPDATE, NULL, NULL, NULL );
+    if( DS != NULL )
+    {
+        OGRLayer * lay = DS->GetLayer(0);
+        OGRFeature *poFeature;
+        OGRGeometry * poGeom;
+
+        while( (poFeature = lay->GetNextFeature()) != NULL )
+        {
+                poGeom=poFeature->GetGeometryRef();
+                if (poGeom->IsValid()!=1) { std::cout << "géométrie feature " << poFeature->GetFID() << " is invalid" << std::endl;
+                //OGRFeature::DestroyFeature(poFeature);
+                lay->DeleteFeature(poFeature->GetFID());
+                }
+        }
+
+    }
+    GDALClose(DS);
+
     // ouverture en update mode pour pouvoir projeter en bl72
     GDALDatasetH hSrcDS  = GDALOpenEx( inputPath, GDAL_OF_VECTOR | GDAL_OF_READONLY, NULL, NULL, NULL );
     char** papszArgv = nullptr;
@@ -108,7 +131,7 @@ bool parcellaire::to31370AndGeoJson(){
     GDALVectorTranslateOptionsFree(option);
     GDALClose(hSrcDS);
     // la source devient le geojson
-    hSrcDS  = GDALOpenEx( outPath, GDAL_OF_VECTOR | GDAL_OF_READONLY, NULL, NULL, NULL );
+    hSrcDS  =  GDALOpenEx( outPath, GDAL_OF_VECTOR | GDAL_OF_READONLY, NULL, NULL, NULL );
     papszArgv = CSLAddString(papszArgv, "-overwrite");
     GDALVectorTranslateOptions * option2 = GDALVectorTranslateOptionsNew(papszArgv, nullptr);
     if( option2 ){

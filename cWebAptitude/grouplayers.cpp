@@ -61,10 +61,15 @@ groupLayers::groupLayers(cDicoApt * aDico, WOpenLayers *aMap, AuthApplication *a
     tree->setTreeRoot(std::move(main_node));
     tree->treeRoot()->label()->setTextFormat(Wt::TextFormat::Plain);
     tree->treeRoot()->setLoadPolicy(Wt::ContentLoading::NextLevel);
+    tree->treeRoot()->expand();
     auto node1 = Wt::cpp14::make_unique<Wt::WTreeNode>(tr("groupeCoucheThem"));
     auto node1_ = tree->treeRoot()->addChildNode(std::move(node1));
     node1_->addStyleClass("tree_node");
-    tree->treeRoot()->expand();
+
+    auto node4 = Wt::cpp14::make_unique<Wt::WTreeNode>(tr("groupeCoucheKKCS"));
+    auto node4_ = tree->treeRoot()->addChildNode(std::move(node4));
+    node4_->addStyleClass("tree_node");
+    this->changeExpertMode().connect(node4_,&Wt::WTreeNode::setNodeVisible);
 
     auto node0 = Wt::cpp14::make_unique<Wt::WTreeNode>(tr("groupeCouchePeup"));
     auto node0_ = tree->treeRoot()->addChildNode(std::move(node0));
@@ -75,25 +80,19 @@ groupLayers::groupLayers(cDicoApt * aDico, WOpenLayers *aMap, AuthApplication *a
     node2_->addStyleClass("tree_node");
 
     auto node3 = Wt::cpp14::make_unique<Wt::WTreeNode>(tr("groupeCoucheAptCS"));
-    auto node3_ = node3.get();
+    auto node3_ = tree->treeRoot()->addChildNode(std::move(node3));
     node3_->addStyleClass("tree_node");
-    node3_ = tree->treeRoot()->addChildNode(std::move(node3));
+
     // ici je  vais devoir rendre ce noeuds invisible si mode normal
     this->changeExpertMode().connect(node3_,&Wt::WTreeNode::setNodeVisible);
 
-    // creation des layers pour les KK du CS
-/*
-    for (auto & pair : *mDico->codeKK2Nom()){
-        Wt::WTreeNode * n = node1_->addChildNode(Wt::cpp14::make_unique<Wt::WTreeNode>(""));
-        WText *label=n->label();
-        std::shared_ptr<Layer> aL=std::make_shared<Layer>(this,pair.first,label,TypeLayer::KK);
-        std::string aCode=pair.first;
-        label->clicked().connect([this,aCode]{clickOnName(aCode,TypeLayer::KK);});
-        aL->changeExpertMode().connect(n,&Wt::WTreeNode::setNodeVisible);
-        mVLs.push_back(aL);
-    }*/
+    node0_->expand();
+    node1_->expand();
+    node2_->expand();
+    node3_->expand();
+    node4_->expand();
 
-    // ajout des cartes "FEE" ; NT NH Topo AE SS
+    // ajout des cartes
     for (auto & pair :mDico->VlayerBase()){
         std::shared_ptr<layerBase> aLB=pair.second;
 
@@ -104,6 +103,11 @@ groupLayers::groupLayers(cDicoApt * aDico, WOpenLayers *aMap, AuthApplication *a
         switch (aLB->getCatLayer()) {
         case (TypeLayer::Station):{
             n = node1_->addChildNode(Wt::cpp14::make_unique<Wt::WTreeNode>(""));
+            wtext=n->label();
+            break;}
+        // carte thématique des catalogues de stations
+        case (TypeLayer::KK):{
+            n = node4_->addChildNode(Wt::cpp14::make_unique<Wt::WTreeNode>(""));
             wtext=n->label();
             break;}
         case (TypeLayer::Externe):{
@@ -139,14 +143,10 @@ groupLayers::groupLayers(cDicoApt * aDico, WOpenLayers *aMap, AuthApplication *a
         }
     }
 
-    node0_->expand();
-    node1_->expand();
-    node2_->expand();
-    node3_->expand();
-
     mParent->addWidget(cpp14::make_unique<WText>(tr("coucheStep1")));
     mParent->addWidget(std::move(tree));
-    mParent->addWidget(cpp14::make_unique<WText>(tr("coucheStep2")));
+    Wt::WText * t =mParent->addWidget(cpp14::make_unique<WText>(tr("coucheStep2")));
+    t->setToolTip(tr("coucheStep1.infoBulle"));
 
     mExtentDivGlob = mParent->addWidget(cpp14::make_unique<WContainerWidget>());
     WPushButton * button_e = mExtentDivGlob->addWidget(cpp14::make_unique<WPushButton>(tr("afficher_extent")));
@@ -217,7 +217,7 @@ void groupLayers::clickOnName(std::string aCode, TypeLayer type){
     // cacher la fenetre popup
     mParent->doJavaScript("overlay.setVisible(0);");
 
-    // changer le mode CS vs FEE de grouplayer, utilse pour le tableau d'aptitude
+    // changer le mode CS vs FEE de grouplayer, utilise pour le tableau d'aptitude
     if (type == TypeLayer::CS | type == TypeLayer::KK | aCode.substr(0,2)=="CS"){ mTypeClassifST=TypeClassifST::CS;} else
     { mTypeClassifST=TypeClassifST::FEE;}
 
@@ -237,11 +237,6 @@ void groupLayers::clickOnName(std::string aCode, TypeLayer type){
  * @param y
  */
 void groupLayers::extractInfo(double x, double y){
-
-    // debug du wsm2jpg, je l'appel ici pour pas devoir charger à la main un shp à chaque test
-    /*OGREnvelope * env = new OGREnvelope();
-    env->MinX=214776;env->MinY=47789.8;env->MaxX=215275;env->MaxY=48292.3;
-    getActiveLay()->wms2jpg(env,1000,1000,"/home/lisein/Documents/carteApt/Forestimator/data/tmp/toto.png");*/
 
     if(!isnan(x) && !isnan(y) && !(x==0 && y==0)){
         std::cout << "groupLayers ; extractInfo " << x << " , " << y << std::endl;
@@ -305,6 +300,10 @@ void groupLayers::extractInfo(double x, double y){
 
 void groupLayers::computeStatGlob(OGRGeometry *poGeomGlobale){
     std::cout << " groupLayers::computeStatGlob " << std::endl;
+    /*char * test;
+    poGeomGlobale->exportToWkt(&test);
+    std::cout << " geometrie geojson :" << test << std::endl;
+    */
     clearStat();
 
     // pour les statistiques globales, on prend toutes les couches selectionnées par select4Download

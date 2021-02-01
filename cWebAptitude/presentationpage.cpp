@@ -34,7 +34,7 @@ presentationPage::presentationPage(cDicoApt *aDico):mDico(aDico)
     subMenu_->addStyleClass("nav-pills nav-stacked submenu submenuPresentation");
     subMenu_->setWidth(200);
 
-    subMenu_->setInternalPathEnabled("/presentation");// bah ça à l'air de bien fonctionner quand mm
+    subMenu_->setInternalPathEnabled("/documentation");// bah ça à l'air de bien fonctionner quand mm
 
     // probleme https://redmine.webtoolkit.eu/boards/2/topics/1206, j'ai plein de session qui se lancent quand je veux accèder à l'internal path d'une documentation
 

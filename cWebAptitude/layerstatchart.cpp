@@ -239,7 +239,7 @@ olOneLay::olOneLay(Layer * aLay, OGRGeometry *poGeom):mLay(aLay){
 }
 */
 
-staticMap::staticMap(std::shared_ptr<layerBase> aLay, OGRGeometry *poGeom, OGREnvelope *env):mLay(aLay),mSx(700),mSy(700),ext(env){
+staticMap::staticMap(std::shared_ptr<layerBase> aLay, OGRGeometry *poGeom, OGREnvelope *env):mLay(aLay),mSx(500),mSy(500),ext(env){
     //std::cout << "staticMap::staticMap" << std::endl;
     std::string name0 = std::tmpnam(nullptr);
     std::string name1 = name0.substr(5,name0.size()-5);

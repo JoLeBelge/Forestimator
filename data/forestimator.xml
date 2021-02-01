@@ -3,7 +3,7 @@
 	  nplurals="2"
 	  plural="n == 1 ? 0 : 1">
 <!-- Note : certain message doivent être devant car sinon ils n'overload pas celui de base en anglais... -->
-<message id="titre.presentation">   <strong>Forestimator - présentation</strong> </message>
+<message id="titre.presentation">   <strong>Forestimator - documentation</strong> </message>
  <message id="titre.carto">   <strong>Forestimator - cartographie</strong> </message>
  <message id="titre.ana.surf">    <strong>Forestimator - analyse</strong>  </message>
  <message id="titre.ana.point">   <strong>Forestimator - info ponctuelle</strong>  </message>
@@ -51,7 +51,8 @@ Vous pouvez télécharger les cartes listées ci-dessous qui seront découpées 
 <message id="legendCheckbox">Afficher la légende</message>
 
 <message id="coucheStep1"><h3>1 : Sélectionner une couche</h3> </message>
-<message id="coucheStep2"><h3>2 : Sélectionner une zone d'intérêt</h3> </message>
+<message id="coucheStep2"><h3>2 : Zoomer sur une zone d'intérêt</h3> </message>
+<message id="coucheStep2.infoBulle">La zone d'intérêt est celle affichée sur la carte à gauche</message>
 <message id="coucheStep3"><h3>3 : Exporter l'extrait de la couche thématique</h3></message>
 <message id="afficher_extent">Emprises...</message>
 <message id="sauver_extent">Enregistrer</message>
@@ -59,8 +60,10 @@ Vous pouvez télécharger les cartes listées ci-dessous qui seront découpées 
 
 <message id="anaStep1"><h3>1 : Sélectionner une couche de référence</h3></message>
 <message id="anaStep2"><h3>2 : Sélectionner l'analyse</h3></message>
-<message id="anaStep3"><h3>3 : Excécuter l'analyse</h3></message>
-<message id="anaStep4"><h3>4 : Exporter le résultat</h3></message>
+<message id="anaStep3"><h3>3 : Excécuter l'analyse</h3> <br></br>
+Effectuer une analyse pour un polygone de votre shapefile en cliquant dessus tout en maintenant la touche shift enfoncée. L'analyse portera sur les cartes sélectionnées ci-dessus.
+</message>
+
 
 <!-- label page anayle simple -->
 <message id="sp_infoclic"><i>Veuillez double-cliquer dans la carte pour afficher les infos ponctuelles à cet endroit.</i></message>
@@ -71,7 +74,8 @@ Vous pouvez télécharger les cartes listées ci-dessous qui seront découpées 
 <message id="groupeCouchePeup">Cartographie des peuplements</message>
 <message id="groupeCoucheAptFEE">Aptitude des essences</message>
 <message id="groupeCoucheAptCS">Aptitude des essences (Catalogue de stations)</message>
-<message id="groupeCoucheKKCS">Habitats et potentiel sylvicole</message>
+<!--<message id="groupeCoucheKKCS">Habitats et potentiel sylvicole</message>-->
+<message id="groupeCoucheKKCS">Couches thématiques (Catalogue de stations)</message>
 
 <message id="titreEcogramme"><h4>Ecogramme : aptitude hydrotrophique pour cette zone bioclimatique</h4></message>
 <message id="legendEcogramme">L'abscisse représente les niveaux trophiques, allant du plus acide à gauche vers les sols carbonatés à droite. L'ordonnée représente le gradient hydrique, avec les stations sèches en haut, humide en bas, et à régime hydrique alternatif sur l'encart à part en bas.</message>
@@ -541,6 +545,9 @@ detAptFEE
 <message id="report.ban"><img src="PATH/resources/DJI_0497_navbar.JPG" width="500px"  border-radius="30px" /></message>
 
 <message id="download.lay.error.noLay"><p>Aucune cartes sélectionnée. Veuillez selectionner les couches à exporter à l'étape numéro 2 de la page analyse</p></message>
+
+<message id="api.msg.error.tool.name">Aucune carte ou traitement de ce nom.</message>
+<message id="api.msg.error.polyg1">Veillez utiliser le format Géojson pour votre polygone</message>
 
 
 </messages>

@@ -328,7 +328,6 @@ color layerBase::getColor(std::string aStrCode) const{
 
 // création d'un raster masque pour un polygone. Valeur de 255 pour l'intérieur du polygone
 GDALDataset * rasterFiles::rasterizeGeom(OGRGeometry *poGeom){
-
     std::string output("/vsimem/tmp.tif");
     const char *out=output.c_str();
     GDALDriver *pDriver;
