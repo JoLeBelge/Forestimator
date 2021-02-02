@@ -470,7 +470,7 @@ std::map<int,std::string> cDicoApt::getDicoRaster(std::string aCode){
     }
     SQLstring="SELECT "+field_raster+","+field_value+" FROM "+ nom_dico ;
     if (cond!=""){ SQLstring=SQLstring+" WHERE "+cond+";";} else {SQLstring=SQLstring+";";}
-    if (aCode=="Habitat"){std::cout << SQLstring << std::endl;}
+    //std::cout << SQLstring << std::endl;
     sqlite3_finalize(stmt);
     sqlite3_prepare_v2( *db_, SQLstring.c_str(), -1, &stmt, NULL );//preparing the statement
     while(sqlite3_step(stmt) == SQLITE_ROW)
