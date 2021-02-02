@@ -146,7 +146,7 @@ groupLayers::groupLayers(cDicoApt * aDico, WOpenLayers *aMap, AuthApplication *a
     mParent->addWidget(cpp14::make_unique<WText>(tr("coucheStep1")));
     mParent->addWidget(std::move(tree));
     Wt::WText * t =mParent->addWidget(cpp14::make_unique<WText>(tr("coucheStep2")));
-    t->setToolTip(tr("coucheStep1.infoBulle"));
+    t->setToolTip(tr("coucheStep2.infoBulle"));
 
     mExtentDivGlob = mParent->addWidget(cpp14::make_unique<WContainerWidget>());
     WPushButton * button_e = mExtentDivGlob->addWidget(cpp14::make_unique<WPushButton>(tr("afficher_extent")));

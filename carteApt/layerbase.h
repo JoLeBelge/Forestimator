@@ -130,6 +130,7 @@ public:
     std::string symbology() const{return mPathQml;}
     bool hasSymbology() const{return mPathQml!="";}
     rasterFiles getRasterfile();
+    bool rasterExist(){return exists(mPathRaster);}
 
     // méthode GDAL
     int getValue(double x, double y);

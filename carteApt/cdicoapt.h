@@ -364,7 +364,7 @@ public:
     std::shared_ptr<cEss> getEss(std::string aCode){
         std::shared_ptr<cEss> aRes=NULL;
         if (mVEss.find(aCode)!=mVEss.end()){aRes=mVEss.at(aCode);} else {
-            std::cout << "getEss de cdicoapt, création d'une essence vide attention " << std::endl;
+            std::cout << "getEss de cdicoapt, création d'une essence vide pour " << aCode << ", attention " << std::endl;
             aRes= std::make_shared<cEss>("toto",this);
         }
         return aRes;

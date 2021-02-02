@@ -132,8 +132,7 @@ std::vector<std::string> Layer::displayInfo(double x, double y){
     }
 
     if ((mType==TypeLayer::FEE || mType==TypeLayer::CS) && (this->IsActive())){
-
-        mGroupL->mStation->mActiveEss=mDico->getEss(mCode);
+        mGroupL->mStation->mActiveEss=Ess();
         mGroupL->mStation->HaveEss=1;
     }
 

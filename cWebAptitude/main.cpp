@@ -53,7 +53,7 @@ std::unique_ptr<Wt::WApplication> createAuthApplication(const Wt::WEnvironment &
     //std::cout << env.internalPath() << " " << env.deploymentPath() << std::endl;
     //std::cout << env.getParameter("a0") << std::endl;
     //std::cout << env.getParameter("a1") << std::endl;
-    if (env.internalPath() == "/documentation"){
+    if (env.internalPath() == "/documentation" | env.internalPath().substr(0,14)== "/documentation"){
         ;
     }else if (env.internalPath() == "/home"){
         ;

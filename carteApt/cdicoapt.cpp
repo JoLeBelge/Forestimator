@@ -97,7 +97,7 @@ cDicoApt::cDicoApt(std::string aBDFile):mBDpath(aBDFile),ptDb_(NULL)
         char userName[20];
         getlogin_r(userName,sizeof(userName));
         std::string s(userName);
-        // j'ai fini par organiser les fichiers GIS en deux tables ; une spécifique pour les cartes d'aptitudes (ça permettra à terme de restructure la classe layer qui contient des cEss ou layerbase beurk on mettra tout en layerbase
+        // j'ai fini par organiser les fichiers GIS en deux tables ; une spécifique pour les cartes d'aptitudes
         for (std::string table : std::vector<std::string>{"layerApt","fichiersGIS"})
         {
             if (s=="lisein"){
@@ -381,7 +381,12 @@ cDicoApt::cDicoApt(std::string aBDFile):mBDpath(aBDFile),ptDb_(NULL)
         }
         // toutes les layerbase
         for (auto & pair : Dico_RasterType){
-            mVlayerBase.emplace(std::make_pair(pair.first,std::make_shared<layerBase>(pair.first,this)));
+            std::shared_ptr<layerBase> l=std::make_shared<layerBase>(pair.first,this);
+            if (l->getCatLayer()!=TypeLayer::Externe & !l->rasterExist()){
+                std::cout << " \n Attention layerBase " << l->Code() << ", fichier " << l->getPathTif() << " inexistant" << std::endl;
+            }
+
+            mVlayerBase.emplace(std::make_pair(pair.first,l));
         }
         closeConnection();
     }
