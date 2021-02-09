@@ -10,8 +10,8 @@
 #include <Wt/WTableView.h>
 #include "layer.h"
 //#include "grouplayers.h"
-class lStatContChart; // similaire à layerSatChart mais dédié au var continue type hdom prédit
-class lStatCompoChart; // différent des 2 autres lstat chart cart va devoir utiliser plusieurs layers.
+class statHdom; // similaire à layerSatChart mais dédié au HDOM
+class statCompo; // différent car va devoir utiliser plusieurs layers.
 
 class basicStat; // forward declaration
 
@@ -28,33 +28,31 @@ bool IsInsideHexagon(float x0, float y0, float d, float x, float y) ;
 bool InsideHexagonB(float x0, float y0, float x, float y, float d);
 */
 
-enum TypeStat {HDOM
-               ,COMPO
-               };
 
-// pour les stat des var continue, à commencer par hdom prédit sur grille
-class lStatContChart {
+// pour les stat sur un MNH
+class statHdom {
 public:
-    lStatContChart(std::shared_ptr<Layer> aLay, OGRGeometry * poGeom, TypeStat aType);
-    ~lStatContChart(){
+    statHdom(std::shared_ptr<layerBase> aLay, OGRGeometry * poGeom);
+    ~statHdom(){
        for (OGRPolygon * pol: mVaddPol) OGRGeometryFactory::destroyGeometry(pol);
        mVaddPol.clear();
        mStat.clear();
        mDistFrequ.clear();
     }
-    std::shared_ptr<Layer> Lay(){return mLay;}
+    std::shared_ptr<layerBase> Lay(){return mLay;}
     bool deserveChart();
     cDicoApt * Dico();
 
-    // pour hdom
     void predictHdom();
     //std::map<std::string, double> computeDistrH();
     std::vector<std::pair<std::string,double>> computeDistrH();
     // equivalent de getChart, conteneur qui sera affiché dans la page de statistique
     std::unique_ptr<Wt::WContainerWidget> getResult();
 
+    basicStat bshdom(){return basicStat(mStat);}
+
 private:
-    std::shared_ptr<Layer> mLay;
+    std::shared_ptr<layerBase> mLay;
     std::vector<double> mStat;
     //std::vector<std::string,double>
     std::vector<std::pair<std::string,double>>mDistFrequ;// pair avec range de valeur (genre 3-9) et proportion de la distribution
@@ -62,18 +60,20 @@ private:
     // geometrie supplémentaire à afficher sur l'image statique
     std::vector<OGRPolygon *> mVaddPol;
     int mNbOccurence;
-    TypeStat mType;
 };
 
-class lStatCompoChart{
+class statCompo{
 public:
-    lStatCompoChart(groupLayers * aGL, OGRGeometry * poGeom);
+    statCompo(cDicoApt * aDico, OGRGeometry * poGeom);
+    // utilisation API ; pas spécialement toutes les essences
+    statCompo(std::vector<std::shared_ptr<layerBase>> VlayCompo, cDicoApt * aDico, OGRGeometry * poGeom);
 
-    basicStat computeStatWithMasq(std::shared_ptr<Layer> aLay, OGRGeometry * poGeom);
+    basicStat computeStatWithMasq(std::shared_ptr<layerBase> aLay, OGRGeometry * poGeom);
     // equivalent de getChart, conteneur qui sera affiché dans la page de statistique
     std::unique_ptr<Wt::WContainerWidget> getResult();
+    std::string getAPIresult();
 private:
-    std::vector<std::shared_ptr<Layer>> mVLay;
+    std::vector<std::shared_ptr<layerBase>> mVLay;
     OGRGeometry * mGeom;
     cDicoApt * mDico;
 };

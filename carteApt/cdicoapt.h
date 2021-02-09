@@ -125,6 +125,11 @@ public:
         if (Dico_RasterNomComplet.find(aCode)!=Dico_RasterNomComplet.end()){aRes=Dico_RasterNomComplet.at(aCode);}
         return aRes;
     }
+    std::string RasterNomCourt(std::string aCode){
+        std::string aRes("not found");
+        if (Dico_RasterNomCourt.find(aCode)!=Dico_RasterNomCourt.end()){aRes=Dico_RasterNomCourt.at(aCode);}
+        return aRes;
+    }
     bool RasterExpert(std::string aCode){
         bool aRes(0);
         if (Dico_RasterExpert.find(aCode)!=Dico_RasterExpert.end()){aRes=Dico_RasterExpert.at(aCode);}
@@ -407,6 +412,7 @@ private:
     // description peuplement vs description station
     std::map<std::string,std::string>  Dico_RasterCategorie;
     std::map<std::string,std::string>  Dico_RasterNomComplet;
+    std::map<std::string,std::string>  Dico_RasterNomCourt;
     std::map<std::string,bool>  Dico_RasterExpert;
     // pour savoir de quelle table provient les info du raster, fichiersGIS ou layerApt, car j'ai besoin du nom de la table pour charger le dicitonnaire (pour l'instant)
     std::map<std::string,std::string>  Dico_RasterTable;

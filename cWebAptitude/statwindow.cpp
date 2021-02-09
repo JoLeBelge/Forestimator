@@ -68,7 +68,7 @@ void statWindow::genIndivCarteAndAptT(){
         }
     }
 
-    for (lStatContChart * chart : mGL->ptrVLStatCont()) {
+    for (statHdom * chart : mGL->ptrVLStatCont()) {
         if (chart->deserveChart()){
                 add1layerStat(chart);
         }
@@ -93,7 +93,7 @@ void statWindow::add1Aptitude(layerStatChart * lstat){
         row=2;
     }
 
-    mAptTable->elementAt(row, 0)->addWidget(cpp14::make_unique<WText>(lstat->Lay()->getLegendLabel()));
+    mAptTable->elementAt(row, 0)->addWidget(cpp14::make_unique<WText>(lstat->Lay()->getLegendLabel(false)));
     // ajout de la barre de statistique
     mAptTable->elementAt(row, 1)->addWidget(lstat->getBarStat());
     mAptTable->elementAt(row, 1)->setContentAlignment(AlignmentFlag::Top | AlignmentFlag::Center);
@@ -106,7 +106,7 @@ void statWindow::add1layerStat(layerStatChart * layerStat){
     //mContStatIndiv->addWidget(std::unique_ptr<Wt::WContainerWidget>(layerStat));
     std::cout << "statWindow::add1layerStat done" << std::endl;
 }
-void statWindow::add1layerStat(lStatContChart *lStatCont){
+void statWindow::add1layerStat(statHdom *lStatCont){
     mAllStatIndivCont->addWidget(lStatCont->getResult());
 }
 
@@ -166,7 +166,7 @@ void statWindow::generateGenCarte(OGRFeature * poFeature){
      aContInfo->addWidget(cpp14::make_unique<WBreak>());
      aContInfo->addWidget(cpp14::make_unique<WText>("Altitude moyenne : "+ statMNT.getMean()+ " m"));
      aContInfo->addWidget(cpp14::make_unique<WBreak>());
-     aContInfo->addWidget(cpp14::make_unique<WText>("Altitude maximum : "+ statMNT.getMin()+ " m"));
+     aContInfo->addWidget(cpp14::make_unique<WText>("Altitude minimum : "+ statMNT.getMin()+ " m"));
      aContInfo->addWidget(cpp14::make_unique<WBreak>());
      aContInfo->addWidget(cpp14::make_unique<WText>("Pente moyenne : "+ statPente.getMean()+ " %"));
      aContInfo->addWidget(cpp14::make_unique<WBreak>());

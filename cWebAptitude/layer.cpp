@@ -39,7 +39,7 @@ Layer::Layer(groupLayers * aGroupL, std::string aCode):
   ,mLay4Stat(1)
   ,mLay4Visu(0)
 {
-    mLabel=mNom;
+    mLabel=mNomCourt;
     mWtText=NULL;
     mLay4Stat=mDico->lay4Stat(mCode);
     mLay4Visu=mDico->lay4Visu(mCode);
@@ -55,7 +55,7 @@ Layer::Layer(groupLayers * aGroupL, std::shared_ptr<layerBase> aLB, WText * PWTe
    ,mLay4Visu(1)
  {
      //std::cout << "création de layer en copiant layerbase " << aLB->Code() << std::endl;
-     mLabel=mNom;
+     mLabel=mNomCourt;
      mWtText->setText(mLabel);
      mLay4Stat=mDico->lay4Stat(mCode);
      mLay4Visu=mDico->lay4Visu(mCode);
@@ -72,7 +72,7 @@ Layer::Layer(groupLayers * aGroupL, std::shared_ptr<layerBase> aLB):
    ,mLay4Visu(0)
  {
      //std::cout << "création de layer pour " << aCode << std::endl;
-     mLabel=mNom;
+     mLabel=mNomCourt;
      mLay4Stat=mDico->lay4Stat(mCode);
      mLay4Visu=mDico->lay4Visu(mCode);
      setActive(false);

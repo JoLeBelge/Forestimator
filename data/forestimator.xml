@@ -417,7 +417,46 @@ Le contenu cartographiques est en grande partie issue des recherches menées au 
 Personne de contact : Lejeune Philippe <font color="blue">p.lejeune@uliege.be</font>.
 <br></br>
 <br></br>
-Réalisation : Lisein Jonathan <font color="blue">liseinjon@hotmail.com</font> et Samuel Quevauvillers.
+Réalisation : Lisein Jonathan <font color="blue">liseinjon@hotmail.com</font>, Hugues Claessens et Samuel Quevauvillers.
+</message>
+
+<message id="docu.api"> 
+La plateforme web Forestimator sert de vitrine ; les informations et les traitements y sont présentés au grand public via une interface conviviale.
+<br></br>
+Par ailleurs, Forestimator fournit des webservices pour les développeurs soucieux d'utiliser les résultats de traitements (analyse ponctuelle ou surfacique) dans leurs plateforme web. Cette page d'aide décrit le fonctionnement de l'API (Application Programming Interface) de forestimator.
+<h3>Aide</h3>
+Pour afficher la liste des couches et des traitements disponibles;
+<br></br>
+http://forestimator.gembloux.ulg.ac.be/api/help
+<br></br>
+<h3>Analyse surfacique</h3>
+la syntaxe générale est la suivante;
+<br></br>
+http://forestimator.gembloux.ulg.ac.be/api/<font color="blue">CODE_COUCHE_OU_NOM_TRAITEMENT</font>/polygon/<font color="blue">POLYGONE_FORMAT_WKT</font>
+<br></br>
+CODE_COUCHE_OU_NOM_TRAITEMENT; consultez la page http://forestimator.gembloux.ulg.ac.be/api/help pour avoir la liste.
+<br></br>
+POLYGONE_FORMAT_WKT; le polygone délimitant la surface de terrain pour laquelle vous souhaitez effectuer les analyses. Le format doit être le WKT, le système de projection doit être en Belge Lambert 72. De plus, la géométrie du polygone doit être valide et sa surface ne peut dépasser 200 ha.
+<br></br>
+<p style="margin-bottom:0.2cm;margin-top:0.2cm">
+Certains traitements accèptent des arguments qui permettent de modifier leurs comportement par défaut. Dans ce cas, la syntaxe sera la suivante:
+<br></br>
+http://forestimator.gembloux.ulg.ac.be/api/<font color="blue">CODE_COUCHE_OU_NOM_TRAITEMENT</font>/args/<font color="blue">ARGUMENTS_OPTIONNEL</font>/polygon/<font color="blue">POLYGONE_FORMAT_WKT</font>
+
+</p>
+<h3>Exemples</h3>
+<p style="margin-bottom:0.2cm;margin-top:0.2cm">
+http://forestimator.gembloux.ulg.ac.be/api/<font color="blue">aptitude</font>/polygon/POLYGON ((208118.986622118 113943.623825983,208387.928131752 113684.230535628,208211.816531718 113533.580853657,207902.029861846 113854.507112691,208118.986622118 113943.623825983))
+</p>
+<p style="margin-bottom:0.2cm;margin-top:0.2cm">
+http://forestimator.gembloux.ulg.ac.be/api/<font color="blue">aptitude</font>/args/<font color="blue">HE,DO,AG</font>/polygon/POLYGON ((208118.986622118 113943.623825983,208387.928131752 113684.230535628,208211.816531718 113533.580853657,207902.029861846 113854.507112691,208118.986622118 113943.623825983))
+</p>
+<p style="margin-bottom:0.2cm;margin-top:0.2cm;">
+http://forestimator.gembloux.ulg.ac.be/api/<font color="blue">hdom</font>/polygon/POLYGON ((208118.986622118 113943.623825983,208387.928131752 113684.230535628,208211.816531718 113533.580853657,207902.029861846 113854.507112691,208118.986622118 113943.623825983))
+</p>
+<p style="margin-bottom:0.2cm;margin-top:0.2cm;">
+http://forestimator.gembloux.ulg.ac.be/api/<font color="blue">compo</font>/polygon/POLYGON ((208118.986622118 113943.623825983,208387.928131752 113684.230535628,208211.816531718 113533.580853657,207902.029861846 113854.507112691,208118.986622118 113943.623825983))
+</p>
 </message>
 
 <message id="report.analyse.surf.hdom.t">Hauteur dominante calculé sur le MNH</message>
@@ -548,6 +587,14 @@ detAptFEE
 
 <message id="api.msg.error.tool.name">Aucune carte ou traitement de ce nom.</message>
 <message id="api.msg.error.polyg1">Veillez utiliser le format Géojson pour votre polygone</message>
+
+<message id="menu.button.tooltip.home">Acceuil</message>
+<message id="menu.button.tooltip.doc">Documentation</message>
+<message id="menu.button.tooltip.carto">Cartographie</message>
+<message id="menu.button.tooltip.point">Info ponctuelle</message>
+<message id="menu.button.tooltip.surf">Analyse surfacique</message>
+
+
 
 
 </messages>

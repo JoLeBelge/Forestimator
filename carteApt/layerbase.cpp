@@ -69,6 +69,7 @@ rasterFiles rasterFiles::getRasterfile(){
 layerBase::layerBase(std::string aCode,cDicoApt * aDico):rasterFiles(aDico->File(aCode),aCode),mDico(aDico),mExpert(0){
     //std::cout << "layerBase constructor " << std::endl;
     mNom=mDico->RasterNom(mCode);
+    mNomCourt=mDico->RasterNomCourt(mCode);
     mExpert=mDico->RasterExpert(mCode);
     mTypeCarte =str2TypeCarte(mDico->RasterType(mCode));
     mTypeVar =str2TypeVar(mDico->RasterVar(mCode));
@@ -84,6 +85,7 @@ layerBase::layerBase(std::shared_ptr<layerBase> aLB):rasterFiles(aLB->Dico()->Fi
     mDico=aLB->Dico();
     mExpert=aLB->Expert();
     mNom=aLB->Nom();
+    mNomCourt=aLB->NomCourt();
     mTypeCarte =aLB->TypeCart();
     mTypeVar =aLB->getTypeVar();
     mType=aLB->getCatLayer();

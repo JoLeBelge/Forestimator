@@ -45,14 +45,15 @@ presentationPage::presentationPage(cDicoApt *aDico):mDico(aDico)
     std::unique_ptr<Wt::WMenuItem> item2 = std::make_unique<Wt::WMenuItem>("Crédit et contact", cpp14::make_unique<Wt::WText>(WString::tr("page_presentation.credit")));
     subMenu_->addItem(std::move(item2));
 
-
-
     for( auto kv : *mDico->layerMTD()){
         LayerMTD lMTD=kv.second;
         //std::cout << "ajout lMTD dans sous menu présentation " << lMTD.Nom() << std::endl;
         std::unique_ptr<Wt::WMenuItem> item = std::make_unique<Wt::WMenuItem>(lMTD.Label(), cpp14::make_unique<Wt::WText>(getHtml(&lMTD)));
         subMenu_->addItem(std::move(item));
     }
+
+    std::unique_ptr<Wt::WMenuItem> item3 = std::make_unique<Wt::WMenuItem>("Forestimator API", cpp14::make_unique<Wt::WText>(WString::tr("docu.api")));
+    subMenu_->addItem(std::move(item3));
 
     hLayout->addWidget(std::move(subMenu));
     hLayout->addWidget(std::move(subStack),1);

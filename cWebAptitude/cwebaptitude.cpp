@@ -49,13 +49,13 @@ cWebAptitude::cWebAptitude(AuthApplication *app, Auth::AuthWidget* authWidget_)
     container_home->addNew<Wt::WText>("<h1 style='color:white;height: 37px;font-size: 3em;max-width: 1000px;text-align: center;'>Forestimator</h1>");
     container_home->decorationStyle().setBackgroundImage(Wt::WLink("resources/DJI_0497_3.png"), None);
     // add menu as push buttons!
-    Wt::WPushButton *b_pres  = container_home->addWidget(Wt::cpp14::make_unique<Wt::WPushButton>("Documentation"));
+    Wt::WPushButton *b_pres  = container_home->addWidget(Wt::cpp14::make_unique<Wt::WPushButton>(tr("menu.button.tooltip.doc")));
     container_home->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
-    Wt::WPushButton *b_carto = container_home->addWidget(Wt::cpp14::make_unique<Wt::WPushButton>("Cartographie"));
+    Wt::WPushButton *b_carto = container_home->addWidget(Wt::cpp14::make_unique<Wt::WPushButton>(tr("menu.button.tooltip.carto")));
     container_home->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
-    Wt::WPushButton *b_point = container_home->addWidget(Wt::cpp14::make_unique<Wt::WPushButton>("Info ponctuelle"));
+    Wt::WPushButton *b_point = container_home->addWidget(Wt::cpp14::make_unique<Wt::WPushButton>(tr("menu.button.tooltip.point")));
     container_home->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
-    Wt::WPushButton *b_anal  = container_home->addWidget(Wt::cpp14::make_unique<Wt::WPushButton>("Analyse"));
+    Wt::WPushButton *b_anal  = container_home->addWidget(Wt::cpp14::make_unique<Wt::WPushButton>(tr("menu.button.tooltip.surf")));
     container_home->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
     b_login  = container_home->addWidget(Wt::cpp14::make_unique<Wt::WPushButton>(m_app->isLoggedIn()?"Se déconnecter":"Se connecter"));
     container_home->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
@@ -143,25 +143,26 @@ cWebAptitude::cWebAptitude(AuthApplication *app, Auth::AuthWidget* authWidget_)
     WMenu * right_menu = navigation->addMenu(std::move(menu_), Wt::AlignmentFlag::Right);
     auto bh = right_menu->addItem("resources/purchasing_management_icon_149886.png","");
     bh->setLink(WLink(LinkType::InternalPath, "/home"));
-    bh->setToolTip("Accueil");
+    bh->setToolTip(tr("menu.button.tooltip.home"));
     mStackInfoPtr->menuitem_documentation = right_menu->addItem("resources/problem_analysis_icon_149897.png","");
     mStackInfoPtr->menuitem_documentation->setLink(WLink(LinkType::InternalPath, "/documentation"));
-    mStackInfoPtr->menuitem_documentation->setToolTip("Documentation");
+    mStackInfoPtr->menuitem_documentation->setToolTip(tr("menu.button.tooltip.doc"));
     mStackInfoPtr->menuitem_cartes = right_menu->addItem("resources/layers_filled_icon_149920.png","");
     mStackInfoPtr->menuitem_cartes->setLink(WLink(LinkType::InternalPath, "/cartographie"));
-    mStackInfoPtr->menuitem_cartes->setToolTip("Cartographie");
-    mStackInfoPtr->menuitem_simplepoint = right_menu->addItem("resources/process_icon_149895.png","");
+    mStackInfoPtr->menuitem_cartes->setToolTip(tr("menu.button.tooltip.carto"));
+    //mStackInfoPtr->menuitem_simplepoint = right_menu->addItem("resources/process_icon_149895.png","");
+    mStackInfoPtr->menuitem_simplepoint = right_menu->addItem("resources/position-logo.png","");
     mStackInfoPtr->menuitem_simplepoint->setLink(WLink(LinkType::InternalPath, "/point"));
-    mStackInfoPtr->menuitem_simplepoint->setToolTip("Info ponctuelle");
-    mStackInfoPtr->menuitem_analyse = right_menu->addItem("resources/data_analysis_icon_149953.png","");
+    mStackInfoPtr->menuitem_simplepoint->setToolTip(tr("menu.button.tooltip.point"));
+    //mStackInfoPtr->menuitem_analyse = right_menu->addItem("resources/data_analysis_icon_149953.png","");
+    mStackInfoPtr->menuitem_analyse = right_menu->addItem("resources/stat-logo.png","");
     mStackInfoPtr->menuitem_analyse->setLink(WLink(LinkType::InternalPath, "/analyse"));
-    mStackInfoPtr->menuitem_analyse->setToolTip("Analyse");
+    mStackInfoPtr->menuitem_analyse->setToolTip(tr("menu.button.tooltip.surf"));
     // pas encore implémenté
     /*right_menu->addItem("resources/configuration_center_icon_149956.png","")
             ->setLink(WLink(LinkType::InternalPath, "/parametres"));
             */
     
-
     mStackInfoPtr->mSimplepointW = mStackInfoPtr->stack_info->addWidget(cpp14::make_unique<WContainerWidget>()); // index 0
     mStackInfoPtr->mGroupLayerW  = mStackInfoPtr->stack_info->addWidget(cpp14::make_unique<WContainerWidget>()); // index 1
     mStackInfoPtr->mGroupLayerW->setStyleClass("content_GL");

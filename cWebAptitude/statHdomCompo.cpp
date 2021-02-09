@@ -1,4 +1,4 @@
-#include "lstatcontchart.h"
+#include "statHdomCompo.h"
 // hexagone ; apotheme et x qui sert pour les longeurs de d
 //hexagone de 0.1ha de surface, soit 17 mètre d'apotheme car Aire=1/2*périmetre*apotheme et p=((a/sqrt(3))x2 x6coté, donc a = sqrt(sqrt(3)/6  * aire) et aire = 1000m2, voir https://fr.wikihow.com/calculer-l%27aire-d%27un-hexagone
 double globa(17);
@@ -6,21 +6,15 @@ double globx=globa/std::sqrt(3);
 // distance du centre à un sommet
 double globd=2*globx;
 
-lStatContChart::lStatContChart(std::shared_ptr<Layer> aLay, OGRGeometry * poGeom, TypeStat aType):mLay(aLay),mGeom(poGeom),mType(aType)
+statHdom::statHdom(std::shared_ptr<layerBase> aLay, OGRGeometry * poGeom):mLay(aLay),mGeom(poGeom)
 {
-    std::cout << "lStatContChart::lStatContChart " << std::endl;
-    switch (mType) {
-    case TypeStat::HDOM:
-        predictHdom(); // va calculer mStat et mVaddPol qui sont les hexagones à dessiner sur l'image statique
-        mDistFrequ=computeDistrH();
-        break;
-    default:
-        break;
-    }
+    std::cout << "statHdom::statHdom" << std::endl;
+    predictHdom(); // va calculer mStat et mVaddPol qui sont les hexagones à dessiner sur l'image statique
+    mDistFrequ=computeDistrH();
 }
 
 // le probleme des map c'est qu'elles sont ordonnées automatiquement avec leur clé, je veux pas.
-std::vector<std::pair<std::string,double>> lStatContChart::computeDistrH(){
+std::vector<std::pair<std::string,double>> statHdom::computeDistrH(){
 
     std::vector<std::pair<std::string,double>> aRes;
     std::vector<double> seuilClasses{0,3,9,15,21,27,33,39,45,51};
@@ -118,7 +112,7 @@ std::vector<std::pair<std::string,double>> lStatContChart::computeDistrH(){
 }
 
 
-void lStatContChart::predictHdom(){
+void statHdom::predictHdom(){
     //std::cout << " predict Hdom depuis MNH2019" << std::endl;
     std::vector<double> aRes;
 
@@ -159,9 +153,12 @@ void lStatContChart::predictHdom(){
         int c(0);
         std::vector<int> toRm;
         for (OGRPolygon  * hex : mVaddPol){
-
             OGREnvelope ext;
             hex->getEnvelope(&ext);
+            // si j'utilise le centroide pour déterminer si mon pixel est dans l'hexagone ou pas, j'aurai certainement un gain de temps de calcul
+            // pas possible sur base d'une distance, raté...
+            //OGRPoint * centre;
+            //hex->Centroid(centre);
             char** papszArgv = nullptr;
             papszArgv = CSLAddString(papszArgv, "-projwin"); //Selects a subwindow from the source image for copying but with the corners given in georeferenced coordinate
             papszArgv = CSLAddString(papszArgv, std::to_string(ext.MinX).c_str());
@@ -198,7 +195,10 @@ void lStatContChart::predictHdom(){
                                 OGRPoint pt(ext.MinX+col*pixelWidth,ext.MaxY-row*pixelWidth);
                                 // check que le pixel est bien dans l'hexagone
                                 if ( pt.Intersect(hex)){
+                                //centre->Distance(pt)=<
                                     double aVal=scanline[ col ];
+
+                                    // H() c'est pour gain de 0.2
                                     aVHs.push_back(Dico()->H(aVal));
                                 }
                             }
@@ -240,14 +240,14 @@ void lStatContChart::predictHdom(){
     mStat=aRes;
 }
 
-bool lStatContChart::deserveChart(){
+bool statHdom::deserveChart(){
     bool aRes=mStat.size()>0;
     if (!aRes){ std::cout << "la couche " << mLay->getLegendLabel() << " ne mérite pas de graphique pour ses statistiques " << std::endl;}
     return aRes;
 }
 
-std::unique_ptr<WContainerWidget> lStatContChart::getResult(){
-    std::cout << "lStatContChart::getResult() " << std::endl;
+std::unique_ptr<WContainerWidget> statHdom::getResult(){
+    std::cout << "statHdom::getResult() " << std::endl;
     std::unique_ptr<WContainerWidget> aRes= std::make_unique<Wt::WContainerWidget>();
 
     aRes->setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Center);
@@ -263,11 +263,11 @@ std::unique_ptr<WContainerWidget> lStatContChart::getResult(){
 
     staticMap sm(mLay,mGeom);
     // dessine les géométrie supplémentaire si nécessaire // pour le moment uniquement hexagone de Hdom
-    //for (OGRPolygon pol : mVaddPol){
-    if (mVaddPol.size()>0){
+
+    if (mVaddPol.size()>0 & mVaddPol.size()<50){
         sm.addPols(mVaddPol, Wt::StandardColor::DarkBlue);
     }
-    //}
+
 
     Wt::WImage * im =layoutH->addWidget(cpp14::make_unique<Wt::WImage>(sm.getWLinkRel()),0);
     im->resize(350,350);
@@ -320,6 +320,7 @@ std::unique_ptr<WContainerWidget> lStatContChart::getResult(){
     return std::move(aRes);
     //std::cout << "lStatContChart::getResult() done" << std::endl;
 }
+
 
 // modèle de prédiction de hdom depuis MNH2019
 double predHdom(std::vector<double> aVHs){
@@ -427,7 +428,7 @@ std::vector<OGRPolygon *> hexGeombin(GDALDataset *mask){
 
 }
 
-cDicoApt * lStatContChart::Dico(){return mLay->Dico();}
+cDicoApt * statHdom::Dico(){return mLay->Dico();}
 
 /*
 OGRPoint * getCentroid(OGRPolygon * hex){
@@ -476,8 +477,9 @@ bool InsideHexagonB(float x0, float y0, float x, float y,float d)
     return true;
 }*/
 
-lStatCompoChart::lStatCompoChart(groupLayers * aGL, OGRGeometry * poGeom):mGeom(poGeom),mDico(aGL->Dico()){
-    for (std::shared_ptr<Layer> l:aGL->Layers()){
+statCompo::statCompo(cDicoApt * aDico, OGRGeometry * poGeom):mGeom(poGeom),mDico(aDico){
+    for (auto kv:mDico->VlayerBase()){
+        std::shared_ptr<layerBase> l=kv.second;
         // on reconnais que c'est une carte de composition avec la taille du code et son préfix compo
         if(l->Code().substr(0,5)=="COMPO" && l->Code().size()==6){
             mVLay.push_back(l);
@@ -485,9 +487,15 @@ lStatCompoChart::lStatCompoChart(groupLayers * aGL, OGRGeometry * poGeom):mGeom(
     }
 }
 
+statCompo::statCompo(std::vector<std::shared_ptr<layerBase>> VlayCompo, cDicoApt *aDico, OGRGeometry * poGeom):mGeom(poGeom),mDico(aDico){
+    for (std::shared_ptr<layerBase> l:VlayCompo){
+            mVLay.push_back(l);
+    }
+}
 
-std::unique_ptr<WContainerWidget> lStatCompoChart::getResult(){
-    std::cout << "lStatCompoChart::getResult() " << std::endl;
+
+std::unique_ptr<WContainerWidget> statCompo::getResult(){
+    std::cout << "statCompo::getResult() " << std::endl;
     std::unique_ptr<WContainerWidget> aRes= std::make_unique<Wt::WContainerWidget>();
 
     aRes->setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Center);
@@ -508,7 +516,7 @@ std::unique_ptr<WContainerWidget> lStatCompoChart::getResult(){
     table->elementAt(0,0)->addWidget(cpp14::make_unique<WText>(Wt::WString::tr("report.analyse.surf.compo.t")));
 
     int c(0);
-    for (std::shared_ptr<Layer> l:mVLay){
+    for (std::shared_ptr<layerBase> l:mVLay){
         c++;
         // je vais utiliser une autre fonction qui lit la couche all_sp qui sert de masque, pour gerer les nd des différentes cartes.
         // basicStat stat= l->computeBasicStatOnPolyg(mGeom);
@@ -520,8 +528,19 @@ std::unique_ptr<WContainerWidget> lStatCompoChart::getResult(){
     return std::move(aRes);
 }
 
+std::string statCompo::getAPIresult(){
+    std::string aRes("ess;prob\n");
+    for (std::shared_ptr<layerBase> l:mVLay){
+        // je vais utiliser une autre fonction qui lit la couche all_sp qui sert de masque, pour gerer les nd des différentes cartes.
+        //std::cout << " calcul stat compo pour " << l->getShortLabel() << std::endl;
+        basicStat stat=computeStatWithMasq(l,mGeom);
+        aRes+=l->getShortLabel()+";"+stat.getMean()+"%\n";
+    }
+    return aRes;
+}
+
 // j'ai fait cette méthode car le calcul des stat sur les cartes de présence nécessite de charger la carte all_sp qui sert de masque. Sans ce masque je ne sais pas si j'ai 0 pour une ess car prob présence =0 ou si c'est un no data
-basicStat lStatCompoChart::computeStatWithMasq(std::shared_ptr<Layer> aLay, OGRGeometry * poGeom){
+basicStat statCompo::computeStatWithMasq(std::shared_ptr<layerBase> aLay, OGRGeometry * poGeom){
     std::map<double,int> aMapValandFrequ;
     for (auto &kv : aLay->getDicoVal()){
         try {

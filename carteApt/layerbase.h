@@ -32,7 +32,7 @@ class layerBase;
 class layerStat;
 
 // ça c'était utilisé pour le calcul des carte apt, des tuiles et du code mapserveur
-enum TypeCarte {Apt, Potentiel, Station1, Habitats,NH,NT,Topo,AE,SS,ZBIO,CSArdenne,CSLorraine,MNH2019,Composition,MNT16b};
+enum TypeCarte {Apt, Potentiel, Station1, Habitats,NH,NT,Topo,AE,SS,ZBIO,CSArdenne,CSLorraine,MNH,Composition,MNT16b};
 
 
 
@@ -149,10 +149,11 @@ public:
 
     std::string NomFile(); // nom du fichier tiff sans l'extension
     std::string NomFileWithExt();
-    // provisoirement, le nom = le label = le short label
+
     std::string Nom(){return mNom;}
+    std::string NomCourt(){return mNomCourt;}
     std::string getLegendLabel(bool escapeChar=true) const;
-    std::string getShortLabel() const {return mNom;}
+    std::string getShortLabel() const {return mNomCourt;}
 
     TypeCarte TypeCart(){return mTypeCarte;}
     std::map<int, std::string> getDicoVal(){return mDicoVal;}
@@ -161,7 +162,18 @@ public:
     TypeVar getTypeVar() const{return mTypeVar;}
     TypeLayer getCatLayer() const{return mType;}
     bool Expert() const{return mExpert;}
-    void catSummary(){std::cout << "RasterInfo ; Code " << mCode << " , Nom " << mNom << ", raser " << mPathRaster << ", dictionnaire valeurs de " << mDicoVal.size() << " elements " << std::endl;}
+    void catSummary(){std::cout << "layerbase ; Code " << mCode << " , Nom " << mNom << ", raser " << mPathRaster << ", dictionnaire valeurs de " << mDicoVal.size() << " elements " << std::endl;}
+
+    std::string EssCode() const{std::string aRes="";
+                                   if (mType==TypeLayer::CS |mType==TypeLayer::FEE){aRes=mCode.substr(0,2);}
+                                   return aRes;}
+    std::string getCatLayerStr() const{std::string aRes("");
+      if (mType==TypeLayer::KK){aRes="KK";}
+      if (mType==TypeLayer::Station){aRes="Station";}
+      if (mType==TypeLayer::Externe){aRes="Externe";}
+      if (mType==TypeLayer::FEE){aRes="FEE";}
+      if (mType==TypeLayer::CS){aRes="CS";}
+        return aRes;}
 
     // stat sur un polygone ; deux retour possible, une map avec clé = valeur raster, une map avec clé = signification string
     // clé ; signification du code raster. Val ; nombre d'occurence
@@ -198,7 +210,7 @@ protected:
     TypeVar mTypeVar; // var continue ou discontinue, pour le calcul de statistique
     TypeLayer mType;
     cDicoApt * mDico;
-    std::string mNom;
+    std::string mNom,mNomCourt;
     // le dictionnaire des valeurs raster vers leur signification.
     std::map<int, std::string> mDicoVal;
 

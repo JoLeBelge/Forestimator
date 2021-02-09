@@ -218,7 +218,8 @@ void groupLayers::clickOnName(std::string aCode, TypeLayer type){
     mParent->doJavaScript("overlay.setVisible(0);");
 
     // changer le mode CS vs FEE de grouplayer, utilise pour le tableau d'aptitude
-    if (type == TypeLayer::CS | type == TypeLayer::KK | aCode.substr(0,2)=="CS"){ mTypeClassifST=TypeClassifST::CS;} else
+    // attention de ne pas prendre la couche "CS_FEE" dans le tas..
+    if (type == TypeLayer::CS | type == TypeLayer::KK | (type == TypeLayer::Station & aCode.substr(0,2)=="CS")){ mTypeClassifST=TypeClassifST::CS;} else
     { mTypeClassifST=TypeClassifST::FEE;}
 
     // ajouter la couche à la carte
@@ -300,10 +301,10 @@ void groupLayers::extractInfo(double x, double y){
 
 void groupLayers::computeStatGlob(OGRGeometry *poGeomGlobale){
     std::cout << " groupLayers::computeStatGlob " << std::endl;
-    /*char * test;
+    char * test;
     poGeomGlobale->exportToWkt(&test);
-    std::cout << " geometrie geojson :" << test << std::endl;
-    */
+    std::cout << " geometrie WKT :" << test << std::endl;
+
     clearStat();
 
     // pour les statistiques globales, on prend toutes les couches selectionnées par select4Download
@@ -311,11 +312,11 @@ void groupLayers::computeStatGlob(OGRGeometry *poGeomGlobale){
 
         if (l->Code()=="MNH2019"){
             // calcul de Hdom
-           mVLStatCont.push_back(new lStatContChart(l,poGeomGlobale,TypeStat::HDOM));
+           mVLStatCont.push_back(new statHdom(l,poGeomGlobale));
 
         } else if(l->Code()=="COMPO"){
             // calcul des probabilités de présence pour les 9 sp.
-            mCompo = std::make_unique<lStatCompoChart>(this,poGeomGlobale);
+            mCompo = std::make_unique<statCompo>(mDico,poGeomGlobale);
         } else {
 
             if (l->l4Stat()){

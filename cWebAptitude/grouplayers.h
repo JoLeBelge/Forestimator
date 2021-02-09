@@ -28,7 +28,7 @@
 #include <string.h>
 #include "auth.h"
 #include "selectlayers.h"
-#include "lstatcontchart.h"
+#include "statHdomCompo.h"
 
 class WOpenLayers;
 class Layer;
@@ -36,14 +36,14 @@ class groupLayers;
 class simplepoint;
 class ST;
 class layerStatChart;
-class lStatContChart;
-class lStatCompoChart;
+class statHdom;
+class statCompo;
 class rasterFiles;
 class baseSelectLayers;
 class selectLayers4Stat;
 class selectLayers;
 class stackInfoPtr;
-
+class AuthApplication;
 class groupStat;
 
 enum TypeClassifST {FEE
@@ -69,13 +69,13 @@ public:
     groupStat(){}
     ~groupStat(){clearStat();}
     std::vector<layerStatChart*> ptrVLStat() {return mVLStat;}
-    std::vector<lStatContChart*> ptrVLStatCont() {return mVLStatCont;}
-    std::unique_ptr<lStatCompoChart> mCompo;
+    std::vector<statHdom*> ptrVLStatCont() {return mVLStatCont;}
+    std::unique_ptr<statCompo> mCompo;
 protected:
     // un vecteur pour les statistique des cartes variables de classes (majoritaire)
     std::vector<layerStatChart*> mVLStat;
     // un autre pour les statistique des cartes variables continu (à commencer à MNH)
-    std::vector<lStatContChart*> mVLStatCont;
+    std::vector<statHdom*> mVLStatCont;
 
 
     void clearStat(){
