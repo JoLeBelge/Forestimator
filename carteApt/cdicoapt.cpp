@@ -103,7 +103,7 @@ cDicoApt::cDicoApt(std::string aBDFile):mBDpath(aBDFile),ptDb_(NULL)
             if (s=="lisein"){
                 SQLstring="SELECT Code,Dir2,Nom,Type,NomComplet,Categorie,TypeVar, expert, visu, stat,NomCourt FROM "+table+";";
             } else {
-                SQLstring="SELECT Code,Dir,Nom,Type,NomComplet,Categorie,TypeVar, expert, visu, stat FROM,NomCourt "+table+";";
+                SQLstring="SELECT Code,Dir,Nom,Type,NomComplet,Categorie,TypeVar, expert, visu, stat ,NomCourt FROM "+table+";";
             }
             //std::cout << SQLstring << std::endl;
 
@@ -394,8 +394,8 @@ cDicoApt::cDicoApt(std::string aBDFile):mBDpath(aBDFile),ptDb_(NULL)
     }
 
     std::cout << "done " << std::endl;
-    std::cout << "Dico code essence --> nom essence francais a "<< Dico_codeEs2NomFR.size() << " elements \n" << std::endl;
-    std::cout << "Dico code essence --> nom essence francais a "<< Dico_GISfile.size() << " elements \n" << std::endl;
+    //std::cout << "Dico code essence --> nom essence francais a "<< Dico_codeEs2NomFR.size() << " elements \n" << std::endl;
+    std::cout << "Dico gis file a "<< Dico_GISfile.size() << " elements \n" << std::endl;
 }
 
 std::map<int,std::map<std::string,int>> cDicoApt::getFEEApt(std::string aCodeEs){
