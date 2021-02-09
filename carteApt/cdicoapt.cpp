@@ -395,6 +395,7 @@ cDicoApt::cDicoApt(std::string aBDFile):mBDpath(aBDFile),ptDb_(NULL)
 
     std::cout << "done " << std::endl;
     std::cout << "Dico code essence --> nom essence francais a "<< Dico_codeEs2NomFR.size() << " elements \n" << std::endl;
+    std::cout << "Dico code essence --> nom essence francais a "<< Dico_GISfile.size() << " elements \n" << std::endl;
 }
 
 std::map<int,std::map<std::string,int>> cDicoApt::getFEEApt(std::string aCodeEs){
