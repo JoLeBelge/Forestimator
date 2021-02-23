@@ -63,15 +63,16 @@
 		  -->
 		<log-config>-info -debug</log-config>
 
+		<head-matter>
+			<!--<meta name="robots" content="all" /> -->
+			<!--<meta name="viewport" content="width=device-width, initial-scale=1"/> -->
+		</head-matter> 
 		
+		<!--<max-memory-request-size>5000</max-memory-request-size>-->
 	</application-settings>
 
-	<head-matter>
-		<meta name="viewport" content="width=device-width, initial-scale=1"/> 
-	</head-matter> 
 
 
-  <!--<max-memory-request-size>5000</max-memory-request-size>-->
  </server>
 
 

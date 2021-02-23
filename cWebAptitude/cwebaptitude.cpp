@@ -224,37 +224,44 @@ void cWebAptitude::handlePathChange()
         mStackInfoPtr->menuitem_documentation->select();
         sub_stack->setCurrentIndex(1);
         navigation->setTitle(tr("titre.presentation"));
+        m_app->addMetaHeader("description", tr("desc.pres"), "fr");
     }else if (m_app->internalPath() == "/home"){
         top_stack->setCurrentIndex(0);
+        m_app->addMetaHeader("description", tr("desc.home"), "fr");
     }else if (m_app->internalPath() == "/cartographie"){
         top_stack->setCurrentIndex(1);
         mStackInfoPtr->stack_info->setCurrentIndex(1);
         mStackInfoPtr->menuitem_cartes->select();
         sub_stack->setCurrentIndex(0);
         navigation->setTitle(tr("titre.carto"));
+        m_app->addMetaHeader("description", tr("desc.carto"), "fr");
     }else if (m_app->internalPath() == "/analyse"){
         top_stack->setCurrentIndex(1);
         mStackInfoPtr->stack_info->setCurrentIndex(2);
         mStackInfoPtr->menuitem_analyse->select();
         sub_stack->setCurrentIndex(0);
         navigation->setTitle(tr("titre.ana.surf"));
+        m_app->addMetaHeader("description", tr("desc.surf"), "fr");
     }else if (m_app->internalPath() == "/point"){
         top_stack->setCurrentIndex(1);
         mStackInfoPtr->stack_info->setCurrentIndex(0);
         mStackInfoPtr->menuitem_simplepoint->select();
         sub_stack->setCurrentIndex(0);
         navigation->setTitle(tr("titre.ana.point"));
+        m_app->addMetaHeader("description", tr("desc.point"), "fr");
     }else if (m_app->internalPath() == "/resultat"){
         top_stack->setCurrentIndex(1);
         sub_stack->setCurrentIndex(2);
     }else if (m_app->internalPath() == "/parametres"){
         m_app->doJavaScript("alert('Pas encore implémenté...')");
     }else if (m_app->internalPath() == "/"){
-        // do nothing
+        m_app->addMetaHeader("description", tr("desc.home"), "fr");
     }else{
         std::cout << "m_app->internalPath() " << m_app->internalPath() << std::endl;
         std::cout << "internal path pas geré dans le handler " << m_app->internalPath() << std::endl;
     }
+    //m_app->removeMetaHeader(Wt::MetaHeaderType::Meta, "robots");
+    //m_app->addMetaHeader("robots", "index, follow", "fr");
 
     // TODO css min-size [menu_analyse] display:none if width<900
     // TODO css @media-width<1200 -> map 60%  @media-width<900 -> [div stack] display:blocks et overflow:auto [map] width:90%  [linfo] min-height: 600px;
