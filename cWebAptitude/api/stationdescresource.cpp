@@ -115,8 +115,8 @@ OGRGeometry * stationDescResource::checkPolyg(std::string aPolyg){
     //bool aRes(0);
     OGRGeometry * pol=NULL;
     // lecture du polygone
-    OGRSpatialReference src;
-    /*src.importFromWkt()
+    /*OGRSpatialReference src;
+    src.importFromWkt()
      OGRErr err=src.SetWellKnownGeogCS( "EPSG:31370" );
      std::cout << "OGR error setwellKnownGeog : " << err << std::endl; // failure! je sais pas pk
     */

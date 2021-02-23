@@ -335,18 +335,6 @@ GDALDataset * rasterFiles::rasterizeGeom(OGRGeometry *poGeom){
     GDALDriver *pDriver;
     GDALDataset *pRaster=NULL, * pShp;
 
-    //if (mType!=TypeLayer::Externe){
-    // driver et dataset shp -- creation depuis la géométrie
-    GDALDriver *pShpDriver = GetGDALDriverManager()->GetDriverByName("ESRI Shapefile");
-    pShp = pShpDriver->Create("/vsimem/blahblah.shp", 0, 0, 0, GDT_Unknown, NULL );
-    // he bien c'est le comble, sur le serveur j'arrive à avoir le comportement adéquat si JE NE MET PAS de src. j'ai des warnings mais tout vas mieux!!
-    OGRLayer * lay = pShp->CreateLayer("toto",nullptr,wkbPolygon,NULL);
-
-    OGRFeature * feat = new OGRFeature(lay->GetLayerDefn());
-    feat->SetGeometry(poGeom);
-
-    lay->CreateFeature(feat);
-    delete feat;
     const char *pszFormat = "MEM";
     // sauver le masque pour vérification
     //const char *pszFormat = "GTiff";
@@ -362,10 +350,27 @@ GDALDataset * rasterFiles::rasterizeGeom(OGRGeometry *poGeom){
         double width((ext.MaxX-ext.MinX)), height((ext.MaxY-ext.MinY));
 
         GDALDataset * mGDALDat = (GDALDataset *) GDALOpen( getPathTif().c_str(), GA_ReadOnly );
+
         if( mGDALDat == NULL )
         {
             std::cout << "je n'ai pas lu l'image " << getPathTif() << std::endl;
         } else {
+            const char *pszWkt = mGDALDat->GetProjectionRef();
+            OGRSpatialReference oSRS;
+            oSRS.importFromWkt(&pszWkt);
+
+            // driver et dataset shp -- creation depuis la géométrie
+            GDALDriver *pShpDriver = GetGDALDriverManager()->GetDriverByName("ESRI Shapefile");
+            pShp = pShpDriver->Create("/vsimem/blahblah.shp", 0, 0, 0, GDT_Unknown, NULL );
+            // he bien c'est le comble, sur le serveur j'arrive à avoir le comportement adéquat si JE NE MET PAS de src. j'ai des warnings mais tout vas mieux!!
+            //mais c'est parceque avant j'utilisais  OGRErr err=src.SetWellKnownGeogCS( "EPSG:31370" );
+            OGRLayer * lay = pShp->CreateLayer("toto",&oSRS,wkbPolygon,NULL);
+
+            OGRFeature * feat = new OGRFeature(lay->GetLayerDefn());
+            feat->SetGeometry(poGeom);
+            lay->CreateFeature(feat);
+            delete feat;
+
             double transform[6];
             mGDALDat->GetGeoTransform(transform);
 
@@ -868,4 +873,77 @@ std::string getAbbreviation(std::string str)
     }
     //aRes=removeAccents(aRes);
     return aRes;
+}
+
+GDALDataset * rasterizeGeom(OGRGeometry *poGeom, GDALDataset * aGDALDat){
+    //std::string output("/vsimem/tmp.tif");
+    std::string output("/home/lisein/Documents/tmp.tif");
+
+    const char *out=output.c_str();
+    GDALDriver *pDriver;
+    GDALDataset *pRaster=NULL, * pShp;
+
+    //const char *pszFormat = "MEM";
+    // sauver le masque pour vérification
+    const char *pszFormat = "GTiff";
+
+    pDriver = GetGDALDriverManager()->GetDriverByName(pszFormat);
+    if( pDriver == NULL )
+    {
+        printf( "%s driver not available.\n", pszFormat );
+    } else {
+
+        OGREnvelope ext;
+        poGeom->getEnvelope(&ext);
+        double width((ext.MaxX-ext.MinX)), height((ext.MaxY-ext.MinY));
+
+        if( aGDALDat == NULL )
+        {
+            std::cout << "rasterizeGeom ; on m'as donnée un pointeur GDALDataset qui est nul" << std::endl;
+        } else {
+            const char *pszWkt = aGDALDat->GetProjectionRef();
+            OGRSpatialReference oSRS;
+            oSRS.importFromWkt(&pszWkt);
+            // driver et dataset shp -- creation depuis la géométrie
+            GDALDriver *pShpDriver = GetGDALDriverManager()->GetDriverByName("ESRI Shapefile");
+            pShp = pShpDriver->Create("/vsimem/blahblah.shp", 0, 0, 0, GDT_Unknown, NULL );
+             OGRLayer * lay = pShp->CreateLayer("toto",&oSRS,wkbPolygon,NULL);
+            OGRFeature * feat = new OGRFeature(lay->GetLayerDefn());
+            feat->SetGeometry(poGeom);
+
+            lay->CreateFeature(feat);
+            delete feat;
+
+
+
+            double transform[6];
+            aGDALDat->GetGeoTransform(transform);
+
+            double pixelWidth = transform[1];
+            double pixelHeight = -transform[5];
+            //determine dimensions of the tile
+            int xSize = round(width/pixelWidth);
+            int ySize = round(height/pixelHeight);
+
+            double tr2[6];
+            tr2[0]=ext.MinX;
+            tr2[3]=ext.MaxY;
+            tr2[1]=transform[1];
+            tr2[2]=transform[2];
+            tr2[4]=transform[4];
+            tr2[5]=transform[5];
+            // création du raster en mémoire - on dois lui donner un out mais il ne l'utile pas car MEM driver
+
+            pRaster = pDriver->Create(out, xSize, ySize, 1, GDT_Byte,NULL);
+            pRaster->SetGeoTransform(tr2);
+
+            // on en avait besoin que pour l'extent et resol
+            pRaster->SetProjection(aGDALDat->GetProjectionRef());
+            //GDALClose(aGDALDat);
+            GDALRasterize(NULL,pRaster,pShp,NULL,NULL);
+        }
+    }
+    GDALClose(pShp);
+    //}
+    return pRaster;
 }

@@ -147,18 +147,17 @@ void statHdom::predictHdom(){
         std::cout << "je n'ai pas lu l'image " <<  mLay->getPathTif() << std::endl;
     } else {
 
-        double transform[6];
-        DS->GetGeoTransform(transform);
+        //double transform[6];
+        //DS->GetGeoTransform(transform);
 
         int c(0);
         std::vector<int> toRm;
+        GDALDataset * maskHex;
+        float *scanline, *scanlineMask,*scanlineMaskHex;
+
         for (OGRPolygon  * hex : mVaddPol){
             OGREnvelope ext;
             hex->getEnvelope(&ext);
-            // si j'utilise le centroide pour déterminer si mon pixel est dans l'hexagone ou pas, j'aurai certainement un gain de temps de calcul
-            // pas possible sur base d'une distance, raté...
-            //OGRPoint * centre;
-            //hex->Centroid(centre);
             char** papszArgv = nullptr;
             papszArgv = CSLAddString(papszArgv, "-projwin"); //Selects a subwindow from the source image for copying but with the corners given in georeferenced coordinate
             papszArgv = CSLAddString(papszArgv, std::to_string(ext.MinX).c_str());
@@ -175,11 +174,22 @@ void statHdom::predictHdom(){
                     // j'ai toujours 2 raster a ouvrir conjointement
                     GDALDataset * MNH= GDALDataset::FromHandle(DSmnhCrop);
                     GDALDataset * MaskCrop= GDALDataset::FromHandle(DSMaskCrop);
-                    float *scanline, *scanlineMask;
+
                     int xSize=MNH->GetRasterBand(1)->GetXSize();
                     int ySize=MNH->GetRasterBand(1)->GetYSize();
+                    //std::cout << " mnh masqué dimension :" << xSize << "," << ySize << std::endl;
+
+                    if (c==0){
+                         // création d'un masque raster qui sera utilisé pour tout les hexagones pour déterminer les pixels dedans et dehors.
+                         // Ca sera toujours plus rapide que l'intersect de OGR
+                        //std::cout << " mnh masqué dimension :" << xSize << "," << ySize << std::endl;
+                         maskHex =  rasterizeGeom(hex, MNH);
+                    }
+                    //std::cout << " mnh masqué dimension :" << xSize << "," << ySize << std::endl;
+
                     scanline = (float *) CPLMalloc( sizeof( float ) * xSize );
                     scanlineMask = (float *) CPLMalloc( sizeof( float ) * xSize );
+                    scanlineMaskHex = (float *) CPLMalloc( sizeof( float ) * xSize );
                     std::vector<double> aVHs;
                     // boucle sur chaque ligne
                     for ( int row = 0; row < ySize; row++ )
@@ -188,24 +198,26 @@ void statHdom::predictHdom(){
                         MNH->GetRasterBand(1)->RasterIO( GF_Read, 0, row, xSize, 1, scanline, xSize,1, GDT_Float32, 0, 0 );
                         // lecture du masque
                         MaskCrop->GetRasterBand(1)->RasterIO( GF_Read, 0, row, xSize, 1, scanlineMask, xSize,1, GDT_Float32, 0, 0 );
+                        maskHex->GetRasterBand(1)->RasterIO( GF_Read, 0, row, xSize, 1, scanlineMaskHex, xSize,1, GDT_Float32, 0, 0 );
                         // boucle sur scanline et garder les pixels qui sont dans le polygone
                         for (int col = 0; col <  xSize; col++)
                         {
-                            if (scanlineMask[col]==255){
-                                OGRPoint pt(ext.MinX+col*pixelWidth,ext.MaxY-row*pixelWidth);
+                            if (scanlineMask[col]==255 && scanlineMaskHex[col]==255){
+                                //OGRPoint pt(ext.MinX+col*pixelWidth,ext.MaxY-row*pixelWidth);
                                 // check que le pixel est bien dans l'hexagone
-                                if ( pt.Intersect(hex)){
+                                //if ( pt.Intersect(hex)){
                                 //centre->Distance(pt)=<
                                     double aVal=scanline[ col ];
 
                                     // H() c'est pour gain de 0.2
                                     aVHs.push_back(Dico()->H(aVal));
-                                }
+                                //}
                             }
                         }
                     }
                     CPLFree(scanline);
                     CPLFree(scanlineMask);
+                    CPLFree(scanlineMaskHex);
                     GDALClose(MNH);
                     GDALClose(MaskCrop);
 
@@ -227,6 +239,9 @@ void statHdom::predictHdom(){
             // hexagone suivant
             c++;
         }
+        GDALClose(maskHex);
+        GDALClose(DS);
+        GDALClose(mask);
         // trié en sens décroissant pour retirer les hexagones les plus loin dans le vecteur sans changer la positions des autres elem à retirer
         std::sort(toRm.begin(), toRm.end(), std::greater<>());
         for (int i:toRm){
@@ -234,8 +249,7 @@ void statHdom::predictHdom(){
             OGRGeometryFactory::destroyGeometry(mVaddPol.at(i));
             mVaddPol.erase(mVaddPol.begin() + i);
         }
-        GDALClose(DS);
-        GDALClose(mask);
+
     }
     mStat=aRes;
 }

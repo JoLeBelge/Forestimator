@@ -12,6 +12,8 @@
 
 
 std::string getAbbreviation(std::string str);
+
+GDALDataset * rasterizeGeom(OGRGeometry *poGeom, GDALDataset * aGDALDat);
 // dans Forestimator, un gros problème, c'est le fait que j'ai ma classe layer qui soiet strictement liée à Wt et à Forestimator (via grouplayer)
 // J'aurai du avoir une classe mère qui soie indépendante de Wt et me permette de faire des stats sur des cartes, exactement comme j'en ai besoin maintenant pour stationDescriptor
 // je tente donc de faire ça en repartant de cRasterInfo qui était un bon début
