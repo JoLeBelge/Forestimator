@@ -321,12 +321,13 @@ Cette application web de cartographie permet une visualisation des informations 
  
     <p>
 
-<div style="margin:auto;">
-	<input id="toggle1" class="unfolder" type="checkbox"/>
+<div style="margin:auto;"><p style="margin: 15px;">
+	<!--<input id="toggle1" class="unfolder" type="checkbox"/>-->
 	<label for="toggle1" class="toggle-label">
-		<span class="unfold-icon"></span><span class="fold-icon"></span>Page Cartographie : Visualisation et téléchargement  <span class="unfold-icon"></span><span class="fold-icon"></span>
+		<!--<span class="unfold-icon"></span><span class="fold-icon"></span>-->Page Cartographie : Visualisation et téléchargement  <!--<span class="unfold-icon"></span><span class="fold-icon"></span>-->
 	</label>
-	<div id="part1" class="fold">
+	</p>
+	<div id="part1" class="unfold">
 		<h5>Visualiser une carte</h5>
 		Le choix de la carte à afficher s'effectue en cliquant sur son nom dans l'encart de droite de la page "cartographie". La légende (signification des couleurs) est consultable en cochant la case à cocher en haut de cet encadré, mais à tout moment, un double click sur une position en particulier de la carte ouvre une fenêtre qui renseigne la signification de la carte pour cet endroit donné. 
 		<div>
@@ -342,12 +343,12 @@ Cette application web de cartographie permet une visualisation des informations 
 	</div>
 </div>
 
-<div style="margin:auto;">
-	<input id="toggle2" class="unfolder" type="checkbox"/>
+<div style="margin:auto;"><p style="margin: 15px;">
+	<!--<input id="toggle2" class="unfolder" type="checkbox"/>-->
 	<label for="toggle2" class="toggle-label">
-		<span class="unfold-icon"></span><span class="fold-icon"></span>Page info ponctuelle : description d'une station  <span class="unfold-icon"></span><span class="fold-icon"></span>
-	</label>
-	<div id="part2" class="fold">
+		<!--<span class="unfold-icon"></span><span class="fold-icon"></span>-->Page info ponctuelle : description d'une station  <!--<span class="unfold-icon"></span><span class="fold-icon"></span>-->
+	</label></p>
+	<div id="part2" class="unfold">
 		C'est bien là que se situe tout l'intérêt des outils de consultation des informations cartographiques utiles aux forestiers ; <b>disposer en un (double) click de la description synthétique d'une station et du peuplement en place</b>. 
 		Ainsi, un double click sur une position de la carte va permettre l'affichage, dans la page d'info ponctuelle, de la carte d'indentité de cette station.
 		Premièrement, le tableau d'aptitude pour cette station est présenté. Les essences sont représentées par leur accronymes et sont classées dans 4 colonnes qui correspondent aux 4 aptitudes ; optimum (en vert foncé), tolérance (en vert clair), tolérance élargie (en orange) et exclusion (en rouge).
@@ -373,12 +374,12 @@ Cette application web de cartographie permet une visualisation des informations 
 	</div>
 </div>
 
-<div style="margin:auto;">
-	<input id="toggle3" class="unfolder" type="checkbox"/>
+<div style="margin:auto;"><p style="margin: 15px;">
+<!--	<input id="toggle3" class="unfolder" type="checkbox"/>-->
 	<label for="toggle3" class="toggle-label">
-		<span class="unfold-icon"></span><span class="fold-icon"></span>Page Analyse Surfacique : statistique sur une surface d'intérêt  <span class="unfold-icon"></span><span class="fold-icon"></span>
-	</label>
-	<div id="part3" class="fold">
+		<!--<span class="unfold-icon"></span><span class="fold-icon"></span>-->Page Analyse Surfacique : statistique sur une surface d'intérêt  <!--<span class="unfold-icon"></span><span class="fold-icon"></span>-->
+	</label></p>
+	<div id="part3" class="unfold">
 		La description d'une station sous forme de position ponctuelle suit une méthodologie relativement directe, dans la mesure ou les caractéristiques sont lues sur chacunes des cartes pour cette position donnée. Par contre, un aménagiste qui souhaite obtenir une synthèse des caractéristiques stationnelles et des peuplements en place pour une surface donnée, représentant tantôt une parcelle, tantôt un massif dans son ensemble, dois passer par une phase de calcul des statistiques pour cette surface. Des outils d'analyses sont implémentés dans Forestimator et permettent de répondre aux besoins les plus récurrents des cartographes forestiers.
 
 		<h3>Importer un shapefile</h3>
