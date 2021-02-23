@@ -594,7 +594,11 @@ detAptFEE
 <message id="menu.button.tooltip.point">Info ponctuelle</message>
 <message id="menu.button.tooltip.surf">Analyse surfacique</message>
 
-
+<message id="desc.home">Forestimator: outils cartographiques pour la gestion des forêts Wallonnes</message>
+<message id="desc.pres">Présentation et explication des fonctionnalités du site web</message>
+<message id="desc.surf">Analyse Surfacique : statistique sur une surface d'intérêt</message>
+<message id="desc.point">Info ponctuelle : description d'une station</message>
+<message id="desc.carto">Cartographie : Visualisation et téléchargement</message>
 
 
 </messages>
