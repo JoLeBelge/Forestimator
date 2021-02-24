@@ -92,30 +92,61 @@ bool parcellaire::to31370AndGeoJson(){
     std::string input(mFullPath+ ".shp");
     const char *inputPath=input.c_str();
     // 0) suppression des polygones foireux - radical mais c'est l'utilisateur qui doit gérer ses propres merdes
+
+    bool testEPSG(1);
     GDALDataset * DS =  (GDALDataset*) GDALOpenEx( inputPath, GDAL_OF_VECTOR | GDAL_OF_UPDATE, NULL, NULL, NULL );
     if( DS != NULL )
     {
+
+        //const char *pszWkt=DS->GetProjectionRef();
+        //OGRSpatialReference oSRS;
+        //oSRS.importFromWkt(&pszWkt);
+        //const char *targetEPSG=oSRS.GetAuthorityCode("GEOGCS");
+        //std::cout << "targetEPSG : " << targetEPSG << std::endl;
+
         OGRLayer * lay = DS->GetLayer(0);
+        OGRSpatialReference * oSRS=lay->GetSpatialRef();
+        int EPSG =  oSRS->GetEPSGGeogCS();
+        std::cout << "EPSG : " << EPSG << std::endl;
+        if (EPSG==-1){testEPSG=0;}
         OGRFeature *poFeature;
         OGRGeometry * poGeom;
 
         while( (poFeature = lay->GetNextFeature()) != NULL )
         {
-                poGeom=poFeature->GetGeometryRef();
-                if (poGeom->IsValid()!=1) { std::cout << "géométrie feature " << poFeature->GetFID() << " is invalid" << std::endl;
+            poGeom=poFeature->GetGeometryRef();
+            if (poGeom->IsValid()!=1) { std::cout << "géométrie feature " << poFeature->GetFID() << " is invalid" << std::endl;
                 //OGRFeature::DestroyFeature(poFeature);
                 lay->DeleteFeature(poFeature->GetFID());
-                }
+            }
         }
 
     }
     GDALClose(DS);
 
+    // check le code EPSG - sur serveur j'ai un probleme avec les couche qui sont en user Defined scr 100036, la reprojection en BL72 me met le shp en décalage de 100 m
     // ouverture en update mode pour pouvoir projeter en bl72
     GDALDatasetH hSrcDS  = GDALOpenEx( inputPath, GDAL_OF_VECTOR | GDAL_OF_READONLY, NULL, NULL, NULL );
+
     char** papszArgv = nullptr;
-    //papszArgv = CSLAddString(papszArgv, "-a_srs"); // target src without reprojection
-    papszArgv = CSLAddString(papszArgv, "-t_srs"); // target src with reprojection
+    if (!testEPSG){papszArgv = CSLAddString(papszArgv, "-a_srs"); // target src without reprojection
+
+        auto messageBox =
+                addChild(Wt::cpp14::make_unique<Wt::WMessageBox>(
+                             "Système de projection",
+                             "Le système de projection de votre shapefile ne semble pas être le BL72. Vérifiez visuellement que la reprojection de votre shapefile a fonctionné correctement."
+                             ,
+                             Wt::Icon::Warning,
+                             Wt::StandardButton::Ok));
+
+        messageBox->setModal(true);
+        messageBox->buttonClicked().connect([=] {
+            removeChild(messageBox);
+        });
+        messageBox->show();
+    }else{
+        papszArgv = CSLAddString(papszArgv, "-t_srs"); // target src with reprojection
+    }
     papszArgv = CSLAddString(papszArgv, "EPSG:31370");
     GDALVectorTranslateOptions * option = GDALVectorTranslateOptionsNew(papszArgv, nullptr);
     if( option ){
@@ -432,7 +463,7 @@ void parcellaire::downloadRaster(){
         auto messageBox =
                 addChild(Wt::cpp14::make_unique<Wt::WMessageBox>(
                              "Sélection des couches à exporter",
-                              tr("download.lay.error.noLay")
+                             tr("download.lay.error.noLay")
                              ,
                              Wt::Icon::Information,
                              Wt::StandardButton::Ok));

@@ -301,9 +301,10 @@ void groupLayers::extractInfo(double x, double y){
 
 void groupLayers::computeStatGlob(OGRGeometry *poGeomGlobale){
     std::cout << " groupLayers::computeStatGlob " << std::endl;
-    char * test;
+    /*char * test;
     poGeomGlobale->exportToWkt(&test);
     std::cout << " geometrie WKT :" << test << std::endl;
+    */
 
     clearStat();
 
