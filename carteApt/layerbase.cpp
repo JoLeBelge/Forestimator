@@ -876,8 +876,8 @@ std::string getAbbreviation(std::string str)
 }
 
 GDALDataset * rasterizeGeom(OGRGeometry *poGeom, GDALDataset * aGDALDat){
-    //std::string output("/vsimem/tmp.tif");
-    std::string output("/home/lisein/Documents/tmp.tif");
+    std::string output("/vsimem/tmp.tif");
+    //std::string output("/home/lisein/Documents/tmp.tif");
 
     const char *out=output.c_str();
     GDALDriver *pDriver;
