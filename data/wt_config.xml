@@ -62,7 +62,10 @@
 		   has been enabled while building Wt.
 		  -->
 		<log-config>-info -debug</log-config>
-
+		
+		<head-matter user-agent=".*Googlebot.*">
+	  		<meta name="robots" content="index" />
+		</head-matter>
 		<head-matter>
 			<!--<meta name="robots" content="all" /> -->
 			<!--<meta name="viewport" content="width=device-width, initial-scale=1"/> -->
