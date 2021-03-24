@@ -92,7 +92,7 @@ cApliCarteApt::~cApliCarteApt()
 }
 
 
-void cApliCarteApt::carteAptFEE(cEss * aEss, std::string aOut, bool force)
+void cApliCarteApt::carteAptFEE(std::shared_ptr<cEss> aEss, std::string aOut, bool force)
 {
     if (aEss->hasFEEApt() && (!exists(aOut) | force)){
         std::cout << "création carte aptitude du FEE pour essence " << aEss->Nom() << std::endl;
@@ -197,7 +197,7 @@ void cApliCarteApt::carteAptFEE(cEss * aEss, std::string aOut, bool force)
         std::cout << " done " << std::endl;
 
     }else {
-        std::cout << aOut << " existe déjà " << std::endl;
+        std::cout << aOut << " existe déjà ou alors aEss->hasFEEApt() false " << std::endl;
     }
 
 }
@@ -734,7 +734,7 @@ void cApliCarteApt::toPNG(std::string input, std::string output,TypeCarte aType)
                 break;
             }
 
-            case MNH2019:{
+            /*case MNH2019:{
                 //double aVald = scanline[ col ];
                 // int H=(aVald/100)+1; // +1 car les hauteurs commencent à 0 mais mes couleurs commencent à 0
                 //int H=(aVald/100);
@@ -745,7 +745,7 @@ void cApliCarteApt::toPNG(std::string input, std::string output,TypeCarte aType)
                     dico->getColor(std::to_string(H-1)).set(aRes1,aRes2,aRes3);
                 }
 
-            }
+            }*/
 
             // MNT en 16 bits, gain de 10, offset 0
             case MNT16b:{

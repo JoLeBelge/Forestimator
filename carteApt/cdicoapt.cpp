@@ -446,7 +446,6 @@ std::map<int,int> cDicoApt::getZBIOApt(std::string aCodeEs){
         }
     }
     sqlite3_finalize(stmt);
-
     return aRes;
 }
 

@@ -375,6 +375,8 @@ public:
         return aRes;
     }
 
+    std::map<std::string,std::shared_ptr<cEss>> getAllEss(){return mVEss;}
+
     std::map<std::string,std::shared_ptr<layerBase>> VlayerBase(){return mVlayerBase;}
      bool hasLayerBase(std::string aCode){
          if (mVlayerBase.find(aCode)!=mVlayerBase.end()){return 1;} else {return 0;}

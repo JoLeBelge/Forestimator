@@ -16,7 +16,7 @@ QMAKE_CC = gcc-8
 QMAKE_CXX = g++-8
 
 #
-LIBS = -lgdal -lwthttp -lwt -lboost_system -lboost_iostreams -lboost_thread -lboost_filesystem -lboost_program_options -lcrypt -pthread -lwtdbo -lwtdbosqlite3 -lzip -lhpdf
+LIBS = -lgdal -lwthttp -lwt -lboost_system -lboost_iostreams -lboost_thread -lboost_filesystem -lboost_program_options -lcrypt -pthread -lwtdbo -lwtdbosqlite3 -lzip -lhpdf -lsqlite3
 #LIBS += -lwkhtmltox
 
 # utilisation de GM ; fonctionne bien, mais un peu chiant à parametrer pour la compilation sur le serveur. Donc je retire et j'utilise WRasterImage (wrapper pour GM en fait)
@@ -51,7 +51,7 @@ INCLUDEPATH += $$PWD/libzipp/src/
 DEPENDPATH += $$PWD/libzipp/src/
 
 } else {
-LIBS += -L$$PWD/../../../usr/include/ -lsqlite3
+#LIBS += -L$$PWD/../../../usr/include/ -lsqlite3
 LIBS += -L$$PWD/usr/include/gdal/ -lgdal
 INCLUDEPATH += $$PWD/../../../../../../usr/include/gdal/
 DEPENDPATH += $$PWD/../../../../../../usr/include/gdal/
@@ -60,6 +60,9 @@ DEPENDPATH += $$PWD/../../../../../../usr/include/gdal/
 #LIBS += -L$$PWD/usr/local/include/gdal/ -lgdal
 #INCLUDEPATH += $$PWD/../../../../../../usr/localinclude/gdal/
 #DEPENDPATH += $$PWD/../../../../../../usr/localinclude/gdal/
+
+INCLUDEPATH += $$PWD/../../../../../../../../../usr/lib/x86_64-linux-gnu
+DEPENDPATH += $$PWD/../../../../../../../../../usr/lib/x86_64-linux-gnu
 
 INCLUDEPATH += $$PWD/libzipp/src/
 DEPENDPATH += $$PWD/libzipp/src/

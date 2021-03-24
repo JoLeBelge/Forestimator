@@ -14,12 +14,6 @@
 
 using namespace std;
 
-inline bool exists (const std::string& name){
-    struct stat buffer;
-    return (stat (name.c_str(), &buffer) == 0);
-};
-
-
 
 class color;
 
@@ -32,7 +26,7 @@ class cApliCarteApt
 public:
     cApliCarteApt(cDicoApt * aDico);
     ~cApliCarteApt();
-    void carteAptFEE(cEss * aEss, std::string aOut, bool force=false);
+    void carteAptFEE(std::shared_ptr<cEss> aEss, std::string aOut, bool force=false);
     void carteAptCS(cEss * aEss, std::string aOut, bool force=false);
     void carteKKCS(cKKCS * aKK, std::string aOut, bool force=false);
     // gdal_translate pour compresser les résultats (à postériori, maintenant je le compresse au moment de la création des cartes.)

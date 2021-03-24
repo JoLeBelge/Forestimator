@@ -9,7 +9,8 @@ SOURCES += main.cpp \
     caplicarteapt.cpp \
     cdicocarteph.cpp \
     capplicarteph.cpp \
-    cnsw.cpp
+    cnsw.cpp \
+    layerbase.cpp
 
 LIBS += -lgdal -lsqlite3 -lboost_system -lboost_filesystem
 
@@ -32,5 +33,6 @@ HEADERS += \
     caplicarteapt.h \
     cdicocarteph.h \
     capplicarteph.h \
-    cnsw.h
+    cnsw.h \
+    layerbase.h
 
