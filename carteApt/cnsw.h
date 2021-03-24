@@ -77,6 +77,12 @@ public:
         if (sToDrainage.find(aCode)!=sToDrainage.end()){aRes=sToDrainage.at(aCode);}
         return aRes;
     }
+    /* plus difficile car il y a plusieurs phase (1, 2, 3)
+    std::string ProfondeurSigle(int aCode){
+        std::string aRes("");
+        if (sToPhase1.find(aCode)!=mPhase.end()){aRes=mPhase.at(aCode);}
+        return aRes;
+    }*/
 
 
 
@@ -97,6 +103,7 @@ public:
         if (mPhase.find(aCode)!=mPhase.end()){aRes=mPhase.at(aCode);}
         return aRes;
     }
+
 
     std::string roundDouble(double d, int precisionVal);
 
@@ -188,6 +195,8 @@ public:
     std::pair<std::string,double> getMajTexture();
     // retourne le symbole de Drainage majoritaire ainsi que sa proportion en surface
     std::pair<std::string,double> getMajDrainage();
+
+    std::pair<std::string,double> getMajProf();
 
     void catPropSurf(){
         std::cout << "surfPedo details;\n";

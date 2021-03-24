@@ -429,6 +429,27 @@ std::pair<std::string,double> surfPedo::getMajTexture(){
     return aRes;
 }
 
+/*
+std::pair<std::string,double> surfPedo::getMajProf(){
+    std::pair<std::string,double> aRes= std::make_pair("",0);
+    // 1) plusieurs sigle pedo peuvent avoir la mm Prof - on regroupe les sigles par text
+    std::map<std::string,double> aVSigleTs;
+    for (auto  kv : propSurf){
+        std::string sText = mDico->ProfondeurSigle(kv.first);
+        if (aVSigleTs.find(sText)!=aVSigleTs.end()){ aVSigleTs.at(sText)+=kv.second;} else {
+            aVSigleTs.emplace(std::make_pair(sText,kv.second));
+        }
+    }
+    // trouver le sigle majoritaire en surface
+    double aMax(0);
+    for (auto & kv : aVSigleTs){
+        if (kv.second>aMax){
+        aMax=kv.second;
+        aRes=kv;}
+    }
+    return aRes;
+}*/
+
 std::pair<std::string,double> surfPedo::getMajDrainage(){
     std::pair<std::string,double> aRes= std::make_pair("",0);
     // 1) plusieurs sigle pedo peuvent avoir le MM drainage - on regroupe les sigles
