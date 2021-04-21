@@ -245,7 +245,7 @@ cDicoApt::cDicoApt(std::string aBDFile):mBDpath(aBDFile),ptDb_(NULL)
             }
         }
         sqlite3_finalize(stmt);
-        SQLstring="SELECT Code_Aptitude,Num,Equiv2Code,OrdreContrainte,Aptitude,col,surcote,souscote FROM dico_apt;";
+        SQLstring="SELECT Code_Aptitude,Num,Equiv2Code,OrdreContrainte,Aptitude,col,surcote,souscote,EquCodeNonContr FROM dico_apt;";
         sqlite3_prepare_v2( *db_, SQLstring.c_str(), -1, &stmt, NULL );
         while(sqlite3_step(stmt) == SQLITE_ROW)
         {
@@ -268,6 +268,8 @@ cDicoApt::cDicoApt(std::string aBDFile):mBDpath(aBDFile),ptDb_(NULL)
 
                 Dico_AptSurcote.emplace(std::make_pair(aB,aG));
                 Dico_AptSouscote.emplace(std::make_pair(aB,aH));
+                int aI=sqlite3_column_int( stmt, 8 );
+                Dico_AptDouble2AptNonContr.emplace(std::make_pair(aB,aI));
             }
         }
         sqlite3_finalize(stmt);

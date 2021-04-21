@@ -15,8 +15,8 @@ QMAKE_CXXFLAGS += -g
 QMAKE_CC = gcc-8
 QMAKE_CXX = g++-8
 
-#
-LIBS = -lgdal -lwthttp -lwt -lboost_system -lboost_iostreams -lboost_thread -lboost_filesystem -lboost_program_options -lcrypt -pthread -lwtdbo -lwtdbosqlite3 -lzip -lhpdf -lsqlite3
+#-lboost_thread
+LIBS = -lgdal -lwthttp -lwt -lboost_system -lboost_iostreams  -lboost_filesystem -lboost_program_options -lcrypt -pthread -lwtdbo -lwtdbosqlite3 -lzip -lhpdf -lsqlite3
 #LIBS += -lwkhtmltox
 
 # utilisation de GM ; fonctionne bien, mais un peu chiant à parametrer pour la compilation sur le serveur. Donc je retire et j'utilise WRasterImage (wrapper pour GM en fait)
@@ -33,6 +33,8 @@ LIBS = -lgdal -lwthttp -lwt -lboost_system -lboost_iostreams -lboost_thread -lbo
 
 INCLUDEPATH += $$PWD/../carteApt/
 INCLUDEPATH += $$PWD/auth/
+INCLUDEPATH += $$PWD/libzipp/src/
+DEPENDPATH += $$PWD/libzipp/src/
 
 # libzippp version https://github.com/ctabin/libzippp
 #LIBS += -L$$PWD/../../../../../../usr/local/lib -lzippp_static#INCLUDEPATH += $$PWD/../../../../../../usr/local/include/libzippp/
@@ -47,8 +49,7 @@ DEPENDPATH += $$PWD/../../../usr/include/gdal/
 # sur le serveur je dois lui préciser ou est cette librairie
 LIBS += -L$$PWD/../../../usr/lib/x86_64-linux-gnu/ -lsqlite3
 
-INCLUDEPATH += $$PWD/libzipp/src/
-DEPENDPATH += $$PWD/libzipp/src/
+
 
 } else {
 #LIBS += -L$$PWD/../../../usr/include/ -lsqlite3
@@ -61,11 +62,8 @@ DEPENDPATH += $$PWD/../../../../../../usr/include/gdal/
 #INCLUDEPATH += $$PWD/../../../../../../usr/localinclude/gdal/
 #DEPENDPATH += $$PWD/../../../../../../usr/localinclude/gdal/
 
-INCLUDEPATH += $$PWD/../../../../../../../../../usr/lib/x86_64-linux-gnu
-DEPENDPATH += $$PWD/../../../../../../../../../usr/lib/x86_64-linux-gnu
-
-INCLUDEPATH += $$PWD/libzipp/src/
-DEPENDPATH += $$PWD/libzipp/src/
+#INCLUDEPATH += $$PWD/../../../../../../../../../usr/lib/x86_64-linux-gnu
+#DEPENDPATH += $$PWD/../../../../../../../../../usr/lib/x86_64-linux-gnu
 }
 
 SOURCES += main.cpp \

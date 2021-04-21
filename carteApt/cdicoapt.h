@@ -249,6 +249,12 @@ public:
         if (Dico_AptDouble2AptContr.find(aCode)!=Dico_AptDouble2AptContr.end()){aRes=Dico_AptDouble2AptContr.at(aCode);}
         return aRes;
     }
+    int AptNonContraignante(int aCode){
+        int aRes(0);
+        if (Dico_AptDouble2AptNonContr.find(aCode)!=Dico_AptDouble2AptNonContr.end()){aRes=Dico_AptDouble2AptNonContr.at(aCode);}
+        return aRes;
+    }
+
     // on améliore l'aptitude car facteur de compensation
 
     int AptSurcote(int aCode){
@@ -434,6 +440,7 @@ private:
 
     std::map<int,std::string> Dico_code2AptFull;
     std::map<int,int>  Dico_AptDouble2AptContr;
+    std::map<int,int>  Dico_AptDouble2AptNonContr;
     std::map<int,int>  Dico_AptSouscote;
     std::map<int,int>  Dico_AptSurcote;
     // les codes aptitudes sont classé dans un ordre fonction de la contrainte, permet de comparer deux aptitude
