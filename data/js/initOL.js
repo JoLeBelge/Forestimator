@@ -158,7 +158,7 @@ activeLayer = new ol.layer.Tile({
 		crossOrigin: 'null',
 		attributions: 'CartoWeb.be',
 		params: {
-		  'LAYERS': 'cartoweb_topo',
+		  'LAYERS': 'topo',
 		  'TILED': false,
 		  'FORMAT': 'image/png'
 		},
