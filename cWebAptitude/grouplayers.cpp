@@ -97,46 +97,46 @@ groupLayers::groupLayers(cDicoApt * aDico, WOpenLayers *aMap, AuthApplication *a
         std::shared_ptr<layerBase> aLB=pair.second;
 
         if (mDico->lay4Visu(pair.first)){
-        // 1) création du mWtText pour cette couche
-         WText * wtext=NULL;
-         Wt::WTreeNode * n=NULL;
-        switch (aLB->getCatLayer()) {
-        case (TypeLayer::Station):{
-            n = node1_->addChildNode(Wt::cpp14::make_unique<Wt::WTreeNode>(""));
-            wtext=n->label();
-            break;}
-        // carte thématique des catalogues de stations
-        case (TypeLayer::KK):{
-            n = node4_->addChildNode(Wt::cpp14::make_unique<Wt::WTreeNode>(""));
-            wtext=n->label();
-            break;}
-        case (TypeLayer::Externe):{
-            n = node1_->addChildNode(Wt::cpp14::make_unique<Wt::WTreeNode>(""));
-            wtext=n->label();
-            break;}
-        case TypeLayer::Peuplement:{
-            n = node0_->addChildNode(Wt::cpp14::make_unique<Wt::WTreeNode>(""));
-            wtext=n->label();
-            break;}
-        case TypeLayer::FEE:{
-            n = node2_->addChildNode(Wt::cpp14::make_unique<Wt::WTreeNode>(""));
-            wtext=n->label();
-            break;}
-        case TypeLayer::CS:{
-            n = node3_->addChildNode(Wt::cpp14::make_unique<Wt::WTreeNode>(""));
-            wtext=n->label();
-            break;}
-        default:
-            break;
-        }
-        // 2) création de la couche
-        std::shared_ptr<Layer> aL=std::make_shared<Layer>(this,aLB,wtext);
-        // 3) ajout des interactions
-        TypeLayer type= aL->getCatLayer();
-        std::string aCode=aL->Code();
-        wtext->clicked().connect([this,aCode,type]{clickOnName(aCode,type);});
-        aL->changeExpertMode().connect(n,&Wt::WTreeNode::setNodeVisible);
-        mVLs.push_back(aL);
+            // 1) création du mWtText pour cette couche
+            WText * wtext=NULL;
+            Wt::WTreeNode * n=NULL;
+            switch (aLB->getCatLayer()) {
+            case (TypeLayer::Station):{
+                n = node1_->addChildNode(Wt::cpp14::make_unique<Wt::WTreeNode>(""));
+                wtext=n->label();
+                break;}
+                // carte thématique des catalogues de stations
+            case (TypeLayer::KK):{
+                n = node4_->addChildNode(Wt::cpp14::make_unique<Wt::WTreeNode>(""));
+                wtext=n->label();
+                break;}
+            case (TypeLayer::Externe):{
+                n = node1_->addChildNode(Wt::cpp14::make_unique<Wt::WTreeNode>(""));
+                wtext=n->label();
+                break;}
+            case TypeLayer::Peuplement:{
+                n = node0_->addChildNode(Wt::cpp14::make_unique<Wt::WTreeNode>(""));
+                wtext=n->label();
+                break;}
+            case TypeLayer::FEE:{
+                n = node2_->addChildNode(Wt::cpp14::make_unique<Wt::WTreeNode>(""));
+                wtext=n->label();
+                break;}
+            case TypeLayer::CS:{
+                n = node3_->addChildNode(Wt::cpp14::make_unique<Wt::WTreeNode>(""));
+                wtext=n->label();
+                break;}
+            default:
+                break;
+            }
+            // 2) création de la couche
+            std::shared_ptr<Layer> aL=std::make_shared<Layer>(this,aLB,wtext);
+            // 3) ajout des interactions
+            TypeLayer type= aL->getCatLayer();
+            std::string aCode=aL->Code();
+            wtext->clicked().connect([this,aCode,type]{clickOnName(aCode,type);});
+            aL->changeExpertMode().connect(n,&Wt::WTreeNode::setNodeVisible);
+            mVLs.push_back(aL);
 
         }else {
             mVLs.push_back(std::make_shared<Layer>(this,aLB));
@@ -257,24 +257,24 @@ void groupLayers::extractInfo(double x, double y){
 
         for (std::shared_ptr<Layer> l : mVLs){
             if (((l->getCatLayer()==TypeLayer::KK )| (l->getCatLayer()==TypeLayer::Station )) | (( l->IsActive()) & (l->getCatLayer()!=TypeLayer::Externe))){
-            if (l->isVisible()){
-                std::vector<std::string> layerLabelAndValue=l->displayInfo(x,y);
-                if (l->l4Stat()){
-                mAnaPoint->add1InfoRaster(layerLabelAndValue);
-                }
-                if (( l->IsActive())){
-                     // affiche une popup pour indiquer la valeur pour cette couche
-                    // attention, il faut escaper les caractères à problèmes du genre apostrophe
-                    boost::replace_all(layerLabelAndValue.at(1),"'","\\'"); // javascript bug si jamais l'apostrophe n'est pas escapée
-                    boost::replace_all(layerLabelAndValue.at(0),"'","\\'");
-                    mParent->doJavaScript("content.innerHTML = '<p>"+layerLabelAndValue.at(0)+":</p><code>"+ layerLabelAndValue.at(1)+ "</code>';"
-                                          +"var coordinate = ["+std::to_string(x) + ","+ std::to_string(y) +"];"
-                                          +"overlay.setPosition(coordinate);"
-                                          +"overlay.setPosition(coordinate);"
-                                          );
-                }
+                if (l->isVisible()){
+                    std::vector<std::string> layerLabelAndValue=l->displayInfo(x,y);
+                    if (l->l4Stat()){
+                        mAnaPoint->add1InfoRaster(layerLabelAndValue);
+                    }
+                    if (( l->IsActive())){
+                        // affiche une popup pour indiquer la valeur pour cette couche
+                        // attention, il faut escaper les caractères à problèmes du genre apostrophe
+                        boost::replace_all(layerLabelAndValue.at(1),"'","\\'"); // javascript bug si jamais l'apostrophe n'est pas escapée
+                        boost::replace_all(layerLabelAndValue.at(0),"'","\\'");
+                        mParent->doJavaScript("content.innerHTML = '<p>"+layerLabelAndValue.at(0)+":</p><code>"+ layerLabelAndValue.at(1)+ "</code>';"
+                                              +"var coordinate = ["+std::to_string(x) + ","+ std::to_string(y) +"];"
+                                              +"overlay.setPosition(coordinate);"
+                                              +"overlay.setPosition(coordinate);"
+                                              );
+                    }
 
-            }
+                }
             }
         }
         // tableau du détail du calcul de l'aptitude d'une essence pour FEE
@@ -289,7 +289,7 @@ void groupLayers::extractInfo(double x, double y){
         }
 
         // tableau des aptitudes pour toutes les essences
-       mAnaPoint->afficheAptAllEss();
+        mAnaPoint->afficheAptAllEss();
 
 
         mMap->updateView();
@@ -313,7 +313,7 @@ void groupLayers::computeStatGlob(OGRGeometry *poGeomGlobale){
 
         if (l->Code()=="MNH2019"){
             // calcul de Hdom
-           mVLStatCont.push_back(new statHdom(l,poGeomGlobale));
+            mVLStatCont.push_back(new statHdom(l,poGeomGlobale));
 
         } else if(l->Code()=="COMPO"){
             // calcul des probabilités de présence pour les 9 sp.
@@ -321,9 +321,9 @@ void groupLayers::computeStatGlob(OGRGeometry *poGeomGlobale){
         } else {
 
             if (l->l4Stat()){
-            // clé : la valeur au format légende (ex ; Optimum). Valeur ; pourcentage pour ce polygone
-            std::map<std::string,int> stat = l->computeStat1(poGeomGlobale);
-            mVLStat.push_back(new layerStatChart(l,stat,poGeomGlobale));
+                // clé : la valeur au format légende (ex ; Optimum). Valeur ; pourcentage pour ce polygone
+                std::map<std::string,int> stat = l->computeStat1(poGeomGlobale);
+                mVLStat.push_back(new layerStatChart(l,stat,poGeomGlobale));
             }
         }
 
@@ -525,27 +525,26 @@ bool cropIm(std::string inputRaster, std::string aOut, OGREnvelope ext){
         // garder l'intersect des 2 extend
         ext.Intersect(extGlob);
         //std::cout << ext.MinX << " , " << ext.MaxX << " , " << ext.MinY << " , " << ext.MaxY << " après intersect " << std::endl;
+
+        double width((ext.MaxX-ext.MinX)), height((ext.MaxY-ext.MinY));
+
+        //adjust top left coordinates
+        transform[0] = ext.MinX;
+        transform[3] = ext.MaxY;
+        //determine dimensions of the new (cropped) raster in cells
+        int xSize = round(width/transform[1]);
+        int ySize = round(height/transform[1]);
+        //std::cout << "xSize " << xSize << ", ySize " << ySize << std::endl;
+
         // test si la différence entre le raster en entier et le raster croppé est significative, si non on va copier tout au lieu de cropper
-
-        //if (extGlob.MinX==ext.MinX && extGlob.MaxX==ext.MaxX && extGlob.MinY==ext.MinY && extGlob.MaxY==ext.MaxY){
         // si 80% ou plus, on garde toute l'image
-        if (getArea(&ext)/getArea(&extGlob)>0.8){
-            std::cout << "copie de toute l'image" << std::endl;
-            pDriver->CopyFiles(cropPath,inputPath);
-            aRes=1;
-        } else {
-            double width((ext.MaxX-ext.MinX)), height((ext.MaxY-ext.MinY));
-
-            //adjust top left coordinates
-            transform[0] = ext.MinX;
-            transform[3] = ext.MaxY;
-            //determine dimensions of the new (cropped) raster in cells
-            int xSize = round(width/transform[1]);
-            int ySize = round(height/transform[1]);
-            //std::cout << "xSize " << xSize << ", ySize " << ySize << std::endl;
-            //create the new (cropped) dataset
-            if (xSize>0 && ySize>0 && xSize < maxSizePix4Export && ySize<maxSizePix4Export){
-
+        if (xSize>0 && ySize>0 && xSize < maxSizePix4Export && ySize<maxSizePix4Export){
+            if (getArea(&ext)/getArea(&extGlob)>0.8){
+                std::cout << "copie de toute l'image" << std::endl;
+                pDriver->CopyFiles(cropPath,inputPath);
+                aRes=1;
+            } else {
+                //create the new (cropped) dataset
                 pCroppedRaster = pDriver->Create(cropPath, xSize, ySize, 1, pInputRaster->GetRasterBand(1)->GetRasterDataType(), NULL); //or something similar
                 pCroppedRaster->SetProjection( pInputRaster->GetProjectionRef() );
                 //pCroppedRaster->SetSpatialRef(pInputRaster->GetSpatialRef());
@@ -567,11 +566,11 @@ bool cropIm(std::string inputRaster, std::string aOut, OGREnvelope ext){
 
                 aRes=1;
                 if( pCroppedRaster != NULL ){GDALClose( (GDALDatasetH) pCroppedRaster );}
-            } else {
-                std::cout << " crop du raster a échoué: taille pas correcte " << std::endl;
             }
-
+        } else {
+            std::cout << " crop du raster a échoué: taille pas correcte " << std::endl;
         }
+
         GDALClose(pInputRaster);
     } else {
         std::cout << " attention, un des fichiers input n'existe pas : " << inputRaster << std::endl;
@@ -776,26 +775,26 @@ GDALDataset * getDSonEnv(std::string inputRaster, OGRGeometry * poGeom){
     {
         std::cout << "je n'ai pas lu l'image " <<  inputRaster << std::endl;
     } else {
-    char** papszArgv = nullptr;
-    papszArgv = CSLAddString(papszArgv, "-projwin"); //Selects a subwindow from the source image for copying but with the corners given in georeferenced coordinate
-    papszArgv = CSLAddString(papszArgv, std::to_string(ext.MinX).c_str());
-    papszArgv = CSLAddString(papszArgv, std::to_string(ext.MaxY).c_str());
-    papszArgv = CSLAddString(papszArgv, std::to_string(ext.MaxX).c_str());
-    papszArgv = CSLAddString(papszArgv, std::to_string(ext.MinY).c_str());
+        char** papszArgv = nullptr;
+        papszArgv = CSLAddString(papszArgv, "-projwin"); //Selects a subwindow from the source image for copying but with the corners given in georeferenced coordinate
+        papszArgv = CSLAddString(papszArgv, std::to_string(ext.MinX).c_str());
+        papszArgv = CSLAddString(papszArgv, std::to_string(ext.MaxY).c_str());
+        papszArgv = CSLAddString(papszArgv, std::to_string(ext.MaxX).c_str());
+        papszArgv = CSLAddString(papszArgv, std::to_string(ext.MinY).c_str());
 
-    GDALTranslateOptions * option = GDALTranslateOptionsNew(papszArgv,nullptr);
-    if (option){
-        //std::cout <<" options parsées " << std::endl;
-        GDALDatasetH DScrop = GDALTranslate("/vsimem/out",DS,option,nullptr);
+        GDALTranslateOptions * option = GDALTranslateOptionsNew(papszArgv,nullptr);
+        if (option){
+            //std::cout <<" options parsées " << std::endl;
+            GDALDatasetH DScrop = GDALTranslate("/vsimem/out",DS,option,nullptr);
 
-        if (DScrop ){
-            // j'ai toujours 2 raster a ouvrir conjointement
-            aRes = GDALDataset::FromHandle(DScrop);
+            if (DScrop ){
+                // j'ai toujours 2 raster a ouvrir conjointement
+                aRes = GDALDataset::FromHandle(DScrop);
+            }
         }
-    }
 
-    GDALTranslateOptionsFree(option);
-    GDALClose(DS);
-   }
-   return aRes;
+        GDALTranslateOptionsFree(option);
+        GDALClose(DS);
+    }
+    return aRes;
 }
