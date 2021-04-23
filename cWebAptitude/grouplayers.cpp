@@ -512,6 +512,7 @@ bool cropIm(std::string inputRaster, std::string aOut, OGREnvelope ext){
         const char *pszFormat = "GTiff";
         pDriver = GetGDALDriverManager()->GetDriverByName(pszFormat);
         pInputRaster = (GDALDataset*) GDALOpen(inputPath, GA_ReadOnly);
+
         double transform[6], tr1[6];
         pInputRaster->GetGeoTransform(transform);
         pInputRaster->GetGeoTransform(tr1);
@@ -544,8 +545,8 @@ bool cropIm(std::string inputRaster, std::string aOut, OGREnvelope ext){
             //std::cout << "xSize " << xSize << ", ySize " << ySize << std::endl;
             //create the new (cropped) dataset
             if (xSize>0 && ySize>0 && xSize < maxSizePix4Export && ySize<maxSizePix4Export){
-                pCroppedRaster = pDriver->Create(cropPath, xSize, ySize, 1, GDT_Byte, NULL); //or something similar
 
+                pCroppedRaster = pDriver->Create(cropPath, xSize, ySize, 1, pInputRaster->GetRasterBand(1)->GetRasterDataType(), NULL); //or something similar
                 pCroppedRaster->SetProjection( pInputRaster->GetProjectionRef() );
                 //pCroppedRaster->SetSpatialRef(pInputRaster->GetSpatialRef());
                 pCroppedRaster->SetGeoTransform( transform );
