@@ -105,7 +105,6 @@ std::string layerBase::NomFileWithExt(){
 int rasterFiles::getValue(double x, double y){
 
     int aRes(0);
-    //if (mType!=TypeLayer::Externe){
     GDALDataset  * mGDALDat = (GDALDataset *) GDALOpen( getPathTif().c_str(), GA_ReadOnly );
     if( mGDALDat == NULL )
     {
@@ -123,18 +122,18 @@ int rasterFiles::getValue(double x, double y){
         int col = int((x - xOrigin) / pixelWidth);
         int row = int((yOrigin - y ) / pixelHeight);
 
-        if (col<mBand->GetXSize() && row < mBand->GetYSize()){
+        if (col<mBand->GetXSize() && col>=0  && row < mBand->GetYSize() && row>=0){
             float *scanPix;
             scanPix = (float *) CPLMalloc( sizeof( float ) * 1 );
             // lecture du pixel
             mBand->RasterIO( GF_Read, col, row, 1, 1, scanPix, 1,1, GDT_Float32, 0, 0 );
             aRes=scanPix[0];
             CPLFree(scanPix);
-            GDALClose( mGDALDat );
+
             mBand=NULL;
         }
+        GDALClose( mGDALDat );
     }
-    //}
     return aRes;
 }
 
@@ -736,7 +735,7 @@ std::string layerStat::summaryStat(){
         for (auto & kv : mStat){
             if (kv.second>1){
                 if (kv.second>99){ aRes+=kv.first;break;} else {
-                aRes+=kv.first+": "+std::to_string(kv.second)+"% ";
+                    aRes+=kv.first+": "+std::to_string(kv.second)+"% ";
                 }
             }
         }
@@ -907,7 +906,7 @@ GDALDataset * rasterizeGeom(OGRGeometry *poGeom, GDALDataset * aGDALDat){
             // driver et dataset shp -- creation depuis la géométrie
             GDALDriver *pShpDriver = GetGDALDriverManager()->GetDriverByName("ESRI Shapefile");
             pShp = pShpDriver->Create("/vsimem/blahblah.shp", 0, 0, 0, GDT_Unknown, NULL );
-             OGRLayer * lay = pShp->CreateLayer("toto",&oSRS,wkbPolygon,NULL);
+            OGRLayer * lay = pShp->CreateLayer("toto",&oSRS,wkbPolygon,NULL);
             OGRFeature * feat = new OGRFeature(lay->GetLayerDefn());
             feat->SetGeometry(poGeom);
 
