@@ -805,7 +805,7 @@ bool layerBase::wms2jpg(OGREnvelope  * extent, int aSx, int aSy, std::string aOu
                                      "</DataWindow>"
                                      "<Projection>EPSG:31370</Projection>"
                                      "<BandsCount>3</BandsCount>"
-                                     "<ZeroBlockHttpCodes>204,404</ZeroBlockHttpCodes>"
+                                     "<ZeroBlockHttpCodes>204,404,500</ZeroBlockHttpCodes>"
                                      "<ZeroBlockOnServerException>true</ZeroBlockOnServerException>"
                                      "</GDAL_WMS>",
                                      mUrl.c_str(),

@@ -408,7 +408,7 @@ std::vector<OGRPoint> hexbin(GDALDataset * mask){
 }
 
 std::vector<OGRPolygon *> hexGeombin(GDALDataset *mask){
-    //std::cout << " hexGeombin sur le masque "<< std::endl;
+    std::cout << " hexGeombin sur le masque "<< std::endl;
     std::vector<OGRPoint> VCentreHexagone=hexbin(mask);
     std::vector<OGRPolygon *> aRes(VCentreHexagone.size());
     int c(0);
@@ -437,7 +437,7 @@ std::vector<OGRPolygon *> hexGeombin(GDALDataset *mask){
         aRes[c]=hex;
         c++;
     }
-    //std::cout << "hexGeombin generate " << aRes.size() << " hexagones" << std::endl;
+    std::cout << "hexGeombin generate " << aRes.size() << " hexagones" << std::endl;
     return aRes;
 
 }
