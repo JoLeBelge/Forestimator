@@ -323,7 +323,9 @@ void simplepoint::export2pdf(std::string titre){
 
     // je peux pas utiliser le membre mapextent de GL car celui-ci ne se met à jours que lorsqu'on télécharge une carte sur l'emprise courante...
     //staticMap sm(mGL->getActiveLay(),&pt,mGL->getMapExtent());
-    staticMap sm(mGL->getLay("IGN"),&pt);
+    // depuis que l'IGN est passé à la version 1.3 du serveur WMS, je ne parviens plus à télécharger les cartes wms en jpg.
+    // donc il faut changer cette ligne. utiliser l'IGN du serveur grfmn?
+    staticMap sm(mGL->getLay("IGNgrfmn"),&pt);
     // ajout du logo IGN. ajout des crédits ; toujours les mêmes, en dur.
     sm.addImg(mDico->File("logoIGN"));
     boost::replace_all(tp,"PATH_CARTE",sm.getFileName());

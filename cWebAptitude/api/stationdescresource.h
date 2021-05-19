@@ -62,11 +62,12 @@ public:
                            "compo\n"
                            "aptitude\n";
 
-         response.out() <<  "Liste des couches accessibles via API\n"
+         response.out() <<  "Liste des couches accessibles via API et leur url WMS\n"
                             "---------------------------\n";
          for (auto kv : mDico->VlayerBase()){
-             if (kv.second->getCatLayer()!=TypeLayer::Externe){
-             response.out() << kv.second->Code() + ", " + kv.second->Nom() + "\n";
+             std::shared_ptr<layerBase> l=kv.second;
+             if (l->getCatLayer()!=TypeLayer::Externe){
+             response.out() << l->Code() + ", " + l->Nom() + " , "+ l->WMSURL() +" , layer " +l->WMSLayerName()+"\n";
              }
          }
 

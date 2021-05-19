@@ -70,7 +70,9 @@ SOURCES += main.cpp \
     auth/Session.cpp \
     auth/User.cpp \
     auth/auth.cpp \
+    cadastre.cpp \
     simplepoint.cpp \
+    widgetcadastre.cpp \
     wopenlayers.cpp \
     cwebaptitude.cpp \
     ../carteApt/cdicoapt.cpp \
@@ -95,8 +97,10 @@ HEADERS += \
     auth/Session.h \
     auth/User.h \
     auth/auth.h \
+    cadastre.h \
     main.h \
     simplepoint.h \
+    widgetcadastre.h \
     wopenlayers.h \
     cwebaptitude.h \
     ../carteApt/cdicoapt.h \

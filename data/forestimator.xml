@@ -601,5 +601,9 @@ detAptFEE
 <message id="desc.point">Info ponctuelle : description d'une station</message>
 <message id="desc.carto">Cartographie : Visualisation et téléchargement</message>
 
+<message id="cadastre.commune">Commune / INS</message>
+<message id="cadastre.division">Division</message>
+<message id="cadastre.section">Section</message>
+<message id="cadastre.paca">Parcelle cadastralle</message>
 
 </messages>

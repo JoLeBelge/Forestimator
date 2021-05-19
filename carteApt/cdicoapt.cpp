@@ -15,6 +15,7 @@ cDicoApt::cDicoApt(std::string aBDFile):mBDpath(aBDFile),ptDb_(NULL)
     if (openConnection()){} else {
 
         mPedo= std::make_shared<cnsw>(*db_);
+        mCadastre= std::make_shared<cadastre>(*db_);
         // dico Ess Nom -- code
         sqlite3_stmt * stmt;
         std::string SQLstring="SELECT Ess_FR,Code_FR,prefix FROM dico_essences ORDER BY Ess_FR DESC;";

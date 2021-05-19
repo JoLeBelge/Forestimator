@@ -14,6 +14,7 @@
 #include  "cnsw.h"
 #include "layerbase.h"
 #include "color.h"
+#include "cadastre.h"
 
 std::string loadBDpath();
 
@@ -24,9 +25,10 @@ extern std::string dirBD;
 
 class color;
 class cDicoApt;
-class layerBase; // ça aurait du être une classe mère ou membre de cEss et cKKCS mais je l'implémente après, c'est pour avoir les info à propose des rasters FEE ; NT, NH, Topo, AE, SS
+class layerBase;
 class ST;
 class cnsw;
+class cadastre;
 class WMSinfo;
 class LayerMTD;
 
@@ -43,6 +45,7 @@ public:
     cDicoApt(std::string aBDFile);
 
     std::shared_ptr<cnsw> mPedo;
+    std::shared_ptr<cadastre> mCadastre;
 
     void closeConnection();
     int openConnection();
