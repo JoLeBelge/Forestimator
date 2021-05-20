@@ -7,14 +7,14 @@ widgetCadastre::widgetCadastre(cadastre * aCad):mCad(aCad),WTable()
     commune_ = elementAt(0,1)->addWidget(cpp14::make_unique<WComboBox>());
     ++row;
     elementAt(row,0)->addWidget(cpp14::make_unique<WLabel>(tr("cadastre.division")));
-    division_ = elementAt(0,1)->addWidget(cpp14::make_unique<WComboBox>());
+    division_ = elementAt(row,1)->addWidget(cpp14::make_unique<WComboBox>());
     ++row;
     // cette partie est grisée tant que commune et division ne sont pas rempli
     elementAt(row,0)->addWidget(cpp14::make_unique<WLabel>(tr("cadastre.section")));
-    section_ = elementAt(0,1)->addWidget(cpp14::make_unique<WComboBox>());
+    section_ = elementAt(row,1)->addWidget(cpp14::make_unique<WComboBox>());
     ++row;
     elementAt(row,0)->addWidget(cpp14::make_unique<WLabel>(tr("cadastre.paca")));
-    paCa_ = elementAt(0,1)->addWidget(cpp14::make_unique<WComboBox>());
+    paCa_ = elementAt(row,1)->addWidget(cpp14::make_unique<WComboBox>());
 
     int c(0);
     for (auto & l : mCad->getCommuneLabel()){
@@ -27,8 +27,7 @@ widgetCadastre::widgetCadastre(cadastre * aCad):mCad(aCad),WTable()
 }
 
 void widgetCadastre::refreshDivision(){
-    std::cout << "refresh Division  Combobox" << std::endl;
-
+    //std::cout << "refresh Division  Combobox" << std::endl;
     if (aMLabelCom.find(commune_->currentIndex())!=aMLabelCom.end()){
         division_->clear();
         aMLabelDiv.clear();

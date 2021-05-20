@@ -20,7 +20,6 @@ std::string loadBDpath();
 
 std::string removeAccents(std::string aStr);
 
-
 extern std::string dirBD;
 
 class color;

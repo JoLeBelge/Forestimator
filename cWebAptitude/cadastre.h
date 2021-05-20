@@ -54,6 +54,7 @@ public:
         for (auto & kv : mVCom){
             aRes.emplace(std::make_pair(kv.first,kv.second+" "+std::to_string(kv.first)));
         }
+        // problème ; pas dans l'ordre alphabétique...
         return aRes;
     }
     std::map<int,std::string> getDivisionLabel(int aCodeCommune){

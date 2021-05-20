@@ -1,6 +1,7 @@
 #include "grouplayers.h"
 
 int maxSizePix4Export(30000);
+extern bool globTest;
 
 groupLayers::groupLayers(cDicoApt * aDico, WOpenLayers *aMap, AuthApplication *app, stackInfoPtr * aStackInfoPtr):
     mDico(aDico)
@@ -180,6 +181,9 @@ groupLayers::groupLayers(cDicoApt * aDico, WOpenLayers *aMap, AuthApplication *a
     /*   AUTRES ONLGETS de la stack   */
     mAnaPoint = new simplepoint(this, mStackInfoPtr->mSimplepointW);
 
+    if (globTest){
+    mParent->addWidget(cpp14::make_unique<widgetCadastre>(mDico->mCadastre.get()));
+}
     // updateGL pour cacher les couches expert
     updateGL();
     std::cout << "done " << std::endl;

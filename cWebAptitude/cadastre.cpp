@@ -113,15 +113,12 @@ void cadastre::loadInfo(){
     /*
     std::cout << " j'ai lu " << mVCom.size() << " communes du cadastres (belgique)" << std::endl;
     std::cout << " j'ai lu " << mVDiv.size() << " divisions du cadastres (belgique)" << std::endl;
-    //
     std::cout << " j'ai rangé les parcelles cadastrales de Wallonie dans " << mVCaPa.size() << " vecteurs " << std::endl;
-    */
-    // test.
     std::vector<std::string> test =getSectionForDiv(61007);
     for (auto & s : test){std::cout << " section " << s << std::endl;}
-
     std::vector<capa *> t=getCaPaPtrVector(std::get<0>(mVDiv.at(61003)),"A");
     std::cout << " nombre de pointers capa" << t.size() << std::endl;
+    */
 
 }
 

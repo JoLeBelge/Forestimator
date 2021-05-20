@@ -18,10 +18,22 @@
  * sudo ./WebAptitude --deploy-path=/ --docroot "/home/sam/master_chatmetaleux/Forestimator/data/;favicon.ico,/resources,/style,/tmp,/data,/js,/jslib" --http-port 80 --http-addr 0.0.0.0 -c ../data/wt_config.xml
 */
 
-
+extern bool globTest;
 
 int main(int argc, char **argv)
 {
+
+    po::options_description desc("Allowed options");
+    desc.add_options()
+            ("help", "produce help message")
+            ("test", po::value<bool>(), "pour le test de nouvelles options en cours de développement");
+    po::variables_map vm;
+    //po::store(po::parse_command_line(argc, argv, desc), vm);
+    //https://stackoverflow.com/questions/15552284/boostprogram-options-how-to-ignore-unknown-parameters
+    po::store(po::command_line_parser(argc, argv).options(desc).allow_unregistered().run(), vm);
+    po::notify(vm);
+     if (vm.count("test")) {globTest=vm["test"].as<bool>();}
+
     // ici, créé mon dictionnaire et le mettre sous forme de membre dans resource
     std::string aBD=loadBDpath();
     cDicoApt *Dico=new cDicoApt(aBD);

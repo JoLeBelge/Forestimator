@@ -1,6 +1,5 @@
 #ifndef GROUPLAYERS_H
 #define GROUPLAYERS_H
-
 #pragma once
 #include <Wt/WContainerWidget.h>
 #include <Wt/WTabWidget.h>
@@ -14,13 +13,11 @@
 #include <Wt/WCheckBox.h>
 #include <Wt/WMessageBox.h>
 #include <Wt/WLoadingIndicator.h>
-
 #include "stackinfoptr.h"
 #include "layer.h"
 #include "simplepoint.h"
 #include <fstream>
 #include "wopenlayers.h"
-
 #include <Wt/WProgressBar.h>
 #include "layerstatchart.h"
 #include "Wt/WFileResource.h"
@@ -29,6 +26,7 @@
 #include "auth.h"
 #include "selectlayers.h"
 #include "statHdomCompo.h"
+#include "widgetcadastre.h"
 
 class WOpenLayers;
 class Layer;

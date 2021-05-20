@@ -1,6 +1,7 @@
 #include "cdicoapt.h"
 
 std::string dirBD("/home/lisein/Documents/carteApt/Forestimator/carteApt/data/aptitudeEssDB.db");
+bool globTest(0);
 
 // memory leak with sqlite3 : https://stackoverflow.com/questions/11126070/sqlite3-prepare-v2-depends-on-scope
 // mieux ; https://stackoverflow.com/questions/33432551/possible-memory-leak-in-the-shared-library-of-sqlite3/33435655
@@ -15,7 +16,7 @@ cDicoApt::cDicoApt(std::string aBDFile):mBDpath(aBDFile),ptDb_(NULL)
     if (openConnection()){} else {
 
         mPedo= std::make_shared<cnsw>(*db_);
-        mCadastre= std::make_shared<cadastre>(*db_);
+        if (globTest) {mCadastre= std::make_shared<cadastre>(*db_);}
         // dico Ess Nom -- code
         sqlite3_stmt * stmt;
         std::string SQLstring="SELECT Ess_FR,Code_FR,prefix FROM dico_essences ORDER BY Ess_FR DESC;";
