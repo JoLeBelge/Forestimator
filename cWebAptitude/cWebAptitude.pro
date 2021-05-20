@@ -10,11 +10,6 @@ QMAKE_CXXFLAGS += -g
 
 #CONFIG += c++11
 
-# la compilation sous debian avec gcc-8 m'a montré un bug dans la boucle de création des groupes écologiques. je spécifie donc que c'est avec le compilateur g++-7 qu'il faut compiler le soft
-# update ; maintenant le code est compatible avec gcc 5 et 9. mais sur le serveur c'est gcc 8 pas 9, le 9 n'est pas installé. En plus 8 fonctionne très bien
-QMAKE_CC = gcc-8
-QMAKE_CXX = g++-8
-
 #-lboost_thread
 LIBS = -lgdal -lwthttp -lwt -lboost_system -lboost_iostreams  -lboost_filesystem -lboost_program_options -lcrypt -pthread -lwtdbo -lwtdbosqlite3 -lzip -lhpdf -lsqlite3
 #LIBS += -lwkhtmltox
@@ -42,6 +37,10 @@ DEPENDPATH += $$PWD/libzipp/src/
 
 #qmake -makefile ../cWebAptitude/cWebAptitude.pro pl=serveur avant de lancer make sur debian server
 contains(pl,serveur) {
+
+QMAKE_CC = gcc-10
+QMAKE_CXX = g++-10
+
 LIBS += -L$$PWD/usr/include/gdal/ -lgdal
 INCLUDEPATH += $$PWD/../../../usr/include/gdal/
 DEPENDPATH += $$PWD/../../../usr/include/gdal/
@@ -52,6 +51,11 @@ LIBS += -L$$PWD/../../../usr/lib/x86_64-linux-gnu/ -lsqlite3
 
 
 } else {
+# la compilation sous debian avec gcc-8 m'a montré un bug dans la boucle de création des groupes écologiques. je spécifie donc que c'est avec le compilateur g++-7 qu'il faut compiler le soft
+# update ; maintenant le code est compatible avec gcc 5 et 9.
+QMAKE_CC = gcc-8
+QMAKE_CXX = g++-8
+
 #LIBS += -L$$PWD/../../../usr/include/ -lsqlite3
 LIBS += -L$$PWD/usr/include/gdal/ -lgdal
 INCLUDEPATH += $$PWD/../../../../../../usr/include/gdal/

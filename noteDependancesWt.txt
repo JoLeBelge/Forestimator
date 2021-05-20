@@ -4,6 +4,11 @@ sudo apt install libgraphicsmagick++1-dev
 sudo apt install libpango1.0-dev 
 
 libharu ; compiler depuis les sources.
+mkdir build
+cd build ../
+cmake ../
+make -j2
+make install
 
 compilation wt ; 
 cmake -DWT_WRASTERIMAGE_IMPLEMENTATION="GraphicsMagick" ..

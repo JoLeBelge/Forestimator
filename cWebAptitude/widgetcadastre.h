@@ -29,6 +29,8 @@ public:
     widgetCadastre(cadastre * aCad);
 
     void refreshDivision();
+    void refreshSection();
+    void refreshPaCa();
 
     void submit();
 private:
@@ -41,9 +43,11 @@ private:
     WComboBox * paCa_;
     WPushButton *submit_;
 
-    // clé ; index dans combobox. val= clé (INS commune , code Division ou Code PaCa)
+    // clé ; index dans combobox. val= clé (INS commune , code Division)
     std::map<int,int> aMLabelCom;
     std::map<int,int> aMLabelDiv;
+    //std::map<int,int> aMLabelSec;
+    std::map<int,int> aMLabelPaCa;
 };
 
 #endif // WIDGETCADASTRE_H

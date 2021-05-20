@@ -51,9 +51,11 @@ void cadastre::loadInfo(){
             OGRFeature *poFeature;
             while( (poFeature = lay->GetNextFeature()) != NULL )
             {
-                //int ins=poFeature->GetFieldAsInteger("AdMuKey");
-                //int ins=poFeature->GetFieldAsString("NameFRE");
-                mVCom.emplace(std::make_pair(poFeature->GetFieldAsInteger("AdMuKey"),poFeature->GetFieldAsString("NameFRE")));
+                // on garde que la région wallonne
+                //std::cout << poFeature->GetFieldAsString("NameFRE") << " , " << poFeature->GetFieldAsInteger("AdReKey") << std::endl;
+                if (poFeature->GetFieldAsInteger("AdReKey")==3000){
+                    mVCom.emplace(std::make_pair(poFeature->GetFieldAsInteger("AdMuKey"),poFeature->GetFieldAsString("NameFRE")));
+                }
             }
         }
         GDALClose(mDS);
@@ -75,7 +77,10 @@ void cadastre::loadInfo(){
             OGRFeature *poFeature;
             while( (poFeature = lay->GetNextFeature()) != NULL )
             {
-                mVDiv.emplace(std::make_pair(poFeature->GetFieldAsInteger("CaDiKey"), std::make_tuple(poFeature->GetFieldAsInteger("AdMuKey"),poFeature->GetFieldAsString("NameFRE"))));
+                // garder que ceux qui sont dans une commune de RW
+                if (mVCom.find(poFeature->GetFieldAsInteger("AdMuKey"))!=mVCom.end()){
+                    mVDiv.emplace(std::make_pair(poFeature->GetFieldAsInteger("CaDiKey"), std::make_tuple(poFeature->GetFieldAsInteger("AdMuKey"),poFeature->GetFieldAsString("NameFRE"))));
+                }
             }
         }
         GDALClose(mDS);
@@ -100,10 +105,10 @@ void cadastre::loadInfo(){
                 // création d'une parcelle cadastrale et ajout au vecteur
                 std::unique_ptr<capa> pt=std::make_unique<capa>(poFeature->GetFieldAsString("CaSeKey"),poFeature->GetFieldAsString("CaPaKey"),&mVCom,&mVDiv);
 
-                        if (mVCaPa.find(pt->divCode)==mVCaPa.end()){
-                            mVCaPa.emplace(std::make_pair(pt->divCode,std::vector<std::unique_ptr<capa>>()));
-                        }
-                        mVCaPa.at(pt->divCode).push_back(std::move(pt));
+                if (mVCaPa.find(pt->divCode)==mVCaPa.end()){
+                    mVCaPa.emplace(std::make_pair(pt->divCode,std::vector<std::unique_ptr<capa>>()));
+                }
+                mVCaPa.at(pt->divCode).push_back(std::move(pt));
             }
         }
         GDALClose(mDS);
@@ -200,7 +205,7 @@ std::string cadastre::createPolygonCommune(int aINScode){
             {
                 if (poFeature->GetFieldAsInteger("AdMuKey")==aINScode){
                     // j'exporte ce polygone au format json
-                    aRes=poFeature->GetGeometryRef()->exportToJson();
+                    aRes=featureToGeoJSON(poFeature);
                     break;
                 }
             }
@@ -209,6 +214,54 @@ std::string cadastre::createPolygonCommune(int aINScode){
     } else {
         std::cout << inputPath << " n'existe pas " ;
     }
+    return aRes;
+}
+
+
+std::string featureToGeoJSON(OGRFeature *f)
+{
+    std::string aRes;
+
+    aRes+="{\"type\":\"FeatureCollection\", crs\": { \"type\": \"name\", \"properties\": { \"name\": \"urn:ogc:def:crs:EPSG::31370\" } },\"features\":[";
+    //Geometry
+    aRes+="{\"type\":\"Feature\",\"geometry\":" + std::string(f->GetGeometryRef()->exportToJson()) + ",";
+
+    //Properties
+    int count = f->GetFieldCount();
+    if (count!=0)
+    {
+        aRes+="\"properties\":{";
+        for (int i = 0; i < count; i++)
+        {
+            OGRFieldType type = f->GetFieldDefnRef(i)->GetType();
+            std::string key = f->GetFieldDefnRef(i)->GetNameRef();
+
+            if (type == OFTInteger)
+            {
+                int field = f->GetFieldAsInteger(i);
+                aRes+="\"" + key + "\":" + std::to_string(field) + ",";
+            }
+            else if (type == OFTReal)
+            {
+                double field = f->GetFieldAsDouble(i);
+                aRes+="\"" + key + "\":" + std::to_string(field) + ",";
+            }
+            else
+            {
+                std::string field = f->GetFieldAsString(i);
+                aRes+="\"" + key + "\":\"" + field + "\",";
+            }
+
+        }
+
+        aRes+="},";
+    }
+    //FID
+    long id = f->GetFID();
+    aRes+="\"id\":" + std::to_string(id) + "},";
+
+    aRes+="]}";
+
     return aRes;
 }
 //std::string createPolygonCaPa(int aDivCode,std::string aCaPaKey);

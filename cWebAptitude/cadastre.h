@@ -18,6 +18,8 @@ namespace fs = boost::filesystem ;
 // une classe qui ressemble un peu dans sa structure à celle de cnsw, qui sera membre du dicoApt
 // sert à renseigner les chemins d'accès vers les shp, à lire les dbf, à retourner les polygones des communes, division et parcelles cadastrales
 
+std::string featureToGeoJSON(OGRFeature *f);
+
 class capa;
 
 class capa{
@@ -44,7 +46,7 @@ public:
     // retourne le chemin d'accès vers le fichier json qui contient le polygone au format json
     std::string createPolygonDiv(int aDivCode);
     std::string createPolygonCommune(int aINScode);
-    std::string createPolygonCaPa(int aDivCode,std::string aCaPaKey);
+    std::string createPolygonPaCa(int aDivCode,std::string aCaPaKey);
 
     std::vector<std::string> getSectionForDiv(int aDivCode);
     std::vector<capa*> getCaPaPtrVector(int aDivCode,std::string aSection);
@@ -54,7 +56,7 @@ public:
         for (auto & kv : mVCom){
             aRes.emplace(std::make_pair(kv.first,kv.second+" "+std::to_string(kv.first)));
         }
-        // problème ; pas dans l'ordre alphabétique...
+        // problème ; pas dans l'ordre alphabétique... aie aie
         return aRes;
     }
     std::map<int,std::string> getDivisionLabel(int aCodeCommune){
