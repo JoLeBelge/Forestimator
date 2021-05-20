@@ -51,7 +51,7 @@ statWindow::statWindow(groupLayers * aGL):mDico(aGL->Dico()), mApp(aGL->m_app),m
     mAllStatIndivCont = addWidget(cpp14::make_unique<WContainerWidget>());
     mAllStatIndivCont->setId("AllStatIndividuelle");
 
-    mIGN= mDico->getLayerBase("IGN");
+    mIGN= mDico->getLayerBase("IGNgrfmn");
     mMNT= mDico->getLayerBase("MNT");
     mZBIO = mDico->getLayerBase("ZBIO");
     mPente= mDico->getLayerBase("slope");

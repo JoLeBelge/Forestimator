@@ -53,8 +53,8 @@ LIBS += -L$$PWD/../../../usr/lib/x86_64-linux-gnu/ -lsqlite3
 } else {
 # la compilation sous debian avec gcc-8 m'a montré un bug dans la boucle de création des groupes écologiques. je spécifie donc que c'est avec le compilateur g++-7 qu'il faut compiler le soft
 # update ; maintenant le code est compatible avec gcc 5 et 9.
-QMAKE_CC = gcc-8
-QMAKE_CXX = g++-8
+QMAKE_CC = gcc-10
+QMAKE_CXX = g++-10
 
 #LIBS += -L$$PWD/../../../usr/include/ -lsqlite3
 LIBS += -L$$PWD/usr/include/gdal/ -lgdal
