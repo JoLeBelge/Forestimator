@@ -26,8 +26,6 @@ class capa{
 
 public:
     capa(std::string aCaSecKey, std::string aCaPaKey, std::map<int,std::string> * aVCom, std::map<int,std::tuple<int,std::string>> * aVDiv);
-
-
     std::string CaSecKey, CaPaKey;
     int comINS, divCode;
     std::string section;
@@ -68,10 +66,15 @@ public:
         }
         return aRes;
     }
+
+    std::string saveFeatAsGEOJSON(OGRFeature *f);
+
     private:
       boost::filesystem::path mShpCommunePath;
       boost::filesystem::path mShpDivisionPath;
       boost::filesystem::path mShpParcellePath;
+
+      std::string mTmpDir;
 
       // clé ; code INS commune. valeur ; nom français
       std::map<int,std::string> mVCom;

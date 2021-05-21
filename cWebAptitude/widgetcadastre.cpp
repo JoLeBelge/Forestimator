@@ -93,12 +93,8 @@ void widgetCadastre::submit(){
 
     if (division_->currentIndex()==0){
         // commune
-        std::string name0 = std::tmpnam(nullptr);
-        std::string name1 = name0.substr(5,name0.size()-5);
-        //std::string aOut = mDico->File("TMPDIR")+"/"+name1+".geojson";
-        std::cout << "\n" << mCad->createPolygonCommune(aMLabelCom.at(commune_->currentIndex())) << std::endl;
+        pathGeoJson_.emit(mCad->createPolygonCommune(aMLabelCom.at(commune_->currentIndex())));
     }
-
     }
 }
 

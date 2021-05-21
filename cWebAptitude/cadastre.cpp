@@ -17,14 +17,15 @@ void cadastre::loadInfo(){
     std::string s(userName),SQLstring;
 
     if (s=="lisein"){
-        SQLstring="SELECT Dir2,Nom,Code FROM fichiersGIS WHERE Categorie='Cadastre';";
+        SQLstring="SELECT Dir2,Nom,Code FROM fichiersGIS WHERE Categorie='Cadastre' OR Code='TMPDIR';";
     } else {
-        SQLstring="SELECT Dir,Nom,Code FROM fichiersGIS WHERE Categorie='Cadastre';";
+        SQLstring="SELECT Dir,Nom,Code FROM fichiersGIS WHERE Categorie='Cadastre' OR Code='TMPDIR';";
     }
     sqlite3_prepare_v2( db_, SQLstring.c_str(), -1, &stmt, NULL );
     while(sqlite3_step(stmt) == SQLITE_ROW)
     {
-        if (sqlite3_column_type(stmt, 0)!=SQLITE_NULL && sqlite3_column_type(stmt, 1)!=SQLITE_NULL  && sqlite3_column_type(stmt, 2)!=SQLITE_NULL){
+       // if (sqlite3_column_type(stmt, 0)!=SQLITE_NULL && sqlite3_column_type(stmt, 1)!=SQLITE_NULL  && sqlite3_column_type(stmt, 2)!=SQLITE_NULL){
+        if (sqlite3_column_type(stmt, 0)!=SQLITE_NULL){
             std::string code=std::string((char *)sqlite3_column_text( stmt, 2 ));
             if (code=="Commune"){
                 mShpCommunePath=fs::path(std::string( (char *)sqlite3_column_text( stmt, 0 ) )+"/"+std::string( (char *)sqlite3_column_text( stmt, 1 ) ));
@@ -32,7 +33,9 @@ void cadastre::loadInfo(){
                 mShpDivisionPath=fs::path(std::string( (char *)sqlite3_column_text( stmt, 0 ) )+"/"+std::string( (char *)sqlite3_column_text( stmt, 1 ) ));
             }else if (code=="PaCa"){
                 mShpParcellePath=fs::path(std::string( (char *)sqlite3_column_text( stmt, 0 ) )+"/"+std::string( (char *)sqlite3_column_text( stmt, 1 ) ));
-            }
+        }else if (code=="TMPDIR"){
+            mTmpDir=std::string( (char *)sqlite3_column_text( stmt, 0 ));
+        }
         }
     }
     sqlite3_finalize(stmt);
@@ -204,8 +207,8 @@ std::string cadastre::createPolygonCommune(int aINScode){
             while( (poFeature = lay->GetNextFeature()) != NULL )
             {
                 if (poFeature->GetFieldAsInteger("AdMuKey")==aINScode){
-                    // j'exporte ce polygone au format json
-                    aRes=featureToGeoJSON(poFeature);
+                    // j'exporte ce polygone au format json, je le sauve dans un fichier, me retourne le nom du fichier
+                    aRes=saveFeatAsGEOJSON(poFeature);
                     break;
                 }
             }
@@ -217,12 +220,11 @@ std::string cadastre::createPolygonCommune(int aINScode){
     return aRes;
 }
 
-
 std::string featureToGeoJSON(OGRFeature *f)
 {
     std::string aRes;
 
-    aRes+="{\"type\":\"FeatureCollection\", crs\": { \"type\": \"name\", \"properties\": { \"name\": \"urn:ogc:def:crs:EPSG::31370\" } },\"features\":[";
+    aRes+="{\"type\":\"FeatureCollection\", \"crs\": { \"type\": \"name\", \"properties\": { \"name\": \"urn:ogc:def:crs:EPSG::31370\" } },\"features\":[";
     //Geometry
     aRes+="{\"type\":\"Feature\",\"geometry\":" + std::string(f->GetGeometryRef()->exportToJson()) + ",";
 
@@ -259,9 +261,18 @@ std::string featureToGeoJSON(OGRFeature *f)
     //FID
     long id = f->GetFID();
     aRes+="\"id\":" + std::to_string(id) + "},";
-
     aRes+="]}";
-
     return aRes;
+}
+
+std::string cadastre::saveFeatAsGEOJSON(OGRFeature *f){
+    std::string name0 = std::tmpnam(nullptr);
+    std::string name1 = name0.substr(5,name0.size()-5);
+    std::string aOut = mTmpDir+"/"+name1+".geojson";
+    std::string pol=featureToGeoJSON(f);
+    std::ofstream ofs (aOut, std::ofstream::out);
+    ofs << pol;
+    ofs.close();
+    return aOut;
 }
 //std::string createPolygonCaPa(int aDivCode,std::string aCaPaKey);

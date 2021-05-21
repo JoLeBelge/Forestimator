@@ -2,6 +2,7 @@
 
 int globSurfMax(3000);// en ha
 int globVolMaxShp(10000);// en ko // n'as pas l'air de fonctionner comme je le souhaite
+extern bool globTest;
 
 parcellaire::parcellaire(groupLayers *aGL, Wt::WApplication* app, statWindow *statW):mGL(aGL),centerX(0.0),centerY(0.0),mClientName(""),mName(""),mFullPath(""),m_app(app),fu(NULL),msg(NULL)
   ,hasValidShp(0)
@@ -52,6 +53,11 @@ parcellaire::parcellaire(groupLayers *aGL, Wt::WApplication* app, statWindow *st
     downloadRasterBt->clicked().connect(this,&parcellaire::downloadRaster);
     // ouu je pense que c'est mal, car si j'appui sur boutton télécharger les cartes, il me dis que toutes les cartes sont sélectionnées
     mContSelect4D->addWidget(std::unique_ptr<baseSelectLayers>(mGL->mSelectLayers));
+
+    if (globTest){
+    widgetCadastre * w=addWidget(cpp14::make_unique<widgetCadastre>(mDico->mCadastre.get()));
+    w->sendPolygone().connect(this,&parcellaire::polygoneCadastre);
+    }
 }
 
 parcellaire::~parcellaire(){
@@ -516,4 +522,23 @@ void parcellaire::selectPolygon(double x, double y){
             GDALClose(mDS);
         } else { std::cout << "select Polygone mDS is null " << std::endl;}
     }
+}
+
+void parcellaire::polygoneCadastre(std::string aFileGeoJson){
+
+    std::cout << "polygoneCadastre()\n\n" << std::endl;
+
+    //check que fichier existe, et que fichier valable.
+    //this->mClientName = p.stem().c_str();
+
+    //mName = ((std::string) p2.filename().c_str()) + "-"+ mClientName;
+    //mFullPath = this->mDico->File("TMPDIR")+ mName;
+    /*if (computeGlobalGeom()){
+        hasValidShp=true;
+        //computeStatButton->enable();
+        downloadRasterBt->enable();
+        display();
+        mGL->mMap->setToolTip(tr("tooltipMap2"));
+    }*/
+
 }

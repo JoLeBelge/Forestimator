@@ -8,6 +8,7 @@
 #include <Wt/WLabel.h>
 #include <Wt/WPushButton.h>
 #include <Wt/WText.h>
+#include <Wt/WSignal.h>
 #include <vector>
 #include <algorithm>
 
@@ -33,6 +34,9 @@ public:
     void refreshPaCa();
 
     void submit();
+
+    Wt::Signal<std::string>& sendPolygone() { return pathGeoJson_; }
+    Wt::Signal<std::string> pathGeoJson_;
 private:
     cadastre * mCad;
 

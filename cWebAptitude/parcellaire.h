@@ -15,6 +15,7 @@
 #include "Wt/WFileResource.h"
 #include "Wt/WLoadingIndicator.h"
 #include "statwindow.h"
+#include "widgetcadastre.h"
 
 #include "boost/filesystem.hpp"
 #include <functional> //--> pour bind
@@ -58,6 +59,10 @@ public:
     //void downloadShp();
     void downloadRaster();
     bool cropImWithShp(std::string inputRaster, std::string aOut);
+
+    // une méthode pour utiliser le polygone issu d'une recherche sur le cadastre. Un seul polygone, format geojson - et les signaux qui vont avec pour la communicaiton avec widgetCadastre.
+    void polygoneCadastre(std::string aFileGeoJson);
+
 
 private:
 

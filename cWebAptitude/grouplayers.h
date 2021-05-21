@@ -26,7 +26,6 @@
 #include "auth.h"
 #include "selectlayers.h"
 #include "statHdomCompo.h"
-#include "widgetcadastre.h"
 
 class WOpenLayers;
 class Layer;
