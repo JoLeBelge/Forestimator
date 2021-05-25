@@ -51,6 +51,7 @@ private:
     std::map<int,int> aMLabelCom;
     std::map<int,int> aMLabelDiv;
     //std::map<int,int> aMLabelSec;
+    // clé ; index dans combobox. val= FID du polygone
     std::map<int,int> aMLabelPaCa;
 };
 

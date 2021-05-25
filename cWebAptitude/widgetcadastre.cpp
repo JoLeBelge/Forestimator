@@ -32,24 +32,25 @@ widgetCadastre::widgetCadastre(cadastre * aCad):mCad(aCad),WTable()
     commune_->changed().connect(std::bind(&widgetCadastre::refreshDivision, this));
     division_->changed().connect(std::bind(&widgetCadastre::refreshSection, this));
     section_->changed().connect(std::bind(&widgetCadastre::refreshPaCa, this));
+
+    section_->disable();
+    paCa_->disable();
+    division_->disable();
 }
 
 void widgetCadastre::refreshDivision(){
     //std::cout << "refresh Division  Combobox" << std::endl;
-    if (commune_->currentIndex()!=0 && aMLabelCom.find(commune_->currentIndex())!=aMLabelCom.end()){
-        division_->clear();
-        //division_->setNoSelectionEnabled(1);
-        //division_->setCurrentIndex(-1);
-        aMLabelDiv.clear();        
+    division_->clear();
+    aMLabelDiv.clear();
+    section_->clear();
+    paCa_->clear();
+    aMLabelPaCa.clear();
+    section_->disable();
+    paCa_->disable();
+    division_->enable();
+    if (commune_->currentIndex()!=0 && aMLabelCom.find(commune_->currentIndex())!=aMLabelCom.end()){   
         aMLabelDiv.emplace(std::make_pair(0,0));
         division_->addItem(tr("cadastre.choisir"));
-
-        section_->clear();
-        section_->setNoSelectionEnabled(1);
-        //section_->setCurrentIndex(-1);
-        paCa_->clear();
-        //paCa_->setNoSelectionEnabled(1);
-        paCa_->setCurrentIndex(-1);
         int c(1);
         for (auto & l : mCad->getDivisionLabel(aMLabelCom.at(commune_->currentIndex()))){
             // sert à avoir directement le lien entre l'index de la combobox div et le code
@@ -62,16 +63,16 @@ void widgetCadastre::refreshDivision(){
 
 void widgetCadastre::refreshSection(){
     //std::cout << "refresh Section  Combobox" << std::endl;
+    section_->clear();
+    paCa_->clear();
+    aMLabelPaCa.clear();
+    section_->enable();
     if (division_->currentIndex()!=0 && aMLabelDiv.find(division_->currentIndex())!=aMLabelDiv.end()){
-        section_->clear();
-        section_->setNoSelectionEnabled(1);
-        section_->setCurrentIndex(-1);
-        paCa_->clear();
-        paCa_->setCurrentIndex(-1);
-        int c(0);
+
+        section_->addItem(tr("cadastre.choisir"));
+
         for (auto & l : mCad->getSectionForDiv(aMLabelDiv.at(division_->currentIndex()))){
             section_->addItem(l);
-            c++;
         }
     }
 }
@@ -79,11 +80,16 @@ void widgetCadastre::refreshSection(){
 void widgetCadastre::refreshPaCa(){
     //std::cout << "refresh paca Combobox" << std::endl;
         paCa_->clear();
-        paCa_->setCurrentIndex(-1);
-        int c(0);
+        aMLabelPaCa.clear();
+        paCa_->enable();
+        if (section_->currentIndex()!=0){
+        paCa_->addItem(tr("cadastre.choisir"));
+        int c(1);
         for (capa * l : mCad->getCaPaPtrVector(aMLabelDiv.at(division_->currentIndex()),section_->currentText().toUTF8())){
             paCa_->addItem(l->CaPaKey);
+            aMLabelPaCa.emplace(std::make_pair(c,l->mPID));
             c++;
+        }
         }
 }
 
@@ -94,44 +100,15 @@ void widgetCadastre::submit(){
     if (division_->currentIndex()==0){
         // commune
         pathGeoJson_.emit(mCad->createPolygonCommune(aMLabelCom.at(commune_->currentIndex())));
+    } else if (section_->currentIndex()==0){
+        // division
+        pathGeoJson_.emit(mCad->createPolygonDiv(aMLabelDiv.at(division_->currentIndex())));
+    } else if (paCa_->currentIndex()!=0 && section_->currentIndex()!=0){
+        // parcelle cadastrale
+        //pathGeoJson_.emit(mCad->createPolygonPaCa(paCa_->currentText().toUTF8()));
+        // avec FID c'est plus rapide pour la recherche dans le shp
+        pathGeoJson_.emit(mCad->createPolygonPaCa(aMLabelPaCa.at(paCa_->currentIndex())));
     }
     }
 }
 
-/*
-void widgetCadastre::display(){
-    //std::cout << " parcellaire::display " << std::endl;
-    boost::system::error_code ec;
-    std::string JSfile(mDico->File("addOLgeojson"));
-    if (boost::filesystem::exists(JSfile,ec)){
-        assert(!ec);
-        std::cout << " ... " << std::endl;
-        std::stringstream ss;
-        std::string aFileIn(JSfile);
-
-        std::ifstream in(aFileIn);
-        ss << in.rdbuf();
-        in.close();
-        std::string JScommand(ss.str());
-
-        std::string aFind1("NAME");
-
-        std::string aReplace(geoJsonRelName());
-
-        boost::replace_all(JScommand,aFind1,aReplace);
-
-        // extent du parcellaire
-        boost::replace_all(JScommand,"MAXX",std::to_string(mParcellaireExtent.MaxX));
-        boost::replace_all(JScommand,"MAXY",std::to_string(mParcellaireExtent.MaxY));
-        boost::replace_all(JScommand,"MINX",std::to_string(mParcellaireExtent.MinX));
-        boost::replace_all(JScommand,"MINY",std::to_string(mParcellaireExtent.MinY));
-
-        doJavaScript(JScommand);
-        // centrer la map sur le shp
-        doJavaScript("map.getView().setCenter(["+std::to_string(centerX)+","+std::to_string(centerY)+" ]);");
-    } else {
-        std::cout << " ne trouve pas le fichier script de js " << std::endl;
-    }
-    //std::cout << " done " << std::endl;
-}
-*/

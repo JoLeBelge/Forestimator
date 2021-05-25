@@ -183,10 +183,10 @@ bool parcellaire::to31370AndGeoJson(){
     return aRes;
 }
 
-bool parcellaire::computeGlobalGeom(){
+bool parcellaire::computeGlobalGeom(std::string extension="shp",bool limitSize=1){
     //std::cout << "computeGlobalGeom " << std::endl;
     bool aRes(0);
-    std::string input(mFullPath+ ".shp");
+    std::string input(mFullPath+ "."+extension);
     const char *inputPath=input.c_str();
     GDALDataset * DS =  (GDALDataset*) GDALOpenEx( inputPath, GDAL_OF_VECTOR | GDAL_OF_READONLY, NULL, NULL, NULL );
     if( DS != NULL )
@@ -250,7 +250,7 @@ bool parcellaire::computeGlobalGeom(){
             poGeomGlobale = poGeom2->Simplify(1.0);
             int aSurfha=OGR_G_Area(poGeomGlobale)/10000;
             printf("aSurfha=%d",aSurfha);
-            if (aSurfha<globSurfMax){
+            if (!limitSize | aSurfha<globSurfMax){
                 poGeomGlobale->getEnvelope(&mParcellaireExtent);
                 centerX= (mParcellaireExtent.MaxX+mParcellaireExtent.MinX)/2;
                 centerY= (mParcellaireExtent.MaxY+mParcellaireExtent.MinY)/2;
@@ -258,6 +258,8 @@ bool parcellaire::computeGlobalGeom(){
             }
         }
 
+    }else {
+        std::cout << "computeGlobalGeom : je n'arrive pas à ouvrir " << mFullPath << "."<< extension<< std::endl;
     }
     GDALClose(DS);
     return aRes;
@@ -526,19 +528,17 @@ void parcellaire::selectPolygon(double x, double y){
 
 void parcellaire::polygoneCadastre(std::string aFileGeoJson){
 
-    std::cout << "polygoneCadastre()\n\n" << std::endl;
+    //std::cout << "polygoneCadastre()\n" << std::endl;
 
-    //check que fichier existe, et que fichier valable.
-    //this->mClientName = p.stem().c_str();
+    mFullPath=aFileGeoJson.substr(0,aFileGeoJson.size()-8);
+    fs::path p(aFileGeoJson);
+    mName=p.filename().stem().c_str();
 
-    //mName = ((std::string) p2.filename().c_str()) + "-"+ mClientName;
-    //mFullPath = this->mDico->File("TMPDIR")+ mName;
-    /*if (computeGlobalGeom()){
+    if (computeGlobalGeom("geojson",0)){
         hasValidShp=true;
-        //computeStatButton->enable();
         downloadRasterBt->enable();
         display();
         mGL->mMap->setToolTip(tr("tooltipMap2"));
-    }*/
+    }
 
 }

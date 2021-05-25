@@ -38,7 +38,7 @@ public:
     // effectue des vérification du shp (polygone, src)
     void checkShp();
     // merge de tout les polygones pour avoir une géométrie globale et y calculer la surface totale
-    bool computeGlobalGeom();
+    bool computeGlobalGeom(std::string extension, bool limitSize);
 
     // computeStat est l'ancienne version qui ajoutait un champ au shp - OLD
     void computeStat();

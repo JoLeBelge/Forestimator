@@ -25,9 +25,9 @@ class capa;
 class capa{
 
 public:
-    capa(std::string aCaSecKey, std::string aCaPaKey, std::map<int,std::string> * aVCom, std::map<int,std::tuple<int,std::string>> * aVDiv);
+    capa(std::string aCaSecKey, std::string aCaPaKey,int aPID, std::map<int,std::tuple<int,std::string>> * aVDiv);
     std::string CaSecKey, CaPaKey;
-    int comINS, divCode;
+    int comINS, divCode, mPID;
     std::string section;
     std::string * divisionName;
     private:
@@ -44,7 +44,8 @@ public:
     // retourne le chemin d'accès vers le fichier json qui contient le polygone au format json
     std::string createPolygonDiv(int aDivCode);
     std::string createPolygonCommune(int aINScode);
-    std::string createPolygonPaCa(int aDivCode,std::string aCaPaKey);
+    std::string createPolygonPaCa(std::string aCaPaKey, int divCode);// trop lent
+    std::string createPolygonPaCa(int aFID);
 
     std::vector<std::string> getSectionForDiv(int aDivCode);
     std::vector<capa*> getCaPaPtrVector(int aDivCode,std::string aSection);
@@ -83,7 +84,6 @@ public:
       std::map<int,std::tuple<int,std::string>> mVDiv;
       //std::vector<std::unique_ptr<capa>> mVCaPa;
       //clé ; le code de la division.
-
       std::map<int,std::vector<std::unique_ptr<capa>>> mVCaPa;
 
       sqlite3 *db_;

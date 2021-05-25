@@ -2,6 +2,7 @@
 
 cadastre::cadastre(sqlite3 *db)
 {
+    std::cout << " creation de la BD cadastre ; ça prend un peu de temps..\n" << std::endl;
     db_=db;
     // les chemins d'accès vers les shp
     GDALAllRegister();
@@ -24,7 +25,7 @@ void cadastre::loadInfo(){
     sqlite3_prepare_v2( db_, SQLstring.c_str(), -1, &stmt, NULL );
     while(sqlite3_step(stmt) == SQLITE_ROW)
     {
-       // if (sqlite3_column_type(stmt, 0)!=SQLITE_NULL && sqlite3_column_type(stmt, 1)!=SQLITE_NULL  && sqlite3_column_type(stmt, 2)!=SQLITE_NULL){
+        // if (sqlite3_column_type(stmt, 0)!=SQLITE_NULL && sqlite3_column_type(stmt, 1)!=SQLITE_NULL  && sqlite3_column_type(stmt, 2)!=SQLITE_NULL){
         if (sqlite3_column_type(stmt, 0)!=SQLITE_NULL){
             std::string code=std::string((char *)sqlite3_column_text( stmt, 2 ));
             if (code=="Commune"){
@@ -33,9 +34,9 @@ void cadastre::loadInfo(){
                 mShpDivisionPath=fs::path(std::string( (char *)sqlite3_column_text( stmt, 0 ) )+"/"+std::string( (char *)sqlite3_column_text( stmt, 1 ) ));
             }else if (code=="PaCa"){
                 mShpParcellePath=fs::path(std::string( (char *)sqlite3_column_text( stmt, 0 ) )+"/"+std::string( (char *)sqlite3_column_text( stmt, 1 ) ));
-        }else if (code=="TMPDIR"){
-            mTmpDir=std::string( (char *)sqlite3_column_text( stmt, 0 ));
-        }
+            }else if (code=="TMPDIR"){
+                mTmpDir=std::string( (char *)sqlite3_column_text( stmt, 0 ));
+            }
         }
     }
     sqlite3_finalize(stmt);
@@ -92,7 +93,11 @@ void cadastre::loadInfo(){
     }
 
     // lecture des parcelles cadastrales - il y en a 4 000 000 donc je ne vais pas tout lire, sinon c'est un peu lent.
-    inputPath= mShpParcellePath.c_str();
+    //inputPath= mShpParcellePath.c_str();
+    // si j'ouvre uniquement le dbf, est-ce que je ne gagne pas un peu de temps? apparemment pas...
+    std::string tmp= mShpParcellePath.c_str();
+    tmp= tmp.substr(0,mShpParcellePath.size()-3)+"dbf";
+    inputPath=tmp.c_str();
     if (boost::filesystem::exists(inputPath)){
         GDALDataset * mDS; mDS= GDALDataset::Open(inputPath, GDAL_OF_VECTOR | GDAL_OF_READONLY);
         if( mDS == NULL )
@@ -106,7 +111,7 @@ void cadastre::loadInfo(){
             while( (poFeature = lay->GetNextFeature()) != NULL )
             {
                 // création d'une parcelle cadastrale et ajout au vecteur
-                std::unique_ptr<capa> pt=std::make_unique<capa>(poFeature->GetFieldAsString("CaSeKey"),poFeature->GetFieldAsString("CaPaKey"),&mVCom,&mVDiv);
+                std::unique_ptr<capa> pt=std::make_unique<capa>(poFeature->GetFieldAsString("CaSeKey"),poFeature->GetFieldAsString("CaPaKey"),poFeature->GetFID(),&mVDiv);
 
                 if (mVCaPa.find(pt->divCode)==mVCaPa.end()){
                     mVCaPa.emplace(std::make_pair(pt->divCode,std::vector<std::unique_ptr<capa>>()));
@@ -131,16 +136,14 @@ void cadastre::loadInfo(){
 }
 
 
-capa::capa(std::string aCaSecKey, std::string aCaPaKey, std::map<int,std::string> * aVCom, std::map<int,std::tuple<int,std::string>> * aVDiv):
-    CaSecKey(aCaSecKey),CaPaKey(aCaPaKey),comINS(0){
+capa::capa(std::string aCaSecKey, std::string aCaPaKey, int aPID, std::map<int,std::tuple<int,std::string>> * aVDiv):
+    CaSecKey(aCaSecKey),CaPaKey(aCaPaKey),comINS(0),mPID(aPID){
     // détermine le code division et la section depuis CaSecKey
     divCode=std::stoi(CaSecKey.substr(0,CaSecKey.size()-1));
     section=CaSecKey.substr(CaSecKey.size()-1,CaSecKey.size());
     if( aVDiv->find(divCode)!=aVDiv->end()){
         comINS=std::get<0>(aVDiv->at(divCode));
     }
-
-    //std::cout << "Parcelle Cadastrale " << CaPaKey << ", section " << section << " de la division " << divCode << " , commune " << comINS<< std::endl;
 }
 
 std::vector<std::string> cadastre::getSectionForDiv(int aDivCode){
@@ -180,7 +183,7 @@ std::string cadastre::createPolygonDiv(int aDivCode){
             {
                 if (poFeature->GetFieldAsInteger("CaDiKey")==aDivCode){
                     // j'exporte ce polygone au format json
-                    aRes=poFeature->GetGeometryRef()->exportToJson();
+                    aRes=saveFeatAsGEOJSON(poFeature);
                     break;
                 }
             }
@@ -219,15 +222,61 @@ std::string cadastre::createPolygonCommune(int aINScode){
     }
     return aRes;
 }
+/*
+std::string cadastre::createPolygonPaCa(std::string aCaPaKey, int divCode){
+    std::string aRes;
+    const char *inputPath= mShpParcellePath.c_str();
+    if (boost::filesystem::exists(inputPath)){
+        GDALDataset * mDS; mDS= GDALDataset::Open(inputPath, GDAL_OF_VECTOR | GDAL_OF_READONLY);
+        if( mDS == NULL )
+        {
+            std::cout << inputPath << " : " ;
+            printf( " cadastre : Open parcelles failed." );
+        } else{
+            // layer
+            OGRLayer * lay = mDS->GetLayer(0);
+           // OGRFeature *poFeature=lay->GetFeature();
+            // j'exporte ce polygone au format json, je le sauve dans un fichier, me retourne le nom du fichier
+            aRes=saveFeatAsGEOJSON(poFeature);
+
+
+        }
+        GDALClose(mDS);
+    } else {
+        std::cout << inputPath << " n'existe pas " ;
+    }
+    return aRes;
+}*/
+
+std::string cadastre::createPolygonPaCa(int aFID){
+    std::string aRes;
+    const char *inputPath= mShpParcellePath.c_str();
+    if (boost::filesystem::exists(inputPath)){
+        GDALDataset * mDS; mDS= GDALDataset::Open(inputPath, GDAL_OF_VECTOR | GDAL_OF_READONLY);
+        if( mDS == NULL )
+        {
+            std::cout << inputPath << " : " ;
+            printf( " cadastre : Open parcelles failed." );
+        } else{
+            // layer
+            OGRLayer * lay = mDS->GetLayer(0);
+            OGRFeature *poFeature=lay->GetFeature(aFID);
+            // j'exporte ce polygone au format json, je le sauve dans un fichier, me retourne le nom du fichier
+            aRes=saveFeatAsGEOJSON(poFeature);
+        }
+        GDALClose(mDS);
+    } else {
+        std::cout << inputPath << " n'existe pas " ;
+    }
+    return aRes;
+}
 
 std::string featureToGeoJSON(OGRFeature *f)
 {
     std::string aRes;
-
-    aRes+="{\"type\":\"FeatureCollection\", \"crs\": { \"type\": \"name\", \"properties\": { \"name\": \"urn:ogc:def:crs:EPSG::31370\" } },\"features\":[";
+    aRes+="{\"type\":\"FeatureCollection\",\n \"crs\": { \"type\": \"name\", \"properties\": { \"name\": \"urn:ogc:def:crs:EPSG::31370\" } },\n \"features\":[\n";
     //Geometry
-    aRes+="{\"type\":\"Feature\",\"geometry\":" + std::string(f->GetGeometryRef()->exportToJson()) + ",";
-
+    aRes+="{\"type\":\"Feature\",\"geometry\":" + std::string(f->GetGeometryRef()->exportToJson()) + ",\n";
     //Properties
     int count = f->GetFieldCount();
     if (count!=0)
@@ -241,27 +290,26 @@ std::string featureToGeoJSON(OGRFeature *f)
             if (type == OFTInteger)
             {
                 int field = f->GetFieldAsInteger(i);
-                aRes+="\"" + key + "\":" + std::to_string(field) + ",";
+                aRes+="\"" + key + "\":" + std::to_string(field);
             }
             else if (type == OFTReal)
             {
                 double field = f->GetFieldAsDouble(i);
-                aRes+="\"" + key + "\":" + std::to_string(field) + ",";
+                aRes+="\"" + key + "\":" + std::to_string(field) ;
             }
             else
             {
                 std::string field = f->GetFieldAsString(i);
-                aRes+="\"" + key + "\":\"" + field + "\",";
+                aRes+="\"" + key + "\":\"" + field + "\"";
             }
+            if (i+1!=count){aRes+=+ ",";}
 
         }
 
-        aRes+="},";
+        aRes+="}\n";
     }
-    //FID
-    long id = f->GetFID();
-    aRes+="\"id\":" + std::to_string(id) + "},";
-    aRes+="]}";
+    aRes+="}\n";
+    aRes+="]}\n";
     return aRes;
 }
 
@@ -275,4 +323,4 @@ std::string cadastre::saveFeatAsGEOJSON(OGRFeature *f){
     ofs.close();
     return aOut;
 }
-//std::string createPolygonCaPa(int aDivCode,std::string aCaPaKey);
+
