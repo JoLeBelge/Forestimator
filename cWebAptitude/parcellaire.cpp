@@ -100,7 +100,7 @@ bool parcellaire::to31370AndGeoJson(){
     // 0) suppression des polygones foireux - radical mais c'est l'utilisateur qui doit gérer ses propres merdes
 
     bool testEPSG(1);
-    GDALDataset * DS =  (GDALDataset*) GDALOpenEx( inputPath, GDAL_OF_VECTOR | GDAL_OF_UPDATE, NULL, NULL, NULL );
+    GDALDataset * DS =  (GDALDataset*) GDALOpenEx( inputPath, GDAL_OF_VECTOR | GDAL_OF_READONLY, NULL, NULL, NULL );
     if( DS != NULL )
     {
 
@@ -109,10 +109,29 @@ bool parcellaire::to31370AndGeoJson(){
         //oSRS.importFromWkt(&pszWkt);
         //const char *targetEPSG=oSRS.GetAuthorityCode("GEOGCS");
         //std::cout << "targetEPSG : " << targetEPSG << std::endl;
+        std::cout << " toto"  << std::endl;
 
         OGRLayer * lay = DS->GetLayer(0);
         OGRSpatialReference * oSRS=lay->GetSpatialRef();
+        std::cout << " tato"  << std::endl;
+        if (oSRS==NULL){
+            auto messageBox =
+                    addChild(Wt::cpp14::make_unique<Wt::WMessageBox>(
+                                 "Système de projection",
+                                 "Le système de projection de votre shapefile n'est pas défini. L'import a échoué."
+                                 ,
+                                 Wt::Icon::Warning,
+                                 Wt::StandardButton::Ok));
+
+            messageBox->setModal(true);
+            messageBox->buttonClicked().connect([=] {
+                removeChild(messageBox);
+            });
+            messageBox->show();
+            return 0;
+        }
         int EPSG =  oSRS->GetEPSGGeogCS();
+        std::cout << " tutu"  << std::endl;
         std::cout << "EPSG : " << EPSG << std::endl;
         if (EPSG==-1){testEPSG=0;}
         OGRFeature *poFeature;
@@ -127,6 +146,9 @@ bool parcellaire::to31370AndGeoJson(){
             }
         }
 
+    } else {
+        std::cout << " pas possible de lire fichier " << inputPath << std::endl;
+        return 0;
     }
     GDALClose(DS);
 
@@ -340,6 +362,7 @@ void parcellaire::upload(){
     // ici je converti en json et affichage dans ol
     if (nbFiles==3){
         msg->setText("Téléchargement du shp effectué avec succès.");
+         std::cout << "Téléchargement du shp effectué avec succès.. " << std::endl ;
         if (to31370AndGeoJson()){
             if (computeGlobalGeom()){
                 hasValidShp=true;
