@@ -87,7 +87,6 @@ SOURCES += main.cpp \
     uploadcarte.cpp \
     libzippp/src/libzippp.cpp \
     ecogrammeEss.cpp \
-    stackinfoptr.cpp \
     statwindow.cpp \
     selectlayers.cpp \
     presentationpage.cpp \
@@ -115,7 +114,6 @@ HEADERS += \
     uploadcarte.h \
     libzippp/src/libzippp.h \
     ecogrammeEss.h \
-    stackinfoptr.h \
     statwindow.h \
     selectlayers.h \
     presentationpage.h \

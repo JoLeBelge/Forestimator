@@ -1,7 +1,7 @@
 #ifndef PARCELLAIRE_H
 #define PARCELLAIRE_H
+#pragma once
 #include "grouplayers.h"
-
 #include <Wt/WBreak.h>
 #include <Wt/WContainerWidget.h>
 #include <Wt/WFileUpload.h>
@@ -21,6 +21,11 @@
 #include <functional> //--> pour bind
 #include "./libzippp/src/libzippp.h"
 using namespace libzippp;
+
+class groupLayers;
+class statWindow;
+class cDicoApt;
+
 
 // objet qui comprend le shp d'un parcellaire DNF que l'on va afficher dans openlayer
 // cet objet contient également l'interface graphique wt avec les bouttons qui permettent de charger le shp, les bouttons pour démarrer les calcul, ect

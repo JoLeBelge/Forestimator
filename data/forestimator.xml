@@ -594,6 +594,7 @@ detAptFEE
 <message id="menu.button.tooltip.carto">Cartographie</message>
 <message id="menu.button.tooltip.point">Info ponctuelle</message>
 <message id="menu.button.tooltip.surf">Analyse surfacique</message>
+<message id="menu.button.tooltip.panier_collapse">Réduire / Aggrandir</message>
 
 <message id="desc.home">Forestimator: outils cartographiques pour la gestion des forêts Wallonnes</message>
 <message id="desc.pres">Présentation et explication des fonctionnalités du site web</message>

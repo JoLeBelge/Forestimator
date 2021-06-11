@@ -13,7 +13,7 @@
 #include <Wt/WCheckBox.h>
 #include <Wt/WMessageBox.h>
 #include <Wt/WLoadingIndicator.h>
-#include "stackinfoptr.h"
+#include "cwebaptitude.h"
 #include "layer.h"
 #include "simplepoint.h"
 #include <fstream>
@@ -39,7 +39,7 @@ class rasterFiles;
 class baseSelectLayers;
 class selectLayers4Stat;
 class selectLayers;
-class stackInfoPtr;
+class cWebAptitude;
 class AuthApplication;
 class groupStat;
 
@@ -95,7 +95,7 @@ protected:
 class groupLayers: public WContainerWidget, public groupStat
 {
 public:
-    groupLayers(cDicoApt * aDico,WOpenLayers * aMap, AuthApplication* app,stackInfoPtr * aStackInfoPtr);
+    groupLayers(cDicoApt * aDico,WOpenLayers * aMap, AuthApplication* app,cWebAptitude * acWebAptitude);
     ~groupLayers();
     /*groupLayers(const groupLayers &gl){
         std::cout << "construct by copy group layer -- should never happend\n\n\n" << std::endl;
@@ -171,7 +171,7 @@ public:
     Wt::WLineEdit * tb_extent_name;
     Wt::WText * mTitle;
     Wt::WTable * mLegendIndiv;
-    stackInfoPtr * mStackInfoPtr;
+    cWebAptitude * mcWebAptitude;
 
     void saveExtent(double c_x, double c_y, double zoom);
     void deleteExtent(std::string id);

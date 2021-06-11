@@ -80,6 +80,18 @@
 
 }
 
+.content_couches{
+	width:300px;
+}
+
+.menu_gauche{
+	background-color:green;
+}
+
+.menu_gauche ul li a {
+	padding:0px;
+}
+
 .content_info{
 	padding: 6px 0px 6px 0px;
 	margin: 0px;
