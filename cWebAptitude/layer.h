@@ -1,11 +1,12 @@
 #ifndef LAYER_H
 #define LAYER_H
 
+#pragma once
 #include <Wt/WText.h>
 #include "cdicoapt.h"
 #include <Wt/WString.h>
-#include "grouplayers.h"
-
+//#include "grouplayers.h"
+#include "cwebaptitude.h"
 
 using namespace Wt;
 

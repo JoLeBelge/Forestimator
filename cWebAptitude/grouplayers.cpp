@@ -3,15 +3,15 @@
 int maxSizePix4Export(30000);
 extern bool globTest;
 
-groupLayers::groupLayers(cDicoApt * aDico, WOpenLayers *aMap, AuthApplication *app, stackInfoPtr * aStackInfoPtr):
+groupLayers::groupLayers(cDicoApt * aDico, WOpenLayers *aMap, AuthApplication *app, cWebAptitude * acWebAptitude):
     mDico(aDico)
   ,mTypeClassifST(FEE)
   ,mMap(aMap)
-  ,mParent(aStackInfoPtr->mGroupLayerW)
+  ,mParent(acWebAptitude->mGroupLayerW)
   ,m_app(app)
   ,mAnaPoint(NULL)
   ,mSelectLayers(NULL)
-  ,mStackInfoPtr(aStackInfoPtr)
+  ,mcWebAptitude(acWebAptitude)
   ,mapExtent_(this,"1.0")
   ,sigMapCenter(this,"2.0")
   ,slot(this)
@@ -179,7 +179,7 @@ groupLayers::groupLayers(cDicoApt * aDico, WOpenLayers *aMap, AuthApplication *a
     mStation = new ST(mDico);
 
     /*   AUTRES ONLGETS de la stack   */
-    mAnaPoint = new simplepoint(this, mStackInfoPtr->mSimplepointW);
+    mAnaPoint = new simplepoint(this, mcWebAptitude->mSimplepointW);
 
     // updateGL pour cacher les couches expert
     updateGL();

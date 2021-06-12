@@ -26,6 +26,7 @@ class layerStatChart;
 //class olOneLay;// plus utilisé, remplacé par staticMap
 class staticMap;
 class batonnetApt;
+class Layer;
 
 class batonnetApt : public Wt::WPaintedWidget
 {

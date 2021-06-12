@@ -7,13 +7,14 @@
 // sert a préparer le téléchargement par l'utilisateur de cartes, soit en plein, soit croppées avec un shp parcellaire.
 // il faut donc que l'utilisateur puisse choisir tout cela (listing via groupLayers ; même genre de tableau que grouplayers avec des checkbox en plus)
 
-class uploadCarte;
+class groupLayers;
+class parcellaire;
 
-class uploadCarte : public WContainerWidget
+class uploadCarte : public Wt::WContainerWidget
 {
 public:
     // structure similaire à parcellaire sauf que pas de nouvelle fenetre à ouvrir
-    uploadCarte(WContainerWidget *parent, groupLayers * aGL, parcellaire * aPA, Wt::WApplication* app);
+    uploadCarte(Wt::WContainerWidget *parent, groupLayers * aGL, parcellaire * aPA, Wt::WApplication* app);
 
     void uploadShp();
     void uploadRaster();

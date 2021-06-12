@@ -10,9 +10,6 @@ cWebAptitude::cWebAptitude(AuthApplication *app, Auth::AuthWidget* authWidget_)
     m_app = app;
     m_app->setLoadingIndicator(cpp14::make_unique<Wt::WOverlayLoadingIndicator>());
     m_app->loadingIndicator()->setMessage(tr("defaultLoadingI"));
-    //m_app->loadingIndicator()->setStyleClass("loading-indicator"); // c'est moche, je vais laisser Sam gerer ça
-    //std::string aBD=loadBDpath();
-    //mDico=new cDicoApt(aBD);
 
     for (auto kv : mDico->colors){
         color col= kv.second;
@@ -23,170 +20,134 @@ cWebAptitude::cWebAptitude(AuthApplication *app, Auth::AuthWidget* authWidget_)
         //std::cout << col.getStyleName() << "{" << styleBgrd.cssText() << "}" <<  std::endl;;
     }
 
-    mStackInfoPtr=new stackInfoPtr();
-
     addStyleClass("cWebAptitude");
     setMargin(0);
     setPadding(0);
-    std::unique_ptr<WContainerWidget> container_2 = cpp14::make_unique<WContainerWidget>();
-    WVBoxLayout * layoutGlobal = container_2->setLayout(cpp14::make_unique<WVBoxLayout>());
-    layoutGlobal->setContentsMargins(0,0,0,0);
 
-    container_2->setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Middle);
-    container_2->addStyleClass("carto_div");
+    /*	NAVIGATION BAR	*/
+    navigation = this->addWidget(cpp14::make_unique<WNavigationBar>());
+    navigation->setResponsive(true);
+    navigation->addStyleClass("carto_menu");
 
-    WVBoxLayout * layout = setLayout(Wt::cpp14::make_unique<Wt::WVBoxLayout>());
-    layout->setContentsMargins(0,0,0,0);
-    top_stack  = layout->addWidget(Wt::cpp14::make_unique<Wt::WStackedWidget>());
-    top_stack->setMargin(0);
+    std::unique_ptr<WMenu> menu_ = cpp14::make_unique<WMenu>();
+    WMenu * navbar_menu = navigation->addMenu(std::move(menu_), Wt::AlignmentFlag::Right);
 
-    /*	HOME PAGE	*/
-    auto container_home = Wt::cpp14::make_unique<Wt::WContainerWidget>();
-    container_home->setStyleClass("home_div");
-    //container_home->setOverflow(Wt::Overflow::Auto);
-    container_home->setMargin(Wt::WLength::Auto);
-    container_home->setMargin(20,Wt::Side::Top);
-    container_home->addNew<Wt::WText>("<h1 style='color:white;height: 37px;font-size: 3em;max-width: 1000px;text-align: center;'>Forestimator</h1>");
-    container_home->decorationStyle().setBackgroundImage(Wt::WLink("resources/DJI_0497_3.png"), None);
-    // add menu as push buttons!
-    Wt::WPushButton *b_pres  = container_home->addWidget(Wt::cpp14::make_unique<Wt::WPushButton>(tr("menu.button.tooltip.doc")));
-    container_home->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
-    Wt::WPushButton *b_carto = container_home->addWidget(Wt::cpp14::make_unique<Wt::WPushButton>(tr("menu.button.tooltip.carto")));
-    container_home->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
-    Wt::WPushButton *b_point = container_home->addWidget(Wt::cpp14::make_unique<Wt::WPushButton>(tr("menu.button.tooltip.point")));
-    container_home->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
-    Wt::WPushButton *b_anal  = container_home->addWidget(Wt::cpp14::make_unique<Wt::WPushButton>(tr("menu.button.tooltip.surf")));
-    container_home->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
-    b_login  = container_home->addWidget(Wt::cpp14::make_unique<Wt::WPushButton>(m_app->isLoggedIn()?"Se déconnecter":"Se connecter"));
-    container_home->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
-    b_pres ->setStyleClass("btn btn-success");
-    b_carto->setStyleClass("btn btn-success");
-    b_anal ->setStyleClass("btn btn-success");
-    b_login->setStyleClass("btn btn-success");
-    b_point->setStyleClass("btn btn-success");
-    b_pres ->setLink(Wt::WLink(Wt::LinkType::InternalPath, "/documentation"));
-    b_carto->setLink(Wt::WLink(Wt::LinkType::InternalPath, "/cartographie"));
-    b_anal ->setLink(Wt::WLink(Wt::LinkType::InternalPath, "/analyse"));
-    b_point->setLink(Wt::WLink(Wt::LinkType::InternalPath, "/point"));
-    b_login ->clicked().connect([=] {
+    // menu app
+    menuitem_app = navbar_menu->addItem("resources/layers_filled_icon_149920.png","");
+    menuitem_app->setLink(WLink(LinkType::InternalPath, "/cartographie"));
+    menuitem_app->setToolTip(tr("menu.button.tooltip.carto"));
+    // menu doc
+    menuitem_documentation = navbar_menu->addItem("resources/problem_analysis_icon_149897.png","");
+    menuitem_documentation->setLink(WLink(LinkType::InternalPath, "/documentation"));
+    menuitem_documentation->setToolTip(tr("menu.button.tooltip.doc"));
+    // menu login
+    menuitem_login = navbar_menu->addItem("resources/user_icon_149851.png","");
+    menuitem_login->clicked().connect([=] {
         if(m_app->isLoggedIn()){
-            b_login->setText("Se connecter");
+            menuitem_login->setIcon("resources/user_icon_149851.png");
             m_app->logout();
-            // toto enlever les extents dans carto
         }else{
-            printf("event");
             //authWidget->addStyleClass("visible"); // ne fonctionne qu'une fois ! bizarre...workaround avec injection de JS direct OK !
             //authWidget->removeStyleClass("nonvisible");
             std::string JScommand("$('.Wt-auth-login-container').removeClass('nonvisible').addClass('visible');");
             m_app->doJavaScript(JScommand);
         }
     });
-    authWidget->addStyleClass("nonvisible");
+    menuitem_login->setToolTip(tr("menu.button.tooltip.login"));
 
-    WContainerWidget *c_img1 = container_home->addWidget(Wt::cpp14::make_unique<Wt::WContainerWidget>());
-    Wt::WImage *img1 = c_img1->addNew<Wt::WImage>(Wt::WLink("resources/uliege.png"));
-    img1->setAlternateText("ULiege logo");
-    c_img1->addStyleClass("logo_left");
-
-    WContainerWidget *c_img2 = container_home->addWidget(Wt::cpp14::make_unique<Wt::WContainerWidget>());
-    c_img2->addNew<Wt::WImage>(Wt::WLink("resources/fpb.png"));
-    c_img2->addStyleClass("logo_right");
-    /*	FIN HOME PAGE	*/
-
-    /*	NAVIGATION BAR	*/
-    navigation = layoutGlobal->addWidget(cpp14::make_unique<WNavigationBar>());
-    //navigation->setTitle("   <strong>Forestimator - cartographie</strong>   "); // WLink(LinkType::InternalPath, "/home"));
-    navigation->setResponsive(true);
-    navigation->addStyleClass("carto_menu");
-
-    /*
-     * Création d'un stack sous la barre de navigation
-     * 0 : map et couche et legende et analyse
-     * 1 : présentation
-     * 2 : statistique parcellaire
-     */
-    sub_stack  = layoutGlobal->addWidget(cpp14::make_unique<WStackedWidget>());
-    // page principale
-    WContainerWidget * page_carto = sub_stack->addNew<WContainerWidget>();
-
-    //WContainerWidget * page_camembert = sub_stack->addNew<WContainerWidget>();
-    sub_stack->addNew<presentationPage>(mDico);
-
-    /* MAP div */
-    auto layout_carto = page_carto->setLayout(cpp14::make_unique<WHBoxLayout>());
-    page_carto->layout()->setContentsMargins(0,0,0,0);
-    page_carto->setHeight("100%"); // oui ça ca marche bien! reste plus qu'à empêcher la carte de s'escamoter.
-    page_carto->setOverflow(Overflow::Visible); // non pas d'overflow pour la carte, qui est dans page_carto
-
-    /* Partie droite couches-légende-analyse */
-    auto content_info = cpp14::make_unique<WContainerWidget>();
-    WContainerWidget * content_info_ = content_info.get();
-    //WVBoxLayout * layout_info = content_info_->setLayout(cpp14::make_unique<WVBoxLayout>());
-    content_info_->setOverflow(Overflow::Auto);
-    content_info_->setWidth("30%"); // TODO CSS resize @min-width
-    //content_info_->setMinimumSize(400,0);
-    content_info_->addStyleClass("content_info");
-
-    /* 	SOUS-MENU droite    */
-    /* Create a stack where the contents will be located.
-     *
-     * Index de mStackInfoPtr->stack_info
-     * 0 : point (analyse simple par double clic on map)
-     * 1 : analyse
-     * 2 : carto
-     *
-     * */
-    mStackInfoPtr->stack_info = content_info_->addWidget(cpp14::make_unique<WStackedWidget>());
-    //mStackInfoPtr->stack_info->setOverflow(Overflow::Auto);
-    mStackInfoPtr->stack_info->addStyleClass("content_info_stack");
-    std::unique_ptr<WMenu> menu_ = cpp14::make_unique<WMenu>();
-    WMenu * right_menu = navigation->addMenu(std::move(menu_), Wt::AlignmentFlag::Right);
-    auto bh = right_menu->addItem("resources/purchasing_management_icon_149886.png","");
-    bh->setLink(WLink(LinkType::InternalPath, "/home"));
-    bh->setToolTip(tr("menu.button.tooltip.home"));
-    mStackInfoPtr->menuitem_documentation = right_menu->addItem("resources/problem_analysis_icon_149897.png","");
-    mStackInfoPtr->menuitem_documentation->setLink(WLink(LinkType::InternalPath, "/documentation"));
-    mStackInfoPtr->menuitem_documentation->setToolTip(tr("menu.button.tooltip.doc"));
-    mStackInfoPtr->menuitem_cartes = right_menu->addItem("resources/layers_filled_icon_149920.png","");
-    mStackInfoPtr->menuitem_cartes->setLink(WLink(LinkType::InternalPath, "/cartographie"));
-    mStackInfoPtr->menuitem_cartes->setToolTip(tr("menu.button.tooltip.carto"));
-    //mStackInfoPtr->menuitem_simplepoint = right_menu->addItem("resources/process_icon_149895.png","");
-    mStackInfoPtr->menuitem_simplepoint = right_menu->addItem("resources/position-logo.png","");
-    mStackInfoPtr->menuitem_simplepoint->setLink(WLink(LinkType::InternalPath, "/point"));
-    mStackInfoPtr->menuitem_simplepoint->setToolTip(tr("menu.button.tooltip.point"));
-    //mStackInfoPtr->menuitem_analyse = right_menu->addItem("resources/data_analysis_icon_149953.png","");
-    mStackInfoPtr->menuitem_analyse = right_menu->addItem("resources/stat-logo.png","");
-    mStackInfoPtr->menuitem_analyse->setLink(WLink(LinkType::InternalPath, "/analyse"));
-    mStackInfoPtr->menuitem_analyse->setToolTip(tr("menu.button.tooltip.surf"));
     // pas encore implémenté
-    /*right_menu->addItem("resources/configuration_center_icon_149956.png","")
+    /*navbar_menu->addItem("resources/configuration_center_icon_149956.png","")
             ->setLink(WLink(LinkType::InternalPath, "/parametres"));
-            */
-    
-    mStackInfoPtr->mSimplepointW = mStackInfoPtr->stack_info->addWidget(cpp14::make_unique<WContainerWidget>()); // index 0
-    mStackInfoPtr->mGroupLayerW  = mStackInfoPtr->stack_info->addWidget(cpp14::make_unique<WContainerWidget>()); // index 1
-    mStackInfoPtr->mGroupLayerW->setStyleClass("content_GL");
+    */
 
-    /*	MAPS	*/
+
+    // main stack : DOC and MAP and RESULTS divs
+    top_stack  = this->addWidget(Wt::cpp14::make_unique<Wt::WStackedWidget>());
+    top_stack->setMargin(0);
+    top_stack->setHeight("100%");
+    // load DOC page
+    top_stack->addNew<presentationPage>(mDico);
+    // load MAP page
+    std::unique_ptr<WContainerWidget> content_app = cpp14::make_unique<WContainerWidget>();
+    content_app->setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Middle);
+    content_app->addStyleClass("carto_div");
+    WHBoxLayout * layout_app = content_app->setLayout(cpp14::make_unique<WHBoxLayout>());
+    layout_app->setContentsMargins(0,0,0,0);
+    content_app->setHeight("100%"); // oui ça ca marche bien! reste plus qu'à empêcher la carte de s'escamoter.
+    content_app->setOverflow(Overflow::Visible); // non pas d'overflow pour la carte, qui est dans page_carto
+    top_stack->addWidget(std::move(content_app));
+    top_stack->setCurrentIndex(1);
+
+
+    /*** page principale application map ***/
+
+    /*	MAP	*/
     std::cout << "create map" << std::endl;
     auto map = cpp14::make_unique<WOpenLayers>(mDico);
     mMap = map.get();
-    mMap->setWidth("70%");
+    mMap->setWidth("100%");
     mMap->setMinimumSize(400,0);
     mMap->setOverflow(Overflow::Visible);
+    layout_app->addWidget(std::move(map), 0);
+
+    /*  Panel droit avec boutons et couches selectionnees */
+    auto content_couches = layout_app->addWidget(cpp14::make_unique<WContainerWidget>());
+    content_couches->setId("content_couches");
+    content_couches->setOverflow(Overflow::Auto);
+    content_couches->addStyleClass("content_couches");
+    load_content_couches(content_couches);
+
+    /*  DIALOGS info_point-légende-analyse */
+    dialog_info = layout_app->addChild(Wt::cpp14::make_unique<Wt::WDialog>("info"));
+    dialog_info->setResizable(true);
+    dialog_info->setModal(false);
+    dialog_info->setMaximumSize(1000,1000);
+
+    auto content_info = dialog_info->contents()->addWidget(cpp14::make_unique<WContainerWidget>());
+    content_info->setOverflow(Overflow::Auto);
+    content_info->addStyleClass("content_info");
+
+    dialog_anal = layout_app->addChild(Wt::cpp14::make_unique<Wt::WDialog>("anal"));
+    dialog_anal->setResizable(true);
+    dialog_anal->setModal(false);
+    dialog_anal->setMaximumSize(1000,1000);
+
+    //auto content_anal = dialog_anal->contents()->addWidget(cpp14::make_unique<WContainerWidget>());
+    //content_anal->setOverflow(Overflow::Auto);
+    //content_anal->addStyleClass("content_anal");
+
+    dialog_catalog = layout_app->addChild(Wt::cpp14::make_unique<Wt::WDialog>("catalog"));
+    dialog_catalog->setResizable(true);
+    dialog_catalog->setModal(false);
+    dialog_catalog->setMaximumSize(1000,1000);
+
+    auto content_catalog = dialog_catalog->contents()->addWidget(cpp14::make_unique<WContainerWidget>());
+    content_catalog->setOverflow(Overflow::Auto);
+    content_catalog->addStyleClass("content_catalog");
+
+    //stack_info = content_info_->addWidget(cpp14::make_unique<WStackedWidget>());
+    //stack_info = dialog_cont->contents()->addWidget(cpp14::make_unique<WStackedWidget>());
+    //stack_info->setOverflow(Overflow::Auto);
+    //stack_info->addStyleClass("content_info_stack");
+
+    
+    mSimplepointW = content_info;
+    mGroupLayerW  = content_catalog;
+    mGroupLayerW->setStyleClass("content_GL");
+
+
 
     /* CHARGE ONGLET COUCHES & SIMPLEPOINT */
     printf("create GL\n");
     //mDico->openConnection();
-    mGroupL = new groupLayers(mDico,mMap,m_app,mStackInfoPtr);
+    mGroupL = new groupLayers(mDico,mMap,m_app,this);
     //mDico->closeConnection();// avant, GL et stat windows avaient tout deux besoin d'ouvrir la connection du dico pour créer des layers
 
-    statWindow * page_camembert = sub_stack->addNew<statWindow>(mGroupL);
+    statWindow * page_camembert = top_stack->addNew<statWindow>(mGroupL);
 
     /* CHARGE ONGLET ANALYSES */
     //printf("create PA\n");
-
-    mPA = mStackInfoPtr->stack_info->addWidget(cpp14::make_unique<parcellaire>(mGroupL,m_app,page_camembert)); // index 2
+    mPA = dialog_anal->contents()->addWidget(cpp14::make_unique<parcellaire>(mGroupL,m_app,page_camembert));
     mPA->addStyleClass("content_analyse");
 
     /*	ACTIONS	: on connect les events aux méthodes	*/
@@ -197,18 +158,80 @@ cWebAptitude::cWebAptitude(AuthApplication *app, Auth::AuthWidget* authWidget_)
     //mMap->polygId().connect(std::bind(&parcellaire::computeStatAndVisuSelectedPol,mPA, std::placeholders::_1));
     //mMap->getMapExtendSignal().connect(std::bind(&WOpenLayers::updateMapExtend,mMap,std::placeholders::_1,std::placeholders::_2,std::placeholders::_3,std::placeholders::_4));
 
-    // je divise la fenetre en 2 dans la largeur pour mettre la carte à gauche et à droite une fenetre avec les infos des couches
-    layout_carto->addWidget(std::move(map), 0);
-    layout_carto->addWidget(std::move(content_info), 1);
-    top_stack->addWidget(std::move(container_home));
-    top_stack->addWidget(std::move(container_2));
-    top_stack->setCurrentIndex(0);
+    //layout_carto->addWidget(std::move(content_info), 1);
+    //dialog_cont->contents()->addChild(std::move(content_info));
+    //dialog_cont->contents()->addNew<Wt::WLabel>("Cell location (A1..Z999)");
+    //top_stack->addWidget(std::move(container_home));
+
 
     m_app->internalPathChanged().connect(this, &cWebAptitude::handlePathChange);
 
     // force first route
     handlePathChange();
+
 }
+
+
+void cWebAptitude::load_content_couches(WContainerWidget * content){
+    auto layout = content->setLayout(cpp14::make_unique<WHBoxLayout>());
+
+    auto menu_gauche = layout->addWidget(cpp14::make_unique<WContainerWidget>());
+    auto content_panier = layout->addWidget(cpp14::make_unique<WContainerWidget>());
+
+    menu_gauche->setWidth(60);
+    menu_gauche->addStyleClass("menu_gauche");
+
+    content_panier->addWidget(Wt::cpp14::make_unique<Wt::WText>("coucoucoucouc ocuc"));
+    content_panier->setWidth("100%");
+
+    auto menu = menu_gauche->addWidget(Wt::cpp14::make_unique<WMenu>());
+    //menu->setStyleClass("nav nav-pills nav-stacked");
+    menu->setStyleClass("nav-stacked");
+
+    menuitem_panier = menu->addItem("resources/right_angle_circle_icon_149877d.png","");
+    menuitem_panier->clicked().connect([=] {
+        std::cout << content->width().value() << std::endl;
+        if(content->width().value()>70 || content->width().value()==-1){
+            content->setWidth(70);
+            content_panier->hide();
+        }else{
+            content->setWidth(300);
+            content_panier->show();
+        }
+        //menuitem_panier->renderSelected(false);
+
+    });
+    menuitem_panier->setToolTip(tr("menu.button.tooltip.panier_collapse"));
+
+    menuitem_simplepoint = menu->addItem("resources/position-logo.png","");
+    menuitem_simplepoint->clicked().connect([=] {
+        if(dialog_info->isVisible()){
+            dialog_info->hide();
+            menuitem_simplepoint->decorationStyle().setBackgroundColor(Wt::WColor(0,220,0,0));
+        }else{
+            dialog_info->show();
+            menuitem_simplepoint->decorationStyle().setBackgroundColor(Wt::WColor(255,255,255,0));
+        }
+        //menuitem_simplepoint->renderSelected(dialog_info->isVisible());
+    });
+    menuitem_simplepoint->setToolTip(tr("menu.button.tooltip.point"));
+
+    menuitem_analyse = menu->addItem("resources/stat-logo.png","");
+    menuitem_analyse->clicked().connect([=] {
+        if(dialog_anal->isVisible()){
+            dialog_anal->hide();
+        }else{
+            dialog_anal->show();
+        }
+        //menuitem_analyse->renderSelected(dialog_info->isVisible());
+    });
+    menuitem_analyse->setToolTip(tr("menu.button.tooltip.surf"));
+
+    // TODO menu catalog
+
+    // TODO charger le panier
+}
+
 
 /*
  * Redirections en fonction du internal path
@@ -220,42 +243,40 @@ void cWebAptitude::handlePathChange()
 
     std::size_t found = m_app->internalPath().find("/documentation");
     if (m_app->internalPath() == "/documentation" | found!=std::string::npos){
-        top_stack->setCurrentIndex(1);
-        mStackInfoPtr->menuitem_documentation->select();
-        sub_stack->setCurrentIndex(1);
+        top_stack->setCurrentIndex(0);
+        menuitem_documentation->select();
+        //sub_stack->setCurrentIndex(1);
         navigation->setTitle(tr("titre.presentation"));
         m_app->addMetaHeader("description", tr("desc.pres"), "fr");
-    }else if (m_app->internalPath() == "/home"){
-        top_stack->setCurrentIndex(0);
+    /*}else if (m_app->internalPath() == "/home"){
+        top_stack->setCurrentIndex(0);*/
         m_app->addMetaHeader("description", tr("desc.home"), "fr");
-    }else if (m_app->internalPath() == "/cartographie"){
+    }else if (m_app->internalPath() == "/cartographie" || m_app->internalPath() == "/"){
         top_stack->setCurrentIndex(1);
-        mStackInfoPtr->stack_info->setCurrentIndex(1);
-        mStackInfoPtr->menuitem_cartes->select();
-        sub_stack->setCurrentIndex(0);
+        //stack_info->setCurrentIndex(1);
+        menuitem_app->select();
+        //sub_stack->setCurrentIndex(0);
         navigation->setTitle(tr("titre.carto"));
         m_app->addMetaHeader("description", tr("desc.carto"), "fr");
-    }else if (m_app->internalPath() == "/analyse"){
+    /*}else if (m_app->internalPath() == "/analyse"){
         top_stack->setCurrentIndex(1);
-        mStackInfoPtr->stack_info->setCurrentIndex(2);
-        mStackInfoPtr->menuitem_analyse->select();
-        sub_stack->setCurrentIndex(0);
+        //stack_info->setCurrentIndex(2);
+        menuitem_analyse->select();
+        //sub_stack->setCurrentIndex(0);
         navigation->setTitle(tr("titre.ana.surf"));
         m_app->addMetaHeader("description", tr("desc.surf"), "fr");
     }else if (m_app->internalPath() == "/point"){
         top_stack->setCurrentIndex(1);
-        mStackInfoPtr->stack_info->setCurrentIndex(0);
-        mStackInfoPtr->menuitem_simplepoint->select();
-        sub_stack->setCurrentIndex(0);
+        //stack_info->setCurrentIndex(0);
+        menuitem_simplepoint->select();
+        //sub_stack->setCurrentIndex(0);
         navigation->setTitle(tr("titre.ana.point"));
-        m_app->addMetaHeader("description", tr("desc.point"), "fr");
+        m_app->addMetaHeader("description", tr("desc.point"), "fr");*/
     }else if (m_app->internalPath() == "/resultat"){
         top_stack->setCurrentIndex(1);
-        sub_stack->setCurrentIndex(2);
+        //sub_stack->setCurrentIndex(2);
     }else if (m_app->internalPath() == "/parametres"){
         m_app->doJavaScript("alert('Pas encore implémenté...')");
-    }else if (m_app->internalPath() == "/"){
-        m_app->addMetaHeader("description", tr("desc.home"), "fr");
     }else{
         std::cout << "m_app->internalPath() " << m_app->internalPath() << std::endl;
         std::cout << "internal path pas geré dans le handler " << m_app->internalPath() << std::endl;

@@ -13,24 +13,30 @@ AuthApplication::AuthApplication(const Wt::WEnvironment& env, cDicoApt *dico)
     messageResourceBundle().use(docRoot() + "/forestimator");
 
     setTitle("Forestimator");
+
+    loadStyles();
+
+    auto layout = root()->setLayout(Wt::cpp14::make_unique<Wt::WVBoxLayout>());
+    root()->setMargin(0);
+    root()->setPadding(0);
+
+    //layout->addWidget(std::move(authWidget));
+    layout->addWidget(std::move(loadAuthWidget()));
+
+    std::unique_ptr<cWebAptitude> WebApt = Wt::cpp14::make_unique<cWebAptitude>(this, authWidget_);
+    cwebapt = layout->addWidget(std::move(WebApt), 0);
+
+    root()->addStyleClass("layout_main");
+    loaded_=true;
+}
+
+void AuthApplication::loadStyles(){
     // thème bootstrap 3
     auto theme = std::make_shared<Wt::WBootstrapTheme>();
     theme->setVersion(Wt::BootstrapVersion::v3);
     //spécifier ça également dans wt_option.xml sinon ne fonctionne pas
     theme->setResponsive(true);
     setTheme(theme);
-
-    // auth widget (login)
-    printf("Auth widget...");
-    session_.login().changed().connect(this, &AuthApplication::authEvent);
-    std::unique_ptr<Wt::Auth::AuthWidget> authWidget = cpp14::make_unique<Wt::Auth::AuthWidget>(Session::auth(), session_.users(), session_.login());
-    authWidget_=authWidget.get();
-    authWidget_->model()->addPasswordAuth(&session_.passwordAuth());
-    //authWidget_->model()->addOAuth(Session::oAuth()); / no need google and facebook
-    authWidget_->setRegistrationEnabled(true);
-    authWidget_->processEnvironment();
-    authWidget_->addStyleClass("Wt-auth-login-container");
-    printf("done\n");
 
     // load the default bootstrap3 (sub-)theme (nécessaire en plus de theme->setVersion)
     useStyleSheet("style/bootstrap-theme.min.css");
@@ -76,16 +82,22 @@ AuthApplication::AuthApplication(const Wt::WEnvironment& env, cDicoApt *dico)
     useStyleSheet("style/style.css");
 
     enableUpdates();
+}
 
-    auto layout = root()->setLayout(Wt::cpp14::make_unique<Wt::WVBoxLayout>());
-    layout->addWidget(std::move(authWidget));
-    //authWidget_->hide();
-
-    std::unique_ptr<cWebAptitude> WebApt = Wt::cpp14::make_unique<cWebAptitude>(this, authWidget_);
-    cwebapt = layout->addWidget(std::move(WebApt), 0);
-
-    root()->addStyleClass("layout_main");
-    loaded_=true;
+std::unique_ptr<Wt::Auth::AuthWidget> AuthApplication::loadAuthWidget(){
+    // auth widget (login)
+    printf("Auth widget...");
+    session_.login().changed().connect(this, &AuthApplication::authEvent);
+    std::unique_ptr<Wt::Auth::AuthWidget> authWidget = cpp14::make_unique<Wt::Auth::AuthWidget>(Session::auth(), session_.users(), session_.login());
+    authWidget_=authWidget.get();
+    authWidget_->model()->addPasswordAuth(&session_.passwordAuth());
+    //authWidget_->model()->addOAuth(Session::oAuth()); // no need google and facebook
+    authWidget_->setRegistrationEnabled(true);
+    authWidget_->processEnvironment();
+    authWidget_->addStyleClass("Wt-auth-login-container");
+    authWidget_->addStyleClass("nonvisible");
+    printf("done\n");
+    return authWidget;
 }
 
 void AuthApplication::authEvent() {
@@ -98,7 +110,7 @@ void AuthApplication::authEvent() {
                 << " (" << u.identity(Wt::Auth::Identity::LoginName) << ")"
                 << " logged in. (2)";
         if(loaded_){
-            cwebapt->b_login->setText("Se déconnecter");
+            cwebapt->menuitem_login->setIcon("resources/user_icon_logout.png");
             std::string JScommand("$('.Wt-auth-login-container').removeClass('visible').addClass('nonvisible');");
             doJavaScript(JScommand);
             cwebapt->mGroupL->updateGL();
@@ -106,7 +118,7 @@ void AuthApplication::authEvent() {
     } else{
         log("notice") << "User logged out.";
         if(loaded_){
-            cwebapt->b_login->setText("Se connecter");
+            cwebapt->menuitem_login->setIcon("resources/user_icon_149851.png");
             cwebapt->mGroupL->updateGL();
         }
     }
