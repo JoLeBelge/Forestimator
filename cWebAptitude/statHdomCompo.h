@@ -13,6 +13,8 @@
 class statHdom; // similaire à layerSatChart mais dédié au HDOM
 class statCompo; // différent car va devoir utiliser plusieurs layers.
 
+class statCellule; // info dendrométrique stoquée pour une cellule d'un are. on fait tourner les modèles dendro pour chaque cellule et puis effectue une aggrégation.
+
 class basicStat; // forward declaration
 
 // renvoie une grille de point, centre d'hexagone
@@ -20,6 +22,7 @@ std::vector<OGRPoint> hexbin(GDALDataset * mask);
 // renvoie une liste de polgone qui sont des hexagones
 std::vector<OGRPolygon*> hexGeombin(GDALDataset *mask);
 double predHdom(std::vector<double> aVHs);
+double getQ95(std::vector<double> aVHs);
 
 /*
 // la méthode Centroid de OGR bugge, alors je fait la mienne - plus nécessaire
@@ -28,6 +31,8 @@ bool IsInsideHexagon(float x0, float y0, float d, float x, float y) ;
 bool InsideHexagonB(float x0, float y0, float x, float y, float d);
 */
 
+// modèle reçu de jérome le 9/06/2021
+extern double k1hdom, k2hdom, k1vha,k2vha,k3vha,k1gha, k1cmoy,k2cmoy,k3cmoy;
 
 // pour les stat sur un MNH
 class statHdom {
@@ -43,23 +48,39 @@ public:
     bool deserveChart();
     cDicoApt * Dico();
 
-    void predictHdom();
+    void predictHdomHex();
+    void predictDendro();
     //std::map<std::string, double> computeDistrH();
     std::vector<std::pair<std::string,double>> computeDistrH();
     // equivalent de getChart, conteneur qui sera affiché dans la page de statistique
     std::unique_ptr<Wt::WContainerWidget> getResult();
 
-    basicStat bshdom(){return basicStat(mStat);}
+    basicStat bshdom();
 
 private:
     std::shared_ptr<layerBase> mLay;
-    std::vector<double> mStat;
+    //std::vector<double> mStat; // un vecteur ; une valeur par cellule d'un are.
+    std::vector<std::unique_ptr<statCellule>> mStat;
     //std::vector<std::string,double>
     std::vector<std::pair<std::string,double>>mDistFrequ;// pair avec range de valeur (genre 3-9) et proportion de la distribution
     OGRGeometry * mGeom;
     // geometrie supplémentaire à afficher sur l'image statique
     std::vector<OGRPolygon *> mVaddPol;
     int mNbOccurence;
+};
+
+class statCellule{
+public:
+    statCellule(std::vector<double> *aVHs, int aSurf);
+    void computeHdom(){mHdom=k1hdom*mQ95+k2hdom*pow(mQ95,2);}
+    void computeGha(){mGha=k1gha*mVHA/mHdom;}
+    void computeNha(){mNha=40000.0*M_PI*mGha/pow(mCmoy,2);}
+    void computeCmoy(){mCmoy=(k1cmoy*(mHdom-1.3)+k2cmoy*pow((mHdom-1.3),2))*pow(mMean/mQ95,k3cmoy);}
+
+    double mVHA, mHdom, mGha, mCmoy, mNha;
+private:
+    double mMean,mQ95;
+    int mSurf;
 };
 
 class statCompo{

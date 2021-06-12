@@ -6,10 +6,16 @@ double globx=globa/std::sqrt(3);
 // distance du centre à un sommet
 double globd=2*globx;
 
+// modèle reçu de jérome le 9/06/2021
+double k1hdom(1.237116), k2hdom(-0.005823), k1vha(52.176316),k2vha(6.677865),k3vha(0.807146);
+double k1gha(2.143419), k1cmoy(2.143419),k2cmoy(0.054804),k3cmoy(-0.199079);
+
+
 statHdom::statHdom(std::shared_ptr<layerBase> aLay, OGRGeometry * poGeom):mLay(aLay),mGeom(poGeom)
 {
     std::cout << "statHdom::statHdom" << std::endl;
-    predictHdom(); // va calculer mStat et mVaddPol qui sont les hexagones à dessiner sur l'image statique
+    //predictHdomHex(); // va calculer mStat et mVaddPol qui sont les hexagones à dessiner sur l'image statique
+    predictDendro();
     mDistFrequ=computeDistrH();
 }
 
@@ -112,7 +118,7 @@ std::vector<std::pair<std::string,double>> statHdom::computeDistrH(){
 }
 
 
-void statHdom::predictHdom(){
+void statHdom::predictHdomHex(){
     //std::cout << " predict Hdom depuis MNH2019" << std::endl;
     std::vector<double> aRes;
 
@@ -251,8 +257,91 @@ void statHdom::predictHdom(){
         }
 
     }
-    mStat=aRes;
+    //mStat=aRes;
+    // pour l'instant cette fonction ne fonctionne plus donc
 }
+
+// approche rectangle de 1 are. Tellement plus simple,  et plus rapide
+void statHdom::predictDendro(){
+    std::cout << " predict Dendro depuis MNH2019" << std::endl;
+    //std::vector<std::unique_ptr<statCellule>> aRes;
+
+    // masque au format raster
+    GDALDataset * mask = mLay->rasterizeGeom(mGeom);
+    OGREnvelope ext;
+    mGeom->getEnvelope(&ext);
+    double width((ext.MaxX-ext.MinX)), height((ext.MaxY-ext.MinY));
+
+
+    GDALDataset  * DS = (GDALDataset *) GDALOpen( mLay->getPathTif().c_str(), GA_ReadOnly );
+    if( DS == NULL )
+    {
+        std::cout << "je n'ai pas lu l'image " <<  mLay->getPathTif() << std::endl;
+    } else {
+
+        double transform[6];
+        DS->GetGeoTransform(transform);
+        double pixelWidth = transform[1];
+        double pixelHeight = -transform[5];
+        double xOrigin = transform[0];
+        double yOrigin = transform[3];
+        int xOffset = int((ext.MinX - xOrigin) / pixelWidth);
+        int yOffset = int((yOrigin - ext.MaxY ) / pixelHeight);
+
+        // découpe du masque en cellule rectangle de 10 mètre, soit un are
+        int nbPix= 10/pixelWidth;
+
+        float *scanline, *scanlineMask;
+        scanline = (float *) CPLMalloc( sizeof( float ) * nbPix );
+        scanlineMask = (float *) CPLMalloc( sizeof( float ) * nbPix );
+
+
+        // boucle sur les cellules
+        for (int i(0) ; i< (width/(10.0)); i++){
+            for (int j(0) ; j< (height/10.0); j++){
+
+                    std::vector<double> aVHs;
+                    // boucle sur chaque ligne de la cellule
+                    for ( int row = 0; row < nbPix; row++ )
+                    {
+                        // lecture
+                        int posU=i*nbPix;
+                        int posV=j*nbPix;
+
+                        DS->GetRasterBand(1)->RasterIO( GF_Read, posU+xOffset, posV+row+yOffset, nbPix, 1, scanline, nbPix,1, GDT_Float32, 0, 0 );
+                        // lecture du masque
+                        mask->GetRasterBand(1)->RasterIO( GF_Read, posU , posV+row, nbPix, 1, scanlineMask, nbPix,1, GDT_Float32, 0, 0 );
+                        // boucle sur scanline et garder les pixels qui sont dans le polygone
+                        for (int col = 0; col <  nbPix; col++)
+                        {
+                            if (scanlineMask[col]==255){
+                                    double aVal=scanline[ col ];
+                                    // H() c'est pour gain de 0.2
+                                    aVHs.push_back(Dico()->H(aVal));
+                            }
+                        }
+                    }
+
+                    // prediction des variables dendro si assez d'observations
+                    double surf=aVHs.size()*pixelWidth*pixelHeight;
+                    //std::cout << "surface nid abeille ; " << surf << std::endl;
+                    // seuil de 800 m2
+                    if (surf>800){
+                        std::unique_ptr<statCellule> cel=std::make_unique<statCellule>(&aVHs,surf);
+                        mStat.push_back(std::move(cel));
+                    }
+
+            }
+        }
+
+        CPLFree(scanline);
+        CPLFree(scanlineMask);
+        GDALClose(DS);
+    }
+    GDALClose(mask);
+}
+
+
 
 bool statHdom::deserveChart(){
     bool aRes=mStat.size()>0;
@@ -296,7 +385,7 @@ std::unique_ptr<WContainerWidget> statHdom::getResult(){
     table->elementAt(0, 0)->setPadding(10);
     table->elementAt(0,0)->addWidget(cpp14::make_unique<WText>(Wt::WString::tr("report.analyse.surf.hdom.t")));
 
-    basicStat bs(mStat);
+    basicStat bs=bshdom();
 
     int c(1);
     table->elementAt(c, 0)->addWidget(cpp14::make_unique<WText>("Moyenne"));
@@ -334,20 +423,32 @@ std::unique_ptr<WContainerWidget> statHdom::getResult(){
     return std::move(aRes);
     //std::cout << "lStatContChart::getResult() done" << std::endl;
 }
+basicStat statHdom::bshdom(){
+    std::vector<double> aVHdom;
+    for (auto & ptCel : mStat){
+     aVHdom.push_back(ptCel->mHdom);
+    }
+return basicStat(aVHdom);}
 
 
 // modèle de prédiction de hdom depuis MNH2019
 double predHdom(std::vector<double> aVHs){
     //std::cout << "predit Hdom depuis un vecteur de hauteur photogrammétrique " ;
     double aRes(0.0);
-    // tri du vecteur de hauteur puis sélection du 95ieme percentile
-    std::sort(aVHs.begin(), aVHs.end());
-    double pos95=((double) aVHs.size())*95.0/100.00;
-    double h95= aVHs.at((int) pos95);
+    double h95= getQ95(aVHs);
     //Hdom = 1,4 + 1,05 * CHM95  (erreur résiduelle : 1,35 m)
     double Hdom=1.4 + 1.05 * h95;
     aRes=Hdom;
     //std::cout << aRes << std::endl;
+    return aRes;
+}
+
+double getQ95(std::vector<double> aVHs){
+    double aRes(0.0);
+    // tri du vecteur de hauteur puis sélection du 95ieme percentile
+    std::sort(aVHs.begin(), aVHs.end());
+    double pos95=((double) aVHs.size())*95.0/100.00;
+    aRes= aVHs.at((int) pos95);
     return aRes;
 }
 
@@ -621,3 +722,18 @@ basicStat statCompo::computeStatWithMasq(std::shared_ptr<layerBase> aLay, OGRGeo
 }
 
 
+statCellule::statCellule(std::vector<double> * aVHs,int aSurf):mSurf(aSurf){
+    // calcul de Vha
+    double vhaSum;
+    for (double h : *aVHs){
+        vhaSum+=pow(std::max(0.0,h-k2vha),k3vha);
+    }
+    mVHA=k1vha*(vhaSum/aVHs->size());
+    // calcul de Q95
+    mQ95=getQ95(*aVHs);
+    // le reste des variables dendro
+    computeHdom();
+    computeGha();
+    computeNha();
+    computeCmoy();
+}

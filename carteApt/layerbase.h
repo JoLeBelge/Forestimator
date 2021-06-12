@@ -167,7 +167,7 @@ public:
     void catSummary(){std::cout << "layerbase ; Code " << mCode << " , Nom " << mNom << ", raser " << mPathRaster << ", dictionnaire valeurs de " << mDicoVal.size() << " elements " << std::endl;}
 
     std::string EssCode() const{std::string aRes="";
-                                   if (mType==TypeLayer::CS |mType==TypeLayer::FEE){aRes=mCode.substr(0,2);}
+                                   if ((mType==TypeLayer::CS) |(mType==TypeLayer::FEE)){aRes=mCode.substr(0,2);}
                                    return aRes;}
     std::string getCatLayerStr() const{std::string aRes("");
       if (mType==TypeLayer::KK){aRes="KK";}

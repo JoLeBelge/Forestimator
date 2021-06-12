@@ -21,8 +21,9 @@ std::string stationDescResource::geoservice(std::string aTool,std::string aArgs,
                     for (std::string code : VMNH){
                         std::shared_ptr<layerBase> l=mDico->getLayerBase(code);
                         statHdom stat(l,pol);
-                        basicStat bs= stat.bshdom();
+                        basicStat bs= stat.bshdom(); // a modifier quand j'aurai fini d'encoder tout les modèles de Jérome
                         aResponse+=l->Code()+";"+bs.getMean()+";"+bs.getCV()+";"+bs.getMax()+";"+bs.getMin()+";"+bs.getNb()+"\n";
+                        //aResponse+="pas disponible pour le moment\n";
                     }
                 }
             }else if (aTool=="compo"){

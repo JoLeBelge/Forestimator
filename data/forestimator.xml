@@ -397,7 +397,7 @@ Cette application web de cartographie permet une visualisation des informations 
 
 		Une analyse détaillée est effectuée pour un seul polygone du shapefile. La sélection des couches pour lesquelles seront effectuées les analyses détaillées s'effectue en cochant les cases à cocher situées sous la rubrique intitulée <b>"2 : Sélectionner l'analyse"</b>.
 
-		Le calcul des statistique est réalisé en effectuant <b>un click droit sur le polygone de votre choix</b>, tout en maintenent enfoncé <b>la touche contrôle</b>. Une page de résultat affiche alors les résultats en trois sections distinctes : une carte de localisation générale ainsi qu'une description de la topographie et de la pédologie de cette zone d'intérêt, le tableau d'aptitude des essences et une dernière section qui présente, pour ce polygone donné, les cartes de description des conditions stationnelles et des caractéristique du peuplement en place. Un tableau de statistiques accompagne chacune des cartes individuelles.
+		Le calcul des statistique est réalisé en effectuant <b>un click gauche sur le polygone de votre choix</b>, tout en maintenent enfoncé <b>la touche shift</b>. Une page de résultat affiche alors les résultats en trois sections distinctes : une carte de localisation générale ainsi qu'une description de la topographie et de la pédologie de cette zone d'intérêt, le tableau d'aptitude des essences et une dernière section qui présente, pour ce polygone donné, les cartes de description des conditions stationnelles et des caractéristique du peuplement en place. Un tableau de statistiques accompagne chacune des cartes individuelles.
 
 <h3>Téléchargement d'un ensemble de cartes sur l'emprise du shapefile</h3>
 
@@ -585,6 +585,8 @@ detAptFEE
 <message id="report.ban"><img src="PATH/resources/DJI_0497_navbar.JPG" width="500px"  border-radius="30px" /></message>
 
 <message id="download.lay.error.noLay"><p>Aucune cartes sélectionnée. Veuillez selectionner les couches à exporter à l'étape numéro 2 de la page analyse</p></message>
+
+<message id="parcellaire.upload.size"><p> La surface du ou des polygones est trop importante que pour effectuer une analyse surfacique.</p></message>
 
 <message id="api.msg.error.tool.name">Aucune carte ou traitement de ce nom.</message>
 <message id="api.msg.error.polyg1">Veillez utiliser le format Géojson pour votre polygone</message>

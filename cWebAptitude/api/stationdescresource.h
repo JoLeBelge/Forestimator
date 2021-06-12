@@ -37,7 +37,7 @@ public:
      //response.setMimeType("text/plain");
      //response.setMimeType("text/csv");
      //response.addHeader("charset","utf-8");
-       // c'est la solution que j'ai trouvée pour que mes caractère accentués passent bien sur le navigateur
+     // c'est la solution que j'ai trouvée pour que mes caractère accentués passent bien sur le navigateur
      response.addHeader("Content-Type","text/plain; charset=utf-8");
 
 
