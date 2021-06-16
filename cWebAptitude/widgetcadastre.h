@@ -37,6 +37,9 @@ public:
 
     Wt::Signal<std::string>& sendPolygone() { return pathGeoJson_; }
     Wt::Signal<std::string> pathGeoJson_;
+
+    // la session est créé ici car dépend de la session d'utilisateur, ne dois pas être propre au dicoApt ou à class^ cadastre
+    dbo::Session session;
 private:
     cadastre * mCad;
 

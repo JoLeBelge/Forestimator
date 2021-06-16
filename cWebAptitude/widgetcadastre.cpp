@@ -19,7 +19,6 @@ widgetCadastre::widgetCadastre(cadastre * aCad):mCad(aCad),WTable()
     submit_ = elementAt(row,0)->addWidget(cpp14::make_unique<WPushButton>(tr("cadastre.submit")));
     submit_->clicked().connect(this, &widgetCadastre::submit);
 
-
     aMLabelCom.emplace(std::make_pair(0,0));
     commune_->addItem(tr("cadastre.choisir"));
     int c(1);
@@ -36,6 +35,13 @@ widgetCadastre::widgetCadastre(cadastre * aCad):mCad(aCad),WTable()
     section_->disable();
     paCa_->disable();
     division_->disable();
+
+    // session pour se connecter à la db cadastre
+    //std::cout << " bd cadastre " << mCad->mDirBDCadastre << std::endl;
+    std::unique_ptr<dbo::backend::Sqlite3> sqlite3{new dbo::backend::Sqlite3(mCad->mDirBDCadastre)};
+    session.setConnection(std::move(sqlite3));
+    session.mapClass<capa>("capa");
+
 }
 
 void widgetCadastre::refreshDivision(){
@@ -71,7 +77,7 @@ void widgetCadastre::refreshSection(){
 
         section_->addItem(tr("cadastre.choisir"));
 
-        for (auto & l : mCad->getSectionForDiv(aMLabelDiv.at(division_->currentIndex()))){
+        for (auto & l : mCad->getSectionForDiv(aMLabelDiv.at(division_->currentIndex()),&session)){
             section_->addItem(l);
         }
     }
@@ -85,7 +91,7 @@ void widgetCadastre::refreshPaCa(){
         if (section_->currentIndex()!=0){
         paCa_->addItem(tr("cadastre.choisir"));
         int c(1);
-        for (capa * l : mCad->getCaPaPtrVector(aMLabelDiv.at(division_->currentIndex()),section_->currentText().toUTF8())){
+        for (dbo::ptr<capa> l : mCad->getCaPaPtrVector(aMLabelDiv.at(division_->currentIndex()),section_->currentText().toUTF8(), & session)){
             paCa_->addItem(l->CaPaKey);
             aMLabelPaCa.emplace(std::make_pair(c,l->mPID));
             c++;

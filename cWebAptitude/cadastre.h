@@ -15,7 +15,11 @@
 #include <cmath>
 #include <sqlite3.h>
 #include <tuple>
+
+#include <Wt/Dbo/Dbo.h>
+#include <Wt/Dbo/backend/Sqlite3.h>
 namespace fs = boost::filesystem ;
+namespace dbo = Wt::Dbo;
 // une classe qui ressemble un peu dans sa structure à celle de cnsw, qui sera membre du dicoApt
 // sert à renseigner les chemins d'accès vers les shp, à lire les dbf, à retourner les polygones des communes, division et parcelles cadastrales
 
@@ -29,11 +33,22 @@ class capa{
 
 public:
     capa(std::string aCaSecKey, std::string aCaPaKey,int aPID, std::map<int,std::tuple<int,std::string>> * aVDiv);
+    capa(){};
 
     std::string CaSecKey, CaPaKey;
     int comINS, divCode, mPID;
     std::string section;
-    std::string * divisionName;
+
+    template<class Action>
+       void persist(Action& a)
+       {
+           dbo::field(a, CaSecKey,     "CaSecKey");
+           dbo::field(a, CaPaKey, "CaPaKey");
+           dbo::field(a, comINS,     "comINS");
+           dbo::field(a, divCode,    "divCode");
+           dbo::field(a, mPID,    "mPID");
+           dbo::field(a, section,    "section");
+       }
     private:
 
 };
@@ -43,7 +58,6 @@ class cadastre
 {
 public:
     cadastre(sqlite3 *db);
-    //cadastre(std::string xmlCadastre);// pour rendre plus rapide le démarrage de l'appli, je sauve cet objet au format xml
     void loadInfo();
 
     // retourne le chemin d'accès vers le fichier json qui contient le polygone au format json
@@ -52,15 +66,16 @@ public:
     std::string createPolygonPaCa(std::string aCaPaKey, int divCode);// trop lent
     std::string createPolygonPaCa(int aFID);
 
-    std::vector<std::string> getSectionForDiv(int aDivCode);
-    std::vector<capa*> getCaPaPtrVector(int aDivCode,std::string aSection);
+    // info nécessitant la lecture des objets capa mappé dans la bd sqlite
+    std::vector<std::string> getSectionForDiv(int aDivCode, Wt::Dbo::Session * session);
+    std::vector<dbo::ptr<capa> > getCaPaPtrVector(int aDivCode,std::string aSection,dbo::Session * session);
 
     std::map<int,std::string> getCommuneLabel(){
         std::map<int,std::string> aRes;
         for (auto & kv : mVCom){
             aRes.emplace(std::make_pair(kv.first,kv.second+" "+std::to_string(kv.first)));
         }
-        // problème ; pas dans l'ordre alphabétique... aie aie
+        // problème ; pas dans l'ordre alphabétique...
         return aRes;
     }
     std::map<int,std::string> getDivisionLabel(int aCodeCommune){
@@ -74,7 +89,7 @@ public:
     }
 
     std::string saveFeatAsGEOJSON(OGRFeature *f);
-
+    std::string mDirBDCadastre;
 
     private:
       boost::filesystem::path mShpCommunePath;
@@ -90,7 +105,7 @@ public:
       std::map<int,std::tuple<int,std::string>> mVDiv;
       //std::vector<std::unique_ptr<capa>> mVCaPa;
       //clé ; le code de la division.
-      std::map<int,std::vector<std::unique_ptr<capa>>> mVCaPa;
+      //std::map<int,std::vector<std::unique_ptr<capa>>> mVCaPa;
 
       sqlite3 *db_;
 };

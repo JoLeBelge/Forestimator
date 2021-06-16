@@ -11,8 +11,8 @@ QMAKE_CXXFLAGS += -g
 #CONFIG += c++11
 
 #-lboost_thread
-LIBS = -lgdal -lwthttp -lwt -lboost_system -lboost_iostreams  -lboost_filesystem -lboost_program_options -lcrypt -pthread -lwtdbo -lwtdbosqlite3 -lzip -lhpdf -lsqlite3 -lboost_serialization
-#LIBS += -lwkhtmltox
+LIBS = -lgdal -lwthttp -lwt -lboost_system -lboost_iostreams  -lboost_filesystem -lboost_program_options -lcrypt -pthread -lwtdbo -lwtdbosqlite3 -lzip -lhpdf -lsqlite3
+#LIBS += -lwkhtmltox -lboost_serialization
 
 # utilisation de GM ; fonctionne bien, mais un peu chiant à parametrer pour la compilation sur le serveur. Donc je retire et j'utilise WRasterImage (wrapper pour GM en fait)
 #https://stackoverflow.com/questions/33659208/using-magick-in-qt-creator
