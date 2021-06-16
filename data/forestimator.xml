@@ -461,6 +461,7 @@ http://forestimator.gembloux.ulg.ac.be/api/<font color="blue">compo</font>/polyg
 </message>
 
 <message id="report.analyse.surf.hdom.t">Hauteur dominante calculé sur le MNH</message>
+<message id="report.analyse.surf.dendro.t">Description dendrométriques</message>
 <message id="report.analyse.surf.compo.t">Composition</message>
 
 <message id="report.analyse.point.titre">Analyse ponctuelle</message>

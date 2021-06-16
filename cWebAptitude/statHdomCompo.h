@@ -56,6 +56,7 @@ public:
     std::unique_ptr<Wt::WContainerWidget> getResult();
 
     basicStat bshdom();
+    basicStat bsDendro(std::string aVar="hdom");
 
 private:
     std::shared_ptr<layerBase> mLay;
@@ -76,6 +77,8 @@ public:
     void computeGha(){mGha=k1gha*mVHA/mHdom;}
     void computeNha(){mNha=40000.0*M_PI*mGha/pow(mCmoy,2);}
     void computeCmoy(){mCmoy=(k1cmoy*(mHdom-1.3)+k2cmoy*pow((mHdom-1.3),2))*pow(mMean/mQ95,k3cmoy);}
+
+    void printDetail();
 
     double mVHA, mHdom, mGha, mCmoy, mNha;
 private:

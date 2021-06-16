@@ -8,7 +8,7 @@ double globd=2*globx;
 
 // modèle reçu de jérome le 9/06/2021
 double k1hdom(1.237116), k2hdom(-0.005823), k1vha(52.176316),k2vha(6.677865),k3vha(0.807146);
-double k1gha(2.143419), k1cmoy(2.143419),k2cmoy(0.054804),k3cmoy(-0.199079);
+double k1gha(2.143419), k1cmoy(2.869327),k2cmoy(0.054804),k3cmoy(-0.199079);
 
 
 statHdom::statHdom(std::shared_ptr<layerBase> aLay, OGRGeometry * poGeom):mLay(aLay),mGeom(poGeom)
@@ -186,10 +186,10 @@ void statHdom::predictHdomHex(){
                     //std::cout << " mnh masqué dimension :" << xSize << "," << ySize << std::endl;
 
                     if (c==0){
-                         // création d'un masque raster qui sera utilisé pour tout les hexagones pour déterminer les pixels dedans et dehors.
-                         // Ca sera toujours plus rapide que l'intersect de OGR
+                        // création d'un masque raster qui sera utilisé pour tout les hexagones pour déterminer les pixels dedans et dehors.
+                        // Ca sera toujours plus rapide que l'intersect de OGR
                         //std::cout << " mnh masqué dimension :" << xSize << "," << ySize << std::endl;
-                         maskHex =  rasterizeGeom(hex, MNH);
+                        maskHex =  rasterizeGeom(hex, MNH);
                     }
                     //std::cout << " mnh masqué dimension :" << xSize << "," << ySize << std::endl;
 
@@ -213,10 +213,10 @@ void statHdom::predictHdomHex(){
                                 // check que le pixel est bien dans l'hexagone
                                 //if ( pt.Intersect(hex)){
                                 //centre->Distance(pt)=<
-                                    double aVal=scanline[ col ];
+                                double aVal=scanline[ col ];
 
-                                    // H() c'est pour gain de 0.2
-                                    aVHs.push_back(Dico()->H(aVal));
+                                // H() c'est pour gain de 0.2
+                                aVHs.push_back(Dico()->H(aVal));
                                 //}
                             }
                         }
@@ -263,15 +263,13 @@ void statHdom::predictHdomHex(){
 
 // approche rectangle de 1 are. Tellement plus simple,  et plus rapide
 void statHdom::predictDendro(){
-    std::cout << " predict Dendro depuis MNH2019" << std::endl;
-    //std::vector<std::unique_ptr<statCellule>> aRes;
+    //std::cout << " predict Dendro depuis MNH2019" << std::endl;
 
     // masque au format raster
     GDALDataset * mask = mLay->rasterizeGeom(mGeom);
     OGREnvelope ext;
     mGeom->getEnvelope(&ext);
     double width((ext.MaxX-ext.MinX)), height((ext.MaxY-ext.MinY));
-
 
     GDALDataset  * DS = (GDALDataset *) GDALOpen( mLay->getPathTif().c_str(), GA_ReadOnly );
     if( DS == NULL )
@@ -292,44 +290,42 @@ void statHdom::predictDendro(){
         int nbPix= 10/pixelWidth;
 
         float *scanline, *scanlineMask;
-        scanline = (float *) CPLMalloc( sizeof( float ) * nbPix );
-        scanlineMask = (float *) CPLMalloc( sizeof( float ) * nbPix );
-
+        scanline = (float *) CPLMalloc( sizeof( float ) * nbPix*nbPix );
+        scanlineMask = (float *) CPLMalloc( sizeof( float ) * nbPix*nbPix );
 
         // boucle sur les cellules
-        for (int i(0) ; i< (width/(10.0)); i++){
-            for (int j(0) ; j< (height/10.0); j++){
+        for (int i(0) ; i< ((int) (width/(10.0))); i++){
+            for (int j(0) ; j< ((int)(height/10.0)); j++){
 
-                    std::vector<double> aVHs;
-                    // boucle sur chaque ligne de la cellule
-                    for ( int row = 0; row < nbPix; row++ )
-                    {
-                        // lecture
-                        int posU=i*nbPix;
-                        int posV=j*nbPix;
+                std::vector<double> aVHs;
 
-                        DS->GetRasterBand(1)->RasterIO( GF_Read, posU+xOffset, posV+row+yOffset, nbPix, 1, scanline, nbPix,1, GDT_Float32, 0, 0 );
-                        // lecture du masque
-                        mask->GetRasterBand(1)->RasterIO( GF_Read, posU , posV+row, nbPix, 1, scanlineMask, nbPix,1, GDT_Float32, 0, 0 );
-                        // boucle sur scanline et garder les pixels qui sont dans le polygone
-                        for (int col = 0; col <  nbPix; col++)
-                        {
-                            if (scanlineMask[col]==255){
-                                    double aVal=scanline[ col ];
-                                    // H() c'est pour gain de 0.2
-                                    aVHs.push_back(Dico()->H(aVal));
-                            }
-                        }
+                // lecture
+                int posU=i*nbPix;
+                int posV=j*nbPix;
+                //std::cout << "i " << i << " , j " << j << " ; row  pos U " << posU << " , posV " << posV << " (width/(10.0)) " << (width/(10.0)) <<  " , (height/10.0) " << (height/10.0)<< std::endl;
+
+                // lecture du bloc en 1 coup
+                DS->GetRasterBand(1)->RasterIO( GF_Read, posU+xOffset, posV+yOffset, nbPix, nbPix, scanline, nbPix,nbPix, GDT_Float32, 0, 0 );
+                // lecture du masque
+                mask->GetRasterBand(1)->RasterIO( GF_Read, posU , posV, nbPix, nbPix, scanlineMask, nbPix,nbPix, GDT_Float32, 0, 0 );
+
+                // boucle sur scanline et garder les pixels qui sont dans le polygone
+                for (int pix = 0; pix <  nbPix*nbPix; pix++)
+                {
+                    if (scanlineMask[pix]==255){
+                        double aVal=scanline[ pix ];
+                        // H() c'est pour gain de 0.2
+                        aVHs.push_back(Dico()->H(aVal));
                     }
-
-                    // prediction des variables dendro si assez d'observations
-                    double surf=aVHs.size()*pixelWidth*pixelHeight;
-                    //std::cout << "surface nid abeille ; " << surf << std::endl;
-                    // seuil de 800 m2
-                    if (surf>800){
-                        std::unique_ptr<statCellule> cel=std::make_unique<statCellule>(&aVHs,surf);
-                        mStat.push_back(std::move(cel));
-                    }
+                }
+                // prediction des variables dendro si assez d'observations
+                double surf=aVHs.size()*pixelWidth*pixelHeight;
+                //std::cout << "surface nid abeille ; " << surf << std::endl;
+                // seuil de 80 m2
+                if (surf>80){
+                    std::unique_ptr<statCellule> cel=std::make_unique<statCellule>(&aVHs,surf);
+                    mStat.push_back(std::move(cel));
+                }
 
             }
         }
@@ -404,10 +400,34 @@ std::unique_ptr<WContainerWidget> statHdom::getResult(){
     table->elementAt(c, 1)->addWidget(cpp14::make_unique<WText>(bs.getMin()));
     table->elementAt(c, 1)->setPadding(10,Wt::Side::Left);
     c++;
-    table->elementAt(c, 0)->addWidget(cpp14::make_unique<WText>("Nombre de Hdom mesuré (surface de 0.1 ha)"));
+    //table->elementAt(c, 0)->addWidget(cpp14::make_unique<WText>("Nombre de Hdom mesuré (surface de 0.1 ha)"));// hexagones OLD OLD
+    table->elementAt(c, 0)->addWidget(cpp14::make_unique<WText>("Nombre de Hdom mesuré (surface de 1 are)"));
     table->elementAt(c, 1)->addWidget(cpp14::make_unique<WText>(bs.getNb()));
     table->elementAt(c, 1)->setPadding(10,Wt::Side::Left);
     c++;
+    // autres variable dendro
+    table->elementAt(c, 0)->setColumnSpan(2);
+    table->elementAt(c, 0)->setContentAlignment(AlignmentFlag::Top | AlignmentFlag::Center);
+    table->elementAt(c, 0)->setPadding(10);
+    table->elementAt(c,0)->addWidget(cpp14::make_unique<WText>(Wt::WString::tr("report.analyse.surf.dendro.t")));
+    c++;
+    table->elementAt(c, 0)->addWidget(cpp14::make_unique<WText>("VHA moyen"));
+    table->elementAt(c, 1)->addWidget(cpp14::make_unique<WText>(bsDendro("vha").getMean()+ " m3/ha"));
+    table->elementAt(c, 1)->setPadding(10,Wt::Side::Left);
+    c++;
+    table->elementAt(c, 0)->addWidget(cpp14::make_unique<WText>("NHA moyen"));
+    table->elementAt(c, 1)->addWidget(cpp14::make_unique<WText>(bsDendro("nha").getMean()+ " tige/ha"));
+    table->elementAt(c, 1)->setPadding(10,Wt::Side::Left);
+    c++;
+    table->elementAt(c, 0)->addWidget(cpp14::make_unique<WText>("GHA moyen"));
+    table->elementAt(c, 1)->addWidget(cpp14::make_unique<WText>(bsDendro("gha").getMean()+ " m2/ha"));
+    table->elementAt(c, 1)->setPadding(10,Wt::Side::Left);
+    c++;
+    table->elementAt(c, 0)->addWidget(cpp14::make_unique<WText>("Cmoy moyen"));
+    table->elementAt(c, 1)->addWidget(cpp14::make_unique<WText>(bsDendro("cmoy").getMean()+ " cm"));
+    table->elementAt(c, 1)->setPadding(10,Wt::Side::Left);
+    c++;
+
     // maintenant un tableau avec proportion par classe de hauteur;
     table->elementAt(c, 0)->setColumnSpan(2);
     table->elementAt(c, 0)->setContentAlignment(AlignmentFlag::Top | AlignmentFlag::Center);
@@ -423,12 +443,36 @@ std::unique_ptr<WContainerWidget> statHdom::getResult(){
     return std::move(aRes);
     //std::cout << "lStatContChart::getResult() done" << std::endl;
 }
-basicStat statHdom::bshdom(){
-    std::vector<double> aVHdom;
-    for (auto & ptCel : mStat){
-     aVHdom.push_back(ptCel->mHdom);
+basicStat statHdom::bshdom(){  
+    return bsDendro("hdom");
+}
+basicStat statHdom::bsDendro(std::string aVar){
+    std::vector<double> aVVar;
+
+    if (aVar=="hdom"){
+        for (auto & ptCel : mStat){
+            aVVar.push_back(ptCel->mHdom);
+        }
+    } else if (aVar=="vha"){
+        for (auto & ptCel : mStat){
+            aVVar.push_back(ptCel->mVHA);
+        }
+    } else if (aVar=="nha"){
+        for (auto & ptCel : mStat){
+            aVVar.push_back(ptCel->mNha);
+        }
+    } else if (aVar=="cmoy"){
+        for (auto & ptCel : mStat){
+            aVVar.push_back(ptCel->mCmoy);
+        }
+    } else if (aVar=="gha"){
+        for (auto & ptCel : mStat){
+            aVVar.push_back(ptCel->mGha);
+        }
     }
-return basicStat(aVHdom);}
+
+    return basicStat(aVVar);
+}
 
 
 // modèle de prédiction de hdom depuis MNH2019
@@ -493,7 +537,7 @@ std::vector<OGRPoint> hexbin(GDALDataset * mask){
                 // lecture du pixel
                 mask->GetRasterBand(1)->RasterIO( GF_Read, col, row, 1, 1, scanPix, 1,1, GDT_Float32, 0, 0 );
                 int maskVal=scanPix[0];
-               // c++;
+                // c++;
                 if (maskVal==255){
 
                     OGRPoint pt(x, y);
@@ -604,7 +648,7 @@ statCompo::statCompo(cDicoApt * aDico, OGRGeometry * poGeom):mGeom(poGeom),mDico
 
 statCompo::statCompo(std::vector<std::shared_ptr<layerBase>> VlayCompo, cDicoApt *aDico, OGRGeometry * poGeom):mGeom(poGeom),mDico(aDico){
     for (std::shared_ptr<layerBase> l:VlayCompo){
-            mVLay.push_back(l);
+        mVLay.push_back(l);
     }
 }
 
@@ -724,16 +768,42 @@ basicStat statCompo::computeStatWithMasq(std::shared_ptr<layerBase> aLay, OGRGeo
 
 statCellule::statCellule(std::vector<double> * aVHs,int aSurf):mSurf(aSurf){
     // calcul de Vha
-    double vhaSum;
+    double vhaSum, hSum;
     for (double h : *aVHs){
         vhaSum+=pow(std::max(0.0,h-k2vha),k3vha);
+        hSum+=h;
     }
+    // calcul de la moyenne
+    mMean=hSum/aVHs->size();
     mVHA=k1vha*(vhaSum/aVHs->size());
     // calcul de Q95
     mQ95=getQ95(*aVHs);
+    //std::cout << "mean hauteur : " << mMean << " , Q95 " << mQ95 << std::endl;
+
     // le reste des variables dendro
     computeHdom();
     computeGha();
-    computeNha();
     computeCmoy();
+    computeNha();
+
+    if (mCmoy>1000000){
+        printDetail();
+        std::cout << " vecteur de hauteur : "<< std::endl;
+        for (double h : *aVHs){
+            std::cout << h << std::endl;
+        }
+
+    }
+
+}
+
+void  statCellule::printDetail(){
+    std::cout << "Mean : " << mMean << std::endl;
+    std::cout << "Q95 : " << mQ95 << std::endl;
+    std::cout << "Hdom : " << mHdom << std::endl;
+    std::cout << "VHA : " << mVHA << std::endl;
+    std::cout << "NHA : " << mNha << std::endl;
+    std::cout << "Gha : " << mGha << std::endl;
+    std::cout << "Cmoy : " << mCmoy << std::endl;
+
 }
