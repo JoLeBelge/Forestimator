@@ -943,6 +943,12 @@ TypeLayer str2TypeLayer(const std::string& str)
     return aRes;
 }
 
+TypeWMS str2TypeWMS(const std::string& str){
+    TypeWMS aRes=TypeWMS::WMS;
+    if(str == "ArcGisRest") aRes=TypeWMS::ArcGisRest;
+    return aRes;
+}
+
 std::string loadBDpath()
 {
     std::string aRes;

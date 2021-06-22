@@ -51,6 +51,10 @@ enum class TypeLayer {
     ,Peuplement // description du peuplement en place
 };
 
+enum class TypeWMS {WMS,
+                    ArcGisRest
+                   };
+
 // forward dec
 class cDicoApt;
 
@@ -64,6 +68,7 @@ inline bool exists (const std::string& name){
 TypeCarte str2TypeCarte(const std::string& str);
 TypeVar str2TypeVar(const std::string& str);
 TypeLayer str2TypeLayer(const std::string& str);
+TypeWMS str2TypeWMS(const std::string& str);
 
 std::string roundDouble(double d, int precisionVal=1);
 
@@ -96,6 +101,8 @@ class WMSinfo
     WMSinfo():mUrl(""),mWMSLayerName("toto"){}
     WMSinfo(std::string url,std::string layer, std::string attribution=""):mUrl(url),mWMSLayerName(layer),mWMSattribution(attribution){}
     std::string mUrl, mWMSLayerName, mWMSattribution;
+
+    TypeWMS mTypeWMS;
 };
 
 

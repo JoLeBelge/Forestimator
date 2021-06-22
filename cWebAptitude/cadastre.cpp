@@ -7,7 +7,6 @@ cadastre::cadastre(sqlite3 *db)
     // les chemins d'accès vers les shp
     GDALAllRegister();
     loadInfo();
-    //writeArchive("/home/lisein/Documents/carteApt/Forestimator/data/tmp/testArchive.xml");
 }
 
 void cadastre::loadInfo(){
@@ -37,7 +36,7 @@ void cadastre::loadInfo(){
             }else if (code=="TMPDIR"){
                 mTmpDir=std::string( (char *)sqlite3_column_text( stmt, 0 ));
             }else if (code=="CadastreBD"){
-                mDirBDCadastre=std::string( (char *)sqlite3_column_text( stmt, 0 ));
+                mDirBDCadastre=std::string( (char *)sqlite3_column_text( stmt, 0 ))+"/"+std::string( (char *)sqlite3_column_text( stmt, 1 ) );
             }
         }
     }

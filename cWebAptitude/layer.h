@@ -28,7 +28,6 @@ public:
     Layer(groupLayers * aGroupL, std::shared_ptr<layerBase> aLB,WText * PWText);
     Layer(groupLayers * aGroupL, std::shared_ptr<layerBase> aLB);
 
-
     void displayLayer() const;
     std::vector<std::string> displayInfo(double x, double y);
 
