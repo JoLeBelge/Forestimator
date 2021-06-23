@@ -51,6 +51,10 @@ enum class TypeLayer {
     ,Peuplement // description du peuplement en place
 };
 
+enum class TypeWMS {WMS,
+                    ArcGisRest
+                   };
+
 // forward dec
 class cDicoApt;
 
@@ -64,6 +68,7 @@ inline bool exists (const std::string& name){
 TypeCarte str2TypeCarte(const std::string& str);
 TypeVar str2TypeVar(const std::string& str);
 TypeLayer str2TypeLayer(const std::string& str);
+TypeWMS str2TypeWMS(const std::string& str);
 
 std::string roundDouble(double d, int precisionVal=1);
 
@@ -96,6 +101,8 @@ class WMSinfo
     WMSinfo():mUrl(""),mWMSLayerName("toto"){}
     WMSinfo(std::string url,std::string layer, std::string attribution=""):mUrl(url),mWMSLayerName(layer),mWMSattribution(attribution){}
     std::string mUrl, mWMSLayerName, mWMSattribution;
+
+    TypeWMS mTypeWMS;
 };
 
 
@@ -167,7 +174,7 @@ public:
     void catSummary(){std::cout << "layerbase ; Code " << mCode << " , Nom " << mNom << ", raser " << mPathRaster << ", dictionnaire valeurs de " << mDicoVal.size() << " elements " << std::endl;}
 
     std::string EssCode() const{std::string aRes="";
-                                   if (mType==TypeLayer::CS |mType==TypeLayer::FEE){aRes=mCode.substr(0,2);}
+                                   if ((mType==TypeLayer::CS) |(mType==TypeLayer::FEE)){aRes=mCode.substr(0,2);}
                                    return aRes;}
     std::string getCatLayerStr() const{std::string aRes("");
       if (mType==TypeLayer::KK){aRes="KK";}

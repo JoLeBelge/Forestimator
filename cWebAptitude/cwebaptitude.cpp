@@ -67,6 +67,7 @@ cWebAptitude::cWebAptitude(AuthApplication *app, Auth::AuthWidget* authWidget_)
     top_stack  = this->addWidget(Wt::cpp14::make_unique<Wt::WStackedWidget>());
     top_stack->setMargin(0);
     top_stack->setHeight("100%");
+     top_stack->setOverflow(Overflow::Auto);
     // load DOC page
     top_stack->addNew<presentationPage>(mDico);
     // load MAP page
@@ -375,7 +376,7 @@ void cWebAptitude::handlePathChange()
         navigation->setTitle(tr("titre.ana.point"));
         m_app->addMetaHeader("description", tr("desc.point"), "fr");*/
     }else if (mApp->internalPath() == "/resultat"){
-        top_stack->setCurrentIndex(1);
+        top_stack->setCurrentIndex(2);
         //sub_stack->setCurrentIndex(2);
     }else if (mApp->internalPath() == "/parametres"){
         mApp->doJavaScript("alert('Pas encore implémenté...')");

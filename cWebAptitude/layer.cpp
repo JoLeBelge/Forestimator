@@ -96,6 +96,7 @@ void Layer::displayLayer() const{
     //std::cout << "display layer " << std::endl;
 
     std::string aFileIn(mDico->File("displayWMS"));
+    if (mTypeWMS==TypeWMS::ArcGisRest){ aFileIn=mDico->File("displayOLArcGisRest");}
     std::ifstream in(aFileIn);
     std::stringstream ss;
     ss << in.rdbuf();

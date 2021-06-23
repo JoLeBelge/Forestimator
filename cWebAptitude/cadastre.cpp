@@ -2,12 +2,11 @@
 
 cadastre::cadastre(sqlite3 *db)
 {
-    std::cout << " creation de la BD cadastre ; ça prend un peu de temps..\n" << std::endl;
+    std::cout << " création classe cadastre.." << std::endl;
     db_=db;
     // les chemins d'accès vers les shp
     GDALAllRegister();
     loadInfo();
-
 }
 
 void cadastre::loadInfo(){
@@ -36,6 +35,8 @@ void cadastre::loadInfo(){
                 mShpParcellePath=fs::path(std::string( (char *)sqlite3_column_text( stmt, 0 ) )+"/"+std::string( (char *)sqlite3_column_text( stmt, 1 ) ));
             }else if (code=="TMPDIR"){
                 mTmpDir=std::string( (char *)sqlite3_column_text( stmt, 0 ));
+            }else if (code=="CadastreBD"){
+                mDirBDCadastre=std::string( (char *)sqlite3_column_text( stmt, 0 ))+"/"+std::string( (char *)sqlite3_column_text( stmt, 1 ) );
             }
         }
     }
@@ -95,6 +96,15 @@ void cadastre::loadInfo(){
     // lecture des parcelles cadastrales - il y en a 4 000 000 donc je ne vais pas tout lire, sinon c'est un peu lent.
     //inputPath= mShpParcellePath.c_str();
     // si j'ouvre uniquement le dbf, est-ce que je ne gagne pas un peu de temps? apparemment pas...
+    /*  std::unique_ptr<dbo::backend::Sqlite3> sqlite3{new dbo::backend::Sqlite3("cadastre.db")};
+    dbo::Session session;
+    session.setConnection(std::move(sqlite3));
+    session.mapClass<capa>("capa");
+    //session.createTables();
+    dbo::Transaction transaction{session}; // une seule transaction pour l'ajout de tout
+    */
+    // ça c'est fait uniquement une fois pour créer la bd sqlite
+    if (0){
     std::string tmp= mShpParcellePath.c_str();
     tmp= tmp.substr(0,mShpParcellePath.size()-3)+"dbf";
     inputPath=tmp.c_str();
@@ -108,21 +118,33 @@ void cadastre::loadInfo(){
             // layer
             OGRLayer * lay = mDS->GetLayer(0);
             OGRFeature *poFeature;
+            int i(0);
             while( (poFeature = lay->GetNextFeature()) != NULL )
             {
                 // création d'une parcelle cadastrale et ajout au vecteur
                 std::unique_ptr<capa> pt=std::make_unique<capa>(poFeature->GetFieldAsString("CaSeKey"),poFeature->GetFieldAsString("CaPaKey"),poFeature->GetFID(),&mVDiv);
 
-                if (mVCaPa.find(pt->divCode)==mVCaPa.end()){
+               /* if (mVCaPa.find(pt->divCode)==mVCaPa.end()){
                     mVCaPa.emplace(std::make_pair(pt->divCode,std::vector<std::unique_ptr<capa>>()));
                 }
+
                 mVCaPa.at(pt->divCode).push_back(std::move(pt));
+                */
+                // ajout de la parcelle à la bd sqlite via ORM de wt
+
+                //dbo::ptr<capa> capaPtr = session.add(std::move(pt));
+
+                i++;
+                if (i % 10000==0){ std::cout << " i " << i << std::endl;}
+
             }
         }
         GDALClose(mDS);
     } else {
         std::cout << inputPath << " n'existe pas " ;
     }
+    }
+
     /*
     std::cout << " j'ai lu " << mVCom.size() << " communes du cadastres (belgique)" << std::endl;
     std::cout << " j'ai lu " << mVDiv.size() << " divisions du cadastres (belgique)" << std::endl;
@@ -146,23 +168,45 @@ capa::capa(std::string aCaSecKey, std::string aCaPaKey, int aPID, std::map<int,s
     }
 }
 
-std::vector<std::string> cadastre::getSectionForDiv(int aDivCode){
+std::vector<std::string> cadastre::getSectionForDiv(int aDivCode, Wt::Dbo::Session *session){
     std::vector<std::string> aRes;
+
+    /* a modifier, maintenant que je vais lire l'objet mappé capa.
     if (mVCaPa.find(aDivCode)!=mVCaPa.end()){
         for (std::unique_ptr<capa> & parcelle : mVCaPa.at(aDivCode)){
             if (std::find(aRes.begin(), aRes.end(), parcelle->section) == aRes.end()){aRes.push_back(parcelle->section);}
         }
+    }*/
+    typedef dbo::collection< dbo::ptr<capa> > collectionCapa;
+    dbo::Transaction transaction{*session};
+    collectionCapa Capas = session->find<capa>().where("divCode = ?").bind(aDivCode);
+
+    for (dbo::ptr<capa> &c : Capas){
+      if (std::find(aRes.begin(), aRes.end(), c->section) == aRes.end()){aRes.push_back(c->section);}
     }
+
     std::sort(aRes.begin(), aRes.end());
     return aRes;
 }
-std::vector<capa *> cadastre::getCaPaPtrVector(int aDivCode,std::string aSection){
-    std::vector<capa *> aRes;
-    if (mVCaPa.find(aDivCode)!=mVCaPa.end()){
+
+// a modifier, maintenant que je vais lire l'objet mappé capa.
+std::vector<dbo::ptr<capa>> cadastre::getCaPaPtrVector(int aDivCode, std::string aSection, Wt::Dbo::Session *session){
+   // std::vector<const capa *> aRes;
+    std::vector<dbo::ptr<capa>> aRes;
+    /*if (mVCaPa.find(aDivCode)!=mVCaPa.end()){
         for (std::unique_ptr<capa> & parcelle : mVCaPa.at(aDivCode)){
             if (parcelle->section==aSection){aRes.push_back(parcelle.get());}
         }
+    }*/
+
+    typedef dbo::collection< dbo::ptr<capa> > collectionCapa;
+    dbo::Transaction transaction{*session};
+    collectionCapa Capas = session->find<capa>().where("divCode = ?").bind(aDivCode);
+
+    for (dbo::ptr<capa> &c : Capas){
+      aRes.push_back(c);
     }
+
     return aRes;
 }
 
@@ -323,4 +367,36 @@ std::string cadastre::saveFeatAsGEOJSON(OGRFeature *f){
     ofs.close();
     return aOut;
 }
+/*
+void cadastre::writeArchive(std::string aArchive){
+    std::cout << "Ecriture de l'archive des parcelles cadastrales dans " << aArchive << std::endl;
+    std::ofstream ofs(aArchive);
+    //boost::archive::xml_oarchive oa(ofs);
+    //oa << boost::serialization::make_nvp("cadastre",*this);
+    boost::archive::binary_oarchive oa(ofs);
+    oa <<   boost::serialization::make_binary_object(&mVCaPa, sizeof(mVCaPa));
+    ofs.close();
+}
+
+
+
+void capa::writeArchive(std::string aArchive){
+    std::cout << "Ecriture de l'archive de la parcelle cadastrale dans " << aArchive << std::endl;
+    std::ofstream ofs(aArchive);
+    boost::archive::binary_oarchive oa(ofs);
+    oa <<   boost::serialization::make_binary_object(this, sizeof(*this));
+    ofs.close();
+}
+
+
+
+cadastre::cadastre(std::string xmlCadastre){
+std::cout << "Lecture de l'archive du cadastre "<< std::endl;
+ std::ifstream ifs(xmlCadastre);
+ boost::archive::binary_iarchive archive(ifs);
+//archive & boost::serialization::make_nvp("cadastre",*this);
+ ifs.close();
+ std::cout << "Done "<< std::endl;
+}
+*/
 

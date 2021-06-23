@@ -3,8 +3,10 @@ build-WebAptitude/
 build-WebAptitudeDebug/
 carteApt/data/aptitudeEssDB.db-wal
 carteApt/data/aptitudeEssDB.db-shm
+carteApt/carteApt.pro.*
 cWebAptitude/cWebAptitude.pro.user.*
 cWebAptitude/cWebAptitude.pro.user
 data/tmp
 data/auth.db
 data/extents.db
+data/cadastre.db*

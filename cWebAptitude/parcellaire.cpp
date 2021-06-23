@@ -1,6 +1,7 @@
 #include "parcellaire.h"
 
-int globSurfMax(3000);// en ha
+int globSurfMax(3000);// en ha, surface max pour tout le shp
+int globSurfMaxOnePol(3000);// en ha, surface max pour un polygone
 int globVolMaxShp(10000);// en ko // n'as pas l'air de fonctionner comme je le souhaite
 extern bool globTest;
 
@@ -103,17 +104,14 @@ bool parcellaire::to31370AndGeoJson(){
     GDALDataset * DS =  (GDALDataset*) GDALOpenEx( inputPath, GDAL_OF_VECTOR | GDAL_OF_READONLY, NULL, NULL, NULL );
     if( DS != NULL )
     {
-
         //const char *pszWkt=DS->GetProjectionRef();
         //OGRSpatialReference oSRS;
         //oSRS.importFromWkt(&pszWkt);
         //const char *targetEPSG=oSRS.GetAuthorityCode("GEOGCS");
         //std::cout << "targetEPSG : " << targetEPSG << std::endl;
-        std::cout << " toto"  << std::endl;
 
         OGRLayer * lay = DS->GetLayer(0);
         OGRSpatialReference * oSRS=lay->GetSpatialRef();
-        std::cout << " tato"  << std::endl;
         if (oSRS==NULL){
             auto messageBox =
                     addChild(Wt::cpp14::make_unique<Wt::WMessageBox>(
@@ -131,7 +129,6 @@ bool parcellaire::to31370AndGeoJson(){
             return 0;
         }
         int EPSG =  oSRS->GetEPSGGeogCS();
-        std::cout << " tutu"  << std::endl;
         std::cout << "EPSG : " << EPSG << std::endl;
         if (EPSG==-1){testEPSG=0;}
         OGRFeature *poFeature;
@@ -277,6 +274,21 @@ bool parcellaire::computeGlobalGeom(std::string extension="shp",bool limitSize=1
                 centerX= (mParcellaireExtent.MaxX+mParcellaireExtent.MinX)/2;
                 centerY= (mParcellaireExtent.MaxY+mParcellaireExtent.MinY)/2;
                 aRes=1;
+            } else {
+                // message box
+                auto messageBox =
+                        addChild(Wt::cpp14::make_unique<Wt::WMessageBox>(
+                                     "Import du shapefile polygone",
+                                     tr("parcellaire.upload.size")
+                                     ,
+                                     Wt::Icon::Information,
+                                     Wt::StandardButton::Ok));
+
+                messageBox->setModal(true);
+                messageBox->buttonClicked().connect([=] {
+                    removeChild(messageBox);
+                });
+                messageBox->show();
             }
         }
 
@@ -397,7 +409,8 @@ void parcellaire::computeStatAndVisuSelectedPol(int aId){
     std::cout << " computeStatAndVisuSelectedPol  , id " << aId << std::endl;
     m_app->loadingIndicator()->setMessage(tr("LoadingI1"));
     m_app->loadingIndicator()->show();
-    std::string input(mFullPath+ ".shp");
+    //std::string input(mFullPath+ ".shp");
+    std::string input(geoJsonName());
     const char *inputPath=input.c_str();
     GDALDataset * mDS =  (GDALDataset*) GDALOpenEx( inputPath, GDAL_OF_VECTOR | GDAL_OF_READONLY, NULL, NULL, NULL );
     if( mDS != NULL )
@@ -419,6 +432,8 @@ void parcellaire::computeStatAndVisuSelectedPol(int aId){
         }
         if (find) {visuStat(poFeature);}
         GDALClose(mDS);
+    } else {
+       std::cout << "ne parviens pas à lire " << input << std::endl;
     }
     m_app->loadingIndicator()->hide();
     m_app->loadingIndicator()->setMessage(tr("defaultLoadingI"));
@@ -522,7 +537,7 @@ bool parcellaire::cropImWithShp(std::string inputRaster, std::string aOut){
 void parcellaire::selectPolygon(double x, double y){
     if(!isnan(x) && !isnan(y) && !(x==0 && y==0)){
         std::cout << "parcellaire::selectPolygon " << std::endl;
-        std::string input(mFullPath+ ".shp");
+        std::string input(geoJsonName());// lecture du geojson et pas du shp, comme cela compatible avec polygone du cadastre.
         const char *inputPath=input.c_str();
         GDALDataset * mDS =  (GDALDataset*) GDALOpenEx( inputPath, GDAL_OF_VECTOR | GDAL_OF_READONLY, NULL, NULL, NULL );
         if( mDS != NULL )
@@ -531,16 +546,34 @@ void parcellaire::selectPolygon(double x, double y){
             OGRLayer * lay = mDS->GetLayer(0);
             OGRFeature *poFeature;
             lay->ResetReading();
-
             OGRPoint pt(x,y);
-            //pt.assignSpatialReference(lay->GetSpatialRef());
+
             while( (poFeature = lay->GetNextFeature()) != NULL )
             {
                 OGRGeometry * poGeom = poFeature->GetGeometryRef();
                 poGeom->closeRings();
                 poGeom->flattenTo2D();
                 if ( pt.Within(poGeom)){
+                    // je refais le test de la surface, car c'est peut-être un polgone de commune ou de division qui sont trop grand du coup
+                    int aSurfha=OGR_G_Area(poGeom)/10000;
+                    if (aSurfha<globSurfMax){
                     computeStatAndVisuSelectedPol(poFeature->GetFID());
+                    } else {
+                        // message box
+                        auto messageBox =
+                                addChild(Wt::cpp14::make_unique<Wt::WMessageBox>(
+                                             "Analyse surfacique",
+                                             tr("parcellaire.upload.size")
+                                             ,
+                                             Wt::Icon::Information,
+                                             Wt::StandardButton::Ok));
+
+                        messageBox->setModal(true);
+                        messageBox->buttonClicked().connect([=] {
+                            removeChild(messageBox);
+                        });
+                        messageBox->show();
+                    }
                     break;
                 }
             }

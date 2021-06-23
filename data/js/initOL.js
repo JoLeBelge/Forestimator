@@ -335,6 +335,36 @@ refreshLayers = function (){
 	//activeLayer.getSource().changed();
 }
 
+/***
+ *	Redéfini les couches à afficher
+ *
+ **/
+updateGroupeLayers = function(){
+	let l = [];
+	l.push(orthoLayer);
+	l.push(IGNLayer);
+	for (const [key, value] of Object.entries(activeLayers)){
+		l.push(value);
+	};	
+	
+	if (typeof parcellaire !== 'undefined') {
+		l.push(parcellaire);
+		l.push(station);
+		groupe = new ol.layer.Group({
+			'title': 'parcellaire',
+			//attributions: 'Gembloux Agro-Bio Tech',
+			 layers:l
+		});
+	} else {
+		l.push(communes);
+		l.push(station);
+		groupe = new ol.layer.Group({
+			'title': 'aptitude',
+			//attributions: 'Gembloux Agro-Bio Tech',
+			layers:l
+		});
 
-
+	}
+	map.setLayerGroup(groupe);
+}
 

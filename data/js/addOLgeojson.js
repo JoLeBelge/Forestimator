@@ -16,12 +16,5 @@ parcellaire = new ol.layer.Vector({
 	extent: [MINX,MINY,MAXX,MAXY],
 });
 
-// the variable is defined
-groupe = new ol.layer.Group({
-	'title': 'parcellaire',
-	attributions: 'Gembloux Agro-Bio Tech',
-	layers:[activeLayer, parcellaire, station]
-	});
-
-map.setLayerGroup(groupe);
+updateGroupeLayers();
 map.getView().fit(parcellaire.getExtent());
