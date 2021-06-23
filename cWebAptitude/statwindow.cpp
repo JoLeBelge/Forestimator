@@ -16,7 +16,7 @@ statWindow::statWindow(groupLayers * aGL):mDico(aGL->Dico()), mApp(aGL->m_app),m
     // bouton retour
     auto * tpl = contTitre_->addWidget(cpp14::make_unique<Wt::WTemplate>(tr("bouton_retour_parcelaire")));
     WPushButton * retour = tpl->bindWidget("retour", Wt::cpp14::make_unique<WPushButton>("Retour"));
-    retour->setLink(WLink(LinkType::InternalPath, "/analyse"));
+    retour->setLink(WLink(LinkType::InternalPath, "/cartographie"));
     // bouton export PDF
     if (0){
     createPdfBut = contTitre_->addWidget(cpp14::make_unique<WPushButton>("Export PDF"));

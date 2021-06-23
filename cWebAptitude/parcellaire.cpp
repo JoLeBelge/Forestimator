@@ -1,7 +1,7 @@
 #include "parcellaire.h"
 
 int globSurfMax(3000);// en ha, surface max pour tout le shp
-int globSurfMaxOnePol(3000);// en ha, surface max pour un polygone
+int globSurfMaxOnePol(300);// en ha, surface max pour un polygone
 int globVolMaxShp(10000);// en ko // n'as pas l'air de fonctionner comme je le souhaite
 extern bool globTest;
 
@@ -55,10 +55,6 @@ parcellaire::parcellaire(groupLayers *aGL, Wt::WApplication* app, statWindow *st
     // ouu je pense que c'est mal, car si j'appui sur boutton télécharger les cartes, il me dis que toutes les cartes sont sélectionnées
     mContSelect4D->addWidget(std::unique_ptr<baseSelectLayers>(mGL->mSelectLayers));
 
-    if (globTest){
-    widgetCadastre * w=addWidget(cpp14::make_unique<widgetCadastre>(mDico->mCadastre.get()));
-    w->sendPolygone().connect(this,&parcellaire::polygoneCadastre);
-    }
 }
 
 parcellaire::~parcellaire(){
@@ -556,7 +552,7 @@ void parcellaire::selectPolygon(double x, double y){
                 if ( pt.Within(poGeom)){
                     // je refais le test de la surface, car c'est peut-être un polgone de commune ou de division qui sont trop grand du coup
                     int aSurfha=OGR_G_Area(poGeom)/10000;
-                    if (aSurfha<globSurfMax){
+                    if (aSurfha<globSurfMaxOnePol){
                     computeStatAndVisuSelectedPol(poFeature->GetFID());
                     } else {
                         // message box

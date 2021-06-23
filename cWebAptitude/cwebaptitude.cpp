@@ -67,7 +67,7 @@ cWebAptitude::cWebAptitude(AuthApplication *app, Auth::AuthWidget* authWidget_)
     top_stack  = this->addWidget(Wt::cpp14::make_unique<Wt::WStackedWidget>());
     top_stack->setMargin(0);
     top_stack->setHeight("100%");
-     top_stack->setOverflow(Overflow::Auto);
+    top_stack->setOverflow(Overflow::Auto);
     // load DOC page
     top_stack->addNew<presentationPage>(mDico);
     // load MAP page
@@ -99,76 +99,92 @@ cWebAptitude::cWebAptitude(AuthApplication *app, Auth::AuthWidget* authWidget_)
     content_couches->setId("content_couches");
     //content_couches->setOverflow(Overflow::Auto);
     content_couches->addStyleClass("content_couches");
-    //load_content_couches(content_couches); // moved after mGroupL initialization !!
+    //load_content_couches(content_couches); // moved after mGroupL initialization !! non c'est juste la création du panier qu'il faut mettre après, le reste (création conteneur et layout) je dois le faire ici pour avoir mes Menuitem avant de créer class dialogu
+    auto layout = content_couches->setLayout(cpp14::make_unique<WHBoxLayout>());
+    content_couches->setPadding(0);
+    layout->setContentsMargins(0,0,0,0);
+
+    auto menu_gauche = layout->addWidget(cpp14::make_unique<WContainerWidget>());
+    auto content_panier = layout->addWidget(cpp14::make_unique<WContainerWidget>());
+
+    menu_gauche->setWidth(60);
+    menu_gauche->addStyleClass("menu_gauche");
+
+    content_panier->addWidget(Wt::cpp14::make_unique<Wt::WTemplate>(tr("panier.header")));
+    content_panier->setWidth("100%");
+
+    auto menu = menu_gauche->addWidget(Wt::cpp14::make_unique<WMenu>());
+    //menu->setStyleClass("nav nav-pills nav-stacked");
+    menu->setStyleClass("nav-stacked");
+    menu->addStyleClass("nav-apt");
+
+    menuitem_panier = menu->addItem("resources/right_angle_circle_icon_149877.png","");
+    menuitem_panier->clicked().connect([=] {
+        std::cout << content_couches->width().value() << std::endl;
+        if(content_couches->width().value()>60 || content_couches->width().value()==-1){
+            content_couches->setWidth(60);
+            menuitem_panier->setIcon("resources/right_angle_circle_icon_149877d.png");
+            content_panier->hide();
+        }else{
+            content_couches->setWidth(400);
+            menuitem_panier->setIcon("resources/right_angle_circle_icon_149877.png");
+            content_panier->show();
+        }
+        //menuitem_panier->renderSelected(false);
+
+    });
+    menuitem_panier->setToolTip(tr("menu.button.tooltip.panier_collapse"));
+    // bouton catalogue
+    menuitem_catalog = menu->addItem("resources/warehouse_check_icon_149849.png","");
+    menuitem_catalog->setToolTip(tr("menu.button.tooltip.catalog"));
+    // bouton cadastre
+    menuitem_cadastre = menu->addItem("resources/incoming_inspection_icon_149926.png","");
+    menuitem_cadastre->setToolTip(tr("menu.button.tooltip.cadastre"));
+    // bouton legende
+    menuitem_legend = menu->addItem("resources/product_bom_icon_149894.png","");
+    menuitem_legend->setToolTip(tr("menu.button.tooltip.legend"));
+    // bouton info point
+    menuitem_simplepoint = menu->addItem("resources/position-logo.png","");
+    menuitem_simplepoint->setToolTip(tr("menu.button.tooltip.point"));
+    // bouton analyse
+    menuitem_analyse = menu->addItem("resources/stat-logo.png","");
+    menuitem_analyse->setToolTip(tr("menu.button.tooltip.surf"));
 
     /*  DIALOGS info_point-légende-analyse-catalogue-cadastre */
 
     // info point
-    dialog_info = layout_app->addChild(Wt::cpp14::make_unique<Wt::WDialog>("Info ponctuelle"));
-    dialog_info->setResizable(true);
-    dialog_info->setModal(false);
-    dialog_info->setMaximumSize(700,800);
-    dialog_info->contents()->setOverflow(Overflow::Scroll);
-    dialog_info->setClosable(true);
-    dialog_info->finished().connect([=] { menuitem_simplepoint->decorationStyle().setBackgroundColor(col_not_sel); });
+    dialog_info = layout_app->addChild(Wt::cpp14::make_unique<dialog>("Info ponctuelle",menuitem_simplepoint));
 
     auto content_info = dialog_info->contents()->addWidget(cpp14::make_unique<WContainerWidget>());
     //content_info->setOverflow(Overflow::Auto);
     content_info->addStyleClass("content_info");
 
     // analyse
-    dialog_anal = layout_app->addChild(Wt::cpp14::make_unique<Wt::WDialog>("Analyse surfacique"));
-    dialog_anal->setResizable(true);
-    dialog_anal->setModal(false);
-    dialog_anal->setMaximumSize(700,800);
-    dialog_anal->contents()->setOverflow(Overflow::Scroll);
-    dialog_anal->setClosable(true);
-    dialog_anal->finished().connect([=] { menuitem_analyse->decorationStyle().setBackgroundColor(col_not_sel); });
+    dialog_anal = layout_app->addChild(Wt::cpp14::make_unique<dialog>("Analyse surfacique",menuitem_analyse));
+
 
     //auto content_anal = dialog_anal->contents()->addWidget(cpp14::make_unique<WContainerWidget>());
     //content_anal->setOverflow(Overflow::Auto);
     //content_anal->addStyleClass("content_anal");
 
     // catalogue
-    dialog_catalog = layout_app->addChild(Wt::cpp14::make_unique<Wt::WDialog>("Catalogue des couches"));
-    dialog_catalog->setResizable(true);
-    dialog_catalog->setModal(false);
-    dialog_catalog->setMaximumSize(700,800);
-    dialog_catalog->contents()->setOverflow(Overflow::Scroll);
-    dialog_catalog->setClosable(true);
-    dialog_catalog->finished().connect([=] { menuitem_catalog->decorationStyle().setBackgroundColor(col_not_sel); });
+    dialog_catalog = layout_app->addChild(Wt::cpp14::make_unique<dialog>("Catalogue des couches",menuitem_catalog));
+
     auto content_catalog = dialog_catalog->contents()->addWidget(cpp14::make_unique<WContainerWidget>());
     content_catalog->addStyleClass("content_catalog");
 
     // cadastre
-    dialog_cadastre = layout_app->addChild(Wt::cpp14::make_unique<Wt::WDialog>("Recherche cadastrale"));
-    dialog_cadastre->setResizable(true);
-    dialog_cadastre->setModal(false);
-    dialog_cadastre->setMaximumSize(700,800);
-    dialog_cadastre->contents()->setOverflow(Overflow::Scroll);
-    dialog_cadastre->setClosable(true);
-    dialog_cadastre->finished().connect([=] { menuitem_cadastre->decorationStyle().setBackgroundColor(col_not_sel); });
-
+    dialog_cadastre = layout_app->addChild(Wt::cpp14::make_unique<dialog>("Recherche cadastrale",menuitem_cadastre));
     // legende
-    dialog_legend = layout_app->addChild(Wt::cpp14::make_unique<Wt::WDialog>("Légende"));
-    dialog_legend->setResizable(true);
-    dialog_legend->setModal(false);
-    dialog_legend->setMaximumSize(700,800);
-    dialog_legend->contents()->setOverflow(Overflow::Scroll);
-    dialog_legend->setClosable(true);
-    dialog_legend->finished().connect([=] { menuitem_legend->decorationStyle().setBackgroundColor(col_not_sel); });
-
+    dialog_legend = layout_app->addChild(Wt::cpp14::make_unique<dialog>("Légende",menuitem_legend));
     mLegendW = dialog_legend->contents()->addWidget(cpp14::make_unique<WContainerWidget>());
     //mLegendW->setOverflow(Overflow::Auto);
     mLegendW->addStyleClass("content_legend");
 
 
     widgetCadastre * content_cadastre;
-    if(globTest){
-        content_cadastre = dialog_cadastre->contents()->addWidget(cpp14::make_unique<widgetCadastre>(mDico->mCadastre.get()));
-        content_cadastre->addStyleClass("content_cadastre");
-    }
-
+    content_cadastre = dialog_cadastre->contents()->addWidget(cpp14::make_unique<widgetCadastre>(mDico->mCadastre.get()));
+    content_cadastre->addStyleClass("content_cadastre");
 
 
     //stack_info = content_info_->addWidget(cpp14::make_unique<WStackedWidget>());
@@ -186,7 +202,9 @@ cWebAptitude::cWebAptitude(AuthApplication *app, Auth::AuthWidget* authWidget_)
     /* CHARGE ONGLET COUCHES & SIMPLEPOINT */
     printf("create GL\n");
     mGroupL = new groupLayers(mApp,this);
-    load_content_couches(content_couches);
+    //load_content_couches(content_couches);
+
+    mPanier = content_panier->addWidget(Wt::cpp14::make_unique<panier>(mApp, this));
     mGroupL->updateGL();
 
     statWindow * page_camembert = top_stack->addNew<statWindow>(mGroupL);
@@ -210,9 +228,9 @@ cWebAptitude::cWebAptitude(AuthApplication *app, Auth::AuthWidget* authWidget_)
     //top_stack->addWidget(std::move(container_home));
 
     //cadastre
-    if(globTest){
-        content_cadastre->sendPolygone().connect(std::bind(&parcellaire::polygoneCadastre,mPA,std::placeholders::_1));
-    }
+
+    content_cadastre->sendPolygone().connect(std::bind(&parcellaire::polygoneCadastre,mPA,std::placeholders::_1));
+
 
 
     mApp->internalPathChanged().connect(this, &cWebAptitude::handlePathChange);
@@ -222,118 +240,12 @@ cWebAptitude::cWebAptitude(AuthApplication *app, Auth::AuthWidget* authWidget_)
 
 }
 
-
+/*
 void cWebAptitude::load_content_couches(WContainerWidget * content){
-    auto layout = content->setLayout(cpp14::make_unique<WHBoxLayout>());
-    content->setPadding(0);
-    layout->setContentsMargins(0,0,0,0);
-
-    auto menu_gauche = layout->addWidget(cpp14::make_unique<WContainerWidget>());
-    auto content_panier = layout->addWidget(cpp14::make_unique<WContainerWidget>());
-
-    menu_gauche->setWidth(60);
-    menu_gauche->addStyleClass("menu_gauche");
-
-    content_panier->addWidget(Wt::cpp14::make_unique<Wt::WTemplate>(tr("panier.header")));
-    content_panier->setWidth("100%");
-
-    auto menu = menu_gauche->addWidget(Wt::cpp14::make_unique<WMenu>());
-    //menu->setStyleClass("nav nav-pills nav-stacked");
-    menu->setStyleClass("nav-stacked");
-    menu->addStyleClass("nav-apt");
-
-    menuitem_panier = menu->addItem("resources/right_angle_circle_icon_149877.png","");
-    menuitem_panier->clicked().connect([=] {
-        std::cout << content->width().value() << std::endl;
-        if(content->width().value()>60 || content->width().value()==-1){
-            content->setWidth(60);
-            menuitem_panier->setIcon("resources/right_angle_circle_icon_149877d.png");
-            content_panier->hide();
-        }else{
-            content->setWidth(400);
-            menuitem_panier->setIcon("resources/right_angle_circle_icon_149877.png");
-            content_panier->show();
-        }
-        //menuitem_panier->renderSelected(false);
-
-    });
-    menuitem_panier->setToolTip(tr("menu.button.tooltip.panier_collapse"));
-
-    // bouton catalogue
-    menuitem_catalog = menu->addItem("resources/warehouse_check_icon_149849.png","");
-    menuitem_catalog->clicked().connect([=] {
-        if(dialog_catalog->isVisible()){
-            dialog_catalog->hide();
-            menuitem_catalog->decorationStyle().setBackgroundColor(col_not_sel);
-        }else{
-            dialog_catalog->show();
-            menuitem_catalog->decorationStyle().setBackgroundColor(col_sel);
-        }
-        menuitem_catalog->setSelectable(false);
-    });
-    menuitem_catalog->setToolTip(tr("menu.button.tooltip.catalog"));
-
-    // bouton cadastre
-    menuitem_cadastre = menu->addItem("resources/incoming_inspection_icon_149926.png","");
-    menuitem_cadastre->clicked().connect([=] {
-        if(dialog_cadastre->isVisible()){
-            dialog_cadastre->hide();
-            menuitem_cadastre->decorationStyle().setBackgroundColor(col_not_sel);
-        }else{
-            dialog_cadastre->show();
-            menuitem_cadastre->decorationStyle().setBackgroundColor(col_sel);
-        }
-        //menuitem_simplepoint->renderSelected(dialog_info->isVisible());
-    });
-    menuitem_cadastre->setToolTip(tr("menu.button.tooltip.cadastre"));
-
-    // bouton legende
-    menuitem_legend = menu->addItem("resources/product_bom_icon_149894.png","");
-    menuitem_legend->clicked().connect([=] {
-        if(dialog_legend->isVisible()){
-            dialog_legend->hide();
-            menuitem_legend->decorationStyle().setBackgroundColor(col_not_sel);
-        }else{
-            dialog_legend->show();
-            menuitem_legend->decorationStyle().setBackgroundColor(col_sel);
-        }
-        //menuitem_simplepoint->renderSelected(dialog_info->isVisible());
-    });
-    menuitem_legend->setToolTip(tr("menu.button.tooltip.legend"));
-
-    // bouton info point
-    menuitem_simplepoint = menu->addItem("resources/position-logo.png","");
-    menuitem_simplepoint->clicked().connect([=] {
-        if(dialog_info->isVisible()){
-            dialog_info->hide();
-            menuitem_simplepoint->decorationStyle().setBackgroundColor(col_not_sel);
-        }else{
-            dialog_info->show();
-            menuitem_simplepoint->decorationStyle().setBackgroundColor(col_sel);
-        }
-        //menuitem_simplepoint->renderSelected(dialog_info->isVisible());
-    });
-    menuitem_simplepoint->setToolTip(tr("menu.button.tooltip.point"));
-
-    // bouton analyse
-    menuitem_analyse = menu->addItem("resources/stat-logo.png","");
-    menuitem_analyse->clicked().connect([=] {
-        if(dialog_anal->isVisible()){
-            dialog_anal->hide();
-            menuitem_analyse->decorationStyle().setBackgroundColor(col_not_sel);
-        }else{
-            dialog_anal->show();
-            menuitem_analyse->decorationStyle().setBackgroundColor(col_sel);
-        }
-        //menuitem_analyse->renderSelected(dialog_info->isVisible());
-    });
-    menuitem_analyse->setToolTip(tr("menu.button.tooltip.surf"));
 
     // TODO charger le panier
-    mPanier = content_panier->addWidget(Wt::cpp14::make_unique<panier>(mApp, this));
-
-
 }
+*/
 
 
 /*
@@ -351,9 +263,11 @@ void cWebAptitude::handlePathChange()
         //sub_stack->setCurrentIndex(1);
         navigation->setTitle(tr("titre.presentation"));
         mApp->addMetaHeader("description", tr("desc.pres"), "fr");
-    /*}else if (m_app->internalPath() == "/home"){
+        /*}else if (m_app->internalPath() == "/home"){
         top_stack->setCurrentIndex(0);*/
         mApp->addMetaHeader("description", tr("desc.home"), "fr");
+
+        showDialogues(0);
     }else if (mApp->internalPath() == "/cartographie" || mApp->internalPath() == "/"){
         top_stack->setCurrentIndex(1);
         //stack_info->setCurrentIndex(1);
@@ -361,7 +275,7 @@ void cWebAptitude::handlePathChange()
         //sub_stack->setCurrentIndex(0);
         navigation->setTitle(tr("titre.carto"));
         mApp->addMetaHeader("description", tr("desc.carto"), "fr");
-    /*}else if (m_app->internalPath() == "/analyse"){
+        /*}else if (m_app->internalPath() == "/analyse"){
         top_stack->setCurrentIndex(1);
         //stack_info->setCurrentIndex(2);
         menuitem_analyse->select();
@@ -375,11 +289,15 @@ void cWebAptitude::handlePathChange()
         //sub_stack->setCurrentIndex(0);
         navigation->setTitle(tr("titre.ana.point"));
         m_app->addMetaHeader("description", tr("desc.point"), "fr");*/
+
+         showDialogues(1);
     }else if (mApp->internalPath() == "/resultat"){
         top_stack->setCurrentIndex(2);
         //sub_stack->setCurrentIndex(2);
+         showDialogues(0);
     }else if (mApp->internalPath() == "/parametres"){
         mApp->doJavaScript("alert('Pas encore implémenté...')");
+         showDialogues(0);
     }else{
         std::cout << "m_app->internalPath() " << mApp->internalPath() << std::endl;
         std::cout << "internal path pas geré dans le handler " << mApp->internalPath() << std::endl;
@@ -390,4 +308,29 @@ void cWebAptitude::handlePathChange()
     // TODO css min-size [menu_analyse] display:none if width<900
     // TODO css @media-width<1200 -> map 60%  @media-width<900 -> [div stack] display:blocks et overflow:auto [map] width:90%  [linfo] min-height: 600px;
 
+}
+
+
+dialog::dialog(const WString& windowTitle,Wt::WMenuItem * aMenu):WDialog(windowTitle),mMenu(aMenu),mShow(0){
+
+    setResizable(true);
+    setModal(false);
+    setMaximumSize(700,800);
+    contents()->setOverflow(Overflow::Scroll);
+    setClosable(true);
+
+   // faire les liens entre le boutton menu et l'affichage de la fenetre
+    finished().connect([=] {mMenu->decorationStyle().setBackgroundColor(col_not_sel); mShow=0;});
+
+    mMenu->clicked().connect([=] {
+        if(this->isVisible()){
+            this->hide();
+            mMenu->decorationStyle().setBackgroundColor(col_not_sel);
+            mShow=0;
+        }else{
+            this->show();
+            mMenu->decorationStyle().setBackgroundColor(col_sel);
+            mShow=1;
+        }
+    });
 }
