@@ -95,7 +95,7 @@ protected:
 class groupLayers: public WContainerWidget, public groupStat
 {
 public:
-    groupLayers(cDicoApt * aDico,WOpenLayers * aMap, AuthApplication* app,cWebAptitude * acWebAptitude);
+    groupLayers(AuthApplication* app, cWebAptitude * cWebApt);
     ~groupLayers();
     /*groupLayers(const groupLayers &gl){
         std::cout << "construct by copy group layer -- should never happend\n\n\n" << std::endl;
@@ -184,6 +184,7 @@ public:
 
     OGREnvelope * getMapExtent(){return & mMapExtent;}
 
+    JSlot slotMapExport;
 private:
 
     std::vector<std::shared_ptr<Layer>> mVLs;
@@ -195,9 +196,8 @@ private:
 
     // bof finalement c'est mieux le conteneur parent
     Wt::WContainerWidget     * mParent;
-    JSignal<double, double, double, double>& getMapExtendSignal(){return mapExtent_; }
-    JSlot slot;
-    JSignal<double, double, double, double>  mapExtent_;
+
+    JSignal<double, double, double, double>  sigMapExport;
     OGREnvelope mMapExtent;
     void updateMapExtentAndCropIm(double topX, double topY, double bottomX, double bottomY){
       updateMapExtent(topX, topY, bottomX, bottomY);

@@ -28,10 +28,12 @@
 #include <Wt/WLineEdit.h>
 
 #include "presentationpage.h"
+#include "panier.h"
 
 class AuthApplication;
 class parcellaire;
 class uploadCarte;
+class panier;
 
 class cWebAptitude : public Wt::WContainerWidget
 {
@@ -40,6 +42,8 @@ public:
     cWebAptitude(AuthApplication *app, Wt::Auth::AuthWidget* authWidget_);
 
     void handlePathChange();
+
+    /** VARS GLOBALES  **/
     WOpenLayers * mMap;
 
     Wt::WNavigationBar * navigation;
@@ -49,21 +53,23 @@ public:
     groupLayers * mGroupL;
 
     //WStackedWidget * stack_info; // cause que je dois changer de current index après avoir mis à jour la légende que je clique sur une station
-    WContainerWidget * mSimplepointW;
-    WContainerWidget * mGroupLayerW;
-    WMenuItem * menuitem_analyse,* menuitem_app,*menuitem_legend,*menuitem_documentation,*menuitem_simplepoint,*menuitem_login,*menuitem_panier;
-    WDialog *dialog_anal,*dialog_info,*dialog_catalog;
+    WContainerWidget *mSimplepointW, *mGroupLayerW, *mLegendW;
+    WMenuItem * menuitem_analyse,* menuitem_app,*menuitem_legend,*menuitem_documentation,*menuitem_simplepoint,*menuitem_login,*menuitem_panier,*menuitem_catalog,*menuitem_cadastre;
+    WDialog *dialog_anal,*dialog_info,*dialog_catalog,*dialog_cadastre,*dialog_legend;
+    panier * mPanier;
 private:
     void load_content_couches(WContainerWidget * content);
     //std::map<std::string,cEss>  mMEss;
     //Wt::WApplication* m_app;
-    AuthApplication * m_app;
+    AuthApplication * mApp;
     cDicoApt * mDico;
 
     parcellaire * mPA;
     //simplepoint * mSP;// c'est groupGL qui s'en charge
     uploadCarte * mUpload;
 
+    Wt::WColor col_sel = Wt::WColor(23,87,23);
+    Wt::WColor col_not_sel = Wt::WColor("transparent");
 };
 
 #endif // CWEBAPTITUDE_H

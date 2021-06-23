@@ -105,6 +105,7 @@ void Layer::displayLayer() const{
     boost::replace_all(JScommand,"MYLAYER",mWMSLayerName);
     boost::replace_all(JScommand,"MYURL",mUrl);
     boost::replace_all(JScommand,"MYATTRIBUTION",mWMSattribution);
+    boost::replace_all(JScommand,"MYCODE",mCode);
     mWtText->doJavaScript(JScommand);
     //std::cout << JScommand << std::endl;
 }

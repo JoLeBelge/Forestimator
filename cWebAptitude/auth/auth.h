@@ -58,9 +58,10 @@ public:
     cDicoApt * getDico(){return mDico;}
 
     Wt::Auth::AuthWidget* authWidget_;
-    cWebAptitude * cwebapt;
-private:
     cDicoApt * mDico;
+    cWebAptitude * cWebApt;
+
+private:
     Session session_;
     bool loaded_=false; // sert à éviter que void authEvent ne crash si refresh la page et que user connecté...
 };

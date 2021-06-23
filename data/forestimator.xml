@@ -50,11 +50,12 @@ Vous pouvez télécharger les cartes listées ci-dessous qui seront découpées 
 <message id="legendTitre"><h3>Légende de la carte :</h3> </message>
 <message id="legendCheckbox">Afficher la légende</message>
 
-<message id="coucheStep1"><h3>1 : Sélectionner une couche</h3> </message>
+<message id="coucheStep1"><h3>Double-cliquer sur une couche pour l'ajouter à votre sélection</h3> </message>
 <message id="coucheStep2"><h3>2 : Zoomer sur une zone d'intérêt</h3> </message>
 <message id="coucheStep2.infoBulle">La zone d'intérêt est celle affichée sur la carte à gauche</message>
-<message id="coucheStep3"><h3>3 : Exporter l'extrait de la couche thématique</h3></message>
+<message id="coucheStep3"><h3>Exporter l'extrait de la couche thématique</h3></message>
 <message id="afficher_extent">Emprises...</message>
+<message id="afficher_extent_tooltip">Permet d'enregistrer et de charger vos emprises de carte existantes. Déplacez-vous et zoomer à un endroit de votre choix pour sauvegarder cet emplacement afin d'y revenir plus tard.</message>
 <message id="sauver_extent">Enregistrer</message>
 <message id="extent_del_comfirm">Voulez-vous supprimer cette emprise ?</message>
 
@@ -594,7 +595,11 @@ detAptFEE
 <message id="menu.button.tooltip.carto">Cartographie</message>
 <message id="menu.button.tooltip.point">Info ponctuelle</message>
 <message id="menu.button.tooltip.surf">Analyse surfacique</message>
-<message id="menu.button.tooltip.panier_collapse">Réduire / Aggrandir</message>
+<message id="menu.button.tooltip.panier_collapse">Réduire / Agrandir</message>
+<message id="menu.button.tooltip.catalog">Catalogue de couches cartographiques</message>
+<message id="menu.button.tooltip.cadastre">Recherche cadastrale</message>
+<message id="menu.button.tooltip.legend">Légende</message>
+<message id="menu.button.tooltip.login">Se connecter / déconnecter</message>
 
 <message id="desc.home">Forestimator: outils cartographiques pour la gestion des forêts Wallonnes</message>
 <message id="desc.pres">Présentation et explication des fonctionnalités du site web</message>
@@ -608,5 +613,10 @@ detAptFEE
 <message id="cadastre.paca">Parcelle cadastrale</message>
 <message id="cadastre.submit">Rechercher</message>
 <message id="cadastre.choisir">Choisissez une option -----</message>
+
+<message id="panier.header"><h3>Ma sélection de cartes</h3></message>
+<message id="panier.transparent">Transparent / Opaque</message>
+<message id="panier.delete">Enlever cette couche de votre sélection</message>
+
 
 </messages>

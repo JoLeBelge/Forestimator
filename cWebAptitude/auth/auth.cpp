@@ -23,8 +23,9 @@ AuthApplication::AuthApplication(const Wt::WEnvironment& env, cDicoApt *dico)
     //layout->addWidget(std::move(authWidget));
     layout->addWidget(std::move(loadAuthWidget()));
 
-    std::unique_ptr<cWebAptitude> WebApt = Wt::cpp14::make_unique<cWebAptitude>(this, authWidget_);
-    cwebapt = layout->addWidget(std::move(WebApt), 0);
+    //std::unique_ptr<cWebAptitude> WebApt = Wt::cpp14::make_unique<cWebAptitude>(this, authWidget_);
+    //cWebApt = layout->addWidget(std::move(WebApt), 0);
+    cWebApt = layout->addWidget(Wt::cpp14::make_unique<cWebAptitude>(this, authWidget_));
 
     root()->addStyleClass("layout_main");
     loaded_=true;
@@ -110,16 +111,16 @@ void AuthApplication::authEvent() {
                 << " (" << u.identity(Wt::Auth::Identity::LoginName) << ")"
                 << " logged in. (2)";
         if(loaded_){
-            cwebapt->menuitem_login->setIcon("resources/user_icon_logout.png");
+            cWebApt->menuitem_login->setIcon("resources/user_icon_logout.png");
             std::string JScommand("$('.Wt-auth-login-container').removeClass('visible').addClass('nonvisible');");
             doJavaScript(JScommand);
-            cwebapt->mGroupL->updateGL();
+            cWebApt->mGroupL->updateGL();
         }
     } else{
         log("notice") << "User logged out.";
         if(loaded_){
-            cwebapt->menuitem_login->setIcon("resources/user_icon_149851.png");
-            cwebapt->mGroupL->updateGL();
+            cWebApt->menuitem_login->setIcon("resources/user_icon_149851.png");
+            cWebApt->mGroupL->updateGL();
         }
     }
 }

@@ -19,6 +19,9 @@
 .carto_menu span{
 	font-size: larger;
 }
+.navbar {
+	margin-bottom: 5px;
+}
 .navbar-default .navbar-brand a:hover{
     /*color: white;	*/
 }
@@ -33,7 +36,7 @@
 	margin: 0;
 }
 .navbar-right{
-	margin-bottom: -6px;
+	//margin-bottom: -6px;
 }
 
 .tree_left{
@@ -81,15 +84,35 @@
 }
 
 .content_couches{
-	width:300px;
+	width:400px;
+
 }
 
 .menu_gauche{
 	background-color:green;
+	
 }
-
+.menu_gauche a{
+	text-decoration: none;
+}
 .menu_gauche ul li a {
 	padding:0px;
+}
+.nav-apt a,
+.nav-apt a:hover,
+.nav-apt a:focus {
+  background-color: transparent;
+  border-color: #337ab7;
+}
+
+.nav-apt > li.active > a,
+.nav-apt > li.active > a:hover,
+.nav-apt > li.active > a:focus {
+  color: #555555;
+  background-color: transparent;
+  border: none;
+  border-bottom-color: transparent;
+  cursor: default;
 }
 
 .content_info{
@@ -275,5 +298,14 @@ display:block;
 
 .submenuPresentation{
 text-align: left;
+}
+
+.button_carto{
+	width: 20px;
+	padding:0px;
+	margin:0px;
+}
+.button_carto img{
+	width: 20px;
 }
 

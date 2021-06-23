@@ -47,7 +47,8 @@ public:
     }*/
 
     void updateView(){
-        doJavaScript("activeLayer.getSource().changed();");
+        //doJavaScript("activeLayer.getSource().changed();");
+        doJavaScript("refreshLayers();");
     }
 
     // pas simple d'impletemter ses signaux, voir https://redmine.webtoolkit.eu/boards/2/topics/12782?r=12807#message-12807

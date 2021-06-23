@@ -15,21 +15,32 @@ activeLayer  = new ol.layer.Tile({
 		//tileGrid: tileGrid,
 		projection: 'EPSG:31370',
 		//serverType: 'mapserver',
-	})
+	}),
+	opacity: 0.5
 });
-
+activeLayers["MYCODE"] = activeLayer;
 
 if (typeof parcellaire !== 'undefined') {
     // the variable is defined
     groupe = new ol.layer.Group({
 		'title': 'parcellaire',
 		//attributions: 'Gembloux Agro-Bio Tech',
-		 layers:[activeLayer, parcellaire, station]});
+		 layers:[activeLayer, parcellaire, station]
+	});
 } else {
-groupe = new ol.layer.Group({
+	let l = [];
+	l.push(orthoLayer);
+	l.push(IGNLayer);
+	for (const [key, value] of Object.entries(activeLayers)){
+		l.push(value);
+	};
+	l.push(communes);
+	l.push(station);
+	groupe = new ol.layer.Group({
 		'title': 'aptitude',
 		//attributions: 'Gembloux Agro-Bio Tech',
-		layers:[activeLayer, communes, station]});
+		layers:l
+	});
 
 }
 map.setLayerGroup(groupe);

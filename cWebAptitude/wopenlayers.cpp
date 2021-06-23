@@ -62,7 +62,7 @@ WOpenLayers::WOpenLayers(cDicoApt *aDico):xy_(this,"1.0"),mDico(aDico),slot(this
     slot3.setJavaScript
                ("function projection(x,y){"
                 "var f = map.getCoordinateFromPixel([x,y]);"
-                 "source.addFeature(new ol.Feature({geometry: new ol.geom.Point([f[0], f[1]])}));"
+                "source.addFeature(new ol.Feature({geometry: new ol.geom.Point([f[0], f[1]])}));"
                 // source ; c'est la source pour la couche de point "station", càd celle qui affiche là ou l'utilisateur à double-cliqué
                 "source.clear();"
                 "source.addFeature(new ol.Feature({geometry: new ol.geom.Point([f[0], f[1]])}));"

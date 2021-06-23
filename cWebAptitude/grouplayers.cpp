@@ -3,54 +3,50 @@
 int maxSizePix4Export(30000);
 extern bool globTest;
 
-groupLayers::groupLayers(cDicoApt * aDico, WOpenLayers *aMap, AuthApplication *app, cWebAptitude * acWebAptitude):
-    mDico(aDico)
-  ,mTypeClassifST(FEE)
-  ,mMap(aMap)
-  ,mParent(acWebAptitude->mGroupLayerW)
+groupLayers::groupLayers(AuthApplication *app, cWebAptitude * cWebApt):
+   mDico(app->mDico)
   ,m_app(app)
+  ,mcWebAptitude(cWebApt)
+  ,mMap(cWebApt->mMap)
+  ,mTypeClassifST(FEE)
+  ,mParent(cWebApt->mGroupLayerW)
+  ,mLegendDiv(cWebApt->mLegendW)
   ,mAnaPoint(NULL)
   ,mSelectLayers(NULL)
-  ,mcWebAptitude(acWebAptitude)
-  ,mapExtent_(this,"1.0")
+  ,sigMapExport(this,"1.0")
   ,sigMapCenter(this,"2.0")
-  ,slot(this)
   ,slotMapCenter(this)
 {
     mParent->setOverflow(Wt::Overflow::Visible);
     mParent->setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Middle);
 
-    slot.setJavaScript("function toto(e) {"
-                       "var extent = map.getView().calculateExtent(map.getSize());"
-                       "var bottomLeft = ol.extent.getBottomLeft(extent);"
-                       "var topRight =ol.extent.getTopRight(extent);"
-                       "if (bottomLeft != null) {"
-                       + mapExtent_.createCall({"topRight[0]","topRight[1]","bottomLeft[0]","bottomLeft[1]"})
-                       + "}}"
-                       );
+    slotMapExport.setJavaScript(
+       "function () {"
+           "var extent = map.getView().calculateExtent(map.getSize());"
+           "var bottomLeft = ol.extent.getBottomLeft(extent);"
+           "var topRight =ol.extent.getTopRight(extent);"
+           "if (bottomLeft != null) {"
+           + sigMapExport.createCall({"topRight[0]","topRight[1]","bottomLeft[0]","bottomLeft[1]"})
+       + "}}"
+    );
 
-    this->getMapExtendSignal().connect(std::bind(&groupLayers::updateMapExtentAndCropIm,this, std::placeholders::_1,std::placeholders::_2,std::placeholders::_3,std::placeholders::_4));
+    this->sigMapExport.connect(std::bind(&groupLayers::updateMapExtentAndCropIm,this, std::placeholders::_1,std::placeholders::_2,std::placeholders::_3,std::placeholders::_4));
 
-    slotMapCenter.setJavaScript("function () {"
-                                "var centre = map.getView().getCenter();"
-                                "var z = map.getView().getZoom();"
-                                + sigMapCenter.createCall({"centre[0]","centre[1]","z"}) + "}");
+    slotMapCenter.setJavaScript(
+        "function () {"
+            "var centre = map.getView().getCenter();"
+            "var z = map.getView().getZoom();"
+            + sigMapCenter.createCall({"centre[0]","centre[1]","z"})
+        + "}"
+    );
     this->sigMapCenter.connect(std::bind(&groupLayers::saveExtent,this, std::placeholders::_1,std::placeholders::_2,std::placeholders::_3));
 
-    auto legendCombo = mParent->addWidget(cpp14::make_unique<WCheckBox>(tr("legendCheckbox")));
-    legendCombo->changed().connect([this]{
-        if(mLegendDiv->isVisible())
-            mLegendDiv->hide();
-        else
-            mLegendDiv->show();
-    });
-    mLegendDiv = mParent->addWidget(cpp14::make_unique<WContainerWidget>());
-    mLegendDiv->hide();
     mTitle = mLegendDiv->addWidget(cpp14::make_unique<WText>(WString::tr("legendMsg")));
     mLegendIndiv = mLegendDiv->addWidget(cpp14::make_unique<WTable>());
     mLegendIndiv->setHeaderCount(1);
     mLegendIndiv->setWidth(Wt::WLength("90%"));
     mLegendIndiv->toggleStyleClass("table-striped",true);
+    mLegendIndiv->setMaximumSize(1000,1000);
 
     /* Liste cartes 1	*/
     std::unique_ptr<Wt::WTree> tree = Wt::cpp14::make_unique<Wt::WTree>();
@@ -87,11 +83,11 @@ groupLayers::groupLayers(cDicoApt * aDico, WOpenLayers *aMap, AuthApplication *a
     // ici je  vais devoir rendre ce noeuds invisible si mode normal
     this->changeExpertMode().connect(node3_,&Wt::WTreeNode::setNodeVisible);
 
-    node0_->expand();
+    /*node0_->expand();
     node1_->expand();
     node2_->expand();
     node3_->expand();
-    node4_->expand();
+    node4_->expand();*/
 
     // ajout des cartes
     for (auto & pair :mDico->VlayerBase()){
@@ -135,7 +131,8 @@ groupLayers::groupLayers(cDicoApt * aDico, WOpenLayers *aMap, AuthApplication *a
             // 3) ajout des interactions
             TypeLayer type= aL->getCatLayer();
             std::string aCode=aL->Code();
-            wtext->clicked().connect([this,aCode,type]{clickOnName(aCode,type);});
+            //wtext->clicked().connect([this,aCode,type]{clickOnName(aCode,type);});
+            wtext->doubleClicked().connect([this,aCode,type]{clickOnName(aCode,type);});
             aL->changeExpertMode().connect(n,&Wt::WTreeNode::setNodeVisible);
             mVLs.push_back(aL);
 
@@ -146,43 +143,22 @@ groupLayers::groupLayers(cDicoApt * aDico, WOpenLayers *aMap, AuthApplication *a
 
     mParent->addWidget(cpp14::make_unique<WText>(tr("coucheStep1")));
     mParent->addWidget(std::move(tree));
-    Wt::WText * t =mParent->addWidget(cpp14::make_unique<WText>(tr("coucheStep2")));
-    t->setToolTip(tr("coucheStep2.infoBulle"));
+    /*Wt::WText * t =mParent->addWidget(cpp14::make_unique<WText>(tr("coucheStep2")));
+    t->setToolTip(tr("coucheStep2.infoBulle"));*/
 
-    mExtentDivGlob = mParent->addWidget(cpp14::make_unique<WContainerWidget>());
-    WPushButton * button_e = mExtentDivGlob->addWidget(cpp14::make_unique<WPushButton>(tr("afficher_extent")));
-    button_e->clicked().connect([=] {
-        if(mExtentDiv->isVisible())
-            mExtentDiv->hide();
-        else
-            mExtentDiv->show();
-    });
-    button_e->addStyleClass("btn btn-info");
-    printf("mextentdiv\n");
-    mExtentDiv = mExtentDivGlob->addWidget(cpp14::make_unique<WContainerWidget>());
-    mExtentDiv->setMargin(15,Wt::Side::Left);
-    mExtentDiv->setMargin(15,Wt::Side::Right);
-    mExtentDiv->addStyleClass("div_extent");
-    mExtentDiv->hide();
 
-    mParent->addWidget(cpp14::make_unique<WText>(tr("coucheStep3")));
-    WPushButton * bExportTiff = mParent->addWidget(cpp14::make_unique<WPushButton>("Télécharger"));
 
-    // pour l'instant tout passe par le slot JS qui renvoi un extent valide avant d'effectuer le crop et l'envoi de la carte à l'utilisateur
-    // c'est pour éviter que l'extent ne soit pas "à jour" avant le crop
-    // le pbl c'est si je veux utiliser l'extend ailleurs, pas très modulable..
-    bExportTiff->clicked().connect(this->slot);
-    //bExportTiff->clicked().connect(this,&groupLayers::updateMapExtentAndCropIm);
+
 
     //mSelect4Stat= new selectLayers4Stat(this);
     mSelectLayers= new selectLayers(this);
     mStation = new ST(mDico);
 
-    /*   AUTRES ONLGETS de la stack   */
+    /*   AUTRES DIV   */
     mAnaPoint = new simplepoint(this, mcWebAptitude->mSimplepointW);
 
     // updateGL pour cacher les couches expert
-    updateGL();
+    //updateGL(); // -> bougé dans classe parent cwebapt car segfault not init refs !
     std::cout << "done " << std::endl;
 }
 
@@ -214,6 +190,16 @@ void groupLayers::clickOnName(std::string aCode, TypeLayer type){
     //std::cout << " j'ai cliqué sur un label " << aCode <<  "\n\n"<< std::endl;
     // udpate du rendu visuel de tout les labels de couches -- cela se situe au niveau du grouplayer
     update(aCode, type);
+
+    std::shared_ptr<Layer> layer;
+    for (std::shared_ptr<Layer> l : mVLs){
+        if(aCode==l->Code() && type==l->getCatLayer()){
+            layer=l;
+            break;
+        }
+    }
+
+    mcWebAptitude->mPanier->addMap(aCode, type, layer);
 
     // cacher la fenetre popup
     mParent->doJavaScript("overlay.setVisible(0);");

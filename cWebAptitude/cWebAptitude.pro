@@ -75,6 +75,7 @@ SOURCES += main.cpp \
     auth/User.cpp \
     auth/auth.cpp \
     cadastre.cpp \
+    panier.cpp \
     simplepoint.cpp \
     widgetcadastre.cpp \
     wopenlayers.cpp \
@@ -102,6 +103,7 @@ HEADERS += \
     auth/auth.h \
     cadastre.h \
     main.h \
+    panier.h \
     simplepoint.h \
     widgetcadastre.h \
     wopenlayers.h \
