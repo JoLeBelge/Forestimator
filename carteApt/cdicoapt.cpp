@@ -13,9 +13,12 @@ cDicoApt::cDicoApt(std::string aBDFile):mBDpath(aBDFile),ptDb_(NULL)
     db_=&ptDb_;
     //*db_=NULL;
     std::cout << "constructeur cDicoApt, chemin accès "<< mBDpath << std::endl;
-    if (openConnection()){} else {
-
+    if (openConnection()){
+    std::cout << " bd pas ouverte!!!\n"<< std::endl;
+    } else {
+        std::cout << "cnsw" << std::endl;
         mPedo= std::make_shared<cnsw>(*db_);
+        std::cout << "cadastre" << std::endl;
         mCadastre= std::make_shared<cadastre>(*db_);
         // dico Ess Nom -- code
         sqlite3_stmt * stmt;
@@ -722,7 +725,7 @@ int cDicoApt::openConnection(){
     //SQLITE_CANTOPEN (14)
     //SQLITE_OK (0)
 
-    std::cout << std::endl << " bd ouverte..., rc = " << rc << std::endl;;
+    //std::cout << std::endl << " bd ouverte..., rc = " << rc << std::endl;;
 
     return rc;
 }
