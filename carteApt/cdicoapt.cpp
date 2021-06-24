@@ -9,17 +9,17 @@ bool globTest(0);
 
 cDicoApt::cDicoApt(std::string aBDFile):mBDpath(aBDFile),ptDb_(NULL)
 {
-    std::cout << "toto" << std::endl;
     db_=&ptDb_;
     //*db_=NULL;
-    std::cout << "constructeur cDicoApt, chemin accès "<< mBDpath << std::endl;
+
     if (openConnection()){
     std::cout << " bd pas ouverte!!!\n"<< std::endl;
     } else {
-        std::cout << "cnsw" << std::endl;
+        if (globTest){std::cout << "cnsw" << std::endl;}
         mPedo= std::make_shared<cnsw>(*db_);
-        std::cout << "cadastre" << std::endl;
+        if (globTest){std::cout << "cadastre" << std::endl;}
         mCadastre= std::make_shared<cadastre>(*db_);
+        if (globTest){   std::cout << "cadastre done" << std::endl;}
         // dico Ess Nom -- code
         sqlite3_stmt * stmt;
         std::string SQLstring="SELECT Ess_FR,Code_FR,prefix FROM dico_essences ORDER BY Ess_FR DESC;";
@@ -34,6 +34,7 @@ cDicoApt::cDicoApt(std::string aBDFile):mBDpath(aBDFile),ptDb_(NULL)
                 Dico_code2prefix.emplace(std::make_pair(aCodeEs,aPrefix));
             }
         }
+
         sqlite3_finalize(stmt);
         SQLstring="SELECT Nom,Zbio FROM dico_zbio;";
 
@@ -141,6 +142,8 @@ cDicoApt::cDicoApt(std::string aBDFile):mBDpath(aBDFile),ptDb_(NULL)
                     }
                 }
             }
+             if (globTest){   std::cout << "Dico_GISfile a " << Dico_GISfile.size() << " elements " << std::endl;}
+
             sqlite3_finalize(stmt);
             SQLstring="SELECT Code,WMSurl,WMSlayer, WMSattribution, typeGeoservice FROM "+table+" WHERE WMSurl IS NOT NULL;";
 
@@ -385,7 +388,6 @@ cDicoApt::cDicoApt(std::string aBDFile):mBDpath(aBDFile),ptDb_(NULL)
             }
         }
         sqlite3_finalize(stmt);
-
 
         // toutes les essences de la classe essence
         for (auto & pair : *codeEs2Nom()){

@@ -70,7 +70,7 @@ void cadastre::loadInfo(){
     } else {
         std::cout << inputPath << " n'existe pas " ;
     }
-    std::cout << "lecture des communes" << std::endl;
+    std::cout << "lecture des division" << std::endl;
 
     // lecture des divisions
     inputPath= mShpDivisionPath.c_str();

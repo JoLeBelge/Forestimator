@@ -25,6 +25,8 @@ namespace dbo = Wt::Dbo;
 
 // tentative de serialize ; J'ai des tuple, ma classe capa, et des pointeurs uniques à sérialize. Ca ne compile pas, c'est peut-être un peu difficile pour moi. Par ailleur, pas besoin de sérialisé en xml, binaire c'est bon aussi et c'est plus simple
 
+extern bool globTest;
+
 std::string featureToGeoJSON(OGRFeature *f);
 
 class capa;
