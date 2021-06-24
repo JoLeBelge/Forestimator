@@ -2,7 +2,7 @@
 
 cadastre::cadastre(sqlite3 *db)
 {
-    std::cout << " création classe cadastre.." << std::endl;
+    //std::cout << " création classe cadastre.." << std::endl;
     db_=db;
     // les chemins d'accès vers les shp
     GDALAllRegister();

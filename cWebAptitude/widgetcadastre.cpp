@@ -37,11 +37,11 @@ widgetCadastre::widgetCadastre(cadastre * aCad):mCad(aCad),WTable()
     division_->disable();
 
     // session pour se connecter à la db cadastre
-    std::cout << " bd cadastre " << mCad->mDirBDCadastre << std::endl;
+    //std::cout << " bd cadastre " << mCad->mDirBDCadastre << std::endl;
+    if (!boost::filesystem::exists(mCad->mDirBDCadastre)){std::cout << " bd cadastre " << mCad->mDirBDCadastre << " n'existe pas!! ça va planter ... \n\n\n\n" <<std::endl;}
     std::unique_ptr<dbo::backend::Sqlite3> sqlite3{new dbo::backend::Sqlite3(mCad->mDirBDCadastre)};
     session.setConnection(std::move(sqlite3));
     session.mapClass<capa>("capa");
-
 }
 
 void widgetCadastre::refreshDivision(){

@@ -161,7 +161,5 @@ void panier::addMap(std::string aCode, TypeLayer type, std::shared_ptr<Layer> l)
         }
     });
 
-
-
 }
 

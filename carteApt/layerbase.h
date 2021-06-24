@@ -97,9 +97,12 @@ class WMSinfo
     public:
     std::string WMSLayerName()const{return mWMSLayerName;}
     std::string WMSURL()const{return mUrl;}
+    TypeWMS getTypeWMS(){return mTypeWMS;}
 
     WMSinfo():mUrl(""),mWMSLayerName("toto"){}
-    WMSinfo(std::string url,std::string layer, std::string attribution=""):mUrl(url),mWMSLayerName(layer),mWMSattribution(attribution){}
+    WMSinfo(std::string url,std::string layer, std::string aTypeGeoservice,std::string attribution):mUrl(url),mWMSLayerName(layer),mWMSattribution(attribution){
+        mTypeWMS=str2TypeWMS(aTypeGeoservice);
+    }
     std::string mUrl, mWMSLayerName, mWMSattribution;
 
     TypeWMS mTypeWMS;

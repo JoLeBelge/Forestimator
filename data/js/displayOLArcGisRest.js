@@ -5,7 +5,7 @@
 activeLayer  = new ol.layer.Tile({
 	extent: extent,
 	title: 'MYTITLE',
-      source: new ol.source.TileArcGISRest({
+      	source: new ol.source.TileArcGISRest({
           attributions: 'MYATTRIBUTION',
         url:
           //'https://geoservices.wallonie.be/arcgis/rest/services/PLAN_REGLEMENT/CADMAP_2020_PARCELLES/MapServer/'

@@ -139,7 +139,7 @@ cDicoApt::cDicoApt(std::string aBDFile):mBDpath(aBDFile),ptDb_(NULL)
                 }
             }
             sqlite3_finalize(stmt);
-            SQLstring="SELECT Code,WMSurl,WMSlayer, WMSattribution FROM "+table+" WHERE WMSurl IS NOT NULL;";
+            SQLstring="SELECT Code,WMSurl,WMSlayer, WMSattribution, typeGeoservice FROM "+table+" WHERE WMSurl IS NOT NULL;";
 
             sqlite3_prepare_v2( *db_, SQLstring.c_str(), -1, &stmt, NULL );
             while(sqlite3_step(stmt) == SQLITE_ROW)
@@ -150,7 +150,10 @@ cDicoApt::cDicoApt(std::string aBDFile):mBDpath(aBDFile),ptDb_(NULL)
                     std::string aC=std::string( (char *)sqlite3_column_text( stmt, 2 ) );
                     std::string attribution("Gembloux Agro-Bio Tech");
                     if (sqlite3_column_type(stmt, 3)!=SQLITE_NULL) {attribution=std::string( (char *)sqlite3_column_text(stmt, 3 ));}
-                    Dico_WMS.emplace(std::make_pair(aA,WMSinfo(aB,aC,attribution)));
+                    std::string geoservice("");
+                    if (sqlite3_column_type(stmt, 4)!=SQLITE_NULL){geoservice=std::string( (char *)sqlite3_column_text(stmt, 4 ));}
+
+                    Dico_WMS.emplace(std::make_pair(aA,WMSinfo(aB,aC,geoservice,attribution)));
                 }
             }
             sqlite3_finalize(stmt);
@@ -945,7 +948,7 @@ TypeLayer str2TypeLayer(const std::string& str)
 
 TypeWMS str2TypeWMS(const std::string& str){
     TypeWMS aRes=TypeWMS::WMS;
-    if(str == "ArcGisRest") aRes=TypeWMS::ArcGisRest;
+    if(str == "ArcGisRest") {aRes=TypeWMS::ArcGisRest;}
     return aRes;
 }
 
