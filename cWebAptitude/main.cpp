@@ -35,6 +35,7 @@ int main(int argc, char **argv)
      if (vm.count("test")) {globTest=vm["test"].as<bool>();}
 
     // ici, créé mon dictionnaire et le mettre sous forme de membre dans resource
+      std::cout << "loadBDpath et cree dico.." ;
     std::string aBD=loadBDpath();
     cDicoApt *Dico=new cDicoApt(aBD);
     stationDescResource resource(Dico);
