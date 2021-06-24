@@ -42,11 +42,6 @@ groupLayers::groupLayers(AuthApplication *app, cWebAptitude * cWebApt):
     this->sigMapCenter.connect(std::bind(&groupLayers::saveExtent,this, std::placeholders::_1,std::placeholders::_2,std::placeholders::_3));
 
     mTitle = mLegendDiv->addWidget(cpp14::make_unique<WText>(WString::tr("legendMsg")));
-    mLegendIndiv = mLegendDiv->addWidget(cpp14::make_unique<WTable>());
-    mLegendIndiv->setHeaderCount(1);
-    mLegendIndiv->setWidth(Wt::WLength("90%"));
-    mLegendIndiv->toggleStyleClass("table-striped",true);
-    mLegendIndiv->setMaximumSize(1000,1000);
 
     /* Liste cartes 1	*/
     std::unique_ptr<Wt::WTree> tree = Wt::cpp14::make_unique<Wt::WTree>();
@@ -213,7 +208,7 @@ void groupLayers::clickOnName(std::string aCode, TypeLayer type){
     for (std::shared_ptr<Layer> l : mVLs){
         if (l->IsActive()){ //&& type==l->Type()){
             l->displayLayer();
-            updateLegende(l);
+            updateLegendeDiv(mcWebAptitude->mPanier->mVLs);
             break;
         }
     }
@@ -374,29 +369,51 @@ void groupLayers::updateGL(){
 
 }
 
-void groupLayers::updateLegende(const std::shared_ptr<Layer> l){
-    // vider la légende et afficher la légende personnelle de la couche active
-    mLegendIndiv->clear();
-    if (l->getCatLayer()!=TypeLayer::Externe){
+void groupLayers::updateLegendeDiv(std::vector<std::shared_ptr<Layer>> layers){
+    mLegendDiv->clear();
 
-        mTitle->setText(WString::tr("legendTitre"));
+    if(layers.size()==0)
+        mTitle = mLegendDiv->addWidget(cpp14::make_unique<WText>(WString::tr("legendMsg")));
+    else{
+        mTitle = mLegendDiv->addWidget(cpp14::make_unique<WText>(WString::tr("legendTitre")));
+
+        for (auto layer : layers){
+            this->updateLegende(layer);
+        }
+    }
+
+}
+
+void groupLayers::updateLegende(const std::shared_ptr<Layer> l){
+    if (l->getCatLayer()!=TypeLayer::Externe){
+        Wt::WAnimation animation(Wt::AnimationEffect::SlideInFromTop, Wt::TimingFunction::EaseOut, 100);
+
+        auto panel = Wt::cpp14::make_unique<Wt::WPanel>();
+        panel->setTitle("<h3>"+l->getLegendLabel()+"</h3>");
+        panel->addStyleClass("centered-example");
+        panel->setCollapsible(true);
+        panel->setAnimation(animation);
+        //panel->setCollapsed(false);
+
+        auto tab = Wt::cpp14::make_unique<WTable>();
+        tab->setHeaderCount(1);
+        tab->setWidth(Wt::WLength("90%"));
+        tab->toggleStyleClass("table-striped",true);
+        tab->setMaximumSize(1000,1000);
+
+        //mTitle->setText(WString::tr("legendTitre"));
         int row(0);
-        mLegendIndiv->elementAt(row, 0)->setColumnSpan(2);
-        mLegendIndiv->elementAt(row, 0)->setContentAlignment(AlignmentFlag::Top | AlignmentFlag::Center);
-        mLegendIndiv->elementAt(row, 0)->setPadding(10);
-        mLegendIndiv->elementAt(row,0)->addWidget(cpp14::make_unique<WText>("<h4>"+l->getLegendLabel()+"</h4>"));
-        row++;
         for (auto kv : l->getDicoVal()){
             if (l->hasColor(kv.first)){
                 color col = l->getColor(kv.first);
-                mLegendIndiv->elementAt(row, 0)->addWidget(cpp14::make_unique<WText>(kv.second));
-                mLegendIndiv->elementAt(row, 1)->setWidth("40%");
-                mLegendIndiv->elementAt(row, 1)->decorationStyle().setBackgroundColor(WColor(col.mR,col.mG,col.mB));
+                tab->elementAt(row, 0)->addWidget(cpp14::make_unique<WText>(kv.second));
+                tab->elementAt(row, 1)->setWidth("40%");
+                tab->elementAt(row, 1)->decorationStyle().setBackgroundColor(WColor(col.mR,col.mG,col.mB));
                 row++;
             }
         }
-    }else {
-        mTitle->setText(WString::tr("legendMsg"));
+        panel->setCentralWidget(std::move(tab));
+        mLegendDiv->addWidget(std::move(panel));
     }
 }
 
@@ -569,10 +586,7 @@ double getArea(OGREnvelope * env){
     return (double) (env->MaxX-env->MinX)*(env->MaxY-env->MinY);
 }
 
-/*
- * Fonctions pour gérer les extents sauvés dans DB
- *
- */
+/** Fonctions pour gérer les extents sauvés dans DB * */
 int groupLayers::openConnection(){
     int rc;
     std::string db_path = m_app->docRoot() + "/extents.db";
@@ -586,13 +600,11 @@ int groupLayers::openConnection(){
 }
 
 void groupLayers::closeConnection(){
-
     int rc = sqlite3_close_v2(db_);
     if( rc ) {
         fprintf(stderr, "Can't close database: %s\n\n\n", sqlite3_errmsg(db_));
     }
 }
-
 
 bool groupLayers::getExpertModeForUser(std::string id){
 
@@ -701,6 +713,8 @@ void groupLayers::deleteExtent(std::string id){
     closeConnection();
     loadExtents(id);
 }
+/** FIN extents **/
+
 
 std::vector<rasterFiles> groupLayers::getSelect4Download(){return mSelectLayers->getSelectedRaster();}
 //std::vector<rasterFiles> groupLayers::getSelect4Stat(){return mSelect4Stat->getSelectedRaster();}

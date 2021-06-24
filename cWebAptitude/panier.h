@@ -11,17 +11,20 @@ class panier: public WContainerWidget
 public:
     panier(AuthApplication* app, cWebAptitude * cWebApt);
 
+    // var globales
     cDicoApt * mDico;
     AuthApplication * m_app;
     cWebAptitude * mcWebAptitude;
     WOpenLayers * mMap;
     groupLayers * mGroupL;
 
+    // var de classe
+    std::vector<std::shared_ptr<Layer>> mVLs;
+
     // functions
     void addMap(std::string aCode, TypeLayer type, std::shared_ptr<Layer> l);
-
 private:
-    std::vector<std::shared_ptr<Layer>> mVLs;
+
     Wt::WTable * mTable;
 
     WPushButton *bOrtho,*bIGN;

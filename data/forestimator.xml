@@ -46,7 +46,7 @@ Vous pouvez télécharger les cartes listées ci-dessous qui seront découpées 
 
 <message id="toolTipActiveLayer">Cliquez sur la case à cocher "Afficher la légende" ci-dessus pour visualiser la signification des couleurs de cette carte. </message>
 
-<message id="legendMsg"><i>Aucune légende à afficher pour cette carte.</i> </message>
+<message id="legendMsg"><i>Veuillez d'abord ajouter une carte dans votre sélection de cartes pour afficher une légende.</i> </message>
 <message id="legendTitre"><h3>Légende de la carte :</h3> </message>
 <message id="legendCheckbox">Afficher la légende</message>
 

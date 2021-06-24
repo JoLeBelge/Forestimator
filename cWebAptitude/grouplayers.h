@@ -13,6 +13,7 @@
 #include <Wt/WCheckBox.h>
 #include <Wt/WMessageBox.h>
 #include <Wt/WLoadingIndicator.h>
+#include <Wt/WPanel.h>
 #include "cwebaptitude.h"
 #include "layer.h"
 #include "simplepoint.h"
@@ -164,13 +165,13 @@ public:
     WOpenLayers * mMap;
 
     // gestion de la légende de la carte
+    void updateLegendeDiv(std::vector<std::shared_ptr<Layer>> layers);
     void updateLegende(const std::shared_ptr<Layer> l);
     Wt::WContainerWidget * mLegendDiv;
     Wt::WContainerWidget * mExtentDivGlob; // le glob contient le boutton et le extentDiv
     Wt::WContainerWidget * mExtentDiv;
     Wt::WLineEdit * tb_extent_name;
     Wt::WText * mTitle;
-    Wt::WTable * mLegendIndiv;
     cWebAptitude * mcWebAptitude;
 
     void saveExtent(double c_x, double c_y, double zoom);
