@@ -1,6 +1,6 @@
 #include "cadastre.h"
 
-cadastre::cadastre(sqlite3 *db)
+cadastre::cadastre(sqlite3 *db):mShpCommunePath(""),mShpDivisionPath(""),mShpParcellePath(""),mTmpDir(""),mDirBDCadastre("")
 {
     //std::cout << " création classe cadastre.." << std::endl;
     db_=db;
@@ -15,7 +15,7 @@ void cadastre::loadInfo(){
     char userName[20];
     getlogin_r(userName,sizeof(userName));
     std::string s(userName),SQLstring;
-
+    std::cout << "load info cadastre" << std::endl;
     if (s=="lisein"){
         SQLstring="SELECT Dir2,Nom,Code FROM fichiersGIS WHERE Categorie='Cadastre' OR Code='TMPDIR';";
     } else {
@@ -42,6 +42,8 @@ void cadastre::loadInfo(){
     }
     sqlite3_finalize(stmt);
 
+    std::cout << "lecture des communes" << std::endl;
+
     // lecture des communes
     const char *inputPath= mShpCommunePath.c_str();
     if (boost::filesystem::exists(inputPath)){
@@ -67,6 +69,7 @@ void cadastre::loadInfo(){
     } else {
         std::cout << inputPath << " n'existe pas " ;
     }
+    std::cout << "lecture des communes" << std::endl;
 
     // lecture des divisions
     inputPath= mShpDivisionPath.c_str();
