@@ -9,10 +9,10 @@ bool globTest(0);
 
 cDicoApt::cDicoApt(std::string aBDFile):mBDpath(aBDFile),ptDb_(NULL)
 {
-
+    std::cout << "toto" << std::endl;
     db_=&ptDb_;
     //*db_=NULL;
-    //std::cout << "constructeur cDicoApt" << std::endl;
+    std::cout << "constructeur cDicoApt, chemin accès "<< mBDpath << std::endl;
     if (openConnection()){} else {
 
         mPedo= std::make_shared<cnsw>(*db_);
