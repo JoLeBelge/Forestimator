@@ -22,7 +22,7 @@ extern bool globTest;
 
 int main(int argc, char **argv)
 {
-     std::cout << "création des options du programme." ;
+     std::cout << "création des options du programme." << std::endl;
     po::options_description desc("Allowed options");
     desc.add_options()
             ("help", "produce help message")
@@ -35,7 +35,7 @@ int main(int argc, char **argv)
      if (vm.count("test")) {globTest=vm["test"].as<bool>();}
 
     // ici, créé mon dictionnaire et le mettre sous forme de membre dans resource
-      std::cout << "loadBDpath et cree dico.." ;
+      std::cout << "loadBDpath et cree dico.." << std::endl;
     std::string aBD=loadBDpath();
     cDicoApt *Dico=new cDicoApt(aBD);
     stationDescResource resource(Dico);
