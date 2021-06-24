@@ -708,7 +708,7 @@ std::map<int,std::map<int,int>> cDicoApt::getRisqueTopo(std::string aCodeEs){
 int cDicoApt::openConnection(){
     int rc;
 
-    std::cout << "ouvre connexion avec BD dictionnaire ..." ;
+    std::cout << "ouvre connexion avec BD dictionnaire ..." << std::endl;
     //db_->Sqlite3(mBDpath);
     rc = sqlite3_open_v2(mBDpath.c_str(), db_,SQLITE_OPEN_READONLY,NULL);
     // The 31 result codes are defined in sqlite3.h
@@ -722,7 +722,7 @@ int cDicoApt::openConnection(){
     //SQLITE_CANTOPEN (14)
     //SQLITE_OK (0)
 
-    //std::cout << std::endl << " bd ouverte..." << std::endl;;
+    std::cout << std::endl << " bd ouverte..., rc = " << rc << std::endl;;
 
     return rc;
 }
