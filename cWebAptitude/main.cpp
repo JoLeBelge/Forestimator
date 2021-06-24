@@ -22,7 +22,7 @@ extern bool globTest;
 
 int main(int argc, char **argv)
 {
-
+     std::cout << "création des options du programme." ;
     po::options_description desc("Allowed options");
     desc.add_options()
             ("help", "produce help message")
