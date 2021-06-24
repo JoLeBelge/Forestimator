@@ -163,6 +163,7 @@ cDicoApt::cDicoApt(std::string aBDFile):mBDpath(aBDFile),ptDb_(NULL)
                 }
             }
             sqlite3_finalize(stmt);
+            if (globTest){   std::cout << "Dico_WMS a " << Dico_WMS.size() << " elements " << std::endl;}
         }
         SQLstring="SELECT Code, id_projet, description, version, id_reference, Nom, copyrigth,ordre, NomShort FROM carteMTD;";
 
@@ -389,11 +390,14 @@ cDicoApt::cDicoApt(std::string aBDFile):mBDpath(aBDFile),ptDb_(NULL)
         }
         sqlite3_finalize(stmt);
 
+
+        if (globTest){   std::cout << "crée toute les essences " << std::endl;}
         // toutes les essences de la classe essence
         for (auto & pair : *codeEs2Nom()){
             mVEss.emplace(std::make_pair(pair.first,std::make_shared<cEss>(pair.first,this)));
         }
         // toutes les layerbase
+        if (globTest){   std::cout << "crée toute les layerbase " << std::endl;}
         for (auto & pair : Dico_RasterType){
             std::shared_ptr<layerBase> l=std::make_shared<layerBase>(pair.first,this);
             if (l->getCatLayer()!=TypeLayer::Externe & !l->rasterExist()){

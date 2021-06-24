@@ -1,12 +1,12 @@
 #include "cadastre.h"
+extern bool globTest;
 
 cadastre::cadastre(sqlite3 *db):mShpCommunePath(""),mShpDivisionPath(""),mShpParcellePath(""),mTmpDir(""),mDirBDCadastre("")
 {
-    std::cout << " création classe cadastre.." << std::endl;
+    if (globTest){ std::cout << " création classe cadastre.." << std::endl;}
     db_=db;
     // les chemins d'accès vers les shp
     GDALAllRegister();
-    std::cout << " toto" << std::endl;
     loadInfo();
 }
 
@@ -43,8 +43,6 @@ void cadastre::loadInfo(){
     }
     sqlite3_finalize(stmt);
 
-    std::cout << "lecture des communes" << std::endl;
-
     // lecture des communes
     const char *inputPath= mShpCommunePath.c_str();
     if (boost::filesystem::exists(inputPath)){
@@ -70,7 +68,6 @@ void cadastre::loadInfo(){
     } else {
         std::cout << inputPath << " n'existe pas " ;
     }
-    std::cout << "lecture des division" << std::endl;
 
     // lecture des divisions
     inputPath= mShpDivisionPath.c_str();
