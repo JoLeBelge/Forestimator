@@ -2,10 +2,11 @@
 
 cadastre::cadastre(sqlite3 *db):mShpCommunePath(""),mShpDivisionPath(""),mShpParcellePath(""),mTmpDir(""),mDirBDCadastre("")
 {
-    //std::cout << " création classe cadastre.." << std::endl;
+    std::cout << " création classe cadastre.." << std::endl;
     db_=db;
     // les chemins d'accès vers les shp
     GDALAllRegister();
+    std::cout << " toto" << std::endl;
     loadInfo();
 }
 
