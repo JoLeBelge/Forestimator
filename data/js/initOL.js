@@ -129,26 +129,6 @@ var extend_previous=[110345.3375329999980750,-25250.0562959999988379, 301972.300
 var extend_ndvi=[39166.5026720000023488,19513.5278680000010354, 296527.3037289999774657,171984.5151900000055321];
 
 
-orthoLayer = new ol.layer.Tile({
-	extent: extent,
-	title: 'Fond orthophotos',
-	source: new ol.source.TileWMS({
-		title: 'Orthophotos',
-		url: 'https://gxgfservcarto.gxabt.ulg.ac.be/cgi-bin/map',
-		crossOrigin: 'null',
-		attributions: 'Â© CartoWeb.be & Geoportail.wallonie.be',
-		params: {
-		  'LAYERS': 'RGB_2020 0.25',
-		  'TILED': true,
-		  'FORMAT': 'image/jpeg'
-		},
-		//tileGrid: tileGrid,
-		projection: 'EPSG:31370',
-		serverType: 'mapserver',
-	})
-});
-
-
 IGNLayer = new ol.layer.Tile({
 	extent: extent,
 	title: 'Fond topographique IGN',
@@ -258,7 +238,7 @@ communes = new ol.layer.Vector({
 layers = [
 	new ol.layer.Group({
 		'title': 'Fonds de carte',
-		layers:[ orthoLayer , IGNLayer ]
+		layers:[IGNLayer ]
 	}),
 	new ol.layer.Group({
 		'title': 'Limites administratives',
@@ -307,8 +287,6 @@ map = new ol.Map({
 
 
 //activeLayer.setVisible(true);
-orthoLayer.setVisible(false);
-
 
 /**
  * Add a click handler to hide the popup.
@@ -329,7 +307,7 @@ closer.ontouch = function() {
 
 
 refreshLayers = function (){
-	orthoLayer.getSource().changed();
+
 	IGNLayer.getSource().changed();
 	
 	//activeLayer.getSource().changed();
@@ -341,7 +319,6 @@ refreshLayers = function (){
  **/
 updateGroupeLayers = function(){
 	let l = [];
-	l.push(orthoLayer);
 	l.push(IGNLayer);
 	for (const [key, value] of Object.entries(activeLayers)){
 		l.push(value);

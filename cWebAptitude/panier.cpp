@@ -13,34 +13,7 @@ panier::panier(AuthApplication *app, cWebAptitude * cWebApt): WContainerWidget()
     mTable->setWidth(Wt::WLength("90%"));
     mTable->toggleStyleClass("table-striped",true);
 
-    // couche de base Ortho
-    mTable->elementAt(0, 0)->setContentAlignment(AlignmentFlag::Top | AlignmentFlag::Left);
-    mTable->elementAt(0, 0)->setPadding(5);
-    mTable->elementAt(0, 0)->addWidget(cpp14::make_unique<WText>("Carte aérienne 2020"));
-    bOrtho = mTable->elementAt(0, 1)->addWidget(cpp14::make_unique<WPushButton>(""));
-    bOrtho->setIcon("resources/eye_notvisible.png");
-    bOrtho->addStyleClass("button_carto");
-    bOrtho->setCheckable(true);
-    bOrtho->clicked().connect([=] {
-        if(bOrtho->isChecked())
-            bOrtho->setIcon("resources/eye_visible.png");
-        else
-            bOrtho->setIcon("resources/eye_notvisible.png");
-        cWebApt->doJavaScript("orthoLayer.setVisible(!orthoLayer.values_.visible);");
-    });
-    mTable->elementAt(0, 2)->setColumnSpan(2);
-    WPushButton * bvis = mTable->elementAt(0, 2)->addWidget(cpp14::make_unique<WPushButton>("T"));
-    bvis->addStyleClass("button_carto");
-    bvis->setToolTip("panier.transparent");
-    bvis->setCheckable(true);
-    bvis->setChecked(false);
-    bvis->clicked().connect([=] {
-        if(bvis->isChecked())
-            bvis->setText("T");
-        else
-            bvis->setText("O");
-        mcWebAptitude->doJavaScript("orthoLayer.setOpacity(orthoLayer.getOpacity()==1?0.5:1);");
-    });
+    WPushButton * bvis;
 
     // couche de base IGN
     mTable->elementAt(1, 0)->setContentAlignment(AlignmentFlag::Top | AlignmentFlag::Left);
@@ -110,56 +83,73 @@ panier::panier(AuthApplication *app, cWebAptitude * cWebApt): WContainerWidget()
 
 void panier::addMap(std::string aCode, TypeLayer type, std::shared_ptr<Layer> l){
     std::cout << "aCode : " << aCode << std::endl;
-    mVLs.push_back(l);
-    int row=mTable->rowCount();
-    mTable->elementAt(row, 0)->setContentAlignment(AlignmentFlag::Top | AlignmentFlag::Left);
-    mTable->elementAt(row, 0)->setPadding(5);
-    mTable->elementAt(row, 0)->addWidget(cpp14::make_unique<WText>(l->Nom()));
-    WPushButton * bvis = mTable->elementAt(row, 1)->addWidget(cpp14::make_unique<WPushButton>(""));
-    bvis->addStyleClass("button_carto");
-    bvis->setIcon("resources/eye_visible.png");
-    bvis->setCheckable(true);
-    bvis->setChecked(true);
-    bvis->clicked().connect([=] {
-        if(bvis->isChecked())
-            bvis->setIcon("resources/eye_visible.png");
-        else
-            bvis->setIcon("resources/eye_notvisible.png");
-        mcWebAptitude->doJavaScript("activeLayers['"+aCode+"'].setVisible(!activeLayers['"+aCode+"'].values_.visible);");
-    });
-
-    bvis = mTable->elementAt(row, 2)->addWidget(cpp14::make_unique<WPushButton>("T"));
-    bvis->addStyleClass("button_carto");
-    bvis->setToolTip(tr("panier.transparent"));
-    bvis->setCheckable(true);
-    bvis->setChecked(true);
-    bvis->clicked().connect([=] {
-        if(bvis->isChecked())
-            bvis->setText("T");
-        else
-            bvis->setText("O");
-        mcWebAptitude->doJavaScript("activeLayers['"+aCode+"'].setOpacity(activeLayers['"+aCode+"'].getOpacity()==1?0.5:1);");
-    });
-
-    bvis = mTable->elementAt(row, 3)->addWidget(cpp14::make_unique<WPushButton>("x"));
-    bvis->addStyleClass("button_carto");
-    bvis->setToolTip(tr("panier.delete"));
-    bvis->clicked().connect([=] {
-        Wt::StandardButton answer = Wt::WMessageBox::show("Confirmer","<p>Enlever cette couche de votre sélection ?</p>",Wt::StandardButton::Yes | Wt::StandardButton::No | Wt::StandardButton::Cancel);
-        if (answer == Wt::StandardButton::Yes){
-            // del in vector
-            for (int i=0; i<mVLs.size(); i++){
-                if(mVLs.at(i)==l){
-                    mVLs.erase(mVLs.begin()+i);
-                    break;
-                }
-            }
-            // del table row
-            mTable->removeRow(row);
-            // del layer
-            mcWebAptitude->doJavaScript("map.removeLayer(activeLayers['"+aCode+"']);delete activeLayers['"+aCode+"'];");
+    // vérifie qu'elle n'est pas déjà dans le panier
+    bool test(1);
+    for (std::shared_ptr<Layer> l : mVLs){
+        if (l->Code()==aCode){
+            Wt::WMessageBox * messageBox = this->addChild(Wt::cpp14::make_unique<Wt::WMessageBox>("Sélection d'une carte","<p>Cette couche est déjà dans votre sélection</p>",Wt::Icon::Critical,Wt::StandardButton::Ok));
+            messageBox->setModal(true);
+            messageBox->buttonClicked().connect([=] {
+                this->removeChild(messageBox);
+            });
+            messageBox->show();
+            test=0;
+            break;
         }
-    });
+    }
+
+    if (test){
+        mVLs.push_back(l);
+        int row=mTable->rowCount();
+        mTable->elementAt(row, 0)->setContentAlignment(AlignmentFlag::Top | AlignmentFlag::Left);
+        mTable->elementAt(row, 0)->setPadding(5);
+        mTable->elementAt(row, 0)->addWidget(cpp14::make_unique<WText>(l->Nom()));
+        WPushButton * bvis = mTable->elementAt(row, 1)->addWidget(cpp14::make_unique<WPushButton>(""));
+        bvis->addStyleClass("button_carto");
+        bvis->setIcon("resources/eye_visible.png");
+        bvis->setCheckable(true);
+        bvis->setChecked(true);
+        bvis->clicked().connect([=] {
+            if(bvis->isChecked())
+                bvis->setIcon("resources/eye_visible.png");
+            else
+                bvis->setIcon("resources/eye_notvisible.png");
+            mcWebAptitude->doJavaScript("activeLayers['"+aCode+"'].setVisible(!activeLayers['"+aCode+"'].values_.visible);");
+        });
+
+        bvis = mTable->elementAt(row, 2)->addWidget(cpp14::make_unique<WPushButton>("T"));
+        bvis->addStyleClass("button_carto");
+        bvis->setToolTip(tr("panier.transparent"));
+        bvis->setCheckable(true);
+        bvis->setChecked(true);
+        bvis->clicked().connect([=] {
+            if(bvis->isChecked())
+                bvis->setText("T");
+            else
+                bvis->setText("O");
+            mcWebAptitude->doJavaScript("activeLayers['"+aCode+"'].setOpacity(activeLayers['"+aCode+"'].getOpacity()==1?0.5:1);");
+        });
+
+        bvis = mTable->elementAt(row, 3)->addWidget(cpp14::make_unique<WPushButton>("x"));
+        bvis->addStyleClass("button_carto");
+        bvis->setToolTip(tr("panier.delete"));
+        bvis->clicked().connect([=] {
+            Wt::StandardButton answer = Wt::WMessageBox::show("Confirmer","<p>Enlever cette couche de votre sélection ?</p>",Wt::StandardButton::Yes | Wt::StandardButton::No | Wt::StandardButton::Cancel);
+            if (answer == Wt::StandardButton::Yes){
+                // del in vector
+                for (int i=0; i<mVLs.size(); i++){
+                    if(mVLs.at(i)==l){
+                        mVLs.erase(mVLs.begin()+i);
+                        break;
+                    }
+                }
+                // del table row
+                mTable->removeRow(row);
+                // del layer
+                mcWebAptitude->doJavaScript("map.removeLayer(activeLayers['"+aCode+"']);delete activeLayers['"+aCode+"'];");
+            }
+        });
+    }
 
 }
 

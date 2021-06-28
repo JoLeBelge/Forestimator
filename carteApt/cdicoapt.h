@@ -353,6 +353,24 @@ public:
         return aRes;
     }
 
+    std::string lay2groupe(std::string aLayCode){
+        std::string aRes("REF");
+        if (Dico_lay2groupe.find(aLayCode)!=Dico_lay2groupe.end()){aRes=Dico_lay2groupe.at(aLayCode);}
+        return aRes;
+    }
+
+    std::string groupeLabel(std::string aGroupeCode){
+        std::string aRes("REF");
+        if (Dico_groupeLabel.find(aGroupeCode)!=Dico_groupeLabel.end()){aRes=Dico_groupeLabel.at(aGroupeCode);}
+        return aRes;
+    }
+    bool groupeExpert(std::string aGroupeCode){
+        bool aRes(1);
+        if (Dico_groupeExpert.find(aGroupeCode)!=Dico_groupeExpert.end()){aRes=Dico_groupeExpert.at(aGroupeCode);}
+        return aRes;
+    }
+
+
     /*bool hasMTD(std::string aLayerCode){
         return Dico_layerMTD.find(aLayerCode)!=Dico_layerMTD.end();
     }
@@ -386,9 +404,9 @@ public:
     std::map<std::string,std::shared_ptr<cEss>> getAllEss(){return mVEss;}
 
     std::map<std::string,std::shared_ptr<layerBase>> VlayerBase(){return mVlayerBase;}
-     bool hasLayerBase(std::string aCode){
-         if (mVlayerBase.find(aCode)!=mVlayerBase.end()){return 1;} else {return 0;}
-     }
+    bool hasLayerBase(std::string aCode){
+        if (mVlayerBase.find(aCode)!=mVlayerBase.end()){return 1;} else {return 0;}
+    }
 
 
     std::shared_ptr<layerBase> getLayerBase(std::string aCode){
@@ -399,6 +417,8 @@ public:
         }
         return aRes;
     }
+    // dans l'ordre que l'on souhaite!
+    std::vector<std::string> Dico_groupe;
 
 private:
     std::string mBDpath;
@@ -408,6 +428,13 @@ private:
     std::map<std::string,std::string> Dico_code2prefix;
     // code essence 2 code groupe "feuillus" vs "Resineux
     std::map<std::string,std::string> Dico_F_R;
+    // code essence 2 code groupe de couche pour catalogue de couches
+    std::map<std::string,std::string> Dico_lay2groupe;
+    // booléen expert assigné au groupe de couche
+    std::map<std::string,bool> Dico_groupeExpert;
+    // code groupe 2 label groupe
+    std::map<std::string,std::string> Dico_groupeLabel;
+
     std::map<std::string,std::string>  Dico_codeSt2Habitat;
     std::map<int,std::string>  Dico_id2Habitat;
     std::map<std::string,int> Dico_codeSt2idHab;

@@ -4,7 +4,7 @@ int maxSizePix4Export(30000);
 extern bool globTest;
 
 groupLayers::groupLayers(AuthApplication *app, cWebAptitude * cWebApt):
-   mDico(app->mDico)
+    mDico(app->mDico)
   ,m_app(app)
   ,mcWebAptitude(cWebApt)
   ,mMap(cWebApt->mMap)
@@ -21,24 +21,24 @@ groupLayers::groupLayers(AuthApplication *app, cWebAptitude * cWebApt):
     mParent->setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Middle);
 
     slotMapExport.setJavaScript(
-       "function () {"
-           "var extent = map.getView().calculateExtent(map.getSize());"
-           "var bottomLeft = ol.extent.getBottomLeft(extent);"
-           "var topRight =ol.extent.getTopRight(extent);"
-           "if (bottomLeft != null) {"
-           + sigMapExport.createCall({"topRight[0]","topRight[1]","bottomLeft[0]","bottomLeft[1]"})
-       + "}}"
-    );
+                "function () {"
+                "var extent = map.getView().calculateExtent(map.getSize());"
+                "var bottomLeft = ol.extent.getBottomLeft(extent);"
+                "var topRight =ol.extent.getTopRight(extent);"
+                "if (bottomLeft != null) {"
+                + sigMapExport.createCall({"topRight[0]","topRight[1]","bottomLeft[0]","bottomLeft[1]"})
+                + "}}"
+                );
 
     this->sigMapExport.connect(std::bind(&groupLayers::updateMapExtentAndCropIm,this, std::placeholders::_1,std::placeholders::_2,std::placeholders::_3,std::placeholders::_4));
 
     slotMapCenter.setJavaScript(
-        "function () {"
-            "var centre = map.getView().getCenter();"
-            "var z = map.getView().getZoom();"
-            + sigMapCenter.createCall({"centre[0]","centre[1]","z"})
-        + "}"
-    );
+                "function () {"
+                "var centre = map.getView().getCenter();"
+                "var z = map.getView().getZoom();"
+                + sigMapCenter.createCall({"centre[0]","centre[1]","z"})
+                + "}"
+                );
     this->sigMapCenter.connect(std::bind(&groupLayers::saveExtent,this, std::placeholders::_1,std::placeholders::_2,std::placeholders::_3));
 
     mTitle = mLegendDiv->addWidget(cpp14::make_unique<WText>(WString::tr("legendMsg")));
@@ -54,35 +54,20 @@ groupLayers::groupLayers(AuthApplication *app, cWebAptitude * cWebApt):
     tree->treeRoot()->label()->setTextFormat(Wt::TextFormat::Plain);
     tree->treeRoot()->setLoadPolicy(Wt::ContentLoading::NextLevel);
     tree->treeRoot()->expand();
-    auto node1 = Wt::cpp14::make_unique<Wt::WTreeNode>(tr("groupeCoucheThem"));
-    auto node1_ = tree->treeRoot()->addChildNode(std::move(node1));
-    node1_->addStyleClass("tree_node");
 
-    auto node4 = Wt::cpp14::make_unique<Wt::WTreeNode>(tr("groupeCoucheKKCS"));
-    auto node4_ = tree->treeRoot()->addChildNode(std::move(node4));
-    node4_->addStyleClass("tree_node");
-    this->changeExpertMode().connect(node4_,&Wt::WTreeNode::setNodeVisible);
+    std::map<std::string, Wt::WTreeNode*> aMNodes;
+    // ajout des nodes pour les groupes de couches
+    for (std::string gr :mDico->Dico_groupe){
 
-    auto node0 = Wt::cpp14::make_unique<Wt::WTreeNode>(tr("groupeCouchePeup"));
-    auto node0_ = tree->treeRoot()->addChildNode(std::move(node0));
-    node0_->addStyleClass("tree_node");
+        auto node1 = Wt::cpp14::make_unique<Wt::WTreeNode>(mDico->groupeLabel(gr));
+         node1->addStyleClass("tree_node");
+         Wt::WTreeNode * n= tree->treeRoot()->addChildNode(std::move(node1));
 
-    auto node2 = Wt::cpp14::make_unique<Wt::WTreeNode>(tr("groupeCoucheAptFEE"));
-    auto node2_ = tree->treeRoot()->addChildNode(std::move(node2));
-    node2_->addStyleClass("tree_node");
+        if (mDico->groupeExpert(gr)){ this->changeExpertMode().connect(n,&Wt::WTreeNode::setNodeVisible);}
+        aMNodes.emplace(gr, n);
+    }
 
-    auto node3 = Wt::cpp14::make_unique<Wt::WTreeNode>(tr("groupeCoucheAptCS"));
-    auto node3_ = tree->treeRoot()->addChildNode(std::move(node3));
-    node3_->addStyleClass("tree_node");
-
-    // ici je  vais devoir rendre ce noeuds invisible si mode normal
-    this->changeExpertMode().connect(node3_,&Wt::WTreeNode::setNodeVisible);
-
-    /*node0_->expand();
-    node1_->expand();
-    node2_->expand();
-    node3_->expand();
-    node4_->expand();*/
+    //node0_->expand();
 
     // ajout des cartes
     for (auto & pair :mDico->VlayerBase()){
@@ -92,57 +77,33 @@ groupLayers::groupLayers(AuthApplication *app, cWebAptitude * cWebApt):
             // 1) création du mWtText pour cette couche
             WText * wtext=NULL;
             Wt::WTreeNode * n=NULL;
-            switch (aLB->getCatLayer()) {
-            case (TypeLayer::Station):{
-                n = node1_->addChildNode(Wt::cpp14::make_unique<Wt::WTreeNode>(""));
+            if (aMNodes.find(mDico->lay2groupe(pair.first))!=aMNodes.end()){
+                n = aMNodes.at(mDico->lay2groupe(pair.first))->addChildNode(Wt::cpp14::make_unique<Wt::WTreeNode>(""));
                 wtext=n->label();
-                break;}
-                // carte thématique des catalogues de stations
-            case (TypeLayer::KK):{
-                n = node4_->addChildNode(Wt::cpp14::make_unique<Wt::WTreeNode>(""));
-                wtext=n->label();
-                break;}
-            case (TypeLayer::Externe):{
-                n = node1_->addChildNode(Wt::cpp14::make_unique<Wt::WTreeNode>(""));
-                wtext=n->label();
-                break;}
-            case TypeLayer::Peuplement:{
-                n = node0_->addChildNode(Wt::cpp14::make_unique<Wt::WTreeNode>(""));
-                wtext=n->label();
-                break;}
-            case TypeLayer::FEE:{
-                n = node2_->addChildNode(Wt::cpp14::make_unique<Wt::WTreeNode>(""));
-                wtext=n->label();
-                break;}
-            case TypeLayer::CS:{
-                n = node3_->addChildNode(Wt::cpp14::make_unique<Wt::WTreeNode>(""));
-                wtext=n->label();
-                break;}
-            default:
-                break;
+
+                // 2) création de la couche
+                std::shared_ptr<Layer> aL=std::make_shared<Layer>(this,aLB,wtext);
+                // 3) ajout des interactions
+                TypeLayer type= aL->getCatLayer();
+                std::string aCode=aL->Code();
+                //wtext->clicked().connect([this,aCode,type]{clickOnName(aCode,type);});
+                wtext->doubleClicked().connect([this,aCode,type]{clickOnName(aCode,type);});
+                aL->changeExpertMode().connect(n,&Wt::WTreeNode::setNodeVisible);
+                mVLs.push_back(aL);
+            } else {
+                std::cout << "problème pour couche " << pair.first << " car n'as pas de groupe de couche atitré" << std::endl;
             }
-            // 2) création de la couche
-            std::shared_ptr<Layer> aL=std::make_shared<Layer>(this,aLB,wtext);
-            // 3) ajout des interactions
-            TypeLayer type= aL->getCatLayer();
-            std::string aCode=aL->Code();
-            //wtext->clicked().connect([this,aCode,type]{clickOnName(aCode,type);});
-            wtext->doubleClicked().connect([this,aCode,type]{clickOnName(aCode,type);});
-            aL->changeExpertMode().connect(n,&Wt::WTreeNode::setNodeVisible);
-            mVLs.push_back(aL);
 
         }else {
             mVLs.push_back(std::make_shared<Layer>(this,aLB));
         }
+
     }
 
     mParent->addWidget(cpp14::make_unique<WText>(tr("coucheStep1")));
     mParent->addWidget(std::move(tree));
     /*Wt::WText * t =mParent->addWidget(cpp14::make_unique<WText>(tr("coucheStep2")));
     t->setToolTip(tr("coucheStep2.infoBulle"));*/
-
-
-
 
 
     //mSelect4Stat= new selectLayers4Stat(this);

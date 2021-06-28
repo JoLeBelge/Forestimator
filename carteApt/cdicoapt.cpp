@@ -107,9 +107,9 @@ cDicoApt::cDicoApt(std::string aBDFile):mBDpath(aBDFile),ptDb_(NULL)
         for (std::string table : std::vector<std::string>{"layerApt","fichiersGIS"})
         {
             if (s=="lisein"){
-                SQLstring="SELECT Code,Dir2,Nom,Type,NomComplet,Categorie,TypeVar, expert, visu, stat,NomCourt FROM "+table+";";
+                SQLstring="SELECT Code,Dir2,Nom,Type,NomComplet,Categorie,TypeVar, expert, visu, stat,NomCourt,groupe FROM "+table+";";
             } else {
-                SQLstring="SELECT Code,Dir,Nom,Type,NomComplet,Categorie,TypeVar, expert, visu, stat ,NomCourt FROM "+table+";";
+                SQLstring="SELECT Code,Dir,Nom,Type,NomComplet,Categorie,TypeVar, expert, visu, stat ,NomCourt,groupe FROM "+table+";";
             }
             //std::cout << SQLstring << std::endl;
 
@@ -123,6 +123,10 @@ cDicoApt::cDicoApt(std::string aBDFile):mBDpath(aBDFile),ptDb_(NULL)
                     std::string aC=std::string( (char *)sqlite3_column_text( stmt, 2 ) );
                     Dico_GISfile.emplace(std::make_pair(aA,aB+"/"+aC));
                     Dico_RasterTable.emplace(std::make_pair(aA,table));
+                    std::string groupe("REF");
+                    if (sqlite3_column_type(stmt, 11)!=SQLITE_NULL) {groupe=std::string( (char *)sqlite3_column_text( stmt, 11 ) );}
+                    Dico_lay2groupe.emplace(std::make_pair(aA,groupe));
+
                     if ( sqlite3_column_type(stmt, 3)!=SQLITE_NULL && sqlite3_column_type(stmt, 4)!=SQLITE_NULL && sqlite3_column_type(stmt, 5)!=SQLITE_NULL && sqlite3_column_type(stmt, 6)!=SQLITE_NULL&& sqlite3_column_type(stmt, 10)!=SQLITE_NULL){
                         std::string aD=std::string( (char *)sqlite3_column_text( stmt, 3 ) );
                         std::string aE=std::string( (char *)sqlite3_column_text( stmt, 4 ) );
@@ -137,8 +141,8 @@ cDicoApt::cDicoApt(std::string aBDFile):mBDpath(aBDFile),ptDb_(NULL)
                         bool expert(0);
                         if (sqlite3_column_type(stmt, 7)!=SQLITE_NULL) {expert=sqlite3_column_int( stmt, 7 );}
                         Dico_RasterExpert.emplace(std::make_pair(aA,expert));
-                        if (sqlite3_column_type(stmt, 8)!=SQLITE_NULL) { Dico_RasterVisu.emplace(std::make_pair(aA,sqlite3_column_int( stmt, 8 )));;}
-                        if (sqlite3_column_type(stmt, 9)!=SQLITE_NULL) { Dico_RasterStat.emplace(std::make_pair(aA,sqlite3_column_int( stmt, 9 )));;}
+                        if (sqlite3_column_type(stmt, 8)!=SQLITE_NULL) { Dico_RasterVisu.emplace(std::make_pair(aA,sqlite3_column_int( stmt, 8 )));}
+                        if (sqlite3_column_type(stmt, 9)!=SQLITE_NULL) { Dico_RasterStat.emplace(std::make_pair(aA,sqlite3_column_int( stmt, 9 )));}
                     }
                 }
             }
@@ -211,6 +215,23 @@ cDicoApt::cDicoApt(std::string aBDFile):mBDpath(aBDFile),ptDb_(NULL)
                 std::string aB=std::string( (char *)sqlite3_column_text( stmt, 7 ) );
                 if (sqlite3_column_type(stmt, 8)!=SQLITE_NULL ){lMTD.setLabel(std::string( (char *)sqlite3_column_text( stmt, 8 ) ));}
                 Dico_layerMTD.emplace(std::make_pair(aB,lMTD));
+            }
+        }
+
+        sqlite3_finalize(stmt);
+        SQLstring="SELECT code,label,expert FROM groupe_couche ORDER BY id;";
+        sqlite3_prepare_v2( *db_, SQLstring.c_str(), -1, &stmt, NULL );
+        while(sqlite3_step(stmt) == SQLITE_ROW)
+        {
+            if (sqlite3_column_type(stmt, 0)!=SQLITE_NULL && sqlite3_column_type(stmt, 1)!=SQLITE_NULL){
+
+                std::string aA=std::string( (char *)sqlite3_column_text( stmt, 0 ));
+                std::string aB=std::string( (char *)sqlite3_column_text( stmt, 1 ));
+                bool expert(1);
+                if (sqlite3_column_type(stmt, 2)!=SQLITE_NULL){expert=sqlite3_column_int( stmt, 2 );}
+                Dico_groupeLabel.emplace(std::make_pair(aA,aB));
+                Dico_groupeExpert.emplace(std::make_pair(aA,expert));
+                Dico_groupe.push_back(aA);// juste pour avoir les groupes dans l'ordre
             }
         }
 
