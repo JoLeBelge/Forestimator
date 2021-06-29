@@ -1,8 +1,12 @@
 TEMPLATE = app
-CONFIG += console c++11
+#CONFIG += console c++11
 CONFIG -= app_bundle
 CONFIG -= qt
 TARGET = carteApt
+
+
+QMAKE_CC = gcc-10
+QMAKE_CXX = g++-10
 
 SOURCES += main.cpp \
            cdicoapt.cpp \
@@ -10,9 +14,10 @@ SOURCES += main.cpp \
     cdicocarteph.cpp \
     capplicarteph.cpp \
     cnsw.cpp \
-    layerbase.cpp
+    layerbase.cpp\
+    ../cWebAptitude/cadastre.cpp
 
-LIBS += -lgdal -lsqlite3 -lboost_system -lboost_filesystem
+LIBS += -lgdal -lsqlite3 -lboost_system -lboost_filesystem -lwtdbo -lwtdbosqlite3
 
 #LIBS += -L$$PWD/../../../OTB-7.0.0-Linux64/lib
 
@@ -28,6 +33,9 @@ DEPENDPATH += $$PWD/../../../../../../usr/include/gdal/
 INCLUDEPATH += $$PWD/../../../../../../../../../usr/lib/x86_64-linux-gnu
 DEPENDPATH += $$PWD/../../../../../../../../../usr/lib/x86_64-linux-gnu
 
+INCLUDEPATH += $$PWD/../cWebAptitude/
+DEPENDPATH += $$PWD/../cWebAptitude/
+
 HEADERS += \
     cdicoapt.h \
     caplicarteapt.h \
@@ -35,4 +43,5 @@ HEADERS += \
     capplicarteph.h \
     cnsw.h \
     layerbase.h
+    ../cWebAptitude/cadastre.h
 

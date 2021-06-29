@@ -22,9 +22,9 @@ using namespace std;
 
 int main(int argc, char *argv[])
 {
-    //cAppliCartepH aAPH=cAppliCartepH();
+    cAppliCartepH aAPH=cAppliCartepH();
     // lecture de toutes les table dictionnaires
-    cDicoApt dico(dirBD);
+    /*cDicoApt dico(dirBD);
     cApliCarteApt aACA(&dico);
     std::map<std::string,std::shared_ptr<layerBase>> aMEss=dico.VlayerBase();
     std::map<std::string,cKKCS> aMKKs;
@@ -32,7 +32,7 @@ int main(int argc, char *argv[])
     std::string aFileScribusTemp("/home/lisein/matAptRW2021/MatApt_Eco_RW.sla");
     for (int rn(1); rn <11;rn++){
         matriceApt(&dico, aFileScribusTemp, rn);
-    }
+    }*/
 
 
 
@@ -134,7 +134,7 @@ int main(int argc, char *argv[])
     }*/
 
 
-        for (auto & kv : aMEss){
+        /*for (auto & kv : aMEss){
 
             // crée deux fois la carte, une fois pour layerbase CS et une fois pour lb FEE
             std::string essCode(kv.second->EssCode()); //essCode =="AG"  | essCode =="AP" |essCode =="EK") |essCode =="PG" essCode =="PY" |essCode =="PZ"
@@ -156,12 +156,13 @@ int main(int argc, char *argv[])
                 //DicoVal=dico->code2AptFull();
                 //DicoCol=dico->codeApt2col();
                 //aACA.codeMapServer(kv.second.shortNomCarteAptFEE(),kv.second.NomMapServerLayer(),kv.second.NomMapServerLayerFull(),aFileCodeMS,Apt);
-                /*if (exists(kv.second.NomCarteAptFEE())){
+                if (exists(kv.second.NomCarteAptFEE())){
           * std::string aFileCodeMS("/home/lisein/Documents/carteApt/autres/mapserver/mapCS.map");
             aACA.codeMapServer(kv.second.shortNomCarteAptCS(),kv.second.NomMapServerLayerCS(),kv.second.NomMapServerLayerFull(),aFileCodeMS,Apt);
-         }*/
+         }
             }
         }
+*/
 
         //std::string aFileCodeMS("/home/lisein/Documents/carteApt/autres/mapserver/mapKKCS.map");
         //for (auto & kv : aMKKs){

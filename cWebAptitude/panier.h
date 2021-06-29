@@ -22,7 +22,7 @@ public:
     std::vector<std::shared_ptr<Layer>> mVLs;
 
     // functions
-    void addMap(std::string aCode, TypeLayer type, std::shared_ptr<Layer> l);
+    void addMap(std::string aCode, std::shared_ptr<Layer> l);
 private:
 
     Wt::WTable * mTable;

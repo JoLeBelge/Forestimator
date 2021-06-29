@@ -10,9 +10,14 @@
 // pour les vecteurs
 //#include "ogrsf_frmts.h"
 //#include "gdal_utils.h"
+
 using namespace std;
 
 inline bool exists (const std::string& name);
+
+int cleNT(const siglePedo * s, int ZBIO, int TECO, double pH);
+//int cleNT(dbo::ptr<siglePedo> s, int ZBIO, int TECO, double pH);
+
 
 class cAppliCartepH
 {
@@ -23,6 +28,8 @@ public:
 
     // je recrée un raster PTS car celui que j'ai fait avec gdal depuis le shp PTS n'est pas le même que celui de FR en utilisant la table qui lie chaque sigle pédo à un PTS
     void cartePTS(std::string aOut, bool force=true);
+
+    void carteNT(std::string aOut, bool force=true);
 private:
     int x,y;
 

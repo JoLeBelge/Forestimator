@@ -128,26 +128,6 @@ var extend_previous=[110345.3375329999980750,-25250.0562959999988379, 301972.300
 //var extend_ndvi=[38824.4511019999990822,19513.5278680000010354, 296527.3037289999774657,171984.5151900000055321];
 var extend_ndvi=[39166.5026720000023488,19513.5278680000010354, 296527.3037289999774657,171984.5151900000055321];
 
-
-IGNLayer = new ol.layer.Tile({
-	extent: extent,
-	title: 'Fond topographique IGN',
-	source: new ol.source.TileWMS({
-		title: 'carto Web',
-		url: 'https://wms.ngi.be/cartoweb/service',
-		crossOrigin: 'null',
-		attributions: 'CartoWeb.be',
-		params: {
-		  'LAYERS': 'topo',
-		  'TILED': false,
-		  'FORMAT': 'image/png'
-		},
-		//tileGrid: tileGrid,
-		projection: 'EPSG:31370',
-		//serverType: 'mapserver',
-	})
-});
-
 activeLayer=1;
 activeLayers={};
 
@@ -238,7 +218,7 @@ communes = new ol.layer.Vector({
 layers = [
 	new ol.layer.Group({
 		'title': 'Fonds de carte',
-		layers:[IGNLayer ]
+		layers:[ ]
 	}),
 	new ol.layer.Group({
 		'title': 'Limites administratives',
@@ -308,7 +288,7 @@ closer.ontouch = function() {
 
 refreshLayers = function (){
 
-	IGNLayer.getSource().changed();
+	//IGNLayer.getSource().changed();
 	
 	//activeLayer.getSource().changed();
 }
@@ -319,7 +299,7 @@ refreshLayers = function (){
  **/
 updateGroupeLayers = function(){
 	let l = [];
-	l.push(IGNLayer);
+	//l.push(IGNLayer);
 	for (const [key, value] of Object.entries(activeLayers)){
 		l.push(value);
 	};	

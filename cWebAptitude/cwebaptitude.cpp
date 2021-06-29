@@ -206,6 +206,8 @@ cWebAptitude::cWebAptitude(AuthApplication *app, Auth::AuthWidget* authWidget_)
 
     mPanier = content_panier->addWidget(Wt::cpp14::make_unique<panier>(mApp, this));
     mGroupL->updateGL();
+    // des couches que l'on souhaite voir dans le panier dès le départ
+    mGroupL->clickOnName("IGN",TypeLayer::Externe);
 
     statWindow * page_camembert = top_stack->addNew<statWindow>(mGroupL);
 

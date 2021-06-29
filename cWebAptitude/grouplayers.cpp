@@ -115,6 +115,8 @@ groupLayers::groupLayers(AuthApplication *app, cWebAptitude * cWebApt):
 
     // updateGL pour cacher les couches expert
     //updateGL(); // -> bougé dans classe parent cwebapt car segfault not init refs !
+
+
     std::cout << "done " << std::endl;
 }
 
@@ -155,7 +157,7 @@ void groupLayers::clickOnName(std::string aCode, TypeLayer type){
         }
     }
 
-    mcWebAptitude->mPanier->addMap(aCode, type, layer);
+
 
     // cacher la fenetre popup
     mParent->doJavaScript("overlay.setVisible(0);");
@@ -173,6 +175,8 @@ void groupLayers::clickOnName(std::string aCode, TypeLayer type){
             break;
         }
     }
+    // ajout de la carte après le "diplaylayer" sinon ordre du code js pas bon? ben oui car couche pas encore dans activeLayers[]
+     mcWebAptitude->mPanier->addMap(aCode, layer);
 }
 
 /**
