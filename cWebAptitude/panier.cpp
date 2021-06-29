@@ -164,7 +164,7 @@ void panier::addMap(std::string aCode, std::shared_ptr<Layer> l){
 
                 // mTable->removeRow(row); --> cause bug car copie la valeur de row qui en fait n'est pas constante car si je supprime des couche du panier en amont avant de supprimer celle-ci, row  n'as pas la bonne valeur.
 
-                mTable->removeRow(i+2); // attention dangeureux le +1 car 1 couche de base IGN
+                mTable->removeRow(i); // attention dangeureux le +1 car 1 couche de base IGN
                 // del layer
                 mcWebAptitude->doJavaScript("map.removeLayer(activeLayers['"+aCode+"']);delete activeLayers['"+aCode+"'];");
                 } else {

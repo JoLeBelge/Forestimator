@@ -176,6 +176,10 @@ private:
     std::map<int,int> Dico_IndexSiglePed2PTS;
     std::map<int,double> Dico_PTS2pH;
     std::map<std::vector<int>,double> Dico_PTSetRN2pH;
+    // le nombre de mesure - en dessous de 2 on prends pas (correction 2021 06)
+    std::map<std::vector<int>,int> Dico_PTSetRN2NbpH;
+
+
     std::map<std::string,std::string>  Dico_GISfile;
 
     // clé; index, val; l'objet sigle pédo avec tout dedans

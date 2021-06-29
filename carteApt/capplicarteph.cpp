@@ -41,8 +41,8 @@ cAppliCartepH::cAppliCartepH()
     y=ZBIOBand->GetYSize();
 
 
-    if(0){
-        std::string aOut(dico->File("OUTDIR")+"cartepH2020.tif");
+    if(1){
+        std::string aOut(dico->File("OUTDIR")+"cartepH2021.tif");
 
 
         cartepH(aOut);
@@ -117,17 +117,13 @@ void cAppliCartepH::cartepH(std::string aOut, bool force){
                     pH = dico->getpH(pts,zbio);
                     //std::cout << "ph est de " << pH << std::endl;
 
-                }
-                if (row%astep==0){
-                    std::cout << ".." ;
-
-                }
+                }   
                 scanline[ col ] = pH;
             }
             // écriture du résultat dans le fichier de destination
 
             outBand->RasterIO( GF_Write, 0, row, x, 1, scanline, x, 1,GDT_Float32, 0, 0 );
-            if (row%astep==0){std::cout<< std::endl;}
+            if (row%astep==0){std::cout<< " ... " << std::endl;}
         }
         CPLFree(scanline);
         CPLFree(scanlineZBIO);
@@ -366,7 +362,7 @@ int cleNT(const siglePedo *s, int ZBIO, int TECO, double pH){
     if(pH==0.0 | pH==1.0){aRes=0;}
 
     // ajout Claessens 10/02: tourbe en Ardenne
-
+    if(s->tourbe() &&  ( ZBIO==1 | ZBIO!=2 | ZBIO==10)){aRes=7;}
 
     // hors ardenne : indetermin?
     if(s->tourbe() &&  ( ZBIO!=1 && ZBIO!=2 && ZBIO!=10)){aRes=0;}

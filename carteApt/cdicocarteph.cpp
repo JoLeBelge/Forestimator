@@ -79,7 +79,7 @@ cDicoCartepH::cDicoCartepH(std::string aBDFile):mBDpath(aBDFile)
             }
         }
 
-        SQLstring="SELECT PTS,RegNat,pH_moy FROM pH_regnat_pts;";
+        SQLstring="SELECT PTS,RegNat,pH_moy,pH_nb FROM pH_regnat_pts;";
         sqlite3_reset(stmt);
         sqlite3_prepare_v2( db_, SQLstring.c_str(), -1, &stmt, NULL );
         while(sqlite3_step(stmt) == SQLITE_ROW)
@@ -91,8 +91,12 @@ cDicoCartepH::cDicoCartepH(std::string aBDFile):mBDpath(aBDFile)
                 std::string aCtmp=std::string( (char *)sqlite3_column_text( stmt, 2 ) );
                 double aC=toDouble(aCtmp);
 
+
+                 int aD=sqlite3_column_int( stmt, 3 );
+
                 std::vector<int> aV{aA,Dico_NomRN2Code.at(aB)};
                 Dico_PTSetRN2pH.emplace(std::make_pair(aV,aC));
+                Dico_PTSetRN2NbpH.emplace(std::make_pair(aV,aD));
             }
         }
 
@@ -144,6 +148,8 @@ cDicoCartepH::cDicoCartepH(std::string aBDFile):mBDpath(aBDFile)
     session.setConnection(std::move(sqlite3));
     session.mapClass<siglePedo>("dico_cnsw");
 
+    // j'ai essayer de créer une collection de siglePedo mais ça bug ; me crée la collection mais quand je boucle dessus, j'ai toujours le mm objet qui est l'objet de la première ligne en fait.
+
     //dbo::ptr<siglePedo> s1 = session.find<siglePedo>().where("INDEX_=?").bind("10");
     //s1->cat();
 
@@ -164,10 +170,10 @@ cDicoCartepH::cDicoCartepH(std::string aBDFile):mBDpath(aBDFile)
 
     //Wt::Dbo::Query<dbo::ptr<siglePedo>> query {session.find<siglePedo>()};
     //Wt::Dbo::collection<dbo::ptr<siglePedo>> collection {query.resultList()};
-    std::vector<dbo::ptr<siglePedo>> vec; //{collection.begin(), collection.end()};
+    //std::vector<dbo::ptr<siglePedo>> vec; //{collection.begin(), collection.end()};
     //for (int i(1);i>)
 
-    std::cout << "vect has : " << vec.size() << std::endl;
+    //std::cout << "vect has : " << vec.size() << std::endl;
 
      /*for (dbo::ptr<siglePedo> s : vec){
           s->cat();
@@ -191,7 +197,7 @@ double cDicoCartepH::getpH(int aPTS,int aZBIO){
         int aRN=Dico_Zbio2RN.at(aZBIO);
         std::vector<int> aKey{aPTS,aRN};
         // on regarde pour commencer si on a une valeur de pH pour cette combinaison PTS-RN
-        if (Dico_PTSetRN2pH.find(aKey)!=Dico_PTSetRN2pH.end()){aRes=Dico_PTSetRN2pH.at(aKey);
+        if (Dico_PTSetRN2pH.find(aKey)!=Dico_PTSetRN2pH.end() && Dico_PTSetRN2NbpH.at(aKey)>1){aRes=Dico_PTSetRN2pH.at(aKey);
         } else {
             if (Dico_PTS2pH.find(aPTS)!=Dico_PTS2pH.end()){aRes=Dico_PTS2pH.at(aPTS);}
         }
