@@ -35,7 +35,7 @@ panier::panier(AuthApplication *app, cWebAptitude * cWebApt): WContainerWidget()
     mTable->elementAt(1, 2)->setColumnSpan(2);
     bvis = mTable->elementAt(1, 2)->addWidget(cpp14::make_unique<WPushButton>("T"));
     bvis->addStyleClass("button_carto");
-    bvis->setToolTip("panier.transparent");
+    bvis->setToolTip(tr("panier.transparent"));
     bvis->setCheckable(true);
     bvis->setChecked(false);
     bvis->clicked().connect([=] {
@@ -151,17 +151,20 @@ void panier::addMap(std::string aCode, std::shared_ptr<Layer> l){
 
                 if(mVLs.size()>1){
                 // del in vector
-                int c(0);
-                for (int i=0; i<mVLs.size(); i++){
+
+                int i=0;
+                for (i; i<mVLs.size(); i++){
+
                     if(mVLs.at(i)==l){
                         mVLs.erase(mVLs.begin()+i);
                         break;
                     }
-                    c++;
                 }
-                // del table row
-                mTable->removeRow(c);
+
+
                 // mTable->removeRow(row); --> cause bug car copie la valeur de row qui en fait n'est pas constante car si je supprime des couche du panier en amont avant de supprimer celle-ci, row  n'as pas la bonne valeur.
+
+                mTable->removeRow(i+2); // attention dangeureux le +1 car 1 couche de base IGN
                 // del layer
                 mcWebAptitude->doJavaScript("map.removeLayer(activeLayers['"+aCode+"']);delete activeLayers['"+aCode+"'];");
                 } else {
