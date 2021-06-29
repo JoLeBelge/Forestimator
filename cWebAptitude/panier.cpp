@@ -34,7 +34,7 @@ panier::panier(AuthApplication *app, cWebAptitude * cWebApt): WContainerWidget()
     mTable->elementAt(1, 2)->setColumnSpan(2);
     bvis = mTable->elementAt(1, 2)->addWidget(cpp14::make_unique<WPushButton>("T"));
     bvis->addStyleClass("button_carto");
-    bvis->setToolTip("panier.transparent");
+    bvis->setToolTip(tr("panier.transparent"));
     bvis->setCheckable(true);
     bvis->setChecked(false);
     bvis->clicked().connect([=] {
@@ -137,14 +137,16 @@ void panier::addMap(std::string aCode, TypeLayer type, std::shared_ptr<Layer> l)
             Wt::StandardButton answer = Wt::WMessageBox::show("Confirmer","<p>Enlever cette couche de votre sélection ?</p>",Wt::StandardButton::Yes | Wt::StandardButton::No | Wt::StandardButton::Cancel);
             if (answer == Wt::StandardButton::Yes){
                 // del in vector
-                for (int i=0; i<mVLs.size(); i++){
+                int i=0;
+                for (i; i<mVLs.size(); i++){
                     if(mVLs.at(i)==l){
                         mVLs.erase(mVLs.begin()+i);
                         break;
                     }
                 }
+                std::cout << "i:" << i << std::endl;
                 // del table row
-                mTable->removeRow(row);
+                mTable->removeRow(i+2); // attention dangeureux le +1 car 1 couche de base IGN
                 // del layer
                 mcWebAptitude->doJavaScript("map.removeLayer(activeLayers['"+aCode+"']);delete activeLayers['"+aCode+"'];");
             }
