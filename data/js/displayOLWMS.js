@@ -16,7 +16,7 @@ activeLayer  = new ol.layer.Tile({
 		projection: 'EPSG:31370',
 		//serverType: 'mapserver',
 	}),
-	opacity: 0.5
+	opacity: Object.keys(activeLayers).length==0?1:0.5
 });
 activeLayers["MYCODE"] = activeLayer;
 
