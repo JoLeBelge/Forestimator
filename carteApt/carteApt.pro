@@ -17,7 +17,7 @@ SOURCES += main.cpp \
     layerbase.cpp\
     ../cWebAptitude/cadastre.cpp
 
-LIBS += -lgdal -lsqlite3 -lboost_system -lboost_filesystem -lwtdbo -lwtdbosqlite3
+LIBS += -lgdal -lsqlite3 -lboost_system -lboost_filesystem -lwtdbo -lwtdbosqlite3 -lboost_program_options
 
 #LIBS += -L$$PWD/../../../OTB-7.0.0-Linux64/lib
 

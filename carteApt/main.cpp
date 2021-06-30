@@ -1,8 +1,8 @@
-#include "cdicoapt.h"
 #include "caplicarteapt.h"
-
-#include "cdicocarteph.h"
 #include "capplicarteph.h"
+#include "boost/program_options.hpp"
+namespace po = boost::program_options;
+using namespace std;
 
 // écrire double dans cout avec 2 décimales
 #include <iomanip>
@@ -15,43 +15,74 @@ void replaceInDoc(std::string aFileIn, std::string aFind, std::vector<std::strin
 // effectue 1 remplacement par élément du vecteur - la chaine de charactère à remplacer contient l'élément du vecteur en partant de 0
 void replaceInDocVector(std::string aFileIn, std::string aFind, std::vector<std::string> aReplace);
 void replaceFullLineInDoc(std::string aFileIn,std::string aReplace,int lineNumber);
-
 std::vector<int> findLineInDoc(std::string aFileIn, std::string aFind);
 std::string globToto("toto");
 using namespace std;
 
 int main(int argc, char *argv[])
 {
-    cAppliCartepH aAPH=cAppliCartepH();
-    // lecture de toutes les table dictionnaires
-    /*cDicoApt dico(dirBD);
-    cApliCarteApt aACA(&dico);
-    std::map<std::string,std::shared_ptr<layerBase>> aMEss=dico.VlayerBase();
-    std::map<std::string,cKKCS> aMKKs;
+    po::options_description desc("options pour l'outil de calcul des cartes");
+    desc.add_options()
+            ("help", "produce help message")
+            ("carteNT", po::value<bool>(), "calcul de la carte des NT")
+            ("cartepH", po::value<bool>(), "calcul de la carte des pH")
+            ("aptFEE", po::value<bool>(), "calcul des cartes d'aptitude du FEE")
+            ("aptCS", po::value<bool>(), "calcul des cartes d'aptitude du CS")
+            ;
 
-    std::string aFileScribusTemp("/home/lisein/matAptRW2021/MatApt_Eco_RW.sla");
-    for (int rn(1); rn <11;rn++){
-        matriceApt(&dico, aFileScribusTemp, rn);
-    }*/
+    po::variables_map vm;
+    po::store(po::parse_command_line(argc, argv, desc), vm);
+    po::notify(vm);
 
-
-
-
-    //std::map<std::string,cRasterInfo> aMRs;
-    // creation des essences et de leur aptitudes FEE/CS
-    /* for (auto & pair : *dico.codeEs2Nom()){
-        // on ne crée plus l'essence car elle sont toutes créés par le dicitonnaire
-        aMEss.emplace(std::make_pair(pair.first,cEss(pair.first,&dico)));
-    }*/
-
-    /*  for (auto & pair : *dico.codeKK2Nom()){
-        aMKKs.emplace(std::make_pair(pair.first,cKKCS(pair.first,&dico)));
+    if (vm.count("help")) {
+        cout << desc << "\n";
+        return 1;
     }
-*/
-    // topo, nh, nt, ect
-    //  for (auto & pair : *dico.RasterType()){
-    //    aMRs.emplace(std::make_pair(pair.first,cRasterInfo(pair.first,&dico)));
+    bool carteNT(0),cartepH(0),carteFEE(0),carteCS(0),matApt(0);
+    if (vm.count("carteNT")) {carteNT=vm["carteNT"].as<bool>();}
+    if (vm.count("cartepH")) {cartepH=vm["cartepH"].as<bool>();}
+    if (vm.count("aptFEE")) {carteFEE=vm["aptFEE"].as<bool>();}
+    if (vm.count("aptCS")) {carteCS=vm["aptCS"].as<bool>();}
+    if (vm.count("matApt")) {matApt=vm["matApt"].as<bool>();}
 
+
+    // attention, les chemins d'accès pour les inputs et output ne sont pas les même pour cAppliCartepH que pour cApliCarteApt!! ne pas se gourer.
+    if (carteNT | cartepH) {
+        cAppliCartepH aAPH(carteNT,cartepH);
+    }
+
+    if (carteFEE | carteCS) {
+
+        cDicoApt dico(dirBD);
+        cApliCarteApt aACA(&dico);
+        std::map<std::string,std::shared_ptr<layerBase>> aMLB=dico.VlayerBase();
+
+        for (std::pair<std::string,std::shared_ptr<layerBase>>  kv : aMLB){
+
+            //std::string essCode(kv.second->EssCode()); //essCode =="AG"  | essCode =="AP" |essCode =="EK") |essCode =="PG" essCode =="PY" |essCode =="PZ"
+
+            if (carteFEE &&(kv.second->getCatLayer()==TypeLayer::FEE)){
+                aACA.carteAptFEE(dico.getEss(kv.second->EssCode()),kv.second->getPathTif(),true);
+                aACA.compressTif(kv.second->getPathTif());
+            }
+
+            if (carteCS &&(kv.second->getCatLayer()==TypeLayer::FEE)){
+                aACA.carteAptCS(dico.getEss(kv.second->EssCode()),kv.second->getPathTif(),true);
+                aACA.compressTif(kv.second->getPathTif());
+            }
+        }
+    }
+    if (matApt){
+            cDicoApt dico(dirBD);
+            std::string aFileScribusTemp("/home/lisein/matAptRW2021/MatApt_Eco_RW.sla");
+            for (int rn(1); rn <11;rn++){
+                matriceApt(&dico, aFileScribusTemp, rn);
+            }
+    }
+
+
+    // OLD OLD OLD
+    // créé le fichier mapServeur pour chacun des groupe de couches
     /*if (pair.first=="MNT"){
             cRasterInfo RI(pair.first,&dico);
             std::string aFileCodeMS("/home/lisein/Documents/carteApt/autres/mapserver/mapThematiqueFEE.map");
@@ -70,11 +101,7 @@ int main(int argc, char *argv[])
 
         }*/
     //}
-
-
-
-
-    /*
+    /* CREATION PALETTE DE COULEUR
     std::ofstream ofs ("./dico_colGrey.txt", std::ofstream::out | std::ofstream::trunc);
     // creation de ma palette de couleur grise pour MNT
     for (int i(0);i<255;i++){
@@ -92,107 +119,35 @@ int main(int argc, char *argv[])
         if ((i % 30)==0){ col="g"+std::to_string(i/30);}
     ofs <<i << "," <<double(i/10.0)<< "," << col << std::endl;
     }
-
     ofs.close();
     */
-
-    /*
-    cEss EP=aMEss.at("EP");
-    for (auto & pair : EP.mEcoVal){
-        for (auto & pair2 : pair.second){
-        std::cout << " Zbio " << pair.first << "code nt nh " << pair2.first << " aptitude " << pair2.second << std::endl;
-    }
-    }
-    //for(auto&& zbio : EP.mAptCS | boost::adaptors::map_values){
-     for (auto & pair : EP.mAptCS){
-         for (auto & pair2 : pair.second){
-             std::cout << " Zbio " << pair.first << "code station " << pair2.first << " soit " << dico.station(pair.first,pair2.first) << ", aptitude " << pair2.second << std::endl;
-         }
-     }
-     */
-
-
-
-    //aACA.shptoGeoJSON("/home/lisein/Documents/carteApt/autres/epioux_parcellaire.shp","/home/lisein/Documents/carteApt/autres/test.geojson");
-
-
-    //cEss HE=aMEss.at("HE");
-    //std::cout << HE.printRisque() ;
     //aACA.carteAptFEE(&HE,HE.NomCarteAptFEE(),true);
-    // creation des tuiles png pour utilisation dans openlayer
-    //aACA.createTile(HE.NomCarteAptFEE(),HE.NomDirTuileAptFEE(),Apt,true);
-
-
-    if (0){
-
-
-        /* std::string aFileCodeMS("/home/lisein/Documents/carteApt/autres/mapserver/mapThematiqueFEE.map");
+    /* std::string aFileCodeMS("/home/lisein/Documents/carteApt/autres/mapserver/mapThematiqueFEE.map");
     for (auto & kv : aMRs){
         //aACA.createTile(kv.second.NomCarte(),kv.second.NomDirTuile(),kv.second.Type());
         cRasterInfo RI= kv.second;
          aACA.codeMapServer(RI.NomFileWithExt(),RI.Code(),RI.Nom(),aFileCodeMS,RI.getDicoVal(),RI.getDicoCol());
-    }*/
-
-
-        /*for (auto & kv : aMEss){
-
-            // crée deux fois la carte, une fois pour layerbase CS et une fois pour lb FEE
-            std::string essCode(kv.second->EssCode()); //essCode =="AG"  | essCode =="AP" |essCode =="EK") |essCode =="PG" essCode =="PY" |essCode =="PZ"
-            if ((kv.second->getCatLayer()==TypeLayer::FEE) & (essCode =="PG" )){
-
-                aACA.carteAptFEE(dico.getEss(kv.second->EssCode()),kv.second->getPathTif(),true);
-
-                //aOut=dico.Files()->at("OUTDIR")+"aptitudeCS_"+kv.first+".tif";
-                //aACA.carteAptCS(&kv.second,kv.second.NomCarteAptCS(),false);
-
-                // compression
-                //aACA.compressTif(kv.second.NomCarteAptCS());
-                aACA.compressTif(kv.second->getPathTif());
-
-                // creation des tuiles png pour utilisation dans openlayer
-                //aACA.createTile(kv.second.NomCarteAptFEE(),kv.second.NomDirTuileAptFEE(),Apt,true);
-                // aACA.createTile(kv.second.NomCarteAptCS(),kv.second.NomDirTuileAptCS(),Apt);
-
-                //DicoVal=dico->code2AptFull();
-                //DicoCol=dico->codeApt2col();
-                //aACA.codeMapServer(kv.second.shortNomCarteAptFEE(),kv.second.NomMapServerLayer(),kv.second.NomMapServerLayerFull(),aFileCodeMS,Apt);
-                if (exists(kv.second.NomCarteAptFEE())){
-          * std::string aFileCodeMS("/home/lisein/Documents/carteApt/autres/mapserver/mapCS.map");
-            aACA.codeMapServer(kv.second.shortNomCarteAptCS(),kv.second.NomMapServerLayerCS(),kv.second.NomMapServerLayerFull(),aFileCodeMS,Apt);
-         }
-            }
-        }
-*/
-
-        //std::string aFileCodeMS("/home/lisein/Documents/carteApt/autres/mapserver/mapKKCS.map");
-        //for (auto & kv : aMKKs){
-        //aACA.carteKKCS(&kv.second,kv.second.NomCarte(),false);
-        //aACA.createTile(kv.second.NomCarte(),kv.second.NomDirTuile(),kv.second.Type());
-        //aACA.compressTif(kv.second.NomCarte());
-        //   cKKCS KK=kv.second;
-        //aACA.codeMapServer(KK.shortNomCarte(),KK.NomMapServerLayer(),KK.NomMapServerLayerFull(),aFileCodeMS, KK.getDicoValPtr(),KK.getDicoCol());
     }
+      //DicoVal=dico->code2AptFull();
+      //DicoCol=dico->codeApt2col();
+      //aACA.codeMapServer(kv.second.shortNomCarteAptFEE(),kv.second.NomMapServerLayer(),kv.second.NomMapServerLayerFull(),aFileCodeMS,Apt);
 
-
-
-
-
+          std::string aFileCodeMS("/home/lisein/Documents/carteApt/autres/mapserver/mapCS.map");
+            aACA.codeMapServer(kv.second.shortNomCarteAptCS(),kv.second.NomMapServerLayerCS(),kv.second.NomMapServerLayerFull(),aFileCodeMS,Apt);
+        //std::string aFileCodeMS("/home/lisein/Documents/carteApt/autres/mapserver/mapKKCS.map");
+        //aACA.codeMapServer(KK.shortNomCarte(),KK.NomMapServerLayer(),KK.NomMapServerLayerFull(),aFileCodeMS, KK.getDicoValPtr(),KK.getDicoCol());
     // compression gdal des cartes input
-    /*for (auto & kv : *dico.Files()){
+    for (auto & kv : *dico.Files()){
         std::string path=kv.second;
         if (path.substr(path.size()-3,path.size())=="tif"){
             aACA.compressTif(path);
             }
         }
-        */
-
-    //aACA.tiletoPNG("/home/lisein/Documents/carteApt/tutoWtANDOpenlayer/build-WebAptitude/test");
-
+     */
     // creation des tuiles pour le MNH photogrammétrique qui est en 2 mètres de résolution -- pas comme les autres cartes!
     //aACA.createTile("/home/lisein/Documents/carteApt/GIS/mnh_2019.tif","/home/lisein/Documents/carteApt/Forestimator/build-WebAptitude/Tuiles/MNH2019",MNH2019,true);
 
-
-
+    std::cout << "done" << std::endl;
     return 0;
 }
 
@@ -255,7 +210,7 @@ void matriceApt(cDicoApt * dico, std::string aFile, int RN){
 
                     std::string codeEss=kv_ess.first;
 
-                   // if (codeEss=="AG" | codeEss=="AP" |  codeEss=="EP" ){
+                    // if (codeEss=="AG" | codeEss=="AP" |  codeEss=="EP" ){
                     // on veut l'aptitude hydro-trophique, pas celle hierarchique Bioclim/HydroTroph.
                     int AptHT=Ess->getApt(codeNT,codeNH,RN,false);
                     int AptBIO=Ess->getApt(RN);
@@ -271,22 +226,22 @@ void matriceApt(cDicoApt * dico, std::string aFile, int RN){
 
                     if( dico->AptNonContraignante(AptBIO)==1 | dico->AptNonContraignante(AptBIO)==2 | dico->AptNonContraignante(AptBIO)==3| dico->AptNonContraignante(AptBIO)==11){
 
-                    //switch(dico->AptNonContraignante(Apt)){
-                    switch(dico->AptNonContraignante(AptHT)){
-                    case 1:
-                        O.emplace(std::make_pair(codeEss,apts));
-                        break;
-                    case 2:
-                        T.emplace(std::make_pair(codeEss,apts));
-                        break;
-                        // FN veux afficher l'essence en tolérance si indéterminé, avec 1 astérisque.
-                    case 11:
-                        T.emplace(std::make_pair(codeEss,apts));
-                        break;
-                    case 3:
-                        TE.emplace(std::make_pair(codeEss,apts));
-                        break;
-                    }
+                        //switch(dico->AptNonContraignante(Apt)){
+                        switch(dico->AptNonContraignante(AptHT)){
+                        case 1:
+                            O.emplace(std::make_pair(codeEss,apts));
+                            break;
+                        case 2:
+                            T.emplace(std::make_pair(codeEss,apts));
+                            break;
+                            // FN veux afficher l'essence en tolérance si indéterminé, avec 1 astérisque.
+                        case 11:
+                            T.emplace(std::make_pair(codeEss,apts));
+                            break;
+                        case 3:
+                            TE.emplace(std::make_pair(codeEss,apts));
+                            break;
+                        }
                     }
                 }
 
@@ -326,7 +281,7 @@ void matriceApt(cDicoApt * dico, std::string aFile, int RN){
                             essCode=essCode+"*";
                             //std::cout << "double aptitude pour " << essCode << " , RN " << RN << std::endl;
 
-                             // indéterminé ; on met en tolérance avec astérisque
+                            // indéterminé ; on met en tolérance avec astérisque
                         } else if (AptHT==11 | AptZBIO==11){
                             essCode=essCode+"*";
                         }

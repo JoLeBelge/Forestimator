@@ -7,9 +7,6 @@
 #include "cpl_string.h"
 #include <iostream>
 #include "boost/filesystem.hpp"
-// pour les vecteurs
-//#include "ogrsf_frmts.h"
-//#include "gdal_utils.h"
 
 using namespace std;
 
@@ -18,11 +15,10 @@ inline bool exists (const std::string& name);
 int cleNT(const siglePedo * s, int ZBIO, int TECO, double pH);
 //int cleNT(dbo::ptr<siglePedo> s, int ZBIO, int TECO, double pH);
 
-
 class cAppliCartepH
 {
 public:
-    cAppliCartepH();
+    cAppliCartepH(bool bcarteNT=0, bool bcartepH=0);
     ~cAppliCartepH();
     void cartepH(std::string aOut, bool force=true);
 
@@ -33,17 +29,12 @@ public:
 private:
     int x,y;
 
-    cDicoCartepH * dico;
-    //GDALDataset  * poDatNH;
-    //GDALDataset  * poDatNT;
+    std::unique_ptr<cDicoCartepH> dico;
     GDALDataset  * poDatZBIO;
     GDALDataset  * poDatPTS;
-    //GDALDataset  * poDatTopo;
     GDALRasterBand * ZBIOBand;
     GDALRasterBand * PTSBand;
-    //GDALRasterBand * NHBand;
-    //GDALRasterBand * NTBand;
-    //GDALRasterBand * TopoBand;
+
 };
 
 #endif // CAPPLICARTEPH_H
