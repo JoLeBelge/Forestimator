@@ -13,41 +13,6 @@ panier::panier(AuthApplication *app, cWebAptitude * cWebApt): WContainerWidget()
     //mTable->setWidth(Wt::WLength("90%"));
     mTable->toggleStyleClass("table-striped",true);
 
-    /*
-    WPushButton * bvis;
-
-    // couche de base IGN
-    mTable->elementAt(1, 0)->setContentAlignment(AlignmentFlag::Top | AlignmentFlag::Left);
-    mTable->elementAt(1, 0)->setPadding(5);
-    mTable->elementAt(1, 0)->addWidget(cpp14::make_unique<WText>("Carte IGN"));
-    bIGN = mTable->elementAt(1, 1)->addWidget(cpp14::make_unique<WPushButton>(""));
-    bIGN->setIcon("resources/eye_visible.png");
-    bIGN->addStyleClass("button_carto");
-    bIGN->setCheckable(true);
-    bIGN->setChecked(true);
-    bIGN->clicked().connect([=] {
-        if(bIGN->isChecked())
-            bIGN->setIcon("resources/eye_visible.png");
-        else
-            bIGN->setIcon("resources/eye_notvisible.png");
-        cWebApt->doJavaScript("IGNLayer.setVisible(!IGNLayer.values_.visible);");
-    });
-    mTable->elementAt(1, 2)->setColumnSpan(2);
-    bvis = mTable->elementAt(1, 2)->addWidget(cpp14::make_unique<WPushButton>("T"));
-    bvis->addStyleClass("button_carto");
-    bvis->setToolTip(tr("panier.transparent"));
-    bvis->setCheckable(true);
-    bvis->setChecked(false);
-    bvis->clicked().connect([=] {
-        if(bvis->isChecked())
-            bvis->setText("T");
-        else
-            bvis->setText("O");
-        mcWebAptitude->doJavaScript("IGNLayer.setOpacity(IGNLayer.getOpacity()==1?0.5:1);");
-    });
-    */
-
-
     // extent div si user connecté
     this->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
     Wt::WContainerWidget * mExtentDivGlob = this->addWidget(cpp14::make_unique<WContainerWidget>());
@@ -98,13 +63,18 @@ void panier::addMap(std::string aCode, std::shared_ptr<Layer> l){
     }
 
     if (test){
-        mVLs.push_back(l);
-        int row=mTable->rowCount();
-        mTable->elementAt(row, 0)->setContentAlignment(AlignmentFlag::Top | AlignmentFlag::Left);
-        mTable->elementAt(row, 0)->setPadding(5);
-        mTable->elementAt(row, 0)->addWidget(cpp14::make_unique<WText>(l->Nom()));
-        /* bouton visible/invisible */
-        WPushButton * bvis = mTable->elementAt(row, 1)->addWidget(cpp14::make_unique<WPushButton>(""));
+
+        // je la met au début du vecteur
+        mVLs.insert(mVLs.begin(),l);
+
+        // je met la nouvelle couche en haut du tableau
+
+        Wt::WTableRow * r =mTable->insertRow(0);
+        r->elementAt(0)->setContentAlignment(AlignmentFlag::Top | AlignmentFlag::Left);
+        r->elementAt(0)->setPadding(5);
+        r->elementAt(0)->addWidget(cpp14::make_unique<WText>(l->Nom()));
+                /* bouton visible/invisible */
+        WPushButton * bvis = r->elementAt(1)->addWidget(cpp14::make_unique<WPushButton>(""));
         bvis->addStyleClass("button_carto");
         bvis->setIcon("resources/eye_visible.png");
         bvis->setCheckable(true);
@@ -117,7 +87,7 @@ void panier::addMap(std::string aCode, std::shared_ptr<Layer> l){
             mcWebAptitude->doJavaScript("activeLayers['"+aCode+"'].setVisible(!activeLayers['"+aCode+"'].values_.visible);");
         });
         /* bouton transparent/opaque */
-        bvis = mTable->elementAt(row, 2)->addWidget(cpp14::make_unique<WPushButton>("T"));
+        bvis = r->elementAt(2)->addWidget(cpp14::make_unique<WPushButton>("T"));
         bvis->addStyleClass("button_carto");
         bvis->setToolTip(tr("panier.transparent"));
         bvis->setCheckable(true);
@@ -130,14 +100,14 @@ void panier::addMap(std::string aCode, std::shared_ptr<Layer> l){
             mcWebAptitude->doJavaScript("activeLayers['"+aCode+"'].setOpacity(activeLayers['"+aCode+"'].getOpacity()==1?0.5:1);");
         });
 
+        int row=mTable->rowCount();
         // la première couche n'est pas en transparence.
         if (row==0){
-            //mcWebAptitude->doJavaScript("activeLayers['"+aCode+"'].setOpacity(1);"); // -> le JS se fait dans le fichier JS d'ajout d'activeLayer.
             bvis->setChecked(false);
             bvis->setText("O");
         }
         /* bouton delete la couche */
-        bvis = mTable->elementAt(row, 3)->addWidget(cpp14::make_unique<WPushButton>("x"));
+        bvis =r->elementAt(3)->addWidget(cpp14::make_unique<WPushButton>("x"));
         bvis->addStyleClass("button_carto");
         bvis->setToolTip(tr("panier.delete"));
         bvis->clicked().connect([=] {
@@ -154,10 +124,9 @@ void panier::addMap(std::string aCode, std::shared_ptr<Layer> l){
                         }
                     }
                     // del row in table
-                    mTable->removeRow(i); // attention dangeureux le +1 car 1 couche de base IGN
+                    mTable->removeRow(i);
                     // del layer
                     mcWebAptitude->doJavaScript("map.removeLayer(activeLayers['"+aCode+"']);delete activeLayers['"+aCode+"'];");
-
                     mGroupL->updateLegendeDiv(mVLs);
                 } else {
                     Wt::WMessageBox * messageBox = this->addChild(Wt::cpp14::make_unique<Wt::WMessageBox>("Retirer une carte","<p>Il ne reste que cette couche dans votre sélection</p>",Wt::Icon::Critical,Wt::StandardButton::Ok));
@@ -170,7 +139,7 @@ void panier::addMap(std::string aCode, std::shared_ptr<Layer> l){
             }
         });
         /* boutons deplacer la couche */
-        bvis = mTable->elementAt(row, 4)->addWidget(cpp14::make_unique<WPushButton>(""));
+        bvis = r->elementAt(4)->addWidget(cpp14::make_unique<WPushButton>(""));
         bvis->addStyleClass("button_carto movedown");
         bvis->setToolTip(tr("panier.movedown"));
         bvis->clicked().connect([=] {
@@ -186,15 +155,15 @@ void panier::addMap(std::string aCode, std::shared_ptr<Layer> l){
             mTable->moveRow(i,i+1);
             // move layer
             mcWebAptitude->doJavaScript("moveLayerDown('"+aCode+"');");
-
         });
-        bvis = mTable->elementAt(row, 5)->addWidget(cpp14::make_unique<WPushButton>(""));
+        bvis = r->elementAt(5)->addWidget(cpp14::make_unique<WPushButton>(""));
         bvis->addStyleClass("button_carto moveup");
         bvis->setToolTip(tr("panier.moveup"));
         bvis->clicked().connect([=] {
             if (mVLs.size()==1) return; // skipt 1 element
             int i=0;
             for (i; i<mVLs.size(); i++){
+                //std::cout << "i" << i << ", lay = " << l << std::endl;
                 if(mVLs.at(i)==l){break;}
             }
             if (i==0) return; // skipt first element
@@ -204,7 +173,6 @@ void panier::addMap(std::string aCode, std::shared_ptr<Layer> l){
             mTable->moveRow(i,i-1);
             // move layer
             mcWebAptitude->doJavaScript("moveLayerUp('"+aCode+"');");
-
         });
     }
 
