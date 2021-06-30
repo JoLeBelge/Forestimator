@@ -309,3 +309,30 @@ text-align: left;
 	width: 20px;
 }
 
+.movedown:after {
+  display: inline-block;
+  position: relative;
+  content: "";
+  top: -2px;
+  right: 0;
+  margin-left: 4px;
+  width: 7px;
+  height:7px;
+  transform: rotate(45deg);
+  border-right: 2px solid rgba(0,0,0,.9);
+  border-bottom: 2px solid rgba(0,0,0,.9);
+}
+.moveup:after {
+  display: inline-block;
+  position: relative;
+  content: "";
+  top: 1px;
+  right: 0;
+  margin-left: 2px;
+  width: 7px;
+  height:7px;
+  transform: rotate(45deg);
+  border-left: 2px solid rgba(0,0,0,.9);
+  border-top: 2px solid rgba(0,0,0,.9);
+}
+

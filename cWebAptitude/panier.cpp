@@ -10,7 +10,7 @@ panier::panier(AuthApplication *app, cWebAptitude * cWebApt): WContainerWidget()
     // create table et layer nodes
     mTable = this->addWidget(cpp14::make_unique<WTable>());
     mTable->setHeaderCount(0);
-    mTable->setWidth(Wt::WLength("90%"));
+    //mTable->setWidth(Wt::WLength("90%"));
     mTable->toggleStyleClass("table-striped",true);
 
     /*
@@ -103,6 +103,7 @@ void panier::addMap(std::string aCode, std::shared_ptr<Layer> l){
         mTable->elementAt(row, 0)->setContentAlignment(AlignmentFlag::Top | AlignmentFlag::Left);
         mTable->elementAt(row, 0)->setPadding(5);
         mTable->elementAt(row, 0)->addWidget(cpp14::make_unique<WText>(l->Nom()));
+        /* bouton visible/invisible */
         WPushButton * bvis = mTable->elementAt(row, 1)->addWidget(cpp14::make_unique<WPushButton>(""));
         bvis->addStyleClass("button_carto");
         bvis->setIcon("resources/eye_visible.png");
@@ -115,14 +116,12 @@ void panier::addMap(std::string aCode, std::shared_ptr<Layer> l){
                 bvis->setIcon("resources/eye_notvisible.png");
             mcWebAptitude->doJavaScript("activeLayers['"+aCode+"'].setVisible(!activeLayers['"+aCode+"'].values_.visible);");
         });
-
+        /* bouton transparent/opaque */
         bvis = mTable->elementAt(row, 2)->addWidget(cpp14::make_unique<WPushButton>("T"));
         bvis->addStyleClass("button_carto");
         bvis->setToolTip(tr("panier.transparent"));
         bvis->setCheckable(true);
         bvis->setChecked(true);
-
-
         bvis->clicked().connect([=] {
             if(bvis->isChecked())
                 bvis->setText("T");
@@ -131,42 +130,35 @@ void panier::addMap(std::string aCode, std::shared_ptr<Layer> l){
             mcWebAptitude->doJavaScript("activeLayers['"+aCode+"'].setOpacity(activeLayers['"+aCode+"'].getOpacity()==1?0.5:1);");
         });
 
-
-
-        // la première couche n'est pas en transparence. fonctionne pas, je sais pas pk
-        /*if (row==0){
-            this->doJavaScript("activeLayers['"+aCode+"'].setOpacity(1);");
+        // la première couche n'est pas en transparence.
+        if (row==0){
+            //mcWebAptitude->doJavaScript("activeLayers['"+aCode+"'].setOpacity(1);"); // -> le JS se fait dans le fichier JS d'ajout d'activeLayer.
             bvis->setChecked(false);
             bvis->setText("O");
-        }*/
-
-
-
+        }
+        /* bouton delete la couche */
         bvis = mTable->elementAt(row, 3)->addWidget(cpp14::make_unique<WPushButton>("x"));
         bvis->addStyleClass("button_carto");
         bvis->setToolTip(tr("panier.delete"));
         bvis->clicked().connect([=] {
             Wt::StandardButton answer = Wt::WMessageBox::show("Confirmer","<p>Enlever cette couche de votre sélection ?</p>",Wt::StandardButton::Yes | Wt::StandardButton::No | Wt::StandardButton::Cancel);
             if (answer == Wt::StandardButton::Yes){
-
                 if(mVLs.size()>1){
-                // del in vector
+                    // del in vector
+                    int i=0;
+                    for (i; i<mVLs.size(); i++){
 
-                int i=0;
-                for (i; i<mVLs.size(); i++){
-
-                    if(mVLs.at(i)==l){
-                        mVLs.erase(mVLs.begin()+i);
-                        break;
+                        if(mVLs.at(i)==l){
+                            mVLs.erase(mVLs.begin()+i);
+                            break;
+                        }
                     }
-                }
+                    // del row in table
+                    mTable->removeRow(i); // attention dangeureux le +1 car 1 couche de base IGN
+                    // del layer
+                    mcWebAptitude->doJavaScript("map.removeLayer(activeLayers['"+aCode+"']);delete activeLayers['"+aCode+"'];");
 
-
-                // mTable->removeRow(row); --> cause bug car copie la valeur de row qui en fait n'est pas constante car si je supprime des couche du panier en amont avant de supprimer celle-ci, row  n'as pas la bonne valeur.
-
-                mTable->removeRow(i); // attention dangeureux le +1 car 1 couche de base IGN
-                // del layer
-                mcWebAptitude->doJavaScript("map.removeLayer(activeLayers['"+aCode+"']);delete activeLayers['"+aCode+"'];");
+                    mGroupL->updateLegendeDiv(mVLs);
                 } else {
                     Wt::WMessageBox * messageBox = this->addChild(Wt::cpp14::make_unique<Wt::WMessageBox>("Retirer une carte","<p>Il ne reste que cette couche dans votre sélection</p>",Wt::Icon::Critical,Wt::StandardButton::Ok));
                     messageBox->setModal(true);
@@ -176,6 +168,43 @@ void panier::addMap(std::string aCode, std::shared_ptr<Layer> l){
                     messageBox->show();
                 }
             }
+        });
+        /* boutons deplacer la couche */
+        bvis = mTable->elementAt(row, 4)->addWidget(cpp14::make_unique<WPushButton>(""));
+        bvis->addStyleClass("button_carto movedown");
+        bvis->setToolTip(tr("panier.movedown"));
+        bvis->clicked().connect([=] {
+            if (mVLs.size()==1) return; // skipt 1 element
+            int i=0;
+            for (i; i<mVLs.size(); i++){
+                if(mVLs.at(i)==l){break;}
+            }
+            if (i==mVLs.size()-1) return; // skipt last element
+            // move in vector
+            iter_swap(mVLs.begin() + i, mVLs.begin() + i + 1);
+            // move row in table
+            mTable->moveRow(i,i+1);
+            // move layer
+            mcWebAptitude->doJavaScript("moveLayerDown('"+aCode+"');");
+
+        });
+        bvis = mTable->elementAt(row, 5)->addWidget(cpp14::make_unique<WPushButton>(""));
+        bvis->addStyleClass("button_carto moveup");
+        bvis->setToolTip(tr("panier.moveup"));
+        bvis->clicked().connect([=] {
+            if (mVLs.size()==1) return; // skipt 1 element
+            int i=0;
+            for (i; i<mVLs.size(); i++){
+                if(mVLs.at(i)==l){break;}
+            }
+            if (i==0) return; // skipt first element
+            // move in vector
+            iter_swap(mVLs.begin() + i, mVLs.begin() + i - 1);
+            // move row in table
+            mTable->moveRow(i,i-1);
+            // move layer
+            mcWebAptitude->doJavaScript("moveLayerUp('"+aCode+"');");
+
         });
     }
 

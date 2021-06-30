@@ -620,6 +620,8 @@ detAptFEE
 <message id="panier.header"><h3>Ma sélection de cartes</h3></message>
 <message id="panier.transparent">Transparent / Opaque</message>
 <message id="panier.delete">Enlever cette couche de votre sélection</message>
+<message id="panier.movedown">Déplacer cette couche vers le bas</message>
+<message id="panier.moveup">Déplacer cette couche vers le haut</message>
 
 
 </messages>
