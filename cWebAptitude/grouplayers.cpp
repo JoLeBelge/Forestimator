@@ -59,15 +59,17 @@ groupLayers::groupLayers(AuthApplication *app, cWebAptitude * cWebApt):
     // ajout des nodes pour les groupes de couches
     for (std::string gr :mDico->Dico_groupe){
 
-        auto node1 = Wt::cpp14::make_unique<Wt::WTreeNode>(mDico->groupeLabel(gr));
-         node1->addStyleClass("tree_node");
-         Wt::WTreeNode * n= tree->treeRoot()->addChildNode(std::move(node1));
+        std::unique_ptr<Wt::WTreeNode> node1 = Wt::cpp14::make_unique<Wt::WTreeNode>(mDico->groupeLabel(gr));
+        node1->addStyleClass("tree_node");
+        Wt::WTreeNode * n= tree->treeRoot()->addChildNode(std::move(node1));
+        n->label()->clicked().connect([=]{
+            if(n->isExpanded()){n->collapse();} else {
+                n->expand();}});
 
         if (mDico->groupeExpert(gr)){ this->changeExpertMode().connect(n,&Wt::WTreeNode::setNodeVisible);}
         aMNodes.emplace(gr, n);
     }
 
-    //node0_->expand();
 
     // ajout des cartes
     for (auto & pair :mDico->VlayerBase()){
@@ -84,10 +86,8 @@ groupLayers::groupLayers(AuthApplication *app, cWebAptitude * cWebApt):
                 // 2) création de la couche
                 std::shared_ptr<Layer> aL=std::make_shared<Layer>(this,aLB,wtext);
                 // 3) ajout des interactions
-                TypeLayer type= aL->getCatLayer();
                 std::string aCode=aL->Code();
-                //wtext->clicked().connect([this,aCode,type]{clickOnName(aCode,type);});
-                wtext->doubleClicked().connect([this,aCode,type]{clickOnName(aCode,type);});
+                wtext->doubleClicked().connect([this,aCode]{clickOnName(aCode);});
                 aL->changeExpertMode().connect(n,&Wt::WTreeNode::setNodeVisible);
                 mVLs.push_back(aL);
             } else {
@@ -134,30 +134,29 @@ groupLayers::~groupLayers(){
 }
 
 
-void groupLayers::update(std::string aCode, TypeLayer type){
+void groupLayers::updateActiveLay(std::string aCode){
     //std::cout << " group Layers je vais faire un update du rendu visuel de chacun des label de couche \n\n\n" << std::endl;
     // désactiver toutes les couches actives et changer le rendu du label
     for (std::shared_ptr<Layer> l : mVLs){
-        l->setActive(aCode==l->Code() && type==l->getCatLayer());
+        l->setActive(aCode==l->Code());
     }
-    //std::cout << "update done " << std::endl;
 }
 
-void groupLayers::clickOnName(std::string aCode, TypeLayer type){
+void groupLayers::clickOnName(std::string aCode){
 
     //std::cout << " j'ai cliqué sur un label " << aCode <<  "\n\n"<< std::endl;
     // udpate du rendu visuel de tout les labels de couches -- cela se situe au niveau du grouplayer
-    update(aCode, type);
+    updateActiveLay(aCode);
 
+    TypeLayer type;
     std::shared_ptr<Layer> layer;
     for (std::shared_ptr<Layer> l : mVLs){
-        if(aCode==l->Code() && type==l->getCatLayer()){
+        if(aCode==l->Code()){
             layer=l;
+            type==l->getCatLayer();
             break;
         }
     }
-
-
 
     // cacher la fenetre popup
     mParent->doJavaScript("overlay.setVisible(0);");
@@ -169,7 +168,7 @@ void groupLayers::clickOnName(std::string aCode, TypeLayer type){
 
     // ajouter la couche à la carte
     for (std::shared_ptr<Layer> l : mVLs){
-        if (l->IsActive()){ //&& type==l->Type()){
+        if (l->IsActive()){
             l->displayLayer();
             break;
         }
@@ -330,7 +329,6 @@ void groupLayers::updateGL(){
     }
     // pour cacher les noeuds racines , celui "aptitude CS"
     expertMode_.emit(expertMode);
-
 
 }
 

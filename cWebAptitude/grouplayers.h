@@ -98,13 +98,12 @@ class groupLayers: public WContainerWidget, public groupStat
 public:
     groupLayers(AuthApplication* app, cWebAptitude * cWebApt);
     ~groupLayers();
-    /*groupLayers(const groupLayers &gl){
-        std::cout << "construct by copy group layer -- should never happend\n\n\n" << std::endl;
-    }*/
-    void clickOnName(std::string aCode, TypeLayer type);
+
+    void clickOnName(std::string aCode);
 
     // update du rendu du nom de la couche qui est sélectionnée
-    void update(std::string aCode, TypeLayer type);
+     // gestion de la carte active ; celle qui est en haut du panier
+    void updateActiveLay(std::string aCode);
     // update pour passer du mode expert au mode non expert et vice et versa
     void updateGL();
     // click de l'utilisateur sur la carte pour extraire les valeurs des raster pour une position donnée
@@ -167,6 +166,7 @@ public:
     // gestion de la légende de la carte
     void updateLegendeDiv(std::vector<std::shared_ptr<Layer>> layers);
     void updateLegende(const std::shared_ptr<Layer> l);
+
     Wt::WContainerWidget * mLegendDiv;
     Wt::WContainerWidget * mExtentDivGlob; // le glob contient le boutton et le extentDiv
     Wt::WContainerWidget * mExtentDiv;

@@ -197,8 +197,6 @@ cWebAptitude::cWebAptitude(AuthApplication *app, Auth::AuthWidget* authWidget_)
     mGroupLayerW  = content_catalog;
     mGroupLayerW->setStyleClass("content_GL");
 
-
-
     /* CHARGE ONGLET COUCHES & SIMPLEPOINT */
     printf("create GL\n");
     mGroupL = new groupLayers(mApp,this);
@@ -207,7 +205,7 @@ cWebAptitude::cWebAptitude(AuthApplication *app, Auth::AuthWidget* authWidget_)
     mPanier = content_panier->addWidget(Wt::cpp14::make_unique<panier>(mApp, this));
     mGroupL->updateGL();
     // des couches que l'on souhaite voir dans le panier dès le départ
-    mGroupL->clickOnName("IGN",TypeLayer::Externe);
+    mGroupL->clickOnName("IGN");
 
     statWindow * page_camembert = top_stack->addNew<statWindow>(mGroupL);
 
@@ -233,8 +231,6 @@ cWebAptitude::cWebAptitude(AuthApplication *app, Auth::AuthWidget* authWidget_)
 
     content_cadastre->sendPolygone().connect(std::bind(&parcellaire::polygoneCadastre,mPA,std::placeholders::_1));
 
-
-
     mApp->internalPathChanged().connect(this, &cWebAptitude::handlePathChange);
 
     // force first route
@@ -256,7 +252,6 @@ void cWebAptitude::load_content_couches(WContainerWidget * content){
  */
 void cWebAptitude::handlePathChange()
 {
-
 
     std::size_t found = mApp->internalPath().find("/documentation");
     if (mApp->internalPath() == "/documentation" | found!=std::string::npos){

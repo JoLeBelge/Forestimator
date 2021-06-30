@@ -63,12 +63,9 @@ void panier::addMap(std::string aCode, std::shared_ptr<Layer> l){
     }
 
     if (test){
-
         // je la met au début du vecteur
         mVLs.insert(mVLs.begin(),l);
-
         // je met la nouvelle couche en haut du tableau
-
         Wt::WTableRow * r =mTable->insertRow(0);
         r->elementAt(0)->setContentAlignment(AlignmentFlag::Top | AlignmentFlag::Left);
         r->elementAt(0)->setPadding(5);
@@ -128,6 +125,7 @@ void panier::addMap(std::string aCode, std::shared_ptr<Layer> l){
                     // del layer
                     mcWebAptitude->doJavaScript("map.removeLayer(activeLayers['"+aCode+"']);delete activeLayers['"+aCode+"'];");
                     mGroupL->updateLegendeDiv(mVLs);
+                    mGroupL->updateActiveLay(mVLs.at(0)->Code());
                 } else {
                     Wt::WMessageBox * messageBox = this->addChild(Wt::cpp14::make_unique<Wt::WMessageBox>("Retirer une carte","<p>Il ne reste que cette couche dans votre sélection</p>",Wt::Icon::Critical,Wt::StandardButton::Ok));
                     messageBox->setModal(true);
@@ -154,7 +152,8 @@ void panier::addMap(std::string aCode, std::shared_ptr<Layer> l){
             // move row in table
             mTable->moveRow(i,i+1);
             // move layer
-            mcWebAptitude->doJavaScript("moveLayerDown('"+aCode+"');");
+            mcWebAptitude->doJavaScript("moveLayerUp('"+aCode+"');");
+            mGroupL->updateActiveLay(mVLs.at(0)->Code());
         });
         bvis = r->elementAt(5)->addWidget(cpp14::make_unique<WPushButton>(""));
         bvis->addStyleClass("button_carto moveup");
@@ -172,7 +171,8 @@ void panier::addMap(std::string aCode, std::shared_ptr<Layer> l){
             // move row in table
             mTable->moveRow(i,i-1);
             // move layer
-            mcWebAptitude->doJavaScript("moveLayerUp('"+aCode+"');");
+             mcWebAptitude->doJavaScript("moveLayerDown('"+aCode+"');");
+             mGroupL->updateActiveLay(mVLs.at(0)->Code());
         });
     }
 
