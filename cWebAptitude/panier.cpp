@@ -10,7 +10,7 @@ panier::panier(AuthApplication *app, cWebAptitude * cWebApt): WContainerWidget()
     // create table et layer nodes
     mTable = this->addWidget(cpp14::make_unique<WTable>());
     mTable->setHeaderCount(0);
-    mTable->setWidth(Wt::WLength("90%"));
+    //mTable->setWidth(Wt::WLength("90%"));
     mTable->toggleStyleClass("table-striped",true);
 
     /*
@@ -157,6 +157,8 @@ void panier::addMap(std::string aCode, std::shared_ptr<Layer> l){
                     mTable->removeRow(i); // attention dangeureux le +1 car 1 couche de base IGN
                     // del layer
                     mcWebAptitude->doJavaScript("map.removeLayer(activeLayers['"+aCode+"']);delete activeLayers['"+aCode+"'];");
+
+                    mGroupL->updateLegendeDiv(mVLs);
                 } else {
                     Wt::WMessageBox * messageBox = this->addChild(Wt::cpp14::make_unique<Wt::WMessageBox>("Retirer une carte","<p>Il ne reste que cette couche dans votre sélection</p>",Wt::Icon::Critical,Wt::StandardButton::Ok));
                     messageBox->setModal(true);
@@ -168,7 +170,42 @@ void panier::addMap(std::string aCode, std::shared_ptr<Layer> l){
             }
         });
         /* boutons deplacer la couche */
-        // TODO now
+        bvis = mTable->elementAt(row, 4)->addWidget(cpp14::make_unique<WPushButton>(""));
+        bvis->addStyleClass("button_carto movedown");
+        bvis->setToolTip(tr("panier.movedown"));
+        bvis->clicked().connect([=] {
+            if (mVLs.size()==1) return; // skipt 1 element
+            int i=0;
+            for (i; i<mVLs.size(); i++){
+                if(mVLs.at(i)==l){break;}
+            }
+            if (i==mVLs.size()-1) return; // skipt last element
+            // move in vector
+            iter_swap(mVLs.begin() + i, mVLs.begin() + i + 1);
+            // move row in table
+            mTable->moveRow(i,i+1);
+            // move layer
+            mcWebAptitude->doJavaScript("moveLayerDown('"+aCode+"');");
+
+        });
+        bvis = mTable->elementAt(row, 5)->addWidget(cpp14::make_unique<WPushButton>(""));
+        bvis->addStyleClass("button_carto moveup");
+        bvis->setToolTip(tr("panier.moveup"));
+        bvis->clicked().connect([=] {
+            if (mVLs.size()==1) return; // skipt 1 element
+            int i=0;
+            for (i; i<mVLs.size(); i++){
+                if(mVLs.at(i)==l){break;}
+            }
+            if (i==0) return; // skipt first element
+            // move in vector
+            iter_swap(mVLs.begin() + i, mVLs.begin() + i - 1);
+            // move row in table
+            mTable->moveRow(i,i-1);
+            // move layer
+            mcWebAptitude->doJavaScript("moveLayerUp('"+aCode+"');");
+
+        });
     }
 
 }

@@ -5,6 +5,7 @@
 #include "wopenlayers.h"
 #include "layer.h"
 #include "grouplayers.h"
+#include <algorithm>
 
 class panier: public WContainerWidget
 {

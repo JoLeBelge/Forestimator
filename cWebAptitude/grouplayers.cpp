@@ -171,12 +171,12 @@ void groupLayers::clickOnName(std::string aCode, TypeLayer type){
     for (std::shared_ptr<Layer> l : mVLs){
         if (l->IsActive()){ //&& type==l->Type()){
             l->displayLayer();
-            updateLegendeDiv(mcWebAptitude->mPanier->mVLs);
             break;
         }
     }
     // ajout de la carte après le "diplaylayer" sinon ordre du code js pas bon? ben oui car couche pas encore dans activeLayers[]
-     mcWebAptitude->mPanier->addMap(aCode, layer);
+    mcWebAptitude->mPanier->addMap(aCode, layer);
+    updateLegendeDiv(mcWebAptitude->mPanier->mVLs);
 }
 
 /**

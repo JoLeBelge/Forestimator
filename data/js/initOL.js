@@ -325,3 +325,50 @@ updateGroupeLayers = function(){
 	map.setLayerGroup(groupe);
 }
 
+moveLayerDown = function(code){
+	let a={};
+	let tmpv,tmpk;
+	let loop=true;
+	for (const [key, value] of Object.entries(activeLayers)){
+		if(!loop){
+			a[key]=value
+			a[tmpk]=tmpv;
+		}
+		if(code==key)loop=false;
+		else a[key]=value;
+
+		tmpk=key;
+		tmpv=value;		
+	};	
+	activeLayers=a;
+	updateGroupeLayers();
+}
+
+moveLayerUp = function(code){
+	let a={};
+	let tmpv,tmpk;
+	let loop=true;
+	let first=true;
+	for (const [key, value] of Object.entries(activeLayers)){
+
+		if(!loop){
+			loop=true;
+		}else if(code==key){			
+			a[key]=value
+			a[tmpk]=tmpv;
+			loop=false;
+		}
+		else{
+			if(!first)a[tmpk]=tmpv; // skip first element
+		}
+
+		tmpk=key;
+		tmpv=value;
+		if(first)first=false;
+	};	
+	// add last elem if any
+	if(loop) a[tmpk]=tmpv;
+	activeLayers=a;	
+	updateGroupeLayers();
+}
+
