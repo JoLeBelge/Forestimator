@@ -42,7 +42,7 @@ public:
 class Analytics
 {
 public:
-    Analytics();
+    Analytics(std::string aFileDB);
     //Analytics(const std::string &sqliteDb);
 
     void addLog(const Wt::WEnvironment &env, int user_id);

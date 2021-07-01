@@ -57,8 +57,7 @@ int main(int argc, char **argv)
         // see paypal example
 
         // stats trafic web
-        Analytics anal;
-        //anal = new Analytics("/data1/Forestimator/data/analytics.db");
+        Analytics anal(dico->File("docroot")+"analytics.db");
 
         server.addEntryPoint(Wt::EntryPointType::Application, std::bind(&createAuthApplication,std::placeholders::_1, dico, &anal));
 

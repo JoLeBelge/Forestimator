@@ -5,10 +5,11 @@
 
 
 
-Analytics::Analytics() : session()
+Analytics::Analytics(std::string aFileDB) : session()
 {
     //auto sqlite3 = Wt::cpp14::make_unique<dbo::backend::Sqlite3>(sqliteDb);
-    auto sqlite3 = Wt::cpp14::make_unique<dbo::backend::Sqlite3>("/data1/Forestimator/data/analytics.db");
+    //auto sqlite3 = Wt::cpp14::make_unique<dbo::backend::Sqlite3>("/data1/Forestimator/data/analytics.db");
+    auto sqlite3 = Wt::cpp14::make_unique<dbo::backend::Sqlite3>(aFileDB);
     sqlite3->setProperty("show-queries", "false");
 
     session.setConnection(std::move(sqlite3));
