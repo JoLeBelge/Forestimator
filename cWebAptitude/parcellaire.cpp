@@ -372,6 +372,7 @@ void parcellaire::upload(){
         msg->setText("Téléchargement du shp effectué avec succès.");
          std::cout << "Téléchargement du shp effectué avec succès.. " << std::endl ;
         if (to31370AndGeoJson()){
+            mGL->m_app->addLog("upload a shp"); // add some web stats
             if (computeGlobalGeom()){
                 hasValidShp=true;
                 //computeStatButton->enable();

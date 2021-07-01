@@ -20,11 +20,8 @@ AuthApplication::AuthApplication(const Wt::WEnvironment& env, cDicoApt *dico, An
     root()->setMargin(0);
     root()->setPadding(0);
 
-    //layout->addWidget(std::move(authWidget));
     layout->addWidget(std::move(loadAuthWidget()));
 
-    //std::unique_ptr<cWebAptitude> WebApt = Wt::cpp14::make_unique<cWebAptitude>(this, authWidget_);
-    //cWebApt = layout->addWidget(std::move(WebApt), 0);
     cWebApt = layout->addWidget(Wt::cpp14::make_unique<cWebAptitude>(this, authWidget_));
 
     // stats web
@@ -32,7 +29,7 @@ AuthApplication::AuthApplication(const Wt::WEnvironment& env, cDicoApt *dico, An
         const Wt::Auth::User& u = session_.login().user();
         anal->addLog(env,atol(u.id().c_str()));
     }else
-        anal->addLog(env,-1);
+        anal->addLog(env);
 
     root()->addStyleClass("layout_main");
     loaded_=true;
@@ -142,4 +139,12 @@ void AuthApplication::logout(){
 
 Wt::Auth::User AuthApplication::getUser(){
     return session_.login().user();
+}
+
+void AuthApplication::addLog(std::string page){
+    if (session_.login().loggedIn()) {
+        const Wt::Auth::User& u = session_.login().user();
+        mAnal->addLog(this->environment(),atol(u.id().c_str()), page);
+    }else
+        mAnal->addLog(this->environment(), page);
 }

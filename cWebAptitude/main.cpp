@@ -96,7 +96,7 @@ std::unique_ptr<Wt::WApplication> createAuthApplication(const Wt::WEnvironment &
     }else{
         std::cout << "internal path pas geré : " << env.internalPath() << std::endl;
 
-        anal->addLog(env,-1);
+        anal->addLog(env);
 
         auto app404 = Wt::cpp14::make_unique<Wt::WApplication>(env);
         auto theme = std::make_shared<Wt::WBootstrapTheme>();

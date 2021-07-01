@@ -102,9 +102,6 @@ groupLayers::groupLayers(AuthApplication *app, cWebAptitude * cWebApt):
 
     mParent->addWidget(cpp14::make_unique<WText>(tr("coucheStep1")));
     mParent->addWidget(std::move(tree));
-    /*Wt::WText * t =mParent->addWidget(cpp14::make_unique<WText>(tr("coucheStep2")));
-    t->setToolTip(tr("coucheStep2.infoBulle"));*/
-
 
     //mSelect4Stat= new selectLayers4Stat(this);
     mSelectLayers= new selectLayers(this);
@@ -443,6 +440,7 @@ void groupLayers::exportLayMapView(){
             //std::unique_ptr<WFileResource> fileResource = std::make_unique<Wt::WFileResource>("plain/text",archiveFileName);
             WFileResource * fileResource = new Wt::WFileResource("plain/text",archiveFileName);
             fileResource->suggestFileName(mClientName+".zip");
+            m_app->addLog("Download map layer"); // add some web stats
             m_app->redirect(fileResource->url());
         } else {
             Wt::WMessageBox * messageBox = this->addChild(Wt::cpp14::make_unique<Wt::WMessageBox>(
@@ -674,6 +672,7 @@ void groupLayers::saveExtent(double c_x, double c_y, double zoom){
 
     closeConnection();
     loadExtents(id);
+    m_app->addLog("save an extent"); // add some web stats
 }
 
 void groupLayers::deleteExtent(std::string id){
@@ -685,6 +684,7 @@ void groupLayers::deleteExtent(std::string id){
 
     closeConnection();
     loadExtents(id);
+    m_app->addLog("delete an extent"); // add some web stats
 }
 /** FIN extents **/
 

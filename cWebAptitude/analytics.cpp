@@ -25,7 +25,7 @@ Analytics::Analytics(std::string aFileDB) : session()
 
 }
 
-void Analytics::addLog(const Wt::WEnvironment& env, int user_id){
+void Analytics::addLog(const Wt::WEnvironment &env, int user_id, std::string page){
 
     dbo::Transaction transaction{session};
 
@@ -33,9 +33,11 @@ void Analytics::addLog(const Wt::WEnvironment& env, int user_id){
     log->datum = time(0);
     log->ip = env.clientAddress();
     log->client = env.userAgent();
-    log->ipath = env.internalPath();
+    log->ipath = page;
     log->id_user = user_id;
 
     dbo::ptr<Log> logPtr = session.add(std::move(log));
+
+
 
 }

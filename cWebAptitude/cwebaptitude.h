@@ -29,6 +29,7 @@
 
 #include "presentationpage.h"
 #include "panier.h"
+#include "analytics.h"
 
 class AuthApplication;
 class parcellaire;

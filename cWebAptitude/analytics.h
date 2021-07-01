@@ -9,7 +9,7 @@
 #include <Wt/WDateTime.h>
 #include <Wt/WApplication.h>
 #include <Wt/WEnvironment.h>
-
+#include <Wt/WString.h>
 #include <string>
 
 namespace dbo = Wt::Dbo;
@@ -45,7 +45,10 @@ public:
     Analytics(std::string aFileDB);
     //Analytics(const std::string &sqliteDb);
 
-    void addLog(const Wt::WEnvironment &env, int user_id);
+    void addLog(const Wt::WEnvironment &env, int user_id, std::string page);
+    void addLog(const Wt::WEnvironment &env, int user_id){addLog(env,user_id,env.internalPath());}
+    void addLog(const Wt::WEnvironment &env, std::string page){addLog(env,-1,page);}
+    void addLog(const Wt::WEnvironment &env){addLog(env,-1,env.internalPath());}
 
     dbo::Session session;
 };

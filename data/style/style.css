@@ -336,3 +336,17 @@ text-align: left;
   border-top: 2px solid rgba(0,0,0,.9);
 }
 
+code{
+	color: #286f14;
+	background-color: transparent;
+}
+.alert {
+    padding: 3px;
+}
+.ol-popup ul{
+	padding-left: 15px;
+}
+.panier_table tr:first-child {
+	font-weight: bold;
+}
+

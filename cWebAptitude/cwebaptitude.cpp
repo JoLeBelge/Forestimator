@@ -257,50 +257,27 @@ void cWebAptitude::handlePathChange()
     if (mApp->internalPath() == "/documentation" | found!=std::string::npos){
         top_stack->setCurrentIndex(0);
         menuitem_documentation->select();
-        //sub_stack->setCurrentIndex(1);
         navigation->setTitle(tr("titre.presentation"));
         mApp->addMetaHeader("description", tr("desc.pres"), "fr");
-        /*}else if (m_app->internalPath() == "/home"){
-        top_stack->setCurrentIndex(0);*/
         mApp->addMetaHeader("description", tr("desc.home"), "fr");
-
         showDialogues(0);
     }else if (mApp->internalPath() == "/cartographie" || mApp->internalPath() == "/"){
         top_stack->setCurrentIndex(1);
-        //stack_info->setCurrentIndex(1);
         menuitem_app->select();
-        //sub_stack->setCurrentIndex(0);
         navigation->setTitle(tr("titre.carto"));
         mApp->addMetaHeader("description", tr("desc.carto"), "fr");
-        /*}else if (m_app->internalPath() == "/analyse"){
-        top_stack->setCurrentIndex(1);
-        //stack_info->setCurrentIndex(2);
-        menuitem_analyse->select();
-        //sub_stack->setCurrentIndex(0);
-        navigation->setTitle(tr("titre.ana.surf"));
-        m_app->addMetaHeader("description", tr("desc.surf"), "fr");
-    }else if (m_app->internalPath() == "/point"){
-        top_stack->setCurrentIndex(1);
-        //stack_info->setCurrentIndex(0);
-        menuitem_simplepoint->select();
-        //sub_stack->setCurrentIndex(0);
-        navigation->setTitle(tr("titre.ana.point"));
-        m_app->addMetaHeader("description", tr("desc.point"), "fr");*/
-
-         showDialogues(1);
+        showDialogues(1);
     }else if (mApp->internalPath() == "/resultat"){
         top_stack->setCurrentIndex(2);
-        //sub_stack->setCurrentIndex(2);
-         showDialogues(0);
+        showDialogues(0);
     }else if (mApp->internalPath() == "/parametres"){
         mApp->doJavaScript("alert('Pas encore implémenté...')");
-         showDialogues(0);
+        showDialogues(0);
     }else{
         std::cout << "m_app->internalPath() " << mApp->internalPath() << std::endl;
         std::cout << "internal path pas geré dans le handler " << mApp->internalPath() << std::endl;
     }
-    //m_app->removeMetaHeader(Wt::MetaHeaderType::Meta, "robots");
-    //m_app->addMetaHeader("robots", "index, follow", "fr");
+    mApp->addLog(mApp->internalPath());
 
     // TODO css min-size [menu_analyse] display:none if width<900
     // TODO css @media-width<1200 -> map 60%  @media-width<900 -> [div stack] display:blocks et overflow:auto [map] width:90%  [linfo] min-height: 600px;
@@ -316,7 +293,7 @@ dialog::dialog(const WString& windowTitle,Wt::WMenuItem * aMenu):WDialog(windowT
     contents()->setOverflow(Overflow::Scroll);
     setClosable(true);
 
-   // faire les liens entre le boutton menu et l'affichage de la fenetre
+    // faire les liens entre le boutton menu et l'affichage de la fenetre
     finished().connect([=] {mMenu->decorationStyle().setBackgroundColor(col_not_sel); mShow=0;});
 
     mMenu->clicked().connect([=] {

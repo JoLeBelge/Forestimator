@@ -10,6 +10,7 @@ panier::panier(AuthApplication *app, cWebAptitude * cWebApt): WContainerWidget()
     // create table et layer nodes
     mTable = this->addWidget(cpp14::make_unique<WTable>());
     mTable->setHeaderCount(0);
+    mTable->addStyleClass("panier_table");
     //mTable->setWidth(Wt::WLength("90%"));
     mTable->toggleStyleClass("table-striped",true);
 

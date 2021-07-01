@@ -57,6 +57,7 @@ public:
     void logout();
     Wt::Auth::User getUser();
     cDicoApt * getDico(){return mDico;}
+    void addLog(std::string page);   // ajoute un record aux stat web
 
     Wt::Auth::AuthWidget* authWidget_;
     cDicoApt * mDico;
