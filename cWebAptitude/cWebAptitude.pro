@@ -8,7 +8,7 @@ QT += sql
 #QMAKE_CXXFLAGS += -ggdb3 # pour utiliser valgrind et pointer la ligne du code qui va pas
 QMAKE_CXXFLAGS += -g
 
-#CONFIG += c++11
+CONFIG += c++17
 
 #-lboost_thread
 LIBS = -lgdal -lwthttp -lwt -lboost_system -lboost_iostreams  -lboost_filesystem -lboost_program_options -lcrypt -pthread -lwtdbo -lwtdbosqlite3 -lzip -lhpdf -lsqlite3

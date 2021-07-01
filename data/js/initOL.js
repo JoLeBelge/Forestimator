@@ -299,7 +299,6 @@ refreshLayers = function (){
  **/
 updateGroupeLayers = function(){
 	let l = [];
-	//l.push(IGNLayer);
 	for (const [key, value] of Object.entries(activeLayers)){
 		l.push(value);
 	};	

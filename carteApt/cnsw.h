@@ -33,22 +33,27 @@ class surfPedo;
 
 namespace fs = boost::filesystem ;
 
-enum class PEDO { DRAINAGE,
-                  TEXTURE,
-                  PROFONDEUR
-                };
+//enum class PEDO { DRAINAGE,
+enum  PEDO {
+    SIGLE,
+    DRAINAGE,
+    TEXTURE,
+    PROFONDEUR,
+    CHARGE,
+    Last// pour itérer sur les enum
+};
 
 class dicoPedo
 {
 
 public:
     // deux constructeur ; un qui recoit un pointeur vers un BD déjà ouverte, l'autre qui reçcois le chemin d'accès et qui l'ouvre
-   // dicoPedo(std::string aBDFile);
+    // dicoPedo(std::string aBDFile);
     dicoPedo(sqlite3 *db);
 
     void loadInfo();
-    void closeConnection();
-    int openConnection();
+    //void closeConnection();
+    //int openConnection();
     std::string sIdToSigleStr(int aCode){
         std::string aRes("/");
         if (sigleIdToSigleStr.find(aCode)!=sigleIdToSigleStr.end()){aRes=sigleIdToSigleStr.at(aCode);}
@@ -83,8 +88,21 @@ public:
         if (sToPhase1.find(aCode)!=mPhase.end()){aRes=mPhase.at(aCode);}
         return aRes;
     }*/
-
-
+    std::string chargeSigle(int aCode){
+        std::string aRes("");
+        if (sToCharge.find(aCode)!=sToCharge.end()){aRes=sToCharge.at(aCode);}
+        return aRes;
+    }
+    std::string charge(int aCode){
+        std::string aRes("/");
+        if (sToCharge.find(aCode)!=sToCharge.end()){
+            std::string sigleCharge=sToCharge.at(aCode);
+           if (mCharge.find(sigleCharge)!=mCharge.end()){
+            aRes=mCharge.at(sigleCharge);
+           }
+        }
+        return aRes;
+    }
 
     std::string Drainage(std::string aText,std::string aDrainage){
         std::string aRes("/");
@@ -138,6 +156,9 @@ private:
     // Phase vers description
     std::map<std::vector<std::string>,std::string> mPhase;
 
+    // sigle vers description
+    std::map<std::string,std::string> mCharge;
+
 
     std::map<int,std::string> sigleIdToSigleStr;
     // index du sigle vers code Texture, drainage, ect
@@ -151,6 +172,8 @@ private:
     std::map<int,std::string> sToPhase6;
     std::map<int,std::string> sToPhase7;
 
+    std::map<int,std::string> sToCharge;
+
 };
 
 class cnsw : public std::enable_shared_from_this<cnsw>,public dicoPedo
@@ -160,28 +183,31 @@ public:
     cnsw(sqlite3 *db);
     std::vector<std::string> displayInfo(double x, double y,PEDO p);
 
-     // void loadCNSW(); j'avais testé l'action d'ouvrir une seule fois la couche (dataset est membre de cnsw) pour voir l'impact sur les ressources en mémoire du soft
+    // void loadCNSW(); j'avais testé l'action d'ouvrir une seule fois la couche (dataset est membre de cnsw) pour voir l'impact sur les ressources en mémoire du soft
     // extractInfo
     std::string getValue(double x, double y, PEDO p);
     // analyse surfacique ; retourne une map avec clé=sigle pédo et valeur=pourcentage en surface pour ce sigle
     std::map<int,double> anaSurface(OGRGeometry *poGeom);
     // selectionne le polygone qui intersecte cette position et renvoi le FID
     int getIndexSol(double x, double y);
+
 private:
 
 };
 
-
+// en fait cette classe pourrait très bien avoir comme membre uniquement le sigle pédo, puis c'est le dico pedo qui gère tout.
 class ptPedo{
 public:
     ptPedo(std::shared_ptr<cnsw> dico, int aIdSigle);
     ptPedo(std::shared_ptr<cnsw> dico, double x, double y);
     std::vector<std::string> displayInfo(PEDO p);
 
+    std::string displayAllInfoInOverlay();
+
 private:
     std::shared_ptr<cnsw> mDico;
     int idSigle;
-    std::string dDrainage,dTexture,dProf; // d pour description
+    std::string dDrainage,dTexture,dProf,dCharge; // d pour description
 };
 
 // analyse surfacique
@@ -205,7 +231,7 @@ public:
         }
     }
 private:
-     std::shared_ptr<cnsw> mDico;
+    std::shared_ptr<cnsw> mDico;
     std::map<int,double> propSurf;
     std::string dDrainage,dTexture,dProf;
 

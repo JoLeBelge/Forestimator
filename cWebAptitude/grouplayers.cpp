@@ -200,6 +200,7 @@ void groupLayers::extractInfo(double x, double y){
         mAnaPoint->add1InfoRaster(ptPed.displayInfo(PEDO::DRAINAGE));
         mAnaPoint->add1InfoRaster(ptPed.displayInfo(PEDO::PROFONDEUR));
         mAnaPoint->add1InfoRaster(ptPed.displayInfo(PEDO::TEXTURE));
+        mAnaPoint->add1InfoRaster(ptPed.displayInfo(PEDO::CHARGE));
 
         for (std::shared_ptr<Layer> l : mVLs){
             if (((l->getCatLayer()==TypeLayer::KK )| (l->getCatLayer()==TypeLayer::Station )) | (( l->IsActive()) & (l->getCatLayer()!=TypeLayer::Externe))){
@@ -216,12 +217,21 @@ void groupLayers::extractInfo(double x, double y){
                         mParent->doJavaScript("content.innerHTML = '<p>"+layerLabelAndValue.at(0)+":</p><code>"+ layerLabelAndValue.at(1)+ "</code>';"
                                               +"var coordinate = ["+std::to_string(x) + ","+ std::to_string(y) +"];"
                                               +"overlay.setPosition(coordinate);"
-                                              +"overlay.setPosition(coordinate);"
+                                              //+"overlay.setPosition(coordinate);"
                                               );
                     }
 
                 }
             }
+
+            // si la couche active est la CNSW, on affiche les info pédo dans la fenetre "overlay"
+            if (( l->IsActive() && l->Code()=="CNSWrest")){
+                mParent->doJavaScript("content.innerHTML = '"+ptPed.displayAllInfoInOverlay()+ "';"
+                                      +"var coordinate = ["+std::to_string(x) + ","+ std::to_string(y) +"];"
+                                      +"overlay.setPosition(coordinate);"
+                                      );
+            }
+
         }
         // tableau du détail du calcul de l'aptitude d'une essence pour FEE
         for (std::shared_ptr<Layer> l : mVLs){

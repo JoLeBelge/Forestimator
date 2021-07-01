@@ -6,7 +6,7 @@ cnsw::cnsw(std::string aBDFile):dicoPedo(aBDFile)
 }*/
 
 cnsw::cnsw(sqlite3 *db):dicoPedo(db){
- //loadCNSW();
+    //loadCNSW();
 }
 
 /*
@@ -84,7 +84,7 @@ std::map<int,double> cnsw::anaSurface(OGRGeometry *poGeom){
             } else {
 
                 if (poFeature->GetGeometryRef()->Intersect(poGeom)) {
-                   // std::cout  << " intersection des deux géométries " << std::endl;
+                    // std::cout  << " intersection des deux géométries " << std::endl;
                     OGRMultiPolygon* pol = poFeature->GetGeometryRef()->Intersection(poGeom)->toMultiPolygon();
                     if (aRes.find(solId)==aRes.end()){ aRes.emplace(solId,pol->get_Area());} else {
                         aRes.at(solId)+=pol->get_Area();
@@ -123,7 +123,7 @@ int cnsw::getIndexSol(double x, double y){
             OGRFeature *poFeature;
             OGRPoint pt(x,y);
 
-           // OGRSpatialReference * georef =lay->GetSpatialRef();
+            // OGRSpatialReference * georef =lay->GetSpatialRef();
             //lay->ResetReading();
             // cause memory leak! still reachable in loss record
             //pt.assignSpatialReference(lay->GetSpatialRef()); ne semble pas nécessaire au bon fonctionnement
@@ -152,7 +152,7 @@ dicoPedo::dicoPedo(sqlite3 *db):db_(db),mBDpath("jesaispas"){
 
 void dicoPedo::loadInfo(){
     sqlite3_stmt * stmt;
-    std::string SQLstring="SELECT INDEX_, SIGLE_PEDO, MAT_TEXT, DRAINAGE, PHASE_1, PHASE_2, PHASE_3, PHASE_4, PHASE_5, PHASE_6, PHASE_7  FROM zz_Table_sigles_eclates;";
+    std::string SQLstring="SELECT INDEX_, SIGLE_PEDO, MAT_TEXT, DRAINAGE, PHASE_1, PHASE_2, PHASE_3, PHASE_4, PHASE_5, PHASE_6, PHASE_7,CHARGE  FROM zz_Table_sigles_eclates;";
     sqlite3_prepare_v2( db_, SQLstring.c_str(), -1, &stmt, NULL );
     while(sqlite3_step(stmt) == SQLITE_ROW)
     {
@@ -186,9 +186,11 @@ void dicoPedo::loadInfo(){
             if (sqlite3_column_type(stmt, 10)!=SQLITE_NULL){
                 sToPhase7.emplace(std::make_pair(index,std::string( (char *)sqlite3_column_text( stmt, 10 ) )));
             }
+            if (sqlite3_column_type(stmt, 11)!=SQLITE_NULL){
+                sToCharge.emplace(std::make_pair(index,std::string( (char *)sqlite3_column_text( stmt, 11 ) )));
+            }
         }
     }
-
     sqlite3_finalize(stmt);
     SQLstring="SELECT MAT_TEXT, DESCR  FROM b_texture;";
     sqlite3_prepare_v2( db_, SQLstring.c_str(), -1, &stmt, NULL );
@@ -198,6 +200,18 @@ void dicoPedo::loadInfo(){
             std::string code=std::string( (char *)sqlite3_column_text( stmt, 0 ) );
             std::string desc=std::string( (char *)sqlite3_column_text( stmt, 1 ) );
             mTexture.emplace(std::make_pair(code,desc));
+        }
+    }
+
+    sqlite3_finalize(stmt);
+    SQLstring="SELECT CHARGE, DESCR  FROM g_charge;";
+    sqlite3_prepare_v2( db_, SQLstring.c_str(), -1, &stmt, NULL );
+    while(sqlite3_step(stmt) == SQLITE_ROW)
+    {
+        if (sqlite3_column_type(stmt, 0)!=SQLITE_NULL && sqlite3_column_type(stmt, 1)!=SQLITE_NULL){
+            std::string code=std::string( (char *)sqlite3_column_text( stmt, 0 ) );
+            std::string desc=std::string( (char *)sqlite3_column_text( stmt, 1 ) );
+            mCharge.emplace(std::make_pair(code,desc));
         }
     }
     sqlite3_finalize(stmt);
@@ -259,47 +273,11 @@ void dicoPedo::loadInfo(){
     sqlite3_finalize(stmt);
 }
 
-/*
-dicoPedo::dicoPedo(std::string aBDFile):mBDpath(aBDFile),db_(NULL){
-    //std::cout << "dicoPedo::dicoPedo " << mBDpath << std::endl;
-
-    if (openConnection()){} else {
-
-        loadInfo();
-    }
-    closeConnection();
-}*/
-
-int dicoPedo::openConnection(){
-    int rc;
-
-    std::cout << "chargement des dictionnaires lié à la couche pédo ..." << std::endl;
-
-    rc = sqlite3_open_v2(mBDpath.c_str(), &db_,SQLITE_OPEN_READONLY,NULL);
-
-    // The 31 result codes are defined in sqlite3.h
-    //SQLITE_ERROR (1)
-    if( rc!=0) {
-        fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db_));
-        std::cout << " mBDpath " << mBDpath << std::endl;
-        std::cout << "result code : " << rc << std::endl;
-    }
-    return rc;
-}
-
-void dicoPedo::closeConnection(){
-
-    std::cout << "close connection" << std::endl;
-    int rc = sqlite3_close_v2(db_);
-    if( rc ) {
-        fprintf(stderr, "Can't close database: %s\n\n\n", sqlite3_errmsg(db_));
-    }
-}
-
 ptPedo::ptPedo(std::shared_ptr<cnsw> dico, int aIdSigle):mDico(dico),idSigle(aIdSigle){
     dTexture=mDico->Texture(idSigle);
     dDrainage=mDico->Drainage(idSigle);
     dProf = mDico->Profondeur(idSigle);
+    dCharge = mDico->charge(idSigle);
 }
 
 ptPedo::ptPedo(std::shared_ptr<cnsw> dico, double x,double y):mDico(dico){
@@ -307,35 +285,62 @@ ptPedo::ptPedo(std::shared_ptr<cnsw> dico, double x,double y):mDico(dico){
     dTexture=mDico->Texture(idSigle);
     dDrainage=mDico->Drainage(idSigle);
     dProf = mDico->Profondeur(idSigle);
+    dCharge = mDico->charge(idSigle);
 }
 
 
 std::vector<std::string> ptPedo::displayInfo(PEDO p){
     std::vector<std::string> aRes;
-
+    std::string champ(""),desc("");
     if (idSigle!=-1){
+
         switch (p) {
         case PEDO::TEXTURE:{
-            aRes.push_back("Texture du sol");
-            if (dTexture!="/"){aRes.push_back(dTexture);}
+            champ="Texture du sol";
+            desc=dTexture;
             break;
         }
         case PEDO::DRAINAGE:{
-            aRes.push_back("Drainage du sol");
-            if (dDrainage!="/"){aRes.push_back(dDrainage);}
+            champ="Drainage du sol";
+            desc=dDrainage;
             break;
         }
         case PEDO::PROFONDEUR:{
-            aRes.push_back("Profondeur du sol");
-            if (dProf!="/"){aRes.push_back(dProf);}
+            champ="Profondeur du sol";
+            desc=dProf;
             break;
         }
-
+        case PEDO::SIGLE:{
+            champ="Sigle pédologique";
+            desc= mDico->sIdToSigleStr(idSigle);
+            break;
+        }
+        case PEDO::CHARGE:{
+            champ="Charge caillouteuse";
+            desc=mDico->charge(idSigle);
+            break;
+        }
         }
     }
+    aRes.push_back(champ);
+    aRes.push_back(desc);
     return aRes;
 }
 
+std::string ptPedo::displayAllInfoInOverlay(){
+    std::string aRes("");
+    aRes+="<div class=\"alert alert-success\"> Sigle pédologique : " + displayInfo(PEDO::SIGLE).at(1) +" </div> <ul>";
+    for ( int p = PEDO::DRAINAGE; p != PEDO::Last; p++ )
+    {
+        PEDO ped = static_cast<PEDO>(p);
+        std::vector<std::string> info=displayInfo(ped);
+        aRes+="<li>"+info.at(0)+": <code>"+info.at(1)+ "</code></li>";
+    }
+    aRes+="</ul>";
+    // javascript bug si jamais l'apostrophe n'est pas escapée
+    boost::replace_all(aRes,"'","\\'");
+    return aRes;
+}
 
 surfPedo::surfPedo(std::shared_ptr<cnsw> dico, OGRGeometry *poGeom ):mDico(dico){
     propSurf=dico->anaSurface(poGeom);
@@ -370,20 +375,20 @@ surfPedo::surfPedo(std::shared_ptr<cnsw> dico, OGRGeometry *poGeom ):mDico(dico)
     for (auto kv : VDText){
         if (kv.second>1){
             if (kv.second>99.0){ dTexture+=kv.first; break;} else {
-            dTexture+=kv.first+": "+mDico->roundDouble(kv.second,0)+"% ";
+                dTexture+=kv.first+": "+mDico->roundDouble(kv.second,0)+"% ";
             }
         }
     }
     for (auto kv : VDDrainage){
         if (kv.second>1){
             if (kv.second>99.0){ dDrainage+=kv.first; break;} else {
-            dDrainage+=kv.first+": "+mDico->roundDouble(kv.second,0)+"% ";}
+                dDrainage+=kv.first+": "+mDico->roundDouble(kv.second,0)+"% ";}
         }
     }
     for (auto kv : VDProf){
         if (kv.second>1){
             if (kv.second>99.0){ dProf+=kv.first;break;} else {
-            dProf+=kv.first+": "+mDico->roundDouble(kv.second,0)+"% ";
+                dProf+=kv.first+": "+mDico->roundDouble(kv.second,0)+"% ";
             }
         }
     }
@@ -391,19 +396,19 @@ surfPedo::surfPedo(std::shared_ptr<cnsw> dico, OGRGeometry *poGeom ):mDico(dico)
 
 std::string surfPedo::getSummary(PEDO p){
     std::string aRes("");
-        switch (p) {
-        case PEDO::TEXTURE:{
-            aRes= dTexture;
-            break;
-        }
-        case PEDO::DRAINAGE:{
-              aRes= dDrainage;
-            break;
-        }
-        case PEDO::PROFONDEUR:{
-              aRes= dProf;
-            break;
-        }
+    switch (p) {
+    case PEDO::TEXTURE:{
+        aRes= dTexture;
+        break;
+    }
+    case PEDO::DRAINAGE:{
+        aRes= dDrainage;
+        break;
+    }
+    case PEDO::PROFONDEUR:{
+        aRes= dProf;
+        break;
+    }
 
     }
     return aRes;
@@ -423,8 +428,8 @@ std::pair<std::string,double> surfPedo::getMajTexture(){
     double aMax(0);
     for (auto & kv : aVSigleTs){
         if (kv.second>aMax){
-        aMax=kv.second;
-        aRes=kv;}
+            aMax=kv.second;
+            aRes=kv;}
     }
     return aRes;
 }
@@ -464,8 +469,8 @@ std::pair<std::string,double> surfPedo::getMajDrainage(){
     double aMax(0);
     for (auto & kv : aVSigleDs){
         if (kv.second>aMax){
-        aMax=kv.second;
-        aRes=kv;}
+            aMax=kv.second;
+            aRes=kv;}
     }
     return aRes;
 }
@@ -475,5 +480,5 @@ std::string dicoPedo::roundDouble(double d, int precisionVal){
     std::string aRes("");
     if (precisionVal>0){aRes=std::to_string(d).substr(0, std::to_string(d).find(".") + precisionVal + 1);}
     else  {aRes=std::to_string(d+0.5).substr(0, std::to_string(d).find("."));}
-   return aRes;
+    return aRes;
 }
