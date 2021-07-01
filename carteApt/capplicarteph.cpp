@@ -1,25 +1,17 @@
 #include "capplicarteph.h"
-int astep(2500);
-
 // limite pH pour modelisation carte NT
 double lim_m32(3.8);
 double lim_m12(4.2);
 double lim_p12(7.5);
 
-cAppliCartepH::cAppliCartepH()
+cAppliCartepH::cAppliCartepH(bool bcarteNT, bool bcartepH)
 {
-    std::cout << "constructeur de cApliCartepH " << std::endl;
-    std::string adirBD("/home/lisein/Documents/Carto/pH/2020/cartepH.db");
-    dico= new cDicoCartepH(adirBD);
+    std::cout << "cApliCarteNT pH PTS " << std::endl;
+    std::string adirBD("/home/lisein/Documents/carteApt/Forestimator/carteApt/data/carteFEE_NTpH.db");
+    dico= std::make_unique<cDicoCartepH>(adirBD);
 
     std::string aZBIOpath(dico->File("ZBIO"));
-    std::string aTPSpath(dico->File("PTS"));
-
     GDALAllRegister();
-
-    //cartePTS(aTPSpath);
-
-
 
     poDatZBIO = (GDALDataset *) GDALOpen( aZBIOpath.c_str(), GA_ReadOnly );
     if( poDatZBIO == NULL )
@@ -29,45 +21,43 @@ cAppliCartepH::cAppliCartepH()
 
     ZBIOBand = poDatZBIO->GetRasterBand( 1 );
 
-    poDatPTS = (GDALDataset *) GDALOpen( aTPSpath.c_str(), GA_ReadOnly );
-    if( poDatPTS == NULL )
-    {
-        std::cout << "je n'ai pas lu le fichier " << aTPSpath << std::endl;
-    }
+    // si on veux recalculer la carte des pH
+    if(bcartepH){
+        std::string aTPSpath(dico->File("PTS"));
+        //cartePTS(aTPSpath); // créé une seule fois
 
-    PTSBand = poDatPTS->GetRasterBand(1);
+        poDatPTS = (GDALDataset *) GDALOpen( aTPSpath.c_str(), GA_ReadOnly );
+        if( poDatPTS == NULL )
+        {
+            std::cout << "je n'ai pas lu le fichier " << aTPSpath << std::endl;
+        }
 
-    x=ZBIOBand->GetXSize();
-    y=ZBIOBand->GetYSize();
+        PTSBand = poDatPTS->GetRasterBand(1);
 
+        x=ZBIOBand->GetXSize();
+        y=ZBIOBand->GetYSize();
 
-    if(1){
-        std::string aOut(dico->File("OUTDIR")+"cartepH2021.tif");
-
-
+        std::string aOut(dico->File("pH"));
         cartepH(aOut);
     }
 
-    std::string aOut(dico->File("OUTDIR")+"carteNT2021.tif");
+    if(bcarteNT){
+    std::string aOut(dico->File("NT"));
     carteNT(aOut);
-
-    //}
-
+    }
 }
 
 cAppliCartepH::~cAppliCartepH()
 {
     std::cout << "destructeur de c appli Carte pH " << std::endl;
     if( poDatPTS != NULL ){GDALClose(poDatPTS);}
-    if( poDatZBIO != NULL ){GDALClose( poDatZBIO);}
-    delete dico;
+    if( poDatZBIO != NULL ){GDALClose(poDatZBIO);}
 }
 
 void cAppliCartepH::cartepH(std::string aOut, bool force){
 
-
     if ((!exists(aOut) | force)){
-        std::cout << "création carte pH" << std::endl;
+        std::cout << "création carte pH, fichier " << aOut << std::endl;
         // create a copy d'une des couches pour que ce soit une carte d'aptitude
         const char *pszFormat = "GTiff";
         GDALDriver *poDriver;
@@ -91,6 +81,8 @@ void cAppliCartepH::cartepH(std::string aOut, bool force){
         outBand = poDstDS->GetRasterBand(1);
         std::cout << "copy of raster done" << std::endl;
 
+        int step= y/100;
+
         float *scanlinePTS;
         scanlinePTS = (float *) CPLMalloc( sizeof( float ) * x );
         float *scanlineZBIO;
@@ -98,6 +90,7 @@ void cAppliCartepH::cartepH(std::string aOut, bool force){
         float *scanline;
         scanline = (float *) CPLMalloc( sizeof( float ) * x );
         // boucle sur les pixels
+        int c(0);
         for ( int row = 0; row < y; row++ )
         {
             // je ne sais pas pourquoi mais c'est obligé de lire les valeur en float 32 et de les écrires avec le flag FLOAT32 alors que moi je ne manipule que des 8bit
@@ -117,13 +110,13 @@ void cAppliCartepH::cartepH(std::string aOut, bool force){
                     pH = dico->getpH(pts,zbio);
                     //std::cout << "ph est de " << pH << std::endl;
 
-                }   
+                }
                 scanline[ col ] = pH;
             }
             // écriture du résultat dans le fichier de destination
-
             outBand->RasterIO( GF_Write, 0, row, x, 1, scanline, x, 1,GDT_Float32, 0, 0 );
-            if (row%astep==0){std::cout<< " ... " << std::endl;}
+            if (row%step==0){std::cout << c << " pct"<< std::endl;c++;}
+
         }
         CPLFree(scanline);
         CPLFree(scanlineZBIO);
@@ -167,12 +160,13 @@ void cAppliCartepH::cartePTS(std::string aOut, bool force){
 
         x =inBand->GetXSize();
         y = inBand->GetYSize();
-
+        int step= y/100;
         float *scanlineCNSW;
         scanlineCNSW = (float *) CPLMalloc( sizeof( float ) * x );
         float *scanline;
         scanline = (float *) CPLMalloc( sizeof( float ) * x );
         // boucle sur les pixels
+        int c(0);
         for ( int row = 0; row < y; row++ )
         {
             // je ne sais pas pourquoi mais c'est obligé de lire les valeur en float 32 et de les écrires avec le flag FLOAT32 alors que moi je ne manipule que des 8bit
@@ -191,16 +185,11 @@ void cAppliCartepH::cartePTS(std::string aOut, bool force){
                     pts = dico->getPTS(cnsw);
                     //std::cout << " pts = = " << pts << std::endl;
                 }
-                if ((col%astep==0) && row%astep==0){
-                    std::cout << ".." ;
-
-                }
                 scanline[ col ] = pts;
             }
             // écriture du résultat dans le fichier de destination
-
             outBand->RasterIO( GF_Write, 0, row, x, 1, scanline, x, 1,GDT_Float32, 0, 0 );
-            if (row%astep==0){std::cout<< std::endl;}
+            if (row%step==0){std::cout << c << " pct"<< std::endl;c++;}
         }
         CPLFree(scanline);
         CPLFree(scanlineCNSW);
@@ -218,8 +207,8 @@ void cAppliCartepH::cartePTS(std::string aOut, bool force){
 void cAppliCartepH::carteNT(std::string aOut, bool force){
 
     if ((!exists(aOut) | force)){
-        std::cout << "creation de la carte des NT sur base du dico sigle pédo" << std::endl;
-
+        std::cout << "creation de la carte des NT sur base du dico sigle pédo, de la carte des pH, des territoire ecologique et des zones bioclimatiques" << std::endl;
+        std::cout << "  fichier " << aOut << std::endl;
         // input ; zbio (déjà ouvert dans constructeur, ter eco, cnsw
         std::string aCNSWpath(dico->File("CNSW"));
         GDALDataset  * poDatCNSW = (GDALDataset *) GDALOpen( aCNSWpath.c_str(), GA_ReadOnly );
@@ -271,19 +260,17 @@ void cAppliCartepH::carteNT(std::string aOut, bool force){
         float *scanline;
         scanline = (float *) CPLMalloc( sizeof( float ) * x );
         // boucle sur les pixels
-        int c(1);
+        int c(0);
         for ( int row = 0; row < y; row++ )
         {
             // je ne sais pas pourquoi mais c'est obligé de lire les valeur en float 32 et de les écrires avec le flag FLOAT32 alors que moi je ne manipule que des 8bit
-
-            inBand->RasterIO( GF_Read, 0, row, x, 1, scanlineCNSW, x,1, GDT_Float32, 0, 0 );
+           inBand->RasterIO( GF_Read, 0, row, x, 1, scanlineCNSW, x,1, GDT_Float32, 0, 0 );
             poDatpH->GetRasterBand(1)->RasterIO( GF_Read, 0, row, x, 1, scanlinepH, x,1, GDT_Float32, 0, 0 );
             poDatZBIO->GetRasterBand(1)->RasterIO( GF_Read, 0, row, x, 1, scanlineZBIO, x,1, GDT_Float32, 0, 0 );
             poDatTECO->GetRasterBand(1)->RasterIO( GF_Read, 0, row, x, 1, scanlineTECO, x,1, GDT_Float32, 0, 0 );
             // iterate on pixels in row
             for (int col = 0; col < x; col++)
             {
-
 
                 int NT(0);
                 int cnsw = scanlineCNSW[ col ];
@@ -292,19 +279,14 @@ void cAppliCartepH::carteNT(std::string aOut, bool force){
                 double pH = scanlinepH[ col ];
                 // un test pour tenter de gagner de la vitesse de temps de calcul - masque pour travailler que sur la RW
                 if (cnsw!=0){
-                    //std::cout << " pts = = " << pts << std::endl;
                     //dbo::ptr<siglePedo> s=dico->getSiglePedoPtr(cnsw);
                     const siglePedo *s=dico->getSiglePedoPtr(cnsw);
                     NT=cleNT(s,zbio,teco,pH);
-                    //std::cout << "NH = " << NT << std::endl;
                 }
-
-
 
                 scanline[ col ] = NT;
             }
             // écriture du résultat dans le fichier de destination
-
             outBand->RasterIO( GF_Write, 0, row, x, 1, scanline, x, 1,GDT_Float32, 0, 0 );
             if (row%step==0){std::cout << c << " pct"<< std::endl;c++;}
         }
