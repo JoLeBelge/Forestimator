@@ -36,9 +36,9 @@ int main(int argc, char **argv)
     // ici, créé mon dictionnaire et le mettre sous forme de membre dans resource
     //  std::cout << "loadBDpath et cree dico.." << std::endl;
     std::string aBD=loadBDpath();
-    cDicoApt *Dico=new cDicoApt(aBD);
+    cDicoApt *dico=new cDicoApt(aBD);
 
-    stationDescResource resource(Dico);
+    stationDescResource resource(dico);
     try {
         Wt::WServer server{argc, argv, WTHTTP_CONFIGURATION};
 
@@ -56,7 +56,11 @@ int main(int argc, char **argv)
         // https://redmine.webtoolkit.eu/boards/2/topics/17226?r=17243#message-17243
         // see paypal example
 
-        server.addEntryPoint(Wt::EntryPointType::Application, std::bind(&createAuthApplication,std::placeholders::_1, Dico));
+        // stats trafic web
+        Analytics anal;
+        //anal = new Analytics("/data1/Forestimator/data/analytics.db");
+
+        server.addEntryPoint(Wt::EntryPointType::Application, std::bind(&createAuthApplication,std::placeholders::_1, dico, &anal));
 
         Session::configureAuth();
 
@@ -70,11 +74,14 @@ int main(int argc, char **argv)
     }
 }
 
-std::unique_ptr<Wt::WApplication> createAuthApplication(const Wt::WEnvironment &env, cDicoApt *dico)
+std::unique_ptr<Wt::WApplication> createAuthApplication(const Wt::WEnvironment &env, cDicoApt *dico, Analytics *anal)
 {
     //std::cout << env.internalPath() << " " << env.deploymentPath() << std::endl;
     //std::cout << env.getParameter("a0") << std::endl;
     //std::cout << env.getParameter("a1") << std::endl;
+
+    //anal->addLog(env,-1);
+
     if (env.internalPath() == "/documentation" | env.internalPath().substr(0,14)== "/documentation"){
         ;
     }else if (env.internalPath() == "/cartographie"){
@@ -89,6 +96,9 @@ std::unique_ptr<Wt::WApplication> createAuthApplication(const Wt::WEnvironment &
         ;
     }else{
         std::cout << "internal path pas geré : " << env.internalPath() << std::endl;
+
+        anal->addLog(env,-1);
+
         auto app404 = Wt::cpp14::make_unique<Wt::WApplication>(env);
         auto theme = std::make_shared<Wt::WBootstrapTheme>();
         theme->setVersion(Wt::BootstrapVersion::v3);
@@ -99,5 +109,5 @@ std::unique_ptr<Wt::WApplication> createAuthApplication(const Wt::WEnvironment &
     }
 
 
-    return Wt::cpp14::make_unique<AuthApplication>(env,dico);
+    return Wt::cpp14::make_unique<AuthApplication>(env,dico,anal);
 }

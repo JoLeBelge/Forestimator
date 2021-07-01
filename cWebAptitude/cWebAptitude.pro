@@ -67,6 +67,7 @@ DEPENDPATH += $$PWD/../../../../../../usr/include/gdal/
 }
 
 SOURCES += main.cpp \
+    analytics.cpp \
     auth/Session.cpp \
     auth/User.cpp \
     auth/auth.cpp \
@@ -94,6 +95,7 @@ SOURCES += main.cpp \
     statHdomCompo.cpp
 
 HEADERS += \
+    analytics.h \
     auth/Session.h \
     auth/User.h \
     auth/auth.h \
