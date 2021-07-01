@@ -328,6 +328,7 @@ dialog::dialog(const WString& windowTitle,Wt::WMenuItem * aMenu):WDialog(windowT
             this->show();
             mMenu->decorationStyle().setBackgroundColor(col_sel);
             mShow=1;
+            this->raiseToFront();
         }
     });
 }

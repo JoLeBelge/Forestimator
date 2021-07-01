@@ -11,3 +11,4 @@ data/tmp
 data/auth.db
 data/extents.db
 data/cadastre.db*
+data/analytics.db*

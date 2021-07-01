@@ -5,9 +5,9 @@
 using namespace std;
 using namespace Wt;
 
-AuthApplication::AuthApplication(const Wt::WEnvironment& env, cDicoApt *dico)
+AuthApplication::AuthApplication(const Wt::WEnvironment& env, cDicoApt *dico, Analytics *anal)
     : Wt::WApplication(env),
-      session_(docRoot() + "/auth.db"),mDico(dico)
+      session_(docRoot() + "/auth.db"),mDico(dico),mAnal(anal)
 {
     // charge le xml avec tout le texte qui sera chargé via la fonction tr()
     messageResourceBundle().use(docRoot() + "/forestimator");
@@ -26,6 +26,13 @@ AuthApplication::AuthApplication(const Wt::WEnvironment& env, cDicoApt *dico)
     //std::unique_ptr<cWebAptitude> WebApt = Wt::cpp14::make_unique<cWebAptitude>(this, authWidget_);
     //cWebApt = layout->addWidget(std::move(WebApt), 0);
     cWebApt = layout->addWidget(Wt::cpp14::make_unique<cWebAptitude>(this, authWidget_));
+
+    // stats web
+    if (session_.login().loggedIn()) {
+        const Wt::Auth::User& u = session_.login().user();
+        anal->addLog(env,atol(u.id().c_str()));
+    }else
+        anal->addLog(env,-1);
 
     root()->addStyleClass("layout_main");
     loaded_=true;

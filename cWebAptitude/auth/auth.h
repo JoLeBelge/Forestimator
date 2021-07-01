@@ -39,6 +39,7 @@
 #include <Wt/WTemplate.h>
 #include <Wt/WString.h>
 #include <sys/stat.h>
+#include "analytics.h"
 
 #include "api/stationdescresource.h"
 
@@ -48,7 +49,7 @@ class cWebAptitude; // forward declaration
 class AuthApplication : public Wt::WApplication
 {
 public:
-    AuthApplication(const Wt::WEnvironment& env, cDicoApt * dico);
+    AuthApplication(const Wt::WEnvironment& env, cDicoApt * dico, Analytics *anal);
     void loadStyles();
     std::unique_ptr<Auth::AuthWidget> loadAuthWidget();
     void authEvent();
@@ -60,7 +61,7 @@ public:
     Wt::Auth::AuthWidget* authWidget_;
     cDicoApt * mDico;
     cWebAptitude * cWebApt;
-
+    Analytics *mAnal;
 private:
     Session session_;
     bool loaded_=false; // sert à éviter que void authEvent ne crash si refresh la page et que user connecté...
