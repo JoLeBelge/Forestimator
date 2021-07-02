@@ -214,12 +214,20 @@ input[type="checkbox"] {
 .div_extent{
 	background-color: #eeeeee;
 	margin:5px 15px 0px 15px;
+	text-align: center;
+}
+.div_extent button {
+	height: 25px;
+	padding: 2px 2px;
+	margin: 2px;
 }
 .extent_inline{
 	display:inline;
+	margin-top: 5px;
 }
-.extent_margin{
-	margin: 0px 0px 0px 5px;
+.extent_button{
+	margin: 0px;
+	width: 200.0px;
 }
 .navbar-nav .active a{
 	padding-bottom: 1px;

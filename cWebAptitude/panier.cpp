@@ -37,7 +37,7 @@ panier::panier(AuthApplication *app, cWebAptitude * cWebApt): WContainerWidget()
     this->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
     this->addWidget(cpp14::make_unique<WText>(tr("coucheStep3")));
     WPushButton * bExportTiff = this->addWidget(cpp14::make_unique<WPushButton>("Télécharger"));
-
+    bExportTiff->setToolTip(tr("panier.download_tooltip"));
     bExportTiff->clicked().connect(mGroupL->slotMapExport);
     //bExportTiff->clicked().connect(this,&groupLayers::updateMapExtentAndCropIm);
 

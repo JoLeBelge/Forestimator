@@ -175,7 +175,7 @@ public:
     cWebAptitude * mcWebAptitude;
 
     void saveExtent(double c_x, double c_y, double zoom);
-    void deleteExtent(std::string id);
+    void deleteExtent(std::string id_extent);
 
     //selectLayers4Stat * mSelect4Stat;
     selectLayers * mSelectLayers;

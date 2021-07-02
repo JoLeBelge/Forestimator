@@ -10,6 +10,7 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/range/adaptor/map.hpp>
 #include "boost/filesystem.hpp"
+#include <algorithm>
 
 #include <unistd.h>
 #include <cmath>
@@ -72,13 +73,24 @@ public:
     std::vector<std::string> getSectionForDiv(int aDivCode, Wt::Dbo::Session * session);
     std::vector<dbo::ptr<capa> > getCaPaPtrVector(int aDivCode,std::string aSection,dbo::Session * session);
 
-    std::map<int,std::string> getCommuneLabel(){
+    std::vector<std::pair<int,std::string>> getCommuneLabel(){
         std::map<int,std::string> aRes;
-        for (auto & kv : mVCom){
+        std::vector<std::pair<int,std::string>> vec; // vecteur temp pour ordre alpha
+
+        // copy key-value pairs from the map to the vector
+        std::copy(mVCom.begin(), mVCom.end(), std::back_inserter<std::vector<std::pair<int,std::string>>>(vec));
+        // sort the vector by increasing the order of its pair's second value
+        // if the second value is equal, order by the pair's first value
+        std::sort(vec.begin(), vec.end(),
+                [](const std::pair<int,std::string> &l, const std::pair<int,std::string> &r)
+                {
+                        return l.second < r.second;
+                });
+        for (auto & kv : vec){
             aRes.emplace(std::make_pair(kv.first,kv.second+" "+std::to_string(kv.first)));
         }
-        // problème ; pas dans l'ordre alphabétique...
-        return aRes;
+        //return aRes;
+        return vec;
     }
     std::map<int,std::string> getDivisionLabel(int aCodeCommune){
         std::map<int,std::string> aRes;

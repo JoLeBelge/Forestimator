@@ -202,7 +202,8 @@ std::vector<dbo::ptr<capa>> cadastre::getCaPaPtrVector(int aDivCode, std::string
 
     typedef dbo::collection< dbo::ptr<capa> > collectionCapa;
     dbo::Transaction transaction{*session};
-    collectionCapa Capas = session->find<capa>().where("divCode = ?").bind(aDivCode);
+    //collectionCapa Capas = session->find<capa>().where("divCode = ?").bind(aDivCode).orderBy("CaPaKey");
+    collectionCapa Capas = session->find<capa>().where("CaSecKey = ?").bind(std::to_string(aDivCode)+aSection).orderBy("CaPaKey");
 
     for (dbo::ptr<capa> &c : Capas){
       aRes.push_back(c);

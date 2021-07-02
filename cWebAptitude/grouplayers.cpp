@@ -252,6 +252,10 @@ void groupLayers::extractInfo(double x, double y){
 
 }
 
+/**
+ * @brief groupLayers::computeStatGlob
+ * @param poGeomGlobale
+ */
 void groupLayers::computeStatGlob(OGRGeometry *poGeomGlobale){
     std::cout << " groupLayers::computeStatGlob " << std::endl;
     /*char * test;
@@ -287,7 +291,10 @@ void groupLayers::computeStatGlob(OGRGeometry *poGeomGlobale){
     //return aRes;
 }
 
-
+/**
+ * @brief groupLayers::apts
+ * @return
+ */
 std::map<std::string,int> groupLayers::apts(){
     std::map<std::string,int> aRes;
     switch (mTypeClassifST){
@@ -319,6 +326,9 @@ std::map<std::string,int> groupLayers::apts(){
     return aRes;
 }
 
+/**
+ * @brief groupLayers::updateGL
+ */
 void groupLayers::updateGL(){
     bool expertMode=0;
 
@@ -339,6 +349,10 @@ void groupLayers::updateGL(){
 
 }
 
+/**
+ * @brief groupLayers::updateLegendeDiv Refresh les legendes pour les couches du panier
+ * @param layers
+ */
 void groupLayers::updateLegendeDiv(std::vector<std::shared_ptr<Layer>> layers){
     mLegendDiv->clear();
 
@@ -354,6 +368,10 @@ void groupLayers::updateLegendeDiv(std::vector<std::shared_ptr<Layer>> layers){
 
 }
 
+/**
+ * @brief groupLayers::updateLegende Refresh la legende pour une couche
+ * @param l
+ */
 void groupLayers::updateLegende(const std::shared_ptr<Layer> l){
     if (l->getCatLayer()!=TypeLayer::Externe){
         Wt::WAnimation animation(Wt::AnimationEffect::SlideInFromTop, Wt::TimingFunction::EaseOut, 100);
@@ -387,6 +405,10 @@ void groupLayers::updateLegende(const std::shared_ptr<Layer> l){
     }
 }
 
+/**
+ * @brief groupLayers::getActiveLay
+ * @return
+ */
 std::shared_ptr<Layer> groupLayers::getActiveLay(){
     std::shared_ptr<Layer> aRes=NULL;
     for (std::shared_ptr<Layer> l : mVLs){
@@ -403,6 +425,11 @@ std::shared_ptr<Layer> groupLayers::getActiveLay(){
     return aRes;
 }
 
+/**
+ * @brief groupLayers::getLay Getter d'une couche selon son code
+ * @param aCode
+ * @return
+ */
 std::shared_ptr<Layer> groupLayers::getLay(std::string aCode){
     std::shared_ptr<Layer> aRes=NULL;
     for (std::shared_ptr<Layer> l : mVLs){
@@ -411,6 +438,9 @@ std::shared_ptr<Layer> groupLayers::getLay(std::string aCode){
     return aRes;
 }
 
+/**
+ * @brief groupLayers::exportLayMapView Exporte la vue actuelle de la top couche du panier
+ */
 void groupLayers::exportLayMapView(){
 
     std::cout << "exportLayMapView " << std::endl;
@@ -473,7 +503,13 @@ void groupLayers::exportLayMapView(){
     }
 }
 
-
+/**
+ * @brief cropIm
+ * @param inputRaster
+ * @param aOut
+ * @param ext
+ * @return
+ */
 bool cropIm(std::string inputRaster, std::string aOut, OGREnvelope ext){
     bool aRes(0);
     std::cout << " cropIm" << std::endl;
@@ -597,6 +633,10 @@ bool groupLayers::getExpertModeForUser(std::string id){
     return aRes;
 }
 
+/**
+ * @brief groupLayers::loadExtents Charge/recharge les extents du user
+ * @param id
+ */
 void groupLayers::loadExtents(std::string id){
     openConnection();
     printf("loadextents...");
@@ -651,7 +691,7 @@ void groupLayers::loadExtents(std::string id){
     WPushButton * button_s = mExtentDiv->addWidget(cpp14::make_unique<WPushButton>(tr("sauver_extent")));
     button_s->addStyleClass("btn btn-success");
     button_s->setInline(1);
-    button_s->addStyleClass("extent_inline extent_margin");
+    button_s->addStyleClass("extent_button");
     button_s->clicked().connect(this->slotMapCenter);
 
     std::cout << "done" << std::endl;
@@ -669,21 +709,21 @@ void groupLayers::saveExtent(double c_x, double c_y, double zoom){
     std::string sql = "INSERT INTO user_extent (id_user,centre_x,centre_y,zoom,name) VALUES ("+id+","+cx+","+cy+","+z+",'"+n+"')";
     std::cout << sql << std::endl;
     sqlite3_exec(db_, sql.c_str(),NULL,NULL,NULL);
-
     closeConnection();
+
     loadExtents(id);
     m_app->addLog("save an extent"); // add some web stats
 }
 
-void groupLayers::deleteExtent(std::string id){
+void groupLayers::deleteExtent(std::string id_extent){
     openConnection();
 
-    std::string sql = "DELETE FROM user_extent WHERE id="+id;
+    std::string sql = "DELETE FROM user_extent WHERE id="+id_extent;
     std::cout << sql << std::endl;
     sqlite3_exec(db_, sql.c_str(),NULL,NULL,NULL);
-
     closeConnection();
-    loadExtents(id);
+
+    loadExtents(m_app->getUser().id());
     m_app->addLog("delete an extent"); // add some web stats
 }
 /** FIN extents **/
