@@ -49,7 +49,7 @@ class cWebAptitude; // forward declaration
 class AuthApplication : public Wt::WApplication
 {
 public:
-    AuthApplication(const Wt::WEnvironment& env, cDicoApt * dico, Analytics *anal);
+    AuthApplication(const Wt::WEnvironment& env, cDicoApt * dico);
     void loadStyles();
     std::unique_ptr<Auth::AuthWidget> loadAuthWidget();
     void authEvent();
@@ -62,7 +62,7 @@ public:
     Wt::Auth::AuthWidget* authWidget_;
     cDicoApt * mDico;
     cWebAptitude * cWebApt;
-    Analytics *mAnal;
+    Analytics mAnal;
 private:
     Session session_;
     bool loaded_=false; // sert à éviter que void authEvent ne crash si refresh la page et que user connecté...

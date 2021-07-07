@@ -30,6 +30,7 @@ cWebAptitude::cWebAptitude(AuthApplication *app, Auth::AuthWidget* authWidget_)
     navigation = this->addWidget(cpp14::make_unique<WNavigationBar>());
     navigation->setResponsive(true);
     navigation->addStyleClass("carto_menu");
+    navigation->setTitle("<strong>Forestimator</strong>"); // PL request !
 
     std::unique_ptr<WMenu> menu_ = cpp14::make_unique<WMenu>();
     WMenu * navbar_menu = navigation->addMenu(std::move(menu_), Wt::AlignmentFlag::Right);
@@ -257,14 +258,14 @@ void cWebAptitude::handlePathChange()
     if (mApp->internalPath() == "/documentation" | found!=std::string::npos){
         top_stack->setCurrentIndex(0);
         menuitem_documentation->select();
-        navigation->setTitle(tr("titre.presentation"));
+        //navigation->setTitle(tr("titre.presentation"));
         mApp->addMetaHeader("description", tr("desc.pres"), "fr");
         mApp->addMetaHeader("description", tr("desc.home"), "fr");
         showDialogues(0);
     }else if (mApp->internalPath() == "/cartographie" || mApp->internalPath() == "/"){
         top_stack->setCurrentIndex(1);
         menuitem_app->select();
-        navigation->setTitle(tr("titre.carto"));
+        //navigation->setTitle(tr("titre.carto"));
         mApp->addMetaHeader("description", tr("desc.carto"), "fr");
         showDialogues(1);
     }else if (mApp->internalPath() == "/resultat"){

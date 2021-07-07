@@ -5,12 +5,14 @@
 using namespace std;
 using namespace Wt;
 
-AuthApplication::AuthApplication(const Wt::WEnvironment& env, cDicoApt *dico, Analytics *anal)
+AuthApplication::AuthApplication(const Wt::WEnvironment& env, cDicoApt *dico)
     : Wt::WApplication(env),
-      session_(docRoot() + "/auth.db"),mDico(dico),mAnal(anal)
+      session_(docRoot() + "/auth.db"),mDico(dico),mAnal(dico->File("docroot")+"analytics.db")
 {
     // charge le xml avec tout le texte qui sera chargé via la fonction tr()
     messageResourceBundle().use(docRoot() + "/forestimator");
+
+
 
     setTitle("Forestimator");
 
@@ -27,9 +29,9 @@ AuthApplication::AuthApplication(const Wt::WEnvironment& env, cDicoApt *dico, An
     // stats web
     if (session_.login().loggedIn()) {
         const Wt::Auth::User& u = session_.login().user();
-        anal->addLog(env,atol(u.id().c_str()));
+        mAnal.addLog(env,atol(u.id().c_str()));
     }else
-        anal->addLog(env);
+        mAnal.addLog(env);
 
     root()->addStyleClass("layout_main");
     loaded_=true;
@@ -144,7 +146,7 @@ Wt::Auth::User AuthApplication::getUser(){
 void AuthApplication::addLog(std::string page){
     if (session_.login().loggedIn()) {
         const Wt::Auth::User& u = session_.login().user();
-        mAnal->addLog(this->environment(),atol(u.id().c_str()), page);
+        mAnal.addLog(this->environment(),atol(u.id().c_str()), page);
     }else
-        mAnal->addLog(this->environment(), page);
+        mAnal.addLog(this->environment(), page);
 }

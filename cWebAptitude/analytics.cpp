@@ -36,8 +36,8 @@ void Analytics::addLog(const Wt::WEnvironment &env, int user_id, std::string pag
     log->ipath = page;
     log->id_user = user_id;
 
+    //std::cout << log->datum << log->client << log->ipath << std::endl;
+
     dbo::ptr<Log> logPtr = session.add(std::move(log));
-
-
 
 }

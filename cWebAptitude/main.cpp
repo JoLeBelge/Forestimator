@@ -56,10 +56,7 @@ int main(int argc, char **argv)
         // https://redmine.webtoolkit.eu/boards/2/topics/17226?r=17243#message-17243
         // see paypal example
 
-        // stats trafic web
-        Analytics anal(dico->File("docroot")+"analytics.db");
-
-        server.addEntryPoint(Wt::EntryPointType::Application, std::bind(&createAuthApplication,std::placeholders::_1, dico, &anal));
+        server.addEntryPoint(Wt::EntryPointType::Application, std::bind(&createAuthApplication,std::placeholders::_1, dico));
 
         Session::configureAuth();
 
@@ -73,13 +70,13 @@ int main(int argc, char **argv)
     }
 }
 
-std::unique_ptr<Wt::WApplication> createAuthApplication(const Wt::WEnvironment &env, cDicoApt *dico, Analytics *anal)
+std::unique_ptr<Wt::WApplication> createAuthApplication(const Wt::WEnvironment &env, cDicoApt *dico)
 {
     //std::cout << env.internalPath() << " " << env.deploymentPath() << std::endl;
     //std::cout << env.getParameter("a0") << std::endl;
     //std::cout << env.getParameter("a1") << std::endl;
 
-    //anal->addLog(env,-1);
+
 
     if (env.internalPath() == "/documentation" | env.internalPath().substr(0,14)== "/documentation"){
         ;
@@ -96,7 +93,9 @@ std::unique_ptr<Wt::WApplication> createAuthApplication(const Wt::WEnvironment &
     }else{
         std::cout << "internal path pas geré : " << env.internalPath() << std::endl;
 
-        anal->addLog(env);
+        // stats trafic web
+        Analytics anal(dico->File("docroot")+"analytics.db");
+        anal.addLog(env);
 
         auto app404 = Wt::cpp14::make_unique<Wt::WApplication>(env);
         auto theme = std::make_shared<Wt::WBootstrapTheme>();
@@ -108,5 +107,5 @@ std::unique_ptr<Wt::WApplication> createAuthApplication(const Wt::WEnvironment &
     }
 
 
-    return Wt::cpp14::make_unique<AuthApplication>(env,dico,anal);
+    return Wt::cpp14::make_unique<AuthApplication>(env,dico);
 }

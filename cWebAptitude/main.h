@@ -13,7 +13,7 @@ namespace po = boost::program_options;
 #include "api/stationdescresource.h"
 #include "analytics.h"
 
-std::unique_ptr<Wt::WApplication> createAuthApplication(const Wt::WEnvironment &env, cDicoApt * dico, Analytics *anal);
+std::unique_ptr<Wt::WApplication> createAuthApplication(const Wt::WEnvironment &env, cDicoApt * dico);
 
 int main(int argc, char **argv);
 
