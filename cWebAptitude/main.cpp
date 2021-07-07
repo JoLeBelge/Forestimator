@@ -90,6 +90,9 @@ std::unique_ptr<Wt::WApplication> createAuthApplication(const Wt::WEnvironment &
         ;
     }else if (env.internalPath().rfind("/auth",0)==0){ /* authentification links ! */
         ;
+    }else if (env.internalPath() == "/stats_analytics"){
+        auto app = Wt::cpp14::make_unique<PageAnalytics>(env,dico->File("docroot")+"analytics.db");
+        return app;
     }else{
         std::cout << "internal path pas geré : " << env.internalPath() << std::endl;
 

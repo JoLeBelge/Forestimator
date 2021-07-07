@@ -340,7 +340,7 @@ Cette application web de cartographie permet une visualisation des informations 
 		<h5>Visualiser une carte</h5>
 		Le choix de la carte à afficher s'effectue en cliquant sur son nom dans l'encart de droite de la page "cartographie". La légende (signification des couleurs) est consultable en cochant la case à cocher en haut de cet encadré, mais à tout moment, un double click sur une position en particulier de la carte ouvre une fenêtre qui renseigne la signification de la carte pour cet endroit donné. 
 		<div>
-		 <img src="img/popupLegende.png" alt="fenêtre popup qui renseigne la valeur en un point donné" width="350px"  />
+		 <img src="/img/popupLegende.png" alt="fenêtre popup qui renseigne la valeur en un point donné" width="350px"  />
 		</div>
 		<br></br>
 		L'action de double cliquer sur une position de la carte (rond mauve sur la figure) ouvre une fenêtre qui renseigne la valeur pour cette position.
@@ -362,7 +362,7 @@ Cette application web de cartographie permet une visualisation des informations 
 		Ainsi, un double click sur une position de la carte va permettre l'affichage, dans la page d'info ponctuelle, de la carte d'indentité de cette station.
 		Premièrement, le tableau d'aptitude pour cette station est présenté. Les essences sont représentées par leur accronymes et sont classées dans 4 colonnes qui correspondent aux 4 aptitudes ; optimum (en vert foncé), tolérance (en vert clair), tolérance élargie (en orange) et exclusion (en rouge).
 		<div>
-			<img src="img/tableApt.png" alt="pour une station donnée, le tableau d'aptitude des essences" width="350px"/> 
+			<img src="/img/tableApt.png" alt="pour une station donnée, le tableau d'aptitude des essences" width="350px"/> 
 		 	<br></br>
 			Le tableau d'aptitude, qui apparait lorsqu'on double-click sur une station, renseigne l'aptitude pour toutes les essences forestières. Une info-bulle s'affiche lorsqu'on pointe la souris sur les codes essences en deux lettre et affiche le nom complêt de l'essence forestière. Les code essences sont affichés en gris dans le cas d'une <u>double aptitude</u> (ex; Tolérance/Tolérance élargie pour le Hêtre), cette double aptitude est renseignée dans l'info-bulle qui s'affiche lorsqu'on déplace la souris sur le code essence.
 		</div>
@@ -372,7 +372,7 @@ Cette application web de cartographie permet une visualisation des informations 
 <br></br>
 		Enfin, si la carte affichée est une carte d'aptitude pour l'une des essences, une section suplémentaire s'affichera et renseignera le cheminement effectué pour la détermination de l'aptitude de l'essence. L'aptitude des essences est en effet fonction de l'aptitude bioclimatique d'une part, de l'aptitude hydro-trophique d'autre part et des éventuels facteurs de compensation liés à la topographie. Nous renvoyons l'utilisateur vers le guide méthodologique du <a href="https://www.fichierecologique.be">Fichier Ecologique des Essences (FEE)</a>, qui se trouve sous la rubrique aide du site <a href="https://www.fichierecologique.be">www.fichierecologique.be</a>. C'est dans cette section qu'est également présenté l'écogramme de l'espèce pour laquelle la carte d'aptitude est affichée, avec un rectangle mauve situant la station au sein de cet écogramme et de la niche écologique de l'essence.
 		<div>
-			<img src="img/ecogramme.png" alt="position de la station en mauve dans l'écogramme de l'essence" width="200px"  />
+			<img src="/img/ecogramme.png" alt="position de la station en mauve dans l'écogramme de l'essence" width="200px"  />
 		 	<br></br>
 			Lors d'un double-click sur une station, si la carte affichée est une carte d'aptitude, la niche écologique de l'essence ainsi que la position de la station dans l'écogramme (station représentée par le carré mauve) sont également renseignés.
 		</div>
@@ -397,7 +397,7 @@ Cette application web de cartographie permet une visualisation des informations 
 		Une fois le shapefile importé vers Forestimator, celui-ci apparaitra en bleu sur la carte.
 
 		<div>
-			<img src="img/importShp.png" alt="importer un shapefile de polygone dans Forestimator pour y effectuer des analyses surfaciques" width="350px"  />
+			<img src="/img/importShp.png" alt="importer un shapefile de polygone dans Forestimator pour y effectuer des analyses surfaciques" width="350px"  />
 		 	<br></br>
 			Lorsque votre shapefile est importé dans l'application web Forestimator, celui-ci s'affiche en bleu sur la carte. 
 		</div>

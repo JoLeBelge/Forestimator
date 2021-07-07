@@ -1,6 +1,7 @@
 #ifndef ANALYTICS_H
 #define ANALYTICS_H
 
+#pragma once
 #include <Wt/Dbo/Dbo.h>
 #include <Wt/Dbo/Session.h>
 #include <Wt/Dbo/ptr.h>
@@ -10,7 +11,14 @@
 #include <Wt/WApplication.h>
 #include <Wt/WEnvironment.h>
 #include <Wt/WString.h>
+#include <Wt/WBootstrapTheme.h>
+#include <Wt/WContainerWidget.h>
+#include <Wt/WTable.h>
+#include <Wt/WText.h>
+#include <Wt/WHBoxLayout.h>
+#include <Wt/WVBoxLayout.h>
 #include <string>
+#include <ctime>
 
 namespace dbo = Wt::Dbo;
 
@@ -54,3 +62,11 @@ public:
 };
 
 #endif // ANALYTICS_H
+
+class PageAnalytics : public Wt::WApplication
+{
+public:
+    PageAnalytics(const Wt::WEnvironment& env, std::string aFileDB);
+
+    dbo::Session session;
+};
