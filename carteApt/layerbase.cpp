@@ -67,7 +67,7 @@ rasterFiles rasterFiles::getRasterfile(){
 }
 
 layerBase::layerBase(std::string aCode,cDicoApt * aDico):rasterFiles(aDico->File(aCode),aCode),mDico(aDico),mExpert(0){
-    //std::cout << "layerBase constructor " << std::endl;
+    if (globTest){std::cout << "layerBase constructor " << aCode << std::endl;}
     mNom=mDico->RasterNom(mCode);
     mNomCourt=mDico->RasterNomCourt(mCode);
     mExpert=mDico->RasterExpert(mCode);

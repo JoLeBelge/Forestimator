@@ -164,7 +164,7 @@ void groupLayers::clickOnName(std::string aCode){
         if (globTest){ std::cout << " passe en mode classif CS , couche " << aCode << std::endl;}
         mTypeClassifST=TypeClassifST::CS;
     } else{ mTypeClassifST=TypeClassifST::FEE;
-    if (globTest){ std::cout << " passe en mode classif FEE , couche " << aCode << std::endl;}
+        if (globTest){ std::cout << " passe en mode classif FEE , couche " << aCode << std::endl;}
     }
     // ajouter la couche à la carte
     for (std::shared_ptr<Layer> l : mVLs){
@@ -301,7 +301,7 @@ void groupLayers::computeStatGlob(OGRGeometry *poGeomGlobale){
 std::map<std::string,int> groupLayers::apts(){
     std::map<std::string,int> aRes;
     switch (mTypeClassifST){
-    case FEE:
+    case FEE:{
         if (globTest){std::cout << " GL get apt pour mode FEE " << std::endl;}
         if (mStation->readyFEE()){
             if (globTest){std::cout << "station a NT NH ZBIO et Topo " << std::endl;}
@@ -315,7 +315,8 @@ std::map<std::string,int> groupLayers::apts(){
             }
         }
         break;
-    case CS:
+    }
+    case CS:{
         if (globTest){std::cout << " GL get apt pour mode CS " << std::endl;}
         if (mStation->readyCS()){
             if (globTest){std::cout << "station a bien une station du catalogue " << std::endl;}
@@ -329,6 +330,7 @@ std::map<std::string,int> groupLayers::apts(){
             }
         }
         break;
+    }
     }
     return aRes;
 }

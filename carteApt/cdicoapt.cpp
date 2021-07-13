@@ -973,6 +973,7 @@ TypeLayer str2TypeLayer(const std::string& str)
     if(str == "FEE") aRes=TypeLayer::FEE;
     if(str == "CS") aRes=TypeLayer::CS;
     if(str == "KK") aRes=TypeLayer::KK;
+    if (globTest){std::cout << "str2TypeLayer " << str << " , " << (int (aRes)) << std::endl;}
     return aRes;
 }
 
