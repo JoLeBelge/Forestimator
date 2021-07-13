@@ -47,13 +47,13 @@ public:
     std::string getPHASE_2() const {return mPHASE_2;}
     std::string getPHASE_4() const {return mPHASE_4;}
     std::string getPHASE_6() const {return mPHASE_6;}
-   std::string getCHARGE() const {return mCHARGE;}
+    std::string getCHARGE() const {return mCHARGE;}
 
     std::string getDRAINAGE() const {return mDRAINAGE;}
-     std::string getDEV_PROFIL() const {return mDEV_PROFIL;}
-      std::string getSER_SPEC() const {return mSER_SPEC;}
+    std::string getDEV_PROFIL() const {return mDEV_PROFIL;}
+    std::string getSER_SPEC() const {return mSER_SPEC;}
 
-   /* bool calcaire() const;
+    /* bool calcaire() const;
     // serie.special.riche
     bool ssriche() const;
     bool profond() const;
@@ -65,15 +65,16 @@ public:
     bool limon() const;
     */
     bool calcaire() const {return mCalcaire;}
-        // serie.special.riche
-        bool ssriche() const {return mSsriche;}
-        bool profond() const{return mProfond;}
-        bool alluvion() const{return mAlluvion;}
-        bool podzol() const{return mPodzol;}
-         bool podzolique() const{return mPodzolique;}
-        bool superficiel() const{return mSuperficiel;}
-        bool tourbe() const{return mTourbe;}
-        bool limon() const{return mLimon;}
+    // serie.special.riche
+    bool ssriche() const {return mSsriche;}
+    bool profond() const{return mProfond;}
+    bool alluvion() const{return mAlluvion;}
+    bool podzol() const{return mPodzol;}
+    bool podzolique() const{return mPodzolique;}
+    bool superficiel() const{return mSuperficiel;}
+    bool tourbe() const{return mTourbe;}
+    bool limon() const{return mLimon;}
+    bool chargeSchisteux() const{return SUBSTRAT=="f";}
 
     void cat() const{std::cout << " siglePedo " << INDEX_ << " , substrat " << SUBSTRAT << ", drainage " << mDRAINAGE << std::endl;}
 
@@ -145,25 +146,25 @@ public:
         return aRes;
     }*/
 
-   siglePedo * getSiglePedoPtr(int aIndex){
+    siglePedo * getSiglePedoPtr(int aIndex){
 
-            //std::cout << "get Sigle pour " << aIndex << std::endl;
-            siglePedo * aRes;
+        //std::cout << "get Sigle pour " << aIndex << std::endl;
+        siglePedo * aRes;
 
-            // d'abord regarder dans la map si je l'ai déjà quelque part
-            if(mMSigles.find(aIndex)!=mMSigles.end()){
-                aRes=mMSigles.at(aIndex);
-            } else {
+        // d'abord regarder dans la map si je l'ai déjà quelque part
+        if(mMSigles.find(aIndex)!=mMSigles.end()){
+            aRes=mMSigles.at(aIndex);
+        } else {
             dbo::Transaction transaction{session};
             dbo::ptr<siglePedo> s = session.find<siglePedo>().where("INDEX_=?").bind(std::to_string(aIndex));
 
             siglePedo * s2=new siglePedo(s);
             mMSigles.emplace(std::make_pair(aIndex,s2));
             aRes=s2;
-            }
-
-            return aRes;
         }
+
+        return aRes;
+    }
 
 private:
     std::string mBDpath;

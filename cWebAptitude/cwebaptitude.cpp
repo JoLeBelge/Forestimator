@@ -87,7 +87,7 @@ cWebAptitude::cWebAptitude(AuthApplication *app, Auth::AuthWidget* authWidget_)
     /*** page principale application map ***/
 
     /*	MAP	*/
-    std::cout << "create map" << std::endl;
+    if (globTest){std::cout << "create map" << std::endl;}
     auto map = cpp14::make_unique<WOpenLayers>(mDico);
     mMap = map.get();
     mMap->setWidth("100%");
@@ -199,7 +199,7 @@ cWebAptitude::cWebAptitude(AuthApplication *app, Auth::AuthWidget* authWidget_)
     mGroupLayerW->setStyleClass("content_GL");
 
     /* CHARGE ONGLET COUCHES & SIMPLEPOINT */
-    printf("create GL\n");
+   if (globTest){ printf("create GL\n");}
     mGroupL = new groupLayers(mApp,this);
     //load_content_couches(content_couches);
 

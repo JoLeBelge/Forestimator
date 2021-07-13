@@ -1,6 +1,6 @@
 #include "panier.h"
 
-
+extern bool globTest;
 panier::panier(AuthApplication *app, cWebAptitude * cWebApt): WContainerWidget() ,
     mDico(app->mDico),m_app(app),mcWebAptitude(cWebApt),mMap(cWebApt->mMap),mGroupL(cWebApt->mGroupL)
 {
@@ -27,7 +27,7 @@ panier::panier(AuthApplication *app, cWebAptitude * cWebApt): WContainerWidget()
             mGroupL->mExtentDiv->show();
     });
     button_e->addStyleClass("btn btn-info");
-    printf("mextentdiv\n");
+    if (globTest){printf("mextentdiv\n");}
     mExtentDiv = mExtentDivGlob->addWidget(cpp14::make_unique<WContainerWidget>());
     mExtentDiv->setMargin(15,Wt::Side::Left);
     mExtentDiv->setMargin(15,Wt::Side::Right);
@@ -47,7 +47,7 @@ panier::panier(AuthApplication *app, cWebAptitude * cWebApt): WContainerWidget()
 
 
 void panier::addMap(std::string aCode, std::shared_ptr<Layer> l){
-    std::cout << "aCode : " << aCode << std::endl;
+    if (globTest) {std::cout << "aCode : " << aCode << std::endl;}
 
     // vérifie qu'elle n'est pas déjà dans le panier
     for (std::shared_ptr<Layer> l : mVLs){

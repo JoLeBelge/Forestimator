@@ -183,7 +183,7 @@ void groupLayers::clickOnName(std::string aCode){
 void groupLayers::extractInfo(double x, double y){
 
     if(!isnan(x) && !isnan(y) && !(x==0 && y==0)){
-        std::cout << "groupLayers ; extractInfo " << x << " , " << y << std::endl;
+        if (globTest){std::cout << "groupLayers ; extractInfo " << x << " , " << y << std::endl;}
         mStation->vider();
         mStation->setOK();
         mStation->setX(x);

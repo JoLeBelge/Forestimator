@@ -79,7 +79,7 @@ cDicoCartepH::cDicoCartepH(std::string aBDFile):mBDpath(aBDFile)
             }
         }
 
-        SQLstring="SELECT PTS,RegNat,pH_moy,pH_nb FROM pH_regnat_pts;";
+        SQLstring="SELECT PTS,RegNat,pH_moy,pH_nb FROM pH_regnat_pts WHERE keep=1;";
         sqlite3_reset(stmt);
         sqlite3_prepare_v2( db_, SQLstring.c_str(), -1, &stmt, NULL );
         while(sqlite3_step(stmt) == SQLITE_ROW)

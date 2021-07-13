@@ -1,8 +1,9 @@
 #include "statwindow.h"
+extern bool globTest;
 
 statWindow::statWindow(groupLayers * aGL):mDico(aGL->Dico()), mApp(aGL->m_app),mGL(aGL)//, sigImgPDF(this,"pdf"), slotImgPDF(this)
 {
-    std::cout << "statWindow::statWindow" << std::endl;
+    if (globTest){std::cout << "statWindow::statWindow" << std::endl;}
     setId("statWindow");
     setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Left);
     setMargin(1,Wt::Side::Bottom | Wt::Side::Top);
@@ -22,18 +23,6 @@ statWindow::statWindow(groupLayers * aGL):mDico(aGL->Dico()), mApp(aGL->m_app),m
     createPdfBut = contTitre_->addWidget(cpp14::make_unique<WPushButton>("Export PDF"));
     createPdfBut->clicked().connect(this,&statWindow::export2pdf);
     }
-    //createPdfBut->clicked().connect(this->slotImgPDF);
-
-    //sigImgPDF.connect(std::bind(&statWindow::export2pdf,this, std::placeholders::_1));
-    //sigImgPDF.connect(this, &statWindow::export2pdf);
-
-    // 75k,100k,112.5k,120k ok
-    // 125k,122.5k KO
-    // "img=img.substr(0,122500);"
-
-    /*auto pdf = std::make_shared<ReportResource>(this);
-    createPdfBut->setLink(WLink(pdf));
-    */
 
     mCarteGenCont = addWidget(cpp14::make_unique<WContainerWidget>());
     mCarteGenCont->setId("carteGenStat");
@@ -129,24 +118,6 @@ void statWindow::generateGenCarte(OGRFeature * poFeature){
      Wt::WImage * im =layoutH->addWidget(cpp14::make_unique<Wt::WImage>(sm.getWLinkRel()),0);
      im->resize(350,"100%");
      // need to set it here after initialization of the map id !
-    /* slotImgPDF.setJavaScript("function () {"
-                              "var mapCanvas = document.createElement('canvas');"
-                              "var size = mapStat"+olStatic->id()+".getSize();"
-                              "mapCanvas.width = size[0];"
-                              "mapCanvas.height = size[1];"
-                              "var mapContext = mapCanvas.getContext('2d');"
-                              "var canvas = document.querySelectorAll('.ol-viewport canvas');"
-                              "mapContext.drawImage(canvas[1], 0, 0);"
-                              "var img = ''+mapCanvas.toDataURL();"
-                              "console.log('length of img text='+img.length);"
-                              "var l=img.length;"
-                              "var maxiter=0;"
-                              "if(img.length>120000){"
-                              "  img=img.substr(0,120000);"
-                              "}"
-                              + sigImgPDF.createCall({"img","l"}) + "}");
-     //olStatic->setId("olCarteGenerale");
-     */
 
      // description générale ; lecture des attribut du polygone?calcul de pente, zone bioclim, et élévation
      WContainerWidget * aContInfo = layoutH->addWidget(cpp14::make_unique<WContainerWidget>());
@@ -184,46 +155,6 @@ void statWindow::generateGenCarte(OGRFeature * poFeature){
 }
 
 
-
-
-/*void statWindow::export2pdf(std::string img, int length){
-    std::cout << "statWindow::export2pdf() size :" << length << "; ind=" << chunkImgPDFind << std::endl;
-
-    if(length>120000){
-        if(chunkImgPDF==0){
-            chunkImgPDF=length/120000;
-            if(length%120000>0)chunkImgPDF++;
-            chunkImgPDFind=1;
-            std::cout << "statWindow::export2pdf() chunks :" << chunkImgPDF << std::endl;
-            strImgPDF=img;
-        }else{
-            strImgPDF=strImgPDF+img;
-            chunkImgPDFind++;
-            std::cout << "statWindow::export2pdf() chunks ind :" << chunkImgPDFind << std::endl;
-        }
-
-        if(chunkImgPDFind<chunkImgPDF){
-            doJavaScript(
-                 "var mapCanvas = document.createElement('canvas');"
-                 "var size = mapStat"+olStatic->id()+".getSize();"
-                 "mapCanvas.width = size[0];"
-                 "mapCanvas.height = size[1];"
-                 "var mapContext = mapCanvas.getContext('2d');"
-                 "var canvas = document.querySelectorAll('.ol-viewport canvas');"
-                 "mapContext.drawImage(canvas[1], 0, 0);"
-                 "var img = ''+mapCanvas.toDataURL();"
-                 "var l=img.length;"
-                 "img=img.substr("+std::to_string(chunkImgPDFind*120000)+",120000);"
-                 "Wt.emit('statWindow','pdf',img,l);");
-            return;
-        }else {
-            chunkImgPDF=0;      // reset
-            chunkImgPDFind=0;   // reset
-        }
-    }else{
-        strImgPDF=img;
-    }
-    */
 void statWindow::export2pdf(){
     // création du pdf
     HPDF_Doc pdf = HPDF_New(error_handler, 0);
@@ -272,10 +203,10 @@ void statWindow::export2pdf(){
     fileResource->suggestFileName("Forestimator-info-parcelaire.pdf");
     mApp->redirect(fileResource->url());
 
+
 }
 
 
 void statWindow::renderPdf(Wt::Render::WPdfRenderer * renderer){
-    std::cout << "statWindow::render" << std::endl;
-
+    if (globTest){std::cout << "statWindow::render" << std::endl;}
 }

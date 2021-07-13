@@ -311,8 +311,11 @@ int cleNT(const siglePedo *s, int ZBIO, int TECO, double pH){
     int aRes(0);
     if(pH>=lim_p12){aRes=12;}
     if(pH<lim_p12 && s->calcaire() && (s->podzol() | s->podzolique())){aRes=9;}
-    if(pH<lim_p12 && s->calcaire() && (!s->podzol() & !s->podzolique()) && pH<5 && !s->profond()){aRes=9;}
-    if(pH<lim_p12 && s->calcaire() && (!s->podzol() & !s->podzolique()) && pH<5 && s->profond()){aRes=9;}
+    // 2021 07 12 Andyne me dis que les kEbb et autres sols en calestienne sont en -1 (cause du pH) mais on aimerai qu'ils soient en +1
+    if(pH<lim_p12 && s->calcaire() && (!s->podzol() & !s->podzolique()) && pH<5 && TECO!=13){aRes=9;}
+    if(pH<lim_p12 && s->calcaire() && (!s->podzol() & !s->podzolique()) && pH<5 && TECO==13){aRes=11;}
+    //if(pH<lim_p12 && s->calcaire() && (!s->podzol() & !s->podzolique()) && pH<5 && !s->profond()){aRes=9;}
+    //if(pH<lim_p12 && s->calcaire() && (!s->podzol() & !s->podzolique()) && pH<5 && s->profond()){aRes=9;}
     if(pH<lim_p12 && s->calcaire() && (!s->podzol() & !s->podzolique()) && pH>=5 && s->profond()){aRes=10;}
     if(pH<lim_p12 && s->calcaire() && (!s->podzol() & !s->podzolique()) && pH>=5 && !s->profond()){aRes=11;}
     if(pH<lim_p12 && s->calcaire() && s->superficiel() && (!s->podzol() & !s->podzolique())){aRes=12;}
@@ -336,6 +339,10 @@ int cleNT(const siglePedo *s, int ZBIO, int TECO, double pH){
     // limon en r?gion limoneuse
     if(s->limon() &&  (TECO==6 | TECO==7) && !s->calcaire() && !s->alluvion() && !s->podzol() ){aRes=9;}
 
+    // 2021 07 12 ; andyne souhaite que la bande de sol gbbf en ardenne qui longe la famenne soit en -1 plutôt que -2. Sophie et Hugues confirme que c'est plus riche, malgré que le pH de ce pts soit à 4.15 pour l'Ardenne
+     if( s->chargeSchisteux() &&  ( ZBIO==1 | ZBIO==2 | ZBIO==10) ){aRes=9;}
+
+
     // attention, si na sur carte pH, attribue mauvaise classe trophique.
 
     // en 2017 je mettais cette ligne de code en fin de clé, du coup certains sols en zone de tourbe qui n'avait pas de valeur de pH se voyais attribuer un nodata.
@@ -344,7 +351,7 @@ int cleNT(const siglePedo *s, int ZBIO, int TECO, double pH){
     if(pH==0.0 | pH==1.0){aRes=0;}
 
     // ajout Claessens 10/02: tourbe en Ardenne
-    if(s->tourbe() &&  ( ZBIO==1 | ZBIO!=2 | ZBIO==10)){aRes=7;}
+    if(s->tourbe() &&  ( ZBIO==1 | ZBIO==2 | ZBIO==10)){aRes=7;}
 
     // hors ardenne : indetermin?
     if(s->tourbe() &&  ( ZBIO!=1 && ZBIO!=2 && ZBIO!=10)){aRes=0;}
