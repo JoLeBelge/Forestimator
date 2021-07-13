@@ -150,7 +150,7 @@ void groupLayers::clickOnName(std::string aCode){
     for (std::shared_ptr<Layer> l : mVLs){
         if(aCode==l->Code()){
             layer=l;
-            type==l->getCatLayer();
+            type=l->getCatLayer();
             break;
         }
     }
