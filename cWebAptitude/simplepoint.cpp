@@ -117,9 +117,10 @@ void simplepoint::detailCalculAptFEE(ST * aST){
 }
 
 void simplepoint::afficheAptAllEss(){
-
+    if (globTest){std::cout << "simplepoint::afficheAptAllEss" << std::endl;}
     std::map<std::string, int> Apts = mGL->apts();
     if (Apts.size()>1){
+         if (globTest){std::cout << "Apts.size() : " << Apts.size() << std::endl;}
 
         // on splitte le vecteur aptitudes en 4 vecteurs, qui seront dans des colonnes différentes
         std::map<std::string, int> O;
@@ -223,6 +224,8 @@ void simplepoint::afficheAptAllEss(){
             column++;
             row=0;
         }
+    } else {
+        std::cout << "simplePoint affiche tableau apt : pas d'essence pour le tableau" << std::endl;
     }
 }
 
