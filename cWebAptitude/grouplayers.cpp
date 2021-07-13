@@ -159,10 +159,13 @@ void groupLayers::clickOnName(std::string aCode){
     mParent->doJavaScript("overlay.setVisible(0);");
 
     // changer le mode CS vs FEE de grouplayer, utilise pour le tableau d'aptitude
-    // attention de ne pas prendre la couche "CS_FEE" dans le tas..
-    if (type == TypeLayer::CS | type == TypeLayer::KK | (type == TypeLayer::Station & aCode.substr(0,2)=="CS")){ mTypeClassifST=TypeClassifST::CS;} else
-    { mTypeClassifST=TypeClassifST::FEE;}
-
+    // attention de ne pas prendre la couche "CS_FEE" dans le tas (pour Chêne Sessile).
+    if (type == TypeLayer::CS | type == TypeLayer::KK | (type == TypeLayer::Station & aCode.substr(0,2)=="CS")){
+        if (globTest){ std::cout << " passe en mode classif CS , couche " << aCode << std::endl;}
+        mTypeClassifST=TypeClassifST::CS;
+    } else{ mTypeClassifST=TypeClassifST::FEE;
+    if (globTest){ std::cout << " passe en mode classif FEE , couche " << aCode << std::endl;}
+    }
     // ajouter la couche à la carte
     for (std::shared_ptr<Layer> l : mVLs){
         if (l->IsActive()){
@@ -315,6 +318,7 @@ std::map<std::string,int> groupLayers::apts(){
     case CS:
         if (globTest){std::cout << " GL get apt pour mode CS " << std::endl;}
         if (mStation->readyCS()){
+            if (globTest){std::cout << "station a bien une station du catalogue " << std::endl;}
             for (std::shared_ptr<Layer> l : mVLs){
                 if ( l->getCatLayer()==TypeLayer::CS){//l->Type()==TypeLayer::FEE ||
                     // j'ai deux solution pour avoir les aptitudes ; soit je lis la valeur du raster apt, soit je recalcule l'aptitude avec les variables environnementales
