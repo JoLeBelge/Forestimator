@@ -299,9 +299,11 @@ std::map<std::string,int> groupLayers::apts(){
     std::map<std::string,int> aRes;
     switch (mTypeClassifST){
     case FEE:
+        if (globTest){std::cout << " GL get apt pour mode FEE " << std::endl;}
         if (mStation->readyFEE()){
+            if (globTest){std::cout << "station a NT NH ZBIO et Topo " << std::endl;}
             for (std::shared_ptr<Layer> l : mVLs){
-                if (l->getCatLayer()==TypeLayer::FEE ){//|| l->Type()==TypeLayer::CS){
+                if (l->getCatLayer()==TypeLayer::FEE ){
                     // j'ai deux solution pour avoir les aptitudes ; soit je lis la valeur du raster apt, soit je recalcule l'aptitude avec les variables environnementales
                     std::shared_ptr<cEss> Ess= l->Ess();
                     int apt = Ess->getFinalApt(mStation->mNT,mStation->mNH, mStation->mZBIO, mStation->mTOPO);
@@ -311,6 +313,7 @@ std::map<std::string,int> groupLayers::apts(){
         }
         break;
     case CS:
+        if (globTest){std::cout << " GL get apt pour mode CS " << std::endl;}
         if (mStation->readyCS()){
             for (std::shared_ptr<Layer> l : mVLs){
                 if ( l->getCatLayer()==TypeLayer::CS){//l->Type()==TypeLayer::FEE ||

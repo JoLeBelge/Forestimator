@@ -10,7 +10,7 @@
 
 using namespace Wt;
 
-//C'est la classe qui hérite de layerbase et qui intègre tout le volêt Wt - site internet avec interface graphique
+// C'est la classe qui hérite de layerbase et qui intègre tout le volêt Wt - site internet avec interface graphique
 // c'est également la classe qui fait le lien avec la classe Ess et les aptitudes qui vont avec
 
 class groupLayers;
