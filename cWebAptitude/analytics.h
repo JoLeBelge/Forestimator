@@ -62,7 +62,7 @@ class Analytics
 public:
     Analytics(std::string aFileDB);
     //Analytics(const std::string &sqliteDb);
-    bool findLog(const Wt::WEnvironment &env, std::string page, typeLog cat);
+    bool logExist(const Wt::WEnvironment &env, std::string page, typeLog cat);
 
     void addLog(const Wt::WEnvironment &env, int user_id, std::string page,int cat=1);
     void addLog(const Wt::WEnvironment &env, int user_id){addLog(env,user_id,env.internalPath());}

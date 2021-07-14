@@ -40,7 +40,7 @@ cWebAptitude::cWebAptitude(AuthApplication *app, Auth::AuthWidget* authWidget_)
     menuitem_app->setLink(WLink(LinkType::InternalPath, "/cartographie"));
     menuitem_app->setToolTip(tr("menu.button.tooltip.carto"));
     // menu doc
-    menuitem_documentation = navbar_menu->addItem("resources/problem_analysis_icon_149897.png","");
+    menuitem_documentation = navbar_menu->addIthis->raiseToFront();tem("resources/problem_analysis_icon_149897.png","");
     menuitem_documentation->setLink(WLink(LinkType::InternalPath, "/documentation"));
     menuitem_documentation->setToolTip(tr("menu.button.tooltip.doc"));
     // menu login

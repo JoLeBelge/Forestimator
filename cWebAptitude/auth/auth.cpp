@@ -21,16 +21,18 @@ AuthApplication::AuthApplication(const Wt::WEnvironment& env, cDicoApt *dico)
     root()->setMargin(0);
     root()->setPadding(0);
 
-    layout->addWidget(std::move(loadAuthWidget()));
+    //layout->addWidget(std::move(loadAuthWidget()));
+    dialog_auth = layout->addChild(Wt::cpp14::make_unique<Wt::WDialog>("Connexion"));
+    dialog_auth->setResizable(true);
+    dialog_auth->setModal(true);
+    dialog_auth->setMaximumSize(700,600);
+    dialog_auth->setWidth(600);
+    dialog_auth->setHeight(500);
+    dialog_auth->contents()->setOverflow(Overflow::Scroll);
+    dialog_auth->setClosable(true);
+    dialog_auth->contents()->addWidget(std::move(loadAuthWidget()));
 
     cWebApt = layout->addWidget(Wt::cpp14::make_unique<cWebAptitude>(this, authWidget_));
-
-    // stats web
-    if (session_.login().loggedIn()) {
-        const Wt::Auth::User& u = session_.login().user();
-        mAnal.addLog(env,atol(u.id().c_str()));
-    }else
-        mAnal.addLog(env);
 
     root()->addStyleClass("layout_main");
     loaded_=true;
@@ -101,8 +103,6 @@ std::unique_ptr<Wt::Auth::AuthWidget> AuthApplication::loadAuthWidget(){
     authWidget_->setRegistrationEnabled(true);
     authWidget_->processEnvironment();
     authWidget_->addStyleClass("Wt-auth-login-container");
-    //authWidget_->addStyleClass("nonvisible");
-    authWidget_->hide();
     if (globTest){printf("done\n");}
     return authWidget;
 }
@@ -118,9 +118,8 @@ void AuthApplication::authEvent() {
                 << " logged in. (2)";
         if(loaded_){
             cWebApt->menuitem_login->setIcon("resources/user_icon_logout.png");
-            std::string JScommand("$('.Wt-auth-login-container').removeClass('visible').addClass('nonvisible');");
-            doJavaScript(JScommand);
             cWebApt->mGroupL->updateGL();
+            dialog_auth->hide();
         }
     } else{
         log("notice") << "User logged out.";
@@ -146,7 +145,7 @@ Wt::Auth::User AuthApplication::getUser(){
 void AuthApplication::addLog(std::string page, typeLog cat){
 
     // check pour ne pas ajouter dix fois sur la mm journée et pour le même utilisateur un log identique.
-    if (mAnal.findLog(this->environment(),page, cat)==0){
+    if (!mAnal.logExist(this->environment(),page, cat)){
     if (session_.login().loggedIn()) {
         const Wt::Auth::User& u = session_.login().user();
         mAnal.addLog(this->environment(),atol(u.id().c_str()), page,(int (cat)));

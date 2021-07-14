@@ -25,7 +25,10 @@ Analytics::Analytics(std::string aFileDB) : session()
 
 }
 
+
 void Analytics::addLog(const Wt::WEnvironment &env, int user_id, std::string page, int cat){
+
+    if(env.agentIsSpiderBot())return;
 
     dbo::Transaction transaction{session};
 
@@ -44,14 +47,20 @@ void Analytics::addLog(const Wt::WEnvironment &env, int user_id, std::string pag
 
 }
 
-bool Analytics::findLog(const Wt::WEnvironment &env, std::string page, typeLog cat){
-    bool aRes(0);
+bool Analytics::logExist(const Wt::WEnvironment &env, std::string page, typeLog cat){
+    bool aRes(1);
     dbo::Transaction transaction{session};
-    std::cout << " date " << Wt::WDate::currentDate().extFormat("yyyy-mm-dd") << std::endl;
-    dbo::ptr<Log> logPtr = session.find<Log>().where("date = ?").bind(Wt::WDate::currentDate().toString()).where("ipath = ?").bind(page).where("ip = ?").bind(env.clientAddress());
-        if (logPtr.get()!=nullptr) {aRes=1;} else {aRes=0;
+
+    /*dbo::ptr<Log> logPtr = session.find<Log>().where("date = ?").bind(Wt::WDate::currentDate().toString("yyyy-MM-dd")).where("ipath = ?").bind(page).where("ip = ?").bind(env.clientAddress());
+        if (logPtr.get()==nullptr){aRes=0;} else{
          if (globTest){std::cout << " le log existe déjà pour cet utilisateur !" << std::endl;}
         }
+        */
+
+    int c=session.query<int>("select count(1) from Log").where("date = ?").bind(Wt::WDate::currentDate().toString("yyyy-MM-dd")).where("ipath = ?").bind(page).where("ip = ?").bind(env.clientAddress()).where("cat = ?").bind((int (cat)));
+    if (c==0){aRes=0;} else{
+     if (globTest){std::cout << " le log existe déjà pour cet utilisateur !" << std::endl;}
+    }
     return aRes;
 }
 
