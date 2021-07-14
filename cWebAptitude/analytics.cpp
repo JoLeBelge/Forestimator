@@ -26,6 +26,7 @@ Analytics::Analytics(std::string aFileDB) : session()
 }
 
 void Analytics::addLog(const Wt::WEnvironment &env, int user_id, std::string page){
+    if(env.agentIsSpiderBot())return;
 
     dbo::Transaction transaction{session};
 

@@ -45,18 +45,16 @@ cWebAptitude::cWebAptitude(AuthApplication *app, Auth::AuthWidget* authWidget_)
     menuitem_documentation->setToolTip(tr("menu.button.tooltip.doc"));
     // menu login
     menuitem_login = navbar_menu->addItem(mApp->isLoggedIn()?"resources/user_icon_logout.png":"resources/user_icon_149851.png","");
+    menuitem_login->setToolTip(tr("menu.button.tooltip.login"));
     menuitem_login->clicked().connect([=] {
         if(mApp->isLoggedIn()){
             menuitem_login->setIcon("resources/user_icon_149851.png");
             mApp->logout();
+            app->dialog_auth->hide();
         }else{
-            //authWidget->addStyleClass("visible"); // ne fonctionne qu'une fois ! bizarre...workaround avec injection de JS direct OK !
-            //authWidget->removeStyleClass("nonvisible");
-            std::string JScommand("$('.Wt-auth-login-container').removeClass('nonvisible').addClass('visible');");
-            mApp->doJavaScript(JScommand);
+            app->dialog_auth->show();
         }
     });
-    menuitem_login->setToolTip(tr("menu.button.tooltip.login"));
 
     // pas encore implémenté
     /*navbar_menu->addItem("resources/configuration_center_icon_149956.png","")

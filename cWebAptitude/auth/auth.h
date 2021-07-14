@@ -63,6 +63,7 @@ public:
     cDicoApt * mDico;
     cWebAptitude * cWebApt;
     Analytics mAnal;
+    Wt::WDialog *dialog_auth;
 private:
     Session session_;
     bool loaded_=false; // sert à éviter que void authEvent ne crash si refresh la page et que user connecté...

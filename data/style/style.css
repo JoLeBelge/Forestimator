@@ -186,18 +186,21 @@ text-align: center
 	//display: none;
 	position: absolute;
 	z-index: 1;
-	top: 200px;
+	//top: 200px;
 	float: right;
-	width: 100%;
+	width: 90%;
 }
 .Wt-auth-login{
-	width: 50%;
+	//width: 50%;
 	background-color: white; //#d8ecd6;
 	max-width: 600px;
-	margin: auto;
+	//margin: auto;
 	padding-left: 15px;
 	padding-right: 15px;
-	border: green solid 1px;
+	//border: green solid 1px;
+}
+.Wt-auth-login legend{
+	display:none
 }
 
 input[type="checkbox"] {

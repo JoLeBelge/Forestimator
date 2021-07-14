@@ -74,9 +74,10 @@ std::unique_ptr<Wt::WApplication> createAuthApplication(const Wt::WEnvironment &
 {
     //std::cout << env.internalPath() << " " << env.deploymentPath() << std::endl;
     //std::cout << env.getParameter("a0") << std::endl;
-    //std::cout << env.getParameter("a1") << std::endl;
-
-
+    /*std::cout << "ffor: " << env.headerValue("X-Forwarded-For") << std::endl;
+    std::cout << "fpro: " << env.headerValue("X-Forwarded-Prot") << std::endl;
+    std::cout << "ip: " << env.headerValue("Client-IP") << std::endl;
+    std::cout << "ua: " << env.headerValue("User-Agent") << std::endl;*/
 
     if (env.internalPath() == "/documentation" | env.internalPath().substr(0,14)== "/documentation"){
         ;
