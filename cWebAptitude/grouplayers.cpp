@@ -292,6 +292,7 @@ void groupLayers::computeStatGlob(OGRGeometry *poGeomGlobale){
     }
     //mPBar->setValue(mPBar->maximum());
     //return aRes;
+     m_app->addLog("compute stat, "+std::to_string(getNumSelect4Download())+" traitements",typeLog::anas); // add some web stats
 }
 
 /**
@@ -479,7 +480,7 @@ void groupLayers::exportLayMapView(){
             //std::unique_ptr<WFileResource> fileResource = std::make_unique<Wt::WFileResource>("plain/text",archiveFileName);
             WFileResource * fileResource = new Wt::WFileResource("plain/text",archiveFileName);
             fileResource->suggestFileName(mClientName+".zip");
-            m_app->addLog("Download map layer"); // add some web stats
+            m_app->addLog(l->Code(),typeLog::dsingle);
             m_app->redirect(fileResource->url());
         } else {
             Wt::WMessageBox * messageBox = this->addChild(Wt::cpp14::make_unique<Wt::WMessageBox>(
@@ -721,7 +722,7 @@ void groupLayers::saveExtent(double c_x, double c_y, double zoom){
     closeConnection();
 
     loadExtents(id);
-    m_app->addLog("save an extent"); // add some web stats
+    m_app->addLog("save an extent",typeLog::extend); // add some web stats
 }
 
 void groupLayers::deleteExtent(std::string id_extent){
@@ -733,7 +734,7 @@ void groupLayers::deleteExtent(std::string id_extent){
     closeConnection();
 
     loadExtents(m_app->getUser().id());
-    m_app->addLog("delete an extent"); // add some web stats
+    m_app->addLog("delete an extent",typeLog::extend); // add some web stats
 }
 /** FIN extents **/
 
@@ -743,9 +744,9 @@ std::vector<rasterFiles> groupLayers::getSelect4Download(){return mSelectLayers-
 
 //int groupLayers::getNumSelect4Stat(){return mSelect4Stat->numSelectedLayer();}
 int groupLayers::getNumSelect4Download(){return mSelectLayers->numSelectedLayer();}
-//std::vector<std::shared_ptr<Layer>>groupLayers::getSelectedLayer4Stat(){return mSelect4Stat->getSelectedLayer();}
+
 std::vector<std::shared_ptr<Layer>> groupLayers::getSelectedLayer4Download(){return mSelectLayers->getSelectedLayer();}
-//std::vector<Layer *> groupLayers::getAllLayer(){return mSelect4Download->getAllLayer();}
+
 
 
 // crée le html en vérifiant que chaque membre de layerMTD soit bien un code html valide

@@ -54,6 +54,7 @@ cWebAptitude::cWebAptitude(AuthApplication *app, Auth::AuthWidget* authWidget_)
             //authWidget->removeStyleClass("nonvisible");
             std::string JScommand("$('.Wt-auth-login-container').removeClass('nonvisible').addClass('visible');");
             mApp->doJavaScript(JScommand);
+            //authWidget->show();
         }
     });
     menuitem_login->setToolTip(tr("menu.button.tooltip.login"));

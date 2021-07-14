@@ -1,7 +1,7 @@
 #include "analytics.h"
 
 
-
+extern bool globTest;
 
 
 
@@ -25,21 +25,34 @@ Analytics::Analytics(std::string aFileDB) : session()
 
 }
 
-void Analytics::addLog(const Wt::WEnvironment &env, int user_id, std::string page){
+void Analytics::addLog(const Wt::WEnvironment &env, int user_id, std::string page, int cat){
 
     dbo::Transaction transaction{session};
 
     std::unique_ptr<Log> log{new Log()};
     log->datum = time(0);
+    log->date = Wt::WDate::currentDate();
     log->ip = env.clientAddress();
     log->client = env.userAgent();
     log->ipath = page;
     log->id_user = user_id;
+    log->categorie = cat;
 
     //std::cout << log->datum << log->client << log->ipath << std::endl;
 
     dbo::ptr<Log> logPtr = session.add(std::move(log));
 
+}
+
+bool Analytics::findLog(const Wt::WEnvironment &env, std::string page, typeLog cat){
+    bool aRes(0);
+    dbo::Transaction transaction{session};
+    std::cout << " date " << Wt::WDate::currentDate().extFormat("yyyy-mm-dd") << std::endl;
+    dbo::ptr<Log> logPtr = session.find<Log>().where("date = ?").bind(Wt::WDate::currentDate().toString()).where("ipath = ?").bind(page).where("ip = ?").bind(env.clientAddress());
+        if (logPtr.get()!=nullptr) {aRes=1;} else {aRes=0;
+         if (globTest){std::cout << " le log existe déjà pour cet utilisateur !" << std::endl;}
+        }
+    return aRes;
 }
 
 

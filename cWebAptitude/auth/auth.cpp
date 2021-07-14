@@ -4,6 +4,7 @@
 
 using namespace std;
 using namespace Wt;
+extern bool globTest;
 
 AuthApplication::AuthApplication(const Wt::WEnvironment& env, cDicoApt *dico)
     : Wt::WApplication(env),
@@ -11,8 +12,6 @@ AuthApplication::AuthApplication(const Wt::WEnvironment& env, cDicoApt *dico)
 {
     // charge le xml avec tout le texte qui sera chargé via la fonction tr()
     messageResourceBundle().use(docRoot() + "/forestimator");
-
-
 
     setTitle("Forestimator");
 
@@ -93,7 +92,7 @@ void AuthApplication::loadStyles(){
 
 std::unique_ptr<Wt::Auth::AuthWidget> AuthApplication::loadAuthWidget(){
     // auth widget (login)
-    printf("Auth widget...");
+     if (globTest){printf("Auth widget...");}
     session_.login().changed().connect(this, &AuthApplication::authEvent);
     std::unique_ptr<Wt::Auth::AuthWidget> authWidget = cpp14::make_unique<Wt::Auth::AuthWidget>(Session::auth(), session_.users(), session_.login());
     authWidget_=authWidget.get();
@@ -102,8 +101,9 @@ std::unique_ptr<Wt::Auth::AuthWidget> AuthApplication::loadAuthWidget(){
     authWidget_->setRegistrationEnabled(true);
     authWidget_->processEnvironment();
     authWidget_->addStyleClass("Wt-auth-login-container");
-    authWidget_->addStyleClass("nonvisible");
-    printf("done\n");
+    //authWidget_->addStyleClass("nonvisible");
+    authWidget_->hide();
+    if (globTest){printf("done\n");}
     return authWidget;
 }
 
@@ -143,10 +143,14 @@ Wt::Auth::User AuthApplication::getUser(){
     return session_.login().user();
 }
 
-void AuthApplication::addLog(std::string page){
+void AuthApplication::addLog(std::string page, typeLog cat){
+
+    // check pour ne pas ajouter dix fois sur la mm journée et pour le même utilisateur un log identique.
+    if (mAnal.findLog(this->environment(),page, cat)==0){
     if (session_.login().loggedIn()) {
         const Wt::Auth::User& u = session_.login().user();
-        mAnal.addLog(this->environment(),atol(u.id().c_str()), page);
+        mAnal.addLog(this->environment(),atol(u.id().c_str()), page,(int (cat)));
     }else
-        mAnal.addLog(this->environment(), page);
+        mAnal.addLog(this->environment(), page,(int (cat)));
+    }
 }

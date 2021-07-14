@@ -390,5 +390,6 @@ void simplepoint::export2pdf(std::string titre){
     boost::replace_all(titre," ","-");
     fileResource->suggestFileName(titre+".pdf");
 
+    mGL->m_app->addLog("analyse ponctuelle pdf",typeLog::danap);
     mGL->m_app->redirect(fileResource->url());
 }

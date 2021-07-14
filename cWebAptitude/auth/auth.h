@@ -43,7 +43,6 @@
 
 #include "api/stationdescresource.h"
 
-
 class cWebAptitude; // forward declaration
 
 class AuthApplication : public Wt::WApplication
@@ -57,7 +56,7 @@ public:
     void logout();
     Wt::Auth::User getUser();
     cDicoApt * getDico(){return mDico;}
-    void addLog(std::string page);   // ajoute un record aux stat web
+    void addLog(std::string page,typeLog cat=typeLog::page);   // ajoute un record aux stat web
 
     Wt::Auth::AuthWidget* authWidget_;
     cDicoApt * mDico;
