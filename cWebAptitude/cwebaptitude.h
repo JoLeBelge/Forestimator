@@ -39,7 +39,7 @@ class panier;
 class dialog : public Wt::WDialog
 {
 public:
-    dialog(const WString& windowTitle,Wt::WMenuItem * aMenu);
+    dialog(const WString& windowTitle, Wt::WMenuItem * aMenu);
 
     void myshow(){
         if (mShow){show();}
