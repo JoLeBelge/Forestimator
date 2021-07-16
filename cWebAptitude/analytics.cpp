@@ -90,9 +90,9 @@ PageAnalytics::PageAnalytics(const Wt::WEnvironment& env, std::string aFileDB) :
     table->elementAt(0, 3)->addNew<Wt::WText>("Page");
     table->elementAt(0, 4)->addNew<Wt::WText>("Categorie");
 
-    if (globTest){std::cout << " statistiques brutes : début de transaction avec la BD analytics " << std::endl;
+    if (globTest){std::cout << " statistiques brutes : début de transaction avec la BD analytics " << std::endl;}
     dbo::Transaction transaction{session};
-    if (globTest){std::cout << " done " << std::endl;
+    if (globTest){std::cout << " done " << std::endl;}
 
     typedef dbo::collection< dbo::ptr<Log> > Logs;
     Logs logs = session.find<Log>().orderBy("datum DESC").limit(100);
