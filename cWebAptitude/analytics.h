@@ -65,6 +65,7 @@ public:
         default:
             break;
         }
+        return aRes;
     }
 
     template<class Action>
