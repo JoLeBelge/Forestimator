@@ -215,7 +215,7 @@ void dicoPedo::loadInfo(){
         }
     }
     sqlite3_finalize(stmt);
-    SQLstring="SELECT  DESCR,PHASE_1, PHASE_2, PHASE_3, PHASE_4, PHASE_5, PHASE_6, PHASE_7  FROM i_phase;";
+    SQLstring="SELECT  DESCR,PHASE_1, PHASE_2, PHASE_3, PHASE_4, PHASE_5, PHASE_6, PHASE_7, DESCR_COURT  FROM i_phase;";
     sqlite3_prepare_v2( db_, SQLstring.c_str(), -1, &stmt, NULL );
     while(sqlite3_step(stmt) == SQLITE_ROW)
     {
@@ -229,8 +229,12 @@ void dicoPedo::loadInfo(){
             if (sqlite3_column_type(stmt, 5)!=SQLITE_NULL){p5=std::string( (char *)sqlite3_column_text( stmt, 5 ) );}
             if (sqlite3_column_type(stmt, 6)!=SQLITE_NULL){p6=std::string( (char *)sqlite3_column_text( stmt, 6 ) );}
             if (sqlite3_column_type(stmt, 7)!=SQLITE_NULL){p7=std::string( (char *)sqlite3_column_text( stmt, 7 ) );}
+             std::string desc2=desc;
+            if (sqlite3_column_type(stmt, 8)!=SQLITE_NULL){desc2=std::string( (char *)sqlite3_column_text( stmt, 8 ) );}
+
             std::vector<std::string> aKey{p1,p2,p3,p4,p5,p6,p7};
             mPhase.emplace(std::make_pair(aKey,desc));
+            mPhaseCourt.emplace(std::make_pair(aKey,desc2));
         }
 
     }
@@ -434,26 +438,46 @@ std::pair<std::string,double> surfPedo::getMajTexture(){
     return aRes;
 }
 
-/*
+
 std::pair<std::string,double> surfPedo::getMajProf(){
     std::pair<std::string,double> aRes= std::make_pair("",0);
     // 1) plusieurs sigle pedo peuvent avoir la mm Prof - on regroupe les sigles par text
-    std::map<std::string,double> aVSigleTs;
+    std::map<std::string,double> aVProfs;
     for (auto  kv : propSurf){
-        std::string sText = mDico->ProfondeurSigle(kv.first);
-        if (aVSigleTs.find(sText)!=aVSigleTs.end()){ aVSigleTs.at(sText)+=kv.second;} else {
-            aVSigleTs.emplace(std::make_pair(sText,kv.second));
+        std::string prof = mDico->Profondeur(kv.first);
+        if (aVProfs.find(prof)!=aVProfs.end()){ aVProfs.at(prof)+=kv.second;} else {
+            aVProfs.emplace(std::make_pair(prof,kv.second));
         }
     }
     // trouver le sigle majoritaire en surface
     double aMax(0);
-    for (auto & kv : aVSigleTs){
+    for (auto & kv : aVProfs){
         if (kv.second>aMax){
         aMax=kv.second;
         aRes=kv;}
     }
     return aRes;
-}*/
+}
+
+std::pair<std::string,double> surfPedo::getMajProfCourt(){
+    std::pair<std::string,double> aRes= std::make_pair("",0);
+    // 1) plusieurs sigle pedo peuvent avoir la mm Prof - on regroupe les sigles par text
+    std::map<std::string,double> aVProfs;
+    for (auto  kv : propSurf){
+        std::string prof = mDico->ProfondeurCourt(kv.first);
+        if (aVProfs.find(prof)!=aVProfs.end()){ aVProfs.at(prof)+=kv.second;} else {
+            aVProfs.emplace(std::make_pair(prof,kv.second));
+        }
+    }
+    // trouver le sigle majoritaire en surface
+    double aMax(0);
+    for (auto & kv : aVProfs){
+        if (kv.second>aMax){
+        aMax=kv.second;
+        aRes=kv;}
+    }
+    return aRes;
+}
 
 std::pair<std::string,double> surfPedo::getMajDrainage(){
     std::pair<std::string,double> aRes= std::make_pair("",0);

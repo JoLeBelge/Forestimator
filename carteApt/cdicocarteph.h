@@ -74,7 +74,12 @@ public:
     bool superficiel() const{return mSuperficiel;}
     bool tourbe() const{return mTourbe;}
     bool limon() const{return mLimon;}
-    bool chargeSchisteux() const{return SUBSTRAT=="f";}
+    bool chargeSchisteux() const{return mCHARGE=="f";}
+
+    bool substratSchisteux() const{
+        bool aRes(0);
+          if ((SUBSTRAT.find("f")!=std::string::npos) && (SUBSTRAT.find("(")==std::string::npos) && (SUBSTRAT.find("k")==std::string::npos)){aRes=1;}
+        return aRes;}
 
     void cat() const{std::cout << " siglePedo " << INDEX_ << " , substrat " << SUBSTRAT << ", drainage " << mDRAINAGE << std::endl;}
 

@@ -1,6 +1,7 @@
 build-carteApt/
 build-WebAptitude/
 build-WebAptitudeDebug/
+build-stationDescriptor/
 carteApt/data/aptitudeEssDB.db-wal
 carteApt/data/aptitudeEssDB.db-shm
 carteApt/data/carteFEE_NTpH.db-*
@@ -12,3 +13,4 @@ data/auth.db
 data/extents.db
 data/cadastre.db*
 data/analytics.db*
+stationDescriptor/stationDescriptor.pro.*

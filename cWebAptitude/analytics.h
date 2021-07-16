@@ -41,6 +41,32 @@ public:
     int             id_user; // optionnal
     int categorie;
 
+    std::string getCat() const{
+        std::string aRes("/");
+        switch (categorie) {
+        case page:
+            aRes="page";
+            break;
+        case extend:
+            aRes="extend";
+            break;
+        case danap:
+            aRes="télécharge rapport analyse ponctuelle";
+            break;
+        case anas:
+            aRes="analyse surfacique";
+            break;
+        case dsingle:
+            aRes="télécharge une carte";
+            break;
+        case dmulti:
+            aRes="télécharge plusieurs cartes";
+            break;
+        default:
+            break;
+        }
+    }
+
     template<class Action>
     void persist(Action& a)
     {

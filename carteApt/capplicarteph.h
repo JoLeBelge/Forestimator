@@ -12,7 +12,7 @@ using namespace std;
 
 inline bool exists (const std::string& name);
 
-int cleNT(const siglePedo * s, int ZBIO, int TECO, double pH);
+int cleNT(const siglePedo * s, int ZBIO, int TECO, double pH, bool carbo, bool evm);
 //int cleNT(dbo::ptr<siglePedo> s, int ZBIO, int TECO, double pH);
 
 class cAppliCartepH

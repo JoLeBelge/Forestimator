@@ -122,12 +122,17 @@ public:
         return aRes;
     }
 
+    std::string ProfondeurCourt(std::vector<std::string> aCode){
+        std::string aRes("/");
+        if (mPhaseCourt.find(aCode)!=mPhaseCourt.end()){aRes=mPhaseCourt.at(aCode);}
+        return aRes;
+    }
+
 
     std::string roundDouble(double d, int precisionVal);
 
     // la description de la profondeur dépend des valeurs de toutes les phase
     std::string Profondeur(int aCode){
-
         std::string p1(""),p2(""),p3(""),p4(""),p5(""),p6(""),p7("");
 
         if (sToPhase1.find(aCode)!=sToPhase1.end()){p1=sToPhase1.at(aCode);}
@@ -141,6 +146,21 @@ public:
 
         return Profondeur(aKey);
     }
+    std::string ProfondeurCourt(int aCode){
+        std::string p1(""),p2(""),p3(""),p4(""),p5(""),p6(""),p7("");
+
+        if (sToPhase1.find(aCode)!=sToPhase1.end()){p1=sToPhase1.at(aCode);}
+        if (sToPhase2.find(aCode)!=sToPhase2.end()){p2=sToPhase2.at(aCode);}
+        if (sToPhase3.find(aCode)!=sToPhase3.end()){p3=sToPhase3.at(aCode);}
+        if (sToPhase4.find(aCode)!=sToPhase4.end()){p4=sToPhase4.at(aCode);}
+        if (sToPhase5.find(aCode)!=sToPhase5.end()){p5=sToPhase5.at(aCode);}
+        if (sToPhase6.find(aCode)!=sToPhase6.end()){p6=sToPhase6.at(aCode);}
+        if (sToPhase7.find(aCode)!=sToPhase7.end()){p7=sToPhase7.at(aCode);}
+        std::vector<std::string> aKey{p1,p2,p3,p4,p5,p6,p7};
+
+        return ProfondeurCourt(aKey);
+    }
+
 protected:
     boost::filesystem::path mShpPath;
 private:
@@ -155,6 +175,9 @@ private:
     std::map<std::string,std::string> mTexture;
     // Phase vers description
     std::map<std::vector<std::string>,std::string> mPhase;
+
+    // Phase vers description courte (juste chiffre de profondeurs)
+    std::map<std::vector<std::string>,std::string> mPhaseCourt;
 
     // sigle vers description
     std::map<std::string,std::string> mCharge;
@@ -223,6 +246,8 @@ public:
     std::pair<std::string,double> getMajDrainage();
 
     std::pair<std::string,double> getMajProf();
+    // pour avoir uniquement les chiffres, sans le texte en détails
+    std::pair<std::string,double> getMajProfCourt();
 
     void catPropSurf(){
         std::cout << "surfPedo details;\n";

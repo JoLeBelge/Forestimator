@@ -146,7 +146,7 @@ bool parcellaire::to31370AndGeoJson(){
     GDALClose(DS);
 
     // check le code EPSG - sur serveur j'ai un probleme avec les couche qui sont en user Defined scr 100036, la reprojection en BL72 me met le shp en décalage de 100 m
-    // ouverture en update mode pour pouvoir projeter en bl72
+
     GDALDatasetH hSrcDS  = GDALOpenEx( inputPath, GDAL_OF_VECTOR | GDAL_OF_READONLY, NULL, NULL, NULL );
 
     char** papszArgv = nullptr;

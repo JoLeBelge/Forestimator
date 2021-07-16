@@ -1,9 +1,6 @@
 #include "analytics.h"
 
-
 extern bool globTest;
-
-
 
 Analytics::Analytics(std::string aFileDB) : session()
 {
@@ -59,7 +56,7 @@ bool Analytics::logExist(const Wt::WEnvironment &env, std::string page, typeLog 
 
     int c=session.query<int>("select count(1) from Log").where("date = ?").bind(Wt::WDate::currentDate().toString("yyyy-MM-dd")).where("ipath = ?").bind(page).where("ip = ?").bind(env.clientAddress()).where("cat = ?").bind((int (cat)));
     if (c==0){aRes=0;} else{
-     if (globTest){std::cout << " le log existe déjà pour cet utilisateur !" << std::endl;}
+        if (globTest){std::cout << " le log existe déjà pour cet utilisateur !" << std::endl;}
     }
     return aRes;
 }
@@ -79,8 +76,10 @@ PageAnalytics::PageAnalytics(const Wt::WEnvironment& env, std::string aFileDB) :
     root()->setMargin(0);
     root()->setPadding(0);
 
-    auto content = layout->addWidget(Wt::cpp14::make_unique<Wt::WContainerWidget>());
+    Wt::WContainerWidget * content = layout->addWidget(Wt::cpp14::make_unique<Wt::WContainerWidget>());
+    content->setOverflow(Wt::Overflow::Scroll);
     content->addNew<Wt::WText>("Dernieres stats brutes :");
+
     auto table = content->addWidget(Wt::cpp14::make_unique<Wt::WTable>());
     table->setHeaderCount(1);
     table->setWidth(Wt::WLength("100%"));
@@ -89,6 +88,7 @@ PageAnalytics::PageAnalytics(const Wt::WEnvironment& env, std::string aFileDB) :
     table->elementAt(0, 1)->addNew<Wt::WText>("IP");
     table->elementAt(0, 2)->addNew<Wt::WText>("Client");
     table->elementAt(0, 3)->addNew<Wt::WText>("Page");
+    table->elementAt(0, 4)->addNew<Wt::WText>("Categorie");
 
     dbo::Transaction transaction{session};
 
@@ -97,7 +97,7 @@ PageAnalytics::PageAnalytics(const Wt::WEnvironment& env, std::string aFileDB) :
 
     int i=1;
     for (const dbo::ptr<Log> &log : logs){
-        std::cout << " log " << log->datum << " : " << log->ip << " : " << log->ipath << std::endl;
+        if (globTest){std::cout << " log " << log->datum << " : " << log->ip << " : " << log->ipath << std::endl;}
 
         time_t now=log->datum;
         //tm *ltm = localtime(&now);
@@ -106,9 +106,9 @@ PageAnalytics::PageAnalytics(const Wt::WEnvironment& env, std::string aFileDB) :
         table->elementAt(i,1)->addWidget(Wt::cpp14::make_unique<Wt::WText>(log->ip));
         table->elementAt(i,2)->addWidget(Wt::cpp14::make_unique<Wt::WText>(log->client));
         table->elementAt(i,3)->addWidget(Wt::cpp14::make_unique<Wt::WText>(log->ipath));
+        table->elementAt(i,4)->addWidget(Wt::cpp14::make_unique<Wt::WText>(log->getCat()));
 
         i++;
     }
-    //content->
 
 }

@@ -76,19 +76,30 @@ class basicStat{
 public:
 
     basicStat():min(0),max(0),mean(0),stdev(0),nb(0){}
-    basicStat(std::map<double,int> aMapValandFrequ);
+    basicStat(std::map<double,int> aMapValandFrequ, double na=0.0);
     basicStat(std::vector<double> v);
     std::string getMin(){return roundDouble(min);}
     std::string getMax(){return roundDouble(max);}
     std::string getMean(){return roundDouble(mean);}
     std::string getNb(){return std::to_string(nb);}
+    int getNbInt(){return nb;}
     std::string getSd(){return roundDouble(stdev);}
     std::string getCV(){if (mean!=0) {return roundDouble(100.0*stdev/mean)+"%";} else { return "-1";};}
+
+    double getFreq(double aVal){
+        double aRes(0);
+        if (mValFreq.find(aVal)!=mValFreq.end()){
+            //std::cout << " freq pour val " << aVal << " est de " << mValFreq.at(aVal) << " pixel sur un total de " << nb << std::endl;
+            aRes=mValFreq.at(aVal)/(double (nb));
+        }
+        return aRes;
+    }
 
     double getMeanDbl(){return mean;}
    private:
     double min,max,mean,stdev;
     int nb;
+    std::map<double,int> mValFreq;// utile quand je veux des stats basiques sur un raster de variable discontinu
 };
 
 
@@ -146,6 +157,7 @@ public:
 
     // méthode GDAL
     int getValue(double x, double y);
+    double getValueDouble(double x, double y);
     // rasterfile, pas de dictionnaire
     basicStat computeBasicStatOnPolyg(OGRGeometry * poGeom);
     GDALDataset * rasterizeGeom(OGRGeometry *poGeom);

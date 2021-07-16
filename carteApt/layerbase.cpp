@@ -2,10 +2,11 @@
 
 int seuilClasseMinoritaire(2); // en dessous de ce seuil, les classes sont regroupées dans la catégorie "Autre"
 
-basicStat::basicStat(std::map<double,int> aMapValandFrequ):mean(0),max(0),min(0),nb(0){
+basicStat::basicStat(std::map<double,int> aMapValandFrequ, double na):mean(0),max(0),min(0),nb(0),mValFreq(aMapValandFrequ){
     bool test(0);
     std::vector<double> v;
     for (auto kv : aMapValandFrequ){
+        if (kv.first!=na){
         mean += kv.first*kv.second;
         nb+=kv.second;
 
@@ -23,6 +24,7 @@ basicStat::basicStat(std::map<double,int> aMapValandFrequ):mean(0),max(0),min(0)
                 min=kv.first;
                 test=1;
             }
+        }
         }
     }
     mean=mean/nb;
@@ -107,6 +109,42 @@ std::string layerBase::NomFileWithExt(){
 int rasterFiles::getValue(double x, double y){
 
     int aRes(0);
+    GDALDataset  * mGDALDat = (GDALDataset *) GDALOpen( getPathTif().c_str(), GA_ReadOnly );
+    if( mGDALDat == NULL )
+    {
+        std::cout << "je n'ai pas lu l'image " << getPathTif() << std::endl;
+    } else {
+        GDALRasterBand * mBand = mGDALDat->GetRasterBand( 1 );
+
+        double transform[6];
+        mGDALDat->GetGeoTransform(transform);
+        double xOrigin = transform[0];
+        double yOrigin = transform[3];
+        double pixelWidth = transform[1];
+        double pixelHeight = -transform[5];
+
+        int col = int((x - xOrigin) / pixelWidth);
+        int row = int((yOrigin - y ) / pixelHeight);
+
+        if (col<mBand->GetXSize() && col>=0  && row < mBand->GetYSize() && row>=0){
+            float *scanPix;
+            scanPix = (float *) CPLMalloc( sizeof( float ) * 1 );
+            // lecture du pixel
+            mBand->RasterIO( GF_Read, col, row, 1, 1, scanPix, 1,1, GDT_Float32, 0, 0 );
+            aRes=scanPix[0];
+            CPLFree(scanPix);
+
+            mBand=NULL;
+        }
+        GDALClose( mGDALDat );
+    }
+    return aRes;
+}
+
+
+double rasterFiles::getValueDouble(double x, double y){
+
+    double aRes(0);
     GDALDataset  * mGDALDat = (GDALDataset *) GDALOpen( getPathTif().c_str(), GA_ReadOnly );
     if( mGDALDat == NULL )
     {
