@@ -33,3 +33,8 @@ cmake -DWT_WRASTERIMAGE_IMPLEMENTATION="GraphicsMagick" -DGM_INCLUDE_DIR="/usr/l
 
 ok ça fonctionne sur le serveur également
 
+#Install header files and library for cURL (dans wrapper pour WMS CNSW)
+sudo aptitude install libcurl4-openssl-dev
+sur le serveur il a désinstallé libcurl4-gnutsl pour installé ce truc. J'espère que j'ai pas foutu le bronx
+
+
