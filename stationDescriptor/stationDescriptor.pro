@@ -1,7 +1,10 @@
 TEMPLATE = app
 CONFIG -= app_bundle
 CONFIG -= qt
+CONFIG += console c++17
 TARGET = stationDesc
+QMAKE_LFLAGS+=-fopenmp
+QMAKE_CXXFLAGS+=-fopenmp
 
 INCLUDEPATH += $$PWD/../carteApt/
 INCLUDEPATH += $$PWD/../cWebAptitude
@@ -13,7 +16,7 @@ SOURCES += stationDescriptor.cpp \
     ../carteApt/layerbase.cpp \
     ../cWebAptitude/cadastre.cpp
 
-LIBS = -lboost_system -lboost_iostreams -lboost_thread -lboost_filesystem -lboost_program_options -lwtdbo -lwtdbosqlite3
+LIBS = -lboost_system -lboost_iostreams -lboost_thread -lboost_filesystem -lboost_program_options -lwtdbo -lwtdbosqlite3 -fopenmp
 
 LIBS += -L$$PWD/usr/include/ -lsqlite3
 LIBS += -L$$PWD/usr/include/gdal/ -lgdal

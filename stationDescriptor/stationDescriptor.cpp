@@ -8,6 +8,7 @@ using namespace std;
 #include "layerbase.h"
 #include <string>
 #include <random>
+#include <omp.h>
 namespace po = boost::program_options;
 extern string dirBD;
 std::string datDir("/home/lisein/Documents/Scolyte/projetRegioWood/Data/");
@@ -291,121 +292,166 @@ void descriptionStation(std::string aShp){
 
         // layer
         OGRLayer * lay = mDS->GetLayer(0);
-
-        OGRFeature *poFeature;
-        std::map<int,std::vector<std::string>> aStat;
-        while( (poFeature = lay->GetNextFeature()) != NULL )
-        {
-            //if (poFeature->GetFID()<150){
-            //if (poFeature->GetFieldAsInteger("IGN")==4356 && poFeature->GetFieldAsInteger("NPL")==52 ){
-            if (poFeature->GetFID() % 100==0){std::cout << " process feature " << poFeature->GetFID() << std::endl;}
-            // if (poFeature->GetFID() == 100){break;}
-            if (poFeature->GetFID()==0){
-                for (int i(0);i<poFeature->GetFieldCount();i++){
-                    header+=std::string(poFeature->GetFieldDefnRef(i)->GetNameRef())+";";
-                }
-            }
-
-
-            OGRGeometry * poGeom = poFeature->GetGeometryRef();
-            switch (poGeom->getGeometryType()){
-            case (wkbPolygon):
-            {
-                break;
-            }
-            case wkbMultiPolygon:
-            {
-
-                break;
-            }
-                // pour la carte générée pour analyse point, on ne dessine pas un polygone mais un cercle autour du point
-            case wkbPoint:
-            {
-                std::cout << " shp de point ; j'effectue un buffer de 18 m" << std::endl;
-                poGeom = poGeom->Buffer(18);
-
-                break;
-            }
-
-            default:
-                std::cout << "Geometrie " << poGeom->getGeometryName() << " non pris en charge " << std::endl;
-
-                break;
-            }
-            poGeom->closeRings();
-            poGeom->flattenTo2D();
-            std::vector<std::string> aStatOnPol;
-
-            // je commence par écrire dans le vecteur de résultat la valeur des champs de la table d'attribu, comme cela j'aurai mes identifiant
-            for (int i(0);i<poFeature->GetFieldCount();i++){
-                aStatOnPol.push_back(poFeature->GetFieldAsString(i));
-            }
-
-            headerProcessing="Texture;pct;Drainage;pct;Prof;pct";
-            // cnsw
-            //std::cout << " pedo ; extract value" << std::endl;
-            //surfPedo statPedo(dico.mPedo,poFeature->GetGeometryRef());
-            surfPedo statPedo(dico.mPedo,poGeom);
-            //statPedo.catPropSurf();
-            std::pair<std::string,double> t=statPedo.getMajTexture();
-            aStatOnPol.push_back(t.first);
-            aStatOnPol.push_back(roundDouble(t.second,0));
-            std::pair<std::string,double> d=statPedo.getMajDrainage();
-            aStatOnPol.push_back(d.first);
-            aStatOnPol.push_back(roundDouble(d.second,0));
-            std::pair<std::string,double> p=statPedo.getMajProfCourt();
-            aStatOnPol.push_back(p.first);
-            aStatOnPol.push_back(roundDouble(p.second,0));
-
-            // les autres couches
-
-            for (std::shared_ptr<layerBase> & l : aVLs){
-                // analyse surfacique ; basic stat pour les var continue
-                switch (l->getTypeVar()) {
-                case TypeVar::Continu:{
-                    switch (l->getCatLayer()) {
-                    case TypeLayer::Peuplement:{
-                        basicStat stat=l->computeBasicStatOnPolyg(poGeom);
-                        aStatOnPol.push_back(stat.getMean());
-                        aStatOnPol.push_back(stat.getMax());
-                        aStatOnPol.push_back(stat.getSd());
-                        headerProcessing+=";"+l->Code()+"mean";
-                        headerProcessing+=";"+l->Code()+"max";
-                        headerProcessing+=";"+l->Code()+"sd";
-                        break;
-                    }
-                    default:
-                        basicStat stat=l->computeBasicStatOnPolyg(poGeom);
-                        aStatOnPol.push_back(stat.getMean());
-                        headerProcessing+=";"+l->Code()+"mean";
-                    }
-                    break;
-                }
-                case TypeVar::Classe:{
-                    std::pair<int,double> p= l->valMajoritaire(poGeom);
-                    aStatOnPol.push_back(std::to_string(p.first));
-                    aStatOnPol.push_back(roundDouble(p.second,0));
-                    headerProcessing+=";"+l->Code()+"maj";
-                    headerProcessing+=";"+l->Code()+"pct";
+        OGRFeature *poFeature=lay->GetFeature(0);
+        for (int i(0);i<poFeature->GetFieldCount();i++){
+            header+=std::string(poFeature->GetFieldDefnRef(i)->GetNameRef())+";";
+        }
+        headerProcessing="Texture;pct;Drainage;pct;Prof;pct";
+        for (std::shared_ptr<layerBase> & l : aVLs){
+            switch (l->getTypeVar()) {
+            case TypeVar::Continu:{
+                switch (l->getCatLayer()) {
+                case TypeLayer::Peuplement:{
+                    headerProcessing+=";"+l->Code()+"mean";
+                    headerProcessing+=";"+l->Code()+"max";
+                    headerProcessing+=";"+l->Code()+"sd";
                     break;
                 }
                 default:
+                    headerProcessing+=";"+l->Code()+"mean";
+                }
+                break;
+            }
+            case TypeVar::Classe:{
+                headerProcessing+=";"+l->Code()+"maj";
+                headerProcessing+=";"+l->Code()+"pct";
+                break;
+            }
+            default:
+                break;
+            }
+        }
+        for (std::unique_ptr<rasterFiles> & r : aVRFs){
+            headerProcessing+=";"+r->Code();
+        }
+
+
+        std::map<int,std::vector<std::string>> aStat;
+        //#pragma omp parallel num_threads(2) shared(aStat, lay,aVRFs,aVLs) //private(id,i,poFeature,poGeom,aStatOnPol,statPedo,pt)
+        {
+            //#pragma omp for
+            for (int id=0;id<lay->GetFeatureCount();id++){
+                poFeature = lay->GetFeature(id);
+                //if (poFeature->GetFID()<150){
+                //if (poFeature->GetFieldAsInteger("IGN")==4356 && poFeature->GetFieldAsInteger("NPL")==52 ){
+                if (poFeature->GetFID() % 100==0){std::cout << " process feature " << poFeature->GetFID() << std::endl;}
+                //if (poFeature->GetFID() == 1000){break;}
+
+                OGRGeometry * poGeom = poFeature->GetGeometryRef();
+                switch (poGeom->getGeometryType()){
+                case (wkbPolygon):
+                {
+                    break;
+                }
+                case wkbMultiPolygon:
+                {
+
+                    break;
+                }
+                    // pour la carte générée pour analyse point, on ne dessine pas un polygone mais un cercle autour du point
+                case wkbPoint:
+                {
+                    std::cout << " shp de point ; j'effectue un buffer de 18 m" << std::endl;
+                    poGeom = poGeom->Buffer(18);
+
                     break;
                 }
 
-            }
+                default:
+                    std::cout << "Geometrie " << poGeom->getGeometryName() << " non pris en charge " << std::endl;
 
-            // carte climat
-            for (std::unique_ptr<rasterFiles> & r : aVRFs){
+                    break;
+                }
+                poGeom->closeRings();
+                poGeom->flattenTo2D();
+                std::vector<std::string> aStatOnPol;
+
+                // je commence par écrire dans le vecteur de résultat la valeur des champs de la table d'attribu, comme cela j'aurai mes identifiant
+                for (int i=0;i<poFeature->GetFieldCount();i++){
+                    aStatOnPol.push_back(poFeature->GetFieldAsString(i));
+                }
+
+                // cnsw
+                //surfPedo statPedo(dico.mPedo,poFeature->GetGeometryRef());
+                surfPedo statPedo(dico.mPedo,poGeom);
+                //statPedo.catPropSurf();
+                std::pair<std::string,double> t=statPedo.getMajTexture();
+                aStatOnPol.push_back(t.first);
+                aStatOnPol.push_back(roundDouble(t.second,0));
+                std::pair<std::string,double> d=statPedo.getMajDrainage();
+                aStatOnPol.push_back(d.first);
+                aStatOnPol.push_back(roundDouble(d.second,0));
+                std::pair<std::string,double> p=statPedo.getMajProfCourt();
+                aStatOnPol.push_back(p.first);
+                aStatOnPol.push_back(roundDouble(p.second,0));
+
+                // les autres couches
+#pragma omp parallel num_threads(8) shared(aStatOnPol,aVLs) //private(id,i,poFeature,poGeom,aStatOnPol,statPedo,pt)
+                {
+#pragma omp for
+                    for (std::shared_ptr<layerBase> & l : aVLs){
+                        // analyse surfacique ; basic stat pour les var continue
+                        switch (l->getTypeVar()) {
+                        case TypeVar::Continu:{
+
+                            basicStat stat=l->computeBasicStatOnPolyg(poGeom);
+
+                            switch (l->getCatLayer()) {
+                            case TypeLayer::Peuplement:{
+#pragma omp critical
+                                {
+                                    aStatOnPol.push_back(stat.getMean());
+                                    aStatOnPol.push_back(stat.getMax());
+                                    aStatOnPol.push_back(stat.getSd());
+                                }
+                                break;
+                            }
+                            default:
+#pragma omp critical
+                            {
+                                aStatOnPol.push_back(stat.getMean());
+                            }
+                            }
+                            break;
+                        }
+                        case TypeVar::Classe:{
+                            std::pair<int,double> p= l->valMajoritaire(poGeom);
+#pragma omp critical
+                            {
+                                aStatOnPol.push_back(std::to_string(p.first));
+                                aStatOnPol.push_back(roundDouble(p.second,0));
+                            }
+                            break;
+                        }
+                        default:
+                            break;
+                        }
+
+                    }
+                }
+
+                // carte climat
                 OGRPoint * pt= getCentroid(poGeom->toPolygon());
-                aStatOnPol.push_back(std::to_string( r->getValueDouble(pt->getX(),pt->getY())));
-                headerProcessing+=";"+r->Code();
+                double aX=pt->getX(),aY=pt->getY();
                 delete pt;
+#pragma omp parallel num_threads(8) shared(aStatOnPol,aVRFs,aX,aY)
+                {
+#pragma omp for
+                    for (std::unique_ptr<rasterFiles> & r : aVRFs){
+                        std::string aRes=std::to_string(r->getValueDouble(aX,aY));
+#pragma omp critical
+                        {
+                            aStatOnPol.push_back(aRes);
+                        }
+
+                    }
+                }
+
+
+
+                aStat.emplace(std::make_pair(poFeature->GetFID(),aStatOnPol));
+
             }
-
-
-            aStat.emplace(std::make_pair(poFeature->GetFID(),aStatOnPol));
-
         }
 
         GDALClose(mDS);
@@ -733,7 +779,7 @@ OGRPoint * getCentroid(OGRPolygon * hex){
     {
         hex->getExteriorRing()->getPoint(k,&ptTemp1);
         x+=ptTemp1.getX();
-        y+=ptTemp1.getX();
+        y+=ptTemp1.getY();
     }
     x/=NumberOfVertices;
     y/=NumberOfVertices;

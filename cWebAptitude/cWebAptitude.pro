@@ -11,7 +11,7 @@ QMAKE_CXXFLAGS += -g
 CONFIG += c++17
 
 #-lboost_thread
-LIBS = -lgdal -lwthttp -lwt -lboost_system -lboost_iostreams  -lboost_filesystem -lboost_program_options -lcrypt -pthread -lwtdbo -lwtdbosqlite3 -lzip -lhpdf -lsqlite3
+LIBS = -lcurl -lgdal -lwthttp -lwt -lboost_system -lboost_iostreams  -lboost_filesystem -lboost_program_options -lcrypt -pthread -lwtdbo -lwtdbosqlite3 -lzip -lhpdf -lsqlite3
 #LIBS += -lwkhtmltox -lboost_serialization
 
 # utilisation de GM ; fonctionne bien, mais un peu chiant à parametrer pour la compilation sur le serveur. Donc je retire et j'utilise WRasterImage (wrapper pour GM en fait)
@@ -68,6 +68,7 @@ DEPENDPATH += $$PWD/../../../../../../usr/include/gdal/
 
 SOURCES += main.cpp \
     analytics.cpp \
+    api/cnswresource.cpp \
     auth/Session.cpp \
     auth/User.cpp \
     auth/auth.cpp \
@@ -96,6 +97,7 @@ SOURCES += main.cpp \
 
 HEADERS += \
     analytics.h \
+    api/cnswresource.h \
     auth/Session.h \
     auth/User.h \
     auth/auth.h \

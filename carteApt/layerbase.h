@@ -10,7 +10,6 @@
 #include <numeric>
 #include "color.h"
 
-
 std::string getAbbreviation(std::string str);
 
 GDALDataset * rasterizeGeom(OGRGeometry *poGeom, GDALDataset * aGDALDat);

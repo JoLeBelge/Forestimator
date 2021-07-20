@@ -62,7 +62,6 @@ cWebAptitude::cWebAptitude(AuthApplication *app, Auth::AuthWidget* authWidget_)
             ->setLink(WLink(LinkType::InternalPath, "/parametres"));
     */
 
-
     // main stack : DOC and MAP and RESULTS divs
     top_stack  = this->addWidget(Wt::cpp14::make_unique<Wt::WStackedWidget>());
     top_stack->setMargin(0);

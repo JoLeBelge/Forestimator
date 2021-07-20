@@ -56,6 +56,9 @@ int main(int argc, char **argv)
         // https://redmine.webtoolkit.eu/boards/2/topics/17226?r=17243#message-17243
         // see paypal example
 
+        cnswresource cnswr(dico->File("TMPDIR")+"/");
+        server.addResource(&cnswr, "/CNSW");
+
         server.addEntryPoint(Wt::EntryPointType::Application, std::bind(&createAuthApplication,std::placeholders::_1, dico));
 
         Session::configureAuth();

@@ -239,7 +239,7 @@ void siglePedo::prepare(){
      t1 =std::find(PHASE_1Profond.begin(), PHASE_1Profond.end(), mPHASE_1) !=PHASE_1Profond.end() ;
     t2 =std::find(PHASE_2Profond.begin(), PHASE_2Profond.end(), mPHASE_2) !=PHASE_2Profond.end() ;
     if (t1 | t2){ mProfond=1;}
-    if (mPHASE_1=="" && mPHASE_2==""){ mProfond=1;}
+    if (mPHASE_1=="" && (mPHASE_2=="" | mPHASE_2=="NA")){ mProfond=1;}
 
     mAlluvion=0;
     t1 =std::find(DEV_PROFILalluvion.begin(), DEV_PROFILalluvion.end(), mDEV_PROFIL) !=DEV_PROFILalluvion.end() ;

@@ -11,6 +11,7 @@ namespace po = boost::program_options;
 #include <Wt/Auth/AuthWidget.h>
 #include <Wt/Auth/PasswordService.h>
 #include "api/stationdescresource.h"
+#include "api/cnswresource.h"
 #include "analytics.h"
 
 std::unique_ptr<Wt::WApplication> createAuthApplication(const Wt::WEnvironment &env, cDicoApt * dico);

@@ -600,7 +600,7 @@ OGRPoint * getCentroid(OGRPolygon * hex){
     {
         hex->getExteriorRing()->getPoint(k,&ptTemp1);
         x+=ptTemp1.getX();
-        y+=ptTemp1.getX();
+        y+=ptTemp1.getY();
     }
     x/=NumberOfVertices;
     y/=NumberOfVertices;

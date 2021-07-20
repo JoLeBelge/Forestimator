@@ -169,10 +169,12 @@ double rasterFiles::getValueDouble(double x, double y){
             mBand->RasterIO( GF_Read, col, row, 1, 1, scanPix, 1,1, GDT_Float32, 0, 0 );
             aRes=scanPix[0];
             CPLFree(scanPix);
-
-            mBand=NULL;
+            //mBand=NULL;
         }
-        GDALClose( mGDALDat );
+        /*if (Code()=="ETP_30aire"){
+        std::cout << "rasterFiles::getValueDouble pour raster " << Code() << " et position " << x <<  " , " << y << " donne comme résultat " << aRes << " qui est en position pixel de " << col << " , " << row <<std::endl;
+        }*/
+        if( mGDALDat != NULL){GDALClose(mGDALDat);}
     }
     return aRes;
 }
@@ -399,16 +401,23 @@ GDALDataset * rasterFiles::rasterizeGeom(OGRGeometry *poGeom){
             oSRS.importFromWkt(&pszWkt);
 
             // driver et dataset shp -- creation depuis la géométrie
-            GDALDriver *pShpDriver = GetGDALDriverManager()->GetDriverByName("ESRI Shapefile");
-            pShp = pShpDriver->Create("/vsimem/blahblah.shp", 0, 0, 0, GDT_Unknown, NULL );
+            GDALDriver *pShpDriver = GetGDALDriverManager()->GetDriverByName("Memory");
+            char name[L_tmpnam];
+            std::tmpnam(name);
+            std::string name0 = name;
+            std::string name1 = "/vsimem/"+name0.substr(5,name0.size()-5);
+            std::string name2 = name0.substr(5,name0.size()-5);
+            //pShp = pShpDriver->Create("/vsimem/blahblah.shp", 0, 0, 0, GDT_Unknown, NULL );
+            pShp = pShpDriver->Create(name1.c_str(), 0, 0, 0, GDT_Unknown, NULL );// avoir des noms unique si je veux fontionner en parrallel computing
             // he bien c'est le comble, sur le serveur j'arrive à avoir le comportement adéquat si JE NE MET PAS de src. j'ai des warnings mais tout vas mieux!!
             //mais c'est parceque avant j'utilisais  OGRErr err=src.SetWellKnownGeogCS( "EPSG:31370" );
-            OGRLayer * lay = pShp->CreateLayer("toto",&oSRS,wkbPolygon,NULL);
+
+            OGRLayer * lay = pShp->CreateLayer(name2.c_str(),&oSRS,wkbPolygon,NULL);
 
             OGRFeature * feat = new OGRFeature(lay->GetLayerDefn());
             feat->SetGeometry(poGeom);
             lay->CreateFeature(feat);
-            delete feat;
+            //delete feat;
 
             double transform[6];
             mGDALDat->GetGeoTransform(transform);
@@ -435,9 +444,12 @@ GDALDataset * rasterFiles::rasterizeGeom(OGRGeometry *poGeom){
             pRaster->SetProjection(mGDALDat->GetProjectionRef());
             GDALClose(mGDALDat);
             GDALRasterize(NULL,pRaster,pShp,NULL,NULL);
+            OGRFeature::DestroyFeature(feat);
+            pShp->DeleteLayer(0);
+            GDALClose(pShp);
         }
     }
-    GDALClose(pShp);
+
     //}
     return pRaster;
 }
@@ -527,7 +539,7 @@ basicStat layerBase::computeBasicStatOnPolyg(OGRGeometry * poGeom){
             CPLFree(scanline);
             CPLFree(scanlineMask);
 
-            mBand=NULL;
+            //mBand=NULL;
         }
         GDALClose(mask);
         GDALClose(mGDALDat);
@@ -924,9 +936,9 @@ GDALDataset * rasterizeGeom(OGRGeometry *poGeom, GDALDataset * aGDALDat){
     GDALDriver *pDriver;
     GDALDataset *pRaster=NULL, * pShp;
 
-    //const char *pszFormat = "MEM";
+    const char *pszFormat = "MEM";
     // sauver le masque pour vérification
-    const char *pszFormat = "GTiff";
+   // const char *pszFormat = "GTiff";
 
     pDriver = GetGDALDriverManager()->GetDriverByName(pszFormat);
     if( pDriver == NULL )
@@ -946,15 +958,12 @@ GDALDataset * rasterizeGeom(OGRGeometry *poGeom, GDALDataset * aGDALDat){
             OGRSpatialReference oSRS;
             oSRS.importFromWkt(&pszWkt);
             // driver et dataset shp -- creation depuis la géométrie
-            GDALDriver *pShpDriver = GetGDALDriverManager()->GetDriverByName("ESRI Shapefile");
+            GDALDriver *pShpDriver = GetGDALDriverManager()->GetDriverByName("Memory");
             pShp = pShpDriver->Create("/vsimem/blahblah.shp", 0, 0, 0, GDT_Unknown, NULL );
             OGRLayer * lay = pShp->CreateLayer("toto",&oSRS,wkbPolygon,NULL);
             OGRFeature * feat = new OGRFeature(lay->GetLayerDefn());
             feat->SetGeometry(poGeom);
-
             lay->CreateFeature(feat);
-            delete feat;
-
 
 
             double transform[6];
@@ -974,17 +983,17 @@ GDALDataset * rasterizeGeom(OGRGeometry *poGeom, GDALDataset * aGDALDat){
             tr2[4]=transform[4];
             tr2[5]=transform[5];
             // création du raster en mémoire - on dois lui donner un out mais il ne l'utile pas car MEM driver
-
             pRaster = pDriver->Create(out, xSize, ySize, 1, GDT_Byte,NULL);
             pRaster->SetGeoTransform(tr2);
-
-            // on en avait besoin que pour l'extent et resol
             pRaster->SetProjection(aGDALDat->GetProjectionRef());
-            //GDALClose(aGDALDat);
+            // on en avait besoin que pour l'extent et resol
+            GDALClose(aGDALDat);
             GDALRasterize(NULL,pRaster,pShp,NULL,NULL);
+            OGRFeature::DestroyFeature(feat);
+            pShp->DeleteLayer(0);
+            GDALClose(pShp);
         }
     }
-    GDALClose(pShp);
-    //}
+
     return pRaster;
 }
