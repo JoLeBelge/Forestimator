@@ -289,14 +289,17 @@ void descriptionStation(std::string aShp){
 
         // j'aimerai utiliser la carte d'aptitude de l'ep sans passer par l'objet cEss. Comment?
         // création d'un cRasterFile pour essence
+        std::map<std::string,int> statOrder;// en parallel computing il remplis le vecteur résultat dans un ordre aléatoire (push_back est effectué par le thread qui fini le plus rapidement
+        // j'ai donc besoin d'une map pour savoir ordonner mes résultats
 
         // layer
         OGRLayer * lay = mDS->GetLayer(0);
         OGRFeature *poFeature=lay->GetFeature(0);
         for (int i(0);i<poFeature->GetFieldCount();i++){
             header+=std::string(poFeature->GetFieldDefnRef(i)->GetNameRef())+";";
+
         }
-        headerProcessing="Texture;pct;Drainage;pct;Prof;pct";
+        headerProcessing="Texture;Texpct;Drainage;Dpct;Prof;Ppct";
         for (std::shared_ptr<layerBase> & l : aVLs){
             switch (l->getTypeVar()) {
             case TypeVar::Continu:{

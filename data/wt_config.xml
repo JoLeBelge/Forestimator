@@ -82,6 +82,7 @@
             <user-agent>.*AhrefsBot.*</user-agent>
             <user-agent>.*bingbot.*</user-agent>
             <user-agent>.*PetalBot.*</user-agent>
+            <user-agent>.*Barkrawler.*</user-agent>
 		</user-agents>
 		
 		<head-matter user-agent=".*Googlebot.*">
