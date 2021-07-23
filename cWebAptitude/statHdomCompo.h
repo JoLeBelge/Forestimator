@@ -74,8 +74,12 @@ class statCellule{
 public:
     statCellule(std::vector<double> *aVHs, int aSurf);
     void computeHdom(){mHdom=k1hdom*mQ95+k2hdom*pow(mQ95,2);}
-    void computeGha(){mGha=k1gha*mVHA/mHdom;}
-    void computeNha(){mNha=40000.0*M_PI*mGha/pow(mCmoy,2);}
+    void computeGha(){ if (mHdom!=0.0){mGha=k1gha*mVHA/mHdom;} else {mGha=0.0;}
+                     }
+    void computeNha(){mNha=40000.0*M_PI*mGha/pow(mCmoy,2);
+                     // peut me renvoyer inf par moment
+                      if (isinf(mNha) | isnan(mNha)){mNha=0.0;}
+                     }
     void computeCmoy(){mCmoy=(k1cmoy*(mHdom-1.3)+k2cmoy*pow((mHdom-1.3),2))*pow(mMean/mQ95,k3cmoy);}
 
     void printDetail();

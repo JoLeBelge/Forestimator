@@ -127,12 +127,13 @@ void statWindow::generateGenCarte(OGRFeature * poFeature){
      basicStat statMNT= mMNT->computeBasicStatOnPolyg(poFeature->GetGeometryRef());
      basicStat statPente= mPente->computeBasicStatOnPolyg(poFeature->GetGeometryRef());
 
-     aContInfo->addWidget(cpp14::make_unique<WText>("<h5>Zone bioclimatique</h5>"));
+     aContInfo->addWidget(cpp14::make_unique<WText>(Wt::WString::tr("report.analyse.surf.zbio.t")));
 
      std::cout << "statWindow::generateGenCarte ---" << std::endl;
      aContInfo->addWidget(cpp14::make_unique<WText>(mZBIO->summaryStat(poFeature->GetGeometryRef())));
 
-     aContInfo->addWidget(cpp14::make_unique<WText>("<h5>Relief</h5>"));
+     aContInfo->addWidget(cpp14::make_unique<WText>(Wt::WString::tr("report.analyse.surf.relief.t")));
+
      aContInfo->addWidget(cpp14::make_unique<WText>("Altitude maximum : "+ statMNT.getMax() + " m"));
      aContInfo->addWidget(cpp14::make_unique<WBreak>());
      aContInfo->addWidget(cpp14::make_unique<WText>("Altitude moyenne : "+ statMNT.getMean()+ " m"));
@@ -145,7 +146,7 @@ void statWindow::generateGenCarte(OGRFeature * poFeature){
      // analyse pédo surfacique
 
      surfPedo statPedo(mDico->mPedo,poFeature->GetGeometryRef());
-     aContInfo->addWidget(cpp14::make_unique<WText>("<h5>Pédologie</h5>"));
+     aContInfo->addWidget(cpp14::make_unique<WText>(Wt::WString::tr("report.analyse.surf.pedo.t")));
      aContInfo->addWidget(cpp14::make_unique<WText>("Texture : "+ statPedo.getSummary(PEDO::TEXTURE)));
      aContInfo->addWidget(cpp14::make_unique<WBreak>());
      aContInfo->addWidget(cpp14::make_unique<WText>("Drainage : "+ statPedo.getSummary(PEDO::DRAINAGE)));
@@ -153,7 +154,6 @@ void statWindow::generateGenCarte(OGRFeature * poFeature){
      aContInfo->addWidget(cpp14::make_unique<WText>("Profondeur : "+ statPedo.getSummary(PEDO::PROFONDEUR)));
      aContInfo->addWidget(cpp14::make_unique<WBreak>());
 }
-
 
 void statWindow::export2pdf(){
     // création du pdf

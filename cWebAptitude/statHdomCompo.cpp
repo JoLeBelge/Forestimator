@@ -10,6 +10,8 @@ double globd=2*globx;
 double k1hdom(1.237116), k2hdom(-0.005823), k1vha(52.176316),k2vha(6.677865),k3vha(0.807146);
 double k1gha(2.143419), k1cmoy(2.869327),k2cmoy(0.054804),k3cmoy(-0.199079);
 
+extern bool globTest;
+
 
 statHdom::statHdom(std::shared_ptr<layerBase> aLay, OGRGeometry * poGeom):mLay(aLay),mGeom(poGeom)
 {
@@ -416,6 +418,7 @@ std::unique_ptr<WContainerWidget> statHdom::getResult(){
     table->elementAt(c, 1)->setPadding(10,Wt::Side::Left);
     c++;
     table->elementAt(c, 0)->addWidget(cpp14::make_unique<WText>("NHA moyen"));
+
     table->elementAt(c, 1)->addWidget(cpp14::make_unique<WText>(bsDendro("nha").getMean()+ " tige/ha"));
     table->elementAt(c, 1)->setPadding(10,Wt::Side::Left);
     c++;
@@ -432,7 +435,8 @@ std::unique_ptr<WContainerWidget> statHdom::getResult(){
     table->elementAt(c, 0)->setColumnSpan(2);
     table->elementAt(c, 0)->setContentAlignment(AlignmentFlag::Top | AlignmentFlag::Center);
     table->elementAt(c, 0)->setPadding(10);
-    table->elementAt(c,0)->addWidget(cpp14::make_unique<WText>("Répartition de la surface par classe de hauteur"));
+
+    table->elementAt(c,0)->addWidget(cpp14::make_unique<WText>(Wt::WString::tr("report.analyse.surf.classeHauteur.t")));
     for (std::pair<std::string, double> p : mDistFrequ){
         c++;
         table->elementAt(c, 0)->addWidget(cpp14::make_unique<WText>(p.first));
@@ -786,15 +790,7 @@ statCellule::statCellule(std::vector<double> * aVHs,int aSurf):mSurf(aSurf){
     computeCmoy();
     computeNha();
 
-    if (mCmoy>1000000){
-        printDetail();
-        std::cout << " vecteur de hauteur : "<< std::endl;
-        for (double h : *aVHs){
-            std::cout << h << std::endl;
-        }
-
-    }
-
+    //if (globTest){ printDetail();}
 }
 
 void  statCellule::printDetail(){
