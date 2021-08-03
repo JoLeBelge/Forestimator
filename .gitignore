@@ -14,3 +14,6 @@ data/extents.db
 data/cadastre.db*
 data/analytics.db*
 stationDescriptor/stationDescriptor.pro.*
+carteApt/*.autosave
+stationDescriptor/*.autosave
+cWebAptitude/*.autosave
