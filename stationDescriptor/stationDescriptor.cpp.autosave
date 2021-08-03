@@ -288,8 +288,6 @@ void descriptionStation(std::string aShp){
             }
         }
 
-        // j'aimerai utiliser la carte d'aptitude de l'ep sans passer par l'objet cEss. Comment?
-        // création d'un cRasterFile pour essence
         std::map<std::string,int> statOrder;// en parallel computing il remplis le vecteur résultat dans un ordre aléatoire (push_back est effectué par le thread qui fini le plus rapidement
         // j'ai donc besoin d'une map pour savoir ordonner mes résultats
         int c(0);
@@ -325,7 +323,6 @@ void descriptionStation(std::string aShp){
                     headerProcessing+=";"+l->Code()+"mean";
                     headerProcessing+=";"+l->Code()+"max";
                     headerProcessing+=";"+l->Code()+"sd";
-
                     statOrder.emplace(std::make_pair(l->Code()+"mean",c));
                     c++;
                     statOrder.emplace(std::make_pair(l->Code()+"max",c));
@@ -359,9 +356,15 @@ void descriptionStation(std::string aShp){
             statOrder.emplace(std::make_pair(r->Code(),c));
             c++;
         }
-
-
+        
         std::map<int,std::vector<std::string>> aStat;
+        
+        //peut prendre 3 heures de calcul sur 100k tuiles, je devrai pe faire du checkpointing..
+        //for (int cp(0) ; cp<lay->GetFeatureCount()/25000; cp++){
+            
+        //}
+        
+      
         //#pragma omp parallel num_threads(2) shared(aStat, lay,aVRFs,aVLs) //private(id,i,poFeature,poGeom,aStatOnPol,statPedo,pt)
         {
             //#pragma omp for

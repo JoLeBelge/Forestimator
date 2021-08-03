@@ -123,6 +123,7 @@ class WMSinfo
 class LayerMTD{
 public:
     LayerMTD(){}
+    void setCode(std::string aCode){mCode=aCode;}
     void setNom(std::string aNom){mNom=aNom;}
     void setLabel(std::string a){mShortName=a;}
     void setProjet(std::string aProj){mProjet=aProj;}
@@ -130,6 +131,7 @@ public:
     void setVersion(std::string aV){mVersion=aV;}
     void addRef(std::string aVRef){mVRefs.push_back(aVRef);}
     void setCopyR(std::string a){mCopyR=a;}
+     std::string code(){return mCode;}
     std::string Nom(){return mNom;}
     std::string Label(){return mShortName;}
     std::string Descr(){return mDescr;}
@@ -139,7 +141,7 @@ public:
     std::vector<std::string> VRefs(){return mVRefs;}
 private:
     std::vector<std::string> mVRefs;
-    std::string mProjet, mDescr,mVersion, mNom,mCopyR,mShortName;
+    std::string mProjet, mDescr,mVersion, mNom,mCopyR,mShortName,mCode;
 };
 
 class rasterFiles{

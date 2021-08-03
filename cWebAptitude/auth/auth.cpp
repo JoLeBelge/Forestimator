@@ -12,6 +12,9 @@ AuthApplication::AuthApplication(const Wt::WEnvironment& env, cDicoApt *dico)
 {
     // charge le xml avec tout le texte qui sera chargé via la fonction tr()
     messageResourceBundle().use(docRoot() + "/forestimator");
+    messageResourceBundle().use(docRoot() + "/forestimator-documentation");
+
+
 
     setTitle("Forestimator");
 

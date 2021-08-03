@@ -219,7 +219,7 @@ void cAppliCartepH::carteNT(std::string aOut, bool force){
     }
 
     if ((!exists(aOut) | force)){
-        std::cout << "creation de la carte des NT sur base du dico sigle pédo, de la carte des pH, des territoire ecologique et des zones bioclimatiques" << std::endl;
+        std::cout << "creation de la carte des NT sur base du dico sigle pédo, de la carte des pH, des territoire ecologique, des formations carbonatés, de la zone entre-sambre et Meuse et des zones bioclimatiques" << std::endl;
         std::cout << "  fichier " << aOut << std::endl;
         // input ; zbio (déjà ouvert dans constructeur, ter eco, cnsw
         std::string aCNSWpath(dico->File("CNSW"));
@@ -269,8 +269,8 @@ void cAppliCartepH::carteNT(std::string aOut, bool force){
         float * scanlineTECO = (float *) CPLMalloc( sizeof( float ) * x );
         float * scanlineZBIO = (float *) CPLMalloc( sizeof( float ) * x );
         float * scanlinepH = (float *) CPLMalloc( sizeof( float ) * x );
-         float * scanlineEVM = (float *) CPLMalloc( sizeof( float ) * x );
-          float * scanlineCARBO = (float *) CPLMalloc( sizeof( float ) * x );
+        float * scanlineEVM = (float *) CPLMalloc( sizeof( float ) * x );
+        float * scanlineCARBO = (float *) CPLMalloc( sizeof( float ) * x );
         float *scanline;
         scanline = (float *) CPLMalloc( sizeof( float ) * x );
         // boucle sur les pixels
@@ -333,8 +333,13 @@ int cleNT(const siglePedo *s, int ZBIO, int TECO, double pH, bool carbo, bool ev
     if(pH>=lim_p12){aRes=12;}
     if(pH<lim_p12 && s->calcaire() && (s->podzol() | s->podzolique())){aRes=9;}
     // 2021 07 12 Andyne me dis que les kEbb et autres sols en calestienne sont en -1 (cause du pH) mais on aimerai qu'ils soient en +1
-    if(pH<lim_p12 && s->calcaire() && (!s->podzol() & !s->podzolique()) && pH<5 && TECO!=13){aRes=9;}
-    if(pH<lim_p12 && s->calcaire() && (!s->podzol() & !s->podzolique()) && pH<5 && TECO==13){aRes=11;}
+    // pareil en Condroz, les sol kAba sont limoneux donc pH bas (4.7) donc NT -1 mais nous on veux du +1
+   // if(pH<lim_p12 && s->calcaire() && (!s->podzol() & !s->podzolique()) && pH<5 && !(TECO==13 |TECO==7)){aRes=9;}
+    //if(pH<lim_p12 && s->calcaire() && (!s->podzol() & !s->podzolique()) && pH<5 && (TECO==13 |TECO==7)){aRes=11;}
+    if(pH<lim_p12 && s->calcaire() && (!s->podzol() & !s->podzolique()) && pH<5 ){aRes=11;}
+    // sol de lorraine; on est plus restrictif pour attribuer le niveau +1, uniquement charge j/ j-w sur Texture argile. les sols avec calcaire détectés en lorraine mais sans la texture
+     if(pH<lim_p12 && s->fauxCalcaireLorraine() && (!s->podzol() & !s->podzolique()) && pH<5 && ( ZBIO==3 | ZBIO==5) ){aRes=9;}
+
     //if(pH<lim_p12 && s->calcaire() && (!s->podzol() & !s->podzolique()) && pH<5 && !s->profond()){aRes=9;}
     //if(pH<lim_p12 && s->calcaire() && (!s->podzol() & !s->podzolique()) && pH<5 && s->profond()){aRes=9;}
     if(pH<lim_p12 && s->calcaire() && (!s->podzol() & !s->podzolique()) && pH>=5 && s->profond()){aRes=10;}
@@ -361,10 +366,11 @@ int cleNT(const siglePedo *s, int ZBIO, int TECO, double pH, bool carbo, bool ev
     if(s->limon() &&  (TECO==6 | TECO==7) && !s->calcaire() && !s->alluvion() && !s->podzol() ){aRes=9;}
 
     // 2021 07 12 ; andyne souhaite que la bande de sol gbbf en ardenne qui longe la famenne soit en -1 plutôt que -2. Sophie et Hugues confirme que c'est plus riche, malgré que le pH de ce pts soit à 4.15 pour l'Ardenne
-     if( s->chargeSchisteux() &&  ( ZBIO==1 | ZBIO==2 | ZBIO==10) ){aRes=9;}
+    // thierarche
+    if( s->chargeSchisteux() &&  ( ZBIO==1 | ZBIO==2 | ZBIO==10 | ZBIO==9) ){aRes=9;}
     // 2021 07 Andyne
      // limon calestienne sans calcaire détecté.
-     if(s->limon() &&  TECO==13 && !s->calcaire() && !s->substratSchisteux()){aRes=10;}
+     if(s->limon() &&  (TECO==13 |TECO==7) && !s->calcaire() && !s->substratSchisteux()){aRes=10;}
      // nord du Condroz, Entre Vesdre et Meuse
      if(evm && s->getDEV_PROFIL()=="a" &&  s->getCHARGE()=="x"){aRes=8;}
      if(evm && s->getDEV_PROFIL()=="b" &&  s->getCHARGE()=="x"){aRes=10;}
@@ -374,7 +380,7 @@ int cleNT(const siglePedo *s, int ZBIO, int TECO, double pH, bool carbo, bool ev
      if(s->getCHARGE()=="r"){aRes=8;}
 
      // substrat schisteux : en -1, surtout pour la famenne
-     if (s->substratSchisteux()){aRes=9;}
+     if (s->substratSchisteux() && !s->calcaire() && s->getCHARGE()!="r" && s->getCHARGE()!="q"  && s->getCHARGE()!="rj"){aRes=9;}
 
     // attention, si na sur carte pH, attribue mauvaise classe trophique.
 

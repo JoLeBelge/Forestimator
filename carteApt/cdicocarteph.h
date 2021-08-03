@@ -65,6 +65,8 @@ public:
     bool limon() const;
     */
     bool calcaire() const {return mCalcaire;}
+    bool calcaireLorraine() const {return mCalcaireLorraine;}
+    bool fauxCalcaireLorraine() const {return mFauxCalcaireLorraine;}
     // serie.special.riche
     bool ssriche() const {return mSsriche;}
     bool profond() const{return mProfond;}
@@ -100,7 +102,7 @@ public:
         dbo::field(a, mSER_SPEC,    "SER_SPEC");
     }
 private:
-    bool mCalcaire,mSsriche,mProfond,mAlluvion,mPodzol,mPodzolique,mSuperficiel,mTourbe,mLimon;
+    bool mCalcaire,mSsriche,mProfond,mAlluvion,mPodzol,mPodzolique,mSuperficiel,mTourbe,mLimon, mCalcaireLorraine,mFauxCalcaireLorraine;
     std::string SUBSTRAT,mMAT_TEXT, mPHASE_1, mPHASE_2,mPHASE_4, mPHASE_6, mCHARGE, mDRAINAGE, mDEV_PROFIL, mSER_SPEC;
     int INDEX_;
 

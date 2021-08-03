@@ -766,6 +766,13 @@ std::string getHtml(LayerMTD * lMTD){
         std::string html="<h4>Version  </h4>" +lMTD->Vers();
         if (isValidHtml(html)){aRes+=html;}
     }
+    // test si il existe un message dans le xml qui contient les logs de changements pour cette carte
+    std::string logs(WString::tr(lMTD->code()+".logs").toUTF8());
+    if (logs.substr(0,2)!="??"){
+        std::string html="<h4>Information de modification </h4>" +logs;
+        if (isValidHtml(logs)){aRes+=html;}
+    }
+
     if (lMTD->CopyR()!=""){
         std::string html="<h4>Copyright </h4>" +lMTD->CopyR();
         if (isValidHtml(html)){aRes+=html;}

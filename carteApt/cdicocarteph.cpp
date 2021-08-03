@@ -210,7 +210,7 @@ double cDicoCartepH::toDouble(std::string aStr){
     return std::stod(aStr);
 }
 
-std::vector<std::string> substratCalcaire{"j", "k", "m", "n", "i", "kf", "j-w", "ks", "kt", "(+u)"};
+std::vector<std::string> substratCalcaire{"j", "k", "m", "n", "i", "kf", "j-w", "ks", "kt", "(+u)", "ku"};
 std::vector<std::string> PHASE_2Calcaire{"(ca)","(k)"};
 std::vector<std::string> PHASE_6Calcaire{"J","M"};
 std::vector<std::string> CHARGECalcaire{"k", "K", "kf", "m", "n"};
@@ -223,6 +223,8 @@ std::vector<std::string> MAT_TEXTtourbe{"V", "W", "V-E"};
 std::vector<std::string> PHASE_4tourbe{"(v)","(v3)", "(v4)"};
 std::vector<std::string> MAT_TEXTlimon{"A", "A-L", "A-E", "A-U"};
 
+
+
 void siglePedo::prepare(){
     mCalcaire=0;
     bool t1 =std::find(substratCalcaire.begin(), substratCalcaire.end(), SUBSTRAT) !=substratCalcaire.end() ;
@@ -230,6 +232,14 @@ void siglePedo::prepare(){
     bool t3 =std::find(PHASE_6Calcaire.begin(), PHASE_6Calcaire.end(), mPHASE_6) !=PHASE_6Calcaire.end() ;
     bool t4 =std::find(CHARGECalcaire.begin(), CHARGECalcaire.end(), mCHARGE) !=CHARGECalcaire.end() ;
     if (t1 | t2 | t3 | t4){ mCalcaire=1;}
+
+    // regles différentes pour détection des sols eutrophes +1 en Lorraines, ou les sols et les sigles sont différents
+    mCalcaireLorraine=0;mFauxCalcaireLorraine=0;
+    t1 = (SUBSTRAT=="j" | SUBSTRAT=="j-w");
+    t2 = (mMAT_TEXT=="E");
+    if (t1 && t2){mCalcaireLorraine=1;}
+    if (t1 && !t2){mFauxCalcaireLorraine=1;}
+
 
     mSsriche=0;
     t1 =std::find(SER_SPECRiche.begin(), SER_SPECRiche.end(), mSER_SPEC) !=SER_SPECRiche.end() ;
@@ -263,5 +273,7 @@ void siglePedo::prepare(){
     mLimon=0;
     t1 =std::find(MAT_TEXTlimon.begin(),MAT_TEXTlimon.end(), mMAT_TEXT) !=MAT_TEXTlimon.end() ;
    if (t1){mLimon=1;}
+
+
 
 }
