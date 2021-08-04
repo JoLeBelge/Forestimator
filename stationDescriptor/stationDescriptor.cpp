@@ -13,6 +13,7 @@ using namespace std;
 namespace po = boost::program_options;
 extern string dirBD;
 std::string datDir("/home/lisein/Documents/Scolyte/projetRegioWood/Data/");
+std::string dirIRMMap="/home/lisein/Documents/Scolyte/Data/climat/IRM/irmCarte/";
 
 bool climat(0);
 std::vector<int> vYears={2016,2017,2018,2019,2020};
@@ -65,6 +66,7 @@ int main(int argc, char *argv[])
             ("raster", po::value< std::string>(), "raster de description du mileu")
             ("rasterMask", po::value< std::string>(), "raster masque à partir duquel on va générer des tuiles")
             ("meteo", po::value<bool>(), "description de la station avec des indices météo en plus")
+            ("dirIRMMap", po::value<bool>(), "chemin d'accès aux cartes de l'IRM")
             ;
 
     po::variables_map vm;
@@ -86,6 +88,8 @@ int main(int argc, char *argv[])
             if (vm.count("shp")) {
                 std::string file(vm["shp"].as<std::string>());
                 if (vm.count("meteo")){climat =vm["meteo"].as<bool>();}
+
+                if (vm.count("dirIRMMap")){climat =vm["dirIRMMap"].as<std::string>();}
                 descriptionStation(file);
 
 
@@ -259,14 +263,13 @@ void descriptionStation(std::string aShp){
         std::vector<std::unique_ptr<rasterFiles>> aVRFs;
         if (climat){
             std::cout << " raster description du climat" << std::endl;
-            std::string dir="/home/lisein/Documents/Scolyte/Data/climat/IRM/irmCarte/";
             // boucle sur les raster de données climatique et extraction de la valeur pour le centre de la tuile
             for (int y : vYears){
                 for (int m : vMonths){
 
                     for (std::string var : vVAR){
                         std::string code=var +"_"+std::to_string(y)+"_"+std::to_string(m);
-                        std::string file(dir +code +".tif");
+                        std::string file(dirIRMMap +code +".tif");
                         std::unique_ptr<rasterFiles> r= std::make_unique<rasterFiles>(file,code);
                         aVRFs.push_back(std::move(r));
                     }
@@ -277,19 +280,17 @@ void descriptionStation(std::string aShp){
                 for (int m : vMonths){
 
                     std::string code=var +"_"+std::to_string(m);
-                    std::string file(dir +code +".tif");
+                    std::string file(dirIRMMap +code +".tif");
                     std::unique_ptr<rasterFiles> r= std::make_unique<rasterFiles>(file,code);
                     aVRFs.push_back(std::move(r));
                 }
                 // moy trentenaire annuelle
-                std::string file(dir +var +".tif");
+                std::string file(dirIRMMap +var +".tif");
                 std::unique_ptr<rasterFiles> r= std::make_unique<rasterFiles>(file,var);
                 aVRFs.push_back(std::move(r));
             }
         }
 
-        // j'aimerai utiliser la carte d'aptitude de l'ep sans passer par l'objet cEss. Comment?
-        // création d'un cRasterFile pour essence
         std::map<std::string,int> statOrder;// en parallel computing il remplis le vecteur résultat dans un ordre aléatoire (push_back est effectué par le thread qui fini le plus rapidement
         // j'ai donc besoin d'une map pour savoir ordonner mes résultats
         int c(0);
@@ -325,7 +326,6 @@ void descriptionStation(std::string aShp){
                     headerProcessing+=";"+l->Code()+"mean";
                     headerProcessing+=";"+l->Code()+"max";
                     headerProcessing+=";"+l->Code()+"sd";
-
                     statOrder.emplace(std::make_pair(l->Code()+"mean",c));
                     c++;
                     statOrder.emplace(std::make_pair(l->Code()+"max",c));
@@ -359,9 +359,15 @@ void descriptionStation(std::string aShp){
             statOrder.emplace(std::make_pair(r->Code(),c));
             c++;
         }
-
-
+        
         std::map<int,std::vector<std::string>> aStat;
+        
+        //peut prendre 3 heures de calcul sur 100k tuiles, je devrai pe faire du checkpointing..
+        //for (int cp(0) ; cp<lay->GetFeatureCount()/25000; cp++){
+            
+        //}
+        
+      
         //#pragma omp parallel num_threads(2) shared(aStat, lay,aVRFs,aVLs) //private(id,i,poFeature,poGeom,aStatOnPol,statPedo,pt)
         {
             //#pragma omp for
