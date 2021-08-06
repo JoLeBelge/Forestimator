@@ -61,12 +61,13 @@ int main(int argc, char *argv[])
     po::options_description desc("Allowed options");
     desc.add_options()
             ("help", "produce help message")
-            ("outil", po::value<int>(), "choix de l'outil à utiliser")
+            ("outil", po::value<int>(), "choix de l'outil à utiliser (1 : description stationnelle sur un shapefile de polygone)")
             ("shp", po::value< std::string>(), "shapefile des polgones sur lesquels effectuer l'analyse surfacique")
             ("raster", po::value< std::string>(), "raster de description du mileu")
             ("rasterMask", po::value< std::string>(), "raster masque à partir duquel on va générer des tuiles")
             ("meteo", po::value<bool>(), "description de la station avec des indices météo en plus")
-            ("dirIRMMap", po::value<bool>(), "chemin d'accès aux cartes de l'IRM")
+            ("dirIRMMap", po::value<std::string>(), "chemin d'accès aux cartes de l'IRM")
+             ("dirBDForestimator", po::value<std::string>(), "chemin d'accès à la BD de forestimator, dont une table sert à avoir tout les chemins d'accès aux raster + cnsw qui nous sont nécessaire.")
             ;
 
     po::variables_map vm;
@@ -89,7 +90,9 @@ int main(int argc, char *argv[])
                 std::string file(vm["shp"].as<std::string>());
                 if (vm.count("meteo")){climat =vm["meteo"].as<bool>();}
 
-                if (vm.count("dirIRMMap")){climat =vm["dirIRMMap"].as<std::string>();}
+                if (vm.count("dirIRMMap")){dirIRMMap =vm["dirIRMMap"].as<std::string>();}
+                 if (vm.count("dirBDForestimator")){dirBD =vm["dirBDForestimator"].as<std::string>();}
+
                 descriptionStation(file);
 
 
@@ -247,7 +250,7 @@ void descriptionStation(std::string aShp){
         std::cout << "shp chargé " << std::endl;
         // selectionne les couches raster que je vais utiliser
         // std::vector<std::string> aVCodes{"MNT","ZBIO","NT","NH","AE","SS","Topo","EP_FEE"};
-        std::vector<std::string> aVCodes{"MNT","ZBIO","NT","NH","AE","SS","Topo","EP_FEE","EP_CS","CS_A","slope","MNH2019","MNH2014"};
+        std::vector<std::string> aVCodes{"MNT","ZBIO","NT","NH","AE","SS","Topo","EP_FEE","slope","MNH2019","MNH2014"};// ,"EP_CS","CS_A"
 
         //std::vector<std::string> aVCodes{"MNT","ZBIO","NT","NH","AE","SS","Topo","BV_FEE","BP_FEE","slope"};
         //std::vector<std::string> aVCodes{"MNT","ZBIO","NT","NH","AE","SS","Topo"};
@@ -305,7 +308,11 @@ void descriptionStation(std::string aShp){
             statOrder.emplace(std::make_pair(f,c));
             c++;
         }
-        headerProcessing="Texture;Texpct;Drainage;Dpct;Prof;Ppct";
+        // je pense que c'est assez long comme process. j'enlève pour voir
+        headerProcessing="";
+        bool doCNSW=0;
+        if (doCNSW){
+        headerProcessing+="Texture;Texpct;Drainage;Dpct;Prof;Ppct";
         statOrder.emplace(std::make_pair("Texture",c));
         c++;
         statOrder.emplace(std::make_pair("Texpct",c));
@@ -318,6 +325,7 @@ void descriptionStation(std::string aShp){
         c++;
         statOrder.emplace(std::make_pair("Ppct",c));
         c++;
+        }
         for (std::shared_ptr<layerBase> & l : aVLs){
             switch (l->getTypeVar()) {
             case TypeVar::Continu:{
@@ -367,16 +375,15 @@ void descriptionStation(std::string aShp){
             
         //}
         
-      
         //#pragma omp parallel num_threads(2) shared(aStat, lay,aVRFs,aVLs) //private(id,i,poFeature,poGeom,aStatOnPol,statPedo,pt)
         {
             //#pragma omp for
             for (int id=0;id<lay->GetFeatureCount();id++){
                 poFeature = lay->GetFeature(id);
-
+                //std::cout << " process feature id " << id << std::endl;
                 //if (poFeature->GetFieldAsInteger("IGN")==4356 && poFeature->GetFieldAsInteger("NPL")==52 ){
                 if (poFeature->GetFID() % 1000==0){std::cout << " process feature " << poFeature->GetFID() << std::endl;}
-                //if (poFeature->GetFID() == 5000){break;}
+                if (poFeature->GetFID() == 2000){break;}
 
                 OGRGeometry * poGeom = poFeature->GetGeometryRef();
                 switch (poGeom->getGeometryType()){
@@ -386,7 +393,6 @@ void descriptionStation(std::string aShp){
                 }
                 case wkbMultiPolygon:
                 {
-
                     break;
                 }
                     // pour la carte générée pour analyse point, on ne dessine pas un polygone mais un cercle autour du point
@@ -403,8 +409,10 @@ void descriptionStation(std::string aShp){
 
                     break;
                 }
-                poGeom->closeRings();
-                poGeom->flattenTo2D();
+                //poGeom->closeRings();
+                //poGeom->flattenTo2D();
+                //poGeom->MakeValid();
+                // std::cout << " close ring et tout " << std::endl;
                 //std::vector<std::string> aStatOnPol;
                 std::map<int,std::string> aStatOnPol;
 
@@ -417,6 +425,7 @@ void descriptionStation(std::string aShp){
                 }
 
                 // cnsw
+                if(doCNSW){
                 surfPedo statPedo(dico.mPedo,poGeom);
                 std::pair<std::string,double> t=statPedo.getMajTexture();
                 ind=statOrder.at("Texture");
@@ -433,7 +442,7 @@ void descriptionStation(std::string aShp){
                 aStatOnPol.emplace(std::make_pair(ind,p.first));
                 ind=statOrder.at("Ppct");
                 aStatOnPol.emplace(std::make_pair(ind,roundDouble(p.second,0)));
-
+                }
 
                 // les autres couches
 #pragma omp parallel num_threads(8) shared(aStatOnPol,aVLs,statOrder)
