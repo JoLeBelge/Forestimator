@@ -14,6 +14,10 @@ namespace po = boost::program_options;
 extern string dirBD;
 std::string datDir("/home/lisein/Documents/Scolyte/projetRegioWood/Data/");
 std::string dirIRMMap="/home/lisein/Documents/Scolyte/Data/climat/IRM/irmCarte/";
+std::string dirMapDescr="toto";
+
+
+namespace bf =boost::filesystem;
 
 bool climat(0);
 std::vector<int> vYears={2016,2017,2018,2019,2020};
@@ -66,6 +70,7 @@ int main(int argc, char *argv[])
             ("meteo", po::value<bool>(), "description de la station avec des indices météo en plus (précision chemin d'accès au cartes avec dirIRMMap)")
             ("dirIRMMap", po::value<std::string>(), "chemin d'accès aux cartes de l'IRM")
             ("dirBDForestimator", po::value<std::string>(), "chemin d'accès à la BD de forestimator, dont une table sert à avoir tout les chemins d'accès aux raster + cnsw qui nous sont nécessaire.")
+            ("dirMapDescr", po::value<std::string>(), "pour outil 1. Dossier contenant des cartes de variables continues pour lesquelles on souhaite calculer la valeur moyenne sur la tuile.")
             ("raster", po::value< std::string>(), "raster de description du mileu pour ajout d'un champs dans shp (outil 101")
             ("rasterMask", po::value< std::string>(), "raster masque à partir duquel on va générer des tuiles (outil 102) , pour tuilages scolytes ou hetraie mature")
             ;
@@ -92,7 +97,8 @@ int main(int argc, char *argv[])
                 if (vm.count("meteo")){climat =vm["meteo"].as<bool>();}
 
                 if (vm.count("dirIRMMap")){dirIRMMap =vm["dirIRMMap"].as<std::string>();}
-                 if (vm.count("dirBDForestimator")){dirBD =vm["dirBDForestimator"].as<std::string>();}
+                if (vm.count("dirBDForestimator")){dirBD =vm["dirBDForestimator"].as<std::string>();}
+                if (vm.count("dirMapDescr")){dirMapDescr =vm["dirMapDescr"].as<std::string>();}
 
                 descriptionStation(file);
 
@@ -251,188 +257,256 @@ void descriptionStation(std::string aShp){
     if( mDS != NULL )
     {
         std::cout << "shp chargé " << std::endl;
-        // selectionne les couches raster que je vais utiliser
-        // std::vector<std::string> aVCodes{"MNT","ZBIO","NT","NH","AE","SS","Topo","EP_FEE"};
-        std::vector<std::string> aVCodes{"MNT","ZBIO","NT","NH","AE","SS","Topo","EP_FEE","slope","MNH2019","MNH2014"};// ,"EP_CS","CS_A"
 
-        //std::vector<std::string> aVCodes{"MNT","ZBIO","NT","NH","AE","SS","Topo","BV_FEE","BP_FEE","slope"};
-        //std::vector<std::string> aVCodes{"MNT","ZBIO","NT","NH","AE","SS","Topo"};
-        //std::vector<std::string> aVCodes{"COMPO6","MNH2019","MNH2014","slope", "CS_A","CS3","CS8","HE_FEE","HE_CS"};
-        std::vector<std::shared_ptr<layerBase>> aVLs;
-
-        for (std::string aCode : aVCodes){
-            if (dico.hasLayerBase(aCode)){
-                aVLs.push_back(dico.getLayerBase(aCode));
-            } else { std::cout << "ne trouve pas la couche " << aCode << std::endl;}
-        }
-
-        std::vector<std::unique_ptr<rasterFiles>> aVRFs;
-        if (climat){
-            std::cout << " raster description du climat" << std::endl;
-            // boucle sur les raster de données climatique et extraction de la valeur pour le centre de la tuile
-            for (int y : vYears){
-                for (int m : vMonths){
-
-                    for (std::string var : vVAR){
-                        std::string code=var +"_"+std::to_string(y)+"_"+std::to_string(m);
-                        std::string file(dirIRMMap +code +".tif");
-                        std::unique_ptr<rasterFiles> r= std::make_unique<rasterFiles>(file,code);
-                        aVRFs.push_back(std::move(r));
-                    }
-                }
-            }
-
-            std::vector<std::string> var30{"ETP_30aire","P_30aire"};
-            for (std::string var : var30){
-                for (int m : vMonths){
-
-                    std::string code=var +"_"+std::to_string(m);
-                    std::string file(dirIRMMap +code +".tif");
-                    std::unique_ptr<rasterFiles> r= std::make_unique<rasterFiles>(file,code);
-                    aVRFs.push_back(std::move(r));
-                }
-                // moy trentenaire annuelle
-                std::string file(dirIRMMap +var +".tif");
-                std::unique_ptr<rasterFiles> r= std::make_unique<rasterFiles>(file,var);
-                aVRFs.push_back(std::move(r));
-            }
-        }
-
-        std::map<std::string,int> statOrder;// en parallel computing il remplis le vecteur résultat dans un ordre aléatoire (push_back est effectué par le thread qui fini le plus rapidement
-        // j'ai donc besoin d'une map pour savoir ordonner mes résultats
-        int c(0);
 
         // layer
         OGRLayer * lay = mDS->GetLayer(0);
         OGRFeature *poFeature=lay->GetFeature(0);
 
+        std::map<std::string,int> statOrder;// en parallel computing il remplis le vecteur résultat dans un ordre aléatoire (push_back est effectué par le thread qui fini le plus rapidement
+        // j'ai donc besoin d'une map pour savoir ordonner mes résultats
+        int ind(0);
 
-        /*
-         * PREPARATION DES HEADERS
-         *
-         */
-
+        int c(0);
         for (int i(0);i<poFeature->GetFieldCount();i++){
             std::string f=std::string(poFeature->GetFieldDefnRef(i)->GetNameRef());
             header+=f+";";
             statOrder.emplace(std::make_pair(f,c));
             c++;
         }
-        // je pense que c'est assez long comme process (lecture CNSW)
-        headerProcessing="";
-        bool doCNSW=0;
-        if (doCNSW){
-        headerProcessing+="Texture;Texpct;Drainage;Dpct;Prof;Ppct";
-        statOrder.emplace(std::make_pair("Texture",c));
-        c++;
-        statOrder.emplace(std::make_pair("Texpct",c));
-        c++;
-        statOrder.emplace(std::make_pair("Drainage",c));
-        c++;
-        statOrder.emplace(std::make_pair("Dpct",c));
-        c++;
-        statOrder.emplace(std::make_pair("Prof",c));
-        c++;
-        statOrder.emplace(std::make_pair("Ppct",c));
-        c++;
-        }
-        for (std::shared_ptr<layerBase> & l : aVLs){
-            switch (l->getTypeVar()) {
-            case TypeVar::Continu:{
-                switch (l->getCatLayer()) {
-                case TypeLayer::Peuplement:{
-                    headerProcessing+=";"+l->Code()+"mean";
-                    headerProcessing+=";"+l->Code()+"max";
-                    headerProcessing+=";"+l->Code()+"sd";
-                    statOrder.emplace(std::make_pair(l->Code()+"mean",c));
+        std::vector<std::unique_ptr<rasterFiles>> aVRFs;
+        std::map<int,std::vector<std::string>> aStat;
+
+
+
+        // mode avec les raster de l'utilisateur
+        if (dirMapDescr!="toto"){
+            if (bf::is_directory(dirMapDescr)){
+                std::vector<std::unique_ptr<rasterFiles>> aVRFs;
+                std::cout << " ajout raster description de la station" << std::endl;
+
+                for (bf::directory_iterator itr(dirMapDescr); itr!=bf::directory_iterator(); ++itr)
+                {
+                    //std::cout << itr->path().extension() << std::endl;
+                    if (itr->path().extension()==".tif"){
+                        //bf::path p;
+                        //p.stem().string()
+                        std::string var = itr->path().stem().string();
+                        std::cout << " ajout " << var << "  " <<  " " << itr->path().string() << std::endl; // display filename only
+                        std::unique_ptr<rasterFiles> r= std::make_unique<rasterFiles>(itr->path().string(),var);
+                        headerProcessing+=";"+r->Code();
+                        statOrder.emplace(std::make_pair(r->Code(),c));
+                        aVRFs.push_back(std::move(r));
+                        c++;
+                    }
+                }
+                std::cout << "Total de " << aVRFs.size() << " raster ajouté " << std::endl;
+
+                for (int id=0;id<lay->GetFeatureCount();id++){
+                    poFeature = lay->GetFeature(id);
+                    if (poFeature->GetFID() % 1000==0){std::cout << " process feature " << poFeature->GetFID() << std::endl;}
+                    //if (poFeature->GetFID() == 2000){break;}
+                    OGRGeometry * poGeom = poFeature->GetGeometryRef();
+                    switch (poGeom->getGeometryType()){
+                    case (wkbPolygon):{break;}
+                    case wkbMultiPolygon:{break;}
+                        // pour la carte générée pour analyse point, on ne dessine pas un polygone mais un cercle autour du point
+                    case wkbPoint:
+                    {
+                        std::cout << " shp de point ; j'effectue un buffer de 18 m" << std::endl;
+                        poGeom = poGeom->Buffer(18);
+                        break;
+                    }
+                    default:
+                        std::cout << "Geometrie " << poGeom->getGeometryName() << " non pris en charge " << std::endl;
+                        break;
+                    }
+                    std::map<int,std::string> aStatOnPol;
+                    // je commence par écrire dans le vecteur de résultat la valeur des champs de la table d'attribu, comme cela j'aurai mes identifiant
+                    for (int i=0;i<poFeature->GetFieldCount();i++){
+                        //aStatOnPol.push_back(poFeature->GetFieldAsString(i));
+                        ind=statOrder.at(poFeature->GetFieldDefnRef(i)->GetNameRef());
+                        aStatOnPol.emplace(std::make_pair(ind,poFeature->GetFieldAsString(i)));
+                    }
+                    OGRPoint * pt= getCentroid(poGeom->toPolygon());
+                    double aX=pt->getX(),aY=pt->getY();
+                    delete pt;
+#pragma omp parallel num_threads(8) shared(aStatOnPol,aVRFs,aX,aY)
+                    {
+#pragma omp for
+                        for (std::unique_ptr<rasterFiles> & r : aVRFs){
+                            std::string aRes=std::to_string(r->getValueDouble(aX,aY));
+#pragma omp critical
+                            {
+                                int ind2=statOrder.at(r->Code());
+                                aStatOnPol.emplace(std::make_pair(ind2,aRes));
+                            }
+
+                        }
+                    }
+                    //maintenant on converti la map en vecteur de string
+                    std::vector<std::string> vResOnPol;
+                    for (auto kv : aStatOnPol){
+                        vResOnPol.push_back(kv.second);
+                    }
+                    aStat.emplace(std::make_pair(poFeature->GetFID(),vResOnPol));
+                }
+
+            } else { std::cout << " vous avez spécifié un chemin d'accès pour des raster " << dirMapDescr << " mais celui-ci est introuvable " << std::endl;}
+        } else{
+
+            /*
+             *
+             *MODE NORMAL SANS chemin d'accès à des couches raster
+             *
+             */
+
+
+            // selectionne les couches raster que je vais utiliser
+            // std::vector<std::string> aVCodes{"MNT","ZBIO","NT","NH","AE","SS","Topo","EP_FEE"};
+            std::vector<std::string> aVCodes{"MNT","ZBIO","NT","NH","AE","SS","Topo","EP_FEE","slope","MNH2019","MNH2014"};// ,"EP_CS","CS_A"
+
+            //std::vector<std::string> aVCodes{"MNT","ZBIO","NT","NH","AE","SS","Topo","BV_FEE","BP_FEE","slope"};
+            //std::vector<std::string> aVCodes{"MNT","ZBIO","NT","NH","AE","SS","Topo"};
+            //std::vector<std::string> aVCodes{"COMPO6","MNH2019","MNH2014","slope", "CS_A","CS3","CS8","HE_FEE","HE_CS"};
+            std::vector<std::shared_ptr<layerBase>> aVLs;
+
+            for (std::string aCode : aVCodes){
+                if (dico.hasLayerBase(aCode)){
+                    aVLs.push_back(dico.getLayerBase(aCode));
+                } else { std::cout << "ne trouve pas la couche " << aCode << std::endl;}
+            }
+
+
+            if (climat){
+                std::cout << " raster description du climat" << std::endl;
+                // boucle sur les raster de données climatique et extraction de la valeur pour le centre de la tuile
+                for (int y : vYears){
+                    for (int m : vMonths){
+
+                        for (std::string var : vVAR){
+                            std::string code=var +"_"+std::to_string(y)+"_"+std::to_string(m);
+                            std::string file(dirIRMMap +code +".tif");
+                            std::unique_ptr<rasterFiles> r= std::make_unique<rasterFiles>(file,code);
+                            aVRFs.push_back(std::move(r));
+                        }
+                    }
+                }
+
+                std::vector<std::string> var30{"ETP_30aire","P_30aire"};
+                for (std::string var : var30){
+                    for (int m : vMonths){
+
+                        std::string code=var +"_"+std::to_string(m);
+                        std::string file(dirIRMMap +code +".tif");
+                        std::unique_ptr<rasterFiles> r= std::make_unique<rasterFiles>(file,code);
+                        aVRFs.push_back(std::move(r));
+                    }
+                    // moy trentenaire annuelle
+                    std::string file(dirIRMMap +var +".tif");
+                    std::unique_ptr<rasterFiles> r= std::make_unique<rasterFiles>(file,var);
+                    aVRFs.push_back(std::move(r));
+                }
+            }
+
+            /*
+         * PREPARATION DES HEADERS
+         *
+         */
+
+            // je pense que c'est assez long comme process (lecture CNSW)
+            headerProcessing="";
+            bool doCNSW=0;
+            if (doCNSW){
+                headerProcessing+="Texture;Texpct;Drainage;Dpct;Prof;Ppct";
+                statOrder.emplace(std::make_pair("Texture",c));
+                c++;
+                statOrder.emplace(std::make_pair("Texpct",c));
+                c++;
+                statOrder.emplace(std::make_pair("Drainage",c));
+                c++;
+                statOrder.emplace(std::make_pair("Dpct",c));
+                c++;
+                statOrder.emplace(std::make_pair("Prof",c));
+                c++;
+                statOrder.emplace(std::make_pair("Ppct",c));
+                c++;
+            }
+            for (std::shared_ptr<layerBase> & l : aVLs){
+                switch (l->getTypeVar()) {
+                case TypeVar::Continu:{
+                    switch (l->getCatLayer()) {
+                    case TypeLayer::Peuplement:{
+                        headerProcessing+=";"+l->Code()+"mean";
+                        headerProcessing+=";"+l->Code()+"max";
+                        headerProcessing+=";"+l->Code()+"sd";
+                        statOrder.emplace(std::make_pair(l->Code()+"mean",c));
+                        c++;
+                        statOrder.emplace(std::make_pair(l->Code()+"max",c));
+                        c++;
+                        statOrder.emplace(std::make_pair(l->Code()+"sd",c));
+                        c++;
+                        break;
+                    }
+                    default:
+                        headerProcessing+=";"+l->Code()+"mean";
+                        statOrder.emplace(std::make_pair(l->Code()+"mean",c));
+                        c++;
+                    }
+                    break;
+                }
+                case TypeVar::Classe:{
+                    headerProcessing+=";"+l->Code()+"maj";
+                    headerProcessing+=";"+l->Code()+"pct";
+                    statOrder.emplace(std::make_pair(l->Code()+"maj",c));
                     c++;
-                    statOrder.emplace(std::make_pair(l->Code()+"max",c));
-                    c++;
-                    statOrder.emplace(std::make_pair(l->Code()+"sd",c));
+                    statOrder.emplace(std::make_pair(l->Code()+"pct",c));
                     c++;
                     break;
                 }
                 default:
-                    headerProcessing+=";"+l->Code()+"mean";
-                    statOrder.emplace(std::make_pair(l->Code()+"mean",c));
-                    c++;
+                    break;
                 }
-                break;
             }
-            case TypeVar::Classe:{
-                headerProcessing+=";"+l->Code()+"maj";
-                headerProcessing+=";"+l->Code()+"pct";
-                statOrder.emplace(std::make_pair(l->Code()+"maj",c));
+            for (std::unique_ptr<rasterFiles> & r : aVRFs){
+                headerProcessing+=";"+r->Code();
+                statOrder.emplace(std::make_pair(r->Code(),c));
                 c++;
-                statOrder.emplace(std::make_pair(l->Code()+"pct",c));
-                c++;
-                break;
             }
-            default:
-                break;
-            }
-        }
-        for (std::unique_ptr<rasterFiles> & r : aVRFs){
-            headerProcessing+=";"+r->Code();
-            statOrder.emplace(std::make_pair(r->Code(),c));
-            c++;
-        }
 
-
-        /*
+            /*
          * CALCUL
          *
          */
-        
-        std::map<int,std::vector<std::string>> aStat;
-        
-        //peut prendre 3 heures de calcul sur 100k tuiles, je devrai pe faire du checkpointing..
-        //for (int cp(0) ; cp<lay->GetFeatureCount()/25000; cp++){
-            
-        //}
-        
-        //#pragma omp parallel num_threads(2) shared(aStat, lay,aVRFs,aVLs) //private(id,i,poFeature,poGeom,aStatOnPol,statPedo,pt)
-        {
-            //#pragma omp for
+            //peut prendre 3 heures de calcul sur 100k tuiles, je devrai pe faire du checkpointing..
+            //for (int cp(0) ; cp<lay->GetFeatureCount()/25000; cp++){
+            //}
+
             for (int id=0;id<lay->GetFeatureCount();id++){
                 poFeature = lay->GetFeature(id);
                 //std::cout << " process feature id " << id << std::endl;
-                //if (poFeature->GetFieldAsInteger("IGN")==4356 && poFeature->GetFieldAsInteger("NPL")==52 ){
                 if (poFeature->GetFID() % 1000==0){std::cout << " process feature " << poFeature->GetFID() << std::endl;}
                 //if (poFeature->GetFID() == 2000){break;}
-
                 OGRGeometry * poGeom = poFeature->GetGeometryRef();
                 switch (poGeom->getGeometryType()){
-                case (wkbPolygon):
-                {
-                    break;
-                }
-                case wkbMultiPolygon:
-                {
-                    break;
-                }
+                case (wkbPolygon):{break;}
+                case wkbMultiPolygon:{break;}
                     // pour la carte générée pour analyse point, on ne dessine pas un polygone mais un cercle autour du point
                 case wkbPoint:
                 {
                     std::cout << " shp de point ; j'effectue un buffer de 18 m" << std::endl;
                     poGeom = poGeom->Buffer(18);
-
                     break;
                 }
-
                 default:
                     std::cout << "Geometrie " << poGeom->getGeometryName() << " non pris en charge " << std::endl;
-
                     break;
                 }
                 //poGeom->closeRings();
                 //poGeom->flattenTo2D();
                 //poGeom->MakeValid();
-                // std::cout << " close ring et tout " << std::endl;
-                //std::vector<std::string> aStatOnPol;
                 std::map<int,std::string> aStatOnPol;
 
-                int ind(0);
                 // je commence par écrire dans le vecteur de résultat la valeur des champs de la table d'attribu, comme cela j'aurai mes identifiant
                 for (int i=0;i<poFeature->GetFieldCount();i++){
                     //aStatOnPol.push_back(poFeature->GetFieldAsString(i));
@@ -442,22 +516,22 @@ void descriptionStation(std::string aShp){
 
                 // cnsw
                 if(doCNSW){
-                surfPedo statPedo(dico.mPedo,poGeom);
-                std::pair<std::string,double> t=statPedo.getMajTexture();
-                ind=statOrder.at("Texture");
-                aStatOnPol.emplace(std::make_pair(ind,t.first));
-                ind=statOrder.at("Texpct");
-                aStatOnPol.emplace(std::make_pair(ind,roundDouble(t.second,0)));
-                std::pair<std::string,double> d=statPedo.getMajDrainage();
-                ind=statOrder.at("Drainage");
-                aStatOnPol.emplace(std::make_pair(ind,d.first));
-                ind=statOrder.at("Dpct");
-                aStatOnPol.emplace(std::make_pair(ind,roundDouble(d.second,0)));
-                std::pair<std::string,double> p=statPedo.getMajProfCourt();
-                ind=statOrder.at("Prof");
-                aStatOnPol.emplace(std::make_pair(ind,p.first));
-                ind=statOrder.at("Ppct");
-                aStatOnPol.emplace(std::make_pair(ind,roundDouble(p.second,0)));
+                    surfPedo statPedo(dico.mPedo,poGeom);
+                    std::pair<std::string,double> t=statPedo.getMajTexture();
+                    ind=statOrder.at("Texture");
+                    aStatOnPol.emplace(std::make_pair(ind,t.first));
+                    ind=statOrder.at("Texpct");
+                    aStatOnPol.emplace(std::make_pair(ind,roundDouble(t.second,0)));
+                    std::pair<std::string,double> d=statPedo.getMajDrainage();
+                    ind=statOrder.at("Drainage");
+                    aStatOnPol.emplace(std::make_pair(ind,d.first));
+                    ind=statOrder.at("Dpct");
+                    aStatOnPol.emplace(std::make_pair(ind,roundDouble(d.second,0)));
+                    std::pair<std::string,double> p=statPedo.getMajProfCourt();
+                    ind=statOrder.at("Prof");
+                    aStatOnPol.emplace(std::make_pair(ind,p.first));
+                    ind=statOrder.at("Ppct");
+                    aStatOnPol.emplace(std::make_pair(ind,roundDouble(p.second,0)));
                 }
 
                 // les autres couches
@@ -542,14 +616,14 @@ void descriptionStation(std::string aShp){
 
                 aStat.emplace(std::make_pair(poFeature->GetFID(),vResOnPol));
             }
+
+            std::cout << " finish to process features " << std::endl;
         }
-        std::cout << " finish to process features " << std::endl;
 
         GDALClose(mDS);
 
         // sauve les stats dans un fichier texte
         std::string aFile(aShp.substr(0, aShp.size()-4)+"_stationDescriptor.csv");
-
 
         std::ofstream aOut;
         aOut.open(aFile,ios::out);
