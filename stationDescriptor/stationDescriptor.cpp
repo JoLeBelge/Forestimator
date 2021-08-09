@@ -61,14 +61,15 @@ int main(int argc, char *argv[])
     po::options_description desc("Allowed options");
     desc.add_options()
             ("help", "produce help message")
-            ("outil", po::value<int>(), "choix de l'outil à utiliser (1 : description stationnelle sur un shapefile de polygone)")
+            ("outil", po::value<int>(), "choix de l'outil à utiliser (1 : description stationnelle sur un shapefile de polygone, 101 : ajoute un champ aux shapefile avec la valeur extraite d'un raster donné en entrée), 102 : création d'un shp tuile à partir d'un raster (RasterMasq) ")
             ("shp", po::value< std::string>(), "shapefile des polgones sur lesquels effectuer l'analyse surfacique")
-            ("raster", po::value< std::string>(), "raster de description du mileu")
-            ("rasterMask", po::value< std::string>(), "raster masque à partir duquel on va générer des tuiles")
-            ("meteo", po::value<bool>(), "description de la station avec des indices météo en plus")
+            ("meteo", po::value<bool>(), "description de la station avec des indices météo en plus (précision chemin d'accès au cartes avec dirIRMMap)")
             ("dirIRMMap", po::value<std::string>(), "chemin d'accès aux cartes de l'IRM")
-             ("dirBDForestimator", po::value<std::string>(), "chemin d'accès à la BD de forestimator, dont une table sert à avoir tout les chemins d'accès aux raster + cnsw qui nous sont nécessaire.")
+            ("dirBDForestimator", po::value<std::string>(), "chemin d'accès à la BD de forestimator, dont une table sert à avoir tout les chemins d'accès aux raster + cnsw qui nous sont nécessaire.")
+            ("raster", po::value< std::string>(), "raster de description du mileu pour ajout d'un champs dans shp (outil 101")
+            ("rasterMask", po::value< std::string>(), "raster masque à partir duquel on va générer des tuiles (outil 102) , pour tuilages scolytes ou hetraie mature")
             ;
+
 
     po::variables_map vm;
     po::store(po::parse_command_line(argc, argv, desc), vm);
@@ -180,6 +181,8 @@ int main(int argc, char *argv[])
             break;
         }
         case 101:{
+            // ajoute un champ aux shapefile avec la valeur extraite de raster donné en entrée
+
             if (vm.count("shp")) {
                 std::string file(vm["shp"].as<std::string>());
                 // extraction des valeurs de pentes
@@ -278,6 +281,7 @@ void descriptionStation(std::string aShp){
                     }
                 }
             }
+
             std::vector<std::string> var30{"ETP_30aire","P_30aire"};
             for (std::string var : var30){
                 for (int m : vMonths){
@@ -302,13 +306,19 @@ void descriptionStation(std::string aShp){
         OGRLayer * lay = mDS->GetLayer(0);
         OGRFeature *poFeature=lay->GetFeature(0);
 
+
+        /*
+         * PREPARATION DES HEADERS
+         *
+         */
+
         for (int i(0);i<poFeature->GetFieldCount();i++){
             std::string f=std::string(poFeature->GetFieldDefnRef(i)->GetNameRef());
             header+=f+";";
             statOrder.emplace(std::make_pair(f,c));
             c++;
         }
-        // je pense que c'est assez long comme process. j'enlève pour voir
+        // je pense que c'est assez long comme process (lecture CNSW)
         headerProcessing="";
         bool doCNSW=0;
         if (doCNSW){
@@ -367,6 +377,12 @@ void descriptionStation(std::string aShp){
             statOrder.emplace(std::make_pair(r->Code(),c));
             c++;
         }
+
+
+        /*
+         * CALCUL
+         *
+         */
         
         std::map<int,std::vector<std::string>> aStat;
         
@@ -383,7 +399,7 @@ void descriptionStation(std::string aShp){
                 //std::cout << " process feature id " << id << std::endl;
                 //if (poFeature->GetFieldAsInteger("IGN")==4356 && poFeature->GetFieldAsInteger("NPL")==52 ){
                 if (poFeature->GetFID() % 1000==0){std::cout << " process feature " << poFeature->GetFID() << std::endl;}
-                if (poFeature->GetFID() == 2000){break;}
+                //if (poFeature->GetFID() == 2000){break;}
 
                 OGRGeometry * poGeom = poFeature->GetGeometryRef();
                 switch (poGeom->getGeometryType()){
@@ -496,7 +512,11 @@ void descriptionStation(std::string aShp){
                     }
                 }
 
-                // carte climat
+                /*
+                 * CARTE CLIMAT
+                 *
+                 */
+
                 OGRPoint * pt= getCentroid(poGeom->toPolygon());
                 double aX=pt->getX(),aY=pt->getY();
                 delete pt;
@@ -514,7 +534,6 @@ void descriptionStation(std::string aShp){
                     }
                 }
 
-
                 //maintenant on converti la map en vecteur de string
                 std::vector<std::string> vResOnPol;
                 for (auto kv : aStatOnPol){
@@ -522,7 +541,6 @@ void descriptionStation(std::string aShp){
                 }
 
                 aStat.emplace(std::make_pair(poFeature->GetFID(),vResOnPol));
-
             }
         }
         std::cout << " finish to process features " << std::endl;
@@ -861,5 +879,3 @@ OGRPoint * getCentroid(OGRPolygon * hex){
     y/=NumberOfVertices;
     return new OGRPoint(x,y);
 }
-
-
