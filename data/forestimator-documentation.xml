@@ -54,5 +54,28 @@ Entre Vesdre et Meuse --> Gbax NT -2, Gbbx NT 0.
 
 </message>
 
+<message id="AE.logs">
+
+<h5>Modifications de 2019</h5>
+
+1) intégration de la carte des zones d'aléas d'inondation du SPW (en apport permanent). --> changement mineur
+<br></br>
+2) prise en compte du caractère temporaire de l'écoulement pour le réseau hydrographique. Pour les cours d'eau à écoulement temporaire, la zone environnante est classée en apport variable alors qu'auparavent elle l'était en apport permanent. --> changement mineur
+<br></br>
+3) changement des seuils de topographic position index utilisés pour le classement des apports variable dans les zones encaissées afin de <u>réduire considérablement la surface de ces zones qui remontaient trop dans le haut des pentes de vallons et vallées</u>. --> changement majeur
+<br></br>
+</message>
+
+<message id="NH.logs">
+<h5>Modifications de 2019</h5>
+Correction d'un oubli sur les séries spéciale pédologique;
+<br></br>
+-"B" : source --> NH-3
+<br></br>
+-"R" ravin --> NH-2
+<br></br>
+On estime que la profondeur de sol d'une série spéciale "P" (base de grand versant) equivaut à une profondeur 2 (en fonction du SS, NH différent).
+</message>
+
 </messages>
 

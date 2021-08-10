@@ -210,7 +210,8 @@ double cDicoCartepH::toDouble(std::string aStr){
     return std::stod(aStr);
 }
 
-std::vector<std::string> substratCalcaire{"j", "k", "m", "n", "i", "kf", "j-w", "ks", "kt", "(+u)", "ku"};
+std::vector<std::string> substratCalcaire{ "k", "kf", "ks", "kt", "ku"};
+//std::vector<std::string> substratCalcaire{"j", "k", "m", "n", "i", "kf", "j-w", "ks", "kt", "(+u)", "ku"};
 std::vector<std::string> PHASE_2Calcaire{"(ca)","(k)"};
 std::vector<std::string> PHASE_6Calcaire{"J","M"};
 std::vector<std::string> CHARGECalcaire{"k", "K", "kf", "m", "n"};
@@ -235,11 +236,17 @@ void siglePedo::prepare(){
 
     // regles différentes pour détection des sols eutrophes +1 en Lorraines, ou les sols et les sigles sont différents
     mCalcaireLorraine=0;mFauxCalcaireLorraine=0;
-    t1 = (SUBSTRAT=="j" | SUBSTRAT=="j-w");
-    t2 = (mMAT_TEXT=="E");
+    t1 = (SUBSTRAT=="j" | SUBSTRAT=="j-w" | SUBSTRAT=="m");
+    t2 = (mMAT_TEXT=="E" && mPHASE_1!="2_3" && mPHASE_1!="3");
     if (t1 && t2){mCalcaireLorraine=1;}
     if (t1 && !t2){mFauxCalcaireLorraine=1;}
 
+    t1 = (SUBSTRAT=="m");
+    t2 = (mMAT_TEXT=="A");
+    if (t1 && t2){mFauxCalcaireLorraine=1;}
+    t1 = (SUBSTRAT=="ku");
+    t2 = (mMAT_TEXT=="S");
+    if (t1 && t2){mFauxCalcaireLorraine=1;}
 
     mSsriche=0;
     t1 =std::find(SER_SPECRiche.begin(), SER_SPECRiche.end(), mSER_SPEC) !=SER_SPECRiche.end() ;

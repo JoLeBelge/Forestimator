@@ -337,7 +337,7 @@ int cleNT(const siglePedo *s, int ZBIO, int TECO, double pH, bool carbo, bool ev
    // if(pH<lim_p12 && s->calcaire() && (!s->podzol() & !s->podzolique()) && pH<5 && !(TECO==13 |TECO==7)){aRes=9;}
     //if(pH<lim_p12 && s->calcaire() && (!s->podzol() & !s->podzolique()) && pH<5 && (TECO==13 |TECO==7)){aRes=11;}
     if(pH<lim_p12 && s->calcaire() && (!s->podzol() & !s->podzolique()) && pH<5 ){aRes=11;}
-    // sol de lorraine; on est plus restrictif pour attribuer le niveau +1, uniquement charge j/ j-w sur Texture argile. les sols avec calcaire détectés en lorraine mais sans la texture
+    // sol de lorraine; on est plus restrictif pour attribuer le niveau +1, uniquement substrat j/ j-w sur Texture argile. les sols avec calcaire détectés en lorraine mais sans la texture
      if(pH<lim_p12 && s->fauxCalcaireLorraine() && (!s->podzol() & !s->podzolique()) && pH<5 && ( ZBIO==3 | ZBIO==5) ){aRes=9;}
 
     //if(pH<lim_p12 && s->calcaire() && (!s->podzol() & !s->podzolique()) && pH<5 && !s->profond()){aRes=9;}
@@ -360,10 +360,10 @@ int cleNT(const siglePedo *s, int ZBIO, int TECO, double pH, bool carbo, bool ev
     if(pH<lim_m32){aRes=7;}
 
     // limon en ardenne condruzienne - Andyne me dis de mettre tout en -1 en 2021
-    //if(s->limon() &&  TECO==14 && !s->calcaire() && !s->alluvion() && !s->podzol() ){aRes=8;}
+    //if(s->limon() &&  TECO==14 && !s->calcaire() && !s->alluvion() && !s->podzol() ){aRes=8;}  
 
-    // limon en r?gion limoneuse
-    if(s->limon() &&  (TECO==6 | TECO==7) && !s->calcaire() && !s->alluvion() && !s->podzol() ){aRes=9;}
+    // on applique cette regle pas partout
+    if(s->limon() && (ZBIO==4 | ZBIO==8) && (TECO!=13 && TECO!=7)  && !s->calcaire() && !s->alluvion() && !s->podzol() ){aRes=9;}
 
     // 2021 07 12 ; andyne souhaite que la bande de sol gbbf en ardenne qui longe la famenne soit en -1 plutôt que -2. Sophie et Hugues confirme que c'est plus riche, malgré que le pH de ce pts soit à 4.15 pour l'Ardenne
     // thierarche
@@ -380,7 +380,7 @@ int cleNT(const siglePedo *s, int ZBIO, int TECO, double pH, bool carbo, bool ev
      if(s->getCHARGE()=="r"){aRes=8;}
 
      // substrat schisteux : en -1, surtout pour la famenne
-     if (s->substratSchisteux() && !s->calcaire() && s->getCHARGE()!="r" && s->getCHARGE()!="q"  && s->getCHARGE()!="rj"){aRes=9;}
+     if (s->substratSchisteux() && !s->calcaire() && s->alluvion() && s->getCHARGE()!="r" && s->getCHARGE()!="q"  && s->getCHARGE()!="rj"){aRes=9;}
 
     // attention, si na sur carte pH, attribue mauvaise classe trophique.
 
