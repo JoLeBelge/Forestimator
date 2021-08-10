@@ -6,6 +6,11 @@ TARGET = stationDesc
 QMAKE_LFLAGS+=-fopenmp
 QMAKE_CXXFLAGS+=-fopenmp
 
+#QMAKE_CC = gcc-9
+#QMAKE_CXX = g++-9
+#sudo ln -s /usr/bin/gcc-9 /usr/bin/g++-9
+
+
 INCLUDEPATH += $$PWD/../carteApt/
 INCLUDEPATH += $$PWD/../cWebAptitude
 

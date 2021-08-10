@@ -70,13 +70,17 @@ std::map<int,double> cnsw::anaSurface(OGRGeometry *poGeom){
         //lay->ResetReading();
         lay->SetSpatialFilter(poGeom);
 
+        //poGeom->MakeValid();
+
         while( (poFeature = lay->GetNextFeature()) != NULL )
         {
+            //poFeature->GetGeometryRef()->MakeValid();
+            //std::cout  << " test within" << std::endl;
             int solId=poFeature->GetFieldAsInteger("INDEX_SOL");
             if (poFeature->GetGeometryRef()->Within(poGeom)) {
-                //std::cout  << " intersection des deux géométries " << std::endl;
-
+                //std::cout  << " intersection des deux géométries OGRMultiPolygon" << std::endl;
                 OGRMultiPolygon * pol =poFeature->GetGeometryRef()->toMultiPolygon();
+                //pol->MakeValid();
                 if (aRes.find(solId)==aRes.end()){ aRes.emplace(solId,pol->get_Area());} else {
                     aRes.at(solId)+=pol->get_Area();
                 }
@@ -84,10 +88,19 @@ std::map<int,double> cnsw::anaSurface(OGRGeometry *poGeom){
             } else {
 
                 if (poFeature->GetGeometryRef()->Intersect(poGeom)) {
-                    // std::cout  << " intersection des deux géométries " << std::endl;
-                    OGRMultiPolygon* pol = poFeature->GetGeometryRef()->Intersection(poGeom)->toMultiPolygon();
-                    if (aRes.find(solId)==aRes.end()){ aRes.emplace(solId,pol->get_Area());} else {
-                        aRes.at(solId)+=pol->get_Area();
+                    //std::cout  << " intersection des deux géométries " << std::endl;
+                    // cette ligne foire sur le pc sentinel 2. alors que j'ai fait en sorte de placer des MakeValid pour corriger les problèmes de self intersection
+
+                    if( poFeature->GetGeometryRef()->IsValid()){
+                        OGRGeometry* pol1 = poFeature->GetGeometryRef()->Intersection(poGeom);
+                        //pol1->MakeValid();
+                        OGRMultiPolygon* pol = pol1->toMultiPolygon();
+                        //pol->MakeValid();
+                        if (aRes.find(solId)==aRes.end()){ aRes.emplace(solId,pol->get_Area());} else {
+                            aRes.at(solId)+=pol->get_Area();
+                        }
+                    } else {
+                        std::cout  << " intersection des deux géométries dans cnsw::anaSurface : problème de géométrie invalide!! " << std::endl;
                     }
                 }
             }
@@ -229,7 +242,7 @@ void dicoPedo::loadInfo(){
             if (sqlite3_column_type(stmt, 5)!=SQLITE_NULL){p5=std::string( (char *)sqlite3_column_text( stmt, 5 ) );}
             if (sqlite3_column_type(stmt, 6)!=SQLITE_NULL){p6=std::string( (char *)sqlite3_column_text( stmt, 6 ) );}
             if (sqlite3_column_type(stmt, 7)!=SQLITE_NULL){p7=std::string( (char *)sqlite3_column_text( stmt, 7 ) );}
-             std::string desc2=desc;
+            std::string desc2=desc;
             if (sqlite3_column_type(stmt, 8)!=SQLITE_NULL){desc2=std::string( (char *)sqlite3_column_text( stmt, 8 ) );}
 
             std::vector<std::string> aKey{p1,p2,p3,p4,p5,p6,p7};
@@ -453,8 +466,8 @@ std::pair<std::string,double> surfPedo::getMajProf(){
     double aMax(0);
     for (auto & kv : aVProfs){
         if (kv.second>aMax){
-        aMax=kv.second;
-        aRes=kv;}
+            aMax=kv.second;
+            aRes=kv;}
     }
     return aRes;
 }
@@ -473,8 +486,8 @@ std::pair<std::string,double> surfPedo::getMajProfCourt(){
     double aMax(0);
     for (auto & kv : aVProfs){
         if (kv.second>aMax){
-        aMax=kv.second;
-        aRes=kv;}
+            aMax=kv.second;
+            aRes=kv;}
     }
     return aRes;
 }
