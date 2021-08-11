@@ -270,7 +270,8 @@ void descriptionStation(std::string aShp){
         int c(0);
         for (int i(0);i<poFeature->GetFieldCount();i++){
             std::string f=std::string(poFeature->GetFieldDefnRef(i)->GetNameRef());
-            header+=f+";";
+            header+=f;
+            if (i+1!=poFeature->GetFieldCount()){ header+=";";}
             statOrder.emplace(std::make_pair(f,c));
             c++;
         }
