@@ -16,13 +16,13 @@ std::string datDir("/home/lisein/Documents/Scolyte/projetRegioWood/Data/");
 std::string dirIRMMap="/home/lisein/Documents/Scolyte/Data/climat/IRM/irmCarte/";
 std::string dirMapDescr="toto";
 
-
 namespace bf =boost::filesystem;
 
 bool climat(0);
 std::vector<int> vYears={2016,2017,2018,2019,2020};
 std::vector<int> vMonths={3,4,5,6,7,8,9};
 std::vector<std::string> vVAR={"Tmean","Tmax","Tmin","ETP","P","R","DJ"};
+int globSeuilPres(70);
 
 
 /* jo 2020
@@ -52,7 +52,7 @@ std::vector<OGRPoint> squarebin(OGRLayer * lay, int rectSize);
 std::vector<OGRGeometry*> squarebinPol(OGRLayer * lay, int rectSize);
 
 // générer une grille depuis un raster masque, on garde les tuiles qui ont plus de x pct d'occurence de 1 dans le masque
-void tuilageFromRaster(rasterFiles * rasterMask, int rectSize,double prop);
+void tuilageFromRaster(rasterFiles * rasterMask, int rectSize, double prop, double seuilRasterIn);
 
 // stat sur un raster scolyte et ajout d'un champ dans shp tuile
 void anaScolyteOnShp(rasterFiles * raster, std::string aShp);
@@ -73,8 +73,8 @@ int main(int argc, char *argv[])
             ("dirMapDescr", po::value<std::string>(), "pour outil 1. Dossier contenant des cartes de variables continues pour lesquelles on souhaite calculer la valeur moyenne sur la tuile.")
             ("raster", po::value< std::string>(), "raster de description du mileu pour ajout d'un champs dans shp (outil 101")
             ("rasterMask", po::value< std::string>(), "raster masque à partir duquel on va générer des tuiles (outil 102) , pour tuilages scolytes ou hetraie mature")
+            ("seuilPP", po::value<int>(), "seuil de probabilité de présence, utilisé pour masquer le raster pour création de tuile (102), défaut 70")
             ;
-
 
     po::variables_map vm;
     po::store(po::parse_command_line(argc, argv, desc), vm);
@@ -87,6 +87,7 @@ int main(int argc, char *argv[])
 
     if (vm.count("outil")) {
         GDALAllRegister();
+
 
         int mode(vm["outil"].as<int>());
         switch (mode) {
@@ -177,12 +178,13 @@ int main(int argc, char *argv[])
         }
             // Marie pierre; je veux créer des tuiles à partir d'un masque de hetraie mature
         case 102:{
+            if (vm.count("seuilPP")) {globSeuilPres=vm["seuilPP"].as<int>();}
             if (vm.count("rasterMask")) {
                 std::string file(vm["rasterMask"].as<std::string>());
                 rasterFiles r(file,"toto");
                 //tuilageFromRaster(&r,30,65.0); // 65 pct ça fait 6 pixel sur 9 Marie pierre
                 // scolyte
-                tuilageFromRaster(&r,50,65.0);
+                tuilageFromRaster(&r,50,65.0,globSeuilPres);
             }
             break;
         }
@@ -759,7 +761,7 @@ std::vector<OGRGeometry*> squarebinPol(OGRLayer * lay, int rectSize){
 
 }
 
-void tuilageFromRaster(rasterFiles * rasterMask, int rectSize,double prop){
+void tuilageFromRaster(rasterFiles * rasterMask, int rectSize,double prop,double seuilRasterIn){
     // on va parcourir chaque vignette du raster et créer la géométrie si la proportion de 1 est >= prop
     // solution 1 plus propre.
     // mais alors on accepte des tuiles avec une taille étant un multiple de la résolution du raster...
@@ -805,13 +807,12 @@ void tuilageFromRaster(rasterFiles * rasterMask, int rectSize,double prop){
                 // lecture
                 mBand->RasterIO( GF_Read, i*xSize, j*ySize, xSize, ySize, scanVignette, xSize,ySize, GDT_Float32, 0, 0 );
                 for (int pix(0) ; pix<xSize*ySize;pix++){
-                    if(scanVignette[pix]==1) {nb++;}
+                    if(scanVignette[pix]>=seuilRasterIn) {nb++;}
                 }
                 if (100.0*((double) nb)/((double)(xSize*ySize))>=prop){
                     nbTuiles++;
                     // création de la tuile
-                    //std::cout << " création tuile " << nbTuiles << std::endl;
-                    if (nbTuiles % 100==0){std::cout << " création tuile " << nbTuiles << std::endl;}
+                    if (nbTuiles % 1000==0){std::cout << " création tuile " << nbTuiles << std::endl;}
                     OGRLinearRing * ring = new OGRLinearRing();
                     OGRPolygon * square= new OGRPolygon();
                     double x=xMin+i*xSize*pixelWidth;
