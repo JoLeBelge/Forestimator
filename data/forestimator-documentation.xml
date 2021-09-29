@@ -79,7 +79,7 @@ On estime que la profondeur de sol d'une série spéciale "P" (base de grand ver
 
 <message id="ES_EP.description">
 <h4>Cartographie des foyers de scolytes sur base d'images satellites</h4>
-L'idée générale est de se calquer sur la méthodologie de l'INRAE (INRAE, UMR TETIS, R. Dutrieux, K. Ose, J.-B. Féret) développée depuis 2017. Celle-ci consiste à surveiller l'évolution saisonière d'un indice spectral calculer sur base de série temporelle d'images Sentinel-2. L'information est résumée sous forme d'une carte d'état sanitaire par an.
+L'idée générale est de se calquer sur la méthodologie de l'INRAE (INRAE, UMR TETIS, R. Dutrieux, K. Ose, J.-B. Féret) développée depuis 2017. Celle-ci consiste à surveiller l'évolution saisonière d'un indice spectral calculé sur base de série temporelle d'images Sentinel-2. L'information est résumée sous forme d'une carte d'état sanitaire par an.
 <br></br>
 Une documentation plus exhaustive de la méthode est disponible sous format pdf:
 <a href="/pdf/methodoAnalyseSentinel2TimeSerie2021.pdf" download="detectionScolyte">
