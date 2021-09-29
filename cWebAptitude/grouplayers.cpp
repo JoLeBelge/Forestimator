@@ -558,9 +558,9 @@ bool cropIm(std::string inputRaster, std::string aOut, OGREnvelope ext){
         //std::cout << "xSize " << xSize << ", ySize " << ySize << std::endl;
 
         // test si la différence entre le raster en entier et le raster croppé est significative, si non on va copier tout au lieu de cropper
-        // si 80% ou plus, on garde toute l'image
+        // si 65% ou plus, on garde toute l'image
         if (xSize>0 && ySize>0 && xSize < maxSizePix4Export && ySize<maxSizePix4Export){
-            if (getArea(&ext)/getArea(&extGlob)>0.8){
+            if (getArea(&ext)/getArea(&extGlob)>0.65){
                 std::cout << "copie de toute l'image" << std::endl;
                 pDriver->CopyFiles(cropPath,inputPath);
                 aRes=1;
