@@ -190,16 +190,9 @@ std::vector<std::string> cadastre::getSectionForDiv(int aDivCode, Wt::Dbo::Sessi
     return aRes;
 }
 
-// a modifier, maintenant que je vais lire l'objet mappé capa.
 std::vector<dbo::ptr<capa>> cadastre::getCaPaPtrVector(int aDivCode, std::string aSection, Wt::Dbo::Session *session){
-   // std::vector<const capa *> aRes;
-    std::vector<dbo::ptr<capa>> aRes;
-    /*if (mVCaPa.find(aDivCode)!=mVCaPa.end()){
-        for (std::unique_ptr<capa> & parcelle : mVCaPa.at(aDivCode)){
-            if (parcelle->section==aSection){aRes.push_back(parcelle.get());}
-        }
-    }*/
 
+    std::vector<dbo::ptr<capa>> aRes;
     typedef dbo::collection< dbo::ptr<capa> > collectionCapa;
     dbo::Transaction transaction{*session};
     //collectionCapa Capas = session->find<capa>().where("divCode = ?").bind(aDivCode).orderBy("CaPaKey");

@@ -396,10 +396,9 @@ void descriptionStation(std::string aShp){
                     }
                 }
 
-                std::vector<std::string> var30{"ETP_30aire","P_30aire"};
+                std::vector<std::string> var30{"ETP_30aire","P_30aire","R_30aire","Tmean_30aire","Tmax_30aire","Tmin_30aire"};
                 for (std::string var : var30){
                     for (int m : vMonths){
-
                         std::string code=var +"_"+std::to_string(m);
                         std::string file(dirIRMMap +code +".tif");
                         std::unique_ptr<rasterFiles> r= std::make_unique<rasterFiles>(file,code);
@@ -848,8 +847,12 @@ void anaScolyteOnShp(rasterFiles * raster, std::string aShp){
     {
         // défini les nouveaux champs à ajouter à la table d'attribut - vérifie qu'il n'existe pas préhalablement
         OGRLayer * lay = mDS->GetLayer(0);
-        if (lay->FindFieldIndex("sco",0)==-1){
-            OGRFieldDefn * oFLD= new OGRFieldDefn("sco",  OFTReal);
+        if (lay->FindFieldIndex("newSco",0)==-1){
+            OGRFieldDefn * oFLD= new OGRFieldDefn("newSco",  OFTReal);
+            lay->CreateField(oFLD);
+        }
+        if (lay->FindFieldIndex("oldSco",0)==-1){
+            OGRFieldDefn * oFLD= new OGRFieldDefn("oldSco",  OFTReal);
             lay->CreateField(oFLD);
         }
         if (lay->FindFieldIndex("pix",0)==-1){
@@ -867,18 +870,15 @@ void anaScolyteOnShp(rasterFiles * raster, std::string aShp){
 
             basicStat bs=raster->computeBasicStatOnPolyg(poGeom);
 
-            double freq = bs.getFreq(2)+bs.getFreq(4);
+            double freqNewSco = bs.getFreq(2)+bs.getFreq(22)+bs.getFreq(42);
+            double freqOldSco = bs.getFreq(4)+bs.getFreq(21)+bs.getFreq(41);
             /*if (freq>0){
             std::cout << " freq scolyte de " << freq << std::endl;
             }*/
-            poFeature->SetField("sco",freq );
-
+            poFeature->SetField("oldSco",freqOldSco );
+            poFeature->SetField("newSco",freqNewSco );
             int nb =bs.getNbInt();
-            /* if (nb<25){
-                        std::cout << " nb pix de " << nb << std::endl;
-                        }*/
             poFeature->SetField("pix",nb);
-
             //poFeature->SetField(); This method has only an effect on the in-memory feature object. If this object comes from a layer and the modifications must be serialized back to the datasource, OGR_L_SetFeature()
             lay->SetFeature(poFeature);
         }
@@ -914,7 +914,7 @@ void echantillonTuiles(std::string aShp){
         while( (poFeature = lay->GetNextFeature()) != NULL )
         {
             if (poFeature->GetFID() % 1000==0){std::cout << " process feature " << poFeature->GetFID() << std::endl;}
-            double i =poFeature->GetFieldAsDouble("sco");
+            double i =poFeature->GetFieldAsDouble("newSco")+poFeature->GetFieldAsDouble("oldSco");
             if (i<0.05){
                 indices.push_back(poFeature->GetFID());
             } else {

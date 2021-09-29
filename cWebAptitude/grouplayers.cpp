@@ -758,10 +758,14 @@ std::string getHtml(LayerMTD * lMTD){
         std::string html="<h4>Projet </h4>" +lMTD->Projet();
         if (isValidHtml(html)){aRes+=html;}
     }
-    if (lMTD->Descr()!=""){
-        std::string html="<h4>Description </h4>" +lMTD->Descr();
-        if (isValidHtml(html)){aRes+=html;}
+
+    // si il y a un message avec le bon id, on le prend
+     std::string descr(WString::tr(lMTD->code()+".description").toUTF8());
+     if (descr.substr(0,2)=="??"){
+         descr="<h4>Description </h4>" + lMTD->Descr();
     }
+    if (descr!="" && isValidHtml(descr)){aRes+=descr;}
+
     if (lMTD->Vers()!=""){
         std::string html="<h4>Version  </h4>" +lMTD->Vers();
         if (isValidHtml(html)){aRes+=html;}

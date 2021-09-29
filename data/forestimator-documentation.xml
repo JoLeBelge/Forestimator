@@ -77,5 +77,16 @@ Correction d'un oubli sur les séries spéciale pédologique;
 On estime que la profondeur de sol d'une série spéciale "P" (base de grand versant) equivaut à une profondeur 2 (en fonction du SS, NH différent).
 </message>
 
+<message id="ES_EP.description">
+<h4>Cartographie des foyers de scolytes sur base d'images satellites</h4>
+L'idée générale est de se calquer sur la méthodologie de l'INRAE (INRAE, UMR TETIS, R. Dutrieux, K. Ose, J.-B. Féret) développée depuis 2017. Celle-ci consiste à surveiller l'évolution saisonière d'un indice spectral calculer sur base de série temporelle d'images Sentinel-2. L'information est résumée sous forme d'une carte d'état sanitaire par an.
+<br></br>
+Une documentation plus exhaustive de la méthode est disponible sous format pdf:
+<a href="/pdf/methodoAnalyseSentinel2TimeSerie2021.pdf" download="detectionScolyte">
+  <img src="/img/typographe.jpeg" alt="document pdf" width="104" height="142"> </img>
+</a>
+
+</message>
+
 </messages>
 
