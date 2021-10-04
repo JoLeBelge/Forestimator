@@ -67,6 +67,7 @@ DEPENDPATH += $$PWD/../../../../../../usr/include/gdal/
 }
 
 SOURCES += main.cpp \
+    ../carteApt/cdicoaptbase.cpp \
     analytics.cpp \
     api/cnswresource.cpp \
     auth/Session.cpp \
@@ -96,6 +97,7 @@ SOURCES += main.cpp \
     statHdomCompo.cpp
 
 HEADERS += \
+    ../carteApt/cdicoaptbase.h \
     analytics.h \
     api/cnswresource.h \
     auth/Session.h \

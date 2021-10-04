@@ -454,13 +454,6 @@ GDALDataset * rasterFiles::rasterizeGeom(OGRGeometry *poGeom){
     return pRaster;
 }
 
-std::string roundDouble(double d, int precisionVal){
-    std::string aRes("");
-    if (precisionVal>0){aRes=std::to_string(d).substr(0, std::to_string(d).find(".") + precisionVal + 1);}
-    else  {
-        aRes=std::to_string(d+0.5).substr(0, std::to_string(d+0.5).find("."));}
-    return aRes;
-}
 
 // pour les couches des variables continues
 basicStat layerBase::computeBasicStatOnPolyg(OGRGeometry * poGeom){

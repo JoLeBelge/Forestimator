@@ -94,7 +94,7 @@ void EcogrammeEss::draw(Wt::WPainter *painter){
 
 }
 
-// ajouter position x0,y0
+// fonction pour dessiner l'écogramme dans un raster afin de l'exporter
 void EcogrammeEss::draw(Wt::WPainter *painter, int x0, int y0, int x1, int y1, int yrha0){
 
     int apixPerLevelX=(x1-x0)/6;

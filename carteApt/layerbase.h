@@ -69,8 +69,6 @@ TypeVar str2TypeVar(const std::string& str);
 TypeLayer str2TypeLayer(const std::string& str);
 TypeWMS str2TypeWMS(const std::string& str);
 
-std::string roundDouble(double d, int precisionVal=1);
-
 class basicStat{
 public:
 
