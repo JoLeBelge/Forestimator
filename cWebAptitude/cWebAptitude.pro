@@ -6,11 +6,10 @@ QT -= gui
 QT += sql
 
 #QMAKE_CXXFLAGS += -ggdb3 # pour utiliser valgrind et pointer la ligne du code qui va pas
-QMAKE_CXXFLAGS += -g
+#QMAKE_CXXFLAGS += -g
 
 CONFIG += c++17
 
-#-lboost_thread
 LIBS = -lcurl -lgdal -lwthttp -lwt -lboost_system -lboost_iostreams  -lboost_filesystem -lboost_program_options -lcrypt -pthread -lwtdbo -lwtdbosqlite3 -lzip -lhpdf -lsqlite3
 #LIBS += -lwkhtmltox -lboost_serialization
 
@@ -28,17 +27,14 @@ LIBS = -lcurl -lgdal -lwthttp -lwt -lboost_system -lboost_iostreams  -lboost_fil
 
 INCLUDEPATH += $$PWD/../carteApt/
 INCLUDEPATH += $$PWD/auth/
+# libzippp version https://github.com/ctabin/libzippp
 INCLUDEPATH += $$PWD/libzipp/src/
 DEPENDPATH += $$PWD/libzipp/src/
 
-# libzippp version https://github.com/ctabin/libzippp
-#LIBS += -L$$PWD/../../../../../../usr/local/lib -lzippp_static#INCLUDEPATH += $$PWD/../../../../../../usr/local/include/libzippp/
-#DEPENDPATH += $$PWD/../../../../../../usr/local/include/libzippp/
-
 #qmake -makefile ../cWebAptitude/cWebAptitude.pro pl=serveur avant de lancer make sur debian server
 
-QMAKE_CC = gcc-10
-QMAKE_CXX = g++-10
+#QMAKE_CC = gcc-10
+#QMAKE_CXX = g++-10
 
 contains(pl,serveur) {
 LIBS += -L$$PWD/usr/include/gdal/ -lgdal
@@ -52,7 +48,6 @@ DEPENDPATH += $$PWD/../../../usr/include/gdal/
 # la compilation sous debian avec gcc-8 m'a montré un bug dans la boucle de création des groupes écologiques. je spécifie donc que c'est avec le compilateur g++-7 qu'il faut compiler le soft
 # update ; maintenant le code est compatible avec gcc 5 et 9.
 
-#LIBS += -L$$PWD/../../../usr/include/ -lsqlite3
 LIBS += -L$$PWD/usr/include/gdal/ -lgdal
 INCLUDEPATH += $$PWD/../../../../../../usr/include/gdal/
 DEPENDPATH += $$PWD/../../../../../../usr/include/gdal/
@@ -92,7 +87,6 @@ SOURCES += main.cpp \
     presentationpage.cpp \
     ../carteApt/cnsw.cpp \
     ../carteApt/layerbase.cpp \
- #   wkhtml/wkhtmlutil.cpp
     api/stationdescresource.cpp \
     statHdomCompo.cpp
 
@@ -123,7 +117,6 @@ HEADERS += \
     presentationpage.h \
     ../carteApt/cnsw.h \
     ../carteApt/layerbase.h \
- #   wkhtml/wkhtmlutil.h
     api/stationdescresource.h \
     ../carteApt/color.h \
     statHdomCompo.h
