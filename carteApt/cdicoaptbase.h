@@ -10,7 +10,7 @@
 #include <boost/range/adaptor/map.hpp>
 #include "boost/filesystem.hpp"
 #include <unistd.h>
-#include <cmath>
+
 
 // octobre 2021 ; j'aimerai utiliser dans phytospy le dico Apt, entre autre pour concevoir une mise en page des matrices d'aptitudes.
 // j'aimerai partager le dico Apt entre forestimator et phytospy, mais celui-ci est trop spécialisé forestimator. Je crée une classe mère avec les membres que je souhaite partager entre les deux applis

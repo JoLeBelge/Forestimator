@@ -4,7 +4,6 @@ INCLUDEPATH += .
 CONFIG -= qt
 QT -= gui
 QT += sql
-
 #QMAKE_CXXFLAGS += -ggdb3 # pour utiliser valgrind et pointer la ligne du code qui va pas
 #QMAKE_CXXFLAGS += -g
 

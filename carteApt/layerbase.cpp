@@ -1,6 +1,7 @@
 #include "layerbase.h"
 
 int seuilClasseMinoritaire(2); // en dessous de ce seuil, les classes sont regroupées dans la catégorie "Autre"
+extern bool globTest;
 
 basicStat::basicStat(std::map<double,int> aMapValandFrequ, double na):mean(0),max(0),min(0),nb(0),mValFreq(aMapValandFrequ){
     bool test(0);

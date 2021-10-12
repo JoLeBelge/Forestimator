@@ -36,7 +36,7 @@ cdicoAptBase::cdicoAptBase(std::string aBDFile):mBDpath(aBDFile),ptDb_(NULL)
             }
         }
         sqlite3_finalize(stmt);
-        SQLstring="SELECT raster_val,NH,posEco, id_groupNH FROM dico_raster_nh;";
+        SQLstring="SELECT raster_val,NH,posEco, id_groupNH2 FROM dico_raster_nh;";
         sqlite3_prepare_v2( *db_, SQLstring.c_str(), -1, &stmt, NULL );
         while(sqlite3_step(stmt) == SQLITE_ROW)
         {
@@ -116,7 +116,7 @@ cdicoAptBase::cdicoAptBase(std::string aBDFile):mBDpath(aBDFile),ptDb_(NULL)
             }
         }
         sqlite3_finalize(stmt);
-        SQLstring="SELECT id,code_nh_start,nb_nh,label FROM dico_groupeNH;";
+        SQLstring="SELECT id,code_nh_start,nb_nh,label FROM dico_groupeNH2;";
         sqlite3_prepare_v2( *db_, SQLstring.c_str(), -1, &stmt, NULL );
         while(sqlite3_step(stmt) == SQLITE_ROW)
         {

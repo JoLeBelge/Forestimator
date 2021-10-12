@@ -1,28 +1,20 @@
 #ifndef COLOR_H
 #define COLOR_H
-
+#include <cmath>
 
 
 class color
 {
 public:
     ~color(){}
-    color(int R,int G,int B,std::string name="toto"):mR(R),mG(G),mB(B),mStyleClassName(name){isDark();}
-    color(std::string aHex,std::string name):mStyleClassName(name){
+    color(int R,int G,int B,std::string name="toto"):mR(R),mG(G),mB(B),mStyleClassName(name),mHTMLcode("toto"){isDark();}
+    color(std::string aHex,std::string name="toto"):mStyleClassName(name),mHTMLcode(aHex){
         // j'enlève le diaise qui semble ne pas convenir
         const char* c=aHex.substr(1,aHex.size()).c_str();
         sscanf(c, "%02x%02x%02x", &mR, &mG, &mB);
         //std::cout << std::to_string(mR) << ";" <<std::to_string(mG) << ";" <<std::to_string(mB) << std::endl;
         isDark();
-    }
-    color(std::string aHex){
-        const char* c=aHex.substr(1,aHex.size()).c_str();
-        // j'enlève le diaise qui semble ne pas convenir pour le nom de style il faut également s'assurer que le code ne commence pas par un numéro.
-        mStyleClassName=aHex.substr(1,aHex.size());
-        if (isdigit(mStyleClassName[0])){ mStyleClassName="a"+mStyleClassName;}
-        sscanf(c, "%02x%02x%02x", &mR, &mG, &mB);
-        //std::cout << std::to_string(mR) << ";" <<std::to_string(mG) << ";" <<std::to_string(mB) << std::endl;
-        isDark();
+
     }
     int mR,mG,mB;
     void set(int &R,int &G,int &B){
@@ -48,7 +40,8 @@ public:
     }
     std::string getStyleName(){return "."+mStyleClassName;}
     std::string getStyleNameShort(){return mStyleClassName;}
-    std::string mStyleClassName;
+    std::string getHTMLcode(){return "#"+mHTMLcode;}
+    std::string mStyleClassName,mHTMLcode;
     bool mDark;
 };
 

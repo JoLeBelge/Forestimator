@@ -36,7 +36,6 @@ class layerStat;
 enum TypeCarte {Apt, Potentiel, Station1, Habitats,NH,NT,Topo,AE,SS,ZBIO,CSArdenne,CSLorraine,MNH,Composition,MNT16b};
 
 
-
 enum class TypeVar {Classe,
                     Continu
                    };
