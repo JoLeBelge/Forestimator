@@ -34,11 +34,10 @@ presentationPage::presentationPage(cDicoApt *aDico):mDico(aDico)
     subMenu_->addStyleClass("nav-pills nav-stacked submenu submenuPresentation");
     subMenu_->setWidth(200);
 
-    subMenu_->setInternalPathEnabled("/documentation");// bah ça à l'air de bien fonctionner quand mm
+    subMenu_->setInternalPathEnabled("/documentation");
 
     // probleme https://redmine.webtoolkit.eu/boards/2/topics/1206, j'ai plein de session qui se lancent quand je veux accèder à l'internal path d'une documentation
 
-    //addWidget(cpp14::make_unique<Wt::WTemplate>(WString::tr("page_presentation")));
     // introduction forestimator
     std::unique_ptr<Wt::WMenuItem> item = std::make_unique<Wt::WMenuItem>("Forestimator : présentation", cpp14::make_unique<Wt::WText>(WString::tr("page_presentation")));
     subMenu_->addItem(std::move(item));
@@ -50,6 +49,7 @@ presentationPage::presentationPage(cDicoApt *aDico):mDico(aDico)
         //std::cout << "ajout lMTD dans sous menu présentation " << lMTD.Nom() << std::endl;
         std::unique_ptr<Wt::WMenuItem> item = std::make_unique<Wt::WMenuItem>(lMTD.Label(), cpp14::make_unique<Wt::WText>(getHtml(&lMTD)));
         subMenu_->addItem(std::move(item));
+
     }
 
     std::unique_ptr<Wt::WMenuItem> item3 = std::make_unique<Wt::WMenuItem>("Forestimator API", cpp14::make_unique<Wt::WText>(WString::tr("docu.api")));

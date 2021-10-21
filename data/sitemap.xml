@@ -3,27 +3,69 @@
    <url>
       <loc>http://forestimator.gembloux.ulg.ac.be/</loc>
       <lastmod>2021-02-23</lastmod>
-      <changefreq>never</changefreq>
+      <changefreq>monthly</changefreq>
    </url>
-   
    <url>
       <loc>http://forestimator.gembloux.ulg.ac.be/documentation</loc>
-      <changefreq>never</changefreq>
-   </url>
-   <url>
-      <loc>http://forestimator.gembloux.ulg.ac.be/home</loc>
-      <changefreq>never</changefreq>
+      <changefreq>monthly</changefreq>
    </url>
    <url>
       <loc>http://forestimator.gembloux.ulg.ac.be/cartographie</loc>
-      <changefreq>never</changefreq>
+      <changefreq>monthly</changefreq>
+   </url>
+   
+   <url>
+      <loc>http://forestimator.gembloux.ulg.ac.be/documentation/forestimator-_-pr_sentation</loc>
+      <changefreq>monthly</changefreq>
    </url>
    <url>
-      <loc>http://forestimator.gembloux.ulg.ac.be/point</loc>
-      <changefreq>never</changefreq>
+      <loc>http://forestimator.gembloux.ulg.ac.be/documentation/cr_dit-et-contact</loc>
+      <changefreq>monthly</changefreq>
+   </url>
+      <url>
+      <loc>http://forestimator.gembloux.ulg.ac.be/documentation/aptitude-des-essences</loc>
+      <changefreq>monthly</changefreq>
+   </url>
+         <url>
+      <loc>http://forestimator.gembloux.ulg.ac.be/documentation/ecogramme</loc>
+      <changefreq>monthly</changefreq>
+   </url>
+   
+   <url>
+      <loc>http://forestimator.gembloux.ulg.ac.be/documentation/zone-bioclimatique</loc>
+      <changefreq>monthly</changefreq>
+   </url>
+   
+   <url>
+      <loc>http://forestimator.gembloux.ulg.ac.be/documentation/niveaux-trophiques</loc>
+      <changefreq>monthly</changefreq>
+   </url>
+   
+   <url>
+      <loc>http://forestimator.gembloux.ulg.ac.be/documentation/niveaux-hydriques</loc>
+      <changefreq>monthly</changefreq>
+   </url>
+   
+   <url>
+      <loc>http://forestimator.gembloux.ulg.ac.be/documentation/apport-d_eau</loc>
+      <changefreq>monthly</changefreq>
+   </url>
+   
+      <url>
+      <loc>http://forestimator.gembloux.ulg.ac.be/documentation/sous_secteurs-et-topo</loc>
+      <changefreq>monthly</changefreq>
    </url>
    <url>
-      <loc>http://forestimator.gembloux.ulg.ac.be/analyse</loc>
-      <changefreq>never</changefreq>
-   </url>      
+      <loc>http://forestimator.gembloux.ulg.ac.be/documentation/hauteur-de-la-v_g_tation</loc>
+      <changefreq>monthly</changefreq>
+   </url>
+     <url>
+      <loc>http://forestimator.gembloux.ulg.ac.be/documentation/composition-des-essences</loc>
+      <changefreq>monthly</changefreq>
+   </url>
+   <url>
+      <loc>http://forestimator.gembloux.ulg.ac.be/documentation/crise-du-scolyte</loc>
+      <changefreq>monthly</changefreq>
+   </url>
+     
 </urlset>

@@ -256,8 +256,8 @@ void cWebAptitude::handlePathChange()
         top_stack->setCurrentIndex(0);
         menuitem_documentation->select();
         //navigation->setTitle(tr("titre.presentation"));
-        mApp->addMetaHeader("description", tr("desc.pres"), "fr");
-        mApp->addMetaHeader("description", tr("desc.home"), "fr");
+       // mApp->addMetaHeader("description", tr("desc.pres"), "fr");
+        mApp->addMetaHeader("description", tr("desc.carto"), "fr");
         showDialogues(0);
     }else if (mApp->internalPath() == "/cartographie" || mApp->internalPath() == "/"){
         top_stack->setCurrentIndex(1);
