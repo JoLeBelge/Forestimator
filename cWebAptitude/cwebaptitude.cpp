@@ -250,7 +250,7 @@ void cWebAptitude::load_content_couches(WContainerWidget * content){
  */
 void cWebAptitude::handlePathChange()
 {
-
+    bool baddLog(1);
     std::size_t found = mApp->internalPath().find("/documentation");
     if (mApp->internalPath() == "/documentation" | found!=std::string::npos){
         top_stack->setCurrentIndex(0);
@@ -274,8 +274,11 @@ void cWebAptitude::handlePathChange()
     }else{
         std::cout << "m_app->internalPath() " << mApp->internalPath() << std::endl;
         std::cout << "internal path pas geré dans le handler " << mApp->internalPath() << std::endl;
+        baddLog=0;
     }
-    mApp->addLog(mApp->internalPath());
+
+
+    if (baddLog){mApp->addLog(mApp->internalPath());}
 
     // TODO css min-size [menu_analyse] display:none if width<900
     // TODO css @media-width<1200 -> map 60%  @media-width<900 -> [div stack] display:blocks et overflow:auto [map] width:90%  [linfo] min-height: 600px;

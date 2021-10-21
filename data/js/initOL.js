@@ -107,7 +107,8 @@ ol.proj.get('EPSG:31370').setExtent(extent);
 // ol 6 va pas. Si si ol 6.4.3 ça roule sans problème, et l'échelle est bonne avec ol.proj.proj4.register(proj4)+ ol.proj.get('EPSG:31370').setExtent(extent);
 
 /*
-le tileGrid est une astuce assez lourde à mettre en place pour le chargement de tuile png ou raster stockées sur le server (carte des scolyte) --> nous on a plus besoin de cette approche
+le tileGrid est une astuce assez lourde à mettre en place pour le chargement de tuile png ou raster stockées sur le server (carte des scolyte) --> nous on a plus besoin de cette approche - quoi que si pour pouvoir changer la taille des tuiles (512 au lieu de 256) afin de diminuer par 4 le nombres de requêtes au serveur
+*/
 var resolutions = new Array(22);
 var startResolution = (extent[2]-extent[0]) / 512;
 for (var i = 0, ii = resolutions.length; i < ii; ++i) {
@@ -118,7 +119,7 @@ tileGrid = new ol.tilegrid.TileGrid({
 	resolutions: resolutions,
 	tileSize: [512, 512]
 });
-*/
+
 //console.log(resolutions);
 
 //var res_ndvi=[384.02176,192.01088,96.00544,48.00272,24.00136,12.00068,6.00034,3.00017];
@@ -370,4 +371,3 @@ moveLayerUp = function(code){
 	activeLayers=a;	
 	updateGroupeLayers();
 }
-

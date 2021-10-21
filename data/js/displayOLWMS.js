@@ -9,10 +9,11 @@ activeLayer  = new ol.layer.Tile({
 		attributions: 'MYATTRIBUTION',
 		params: {
 		  'LAYERS': 'MYLAYER',
-		  'TILED': false, // avant était à true mais ça faisait bugger cartoweb_topo
+		  'TILED': false,
+		  //'TILED': false, // avant était à true mais ça faisait bugger cartoweb_topo
 		  'FORMAT': 'image/png'
 		},
-		//tileGrid: tileGrid,
+		tileGrid: tileGrid,
 		projection: 'EPSG:31370',
 		//serverType: 'mapserver',
 	}),
