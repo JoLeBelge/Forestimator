@@ -3,10 +3,6 @@
 std::string dirBD("/home/lisein/Documents/carteApt/Forestimator/carteApt/data/aptitudeEssDB.db");
 bool globTest(0);
 
-// memory leak with sqlite3 : https://stackoverflow.com/questions/11126070/sqlite3-prepare-v2-depends-on-scope
-// mieux ; https://stackoverflow.com/questions/33432551/possible-memory-leak-in-the-shared-library-of-sqlite3/33435655
-// apparemment le pbl viens de sqlite3_open_v2( qui doit prendre comme argument sqlite3 **ppDb, (double pointeur, pas simple!!)
-
 cDicoApt::cDicoApt(std::string aBDFile):cdicoAptBase(aBDFile)
 {
 

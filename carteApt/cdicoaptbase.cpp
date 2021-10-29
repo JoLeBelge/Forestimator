@@ -139,7 +139,8 @@ cdicoAptBase::cdicoAptBase(std::string aBDFile):mBDpath(aBDFile),ptDb_(NULL)
 
 void cdicoAptBase::closeConnection(){
 
-    int rc = sqlite3_close_v2(*db_);
+    //int rc = sqlite3_close_v2(*db_);
+    int rc = sqlite3_close(*db_);
     if( rc ) {
         fprintf(stderr, "Can't close database: %s\n\n\n", sqlite3_errmsg(*db_));
     }
@@ -150,7 +151,8 @@ int cdicoAptBase::openConnection(){
 
     std::cout << "ouvre connexion avec BD dictionnaire ..." << std::endl;
     //db_->Sqlite3(mBDpath);
-    rc = sqlite3_open_v2(mBDpath.c_str(), db_,SQLITE_OPEN_READONLY,NULL);
+    //rc = sqlite3_open_v2(mBDpath.c_str(), db_,SQLITE_OPEN_READONLY,NULL);
+    rc = sqlite3_open(mBDpath.c_str(), db_);
     // The 31 result codes are defined in sqlite3.h
     //SQLITE_ERROR (1)
     if( rc!=0) {

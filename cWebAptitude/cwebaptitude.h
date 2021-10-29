@@ -47,7 +47,7 @@ public:
         // on ne peut pas utiliser l'environnement dans le constructeur, car au début de la session, la taille de l'écran n'est pas encore définie (plain html session without ajax machin)
         int w_=env_->screenWidth()*5.0/10.0;
         int h_=env_->screenHeight()*7.0/10.0;
-        std::cout << " set size dialog " << w_ << " , " << h_ << std::endl;
+        //std::cout << " set size dialog " << w_ << " , " << h_ << std::endl;
         // setMaximumSize(w_,h_);
         setMaximumSize(w_,h_);
 
