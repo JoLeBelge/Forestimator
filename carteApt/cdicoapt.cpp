@@ -11,12 +11,13 @@ cDicoApt::cDicoApt(std::string aBDFile):cdicoAptBase(aBDFile)
     } else {
         if (globTest){std::cout << "cnsw" << std::endl;}
         mPedo= std::make_shared<cnsw>(*db_);
+
         if (globTest){std::cout << "cadastre" << std::endl;}
         mCadastre= std::make_shared<cadastre>(*db_);
         if (globTest){   std::cout << "cadastre done" << std::endl;}
 
-        sqlite3_stmt * stmt;
 
+        sqlite3_stmt * stmt;
         //pour l'instant je ne sélectionne pas les stations qui ne sont pas cartographiées ; celles qui ont été regroupée en une station carto.
         std::string SQLstring="SELECT ZBIO,stat_id,Station_carto FROM dico_station WHERE stat_id=stat_num;";
         sqlite3_prepare_v2( *db_, SQLstring.c_str(), -1, &stmt, NULL );
@@ -101,8 +102,8 @@ cDicoApt::cDicoApt(std::string aBDFile):cdicoAptBase(aBDFile)
             sqlite3_finalize(stmt);
             if (globTest){   std::cout << "Dico_WMS a " << Dico_WMS.size() << " elements " << std::endl;}
         }
-        SQLstring="SELECT Code, id_projet, description, version, id_reference, Nom, copyrigth,ordre, NomShort FROM carteMTD;";
 
+        SQLstring="SELECT Code, id_projet, description, version, id_reference, Nom, copyrigth,ordre, NomShort FROM carteMTD;";
         sqlite3_prepare_v2( *db_, SQLstring.c_str(), -1, &stmt, NULL );
         while(sqlite3_step(stmt) == SQLITE_ROW)
         {
@@ -150,8 +151,8 @@ cDicoApt::cDicoApt(std::string aBDFile):cdicoAptBase(aBDFile)
                 Dico_layerMTD.emplace(std::make_pair(aB,lMTD));
             }
         }
-
         sqlite3_finalize(stmt);
+
         SQLstring="SELECT code,label,expert FROM groupe_couche ORDER BY id;";
         sqlite3_prepare_v2( *db_, SQLstring.c_str(), -1, &stmt, NULL );
         while(sqlite3_step(stmt) == SQLITE_ROW)
@@ -167,7 +168,6 @@ cDicoApt::cDicoApt(std::string aBDFile):cdicoAptBase(aBDFile)
                 Dico_groupe.push_back(aA);// juste pour avoir les groupes dans l'ordre
             }
         }
-
         sqlite3_finalize(stmt);
         SQLstring="SELECT Col,R,G,B FROM dico_color;";
         sqlite3_prepare_v2( *db_, SQLstring.c_str(), -1, &stmt, NULL );
@@ -315,12 +315,12 @@ cDicoApt::cDicoApt(std::string aBDFile):cdicoAptBase(aBDFile)
         }
         sqlite3_finalize(stmt);
 
-
         if (globTest){   std::cout << "crée toute les essences " << std::endl;}
         // toutes les essences de la classe essence
         for (auto & pair : *codeEs2Nom()){
             mVEss.emplace(std::make_pair(pair.first,std::make_shared<cEss>(pair.first,this)));
         }
+
         // toutes les layerbase
         if (globTest){   std::cout << "crée toute les layerbase " << std::endl;}
         for (auto & pair : Dico_RasterType){
@@ -331,6 +331,7 @@ cDicoApt::cDicoApt(std::string aBDFile):cdicoAptBase(aBDFile)
 
             mVlayerBase.emplace(std::make_pair(pair.first,l));
         }
+        //std::cout << "close connection (dicoApt)" << std::endl;
         closeConnection();
     }
 
@@ -394,10 +395,10 @@ std::map<int,color> cDicoApt::getDicoRasterCol(std::string aCode){
             if (sqlite3_column_type(stmt, 3)!=SQLITE_NULL )  cond=std::string( (char *)sqlite3_column_text( stmt, 3 ) );
         }
     }
+     sqlite3_finalize(stmt);
     SQLstring="SELECT "+field_raster+", col FROM "+ nom_dico ;
     if (cond!=""){ SQLstring=SQLstring+" WHERE "+cond+";";} else {SQLstring=SQLstring+";";}
     //std::cout << SQLstring << "\n\n" << std::endl;
-    sqlite3_finalize(stmt);
     sqlite3_prepare_v2( *db_, SQLstring.c_str(), -1, &stmt, NULL );//preparing the statement
     while(sqlite3_step(stmt) == SQLITE_ROW)
     {
@@ -458,8 +459,9 @@ std::map<int,std::map<int,int>> cDicoApt::getCSApt(std::string aCodeEs){
                 aRes[zbio].emplace(std::make_pair(station,codeApt));
             }
         }
+        sqlite3_finalize(stmt);
     }
-    sqlite3_finalize(stmt);
+
 
     return aRes;
 }
@@ -481,8 +483,9 @@ std::map<int,std::map<int,int>> cDicoApt::getKKCS(std::string aColName){
                 aRes[zbio].emplace(std::make_pair(station,echelle));
             }
         }
+        sqlite3_finalize(stmt);
     }
-    sqlite3_finalize(stmt);
+
 
     return aRes;
 }
@@ -534,8 +537,9 @@ std::map<int,std::map<int,std::vector<std::string>>> cDicoApt::getHabitatCS(std:
                 aRes[zbio].emplace(std::make_pair(station,aVHab));
             }
         }
+        sqlite3_finalize(stmt);
     }
-    sqlite3_finalize(stmt);
+
 
     return aRes;
 }

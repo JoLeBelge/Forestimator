@@ -131,6 +131,7 @@ cdicoAptBase::cdicoAptBase(std::string aBDFile):mBDpath(aBDFile),ptDb_(NULL)
         }
         sqlite3_finalize(stmt);
 
+        std::cout << "close connection (dicoAptBase)" << std::endl;
         closeConnection();
     }
 

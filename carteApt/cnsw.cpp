@@ -270,6 +270,7 @@ void dicoPedo::loadInfo(){
             }
         }
     }
+    sqlite3_finalize(stmt);
 
     // changer la requete en fonction de la machine sur laquelle est installé l'appli
     char userName[20];
