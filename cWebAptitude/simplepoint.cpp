@@ -94,21 +94,28 @@ void simplepoint::detailCalculAptFEE(ST * aST){
     mDetAptFEE->elementAt(row, 0)->addWidget(cpp14::make_unique<WText>("Aptitude hydro-trophique"));
     mDetAptFEE->elementAt(row, 1)->addWidget(cpp14::make_unique<WText>(aST->mDico->code2AptFull(Ess->getApt(aST->mNT,aST->mNH,aST->mZBIO,false))));
     row++;
-    // test si apt bioclim et apt hydrotroph sont les même?
-    mDetAptFEE->elementAt(row, 0)->addWidget(cpp14::make_unique<WText>("Aptitude la plus contraignante :"));
     int apt=Ess->getApt(aST->mNT,aST->mNH,aST->mZBIO,true);
-    mDetAptFEE->elementAt(row, 1)->addWidget(cpp14::make_unique<WText>(aST->mDico->code2AptFull(apt)));
-    row++;
-    if ( Ess->hasRisqueComp(aST->mZBIO,aST->mTOPO)) {
+    int aptComp=Ess->getApt(aST->mNT,aST->mNH,aST->mZBIO,true,aST->mTOPO);
+    if ( aptComp!=apt) {
+        // la compensation liée à la situation topographique impacte l'aptitude finale :
         mDetAptFEE->elementAt(row, 0)->addWidget(cpp14::make_unique<WText>("Situation Topographique"));
         mDetAptFEE->elementAt(row, 1)->addWidget(cpp14::make_unique<WText>(aST->TOPO()));
         row++;
-        mDetAptFEE->elementAt(row, 0)->addWidget(cpp14::make_unique<WText>("rique pour l'essence :"));
+        Wt::WText * r=mDetAptFEE->elementAt(row, 0)->addWidget(cpp14::make_unique<WText>("rique pour l'essence :"));
+       mDetAptFEE->elementAt(row, 0)->setToolTip(tr("tooltip.compensationTopo"));;
         int risque=Ess->getRisque(aST->mZBIO,aST->mTOPO);
         mDetAptFEE->elementAt(row, 1)->addWidget(cpp14::make_unique<WText>(aST->mDico->Risque(risque)));
         row++;
+        mDetAptFEE->elementAt(row, 0)->addWidget(cpp14::make_unique<WText>("Aptitude bioclimatique avec micro-climat:"));
+        mDetAptFEE->elementAt(row, 1)->addWidget(cpp14::make_unique<WText>(aST->mDico->code2AptFull(Ess->corrigAptBioRisqueTopo(Ess->getApt(aST->mZBIO),aST->mTOPO,aST->mZBIO))));
+        row++;
         mDetAptFEE->elementAt(row, 0)->addWidget(cpp14::make_unique<WText>("Aptitude Finale :"));
-        mDetAptFEE->elementAt(row, 1)->addWidget(cpp14::make_unique<WText>(aST->mDico->code2AptFull(Ess->corrigAptRisqueTopo(apt,aST->mTOPO,aST->mZBIO))));
+        mDetAptFEE->elementAt(row, 1)->addWidget(cpp14::make_unique<WText>(aST->mDico->code2AptFull(aptComp)));
+        mDetAptFEE->elementAt(row, 1)->setToolTip(tr("tooltip.compensationTopo"));
+    } else {
+        mDetAptFEE->elementAt(row, 0)->addWidget(cpp14::make_unique<WText>("Aptitude la plus contraignante :"));
+        mDetAptFEE->elementAt(row, 1)->addWidget(cpp14::make_unique<WText>(aST->mDico->code2AptFull(apt)));
+        row++;
     }
     // un titre pour l'écogramme
     mContEco->addWidget(cpp14::make_unique<WText>(tr("titreEcogramme")));

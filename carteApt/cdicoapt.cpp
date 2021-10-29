@@ -565,13 +565,14 @@ cEss::cEss(std::string aCodeEs,cDicoApt * aDico):mCode(aCodeEs),mNomFR(aDico->ac
     mAptCS=aDico->getCSApt(mCode);
     mAptZbio=aDico->getZBIOApt(mCode);
     mRisqueTopo=aDico->getRisqueTopo(mCode);
+    mFeRe=aDico->accroEss2FeRe(aCodeEs);
 }
 
 //effectue la confrontation Apt Zbio et AptHydroTrophiue
-int cEss::getApt(int aCodeNT, int aCodeNH, int aZbio, bool hierachique){
+int cEss::getApt(int aCodeNT, int aCodeNH, int aZbio, bool hierachique,int aTopo){
     int aRes(12); // indéterminé zone batie ; par défaut
-    if (aCodeNT==0 && aCodeNH!=0){aRes=11;}
-    if (mAptZbio.find(aZbio)==mAptZbio.end()){aRes=11;}// hors belgique ; Indéterminé mais pas zone batie
+    if (aCodeNT==0 && aCodeNH!=0){aRes=11; return aRes;}
+    if (mAptZbio.find(aZbio)==mAptZbio.end()){aRes=11;return aRes;}// hors belgique ; Indéterminé mais pas zone batie
 
     //int codeNTNH= mDico->NTNH()->at("h"+std::to_string(aCodeNH)+"t"+std::to_string(aCodeNT));
     std::string codeNTNH= "h"+std::to_string(aCodeNH)+"t"+std::to_string(aCodeNT);
@@ -586,6 +587,12 @@ int cEss::getApt(int aCodeNT, int aCodeNH, int aZbio, bool hierachique){
     // attention, si pas d'aptitude hydro-trophique, aRes
     if (hierachique && mAptZbio.find(aZbio)!=mAptZbio.end()){
         int aZbioApt= mAptZbio.at(aZbio);
+
+        if (aTopo!=666){
+        // c'est sur cette aptitude que l'on applique un facteur de correction
+         aZbioApt=corrigAptBioRisqueTopo(aZbioApt,aTopo,aZbio);
+        }
+
         if (mDico->AptContraignante(aRes)<mDico->AptContraignante(aZbioApt)){
             aRes=aZbioApt;
         }
@@ -612,12 +619,31 @@ int cEss::getApt(int aZbio){
     return aRes;
 }
 
-int cEss::corrigAptRisqueTopo(int apt,int topo,int zbio){
+// octobre 2021 ; la compensation topo s'applique exclusivement sur l'aptitude bioclim,
+int cEss::corrigAptBioRisqueTopo(int aptBio,int topo,int zbio){
+    int aRes=aptBio;
+    int risque=getRisque(zbio,topo);
+    int catRisque=mDico->risqueCat(risque);
+    // situation favorable
+    if (catRisque==1){
+        aRes=mDico->AptSurcote(aptBio);
+        return aRes;
+        //std::cout << "Surcote l'aptitude " << mDico->code2Apt(apt) << " vers " << mDico->code2Apt(aRes) << std::endl;
+    }
+    // risque élevé et très élevé
+    if (catRisque==3){aRes=mDico->AptSouscote(aptBio);}
+    // attention, pour résineux, pas de Tolérance Elargie --> exclusion
+    if (aRes==3 && mFeRe==FeRe::Resineux){aRes=4;}
+    //std::cout << "Décote l'aptitude " << mDico->code2Apt(apt) << " vers " << mDico->code2Apt(aRes) << std::endl;}
+    return aRes;
+}
+/*int cEss::corrigAptRisqueTopo(int apt,int topo,int zbio){
     int aRes=apt;
     int risque=getRisque(zbio,topo);
     int catRisque=mDico->risqueCat(risque);
     // situation favorable
     if (catRisque==1){
+
         aRes=mDico->AptSurcote(apt);
         //std::cout << "Surcote l'aptitude " << mDico->code2Apt(apt) << " vers " << mDico->code2Apt(aRes) << std::endl;
     }
@@ -625,7 +651,7 @@ int cEss::corrigAptRisqueTopo(int apt,int topo,int zbio){
     if (catRisque==3){aRes=mDico->AptSouscote(apt);}
     //std::cout << "Décote l'aptitude " << mDico->code2Apt(apt) << " vers " << mDico->code2Apt(aRes) << std::endl;}
     return aRes;
-}
+}*/
 
 std::string cEss::printRisque(){
     std::string aRes("Risque pour "+mNomFR+ "------\n");

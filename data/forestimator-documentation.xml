@@ -88,5 +88,23 @@ Une documentation plus exhaustive de la méthode est disponible sous format pdf:
 
 </message>
 
+<message id="Aptitude.version">
+Carte d'aptitude du FEE : version de mars 2021 pour AG, AP, EK, PG, PY, PZ et de juin 2020 pour les autres
+</message>
+
+<message id="Aptitude.logs">
+Octobre 2021 : mise à jours de toutes les cartes d'aptitudes du FEE suite à la mise à jour de la carte des niveaux hydriques. Par ailleurs, le système de calcul de compensations liés à la situation topographique est amélioré (compensation uniquement sur l'aptitude climatique et pas hydro-trophique, et correction du bug des aptitudes Tolérance élargie pour les résineux qui ne devaients pas exister par définition).
+<br></br>
+Mars 2021 : mise à jours pour AG, AP, EK, PG, PY, PZ.
+<br></br>
+Juin 2020 : première version pour toutes les essences forestières.
+</message>
+
+<message id="tooltip.compensationTopo">
+Les compensations dues à la situations topographiques sont de l'ordre du micro-climat. Une situation de risque ou une situation favorable influencera ainsi l'aptitude bioclimatique pour cette station. Cette aptitude bioclimatique "compensée" est ensuite confrontée à l'aptitude hydro-trophique afin de sélectionner la plus contraignante des deux.
+</message>
+
+
+
 </messages>
 

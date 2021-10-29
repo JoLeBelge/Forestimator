@@ -128,6 +128,9 @@ void cApliCarteApt::carteAptFEE(std::shared_ptr<cEss> aEss, std::string aOut, bo
             ZBIOBand->RasterIO( GF_Read, 0, row, x, 1, scanlineZBIO, x,1, GDT_Float32, 0, 0 );
             TopoBand->RasterIO( GF_Read, 0, row, x, 1, scanlineTopo, x,1, GDT_Float32, 0, 0 );
             // iterate on pixels in row
+#pragma omp parallel num_threads(12)
+            {
+#pragma omp for
             for (int col = 0; col < x; col++)
             {
                 int apt(0);
@@ -136,15 +139,18 @@ void cApliCarteApt::carteAptFEE(std::shared_ptr<cEss> aEss, std::string aOut, bo
                 if (zbio!=0){
                     int nh = scanlineNH[ col ];
                     int nt = scanlineNT[ col ];
-                    apt = aEss->getApt(nt,nh,zbio);
-
+                    //apt = aEss->getApt(nt,nh,zbio);
                     // prise en compte des risques liés à la situation topographique
                     int topo = scanlineTopo[ col ];
-                    apt = aEss->corrigAptRisqueTopo(apt,topo,zbio);
+                    //apt = aEss->corrigAptRisqueTopo(apt,topo,zbio); OLD OLD
+                    //apt = aEss->getApt(nt,nh,zbio,1,topo);
+                    apt =aEss->getFinalApt(nt,nh,zbio,topo);
+
                     // fonction menbre de l'essence qui Corrige l'apt sur base de la situtation topographique et des risques
                     //if (scanline[ col ]>20) std::cout << " one value of aptitude more than 20 -- should not exist" << std::endl;
                 }
                 scanline[ col ] = apt;
+            }
             }
             if (row%step==0){std::cout << c*10 << " pct"<< std::endl;c++;}
             // écriture du résultat dans le fichier de destination

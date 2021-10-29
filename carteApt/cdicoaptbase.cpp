@@ -10,7 +10,7 @@ cdicoAptBase::cdicoAptBase(std::string aBDFile):mBDpath(aBDFile),ptDb_(NULL)
         // dico Ess Nom -- code
         sqlite3_stmt * stmt;
 
-        std::string SQLstring="SELECT Ess_FR,Code_FR,prefix FROM dico_essences ORDER BY Ess_FR DESC;";
+        std::string SQLstring="SELECT Ess_FR,Code_FR,prefix, FeRe FROM dico_essences ORDER BY Ess_FR DESC;";
         sqlite3_prepare_v2( *db_, SQLstring.c_str(), -1, &stmt, NULL );//preparing the statement
         while(sqlite3_step(stmt) == SQLITE_ROW)
         {
@@ -20,6 +20,8 @@ cdicoAptBase::cdicoAptBase(std::string aBDFile):mBDpath(aBDFile),ptDb_(NULL)
                 std::string aPrefix=std::string( (char *)sqlite3_column_text( stmt, 2 ) );
                 Dico_codeEs2NomFR.emplace(std::make_pair(aCodeEs,aNomEs));
                 Dico_code2prefix.emplace(std::make_pair(aCodeEs,aPrefix));
+                int FR=sqlite3_column_int( stmt, 3 );
+                Dico_F_R.emplace(std::make_pair(aCodeEs,FR));
             }
         }
 

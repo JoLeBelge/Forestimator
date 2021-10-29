@@ -59,7 +59,7 @@ int main(int argc, char *argv[])
 
         for (std::pair<std::string,std::shared_ptr<layerBase>>  kv : aMLB){
 
-            //std::string essCode(kv.second->EssCode()); //essCode =="AG"  | essCode =="AP" |essCode =="EK") |essCode =="PG" essCode =="PY" |essCode =="PZ"
+            std::string essCode(kv.second->EssCode()); //essCode =="AG"  | essCode =="AP" |essCode =="EK") |essCode =="PG" essCode =="PY" |essCode =="PZ"
 
             if (carteFEE &&(kv.second->getCatLayer()==TypeLayer::FEE)){
                 aACA.carteAptFEE(dico.getEss(kv.second->EssCode()),kv.second->getPathTif(),true);

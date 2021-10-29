@@ -28,12 +28,12 @@
         <paletteEntry color="#72ac2f" label="Tolérance" value="2" alpha="255"/>
         <paletteEntry color="#e5920d" label="Tolérance Elargie" value="3" alpha="255"/>
         <paletteEntry color="#d61a10" label="Exclusion" value="4" alpha="255"/>
-        <paletteEntry color="#0d4209" label="Optimum/Tolérance" value="5" alpha="255"/>
-        <paletteEntry color="#0d4209" label="Optimum/Tolérance élargie" value="6" alpha="255"/>
-        <paletteEntry color="#0d4209" label="Optimum/Exclusion" value="7" alpha="255"/>
-        <paletteEntry color="#72ac2f" label="Tolérance/Tolérance élargie" value="8" alpha="255"/>
-        <paletteEntry color="#72ac2f" label="Tolérance/Exclusion" value="9" alpha="255"/>
-        <paletteEntry color="#e5920d" label="Tolérance élargie/Exclusion" value="10" alpha="255"/>
+        <paletteEntry color="#72ac2f" label="Optimum/Tolérance" value="5" alpha="255"/>
+        <paletteEntry color="#e5920d" label="Optimum/Tolérance élargie" value="6" alpha="255"/>
+        <paletteEntry color="#d61a10" label="Optimum/Exclusion" value="7" alpha="255"/>
+        <paletteEntry color="#e5920d" label="Tolérance/Tolérance élargie" value="8" alpha="255"/>
+        <paletteEntry color="#d61a10" label="Tolérance/Exclusion" value="9" alpha="255"/>
+        <paletteEntry color="#d61a10" label="Tolérance élargie/Exclusion" value="10" alpha="255"/>
         <paletteEntry color="#e0e1e0" label="Indéterminé (Zone batie)" value="12" alpha="255"/>
       </colorPalette>
       <colorramp name="[source]" type="randomcolors"/>

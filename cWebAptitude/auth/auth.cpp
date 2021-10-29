@@ -14,8 +14,6 @@ AuthApplication::AuthApplication(const Wt::WEnvironment& env, cDicoApt *dico)
     messageResourceBundle().use(docRoot() + "/forestimator");
     messageResourceBundle().use(docRoot() + "/forestimator-documentation");
 
-
-
     setTitle("Forestimator");
 
     loadStyles();

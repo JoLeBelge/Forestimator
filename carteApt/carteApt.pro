@@ -3,12 +3,15 @@ TEMPLATE = app
 CONFIG -= app_bundle
 CONFIG -= qt
 TARGET = carteApt
+QMAKE_LFLAGS+=-fopenmp
+QMAKE_CXXFLAGS+=-fopenmp
 
 
-QMAKE_CC = gcc-10
-QMAKE_CXX = g++-10
+#QMAKE_CC = gcc-10
+#QMAKE_CXX = g++-10
 
 SOURCES += main.cpp \
+            cdicoaptbase.cpp \
            cdicoapt.cpp \
     caplicarteapt.cpp \
     cdicocarteph.cpp \
@@ -17,7 +20,7 @@ SOURCES += main.cpp \
     layerbase.cpp\
     ../cWebAptitude/cadastre.cpp
 
-LIBS += -lgdal -lsqlite3 -lboost_system -lboost_filesystem -lwtdbo -lwtdbosqlite3 -lboost_program_options
+LIBS += -lgdal -lsqlite3 -lboost_system -lboost_filesystem -lwtdbo -lwtdbosqlite3 -lboost_program_options -lboost_thread -ltbb -fopenmp
 
 #LIBS += -L$$PWD/../../../OTB-7.0.0-Linux64/lib
 
@@ -37,6 +40,7 @@ INCLUDEPATH += $$PWD/../cWebAptitude/
 DEPENDPATH += $$PWD/../cWebAptitude/
 
 HEADERS += \
+    cdicoaptbase.h \
     cdicoapt.h \
     caplicarteapt.h \
     cdicocarteph.h \
@@ -44,4 +48,3 @@ HEADERS += \
     cnsw.h \
     layerbase.h
     ../cWebAptitude/cadastre.h
-

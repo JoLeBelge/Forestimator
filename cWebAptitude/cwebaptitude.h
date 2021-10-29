@@ -23,6 +23,7 @@
 #include "cdicoapt.h"
 #include "statwindow.h"
 #include "simplepoint.h"
+#include "Wt/WEnvironment.h"
 
 #include <Wt/WIntValidator.h>
 #include <Wt/WLineEdit.h>
@@ -36,12 +37,20 @@ class parcellaire;
 class uploadCarte;
 class panier;
 
+
 class dialog : public Wt::WDialog
 {
 public:
-    dialog(const WString& windowTitle, Wt::WMenuItem * aMenu);
+    dialog(const WString& windowTitle, Wt::WMenuItem * aMenu,const WEnvironment * env);
 
     void myshow(){
+        // on ne peut pas utiliser l'environnement dans le constructeur, car au début de la session, la taille de l'écran n'est pas encore définie (plain html session without ajax machin)
+        int w_=env_->screenWidth()*5.0/10.0;
+        int h_=env_->screenHeight()*7.0/10.0;
+        std::cout << " set size dialog " << w_ << " , " << h_ << std::endl;
+        // setMaximumSize(w_,h_);
+        setMaximumSize(w_,h_);
+
         if (mShow){show();}
     }
 
@@ -52,6 +61,7 @@ private:
     bool mShow;
     Wt::WColor col_sel = Wt::WColor(23,87,23);
     Wt::WColor col_not_sel = Wt::WColor("transparent");
+    const WEnvironment * env_;
 };
 
 class cWebAptitude : public Wt::WContainerWidget

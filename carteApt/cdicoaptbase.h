@@ -11,6 +11,10 @@
 #include "boost/filesystem.hpp"
 #include <unistd.h>
 
+enum class FeRe {Feuillus,
+                 Resineux,
+                 Autre
+                   };
 
 // octobre 2021 ; j'aimerai utiliser dans phytospy le dico Apt, entre autre pour concevoir une mise en page des matrices d'aptitudes.
 // j'aimerai partager le dico Apt entre forestimator et phytospy, mais celui-ci est trop spécialisé forestimator. Je crée une classe mère avec les membres que je souhaite partager entre les deux applis
@@ -188,6 +192,21 @@ public:
         return aRes;
     }
 
+    FeRe accroEss2FeRe(std::string aEss){
+        FeRe aRes(FeRe::Feuillus);
+        switch (Dico_F_R.at(aEss)) {
+        case 1:{
+            aRes=FeRe::Feuillus;
+            break;}
+        case 2:{
+            aRes=FeRe::Resineux;
+            break;}
+        default:
+            break;
+        }
+        return aRes;
+    }
+
     std::map<std::string,std::string>  Dico_AptFull2AptAcro;// j'en ai besoin dans les batonnetApt
 protected:
     std::string mBDpath;
@@ -197,8 +216,8 @@ protected:
     //code ess vers nom français
     std::map<std::string,std::string> Dico_codeEs2NomFR;
     std::map<std::string,std::string> Dico_code2prefix;
-    // code essence 2 code groupe "feuillus" vs "Resineux
-    std::map<std::string,std::string> Dico_F_R;
+    // code essence 2 code groupe "feuillus" vs "Resineux (1=feuillus, 2=Résineux)
+    std::map<std::string,int> Dico_F_R;
     std::map<int,std::string>  Dico_NH;
     // c'est dans mes analyses phyto que j'ai besoin de grouper les niveaux hydriques en groupe
     std::map<int,int>  Dico_rasterNH2groupe;

@@ -323,7 +323,7 @@ public:
     cEss(std::string aCodeEs,cDicoApt * aDico);
 
     //effectue la confrontation Apt Zbio et AptHydroTrophiue si hierarchique = true, sinon renvoie l'aptitude de l'écogramme
-    int getApt(int aCodeNT,int aCodeNH, int aZbio,bool hierachique=true);
+    int getApt(int aCodeNT, int aCodeNH, int aZbio, bool hierachique=true, int aTopo=666);
     // retourne l'aptitude global de la zone bioclimatique
     int getApt(int aZbio);
     // retourne l'aptitude du catalogue de station
@@ -360,11 +360,15 @@ public:
     }
 
     int getFinalApt(int aCodeNT,int aCodeNH, int aZbio, int topo){
-        int apt=getApt(aCodeNT, aCodeNH,aZbio);
-        return corrigAptRisqueTopo(apt,topo,aZbio);
+        //int apt=getApt(aCodeNT, aCodeNH,aZbio);
+        //return corrigAptRisqueTopo(apt,topo,aZbio);
+        return getApt(aCodeNT,aCodeNH,aZbio,true,topo);
     }
 
-    int corrigAptRisqueTopo(int apt, int topo, int zbio);
+    //int corrigAptRisqueTopo(int apt, int topo, int zbio);
+    // renvoie l'apt climatique compensée par situation topographique
+    int corrigAptBioRisqueTopo(int aptBio,int topo,int zbio);
+
     std::string Nom(){return mNomFR;}
     std::string Code(){return mCode;}
 
@@ -406,6 +410,7 @@ public:
     TypeCarte Type(){return mType;}
 
 private:
+    FeRe mFeRe;
     TypeCarte mType;
     cDicoApt * mDico;
     std::string mCode, mNomFR, mF_R,mPrefix;
