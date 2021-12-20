@@ -40,8 +40,24 @@ void Analytics::addLog(const Wt::WEnvironment &env, int user_id, std::string pag
 
     //std::cout << log->datum << log->client << log->ipath << std::endl;
 
-    dbo::ptr<Log> logPtr = session.add(std::move(log));
+    addLogApache(env,page);
 
+    dbo::ptr<Log> logPtr = session.add(std::move(log));
+}
+
+void Analytics::addLogApache(const Wt::WEnvironment &env, std::string page){
+    time_t timestamp=time(0);
+    struct tm * timeinfo = localtime(&timestamp);
+    char buffer[80];
+    strftime(buffer,sizeof(buffer),"%d/%b/%Y:%H:%M:%S",timeinfo);
+    std::string str(buffer);
+
+    std::ofstream out("log.txt", std::ios::app);
+    out << env.clientAddress();
+    out <<  " - - [";
+    out << str;
+    out << " +0100] \"GET " << page ;
+    out << " HTTP/1.1\" 200 1000 \"-\" \"" << env.userAgent() << "\"\n";
 }
 
 bool Analytics::logExist(const Wt::WEnvironment &env, std::string page, typeLog cat){
@@ -55,7 +71,11 @@ bool Analytics::logExist(const Wt::WEnvironment &env, std::string page, typeLog 
         */
 
     int c=session.query<int>("select count(1) from Log").where("date = ?").bind(Wt::WDate::currentDate().toString("yyyy-MM-dd")).where("ipath = ?").bind(page).where("ip = ?").bind(env.clientAddress()).where("cat = ?").bind((int (cat)));
-    if (c==0){aRes=0;} else{
+    if (c==0){
+        aRes=0;
+    } else{
+        // log brut data anyway
+        addLogApache(env,page);
         if (globTest){std::cout << " le log existe déjà pour cet utilisateur !" << std::endl;}
     }
     return aRes;
