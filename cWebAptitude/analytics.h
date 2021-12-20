@@ -19,6 +19,8 @@
 #include <Wt/WVBoxLayout.h>
 #include <string>
 #include <ctime>
+#include <iostream>
+#include <fstream>
 
 #include <Wt/Dbo/WtSqlTraits.h>
 
@@ -91,10 +93,12 @@ public:
     //Analytics(const std::string &sqliteDb);
     bool logExist(const Wt::WEnvironment &env, std::string page, typeLog cat);
 
+    void addLogApache(const Wt::WEnvironment &env, std::string page);
     void addLog(const Wt::WEnvironment &env, int user_id, std::string page,int cat=1);
     void addLog(const Wt::WEnvironment &env, int user_id){addLog(env,user_id,env.internalPath());}
     void addLog(const Wt::WEnvironment &env, std::string page,int cat=1){addLog(env,-1,page,cat);}
     void addLog(const Wt::WEnvironment &env){addLog(env,-1,env.internalPath());}
+
 
     dbo::Session session;
 };

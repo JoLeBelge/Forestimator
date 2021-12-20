@@ -147,10 +147,11 @@ void AuthApplication::addLog(std::string page, typeLog cat){
 
     // check pour ne pas ajouter dix fois sur la mm journée et pour le même utilisateur un log identique.
     if (!mAnal.logExist(this->environment(),page, cat)){
-    if (session_.login().loggedIn()) {
-        const Wt::Auth::User& u = session_.login().user();
-        mAnal.addLog(this->environment(),atol(u.id().c_str()), page,(int (cat)));
-    }else
-        mAnal.addLog(this->environment(), page,(int (cat)));
+        if (session_.login().loggedIn()) {
+            const Wt::Auth::User& u = session_.login().user();
+            mAnal.addLog(this->environment(),atol(u.id().c_str()), page,(int (cat)));
+        }else{
+            mAnal.addLog(this->environment(), page,(int (cat)));
+        }
     }
 }
