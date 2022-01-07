@@ -15,6 +15,7 @@ cWebAptitude::cWebAptitude(AuthApplication *app, Auth::AuthWidget* authWidget_)
 
     for (auto kv : mDico->colors){
         color col= kv.second;
+        //std::cout << "add getStyleName() " << col.getStyleName() << std::endl;
         WCssDecorationStyle styleBgrd;
         styleBgrd.setBackgroundColor(WColor(col.mR,col.mG,col.mB));
         if (col.dark()){styleBgrd.setForegroundColor(WColor("white"));}
@@ -276,7 +277,6 @@ void cWebAptitude::handlePathChange()
         std::cout << "internal path pas geré dans le handler " << mApp->internalPath() << std::endl;
         baddLog=0;
     }
-
 
     if (baddLog){mApp->addLog(mApp->internalPath());}
 

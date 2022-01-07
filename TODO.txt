@@ -1,8 +1,19 @@
 TO DO forestimator
 ------------------
--carte apt FEE ; mise à jours sur les deux serveurs. Pareil pour NT. je m'occupe du premier serveur, demander à Sam pour le des,
+
+-mise en page ana surf : overflow conteneur de droite; j'y parviens pas avec la table hdom
+changer texte hdom : ajout model pessières.
+
+-export pdf ana surf
+
+-info ponctuelle sur cadastre : a développer
+
+- stat surf sur parcelles cadastrale ; créer un nom de mClientName?
+
+-Terminer MAJ carte NH avec Andyne!!
 
 -api ; possibilité d'effectuer les traitements sur un shapefile en entier (cf Gilles San Martin)
+-api ; réponse en xml
 
 -téléchargement/ api ; un page avec des liens pour télécharger les cartes sur l'ensemble de la RW.
 
@@ -10,3 +21,6 @@ Matrice d'aptitude : réunion du 25/08/21 à Rochefort, HC, Quentin P, SP et Jo;
 
 réunion PL 23/11/2020
 -analyse Compo ; présence pour chaque essences plus typologie des peuplements (celle de IFPRW j'imagine - phil vois avec HC - moi je peux voir ce qu'on utilisais pour IFA - IFG)
+
+
+- envoyer un shp à un serveur : pour le moment, utiliser ce qui est déjà mis en place (parcellaire.h) et ajouter donc une interface graphique pour lancer les traitements sur tout le shp. un boutton par exemple. récupération d'un résultat sous forme de xml

@@ -353,7 +353,8 @@ std::map<int,double> layerBase::computeStat2(OGRGeometry * poGeom){
 color layerBase::getColor(std::string aStrCode) const{
     int aCode(0);
     bool test(0);
-    color aRes(255,255,255);
+    //color aRes(255,255,255);
+    color aRes(0,0,0);
 
     for (auto & kv : mDicoVal){
         if(kv.second == aStrCode)

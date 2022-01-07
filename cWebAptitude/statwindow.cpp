@@ -155,21 +155,22 @@ void statWindow::generateGenCarte(OGRFeature * poFeature){
      aContInfo->addWidget(cpp14::make_unique<WBreak>());
 }
 
-void statWindow::export2pdf(){
+void statWindow::export2pdf(std::string titre){
+
+    std::cout << "statWindow::export2pdf()" << std::endl;
     // création du pdf
     HPDF_Doc pdf = HPDF_New(error_handler, 0);
+
     HPDF_UseUTFEncodings(pdf);
-    HPDF_SetCurrentEncoder(pdf, "UTF-8");
     HPDF_Page page = HPDF_AddPage(pdf);
     HPDF_Page_SetSize(page, HPDF_PAGE_SIZE_A4, HPDF_PAGE_PORTRAIT);
+    HPDF_SetCompressionMode(pdf, HPDF_COMP_ALL);// sinon pdf fait 5 Mo pour rien du tout
 
-    Wt::Render::WPdfRenderer renderer(pdf, page);
-    renderer.setMargin(2.54);
-    renderer.setDpi(96);
+    MyRenderer renderer(pdf, page,titre,mDico);
 
     // post sur l'export des widgets vers pdf - pas super clair mais informatif
     //https://redmine.webtoolkit.eu/boards/2/topics/14392?r=14462#message-14462
-    Wt::WString tpl = tr("report.statwindow");
+    Wt::WString tpl = tr("report.analyse.surf");
     std::string tp = tpl.toUTF8();
 
 // cette boucle fait crasher wt avec un g is null de javascript, à la fin de la méthode. Je sais pas pourquoi.

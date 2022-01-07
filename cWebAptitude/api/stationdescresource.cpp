@@ -11,6 +11,14 @@ std::string stationDescResource::geoservice(std::string aTool,std::string aArgs,
 
     GDALAllRegister();
     if (checkTool(aTool)){
+
+        // outils différent, car je teste janvier 2022 1) la réponse en xml et 2) l'api sur tout un shp
+        if(aTool=="dendro2018"){
+
+        // finalement je vais me rabattre sur l'interface graphique de forestimator, car c'est le seul moyen que j'ai de facilement uploader un shp. Je pourrais le faire en envoyer par ex un KML dans une requete, mais c'est assez difficile de rester propre. et l'upload de fichier sans passer par fileupload, je n'y parviens pas.
+
+        } else {
+
         OGRGeometry * pol=checkPolyg(aPolyg);
         if (pol!=NULL){
             if (aTool=="hdom"){
@@ -51,6 +59,7 @@ std::string stationDescResource::geoservice(std::string aTool,std::string aArgs,
                     }
                     aResponse+="\n";
                 }
+
 
             } else {
 
@@ -95,7 +104,8 @@ std::string stationDescResource::geoservice(std::string aTool,std::string aArgs,
             }
             OGRGeometryFactory::destroyGeometry(pol);
         } else {aResponse="Veillez utiliser le format wkt pour le polygone (projeté en BL72, epsg 31370). La géométrie du polygone doit être valide et sa surface de maximum "+std::to_string(globMaxSurf)+"ha";}
-    } else {aResponse="arguments pour traitement 'Aptitude' ; vous avez rentré une valeur mais qui semble fausse. Entrez une liste d'accronyme d'essences séparées par une virgule, ou une liste de carte d'aptitude\n";}
+    }
+        } else {aResponse="arguments pour traitement 'Aptitude' ; vous avez rentré une valeur mais qui semble fausse. Entrez une liste d'accronyme d'essences séparées par une virgule, ou une liste de carte d'aptitude\n";}
 
     return aResponse;
 }
@@ -105,7 +115,7 @@ bool stationDescResource::checkTool(std::string aTool){
 
     if (mDico->hasLayerBase(aTool)){ aRes=1;}
     // traitements qui ne sont pas des cartes
-    if (aTool=="hdom" | aTool=="compo"  | aTool=="aptitude"){ aRes=1;}
+    if (aTool=="hdom" | aTool=="compo"  | aTool=="aptitude" | aTool=="dendro2018" ){ aRes=1;}
 
     //if (aRes==0){mResponse="Aucune couche ou traitement de ce nom. Voir la liste sur forestimator.gembloux.ulg.ac.be/api/help";}
 

@@ -46,12 +46,19 @@ parcellaire::parcellaire(groupLayers *aGL, Wt::WApplication* app, statWindow *st
     downloadRasterBt->setWidth(200);
     downloadRasterBt->setInline(0);
     downloadRasterBt->disable();
+    addWidget(cpp14::make_unique<Wt::WBreak>());
+    anaOnAllPolygBt = addWidget(cpp14::make_unique<Wt::WPushButton>("Analyse sur tout les polygones"));
+    anaOnAllPolygBt->setStyleClass("btn btn-success");
+    anaOnAllPolygBt->setWidth(200);
+    anaOnAllPolygBt->setInline(0);
+    anaOnAllPolygBt->disable();
 
     fu->fileTooLarge().connect([=] { msg->setText("Le fichier est trop volumineux (max "+std::to_string(globVolMaxShp)+"Ko).");});
     fu->changed().connect(this,&parcellaire::fuChanged);
     fu->uploaded().connect(this,&parcellaire::upload);
 
     downloadRasterBt->clicked().connect(this,&parcellaire::downloadRaster);
+    anaOnAllPolygBt->clicked().connect(this,&parcellaire::anaAllPol);
     // ouu je pense que c'est mal, car si j'appui sur boutton télécharger les cartes, il me dis que toutes les cartes sont sélectionnées
     mContSelect4D->addWidget(std::unique_ptr<baseSelectLayers>(mGL->mSelectLayers));
 
@@ -519,6 +526,14 @@ void parcellaire::downloadRaster(){
     }
 }
 
+void anaAllPol(){
+
+    // créer une ressource avec tout les résultats. xml
+
+
+
+}
+
 
 bool parcellaire::cropImWithShp(std::string inputRaster, std::string aOut){
     bool aRes(0);
@@ -593,5 +608,24 @@ void parcellaire::polygoneCadastre(std::string aFileGeoJson){
         display();
         mGL->mMap->setToolTip(tr("tooltipMap2"));
     }
+
+}
+
+void parcellaire::anaAllPol(){
+    // message box
+    auto messageBox =
+            addChild(Wt::cpp14::make_unique<Wt::WMessageBox>(
+                         "Analyse surfacique",
+                         tr("parcellaire.anaAllPol")
+                         ,
+                         Wt::Icon::Information,
+                         Wt::StandardButton::Ok));
+
+    messageBox->setModal(true);
+    messageBox->buttonClicked().connect([=] {
+        removeChild(messageBox);
+    });
+    messageBox->show();
+
 
 }

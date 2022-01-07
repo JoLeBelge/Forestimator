@@ -57,7 +57,6 @@ void tuilageFromRaster(rasterFiles * rasterMask, int rectSize, double prop, doub
 // stat sur un raster scolyte et ajout d'un champ dans shp tuile
 void anaScolyteOnShp(rasterFiles * raster, std::string aShp);
 
-
 int main(int argc, char *argv[])
 {
 
@@ -838,56 +837,6 @@ void tuilageFromRaster(rasterFiles * rasterMask, int rectSize,double prop,double
 
 }
 
-void anaScolyteOnShp(rasterFiles * raster, std::string aShp){
-    GDALAllRegister();
-    //ouverture du shp input
-    const char *inputPath=aShp.c_str();
-    GDALDataset * mDS =  (GDALDataset*) GDALOpenEx( inputPath, GDAL_OF_VECTOR | GDAL_OF_UPDATE, NULL, NULL, NULL );
-    if( mDS != NULL )
-    {
-        // défini les nouveaux champs à ajouter à la table d'attribut - vérifie qu'il n'existe pas préhalablement
-        OGRLayer * lay = mDS->GetLayer(0);
-        if (lay->FindFieldIndex("newSco",0)==-1){
-            OGRFieldDefn * oFLD= new OGRFieldDefn("newSco",  OFTReal);
-            lay->CreateField(oFLD);
-        }
-        if (lay->FindFieldIndex("oldSco",0)==-1){
-            OGRFieldDefn * oFLD= new OGRFieldDefn("oldSco",  OFTReal);
-            lay->CreateField(oFLD);
-        }
-        if (lay->FindFieldIndex("pix",0)==-1){
-            OGRFieldDefn * oFLD2= new OGRFieldDefn("pix",  OFTReal);
-            lay->CreateField(oFLD2);
-        }
-
-        // boucle sur les features
-        OGRFeature *poFeature;
-        while( (poFeature = lay->GetNextFeature()) != NULL )
-        {
-
-            if (poFeature->GetFID() % 100==0){std::cout << " process feature " << poFeature->GetFID() << std::endl;}
-            OGRGeometry * poGeom = poFeature->GetGeometryRef();
-
-            basicStat bs=raster->computeBasicStatOnPolyg(poGeom);
-
-            double freqNewSco = bs.getFreq(2)+bs.getFreq(22)+bs.getFreq(42);
-            double freqOldSco = bs.getFreq(4)+bs.getFreq(21)+bs.getFreq(41);
-            /*if (freq>0){
-            std::cout << " freq scolyte de " << freq << std::endl;
-            }*/
-            poFeature->SetField("oldSco",freqOldSco );
-            poFeature->SetField("newSco",freqNewSco );
-            int nb =bs.getNbInt();
-            poFeature->SetField("pix",nb);
-            //poFeature->SetField(); This method has only an effect on the in-memory feature object. If this object comes from a layer and the modifications must be serialized back to the datasource, OGR_L_SetFeature()
-            lay->SetFeature(poFeature);
-        }
-
-        GDALClose(mDS);
-
-    } else { std::cout << " shp " << aShp << " pas ouvert correctement " << std::endl;}
-
-}
 
 void echantillonTuiles(std::string aShp){
     std::cout << "echantillonTuiles " << std::endl;
@@ -955,3 +904,56 @@ OGRPoint * getCentroid(OGRPolygon * hex){
     y/=NumberOfVertices;
     return new OGRPoint(x,y);
 }
+
+
+void anaScolyteOnShp(rasterFiles * raster, std::string aShp){
+    GDALAllRegister();
+    //ouverture du shp input
+    const char *inputPath=aShp.c_str();
+    GDALDataset * mDS =  (GDALDataset*) GDALOpenEx( inputPath, GDAL_OF_VECTOR | GDAL_OF_UPDATE, NULL, NULL, NULL );
+    if( mDS != NULL )
+    {
+        // défini les nouveaux champs à ajouter à la table d'attribut - vérifie qu'il n'existe pas préhalablement
+        OGRLayer * lay = mDS->GetLayer(0);
+        if (lay->FindFieldIndex("newSco",0)==-1){
+            OGRFieldDefn * oFLD= new OGRFieldDefn("newSco",  OFTReal);
+            lay->CreateField(oFLD);
+        }
+        if (lay->FindFieldIndex("oldSco",0)==-1){
+            OGRFieldDefn * oFLD= new OGRFieldDefn("oldSco",  OFTReal);
+            lay->CreateField(oFLD);
+        }
+        if (lay->FindFieldIndex("pix",0)==-1){
+            OGRFieldDefn * oFLD2= new OGRFieldDefn("pix",  OFTReal);
+            lay->CreateField(oFLD2);
+        }
+
+        // boucle sur les features
+        OGRFeature *poFeature;
+        while( (poFeature = lay->GetNextFeature()) != NULL )
+        {
+
+            if (poFeature->GetFID() % 100==0){std::cout << " process feature " << poFeature->GetFID() << std::endl;}
+            OGRGeometry * poGeom = poFeature->GetGeometryRef();
+
+            basicStat bs=raster->computeBasicStatOnPolyg(poGeom);
+
+            double freqNewSco = bs.getFreq(2)+bs.getFreq(22)+bs.getFreq(42);
+            double freqOldSco = bs.getFreq(4)+bs.getFreq(21)+bs.getFreq(41);
+            /*if (freq>0){
+            std::cout << " freq scolyte de " << freq << std::endl;
+            }*/
+            poFeature->SetField("oldSco",freqOldSco );
+            poFeature->SetField("newSco",freqNewSco );
+            int nb =bs.getNbInt();
+            poFeature->SetField("pix",nb);
+            //poFeature->SetField(); This method has only an effect on the in-memory feature object. If this object comes from a layer and the modifications must be serialized back to the datasource, OGR_L_SetFeature()
+            lay->SetFeature(poFeature);
+        }
+
+        GDALClose(mDS);
+
+    } else { std::cout << " shp " << aShp << " pas ouvert correctement " << std::endl;}
+
+}
+

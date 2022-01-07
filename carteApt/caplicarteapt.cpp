@@ -172,6 +172,10 @@ void cApliCarteApt::carteAptFEE(std::shared_ptr<cEss> aEss, std::string aOut, bo
     }else {
         std::cout << aOut << " existe déjà ou alors aEss->hasFEEApt() false " << std::endl;
     }
+
+    // copie du fichier de style qgis
+    std::string aStyleFile=dico->Files()->at("styleApt");
+    boost::filesystem::copy_file(aStyleFile,aOut.substr(0,aOut.size()-3)+"qml",boost::filesystem::copy_option::overwrite_if_exists);
 }
 
 void cApliCarteApt::carteAptCS(std::shared_ptr<cEss> aEss, std::string aOut, bool force)

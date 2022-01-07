@@ -59,7 +59,7 @@ selectLayers::selectLayers(groupLayers * aGL){
 
     mGL=aGL;
     mVpLs=aGL->Layers();
-    nbMax=25;
+    nbMax=15;
 
     // ajout des noeuds racine des groupes de couches et création de la checkbox pour le groupe
     for (auto & kv : mLayerGroupNode){

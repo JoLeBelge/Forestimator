@@ -294,7 +294,10 @@ cDicoApt::cDicoApt(std::string aBDFile):cdicoAptBase(aBDFile)
                         std::string col=std::string( (char *)sqlite3_column_text( stmt2, 0 ) );
                         // soit c'est un identifiant de couleur que j'ai déjà dans mon dictionnaire, soit c'est un code hexadécimal
                         if (colors.find(col)==colors.end()){
-                            colors.emplace(std::make_pair(col,color(col)));
+                            // problème quand c'est le code hexadécimal ,c'est que la fonction getCol fonctionne avec un nom de couleur.. donc le nom doit-être le mm que le code hexa, comme ça c'est pa ambigu. sauf que c'est peut-être pas opportun d'avoir un diaise en début de nom..
+
+                            //std::cout << "creation couleur nom " << col.substr(1,col.size()) << std::endl;
+                            colors.emplace(std::make_pair(col,color(col,col.substr(1,col.size()))));
                         }
                     }
                 }
@@ -406,9 +409,13 @@ std::map<int,color> cDicoApt::getDicoRasterCol(std::string aCode){
             int aA=sqlite3_column_int( stmt, 0 );
             std::string aB("");
             if (sqlite3_column_type(stmt, 1)!=SQLITE_NULL ) {aB=std::string( (char *)sqlite3_column_text( stmt, 1 ) );}
+              if (aB.substr(0,1)=="#") {
+                  if (globTest){std::cout << " ajout dans dicoCol " << aA << " , col " << aB << " table" << nom_dico << std::endl;}
+                  // il faut d'office l'ajouter au vecteur colors, car les styles sont créé via ce vecteur
+                  colors.emplace(std::make_pair(aB,color(aB,aB)));
+              }
 
-            // if (aCode=="MF"){ std::cout << " ajout dans dicoCol " << aA << " , col " << aB << std::endl;}
-            aRes.emplace(std::make_pair(aA,getColor(aB)));
+             aRes.emplace(std::make_pair(aA,getColor(aB)));
         }
     }
     sqlite3_finalize(stmt);
@@ -523,7 +530,6 @@ std::map<int,std::map<int,std::vector<std::string>>> cDicoApt::getHabitatCS(std:
                 // on découpe le nom de l'image
                 if (aVPos.size()>0){
                     for (int i(0); i<(aVPos.size()-1) ;i++){
-                        //std::cout << " toto " << i << " i "<< std::endl;
                         int p(aVPos.at(i));
                         int j=aVPos.at(i+1)-p;
                         if (j >1){

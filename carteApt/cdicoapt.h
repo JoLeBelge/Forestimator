@@ -188,10 +188,8 @@ public:
 
     color getColor(std::string aCode){
         color aRes(0,0,0);
-        if (aCode.substr(0,1)=="#") {aRes=color(aCode);}
-        else {
-            if (colors.find(aCode)!=colors.end()){aRes=colors.at(aCode);}
-        }
+        if (colors.find(aCode)!=colors.end()){aRes=colors.at(aCode);
+        } else { std::cout << "color " << aCode << " not found"<< std::endl;}
         return aRes;
     }
     bool lay4Visu(std::string aLayerCode){

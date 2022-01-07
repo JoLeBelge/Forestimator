@@ -25,7 +25,7 @@
 namespace dbo = Wt::Dbo;
 
 //pour pouvoir classer les logs en différentes catégories. attention, ne pas changer l'ordre sinon la valeur de l'entier change et on est paumé
-enum typeLog {unknown,page,extend,danap,anas,dsingle,dmulti};
+enum typeLog {unknown,page,extend,danap,anas,dsingle,dmulti,danas};
 // danap download pdf analyse ponctuelle.
 // anas analyse surfacique
 // dsingle download une carte

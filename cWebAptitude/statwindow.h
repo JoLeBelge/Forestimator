@@ -32,7 +32,7 @@ public:
     void generateGenCarte(OGRFeature *poFeature);
 
     //void export2pdf(std::string img, int length);
-    void export2pdf();
+    void export2pdf(std::string titre="test");
     void renderPdf(Wt::Render::WPdfRenderer * renderer);
 
     WText * mTitre;

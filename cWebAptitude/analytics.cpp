@@ -10,7 +10,6 @@ Analytics::Analytics(std::string aFileDB) : session()
     sqlite3->setProperty("show-queries", "false");
 
     session.setConnection(std::move(sqlite3));
-
     session.mapClass<Log>("log");
 
     try {

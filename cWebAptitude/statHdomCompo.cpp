@@ -352,7 +352,7 @@ std::unique_ptr<WContainerWidget> statHdom::getResult(){
     std::unique_ptr<WContainerWidget> aRes= std::make_unique<Wt::WContainerWidget>();
 
     aRes->setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Center);
-    aRes->setInline(0);
+    //aRes->setInline(0);
     aRes->setOverflow(Wt::Overflow::Auto);
 
     WVBoxLayout * layoutV = aRes->setLayout(cpp14::make_unique<WVBoxLayout>());
@@ -369,9 +369,9 @@ std::unique_ptr<WContainerWidget> statHdom::getResult(){
         sm.addPols(mVaddPol, Wt::StandardColor::DarkBlue);
     }
 
-
-    Wt::WImage * im =layoutH->addWidget(cpp14::make_unique<Wt::WImage>(sm.getWLinkRel()),0);
-    im->resize(350,350);
+    WContainerWidget * aContIm = layoutH->addWidget(cpp14::make_unique<WContainerWidget>(),0);
+    Wt::WImage * im =aContIm->addWidget(cpp14::make_unique<Wt::WImage>(sm.getWLinkRel()));
+    im->resize(450,450);
 
     WContainerWidget * aContTable = layoutH->addWidget(cpp14::make_unique<WContainerWidget>());
     aContTable->setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Center);
@@ -403,7 +403,7 @@ std::unique_ptr<WContainerWidget> statHdom::getResult(){
     table->elementAt(c, 1)->setPadding(10,Wt::Side::Left);
     c++;
     //table->elementAt(c, 0)->addWidget(cpp14::make_unique<WText>("Nombre de Hdom mesuré (surface de 0.1 ha)"));// hexagones OLD OLD
-    table->elementAt(c, 0)->addWidget(cpp14::make_unique<WText>("Nombre de Hdom mesuré (surface de 1 are)"));
+    table->elementAt(c, 0)->addWidget(cpp14::make_unique<WText>(Wt::WString::tr("report.analyse.surf.hdom.t")));
     table->elementAt(c, 1)->addWidget(cpp14::make_unique<WText>(bs.getNb()));
     table->elementAt(c, 1)->setPadding(10,Wt::Side::Left);
     c++;
