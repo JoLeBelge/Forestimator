@@ -1,5 +1,5 @@
 #include "layerstatchart.h"
-
+extern bool globTest;
 layerStatChart::layerStatChart(std::shared_ptr<Layer> aLay, std::map<std::string, int> aStat, OGRGeometry *poGeom):layerStat(aLay,aStat),rowAtMax(0),mGeom(poGeom)
 {
 
@@ -45,7 +45,7 @@ bool layerStatChart::deserveChart(){
 
 std::unique_ptr<WContainerWidget> layerStatChart::getChart(bool forRenderingInPdf){
 
-    //std::cout << " creation d'un chart " << std::endl;
+    if (globTest) {std::cout << " creation d'un chart " << std::endl;}
     std::unique_ptr<WContainerWidget> aRes= std::make_unique<Wt::WContainerWidget>();
 
     aRes->setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Center);
@@ -57,17 +57,22 @@ std::unique_ptr<WContainerWidget> layerStatChart::getChart(bool forRenderingInPd
     //aRes->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
     WContainerWidget * aCont = layoutV->addWidget(cpp14::make_unique<WContainerWidget>());
     WHBoxLayout * layoutH = aCont->setLayout(cpp14::make_unique<WHBoxLayout>());
+
     // ajout de la carte pour cette couche
     //layoutH->addWidget(cpp14::make_unique<olOneLay>(mLay,mGeom),0);
     staticMap sm(mLay,mGeom);
     // ça fonctionne mais je ne gère pas bien la taille de l'image dans le conteneur, pour l'instant la taille de l'image affichée est celle de l'image sur le disque
 
+
     if (forRenderingInPdf){
         Wt::WImage * im =layoutH->addWidget(cpp14::make_unique<Wt::WImage>(sm.getWLink()),0);
         im->resize(350,350);
     } else {
-        Wt::WImage * im =layoutH->addWidget(cpp14::make_unique<Wt::WImage>(sm.getWLinkRel()),0);
-        im->resize(350,350);
+        // je dois ajouter un conteneur pour y mettre l'image dedans, sinon mise en page foireuse
+        WContainerWidget * aContIm = layoutH->addWidget(cpp14::make_unique<WContainerWidget>(),0);
+        Wt::WImage * im =aContIm->addWidget(cpp14::make_unique<Wt::WImage>(sm.getWLinkRel()));
+        im->resize(450,450);
+
     }
 
     WContainerWidget * aContTableAndPie = layoutH->addWidget(cpp14::make_unique<WContainerWidget>());

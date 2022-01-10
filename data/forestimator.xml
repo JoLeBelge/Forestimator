@@ -468,9 +468,11 @@ http://forestimator.gembloux.ulg.ac.be/api/<font color="blue">compo</font>/polyg
 </p>
 </message>
 
-<message id="report.analyse.surf.hdom.t"> <h4> Hauteur dominante calculé sur le MNH  </h4> </message>
-<message id="report.analyse.surf.dendro.t"> <h4> Description dendrométriques  </h4> </message>
-<message id="report.analyse.surf.classeHauteur.t"> <h4> Répartition de la surface par classe de hauteur  </h4> </message>
+<message id="report.analyse.surf.hdom.t"> <h4> Hauteur dominante calculé sur le MNH  (modèle pour pessière)</h4> </message>
+<message id="report.analyse.surf.hdom.nb"> Nombre de Hdom mesuré (surface de 1 are) </message>
+
+<message id="report.analyse.surf.dendro.t"> <h4> Description dendrométriques (modèle pour pessière)  </h4> </message>
+<message id="report.analyse.surf.classeHauteur.t"> <h4> Répartition de la surface par classe de hauteur (tout peuplements)</h4> </message>
 <message id="report.analyse.surf.compo.t"> <h4> Composition  </h4> </message>
 <message id="report.analyse.surf.zbio.t"> <h4> Zone bioclimatique  </h4> </message>
 <message id="report.analyse.surf.relief.t"> <h4> Relief  </h4> </message>
@@ -560,7 +562,7 @@ detAptFEE
 
 <message id="titre-InfoTableAna-point"> <h4>Description de la station forestière</h4></message>
 
-<message id="report.statwindow">
+<message id="report.analyse.surf">
 	<div>
 		  <h1>Forestimator : analyse parcelaire</h1>
 
@@ -600,6 +602,7 @@ detAptFEE
 <message id="download.lay.error.noLay"><p>Aucune cartes sélectionnée. Veuillez selectionner les couches à exporter à l'étape numéro 2 de la page analyse</p></message>
 
 <message id="parcellaire.upload.size"><p> La surface du ou des polygones est trop importante que pour effectuer une analyse surfacique.</p></message>
+<message id="parcellaire.anaAllPol"><p> Indisponible pour le moment, en cours de développement..s.</p></message>
 
 <message id="api.msg.error.tool.name">Aucune carte ou traitement de ce nom.</message>
 <message id="api.msg.error.polyg1">Veillez utiliser le format Géojson pour votre polygone</message>

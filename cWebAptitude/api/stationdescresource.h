@@ -12,6 +12,7 @@
 
 #include "cdicoapt.h"
 #include "statHdomCompo.h"
+#include <Wt/WFileUpload.h>
 
 // voir aussi te-benchmark/ example
 
@@ -38,7 +39,9 @@ public:
      //response.setMimeType("text/csv");
      //response.addHeader("charset","utf-8");
      // c'est la solution que j'ai trouvée pour que mes caractère accentués passent bien sur le navigateur
-     response.addHeader("Content-Type","text/plain; charset=utf-8");
+
+
+     //application/xml pour certain traitement ; dendro par exemple
 
 
       /*response.out() << "Request path:\n"<< request.path() << "\n\n";
@@ -54,6 +57,7 @@ public:
                        */
 
      if (request.path().substr(request.path().size()-4,4)=="help"){
+         response.addHeader("Content-Type","text/plain; charset=utf-8");
          response.out() << "FORESTIMATOR API short help \n"
                            "---------------------------\n\n"
                            "\nListe des traitements pour analyse surfacique (analyse spécifique sur une couche ou analyse standard sur plusieurs couches) \n"
@@ -61,6 +65,8 @@ public:
                            "hdom \n"
                            "compo\n"
                            "aptitude\n";
+
+         //"dendro2018\n"
 
          response.out() <<  "Liste des couches accessibles via API et leur url WMS\n"
                             "---------------------------\n";
@@ -90,12 +96,17 @@ public:
 
      //response.out() << "Réponse\n" <<"----------------------\n";
 
+     if (aTool=="dendro2018") {response.addHeader("Content-Type","text/plain; charset=utf-8");}else {
+     response.addHeader("Content-Type","text/plain; charset=utf-8");
+     }
+
      response.out() << geoservice(aTool,aArgs,aPolyg);
      }
    }
 
    std::string geoservice(std::string aTool,std::string aArgs,std::string aPolyg);
    bool checkTool(std::string aTool);
+   OGRLayer * uploadLayer(std::string aShpToUpload);
    OGRGeometry * checkPolyg(std::string aPolyg);
    // pour commencer, uniquement une liste de code de carte d'aptitude (AG_FEE, ...)
    std::vector<std::string> parseAptArg(std::string aArgs);

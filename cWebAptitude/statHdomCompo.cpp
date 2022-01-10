@@ -7,18 +7,33 @@ double globx=globa/std::sqrt(3);
 double globd=2*globx;
 
 // modèle reçu de jérome le 9/06/2021
-double k1hdom(1.237116), k2hdom(-0.005823), k1vha(52.176316),k2vha(6.677865),k3vha(0.807146);
-double k1gha(2.143419), k1cmoy(2.869327),k2cmoy(0.054804),k3cmoy(-0.199079);
+//double k1hdom(1.237116), k2hdom(-0.005823), k1vha(52.176316),k2vha(6.677865),k3vha(0.807146);
+//double k1gha(2.143419), k1cmoy(2.869327),k2cmoy(0.054804),k3cmoy(-0.199079);
+// révision pour Adrien en décembre 2021 - les modèles "pixels" et non placettes sont utilisé, uniquement pour vha hdom et cmoy
+double k1hdom(1.300130), k2hdom(2.67), k1vha(46.000735),k2vha(7.065979),k3vha(0.821239);
+double k1gha(2.216901), k2gha(4.100043);
+double k1cmoy(2.789623),k2cmoy(0.06288);//,k3cmoy(-0.199079);
 
 extern bool globTest;
 
 
-statHdom::statHdom(std::shared_ptr<layerBase> aLay, OGRGeometry * poGeom):mLay(aLay),mGeom(poGeom)
+statHdom::statHdom(std::shared_ptr<layerBase> aLay, OGRGeometry * poGeom, bool computeStat):mLay(aLay),mGeom(poGeom)
 {
-    std::cout << "statHdom::statHdom" << std::endl;
+    //std::cout << "statHdom::statHdom" << std::endl;
+
     //predictHdomHex(); // va calculer mStat et mVaddPol qui sont les hexagones à dessiner sur l'image statique
-    predictDendro();
+    if (computeStat){predictDendro();
     mDistFrequ=computeDistrH();
+    prepareResult();
+    }
+}
+
+statDendro::statDendro(std::shared_ptr<layerBase> aLay, OGRGeometry * poGeom):statHdom(aLay,poGeom,0)
+{
+
+    std::cout << "statDendro" << std::endl;
+    predictDendroPix();
+    prepareResult();
 }
 
 // le probleme des map c'est qu'elles sont ordonnées automatiquement avec leur clé, je veux pas.
@@ -72,7 +87,7 @@ std::vector<std::pair<std::string,double>> statHdom::computeDistrH(){
             {
                 if (scanlineMask[col]==255){
                     double aVal=scanline[ col ];
-                    aVHauteur.push_back(Dico()->H(aVal));
+                    aVHauteur.push_back(Dico()->H(aVal,mLay->Gain()));
                 }
             }
         }
@@ -264,7 +279,7 @@ void statHdom::predictHdomHex(){
 }
 
 // approche rectangle de 1 are. Tellement plus simple,  et plus rapide
-void statHdom::predictDendro(){
+void statHdom::predictDendro(bool onlyHdomStat){
     //std::cout << " predict Dendro depuis MNH2019" << std::endl;
 
     // masque au format raster
@@ -317,7 +332,7 @@ void statHdom::predictDendro(){
                     if (scanlineMask[pix]==255){
                         double aVal=scanline[ pix ];
                         // H() c'est pour gain de 0.2
-                        aVHs.push_back(Dico()->H(aVal));
+                        aVHs.push_back(Dico()->H(aVal,mLay->Gain()));
                     }
                 }
                 // prediction des variables dendro si assez d'observations
@@ -325,8 +340,15 @@ void statHdom::predictDendro(){
                 //std::cout << "surface nid abeille ; " << surf << std::endl;
                 // seuil de 80 m2
                 if (surf>80){
-                    std::unique_ptr<statCellule> cel=std::make_unique<statCellule>(&aVHs,surf);
-                    mStat.push_back(std::move(cel));
+                    if (onlyHdomStat){
+                    std::unique_ptr<statCellule> cel=std::make_unique<statCellule>(&aVHs,surf,0);
+                     mStat.push_back(std::move(cel));
+                    } else {
+                        // tout les paramètres dendrométriques
+                    std::unique_ptr<statCellule> cel=std::make_unique<statCellule>(&aVHs,surf,1);
+                     mStat.push_back(std::move(cel));
+                    }
+
                 }
 
             }
@@ -339,6 +361,72 @@ void statHdom::predictDendro(){
     GDALClose(mask);
 }
 
+// méthode un polygone = une cellulle
+void statDendro::predictDendroPix(){
+    std::cout << " predict Dendro depuis MNH2018" << std::endl;
+
+    // masque au format raster
+    GDALDataset * mask = mLay->rasterizeGeom(mGeom);
+    OGREnvelope ext;
+    mGeom->getEnvelope(&ext);
+    double width((ext.MaxX-ext.MinX)), height((ext.MaxY-ext.MinY));
+
+    GDALDataset  * DS = (GDALDataset *) GDALOpen( mLay->getPathTif().c_str(), GA_ReadOnly );
+    if( DS == NULL )
+    {
+        std::cout << "je n'ai pas lu l'image " <<  mLay->getPathTif() << std::endl;
+    } else {
+
+        std::vector<double> aVHs;
+        int nbPix(0);
+
+        double transform[6];
+        DS->GetGeoTransform(transform);
+        double xOrigin = transform[0];
+        double yOrigin = transform[3];
+        double pixelWidth = transform[1];
+        double pixelHeight = -transform[5];
+
+        //determine dimensions of the tile
+        int xSize = round(width/pixelWidth);
+        int ySize = round(height/pixelHeight);
+        int xOffset = int((ext.MinX - xOrigin) / pixelWidth);
+        int yOffset = int((yOrigin - ext.MaxY ) / pixelHeight);
+
+        float *scanline, *scanlineMask;
+        scanline = (float *) CPLMalloc( sizeof( float ) * xSize );
+        scanlineMask = (float *) CPLMalloc( sizeof( float ) * xSize );
+        // boucle sur chaque ligne
+        for ( int row = 0; row < ySize; row++ )
+        {
+            //std::cout << " read row " << row << std::endl;
+            // lecture
+            DS->GetRasterBand(1)->RasterIO( GF_Read, xOffset, row+yOffset, xSize, 1, scanline, xSize,1, GDT_Float32, 0, 0 );
+            // lecture du masque
+            mask->GetRasterBand(1)->RasterIO( GF_Read, 0, row, xSize, 1, scanlineMask, xSize,1, GDT_Float32, 0, 0 );
+            // boucle sur scanline et garder les pixels qui sont dans le polygone
+            for (int col = 0; col <  xSize; col++)
+            {
+                if (scanlineMask[col]==255){
+                    double aVal=scanline[ col ];
+                    aVHs.push_back(Dico()->H(aVal,mLay->Gain()));
+                    nbPix++;
+                }
+            }
+        }
+        CPLFree(scanline);
+        CPLFree(scanlineMask);
+
+       // tout les paramètres dendrométriques
+       std::unique_ptr<statCellule> cel=std::make_unique<statCellule>(&aVHs,nbPix*pixelWidth*pixelHeight,1);
+       mStat.push_back(std::move(cel));
+
+       GDALClose(DS);
+    }
+    GDALClose(mask);
+}
+
+
 
 
 bool statHdom::deserveChart(){
@@ -347,15 +435,24 @@ bool statHdom::deserveChart(){
     return aRes;
 }
 
-std::unique_ptr<WContainerWidget> statHdom::getResult(){
-    std::cout << "statHdom::getResult() " << std::endl;
-    std::unique_ptr<WContainerWidget> aRes= std::make_unique<Wt::WContainerWidget>();
+bool statDendro::deserveChart(){ // vérifier qu'il y ai bien une cellule et pas trop petite "
+    bool aRes(1);
+    if (mStat.size()==1 && mStat.at(0)->mSurf > 100){} else { std::cout << "Attention, calcul param dendro sur plusieurs cellules (pas normal) ou alors surface trop petite " << std::endl;
+}
+    return aRes;
+}
 
-    aRes->setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Center);
-    aRes->setInline(0);
-    aRes->setOverflow(Wt::Overflow::Auto);
 
-    WVBoxLayout * layoutV = aRes->setLayout(cpp14::make_unique<WVBoxLayout>());
+void statHdom::prepareResult(){
+    std::cout << "statHdom::prepareResult() " << std::endl;
+    //std::unique_ptr<WContainerWidget>
+    mResult= std::make_unique<Wt::WContainerWidget>();
+
+    mResult->setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Center);
+    //aRes->setInline(0);
+    mResult->setOverflow(Wt::Overflow::Auto);
+
+    WVBoxLayout * layoutV = mResult->setLayout(cpp14::make_unique<WVBoxLayout>());
     layoutV->addWidget(cpp14::make_unique<WText>("<h4>"+mLay->getLegendLabel(false)+"</h4>"));
 
     WContainerWidget * aCont = layoutV->addWidget(cpp14::make_unique<WContainerWidget>());
@@ -369,9 +466,9 @@ std::unique_ptr<WContainerWidget> statHdom::getResult(){
         sm.addPols(mVaddPol, Wt::StandardColor::DarkBlue);
     }
 
-
-    Wt::WImage * im =layoutH->addWidget(cpp14::make_unique<Wt::WImage>(sm.getWLinkRel()),0);
-    im->resize(350,350);
+    WContainerWidget * aContIm = layoutH->addWidget(cpp14::make_unique<WContainerWidget>(),0);
+    Wt::WImage * im =aContIm->addWidget(cpp14::make_unique<Wt::WImage>(sm.getWLinkRel()));
+    im->resize(450,450);
 
     WContainerWidget * aContTable = layoutH->addWidget(cpp14::make_unique<WContainerWidget>());
     aContTable->setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Center);
@@ -402,12 +499,12 @@ std::unique_ptr<WContainerWidget> statHdom::getResult(){
     table->elementAt(c, 1)->addWidget(cpp14::make_unique<WText>(bs.getMin()));
     table->elementAt(c, 1)->setPadding(10,Wt::Side::Left);
     c++;
-    //table->elementAt(c, 0)->addWidget(cpp14::make_unique<WText>("Nombre de Hdom mesuré (surface de 0.1 ha)"));// hexagones OLD OLD
-    table->elementAt(c, 0)->addWidget(cpp14::make_unique<WText>("Nombre de Hdom mesuré (surface de 1 are)"));
+    table->elementAt(c, 0)->addWidget(cpp14::make_unique<WText>("Nombre de Hdom mesuré (surface de 0.1 ha)"));// hexagones OLD OLD
     table->elementAt(c, 1)->addWidget(cpp14::make_unique<WText>(bs.getNb()));
     table->elementAt(c, 1)->setPadding(10,Wt::Side::Left);
     c++;
-    // autres variable dendro
+    /*// autres variable dendro
+
     table->elementAt(c, 0)->setColumnSpan(2);
     table->elementAt(c, 0)->setContentAlignment(AlignmentFlag::Top | AlignmentFlag::Center);
     table->elementAt(c, 0)->setPadding(10);
@@ -431,6 +528,8 @@ std::unique_ptr<WContainerWidget> statHdom::getResult(){
     table->elementAt(c, 1)->setPadding(10,Wt::Side::Left);
     c++;
 
+    */
+
     // maintenant un tableau avec proportion par classe de hauteur;
     table->elementAt(c, 0)->setColumnSpan(2);
     table->elementAt(c, 0)->setContentAlignment(AlignmentFlag::Top | AlignmentFlag::Center);
@@ -444,10 +543,13 @@ std::unique_ptr<WContainerWidget> statHdom::getResult(){
         table->elementAt(c, 1)->setPadding(10,Wt::Side::Left);
     }
 
-    return std::move(aRes);
+    //return std::move(aRes);
     //std::cout << "lStatContChart::getResult() done" << std::endl;
 }
-basicStat statHdom::bshdom(){  
+
+
+
+basicStat statHdom::bshdom(){
     return bsDendro("hdom");
 }
 basicStat statHdom::bsDendro(std::string aVar){
@@ -769,26 +871,76 @@ basicStat statCompo::computeStatWithMasq(std::shared_ptr<layerBase> aLay, OGRGeo
     if (aMapValandFrequ.size()>0) {return basicStat(aMapValandFrequ);} else {return  basicStat();}
 }
 
+statCellule::statCellule(std::vector<double> * aVHs, int aSurf, bool computeDendro):mSurf(aSurf),mVHA(0.0),mHdom(0),mCmoy(0),mNha(0),mMean(0),mQ95(0),mGha(0){
 
-statCellule::statCellule(std::vector<double> * aVHs,int aSurf):mSurf(aSurf){
     // calcul de Vha
-    double vhaSum, hSum;
-    for (double h : *aVHs){
-        vhaSum+=pow(std::max(0.0,h-k2vha),k3vha);
+    double hSum(0);
+    if (computeDendro){
+        std::cout << "statCellule::statCellule dendro" << std::endl;
+
+         double vhaSum(0.0),cmoySum(0.0),ghaSum(0.0),nhaSum(0.0),hdomSum(0);
+        for (double h : *aVHs){
+        // old vhaSum+=pow(std::max(0.0,h-k2vha),k3vha);
+        double vhaPix(0),hdomPix(0),cmoyPix(0),ghaPix(0);
+
+        // VHA
+        //SI(Hpixi <= K2; 0; K1*(Hpixi-K2)^K3)
+        if (h<k2vha) {} else {vhaPix=k1vha*pow((h-k2vha),k3vha);}
+
+        // HDOM
+        //SI(Hpixi <= 0; 0; K1*Hpixi+K2)
+        hdomPix=k1hdom*h+k2hdom;
+
+        // CMOY
+        // SI(HDOMpixi <= 1.3; 0; K1*(HDOMpixi-1.3)+K2*(HDOMpixi-1.3)²)
+        if (hdomPix<1.3) {} else {cmoyPix=k1cmoy*(hdomPix-1.3)+k2cmoy*pow((hdomPix-1.3),2);}
+
+        // GHA
+        //SI(Hpixi <= 0; 0; K1*VHApixi/(Hpixi+K2))
+        ghaPix=k1gha*vhaPix/(h+k2gha);
+
+        // NHA
+        //SI(CMOYpixi <= 0; 0; 40000*pi()*GHApixi/Cmoypixi²)
+        if (cmoyPix > 0){ nhaSum+=40000.0*M_PI*ghaPix/pow(cmoyPix,2);}
+
+        vhaSum+=vhaPix;
+        hdomSum+=hdomPix;
+        ghaSum+=ghaPix;
+        cmoySum+=cmoyPix;
         hSum+=h;
+
     }
     // calcul de la moyenne
     mMean=hSum/aVHs->size();
-    mVHA=k1vha*(vhaSum/aVHs->size());
+    mHdom=hdomSum/aVHs->size();
+    mVHA=vhaSum/aVHs->size();
+    mGha=ghaSum/aVHs->size();
+    mNha=nhaSum/aVHs->size();
+
+    mCmoy=sqrt(40000*M_PI*(mGha/mNha));
+
+
+    //mVHA=k1vha*(vhaSum/aVHs->size());
     // calcul de Q95
-    mQ95=getQ95(*aVHs);
+    // mQ95=getQ95(*aVHs);
     //std::cout << "mean hauteur : " << mMean << " , Q95 " << mQ95 << std::endl;
 
     // le reste des variables dendro
-    computeHdom();
-    computeGha();
-    computeCmoy();
-    computeNha();
+    //computeHdom();
+    //computeGha();
+    //computeCmoy();
+    //computeNha();
+    } else {
+        //std::cout << "statCellule::statCellule hdom" << std::endl;
+        for (double h : *aVHs){
+            hSum+=k1hdom*h+k2hdom;;
+        }
+        // calcul de la moyenne
+        mMean=hSum/aVHs->size();
+        mHdom=mMean;
+    //mQ95=getQ95(*aVHs);
+    //computeHdom();
+    }
 
     //if (globTest){ printDetail();}
 }
@@ -801,5 +953,62 @@ void  statCellule::printDetail(){
     std::cout << "NHA : " << mNha << std::endl;
     std::cout << "Gha : " << mGha << std::endl;
     std::cout << "Cmoy : " << mCmoy << std::endl;
+}
+
+void statDendro::prepareResult(){
+    std::cout << "statHdom::prepareResult() " << std::endl;
+    mResult= std::make_unique<Wt::WContainerWidget>();
+
+    mResult->setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Center);
+    //aRes->setInline(0);
+    mResult->setOverflow(Wt::Overflow::Auto);
+
+    WVBoxLayout * layoutV = mResult->setLayout(cpp14::make_unique<WVBoxLayout>());
+    //layoutV->addWidget(cpp14::make_unique<WText>("<h4>"+mLay->getLegendLabel(false)+"</h4>"));
+
+    WContainerWidget * aCont = layoutV->addWidget(cpp14::make_unique<WContainerWidget>());
+    WHBoxLayout * layoutH = aCont->setLayout(cpp14::make_unique<WHBoxLayout>());
+    // ajout de la carte pour cette couche
+
+    /*staticMap sm(mLay,mGeom);
+
+    WContainerWidget * aContIm = layoutH->addWidget(cpp14::make_unique<WContainerWidget>(),0);
+    Wt::WImage * im =aContIm->addWidget(cpp14::make_unique<Wt::WImage>(sm.getWLinkRel()));
+    im->resize(450,450);
+    */
+    WContainerWidget * aContTable = layoutH->addWidget(cpp14::make_unique<WContainerWidget>());
+    aContTable->setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Center);
+    aContTable->setOverflow(Wt::Overflow::Auto);
+    WTable * table =aContTable->addWidget(cpp14::make_unique<WTable>());
+
+    table->elementAt(0, 0)->setColumnSpan(2);
+    table->elementAt(0, 0)->setContentAlignment(AlignmentFlag::Top | AlignmentFlag::Center);
+    table->elementAt(0, 0)->setPadding(10);
+    table->elementAt(0,0)->addWidget(cpp14::make_unique<WText>(Wt::WString::tr("report.analyse.surf.dendro.t")));
+
+    int c(1);
+    table->elementAt(c, 0)->addWidget(cpp14::make_unique<WText>("Hdom moyen"));
+    table->elementAt(c, 1)->addWidget(cpp14::make_unique<WText>(roundDouble(mStat.at(0)->mHdom)+ " m"));
+    table->elementAt(c, 1)->setPadding(10,Wt::Side::Left);
+    c++;
+    table->elementAt(c, 0)->addWidget(cpp14::make_unique<WText>("VHA moyen"));
+    table->elementAt(c, 1)->addWidget(cpp14::make_unique<WText>(roundDouble(mStat.at(0)->mVHA)+ " m3/ha"));
+    table->elementAt(c, 1)->setPadding(10,Wt::Side::Left);
+    c++;
+    table->elementAt(c, 0)->addWidget(cpp14::make_unique<WText>("NHA moyen"));
+
+    table->elementAt(c, 1)->addWidget(cpp14::make_unique<WText>(roundDouble(mStat.at(0)->mNha)+ " tige/ha"));
+    table->elementAt(c, 1)->setPadding(10,Wt::Side::Left);
+    c++;
+    table->elementAt(c, 0)->addWidget(cpp14::make_unique<WText>("GHA moyen"));
+    table->elementAt(c, 1)->addWidget(cpp14::make_unique<WText>(roundDouble(mStat.at(0)->mGha)+ " m2/ha"));
+    table->elementAt(c, 1)->setPadding(10,Wt::Side::Left);
+    c++;
+    table->elementAt(c, 0)->addWidget(cpp14::make_unique<WText>("Cmoy moyen"));
+    table->elementAt(c, 1)->addWidget(cpp14::make_unique<WText>(roundDouble(mStat.at(0)->mCmoy)+ " cm"));
+    table->elementAt(c, 1)->setPadding(10,Wt::Side::Left);
+    c++;
+
+    //return std::move(aRes);
 
 }

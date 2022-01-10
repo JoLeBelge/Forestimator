@@ -1,9 +1,9 @@
 #include "parcellaire.h"
 
-//SQ-24.11.2021 limites fois 100 temporairement pour les student de philippe
-int globSurfMax(300000);// en ha, surface max pour tout le shp
-int globSurfMaxOnePol(30000);// en ha, surface max pour un polygone
-int globVolMaxShp(1000000);// en ko // n'as pas l'air de fonctionner comme je le souhaite
+int globSurfMax(10000);// en ha, surface max pour tout le shp
+int globSurfMaxOnePol(1000);// en ha, surface max pour un polygone
+int globVolMaxShp(10000);// en ko // n'as pas l'air de fonctionner comme je le souhaite
+
 extern bool globTest;
 
 parcellaire::parcellaire(groupLayers *aGL, Wt::WApplication* app, statWindow *statW):mGL(aGL),centerX(0.0),centerY(0.0),mClientName(""),mName(""),mFullPath(""),m_app(app),fu(NULL),msg(NULL)
@@ -47,12 +47,19 @@ parcellaire::parcellaire(groupLayers *aGL, Wt::WApplication* app, statWindow *st
     downloadRasterBt->setWidth(200);
     downloadRasterBt->setInline(0);
     downloadRasterBt->disable();
+    addWidget(cpp14::make_unique<Wt::WBreak>());
+    anaOnAllPolygBt = addWidget(cpp14::make_unique<Wt::WPushButton>("Analyse sur tout les polygones"));
+    anaOnAllPolygBt->setStyleClass("btn btn-success");
+    anaOnAllPolygBt->setWidth(200);
+    anaOnAllPolygBt->setInline(0);
+    anaOnAllPolygBt->disable();
 
     fu->fileTooLarge().connect([=] { msg->setText("Le fichier est trop volumineux (max "+std::to_string(globVolMaxShp)+"Ko).");});
     fu->changed().connect(this,&parcellaire::fuChanged);
     fu->uploaded().connect(this,&parcellaire::upload);
 
     downloadRasterBt->clicked().connect(this,&parcellaire::downloadRaster);
+    anaOnAllPolygBt->clicked().connect(this,&parcellaire::anaAllPol);
     // ouu je pense que c'est mal, car si j'appui sur boutton télécharger les cartes, il me dis que toutes les cartes sont sélectionnées
     mContSelect4D->addWidget(std::unique_ptr<baseSelectLayers>(mGL->mSelectLayers));
 
@@ -349,6 +356,7 @@ void parcellaire::upload(){
     std::cout << "upload commence.. " ;
     //computeStatButton->disable();
     downloadRasterBt->disable();
+    anaOnAllPolygBt->disable();
     cleanShpFile();
     boost::filesystem::path p(fu->clientFileName().toUTF8()), p2(this->fu->spoolFileName());
     this->mClientName = p.stem().c_str();
@@ -378,6 +386,7 @@ void parcellaire::upload(){
                 hasValidShp=true;
                 //computeStatButton->enable();
                 downloadRasterBt->enable();
+                anaOnAllPolygBt->enable();
                 display();
                 mGL->mMap->setToolTip(tr("tooltipMap2"));
             }
@@ -520,7 +529,6 @@ void parcellaire::downloadRaster(){
     }
 }
 
-
 bool parcellaire::cropImWithShp(std::string inputRaster, std::string aOut){
     bool aRes(0);
     std::cout << " cropImWithShp" << std::endl;
@@ -591,8 +599,27 @@ void parcellaire::polygoneCadastre(std::string aFileGeoJson){
     if (computeGlobalGeom("geojson",0)){
         hasValidShp=true;
         downloadRasterBt->enable();
+        anaOnAllPolygBt->enable();
         display();
         mGL->mMap->setToolTip(tr("tooltipMap2"));
     }
+}
+
+void parcellaire::anaAllPol(){
+    // message box
+    auto messageBox =
+            addChild(Wt::cpp14::make_unique<Wt::WMessageBox>(
+                         "Analyse surfacique",
+                         tr("parcellaire.anaAllPol")
+                         ,
+                         Wt::Icon::Information,
+                         Wt::StandardButton::Ok));
+
+    messageBox->setModal(true);
+    messageBox->buttonClicked().connect([=] {
+        removeChild(messageBox);
+    });
+    messageBox->show();
+
 
 }

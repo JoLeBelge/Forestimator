@@ -102,10 +102,11 @@ public:
         if (Dico_RasterCategorie.find(aCode)!=Dico_RasterCategorie.end()){aRes=Dico_RasterCategorie.at(aCode);}
         return aRes;
     }
-
-
-
-
+    double RasterGain(std::string aCode){
+        double aRes(1);
+        if (Dico_RasterGain.find(aCode)!=Dico_RasterGain.end()){aRes=Dico_RasterGain.at(aCode);}
+        return aRes;
+    }
 
     std::string station(int aZbio, int aSt){
         std::string aRes("not found");
@@ -157,9 +158,10 @@ public:
     }
 
     // hauteur en mètres de la couche MNH2019 que j'ai convertie en 8bits
-    double H(int aVal){
+    double H(int aVal,double aGain=0.2){
         double aRes(0.0);
-        if (aVal<255 && aVal>0){aRes=aVal/5;}
+        if (aVal<255 && aVal>0){aRes=aVal*aGain;}
+        //std::cout << " hauteur DN " << aVal << " devient " << aRes << std::endl;
         return aRes;
     }
 
@@ -188,10 +190,8 @@ public:
 
     color getColor(std::string aCode){
         color aRes(0,0,0);
-        if (aCode.substr(0,1)=="#") {aRes=color(aCode);}
-        else {
-            if (colors.find(aCode)!=colors.end()){aRes=colors.at(aCode);}
-        }
+        if (colors.find(aCode)!=colors.end()){aRes=colors.at(aCode);
+        } else { std::cout << "color " << aCode << " not found"<< std::endl;}
         return aRes;
     }
     bool lay4Visu(std::string aLayerCode){
@@ -288,6 +288,7 @@ private:
     std::map<std::string,std::string>  Dico_RasterNomComplet;
     std::map<std::string,std::string>  Dico_RasterNomCourt;
     std::map<std::string,bool>  Dico_RasterExpert;
+    std::map<std::string,double>  Dico_RasterGain;
     // pour savoir de quelle table provient les info du raster, fichiersGIS ou layerApt, car j'ai besoin du nom de la table pour charger le dicitonnaire (pour l'instant)
     std::map<std::string,std::string>  Dico_RasterTable;
     // key ; code le la couche layer. value ; les infos nécessaire pour charger le wms

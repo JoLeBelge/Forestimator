@@ -32,12 +32,13 @@ bool InsideHexagonB(float x0, float y0, float x, float y, float d);
 */
 
 // modèle reçu de jérome le 9/06/2021
-extern double k1hdom, k2hdom, k1vha,k2vha,k3vha,k1gha, k1cmoy,k2cmoy,k3cmoy;
+// reçu update du modèle par Adrien. 1) seul le MNH 2018 est suffisament correct. 2) la résolution des couches d'entrainement du modèle est de 5m ET c'est un MNH percentile 95 (on applique donc le percentile à deux reprises)
+extern double k1hdom, k2hdom, k1vha,k2vha,k3vha, k1cmoy,k2cmoy;//,k3cmoyk1gha,;
 
 // pour les stat sur un MNH
 class statHdom {
 public:
-    statHdom(std::shared_ptr<layerBase> aLay, OGRGeometry * poGeom);
+    statHdom(std::shared_ptr<layerBase> aLay, OGRGeometry * poGeom,bool computeStat=1);
     ~statHdom(){
        for (OGRPolygon * pol: mVaddPol) OGRGeometryFactory::destroyGeometry(pol);
        mVaddPol.clear();
@@ -49,16 +50,17 @@ public:
     cDicoApt * Dico();
 
     void predictHdomHex();
-    void predictDendro();
+    void predictDendro(bool onlyHdomStat=1);
+    void prepareResult();
     //std::map<std::string, double> computeDistrH();
     std::vector<std::pair<std::string,double>> computeDistrH();
     // equivalent de getChart, conteneur qui sera affiché dans la page de statistique
-    std::unique_ptr<Wt::WContainerWidget> getResult();
+    std::unique_ptr<Wt::WContainerWidget> getResult(){ return std::move(mResult); }
 
     basicStat bshdom();
     basicStat bsDendro(std::string aVar="hdom");
 
-private:
+protected:
     std::shared_ptr<layerBase> mLay;
     //std::vector<double> mStat; // un vecteur ; une valeur par cellule d'un are.
     std::vector<std::unique_ptr<statCellule>> mStat;
@@ -68,26 +70,49 @@ private:
     // geometrie supplémentaire à afficher sur l'image statique
     std::vector<OGRPolygon *> mVaddPol;
     int mNbOccurence;
+    std::unique_ptr<WContainerWidget> mResult;
+};
+
+// pour les estimation dendrométriques : je fait une autre classe dérivée. Mais finalement il semblerai que deux classes entièrement séparée serai mieux, surtout à partir du moment ou l'estimation avec une seule cellule par polygone est appliquée (cad modèle pixel au lieu des modèles parcelle)
+// en fait statHom doit rester la classe mère car c'est cette classe qui est utilisée par le parcellaire pour la génération du résultat visuel
+class statDendro : public statHdom{
+public:
+    statDendro(std::shared_ptr<layerBase> aLay, OGRGeometry * poGeom);
+    void predictDendroPix();
+    bool deserveChart();
+    void prepareResult();
+    // equivalent de getChart, conteneur qui sera affiché dans la page de statistique
+    //std::unique_ptr<Wt::WContainerWidget> getResult();
 };
 
 class statCellule{
 public:
-    statCellule(std::vector<double> *aVHs, int aSurf);
-    void computeHdom(){mHdom=k1hdom*mQ95+k2hdom*pow(mQ95,2);}
+    statCellule(std::vector<double> *aVHs, int aSurf,bool computeDendro=0);
+    //void computeHdom(){mHdom=k1hdom*mQ95+k2hdom*pow(mQ95,2);}
+
+    // OLD OLD maintenant c'est une approche pixel
+    /*
     void computeGha(){ if (mHdom!=0.0){mGha=k1gha*mVHA/mHdom;} else {mGha=0.0;}
                      }
     void computeNha(){mNha=40000.0*M_PI*mGha/pow(mCmoy,2);
                      // peut me renvoyer inf par moment
                       if (isinf(mNha) | isnan(mNha)){mNha=0.0;}
                      }
-    void computeCmoy(){mCmoy=(k1cmoy*(mHdom-1.3)+k2cmoy*pow((mHdom-1.3),2))*pow(mMean/mQ95,k3cmoy);}
+    void computeCmoy(){mCmoy=(k1cmoy*(mHdom-1.3)+k2cmoy*pow((mHdom-1.3),2))*pow(mMean/mQ95,k3cmoy);}*/
+
+    //SI(Hpixi <= K2; 0; K1*(Hpixi-K2)^K3)
+
+
+
+    //void computeHdom(){
 
     void printDetail();
 
     double mVHA, mHdom, mGha, mCmoy, mNha;
+     int mSurf;
 private:
     double mMean,mQ95;
-    int mSurf;
+
 };
 
 class statCompo{

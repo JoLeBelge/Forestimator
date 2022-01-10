@@ -69,11 +69,12 @@ rasterFiles rasterFiles::getRasterfile(){
     return rasterFiles(mPathRaster,mCode);
 }
 
-layerBase::layerBase(std::string aCode,cDicoApt * aDico):rasterFiles(aDico->File(aCode),aCode),mDico(aDico),mExpert(0){
+layerBase::layerBase(std::string aCode,cDicoApt * aDico):rasterFiles(aDico->File(aCode),aCode),mDico(aDico),mExpert(0),mGain(1){
     if (globTest){std::cout << "layerBase constructor " << aCode << std::endl;}
     mNom=mDico->RasterNom(mCode);
     mNomCourt=mDico->RasterNomCourt(mCode);
     mExpert=mDico->RasterExpert(mCode);
+    mGain=mDico->RasterGain(mCode);
     mTypeCarte =str2TypeCarte(mDico->RasterType(mCode));
     mTypeVar =str2TypeVar(mDico->RasterVar(mCode));
     mType =str2TypeLayer(mDico->RasterCategorie(mCode));
@@ -88,6 +89,7 @@ layerBase::layerBase(std::shared_ptr<layerBase> aLB):rasterFiles(aLB->Dico()->Fi
     //std::cout << "layerBase constructor by copy " << aLB->Code() << std::endl;
     mDico=aLB->Dico();
     mExpert=aLB->Expert();
+    mGain=aLB->Gain();
     mNom=aLB->Nom();
     mNomCourt=aLB->NomCourt();
     mTypeCarte =aLB->TypeCart();
@@ -353,7 +355,8 @@ std::map<int,double> layerBase::computeStat2(OGRGeometry * poGeom){
 color layerBase::getColor(std::string aStrCode) const{
     int aCode(0);
     bool test(0);
-    color aRes(255,255,255);
+    //color aRes(255,255,255);
+    color aRes(0,0,0);
 
     for (auto & kv : mDicoVal){
         if(kv.second == aStrCode)
@@ -397,6 +400,7 @@ GDALDataset * rasterFiles::rasterizeGeom(OGRGeometry *poGeom){
         {
             std::cout << "je n'ai pas lu l'image " << getPathTif() << std::endl;
         } else {
+
             const char *pszWkt = mGDALDat->GetProjectionRef();
             OGRSpatialReference oSRS;
             oSRS.importFromWkt(&pszWkt);
@@ -452,6 +456,7 @@ GDALDataset * rasterFiles::rasterizeGeom(OGRGeometry *poGeom){
     }
 
     //}
+    //std::cout << " masq rasterized" << std::endl;
     return pRaster;
 }
 

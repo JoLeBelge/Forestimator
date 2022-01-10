@@ -63,6 +63,7 @@ public:
 
     //void downloadShp();
     void downloadRaster();
+    void anaAllPol();
     bool cropImWithShp(std::string inputRaster, std::string aOut);
 
     // une méthode pour utiliser le polygone issu d'une recherche sur le cadastre. Un seul polygone, format geojson - et les signaux qui vont avec pour la communicaiton avec widgetCadastre.
@@ -77,6 +78,7 @@ private:
     statWindow * mStatW;
     Wt::WFileUpload *fu;
     Wt::WPushButton  *downloadRasterBt;
+    Wt::WPushButton  *anaOnAllPolygBt;
     Wt::WApplication* m_app;
     Wt::WText * msg;
     groupLayers * mGL;
