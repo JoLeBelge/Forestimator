@@ -1,8 +1,9 @@
 #include "parcellaire.h"
 
-int globSurfMax(3000);// en ha, surface max pour tout le shp
-int globSurfMaxOnePol(300);// en ha, surface max pour un polygone
-int globVolMaxShp(10000);// en ko // n'as pas l'air de fonctionner comme je le souhaite
+//SQ-24.11.2021 limites fois 100 temporairement pour les student de philippe
+int globSurfMax(300000);// en ha, surface max pour tout le shp
+int globSurfMaxOnePol(30000);// en ha, surface max pour un polygone
+int globVolMaxShp(1000000);// en ko // n'as pas l'air de fonctionner comme je le souhaite
 extern bool globTest;
 
 parcellaire::parcellaire(groupLayers *aGL, Wt::WApplication* app, statWindow *statW):mGL(aGL),centerX(0.0),centerY(0.0),mClientName(""),mName(""),mFullPath(""),m_app(app),fu(NULL),msg(NULL)
