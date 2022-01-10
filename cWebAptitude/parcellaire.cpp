@@ -1,7 +1,7 @@
 #include "parcellaire.h"
 
-int globSurfMax(3000);// en ha, surface max pour tout le shp
-int globSurfMaxOnePol(300);// en ha, surface max pour un polygone
+int globSurfMax(10000);// en ha, surface max pour tout le shp
+int globSurfMaxOnePol(1000);// en ha, surface max pour un polygone
 int globVolMaxShp(10000);// en ko // n'as pas l'air de fonctionner comme je le souhaite
 extern bool globTest;
 
