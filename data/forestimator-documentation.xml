@@ -104,6 +104,23 @@ Juin 2020 : première version pour toutes les essences forestières.
 Les compensations dues à la situations topographiques sont de l'ordre du micro-climat. Une situation de risque ou une situation favorable influencera ainsi l'aptitude bioclimatique pour cette station. Cette aptitude bioclimatique "compensée" est ensuite confrontée à l'aptitude hydro-trophique afin de sélectionner la plus contraignante des deux.
 </message>
 
+<message id="dendro.projet">
+Les modèles dendrométriques ont été réalisés dans le cadre des actions 0.8 (Suivi scientifique de l'Inventaire permanent des ressources forestières de Wallonie
+(IPRFW)) et 0.9 (CARTOFOR : recherches appliquées pour le développement à l’échelle de la Wallonie de méthodologies innovantes permettant la caractérisation et le suivi de la structure, de la composition et de l’état sanitaire des peuplements forestiers) de l’action du plan quinquennal de recherches forestières 2019-2024 (coordination Pr Philippe Lejeune).
+</message>
+
+<message id="dendro.description">
+Les recherches réalisées portaient sur l’évaluation la qualité de modèles prédictifs des paramètres dendrométriques suivants: Hauteur dominante (HDOM), Volume par hectare (VHA) et Circonférence moyenne (CMOY). Ces modèles sont construits sur base du modèle numérique de hauteur photogrammétrique couvrant l’ensemble du territoire wallon acquis en 2018 à une résolution de 50 cm. Cette donnée initiale a été rééchantillonnée à une résolution de 5m, en sélectionnant au sein de chaque fenêtre de 5m le percentile 95 comme valeur finale. 
+Les modèles repris au sein de la Table 1 ont été ajustés sur base d’un réseau de 1051 placettes résineuses représentatif de la forêt résineuse wallonne (Figure 1). Ce réseau est essentiellement situé au sein de pessières (79%), de douglasaies (5%) et de mélézières (3%). Le reste du réseau étant constitué de mélanges divers ou de peuplements composés d’essences résineuses plus rares. La donnée de départ couvrant l’ensemble du territoire wallon, la plateforme peut donc en théorie fournir des valeurs pour ces paramètre en dehors de leur zone d’application. Il est donc essentiel que l’utilisateur restreigne par lui-même son usage aux seuls peuplements résineux. 
+<p>&nbsp;</p>
+            <p><img src="../img/dendroPLA.png" alt="carte Placettes" width="90%"/></p>
+            <p>réseau de placettes utilisé pour la calibration des modèles prédictifs</p>  
+</message>
+
+<message id="dendro.version">
+Janvier 2022
+</message>
+
 
 
 </messages>

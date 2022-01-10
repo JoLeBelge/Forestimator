@@ -21,7 +21,7 @@ statWindow::statWindow(groupLayers * aGL):mDico(aGL->Dico()), mApp(aGL->m_app),m
     // bouton export PDF
     if (0){
     createPdfBut = contTitre_->addWidget(cpp14::make_unique<WPushButton>("Export PDF"));
-    createPdfBut->clicked().connect(this,&statWindow::export2pdf);
+    //createPdfBut->clicked().connect(this,&statWindow::export2pdf);
     }
 
     mCarteGenCont = addWidget(cpp14::make_unique<WContainerWidget>());
@@ -59,6 +59,7 @@ void statWindow::genIndivCarteAndAptT(){
 
     for (statHdom * chart : mGL->ptrVLStatCont()) {
         if (chart->deserveChart()){
+            // je veux un comportement différent pour
                 add1layerStat(chart);
         }
     }

@@ -275,6 +275,10 @@ void groupLayers::computeStatGlob(OGRGeometry *poGeomGlobale){
             // calcul de Hdom
             mVLStatCont.push_back(new statHdom(l,poGeomGlobale));
 
+        } else if(l->Code()=="MNH2018P95"){
+            // calcul des params dendrométriques
+            mVLStatCont.push_back(new statDendro(l,poGeomGlobale));
+
         } else if(l->Code()=="COMPO"){
             // calcul des probabilités de présence pour les 9 sp.
             mCompo = std::make_unique<statCompo>(mDico,poGeomGlobale);
@@ -753,23 +757,33 @@ std::vector<std::shared_ptr<Layer>> groupLayers::getSelectedLayer4Download(){ret
 std::string getHtml(LayerMTD * lMTD){
 
     std::string aRes("");
-    aRes+="<h3><strong>"+lMTD->Nom()+"</strong></h3>";
-    if (lMTD->Projet()!=""){
-        std::string html="<h4>Projet </h4>" +lMTD->Projet();
-        if (isValidHtml(html)){aRes+=html;}
-    }
 
+
+    aRes+="<h3><strong>"+lMTD->Nom()+"</strong></h3>";
+
+    std::string proj(WString::tr(lMTD->code()+".projet").toUTF8());
+    if (proj.substr(0,2)=="??" && lMTD->Projet()!=""){
+        std::string proj="<h4>Projet </h4>" +lMTD->Projet();
+
+    }
+     if (proj!="" && isValidHtml(proj)){aRes+=proj;}
     // si il y a un message avec le bon id, on le prend
+
      std::string descr(WString::tr(lMTD->code()+".description").toUTF8());
      if (descr.substr(0,2)=="??"){
          descr="<h4>Description </h4>" + lMTD->Descr();
     }
-    if (descr!="" && isValidHtml(descr)){aRes+=descr;}
+     if (descr!="" && isValidHtml(descr)){aRes+=descr;}
 
-    if (lMTD->Vers()!=""){
-        std::string html="<h4>Version  </h4>" +lMTD->Vers();
-        if (isValidHtml(html)){aRes+=html;}
+    std::string version( "<h4>Version  </h4>" + WString::tr(lMTD->code()+".version").toUTF8());
+    if (version.substr(0,2)=="??"){
+        if (lMTD->Vers()!=""){
+
+        version="<h4>Version  </h4>" +lMTD->Vers();
+        }
     }
+    if (version!="" && isValidHtml(version)){aRes+=version;}
+
     // test si il existe un message dans le xml qui contient les logs de changements pour cette carte
     std::string logs(WString::tr(lMTD->code()+".logs").toUTF8());
     if (logs.substr(0,2)!="??"){

@@ -355,6 +355,7 @@ void parcellaire::upload(){
     std::cout << "upload commence.. " ;
     //computeStatButton->disable();
     downloadRasterBt->disable();
+    anaOnAllPolygBt->disable();
     cleanShpFile();
     boost::filesystem::path p(fu->clientFileName().toUTF8()), p2(this->fu->spoolFileName());
     this->mClientName = p.stem().c_str();
@@ -384,6 +385,7 @@ void parcellaire::upload(){
                 hasValidShp=true;
                 //computeStatButton->enable();
                 downloadRasterBt->enable();
+                anaOnAllPolygBt->enable();
                 display();
                 mGL->mMap->setToolTip(tr("tooltipMap2"));
             }
@@ -526,15 +528,6 @@ void parcellaire::downloadRaster(){
     }
 }
 
-void anaAllPol(){
-
-    // créer une ressource avec tout les résultats. xml
-
-
-
-}
-
-
 bool parcellaire::cropImWithShp(std::string inputRaster, std::string aOut){
     bool aRes(0);
     std::cout << " cropImWithShp" << std::endl;
@@ -605,10 +598,10 @@ void parcellaire::polygoneCadastre(std::string aFileGeoJson){
     if (computeGlobalGeom("geojson",0)){
         hasValidShp=true;
         downloadRasterBt->enable();
+        anaOnAllPolygBt->enable();
         display();
         mGL->mMap->setToolTip(tr("tooltipMap2"));
     }
-
 }
 
 void parcellaire::anaAllPol(){

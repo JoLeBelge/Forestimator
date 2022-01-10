@@ -184,6 +184,7 @@ public:
     TypeVar getTypeVar() const{return mTypeVar;}
     TypeLayer getCatLayer() const{return mType;}
     bool Expert() const{return mExpert;}
+    double Gain() const{return mGain;}
     void catSummary(){std::cout << "layerbase ; Code " << mCode << " , Nom " << mNom << ", raser " << mPathRaster << ", dictionnaire valeurs de " << mDicoVal.size() << " elements " << std::endl;}
 
     std::string EssCode() const{std::string aRes="";
@@ -240,6 +241,7 @@ protected:
     std::map<int, color> mDicoCol;
     // pour distinguer les cartes qui sont accèssible à tous ou pas
     bool mExpert;
+    double mGain;
 };
 
 class layerStat

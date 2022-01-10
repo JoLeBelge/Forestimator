@@ -36,11 +36,14 @@ cDicoApt::cDicoApt(std::string aBDFile):cdicoAptBase(aBDFile)
         char userName[20];
         getlogin_r(userName,sizeof(userName));
         std::string s(userName);
+        std::string sqlString2;
         // j'ai fini par organiser les fichiers GIS en deux tables ; une spécifique pour les cartes d'aptitudes
         for (std::string table : std::vector<std::string>{"layerApt","fichiersGIS"})
         {
+
             if (s=="lisein"){
                 SQLstring="SELECT Code,Dir2,Nom,Type,NomComplet,Categorie,TypeVar, expert, visu, stat,NomCourt,groupe FROM "+table+";";
+
             } else {
                 SQLstring="SELECT Code,Dir,Nom,Type,NomComplet,Categorie,TypeVar, expert, visu, stat ,NomCourt,groupe FROM "+table+";";
             }
@@ -100,6 +103,20 @@ cDicoApt::cDicoApt(std::string aBDFile):cdicoAptBase(aBDFile)
                 }
             }
             sqlite3_finalize(stmt);
+
+            sqlString2="SELECT gain, Code FROM "+table+" WHERE gain IS NOT NULL;";
+            sqlite3_prepare_v2( *db_, sqlString2.c_str(), -1, &stmt, NULL );
+            while(sqlite3_step(stmt) == SQLITE_ROW)
+            {
+                if (sqlite3_column_type(stmt, 0)!=SQLITE_NULL){
+                    double aA=sqlite3_column_double(stmt, 0 );
+                    std::string aB=std::string( (char *)sqlite3_column_text( stmt, 1 ) );
+                    Dico_RasterGain.emplace(std::make_pair(aB,aA));
+                    std::cout <<  " gain de " << aA << " pour couche " << aB << std::endl;
+                }
+            }
+            sqlite3_finalize(stmt);
+
             if (globTest){   std::cout << "Dico_WMS a " << Dico_WMS.size() << " elements " << std::endl;}
         }
 

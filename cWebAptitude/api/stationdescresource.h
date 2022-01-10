@@ -63,9 +63,10 @@ public:
                            "\nListe des traitements pour analyse surfacique (analyse spécifique sur une couche ou analyse standard sur plusieurs couches) \n"
                            "----------------------------------------------------------------------------------------------------\n"
                            "hdom \n"
-                           "dendro2018\n"
                            "compo\n"
                            "aptitude\n";
+
+         //"dendro2018\n"
 
          response.out() <<  "Liste des couches accessibles via API et leur url WMS\n"
                             "---------------------------\n";
