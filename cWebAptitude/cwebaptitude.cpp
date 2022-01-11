@@ -66,8 +66,9 @@ cWebAptitude::cWebAptitude(AuthApplication *app, Auth::AuthWidget* authWidget_)
     // main stack : DOC and MAP and RESULTS divs
     top_stack  = this->addWidget(Wt::cpp14::make_unique<Wt::WStackedWidget>());
     top_stack->setMargin(0);
-    top_stack->setHeight("100%");
+    //top_stack->setHeight("100%");
     top_stack->setOverflow(Overflow::Auto);
+    top_stack->addStyleClass("stackfit");
     // load DOC page
     top_stack->addNew<presentationPage>(mDico);
     // load MAP page
