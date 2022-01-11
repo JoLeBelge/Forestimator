@@ -262,6 +262,10 @@ display:block;
 	transition: all 0.3s linear;
 }
 
+.stackfit {
+	height: calc(100% - 60px);
+}
+
 .unfolder { display: none; }
 
 .toggle-label {
