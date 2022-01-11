@@ -113,7 +113,7 @@ std::string stationDescResource::geoservice(std::string aTool,std::string aArgs,
                     }
                 }
                 OGRGeometryFactory::destroyGeometry(pol);
-            } else {aResponse="Veillez utiliser le format wkt pour le polygone (projeté en BL72, epsg 31370). La géométrie du polygone doit être valide et sa surface de maximum "+std::to_string(globMaxSurf)+"ha";}
+            } else {aResponse="Veillez utiliser le format wkt pour le polygone (projeté en BL72, epsg 31370). La géométrie du polygone (ou du multipolygone) doit être valide et sa surface de maximum "+std::to_string(globMaxSurf)+"ha";}
 
     } else {aResponse="arguments pour traitement 'Aptitude' ; vous avez rentré une valeur mais qui semble fausse. Entrez une liste d'accronyme d'essences séparées par une virgule, ou une liste de carte d'aptitude\n";}
 
@@ -144,12 +144,14 @@ OGRGeometry * stationDescResource::checkPolyg(std::string aPolyg){
     OGRErr err=OGRGeometryFactory::createFromWkt(aPolyg.c_str(),NULL,&pol);
     if(globTest){std::cout << "createFromWkt OGR error : " << err << std::endl;}
     //std::cout << "src " << src.exportToProj4();
-    if (err==OGRERR_NONE && pol!=NULL && pol->IsValid()){} else {OGRGeometryFactory::destroyGeometry(pol);}//aRes=1;}
-    if (pol!=NULL) {
+    // isValid() fonctionne mais par contre le destroyGeom doit être suivi d'un pol=NULL sinon bug
+    if (err==OGRERR_NONE && pol!=NULL && pol->IsValid()){
         int aSurfha=OGR_G_Area(pol)/10000;
-        if (aSurfha>globMaxSurf){OGRGeometryFactory::destroyGeometry(pol);}
-    }
+        if (aSurfha>globMaxSurf){OGRGeometryFactory::destroyGeometry(pol);pol=NULL;}
+    } else {OGRGeometryFactory::destroyGeometry(pol);pol=NULL;}//aRes=1;}
+
     //if (aRes==0){mResponse="Veillez utiliser le format wkt pour le polygone (projeté en BL72, epsg 31370).";}//Wt::WText::tr("api.msg.error.polyg1").toUTF8();}}
+    if(globTest){std::cout << "checkPolyg API done "<< std::endl;}
     return pol;
 }
 
