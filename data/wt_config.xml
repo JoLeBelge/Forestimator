@@ -84,6 +84,7 @@
             <user-agent>.*PetalBot.*</user-agent>
             <user-agent>.*Barkrawler.*</user-agent>
             <user-agent>.*barkrowler.*</user-agent>
+            <user-agent>.*Barkrowler.*</user-agent>
 		</user-agents>
 		
 		<head-matter user-agent=".*Googlebot.*">

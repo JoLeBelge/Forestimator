@@ -32,13 +32,13 @@ bool InsideHexagonB(float x0, float y0, float x, float y, float d);
 */
 
 // modèle reçu de jérome le 9/06/2021
-// reçu update du modèle par Adrien. 1) seul le MNH 2018 est suffisament correct. 2) la résolution des couches d'entrainement du modèle est de 5m ET c'est un MNH percentile 95 (on applique donc le percentile à deux reprises)
+// reçu update du modèle par Adrien. 1) seul le MNH 2018 est suffisament correct (selon philippe). 2) la résolution des couches d'entrainement du modèle est de 5m ET c'est un MNH percentile 95 (on applique donc le percentile à deux reprises) 3) des modèles "pixels" sont ajustés, plus facile d'utilisation que les modèles "placettes (=objectif premier de la classe cellulle)
 extern double k1hdom, k2hdom, k1vha,k2vha,k3vha, k1cmoy,k2cmoy;//,k3cmoyk1gha,;
 
 // pour les stat sur un MNH
 class statHdom {
 public:
-    statHdom(std::shared_ptr<layerBase> aLay, OGRGeometry * poGeom,bool computeStat=1);
+    statHdom(std::shared_ptr<layerBase> aLay, OGRGeometry * poGeom,bool computeStat=1,bool api=0);
     ~statHdom(){
        for (OGRPolygon * pol: mVaddPol) OGRGeometryFactory::destroyGeometry(pol);
        mVaddPol.clear();
@@ -77,12 +77,18 @@ protected:
 // en fait statHom doit rester la classe mère car c'est cette classe qui est utilisée par le parcellaire pour la génération du résultat visuel
 class statDendro : public statHdom{
 public:
-    statDendro(std::shared_ptr<layerBase> aLay, OGRGeometry * poGeom);
+    statDendro(std::shared_ptr<layerBase> aLay, OGRGeometry * poGeom,bool api=0);
     void predictDendroPix();
     bool deserveChart();
     void prepareResult();
     // equivalent de getChart, conteneur qui sera affiché dans la page de statistique
     //std::unique_ptr<Wt::WContainerWidget> getResult();
+
+    std::string getNha();
+    std::string getVha();
+    std::string getGha();
+    std::string getHdom();
+    std::string getCmoy();
 };
 
 class statCellule{

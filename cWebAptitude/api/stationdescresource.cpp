@@ -1,9 +1,12 @@
 #include "stationdescresource.h"
 
 int globMaxSurf(200);
+std::string nameDendroTool("dendro2018");
+extern bool globTest;
 
 std::string stationDescResource::geoservice(std::string aTool,std::string aArgs,std::string aPolyg){
 
+    if (globTest) {std::cout << "Forestimator API " << aTool << " aArgs " << aArgs << " polygon " << aPolyg << std::endl;}
     // je suis pas dans une appli Wt donc je n'ai pas accès au docroot malheureusement...
     //Wt::WMessageResourceBundle msg();
     //msg.use(docRoot() + "/forestimator");
@@ -13,99 +16,106 @@ std::string stationDescResource::geoservice(std::string aTool,std::string aArgs,
     if (checkTool(aTool)){
 
         // outils différent, car je teste janvier 2022 1) la réponse en xml et 2) l'api sur tout un shp
-        if(aTool=="dendro2018"){
+        //if(aTool=="dendro2018"){
 
-        // finalement je vais me rabattre sur l'interface graphique de forestimator, car c'est le seul moyen que j'ai de facilement uploader un shp. Je pourrais le faire en envoyer par ex un KML dans une requete, mais c'est assez difficile de rester propre. et l'upload de fichier sans passer par fileupload, je n'y parviens pas.
+            // finalement je vais me rabattre sur l'interface graphique de forestimator, car c'est le seul moyen que j'ai de facilement uploader un shp. Je pourrais le faire en envoyer par ex un KML dans une requete, mais c'est assez difficile de rester propre. et l'upload de fichier sans passer par fileupload, je n'y parviens pas.
 
-        } else {
+        //} else {
 
-        OGRGeometry * pol=checkPolyg(aPolyg);
-        if (pol!=NULL){
-            if (aTool=="hdom"){
-                std::vector<std::string> VMNH=parseHdomArg(aArgs);
-                if (VMNH.size()==0){aResponse="arguments pour traitement 'hdom' ; vous avez rentré une valeur mais qui semble fausse. Entrez une liste de code de couche MNH séparées par une virgule\n";
-                }else{
-                    aResponse+="code_mnh;moy;cv;max;min;nb\n";
-                    for (std::string code : VMNH){
+            OGRGeometry * pol=checkPolyg(aPolyg);
+            if (pol!=NULL){
+                if (aTool=="hdom"){
+                    std::vector<std::string> VMNH=parseHdomArg(aArgs);
+                    if (VMNH.size()==0){aResponse="arguments pour traitement 'hdom' ; vous avez rentré une valeur mais qui semble fausse. Entrez une liste de code de couche MNH séparées par une virgule\n";
+                    }else{
+                        aResponse+="code_mnh;moy;cv;max;min;nb\n";
+                        for (std::string code : VMNH){
+                            std::shared_ptr<layerBase> l=mDico->getLayerBase(code);
+                            statHdom stat(l,pol,1,1);
+                            basicStat bs= stat.bshdom(); // a modifier quand j'aurai fini d'encoder tout les modèles de Jérome
+                            aResponse+=l->Code()+";"+bs.getMean()+";"+bs.getCV()+";"+bs.getMax()+";"+bs.getMin()+";"+bs.getNb()+"\n";
+                            //aResponse+="pas disponible pour le moment\n";
+                        }
+                    }
+                } else if (aTool==nameDendroTool){
+                    if (globTest) {std::cout << "dendro 2018 api " << std::endl;}
+                    aResponse+="hdom;vha;gha;nha;cmoy\n";
+                    std::shared_ptr<layerBase> l=mDico->getLayerBase("MNH2018P95");
+                    statDendro stat(l,pol,1);
+                    aResponse+=stat.getHdom()+";"+stat.getVha()+";"+stat.getGha()+";"+stat.getNha()+";"+stat.getCmoy()+"\n";
+                }else if (aTool=="compo"){
+                    std::vector<std::string> VCOMPO=parseCompoArg(aArgs);
+                    if (VCOMPO.size()==0){aResponse="arguments pour traitement 'compo' ; vous avez rentré une valeur mais qui semble fausse. Entrez une liste de code de couche de probabilité de présence d'une essence forestière, séparées par une virgule\n";
+                    }else{
+                        std::vector<std::shared_ptr<layerBase>> Vlay;
+                        for (std::string code : VCOMPO){
+                            Vlay.push_back(mDico->getLayerBase(code));
+                        }
+                        statCompo stat(Vlay,mDico,pol);
+                        aResponse+=stat.getAPIresult();
+                    }
+
+                }else if(aTool=="aptitude"){
+                    std::vector<std::string> VCApt=parseAptArg(aArgs);
+                    aResponse+="code_es;type;O;T;TE;E;I\n";
+                    for (std::string code : VCApt){
                         std::shared_ptr<layerBase> l=mDico->getLayerBase(code);
-                        statHdom stat(l,pol);
-                        basicStat bs= stat.bshdom(); // a modifier quand j'aurai fini d'encoder tout les modèles de Jérome
-                        aResponse+=l->Code()+";"+bs.getMean()+";"+bs.getCV()+";"+bs.getMax()+";"+bs.getMin()+";"+bs.getNb()+"\n";
-                        //aResponse+="pas disponible pour le moment\n";
+                        std::map<int,double> stat=l->computeStat2(pol);
+                        aResponse+=l->EssCode()+";"+l->getCatLayerStr();
+                        std::map<int,double> statSimp=simplifieAptStat(stat);
+                        for (auto kv:statSimp){
+                            aResponse+=";"+roundDouble(kv.second);
+                        }
+                        aResponse+="\n";
                     }
-                }
-            }else if (aTool=="compo"){
-                std::vector<std::string> VCOMPO=parseCompoArg(aArgs);
-                if (VCOMPO.size()==0){aResponse="arguments pour traitement 'compo' ; vous avez rentré une valeur mais qui semble fausse. Entrez une liste de code de couche de probabilité de présence d'une essence forestière, séparées par une virgule\n";
-                }else{
-                    std::vector<std::shared_ptr<layerBase>> Vlay;
-                    for (std::string code : VCOMPO){
-                        Vlay.push_back(mDico->getLayerBase(code));
+
+
+                } else {
+                    if (globTest) {std::cout << " API sur layerBase " << std::endl;}
+
+                    std::shared_ptr<layerBase> l=mDico->getLayerBase(aTool);
+                    // analyse surfacique ; basic stat pour les var continue
+                    switch (l->getTypeVar()) {
+                    case TypeVar::Continu:{
+                        std::cout << " api compute basic stat on polyg " << std::endl;
+                        basicStat stat=l->computeBasicStatOnPolyg(pol);
+                        std::cout << " done " << std::endl;
+                        aResponse+="mean;"+stat.getMean()+"\n";
+                        aResponse+="max;"+stat.getMax()+"\n";
+                        aResponse+="sd;"+stat.getSd()+"\n";
+                        break;
                     }
-                    statCompo stat(Vlay,mDico,pol);
-                    aResponse+=stat.getAPIresult();
-                }
-
-            }else if(aTool=="aptitude"){
-                std::vector<std::string> VCApt=parseAptArg(aArgs);
-                aResponse+="code_es;type;O;T;TE;E;I\n";
-                for (std::string code : VCApt){
-                    std::shared_ptr<layerBase> l=mDico->getLayerBase(code);
-                    std::map<int,double> stat=l->computeStat2(pol);
-                    aResponse+=l->EssCode()+";"+l->getCatLayerStr();
-                    std::map<int,double> statSimp=simplifieAptStat(stat);
-                    for (auto kv:statSimp){
-                        aResponse+=";"+roundDouble(kv.second);
-                    }
-                    aResponse+="\n";
-                }
-
-
-            } else {
-
-                std::shared_ptr<layerBase> l=mDico->getLayerBase(aTool);
-                // analyse surfacique ; basic stat pour les var continue
-                switch (l->getTypeVar()) {
-                case TypeVar::Continu:{
-                    std::cout << " api compute basic stat on polyg " << std::endl;
-                    basicStat stat=l->computeBasicStatOnPolyg(pol);
-                    std::cout << " done " << std::endl;
-                    aResponse+="mean;"+stat.getMean()+"\n";
-                    aResponse+="max;"+stat.getMax()+"\n";
-                    aResponse+="sd;"+stat.getSd()+"\n";
-                    break;
-                }
-                case TypeVar::Classe:{
-                    /*std::cout << " api compute valeur majoritaire " << std::endl;
+                    case TypeVar::Classe:{
+                        /*std::cout << " api compute valeur majoritaire " << std::endl;
                 std::pair<int,double> p= l->valMajoritaire(pol);
                 aResponse+="maj;"+std::to_string(p.first)+"\n";
                 aResponse+="pct;"+roundDouble(p.second,0)+"\n";
                 */
-                    std::map<int,double> stat=l->computeStat2(pol);
-                    std::string aL1,aL2;
-                    bool test(1);
-                    for (auto kv:stat){
-                        if (test){
-                            aL2=std::to_string(kv.first);
-                            aL1=roundDouble(kv.second);
-                            test=0;
-                        }else{
-                            aL2+=";"+std::to_string(kv.first);
-                            aL1+=";"+roundDouble(kv.second);
+                        std::map<int,double> stat=l->computeStat2(pol);
+                        std::string aL1,aL2;
+                        bool test(1);
+                        for (auto kv:stat){
+                            if (test){
+                                aL2=std::to_string(kv.first);
+                                aL1=roundDouble(kv.second);
+                                test=0;
+                            }else{
+                                aL2+=";"+std::to_string(kv.first);
+                                aL1+=";"+roundDouble(kv.second);
+                            }
                         }
-                    }
-                    aResponse+=aL2+"\n"+aL1+"\n";
+                        aResponse+=aL2+"\n"+aL1+"\n";
 
-                    break;
+                        break;
+                    }
+                    default:
+                        break;
+                    }
                 }
-                default:
-                    break;
-                }
-            }
-            OGRGeometryFactory::destroyGeometry(pol);
-        } else {aResponse="Veillez utiliser le format wkt pour le polygone (projeté en BL72, epsg 31370). La géométrie du polygone doit être valide et sa surface de maximum "+std::to_string(globMaxSurf)+"ha";}
-    }
-        } else {aResponse="arguments pour traitement 'Aptitude' ; vous avez rentré une valeur mais qui semble fausse. Entrez une liste d'accronyme d'essences séparées par une virgule, ou une liste de carte d'aptitude\n";}
+                OGRGeometryFactory::destroyGeometry(pol);
+            } else {aResponse="Veillez utiliser le format wkt pour le polygone (projeté en BL72, epsg 31370). La géométrie du polygone doit être valide et sa surface de maximum "+std::to_string(globMaxSurf)+"ha";}
+
+    } else {aResponse="arguments pour traitement 'Aptitude' ; vous avez rentré une valeur mais qui semble fausse. Entrez une liste d'accronyme d'essences séparées par une virgule, ou une liste de carte d'aptitude\n";}
 
     return aResponse;
 }
@@ -132,7 +142,7 @@ OGRGeometry * stationDescResource::checkPolyg(std::string aPolyg){
      std::cout << "OGR error setwellKnownGeog : " << err << std::endl; // failure! je sais pas pk
     */
     OGRErr err=OGRGeometryFactory::createFromWkt(aPolyg.c_str(),NULL,&pol);
-    std::cout << "createFromWkt OGR error : " << err << std::endl;
+    if(globTest){std::cout << "createFromWkt OGR error : " << err << std::endl;}
     //std::cout << "src " << src.exportToProj4();
     if (err==OGRERR_NONE && pol!=NULL && pol->IsValid()){} else {OGRGeometryFactory::destroyGeometry(pol);}//aRes=1;}
     if (pol!=NULL) {

@@ -14,6 +14,8 @@
 #include "statHdomCompo.h"
 #include <Wt/WFileUpload.h>
 
+extern std::string nameDendroTool;
+
 // voir aussi te-benchmark/ example
 
 // problème avec ces ressources dynamiques, c'est que je passe par des membres (mParamTool, mResponse) et ceux-ci gardent leurs états dune requête à lautre, dun utilisateur à lautre
@@ -62,11 +64,12 @@ public:
                            "---------------------------\n\n"
                            "\nListe des traitements pour analyse surfacique (analyse spécifique sur une couche ou analyse standard sur plusieurs couches) \n"
                            "----------------------------------------------------------------------------------------------------\n"
-                           "hdom \n"
+                           "hdom\n"
                            "compo\n"
-                           "aptitude\n";
+                           "aptitude\n"
+                           +nameDendroTool+"\n";
 
-         //"dendro2018\n"
+
 
          response.out() <<  "Liste des couches accessibles via API et leur url WMS\n"
                             "---------------------------\n";
@@ -96,7 +99,7 @@ public:
 
      //response.out() << "Réponse\n" <<"----------------------\n";
 
-     if (aTool=="dendro2018") {response.addHeader("Content-Type","text/plain; charset=utf-8");}else {
+     if (aTool==nameDendroTool) {response.addHeader("Content-Type","text/plain; charset=utf-8");}else {
      response.addHeader("Content-Type","text/plain; charset=utf-8");
      }
 

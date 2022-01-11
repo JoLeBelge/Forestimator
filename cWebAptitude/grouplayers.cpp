@@ -762,9 +762,10 @@ std::string getHtml(LayerMTD * lMTD){
     aRes+="<h3><strong>"+lMTD->Nom()+"</strong></h3>";
 
     std::string proj(WString::tr(lMTD->code()+".projet").toUTF8());
-    if (proj.substr(0,2)=="??" && lMTD->Projet()!=""){
-        std::string proj="<h4>Projet </h4>" +lMTD->Projet();
-
+    if (proj.substr(0,2)=="??"){
+        if (lMTD->Projet()!=""){
+        proj="<h4>Projet </h4>" +lMTD->Projet();
+        } else {proj="";}
     }
      if (proj!="" && isValidHtml(proj)){aRes+=proj;}
     // si il y a un message avec le bon id, on le prend
@@ -775,13 +776,14 @@ std::string getHtml(LayerMTD * lMTD){
     }
      if (descr!="" && isValidHtml(descr)){aRes+=descr;}
 
-    std::string version( "<h4>Version  </h4>" + WString::tr(lMTD->code()+".version").toUTF8());
+    std::string version(WString::tr(lMTD->code()+".version").toUTF8());
     if (version.substr(0,2)=="??"){
         if (lMTD->Vers()!=""){
 
         version="<h4>Version  </h4>" +lMTD->Vers();
-        }
-    }
+        } else{ version="";}
+    } else { version="<h4>Version  </h4>"+version;}
+
     if (version!="" && isValidHtml(version)){aRes+=version;}
 
     // test si il existe un message dans le xml qui contient les logs de changements pour cette carte

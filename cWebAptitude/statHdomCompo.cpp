@@ -17,23 +17,23 @@ double k1cmoy(2.789623),k2cmoy(0.06288);//,k3cmoy(-0.199079);
 extern bool globTest;
 
 
-statHdom::statHdom(std::shared_ptr<layerBase> aLay, OGRGeometry * poGeom, bool computeStat):mLay(aLay),mGeom(poGeom)
+statHdom::statHdom(std::shared_ptr<layerBase> aLay, OGRGeometry * poGeom, bool computeStat, bool api):mLay(aLay),mGeom(poGeom)
 {
     //std::cout << "statHdom::statHdom" << std::endl;
 
     //predictHdomHex(); // va calculer mStat et mVaddPol qui sont les hexagones à dessiner sur l'image statique
     if (computeStat){predictDendro();
     mDistFrequ=computeDistrH();
-    prepareResult();
+    if (!api){prepareResult();}
     }
 }
 
-statDendro::statDendro(std::shared_ptr<layerBase> aLay, OGRGeometry * poGeom):statHdom(aLay,poGeom,0)
+statDendro::statDendro(std::shared_ptr<layerBase> aLay, OGRGeometry * poGeom, bool api):statHdom(aLay,poGeom,0)
 {
-
     std::cout << "statDendro" << std::endl;
     predictDendroPix();
-    prepareResult();
+    // si c'est pas le mode api, on prépare les résultats graphiques pour affichage
+    if (!api){prepareResult();}
 }
 
 // le probleme des map c'est qu'elles sont ordonnées automatiquement avec leur clé, je veux pas.
@@ -988,27 +988,33 @@ void statDendro::prepareResult(){
 
     int c(1);
     table->elementAt(c, 0)->addWidget(cpp14::make_unique<WText>("Hdom moyen"));
-    table->elementAt(c, 1)->addWidget(cpp14::make_unique<WText>(roundDouble(mStat.at(0)->mHdom)+ " m"));
+    table->elementAt(c, 1)->addWidget(cpp14::make_unique<WText>(getHdom()+ " m"));
     table->elementAt(c, 1)->setPadding(10,Wt::Side::Left);
     c++;
     table->elementAt(c, 0)->addWidget(cpp14::make_unique<WText>("VHA moyen"));
-    table->elementAt(c, 1)->addWidget(cpp14::make_unique<WText>(roundDouble(mStat.at(0)->mVHA)+ " m3/ha"));
+    table->elementAt(c, 1)->addWidget(cpp14::make_unique<WText>(getVha()+ " m3/ha"));
     table->elementAt(c, 1)->setPadding(10,Wt::Side::Left);
     c++;
     table->elementAt(c, 0)->addWidget(cpp14::make_unique<WText>("NHA moyen"));
 
-    table->elementAt(c, 1)->addWidget(cpp14::make_unique<WText>(roundDouble(mStat.at(0)->mNha)+ " tige/ha"));
+    table->elementAt(c, 1)->addWidget(cpp14::make_unique<WText>(getNha()+ " tige/ha"));
     table->elementAt(c, 1)->setPadding(10,Wt::Side::Left);
     c++;
     table->elementAt(c, 0)->addWidget(cpp14::make_unique<WText>("GHA moyen"));
-    table->elementAt(c, 1)->addWidget(cpp14::make_unique<WText>(roundDouble(mStat.at(0)->mGha)+ " m2/ha"));
+    table->elementAt(c, 1)->addWidget(cpp14::make_unique<WText>(getGha()+ " m2/ha"));
     table->elementAt(c, 1)->setPadding(10,Wt::Side::Left);
     c++;
     table->elementAt(c, 0)->addWidget(cpp14::make_unique<WText>("Cmoy moyen"));
-    table->elementAt(c, 1)->addWidget(cpp14::make_unique<WText>(roundDouble(mStat.at(0)->mCmoy)+ " cm"));
+    table->elementAt(c, 1)->addWidget(cpp14::make_unique<WText>(getCmoy()+ " cm"));
     table->elementAt(c, 1)->setPadding(10,Wt::Side::Left);
     c++;
 
     //return std::move(aRes);
 
 }
+
+std::string statDendro::getNha(){if (mStat.size()==1){return roundDouble(mStat.at(0)->mNha);}else{return "failure";}}
+std::string statDendro::getVha(){if (mStat.size()==1){return roundDouble(mStat.at(0)->mVHA);}else{return "failure";}}
+std::string statDendro::getGha(){if (mStat.size()==1){return roundDouble(mStat.at(0)->mGha);}else{return "failure";}}
+std::string statDendro::getHdom(){if (mStat.size()==1){return roundDouble(mStat.at(0)->mHdom);}else{return "failure";}}
+std::string statDendro::getCmoy(){if (mStat.size()==1){return roundDouble(mStat.at(0)->mCmoy);}else{return "failure";}}
