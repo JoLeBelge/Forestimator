@@ -1,10 +1,10 @@
-#include "stationdescresource.h"
+#include "cdicoapt.h"
 
 int globMaxSurf(200);
 std::string nameDendroTool("dendro2018");
 extern bool globTest;
 
-std::string stationDescResource::geoservice(std::string aTool,std::string aArgs,std::string aPolyg){
+std::string cDicoApt::geoservice(std::string aTool,std::string aArgs,std::string aPolyg){
 
     if (globTest) {std::cout << "Forestimator API " << aTool << " aArgs " << aArgs << " polygon " << aPolyg << std::endl;}
     // je suis pas dans une appli Wt donc je n'ai pas accès au docroot malheureusement...
@@ -30,7 +30,7 @@ std::string stationDescResource::geoservice(std::string aTool,std::string aArgs,
                     }else{
                         aResponse+="code_mnh;moy;cv;max;min;nb\n";
                         for (std::string code : VMNH){
-                            std::shared_ptr<layerBase> l=mDico->getLayerBase(code);
+                            std::shared_ptr<layerBase> l=getLayerBase(code);
                             statHdomBase stat(l,pol,1);
                             basicStat bs= stat.bshdom(); // a modifier quand j'aurai fini d'encoder tout les modèles de Jérome
                             aResponse+=l->Code()+";"+bs.getMean()+";"+bs.getCV()+";"+bs.getMax()+";"+bs.getMin()+";"+bs.getNb()+"\n";
@@ -40,7 +40,7 @@ std::string stationDescResource::geoservice(std::string aTool,std::string aArgs,
                 } else if (aTool==nameDendroTool){
                     if (globTest) {std::cout << "dendro 2018 api " << std::endl;}
                     aResponse+="hdom;vha;gha;nha;cmoy\n";
-                    std::shared_ptr<layerBase> l=mDico->getLayerBase("MNH2018P95");
+                    std::shared_ptr<layerBase> l=getLayerBase("MNH2018P95");
                     statDendroBase stat(l,pol,1);
                     aResponse+=stat.getHdom()+";"+stat.getVha()+";"+stat.getGha()+";"+stat.getNha()+";"+stat.getCmoy()+"\n";
                /* }else if (aTool=="compo"){
@@ -59,7 +59,7 @@ std::string stationDescResource::geoservice(std::string aTool,std::string aArgs,
                     std::vector<std::string> VCApt=parseAptArg(aArgs);
                     aResponse+="code_es;type;O;T;TE;E;I\n";
                     for (std::string code : VCApt){
-                        std::shared_ptr<layerBase> l=mDico->getLayerBase(code);
+                        std::shared_ptr<layerBase> l=getLayerBase(code);
                         std::map<int,double> stat=l->computeStat2(pol);
                         aResponse+=l->EssCode()+";"+l->getCatLayerStr();
                         std::map<int,double> statSimp=simplifieAptStat(stat);
@@ -73,7 +73,7 @@ std::string stationDescResource::geoservice(std::string aTool,std::string aArgs,
                 } else {
                     if (globTest) {std::cout << " API sur layerBase " << std::endl;}
 
-                    std::shared_ptr<layerBase> l=mDico->getLayerBase(aTool);
+                    std::shared_ptr<layerBase> l=getLayerBase(aTool);
                     // analyse surfacique ; basic stat pour les var continue
                     switch (l->getTypeVar()) {
                     case TypeVar::Continu:{
@@ -120,10 +120,10 @@ std::string stationDescResource::geoservice(std::string aTool,std::string aArgs,
     return aResponse;
 }
 
-bool stationDescResource::checkTool(std::string aTool){
+bool cDicoApt::checkTool(std::string aTool){
     bool aRes(0);
 
-    if (mDico->hasLayerBase(aTool)){ aRes=1;}
+    if (hasLayerBase(aTool)){ aRes=1;}
     // traitements qui ne sont pas des cartes
     if (aTool=="hdom"   | aTool=="aptitude" | aTool=="dendro2018" ){ aRes=1;} //| aTool=="compo"
 
@@ -132,7 +132,7 @@ bool stationDescResource::checkTool(std::string aTool){
     return aRes;
 }
 
-OGRGeometry * stationDescResource::checkPolyg(std::string aPolyg){
+OGRGeometry * cDicoApt::checkPolyg(std::string aPolyg){
     //bool aRes(0);
     OGRGeometry * pol=NULL;
     // lecture du polygone
@@ -155,14 +155,14 @@ OGRGeometry * stationDescResource::checkPolyg(std::string aPolyg){
     return pol;
 }
 
-std::vector<std::string> stationDescResource::parseAptArg(std::string aArgs){
+std::vector<std::string> cDicoApt::parseAptArg(std::string aArgs){
     std::vector<std::string> aRes;
     if (aArgs==""){ aRes={"HE_FEE","CS_FEE","CP_FEE","EP_FEE","DO_FEE","ME_FEE"};} else{
         std::vector<std::string> aVAptCarte;
         boost::split( aVAptCarte,aArgs,boost::is_any_of(","),boost::token_compress_on);
         for (std::string code: aVAptCarte){
-            if (mDico->accroEss2Nom(code)!=""){ code=code+"_FEE";}
-            if (mDico->hasLayerBase(code) & (mDico->getLayerBase(code)->getCatLayer()==TypeLayer::FEE | mDico->getLayerBase(code)->getCatLayer()==TypeLayer::CS)){
+            if (accroEss2Nom(code)!=""){ code=code+"_FEE";}
+            if (hasLayerBase(code) & (getLayerBase(code)->getCatLayer()==TypeLayer::FEE | getLayerBase(code)->getCatLayer()==TypeLayer::CS)){
                 aRes.push_back(code);
             }
         }
@@ -171,26 +171,26 @@ std::vector<std::string> stationDescResource::parseAptArg(std::string aArgs){
     return aRes;
 }
 
-std::vector<std::string> stationDescResource::parseHdomArg(std::string aArgs){
+std::vector<std::string> cDicoApt::parseHdomArg(std::string aArgs){
     std::vector<std::string> aRes;
     if (aArgs==""){ aRes={"MNH2019"};} else{
         std::vector<std::string> aV;
         boost::split( aV,aArgs,boost::is_any_of(","),boost::token_compress_on);
         for (std::string code: aV){
-            if (mDico->hasLayerBase(code) & (mDico->getLayerBase(code)->TypeCart()==TypeCarte::MNH)){
+            if (hasLayerBase(code) & (getLayerBase(code)->TypeCart()==TypeCarte::MNH)){
                 aRes.push_back(code);
             }
         }
     }
     return aRes;
 }
-std::vector<std::string> stationDescResource::parseCompoArg(std::string aArgs){
+std::vector<std::string> cDicoApt::parseCompoArg(std::string aArgs){
     std::vector<std::string> aRes;
     if (aArgs==""){ aRes={"COMPO1","COMPO2","COMPO3","COMPO4","COMPO5","COMPO6","COMPO7","COMPO8","COMPO9"};} else{
         std::vector<std::string> aV;
         boost::split( aV,aArgs,boost::is_any_of(","),boost::token_compress_on);
         for (std::string code: aV){
-            if (mDico->hasLayerBase(code) & (mDico->getLayerBase(code)->TypeCart()==TypeCarte::Composition)){
+            if (hasLayerBase(code) & (getLayerBase(code)->TypeCart()==TypeCarte::Composition)){
                 aRes.push_back(code);
             }
         }
@@ -198,12 +198,12 @@ std::vector<std::string> stationDescResource::parseCompoArg(std::string aArgs){
     return aRes;
 }
 
-std::map<int,double> stationDescResource::simplifieAptStat(std::map<int,double> aStat){
+std::map<int,double> cDicoApt::simplifieAptStat(std::map<int,double> aStat){
     std::map<int,double> aRes;
     for (auto kv : aStat){
         int apt=kv.first;
         double propSurf=kv.second;
-        int aptContr=mDico->AptContraignante(apt);
+        int aptContr=AptContraignante(apt);
         if (aRes.find(aptContr)!=aRes.end()){ aRes.at(aptContr)+=propSurf;}else{aRes.emplace(std::make_pair(aptContr,propSurf));}
     }
     // avec clé 1, 2, 3, 4, 11

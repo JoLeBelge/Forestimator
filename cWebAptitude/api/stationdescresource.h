@@ -76,19 +76,11 @@ public:
      response.addHeader("Content-Type","text/plain; charset=utf-8");
      }
 
-     response.out() << geoservice(aTool,aArgs,aPolyg);
+     response.out() << mDico->geoservice(aTool,aArgs,aPolyg);
      }
    }
 
-   std::string geoservice(std::string aTool,std::string aArgs,std::string aPolyg);
-   bool checkTool(std::string aTool);
-   OGRLayer * uploadLayer(std::string aShpToUpload);
-   OGRGeometry * checkPolyg(std::string aPolyg);
-   // pour commencer, uniquement une liste de code de carte d'aptitude (AG_FEE, ...)
-   std::vector<std::string> parseAptArg(std::string aArgs);
-   std::map<int,double> simplifieAptStat(std::map<int,double> aStat);
-   std::vector<std::string> parseHdomArg(std::string aArgs);
-   std::vector<std::string> parseCompoArg(std::string aArgs);
+
 
 private:
     cDicoApt * mDico;
