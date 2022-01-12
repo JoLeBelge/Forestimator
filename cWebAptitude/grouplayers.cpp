@@ -272,16 +272,17 @@ void groupLayers::computeStatGlob(OGRGeometry *poGeomGlobale){
     for (auto & l: getSelectedLayer4Download() ){
 
         if (l->Code()=="MNH2019"){
-            // calcul de Hdom
-            mVLStatCont.push_back(new statHdom(l,poGeomGlobale));
+            // calcul de Hdomnew statHdom(l,poGeomGlobale)
+            mVLStatCont.push_back(statHdom(l,poGeomGlobale).getResult());
 
         } else if(l->Code()=="MNH2018P95"){
             // calcul des params dendrométriques
-            mVLStatCont.push_back(new statDendro(l,poGeomGlobale));
+            mVLStatCont.push_back(statDendro(l,poGeomGlobale).getResult());
 
         } else if(l->Code()=="COMPO"){
             // calcul des probabilités de présence pour les 9 sp.
-            mCompo = std::make_unique<statCompo>(mDico,poGeomGlobale);
+            //mCompo = std::make_unique<statCompo>(mDico,poGeomGlobale);
+            mVLStatCont.push_back(statCompo(mDico,poGeomGlobale).getResult());
         } else {
 
             if (l->l4Stat()){

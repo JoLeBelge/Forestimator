@@ -4,14 +4,11 @@
 #include "Wt/WResource.h"
 #include <Wt/Http/Request.h>
 #include <Wt/Http/Response.h>
-/*
-#include <Wt/WText.h>
-#include <Wt/WMessageResourceBundle.h>
-*/
 #include <iostream>
-
 #include "cdicoapt.h"
-#include "statHdomCompo.h"
+#include "layerbase.h"
+
+
 #include <Wt/WFileUpload.h>
 
 extern std::string nameDendroTool;
@@ -33,30 +30,6 @@ public:
    virtual void handleRequest(const Wt::Http::Request &request,
                               Wt::Http::Response &response) override
    {
-      /* mParamTool="";
-       mParamArgs="";
-       mParamPolyg="";
-       */
-     //response.setMimeType("text/plain");
-     //response.setMimeType("text/csv");
-     //response.addHeader("charset","utf-8");
-     // c'est la solution que j'ai trouvée pour que mes caractère accentués passent bien sur le navigateur
-
-
-     //application/xml pour certain traitement ; dendro par exemple
-
-
-      /*response.out() << "Request path:\n"<< request.path() << "\n\n";
-
-     auto pathInfo = request.pathInfo();
-    if (pathInfo.empty())
-       pathInfo = "(empty)";
-     response.out() << "Request path info:\n"
-                    << pathInfo << "\n\n";
-
-     response.out() << "Request URL parameters\n"
-                       "----------------------\n";
-                       */
 
      if (request.path().substr(request.path().size()-4,4)=="help"){
          response.addHeader("Content-Type","text/plain; charset=utf-8");
@@ -65,7 +38,7 @@ public:
                            "\nListe des traitements pour analyse surfacique (analyse spécifique sur une couche ou analyse standard sur plusieurs couches) \n"
                            "----------------------------------------------------------------------------------------------------\n"
                            "hdom\n"
-                           "compo\n"
+                           //"compo\n"
                            "aptitude\n"
                            +nameDendroTool+"\n";
 

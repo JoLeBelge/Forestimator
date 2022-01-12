@@ -50,7 +50,7 @@ class AuthApplication : public Wt::WApplication
 public:
     AuthApplication(const Wt::WEnvironment& env, cDicoApt * dico);
     void loadStyles();
-    std::unique_ptr<Auth::AuthWidget> loadAuthWidget();
+    std::unique_ptr<Wt::Auth::AuthWidget> loadAuthWidget();
     void authEvent();
     bool isLoggedIn();
     void logout();

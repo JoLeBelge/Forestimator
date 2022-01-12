@@ -13,9 +13,18 @@
 std::string getAbbreviation(std::string str);
 
 GDALDataset * rasterizeGeom(OGRGeometry *poGeom, GDALDataset * aGDALDat);
+
+// renvoie une liste de polgone qui sont des hexagones
+std::vector<OGRPolygon*> hexGeombin(GDALDataset *mask);
+// renvoie une grille de point, centre d'hexagone
+std::vector<OGRPoint> hexbin(GDALDataset * mask);
+
+
+double predHdom(std::vector<double> aVHs);
+double getQ95(std::vector<double> aVHs);
 // dans Forestimator, un gros problème, c'est le fait que j'ai ma classe layer qui soiet strictement liée à Wt et à Forestimator (via grouplayer)
 // J'aurai du avoir une classe mère qui soie indépendante de Wt et me permette de faire des stats sur des cartes, exactement comme j'en ai besoin maintenant pour stationDescriptor
-// je tente donc de faire ça en repartant de cRasterInfo qui était un bon début
+// Du coup toute mes classe qui terminent par Base sont des classes SANS Wt qui sont intégrée dans le dictionnaire et qui sont donc utilisée pour les traitements API et autre du genre
 
 class LayerMTD; // classe tout à fait à par qui sert uniquement à générer la rubrique de documentation de forestimator pour cette couche
 class WMSinfo;
@@ -96,6 +105,89 @@ public:
     double min,max,mean,stdev;
     int nb;
     std::map<double,int> mValFreq;// utile quand je veux des stats basiques sur un raster de variable discontinu
+};
+
+
+class statCellule{
+public:
+    statCellule(std::vector<double> *aVHs, int aSurf,bool computeDendro=0);
+    //void computeHdom(){mHdom=k1hdom*mQ95+k2hdom*pow(mQ95,2);}
+
+    // OLD OLD maintenant c'est une approche pixel
+    /*
+    void computeGha(){ if (mHdom!=0.0){mGha=k1gha*mVHA/mHdom;} else {mGha=0.0;}
+                     }
+    void computeNha(){mNha=40000.0*M_PI*mGha/pow(mCmoy,2);
+                     // peut me renvoyer inf par moment
+                      if (isinf(mNha) | isnan(mNha)){mNha=0.0;}
+                     }
+    void computeCmoy(){mCmoy=(k1cmoy*(mHdom-1.3)+k2cmoy*pow((mHdom-1.3),2))*pow(mMean/mQ95,k3cmoy);}*/
+
+    //SI(Hpixi <= K2; 0; K1*(Hpixi-K2)^K3)
+
+
+
+    //void computeHdom(){
+
+    void printDetail();
+
+    double mVHA, mHdom, mGha, mCmoy, mNha;
+     int mSurf;
+private:
+    double mMean,mQ95;
+
+};
+
+
+class statHdomBase {
+public:
+    statHdomBase(std::shared_ptr<layerBase> aLay, OGRGeometry * poGeom,bool computeStat=1);
+    ~statHdomBase(){
+       for (OGRPolygon * pol: mVaddPol) OGRGeometryFactory::destroyGeometry(pol);
+       mVaddPol.clear();
+       mStat.clear();
+       mDistFrequ.clear();
+    }
+    std::shared_ptr<layerBase> Lay(){return mLay;}
+    bool deserveChart();
+    cDicoApt * Dico();
+
+    void predictHdomHex();
+    void predictDendro(bool onlyHdomStat=1);
+
+    //std::map<std::string, double> computeDistrH();
+    std::vector<std::pair<std::string,double>> computeDistrH();
+
+    basicStat bshdom();
+    basicStat bsDendro(std::string aVar="hdom");
+
+protected:
+    std::shared_ptr<layerBase> mLay;
+    //std::vector<double> mStat; // un vecteur ; une valeur par cellule d'un are.
+    std::vector<std::unique_ptr<statCellule>> mStat;
+    //std::vector<std::string,double>
+    std::vector<std::pair<std::string,double>>mDistFrequ;// pair avec range de valeur (genre 3-9) et proportion de la distribution
+    OGRGeometry * mGeom;
+    // geometrie supplémentaire à afficher sur l'image statique
+    std::vector<OGRPolygon *> mVaddPol;
+    int mNbOccurence;
+};
+
+// modèle reçu de jérome le 9/06/2021
+// reçu update du modèle par Adrien. 1) seul le MNH 2018 est suffisament correct (selon philippe). 2) la résolution des couches d'entrainement du modèle est de 5m ET c'est un MNH percentile 95 (on applique donc le percentile à deux reprises) 3) des modèles "pixels" sont ajustés, plus facile d'utilisation que les modèles "placettes (=objectif premier de la classe cellulle)
+//extern double k1hdom, k2hdom, k1vha,k2vha,k3vha, k1cmoy,k2cmoy;//,k3cmoyk1gha,;
+
+class statDendroBase : public statHdomBase{
+public:
+    statDendroBase(std::shared_ptr<layerBase> aLay, OGRGeometry * poGeom,bool api=0);
+    void predictDendroPix();
+    bool deserveChart();
+
+    std::string getNha();
+    std::string getVha();
+    std::string getGha();
+    std::string getHdom();
+    std::string getCmoy();
 };
 
 

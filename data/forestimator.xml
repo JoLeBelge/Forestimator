@@ -463,9 +463,10 @@ http://forestimator.gembloux.ulg.ac.be/api/<font color="blue">aptitude</font>/ar
 <p style="margin-bottom:0.2cm;margin-top:0.2cm;">
 http://forestimator.gembloux.ulg.ac.be/api/<font color="blue">hdom</font>/polygon/POLYGON ((208118.986622118 113943.623825983,208387.928131752 113684.230535628,208211.816531718 113533.580853657,207902.029861846 113854.507112691,208118.986622118 113943.623825983))
 </p>
+<!--
 <p style="margin-bottom:0.2cm;margin-top:0.2cm;">
 http://forestimator.gembloux.ulg.ac.be/api/<font color="blue">compo</font>/polygon/POLYGON ((208118.986622118 113943.623825983,208387.928131752 113684.230535628,208211.816531718 113533.580853657,207902.029861846 113854.507112691,208118.986622118 113943.623825983))
-</p>
+</p>-->
 </message>
 
 <message id="report.analyse.surf.hdom.t"> <h4> Hauteur dominante calculé sur le MNH  (modèle pour pessière)</h4> </message>

@@ -121,6 +121,10 @@ Les modèles repris au sein de la Table 1 ont été ajustés sur base d’un ré
 Janvier 2022
 </message>
 
+<message id="dendro.logs">
+Janvier 2022 : implémenté les modèles dendrométriques à l'échelle de pixel de 5 m de résolution. Les paramètres dendro pour un polygone sont calulés comme la moyenne pour chaque pixels. Précédemment, par exemple dans le plug-In Qgis Forestimator, une échelle intermédiaire était utilisée entre la parcelle et le pixel. Elle correspondait à une surface de un are affin de répondre à la définition de la hauteur dominante, qui correspond à la hauteur moyenne des 100 arbres les plus haut par hectare (donc une surface moyenne de 1 are).
+</message>
+
 
 
 </messages>

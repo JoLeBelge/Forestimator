@@ -57,16 +57,16 @@ void statWindow::genIndivCarteAndAptT(){
         }
     }
 
-    for (statHdom * chart : mGL->ptrVLStatCont()) {
-        if (chart->deserveChart()){
+    for (std::unique_ptr<Wt::WContainerWidget> & chart : mGL->mVLStatCont) {
+       // if (chart->deserveChart()){
             // je veux un comportement différent pour
-                add1layerStat(chart);
-        }
+                add1layerStat(std::move(chart));
+       // }
     }
 
-    if (mGL->mCompo){
+    /*if (mGL->mCompo){
         mAllStatIndivCont->addWidget(mGL->mCompo->getResult());
-    }
+    }*/
 }
 
 void statWindow::add1Aptitude(layerStatChart * lstat){
@@ -96,8 +96,8 @@ void statWindow::add1layerStat(layerStatChart * layerStat){
     //mContStatIndiv->addWidget(std::unique_ptr<Wt::WContainerWidget>(layerStat));
     std::cout << "statWindow::add1layerStat done" << std::endl;
 }
-void statWindow::add1layerStat(statHdom *lStatCont){
-    mAllStatIndivCont->addWidget(lStatCont->getResult());
+void statWindow::add1layerStat(std::unique_ptr<Wt::WContainerWidget> cont){
+    mAllStatIndivCont->addWidget(std::move(cont));
 }
 
 void statWindow::vider()

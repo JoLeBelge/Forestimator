@@ -31,7 +31,7 @@ std::string stationDescResource::geoservice(std::string aTool,std::string aArgs,
                         aResponse+="code_mnh;moy;cv;max;min;nb\n";
                         for (std::string code : VMNH){
                             std::shared_ptr<layerBase> l=mDico->getLayerBase(code);
-                            statHdom stat(l,pol,1,1);
+                            statHdomBase stat(l,pol,1);
                             basicStat bs= stat.bshdom(); // a modifier quand j'aurai fini d'encoder tout les modèles de Jérome
                             aResponse+=l->Code()+";"+bs.getMean()+";"+bs.getCV()+";"+bs.getMax()+";"+bs.getMin()+";"+bs.getNb()+"\n";
                             //aResponse+="pas disponible pour le moment\n";
@@ -41,9 +41,9 @@ std::string stationDescResource::geoservice(std::string aTool,std::string aArgs,
                     if (globTest) {std::cout << "dendro 2018 api " << std::endl;}
                     aResponse+="hdom;vha;gha;nha;cmoy\n";
                     std::shared_ptr<layerBase> l=mDico->getLayerBase("MNH2018P95");
-                    statDendro stat(l,pol,1);
+                    statDendroBase stat(l,pol,1);
                     aResponse+=stat.getHdom()+";"+stat.getVha()+";"+stat.getGha()+";"+stat.getNha()+";"+stat.getCmoy()+"\n";
-                }else if (aTool=="compo"){
+               /* }else if (aTool=="compo"){
                     std::vector<std::string> VCOMPO=parseCompoArg(aArgs);
                     if (VCOMPO.size()==0){aResponse="arguments pour traitement 'compo' ; vous avez rentré une valeur mais qui semble fausse. Entrez une liste de code de couche de probabilité de présence d'une essence forestière, séparées par une virgule\n";
                     }else{
@@ -53,7 +53,7 @@ std::string stationDescResource::geoservice(std::string aTool,std::string aArgs,
                         }
                         statCompo stat(Vlay,mDico,pol);
                         aResponse+=stat.getAPIresult();
-                    }
+                    }*/
 
                 }else if(aTool=="aptitude"){
                     std::vector<std::string> VCApt=parseAptArg(aArgs);
@@ -125,7 +125,7 @@ bool stationDescResource::checkTool(std::string aTool){
 
     if (mDico->hasLayerBase(aTool)){ aRes=1;}
     // traitements qui ne sont pas des cartes
-    if (aTool=="hdom" | aTool=="compo"  | aTool=="aptitude" | aTool=="dendro2018" ){ aRes=1;}
+    if (aTool=="hdom"   | aTool=="aptitude" | aTool=="dendro2018" ){ aRes=1;} //| aTool=="compo"
 
     //if (aRes==0){mResponse="Aucune couche ou traitement de ce nom. Voir la liste sur forestimator.gembloux.ulg.ac.be/api/help";}
 

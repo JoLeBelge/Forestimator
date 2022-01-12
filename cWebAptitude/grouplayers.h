@@ -67,13 +67,17 @@ public:
     groupStat(){}
     ~groupStat(){clearStat();}
     std::vector<layerStatChart*> ptrVLStat() {return mVLStat;}
-    std::vector<statHdom*> ptrVLStatCont() {return mVLStatCont;}
-    std::unique_ptr<statCompo> mCompo;
+    //std::vector<std::unique_ptr<Wt::WContainerWidget>> ptrVLStatCont() {return mVLStatCont;}
+    // dans vecteur mVLStatCont std::unique_ptr<statCompo> mCompo;
+    // un autre pour les statistique des cartes variables continu (à commencer à MNH)
+    //std::vector<statHdom*> mVLStatCont;
+    // j'y met directement le conteneur résultats
+    std::vector<std::unique_ptr<Wt::WContainerWidget>> mVLStatCont;
 protected:
     // un vecteur pour les statistique des cartes variables de classes (majoritaire)
     std::vector<layerStatChart*> mVLStat;
-    // un autre pour les statistique des cartes variables continu (à commencer à MNH)
-    std::vector<statHdom*> mVLStatCont;
+
+
 
 
     void clearStat(){
@@ -82,13 +86,13 @@ protected:
         {
             delete p;
         }
-        for (auto p : mVLStatCont)
+/*        for (auto p : mVLStatCont)
         {
             delete p;
-        }
+        }*/
         mVLStatCont.clear();
         mVLStat.clear();
-        mCompo.reset();
+        //mCompo.reset();
     }
 
 };
