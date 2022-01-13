@@ -320,6 +320,12 @@ public:
     // convertir le wms de la couche au format image en local
     bool wms2jpg(OGREnvelope *extent, int aSx, int aSy, std::string aOut) const;
 
+    std::string getValLabel(int aVal){
+        std::string aRes("");
+        if (mDicoVal.find(aVal)!=mDicoVal.end()){aRes=mDicoVal.at(aVal);}
+        return aRes;
+    }
+
 protected:
     TypeCarte mTypeCarte;
     TypeVar mTypeVar; // var continue ou discontinue, pour le calcul de statistique
@@ -392,6 +398,7 @@ public:
     std::map<int, std::string> getDicoVal(){return mDicoVal;}
     std::map<int, std::string> * getDicoValPtr(){return &mDicoVal;}
     TypeCarte Type(){return mType;}
+
 private:
     TypeCarte mType;
     cDicoApt * mDico;

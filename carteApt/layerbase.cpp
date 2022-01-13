@@ -9,6 +9,15 @@ double globx=globa/std::sqrt(3);
 // distance du centre à un sommet
 double globd=2*globx;
 
+
+// modèle reçu de jérome le 9/06/2021
+//double k1hdom(1.237116), k2hdom(-0.005823), k1vha(52.176316),k2vha(6.677865),k3vha(0.807146);
+//double k1gha(2.143419), k1cmoy(2.869327),k2cmoy(0.054804),k3cmoy(-0.199079);
+// révision pour Adrien en décembre 2021 - les modèles "pixels" et non placettes sont utilisé, uniquement pour vha hdom et cmoy
+double k1hdom(1.300130), k2hdom(2.67), k1vha(46.000735),k2vha(7.065979),k3vha(0.821239);
+double k1gha(2.216901), k2gha(4.100043);
+double k1cmoy(2.789623),k2cmoy(0.06288);//,k3cmoy(-0.199079);
+
 basicStat::basicStat(std::map<double,int> aMapValandFrequ, double na):mean(0),max(0),min(0),nb(0),mValFreq(aMapValandFrequ){
     bool test(0);
     std::vector<double> v;
@@ -53,13 +62,13 @@ statHdomBase::statHdomBase(std::shared_ptr<layerBase> aLay, OGRGeometry * poGeom
 
 statDendroBase::statDendroBase(std::shared_ptr<layerBase> aLay, OGRGeometry * poGeom, bool api):statHdomBase(aLay,poGeom,0)
 {
-    std::cout << "statDendro" << std::endl;
+    if (globTest){std::cout << "statDendro" << std::endl;}
     predictDendroPix();
 
 }
 // méthode un polygone = une cellulle
 void statDendroBase::predictDendroPix(){
-    std::cout << " predict Dendro depuis MNH2018" << std::endl;
+    //std::cout << " predict Dendro depuis MNH2018" << std::endl;
 
     // masque au format raster
     GDALDataset * mask = mLay->rasterizeGeom(mGeom);
@@ -122,6 +131,90 @@ void statDendroBase::predictDendroPix(){
     GDALClose(mask);
 }
 
+
+statCellule::statCellule(std::vector<double> * aVHs, int aSurf, bool computeDendro):mSurf(aSurf),mVHA(0.0),mHdom(0),mCmoy(0),mNha(0),mMean(0),mQ95(0),mGha(0){
+
+    // calcul de Vha
+    double hSum(0);
+    if (computeDendro){
+        if (globTest){std::cout << "statCellule::statCellule dendro" << std::endl;}
+
+         double vhaSum(0.0),cmoySum(0.0),ghaSum(0.0),nhaSum(0.0),hdomSum(0);
+        for (double h : *aVHs){
+        // old vhaSum+=pow(std::max(0.0,h-k2vha),k3vha);
+        double vhaPix(0),hdomPix(0),cmoyPix(0),ghaPix(0);
+
+        // VHA
+        //SI(Hpixi <= K2; 0; K1*(Hpixi-K2)^K3)
+        if (h<k2vha) {} else {vhaPix=k1vha*pow((h-k2vha),k3vha);}
+
+        // HDOM
+        //SI(Hpixi <= 0; 0; K1*Hpixi+K2)
+        hdomPix=k1hdom*h+k2hdom;
+
+        // CMOY
+        // SI(HDOMpixi <= 1.3; 0; K1*(HDOMpixi-1.3)+K2*(HDOMpixi-1.3)²)
+        if (hdomPix<1.3) {} else {cmoyPix=k1cmoy*(hdomPix-1.3)+k2cmoy*pow((hdomPix-1.3),2);}
+
+        // GHA
+        //SI(Hpixi <= 0; 0; K1*VHApixi/(Hpixi+K2))
+        ghaPix=k1gha*vhaPix/(h+k2gha);
+
+        // NHA
+        //SI(CMOYpixi <= 0; 0; 40000*pi()*GHApixi/Cmoypixi²)
+        if (cmoyPix > 0){ nhaSum+=40000.0*M_PI*ghaPix/pow(cmoyPix,2);}
+
+        vhaSum+=vhaPix;
+        hdomSum+=hdomPix;
+        ghaSum+=ghaPix;
+        cmoySum+=cmoyPix;
+        hSum+=h;
+
+    }
+    // calcul de la moyenne
+    mMean=hSum/aVHs->size();
+    mHdom=hdomSum/aVHs->size();
+    mVHA=vhaSum/aVHs->size();
+    mGha=ghaSum/aVHs->size();
+    mNha=nhaSum/aVHs->size();
+
+    mCmoy=sqrt(40000*M_PI*(mGha/mNha));
+
+
+    //mVHA=k1vha*(vhaSum/aVHs->size());
+    // calcul de Q95
+    // mQ95=getQ95(*aVHs);
+    //std::cout << "mean hauteur : " << mMean << " , Q95 " << mQ95 << std::endl;
+
+    // le reste des variables dendro
+    //computeHdom();
+    //computeGha();
+    //computeCmoy();
+    //computeNha();
+    } else {
+        //std::cout << "statCellule::statCellule hdom" << std::endl;
+        for (double h : *aVHs){
+            hSum+=k1hdom*h+k2hdom;;
+        }
+        // calcul de la moyenne
+        mMean=hSum/aVHs->size();
+        mHdom=mMean;
+    //mQ95=getQ95(*aVHs);
+    //computeHdom();
+    }
+
+    //if (globTest){ printDetail();}
+}
+
+void  statCellule::printDetail(){
+    std::cout << "Mean : " << mMean << std::endl;
+    std::cout << "Q95 : " << mQ95 << std::endl;
+    std::cout << "Hdom : " << mHdom << std::endl;
+    std::cout << "VHA : " << mVHA << std::endl;
+    std::cout << "NHA : " << mNha << std::endl;
+    std::cout << "Gha : " << mGha << std::endl;
+    std::cout << "Cmoy : " << mCmoy << std::endl;
+}
 
 
 

@@ -112,7 +112,7 @@ cDicoApt::cDicoApt(std::string aBDFile):cdicoAptBase(aBDFile)
                     double aA=sqlite3_column_double(stmt, 0 );
                     std::string aB=std::string( (char *)sqlite3_column_text( stmt, 1 ) );
                     Dico_RasterGain.emplace(std::make_pair(aB,aA));
-                    std::cout <<  " gain de " << aA << " pour couche " << aB << std::endl;
+                    //std::cout <<  " gain de " << aA << " pour couche " << aB << std::endl;
                 }
             }
             sqlite3_finalize(stmt);

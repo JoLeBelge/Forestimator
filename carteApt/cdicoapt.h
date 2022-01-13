@@ -7,6 +7,7 @@
 #include "cadastre.h"
 
 std::string removeAccents(std::string aStr);
+std::string putInBalise(std::string aCont,std::string aBalise);
 
 extern std::string dirBD;
 
@@ -34,7 +35,7 @@ public:
     std::shared_ptr<cadastre> mCadastre;
 
     /*************************/
-    std::string geoservice(std::string aTool,std::string aArgs,std::string aPolyg);
+    std::string geoservice(std::string aTool,std::string aArgs,std::string aPolyg,bool xml=0);
     bool checkTool(std::string aTool);
     OGRLayer * uploadLayer(std::string aShpToUpload);
     OGRGeometry * checkPolyg(std::string aPolyg);

@@ -306,27 +306,60 @@ void groupLayers::computeStatGlob(OGRGeometry *poGeomGlobale){
 
 void groupLayers::computeStatAllPol(OGRLayer * lay){
     std::cout << " computeStatAllPol::computeStatAllPol " << std::endl;
+    std::string name0 = std::tmpnam(nullptr);
+    std::string name1 = name0.substr(5,name0.size()-5);
+    std::string aOut = mDico->File("TMPDIR")+"/"+name1+".xml";
+    std::ofstream aFile(aOut.c_str());
+    aFile.precision(10);
 
-    // pour les statistiques globales, on prend toutes les couches selectionnées par select4Download
-    for (auto & l: getSelectedLayer4Download() ){
-
-        if (l->Code()=="MNH2019"){
-
-
-        } else if(l->Code()=="MNH2018P95"){
-
-
-       } else {
-            if (l->l4Stat()){
-
-            }
+    aFile << "<layerStat>\n";
+    OGRFeature *poFeature;
+    OGRFeatureDefn * def = lay->GetLayerDefn();
+    lay->ResetReading();
+    while( (poFeature = lay->GetNextFeature()) != NULL )
+    {
+        // écriture des informations du polygones dans le fichiers résultats
+        aFile << "<feature>\n" ;
+        for (int f(0);f<def->GetFieldCount();f++){
+            aFile << "<" <<def->GetFieldDefn(f)->GetNameRef()<<">" << poFeature->GetFieldAsString(f)<<"</" <<def->GetFieldDefn(f)->GetNameRef()<<">" "\n";
         }
 
-        //mPBar->setValue(mPBar->value() + 1);
-        //m_app->processEvents();
-    }
+        OGRGeometry * poGeom = poFeature->GetGeometryRef();
+        poGeom->closeRings();
+        poGeom->flattenTo2D();
+        char * polWkt;
+        poGeom->exportToWkt(&polWkt);
+        for (auto & l: getSelectedLayer4Download() ){
+             aFile << "<processing>\n" ;
 
-     m_app->addLog("compute stat AllPol, "+std::to_string(getNumSelect4Download())+" traitements",typeLog::anas); // add some web stats
+            if (l->Code()=="MNH2019"){
+                aFile << "<processingName>hdom2019</processingName>\n" ;
+                aFile << mDico->geoservice("hdom","MNH2019",polWkt,1);
+            } else if(l->Code()=="MNH2018P95"){
+                 aFile << "<processingName>dendro2018</processingName>\n" ;
+                 aFile << mDico->geoservice("dendro2018","",polWkt,1);
+           } else {
+                if (l->l4Stat()){
+                     aFile << "<processingName>"+l->Code()+"</processingName>\n" ;
+                     aFile << mDico->geoservice(l->Code(),"",polWkt,1);
+                }
+            }
+            aFile << "</processing>\n" ;
+        }
+        aFile << "</feature>\n" ;
+    }
+     aFile << "</layerStat>\n";
+
+    // pour les statistiques globales, on prend toutes les couches selectionnées par select4Download
+
+
+    aFile.close();
+
+    WFileResource *fileResource = new Wt::WFileResource("text/xml",aOut);
+    fileResource->suggestFileName("Forestimator-statistiques.xml");
+    m_app->redirect(fileResource->url());
+
+    m_app->addLog("compute stat AllPol, "+std::to_string(getNumSelect4Download())+" traitements",typeLog::anas); // add some web stats
 }
 
 /**

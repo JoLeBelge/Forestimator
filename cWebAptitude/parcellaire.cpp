@@ -607,7 +607,7 @@ void parcellaire::polygoneCadastre(std::string aFileGeoJson){
 
 void parcellaire::anaAllPol(){
     // message box
-    if (!globTest){
+    /*if (!globTest){
         auto messageBox =
                 addChild(Wt::cpp14::make_unique<Wt::WMessageBox>(
                              "Analyse surfacique",
@@ -621,33 +621,35 @@ void parcellaire::anaAllPol(){
             removeChild(messageBox);
         });
         messageBox->show();
-    }else {
+    }else {*/
 
-        std::string input(geoJsonName());// lecture du geojson et pas du shp, comme cela compatible avec polygone du cadastre.
-        const char *inputPath=input.c_str();
-        GDALDataset * mDS =  (GDALDataset*) GDALOpenEx( inputPath, GDAL_OF_VECTOR | GDAL_OF_READONLY, NULL, NULL, NULL );
-        if( mDS != NULL )
-        {
-            // layer
-            OGRLayer * lay = mDS->GetLayer(0);
+        if (mGL->getNumSelect4Download()> 4){
 
-            mGL->computeStatAllPol(lay);
-           /*OGRFeature *poFeature;
-            lay->ResetReading();
-            while( (poFeature = lay->GetNextFeature()) != NULL )
+            auto messageBox =
+                    addChild(Wt::cpp14::make_unique<Wt::WMessageBox>(
+                                 "Analyse surfacique",
+                                 tr("parcellaire.anaAllPol.maxProcess")
+                                 ,
+                                 Wt::Icon::Information,
+                                 Wt::StandardButton::Ok));
+
+            messageBox->setModal(true);
+            messageBox->buttonClicked().connect([=] {
+                removeChild(messageBox);
+            });
+            messageBox->show();
+        } else {
+
+            std::string input(geoJsonName());// lecture du geojson et pas du shp, comme cela compatible avec polygone du cadastre.
+            const char *inputPath=input.c_str();
+            GDALDataset * mDS =  (GDALDataset*) GDALOpenEx( inputPath, GDAL_OF_VECTOR | GDAL_OF_READONLY, NULL, NULL, NULL );
+            if( mDS != NULL )
             {
-                OGRGeometry * poGeom = poFeature->GetGeometryRef();
-                poGeom->closeRings();
-                poGeom->flattenTo2D();
-
-                char * test;
-                poGeom->exportToWkt(&test);
-                // avoir acèss à la liste des traitements sélectionnés
-                //mDico->geoservice();
-
-
-            }*/
-            GDALClose(mDS);
-        } else { std::cout << "select dataset mDS is null " << std::endl;}
-    }
+                // layer
+                OGRLayer * lay = mDS->GetLayer(0);
+                mGL->computeStatAllPol(lay);
+                GDALClose(mDS);
+            } else { std::cout << "select dataset mDS is null " << std::endl;}
+        }
+    //}
 }

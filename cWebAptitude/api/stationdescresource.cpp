@@ -4,9 +4,9 @@ int globMaxSurf(200);
 std::string nameDendroTool("dendro2018");
 extern bool globTest;
 
-std::string cDicoApt::geoservice(std::string aTool,std::string aArgs,std::string aPolyg){
+std::string cDicoApt::geoservice(std::string aTool, std::string aArgs, std::string aPolyg, bool xml){
 
-    if (globTest) {std::cout << "Forestimator API " << aTool << " aArgs " << aArgs << " polygon " << aPolyg << std::endl;}
+    //if (globTest) {std::cout << "Forestimator API " << aTool << " aArgs " << aArgs << " polygon " << aPolyg << std::endl;}
     // je suis pas dans une appli Wt donc je n'ai pas accès au docroot malheureusement...
     //Wt::WMessageResourceBundle msg();
     //msg.use(docRoot() + "/forestimator");
@@ -28,22 +28,36 @@ std::string cDicoApt::geoservice(std::string aTool,std::string aArgs,std::string
                     std::vector<std::string> VMNH=parseHdomArg(aArgs);
                     if (VMNH.size()==0){aResponse="arguments pour traitement 'hdom' ; vous avez rentré une valeur mais qui semble fausse. Entrez une liste de code de couche MNH séparées par une virgule\n";
                     }else{
-                        aResponse+="code_mnh;moy;cv;max;min;nb\n";
+                        if (!xml){aResponse+="code_mnh;moy;cv;max;min;nb\n";}
                         for (std::string code : VMNH){
                             std::shared_ptr<layerBase> l=getLayerBase(code);
                             statHdomBase stat(l,pol,1);
                             basicStat bs= stat.bshdom(); // a modifier quand j'aurai fini d'encoder tout les modèles de Jérome
-                            aResponse+=l->Code()+";"+bs.getMean()+";"+bs.getCV()+";"+bs.getMax()+";"+bs.getMin()+";"+bs.getNb()+"\n";
+                            if (!xml){aResponse+=l->Code()+";"+bs.getMean()+";"+bs.getCV()+";"+bs.getMax()+";"+bs.getMin()+";"+bs.getNb()+"\n";}
+                            else { aResponse="<code_mnh>"+ l->Code()+ "</code_mnh>\n"
+                                        +"<moy>"+ bs.getMean()+ "</moy>\n"
+                                        +"<cv>"+ bs.getCV()+ "</cv>\n"
+                                        +"<max>"+ bs.getMax()+ "</max>\n"
+                                        +"<min>"+ bs.getMin()+ "</min>\n"
+                                        +"<nb>"+ bs.getNb()+ "</nb>\n";}
                             //aResponse+="pas disponible pour le moment\n";
                         }
                     }
                 } else if (aTool==nameDendroTool){
-                    if (globTest) {std::cout << "dendro 2018 api " << std::endl;}
-                    aResponse+="hdom;vha;gha;nha;cmoy\n";
+                    //if (globTest) {std::cout << "dendro 2018 api " << std::endl;}
+                     if (!xml){aResponse+="hdom;vha;gha;nha;cmoy\n";}
                     std::shared_ptr<layerBase> l=getLayerBase("MNH2018P95");
                     statDendroBase stat(l,pol,1);
-                    aResponse+=stat.getHdom()+";"+stat.getVha()+";"+stat.getGha()+";"+stat.getNha()+";"+stat.getCmoy()+"\n";
-               /* }else if (aTool=="compo"){
+                     if (!xml){aResponse+=stat.getHdom()+";"+stat.getVha()+";"+stat.getGha()+";"+stat.getNha()+";"+stat.getCmoy()+"\n";
+                     }else {
+                         aResponse=putInBalise(stat.getHdom(),"hdom")
+                                 +putInBalise(stat.getVha(),"vha")
+                                 +putInBalise(stat.getGha(),"gha")
+                                 +putInBalise(stat.getNha(),"nha")
+                                 +putInBalise(stat.getCmoy(),"cmoy");
+                     }
+
+                    /* }else if (aTool=="compo"){
                     std::vector<std::string> VCOMPO=parseCompoArg(aArgs);
                     if (VCOMPO.size()==0){aResponse="arguments pour traitement 'compo' ; vous avez rentré une valeur mais qui semble fausse. Entrez une liste de code de couche de probabilité de présence d'une essence forestière, séparées par une virgule\n";
                     }else{
@@ -69,7 +83,6 @@ std::string cDicoApt::geoservice(std::string aTool,std::string aArgs,std::string
                         aResponse+="\n";
                     }
 
-
                 } else {
                     if (globTest) {std::cout << " API sur layerBase " << std::endl;}
 
@@ -80,9 +93,15 @@ std::string cDicoApt::geoservice(std::string aTool,std::string aArgs,std::string
                         std::cout << " api compute basic stat on polyg " << std::endl;
                         basicStat stat=l->computeBasicStatOnPolyg(pol);
                         std::cout << " done " << std::endl;
+                        if (!xml){
                         aResponse+="mean;"+stat.getMean()+"\n";
                         aResponse+="max;"+stat.getMax()+"\n";
                         aResponse+="sd;"+stat.getSd()+"\n";
+                        } else {
+                           aResponse=putInBalise(stat.getMean(),"mean")
+                                   +putInBalise(stat.getMax(),"max")
+                                   +putInBalise(stat.getSd(),"sd");
+                        }
                         break;
                     }
                     case TypeVar::Classe:{
@@ -93,8 +112,10 @@ std::string cDicoApt::geoservice(std::string aTool,std::string aArgs,std::string
                 */
                         std::map<int,double> stat=l->computeStat2(pol);
                         std::string aL1,aL2;
-                        bool test(1);
+                        bool test(1);// detecte la première ligne
                         for (auto kv:stat){
+
+                             if (!xml){
                             if (test){
                                 aL2=std::to_string(kv.first);
                                 aL1=roundDouble(kv.second);
@@ -103,8 +124,17 @@ std::string cDicoApt::geoservice(std::string aTool,std::string aArgs,std::string
                                 aL2+=";"+std::to_string(kv.first);
                                 aL1+=";"+roundDouble(kv.second);
                             }
+                             } else {
+                                 // ici je met trois balise ; nom du field, valeur raster , et pourcentage
+                                 aResponse+="<classe>";
+                                 aResponse+=putInBalise(l->getValLabel(kv.first),"classeName");
+                                 aResponse+=putInBalise(std::to_string(kv.first),"classeRasterVal");
+                                 aResponse+=putInBalise(roundDouble(kv.second),"pourcentage");
+                                 aResponse+="</classe>";
+                             }
                         }
-                        aResponse+=aL2+"\n"+aL1+"\n";
+
+                         if (!xml){aResponse+=aL2+"\n"+aL1+"\n";}
 
                         break;
                     }
@@ -113,9 +143,15 @@ std::string cDicoApt::geoservice(std::string aTool,std::string aArgs,std::string
                     }
                 }
                 OGRGeometryFactory::destroyGeometry(pol);
-            } else {aResponse="Veillez utiliser le format wkt pour le polygone (projeté en BL72, epsg 31370). La géométrie du polygone (ou du multipolygone) doit être valide et sa surface de maximum "+std::to_string(globMaxSurf)+"ha";}
+            } else {
+                if (!xml){
+                aResponse="Veillez utiliser le format wkt pour le polygone (projeté en BL72, epsg 31370). La géométrie du polygone (ou du multipolygone) doit être valide et sa surface de maximum "+std::to_string(globMaxSurf)+"ha";
+                } else {
+                   aResponse="<error>La géométrie du polygone (ou du multipolygone) doit être valide et sa surface de maximum "+std::to_string(globMaxSurf)+"ha</error>";
+                }
+            }
 
-    } else {aResponse="arguments pour traitement 'Aptitude' ; vous avez rentré une valeur mais qui semble fausse. Entrez une liste d'accronyme d'essences séparées par une virgule, ou une liste de carte d'aptitude\n";}
+    } else {aResponse="arguments pour geotraitement ; vous avez rentré une valeur mais qui semble fausse. Consultez la page d'aide.\n";}
 
     return aResponse;
 }
@@ -208,4 +244,10 @@ std::map<int,double> cDicoApt::simplifieAptStat(std::map<int,double> aStat){
     }
     // avec clé 1, 2, 3, 4, 11
     return aRes;
+}
+
+std::string putInBalise(std::string aCont,std::string aBalise){
+
+    return "<"+aBalise+">"+aCont+"</"+aBalise+">\n";
+
 }

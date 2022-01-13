@@ -603,7 +603,10 @@ detAptFEE
 <message id="download.lay.error.noLay"><p>Aucune cartes sélectionnée. Veuillez selectionner les couches à exporter à l'étape numéro 2 de la page analyse</p></message>
 
 <message id="parcellaire.upload.size"><p> La surface du ou des polygones est trop importante que pour effectuer une analyse surfacique.</p></message>
-<message id="parcellaire.anaAllPol"><p> Indisponible pour le moment, en cours de développement..s.</p></message>
+<message id="parcellaire.anaAllPol"><p> Indisponible pour le moment, en cours de développement...</p></message>
+<message id="parcellaire.anaAllPol.maxProcess"><p> Si vous souhaiter effectuer des analyses sur tout les polygones, vous ne pouvez sélectionner que maximum 4 analyses différentes.</p></message>
+
+
 
 <message id="api.msg.error.tool.name">Aucune carte ou traitement de ce nom.</message>
 <message id="api.msg.error.polyg1">Veillez utiliser le format Géojson pour votre polygone</message>

@@ -102,7 +102,7 @@ selectLayers::selectLayers(groupLayers * aGL){
 
 void baseSelectLayers::SelectLayer(bool select,std::shared_ptr<Layer> l,bool afficheMsg){
 
-    std::cout << "couche " << l->getLegendLabel() << ", baseSelectLayers::SelectLayer, select= " << select << std::endl;
+    if (globTest){std::cout << "couche " << l->getLegendLabel() << ", baseSelectLayers::SelectLayer, select= " << select << std::endl;}
     if ((!select) |(nbMax>(numSelectedLayer()))){
         if (mSelectedLayers.find(l)!=mSelectedLayers.end()){
             // permet d'empêcher la selection des layers expert en mode non-expert
@@ -134,7 +134,7 @@ void baseSelectLayers::SelectLayer(bool select,std::shared_ptr<Layer> l,bool aff
         }
 
     }
-    std::cout << "nombre de couches sélectionnées " << numSelectedLayer() << std::endl;
+    if (globTest){std::cout << "nombre de couches sélectionnées " << numSelectedLayer() << std::endl;}
 }
 
 void baseSelectLayers::SelectLayerGroup(bool select,TypeLayer aType){
