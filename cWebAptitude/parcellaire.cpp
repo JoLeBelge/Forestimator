@@ -379,7 +379,7 @@ void parcellaire::upload(){
     // ici je converti en json et affichage dans ol
     if (nbFiles==3){
         msg->setText("Téléchargement du shp effectué avec succès.");
-         std::cout << "Téléchargement du shp effectué avec succès.. " << std::endl ;
+        std::cout << "Téléchargement du shp effectué avec succès.. " << std::endl ;
         if (to31370AndGeoJson()){
             mGL->m_app->addLog("upload a shp"); // add some web stats
             if (computeGlobalGeom()){
@@ -440,7 +440,7 @@ void parcellaire::computeStatAndVisuSelectedPol(int aId){
         if (find) {visuStat(poFeature);}
         GDALClose(mDS);
     } else {
-       std::cout << "ne parviens pas à lire " << input << std::endl;
+        std::cout << "ne parviens pas à lire " << input << std::endl;
     }
     m_app->loadingIndicator()->hide();
     m_app->loadingIndicator()->setMessage(tr("defaultLoadingI"));
@@ -563,7 +563,7 @@ void parcellaire::selectPolygon(double x, double y){
                     // je refais le test de la surface, car c'est peut-être un polgone de commune ou de division qui sont trop grand du coup
                     int aSurfha=OGR_G_Area(poGeom)/10000;
                     if (aSurfha<globSurfMaxOnePol){
-                    computeStatAndVisuSelectedPol(poFeature->GetFID());
+                        computeStatAndVisuSelectedPol(poFeature->GetFID());
                     } else {
                         // message box
                         auto messageBox =
@@ -607,19 +607,47 @@ void parcellaire::polygoneCadastre(std::string aFileGeoJson){
 
 void parcellaire::anaAllPol(){
     // message box
-    auto messageBox =
-            addChild(Wt::cpp14::make_unique<Wt::WMessageBox>(
-                         "Analyse surfacique",
-                         tr("parcellaire.anaAllPol")
-                         ,
-                         Wt::Icon::Information,
-                         Wt::StandardButton::Ok));
+    if (!globTest){
+        auto messageBox =
+                addChild(Wt::cpp14::make_unique<Wt::WMessageBox>(
+                             "Analyse surfacique",
+                             tr("parcellaire.anaAllPol")
+                             ,
+                             Wt::Icon::Information,
+                             Wt::StandardButton::Ok));
 
-    messageBox->setModal(true);
-    messageBox->buttonClicked().connect([=] {
-        removeChild(messageBox);
-    });
-    messageBox->show();
+        messageBox->setModal(true);
+        messageBox->buttonClicked().connect([=] {
+            removeChild(messageBox);
+        });
+        messageBox->show();
+    }else {
+
+        std::string input(geoJsonName());// lecture du geojson et pas du shp, comme cela compatible avec polygone du cadastre.
+        const char *inputPath=input.c_str();
+        GDALDataset * mDS =  (GDALDataset*) GDALOpenEx( inputPath, GDAL_OF_VECTOR | GDAL_OF_READONLY, NULL, NULL, NULL );
+        if( mDS != NULL )
+        {
+            // layer
+            OGRLayer * lay = mDS->GetLayer(0);
+
+            mGL->computeStatAllPol(lay);
+           /*OGRFeature *poFeature;
+            lay->ResetReading();
+            while( (poFeature = lay->GetNextFeature()) != NULL )
+            {
+                OGRGeometry * poGeom = poFeature->GetGeometryRef();
+                poGeom->closeRings();
+                poGeom->flattenTo2D();
+
+                char * test;
+                poGeom->exportToWkt(&test);
+                // avoir acèss à la liste des traitements sélectionnés
+                //mDico->geoservice();
 
 
+            }*/
+            GDALClose(mDS);
+        } else { std::cout << "select dataset mDS is null " << std::endl;}
+    }
 }

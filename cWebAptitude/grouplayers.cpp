@@ -1,6 +1,9 @@
 #include "grouplayers.h"
 
-int maxSizePix4Export(30000);
+//int maxSizePix4Export(30000);
+//129000, 75001 taille en pix du masque forêt qui est passé à 2 m de résolution lors d'une mise à jours; j'aimerai pouvoir le faire télécharger
+int maxSizePix4Export(130000);
+
 extern bool globTest;
 
 groupLayers::groupLayers(AuthApplication *app, cWebAptitude * cWebApt):
@@ -298,6 +301,32 @@ void groupLayers::computeStatGlob(OGRGeometry *poGeomGlobale){
     //mPBar->setValue(mPBar->maximum());
     //return aRes;
      m_app->addLog("compute stat, "+std::to_string(getNumSelect4Download())+" traitements",typeLog::anas); // add some web stats
+}
+
+
+void groupLayers::computeStatAllPol(OGRLayer * lay){
+    std::cout << " computeStatAllPol::computeStatAllPol " << std::endl;
+
+    // pour les statistiques globales, on prend toutes les couches selectionnées par select4Download
+    for (auto & l: getSelectedLayer4Download() ){
+
+        if (l->Code()=="MNH2019"){
+
+
+        } else if(l->Code()=="MNH2018P95"){
+
+
+       } else {
+            if (l->l4Stat()){
+
+            }
+        }
+
+        //mPBar->setValue(mPBar->value() + 1);
+        //m_app->processEvents();
+    }
+
+     m_app->addLog("compute stat AllPol, "+std::to_string(getNumSelect4Download())+" traitements",typeLog::anas); // add some web stats
 }
 
 /**

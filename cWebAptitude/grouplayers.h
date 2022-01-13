@@ -131,8 +131,8 @@ public:
 
     void computeStatGlob(OGRGeometry *poGeomGlobale);
 
-    // void car on ajoute les résulats à la table d'attribut de la couche
-    void computeStatOnPolyg(OGRLayer * lay, bool mergeOT=0);
+    // avec un retour qui est un fichier texte à télécharger
+    void computeStatAllPol(OGRLayer * lay);
 
     ST * mStation;
     std::vector<std::shared_ptr<Layer>> Layers(){ return mVLs;}
