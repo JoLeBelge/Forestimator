@@ -278,6 +278,8 @@ void dicoPedo::loadInfo(){
     std::string s(userName);
     if (s=="lisein"){
         SQLstring="SELECT Dir2,Nom FROM fichiersGIS WHERE Code='CNSW';";
+    } else if (s=="jo") {
+        SQLstring="SELECT Dir3,Nom FROM fichiersGIS WHERE Code='CNSW';";
     } else {
         SQLstring="SELECT Dir,Nom FROM fichiersGIS WHERE Code='CNSW';";
     }

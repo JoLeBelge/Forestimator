@@ -19,7 +19,9 @@ void cadastre::loadInfo(){
     std::cout << "load info cadastre" << std::endl;
     if (s=="lisein"){
         SQLstring="SELECT Dir2,Nom,Code FROM fichiersGIS WHERE Categorie='Cadastre' OR Code='TMPDIR';";
-    } else {
+    } else if (s=="jo") {
+        SQLstring="SELECT Dir3,Nom,Code FROM fichiersGIS WHERE Categorie='Cadastre' OR Code='TMPDIR';";
+    }  else {
         SQLstring="SELECT Dir,Nom,Code FROM fichiersGIS WHERE Categorie='Cadastre' OR Code='TMPDIR';";
     }
     sqlite3_prepare_v2( db_, SQLstring.c_str(), -1, &stmt, NULL );

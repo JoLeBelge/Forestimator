@@ -44,6 +44,8 @@ cDicoApt::cDicoApt(std::string aBDFile):cdicoAptBase(aBDFile)
             if (s=="lisein"){
                 SQLstring="SELECT Code,Dir2,Nom,Type,NomComplet,Categorie,TypeVar, expert, visu, stat,NomCourt,groupe FROM "+table+";";
 
+            } else if (s=="jo") {
+                SQLstring="SELECT Code,Dir3,Nom,Type,NomComplet,Categorie,TypeVar, expert, visu, stat ,NomCourt,groupe FROM "+table+";";
             } else {
                 SQLstring="SELECT Code,Dir,Nom,Type,NomComplet,Categorie,TypeVar, expert, visu, stat ,NomCourt,groupe FROM "+table+";";
             }
