@@ -1,9 +1,31 @@
 dépendances wt pour webAptitude ; 
 
-sudo apt install libgraphicsmagick++1-dev
-sudo apt install libpango1.0-dev 
+git clone https://github.com/JoLeBelge/Forestimator
+
+contenu git/config:
+[core]
+	repositoryformatversion = 0
+	filemode = true
+	bare = false
+	logallrefupdates = true
+[remote "origin"]
+	url = https://JoLeBelge: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@github.com/JoLeBelge//Forestimator.git
+	fetch = +refs/heads/*:refs/remotes/origin/*
+[branch "master"]
+	remote = origin
+	merge = refs/heads/master
+[submodule "cWebAptitude/libzippp"]
+	url = https://github.com/ctabin/libzippp
+	active = true
+	
+
+sudo apt install libgraphicsmagick++1-dev libpango1.0-dev cmake mercurial libcurl4-openssl-dev
+
+# package pour compilation forestimator
+sudo apt install sqlite3 libgdal-dev lzip
 
 libharu ; compiler depuis les sources.
+git clone https://github.com/libharu/libharu
 mkdir build
 cd build ../
 cmake ../
@@ -21,7 +43,6 @@ cmake -DWT_WRASTERIMAGE_IMPLEMENTATION="GraphicsMagick" -DGM_INCLUDE_DIR="/usr/l
 
 le problème est reglé. Donc si je comprend bien il faut compiler GM depuis les sources :
 
-apt install mercurial
 hg clone http://hg.code.sf.net/p/graphicsmagick/code/ GM
 cd GM
 ./configure --enable-shared --with-quantum-depth=16
