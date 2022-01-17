@@ -1,6 +1,17 @@
 dépendances wt pour webAptitude ; 
 
 git clone https://github.com/JoLeBelge/Forestimator
+git submodule init
+git submodule update
+
+installation de libzipp
+sudo apt install zlib1g-dev libzip-dev liblzma-dev libbz2-dev
+cd cWebAptitude/libzippp/
+mkdir build && cd build
+cmake .. -DCMAKE_BUILD_TYPE=Release
+make && make install
+make && sudo make install
+
 
 contenu git/config LOCAL:
 [core]
