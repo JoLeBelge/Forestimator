@@ -2,7 +2,7 @@ dépendances wt pour webAptitude ;
 
 git clone https://github.com/JoLeBelge/Forestimator
 
-contenu git/config:
+contenu git/config LOCAL:
 [core]
 	repositoryformatversion = 0
 	filemode = true
@@ -17,6 +17,18 @@ contenu git/config:
 [submodule "cWebAptitude/libzippp"]
 	url = https://github.com/ctabin/libzippp
 	active = true
+	
+Contenu git config GLOBAL, accessible via git config --global --edit
+
+[user]
+        user = JoLeBelge
+        email = liseinjon@hotmail.com
+        name = lisein
+        #password=joaigun1
+        password = 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
+[credential]
+        helper = cache
+
 	
 
 sudo apt install libgraphicsmagick++1-dev libpango1.0-dev cmake mercurial libcurl4-openssl-dev
