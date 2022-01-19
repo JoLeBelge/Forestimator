@@ -21,6 +21,8 @@ void cadastre::loadInfo(){
         SQLstring="SELECT Dir2,Nom,Code FROM fichiersGIS WHERE Categorie='Cadastre' OR Code='TMPDIR';";
     } else if (s=="jo") {
         SQLstring="SELECT Dir3,Nom,Code FROM fichiersGIS WHERE Categorie='Cadastre' OR Code='TMPDIR';";
+    } else if (s=="carto") {
+        SQLstring="SELECT Dir4,Nom,Code FROM fichiersGIS WHERE Categorie='Cadastre' OR Code='TMPDIR';";
     }  else {
         SQLstring="SELECT Dir,Nom,Code FROM fichiersGIS WHERE Categorie='Cadastre' OR Code='TMPDIR';";
     }

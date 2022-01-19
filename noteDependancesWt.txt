@@ -107,6 +107,8 @@ sudo ln -s /media/Data10/Forestimator/KKCS/* /data1/Carto/FEE/
 lien de webaptitude vers data1
 sudo ln -s /home/carto/app/Forestimator/* /data1/Forestimator/
 
+-- finalement on abandonne l'utilisation des liens symboliques, c'est déjà assez le bronx comme ça
+
 
 
 
