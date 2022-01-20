@@ -45,7 +45,7 @@ cDicoApt::cDicoApt(std::string aBDFile):cdicoAptBase(aBDFile)
                 SQLstring="SELECT Code,Dir2,Nom,Type,NomComplet,Categorie,TypeVar, expert, visu, stat,NomCourt,groupe FROM "+table+";";
             } else if (s=="jo") {
                 SQLstring="SELECT Code,Dir3,Nom,Type,NomComplet,Categorie,TypeVar, expert, visu, stat ,NomCourt,groupe FROM "+table+";";
-            } else if (s=="carto") {
+            } else if (exists("/home/carto/app/Forestimator/carteApt/data/aptitudeEssDB.db")) { //(s=="carto") {
                 SQLstring="SELECT Code,Dir4,Nom,Type,NomComplet,Categorie,TypeVar, expert, visu, stat ,NomCourt,groupe FROM "+table+";";
             } else {
                 SQLstring="SELECT Code,Dir,Nom,Type,NomComplet,Categorie,TypeVar, expert, visu, stat ,NomCourt,groupe FROM "+table+";";
