@@ -82,3 +82,8 @@ sudo aptitude install libcurl4-openssl-dev
 sur le serveur il a désinstallé libcurl4-gnutsl pour installé ce truc. J'espère que j'ai pas foutu le bronx
 
 
+---
+./WebAptitude --deploy-path=/ --docroot "/home/lisein/Documents/carteApt/Forestimator/data/;/favicon.ico,/js,/jslib,/resources,/style,/tmp,/data,/img" --http-port 8085 --http-addr 0.0.0.0 --test 1
+
+
+
