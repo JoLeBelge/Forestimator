@@ -39,13 +39,15 @@ Contenu git config GLOBAL, accessible via git config --global --edit
         password = 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
 [credential]
         helper = cache
+        
+        
+        
+git clone https://github.com/emweb/wt.git Wt
 
-	
-
-sudo apt install libgraphicsmagick++1-dev libpango1.0-dev cmake mercurial libcurl4-openssl-dev
+sudo apt install libgraphicsmagick++1-dev libpango1.0-dev cmake mercurial libcurl4-openssl-dev cmake-curses-gui
 
 # package pour compilation forestimator
-sudo apt install sqlite3 libgdal-dev lzip
+sudo apt install sqlite3 libgdal-dev lzip libboost-all-dev
 
 libharu ; compiler depuis les sources.
 git clone https://github.com/libharu/libharu
@@ -74,12 +76,43 @@ sudo make install
 et ensuite
 
 cmake -DWT_WRASTERIMAGE_IMPLEMENTATION="GraphicsMagick" -DGM_INCLUDE_DIR="/usr/local/include/GraphicsMagick" -DGM_LIB="/usr/local/lib/libGraphicsMagick.so" -DGM_PREFIX="/usr/local/include/GraphicsMagick" ..
+make -j8
+make install
+les librairies sont dans /usr/local/lib, il faut ajouter ce chemin dans notre config
+gedit /etc/ld.so.conf
+ajout ligne /usr/local/lib
+puis
+sudo ldconfig
+
+
 
 ok ça fonctionne sur le serveur également
 
-#Install header files and library for cURL (dans wrapper pour WMS CNSW)
-sudo aptitude install libcurl4-openssl-dev
-sur le serveur il a désinstallé libcurl4-gnutsl pour installé ce truc. J'espère que j'ai pas foutu le bronx
+
+------------- lien symbolique pour couches sur servcarto ---------
+
+il faut créer les directory data1/Carto/FEEW2020/, /data1/Carto/CS, puis y créer les liens symboliques
+sudo mkdir /data1 et tout ça
+sudo ln -s /media/Data10/Forestimator/Station/* /data1/Carto/FEEW2020/
+sudo ln -s /media/Data10/Forestimator/Station/* /data1/Carto/CS/
+
+sudo ln -s /media/Data10/Forestimator/Autre/* /data1/Carto/Autre/
+sudo ln -s /media/Data10/Forestimator/Autre/* /data1/Carto/Autre/ES_EP
+sudo ln -s /media/Data10/Forestimator/Autre/* /data1/Carto/CS/
+
+sudo ln -s /media/Data10/Forestimator/CS/* /data1/Carto/FEE/
+sudo ln -s /media/Data10/Forestimator/FEE/* /data1/Carto/FEE/
+sudo ln -s /media/Data10/Forestimator/KKCS/* /data1/Carto/FEE/
+
+lien de webaptitude vers data1
+sudo ln -s /home/carto/app/Forestimator/* /data1/Forestimator/
+
+-- finalement on abandonne l'utilisation des liens symboliques, c'est déjà assez le bronx comme ça
+
+
+
+
+
 
 
 ---

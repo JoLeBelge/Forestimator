@@ -25,7 +25,10 @@ int main(int argc, char **argv)
     po::options_description desc("Allowed options");
     desc.add_options()
             ("help", "produce help message")
-            ("test", po::value<bool>(), "pour le test de nouvelles options en cours de développement");
+            ("test", po::value<bool>(), "pour le test de nouvelles options en cours de développement")
+            ("BD", po::value<std::string>(), "chemin d'accès à la BD forestimator")
+
+            ;
     po::variables_map vm;
     //po::store(po::parse_command_line(argc, argv, desc), vm);
     //https://stackoverflow.com/questions/15552284/boostprogram-options-how-to-ignore-unknown-parameters
@@ -36,6 +39,7 @@ int main(int argc, char **argv)
     // ici, créé mon dictionnaire et le mettre sous forme de membre dans resource
     //  std::cout << "loadBDpath et cree dico.." << std::endl;
     std::string aBD=loadBDpath();
+    if (vm.count("BD")) {aBD=vm["BD"].as<std::string>();std::cout << " chemin bd =" << aBD << std::endl;}
     cDicoApt *dico=new cDicoApt(aBD);
 
     stationDescResource resource(dico);
