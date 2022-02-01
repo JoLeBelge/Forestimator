@@ -41,7 +41,7 @@ void Analytics::addLog(const Wt::WEnvironment &env, int user_id, std::string pag
 
     addLogApache(env,page);
 
-    dbo::ptr<Log> logPtr = session.add(std::move(log));
+    session.add(std::move(log));
 }
 
 void Analytics::addLogApache(const Wt::WEnvironment &env, std::string page){
@@ -118,6 +118,8 @@ PageAnalytics::PageAnalytics(const Wt::WEnvironment& env, std::string aFileDB) :
 
     int i=1;
     for (const dbo::ptr<Log> &log : logs){
+        // ici si un logs dans la db a un identifiant NULL (si on a oublié de coché "auto-increment" pour colonne id - on se retrouve avec un déréférencement.
+        if (log.get()!=nullptr){
         if (globTest){std::cout << " log " << log->datum << " : " << log->ip << " : " << log->ipath << std::endl;}
 
         time_t now=log->datum;
@@ -129,6 +131,8 @@ PageAnalytics::PageAnalytics(const Wt::WEnvironment& env, std::string aFileDB) :
         table->elementAt(i,4)->addWidget(Wt::cpp14::make_unique<Wt::WText>(log->getCat()));
 
         i++;
+        }
+
     }
 
 }
