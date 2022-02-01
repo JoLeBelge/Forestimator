@@ -125,7 +125,34 @@ Janvier 2022
 Janvier 2022 : implémenté les modèles dendrométriques à l'échelle de pixel de 5 m de résolution. Les paramètres dendro pour un polygone sont calulés comme la moyenne pour chaque pixels. Précédemment, par exemple dans le plug-In Qgis Forestimator, une échelle intermédiaire était utilisée entre la parcelle et le pixel. Elle correspondait à une surface de un are affin de répondre à la définition de la hauteur dominante, qui correspond à la hauteur moyenne des 100 arbres les plus haut par hectare (donc une surface moyenne de 1 are).
 </message>
 
+<message id="COMPO.projet">
+Cette cartographie des essences forestières est le résultat de recherches menées à ULiège Gembloux Agro-Bio Tech au travers de deux projets Interreg, Forêt Pro Bos et RegioWood 2, et du projet Cartofor appuyé par le DNF.
+<br></br>
+</message>
 
+<message id="COMPO.description">
+<p>La cartographie des essences forestières a été réalisée à partir d’imagerie satellitaire Sentinel-2. Elle fournit le pourcentage de présence en terme de GHA de 9 groupes d’essences retenus : épicéas, chênes, hêtres, douglas, pins, peupliers, mélèzes, bouleaux et autres. La somme des pourcentages de ces 9 groupes faisant 100 %.
+Exemple : (0 % épicéas, 6 % chênes, 2 % hêtres, 0 % douglas, 0 % pins, 0 % peupliers, 0 % mélèzes, 
+0 % bouleaux, 2 % autres). 
+</p>
+<p>
+La cartographie se présente sous la forme d’une collection de couches cartographiques au format raster. 
+Pour chaque essence, une carte renseigne le pourcentage en GHA (valeur variant de 0 à 100%). 
+En plus de ces 9 raster, une couche synthétique nommée "Essence majoritaire" renseigne l'essence majoritaire du peuplement. 
+</p>
+<!--La composition spécifique attribuée à un pixel résulte de l’analyse du peuplement dans lequel il se trouve. Cette carte fournit donc une information valorisable à l’échelle de la parcelle et non de l’arbre.</p>
+
+            <p><img src="../img/compo.jpg" alt="" width="60%"/></p>
+            <p>Illustration de la cartographie des essences pour la bande « chênes » et la bande « hêtre » à l’échelle de la région wallonne.</p>-->
+</message>
+
+<message id="COMPO.version">
+Version d'octobre 2021
+</message>
+
+<message id="COMPO.logs">
+Octobre 2021 ; passage à une résolution de 2.5 m (auparavent 10 m). Les cartes renseignent dorénavent la proportion de l'essence en pourcentage de gha (précédemment "probabilité de présence).
+</message>
 
 </messages>
 

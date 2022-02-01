@@ -829,15 +829,15 @@ std::string getHtml(LayerMTD * lMTD){
         if (lMTD->Projet()!=""){
         proj="<h4>Projet </h4>" +lMTD->Projet();
         } else {proj="";}
-    }
-     if (proj!="" && isValidHtml(proj)){aRes+=proj;}
+    }else { proj="<h4>Projet  </h4>"+proj;}
+     if (proj!="" && isValidHtml(proj)){aRes+=proj;} else if (globTest){ std::cout << " pas de documentation pour le projet - carte " <<  lMTD->code() << std::endl;}
     // si il y a un message avec le bon id, on le prend
 
      std::string descr(WString::tr(lMTD->code()+".description").toUTF8());
      if (descr.substr(0,2)=="??"){
          descr="<h4>Description </h4>" + lMTD->Descr();
-    }
-     if (descr!="" && isValidHtml(descr)){aRes+=descr;}
+     }else { descr="<h4>Description  </h4>"+descr;}
+     if (descr!="" && isValidHtml(descr)){aRes+=descr;} else if (globTest){ std::cout << " pas de documentation pour la description - carte " <<  lMTD->code() << std::endl;}
 
     std::string version(WString::tr(lMTD->code()+".version").toUTF8());
     if (version.substr(0,2)=="??"){
@@ -847,18 +847,18 @@ std::string getHtml(LayerMTD * lMTD){
         } else{ version="";}
     } else { version="<h4>Version  </h4>"+version;}
 
-    if (version!="" && isValidHtml(version)){aRes+=version;}
+    if (version!="" && isValidHtml(version)){aRes+=version;} else if (globTest){ std::cout << " pas de documentation pour la version - carte " <<  lMTD->code() << std::endl;}
 
     // test si il existe un message dans le xml qui contient les logs de changements pour cette carte
     std::string logs(WString::tr(lMTD->code()+".logs").toUTF8());
     if (logs.substr(0,2)!="??"){
         std::string html="<h4>Information de modification </h4>" +logs;
-        if (isValidHtml(logs)){aRes+=html;}
+        if (isValidHtml(logs)){aRes+=html;} else if (globTest){ std::cout << " pas de documentation pour les logs - carte " <<  lMTD->code() << std::endl;}
     }
 
     if (lMTD->CopyR()!=""){
         std::string html="<h4>Copyright </h4>" +lMTD->CopyR();
-        if (isValidHtml(html)){aRes+=html;}
+        if (isValidHtml(html)){aRes+=html;} else if (globTest){ std::cout << " pas de documentation pour le copyrigth - carte " <<  lMTD->code() << std::endl;}
     }
     if (lMTD->VRefs().size()>0){
         std::string html="<h4>Référence  </h4>" ;
