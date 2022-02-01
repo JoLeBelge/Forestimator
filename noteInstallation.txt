@@ -1,0 +1,108 @@
+Notes sur l'installation de Forestimator
+----------------------------------------
+
+1) packages généraux/ installation via sudo
+-------------------------------------------
+
+sudo apt install libgraphicsmagick++1-dev libpango1.0-dev cmake mercurial libcurl4-openssl-dev cmake-curses-gui git ccmake
+
+sudo apt install sqlite3 libgdal-dev lzip libboost-all-dev
+
+
+2) Cloner dépot Forestimator, dépot Wt et autres dépendances
+---------------------------------------------------------------
+
+contenu git/config LOCAL pour Forestimator:
+[core]
+	repositoryformatversion = 0
+	filemode = true
+	bare = false
+	logallrefupdates = true
+[remote "origin"]
+	url = https://JoLeBelge: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@github.com/JoLeBelge//Forestimator.git
+	fetch = +refs/heads/*:refs/remotes/origin/*
+[branch "master"]
+	remote = origin
+	merge = refs/heads/master
+[submodule "cWebAptitude/libzippp"]
+	url = https://github.com/ctabin/libzippp
+	active = true
+	
+Contenu git config GLOBAL, accessible via git config --global --edit
+[user]
+        user = JoLeBelge
+        email = liseinjon@hotmail.com
+        name = lisein
+        #password=joaigun1
+        password = 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
+[credential]
+        helper = cache
+        
+2.1 Forestimator
+-----------------     
+
+git clone https://github.com/JoLeBelge/Forestimator
+git submodule init
+git submodule update
+
+installation de libzipp (est en sous-module dans Forestimator)
+sudo apt install zlib1g-dev libzip-dev liblzma-dev libbz2-dev
+cd cWebAptitude/libzippp/
+mkdir build && cd build
+cmake .. -DCMAKE_BUILD_TYPE=Release
+make && make install
+make && sudo make install
+
+
+2.2 Libharu (dépendance Wt)
+----------------------------
+      
+libharu ; compiler depuis les sources.
+git clone https://github.com/libharu/libharu
+mkdir build
+cd build ../
+cmake ../
+make -j2
+make install
+
+2.3 Graphicsmagick (dépendance Wt)
+----------------------------------
+pour un fonctionnement sans bug de WRasterImage, il nous faut compiler GM depuis les sources avec le quantum-depth=16 (8 par défaut)? Si QD=8, image dédoublée et avec couleur mauvâtre
+
+hg clone http://hg.code.sf.net/p/graphicsmagick/code/ GM
+cd GM
+./configure --enable-shared --with-quantum-depth=16
+sudo make install
+
+2.4 Wt
+------
+git clone https://github.com/emweb/wt.git Wt
+
+Sur ordi Assus lisein, changer les paramètres de cmake pour wt GM_INCLUDE_DIR, GM_LIB et GM_PREFIX comme ceci;
+
+cmake -DWT_WRASTERIMAGE_IMPLEMENTATION="GraphicsMagick" -DGM_INCLUDE_DIR="/usr/local/include/GraphicsMagick" -DGM_LIB="/usr/local/lib/libGraphicsMagick.so" -DGM_PREFIX="/usr/local/include/GraphicsMagick" ..
+make -j8
+make install
+
+les librairies Wt sont dans /usr/local/lib, il faut ajouter ce chemin dans notre config de la manière suivante:
+gedit /etc/ld.so.conf
+ajout ligne /usr/local/lib
+puis
+sudo ldconfig
+
+3) Compilation cWebAptitude
+---------------------------
+Maintenant que toutes les dépendances sont installées, on peut compiler Forestimator. Soit via Qt-creator, soit en ligne de commande avec qmake
+
+
+4) chemin d'accès aux couches cartographiques
+
+lien symbolique pour couches sur servcarto OLD OLD ---------
+
+il faut créer les directory data1/Carto/FEEW2020/, /data1/Carto/CS, puis y créer les liens symboliques
+sudo mkdir /data1 et tout 
+sudo ln -s /media/Data10/Forestimator/Station/* /data1/Carto/FEEW2020/
+
+-- OLD OLD --- on abandonne l'utilisation des liens symboliques, c'est déjà assez le bronx comme ça
+
+Donc on faut utiliser les chemins d'accès dans les tables layersApt et fichiersGIS dans la BD.
