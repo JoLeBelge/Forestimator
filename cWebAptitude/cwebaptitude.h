@@ -103,6 +103,9 @@ public:
             dialog_catalog->hide();
         }
     }
+
+    // un bon référencement dans moteur de recherche google passe par un header avec une description et un titre propre à chaque page. géré ici
+    void changeHeader(std::string aSection);
 private:
     void load_content_couches(WContainerWidget * content);
     //std::map<std::string,cEss>  mMEss;

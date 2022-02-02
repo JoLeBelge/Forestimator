@@ -627,7 +627,29 @@ detAptFEE
 <message id="desc.surf">Analyse Surfacique : statistique sur une surface d'intérêt</message>
 <message id="desc.point">Info ponctuelle : description d'une station</message>-->
 
-<message id="desc.carto">Forestimator application web - portail web - cartographie - description - stations forestières - peuplements - aptitudes des essences - fichier écologique des essences - analyse adéquation optimale choix des essences - composition spécifique - crise du scolyte - Wallonie - écogramme hydro-trophique - modèle numérique de hauteur - zone bioclimatique - niveau trophique hydrique - masque forestier - téléchargement - système d'information géographique - Catalogue de station - Sapin pectiné-Sapin de Vancouver-Sapin de Nordmann-Sapin noble-Cèdre de l'Atlas-Cyprès de Lawson-Mélèze d'Europe-Mélèze du Japon-Mélèze hybride-Épicéa commun-Épicea de Sitka-Pin de Koekelare-Pin laricio de Corse-Pin noir d'Autriche-Pin sylvestre-Douglas-Thuya géant-Tsuga hétérophylle-Érable sycomore-Hêtre-Frêne-Chêne sessile-Chêne pédonculé-Chêne rouge d'Amérique-Érable plane-Merisier-Peuplier baumier-Peuplier noir hybride-Aulne glutineux-Charme-Bouleau verruqueux-Bouleau pubescent-Châtaignier-Noyer noir-Noyer commun-Noyer hybride-Robinier-Alisier torminal-Tilleul à petites feuilles-Tilleul à grandes feuilles-Érable champêtre-Caryers-Tulipier de Virginie-Pommier sauvage-Peuplier grisard-Peuplier tremble-Poirier sauvage-Saule blanc-Sorbier des oiseleurs-Cormier-Orme champêtre-Orme de montagne-If commun-Orme lisse-Peuplier noir - Lisein Jonathan - Philippe Lejeune - Hugues Claessens - Samuel Quevauvillers - Ardenne centro-orientale - Basse et moyenne Ardenne - Basse Lorraine - Fagne - Famenne - Calestienne - Haute Lorraine - Hesbino-Brabançon - Plaines et Vallées Scaldisiennes - Condroz - Sambre et Meuse - Thiérache - Haute Ardenne - Calestienne - lidar - canopée -Carte numérique des sols de Wallonie</message>
+<message id="meta.desc.carto">Forestimator application web - portail web - cartographie - description - stations forestières - peuplements - aptitudes des essences - fichier écologique des essences - analyse adéquation optimale choix des essences - composition spécifique - crise du scolyte - Wallonie - écogramme hydro-trophique - modèle numérique de hauteur - zone bioclimatique - niveau trophique hydrique - masque forestier - téléchargement - système d'information géographique - Catalogue de station - Sapin pectiné-Sapin de Vancouver-Sapin de Nordmann-Sapin noble-Cèdre de l'Atlas-Cyprès de Lawson-Mélèze d'Europe-Mélèze du Japon-Mélèze hybride-Épicéa commun-Épicea de Sitka-Pin de Koekelare-Pin laricio de Corse-Pin noir d'Autriche-Pin sylvestre-Douglas-Thuya géant-Tsuga hétérophylle-Érable sycomore-Hêtre-Frêne-Chêne sessile-Chêne pédonculé-Chêne rouge d'Amérique-Érable plane-Merisier-Peuplier baumier-Peuplier noir hybride-Aulne glutineux-Charme-Bouleau verruqueux-Bouleau pubescent-Châtaignier-Noyer noir-Noyer commun-Noyer hybride-Robinier-Alisier torminal-Tilleul à petites feuilles-Tilleul à grandes feuilles-Érable champêtre-Caryers-Tulipier de Virginie-Pommier sauvage-Peuplier grisard-Peuplier tremble-Poirier sauvage-Saule blanc-Sorbier des oiseleurs-Cormier-Orme champêtre-Orme de montagne-If commun-Orme lisse-Peuplier noir - Lisein Jonathan - Philippe Lejeune - Hugues Claessens - Samuel Quevauvillers - Ardenne centro-orientale - Basse et moyenne Ardenne - Basse Lorraine - Fagne - Famenne - Calestienne - Haute Lorraine - Hesbino-Brabançon - Plaines et Vallées Scaldisiennes - Condroz - Sambre et Meuse - Thiérache - Haute Ardenne - Calestienne - lidar - canopée -Carte numérique des sols de Wallonie</message>
+
+<message id="meta.desc.documentation">Des outils cartographiques qui sont une aide à la gestion des ressources forestières de Wallonie</message>
+<message id="meta.titre.documentation">Documentation des couches cartographiques consultables sur Forestimator</message>
+
+<message id="meta.desc.cr_dit-et-contact">Contactez l'équipe de chercheurs de Forestimator</message>
+
+<message id="meta.desc.aptitude-des-essences">L'aptitude des essences forestières, leur capacité à produire du bois de qualité pour une station donnée</message>
+<message id="meta.titre.aptitude-des-essences">L'aptitude des essences forestières</message>
+
+<!--
+aptitude-des-essences
+ecogramme
+zone-bioclimatique
+niveaux-trophiques
+niveaux-hydriques
+apport-d_eau
+sous_secteurs-et-topo
+hauteur-de-la-v_g_tation
+forestimator-_-pr_sentation
+composition-des-essences
+crise-du-scolyte
+-->
 
 <message id="cadastre.commune">Commune / INS</message>
 <message id="cadastre.division">Division</message>

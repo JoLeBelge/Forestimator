@@ -253,19 +253,37 @@ void cWebAptitude::load_content_couches(WContainerWidget * content){
 void cWebAptitude::handlePathChange()
 {
     bool baddLog(1);
-    std::size_t found = mApp->internalPath().find("/documentation");
+    std::string docInternalP("/documentation");
+    std::size_t found = mApp->internalPath().find(docInternalP);
     if (mApp->internalPath() == "/documentation" | found!=std::string::npos){
         top_stack->setCurrentIndex(0);
         menuitem_documentation->select();
         //navigation->setTitle(tr("titre.presentation"));
        // mApp->addMetaHeader("description", tr("desc.pres"), "fr");
-        mApp->addMetaHeader("description", tr("desc.carto"), "fr");
+
+        // une description différentes pour chaques page de documentation. Il faut préhalablement retirer la description, sinon ça n'aura pas d'effet
+        // fonctionne pas si session avec javascript, mais pour les robots ça va quand-même. Sur mon navigateur, le meta descr c'est celui de la première page consultée de la session
+        // check si j'ai un header description pour cette sous-section, sinon celui général à la page documentation
+
+        if (found!=std::string::npos && found + docInternalP.length()+1 < mApp->internalPath().size()){// test sur la longueur car il faut gérer le cas ou on a juste un backslach : /documentation/
+        std::string sectionDoc=mApp->internalPath().erase(0, found + docInternalP.length()+1);
+        // retirer l'éventuel baslach en fin de url
+        sectionDoc.erase(std::remove(sectionDoc.begin(), sectionDoc.end(), '/'), sectionDoc.end());
+        if (globTest){std::cout << "section Documentation : "<< sectionDoc << std::endl;}
+        changeHeader(sectionDoc);
+        } else {
+             changeHeader("documentation");
+        }
+        //mApp->removeMetaHeader(MetaHeaderType::Meta,"description");
+        //mApp->addMetaHeader(MetaHeaderType::Meta,"description", tr("meta.desc.documentation"), "fr");
+
         showDialogues(0);
     }else if (mApp->internalPath() == "/cartographie" || mApp->internalPath() == "/" || mApp->internalPath() == ""){
         top_stack->setCurrentIndex(1);
         menuitem_app->select();
         //navigation->setTitle(tr("titre.carto"));
-        mApp->addMetaHeader("description", tr("desc.carto"), "fr");
+        mApp->removeMetaHeader(MetaHeaderType::Meta,"description");
+        mApp->addMetaHeader(MetaHeaderType::Meta,"description", tr("meta.desc.carto"), "fr");
         showDialogues(1);
     }else if (mApp->internalPath() == "/resultat"){
         top_stack->setCurrentIndex(2);
@@ -283,6 +301,21 @@ void cWebAptitude::handlePathChange()
 
     // TODO css min-size [menu_analyse] display:none if width<900
     // TODO css @media-width<1200 -> map 60%  @media-width<900 -> [div stack] display:blocks et overflow:auto [map] width:90%  [linfo] min-height: 600px;
+
+}
+
+
+void cWebAptitude::changeHeader(std::string aSection){
+    std::string message(WString::tr("meta.desc."+aSection).toUTF8());
+    if (message.substr(0,2)!="??"){
+    mApp->removeMetaHeader(MetaHeaderType::Meta,"description");
+    mApp->addMetaHeader(MetaHeaderType::Meta,"description", message, "fr");
+    }
+    message=WString::tr("meta.titre."+aSection).toUTF8();
+    if (message.substr(0,2)!="??"){
+    mApp->removeMetaHeader(MetaHeaderType::Meta,"titre");
+    mApp->addMetaHeader(MetaHeaderType::Meta,"titre", message, "fr");
+    }
 
 }
 
