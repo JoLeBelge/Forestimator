@@ -67,5 +67,17 @@
       <loc>http://forestimator.gembloux.ulg.ac.be/documentation/crise-du-scolyte</loc>
       <changefreq>monthly</changefreq>
    </url>
+   <url>
+      <loc>http://forestimator.gembloux.ulg.ac.be/documentation/mod_le-dendro</loc>
+      <changefreq>monthly</changefreq>
+   </url>
+    <url>
+      <loc>http://forestimator.gembloux.ulg.ac.be/documentation/masque-forestier</loc>
+      <changefreq>monthly</changefreq>
+   </url>
+      <url>
+      <loc>http://forestimator.gembloux.ulg.ac.be/documentation/forestimator-api</loc>
+      <changefreq>monthly</changefreq>
+   </url>
      
 </urlset>
