@@ -11,6 +11,10 @@ CONFIG += c++17
 
 LIBS = -lcurl -lgdal -lwthttp -lwt -lboost_system -lboost_iostreams  -lboost_filesystem -lboost_program_options -lcrypt -pthread -lwtdbo -lwtdbosqlite3 -lzip -lhpdf -lsqlite3
 
+#LIBS += -L$$PWD/usr/include/gdal/ -lgdal
+#DEPENDPATH += /usr/include/gdal/
+INCLUDEPATH += /usr/include/gdal/
+
 INCLUDEPATH += $$PWD/../carteApt/
 INCLUDEPATH += $$PWD/auth/
 INCLUDEPATH += $$PWD/libzipp/src/
