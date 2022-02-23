@@ -280,8 +280,8 @@ void dicoPedo::loadInfo(){
         SQLstring="SELECT Dir2,Nom FROM fichiersGIS WHERE Code='CNSW';";
     } else if (s=="jo") {
         SQLstring="SELECT Dir3,Nom FROM fichiersGIS WHERE Code='CNSW';";
-    } else if (s=="carto") {
-        SQLstring="SELECT Dir3,Nom FROM fichiersGIS WHERE Code='CNSW';";
+    } else if (boost::filesystem::exists("/home/carto/app/Forestimator/carteApt/data/aptitudeEssDB.db")) {
+        SQLstring="SELECT Dir4,Nom FROM fichiersGIS WHERE Code='CNSW';";
     } else {
         SQLstring="SELECT Dir,Nom FROM fichiersGIS WHERE Code='CNSW';";
     }
