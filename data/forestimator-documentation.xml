@@ -104,6 +104,19 @@ Juin 2020 : première version pour toutes les essences forestières.
 Les compensations dues à la situations topographiques sont de l'ordre du micro-climat. Une situation de risque ou une situation favorable influencera ainsi l'aptitude bioclimatique pour cette station. Cette aptitude bioclimatique "compensée" est ensuite confrontée à l'aptitude hydro-trophique afin de sélectionner la plus contraignante des deux.
 </message>
 
+
+
+<message id="SWC.description">
+La ressource en eau constitue un des facteurs déterminants de l’adaptation de nos écosystèmes forestiers aux bouleversements climatiques annoncés. L’évaluation de la réserve en eau des sols devrait amener à une meilleure perception de la vulnérabilité des stations forestières au stress hydrique et à des recommandations  de gestion plus précises quant au choix des essences à implanter et aux techniques de sylviculture.
+
+<figure class="highlight">
+<img src="/img/swcTable.jpg" alt="Légende réserve en eau"/> 
+<figcaption class="figure-caption">Ordre de grandeur de la réserve en eau du sol (en mmm) et classes de contraintes et aptitudes forestières associées. Pour établir le lien avec les besoins en eau d’un peuplement, la transpiration d’une chênaie de 40 ans atteint de l’ordre de 2 à 3 mm d’eau par jour.
+</figcaption>
+</figure>
+
+</message>
+
 <message id="dendro.projet">
 Les modèles dendrométriques ont été réalisés dans le cadre des actions 0.8 (Suivi scientifique de l'Inventaire permanent des ressources forestières de Wallonie
 (IPRFW)) et 0.9 (CARTOFOR : recherches appliquées pour le développement à l’échelle de la Wallonie de méthodologies innovantes permettant la caractérisation et le suivi de la structure, de la composition et de l’état sanitaire des peuplements forestiers) de l’action du plan quinquennal de recherches forestières 2019-2024 (coordination Pr Philippe Lejeune).
