@@ -2,7 +2,10 @@
 
 using namespace std;
 
+#include "cdicoaptbase.h"
+#include "cnsw.h"
 #include "cdicoapt.h"
+
 #include "boost/program_options.hpp"
 #include "plaiprfw.h"
 #include "layerbase.h"
@@ -366,7 +369,13 @@ void descriptionStation(std::string aShp){
 
             // selectionne les couches raster que je vais utiliser
             // std::vector<std::string> aVCodes{"MNT","ZBIO","NT","NH","AE","SS","Topo","EP_FEE"};
-            std::vector<std::string> aVCodes{"MNT","ZBIO","NT","NH","AE","SS","Topo","EP_FEE","slope","MNH2019","MNH2014"};// ,"EP_CS","CS_A"
+
+            //std::vector<std::string> aVCodes{"MNT","ZBIO","NT","NH","AE","SS","Topo","EP_FEE","slope","MNH2019","MNH2014"};// ,"EP_CS","CS_A"
+
+            std::vector<std::string> aVCodes{"ZBIO","NT","NH","Topo"};// plus toutes les essences pour avoir les Aptitude pour l'IPRFW
+            for (std::string es : dico.getAllAcroEss()){
+                aVCodes.push_back(es+"_FEE");
+            }
 
             //std::vector<std::string> aVCodes{"MNT","ZBIO","NT","NH","AE","SS","Topo","BV_FEE","BP_FEE","slope"};
             //std::vector<std::string> aVCodes{"MNT","ZBIO","NT","NH","AE","SS","Topo"};
@@ -415,6 +424,8 @@ void descriptionStation(std::string aShp){
          *
          */
 
+            bool isPt(1);// j'ai envie de faire les analyses non pas en mode surfacique mais en mode extract value to point
+
             // je pense que c'est assez long comme process (lecture CNSW)
             headerProcessing="";
             bool doCNSW=0;
@@ -433,7 +444,10 @@ void descriptionStation(std::string aShp){
                 statOrder.emplace(std::make_pair("Ppct",c));
                 c++;
             }
+
+
             for (std::shared_ptr<layerBase> & l : aVLs){
+                if (!isPt){
                 switch (l->getTypeVar()) {
                 case TypeVar::Continu:{
                     switch (l->getCatLayer()) {
@@ -468,6 +482,11 @@ void descriptionStation(std::string aShp){
                 default:
                     break;
                 }
+                }else {
+                    headerProcessing+=";"+l->Code();
+                    statOrder.emplace(std::make_pair(l->Code(),c));
+                    c++;
+                }
             }
             for (std::unique_ptr<rasterFiles> & r : aVRFs){
                 headerProcessing+=";"+r->Code();
@@ -484,9 +503,10 @@ void descriptionStation(std::string aShp){
             //}
 
             for (int id=0;id<lay->GetFeatureCount();id++){
+               // for (int id=0;id<100;id++){
                 poFeature = lay->GetFeature(id);
                 //std::cout << " process feature id " << id << std::endl;
-                if (poFeature->GetFID() % 1000==0){std::cout << " process feature " << poFeature->GetFID() << std::endl;}
+                if (poFeature->GetFID() % 100==0){std::cout << " process feature " << poFeature->GetFID() << std::endl;}
                 //if (poFeature->GetFID() == 2000){break;}
                 OGRGeometry * poGeom = poFeature->GetGeometryRef();
                 switch (poGeom->getGeometryType()){
@@ -495,8 +515,12 @@ void descriptionStation(std::string aShp){
                     // pour la carte générée pour analyse point, on ne dessine pas un polygone mais un cercle autour du point
                 case wkbPoint:
                 {
-                    std::cout << " shp de point ; j'effectue un buffer de 18 m" << std::endl;
-                    poGeom = poGeom->Buffer(18);
+                    if (0){
+                        std::cout << " shp de point ; j'effectue un buffer de 18 m" << std::endl;
+                        poGeom = poGeom->Buffer(18);
+                    }
+                    //std::cout << " point " << std::endl;
+                    //isPt=1;
                     break;
                 }
                 default:
@@ -535,63 +559,95 @@ void descriptionStation(std::string aShp){
                     aStatOnPol.emplace(std::make_pair(ind,roundDouble(p.second,0)));
                 }
 
-                // les autres couches
+
+                if (!isPt){
+                    // les autres couches
 #pragma omp parallel num_threads(8) shared(aStatOnPol,aVLs,statOrder)
-                {
+                    {
 #pragma omp for
-                    for (std::shared_ptr<layerBase> & l : aVLs){
-                        // analyse surfacique ; basic stat pour les var continue
-                        switch (l->getTypeVar()) {
-                        case TypeVar::Continu:{
+                        for (std::shared_ptr<layerBase> & l : aVLs){
+                            // analyse surfacique ; basic stat pour les var continue
 
-                            basicStat stat=l->computeBasicStatOnPolyg(poGeom);
 
-                            switch (l->getCatLayer()) {
-                            case TypeLayer::Peuplement:{
+                            switch (l->getTypeVar()) {
+                            case TypeVar::Continu:{
+
+                                basicStat stat=l->computeBasicStatOnPolyg(poGeom);
+
+                                switch (l->getCatLayer()) {
+                                case TypeLayer::Peuplement:{
+#pragma omp critical
+                                    {
+                                        int ind2=statOrder.at(l->Code()+"mean");
+                                        aStatOnPol.emplace(std::make_pair(ind2,stat.getMean()));
+                                        ind2=statOrder.at(l->Code()+"max");
+                                        aStatOnPol.emplace(std::make_pair(ind2,stat.getMax()));
+                                        ind2=statOrder.at(l->Code()+"sd");
+                                        aStatOnPol.emplace(std::make_pair(ind2,stat.getSd()));
+                                    }
+                                    break;
+                                }
+                                default:
 #pragma omp critical
                                 {
+                                    //aStatOnPol.push_back(stat.getMean());
                                     int ind2=statOrder.at(l->Code()+"mean");
                                     aStatOnPol.emplace(std::make_pair(ind2,stat.getMean()));
-                                    ind2=statOrder.at(l->Code()+"max");
-                                    aStatOnPol.emplace(std::make_pair(ind2,stat.getMax()));
-                                    ind2=statOrder.at(l->Code()+"sd");
-                                    aStatOnPol.emplace(std::make_pair(ind2,stat.getSd()));
+                                }
+                                }
+                                break;
+                            }
+                            case TypeVar::Classe:{
+                                std::pair<int,double> p= l->valMajoritaire(poGeom);
+#pragma omp critical
+                                {
+                                    int ind2=statOrder.at(l->Code()+"maj");
+                                    aStatOnPol.emplace(std::make_pair(ind2,std::to_string(p.first)));
+                                    ind2=statOrder.at(l->Code()+"pct");
+                                    aStatOnPol.emplace(std::make_pair(ind2,roundDouble(p.second,0)));
                                 }
                                 break;
                             }
                             default:
-#pragma omp critical
-                            {
-                                //aStatOnPol.push_back(stat.getMean());
-                                int ind2=statOrder.at(l->Code()+"mean");
-                                aStatOnPol.emplace(std::make_pair(ind2,stat.getMean()));
+                                break;
                             }
-                            }
-                            break;
-                        }
-                        case TypeVar::Classe:{
-                            std::pair<int,double> p= l->valMajoritaire(poGeom);
-#pragma omp critical
-                            {
-                                int ind2=statOrder.at(l->Code()+"maj");
-                                aStatOnPol.emplace(std::make_pair(ind2,std::to_string(p.first)));
-                                ind2=statOrder.at(l->Code()+"pct");
-                                aStatOnPol.emplace(std::make_pair(ind2,roundDouble(p.second,0)));
-                            }
-                            break;
-                        }
-                        default:
-                            break;
-                        }
 
+
+                        }
                     }
+
+
+                     // analyse ponctuelle, plus rapide.
+                } else {
+                    //std::cout << " analyse ponctuelle" << std::endl;
+
+                    OGRPoint * pt= poGeom->toPoint();
+                    double aX=pt->getX(),aY=pt->getY();
+                    //delete pt;
+#pragma omp parallel num_threads(8) shared(aStatOnPol, aVLs,aX,aY)
+                    {
+#pragma omp for
+                        for (std::shared_ptr<layerBase> & l : aVLs){
+                            std::string aRes=std::to_string(l->getValue(aX,aY));
+#pragma omp critical
+                            {
+                                int ind2=statOrder.at(l->Code());
+                                aStatOnPol.emplace(std::make_pair(ind2,aRes));
+                            }
+
+                        }
+                    }
+
+
                 }
+                //std::cout << "done " << std::endl;
+
 
                 /*
                  * CARTE CLIMAT
                  *
                  */
-
+                if (climat){
                 OGRPoint * pt= getCentroid(poGeom->toPolygon());
                 double aX=pt->getX(),aY=pt->getY();
                 delete pt;
@@ -607,6 +663,7 @@ void descriptionStation(std::string aShp){
                         }
 
                     }
+                }
                 }
 
                 //maintenant on converti la map en vecteur de string

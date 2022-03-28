@@ -14,7 +14,7 @@
 enum class FeRe {Feuillus,
                  Resineux,
                  Autre
-                   };
+                };
 
 // octobre 2021 ; j'aimerai utiliser dans phytospy le dico Apt, entre autre pour concevoir une mise en page des matrices d'aptitudes.
 // j'aimerai partager le dico Apt entre forestimator et phytospy, mais celui-ci est trop spécialisé forestimator. Je crée une classe mère avec les membres que je souhaite partager entre les deux applis
@@ -203,6 +203,14 @@ public:
             break;}
         default:
             break;
+        }
+        return aRes;
+    }
+
+    std::vector<std::string> getAllAcroEss(){
+        std::vector<std::string> aRes;
+        for (auto es : Dico_codeEs2NomFR){
+            aRes.push_back(es.first);
         }
         return aRes;
     }

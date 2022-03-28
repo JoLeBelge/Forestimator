@@ -16,6 +16,7 @@ INCLUDEPATH += $$PWD/../cWebAptitude
 
 SOURCES += stationDescriptor.cpp \
         ../carteApt/cdicoapt.cpp \
+        ../carteApt/cdicoaptbase.cpp \
         ../carteApt/cnsw.cpp \
     plaiprfw.cpp \
     ../carteApt/layerbase.cpp \
@@ -32,6 +33,7 @@ HEADERS += \
     plaiprfw.h \
     ../carteApt/layerbase.h \
     ../carteApt/cdicoapt.h \
+    ../carteApt/cdicoaptbase.h \
     ../carteApt/cnsw.h \
     ../cWebAptitude/cadastre.h \
 

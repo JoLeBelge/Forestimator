@@ -1,6 +1,8 @@
 TO DO forestimator
 ------------------
 
+-catalogues des couches ; mettre essences par ordre alphabétique
+
 -export pdf ana surf
 
 -info ponctuelle sur cadastre : a développer
