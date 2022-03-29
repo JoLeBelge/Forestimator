@@ -160,9 +160,10 @@ void simplepoint::afficheAptAllEss(){
         mAptAllEss->elementAt(row,0)->addWidget(cpp14::make_unique<WText>("<h4>Aptitude "+ mGL->TypeClasStr()+"</h4>"));
         row++;
         color col(0,0,0);
-        if (O.size()>1){
+        if (O.size()>0){
             col = mGL->Dico()->Apt2col(1);
             for (auto & kv : O){
+                 if (globTest && kv.first=="AX"){std::cout << "AX est en optimum" << std::endl;}
                 mAptAllEss->elementAt(row, column)->addWidget(cpp14::make_unique<WText>(kv.first));
                 mAptAllEss->elementAt(row, column)->setStyleClass("O");
                 mAptAllEss->elementAt(row, column)->setToolTip(mGL->Dico()->accroEss2Nom(kv.first));
@@ -170,10 +171,10 @@ void simplepoint::afficheAptAllEss(){
                 row++;
             }
             column++;
-            row=0;
+            row=1;
         }
 
-        if (T.size()>1){
+        if (T.size()>0){
             col = mGL->Dico()->Apt2col(2);
             for (auto & kv : T){
                 mAptAllEss->elementAt(row, column)->addWidget(cpp14::make_unique<WText>(kv.first));
@@ -190,9 +191,9 @@ void simplepoint::afficheAptAllEss(){
                 row++;
             }
             column++;
-            row=0;
+            row=1;
         }
-        if (TE.size()>1){
+        if (TE.size()>0){
             col = mGL->Dico()->Apt2col(3);
             for (auto & kv : TE){
                 mAptAllEss->elementAt(row, column)->addWidget(cpp14::make_unique<WText>(kv.first));
@@ -208,9 +209,9 @@ void simplepoint::afficheAptAllEss(){
                 row++;
             }
             column++;
-            row=0;
+            row=1;
         }
-        if (E.size()>1){
+        if (E.size()>0){
             col = mGL->Dico()->Apt2col(4);
             for (auto & kv : E){
                 mAptAllEss->elementAt(row, column)->addWidget(cpp14::make_unique<WText>(kv.first));
