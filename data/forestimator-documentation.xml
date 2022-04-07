@@ -79,6 +79,13 @@ On estime que la profondeur de sol d'une série spéciale "P" (base de grand ver
 
 <message id="ES_EP.description">
 <h4>Cartographie des foyers de scolytes sur base d'images satellites</h4>
+
+<figure class="highlight">
+<img src="/img/scoMM.png" alt="Méthode de détection des scolytes" width="800"/> 
+<figcaption class="figure-caption">Une modélisation de la réponse spectrale des pessières saines au cours de la saison de végétation permet la détection d'observations pour lesquelles l'activité photosynthétique semble anormale (au dessus de la ligne en mauve).
+</figcaption>
+</figure>
+<br></br>
 L'idée générale est de se calquer sur la méthodologie de l'INRAE (INRAE, UMR TETIS, R. Dutrieux, K. Ose, J.-B. Féret) développée depuis 2017. Celle-ci consiste à surveiller l'évolution saisonière d'un indice spectral calculé sur base de série temporelle d'images Sentinel-2. L'information est résumée sous forme d'une carte d'état sanitaire par an.
 <br></br>
 Une documentation plus exhaustive de la méthode est disponible sous format pdf:
@@ -165,6 +172,11 @@ Version d'octobre 2021
 
 <message id="COMPO.logs">
 Octobre 2021 ; passage à une résolution de 2.5 m (auparavent 10 m). Les cartes renseignent dorénavent la proportion de l'essence en pourcentage de gha (précédemment "probabilité de présence).
+</message>
+
+<message id="ES_EP.logs">
+Avril 2022 : mise à jour des cartes d'état sanitaire en pessière (détection de scolyte) en prenant en compte les acquisitions Sentinel-2 jusqu'en mars 2022. 
+Pour la délimitation de la zone en pessière, utilisation de la dernière version de la couche de présence d'épicéa avec seuil de 80% en Gha.
 </message>
 
 </messages>
