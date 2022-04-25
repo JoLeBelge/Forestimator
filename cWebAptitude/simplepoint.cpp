@@ -17,7 +17,7 @@ void simplepoint::createUI()
     mParent->setMargin(1,Wt::Side::Bottom | Wt::Side::Top);
     mParent->setInline(0);// si pas inline Et bizarrement si pas de setMargin autre que 0, pas de scrollbar pour l'overflow!
 
-    mParent->addWidget(cpp14::make_unique<WText>(tr("sp_infoclic")));
+    mIntroTxt = mParent->addWidget(cpp14::make_unique<WText>(tr("sp_infoclic")));
     mParent->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
     createPdfBut = mParent->addWidget(Wt::cpp14::make_unique<WPushButton>("Export pdf"));
     createPdfBut->clicked().connect(this,&simplepoint::export2pdfTitreDialog);
@@ -51,6 +51,7 @@ void simplepoint::vider()
     mDetAptFEE->clear();
     mAptAllEss->clear();
     mContEco->clear();  
+    mIntroTxt->hide();
 }
 
 void simplepoint::titreInfoRaster(){
@@ -66,9 +67,9 @@ void simplepoint::add1InfoRaster(std::vector<std::string> aV){
 
     if (aV.size()>1 && aV.at(1)!=""){
         int row=mInfoT->rowCount();
-        //auto t1 = mInfoT->elementAt(row, 0)->addWidget(cpp14::make_unique<WText>(aV.at(0)));
         mInfoT->elementAt(row, 0)->addWidget(cpp14::make_unique<WText>(WString::fromUTF8(aV.at(0))));
         auto t2 =mInfoT->elementAt(row, 1)->addWidget(cpp14::make_unique<WText>(aV.at(1)));
+        mInfoT->elementAt(row, 1)->setContentAlignment(AlignmentFlag::Right);
 
         if (aV.size()>2 && aV.at(2)=="bold"){
             mInfoT->elementAt(row, 0)->setStyleClass("bold");
@@ -163,9 +164,9 @@ void simplepoint::afficheAptAllEss(){
         if (O.size()>0){
             col = mGL->Dico()->Apt2col(1);
             for (auto & kv : O){
-                 if (globTest && kv.first=="AX"){std::cout << "AX est en optimum" << std::endl;}
                 mAptAllEss->elementAt(row, column)->addWidget(cpp14::make_unique<WText>(kv.first));
                 mAptAllEss->elementAt(row, column)->setStyleClass("O");
+                mAptAllEss->elementAt(row, column)->addStyleClass("bold");
                 mAptAllEss->elementAt(row, column)->setToolTip(mGL->Dico()->accroEss2Nom(kv.first));
                 mAptAllEss->elementAt(row, column)->setContentAlignment(AlignmentFlag::Center);
                 row++;
@@ -178,15 +179,14 @@ void simplepoint::afficheAptAllEss(){
             col = mGL->Dico()->Apt2col(2);
             for (auto & kv : T){
                 mAptAllEss->elementAt(row, column)->addWidget(cpp14::make_unique<WText>(kv.first));
-                //mAptAllEss->elementAt(row, column)->decorationStyle().setBackgroundColor(WColor(col.mR,col.mG,col.mB));
                 mAptAllEss->elementAt(row, column)->setToolTip(mGL->Dico()->accroEss2Nom(kv.first));
                 // pour le moment, si double aptitude, celle-ci est visible dans le tooltip
                 if (kv.second!=2) {
                     mAptAllEss->elementAt(row, column)->setToolTip( mAptAllEss->elementAt(row, column)->toolTip()+ " - " +WString::fromUTF8(mDico->code2AptFull(kv.second)));
-                    //mAptAllEss->elementAt(row, column)->decorationStyle().setForegroundColor(WColor("gray"));
                     mAptAllEss->elementAt(row, column)->decorationStyle().setForegroundColor(WColor(120,120,120));
                 }
                 mAptAllEss->elementAt(row, column)->setStyleClass("T");
+                mAptAllEss->elementAt(row, column)->addStyleClass("bold");
                 mAptAllEss->elementAt(row, column)->setContentAlignment(AlignmentFlag::Center);
                 row++;
             }
@@ -198,11 +198,11 @@ void simplepoint::afficheAptAllEss(){
             for (auto & kv : TE){
                 mAptAllEss->elementAt(row, column)->addWidget(cpp14::make_unique<WText>(kv.first));
                 mAptAllEss->elementAt(row, column)->setStyleClass("TE");
+                mAptAllEss->elementAt(row, column)->addStyleClass("bold");
                 mAptAllEss->elementAt(row, column)->setToolTip(mGL->Dico()->accroEss2Nom(kv.first));
                 // pour le moment, si double aptitude, celle-ci est visible dans le tooltip
                 if (kv.second!=3) {
                     mAptAllEss->elementAt(row, column)->setToolTip( mAptAllEss->elementAt(row, column)->toolTip()+ " - " +WString::fromUTF8(mDico->code2AptFull(kv.second)));
-                    //mAptAllEss->elementAt(row, column)->decorationStyle().setForegroundColor(WColor("gray"));
                     mAptAllEss->elementAt(row, column)->decorationStyle().setForegroundColor(WColor(120,120,120));
                 }
                 mAptAllEss->elementAt(row, column)->setContentAlignment(AlignmentFlag::Center);
@@ -216,6 +216,7 @@ void simplepoint::afficheAptAllEss(){
             for (auto & kv : E){
                 mAptAllEss->elementAt(row, column)->addWidget(cpp14::make_unique<WText>(kv.first));
                 mAptAllEss->elementAt(row, column)->setStyleClass("E");
+                mAptAllEss->elementAt(row, column)->addStyleClass("bold");
                 mAptAllEss->elementAt(row, column)->setToolTip(mGL->Dico()->accroEss2Nom(kv.first));
                 // pour le moment, si double aptitude, celle-ci est visible dans le tooltip
                 if (kv.second!=4) {

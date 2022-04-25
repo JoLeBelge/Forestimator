@@ -64,6 +64,7 @@ public:
         //std::cout <<" layer code " << mCode << ", substr" <<mCode.substr(0,2) << std::endl;
         return mDico->getEss(mCode.substr(0,2));}
     bool l4Stat(){return mLay4Stat;}
+    bool l4StatP(){return mLay4StatPonctuel;}
 
 private:
     bool mIsVisible;
@@ -71,6 +72,7 @@ private:
     // est ce une couche qu'on veux pouvoir visulaliser, qu'on veux pouvoir calculer des stats dessus?
     bool mLay4Visu;
     bool mLay4Stat;
+    bool mLay4StatPonctuel;
     groupLayers * mGroupL;
 
     WText * mWtText; // ça c'est le lien entre l'objet et l'affichage dans la page web

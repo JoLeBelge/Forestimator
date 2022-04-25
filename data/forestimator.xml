@@ -87,7 +87,9 @@ Effectuer une analyse pour un polygone de votre shapefile en cliquant dessus tou
 <message id="groupeCoucheKKCS">Couches thématiques (Catalogue de stations)</message>
 
 <message id="titreEcogramme"><h4>Ecogramme : aptitude hydrotrophique pour cette zone bioclimatique</h4></message>
-<message id="legendEcogramme">L'abscisse représente les niveaux trophiques, allant du plus acide à gauche vers les sols carbonatés à droite. L'ordonnée représente le gradient hydrique, avec les stations sèches en haut, humide en bas, et à régime hydrique alternatif sur l'encart à part en bas.</message>
+<message id="legendEcogrammeOLD">L'abscisse représente les niveaux trophiques, allant du plus acide à gauche vers les sols carbonatés à droite. L'ordonnée représente le gradient hydrique, avec les stations sèches en haut, humide en bas, et à régime hydrique alternatif sur l'encart à part en bas.</message>
+
+<message id="legendEcogramme">L'abscisse représente les niveaux trophiques, l'ordonnée représente le gradient hydrique.</message>
 
 <message id="defaultLoadingI">Chargement...</message>
 <message id="LoadingI1">Calcul des statistiques pour ce polygone</message>

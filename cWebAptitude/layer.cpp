@@ -7,6 +7,7 @@ Layer::Layer(groupLayers * aGroupL, std::string aCode,WText * PWText):
   ,mIsVisible(1)
   ,mLay4Stat(1)
   ,mLay4Visu(1)
+ ,mLay4StatPonctuel(1)
 {
     //std::cout << "création de layer pour " << aCode << std::endl;
     mLabel=mNom;
@@ -26,6 +27,7 @@ Layer::Layer(groupLayers * aGroupL, std::string aCode,WText * PWText):
     */
 
     mLay4Stat=mDico->lay4Stat(mCode);
+    mLay4StatPonctuel=mDico->lay4StatP(mCode);
     mLay4Visu=mDico->lay4Visu(mCode);
 
     setActive(false);
@@ -38,11 +40,13 @@ Layer::Layer(groupLayers * aGroupL, std::string aCode):
   ,mIsVisible(0)
   ,mLay4Stat(1)
   ,mLay4Visu(0)
+   ,mLay4StatPonctuel(1)
 {
     mLabel=mNomCourt;
     mWtText=NULL;
     mLay4Stat=mDico->lay4Stat(mCode);
     mLay4Visu=mDico->lay4Visu(mCode);
+    mLay4StatPonctuel=mDico->lay4StatP(mCode);
     setActive(false);
 }
 
@@ -53,12 +57,14 @@ Layer::Layer(groupLayers * aGroupL, std::shared_ptr<layerBase> aLB, WText * PWTe
    ,mIsVisible(1)
    ,mLay4Stat(1)
    ,mLay4Visu(1)
+  ,mLay4StatPonctuel(1)
  {
      //std::cout << "création de layer en copiant layerbase " << aLB->Code() << std::endl;
      mLabel=mNomCourt;
      mWtText->setText(mLabel);
      mLay4Stat=mDico->lay4Stat(mCode);
      mLay4Visu=mDico->lay4Visu(mCode);
+     mLay4StatPonctuel=mDico->lay4StatP(mCode);
      setActive(false);
      //std::cout << "done" << std::endl;
  }
@@ -70,11 +76,13 @@ Layer::Layer(groupLayers * aGroupL, std::shared_ptr<layerBase> aLB):
    ,mIsVisible(0)
    ,mLay4Stat(1)
    ,mLay4Visu(0)
+    ,mLay4StatPonctuel(1)
  {
      //std::cout << "création de layer pour " << aCode << std::endl;
      mLabel=mNomCourt;
      mLay4Stat=mDico->lay4Stat(mCode);
      mLay4Visu=mDico->lay4Visu(mCode);
+     mLay4StatPonctuel=mDico->lay4StatP(mCode);
      setActive(false);
     //std::cout << "done" << std::endl;
  }

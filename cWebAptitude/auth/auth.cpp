@@ -75,11 +75,7 @@ void AuthApplication::loadStyles(){
     EssStyle.font().setWeight(FontWeight::Bold);
     styleSheet().addRule(".currentEss", EssStyle);
 
-    WCssDecorationStyle BoldStyle;
-    BoldStyle.font().setSize(FontSize::XSmall);
-    BoldStyle.setForegroundColor(WColor("black"));
-    BoldStyle.font().setWeight(FontWeight::Bold);
-    styleSheet().addRule(".bold", BoldStyle);
+
 
     // init the OpenLayers javascript api
     require("jslib/v6.4.3-dist/ol.js");

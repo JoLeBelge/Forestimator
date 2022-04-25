@@ -49,8 +49,8 @@ public:
         int h_=env_->screenHeight()*7.0/10.0;
         //std::cout << " set size dialog " << w_ << " , " << h_ << std::endl;
         // setMaximumSize(w_,h_);
-        setMaximumSize(w_,h_);
 
+        setMaximumSize(w_,h_);
         if (mShow){show();}
     }
 

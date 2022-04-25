@@ -1,5 +1,6 @@
 #include "cnsw.h"
 
+extern std::string columnPath;
 /*
 cnsw::cnsw(std::string aBDFile):dicoPedo(aBDFile)
 {
@@ -272,19 +273,8 @@ void dicoPedo::loadInfo(){
     }
     sqlite3_finalize(stmt);
 
-    // changer la requete en fonction de la machine sur laquelle est installé l'appli
-    char userName[20];
-    getlogin_r(userName,sizeof(userName));
-    std::string s(userName);
-    if (s=="lisein"){
-        SQLstring="SELECT Dir2,Nom FROM fichiersGIS WHERE Code='CNSW';";
-    } else if (s=="jo") {
-        SQLstring="SELECT Dir3,Nom FROM fichiersGIS WHERE Code='CNSW';";
-    } else if (boost::filesystem::exists("/home/carto/app/Forestimator/carteApt/data/aptitudeEssDB.db")) {
-        SQLstring="SELECT Dir4,Nom FROM fichiersGIS WHERE Code='CNSW';";
-    } else {
-        SQLstring="SELECT Dir,Nom FROM fichiersGIS WHERE Code='CNSW';";
-    }
+    SQLstring="SELECT "+columnPath+",Nom FROM fichiersGIS WHERE Code='CNSW';";
+
     sqlite3_prepare_v2( db_, SQLstring.c_str(), -1, &stmt, NULL );
     if(sqlite3_step(stmt) == SQLITE_ROW)
     {

@@ -1,5 +1,6 @@
 #include "cadastre.h"
 extern bool globTest;
+extern std::string columnPath;
 
 inline bool exists (const std::string& name){
     struct stat buffer;
@@ -17,20 +18,10 @@ cadastre::cadastre(sqlite3 *db):mShpCommunePath(""),mShpDivisionPath(""),mShpPar
 
 void cadastre::loadInfo(){
     sqlite3_stmt * stmt;
-    // changer la requete en fonction de la machine sur laquelle est installé l'appli
-    char userName[20];
-    getlogin_r(userName,sizeof(userName));
-    std::string s(userName),SQLstring;
+
     std::cout << "load info cadastre" << std::endl;
-    if (s=="lisein"){
-        SQLstring="SELECT Dir2,Nom,Code FROM fichiersGIS WHERE Categorie='Cadastre' OR Code='TMPDIR';";
-    } else if (s=="jo") {
-        SQLstring="SELECT Dir3,Nom,Code FROM fichiersGIS WHERE Categorie='Cadastre' OR Code='TMPDIR';";
-    } else if (exists("/home/carto/app/Forestimator/carteApt/data/aptitudeEssDB.db")) { // (s=="carto") {
-        SQLstring="SELECT Dir4,Nom,Code FROM fichiersGIS WHERE Categorie='Cadastre' OR Code='TMPDIR';";
-    }  else {
-        SQLstring="SELECT Dir,Nom,Code FROM fichiersGIS WHERE Categorie='Cadastre' OR Code='TMPDIR';";
-    }
+    std::string SQLstring="SELECT "+columnPath+",Nom,Code FROM fichiersGIS WHERE Categorie='Cadastre' OR Code='TMPDIR';";
+
     sqlite3_prepare_v2( db_, SQLstring.c_str(), -1, &stmt, NULL );
     while(sqlite3_step(stmt) == SQLITE_ROW)
     {

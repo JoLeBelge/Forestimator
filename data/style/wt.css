@@ -5,7 +5,7 @@
 body {
 	color: #333333;
 	font-family:  arial,sans-serif;
-	font-size: 80%;
+	font-size: 16px;
 	font-size-adjust:none;
 	font-stretch:normal;
 	font-style:normal;
@@ -51,7 +51,7 @@ h1 {
 	}
 	
 h4 {
-	font-size: 1.5em;
+	font-size: 1.2em;
 	line-height: 1.8;
 	//border-top : 1px solid  #528B12;
 	padding-bottom:0px;
@@ -67,7 +67,7 @@ h4.example {
 	
 h2 {
 	background:#70BD1A no-repeat left top;
-	font-size: 1.6em;
+	font-size: 1.3em;
 	font-weight:600;
 	//letter-spacing:2px;
 	//line-height: 1.8;
@@ -81,7 +81,7 @@ h2 {
 	
 h3 {
 	//background:#70BD1A right top;
-	font-size: 1.6em;
+	font-size: 1.3em;
 	font-weight:600;
 	//letter-spacing:2px;
 	//line-height: 1.8;
