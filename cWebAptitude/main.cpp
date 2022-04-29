@@ -19,6 +19,7 @@
 */
 
 extern bool globTest;
+extern std::string columnPath;
 
 int main(int argc, char **argv)
 {
@@ -27,6 +28,7 @@ int main(int argc, char **argv)
             ("help", "produce help message")
             ("test", po::value<bool>(), "pour le test de nouvelles options en cours de développement")
             ("BD", po::value<std::string>(), "chemin d'accès à la BD forestimator")
+            ("colPath", po::value<std::string>(), "nom de la colonne de fichierGIS et layerApt propre à la machine (chemin d'accès couche en local)")
 
             ;
     po::variables_map vm;
@@ -37,9 +39,9 @@ int main(int argc, char **argv)
     if (vm.count("test")) {globTest=vm["test"].as<bool>();}
 
     // ici, créé mon dictionnaire et le mettre sous forme de membre dans resource
-    //  std::cout << "loadBDpath et cree dico.." << std::endl;
-    std::string aBD=loadBDpath();
+    std::string aBD("");
     if (vm.count("BD")) {aBD=vm["BD"].as<std::string>();std::cout << " chemin bd =" << aBD << std::endl;}
+    if (vm.count("colPath")) {columnPath=vm["colPath"].as<std::string>();std::cout << " colPath =" << columnPath << std::endl;}
     cDicoApt *dico=new cDicoApt(aBD);
 
     stationDescResource resource(dico);

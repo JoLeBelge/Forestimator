@@ -133,6 +133,7 @@ cdicoAptBase::cdicoAptBase(std::string aBDFile):mBDpath(aBDFile),ptDb_(NULL)
 
         std::cout << "close connection (dicoAptBase)" << std::endl;
         closeConnection();
+
     }
 
     //std::cout << "dicoAptBase done " << std::endl;
@@ -270,26 +271,6 @@ std::map<int,std::map<int,int>> cdicoAptBase::getRisqueTopo(std::string aCodeEs)
     sqlite3_finalize(stmt);
     return aRes;
 }
-
-
-
-std::string loadBDpath()
-{
-    std::string aRes;
-    // changer chemin d'accès en fonction de la machine sur laquelle tourne l'app. pour pas devoir modifier en local et se priver des avantages de git
-    char userName[20];
-    getlogin_r(userName,sizeof(userName));
-    std::string s(userName);
-    if (s=="lisein"){
-        aRes="/home/lisein/Documents/carteApt/Forestimator/carteApt/data/aptitudeEssDB.db";
-    } else {
-        aRes="/data1/Forestimator/carteApt/data/aptitudeEssDB.db";
-    }
-    //std::ifstream File("./data/BDpath.txt");
-    //File >> aRes;
-    return aRes;
-}
-
 
 std::string roundDouble(double d, int precisionVal){
     std::string aRes("");

@@ -20,7 +20,6 @@ enum class FeRe {Feuillus,
 // j'aimerai partager le dico Apt entre forestimator et phytospy, mais celui-ci est trop spécialisé forestimator. Je crée une classe mère avec les membres que je souhaite partager entre les deux applis
 
 std::string roundDouble(double d, int precisionVal=1);
-std::string loadBDpath();
 
 class cdicoAptBase : public std::enable_shared_from_this<cdicoAptBase>
 {

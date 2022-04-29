@@ -215,6 +215,11 @@ public:
         if (Dico_RasterStat.find(aLayerCode)!=Dico_RasterStat.end()){aRes=Dico_RasterStat.at(aLayerCode);}
         return aRes;
     }
+    bool lay4StatP(std::string aLayerCode){
+        bool aRes(1);
+        if (Dico_RasterStatP.find(aLayerCode)!=Dico_RasterStatP.end()){aRes=Dico_RasterStatP.at(aLayerCode);}
+        return aRes;
+    }
 
     std::string lay2groupe(std::string aLayCode){
         std::string aRes("REF");
@@ -294,6 +299,7 @@ private:
     std::map<std::string,std::string>  Dico_RasterVar;
     std::map<std::string,bool>  Dico_RasterVisu;// les couches que l'on peux visualiser dans la partie carto
     std::map<std::string,bool>  Dico_RasterStat;// les couches sur lesquelles on peut calculer des statistiques
+     std::map<std::string,bool>  Dico_RasterStatP;// les couches sur lesquelles on peut calculer des statistiques ponctuelles
     // description peuplement vs description station
     std::map<std::string,std::string>  Dico_RasterCategorie;
     std::map<std::string,std::string>  Dico_RasterNomComplet;

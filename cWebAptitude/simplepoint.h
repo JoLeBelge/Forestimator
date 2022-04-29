@@ -63,6 +63,7 @@ public:
     void export2pdf(std::string titre);
     void export2pdfTitreDialog();
 
+     Wt::WText                 *mIntroTxt;
     Wt::WTable                 *mInfoT;
     Wt::WTable                 *mDetAptFEE;
     Wt::WTable                 *mAptAllEss;

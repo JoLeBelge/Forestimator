@@ -209,7 +209,7 @@ void groupLayers::extractInfo(double x, double y){
             if (((l->getCatLayer()==TypeLayer::KK )| (l->getCatLayer()==TypeLayer::Station )) | (( l->IsActive()) & (l->getCatLayer()!=TypeLayer::Externe))){
                 if (l->isVisible()){
                     std::vector<std::string> layerLabelAndValue=l->displayInfo(x,y);
-                    if (l->l4Stat()){
+                    if (l->l4StatP()){
                         mAnaPoint->add1InfoRaster(layerLabelAndValue);
                     }
                     if (( l->IsActive())){
