@@ -228,7 +228,7 @@ void dicoPedo::loadInfo(){
         }
     }
     sqlite3_finalize(stmt);
-    SQLstring="SELECT  DESCR,PHASE_1, PHASE_2, PHASE_3, PHASE_4, PHASE_5, PHASE_6, PHASE_7, DESCR_COURT  FROM i_phase;";
+    SQLstring="SELECT DESCR,PHASE_1, PHASE_2, PHASE_3, PHASE_4, PHASE_5, PHASE_6, PHASE_7, DESCR_COURT  FROM i_phase;";
     sqlite3_prepare_v2( db_, SQLstring.c_str(), -1, &stmt, NULL );
     while(sqlite3_step(stmt) == SQLITE_ROW)
     {
