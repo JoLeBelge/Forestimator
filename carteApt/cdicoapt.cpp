@@ -39,6 +39,7 @@ cDicoApt::cDicoApt(std::string aBDFile):cdicoAptBase(aBDFile)
         // j'ai fini par organiser les fichiers GIS en deux tables ; une spécifique pour les cartes d'aptitudes
         for (std::string table : std::vector<std::string>{"layerApt","fichiersGIS"})
         {
+
             SQLstring="SELECT Code,"+columnPath+",Nom,Type,NomComplet,Categorie,TypeVar, expert, visu, stat,NomCourt,groupe,statPonct FROM "+table+";";
             sqlite3_prepare_v2( *db_, SQLstring.c_str(), -1, &stmt, NULL );
             while(sqlite3_step(stmt) == SQLITE_ROW)
@@ -75,6 +76,7 @@ cDicoApt::cDicoApt(std::string aBDFile):cdicoAptBase(aBDFile)
                     }
                 }
             }
+            if(Dico_GISfile.size()==0) { std::cout << "\n Il se pourrait que la colonne " << columnPath << " n'existe pas dans la table fichiersGIS " << std::endl;}
             if (globTest){   std::cout << "Dico_GISfile a " << Dico_GISfile.size() << " elements " << std::endl;
 
                 for (auto kv : Dico_GISfile){
