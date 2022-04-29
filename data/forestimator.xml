@@ -476,32 +476,34 @@ http://forestimator.gembloux.ulg.ac.be/api/<font color="blue">compo</font>/polyg
 
 <br></br>
 <h3>Exemples de script R pour traiter plusieurs polygones</h3>
-<pre class="r"><code># librairie pour effectuer des requêtes sur un webserver
-require(curl)
-# librairie pour la lecture de shapefile
-library(sf)
 
-server.api &lt;- &quot;http://forestimator.gembloux.ulg.ac.be/api/&quot;
+<code class="hljs"><span class="hljs-comment"># librairie pour effectuer des requêtes sur un webserver</span><br></br>
+<span class="hljs-keyword">require</span>(curl)<br></br>
+<span class="hljs-comment"># librairie pour la lecture de shapefile</span><br></br>
+<span class="hljs-keyword">library</span>(sf)<br></br>
 
-shp.path &lt;- &quot;/home/lisein/Documents/carteApt/autres/shpTest/epioux_sample.shp&quot;
-parcellaire.shp &lt;- st_read(shp.path)
+server.api &lt;- <span class="hljs-string">"http://forestimator.gembloux.ulg.ac.be/api/"</span><br></br>
 
-# attention, la méthode fonctionne pour des POLYGONES et des MULTIPOLYGONES dont la géométrie est valide. Si géométrie pas valide, je ne garanti pas l'exactitude du résultat.
-# boucle sur les polygones du shapefile
-for (polNum in 1:nrow(parcellaire.shp)){
-  cat(paste0(&quot;traitement du polygone numéro &quot;, polNum,&quot;\n&quot;))
-  wkt.pol &lt;- st_as_text(parcellaire.shp$geometry[polNum])
+shp.path &lt;- <span class="hljs-string">"/home/lisein/Documents/carteApt/autres/shpTest/epioux_sample.shp"</span><br></br>
+parcellaire.shp &lt;- st_read(shp.path)<br></br>
 
-  #cat(paste0(&quot;wkt polygone : \n &quot;, wkt.pol,&quot;\n&quot;))
-  my.request &lt;- paste0(server.api,&quot;dendro2018/polygon/&quot;,wkt.pol)
-  # remplacement des espaces par le symbole consacré
-  my.request &lt;- gsub(&quot; &quot;, &quot;%20&quot;, my.request, fixed = TRUE)
-  # on effectue la requete auprès du serveur - résultat sauvé en mémoire sous forme hexadécimale (=raw)
-  req.res &lt;- curl_fetch_memory(my.request)
-  # on écrit dans la console (ou ailleurs) la réponse du serveur
-  cat(rawToChar(req.res$content))
-  cat(&quot;\n&quot;)
-}</code></pre>
+<span class="hljs-comment"># attention, la méthode fonctionne pour des POLYGONES et des MULTIPOLYGONES dont la géométrie est valide. Si géométrie pas valide, je ne garanti pas l'exactitude du résultat.</span><br></br>
+<span class="hljs-comment"># boucle sur les polygones du shapefile</span><br></br>
+<span class="hljs-keyword">for</span> (polNum <span class="hljs-keyword">in</span> <span class="hljs-number">1</span>:nrow(parcellaire.shp)){<br></br>
+  cat(paste0(<span class="hljs-string">"traitement du polygone numéro "</span>, polNum,<span class="hljs-string">"\n"</span>))<br></br>
+  wkt.pol &lt;- st_as_text(parcellaire.shp$geometry[polNum])<br></br>
+
+  <span class="hljs-comment">#cat(paste0("wkt polygone : \n ", wkt.pol,"\n"))</span><br></br>
+  my.request &lt;- paste0(server.api,<span class="hljs-string">"dendro2018/polygon/"</span>,wkt.pol)<br></br>
+  <span class="hljs-comment"># remplacement des espaces par le symbole consacré</span><br></br>
+  my.request &lt;- gsub(<span class="hljs-string">" "</span>, <span class="hljs-string">"%20"</span>, my.request, fixed = <span class="hljs-literal">TRUE</span>)<br></br>
+  <span class="hljs-comment"># on effectue la requete auprès du serveur - résultat sauvé en mémoire sous forme hexadécimale (=raw)</span><br></br>
+  req.res &lt;- curl_fetch_memory(my.request)<br></br>
+  <span class="hljs-comment"># on écrit dans la console (ou ailleurs) la réponse du serveur</span><br></br>
+  cat(rawToChar(req.res$content))<br></br>
+  cat(<span class="hljs-string">"\n"</span>)<br></br>
+}
+<br></br></code>
 
 
 
