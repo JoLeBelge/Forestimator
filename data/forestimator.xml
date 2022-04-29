@@ -472,6 +472,40 @@ https://forestimator.gembloux.ulg.ac.be/api/<font color="blue">dendro2018</font>
 <p style="margin-bottom:0.2cm;margin-top:0.2cm;">
 http://forestimator.gembloux.ulg.ac.be/api/<font color="blue">compo</font>/polygon/POLYGON ((208118.986622118 113943.623825983,208387.928131752 113684.230535628,208211.816531718 113533.580853657,207902.029861846 113854.507112691,208118.986622118 113943.623825983))
 </p>-->
+
+
+<br></br>
+<h3>Exemples de script R pour traiter plusieurs polygones</h3>
+<pre class="r"><code># librairie pour effectuer des requêtes sur un webserver
+require(curl)
+# librairie pour la lecture de shapefile
+library(sf)
+
+server.api &lt;- &quot;http://forestimator.gembloux.ulg.ac.be/api/&quot;
+
+shp.path &lt;- &quot;/home/lisein/Documents/carteApt/autres/shpTest/epioux_sample.shp&quot;
+parcellaire.shp &lt;- st_read(shp.path)
+
+# attention, la méthode fonctionne pour des POLYGONES et des MULTIPOLYGONES dont la géométrie est valide. Si géométrie pas valide, je ne garanti pas l'exactitude du résultat.
+# boucle sur les polygones du shapefile
+for (polNum in 1:nrow(parcellaire.shp)){
+  cat(paste0(&quot;traitement du polygone numéro &quot;, polNum,&quot;\n&quot;))
+  wkt.pol &lt;- st_as_text(parcellaire.shp$geometry[polNum])
+
+  #cat(paste0(&quot;wkt polygone : \n &quot;, wkt.pol,&quot;\n&quot;))
+  my.request &lt;- paste0(server.api,&quot;dendro2018/polygon/&quot;,wkt.pol)
+  # remplacement des espaces par le symbole consacré
+  my.request &lt;- gsub(&quot; &quot;, &quot;%20&quot;, my.request, fixed = TRUE)
+  # on effectue la requete auprès du serveur - résultat sauvé en mémoire sous forme hexadécimale (=raw)
+  req.res &lt;- curl_fetch_memory(my.request)
+  # on écrit dans la console (ou ailleurs) la réponse du serveur
+  cat(rawToChar(req.res$content))
+  cat(&quot;\n&quot;)
+}</code></pre>
+
+
+
+
 </message>
 
 <message id="report.analyse.surf.hdom.t"> <h4> Hauteur dominante calculé sur le MNH  (modèle pour pessière)</h4> </message>
