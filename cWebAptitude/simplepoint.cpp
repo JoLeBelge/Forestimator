@@ -20,7 +20,7 @@ void simplepoint::createUI()
     mIntroTxt = mParent->addWidget(cpp14::make_unique<WText>(tr("sp_infoclic")));
     mParent->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
     createPdfBut = mParent->addWidget(Wt::cpp14::make_unique<WPushButton>("Export pdf"));
-    createPdfBut->clicked().connect(this,&simplepoint::export2pdfTitreDialog);
+    //createPdfBut->clicked().connect(this,&simplepoint::export2pdfTitreDialog);
 
     mAptAllEss = mParent->addWidget(cpp14::make_unique<WTable>());
     mAptAllEss->setHeaderCount(1);
@@ -239,7 +239,7 @@ void simplepoint::afficheAptAllEss(){
 }
 
 
-void simplepoint::export2pdfTitreDialog(){
+/*void simplepoint::export2pdfTitreDialog(){
 
     // check si l'utilisateur à bien double-cliqué sur une station
     if (mGL->mStation->isOK()){
@@ -251,7 +251,7 @@ void simplepoint::export2pdfTitreDialog(){
         edit->setText(tr("report.analyse.point.titre"));
         label->setBuddy(edit);
         dialog->contents()->addStyleClass("form-group");
-        Wt::WPushButton *ok =
+        Wt::WPush *ok =
                 dialog->footer()->addNew<Wt::WPushButton>("OK");
         ok->setDefault(true);
         ok->clicked().connect([=] {
@@ -401,4 +401,126 @@ void simplepoint::export2pdf(std::string titre){
 
     mGL->m_app->addLog("analyse ponctuelle pdf",typeLog::danap);
     mGL->m_app->redirect(fileResource->url());
+}
+*/
+
+void pointPdfResource::handleRequest(const Http::Request &request, Http::Response &response)
+{
+    if (globTest) {std::cout << "\n pointPdfResource handle request \n " << std::endl;}
+
+    HPDF_Doc pdf = HPDF_New(error_handler, 0);
+
+    HPDF_UseUTFEncodings(pdf);
+    HPDF_Page page = HPDF_AddPage(pdf);
+    HPDF_Page_SetSize(page, HPDF_PAGE_SIZE_A4, HPDF_PAGE_PORTRAIT);
+    HPDF_SetCompressionMode(pdf, HPDF_COMP_ALL);// sinon pdf fait 5 Mo pour rien du tout
+
+    std::string titre("Analyse Ponctuelle");
+    MyRenderer renderer(pdf, page,titre,mSP->mDico);
+
+    Wt::WString tpl = Wt::WText::tr("report.analyse.point");
+    std::string tp = tpl.toUTF8();
+    std::ostringstream o;
+
+    //renderer.addFontCollection("/usr/share/fonts/truetype",true); plus nécessaire si compilé avec pango
+
+    boost::replace_all(tp,"TITRE_REPPORT",titre);
+
+    // RENDU TABLE d'APTITUDE
+    mSP->mAptAllEss->htmlText(o);
+    boost::replace_all(tp,"${AptTable}",o.str());
+
+    // RENDU TABLES AVEC DESCRIPTION DE LA STATION
+    // vider le oss
+    o.str("");
+    o.clear();
+    mSP->mInfoT->htmlText(o);
+    boost::replace_all(tp,"${InfoT}",o.str());
+
+    // RENDU LISTE D'ACCRONYME des ESSENCES
+
+    Wt::WTable * legendAcroEs= new Wt::WTable();
+    legendAcroEs->setId("legendAcroEs"); // dans le template html j'ai un style défini pour l'objet ayant cet id
+    int row(0);
+    int col(0);
+    for (auto kv : *mSP->mGL->Dico()->codeEs2Nom() ){
+        legendAcroEs->elementAt(row, col)->addWidget(cpp14::make_unique<WText>(kv.first));
+        legendAcroEs->elementAt(row, col+1)->addWidget(cpp14::make_unique<WText>(kv.second));
+        row++;
+        if (row>20){row=0;col=col+2;}
+    }
+    o.str("");
+    o.clear();
+    legendAcroEs->htmlText(o);
+    boost::replace_all(tp,"${legendAcro}",o.str());
+    o.str("");
+    o.clear();
+
+    // RENDU CARTE ACTIVE AVEC POSITION de la STATION
+
+    OGRPoint pt = mSP->mGL->mStation->getPoint();
+
+    // je peux pas utiliser le membre mapextent de GL car celui-ci ne se met à jours que lorsqu'on télécharge une carte sur l'emprise courante...
+    //staticMap sm(mGL->getActiveLay(),&pt,mGL->getMapExtent());
+    // depuis que l'IGN est passé à la version 1.3 du serveur WMS, je ne parviens plus à télécharger les cartes wms en jpg.
+    // donc il faut changer cette ligne. utiliser l'IGN du serveur grfmn?
+    staticMap sm(mSP->mGL->getLay("IGNgrfmn"),&pt);
+    // ajout du logo IGN. ajout des crédits ; toujours les mêmes, en dur.
+    sm.addImg(mSP->mDico->File("logoIGN"));
+    boost::replace_all(tp,"PATH_CARTE",sm.getFileName());
+    boost::replace_all(tp,"TITRE_CARTE",mSP->mGL->getLay("IGN")->getLegendLabel(0));
+    boost::replace_all(tp,"POSITION_PTX",roundDouble(mSP->mGL->mStation->getX(),1));
+    boost::replace_all(tp,"POSITION_PTY",roundDouble(mSP->mGL->mStation->getY(),1));
+
+    if (mSP->mGL->mStation->ecogramme()){
+        // RENDU ECOGRAMME
+        // export de l'image de l'écogramme - bug constaté ; https://redmine.webtoolkit.eu/issues/7769
+        // pour ma part j'ai compilé Graphicmagick puis cela fonctionnais
+        int aEcoWidth(750);
+        int aHeigth(aEcoWidth*15.0/7.0);
+
+        Wt::WRasterImage pngImage("png", WLength(aEcoWidth), WLength(aHeigth));
+        std::string name01 = std::tmpnam(nullptr);
+        std::string name11 = name01.substr(5,name01.size()-5);
+        std::string aEcoPng = mSP->mDico->File("TMPDIR")+"/"+name11+".png";
+        std::ofstream f(aEcoPng, std::ios::out | std::ios::binary);
+        WPainter painter(&pngImage);
+
+        std::string ecoBgPath=mSP->mDico->File("docroot")+"img/ecogrammeAxes.png";
+        if (exists(ecoBgPath)){
+        Wt::WPainter::Image ecoBg(ecoBgPath,ecoBgPath);
+        Wt::WRectF destinationRect = Wt::WRectF(0.0,0.0,aEcoWidth, aHeigth);
+        painter.drawImage(destinationRect,ecoBg);
+        }
+        // pour determiner ces positions, j'ai fixé aEcoWidth à 750, j'ai fait tourné le code, puis j'ai ouvert l'image et mesuré les positions
+        mSP->mEcoEss->draw(&painter,292,332,700,1240,1330);
+        pngImage.done();
+        pngImage.write(f);
+        f.close();
+        // ajout dans le pdf
+        std::string baliseEco = Wt::WText::tr("report.eco").toUTF8();
+        boost::replace_all(baliseEco,"PATH_ECO",aEcoPng);
+        boost::replace_all(baliseEco,"TITRE_ECO","Ecogramme - "+mSP->mGL->mStation->mActiveEss->Nom());
+        mSP->mDetAptFEE->htmlText(o);
+        boost::replace_all(baliseEco,"detAptFEE",o.str());
+        o.str("");
+        o.clear();
+
+        boost::replace_all(tp,"REPORT_ECO",baliseEco);
+
+    } else {
+        boost::replace_all(tp,"REPORT_ECO","");
+    }
+
+    renderer.render(tp);
+    response.setMimeType("application/pdf");
+    HPDF_SaveToStream (pdf);
+    unsigned int size = HPDF_GetStreamSize (pdf);
+    HPDF_BYTE * buf = new HPDF_BYTE [size];
+    HPDF_ReadFromStream (pdf, buf, & size);
+    HPDF_Free (pdf);
+
+    response.out (). write ((char *) buf, size);
+
+    delete [] buf;
 }

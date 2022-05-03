@@ -60,17 +60,16 @@ public:
     void detailCalculAptFEE(ST *aST);
     //void afficheLegendeIndiv(const Layer *l);
     void afficheAptAllEss();
-    void export2pdf(std::string titre);
-    void export2pdfTitreDialog();
+    //void export2pdf(std::string titre);
+    //void export2pdfTitreDialog();
 
-     Wt::WText                 *mIntroTxt;
+    Wt::WText                 *mIntroTxt;
     Wt::WTable                 *mInfoT;
     Wt::WTable                 *mDetAptFEE;
     Wt::WTable                 *mAptAllEss;
     Wt::WContainerWidget     * mParent;
     WPushButton * createPdfBut;
     EcogrammeEss       *mEcoEss;
-private:
 
     Wt::WContainerWidget     * mContEco;
     groupLayers*mGL;
@@ -143,5 +142,22 @@ private:
 };
 
 
+class pointPdfResource : public Wt::WResource
+{
+public:
+
+pointPdfResource(simplepoint * mSimplePoint) : WResource(), mSP(mSimplePoint){}
+
+    ~pointPdfResource()
+    {
+        beingDeleted();
+    }
+void handleRequest(const Http::Request &request, Http::Response &response);
+
+
+private:
+simplepoint * mSP;
+
+};
 
 #endif // LEGEND_H

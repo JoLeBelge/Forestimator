@@ -6,7 +6,7 @@ Notes sur l'installation de Forestimator
 
 sudo apt install libgraphicsmagick++1-dev libpango1.0-dev cmake mercurial libcurl4-openssl-dev cmake-curses-gui git ccmake
 
-sudo apt install sqlite3 libgdal-dev lzip libboost-all-dev
+sudo apt install sqlite3 libgdal-dev lzip libboost-all-dev libglu1-mesa-dev package
 
 
 2) Cloner dépot Forestimator, dépot Wt et autres dépendances

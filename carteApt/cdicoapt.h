@@ -271,11 +271,21 @@ public:
     std::shared_ptr<layerBase> getLayerBase(std::string aCode){
         std::shared_ptr<layerBase> aRes=NULL;
         if (mVlayerBase.find(aCode)!=mVlayerBase.end()){aRes=mVlayerBase.at(aCode);} else {
-            std::cout << " getLayerBase de cdicoapt, création d'une layerbase vide attention " << std::endl;
+            std::cout << " getLayerBase de cdicoapt, création d'une layerbase vide attention , code " << aCode << std::endl;
             aRes= std::make_shared<layerBase>("toto",this);
         }
         return aRes;
     }
+
+    std::vector<std::shared_ptr<layerBase>> VlayersForGroupe(std::string aGroupe){
+        std::vector<std::shared_ptr<layerBase>> aRes;
+        for (auto & kv :mVlayerBase){
+            if (lay2groupe(kv.first)==aGroupe){
+            aRes.push_back(kv.second);
+            }
+        }
+       return aRes;
+   }
     // dans l'ordre que l'on souhaite!
     std::vector<std::string> Dico_groupe;
 

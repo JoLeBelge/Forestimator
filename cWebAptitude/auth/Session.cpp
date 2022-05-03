@@ -76,7 +76,7 @@ Session::Session(const std::string& sqliteDb)
     }
 
     users_ = cpp14::make_unique<UserDatabase>(*this);
-    std::cout << "done\n" << std::endl;
+    //std::cout << "done\n" << std::endl;
 }
 
 Auth::AbstractUserDatabase& Session::users()

@@ -215,6 +215,8 @@ public:
     }
 
     std::map<std::string,std::string>  Dico_AptFull2AptAcro;// j'en ai besoin dans les batonnetApt
+    // dans l'ordre alphabétique
+    std::vector<std::string> Dico_Ess;
 protected:
     std::string mBDpath;
     sqlite3 **db_;

@@ -22,6 +22,7 @@ cdicoAptBase::cdicoAptBase(std::string aBDFile):mBDpath(aBDFile),ptDb_(NULL)
                 Dico_code2prefix.emplace(std::make_pair(aCodeEs,aPrefix));
                 int FR=sqlite3_column_int( stmt, 3 );
                 Dico_F_R.emplace(std::make_pair(aCodeEs,FR));
+                Dico_Ess.push_back(aCodeEs);
             }
         }
 

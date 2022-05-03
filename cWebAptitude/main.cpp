@@ -4,19 +4,6 @@
  * See the LICENSE file for terms of use.
  */
 #include "main.h"
-//#include "auth.h"
-
-
-/* attention, je n'ai jamais réussi à paramètrer deux docroot donc je dois tout mettre dans un seul et unique!
- *
- * ./WebAptitude --http-address=0.0.0.0 --http-port=8085 --deploy-path=/WebAptitude --docroot="./" --config="/home/lisein/Documents/carteApt/Forestimator/build-WebAptitude/wt_config.xml"
- * Current arg :
- * ./WebAptitude --deploy-path=/ --docroot "/data1/Forestimator/build-WebAptitude;favicon.ico,/resources,/style,/tmp,/data,/Tuiles" --http-port 80 --http-addr 0.0.0.0
- * sudo ./WebAptitude --deploy-path=/ --docroot "/home/sam/master_chatmetaleux/Forestimator/data;favicon.ico,/resources,/style,/tmp,/data,/Tuiles" --http-port 80 --http-addr 0.0.0.0
- * ./WebAptitude --deploy-path=/ --docroot "/home/lisein/Documents/carteApt/Forestimator/data/;/favicon.ico,/js,/jslib,/resources,/style,/tmp,/data,/Tuiles" --http-port 8085 --http-addr 0.0.0.0
- * Ajout du wt config.xml :
- * sudo ./WebAptitude --deploy-path=/ --docroot "/home/sam/master_chatmetaleux/Forestimator/data/;favicon.ico,/resources,/style,/tmp,/data,/js,/jslib" --http-port 80 --http-addr 0.0.0.0 -c ../data/wt_config.xml
-*/
 
 extern bool globTest;
 extern std::string columnPath;
@@ -65,8 +52,20 @@ int main(int argc, char **argv)
         cnswresource cnswr(dico->File("TMPDIR")+"/");
         server.addResource(&cnswr, "/CNSW");
 
-        server.addEntryPoint(Wt::EntryPointType::Application, std::bind(&createAuthApplication,std::placeholders::_1, dico));
+        // fileResource pour les cartes à l'échelle de toute la RW
+        for (auto kv : dico->VlayerBase()){
+            std::shared_ptr<layerBase> l= kv.second;
+            std::string aCode=kv.first;
+            if (l->rasterExist()){
+            layerResource * fileResource = new layerResource(l);
+            //WFileResource * fileResource = new Wt::WFileResource(l->getPathTif());
+            fileResource->suggestFileName(l->NomFile()+".zip");
+            if (globTest){std::cout << " ajout fileresource " << l->getPathTif() << ", nom fichier " <<  l->NomFileWithExt() << " sous url data/"<<aCode << std::endl;}
+            server.addResource(fileResource, "/telechargement/"+aCode);
+            }
+        }
 
+        server.addEntryPoint(Wt::EntryPointType::Application, std::bind(&createAuthApplication,std::placeholders::_1, dico));
         Session::configureAuth();
 
         server.run();
@@ -122,3 +121,27 @@ std::unique_ptr<Wt::WApplication> createAuthApplication(const Wt::WEnvironment &
 
     return Wt::cpp14::make_unique<AuthApplication>(env,dico);
 }
+
+void layerResource::handleRequest(const Http::Request &request, Http::Response &response){
+    //std::cout << "fichier " << ml->getPathTif() << std::endl;
+    // création des archives zip avec la carte + la symbologie
+
+    std::string archiveName=ml->Dico()->File("OUTDIR")+ml->NomFile()+".zip";
+
+    if (!boost::filesystem::exists(archiveName)){
+    std::cout << "create archive pour raster croppé " << std::endl;
+    ZipArchive* zf = new ZipArchive(archiveName);
+    zf->open(ZipArchive::WRITE);
+    zf->addFile(ml->NomFileWithExt(),ml->getPathTif());
+    if (ml->hasSymbology()){zf->addFile(ml->NomFile()+".qml",ml->symbology());}
+    zf->close();
+    delete zf;
+    }
+
+    //std::ifstream r(ml->getPathTif().c_str(), std::ios::in | std::ios::binary);
+    std::ifstream r(archiveName.c_str(), std::ios::in | std::ios::binary);
+
+    handleRequestPiecewise(request, response, r);
+}
+
+

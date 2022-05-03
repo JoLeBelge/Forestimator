@@ -185,12 +185,10 @@ cWebAptitude::cWebAptitude(AuthApplication *app, Auth::AuthWidget* authWidget_)
     content_cadastre = dialog_cadastre->contents()->addWidget(cpp14::make_unique<widgetCadastre>(mDico->mCadastre.get()));
     content_cadastre->addStyleClass("content_cadastre");
 
-
     //stack_info = content_info_->addWidget(cpp14::make_unique<WStackedWidget>());
     //stack_info = dialog_cont->contents()->addWidget(cpp14::make_unique<WStackedWidget>());
     //stack_info->setOverflow(Overflow::Auto);
     //stack_info->addStyleClass("content_info_stack");
-
     
     mSimplepointW = content_info;
     mGroupLayerW  = content_catalog;
@@ -203,6 +201,7 @@ cWebAptitude::cWebAptitude(AuthApplication *app, Auth::AuthWidget* authWidget_)
 
     mPanier = content_panier->addWidget(Wt::cpp14::make_unique<panier>(mApp, this));
     mGroupL->updateGL();
+
     // des couches que l'on souhaite voir dans le panier dès le départ
     mGroupL->clickOnName("IGN");
 

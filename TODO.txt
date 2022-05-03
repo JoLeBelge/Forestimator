@@ -1,11 +1,9 @@
 TO DO forestimator
 ------------------
 
--catalogues des couches ; mettre essences par ordre alphabétique
-
 -export pdf ana surf
 
--info ponctuelle sur cadastre : a développer
+-info ponctuelle sur cadastre : a développer. voir meme selection de polygone depuis cadastre.
 
 - stat surf sur parcelles cadastrale ; créer un nom de mClientName?
 
@@ -16,4 +14,4 @@ réunion PL 23/11/2020
 
 - géoservice API ;
 --> découpler les traitements du site web en lui-même. peut-être simplement 2 applications Wt différentes (sur des ordinateurs différents - ou le même). La réponse doit être envoyée par email. OUi mais si c'est pas sur la même machine, je dois envoyer le shapefile dans la requete (beurk encore)
---> réponse xml pour traitement
+--> réponse xml pour traitement ; offrir un autre format?

@@ -77,8 +77,8 @@ groupLayers::groupLayers(AuthApplication *app, cWebAptitude * cWebApt):
     // ajout des cartes
     for (auto & pair :mDico->VlayerBase()){
         std::shared_ptr<layerBase> aLB=pair.second;
-
-        if (mDico->lay4Visu(pair.first)){
+    if (mDico->lay2groupe(pair.first)!= "APT_FEE"){
+        if (mDico->lay4Visu(pair.first) ){
             // 1) création du mWtText pour cette couche
             WText * wtext=NULL;
             Wt::WTreeNode * n=NULL;
@@ -100,7 +100,31 @@ groupLayers::groupLayers(AuthApplication *app, cWebAptitude * cWebApt):
         }else {
             mVLs.push_back(std::make_shared<Layer>(this,aLB));
         }
+    }
+    }
 
+    // on refais la boucle pour APT FEE pour avoir ordre alphabétique du nom en français et pas alpha du code ESS
+    for (std::string essCode : mDico->Dico_Ess){
+        std::string essFEE=essCode+"_FEE";
+
+        if (mDico->hasLayerBase(essFEE)){
+        std::shared_ptr<layerBase> aLB =mDico->getLayerBase(essFEE);
+        WText * wtext=NULL;
+        Wt::WTreeNode * n=NULL;
+        if (aMNodes.find(mDico->lay2groupe(aLB->Code()))!=aMNodes.end()){
+            n = aMNodes.at(mDico->lay2groupe(aLB->Code()))->addChildNode(Wt::cpp14::make_unique<Wt::WTreeNode>(""));
+            wtext=n->label();
+            // 2) création de la couche
+            std::shared_ptr<Layer> aL=std::make_shared<Layer>(this,aLB,wtext);
+            // 3) ajout des interactions
+            std::string aCode=aL->Code();
+            wtext->doubleClicked().connect([this,aCode]{clickOnName(aCode);});
+            aL->changeExpertMode().connect(n,&Wt::WTreeNode::setNodeVisible);
+            mVLs.push_back(aL);
+        } else {
+            std::cout << "problème pour couche " << aLB->Code() << " car n'as pas de groupe de couche atitré" << std::endl;
+        }
+    }
     }
 
     mParent->addWidget(cpp14::make_unique<WText>(tr("coucheStep1")));
@@ -416,6 +440,11 @@ void groupLayers::updateGL(){
     } else {
         mExtentDivGlob->hide();
     }
+
+    auto pdf = std::make_shared<pointPdfResource>(mAnaPoint);
+    auto pdfLink = Wt::WLink(pdf);
+    pdfLink.setTarget(Wt::LinkTarget::NewWindow);
+    mAnaPoint->createPdfBut->setLink(pdfLink);
 
     // boucle sur les layers et envoi du signal pour cacher ou rendre visible les checkbox
     for (std::shared_ptr<Layer> l : mVLs){

@@ -44,6 +44,46 @@ presentationPage::presentationPage(cDicoApt *aDico):mDico(aDico)
     std::unique_ptr<Wt::WMenuItem> item2 = std::make_unique<Wt::WMenuItem>("Crédit et contact", cpp14::make_unique<Wt::WText>(WString::tr("page_presentation.credit")));
     subMenu_->addItem(std::move(item2));
 
+    std::unique_ptr<Wt::WMenuItem> item3 = std::make_unique<Wt::WMenuItem>("Téléchargement");
+    //item3->addWidget(WString::tr("intro_telechargement"));
+
+    Wt::WTable * t = new Wt::WTable();
+    t->setHeaderCount(1);
+    t->setWidth(Wt::WLength("90%"));
+    t->toggleStyleClass("table-striped",true);
+    t->elementAt(0, 0)->setColumnSpan(4);
+    t->elementAt(0, 0)->setContentAlignment(AlignmentFlag::Top | AlignmentFlag::Center);
+    t->elementAt(0, 0)->setPadding(10);
+    t->elementAt(0,0)->addWidget(cpp14::make_unique<WText>(tr("titre.tab.download")));
+    // on les présente par groupe de couches
+    for (std::string gr : mDico->Dico_groupe){
+    int r=t->rowCount();
+    t->elementAt(r, 0)->setColumnSpan(4);
+    t->elementAt(r, 0)->addWidget(cpp14::make_unique<WText>(WString::fromUTF8("<h4>"+mDico->groupeLabel(gr)+"</h4>")));
+    t->elementAt(r, 0)->addStyleClass("bold");
+
+    for (std::shared_ptr<layerBase> l : mDico->VlayersForGroupe(gr)){
+        if (l->getCatLayer()!=TypeLayer::Externe){
+            int row=t->rowCount();
+            //l->Code() + ", " + l->Nom() + " , "+ l->WMSURL() +" , layer " +l->WMSLayerName()+"\n";
+            t->elementAt(row, 0)->addWidget(cpp14::make_unique<WText>(WString::fromUTF8(l->Nom())));
+            t->elementAt(row, 1)->addWidget(cpp14::make_unique<WText>(WString::fromUTF8(l->WMSURL())));
+            t->elementAt(row, 2)->addWidget(cpp14::make_unique<WText>(WString::fromUTF8(l->WMSLayerName())));
+            //Wt::WPushButton * b = t->elementAt(row, 3)->addWidget(cpp14::make_unique<Wt::WPushButton>(WString::fromUTF8(l->Code())));
+            Wt::WPushButton * b = t->elementAt(row, 3)->addWidget(cpp14::make_unique<Wt::WPushButton>("télécharger"));
+            t->elementAt(row, 3)->setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Middle);
+            Wt::WLink loadLink = Wt::WLink("/telechargement/"+l->Code());
+            //loadLink.setTarget(Wt::LinkTarget::NewWindow);
+            b->setLink(loadLink);
+        }
+    }
+    }
+
+    item3->setContents(std::unique_ptr<Wt::WTable>(t));
+
+
+    subMenu_->addItem(std::move(item3));
+
     for( auto kv : *mDico->layerMTD()){
         LayerMTD lMTD=kv.second;
         //std::cout << "ajout lMTD dans sous menu présentation " << lMTD.Nom() << std::endl;
@@ -52,8 +92,8 @@ presentationPage::presentationPage(cDicoApt *aDico):mDico(aDico)
 
     }
 
-    std::unique_ptr<Wt::WMenuItem> item3 = std::make_unique<Wt::WMenuItem>("Forestimator API", cpp14::make_unique<Wt::WText>(WString::tr("docu.api")));
-    subMenu_->addItem(std::move(item3));
+    std::unique_ptr<Wt::WMenuItem> item4 = std::make_unique<Wt::WMenuItem>("Forestimator API", cpp14::make_unique<Wt::WText>(WString::tr("docu.api")));
+    subMenu_->addItem(std::move(item4));
 
     hLayout->addWidget(std::move(subMenu));
     hLayout->addWidget(std::move(subStack),1);

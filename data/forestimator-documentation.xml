@@ -179,5 +179,18 @@ Avril 2022 : mise à jour des cartes d'état sanitaire en pessière (détection 
 Pour la délimitation de la zone en pessière, utilisation de la dernière version de la couche de présence d'épicéa avec seuil de 80% en Gha.
 </message>
 
+
+<message id="intro_telechargement">
+<h1>Téléchargement des couches cartographiques</h1>
+Les couches cartographiques téléchargeables sont listées dans le tableau ci-dessous
+</message>
+
+<message id="titre.tab.download">
+Couches cartographiques
+</message>
+
+
+
+
 </messages>
 
