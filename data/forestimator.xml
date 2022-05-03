@@ -472,6 +472,42 @@ https://forestimator.gembloux.ulg.ac.be/api/<font color="blue">dendro2018</font>
 <p style="margin-bottom:0.2cm;margin-top:0.2cm;">
 http://forestimator.gembloux.ulg.ac.be/api/<font color="blue">compo</font>/polygon/POLYGON ((208118.986622118 113943.623825983,208387.928131752 113684.230535628,208211.816531718 113533.580853657,207902.029861846 113854.507112691,208118.986622118 113943.623825983))
 </p>-->
+
+
+<br></br>
+<h3>Exemples de script R pour traiter plusieurs polygones</h3>
+
+<code class="hljs"><span class="hljs-comment"># librairie pour effectuer des requêtes sur un webserver</span><br></br>
+<span class="hljs-keyword">require</span>(curl)<br></br>
+<span class="hljs-comment"># librairie pour la lecture de shapefile</span><br></br>
+<span class="hljs-keyword">library</span>(sf)<br></br>
+
+server.api &lt;- <span class="hljs-string">"http://forestimator.gembloux.ulg.ac.be/api/"</span><br></br>
+
+shp.path &lt;- <span class="hljs-string">"/home/lisein/Documents/carteApt/autres/shpTest/epioux_sample.shp"</span><br></br>
+parcellaire.shp &lt;- st_read(shp.path)<br></br>
+
+<span class="hljs-comment"># attention, la méthode fonctionne pour des POLYGONES et des MULTIPOLYGONES dont la géométrie est valide. Si géométrie pas valide, je ne garanti pas l'exactitude du résultat.</span><br></br>
+<span class="hljs-comment"># boucle sur les polygones du shapefile</span><br></br>
+<span class="hljs-keyword">for</span> (polNum <span class="hljs-keyword">in</span> <span class="hljs-number">1</span>:nrow(parcellaire.shp)){<br></br>
+  cat(paste0(<span class="hljs-string">"traitement du polygone numéro "</span>, polNum,<span class="hljs-string">"\n"</span>))<br></br>
+  wkt.pol &lt;- st_as_text(parcellaire.shp$geometry[polNum])<br></br>
+
+  <span class="hljs-comment">#cat(paste0("wkt polygone : \n ", wkt.pol,"\n"))</span><br></br>
+  my.request &lt;- paste0(server.api,<span class="hljs-string">"dendro2018/polygon/"</span>,wkt.pol)<br></br>
+  <span class="hljs-comment"># remplacement des espaces par le symbole consacré</span><br></br>
+  my.request &lt;- gsub(<span class="hljs-string">" "</span>, <span class="hljs-string">"%20"</span>, my.request, fixed = <span class="hljs-literal">TRUE</span>)<br></br>
+  <span class="hljs-comment"># on effectue la requete auprès du serveur - résultat sauvé en mémoire sous forme hexadécimale (=raw)</span><br></br>
+  req.res &lt;- curl_fetch_memory(my.request)<br></br>
+  <span class="hljs-comment"># on écrit dans la console (ou ailleurs) la réponse du serveur</span><br></br>
+  cat(rawToChar(req.res$content))<br></br>
+  cat(<span class="hljs-string">"\n"</span>)<br></br>
+}
+<br></br></code>
+
+
+
+
 </message>
 
 <message id="report.analyse.surf.hdom.t"> <h4> Hauteur dominante calculé sur le MNH  (modèle pour pessière)</h4> </message>

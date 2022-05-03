@@ -319,7 +319,7 @@ void descriptionStation(std::string aShp){
                     case wkbPoint:
                     {
                         std::cout << " shp de point ; j'effectue un buffer de 18 m" << std::endl;
-                        poGeom = poGeom->Buffer(18);
+                        poGeom = poGeom->Buffer(25);
                         break;
                     }
                     default:
@@ -368,14 +368,15 @@ void descriptionStation(std::string aShp){
 
 
             // selectionne les couches raster que je vais utiliser
-            // std::vector<std::string> aVCodes{"MNT","ZBIO","NT","NH","AE","SS","Topo","EP_FEE"};
+            std::vector<std::string> aVCodes{"MNT","ZBIO","NT","NH","AE","SS","Topo","EP_FEE","SWC"};
 
             //std::vector<std::string> aVCodes{"MNT","ZBIO","NT","NH","AE","SS","Topo","EP_FEE","slope","MNH2019","MNH2014"};// ,"EP_CS","CS_A"
 
+            /*
             std::vector<std::string> aVCodes{"ZBIO","NT","NH","Topo"};// plus toutes les essences pour avoir les Aptitude pour l'IPRFW
             for (std::string es : dico.getAllAcroEss()){
                 aVCodes.push_back(es+"_FEE");
-            }
+            }*/
 
             //std::vector<std::string> aVCodes{"MNT","ZBIO","NT","NH","AE","SS","Topo","BV_FEE","BP_FEE","slope"};
             //std::vector<std::string> aVCodes{"MNT","ZBIO","NT","NH","AE","SS","Topo"};
@@ -424,11 +425,11 @@ void descriptionStation(std::string aShp){
          *
          */
 
-            bool isPt(1);// j'ai envie de faire les analyses non pas en mode surfacique mais en mode extract value to point
+            bool isPt(0);// j'ai envie de faire les analyses non pas en mode surfacique mais en mode extract value to point
 
             // je pense que c'est assez long comme process (lecture CNSW)
             headerProcessing="";
-            bool doCNSW=0;
+            bool doCNSW=1;
             if (doCNSW){
                 headerProcessing+="Texture;Texpct;Drainage;Dpct;Prof;Ppct";
                 statOrder.emplace(std::make_pair("Texture",c));
@@ -515,9 +516,9 @@ void descriptionStation(std::string aShp){
                     // pour la carte générée pour analyse point, on ne dessine pas un polygone mais un cercle autour du point
                 case wkbPoint:
                 {
-                    if (0){
-                        std::cout << " shp de point ; j'effectue un buffer de 18 m" << std::endl;
-                        poGeom = poGeom->Buffer(18);
+                    if (1){
+                        //std::cout << " shp de point ; j'effectue un buffer de 18 m" << std::endl;
+                        poGeom = poGeom->Buffer(25);
                     }
                     //std::cout << " point " << std::endl;
                     //isPt=1;
@@ -688,7 +689,7 @@ void descriptionStation(std::string aShp){
         //aOut << fixed << setprecision(2) << endl;
 
         aOut << header ;
-        aOut << headerProcessing ;
+        aOut << ";" << headerProcessing ;
         aOut << "\n" ;
         for (auto & kv : aStat){
             std::vector<std::string> v=kv.second;
@@ -980,6 +981,10 @@ void anaScolyteOnShp(rasterFiles * raster, std::string aShp){
             OGRFieldDefn * oFLD= new OGRFieldDefn("oldSco",  OFTReal);
             lay->CreateField(oFLD);
         }
+        if (lay->FindFieldIndex("sco",0)==-1){
+            OGRFieldDefn * oFLD= new OGRFieldDefn("sco",  OFTReal);
+            lay->CreateField(oFLD);
+        }
         if (lay->FindFieldIndex("pix",0)==-1){
             OGRFieldDefn * oFLD2= new OGRFieldDefn("pix",  OFTReal);
             lay->CreateField(oFLD2);
@@ -992,16 +997,31 @@ void anaScolyteOnShp(rasterFiles * raster, std::string aShp){
 
             if (poFeature->GetFID() % 100==0){std::cout << " process feature " << poFeature->GetFID() << std::endl;}
             OGRGeometry * poGeom = poFeature->GetGeometryRef();
+            switch (poGeom->getGeometryType()){
+            case (wkbPolygon):{break;}
+            case wkbMultiPolygon:{break;}
+            case wkbPoint:
+            {
+                //std::cout << " shp de point ; j'effectue un buffer de 25 m" << std::endl;
+                poGeom = poGeom->Buffer(25);
+                break;
+            }
+            default:
+                std::cout << "Geometrie " << poGeom->getGeometryName() << " non pris en charge " << std::endl;
+                break;
+            }
 
             basicStat bs=raster->computeBasicStatOnPolyg(poGeom);
 
             double freqNewSco = bs.getFreq(2)+bs.getFreq(22)+bs.getFreq(42);
-            double freqOldSco = bs.getFreq(4)+bs.getFreq(21)+bs.getFreq(41);
+            double freqOldSco = bs.getFreq(4)+bs.getFreq(21)+bs.getFreq(41)+bs.getFreq(43);
+            double freqSco=freqOldSco+freqNewSco;
             /*if (freq>0){
             std::cout << " freq scolyte de " << freq << std::endl;
             }*/
             poFeature->SetField("oldSco",freqOldSco );
             poFeature->SetField("newSco",freqNewSco );
+            poFeature->SetField("sco",freqSco );
             int nb =bs.getNbInt();
             poFeature->SetField("pix",nb);
             //poFeature->SetField(); This method has only an effect on the in-memory feature object. If this object comes from a layer and the modifications must be serialized back to the datasource, OGR_L_SetFeature()

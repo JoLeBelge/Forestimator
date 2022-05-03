@@ -118,7 +118,9 @@ public:
     }
     std::string Profondeur(std::vector<std::string> aCode){
         std::string aRes("/");
-        if (mPhase.find(aCode)!=mPhase.end()){aRes=mPhase.at(aCode);}
+        if (mPhase.find(aCode)!=mPhase.end()){aRes=mPhase.at(aCode);} else {
+           // if (1){ std::cout << " pas de phase de profondeur pour  " << 1<< std::endl;}
+        }
         return aRes;
     }
 
@@ -143,7 +145,7 @@ public:
         if (sToPhase6.find(aCode)!=sToPhase6.end()){p6=sToPhase6.at(aCode);}
         if (sToPhase7.find(aCode)!=sToPhase7.end()){p7=sToPhase7.at(aCode);}
         std::vector<std::string> aKey{p1,p2,p3,p4,p5,p6,p7};
-
+        //std::cout << "sigle " << sigleIdToSigleStr.at(aCode) << std::endl;
         return Profondeur(aKey);
     }
     std::string ProfondeurCourt(int aCode){
