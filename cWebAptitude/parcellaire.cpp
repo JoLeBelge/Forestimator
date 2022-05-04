@@ -42,13 +42,13 @@ parcellaire::parcellaire(groupLayers *aGL, Wt::WApplication* app, statWindow *st
     addWidget(cpp14::make_unique<WText>(tr("anaStep3")));
 
 
-    downloadRasterBt = addWidget(cpp14::make_unique<Wt::WPushButton>("Télécharger les cartes"));
+    downloadRasterBt = addWidget(cpp14::make_unique<Wt::WPushButton>(tr("parcellaire.tele.btn")));
     downloadRasterBt->setStyleClass("btn btn-success");
     downloadRasterBt->setWidth(200);
     downloadRasterBt->setInline(0);
     downloadRasterBt->disable();
     addWidget(cpp14::make_unique<Wt::WBreak>());
-    anaOnAllPolygBt = addWidget(cpp14::make_unique<Wt::WPushButton>("Analyse sur tout les polygones"));
+    anaOnAllPolygBt = addWidget(cpp14::make_unique<Wt::WPushButton>(tr("parcellaire.ana.btn")));
     anaOnAllPolygBt->setStyleClass("btn btn-success");
     anaOnAllPolygBt->setWidth(200);
     anaOnAllPolygBt->setInline(0);
@@ -163,7 +163,7 @@ bool parcellaire::to31370AndGeoJson(){
         auto messageBox =
                 addChild(Wt::cpp14::make_unique<Wt::WMessageBox>(
                              "Système de projection",
-                             "Le système de projection de votre shapefile ne semble pas être le BL72. Vérifiez visuellement que la reprojection de votre shapefile a fonctionné correctement."
+                             tr("parcellaire.loadshp.error.src")
                              ,
                              Wt::Icon::Warning,
                              Wt::StandardButton::Ok));

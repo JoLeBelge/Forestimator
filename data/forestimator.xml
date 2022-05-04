@@ -69,7 +69,7 @@ Vous pouvez télécharger les cartes listées ci-dessous qui seront découpées 
 
 <message id="anaStep1"><h3>1 : Sélectionner une couche de référence</h3></message>
 <message id="anaStep2"><h3>2 : Sélectionner l'analyse</h3></message>
-<message id="anaStep3"><h3>3 : Excécuter l'analyse</h3> <br></br>
+<message id="anaStep3"><h3>3 : Exécuter l'analyse</h3> <br></br>
 Effectuer une analyse pour un polygone de votre shapefile en cliquant dessus tout en maintenant la touche shift enfoncée. L'analyse portera sur les cartes sélectionnées ci-dessus.
 </message>
 
@@ -645,8 +645,12 @@ detAptFEE
 
 <message id="parcellaire.upload.size"><p> La surface du ou des polygones est trop importante que pour effectuer une analyse surfacique.</p></message>
 <message id="parcellaire.anaAllPol"><p> Indisponible pour le moment, en cours de développement...</p></message>
-<message id="parcellaire.anaAllPol.maxProcess"><p> Si vous souhaiter effectuer des analyses sur tout les polygones, vous ne pouvez sélectionner que maximum 4 analyses différentes.</p></message>
+<message id="parcellaire.anaAllPol.maxProcess"><p> Si vous souhaiter effectuer des analyses sur tous les polygones, vous ne pouvez sélectionner que maximum 4 analyses différentes.</p></message>
 
+<message id="parcellaire.tele.btn">Télécharger les cartes</message>
+<message id="parcellaire.ana.btn">Analyse sur tous les polygones</message>
+<message id="parcellaire.loadshp.error.src">Le système de projection de votre shapefile ne semble pas être le BL72. Vérifiez visuellement que la reprojection de votre shapefile a fonctionné correctement.</message>
+                           
 
 
 <message id="api.msg.error.tool.name">Aucune carte ou traitement de ce nom.</message>

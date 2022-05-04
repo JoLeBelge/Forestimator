@@ -182,13 +182,30 @@ Pour la délimitation de la zone en pessière, utilisation de la dernière versi
 
 <message id="intro_telechargement">
 <h1>Téléchargement des couches cartographiques</h1>
-Les couches cartographiques téléchargeables sont listées dans le tableau ci-dessous
+
+Il y a trois manière de télécharger les cartes pour une utilisation dans votre logiciel de Système d'Information Géographique. Les couches cartographiques sont des raster au format Geotif et ceux-ci sont accompagnés d'un fichier de symbologie spécifique au logiciel Qgis.
+<br></br>
+La manière la plus directe est l'utilisation du boutton Télécharger situé sous la fenêtre reprennant votre sélection de couches cartographiques. Cette méthode permet de télécharger la carte qui est tout en haut dans la liste de couche. La carte est découpée pour épouser l'emprise affichée avant son téléchargement.
+<figure class="highlight">
+<img src="/img/telechargementA.png" alt="Télécharger la carte active"/> 
+<figcaption class="figure-caption">Téléchargement de la carte active avec découpage sur une petite emprise.
+</figcaption>
+</figure>
+<br></br>
+La deuxième méthode permet de télécharger en une fois un ensemble de cartes découpées sur l'emprise choisie. Pour se faire, il faut préhalablement charger un shapefile de polygones via la fenêtre d'analyse surfacique. Ensuite, le boutton "Télécharger les cartes" permet le découpage à l'emprise choisie de toutes les couches sélectionnées au moyen des cases à cocher.
+<figure class="highlight">
+<img src="/img/teleB.png" alt="Télécharger plusieurs cartes"/> 
+<figcaption class="figure-caption">Téléchargement de plusieurs cartes avec découpage sur une petite emprise, après avoir chargé un shapefile.
+</figcaption>
+</figure>
+<br></br>
+Enfin, la dernière méthode permet le téléchargement des couches dans leur entièreté, c'est à dire sans découpage préhalable.
+Les couches cartographiques téléchargeables sont listées dans le tableau ci-dessous.
 </message>
 
-<message id="titre.tab.download">
-Couches cartographiques
-</message>
-
+<message id="titre.tab.download"> Couches cartographiques </message>
+<message id="colWMS.tab.download"> adresse WMS</message>
+<message id="colWMSname.tab.download"> nom de la couche WMS</message>
 
 
 

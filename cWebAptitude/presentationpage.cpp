@@ -45,42 +45,54 @@ presentationPage::presentationPage(cDicoApt *aDico):mDico(aDico)
     subMenu_->addItem(std::move(item2));
 
     std::unique_ptr<Wt::WMenuItem> item3 = std::make_unique<Wt::WMenuItem>("Téléchargement");
-    //item3->addWidget(WString::tr("intro_telechargement"));
-
-    Wt::WTable * t = new Wt::WTable();
+    Wt::WContainerWidget * c = new Wt::WContainerWidget();
+    c->addNew<WText>(WString::tr("intro_telechargement"));
+    Wt::WTable * t = c->addNew<Wt::WTable>();
     t->setHeaderCount(1);
     t->setWidth(Wt::WLength("90%"));
     t->toggleStyleClass("table-striped",true);
     t->elementAt(0, 0)->setColumnSpan(4);
     t->elementAt(0, 0)->setContentAlignment(AlignmentFlag::Top | AlignmentFlag::Center);
     t->elementAt(0, 0)->setPadding(10);
-    t->elementAt(0,0)->addWidget(cpp14::make_unique<WText>(tr("titre.tab.download")));
+    t->elementAt(0, 0)->addWidget(cpp14::make_unique<WText>(tr("titre.tab.download")));
+
     // on les présente par groupe de couches
     for (std::string gr : mDico->Dico_groupe){
-    int r=t->rowCount();
-    t->elementAt(r, 0)->setColumnSpan(4);
-    t->elementAt(r, 0)->addWidget(cpp14::make_unique<WText>(WString::fromUTF8("<h4>"+mDico->groupeLabel(gr)+"</h4>")));
-    t->elementAt(r, 0)->addStyleClass("bold");
+        // test si au moins une couche pour le groupe
+        bool test(0);
+        for (std::shared_ptr<layerBase> l : mDico->VlayersForGroupe(gr)){
+            if (l->getCatLayer()!=TypeLayer::Externe & !l->Expert() & mDico->lay4Visu(l->Code())){
+                test=1;break;
+            }
+        }
+        if (test){
 
-    for (std::shared_ptr<layerBase> l : mDico->VlayersForGroupe(gr)){
-        if (l->getCatLayer()!=TypeLayer::Externe){
-            int row=t->rowCount();
-            //l->Code() + ", " + l->Nom() + " , "+ l->WMSURL() +" , layer " +l->WMSLayerName()+"\n";
-            t->elementAt(row, 0)->addWidget(cpp14::make_unique<WText>(WString::fromUTF8(l->Nom())));
-            t->elementAt(row, 1)->addWidget(cpp14::make_unique<WText>(WString::fromUTF8(l->WMSURL())));
-            t->elementAt(row, 2)->addWidget(cpp14::make_unique<WText>(WString::fromUTF8(l->WMSLayerName())));
-            //Wt::WPushButton * b = t->elementAt(row, 3)->addWidget(cpp14::make_unique<Wt::WPushButton>(WString::fromUTF8(l->Code())));
-            Wt::WPushButton * b = t->elementAt(row, 3)->addWidget(cpp14::make_unique<Wt::WPushButton>("télécharger"));
-            t->elementAt(row, 3)->setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Middle);
-            Wt::WLink loadLink = Wt::WLink("/telechargement/"+l->Code());
-            //loadLink.setTarget(Wt::LinkTarget::NewWindow);
-            b->setLink(loadLink);
+            int r=t->rowCount();
+            t->elementAt(r, 0)->setColumnSpan(4);
+            t->elementAt(r, 0)->addWidget(cpp14::make_unique<WText>(WString::fromUTF8("<h4>"+mDico->groupeLabel(gr)+"</h4>")));
+            t->elementAt(r, 0)->addStyleClass("bold");
+            t->elementAt(r+1, 1)->addWidget(cpp14::make_unique<WText>(tr("colWMS.tab.download")));
+            t->elementAt(r+1, 2)->addWidget(cpp14::make_unique<WText>(tr("colWMSname.tab.download")));
+
+            for (std::shared_ptr<layerBase> l : mDico->VlayersForGroupe(gr)){
+                if (l->getCatLayer()!=TypeLayer::Externe & !l->Expert() & mDico->lay4Visu(l->Code())){
+                    int row=t->rowCount();
+                    //l->Code() + ", " + l->Nom() + " , "+ l->WMSURL() +" , layer " +l->WMSLayerName()+"\n";
+                    t->elementAt(row, 0)->addWidget(cpp14::make_unique<WText>(WString::fromUTF8(l->Nom())));
+                    WText * url =t->elementAt(row, 1)->addWidget(cpp14::make_unique<WText>(WString::fromUTF8(l->WMSURL())));
+                    url->addStyleClass("mya");
+                    t->elementAt(row, 2)->addWidget(cpp14::make_unique<WText>(WString::fromUTF8(l->WMSLayerName())));
+                    //Wt::WPushButton * b = t->elementAt(row, 3)->addWidget(cpp14::make_unique<Wt::WPushButton>(WString::fromUTF8(l->Code())));
+                    Wt::WPushButton * b = t->elementAt(row, 3)->addWidget(cpp14::make_unique<Wt::WPushButton>("télécharger"));
+                    t->elementAt(row, 3)->setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Middle);
+                    Wt::WLink loadLink = Wt::WLink("/telechargement/"+l->Code());
+                    //loadLink.setTarget(Wt::LinkTarget::NewWindow);
+                    b->setLink(loadLink);
+                }
+            }
         }
     }
-    }
-
-    item3->setContents(std::unique_ptr<Wt::WTable>(t));
-
+    item3->setContents(std::unique_ptr<Wt::WContainerWidget>(c));
 
     subMenu_->addItem(std::move(item3));
 
