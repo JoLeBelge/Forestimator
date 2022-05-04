@@ -129,7 +129,7 @@ void layerResource::handleRequest(const Http::Request &request, Http::Response &
     std::string archiveName=ml->Dico()->File("OUTDIR")+ml->NomFile()+".zip";
 
     if (!boost::filesystem::exists(archiveName)){
-    std::cout << "create archive pour raster croppé " << std::endl;
+    if (globTest){std::cout << "create archive pour raster complet " << std::endl;}
     ZipArchive* zf = new ZipArchive(archiveName);
     zf->open(ZipArchive::WRITE);
     zf->addFile(ml->NomFileWithExt(),ml->getPathTif());
@@ -138,7 +138,6 @@ void layerResource::handleRequest(const Http::Request &request, Http::Response &
     delete zf;
     }
 
-    //std::ifstream r(ml->getPathTif().c_str(), std::ios::in | std::ios::binary);
     std::ifstream r(archiveName.c_str(), std::ios::in | std::ios::binary);
 
     handleRequestPiecewise(request, response, r);
