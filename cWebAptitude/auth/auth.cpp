@@ -14,6 +14,47 @@ AuthApplication::AuthApplication(const Wt::WEnvironment& env, cDicoApt *dico)
     messageResourceBundle().use(docRoot() + "/forestimator");
     messageResourceBundle().use(docRoot() + "/forestimator-documentation");
 
+    // export de tout les messages html vers un fichier csv qui sera traduit en text avec ./html2text -from_encoding UTF8 -nobs -o /home/jo/app/Forestimator/data/tmp/Forestimator.txt /home/jo/app/Forestimator/data/tmp/texteForestimator.csv pour correction orthographique
+    if (globTest & 0){
+        std::string aFile(mDico->File("TMPDIR")+"texteForestimator.csv");
+
+        std::ofstream aOut;
+        aOut.open(aFile,ios::out);
+
+        xml_document<> doc;
+        xml_node<> * root_node;
+        std::ifstream theFile (docRoot() + "/forestimator.xml");
+        std::vector<char> buffer((std::istreambuf_iterator<char>(theFile)), std::istreambuf_iterator<char>());
+        buffer.push_back('\0');
+        // Parse the buffer using the xml file parsing library into doc
+        doc.parse<0>(&buffer[0]);
+        // Find our root node
+        root_node = doc.first_node("messages");
+        for (xml_node<> * node = root_node->first_node("message"); node; node = node->next_sibling())
+        {
+            //std::cout << WText::tr(node->first_attribute("id")->value()).toUTF8() << "\n\n" << std::endl;
+            aOut << WText::tr(node->first_attribute("id")->value()).toUTF8() ;
+             aOut <<"\n\n<br> <br/>" ;
+        }
+        doc.clear();
+        theFile.close();
+        theFile.open(docRoot() + "/forestimator-documentation.xml");
+        std::vector<char> buffer2((std::istreambuf_iterator<char>(theFile)), std::istreambuf_iterator<char>());
+        buffer2.push_back('\0');
+        // Parse the buffer using the xml file parsing library into doc
+        doc.parse<0>(&buffer2[0]);
+        // Find our root node
+        root_node = doc.first_node("messages");
+        for (xml_node<> * node = root_node->first_node("message"); node; node = node->next_sibling())
+        {
+            //std::cout << WText::tr(node->first_attribute("id")->value()).toUTF8() << "\n\n" << std::endl;
+            aOut << WText::tr(node->first_attribute("id")->value()).toUTF8() ;
+             aOut <<"\n\n<br> <br/>" ;
+        }
+        aOut.close();
+    }
+
+
     setTitle("Forestimator");
 
     loadStyles();
@@ -91,7 +132,7 @@ void AuthApplication::loadStyles(){
 
 std::unique_ptr<Wt::Auth::AuthWidget> AuthApplication::loadAuthWidget(){
     // auth widget (login)
-     if (globTest){printf("Auth widget...");}
+    if (globTest){printf("Auth widget...");}
     session_.login().changed().connect(this, &AuthApplication::authEvent);
     std::unique_ptr<Wt::Auth::AuthWidget> authWidget = cpp14::make_unique<Wt::Auth::AuthWidget>(Session::auth(), session_.users(), session_.login());
     authWidget_=authWidget.get();

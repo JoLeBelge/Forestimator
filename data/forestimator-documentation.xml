@@ -4,11 +4,11 @@
 	  plural="n == 1 ? 0 : 1">
 <message id="NT.logs">
 
-<h5>Modifications d'aout 2021</h5>
+<h5>Modifications d'août 2021</h5>
 
-Quatre années d'utilisation de la carte des niveaux trophiques en Wallonie ont permis de prendre le recul nécessaire pour détecter et corriger un certains nombres de stations qui s'étaient vu attribuer un niveau trohique incorrect ou imprécis. Pour rappel, la détermination des niveaux trophiques se base sur <u>la valeur d'une moyenne de pH par principaux types de sols (PTS) pour une zone bioclimatique donnée</u>. Les mesures de pH sont issue du suivi pédologique de l’Inventaire permanent des ressources forestières de Wallonie (IPRFW), et sont amplement utilisés dans la clé dichotomique des niveaux trophiques. Cette clé de détermination des niveaux trophiques est adaptée à une enquête sur terrain, mais sont utilisation sous SIG avec la carte numérique des sols de Wallonie et la carte des pH moyenné par principaux type de sols ne permet pas d'appréhender un certain nombre de situation marginale (ex : sols avec charge calcaire en Calestienne - Calestienne qui fait partie de la zone bioclimatique de la Fagne-Famenne) et est frocément tributaire de mesures ponctuelle de pH dont la valeur n'est pas toujours représentative d'un ensemble de sols.
+Quatre années d'utilisation de la carte des niveaux trophiques en Wallonie ont permis de prendre le recul nécessaire pour détecter et corriger un certains nombres de stations qui s'étaient vu attribuer un niveau trophique incorrect ou imprécis. Pour rappel, la détermination des niveaux trophiques se base sur <u>la valeur d'une moyenne de pH par principaux types de sols (PTS) pour une zone bioclimatique donnée</u>. Les mesures de pH sont issue du suivi pédologique de l’Inventaire permanent des ressources forestières de Wallonie (IPRFW), et sont amplement utilisés dans la clé dichotomique des niveaux trophiques. Cette clé de détermination des niveaux trophiques est adaptée à une enquête sur terrain, mais sont utilisation sous SIG avec la carte numérique des sols de Wallonie et la carte des pH moyenné par principaux type de sols ne permet pas d'appréhender un certain nombre de situation marginale (ex : sols avec charge calcaire en Calestienne - Calestienne qui fait partie de la zone bioclimatique de la Fagne-Famenne) et est forcément tributaire de mesures ponctuelle de pH dont la valeur n'est pas toujours représentative d'un ensemble de sols.
 <br></br>
-Les modifications apportée en 2021 sont donc issues d'une analyse d'expert. Une inspection minutieuse de la carte des niveaux trophique à permis à un groupe d'experts en analyse stationelle de corriger les situations listées ci-dessous. L'utilisation des 27 territoires écologiques tels que défini dans le guide du boisement de 1994 et digitalisée l'équipe de Gembloux Agro (Ridremont et Henrotay) nous a permis de définir des rêgles s'applicant à un contexte pédologique plus cohérent que les zones bioclimatiques, qui sont avant tout un découpage du territoire le long du gradient climatique.
+Les modifications apportée en 2021 sont donc issues d'une analyse d'expert. Une inspection minutieuse de la carte des niveaux trophique à permis à un groupe d'experts en analyse stationelle de corriger les situations listées ci-dessous. L'utilisation des 27 territoires écologiques tels que défini dans le guide du boisement de 1994 et digitalisée l'équipe de Gembloux Agro (Ridremont et Henrotay) nous a permis de définir des règles s'appliquant à un contexte pédologique plus cohérent que les zones bioclimatiques, qui sont avant tout un découpage du territoire le long du gradient climatique.
 <br></br>
 <div class="alert alert-success"> Sigle pédologique : Gbbf </div>
 
@@ -24,7 +24,7 @@ Les modifications apportée en 2021 sont donc issues d'une analyse d'expert. Une
 
 <u> Décision</u> : Condroz --> sur formation carbonaté, NT 0, sinon, NT -1.
 Entre Vesdre et Meuse --> Gbax NT -2, Gbbx NT 0.
-<br></br><u>Justificatif (Condroz)</u>: Silexites assez variables à teneur en sable qui varie. Globalement, on peut dire qu'elles resemblent aux GbbK. Le niveau trophique dépend de la proximité du substrat calcaire (-1, 0, +1 voire +2). On prend le cas le plus courant, càd 0. Hors formation carbonatée, on diminue le NT car elles peuvent être plus acides.
+<br></br><u>Justificatif (Condroz)</u>: Silexites assez variables à teneur en sable qui varie. Globalement, on peut dire qu'elles ressemblent aux GbbK. Le niveau trophique dépend de la proximité du substrat calcaire (-1, 0, +1 voire +2). On prend le cas le plus courant, càd 0. Hors formation carbonatée, on diminue le NT car elles peuvent être plus acides.
 <br></br><u>Justificatif (Entre Vesdre et Meuse)</u>: Le développement de profil a et b est une convention de cette région pour différentier les sols très lessivés et acides (Gbax) de ceux influencés par le substrat calcaire (Gbbx). Voir livret de sol 122E p75 et 76.
  <br></br>
  <div class="alert alert-success"> Limons profonds A </div>
@@ -32,7 +32,7 @@ Entre Vesdre et Meuse --> Gbax NT -2, Gbbx NT 0.
 <h5> -Ardenne Condruzienne:</h5>
 
 <u> Décision</u> : les mettre tous en -1.
-<br></br><u>Justificatif</u> : l'épaisseur de limon fait qu'il reste peu influencé au niveau de sa fertilité par le substrat (qui influence par contre le drainage). Les limons de drainage h et i ont une valeur de pH moyen plus petit que ceux des drainages c et b (4.29 vs 4.35 et 4.7) car moins épais et donc un peu + proches du subsrat gréseux (les Ah et Ai quazi tous en Ardenne Condruzienne). Mais on reste la majorité du temps dans du NT -1.
+<br></br><u>Justificatif</u> : l'épaisseur de limon fait qu'il reste peu influencé au niveau de sa fertilité par le substrat (qui influence par contre le drainage). Les limons de drainage h et i ont une valeur de pH moyen plus petit que ceux des drainages c et b (4.29 vs 4.35 et 4.7) car moins épais et donc un peu + proches du subsrat gréseux (les Ah et Ai quasi tous en Ardenne Condruzienne). Mais on reste la majorité du temps dans du NT -1.
 <br></br>
 <h5> -Calestienne (orientale et occidentale)</h5> 
 <u> Décision</u> : les mettre en 0 sauf si présence d'un substrat f avant 80cm.
@@ -50,7 +50,7 @@ Entre Vesdre et Meuse --> Gbax NT -2, Gbbx NT 0.
  <div class="alert alert-success"> Sigle pédologique : Ghx2, Gix2, GDb2 </div>
 
 <u> Décision</u> : les mettre tous en -2.
-<br></br><u>Justificatif</u> : zones ou le substrat gréseux influence le sol, qui est donc acide (Ardenne, Adrenne condruzienne). Précédemment, la valeur de NT de -1 est trop peu contraignante.
+<br></br><u>Justificatif</u> : zones ou le substrat gréseux influence le sol, qui est donc acide (Ardenne, Ardenne condruzienne). Précédemment, la valeur de NT de -1 est trop peu contraignante.
 
 </message>
 
@@ -60,7 +60,7 @@ Entre Vesdre et Meuse --> Gbax NT -2, Gbbx NT 0.
 
 1) intégration de la carte des zones d'aléas d'inondation du SPW (en apport permanent). --> changement mineur
 <br></br>
-2) prise en compte du caractère temporaire de l'écoulement pour le réseau hydrographique. Pour les cours d'eau à écoulement temporaire, la zone environnante est classée en apport variable alors qu'auparavent elle l'était en apport permanent. --> changement mineur
+2) prise en compte du caractère temporaire de l'écoulement pour le réseau hydrographique. Pour les cours d'eau à écoulement temporaire, la zone environnante est classée en apport variable alors qu'auparavant elle l'était en apport permanent. --> changement mineur
 <br></br>
 3) changement des seuils de topographic position index utilisés pour le classement des apports variable dans les zones encaissées afin de <u>réduire considérablement la surface de ces zones qui remontaient trop dans le haut des pentes de vallons et vallées</u>. --> changement majeur
 <br></br>
@@ -86,7 +86,7 @@ On estime que la profondeur de sol d'une série spéciale "P" (base de grand ver
 </figcaption>
 </figure>
 <br></br>
-L'idée générale est de se calquer sur la méthodologie de l'INRAE (INRAE, UMR TETIS, R. Dutrieux, K. Ose, J.-B. Féret) développée depuis 2017. Celle-ci consiste à surveiller l'évolution saisonière d'un indice spectral calculé sur base de série temporelle d'images Sentinel-2. L'information est résumée sous forme d'une carte d'état sanitaire par an.
+L'idée générale est de se calquer sur la méthodologie de l'INRAE (INRAE, UMR TETIS, R. Dutrieux, K. Ose, J.-B. Féret) développée depuis 2017. Celle-ci consiste à surveiller l'évolution saisonnière d'un indice spectral calculé sur base de série temporelle d'images Sentinel-2. L'information est résumée sous forme d'une carte d'état sanitaire par an.
 <br></br>
 Une documentation plus exhaustive de la méthode est disponible sous format pdf:
 <a href="/pdf/methodoAnalyseSentinel2TimeSerie2021.pdf" download="detectionScolyte">
@@ -100,7 +100,7 @@ Carte d'aptitude du FEE : version de mars 2021 pour AG, AP, EK, PG, PY, PZ et de
 </message>
 
 <message id="Aptitude.logs">
-Octobre 2021 : mise à jours de toutes les cartes d'aptitudes du FEE suite à la mise à jour de la carte des niveaux hydriques. Par ailleurs, le système de calcul de compensations liés à la situation topographique est amélioré (compensation uniquement sur l'aptitude climatique et pas hydro-trophique, et correction du bug des aptitudes Tolérance élargie pour les résineux qui ne devaients pas exister par définition).
+Octobre 2021 : mise à jours de toutes les cartes d'aptitudes du FEE suite à la mise à jour de la carte des niveaux hydriques. Par ailleurs, le système de calcul de compensations liés à la situation topographique est amélioré (compensation uniquement sur l'aptitude climatique et pas hydro-trophique, et correction du bug des aptitudes Tolérance élargie pour les résineux qui ne devaient pas exister par définition).
 <br></br>
 Mars 2021 : mise à jours pour AG, AP, EK, PG, PY, PZ.
 <br></br>
@@ -142,11 +142,11 @@ Janvier 2022
 </message>
 
 <message id="dendro.logs">
-Janvier 2022 : implémenté les modèles dendrométriques à l'échelle de pixel de 5 m de résolution. Les paramètres dendro pour un polygone sont calulés comme la moyenne pour chaque pixels. Précédemment, par exemple dans le plug-In Qgis Forestimator, une échelle intermédiaire était utilisée entre la parcelle et le pixel. Elle correspondait à une surface de un are affin de répondre à la définition de la hauteur dominante, qui correspond à la hauteur moyenne des 100 arbres les plus haut par hectare (donc une surface moyenne de 1 are).
+Janvier 2022 : implémenté les modèles dendrométriques à l'échelle de pixel de 5 m de résolution. Les paramètres dendro pour un polygone sont calculés comme la moyenne pour chaque pixels. Précédemment, par exemple dans le plug-In Qgis Forestimator, une échelle intermédiaire était utilisée entre la parcelle et le pixel. Elle correspondait à une surface de un are affin de répondre à la définition de la hauteur dominante, qui correspond à la hauteur moyenne des 100 arbres les plus haut par hectare (donc une surface moyenne de 1 are).
 </message>
 
 <message id="COMPO.projet">
-Cette cartographie des essences forestières est le résultat de recherches menées à ULiège Gembloux Agro-Bio Tech au travers de deux projets Interreg, Forêt Pro Bos et RegioWood 2, et du projet Cartofor appuyé par le DNF.
+Cette cartographie des essences forestières est le résultat de recherches menées à ULiège Gembloux Agro-Bio Tech au travers de deux projets interreg, Forêt Pro Bos et RegioWood 2, et du projet Cartofor appuyé par le DNF.
 <br></br>
 </message>
 
@@ -171,7 +171,7 @@ Version d'octobre 2021
 </message>
 
 <message id="COMPO.logs">
-Octobre 2021 ; passage à une résolution de 2.5 m (auparavent 10 m). Les cartes renseignent dorénavent la proportion de l'essence en pourcentage de gha (précédemment "probabilité de présence).
+Octobre 2021 ; passage à une résolution de 2.5 m (auparavant 10 m). Les cartes renseignent dorénavant la proportion de l'essence en pourcentage de gha (précédemment "probabilité de présence").
 </message>
 
 <message id="ES_EP.logs">
@@ -185,21 +185,21 @@ Pour la délimitation de la zone en pessière, utilisation de la dernière versi
 
 Il y a trois manière de télécharger les cartes pour une utilisation dans votre logiciel de Système d'Information Géographique. Les couches cartographiques sont des raster au format Geotif et ceux-ci sont accompagnés d'un fichier de symbologie spécifique au logiciel Qgis.
 <br></br>
-La manière la plus directe est l'utilisation du boutton Télécharger situé sous la fenêtre reprennant votre sélection de couches cartographiques. Cette méthode permet de télécharger la carte qui est tout en haut dans la liste de couche. La carte est découpée pour épouser l'emprise affichée avant son téléchargement.
+La manière la plus directe est l'utilisation du bouton Télécharger situé sous la fenêtre reprenant votre sélection de couches cartographiques. Cette méthode permet de télécharger la carte qui est tout en haut dans la liste de couche. La carte est découpée pour épouser l'emprise affichée avant son téléchargement.
 <figure class="highlight">
 <img src="/img/telechargementA.png" alt="Télécharger la carte active"/> 
 <figcaption class="figure-caption">Téléchargement de la carte active avec découpage sur une petite emprise.
 </figcaption>
 </figure>
 <br></br>
-La deuxième méthode permet de télécharger en une fois un ensemble de cartes découpées sur l'emprise choisie. Pour se faire, il faut préhalablement charger un shapefile de polygones via la fenêtre d'analyse surfacique. Ensuite, le boutton "Télécharger les cartes" permet le découpage à l'emprise choisie de toutes les couches sélectionnées au moyen des cases à cocher.
+La deuxième méthode permet de télécharger en une fois un ensemble de cartes découpées sur l'emprise choisie. Pour se faire, il faut préalablement charger un shapefile de polygones via la fenêtre d'analyse surfacique. Ensuite, le bouton "Télécharger les cartes" permet le découpage à l'emprise choisie de toutes les couches sélectionnées au moyen des cases à cocher.
 <figure class="highlight">
 <img src="/img/teleB.png" alt="Télécharger plusieurs cartes"/> 
 <figcaption class="figure-caption">Téléchargement de plusieurs cartes avec découpage sur une petite emprise, après avoir chargé un shapefile.
 </figcaption>
 </figure>
 <br></br>
-Enfin, la dernière méthode permet le téléchargement des couches dans leur entièreté, c'est à dire sans découpage préhalable.
+Enfin, la dernière méthode permet le téléchargement des couches dans leur entièreté, c'est à dire sans découpage préalable.
 Les couches cartographiques téléchargeables sont listées dans le tableau ci-dessous.
 </message>
 

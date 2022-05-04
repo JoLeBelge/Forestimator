@@ -27,6 +27,18 @@ std::vector<int> vMonths={3,4,5,6,7,8,9};
 std::vector<std::string> vVAR={"Tmean","Tmax","Tmin","ETP","P","R","DJ"};
 int globSeuilPres(70);
 
+/*
+#include <iostream>
+#include <string.h>
+#include <stdlib.h>
+#include "html.h"
+#include "HTMLControl.h"
+#include "HTMLDriver.h"
+#include "iconvstream.h"
+#include "format.h"
+*/
+
+
 
 /* jo 2020
 Projet RégioWood 2 et thèse de Arthur G.
@@ -231,6 +243,46 @@ int main(int argc, char *argv[])
                 }
 
             }
+            break;
+        }
+
+            // Marie pierre; je veux créer des tuiles à partir d'un masque de hetraie mature
+        case 200:{
+
+            // test html2text
+            /*int mode = HTMLDriver::PRINT_AS_ASCII;
+            iconvstream is;
+            bool toto(false);
+            int width(79);
+            const char *input_file = "/home/jo/app/html2text/tests/montest.html";
+            HTMLControl control(is, mode, false, input_file);
+            HTMLDriver driver(control, is, toto, width, mode, toto);
+
+            if (driver.parse() != 0)*/
+            // ouverture du fichier xml et on retire les balises xml (pas celle html)
+
+
+            //std::string aCommand="./html2text -from_encoding UTF8 "+std::to_string(mVProduts.at(0)->mXmin)+" "+std::to_string(mVProduts.at(0)->mYmin)+" "+std::to_string(mVProduts.at(0)->mXmax)+" "+std::to_string(mVProduts.at(0)->mYmax)+ " -t_srs EPSG:"+std::to_string(epsg)+" -ot Byte -overwrite -tr 10 10 "+ masqueRW+ " "+ out;
+            //std::cout << aCommand << std::endl;
+            //system(aCommand.c_str());
+            /*std::string file(vm["shp"].as<std::string>());
+            xml_document<> doc;
+            xml_node<> * root_node;
+            std::ifstream theFile (file);
+            std::vector<char> buffer((std::istreambuf_iterator<char>(theFile)), std::istreambuf_iterator<char>());
+            buffer.push_back('\0');
+            // Parse the buffer using the xml file parsing library into doc
+            doc.parse<0>(&buffer[0]);
+            // Find our root node
+            root_node = doc.first_node("messages");
+            for (xml_node<> * node = root_node->first_node("message"); node; node = node->next_sibling())
+            {
+                std::cout << node->first_attribute("id")->value() << std::endl;
+                std::cout << "n = " << node-><< std::endl;
+
+            }
+            */
+
             break;
         }
         default:

@@ -20,7 +20,14 @@ SOURCES += stationDescriptor.cpp \
         ../carteApt/cnsw.cpp \
     plaiprfw.cpp \
     ../carteApt/layerbase.cpp \
-    ../cWebAptitude/cadastre.cpp
+    ../cWebAptitude/cadastre.cpp \
+
+#../../html2text/HTMLDriver.cpp \
+ #../../html2text/HTMLControl.cpp \
+#../../html2text/HTMLParser.tab.cc \
+#../../html2text/HTMLParser.yy \
+
+
 
 LIBS = -lboost_system -lboost_iostreams -lboost_thread -lboost_filesystem -lboost_program_options -lwtdbo -lwtdbosqlite3 -fopenmp
 
@@ -29,6 +36,12 @@ LIBS += -L$$PWD/usr/include/gdal/ -lgdal
 INCLUDEPATH += $$PWD/../../../../../../usr/include/gdal/
 DEPENDPATH += $$PWD/../../../../../../usr/include/gdal/
 
+#INCLUDEPATH += $$PWD/../../html2text/
+#DEPENDPATH += $$PWD/../../html2text/
+
+#INCLUDEPATH += $$PWD/rapidxml/
+#DEPENDPATH += $$PWD/rapidxml/
+
 HEADERS += \
     plaiprfw.h \
     ../carteApt/layerbase.h \
@@ -36,4 +49,9 @@ HEADERS += \
     ../carteApt/cdicoaptbase.h \
     ../carteApt/cnsw.h \
     ../cWebAptitude/cadastre.h \
+ #   rapidxml/rapidxml.hpp \
+ #   rapidxml/rapidxml_iterators.hpp \
+  #  ../../html2text/HTMLDriver.h \
+  #  ../../html2text/HTMLControl.h \
+#../../html2text/HTMLParser.tab.hh \
 

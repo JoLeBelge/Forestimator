@@ -20,6 +20,10 @@ INCLUDEPATH += $$PWD/auth/
 INCLUDEPATH += $$PWD/libzipp/src/
 DEPENDPATH += $$PWD/libzipp/src/
 
+
+INCLUDEPATH += $$PWD../stationDescriptor/rapidxml/
+DEPENDPATH += $$PWD../stationDescriptor/rapidxml/
+
 SOURCES += main.cpp \
     ../carteApt/cdicoaptbase.cpp \
     analytics.cpp \
@@ -78,4 +82,6 @@ HEADERS += \
     ../carteApt/layerbase.h \
     api/stationdescresource.h \
     ../carteApt/color.h \
-    statHdomCompo.h
+    statHdomCompo.h \
+    ../stationDescriptor/rapidxml/rapidxml.hpp \
+    ../stationDescriptor/rapidxml/rapidxml_iterators.hpp
