@@ -2,7 +2,6 @@
 
 std::string dirBD("/home/lisein/Documents/carteApt/Forestimator/carteApt/data/aptitudeEssDB.db");
 bool globTest(0);
-std::string columnPath("Dir2");
 
 cDicoApt::cDicoApt(std::string aBDFile):cdicoAptBase(aBDFile)
 {
@@ -35,93 +34,8 @@ cDicoApt::cDicoApt(std::string aBDFile):cdicoAptBase(aBDFile)
         }
         sqlite3_finalize(stmt);
 
-        std::string sqlString2;
-        // j'ai fini par organiser les fichiers GIS en deux tables ; une spécifique pour les cartes d'aptitudes
-        for (std::string table : std::vector<std::string>{"layerApt","fichiersGIS"})
-        {
 
-            SQLstring="SELECT Code,"+columnPath+",Nom,Type,NomComplet,Categorie,TypeVar, expert, visu, stat,NomCourt,groupe,statPonct FROM "+table+";";
-            sqlite3_prepare_v2( *db_, SQLstring.c_str(), -1, &stmt, NULL );
-            while(sqlite3_step(stmt) == SQLITE_ROW)
-            {
-                if (sqlite3_column_type(stmt, 0)!=SQLITE_NULL && sqlite3_column_type(stmt, 1)!=SQLITE_NULL){
 
-                    std::string aA=std::string( (char *)sqlite3_column_text( stmt, 0 ) );
-                    std::string aB=std::string( (char *)sqlite3_column_text( stmt, 1 ) );
-                    std::string aC=std::string( (char *)sqlite3_column_text( stmt, 2 ) );
-                    Dico_GISfile.emplace(std::make_pair(aA,aB+"/"+aC));
-                    Dico_RasterTable.emplace(std::make_pair(aA,table));
-                    std::string groupe("REF");
-                    if (sqlite3_column_type(stmt, 11)!=SQLITE_NULL) {groupe=std::string( (char *)sqlite3_column_text( stmt, 11 ) );}
-                    Dico_lay2groupe.emplace(std::make_pair(aA,groupe));
-
-                    if ( sqlite3_column_type(stmt, 3)!=SQLITE_NULL && sqlite3_column_type(stmt, 4)!=SQLITE_NULL && sqlite3_column_type(stmt, 5)!=SQLITE_NULL && sqlite3_column_type(stmt, 6)!=SQLITE_NULL&& sqlite3_column_type(stmt, 10)!=SQLITE_NULL){
-                        std::string aD=std::string( (char *)sqlite3_column_text( stmt, 3 ) );
-                        std::string aE=std::string( (char *)sqlite3_column_text( stmt, 4 ) );
-                        std::string aF=std::string( (char *)sqlite3_column_text( stmt, 5 ) );
-                        std::string aG=std::string( (char *)sqlite3_column_text( stmt, 6 ) );
-                        std::string aH=std::string( (char *)sqlite3_column_text( stmt, 10 ) );
-                        Dico_RasterType.emplace(std::make_pair(aA,aD));
-                        Dico_RasterNomComplet.emplace(std::make_pair(aA,aE));
-                        Dico_RasterNomCourt.emplace(std::make_pair(aA,aH));
-                        Dico_RasterCategorie.emplace(std::make_pair(aA,aF));
-                        Dico_RasterVar.emplace(std::make_pair(aA,aG));
-                        bool expert(0);
-                        if (sqlite3_column_type(stmt, 7)!=SQLITE_NULL) {expert=sqlite3_column_int( stmt, 7 );}
-                        Dico_RasterExpert.emplace(std::make_pair(aA,expert));
-                        if (sqlite3_column_type(stmt, 8)!=SQLITE_NULL) { Dico_RasterVisu.emplace(std::make_pair(aA,sqlite3_column_int( stmt, 8 )));}
-                        if (sqlite3_column_type(stmt, 9)!=SQLITE_NULL) { Dico_RasterStat.emplace(std::make_pair(aA,sqlite3_column_int( stmt, 9 )));}
-
-                        if (sqlite3_column_type(stmt, 12)!=SQLITE_NULL) { Dico_RasterStatP.emplace(std::make_pair(aA,sqlite3_column_int( stmt, 12 )));}
-                    }
-                }
-            }
-            if(Dico_GISfile.size()==0) { std::cout << "\n Il se pourrait que la colonne " << columnPath << " n'existe pas dans la table fichiersGIS " << std::endl;}
-            if (globTest){   std::cout << "Dico_GISfile a " << Dico_GISfile.size() << " elements " << std::endl;
-
-                for (auto kv : Dico_GISfile){
-                    if(!boost::filesystem::exists(kv.second)){
-                        std::cout << " fichier " << kv.second << " n'existe pas " << std::endl;
-                    }
-
-                }
-            }
-
-            sqlite3_finalize(stmt);
-            SQLstring="SELECT Code,WMSurl,WMSlayer, WMSattribution, typeGeoservice FROM "+table+" WHERE WMSurl IS NOT NULL;";
-
-            sqlite3_prepare_v2( *db_, SQLstring.c_str(), -1, &stmt, NULL );
-            while(sqlite3_step(stmt) == SQLITE_ROW)
-            {
-                if (sqlite3_column_type(stmt, 0)!=SQLITE_NULL && sqlite3_column_type(stmt, 1)!=SQLITE_NULL && sqlite3_column_type(stmt, 2)!=SQLITE_NULL){
-                    std::string aA=std::string( (char *)sqlite3_column_text( stmt, 0 ) );
-                    std::string aB=std::string( (char *)sqlite3_column_text( stmt, 1 ) );
-                    std::string aC=std::string( (char *)sqlite3_column_text( stmt, 2 ) );
-                    std::string attribution("Gembloux Agro-Bio Tech");
-                    if (sqlite3_column_type(stmt, 3)!=SQLITE_NULL) {attribution=std::string( (char *)sqlite3_column_text(stmt, 3 ));}
-                    std::string geoservice("");
-                    if (sqlite3_column_type(stmt, 4)!=SQLITE_NULL){geoservice=std::string( (char *)sqlite3_column_text(stmt, 4 ));}
-
-                    Dico_WMS.emplace(std::make_pair(aA,WMSinfo(aB,aC,geoservice,attribution)));
-                }
-            }
-            sqlite3_finalize(stmt);
-
-            sqlString2="SELECT gain, Code FROM "+table+" WHERE gain IS NOT NULL;";
-            sqlite3_prepare_v2( *db_, sqlString2.c_str(), -1, &stmt, NULL );
-            while(sqlite3_step(stmt) == SQLITE_ROW)
-            {
-                if (sqlite3_column_type(stmt, 0)!=SQLITE_NULL){
-                    double aA=sqlite3_column_double(stmt, 0 );
-                    std::string aB=std::string( (char *)sqlite3_column_text( stmt, 1 ) );
-                    Dico_RasterGain.emplace(std::make_pair(aB,aA));
-                    //std::cout <<  " gain de " << aA << " pour couche " << aB << std::endl;
-                }
-            }
-            sqlite3_finalize(stmt);
-
-            if (globTest){   std::cout << "Dico_WMS a " << Dico_WMS.size() << " elements " << std::endl;}
-        }
 
         SQLstring="SELECT Code, id_projet, description, version, id_reference, Nom, copyrigth,ordre, NomShort FROM carteMTD;";
         sqlite3_prepare_v2( *db_, SQLstring.c_str(), -1, &stmt, NULL );
@@ -189,48 +103,7 @@ cDicoApt::cDicoApt(std::string aBDFile):cdicoAptBase(aBDFile)
             }
         }
         sqlite3_finalize(stmt);
-        SQLstring="SELECT Col,R,G,B FROM dico_color;";
-        sqlite3_prepare_v2( *db_, SQLstring.c_str(), -1, &stmt, NULL );
-        while(sqlite3_step(stmt) == SQLITE_ROW)
-        {
-            if (sqlite3_column_type(stmt, 0)!=SQLITE_NULL && sqlite3_column_type(stmt, 1)!=SQLITE_NULL && sqlite3_column_type(stmt, 2)!=SQLITE_NULL&& sqlite3_column_type(stmt, 3)!=SQLITE_NULL){
 
-                std::string aA=std::string( (char *)sqlite3_column_text( stmt, 0 ));
-                int R=sqlite3_column_int( stmt, 1 );
-                int G=sqlite3_column_int( stmt, 2 );
-                int B=sqlite3_column_int( stmt, 3 );
-                colors.emplace(std::make_pair(aA,color(R,G,B,aA)));
-            }
-        }
-        sqlite3_finalize(stmt);
-        // palette des gris faite maison
-        SQLstring="SELECT Col,R,G,B FROM dico_colGrey;";
-        sqlite3_prepare_v2( *db_, SQLstring.c_str(), -1, &stmt, NULL );
-        while(sqlite3_step(stmt) == SQLITE_ROW)
-        {
-            if (sqlite3_column_type(stmt, 0)!=SQLITE_NULL && sqlite3_column_type(stmt, 1)!=SQLITE_NULL && sqlite3_column_type(stmt, 2)!=SQLITE_NULL&& sqlite3_column_type(stmt, 3)!=SQLITE_NULL){
-                std::string aA=std::string( (char *)sqlite3_column_text( stmt, 0 ));
-                int R=sqlite3_column_int( stmt, 1 );
-                int G=sqlite3_column_int( stmt, 2 );
-                int B=sqlite3_column_int( stmt, 3 );
-                colors.emplace(std::make_pair(aA,color(R,G,B,aA)));
-            }
-        }
-        sqlite3_finalize(stmt);
-
-        // par après je décide de travailler en code hex pour pas me faire ch***
-        SQLstring="SELECT id,hex FROM dico_viridisColors;";
-        sqlite3_prepare_v2( *db_, SQLstring.c_str(), -1, &stmt, NULL );
-        while(sqlite3_step(stmt) == SQLITE_ROW)
-        {
-            if (sqlite3_column_type(stmt, 0)!=SQLITE_NULL && sqlite3_column_type(stmt, 1)!=SQLITE_NULL){
-                int aA=sqlite3_column_int( stmt, 0 );
-                std::string aB=std::string( (char *)sqlite3_column_text( stmt, 1 ));
-                //std::cout << aA << ";";
-                colors.emplace(std::make_pair(std::to_string(aA),color(aB,std::to_string(aA))));
-            }
-        }
-        sqlite3_finalize(stmt);
         SQLstring="SELECT Code,Nom,NomCol FROM dico_caracteristiqueCS;";
         sqlite3_prepare_v2( *db_, SQLstring.c_str(), -1, &stmt, NULL );
         while(sqlite3_step(stmt) == SQLITE_ROW)
@@ -339,10 +212,7 @@ cDicoApt::cDicoApt(std::string aBDFile):cdicoAptBase(aBDFile)
         sqlite3_finalize(stmt);
 
         if (globTest){   std::cout << "crée toute les essences " << std::endl;}
-        // toutes les essences de la classe essence
-        for (auto & pair : *codeEs2Nom()){
-            mVEss.emplace(std::make_pair(pair.first,std::make_shared<cEss>(pair.first,this)));
-        }
+
 
         // toutes les layerbase
         if (globTest){   std::cout << "crée toute les layerbase " << std::endl;}
@@ -469,30 +339,6 @@ std::map<int,color> cDicoApt::getDicoRasterCol(cKKCS * aKK){
 }
 
 
-std::map<int,std::map<int,int>> cDicoApt::getCSApt(std::string aCodeEs){
-    std::map<int,std::map<int,int>> aRes;
-
-    sqlite3_stmt * stmt;
-    // boucle sur tout les identifiants de zbio mais attention, les catalogues de station ne couvrent pas tout donc vérif si ND
-    for(auto&& zbio : Dico_ZBIO | boost::adaptors::map_keys){
-        std::string SQLstring="SELECT stat_id,"+aCodeEs+" FROM AptCS WHERE ZBIO="+ std::to_string(zbio)+";";
-        //std::cout << SQLstring << std::endl;
-        sqlite3_prepare_v2( *db_, SQLstring.c_str(), -1, &stmt, NULL );//preparing the statement
-        while(sqlite3_step(stmt) == SQLITE_ROW)
-        {
-            if (sqlite3_column_type(stmt, 0)!=SQLITE_NULL && sqlite3_column_type(stmt, 1)!=SQLITE_NULL){
-                int station=sqlite3_column_int( stmt, 0 );
-                std::string apt=std::string( (char *)sqlite3_column_text( stmt, 1 ) );
-                int codeApt=Apt(apt);
-                aRes[zbio].emplace(std::make_pair(station,codeApt));
-            }
-        }
-        sqlite3_finalize(stmt);
-    }
-
-
-    return aRes;
-}
 
 std::map<int,std::map<int,int>> cDicoApt::getKKCS(std::string aColName){
     std::map<int,std::map<int,int>> aRes;
@@ -585,132 +431,6 @@ WMSinfo * cDicoApt::getWMSinfo(std::string aCode){
 
 std::map<std::string,LayerMTD> * cDicoApt::layerMTD(){return &Dico_layerMTD;}
 
-cEss::cEss(std::string aCodeEs,cDicoApt * aDico):mCode(aCodeEs),mNomFR(aDico->accroEss2Nom(aCodeEs)),mDico(aDico)
-  ,mType(Apt),mPrefix(aDico->accroEss2prefix(aCodeEs)){
-    //std::cout << "creation de l'essence " << mNomFR << std::endl;
-    mEcoVal=aDico->getFEEApt(mCode);
-    mAptCS=aDico->getCSApt(mCode);
-    mAptZbio=aDico->getZBIOApt(mCode);
-    mRisqueTopo=aDico->getRisqueTopo(mCode);
-    mFeRe=aDico->accroEss2FeRe(aCodeEs);
-}
-
-//effectue la confrontation Apt Zbio et AptHydroTrophiue
-int cEss::getApt(int aCodeNT, int aCodeNH, int aZbio, bool hierachique,int aTopo){
-    int aRes(12); // indéterminé zone batie ; par défaut
-    if (aCodeNT==0 && aCodeNH!=0){aRes=11; return aRes;}
-    if (mAptZbio.find(aZbio)==mAptZbio.end()){aRes=11;return aRes;}// hors belgique ; Indéterminé mais pas zone batie
-
-    //int codeNTNH= mDico->NTNH()->at("h"+std::to_string(aCodeNH)+"t"+std::to_string(aCodeNT));
-    std::string codeNTNH= "h"+std::to_string(aCodeNH)+"t"+std::to_string(aCodeNT);
-    if (mEcoVal.find(aZbio)!=mEcoVal.end()){
-        //aRes=20;
-        std::map<std::string,int> * Eco=&mEcoVal.at(aZbio);
-        if (Eco->find(codeNTNH)!=Eco->end()){
-            aRes=Eco->at(codeNTNH);
-        }
-    }
-    // confrontation de l'aptitude de l'écogramme avec celui de la zone bioclim et choix du plus contraignant
-    // attention, si pas d'aptitude hydro-trophique, aRes
-    if (hierachique && mAptZbio.find(aZbio)!=mAptZbio.end()){
-        int aZbioApt= mAptZbio.at(aZbio);
-
-        if (aTopo!=666){
-            // c'est sur cette aptitude que l'on applique un facteur de correction
-            aZbioApt=corrigAptBioRisqueTopo(aZbioApt,aTopo,aZbio);
-        }
-
-        if (mDico->AptContraignante(aRes)<mDico->AptContraignante(aZbioApt)){
-            aRes=aZbioApt;
-        }
-    }
-    return aRes;
-}
-
-int cEss::getApt(int aZbio,int aSTId){
-    int aRes(0);
-    if (mAptCS.find(aZbio)!=mAptCS.end()){
-        std::map<int,int> * Apt=&mAptCS.at(aZbio);
-        if (Apt->find(aSTId)!=Apt->end()){
-            aRes=Apt->at(aSTId);
-        }
-    }
-    return aRes;
-}
-
-int cEss::getApt(int aZbio){
-    int aRes(0);
-    if (mAptZbio.find(aZbio)!=mAptZbio.end()){
-        aRes=mAptZbio.at(aZbio);
-    }
-    return aRes;
-}
-
-// octobre 2021 ; la compensation topo s'applique exclusivement sur l'aptitude bioclim,
-int cEss::corrigAptBioRisqueTopo(int aptBio,int topo,int zbio){
-    int aRes=aptBio;
-    int risque=getRisque(zbio,topo);
-    int catRisque=mDico->risqueCat(risque);
-    // situation favorable
-    if (catRisque==1){
-        aRes=mDico->AptSurcote(aptBio);
-        return aRes;
-        //std::cout << "Surcote l'aptitude " << mDico->code2Apt(apt) << " vers " << mDico->code2Apt(aRes) << std::endl;
-    }
-    // risque élevé et très élevé
-    if (catRisque==3){aRes=mDico->AptSouscote(aptBio);}
-    // attention, pour résineux, pas de Tolérance Elargie --> exclusion
-    if (aRes==3 && mFeRe==FeRe::Resineux){aRes=4;}
-    //std::cout << "Décote l'aptitude " << mDico->code2Apt(apt) << " vers " << mDico->code2Apt(aRes) << std::endl;}
-    return aRes;
-}
-/*int cEss::corrigAptRisqueTopo(int apt,int topo,int zbio){
-    int aRes=apt;
-    int risque=getRisque(zbio,topo);
-    int catRisque=mDico->risqueCat(risque);
-    // situation favorable
-    if (catRisque==1){
-
-        aRes=mDico->AptSurcote(apt);
-        //std::cout << "Surcote l'aptitude " << mDico->code2Apt(apt) << " vers " << mDico->code2Apt(aRes) << std::endl;
-    }
-    // risque élevé et très élevé
-    if (catRisque==3){aRes=mDico->AptSouscote(apt);}
-    //std::cout << "Décote l'aptitude " << mDico->code2Apt(apt) << " vers " << mDico->code2Apt(aRes) << std::endl;}
-    return aRes;
-}*/
-
-std::string cEss::printRisque(){
-    std::string aRes("Risque pour "+mNomFR+ "------\n");
-    for (int zbio(1); zbio<11;zbio++){
-        for (int topo(1);topo<5;topo++){
-            aRes= aRes+ mDico->ZBIO(zbio) +", topo "+ std::to_string(topo) ;
-            aRes= aRes+ ", risque : " + mDico->Risque(getRisque(zbio,topo)) +"\n" ;
-        }
-    }
-    return aRes;
-}
-
-
-std::string cEss::NomCarteAptFEE(){return mDico->File("OUTDIR")+"aptitudeFEE_"+mCode+".tif";}
-//std::string cEss::NomDirTuileAptFEE(){return mDico->File("OUTDIR2")+"FEE_"+mCode;}
-std::string cEss::shortNomCarteAptFEE(){return "aptitudeFEE_"+mCode+".tif";}
-std::string cEss::NomCarteAptCS(){return mDico->File("OUTDIR")+"aptitudeCS_"+mCode+".tif";}
-//std::string cEss::NomDirTuileAptCS(){return mDico->File("OUTDIR2")+"CS_"+mCode;}
-std::string cEss::shortNomCarteAptCS(){return "aptitudeCS_"+mCode+".tif";}
-
-std::string cEss::NomMapServerLayer(){return "Aptitude_FEE_"+mCode;}
-std::string cEss::NomMapServerLayerFull(){return "Aptitude "+mPrefix+mNomFR;}
-
-std::string cEss::NomMapServerLayerCS(){return "Aptitude_CS_"+mCode;}
-
-bool cEss::hasRisqueComp(int zbio,int topo){
-    bool aRes(0);
-    int risque=getRisque(zbio,topo);
-    int catRisque=mDico->risqueCat(risque);
-    if ((catRisque==1) | (catRisque==3)){aRes=1;}
-    return aRes;
-}
 
 cKKCS::cKKCS(std::string aCode,cDicoApt * aDico):mCode(aCode),mNom(aDico->codeKK2Nom(aCode)),mDico(aDico)
   ,mNomCol(aDico->codeKK2NomCol()->at(aCode)),mType(Potentiel)
@@ -808,13 +528,6 @@ TypeLayer str2TypeLayer(const std::string& str)
     //if (globTest){std::cout << "str2TypeLayer " << str << " , " << (int (aRes)) << std::endl;}
     return aRes;
 }
-
-TypeWMS str2TypeWMS(const std::string& str){
-    TypeWMS aRes=TypeWMS::WMS;
-    if(str == "ArcGisRest") {aRes=TypeWMS::ArcGisRest;}
-    return aRes;
-}
-
 
 ST::ST(cDicoApt * aDico):mDico(aDico),mNT(666),mNH(666),mZBIO(666),mTOPO(666),mActiveEss(NULL),HaveEss(0),mSt(0),mEmpty(1)
 {

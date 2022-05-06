@@ -2,7 +2,7 @@
 
 int nbAds(5); // Ads = advertising
 // creation d'une bannières de pub (ads banner) pour faire défiler des informations descriptives du sites
-presentationPage::presentationPage(cDicoApt *aDico):mDico(aDico)
+presentationPage::presentationPage(cDicoApt *aDico, AuthApplication *app):mDico(aDico),m_app(app)
 {
     /*
     adsBanner = addNew<WStackedWidget>();
@@ -77,16 +77,14 @@ presentationPage::presentationPage(cDicoApt *aDico):mDico(aDico)
             for (std::shared_ptr<layerBase> l : mDico->VlayersForGroupe(gr)){
                 if (l->getCatLayer()!=TypeLayer::Externe & !l->Expert() & mDico->lay4Visu(l->Code())){
                     int row=t->rowCount();
-                    //l->Code() + ", " + l->Nom() + " , "+ l->WMSURL() +" , layer " +l->WMSLayerName()+"\n";
                     t->elementAt(row, 0)->addWidget(cpp14::make_unique<WText>(WString::fromUTF8(l->Nom())));
                     WText * url =t->elementAt(row, 1)->addWidget(cpp14::make_unique<WText>(WString::fromUTF8(l->WMSURL())));
                     url->addStyleClass("mya");
                     t->elementAt(row, 2)->addWidget(cpp14::make_unique<WText>(WString::fromUTF8(l->WMSLayerName())));
-                    //Wt::WPushButton * b = t->elementAt(row, 3)->addWidget(cpp14::make_unique<Wt::WPushButton>(WString::fromUTF8(l->Code())));
                     Wt::WPushButton * b = t->elementAt(row, 3)->addWidget(cpp14::make_unique<Wt::WPushButton>("télécharger"));
                     t->elementAt(row, 3)->setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Middle);
                     Wt::WLink loadLink = Wt::WLink("/telechargement/"+l->Code());
-                    //loadLink.setTarget(Wt::LinkTarget::NewWindow);
+                    b->clicked().connect([=]{m_app->addLog(l->Code(),typeLog::dsingleRW);});
                     b->setLink(loadLink);
                 }
             }

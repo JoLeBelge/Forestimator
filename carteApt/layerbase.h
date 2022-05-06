@@ -27,7 +27,7 @@ double getQ95(std::vector<double> aVHs);
 // Du coup toute mes classe qui terminent par Base sont des classes SANS Wt qui sont intégrée dans le dictionnaire et qui sont donc utilisée pour les traitements API et autre du genre
 
 class LayerMTD; // classe tout à fait à par qui sert uniquement à générer la rubrique de documentation de forestimator pour cette couche
-class WMSinfo;
+
 class basicStat;
 
 class cEss; // avec les aptitudes de l'essence
@@ -41,8 +41,6 @@ class layerBase;
 
 class layerStat;
 
-// ça c'était utilisé pour le calcul des carte apt, des tuiles et du code mapserveur
-enum TypeCarte {Apt, Potentiel, Station1, Habitats,NH,NT,Topo,AE,SS,ZBIO,CSArdenne,CSLorraine,MNH,Composition,MNT16b};
 
 
 enum class TypeVar {Classe,
@@ -58,9 +56,6 @@ enum class TypeLayer {
     ,Peuplement // description du peuplement en place
 };
 
-enum class TypeWMS {WMS,
-                    ArcGisRest
-                   };
 
 // forward dec
 class cDicoApt;
@@ -75,7 +70,7 @@ inline bool exists (const std::string& name){
 TypeCarte str2TypeCarte(const std::string& str);
 TypeVar str2TypeVar(const std::string& str);
 TypeLayer str2TypeLayer(const std::string& str);
-TypeWMS str2TypeWMS(const std::string& str);
+
 
 class basicStat{
 public:
@@ -191,21 +186,6 @@ public:
 };
 
 
-class WMSinfo
-{
-    public:
-    std::string WMSLayerName()const{return mWMSLayerName;}
-    std::string WMSURL()const{return mUrl;}
-    TypeWMS getTypeWMS(){return mTypeWMS;}
-
-    WMSinfo():mUrl(""),mWMSLayerName("toto"){}
-    WMSinfo(std::string url,std::string layer, std::string aTypeGeoservice,std::string attribution):mUrl(url),mWMSLayerName(layer),mWMSattribution(attribution){
-        mTypeWMS=str2TypeWMS(aTypeGeoservice);
-    }
-    std::string mUrl, mWMSLayerName, mWMSattribution;
-
-    TypeWMS mTypeWMS;
-};
 
 
 // pour afficher en html ou pdf les informations relatives aux couches, aux stations des cs, au méthodologies (genre calcul de hdom)
@@ -417,105 +397,6 @@ private:
     std::map<int, color> mDicoCol;
 };
 
-
-class cEss
-{
-public:
-    cEss(std::string aCodeEs,cDicoApt * aDico);
-
-    //effectue la confrontation Apt Zbio et AptHydroTrophiue si hierarchique = true, sinon renvoie l'aptitude de l'écogramme
-    int getApt(int aCodeNT, int aCodeNH, int aZbio, bool hierachique=true, int aTopo=666);
-    // retourne l'aptitude global de la zone bioclimatique
-    int getApt(int aZbio);
-    // retourne l'aptitude du catalogue de station
-    int getApt(int aZbio, int aSTId);
-    bool hasCSApt(){
-        bool aRes(1);
-        if (mAptCS.size()==0) {
-            aRes=0;
-            //std::cout << "essence " << mNomFR << " n'as pas d'aptitude pour CS" << std::endl;
-        }
-        return aRes;
-    }
-    bool hasFEEApt(){
-        bool aRes(0);
-        // maintenant j'initialise EcoVal comme une map de 10 elem vide
-       /* if (mEcoVal.size()==0) {
-            aRes=0;
-            //std::cout << "essence " << mNomFR << " n'as pas d'aptitude pour FEE" << std::endl;
-        }*/
-        if (mEcoVal.size()>0 && mEcoVal.at(1).size()>0) {
-                    aRes=1;
-                    //std::cout << "essence " << mNomFR << " n'as pas d'aptitude pour FEE" << std::endl;
-         }
-        return aRes;
-    }
-
-    bool hasApt(){
-        bool aRes(1);
-        if (mEcoVal.size()==0 && mAptCS.size()==0) {
-            aRes=0;
-            std::cout << "essence " << mNomFR << " n'as pas d'aptitude pour FEE ni pour Catalogue de stations" << std::endl;
-        }
-        return aRes;
-    }
-
-    int getFinalApt(int aCodeNT,int aCodeNH, int aZbio, int topo){
-        //int apt=getApt(aCodeNT, aCodeNH,aZbio);
-        //return corrigAptRisqueTopo(apt,topo,aZbio);
-        return getApt(aCodeNT,aCodeNH,aZbio,true,topo);
-    }
-
-    //int corrigAptRisqueTopo(int apt, int topo, int zbio);
-    // renvoie l'apt climatique compensée par situation topographique
-    int corrigAptBioRisqueTopo(int aptBio,int topo,int zbio);
-
-    std::string Nom(){return mNomFR;}
-    std::string Code(){return mCode;}
-
-    std::string NomCarteAptFEE();
-    std::string shortNomCarteAptFEE();
-    std::string NomDirTuileAptFEE();
-    std::string NomCarteAptCS();
-    std::string shortNomCarteAptCS();
-    std::string NomDirTuileAptCS();
-
-    std::string NomMapServerLayer();
-    std::string NomMapServerLayerFull();//pour FEE et CS
-    std::string NomMapServerLayerCS();
-
-
-    // aptitude ecograme : clé chaine charactère ; c'est la combinaison ntxnh du genre "A2p5" ou "Mm4
-    std::map<int,std::map<std::string,int>> mEcoVal;
-    // aptitude pour chaque zone bioclim
-    std::map<int,int> mAptZbio;
-    // aptitude pour catalogue de station
-    // clé ; zone bioclim/ région. Value ; une map -> clé = identifiant de la station. Value ; aptitude
-    std::map<int,std::map<int,int>> mAptCS;
-    // clé ; zone bioclim/ région. Value ; une map -> clé ; id situation topo. valeur ; code risque
-    std::map<int,std::map<int,int>> mRisqueTopo;
-
-    int getRisque(int zbio,int topo){
-        int aRes(0);
-        if (mRisqueTopo.find(zbio)!=mRisqueTopo.end() && mRisqueTopo.at(zbio).find(topo)!=mRisqueTopo.at(zbio).end()){
-            aRes=mRisqueTopo.at(zbio).at(topo);
-        }
-        return aRes;
-    }
-    // savoir si il faut utiliser la situation topo comme facteur de compensation ou d'aggravation
-    bool hasRisqueComp(int zbio,int topo);
-
-    cDicoApt * Dico(){return mDico;}
-    std::string printRisque();
-
-    TypeCarte Type(){return mType;}
-
-private:
-    FeRe mFeRe;
-    TypeCarte mType;
-    cDicoApt * mDico;
-    std::string mCode, mNomFR, mF_R,mPrefix;
-};
 
 
 #endif // LAYERBASE_H

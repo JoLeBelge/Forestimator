@@ -40,7 +40,7 @@ public:
 
 private:
     cEss * mEss;
-    cDicoApt *mDico;
+    cdicoAptBase *mDico;
     //int mZbio,pixPerLevel;
     ST  * mST;
     int pixPerLevel,Width;

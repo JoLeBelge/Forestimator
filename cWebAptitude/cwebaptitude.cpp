@@ -69,7 +69,7 @@ cWebAptitude::cWebAptitude(AuthApplication *app, Auth::AuthWidget* authWidget_)
     top_stack->setOverflow(Overflow::Auto);
     top_stack->addStyleClass("stackfit");
     // load DOC page
-    top_stack->addNew<presentationPage>(mDico);
+    top_stack->addNew<presentationPage>(mDico,mApp);
     // load MAP page
     std::unique_ptr<WContainerWidget> content_app = cpp14::make_unique<WContainerWidget>();
     content_app->setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Middle);

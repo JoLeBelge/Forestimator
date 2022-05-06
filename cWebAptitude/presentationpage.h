@@ -14,10 +14,13 @@ using namespace Wt;
 class presentationPage : public Wt::WContainerWidget
 {
 public:
-    presentationPage(cDicoApt * aDico);
+    presentationPage(cDicoApt * aDico,AuthApplication* app);
     cDicoApt * mDico;
     //void bannerAnimation();
     //Wt::WStackedWidget * adsBanner;
+private:
+    AuthApplication* m_app;
+
 };
 
 #endif // PRESENTATIONPAGE_H

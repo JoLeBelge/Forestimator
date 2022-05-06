@@ -3,7 +3,7 @@
 #include "cdicoaptbase.h"
 #include  "cnsw.h"
 #include "layerbase.h"
-#include "color.h"
+
 #include "cadastre.h"
 
 std::string removeAccents(std::string aStr);
@@ -18,10 +18,8 @@ class layerBase;
 class ST;
 class cnsw;
 class cadastre;
-class WMSinfo;
 class LayerMTD;
 
-class cEss;
 class cKKCS;
 
 // toute les informations/ dico que j'ai besoin pour le soft
@@ -54,7 +52,7 @@ public:
     std::map<std::string,std::string>  * RasterCategorie(){return  &Dico_RasterCategorie;}
     std::map<std::string,std::string>  * RasterNom(){return  &Dico_RasterNomComplet;}
     std::map<std::string,bool>  * RasterExpert(){return  &Dico_RasterExpert;}
-    std::map<std::string,std::string>  * codeEs2Nom(){return  &Dico_codeEs2NomFR;}
+
 
     std::map<std::string,std::string>  * codeKK2Nom(){return  &Dico_codeKK2Nom;}
     std::map<std::string,std::string>  * codeKK2NomCol(){return  &Dico_codeKK2NomCol;}
@@ -70,12 +68,6 @@ public:
     std::map<int, color>  codeApt2col(){return  Dico_codeApt2col;}
 
     std::string BDpath(){return mBDpath;}
-
-    color Apt2col(int aCode){
-        color aRes(0,0,0);
-        if (Dico_codeApt2col.find(aCode)!=Dico_codeApt2col.end()){aRes=Dico_codeApt2col.at(aCode);}
-        return aRes;
-    }
 
 
     std::string RasterNom(std::string aCode){
@@ -137,14 +129,6 @@ public:
         return aRes;
     }
 
-    std::string File(std::string aCode){
-        std::string aRes("");
-        if (Dico_GISfile.find(aCode)!=Dico_GISfile.end()){aRes=Dico_GISfile.at(aCode);}
-        return aRes;
-    }
-
-
-
     std::string codeKK2Nom(std::string aCode){
         std::string aRes("not found\n");
         if (Dico_codeKK2Nom.find(aCode)!=Dico_codeKK2Nom.end()){aRes=Dico_codeKK2Nom.at(aCode);}
@@ -186,7 +170,6 @@ public:
 
     WMSinfo * getWMSinfo(std::string aCode);
 
-    std::map<int,std::map<int,int>> getCSApt(std::string aCodeEs);
     // charger les valeurs pour les potentiel sylvi, facteur eco et risque pour chaque station
     std::map<int,std::map<int,int>> getKKCS(std::string aColName);
 
@@ -197,7 +180,7 @@ public:
     // pour les cKKCS,
     std::map<int,color> getDicoRasterCol(cKKCS * aKK);
 
-    std::map<std::string,color> colors;
+
 
     color getColor(std::string aCode){
         color aRes(0,0,0);
@@ -251,22 +234,11 @@ public:
         }
     }
 
-    std::shared_ptr<cEss> getEss(std::string aCode){
-        std::shared_ptr<cEss> aRes=NULL;
-        if (mVEss.find(aCode)!=mVEss.end()){aRes=mVEss.at(aCode);} else {
-            std::cout << "getEss de cdicoapt, création d'une essence vide pour " << aCode << ", attention " << std::endl;
-            aRes= std::make_shared<cEss>("toto",this);
-        }
-        return aRes;
-    }
-
-    std::map<std::string,std::shared_ptr<cEss>> getAllEss(){return mVEss;}
 
     std::map<std::string,std::shared_ptr<layerBase>> VlayerBase(){return mVlayerBase;}
     bool hasLayerBase(std::string aCode){
         if (mVlayerBase.find(aCode)!=mVlayerBase.end()){return 1;} else {return 0;}
     }
-
 
     std::shared_ptr<layerBase> getLayerBase(std::string aCode){
         std::shared_ptr<layerBase> aRes=NULL;
@@ -276,7 +248,6 @@ public:
         }
         return aRes;
     }
-
     std::vector<std::shared_ptr<layerBase>> VlayersForGroupe(std::string aGroupe){
         std::vector<std::shared_ptr<layerBase>> aRes;
         for (auto & kv :mVlayerBase){
@@ -291,39 +262,16 @@ public:
 
 private:
 
-    // code essence 2 code groupe de couche pour catalogue de couches
-    std::map<std::string,std::string> Dico_lay2groupe;
-    // booléen expert assigné au groupe de couche
-    std::map<std::string,bool> Dico_groupeExpert;
+
     // code groupe 2 label groupe
     std::map<std::string,std::string> Dico_groupeLabel;
-
     std::map<std::string,std::string>  Dico_codeSt2Habitat;
     std::map<int,std::string>  Dico_id2Habitat;
     std::map<std::string,int> Dico_codeSt2idHab;
-
     std::map<std::string,LayerMTD>  Dico_layerMTD;
-    std::map<std::string,std::string>  Dico_GISfile;
-    std::map<std::string,std::string>  Dico_RasterType;
-    // continu vs classe
-    std::map<std::string,std::string>  Dico_RasterVar;
-    std::map<std::string,bool>  Dico_RasterVisu;// les couches que l'on peux visualiser dans la partie carto
-    std::map<std::string,bool>  Dico_RasterStat;// les couches sur lesquelles on peut calculer des statistiques
-     std::map<std::string,bool>  Dico_RasterStatP;// les couches sur lesquelles on peut calculer des statistiques ponctuelles
-    // description peuplement vs description station
-    std::map<std::string,std::string>  Dico_RasterCategorie;
-    std::map<std::string,std::string>  Dico_RasterNomComplet;
-    std::map<std::string,std::string>  Dico_RasterNomCourt;
-    std::map<std::string,bool>  Dico_RasterExpert;
-    std::map<std::string,double>  Dico_RasterGain;
-    // pour savoir de quelle table provient les info du raster, fichiersGIS ou layerApt, car j'ai besoin du nom de la table pour charger le dicitonnaire (pour l'instant)
-    std::map<std::string,std::string>  Dico_RasterTable;
-    // key ; code le la couche layer. value ; les infos nécessaire pour charger le wms
-    std::map<std::string,WMSinfo>  Dico_WMS;
 
     // clé 1 : zbio, clé 2: id station,value ; nom de la sation cartograhique
     std::map<int,std::map<int,std::string>>  Dico_station;
-
     std::map<std::string,std::string> Dico_codeKK2Nom;
     std::map<std::string,std::string> Dico_codeKK2NomCol;
     // il y a 9 niveau dans l'échelle, mais on simplifie en 3 catégories pour les cartes de risque et potentiel sylv
@@ -332,10 +280,6 @@ private:
     // de la catégorie ver le nom
     std::map<int,std::string> Dico_echellePotCat;
 
-    std::map<int,color> Dico_codeApt2col;
-
-    // clé ; code ess. val ; pointeur vers essence
-    std::map<std::string,std::shared_ptr<cEss>> mVEss;
     std::map<std::string,std::shared_ptr<layerBase>> mVlayerBase;
 
 };

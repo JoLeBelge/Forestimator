@@ -10,16 +10,32 @@
 #include <boost/range/adaptor/map.hpp>
 #include "boost/filesystem.hpp"
 #include <unistd.h>
+#include "color.h"
 
 enum class FeRe {Feuillus,
                  Resineux,
                  Autre
                 };
 
+// ça c'était utilisé pour le calcul des carte apt, des tuiles et du code mapserveur
+enum TypeCarte {Apt, Potentiel, Station1, Habitats,NH,NT,Topo,AE,SS,ZBIO,CSArdenne,CSLorraine,MNH,Composition,MNT16b};
+
+enum class TypeWMS {WMS,
+                    ArcGisRest
+                   };
+
+TypeWMS str2TypeWMS(const std::string& str);
+
+
+
 // octobre 2021 ; j'aimerai utiliser dans phytospy le dico Apt, entre autre pour concevoir une mise en page des matrices d'aptitudes.
 // j'aimerai partager le dico Apt entre forestimator et phytospy, mais celui-ci est trop spécialisé forestimator. Je crée une classe mère avec les membres que je souhaite partager entre les deux applis
 
 std::string roundDouble(double d, int precisionVal=1);
+
+
+class cEss;
+class WMSinfo;
 
 class cdicoAptBase : public std::enable_shared_from_this<cdicoAptBase>
 {
@@ -31,6 +47,7 @@ public:
     std::map<int,std::map<std::string,int>> getFEEApt(std::string aCodeEs);
     std::map<int,int> getZBIOApt(std::string aCodeEs);
     std::map<int,std::map<int,int>> getRisqueTopo(std::string aCodeEs);
+     std::map<int,std::map<int,int>> getCSApt(std::string aCodeEs);
 
 
     std::map<int,std::string>  * NH(){return  &Dico_NH;}
@@ -128,6 +145,12 @@ public:
         return aRes;
     }
 
+    bool isDoubleApt(int aCode){
+        bool aRes(0);
+        if (AptContraignante(aCode)!=AptNonContraignante(aCode)){aRes=1;}
+        return aRes;
+    }
+
     // on améliore l'aptitude car facteur de compensation
 
     int AptSurcote(int aCode){
@@ -217,11 +240,58 @@ public:
     std::map<std::string,std::string>  Dico_AptFull2AptAcro;// j'en ai besoin dans les batonnetApt
     // dans l'ordre alphabétique
     std::vector<std::string> Dico_Ess;
+
+    std::shared_ptr<cEss> getEss(std::string aCode){
+        std::shared_ptr<cEss> aRes=NULL;
+        if (mVEss.find(aCode)!=mVEss.end()){aRes=mVEss.at(aCode);} else {
+            std::cout << "getEss de cdicoapt, création d'une essence vide pour " << aCode << ", attention " << std::endl;
+            aRes= std::make_shared<cEss>("toto",this);
+        }
+        return aRes;
+    }
+    std::map<std::string,std::shared_ptr<cEss>> getAllEss(){return mVEss;}
+
+    std::string File(std::string aCode){
+        std::string aRes("");
+        if (Dico_GISfile.find(aCode)!=Dico_GISfile.end()){aRes=Dico_GISfile.at(aCode);}
+        return aRes;
+    }
+
+    std::map<std::string,std::string>  * codeEs2Nom(){return  &Dico_codeEs2NomFR;}
+    std::map<std::string,color> colors;
+
+    color Apt2col(int aCode){
+        color aRes(0,0,0);
+        if (Dico_codeApt2col.find(aCode)!=Dico_codeApt2col.end()){aRes=Dico_codeApt2col.at(aCode);}
+        return aRes;
+    }
+
+
 protected:
     std::string mBDpath;
     sqlite3 **db_;
     sqlite3 * ptDb_;
 
+
+    // code essence 2 code groupe de couche pour catalogue de couches
+    std::map<std::string,std::string> Dico_lay2groupe;
+    // booléen expert assigné au groupe de couche
+    std::map<std::string,bool> Dico_groupeExpert;
+    std::map<std::string,std::string>  Dico_GISfile;
+    std::map<std::string,std::string>  Dico_RasterType;
+    // continu vs classe
+    std::map<std::string,std::string>  Dico_RasterVar;
+    std::map<std::string,bool>  Dico_RasterVisu;// les couches que l'on peux visualiser dans la partie carto
+    std::map<std::string,bool>  Dico_RasterStat;// les couches sur lesquelles on peut calculer des statistiques
+     std::map<std::string,bool>  Dico_RasterStatP;// les couches sur lesquelles on peut calculer des statistiques ponctuelles
+    // description peuplement vs description station
+    std::map<std::string,std::string>  Dico_RasterCategorie;
+    std::map<std::string,std::string>  Dico_RasterNomComplet;
+    std::map<std::string,std::string>  Dico_RasterNomCourt;
+    std::map<std::string,bool>  Dico_RasterExpert;
+    std::map<std::string,double>  Dico_RasterGain;
+    // pour savoir de quelle table provient les info du raster, fichiersGIS ou layerApt, car j'ai besoin du nom de la table pour charger le dicitonnaire (pour l'instant)
+    std::map<std::string,std::string>  Dico_RasterTable;
     //code ess vers nom français
     std::map<std::string,std::string> Dico_codeEs2NomFR;
     std::map<std::string,std::string> Dico_code2prefix;
@@ -255,7 +325,132 @@ protected:
     std::map<int,std::string>  dico_groupeNH2Label;// pour l'écogramme avec visu prédiciton random forest
     std::map<int,int>  dico_groupeNH2Nb;//nombre de niveau NH par groupe
     std::map<int,int>  dico_groupeNH2NHStart;// code nh qui débute le groupe.
+    std::map<int,color> Dico_codeApt2col;
 
+
+    // key ; code le la couche layer. value ; les infos nécessaire pour charger le wms
+    std::map<std::string,WMSinfo>  Dico_WMS;
+
+
+     // clé ; code ess. val ; pointeur vers essence
+     std::map<std::string,std::shared_ptr<cEss>> mVEss;
 };
+
+
+class cEss
+{
+public:
+    cEss(std::string aCodeEs,cdicoAptBase * aDico);
+
+    //effectue la confrontation Apt Zbio et AptHydroTrophiue si hierarchique = true, sinon renvoie l'aptitude de l'écogramme
+    int getApt(int aCodeNT, int aCodeNH, int aZbio, bool hierachique=true, int aTopo=666);
+    // retourne l'aptitude global de la zone bioclimatique
+    int getApt(int aZbio);
+    // retourne l'aptitude du catalogue de station
+    int getApt(int aZbio, int aSTId);
+    bool hasCSApt(){
+        bool aRes(1);
+        if (mAptCS.size()==0) {
+            aRes=0;
+            //std::cout << "essence " << mNomFR << " n'as pas d'aptitude pour CS" << std::endl;
+        }
+        return aRes;
+    }
+    bool hasFEEApt(){
+        bool aRes(0);
+        // maintenant j'initialise EcoVal comme une map de 10 elem vide
+       /* if (mEcoVal.size()==0) {
+            aRes=0;
+            //std::cout << "essence " << mNomFR << " n'as pas d'aptitude pour FEE" << std::endl;
+        }*/
+        if (mEcoVal.size()>0 && mEcoVal.at(1).size()>0) {
+                    aRes=1;
+                    //std::cout << "essence " << mNomFR << " n'as pas d'aptitude pour FEE" << std::endl;
+         }
+        return aRes;
+    }
+
+    bool hasApt(){
+        bool aRes(1);
+        if (mEcoVal.size()==0 && mAptCS.size()==0) {
+            aRes=0;
+            std::cout << "essence " << mNomFR << " n'as pas d'aptitude pour FEE ni pour Catalogue de stations" << std::endl;
+        }
+        return aRes;
+    }
+
+    int getFinalApt(int aCodeNT,int aCodeNH, int aZbio, int topo){
+        //int apt=getApt(aCodeNT, aCodeNH,aZbio);
+        //return corrigAptRisqueTopo(apt,topo,aZbio);
+        return getApt(aCodeNT,aCodeNH,aZbio,true,topo);
+    }
+
+    //int corrigAptRisqueTopo(int apt, int topo, int zbio);
+    // renvoie l'apt climatique compensée par situation topographique
+    int corrigAptBioRisqueTopo(int aptBio,int topo,int zbio);
+
+    std::string Nom(){return mNomFR;}
+    std::string Code(){return mCode;}
+
+    std::string NomCarteAptFEE();
+    std::string shortNomCarteAptFEE();
+    std::string NomDirTuileAptFEE();
+    std::string NomCarteAptCS();
+    std::string shortNomCarteAptCS();
+    std::string NomDirTuileAptCS();
+
+    std::string NomMapServerLayer();
+    std::string NomMapServerLayerFull();//pour FEE et CS
+    std::string NomMapServerLayerCS();
+
+
+    // aptitude ecograme : clé chaine charactère ; c'est la combinaison ntxnh du genre "A2p5" ou "Mm4
+    std::map<int,std::map<std::string,int>> mEcoVal;
+    // aptitude pour chaque zone bioclim
+    std::map<int,int> mAptZbio;
+    // aptitude pour catalogue de station
+    // clé ; zone bioclim/ région. Value ; une map -> clé = identifiant de la station. Value ; aptitude
+    std::map<int,std::map<int,int>> mAptCS;
+    // clé ; zone bioclim/ région. Value ; une map -> clé ; id situation topo. valeur ; code risque
+    std::map<int,std::map<int,int>> mRisqueTopo;
+
+    int getRisque(int zbio,int topo){
+        int aRes(0);
+        if (mRisqueTopo.find(zbio)!=mRisqueTopo.end() && mRisqueTopo.at(zbio).find(topo)!=mRisqueTopo.at(zbio).end()){
+            aRes=mRisqueTopo.at(zbio).at(topo);
+        }
+        return aRes;
+    }
+    // savoir si il faut utiliser la situation topo comme facteur de compensation ou d'aggravation
+    bool hasRisqueComp(int zbio,int topo);
+
+    cdicoAptBase * Dico(){return mDico;}
+    std::string printRisque();
+
+    TypeCarte Type(){return mType;}
+
+private:
+    FeRe mFeRe;
+    TypeCarte mType;
+    cdicoAptBase * mDico;
+    std::string mCode, mNomFR, mF_R,mPrefix;
+};
+
+class WMSinfo
+{
+    public:
+    std::string WMSLayerName()const{return mWMSLayerName;}
+    std::string WMSURL()const{return mUrl;}
+    TypeWMS getTypeWMS(){return mTypeWMS;}
+
+    WMSinfo():mUrl(""),mWMSLayerName("toto"){}
+    WMSinfo(std::string url,std::string layer, std::string aTypeGeoservice,std::string attribution):mUrl(url),mWMSLayerName(layer),mWMSattribution(attribution){
+        mTypeWMS=str2TypeWMS(aTypeGeoservice);
+    }
+    std::string mUrl, mWMSLayerName, mWMSattribution;
+
+    TypeWMS mTypeWMS;
+};
+
 
 #endif // CDICOAPTBASE_H
