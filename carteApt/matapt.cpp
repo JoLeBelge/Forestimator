@@ -216,12 +216,14 @@ void matApt::receivePrediction(int aCode,std::vector<double> aVPredNT,std::vecto
      }
    }
    // identifier la liste de code ntnh qui correspondent à ces groupes (groupe hydrique)
+    if (globTest2){std::cout << " max nh index " << max_index_nh << " , max nt index " << max_index_nt << std::endl;}
     std::vector<std::tuple<int,int>> aVNTNH;
     if (max_index_nh>0){
-        int nhStart= mDicoApt->groupeNH2Nb(max_index_nh);
+        int nhStart= mDicoApt->groupeNH2NHStart(max_index_nh);
         for (int j(0);j<mDicoApt->groupeNH2Nb(max_index_nh);j++){
            int nh=nhStart-j;
-           std::tuple<int,int> ntnh(max_index_nt,nh+10);
+           //std::cout << " ajout nt " << max_index_nt << " , nh " << nh << ", nh start " << nhStart << std::endl;
+           std::tuple<int,int> ntnh(max_index_nt,nh);
            aVNTNH.push_back(ntnh);
         }
     }
