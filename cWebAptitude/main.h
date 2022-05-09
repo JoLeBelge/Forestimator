@@ -25,7 +25,7 @@ class layerResource : public Wt::WStreamResource
 {
 public:
 
-layerResource(std::shared_ptr<layerBase> al) : WStreamResource("plain/text"), ml(al){}
+layerResource(std::shared_ptr<layerBase> al,bool qml=0) : WStreamResource("plain/text"), ml(al),mQml(qml){}
     ~layerResource()
     {
         beingDeleted();
@@ -35,6 +35,7 @@ void handleRequest(const Http::Request &request, Http::Response &response);
 
 private:
 std::shared_ptr<layerBase> ml;
+bool mQml;
 
 };
 

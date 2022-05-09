@@ -1,6 +1,7 @@
 #include "presentationpage.h"
 
 int nbAds(5); // Ads = advertising
+int globMaxDownloadFileS(1000);
 // creation d'une bannières de pub (ads banner) pour faire défiler des informations descriptives du sites
 presentationPage::presentationPage(cDicoApt *aDico, AuthApplication *app):mDico(aDico),m_app(app)
 {
@@ -73,19 +74,30 @@ presentationPage::presentationPage(cDicoApt *aDico, AuthApplication *app):mDico(
             t->elementAt(r, 0)->addStyleClass("bold");
             t->elementAt(r+1, 1)->addWidget(cpp14::make_unique<WText>(tr("colWMS.tab.download")));
             t->elementAt(r+1, 2)->addWidget(cpp14::make_unique<WText>(tr("colWMSname.tab.download")));
+            t->elementAt(r+1, 3)->addWidget(cpp14::make_unique<WText>(tr("colSize.tab.download")));
 
             for (std::shared_ptr<layerBase> l : mDico->VlayersForGroupe(gr)){
-                if (l->getCatLayer()!=TypeLayer::Externe & !l->Expert() & mDico->lay4Visu(l->Code())){
+                if (l->getCatLayer()!=TypeLayer::Externe & !l->Expert() & mDico->lay4Visu(l->Code()) & l->getFilesize()<globMaxDownloadFileS){
                     int row=t->rowCount();
                     t->elementAt(row, 0)->addWidget(cpp14::make_unique<WText>(WString::fromUTF8(l->Nom())));
                     WText * url =t->elementAt(row, 1)->addWidget(cpp14::make_unique<WText>(WString::fromUTF8(l->WMSURL())));
                     url->addStyleClass("mya");
                     t->elementAt(row, 2)->addWidget(cpp14::make_unique<WText>(WString::fromUTF8(l->WMSLayerName())));
-                    Wt::WPushButton * b = t->elementAt(row, 3)->addWidget(cpp14::make_unique<Wt::WPushButton>("télécharger"));
-                    t->elementAt(row, 3)->setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Middle);
+                    t->elementAt(row, 3)->addWidget(cpp14::make_unique<WText>(WString::fromUTF8(roundDouble(l->getFilesize(),1)+ " Mo")));
+
+                    Wt::WPushButton * b = t->elementAt(row, 4)->addWidget(cpp14::make_unique<Wt::WPushButton>("télécharger"));
+                    t->elementAt(row, 4)->setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Middle);
                     Wt::WLink loadLink = Wt::WLink("/telechargement/"+l->Code());
                     b->clicked().connect([=]{m_app->addLog(l->Code(),typeLog::dsingleRW);});
                     b->setLink(loadLink);
+                    // qml
+                    if (l->hasSymbology()){
+                        Wt::WPushButton * b2 = t->elementAt(row, 5)->addWidget(cpp14::make_unique<Wt::WPushButton>("télécharger le qml"));
+                        t->elementAt(row, 5)->setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Middle);
+                        Wt::WLink loadLink2 = Wt::WLink("/telechargement/"+l->Code()+"qml");
+                        //b->clicked().connect([=]{m_app->addLog(l->Code(),typeLog::dsingleRW);});
+                        b2->setLink(loadLink2);
+                    }
                 }
             }
         }

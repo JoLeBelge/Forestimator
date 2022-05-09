@@ -59,9 +59,18 @@ int main(int argc, char **argv)
             if (l->rasterExist()){
             layerResource * fileResource = new layerResource(l);
             //WFileResource * fileResource = new Wt::WFileResource(l->getPathTif());
-            fileResource->suggestFileName(l->NomFile()+".zip");
-            if (globTest){std::cout << " ajout fileresource " << l->getPathTif() << ", nom fichier " <<  l->NomFileWithExt() << " sous url data/"<<aCode << std::endl;}
+            //fileResource->suggestFileName(l->NomFile()+".zip");
+            fileResource->suggestFileName(l->NomFileWithExt());
+           // if (globTest){std::cout << " ajout fileresource " << l->getPathTif() << ", nom fichier " <<  l->NomFileWithExt() << " sous url data/"<<aCode << std::endl;}
             server.addResource(fileResource, "/telechargement/"+aCode);
+
+            // fichier de symbologie
+            layerResource * fileResource2 = new layerResource(l,1);
+            //WFileResource * fileResource = new Wt::WFileResource(l->getPathTif());
+            //fileResource->suggestFileName(l->NomFile()+".zip");
+            fileResource2->suggestFileName(l->NomFile()+".qml");
+           // if (globTest){std::cout << " ajout fileresource " << l->getPathTif() << ", nom fichier " <<  l->NomFileWithExt() << " sous url data/"<<aCode << std::endl;}
+            server.addResource(fileResource2, "/telechargement/"+aCode+"qml");
             }
         }
 
@@ -126,16 +135,19 @@ void layerResource::handleRequest(const Http::Request &request, Http::Response &
     //std::cout << "fichier " << ml->getPathTif() << std::endl;
     // création des archives zip avec la carte + la symbologie
 
-    std::string archiveName=ml->Dico()->File("OUTDIR")+ml->NomFile()+".zip";
+    //std::string archiveName=ml->Dico()->File("OUTDIR")+ml->NomFile()+".zip";
+    std::string archiveName=ml->getPathTif();
+    if (mQml){archiveName = ml->symbology();}
 
     if (!boost::filesystem::exists(archiveName)){
-    if (globTest){std::cout << "create archive pour raster complet " << std::endl;}
+    /*if (globTest){std::cout << "create archive pour raster complet " << std::endl;}
     ZipArchive* zf = new ZipArchive(archiveName);
     zf->open(ZipArchive::WRITE);
     zf->addFile(ml->NomFileWithExt(),ml->getPathTif());
     if (ml->hasSymbology()){zf->addFile(ml->NomFile()+".qml",ml->symbology());}
     zf->close();
     delete zf;
+    }*/
     }
 
     std::ifstream r(archiveName.c_str(), std::ios::in | std::ios::binary);

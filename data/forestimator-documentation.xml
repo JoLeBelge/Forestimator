@@ -206,6 +206,8 @@ Les couches cartographiques téléchargeables sont listées dans le tableau ci-d
 <message id="titre.tab.download"> Couches cartographiques </message>
 <message id="colWMS.tab.download"> adresse WMS</message>
 <message id="colWMSname.tab.download"> nom de la couche WMS</message>
+<message id="colSize.tab.download"> Taille</message>
+
 
 
 

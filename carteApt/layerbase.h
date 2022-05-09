@@ -224,6 +224,14 @@ public:
     bool hasSymbology() const{return mPathQml!="";}
     rasterFiles getRasterfile();
     bool rasterExist(){return exists(mPathRaster);}
+    double getFilesize(){
+        // en Mo
+        double aRes(0);
+        if (boost::filesystem::exists(mPathRaster)){
+        aRes= ((double) boost::filesystem::file_size(mPathRaster))/1000000.0;
+        }
+        return aRes;
+    }
 
     // méthode GDAL
     int getValue(double x, double y);
