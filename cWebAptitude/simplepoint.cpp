@@ -19,7 +19,7 @@ void simplepoint::createUI()
 
     mIntroTxt = mParent->addWidget(cpp14::make_unique<WText>(tr("sp_infoclic")));
     mParent->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
-    createPdfBut = mParent->addWidget(Wt::cpp14::make_unique<WPushButton>("Export pdf"));
+    createPdfBut = mParent->addWidget(Wt::cpp14::make_unique<WPushButton>(tr("ana.pt.export.pdf")));
     //createPdfBut->clicked().connect(this,&simplepoint::export2pdfTitreDialog);
 
     mAptAllEss = mParent->addWidget(cpp14::make_unique<WTable>());

@@ -37,7 +37,7 @@ cDicoApt::cDicoApt(std::string aBDFile):cdicoAptBase(aBDFile)
 
 
 
-        SQLstring="SELECT Code, id_projet, description, version, id_reference, Nom, copyrigth,ordre, NomShort FROM carteMTD;";
+        SQLstring="SELECT Code, id_projet, version, id_reference, Nom, copyrigth,ordre, NomShort FROM carteMTD;";
         sqlite3_prepare_v2( *db_, SQLstring.c_str(), -1, &stmt, NULL );
         while(sqlite3_step(stmt) == SQLITE_ROW)
         {
@@ -45,8 +45,8 @@ cDicoApt::cDicoApt(std::string aBDFile):cdicoAptBase(aBDFile)
                 std::string aA=std::string( (char *)sqlite3_column_text( stmt, 0 ) );
                 LayerMTD lMTD;
                 lMTD.setCode(aA);
-                if (sqlite3_column_type(stmt, 2)!=SQLITE_NULL ){lMTD.setDescr(std::string( (char *)sqlite3_column_text( stmt, 2 ) ));}
-                if (sqlite3_column_type(stmt, 3)!=SQLITE_NULL ){lMTD.setVersion(std::string( (char *)sqlite3_column_text( stmt, 3 ) ));}
+                //if (sqlite3_column_type(stmt, 2)!=SQLITE_NULL ){lMTD.setDescr(std::string( (char *)sqlite3_column_text( stmt, 2 ) ));}
+                if (sqlite3_column_type(stmt, 2)!=SQLITE_NULL ){lMTD.setVersion(std::string( (char *)sqlite3_column_text( stmt, 2 ) ));}
                 if (sqlite3_column_type(stmt, 1)!=SQLITE_NULL ){
                     SQLstring="SELECT Description FROM carteMTD_projet WHERE Code='"+std::string( (char *)sqlite3_column_text( stmt, 1 ))+"';";
                     sqlite3_stmt * stmt2;
@@ -59,10 +59,10 @@ cDicoApt::cDicoApt(std::string aBDFile):cdicoAptBase(aBDFile)
                     }
                     sqlite3_finalize(stmt2);
                 }
-                if (sqlite3_column_type(stmt, 4)!=SQLITE_NULL ){
+                if (sqlite3_column_type(stmt, 3)!=SQLITE_NULL ){
                     // le champ id est une liste de numéro sépraré par une virgule, il faut parser
                     std::vector<std::string> aVidRef;
-                    std::string aListRef=std::string( (char *)sqlite3_column_text( stmt, 4 ));
+                    std::string aListRef=std::string( (char *)sqlite3_column_text( stmt, 3 ));
                     boost::split( aVidRef,aListRef,boost::is_any_of(","),boost::token_compress_on);
                     for (std::string idRef: aVidRef){
                         SQLstring="SELECT ref FROM carteMTD_reference WHERE id="+idRef+";";
@@ -77,11 +77,11 @@ cDicoApt::cDicoApt(std::string aBDFile):cdicoAptBase(aBDFile)
                         sqlite3_finalize(stmt2);
                     }
                 }
-                if (sqlite3_column_type(stmt, 5)!=SQLITE_NULL ){lMTD.setNom(std::string( (char *)sqlite3_column_text( stmt, 5 ) ));}
-                if (sqlite3_column_type(stmt, 6)!=SQLITE_NULL ){lMTD.setCopyR(std::string( (char *)sqlite3_column_text( stmt, 6 ) ));}
+                if (sqlite3_column_type(stmt, 4)!=SQLITE_NULL ){lMTD.setNom(std::string( (char *)sqlite3_column_text( stmt, 4 ) ));}
+                if (sqlite3_column_type(stmt, 5)!=SQLITE_NULL ){lMTD.setCopyR(std::string( (char *)sqlite3_column_text( stmt, 5 ) ));}
                 //std::cout << " done layerMTD " << lMTD.Nom() << std::endl;
-                std::string aB=std::string( (char *)sqlite3_column_text( stmt, 7 ) );
-                if (sqlite3_column_type(stmt, 8)!=SQLITE_NULL ){lMTD.setLabel(std::string( (char *)sqlite3_column_text( stmt, 8 ) ));}
+                std::string aB=std::string( (char *)sqlite3_column_text( stmt, 6 ) );
+                if (sqlite3_column_type(stmt, 7)!=SQLITE_NULL ){lMTD.setLabel(std::string( (char *)sqlite3_column_text( stmt, 7 ) ));}
                 Dico_layerMTD.emplace(std::make_pair(aB,lMTD));
             }
         }

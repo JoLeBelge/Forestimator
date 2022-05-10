@@ -16,7 +16,7 @@ AuthApplication::AuthApplication(const Wt::WEnvironment& env, cDicoApt *dico)
     //messageResourceBundle().use("/home/jo/app/phytospy/data/phytoTool");
 
     // export de tout les messages html vers un fichier csv qui sera traduit en text avec ./html2text -from_encoding UTF8 -nobs -o /home/jo/app/Forestimator/data/tmp/Forestimator.txt /home/jo/app/Forestimator/data/tmp/texteForestimator.csv pour correction orthographique
-    if (globTest & 0){
+    if (globTest & 1){
         std::string aFile(mDico->File("TMPDIR")+"texteForestimator.csv");
 
         std::ofstream aOut;
@@ -24,9 +24,9 @@ AuthApplication::AuthApplication(const Wt::WEnvironment& env, cDicoApt *dico)
 
         xml_document<> doc;
         xml_node<> * root_node;
-        //std::ifstream theFile (docRoot() + "/forestimator.xml");
+        std::ifstream theFile (docRoot() + "/forestimator.xml");
 
-        std::ifstream theFile ("/home/jo/app/phytospy/data/phytoTool.xml");
+        //std::ifstream theFile ("/home/jo/app/phytospy/data/phytoTool.xml");
         std::vector<char> buffer((std::istreambuf_iterator<char>(theFile)), std::istreambuf_iterator<char>());
         buffer.push_back('\0');
         // Parse the buffer using the xml file parsing library into doc
@@ -37,9 +37,11 @@ AuthApplication::AuthApplication(const Wt::WEnvironment& env, cDicoApt *dico)
         {
             // il faudrait tester si l'attribut id existe, sinon plante. pour le moment c'est pas fonctionnel
             if (node->first_attribute("id")->value()){
-            //std::cout << WText::tr(node->first_attribute("id")->value()).toUTF8() << "\n\n" << std::endl;
-            aOut << WText::tr(node->first_attribute("id")->value()).toUTF8() ;
-             aOut <<"\n\n<br> <br/>" ;
+                std::string aId(node->first_attribute("id")->value());
+                if (aId.find("Wt.Auth")==std::string::npos){
+                aOut << WText::tr(aId).toUTF8() ;
+                aOut <<"\n\n<br> <br/>" ;
+                }
             } else {
                 std::cout << "incorrect node " << std::endl;
             }
@@ -47,7 +49,7 @@ AuthApplication::AuthApplication(const Wt::WEnvironment& env, cDicoApt *dico)
         std::cout << " premier fichier fait " << std::endl;
         doc.clear();
         theFile.close();
-        if (0){
+        if (1){
         theFile.open(docRoot() + "/forestimator-documentation.xml");
         std::vector<char> buffer2((std::istreambuf_iterator<char>(theFile)), std::istreambuf_iterator<char>());
         buffer2.push_back('\0');
@@ -58,8 +60,11 @@ AuthApplication::AuthApplication(const Wt::WEnvironment& env, cDicoApt *dico)
         for (xml_node<> * node = root_node->first_node("message"); node; node = node->next_sibling())
         {
             //std::cout << WText::tr(node->first_attribute("id")->value()).toUTF8() << "\n\n" << std::endl;
-            aOut << WText::tr(node->first_attribute("id")->value()).toUTF8() ;
-             aOut <<"\n\n<br> <br/>" ;
+            std::string aId(node->first_attribute("id")->value());
+            if (aId.find("Wt.Auth")==std::string::npos){
+            aOut << WText::tr(aId).toUTF8() ;
+            aOut <<"\n\n<br> <br/>" ;
+            }
         }
         }
         aOut.close();

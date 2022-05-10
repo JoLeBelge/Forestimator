@@ -58,18 +58,12 @@ int main(int argc, char **argv)
             std::string aCode=kv.first;
             if (l->rasterExist()){
             layerResource * fileResource = new layerResource(l);
-            //WFileResource * fileResource = new Wt::WFileResource(l->getPathTif());
-            //fileResource->suggestFileName(l->NomFile()+".zip");
             fileResource->suggestFileName(l->NomFileWithExt());
            // if (globTest){std::cout << " ajout fileresource " << l->getPathTif() << ", nom fichier " <<  l->NomFileWithExt() << " sous url data/"<<aCode << std::endl;}
             server.addResource(fileResource, "/telechargement/"+aCode);
-
             // fichier de symbologie
             layerResource * fileResource2 = new layerResource(l,1);
-            //WFileResource * fileResource = new Wt::WFileResource(l->getPathTif());
-            //fileResource->suggestFileName(l->NomFile()+".zip");
             fileResource2->suggestFileName(l->NomFile()+".qml");
-           // if (globTest){std::cout << " ajout fileresource " << l->getPathTif() << ", nom fichier " <<  l->NomFileWithExt() << " sous url data/"<<aCode << std::endl;}
             server.addResource(fileResource2, "/telechargement/"+aCode+"qml");
             }
         }

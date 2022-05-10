@@ -3,7 +3,7 @@
 #include "parcellaire.h"
 #include "Wt/WFileResource.h"
 
-
+// OLD OLD je devrais supprimer ces fichiers..
 // sert a préparer le téléchargement par l'utilisateur de cartes, soit en plein, soit croppées avec un shp parcellaire.
 // il faut donc que l'utilisateur puisse choisir tout cela (listing via groupLayers ; même genre de tableau que grouplayers avec des checkbox en plus)
 

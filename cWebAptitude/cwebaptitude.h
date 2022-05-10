@@ -4,7 +4,7 @@
 #include <iostream>
 #include "grouplayers.h"
 #include "parcellaire.h"
-#include "uploadcarte.h"
+//#include "uploadcarte.h"
 #include "auth.h"
 #include <Wt/WContainerWidget.h>
 #include <Wt/WVBoxLayout.h>
@@ -34,7 +34,6 @@
 
 class AuthApplication;
 class parcellaire;
-class uploadCarte;
 class panier;
 
 
@@ -108,14 +107,9 @@ public:
     void changeHeader(std::string aSection);
 private:
     void load_content_couches(WContainerWidget * content);
-    //std::map<std::string,cEss>  mMEss;
-    //Wt::WApplication* m_app;
     AuthApplication * mApp;
     cDicoApt * mDico;
-
     parcellaire * mPA;
-    //simplepoint * mSP;// c'est groupGL qui s'en charge
-    uploadCarte * mUpload;
 
     Wt::WColor col_sel = Wt::WColor(23,87,23);
     Wt::WColor col_not_sel = Wt::WColor("transparent");

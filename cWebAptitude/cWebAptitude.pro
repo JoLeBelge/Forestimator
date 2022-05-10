@@ -42,7 +42,7 @@ SOURCES += main.cpp \
     grouplayers.cpp \
     parcellaire.cpp \
     layerstatchart.cpp \
-    uploadcarte.cpp \
+    #uploadcarte.cpp \
     libzippp/src/libzippp.cpp \
     ecogrammeEss.cpp \
     statwindow.cpp \
@@ -72,7 +72,7 @@ HEADERS += \
     grouplayers.h \
     parcellaire.h \
     layerstatchart.h \
-    uploadcarte.h \
+    #uploadcarte.h \
     libzippp/src/libzippp.h \
     ecogrammeEss.h \
     statwindow.h \

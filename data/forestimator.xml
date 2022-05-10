@@ -6,21 +6,21 @@
 <message id="titre.presentation">   <strong>Forestimator - documentation</strong> </message>
  <message id="titre.carto">   <strong>Forestimator - cartographie</strong> </message>
  <message id="titre.ana.surf">    <strong>Forestimator - analyse</strong>  </message>
- <message id="titre.ana.point">   <strong>Forestimator - info ponctuelle</strong>  </message>
 
  <message id="ana.point.titre">  Forestimator - info ponctuelle </message>
  <message id="ana.point.error.exportpdf.noStation"> Aucune analyse ponctuelle à exporter en pdf  </message>
 
-
+<!-- OLD OLD
 <message id="infoTelechargement">
-Plusieurs possibilités vous sont proposées. Vous avez la possibilité de télécharger votre shapefile précédemment chargé via l'onglet "Plan d'Aménagement". Les statistiques calculées pour les couches (exemple : couches d'aptitude) seront disponibles dans la table d'attribut. Vous avez la possibilité de téléchargement les couches raster correspondant uniquement à l'étendue de votre zone d'intérêt, c'est-à-dire l'emprise du shapefile que vous avez chargé. Vous pouvez également télécharger les couches raster sur l'ensemble de la Région Wallonne, mais la taille des fichiers sera alors conséquente.
+Plusieurs possibilités vous sont proposées. Vous avez la possibilité de télécharger votre shapefile précédemment chargé via l'onglet "Plan d'Aménagement". Les statistiques calculées pour les couches (exemple : couches d'aptitude) seront disponibles dans la table d'attributs. Vous avez la possibilité de télécharger les couches raster correspondant uniquement à l'étendue de votre zone d'intérêt, c'est-à-dire l'emprise du shapefile que vous avez chargé. Vous pouvez également télécharger les couches raster sur l'ensemble de la Région Wallonne, mais la taille des fichiers sera alors conséquente.
 </message>
  <message id="infoTelechargementShp">
-Sélectionnez ci-dessus les couches pour lesquelles vous désirez ajouter les statistiques dans la table d'attribut de votre shapefile. Ensuite, appuyez sur le bouton de téléchargement.</message>
+Sélectionnez ci-dessus les couches pour lesquelles vous désirez ajouter les statistiques dans la table d'attributs de votre shapefile. Ensuite, appuyez sur le bouton de téléchargement.</message>
 
   <message id="infoTelechargementRaster">Sélectionnez ci-dessus les couches que vous désirez télécharger. Il est préférable de découper la couche sur l'emprise d'un shapefile que vous aurez préalablement chargé via l'onglet "plan d'aménagement".</message>
  
  <message id="cb_decoupeShp">Découper les cartes avec l'emprise du shp</message>
+
 
  <message id="infoParcellaire">Chargez un shapefile au format ESRI afin d'effectuer le calcul de statistique pour les aptitudes des essences (Fichier Écologique des Essences) qui seront ajoutées dans la table d'attribut de votre shapefile. Vous pouvez également télécharger les cartes qui vous intéressent sur l'emprise de votre shapefile.</message>
 
@@ -32,19 +32,22 @@ Sélectionnez ci-dessus les couches pour lesquelles vous désirez ajouter les st
 
 <message id="infoVisuStat">La visualisation des statistiques permet un affichage des proportions de surface pour chaque classe d'aptitude. Pour l'instant, il s'agit uniquement des statistiques pour l'ensemble de tous les polygones de votre shapefile.</message>
 
+
 <message id="infoDownloadClippedRaster">
 <h4>Télécharger les couches géographiques au format raster</h4>
 Vous pouvez télécharger les cartes listées ci-dessous qui seront découpées sur l'emprise de votre shapefile. Une visualisation des statistiques de ces couches pour un polygone donné est également possible en appuyant sur le polygone tout en gardant la touche SHIFT enfoncée.
 </message>
 
+ -->
 
-<message id="tooltipMap1">Double-cliquez sur une station pour afficher sa description dans l'onglet légende.</message>
 
-<message id="tooltipMap2">Double-cliquez sur une station pour afficher sa description dans l'onglet "Info Ponctuelle". Enfoncez la touche SHIFT et cliquez sur un polygone de votre shapefile pour afficher les statistiques. Les couches sélectionnées dans la section "Analyse" feront l'objet d'une synthèse sur cette surface. </message>
+<message id="tooltipMap1">Double-cliquer sur une station pour afficher sa description dans l'onglet légende.</message>
+
+<message id="tooltipMap2">Double-cliquer sur une station pour afficher sa description dans l'onglet "Info Ponctuelle". Enfoncez la touche SHIFT et cliquez sur un polygone de votre shapefile pour afficher les statistiques. Les couches sélectionnées dans la section "Analyse" feront l'objet d'une synthèse sur cette surface. </message>
 
 <message id="infoDansVisuStat">Les statistiques sont calculées pour les couches sélectionnées dans la section "Analyse". </message>
 
-<message id="toolTipActiveLayer">Cliquez sur la case à cocher "Afficher la légende" ci-dessus pour visualiser la signification des couleurs de cette carte. </message>
+<message id="toolTipActiveLayer">Cliquer sur la case à cocher "Afficher la légende" ci-dessus pour visualiser la signification des couleurs de cette carte. </message>
 
 <message id="legendMsg"><i>Veuillez d'abord ajouter une carte dans votre sélection de cartes pour afficher une légende.</i> </message>
 <message id="legendTitre"><h3>Légende de la carte :</h3> </message>
@@ -75,7 +78,7 @@ Effectuer une analyse pour un polygone de votre shapefile en cliquant dessus tou
 
 
 <!-- label page anayle simple -->
-<message id="sp_infoclic"><i>Veuillez double-cliquer dans la carte pour afficher les infos ponctuelles à cet endroit.</i></message>
+<message id="sp_infoclic"><i>Double-cliquer dans la carte pour afficher les infos ponctuelles à cet endroit.</i></message>
 
 <!--label dans le treelist de couches -->
 <message id="groupeCoucheAll">Couches</message>
@@ -131,10 +134,10 @@ Effectuer une analyse pour un polygone de votre shapefile en cliquant dessus tou
   <message id="Wt.Auth.user-name">Nom d'utilisateur</message>
   <message id="Wt.Auth.user-name-info">Entrez votre nom d'utilisateur</message>
   <message id="Wt.Auth.user-name-invalid">Invalide</message>
-  <message id="Wt.Auth.email">Adresse email</message>
-  <message id="Wt.Auth.email-info">Entrez votre adresse email</message>
+  <message id="Wt.Auth.email">Adresse e-mail</message>
+  <message id="Wt.Auth.email-info">Entrez votre adresse e-mail</message>
   <message id="Wt.Auth.optional-email-info">
-    Entrez votre adresse email (optionnel)
+    Entrez votre adresse e-mail (optionnel)
   </message>
   <message id="Wt.Auth.password">Mot de passe</message>
   <message id="Wt.Auth.password-info">Entrez votre mot de passe</message>
@@ -157,7 +160,7 @@ Effectuer une analyse pour un polygone de votre shapefile en cliquant dessus tou
   <!-- RegistrationWidget -->
 
   <message id="Wt.Auth.registration-form-title">Inscription</message>
-  <message id="Wt.Auth.registration-form-info">Veuillez compléter les informations pour vous enregistrer.</message>
+  <message id="Wt.Auth.registration-form-info">Compléter les informations pour vous enregistrer.</message>
   <message id="Wt.Auth.password-registration">S'enregistrer avec un nom d'utilisateur et un mot de passe :</message>
   <message id="Wt.Auth.oauth-registration">Register with an identity provider:</message>
   <message id="Wt.Auth.or-oauth-registration">Or, register with an identity provider:</message>
@@ -166,8 +169,8 @@ Effectuer une analyse pour un polygone de votre shapefile en cliquant dessus tou
   <message id="Wt.Auth.choose-password-info">Choisir un mot de passe</message>
   <message id="Wt.Auth.repeat-password">Répéter le mot de passe</message>
   <message id="Wt.Auth.repeat-password-info">Répéter le mot de passe</message>
-  <message id="Wt.Auth.email-invalid">Adresse email invalide</message>
-  <message id="Wt.Auth.email-exists">Adresse email déjà utilisée</message>
+  <message id="Wt.Auth.email-invalid">Adresse e-mail invalide</message>
+  <message id="Wt.Auth.email-exists">Adresse e-mail déjà utilisée</message>
   <message id="Wt.Auth.oauth">Your external account</message>
   <message id="Wt.Auth.oauth-info">Choose one of your accounts</message>
   <message id="Wt.Auth.user-name-exists">Ce nom d'utilisateur existe déjà</message>
@@ -313,20 +316,22 @@ a second line.)
     </div>
   </message>
 
-<message id="presentation-ad1"> Un plateforme de diffusion des outils de gestion forestière</message>
+<!-- OLD
+<message id="presentation-ad1"> Une plateforme de diffusion des outils de gestion forestière</message>
 <message id="presentation-ad2"> Description stationnelle et carte d'aptitude des essences</message>
 <message id="presentation-ad3"> Description des peuplements en place</message>
 <message id="presentation-ad4"> Visualisation et téléchargement des cartes et de la documentation</message>
 <message id="presentation-ad5"> Analyse statistique préalable à la préparation du plan d'aménagement</message>
+-->
 
 
 <message id="page_presentation">
 <div class="form">
   <p>
     <h3>Forestimator: outils cartographiques pour la gestion des forêts Wallonnes</h3>
-Forestimator, c'est une boite à outils entièrement gratuite développée par l'unité de <a href="https://www.gembloux.ulg.ac.be/gestion-des-ressources-forestieres/">Gestion des Ressources Forestières</a> de Gembloux Agro-Bio Tech (ULiège). Les résultats de diverses recherches y sont rassemblés affin d'en faciliter la consultation et le téléchargement par les praticiens forestiers.
+Forestimator, c'est une boite à outils entièrement gratuite développée par l'unité de <a target="_blank" rel="noopener noreferrer" href="https://www.gembloux.ulg.ac.be/gestion-des-ressources-forestieres/">Gestion des Ressources Forestières</a> de Gembloux Agro-Bio Tech (ULiège). Les résultats de diverses recherches y sont rassemblés afin d'en faciliter la consultation et le téléchargement par les praticiens forestiers.
 
-Cette application web de cartographie permet une visualisation des informations relatives à la description des stations forestières, aux peuplements en place et des aptitudes des essences telles que définies dans <a href="https://www.fichierecologique.be">le fichier écologique des essences (FEE)</a>. Les cartes peuvent y être téléchargées par ceux qui souhaitent utiliser leur propre logiciel de Système d'Information Géographique. Forestimator compte également une série d'analyse que l'utilisateur peut effectuer en chargeant le ou les polygone(s) délimitant une zone d'intérêt. Ainsi, par exemple, la proportion en surface pour laquelle une essence présente une adéquation optimale avec la zone en question est déterminé et présenté de manière à appuyer le choix des essences lors des opérations de plantation ou de régénération naturelles.
+Cette application web de cartographie permet une visualisation des informations relatives à la description des stations forestières, aux peuplements en place et à l'aptitude des essences telles que définie dans <a href="https://www.fichierecologique.be">le fichier écologique des essences (FEE)</a>. Les cartes peuvent y être téléchargées par ceux qui souhaitent utiliser leur propre logiciel de Système d'Information Géographique. Forestimator compte également une série d'analyses que l'utilisateur peut effectuer en chargeant le ou les polygone(s) délimitant une zone d'intérêt. Ainsi, par exemple, la proportion en surface pour laquelle une essence présente une adéquation optimale avec la zone en question est déterminée et présentée de manière à appuyer le choix des essences lors des opérations de plantation ou de régénération naturelles.
  </p>
  
     <p>
@@ -338,17 +343,17 @@ Cette application web de cartographie permet une visualisation des informations 
 	</label>
 	</p>
 	<div id="part1" class="unfold">
-		<h5>Visualiser une carte</h5>
-		Le choix de la carte à afficher s'effectue en cliquant sur son nom dans l'encart de droite de la page "cartographie". La légende (signification des couleurs) est consultable en cochant la case à cocher en haut de cet encadré, mais à tout moment, un double-clic sur une position en particulier de la carte ouvre une fenêtre qui renseigne la signification de la carte pour cet endroit donné. 
+		<h3>Visualiser une carte</h3>
+		Le choix de la carte à afficher s'effectue via le "Catalogue de couche" en double-cliquant sur son nom. La légende (signification des couleurs) est consultable dans la rubrique "Légende", mais à tout moment, un double-clic sur une position en particulier de la carte ouvre une fenêtre qui renseigne la signification de la carte pour cet endroit donné. 
 		<div>
-		 <img src="/img/popupLegende.png" alt="fenêtre popup qui renseigne la valeur en un point donné" width="350px"  />
+		 <img src="/img/popupLegende.png" alt="fenêtre popup qui renseigne la valeur en un point donné" width="700px"  />
 		</div>
 		<br></br>
 		L'action de double-cliquer sur une position de la carte (rond mauve sur la figure) ouvre une fenêtre qui renseigne la valeur pour cette position.
 		 
-		<h5>Télécharger une carte</h5>
+		<h3>Télécharger une carte</h3>
 
-		Les cartes aux format raster peuvent être découpées sur l'emprise de votre choix. L'emprise est celle affichée dans la page cartographie et peut-être modifiée en effectuant un zoom avant ou arrière et en effectuant des déplacements en vue de centrer la carte sur une zone qui retient votre intérêt.
+		Les cartes au format raster peuvent être découpées sur l'emprise de votre choix. L'emprise est celle affichée dans la page cartographie et peut être modifiée en effectuant un zoom avant ou arrière et en effectuant des déplacements en vue de centrer la carte sur une zone qui retient votre intérêt.
 		La carte et un fichier de symbologie (signification des codes couleurs) utilisable dans le logiciel <b>QGIS</b> sont téléchargeables en cliquant sur le bouton de téléchargement situé tout en bas de l'encart de droite.
 	</div>
 </div>
@@ -356,30 +361,30 @@ Cette application web de cartographie permet une visualisation des informations 
 <div style="margin:auto;"><p style="margin: 15px;">
 	<!--<input id="toggle2" class="unfolder" type="checkbox"/>-->
 	<label for="toggle2" class="toggle-label">
-		<!--<span class="unfold-icon"></span><span class="fold-icon"></span>-->Page info ponctuelle : description d'une station  <!--<span class="unfold-icon"></span><span class="fold-icon"></span>-->
+		<!--<span class="unfold-icon"></span><span class="fold-icon"></span>-->Rubrique info ponctuelle : description d'une station  <!--<span class="unfold-icon"></span><span class="fold-icon"></span>-->
 	</label></p>
 	<div id="part2" class="unfold">
 		C'est bien là que se situe tout l'intérêt des outils de consultation des informations cartographiques utiles aux forestiers ; <b>disposer en un double-clic de la description synthétique d'une station et du peuplement en place</b>. 
 		Ainsi, un double-clic sur une position de la carte va permettre l'affichage, dans la page d'info ponctuelle, de la carte d'identité de cette station.
 		Premièrement, le tableau d'aptitude pour cette station est présenté. Les essences sont représentées par leur acronymes et sont classées dans 4 colonnes qui correspondent aux 4 aptitudes ; optimum (en vert foncé), tolérance (en vert clair), tolérance élargie (en orange) et exclusion (en rouge).
 		<div>
-			<img src="/img/tableApt.png" alt="pour une station donnée, le tableau d'aptitude des essences" width="350px"/> 
+			<img src="/img/tableApt.png" alt="pour une station donnée, le tableau d'aptitude des essences" width="500px"/> 
 		 	<br></br>
-			Le tableau d'aptitude, qui apparaît lorsqu'on double-clic sur une station, renseigne l'aptitude pour toutes les essences forestières. Une info-bulle s'affiche lorsqu'on pointe la souris sur les codes essences en deux lettre et affiche le nom complet de l'essence forestière. Les code essences sont affichés en gris dans le cas d'une <u>double aptitude</u> (ex; Tolérance/Tolérance élargie pour le Hêtre), cette double aptitude est renseignée dans l'info-bulle qui s'affiche lorsqu'on déplace la souris sur le code essence.
+			Le tableau d'aptitude, qui apparaît lorsqu'on double-clique sur une station, renseigne l'aptitude pour toutes les essences forestières. Une info-bulle s'affiche lorsqu'on pointe la souris sur les codes essences en deux lettres et affiche le nom complet de l'essence forestière. Les codes essences sont affichés en gris dans le cas d'une <u>double aptitude</u> (ex; Tolérance/Tolérance élargie pour le Hêtre), cette double aptitude est renseignée dans l'info-bulle qui s'affiche lorsqu'on déplace la souris sur le code essence.
 		</div>
 		<br></br>
 
 		Deuxièmement, les caractéristiques stationnelles et du peuplement en place pour la station sélectionnée vont être énumérées dans un tableau s'intitulant "Description de la station forestière".  
 <br></br>
-		Enfin, si la carte affichée est une carte d'aptitude pour l'une des essences, une section supplémentaire s'affichera et renseignera le cheminement effectué pour la détermination de l'aptitude de l'essence. L'aptitude des essences est en effet fonction de l'aptitude bioclimatique d'une part, de l'aptitude hydro-trophique d'autre part et des éventuels facteurs de compensation liés à la topographie. Nous renvoyons l'utilisateur vers le guide méthodologique du <a href="https://www.fichierecologique.be">Fichier Écologique des Essences (FEE)</a>, qui se trouve sous la rubrique aide du site <a href="https://www.fichierecologique.be">www.fichierecologique.be</a>. C'est dans cette section qu'est également présenté l'écogramme de l'espèce pour laquelle la carte d'aptitude est affichée, avec un rectangle mauve situant la station au sein de cet écogramme et de la niche écologique de l'essence.
+		Enfin, si la carte affichée est une carte d'aptitude pour l'une des essences, une section supplémentaire s'affichera et renseignera le cheminement effectué pour la détermination de l'aptitude de l'essence. L'aptitude des essences est en effet fonction de l'aptitude bioclimatique d'une part, de l'aptitude hydro-trophique d'autre part et des éventuels facteurs de compensation liés à la topographie. Nous renvoyons l'utilisateur vers le guide méthodologique du <a target="_blank" rel="noopener noreferrer" href="https://www.fichierecologique.be">Fichier Écologique des Essences (FEE)</a>, qui se trouve sous la rubrique aide du site <a target="_blank" rel="noopener noreferrer" href="https://www.fichierecologique.be">www.fichierecologique.be</a>. C'est dans cette section qu'est également présenté l'écogramme de l'espèce pour laquelle la carte d'aptitude est affichée, avec un rectangle mauve situant la station au sein de cet écogramme et de la niche écologique de l'essence.
 		<div>
-			<img src="/img/ecogramme.png" alt="position de la station en mauve dans l'écogramme de l'essence" width="200px"  />
+			<img src="/img/ecogramme.png" alt="position de la station en mauve dans l'écogramme de l'essence" width="350px"  />
 		 	<br></br>
 			Lors d'un double-clic sur une station, si la carte affichée est une carte d'aptitude, la niche écologique de l'essence ainsi que la position de la station dans l'écogramme (station représentée par le carré mauve) sont également renseignés.
 		</div>
 		<h3>Génération d'un rapport</h3>
 
-		Les résultats de l'analyse ponctuelles peuvent être obtenus sous forme d'un document pdf que l'utilisateur peut télécharger au moyen du bouton <b>export pdf</b>.
+		Les résultats de l'analyse ponctuelle peuvent être obtenus sous forme d'un document PDF que l'utilisateur peut télécharger au moyen du bouton <b>export PDF</b>.
 
 	</div>
 </div>
@@ -387,18 +392,18 @@ Cette application web de cartographie permet une visualisation des informations 
 <div style="margin:auto;"><p style="margin: 15px;">
 <!--	<input id="toggle3" class="unfolder" type="checkbox"/>-->
 	<label for="toggle3" class="toggle-label">
-		<!--<span class="unfold-icon"></span><span class="fold-icon"></span>-->Page Analyse Surfacique : statistique sur une surface d'intérêt  <!--<span class="unfold-icon"></span><span class="fold-icon"></span>-->
+		<!--<span class="unfold-icon"></span><span class="fold-icon"></span>-->Rubrique Analyse surfacique : statistique sur une surface d'intérêt  <!--<span class="unfold-icon"></span><span class="fold-icon"></span>-->
 	</label></p>
 	<div id="part3" class="unfold">
 		La description d'une station sous forme de position ponctuelle suit une méthodologie relativement directe, dans la mesure ou les caractéristiques sont lues sur chacune des cartes pour cette position donnée. Par contre, un aménagiste qui souhaite obtenir une synthèse des caractéristiques stationnelles et des peuplements en place pour une surface donnée, représentant tantôt une parcelle, tantôt un massif dans son ensemble, dois passer par une phase de calcul des statistiques pour cette surface. Des outils d'analyses sont implémentés dans Forestimator et permettent de répondre aux besoins les plus récurrents des cartographes forestiers.
 
 		<h3>Importer un shapefile</h3>
 
-		L'encart de droite sous la page "analyse" permet à l'utilisateur de sélectionner sur son ordinateur les 4 fichiers (.shp, .shx, .dbf, et .prj) constituant le shapefile de polygones définissant sa zone d'intérêt. Le shapefile dois obligatoirement contenir un ou des polygones, dois impérativement être en système de projection Belge Lambert 72 et la surface totale des polygones ne dois pas excéder 2500 hectares.
+		La rubrique "Analyse surfacique" permet à l'utilisateur de sélectionner sur son ordinateur les 4 fichiers (.shp, .shx, .dbf, et .prj) constituant le shapefile de polygones définissant sa zone d'intérêt. Le shapefile doit obligatoirement contenir un ou des polygones, doit impérativement être en système de projection Belge Lambert 72 et la surface totale des polygones ne doit pas excéder 2500 hectares.
 		Une fois le shapefile importé vers Forestimator, celui-ci apparaîtra en bleu sur la carte.
 
 		<div>
-			<img src="/img/importShp.png" alt="importer un shapefile de polygone dans Forestimator pour y effectuer des analyses surfaciques" width="350px"  />
+			<img src="/img/importShp.png" alt="importer un shapefile de polygones dans Forestimator pour y effectuer des analyses surfaciques" width="500px"  />
 		 	<br></br>
 			Lorsque votre shapefile est importé dans l'application web Forestimator, celui-ci s'affiche en bleu sur la carte. 
 		</div>
@@ -407,41 +412,46 @@ Cette application web de cartographie permet une visualisation des informations 
 
 		Une analyse détaillée est effectuée pour un seul polygone du shapefile. La sélection des couches pour lesquelles seront effectuées les analyses détaillées s'effectue en cochant les cases à cocher situées sous la rubrique intitulée <b>"2 : Sélectionner l'analyse"</b>.
 
-		Le calcul des statistique est réalisé en effectuant <b>un clic gauche sur le polygone de votre choix</b>, tout en maintenant enfoncé <b>la touche shift</b>. Une page de résultat affiche alors les résultats en trois sections distinctes : une carte de localisation générale ainsi qu'une description de la topographie et de la pédologie de cette zone d'intérêt, le tableau d'aptitude des essences et une dernière section qui présente, pour ce polygone donné, les cartes de description des conditions stationnelles et des caractéristique du peuplement en place. Un tableau de statistiques accompagne chacune des cartes individuelles.
+		Le calcul des statistiques est réalisé en effectuant <b>un clic gauche sur le polygone de votre choix</b>, tout en maintenant enfoncée <b>la touche shift</b>. Une page affiche alors les résultats en trois sections distinctes : une carte de localisation générale ainsi qu'une description de la topographie et de la pédologie de cette zone d'intérêt, le tableau d'aptitude des essences et une dernière section qui présente, pour ce polygone donné, les cartes de description des conditions stationnelles et des caractéristiques du peuplement en place. Un tableau de statistiques accompagne chacunes des cartes individuelles.
 
 <h3>Téléchargement d'un ensemble de cartes sur l'emprise du shapefile</h3>
 
-		Les utilisateurs désireux d'effectuer la mise en page de carte par eux-même, voir d'effectuer des calculs propres à des besoins spécifiques, peuvent télécharger un ensemble de cartes sur l'emprise de leur shapefile. Le bouton <b>Télécharger les cartes</b> permet un découpage simultané de toutes les cartes sélectionnées pour l'analyse surfacique et leur téléchargement sous forme d'une archive compressée.
+		Les utilisateurs désireux d'effectuer la mise en page de carte par eux-mêmes, voire d'effectuer des calculs propres à des besoins spécifiques, peuvent télécharger un ensemble de cartes sur l'emprise de leur shapefile. Le bouton <b>Télécharger les cartes</b> permet un découpage simultané de toutes les cartes sélectionnées pour l'analyse surfacique et leur téléchargement sous forme d'une archive compressée.
 	</div>
 </div>
 </p>
 </div>
 
+<h2> Référence </h2>
+
+<div class="csl-entry">Lisein, J., Claessens, H., Quevauvillers, S., Lejeune, P. 2022. <a target="_blank" rel="noopener noreferrer" href="https://www.fichierecologique.be/resources/FO143-47-60.pdf">Forestimator : un nouveau portail cartographique pour l'information forestière en Wallonie.</a>
+ Forêt.Nature 162, 40–47.</div>
+
 </message>
 
 
 <message id="page_presentation.credit"> 
-Le développement de ce site internet est financé par l'Accord-cadre de recherches et vulgarisation forestières.
-Le contenu cartographiques est en grande partie issue des recherches menées au sein de l'unité de <a href="https://www.gembloux.ulg.ac.be/gestion-des-ressources-forestieres/">Gestion des Ressources Forestières</a> de Gembloux Agro-Bio Tech (ULiège).
+Le développement de ce site internet est financé par l'Accord Cadre de Recherches et Vulgarisation Forestières.
+Le contenu cartographique est en grande partie issu des recherches menées au sein de l'unité de <a target="_blank" rel="noopener noreferrer" href="https://www.gembloux.ulg.ac.be/gestion-des-ressources-forestieres/">Gestion des Ressources Forestières</a> de Gembloux Agro-Bio Tech (ULiège).
 <br></br>
 <br></br>
-Personne de contact : Lejeune Philippe <font color="blue">p.lejeune@uliege.be</font>.
+Personne de contact : Lejeune Philippe - <font color="blue">p.lejeune@uliege.be</font>.
 <br></br>
 <br></br>
-Réalisation : Lisein Jonathan <font color="blue">liseinjon@hotmail.com</font>, Hugues Claessens et Samuel Quevauvillers.
+Réalisation : Lisein Jonathan - <font color="blue">liseinjon@hotmail.com</font>, Hugues Claessens et Samuel Quevauvillers.
 </message>
 
 <message id="docu.api"> 
 La plateforme web Forestimator sert de vitrine ; les informations et les traitements y sont présentés au grand public via une interface conviviale.
 <br></br>
-Par ailleurs, Forestimator fournit des webservices pour les développeurs soucieux d'utiliser les résultats de traitements (analyse ponctuelle ou surfacique) dans leurs plateforme web. Cette page d'aide décrit le fonctionnement de l'API (Application Programming Interface) de forestimator.
+Par ailleurs, Forestimator fournit des webservices pour les développeurs soucieux d'utiliser les résultats de traitements (analyse ponctuelle ou surfacique) dans leurs plateforme web. Cette page d'aide décrit le fonctionnement de l'API (Application Programming Interface) de Forestimator.
 <h3>Aide</h3>
 Pour afficher la liste des couches et des traitements disponibles;
 <br></br>
-<a href="http://forestimator.gembloux.ulg.ac.be/api/help">http://forestimator.gembloux.ulg.ac.be/api/help</a>
+<a target="_blank" rel="noopener noreferrer" href="http://forestimator.gembloux.ulg.ac.be/api/help">http://forestimator.gembloux.ulg.ac.be/api/help</a>
 <br></br>
 <h3>Analyse surfacique</h3>
-la syntaxe générale est la suivante;
+La syntaxe générale est la suivante :
 <br></br>
 https://forestimator.gembloux.ulg.ac.be/api/<font color="blue">CODE_COUCHE_OU_NOM_TRAITEMENT</font>/polygon/<font color="blue">POLYGONE_FORMAT_WKT</font>
 <br></br>
@@ -450,7 +460,7 @@ CODE_COUCHE_OU_NOM_TRAITEMENT; consultez la page http://forestimator.gembloux.ul
 POLYGONE_FORMAT_WKT; le polygone délimitant la surface de terrain pour laquelle vous souhaitez effectuer les analyses. Le format doit être le WKT, le système de projection doit être en Belge Lambert 72. De plus, la géométrie du polygone doit être valide et sa surface ne peut dépasser 200 ha.
 <br></br>
 <p style="margin-bottom:0.2cm;margin-top:0.2cm">
-Certains traitements accèptent des arguments qui permettent de modifier leurs comportement par défaut. Dans ce cas, la syntaxe sera la suivante:
+Certains traitements acceptent des arguments qui permettent de modifier leurs comportement par défaut. Dans ce cas, la syntaxe sera la suivante:
 <br></br>
 https://forestimator.gembloux.ulg.ac.be/api/<font color="blue">CODE_COUCHE_OU_NOM_TRAITEMENT</font>/args/<font color="blue">ARGUMENTS_OPTIONNEL</font>/polygon/<font color="blue">POLYGONE_FORMAT_WKT</font>
 
@@ -654,7 +664,7 @@ detAptFEE
 
 
 <message id="api.msg.error.tool.name">Aucune carte ou traitement de ce nom.</message>
-<message id="api.msg.error.polyg1">Veillez utiliser le format Géojson pour votre polygone</message>
+<message id="api.msg.error.polyg1">Veuillez utiliser le format Géojson pour votre polygone</message>
 
 <message id="menu.button.tooltip.home">Accueil</message>
 <message id="menu.button.tooltip.doc">Documentation</message>
