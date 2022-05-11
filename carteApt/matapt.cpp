@@ -2,10 +2,12 @@
 
 matApt::matApt(std::shared_ptr<cdicoAptBase> aDicoApt):mDicoApt(aDicoApt),zbio_(1)
 {
+
     WHBoxLayout * layoutGlobal = setLayout(cpp14::make_unique<WHBoxLayout>());
     layoutGlobal->setContentsMargins(0,0,0,0);
-    WContainerWidget * contG = layoutGlobal->addWidget(cpp14::make_unique<WContainerWidget>());
+    WContainerWidget * contG = layoutGlobal->addWidget(cpp14::make_unique<WContainerWidget>(),1);
     // on commence avec tableau ecogramme:
+        contG->setOverflow(Wt::Overflow::Auto);
     mEco= contG->addNew<WTable>();
     mEco->setStyleClass("eco-table");
     // création de toutes les cellulles de l'écogramme
@@ -35,6 +37,8 @@ matApt::matApt(std::shared_ptr<cdicoAptBase> aDicoApt):mDicoApt(aDicoApt),zbio_(
     }
     // partie droite
     WContainerWidget * contD = layoutGlobal->addWidget(cpp14::make_unique<WContainerWidget>());
+    contD->setContentAlignment(AlignmentFlag::Left);
+
     WVBoxLayout * layoutDroite = contD->setLayout(cpp14::make_unique<WVBoxLayout>());
     WContainerWidget * contZbio = layoutDroite->addWidget(cpp14::make_unique<WContainerWidget>());
     contZbio->addNew<Wt::WText>(tr("zbio.titre"));
@@ -47,8 +51,8 @@ matApt::matApt(std::shared_ptr<cdicoAptBase> aDicoApt):mDicoApt(aDicoApt),zbio_(
     zbioSelection_->setCurrentIndex(0);
 
     WContainerWidget * contApt = layoutDroite->addWidget(cpp14::make_unique<WContainerWidget>());
+    contApt->setOverflow(Wt::Overflow::Auto);
     mAptTable= contApt->addNew<WTable>();
-
 }
 
 void matApt::hoverEco(WContainerWidget * c, bool hover){
@@ -102,8 +106,8 @@ void matApt::clicEco(std::tuple<int,int> ntnh){
                                 //c->setLink();
                 std::string text(aV.at(n)->Code());
                 // check si double apt
-                if (mDicoApt->isDoubleApt(aV.at(n)->getApt(aptZbio))){text+="*";}
-                if (mDicoApt->isDoubleApt(aV.at(n)->getApt(nt,nh,aptZbio,false))){text+="*";}
+                if (mDicoApt->isDoubleApt(aV.at(n)->getApt(zbio_))){text+="*";}
+                if (mDicoApt->isDoubleApt(aV.at(n)->getApt(nt,nh,zbio_,false))){text+="*";}
                 c->addNew<Wt::WText>(text);
 
                 c->addStyleClass("circle_eco");
@@ -114,30 +118,31 @@ void matApt::clicEco(std::tuple<int,int> ntnh){
                     this->hoverEco(c,0);
                 });
                 c->setToolTip(aV.at(n)->Nom());
+                //if(aV.at(n)->Code()=="EC"){ std::cout << " érable champêtre, aptitude zbio climatique " << mDicoApt->code2AptFull(aV.at(n)->getApt(zbio_)) << ", aptitude HT " << mDicoApt->code2AptFull(aV.at(n)->getApt(nt,nh,zbio_,false)) << std::endl;}
+                //if(aV.at(n)->Code()=="EC"){ std::cout << " érable champêtre, aptitude zbio climatique " << aV.at(n)->getApt(zbio_) << ", aptitude HT " << aV.at(n)->getApt(nt,nh,zbio_,false) << std::endl;}
+
                 c->clicked().connect([=] {
-                    Wt::WMessageBox * messageBox = this->addChild(Wt::cpp14::make_unique<Wt::WMessageBox>(
+                Wt::WMessageBox * messageBox = mAptTable->addChild(Wt::cpp14::make_unique<Wt::WMessageBox>(
                                                                       aV.at(n)->Nom(),
                                                                       "",
                                                                       Wt::Icon::Information,
                                                                       Wt::StandardButton::Ok));
-                    messageBox->contents()->addNew<Wt::WText>("Aptitude bioclimatique : " + mDicoApt->code2AptFull(aV.at(n)->getApt(aptZbio)));
+                    messageBox->contents()->addNew<Wt::WText>("Aptitude bioclimatique : " + mDicoApt->code2AptFull(aV.at(n)->getApt(zbio_)));
                     messageBox->contents()->addNew<Wt::WBreak>();
-                    messageBox->contents()->addNew<Wt::WText>("Aptitude hydro-trophique : " + mDicoApt->code2AptFull(aV.at(n)->getApt(nt,nh,aptZbio,false)));
+                    messageBox->contents()->addNew<Wt::WText>("Aptitude hydro-trophique : " + mDicoApt->code2AptFull(aV.at(n)->getApt(nt,nh,zbio_,false)));
                     messageBox->contents()->addNew<Wt::WBreak>();
                     Wt::WLink l("https://www.fichierecologique.be/resources/fee/FEE-"+aV.at(n)->Code()+".pdf");
                     l.setTarget(Wt::LinkTarget::NewWindow);
                     Wt::WString s("Fiche-essence disponible ici");
                     Wt::WAnchor * a =messageBox->contents()->addNew<Wt::WAnchor>(l,s);
                     a->clicked().connect([=] {
-                        this->removeChild(messageBox);
+                        mAptTable->removeChild(messageBox);
                     });
                     messageBox->setModal(true);
                     messageBox->buttonClicked().connect([=] {
-                        this->removeChild(messageBox);
+                        mAptTable->removeChild(messageBox);
                     });
                     messageBox->show();
-
-
 
                 });
                 col++;
@@ -170,6 +175,7 @@ void matApt::trierEss(std::tuple<int,int> ntnh, int zbio){
                 if (ess->hasFEEApt()){
                     if(mDicoApt->AptNonContraignante(ess->getApt(zbio))==aptZbio){
                         if (mDicoApt->AptNonContraignante(ess->getApt(nt,nh,zbio,false))==aptHT){
+                            //if(ess->Code()=="EC"){ std::cout << " érable champêtre, aptitude zbio climatique " << ess->getApt(zbio) << ", aptitude HT " << ess->getApt(nt,nh,zbio,false) << std::endl;}
                             aV.push_back(ess);
                         }
                     }

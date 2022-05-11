@@ -520,11 +520,11 @@ parcellaire.shp &lt;- st_read(shp.path)<br></br>
 
 </message>
 
-<message id="report.analyse.surf.hdom.t"> <h4> Hauteur dominante calculé sur le MNH  (modèle pour pessière)</h4> </message>
-<message id="report.analyse.surf.hdom.nb"> Nombre de Hdom mesuré (surface de 1 are) </message>
+<message id="report.analyse.surf.hdom.t"> <h4> Hauteur dominante calculée sur le MNH  (modèle pour pessière)</h4> </message>
+<message id="report.analyse.surf.hdom.nb"> Nombre de Hdom mesurées (surface de 1 are) </message>
 
-<message id="report.analyse.surf.dendro.t"> <h4> Description dendrométriques (modèle pour pessière)  </h4> </message>
-<message id="report.analyse.surf.classeHauteur.t"> <h4> Répartition de la surface par classe de hauteur (tout peuplements)</h4> </message>
+<message id="report.analyse.surf.dendro.t"> <h4> Description dendrométrique (modèle pour pessière)  </h4> </message>
+<message id="report.analyse.surf.classeHauteur.t"> <h4> Répartition de la surface par classe de hauteur (tous peuplements)</h4> </message>
 <message id="report.analyse.surf.compo.t"> <h4> Composition  </h4> </message>
 <message id="report.analyse.surf.zbio.t"> <h4> Zone bioclimatique  </h4> </message>
 <message id="report.analyse.surf.relief.t"> <h4> Relief  </h4> </message>
@@ -584,7 +584,7 @@ ${AptTable}
 </div>
 
 <div>
-<h2>Liste des accronymes des essences </h2>
+<h2>Liste des acronymes des essences </h2>
 ${legendAcro}
 </div> 
 
@@ -651,11 +651,11 @@ detAptFEE
 
 <message id="report.ban"><img src="PATH/resources/DJI_0497_navbar.JPG" width="500px"  border-radius="30px" /></message>
 
-<message id="download.lay.error.noLay"><p>Aucune cartes sélectionnée. Veuillez sélectionner les couches à exporter à l'étape numéro 2 de la page analyse</p></message>
+<message id="download.lay.error.noLay"><p>Aucune carte sélectionnée. Veuillez sélectionner les couches à exporter à l'étape numéro 2 de la page analyse</p></message>
 
 <message id="parcellaire.upload.size"><p> La surface du ou des polygones est trop importante que pour effectuer une analyse surfacique.</p></message>
 <message id="parcellaire.anaAllPol"><p> Indisponible pour le moment, en cours de développement...</p></message>
-<message id="parcellaire.anaAllPol.maxProcess"><p> Si vous souhaiter effectuer des analyses sur tous les polygones, vous ne pouvez sélectionner que maximum 4 analyses différentes.</p></message>
+<message id="parcellaire.anaAllPol.maxProcess"><p> Si vous souhaitez effectuer des analyses sur tous les polygones, vous ne pouvez sélectionner que maximum 4 analyses différentes.</p></message>
 
 <message id="parcellaire.tele.btn">Télécharger les cartes</message>
 <message id="parcellaire.ana.btn">Analyse sur tous les polygones</message>
@@ -685,7 +685,7 @@ detAptFEE
 <message id="meta.desc.carto">Forestimator est un portail web de cartographie des stations et des peuplements forestiers.
 De nombreuses couches cartographiques y sont disponibles à la consultation et au téléchargement.
 Une analyse des conditions environnementales des stations de Wallonie permet de déterminer l'adéquation essence-station la plus pertinente pour une sylviculture efficace. 
-De nombreuses cartes sont disponibles : l'aptitude des essences au sens du fichier écologique des essences, les cartes de composition, les zones bioclimatiques, les cartes de niveaux hydriques et des niveaux trophiques. 
+De nombreuses cartes sont disponibles : l'aptitude des essences au sens du Fichier Écologique des Essences, les cartes de composition, les zones bioclimatiques, les cartes de niveaux hydriques et des niveaux trophiques. 
 Des modèles dendrométriques sont implémenté pour l'estimation de la densité des peuplements sur base des modèles numériques de hauteur de la canopée.
 
  </message>
@@ -697,53 +697,53 @@ Des modèles dendrométriques sont implémenté pour l'estimation de la densité
 <message id="meta.desc.documentation">Des outils cartographiques qui sont une aide à la gestion des ressources forestières de Wallonie</message>
 <message id="meta.titre.documentation">Documentation des couches cartographiques consultables sur Forestimator</message>
 
-<message id="meta.desc.cr_dit-et-contact">Plateforme web développée par l'unité de Gestion des Ressources Forestière (Ulg - Gembloux Agro-Bio Tech)</message>
+<message id="meta.desc.cr_dit-et-contact">Plateforme web développée par l'unité de Gestion des Ressources Forestière (ULiège - Gembloux Agro-Bio Tech)</message>
 <message id="meta.titre.cr_dit-et-contact">Contactez l'équipe de chercheurs de Forestimator</message>
 
 <message id="meta.desc.aptitude-des-essences">L'aptitude des essences forestières, leur capacité à produire du bois de qualité pour une station donnée</message>
 <message id="meta.titre.aptitude-des-essences">L'aptitude sylvicole des essences forestières</message>
 
-<message id="meta.desc.ecogramme">L'écogramme est une typologie des stations forestières qui représente dans une matrice à deux dimensions les gradients environnementaux. Premièrement, le niveau trophiques (fertilité) des sols détermine le développement des essences forestières. Deuxièmement, le niveau hydrique (humidité) des stations forestières joue un rôle prépondérant dans la croissance des arbres.</message>
-<message id="meta.titre.ecogramme">L'écogramme hydro-trophique du Fichier écologique des essences</message>
+<message id="meta.desc.ecogramme">L'écogramme est une typologie des stations forestières qui représente dans une matrice à deux dimensions les gradients environnementaux. Premièrement, le niveau trophique (fertilité) des sols détermine le développement des essences forestières. Deuxièmement, le niveau hydrique (humidité) des stations forestières joue un rôle prépondérant dans la croissance des arbres.</message>
+<message id="meta.titre.ecogramme">L'écogramme hydro-trophique du Fichier Écologique des Essences</message>
 
-<message id="meta.desc.zone-bioclimatique">Les 10 zones bioclimatiques de Wallonie sont cartographiés. On y distingue l'Ardenne centro-orientale, la Basse et moyenne Ardenne, la Basse Lorraine, la Fagne - Famenne - Calestienne, la Haute Lorraine, le Hesbino-Brabançon, les Plaines et Vallées Scaldisiennes, le Condroz Sambre et Meuse, la Thiérache  et enfin la Haute Ardenne. Ces zones bioclimatiques remplacent les régions naturelles.</message>
+<message id="meta.desc.zone-bioclimatique">Les 10 zones bioclimatiques de Wallonie sont cartographiées. On y distingue l'Ardenne centro-orientale, la Basse et moyenne Ardenne, la Basse Lorraine, la Fagne - Famenne - Calestienne, la Haute Lorraine, le Hesbino-Brabançon, les Plaines et Vallées Scaldisiennes, le Condroz Sambre et Meuse, la Thiérache  et enfin la Haute Ardenne. Ces zones bioclimatiques remplacent les régions naturelles.</message>
 <message id="meta.titre.zone-bioclimatique">Les zones bioclimatiques de Wallonie</message>
 
-<message id="meta.desc.niveaux-trophiques">Le niveaux trophique permet de caractériser la fertilité d'un sol forestier. Il est utilisé pour déterminer l'aptitude des essences forestières. On distingue 6 niveaux, qui suivent le gradient d'acidité du sol : hyper-oligotrophe, oligotrophe, méso-oligotrophe, mésotrophe, eutrophe et carbonaté.</message>
+<message id="meta.desc.niveaux-trophiques">Le niveau trophique permet de caractériser la fertilité d'un sol forestier. Il est utilisé pour déterminer l'aptitude des essences forestières. On distingue 6 niveaux, qui suivent le gradient d'acidité du sol : hyper-oligotrophe, oligotrophe, méso-oligotrophe, mésotrophe, eutrophe et carbonaté.</message>
 <message id="meta.titre.niveaux-trophiques">Les niveaux trophiques du fichier écologique des essences</message>
 
-<message id="meta.desc.niveaux-hydriques">Le niveaux hydrique permet de caractériser la disponibilité en eau et en oxygène d'un sol forestier. Il est utilisé pour déterminer l'aptitude des essences forestières. On distingue 13 niveaux, qui combinent le gradient d'hypoxie (manque d'oxygène) et de disponibilité en eau.</message>
+<message id="meta.desc.niveaux-hydriques">Le niveau hydrique permet de caractériser la disponibilité en eau et en oxygène d'un sol forestier. Il est utilisé pour déterminer l'aptitude des essences forestières. On distingue 13 niveaux, qui combinent le gradient d'hypoxie (manque d'oxygène) et de disponibilité en eau.</message>
 <message id="meta.titre.niveaux-hydriques">Les niveaux hydriques du fichier écologique des essences</message>
 
 <message id="meta.desc.apport-d_eau">L'apport en eau latéral est l'apport par écoulement ou remontée de la nappe phréatique. Il s'agit donc de l'eau qui ne provient pas des précipitations, et qui est intimement liée à la topographie. Par exemple, un bas de grand versant sera alimenté par intermittence en eau de ruissellement. </message>
 <message id="meta.titre.apport-d_eau">L'apport en eau hors précipitation</message>
 
-<message id="meta.desc.sous_secteurs-et-topo">Sous-secteurs et situation topographiques sont deux manières de représenter la position d'une station forestière dans le paysage. La topographie de la station va avoir de multiples influences sur les conditions environnementales ; température, humidité.</message>
+<message id="meta.desc.sous_secteurs-et-topo">Sous-secteurs radiatifs et situation topographique sont deux manières de représenter la position d'une station forestière dans le paysage. La topographie de la station va avoir de multiples influences sur les conditions environnementales ; température, humidité.</message>
 <message id="meta.titre.sous_secteurs-et-topo">Les sous-secteurs radiatifs et la situation topographiques des stations forestières</message>
 
 <message id="meta.desc.hauteur-de-la-v_g_tation">Les Modèles Numériques de Hauteur de la végétation, ou Modèle Numérique de Canopée, sont des couches cartographiques qui décrivent la hauteur de la canopée. La hauteur des arbres est un paramètre de structure qui permet de caractériser un peuplement, du point de vue de sa maturité et de sa densité.</message>
 <message id="meta.titre.hauteur-de-la-v_g_tation">Les Modèles Numériques de Hauteur de la végétation.</message>
 
-<message id="meta.desc.forestimator-_-pr_sentation">Au service des forestiers de Wallonie, forestimator permet à quiconque de consulter et de télécharger des informations cartographiques décrivant les stations forestières et les peuplements.</message>
+<message id="meta.desc.forestimator-_-pr_sentation">Au service des forestiers de Wallonie, Forestimator permet à quiconque de consulter et de télécharger des informations cartographiques décrivant les stations forestières et les peuplements.</message>
 <message id="meta.titre.forestimator-_-pr_sentation">Présentation du portail web Forestimator</message>
 
 <message id="meta.desc.composition-des-essences">La connaissance d'une forêt passe par la description des espèces qui s'y développent. 
-La composition spécifiques est renseignée par 9 couches cartographiques, indiquant la proportion en surface terrière des épicéas, chênes, hêtres, douglas, pins, peupliers, mélèzes, bouleaux et autres </message>
-<message id="meta.titre.composition-des-essences">Composition des essences forestières en forêt Wallonne</message>
+La composition spécifique est renseignée par 9 couches cartographiques, indiquant la proportion en surface terrière des épicéas, chênes, hêtres, douglas, pins, peupliers, mélèzes, bouleaux et autres </message>
+<message id="meta.titre.composition-des-essences">Composition des essences forestières en forêt wallonne</message>
 
-<message id="meta.desc.crise-du-scolyte"> Les scolytes sont des insectes ravageurs qui sont naturellement présent en forêt. 
+<message id="meta.desc.crise-du-scolyte"> Les scolytes sont des insectes ravageurs qui sont naturellement présents en forêt. 
 Les typographes ont profité des conditions météorologiques propices de 2018 pour se multiplier au point de provoquer une crise sanitaire qui touche durement l'épicéa en Europe.
-Les dégâts qu'ils ont provoqués sont quantifiés et spatialisés par télédétection au moyen de nombreuses prise de vue satellites. 
-Un suivi de l'état sanitaire des pessière est réalisé en vue d'identifier la dynamique des foyers d'infections. </message>
+Les dégâts qu'ils ont provoqués sont quantifiés et spatialisés par télédétection au moyen de nombreuses prises de vues satellites. 
+Un suivi de l'état sanitaire des pessières est réalisé en vue d'identifier la dynamique des foyers d'infections. </message>
 <message id="meta.titre.crise-du-scolyte">La crise du scolyte (typographe) en pessière Wallonne</message>
 
-<message id="meta.desc.mod_le-dendro"> Les peuplements résineux d'épicéa commun et de douglas font l'objet d'une description dendrométriques en terme de hauteur dominante, de surface terrière, de volume à l'hectare, de nombre de tige par hectare et de circonférence moyenne. Toutes ces informations sont calculées depuis un modèle numérique de hauteur et sont valables pour l'année 2018.</message>
+<message id="meta.desc.mod_le-dendro"> Les peuplements résineux d'épicéa commun et de douglas font l'objet d'une description dendrométriques en terme de hauteur dominante, de surface terrière, de volume à l'hectare, de nombre de tiges par hectare et de circonférence moyenne. Toutes ces informations sont calculées depuis un modèle numérique de hauteur et sont valables pour l'année 2018.</message>
 <message id="meta.titre.mod_le-dendro">Description dendrométrique des peuplements résineux</message>
 
 <message id="meta.desc.masque-forestier"> Cela semble simple, mais discriminer précisément les zones forestières, haies et arbres isolés d'une part, des surfaces non boisées d'autre part, n'est pas trivial. Le masque forestier est dédié à cet usage : il nous informe ou se trouve la forêt en Région Wallonne. </message>
-<message id="meta.titre.masque-forestier">Le masque forestier nous renseigne là ou il y a de la forêt</message>
+<message id="meta.titre.masque-forestier">Le masque forestier nous renseigne là où il y a de la forêt</message>
 
-<message id="meta.desc.forestimator-api">Des géo-services permettent d'effectuer des calculs à l'échelles d'une surface délimitée par un polygone, dans le but de préparer un plan d'aménagement sur une propriété forestière. </message>
+<message id="meta.desc.forestimator-api">Des géo-services permettent d'effectuer des calculs à l'échelle d'une surface délimitée par un polygone, dans le but de préparer un plan d'aménagement sur une propriété forestière. </message>
 <message id="meta.titre.forestimator-api">Les géo-services de la plateforme Forestimator</message>
 
 <message id="cadastre.commune">Commune / INS</message>
