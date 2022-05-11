@@ -175,7 +175,7 @@ void matApt::trierEss(std::tuple<int,int> ntnh, int zbio){
                 if (ess->hasFEEApt()){
                     if(mDicoApt->AptNonContraignante(ess->getApt(zbio))==aptZbio){
                         if (mDicoApt->AptNonContraignante(ess->getApt(nt,nh,zbio,false))==aptHT){
-                            //if(ess->Code()=="EC"){ std::cout << " érable champêtre, aptitude zbio climatique " << ess->getApt(zbio) << ", aptitude HT " << ess->getApt(nt,nh,zbio,false) << std::endl;}
+                            if(ess->Code()=="SO"){ std::cout << " SO, aptitude zbio climatique " << ess->getApt(zbio) << ", aptitude HT " << ess->getApt(nt,nh,zbio,false) << std::endl;}
                             aV.push_back(ess);
                         }
                     }
