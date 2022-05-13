@@ -1,6 +1,8 @@
 TO DO forestimator
 ------------------
 
+-carte ES en ligne ; simplifier pour ne garder que Scolyte/ pas scolyte, enlever les coupes normales qui sont moins bien cartographiées.
+
 -export pdf ana surf
 
 -info ponctuelle sur cadastre : a développer. voir meme selection de polygone depuis cadastre.

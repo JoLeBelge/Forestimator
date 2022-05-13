@@ -18,7 +18,7 @@ Les modifications apportées en 2021 sont donc issues d'une analyse d'expert. Un
 <div class="alert alert-success"> Sigle pédologique : f2Ehxy </div>
 
 <u> Décision</u> : les mettre tous (d,h,i) en -1
-<br></br><u>Justificatif</u> : les valeurs de pH sont en moyenne plus élevées sur ces schistes mal drainés. mais l'expertise de terrain par la flore tends vers un -1 (présence d'acidiphiles). On privilégie la connaissance de terrain.
+<br></br><u>Justificatif</u> : les valeurs de pH sont en moyenne plus élevées sur ces schistes mal drainés mais l'expertise de terrain par la flore tend vers un -1 (présence d'acidiphiles). On privilégie la connaissance de terrain.
 <br></br>
 <div class="alert alert-success"> Silexite x </div>
 
@@ -32,7 +32,7 @@ Entre Vesdre et Meuse --> Gbax NT -2, Gbbx NT 0.
 <h5> -Ardenne Condruzienne:</h5>
 
 <u> Décision</u> : les mettre tous en -1.
-<br></br><u>Justificatif</u> : l'épaisseur de limon fait qu'il reste peu influencé au niveau de sa fertilité par le substrat (qui influence par contre le drainage). Les limons de drainage h et i ont une valeur de pH moyen plus petit que ceux des drainages c et b (4.29 vs 4.35 et 4.7) car moins épais et donc un peu + proches du subsrat gréseux (les Ah et Ai quasi tous en Ardenne Condruzienne). Mais on reste la majorité du temps dans du NT -1.
+<br></br><u>Justificatif</u> : l'épaisseur de limon fait qu'ils restent peu influencés au niveau de leur fertilité par le substrat (qui influence par contre le drainage). Les limons de drainage h et i ont une valeur de pH moyen plus petite que celle des drainages c et b (4.29 vs 4.35 et 4.7) car moins épais et donc un peu + proches du substrat gréseux (les Ah et Ai quasi tous en Ardenne Condruzienne). Mais on reste la majorité du temps dans du NT -1.
 <br></br>
 <h5> -Calestienne (orientale et occidentale)</h5> 
 <u> Décision</u> : les mettre en 0 sauf si présence d'un substrat f avant 80cm.
@@ -45,7 +45,7 @@ Entre Vesdre et Meuse --> Gbax NT -2, Gbbx NT 0.
  <div class="alert alert-success"> Sigle pédologique : kAba, kEbb, kGbb (+ kf ...) </div>
 
 <u> Décision</u> : les mettre tous en +1.
-<br></br><u>Justificatif</u> : les kAba sont déjà en NT +1 car malgré plus de profondeur et moins de charge caillouteuse, le risque de calcaire est présent en profondeur. Par ailleurs, la clé NT du FE nous amène à cette même décision. On transpose donc ce raisonnement aux kE et kG qui étaient en NT -1 (kAba en Conroz, FFC (Calestienne), Lorraine et Région Limoneuse)
+<br></br><u>Justificatif</u> : les kAba sont déjà en NT +1 car malgré plus de profondeur et moins de charge caillouteuse, le risque de calcaire est présent en profondeur. Par ailleurs, la clé NT du FE nous amène à cette même décision. On transpose donc ce raisonnement aux kE et kG qui étaient en NT -1 (kAba en Condroz, FFC (Calestienne), Lorraine et Région Limoneuse)
 <br></br>
  <div class="alert alert-success"> Sigle pédologique : Ghx2, Gix2, GDb2 </div>
 
@@ -62,19 +62,19 @@ Entre Vesdre et Meuse --> Gbax NT -2, Gbbx NT 0.
 <br></br>
 2) prise en compte du caractère temporaire de l'écoulement pour le réseau hydrographique. Pour les cours d'eau à écoulement temporaire, la zone environnante est classée en apport variable alors qu'auparavant elle l'était en apport permanent. --> changement mineur
 <br></br>
-3) changement des seuils de topographic position index utilisés pour le classement des apports variable dans les zones encaissées afin de <u>réduire considérablement la surface de ces zones qui remontaient trop dans le haut des pentes de vallons et vallées</u>. --> changement majeur
+3) changement des seuils de <p style="font-style: oblique;">topographic position index</p> utilisés pour le classement des apports variable dans les zones encaissées afin de <u>réduire considérablement la surface de ces zones qui remontaient trop dans le haut des pentes de vallons et vallées</u>. --> changement majeur
 <br></br>
 </message>
 
 <message id="NH.logs">
 <h5>Modifications de 2019</h5>
-Correction d'un oubli sur les séries spéciale pédologique;
+Correction d'un oubli sur les séries spéciales pédologiques;
 <br></br>
 -"B" : source --> NH-3
 <br></br>
 -"R" ravin --> NH-2
 <br></br>
-On estime que la profondeur de sol d'une série spéciale "P" (base de grand versant) equivaut à une profondeur 2 (en fonction du SS, NH différent).
+On estime que la profondeur de sol d'une série spéciale "P" (base de grand versant) équivaut à une profondeur 2 (en fonction du SS, NH différent).
 </message>
 
 <message id="ES_EP.description">
@@ -82,11 +82,11 @@ On estime que la profondeur de sol d'une série spéciale "P" (base de grand ver
 
 <figure class="highlight">
 <img src="/img/scoMM.png" alt="Méthode de détection des scolytes" width="800"/> 
-<figcaption class="figure-caption">Une modélisation de la réponse spectrale des pessières saines au cours de la saison de végétation permet la détection d'observations pour lesquelles l'activité photosynthétique semble anormale (au dessus de la ligne en mauve).
+<figcaption class="figure-caption">Une modélisation de la réponse spectrale des pessières saines au cours de la saison de végétation permet la détection d'observations pour lesquelles l'activité photosynthétique semble anormale (au-dessus de la ligne en mauve).
 </figcaption>
 </figure>
 <br></br>
-L'idée générale est de se calquer sur la méthodologie de l'INRAE (INRAE, UMR TETIS, R. Dutrieux, K. Ose, J.-B. Féret) développée depuis 2017. Celle-ci consiste à surveiller l'évolution saisonnière d'un indice spectral calculé sur base de série temporelle d'images Sentinel-2. L'information est résumée sous forme d'une carte d'état sanitaire par an.
+L'idée générale est de se calquer sur la méthodologie de l'INRAE (INRAE, UMR TETIS, R. Dutrieux, K. Ose, J.-B. Féret) développée depuis 2017. Celle-ci consiste à surveiller l'évolution saisonnière d'un indice spectral calculé sur base de séries temporelles d'images Sentinel-2. L'information est résumée sous forme d'une carte d'état sanitaire par an.
 <br></br>
 Une documentation plus exhaustive de la méthode est disponible sous format pdf:
 <a href="/pdf/methodoAnalyseSentinel2TimeSerie2021.pdf" download="detectionScolyte">
@@ -100,15 +100,15 @@ Carte d'aptitude du FEE : version de mars 2021 pour AG, AP, EK, PG, PY, PZ et de
 </message>
 
 <message id="Aptitude.logs">
-Octobre 2021 : mise à jours de toutes les cartes d'aptitudes du FEE suite à la mise à jour de la carte des niveaux hydriques. Par ailleurs, le système de calcul de compensations liés à la situation topographique est amélioré (compensation uniquement sur l'aptitude climatique et pas hydro-trophique, et correction du bug des aptitudes Tolérance élargie pour les résineux qui ne devaient pas exister par définition).
+Octobre 2021 : actualisation de toutes les cartes d'aptitudes du FEE suite à la mise à jour de la carte des niveaux hydriques. Par ailleurs, le système de calcul de compensations liés à la situation topographique est amélioré (compensation uniquement sur l'aptitude climatique et pas hydro-trophique, et correction du bug des aptitudes Tolérance élargie pour les résineux qui ne devaient pas exister par définition).
 <br></br>
-Mars 2021 : mise à jours pour AG, AP, EK, PG, PY, PZ.
+Mars 2021 : mise à jour pour AG, AP, EK, PG, PY, PZ.
 <br></br>
 Juin 2020 : première version pour toutes les essences forestières.
 </message>
 
 <message id="tooltip.compensationTopo">
-Les compensations dues à la situations topographiques sont de l'ordre du micro-climat. Une situation de risque ou une situation favorable influencera ainsi l'aptitude bioclimatique pour cette station. Cette aptitude bioclimatique "compensée" est ensuite confrontée à l'aptitude hydro-trophique afin de sélectionner la plus contraignante des deux.
+Les compensations dues à la situation topographique sont de l'ordre du micro-climat. Une situation de risque ou une situation favorable influencera ainsi l'aptitude bioclimatique pour cette station. Cette aptitude bioclimatique "compensée" est ensuite confrontée à l'aptitude hydro-trophique afin de sélectionner la plus contraignante des deux.
 </message>
 
 
@@ -118,15 +118,15 @@ La ressource en eau constitue un des facteurs déterminants de l’adaptation de
 
 <figure class="highlight">
 <img src="/img/swcTable.jpg" alt="Légende réserve en eau"/> 
-<figcaption class="figure-caption">Ordre de grandeur de la réserve en eau du sol (en mmm) et classes de contraintes et aptitudes forestières associées. Pour établir le lien avec les besoins en eau d’un peuplement, la transpiration d’une chênaie de 40 ans atteint de l’ordre de 2 à 3 mm d’eau par jour.
+<figcaption class="figure-caption">Ordre de grandeur de la réserve en eau du sol (en mm) et classes de contraintes et aptitudes forestières associées. Pour établir le lien avec les besoins en eau d’un peuplement, la transpiration d’une chênaie de 40 ans atteint de l’ordre de 2 à 3 mm d’eau par jour.
 </figcaption>
 </figure>
 
 </message>
 
 <message id="dendro.projet">
-Les modèles dendrométriques ont été réalisés dans le cadre des actions 0.8 (Suivi scientifique de l'Inventaire permanent des ressources forestières de Wallonie
-(IPRFW)) et 0.9 (CARTOFOR : recherches appliquées pour le développement à l’échelle de la Wallonie de méthodologies innovantes permettant la caractérisation et le suivi de la structure, de la composition et de l’état sanitaire des peuplements forestiers) de l’action du plan quinquennal de recherches forestières 2019-2024 (coordination Pr Philippe Lejeune).
+Les modèles dendrométriques ont été réalisés dans le cadre des actions 0.8 (Suivi scientifique de l'Inventaire permanent des Ressources forestières de Wallonie
+(IPRFW)) et 0.9 (CARTOFOR : recherches appliquées pour le développement à l’échelle de la Wallonie de méthodologies innovantes permettant la caractérisation et le suivi de la structure, de la composition et de l’état sanitaire des peuplements forestiers) de l’action du Plan quinquennal de Recherches forestières 2019-2024 (coordination Pr Philippe Lejeune).
 </message>
 
 <message id="dendro.description">
@@ -134,7 +134,7 @@ Les recherches réalisées portaient sur l’évaluation la qualité de modèles
 Les modèles repris au sein de la Table 1 ont été ajustés sur base d’un réseau de 1051 placettes résineuses représentatif de la forêt résineuse wallonne (Figure 1). Ce réseau est essentiellement situé au sein de pessières (79%), de douglasaies (5%) et de mélézières (3%). Le reste du réseau étant constitué de mélanges divers ou de peuplements composés d’essences résineuses plus rares. La donnée de départ couvrant l’ensemble du territoire wallon, la plateforme peut donc en théorie fournir des valeurs pour ces paramètre en dehors de leur zone d’application. Il est donc essentiel que l’utilisateur restreigne par lui-même son usage aux seuls peuplements résineux. 
 <p>&nbsp;</p>
             <p><img src="../img/dendroPLA.png" alt="carte Placettes" width="90%"/></p>
-            <p>réseau de placettes utilisé pour la calibration des modèles prédictifs</p>  
+            <p>Réseau de placettes utilisé pour la calibration des modèles prédictifs</p>  
 </message>
 
 <message id="dendro.version">
@@ -142,23 +142,23 @@ Janvier 2022
 </message>
 
 <message id="dendro.logs">
-Janvier 2022 : implémenté les modèles dendrométriques à l'échelle de pixel de 5 m de résolution. Les paramètres dendro pour un polygone sont calculés comme la moyenne pour chaque pixels. Précédemment, par exemple dans le plug-In Qgis Forestimator, une échelle intermédiaire était utilisée entre la parcelle et le pixel. Elle correspondait à une surface de un are affin de répondre à la définition de la hauteur dominante, qui correspond à la hauteur moyenne des 100 arbres les plus haut par hectare (donc une surface moyenne de 1 are).
+Janvier 2022 : implémenté les modèles dendrométriques à l'échelle de pixel de 5 m de résolution. Les paramètres dendro pour un polygone sont calculés comme la moyenne pour chaque pixels. Précédemment, par exemple dans le plug-In Qgis Forestimator, une échelle intermédiaire était utilisée entre la parcelle et le pixel. Elle correspondait à une surface de un are afin de répondre à la définition de la hauteur dominante, qui correspond à la hauteur moyenne des 100 arbres les plus hauts par hectare (donc une surface moyenne de 1 are).
 </message>
 
 <message id="COMPO.projet">
-Cette cartographie des essences forestières est le résultat de recherches menées à ULiège Gembloux Agro-Bio Tech au travers de deux projets interreg, Forêt Pro Bos et RegioWood 2, et du projet Cartofor appuyé par le DNF.
+Cette cartographie des essences forestières est le résultat de recherches menées à ULiège Gembloux Agro-Bio Tech au travers de deux projets Interreg, Forêt Pro Bos et RegioWood 2, et du projet CARTOFOR appuyé par le DNF.
 <br></br>
 </message>
 
 <message id="COMPO.description">
 <p>La cartographie des essences forestières a été réalisée à partir d’imagerie satellitaire Sentinel-2. Elle fournit le pourcentage de présence en terme de GHA de 9 groupes d’essences retenus : épicéas, chênes, hêtres, douglas, pins, peupliers, mélèzes, bouleaux et autres. La somme des pourcentages de ces 9 groupes faisant 100 %.
-Exemple : (0 % épicéas, 6 % chênes, 2 % hêtres, 0 % douglas, 0 % pins, 0 % peupliers, 0 % mélèzes, 
-0 % bouleaux, 2 % autres). 
+Exemple : 0 % épicéas, 60 % chênes, 20 % hêtres, 0 % douglas, 0 % pins, 0 % peupliers, 0 % mélèzes, 
+0 % bouleaux, 20 % autres. 
 </p>
 <p>
 La cartographie se présente sous la forme d’une collection de couches cartographiques au format raster. 
 Pour chaque essence, une carte renseigne le pourcentage en GHA (valeur variant de 0 à 100%). 
-En plus de ces 9 raster, une couche synthétique nommée "Essence majoritaire" renseigne l'essence majoritaire du peuplement. 
+En plus de ces 9 rasters, une couche synthétique nommée "Essence majoritaire" renseigne l'essence majoritaire du peuplement. 
 </p>
 <!--La composition spécifique attribuée à un pixel résulte de l’analyse du peuplement dans lequel il se trouve. Cette carte fournit donc une information valorisable à l’échelle de la parcelle et non de l’arbre.</p>
 
@@ -171,7 +171,7 @@ Version d'octobre 2021
 </message>
 
 <message id="COMPO.logs">
-Octobre 2021 ; passage à une résolution de 2.5 m (auparavant 10 m). Les cartes renseignent dorénavant la proportion de l'essence en pourcentage de gha (précédemment "probabilité de présence").
+Octobre 2021 ; passage à une résolution de 2,5 m (auparavant 10 m). Les cartes renseignent dorénavant la proportion de l'essence en pourcentage de gha (précédemment "probabilité de présence").
 </message>
 
 <message id="ES_EP.logs">
@@ -183,7 +183,7 @@ Pour la délimitation de la zone en pessière, utilisation de la dernière versi
 <message id="intro_telechargement">
 <h1>Téléchargement des couches cartographiques</h1>
 
-Il y a trois manière de télécharger les cartes pour une utilisation dans votre logiciel de Système d'Information Géographique. Les couches cartographiques sont des raster au format Geotif et ceux-ci sont accompagnés d'un fichier de symbologie spécifique au logiciel Qgis.
+Il y a trois manières de télécharger les cartes pour une utilisation dans votre logiciel de Système d'Information Géographique. Les couches cartographiques sont des rasters au format Geotif et ceux-ci sont accompagnés d'un fichier de symbologie spécifique au logiciel Qgis.
 <br></br>
 La manière la plus directe est l'utilisation du bouton Télécharger situé sous la fenêtre reprenant votre sélection de couches cartographiques. Cette méthode permet de télécharger la carte qui est tout en haut dans la liste de couche. La carte est découpée pour épouser l'emprise affichée avant son téléchargement.
 <figure class="highlight">
@@ -199,13 +199,13 @@ La deuxième méthode permet de télécharger en une fois un ensemble de cartes 
 </figcaption>
 </figure>
 <br></br>
-Enfin, la dernière méthode permet le téléchargement des couches dans leur entièreté, c'est à dire sans découpage préalable.
+Enfin, la dernière méthode permet le téléchargement des couches dans leur entièreté, c-est-à-dire sans découpage préalable.
 Les couches cartographiques téléchargeables sont listées dans le tableau ci-dessous.
 </message>
 
 <message id="titre.tab.download"> Couches cartographiques </message>
-<message id="colWMS.tab.download"> adresse WMS</message>
-<message id="colWMSname.tab.download"> nom de la couche WMS</message>
+<message id="colWMS.tab.download"> Adresse WMS</message>
+<message id="colWMSname.tab.download"> Nom de la couche WMS</message>
 <message id="colSize.tab.download"> Taille</message>
 
 

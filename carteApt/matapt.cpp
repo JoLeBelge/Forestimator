@@ -24,7 +24,6 @@ matApt::matApt(std::shared_ptr<cdicoAptBase> aDicoApt):mDicoApt(aDicoApt),zbio_(
     mEco->elementAt(2,0)->setRowSpan(14);
     mEco->elementAt(2,0)->addWidget(cpp14::make_unique<WText>(tr("eco.NH.titre")));
 
-
     int addr(2),addc(2);
     // création de toutes les cellulles de l'écogramme
     for (auto kvNH : *mDicoApt->NH()){
@@ -72,6 +71,7 @@ matApt::matApt(std::shared_ptr<cdicoAptBase> aDicoApt):mDicoApt(aDicoApt),zbio_(
     WContainerWidget * contApt = layoutDroite->addWidget(cpp14::make_unique<WContainerWidget>());
     contApt->setOverflow(Wt::Overflow::Auto);
     mAptTable= contApt->addNew<WTable>();
+    contApt->addNew<Wt::WText>(tr("matApt.asterisque.doubleApt"));
 }
 
 void matApt::hoverEco(WContainerWidget * c, bool hover){
