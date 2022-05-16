@@ -31,10 +31,12 @@ private:
      Wt::WTable * mAptTable;
      WComboBox * zbioSelection_;
 
-     void hoverEco(WContainerWidget *c, bool hover);
+     void hoverBubble(WContainerWidget *c, bool hover);
      void clicEco(std::tuple<int,int> ntnh);
      void trierEss(std::tuple<int,int> ntnh, int zbio);
      void changeZbio();
+     void displayNiche(std::string aEssCode);
+     void resetEco();
 
      std::vector<std::vector<std::shared_ptr<cEss>>> mVEss;
      std::map<std::tuple<int,int>, Wt::WContainerWidget *> mMapCircleEco;

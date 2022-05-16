@@ -743,8 +743,12 @@ Un suivi de l'état sanitaire des pessières est réalisé en vue d'identifier l
 <message id="meta.desc.masque-forestier"> Cela semble simple, mais discriminer précisément les zones forestières, haies et arbres isolés d'une part, des surfaces non boisées d'autre part, n'est pas trivial. Le masque forestier est dédié à cet usage : il nous informe ou se trouve la forêt en Région Wallonne. </message>
 <message id="meta.titre.masque-forestier">Le masque forestier nous renseigne là où il y a de la forêt</message>
 
-<message id="meta.desc.forestimator-api">Des géo-services permettent d'effectuer des calculs à l'échelle d'une surface délimitée par un polygone, dans le but de préparer un plan d'aménagement sur une propriété forestière. </message>
 <message id="meta.titre.forestimator-api">Les géo-services de la plateforme Forestimator</message>
+<message id="meta.desc.forestimator-api">Des géo-services permettent d'effectuer des calculs à l'échelle d'une surface délimitée par un polygone, dans le but de préparer un plan d'aménagement sur une propriété forestière. </message>
+
+<message id="meta.titre.forestimator-api">Capacité de Réserve en eau des sols</message>
+<message id="meta.desc.r_serve-en-eau"> Cartographie de la réserve eau des sols pour une meilleure perception de la vulnérabilité des stations forestières.</message>
+
 
 <message id="cadastre.commune">Commune / INS</message>
 <message id="cadastre.division">Division</message>

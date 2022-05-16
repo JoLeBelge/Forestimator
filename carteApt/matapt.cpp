@@ -2,7 +2,10 @@
 
 matApt::matApt(std::shared_ptr<cdicoAptBase> aDicoApt):mDicoApt(aDicoApt),zbio_(1)
 {
-    WHBoxLayout * layoutGlobal = setLayout(cpp14::make_unique<WHBoxLayout>());
+    setOverflow(Wt::Overflow::Auto);
+    WVBoxLayout * layoutGlobalA = setLayout(cpp14::make_unique<WVBoxLayout>());
+    WContainerWidget * cA = layoutGlobalA->addWidget(cpp14::make_unique<WContainerWidget>());
+    WHBoxLayout * layoutGlobal = cA->setLayout(cpp14::make_unique<WHBoxLayout>());
     layoutGlobal->setContentsMargins(0,0,0,0);
     WContainerWidget * contG = layoutGlobal->addWidget(cpp14::make_unique<WContainerWidget>());
     // on commence avec tableau ecogramme:
@@ -43,10 +46,10 @@ matApt::matApt(std::shared_ptr<cdicoAptBase> aDicoApt):mDicoApt(aDicoApt),zbio_(
                 c->setId("ntnh"+std::to_string(codeNT)+std::to_string(codeNH));
                 mMapCircleEco.emplace(std::make_pair(ntnh,c));
                 tc->mouseWentOver().connect([=] {
-                    this->hoverEco(c,1);
+                    hoverBubble(c,1);
                 });
                 tc->mouseWentOut().connect([=] {
-                    this->hoverEco(c,0);
+                    hoverBubble(c,0);
                 });
                 tc->clicked().connect(std::bind(&matApt::clicEco,this,ntnh));
             }
@@ -72,9 +75,13 @@ matApt::matApt(std::shared_ptr<cdicoAptBase> aDicoApt):mDicoApt(aDicoApt),zbio_(
     contApt->setOverflow(Wt::Overflow::Auto);
     mAptTable= contApt->addNew<WTable>();
     contApt->addNew<Wt::WText>(tr("matApt.asterisque.doubleApt"));
+    // partie documentation
+    WContainerWidget * cB = layoutGlobalA->addWidget(cpp14::make_unique<WContainerWidget>(),1);
+    cB->addNew<Wt::WText>(tr("matApt.documentation"));
+    cB->setOverflow(Wt::Overflow::Auto);
 }
 
-void matApt::hoverEco(WContainerWidget * c, bool hover){
+void matApt::hoverBubble(WContainerWidget * c, bool hover){
     // if(hover){c->addStyleClass("circle_eco_large");} else {c->setStyleClass("circle_eco");}
     if(hover){c->addStyleClass("circle_eco_large");} else {c->removeStyleClass("circle_eco_large");}
 }
@@ -129,10 +136,12 @@ void matApt::clicEco(std::tuple<int,int> ntnh){
 
                 c->addStyleClass("circle_eco");
                 c->mouseWentOver().connect([=] {
-                    this->hoverEco(c,1);
+                    hoverBubble(c,1);
+                    displayNiche(aV.at(n)->Code());
                 });
                 c->mouseWentOut().connect([=] {
-                    this->hoverEco(c,0);
+                    hoverBubble(c,0);
+                    resetEco();
                 });
                 c->setToolTip(aV.at(n)->Nom());
                 //if(aV.at(n)->Code()=="EC"){ std::cout << " érable champêtre, aptitude zbio climatique " << mDicoApt->code2AptFull(aV.at(n)->getApt(zbio_)) << ", aptitude HT " << mDicoApt->code2AptFull(aV.at(n)->getApt(nt,nh,zbio_,false)) << std::endl;}
@@ -159,9 +168,10 @@ void matApt::clicEco(std::tuple<int,int> ntnh){
                     messageBox->buttonClicked().connect([=] {
                         this->removeChild(messageBox);
                     });
-                    messageBox->show();
-
+                    messageBox->show();                                     
                 });
+
+
                 col++;
                 if (col+1>ncells){col=0;r++;}
             }
@@ -177,7 +187,29 @@ void matApt::clicEco(std::tuple<int,int> ntnh){
             kv.second->removeStyleClass("circle_eco_large");
         }
     }
+}
 
+void matApt::displayNiche(std::string aEssCode){
+    std::shared_ptr<cEss> ess=mDicoApt->getEss(aEssCode);
+    // boucle sur tout les ntnh de l'écogramme
+    for (auto kv : mMapCircleEco){
+        int nt=std::get<0>(kv.first);
+        int nh=std::get<1>(kv.first);
+        // récupérer l'aptitude
+        int apt=ess->getApt(nt,nh,zbio_,false);
+        // choisir la couleur en fonction de l'aptitude
+         std::string styleName("col-apt"+std::to_string(mDicoApt->AptNonContraignante(apt)));
+         kv.second->addStyleClass(styleName);
+    }
+}
+
+void matApt::resetEco(){
+        for (auto kv : mMapCircleEco){
+             kv.second->removeStyleClass("col-apt1");
+             kv.second->removeStyleClass("col-apt2");
+             kv.second->removeStyleClass("col-apt3");
+             kv.second->removeStyleClass("col-apt4");
+        }
 }
 
 void matApt::trierEss(std::tuple<int,int> ntnh, int zbio){
@@ -192,7 +224,7 @@ void matApt::trierEss(std::tuple<int,int> ntnh, int zbio){
                 if (ess->hasFEEApt()){
                     if(mDicoApt->AptNonContraignante(ess->getApt(zbio))==aptZbio){
                         if (mDicoApt->AptNonContraignante(ess->getApt(nt,nh,zbio,false))==aptHT){
-                            if(ess->Code()=="SO"){ std::cout << " SO, aptitude zbio climatique " << ess->getApt(zbio) << ", aptitude HT " << ess->getApt(nt,nh,zbio,false) << std::endl;}
+                            //if(ess->Code()=="SO"){ std::cout << " SO, aptitude zbio climatique " << ess->getApt(zbio) << ", aptitude HT " << ess->getApt(nt,nh,zbio,false) << std::endl;}
                             aV.push_back(ess);
                         }
                     }

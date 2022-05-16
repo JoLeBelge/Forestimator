@@ -230,7 +230,7 @@ Les couches cartographiques téléchargeables sont listées dans le tableau ci-d
 <message id="AE.description">
  <p>Selon leur position dans le paysage, les stations sont plus ou moins approvisionnées en eau. Trois classes différentes sont déterminées.</p>
             <p><strong>Classe C : zone d’apports d’eau permanents.&nbsp;</strong>Zone constamment alimentée en eau, qui est liée au réseau hydrographique par sa position de fond de vallée ou en relation avec des zones de sources. Ce sont le plus souvent des sols alluvionnaires.</p>
-            <p><strong>Classe B : zone d’apports d’eau variables.&nbsp;</strong>Zone située dans des bas de versants, replats, concavités, vallons. Lors des périodes pluvieuses, les sols de ces situations topographiques sont occasionnellement réalimentés en eau par les écoulements provenant du versant (ruissellement, écoulements hypodermiques, etc.). Ils ont donc un statut hydrique amélioré par rapport aux plateaux et aux versants.</p>
+            <p><strong>Classe B : zone d’apports d’eau variables.&nbsp;</strong>Zone située dans des bas de versants, replats, concavités, vallons. Lors des périodes pluvieuses, les sols de ces situations topographiques sont occasionnellement réalimentés en eau par les écoulements provenant du versant (ruissellements, écoulements hypodermiques, etc.). Ils ont donc un statut hydrique amélioré par rapport aux plateaux et aux versants.</p>
             <p><strong>Classe A : zone sans apports d’eau latéraux.&nbsp;</strong>Zone où l’humidité du sol est essentiellement liée aux pluies et à la capacité de rétention et de percolation des sols. Il s’agit de sols de plateau ou de pente (pleine pente, hauts de versant, convexités) où l’eau s’évacue rapidement en suivant le relief. Dans ce cas, la situation se rétablit généralement en cours de saison de végétation par la consommation d'eau par la végétation. On qualifie de "sols à régime hydrique alternatif" (RHA) ces sols engorgés pendant une partie de l'année.</p>
    <p><img src="../img/ae.png" alt="" width="90%"/></p>
 </message>
@@ -244,7 +244,7 @@ Les couches cartographiques téléchargeables sont listées dans le tableau ci-d
 </p>
             <p><strong>Les fonds de vallées encaissées (sous-secteur froid)</strong>. Dans les vallées encaissées, le fond de vallée est généralement ombragé. De plus, il est sujet à l’accumulation et à la stagnation du froid (qui peut provoquer de sévères gelées tardives) et de l’humidité, à l’origine de fréquents brouillards. 
 &nbsp;</p>
-            <p>Une attention particulière doit également être apportée aux situations topographiques qui provoquent des accumulations d’air froid, communément appelées « trous à gelées ». Ces situations ne sont pas formalisées sur la coupe topographique car elles peuvent être très diverses et relèvent de l’expérience locale (dépressions, plateaux, concavités, <em>etc.</em>) ; il est néanmoins essentiel d’identifier ces situations en regard de le la sensibilité des essences aux gels hors saisons. 
+            <p>Une attention particulière doit également être apportée aux situations topographiques qui provoquent des accumulations d’air froid, communément appelées « trous à gelées ». Ces situations ne sont pas formalisées sur la coupe topographique car elles peuvent être très diverses et relèvent de l’expérience locale (dépressions, plateaux, concavités, <em>etc.</em>) ; il est néanmoins essentiel d’identifier ces situations en regard de la sensibilité des essences aux gels hors saisons. 
 Enfin, outre ces considérations purement microclimatiques, on note que bien souvent, les situations de pentes fortes s’accompagnent d’une profondeur de sol réduite (bien que ceci ne soit pas systématique), induisant de ce fait un risque pour les espèces à fort besoin en eau. 
 </p>
             <p>&nbsp;</p>
@@ -257,7 +257,7 @@ Enfin, outre ces considérations purement microclimatiques, on note que bien sou
             <p>Quatre niveaux d’aptitude ont été définis dans le Fichier écologique des essences.</p>
             <p><strong>Optimum.</strong>&nbsp;L’essence est <strong>parfaitement en adéquation </strong>avec la station en termes de vitalité, stabilité et productivité. L’essence peut être cultivée sans restriction.  </p>
             <p><strong>Tolérance.</strong>&nbsp;<strong>Certaines caractéristiques de la station engendrent une contrainte pour la vitalité, la stabilité ou la productivité de l’essence</strong>. Par exemple : un sol un peu trop humide limite la puissance de l’enracinement et prédispose l’arbre aux chablis. Il y a donc lieu d’adapter la sylviculture à ces contraintes. Dans le cas ci-dessus, ce pourrait être en dynamisant la sylviculture pour favoriser l’accroissement individuel des arbres, ce qui écourterait la révolution et limiterait la durée d’exposition des arbres adultes aux risques de tempête.</p>
-            <p><strong>Tolérance élargie.</strong>&nbsp;S’il n’est pas envisageable de produire du bois de qualité sur la station, l’essence n’est pas forcément à exclure. <strong>Si elle est capable d’y survivre et de se reproduire, avec certes une productivité dérisoire ou une forme rédhibitoire, elle peut toutefois apporter ses services à l’écosystème ou au peuplement principal. </strong>Dans ces situations, l’utilisation de l’essence se limite alors à un rôle d’accompagnement pour des raisons écologiques ou sylvicoles. Il va de soi que l’on réserve cette classe d’aptitude aux essences qui sont bénéfiques à l’écosystème par leur fane, leur couvert, leur biodiversité associée ou toute autre caractéristique positive (cas de l’aulne glutineux sur argiles blanches en haute Ardenne, par exemple).</p>
+            <p><strong>Tolérance élargie.</strong>&nbsp;S’il n’est pas envisageable de produire du bois de qualité sur la station, l’essence n’est pas forcément à exclure. <strong>Si elle est capable d’y survivre et de se reproduire, avec certes une productivité dérisoire ou une forme rédhibitoire, elle peut toutefois apporter ses services à l’écosystème ou au peuplement principal. </strong>Dans ces situations, l’utilisation de l’essence se limite alors à un rôle d’accompagnement pour des raisons écologiques ou sylvicoles. Il va de soi que l’on réserve cette classe d’aptitude aux essences qui sont bénéfiques à l’écosystème par leur fane, leur couvert, leur biodiversité associée ou toute autre caractéristique positive (cas de l’aulne glutineux sur argiles blanches en Haute Ardenne, par exemple).</p>
             <p><strong>Exclusion.</strong>&nbsp;L’essence est <strong>incapable de se développer à long terme sur la station</strong>, très sensible aux dépérissements, aux maladies, aux chablis, aux gelées, <em>etc</em>. En d’autres termes, les contraintes environnementales sont rédhibitoires.</p>
             <p>&nbsp;</p>
             <p><img src="../img/aptitude.jpg"  width="90%" alt=""/></p>
@@ -273,8 +273,8 @@ Enfin, outre ces considérations purement microclimatiques, on note que bien sou
 </message>
 
 <message id="MNT.description">
-<p>Modèle Numérique de Terrain (MNT) de la Wallonie d'une résolution d'un mètre issu d'acquisitions Lidar effectuées entre le 12/12/2012 et le 09/03/2014.</p>
-<p>Un Modèle Numérique de Terrain (MNT) est une représentation de l'altitude du sol d'une zone déterminée et exclut tous les éléments situés à la surface du sol (bâtiments, ponts, végétation, véhicules, etc.). Cette donnée raster fournit une information sur l'altitude du sol (Z) en tout point du territoire wallon. Il s'agit d'une couverture brute, non lissée.L'acquisition de la donnée a été réalisée avec la technologie Lidar.Certaines parties très réduites du territoire (notamment les plans d'eau) n'ont pu faire l'objet d'une acquisition de données par la méthode Lidar. Néanmoins, pour fournir une information sur l'altimétrie (Z) dans ces zones, une interpolation a été réalisée afin de garantir une continuité sur toute la Wallonie.</p>
+<p>Modèle Numérique de Terrain (MNT) de la Wallonie d'une résolution d'un mètre issu d'acquisitions LiDAR effectuées entre le 12/12/2012 et le 09/03/2014.</p>
+<p>Un Modèle Numérique de Terrain (MNT) est une représentation de l'altitude du sol d'une zone déterminée et exclut tous les éléments situés à la surface du sol (bâtiments, ponts, végétation, véhicules, etc.). Cette donnée raster fournit une information sur l'altitude du sol (Z) en tout point du territoire wallon. Il s'agit d'une couverture brute, non lissée.L'acquisition de la donnée a été réalisée avec la technologie LiDAR.Certaines parties très réduites du territoire (notamment les plans d'eau) n'ont pu faire l'objet d'une acquisition de données par la méthode LiDAR. Néanmoins, pour fournir une information sur l'altimétrie (Z) dans ces zones, une interpolation a été réalisée afin de garantir une continuité sur toute la Wallonie.</p>
 <p>Le système de coordonnées de la donnée est le Lambert Belge 72 (EPSG:31370). La référence altimétrique est le Deuxième Nivellement Général (EPSG:5710). La précision planimétrique est inférieure à la résolution du MNS (1 m), et la précision altimétrique est de l'ordre de 0,12 m en absolu sur l'ensemble du territoire.</p>
 </message>
 
@@ -308,7 +308,7 @@ Le masque forestier est le résultat de la combinaison de 5 masques ligneux : <b
 <br></br>Valeur du pixel : 0 =&gt; hors forêt, 1  =&gt; en forêt
 <br></br>
 <br></br>
-Les données de base utilisées sont les orthophotos ("TrueOrtho") du SPW et les modèles numériques de hauteur (obtenu par photogrammétrie et réalisé par Gembloux Agro-Bio Tech, Forest is Life) pour les 5 "années".
+Les données de base utilisées sont les orthophotos ("TrueOrtho") du SPW et les Modèles Numériques de Hauteur (obtenus par photogrammétrie et réalisés par Gembloux Agro-Bio Tech, Forest is Life) pour les 5 "années".
 <br></br>
 <br></br>
 Considérant la période complète (2006-2018):
@@ -327,7 +327,7 @@ La zone forestière considérée correspond aux affectations R02 (forestière), 
 Utilisation des couches IGN Top10 pour identifier et masquer les routes de plus de 6 m de largeur, les bâtiments et les eaux stagnantes.
 <br></br><br></br>
 La précision globale de la couche a été estimée par photointerprétation à 99%.
-La photointerprétation a été réalisée sur 4221 points sur l'ensemble de la Wallonie (sous-échantillonnage de l'Inventaire Permanent de Ressources Forestières de Wallonie). 
+La photointerprétation a été réalisée sur 4221 points sur l'ensemble de la Wallonie (sous-échantillonnage de l'Inventaire permanent des Ressources forestières de Wallonie). 
 </message>
 
 <message id="ana.pt.export.pdf">Export PDF</message>
