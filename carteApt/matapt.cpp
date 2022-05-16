@@ -2,8 +2,13 @@
 
 matApt::matApt(std::shared_ptr<cdicoAptBase> aDicoApt):mDicoApt(aDicoApt),zbio_(1)
 {
+    WContainerWidget * global = addWidget(cpp14::make_unique<WContainerWidget>());
     setOverflow(Wt::Overflow::Auto);
-    WVBoxLayout * layoutGlobalA = setLayout(cpp14::make_unique<WVBoxLayout>());
+    setFlexBox(0);
+    //setInline(0);
+    setId("matAptCont");
+    // il faut enlever le flex du conteneur global
+    WVBoxLayout * layoutGlobalA = global->setLayout(cpp14::make_unique<WVBoxLayout>());
     WContainerWidget * cA = layoutGlobalA->addWidget(cpp14::make_unique<WContainerWidget>());
     WHBoxLayout * layoutGlobal = cA->setLayout(cpp14::make_unique<WHBoxLayout>());
     layoutGlobal->setContentsMargins(0,0,0,0);
@@ -168,6 +173,7 @@ void matApt::clicEco(std::tuple<int,int> ntnh){
                     messageBox->buttonClicked().connect([=] {
                         this->removeChild(messageBox);
                     });
+                    messageBox->setMinimumSize("40%","30%");
                     messageBox->show();                                     
                 });
 
