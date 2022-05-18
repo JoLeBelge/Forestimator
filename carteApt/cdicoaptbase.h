@@ -265,6 +265,12 @@ public:
         if (Dico_codeApt2col.find(aCode)!=Dico_codeApt2col.end()){aRes=Dico_codeApt2col.at(aCode);}
         return aRes;
     }
+    color getColor(std::string aCode){
+        color aRes(0,0,0);
+        if (colors.find(aCode)!=colors.end()){aRes=colors.at(aCode);
+        } else { std::cout << "color " << aCode << " not found"<< std::endl;}
+        return aRes;
+    }
 
 
 protected:

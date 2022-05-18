@@ -181,13 +181,6 @@ public:
     std::map<int,color> getDicoRasterCol(cKKCS * aKK);
 
 
-
-    color getColor(std::string aCode){
-        color aRes(0,0,0);
-        if (colors.find(aCode)!=colors.end()){aRes=colors.at(aCode);
-        } else { std::cout << "color " << aCode << " not found"<< std::endl;}
-        return aRes;
-    }
     bool lay4Visu(std::string aLayerCode){
         bool aRes(0);
         if (Dico_RasterVisu.find(aLayerCode)!=Dico_RasterVisu.end()){aRes=Dico_RasterVisu.at(aLayerCode);}

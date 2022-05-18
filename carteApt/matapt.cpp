@@ -1,13 +1,11 @@
 #include "matapt.h"
 
-matApt::matApt(std::shared_ptr<cdicoAptBase> aDicoApt):mDicoApt(aDicoApt),zbio_(1)
+matApt::matApt(std::shared_ptr<cdicoAptBase> aDicoApt):mDicoApt(aDicoApt),zbio_(1),nh_(10),nt_(10)
 {
-    WContainerWidget * global = addWidget(cpp14::make_unique<WContainerWidget>());
     setOverflow(Wt::Overflow::Auto);
-    setFlexBox(0);
-    //setInline(0);
     setId("matAptCont");
-    // il faut enlever le flex du conteneur global
+    // un nouveau div enfant car le parent est dans le stack, avec display flex, ce qui fait foirer un scroll général sur tout le contenu.
+    WContainerWidget * global = addWidget(cpp14::make_unique<WContainerWidget>());
     WVBoxLayout * layoutGlobalA = global->setLayout(cpp14::make_unique<WVBoxLayout>());
     WContainerWidget * cA = layoutGlobalA->addWidget(cpp14::make_unique<WContainerWidget>());
     WHBoxLayout * layoutGlobal = cA->setLayout(cpp14::make_unique<WHBoxLayout>());
@@ -65,16 +63,20 @@ matApt::matApt(std::shared_ptr<cdicoAptBase> aDicoApt):mDicoApt(aDicoApt),zbio_(
 
     WVBoxLayout * layoutDroite = contD->setLayout(cpp14::make_unique<WVBoxLayout>());
     WContainerWidget * contZbio = layoutDroite->addWidget(cpp14::make_unique<WContainerWidget>());
-    contZbio->addNew<Wt::WText>(tr("zbio.titre"));
-    contZbio->setMinimumSize("100%","100px");
-    contZbio->setMaximumSize("100%","100px");
+    WHBoxLayout * layoutzbio = contZbio->setLayout(cpp14::make_unique<WHBoxLayout>());
+    WContainerWidget * contZbioGauche = layoutzbio->addWidget(cpp14::make_unique<WContainerWidget>());
+    contZbioGauche->addWidget(std::make_unique<Wt::WText>(tr("zbio.titre")));
+    //contZbio->setMinimumSize("50%","100px");
+    //contZbio->setMaximumSize("50%","300px");
     //contZbio->addNew<Wt::WBreak>();
-    zbioSelection_  =contZbio->addNew<Wt::WComboBox>();
+    zbioSelection_  =contZbioGauche->addWidget(std::make_unique<Wt::WComboBox>());
     for (auto kv : *mDicoApt->ZBIO()){
         zbioSelection_->addItem(kv.second);
     }
     zbioSelection_->changed().connect(std::bind(&matApt::changeZbio,this));
     zbioSelection_->setCurrentIndex(0);
+    std::string  aShp=mDicoApt->File("ZBIOSIMP");
+    graphZbio = layoutzbio->addWidget(std::make_unique<zbioPainted>(aShp,mDicoApt));
 
     WContainerWidget * contApt = layoutDroite->addWidget(cpp14::make_unique<WContainerWidget>());
     contApt->setOverflow(Wt::Overflow::Auto);
@@ -92,9 +94,12 @@ void matApt::hoverBubble(WContainerWidget * c, bool hover){
 }
 
 void matApt::clicEco(std::tuple<int,int> ntnh){
+    nt_=std::get<0>(ntnh);
+    nh_=std::get<1>(ntnh);
+    displayMatApt();
+}
 
-    int nt=std::get<0>(ntnh);
-    int nh=std::get<1>(ntnh);
+void matApt::displayMatApt(){
 
     //std::cout << "clic Eco sur nt " << nt << ", nh " << nh << std::endl;
     mAptTable->clear();
@@ -102,19 +107,21 @@ void matApt::clicEco(std::tuple<int,int> ntnh){
     mAptTable->setHeaderCount(2);
     mAptTable->elementAt(0,2)->setColumnSpan(3);
     // titre colonne
-    mAptTable->elementAt(0,2)->addWidget(cpp14::make_unique<WText>(tr("aptHT.titre")+" NT "+mDicoApt->NT(nt) +", NH "+mDicoApt->NH(nh)));
+    mAptTable->elementAt(0,2)->addWidget(cpp14::make_unique<WText>(tr("aptHT.titre")+" NT "+mDicoApt->NT(nt_) +", NH "+mDicoApt->NH(nh_)));
     mAptTable->elementAt(1,2)->addWidget(cpp14::make_unique<WText>(tr("apt.t.O")));
     mAptTable->elementAt(1,3)->addWidget(cpp14::make_unique<WText>(tr("apt.t.T")));
     mAptTable->elementAt(1,4)->addWidget(cpp14::make_unique<WText>(tr("apt.t.TE")));
     mAptTable->elementAt(2,0)->setRowSpan(3);
-    mAptTable->elementAt(2,0)->addWidget(cpp14::make_unique<WText>(tr("aptZ.titre")));
-    //WText * titre =mAptTable->elementAt(2,0)->addWidget(cpp14::make_unique<WText>(tr("aptZ.titre")+" "+WString(mDicoApt->ZBIO(zbio_))));
-    //titre->setStyleClass("vertical-text");
+    //mAptTable->elementAt(2,0)->addWidget(cpp14::make_unique<WText>(tr("aptZ.titre")));
+
+    mAptTable->elementAt(2,0)->addWidget(cpp14::make_unique<WText>("<strong class='vertical-text'><span>Aptitude climatique : "+WString(mDicoApt->ZBIO(zbio_))+"</span></strong>"));
+    mAptTable->elementAt(2,0)->addStyleClass("rel-pos");
     mAptTable->elementAt(2,1)->addWidget(cpp14::make_unique<WText>(tr("apt.t.O")));
     mAptTable->elementAt(3,1)->addWidget(cpp14::make_unique<WText>(tr("apt.t.T")));
     mAptTable->elementAt(4,1)->addWidget(cpp14::make_unique<WText>(tr("apt.t.TE")));
 
     // boucle sur toutes les essences pour déterminer dans quelles cellules elles se situent
+    std::tuple<int,int> ntnh(nt_,nh_);
     trierEss(ntnh,zbio_);
     // on commence avec un tableau 3x3
     for (int aptZbio : {1,2,3}){
@@ -136,17 +143,19 @@ void matApt::clicEco(std::tuple<int,int> ntnh){
                 std::string text(aV.at(n)->Code());
                 // check si double apt
                 if (mDicoApt->isDoubleApt(aV.at(n)->getApt(zbio_))){text+="*";}
-                if (mDicoApt->isDoubleApt(aV.at(n)->getApt(nt,nh,zbio_,false))){text+="*";}
+                if (mDicoApt->isDoubleApt(aV.at(n)->getApt(nt_,nh_,zbio_,false))){text+="*";}
                 c->addNew<Wt::WText>(text);
 
                 c->addStyleClass("circle_eco");
                 c->mouseWentOver().connect([=] {
                     hoverBubble(c,1);
                     displayNiche(aV.at(n)->Code());
+                    graphZbio->displayAptMap(aV.at(n)->Code());
                 });
                 c->mouseWentOut().connect([=] {
                     hoverBubble(c,0);
                     resetEco();
+                    graphZbio->selectZbio(zbio_);
                 });
                 c->setToolTip(aV.at(n)->Nom());
                 //if(aV.at(n)->Code()=="EC"){ std::cout << " érable champêtre, aptitude zbio climatique " << mDicoApt->code2AptFull(aV.at(n)->getApt(zbio_)) << ", aptitude HT " << mDicoApt->code2AptFull(aV.at(n)->getApt(nt,nh,zbio_,false)) << std::endl;}
@@ -160,7 +169,7 @@ void matApt::clicEco(std::tuple<int,int> ntnh){
                                                                       Wt::StandardButton::Ok));
                     messageBox->contents()->addNew<Wt::WText>("Aptitude bioclimatique : " + mDicoApt->code2AptFull(aV.at(n)->getApt(zbio_)));
                     messageBox->contents()->addNew<Wt::WBreak>();
-                    messageBox->contents()->addNew<Wt::WText>("Aptitude hydro-trophique : " + mDicoApt->code2AptFull(aV.at(n)->getApt(nt,nh,zbio_,false)));
+                    messageBox->contents()->addNew<Wt::WText>("Aptitude hydro-trophique : " + mDicoApt->code2AptFull(aV.at(n)->getApt(nt_,nh_,zbio_,false)));
                     messageBox->contents()->addNew<Wt::WBreak>();
                     Wt::WLink l("https://www.fichierecologique.be/resources/fee/FEE-"+aV.at(n)->Code()+".pdf");
                     l.setTarget(Wt::LinkTarget::NewWindow);
@@ -174,7 +183,7 @@ void matApt::clicEco(std::tuple<int,int> ntnh){
                         this->removeChild(messageBox);
                     });
                     messageBox->setMinimumSize("40%","30%");
-                    messageBox->show();                                     
+                    messageBox->show();
                 });
 
 
@@ -204,18 +213,18 @@ void matApt::displayNiche(std::string aEssCode){
         // récupérer l'aptitude
         int apt=ess->getApt(nt,nh,zbio_,false);
         // choisir la couleur en fonction de l'aptitude
-         std::string styleName("col-apt"+std::to_string(mDicoApt->AptNonContraignante(apt)));
-         kv.second->addStyleClass(styleName);
+        std::string styleName("col-apt"+std::to_string(mDicoApt->AptNonContraignante(apt)));
+        kv.second->addStyleClass(styleName);
     }
 }
 
 void matApt::resetEco(){
-        for (auto kv : mMapCircleEco){
-             kv.second->removeStyleClass("col-apt1");
-             kv.second->removeStyleClass("col-apt2");
-             kv.second->removeStyleClass("col-apt3");
-             kv.second->removeStyleClass("col-apt4");
-        }
+    for (auto kv : mMapCircleEco){
+        kv.second->removeStyleClass("col-apt1");
+        kv.second->removeStyleClass("col-apt2");
+        kv.second->removeStyleClass("col-apt3");
+        kv.second->removeStyleClass("col-apt4");
+    }
 }
 
 void matApt::trierEss(std::tuple<int,int> ntnh, int zbio){
@@ -245,6 +254,8 @@ void matApt::changeZbio(){
     for (auto & kv : *mDicoApt->ZBIO()){
         if (kv.second==zbioSelection_->currentText()){zbio_=kv.first;}
     }
+    graphZbio->selectZbio(zbio_);
+    displayMatApt();
 }
 
 void matApt::receivePrediction(int aCode,std::vector<double> aVPredNT,std::vector<double> aVPredNH){
@@ -296,4 +307,139 @@ void matApt::receivePrediction(int aCode,std::vector<double> aVPredNT,std::vecto
             kv.second->removeStyleClass("circle_eco_phyto");
         }
     }
+}
+
+zbioPainted::zbioPainted(std::string  aShp, std::shared_ptr<cdicoAptBase> aDico)
+    : WPaintedWidget(),zbio_(1),shpPath(aShp),mSx(400),mSy(200),displayApt_(0),mDico(aDico),mlay(NULL)
+{
+    GDALAllRegister();
+    resize(mSx,mSy);   // Provide a default size.
+    const char *inputPath= shpPath.c_str();
+    if (boost::filesystem::exists(inputPath)){
+        mDS= GDALDataset::Open(inputPath, GDAL_OF_VECTOR | GDAL_OF_READONLY);
+        if( mDS == NULL )
+        {
+            std::cout << inputPath << " : " ;
+            printf( " shp zbio : pas réussi à l'ouvrir." );
+        } else{
+            // layer
+            std::cout << "zbioPainted création " << std::endl;
+            mlay = mDS->GetLayer(0);
+            ext= new OGREnvelope;
+            mlay->GetExtent(ext);
+            // taille de l'emprise de l'image  - mettre tout ça une fois dans le constructeur.
+            mWx=ext->MaxX-ext->MinX;
+            mWy=ext->MaxY-ext->MinY;
+        }
+    } else {std::cout << inputPath << " : n'existe pas (zbioPainted::zbioPainted)" << std::endl;}
+}
+
+void zbioPainted::paintEvent(Wt::WPaintDevice *paintDevice){
+    //std::cout << " zbioPainted::paintEvent" << std::endl;
+    Wt::WPainter painter(paintDevice);
+    if(mlay!=NULL){
+        OGRFeature *poFeature;
+         mlay->ResetReading();
+        while( (poFeature = mlay->GetNextFeature()) != NULL )
+        {
+            int currentZbio=poFeature->GetFieldAsInteger("Zbio");
+            if (displayApt_){
+                // choix de la couleur en fonction de l'aptitude de l'essence
+                Wt::WPen pen0(Wt::WColor(Wt::StandardColor::Black));
+                pen0.setWidth(1);
+                painter.setPen(pen0);
+                int apt =mDico->getEss(essCoce_)->getApt(currentZbio);
+                color col= mDico->Apt2col(apt);
+                painter.setBrush(Wt::WBrush(Wt::WColor(col.mR,col.mG,col.mB)));
+            } else {
+                if (currentZbio==zbio_){
+                    Wt::WPen pen0(Wt::WColor(Wt::StandardColor::Yellow));
+                    pen0.setWidth(3);
+                    painter.setPen(pen0);
+                    painter.setBrush(Wt::WBrush(Wt::WColor(Wt::StandardColor::Yellow)));
+                } else {
+                    Wt::WPen pen0(Wt::WColor(Wt::StandardColor::Black));
+                    pen0.setWidth(1);
+                    painter.setPen(pen0);
+                    painter.setBrush(Wt::WBrush(Wt::WColor(Wt::StandardColor::Green)));
+                }
+            }
+            // on parcours la géométrie
+            switch (poFeature->GetGeometryRef()->getGeometryType()){
+            case (wkbPolygon):
+            {
+                OGRPolygon * pol =poFeature->GetGeometryRef()->toPolygon();
+                drawPol(pol,&painter);
+                break;
+            }
+            case wkbMultiPolygon:
+            {
+                OGRMultiPolygon * mulP = poFeature->GetGeometryRef()->toMultiPolygon();
+                int n(mulP->getNumGeometries());
+                for (int i(0);i<n;i++){
+                    OGRGeometry * subGeom=mulP->getGeometryRef(i);
+                    if (subGeom->getGeometryType()==wkbPolygon){
+                        OGRPolygon * pol =subGeom->toPolygon();
+                        drawPol(pol, &painter);
+                    }
+                }
+                break;
+            }
+            }
+        }
+    }
+
+}
+
+void zbioPainted::drawPol(OGRPolygon * pol, WPainter *painter){
+    //std::cout << " zbioPainted::drawPol" << std::endl;
+    if (pol){
+        OGRPoint ptTemp1, ptTemp2;
+        std::vector<Wt::WLineF> aVLines;
+        int NumberOfVertices = pol->getExteriorRing()->getNumPoints();
+        //std::cout << "number of verticiles " << std::endl;
+
+        Wt::WPainterPath pp = Wt::WPainterPath();
+        for ( int k = 0; k < NumberOfVertices-1; k++ )
+        {
+
+            pol->getExteriorRing()->getPoint(k,&ptTemp1);
+            pol->getExteriorRing()->getPoint(k+1,&ptTemp2);
+            aVLines.push_back(WLineF(xGeo2Im(ptTemp1.getX()),yGeo2Im(ptTemp1.getY()),xGeo2Im(ptTemp2.getX()),yGeo2Im(ptTemp2.getY())));
+            if (k==0){pp.moveTo(xGeo2Im(ptTemp1.getX()),yGeo2Im(ptTemp1.getY()));} else {pp.lineTo(xGeo2Im(ptTemp1.getX()),yGeo2Im(ptTemp1.getY()));}
+        }
+        pp.closeSubPath();
+        painter->drawPath(pp);
+
+        // ajout segment final
+        pol->getExteriorRing()->getPoint(0,&ptTemp1);
+        pol->getExteriorRing()->getPoint(NumberOfVertices-1,&ptTemp2);
+        aVLines.push_back(WLineF(xGeo2Im(ptTemp1.getX()),yGeo2Im(ptTemp1.getY()),xGeo2Im(ptTemp2.getX()),yGeo2Im(ptTemp2.getY())));
+
+        for (int c(0);c<pol->getNumInteriorRings();c++){
+            int NumberOfVertices =pol->getInteriorRing(c)->getNumPoints();;
+            for ( int k = 0; k < NumberOfVertices-1; k++ )
+            {
+                pol->getInteriorRing(c)->getPoint(k,&ptTemp1);
+                pol->getInteriorRing(c)->getPoint(k+1,&ptTemp2);
+                aVLines.push_back(WLineF(xGeo2Im(ptTemp1.getX()),yGeo2Im(ptTemp1.getY()),xGeo2Im(ptTemp2.getX()),yGeo2Im(ptTemp2.getY())));
+            }
+            // ajout segment final
+            pol->getInteriorRing(c)->getPoint(0,&ptTemp1);
+            pol->getInteriorRing(c)->getPoint(NumberOfVertices-1,&ptTemp2);
+            aVLines.push_back(WLineF(xGeo2Im(ptTemp1.getX()),yGeo2Im(ptTemp1.getY()),xGeo2Im(ptTemp2.getX()),yGeo2Im(ptTemp2.getY())));
+        }
+
+        painter->drawLines(aVLines);
+        //std::unique_ptr<Wt::WRectArea> rectA = Wt::cpp14::make_unique<Wt::WRectArea>(posX_.at(codeNT), posY_.at(codeNH), pixPerLevel,pixPerLevel);
+        //rectA->setToolTip(label);
+        //addArea(std::move(rectA));
+    } else { std::cout << "polygone is null" << std::endl;}
+}
+
+double zbioPainted::xGeo2Im(double x){
+    return mSx*(x-ext->MinX)/mWx;
+}
+double zbioPainted::yGeo2Im(double y){
+    return mSy-(mSy*(y-ext->MinY)/mWy);
 }

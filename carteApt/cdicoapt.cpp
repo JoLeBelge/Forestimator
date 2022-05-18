@@ -201,17 +201,7 @@ cDicoApt::cDicoApt(std::string aBDFile):cdicoAptBase(aBDFile)
         }
         sqlite3_finalize(stmt);
 
-        SQLstring="SELECT Code_Aptitude,Num,Equiv2Code,OrdreContrainte,Aptitude,col,surcote,souscote,EquCodeNonContr FROM dico_apt;";
-        sqlite3_prepare_v2( *db_, SQLstring.c_str(), -1, &stmt, NULL );
-        while(sqlite3_step(stmt) == SQLITE_ROW)
-        {
-            if (sqlite3_column_type(stmt, 0)!=SQLITE_NULL && sqlite3_column_type(stmt, 1)!=SQLITE_NULL && sqlite3_column_type(stmt, 2)!=SQLITE_NULL){
-                int aB=sqlite3_column_int( stmt, 1 );
-                std::string aF=std::string( (char *)sqlite3_column_text( stmt, 5 ) );
-                Dico_codeApt2col.emplace(std::make_pair(aB,getColor(aF)));
-            }
-        }
-        sqlite3_finalize(stmt);
+
 
         if (globTest){   std::cout << "crée toute les essences " << std::endl;}
 

@@ -11,9 +11,60 @@
 #include "Wt/WComboBox.h"
 #include "Wt/WMessageBox.h"
 #include "Wt/WBreak.h"
+#include <Wt/WImage.h>
+#include <Wt/WSvgImage.h>
+#include <Wt/WPaintDevice.h>
+#include <Wt/WPaintedWidget.h>
+#include <Wt/WPainter.h>
+
+// gdal pour ouvrir un shp et le mettre dans un painted widget. expérimental.
+#include "ogrsf_frmts.h"
+#include "gdal_utils.h"
 
 extern bool globTest2;
 using namespace  Wt;
+
+// inspiré de staticMap, forestimator
+class zbioPainted : public Wt::WPaintedWidget {
+public:
+    zbioPainted(std::string  aShp, std::shared_ptr<cdicoAptBase> aDico);
+    ~zbioPainted(){
+        if (mDS!=NULL){
+            GDALClose(mDS);
+        }
+    }
+    double xGeo2Im(double x);
+    double yGeo2Im(double y);
+
+    void drawPol(OGRPolygon * pol, Wt::WPainter * painter);
+    void selectZbio(int zbio) {
+    zbio_ = zbio;
+    displayApt_=0;
+    update();          // Trigger a repaint.
+    }
+
+    void displayAptMap(std::string essCode) {
+    displayApt_=1;
+    essCoce_=essCode;
+    update();          // Trigger a repaint. Oui mais comment avoir deux type de repaint différent? un pour la sélection de la zone bioclim, l'autre pour la carte d'aptitude bioclimatique d'une essence? en utilisant une variable membre!
+    }
+
+protected:
+    void paintEvent(Wt::WPaintDevice *paintDevice);
+
+private:
+    OGREnvelope * ext;
+    // taille de l'image en pixel
+    int mSx,mSy;
+    // taille de l'emprise de l'image en mètre
+    double mWx,mWy;
+    int zbio_;
+    bool displayApt_;
+    std::string shpPath, essCoce_;
+    std::shared_ptr<cdicoAptBase> mDico;
+    OGRLayer * mlay;
+    GDALDataset * mDS;
+};
 
 class matApt : public Wt::WContainerWidget
 {
@@ -38,9 +89,13 @@ private:
      void displayNiche(std::string aEssCode);
      void resetEco();
 
+     void displayMatApt();
+
      std::vector<std::vector<std::shared_ptr<cEss>>> mVEss;
      std::map<std::tuple<int,int>, Wt::WContainerWidget *> mMapCircleEco;
-     int zbio_;
+     int zbio_, nt_,nh_;
+     zbioPainted * graphZbio;
 };
+
 
 #endif // MATAPT_H
