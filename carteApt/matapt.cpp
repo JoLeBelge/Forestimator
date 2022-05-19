@@ -54,7 +54,8 @@ matApt::matApt(std::shared_ptr<cdicoAptBase> aDicoApt):mDicoApt(aDicoApt),zbio_(
                 tc->mouseWentOut().connect([=] {
                     hoverBubble(c,0);
                 });
-                tc->clicked().connect(std::bind(&matApt::clicEco,this,ntnh));
+                //tc->clicked().connect(std::bind(&matApt::clicEco,this,ntnh));
+                tc->clicked().connect(std::bind(&matApt::filterMouseEvent,this,std::placeholders::_1,ntnh));
             }
         }
     }
@@ -99,27 +100,9 @@ void matApt::clicEco(std::tuple<int,int> ntnh){
     displayMatApt();
 }
 
-void matApt::displayMatApt(){
-
+void matApt::displayMatApt(){   
     //std::cout << "clic Eco sur nt " << nt << ", nh " << nh << std::endl;
-    mAptTable->clear();
-    mAptTable->setStyleClass("table-AptGlob");
-    mAptTable->setHeaderCount(2);
-    mAptTable->elementAt(0,2)->setColumnSpan(3);
-    // titre colonne
-    mAptTable->elementAt(0,2)->addWidget(cpp14::make_unique<WText>(tr("aptHT.titre")+" NT "+mDicoApt->NT(nt_) +", NH "+mDicoApt->NH(nh_)));
-    mAptTable->elementAt(1,2)->addWidget(cpp14::make_unique<WText>(tr("apt.t.O")));
-    mAptTable->elementAt(1,3)->addWidget(cpp14::make_unique<WText>(tr("apt.t.T")));
-    mAptTable->elementAt(1,4)->addWidget(cpp14::make_unique<WText>(tr("apt.t.TE")));
-    mAptTable->elementAt(2,0)->setRowSpan(3);
-    //mAptTable->elementAt(2,0)->addWidget(cpp14::make_unique<WText>(tr("aptZ.titre")));
-
-    mAptTable->elementAt(2,0)->addWidget(cpp14::make_unique<WText>("<strong class='vertical-text'><span>Aptitude climatique : "+WString(mDicoApt->ZBIO(zbio_))+"</span></strong>"));
-    mAptTable->elementAt(2,0)->addStyleClass("rel-pos");
-    mAptTable->elementAt(2,1)->addWidget(cpp14::make_unique<WText>(tr("apt.t.O")));
-    mAptTable->elementAt(3,1)->addWidget(cpp14::make_unique<WText>(tr("apt.t.T")));
-    mAptTable->elementAt(4,1)->addWidget(cpp14::make_unique<WText>(tr("apt.t.TE")));
-
+    initAptTable(tr("aptHT.titre").toUTF8()+" NT "+mDicoApt->NT(nt_) +", NH "+mDicoApt->NH(nh_));
     // boucle sur toutes les essences pour déterminer dans quelles cellules elles se situent
     std::tuple<int,int> ntnh(nt_,nh_);
     trierEss(ntnh,zbio_);
@@ -133,6 +116,7 @@ void matApt::displayMatApt(){
             t1->setStyleClass("table-apt");
             std::string styleName("table-apt"+std::to_string(std::max(aptZbio,aptHT)));
             mAptTable->elementAt(rGlob,cGlob)->addStyleClass(styleName);
+            std::string styleNameCol("col-apt"+std::to_string(std::max(aptZbio,aptHT)));
             //std::cout << " aptZbio de " << aptZbio << ", aptHT de " << aptHT << ", cellulle " <<  aptZbio-1 << "," << aptHT-1 << ", nb Ess " << aV.size() << ", sytle " << styleName << std::endl;
             int r(0),col(0);
             for (int n(0);n<aV.size();n++){
@@ -147,6 +131,7 @@ void matApt::displayMatApt(){
                 c->addNew<Wt::WText>(text);
 
                 c->addStyleClass("circle_eco");
+                c->addStyleClass(styleNameCol);
                 c->mouseWentOver().connect([=] {
                     hoverBubble(c,1);
                     displayNiche(aV.at(n)->Code());
@@ -250,6 +235,30 @@ void matApt::trierEss(std::tuple<int,int> ntnh, int zbio){
     }
 }
 
+void matApt::trierEss(std::tuple<int,int> ntnh, int zbio, std::vector<std::vector<std::shared_ptr<cEss>>> * aVEss){
+    aVEss->clear();
+    int nt=std::get<0>(ntnh);
+    int nh=std::get<1>(ntnh);
+    for (int aptZbio : {1,2,3}){
+        for (int aptHT : {1,2,3}){
+            std::vector<std::shared_ptr<cEss>> aV;
+            for (auto kv : mDicoApt->getAllEss()){
+                std::shared_ptr<cEss> ess = kv.second;
+                if (ess->hasFEEApt()){
+                    if(mDicoApt->AptNonContraignante(ess->getApt(zbio))==aptZbio){
+                        if (mDicoApt->AptNonContraignante(ess->getApt(nt,nh,zbio,false))==aptHT){
+                            //if(ess->Code()=="SO"){ std::cout << " SO, aptitude zbio climatique " << ess->getApt(zbio) << ", aptitude HT " << ess->getApt(nt,nh,zbio,false) << std::endl;}
+                            aV.push_back(ess);
+                        }
+                    }
+                }
+            }
+            aVEss->push_back(aV);
+        }
+    }
+}
+
+
 void matApt::changeZbio(){
     for (auto & kv : *mDicoApt->ZBIO()){
         if (kv.second==zbioSelection_->currentText()){zbio_=kv.first;}
@@ -309,6 +318,162 @@ void matApt::receivePrediction(int aCode,std::vector<double> aVPredNT,std::vecto
     }
 }
 
+void matApt::initAptTable(std::string aNTNHTitle){
+    mAptTable->clear();
+    mAptTable->setStyleClass("table-AptGlob");
+    mAptTable->setHeaderCount(2);
+    mAptTable->elementAt(0,2)->setColumnSpan(3);
+    // titre colonne
+    mAptTable->elementAt(0,2)->addWidget(cpp14::make_unique<WText>( aNTNHTitle));
+    mAptTable->elementAt(1,2)->addWidget(cpp14::make_unique<WText>(tr("apt.t.O")));
+    mAptTable->elementAt(1,3)->addWidget(cpp14::make_unique<WText>(tr("apt.t.T")));
+    mAptTable->elementAt(1,4)->addWidget(cpp14::make_unique<WText>(tr("apt.t.TE")));
+    mAptTable->elementAt(2,0)->setRowSpan(3);
+    //mAptTable->elementAt(2,0)->addWidget(cpp14::make_unique<WText>(tr("aptZ.titre")));
+
+    mAptTable->elementAt(2,0)->addWidget(cpp14::make_unique<WText>("<strong class='vertical-text'><span>Aptitude climatique : "+WString(mDicoApt->ZBIO(zbio_))+"</span></strong>"));
+    mAptTable->elementAt(2,0)->addStyleClass("rel-pos");
+    mAptTable->elementAt(2,1)->addWidget(cpp14::make_unique<WText>(tr("apt.t.O")));
+    mAptTable->elementAt(3,1)->addWidget(cpp14::make_unique<WText>(tr("apt.t.T")));
+    mAptTable->elementAt(4,1)->addWidget(cpp14::make_unique<WText>(tr("apt.t.TE")));
+}
+
+void matApt::compareMatApt(std::vector<std::tuple<int,int>> aVntnh){
+    // pour l'instant, je fonctionne avec juste 2 niveaux
+    if (aVntnh.size()==2){
+        std::vector<std::vector<std::shared_ptr<cEss>>> aVEss2;
+        std::tuple<int,int> ntnh2 = aVntnh.at(1);
+        trierEss(ntnh2,zbio_,& aVEss2);
+        // boucle sur toutes les essences pour déterminer dans quelles cellules elles se situent
+        std::tuple<int,int> ntnh= aVntnh.at(0);
+        trierEss(ntnh,zbio_,& mVEss);// le tri pour le niveau de base je l'ai déjà dans mVEss; sauf si l'utilisateur veut comparer avant d'avoir sélectionné un niveau... donc je refais
+
+
+        int nt=std::get<0>(ntnh2);
+        int nh=std::get<1>(ntnh2);
+          initAptTable(tr("aptHT.titre").toUTF8()+" NT "+mDicoApt->NT(nt_) +", NH "+mDicoApt->NH(nh_) +" et NT " +mDicoApt->NT(nt)+", NH "+mDicoApt->NH(nh));
+
+        // il faudrait sortir ici toutes les espèces en commun et déplacer celles pas en commun au ntnh dans leur aptitude la plus contraignante
+        std::vector<std::vector<std::shared_ptr<cEss>>> aVVEssCommun;
+        std::vector<std::shared_ptr<cEss>> aVEssDiff; // d'abor on identifie toutes les essences qui ont des apt différentes
+        for (int aptZbio : {1,2,3}){
+            for (int aptHT : {1,2,3}){
+                std::vector<std::shared_ptr<cEss>> aV1=mVEss.at(aptHT+(3*(aptZbio-1))-1);
+                std::vector<std::shared_ptr<cEss>> aV2=aVEss2.at(aptHT+(3*(aptZbio-1))-1);
+                std::vector<std::shared_ptr<cEss>> aVEssCom;
+                getVEssCommun(aV1, aV2,aVEssCom, aVEssDiff);
+                aVVEssCommun.push_back(aVEssCom);
+            }
+        }
+        // on retrie les essences en fonction de leur aptitude la plus contraignante
+        // création du vecteur de vecteur, vide, mais de bonne dimension
+        std::vector<std::vector<std::shared_ptr<cEss>>> aVVEssDiff;
+        for (int aptZbio : {1,2,3}){
+            for (int aptHT : {1,2,3}){
+                std::vector<std::shared_ptr<cEss>> aV;
+                for (std::shared_ptr<cEss> ess : aVEssDiff){
+
+                        if(mDicoApt->AptNonContraignante(ess->getApt(zbio_))==aptZbio){
+                            int aptHT1 = mDicoApt->AptNonContraignante(ess->getApt(nt_,nh_,zbio_,false));
+                            int aptHT2 = mDicoApt->AptNonContraignante(ess->getApt(nt,nh,zbio_,false));
+                            if (std::min(aptHT1,aptHT2)==aptHT){
+                                aV.push_back(ess);
+                            }
+                    }
+                }
+                aVVEssDiff.push_back(aV);
+            }
+        }
+
+        for (int aptZbio : {1,2,3}){
+            for (int aptHT : {1,2,3}){
+                std::vector<std::shared_ptr<cEss>> aV1=aVVEssCommun.at(aptHT+(3*(aptZbio-1))-1);
+                std::vector<std::shared_ptr<cEss>> aV2=aVVEssDiff.at(aptHT+(3*(aptZbio-1))-1);
+                int nb=aV1.size()+aV2.size();
+                int ncells=std::ceil(std::sqrt(nb));
+                int rGlob(aptZbio+1),cGlob(aptHT+1);
+                Wt::WTable * t1 = mAptTable->elementAt(rGlob,cGlob)->addNew<Wt::WTable>();
+                t1->setStyleClass("table-apt");
+                std::string styleName("table-apt"+std::to_string(std::max(aptZbio,aptHT)));
+                mAptTable->elementAt(rGlob,cGlob)->addStyleClass(styleName);
+                std::string styleNameCol("col-apt"+std::to_string(std::max(aptZbio,aptHT)));
+
+                //std::cout << " aptZbio de " << aptZbio << ", aptHT de " << aptHT << ", cellulle " <<  aptZbio-1 << "," << aptHT-1 << ", nb Ess " << aV.size() << ", sytle " << styleName << std::endl;
+                int r(0),col(0);
+                for (int n(0);n<aV1.size();n++){
+                    WContainerWidget * c = t1->elementAt(r,col)->addNew<WContainerWidget>();
+                    std::string essCode(aV1.at(n)->Code());
+                    c->addStyleClass("circle_eco");
+                    c->addStyleClass(styleNameCol);
+                    // check si double apt
+                    if (mDicoApt->isDoubleApt(aV1.at(n)->getApt(zbio_))){essCode+="*";}
+                    if (mDicoApt->isDoubleApt(aV1.at(n)->getApt(nt,nh,zbio_,false))){essCode+="*";}
+                    c->addNew<Wt::WText>(essCode);
+                    c->mouseWentOver().connect([=] {
+                        hoverBubble(c,1);
+                        displayNiche(aV1.at(n)->Code());
+                        graphZbio->displayAptMap(aV1.at(n)->Code());
+                    });
+                    c->mouseWentOut().connect([=] {
+                        hoverBubble(c,0);
+                        resetEco();
+                        graphZbio->selectZbio(zbio_);
+                    });
+                    c->setToolTip(aV1.at(n)->Nom());
+                    col++;
+                    if (col+1>ncells){col=0;r++;}
+                }
+                for (int n(0);n<aV2.size();n++){
+                    WContainerWidget * c = t1->elementAt(r,col)->addNew<WContainerWidget>();
+                    std::string essCode(aV2.at(n)->Code());
+                    c->addStyleClass("circle_eco");
+                    // check si double apt
+                    if (mDicoApt->isDoubleApt(aV2.at(n)->getApt(zbio_))){essCode+="*";}
+                    if (mDicoApt->isDoubleApt(aV2.at(n)->getApt(nt,nh,zbio_,false))){essCode+="*";}
+                    c->addNew<Wt::WText>(essCode);
+                    c->mouseWentOver().connect([=] {
+                        hoverBubble(c,1);
+                        displayNiche(aV2.at(n)->Code());
+                        graphZbio->displayAptMap(aV2.at(n)->Code());
+                    });
+                    c->mouseWentOut().connect([=] {
+                        hoverBubble(c,0);
+                        resetEco();
+                        graphZbio->selectZbio(zbio_);
+                    });
+                    c->setToolTip(aV2.at(n)->Nom());
+                    essCode+="!";
+                    // mise en évidence par couleur grise
+                    c->addStyleClass("col-grey"); // n'est pas appliqué car style table-apt2 prend le dessus sur la couleur. c'est un style hérité du parent, donc je dois régler l'hiérarchie entre les deux..
+                    // change table-apt3 div en .table-apt3 > div{ et ça fonctionne
+                    col++;
+                    if (col+1>ncells){col=0;r++;}
+                }
+
+            }
+        }
+    }
+}
+
+
+void matApt::getVEssCommun(std::vector<std::shared_ptr<cEss>> aV1,std::vector<std::shared_ptr<cEss>> aV2, std::vector<std::shared_ptr<cEss>> & aVCom, std::vector<std::shared_ptr<cEss>> & aVDiff){
+    for (std::shared_ptr<cEss> ess1 : aV1){
+        if (commonEss(ess1->Code(),aV2)){
+            aVCom.push_back(ess1);
+        } else {
+            aVDiff.push_back(ess1);
+        }
+    }
+}
+
+bool commonEss(std::string aCode, std::vector<std::shared_ptr<cEss>> & aV2){
+    bool aRes(0);
+    for (std::shared_ptr<cEss> ess : aV2){
+        if (ess->Code()==aCode){aRes=1;break;}
+    }
+    return aRes;
+}
+
 zbioPainted::zbioPainted(std::string  aShp, std::shared_ptr<cdicoAptBase> aDico)
     : WPaintedWidget(),zbio_(1),shpPath(aShp),mSx(400),mSy(200),displayApt_(0),mDico(aDico),mlay(NULL)
 {
@@ -339,7 +504,7 @@ void zbioPainted::paintEvent(Wt::WPaintDevice *paintDevice){
     Wt::WPainter painter(paintDevice);
     if(mlay!=NULL){
         OGRFeature *poFeature;
-         mlay->ResetReading();
+        mlay->ResetReading();
         while( (poFeature = mlay->GetNextFeature()) != NULL )
         {
             int currentZbio=poFeature->GetFieldAsInteger("Zbio");

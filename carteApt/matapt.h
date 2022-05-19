@@ -24,6 +24,8 @@
 extern bool globTest2;
 using namespace  Wt;
 
+bool commonEss(std::string aCode, std::vector<std::shared_ptr<cEss>> & aV2);
+
 // inspiré de staticMap, forestimator
 class zbioPainted : public Wt::WPaintedWidget {
 public:
@@ -77,7 +79,7 @@ private:
     std::shared_ptr<cdicoAptBase> mDicoApt;
 
     // un tableau pour l'écogramme
-    Wt::WTable * mEco;
+     Wt::WTable * mEco;
     // un tableau croisé pour l'aptitude bioclim et hydro-trophique pour un niveau donné
      Wt::WTable * mAptTable;
      WComboBox * zbioSelection_;
@@ -85,11 +87,30 @@ private:
      void hoverBubble(WContainerWidget *c, bool hover);
      void clicEco(std::tuple<int,int> ntnh);
      void trierEss(std::tuple<int,int> ntnh, int zbio);
+     void trierEss(std::tuple<int,int> ntnh, int zbio, std::vector<std::vector<std::shared_ptr<cEss>>> * aVEss);
      void changeZbio();
      void displayNiche(std::string aEssCode);
      void resetEco();
-
      void displayMatApt();
+     void initAptTable(std::string aNTNHTitle);
+     void selectLevel4comparison(std::tuple<int,int> ntnh){
+         std::vector<std::tuple<int,int>> Vntnh;
+         std::tuple<int,int> ntnhBase(nt_,nh_);
+         Vntnh.push_back(ntnhBase);
+         Vntnh.push_back(ntnh);
+         compareMatApt(Vntnh);
+     }
+     void compareMatApt(std::vector<std::tuple<int,int>> aVntnh);
+
+     void filterMouseEvent(WMouseEvent event, std::tuple<int,int> ntnh){
+         if (event.modifiers().test(Wt::KeyboardModifier::Shift)){
+             selectLevel4comparison(ntnh);
+         } else {
+             clicEco(ntnh);
+         }
+     }
+
+     void getVEssCommun(std::vector<std::shared_ptr<cEss>> aV1,std::vector<std::shared_ptr<cEss>> aV2, std::vector<std::shared_ptr<cEss>> & aVCom, std::vector<std::shared_ptr<cEss>> & aVDiff);
 
      std::vector<std::vector<std::shared_ptr<cEss>>> mVEss;
      std::map<std::tuple<int,int>, Wt::WContainerWidget *> mMapCircleEco;
