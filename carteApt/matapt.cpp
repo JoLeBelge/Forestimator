@@ -347,11 +347,9 @@ void matApt::compareMatApt(std::vector<std::tuple<int,int>> aVntnh){
         // boucle sur toutes les essences pour déterminer dans quelles cellules elles se situent
         std::tuple<int,int> ntnh= aVntnh.at(0);
         trierEss(ntnh,zbio_,& mVEss);// le tri pour le niveau de base je l'ai déjà dans mVEss; sauf si l'utilisateur veut comparer avant d'avoir sélectionné un niveau... donc je refais
-
-
         int nt=std::get<0>(ntnh2);
         int nh=std::get<1>(ntnh2);
-          initAptTable(tr("aptHT.titre").toUTF8()+" NT "+mDicoApt->NT(nt_) +", NH "+mDicoApt->NH(nh_) +" et NT " +mDicoApt->NT(nt)+", NH "+mDicoApt->NH(nh));
+        initAptTable(tr("aptHT.titre").toUTF8()+" NT "+mDicoApt->NT(nt_) +", NH "+mDicoApt->NH(nh_) +" et NT " +mDicoApt->NT(nt)+", NH "+mDicoApt->NH(nh));
 
         // il faudrait sortir ici toutes les espèces en commun et déplacer celles pas en commun au ntnh dans leur aptitude la plus contraignante
         std::vector<std::vector<std::shared_ptr<cEss>>> aVVEssCommun;
@@ -376,7 +374,7 @@ void matApt::compareMatApt(std::vector<std::tuple<int,int>> aVntnh){
                         if(mDicoApt->AptNonContraignante(ess->getApt(zbio_))==aptZbio){
                             int aptHT1 = mDicoApt->AptNonContraignante(ess->getApt(nt_,nh_,zbio_,false));
                             int aptHT2 = mDicoApt->AptNonContraignante(ess->getApt(nt,nh,zbio_,false));
-                            if (std::min(aptHT1,aptHT2)==aptHT){
+                            if (std::max(aptHT1,aptHT2)==aptHT){
                                 aV.push_back(ess);
                             }
                     }
