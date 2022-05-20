@@ -141,8 +141,6 @@ void AuthApplication::loadStyles(){
     EssStyle.font().setWeight(FontWeight::Bold);
     styleSheet().addRule(".currentEss", EssStyle);
 
-
-
     // init the OpenLayers javascript api
     require("jslib/v6.4.3-dist/ol.js");
     useStyleSheet("jslib/v6.4.3-dist/ol.css");

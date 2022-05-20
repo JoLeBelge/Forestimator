@@ -16,6 +16,7 @@
 #include <Wt/WPaintDevice.h>
 #include <Wt/WPaintedWidget.h>
 #include <Wt/WPainter.h>
+#include <Wt/WPushButton.h>
 
 // gdal pour ouvrir un shp et le mettre dans un painted widget. expérimental.
 #include "ogrsf_frmts.h"
@@ -93,13 +94,8 @@ private:
      void resetEco();
      void displayMatApt();
      void initAptTable(std::string aNTNHTitle);
-     void selectLevel4comparison(std::tuple<int,int> ntnh){
-         std::vector<std::tuple<int,int>> Vntnh;
-         std::tuple<int,int> ntnhBase(nt_,nh_);
-         Vntnh.push_back(ntnhBase);
-         Vntnh.push_back(ntnh);
-         compareMatApt(Vntnh);
-     }
+     void selectLevel4comparison(std::tuple<int,int> ntnh);
+     void comparison4predicted();
      void compareMatApt(std::vector<std::tuple<int,int>> aVntnh);
 
      void filterMouseEvent(WMouseEvent event, std::tuple<int,int> ntnh){
@@ -116,6 +112,8 @@ private:
      std::map<std::tuple<int,int>, Wt::WContainerWidget *> mMapCircleEco;
      int zbio_, nt_,nh_;
      zbioPainted * graphZbio;
+     Wt::WPushButton * bt_compare4Predicted ;
+     std::vector<std::tuple<int,int>> mVPredictedNtnh;
 };
 
 

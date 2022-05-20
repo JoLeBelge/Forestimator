@@ -1,6 +1,6 @@
 #include "matapt.h"
 
-matApt::matApt(std::shared_ptr<cdicoAptBase> aDicoApt):mDicoApt(aDicoApt),zbio_(1),nh_(10),nt_(10)
+matApt::matApt(std::shared_ptr<cdicoAptBase> aDicoApt):mDicoApt(aDicoApt),zbio_(1),nh_(10),nt_(10),bt_compare4Predicted(NULL)
 {
     setOverflow(Wt::Overflow::Auto);
     setId("matAptCont");
@@ -76,6 +76,12 @@ matApt::matApt(std::shared_ptr<cdicoAptBase> aDicoApt):mDicoApt(aDicoApt),zbio_(
     }
     zbioSelection_->changed().connect(std::bind(&matApt::changeZbio,this));
     zbioSelection_->setCurrentIndex(0);
+    contZbioGauche->addWidget(std::make_unique<Wt::WBreak>());
+    bt_compare4Predicted =contZbioGauche->addWidget(std::make_unique<Wt::WPushButton>());
+    bt_compare4Predicted->setText(tr("matApt.compare4Predicted"));
+    bt_compare4Predicted->hide();
+    bt_compare4Predicted->clicked().connect(std::bind(&matApt::comparison4predicted,this));
+
     std::string  aShp=mDicoApt->File("ZBIOSIMP");
     graphZbio = layoutzbio->addWidget(std::make_unique<zbioPainted>(aShp,mDicoApt));
 
@@ -298,24 +304,27 @@ void matApt::receivePrediction(int aCode,std::vector<double> aVPredNT,std::vecto
     }
     // identifier la liste de code ntnh qui correspondent à ces groupes (groupe hydrique)
     if (globTest2){std::cout << " max nh index " << max_index_nh << " , max nt index " << max_index_nt << std::endl;}
-    std::vector<std::tuple<int,int>> aVNTNH;
+    //std::vector<std::tuple<int,int>> aVNTNH;
+     mVPredictedNtnh.clear();
     if (max_index_nh>0){
         int nhStart= mDicoApt->groupeNH2NHStart(max_index_nh);
         for (int j(0);j<mDicoApt->groupeNH2Nb(max_index_nh);j++){
             int nh=nhStart-j;
             //std::cout << " ajout nt " << max_index_nt << " , nh " << nh << ", nh start " << nhStart << std::endl;
             std::tuple<int,int> ntnh(max_index_nt,nh);
-            aVNTNH.push_back(ntnh);
+            //aVNTNH.push_back(ntnh);
+             mVPredictedNtnh.push_back(ntnh);
         }
     }
     // reset des syles de couleurs jaunes pours les disques
     for (auto kv : mMapCircleEco){
-        if (std::find(aVNTNH.begin(), aVNTNH.end(), kv.first) != aVNTNH.end()){
+        if (std::find(mVPredictedNtnh.begin(), mVPredictedNtnh.end(), kv.first) != mVPredictedNtnh.end()){
             kv.second->addStyleClass("circle_eco_phyto");
         } else {
             kv.second->removeStyleClass("circle_eco_phyto");
         }
     }
+    bt_compare4Predicted->show();
 }
 
 void matApt::initAptTable(std::string aNTNHTitle){
@@ -346,10 +355,13 @@ void matApt::compareMatApt(std::vector<std::tuple<int,int>> aVntnh){
         trierEss(ntnh2,zbio_,& aVEss2);
         // boucle sur toutes les essences pour déterminer dans quelles cellules elles se situent
         std::tuple<int,int> ntnh= aVntnh.at(0);
-        trierEss(ntnh,zbio_,& mVEss);// le tri pour le niveau de base je l'ai déjà dans mVEss; sauf si l'utilisateur veut comparer avant d'avoir sélectionné un niveau... donc je refais
+        trierEss(ntnh,zbio_,& mVEss);// le tri pour le niveau de base je l'ai déjà dans mVEss; sauf si l'utilisateur veut comparer avant d'avoir sélectionné un niveau. ou pour le cas compare4predictedLevel
         int nt=std::get<0>(ntnh2);
         int nh=std::get<1>(ntnh2);
-        initAptTable(tr("aptHT.titre").toUTF8()+" NT "+mDicoApt->NT(nt_) +", NH "+mDicoApt->NH(nh_) +" et NT " +mDicoApt->NT(nt)+", NH "+mDicoApt->NH(nh));
+
+        int nt0=std::get<0>(ntnh);
+        int nh0=std::get<1>(ntnh);
+        initAptTable(tr("aptHT.titre").toUTF8()+" commune à NT "+mDicoApt->NT(nt0) +", NH "+mDicoApt->NH(nh0) +" et NT " +mDicoApt->NT(nt)+", NH "+mDicoApt->NH(nh));
 
         // il faudrait sortir ici toutes les espèces en commun et déplacer celles pas en commun au ntnh dans leur aptitude la plus contraignante
         std::vector<std::vector<std::shared_ptr<cEss>>> aVVEssCommun;
@@ -372,7 +384,7 @@ void matApt::compareMatApt(std::vector<std::tuple<int,int>> aVntnh){
                 for (std::shared_ptr<cEss> ess : aVEssDiff){
 
                         if(mDicoApt->AptNonContraignante(ess->getApt(zbio_))==aptZbio){
-                            int aptHT1 = mDicoApt->AptNonContraignante(ess->getApt(nt_,nh_,zbio_,false));
+                            int aptHT1 = mDicoApt->AptNonContraignante(ess->getApt(nt0,nh0,zbio_,false));
                             int aptHT2 = mDicoApt->AptNonContraignante(ess->getApt(nt,nh,zbio_,false));
                             if (std::max(aptHT1,aptHT2)==aptHT){
                                 aV.push_back(ess);
@@ -605,4 +617,34 @@ double zbioPainted::xGeo2Im(double x){
 }
 double zbioPainted::yGeo2Im(double y){
     return mSy-(mSy*(y-ext->MinY)/mWy);
+}
+
+void matApt::selectLevel4comparison(std::tuple<int,int> ntnh){
+    std::vector<std::tuple<int,int>> Vntnh;
+    std::tuple<int,int> ntnhBase(nt_,nh_);
+    Vntnh.push_back(ntnhBase);
+    Vntnh.push_back(ntnh);
+    compareMatApt(Vntnh);
+}
+
+void matApt::comparison4predicted(){
+    std::vector<std::tuple<int,int>> Vntnh;
+    if (mVPredictedNtnh.size()>1){
+        Vntnh.push_back(mVPredictedNtnh.at(0));
+        Vntnh.push_back(mVPredictedNtnh.at(mVPredictedNtnh.size()-1));
+        compareMatApt(Vntnh);
+    } else {
+        Wt::WMessageBox * messageBox = this->addChild(Wt::cpp14::make_unique<Wt::WMessageBox>(
+                                                          tr("matApt.compare4Predicted"),
+                                                          tr("matApt.compare4Predicted.noPrediction"),
+                                                          Wt::Icon::Critical,
+                                                          Wt::StandardButton::Ok));
+        messageBox->setModal(true);
+        messageBox->buttonClicked().connect([=] {
+            this->removeChild(messageBox);
+        });
+        messageBox->setMinimumSize("40%","30%");
+        messageBox->show();
+    }
+
 }
