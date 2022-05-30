@@ -370,7 +370,7 @@ void matApt::compareMatApt(){
 
     }
 
-    if (mVNtnh4Comparison.size()>1){
+    if (mVNtnh4Comparison.size()>0){
         std::vector<std::vector<std::vector<std::shared_ptr<cEss>>>> allVEss; // mettre tout dans ce vecteur
 
         std::string aTitre;
@@ -382,7 +382,10 @@ void matApt::compareMatApt(){
             // titre pour le tableau
             int nt=std::get<0>(ntnh);
             int nh=std::get<1>(ntnh);
-            if (first){aTitre=tr("aptHT.titre").toUTF8()+" commune à NT "+mDicoApt->NT(nt) +", NH "+mDicoApt->NH(nh); first=0;
+            if (first){
+                if (mVNtnh4Comparison.size()==1){aTitre=tr("aptHT.titre").toUTF8()+" NT "+mDicoApt->NT(nt) +", NH "+mDicoApt->NH(nh);
+                }else{aTitre=tr("aptHT.titre").toUTF8()+" commune à NT "+mDicoApt->NT(nt) +", NH "+mDicoApt->NH(nh);}
+                first=0;
             } else {
                 if (n<3){
                     aTitre+=" et NT " +mDicoApt->NT(nt)+", NH "+mDicoApt->NH(nh);
@@ -403,7 +406,7 @@ void matApt::compareMatApt(){
             for (int aptHT : {1,2,3}){
                 std::vector<std::shared_ptr<cEss>> aV1=allVEss.at(0).at(aptHT+(3*(aptZbio-1))-1);
                 std::vector<std::shared_ptr<cEss>> aVEssCom;
-                for (int c(1);c<allVEss.size();c++){
+                for (int c(0);c<allVEss.size();c++){
                     std::vector<std::shared_ptr<cEss>> aV2=allVEss.at(c).at(aptHT+(3*(aptZbio-1))-1);
                     getVEssCommun(aV1, aV2,aVEssCom, aVEssDiff);
                 }
@@ -548,7 +551,7 @@ void matApt::compareMatApt(){
             }
         }
     } else {
-        if (mVNtnh4Comparison.size()==1){clicEco(mVNtnh4Comparison.at(0));} else {resetEco();}
+       resetEco();
     }
 }
 
@@ -734,18 +737,19 @@ double zbioPainted::yGeo2Im(double y){
 void matApt::selectLevel4comparison(std::tuple<int,int> ntnh){   
     if(mVNtnh4Comparison.size()==0){
         std::tuple<int,int> ntnhBase(nt_,nh_);
+        if (ntnhBase!=ntnh){
         mVNtnh4Comparison.push_back(ntnhBase);
+        }
     }
     // on retire le niveau si il est déjà présent
     int c(0); bool remove(0);
     for ( std::tuple<int,int> ntnh2 : mVNtnh4Comparison){
-        if (ntnh2==ntnh & mVNtnh4Comparison.size()>1 ) { mVNtnh4Comparison.erase(mVNtnh4Comparison.begin()+c); remove=1; break;}
+        if (ntnh2==ntnh) { mVNtnh4Comparison.erase(mVNtnh4Comparison.begin()+c); remove=1; break;}
         c++;
     }
-    if (!remove){
+    if (!remove | mVNtnh4Comparison.size()==0){
         mVNtnh4Comparison.push_back(ntnh);
     }
-
     compareMatApt();
 }
 
