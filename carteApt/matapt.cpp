@@ -456,7 +456,9 @@ void matApt::compareMatApt(){
                     c->addStyleClass(styleNameCol);
                     // check si double apt
                     if (mDicoApt->isDoubleApt(aV1.at(n)->getApt(zbio_))){essCode+="*";}
-                    // if (mDicoApt->isDoubleApt(aV1.at(n)->getApt(nt,nh,zbio_,false))){essCode+="*";}
+                    int nt=std::get<0>(mVNtnh4Comparison.at(0));
+                    int nh=std::get<1>(mVNtnh4Comparison.at(0));
+                    if (mDicoApt->isDoubleApt(aV1.at(n)->getApt(nt,nh,zbio_,false))){essCode+="*";}
                     c->addNew<Wt::WText>(essCode);
                     c->mouseWentOver().connect([=] {
                         hoverBubble(c,1);
@@ -477,9 +479,6 @@ void matApt::compareMatApt(){
                                                                           Wt::StandardButton::Ok));
                         messageBox->contents()->addNew<Wt::WText>("Aptitude bioclimatique : " + mDicoApt->code2AptFull(aV1.at(n)->getApt(zbio_)));
                         messageBox->contents()->addNew<Wt::WBreak>();
-
-                        int nt=std::get<0>(mVNtnh4Comparison.at(0));
-                        int nh=std::get<1>(mVNtnh4Comparison.at(0));
                         messageBox->contents()->addNew<Wt::WText>("Aptitude hydro-trophique : " + mDicoApt->code2AptFull(aV1.at(n)->getApt(nt,nh,zbio_,false)));
                         messageBox->contents()->addNew<Wt::WBreak>();
                         Wt::WLink l("https://www.fichierecologique.be/resources/fee/FEE-"+aV1.at(n)->Code()+".pdf");
