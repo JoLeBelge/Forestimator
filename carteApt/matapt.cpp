@@ -101,11 +101,13 @@ void matApt::hoverBubble(WContainerWidget * c, bool hover){
 }
 
 void matApt::clicEco(std::tuple<int,int> ntnh){
+    mVNtnh4Comparison.clear();
     nt_=std::get<0>(ntnh);
     nh_=std::get<1>(ntnh);
-    displayMatApt();
+    selectLevel4comparison(ntnh);
 }
 
+/*
 void matApt::displayMatApt(){   
     //std::cout << "clic Eco sur nt " << nt << ", nh " << nh << std::endl;
     initAptTable(tr("aptHT.titre").toUTF8()+" NT "+mDicoApt->NT(nt_) +", NH "+mDicoApt->NH(nh_));
@@ -193,7 +195,7 @@ void matApt::displayMatApt(){
             kv.second->removeStyleClass("circle_eco_large");
         }
     }
-}
+}*/
 
 void matApt::displayNiche(std::string aEssCode){
     std::shared_ptr<cEss> ess=mDicoApt->getEss(aEssCode);
@@ -270,7 +272,8 @@ void matApt::changeZbio(){
         if (kv.second==zbioSelection_->currentText()){zbio_=kv.first;}
     }
     graphZbio->selectZbio(zbio_);
-    displayMatApt();
+    //displayMatApt();
+    compareMatApt();
 }
 
 void matApt::receivePrediction(int aCode,std::vector<double> aVPredNT,std::vector<double> aVPredNH){
@@ -303,17 +306,16 @@ void matApt::receivePrediction(int aCode,std::vector<double> aVPredNT,std::vecto
         }
     }
     // identifier la liste de code ntnh qui correspondent à ces groupes (groupe hydrique)
-    if (globTest2){std::cout << " max nh index " << max_index_nh << " , max nt index " << max_index_nt << std::endl;}
+    //if (globTest2){std::cout << " max nh index " << max_index_nh << " , max nt index " << max_index_nt << std::endl;}
     //std::vector<std::tuple<int,int>> aVNTNH;
-     mVPredictedNtnh.clear();
+    mVPredictedNtnh.clear();
     if (max_index_nh>0){
         int nhStart= mDicoApt->groupeNH2NHStart(max_index_nh);
         for (int j(0);j<mDicoApt->groupeNH2Nb(max_index_nh);j++){
             int nh=nhStart-j;
             //std::cout << " ajout nt " << max_index_nt << " , nh " << nh << ", nh start " << nhStart << std::endl;
             std::tuple<int,int> ntnh(max_index_nt,nh);
-            //aVNTNH.push_back(ntnh);
-             mVPredictedNtnh.push_back(ntnh);
+            mVPredictedNtnh.push_back(ntnh);
         }
     }
     // reset des syles de couleurs jaunes pours les disques
@@ -347,48 +349,80 @@ void matApt::initAptTable(std::string aNTNHTitle){
     mAptTable->elementAt(4,1)->addWidget(cpp14::make_unique<WText>(tr("apt.t.TE")));
 }
 
-void matApt::compareMatApt(std::vector<std::tuple<int,int>> aVntnh){
-    // pour l'instant, je fonctionne avec juste 2 niveaux
-    if (aVntnh.size()==2){
-        std::vector<std::vector<std::shared_ptr<cEss>>> aVEss2;
-        std::tuple<int,int> ntnh2 = aVntnh.at(1);
-        trierEss(ntnh2,zbio_,& aVEss2);
-        // boucle sur toutes les essences pour déterminer dans quelles cellules elles se situent
-        std::tuple<int,int> ntnh= aVntnh.at(0);
-        trierEss(ntnh,zbio_,& mVEss);// le tri pour le niveau de base je l'ai déjà dans mVEss; sauf si l'utilisateur veut comparer avant d'avoir sélectionné un niveau. ou pour le cas compare4predictedLevel
-        int nt=std::get<0>(ntnh2);
-        int nh=std::get<1>(ntnh2);
+void matApt::compareMatApt(){
 
-        int nt0=std::get<0>(ntnh);
-        int nh0=std::get<1>(ntnh);
-        initAptTable(tr("aptHT.titre").toUTF8()+" commune à NT "+mDicoApt->NT(nt0) +", NH "+mDicoApt->NH(nh0) +" et NT " +mDicoApt->NT(nt)+", NH "+mDicoApt->NH(nh));
+    for (auto kv : mMapCircleEco){
+        if (std::find(mVPredictedNtnh.begin(), mVPredictedNtnh.end(), kv.first) != mVPredictedNtnh.end()){
+            kv.second->addStyleClass("circle_eco_phyto");
+        } else {
+            kv.second->removeStyleClass("circle_eco_phyto");
+        }
 
-        // il faudrait sortir ici toutes les espèces en commun et déplacer celles pas en commun au ntnh dans leur aptitude la plus contraignante
+        if (std::find(mVNtnh4Comparison.begin(), mVNtnh4Comparison.end(), kv.first) != mVNtnh4Comparison.end()){
+            kv.second->addStyleClass("circle_eco_selected");
+            kv.second->removeStyleClass("circle_eco_large");
+            kv.second->removeStyleClass("circle_eco_phyto");
+            //std::cout << " style rouge pour " << std::get<0>(kv.first) << ", " << std::get<1>(kv.first) << std::endl;
+        } else {
+            kv.second->removeStyleClass("circle_eco_selected");
+            kv.second->removeStyleClass("circle_eco_large");
+        }
+
+    }
+
+    if (mVNtnh4Comparison.size()>1){
+        std::vector<std::vector<std::vector<std::shared_ptr<cEss>>>> allVEss; // mettre tout dans ce vecteur
+
+        std::string aTitre;
+        bool first(1); int n(1);
+        for (std::tuple<int,int> ntnh : mVNtnh4Comparison){
+            std::vector<std::vector<std::shared_ptr<cEss>>> aVEss;
+            trierEss(ntnh,zbio_,& aVEss);
+            allVEss.push_back(aVEss);
+            // titre pour le tableau
+            int nt=std::get<0>(ntnh);
+            int nh=std::get<1>(ntnh);
+            if (first){aTitre=tr("aptHT.titre").toUTF8()+" commune à NT "+mDicoApt->NT(nt) +", NH "+mDicoApt->NH(nh); first=0;
+            } else {
+                if (n<3){
+                    aTitre+=" et NT " +mDicoApt->NT(nt)+", NH "+mDicoApt->NH(nh);
+                } else if(n==3){
+                    aTitre+=" et "+ std::to_string(mVNtnh4Comparison.size()-2) + " autre(s) niveau(x)";
+                }
+            }
+            n++;
+        }
+
+        initAptTable(aTitre);
+
+        // On sépare les espèces en commun (mm aptitude pour tout les ntnh) des espèces pour lesquelles on a des aptitudes différentes (l'aptitude la plus contraignante est retenue)
         std::vector<std::vector<std::shared_ptr<cEss>>> aVVEssCommun;
         std::vector<std::shared_ptr<cEss>> aVEssDiff; // d'abor on identifie toutes les essences qui ont des apt différentes
+
         for (int aptZbio : {1,2,3}){
             for (int aptHT : {1,2,3}){
-                std::vector<std::shared_ptr<cEss>> aV1=mVEss.at(aptHT+(3*(aptZbio-1))-1);
-                std::vector<std::shared_ptr<cEss>> aV2=aVEss2.at(aptHT+(3*(aptZbio-1))-1);
+                std::vector<std::shared_ptr<cEss>> aV1=allVEss.at(0).at(aptHT+(3*(aptZbio-1))-1);
                 std::vector<std::shared_ptr<cEss>> aVEssCom;
-                getVEssCommun(aV1, aV2,aVEssCom, aVEssDiff);
+                for (int c(1);c<allVEss.size();c++){
+                    std::vector<std::shared_ptr<cEss>> aV2=allVEss.at(c).at(aptHT+(3*(aptZbio-1))-1);
+                    getVEssCommun(aV1, aV2,aVEssCom, aVEssDiff);
+                }
                 aVVEssCommun.push_back(aVEssCom);
             }
         }
-        // on retrie les essences en fonction de leur aptitude la plus contraignante
-        // création du vecteur de vecteur, vide, mais de bonne dimension
+        // on retrie les essences "Différentes" en fonction de leur aptitude la plus contraignante
         std::vector<std::vector<std::shared_ptr<cEss>>> aVVEssDiff;
         for (int aptZbio : {1,2,3}){
             for (int aptHT : {1,2,3}){
                 std::vector<std::shared_ptr<cEss>> aV;
                 for (std::shared_ptr<cEss> ess : aVEssDiff){
-
-                        if(mDicoApt->AptNonContraignante(ess->getApt(zbio_))==aptZbio){
-                            int aptHT1 = mDicoApt->AptNonContraignante(ess->getApt(nt0,nh0,zbio_,false));
-                            int aptHT2 = mDicoApt->AptNonContraignante(ess->getApt(nt,nh,zbio_,false));
-                            if (std::max(aptHT1,aptHT2)==aptHT){
-                                aV.push_back(ess);
-                            }
+                    if(mDicoApt->AptNonContraignante(ess->getApt(zbio_))==aptZbio){
+                        // retourner l'apt max de plusieurs ntnh
+                        int aptMax=ess->getMaxAptHT(mVNtnh4Comparison,zbio_);
+                        if (aptMax==aptHT){
+                            //std::cout << " essence " << ess->Code() << " a comme aptitude max " << aptMax << " , soit " << mDicoApt->code2Apt(aptMax) << ", ajout dans le vecteur d'essence pour le niveau d'aptitude " << aptHT << std::endl;
+                            aV.push_back(ess);
+                        }
                     }
                 }
                 aVVEssDiff.push_back(aV);
@@ -410,6 +444,8 @@ void matApt::compareMatApt(std::vector<std::tuple<int,int>> aVntnh){
 
                 //std::cout << " aptZbio de " << aptZbio << ", aptHT de " << aptHT << ", cellulle " <<  aptZbio-1 << "," << aptHT-1 << ", nb Ess " << aV.size() << ", sytle " << styleName << std::endl;
                 int r(0),col(0);
+
+                // les essences qui partagent la mm aptitude
                 for (int n(0);n<aV1.size();n++){
                     WContainerWidget * c = t1->elementAt(r,col)->addNew<WContainerWidget>();
                     std::string essCode(aV1.at(n)->Code());
@@ -417,7 +453,7 @@ void matApt::compareMatApt(std::vector<std::tuple<int,int>> aVntnh){
                     c->addStyleClass(styleNameCol);
                     // check si double apt
                     if (mDicoApt->isDoubleApt(aV1.at(n)->getApt(zbio_))){essCode+="*";}
-                    if (mDicoApt->isDoubleApt(aV1.at(n)->getApt(nt,nh,zbio_,false))){essCode+="*";}
+                    // if (mDicoApt->isDoubleApt(aV1.at(n)->getApt(nt,nh,zbio_,false))){essCode+="*";}
                     c->addNew<Wt::WText>(essCode);
                     c->mouseWentOver().connect([=] {
                         hoverBubble(c,1);
@@ -430,6 +466,33 @@ void matApt::compareMatApt(std::vector<std::tuple<int,int>> aVntnh){
                         graphZbio->selectZbio(zbio_);
                     });
                     c->setToolTip(aV1.at(n)->Nom());
+                    c->clicked().connect([=] {
+                        Wt::WMessageBox * messageBox = this->addChild(Wt::cpp14::make_unique<Wt::WMessageBox>(
+                                                                          aV1.at(n)->Nom(),
+                                                                          "",
+                                                                          Wt::Icon::Information,
+                                                                          Wt::StandardButton::Ok));
+                        messageBox->contents()->addNew<Wt::WText>("Aptitude bioclimatique : " + mDicoApt->code2AptFull(aV1.at(n)->getApt(zbio_)));
+                        messageBox->contents()->addNew<Wt::WBreak>();
+
+                        int nt=std::get<0>(mVNtnh4Comparison.at(0));
+                        int nh=std::get<1>(mVNtnh4Comparison.at(0));
+                        messageBox->contents()->addNew<Wt::WText>("Aptitude hydro-trophique : " + mDicoApt->code2AptFull(aV1.at(n)->getApt(nt,nh,zbio_,false)));
+                        messageBox->contents()->addNew<Wt::WBreak>();
+                        Wt::WLink l("https://www.fichierecologique.be/resources/fee/FEE-"+aV1.at(n)->Code()+".pdf");
+                        l.setTarget(Wt::LinkTarget::NewWindow);
+                        Wt::WString s("Fiche-essence disponible ici");
+                        Wt::WAnchor * a =messageBox->contents()->addNew<Wt::WAnchor>(l,s);
+                        a->clicked().connect([=] {
+                            this->removeChild(messageBox);
+                        });
+                        messageBox->setModal(true);
+                        messageBox->buttonClicked().connect([=] {
+                            this->removeChild(messageBox);
+                        });
+                        messageBox->setMinimumSize("40%","30%");
+                        messageBox->show();
+                    });
                     col++;
                     if (col+1>ncells){col=0;r++;}
                 }
@@ -439,7 +502,7 @@ void matApt::compareMatApt(std::vector<std::tuple<int,int>> aVntnh){
                     c->addStyleClass("circle_eco");
                     // check si double apt
                     if (mDicoApt->isDoubleApt(aV2.at(n)->getApt(zbio_))){essCode+="*";}
-                    if (mDicoApt->isDoubleApt(aV2.at(n)->getApt(nt,nh,zbio_,false))){essCode+="*";}
+                    //  if (mDicoApt->isDoubleApt(aV2.at(n)->getApt(nt,nh,zbio_,false))){essCode+="*";}
                     c->addNew<Wt::WText>(essCode);
                     c->mouseWentOver().connect([=] {
                         hoverBubble(c,1);
@@ -452,7 +515,29 @@ void matApt::compareMatApt(std::vector<std::tuple<int,int>> aVntnh){
                         graphZbio->selectZbio(zbio_);
                     });
                     c->setToolTip(aV2.at(n)->Nom());
-                    essCode+="!";
+                    c->clicked().connect([=] {
+                        Wt::WMessageBox * messageBox = this->addChild(Wt::cpp14::make_unique<Wt::WMessageBox>(
+                                                                          aV2.at(n)->Nom(),
+                                                                          "",
+                                                                          Wt::Icon::Information,
+                                                                          Wt::StandardButton::Ok));
+                        messageBox->contents()->addNew<Wt::WText>("Aptitude bioclimatique : " + mDicoApt->code2AptFull(aV2.at(n)->getApt(zbio_)));
+                        messageBox->contents()->addNew<Wt::WBreak>();
+                        Wt::WLink l("https://www.fichierecologique.be/resources/fee/FEE-"+aV2.at(n)->Code()+".pdf");
+                        l.setTarget(Wt::LinkTarget::NewWindow);
+                        Wt::WString s("Fiche-essence disponible ici");
+                        Wt::WAnchor * a =messageBox->contents()->addNew<Wt::WAnchor>(l,s);
+                        a->clicked().connect([=] {
+                            this->removeChild(messageBox);
+                        });
+                        messageBox->setModal(true);
+                        messageBox->buttonClicked().connect([=] {
+                            this->removeChild(messageBox);
+                        });
+                        messageBox->setMinimumSize("40%","30%");
+                        messageBox->show();
+                    });
+
                     // mise en évidence par couleur grise
                     c->addStyleClass("col-grey"); // n'est pas appliqué car style table-apt2 prend le dessus sur la couleur. c'est un style hérité du parent, donc je dois régler l'hiérarchie entre les deux..
                     // change table-apt3 div en .table-apt3 > div{ et ça fonctionne
@@ -462,19 +547,46 @@ void matApt::compareMatApt(std::vector<std::tuple<int,int>> aVntnh){
 
             }
         }
+    } else {
+        if (mVNtnh4Comparison.size()==1){clicEco(mVNtnh4Comparison.at(0));} else {resetEco();}
     }
 }
 
-
+// s'utilise soit en one shot, soit de manière itérative plusieur fois d'affilé.
 void matApt::getVEssCommun(std::vector<std::shared_ptr<cEss>> aV1,std::vector<std::shared_ptr<cEss>> aV2, std::vector<std::shared_ptr<cEss>> & aVCom, std::vector<std::shared_ptr<cEss>> & aVDiff){
-    for (std::shared_ptr<cEss> ess1 : aV1){
-        if (commonEss(ess1->Code(),aV2)){
-            aVCom.push_back(ess1);
+    // d'abor avoir toute les essences pour boucler dessus, car elle ne sont pas d'office toute dans les vecteurs qui peuvent avoir des longeurs différentes.
+    for (std::shared_ptr<cEss> ess : getAllEssFrom2V(aV1,aV2)){
+        if (commonEss(ess->Code(),aV1) & commonEss(ess->Code(),aV2)){
+            if (!commonEss(ess->Code(),aVCom) & !commonEss(ess->Code(),aVDiff)){
+                // on rajoute
+                aVCom.push_back(ess);
+            }
         } else {
-            aVDiff.push_back(ess1);
+            if (!commonEss(ess->Code(),aVDiff)){
+                aVDiff.push_back(ess);
+            }
+            if (commonEss(ess->Code(),aVCom)){
+                // on retire l'essence du vecteur essence commune
+                int c(0);
+                for (std::shared_ptr<cEss> ess2 : aVCom){
+                    if (ess2->Code()==ess->Code()) { aVCom.erase(aVCom.begin()+c); break;}
+                    c++;
+                }
+            }
         }
     }
 }
+
+std::vector<std::shared_ptr<cEss>> matApt::getAllEssFrom2V(std::vector<std::shared_ptr<cEss>> aV1, std::vector<std::shared_ptr<cEss>> aV2){
+    std::vector<std::shared_ptr<cEss>> aRes=aV1;
+    for (std::shared_ptr<cEss> ess1 : aV2){
+        if (!commonEss(ess1->Code(),aV1)){
+            aRes.push_back(ess1);
+        }
+    }
+    return aRes;
+}
+
 
 bool commonEss(std::string aCode, std::vector<std::shared_ptr<cEss>> & aV2){
     bool aRes(0);
@@ -619,20 +731,34 @@ double zbioPainted::yGeo2Im(double y){
     return mSy-(mSy*(y-ext->MinY)/mWy);
 }
 
-void matApt::selectLevel4comparison(std::tuple<int,int> ntnh){
-    std::vector<std::tuple<int,int>> Vntnh;
-    std::tuple<int,int> ntnhBase(nt_,nh_);
-    Vntnh.push_back(ntnhBase);
-    Vntnh.push_back(ntnh);
-    compareMatApt(Vntnh);
+void matApt::selectLevel4comparison(std::tuple<int,int> ntnh){   
+    if(mVNtnh4Comparison.size()==0){
+        std::tuple<int,int> ntnhBase(nt_,nh_);
+        mVNtnh4Comparison.push_back(ntnhBase);
+    }
+    // on retire le niveau si il est déjà présent
+    int c(0); bool remove(0);
+    for ( std::tuple<int,int> ntnh2 : mVNtnh4Comparison){
+        if (ntnh2==ntnh & mVNtnh4Comparison.size()>1 ) { mVNtnh4Comparison.erase(mVNtnh4Comparison.begin()+c); remove=1; break;}
+        c++;
+    }
+    if (!remove){
+        mVNtnh4Comparison.push_back(ntnh);
+    }
+
+    compareMatApt();
 }
 
 void matApt::comparison4predicted(){
     std::vector<std::tuple<int,int>> Vntnh;
     if (mVPredictedNtnh.size()>1){
-        Vntnh.push_back(mVPredictedNtnh.at(0));
-        Vntnh.push_back(mVPredictedNtnh.at(mVPredictedNtnh.size()-1));
-        compareMatApt(Vntnh);
+        mVNtnh4Comparison.clear();
+        for (auto ntnh : mVPredictedNtnh){
+            mVNtnh4Comparison.push_back(ntnh);
+        }
+        //mVNtnh4Comparison.push_back(mVPredictedNtnh.at(0));
+        //mVNtnh4Comparison.push_back(mVPredictedNtnh.at(mVPredictedNtnh.size()-1));
+        compareMatApt();
     } else {
         Wt::WMessageBox * messageBox = this->addChild(Wt::cpp14::make_unique<Wt::WMessageBox>(
                                                           tr("matApt.compare4Predicted"),

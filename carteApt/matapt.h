@@ -96,7 +96,9 @@ private:
      void initAptTable(std::string aNTNHTitle);
      void selectLevel4comparison(std::tuple<int,int> ntnh);
      void comparison4predicted();
-     void compareMatApt(std::vector<std::tuple<int,int>> aVntnh);
+     void compareMatApt();
+
+   std::vector<std::shared_ptr<cEss>> getAllEssFrom2V(std::vector<std::shared_ptr<cEss>> aV1, std::vector<std::shared_ptr<cEss>> aV2);
 
      void filterMouseEvent(WMouseEvent event, std::tuple<int,int> ntnh){
          if (event.modifiers().test(Wt::KeyboardModifier::Shift)){
@@ -107,13 +109,13 @@ private:
      }
 
      void getVEssCommun(std::vector<std::shared_ptr<cEss>> aV1,std::vector<std::shared_ptr<cEss>> aV2, std::vector<std::shared_ptr<cEss>> & aVCom, std::vector<std::shared_ptr<cEss>> & aVDiff);
-
      std::vector<std::vector<std::shared_ptr<cEss>>> mVEss;
      std::map<std::tuple<int,int>, Wt::WContainerWidget *> mMapCircleEco;
      int zbio_, nt_,nh_;
      zbioPainted * graphZbio;
      Wt::WPushButton * bt_compare4Predicted ;
      std::vector<std::tuple<int,int>> mVPredictedNtnh;
+     std::vector<std::tuple<int,int>> mVNtnh4Comparison; // je devrais faire un refactoring pour que ce vecteur contienne les nt_,nh_ et que je supprime ainsi la méthode displayMatApt(); qui est redondante avec compareMatApt()
 };
 
 

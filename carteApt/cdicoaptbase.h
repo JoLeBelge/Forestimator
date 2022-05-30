@@ -47,7 +47,7 @@ public:
     std::map<int,std::map<std::string,int>> getFEEApt(std::string aCodeEs);
     std::map<int,int> getZBIOApt(std::string aCodeEs);
     std::map<int,std::map<int,int>> getRisqueTopo(std::string aCodeEs);
-     std::map<int,std::map<int,int>> getCSApt(std::string aCodeEs);
+    std::map<int,std::map<int,int>> getCSApt(std::string aCodeEs);
 
 
     std::map<int,std::string>  * NH(){return  &Dico_NH;}
@@ -289,7 +289,7 @@ protected:
     std::map<std::string,std::string>  Dico_RasterVar;
     std::map<std::string,bool>  Dico_RasterVisu;// les couches que l'on peux visualiser dans la partie carto
     std::map<std::string,bool>  Dico_RasterStat;// les couches sur lesquelles on peut calculer des statistiques
-     std::map<std::string,bool>  Dico_RasterStatP;// les couches sur lesquelles on peut calculer des statistiques ponctuelles
+    std::map<std::string,bool>  Dico_RasterStatP;// les couches sur lesquelles on peut calculer des statistiques ponctuelles
     // description peuplement vs description station
     std::map<std::string,std::string>  Dico_RasterCategorie;
     std::map<std::string,std::string>  Dico_RasterNomComplet;
@@ -338,8 +338,8 @@ protected:
     std::map<std::string,WMSinfo>  Dico_WMS;
 
 
-     // clé ; code ess. val ; pointeur vers essence
-     std::map<std::string,std::shared_ptr<cEss>> mVEss;
+    // clé ; code ess. val ; pointeur vers essence
+    std::map<std::string,std::shared_ptr<cEss>> mVEss;
 };
 
 
@@ -365,14 +365,33 @@ public:
     bool hasFEEApt(){
         bool aRes(0);
         // maintenant j'initialise EcoVal comme une map de 10 elem vide
-       /* if (mEcoVal.size()==0) {
+        /* if (mEcoVal.size()==0) {
             aRes=0;
             //std::cout << "essence " << mNomFR << " n'as pas d'aptitude pour FEE" << std::endl;
         }*/
         if (mEcoVal.size()>0 && mEcoVal.at(1).size()>0) {
-                    aRes=1;
-                    //std::cout << "essence " << mNomFR << " n'as pas d'aptitude pour FEE" << std::endl;
-         }
+            aRes=1;
+            //std::cout << "essence " << mNomFR << " n'as pas d'aptitude pour FEE" << std::endl;
+        }
+        return aRes;
+    }
+
+    int getMaxAptHT(std::vector<std::tuple<int,int>> aVNtnh4Comparison, int aZbio){
+        int aRes(4);
+        if (aVNtnh4Comparison.size()>0){
+            std::tuple<int,int> ntnh0 =aVNtnh4Comparison.at(0);
+            int nt0=std::get<0>(ntnh0);
+            int nh0=std::get<1>(ntnh0);
+            aRes = mDico->AptNonContraignante(getApt(nt0,nh0,aZbio,false));
+            for (int c(1); c<aVNtnh4Comparison.size();c++){
+                std::tuple<int,int> ntnh = aVNtnh4Comparison.at(c);
+                int nt=std::get<0>(ntnh);
+                int nh=std::get<1>(ntnh);
+                int aptHT2 = mDico->AptNonContraignante(getApt(nt,nh,aZbio,false));
+                if (aptHT2>aRes){
+                    aRes=aptHT2;}
+            }
+        }
         return aRes;
     }
 
@@ -444,7 +463,7 @@ private:
 
 class WMSinfo
 {
-    public:
+public:
     std::string WMSLayerName()const{return mWMSLayerName;}
     std::string WMSURL()const{return mUrl;}
     TypeWMS getTypeWMS(){return mTypeWMS;}
