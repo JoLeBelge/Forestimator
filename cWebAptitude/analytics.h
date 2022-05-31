@@ -22,9 +22,19 @@
 #include <iostream>
 #include <fstream>
 
+#include <Wt/Chart/WCartesianChart.h>
+#include <Wt/WItemDelegate.h>
+#include <Wt/Chart/WDataSeries.h>
+#include <Wt/WStandardItemModel.h>
+#include <Wt/WStandardItem.h>
+#include <Wt/WComboBox.h>
+
 #include <Wt/Dbo/WtSqlTraits.h>
+//#include <Wt/Date/date.h>
 
 namespace dbo = Wt::Dbo;
+using namespace Wt;
+//using namespace date;
 
 //pour pouvoir classer les logs en différentes catégories. attention, ne pas changer l'ordre sinon la valeur de l'entier change et on est paumé
 enum typeLog {unknown,page,extend,danap,anas,dsingle,dmulti,danas,dsingleRW};
@@ -113,5 +123,16 @@ class PageAnalytics : public Wt::WApplication
 public:
     PageAnalytics(const Wt::WEnvironment& env, std::string aFileDB);
 
+    void setChart(int nbMonth);
+    void changeGraph(){
+        int nbm=std::stoi(nbMonthSelection_->currentText());
+        setChart(nbm);
+    }
+
+private:
+
     dbo::Session session;
+    Chart::WCartesianChart *mChart;
+    WComboBox * nbMonthSelection_;
+    std::shared_ptr<WStandardItemModel> model;
 };
