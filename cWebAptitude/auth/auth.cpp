@@ -17,8 +17,8 @@ AuthApplication::AuthApplication(const Wt::WEnvironment& env, cDicoApt *dico)
 
     // export de tout les messages html vers un fichier csv qui sera traduit en text avec ./html2text -from_encoding UTF8 -nobs -o /home/jo/app/Forestimator/data/tmp/Forestimator.txt /home/jo/app/Forestimator/data/tmp/texteForestimator.csv pour correction orthographique
     bool forestimator(0);
-    if (globTest){
-          std::cout << " tata!!!!\n\n\n" << std::endl;
+    if (globTest & 0){
+        std::cout << " tata!!!!\n\n\n" << std::endl;
         std::ifstream theFile;
         std::string aFile(mDico->File("TMPDIR")+"texteForestimator.csv");
         if (forestimator){

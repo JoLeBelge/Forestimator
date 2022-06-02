@@ -261,6 +261,10 @@ Enfin, outre ces considérations purement microclimatiques, on note que bien sou
             <p><strong>Exclusion.</strong>&nbsp;L’essence est <strong>incapable de se développer à long terme sur la station</strong>, très sensible aux dépérissements, aux maladies, aux chablis, aux gelées, <em>etc</em>. En d’autres termes, les contraintes environnementales sont rédhibitoires.</p>
             <p>&nbsp;</p>
             <p><img src="../img/aptitude.jpg"  width="90%" alt=""/></p>
+            
+            <h3> Les matrices d'aptitude  </h3>
+         Les matrices d'aptitude renseignent les essences forestières qui sont en adéquation avec les conditions stationnelles. Les conditions climatiques sont renseignées via la zone bioclimatique alors que les conditions hydro-trophiques reflètent une position au sein de l'écogramme. Les matrices d'aptitude sont consultables sur le site <a target="_blank" rel="noopener noreferrer" href="http://phytospy.gembloux.ulg.ac.be/matrice-aptitude"> phytoSpy</a>.
+     
 </message>
 
 
@@ -331,6 +335,15 @@ La photointerprétation a été réalisée sur 4221 points sur l'ensemble de la 
 </message>
 
 <message id="ana.pt.export.pdf">Export PDF</message>
+
+<message id="ref.article.forestimator">
+
+<figure class="highlight">
+<img src="../img/forestimatorArt.jpg" alt="Forestimator article" style="width:100.0px"/> 
+<figcaption class="figure-caption">Cet article de vulgarisation présente le portail cartographique Foresrtimator : <a target="_blank" rel="noopener noreferrer" href="https://hdl.handle.net/2268/291563"> Forestimator : un nouveau portail cartographique pour l'information forestière en Wallonie Lisein, Jonathan ; Claessens, Hugues ; Quevauvillers, Samuel et Lejeune, Philippe. 2022 • In <em>Forêt.Nature, 162</em>, p. 40-47.</a></figcaption>
+</figure>
+
+</message>
 
 </messages>
 

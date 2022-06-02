@@ -39,8 +39,14 @@ presentationPage::presentationPage(cDicoApt *aDico, AuthApplication *app):mDico(
     // probleme https://redmine.webtoolkit.eu/boards/2/topics/1206, j'ai plein de session qui se lancent quand je veux accèder à l'internal path d'une documentation
 
     // introduction forestimator
-    std::unique_ptr<Wt::WMenuItem> item = std::make_unique<Wt::WMenuItem>("Forestimator : présentation", cpp14::make_unique<Wt::WText>(WString::tr("page_presentation")));
+    //std::unique_ptr<Wt::WMenuItem> item = std::make_unique<Wt::WMenuItem>("Forestimator : présentation", cpp14::make_unique<Wt::WText>(WString::tr("page_presentation")));
+    std::unique_ptr<Wt::WMenuItem> item = std::make_unique<Wt::WMenuItem>("Forestimator : présentation");
+    Wt::WContainerWidget * c0 = new Wt::WContainerWidget();
+    c0->addNew<WText>(WString::tr("ref.article.forestimator"));
+    c0->addNew<WText>(WString::tr("page_presentation"));
+    item->setContents(std::unique_ptr<Wt::WContainerWidget>(c0));
     subMenu_->addItem(std::move(item));
+
     std::unique_ptr<Wt::WMenuItem> item2 = std::make_unique<Wt::WMenuItem>("Crédit et contact", cpp14::make_unique<Wt::WText>(WString::tr("page_presentation.credit")));
     subMenu_->addItem(std::move(item2));
 
@@ -117,6 +123,6 @@ presentationPage::presentationPage(cDicoApt *aDico, AuthApplication *app):mDico(
     subMenu_->addItem(std::move(item4));
 
     hLayout->addWidget(std::move(subMenu));
-    hLayout->addWidget(std::move(subStack),1);   
+    hLayout->addWidget(std::move(subStack),1);
 
 }

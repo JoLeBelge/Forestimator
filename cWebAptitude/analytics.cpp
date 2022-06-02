@@ -177,12 +177,14 @@ PageAnalytics::PageAnalytics(const Wt::WEnvironment& env, std::string aFileDB) :
     auto table = content->addWidget(Wt::cpp14::make_unique<Wt::WTable>());
     table->setHeaderCount(1);
     table->setWidth(Wt::WLength("100%"));
+    table->toggleStyleClass("table-striped",true);
 
-    table->elementAt(0, 0)->addNew<Wt::WText>("Date");
-    table->elementAt(0, 1)->addNew<Wt::WText>("IP");
-    table->elementAt(0, 2)->addNew<Wt::WText>("Client");
-    table->elementAt(0, 3)->addNew<Wt::WText>("Page");
-    table->elementAt(0, 4)->addNew<Wt::WText>("Categorie");
+    table->elementAt(0, 0)->addNew<Wt::WText>("Numéro");
+    table->elementAt(0, 1)->addNew<Wt::WText>("Date");
+    table->elementAt(0, 2)->addNew<Wt::WText>("IP");
+    table->elementAt(0, 3)->addNew<Wt::WText>("Client");
+    table->elementAt(0, 4)->addNew<Wt::WText>("Page");
+    table->elementAt(0, 5)->addNew<Wt::WText>("Categorie");
 
     Logs logs = session.find<Log>().orderBy("datum DESC").limit(100);
     int i=1;
@@ -193,11 +195,12 @@ PageAnalytics::PageAnalytics(const Wt::WEnvironment& env, std::string aFileDB) :
 
             time_t now=log->datum;
             //tm *ltm = localtime(&now);
-            table->elementAt(i,0)->addWidget(Wt::cpp14::make_unique<Wt::WText>(ctime(&now)));
-            table->elementAt(i,1)->addWidget(Wt::cpp14::make_unique<Wt::WText>(log->ip));
-            table->elementAt(i,2)->addWidget(Wt::cpp14::make_unique<Wt::WText>(log->client));
-            table->elementAt(i,3)->addWidget(Wt::cpp14::make_unique<Wt::WText>(log->ipath));
-            table->elementAt(i,4)->addWidget(Wt::cpp14::make_unique<Wt::WText>(log->getCat()));
+            table->elementAt(i,0)->addWidget(Wt::cpp14::make_unique<Wt::WText>(std::to_string(i)));
+            table->elementAt(i,1)->addWidget(Wt::cpp14::make_unique<Wt::WText>(ctime(&now)));
+            table->elementAt(i,2)->addWidget(Wt::cpp14::make_unique<Wt::WText>(log->ip));
+            table->elementAt(i,3)->addWidget(Wt::cpp14::make_unique<Wt::WText>(log->client));
+            table->elementAt(i,4)->addWidget(Wt::cpp14::make_unique<Wt::WText>(log->ipath));
+            table->elementAt(i,5)->addWidget(Wt::cpp14::make_unique<Wt::WText>(log->getCat()));
 
             i++;
         }

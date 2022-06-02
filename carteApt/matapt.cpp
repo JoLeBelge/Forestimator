@@ -612,7 +612,7 @@ zbioPainted::zbioPainted(std::string  aShp, std::shared_ptr<cdicoAptBase> aDico)
             printf( " shp zbio : pas réussi à l'ouvrir." );
         } else{
             // layer
-            std::cout << "zbioPainted création " << std::endl;
+            //std::cout << "zbioPainted création " << std::endl;
             mlay = mDS->GetLayer(0);
             ext= new OGREnvelope;
             mlay->GetExtent(ext);
