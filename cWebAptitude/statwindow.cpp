@@ -198,10 +198,13 @@ void surfPdfResource::handleRequest(const Http::Request &request, Http::Response
             }
         }
     }
-    std::cout << o.str() << std::endl;
+    //std::cout << o.str() << std::endl;
     boost::replace_all(tp,"mApt",o.str());
     // toujours le même problème ; le htmlText renseigne le chemin d'accès à des images en ommettant le docroot, alors que le pdfrenderer lui à besoin du chemin d'accès complêt.
     boost::replace_all(tp,"src=\"","src=\""+mSW->mDico->File("docroot"));
+
+    o.str("");
+    o.clear();
     //std::cout << tp << std::endl;
     renderer.render(tp);
     response.setMimeType("application/pdf");
@@ -212,6 +215,5 @@ void surfPdfResource::handleRequest(const Http::Request &request, Http::Response
     HPDF_Free (pdf);
 
     response.out (). write ((char *) buf, size);
-
     delete [] buf;
 }
