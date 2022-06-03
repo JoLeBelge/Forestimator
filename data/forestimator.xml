@@ -616,35 +616,27 @@ detAptFEE
 
 <message id="report.analyse.surf">
 	<div>
-		  <h1>Forestimator : analyse parcellaire</h1>
-
+		  <h1>TITRE_REPPORT </h1>
 		  <style>
 		span.special {
 		  color: #FF0000;
 		  font-weight: bold;
 		}
-
 		#main_table {
 		  font-size: 8pt;
 		  margin-left: auto;
 		  margin-right: auto;
 		}
-
 		#main_table .special {
 		  color: #FF0000;
 		}
-
 		#main_table th {
 		  border-bottom: 1px solid black;
 		}
-		
 		  </style>
-
-		<!--<div><img src="${carte_static_1}"/></div> j'ai eu un bug lors du rendu je pense que c'est à cause de l'image carte_stat_1 donc je commente pour un temps-->
-		<div>
-		${AptTable}
-		</div>
-		<div>${InfoT}</div>
+		<div>mCarteGenCont</div>
+		<div>mApt</div>
+		<div>mAllStatIndivCont</div>
 	</div>
 </message>
 

@@ -9,15 +9,11 @@ TO DO forestimator
 
 - stat surf sur parcelles cadastrale ; créer un nom de mClientName?
 
--téléchargement/ api ; un page avec des liens pour télécharger les cartes sur l'ensemble de la RW ; oui mais pas sous la forme du tableau d'aide actuel, il faut recréer une vrai page web avec un tableau et des lien vers des ressources (zip carte + qml)
-
 réunion PL 23/11/2020
 -analyse Compo ; présence pour chaque essences plus typologie des peuplements (celle de IFPRW j'imagine - phil vois avec HC - moi je peux voir ce qu'on utilisais pour IFA - IFG)
 
 - géoservice API ;
 --> découpler les traitements du site web en lui-même. peut-être simplement 2 applications Wt différentes (sur des ordinateurs différents - ou le même). La réponse doit être envoyée par email. OUi mais si c'est pas sur la même machine, je dois envoyer le shapefile dans la requete (beurk encore)
-
---> réponse xml pour traitement
 
 --> s'inspirer de https://map.gis-gr.eu/ pour sélection de couches (coté rendu visuel). fait avec https://docs.mapbox.com/mapbox-gl-js
 --> ajout mode dessin de polygones?

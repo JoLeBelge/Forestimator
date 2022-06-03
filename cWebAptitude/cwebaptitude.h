@@ -105,11 +105,13 @@ public:
 
     // un bon référencement dans moteur de recherche google passe par un header avec une description et un titre propre à chaque page. géré ici
     void changeHeader(std::string aSection);
+
+      parcellaire * mPA;
 private:
     void load_content_couches(WContainerWidget * content);
     AuthApplication * mApp;
     cDicoApt * mDico;
-    parcellaire * mPA;
+
 
     Wt::WColor col_sel = Wt::WColor(23,87,23);
     Wt::WColor col_not_sel = Wt::WColor("transparent");

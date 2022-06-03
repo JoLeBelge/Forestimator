@@ -446,6 +446,12 @@ void groupLayers::updateGL(){
     pdfLink.setTarget(Wt::LinkTarget::NewWindow);
     mAnaPoint->createPdfBut->setLink(pdfLink);
 
+    // report analyse surfacique
+    auto pdfSurf = std::make_shared<surfPdfResource>(mcWebAptitude->mPA->mStatW);
+    auto pdfLink2 = Wt::WLink(pdfSurf);
+    pdfLink2.setTarget(Wt::LinkTarget::NewWindow);
+    mcWebAptitude->mPA->mStatW->createPdfBut->setLink(pdfLink2);
+
     // boucle sur les layers et envoi du signal pour cacher ou rendre visible les checkbox
     for (std::shared_ptr<Layer> l : mVLs){
         l->ExpertMode(expertMode);

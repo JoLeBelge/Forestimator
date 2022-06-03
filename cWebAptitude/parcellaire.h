@@ -69,13 +69,13 @@ public:
     // une méthode pour utiliser le polygone issu d'une recherche sur le cadastre. Un seul polygone, format geojson - et les signaux qui vont avec pour la communicaiton avec widgetCadastre.
     void polygoneCadastre(std::string aFileGeoJson);
 
-
+    statWindow * mStatW;
 private:
 
     // Full path ; là ou est sauvé le shp localement, mName ; le nom du shp tels qu'il était chez le client
     std::string mFullPath, mName,mClientName;
     Wt::WContainerWidget * mContSelect4D;
-    statWindow * mStatW;
+
     Wt::WFileUpload *fu;
     Wt::WPushButton  *downloadRasterBt;
     Wt::WPushButton  *anaOnAllPolygBt;

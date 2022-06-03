@@ -86,7 +86,7 @@ protected:
         {
             delete p;
         }
-/*        for (auto p : mVLStatCont)
+        /*        for (auto p : mVLStatCont)
         {
             delete p;
         }*/
@@ -106,7 +106,7 @@ public:
     void clickOnName(std::string aCode);
 
     // update du rendu du nom de la couche qui est sélectionnée
-     // gestion de la carte active ; celle qui est en haut du panier
+    // gestion de la carte active ; celle qui est en haut du panier
     void updateActiveLay(std::string aCode);
     // update pour passer du mode expert au mode non expert et vice et versa
     void updateGL();
@@ -118,10 +118,10 @@ public:
         std::string aRes("");
         switch (mTypeClassifST) {
         case FEE:
-          aRes="FEE";
+            aRes="FEE";
             break;
         case CS:
-             aRes="CS";
+            aRes="CS";
             break;
         }
         return aRes;
@@ -190,7 +190,8 @@ public:
     OGREnvelope * getMapExtent(){return & mMapExtent;}
 
     JSlot slotMapExport;
-       simplepoint * mAnaPoint;
+    simplepoint * mAnaPoint;
+
 private:
 
     std::vector<std::shared_ptr<Layer>> mVLs;
@@ -206,8 +207,8 @@ private:
     JSignal<double, double, double, double>  sigMapExport;
     OGREnvelope mMapExtent;
     void updateMapExtentAndCropIm(double topX, double topY, double bottomX, double bottomY){
-      updateMapExtent(topX, topY, bottomX, bottomY);
-      exportLayMapView();
+        updateMapExtent(topX, topY, bottomX, bottomY);
+        exportLayMapView();
     }
 
     // signal pour cacher les nodes qui sont en mode expert

@@ -200,17 +200,19 @@ cWebAptitude::cWebAptitude(AuthApplication *app, Auth::AuthWidget* authWidget_)
     //load_content_couches(content_couches);
 
     mPanier = content_panier->addWidget(Wt::cpp14::make_unique<panier>(mApp, this));
-    mGroupL->updateGL();
-
-    // des couches que l'on souhaite voir dans le panier dès le départ
-    mGroupL->clickOnName("IGN");
 
     statWindow * page_camembert = top_stack->addNew<statWindow>(mGroupL);
+
 
     /* CHARGE ONGLET ANALYSES */
     //printf("create PA\n");
     mPA = dialog_anal->contents()->addWidget(cpp14::make_unique<parcellaire>(mGroupL,mApp,page_camembert));
     mPA->addStyleClass("content_analyse");
+
+    mGroupL->updateGL();// updaGL utilise des pointeurs d'autres classe, donc je dois le faire après avoir instancier toutes les autres classes... StatWindows, SimplePoint et parcellaire
+    // des couches que l'on souhaite voir dans le panier dès le départ
+    mGroupL->clickOnName("IGN");
+
 
     /*	ACTIONS	: on connect les events aux méthodes	*/
     // dans wt_config, mettre à 500 milliseconde au lieu de 200 pour le double click

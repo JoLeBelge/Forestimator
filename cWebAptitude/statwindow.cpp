@@ -19,10 +19,7 @@ statWindow::statWindow(groupLayers * aGL):mDico(aGL->Dico()), mApp(aGL->m_app),m
     WPushButton * retour = tpl->bindWidget("retour", Wt::cpp14::make_unique<WPushButton>("Retour"));
     retour->setLink(WLink(LinkType::InternalPath, "/cartographie"));
     // bouton export PDF
-    if (0){
     createPdfBut = contTitre_->addWidget(cpp14::make_unique<WPushButton>("Export PDF"));
-    //createPdfBut->clicked().connect(this,&statWindow::export2pdf);
-    }
 
     mCarteGenCont = addWidget(cpp14::make_unique<WContainerWidget>());
     mCarteGenCont->setId("carteGenStat");
@@ -58,10 +55,10 @@ void statWindow::genIndivCarteAndAptT(){
     }
 
     for (std::unique_ptr<Wt::WContainerWidget> & chart : mGL->mVLStatCont) {
-       // if (chart->deserveChart()){
-            // je veux un comportement différent pour
-                add1layerStat(std::move(chart));
-       // }
+        // if (chart->deserveChart()){
+        // je veux un comportement différent pour
+        add1layerStat(std::move(chart));
+        // }
     }
 
     /*if (mGL->mCompo){
@@ -109,57 +106,58 @@ void statWindow::vider()
 }
 
 void statWindow::generateGenCarte(OGRFeature * poFeature){
-     WVBoxLayout * layoutV =mCarteGenCont->setLayout(cpp14::make_unique<WVBoxLayout>());
-     layoutV->addWidget(cpp14::make_unique<WText>("<h4>Aperçu</h4>"));
-     //aRes->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
-     WContainerWidget * aContCarte = layoutV->addWidget(cpp14::make_unique<WContainerWidget>());
-     WHBoxLayout * layoutH = aContCarte->setLayout(cpp14::make_unique<WHBoxLayout>());
-     // ajout de la carte pour cette couche
-     staticMap sm(mIGN,poFeature->GetGeometryRef());
-     Wt::WImage * im =layoutH->addWidget(cpp14::make_unique<Wt::WImage>(sm.getWLinkRel()),0);
-     im->resize(350,"100%");
-     // need to set it here after initialization of the map id !
+    WVBoxLayout * layoutV =mCarteGenCont->setLayout(cpp14::make_unique<WVBoxLayout>());
+    layoutV->addWidget(cpp14::make_unique<WText>("<h4>Aperçu</h4>"));
+    //aRes->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
+    WContainerWidget * aContCarte = layoutV->addWidget(cpp14::make_unique<WContainerWidget>());
+    WHBoxLayout * layoutH = aContCarte->setLayout(cpp14::make_unique<WHBoxLayout>());
+    // ajout de la carte pour cette couche
+    staticMap sm(mIGN,poFeature->GetGeometryRef());
+    Wt::WImage * im =layoutH->addWidget(cpp14::make_unique<Wt::WImage>(sm.getWLinkRel()),0);
+    im->resize(350,"100%");
+    // need to set it here after initialization of the map id !
 
-     // description générale ; lecture des attribut du polygone?calcul de pente, zone bioclim, et élévation
-     WContainerWidget * aContInfo = layoutH->addWidget(cpp14::make_unique<WContainerWidget>());
+    // description générale ; lecture des attribut du polygone?calcul de pente, zone bioclim, et élévation
+    WContainerWidget * aContInfo = layoutH->addWidget(cpp14::make_unique<WContainerWidget>());
 
-      // je refais les calculs pour les couches qui m'intéressent
+    // je refais les calculs pour les couches qui m'intéressent
 
-     basicStat statMNT= mMNT->computeBasicStatOnPolyg(poFeature->GetGeometryRef());
-     basicStat statPente= mPente->computeBasicStatOnPolyg(poFeature->GetGeometryRef());
+    basicStat statMNT= mMNT->computeBasicStatOnPolyg(poFeature->GetGeometryRef());
+    basicStat statPente= mPente->computeBasicStatOnPolyg(poFeature->GetGeometryRef());
 
-     aContInfo->addWidget(cpp14::make_unique<WText>(Wt::WString::tr("report.analyse.surf.zbio.t")));
+    aContInfo->addWidget(cpp14::make_unique<WText>(Wt::WString::tr("report.analyse.surf.zbio.t")));
 
-     std::cout << "statWindow::generateGenCarte ---" << std::endl;
-     aContInfo->addWidget(cpp14::make_unique<WText>(mZBIO->summaryStat(poFeature->GetGeometryRef())));
+    std::cout << "statWindow::generateGenCarte ---" << std::endl;
+    aContInfo->addWidget(cpp14::make_unique<WText>(mZBIO->summaryStat(poFeature->GetGeometryRef())));
 
-     aContInfo->addWidget(cpp14::make_unique<WText>(Wt::WString::tr("report.analyse.surf.relief.t")));
+    aContInfo->addWidget(cpp14::make_unique<WText>(Wt::WString::tr("report.analyse.surf.relief.t")));
 
-     aContInfo->addWidget(cpp14::make_unique<WText>("Altitude maximum : "+ statMNT.getMax() + " m"));
-     aContInfo->addWidget(cpp14::make_unique<WBreak>());
-     aContInfo->addWidget(cpp14::make_unique<WText>("Altitude moyenne : "+ statMNT.getMean()+ " m"));
-     aContInfo->addWidget(cpp14::make_unique<WBreak>());
-     aContInfo->addWidget(cpp14::make_unique<WText>("Altitude minimum : "+ statMNT.getMin()+ " m"));
-     aContInfo->addWidget(cpp14::make_unique<WBreak>());
-     aContInfo->addWidget(cpp14::make_unique<WText>("Pente moyenne : "+ statPente.getMean()+ " %"));
-     aContInfo->addWidget(cpp14::make_unique<WBreak>());
+    aContInfo->addWidget(cpp14::make_unique<WText>("Altitude maximum : "+ statMNT.getMax() + " m"));
+    aContInfo->addWidget(cpp14::make_unique<WBreak>());
+    aContInfo->addWidget(cpp14::make_unique<WText>("Altitude moyenne : "+ statMNT.getMean()+ " m"));
+    aContInfo->addWidget(cpp14::make_unique<WBreak>());
+    aContInfo->addWidget(cpp14::make_unique<WText>("Altitude minimum : "+ statMNT.getMin()+ " m"));
+    aContInfo->addWidget(cpp14::make_unique<WBreak>());
+    aContInfo->addWidget(cpp14::make_unique<WText>("Pente moyenne : "+ statPente.getMean()+ " %"));
+    aContInfo->addWidget(cpp14::make_unique<WBreak>());
 
-     // analyse pédo surfacique
+    // analyse pédo surfacique
 
-     surfPedo statPedo(mDico->mPedo,poFeature->GetGeometryRef());
-     aContInfo->addWidget(cpp14::make_unique<WText>(Wt::WString::tr("report.analyse.surf.pedo.t")));
-     aContInfo->addWidget(cpp14::make_unique<WText>("Texture : "+ statPedo.getSummary(PEDO::TEXTURE)));
-     aContInfo->addWidget(cpp14::make_unique<WBreak>());
-     aContInfo->addWidget(cpp14::make_unique<WText>("Drainage : "+ statPedo.getSummary(PEDO::DRAINAGE)));
-     aContInfo->addWidget(cpp14::make_unique<WBreak>());
-     aContInfo->addWidget(cpp14::make_unique<WText>("Profondeur : "+ statPedo.getSummary(PEDO::PROFONDEUR)));
-     aContInfo->addWidget(cpp14::make_unique<WBreak>());
+    surfPedo statPedo(mDico->mPedo,poFeature->GetGeometryRef());
+    aContInfo->addWidget(cpp14::make_unique<WText>(Wt::WString::tr("report.analyse.surf.pedo.t")));
+    aContInfo->addWidget(cpp14::make_unique<WText>("Texture : "+ statPedo.getSummary(PEDO::TEXTURE)));
+    aContInfo->addWidget(cpp14::make_unique<WBreak>());
+    aContInfo->addWidget(cpp14::make_unique<WText>("Drainage : "+ statPedo.getSummary(PEDO::DRAINAGE)));
+    aContInfo->addWidget(cpp14::make_unique<WBreak>());
+    aContInfo->addWidget(cpp14::make_unique<WText>("Profondeur : "+ statPedo.getSummary(PEDO::PROFONDEUR)));
+    aContInfo->addWidget(cpp14::make_unique<WBreak>());
 }
 
-void statWindow::export2pdf(std::string titre){
 
-    std::cout << "statWindow::export2pdf()" << std::endl;
-    // création du pdf
+void surfPdfResource::handleRequest(const Http::Request &request, Http::Response &response)
+{
+    if (globTest) {std::cout << "\n surfPdfResource handle request \n " << std::endl;}
+
     HPDF_Doc pdf = HPDF_New(error_handler, 0);
 
     HPDF_UseUTFEncodings(pdf);
@@ -167,48 +165,53 @@ void statWindow::export2pdf(std::string titre){
     HPDF_Page_SetSize(page, HPDF_PAGE_SIZE_A4, HPDF_PAGE_PORTRAIT);
     HPDF_SetCompressionMode(pdf, HPDF_COMP_ALL);// sinon pdf fait 5 Mo pour rien du tout
 
-    MyRenderer renderer(pdf, page,titre,mDico);
+    std::string titre("Analyse Surfacique");
+    MyRenderer renderer(pdf, page,titre,mSW->mDico);
 
-    // post sur l'export des widgets vers pdf - pas super clair mais informatif
-    //https://redmine.webtoolkit.eu/boards/2/topics/14392?r=14462#message-14462
-    Wt::WString tpl = tr("report.analyse.surf");
+    Wt::WString tpl = Wt::WText::tr("report.analyse.surf");
     std::string tp = tpl.toUTF8();
+    std::ostringstream o;
+    //std::string htmlText;
+    boost::replace_all(tp,"TITRE_REPPORT",titre);
 
-// cette boucle fait crasher wt avec un g is null de javascript, à la fin de la méthode. Je sais pas pourquoi.
-  /* for (layerStatChart * stat :VStatIndiv()){
-        std::ostringstream o;
-        //if (VStatIndiv().size()>0){
-        // ça ça fait crasher mais pas
-        stat->getChart(1)->htmlText(o);
-        // pas cette ligne
-        //stat->getChart(1);
-        //boost::replace_all(tp,"${InfoT}",o.str());
-        o.str("");
-        o.clear();
-    }*/
-    //boost::replace_all(tp,"${InfoT}",o.str());
+    mSW->mTitre->htmlText(o);
+    mSW->mCarteGenCont->htmlText(o);
+    // toujours le même problème ; le htmlText renseigne le chemin d'accès à des images en ommettant le docroot, alors que le pdfrenderer lui à besoin du chemin d'accès complêt.
+    //htmlText=o.str();
+    //boost::replace_all(htmlText,"src=\"","src=\""+mSW->mDico->File("docroot"));
+    boost::replace_all(tp,"mCarteGenCont",o.str());
 
-    //boost::replace_all(tp,"${AptTable}",o.str()); // c'est buggé donc juste desactive pour instant...
-    //boost::replace_all(tp,"${carte_static_1}",strImgPDF);
+    o.str("");// en faut au lieu de vider à chaque fois le streamstream, je peux ajouter tout mon htmltext dedans
+    mSW->mAllStatIndivCont->htmlText(o);
+    //htmlText=o.str();
+    //boost::replace_all(htmlText,"src=\"","src=\""+mSW->mDico->File("docroot"));
+    boost::replace_all(tp,"mAllStatIndivCont",o.str());
 
+    o.str("");
+    // le plus délicat, c'est ce portage des WpaintedWidget batonnet qui sont dans la table d'aptitude vers le pdf
+    //Je pourrais très simplement faire un "StatIndivCont" qui est générique à toute les cartes-> prend une autre forme et plus de place dans le pdf mais ça reste complêt et très bien.
+    for (layerStatChart * chart : mSW->mGL->ptrVLStat()) {
+        if (chart->deserveChart()){
+            if (chart->Lay()->getCatLayer()==TypeLayer::FEE | chart->Lay()->getCatLayer()==TypeLayer::CS){
+                // problème : le layerStatChart d'une aptitude dois pouvoir utiliser la méthode getChart au lieu de getBarStat
+                chart->getChart(0)->htmlText(o);
+            }
+        }
+    }
+    std::cout << o.str() << std::endl;
+    boost::replace_all(tp,"mApt",o.str());
+    // toujours le même problème ; le htmlText renseigne le chemin d'accès à des images en ommettant le docroot, alors que le pdfrenderer lui à besoin du chemin d'accès complêt.
+    boost::replace_all(tp,"src=\"","src=\""+mSW->mDico->File("docroot"));
+    //std::cout << tp << std::endl;
     renderer.render(tp);
+    response.setMimeType("application/pdf");
+    HPDF_SaveToStream (pdf);
+    unsigned int size = HPDF_GetStreamSize (pdf);
+    HPDF_BYTE * buf = new HPDF_BYTE [size];
+    HPDF_ReadFromStream (pdf, buf, & size);
+    HPDF_Free (pdf);
 
-    std::string name0 = std::tmpnam(nullptr);
-    std::string name1 = name0.substr(5,name0.size()-5);
-    std::string aOut = mDico->File("TMPDIR")+"/"+name1+".pdf";
+    response.out (). write ((char *) buf, size);
 
-    HPDF_SaveToFile(pdf,aOut.c_str());
-    HPDF_Free(pdf);
-
-     //std::unique_ptr<WFileResource> fileResource = std::make_unique<Wt::WFileResource>("plain/text",aOut);
-     WFileResource *fileResource = new Wt::WFileResource("application/pdf",aOut);
-    fileResource->suggestFileName("Forestimator-info-parcelaire.pdf");
-    mApp->redirect(fileResource->url());
-
-
-}
-
-
-void statWindow::renderPdf(Wt::Render::WPdfRenderer * renderer){
-    if (globTest){std::cout << "statWindow::render" << std::endl;}
+    delete [] buf;
 }

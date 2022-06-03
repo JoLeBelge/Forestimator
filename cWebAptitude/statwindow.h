@@ -31,21 +31,18 @@ public:
     void genIndivCarteAndAptT();
     void generateGenCarte(OGRFeature *poFeature);
 
-    //void export2pdf(std::string img, int length);
-    void export2pdf(std::string titre="test");
-    void renderPdf(Wt::Render::WPdfRenderer * renderer);
-
     WText * mTitre;
     WTable * mAptTable;
     WPushButton * createPdfBut;
     WContainerWidget * mCarteGenCont;
     WContainerWidget * mAllStatIndivCont;
 
-private:
-    cDicoApt * mDico;
-    AuthApplication * mApp;
-    groupLayers*mGL;
 
+    cDicoApt * mDico;
+     groupLayers*mGL;
+private:
+
+    AuthApplication * mApp;
     Wt::WVBoxLayout * layout;
 
     // pour la carte de localisation
@@ -61,6 +58,23 @@ private:
     int chunkImgPDF=0;
     int chunkImgPDFind=0;
     std::string strImgPDF;*/
+};
+
+class surfPdfResource : public Wt::WResource
+{
+public:
+
+surfPdfResource(statWindow * aStatW) : WResource(), mSW(aStatW){}
+
+    ~surfPdfResource()
+    {
+        beingDeleted();
+    }
+void handleRequest(const Http::Request &request, Http::Response &response);
+
+private:
+statWindow * mSW;
+
 };
 
 #endif // STATWINDOW_H

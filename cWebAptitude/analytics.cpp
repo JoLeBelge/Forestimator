@@ -130,7 +130,8 @@ PageAnalytics::PageAnalytics(const Wt::WEnvironment& env, std::string aFileDB) :
     //time_t t=time(0);
     model = std::make_shared<WStandardItemModel>();
 
-    mChart->resize(800, 600);    // WPaintedWidget must be given an explicit size.
+    mChart->resize(800, 500);    // WPaintedWidget must be given an explicit size.
+    mChart->setMinimumSize(800, 500);
     mChart->setMargin(20, Side::Top | Side::Bottom); // Add margin vertically.
     //aChart->setMargin(WLength::Auto, Side::Left | Side::Right); // Center horizontally. il faut mettre des marges, qui sont comtpée au départ du cammembert, pour mettre les label
     mChart->setMargin(50, Side::Left | Side::Right);

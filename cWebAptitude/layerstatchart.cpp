@@ -63,7 +63,6 @@ std::unique_ptr<WContainerWidget> layerStatChart::getChart(bool forRenderingInPd
     staticMap sm(mLay,mGeom);
     // ça fonctionne mais je ne gère pas bien la taille de l'image dans le conteneur, pour l'instant la taille de l'image affichée est celle de l'image sur le disque
 
-
     if (forRenderingInPdf){
         Wt::WImage * im =layoutH->addWidget(cpp14::make_unique<Wt::WImage>(sm.getWLink()),0);
         im->resize(350,350);
@@ -74,7 +73,6 @@ std::unique_ptr<WContainerWidget> layerStatChart::getChart(bool forRenderingInPd
         im->resize(450,450);
 
     }
-
     WContainerWidget * aContTableAndPie = layoutH->addWidget(cpp14::make_unique<WContainerWidget>());
     aContTableAndPie->setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Center);
     //aContTableAndPie->setInline(0);
