@@ -89,12 +89,11 @@ std::unique_ptr<WContainerWidget> layerStatChart::getChart(bool forRenderingInPd
                 table->setMargin(10, Side::Top | Side::Bottom);
                 table->setMargin(WLength::Auto, Side::Left | Side::Right);
                 table->setAlternatingRowColors(0);
-                table->setSortingEnabled(1,false);
-                table->setSortingEnabled(0,false);// pas très utile
+                //table->setSortingEnabled(1,false);
+                //table->setSortingEnabled(0,false);// pas très utile
                 //table->setAlternatingRowColors(true); // si je met à true , va overrider les couleurs que j'ai notée dans la colonne 3 du model qui sert de légende
                 //std::cout << "set model " << std::endl;
                 table->setModel(mModel);
-
                 // delegate ; met à 0 mes valeurs de pct dans la colonne, mais pour les labels de pct dans le graph ça fonctionne
                 //std::shared_ptr<WItemDelegate> delegate = std::make_shared<WItemDelegate>();
                 //delegate->setTextFormat("%.0f");

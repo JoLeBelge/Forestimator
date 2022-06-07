@@ -195,6 +195,8 @@ void surfPdfResource::handleRequest(const Http::Request &request, Http::Response
             if (chart->Lay()->getCatLayer()==TypeLayer::FEE | chart->Lay()->getCatLayer()==TypeLayer::CS){
                 // problème : le layerStatChart d'une aptitude dois pouvoir utiliser la méthode getChart au lieu de getBarStat
                 chart->getChart(0)->htmlText(o);
+                // problème quand je reviens à la page résultat ; il y a un bug quand j'appuie sur les tableaux de statistique, à cause du setModel dans getChart...
+                // c'est peut-être parce que l'objet retourné par getChart est détruit, et que la destruction entraine celle du modèle?
             }
         }
     }
