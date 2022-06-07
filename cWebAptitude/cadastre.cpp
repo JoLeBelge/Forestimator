@@ -106,44 +106,44 @@ void cadastre::loadInfo(){
     */
     // ça c'est fait uniquement une fois pour créer la bd sqlite
     if (0){
-    std::string tmp= mShpParcellePath.c_str();
-    tmp= tmp.substr(0,mShpParcellePath.size()-3)+"dbf";
-    inputPath=tmp.c_str();
-    if (boost::filesystem::exists(inputPath)){
-        GDALDataset * mDS; mDS= GDALDataset::Open(inputPath, GDAL_OF_VECTOR | GDAL_OF_READONLY);
-        if( mDS == NULL )
-        {
-            std::cout << inputPath << " : " ;
-            printf( " cadastre : Open parcelles cadastrales failed." );
-        } else{
-            // layer
-            OGRLayer * lay = mDS->GetLayer(0);
-            OGRFeature *poFeature;
-            int i(0);
-            while( (poFeature = lay->GetNextFeature()) != NULL )
+        std::string tmp= mShpParcellePath.c_str();
+        tmp= tmp.substr(0,mShpParcellePath.size()-3)+"dbf";
+        inputPath=tmp.c_str();
+        if (boost::filesystem::exists(inputPath)){
+            GDALDataset * mDS; mDS= GDALDataset::Open(inputPath, GDAL_OF_VECTOR | GDAL_OF_READONLY);
+            if( mDS == NULL )
             {
-                // création d'une parcelle cadastrale et ajout au vecteur
-                std::unique_ptr<capa> pt=std::make_unique<capa>(poFeature->GetFieldAsString("CaSeKey"),poFeature->GetFieldAsString("CaPaKey"),poFeature->GetFID(),&mVDiv);
+                std::cout << inputPath << " : " ;
+                printf( " cadastre : Open parcelles cadastrales failed." );
+            } else{
+                // layer
+                OGRLayer * lay = mDS->GetLayer(0);
+                OGRFeature *poFeature;
+                int i(0);
+                while( (poFeature = lay->GetNextFeature()) != NULL )
+                {
+                    // création d'une parcelle cadastrale et ajout au vecteur
+                    std::unique_ptr<capa> pt=std::make_unique<capa>(poFeature->GetFieldAsString("CaSeKey"),poFeature->GetFieldAsString("CaPaKey"),poFeature->GetFID(),&mVDiv);
 
-               /* if (mVCaPa.find(pt->divCode)==mVCaPa.end()){
+                    /* if (mVCaPa.find(pt->divCode)==mVCaPa.end()){
                     mVCaPa.emplace(std::make_pair(pt->divCode,std::vector<std::unique_ptr<capa>>()));
                 }
 
                 mVCaPa.at(pt->divCode).push_back(std::move(pt));
                 */
-                // ajout de la parcelle à la bd sqlite via ORM de wt
+                    // ajout de la parcelle à la bd sqlite via ORM de wt
 
-                //dbo::ptr<capa> capaPtr = session.add(std::move(pt));
+                    //dbo::ptr<capa> capaPtr = session.add(std::move(pt));
 
-                i++;
-                if (i % 10000==0){ std::cout << " i " << i << std::endl;}
+                    i++;
+                    if (i % 10000==0){ std::cout << " i " << i << std::endl;}
 
+                }
             }
+            GDALClose(mDS);
+        } else {
+            std::cout << inputPath << " n'existe pas " ;
         }
-        GDALClose(mDS);
-    } else {
-        std::cout << inputPath << " n'existe pas " ;
-    }
     }
 
     /*
@@ -183,7 +183,7 @@ std::vector<std::string> cadastre::getSectionForDiv(int aDivCode, Wt::Dbo::Sessi
     collectionCapa Capas = session->find<capa>().where("divCode = ?").bind(aDivCode);
 
     for (dbo::ptr<capa> &c : Capas){
-      if (std::find(aRes.begin(), aRes.end(), c->section) == aRes.end()){aRes.push_back(c->section);}
+        if (std::find(aRes.begin(), aRes.end(), c->section) == aRes.end()){aRes.push_back(c->section);}
     }
 
     std::sort(aRes.begin(), aRes.end());
@@ -199,9 +199,19 @@ std::vector<dbo::ptr<capa>> cadastre::getCaPaPtrVector(int aDivCode, std::string
     collectionCapa Capas = session->find<capa>().where("CaSecKey = ?").bind(std::to_string(aDivCode)+aSection).orderBy("CaPaKey");
 
     for (dbo::ptr<capa> &c : Capas){
-      aRes.push_back(c);
+        aRes.push_back(c);
     }
 
+    return aRes;
+}
+
+dbo::ptr<capa> cadastre::getCaPaPtr(std::string aCaPaKey,dbo::Session * session){
+    dbo::Transaction transaction{*session};
+    dbo::ptr<capa> aRes = session->find<capa>().where("CaPaKey = ?").bind(aCaPaKey);
+    boost::replace_all(aCaPaKey,"/","\/"); // ben oui sinon ça marche pas le sql select de dbo wt si on échappe pas le slash...
+    //aRes = session->find<capa>().where("CaPaKey = ?").bind(aCaPaKey);
+    //collectionCapa Capas = session->find<capa>().where("CaPaKey = ?").bind(aCaPaKey);
+    //std::cout << Capas.size() <<" est le nombre de capa retourné par la méthode" << std::endl;
     return aRes;
 }
 
@@ -362,6 +372,63 @@ std::string cadastre::saveFeatAsGEOJSON(OGRFeature *f){
     ofs.close();
     return aOut;
 }
+
+void cadastre::getCaPa4pt(double x, double y, ptCadastre * aPt){
+    if(!isnan(x) && !isnan(y) && !(x==0 && y==0)){
+        const char *inputPath= mShpParcellePath.c_str();
+        if (boost::filesystem::exists(inputPath)){
+            GDALDataset * mDS; mDS= GDALDataset::Open(inputPath, GDAL_OF_VECTOR | GDAL_OF_READONLY);
+            if( mDS == NULL )
+            {
+                std::cout << inputPath << " : " ;
+                printf( " cadastre : Open parcelles failed." );
+            } else{
+                //std::cout << "getCaPaKey pour une position donnée" << std::endl;
+                OGRLayer * lay = mDS->GetLayer(0);
+                OGRFeature *poFeature;
+                OGRPoint pt(x,y);
+                lay->SetSpatialFilter(&pt);
+                //The returned feature becomes the responsibility of the caller to delete with OGRFeature::DestroyFeature().
+                poFeature = lay->GetNextFeature();
+                if  (poFeature!= NULL )
+                {
+                    aPt->setCaPaKey(poFeature->GetFieldAsString("CaPaKey"));
+                    aPt->setCaPaFID(poFeature->GetFID());
+                    OGRFeature::DestroyFeature(poFeature);
+                }
+            }
+            GDALClose(mDS);
+        } else {
+            std::cout << inputPath << " n'existe pas " ;
+        }
+    }
+}
+
+
+ptCadastre::ptCadastre(std::shared_ptr<cadastre> aCadastre, double x, double y):mCad(aCadastre),mCommune(""),mFID(0),mCaPaKey(""){
+    if (!boost::filesystem::exists(mCad->mDirBDCadastre)){std::cout << " bd cadastre " << mCad->mDirBDCadastre << " n'existe pas!! ça va planter ... \n\n\n\n" <<std::endl;}
+    std::unique_ptr<dbo::backend::Sqlite3> sqlite3{new dbo::backend::Sqlite3(mCad->mDirBDCadastre)};
+
+    if (globTest){sqlite3->setProperty("show-queries", "true");}
+    session.setConnection(std::move(sqlite3));
+    session.mapClass<capa>("capa");
+    mCad->getCaPa4pt(x,y,this);
+
+    // maintenant je vais chercher l'objet mappé capa
+    if (mCaPaKey!=""){
+        dbo::ptr<capa> pt = mCad->getCaPaPtr(mCaPaKey,&session);
+        mCommune=mCad->Commune(pt->comINS);
+    }
+}
+
+std::string ptCadastre::displayAllInfoInOverlay(){
+    return "parcelle cadastrale "+mCaPaKey+ ", commune de " + mCommune;
+}
+
+void ptCadastre::usePolyg4Stat(){
+    geoJson_.emit(mCad->createPolygonPaCa(mFID));
+}
+
 /*
 void cadastre::writeArchive(std::string aArchive){
     std::cout << "Ecriture de l'archive des parcelles cadastrales dans " << aArchive << std::endl;

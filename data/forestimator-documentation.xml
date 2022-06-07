@@ -89,9 +89,32 @@ On estime que la profondeur de sol d'une série spéciale "P" (base de grand ver
 L'idée générale est de se calquer sur la méthodologie de l'INRAE (INRAE, UMR TETIS, R. Dutrieux, K. Ose, J.-B. Féret) développée depuis 2017. Celle-ci consiste à surveiller l'évolution saisonnière d'un indice spectral calculé sur base de séries temporelles d'images Sentinel-2. L'information est résumée sous forme d'une carte d'état sanitaire par an.
 <br></br>
 Une documentation plus exhaustive de la méthode est disponible sous format pdf:
-<a href="/pdf/methodoAnalyseSentinel2TimeSerie2021.pdf" download="detectionScolyte">
+<a target="_blank" rel="noopener noreferrer" href="/pdf/methodoAnalyseSentinel2TimeSerie2021.pdf" download="detectionScolyte">
   <img src="/img/typographe.jpeg" alt="document pdf" width="104" height="142"> </img>
 </a>
+
+</message>
+
+<message id="ES_EP.ref">
+<h4>Référence</h4>
+<br></br><br></br>
+ <div class="csl-entry">Dutrieux, R., Féret, J.-B., Ose, K., 2021. Mise au point d’une méthode reproductible pour le suivi généralisé des dégats de scolytes par télédétection satellitaire. ONF Rendez-vous techniques 37–44.  Consulter en ligne <a target="_blank" rel="noopener noreferrer"  href="https://www.onf.fr/onf/+/cec::les-rendez-vous-techniques-de-lonf-no69-70.html">ici</a>. </div>
+ <br></br><br></br>
+ <div class="csl-entry">DUTRIEUX, R., FERET, J.-B., OSE, K., DE BOISSIEU, F., 2021. Package Fordead. Portail Data INRAE. <a target="_blank" rel="noopener noreferrer"  href="https://doi.org/10.15454/4TEO6H">https://doi.org/10.15454/4TEO6H</a></div>
+ <br></br><br></br>
+<div class="csl-entry">Ministère de l'argriculture et de l'alimentation (France). <a target="_blank" rel="noopener noreferrer"  href="https://draaf.grand-est.agriculture.gouv.fr/IMG/pdf/Article_Emergeance_scolyte_2022_V5_cle84be42.pdf">Crise scolyte sur épicéa : alerte essaimage printemps 2022 - santé des forêts.</a></div>
+<br></br><br></br>
+<div class="csl-entry">Département de la santé des forêts - Ministère de l'argriculture et de l'alimentation (France). <a target="_blank" rel="noopener noreferrer"  href="https://agriculture.gouv.fr/telecharger/129089?token=6bc56d7dc6eb285fd170a14fadd5cd6d94c1973a73dd7a4e408eea316d47c9aa">Crise scolytes sur épicéas - Bilan fin 2021</a></div>
+
+</message>
+
+<message id="ES_EP.video">
+<h4>Illustration vidéo de la crise du typographe sur la pessière d'Argonne</h4>
+Le massif d'Argonne dans le Grand-Est (France) est un massif qui a subit de plein fouet la crise du scolyte. 
+La vidéo ci-dessous retrace la crise au moyen de prises de vue satellites (planetScope).
+En supplément de l'image en couleur bleu-vert-rouge à droite, un indice spectrale de végétation (NDVI) est présenté en haut à gauche et les cartes d'état sanitaire annuelles calculées avec les images sentinel-2 sont présentées en bas à gauche.
+<br></br><br></br>
+Une ligne du temps est symbolisée par la fonction harmonique qui représente la variation d'activité photosynthétique de la pessière au sein de l'année.
 
 </message>
 
@@ -167,7 +190,7 @@ En plus de ces 9 rasters, une couche synthétique nommée "Essence majoritaire" 
 </message>
 
 <message id="COMPO.version">
-Version d'octobre 2021
+Version d'octobre 2021 utilisant les prises de vue satellite de la période de végétation de 2018 (mai/juin/juillet).
 </message>
 
 <message id="COMPO.logs">
@@ -340,7 +363,9 @@ La photointerprétation a été réalisée sur 4221 points sur l'ensemble de la 
 
 <figure class="highlight">
 <img src="../img/forestimatorArt.jpg" alt="Forestimator article" style="width:100.0px"/> 
-<figcaption class="figure-caption">Cet article de vulgarisation présente le portail cartographique Foresrtimator : <a target="_blank" rel="noopener noreferrer" href="https://hdl.handle.net/2268/291563"> Forestimator : un nouveau portail cartographique pour l'information forestière en Wallonie Lisein, Jonathan ; Claessens, Hugues ; Quevauvillers, Samuel et Lejeune, Philippe. 2022 • In <em>Forêt.Nature, 162</em>, p. 40-47.</a></figcaption>
+<figcaption class="figure-caption">Cet article de vulgarisation présente le portail cartographique Foresrtimator :
+<br></br> <a target="_blank" rel="noopener noreferrer" href="https://hdl.handle.net/2268/291563"> Forestimator : un nouveau portail cartographique pour l'information forestière en Wallonie. <br></br> Lisein, Jonathan ; Claessens, Hugues ; Quevauvillers, Samuel et Lejeune, Philippe. 2022 • In <em>Forêt.Nature, 162</em>, p. 40-47.</a></figcaption>
+<br></br>
 </figure>
 
 </message>

@@ -14,7 +14,7 @@
 			<timeout>30000</timeout>
 
 
-		 	<plain-ajax-sessions-ratio-limit>1</plain-ajax-sessions-ratio-limit>
+		 	<!--<plain-ajax-sessions-ratio-limit>1</plain-ajax-sessions-ratio-limit>-->
 			<ajax-puzzle>true</ajax-puzzle>
 			<reload-is-new-session>true</reload-is-new-session>
 		</session-management>

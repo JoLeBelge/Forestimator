@@ -66,7 +66,7 @@ class groupStat{
 public:
     groupStat(){}
     ~groupStat(){clearStat();}
-    std::vector<layerStatChart*> ptrVLStat() {return mVLStat;}
+    std::vector<std::shared_ptr<layerStatChart>> ptrVLStat() {return mVLStat;}
     //std::vector<std::unique_ptr<Wt::WContainerWidget>> ptrVLStatCont() {return mVLStatCont;}
     // dans vecteur mVLStatCont std::unique_ptr<statCompo> mCompo;
     // un autre pour les statistique des cartes variables continu (à commencer à MNH)
@@ -75,24 +75,16 @@ public:
     std::vector<std::unique_ptr<Wt::WContainerWidget>> mVLStatCont;
 protected:
     // un vecteur pour les statistique des cartes variables de classes (majoritaire)
-    std::vector<layerStatChart*> mVLStat;
-
-
+    std::vector<std::shared_ptr<layerStatChart>> mVLStat;
 
 
     void clearStat(){
-        // clear d'un vecteur de pointeur, c'est mal. d'ailleurs ça bug si on calcule plusieur fois des stat dans la mm session, à regler donc
-        for (auto p : mVLStat)
+        for (std::shared_ptr<layerStatChart> p : mVLStat)
         {
-            delete p;
+            p.reset();
         }
-        /*        for (auto p : mVLStatCont)
-        {
-            delete p;
-        }*/
         mVLStatCont.clear();
         mVLStat.clear();
-        //mCompo.reset();
     }
 
 };

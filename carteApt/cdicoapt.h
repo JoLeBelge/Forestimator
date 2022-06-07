@@ -22,6 +22,8 @@ class LayerMTD;
 
 class cKKCS;
 
+enum typeAna {ponctuel,surfacique,dicoTable};
+
 // toute les informations/ dico que j'ai besoin pour le soft
 class cDicoApt : public cdicoAptBase
 {
@@ -33,10 +35,11 @@ public:
     std::shared_ptr<cadastre> mCadastre;
 
     /*************************/
-    std::string geoservice(std::string aTool,std::string aArgs,std::string aPolyg,bool xml=0);
+    std::string geoservice(std::string aTool,std::string aArgs,std::string aPolyg,typeAna aType,bool xml=0);
     bool checkTool(std::string aTool);
     OGRLayer * uploadLayer(std::string aShpToUpload);
     OGRGeometry * checkPolyg(std::string aPolyg);
+    OGRPoint * checkPoint(std::string aPolyg);
     // pour commencer, uniquement une liste de code de carte d'aptitude (AG_FEE, ...)
     std::vector<std::string> parseAptArg(std::string aArgs);
     std::map<int,double> simplifieAptStat(std::map<int,double> aStat);

@@ -19,6 +19,7 @@
 
 #include <Wt/Dbo/Dbo.h>
 #include <Wt/Dbo/backend/Sqlite3.h>
+#include <Wt/WSignal.h>
 namespace fs = boost::filesystem ;
 namespace dbo = Wt::Dbo;
 // une classe qui ressemble un peu dans sa structure à celle de cnsw, qui sera membre du dicoApt
@@ -31,6 +32,7 @@ extern bool globTest;
 std::string featureToGeoJSON(OGRFeature *f);
 
 class capa;
+class ptCadastre;
 
 class capa{
 
@@ -72,6 +74,16 @@ public:
     // info nécessitant la lecture des objets capa mappé dans la bd sqlite
     std::vector<std::string> getSectionForDiv(int aDivCode, Wt::Dbo::Session * session);
     std::vector<dbo::ptr<capa> > getCaPaPtrVector(int aDivCode,std::string aSection,dbo::Session * session);
+    dbo::ptr<capa> getCaPaPtr(std::string aCaPaKey,dbo::Session * session);
+
+    void getCaPa4pt(double x, double y, ptCadastre * aPt);
+    std::string Commune(int aComINS){
+        std::string aRes("");
+        if (mVCom.find(aComINS)!=mVCom.end()){
+            aRes=mVCom.at(aComINS);
+        }
+        return aRes;
+    }
 
     std::vector<std::pair<int,std::string>> getCommuneLabel(){
         std::map<int,std::string> aRes;
@@ -123,5 +135,24 @@ public:
 
       sqlite3 *db_;
 };
+
+class ptCadastre{
+public:
+    ptCadastre(std::shared_ptr<cadastre> aCadastre, double x, double y);
+    std::string displayAllInfoInOverlay();
+    Wt::Signal<std::string>& sendPolygone() { return geoJson_; }
+    Wt::Signal<std::string> geoJson_;
+    void usePolyg4Stat();
+
+    void setCaPaKey(std::string aKey){mCaPaKey=aKey;}
+    void setCaPaFID(int aFID){mFID=aFID;}
+
+private:
+    dbo::Session session;
+    std::shared_ptr<cadastre> mCad;
+    std::string mCaPaKey,mCommune;
+    int mFID;
+};
+
 
 #endif // CADASTRE_H

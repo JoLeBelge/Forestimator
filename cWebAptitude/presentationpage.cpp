@@ -113,10 +113,30 @@ presentationPage::presentationPage(cDicoApt *aDico, AuthApplication *app):mDico(
 
     for( auto kv : *mDico->layerMTD()){
         LayerMTD lMTD=kv.second;
+        if (lMTD.code()!="ES_EP"){
         //std::cout << "ajout lMTD dans sous menu présentation " << lMTD.Nom() << std::endl;
         std::unique_ptr<Wt::WMenuItem> item = std::make_unique<Wt::WMenuItem>(lMTD.Label(), cpp14::make_unique<Wt::WText>(getHtml(&lMTD)));
         subMenu_->addItem(std::move(item));
+        } else {
+            std::unique_ptr<Wt::WMenuItem> mi = std::make_unique<Wt::WMenuItem>(lMTD.Label());
+            Wt::WContainerWidget * ac = new Wt::WContainerWidget();
+            ac->addNew<WText>(getHtml(&lMTD));
+            // ajout d'un média video via librairie wt
 
+            ac->addNew<WText>(tr("ES_EP.video"));
+            std::string mp4Video = "video/Argonne-illuCriseSco.mp4";
+            //std::string ogvVideo = "https://www.webtoolkit.eu/videos/sintel_trailer.ogv";
+            // Define poster image location
+            std::string poster = "img/scoMM.png";
+            Wt::WVideo * video = ac->addNew<Wt::WVideo>();
+            video->addSource(Wt::WLink(mp4Video),"");
+            //video->addSource(Wt::WLink(ogvVideo));
+            video->setPoster(poster);
+            video->setAlternativeContent(std::make_unique<Wt::WImage>(Wt::WLink(poster)));
+            video->resize(640, 360);
+            mi->setContents(std::unique_ptr<Wt::WContainerWidget>(ac));
+            subMenu_->addItem(std::move(mi));
+        }
     }
 
     std::unique_ptr<Wt::WMenuItem> item4 = std::make_unique<Wt::WMenuItem>("Forestimator API", cpp14::make_unique<Wt::WText>(WString::tr("docu.api")));

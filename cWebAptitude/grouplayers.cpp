@@ -259,6 +259,18 @@ void groupLayers::extractInfo(double x, double y){
                                       );
             }
 
+            // si la couche active est le cadastre
+            if (( l->IsActive() && l->Code()=="Cadastre")){
+
+                ptCadastre ptCad(mDico->mCadastre,x,y);
+                mParent->doJavaScript("content.innerHTML = '"+ptCad.displayAllInfoInOverlay()+ "';"
+                                      +"var coordinate = ["+std::to_string(x) + ","+ std::to_string(y) +"];"
+                                      +"overlay.setPosition(coordinate);"
+                                      );
+                // comment créer le boutton pour que le polgyone du cadastre serve pour l'analyse surfacique? vu que je passe par du javascript pour la fenetre, je ne peux pas y ajouter de boutton...
+
+            }
+
         }
         // tableau du détail du calcul de l'aptitude d'une essence pour FEE
         for (std::shared_ptr<Layer> l : mVLs){
@@ -270,16 +282,12 @@ void groupLayers::extractInfo(double x, double y){
 
             }
         }
-
         // tableau des aptitudes pour toutes les essences
         mAnaPoint->afficheAptAllEss();
-
-
         mMap->updateView();
     }else {
         std::cout << "x et y ne sont pas des nombres , pas bien " << std::endl;
     }
-
 }
 
 /**
@@ -315,7 +323,7 @@ void groupLayers::computeStatGlob(OGRGeometry *poGeomGlobale){
             if (l->l4Stat()){
                 // clé : la valeur au format légende (ex ; Optimum). Valeur ; pourcentage pour ce polygone
                 std::map<std::string,int> stat = l->computeStat1(poGeomGlobale);
-                mVLStat.push_back(new layerStatChart(l,stat,poGeomGlobale));
+                mVLStat.push_back(std::make_shared<layerStatChart>(l,stat,poGeomGlobale));
             }
         }
 
@@ -358,14 +366,14 @@ void groupLayers::computeStatAllPol(OGRLayer * lay){
 
             if (l->Code()=="MNH2019"){
                 aFile << "<processingName>hdom2019</processingName>\n" ;
-                aFile << mDico->geoservice("hdom","MNH2019",polWkt,1);
+                aFile << mDico->geoservice("hdom","MNH2019",polWkt,typeAna::surfacique,1);
             } else if(l->Code()=="MNH2018P95"){
                  aFile << "<processingName>dendro2018</processingName>\n" ;
-                 aFile << mDico->geoservice("dendro2018","",polWkt,1);
+                 aFile << mDico->geoservice("dendro2018","",polWkt,typeAna::surfacique,1);
            } else {
                 if (l->l4Stat()){
                      aFile << "<processingName>"+l->Code()+"</processingName>\n" ;
-                     aFile << mDico->geoservice(l->Code(),"",polWkt,1);
+                     aFile << mDico->geoservice(l->Code(),"",polWkt,typeAna::surfacique,1);
                 }
             }
             aFile << "</processing>\n" ;
@@ -894,14 +902,21 @@ std::string getHtml(LayerMTD * lMTD){
     if (lMTD->CopyR()!=""){
         std::string html="<h4>Copyright </h4>" +lMTD->CopyR();
         if (isValidHtml(html)){aRes+=html;} else if (globTest){ std::cout << " pas de documentation pour le copyrigth - carte " <<  lMTD->code() << std::endl;}
-    }
-    if (lMTD->VRefs().size()>0){
-        std::string html="<h4>Référence  </h4>" ;
-        for (std::string ref : lMTD->VRefs()){
-            if (isValidHtml(ref)){html+="<p>"+ref+"</p>";}
+    } 
+
+    std::string ref(WString::tr(lMTD->code()+".ref").toUTF8());
+    if (ref.substr(0,2)=="??"){
+        if (lMTD->VRefs().size()>0){
+            std::string html="<h4>Référence  </h4>" ;
+            for (std::string aref : lMTD->VRefs()){
+                if (isValidHtml(aref)){html+="<p>"+aref+"</p>";}
+            }
+            aRes+=html;
         }
-        aRes+=html;
+    }else{
+        if (isValidHtml(ref)){aRes+=ref;} else if (globTest){ std::cout << " pas de référence - carte " <<  lMTD->code() << std::endl;}
     }
+
     return aRes;
 }
 

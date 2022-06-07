@@ -38,7 +38,10 @@ public:
     Wt::Signal<std::string>& sendPolygone() { return pathGeoJson_; }
     Wt::Signal<std::string> pathGeoJson_;
 
-    // la session est créé ici car dépend de la session d'utilisateur, ne dois pas être propre au dicoApt ou à class^ cadastre
+    // la session est créé ici car dépend de la session d'utilisateur, ne dois pas être propre au dicoApt ou à classe cadastre
+    // pas sur que ce soit vraiment ideal comme ça. Je pense que je dois détourner l'usage premier du dbo de Wt qui fait du mapping orienté "session", alors que moi je veux du mapping
+    // d'objet constant d'une session à l'autre, plutôt à mettre dans les dictionnaires utilisé par toutes les sessions.. voir ce que j'ai fait pour phytospy par ex.
+
     dbo::Session session;
 private:
     cadastre * mCad;

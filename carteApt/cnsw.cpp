@@ -353,6 +353,17 @@ std::string ptPedo::displayAllInfoInOverlay(){
     boost::replace_all(aRes,"'","\\'");
     return aRes;
 }
+std::string ptPedo::displayAllInfoAPI(){
+    std::string aRes("");
+    aRes+="Sigle pédologique;" + displayInfo(PEDO::SIGLE).at(1) +"\n";
+    for ( int p = PEDO::DRAINAGE; p != PEDO::Last; p++ )
+    {
+        PEDO ped = static_cast<PEDO>(p);
+        std::vector<std::string> info=displayInfo(ped);
+        aRes+=info.at(0)+";"+info.at(1)+ "\n";
+    }
+    return aRes;
+}
 
 surfPedo::surfPedo(std::shared_ptr<cnsw> dico, OGRGeometry *poGeom ):mDico(dico){
     propSurf=dico->anaSurface(poGeom);
@@ -423,6 +434,14 @@ std::string surfPedo::getSummary(PEDO p){
     }
 
     }
+    return aRes;
+}
+
+std::string surfPedo::getSummaryAPI(){
+    std::string aRes("");
+    aRes+="Texture;"+ getSummary(PEDO::TEXTURE)+"\n";
+    aRes+="Drainage;"+ getSummary(PEDO::DRAINAGE)+"\n";
+    aRes+="Profondeur;"+ getSummary(PEDO::PROFONDEUR)+"\n";
     return aRes;
 }
 

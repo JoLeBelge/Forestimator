@@ -266,7 +266,8 @@ public:
     bool Expert() const{return mExpert;}
     double Gain() const{return mGain;}
     void catSummary(){std::cout << "layerbase ; Code " << mCode << " , Nom " << mNom << ", raser " << mPathRaster << ", dictionnaire valeurs de " << mDicoVal.size() << " elements " << std::endl;}
-
+    // pour l'api qui veu avoir la table dictionnaire
+    std::string getDicoValStr();
     std::string EssCode() const{std::string aRes="";
                                    if ((mType==TypeLayer::CS) |(mType==TypeLayer::FEE)){aRes=mCode.substr(0,2);}
                                    return aRes;}

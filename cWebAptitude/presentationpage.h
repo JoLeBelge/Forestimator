@@ -8,6 +8,7 @@
 #include <Wt/WTemplate.h>
 #include "cdicoapt.h"
 #include "grouplayers.h"
+#include <Wt/WVideo.h>
 
 using namespace Wt;
 

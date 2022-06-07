@@ -44,7 +44,7 @@ statWindow::statWindow(groupLayers * aGL):mDico(aGL->Dico()), mApp(aGL->m_app),m
 }
 
 void statWindow::genIndivCarteAndAptT(){
-    for (layerStatChart * chart : mGL->ptrVLStat()) {
+    for (std::shared_ptr<layerStatChart> chart : mGL->ptrVLStat()) {
         if (chart->deserveChart()){
             if (chart->Lay()->getCatLayer()==TypeLayer::FEE | chart->Lay()->getCatLayer()==TypeLayer::CS){
                 add1Aptitude(chart);
@@ -66,7 +66,7 @@ void statWindow::genIndivCarteAndAptT(){
     }*/
 }
 
-void statWindow::add1Aptitude(layerStatChart * lstat){
+void statWindow::add1Aptitude(std::shared_ptr<layerStatChart> lstat){
     int row=mAptTable->rowCount();
     if (row==0){
         mAptTable->elementAt(0, 0)->setColumnSpan(2);
@@ -86,7 +86,7 @@ void statWindow::add1Aptitude(layerStatChart * lstat){
     mAptTable->elementAt(row, 1)->setContentAlignment(AlignmentFlag::Top | AlignmentFlag::Center);
 }
 
-void statWindow::add1layerStat(layerStatChart * layerStat){  
+void statWindow::add1layerStat(std::shared_ptr<layerStatChart> layerStat){
     // ici ça à l'air de se compliquer car je transforme un ptr layerStat en std::unique_ptr<Wt::WContainerWidget> et cela à l'air de rendre le raw pointer dandling, il sera par la suite deleted dans groupLayer et là segfault
     // donc il faut rester sur la solution qui fait que layerStat crée un chart pour l'affichage, puis crée un autre contenu pour le rendu
     mAllStatIndivCont->addWidget(layerStat->getChart());
@@ -190,11 +190,17 @@ void surfPdfResource::handleRequest(const Http::Request &request, Http::Response
     o.str("");
     // le plus délicat, c'est ce portage des WpaintedWidget batonnet qui sont dans la table d'aptitude vers le pdf
     //Je pourrais très simplement faire un "StatIndivCont" qui est générique à toute les cartes-> prend une autre forme et plus de place dans le pdf mais ça reste complêt et très bien.
-    for (layerStatChart * chart : mSW->mGL->ptrVLStat()) {
+    for (std::shared_ptr<layerStatChart> chart : mSW->mGL->ptrVLStat()) {
         if (chart->deserveChart()){
             if (chart->Lay()->getCatLayer()==TypeLayer::FEE | chart->Lay()->getCatLayer()==TypeLayer::CS){
                 // problème : le layerStatChart d'une aptitude dois pouvoir utiliser la méthode getChart au lieu de getBarStat
-                chart->getChart(0)->htmlText(o);
+               std::unique_ptr<WContainerWidget> toto= chart->getChart(1);
+               toto->htmlText(o);
+               //toto->hide();
+               mSW->mAllStatIndivCont->addWidget(std::move(toto));// rigolo, ça bug pas quand je déplace l'objet ici, mais si je ne fait rien avec, ça bug. Ces smartptr sont peut-être pas assez malin pour cette situation présente.
+               // peut-être que la suppression de la tableView supprime le model qui va avec?
+               //toto.reset();
+
             }
         }
     }

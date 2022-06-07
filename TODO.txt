@@ -5,7 +5,7 @@ TO DO forestimator
 
 -export pdf ana surf
 
--info ponctuelle sur cadastre : a développer. voir meme selection de polygone depuis cadastre.
+-info ponctuelle sur cadastre : affichage du polygone sur lequel on clique? pareil pour CNSW? puis possibilité de faire analyse surfacique sur ce polygone?
 
 - stat surf sur parcelles cadastrale ; créer un nom de mClientName?
 

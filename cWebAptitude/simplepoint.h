@@ -53,7 +53,6 @@ class simplepoint: public WContainerWidget
 {
 public:
     simplepoint(groupLayers *aGL,WContainerWidget *parent);
-    void createUI();
     void vider();
     void titreInfoRaster();
     void add1InfoRaster(std::vector<std::string> aV);

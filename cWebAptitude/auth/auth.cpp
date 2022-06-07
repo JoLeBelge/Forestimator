@@ -124,6 +124,7 @@ void AuthApplication::loadStyles(){
     useStyleSheet("style/wt.css");
     useStyleSheet("style/form.css");
     useStyleSheet("resources/themes/polished/wt.css");
+    useStyleSheet("resources/jPlayer/skin/jplayer.blue.monday.css");
 
     WCssDecorationStyle EssStyle;
     EssStyle.font().setSize(FontSize::Medium);

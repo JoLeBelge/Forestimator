@@ -1020,6 +1020,13 @@ color layerBase::getColor(std::string aStrCode) const{
     return aRes;
 }
 
+std::string layerBase::getDicoValStr(){
+    std::string aRes("");
+    for (auto & kv :mDicoVal){
+        aRes+=std::to_string(kv.first)+";"+kv.second+"\n";
+    }
+    return aRes;
+}
 
 // création d'un raster masque pour un polygone. Valeur de 255 pour l'intérieur du polygone
 GDALDataset * rasterFiles::rasterizeGeom(OGRGeometry *poGeom){

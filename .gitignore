@@ -11,8 +11,8 @@ cWebAptitude/cWebAptitude.pro.user
 data/tmp
 data/auth*.db*
 data/extents*.db*
-data/cadastre.db*
 data/analytics*.db*
+data/cadastre.db*
 stationDescriptor/stationDescriptor.pro.*
 carteApt/*.autosave
 stationDescriptor/*.autosave

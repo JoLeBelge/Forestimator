@@ -37,17 +37,15 @@ int main(int argc, char **argv)
 
         // set first ressources with sub-folder /api/
         // then add entry point for the web site
-
         server.addResource(&resource, "/api/${tool}/args/${toolarg}/polygon/${pol}");
         server.addResource(&resource, "/api/${tool}/polygon/${pol}");
-        // seul url de la ressource ou tout les arguments sont vide
+        server.addResource(&resource, "/api/${tool}/point/${pt}");
+        // seule url de la ressource ou tout les arguments sont vide
         server.addResource(&resource, "/api/help");
 
-        //j'ajouterai bien une autre ressource qui permet de visualiser le contenu des tables dictionnaire de la BD. Mais alors créer une classe qui lit les tables de la BD et qui les affiche sur demande
-        // l'idée c'est que le programmeur puisse avoir accès au tables dictionnaires (à jours) sans que cela ne m'oblique à les lui envoyer.
-        // ou alors juste visualiser le dictionnaire d'une layerBase? Est-ce que cela sera suffisant? facile à faire en tout cas...
-        // https://redmine.webtoolkit.eu/boards/2/topics/17226?r=17243#message-17243
-        // see paypal example
+        // pour avoir la table dictionnaire
+        server.addResource(&resource, "/api/${tool}");
+
 
         cnswresource cnswr(dico->File("TMPDIR")+"/");
         server.addResource(&cnswr, "/CNSW");
