@@ -1,13 +1,14 @@
-#include "cdicoapt.h"
+//#include "cdicoapt.h"
+#include "stationdescresource.h"
 
 int globMaxSurf(200);
 std::string nameDendroTool("dendro2018");
 extern bool globTest;
 
-std::string cDicoApt::geoservice(std::string aTool, std::string aArgs, std::string aPolyg, bool xml){
+std::string cDicoApt::geoservice(std::string aTool, std::string aArgs, std::string aPolyg, typeAna aType, bool xml){
 
     //if (globTest) {std::cout << "Forestimator API " << aTool << " aArgs " << aArgs << " polygon " << aPolyg << std::endl;}
-    // je suis pas dans une appli Wt donc je n'ai pas accès au docroot malheureusement...
+    // je suis pas dans une appli Wt donc je n'ai pas accès au docroot
     //Wt::WMessageResourceBundle msg();
     //msg.use(docRoot() + "/forestimator");
     std::string aResponse;
@@ -18,10 +19,11 @@ std::string cDicoApt::geoservice(std::string aTool, std::string aArgs, std::stri
         // outils différent, car je teste janvier 2022 1) la réponse en xml et 2) l'api sur tout un shp
         //if(aTool=="dendro2018"){
 
-            // finalement je vais me rabattre sur l'interface graphique de forestimator, car c'est le seul moyen que j'ai de facilement uploader un shp. Je pourrais le faire en envoyer par ex un KML dans une requete, mais c'est assez difficile de rester propre. et l'upload de fichier sans passer par fileupload, je n'y parviens pas.
+        // finalement je vais me rabattre sur l'interface graphique de forestimator, car c'est le seul moyen que j'ai de facilement uploader un shp. Je pourrais le faire en envoyer par ex un KML dans une requete, mais c'est assez difficile de rester propre. et l'upload de fichier sans passer par fileupload, je n'y parviens pas.
 
         //} else {
-
+        switch(aType){
+        case typeAna::surfacique:{
             OGRGeometry * pol=checkPolyg(aPolyg);
             if (pol!=NULL){
                 if (aTool=="hdom"){
@@ -40,22 +42,21 @@ std::string cDicoApt::geoservice(std::string aTool, std::string aArgs, std::stri
                                         +"<max>"+ bs.getMax()+ "</max>\n"
                                         +"<min>"+ bs.getMin()+ "</min>\n"
                                         +"<nb>"+ bs.getNb()+ "</nb>\n";}
-                            //aResponse+="pas disponible pour le moment\n";
                         }
                     }
                 } else if (aTool==nameDendroTool){
-                    //if (globTest) {std::cout << "dendro 2018 api " << std::endl;}
-                     if (!xml){aResponse+="hdom;vha;gha;nha;cmoy\n";}
+                    if (globTest) {std::cout << "dendro 2018 api " << std::endl;}
+                    if (!xml){aResponse+="hdom;vha;gha;nha;cmoy\n";}
                     std::shared_ptr<layerBase> l=getLayerBase("MNH2018P95");
                     statDendroBase stat(l,pol,1);
-                     if (!xml){aResponse+=stat.getHdom()+";"+stat.getVha()+";"+stat.getGha()+";"+stat.getNha()+";"+stat.getCmoy()+"\n";
-                     }else {
-                         aResponse=putInBalise(stat.getHdom(),"hdom")
-                                 +putInBalise(stat.getVha(),"vha")
-                                 +putInBalise(stat.getGha(),"gha")
-                                 +putInBalise(stat.getNha(),"nha")
-                                 +putInBalise(stat.getCmoy(),"cmoy");
-                     }
+                    if (!xml){aResponse+=stat.getHdom()+";"+stat.getVha()+";"+stat.getGha()+";"+stat.getNha()+";"+stat.getCmoy()+"\n";
+                    }else {
+                        aResponse=putInBalise(stat.getHdom(),"hdom")
+                                +putInBalise(stat.getVha(),"vha")
+                                +putInBalise(stat.getGha(),"gha")
+                                +putInBalise(stat.getNha(),"nha")
+                                +putInBalise(stat.getCmoy(),"cmoy");
+                    }
 
                     /* }else if (aTool=="compo"){
                     std::vector<std::string> VCOMPO=parseCompoArg(aArgs);
@@ -82,8 +83,11 @@ std::string cDicoApt::geoservice(std::string aTool, std::string aArgs, std::stri
                         }
                         aResponse+="\n";
                     }
+                }else if(aTool=="CNSW"){
+                    surfPedo surf(mPedo,pol);
+                    aResponse+=surf.getSummaryAPI();
 
-                } else {
+                } else if (hasLayerBase(aTool)) {
                     if (globTest) {std::cout << " API sur layerBase " << std::endl;}
 
                     std::shared_ptr<layerBase> l=getLayerBase(aTool);
@@ -94,13 +98,13 @@ std::string cDicoApt::geoservice(std::string aTool, std::string aArgs, std::stri
                         basicStat stat=l->computeBasicStatOnPolyg(pol);
                         std::cout << " done " << std::endl;
                         if (!xml){
-                        aResponse+="mean;"+stat.getMean()+"\n";
-                        aResponse+="max;"+stat.getMax()+"\n";
-                        aResponse+="sd;"+stat.getSd()+"\n";
+                            aResponse+="mean;"+stat.getMean()+"\n";
+                            aResponse+="max;"+stat.getMax()+"\n";
+                            aResponse+="sd;"+stat.getSd()+"\n";
                         } else {
-                           aResponse=putInBalise(stat.getMean(),"mean")
-                                   +putInBalise(stat.getMax(),"max")
-                                   +putInBalise(stat.getSd(),"sd");
+                            aResponse=putInBalise(stat.getMean(),"mean")
+                                    +putInBalise(stat.getMax(),"max")
+                                    +putInBalise(stat.getSd(),"sd");
                         }
                         break;
                     }
@@ -115,26 +119,26 @@ std::string cDicoApt::geoservice(std::string aTool, std::string aArgs, std::stri
                         bool test(1);// detecte la première ligne
                         for (auto kv:stat){
 
-                             if (!xml){
-                            if (test){
-                                aL2=std::to_string(kv.first);
-                                aL1=roundDouble(kv.second);
-                                test=0;
-                            }else{
-                                aL2+=";"+std::to_string(kv.first);
-                                aL1+=";"+roundDouble(kv.second);
+                            if (!xml){
+                                if (test){
+                                    aL2=std::to_string(kv.first);
+                                    aL1=roundDouble(kv.second);
+                                    test=0;
+                                }else{
+                                    aL2+=";"+std::to_string(kv.first);
+                                    aL1+=";"+roundDouble(kv.second);
+                                }
+                            } else {
+                                // ici je met trois balise ; nom du field, valeur raster , et pourcentage
+                                aResponse+="<classe>";
+                                aResponse+=putInBalise(l->getValLabel(kv.first),"classeName");
+                                aResponse+=putInBalise(std::to_string(kv.first),"classeRasterVal");
+                                aResponse+=putInBalise(roundDouble(kv.second),"pourcentage");
+                                aResponse+="</classe>";
                             }
-                             } else {
-                                 // ici je met trois balise ; nom du field, valeur raster , et pourcentage
-                                 aResponse+="<classe>";
-                                 aResponse+=putInBalise(l->getValLabel(kv.first),"classeName");
-                                 aResponse+=putInBalise(std::to_string(kv.first),"classeRasterVal");
-                                 aResponse+=putInBalise(roundDouble(kv.second),"pourcentage");
-                                 aResponse+="</classe>";
-                             }
                         }
 
-                         if (!xml){aResponse+=aL2+"\n"+aL1+"\n";}
+                        if (!xml){aResponse+=aL2+"\n"+aL1+"\n";}
 
                         break;
                     }
@@ -145,26 +149,52 @@ std::string cDicoApt::geoservice(std::string aTool, std::string aArgs, std::stri
                 OGRGeometryFactory::destroyGeometry(pol);
             } else {
                 if (!xml){
-                aResponse="Veillez utiliser le format wkt pour le polygone (projeté en BL72, epsg 31370). La géométrie du polygone (ou du multipolygone) doit être valide et sa surface de maximum "+std::to_string(globMaxSurf)+"ha";
+                    aResponse="Veillez utiliser le format wkt pour le polygone (projeté en BL72, epsg 31370). La géométrie du polygone (ou du multipolygone) doit être valide et sa surface de maximum "+std::to_string(globMaxSurf)+"ha";
                 } else {
-                   aResponse="<error>La géométrie du polygone (ou du multipolygone) doit être valide et sa surface de maximum "+std::to_string(globMaxSurf)+"ha</error>";
+                    aResponse="<error>La géométrie du polygone (ou du multipolygone) doit être valide et sa surface de maximum "+std::to_string(globMaxSurf)+"ha</error>";
                 }
             }
+            break;
+        }
+        case typeAna::ponctuel:{
+            // créer le point
+            if (globTest){std::cout << "api analyse ponctuelle" << std::endl;}
+            OGRPoint * pt=checkPoint(aPolyg);
+            if (pt!=NULL){
+                if (aTool=="hdom"   | aTool=="aptitude" | aTool=="dendro2018" ){
+                    aResponse="pas de traitement ponctuel pour cet outil";
+                } else if(aTool=="CNSW"){
+                    ptPedo ptPed=ptPedo(mPedo,pt->getX(),pt->getY());
+                    aResponse=ptPed.displayAllInfoAPI();
+                }else {
+                    std::shared_ptr<layerBase> l=getLayerBase(aTool);
+                    aResponse=std::to_string(l->getValue(pt->getX(),pt->getY()));
+                }
+            } else {
+                aResponse="géométrie du point invalide ";
+            }
+            break;
+        }
+        case typeAna::dicoTable:{
+            if (globTest){std::cout << "api table dictionnaire" << std::endl;}
+            if (hasLayerBase(aTool)) {
+                std::shared_ptr<layerBase> l=getLayerBase(aTool);
+                aResponse=l->getDicoValStr();
+            }
+            break;
+        }
+        }
 
-    } else {aResponse="arguments pour geotraitement ; vous avez rentré une valeur mais qui semble fausse. Consultez la page d'aide.\n";}
+    } else {aResponse="arguments pour geotraitement ; vous avez rentré une valeur mais qui semble fausse. peut-être le nom de la couche ou du traitement. Consultez la page d'aide.\n";}
 
     return aResponse;
 }
 
 bool cDicoApt::checkTool(std::string aTool){
     bool aRes(0);
-
     if (hasLayerBase(aTool)){ aRes=1;}
     // traitements qui ne sont pas des cartes
-    if (aTool=="hdom"   | aTool=="aptitude" | aTool=="dendro2018" ){ aRes=1;} //| aTool=="compo"
-
-    //if (aRes==0){mResponse="Aucune couche ou traitement de ce nom. Voir la liste sur forestimator.gembloux.ulg.ac.be/api/help";}
-
+    if (aTool=="hdom"   | aTool=="aptitude" | aTool=="dendro2018" | aTool=="CNSW"){ aRes=1;} //| aTool=="compo"
     return aRes;
 }
 
@@ -185,14 +215,14 @@ OGRGeometry * cDicoApt::checkPolyg(std::string aPolyg){
         pol->MakeValid();
         // j'ai des pol invalides qui sont des multipolygones avec self intersection, je garde que le premier polygone. solution rapide...
         if (!pol->IsValid() & pol->toGeometryCollection()->getNumGeometries()>1){
-          if(OGR_G_Area(pol->toGeometryCollection()->getGeometryRef(0))>100 & pol->toGeometryCollection()->getGeometryRef(0)->IsValid()){
-             pol=pol->toGeometryCollection()->getGeometryRef(0);
-          }
+            if(OGR_G_Area(pol->toGeometryCollection()->getGeometryRef(0))>100 & pol->toGeometryCollection()->getGeometryRef(0)->IsValid()){
+                pol=pol->toGeometryCollection()->getGeometryRef(0);
+            }
         }
         if(pol->IsValid()){
-             //std::cout << " geométrie valide " << pol->getGeometryName() << std::endl;
-        int aSurfha=OGR_G_Area(pol)/10000;
-        if (aSurfha>globMaxSurf){OGRGeometryFactory::destroyGeometry(pol);pol=NULL;}
+            //std::cout << " geométrie valide " << pol->getGeometryName() << std::endl;
+            int aSurfha=OGR_G_Area(pol)/10000;
+            if (aSurfha>globMaxSurf){OGRGeometryFactory::destroyGeometry(pol);pol=NULL;}
         } else {
             std::cout << " geométrie invalide " << pol->getGeometryName() << " nombre de geometrie " << pol->toGeometryCollection()->getNumGeometries()<< std::endl;
             OGRGeometryFactory::destroyGeometry(pol);pol=NULL;}
@@ -203,6 +233,17 @@ OGRGeometry * cDicoApt::checkPolyg(std::string aPolyg){
     //if (aRes==0){mResponse="Veillez utiliser le format wkt pour le polygone (projeté en BL72, epsg 31370).";}//Wt::WText::tr("api.msg.error.polyg1").toUTF8();}}
     if(globTest){std::cout << "checkPolyg API done "<< std::endl;}
     return pol;
+}
+
+OGRPoint * cDicoApt::checkPoint(std::string aPolyg){
+    OGRGeometry * pol=NULL;
+    OGRPoint * pt=NULL;
+    OGRErr err=OGRGeometryFactory::createFromWkt(aPolyg.c_str(),NULL,&pol);
+    if(globTest){std::cout << "createFromWkt OGR error : " << err << std::endl;}
+    if (err==OGRERR_NONE && pol!=NULL){
+        pt=pol->toPoint();
+    }
+    return pt;
 }
 
 std::vector<std::string> cDicoApt::parseAptArg(std::string aArgs){
@@ -265,3 +306,59 @@ std::string putInBalise(std::string aCont,std::string aBalise){
     return "<"+aBalise+">"+aCont+"</"+aBalise+">\n";
 
 }
+
+//virtual void handleRequest(const Wt::Http::Request &request, Wt::Http::Response &response) override
+void stationDescResource::handleRequest(const Http::Request &request,Http::Response &response){
+
+    if (request.path().substr(request.path().size()-4,4)=="help"){
+        response.addHeader("Content-Type","text/plain; charset=utf-8");
+        response.out() << "FORESTIMATOR API short help \n"
+                          "---------------------------\n\n"
+                          "\nListe des traitements pour analyse surfacique (analyse spécifique sur une couche ou analyse standard sur plusieurs couches) \n"
+                          "----------------------------------------------------------------------------------------------------\n"
+                          "hdom\n"
+                          //"compo\n"
+                          "aptitude\n"
+                          "CNSW\n"
+                          +nameDendroTool+"\n";
+
+        response.out() <<  "Liste des couches accessibles via API et leur url WMS\n"
+                           "---------------------------\n";
+        for (auto kv : mDico->VlayerBase()){
+            std::shared_ptr<layerBase> l=kv.second;
+            if (l->getCatLayer()!=TypeLayer::Externe){
+                response.out() << l->Code() + ", " + l->Nom() + " , "+ l->WMSURL() +" , layer " +l->WMSLayerName()+"\n";
+            }
+        }
+
+
+    } else {
+
+        auto params = request.urlParams();
+
+        //if (params.empty()) response.out() << "(empty)\n";
+        std::string aTool,aPolyg(""),aArgs;
+        typeAna aMode(typeAna::surfacique);
+        for (const auto &param : params) {
+
+            const auto &name = param.first;
+            const auto &value = param.second;
+            if (name=="tool") {aTool=value;}
+            if (name=="toolarg") {aArgs=value;}
+            if (name=="pol") {aPolyg=value;}
+            if (name=="pt") {aPolyg=value;aMode=typeAna::ponctuel;}
+            //response.out() << name << ": " << value << '\n';
+        }
+        // si pas de polygone mais bien le nom d'une couche, on délivre le dictionnaire de la couche à l'utilisateur
+        if (aPolyg==""){aMode=typeAna::dicoTable;
+            std::cout << " API : le polygone/ point est de "<< aPolyg << std::endl;
+        }
+
+        if (aTool==nameDendroTool) {response.addHeader("Content-Type","text/plain; charset=utf-8");}else {
+            response.addHeader("Content-Type","text/plain; charset=utf-8");
+        }
+
+        response.out() << mDico->geoservice(aTool,aArgs,aPolyg,aMode);
+    }
+}
+

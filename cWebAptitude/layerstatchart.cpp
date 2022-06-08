@@ -47,52 +47,39 @@ std::unique_ptr<WContainerWidget> layerStatChart::getChart(bool forRenderingInPd
 
     if (globTest) {std::cout << " creation d'un chart " << std::endl;}
     std::unique_ptr<WContainerWidget> aRes= std::make_unique<Wt::WContainerWidget>();
-
     aRes->setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Center);
     aRes->setInline(0);
     aRes->setOverflow(Wt::Overflow::Auto);
+    staticMap sm(mLay,mGeom);
+    WContainerWidget * aContTableAndPie ;
 
+    if (forRenderingInPdf){// je pensais que le rendu pdf était en conflit avec les layouts, mais ça ne semble pas être ça...
+         aRes->addWidget(cpp14::make_unique<WText>("<h4>"+mLay->getLegendLabel(false)+"</h4>"));
+         WContainerWidget * aContIm =aRes->addWidget(cpp14::make_unique<WContainerWidget>());
+         Wt::WImage * im =aContIm->addWidget(cpp14::make_unique<Wt::WImage>(sm.getWLinkRel()));
+         im->resize(450,450);
+         aContTableAndPie = aRes->addWidget(cpp14::make_unique<WContainerWidget>());
+    } else {
     WVBoxLayout * layoutV = aRes->setLayout(cpp14::make_unique<WVBoxLayout>());
     layoutV->addWidget(cpp14::make_unique<WText>("<h4>"+mLay->getLegendLabel(false)+"</h4>"));
-    //aRes->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
     WContainerWidget * aCont = layoutV->addWidget(cpp14::make_unique<WContainerWidget>());
     WHBoxLayout * layoutH = aCont->setLayout(cpp14::make_unique<WHBoxLayout>());
-
-    // ajout de la carte pour cette couche
-    //layoutH->addWidget(cpp14::make_unique<olOneLay>(mLay,mGeom),0);
-    staticMap sm(mLay,mGeom);
-    // ça fonctionne mais je ne gère pas bien la taille de l'image dans le conteneur, pour l'instant la taille de l'image affichée est celle de l'image sur le disque
-
-    if (forRenderingInPdf){
-        Wt::WImage * im =layoutH->addWidget(cpp14::make_unique<Wt::WImage>(sm.getWLink()),0);
-        im->resize(350,350);
-    } else {
         // je dois ajouter un conteneur pour y mettre l'image dedans, sinon mise en page foireuse
         WContainerWidget * aContIm = layoutH->addWidget(cpp14::make_unique<WContainerWidget>(),0);
         Wt::WImage * im =aContIm->addWidget(cpp14::make_unique<Wt::WImage>(sm.getWLinkRel()));
         im->resize(450,450);
-
+        aContTableAndPie = layoutH->addWidget(cpp14::make_unique<WContainerWidget>());
     }
-    WContainerWidget * aContTableAndPie = layoutH->addWidget(cpp14::make_unique<WContainerWidget>());
     aContTableAndPie->setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Center);
-    //aContTableAndPie->setInline(0);
     aContTableAndPie->setOverflow(Wt::Overflow::Auto);
-
-    //std::cout << " statsimple : " << mStatSimple.size() << " elem " << std::endl;
-    if (!forRenderingInPdf){
-        if (mStatSimple.size()>0){
-
+   if (mStatSimple.size()>0){
             if (mTypeVar==TypeVar::Classe){
-                //WTableView* table =layoutV2->addWidget(cpp14::make_unique<WTableView>());
                 WTableView* table =aContTableAndPie->addWidget(cpp14::make_unique<WTableView>());
-                //aRes->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
                 table->setMargin(10, Side::Top | Side::Bottom);
                 table->setMargin(WLength::Auto, Side::Left | Side::Right);
                 table->setAlternatingRowColors(0);
-                //table->setSortingEnabled(1,false);
-                //table->setSortingEnabled(0,false);// pas très utile
-                //table->setAlternatingRowColors(true); // si je met à true , va overrider les couleurs que j'ai notée dans la colonne 3 du model qui sert de légende
-                //std::cout << "set model " << std::endl;
+                table->setSortingEnabled(1,false);
+                table->setSortingEnabled(0,false);// pas très utile
                 table->setModel(mModel);
                 // delegate ; met à 0 mes valeurs de pct dans la colonne, mais pour les labels de pct dans le graph ça fonctionne
                 //std::shared_ptr<WItemDelegate> delegate = std::make_shared<WItemDelegate>();
@@ -105,11 +92,9 @@ std::unique_ptr<WContainerWidget> layerStatChart::getChart(bool forRenderingInPd
                 table->setWidth(200 + 150 + 14+2);
             }
             if (mTypeVar==TypeVar::Continu){
-
                 // pour MNH et MNT, pour l'instant  - recrée un vecteur stat, puis un model
                 std::map<double, double> aStat;
                 // je dois mettre et la hauteur en double, et le pct car sinon imprécision d'arrondi
-
                 for (auto & kv : mStat){
                     try {
                         double h(std::stod(kv.first));
@@ -139,29 +124,23 @@ std::unique_ptr<WContainerWidget> layerStatChart::getChart(bool forRenderingInPd
                     row++;
                 }
 
-                Chart::WCartesianChart *aChart = layoutH->addWidget(cpp14::make_unique<Chart::WCartesianChart>());
+                Chart::WCartesianChart *aChart = aContTableAndPie->addWidget(cpp14::make_unique<Chart::WCartesianChart>());
                 //aChart->setBackground(WColor(220, 220, 220));
                 aChart->setModel(model);
                 aChart->setXSeriesColumn(0);
                 aChart->setLegendEnabled(true);
                 aChart->setType(Chart::ChartType::Scatter);
-
                 auto s = cpp14::make_unique<Chart::WDataSeries>(1, Chart::SeriesType::Curve);
                 s->setShadow(WShadow(3, 3, WColor(0, 0, 0, 127), 3));
                 aChart->addSeries(std::move(s));
-
                 aChart->resize(300, 300);    // WPaintedWidget must be given an explicit size.
                 aChart->setMargin(20, Side::Top | Side::Bottom); // Add margin vertically.
                 //aChart->setMargin(WLength::Auto, Side::Left | Side::Right); // Center horizontally. il faut mettre des marges, qui sont comtpée au départ du cammembert, pour mettre les label
                 aChart->setMargin(50, Side::Left | Side::Right);
             }
-
-
         } else {
-            layoutH->addWidget(cpp14::make_unique<WText>("Pas de statistique pour cette couche"));
+            aRes->addWidget(cpp14::make_unique<WText>("Pas de statistique pour cette couche"));
         }
-    }
-
     return std::move(aRes);
 }
 

@@ -47,7 +47,6 @@ private:
     int mW,mH;
 };
 
-
 // une carte statique mais généré au format img en local (server side) car ol ça commence à fair ch*
 // en remplacement de olOneLay, plus de flexibilité et format img server-side pour export en pdf, avec choix de la résolution
 class  staticMap
@@ -80,39 +79,13 @@ private:
     double mWx,mWy;
 };
 
-// une carte statique , donc sans interaction avec l'utilisateur
-/*
-class  olOneLay: public Wt::WContainerWidget
-{
-public:
-    // constructeur ; a besoin d'un extend et de quoi créer la variable js de la carte, donc pointer vers le layer
-    olOneLay(Layer * aLay,OGRGeometry *poGeom);
-
-    virtual void layoutSizeChanged(int width, int height)
-    {
-        WContainerWidget::layoutSizeChanged(width, height);
-        // Force a recalculation of the map viewport size. This should be called when third-party code changes the size of the map viewport
-        // je ne connais pas la portée des variable mapStat (il y en a +ieur map du mm nom) mais j'essaie
-        std::cout << "layoutSizeChanged \n\n" << std::endl;
-        doJavaScript("mapStat"+id()+".updateSize();");
-    }
-private:
-    Layer * mLay;
-};
-*/
 // va contenir le titre, le tableau et le pie chart pour permettre une visualisation des statistiques calculé pour chacune des couches, typiquement les aptitudes des essences
 
 class layerStatChart : public layerStat
 {
 public:
     layerStatChart(std::shared_ptr<Layer> aLay, std::map<std::string,int> aStat, OGRGeometry * poGeom);
-    /*layerStatChart(const layerStatChart &ls):layerStat(ls){
-        std::cout << "construct by copy layerStatChart " << std::endl;
-        mModel=std::move(ls.mModel);
-        rowAtMax=ls.rowAtMax;
-        mTable=ls.mTable;
-        mChart=ls.mChart;
-    }*/
+
     // chart ; une carte individuelle + tableau
     std::unique_ptr<WContainerWidget> getChart(bool forRenderingInPdf=0);
     // barstat; pour aptitude, les statistiques des aptitudes résumées sous forme de battonnet
@@ -124,6 +97,5 @@ private:
     // j'ai besoin de la géometrie pour la carte statique openlayer
     OGRGeometry * mGeom;
 };
-
 
 #endif // LAYERSTATCHART_H

@@ -6,13 +6,6 @@ simplepoint::simplepoint(groupLayers *aGL, WContainerWidget *parent):mGL(aGL)
   ,mDico(aGL->Dico())
   ,createPdfBut(NULL)
 {
-    createUI();
-}
-
-void simplepoint::createUI()
-{
-    //mTitle = mParent->addWidget(cpp14::make_unique<WText>(WString::tr("legendMsg")));
-
     mParent->setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Left);
     mParent->setMargin(1,Wt::Side::Bottom | Wt::Side::Top);
     mParent->setInline(0);// si pas inline Et bizarrement si pas de setMargin autre que 0, pas de scrollbar pour l'overflow!
@@ -45,8 +38,6 @@ void simplepoint::createUI()
 
 void simplepoint::vider()
 {
-    //mTitle->setStyleClass("nonvisible");
-    //mTitle->setText(WString::tr("legendTitre"));
     mInfoT->clear();
     mDetAptFEE->clear();
     mAptAllEss->clear();
@@ -278,130 +269,6 @@ void simplepoint::afficheAptAllEss(){
     }
 
 }
-
-void simplepoint::export2pdf(std::string titre){
-    std::cout << "simplepoint::export2pdf()" << std::endl;
-    // création du pdf
-    HPDF_Doc pdf = HPDF_New(error_handler, 0);
-
-    HPDF_UseUTFEncodings(pdf);
-    HPDF_Page page = HPDF_AddPage(pdf);
-    HPDF_Page_SetSize(page, HPDF_PAGE_SIZE_A4, HPDF_PAGE_PORTRAIT);
-    HPDF_SetCompressionMode(pdf, HPDF_COMP_ALL);// sinon pdf fait 5 Mo pour rien du tout
-
-    MyRenderer renderer(pdf, page,titre,mDico);
-
-    Wt::WString tpl = tr("report.analyse.point");
-    std::string tp = tpl.toUTF8();
-    std::ostringstream o;
-
-    //renderer.addFontCollection("/usr/share/fonts/truetype",true); plus nécessaire si compilé avec pango
-
-    boost::replace_all(tp,"TITRE_REPPORT",titre);
-
-    // RENDU TABLE d'APTITUDE
-    mAptAllEss->htmlText(o);
-    boost::replace_all(tp,"${AptTable}",o.str());
-
-    // RENDU TABLES AVEC DESCRIPTION DE LA STATION
-    // vider le oss
-    o.str("");
-    o.clear();
-    mInfoT->htmlText(o);
-    boost::replace_all(tp,"${InfoT}",o.str());
-
-    // RENDU LISTE D'ACCRONYME des ESSENCES
-
-    Wt::WTable * legendAcroEs= new Wt::WTable();
-    legendAcroEs->setId("legendAcroEs"); // dans le template html j'ai un style défini pour l'objet ayant cet id
-    int row(0);
-    int col(0);
-    for (auto kv : *mGL->Dico()->codeEs2Nom() ){
-        legendAcroEs->elementAt(row, col)->addWidget(cpp14::make_unique<WText>(kv.first));
-        legendAcroEs->elementAt(row, col+1)->addWidget(cpp14::make_unique<WText>(kv.second));
-        row++;
-        if (row>20){row=0;col=col+2;}
-    }
-    o.str("");
-    o.clear();
-    legendAcroEs->htmlText(o);
-    boost::replace_all(tp,"${legendAcro}",o.str());
-    o.str("");
-    o.clear();
-
-    // RENDU CARTE ACTIVE AVEC POSITION de la STATION
-
-    OGRPoint pt = mGL->mStation->getPoint();
-
-    // je peux pas utiliser le membre mapextent de GL car celui-ci ne se met à jours que lorsqu'on télécharge une carte sur l'emprise courante...
-    //staticMap sm(mGL->getActiveLay(),&pt,mGL->getMapExtent());
-    // depuis que l'IGN est passé à la version 1.3 du serveur WMS, je ne parviens plus à télécharger les cartes wms en jpg.
-    // donc il faut changer cette ligne. utiliser l'IGN du serveur grfmn?
-    staticMap sm(mGL->getLay("IGNgrfmn"),&pt);
-    // ajout du logo IGN. ajout des crédits ; toujours les mêmes, en dur.
-    sm.addImg(mDico->File("logoIGN"));
-    boost::replace_all(tp,"PATH_CARTE",sm.getFileName());
-    boost::replace_all(tp,"TITRE_CARTE",mGL->getLay("IGN")->getLegendLabel(0));
-    boost::replace_all(tp,"POSITION_PTX",roundDouble(mGL->mStation->getX(),1));
-    boost::replace_all(tp,"POSITION_PTY",roundDouble(mGL->mStation->getY(),1));
-
-    if (mGL->mStation->ecogramme()){
-        // RENDU ECOGRAMME
-        // export de l'image de l'écogramme - bug constaté ; https://redmine.webtoolkit.eu/issues/7769
-        // pour ma part j'ai compilé Graphicmagick puis cela fonctionnais
-        int aEcoWidth(750);
-        int aHeigth(aEcoWidth*15.0/7.0);
-
-        Wt::WRasterImage pngImage("png", WLength(aEcoWidth), WLength(aHeigth));
-        std::string name01 = std::tmpnam(nullptr);
-        std::string name11 = name01.substr(5,name01.size()-5);
-        std::string aEcoPng = mDico->File("TMPDIR")+"/"+name11+".png";
-        std::ofstream f(aEcoPng, std::ios::out | std::ios::binary);
-        WPainter painter(&pngImage);
-
-        std::string ecoBgPath=mDico->File("docroot")+"img/ecogrammeAxes.png";
-        if (exists(ecoBgPath)){
-        Wt::WPainter::Image ecoBg(ecoBgPath,ecoBgPath);
-        Wt::WRectF destinationRect = Wt::WRectF(0.0,0.0,aEcoWidth, aHeigth);
-        painter.drawImage(destinationRect,ecoBg);
-        }
-        // pour determiner ces positions, j'ai fixé aEcoWidth à 750, j'ai fait tourné le code, puis j'ai ouvert l'image et mesuré les positions
-        mEcoEss->draw(&painter,292,332,700,1240,1330);
-        pngImage.done();
-        pngImage.write(f);
-        f.close();
-        // ajout dans le pdf
-        std::string baliseEco = tr("report.eco").toUTF8();
-        boost::replace_all(baliseEco,"PATH_ECO",aEcoPng);
-        boost::replace_all(baliseEco,"TITRE_ECO","Ecogramme - "+mGL->mStation->mActiveEss->Nom());
-        mDetAptFEE->htmlText(o);
-        boost::replace_all(baliseEco,"detAptFEE",o.str());
-        o.str("");
-        o.clear();
-
-        boost::replace_all(tp,"REPORT_ECO",baliseEco);
-
-    } else {
-        boost::replace_all(tp,"REPORT_ECO","");
-    }
-
-    renderer.render(tp);
-
-    // création du fichier pdf
-    std::string name0 = std::tmpnam(nullptr);
-    std::string name1 = name0.substr(5,name0.size()-5);
-    std::string aOut = mDico->File("TMPDIR")+"/"+name1+".pdf";
-    HPDF_SaveToFile(pdf,aOut.c_str());
-    HPDF_Free(pdf);
-    //std::unique_ptr<WFileResource> fileResource = std::make_unique<Wt::WFileResource>("application/pdf",aOut);
-    // std:: unique fonctionne pas, renvoi un "nothing to say about that" dans le navigateur
-    WFileResource *fileResource = new Wt::WFileResource("application/pdf",aOut);
-    boost::replace_all(titre," ","-");
-    fileResource->suggestFileName(titre+".pdf");
-
-    mGL->m_app->addLog("analyse ponctuelle pdf",typeLog::danap);
-    mGL->m_app->redirect(fileResource->url());
-}
 */
 
 void pointPdfResource::handleRequest(const Http::Request &request, Http::Response &response)
@@ -421,7 +288,6 @@ void pointPdfResource::handleRequest(const Http::Request &request, Http::Respons
     Wt::WString tpl = Wt::WText::tr("report.analyse.point");
     std::string tp = tpl.toUTF8();
     std::ostringstream o;
-
     //renderer.addFontCollection("/usr/share/fonts/truetype",true); plus nécessaire si compilé avec pango
 
     boost::replace_all(tp,"TITRE_REPPORT",titre);
@@ -511,7 +377,6 @@ void pointPdfResource::handleRequest(const Http::Request &request, Http::Respons
     } else {
         boost::replace_all(tp,"REPORT_ECO","");
     }
-
     renderer.render(tp);
     response.setMimeType("application/pdf");
     HPDF_SaveToStream (pdf);
@@ -519,8 +384,6 @@ void pointPdfResource::handleRequest(const Http::Request &request, Http::Respons
     HPDF_BYTE * buf = new HPDF_BYTE [size];
     HPDF_ReadFromStream (pdf, buf, & size);
     HPDF_Free (pdf);
-
     response.out (). write ((char *) buf, size);
-
     delete [] buf;
 }

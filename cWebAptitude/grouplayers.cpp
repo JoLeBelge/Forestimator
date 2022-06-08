@@ -315,7 +315,7 @@ void groupLayers::computeStatGlob(OGRGeometry *poGeomGlobale){
             if (l->l4Stat()){
                 // clé : la valeur au format légende (ex ; Optimum). Valeur ; pourcentage pour ce polygone
                 std::map<std::string,int> stat = l->computeStat1(poGeomGlobale);
-                mVLStat.push_back(new layerStatChart(l,stat,poGeomGlobale));
+                mVLStat.push_back(std::make_shared<layerStatChart>(l,stat,poGeomGlobale));
             }
         }
 
@@ -358,14 +358,14 @@ void groupLayers::computeStatAllPol(OGRLayer * lay){
 
             if (l->Code()=="MNH2019"){
                 aFile << "<processingName>hdom2019</processingName>\n" ;
-                aFile << mDico->geoservice("hdom","MNH2019",polWkt,1);
+                aFile << mDico->geoservice("hdom","MNH2019",polWkt,typeAna::surfacique,1);
             } else if(l->Code()=="MNH2018P95"){
                  aFile << "<processingName>dendro2018</processingName>\n" ;
-                 aFile << mDico->geoservice("dendro2018","",polWkt,1);
+                 aFile << mDico->geoservice("dendro2018","",polWkt,typeAna::surfacique,1);
            } else {
                 if (l->l4Stat()){
                      aFile << "<processingName>"+l->Code()+"</processingName>\n" ;
-                     aFile << mDico->geoservice(l->Code(),"",polWkt,1);
+                     aFile << mDico->geoservice(l->Code(),"",polWkt,typeAna::surfacique,1);
                 }
             }
             aFile << "</processing>\n" ;

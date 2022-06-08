@@ -228,6 +228,7 @@ public:
     std::vector<std::string> displayInfo(PEDO p);
 
     std::string displayAllInfoInOverlay();
+    std::string displayAllInfoAPI();
 
 private:
     std::shared_ptr<cnsw> mDico;
@@ -241,6 +242,7 @@ public:
     surfPedo( std::shared_ptr<cnsw> dico, OGRGeometry *poGeom );
 
     std::string getSummary(PEDO p);
+    std::string getSummaryAPI();
 
     // retourne le symbole de Texture majoritaire ainsi que sa proportion en surface
     std::pair<std::string,double> getMajTexture();

@@ -25,8 +25,8 @@ public:
 
     void vider();
     void titre(std::string aTitre){mTitre->setText(aTitre);}
-    void add1Aptitude(layerStatChart * lstat);
-    void add1layerStat(layerStatChart *layerStat);
+    void add1Aptitude(std::shared_ptr<layerStatChart> lstat);
+    void add1layerStat(std::shared_ptr<layerStatChart> layerStat);
     void add1layerStat(std::unique_ptr<Wt::WContainerWidget> cont);
     void genIndivCarteAndAptT();
     void generateGenCarte(OGRFeature *poFeature);
