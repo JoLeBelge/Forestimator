@@ -168,7 +168,14 @@ std::string cDicoApt::geoservice(std::string aTool, std::string aArgs, std::stri
                     aResponse=ptPed.displayAllInfoAPI();
                 }else {
                     std::shared_ptr<layerBase> l=getLayerBase(aTool);
-                    aResponse=std::to_string(l->getValue(pt->getX(),pt->getY()));
+                    std::string typeOut=parsePointArg(aArgs);
+                    int aVal=l->getValue(pt->getX(),pt->getY());
+                    if (typeOut=="val"){
+                    aResponse=std::to_string(aVal);
+                    }
+                    if (typeOut=="txt"){
+                       aResponse=l->getValLabel(aVal);
+                    }
                 }
             } else {
                 aResponse="géométrie du point invalide ";
@@ -275,6 +282,13 @@ std::vector<std::string> cDicoApt::parseHdomArg(std::string aArgs){
     }
     return aRes;
 }
+
+std::string cDicoApt::parsePointArg(std::string aArgs){
+    std::string aRes;
+    if (aArgs==""){ aRes="val";} else if(aArgs=="txt"){aRes="txt";}
+    return aRes;
+}
+
 std::vector<std::string> cDicoApt::parseCompoArg(std::string aArgs){
     std::vector<std::string> aRes;
     if (aArgs==""){ aRes={"COMPO1","COMPO2","COMPO3","COMPO4","COMPO5","COMPO6","COMPO7","COMPO8","COMPO9"};} else{
