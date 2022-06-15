@@ -262,13 +262,28 @@ void groupLayers::extractInfo(double x, double y){
             // si la couche active est le cadastre
             if (( l->IsActive() && l->Code()=="Cadastre")){
 
-                ptCadastre ptCad(mDico->mCadastre,x,y);
-                mParent->doJavaScript("content.innerHTML = '"+ptCad.displayAllInfoInOverlay()+ "';"
+                ptCadastre * ptCad = new ptCadastre(mDico->mCadastre,x,y);
+                ptCad->sendPolygone().connect(std::bind(&parcellaire::polygoneCadastre,mcWebAptitude->mPA,std::placeholders::_1));
+                mParent->doJavaScript("content.innerHTML = '"+ptCad->displayAllInfoInOverlay()+ "';"
                                       +"var coordinate = ["+std::to_string(x) + ","+ std::to_string(y) +"];"
                                       +"overlay.setPosition(coordinate);"
                                       );
                 // comment créer le boutton pour que le polgyone du cadastre serve pour l'analyse surfacique? vu que je passe par du javascript pour la fenetre, je ne peux pas y ajouter de boutton...
-
+                WDialog * dialogPtr =  mParent->addChild(Wt::cpp14::make_unique<Wt::WDialog>("Charger la parcelle cadastrale"));
+                dialogPtr->contents()->addNew<Wt::WText>(tr("msg.charger.poly.capa"));
+                WPushButton *ok = dialogPtr->footer()->addNew<Wt::WPushButton>("Oui");
+                ok->setDefault(false);
+                ok->clicked().connect([=]{
+                    ptCad->usePolyg4Stat();
+                    delete(ptCad);
+                    dialogPtr->reject();
+                });
+                WPushButton * annuler = dialogPtr->footer()->addNew<Wt::WPushButton>("Non");
+                annuler->setDefault(true);
+                annuler->clicked().connect([=]{dialogPtr->reject();
+                delete(ptCad);
+                });
+                dialogPtr->show();
             }
 
         }

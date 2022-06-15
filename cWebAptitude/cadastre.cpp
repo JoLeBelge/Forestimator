@@ -406,7 +406,7 @@ void cadastre::getCaPa4pt(double x, double y, ptCadastre * aPt){
 
 
 ptCadastre::ptCadastre(std::shared_ptr<cadastre> aCadastre, double x, double y):mCad(aCadastre),mCommune(""),mFID(0),mCaPaKey(""){
-    if (!boost::filesystem::exists(mCad->mDirBDCadastre)){std::cout << " bd cadastre " << mCad->mDirBDCadastre << " n'existe pas!! ça va planter ... \n\n\n\n" <<std::endl;}
+    if (!boost::filesystem::exists(mCad->mDirBDCadastre)){std::cout << " bd cadastre " << mCad->mDirBDCadastre << " n'existe pas!! ça va planter ... \n\n\n\n" <<std::endl;} else {
     std::unique_ptr<dbo::backend::Sqlite3> sqlite3{new dbo::backend::Sqlite3(mCad->mDirBDCadastre)};
 
     if (globTest){sqlite3->setProperty("show-queries", "true");}
@@ -419,6 +419,7 @@ ptCadastre::ptCadastre(std::shared_ptr<cadastre> aCadastre, double x, double y):
         dbo::ptr<capa> pt = mCad->getCaPaPtr(mCaPaKey,&session);
         mCommune=mCad->Commune(pt->comINS);
     }
+    }
 }
 
 std::string ptCadastre::displayAllInfoInOverlay(){
@@ -426,6 +427,7 @@ std::string ptCadastre::displayAllInfoInOverlay(){
 }
 
 void ptCadastre::usePolyg4Stat(){
+    std::cout << "ptCadastre::usePolyg4Stat" << std::endl;
     geoJson_.emit(mCad->createPolygonPaCa(mFID));
 }
 

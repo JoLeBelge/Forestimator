@@ -106,3 +106,5 @@ sudo ln -s /media/Data10/Forestimator/Station/* /data1/Carto/FEEW2020/
 -- OLD OLD --- on abandonne l'utilisation des liens symboliques, c'est déjà assez le bronx comme ça
 
 Donc on faut utiliser les chemins d'accès dans les tables layersApt et fichiersGIS dans la BD.
+
+5) copier la bd cadastre.db, trop volumineuse que pour etre sur le dépot github.

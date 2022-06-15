@@ -121,7 +121,7 @@ void AuthApplication::loadStyles(){
     useStyleSheet("style/combostyle.css");
     useStyleSheet("style/pygments.css");
     useStyleSheet("style/filedrop.css");
-    useStyleSheet("style/wt.css");
+    //useStyleSheet("style/wt.css");
     useStyleSheet("style/form.css");
     useStyleSheet("resources/themes/polished/wt.css");
     useStyleSheet("resources/jPlayer/skin/jplayer.blue.monday.css");
