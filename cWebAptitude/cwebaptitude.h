@@ -32,6 +32,8 @@
 #include "panier.h"
 #include "analytics.h"
 
+#include <curl/curl.h>
+
 class AuthApplication;
 class parcellaire;
 class panier;

@@ -46,7 +46,6 @@
 #include "../stationDescriptor/rapidxml/rapidxml.hpp"
 using namespace rapidxml;
 
-
 class cWebAptitude; // forward declaration
 
 class AuthApplication : public Wt::WApplication

@@ -18,24 +18,23 @@ AuthApplication::AuthApplication(const Wt::WEnvironment& env, cDicoApt *dico)
     // export de tout les messages html vers un fichier csv qui sera traduit en text avec ./html2text -from_encoding UTF8 -nobs -o /home/jo/app/Forestimator/data/tmp/Forestimator.txt /home/jo/app/Forestimator/data/tmp/texteForestimator.csv pour correction orthographique
     bool forestimator(0);
     if (globTest & 0){
-        std::cout << " tata!!!!\n\n\n" << std::endl;
+        std::cout << " export des messages xml \n\n\n" << std::endl;
         std::ifstream theFile;
         std::string aFile(mDico->File("TMPDIR")+"texteForestimator.csv");
         if (forestimator){
 
             theFile.open(docRoot() + "/forestimator.xml");} else {
-            std::cout << " toto !!!!\n\n\n" << std::endl;
+            //std::cout << " toto !!!!\n\n\n" << std::endl;
             aFile=mDico->File("TMPDIR")+"textePhytospy.csv";
             theFile.open("/home/jo/app/phytospy/data/phytoTool.xml");
             messageResourceBundle().use("/home/jo/app/phytospy/data/phytoTool");
         }
 
         std::ofstream aOut;
+        aFile=mDico->File("TMPDIR")+"traductionPhytospy.xml";
         aOut.open(aFile,ios::out);
-
         xml_document<> doc;
         xml_node<> * root_node;
-
         std::vector<char> buffer((std::istreambuf_iterator<char>(theFile)), std::istreambuf_iterator<char>());
         buffer.push_back('\0');
         // Parse the buffer using the xml file parsing library into doc
@@ -47,13 +46,14 @@ AuthApplication::AuthApplication(const Wt::WEnvironment& env, cDicoApt *dico)
             // il faudrait tester si l'attribut id existe, sinon plante. pour le moment c'est pas fonctionnel
             if (node->first_attribute("id")->value()){
                 std::string aId(node->first_attribute("id")->value());
-                if (aId.find("Wt.Auth")==std::string::npos){
+                if (0 & aId.find("Wt.Auth")==std::string::npos){
                     aOut << WText::tr(aId).toUTF8() ;
                     aOut <<"\n\n<br> <br/>" ;
                 }
             } else {
                 std::cout << "incorrect node " << std::endl;
             }
+            //break;
         }
         std::cout << " premier fichier fait " << std::endl;
         doc.clear();
@@ -76,6 +76,7 @@ AuthApplication::AuthApplication(const Wt::WEnvironment& env, cDicoApt *dico)
                 }
             }
         }
+        std::cout << " ---------------- export done\n" << std::endl;
         aOut.close();
     }
 

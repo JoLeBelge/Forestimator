@@ -448,14 +448,14 @@ Par ailleurs, Forestimator fournit des webservices pour les développeurs soucie
 <h3>Aide</h3>
 Pour afficher la liste des couches et des traitements disponibles;
 <br></br><br></br>
-<a target="_blank" rel="noopener noreferrer" href="http://forestimator.gembloux.ulg.ac.be/api/help">http://forestimator.gembloux.ulg.ac.be/api/help</a>
+<a target="_blank" rel="noopener noreferrer" href="https://forestimator.gembloux.ulg.ac.be/api/help">https://forestimator.gembloux.ulg.ac.be/api/help</a>
 <br></br><br></br>
 <h3>Dictionnaire des couches cartographiques</h3>
 La majorité des couches cartographiques sont au format raster. Les variables de classes stoquées dans les couches raster sont renseignées au moyen d'une valeur entière. Il évidemment est nécessaire de connaitre la signification des valeurs entières pour correctement appréhender la couche raster ou les résultats d'analyses relatifs à cette couches : c'est le rôle du dictionnaire de la couche de fournir ces renseignement.
 <br></br>
 Les dictionnaires de couches sont disponibles en renseignant le nom de la carte de la manière suivate (exemple pour l'aptitude du hêtre) :
 <br></br><br></br>
-<a target="_blank" rel="noopener noreferrer" href="http://forestimator.gembloux.ulg.ac.be/api/HE_FEE">http://forestimator.gembloux.ulg.ac.be/api/<font color="blue">HE_FEE</font></a>
+<a target="_blank" rel="noopener noreferrer" href="https://forestimator.gembloux.ulg.ac.be/api/HE_FEE">https://forestimator.gembloux.ulg.ac.be/api/<font color="blue">HE_FEE</font></a>
 <br></br><br></br>
 Voici ce que serveur retourne comme réponse :
 <br></br>
@@ -484,10 +484,10 @@ https://forestimator.gembloux.ulg.ac.be/api/<font color="blue">CODE_COUCHE</font
 <br></br><br></br>
 Ci-dessous un exemple avec la couche de la carte de l'essence majoritaire du peuplement :
 <br></br><br></br>
-<a target="_blank" rel="noopener noreferrer" href="http://forestimator.gembloux.ulg.ac.be/api/COMPOALL/point/POINT (217256.9 50427.0)">http://forestimator.gembloux.ulg.ac.be/api/<font color="blue">COMPOALL</font>/point/<font color="blue">POINT (217256.9 50427.0)</font></a>
+<a target="_blank" rel="noopener noreferrer" href="https://forestimator.gembloux.ulg.ac.be/api/COMPOALL/point/POINT (217256.9 50427.0)">https://forestimator.gembloux.ulg.ac.be/api/<font color="blue">COMPOALL</font>/point/<font color="blue">POINT (217256.9 50427.0)</font></a>
 <br></br>
 <br></br>
-Le dictionnaire de cette couche (sous ce lien : <a target="_blank" rel="noopener noreferrer" href="http://forestimator.gembloux.ulg.ac.be/api/COMPOALL/">http://forestimator.gembloux.ulg.ac.be/api/<font color="blue">COMPOALL</font>/</a>) nous renseigne que la valeur 5 signifie que l'essence majoritaire est l'épicéa commun.
+Le dictionnaire de cette couche (sous ce lien : <a target="_blank" rel="noopener noreferrer" href="https://forestimator.gembloux.ulg.ac.be/api/COMPOALL/">https://forestimator.gembloux.ulg.ac.be/api/<font color="blue">COMPOALL</font>/</a>) nous renseigne que la valeur 5 signifie que l'essence majoritaire est l'épicéa commun.
 <br></br>
 <span class="hljs-comment">5;EP - Spruces</span>
 <br></br><br></br>
@@ -497,7 +497,7 @@ La syntaxe générale est la suivante :
 <br></br><br></br>
 https://forestimator.gembloux.ulg.ac.be/api/<font color="blue">CODE_COUCHE_OU_NOM_TRAITEMENT</font>/polygon/<font color="blue">POLYGONE_FORMAT_WKT</font>
 <br></br><br></br>
-CODE_COUCHE_OU_NOM_TRAITEMENT; consultez la page <a target="_blank" rel="noopener noreferrer" href="http://forestimator.gembloux.ulg.ac.be/api/help">http://forestimator.gembloux.ulg.ac.be/api/help</a> pour avoir la liste.
+CODE_COUCHE_OU_NOM_TRAITEMENT; consultez la page <a target="_blank" rel="noopener noreferrer" href="https://forestimator.gembloux.ulg.ac.be/api/help">https://forestimator.gembloux.ulg.ac.be/api/help</a> pour avoir la liste.
 <br></br><br></br>
 POLYGONE_FORMAT_WKT; le polygone délimitant la surface de terrain pour laquelle vous souhaitez effectuer les analyses. Le format doit être le WKT, le système de projection doit être en Belge Lambert 72. De plus, la géométrie du polygone doit être valide et sa surface ne peut dépasser 200 ha.
 <br></br><br></br>
@@ -543,7 +543,8 @@ http://forestimator.gembloux.ulg.ac.be/api/<font color="blue">compo</font>/polyg
 <span class="hljs-comment"># librairie pour la lecture de shapefile</span><br></br>
 <span class="hljs-keyword">library</span>(sf)<br></br>
 
-server.api &lt;- <span class="hljs-string">"http://forestimator.gembloux.ulg.ac.be/api/"</span><br></br>
+server.api &lt;- <span class="hljs-string">"https://forestimator.gembloux.ulg.ac.be/api/"</span><br></br>
+<span class="hljs-comment"># attention à bien mettre le s de httpS dans l'adresse, sinon sous windows ça ne fonctionne pas.</span><br></br>
 
 shp.path &lt;- <span class="hljs-string">"/home/lisein/Documents/carteApt/autres/shpTest/epioux_sample.shp"</span><br></br>
 parcellaire.shp &lt;- st_read(shp.path)<br></br>

@@ -1,0 +1,82 @@
+TEMPLATE = app
+TARGET = manip
+INCLUDEPATH += .
+CONFIG -= qt
+QT -= gui
+QT += sql
+CONFIG += c++17
+
+LIBS = -lcurl -lgdal -lwthttp -lwt -lboost_system -lboost_iostreams  -lboost_filesystem -lboost_program_options -lcrypt -pthread -lwtdbo -lwtdbosqlite3 -lzip -lhpdf -lsqlite3
+
+DEPENDPATH += /usr/include/gdal/
+INCLUDEPATH += /usr/include/gdal/
+INCLUDEPATH += $$PWD/../carteApt/
+INCLUDEPATH += $$PWD/auth/
+INCLUDEPATH += $$PWD/libzipp/src/
+DEPENDPATH += $$PWD/libzipp/src/
+INCLUDEPATH += $$PWD../stationDescriptor/rapidxml/
+DEPENDPATH += $$PWD../stationDescriptor/rapidxml/
+
+SOURCES += manipRessource.cpp \
+    ../carteApt/cdicoaptbase.cpp \
+    analytics.cpp \
+    api/cnswresource.cpp \
+    auth/Session.cpp \
+    auth/User.cpp \
+    auth/auth.cpp \
+    cadastre.cpp \
+    panier.cpp \
+    simplepoint.cpp \
+    widgetcadastre.cpp \
+    wopenlayers.cpp \
+    cwebaptitude.cpp \
+    ../carteApt/cdicoapt.cpp \
+    layer.cpp \
+    grouplayers.cpp \
+    parcellaire.cpp \
+    layerstatchart.cpp \
+    #uploadcarte.cpp \
+    libzippp/src/libzippp.cpp \
+    ecogrammeEss.cpp \
+    statwindow.cpp \
+    selectlayers.cpp \
+    presentationpage.cpp \
+    ../carteApt/cnsw.cpp \
+    ../carteApt/layerbase.cpp \
+    api/stationdescresource.cpp \
+    statHdomCompo.cpp
+
+HEADERS += \
+    ../carteApt/cdicoaptbase.h \
+    analytics.h \
+    api/cnswresource.h \
+    auth/Session.h \
+    auth/User.h \
+    auth/auth.h \
+    cadastre.h \
+    manipRessource.h \
+    panier.h \
+    simplepoint.h \
+    widgetcadastre.h \
+    wopenlayers.h \
+    cwebaptitude.h \
+    ../carteApt/cdicoapt.h \
+    layer.h \
+    grouplayers.h \
+    parcellaire.h \
+    layerstatchart.h \
+    #uploadcarte.h \
+    libzippp/src/libzippp.h \
+    ecogrammeEss.h \
+    statwindow.h \
+    selectlayers.h \
+    presentationpage.h \
+    ../carteApt/cnsw.h \
+    ../carteApt/layerbase.h \
+    api/stationdescresource.h \
+    ../carteApt/color.h \
+    statHdomCompo.h \
+    ../stationDescriptor/rapidxml/rapidxml.hpp \
+    ../stationDescriptor/rapidxml/rapidxml_iterators.hpp
+
+

@@ -1,8 +1,4 @@
-/*
- * Copyright (C) 2008 Emweb bvba, Kessel-Lo, Belgium.
- *
- * See the LICENSE file for terms of use.
- */
+
 #include "main.h"
 
 extern bool globTest;
@@ -16,7 +12,6 @@ int main(int argc, char **argv)
             ("test", po::value<bool>(), "pour le test de nouvelles options en cours de développement")
             ("BD", po::value<std::string>(), "chemin d'accès à la BD forestimator")
             ("colPath", po::value<std::string>(), "nom de la colonne de fichierGIS et layerApt propre à la machine (chemin d'accès couche en local)")
-
             ;
     po::variables_map vm;
     //po::store(po::parse_command_line(argc, argv, desc), vm);
