@@ -18,11 +18,17 @@ namespace po = boost::program_options;
 #include "../stationDescriptor/rapidxml/rapidxml.hpp"
 #include <curl/curl.h>
 
+#include "cphyto.h"
+
 #include <Wt/WApplication.h>
 #include <Wt/WEnvironment.h>
 
 using namespace libzippp;
 using namespace rapidxml;
+
+void deepl(cDicoApt *dico);
+void dicoToXml(std::shared_ptr<cDicoPhyto> dico);
+std::string traduction(std::string afr);
 
 
 // pour manipuler les xml avec les ressources des 2 sites web, un soft dédié
