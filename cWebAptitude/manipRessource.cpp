@@ -15,7 +15,7 @@ int main(int argc, char **argv)
     po::options_description desc("Allowed options");
     desc.add_options()
             ("help", "produce help message")
-            ("outil", po::value<int>(), "choix de l'outil à utiliser (1 : traduction des messages avec deepl, 2 : export de certaine map du dictionnaire sour forme de message xml")
+            ("outil", po::value<int>(), "choix de l'outil à utiliser (1 : traduction des messages avec deepl, 2 : export de certaine map du dictionnaire sour forme de message xml, 3 : récupéré nom commun en anglais de la BD NCBI")
             ("test", po::value<bool>(), "pour le test de nouvelles options en cours de développement")
             ("BDapt", po::value<std::string>()->required(), "chemin d'accès à la BD forestimator")
             ("BDphyto", po::value<std::string>()->required(), "chemin d'accès à la BD phyto")
@@ -49,6 +49,10 @@ int main(int argc, char **argv)
         }
         case 2:{
             dicoToXml(dicoPhyto);
+            break;
+        }
+        case 3:{
+            processNCBI(dicoPhyto);
             break;
         }
         }
@@ -112,17 +116,17 @@ void dicoToXml(std::shared_ptr<cDicoPhyto> dico){
         std::string code=kv.first;
         std::string nomfr=kv.second;
         aOut <<"<message id=\""<< code << ".nom\">"<< nomfr << "</message>\n" ;
-    }*/
+    }
     for (auto kv : dico->Dico_groupeNT){
-            std::string code=kv.first;
-            std::string nomfr=kv.second;
-            aOut <<"<message id=\""<< code << ".nom\">"<< nomfr << "</message>\n" ;
+        std::string code=kv.first;
+        std::string nomfr=kv.second;
+        aOut <<"<message id=\""<< code << ".nom\">"<< nomfr << "</message>\n" ;
     }
     for (auto kv :  dico->grEcos){
-          std::string code=kv.first;
-          grEco ge=kv.second;
-          aOut <<"<message id=\""<< code << ".nomGroupe\">"<< ge.nom_groupe << "</message>\n" ;
-    }
+        std::string code=kv.first;
+        grEco ge=kv.second;
+        aOut <<"<message id=\""<< code << ".nomGroupe\">"<< ge.nom_groupe << "</message>\n" ;
+    }*/
     aOut <<"</messages>\n" ;
     aOut.close();
 
@@ -136,22 +140,23 @@ void dicoToXml(std::shared_ptr<cDicoPhyto> dico){
             if (en!=""){
                 aOutEN <<"<message id=\"groupeNT."<< code << "\">"<< en << "</message>\n" ;
            }
-    }*/
-    for (auto kv :  dico->grEcos){
-          std::string code=kv.first;
-          grEco ge=kv.second;
-          aOutEN <<"<message id=\""<< code << ".nomGroupe\">"<< ge.nom_shortEN << "</message>\n" ;
     }
+    for (auto kv :  dico->grEcos){
+        std::string code=kv.first;
+        grEco ge=kv.second;
+        aOutEN <<"<message id=\""<< code << ".nomGroupe\">"<< ge.nom_shortEN << "</message>\n" ;
+    }*/
 
-    /*
+
     for (auto kv : dico->Dico_code2NomFR){
         std::string code=kv.first;
         std::string nomfr=kv.second;
-        std::string en=traduction(nomfr);
+        std::string en=dico->nomEN(code);
+        if (en==""){en=traduction(nomfr);}
         if (en!=""){
             aOutEN <<"<message id=\""<< code << ".nom\">"<< en << "</message>\n" ;
         }
-    }*/
+    }
     aOutEN <<"</messages>\n" ;
     aOutEN.close();
 }
@@ -193,4 +198,75 @@ std::string traduction(std::string afr){
     }
     return token;
 }
+
+
+// a fonctionné pour 471 plantes
+void processNCBI(std::shared_ptr<cDicoPhyto> dico){
+    std::cout << " get common name for plant species from ncbi data\n" << std::endl;
+    // j'ai deux BDs sqlite, la BD phytospy, la bd avec une table que j'ai faite issue de la BD NCBI
+    std::string pathBDNCBI="/home/jo/Documents/Lisein_j/AC2016/RelFloristique/phyto2021/englishName/ndbi/namesNCBI.db";
+    sqlite3 *db_,*dbOUT_;
+    int rc;
+    rc = sqlite3_open_v2(pathBDNCBI.c_str(), &db_,SQLITE_OPEN_READWRITE,NULL);
+    if( rc!=0) {
+        fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db_));
+        std::cout << pathBDNCBI << std::endl;
+        std::cout << "result code : " << rc << std::endl;
+    } else {
+
+        rc = sqlite3_open_v2("/home/jo/app/phytospy/data/data/Phyto_NT_JL.db", &dbOUT_,SQLITE_OPEN_READWRITE,NULL);
+
+        sqlite3_stmt * stmt, * stmt2, * stmt3;
+        int c(0);
+        for (auto kv : dico->Dico_code2Nom){
+            c++;
+            std::string codeEs=kv.first;
+            std::string scientificName=kv.second;
+            std::string SQLstring="SELECT id FROM names WHERE name='"+scientificName+"';";
+            sqlite3_prepare( db_, SQLstring.c_str(), -1, &stmt, NULL );
+            while(sqlite3_step(stmt) == SQLITE_ROW)
+            {
+                if (sqlite3_column_type(stmt, 0)!=SQLITE_NULL ){
+                    int id=sqlite3_column_int( stmt, 0 ) ;
+                    //std::cout << "id of " << codeEs <<" is " << id << std::endl;
+                    SQLstring="SELECT name FROM names WHERE id="+std::to_string(id)+" AND type='common name';";
+                    sqlite3_prepare( db_, SQLstring.c_str(), -1, &stmt2, NULL );
+                    while(sqlite3_step(stmt2) == SQLITE_ROW)
+                    {
+                        if (sqlite3_column_type(stmt2, 0)!=SQLITE_NULL ){
+                            std::string commonName=std::string( (char *)sqlite3_column_text( stmt2, 0 ) );
+                            std::cout << scientificName << " is " << commonName << std::endl;
+                            // sauver le résultat dans la table
+                           SQLstring="UPDATE dico_espece_all SET nom_en=TOTO"+commonName+ "TOTO WHERE code_espece=TOTO"+ codeEs+"TOTO;";
+                              boost::replace_all(SQLstring,"TOTO","\"");
+                             // std::cout << "SQLstring " << SQLstring << std::endl;
+                            if (sqlite3_prepare_v2(dbOUT_, SQLstring.c_str(), -1, &stmt3, NULL )== SQLITE_OK){
+                                // applique l'update
+                                sqlite3_step( stmt3 );
+                                sqlite3_finalize(stmt3);
+                            } else {
+                                int ecode = sqlite3_errcode(dbOUT_);
+                                std::cout << "\n error code is " << ecode;
+                            }
+                            break;
+                        }
+                    }
+                    sqlite3_finalize(stmt2);
+                }
+                break;
+            }
+            if (c%500==0){std::cout << c <<"plantes effectués" << std::endl;}
+        }
+        sqlite3_finalize(stmt);
+        sqlite3_close(db_);
+        sqlite3_close(dbOUT_);
+    }
+
+
+
+}
+
+
+
+
 

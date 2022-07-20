@@ -420,7 +420,9 @@ void descriptionStation(std::string aShp){
 
 
             // selectionne les couches raster que je vais utiliser
-            std::vector<std::string> aVCodes{"MNT","ZBIO","NT","NH","AE","SS","Topo","EP_FEE","SWC"};
+            std::vector<std::string> aVCodes{"MNT","ZBIO","NT","NH","AE","SS","Topo","SWC","slope"};
+
+            // ajout kk sol ; prof drainage texture + sigle
 
             //std::vector<std::string> aVCodes{"MNT","ZBIO","NT","NH","AE","SS","Topo","EP_FEE","slope","MNH2019","MNH2014"};// ,"EP_CS","CS_A"
 
@@ -568,12 +570,13 @@ void descriptionStation(std::string aShp){
                     // pour la carte générée pour analyse point, on ne dessine pas un polygone mais un cercle autour du point
                 case wkbPoint:
                 {
-                    if (1){
+                    isPt=1;
+                    if (0){
                         //std::cout << " shp de point ; j'effectue un buffer de 18 m" << std::endl;
                         poGeom = poGeom->Buffer(25);
                     }
                     //std::cout << " point " << std::endl;
-                    //isPt=1;
+
                     break;
                 }
                 default:

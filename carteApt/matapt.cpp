@@ -44,7 +44,7 @@ matApt::matApt(std::shared_ptr<cdicoAptBase> aDicoApt):mDicoApt(aDicoApt),zbio_(
                 int col= mDicoApt->posEcoNT(codeNT)+addc;
                 WContainerWidget * c = mEco->elementAt(row,col)->addNew<WContainerWidget>();
                 WTableCell * tc = mEco->elementAt(row,col);
-                tc->setToolTip("Niveau trophique " + kvNT.second + ", Niveau Hydrique " + kvNH.second);
+                tc->setToolTip(tr("eco.ntnh").arg(kvNT.second).arg(kvNH.second));
                 c->setStyleClass("circle_eco");
                 c->setId("ntnh"+std::to_string(codeNT)+std::to_string(codeNH));
                 mMapCircleEco.emplace(std::make_pair(ntnh,c));
