@@ -29,7 +29,7 @@ SOURCES += stationDescriptor.cpp \
 
 
 
-LIBS = -lboost_system -lboost_iostreams -lboost_thread -lboost_filesystem -lboost_program_options -lwtdbo -lwtdbosqlite3 -fopenmp
+LIBS = -lboost_system -lboost_iostreams -lboost_thread -lboost_filesystem -lboost_program_options -lwtdbo -lwtdbosqlite3 -fopenmp -lwt
 
 LIBS += -L$$PWD/usr/include/ -lsqlite3
 LIBS += -L$$PWD/usr/include/gdal/ -lgdal

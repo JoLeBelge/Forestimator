@@ -64,15 +64,20 @@ int main(int argc, char **argv)
 void deepl(cDicoApt *dico){
 
     std::cout << " export des messages xml \n\n\n" << std::endl;
+    std::string target_lang("NL");
     std::ifstream theFile;
-    std::string aFile=dico->File("TMPDIR")+"traductionPhytospy.xml";
-    //theFile.open("/home/jo/app/phytospy/data/phytoTool.xml");
-    theFile.open("/home/jo/Téléchargements/new.xml");
+    std::string aFile=dico->File("TMPDIR")+"phytoTool_"+target_lang+".xml";
+
+    // j'ai besoin du fichier ressource pour la resource, et pour parser avec rapidXML pour avoir les clés d'identifications
+    std::string aXMLFile("/home/jo/app/phytospy/data/phytoTool.xml");
+    aXMLFile="/home/jo/Téléchargements/new.xml";
+    theFile.open(aXMLFile);
+
     std::ofstream aOut;
     aOut.open(aFile,std::ios::out);
 
     Wt::WMessageResourceBundle resource;
-    resource.use("/home/jo/Téléchargements/new");
+    resource.use(aXMLFile.substr(0,aXMLFile.size()-4));
     // lecture du xml
     xml_document<> doc;
     xml_node<> * root_node;
@@ -92,7 +97,7 @@ void deepl(cDicoApt *dico){
             Wt::LocalizedString ls=resource.resolveKey("fr",aId);
             std::string aMessage= ls.value;
 
-            std::string en=traduction(aMessage);
+            std::string en=traduction(aMessage,target_lang);
             aOut <<"<message id=\""<< aId << "\">"<< en << "</message>\n\n" ;
 
         } else {
@@ -106,13 +111,15 @@ void deepl(cDicoApt *dico){
 
 void dicoToXml(std::shared_ptr<cDicoPhyto> dico){
     std::cout << " export des messages xml depuis le dico\n" << std::endl;
+    std::string target_lang("NL");
     std::string aFile=dico->File("TMPDIR")+"messageFromBD.xml";
-    std::string aFileEN=dico->File("TMPDIR")+"messageFromBD_en.xml";
+    std::string aFileEN=dico->File("TMPDIR")+"messageFromBD_"+target_lang+".xml";
     std::ofstream aOut, aOutEN;
     aOut.open(aFile,std::ios::out);
     aOut <<"<messages>\n" ;
 
-    /*for (auto kv : dico->Dico_code2NomFR){
+    /*
+    for (auto kv : dico->Dico_code2NomFR){
         std::string code=kv.first;
         std::string nomfr=kv.second;
         aOut <<"<message id=\""<< code << ".nom\">"<< nomfr << "</message>\n" ;
@@ -130,42 +137,47 @@ void dicoToXml(std::shared_ptr<cDicoPhyto> dico){
     aOut <<"</messages>\n" ;
     aOut.close();
 
-    // traduction anglaise
+    // traduction anglaise ou néérlandaise
     aOutEN.open(aFileEN,std::ios::out);
     aOutEN <<"<messages>\n" ;
-    /*for (auto kv : dico->Dico_groupeNT){
+    /*
+    for (auto kv : dico->Dico_groupeNT){
             std::string code=kv.first;
             std::string nomfr=kv.second;
-            std::string en=traduction(nomfr);
+            std::string en=traduction(nomfr, target_lang);
             if (en!=""){
-                aOutEN <<"<message id=\"groupeNT."<< code << "\">"<< en << "</message>\n" ;
+                aOutEN <<"<message id=\"<< code << ".nom\">"<< en << "</message>\n" ;
            }
-    }
+    }*/
     for (auto kv :  dico->grEcos){
         std::string code=kv.first;
         grEco ge=kv.second;
-        aOutEN <<"<message id=\""<< code << ".nomGroupe\">"<< ge.nom_shortEN << "</message>\n" ;
-    }*/
+        std::string aTrad("");
+        if (target_lang=="EN"){aTrad=ge.nom_shortEN;} else { aTrad=traduction(ge.nom_groupe, target_lang);}
 
+        aOutEN <<"<message id=\""<< code << ".nomGroupe\">"<< aTrad << "</message>\n" ;
+    }
 
+    /*
     for (auto kv : dico->Dico_code2NomFR){
         std::string code=kv.first;
         std::string nomfr=kv.second;
         std::string en=dico->nomEN(code);
-        if (en==""){en=traduction(nomfr);}
+        if (target_lang!="EN"){en="";}
+        if (en==""){en=traduction(nomfr,target_lang);}
         if (en!=""){
             aOutEN <<"<message id=\""<< code << ".nom\">"<< en << "</message>\n" ;
         }
-    }
+    }*/
     aOutEN <<"</messages>\n" ;
     aOutEN.close();
 }
 
-std::string traduction(std::string afr){
+std::string traduction(std::string afr, std::string target_lang){
 
     std::string token("");
     // traduction par deepl
-    std::string url("https://api-free.deepl.com/v2/translate?auth_key=fe374c38-a172-9620-b311-8f427be37e29:fx&target_lang=EN&source_lang=FR&tag_handling=html&text=");
+    std::string url("https://api-free.deepl.com/v2/translate?auth_key=fe374c38-a172-9620-b311-8f427be37e29:fx&target_lang="+target_lang+"&source_lang=FR&tag_handling=html&text=");
     //"curl -H "Authorization: DeepL-Auth-Key fe374c38-a172-9620-b311-8f427be37e29:fx" https://api-free.deepl.com/v2/usage";
     CURL *curl;
     CURLcode res;
@@ -178,7 +190,8 @@ std::string traduction(std::string afr){
         char *urlified = curl_easy_escape(curl, afr.c_str(), 0);
         //std::cout << "urlified " << urlified << std::endl;
         url+=urlified;
-        //std::cout << url << std::endl;
+         std::cout << "url: \n" << std::endl;
+        std::cout << url << "\n" <<std::endl;
         curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
@@ -194,6 +207,7 @@ std::string traduction(std::string afr){
             std::cout << token << std::endl;
             boost::replace_all(token,"\\n","\n");
             boost::replace_all(token,"\\\"","\"");
+            boost::replace_all(token,"\\t","\t");
         }
     }
     return token;
@@ -237,9 +251,9 @@ void processNCBI(std::shared_ptr<cDicoPhyto> dico){
                             std::string commonName=std::string( (char *)sqlite3_column_text( stmt2, 0 ) );
                             std::cout << scientificName << " is " << commonName << std::endl;
                             // sauver le résultat dans la table
-                           SQLstring="UPDATE dico_espece_all SET nom_en=TOTO"+commonName+ "TOTO WHERE code_espece=TOTO"+ codeEs+"TOTO;";
-                              boost::replace_all(SQLstring,"TOTO","\"");
-                             // std::cout << "SQLstring " << SQLstring << std::endl;
+                            SQLstring="UPDATE dico_espece_all SET nom_en=TOTO"+commonName+ "TOTO WHERE code_espece=TOTO"+ codeEs+"TOTO;";
+                            boost::replace_all(SQLstring,"TOTO","\"");
+                            // std::cout << "SQLstring " << SQLstring << std::endl;
                             if (sqlite3_prepare_v2(dbOUT_, SQLstring.c_str(), -1, &stmt3, NULL )== SQLITE_OK){
                                 // applique l'update
                                 sqlite3_step( stmt3 );

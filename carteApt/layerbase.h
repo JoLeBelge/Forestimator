@@ -126,7 +126,7 @@ public:
 
     void printDetail();
 
-    double mVHA, mHdom, mGha, mCmoy, mNha;
+    double mVHA, mHdom, mGha, mCmoy, mNha, mSdGha, mSdCmoy;
      int mSurf;
 private:
     double mMean,mQ95;
@@ -183,6 +183,8 @@ public:
     std::string getGha();
     std::string getHdom();
     std::string getCmoy();
+     std::string getSdGha();
+      std::string getSdCmoy();
 };
 
 

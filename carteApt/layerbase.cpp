@@ -23,24 +23,24 @@ basicStat::basicStat(std::map<double,int> aMapValandFrequ, double na):mean(0),ma
     std::vector<double> v;
     for (auto kv : aMapValandFrequ){
         if (kv.first!=na){
-        mean += kv.first*kv.second;
-        nb+=kv.second;
+            mean += kv.first*kv.second;
+            nb+=kv.second;
 
-        // pour pouvoir calculer l'écart type
-        for (int i(0) ; i<kv.second;i++){v.push_back(kv.first);}
+            // pour pouvoir calculer l'écart type
+            for (int i(0) ; i<kv.second;i++){v.push_back(kv.first);}
 
-        if (kv.second>1){
-            if (test) {
+            if (kv.second>1){
+                if (test) {
 
-                if (kv.first>max) {max=kv.first;}
-                if (kv.first<min) {min=kv.first;}
+                    if (kv.first>max) {max=kv.first;}
+                    if (kv.first<min) {min=kv.first;}
 
-            } else {
-                max=kv.first;
-                min=kv.first;
-                test=1;
+                } else {
+                    max=kv.first;
+                    min=kv.first;
+                    test=1;
+                }
             }
-        }
         }
     }
     mean=mean/nb;
@@ -54,7 +54,7 @@ statHdomBase::statHdomBase(std::shared_ptr<layerBase> aLay, OGRGeometry * poGeom
     //std::cout << "statHdom::statHdom" << std::endl;
     if (computeStat){
         predictDendro();
-    mDistFrequ=computeDistrH();
+        mDistFrequ=computeDistrH();
     }
 
 }
@@ -122,11 +122,11 @@ void statDendroBase::predictDendroPix(){
         CPLFree(scanline);
         CPLFree(scanlineMask);
 
-       // tout les paramètres dendrométriques
-       std::unique_ptr<statCellule> cel=std::make_unique<statCellule>(&aVHs,nbPix*pixelWidth*pixelHeight,1);
-       mStat.push_back(std::move(cel));
+        // tout les paramètres dendrométriques
+        std::unique_ptr<statCellule> cel=std::make_unique<statCellule>(&aVHs,nbPix*pixelWidth*pixelHeight,1);
+        mStat.push_back(std::move(cel));
 
-       GDALClose(DS);
+        GDALClose(DS);
     }
     GDALClose(mask);
 }
@@ -136,61 +136,86 @@ statCellule::statCellule(std::vector<double> * aVHs, int aSurf, bool computeDend
 
     // calcul de Vha
     double hSum(0);
+
     if (computeDendro){
         if (globTest){std::cout << "statCellule::statCellule dendro" << std::endl;}
 
-         double vhaSum(0.0),cmoySum(0.0),ghaSum(0.0),nhaSum(0.0),hdomSum(0);
+        double vhaSum(0.0),cmoySum(0.0),ghaSum(0.0),nhaSum(0.0),hdomSum(0);
+
+        std::vector<double> vGha, vCmoy;
         for (double h : *aVHs){
-        // old vhaSum+=pow(std::max(0.0,h-k2vha),k3vha);
-        double vhaPix(0),hdomPix(0),cmoyPix(0),ghaPix(0);
+            // old vhaSum+=pow(std::max(0.0,h-k2vha),k3vha);
+            double vhaPix(0),hdomPix(0),cmoyPix(0),ghaPix(0);
 
-        // VHA
-        //SI(Hpixi <= K2; 0; K1*(Hpixi-K2)^K3)
-        if (h<k2vha) {} else {vhaPix=k1vha*pow((h-k2vha),k3vha);}
+            // VHA
+            //SI(Hpixi <= K2; 0; K1*(Hpixi-K2)^K3)
+            if (h<k2vha) {} else {vhaPix=k1vha*pow((h-k2vha),k3vha);}
 
-        // HDOM
-        //SI(Hpixi <= 0; 0; K1*Hpixi+K2)
-        hdomPix=k1hdom*h+k2hdom;
+            // HDOM
+            //SI(Hpixi <= 0; 0; K1*Hpixi+K2)
+            hdomPix=k1hdom*h+k2hdom;
 
-        // CMOY
-        // SI(HDOMpixi <= 1.3; 0; K1*(HDOMpixi-1.3)+K2*(HDOMpixi-1.3)²)
-        if (hdomPix<1.3) {} else {cmoyPix=k1cmoy*(hdomPix-1.3)+k2cmoy*pow((hdomPix-1.3),2);}
+            // CMOY
+            // SI(HDOMpixi <= 1.3; 0; K1*(HDOMpixi-1.3)+K2*(HDOMpixi-1.3)²)
+            if (hdomPix<1.3) {} else {cmoyPix=k1cmoy*(hdomPix-1.3)+k2cmoy*pow((hdomPix-1.3),2);}
+            vCmoy.push_back(cmoyPix);
 
-        // GHA
-        //SI(Hpixi <= 0; 0; K1*VHApixi/(Hpixi+K2))
-        ghaPix=k1gha*vhaPix/(h+k2gha);
+            // GHA
+            //SI(Hpixi <= 0; 0; K1*VHApixi/(Hpixi+K2))
+            ghaPix=k1gha*vhaPix/(h+k2gha);
+            vGha.push_back(ghaPix);
 
-        // NHA
-        //SI(CMOYpixi <= 0; 0; 40000*pi()*GHApixi/Cmoypixi²)
-        if (cmoyPix > 0){ nhaSum+=40000.0*M_PI*ghaPix/pow(cmoyPix,2);}
+            // NHA
+            //SI(CMOYpixi <= 0; 0; 40000*pi()*GHApixi/Cmoypixi²)
+            if (cmoyPix > 0){ nhaSum+=40000.0*M_PI*ghaPix/pow(cmoyPix,2);}
 
-        vhaSum+=vhaPix;
-        hdomSum+=hdomPix;
-        ghaSum+=ghaPix;
-        cmoySum+=cmoyPix;
-        hSum+=h;
+            vhaSum+=vhaPix;
+            hdomSum+=hdomPix;
+            ghaSum+=ghaPix;
+            cmoySum+=cmoyPix;
+            hSum+=h;
 
-    }
-    // calcul de la moyenne
-    mMean=hSum/aVHs->size();
-    mHdom=hdomSum/aVHs->size();
-    mVHA=vhaSum/aVHs->size();
-    mGha=ghaSum/aVHs->size();
-    mNha=nhaSum/aVHs->size();
-
-    mCmoy=sqrt(40000*M_PI*(mGha/mNha));
+        }
 
 
-    //mVHA=k1vha*(vhaSum/aVHs->size());
-    // calcul de Q95
-    // mQ95=getQ95(*aVHs);
-    //std::cout << "mean hauteur : " << mMean << " , Q95 " << mQ95 << std::endl;
 
-    // le reste des variables dendro
-    //computeHdom();
-    //computeGha();
-    //computeCmoy();
-    //computeNha();
+        // calcul de la moyenne
+        mMean=hSum/aVHs->size();
+        mHdom=hdomSum/aVHs->size();
+        mVHA=vhaSum/aVHs->size();
+        mGha=ghaSum/aVHs->size();
+        mNha=nhaSum/aVHs->size();
+
+        mCmoy=sqrt(40000*M_PI*(mGha/mNha));
+
+        // calcul de l'écart type pour gha (besoin dans simreg, capsis)
+        double sq_diff_sum(0);
+        for(int i = 0; i < vGha.size(); ++i) {
+            double diff = vGha.at(i) - mGha;
+            sq_diff_sum += diff * diff;
+        }
+        double variance = sq_diff_sum / aVHs->size();
+        mSdGha=sqrt(variance);
+
+        // calcul de l'écart type pour cmoy (besoin dans simreg, capsis)
+        sq_diff_sum=0;
+        for(int i = 0; i < vCmoy.size(); ++i) {
+            double diff = vCmoy.at(i) - mCmoy;
+            sq_diff_sum += diff * diff;
+        }
+        variance = sq_diff_sum / aVHs->size();
+        mSdCmoy=sqrt(variance);
+
+        //mVHA=k1vha*(vhaSum/aVHs->size());
+        // calcul de Q95
+        // mQ95=getQ95(*aVHs);
+        //std::cout << "mean hauteur : " << mMean << " , Q95 " << mQ95 << std::endl;
+
+        // le reste des variables dendro
+        //computeHdom();
+        //computeGha();
+        //computeCmoy();
+        //computeNha();
     } else {
         //std::cout << "statCellule::statCellule hdom" << std::endl;
         for (double h : *aVHs){
@@ -199,8 +224,8 @@ statCellule::statCellule(std::vector<double> * aVHs, int aSurf, bool computeDend
         // calcul de la moyenne
         mMean=hSum/aVHs->size();
         mHdom=mMean;
-    //mQ95=getQ95(*aVHs);
-    //computeHdom();
+        //mQ95=getQ95(*aVHs);
+        //computeHdom();
     }
 
     //if (globTest){ printDetail();}
@@ -396,7 +421,7 @@ bool statHdomBase::deserveChart(){
 bool statDendroBase::deserveChart(){ // vérifier qu'il y ai bien une cellule et pas trop petite "
     bool aRes(1);
     if (mStat.size()==1 && mStat.at(0)->mSurf > 100){} else { std::cout << "Attention, calcul param dendro sur plusieurs cellules (pas normal) ou alors surface trop petite " << std::endl;
-}
+    }
     return aRes;
 }
 
@@ -406,6 +431,8 @@ std::string statDendroBase::getVha(){if (mStat.size()==1){return roundDouble(mSt
 std::string statDendroBase::getGha(){if (mStat.size()==1){return roundDouble(mStat.at(0)->mGha);}else{return "failure";}}
 std::string statDendroBase::getHdom(){if (mStat.size()==1){return roundDouble(mStat.at(0)->mHdom);}else{return "failure";}}
 std::string statDendroBase::getCmoy(){if (mStat.size()==1){return roundDouble(mStat.at(0)->mCmoy);}else{return "failure";}}
+std::string statDendroBase::getSdGha(){if (mStat.size()==1){return roundDouble(mStat.at(0)->mSdGha);}else{return "failure";}}
+std::string statDendroBase::getSdCmoy(){if (mStat.size()==1){return roundDouble(mStat.at(0)->mSdCmoy);}else{return "failure";}}
 
 // cette fonctione ne fonctionne pas de manière identique sur le serveur qu'en local chez moi.
 // chez moi ; 99 point. serveur ; 66 points, et manifestement pas au même endroit
@@ -563,12 +590,12 @@ void statHdomBase::predictDendro(bool onlyHdomStat){
                 // seuil de 80 m2
                 if (surf>80){
                     if (onlyHdomStat){
-                    std::unique_ptr<statCellule> cel=std::make_unique<statCellule>(&aVHs,surf,0);
-                     mStat.push_back(std::move(cel));
+                        std::unique_ptr<statCellule> cel=std::make_unique<statCellule>(&aVHs,surf,0);
+                        mStat.push_back(std::move(cel));
                     } else {
                         // tout les paramètres dendrométriques
-                    std::unique_ptr<statCellule> cel=std::make_unique<statCellule>(&aVHs,surf,1);
-                     mStat.push_back(std::move(cel));
+                        std::unique_ptr<statCellule> cel=std::make_unique<statCellule>(&aVHs,surf,1);
+                        mStat.push_back(std::move(cel));
                     }
 
                 }
@@ -1494,22 +1521,22 @@ bool layerBase::wms2jpg(OGREnvelope  * extent, int aSx, int aSy, std::string aOu
     boost::replace_all(layerName," ","%20");
     const char *connStr = CPLSPrintf("<GDAL_WMS>"
                                      "<Service name=\"WMS\">"
-                                        "<Version>1.1.1</Version>"
-                                      //"<Version>1.3.0</Version>"
-                                        "<ServerUrl>%s?</ServerUrl>"
-                                        "<SRS>EPSG:31370</SRS>"
-                                        //"<CRS>EPSG:3812</CRS>" pour version 1.3.0
-                                        "<ImageFormat>image/jpeg</ImageFormat>"
-                                        "<Layers>%s</Layers>"
-                                        "<Styles></Styles>"
+                                     "<Version>1.1.1</Version>"
+                                     //"<Version>1.3.0</Version>"
+                                     "<ServerUrl>%s?</ServerUrl>"
+                                     "<SRS>EPSG:31370</SRS>"
+                                     //"<CRS>EPSG:3812</CRS>" pour version 1.3.0
+                                     "<ImageFormat>image/jpeg</ImageFormat>"
+                                     "<Layers>%s</Layers>"
+                                     "<Styles></Styles>"
                                      "</Service>"
                                      "<DataWindow>"
-                                        "<UpperLeftX>%f</UpperLeftX>"
-                                        "<UpperLeftY>%f</UpperLeftY>"
-                                        "<LowerRightX>%f</LowerRightX>"
-                                        "<LowerRightY>%f</LowerRightY>"
-                                        "<SizeX>%d</SizeX>"
-                                        "<SizeY>%d</SizeY>"
+                                     "<UpperLeftX>%f</UpperLeftX>"
+                                     "<UpperLeftY>%f</UpperLeftY>"
+                                     "<LowerRightX>%f</LowerRightX>"
+                                     "<LowerRightY>%f</LowerRightY>"
+                                     "<SizeX>%d</SizeX>"
+                                     "<SizeY>%d</SizeY>"
                                      "</DataWindow>"
                                      "<Projection>EPSG:31370</Projection>"
                                      "<BandsCount>3</BandsCount>"
@@ -1592,7 +1619,7 @@ GDALDataset * rasterizeGeom(OGRGeometry *poGeom, GDALDataset * aGDALDat){
 
     const char *pszFormat = "MEM";
     // sauver le masque pour vérification
-   // const char *pszFormat = "GTiff";
+    // const char *pszFormat = "GTiff";
 
     pDriver = GetGDALDriverManager()->GetDriverByName(pszFormat);
     if( pDriver == NULL )

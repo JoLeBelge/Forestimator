@@ -16,29 +16,21 @@ using namespace std;
 namespace po = boost::program_options;
 extern string dirBD;
 std::string datDir("/home/lisein/Documents/Scolyte/projetRegioWood/Data/");
-std::string dirIRMMap="/home/lisein/Documents/Scolyte/Data/climat/IRM/irmCarte/";
+std::string dirIRMMap="/home/jo/Documents/Scolyte/Data/climat/IRM/irmCarte/";
 std::string dirMapDescr="toto";
+
+extern std::string columnPath;
 
 namespace bf =boost::filesystem;
 
 bool climat(0);
 std::vector<int> vYears={2016,2017,2018,2019,2020};
 std::vector<int> vMonths={3,4,5,6,7,8,9};
-std::vector<std::string> vVAR={"Tmean","Tmax","Tmin","ETP","P","R","DJ"};
+//std::vector<std::string> vVAR={"Tmean","Tmax","Tmin","ETP","P","R","DJ"};
+std::vector<std::string> vVAR={"Tmean","Tmax","Tmin","ETP","P","R"};
 int globSeuilPres(70);
 
-/*
-#include <iostream>
-#include <string.h>
-#include <stdlib.h>
-#include "html.h"
-#include "HTMLControl.h"
-#include "HTMLDriver.h"
-#include "iconvstream.h"
-#include "format.h"
-*/
-
-
+void statDendro(std::string aShp);
 
 /* jo 2020
 Projet RégioWood 2 et thèse de Arthur G.
@@ -50,8 +42,13 @@ j'ai besoin de calculer le NH maj, NT majoritaire, aptitude, hdom, Zbio, SS, AE,
 
 2) thèse MP et démarche similaire mais avec Catalogues Station en premier plan, MNH2014 + MNH2019, probabilité HE
 le masque de forêt Hetraie mature sert pour la selection de nos tuile
+
+
+./stationDesc --shp "/home/jo/Documents/Alice/pt/dispoEnEx.shp" --outil 1 --dirIRMMap "/home/jo/Documents/Scolyte/Data/climat/IRM/irmCarte/" --meteo 1 --dirBDForestimator "/home/jo/app/Forestimator/carteApt/data/aptitudeEssDB.db"
+
 */
 
+bool test(0);
 void descriptionStation(std::string aShp);
 
 OGRPoint * getCentroid(OGRPolygon * hex);
@@ -79,7 +76,7 @@ int main(int argc, char *argv[])
     po::options_description desc("Allowed options");
     desc.add_options()
             ("help", "produce help message")
-            ("outil", po::value<int>(), "choix de l'outil à utiliser (1 : description stationnelle sur un shapefile de polygone, 101 : ajoute un champ aux shapefile avec la valeur extraite d'un raster donné en entrée), 102 : création d'un shp tuile à partir d'un raster (RasterMasq) ")
+            ("outil", po::value<int>(), "choix de l'outil à utiliser (1 : description stationnelle sur un shapefile de polygone, 101 : ajoute un champ aux shapefile avec la valeur extraite d'un raster donné en entrée), 102 : création d'un shp tuile à partir d'un raster (RasterMasq) , 1010 : statDendro2018")
             ("shp", po::value< std::string>(), "shapefile des polgones sur lesquels effectuer l'analyse surfacique")
             ("meteo", po::value<bool>(), "description de la station avec des indices météo en plus (précision chemin d'accès au cartes avec dirIRMMap)")
             ("dirIRMMap", po::value<std::string>(), "chemin d'accès aux cartes de l'IRM")
@@ -88,6 +85,7 @@ int main(int argc, char *argv[])
             ("raster", po::value< std::string>(), "raster de description du mileu pour ajout d'un champs dans shp (outil 101")
             ("rasterMask", po::value< std::string>(), "raster masque à partir duquel on va générer des tuiles (outil 102) , pour tuilages scolytes ou hetraie mature")
             ("seuilPP", po::value<int>(), "seuil de probabilité de présence, utilisé pour masquer le raster pour création de tuile (102), défaut 70")
+            ("colPath", po::value<std::string>(), "nom de la colonne de fichierGIS et layerApt propre à la machine (chemin d'accès couche en local)")
             ;
 
     po::variables_map vm;
@@ -98,6 +96,9 @@ int main(int argc, char *argv[])
         cout << desc << "\n";
         return 1;
     }
+
+    columnPath="Dir3";
+    if (vm.count("colPath")) {columnPath=vm["colPath"].as<std::string>();std::cout << " colPath =" << columnPath << std::endl;}
 
     if (vm.count("outil")) {
         GDALAllRegister();
@@ -123,6 +124,25 @@ int main(int argc, char *argv[])
             }
             break;
         }
+        case 1010:{
+            std::cout << " description station sur base d'un shp de polygone" << std::endl;
+            if (vm.count("shp")) {
+                std::string file(vm["shp"].as<std::string>());
+                if (vm.count("meteo")){climat =vm["meteo"].as<bool>();}
+
+                if (vm.count("dirIRMMap")){dirIRMMap =vm["dirIRMMap"].as<std::string>();}
+                if (vm.count("dirBDForestimator")){dirBD =vm["dirBDForestimator"].as<std::string>();}
+                if (vm.count("dirMapDescr")){dirMapDescr =vm["dirMapDescr"].as<std::string>();}
+
+                statDendro(file);
+
+            } else {
+                std::cout << "vous devez obligatoirement renseigner le shapefile en entrée avec l'argument shp" << std::endl;
+            }
+            break;
+        }
+
+
         case 10:{
             std::cout << "choix placettes IPRFW et création d'un shp avec limite des placettes " << std::endl;
             // ouverture de la bd sqlite , requete convertie de xls en sqlite
@@ -334,7 +354,8 @@ void descriptionStation(std::string aShp){
         std::vector<std::unique_ptr<rasterFiles>> aVRFs;
         std::map<int,std::vector<std::string>> aStat;
 
-
+        bool isPt(1);// j'ai envie de faire les analyses non pas en mode surfacique mais en mode extract value to point
+        // les headers changent en fonction du fait que ce soit une ana ponctuelle ou surfacique
 
         // mode avec les raster de l'utilisateur
         if (dirMapDescr!="toto"){
@@ -422,6 +443,8 @@ void descriptionStation(std::string aShp){
             // selectionne les couches raster que je vais utiliser
             std::vector<std::string> aVCodes{"MNT","ZBIO","NT","NH","AE","SS","Topo","SWC","slope"};
 
+
+
             // ajout kk sol ; prof drainage texture + sigle
 
             //std::vector<std::string> aVCodes{"MNT","ZBIO","NT","NH","AE","SS","Topo","EP_FEE","slope","MNH2019","MNH2014"};// ,"EP_CS","CS_A"
@@ -447,20 +470,24 @@ void descriptionStation(std::string aShp){
             if (climat){
                 std::cout << " raster description du climat" << std::endl;
                 // boucle sur les raster de données climatique et extraction de la valeur pour le centre de la tuile
-                for (int y : vYears){
-                    for (int m : vMonths){
+                if(0){
+                    for (int y : vYears){
+                        for (int m : vMonths){
 
-                        for (std::string var : vVAR){
-                            std::string code=var +"_"+std::to_string(y)+"_"+std::to_string(m);
-                            std::string file(dirIRMMap +code +".tif");
-                            std::unique_ptr<rasterFiles> r= std::make_unique<rasterFiles>(file,code);
-                            aVRFs.push_back(std::move(r));
+                            for (std::string var : vVAR){
+                                std::string code=var +"_"+std::to_string(y)+"_"+std::to_string(m);
+                                std::string file(dirIRMMap +code +".tif");
+                                std::unique_ptr<rasterFiles> r= std::make_unique<rasterFiles>(file,code);
+                                aVRFs.push_back(std::move(r));
+                            }
                         }
                     }
                 }
 
                 std::vector<std::string> var30{"ETP_30aire","P_30aire","R_30aire","Tmean_30aire","Tmax_30aire","Tmin_30aire"};
                 for (std::string var : var30){
+
+
                     for (int m : vMonths){
                         std::string code=var +"_"+std::to_string(m);
                         std::string file(dirIRMMap +code +".tif");
@@ -479,7 +506,7 @@ void descriptionStation(std::string aShp){
          *
          */
 
-            bool isPt(0);// j'ai envie de faire les analyses non pas en mode surfacique mais en mode extract value to point
+
 
             // je pense que c'est assez long comme process (lecture CNSW)
             headerProcessing="";
@@ -503,41 +530,43 @@ void descriptionStation(std::string aShp){
 
             for (std::shared_ptr<layerBase> & l : aVLs){
                 if (!isPt){
-                switch (l->getTypeVar()) {
-                case TypeVar::Continu:{
-                    switch (l->getCatLayer()) {
-                    case TypeLayer::Peuplement:{
-                        headerProcessing+=";"+l->Code()+"mean";
-                        headerProcessing+=";"+l->Code()+"max";
-                        headerProcessing+=";"+l->Code()+"sd";
-                        statOrder.emplace(std::make_pair(l->Code()+"mean",c));
+                    switch (l->getTypeVar()) {
+                    case TypeVar::Continu:{
+                        switch (l->getCatLayer()) {
+                        case TypeLayer::Peuplement:{
+                            headerProcessing+=";"+l->Code()+"mean";
+                            headerProcessing+=";"+l->Code()+"max";
+                            headerProcessing+=";"+l->Code()+"sd";
+                            statOrder.emplace(std::make_pair(l->Code()+"mean",c));
+                            c++;
+                            statOrder.emplace(std::make_pair(l->Code()+"max",c));
+                            c++;
+                            statOrder.emplace(std::make_pair(l->Code()+"sd",c));
+                            c++;
+                            break;
+                        }
+                        default:
+                            headerProcessing+=";"+l->Code()+"mean";
+                            statOrder.emplace(std::make_pair(l->Code()+"mean",c));
+                            c++;
+                        }
+                        break;
+                    }
+                    case TypeVar::Classe:{
+                        headerProcessing+=";"+l->Code()+"maj";
+                        headerProcessing+=";"+l->Code()+"pct";
+                        statOrder.emplace(std::make_pair(l->Code()+"maj",c));
                         c++;
-                        statOrder.emplace(std::make_pair(l->Code()+"max",c));
-                        c++;
-                        statOrder.emplace(std::make_pair(l->Code()+"sd",c));
+                        statOrder.emplace(std::make_pair(l->Code()+"pct",c));
                         c++;
                         break;
                     }
                     default:
-                        headerProcessing+=";"+l->Code()+"mean";
-                        statOrder.emplace(std::make_pair(l->Code()+"mean",c));
-                        c++;
+                        break;
                     }
-                    break;
-                }
-                case TypeVar::Classe:{
-                    headerProcessing+=";"+l->Code()+"maj";
-                    headerProcessing+=";"+l->Code()+"pct";
-                    statOrder.emplace(std::make_pair(l->Code()+"maj",c));
-                    c++;
-                    statOrder.emplace(std::make_pair(l->Code()+"pct",c));
-                    c++;
-                    break;
-                }
-                default:
-                    break;
-                }
                 }else {
+
+                    // analyse ponctuelle
                     headerProcessing+=";"+l->Code();
                     statOrder.emplace(std::make_pair(l->Code(),c));
                     c++;
@@ -558,7 +587,7 @@ void descriptionStation(std::string aShp){
             //}
 
             for (int id=0;id<lay->GetFeatureCount();id++){
-               // for (int id=0;id<100;id++){
+                // for (int id=0;id<100;id++){
                 poFeature = lay->GetFeature(id);
                 //std::cout << " process feature id " << id << std::endl;
                 if (poFeature->GetFID() % 100==0){std::cout << " process feature " << poFeature->GetFID() << std::endl;}
@@ -570,12 +599,13 @@ void descriptionStation(std::string aShp){
                     // pour la carte générée pour analyse point, on ne dessine pas un polygone mais un cercle autour du point
                 case wkbPoint:
                 {
-                    isPt=1;
-                    if (0){
+                    // mm pour ana pt je dois faire le buffer, vieux code
+                    if (1){
                         //std::cout << " shp de point ; j'effectue un buffer de 18 m" << std::endl;
                         poGeom = poGeom->Buffer(25);
                     }
-                    //std::cout << " point " << std::endl;
+
+                    if (test){std::cout << " point " << std::endl;}
 
                     break;
                 }
@@ -673,20 +703,27 @@ void descriptionStation(std::string aShp){
                     }
 
 
-                     // analyse ponctuelle, plus rapide.
+                    // analyse ponctuelle, plus rapide.
                 } else {
-                    //std::cout << " analyse ponctuelle" << std::endl;
+                    if (test){std::cout << " analyse ponctuelle" << std::endl;}
 
-                    OGRPoint * pt= poGeom->toPoint();
+                    //OGRPoint * pt= poGeom->toPoint();
+
+                    OGRPoint * pt=getCentroid(poGeom->toPolygon());
                     double aX=pt->getX(),aY=pt->getY();
+                    //std::cout << " XY " << aX << " , " << aY << std::endl;
                     //delete pt;
 #pragma omp parallel num_threads(8) shared(aStatOnPol, aVLs,aX,aY)
                     {
 #pragma omp for
                         for (std::shared_ptr<layerBase> & l : aVLs){
+                            //std::cout << "layerB " << l->Code() <<std::endl;
                             std::string aRes=std::to_string(l->getValue(aX,aY));
+                            //std::cout << "layer " << l->Code() << ", value "<< aRes << std::endl;
 #pragma omp critical
                             {
+                                if (statOrder.find(l->Code())==statOrder.end()){std::cout << "ooops layer " << l->Code() << " not in statOrder " << std::endl;}
+
                                 int ind2=statOrder.at(l->Code());
                                 aStatOnPol.emplace(std::make_pair(ind2,aRes));
                             }
@@ -696,7 +733,7 @@ void descriptionStation(std::string aShp){
 
 
                 }
-                //std::cout << "done " << std::endl;
+                if (test){std::cout << "done " << std::endl;}
 
 
                 /*
@@ -704,22 +741,26 @@ void descriptionStation(std::string aShp){
                  *
                  */
                 if (climat){
-                OGRPoint * pt= getCentroid(poGeom->toPolygon());
-                double aX=pt->getX(),aY=pt->getY();
-                delete pt;
-#pragma omp parallel num_threads(8) shared(aStatOnPol,aVRFs,aX,aY)
-                {
-#pragma omp for
-                    for (std::unique_ptr<rasterFiles> & r : aVRFs){
-                        std::string aRes=std::to_string(r->getValueDouble(aX,aY));
-#pragma omp critical
-                        {
-                            int ind2=statOrder.at(r->Code());
-                            aStatOnPol.emplace(std::make_pair(ind2,aRes));
-                        }
+                    if (test){std::cout << "climat " << std::endl;}
+                    OGRPoint * pt;
+                    pt= getCentroid(poGeom->toPolygon());
+                    //if (isPt){OGRPoint * pt= poGeom->toPoint();} else { pt= getCentroid(poGeom->toPolygon());}
 
+                    double aX=pt->getX(),aY=pt->getY();
+                    delete pt;
+#pragma omp parallel num_threads(8) shared(aStatOnPol,aVRFs,aX,aY)
+                    {
+#pragma omp for
+                        for (std::unique_ptr<rasterFiles> & r : aVRFs){
+                            std::string aRes=std::to_string(r->getValueDouble(aX,aY));
+#pragma omp critical
+                            {
+                                int ind2=statOrder.at(r->Code());
+                                aStatOnPol.emplace(std::make_pair(ind2,aRes));
+                            }
+
+                        }
                     }
-                }
                 }
 
                 //maintenant on converti la map en vecteur de string
@@ -1089,3 +1130,94 @@ void anaScolyteOnShp(rasterFiles * raster, std::string aShp){
 
 }
 
+
+
+
+
+void statDendro(std::string aShp){
+    std::cout << "description du peuplement pour les polygones d'un shp " << std::endl;
+    cDicoApt dico(dirBD);
+    std::string header("");// pour TA du shp input
+    std::string headerProcessing;// il y a le header qui concernent la table d'attribut du shp puis ceux-ci qui concernent les statistiques calculées
+
+    GDALAllRegister();
+    //ouverture du shp input
+    const char *inputPath=aShp.c_str();
+    GDALDataset * mDS =  (GDALDataset*) GDALOpenEx( inputPath, GDAL_OF_VECTOR | GDAL_OF_READONLY, NULL, NULL, NULL );
+    if( mDS != NULL )
+    {
+        std::cout << "shp chargé " << std::endl;
+        // layer
+        OGRLayer * lay = mDS->GetLayer(0);
+        OGRFeature *poFeature=lay->GetFeature(0);
+
+        std::map<std::string,int> statOrder;// en parallel computing il remplis le vecteur résultat dans un ordre aléatoire (push_back est effectué par le thread qui fini le plus rapidement
+        // j'ai donc besoin d'une map pour savoir ordonner mes résultats
+
+        for (int i(0);i<poFeature->GetFieldCount();i++){
+            std::string f=std::string(poFeature->GetFieldDefnRef(i)->GetNameRef());
+            header+=f;
+            if (i+1!=poFeature->GetFieldCount()){ header+=";";}
+        }
+        std::vector<std::unique_ptr<rasterFiles>> aVRFs;
+        std::map<int,std::vector<std::string>> aStat;
+
+        headerProcessing="hdom;vha;gha;nha;cmoy;sdCmoy";
+        std::shared_ptr<layerBase> l=dico.getLayerBase("MNH2018P95");
+
+        for (int id=0;id<lay->GetFeatureCount();id++){
+            poFeature = lay->GetFeature(id);
+
+            if (poFeature->GetFID() % 100==0){std::cout << " process feature " << poFeature->GetFID() << std::endl;}
+
+            OGRGeometry * poGeom = poFeature->GetGeometryRef();
+
+            std::vector<std::string> aStatOnPol;
+
+            // je commence par écrire dans le vecteur de résultat la valeur des champs de la table d'attribu, comme cela j'aurai mes identifiant
+            for (int i=0;i<poFeature->GetFieldCount();i++){
+                aStatOnPol.push_back(poFeature->GetFieldAsString(i));
+            }
+
+            statDendroBase stat(l,poGeom,1);
+            aStatOnPol.push_back(stat.getHdom());
+            aStatOnPol.push_back(stat.getVha());
+            aStatOnPol.push_back(stat.getGha());
+            aStatOnPol.push_back(stat.getNha());
+            aStatOnPol.push_back(stat.getCmoy());
+            aStatOnPol.push_back(stat.getSdCmoy());
+
+            //maintenant on converti la map en vecteur de string
+            std::vector<std::string> vResOnPol;
+            for (auto s : aStatOnPol){
+                vResOnPol.push_back(s);
+            }
+            aStat.emplace(std::make_pair(poFeature->GetFID(),vResOnPol));
+        }
+
+        GDALClose(mDS);
+        // sauve les stats dans un fichier texte
+        std::string aFile(aShp.substr(0, aShp.size()-4)+"_stationDescriptor.csv");
+        std::ofstream aOut;
+        aOut.open(aFile,ios::out);
+
+        aOut << header ;
+        aOut << ";" << headerProcessing ;
+        aOut << "\n" ;
+        for (auto & kv : aStat){
+            std::vector<std::string> v=kv.second;
+            int c(0);
+            for (std::string s : v){
+                c++;
+                aOut << s ;
+                if (c!=v.size()) aOut << ";";
+            }
+            aOut << "\n";
+        }
+        aOut.close();
+        std::cout << "done, file " << aFile << std::endl;
+
+    } else {
+        std::cout << "shp pas chargé, vérifier le nom de fichier entré avec arguement shp" << std::endl;
+    }
+}

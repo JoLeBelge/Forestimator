@@ -28,7 +28,7 @@ using namespace rapidxml;
 
 void deepl(cDicoApt *dico);
 void dicoToXml(std::shared_ptr<cDicoPhyto> dico);
-std::string traduction(std::string afr);
+std::string traduction(std::string afr, std::string target_lang="EN");
 void processNCBI(std::shared_ptr<cDicoPhyto> dico);
 
 
