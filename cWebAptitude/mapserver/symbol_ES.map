@@ -1,0 +1,57 @@
+  CLASSITEM "[pixel]" 
+   CLASS 
+      NAME "Epicea sain"
+      EXPRESSION "1"
+      STYLE 
+          COLOR 123 239 77
+       END
+   END
+   CLASS 
+      NAME "Coupé"
+      EXPRESSION "3"
+      STYLE 
+          COLOR 19 29 222
+       END
+   END
+   CLASS 
+      NAME "Stress passager"
+      EXPRESSION "5"
+      STYLE 
+          COLOR 228 239 8
+       END
+   END
+   CLASS 
+      NAME "Mélange Pessière-sol-feuillus"
+      EXPRESSION "6"
+      STYLE 
+          COLOR 239 173 29
+       END
+   END
+   CLASS 
+      NAME "Ancien Epicea scolyté"
+      EXPRESSION "21"
+      STYLE 
+          COLOR 167 93 185
+       END
+   END
+   CLASS 
+      NAME "Nouveau Epicea Scolyté"
+      EXPRESSION "22"
+      STYLE 
+          COLOR 255 5 1
+       END
+   END
+   CLASS 
+      NAME "Ancienne Coupe sanitaire"
+      EXPRESSION "41"
+      STYLE 
+          COLOR 58 31 15
+       END
+   END
+   CLASS 
+      NAME "Nouvelle Coupe sanitaire"
+      EXPRESSION "42"
+      STYLE 
+          COLOR 152 16 25
+       END
+   END
