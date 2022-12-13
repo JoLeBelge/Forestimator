@@ -801,5 +801,8 @@ Un suivi de l'état sanitaire des pessières est réalisé en vue d'identifier l
 <message id="cadastre.submit">Rechercher</message>
 <message id="cadastre.choisir">Choisissez une option -----</message>
 
+<message id="msg.Gain.info"><p> Cette couche cartographique décrit une variable continue dont la valeur est calculée suivant le gain (égal à <font color="blue">{1}</font>) et la valeur numérique du raster.</p>
+<p>Notons Y la valeur de la variable d'intérêt, b la valeur du gain et DN la "Digital Number", soit la valeur renseignée dans le raster pour un pixel donnée. La formulation est donc la suivante:  Y = b*DN </p></message>
+
 
 </messages>

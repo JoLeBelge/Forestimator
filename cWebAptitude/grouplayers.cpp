@@ -582,6 +582,22 @@ void groupLayers::exportLayMapView(){
 
     std::shared_ptr<Layer> l=getActiveLay();// attention, si on vient d'ouvrir le soft, aucune layer n'est actives!! gerer les ptr null
     if (l && l->getCatLayer()!=TypeLayer::Externe){
+
+        // si la couche est un raster de valeur continue avec gain et offset, prévenir l'utilisateur avec une boite de dialogue
+        if (l->getTypeVar()==TypeVar::Continu && l->Gain()!=1.0){
+            Wt::WMessageBox * messageBox = this->addChild(Wt::cpp14::make_unique<Wt::WMessageBox>(
+                                                              "Attention",
+                                                             tr("msg.Gain.info").arg(l->Gain()),
+                                                              Wt::Icon::Information,
+                                                              Wt::StandardButton::Ok));
+            messageBox->setModal(true);
+            messageBox->buttonClicked().connect([=] {
+                this->removeChild(messageBox);
+            });
+            messageBox->show();
+
+        }
+
         m_app->loadingIndicator()->setMessage(tr("LoadingI3"));
         m_app->loadingIndicator()->show();
         // crop layer and download
