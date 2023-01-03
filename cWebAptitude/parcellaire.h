@@ -67,13 +67,14 @@ public:
     bool cropImWithShp(std::string inputRaster, std::string aOut);
 
     // une méthode pour utiliser le polygone issu d'une recherche sur le cadastre. Un seul polygone, format geojson - et les signaux qui vont avec pour la communicaiton avec widgetCadastre.
-    void polygoneCadastre(std::string aFileGeoJson);
+    void polygoneCadastre(std::string aFileGeoJson, std::string aLabelName="");
 
     statWindow * mStatW;
 private:
 
     // Full path ; là ou est sauvé le shp localement, mName ; le nom du shp tels qu'il était chez le client
     std::string mFullPath, mName,mClientName;
+    std::string mLabelName;// visible pour rapport
     Wt::WContainerWidget * mContSelect4D;
 
     Wt::WFileUpload *fu;

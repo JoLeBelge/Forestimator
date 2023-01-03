@@ -111,22 +111,27 @@ PageAnalytics::PageAnalytics(const Wt::WEnvironment& env, std::string aFileDB) :
     setTitle("Forestimator - Stats");
 
 
-    auto layout = root()->setLayout(Wt::cpp14::make_unique<Wt::WVBoxLayout>());
+    //Wt::WVBoxLayout * layout = root()->setLayout(Wt::cpp14::make_unique<Wt::WVBoxLayout>());
     root()->setMargin(0);
     root()->setPadding(0);
+    root()->setOverflow(Wt::Overflow::Scroll);
 
-   /* nbMonthSelection_  =layout->addWidget(std::make_unique<Wt::WComboBox>());
+
+    /* nbMonthSelection_  =layout->addWidget(std::make_unique<Wt::WComboBox>());
     for (int c(0);c<5;c++){
         nbMonthSelection_->addItem(std::to_string(1+c*3));
     }
     nbMonthSelection_->changed().connect(std::bind(&PageAnalytics::changeGraph,this));*/
 
-    mChart = layout->addWidget(cpp14::make_unique<Chart::WCartesianChart>());
+    //Wt::WContainerWidget * contentChart = layout->addWidget(Wt::cpp14::make_unique<Wt::WContainerWidget>(),0);
+    //mChart = layout->addWidget(cpp14::make_unique<Chart::WCartesianChart>());
+    mChart = root()->addWidget(cpp14::make_unique<Chart::WCartesianChart>());
+
 
     // ok alors je sais pas trop pourquoi mais une fois que j'ai fini cette boucle je ne peux plus en refaire une autre. L'objet logsGraph est vide par après...
     // for (const dbo::ptr<Log> &log : logsGraph){
     // je pourrais aussi boucler sur les jours et refaire une query pour compter le nombre de logs indépendamment pour chaque jours!
-        // ici si un logs dans la db a un identifiant NULL (si on a oublié de coché "auto-increment" pour colonne id - on se retrouve avec un déréférencement.
+    // ici si un logs dans la db a un identifiant NULL (si on a oublié de coché "auto-increment" pour colonne id - on se retrouve avec un déréférencement.
     //time_t t=time(0);
     model = std::make_shared<WStandardItemModel>();
 
@@ -155,12 +160,12 @@ PageAnalytics::PageAnalytics(const Wt::WEnvironment& env, std::string aFileDB) :
     model->insertRows(model->rowCount(), nbd);
     int row = 0;
     for (int d(0);d<nbd+1;d++){
-            Wt::WDate ad=dateLim.addDays(d);
-            //int count = session.query<int>("select count(1) from log").where("date = ?").bind(ad).groupBy("ip");
-            int count = session.query<int>("SELECT COUNT(*) AS col0 FROM (SELECT DISTINCT ip, date FROM log)  where (date = '"+ad.toString("yyyy-MM-dd").toUTF8()+"')");
-            model->setData(row, 0, ad);
-            model->setData(row, 1, count);// je met row à la place du nombre de vue pour l'instant
-            row++;
+        Wt::WDate ad=dateLim.addDays(d);
+        //int count = session.query<int>("select count(1) from log").where("date = ?").bind(ad).groupBy("ip");
+        int count = session.query<int>("SELECT COUNT(*) AS col0 FROM (SELECT DISTINCT ip, date FROM log)  where (date = '"+ad.toString("yyyy-MM-dd").toUTF8()+"')");
+        model->setData(row, 0, ad);
+        model->setData(row, 1, count);// je met row à la place du nombre de vue pour l'instant
+        row++;
     }
 
     /*
@@ -170,16 +175,58 @@ PageAnalytics::PageAnalytics(const Wt::WEnvironment& env, std::string aFileDB) :
     s->setShadow(WShadow(3, 3, WColor(0, 0, 0, 127), 3));
     mChart->addSeries(std::move(s));
 
+
+    // tableau de synthèse
+   // Wt::WContainerWidget * content2 = layout->addWidget(Wt::cpp14::make_unique<Wt::WContainerWidget>());
+    Wt::WContainerWidget * content2 = root()->addWidget(Wt::cpp14::make_unique<Wt::WContainerWidget>());
+    content2->setOverflow(Wt::Overflow::Scroll);
+    content2->addNew<Wt::WText>("tableau de synthèse (hors utilisation via réseau de l'Ulg) :");
+    auto table2 = content2->addWidget(Wt::cpp14::make_unique<Wt::WTable>());
+    table2->setHeaderCount(1);
+    table2->setWidth(Wt::WLength("100%"));
+    table2->toggleStyleClass("table-striped",true);
+    table2->elementAt(0, 0)->addNew<Wt::WText>("Categorie");
+    table2->elementAt(0, 1)->addNew<Wt::WText>("Nombre de consultation");
+
+    //0 page,extend,danap,anas,dsingle,dmulti,danas,dsingleRW;
+    // Sélection par catégorie de log
+    std::string q="SELECT COUNT(*)as nb, cat FROM log  WHERE ip != '127.0.0.1' AND ip NOT LIKE '%139.165%' GROUP BY cat;";
+    for (int cat(1);cat <9;cat++){
+        int nb=session.query<int>("SELECT COUNT(*) FROM log  WHERE ip != '127.0.0.1' AND ip NOT LIKE '%139.165.%' AND cat="+std::to_string(cat)+" GROUP BY cat");
+        table2->elementAt(cat,0)->addWidget(Wt::cpp14::make_unique<Wt::WText>(getCat(cat)));
+        table2->elementAt(cat,0)->setContentAlignment(AlignmentFlag::Right);
+        table2->elementAt(cat,1)->addWidget(Wt::cpp14::make_unique<Wt::WText>(std::to_string(nb)));
+         table2->elementAt(cat,1)->setContentAlignment(AlignmentFlag::Center);
+    }
+
+    content2->addNew<Wt::WText>("tableau de synthèse (utilisation via réseau de l'Ulg) :");
+    auto table3 = content2->addWidget(Wt::cpp14::make_unique<Wt::WTable>());
+    table3->setHeaderCount(1);
+    table3->setWidth(Wt::WLength("100%"));
+    table3->toggleStyleClass("table-striped",true);
+    table3->elementAt(0, 0)->addNew<Wt::WText>("Categorie");
+    table3->elementAt(0, 1)->addNew<Wt::WText>("Nombre de consultation");
+
+    //0 page,extend,danap,anas,dsingle,dmulti,danas,dsingleRW;
+    // Sélection par catégorie de log
+     q="SELECT COUNT(*)as nb, cat FROM log  WHERE ip != '127.0.0.1' AND ip LIKE '%139.165%' GROUP BY cat;";
+    for (int cat(1);cat <9;cat++){
+        int nb=session.query<int>("SELECT COUNT(*) FROM log  WHERE ip != '127.0.0.1' AND ip LIKE '%139.165.%' AND cat="+std::to_string(cat)+" GROUP BY cat");
+        table3->elementAt(cat,0)->addWidget(Wt::cpp14::make_unique<Wt::WText>(getCat(cat)));
+        table3->elementAt(cat,0)->setContentAlignment(AlignmentFlag::Right);
+        table3->elementAt(cat,1)->addWidget(Wt::cpp14::make_unique<Wt::WText>(std::to_string(nb)));
+         table3->elementAt(cat,1)->setContentAlignment(AlignmentFlag::Center);
+    }
+
     // tableau brut des 100 derniers logs
-    Wt::WContainerWidget * content = layout->addWidget(Wt::cpp14::make_unique<Wt::WContainerWidget>());
+   // Wt::WContainerWidget * content = layout->addWidget(Wt::cpp14::make_unique<Wt::WContainerWidget>());
+    Wt::WContainerWidget * content = root()->addWidget(Wt::cpp14::make_unique<Wt::WContainerWidget>());
     content->setOverflow(Wt::Overflow::Scroll);
     content->addNew<Wt::WText>("Dernieres stats brutes :");
-
     auto table = content->addWidget(Wt::cpp14::make_unique<Wt::WTable>());
     table->setHeaderCount(1);
     table->setWidth(Wt::WLength("100%"));
     table->toggleStyleClass("table-striped",true);
-
     table->elementAt(0, 0)->addNew<Wt::WText>("Numéro");
     table->elementAt(0, 1)->addNew<Wt::WText>("Date");
     table->elementAt(0, 2)->addNew<Wt::WText>("IP");
@@ -207,6 +254,9 @@ PageAnalytics::PageAnalytics(const Wt::WEnvironment& env, std::string aFileDB) :
         }
 
     }
+
+
+
 
 }
 

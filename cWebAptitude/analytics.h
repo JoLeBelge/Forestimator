@@ -43,6 +43,8 @@ enum typeLog {unknown,page,extend,danap,anas,dsingle,dmulti,danas,dsingleRW};
 // dsingle download une carte
 // dmulti download plusieurs cartes
 
+
+
 class Log{
 public:
     long            datum;
@@ -67,6 +69,9 @@ public:
             break;
         case anas:
             aRes="analyse surfacique";
+            break;
+        case danas:
+            aRes="télécharge rapport analyse surfacique";
             break;
         case dsingle:
             aRes="télécharge une carte";
@@ -127,6 +132,40 @@ public:
     void changeGraph(){
         int nbm=std::stoi(nbMonthSelection_->currentText());
         setChart(nbm);
+    }
+
+
+    std::string getCat(int cat) {
+        std::string aRes("/");
+        switch (cat) {
+        case 1:
+            aRes="page";
+            break;
+        case 2:
+            aRes="extend";
+            break;
+        case 3:
+            aRes="télécharge rapport analyse ponctuelle";
+            break;
+        case 4:
+            aRes="analyse surfacique";
+            break;
+        case 7:
+            aRes="télécharge rapport analyse surfacique";
+            break;
+        case 5:
+            aRes="télécharge une carte";
+            break;
+        case 8:
+            aRes="télécharge une carte entière";
+            break;
+        case 6:
+            aRes="télécharge plusieurs cartes";
+            break;
+        default:
+            break;
+        }
+        return aRes;
     }
 
 private:

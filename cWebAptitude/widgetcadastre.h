@@ -35,8 +35,8 @@ public:
 
     void submit();
 
-    Wt::Signal<std::string>& sendPolygone() { return pathGeoJson_; }
-    Wt::Signal<std::string> pathGeoJson_;
+    Wt::Signal<std::string, std::string>& sendPolygone() { return pathGeoJson_; }
+    Wt::Signal<std::string, std::string> pathGeoJson_;
 
     // la session est créé ici car dépend de la session d'utilisateur, ne dois pas être propre au dicoApt ou à classe cadastre
     // pas sur que ce soit vraiment ideal comme ça. Je pense que je dois détourner l'usage premier du dbo de Wt qui fait du mapping orienté "session", alors que moi je veux du mapping

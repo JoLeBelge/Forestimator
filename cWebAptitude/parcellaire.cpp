@@ -11,6 +11,7 @@ parcellaire::parcellaire(groupLayers *aGL, Wt::WApplication* app, statWindow *st
   ,downloadRasterBt(NULL)
   ,mStatW(statW)
   ,poGeomGlobale(NULL)
+  ,mLabelName("")
 
 {
     //std::cout << "creation parcellaire " << std::endl;
@@ -353,7 +354,7 @@ void parcellaire::fuChanged(){
 }
 
 void parcellaire::upload(){
-    std::cout << "upload commence.. " ;
+    if (globTest){std::cout << "upload commence.. " ;}
     //computeStatButton->disable();
     downloadRasterBt->disable();
     anaOnAllPolygBt->disable();
@@ -378,8 +379,9 @@ void parcellaire::upload(){
 
     // ici je converti en json et affichage dans ol
     if (nbFiles==3){
-        msg->setText("Téléchargement du shp effectué avec succès.");
-        std::cout << "Téléchargement du shp effectué avec succès.. " << std::endl ;
+        msg->setText(tr("analyse.surf.msg.uploadOK"));
+        if (globTest){std::cout << "Téléchargement du shp effectué avec succès.. " << std::endl ;}
+        mLabelName="";
         if (to31370AndGeoJson()){
             mGL->m_app->addLog("upload a shp"); // add some web stats
             if (computeGlobalGeom()){
@@ -401,7 +403,9 @@ void parcellaire::visuStat(OGRFeature *poFeature){
     std::cout << " parcellaire::visuStat()... " ;
 
     mStatW->vider();
+
     mStatW->titre("<h4>Statistique pour polygone FID " + std::to_string(poFeature->GetFID()) + " de " + mClientName+ "</h4>");
+    if (mLabelName!=""){ mStatW->titre("<h4>Statistique pour " + mLabelName + "</h4>");}
     mStatW->generateGenCarte(poFeature);
     mStatW->genIndivCarteAndAptT();
 
@@ -587,13 +591,14 @@ void parcellaire::selectPolygon(double x, double y){
     }
 }
 
-void parcellaire::polygoneCadastre(std::string aFileGeoJson){
+void parcellaire::polygoneCadastre(std::string aFileGeoJson, std::string aLabelName){
 
     //std::cout << "polygoneCadastre()\n" << std::endl;
 
     mFullPath=aFileGeoJson.substr(0,aFileGeoJson.size()-8);
     fs::path p(aFileGeoJson);
     mName=p.filename().stem().c_str();
+    mLabelName=aLabelName;
 
     if (computeGlobalGeom("geojson",0)){
         hasValidShp=true;

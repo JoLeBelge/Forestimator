@@ -428,7 +428,7 @@ std::string ptCadastre::displayAllInfoInOverlay(){
 
 void ptCadastre::usePolyg4Stat(){
     std::cout << "ptCadastre::usePolyg4Stat" << std::endl;
-    geoJson_.emit(mCad->createPolygonPaCa(mFID));
+    geoJson_.emit(mCad->createPolygonPaCa(mFID), displayAllInfoInOverlay());
 }
 
 /*

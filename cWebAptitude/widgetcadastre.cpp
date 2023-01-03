@@ -105,15 +105,15 @@ void widgetCadastre::submit(){
 
     if (division_->currentIndex()==0){
         // commune
-        pathGeoJson_.emit(mCad->createPolygonCommune(aMLabelCom.at(commune_->currentIndex())));
+        pathGeoJson_.emit(mCad->createPolygonCommune(aMLabelCom.at(commune_->currentIndex())),"commune");
     } else if (section_->currentIndex()==0){
         // division
-        pathGeoJson_.emit(mCad->createPolygonDiv(aMLabelDiv.at(division_->currentIndex())));
+        pathGeoJson_.emit(mCad->createPolygonDiv(aMLabelDiv.at(division_->currentIndex())),"division");
     } else if (paCa_->currentIndex()!=0 && section_->currentIndex()!=0){
         // parcelle cadastrale
         //pathGeoJson_.emit(mCad->createPolygonPaCa(paCa_->currentText().toUTF8()));
         // avec FID c'est plus rapide pour la recherche dans le shp
-        pathGeoJson_.emit(mCad->createPolygonPaCa(aMLabelPaCa.at(paCa_->currentIndex())));
+        pathGeoJson_.emit(mCad->createPolygonPaCa(aMLabelPaCa.at(paCa_->currentIndex())),"parcelle cadastrale");
     }
     }
 }

@@ -263,7 +263,7 @@ void groupLayers::extractInfo(double x, double y){
             if (( l->IsActive() && l->Code()=="Cadastre")){
 
                 ptCadastre * ptCad = new ptCadastre(mDico->mCadastre,x,y);
-                ptCad->sendPolygone().connect(std::bind(&parcellaire::polygoneCadastre,mcWebAptitude->mPA,std::placeholders::_1));
+                ptCad->sendPolygone().connect(std::bind(&parcellaire::polygoneCadastre,mcWebAptitude->mPA,std::placeholders::_1,std::placeholders::_2));
                 mParent->doJavaScript("content.innerHTML = '"+ptCad->displayAllInfoInOverlay()+ "';"
                                       +"var coordinate = ["+std::to_string(x) + ","+ std::to_string(y) +"];"
                                       +"overlay.setPosition(coordinate);"

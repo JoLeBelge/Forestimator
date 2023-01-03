@@ -572,11 +572,15 @@ parcellaire.shp &lt;- st_read(shp.path)<br></br>
 
 </message>
 
+<message id="analyse.surf.msg.uploadOK"> Téléchargement du shp effectué avec succès. </message>
+
+
 <message id="report.analyse.surf.hdom.t"> <h4> Hauteur dominante calculée sur le MNH  (modèle pour pessière)</h4> </message>
 <message id="report.analyse.surf.hdom.nb"> Nombre de Hdom mesurées (surface de 1 are) </message>
 
 <message id="report.analyse.surf.dendro.t"> <h4> Description dendrométrique (modèle pour pessière)  </h4> </message>
 <message id="report.analyse.surf.classeHauteur.t"> <h4> Répartition de la surface par classe de hauteur (tous peuplements)</h4> </message>
+<message id="report.analyse.surf.area"> <h4> Surface de la parcelle </h4> surface de {1} ha, soit {2} mètre carré. </message>
 <message id="report.analyse.surf.compo.t"> <h4> Composition  </h4> </message>
 <message id="report.analyse.surf.zbio.t"> <h4> Zone bioclimatique  </h4> </message>
 <message id="report.analyse.surf.relief.t"> <h4> Relief  </h4> </message>

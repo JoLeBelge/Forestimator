@@ -1,6 +1,7 @@
 #include "cnsw.h"
 
 extern std::string columnPath;
+extern bool globTest;
 /*
 cnsw::cnsw(std::string aBDFile):dicoPedo(aBDFile)
 {
@@ -150,6 +151,7 @@ int cnsw::getIndexSol(double x, double y){
             {
                 aRes=poFeature->GetFieldAsInteger("INDEX_SOL");
                 OGRFeature::DestroyFeature(poFeature);
+                //if (globTest){std::cout << "cnsw::getIndexSol --> " << aRes << std::endl;}
                 //break;
             }
             //lay->SetSpatialFilter(NULL);
@@ -170,11 +172,20 @@ void dicoPedo::loadInfo(){
     sqlite3_prepare_v2( db_, SQLstring.c_str(), -1, &stmt, NULL );
     while(sqlite3_step(stmt) == SQLITE_ROW)
     {
-        if (sqlite3_column_type(stmt, 0)!=SQLITE_NULL && sqlite3_column_type(stmt, 1)!=SQLITE_NULL && sqlite3_column_type(stmt, 2)!=SQLITE_NULL  && sqlite3_column_type(stmt, 3)!=SQLITE_NULL){
+        if (sqlite3_column_type(stmt, 0)!=SQLITE_NULL && sqlite3_column_type(stmt, 1)!=SQLITE_NULL ){
+
             int index=sqlite3_column_int( stmt, 0 );
             std::string sigle=std::string( (char *)sqlite3_column_text( stmt, 1 ) );
-            std::string texture=std::string( (char *)sqlite3_column_text( stmt, 2 ) );
-            std::string drainage=std::string( (char *)sqlite3_column_text( stmt, 3 ) );
+
+            std::string texture("");
+            if (sqlite3_column_type(stmt, 2)!=SQLITE_NULL){
+                texture=std::string( (char *)sqlite3_column_text( stmt, 2 ) );
+            }
+            std::string drainage("");
+            if (sqlite3_column_type(stmt, 3)!=SQLITE_NULL){
+               drainage=std::string( (char *)sqlite3_column_text( stmt, 3 ) );
+            }
+
             sigleIdToSigleStr.emplace(std::make_pair(index,sigle));
             sToTexture.emplace(std::make_pair(index,texture));
             sToDrainage.emplace(std::make_pair(index,drainage));

@@ -140,8 +140,8 @@ class ptCadastre{
 public:
     ptCadastre(std::shared_ptr<cadastre> aCadastre, double x, double y);
     std::string displayAllInfoInOverlay();
-    Wt::Signal<std::string>& sendPolygone(){ return geoJson_; }
-    Wt::Signal<std::string> geoJson_;
+    Wt::Signal<std::string,std::string>& sendPolygone(){ return geoJson_; }
+    Wt::Signal<std::string,std::string> geoJson_;
     void usePolyg4Stat();
 
     void setCaPaKey(std::string aKey){mCaPaKey=aKey;}

@@ -106,6 +106,9 @@ void statWindow::vider()
 }
 
 void statWindow::generateGenCarte(OGRFeature * poFeature){
+
+    std::cout << "statWindow::generateGenCarte ---" << std::endl;
+
     WVBoxLayout * layoutV =mCarteGenCont->setLayout(cpp14::make_unique<WVBoxLayout>());
     layoutV->addWidget(cpp14::make_unique<WText>("<h4>Aperçu</h4>"));
     //aRes->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
@@ -125,9 +128,13 @@ void statWindow::generateGenCarte(OGRFeature * poFeature){
     basicStat statMNT= mMNT->computeBasicStatOnPolyg(poFeature->GetGeometryRef());
     basicStat statPente= mPente->computeBasicStatOnPolyg(poFeature->GetGeometryRef());
 
+    // info de surface, en ha et en m2
+    OGRMultiPolygon * pol =poFeature->GetGeometryRef()->toMultiPolygon();
+    double surf_m=pol->get_Area();
+    aContInfo->addWidget(cpp14::make_unique<WText>(Wt::WString::tr("report.analyse.surf.area").arg(roundDouble(surf_m/10000.0)).arg(roundDouble(surf_m,0))));
+
     aContInfo->addWidget(cpp14::make_unique<WText>(Wt::WString::tr("report.analyse.surf.zbio.t")));
 
-    std::cout << "statWindow::generateGenCarte ---" << std::endl;
     aContInfo->addWidget(cpp14::make_unique<WText>(mZBIO->summaryStat(poFeature->GetGeometryRef())));
 
     aContInfo->addWidget(cpp14::make_unique<WText>(Wt::WString::tr("report.analyse.surf.relief.t")));
