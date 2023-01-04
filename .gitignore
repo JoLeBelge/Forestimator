@@ -18,3 +18,5 @@ stationDescriptor/stationDescriptor.pro.*
 carteApt/*.autosave
 stationDescriptor/*.autosave
 cWebAptitude/*.autosave
+carteApt/scriptR_AE_SS/.Rhistory
+
