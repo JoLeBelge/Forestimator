@@ -1,0 +1,20 @@
+par rapport ? la cl? terrain derni?re version, la cl? "sig" diff?re quelque peu
+-sol carto non diff?renci? type J, P, H : mis ? NH 0, sur la cl? c'est "entre 0 et 5"
+-cartographie des pertes d'eau (peu de surface mais bon): utilisation du code de NH pour zone en perte d'eau suivant une version ant?rieure de la cl? des NH
+-zone gris?e sur cl? terrain : d?cotte des NH (moins sec donc) pour les zones avec "compensation" type en sous-secteur chaud mais avec apport permanent
+
+-ce qu'il manque: distinguer plateau versus zone de versant pour les RHA, comme sur les cl? ant?rieures. 
+non car selon So, les occurences de mauvais drainage en zone de versant (pente donc) sont peu fr?quente
+
+--- novembre 2019 ----
+
+modification de la carte d'apport eau, SS et NH ;
+-Ã©coulement temporaire Ã  prendre en compte (code 1 en permanent)
+-utilisation de carte alÃ©a d'inondation (tout en Apermanent)
+-les AE variables remontent bien trop dans la pente
+-zone de source pÃ©do ()
+-comparaison avec les cartes terrain que nous n'avions pas il y a 2 ans. (celles scannées)
+-"P" : base de grand versant. Equivaut à une profondeur 2 (en fonction du SS, NH différent)
+-"B" : source --> NH-3
+
+"R" ravin --> NH-2

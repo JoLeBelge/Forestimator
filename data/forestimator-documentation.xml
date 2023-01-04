@@ -274,6 +274,9 @@ Enfin, outre ces considérations purement microclimatiques, on note que bien sou
 </p>
             <p>&nbsp;</p>
             <p><img src="../img/topo.jpg" alt="" width="90%"/></p>
+            
+             <p>Les sous-secteurs et les situations topographiques sont déterminées à partir du <strong>Modèle Numérique de Terrain (MNT)</strong>, couche cartographique décrivant le relief, en utilisant différents indices topographiques qui sont résumés dans la figure ci-dessous</p>
+            <p><img src="../img/topo_illu.png" alt="" width="70%"/></p>
 </message>
 
 <message id="Aptitude.description">
