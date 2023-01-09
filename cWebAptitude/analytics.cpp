@@ -84,6 +84,9 @@ bool Analytics::logExist(const Wt::WEnvironment &env, std::string page, typeLog 
 PageAnalytics::PageAnalytics(const Wt::WEnvironment& env, std::string aFileDB) : Wt::WApplication(env),
     session()
 {
+    messageResourceBundle().use(docRoot() + "/forestimator");
+    messageResourceBundle().use(docRoot() + "/forestimator-documentation");
+
     auto sqlite3 = Wt::cpp14::make_unique<dbo::backend::Sqlite3>(aFileDB);
     sqlite3->setProperty("show-queries", "false");
     //sqlite3->setProperty("show-queries", "true");
@@ -180,7 +183,7 @@ PageAnalytics::PageAnalytics(const Wt::WEnvironment& env, std::string aFileDB) :
    // Wt::WContainerWidget * content2 = layout->addWidget(Wt::cpp14::make_unique<Wt::WContainerWidget>());
     Wt::WContainerWidget * content2 = root()->addWidget(Wt::cpp14::make_unique<Wt::WContainerWidget>());
     content2->setOverflow(Wt::Overflow::Scroll);
-    content2->addNew<Wt::WText>("tableau de synthèse (hors utilisation via réseau de l'Ulg) :");
+    content2->addNew<Wt::WText>(Wt::WText::tr("analytic.tab1"));
     auto table2 = content2->addWidget(Wt::cpp14::make_unique<Wt::WTable>());
     table2->setHeaderCount(1);
     table2->setWidth(Wt::WLength("100%"));
@@ -190,7 +193,7 @@ PageAnalytics::PageAnalytics(const Wt::WEnvironment& env, std::string aFileDB) :
 
     //0 page,extend,danap,anas,dsingle,dmulti,danas,dsingleRW;
     // Sélection par catégorie de log
-    std::string q="SELECT COUNT(*)as nb, cat FROM log  WHERE ip != '127.0.0.1' AND ip NOT LIKE '%139.165%' GROUP BY cat;";
+   // std::string q="SELECT COUNT(*)as nb, cat FROM log  WHERE ip != '127.0.0.1' AND ip NOT LIKE '%139.165%' GROUP BY cat;";
     for (int cat(1);cat <9;cat++){
         int nb=session.query<int>("SELECT COUNT(*) FROM log  WHERE ip != '127.0.0.1' AND ip NOT LIKE '%139.165.%' AND cat="+std::to_string(cat)+" GROUP BY cat");
         table2->elementAt(cat,0)->addWidget(Wt::cpp14::make_unique<Wt::WText>(getCat(cat)));
@@ -209,13 +212,34 @@ PageAnalytics::PageAnalytics(const Wt::WEnvironment& env, std::string aFileDB) :
 
     //0 page,extend,danap,anas,dsingle,dmulti,danas,dsingleRW;
     // Sélection par catégorie de log
-     q="SELECT COUNT(*)as nb, cat FROM log  WHERE ip != '127.0.0.1' AND ip LIKE '%139.165%' GROUP BY cat;";
+    // q="SELECT COUNT(*)as nb, cat FROM log  WHERE ip != '127.0.0.1' AND ip LIKE '%139.165%' GROUP BY cat;";
     for (int cat(1);cat <9;cat++){
         int nb=session.query<int>("SELECT COUNT(*) FROM log  WHERE ip != '127.0.0.1' AND ip LIKE '%139.165.%' AND cat="+std::to_string(cat)+" GROUP BY cat");
         table3->elementAt(cat,0)->addWidget(Wt::cpp14::make_unique<Wt::WText>(getCat(cat)));
         table3->elementAt(cat,0)->setContentAlignment(AlignmentFlag::Right);
         table3->elementAt(cat,1)->addWidget(Wt::cpp14::make_unique<Wt::WText>(std::to_string(nb)));
          table3->elementAt(cat,1)->setContentAlignment(AlignmentFlag::Center);
+    }
+
+
+    content2->addNew<Wt::WText>(Wt::WText::tr("analytic.tabUser"));
+    auto table4 = content2->addWidget(Wt::cpp14::make_unique<Wt::WTable>());
+    table4->setHeaderCount(1);
+    table4->setWidth(Wt::WLength("100%"));
+    table4->toggleStyleClass("table-striped",true);
+    table4->elementAt(0, 0)->addNew<Wt::WText>("mois de l'année 2022");
+    table4->elementAt(0, 1)->addNew<Wt::WText>("Nombre d'utilisateur");
+
+    //q="SELECT COUNT(*)as nb FROM (SELECT COUNT(*)as nb FROM log  WHERE ip != '127.0.0.1' AND ip NOT LIKE '%139.165%' AND date LIKE '%2022-02%' GROUP BY ip);";
+
+    for (int m(1);m <13;m++){
+        std::string month = std::to_string(m);
+        if (month.size()==1){month="0"+ month;}
+        int nb=session.query<int>("SELECT COUNT(*) as nb FROM (SELECT COUNT(*) as nb FROM log  WHERE ip != '127.0.0.1' AND ip NOT LIKE '%139.165%' AND date LIKE '%2022-"+month+"%' GROUP BY ip)");
+        table4->elementAt(m,0)->addWidget(Wt::cpp14::make_unique<Wt::WText>(month));
+        table4->elementAt(m,0)->setContentAlignment(AlignmentFlag::Right);
+        table4->elementAt(m,1)->addWidget(Wt::cpp14::make_unique<Wt::WText>(std::to_string(nb)));
+        table4->elementAt(m,1)->setContentAlignment(AlignmentFlag::Center);
     }
 
     // tableau brut des 100 derniers logs

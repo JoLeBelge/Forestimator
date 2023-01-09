@@ -87,6 +87,13 @@
             <user-agent>.*Barkrowler.*</user-agent>
             <user-agent>.*applebot.*</user-agent>
             <user-agent>.*Applebot.*</user-agent>
+            <user-agent>.*Expanse.*</user-agent>
+            <user-agent>.*NetSystemsResearch.*</user-agent>
+            <user-agent>.*Turnitin.*</user-agent>
+            
+            
+            
+            
             
             
 		</user-agents>
