@@ -6243,7 +6243,7 @@ GROUP "ES_EP_2016_PYR"
    MAXSCALEDENOM 100000.00
    DATA "ES/etatSanitaire_2016_BL72_masq_evol_co.tif" 
    PROCESSING "BANDS=1" 
-INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_ES_SURV.map"
+INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_ES.map"
  METADATA
       "wms_title"           "Etat Sanitaire Pessière 2016"
       "wms_srs"             "EPSG:31370"
@@ -6261,7 +6261,7 @@ GROUP "ES_EP_2017_PYR"
     MAXSCALEDENOM 100000.00
    DATA "ES/etatSanitaire_2017_BL72_masq_evol_co.tif" 
    PROCESSING "BANDS=1" 
-INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_ES_SURV.map"
+INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_ES.map"
  METADATA
       "wms_title"           "Etat Sanitaire Pessière 2017"
       "wms_srs"             "EPSG:31370"
@@ -6279,7 +6279,7 @@ GROUP "ES_EP_2018_PYR"
     MAXSCALEDENOM 100000.00
    DATA "ES/etatSanitaire_2018_BL72_masq_evol_co.tif" 
    PROCESSING "BANDS=1" 
-INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_ES_SURV.map"
+INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_ES.map"
  METADATA
       "wms_title"           "Etat Sanitaire Pessière 2018"
       "wms_srs"             "EPSG:31370"
@@ -6297,7 +6297,7 @@ GROUP "ES_EP_2019_PYR"
     MAXSCALEDENOM 100000.00
    DATA "ES/etatSanitaire_2019_BL72_masq_evol_co.tif" 
    PROCESSING "BANDS=1" 
-INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_ES_SURV.map"
+INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_ES.map"
  METADATA
       "wms_title"           "Etat Sanitaire Pessière 2019"
       "wms_srs"             "EPSG:31370"
@@ -6315,7 +6315,7 @@ GROUP "ES_EP_2020_PYR"
     MAXSCALEDENOM 100000.00
    DATA "ES/etatSanitaire_2020_BL72_masq_evol_co.tif" 
    PROCESSING "BANDS=1" 
-INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_ES_SURV.map"
+INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_ES.map"
  METADATA
       "wms_title"           "Etat Sanitaire Pessière 2020"
       "wms_srs"             "EPSG:31370"
