@@ -809,4 +809,14 @@ Un suivi de l'état sanitaire des pessières est réalisé en vue d'identifier l
 <p>Notons Y la valeur de la variable d'intérêt, b la valeur du gain et DN la "Digital Number", soit la valeur renseignée dans le raster pour un pixel donnée. La formulation est donc la suivante:  Y = b*DN </p></message>
 
 
+<message id="analytic.tab1"><h4>tableau de synthèse (hors utilisation via réseau de l'Ulg) </h4>
+<p> Ces statistiques de fréquentation sont calculées pour différents usages de Forestimator, se déclinant en autant de <emph> catégorie </emph>. L'usage le plus fréquent, correspondant à la catégorie <strong> page </strong>, correspond à la consulation des pages du site Forestimator. Un utilisateur consultant le même jour deux pages différentes du site enregistrera deux consultation. </p>
+</message>
+
+<message id="analytic.tabUser"><h4>tableau de synthèse (hors utilisation via réseau de l'Ulg) </h4>
+<p> Ces statistiques de fréquentation sont calculées pour observer combien d'utilisateurs différents utilisent Forestimator. Une même adresse ip ne sera comptabilisée qu'une seule fois par mois, même si un utilisateur consulte plusieurs pages ou la même page chaque jour du mois. </p>
+</message>
+
+
+
 </messages>

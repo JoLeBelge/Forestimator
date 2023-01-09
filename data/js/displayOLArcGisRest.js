@@ -11,7 +11,8 @@ activeLayer  = new ol.layer.Tile({
           //'https://geoservices.wallonie.be/arcgis/rest/services/PLAN_REGLEMENT/CADMAP_2020_PARCELLES/MapServer/'
           'MYURL'
       }),
-      opacity: Object.keys(activeLayers).length==0?1:0.5
+      //opacity: Object.keys(activeLayers).length==0?1:0.5
+      opacity: 1
 });
 activeLayers["MYCODE"] = activeLayer;
 
