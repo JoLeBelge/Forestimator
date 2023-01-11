@@ -5,10 +5,6 @@ TO DO forestimator
 
 -export pdf ana surf
 
--info ponctuelle sur cadastre : affichage du polygone sur lequel on clique? pareil pour CNSW? puis possibilité de faire analyse surfacique sur ce polygone?
-
-- stat surf sur parcelles cadastrale ; créer un nom de mClientName?
-
 réunion PL 23/11/2020
 -analyse Compo ; présence pour chaque essences plus typologie des peuplements (celle de IFPRW j'imagine - phil vois avec HC - moi je peux voir ce qu'on utilisais pour IFA - IFG)
 

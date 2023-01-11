@@ -246,7 +246,7 @@ PageAnalytics::PageAnalytics(const Wt::WEnvironment& env, std::string aFileDB) :
    // Wt::WContainerWidget * content = layout->addWidget(Wt::cpp14::make_unique<Wt::WContainerWidget>());
     Wt::WContainerWidget * content = root()->addWidget(Wt::cpp14::make_unique<Wt::WContainerWidget>());
     content->setOverflow(Wt::Overflow::Scroll);
-    content->addNew<Wt::WText>("Dernieres stats brutes :");
+    content->addNew<Wt::WText>(WText::tr("analytic.rawData"));
     auto table = content->addWidget(Wt::cpp14::make_unique<Wt::WTable>());
     table->setHeaderCount(1);
     table->setWidth(Wt::WLength("100%"));

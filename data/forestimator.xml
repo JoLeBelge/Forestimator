@@ -810,12 +810,18 @@ Un suivi de l'état sanitaire des pessières est réalisé en vue d'identifier l
 
 
 <message id="analytic.tab1"><h4>tableau de synthèse (hors utilisation via réseau de l'Ulg) </h4>
-<p> Ces statistiques de fréquentation sont calculées pour différents usages de Forestimator, se déclinant en autant de <emph> catégorie </emph>. L'usage le plus fréquent, correspondant à la catégorie <strong> page </strong>, correspond à la consulation des pages du site Forestimator. Un utilisateur consultant le même jour deux pages différentes du site enregistrera deux consultation. </p>
+<p> Ces statistiques de fréquentation sont calculées pour différents usages de Forestimator, se déclinant en autant de <emph> catégorie</emph>. L'usage le plus fréquent, correspondant à la catégorie <strong> page </strong>, correspond à la consulation des pages du site Forestimator. Un utilisateur consultant le même jour deux pages différentes du site enregistrera deux consultation. </p>
 </message>
 
 <message id="analytic.tabUser"><h4>tableau de synthèse (hors utilisation via réseau de l'Ulg) </h4>
 <p> Ces statistiques de fréquentation sont calculées pour observer combien d'utilisateurs différents utilisent Forestimator. Une même adresse ip ne sera comptabilisée qu'une seule fois par mois, même si un utilisateur consulte plusieurs pages ou la même page chaque jour du mois. </p>
 </message>
+
+<message id="analytic.rawData"><h4>Dernieres stats brutes</h4>
+<p> Ces enregistrement de fréquentation sont effectués pour certains usage du portail Forestimator. Par exemple, la consultation d'un page fera l'objet d'une observation, mais pas l'utilisation de l'API. Ces observations ne prennent pas en compte les nombreux robot d'indexation qui consultent le site. Si une page web est consultée plusieur fois par jour depuis le même ordinateur, seul la première consultation est enregistrée. Ce ne sont donc pas à proprement parler des "observations brutes" </p>
+</message>
+
+
 
 
 
