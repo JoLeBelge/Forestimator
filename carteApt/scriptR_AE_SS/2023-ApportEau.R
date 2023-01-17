@@ -49,7 +49,6 @@ MNT.path = "/home/jo/Documents/Carto/MNT/MNT_10m_WALLONIA.tif"
 
 path.hydro = "/home/jo/Documents/Carto/NH_RW2019/data/hydro/reseau_hydro_scenic_tmp.shp"
 
-#r.cnsw <- rast(path.cnsw) # carte apport nappe cnsw fait une seule fois
 r.mnt <- rast(MNT.path)
 v.hydro <-
   read_sf(dsn = "/home/jo/Documents/Carto/NH_RW2019/data/hydro/", layer = "reseau_hydro_scenic_tmp")
@@ -99,22 +98,18 @@ cat("D?tection des apport permanent en provenance d'une nappe phr?atique (sur ba
 apport.nappe.path <- "apportNappe.tif"
 # un peu long alors je sauve le résultat en dur pour réutilisation
 if (0) {
-  siglePedo_id.apport.nappe <-
-    which(
-      CNSW.sub$SER_SPEC %in% c("B", "Do", "R", "S", "B/o", "Ma") |
-        CNSW.sub$DRAINAGE %in% c("e", "f", "g") |
-        CNSW.sub$MAT_TEXT %in% c("V", "W")
-    )
-  indexPedo_id.apport.nappe <-
-    dico_cnsw$INDEX_[dico_cnsw$SER_SPEC %in% c("B", "Do", "R", "S", "B/o", "Ma") |
-                       dico_cnsw$DRAINAGE %in% c("e", "f", "g") |
-                       dico_cnsw$MAT_TEXT %in% c("V", "W")]
-  indexPedo_id.Pasapport.nappe <-
-    dico_cnsw$INDEX_[!(
-      dico_cnsw$SER_SPEC %in% c("B", "Do", "R", "S", "B/o", "Ma") |
-        dico_cnsw$DRAINAGE %in% c("e", "f", "g") |
-        dico_cnsw$MAT_TEXT %in% c("V", "W")
-    )]
+  
+  r.cnsw <- rast(path.cnsw) # carte apport nappe cnsw - fait une seule fois
+  
+  #siglePedo_id.apport.nappe <-which(CNSW.sub$SER_SPEC %in% c("B", "Do", "R", "S", "B/o", "Ma") |CNSW.sub$DRAINAGE %in% c("e", "f", "g") |CNSW.sub$MAT_TEXT %in% c("V", "W"))
+  condition <- dico_cnsw$SER_SPEC %in% c("B", "Do", "R", "S", "B/o", "Ma") |
+    dico_cnsw$DRAINAGE %in% c("e", "f", "g") |
+    dico_cnsw$MAT_TEXT %in% c("V", "W") |
+    dico_cnsw$PHASE_4 %in% c("(v)", "(v3)", "(v4)") # changement 2023 ST --> apport permanent argile blanche (haut plateau Ardennais)
+  
+  indexPedo_id.apport.nappe <-dico_cnsw$INDEX_[condition]
+  indexPedo_id.Pasapport.nappe <-dico_cnsw$INDEX_[!condition]
+  
   class <-
     rbind(cbind(indexPedo_id.apport.nappe, 1),
           cbind(indexPedo_id.Pasapport.nappe, 0))
@@ -273,31 +268,29 @@ r.ae <-
          mnt.rel < 2 &
          r.buf.hydro.tempo == 1,     2, r.ae)   # apport variable car ?coulement variable
 
-# zone de fond de vall?e large en zone peu pentue (pas toujour enti?rement d?tect? autour du r?seau hydro, car grande surface, ni dans Alea inondation)
-r.ae <-
-  ifel(r.ae == 0 & class.tpi.inv == 0 & class.slope == 0,     3, r.ae)
-
 # apport permanent depuis une nappe phr?atique (sur base topo, l? ou la p?do n'est plus capable de voir sous le sol)
 r.ae <- ifel(r.ae == 0 &  r.apport.nappe == 1,     3, r.ae)
+
+# zone de fond de vall?e large en zone peu pentue (pas toujour enti?rement d?tect? autour du r?seau hydro, car grande surface, ni dans Alea inondation)
+r.ae <- ifel(r.ae == 0 & class.tpi.inv == 0 & class.slope == 0,     4, r.ae)
 
 # apport lat?raux non permanent, uniquement sur base topo
 
 r.ae <-
   ifel(r.ae == 0 &
-         TPI.norm.raster < (-10) & TPI.basic.raster < (-5),     4, r.ae)
+         TPI.norm.raster < (-10) & TPI.basic.raster < (-5),     5, r.ae)
 r.ae <-
   ifel(r.ae == 0 &
-         TPI.norm.raster < (-15) & TPI.basic.raster < (-2),     5, r.ae)
+         TPI.norm.raster < (-15) & TPI.basic.raster < (-2),     6, r.ae)
 
-# sans apport : le reste (la majorit? en fait)
-r.ae <- ifel(r.ae == 0,     6, r.ae)
+
 
 # perte en eau - class tpi basic, rayon moyen, tpi basic 2, rayon plus restreint
-r.ae <-
-  ifel(class.tpi.basic2 == 2,  7, r.ae) # tr?s sur?lev? localement
-r.ae <-
-  ifel(class.tpi.basic2 == 1 &
-         class.tpi.basic3 == 1,  7, r.ae) # moins sur?lev? localement mais tout de m?me sur?lev? globalement
+#r.ae <- ifel(r.ae == 0 & class.tpi.basic2 == 2,  7, r.ae) # tr?s sur?lev? localement
+#r.ae <-ifel(r.ae == 0 & class.tpi.basic2 == 1 &  class.tpi.basic3 == 1,  7, r.ae) # moins sur?lev? localement mais tout de m?me sur?lev? globalement
+
+# sans apport : le reste (la majorit? en fait)
+r.ae <- ifel(r.ae == 0,     7, r.ae)
 
 writeRaster(r.ae,
             filename = paste0(filename, "_META_CLASSIF.tif"),
@@ -308,23 +301,28 @@ r.ae.reclass <-
            rbind(
              cbind(1, 3) ,
              cbind(2, 2) ,
-             cbind(3, 2)   ,
-             cbind(4, 2) ,
+             cbind(3, 3),# était en zone apport variable avant 2023
+             cbind(4, 2),
              cbind(5, 2),
-             cbind(6, 1) ,
+             cbind(6, 2),
              cbind(7, 1)
            ))
 
 writeRaster(r.ae.reclass,
-            filename = paste0(filename, ".tif"),
+            filename = paste0(filename, "B.tif"),
             overwrite = TRUE)
 if (quietly == F) {
   cat(
     paste(
-      "fin carto des apport d'eau (Sevrin Damien 2008 + Fran?ois Ridremont 2016 + Jo lisein 2017, 2019 et 2022). \nVoir le Fichier ",
+      "fin carto des apport d'eau (Sevrin Damien 2008 + Fran?ois Ridremont 2016 + Jo lisein 2017, 2019 et 2023). \nVoir le Fichier ",
       filename,
       ".tif qui contient les r?sultats. 1=sans apport, 2= apport non permanent, 3=apport permanent",
       sep = ""
     )
   )
 }
+
+#puis je fait des post-traitement avec lib élise
+enfin, je compresse
+
+gdal_translate -co "COMPRESS=DEFLATE" AE_W_202301_clean.tif AE_RW_202301.tif
