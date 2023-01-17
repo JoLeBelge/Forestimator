@@ -4,10 +4,10 @@ double lim_m32(3.8);
 double lim_m12(4.2);
 double lim_p12(7.5);
 
-cAppliCartepH::cAppliCartepH(bool bcarteNT, bool bcartepH)
+cAppliCartepH::cAppliCartepH(std::string adirBD, bool bcarteNT, bool bcartepH):poDatPTS(NULL),poDatZBIO(NULL),ZBIOBand(NULL),PTSBand(NULL)
 {
     std::cout << "cApliCarteNT pH PTS " << std::endl;
-    std::string adirBD("/home/lisein/Documents/carteApt/Forestimator/carteApt/data/carteFEE_NTpH.db");
+
     dico= std::make_unique<cDicoCartepH>(adirBD);
 
     std::string aZBIOpath(dico->File("ZBIO"));
@@ -391,6 +391,10 @@ int cleNT(const siglePedo *s, int ZBIO, int TECO, double pH, bool carbo, bool ev
 
     // ajout Claessens 10/02: tourbe en Ardenne
     if(s->tourbe() &&  ( ZBIO==1 | ZBIO==2 | ZBIO==10)){aRes=7;}
+
+    // ajout 2023 01 - argile blanche en -2
+    if((aRes==0 | aRes>8) & s->argileBlanche() &&  ( ZBIO==1 | ZBIO==2 | ZBIO==10)){aRes=8;}
+
 
     // hors ardenne : indetermin?
     if(s->tourbe() &&  ( ZBIO!=1 && ZBIO!=2 && ZBIO!=10)){aRes=0;}

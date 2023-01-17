@@ -18,7 +18,7 @@ int cleNT(const siglePedo * s, int ZBIO, int TECO, double pH, bool carbo, bool e
 class cAppliCartepH
 {
 public:
-    cAppliCartepH(bool bcarteNT=0, bool bcartepH=0);
+    cAppliCartepH(string adirBD, bool bcarteNT=0, bool bcartepH=0);
     ~cAppliCartepH();
     void cartepH(std::string aOut, bool force=true);
 

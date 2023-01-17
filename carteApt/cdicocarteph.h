@@ -75,6 +75,7 @@ public:
     bool podzolique() const{return mPodzolique;}
     bool superficiel() const{return mSuperficiel;}
     bool tourbe() const{return mTourbe;}
+    bool argileBlanche() const{return mArgileBlanche;}
     bool limon() const{return mLimon;}
     bool chargeSchisteux() const{return mCHARGE=="f";}
 
@@ -102,11 +103,9 @@ public:
         dbo::field(a, mSER_SPEC,    "SER_SPEC");
     }
 private:
-    bool mCalcaire,mSsriche,mProfond,mAlluvion,mPodzol,mPodzolique,mSuperficiel,mTourbe,mLimon, mCalcaireLorraine,mFauxCalcaireLorraine;
+    bool mCalcaire,mSsriche,mProfond,mAlluvion,mPodzol,mPodzolique,mSuperficiel,mTourbe,mLimon, mCalcaireLorraine,mFauxCalcaireLorraine,mArgileBlanche;
     std::string SUBSTRAT,mMAT_TEXT, mPHASE_1, mPHASE_2,mPHASE_4, mPHASE_6, mCHARGE, mDRAINAGE, mDEV_PROFIL, mSER_SPEC;
     int INDEX_;
-
-
 };
 
 class cDicoCartepH

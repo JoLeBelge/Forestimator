@@ -19,6 +19,8 @@ std::vector<int> findLineInDoc(std::string aFileIn, std::string aFind);
 std::string globToto("toto");
 using namespace std;
 
+std::string adirBD("/home/lisein/Documents/carteApt/Forestimator/carteApt/data/carteFEE_NTpH.db");
+
 int main(int argc, char *argv[])
 {
     po::options_description desc("options pour l'outil de calcul des cartes");
@@ -28,6 +30,7 @@ int main(int argc, char *argv[])
             ("cartepH", po::value<bool>(), "calcul de la carte des pH")
             ("aptFEE", po::value<bool>(), "calcul des cartes d'aptitude du FEE")
             ("aptCS", po::value<bool>(), "calcul des cartes d'aptitude du CS")
+            ("pathBD", po::value<std::string>(), "chemin d'accès à la BD carteFEE_NTpH.db")
             ;
 
     po::variables_map vm;
@@ -44,11 +47,13 @@ int main(int argc, char *argv[])
     if (vm.count("aptFEE")) {carteFEE=vm["aptFEE"].as<bool>();}
     if (vm.count("aptCS")) {carteCS=vm["aptCS"].as<bool>();}
     if (vm.count("matApt")) {matApt=vm["matApt"].as<bool>();}
+    if (vm.count("pathBD")) {adirBD=vm["pathBD"].as<std::string>();}
+
 
 
     // attention, les chemins d'accès pour les inputs et output ne sont pas les même pour cAppliCartepH que pour cApliCarteApt!! ne pas se gourer.
     if (carteNT | cartepH) {
-        cAppliCartepH aAPH(carteNT,cartepH);
+        cAppliCartepH aAPH(adirBD,carteNT,cartepH);
     }
 
     if (carteFEE | carteCS) {

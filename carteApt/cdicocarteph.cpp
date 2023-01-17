@@ -281,6 +281,8 @@ void siglePedo::prepare(){
     t1 =std::find(MAT_TEXTlimon.begin(),MAT_TEXTlimon.end(), mMAT_TEXT) !=MAT_TEXTlimon.end() ;
    if (t1){mLimon=1;}
 
-
+   mArgileBlanche=0;
+   t1 =mMAT_TEXT=="G" & (mDRAINAGE=="i" | mDRAINAGE=="I") &  mDEV_PROFIL=="x" ;
+   if (t1){mArgileBlanche=1;}
 
 }
