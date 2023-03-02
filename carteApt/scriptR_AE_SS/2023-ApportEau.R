@@ -256,6 +256,9 @@ class.slope <- classify(slope.raster, c(0, 3, +Inf))
 # apport quati constant al?a inondation
 r.ae <-ifel(r.ai > 1,                                        1, r.ae)
 
+# apport permanent depuis une nappe phr?atique (sur base topo, l? ou la p?do n'est plus capable de voir sous le sol)
+r.ae <- ifel(r.ae == 0 &  r.apport.nappe == 1,     3, r.ae)
+
 # version 2019 ; j'utilisais les seuils de 2 m et 3 m pour le mnt rel, je dois descendre car trop élevé. j'essaie 1m et 2 m
 r.ae <-
   ifel(r.ae == 0 & mnt.rel < 1 & r.buf.hydro.perm == 1,     1, r.ae)
@@ -267,9 +270,6 @@ r.ae <-
   ifel(r.ae == 0 &
          mnt.rel < 2 &
          r.buf.hydro.tempo == 1,     2, r.ae)   # apport variable car ?coulement variable
-
-# apport permanent depuis une nappe phr?atique (sur base topo, l? ou la p?do n'est plus capable de voir sous le sol)
-r.ae <- ifel(r.ae == 0 &  r.apport.nappe == 1,     3, r.ae)
 
 # zone de fond de vall?e large en zone peu pentue (pas toujour enti?rement d?tect? autour du r?seau hydro, car grande surface, ni dans Alea inondation)
 r.ae <- ifel(r.ae == 0 & class.tpi.inv == 0 & class.slope == 0,     4, r.ae)

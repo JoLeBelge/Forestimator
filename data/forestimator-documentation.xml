@@ -56,6 +56,13 @@ Entre Vesdre et Meuse --> Gbax NT -2, Gbbx NT 0.
 
 <message id="AE.logs">
 
+<h5>Modifications de 2023</h5>
+
+1) diminution des zones d'apport variables qui remontaient trop dans les pentes
+<br></br>
+2) Tout les aléas d'inondations sont classé en apport continu
+<br></br>
+
 <h5>Modifications de 2019</h5>
 
 1) intégration de la carte des zones d'aléas d'inondation du SPW (en apport permanent). --> changement mineur

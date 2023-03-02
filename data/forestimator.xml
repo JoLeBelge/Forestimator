@@ -563,6 +563,7 @@ parcellaire.shp &lt;- st_read(shp.path)<br></br>
   req.res &lt;- curl_fetch_memory(my.request)<br></br>
   <span class="hljs-comment"># on écrit dans la console (ou ailleurs) la réponse du serveur</span><br></br>
   cat(rawToChar(req.res$content))<br></br>
+  
   cat(<span class="hljs-string">"\n"</span>)<br></br>
 }
 <br></br></code>

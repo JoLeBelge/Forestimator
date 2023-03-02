@@ -282,7 +282,7 @@ void siglePedo::prepare(){
    if (t1){mLimon=1;}
 
    mArgileBlanche=0;
-   t1 =mMAT_TEXT=="G" & (mDRAINAGE=="i" | mDRAINAGE=="I") &  mDEV_PROFIL=="x" ;
+   t1 =mMAT_TEXT=="G" & (mDRAINAGE=="i" | mDRAINAGE=="I" | mDRAINAGE=="h") &  mDEV_PROFIL=="x" ;
    if (t1){mArgileBlanche=1;}
 
 }
