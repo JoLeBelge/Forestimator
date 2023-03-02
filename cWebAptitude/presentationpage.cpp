@@ -93,8 +93,23 @@ presentationPage::presentationPage(cDicoApt *aDico, AuthApplication *app):mDico(
                     Wt::WPushButton * b = t->elementAt(row, 4)->addWidget(cpp14::make_unique<Wt::WPushButton>("télécharger"));
                     t->elementAt(row, 4)->setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Middle);
                     Wt::WLink loadLink = Wt::WLink("/telechargement/"+l->Code());
-                    b->clicked().connect([=]{m_app->addLog(l->Code(),typeLog::dsingleRW);});
-                    b->setLink(loadLink);
+                    b->clicked().connect([=]{m_app->addLog(l->Code(),typeLog::dsingleRW);
+                        // si la couche est un raster de valeur continue avec gain et offset, prévenir l'utilisateur avec une boite de dialogue
+                        if (l->getTypeVar()==TypeVar::Continu && l->Gain()!=1.0){
+                            Wt::WMessageBox * messageBox = this->addChild(Wt::cpp14::make_unique<Wt::WMessageBox>(
+                                                                              "Attention",
+                                                                             tr("msg.Gain.info").arg(l->Gain()),
+                                                                              Wt::Icon::Information,
+                                                                              Wt::StandardButton::Ok));
+                            messageBox->setModal(true);
+                            messageBox->buttonClicked().connect([=] {
+                                this->removeChild(messageBox);
+                            });
+                            messageBox->show();
+
+                        }
+                    });
+                    b->setLink(loadLink);// le lien pointe vers une ressource qui est générée dans main.cpp
                     // qml
                     if (l->hasSymbology()){
                         Wt::WPushButton * b2 = t->elementAt(row, 5)->addWidget(cpp14::make_unique<Wt::WPushButton>("télécharger le qml"));

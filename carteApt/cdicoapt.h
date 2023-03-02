@@ -165,10 +165,10 @@ public:
     }
 
     // hauteur en mètres de la couche MNT que j'ai convertie en 16bits
-    double mnt(int aVal){
+    /*double mnt(int aVal){
         double aRes(aVal/10);
         return aRes;
-    }
+    }*/
 
     bool hasWMSinfo(std::string aCode);
 
