@@ -205,6 +205,8 @@ Octobre 2021 ; passage à une résolution de 2,5 m (auparavant 10 m). Les cartes
 </message>
 
 <message id="ES_EP.logs">
+version : 2023 02 28
+
 Novembre 2022 : Deux changements importants : premièrement, les années correspondent maintenant au saison de végétation et non plus à l'année civile. Donc la carte d'état sanitaire de 2021 correspond à la période entre mai 2021 et avril 2022. Un dépérissement constaté en sortie d'hiver, ex. avril 2022, sera considéré comme étant lié à la saison de végétation de l'année précédente, ex. 2021. Deuxièmement, la méthode de détection de sol nul est modifiée et est maintenant indentique à celle dans FORDEAD. 
 
 Avril 2022 : mise à jour des cartes d'état sanitaire en pessière (détection de scolyte) en prenant en compte les acquisitions Sentinel-2 jusqu'en mars 2022. 
