@@ -37,9 +37,13 @@ cdicoAptBase::cdicoAptBase(std::string aBDFile):mBDpath(aBDFile),ptDb_(NULL)
             if (sqlite3_column_type(stmt, 0)!=SQLITE_NULL && sqlite3_column_type(stmt, 1)!=SQLITE_NULL){
                 std::string aA=std::string( (char *)sqlite3_column_text( stmt, 0 ) );
                 int aB=sqlite3_column_int( stmt, 1 );
+
+                if (sqlite3_column_type(stmt, 2)!=SQLITE_NULL){
                 std::string aC=std::string( (char *)sqlite3_column_text( stmt, 2 ) );
+                Dico_ZBIO2layCS.emplace(std::make_pair(aB,aC));}
+
                 Dico_ZBIO.emplace(std::make_pair(aB,aA));
-                Dico_ZBIO2layCS.emplace(std::make_pair(aB,aC));
+
             }
         }
         sqlite3_finalize(stmt);
@@ -441,7 +445,10 @@ std::map<int,std::map<int,int>> cdicoAptBase::getCSApt(std::string aCodeEs){
             if (sqlite3_column_type(stmt, 0)!=SQLITE_NULL && sqlite3_column_type(stmt, 1)!=SQLITE_NULL){
                 int station=sqlite3_column_int( stmt, 0 );
                 std::string apt=std::string( (char *)sqlite3_column_text( stmt, 1 ) );
-                std::string var=std::string( (char *)sqlite3_column_text( stmt, 2 ) );
+                 std::string var="";
+                if(sqlite3_column_type(stmt, 2)!=SQLITE_NULL){
+                var=std::string( (char *)sqlite3_column_text( stmt, 2 ) );
+                }
                 int codeApt=Apt(apt);
                 if (var=="" | var=="a"){ // pour l'instant, je ne considère que la variance "a" des stations
                 aRes[zbio].emplace(std::make_pair(station,codeApt));

@@ -55,390 +55,150 @@ LAYER
    END
    TEMPLATE "../template.html"
 END
+
 LAYER
-  NAME "CS1"
+  NAME "CS_Ardenne"
    TYPE RASTER
    STATUS ON
    PROJECTION
       "init=epsg:31370"
    END
-   DATA "CS_zbio1.tif" 
+   DATA "GSA_20230203_v4.tif" 
    PROCESSING "BANDS=1" 
    CLASSITEM "[pixel]" 
    CLASS 
-      NAME "Tourbieres"
+      NAME "Tourbières acides"
       EXPRESSION "1"
       STYLE 
-          COLOR 4 6 2
+          COLOR 0 0 0
        END
    END
    CLASS 
-      NAME "Marais"
+      NAME "Marais et sources"
       EXPRESSION "2"
       STYLE 
-          COLOR 25 30 160
+          COLOR 23 45 242
        END
    END
    CLASS 
       NAME "Argiles blanches humides"
       EXPRESSION "3"
       STYLE 
-          COLOR 116 113 115
+          COLOR 109 117 114
        END
    END
    CLASS 
-      NAME "Argiles blanches à RHA"
+      NAME "Sols blanchis à régime hydrique alternatif"
       EXPRESSION "4"
       STYLE 
-          COLOR 203 207 194
+          COLOR 223 200 165
        END
    END
    CLASS 
-      NAME "Plateaux et versants sub-humides, acidoclines"
+      NAME "Sols bruns à régime hydrique alternatif"
       EXPRESSION "5"
       STYLE 
-          COLOR 195 161 39
+          COLOR 182 128 2
        END
    END
    CLASS 
       NAME "Terrasses alluviales humides"
       EXPRESSION "6"
       STYLE 
-          COLOR 75 145 195
+          COLOR 80 153 243
        END
    END
    CLASS 
-      NAME "Terrasses alluviales et fonds de vallees frais"
+      NAME "Terrasses alluviales fraiche"
       EXPRESSION "7"
       STYLE 
-          COLOR 37 161 214
+          COLOR 132 233 253
        END
    END
    CLASS 
-      NAME "Stations xero-oligotrophes"
+      NAME "Vallon frais"
+      EXPRESSION "8"
+      STYLE 
+          COLOR 98 249 196
+       END
+   END
+   CLASS 
+      NAME "Ravins hygrosciaphiles"
       EXPRESSION "9"
       STYLE 
-          COLOR 236 36 42
+          COLOR 254 85 248
        END
    END
    CLASS 
-      NAME "Versants chauds superficiels, meso-oligotrophes"
+      NAME "Versants chauds au sol superficiel"
       EXPRESSION "10"
       STYLE 
-          COLOR 233 142 226
+          COLOR 254 47 3
        END
    END
    CLASS 
-      NAME "Versants chauds, meso-oligotrophes"
+      NAME "Versants chauds"
       EXPRESSION "11"
       STYLE 
-          COLOR 199 84 182
+          COLOR 249 155 31
        END
    END
    CLASS 
-      NAME "Stations oligotrophes des versants frais"
+      NAME "Versants frais pauvres"
       EXPRESSION "12"
       STYLE 
-          COLOR 123 135 144
+          COLOR 204 134 213
        END
    END
    CLASS 
-      NAME "Stations hygrosciaphiles acidoclines"
+      NAME "Versants frais riches"
+      EXPRESSION "13"
+      STYLE 
+          COLOR 121 6 187
+       END
+   END
+   CLASS 
+      NAME "Sols profonds des plateaux"
       EXPRESSION "14"
       STYLE 
-          COLOR 49 158 54
+          COLOR 153 235 130
        END
    END
    CLASS 
-      NAME "Plateaux oligotrophes"
+      NAME "Sols peu profonds des plateaux"
       EXPRESSION "15"
       STYLE 
-          COLOR 199 84 182
+          COLOR 13 186 4
        END
    END
    CLASS 
-      NAME "Plateaux meso-oligotrophes"
+      NAME "Sols superficiels des plateaux"
       EXPRESSION "16"
       STYLE 
-          COLOR 76 188 138
+          COLOR 20 112 14
        END
    END
    CLASS 
-      NAME "Plateaux acidoclines"
+      NAME "Affleurements rocheux"
       EXPRESSION "17"
       STYLE 
-          COLOR 138 219 250
+          COLOR 205 191 188
        END
    END
    CLASS 
-      NAME "Lithosols"
-      EXPRESSION "18"
+      NAME "Non définis"
+      EXPRESSION "0"
       STYLE 
-          COLOR 215 222 216
+          COLOR 255 255 255
        END
    END
  METADATA
-      "wms_title"           "Catalogue de station Ardenne centro-orientale"
+      "wms_title"           "Catalogue de station Ardenne"
       "wms_srs"             "EPSG:31370"
    END
    TEMPLATE "../template.html"
 END
-LAYER
-  NAME "CS10"
-   TYPE RASTER
-   STATUS ON
-   PROJECTION
-      "init=epsg:31370"
-   END
-   DATA "CS_zbio10.tif" 
-   PROCESSING "BANDS=1" 
-   CLASSITEM "[pixel]" 
-   CLASS 
-      NAME "Tourbieres"
-      EXPRESSION "1"
-      STYLE 
-          COLOR 4 6 2
-       END
-   END
-   CLASS 
-      NAME "Marais"
-      EXPRESSION "2"
-      STYLE 
-          COLOR 25 30 160
-       END
-   END
-   CLASS 
-      NAME "Argiles blanches humides"
-      EXPRESSION "3"
-      STYLE 
-          COLOR 116 113 115
-       END
-   END
-   CLASS 
-      NAME "Argiles blanches à RHA"
-      EXPRESSION "4"
-      STYLE 
-          COLOR 203 207 194
-       END
-   END
-   CLASS 
-      NAME "Plateaux et versants sub-humides, acidoclines"
-      EXPRESSION "5"
-      STYLE 
-          COLOR 195 161 39
-       END
-   END
-   CLASS 
-      NAME "Terrasses alluviales humides"
-      EXPRESSION "6"
-      STYLE 
-          COLOR 75 145 195
-       END
-   END
-   CLASS 
-      NAME "Terrasses alluviales et fonds de vallees frais"
-      EXPRESSION "7"
-      STYLE 
-          COLOR 37 161 214
-       END
-   END
-   CLASS 
-      NAME "Stations xero-oligotrophes"
-      EXPRESSION "9"
-      STYLE 
-          COLOR 236 36 42
-       END
-   END
-   CLASS 
-      NAME "Versants chauds superficiels, meso-oligotrophes"
-      EXPRESSION "10"
-      STYLE 
-          COLOR 233 142 226
-       END
-   END
-   CLASS 
-      NAME "Versants chauds, meso-oligotrophes"
-      EXPRESSION "11"
-      STYLE 
-          COLOR 199 84 182
-       END
-   END
-   CLASS 
-      NAME "Stations oligotrophes des versants frais"
-      EXPRESSION "12"
-      STYLE 
-          COLOR 123 135 144
-       END
-   END
-   CLASS 
-      NAME "Stations hygrosciaphiles acidoclines"
-      EXPRESSION "14"
-      STYLE 
-          COLOR 49 158 54
-       END
-   END
-   CLASS 
-      NAME "Plateaux oligotrophes"
-      EXPRESSION "15"
-      STYLE 
-          COLOR 199 84 182
-       END
-   END
-   CLASS 
-      NAME "Plateaux meso-oligotrophes"
-      EXPRESSION "16"
-      STYLE 
-          COLOR 76 188 138
-       END
-   END
-   CLASS 
-      NAME "Plateaux acidoclines"
-      EXPRESSION "17"
-      STYLE 
-          COLOR 138 219 250
-       END
-   END
-   CLASS 
-      NAME "Lithosols"
-      EXPRESSION "18"
-      STYLE 
-          COLOR 215 222 216
-       END
-   END
- METADATA
-      "wms_title"           "Catalogue de station Haute Ardenne"
-      "wms_srs"             "EPSG:31370"
-   END
-   TEMPLATE "../template.html"
-END
-LAYER
-  NAME "CS2"
-   TYPE RASTER
-   STATUS ON
-   PROJECTION
-      "init=epsg:31370"
-   END
-   DATA "CS_zbio2.tif" 
-   PROCESSING "BANDS=1" 
-   CLASSITEM "[pixel]" 
-   CLASS 
-      NAME "Tourbieres"
-      EXPRESSION "1"
-      STYLE 
-          COLOR 4 6 2
-       END
-   END
-   CLASS 
-      NAME "Marais"
-      EXPRESSION "2"
-      STYLE 
-          COLOR 25 30 160
-       END
-   END
-   CLASS 
-      NAME "Argiles blanches humides"
-      EXPRESSION "3"
-      STYLE 
-          COLOR 116 113 115
-       END
-   END
-   CLASS 
-      NAME "Argiles blanches à RHA"
-      EXPRESSION "4"
-      STYLE 
-          COLOR 203 207 194
-       END
-   END
-   CLASS 
-      NAME "Plateaux et versants sub-humides, acidoclines"
-      EXPRESSION "5"
-      STYLE 
-          COLOR 195 161 39
-       END
-   END
-   CLASS 
-      NAME "Terrasses alluviales humides"
-      EXPRESSION "6"
-      STYLE 
-          COLOR 75 145 195
-       END
-   END
-   CLASS 
-      NAME "Terrasses alluviales et fonds de vallees frais"
-      EXPRESSION "7"
-      STYLE 
-          COLOR 37 161 214
-       END
-   END
-   CLASS 
-      NAME "Stations xero-oligotrophes"
-      EXPRESSION "9"
-      STYLE 
-          COLOR 236 36 42
-       END
-   END
-   CLASS 
-      NAME "Versants chauds superficiels, meso-oligotrophes"
-      EXPRESSION "10"
-      STYLE 
-          COLOR 233 142 226
-       END
-   END
-   CLASS 
-      NAME "Versants chauds, meso-oligotrophes"
-      EXPRESSION "11"
-      STYLE 
-          COLOR 199 84 182
-       END
-   END
-   CLASS 
-      NAME "Stations oligotrophes des versants frais"
-      EXPRESSION "12"
-      STYLE 
-          COLOR 123 135 144
-       END
-   END
-   CLASS 
-      NAME "Stations hygrosciaphiles acidoclines"
-      EXPRESSION "14"
-      STYLE 
-          COLOR 49 158 54
-       END
-   END
-   CLASS 
-      NAME "Plateaux oligotrophes"
-      EXPRESSION "15"
-      STYLE 
-          COLOR 199 84 182
-       END
-   END
-   CLASS 
-      NAME "Plateaux meso-oligotrophes"
-      EXPRESSION "16"
-      STYLE 
-          COLOR 76 188 138
-       END
-   END
-   CLASS 
-      NAME "Plateaux acidoclines"
-      EXPRESSION "17"
-      STYLE 
-          COLOR 138 219 250
-       END
-   END
-   CLASS 
-      NAME "Lithosols"
-      EXPRESSION "18"
-      STYLE 
-          COLOR 215 222 216
-       END
-   END
- METADATA
-      "wms_title"           "Catalogue de station Basse et moyenne Ardenne"
-      "wms_srs"             "EPSG:31370"
-   END
-   TEMPLATE "../template.html"
-END
+
 LAYER
   NAME "CS3"
    TYPE RASTER
