@@ -29,7 +29,7 @@ cdicoAptBase::cdicoAptBase(std::string aBDFile):mBDpath(aBDFile),ptDb_(NULL)
         }
 
         sqlite3_finalize(stmt);
-        SQLstring="SELECT Nom,Zbio FROM dico_zbio;";
+        SQLstring="SELECT Nom,Zbio,CS_lay FROM dico_zbio;";
 
         sqlite3_prepare_v2( *db_, SQLstring.c_str(), -1, &stmt, NULL );
         while(sqlite3_step(stmt) == SQLITE_ROW)
@@ -37,7 +37,9 @@ cdicoAptBase::cdicoAptBase(std::string aBDFile):mBDpath(aBDFile),ptDb_(NULL)
             if (sqlite3_column_type(stmt, 0)!=SQLITE_NULL && sqlite3_column_type(stmt, 1)!=SQLITE_NULL){
                 std::string aA=std::string( (char *)sqlite3_column_text( stmt, 0 ) );
                 int aB=sqlite3_column_int( stmt, 1 );
+                std::string aC=std::string( (char *)sqlite3_column_text( stmt, 2 ) );
                 Dico_ZBIO.emplace(std::make_pair(aB,aA));
+                Dico_ZBIO2layCS.emplace(std::make_pair(aB,aC));
             }
         }
         sqlite3_finalize(stmt);
@@ -431,7 +433,7 @@ std::map<int,std::map<int,int>> cdicoAptBase::getCSApt(std::string aCodeEs){
     sqlite3_stmt * stmt;
     // boucle sur tout les identifiants de zbio mais attention, les catalogues de station ne couvrent pas tout donc vérif si ND
     for(auto&& zbio : Dico_ZBIO | boost::adaptors::map_keys){
-        std::string SQLstring="SELECT stat_id,"+aCodeEs+" FROM AptCS WHERE ZBIO="+ std::to_string(zbio)+";";
+        std::string SQLstring="SELECT stat_id,"+aCodeEs+",var FROM AptCS WHERE ZBIO="+ std::to_string(zbio)+";";
         //std::cout << SQLstring << std::endl;
         sqlite3_prepare_v2( *db_, SQLstring.c_str(), -1, &stmt, NULL );//preparing the statement
         while(sqlite3_step(stmt) == SQLITE_ROW)
@@ -439,8 +441,11 @@ std::map<int,std::map<int,int>> cdicoAptBase::getCSApt(std::string aCodeEs){
             if (sqlite3_column_type(stmt, 0)!=SQLITE_NULL && sqlite3_column_type(stmt, 1)!=SQLITE_NULL){
                 int station=sqlite3_column_int( stmt, 0 );
                 std::string apt=std::string( (char *)sqlite3_column_text( stmt, 1 ) );
+                std::string var=std::string( (char *)sqlite3_column_text( stmt, 2 ) );
                 int codeApt=Apt(apt);
+                if (var=="" | var=="a"){ // pour l'instant, je ne considère que la variance "a" des stations
                 aRes[zbio].emplace(std::make_pair(station,codeApt));
+                }
             }
         }
         sqlite3_finalize(stmt);

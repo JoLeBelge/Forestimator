@@ -435,15 +435,12 @@ std::map<std::string,int> groupLayers::apts(){
         if (globTest){std::cout << " GL get apt pour mode CS " << std::endl;}
         if (mStation->readyCS()){
             if (globTest){std::cout << "station a bien une station du catalogue " << std::endl;}
-            for (std::shared_ptr<Layer> l : mVLs){
-                if ( l->getCatLayer()==TypeLayer::CS){//l->Type()==TypeLayer::FEE ||
-                    // j'ai deux solution pour avoir les aptitudes ; soit je lis la valeur du raster apt, soit je recalcule l'aptitude avec les variables environnementales
-                    std::shared_ptr<cEss> Ess= l->Ess();
+                  for (auto kv : Dico()->getAllEss()){
+                    std::shared_ptr<cEss> Ess = kv.second;
                     int apt = Ess->getApt(mStation->mZBIO, mStation->mSt);
                     if (apt!=0) aRes.emplace(std::make_pair(Ess->Code(),apt));
                 }
             }
-        }
         break;
     }
     }

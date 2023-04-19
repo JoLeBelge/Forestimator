@@ -49,9 +49,16 @@
        END
    END
    CLASS 
-      NAME "Nouvelle Coupe sanitaire"
+      NAME "Coupe sanitaire nouveau scolyte"
       EXPRESSION "42"
       STYLE 
           COLOR 152 16 25
+       END
+   END
+   CLASS 
+      NAME "Coupe sanitaire ancien scolyte"
+      EXPRESSION "43"
+      STYLE 
+          COLOR 72 6 73
        END
    END

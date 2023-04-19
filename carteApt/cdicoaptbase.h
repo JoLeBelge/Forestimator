@@ -184,6 +184,12 @@ public:
         return aRes;
     }
 
+    std::string ZBIO2CSlay(int aCode){
+        std::string aRes("");
+        if (Dico_ZBIO2layCS.find(aCode)!=Dico_ZBIO2layCS.end()){aRes=Dico_ZBIO2layCS.at(aCode);}
+        return aRes;
+    }
+
     std::string TOPO(int aCode){
         std::string aRes("not found");
         if (Dico_topo.find(aCode)!=Dico_topo.end()){aRes=Dico_topo.at(aCode);}
@@ -340,6 +346,7 @@ protected:
     std::map<int,int> Dico_risqueCategorie;
     std::map<int,std::string>  Dico_topo;
     std::map<int,std::string>  Dico_ZBIO;
+    std::map<int,std::string>  Dico_ZBIO2layCS;
     std::map<int,std::string>  dico_groupeNH2Label;// pour l'écogramme avec visu prédiciton random forest
     std::map<int,int>  dico_groupeNH2Nb;//nombre de niveau NH par groupe
     std::map<int,int>  dico_groupeNH2NHStart;// code nh qui débute le groupe.
