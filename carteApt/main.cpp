@@ -19,7 +19,7 @@ std::vector<int> findLineInDoc(std::string aFileIn, std::string aFind);
 std::string globToto("toto");
 using namespace std;
 
-std::string adirBD("/home/lisein/Documents/carteApt/Forestimator/carteApt/data/carteFEE_NTpH.db");
+std::string adirBD("/home/jo/app/Forestimator/carteApt/data/carteFEE_NTpH.db");
 
 int main(int argc, char *argv[])
 {
@@ -28,6 +28,7 @@ int main(int argc, char *argv[])
             ("help", "produce help message")
             ("carteNT", po::value<bool>(), "calcul de la carte des NT")
             ("cartepH", po::value<bool>(), "calcul de la carte des pH")
+            ("carteNH", po::value<bool>(), "calcul de la carte des NH")
             ("aptFEE", po::value<bool>(), "calcul des cartes d'aptitude du FEE")
             ("aptCS", po::value<bool>(), "calcul des cartes d'aptitude du CS")
             ("pathBD", po::value<std::string>(), "chemin d'accès à la BD carteFEE_NTpH.db")
@@ -41,9 +42,10 @@ int main(int argc, char *argv[])
         cout << desc << "\n";
         return 1;
     }
-    bool carteNT(0),cartepH(0),carteFEE(0),carteCS(0),matApt(0);
+    bool carteNT(0),cartepH(0),carteFEE(0),carteCS(0),matApt(0),carteNH(0);
     if (vm.count("carteNT")) {carteNT=vm["carteNT"].as<bool>();}
     if (vm.count("cartepH")) {cartepH=vm["cartepH"].as<bool>();}
+     if (vm.count("carteNH")) {carteNH=vm["carteNH"].as<bool>();}
     if (vm.count("aptFEE")) {carteFEE=vm["aptFEE"].as<bool>();}
     if (vm.count("aptCS")) {carteCS=vm["aptCS"].as<bool>();}
     if (vm.count("matApt")) {matApt=vm["matApt"].as<bool>();}
@@ -54,6 +56,10 @@ int main(int argc, char *argv[])
     // attention, les chemins d'accès pour les inputs et output ne sont pas les même pour cAppliCartepH que pour cApliCarteApt!! ne pas se gourer.
     if (carteNT | cartepH) {
         cAppliCartepH aAPH(adirBD,carteNT,cartepH);
+    }
+
+    if (carteNH) {
+        calculNH(adirBD);
     }
 
     if (carteFEE | carteCS) {

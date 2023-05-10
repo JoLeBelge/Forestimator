@@ -37,7 +37,7 @@ public:
      //void tiletoPNG(std::string aDir,TypeCarte aType=Apt);
 
     //conversion aptitude geotif to jpg pour utilisation dans openlayer (après tuilage avec gdal_retile)
-    void toPNG(std::string input, std::string output,TypeCarte aType=Apt);
+    //void toPNG(std::string input, std::string output,TypeCarte aType=Apt);
 
     // creation du code de rendu de mapserver pour une couche donnée
     void codeMapServer(std::string inputData, string layerName, string layerFullName, std::string output, std::map<int, string> *DicoVal, std::map<int, color> DicoCol);

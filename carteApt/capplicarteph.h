@@ -13,7 +13,11 @@ using namespace std;
 inline bool exists (const std::string& name);
 
 int cleNT(const siglePedo * s, int ZBIO, int TECO, double pH, bool carbo, bool evm);
-//int cleNT(dbo::ptr<siglePedo> s, int ZBIO, int TECO, double pH);
+
+int cleNH(const siglePedo *s, int AE, int SS);
+
+void calculNH(std::string adirBD);// pas besoin d'une appli pour ça.
+
 
 class cAppliCartepH
 {
@@ -36,5 +40,6 @@ private:
     GDALRasterBand * PTSBand;
 
 };
+
 
 #endif // CAPPLICARTEPH_H

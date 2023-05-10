@@ -20,6 +20,7 @@ namespace dbo = Wt::Dbo;
 
 //juin 2021 je vais refaire le code pour carte NT ici aussi, et utiliser ce dictionnaire
 class siglePedo;
+class cDicoCartepH;
 
 
 class siglePedo{
@@ -40,6 +41,14 @@ public:
         mSER_SPEC=p->getSER_SPEC();
         prepare();
     }
+
+    void cat() const{ std::cout << "sol index " << INDEX_ << " Substrat " << SUBSTRAT << " Texture " << mMAT_TEXT << " mPHASE_1 " << mPHASE_1 << " Charge " << mCHARGE << " drainage " << mDRAINAGE << " PROFIL " << mDEV_PROFIL << " MAT text simp "<< mMAT_TEXT_SIMP <<  std::endl;
+                      std::cout << "mText_ZSP " <<mText_ZSP << " mText_LAEU " << mText_LAEU << " mTextG " << mTextG << " mText_ZSPenrichi " << mText_ZSPenrichi << std::endl;
+                      std::cout << " tourbe " << tourbe() << ", profond " << profond() << ", mPHASE_2 " << mPHASE_2<<  std::endl;
+                      std::cout << "mDb " << mDb << " mDa " << mDa << " mDc " << mDc << std::endl;
+                    }
+
+    void setMAT_TEXT_SIMP(std::string aMatSimp){mMAT_TEXT_SIMP=aMatSimp;}
     int getIndex() const {return INDEX_;}
     std::string getSUBSTRAT() const {return SUBSTRAT;}
     std::string getMAT_TEXT() const {return mMAT_TEXT;}
@@ -81,10 +90,8 @@ public:
 
     bool substratSchisteux() const{
         bool aRes(0);
-          if ((SUBSTRAT.find("f")!=std::string::npos) && (SUBSTRAT.find("(")==std::string::npos) && (SUBSTRAT.find("k")==std::string::npos)){aRes=1;}
+        if ((SUBSTRAT.find("f")!=std::string::npos) && (SUBSTRAT.find("(")==std::string::npos) && (SUBSTRAT.find("k")==std::string::npos)){aRes=1;}
         return aRes;}
-
-    void cat() const{std::cout << " siglePedo " << INDEX_ << " , substrat " << SUBSTRAT << ", drainage " << mDRAINAGE << std::endl;}
 
     void prepare();
     template<class Action>
@@ -102,10 +109,17 @@ public:
         dbo::field(a, mDEV_PROFIL,    "DEV_PROFIL");
         dbo::field(a, mSER_SPEC,    "SER_SPEC");
     }
+
+    // pour NH
+    bool mSsHumid,mSsSource,mSsRavin,mSsAffleurementRocheux,mSsAffleurementIterm,mSsPente,mSss,mProf2,mProf3,mProf45,mProf6;
+    bool mDa,mDb,mDc,mDd,mDe,mDf,mDg,mDh,mDi;
+    bool mText_ZSP,mText_LAEU,mTextG,mText_ZSPenrichi;
+    std::string mMAT_TEXT_SIMP;
 private:
     bool mCalcaire,mSsriche,mProfond,mAlluvion,mPodzol,mPodzolique,mSuperficiel,mTourbe,mLimon, mCalcaireLorraine,mFauxCalcaireLorraine,mArgileBlanche;
     std::string SUBSTRAT,mMAT_TEXT, mPHASE_1, mPHASE_2,mPHASE_4, mPHASE_6, mCHARGE, mDRAINAGE, mDEV_PROFIL, mSER_SPEC;
     int INDEX_;
+
 };
 
 class cDicoCartepH
@@ -130,6 +144,12 @@ public:
     int getPTS(int aSolIndex){
         int aRes(0);
         if (Dico_IndexSiglePed2PTS.find(aSolIndex)!=Dico_IndexSiglePed2PTS.end()){aRes=Dico_IndexSiglePed2PTS.at(aSolIndex);}
+        return aRes;
+    }
+
+    std::string getMatTextSimp(std::string aText){
+        std::string aRes="";
+        if(Dico_MAT_TEXT.find(aText)!=Dico_MAT_TEXT.end()){aRes=Dico_MAT_TEXT.at(aText);}
         return aRes;
     }
 
@@ -165,6 +185,9 @@ public:
             dbo::ptr<siglePedo> s = session.find<siglePedo>().where("INDEX_=?").bind(std::to_string(aIndex));
 
             siglePedo * s2=new siglePedo(s);
+            s2->setMAT_TEXT_SIMP(getMatTextSimp(s2->getMAT_TEXT()));
+            // refaire prepare sinon les critères qui utilisent MAT_TEXT_SIMP ne vont pas fonctionner...
+            s2->prepare();
             mMSigles.emplace(std::make_pair(aIndex,s2));
             aRes=s2;
         }
