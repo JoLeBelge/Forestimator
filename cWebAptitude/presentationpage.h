@@ -9,6 +9,7 @@
 #include "cdicoapt.h"
 #include "grouplayers.h"
 #include <Wt/WVideo.h>
+#include "mataptcs.h"
 
 using namespace Wt;
 

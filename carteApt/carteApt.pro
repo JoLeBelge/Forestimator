@@ -2,10 +2,12 @@ TEMPLATE = app
 CONFIG -= app_bundle
 CONFIG -= qt
 TARGET = carteApt
+QMAKE_LFLAGS+=-fopenmp
+QMAKE_CXXFLAGS+=-fopenmp
 
 SOURCES += main.cpp \
-            cdicoaptbase.cpp \
-           cdicoapt.cpp \
+    cdicoaptbase.cpp \
+    cdicoapt.cpp \
     caplicarteapt.cpp \
     cdicocarteph.cpp \
     capplicarteph.cpp \
@@ -21,7 +23,11 @@ INCLUDEPATH += /usr/include/gdal/
 INCLUDEPATH += $$PWD/../cWebAptitude/
 DEPENDPATH += $$PWD/../cWebAptitude/
 
+INCLUDEPATH += $$PWD/date/include/date/
+DEPENDPATH += $$PWD/date/include/date/
+
 HEADERS += \
+    date.h \
     cdicoaptbase.h \
     cdicoapt.h \
     caplicarteapt.h \

@@ -157,6 +157,14 @@ presentationPage::presentationPage(cDicoApt *aDico, AuthApplication *app):mDico(
     std::unique_ptr<Wt::WMenuItem> item4 = std::make_unique<Wt::WMenuItem>("Forestimator API", cpp14::make_unique<Wt::WText>(WString::tr("docu.api")));
     subMenu_->addItem(std::move(item4));
 
+    std::unique_ptr<Wt::WMenuItem> item5 = std::make_unique<Wt::WMenuItem>("Catalogue de Station");
+    Wt::WContainerWidget * c5 = new Wt::WContainerWidget();
+    //c0->addNew<WText>(WString::tr("page_presentation"));
+    //item5->setContents(std::unique_ptr<Wt::WContainerWidget>(c0));
+    c5->addNew<matAptCS>(mDico);
+    item5->setContents(std::unique_ptr<Wt::WContainerWidget>(c5));
+    subMenu_->addItem(std::move(item5));
+
     hLayout->addWidget(std::move(subMenu));
     hLayout->addWidget(std::move(subStack),1);
 

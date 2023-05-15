@@ -511,3 +511,232 @@ code.hljs {
 	color: #38a;
 }
 
+.circle {
+      width: 50px;
+      height: 50px;
+      -webkit-border-radius: 25px;
+      -moz-border-radius: 25px;
+      border-radius: 25px;
+      max-width: 50px;
+      min-width: 50px;
+ }
+ .circle_petit {
+      width: 10px;
+      height: 10px;
+       margin-top: 4px;
+      -webkit-border-radius: 5px;
+      -moz-border-radius: 5px;
+      border-radius: 5px;
+      max-width: 10px;
+      min-width: 10px;
+     
+ }
+ 
+ .circle_eco {
+      width: 35px;
+      height: 35px;
+      border-radius: 99px;
+      min-width: 35px;
+      min-height: 35px;
+      background-color: rgba(117,167,71,1);
+      transition-duration: 0.1s;
+      cursor: pointer;
+     display: table-cell;
+     text-align: center;
+     vertical-align: middle;
+ }
+ 
+ 
+ .circle_eco_selected {  
+  transform: scale(1.17);
+  background-color: red;
+ }
+ 
+ 
+.circle_eco_large {  
+  transform: scale(1.17);
+  /*background-color: yellow;*/
+ }
+
+.circle_eco_phyto {  
+  transform: scale(1.17);
+  background-color: #f5d714;
+}
+ 
+
+.eco-table td {
+  position: relative;
+  padding: 4px;
+  padding-top: 4px;
+  padding-right: 4px;
+  padding-bottom: 4px;
+  padding-left: 4px;
+  z-index: 1;
+  /*background-color: rgba(117,167,71,.3);*/
+  height: 40px; /* sert de min-height pour la ligne entre NH normaux et RHA*/
+  width: 40px;
+  vertical-align: middle;
+}
+
+.eco-table th{
+	text-align: center;
+}
+
+
+.table-AptGlob > tbody > tr > td {
+
+	border: solid 1px #fff;
+	text-align: center;
+	vertical-align: middle;
+	padding: 15px;
+}
+.rel-pos {
+	 position: relative;
+	 min-width: 100.0px;
+	 }
+	 // pour que le parent qui contient le texte vertical soit en relatif. Si je met vertical-tex en relatif, la rotation ne fonctionne pas. mais en mm temps si je met ça dans le style du talbeau (.table-AptGlob > tbody > tr > td), les bordures ne s'affichent pas si je met position relative.
+	
+
+.table-AptGlob th{
+	text-align: center;
+}
+
+.table-apt {
+  display: inline-table;
+
+}
+.table-apt > tbody > tr > td {
+  padding: 4px;
+  padding-top: 4px;
+  padding-right: 4px;
+  padding-bottom: 4px;
+  padding-left: 4px;
+
+  }
+  
+.table-apt td{color: #fff;}
+
+.table-apt1 {
+  background-color: rgba(61,88,45,.3);
+}
+
+.table-apt1 > div{
+background-color: rgba(61,88,45,.8);
+}
+
+.col-apt1 {
+background-color: rgba(61,88,45,.8);
+transition-duration: 0.5s;
+}
+
+.table-apt2 {
+  background-color: rgba(117,167,71,.3);
+}
+
+.table-apt2 > div{
+  background-color: rgba(117,167,71,.8);
+}
+
+.col-apt2 {
+  background-color: rgba(117,167,71,.8);
+  transition-duration: 0.5s;
+}
+
+
+.table-apt3 {
+  background-color: rgba(210,141,51,.3);
+}
+
+// ne sert plus à rien
+.table-apt3 > div{
+  background-color: rgba(210,141,51,.8);
+  transition-duration: 0.5s;
+}
+
+.col-apt3 {
+  background-color: rgba(210,141,51,.8);
+  transition-duration: 0.5s;
+}
+
+.col-apt4 {
+  background-color: red;
+  transition-duration: 1s;
+}
+
+.col-grey {
+  background-color: rgba(191,191,191,.8);
+  transition-duration: 1s;
+}
+ 
+ .catalogueGr{
+	width:400px;
+
+}
+
+
+.menu_gauche a{
+	text-decoration: none;
+}
+.menu_gauche ul li a {
+	padding:0px;
+}
+/*
+.menu_gauche{
+	background-color:green;
+	
+}
+*/
+
+.nav-apt a,
+.nav-apt a:hover,
+.nav-apt a:focus {
+  background-color: transparent;
+  border-color: #337ab7;
+}
+
+.nav-apt > li.active > a,
+.nav-apt > li.active > a:hover,
+.nav-apt > li.active > a:focus {
+  color: #555555;
+  background-color: transparent;
+  border: none;
+  border-bottom-color: transparent;
+  cursor: default;
+}
+
+.highlight {
+    padding: 9px 14px;
+    margin-bottom: 14px;
+    background-color: #f7f7f9;
+    border: 1px solid #e1e1e8;
+    border-radius: 4px;
+}
+
+.vertical-text {
+	transform: rotate(-90deg);
+	-o-transform-origin: left top;
+	-moz-transform-origin: left top;
+	position: absolute;
+	margin-top: 65px;
+	width : 200px;
+}
+
+.Wt-icon {
+  min-width: 35px;
+  min-height: 35px;
+  background-size: cover;
+}
+
+.navbar-left-fix{
+	margin-right:auto;
+}
+
+.language-button span{
+	width:60px;
+	background-size: auto;
+	padding:0px;
+	margin:0px;
+}
+
+
+

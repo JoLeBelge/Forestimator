@@ -9,7 +9,8 @@
 std::string removeAccents(std::string aStr);
 std::string putInBalise(std::string aCont,std::string aBalise);
 
-extern std::string dirBD;
+//extern std::string dirBD;
+
 
 class cdicoAptBase;
 class color;
@@ -122,6 +123,14 @@ public:
             if (Dico_station.at(aZbio).find(aSt)!=Dico_station.at(aZbio).end()){
                 aRes=Dico_station.at(aZbio).at(aSt);
             }
+        }
+        return aRes;
+    }
+
+    std::map<int,std::string> aVStation(int aZbio){
+        std::map<int,std::string> aRes;
+        if (Dico_station.find(aZbio)!=Dico_station.end()){
+                aRes=Dico_station.at(aZbio);
         }
         return aRes;
     }

@@ -20,6 +20,9 @@ std::string globToto("toto");
 using namespace std;
 
 std::string adirBD("/home/jo/app/Forestimator/carteApt/data/carteFEE_NTpH.db");
+extern string columnPath;
+
+//./carteApt --aptFEE 1 --pathBD "/home/jo/app/Forestimator/carteApt/data/aptitudeEssDB.db" --colPath Dir3
 
 int main(int argc, char *argv[])
 {
@@ -31,7 +34,8 @@ int main(int argc, char *argv[])
             ("carteNH", po::value<bool>(), "calcul de la carte des NH")
             ("aptFEE", po::value<bool>(), "calcul des cartes d'aptitude du FEE")
             ("aptCS", po::value<bool>(), "calcul des cartes d'aptitude du CS")
-            ("pathBD", po::value<std::string>(), "chemin d'accès à la BD carteFEE_NTpH.db")
+            ("pathBD", po::value<std::string>(), "chemin d'accès à la BD carteFEE_NTpH.db ou à aptitudeEssDB.db")
+            ("colPath", po::value<std::string>(), "nom de la colonne de fichierGIS et layerApt propre à la machine (chemin d'accès couche en local)")
             ;
 
     po::variables_map vm;
@@ -50,6 +54,7 @@ int main(int argc, char *argv[])
     if (vm.count("aptCS")) {carteCS=vm["aptCS"].as<bool>();}
     if (vm.count("matApt")) {matApt=vm["matApt"].as<bool>();}
     if (vm.count("pathBD")) {adirBD=vm["pathBD"].as<std::string>();}
+    if (vm.count("colPath")) {columnPath=vm["colPath"].as<std::string>();}
 
 
 
@@ -64,28 +69,28 @@ int main(int argc, char *argv[])
 
     if (carteFEE | carteCS) {
 
-        cDicoApt dico(dirBD);
+        cDicoApt dico(adirBD);
         cApliCarteApt aACA(&dico);
-        std::map<std::string,std::shared_ptr<layerBase>> aMLB=dico.VlayerBase();
 
-        for (std::pair<std::string,std::shared_ptr<layerBase>>  kv : aMLB){
+// je boucle les layersbase et non les essences car j'ai besoin du chemin d'accès au raster
+        for (std::pair<std::string,std::shared_ptr<layerBase>>  kv : dico.VlayerBase()){
 
             std::string essCode(kv.second->EssCode()); //essCode =="AG"  | essCode =="AP" |essCode =="EK") |essCode =="PG" essCode =="PY" |essCode =="PZ"
 
             if (carteFEE &&(kv.second->getCatLayer()==TypeLayer::FEE)){
                // aACA.carteAptFEE(dico.getEss(kv.second->EssCode()),kv.second->getPathTif(),true);
-                aACA.carteAptFEE(dico.getEss(kv.second->EssCode()),kv.second->getPathTif(),false);
-               // aACA.compressTif(kv.second->getPathTif());
+                aACA.carteAptFEE(dico.getEss(essCode),kv.second->getPathTif(),true);
+                aACA.compressTif(kv.second->getPathTif());
             }
 
             if (carteCS &&(kv.second->getCatLayer()==TypeLayer::FEE)){
-                aACA.carteAptCS(dico.getEss(kv.second->EssCode()),kv.second->getPathTif(),true);
+                aACA.carteAptCS(dico.getEss(essCode),kv.second->getPathTif(),true);
                 aACA.compressTif(kv.second->getPathTif());
             }
         }
     }
     if (matApt){
-            cDicoApt dico(dirBD);
+            cDicoApt dico(adirBD);
             std::string aFileScribusTemp("/home/lisein/matAptRW2021/MatApt_Eco_RW.sla");
             for (int rn(1); rn <11;rn++){
                 matriceApt(&dico, aFileScribusTemp, rn);

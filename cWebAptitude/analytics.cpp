@@ -211,6 +211,7 @@ PageAnalytics::PageAnalytics(const Wt::WEnvironment& env, std::string aFileDB) :
     table3->elementAt(0, 1)->addNew<Wt::WText>("Nombre de consultation");
 
     //0 page,extend,danap,anas,dsingle,dmulti,danas,dsingleRW;
+    // connexion par wifi depuis Ulg : donne l'IP 127.0.0.1
     // Sélection par catégorie de log
     // q="SELECT COUNT(*)as nb, cat FROM log  WHERE ip != '127.0.0.1' AND ip LIKE '%139.165%' GROUP BY cat;";
     for (int cat(1);cat <9;cat++){
@@ -240,6 +241,16 @@ PageAnalytics::PageAnalytics(const Wt::WEnvironment& env, std::string aFileDB) :
         table4->elementAt(m,0)->setContentAlignment(AlignmentFlag::Right);
         table4->elementAt(m,1)->addWidget(Wt::cpp14::make_unique<Wt::WText>(std::to_string(nb)));
         table4->elementAt(m,1)->setContentAlignment(AlignmentFlag::Center);
+    }
+
+    for (int m(1);m <6;m++){
+        std::string month = std::to_string(m);
+        if (month.size()==1){month="0"+ month;}
+        int nb=session.query<int>("SELECT COUNT(*) as nb FROM (SELECT COUNT(*) as nb FROM log  WHERE ip != '127.0.0.1' AND ip NOT LIKE '%139.165%' AND date LIKE '%2023-"+month+"%' GROUP BY ip)");
+        table4->elementAt(m+12,0)->addWidget(Wt::cpp14::make_unique<Wt::WText>(month));
+        table4->elementAt(m+12,0)->setContentAlignment(AlignmentFlag::Right);
+        table4->elementAt(m+12,1)->addWidget(Wt::cpp14::make_unique<Wt::WText>(std::to_string(nb)));
+        table4->elementAt(m+12,1)->setContentAlignment(AlignmentFlag::Center);
     }
 
     // tableau brut des 100 derniers logs

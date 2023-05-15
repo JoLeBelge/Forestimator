@@ -30,7 +30,7 @@ bool commonEss(std::string aCode, std::vector<std::shared_ptr<cEss>> & aV2);
 // inspiré de staticMap, forestimator
 class zbioPainted : public Wt::WPaintedWidget {
 public:
-    zbioPainted(std::string  aShp, std::shared_ptr<cdicoAptBase> aDico);
+    zbioPainted(std::string  aShp, cdicoAptBase* aDico);
     ~zbioPainted(){
         if (mDS!=NULL){
             GDALClose(mDS);
@@ -92,7 +92,6 @@ private:
      void changeZbio();
      void displayNiche(std::string aEssCode);
      void resetEco();
-     void displayMatApt();
      void initAptTable(std::string aNTNHTitle);
      void selectLevel4comparison(std::tuple<int,int> ntnh);
      void comparison4predicted();

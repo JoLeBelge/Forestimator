@@ -107,6 +107,15 @@ void cApliCarteApt::carteAptFEE(std::shared_ptr<cEss> aEss, std::string aOut, bo
         char **papszOptions = NULL;
         papszOptions = CSLSetNameValue( papszOptions, "COMPRESS", "DEFLATE" );
         GDALDataset* poDstDS = poDriver->CreateCopy( destFile, poDatNH, FALSE, papszOptions,NULL, NULL );
+        OGRSpatialReference  * spatialReference=new OGRSpatialReference;
+        spatialReference->importFromEPSG(31370);
+        poDstDS->SetSpatialRef(spatialReference);
+        year_month_day today = year_month_day{floor<days>(std::chrono::system_clock::now())};
+        std::string d = "carte aptitude générée le " + format("%F",today);
+        poDstDS->SetMetadataItem("Essence Forestière",aEss->Nom().c_str());
+        poDstDS->SetMetadataItem("carte d'Aptitude","Fichier Ecologique des Essences");
+        poDstDS->SetMetadataItem("Version",d.c_str());
+        poDstDS->SetMetadataItem("Crédit","Lisein Jonathan, Gembloux Agro-Bio Tech");
         GDALRasterBand *outBand;
         outBand = poDstDS->GetRasterBand(1);
         std::cout << "copy of raster done" << std::endl;
@@ -128,7 +137,7 @@ void cApliCarteApt::carteAptFEE(std::shared_ptr<cEss> aEss, std::string aOut, bo
             ZBIOBand->RasterIO( GF_Read, 0, row, x, 1, scanlineZBIO, x,1, GDT_Float32, 0, 0 );
             TopoBand->RasterIO( GF_Read, 0, row, x, 1, scanlineTopo, x,1, GDT_Float32, 0, 0 );
             // iterate on pixels in row
-#pragma omp parallel num_threads(12)
+#pragma omp parallel num_threads(6)
             {
 #pragma omp for
             for (int col = 0; col < x; col++)
@@ -194,6 +203,15 @@ void cApliCarteApt::carteAptCS(std::shared_ptr<cEss> aEss, std::string aOut, boo
         char **papszOptions = NULL;
         papszOptions = CSLSetNameValue( papszOptions, "COMPRESS", "DEFLATE" );
         GDALDataset* poDstDS = poDriver->CreateCopy( destFile, poDatNH, FALSE, papszOptions,NULL, NULL );
+        OGRSpatialReference  * spatialReference=new OGRSpatialReference;
+        spatialReference->importFromEPSG(31370);
+        poDstDS->SetSpatialRef(spatialReference);
+        year_month_day today = year_month_day{floor<days>(std::chrono::system_clock::now())};
+        std::string d = "carte aptitude générée le " + format("%F",today);
+        poDstDS->SetMetadataItem("Essence Forestière",aEss->Nom().c_str());
+        poDstDS->SetMetadataItem("carte d'Aptitude","Catalogue de Station");
+        poDstDS->SetMetadataItem("Version",d.c_str());
+        poDstDS->SetMetadataItem("Crédit","Lisein Jonathan, Gembloux Agro-Bio Tech");
 
         GDALRasterBand *outBand;
         outBand = poDstDS->GetRasterBand(1);
@@ -205,7 +223,6 @@ void cApliCarteApt::carteAptCS(std::shared_ptr<cEss> aEss, std::string aOut, boo
         float *scanlineCS10= (float *) CPLMalloc( sizeof( float ) * x );
         float *scanlineZBIO = (float *) CPLMalloc( sizeof( float ) * x );
         float *scanline = (float *) CPLMalloc( sizeof( float ) * x );
-
 
         int c(0);
         int step= y/100;

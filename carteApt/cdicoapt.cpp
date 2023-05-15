@@ -1,6 +1,6 @@
 #include "cdicoapt.h"
 
-std::string dirBD("/home/lisein/Documents/carteApt/Forestimator/carteApt/data/aptitudeEssDB.db");
+std::string dirBD("/home/jo/Documents/carteApt/Forestimator/carteApt/data/aptitudeEssDB.db");
 bool globTest(0);
 
 cDicoApt::cDicoApt(std::string aBDFile):cdicoAptBase(aBDFile)

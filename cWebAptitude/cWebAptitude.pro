@@ -32,6 +32,8 @@ SOURCES += main.cpp \
     auth/User.cpp \
     auth/auth.cpp \
     cadastre.cpp \
+    ../carteApt/matapt.cpp \
+    mataptcs.cpp \
     panier.cpp \
     simplepoint.cpp \
     widgetcadastre.cpp \
@@ -62,6 +64,8 @@ HEADERS += \
     auth/auth.h \
     cadastre.h \
     main.h \
+    ../carteApt/matapt.h \
+    mataptcs.h \
     panier.h \
     simplepoint.h \
     widgetcadastre.h \

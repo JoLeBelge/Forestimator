@@ -83,7 +83,7 @@ matApt::matApt(std::shared_ptr<cdicoAptBase> aDicoApt):mDicoApt(aDicoApt),zbio_(
     bt_compare4Predicted->clicked().connect(std::bind(&matApt::comparison4predicted,this));
 
     std::string  aShp=mDicoApt->File("ZBIOSIMP");
-    graphZbio = layoutzbio->addWidget(std::make_unique<zbioPainted>(aShp,mDicoApt));
+    graphZbio = layoutzbio->addWidget(std::make_unique<zbioPainted>(aShp,mDicoApt.get()));
 
     WContainerWidget * contApt = layoutDroite->addWidget(cpp14::make_unique<WContainerWidget>());
     contApt->setOverflow(Wt::Overflow::Auto);
@@ -598,7 +598,7 @@ bool commonEss(std::string aCode, std::vector<std::shared_ptr<cEss>> & aV2){
     return aRes;
 }
 
-zbioPainted::zbioPainted(std::string  aShp, std::shared_ptr<cdicoAptBase> aDico)
+zbioPainted::zbioPainted(std::string  aShp, cdicoAptBase *aDico)
     : WPaintedWidget(),zbio_(1),shpPath(aShp),mSx(400),mSy(200),displayApt_(0),mDico(aDico),mlay(NULL)
 {
     GDALAllRegister();
