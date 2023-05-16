@@ -107,24 +107,19 @@ AuthApplication::AuthApplication(const Wt::WEnvironment& env, cDicoApt *dico)
 }
 
 void AuthApplication::loadStyles(){
-    // thème bootstrap 3
-    auto theme = std::make_shared<Wt::WBootstrapTheme>();
-    theme->setVersion(Wt::BootstrapVersion::v3);
-    //spécifier ça également dans wt_option.xml sinon ne fonctionne pas
-    theme->setResponsive(true);
+    std::shared_ptr<Wt::WBootstrap5Theme> theme = std::make_shared<Wt::WBootstrap5Theme>();
     setTheme(theme);
-
-    // load the default bootstrap3 (sub-)theme (nécessaire en plus de theme->setVersion)
-    useStyleSheet("style/bootstrap-theme.min.css");
     // tout les style de wt gallery
+    useStyleSheet("resources/themes/default/wt.css");
     useStyleSheet("style/everywidget.css");
     useStyleSheet("style/dragdrop.css");
     useStyleSheet("style/combostyle.css");
     useStyleSheet("style/pygments.css");
     useStyleSheet("style/filedrop.css");
     useStyleSheet("style/form.css");
-    useStyleSheet("resources/themes/polished/wt.css");
     useStyleSheet("resources/jPlayer/skin/jplayer.blue.monday.css");
+    // CSS custom pour faire beau
+    useStyleSheet("style/style.css");
 
     WCssDecorationStyle EssStyle;
     EssStyle.font().setSize(FontSize::Medium);
@@ -147,10 +142,6 @@ void AuthApplication::loadStyles(){
     useStyleSheet("jslib/v6.4.3-dist/ol.css");
     require("jslib/proj4js-2.6.1/dist/proj4.js");
     require("jslib/proj4js-2.6.1/dist/proj4-src.js");
-
-    // CSS custom pour faire beau
-    useStyleSheet("style/style.css");
-
     enableUpdates();
 }
 

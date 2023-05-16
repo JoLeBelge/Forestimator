@@ -29,6 +29,7 @@
 #include <Wt/WPopupMenuItem.h>
 #include <Wt/WNavigationBar.h>
 #include <Wt/WBootstrapTheme.h>
+#include <Wt/WBootstrap5Theme.h>
 #include <Wt/WEnvironment.h>
 #include <Wt/WHBoxLayout.h>
 #include <Wt/WVBoxLayout.h>

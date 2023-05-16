@@ -19,13 +19,18 @@ private:
      Wt::WTable * mAptTable;
      WComboBox * zbioSelection_;
 
+     WContainerWidget * contUS;
+
      void hoverBubble(WContainerWidget *c, bool hover);
      void changeZbio();
-     void updateApt(int US);
+     void updateUS();
+     void updateApt(int US,std::string aVar);
      //void initAptTable(std::string aNTNHTitle);
 
      std::vector<std::vector<std::shared_ptr<cEss>>> mVEss;
-     int zbio_, US_;
+     int zbio_;
+     int US_;
+     std::string mVar_;
      zbioPainted * graphZbio;
 
 };

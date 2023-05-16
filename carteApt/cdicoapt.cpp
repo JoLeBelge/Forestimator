@@ -20,7 +20,7 @@ cDicoApt::cDicoApt(std::string aBDFile):cdicoAptBase(aBDFile)
 
         sqlite3_stmt * stmt;
         //pour l'instant je ne sélectionne pas les stations qui ne sont pas cartographiées ; celles qui ont été regroupée en une station carto.
-        std::string SQLstring="SELECT ZBIO,stat_id,Station_carto FROM dico_station WHERE stat_id=stat_num;";
+        std::string SQLstring="SELECT ZBIO,stat_id,Station_carto,var FROM dico_station WHERE stat_id=stat_num;";
         sqlite3_prepare_v2( *db_, SQLstring.c_str(), -1, &stmt, NULL );
         while(sqlite3_step(stmt) == SQLITE_ROW)
         {
@@ -29,7 +29,13 @@ cDicoApt::cDicoApt(std::string aBDFile):cdicoAptBase(aBDFile)
                 int aA=sqlite3_column_int( stmt, 0 );
                 int aB=sqlite3_column_int( stmt, 1 );
                 std::string aC=std::string( (char *)sqlite3_column_text( stmt, 2 ) );
-                Dico_station[aA].emplace(std::make_pair(aB,aC));
+                std::string aD("");
+                if (sqlite3_column_type(stmt, 3)!=SQLITE_NULL){
+                aD=std::string( (char *)sqlite3_column_text( stmt, 3 ) );
+                }
+                Dico_station[aA].emplace(std::make_pair(std::make_tuple(aB,aD),aC));
+
+                std::cout << " station " << aB << ", variante " << aD << std::endl;
             }
         }
         sqlite3_finalize(stmt);
@@ -291,7 +297,7 @@ std::map<int,color> cDicoApt::getDicoRasterCol(std::string aCode){
             std::string aB("");
             if (sqlite3_column_type(stmt, 1)!=SQLITE_NULL ) {aB=std::string( (char *)sqlite3_column_text( stmt, 1 ) );}
             if (aB.substr(0,1)=="#") {
-                if (globTest){std::cout << " ajout dans dicoCol " << aA << " , col " << aB << " table" << nom_dico << std::endl;}
+                //if (globTest){std::cout << " ajout dans dicoCol " << aA << " , col " << aB << " table" << nom_dico << std::endl;}
                 // il faut d'office l'ajouter au vecteur colors, car les styles sont créé via ce vecteur
                 colors.emplace(std::make_pair(aB,color(aB,aB)));
             }

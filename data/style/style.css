@@ -22,15 +22,25 @@
 .navbar {
 	margin-bottom: 5px;
 }
+/* fonctionne pas ci-dessous */
 .navbar-default .navbar-brand a:hover{
-    /*color: white;	*/
+    color: white;	
 }
 .navbar-default .navbar-brand span:hover{
-    /*color: white;	*/
+    color: white;
 }
 .navbar-default .navbar-brand {
     color: white;
 }
+
+.navbar-brand {
+    color: white;
+}
+.navbar-brand span:hover{
+    color: white;	
+}
+    
+    
 .navbar-default .navbar-nav li a {
     padding: 0px 0px 1px 0px;
 	margin: 0;
@@ -738,5 +748,9 @@ transition-duration: 0.5s;
 	margin:0px;
 }
 
+.nav>li>a {
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
 
 

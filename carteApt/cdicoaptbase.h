@@ -59,7 +59,7 @@ public:
     std::map<int,std::map<std::string,int>> getFEEApt(std::string aCodeEs);
     std::map<int,int> getZBIOApt(std::string aCodeEs);
     std::map<int,std::map<int,int>> getRisqueTopo(std::string aCodeEs);
-    std::map<int,std::map<int,int>> getCSApt(std::string aCodeEs);
+    std::map<int, std::map<std::tuple<int, std::string>, int> > getCSApt(std::string aCodeEs);
 
 
     std::map<int,std::string>  * NH(){return  &Dico_NH;}
@@ -187,6 +187,11 @@ public:
     std::string ZBIO2CSlay(int aCode){
         std::string aRes("");
         if (Dico_ZBIO2layCS.find(aCode)!=Dico_ZBIO2layCS.end()){aRes=Dico_ZBIO2layCS.at(aCode);}
+        return aRes;
+    }
+    int ZBIO2CSid(int aCode){
+        int aRes(0);
+        if (Dico_ZBIO2CSid.find(aCode)!=Dico_ZBIO2CSid.end()){aRes=Dico_ZBIO2CSid.at(aCode);}
         return aRes;
     }
 
@@ -347,6 +352,7 @@ protected:
     std::map<int,std::string>  Dico_topo;
     std::map<int,std::string>  Dico_ZBIO;
     std::map<int,std::string>  Dico_ZBIO2layCS;
+    std::map<int,int>  Dico_ZBIO2CSid;
     std::map<int,std::string>  dico_groupeNH2Label;// pour l'écogramme avec visu prédiciton random forest
     std::map<int,int>  dico_groupeNH2Nb;//nombre de niveau NH par groupe
     std::map<int,int>  dico_groupeNH2NHStart;// code nh qui débute le groupe.
@@ -372,7 +378,7 @@ public:
     // retourne l'aptitude global de la zone bioclimatique
     int getApt(int aZbio);
     // retourne l'aptitude du catalogue de station
-    int getApt(int aZbio, int aSTId);
+    int getApt(int aZbio, int aSTId, std::string aVar="a");
     bool hasCSApt(){
         bool aRes(1);
         if (mAptCS.size()==0) {
@@ -453,8 +459,8 @@ public:
     // aptitude pour chaque zone bioclim
     std::map<int,int> mAptZbio;
     // aptitude pour catalogue de station
-    // clé ; zone bioclim/ région. Value ; une map -> clé = identifiant de la station. Value ; aptitude
-    std::map<int,std::map<int,int>> mAptCS;
+    // clé ; zone bioclim/ région. Value ; une map -> clé = identifiant de la station (id + variante) Value ; aptitude
+    std::map<int,std::map<std::tuple<int, std::string>,int>> mAptCS;
     // clé ; zone bioclim/ région. Value ; une map -> clé ; id situation topo. valeur ; code risque
     std::map<int,std::map<int,int>> mRisqueTopo;
 

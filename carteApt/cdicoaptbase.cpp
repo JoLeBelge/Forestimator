@@ -29,7 +29,7 @@ cdicoAptBase::cdicoAptBase(std::string aBDFile):mBDpath(aBDFile),ptDb_(NULL)
         }
 
         sqlite3_finalize(stmt);
-        SQLstring="SELECT Nom,Zbio,CS_lay FROM dico_zbio;";
+        SQLstring="SELECT Nom,Zbio,CS_lay, CSid FROM dico_zbio;";
 
         sqlite3_prepare_v2( *db_, SQLstring.c_str(), -1, &stmt, NULL );
         while(sqlite3_step(stmt) == SQLITE_ROW)
@@ -40,7 +40,10 @@ cdicoAptBase::cdicoAptBase(std::string aBDFile):mBDpath(aBDFile),ptDb_(NULL)
 
                 if (sqlite3_column_type(stmt, 2)!=SQLITE_NULL){
                 std::string aC=std::string( (char *)sqlite3_column_text( stmt, 2 ) );
-                Dico_ZBIO2layCS.emplace(std::make_pair(aB,aC));}
+                int aD=sqlite3_column_int( stmt, 3 );
+                Dico_ZBIO2layCS.emplace(std::make_pair(aB,aC));
+                Dico_ZBIO2CSid.emplace(std::make_pair(aB,aD));
+                }
 
                 Dico_ZBIO.emplace(std::make_pair(aB,aA));
 
@@ -431,8 +434,8 @@ std::map<int,std::map<int,int>> cdicoAptBase::getRisqueTopo(std::string aCodeEs)
 }
 
 
-std::map<int,std::map<int,int>> cdicoAptBase::getCSApt(std::string aCodeEs){
-    std::map<int,std::map<int,int>> aRes;
+std::map<int,std::map<std::tuple<int, std::string>,int>> cdicoAptBase::getCSApt(std::string aCodeEs){
+    std::map<int,std::map<std::tuple<int, std::string>,int>> aRes;
 
     sqlite3_stmt * stmt;
     // boucle sur tout les identifiants de zbio mais attention, les catalogues de station ne couvrent pas tout donc vérif si ND
@@ -450,9 +453,9 @@ std::map<int,std::map<int,int>> cdicoAptBase::getCSApt(std::string aCodeEs){
                 var=std::string( (char *)sqlite3_column_text( stmt, 2 ) );
                 }
                 int codeApt=Apt(apt);
-                if (var=="" | var=="a"){ // pour l'instant, je ne considère que la variance "a" des stations
-                aRes[zbio].emplace(std::make_pair(station,codeApt));
-                }
+                //if (var=="" | var=="a"){ // pour l'instant, je ne considère que la variance "a" des stations.
+                aRes[zbio].emplace(std::make_pair(std::make_tuple(station,var),codeApt));
+                //}
             }
         }
         sqlite3_finalize(stmt);
@@ -512,12 +515,15 @@ int cEss::getApt(int aCodeNT, int aCodeNH, int aZbio, bool hierachique,int aTopo
     return aRes;
 }
 
-int cEss::getApt(int aZbio,int aSTId){
+int cEss::getApt(int aZbio, int aSTId, std::string aVar){
     int aRes(0);
     if (mAptCS.find(aZbio)!=mAptCS.end()){
-        std::map<int,int> * Apt=&mAptCS.at(aZbio);
-        if (Apt->find(aSTId)!=Apt->end()){
-            aRes=Apt->at(aSTId);
+        std::map<std::tuple<int, std::string>,int> * Apt=&mAptCS.at(aZbio);
+        if (Apt->find(std::make_tuple(aSTId,""))!=Apt->end()){
+            aRes=Apt->at(std::make_tuple(aSTId,""));
+        }
+        if (Apt->find(std::make_tuple(aSTId,aVar))!=Apt->end()){
+            aRes=Apt->at(std::make_tuple(aSTId,aVar));
         }
     }
     return aRes;

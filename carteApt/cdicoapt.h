@@ -116,19 +116,22 @@ public:
         return aRes;
     }
 
-    std::string station(int aZbio, int aSt){
+    std::string station(int aZbio, int aSt,std::string aVar="a"){
         std::string aRes("not found");
         if (Dico_station.find(aZbio)!=Dico_station.end()){
             aRes="Pas de station numéro " + std::to_string(aSt) + " pour cette zone bioclimatique";
-            if (Dico_station.at(aZbio).find(aSt)!=Dico_station.at(aZbio).end()){
-                aRes=Dico_station.at(aZbio).at(aSt);
+            if (Dico_station.at(aZbio).find(std::make_tuple(aSt,""))!=Dico_station.at(aZbio).end()){
+                aRes=Dico_station.at(aZbio).at(std::make_tuple(aSt,""));
+            }
+            if (Dico_station.at(aZbio).find(std::make_tuple(aSt,aVar))!=Dico_station.at(aZbio).end()){
+                aRes=Dico_station.at(aZbio).at(std::make_tuple(aSt,aVar));
             }
         }
         return aRes;
     }
 
-    std::map<int,std::string> aVStation(int aZbio){
-        std::map<int,std::string> aRes;
+    std::map<std::tuple<int, std::string>,std::string> aVStation(int aZbio){
+        std::map<std::tuple<int, std::string>,std::string> aRes;
         if (Dico_station.find(aZbio)!=Dico_station.end()){
                 aRes=Dico_station.at(aZbio);
         }
@@ -276,8 +279,8 @@ private:
     std::map<std::string,int> Dico_codeSt2idHab;
     std::map<std::string,LayerMTD>  Dico_layerMTD;
 
-    // clé 1 : zbio, clé 2: id station,value ; nom de la sation cartograhique
-    std::map<int,std::map<int,std::string>>  Dico_station;
+    // clé 1 : zbio, clé 2: id station+variance,value ; nom de la sation cartograhique
+    std::map<int,std::map<std::tuple<int, std::string>,std::string>>  Dico_station;
     std::map<std::string,std::string> Dico_codeKK2Nom;
     std::map<std::string,std::string> Dico_codeKK2NomCol;
     // il y a 9 niveau dans l'échelle, mais on simplifie en 3 catégories pour les cartes de risque et potentiel sylv
