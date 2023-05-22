@@ -323,6 +323,7 @@ display:block;
 
 .submenuPresentation{
 text-align: left;
+max-height: 1000px;
 }
 
 .button_carto{
