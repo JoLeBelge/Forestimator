@@ -20,6 +20,7 @@ cDicoApt::cDicoApt(std::string aBDFile):cdicoAptBase(aBDFile)
 
         sqlite3_stmt * stmt;
         //pour l'instant je ne sélectionne pas les stations qui ne sont pas cartographiées ; celles qui ont été regroupée en une station carto.
+        // c'est faux vu que je prends les variantes pour l'Ardenne
         std::string SQLstring="SELECT ZBIO,stat_id,Station_carto,var FROM dico_station WHERE stat_id=stat_num;";
         sqlite3_prepare_v2( *db_, SQLstring.c_str(), -1, &stmt, NULL );
         while(sqlite3_step(stmt) == SQLITE_ROW)
@@ -35,11 +36,10 @@ cDicoApt::cDicoApt(std::string aBDFile):cdicoAptBase(aBDFile)
                 }
                 Dico_station[aA].emplace(std::make_pair(std::make_tuple(aB,aD),aC));
 
-                std::cout << " station " << aB << ", variante " << aD << std::endl;
+                //std::cout << " station " << aB << ", variante " << aD << std::endl;
             }
         }
         sqlite3_finalize(stmt);
-
 
         SQLstring="SELECT Code, id_projet, version, id_reference, Nom, copyrigth,ordre, NomShort,keep FROM carteMTD;";
         sqlite3_prepare_v2( *db_, SQLstring.c_str(), -1, &stmt, NULL );

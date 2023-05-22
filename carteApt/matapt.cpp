@@ -1,4 +1,5 @@
 #include "matapt.h"
+extern bool globTest;
 
 matApt::matApt(std::shared_ptr<cdicoAptBase> aDicoApt):mDicoApt(aDicoApt),zbio_(1),nh_(10),nt_(10),bt_compare4Predicted(NULL)
 {

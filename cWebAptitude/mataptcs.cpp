@@ -1,4 +1,5 @@
 #include "mataptcs.h"
+extern bool globTest;
 
 matAptCS::matAptCS(cDicoApt *aDicoApt):mDicoApt(aDicoApt),zbio_(1),US_(1),mVar_("")
 {
@@ -6,16 +7,12 @@ matAptCS::matAptCS(cDicoApt *aDicoApt):mDicoApt(aDicoApt),zbio_(1),US_(1),mVar_(
     //setId("matAptCont");
     // un nouveau div enfant car le parent est dans le stack, avec display flex, ce qui fait foirer un scroll général sur tout le contenu.
     WVBoxLayout * layoutGlobal = setLayout(cpp14::make_unique<WVBoxLayout>());
-    //layoutGlobal->addWidget(cpp14::make_unique<WText>(tr("CS.intro")));
-    contUS = layoutGlobal->addWidget(cpp14::make_unique<WContainerWidget>());
-    // liste des unités stationnelles
-    contUS->setOverflow(Wt::Overflow::Auto);
-    //contUS->setMaximumSize("400px","100%");
 
-    mAptTable = layoutGlobal->addWidget(cpp14::make_unique<WTable>());
-    // partie droite= zbio
-    WContainerWidget * contD = layoutGlobal->addWidget(cpp14::make_unique<WContainerWidget>());
-    WVBoxLayout * layoutDroite = contD->setLayout(cpp14::make_unique<WVBoxLayout>());
+    /* 1 Intro ---------------------------*/
+    layoutGlobal->addWidget(cpp14::make_unique<WText>(tr("CS.intro")));
+     /* 2 Zbio ---------------------------*/
+    WContainerWidget * contZbioGlob = layoutGlobal->addWidget(cpp14::make_unique<WContainerWidget>());
+    WVBoxLayout * layoutDroite = contZbioGlob->setLayout(cpp14::make_unique<WVBoxLayout>());
     WContainerWidget * contZbio = layoutDroite->addWidget(cpp14::make_unique<WContainerWidget>());
     WHBoxLayout * layoutzbio = contZbio->setLayout(cpp14::make_unique<WHBoxLayout>());
     WContainerWidget * contZbioGauche = layoutzbio->addWidget(cpp14::make_unique<WContainerWidget>());
@@ -23,59 +20,90 @@ matAptCS::matAptCS(cDicoApt *aDicoApt):mDicoApt(aDicoApt),zbio_(1),US_(1),mVar_(
     zbioSelection_  =contZbioGauche->addWidget(std::make_unique<Wt::WComboBox>());
     for (auto kv : *mDicoApt->ZBIO()){
         if(kv.first==1 | kv.first==2 |kv.first==3 | kv.first==10 | kv.first==5){
-        zbioSelection_->addItem(kv.second);
+            zbioSelection_->addItem(kv.second);
         }
     }
     zbioSelection_->changed().connect(std::bind(&matAptCS::changeZbio,this));
     zbioSelection_->setCurrentIndex(0);
     std::string  aShp=mDicoApt->File("ZBIOSIMP");
     graphZbio = layoutzbio->addWidget(std::make_unique<zbioPainted>(aShp,mDicoApt));
-    WContainerWidget * contApt = layoutDroite->addWidget(cpp14::make_unique<WContainerWidget>());
-    contApt->setOverflow(Wt::Overflow::Auto);
-    mAptTable= contApt->addNew<WTable>();
+     /* 3 Liste des unités stationnelles ---------------------------*/
+    contListeUS = layoutGlobal->addWidget(cpp14::make_unique<WContainerWidget>());
+    contListeUS->setOverflow(Wt::Overflow::Auto);
 
-    updateUS();
+     /* 4 Description de unités stationnelles ---------------------------*/
+    // conteneur pour afficher les KK de l'unité stationnelle, avant le tableau d'aptitude
+    contFicheUS = layoutGlobal->addWidget(cpp14::make_unique<WContainerWidget>());
+    mAptTable = layoutGlobal->addWidget(cpp14::make_unique<WTable>());
+    updateListeUS();
 }
 
 
-void matAptCS::updateUS(){
-    contUS->clear();
+void matAptCS::updateListeUS(){
+
+    if (globTest){std::cout << "matAptCS::updateListeUS " << std::endl;}
+    mMapButtonUS.clear();
+    contListeUS->clear();
     mAptTable->clear();
-    std::cout << "matAptCS::updateUS " << std::endl;
-    contUS->addWidget(std::make_unique<Wt::WText>(tr("matAptCS.US").arg(mDicoApt->ZBIO(zbio_))));
+    contFicheUS->clear();
+    contListeUS->addWidget(std::make_unique<Wt::WText>(tr("matAptCS.US").arg(mDicoApt->ZBIO(zbio_))));
+
+    // pour avoir les couleurs des stations, je dois utiliser la layer
+    std::shared_ptr<layerBase> CSlay=mDicoApt->getLayerBase(mDicoApt->ZBIO2CSlay(zbio_));
+
 
     for (auto & kv : mDicoApt->aVStation(mDicoApt->ZBIO2CSid(zbio_))){
         // un boutton avec un badge de la couleur de la station
-        Wt::WPushButton* us =contUS->addWidget(cpp14::make_unique<Wt::WPushButton>());
-         us->addStyleClass("position-relative");
-         us->setTextFormat(Wt::TextFormat::XHTML);
-         us->setText(tr("matAptCS.badge").arg(std::to_string(std::get<0>(kv.first))).arg(std::get<1>(kv.first)));
-         us->setToolTip(kv.second);
-         us->clicked().connect([=]{this->updateApt(std::get<0>(kv.first),std::get<1>(kv.first));});
-    }
+        Wt::WPushButton* us =contListeUS->addWidget(cpp14::make_unique<Wt::WPushButton>());
+        us->addStyleClass("position-relative");
+        us->setTextFormat(Wt::TextFormat::XHTML);
+        color col=CSlay->getColor(std::get<0>(kv.first));
 
+        if (std::get<1>(kv.first)==""){
+            us->setText(tr("matAptCS.nobadge").arg(std::to_string(std::get<0>(kv.first))).arg(col.getRGB()));
+        }else{
+            us->setText(tr("matAptCS.badge").arg(std::to_string(std::get<0>(kv.first))).arg(std::get<1>(kv.first)).arg(col.getRGB()));
+        }
+        //us->addStyleClass(CSlay->getColor(std::get<0>(kv.first)).getStyleNameShort()); // fonctionne pas..
+
+        //us->decorationStyle().setBackgroundColor(WColor(col.mR,col.mG,col.mB));// fonctionne mais interfère avec hoverEss qui change la couleur.
+
+        //std::cout << " add style class " << CSlay->getColor(std::get<0>(kv.first)).getStyleName() << std::endl;
+        us->setToolTip(kv.second);
+        us->clicked().connect([=]{this->updateApt(std::get<0>(kv.first),std::get<1>(kv.first));});
+        mMapButtonUS.emplace(std::make_pair(kv.first,us));
+    }
     if (mDicoApt->aVStation(mDicoApt->ZBIO2CSid(zbio_)).size()==0){
-        contUS->addNew<Wt::WText>(tr("matAptCS.msg.noUS4Zbio").arg(mDicoApt->ZBIO(zbio_)));
+        contListeUS->addNew<Wt::WText>(tr("matAptCS.msg.noUS4Zbio").arg(mDicoApt->ZBIO(zbio_)));
     }
 }
 void matAptCS::updateApt(int US, std::string aVar){
 
-    std::cout << " matAptCS::updateApt, zbio " << std::to_string(zbio_) << " et US " << std::to_string(US_) << " var " << mVar_  <<std::endl;
+    if(globTest){std::cout << " matAptCS::updateApt, zbio " << std::to_string(zbio_) << " et US " << std::to_string(US_) << " var " << mVar_  <<std::endl;}
     US_=US;
     mVar_=aVar;
     mVEss.clear();
+    contFicheUS->clear();
+
+
+    std::string usLabel=mDicoApt->aVStation(mDicoApt->ZBIO2CSid(zbio_)).at(std::make_tuple(US_,mVar_));
+    if (mVar_!=""){
+       usLabel+=", variante " +mVar_;
+    }
+    contFicheUS->addWidget(cpp14::make_unique<WText>(tr("aptCS.titreUS").arg(mDicoApt->ZBIO(zbio_)).arg(std::to_string(US_)).arg(usLabel)));
+
     for (int apt : {1,2,3}){
         std::vector<std::shared_ptr<cEss>> aV;
         for (auto kv : mDicoApt->getAllEss()){
             std::shared_ptr<cEss> ess = kv.second;
             if (ess->hasCSApt()){
-                    if (mDicoApt->AptNonContraignante(ess->getApt(zbio_,US_,mVar_))==apt){
-                        aV.push_back(ess);
-                    }
+                if (mDicoApt->AptNonContraignante(ess->getApt(zbio_,US_,mVar_))==apt){
+                    aV.push_back(ess);
                 }
             }
-        std::cout << "aptitude " << std::to_string(apt) << " contient " << aV.size() << " essences" <<std::endl;
-            mVEss.push_back(aV);
+        }
+        //std::cout << "aptitude " << std::to_string(apt) << " contient " << aV.size() << " essences" <<std::endl;
+        mVEss.push_back(aV);
     }
 
     // maintenant que les essences sont triées, update table apt
@@ -84,7 +112,7 @@ void matAptCS::updateApt(int US, std::string aVar){
     mAptTable->setHeaderCount(2);
     mAptTable->elementAt(0,0)->setColumnSpan(3);
     // titre colonne
-   // mAptTable->elementAt(0,0)->addWidget(cpp14::make_unique<WText>(tr("aptCS.titreMatApt").arg(mDicoApt->ZBIO(zbio_)).arg(mDicoApt->aVStation(mDicoApt->ZBIO2CSid(zbio_)).at(US_))));
+    mAptTable->elementAt(0,0)->addWidget(cpp14::make_unique<WText>(tr("aptCS.titreMatApt")));
     mAptTable->elementAt(1,0)->addWidget(cpp14::make_unique<WText>(tr("apt.t.O")));
     mAptTable->elementAt(1,1)->addWidget(cpp14::make_unique<WText>(tr("apt.t.T")));
     mAptTable->elementAt(1,2)->addWidget(cpp14::make_unique<WText>(tr("aptCS.t.TE")));
@@ -109,12 +137,12 @@ void matAptCS::updateApt(int US, std::string aVar){
             c->addNew<Wt::WText>(essCode);
             c->mouseWentOver().connect([=] {
                 hoverBubble(c,1);
-                //displayNiche(aV1.at(n)->Code());
+                displayNiche(aV.at(n)->Code());
                 graphZbio->displayAptMap(aV.at(n)->Code());
             });
             c->mouseWentOut().connect([=] {
                 hoverBubble(c,0);
-                //resetEco();
+                resetNiche();
                 graphZbio->selectZbio(zbio_);
             });
             c->setToolTip(aV.at(n)->Nom());
@@ -154,11 +182,35 @@ void matAptCS::changeZbio(){
     }
     graphZbio->selectZbio(zbio_);
     mAptTable->clear();
-    updateUS();
+    updateListeUS();
 }
 
 void matAptCS::hoverBubble(WContainerWidget * c, bool hover){
     // if(hover){c->addStyleClass("circle_eco_large");} else {c->setStyleClass("circle_eco");}
     if(hover){c->addStyleClass("circle_eco_large");} else {c->removeStyleClass("circle_eco_large");}
 }
+
+void matAptCS::displayNiche(std::string aEssCode){
+    std::shared_ptr<cEss> ess=mDicoApt->getEss(aEssCode);
+    // boucle sur toute les stations
+    for (auto kv : mMapButtonUS){
+        int us=std::get<0>(kv.first);
+        std::string var=std::get<1>(kv.first);
+        // récupérer l'aptitude
+        int apt=ess->getApt(zbio_,us,var);
+        // choisir la couleur en fonction de l'aptitude
+        std::string styleName("col-apt"+std::to_string(mDicoApt->AptNonContraignante(apt)));
+        kv.second->addStyleClass(styleName);
+    }
+}
+
+void matAptCS::resetNiche(){
+    for (auto kv : mMapButtonUS){
+        kv.second->removeStyleClass("col-apt1");
+        kv.second->removeStyleClass("col-apt2");
+        kv.second->removeStyleClass("col-apt3");
+        kv.second->removeStyleClass("col-apt4");
+    }
+}
+
 

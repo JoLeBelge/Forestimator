@@ -811,7 +811,7 @@ Un suivi de l'état sanitaire des pessières est réalisé en vue d'identifier l
 
 
 <message id="analytic.tab1"><h4>tableau de synthèse (hors utilisation via réseau de l'Ulg) </h4>
-<p> Ces statistiques de fréquentation sont calculées pour différents usages de Forestimator, se déclinant en autant de <emph> catégorie</emph>. L'usage le plus fréquent, correspondant à la catégorie <strong> page </strong>, correspond à la consulation des pages du site Forestimator. Un utilisateur consultant le même jour deux pages différentes du site enregistrera deux consultation. </p>
+<p> Ces statistiques de fréquentation sont calculées pour différents usages de Forestimator, se déclinant en autant de <mark> catégorie</mark>. L'usage le plus fréquent, correspondant à la catégorie <strong> page </strong>, correspond à la consulation des pages du site Forestimator. Un utilisateur consultant le même jour deux pages différentes du site enregistrera deux consultation. </p>
 </message>
 
 <message id="analytic.tabUser"><h4>tableau de synthèse (hors utilisation via réseau de l'Ulg) </h4>
@@ -822,13 +822,15 @@ Un suivi de l'état sanitaire des pessières est réalisé en vue d'identifier l
 <p> Ces enregistrement de fréquentation sont effectués pour certains usage du portail Forestimator. Par exemple, la consultation d'un page fera l'objet d'une observation, mais pas l'utilisation de l'API. Ces observations ne prennent pas en compte les nombreux robot d'indexation qui consultent le site. Si une page web est consultée plusieur fois par jour depuis le même ordinateur, seul la première consultation est enregistrée. Ce ne sont donc pas à proprement parler des "observations brutes" </p>
 </message>
 
-<message id="CS.intro"> <h4>Guide des Stations</h4> 
+<message id="CS.intro"> <h1>Guide des Stations</h1> 
+<p class="lead">
 <h3>Fichier écologique des essences et Guide des stations forestières : des outils complémentaires</h3>
 Le Fichier Ecologique des Essences (FEE) et le Guide des stations forestières sont deux outils complémentaires qui ont pour vocation d’aider les forestiers dans leurs démarches de description stationnelle, de choix des essences et de gestion forestière.
-Le fichier écologique des essences catégorise les stations selon trois facteurs écologiques que sont les niveaux <emph>bioclimatique, hydrique et trophique</emph> ; les 2 derniers étant représentés sous la forme d’un écogramme. C’est un outil orienté « aptitude des essences », qui comporte des fiches très informatives sur les atouts et sensibilités de chaque essence forestière. 
+Le fichier écologique des essences catégorise les stations selon trois facteurs écologiques que sont les niveaux <mark>bioclimatique, hydrique et trophique</mark> ; les 2 derniers étant représentés sous la forme d’un écogramme. C’est un outil orienté « aptitude des essences », qui comporte des fiches très informatives sur les atouts et sensibilités de chaque essence forestière. 
 La classification très systématique des stations convient particulièrement à une utilisation à l’échelle de l’ensemble de la Région Wallonne.
 <br></br>
-A une échelle plus régionale, comme pour les trois zones bioclimatiques d'Ardenne, le guide des stations est un outil orienté « gestion des stations », qui découpe le territoire en milieux-types, bien reconnaissables pour le forestier de terrain. En plus d’un choix d’essences approprié, le guide délivre des conseils de gestion spécifiques aux stations, par exemple en termes de protection des sols ou de promotion de la biodiversité.
+A une échelle plus régionale, comme pour les trois zones bioclimatiques d'Ardenne, le guide des stations est un outil orienté « gestion des stations », qui <mark>découpe le territoire en milieux-types, bien reconnaissables pour le forestier de terrain</mark>. En plus d’un choix d’essences approprié, le guide délivre des conseils de gestion spécifiques aux stations, par exemple en termes de protection des sols ou de promotion de la biodiversité.
+</p>
 <h3>Guide des stations: quel développement pour la Wallonie</h3>
 Pour l'instant, les Guides de Stations de l'Ardenne et de la Lorraine ont été réalisé. 
 Les couches cartographiques sont disponibles sur demande.
@@ -836,21 +838,24 @@ Les tableaux d'aptitude des essences pour les unités stationnelles sont présen
 </message>
 
 <message id="matAptCS.badge">  US {1}
-  <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+  <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill" style="background-color:{3};">
     {2}
     <span class="visually-hidden">variante</span>
   </span> </message>
- 
+ <message id="matAptCS.nobadge">  US {1}
+  <span class="position-absolute top-0 start-100 translate-middle p-2 border border-light rounded-circle" style="background-color:{2};">
+    <span class="visually-hidden">hep</span>
+  </span>
+ </message>
 <message id="matAptCS.msg.noUS4Zbio"> Pour le moment, il n'existe pas de catalogue de station pour la zone bioclimatique {1}. </message>
 <message id="matAptCS.zbio"> <h3>Choix de la zone bioclimatique</h3> </message>
-
 <message id="matAptCS.US"> <h3>Unités Stationnelles pour {1}</h3> </message>
 <message id="apt.t.O"> Optimum</message>
 <message id="apt.t.T"> Tolérance</message>
 <message id="aptCS.t.TE"> Accompagnement</message>
-<message id="aptCS.titreMatApt"> Tableau d'aptitude pour {1}, US {2}</message>
+<message id="aptCS.titreMatApt">Tableau d'aptitude</message>
+<message id="aptCS.titreUS"><h2>{1}, Unité stationnelle {2}: {3} </h2></message>
+<message id="meta.titre.guide-des-stations">Le guide des stations forestières</message>
+<message id="meta.desc.guide-des-stations">le guide des stations est un outil qui découpe le territoire en milieux-types, bien reconnaissables pour le forestier de terrain, dénommée unité stationnelle. En plus d’un choix d’essences approprié, le guide délivre des conseils de gestion spécifiques aux stations, par exemple en termes de protection des sols ou de promotion de la biodiversité. </message>
 
-
-  
- 
 </messages>

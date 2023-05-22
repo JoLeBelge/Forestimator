@@ -42,6 +42,7 @@ public:
     std::string getStyleName(){return "."+mStyleClassName;}
     std::string getStyleNameShort(){return mStyleClassName;}
     std::string getHTMLcode(){return "#"+mHTMLcode;}
+    std::string getRGB(){ return "rgb("+std::to_string(mR)+","+std::to_string(mG)+","+std::to_string(mB)+")";}
     std::string mStyleClassName,mHTMLcode;
     bool mDark;
 };

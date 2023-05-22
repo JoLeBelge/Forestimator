@@ -3,6 +3,7 @@
 
 #include "matapt.h"
 #include "cdicoapt.h"
+#include "Wt/WCssDecorationStyle.h"
 
 extern bool globTest2;
 using namespace  Wt;
@@ -19,12 +20,14 @@ private:
      Wt::WTable * mAptTable;
      WComboBox * zbioSelection_;
 
-     WContainerWidget * contUS;
+     WContainerWidget * contListeUS, *contFicheUS;
 
      void hoverBubble(WContainerWidget *c, bool hover);
      void changeZbio();
-     void updateUS();
+     void updateListeUS();
      void updateApt(int US,std::string aVar);
+     void displayNiche(std::string aEssCode);
+     void resetNiche();
      //void initAptTable(std::string aNTNHTitle);
 
      std::vector<std::vector<std::shared_ptr<cEss>>> mVEss;
@@ -32,6 +35,8 @@ private:
      int US_;
      std::string mVar_;
      zbioPainted * graphZbio;
+
+     std::map<std::tuple<int,std::string>, Wt::WPushButton *> mMapButtonUS;
 
 };
 #endif // MATAPTCS_H
