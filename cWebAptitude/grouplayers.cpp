@@ -183,7 +183,7 @@ void groupLayers::clickOnName(std::string aCode){
     }
 
     // cacher la fenetre popup
-    mParent->doJavaScript("overlay.setVisible(0);");
+    mParent->doJavaScript("overlay?.setVisible(0);");
 
     // changer le mode CS vs FEE de grouplayer, utilise pour le tableau d'aptitude
     // attention de ne pas prendre la couche "CS_FEE" dans le tas (pour Chêne Sessile).

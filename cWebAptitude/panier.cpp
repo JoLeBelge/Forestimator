@@ -79,7 +79,7 @@ void panier::addMap(std::string aCode, std::shared_ptr<Layer> l){
             bvis->setIcon("resources/eye_visible.png");
         else
             bvis->setIcon("resources/eye_notvisible.png");
-        mcWebAptitude->doJavaScript("activeLayers['"+aCode+"'].setVisible(!activeLayers['"+aCode+"'].values_.visible);");
+        mcWebAptitude->doJavaScript("activeLayers['"+aCode+"']?.setVisible(!activeLayers['"+aCode+"']?.values_.visible);");
     });
     /* bouton transparent/opaque */
     bvis = r->elementAt(2)->addWidget(cpp14::make_unique<WPushButton>("T"));
