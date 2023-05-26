@@ -90,10 +90,8 @@
             <user-agent>.*Expanse.*</user-agent>
             <user-agent>.*NetSystemsResearch.*</user-agent>
             <user-agent>.*Turnitin.*</user-agent>
-            
-            
-            
-            
+            <user-agent>.*bot.*</user-agent>
+           
             
             
 		</user-agents>

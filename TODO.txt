@@ -1,10 +1,6 @@
 TO DO forestimator
 ------------------
 
--carte ES en ligne ; simplifier pour ne garder que Scolyte/ pas scolyte, enlever les coupes normales qui sont moins bien cartographiées.
-
--export pdf ana surf
-
 réunion PL 23/11/2020
 -analyse Compo ; présence pour chaque essences plus typologie des peuplements (celle de IFPRW j'imagine - phil vois avec HC - moi je peux voir ce qu'on utilisais pour IFA - IFG)
 

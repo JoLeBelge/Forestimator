@@ -97,14 +97,8 @@ Maintenant que toutes les dépendances sont installées, on peut compiler Forest
 
 4) chemin d'accès aux couches cartographiques
 
-lien symbolique pour couches sur servcarto OLD OLD ---------
-
-il faut créer les directory data1/Carto/FEEW2020/, /data1/Carto/CS, puis y créer les liens symboliques
-sudo mkdir /data1 et tout 
-sudo ln -s /media/Data10/Forestimator/Station/* /data1/Carto/FEEW2020/
-
--- OLD OLD --- on abandonne l'utilisation des liens symboliques, c'est déjà assez le bronx comme ça
-
-Donc on faut utiliser les chemins d'accès dans les tables layersApt et fichiersGIS dans la BD.
+Utiliser les chemins d'accès dans les tables layersApt et fichiersGIS dans la BD. L'argument --colPath (ex: "Dir3") de l'executable ./WebAptitude permet de choisir le chemin d'accès propre à l'ordinateur.
 
 5) copier la bd cadastre.db, trop volumineuse que pour etre sur le dépot github.
+6) copier auth.db, analytics.db, qui sont dans gitignore car c'est la version sur le serveur qui doit rester l'unique version correcte.
+

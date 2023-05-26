@@ -228,7 +228,7 @@ PageAnalytics::PageAnalytics(const Wt::WEnvironment& env, std::string aFileDB) :
     table4->setHeaderCount(1);
     table4->setWidth(Wt::WLength("100%"));
     table4->toggleStyleClass("table-striped",true);
-    table4->elementAt(0, 0)->addNew<Wt::WText>("mois de l'année 2022");
+    table4->elementAt(0, 0)->addNew<Wt::WText>("mois de l'année 2022 et 2023");
     table4->elementAt(0, 1)->addNew<Wt::WText>("Nombre d'utilisateur");
 
     //q="SELECT COUNT(*)as nb FROM (SELECT COUNT(*)as nb FROM log  WHERE ip != '127.0.0.1' AND ip NOT LIKE '%139.165%' AND date LIKE '%2022-02%' GROUP BY ip);";
