@@ -98,25 +98,65 @@ void Layer::setActive(bool b){
     }
 }
 
-
+// bug 2023; on dirait que une fois sur 4, displayLayer ne fonctionne pas.
 void Layer::displayLayer() const{ 
-    std::string JScommand;
+    std::string JScommand=std::string("activeLayer  = new ol.layer.Tile({")+
+            "extent: extent,"+
+            "title: 'MYTITLE',"+
+            "source: new ol.source.TileWMS({"+
+                 "preload: Infinity,"+
+                "title: 'MYTITLE',"+
+                "url: 'MYURL',"+
+                "crossOrigin: 'null',"+
+                "attributions: 'MYATTRIBUTION',"+
+                "params: {"+
+                  "'LAYERS': 'MYLAYER',"+
+                  "'TILED': false,"+
+                  //'TILED': false, // avant était à true mais ça faisait bugger cartoweb_topo
+                  "'FORMAT': 'image/png'"+
+                "},"+
+                "tileGrid: tileGrid,"+
+                "projection: 'EPSG:31370',"+
+           " }),"+
+            //opacity: Object.keys(activeLayers).length==0?1:0.5 // première image ; opaque. Les autres ; tranparence
+           " opacity: 1"+
+        "});";
     //std::cout << "display layer " << std::endl;
 
-    std::string aFileIn(mDico->File("displayWMS"));
-    if (mTypeWMS==TypeWMS::ArcGisRest){ aFileIn=mDico->File("displayOLArcGisRest");}
-    std::ifstream in(aFileIn);
+    //std::string aFileIn(mDico->File("displayWMS"));
+    if (mTypeWMS==TypeWMS::ArcGisRest){
+        //aFileIn=mDico->File("displayOLArcGisRest");
+    JScommand=std::string("activeLayer  = new ol.layer.Tile({")+
+            "extent: extent,"+
+            "title: 'MYTITLE',"+
+              "  source: new ol.source.TileArcGISRest({"+
+              "    attributions: 'MYATTRIBUTION',"+
+               " url:'MYURL'"+
+              "}),"+
+             " opacity: 1"+
+        "});";
+
+    }
+
+    JScommand+="activeLayers['MYCODE'] = activeLayer;updateGroupeLayers();";
+
+   /* std::ifstream in(aFileIn);
     std::stringstream ss;
     ss << in.rdbuf();
-    in.close();
-    JScommand=ss.str();
+    in.close();*/
+
     boost::replace_all(JScommand,"MYTITLE",this->getLegendLabel());
     boost::replace_all(JScommand,"MYLAYER",mWMSLayerName);
     boost::replace_all(JScommand,"MYURL",mUrl);
     boost::replace_all(JScommand,"MYATTRIBUTION",mWMSattribution);
     boost::replace_all(JScommand,"MYCODE",mCode);
-    mWtText->doJavaScript(JScommand);
-    //std::cout << JScommand << std::endl;
+
+    //mWtText->doJavaScript(JScommand);
+    mGroupL->doJavaScript(JScommand);
+
+    if (globTest) {
+        std::cout << " javascript pour ajouter une couche "<< std::endl;
+        std::cout << JScommand << std::endl;}
 }
 
 std::vector<std::string> Layer::displayInfo(double x, double y){

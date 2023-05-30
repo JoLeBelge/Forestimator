@@ -92,7 +92,7 @@ void panier::addMap(std::string aCode, std::shared_ptr<Layer> l){
             bvis->setText("T");
         else
             bvis->setText("O");
-        mcWebAptitude->doJavaScript("activeLayers['"+aCode+"'].setOpacity(activeLayers['"+aCode+"'].getOpacity()==1?0.5:1);");
+        mcWebAptitude->doJavaScript("activeLayers['"+aCode+"']?.setOpacity(activeLayers['"+aCode+"']?.getOpacity()==1?0.5:1);");
     });
 
     int row=mTable->rowCount();
