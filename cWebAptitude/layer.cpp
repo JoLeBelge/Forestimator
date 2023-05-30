@@ -152,7 +152,7 @@ void Layer::displayLayer() const{
     boost::replace_all(JScommand,"MYCODE",mCode);
 
     //mWtText->doJavaScript(JScommand);
-    mGroupL->doJavaScript(JScommand);
+    mGroupL->mParent->doJavaScript(JScommand);
 
     if (globTest) {
         std::cout << " javascript pour ajouter une couche "<< std::endl;

@@ -184,6 +184,9 @@ public:
     JSlot slotMapExport;
     simplepoint * mAnaPoint;
 
+    // bof finalement c'est mieux le conteneur parent
+    Wt::WContainerWidget     * mParent;
+
 private:
 
     std::vector<std::shared_ptr<Layer>> mVLs;
@@ -193,8 +196,7 @@ private:
 
     sqlite3 *db_;
 
-    // bof finalement c'est mieux le conteneur parent
-    Wt::WContainerWidget     * mParent;
+
 
     JSignal<double, double, double, double>  sigMapExport;
     OGREnvelope mMapExtent;
