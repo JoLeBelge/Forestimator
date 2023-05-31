@@ -8,21 +8,24 @@ class color
 public:
     ~color(){}
     color(int R,int G,int B,std::string name="toto"):mR(R),mG(G),mB(B),mStyleClassName(name),mHTMLcode("toto"){isDark();}
+    color(const color &aCol):mR(aCol.mR),mG(aCol.mG),mB(aCol.mB),mStyleClassName(aCol.mStyleClassName),mHTMLcode(aCol.mHTMLcode),mDark(aCol.mDark){}
 
     color(std::string aHex,std::string name):mStyleClassName(name),mHTMLcode(aHex){
     //color(std::string aHex):mStyleClassName(aHex),mHTMLcode(aHex){
         // j'enlève le diaise qui semble ne pas convenir
         const char* c=aHex.substr(1,aHex.size()).c_str();
         sscanf(c, "%02x%02x%02x", &mR, &mG, &mB);
+        // fonctionne pas si #000000
+        if (mR<0  | mG <0| mB<0){mR=0;mG=0;mB=0;mStyleClassName="toto";mHTMLcode="#000000";}
         //std::cout << std::to_string(mR) << ";" <<std::to_string(mG) << ";" <<std::to_string(mB) << std::endl;
         isDark();
     }
     int mR,mG,mB;
-    void set(int &R,int &G,int &B){
+    const void set(int &R,int &G,int &B) const{
         R=mR;
         G=mG;
         B=mB;
-        isDark();
+        //isDark();
     }
 
     void isDark(){

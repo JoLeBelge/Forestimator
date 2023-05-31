@@ -264,15 +264,14 @@ public:
     // dans l'ordre alphabétique
     std::vector<std::string> Dico_Ess;
 
-    std::shared_ptr<cEss> getEss(std::string aCode){
-        std::shared_ptr<cEss> aRes=NULL;
-        if (mVEss.find(aCode)!=mVEss.end()){aRes=mVEss.at(aCode);} else {
-            std::cout << "getEss de cdicoapt, création d'une essence vide pour " << aCode << ", attention " << std::endl;
-            aRes= std::make_shared<cEss>("toto",this);
-        }
+    std::shared_ptr<cEss> getEss(std::string aCode);
+
+    bool hasEss(std::string aCode){
+        bool aRes(0);
+        if (mVEss.find(aCode)!=mVEss.end()){aRes=1;}
         return aRes;
     }
-    std::map<std::string,std::shared_ptr<cEss>> getAllEss(){return mVEss;}
+    std::map<std::string,std::shared_ptr<cEss>> getAllEss(){return mVEss;std::cout << "getAllEss()" << std::endl;}
 
     std::string File(std::string aCode){
         std::string aRes("");
@@ -281,15 +280,15 @@ public:
     }
 
     std::map<std::string,std::string>  * codeEs2Nom(){return  &Dico_codeEs2NomFR;}
-    std::map<std::string,color> colors;
+    std::map<std::string,std::shared_ptr<color>> colors;
 
-    color Apt2col(int aCode){
-        color aRes(0,0,0);
+    std::shared_ptr<color> Apt2col(int aCode){
+        std::shared_ptr<color> aRes=std::make_shared<color>(0,0,0);
         if (Dico_codeApt2col.find(aCode)!=Dico_codeApt2col.end()){aRes=Dico_codeApt2col.at(aCode);}
         return aRes;
     }
-    color getColor(std::string aCode){
-        color aRes(0,0,0);
+    std::shared_ptr<color> getColor(std::string aCode){
+        std::shared_ptr<color> aRes=std::make_shared<color>(0,0,0);
         if (colors.find(aCode)!=colors.end()){aRes=colors.at(aCode);
         } else { std::cout << "color " << aCode << " not found"<< std::endl;}
         return aRes;
@@ -356,7 +355,7 @@ protected:
     std::map<int,std::string>  dico_groupeNH2Label;// pour l'écogramme avec visu prédiciton random forest
     std::map<int,int>  dico_groupeNH2Nb;//nombre de niveau NH par groupe
     std::map<int,int>  dico_groupeNH2NHStart;// code nh qui débute le groupe.
-    std::map<int,color> Dico_codeApt2col;
+    std::map<int,std::shared_ptr<color>> Dico_codeApt2col;
 
 
     // key ; code le la couche layer. value ; les infos nécessaire pour charger le wms

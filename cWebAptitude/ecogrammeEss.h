@@ -44,7 +44,6 @@ private:
     //int mZbio,pixPerLevel;
     ST  * mST;
     int pixPerLevel,Width;
-    //Wt::WContainerWidget * mParent;
     void paintEvent(Wt::WPaintDevice *paintDevice);
 };
 

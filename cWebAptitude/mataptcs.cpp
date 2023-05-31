@@ -11,6 +11,7 @@ matAptCS::matAptCS(cDicoApt *aDicoApt):mDicoApt(aDicoApt),zbio_(1),US_(1),mVar_(
     /* 1 Intro ---------------------------*/
     layoutGlobal->addWidget(cpp14::make_unique<WText>(tr("CS.intro")));
      /* 2 Zbio ---------------------------*/
+    if(0){
     WContainerWidget * contZbioGlob = layoutGlobal->addWidget(cpp14::make_unique<WContainerWidget>());
     WVBoxLayout * layoutDroite = contZbioGlob->setLayout(cpp14::make_unique<WVBoxLayout>());
     WContainerWidget * contZbio = layoutDroite->addWidget(cpp14::make_unique<WContainerWidget>());
@@ -36,6 +37,8 @@ matAptCS::matAptCS(cDicoApt *aDicoApt):mDicoApt(aDicoApt),zbio_(1),US_(1),mVar_(
     contFicheUS = layoutGlobal->addWidget(cpp14::make_unique<WContainerWidget>());
     mAptTable = layoutGlobal->addWidget(cpp14::make_unique<WTable>());
     updateListeUS();
+    }
+
 }
 
 
@@ -57,12 +60,12 @@ void matAptCS::updateListeUS(){
         Wt::WPushButton* us =contListeUS->addWidget(cpp14::make_unique<Wt::WPushButton>());
         us->addStyleClass("position-relative");
         us->setTextFormat(Wt::TextFormat::XHTML);
-        color col=CSlay->getColor(std::get<0>(kv.first));
+        std::shared_ptr<color> col=CSlay->getColor(std::get<0>(kv.first));
 
         if (std::get<1>(kv.first)==""){
-            us->setText(tr("matAptCS.nobadge").arg(std::to_string(std::get<0>(kv.first))).arg(col.getRGB()));
+            us->setText(tr("matAptCS.nobadge").arg(std::to_string(std::get<0>(kv.first))).arg(col->getRGB()));
         }else{
-            us->setText(tr("matAptCS.badge").arg(std::to_string(std::get<0>(kv.first))).arg(std::get<1>(kv.first)).arg(col.getRGB()));
+            us->setText(tr("matAptCS.badge").arg(std::to_string(std::get<0>(kv.first))).arg(std::get<1>(kv.first)).arg(col->getRGB()));
         }
         //us->addStyleClass(CSlay->getColor(std::get<0>(kv.first)).getStyleNameShort()); // fonctionne pas..
 
@@ -93,9 +96,9 @@ void matAptCS::updateApt(int US, std::string aVar){
     contFicheUS->addWidget(cpp14::make_unique<WText>(tr("aptCS.titreUS").arg(mDicoApt->ZBIO(zbio_)).arg(std::to_string(US_)).arg(usLabel)));
 
     for (int apt : {1,2,3}){
-        std::vector<std::shared_ptr<cEss>> aV;
-        for (auto kv : mDicoApt->getAllEss()){
-            std::shared_ptr<cEss> ess = kv.second;
+        std::vector<cEss*> aV;
+        for (const auto &kv : mDicoApt->getAllEss()){
+            cEss * ess = kv.second.get();
             if (ess->hasCSApt()){
                 if (mDicoApt->AptNonContraignante(ess->getApt(zbio_,US_,mVar_))==apt){
                     aV.push_back(ess);
@@ -103,7 +106,7 @@ void matAptCS::updateApt(int US, std::string aVar){
             }
         }
         //std::cout << "aptitude " << std::to_string(apt) << " contient " << aV.size() << " essences" <<std::endl;
-        mVEss.push_back(aV);
+        mVEss.push_back(aV);// ici push back , là haut clear; çe sont des élément partagé avec mDico, je ne peux pas les supprimer comme ça!
     }
 
     // maintenant que les essences sont triées, update table apt
@@ -125,7 +128,7 @@ void matAptCS::updateApt(int US, std::string aVar){
         mAptTable->elementAt(rGlob,cGlob)->addStyleClass(styleName);
         std::string styleNameCol("col-apt"+std::to_string(apt));
         int r(0),col(0);
-        std::vector<std::shared_ptr<cEss>> aV=mVEss.at(apt-1);
+        std::vector<cEss*> aV=mVEss.at(apt-1);
         int ncells=std::ceil(std::sqrt(aV.size()));
         for (int n(0);n<aV.size();n++){
             WContainerWidget * c = t1->elementAt(r,col)->addNew<WContainerWidget>();

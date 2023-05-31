@@ -196,7 +196,7 @@ cDicoApt::cDicoApt(std::string aBDFile):cdicoAptBase(aBDFile)
                             // problème quand c'est le code hexadécimal ,c'est que la fonction getCol fonctionne avec un nom de couleur.. donc le nom doit-être le mm que le code hexa, comme ça c'est pa ambigu. sauf que c'est peut-être pas opportun d'avoir un diaise en début de nom..
 
                             //std::cout << "creation couleur nom " << col.substr(1,col.size()) << std::endl;
-                            colors.emplace(std::make_pair(col,color(col,col.substr(1,col.size()))));
+                            colors.emplace(std::make_pair(col,std::make_shared<color>(col,col.substr(1,col.size()))));
                         }
                     }
                 }
@@ -267,8 +267,8 @@ std::map<int,std::string> cDicoApt::getDicoRaster(std::string aCode){
     return aRes;
 }
 
-std::map<int,color> cDicoApt::getDicoRasterCol(std::string aCode){
-    std::map<int,color> aRes;
+std::map<int,std::shared_ptr<color>> cDicoApt::getDicoRasterCol(std::string aCode){
+    std::map<int,std::shared_ptr<color>> aRes;
 
     sqlite3_stmt * stmt;
     std::string SQLstring="SELECT nom_dico, nom_field_raster, nom_field_value, condition FROM "+RasterTable(aCode)+" WHERE Code='"+ aCode+"';";
@@ -299,7 +299,7 @@ std::map<int,color> cDicoApt::getDicoRasterCol(std::string aCode){
             if (aB.substr(0,1)=="#") {
                 //if (globTest){std::cout << " ajout dans dicoCol " << aA << " , col " << aB << " table" << nom_dico << std::endl;}
                 // il faut d'office l'ajouter au vecteur colors, car les styles sont créé via ce vecteur
-                colors.emplace(std::make_pair(aB,color(aB,aB)));
+                colors.emplace(std::make_pair(aB,std::make_shared<color>(aB,aB)));
             }
 
             aRes.emplace(std::make_pair(aA,getColor(aB)));
@@ -310,8 +310,8 @@ std::map<int,color> cDicoApt::getDicoRasterCol(std::string aCode){
 }
 
 
-std::map<int,color> cDicoApt::getDicoRasterCol(cKKCS * aKK){
-    std::map<int,color> aRes;
+std::map<int,std::shared_ptr<color>> cDicoApt::getDicoRasterCol(cKKCS * aKK){
+   std::map<int,std::shared_ptr<color>> aRes;
 
     sqlite3_stmt * stmt;
     std::string SQLstring("");

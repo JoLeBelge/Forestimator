@@ -28,8 +28,8 @@ layerStatChart::layerStatChart(std::shared_ptr<Layer> aLay, std::map<std::string
         mModel->setData(  row, 1, kv.second);
         //mModel->setData(  row, 2, WString(""));
         // ça me retourne la couleur, moi j'aimerai le nom de cette couleur qui est utilisé pour l'ajout d'un style dans la styleClass de l'application
-        color col=mLay->getColor(kv.first);
-        mModel->itemFromIndex(mModel->index(row,1))->setStyleClass(col.getStyleNameShort());
+        std::shared_ptr<color> col=mLay->getColor(kv.first);
+        mModel->itemFromIndex(mModel->index(row,1))->setStyleClass(col->getStyleNameShort());
 
         if (kv.second>aMax) {aMax=kv.second; rowAtMax=row;}
         row++;
@@ -468,8 +468,8 @@ void batonnetApt::paintEvent(Wt::WPaintDevice *paintDevice){
         //std::cout << "batonnet Aptitude " << kv.first << " " << kv.second << std::endl;
 
         std::string aCodeStr(kv.first);
-        color col(mLayStat->Lay()->getColor(aCodeStr));
-        painter.setBrush(Wt::WBrush(Wt::WColor(col.mR,col.mG,col.mB)));
+        std::shared_ptr<color> col(mLayStat->Lay()->getColor(aCodeStr));
+        painter.setBrush(Wt::WBrush(Wt::WColor(col->mR,col->mG,col->mB)));
         double width=kv.second*(mW/100.0);
         painter.drawRect(xcumul, 0, width, mH);
 

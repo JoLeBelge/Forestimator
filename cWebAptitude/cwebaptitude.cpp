@@ -13,13 +13,15 @@ cWebAptitude::cWebAptitude(AuthApplication *app, Auth::AuthWidget* authWidget_)
     mApp->setLoadingIndicator(cpp14::make_unique<Wt::WOverlayLoadingIndicator>());
     mApp->loadingIndicator()->setMessage(tr("defaultLoadingI"));
 
-    for (auto kv : mDico->colors){
-        color col= kv.second;
+    // std::cout << "nombre de couleurs: " << mDico->colors.size() << std::endl;
+    for (const auto & kv : mDico->colors){
+       // std::cout << kv.first << ", " << kv.second->cat() << std::endl;
+        color * col=kv.second.get();
         //std::cout << "add getStyleName() " << col.getStyleName() << std::endl;
         WCssDecorationStyle styleBgrd;
-        styleBgrd.setBackgroundColor(WColor(col.mR,col.mG,col.mB));
-        if (col.dark()){styleBgrd.setForegroundColor(WColor("white"));}
-        app->styleSheet().addRule(col.getStyleName(), styleBgrd);
+        styleBgrd.setBackgroundColor(WColor(col->mR,col->mG,col->mB));
+        if (col->dark()){styleBgrd.setForegroundColor(WColor("white"));}
+        app->styleSheet().addRule(col->getStyleName(), styleBgrd);
     }
 
     addStyleClass("cWebAptitude");

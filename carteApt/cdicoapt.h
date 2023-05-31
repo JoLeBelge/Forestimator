@@ -70,7 +70,7 @@ public:
     // clé : risque id. value; catégorie ID
 
 
-    std::map<int, color>  codeApt2col(){return  Dico_codeApt2col;}
+    std::map<int, std::shared_ptr<color>>  codeApt2col(){return  Dico_codeApt2col;}
 
     std::string BDpath(){return mBDpath;}
 
@@ -192,9 +192,9 @@ public:
     std::map<int,std::map<int,std::vector<std::string>>> getHabitatCS(std::string aColName);
 
     // pour les cRasterInfo, carte thématique
-    std::map<int,color> getDicoRasterCol(std::string aCode);
+    std::map<int, std::shared_ptr<color> > getDicoRasterCol(std::string aCode);
     // pour les cKKCS,
-    std::map<int,color> getDicoRasterCol(cKKCS * aKK);
+    std::map<int, std::shared_ptr<color> > getDicoRasterCol(cKKCS * aKK);
 
 
     bool lay4Visu(std::string aLayerCode){

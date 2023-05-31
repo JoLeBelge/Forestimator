@@ -14,7 +14,7 @@ public:
     matAptCS(cDicoApt * aDicoApt);
 
 private:
-    cDicoApt * mDicoApt;
+     cDicoApt * mDicoApt;
 
     // un tableau 3 colonne pour les aptitudes
      Wt::WTable * mAptTable;
@@ -30,7 +30,7 @@ private:
      void resetNiche();
      //void initAptTable(std::string aNTNHTitle);
 
-     std::vector<std::vector<std::shared_ptr<cEss>>> mVEss;
+     std::vector<std::vector<cEss*>> mVEss;
      int zbio_;
      int US_;
      std::string mVar_;

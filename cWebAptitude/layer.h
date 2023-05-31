@@ -62,7 +62,7 @@ public:
     std::shared_ptr<cEss> Ess(){
         //code == 'EP_FEE'
         //std::cout <<" layer code " << mCode << ", substr" <<mCode.substr(0,2) << std::endl;
-        return mDico->getEss(mCode.substr(0,2));}
+        return mDico->getEss(EssCode());}
     bool l4Stat(){return mLay4Stat;}
     bool l4StatP(){return mLay4StatPonctuel;}
 

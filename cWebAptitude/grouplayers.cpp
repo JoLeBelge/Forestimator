@@ -149,7 +149,7 @@ groupLayers::~groupLayers(){
     delete mAnaPoint;
     delete mStation;
     //delete mSelect4Stat;
-    delete mSelectLayers;
+    //delete mSelectLayers;
     mMap=NULL;
     m_app=NULL;
     mDico=NULL;
@@ -423,9 +423,12 @@ std::map<std::string,int> groupLayers::apts(){
             for (std::shared_ptr<Layer> l : mVLs){
                 if (l->getCatLayer()==TypeLayer::FEE ){
                     // j'ai deux solution pour avoir les aptitudes ; soit je lis la valeur du raster apt, soit je recalcule l'aptitude avec les variables environnementales
-                    std::shared_ptr<cEss> Ess= l->Ess();
+                    //std::shared_ptr<cEss> Ess= l->Ess();
+                    if (mDico->hasEss(l->EssCode())){
+                    std::shared_ptr<cEss> Ess= mDico->getEss(l->EssCode());
                     int apt = Ess->getFinalApt(mStation->mNT,mStation->mNH, mStation->mZBIO, mStation->mTOPO);
                     aRes.emplace(std::make_pair(Ess->Code(),apt));
+                    }
                 }
             }
         }
@@ -525,10 +528,10 @@ void groupLayers::updateLegende(const std::shared_ptr<Layer> l){
         int row(0);
         for (auto kv : l->getDicoVal()){
             if (l->hasColor(kv.first)){
-                color col = l->getColor(kv.first);
+                std::shared_ptr<color> col = l->getColor(kv.first);
                 tab->elementAt(row, 0)->addWidget(cpp14::make_unique<WText>(kv.second));
                 tab->elementAt(row, 1)->setWidth("40%");
-                tab->elementAt(row, 1)->decorationStyle().setBackgroundColor(WColor(col.mR,col.mG,col.mB));
+                tab->elementAt(row, 1)->decorationStyle().setBackgroundColor(WColor(col->mR,col->mG,col->mB));
                 row++;
             }
         }

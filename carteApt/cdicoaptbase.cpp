@@ -1,6 +1,7 @@
 #include "cdicoaptbase.h"
 
 std::string columnPath("Dir2");
+extern bool globTest;
 
 cdicoAptBase::cdicoAptBase(std::string aBDFile):mBDpath(aBDFile),ptDb_(NULL)
 {
@@ -215,7 +216,7 @@ cdicoAptBase::cdicoAptBase(std::string aBDFile):mBDpath(aBDFile),ptDb_(NULL)
                 int R=sqlite3_column_int( stmt, 1 );
                 int G=sqlite3_column_int( stmt, 2 );
                 int B=sqlite3_column_int( stmt, 3 );
-                colors.emplace(std::make_pair(aA,color(R,G,B,aA)));
+                colors.emplace(std::make_pair(aA,std::make_shared<color>(R,G,B,aA)));
             }
         }
         sqlite3_finalize(stmt);
@@ -229,7 +230,7 @@ cdicoAptBase::cdicoAptBase(std::string aBDFile):mBDpath(aBDFile),ptDb_(NULL)
                 int R=sqlite3_column_int( stmt, 1 );
                 int G=sqlite3_column_int( stmt, 2 );
                 int B=sqlite3_column_int( stmt, 3 );
-                colors.emplace(std::make_pair(aA,color(R,G,B,aA)));
+                colors.emplace(std::make_pair(aA,std::make_shared<color>(R,G,B,aA)));
             }
         }
         sqlite3_finalize(stmt);
@@ -243,7 +244,7 @@ cdicoAptBase::cdicoAptBase(std::string aBDFile):mBDpath(aBDFile),ptDb_(NULL)
                 int aA=sqlite3_column_int( stmt, 0 );
                 std::string aB=std::string( (char *)sqlite3_column_text( stmt, 1 ));
                 //std::cout << aA << ";";
-                colors.emplace(std::make_pair(std::to_string(aA),color(aB,std::to_string(aA))));
+                colors.emplace(std::make_pair(std::to_string(aA),std::make_shared<color>(aB,std::to_string(aA))));
             }
         }
         sqlite3_finalize(stmt);
@@ -606,6 +607,16 @@ bool cEss::hasRisqueComp(int zbio,int topo){
 TypeWMS str2TypeWMS(const std::string& str){
     TypeWMS aRes=TypeWMS::WMS;
     if(str == "ArcGisRest") {aRes=TypeWMS::ArcGisRest;}
+    return aRes;
+}
+
+std::shared_ptr<cEss> cdicoAptBase::getEss(std::string aCode){
+    if (globTest){std::cout << "getEss" << std::endl;}
+    std::shared_ptr<cEss> aRes=NULL;
+    if (hasEss(aCode)){aRes=mVEss.at(aCode);} else {
+        std::cout << "getEss de cdicoapt, création d'une essence vide pour " << aCode << ", attention " << std::endl;
+        aRes= std::make_shared<cEss>("toto",this);
+    }
     return aRes;
 }
 

@@ -600,7 +600,7 @@ bool commonEss(std::string aCode, std::vector<std::shared_ptr<cEss>> & aV2){
 }
 
 zbioPainted::zbioPainted(std::string  aShp, cdicoAptBase *aDico)
-    : WPaintedWidget(),zbio_(1),shpPath(aShp),mSx(400),mSy(200),displayApt_(0),mDico(aDico),mlay(NULL)
+    : WPaintedWidget(),zbio_(1),shpPath(aShp),mSx(400),mSy(200),displayApt_(0),mDico(aDico),mlay(NULL),mDS(NULL)
 {
     GDALAllRegister();
     resize(mSx,mSy);   // Provide a default size.
@@ -639,8 +639,8 @@ void zbioPainted::paintEvent(Wt::WPaintDevice *paintDevice){
                 pen0.setWidth(1);
                 painter.setPen(pen0);
                 int apt =mDico->getEss(essCoce_)->getApt(currentZbio);
-                color col= mDico->Apt2col(apt);
-                painter.setBrush(Wt::WBrush(Wt::WColor(col.mR,col.mG,col.mB)));
+                std::shared_ptr<color> col= mDico->Apt2col(apt);
+                painter.setBrush(Wt::WBrush(Wt::WColor(col->mR,col->mG,col->mB)));
             } else {
                 if (currentZbio==zbio_){
                     Wt::WPen pen0(Wt::WColor(Wt::StandardColor::Yellow));

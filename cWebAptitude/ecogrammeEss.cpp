@@ -2,9 +2,6 @@
 
 EcogrammeEss::EcogrammeEss(cEss * aEss, ST * aStation):mEss(aEss),mDico(aEss->Dico()),mST(aStation)
 { 
-    //setLayoutSizeAware(1);
-    //std::cout << " \n\n\n mParent width" << mParent->width().toPixels() << std::endl;
-    //resize(mParent->width().toPixels(),mParent->width().toPixels()*(15.0/7.0));
     resize(200,200*(15.0/7.0));
     //resize(this->parent()->width(),this->parent()->width()*15.0/7.0);
     //resize(pixPerLevel*7, pixPerLevel*15);   // Provide a default size. non sinon ne se resize pas.
@@ -43,9 +40,9 @@ void EcogrammeEss::draw(Wt::WPainter *painter){
                 int codeNT=kvNT.first;
                 // on veut l'aptitude hydro-trophique, pas celle hierarchique Bioclim/HydroTroph.
                 int apt=mEss->getApt(codeNT,codeNH,mST->mZBIO,false);
-                color colApt=mDico->Apt2col(apt);
+                std::shared_ptr<color> colApt=mDico->Apt2col(apt);
                 int R,G,B;
-                colApt.set(R,G,B);
+                colApt->set(R,G,B);
                 painter->setBrush(Wt::WBrush(Wt::WColor(R,G,B)));
                 double x=(codeNT-7)*pixPerLevel+0.5;//+0.5*pixPerLevel+0.5;
                 double y=mDico->posEcoNH(codeNH)*pixPerLevel+0.5;//+0.5*pixPerLevel+0.5;
@@ -112,10 +109,10 @@ void EcogrammeEss::draw(Wt::WPainter *painter, int x0, int y0, int x1, int y1, i
                 int codeNT=kvNT.first;
                 // on veut l'aptitude hydro-trophique, pas celle hierarchique Bioclim/HydroTroph.
                 int apt=mEss->getApt(codeNT,codeNH,mST->mZBIO,false);
-                color colApt=mDico->Apt2col(apt);
-                int R,G,B;
-                colApt.set(R,G,B);
-                painter->setBrush(Wt::WBrush(Wt::WColor(R,G,B)));
+                std::shared_ptr<color> colApt=mDico->Apt2col(apt);
+                //int R,G,B;
+                //colApt->set(R,G,B);
+                painter->setBrush(Wt::WBrush(Wt::WColor(colApt->mR,colApt->mG,colApt->mB)));
                 double x=x0+(codeNT-7)*apixPerLevelX+0.5;
                 // checkRHA
                 double y(0);

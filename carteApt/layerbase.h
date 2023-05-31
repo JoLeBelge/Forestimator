@@ -261,7 +261,7 @@ public:
 
     TypeCarte TypeCart(){return mTypeCarte;}
     std::map<int, std::string> getDicoVal(){return mDicoVal;}
-    std::map<int, color>  getDicoCol(){return mDicoCol;}
+    std::map<int, std::shared_ptr<color>>  getDicoCol(){return mDicoCol;}
 
     TypeVar getTypeVar() const{return mTypeVar;}
     TypeLayer getCatLayer() const{return mType;}
@@ -299,13 +299,13 @@ public:
         if (mDicoCol.find(aCode)!=mDicoCol.end()){aRes=true;}
         return aRes;
     }
-    color getColor(int aCode) const{
-        color aRes(0,0,0);
+    std::shared_ptr<color> getColor(int aCode) const{
+        std::shared_ptr<color> aRes=std::make_shared<color>(0,0,0);
         if (mDicoCol.find(aCode)!=mDicoCol.end()){
             aRes=mDicoCol.at(aCode);}
         return aRes;
     }
-    color getColor(std::string aStrCode) const;
+    std::shared_ptr<color> getColor(std::string aStrCode) const;
     cDicoApt * Dico(){return mDico;}
 
     // convertir le wms de la couche au format image en local
@@ -327,7 +327,7 @@ protected:
     std::map<int, std::string> mDicoVal;
 
     // le dictionnaire des valeurs raster vers la couleur.
-    std::map<int, color> mDicoCol;
+    std::map<int, std::shared_ptr<color>> mDicoCol;
     // pour distinguer les cartes qui sont accèssible à tous ou pas
     bool mExpert;
     double mGain;
@@ -385,7 +385,7 @@ public:
 
     int getEchelle(int aZbio,int aSTId);
     int getHab(int aZbio,int aSTId);
-    std::map<int, color> getDicoCol(){return mDicoCol;}
+    std::map<int,std::shared_ptr<color>> getDicoCol(){return mDicoCol;}
     std::map<int, std::string> getDicoVal(){return mDicoVal;}
     std::map<int, std::string> * getDicoValPtr(){return &mDicoVal;}
     TypeCarte Type(){return mType;}
@@ -405,7 +405,7 @@ private:
     // le dictionnaire des valeurs raster vers leur signification.
     std::map<int, std::string> mDicoVal;
     // le dictionnaire des valeurs raster vers leur signification.
-    std::map<int, color> mDicoCol;
+    std::map<int,std::shared_ptr<color>> mDicoCol;
 };
 
 

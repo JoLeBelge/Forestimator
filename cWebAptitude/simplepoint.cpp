@@ -151,7 +151,7 @@ void simplepoint::afficheAptAllEss(){
         //WText *titre = mAptAllEss->elementAt(row,0)->addWidget(cpp14::make_unique<WText>("<h4>Aptitude "+ mGL->TypeClasStr()+"</h4>"));
         mAptAllEss->elementAt(row,0)->addWidget(cpp14::make_unique<WText>("<h4>Aptitude "+ mGL->TypeClasStr()+"</h4>"));
         row++;
-        color col(0,0,0);
+        std::shared_ptr<color> col=std::make_shared<color>(0,0,0);
         if (O.size()>0){
             col = mGL->Dico()->Apt2col(1);
             for (auto & kv : O){

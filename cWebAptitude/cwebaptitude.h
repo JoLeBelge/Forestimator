@@ -70,6 +70,7 @@ class cWebAptitude : public Wt::WContainerWidget
 public:
 
     cWebAptitude(AuthApplication *app, Wt::Auth::AuthWidget* authWidget_);
+    ~cWebAptitude(){delete mGroupL;}
 
     void handlePathChange();
 
