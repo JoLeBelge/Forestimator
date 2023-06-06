@@ -200,6 +200,7 @@ cWebAptitude::cWebAptitude(AuthApplication *app, Auth::AuthWidget* authWidget_)
    if (globTest){ printf("create GL\n");}
     mGroupL = new groupLayers(mApp,this);
     //load_content_couches(content_couches);
+    if (globTest){ printf("done\n");}
 
     mPanier = content_panier->addWidget(Wt::cpp14::make_unique<panier>(mApp, this));
 

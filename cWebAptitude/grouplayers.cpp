@@ -145,11 +145,9 @@ groupLayers::groupLayers(AuthApplication *app, cWebAptitude * cWebApt):
 }
 
 groupLayers::~groupLayers(){
-    std::cout << "destructeur de group layer " << std::endl;
+    if(globTest){std::cout << "destructeur de group layer " << std::endl;}
     delete mAnaPoint;
     delete mStation;
-    //delete mSelect4Stat;
-    //delete mSelectLayers;
     mMap=NULL;
     m_app=NULL;
     mDico=NULL;

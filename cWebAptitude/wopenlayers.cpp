@@ -8,24 +8,14 @@ WOpenLayers::WOpenLayers(cDicoApt *aDico):xy_(this,"1.0"),mDico(aDico),slot(this
     setLayoutSizeAware(1);
 
     setId("map");//sans ça le script js ne sert à rien car ne vise aucun objet cible
-    if (!exists(mDico->File("initOL"))){ std::cout << "\n\n\n pas trouvé initOL.js (" <<mDico->File("initOL") << " ), ça va planter!!! \n\n\n"<< std::endl;}
+
+    if (!exists(mDico->File("initOL"))){ std::cout << "\n\n\n pas trouvé initOL.js (" <<mDico->File("initOL") << " ), ça va planter!!! \n\n\n"<< std::endl;
+    }else{
     std::ifstream t(mDico->File("initOL"));
     std::stringstream ss;
     ss << t.rdbuf();
     doJavaScript(ss.str());
-
     setToolTip(tr("tooltipMap1"));
-
-    // le popup pour afficher la valeur de la couche en cours d'affichage
-    Wt::WContainerWidget * popup = addNew<Wt::WContainerWidget>();
-    popup->setId("popup");
-    popup->setStyleClass("ol-popup");
-    Wt::WLink link = Wt::WLink("");// sert à rien en fait
-    Wt::WContainerWidget * popupCloser = popup->addNew<Wt::WAnchor>(link);
-    popupCloser->setId("popup-closer");
-    popupCloser->setStyleClass("ol-popup-closer");
-    Wt::WContainerWidget * popupContent = popup->addNew<Wt::WContainerWidget>();
-    popupContent->setId("popup-content");
 
     // slots
 
@@ -86,6 +76,19 @@ WOpenLayers::WOpenLayers(cDicoApt *aDico):xy_(this,"1.0"),mDico(aDico),slot(this
     touchStarted().preventDefaultAction(true);
     touchMoved().preventDefaultAction(true);
     touchEnded().preventDefaultAction(true);
+
+    }
+
+    // le popup pour afficher la valeur de la couche en cours d'affichage
+    Wt::WContainerWidget * popup = addNew<Wt::WContainerWidget>();
+    popup->setId("popup");
+    popup->setStyleClass("ol-popup");
+    Wt::WLink link = Wt::WLink("");// sert à rien en fait
+    Wt::WContainerWidget * popupCloser = popup->addNew<Wt::WAnchor>(link);
+    popupCloser->setId("popup-closer");
+    popupCloser->setStyleClass("ol-popup-closer");
+    Wt::WContainerWidget * popupContent = popup->addNew<Wt::WContainerWidget>();
+    popupContent->setId("popup-content");
 
 }
 

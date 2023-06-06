@@ -64,7 +64,8 @@ private:
     int zbio_;
     bool displayApt_;
     std::string shpPath, essCoce_;
-    std::shared_ptr<cdicoAptBase> mDico;
+    //std::shared_ptr<cdicoAptBase> mDico;
+    cdicoAptBase * mDico;
     OGRLayer * mlay;
     GDALDataset * mDS;
 };

@@ -11,7 +11,6 @@ matAptCS::matAptCS(cDicoApt *aDicoApt):mDicoApt(aDicoApt),zbio_(1),US_(1),mVar_(
     /* 1 Intro ---------------------------*/
     layoutGlobal->addWidget(cpp14::make_unique<WText>(tr("CS.intro")));
      /* 2 Zbio ---------------------------*/
-    if(0){
     WContainerWidget * contZbioGlob = layoutGlobal->addWidget(cpp14::make_unique<WContainerWidget>());
     WVBoxLayout * layoutDroite = contZbioGlob->setLayout(cpp14::make_unique<WVBoxLayout>());
     WContainerWidget * contZbio = layoutDroite->addWidget(cpp14::make_unique<WContainerWidget>());
@@ -19,7 +18,7 @@ matAptCS::matAptCS(cDicoApt *aDicoApt):mDicoApt(aDicoApt),zbio_(1),US_(1),mVar_(
     WContainerWidget * contZbioGauche = layoutzbio->addWidget(cpp14::make_unique<WContainerWidget>());
     contZbioGauche->addWidget(std::make_unique<Wt::WText>(tr("matAptCS.zbio")));
     zbioSelection_  =contZbioGauche->addWidget(std::make_unique<Wt::WComboBox>());
-    for (auto kv : *mDicoApt->ZBIO()){
+    for (const auto &kv : *mDicoApt->ZBIO()){
         if(kv.first==1 | kv.first==2 |kv.first==3 | kv.first==10 | kv.first==5){
             zbioSelection_->addItem(kv.second);
         }
@@ -37,7 +36,6 @@ matAptCS::matAptCS(cDicoApt *aDicoApt):mDicoApt(aDicoApt),zbio_(1),US_(1),mVar_(
     contFicheUS = layoutGlobal->addWidget(cpp14::make_unique<WContainerWidget>());
     mAptTable = layoutGlobal->addWidget(cpp14::make_unique<WTable>());
     updateListeUS();
-    }
 
 }
 
@@ -68,9 +66,7 @@ void matAptCS::updateListeUS(){
             us->setText(tr("matAptCS.badge").arg(std::to_string(std::get<0>(kv.first))).arg(std::get<1>(kv.first)).arg(col->getRGB()));
         }
         //us->addStyleClass(CSlay->getColor(std::get<0>(kv.first)).getStyleNameShort()); // fonctionne pas..
-
         //us->decorationStyle().setBackgroundColor(WColor(col.mR,col.mG,col.mB));// fonctionne mais interfère avec hoverEss qui change la couleur.
-
         //std::cout << " add style class " << CSlay->getColor(std::get<0>(kv.first)).getStyleName() << std::endl;
         us->setToolTip(kv.second);
         us->clicked().connect([=]{this->updateApt(std::get<0>(kv.first),std::get<1>(kv.first));});
@@ -194,7 +190,7 @@ void matAptCS::hoverBubble(WContainerWidget * c, bool hover){
 }
 
 void matAptCS::displayNiche(std::string aEssCode){
-    std::shared_ptr<cEss> ess=mDicoApt->getEss(aEssCode);
+    cEss * ess=mDicoApt->getEss(aEssCode).get();
     // boucle sur toute les stations
     for (auto kv : mMapButtonUS){
         int us=std::get<0>(kv.first);
