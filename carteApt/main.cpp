@@ -26,7 +26,7 @@ extern string columnPath;
 
 int main(int argc, char *argv[])
 {
-    po::options_description desc("options pour l'outil de calcul des cartes");
+    po::options_description desc("options pour l'outil de calcul des cartes ");
     desc.add_options()
             ("help", "produce help message")
             ("carteNT", po::value<bool>(), "calcul de la carte des NT")

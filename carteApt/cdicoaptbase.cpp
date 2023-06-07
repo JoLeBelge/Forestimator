@@ -468,20 +468,23 @@ std::map<int,std::map<std::tuple<int, std::string>,int>> cdicoAptBase::getCSApt(
 
 std::string roundDouble(double d, int precisionVal){
     std::string aRes("");
-    if (precisionVal>0){aRes=std::to_string(d).substr(0, std::to_string(d).find(".") + precisionVal + 1);}
+    if (precisionVal>0){
+        aRes=std::to_string(d).substr(0, std::to_string(d).find(".") + precisionVal + 1);
+    }
     else  {
-        aRes=std::to_string(d+0.5).substr(0, std::to_string(d+0.5).find("."));}
+        aRes=std::to_string(d+0.5).substr(0, std::to_string(d+0.5).find("."));
+    }
     return aRes;
 }
 
 cEss::cEss(std::string aCodeEs, cdicoAptBase *aDico):mCode(aCodeEs),mNomFR(aDico->accroEss2Nom(aCodeEs)),mDico(aDico)
   ,mType(Apt),mPrefix(aDico->accroEss2prefix(aCodeEs)){
     //std::cout << "creation de l'essence " << mNomFR << std::endl;
-    mEcoVal=aDico->getFEEApt(mCode);
-    mAptCS=aDico->getCSApt(mCode);
-    mAptZbio=aDico->getZBIOApt(mCode);
-    mRisqueTopo=aDico->getRisqueTopo(mCode);
-    mFeRe=aDico->accroEss2FeRe(aCodeEs);
+    mEcoVal = aDico->getFEEApt(mCode);
+    mAptCS = aDico->getCSApt(mCode);
+    mAptZbio = aDico->getZBIOApt(mCode);
+    mRisqueTopo = aDico->getRisqueTopo(mCode);
+    mFeRe = aDico->accroEss2FeRe(aCodeEs);
 }
 
 //effectue la confrontation Apt Zbio et AptHydroTrophiue

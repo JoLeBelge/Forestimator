@@ -1,6 +1,4 @@
-#pragma once
 #include "auth.h"
-#include "cwebaptitude.h"
 
 using namespace std;
 using namespace Wt;

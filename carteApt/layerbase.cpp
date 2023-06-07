@@ -262,7 +262,7 @@ void statHdomBase::predictHdomHex(){
     mVaddPol=hexGeombin(mask);
 
     // sauver sur disk pour vérification
-    /*
+    
     const char *pszFormat = "GTiff";
     GDALDriver * pDriver = GetGDALDriverManager()->GetDriverByName(pszFormat);
     if( pDriver != NULL )

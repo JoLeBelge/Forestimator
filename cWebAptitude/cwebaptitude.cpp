@@ -1,6 +1,4 @@
-#pragma once
 #include "cwebaptitude.h"
-//#include "auth.h"
 
 extern bool globTest;
 

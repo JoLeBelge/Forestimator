@@ -5,7 +5,7 @@
 #pragma once
 #include <stdio.h>
 #include "Session.h"
-
+#include "cwebaptitude.h"
 
 #include <unistd.h>
 #include <stdio.h>
