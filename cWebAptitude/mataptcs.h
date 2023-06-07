@@ -4,6 +4,7 @@
 #include "matapt.h"
 #include "cdicoapt.h"
 #include "Wt/WCssDecorationStyle.h"
+#include "Wt/WTemplate.h"
 
 extern bool globTest2;
 using namespace  Wt;
@@ -20,12 +21,13 @@ private:
      Wt::WTable * mAptTable;
      WComboBox * zbioSelection_;
 
-     WContainerWidget * contListeUS, *contFicheUS;
+     WContainerWidget * contListeUS, *contFicheUS;//, * contTeaserFicheUS;
 
      void hoverBubble(WContainerWidget *c, bool hover);
      void changeZbio();
      void updateListeUS();
-     void updateApt(int US,std::string aVar);
+     void showFicheUS(int US,std::string aVar);
+     //void showTeaserFicheUS(int US,std::string aVar);
      void displayNiche(std::string aEssCode);
      void resetNiche();
      //void initAptTable(std::string aNTNHTitle);

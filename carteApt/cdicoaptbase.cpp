@@ -611,7 +611,6 @@ TypeWMS str2TypeWMS(const std::string& str){
 }
 
 std::shared_ptr<cEss> cdicoAptBase::getEss(std::string aCode){
-    if (globTest){std::cout << "getEss" << std::endl;}
     std::shared_ptr<cEss> aRes=NULL;
     if (hasEss(aCode)){aRes=mVEss.at(aCode);} else {
         std::cout << "getEss de cdicoapt, création d'une essence vide pour " << aCode << ", attention " << std::endl;

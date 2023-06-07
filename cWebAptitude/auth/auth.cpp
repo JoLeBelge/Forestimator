@@ -13,6 +13,8 @@ AuthApplication::AuthApplication(const Wt::WEnvironment& env, cDicoApt *dico)
     // charge le xml avec tout le texte qui sera chargé via la fonction tr()
     messageResourceBundle().use(docRoot() + "/forestimator");
     messageResourceBundle().use(docRoot() + "/forestimator-documentation");
+    messageResourceBundle().use(docRoot() + "/forestimator-CS");
+
 
 
     // export de tout les messages html vers un fichier csv qui sera traduit en text avec ./html2text -from_encoding UTF8 -nobs -o /home/jo/app/Forestimator/data/tmp/Forestimator.txt /home/jo/app/Forestimator/data/tmp/texteForestimator.csv pour correction orthographique

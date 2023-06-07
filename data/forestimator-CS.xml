@@ -1,6 +1,28 @@
 <messages>
 
-<message id="zbio1.US1"> description de l'US 1</message>
+<message id="template.CS">
+<div class="container">
+  <div class="row">
+  <div class="col-6">
+  ${graphZbio}
+  ${listeUS}
+  </div>
+  ${listeEssence class="col-6"}
+  </div>
+</div>
+</message>
+
+<message id="zbio1.US1.var.part1"> 
+toto
+<img src="/img/CS/topo/Logo_topo_US1.png" alt="situation topographique pour cette unité stationnelle" width="800"/> 
+</message>
+
+<message id="listeEss.CS.titre"> 
+<h3> Liste des essences forestières </h3>
+</message>
+
+
+
 
 </messages>
 

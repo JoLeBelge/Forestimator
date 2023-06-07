@@ -11,13 +11,14 @@ matAptCS::matAptCS(cDicoApt *aDicoApt):mDicoApt(aDicoApt),zbio_(1),US_(1),mVar_(
     /* 1 Intro ---------------------------*/
     layoutGlobal->addWidget(cpp14::make_unique<WText>(tr("CS.intro")));
      /* 2 Zbio ---------------------------*/
-    WContainerWidget * contZbioGlob = layoutGlobal->addWidget(cpp14::make_unique<WContainerWidget>());
-    WVBoxLayout * layoutDroite = contZbioGlob->setLayout(cpp14::make_unique<WVBoxLayout>());
-    WContainerWidget * contZbio = layoutDroite->addWidget(cpp14::make_unique<WContainerWidget>());
-    WHBoxLayout * layoutzbio = contZbio->setLayout(cpp14::make_unique<WHBoxLayout>());
-    WContainerWidget * contZbioGauche = layoutzbio->addWidget(cpp14::make_unique<WContainerWidget>());
-    contZbioGauche->addWidget(std::make_unique<Wt::WText>(tr("matAptCS.zbio")));
-    zbioSelection_  =contZbioGauche->addWidget(std::make_unique<Wt::WComboBox>());
+    //WContainerWidget * contZbioGlob = layoutGlobal->addWidget(cpp14::make_unique<WContainerWidget>());
+    //WVBoxLayout * layoutDroite = contZbioGlob->setLayout(cpp14::make_unique<WVBoxLayout>());
+    //WContainerWidget * contZbio = layoutDroite->addWidget(cpp14::make_unique<WContainerWidget>());
+    //WHBoxLayout * layoutzbio = contZbio->setLayout(cpp14::make_unique<WHBoxLayout>());
+    //WContainerWidget * contZbioGauche = layoutzbio->addWidget(cpp14::make_unique<WContainerWidget>());
+
+    layoutGlobal->addWidget(std::make_unique<Wt::WText>(tr("matAptCS.zbio")));
+    zbioSelection_  =layoutGlobal->addWidget(std::make_unique<Wt::WComboBox>());
     for (const auto &kv : *mDicoApt->ZBIO()){
         if(kv.first==1 | kv.first==2 |kv.first==3 | kv.first==10 | kv.first==5){
             zbioSelection_->addItem(kv.second);
@@ -25,14 +26,68 @@ matAptCS::matAptCS(cDicoApt *aDicoApt):mDicoApt(aDicoApt),zbio_(1),US_(1),mVar_(
     }
     zbioSelection_->changed().connect(std::bind(&matAptCS::changeZbio,this));
     zbioSelection_->setCurrentIndex(0);
+
+    Wt::WTemplate * tpl = layoutGlobal->addWidget(cpp14::make_unique<Wt::WTemplate>(tr("template.CS")));
     std::string  aShp=mDicoApt->File("ZBIOSIMP");
-    graphZbio = layoutzbio->addWidget(std::make_unique<zbioPainted>(aShp,mDicoApt));
-     /* 3 Liste des unités stationnelles ---------------------------*/
-    contListeUS = layoutGlobal->addWidget(cpp14::make_unique<WContainerWidget>());
-    contListeUS->setOverflow(Wt::Overflow::Auto);
+    graphZbio = tpl->bindWidget("graphZbio", Wt::cpp14::make_unique<zbioPainted>(aShp,mDicoApt));
+    contListeUS = tpl->bindWidget("listeUS", Wt::cpp14::make_unique<WContainerWidget>());
+    WContainerWidget * contlisteEss = tpl->bindWidget("listeEssence", Wt::cpp14::make_unique<WContainerWidget>());
+    contlisteEss->setStyleClass("row");
+    contlisteEss->addNew<Wt::WText>(tr("listeEss.CS.titre"));
+    // création de la liste de toutes les essences
+    int r(1);
+    int nb(mDicoApt->getAllEss().size());
+    int ncells(nb/2);
+    WContainerWidget * rowCont = contlisteEss->addNew<Wt::WContainerWidget>();
+    rowCont->setStyleClass("col-6");
+    for (auto & kv : mDicoApt->getAllEss()){
+     cEss * ess=kv.second.get();
+     if (ess->hasCSApt()){
+         Wt::WText * t = rowCont->addNew<Wt::WText>(ess->Code()+ " - " +ess->Nom());
+         t->setStyleClass("ess");
+         rowCont->addNew<Wt::WBreak>();
+         t->mouseWentOver().connect([=] {
+             displayNiche(ess->Code());
+             graphZbio->displayAptMap(ess->Code());
+             t->setStyleClass("currentEss");
+         });
+         t->mouseWentOut().connect([=] {
+             resetNiche();
+             graphZbio->selectZbio(zbio_);
+             t->setStyleClass("ess");
+         });
+
+         t->clicked().connect([=] {
+             t->setStyleClass("ess");
+             Wt::WMessageBox * messageBox = this->addChild(Wt::cpp14::make_unique<Wt::WMessageBox>(
+                                                               ess->Nom(),
+                                                               "",
+                                                               Wt::Icon::Information,
+                                                               Wt::StandardButton::Ok));
+             Wt::WLink l("https://www.fichierecologique.be/resources/fee/FEE-"+ess->Code()+".pdf");
+             l.setTarget(Wt::LinkTarget::NewWindow);
+             Wt::WString s("Fiche-essence disponible ici");
+             Wt::WAnchor * a =messageBox->contents()->addNew<Wt::WAnchor>(l,s);
+             a->clicked().connect([=] {
+                 this->removeChild(messageBox);
+             });
+             messageBox->setModal(true);
+             messageBox->buttonClicked().connect([=] {
+                 this->removeChild(messageBox);
+             });
+             messageBox->setMinimumSize("40%","30%");
+             messageBox->show();
+         });
+
+         if (r==ncells){
+             rowCont = contlisteEss->addNew<Wt::WContainerWidget>();
+             rowCont->setStyleClass("col-6");
+             r=1;
+         } else { r++;}
+     }
+    }
 
      /* 4 Description de unités stationnelles ---------------------------*/
-    // conteneur pour afficher les KK de l'unité stationnelle, avant le tableau d'aptitude
     contFicheUS = layoutGlobal->addWidget(cpp14::make_unique<WContainerWidget>());
     mAptTable = layoutGlobal->addWidget(cpp14::make_unique<WTable>());
     updateListeUS();
@@ -65,31 +120,48 @@ void matAptCS::updateListeUS(){
         }else{
             us->setText(tr("matAptCS.badge").arg(std::to_string(std::get<0>(kv.first))).arg(std::get<1>(kv.first)).arg(col->getRGB()));
         }
-        //us->addStyleClass(CSlay->getColor(std::get<0>(kv.first)).getStyleNameShort()); // fonctionne pas..
-        //us->decorationStyle().setBackgroundColor(WColor(col.mR,col.mG,col.mB));// fonctionne mais interfère avec hoverEss qui change la couleur.
-        //std::cout << " add style class " << CSlay->getColor(std::get<0>(kv.first)).getStyleName() << std::endl;
+
         us->setToolTip(kv.second);
-        us->clicked().connect([=]{this->updateApt(std::get<0>(kv.first),std::get<1>(kv.first));});
+        us->clicked().connect([=]{this->showFicheUS(std::get<0>(kv.first),std::get<1>(kv.first));});
         mMapButtonUS.emplace(std::make_pair(kv.first,us));
     }
     if (mDicoApt->aVStation(mDicoApt->ZBIO2CSid(zbio_)).size()==0){
         contListeUS->addNew<Wt::WText>(tr("matAptCS.msg.noUS4Zbio").arg(mDicoApt->ZBIO(zbio_)));
     }
 }
-void matAptCS::updateApt(int US, std::string aVar){
 
-    if(globTest){std::cout << " matAptCS::updateApt, zbio " << std::to_string(zbio_) << " et US " << std::to_string(US_) << " var " << mVar_  <<std::endl;}
+/*void matAptCS::showTeaserFicheUS(int US, std::string aVar){
+    contTeaserFicheUS->clear();
+    std::string idMessage="zbio"+std::to_string(mDicoApt->ZBIO2CSid(zbio_)) +".US"+std::to_string(US)+".var"+aVar+".teaser";
+    std::cout << " matAptCS::showTeaserFicheUS, message " << idMessage  <<std::endl;
+    WString s=Wt::WString::tr(idMessage);
+    if (s.toUTF8().substr(0,2)!="??"){
+        std::cout << "chargement du teaser " << std::endl;
+    contTeaserFicheUS->addNew<Wt::WText>(tr(idMessage));
+    }
+}*/
+
+void matAptCS::showFicheUS(int US, std::string aVar){
+
+    if(globTest){std::cout << " matAptCS::showFicheUS, zbio " << std::to_string(zbio_) << " et US " << std::to_string(US_) << " var " << mVar_  <<std::endl;}
     US_=US;
     mVar_=aVar;
     mVEss.clear();
     contFicheUS->clear();
 
-
+    /*
     std::string usLabel=mDicoApt->aVStation(mDicoApt->ZBIO2CSid(zbio_)).at(std::make_tuple(US_,mVar_));
     if (mVar_!=""){
        usLabel+=", variante " +mVar_;
     }
     contFicheUS->addWidget(cpp14::make_unique<WText>(tr("aptCS.titreUS").arg(mDicoApt->ZBIO(zbio_)).arg(std::to_string(US_)).arg(usLabel)));
+    */
+
+    std::string idMessage="zbio"+std::to_string(mDicoApt->ZBIO2CSid(zbio_)) +".US"+std::to_string(US)+".var"+aVar+".part1";
+    WString s=Wt::WString::tr(idMessage);
+    if (s.toUTF8().substr(0,2)!="??"){
+    contFicheUS->addNew<Wt::WText>(tr(idMessage));
+    }
 
     for (int apt : {1,2,3}){
         std::vector<cEss*> aV;
@@ -102,7 +174,7 @@ void matAptCS::updateApt(int US, std::string aVar){
             }
         }
         //std::cout << "aptitude " << std::to_string(apt) << " contient " << aV.size() << " essences" <<std::endl;
-        mVEss.push_back(aV);// ici push back , là haut clear; çe sont des élément partagé avec mDico, je ne peux pas les supprimer comme ça!
+        mVEss.push_back(aV);
     }
 
     // maintenant que les essences sont triées, update table apt
@@ -136,13 +208,9 @@ void matAptCS::updateApt(int US, std::string aVar){
             c->addNew<Wt::WText>(essCode);
             c->mouseWentOver().connect([=] {
                 hoverBubble(c,1);
-                displayNiche(aV.at(n)->Code());
-                graphZbio->displayAptMap(aV.at(n)->Code());
             });
             c->mouseWentOut().connect([=] {
                 hoverBubble(c,0);
-                resetNiche();
-                graphZbio->selectZbio(zbio_);
             });
             c->setToolTip(aV.at(n)->Nom());
             c->clicked().connect([=] {
