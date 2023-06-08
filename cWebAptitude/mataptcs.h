@@ -5,6 +5,7 @@
 #include "cdicoapt.h"
 #include "Wt/WCssDecorationStyle.h"
 #include "Wt/WTemplate.h"
+#include "Wt/WProgressBar.h"
 
 extern bool globTest2;
 using namespace  Wt;

@@ -97,7 +97,7 @@ matAptCS::matAptCS(cDicoApt *aDicoApt):mDicoApt(aDicoApt),zbio_(1),US_(1),mVar_(
 
 void matAptCS::updateListeUS(){
 
-    if (globTest){std::cout << "matAptCS::updateListeUS " << std::endl;}
+    //if (globTest){std::cout << "matAptCS::updateListeUS " << std::endl;}
     mMapButtonUS.clear();
     contListeUS->clear();
     mAptTable->clear();
@@ -143,7 +143,7 @@ void matAptCS::updateListeUS(){
 
 void matAptCS::showFicheUS(int US, std::string aVar){
 
-    if(globTest){std::cout << " matAptCS::showFicheUS, zbio " << std::to_string(zbio_) << " et US " << std::to_string(US_) << " var " << mVar_  <<std::endl;}
+    //if(globTest){std::cout << " matAptCS::showFicheUS, zbio " << std::to_string(zbio_) << " et US " << std::to_string(US_) << " var " << mVar_  <<std::endl;}
     US_=US;
     mVar_=aVar;
     mVEss.clear();
@@ -157,7 +157,7 @@ void matAptCS::showFicheUS(int US, std::string aVar){
     contFicheUS->addWidget(cpp14::make_unique<WText>(tr("aptCS.titreUS").arg(mDicoApt->ZBIO(zbio_)).arg(std::to_string(US_)).arg(usLabel)));
     */
 
-    std::string idMessage="zbio"+std::to_string(mDicoApt->ZBIO2CSid(zbio_)) +".US"+std::to_string(US)+".var"+aVar+".part1";
+    std::string idMessage="zbio"+std::to_string(mDicoApt->ZBIO2CSid(zbio_)) +".US"+std::to_string(US)+".part1";
     WString s=Wt::WString::tr(idMessage);
     if (s.toUTF8().substr(0,2)!="??"){
     contFicheUS->addNew<Wt::WText>(tr(idMessage));
@@ -240,6 +240,41 @@ void matAptCS::showFicheUS(int US, std::string aVar){
             if (col+1>ncells){col=0;r++;}
         }
     }
+
+    idMessage="zbio"+std::to_string(mDicoApt->ZBIO2CSid(zbio_)) +".US"+std::to_string(US)+".part2";
+    s=Wt::WString::tr(idMessage);
+    if (s.toUTF8().substr(0,2)!="??"){
+    contFicheUS->addNew<Wt::WText>(tr(idMessage));
+    }
+
+    // synthèse globale
+    contFicheUS->addNew<Wt::WText>(tr("CS.titre.synthese"));
+    contFicheUS->addNew<Wt::WBreak>();
+
+    int val=mDicoApt->getKKCS(mDicoApt->ZBIO2CSid(zbio_),US_).VCP;
+    Wt::WTemplate * tpl = contFicheUS->addNew<Wt::WTemplate>(tr("template.CS.progressBar").arg(mDicoApt->codeKK2Nom("VCP")));
+    Wt::WContainerWidget * cont = tpl->bindWidget("progress", Wt::cpp14::make_unique<Wt::WContainerWidget>());
+    cont->setStyleClass("syntheseCS"+std::to_string(val));
+
+    val=mDicoApt->getKKCS(mDicoApt->ZBIO2CSid(zbio_),US_).SES;
+    tpl = contFicheUS->addNew<Wt::WTemplate>(tr("template.CS.progressBar").arg(mDicoApt->codeKK2Nom("SES")));
+    cont = tpl->bindWidget("progress", Wt::cpp14::make_unique<Wt::WContainerWidget>());
+    cont->setStyleClass("syntheseCS"+std::to_string(val));
+
+    val=mDicoApt->getKKCS(mDicoApt->ZBIO2CSid(zbio_),US_).SC;
+    tpl = contFicheUS->addNew<Wt::WTemplate>(tr("template.CS.progressBar").arg(mDicoApt->codeKK2Nom("SC")));
+    cont = tpl->bindWidget("progress", Wt::cpp14::make_unique<Wt::WContainerWidget>());
+    cont->setStyleClass("syntheseCS"+std::to_string(val));
+
+    val=mDicoApt->getKKCS(mDicoApt->ZBIO2CSid(zbio_),US_).RCS;
+    tpl = contFicheUS->addNew<Wt::WTemplate>(tr("template.CS.progressBar").arg(mDicoApt->codeKK2Nom("RCS")));
+    cont = tpl->bindWidget("progress", Wt::cpp14::make_unique<Wt::WContainerWidget>());
+    cont->setStyleClass("syntheseCS"+std::to_string(val));
+
+    val=mDicoApt->getKKCS(mDicoApt->ZBIO2CSid(zbio_),US_).PB;
+    tpl = contFicheUS->addNew<Wt::WTemplate>(tr("template.CS.progressBar").arg(mDicoApt->codeKK2Nom("PB")));
+    cont = tpl->bindWidget("progress", Wt::cpp14::make_unique<Wt::WContainerWidget>());
+    cont->setStyleClass("syntheseCS"+std::to_string(val));
 
 }
 

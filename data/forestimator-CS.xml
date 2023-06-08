@@ -12,14 +12,25 @@
 </div>
 </message>
 
-<message id="zbio1.US1.var.part1"> 
-toto
+<message id="template.CS.progressBar"> 
+<div class="row">
+<div class="col-5"> <h6> {1} </h6> </div>
+<div class="progress col-7"  style="width: 50%;">
+    ${progress class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="4"}
+</div>
+</div>
+</message>
+
+<message id="zbio1.US1.part1"> 
+<h2> Fiche Station : Tourbières acides (US 1) </h2>
 <img src="/img/CS/topo/Logo_topo_US1.png" alt="situation topographique pour cette unité stationnelle" width="800"/> 
 </message>
 
-<message id="listeEss.CS.titre"> 
-<h3> Liste des essences forestières </h3>
-</message>
+<message id="listeEss.CS.titre">  <h3> Liste des essences forestières </h3> </message>
+
+<message id="CS.titre.synthese">  <h3> Synthèse </h3> </message>
+
+
 
 
 

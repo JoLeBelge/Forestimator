@@ -758,5 +758,22 @@ transition-duration: 0.5s;
     font-size: 12pt;
 }
 
+.syntheseCS1{
+	width: 25.000000%;
+	background-color: #f4b183;	
+}
+.syntheseCS2{
+	width: 50.000000%;
+	background-color: #ffe699;	
+}
+.syntheseCS3{
+	width: 75.000000%;
+	background-color: #c5e0b4;	
+}
+.syntheseCS4{
+	width: 100.000000%;
+	background-color: #00a200;	
+}
+
 
 
