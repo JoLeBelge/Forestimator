@@ -12,20 +12,6 @@ Layer::Layer(groupLayers * aGroupL, std::string aCode,WText * PWText):
     //std::cout << "création de layer pour " << aCode << std::endl;
     mLabel=mNom;
     mWtText->setText(mLabel);
-
-    /*
-    case TypeLayer::KK:
-        // construction de la caractéristique stationnelle
-        mKK=new cKKCS(mCode,mDico);
-        mLabel= "Catalogue de Station - "+ mKK->Nom();
-        mWtText->setText(mLabel);
-        mPathTif=mKK->NomCarte();
-        mDicoVal=mKK->getDicoValPtr();
-        mDicoCol=mKK->getDicoCol();
-        mExpert=1;
-        break;
-    */
-
     mLay4Stat=mDico->lay4Stat(mCode);
     mLay4StatPonctuel=mDico->lay4StatP(mCode);
     mLay4Visu=mDico->lay4Visu(mCode);
