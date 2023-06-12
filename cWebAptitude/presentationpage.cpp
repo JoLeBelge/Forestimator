@@ -22,7 +22,9 @@ presentationPage::presentationPage(cDicoApt *aDico, AuthApplication *app):mDico(
 
     // création d'un menu à gauche, co dans wt widget gallery
     Wt::WHBoxLayout * hLayout = setLayout(std::make_unique<Wt::WHBoxLayout>());
+    
     hLayout->setContentsMargins(0, 0, 0, 0);
+    setContentAlignment(Wt::AlignmentFlag::Top);
 
     std::unique_ptr<Wt::WStackedWidget> subStack = std::make_unique<Wt::WStackedWidget>();
     subStack->addStyleClass("contents");
@@ -129,8 +131,12 @@ presentationPage::presentationPage(cDicoApt *aDico, AuthApplication *app):mDico(
     for( auto kv : *mDico->layerMTD()){
         LayerMTD lMTD=kv.second;
         if (lMTD.code()!="ES_EP"){
+<<<<<<< HEAD
         //std::cout << "ajout lMTD dans sous menu présentation " << lMTD.Nom() << std::endl;
         std::unique_ptr<Wt::WMenuItem> item = std::make_unique<Wt::WMenuItem>(lMTD.Label(), std::make_unique<Wt::WText>(getHtml(&lMTD)));
+=======
+        std::unique_ptr<Wt::WMenuItem> item = std::make_unique<Wt::WMenuItem>(lMTD.Label(), cpp14::make_unique<Wt::WText>(getHtml(&lMTD)));
+>>>>>>> 36e9392 (page Catalogue)
         subMenu_->addItem(std::move(item));
         } else {
             std::unique_ptr<Wt::WMenuItem> mi = std::make_unique<Wt::WMenuItem>(lMTD.Label());
@@ -145,7 +151,6 @@ presentationPage::presentationPage(cDicoApt *aDico, AuthApplication *app):mDico(
             std::string poster = "img/scoMM.png";
             Wt::WVideo * video = ac->addNew<Wt::WVideo>();
             video->addSource(Wt::WLink(mp4Video),"");
-            //video->addSource(Wt::WLink(ogvVideo));
             video->setPoster(poster);
             video->setAlternativeContent(std::make_unique<Wt::WImage>(Wt::WLink(poster)));
             video->resize(640, 360);
@@ -159,14 +164,15 @@ presentationPage::presentationPage(cDicoApt *aDico, AuthApplication *app):mDico(
 
 
     std::unique_ptr<Wt::WMenuItem> item5 = std::make_unique<Wt::WMenuItem>("Guide des Stations");
-    Wt::WContainerWidget * c5 = new Wt::WContainerWidget();
-    //c0->addNew<WText>(WString::tr("page_presentation"));
-    //item5->setContents(std::unique_ptr<Wt::WContainerWidget>(c0));
-    c5->addNew<matAptCS>(mDico);
-    item5->setContents(std::unique_ptr<Wt::WContainerWidget>(c5));
+
+    item5->setContents(std::make_unique<matAptCS>(mDico));
+    item5->contents()->setMaximumSize("100%","5000px");
+
     subMenu_->addItem(std::move(item5));
 
     hLayout->addWidget(std::move(subMenu));
     hLayout->addWidget(std::move(subStack),1);
+
+
 
 }
