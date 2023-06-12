@@ -8,6 +8,8 @@ cWebAptitude::cWebAptitude(AuthApplication *app, Auth::AuthWidget* authWidget_)
     : WContainerWidget(),authWidget(authWidget_),mDico(app->getDico())
 {
     std::cout << "cWebApt\n" << std::endl;
+
+    setContentAlignment(Wt::AlignmentFlag::Top);// j'ai mis ça sur deux ou trois conteneur car sinon j'ai un bug avec la taille de la page "catalogue station" qui augmente sa taille à l'infini (voir post sur e layout manager for a container which does not have a height that is constrained somehow, you need to specify AlignTop in the alignment flags of WContainerWidget::setLayout().
     GDALAllRegister();
     mApp = app;
     mApp->setLoadingIndicator(cpp14::make_unique<Wt::WOverlayLoadingIndicator>());

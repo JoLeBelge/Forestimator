@@ -149,6 +149,18 @@ public:
         return aRes;
     }
 
+    std::string stationEtVar(int aZbio, int aSt,std::string aVar="a"){
+        std::string aRes=station(aZbio,aSt,aVar);
+        std::cout << "stationEtVar  " << aRes << std::endl;
+        if (Dico_station_var.find(aZbio)!=Dico_station_var.end()){
+            if (Dico_station_var.at(aZbio).find(std::make_tuple(aSt,aVar))!=Dico_station_var.at(aZbio).end()){
+                aRes+=" "+Dico_station_var.at(aZbio).at(std::make_tuple(aSt,aVar));
+            }
+        }
+        return aRes;
+    }
+
+
     std::map<std::tuple<int, std::string>,std::string> aVStation(int aZbio){
         std::map<std::tuple<int, std::string>,std::string> aRes;
         if (Dico_station.find(aZbio)!=Dico_station.end()){
@@ -301,6 +313,8 @@ private:
 
     // clé 1 : zbio, clé 2: id station+variance,value ; nom de la sation cartograhique
     std::map<int,std::map<std::tuple<int, std::string>,std::string>>  Dico_station;
+    // clé 1 : zbio, clé 2: id station+variance,value ; nom de la variante
+    std::map<int,std::map<std::tuple<int, std::string>,std::string>>  Dico_station_var;
     std::map<std::string,std::string> Dico_codeKK2Nom;
    // std::map<std::string,std::string> Dico_codeKK2NomCol;
     // il y a 9 niveau dans l'échelle, mais on simplifie en 3 catégories pour les cartes de risque et potentiel sylv

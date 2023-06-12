@@ -3,22 +3,16 @@ extern bool globTest;
 
 matAptCS::matAptCS(cDicoApt *aDicoApt):mDicoApt(aDicoApt),zbio_(1),US_(1),mVar_("")
 {
-    setOverflow(Wt::Overflow::Auto);
-    //setId("matAptCont");
-    // un nouveau div enfant car le parent est dans le stack, avec display flex, ce qui fait foirer un scroll général sur tout le contenu.
-    WVBoxLayout * layoutGlobal = setLayout(cpp14::make_unique<WVBoxLayout>());
+    //setOverflow(Wt::Overflow::Auto);
+    setId("pageCS");
 
+    //setMaximumSize("100%","5000px");
     /* 1 Intro ---------------------------*/
-    layoutGlobal->addWidget(cpp14::make_unique<WText>(tr("CS.intro")));
+    addWidget(cpp14::make_unique<WText>(tr("CS.intro")));
      /* 2 Zbio ---------------------------*/
-    //WContainerWidget * contZbioGlob = layoutGlobal->addWidget(cpp14::make_unique<WContainerWidget>());
-    //WVBoxLayout * layoutDroite = contZbioGlob->setLayout(cpp14::make_unique<WVBoxLayout>());
-    //WContainerWidget * contZbio = layoutDroite->addWidget(cpp14::make_unique<WContainerWidget>());
-    //WHBoxLayout * layoutzbio = contZbio->setLayout(cpp14::make_unique<WHBoxLayout>());
-    //WContainerWidget * contZbioGauche = layoutzbio->addWidget(cpp14::make_unique<WContainerWidget>());
+    addWidget(std::make_unique<Wt::WText>(tr("matAptCS.zbio")));
 
-    layoutGlobal->addWidget(std::make_unique<Wt::WText>(tr("matAptCS.zbio")));
-    zbioSelection_  =layoutGlobal->addWidget(std::make_unique<Wt::WComboBox>());
+    zbioSelection_  =addWidget(std::make_unique<Wt::WComboBox>());
     for (const auto &kv : *mDicoApt->ZBIO()){
         if(kv.first==1 | kv.first==2 |kv.first==3 | kv.first==10 | kv.first==5){
             zbioSelection_->addItem(kv.second);
@@ -27,7 +21,10 @@ matAptCS::matAptCS(cDicoApt *aDicoApt):mDicoApt(aDicoApt),zbio_(1),US_(1),mVar_(
     zbioSelection_->changed().connect(std::bind(&matAptCS::changeZbio,this));
     zbioSelection_->setCurrentIndex(0);
 
-    Wt::WTemplate * tpl = layoutGlobal->addWidget(cpp14::make_unique<Wt::WTemplate>(tr("template.CS")));
+    addNew<Wt::WBreak>();
+    addNew<Wt::WBreak>();
+
+    Wt::WTemplate * tpl = addWidget(cpp14::make_unique<Wt::WTemplate>(tr("template.CS")));
     std::string  aShp=mDicoApt->File("ZBIOSIMP");
     graphZbio = tpl->bindWidget("graphZbio", Wt::cpp14::make_unique<zbioPainted>(aShp,mDicoApt));
     contListeUS = tpl->bindWidget("listeUS", Wt::cpp14::make_unique<WContainerWidget>());
@@ -75,38 +72,38 @@ matAptCS::matAptCS(cDicoApt *aDicoApt):mDicoApt(aDicoApt),zbio_(1),US_(1),mVar_(
              messageBox->buttonClicked().connect([=] {
                  this->removeChild(messageBox);
              });
-             messageBox->setMinimumSize("40%","30%");
+             //messageBox->setMinimumSize("40%","30%");
              messageBox->show();
          });
 
+        r++;
          if (r==ncells){
              rowCont = contlisteEss->addNew<Wt::WContainerWidget>();
              rowCont->setStyleClass("col-6");
              r=1;
-         } else { r++;}
+         }
      }
     }
 
      /* 4 Description de unités stationnelles ---------------------------*/
-    contFicheUS = layoutGlobal->addWidget(cpp14::make_unique<WContainerWidget>());
-    mAptTable = layoutGlobal->addWidget(cpp14::make_unique<WTable>());
-    updateListeUS();
+    contFicheUS = addWidget(cpp14::make_unique<WContainerWidget>());
+    contFicheUS->setId("ficheUS");
+    //contFicheUS->setHeight(Wt::WLength(2000.0));
 
+    updateListeUS();
+    setHeight(Wt::WLength(3000));
 }
 
 
 void matAptCS::updateListeUS(){
 
-    //if (globTest){std::cout << "matAptCS::updateListeUS " << std::endl;}
     mMapButtonUS.clear();
     contListeUS->clear();
-    mAptTable->clear();
     contFicheUS->clear();
     contListeUS->addWidget(std::make_unique<Wt::WText>(tr("matAptCS.US").arg(mDicoApt->ZBIO(zbio_))));
 
     // pour avoir les couleurs des stations, je dois utiliser la layer
     std::shared_ptr<layerBase> CSlay=mDicoApt->getLayerBase(mDicoApt->ZBIO2CSlay(zbio_));
-
 
     for (auto & kv : mDicoApt->aVStation(mDicoApt->ZBIO2CSid(zbio_))){
         // un boutton avec un badge de la couleur de la station
@@ -121,7 +118,8 @@ void matAptCS::updateListeUS(){
             us->setText(tr("matAptCS.badge").arg(std::to_string(std::get<0>(kv.first))).arg(std::get<1>(kv.first)).arg(col->getRGB()));
         }
 
-        us->setToolTip(kv.second);
+        us->setToolTip(mDicoApt->stationEtVar(mDicoApt->ZBIO2CSid(zbio_),std::get<0>(kv.first),std::get<1>(kv.first)));
+
         us->clicked().connect([=]{this->showFicheUS(std::get<0>(kv.first),std::get<1>(kv.first));});
         mMapButtonUS.emplace(std::make_pair(kv.first,us));
     }
@@ -130,20 +128,8 @@ void matAptCS::updateListeUS(){
     }
 }
 
-/*void matAptCS::showTeaserFicheUS(int US, std::string aVar){
-    contTeaserFicheUS->clear();
-    std::string idMessage="zbio"+std::to_string(mDicoApt->ZBIO2CSid(zbio_)) +".US"+std::to_string(US)+".var"+aVar+".teaser";
-    std::cout << " matAptCS::showTeaserFicheUS, message " << idMessage  <<std::endl;
-    WString s=Wt::WString::tr(idMessage);
-    if (s.toUTF8().substr(0,2)!="??"){
-        std::cout << "chargement du teaser " << std::endl;
-    contTeaserFicheUS->addNew<Wt::WText>(tr(idMessage));
-    }
-}*/
-
 void matAptCS::showFicheUS(int US, std::string aVar){
 
-    //if(globTest){std::cout << " matAptCS::showFicheUS, zbio " << std::to_string(zbio_) << " et US " << std::to_string(US_) << " var " << mVar_  <<std::endl;}
     US_=US;
     mVar_=aVar;
     mVEss.clear();
@@ -173,12 +159,10 @@ void matAptCS::showFicheUS(int US, std::string aVar){
                 }
             }
         }
-        //std::cout << "aptitude " << std::to_string(apt) << " contient " << aV.size() << " essences" <<std::endl;
         mVEss.push_back(aV);
     }
-
     // maintenant que les essences sont triées, update table apt
-    mAptTable->clear();
+    mAptTable = contFicheUS->addWidget(cpp14::make_unique<WTable>());
     mAptTable->setStyleClass("table-AptGlob");
     mAptTable->setHeaderCount(2);
     mAptTable->elementAt(0,0)->setColumnSpan(3);
@@ -233,7 +217,7 @@ void matAptCS::showFicheUS(int US, std::string aVar){
                 messageBox->buttonClicked().connect([=] {
                     this->removeChild(messageBox);
                 });
-                messageBox->setMinimumSize("40%","30%");
+                //messageBox->setMinimumSize("40%","30%");
                 messageBox->show();
             });
             col++;
@@ -275,6 +259,16 @@ void matAptCS::showFicheUS(int US, std::string aVar){
     tpl = contFicheUS->addNew<Wt::WTemplate>(tr("template.CS.progressBar").arg(mDicoApt->codeKK2Nom("PB")));
     cont = tpl->bindWidget("progress", Wt::cpp14::make_unique<Wt::WContainerWidget>());
     cont->setStyleClass("syntheseCS"+std::to_string(val));
+
+    idMessage="zbio"+std::to_string(mDicoApt->ZBIO2CSid(zbio_)) +".US"+std::to_string(US)+".part3";
+    s=Wt::WString::tr(idMessage);
+    if (s.toUTF8().substr(0,2)!="??"){
+    contFicheUS->addNew<Wt::WText>(tr(idMessage));
+    }
+
+    //setHeight(Wt::WLength(3000));
+    doJavaScript("ficheUS.scrollIntoView({ behavior: 'smooth', block: 'start' })");
+
 
 }
 
