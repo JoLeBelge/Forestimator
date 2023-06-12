@@ -1,38 +1,121 @@
 <messages>
 
+<message id="CS.intro"> <h1>Guide des Stations</h1> 
+<p class="lead">
+<h3>Fichier écologique des essences et Guide des stations forestières : des outils complémentaires</h3>
+Le Fichier Ecologique des Essences (FEE) et le Guide des stations forestières sont deux outils complémentaires qui ont pour vocation d’aider les forestiers dans leurs démarches de description stationnelle, de choix des essences et de gestion forestière.
+Le fichier écologique des essences catégorise les stations selon trois facteurs écologiques que sont les niveaux <mark>bioclimatique, hydrique et trophique</mark> ; les 2 derniers étant représentés sous la forme d’un écogramme. C’est un outil orienté « aptitude des essences », qui comporte des fiches très informatives sur les atouts et sensibilités de chaque essence forestière. 
+La classification très systématique des stations convient particulièrement à une utilisation à l’échelle de l’ensemble de la Région Wallonne.
+<br></br>
+A une échelle plus régionale, comme pour les trois zones bioclimatiques d'Ardenne, le guide des stations est un outil orienté « gestion des stations », qui <mark>découpe le territoire en milieux-types, bien reconnaissables pour le forestier de terrain</mark>. En plus d’un choix d’essences approprié, le guide délivre des conseils de gestion spécifiques aux stations, par exemple en termes de protection des sols ou de promotion de la biodiversité.
+</p>
+<h3>Guide des stations: quel développement pour la Wallonie</h3>
+Pour l'instant, les Guides de Stations de l'Ardenne et de la Lorraine ont été réalisé. 
+Les couches cartographiques sont disponibles sur demande.
+Les tableaux d'aptitude des essences pour les unités stationnelles sont présentés ci-dessous.
+</message>
+
+<message id="matAptCS.badge">  US {1}
+  <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill" style="background-color:{3};">
+    {2}
+    <span class="visually-hidden">variante</span>
+  </span> </message>
+ <message id="matAptCS.nobadge">  US {1}
+  <span class="position-absolute top-0 start-100 translate-middle p-2 border border-light rounded-circle" style="background-color:{2};">
+    <span class="visually-hidden">hep</span>
+  </span>
+ </message>
+
+<message id="matAptCS.msg.noUS4Zbio"> Pour le moment, il n'existe pas de catalogue de station pour la zone bioclimatique {1}. </message>
+<message id="matAptCS.zbio"> <h3>Choix de la zone bioclimatique</h3> </message>
+<message id="matAptCS.US"> <h3>Unités Stationnelles pour {1}</h3> </message>
+<message id="apt.t.O"> Optimum</message>
+<message id="apt.t.T"> Tolérance</message>
+<message id="aptCS.t.TE"> Accompagnement</message>
+<message id="aptCS.titreMatApt"><h3>Essences forestières conseillées</h3></message>
+<message id="aptCS.titreUS"><h2>{1}, Unité stationnelle {2}: {3} </h2></message>
+<message id="meta.titre.guide-des-stations">Le guide des stations forestières</message>
+<message id="meta.desc.guide-des-stations">le guide des stations est un outil qui découpe le territoire en milieux-types, bien reconnaissables pour le forestier de terrain, dénommée unité stationnelle. En plus d’un choix d’essences approprié, le guide délivre des conseils de gestion spécifiques aux stations, par exemple en termes de protection des sols ou de promotion de la biodiversité. </message>
+
 <message id="template.CS">
 <div class="container">
   <div class="row">
   <div class="col-6">
   ${graphZbio}
+  <br></br>
   ${listeUS}
   </div>
-  ${listeEssence class="col-6"}
+  ${listeEssence class="col-6 align-items-center"}
   </div>
 </div>
+<br> </br>
 </message>
 
 <message id="template.CS.progressBar"> 
 <div class="row">
-<div class="col-5"> <h6> {1} </h6> </div>
-<div class="progress col-7"  style="width: 50%;">
+<div class="col-md-5 col-8 text-end"> <h6> {1} </h6> </div>
+<div class="progress col-md-7 col-4"  style="width: 50%;">
     ${progress class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="4"}
 </div>
 </div>
 </message>
 
+<message id="listeEss.CS.titre">  <h3 class='text-center'> Liste des essences forestières </h3> </message>
+<message id="CS.titre.synthese">  <h3> Recommandations de gestion </h3> <h4> synthèse </h4> </message>
+
 <message id="zbio1.US1.part1"> 
-<h2> Fiche Station : Tourbières acides (US 1) </h2>
-<img src="/img/CS/topo/Logo_topo_US1.png" alt="situation topographique pour cette unité stationnelle" width="800"/> 
+<h2>Fiche Station : Tourbières acides (US 1) </h2>
+
+	<h3> Position dans le paysage </h3>
+	<p>Les tourbières acides sont présentes sur les plateaux et les fonds de vallée de hautes altitudes (généralement au-dessus de 450 mètres), principalement dans les massifs des Hautes Fagnes, 		du plateau des Tailles, de Saint-Hubert et de la Croix-Scaille. Elles se forment dans les dépressions des plateaux au sol très acide, où l’eau s’accumule. Aux altitudes plus basses, soumises 		à un 	climat moins froid, les tourbières laissent souvent place à des marais (US2). 
+	</p>
+	<img src="/img/CS/topo/Logo_topo_US1.png" alt="situation topographique pour cette unité stationnelle" width="40%"/>
+
+	<p>Ce type de station, au sol toujours engorgé, est relativement rare en Belgique. Il ne se développe pas en-dessous de 450 mètres d’altitude. Le terrain est irrégulier et parsemé de trous d’eau, ce qui rend les déplacements difficiles. Puisque les tourbières sont souvent situées dans des dépressions où l’eau de la nappe affleure, elles forment souvent une mosaïque avec les autres types de station des plateaux hydromorphes (US 3 : argiles blanches humides, US 4 : sols hydromorphes à horizon blanchi, US5 : sols bruns hydromorphes), dont la configuration dépend de micro-variations topographiques et du cheminement de l’eau dans le sol.</p>
+
+	<h3> Sol </h3>
+	<h4> Résumé synthétique </h4>  
+ 	Sol constitué d’une épaisse couche de tourbe, qui recouvre un horizon gleyifié à engorgement permanent. 
+ 
+	<h4>Description du profil </h4> 
+	Humus : Sol tourbeux sur plus de 40 cm. 
+	Horizons diagnostiques : 
+<ul>
+	<li>Tourbe : Elle forme une couche épaisse humide, foncée et grasse au toucher, de 40 cm minimum. Elle se développe par accumulation de sphaignes, qui ne se décompose pas sous l’effet 	combiné de l’hyper-acidité du milieu, de la froideur du climat et du manque d’oxygène, causé par l’engorgement permanent du sol.  </li>
+	<li>Gley : horizon minéral humide et fortement gleyifié, de couleur blanchâtre et sans taches de rouille (ou presque), caractéristique des engorgements permanents.  
+	Plancher imperméable (fragipan) : profond et rarement atteint au sondage (> 80 cm).  </li>
+	<li>Charge : Absente ou peu présente. </li>
+</ul>
+<img src="/img/CS/sol/sol_US1.png" alt="profil pédologique US1" width="40%"/>
+Profondeur de sol : Très profond, généralement > 1m20.  
+Sigles pédologiques fréquemment associés  
+<ul>
+<li>Texture : V, W (tourbe, tourbière haute intacte) </li>
+<li>Phase de profondeur (de la tourbe) : 0_1, 2 (> 80 cm, entre 40 et 80 cm avec charge caillouteuse (inférieur à 50%)  </li>
+</ul>
+➔ Sigles complets fréquents : V2, V0_1, W  90
 </message>
 
-<message id="listeEss.CS.titre">  <h3> Liste des essences forestières </h3> </message>
+<message id="zbio1.US1.part2">  </message>
 
-<message id="CS.titre.synthese">  <h3> Synthèse </h3> </message>
+<message id="zbio1.US1.part3"> 
+<h4> Recommandations sylvicoles </h4>
+<p>Les tourbières acides sont des stations particulièrement rares et fragiles, facilement dégradées par l’exploitation forestière (orniérage, pollution de l’eau). Elles rendent de nombreux services
+écologiques, tout en étant importantes pour la conservation biologique des écosystèmes et des espèces qui s’y développent. Par ailleurs, ce sont des milieux très peu productifs et particulièrement
+difficiles à exploiter. Pour toutes ces raisons, mieux vaut ne plus envisager d’exploitation foresti re sur ces stations et de laisser libre cours à la végétation naturelle, afin de valoriser son potentielécologique. C’est d’ailleurs une mesure de gestion dans le cadre de Natura 2000. Le cas échéant, le colmatage des drains est conseillé pour rétablir le cycle naturel de l’eau. De la même
+manière, une restauration de l’habitat est à envisager en cas de parcelle enrésinée. </p>
 
+Propositions de mélanges opportuns
+<ul>
+<li> Il n’en existe pas : laisser venir naturellement les essences qui survivent aux conditions extrêmes de la station. </li>
+</ul>
 
-
-
+Tentations à éviter
+<ul>
+<li> Drainer pour planter ensuite</li>
+<li>Tout autre type d’exploitation faisant appel à des engins</li>
+</ul>
+ </message>
 
 
 </messages>
