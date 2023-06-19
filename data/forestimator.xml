@@ -399,7 +399,7 @@ Cette application web de cartographie permet une visualisation des informations 
 
 		<h3>Importer un shapefile</h3>
 
-		La rubrique "Analyse surfacique" permet à l'utilisateur de sélectionner sur son ordinateur les 4 fichiers (.shp, .shx, .dbf, et .prj) constituant le shapefile de polygones définissant sa zone d'intérêt. Le shapefile doit obligatoirement contenir un ou des polygones, doit impérativement être en système de projection Belge Lambert 72 et la surface totale des polygones ne doit pas excéder 2500 hectares.
+		La rubrique "Analyse surfacique" permet à l'utilisateur de sélectionner sur son ordinateur les 4 fichiers (.shp, .shx, .dbf, et .prj) constituant le shapefile de polygones définissant sa zone d'intérêt. Une couche cartographique au format Géopackage (.gpkg) est également compatible avec le géoportail Forestimator. Le shapefile doit obligatoirement contenir un ou des polygones et la surface totale des polygones ne doit pas excéder 2500 hectares.
 		Une fois le shapefile importé vers Forestimator, celui-ci apparaîtra en bleu sur la carte.
 
 		<div>
@@ -573,7 +573,7 @@ parcellaire.shp &lt;- st_read(shp.path)<br></br>
 
 </message>
 
-<message id="analyse.surf.msg.uploadOK"> Téléchargement du shp effectué avec succès. </message>
+<message id="analyse.surf.msg.uploadOK"> Téléchargement de la couche cartographique effectué avec succès. </message>
 
 
 <message id="report.analyse.surf.hdom.t"> <h4> Hauteur dominante calculée sur le MNH  (modèle pour pessière)</h4> </message>
@@ -821,6 +821,10 @@ Un suivi de l'état sanitaire des pessières est réalisé en vue d'identifier l
 <message id="analytic.rawData"><h4>Dernieres stats brutes</h4>
 <p> Ces enregistrement de fréquentation sont effectués pour certains usage du portail Forestimator. Par exemple, la consultation d'un page fera l'objet d'une observation, mais pas l'utilisation de l'API. Ces observations ne prennent pas en compte les nombreux robot d'indexation qui consultent le site. Si une page web est consultée plusieur fois par jour depuis le même ordinateur, seul la première consultation est enregistrée. Ce ne sont donc pas à proprement parler des "observations brutes" </p>
 </message>
+
+<message id="analyse.surf.msg.shpIncomplete">Veillez sélectionner les 3 fichiers du shapefile (shp, shx et dbf).  </message>
+
+<message id="analyse.surf.msg.ImportGeopackage"> Vous avez chargé une couche vectorielle au format Geopackage. La première couche du geopackage va être utilisée </message>
 
 
 </messages>

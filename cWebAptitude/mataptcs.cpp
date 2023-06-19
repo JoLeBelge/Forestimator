@@ -93,7 +93,6 @@ matAptCS::matAptCS(cDicoApt *aDicoApt):mDicoApt(aDicoApt),zbio_(1),US_(1),mVar_(
              messageBox->buttonClicked().connect([=] {
                  this->removeChild(messageBox);
              });
-             //messageBox->setMinimumSize("40%","30%");
              messageBox->show();
          });
 
@@ -205,7 +204,7 @@ void matAptCS::showFicheUS(int US, std::string aVar){
         t1->setStyleClass("table-apt");
         std::string styleName("table-apt"+std::to_string(apt));
         mAptTable->elementAt(rGlob,cGlob)->addStyleClass(styleName);
-        std::string styleNameCol("col-apt"+std::to_string(apt));
+        std::string styleNameCol("col-aptCS"+std::to_string(apt));
         int r(0),col(0);
         std::vector<cEss*> aV=mVEss.at(apt-1);
         int ncells=std::ceil(std::sqrt(aV.size()));
@@ -244,7 +243,6 @@ void matAptCS::showFicheUS(int US, std::string aVar){
                 messageBox->buttonClicked().connect([=] {
                     this->removeChild(messageBox);
                 });
-                //messageBox->setMinimumSize("40%","30%");
                 messageBox->show();
             });
             col++;
@@ -292,11 +290,7 @@ void matAptCS::showFicheUS(int US, std::string aVar){
     if (s.toUTF8().substr(0,2)!="??"){
     contFicheUS->addNew<Wt::WText>(tr(idMessage));
     }
-
-    //setHeight(Wt::WLength(3000));
     doJavaScript("ficheUS.scrollIntoView({ behavior: 'smooth', block: 'start' })");
-
-
 }
 
 void matAptCS::changeZbio(){
@@ -309,7 +303,6 @@ void matAptCS::changeZbio(){
 }
 
 void matAptCS::hoverBubble(WContainerWidget * c, bool hover){
-    // if(hover){c->addStyleClass("circle_eco_large");} else {c->setStyleClass("circle_eco");}
     if(hover){c->addStyleClass("circle_eco_large");} else {c->removeStyleClass("circle_eco_large");}
 }
 
@@ -321,18 +314,18 @@ void matAptCS::displayNiche(std::string aEssCode){
         std::string var=std::get<1>(kv.first);
         // récupérer l'aptitude
         int apt=ess->getApt(zbio_,us,var);
-        // choisir la couleur en fonction de l'aptitude
-        std::string styleName("col-apt"+std::to_string(mDicoApt->AptNonContraignante(apt)));
+        // choisir la couleur en fonction de l'aptitude  - attention, couleur Apt CS et non pas FEE
+        std::string styleName("col-aptCS"+std::to_string(mDicoApt->AptNonContraignante(apt)));
         kv.second->addStyleClass(styleName);
     }
 }
 
 void matAptCS::resetNiche(){
     for (auto kv : mMapButtonUS){
-        kv.second->removeStyleClass("col-apt1");
-        kv.second->removeStyleClass("col-apt2");
-        kv.second->removeStyleClass("col-apt3");
-        kv.second->removeStyleClass("col-apt4");
+        kv.second->removeStyleClass("col-aptCS1");
+        kv.second->removeStyleClass("col-aptCS2");
+        kv.second->removeStyleClass("col-aptCS3");
+        kv.second->removeStyleClass("col-aptCS4");
     }
 }
 

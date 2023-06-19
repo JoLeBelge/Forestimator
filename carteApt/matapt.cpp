@@ -61,12 +61,20 @@ matApt::matApt(std::shared_ptr<cdicoAptBase> aDicoApt):mDicoApt(aDicoApt),zbio_(
         }
     }
     // partie droite
+<<<<<<< HEAD
     WContainerWidget * contD = layoutGlobal->addWidget(std::make_unique<WContainerWidget>());
 
     WVBoxLayout * layoutDroite = contD->setLayout(std::make_unique<WVBoxLayout>());
     WContainerWidget * contZbio = layoutDroite->addWidget(std::make_unique<WContainerWidget>());
     WHBoxLayout * layoutzbio = contZbio->setLayout(std::make_unique<WHBoxLayout>());
     WContainerWidget * contZbioGauche = layoutzbio->addWidget(std::make_unique<WContainerWidget>());
+=======
+    WContainerWidget * contD = layoutGlobal->addWidget(cpp14::make_unique<WContainerWidget>());
+    WVBoxLayout * layoutDroite = contD->setLayout(cpp14::make_unique<WVBoxLayout>());
+    WContainerWidget * contZbio = layoutDroite->addWidget(cpp14::make_unique<WContainerWidget>());
+    WHBoxLayout * layoutzbio = contZbio->setLayout(cpp14::make_unique<WHBoxLayout>());
+    WContainerWidget * contZbioGauche = layoutzbio->addWidget(cpp14::make_unique<WContainerWidget>());
+>>>>>>> f33f849 (parcellaire : on peux charger le format geopackage en plus du format shapefile)
     contZbioGauche->addWidget(std::make_unique<Wt::WText>(tr("zbio.titre")));
     //contZbio->setMinimumSize("50%","100px");
     //contZbio->setMaximumSize("50%","300px");

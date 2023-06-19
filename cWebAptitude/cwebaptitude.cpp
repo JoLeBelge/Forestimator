@@ -112,7 +112,7 @@ cWebAptitude::cWebAptitude(AuthApplication *app, Auth::AuthWidget* authWidget_)
     menu_gauche->setWidth(60);
     menu_gauche->addStyleClass("menu_gauche");
 
-    content_panier->addWidget(Wt::cpp14::make_unique<Wt::WTemplate>(tr("panier.header")));
+    content_panier->addNew<Wt::WText>(tr("panier.header"));
     content_panier->setWidth("100%");
 
     auto menu = menu_gauche->addWidget(Wt::cpp14::make_unique<WMenu>());
