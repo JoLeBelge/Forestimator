@@ -11,7 +11,7 @@
 			<property name="smtp-port">25</property>
 		</properties>
 		<session-management>
-			<timeout>30000</timeout>
+			<timeout>600</timeout>
 
 
 		 	<!--<plain-ajax-sessions-ratio-limit>1</plain-ajax-sessions-ratio-limit>-->

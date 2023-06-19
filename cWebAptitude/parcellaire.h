@@ -33,11 +33,9 @@ class cDicoApt;
 class parcellaire: public WContainerWidget
 {
 public:
-    //parcellaire(WContainerWidget *parent, groupLayers * aGL, Wt::WApplication* app,statWindow * statW);
     parcellaire(groupLayers * aGL, Wt::WApplication* app,statWindow * statW);
     ~parcellaire();
     void cleanShpFile();
-    // conversion shp esri vers geoJson
     bool to31370AndGeoJson();
     void display();
     // effectue des vérification du shp (polygone, src)
@@ -45,8 +43,6 @@ public:
     // merge de tout les polygones pour avoir une géométrie globale et y calculer la surface totale
     bool computeGlobalGeom(std::string extension, bool limitSize);
 
-    // computeStat est l'ancienne version qui ajoutait un champ au shp - OLD
-    void computeStat();
     void visuStat(OGRFeature *poFeature);
     void upload();
     void clickUploadBt();
@@ -60,8 +56,9 @@ public:
 
     std::string geoJsonName();
     std::string geoJsonRelName();
+    std::string fileName();
 
-    //void downloadShp();
+    //télécharger plusieurs carte à la fois
     void downloadRaster();
     void anaAllPol();
     bool cropImWithShp(std::string inputRaster, std::string aOut);
@@ -73,7 +70,7 @@ public:
 private:
 
     // Full path ; là ou est sauvé le shp localement, mName ; le nom du shp tels qu'il était chez le client
-    std::string mFullPath, mName,mClientName;
+    std::string mFullPath, mName,mClientName,mExtention;
     std::string mLabelName;// visible pour rapport
     Wt::WContainerWidget * mContSelect4D;
 

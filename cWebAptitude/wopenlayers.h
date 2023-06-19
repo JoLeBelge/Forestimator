@@ -98,9 +98,6 @@ public:
 
     JSlot slot2;
 
-    //JSignal<int>& polygId() { return polygId_; }
-    //JSignal<int>  polygId_;
-
     static constexpr const char *clickWithShift_label = "toto";
 
     //clock_t timer;

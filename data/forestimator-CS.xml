@@ -10,9 +10,26 @@ La classification très systématique des stations convient particulièrement à
 A une échelle plus régionale, comme pour les trois zones bioclimatiques d'Ardenne, le guide des stations est un outil orienté « gestion des stations », qui <mark>découpe le territoire en milieux-types, bien reconnaissables pour le forestier de terrain</mark>. En plus d’un choix d’essences approprié, le guide délivre des conseils de gestion spécifiques aux stations, par exemple en termes de protection des sols ou de promotion de la biodiversité.
 </p>
 <h3>Guide des stations: quel développement pour la Wallonie</h3>
-Pour l'instant, les Guides de Stations de l'Ardenne et de la Lorraine ont été réalisé. 
+<p>Pour l'instant, les Guides de Stations de l'Ardenne et de la Lorraine ont été réalisé. 
 Les couches cartographiques sont disponibles sur demande.
-Les tableaux d'aptitude des essences pour les unités stationnelles sont présentés ci-dessous.
+Les niveaux d’aptitude des essences pour les unités stationnelles sont présentés ci-dessous.</p>
+
+<br></br>
+<p>Légende des niveaux d’aptitude et signification des abréviations utilisées dans les tableaux d’essences des fiches
+descriptives.</p>
+<div class="row">
+	<div class="col-12 text-center"> <h5> Légende des aptitudes </h5> </div>
+	<div class="col-8 text-end"> <h6> Conseillée sans réserve (optimum) </h6> </div>
+	<div class="col-4 col-aptCS1" style="width:30%; height:25px;"> </div>
+	<div class="col-8 text-end"> <h6> Conseillée, en tenant compte de ses faiblesses (tolérance) </h6> </div>
+	<div class="col-4 col-aptCS2" style="width:30%; height:25px;"> </div>
+	<div class="col-8 text-end"> <h6> A n'envisager qu'en accompagnement (tolérance élargie) </h6> </div>
+	<div class="col-4 col-aptCS3" style="width:30%; height:25px;"> </div>
+	<div class="col-8 text-end"> <h6> Ne pas envisager (exclusion) </h6> </div>
+	<div class="col-4 col-aptCS4" style="width:30%; height:25px;"> </div>
+</div>
+<br></br>
+
 </message>
 
 <message id="matAptCS.badge">  US {1}
