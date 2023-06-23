@@ -32,11 +32,11 @@ void statHdom::prepareResult(){
     //aRes->setInline(0);
     mResult->setOverflow(Wt::Overflow::Auto);
 
-    WVBoxLayout * layoutV = mResult->setLayout(cpp14::make_unique<WVBoxLayout>());
-    layoutV->addWidget(cpp14::make_unique<WText>("<h4>"+mLay->getLegendLabel(false)+"</h4>"));
+    WVBoxLayout * layoutV = mResult->setLayout(std::make_unique<WVBoxLayout>());
+    layoutV->addWidget(std::make_unique<WText>("<h4>"+mLay->getLegendLabel(false)+"</h4>"));
 
-    WContainerWidget * aCont = layoutV->addWidget(cpp14::make_unique<WContainerWidget>());
-    WHBoxLayout * layoutH = aCont->setLayout(cpp14::make_unique<WHBoxLayout>());
+    WContainerWidget * aCont = layoutV->addWidget(std::make_unique<WContainerWidget>());
+    WHBoxLayout * layoutH = aCont->setLayout(std::make_unique<WHBoxLayout>());
     // ajout de la carte pour cette couche
 
     staticMap sm(mLay,mGeom);
@@ -46,41 +46,41 @@ void statHdom::prepareResult(){
         sm.addPols(mVaddPol, Wt::StandardColor::DarkBlue);
     }
 
-    WContainerWidget * aContIm = layoutH->addWidget(cpp14::make_unique<WContainerWidget>(),0);
-    Wt::WImage * im =aContIm->addWidget(cpp14::make_unique<Wt::WImage>(sm.getWLinkRel()));
+    WContainerWidget * aContIm = layoutH->addWidget(std::make_unique<WContainerWidget>(),0);
+    Wt::WImage * im =aContIm->addWidget(std::make_unique<Wt::WImage>(sm.getWLinkRel()));
     im->resize(450,450);
 
-    WContainerWidget * aContTable = layoutH->addWidget(cpp14::make_unique<WContainerWidget>());
+    WContainerWidget * aContTable = layoutH->addWidget(std::make_unique<WContainerWidget>());
     aContTable->setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Center);
     aContTable->setOverflow(Wt::Overflow::Auto);
-    WTable * table =aContTable->addWidget(cpp14::make_unique<WTable>());
+    WTable * table =aContTable->addWidget(std::make_unique<WTable>());
 
     table->elementAt(0, 0)->setColumnSpan(2);
     table->elementAt(0, 0)->setContentAlignment(AlignmentFlag::Top | AlignmentFlag::Center);
     table->elementAt(0, 0)->setPadding(10);
-    table->elementAt(0,0)->addWidget(cpp14::make_unique<WText>(Wt::WString::tr("report.analyse.surf.hdom.t")));
+    table->elementAt(0,0)->addWidget(std::make_unique<WText>(Wt::WString::tr("report.analyse.surf.hdom.t")));
 
     basicStat bs=bshdom();
 
     int c(1);
-    table->elementAt(c, 0)->addWidget(cpp14::make_unique<WText>("Moyenne"));
-    table->elementAt(c, 1)->addWidget(cpp14::make_unique<WText>(bs.getMean()));
+    table->elementAt(c, 0)->addWidget(std::make_unique<WText>("Moyenne"));
+    table->elementAt(c, 1)->addWidget(std::make_unique<WText>(bs.getMean()));
     table->elementAt(c, 1)->setPadding(10,Wt::Side::Left);
     c++;
-    table->elementAt(c, 0)->addWidget(cpp14::make_unique<WText>("Coefficient de variation"));
-    table->elementAt(c, 1)->addWidget(cpp14::make_unique<WText>(bs.getCV()));
+    table->elementAt(c, 0)->addWidget(std::make_unique<WText>("Coefficient de variation"));
+    table->elementAt(c, 1)->addWidget(std::make_unique<WText>(bs.getCV()));
     table->elementAt(c, 1)->setPadding(10,Wt::Side::Left);
     c++;
-    table->elementAt(c, 0)->addWidget(cpp14::make_unique<WText>("Maximum"));
-    table->elementAt(c, 1)->addWidget(cpp14::make_unique<WText>(bs.getMax()));
+    table->elementAt(c, 0)->addWidget(std::make_unique<WText>("Maximum"));
+    table->elementAt(c, 1)->addWidget(std::make_unique<WText>(bs.getMax()));
     table->elementAt(c, 1)->setPadding(10,Wt::Side::Left);
     c++;
-    table->elementAt(c, 0)->addWidget(cpp14::make_unique<WText>("Minimum"));
-    table->elementAt(c, 1)->addWidget(cpp14::make_unique<WText>(bs.getMin()));
+    table->elementAt(c, 0)->addWidget(std::make_unique<WText>("Minimum"));
+    table->elementAt(c, 1)->addWidget(std::make_unique<WText>(bs.getMin()));
     table->elementAt(c, 1)->setPadding(10,Wt::Side::Left);
     c++;
-    table->elementAt(c, 0)->addWidget(cpp14::make_unique<WText>("Nombre de Hdom mesuré (surface de 0.1 ha)"));// hexagones OLD OLD
-    table->elementAt(c, 1)->addWidget(cpp14::make_unique<WText>(bs.getNb()));
+    table->elementAt(c, 0)->addWidget(std::make_unique<WText>("Nombre de Hdom mesuré (surface de 0.1 ha)"));// hexagones OLD OLD
+    table->elementAt(c, 1)->addWidget(std::make_unique<WText>(bs.getNb()));
     table->elementAt(c, 1)->setPadding(10,Wt::Side::Left);
     c++;
     /*// autres variable dendro
@@ -88,23 +88,23 @@ void statHdom::prepareResult(){
     table->elementAt(c, 0)->setColumnSpan(2);
     table->elementAt(c, 0)->setContentAlignment(AlignmentFlag::Top | AlignmentFlag::Center);
     table->elementAt(c, 0)->setPadding(10);
-    table->elementAt(c,0)->addWidget(cpp14::make_unique<WText>(Wt::WString::tr("report.analyse.surf.dendro.t")));
+    table->elementAt(c,0)->addWidget(std::make_unique<WText>(Wt::WString::tr("report.analyse.surf.dendro.t")));
     c++;
-    table->elementAt(c, 0)->addWidget(cpp14::make_unique<WText>("VHA moyen"));
-    table->elementAt(c, 1)->addWidget(cpp14::make_unique<WText>(bsDendro("vha").getMean()+ " m3/ha"));
+    table->elementAt(c, 0)->addWidget(std::make_unique<WText>("VHA moyen"));
+    table->elementAt(c, 1)->addWidget(std::make_unique<WText>(bsDendro("vha").getMean()+ " m3/ha"));
     table->elementAt(c, 1)->setPadding(10,Wt::Side::Left);
     c++;
-    table->elementAt(c, 0)->addWidget(cpp14::make_unique<WText>("NHA moyen"));
+    table->elementAt(c, 0)->addWidget(std::make_unique<WText>("NHA moyen"));
 
-    table->elementAt(c, 1)->addWidget(cpp14::make_unique<WText>(bsDendro("nha").getMean()+ " tige/ha"));
+    table->elementAt(c, 1)->addWidget(std::make_unique<WText>(bsDendro("nha").getMean()+ " tige/ha"));
     table->elementAt(c, 1)->setPadding(10,Wt::Side::Left);
     c++;
-    table->elementAt(c, 0)->addWidget(cpp14::make_unique<WText>("GHA moyen"));
-    table->elementAt(c, 1)->addWidget(cpp14::make_unique<WText>(bsDendro("gha").getMean()+ " m2/ha"));
+    table->elementAt(c, 0)->addWidget(std::make_unique<WText>("GHA moyen"));
+    table->elementAt(c, 1)->addWidget(std::make_unique<WText>(bsDendro("gha").getMean()+ " m2/ha"));
     table->elementAt(c, 1)->setPadding(10,Wt::Side::Left);
     c++;
-    table->elementAt(c, 0)->addWidget(cpp14::make_unique<WText>("Cmoy moyen"));
-    table->elementAt(c, 1)->addWidget(cpp14::make_unique<WText>(bsDendro("cmoy").getMean()+ " cm"));
+    table->elementAt(c, 0)->addWidget(std::make_unique<WText>("Cmoy moyen"));
+    table->elementAt(c, 1)->addWidget(std::make_unique<WText>(bsDendro("cmoy").getMean()+ " cm"));
     table->elementAt(c, 1)->setPadding(10,Wt::Side::Left);
     c++;
 
@@ -115,11 +115,11 @@ void statHdom::prepareResult(){
     table->elementAt(c, 0)->setContentAlignment(AlignmentFlag::Top | AlignmentFlag::Center);
     table->elementAt(c, 0)->setPadding(10);
 
-    table->elementAt(c,0)->addWidget(cpp14::make_unique<WText>(Wt::WString::tr("report.analyse.surf.classeHauteur.t")));
+    table->elementAt(c,0)->addWidget(std::make_unique<WText>(Wt::WString::tr("report.analyse.surf.classeHauteur.t")));
     for (std::pair<std::string, double> p : mDistFrequ){
         c++;
-        table->elementAt(c, 0)->addWidget(cpp14::make_unique<WText>(p.first));
-        table->elementAt(c, 1)->addWidget(cpp14::make_unique<WText>(roundDouble(100.0*p.second,0)+"%"));
+        table->elementAt(c, 0)->addWidget(std::make_unique<WText>(p.first));
+        table->elementAt(c, 1)->addWidget(std::make_unique<WText>(roundDouble(100.0*p.second,0)+"%"));
         table->elementAt(c, 1)->setPadding(10,Wt::Side::Left);
     }
 
@@ -234,18 +234,18 @@ std::unique_ptr<WContainerWidget> statCompo::getResult(){
     aRes->setInline(0);
     aRes->setOverflow(Wt::Overflow::Auto);
 
-    WVBoxLayout * layoutV = aRes->setLayout(cpp14::make_unique<WVBoxLayout>());
-    layoutV->addWidget(cpp14::make_unique<WText>("<h4>Composition</h4>"));
+    WVBoxLayout * layoutV = aRes->setLayout(std::make_unique<WVBoxLayout>());
+    layoutV->addWidget(std::make_unique<WText>("<h4>Composition</h4>"));
 
-    WContainerWidget * aContTable = layoutV->addWidget(cpp14::make_unique<WContainerWidget>());
+    WContainerWidget * aContTable = layoutV->addWidget(std::make_unique<WContainerWidget>());
     aContTable->setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Center);
     aContTable->setOverflow(Wt::Overflow::Auto);
-    WTable * table =aContTable->addWidget(cpp14::make_unique<WTable>());
+    WTable * table =aContTable->addWidget(std::make_unique<WTable>());
 
     table->elementAt(0, 0)->setColumnSpan(2);
     table->elementAt(0, 0)->setContentAlignment(AlignmentFlag::Top | AlignmentFlag::Center);
     table->elementAt(0, 0)->setPadding(10);
-    table->elementAt(0,0)->addWidget(cpp14::make_unique<WText>(Wt::WString::tr("report.analyse.surf.compo.t")));
+    table->elementAt(0,0)->addWidget(std::make_unique<WText>(Wt::WString::tr("report.analyse.surf.compo.t")));
 
     int c(0);
     for (std::shared_ptr<layerBase> l:mVLay){
@@ -253,8 +253,8 @@ std::unique_ptr<WContainerWidget> statCompo::getResult(){
         // je vais utiliser une autre fonction qui lit la couche all_sp qui sert de masque, pour gerer les nd des différentes cartes.
         // basicStat stat= l->computeBasicStatOnPolyg(mGeom);
         basicStat stat=computeStatWithMasq(l,mGeom);
-        table->elementAt(c, 0)->addWidget(cpp14::make_unique<WText>(l->getLegendLabel(false)));
-        table->elementAt(c, 1)->addWidget(cpp14::make_unique<WText>(stat.getMean()+"%"));
+        table->elementAt(c, 0)->addWidget(std::make_unique<WText>(l->getLegendLabel(false)));
+        table->elementAt(c, 1)->addWidget(std::make_unique<WText>(stat.getMean()+"%"));
         table->elementAt(c, 1)->setPadding(10,Wt::Side::Left);
     }
     return std::move(aRes);
@@ -346,49 +346,49 @@ void statDendro::prepareResult(){
     //aRes->setInline(0);
     mResult->setOverflow(Wt::Overflow::Auto);
 
-    WVBoxLayout * layoutV = mResult->setLayout(cpp14::make_unique<WVBoxLayout>());
-    //layoutV->addWidget(cpp14::make_unique<WText>("<h4>"+mLay->getLegendLabel(false)+"</h4>"));
+    WVBoxLayout * layoutV = mResult->setLayout(std::make_unique<WVBoxLayout>());
+    //layoutV->addWidget(std::make_unique<WText>("<h4>"+mLay->getLegendLabel(false)+"</h4>"));
 
-    WContainerWidget * aCont = layoutV->addWidget(cpp14::make_unique<WContainerWidget>());
-    WHBoxLayout * layoutH = aCont->setLayout(cpp14::make_unique<WHBoxLayout>());
+    WContainerWidget * aCont = layoutV->addWidget(std::make_unique<WContainerWidget>());
+    WHBoxLayout * layoutH = aCont->setLayout(std::make_unique<WHBoxLayout>());
     // ajout de la carte pour cette couche
 
     /*staticMap sm(mLay,mGeom);
 
-    WContainerWidget * aContIm = layoutH->addWidget(cpp14::make_unique<WContainerWidget>(),0);
-    Wt::WImage * im =aContIm->addWidget(cpp14::make_unique<Wt::WImage>(sm.getWLinkRel()));
+    WContainerWidget * aContIm = layoutH->addWidget(std::make_unique<WContainerWidget>(),0);
+    Wt::WImage * im =aContIm->addWidget(std::make_unique<Wt::WImage>(sm.getWLinkRel()));
     im->resize(450,450);
     */
-    WContainerWidget * aContTable = layoutH->addWidget(cpp14::make_unique<WContainerWidget>());
+    WContainerWidget * aContTable = layoutH->addWidget(std::make_unique<WContainerWidget>());
     aContTable->setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Center);
     aContTable->setOverflow(Wt::Overflow::Auto);
-    WTable * table =aContTable->addWidget(cpp14::make_unique<WTable>());
+    WTable * table =aContTable->addWidget(std::make_unique<WTable>());
 
     table->elementAt(0, 0)->setColumnSpan(2);
     table->elementAt(0, 0)->setContentAlignment(AlignmentFlag::Top | AlignmentFlag::Center);
     table->elementAt(0, 0)->setPadding(10);
-    table->elementAt(0,0)->addWidget(cpp14::make_unique<WText>(Wt::WString::tr("report.analyse.surf.dendro.t")));
+    table->elementAt(0,0)->addWidget(std::make_unique<WText>(Wt::WString::tr("report.analyse.surf.dendro.t")));
 
     int c(1);
-    table->elementAt(c, 0)->addWidget(cpp14::make_unique<WText>("Hdom moyen"));
-    table->elementAt(c, 1)->addWidget(cpp14::make_unique<WText>(getHdom()+ " m"));
+    table->elementAt(c, 0)->addWidget(std::make_unique<WText>("Hdom moyen"));
+    table->elementAt(c, 1)->addWidget(std::make_unique<WText>(getHdom()+ " m"));
     table->elementAt(c, 1)->setPadding(10,Wt::Side::Left);
     c++;
-    table->elementAt(c, 0)->addWidget(cpp14::make_unique<WText>("VHA moyen"));
-    table->elementAt(c, 1)->addWidget(cpp14::make_unique<WText>(getVha()+ " m3/ha"));
+    table->elementAt(c, 0)->addWidget(std::make_unique<WText>("VHA moyen"));
+    table->elementAt(c, 1)->addWidget(std::make_unique<WText>(getVha()+ " m3/ha"));
     table->elementAt(c, 1)->setPadding(10,Wt::Side::Left);
     c++;
-    table->elementAt(c, 0)->addWidget(cpp14::make_unique<WText>("NHA moyen"));
+    table->elementAt(c, 0)->addWidget(std::make_unique<WText>("NHA moyen"));
 
-    table->elementAt(c, 1)->addWidget(cpp14::make_unique<WText>(getNha()+ " tige/ha"));
+    table->elementAt(c, 1)->addWidget(std::make_unique<WText>(getNha()+ " tige/ha"));
     table->elementAt(c, 1)->setPadding(10,Wt::Side::Left);
     c++;
-    table->elementAt(c, 0)->addWidget(cpp14::make_unique<WText>("GHA moyen"));
-    table->elementAt(c, 1)->addWidget(cpp14::make_unique<WText>(getGha()+ " m2/ha"));
+    table->elementAt(c, 0)->addWidget(std::make_unique<WText>("GHA moyen"));
+    table->elementAt(c, 1)->addWidget(std::make_unique<WText>(getGha()+ " m2/ha"));
     table->elementAt(c, 1)->setPadding(10,Wt::Side::Left);
     c++;
-    table->elementAt(c, 0)->addWidget(cpp14::make_unique<WText>("Cmoy moyen"));
-    table->elementAt(c, 1)->addWidget(cpp14::make_unique<WText>(getCmoy()+ " cm"));
+    table->elementAt(c, 0)->addWidget(std::make_unique<WText>("Cmoy moyen"));
+    table->elementAt(c, 1)->addWidget(std::make_unique<WText>(getCmoy()+ " cm"));
     table->elementAt(c, 1)->setPadding(10,Wt::Side::Left);
     c++;
 

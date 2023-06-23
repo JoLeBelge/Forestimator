@@ -7,7 +7,7 @@ panier::panier(AuthApplication *app, cWebAptitude * cWebApt): WContainerWidget()
     this->setMaximumSize(500,700);
 
     // create table et layer nodes
-    mTable = this->addWidget(cpp14::make_unique<WTable>());
+    mTable = this->addWidget(std::make_unique<WTable>());
     mTable->setHeaderCount(0);
     mTable->addStyleClass("panier_table");
     //mTable->setWidth(Wt::WLength("90%"));
@@ -15,9 +15,9 @@ panier::panier(AuthApplication *app, cWebAptitude * cWebApt): WContainerWidget()
 
     // extent div si user connecté
     this->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
-    Wt::WContainerWidget * mExtentDivGlob = this->addWidget(cpp14::make_unique<WContainerWidget>());
+    Wt::WContainerWidget * mExtentDivGlob = this->addWidget(std::make_unique<WContainerWidget>());
     Wt::WContainerWidget * mExtentDiv;
-    WPushButton * button_e = mExtentDivGlob->addWidget(cpp14::make_unique<WPushButton>(tr("afficher_extent")));
+    WPushButton * button_e = mExtentDivGlob->addWidget(std::make_unique<WPushButton>(tr("afficher_extent")));
     button_e->setToolTip(tr("afficher_extent_tooltip"));
     button_e->clicked().connect([=] {
         if(mGroupL->mExtentDiv->isVisible())
@@ -27,15 +27,15 @@ panier::panier(AuthApplication *app, cWebAptitude * cWebApt): WContainerWidget()
     });
     button_e->addStyleClass("btn btn-info");
     if (globTest){printf("mextentdiv\n");}
-    mExtentDiv = mExtentDivGlob->addWidget(cpp14::make_unique<WContainerWidget>());
+    mExtentDiv = mExtentDivGlob->addWidget(std::make_unique<WContainerWidget>());
     mExtentDiv->setMargin(15,Wt::Side::Left);
     mExtentDiv->setMargin(15,Wt::Side::Right);
     mExtentDiv->addStyleClass("div_extent");
     mExtentDiv->hide();
 
     this->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
-    this->addWidget(cpp14::make_unique<WText>(tr("coucheStep3")));
-    WPushButton * bExportTiff = this->addWidget(cpp14::make_unique<WPushButton>("Télécharger"));
+    this->addWidget(std::make_unique<WText>(tr("coucheStep3")));
+    WPushButton * bExportTiff = this->addWidget(std::make_unique<WPushButton>("Télécharger"));
     bExportTiff->setToolTip(tr("panier.download_tooltip"));
     bExportTiff->clicked().connect(mGroupL->slotMapExport);
     //bExportTiff->clicked().connect(this,&groupLayers::updateMapExtentAndCropIm);
@@ -67,9 +67,9 @@ void panier::addMap(std::string aCode, std::shared_ptr<Layer> l){
     Wt::WTableRow * r =mTable->insertRow(0);
     r->elementAt(0)->setContentAlignment(AlignmentFlag::Top | AlignmentFlag::Left);
     r->elementAt(0)->setPadding(5);
-    r->elementAt(0)->addWidget(cpp14::make_unique<WText>(l->Nom()));
+    r->elementAt(0)->addWidget(std::make_unique<WText>(l->Nom()));
             /* bouton visible/invisible */
-    WPushButton * bvis = r->elementAt(1)->addWidget(cpp14::make_unique<WPushButton>(""));
+    WPushButton * bvis = r->elementAt(1)->addWidget(std::make_unique<WPushButton>(""));
     bvis->addStyleClass("button_carto");
     bvis->setIcon("resources/eye_visible.png");
     bvis->setCheckable(true);
@@ -82,7 +82,7 @@ void panier::addMap(std::string aCode, std::shared_ptr<Layer> l){
         mcWebAptitude->doJavaScript("activeLayers['"+aCode+"']?.setVisible(!activeLayers['"+aCode+"']?.values_.visible);");
     });
     /* bouton transparent/opaque */
-    bvis = r->elementAt(2)->addWidget(cpp14::make_unique<WPushButton>("T"));
+    bvis = r->elementAt(2)->addWidget(std::make_unique<WPushButton>("T"));
     bvis->addStyleClass("button_carto");
     bvis->setToolTip(tr("panier.transparent"));
     bvis->setCheckable(true);
@@ -102,7 +102,7 @@ void panier::addMap(std::string aCode, std::shared_ptr<Layer> l){
         bvis->setText("O");
     }
     /* bouton delete la couche */
-    bvis =r->elementAt(3)->addWidget(cpp14::make_unique<WPushButton>("x"));
+    bvis =r->elementAt(3)->addWidget(std::make_unique<WPushButton>("x"));
     bvis->addStyleClass("button_carto");
     bvis->setToolTip(tr("panier.delete"));
     bvis->clicked().connect([=] {
@@ -135,7 +135,7 @@ void panier::addMap(std::string aCode, std::shared_ptr<Layer> l){
         }
     });
     /* boutons deplacer la couche */
-    bvis = r->elementAt(4)->addWidget(cpp14::make_unique<WPushButton>(""));
+    bvis = r->elementAt(4)->addWidget(std::make_unique<WPushButton>(""));
     bvis->addStyleClass("button_carto movedown");
     bvis->setToolTip(tr("panier.movedown"));
     bvis->clicked().connect([=] {
@@ -153,7 +153,7 @@ void panier::addMap(std::string aCode, std::shared_ptr<Layer> l){
         mcWebAptitude->doJavaScript("moveLayerUp('"+aCode+"');");
         mGroupL->updateActiveLay(mVLs.at(0)->Code());
     });
-    bvis = r->elementAt(5)->addWidget(cpp14::make_unique<WPushButton>(""));
+    bvis = r->elementAt(5)->addWidget(std::make_unique<WPushButton>(""));
     bvis->addStyleClass("button_carto moveup");
     bvis->setToolTip(tr("panier.moveup"));
     bvis->clicked().connect([=] {

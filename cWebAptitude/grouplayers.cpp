@@ -44,7 +44,7 @@ groupLayers::groupLayers(AuthApplication *app, cWebAptitude * cWebApt):
                 );
     this->sigMapCenter.connect(std::bind(&groupLayers::saveExtent,this, std::placeholders::_1,std::placeholders::_2,std::placeholders::_3));
 
-    mTitle = mLegendDiv->addWidget(cpp14::make_unique<WText>(WString::tr("legendMsg")));
+    mTitle = mLegendDiv->addWidget(std::make_unique<WText>(WString::tr("legendMsg")));
 
     /* Liste cartes 1	*/
     std::unique_ptr<Wt::WTree> tree = Wt::cpp14::make_unique<Wt::WTree>();
@@ -127,7 +127,7 @@ groupLayers::groupLayers(AuthApplication *app, cWebAptitude * cWebApt):
     }
     }
 
-    mParent->addWidget(cpp14::make_unique<WText>(tr("coucheStep1")));
+    mParent->addWidget(std::make_unique<WText>(tr("coucheStep1")));
     mParent->addWidget(std::move(tree));
 
     //mSelect4Stat= new selectLayers4Stat(this);
@@ -490,9 +490,9 @@ void groupLayers::updateLegendeDiv(std::vector<std::shared_ptr<Layer>> layers){
     mLegendDiv->clear();
 
     if(layers.size()==0)
-        mTitle = mLegendDiv->addWidget(cpp14::make_unique<WText>(WString::tr("legendMsg")));
+        mTitle = mLegendDiv->addWidget(std::make_unique<WText>(WString::tr("legendMsg")));
     else{
-        mTitle = mLegendDiv->addWidget(cpp14::make_unique<WText>(WString::tr("legendTitre")));
+        mTitle = mLegendDiv->addWidget(std::make_unique<WText>(WString::tr("legendTitre")));
 
         for (auto layer : layers){
             this->updateLegende(layer);
@@ -527,7 +527,7 @@ void groupLayers::updateLegende(const std::shared_ptr<Layer> l){
         for (auto kv : l->getDicoVal()){
             if (l->hasColor(kv.first)){
                 std::shared_ptr<color> col = l->getColor(kv.first);
-                tab->elementAt(row, 0)->addWidget(cpp14::make_unique<WText>(kv.second));
+                tab->elementAt(row, 0)->addWidget(std::make_unique<WText>(kv.second));
                 tab->elementAt(row, 1)->setWidth("40%");
                 tab->elementAt(row, 1)->decorationStyle().setBackgroundColor(WColor(col->mR,col->mG,col->mB));
                 row++;
@@ -832,12 +832,12 @@ void groupLayers::loadExtents(std::string id){
 
     // boutons pour enregistrer l'extent courant
     mExtentDiv->addNew<Wt::WBreak>();
-    tb_extent_name = mExtentDiv->addWidget(cpp14::make_unique<WLineEdit>());
+    tb_extent_name = mExtentDiv->addWidget(std::make_unique<WLineEdit>());
     tb_extent_name->setInline(1);
     tb_extent_name->setPlaceholderText("Nom de l'emprise...");
     tb_extent_name->setWidth("200px");
     tb_extent_name->addStyleClass("extent_inline");
-    WPushButton * button_s = mExtentDiv->addWidget(cpp14::make_unique<WPushButton>(tr("sauver_extent")));
+    WPushButton * button_s = mExtentDiv->addWidget(std::make_unique<WPushButton>(tr("sauver_extent")));
     button_s->addStyleClass("btn btn-success");
     button_s->setInline(1);
     button_s->addStyleClass("extent_button");

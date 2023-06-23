@@ -29,7 +29,7 @@ void Session::configureAuth()
     verifier->addHashFunction(std::make_unique<Auth::BCryptHashFunction>(7));
     myPasswordService.setVerifier(std::move(verifier));
     myPasswordService.setAttemptThrottlingEnabled(true);
-    //myPasswordService.setStrengthValidator(cpp14::make_unique<Auth::PasswordStrengthValidator>());
+    //myPasswordService.setStrengthValidator(std::make_unique<Auth::PasswordStrengthValidator>());
 
     // paramètrer le validateur de password
     std::unique_ptr<Auth::PasswordStrengthValidator> validator= std::make_unique<Auth::PasswordStrengthValidator>();
@@ -42,10 +42,10 @@ void Session::configureAuth()
     myPasswordService.setStrengthValidator(std::move(validator));
 
     /*if (Auth::GoogleService::configured())
-    myOAuthServices.push_back(cpp14::make_unique<Auth::GoogleService>(myAuthService));
+    myOAuthServices.push_back(std::make_unique<Auth::GoogleService>(myAuthService));
 
   if (Auth::FacebookService::configured())
-    myOAuthServices.push_back(cpp14::make_unique<Auth::FacebookService>(myAuthService));
+    myOAuthServices.push_back(std::make_unique<Auth::FacebookService>(myAuthService));
 
   for (unsigned i = 0; i < myOAuthServices.size(); ++i)
     myOAuthServices[i]->generateRedirectEndpoint();

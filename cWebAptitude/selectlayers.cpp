@@ -162,14 +162,14 @@ std::vector<rasterFiles> baseSelectLayers::getSelectedRaster(){
 baseSelectLayers::baseSelectLayers(){
 
     setOverflow(Wt::Overflow::Auto);
-    treeTable = addWidget(cpp14::make_unique<WTreeTable>());
+    treeTable = addWidget(std::make_unique<WTreeTable>());
     //treeTable->resize(300, 250);
     treeTable->setHeight(241);
     treeTable->setStyleClass("tree");
     treeTable->addStyleClass("tree_left");
     treeTable->tree()->setSelectionMode(SelectionMode::Extended);
     treeTable->addColumn("", 20); // colonne pour les checkbox
-    auto root = cpp14::make_unique<WTreeTableNode>(tr("groupeCoucheAll"));
+    auto root = std::make_unique<WTreeTableNode>(tr("groupeCoucheAll"));
     treeTable->setTreeRoot(std::move(root), "Raster");
     treeTable->treeRoot()->expand();
 

@@ -6,7 +6,7 @@ layerStatChart::layerStatChart(std::shared_ptr<Layer> aLay, std::map<std::string
     //std::cout << "création d'un layer StatChart pour " << mLay->getLegendLabel() << std::endl;
     mModel = std::make_shared<WStandardItemModel>();
     // pas sur que j'ai besoin de spécifier le proto
-    //mModel->setItemPrototype(cpp14::make_unique<WStandardItem>());
+    //mModel->setItemPrototype(std::make_unique<WStandardItem>());
 
     // Configure the header.
     mModel->insertColumns(mModel->columnCount(), 2);
@@ -54,27 +54,27 @@ std::unique_ptr<WContainerWidget> layerStatChart::getChart(bool forRenderingInPd
     WContainerWidget * aContTableAndPie ;
 
     if (forRenderingInPdf){// je pensais que le rendu pdf était en conflit avec les layouts, mais ça ne semble pas être ça...
-         aRes->addWidget(cpp14::make_unique<WText>("<h4>"+mLay->getLegendLabel(false)+"</h4>"));
-         WContainerWidget * aContIm =aRes->addWidget(cpp14::make_unique<WContainerWidget>());
-         Wt::WImage * im =aContIm->addWidget(cpp14::make_unique<Wt::WImage>(sm.getWLinkRel()));
+         aRes->addWidget(std::make_unique<WText>("<h4>"+mLay->getLegendLabel(false)+"</h4>"));
+         WContainerWidget * aContIm =aRes->addWidget(std::make_unique<WContainerWidget>());
+         Wt::WImage * im =aContIm->addWidget(std::make_unique<Wt::WImage>(sm.getWLinkRel()));
          im->resize(450,450);
-         aContTableAndPie = aRes->addWidget(cpp14::make_unique<WContainerWidget>());
+         aContTableAndPie = aRes->addWidget(std::make_unique<WContainerWidget>());
     } else {
-    WVBoxLayout * layoutV = aRes->setLayout(cpp14::make_unique<WVBoxLayout>());
-    layoutV->addWidget(cpp14::make_unique<WText>("<h4>"+mLay->getLegendLabel(false)+"</h4>"));
-    WContainerWidget * aCont = layoutV->addWidget(cpp14::make_unique<WContainerWidget>());
-    WHBoxLayout * layoutH = aCont->setLayout(cpp14::make_unique<WHBoxLayout>());
+    WVBoxLayout * layoutV = aRes->setLayout(std::make_unique<WVBoxLayout>());
+    layoutV->addWidget(std::make_unique<WText>("<h4>"+mLay->getLegendLabel(false)+"</h4>"));
+    WContainerWidget * aCont = layoutV->addWidget(std::make_unique<WContainerWidget>());
+    WHBoxLayout * layoutH = aCont->setLayout(std::make_unique<WHBoxLayout>());
         // je dois ajouter un conteneur pour y mettre l'image dedans, sinon mise en page foireuse
-        WContainerWidget * aContIm = layoutH->addWidget(cpp14::make_unique<WContainerWidget>(),0);
-        Wt::WImage * im =aContIm->addWidget(cpp14::make_unique<Wt::WImage>(sm.getWLinkRel()));
+        WContainerWidget * aContIm = layoutH->addWidget(std::make_unique<WContainerWidget>(),0);
+        Wt::WImage * im =aContIm->addWidget(std::make_unique<Wt::WImage>(sm.getWLinkRel()));
         im->resize(450,450);
-        aContTableAndPie = layoutH->addWidget(cpp14::make_unique<WContainerWidget>());
+        aContTableAndPie = layoutH->addWidget(std::make_unique<WContainerWidget>());
     }
     aContTableAndPie->setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Center);
     aContTableAndPie->setOverflow(Wt::Overflow::Auto);
    if (mStatSimple.size()>0){
             if (mTypeVar==TypeVar::Classe){
-                WTableView* table =aContTableAndPie->addWidget(cpp14::make_unique<WTableView>());
+                WTableView* table =aContTableAndPie->addWidget(std::make_unique<WTableView>());
                 table->setMargin(10, Side::Top | Side::Bottom);
                 table->setMargin(WLength::Auto, Side::Left | Side::Right);
                 table->setAlternatingRowColors(0);
@@ -124,13 +124,13 @@ std::unique_ptr<WContainerWidget> layerStatChart::getChart(bool forRenderingInPd
                     row++;
                 }
 
-                Chart::WCartesianChart *aChart = aContTableAndPie->addWidget(cpp14::make_unique<Chart::WCartesianChart>());
+                Chart::WCartesianChart *aChart = aContTableAndPie->addWidget(std::make_unique<Chart::WCartesianChart>());
                 //aChart->setBackground(WColor(220, 220, 220));
                 aChart->setModel(model);
                 aChart->setXSeriesColumn(0);
                 aChart->setLegendEnabled(true);
                 aChart->setType(Chart::ChartType::Scatter);
-                auto s = cpp14::make_unique<Chart::WDataSeries>(1, Chart::SeriesType::Curve);
+                auto s = std::make_unique<Chart::WDataSeries>(1, Chart::SeriesType::Curve);
                 s->setShadow(WShadow(3, 3, WColor(0, 0, 0, 127), 3));
                 aChart->addSeries(std::move(s));
                 aChart->resize(300, 300);    // WPaintedWidget must be given an explicit size.
@@ -139,7 +139,7 @@ std::unique_ptr<WContainerWidget> layerStatChart::getChart(bool forRenderingInPd
                 aChart->setMargin(50, Side::Left | Side::Right);
             }
         } else {
-            aRes->addWidget(cpp14::make_unique<WText>("Pas de statistique pour cette couche"));
+            aRes->addWidget(std::make_unique<WText>("Pas de statistique pour cette couche"));
         }
     return std::move(aRes);
 }
@@ -147,7 +147,7 @@ std::unique_ptr<WContainerWidget> layerStatChart::getChart(bool forRenderingInPd
 std::unique_ptr<Wt::WContainerWidget> layerStatChart::getBarStat(){
 
     std::unique_ptr<Wt::WContainerWidget> aRes= std::make_unique<Wt::WContainerWidget>();
-    aRes->addWidget(cpp14::make_unique<batonnetApt>(this,mLay->Dico()->Dico_AptFull2AptAcro));
+    aRes->addWidget(std::make_unique<batonnetApt>(this,mLay->Dico()->Dico_AptFull2AptAcro));
 
     return std::move(aRes);
 }

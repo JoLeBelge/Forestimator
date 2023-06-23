@@ -2,6 +2,7 @@
 #include <Wt/WGlobal.h>
 
 namespace dbo = Wt::Dbo;
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 
 class User;
 using AuthInfo = Wt::Auth::Dbo::AuthInfo<User>;

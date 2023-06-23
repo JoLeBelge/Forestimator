@@ -149,7 +149,7 @@ std::unique_ptr<Wt::Auth::AuthWidget> AuthApplication::loadAuthWidget(){
     // auth widget (login)
     if (globTest){printf("Auth widget...");}
     session_.login().changed().connect(this, &AuthApplication::authEvent);
-    std::unique_ptr<Wt::Auth::AuthWidget> authWidget = cpp14::make_unique<Wt::Auth::AuthWidget>(Session::auth(), session_.users(), session_.login());
+    std::unique_ptr<Wt::Auth::AuthWidget> authWidget = std::make_unique<Wt::Auth::AuthWidget>(Session::auth(), session_.users(), session_.login());
     authWidget_=authWidget.get();
     authWidget_->model()->addPasswordAuth(&session_.passwordAuth());
     //authWidget_->model()->addOAuth(Session::oAuth()); // no need google and facebook
