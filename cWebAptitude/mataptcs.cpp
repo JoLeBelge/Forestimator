@@ -85,7 +85,7 @@ matAptCS::matAptCS(cDicoApt *aDicoApt):mDicoApt(aDicoApt),zbio_(1),US_(1),mVar_(
     }
 
      /* 4 Description de unités stationnelles ---------------------------*/
-    contFicheUS = addWidget(std::make_unique<WContainerWidget>());
+    contFicheUS = addWidget(cpp14::make_unique<WContainerWidget>());
     contFicheUS->setId("ficheUS");
     //contFicheUS->setHeight(Wt::WLength(2000.0));
 

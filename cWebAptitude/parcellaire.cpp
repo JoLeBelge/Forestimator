@@ -20,13 +20,9 @@ parcellaire::parcellaire(groupLayers *aGL, Wt::WApplication* app, statWindow *st
 
     setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Left);
     setInline(0);
-<<<<<<< HEAD
 
     addWidget(std::make_unique<WText>(tr("anaStep1")));
     //mParent->addWidget(std::make_unique<Wt::WText>(tr("infoParcellaire")));
-=======
-    addWidget(cpp14::make_unique<WText>(tr("anaStep1")));
->>>>>>> f33f849818b155162c797afa8b37f01112774e40
 
     fu =addNew<Wt::WFileUpload>();
     fu->setFileTextSize(globVolMaxShp); // Set the maximum file size. il faut également changer param max-request-size dans wt_config
@@ -44,12 +40,8 @@ parcellaire::parcellaire(groupLayers *aGL, Wt::WApplication* app, statWindow *st
 
     addWidget(std::make_unique<WText>(tr("anaStep3")));
 
-<<<<<<< HEAD
 
     downloadRasterBt = addWidget(std::make_unique<Wt::WPushButton>(tr("parcellaire.tele.btn")));
-=======
-    downloadRasterBt = addWidget(cpp14::make_unique<Wt::WPushButton>(tr("parcellaire.tele.btn")));
->>>>>>> f33f849818b155162c797afa8b37f01112774e40
     downloadRasterBt->setStyleClass("btn btn-success");
     downloadRasterBt->setWidth(200);
     downloadRasterBt->setInline(0);
