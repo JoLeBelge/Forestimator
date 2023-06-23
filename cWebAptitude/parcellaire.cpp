@@ -20,13 +20,15 @@ parcellaire::parcellaire(groupLayers *aGL, Wt::WApplication* app, statWindow *st
 
     setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Left);
     setInline(0);
-<<<<<<< HEAD
 
     addWidget(std::make_unique<WText>(tr("anaStep1")));
     //mParent->addWidget(std::make_unique<Wt::WText>(tr("infoParcellaire")));
+<<<<<<< HEAD
 =======
     addWidget(cpp14::make_unique<WText>(tr("anaStep1")));
 >>>>>>> f33f849 (parcellaire : on peux charger le format geopackage en plus du format shapefile)
+=======
+>>>>>>> 9bef7ba (merge with master)
 
     fu =addNew<Wt::WFileUpload>();
     fu->setFileTextSize(globVolMaxShp); // Set the maximum file size. il faut également changer param max-request-size dans wt_config
@@ -44,12 +46,14 @@ parcellaire::parcellaire(groupLayers *aGL, Wt::WApplication* app, statWindow *st
 
     addWidget(std::make_unique<WText>(tr("anaStep3")));
 
-<<<<<<< HEAD
 
     downloadRasterBt = addWidget(std::make_unique<Wt::WPushButton>(tr("parcellaire.tele.btn")));
+<<<<<<< HEAD
 =======
     downloadRasterBt = addWidget(cpp14::make_unique<Wt::WPushButton>(tr("parcellaire.tele.btn")));
 >>>>>>> f33f849 (parcellaire : on peux charger le format geopackage en plus du format shapefile)
+=======
+>>>>>>> 9bef7ba (merge with master)
     downloadRasterBt->setStyleClass("btn btn-success");
     downloadRasterBt->setWidth(200);
     downloadRasterBt->setInline(0);

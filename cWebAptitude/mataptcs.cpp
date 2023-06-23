@@ -3,31 +3,14 @@ extern bool globTest;
 
 matAptCS::matAptCS(cDicoApt *aDicoApt):mDicoApt(aDicoApt),zbio_(1),US_(1),mVar_("")
 {
-<<<<<<< HEAD
-    setOverflow(Wt::Overflow::Auto);
-    //setId("matAptCont");
-    // un nouveau div enfant car le parent est dans le stack, avec display flex, ce qui fait foirer un scroll général sur tout le contenu.
-    WVBoxLayout * layoutGlobal = setLayout(std::make_unique<WVBoxLayout>());
-=======
     //setOverflow(Wt::Overflow::Auto);
     setId("pageCS");
->>>>>>> 36e9392 (page Catalogue)
 
     //setMaximumSize("100%","5000px");
     /* 1 Intro ---------------------------*/
-<<<<<<< HEAD
-    layoutGlobal->addWidget(std::make_unique<WText>(tr("CS.intro")));
-     /* 2 Zbio ---------------------------*/
-    //WContainerWidget * contZbioGlob = layoutGlobal->addWidget(std::make_unique<WContainerWidget>());
-    //WVBoxLayout * layoutDroite = contZbioGlob->setLayout(std::make_unique<WVBoxLayout>());
-    //WContainerWidget * contZbio = layoutDroite->addWidget(std::make_unique<WContainerWidget>());
-    //WHBoxLayout * layoutzbio = contZbio->setLayout(std::make_unique<WHBoxLayout>());
-    //WContainerWidget * contZbioGauche = layoutzbio->addWidget(std::make_unique<WContainerWidget>());
-=======
     addWidget(cpp14::make_unique<WText>(tr("CS.intro")));
      /* 2 Zbio ---------------------------*/
     addWidget(std::make_unique<Wt::WText>(tr("matAptCS.zbio")));
->>>>>>> 36e9392 (page Catalogue)
 
     zbioSelection_  =addWidget(std::make_unique<Wt::WComboBox>());
     for (const auto &kv : *mDicoApt->ZBIO()){
@@ -38,14 +21,10 @@ matAptCS::matAptCS(cDicoApt *aDicoApt):mDicoApt(aDicoApt),zbio_(1),US_(1),mVar_(
     zbioSelection_->changed().connect(std::bind(&matAptCS::changeZbio,this));
     zbioSelection_->setCurrentIndex(0);
 
-<<<<<<< HEAD
-    Wt::WTemplate * tpl = layoutGlobal->addWidget(std::make_unique<Wt::WTemplate>(tr("template.CS")));
-=======
     addNew<Wt::WBreak>();
     addNew<Wt::WBreak>();
 
     Wt::WTemplate * tpl = addWidget(cpp14::make_unique<Wt::WTemplate>(tr("template.CS")));
->>>>>>> 36e9392 (page Catalogue)
     std::string  aShp=mDicoApt->File("ZBIOSIMP");
     graphZbio = tpl->bindWidget("graphZbio", Wt::cpp14::make_unique<zbioPainted>(aShp,mDicoApt));
     contListeUS = tpl->bindWidget("listeUS", Wt::cpp14::make_unique<WContainerWidget>());
@@ -107,10 +86,13 @@ matAptCS::matAptCS(cDicoApt *aDicoApt):mDicoApt(aDicoApt),zbio_(1),US_(1),mVar_(
 
      /* 4 Description de unités stationnelles ---------------------------*/
 <<<<<<< HEAD
+<<<<<<< HEAD
     contFicheUS = layoutGlobal->addWidget(std::make_unique<WContainerWidget>());
     mAptTable = layoutGlobal->addWidget(std::make_unique<WTable>());
     updateListeUS();
 =======
+=======
+>>>>>>> 9bef7ba (merge with master)
     contFicheUS = addWidget(cpp14::make_unique<WContainerWidget>());
     contFicheUS->setId("ficheUS");
     //contFicheUS->setHeight(Wt::WLength(2000.0));
