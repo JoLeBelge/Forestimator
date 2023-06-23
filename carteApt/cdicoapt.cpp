@@ -21,7 +21,7 @@ cDicoApt::cDicoApt(std::string aBDFile):cdicoAptBase(aBDFile)
         sqlite3_stmt * stmt;
         //pour l'instant je ne sélectionne pas les stations qui ne sont pas cartographiées ; celles qui ont été regroupée en une station carto.
         // c'est faux vu que je prends les variantes pour l'Ardenne
-        std::string SQLstring="SELECT ZBIO,stat_id,Station_carto,var FROM dico_station WHERE stat_id=stat_num;";
+        std::string SQLstring="SELECT ZBIO,stat_id,Station_carto,var,nom_var FROM dico_station WHERE stat_id=stat_num;";
         sqlite3_prepare_v2( *db_, SQLstring.c_str(), -1, &stmt, NULL );
         while(sqlite3_step(stmt) == SQLITE_ROW)
         {
@@ -30,11 +30,15 @@ cDicoApt::cDicoApt(std::string aBDFile):cdicoAptBase(aBDFile)
                 int aA=sqlite3_column_int( stmt, 0 );
                 int aB=sqlite3_column_int( stmt, 1 );
                 std::string aC=std::string( (char *)sqlite3_column_text( stmt, 2 ) );
-                std::string aD("");
+                std::string aD(""),aF("");
                 if (sqlite3_column_type(stmt, 3)!=SQLITE_NULL){
                 aD=std::string( (char *)sqlite3_column_text( stmt, 3 ) );
                 }
+                if (sqlite3_column_type(stmt, 4)!=SQLITE_NULL){
+                aF=std::string( (char *)sqlite3_column_text( stmt, 4 ) );
+                }
                 Dico_station[aA].emplace(std::make_pair(std::make_tuple(aB,aD),aC));
+                Dico_station_var[aA].emplace(std::make_pair(std::make_tuple(aB,aD),aF));
 
                 //std::cout << " station " << aB << ", variante " << aD << std::endl;
             }
@@ -110,20 +114,21 @@ cDicoApt::cDicoApt(std::string aBDFile):cdicoAptBase(aBDFile)
         }
         sqlite3_finalize(stmt);
 
-        SQLstring="SELECT Code,Nom,NomCol FROM dico_caracteristiqueCS;";
+        SQLstring="SELECT code,val FROM dico_caracteristiqueCS;";
         sqlite3_prepare_v2( *db_, SQLstring.c_str(), -1, &stmt, NULL );
         while(sqlite3_step(stmt) == SQLITE_ROW)
         {
-            if (sqlite3_column_type(stmt, 0)!=SQLITE_NULL && sqlite3_column_type(stmt, 1)!=SQLITE_NULL && sqlite3_column_type(stmt, 2)!=SQLITE_NULL){
+            if (sqlite3_column_type(stmt, 0)!=SQLITE_NULL && sqlite3_column_type(stmt, 1)!=SQLITE_NULL){
                 std::string aA=std::string( (char *)sqlite3_column_text( stmt, 0 ));
                 std::string aB=std::string( (char *)sqlite3_column_text( stmt, 1 ));
-                std::string aC=std::string( (char *)sqlite3_column_text( stmt, 2 ));
+                //std::string aC=std::string( (char *)sqlite3_column_text( stmt, 2 ));
                 Dico_codeKK2Nom.emplace(std::make_pair(aA,aB));
-                Dico_codeKK2NomCol.emplace(std::make_pair(aA,aC));
+                //Dico_codeKK2NomCol.emplace(std::make_pair(aA,aC));
             }
         }
         sqlite3_finalize(stmt);
-        SQLstring="SELECT id,cat_id,nom FROM dico_echelleFact;";
+
+        /*SQLstring="SELECT id,cat_id,nom FROM dico_echelleFact;";
         sqlite3_prepare_v2( *db_, SQLstring.c_str(), -1, &stmt, NULL );
 
         while(sqlite3_step(stmt) == SQLITE_ROW)
@@ -137,6 +142,7 @@ cDicoApt::cDicoApt(std::string aBDFile):cdicoAptBase(aBDFile)
             }
         }
         sqlite3_finalize(stmt);
+        */
         SQLstring="SELECT id,Nom_fr_wal, WalEunis FROM dico_habitat;";
         sqlite3_prepare_v2( *db_, SQLstring.c_str(), -1, &stmt, NULL );
         while(sqlite3_step(stmt) == SQLITE_ROW)
@@ -152,7 +158,7 @@ cDicoApt::cDicoApt(std::string aBDFile):cdicoAptBase(aBDFile)
         }
         sqlite3_finalize(stmt);
 
-        SQLstring="SELECT DISTINCT N_cat_pot,Cat_pot FROM dico_echellePotentiel;";
+        /*SQLstring="SELECT DISTINCT N_cat_pot,Cat_pot FROM dico_echellePotentiel;";
         sqlite3_prepare_v2( *db_, SQLstring.c_str(), -1, &stmt, NULL );
         while(sqlite3_step(stmt) == SQLITE_ROW)
         {
@@ -164,7 +170,7 @@ cDicoApt::cDicoApt(std::string aBDFile):cdicoAptBase(aBDFile)
                 Dico_echellePotCat.emplace(std::make_pair(aA,aB));
             }
         }
-        sqlite3_finalize(stmt);
+        sqlite3_finalize(stmt);*/
         SQLstring="SELECT raster_val,Nom FROM dico_topo;";
         sqlite3_prepare_v2( *db_, SQLstring.c_str(), -1, &stmt, NULL );
         while(sqlite3_step(stmt) == SQLITE_ROW)
@@ -207,6 +213,7 @@ cDicoApt::cDicoApt(std::string aBDFile):cdicoAptBase(aBDFile)
 
 
 
+
         if (globTest){   std::cout << "crée toute les essences " << std::endl;}
 
 
@@ -222,6 +229,29 @@ cDicoApt::cDicoApt(std::string aBDFile):cdicoAptBase(aBDFile)
         }
         //std::cout << "close connection (dicoApt)" << std::endl;
         closeConnection();
+
+        // lecture de table avec dbo
+        std::unique_ptr<dbo::backend::Sqlite3> sqlite3{new dbo::backend::Sqlite3(mBDpath)};
+        Wt::Dbo::Session session;
+        session.setConnection(std::move(sqlite3));
+        session.mapClass<caracteristiqueCS>("caracteristiqueCS");
+        dbo::Transaction transaction{session};
+        // je met tout ça dans une map
+        //typedef dbo::collection< dbo::ptr<caracteristiqueCS> > collectionKKCS;
+        //collectionKKCS col = session.find<caracteristiqueCS>().where("zbio = ?").bind(1);
+        // les collection  de type dbo ne fonctionnent pas pour moi, en tout cas quand j'effectue l'itération avec un for (auto : ), c'est toujours le mm élément qu'il me retourne size() fois.
+        //dbo::collection<dbo::ptr<caracteristiqueCS>>::const_iterator i = col.begin();
+        //while(i != col.end())
+        /*{
+        std::cout << "station id: " << (*i)->station_id;
+        i++;
+        }*/
+        for (int us(1);us <18;us++){
+           dbo::ptr<caracteristiqueCS>  pt = session.find<caracteristiqueCS>().where("station_id = ?").bind(us);
+           caracteristiqueCS  kkCSCopy(pt.get());
+           //std::cout <<"encore une caracteristiqueCS " << kkCSCopy.station_id << " , " << kkCSCopy.zbio <<  std::endl;
+           Dico_US2KK.emplace(std::make_pair(std::make_pair(kkCSCopy.zbio,kkCSCopy.station_id),kkCSCopy));
+        }
     }
 
     std::cout << "done " << std::endl;
@@ -310,33 +340,8 @@ std::map<int,std::shared_ptr<color>> cDicoApt::getDicoRasterCol(std::string aCod
 }
 
 
-std::map<int,std::shared_ptr<color>> cDicoApt::getDicoRasterCol(cKKCS * aKK){
-   std::map<int,std::shared_ptr<color>> aRes;
-
-    sqlite3_stmt * stmt;
-    std::string SQLstring("");
-    if (aKK->IsFact()){ SQLstring="SELECT DISTINCT cat_id,col FROM dico_echelleFact;";}
-    if (aKK->IsPot()){ SQLstring="SELECT DISTINCT N_cat_pot,col FROM dico_echellePotentiel;";}
-    if (aKK->IsHabitat()){ SQLstring="SELECT id,col FROM dico_habitat;";}
-
-    sqlite3_prepare_v2( *db_, SQLstring.c_str(), -1, &stmt, NULL );//preparing the statement
-    while(sqlite3_step(stmt) == SQLITE_ROW)
-    {
-        if (sqlite3_column_type(stmt, 0)!=SQLITE_NULL ){ // attention, la colonne col peut être vide!!
-            int aA=sqlite3_column_int( stmt, 0 );
-            std::string aB("");
-            if (sqlite3_column_type(stmt, 1)!=SQLITE_NULL ) {aB=std::string( (char *)sqlite3_column_text( stmt, 1 ) );}
-            aRes.emplace(std::make_pair(aA,getColor(aB)));
-        }
-    }
-    sqlite3_finalize(stmt);
-
-    return aRes;
-}
-
-
-
-std::map<int,std::map<int,int>> cDicoApt::getKKCS(std::string aColName){
+/* OLD, Catalogue de Andyne Legrain. 2023 ; C'est le travail de Simon Tossens qui prime
+ * std::map<int,std::map<int,int>> cDicoApt::getKKCS(std::string aColName){
     std::map<int,std::map<int,int>> aRes;
 
     sqlite3_stmt * stmt;
@@ -360,7 +365,7 @@ std::map<int,std::map<int,int>> cDicoApt::getKKCS(std::string aColName){
     return aRes;
 }
 
-std::map<int,std::map<int,std::vector<std::string>>> cDicoApt::getHabitatCS(std::string aColName){
+ * std::map<int,std::map<int,std::vector<std::string>>> cDicoApt::getHabitatCS(std::string aColName){
     std::map<int,std::map<int,std::vector<std::string>>> aRes;
 
     sqlite3_stmt * stmt;
@@ -411,7 +416,7 @@ std::map<int,std::map<int,std::vector<std::string>>> cDicoApt::getHabitatCS(std:
 
 
     return aRes;
-}
+}*/
 
 bool cDicoApt::hasWMSinfo(std::string aCode){
     return Dico_WMS.find(aCode)!=Dico_WMS.end();
@@ -426,67 +431,6 @@ WMSinfo * cDicoApt::getWMSinfo(std::string aCode){
 }
 
 std::map<std::string,LayerMTD> * cDicoApt::layerMTD(){return &Dico_layerMTD;}
-
-
-cKKCS::cKKCS(std::string aCode,cDicoApt * aDico):mCode(aCode),mNom(aDico->codeKK2Nom(aCode)),mDico(aDico)
-  ,mNomCol(aDico->codeKK2NomCol()->at(aCode)),mType(Potentiel)
-  ,mHabitat(false)
-{
-    //std::cout << "constructeur KKCS , mCode " << mCode << std::endl;
-    if (mCode=="Habitat"){mHabitat=true;mType=Habitats;}
-
-    if(!mHabitat){
-        mEchelleCS=aDico->getKKCS(mNomCol);
-        //std::cout << this->summary() << std::endl;
-    } else {
-        mHabitats=aDico->getHabitatCS(mNomCol);
-    }
-    mDicoCol=mDico->getDicoRasterCol(this);
-
-
-    if (IsHabitat()){
-        mDicoVal=*mDico->id2Hab();
-    } else if (IsFact()){
-        mDicoVal=*mDico->echelleFactNom() ;
-    } else if (IsPot()){
-        mDicoVal=*mDico->echellePotCat() ;
-    }
-    //std::cout << "done " << std::endl;
-}
-
-std::string cKKCS::NomCarte(){return mDico->File("OUTDIR")+"KK_CS_"+mCode+".tif";}
-std::string cKKCS::shortNomCarte(){return "KK_CS_"+mCode+".tif";}
-//std::string cKKCS::NomDirTuile(){return mDico->File("OUTDIR2")+"KK_CS_"+mCode;}
-
-std::string cKKCS::NomMapServerLayer(){return "KK_CS_"+mCode;}
-std::string cKKCS::NomMapServerLayerFull(){return "Description stationnelle - "+mNom;}
-
-int cKKCS::getEchelle(int aZbio,int aSTId){
-    int aRes(0);
-    if (mEchelleCS.find(aZbio)!=mEchelleCS.end()){
-        std::map<int,int> * Apt=&mEchelleCS.at(aZbio);
-        if (Apt->find(aSTId)!=Apt->end()){
-            int aEchelleFine=Apt->at(aSTId);
-            // echelle plus grossière, 3 catégories
-            aRes=mDico->echelleFact(aEchelleFine);
-        }
-    }
-    return aRes;
-}
-
-int cKKCS::getHab(int aZbio,int aSTId){
-    int aRes(0);
-    if (mHabitats.find(aZbio)!=mHabitats.end()){
-        std::map<int,std::vector<std::string>> * hab=&mHabitats.at(aZbio);
-        if (hab->find(aSTId)!=hab->end()){
-            std::vector<std::string> aVHab=hab->at(aSTId);
-            // renvoi l'id du premier habitat
-            aRes=mDico->habitatId(aVHab.at(0));
-        }
-    }
-    return aRes;
-}
-
 
 TypeCarte str2TypeCarte(const std::string& str)
 {

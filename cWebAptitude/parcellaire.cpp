@@ -12,7 +12,6 @@ parcellaire::parcellaire(groupLayers *aGL, Wt::WApplication* app, statWindow *st
   ,mStatW(statW)
   ,poGeomGlobale(NULL)
   ,mLabelName("")
-
 {
     //std::cout << "creation parcellaire " << std::endl;
     mDico=aGL->Dico();
@@ -21,18 +20,21 @@ parcellaire::parcellaire(groupLayers *aGL, Wt::WApplication* app, statWindow *st
 
     setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Left);
     setInline(0);
+<<<<<<< HEAD
 
     addWidget(std::make_unique<WText>(tr("anaStep1")));
     //mParent->addWidget(std::make_unique<Wt::WText>(tr("infoParcellaire")));
+=======
+    addWidget(cpp14::make_unique<WText>(tr("anaStep1")));
+>>>>>>> f33f849818b155162c797afa8b37f01112774e40
 
     fu =addNew<Wt::WFileUpload>();
     fu->setFileTextSize(globVolMaxShp); // Set the maximum file size. il faut également changer param max-request-size dans wt_config
-    fu->setFilters(".shp, .shx, .dbf, .prj");
+    fu->setFilters(".shp, .shx, .dbf, .prj, .gpkg");
     fu->setMultiple(true);
     fu->setInline(0);
     fu->addStyleClass("btn-file");
     addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
-    //fu->setMargin(20,Wt::Side::Bottom | Wt::Side::Top); // si le parent a des marges et est inline(0) et que je met l'enfant à inline, l'enfant a des marges également
 
     msg = addWidget(std::make_unique<Wt::WText>());
     msg->setInline(0);
@@ -42,8 +44,12 @@ parcellaire::parcellaire(groupLayers *aGL, Wt::WApplication* app, statWindow *st
 
     addWidget(std::make_unique<WText>(tr("anaStep3")));
 
+<<<<<<< HEAD
 
     downloadRasterBt = addWidget(std::make_unique<Wt::WPushButton>(tr("parcellaire.tele.btn")));
+=======
+    downloadRasterBt = addWidget(cpp14::make_unique<Wt::WPushButton>(tr("parcellaire.tele.btn")));
+>>>>>>> f33f849818b155162c797afa8b37f01112774e40
     downloadRasterBt->setStyleClass("btn btn-success");
     downloadRasterBt->setWidth(200);
     downloadRasterBt->setInline(0);
@@ -69,8 +75,6 @@ parcellaire::parcellaire(groupLayers *aGL, Wt::WApplication* app, statWindow *st
 parcellaire::~parcellaire(){
     //std::cout << "destructeur de parcellaire" << std::endl;
     cleanShpFile();
-    fu=NULL;
-    //uploadButton=NULL;
     m_app=NULL;
     msg=NULL;
     mGL=NULL;
@@ -89,10 +93,11 @@ void parcellaire::cleanShpFile(){
     for (auto file : aFiles){
         boost::filesystem::remove(file);
     }
-    if (poGeomGlobale!=NULL){OGRGeometryFactory::destroyGeometry(poGeomGlobale);}
+    //if (poGeomGlobale!=NULL){OGRGeometryFactory::destroyGeometry(poGeomGlobale);} // segfault
     hasValidShp=0;
+    poGeomGlobale!=NULL;
     // je devrait réinitialiser les nom mFullPath et autre ici aussi?
-    //std::cout << "done " << std::endl;
+    mExtention="";
 }
 
 // le nouveau toGeoJson ; effectue un changement de src
@@ -101,20 +106,12 @@ bool parcellaire::to31370AndGeoJson(){
     std::cout << " parcellaire::toGeoJson() ... " ;
     std::string  output(geoJsonName().c_str());
     const char *outPath=output.c_str();
-    std::string input(mFullPath+ ".shp");
-    const char *inputPath=input.c_str();
-    // 0) suppression des polygones foireux - radical mais c'est l'utilisateur qui doit gérer ses propres merdes
 
+    // 0) suppression des polygones foireux - radical mais c'est l'utilisateur qui doit gérer ses propres merdes
     bool testEPSG(1);
-    GDALDataset * DS =  (GDALDataset*) GDALOpenEx( inputPath, GDAL_OF_VECTOR | GDAL_OF_READONLY, NULL, NULL, NULL );
+    GDALDataset * DS =  (GDALDataset*) GDALOpenEx( fileName().c_str(), GDAL_OF_VECTOR | GDAL_OF_READONLY, NULL, NULL, NULL );
     if( DS != NULL )
     {
-        //const char *pszWkt=DS->GetProjectionRef();
-        //OGRSpatialReference oSRS;
-        //oSRS.importFromWkt(&pszWkt);
-        //const char *targetEPSG=oSRS.GetAuthorityCode("GEOGCS");
-        //std::cout << "targetEPSG : " << targetEPSG << std::endl;
-
         OGRLayer * lay = DS->GetLayer(0);
         OGRSpatialReference * oSRS=lay->GetSpatialRef();
         if (oSRS==NULL){
@@ -149,14 +146,14 @@ bool parcellaire::to31370AndGeoJson(){
         }
 
     } else {
-        std::cout << " pas possible de lire fichier " << inputPath << std::endl;
+        std::cout << " pas possible de lire fichier " << fileName() << std::endl;
         return 0;
     }
     GDALClose(DS);
 
     // check le code EPSG - sur serveur j'ai un probleme avec les couche qui sont en user Defined scr 100036, la reprojection en BL72 me met le shp en décalage de 100 m
 
-    GDALDatasetH hSrcDS  = GDALOpenEx( inputPath, GDAL_OF_VECTOR | GDAL_OF_READONLY, NULL, NULL, NULL );
+    GDALDatasetH hSrcDS  = GDALOpenEx( fileName().c_str(), GDAL_OF_VECTOR | GDAL_OF_READONLY, NULL, NULL, NULL );
 
     char** papszArgv = nullptr;
     if (!testEPSG){papszArgv = CSLAddString(papszArgv, "-a_srs"); // target src without reprojection
@@ -197,7 +194,7 @@ bool parcellaire::to31370AndGeoJson(){
     GDALVectorTranslateOptions * option2 = GDALVectorTranslateOptionsNew(papszArgv, nullptr);
     if( option2 ){
         // 2) on s'assure que le shp soit en BL72
-        GDALDatasetH hOutDS = GDALVectorTranslate(inputPath,nullptr,1,&hSrcDS,option2,nullptr);
+        GDALDatasetH hOutDS = GDALVectorTranslate(fileName().c_str(),nullptr,1,&hSrcDS,option2,nullptr);
         if( hOutDS ){
             GDALClose(hOutDS);
         }
@@ -207,9 +204,10 @@ bool parcellaire::to31370AndGeoJson(){
     return aRes;
 }
 
-bool parcellaire::computeGlobalGeom(std::string extension="shp",bool limitSize=1){
+bool parcellaire::computeGlobalGeom(std::string extension="",bool limitSize=1){
     //std::cout << "computeGlobalGeom " << std::endl;
     bool aRes(0);
+    if (extension==""){extension=mExtention;}
     std::string input(mFullPath+ "."+extension);
     const char *inputPath=input.c_str();
     GDALDataset * DS =  (GDALDataset*) GDALOpenEx( inputPath, GDAL_OF_VECTOR | GDAL_OF_READONLY, NULL, NULL, NULL );
@@ -218,7 +216,6 @@ bool parcellaire::computeGlobalGeom(std::string extension="shp",bool limitSize=1
         OGRLayer * lay = DS->GetLayer(0);
         // union de tout les polygones du shp
         OGRFeature *poFeature;
-        //OGRPolygon * poGeom;
         OGRGeometry * poGeom;
         OGRGeometry * poGeom2;
         std::unique_ptr<OGRMultiPolygon> multi = std::make_unique<OGRMultiPolygon>();
@@ -306,46 +303,27 @@ bool parcellaire::computeGlobalGeom(std::string extension="shp",bool limitSize=1
 
 void parcellaire::display(){
     //std::cout << " parcellaire::display " << std::endl;
-    boost::system::error_code ec;
-    std::string JSfile(mDico->File("addOLgeojson"));
-    if (boost::filesystem::exists(JSfile,ec)){
-        assert(!ec);
-        std::cout << " ... " << std::endl;
-        std::stringstream ss;
-        std::string aFileIn(JSfile);
-
-        std::ifstream in(aFileIn);
-        ss << in.rdbuf();
-        in.close();
-        std::string JScommand(ss.str());
-
-        std::string aFind1("NAME");
-
-        std::string aReplace(geoJsonRelName());
-
-        boost::replace_all(JScommand,aFind1,aReplace);
-
-        // extent du parcellaire
-        boost::replace_all(JScommand,"MAXX",std::to_string(mParcellaireExtent.MaxX));
-        boost::replace_all(JScommand,"MAXY",std::to_string(mParcellaireExtent.MaxY));
-        boost::replace_all(JScommand,"MINX",std::to_string(mParcellaireExtent.MinX));
-        boost::replace_all(JScommand,"MINY",std::to_string(mParcellaireExtent.MinY));
-
-        doJavaScript(JScommand);
-        // centrer la map sur le shp
-        doJavaScript("map.getView().setCenter(["+std::to_string(centerX)+","+std::to_string(centerY)+" ]);");
-    } else {
-        std::cout << " ne trouve pas le fichier script de js " << std::endl;
-    }
-    //std::cout << " done " << std::endl;
+    std::string JScommand=std::string("parcellaire = new ol.layer.Vector({")+
+            "source: new ol.source.Vector({"+
+            "format: new ol.format.GeoJSON(),"+
+            "url: '"+geoJsonRelName()+"'}),"+
+            "style:new ol.style.Style({"+
+            "stroke: new ol.style.Stroke({"+
+            "color: 'blue',"+
+            "width: 2})"+
+            "  }),"+
+            "extent: [MINX,MINY,MAXX,MAXY],"+
+            "});"+
+            "updateGroupeLayers();"+
+            "map.getView().fit(parcellaire.getExtent());"+
+            "map.getView().setCenter(["+std::to_string(centerX)+","+std::to_string(centerY)+" ]);";
+    // extent du parcellaire
+    boost::replace_all(JScommand,"MAXX",std::to_string(mParcellaireExtent.MaxX));
+    boost::replace_all(JScommand,"MAXY",std::to_string(mParcellaireExtent.MaxY));
+    boost::replace_all(JScommand,"MINX",std::to_string(mParcellaireExtent.MinX));
+    boost::replace_all(JScommand,"MINY",std::to_string(mParcellaireExtent.MinY));
+    doJavaScript(JScommand);
 }
-
-/*
-void parcellaire::clickUploadBt(){
-    uploadButton->disable();
-    fu->upload();
-    uploadButton->enable();
-}*/
 
 void parcellaire::fuChanged(){
     // si on a changé le contenu, on tente de le télécharger
@@ -366,27 +344,27 @@ void parcellaire::upload(){
     mFullPath = this->mDico->File("TMPDIR")+ mName;
 
     int nbFiles(0);
+    bool isShp(0);
+    mExtention="gpkg";
     for (Http::UploadedFile file : fu->uploadedFiles()){
         boost::filesystem::path a(file.clientFileName());
         //boost::filesystem::rename(file.spoolFileName(),mFullPath+a.extension().c_str());
         // sur server boost::filesystem::rename: Invalid cross-device link:  car /data1 et tmp sont sur des différents volumes.
         //solution ; copy! de toute manière tmp/ est pugé souvent
         boost::filesystem::copy(file.spoolFileName(),mFullPath+a.extension().c_str());
-        //std::cout << "réception " << mFullPath+a.extension().c_str() << std::endl;
-        //if ((a.extension().string()==".shp") | (a.extension().string()==".shx" )| (a.extension().string()==".dbf") | (a.extension().string()==".qpj") | (a.extension().string()==".prj")) nbFiles++;
-        if ((a.extension().string()==".shp") | (a.extension().string()==".shx" )| (a.extension().string()==".dbf")) nbFiles++;
+        if ((a.extension().string()==".shp") | (a.extension().string()==".shx" )| (a.extension().string()==".dbf")) {nbFiles++; isShp=1 ;mExtention="shp";}
     }
 
     // ici je converti en json et affichage dans ol
-    if (nbFiles==3){
+    if (isShp){
+        if (nbFiles==3){
         msg->setText(tr("analyse.surf.msg.uploadOK"));
         if (globTest){std::cout << "Téléchargement du shp effectué avec succès.. " << std::endl ;}
         mLabelName="";
         if (to31370AndGeoJson()){
-            mGL->m_app->addLog("upload a shp"); // add some web stats
+            mGL->m_app->addLog("upload a shp");
             if (computeGlobalGeom()){
                 hasValidShp=true;
-                //computeStatButton->enable();
                 downloadRasterBt->enable();
                 anaOnAllPolygBt->enable();
                 display();
@@ -394,24 +372,49 @@ void parcellaire::upload(){
             }
         }
     } else {
-        msg->setText("Veillez sélectionner les 3 fichiers du shapefile (shp, shx et dbf).");
+        msg->setText(tr("analyse.surf.msg.shpIncomplete"));
         cleanShpFile();
+    }
+    }else {
+        // geopackage
+        auto messageBox =
+                addChild(Wt::cpp14::make_unique<Wt::WMessageBox>(
+                             "Chargement de polygones au format Geopackage",
+                             tr("analyse.surf.msg.ImportGeopackage")
+                             ,
+                             Wt::Icon::Warning,
+                             Wt::StandardButton::Ok));
+
+        messageBox->setModal(true);
+        messageBox->buttonClicked().connect([=] {
+            removeChild(messageBox);
+        });
+        messageBox->show();
+
+        mLabelName="";
+        if (to31370AndGeoJson()){
+            mGL->m_app->addLog("upload a shp gpkg");
+            if (computeGlobalGeom()){
+                hasValidShp=true;
+                downloadRasterBt->enable();
+                anaOnAllPolygBt->enable();
+                display();
+                mGL->mMap->setToolTip(tr("tooltipMap2"));
+            }
+        }
+        msg->setText(tr("analyse.surf.msg.uploadOK"));
     }
 }
 
 void parcellaire::visuStat(OGRFeature *poFeature){
-    std::cout << " parcellaire::visuStat()... " ;
+    if(globTest){std::cout << " parcellaire::visuStat()... " ;}
 
     mStatW->vider();
-
     mStatW->titre("<h4>Statistique pour polygone FID " + std::to_string(poFeature->GetFID()) + " de " + mClientName+ "</h4>");
     if (mLabelName!=""){ mStatW->titre("<h4>Statistique pour " + mLabelName + "</h4>");}
     mStatW->generateGenCarte(poFeature);
     mStatW->genIndivCarteAndAptT();
-
-    std::cout << " ..done " << std::endl;
     m_app->setInternalPath("/resultat",true);
-
 }
 
 // si je click sur un polygone dans ol, calcule les stat et affiche dans une nouvelle page
@@ -419,7 +422,6 @@ void parcellaire::computeStatAndVisuSelectedPol(int aId){
     std::cout << " computeStatAndVisuSelectedPol  , id " << aId << std::endl;
     m_app->loadingIndicator()->setMessage(tr("LoadingI1"));
     m_app->loadingIndicator()->show();
-    //std::string input(mFullPath+ ".shp");
     std::string input(geoJsonName());
     const char *inputPath=input.c_str();
     GDALDataset * mDS =  (GDALDataset*) GDALOpenEx( inputPath, GDAL_OF_VECTOR | GDAL_OF_READONLY, NULL, NULL, NULL );
@@ -451,31 +453,7 @@ void parcellaire::computeStatAndVisuSelectedPol(int aId){
 
 std::string parcellaire::geoJsonName(){return mFullPath + ".geojson";}
 std::string parcellaire::geoJsonRelName(){ return "tmp/" + mName +".geojson";}
-
-/*
-void parcellaire::downloadShp(){
-
-    // créer une nouvelle archive et y mettre tout les fichiers du shp
-    // attention, pour l'instant l'archive crée n'est pas supprimée
-    ZipArchive* zf = new ZipArchive(mFullPath+".zip");
-    zf->open(ZipArchive::WRITE);
-    zf->addFile(mClientName+"_statForestimator.shp",mFullPath+".shp");
-    zf->addFile(mClientName+"_statForestimator.dbf",mFullPath+".dbf");
-    zf->addFile(mClientName+"_statForestimator.shx",mFullPath+".shx");
-    if (exists(mFullPath+".prj"))  zf->addFile(mClientName+"_statForestimator.prj",mFullPath+".prj");
-
-    zf->close();
-    delete zf;
-
-     //std::unique_ptr<WFileResource> fileResource = std::make_unique<Wt::WFileResource>("plain/text",mFullPath+".zip");
-     WFileResource *fileResource = new Wt::WFileResource("plain/text",mFullPath+".zip");
-     fileResource->suggestFileName(mClientName+"_statForestimator.zip");
-    m_app->redirect(fileResource->url());
-    // quand est-ce que je supprime fileResource? et l'archive? l'objet wt et les fichiers?
-    // pas simple on dirai : https://redmine.webtoolkit.eu/boards/2/topics/16990?r=16992#message-16992
-    //https://redmine.webtoolkit.eu/boards/2/topics/11758?r=11774
-}
-*/
+std::string parcellaire::fileName(){return mFullPath+"."+mExtention;}
 
 void parcellaire::downloadRaster(){
 
@@ -535,7 +513,6 @@ void parcellaire::downloadRaster(){
 bool parcellaire::cropImWithShp(std::string inputRaster, std::string aOut){
     bool aRes(0);
     std::cout << " cropImWithShp" << std::endl;
-
     // enveloppe de la géométrie globale
     OGREnvelope ext;
     poGeomGlobale->getEnvelope(&ext);
@@ -627,33 +604,33 @@ void parcellaire::anaAllPol(){
         messageBox->show();
     }else {*/
 
-        if (mGL->getNumSelect4Download()> 4){
+    if (mGL->getNumSelect4Download()> 4){
 
-            auto messageBox =
-                    addChild(Wt::cpp14::make_unique<Wt::WMessageBox>(
-                                 "Analyse surfacique",
-                                 tr("parcellaire.anaAllPol.maxProcess")
-                                 ,
-                                 Wt::Icon::Information,
-                                 Wt::StandardButton::Ok));
+        auto messageBox =
+                addChild(Wt::cpp14::make_unique<Wt::WMessageBox>(
+                             "Analyse surfacique",
+                             tr("parcellaire.anaAllPol.maxProcess")
+                             ,
+                             Wt::Icon::Information,
+                             Wt::StandardButton::Ok));
 
-            messageBox->setModal(true);
-            messageBox->buttonClicked().connect([=] {
-                removeChild(messageBox);
-            });
-            messageBox->show();
-        } else {
+        messageBox->setModal(true);
+        messageBox->buttonClicked().connect([=] {
+            removeChild(messageBox);
+        });
+        messageBox->show();
+    } else {
 
-            std::string input(geoJsonName());// lecture du geojson et pas du shp, comme cela compatible avec polygone du cadastre.
-            const char *inputPath=input.c_str();
-            GDALDataset * mDS =  (GDALDataset*) GDALOpenEx( inputPath, GDAL_OF_VECTOR | GDAL_OF_READONLY, NULL, NULL, NULL );
-            if( mDS != NULL )
-            {
-                // layer
-                OGRLayer * lay = mDS->GetLayer(0);
-                mGL->computeStatAllPol(lay);
-                GDALClose(mDS);
-            } else { std::cout << "select dataset mDS is null " << std::endl;}
-        }
+        std::string input(geoJsonName());// lecture du geojson et pas du shp, comme cela compatible avec polygone du cadastre.
+        const char *inputPath=input.c_str();
+        GDALDataset * mDS =  (GDALDataset*) GDALOpenEx( inputPath, GDAL_OF_VECTOR | GDAL_OF_READONLY, NULL, NULL, NULL );
+        if( mDS != NULL )
+        {
+            // layer
+            OGRLayer * lay = mDS->GetLayer(0);
+            mGL->computeStatAllPol(lay);
+            GDALClose(mDS);
+        } else { std::cout << "select dataset mDS is null " << std::endl;}
+    }
     //}
 }
