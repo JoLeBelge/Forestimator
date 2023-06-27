@@ -251,8 +251,6 @@ void parcellaire::upload(){
             if (globTest){std::cout << "Téléchargement du shp effectué avec succès.. " << std::endl ;}
             mLabelName="";
             to31370AndGeoJson();
-
-
         } else {
             msg->setText(tr("analyse.surf.msg.shpIncomplete"));
             cleanShpFile();
@@ -266,25 +264,13 @@ void parcellaire::upload(){
                              ,
                              Wt::Icon::Warning,
                              Wt::StandardButton::Ok));
-
         messageBox->setModal(true);
         messageBox->buttonClicked().connect([=] {
             removeChild(messageBox);
         });
         messageBox->show();
-
         mLabelName="";
-        if (to31370AndGeoJson()){
-            mGL->m_app->addLog("upload a shp gpkg");
-            if (computeGlobalGeom()){
-                hasValidShp=true;
-                downloadRasterBt->enable();
-                anaOnAllPolygBt->enable();
-                display();
-                mGL->mMap->setToolTip(tr("tooltipMap2"));
-            }
-        }
-        msg->setText(tr("analyse.surf.msg.uploadOK"));
+        to31370AndGeoJson();
     }
 }
 
@@ -640,5 +626,5 @@ void parcellaire::to31370AndGeoJsonGDAL(){
         display();
         mGL->mMap->setToolTip(tr("tooltipMap2"));
     }
-
+     msg->setText(tr("analyse.surf.msg.uploadOK"));
 }
