@@ -36,12 +36,13 @@ public:
     parcellaire(groupLayers * aGL, Wt::WApplication* app,statWindow * statW);
     ~parcellaire();
     void cleanShpFile();
-    bool to31370AndGeoJson();
+    bool to31370AndGeoJson();// boite de dialogue pour choisir src si jamais la couche n'en a pas de défini
+    void to31370AndGeoJsonGDAL();
     void display();
     // effectue des vérification du shp (polygone, src)
     void checkShp();
     // merge de tout les polygones pour avoir une géométrie globale et y calculer la surface totale
-    bool computeGlobalGeom(std::string extension, bool limitSize);
+    bool computeGlobalGeom(std::string extension="", bool limitSize=1);
 
     void visuStat(OGRFeature *poFeature);
     void upload();
