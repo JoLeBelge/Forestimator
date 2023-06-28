@@ -362,7 +362,7 @@ protected:
 };
 
 
-
+/*
 class cKKCS
 {
 public:
@@ -407,7 +407,7 @@ private:
     // le dictionnaire des valeurs raster vers leur signification.
     std::map<int,std::shared_ptr<color>> mDicoCol;
 };
-
+*/
 
 
 #endif // LAYERBASE_H
