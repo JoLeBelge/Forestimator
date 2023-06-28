@@ -78,14 +78,12 @@ int main(int argc, char *argv[])
             std::string essCode(kv.second->EssCode()); //essCode =="AG"  | essCode =="AP" |essCode =="EK") |essCode =="PG" essCode =="PY" |essCode =="PZ"
 
             if (carteFEE &&(kv.second->getCatLayer()==TypeLayer::FEE)){
-               // aACA.carteAptFEE(dico.getEss(kv.second->EssCode()),kv.second->getPathTif(),true);
                 aACA.carteAptFEE(dico.getEss(essCode),kv.second->getPathTif(),true);
-                aACA.compressTif(kv.second->getPathTif());
             }
 
-            if (carteCS &&(kv.second->getCatLayer()==TypeLayer::FEE)){
-                aACA.carteAptCS(dico.getEss(essCode),kv.second->getPathTif(),true);
-                aACA.compressTif(kv.second->getPathTif());
+            if (carteCS &&(kv.second->getCatLayer()==TypeLayer::CS)){
+               std::shared_ptr<cEss> ess = dico.getEss(essCode);
+                aACA.carteAptCS(ess,kv.second->getPathTif(),true);
             }
         }
     }
@@ -97,79 +95,10 @@ int main(int argc, char *argv[])
             }
     }
 
-
-    // OLD OLD OLD
-    // créé le fichier mapServeur pour chacun des groupe de couches
-    /*if (pair.first=="MNT"){
-            cRasterInfo RI(pair.first,&dico);
-            std::string aFileCodeMS("/home/lisein/Documents/carteApt/autres/mapserver/mapThematiqueFEE.map");
-            aACA.codeMapServer(RI.NomFileWithExt(),RI.Code(),RI.Nom(),aFileCodeMS,RI.getDicoVal(),RI.getDicoCol());
-        }
-        if (pair.first=="slope"){
-            cRasterInfo RI(pair.first,&dico);
-            std::string aFileCodeMS("/home/lisein/Documents/carteApt/autres/mapserver/mapThematiqueFEE.map");
-            aACA.codeMapServer(RI.NomFileWithExt(),RI.Code(),RI.Nom(),aFileCodeMS,RI.getDicoVal(),RI.getDicoCol());
-        }
-
-        if(pair.first.substr(0,5)=="COMPO" && pair.first.size()==6){
-            cRasterInfo RI(pair.first,&dico);
-            std::string aFileCodeMS("/home/lisein/Documents/carteApt/autres/mapserver/compo.map");
-            aACA.codeMapServer(RI.NomFileWithExt(),RI.Code(),RI.Nom(),aFileCodeMS,RI.getDicoVal(),RI.getDicoCol());
-
-        }*/
-    //}
-    /* CREATION PALETTE DE COULEUR
-    std::ofstream ofs ("./dico_colGrey.txt", std::ofstream::out | std::ofstream::trunc);
-    // creation de ma palette de couleur grise pour MNT
-    for (int i(0);i<255;i++){
-        ofs << "g"<<i << "," <<i << "," << i << "," << i << std::endl;
-    }
-    ofs.close();
-
-    ofs =std::ofstream("./dico_MNT.txt", std::ofstream::out | std::ofstream::trunc);
-    ofs << std::fixed;
-    ofs << std::setprecision(1);
-    // creation du dictionnaire MNT
-    for (int i(0);i<7001;i++){
-        // une nouvelle couleur tout les 3 mètres
-        std::string col("");
-        if ((i % 30)==0){ col="g"+std::to_string(i/30);}
-    ofs <<i << "," <<double(i/10.0)<< "," << col << std::endl;
-    }
-    ofs.close();
-    */
-    //aACA.carteAptFEE(&HE,HE.NomCarteAptFEE(),true);
-    /* std::string aFileCodeMS("/home/lisein/Documents/carteApt/autres/mapserver/mapThematiqueFEE.map");
-    for (auto & kv : aMRs){
-        //aACA.createTile(kv.second.NomCarte(),kv.second.NomDirTuile(),kv.second.Type());
-        cRasterInfo RI= kv.second;
-         aACA.codeMapServer(RI.NomFileWithExt(),RI.Code(),RI.Nom(),aFileCodeMS,RI.getDicoVal(),RI.getDicoCol());
-    }
-      //DicoVal=dico->code2AptFull();
-      //DicoCol=dico->codeApt2col();
-      //aACA.codeMapServer(kv.second.shortNomCarteAptFEE(),kv.second.NomMapServerLayer(),kv.second.NomMapServerLayerFull(),aFileCodeMS,Apt);
-
-          std::string aFileCodeMS("/home/lisein/Documents/carteApt/autres/mapserver/mapCS.map");
-            aACA.codeMapServer(kv.second.shortNomCarteAptCS(),kv.second.NomMapServerLayerCS(),kv.second.NomMapServerLayerFull(),aFileCodeMS,Apt);
-        //std::string aFileCodeMS("/home/lisein/Documents/carteApt/autres/mapserver/mapKKCS.map");
-        //aACA.codeMapServer(KK.shortNomCarte(),KK.NomMapServerLayer(),KK.NomMapServerLayerFull(),aFileCodeMS, KK.getDicoValPtr(),KK.getDicoCol());
-    // compression gdal des cartes input
-    for (auto & kv : *dico.Files()){
-        std::string path=kv.second;
-        if (path.substr(path.size()-3,path.size())=="tif"){
-            aACA.compressTif(path);
-            }
-        }
-     */
-    // creation des tuiles pour le MNH photogrammétrique qui est en 2 mètres de résolution -- pas comme les autres cartes!
-    //aACA.createTile("/home/lisein/Documents/carteApt/GIS/mnh_2019.tif","/home/lisein/Documents/carteApt/Forestimator/build-WebAptitude/Tuiles/MNH2019",MNH2019,true);
-
     std::cout << "done" << std::endl;
     return 0;
 }
 
-
-//void BDFEE::matriceAptitudeV2(std::string aFile, int RN){
 void matriceApt(cDicoApt * dico, std::string aFile, int RN){
 
     // pour création des matrices d'aptitude
@@ -222,9 +151,6 @@ void matriceApt(cDicoApt * dico, std::string aFile, int RN){
                 for (auto kv_ess : dico->getAllEss()){
 
                     std::shared_ptr<cEss> Ess=kv_ess.second;
-
-
-
                     std::string codeEss=kv_ess.first;
 
                     // if (codeEss=="AG" | codeEss=="AP" |  codeEss=="EP" ){
@@ -290,7 +216,6 @@ void matriceApt(cDicoApt * dico, std::string aFile, int RN){
                         essCode=kv.first;
                         int AptHT(kv.second.at(0)), AptZBIO(kv.second.at(1));
 
-
                         // double apt O/E ; deux astérisques
                         if (AptHT==7 | AptZBIO==7){
                             essCode=essCode+"**";
@@ -338,8 +263,6 @@ void matriceApt(cDicoApt * dico, std::string aFile, int RN){
     }
 
 }
-
-
 
 void replaceFullLineInDoc(std::string aFileIn,std::string aReplace,int lineNumber){
 
@@ -471,14 +394,7 @@ void replaceInDoc(std::string aFileIn, std::string aFind, std::string aReplace, 
         boost::replace_all(aReplace, "<", " &lt;");
     }
 
-
-
     std::ifstream in(aFileIn);
-
-    //std::filesystem::path path{aFileIn }; //creates TestingFolder object on C:
-    //path = path.parent_path()+"/tmp.sla"; //put something into there
-    //std::filesystem::create_directories(path.parent_path()); //add directories based on the object path (without this line it will not work)
-
     std::string aTmp(aFileIn+".tmp");
     std::ofstream out(aTmp);
 

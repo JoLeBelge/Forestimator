@@ -1,9 +1,9 @@
 #include "caplicarteapt.h"
 
-cApliCarteApt::cApliCarteApt(cDicoApt *aDico):dico(aDico)
+cApliCarteApt::cApliCarteApt(cDicoApt *aDico):dico(aDico),poDatNH(NULL),poDatZBIO(NULL),poDatTopo(NULL),poDatNT(NULL),poDatCS1(NULL),poDatCS3(NULL)
 {
     std::cout << "constructeur de cApliCarteApt " << std::endl;
-    // carte d'aptitude pour FEE - test zone
+    // carte d'aptitude pour FEE
     std::string aNHpath(dico->Files()->at("NH"));
     std::string aNTpath(dico->Files()->at("NT"));
     std::string aZBIOpath(dico->Files()->at("ZBIO"));
@@ -21,7 +21,6 @@ cApliCarteApt::cApliCarteApt(cDicoApt *aDico):dico(aDico)
     {
         std::cout << "je n'ai pas lu le fichier " << aNHpath << std::endl;
     }
-    //GDALRasterBand * NHBand;
     NHBand = poDatNH->GetRasterBand( 1 );
 
     poDatNT = (GDALDataset *) GDALOpen( aNTpath.c_str(), GA_ReadOnly );
@@ -29,7 +28,6 @@ cApliCarteApt::cApliCarteApt(cDicoApt *aDico):dico(aDico)
     {
         std::cout << "je n'ai pas lu le fichier " << aNTpath << std::endl;
     }
-    //GDALRasterBand * NTBand;
     NTBand = poDatNT->GetRasterBand(1);
 
     poDatZBIO = (GDALDataset *) GDALOpen( aZBIOpath.c_str(), GA_ReadOnly );
@@ -50,40 +48,25 @@ cApliCarteApt::cApliCarteApt(cDicoApt *aDico):dico(aDico)
     y=(NHBand->GetYSize());
 
     // même chose pour les CS
-    poDatCS1 = (GDALDataset *) GDALOpen(dico->Files()->at("CS1").c_str(), GA_ReadOnly );
+    poDatCS1 = (GDALDataset *) GDALOpen(dico->Files()->at("CS_A").c_str(), GA_ReadOnly );
     if( poDatCS1 == NULL )
     {
-        std::cout << "je n'ai pas lu le fichier " << dico->Files()->at("CS1") << std::endl;
-    }
-    poDatCS2 = (GDALDataset *) GDALOpen(dico->Files()->at("CS2").c_str(), GA_ReadOnly );
-    if( poDatCS2 == NULL )
-    {
-        std::cout << "je n'ai pas lu le fichier " << dico->Files()->at("CS2") << std::endl;
+        std::cout << "je n'ai pas lu le fichier " << dico->Files()->at("CS_A") << std::endl;
     }
     poDatCS3 = (GDALDataset *) GDALOpen(dico->Files()->at("CS3").c_str(), GA_ReadOnly );
     if( poDatCS3 == NULL )
     {
         std::cout << "je n'ai pas lu le fichier " << dico->Files()->at("CS3") << std::endl;
     }
-    poDatCS10 = (GDALDataset *) GDALOpen(dico->Files()->at("CS10").c_str(), GA_ReadOnly );
-    if( poDatCS10 == NULL )
-    {
-        std::cout << "je n'ai pas lu le fichier " << dico->Files()->at("CS10") << std::endl;
-    }
     CS1Band = poDatCS1->GetRasterBand( 1 );
-    CS2Band = poDatCS2->GetRasterBand( 1 );
     CS3Band = poDatCS3->GetRasterBand( 1 );
-    CS10Band = poDatCS10->GetRasterBand( 1 );
 }
-
 
 cApliCarteApt::~cApliCarteApt()
 {
     std::cout << "destructeur de c appli Carte Apt " << std::endl;
     if( poDatCS1 != NULL ){GDALClose( poDatCS1 );}
-    if( poDatCS2 != NULL ){GDALClose( poDatCS2 );}
     if( poDatCS3 != NULL ){GDALClose( poDatCS3 );}
-    if( poDatCS10 != NULL ){GDALClose( poDatCS10 );}
     if( poDatTopo != NULL ){GDALClose( poDatTopo );}
     if( poDatNH != NULL ){GDALClose( poDatNH);}
     if( poDatNT != NULL ){GDALClose(poDatNT);}
@@ -189,9 +172,8 @@ void cApliCarteApt::carteAptFEE(std::shared_ptr<cEss> aEss, std::string aOut, bo
 
 void cApliCarteApt::carteAptCS(std::shared_ptr<cEss> aEss, std::string aOut, bool force)
 {
-
     if (aEss->hasCSApt() && (!exists(aOut) | force)){
-        std::cout << "création carte aptitude du CS pour essence " << aEss->Nom() << std::endl;
+        std::cout << "création carte de recommandation CS pour essence " << aEss->Nom() << std::endl;
         // create a copy d'une des couches pour que ce soit une carte d'aptitude
         const char *pszFormat = "GTiff";
         GDALDriver *poDriver;
@@ -207,69 +189,61 @@ void cApliCarteApt::carteAptCS(std::shared_ptr<cEss> aEss, std::string aOut, boo
         spatialReference->importFromEPSG(31370);
         poDstDS->SetSpatialRef(spatialReference);
         year_month_day today = year_month_day{floor<days>(std::chrono::system_clock::now())};
-        std::string d = "carte aptitude générée le " + format("%F",today);
+        std::string d = "carte de recommandation générée le " + format("%F",today);
         poDstDS->SetMetadataItem("Essence Forestière",aEss->Nom().c_str());
-        poDstDS->SetMetadataItem("carte d'Aptitude","Catalogue de Station");
+        poDstDS->SetMetadataItem("carte de recommandation pour une essence","Catalogue de Station");
         poDstDS->SetMetadataItem("Version",d.c_str());
-        poDstDS->SetMetadataItem("Crédit","Lisein Jonathan, Gembloux Agro-Bio Tech");
-
+        poDstDS->SetMetadataItem("Crédit","Lisein Jonathan, Simon Toessens et Claessens Hugues Gembloux Agro-Bio Tech");
         GDALRasterBand *outBand;
         outBand = poDstDS->GetRasterBand(1);
-        std::cout << "copy of raster done" << std::endl;
+        outBand->SetNoDataValue(0);
 
         float *scanlineCS1 = (float *) CPLMalloc( sizeof( float ) * x );
-        float *scanlineCS2= (float *) CPLMalloc( sizeof( float ) * x );
-        float *scanlineCS3= (float *) CPLMalloc( sizeof( float ) * x );
-        float *scanlineCS10= (float *) CPLMalloc( sizeof( float ) * x );
+        float *scanlineCS3 = (float *) CPLMalloc( sizeof( float ) * x );
         float *scanlineZBIO = (float *) CPLMalloc( sizeof( float ) * x );
         float *scanline = (float *) CPLMalloc( sizeof( float ) * x );
 
-        int c(0);
-        int step= y/100;
+        int step= y/10;
         // boucle sur les pixels de la RW
         for ( int row = 0; row < y; row++ )
         {
             CS1Band->RasterIO( GF_Read, 0, row, x, 1, scanlineCS1, x,1, GDT_Float32, 0, 0 );
-            CS2Band->RasterIO( GF_Read, 0, row, x, 1, scanlineCS2, x,1, GDT_Float32, 0, 0 );
             CS3Band->RasterIO( GF_Read, 0, row, x, 1, scanlineCS3, x,1, GDT_Float32, 0, 0 );
-            CS10Band->RasterIO( GF_Read, 0, row, x, 1, scanlineCS10, x,1, GDT_Float32, 0, 0 );
             ZBIOBand->RasterIO( GF_Read, 0, row, x, 1, scanlineZBIO, x,1, GDT_Float32, 0, 0 );
             // iterate on pixels in row
+#pragma omp parallel num_threads(6)
+            {
+#pragma omp for
             for (int col = 0; col < x; col++)
             {
-                //std::cout << "start col " << col << std::endl;
                 int apt(0), st(0);
                 int zbio = scanlineZBIO[ col ];
-                // un test pour tenter de gagner de la vitesse de temps de calcul - masque pour travailler que sur la partie pour laquelle on a des CS
-                if (zbio==1 | zbio==2 |zbio==3 |zbio==5|zbio==10 ){
-                    if (zbio==1) st = scanlineCS1[ col ];
-                    if (zbio==2) st = scanlineCS2[ col ];
-                    if (zbio==3) st = scanlineCS3[ col ];
-                    if (zbio==5) st = scanlineCS3[ col ];
-                    if (zbio==10) st = scanlineCS10[ col ];
+
+                if (zbio==1 | zbio==2 |zbio==10 ){
+                    st = scanlineCS1[ col ];
+                    //if (zbio==3 | zbio==5) st = scanlineCS3[ col ];
                     apt = aEss->getApt(zbio,st);
                 }
                 scanline[ col ] = apt;
             }
+            }
             // écriture du résultat dans le fichier de destination
             outBand->RasterIO( GF_Write, 0, row, x, 1, scanline, x, 1,GDT_Float32, 0, 0 );
-            if (row%step==0){std::cout<< std::endl;}
+            if (row%step==0){std::cout<< "-" << std::endl;}
         }
 
         if( poDstDS != NULL ){ GDALClose( (GDALDatasetH) poDstDS );}
-
         // copie du fichier de style qgis
-        std::string aStyleFile=dico->Files()->at("styleApt");
+        std::string aStyleFile=dico->Files()->at("styleAptCS");
         boost::filesystem::copy_file(aStyleFile,aOut.substr(0,aOut.size()-3)+"qml",boost::filesystem::copy_option::overwrite_if_exists);
-
         std::cout << " done " << std::endl;
 
     }else {
         std::cout << aOut << " existe déjà " << std::endl;
     }
-
 }
 
+/*
 void cApliCarteApt::carteKKCS(cKKCS * aKK, std::string aOut, bool force)
 {
 
@@ -329,9 +303,9 @@ void cApliCarteApt::carteKKCS(cKKCS * aKK, std::string aOut, bool force)
                     if (zbio==3) st = scanlineCS3[ col ];
                     if (zbio==5) st = scanlineCS3[ col ];
                     if (zbio==10) st = scanlineCS10[ col ];
-                    if (aKK->IsHabitat()) {apt = aKK->getHab(zbio,st);}else{
+
                         apt = aKK->getEchelle(zbio,st);
-                    }
+
 
                 }
                 if ((col%step==0) && row%step==0){
@@ -341,7 +315,7 @@ void cApliCarteApt::carteKKCS(cKKCS * aKK, std::string aOut, bool force)
                     std::cout << " nh =" << nh << " soit " << dico.NH(nh) << " nt " <<nt << " soit " << dico.NT(nt) << " zbio " << zbio << " soit " << dico.ZBIO(zbio) ;
                     std::cout << " aptitude pour Epicea commun " << dico.code2Apt(aMEss.at("EP").getApt(nt,nh,zbio)) << std::endl;
                 }
-                */
+
                 }
                 scanline[ col ] = apt;
             }
@@ -351,7 +325,7 @@ void cApliCarteApt::carteKKCS(cKKCS * aKK, std::string aOut, bool force)
             if (row%step==0){std::cout<< std::endl;}
         }
 
-        /* Once we're done, close properly the dataset */
+
         if( poDstDS != NULL ){ GDALClose( (GDALDatasetH) poDstDS );}
 
         // copie du fichier de style qgis
@@ -364,53 +338,7 @@ void cApliCarteApt::carteKKCS(cKKCS * aKK, std::string aOut, bool force)
         std::cout << aOut << " existe déjà " << std::endl;
     }
 
-}
-
-// attention, widht et height en mètres!!!
-void cApliCarteApt::cropIm(std::string input, std::string output, double topLeftX, double topLeftY,
-                           double width, double height)
-{
-    const char *inputPath=input.c_str();
-    const char *cropPath=output.c_str();
-    GDALDataset *pInputRaster, *pCroppedRaster;
-    GDALDriver *pDriver;
-    const char *pszFormat = "GTiff";
-    pDriver = GetGDALDriverManager()->GetDriverByName(pszFormat);
-    pInputRaster = (GDALDataset*) GDALOpen(inputPath, GA_ReadOnly);
-
-    double transform[6], tr1[6];
-    pInputRaster->GetGeoTransform(transform);
-    pInputRaster->GetGeoTransform(tr1);
-    //adjust top left coordinates
-    transform[0] = topLeftX;
-    transform[3] = topLeftY;
-    //determine dimensions of the new (cropped) raster in cells
-    int xSize = round(width/transform[1]);
-    int ySize = round(height/transform[1]);
-    //std::cout << "xSize " << xSize << ", ySize " << ySize << std::endl;
-    //create the new (cropped) dataset
-    pCroppedRaster = pDriver->Create(cropPath, xSize, ySize, 1, GDT_Byte, NULL); //or something similar
-    pCroppedRaster->SetProjection( pInputRaster->GetProjectionRef() );
-    pCroppedRaster->SetGeoTransform( transform );
-
-    int xOffset=round((transform[0]-tr1[0])/tr1[1]);
-    int yOffset=round((transform[3]-tr1[3])/tr1[5]);
-    float *scanline;
-    scanline = (float *) CPLMalloc( sizeof( float ) * xSize );
-    // boucle sur chaque ligne
-    for ( int row = 0; row < ySize; row++ )
-    {
-        // lecture
-        pInputRaster->GetRasterBand(1)->RasterIO( GF_Read, xOffset, row+yOffset, xSize, 1, scanline, xSize,1, GDT_Float32, 0, 0 );
-        // écriture
-        pCroppedRaster->GetRasterBand(1)->RasterIO( GF_Write, 0, row, xSize,1, scanline, xSize, 1,GDT_Float32, 0, 0 );
-    }
-    if( pCroppedRaster != NULL ){GDALClose( (GDALDatasetH) pCroppedRaster );}
-    GDALClose( pInputRaster );
-}
-
-
-
+}*/
 
 void cApliCarteApt::toPol(std::string input, std::string output)
 {
@@ -450,8 +378,7 @@ void cApliCarteApt::toPol(std::string input, std::string output)
     GDALClose(pInputRaster);
 }
 
-
-void cApliCarteApt::compressTif(std::string input){
+/*void cApliCarteApt::compressTif(std::string input){
 
     if (exists(input)){
         std::cout << "compression deflate pour  " << input << std::endl;
@@ -465,8 +392,7 @@ void cApliCarteApt::compressTif(std::string input){
     }else {
         std::cout << input << " n'existe pas. pas de compression donc. " << std::endl;
     }
-}
-
+}*/
 
 void cApliCarteApt::codeMapServer(std::string inputData, std::string layerName, std::string layerFullName, std::string output, std::map<int, string> * DicoVal, std::map<int, color> DicoCol){
     std::cout << " code MapServer " << std::endl;

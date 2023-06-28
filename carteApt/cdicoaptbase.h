@@ -20,7 +20,7 @@ enum class FeRe {Feuillus,
                  Autre
                 };
 
-// ça c'était utilisé pour le calcul des carte apt, des tuiles et du code mapserveur
+// ça c'était utilisé pour le calcul des carte apt, des tuiles et du code mapserveur. Encore utilisé par l'API forestimator
 enum TypeCarte {Apt, Potentiel, Station1, Habitats,NH,NT,Topo,AE,SS,ZBIO,CSArdenne,CSLorraine,MNH,Composition,MNT16b};
 
 enum class TypeWMS {WMS,
@@ -28,11 +28,6 @@ enum class TypeWMS {WMS,
                    };
 
 TypeWMS str2TypeWMS(const std::string& str);
-
-
-
-// octobre 2021 ; j'aimerai utiliser dans phytospy le dico Apt, entre autre pour concevoir une mise en page des matrices d'aptitudes.
-// j'aimerai partager le dico Apt entre forestimator et phytospy, mais celui-ci est trop spécialisé forestimator. Je crée une classe mère avec les membres que je souhaite partager entre les deux applis
 
 std::string roundDouble(double d, int precisionVal=1);
 
@@ -51,6 +46,8 @@ static size_t write_data(void *ptr, size_t size, size_t nmemb, void *stream)
 
 class cEss;
 class WMSinfo;
+
+class cdicoAptBase; // utilisé par plusieurs appli (Forestimator, phytospy)
 
 class cdicoAptBase : public std::enable_shared_from_this<cdicoAptBase>
 {
@@ -169,7 +166,6 @@ public:
     }
 
     // on améliore l'aptitude car facteur de compensation
-
     int AptSurcote(int aCode){
         int aRes(aCode);
         if (Dico_AptSurcote.find(aCode)!=Dico_AptSurcote.end()){aRes=Dico_AptSurcote.at(aCode);}
@@ -299,12 +295,21 @@ public:
         return aRes;
     }
 
+    std::string getStationMaj(int zbio,int US){
+    std::string aRes="";
+    int zbioKey=ZBIO2CSid(zbio);
+         if (Dico_station_varMaj.find(zbioKey)!=Dico_station_varMaj.end()){
+             if (Dico_station_varMaj.at(zbioKey).find(US)!=Dico_station_varMaj.at(zbioKey).end()){
+                 aRes=Dico_station_varMaj.at(zbioKey).at(US);
+             }
+         }
+    return aRes;
+    }
 
 protected:
     std::string mBDpath;
     sqlite3 **db_;
     sqlite3 * ptDb_;
-
 
     // code essence 2 code groupe de couche pour catalogue de couches
     std::map<std::string,std::string> Dico_lay2groupe;
@@ -362,10 +367,15 @@ protected:
     std::map<int,int>  dico_groupeNH2NHStart;// code nh qui débute le groupe.
     std::map<int,std::shared_ptr<color>> Dico_codeApt2col;
 
+    // clé 1 : zbio, clé 2: id station+variance,value ; nom de la sation cartograhique
+    std::map<int,std::map<std::tuple<int, std::string>,std::string>>  Dico_station;
+    // clé 1 : zbio, clé 2: id station+variance,value ; nom de la variante
+    std::map<int,std::map<std::tuple<int, std::string>,std::string>>  Dico_station_varName;
+    // bool pour savoir si c'est la variante majoritaire. clé 1 zbio clé 2 US val var code
+    std::map<int,std::map<int,std::string>>  Dico_station_varMaj;
 
     // key ; code le la couche layer. value ; les infos nécessaire pour charger le wms
     std::map<std::string,WMSinfo>  Dico_WMS;
-
 
     // clé ; code ess. val ; pointeur vers essence
     std::map<std::string,std::shared_ptr<cEss>> mVEss;
@@ -382,7 +392,7 @@ public:
     // retourne l'aptitude global de la zone bioclimatique
     int getApt(int aZbio);
     // retourne l'aptitude du catalogue de station
-    int getApt(int aZbio, int aSTId, std::string aVar="a");
+    int getApt(int aZbio, int US, std::string aVar="");
     bool hasCSApt(){
         bool aRes(1);
         if (mAptCS.size()==0) {
@@ -393,11 +403,6 @@ public:
     }
     bool hasFEEApt(){
         bool aRes(0);
-        // maintenant j'initialise EcoVal comme une map de 10 elem vide
-        /* if (mEcoVal.size()==0) {
-            aRes=0;
-            //std::cout << "essence " << mNomFR << " n'as pas d'aptitude pour FEE" << std::endl;
-        }*/
         if (mEcoVal.size()>0 && mEcoVal.at(1).size()>0) {
             aRes=1;
             //std::cout << "essence " << mNomFR << " n'as pas d'aptitude pour FEE" << std::endl;
@@ -434,29 +439,14 @@ public:
     }
 
     int getFinalApt(int aCodeNT,int aCodeNH, int aZbio, int topo){
-        //int apt=getApt(aCodeNT, aCodeNH,aZbio);
-        //return corrigAptRisqueTopo(apt,topo,aZbio);
         return getApt(aCodeNT,aCodeNH,aZbio,true,topo);
     }
 
-    //int corrigAptRisqueTopo(int apt, int topo, int zbio);
     // renvoie l'apt climatique compensée par situation topographique
     int corrigAptBioRisqueTopo(int aptBio,int topo,int zbio);
 
     std::string Nom(){return mNomFR;}
     std::string Code(){return mCode;}
-
-    std::string NomCarteAptFEE();
-    std::string shortNomCarteAptFEE();
-    std::string NomDirTuileAptFEE();
-    std::string NomCarteAptCS();
-    std::string shortNomCarteAptCS();
-    std::string NomDirTuileAptCS();
-
-    std::string NomMapServerLayer();
-    std::string NomMapServerLayerFull();//pour FEE et CS
-    std::string NomMapServerLayerCS();
-
 
     // aptitude ecograme : clé chaine charactère ; c'est la combinaison ntxnh du genre "A2p5" ou "Mm4
     std::map<int,std::map<std::string,int>> mEcoVal;

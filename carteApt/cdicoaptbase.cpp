@@ -6,7 +6,7 @@ extern bool globTest;
 cdicoAptBase::cdicoAptBase(std::string aBDFile):mBDpath(aBDFile),ptDb_(NULL)
 {
     db_=&ptDb_;
-    //*db_=NULL;
+
     if (openConnection()){
     std::cout << " bd pas ouverte!!!\n"<< std::endl;
     } else {
@@ -30,8 +30,39 @@ cdicoAptBase::cdicoAptBase(std::string aBDFile):mBDpath(aBDFile),ptDb_(NULL)
         }
 
         sqlite3_finalize(stmt);
-        SQLstring="SELECT Nom,Zbio,CS_lay, CSid FROM dico_zbio;";
 
+        SQLstring="SELECT ZBIO,stat_id,Station_carto,var,nom_var,varMajoritaire FROM dico_station WHERE stat_id=stat_num;";
+        sqlite3_prepare_v2( *db_, SQLstring.c_str(), -1, &stmt, NULL );
+        while(sqlite3_step(stmt) == SQLITE_ROW)
+        {
+            if (sqlite3_column_type(stmt, 0)!=SQLITE_NULL && sqlite3_column_type(stmt, 1)!=SQLITE_NULL){
+
+                int aA=sqlite3_column_int( stmt, 0 );
+                int aB=sqlite3_column_int( stmt, 1 );
+                std::string aC=std::string( (char *)sqlite3_column_text( stmt, 2 ) );
+                std::string aD(""),aF("");
+                int varMaj(0);
+                if (sqlite3_column_type(stmt, 3)!=SQLITE_NULL){
+                aD=std::string( (char *)sqlite3_column_text( stmt, 3 ) );
+                }
+                if (sqlite3_column_type(stmt, 4)!=SQLITE_NULL){
+                aF=std::string( (char *)sqlite3_column_text( stmt, 4 ) );
+                }
+                if (sqlite3_column_type(stmt, 5)!=SQLITE_NULL){
+                varMaj=sqlite3_column_int( stmt, 5 ) ;
+                }
+                Dico_station[aA].emplace(std::make_pair(std::make_tuple(aB,aD),aC));
+                Dico_station_varName[aA].emplace(std::make_pair(std::make_tuple(aB,aD),aF));
+                if (varMaj==1){
+                   Dico_station_varMaj[aA].emplace(std::make_pair(aB,aD));
+                }
+
+                //std::cout << " station " << aB << ", variante " << aD << std::endl;
+            }
+        }
+        sqlite3_finalize(stmt);
+
+        SQLstring="SELECT Nom,Zbio,CS_lay, CSid FROM dico_zbio;";
         sqlite3_prepare_v2( *db_, SQLstring.c_str(), -1, &stmt, NULL );
         while(sqlite3_step(stmt) == SQLITE_ROW)
         {
@@ -141,7 +172,6 @@ cdicoAptBase::cdicoAptBase(std::string aBDFile):mBDpath(aBDFile),ptDb_(NULL)
 
                 }
 
-
             sqlite3_finalize(stmt);
 
             SQLstring="SELECT Code,WMSurl,WMSlayer, WMSattribution, typeGeoservice FROM "+table+" WHERE WMSurl IS NOT NULL;";
@@ -171,12 +201,10 @@ cdicoAptBase::cdicoAptBase(std::string aBDFile):mBDpath(aBDFile),ptDb_(NULL)
                     double aA=sqlite3_column_double(stmt, 0 );
                     std::string aB=std::string( (char *)sqlite3_column_text( stmt, 1 ) );
                     Dico_RasterGain.emplace(std::make_pair(aB,aA));
-                    //std::cout <<  " gain de " << aA << " pour couche " << aB << std::endl;
                 }
             }
             sqlite3_finalize(stmt);
 
-            //if (globTest){   std::cout << "Dico_WMS a " << Dico_WMS.size() << " elements " << std::endl;}
         }
 
 
@@ -294,8 +322,6 @@ cdicoAptBase::cdicoAptBase(std::string aBDFile):mBDpath(aBDFile),ptDb_(NULL)
         std::cout << "close connection (dicoAptBase)" << std::endl;
         closeConnection();
 
-
-
     }
 
     //std::cout << "dicoAptBase done " << std::endl;
@@ -314,21 +340,14 @@ int cdicoAptBase::openConnection(){
     int rc;
 
     std::cout << "ouvre connexion avec BD dictionnaire ... avec colonne " << columnPath << " pour chemin access aux fichiers" << std::endl;
-    //db_->Sqlite3(mBDpath);
-    //rc = sqlite3_open_v2(mBDpath.c_str(), db_,SQLITE_OPEN_READONLY,NULL);
     rc = sqlite3_open(mBDpath.c_str(), db_);
     // The 31 result codes are defined in sqlite3.h
-    //SQLITE_ERROR (1)
+
     if( rc!=0) {
         fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(*db_));
         std::cout << " mBDpath " << mBDpath << std::endl;
         std::cout << "result code : " << rc << std::endl;
     }
-    //SQLITE_BUSY (5)
-    //SQLITE_CANTOPEN (14)
-    //SQLITE_OK (0)
-
-    //std::cout << std::endl << " bd ouverte..., rc = " << rc << std::endl;;
 
     return rc;
 }
@@ -519,17 +538,25 @@ int cEss::getApt(int aCodeNT, int aCodeNH, int aZbio, bool hierachique,int aTopo
     return aRes;
 }
 
-int cEss::getApt(int aZbio, int aSTId, std::string aVar){
+int cEss::getApt(int aZbio, int US, std::string aVar){
     int aRes(0);
     if (mAptCS.find(aZbio)!=mAptCS.end()){
         std::map<std::tuple<int, std::string>,int> * Apt=&mAptCS.at(aZbio);
-        if (Apt->find(std::make_tuple(aSTId,""))!=Apt->end()){
-            aRes=Apt->at(std::make_tuple(aSTId,""));
+
+        // on prend par défaut la station majoritaire
+        std::string var=mDico->getStationMaj(aZbio,US);
+        std::tuple<int,std::string> aUSkey=std::make_tuple(US,var);
+        if (Apt->find(aUSkey)!=Apt->end()){
+            aRes=Apt->at(aUSkey);
         }
-        if (Apt->find(std::make_tuple(aSTId,aVar))!=Apt->end()){
-            aRes=Apt->at(std::make_tuple(aSTId,aVar));
+
+        // si l'utilisateur a renseigné une variante avec l'argument aVar:
+        if (Apt->find(std::make_tuple(US,aVar))!=Apt->end()){
+            aRes=Apt->at(std::make_tuple(US,aVar));
         }
     }
+
+    if (aRes>9){aRes=0;}
     return aRes;
 }
 
@@ -559,21 +586,7 @@ int cEss::corrigAptBioRisqueTopo(int aptBio,int topo,int zbio){
     //std::cout << "Décote l'aptitude " << mDico->code2Apt(apt) << " vers " << mDico->code2Apt(aRes) << std::endl;}
     return aRes;
 }
-/*int cEss::corrigAptRisqueTopo(int apt,int topo,int zbio){
-    int aRes=apt;
-    int risque=getRisque(zbio,topo);
-    int catRisque=mDico->risqueCat(risque);
-    // situation favorable
-    if (catRisque==1){
 
-        aRes=mDico->AptSurcote(apt);
-        //std::cout << "Surcote l'aptitude " << mDico->code2Apt(apt) << " vers " << mDico->code2Apt(aRes) << std::endl;
-    }
-    // risque élevé et très élevé
-    if (catRisque==3){aRes=mDico->AptSouscote(apt);}
-    //std::cout << "Décote l'aptitude " << mDico->code2Apt(apt) << " vers " << mDico->code2Apt(aRes) << std::endl;}
-    return aRes;
-}*/
 
 std::string cEss::printRisque(){
     std::string aRes("Risque pour "+mNomFR+ "------\n");
@@ -585,19 +598,6 @@ std::string cEss::printRisque(){
     }
     return aRes;
 }
-
-
-std::string cEss::NomCarteAptFEE(){return mDico->File("OUTDIR")+"aptitudeFEE_"+mCode+".tif";}
-//std::string cEss::NomDirTuileAptFEE(){return mDico->File("OUTDIR2")+"FEE_"+mCode;}
-std::string cEss::shortNomCarteAptFEE(){return "aptitudeFEE_"+mCode+".tif";}
-std::string cEss::NomCarteAptCS(){return mDico->File("OUTDIR")+"aptitudeCS_"+mCode+".tif";}
-//std::string cEss::NomDirTuileAptCS(){return mDico->File("OUTDIR2")+"CS_"+mCode;}
-std::string cEss::shortNomCarteAptCS(){return "aptitudeCS_"+mCode+".tif";}
-
-std::string cEss::NomMapServerLayer(){return "Aptitude_FEE_"+mCode;}
-std::string cEss::NomMapServerLayerFull(){return "Aptitude "+mPrefix+mNomFR;}
-
-std::string cEss::NomMapServerLayerCS(){return "Aptitude_CS_"+mCode;}
 
 bool cEss::hasRisqueComp(int zbio,int topo){
     bool aRes(0);
@@ -621,5 +621,3 @@ std::shared_ptr<cEss> cdicoAptBase::getEss(std::string aCode){
     }
     return aRes;
 }
-
-
