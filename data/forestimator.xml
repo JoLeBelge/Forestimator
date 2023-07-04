@@ -708,9 +708,8 @@ detAptFEE
 
 <message id="parcellaire.tele.btn">Télécharger les cartes</message>
 <message id="parcellaire.ana.btn">Analyse sur tous les polygones</message>
-<message id="parcellaire.loadshp.error.src">Le système de projection de votre shapefile ne semble pas être le BL72. Vérifiez visuellement que la reprojection de votre shapefile a fonctionné correctement.</message>
-                           
 
+<message id="parcellaire.loadshp.srcNotDefined">Le système de projection de votre shapefile n'est pas défini. Vous pouvez définir le système de coordonnée dans votre logiciel de Système d'information Géographique et effectuer à nouveau le chargement de la couche dans Forestimator, ou vous pouver choisir le système de coordonnée dans la liste ci-dessous et vérifier visuellement que votre couche cartographique s'affiche à sa localisation présumée. <br> </br> </message>
 
 <message id="api.msg.error.tool.name">Aucune carte ou traitement de ce nom.</message>
 <message id="api.msg.error.polyg1">Veuillez utiliser le format Géojson pour votre polygone</message>
