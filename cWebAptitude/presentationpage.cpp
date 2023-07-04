@@ -131,7 +131,8 @@ presentationPage::presentationPage(cDicoApt *aDico, AuthApplication *app):mDico(
     for( auto kv : *mDico->layerMTD()){
         LayerMTD lMTD=kv.second;
         if (lMTD.code()!="ES_EP"){
-        std::unique_ptr<Wt::WMenuItem> item = std::make_unique<Wt::WMenuItem>(lMTD.Label(), cpp14::make_unique<Wt::WText>(getHtml(&lMTD)));
+        //std::cout << "ajout lMTD dans sous menu présentation " << lMTD.Nom() << std::endl;
+        std::unique_ptr<Wt::WMenuItem> item = std::make_unique<Wt::WMenuItem>(lMTD.Label(), std::make_unique<Wt::WText>(getHtml(&lMTD)));
         subMenu_->addItem(std::move(item));
         } else {
             std::unique_ptr<Wt::WMenuItem> mi = std::make_unique<Wt::WMenuItem>(lMTD.Label());
