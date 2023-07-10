@@ -116,7 +116,7 @@ int main(int argc, char *argv[])
             std::cout << aCommand << "\n";
             system(aCommand.c_str());
         }*/
-
+        if(0){
         std::string aMask("/home/jo/Documents/Carto/MNH_TS/limitesWaGSD2.tif");
         GDALDataset * DSmask = (GDALDataset *) GDALOpen( aMask.c_str(), GA_ReadOnly );
         int x=DSmask->GetRasterBand(1)->GetXSize();
@@ -152,6 +152,18 @@ int main(int argc, char *argv[])
         }
 
         GDALClose(DSmask);
+
+        // fonctionne bien, assez rapide (10' par raster) mais passe de 4Gb à 8, donc je devrais recompresser après pour gain de place
+        }
+
+        for(auto & p : boost::filesystem::directory_iterator(adirBD)){
+            std::string mnhPath= p.path().string();
+            outPath="/home/jo/Documents/Carto/MNH_TS/MNH/";
+            boost::filesystem::create_directory(outPath);
+            std::string aCommand ="gdalwarp -co 'COMPRESS=DEFLATE' -co 'TILED=YES' --config GDAL_CACHEMAX 512 -co NUM_THREADS=ALL_CPUS -co BIGTIFF=YES "+mnhPath+ " "+ outPath + p.path().filename().string();
+            std::cout << aCommand << "\n";
+            system(aCommand.c_str());
+        }
 
     }
 

@@ -84,7 +84,6 @@ void Layer::setActive(bool b){
     }
 }
 
-// bug 2023; on dirait que une fois sur 4, displayLayer ne fonctionne pas.
 void Layer::displayLayer() const{ 
     std::string JScommand=std::string("activeLayer  = new ol.layer.Tile({")+
             "extent: extent,"+
@@ -109,9 +108,7 @@ void Layer::displayLayer() const{
         "});";
     //std::cout << "display layer " << std::endl;
 
-    //std::string aFileIn(mDico->File("displayWMS"));
     if (mTypeWMS==TypeWMS::ArcGisRest){
-        //aFileIn=mDico->File("displayOLArcGisRest");
     JScommand=std::string("activeLayer  = new ol.layer.Tile({")+
             "extent: extent,"+
             "title: 'MYTITLE',"+
@@ -161,10 +158,11 @@ std::vector<std::string> Layer::displayInfo(double x, double y){
         // station du CS
         if (mCode.substr(0,2)=="CS" && aVal!=0){
             mGroupL->mStation->mSt=aVal;}
-        //std::cout << " la valeur de la couche " << mLabel << " est de " << aVal << std::endl;
         if(mDicoVal.find(aVal)!=mDicoVal.end()){
             val=mDicoVal.at(aVal);
         }
+        if (mTypeVar==TypeVar::Continu){ val=roundDouble(mGain*(double) aVal,2);}
+        //if (globTest){std::cout << "Layer " << Code() << ", aVal is " << std::to_string(aVal) << std::endl;}
     }
 
     if ((mType==TypeLayer::FEE || mType==TypeLayer::CS) && (this->IsActive())){
