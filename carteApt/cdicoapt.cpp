@@ -247,7 +247,7 @@ cDicoApt::cDicoApt(std::string aBDFile):cdicoAptBase(aBDFile)
         i++;
         }*/
         for (int us(1);us <18;us++){
-           dbo::ptr<caracteristiqueCS>  pt = session.find<caracteristiqueCS>().where("station_id = ?").bind(us);
+           dbo::ptr<caracteristiqueCS>  pt = session.find<caracteristiqueCS>().where("zbio = ?").bind(1).where("station_id = ?").bind(us);
            caracteristiqueCS  kkCSCopy(pt.get());
            //std::cout <<"encore une caracteristiqueCS " << kkCSCopy.station_id << " , " << kkCSCopy.zbio <<  std::endl;
            Dico_US2KK.emplace(std::make_pair(std::make_pair(kkCSCopy.zbio,kkCSCopy.station_id),kkCSCopy));
