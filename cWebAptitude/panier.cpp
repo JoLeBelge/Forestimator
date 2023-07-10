@@ -96,7 +96,7 @@ void panier::addMap(std::string aCode, std::shared_ptr<Layer> l){
     });
 
     int row=mTable->rowCount();
-    // la première couche n'est pas en transparence. old old, aucune tranparence par défaut, j'ai modifié displayOLArcGisRest et displayOLWMS
+
     if (row==0){
         bvis->setChecked(false);
         bvis->setText("O");

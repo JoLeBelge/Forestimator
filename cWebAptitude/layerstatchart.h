@@ -23,7 +23,6 @@ std::string nth_letter(int n);
 
 class layerStat;
 class layerStatChart;
-//class olOneLay;// plus utilisé, remplacé par staticMap
 class staticMap;
 class batonnetApt;
 class Layer;
