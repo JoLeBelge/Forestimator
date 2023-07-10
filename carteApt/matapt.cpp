@@ -6,12 +6,12 @@ matApt::matApt(std::shared_ptr<cdicoAptBase> aDicoApt):mDicoApt(aDicoApt),zbio_(
     setOverflow(Wt::Overflow::Auto);
     setId("matAptCont");
     // un nouveau div enfant car le parent est dans le stack, avec display flex, ce qui fait foirer un scroll général sur tout le contenu.
-    WContainerWidget * global = addWidget(cpp14::make_unique<WContainerWidget>());
-    WVBoxLayout * layoutGlobalA = global->setLayout(cpp14::make_unique<WVBoxLayout>());
-    WContainerWidget * cA = layoutGlobalA->addWidget(cpp14::make_unique<WContainerWidget>());
-    WHBoxLayout * layoutGlobal = cA->setLayout(cpp14::make_unique<WHBoxLayout>());
+    WContainerWidget * global = addWidget(std::make_unique<WContainerWidget>());
+    WVBoxLayout * layoutGlobalA = global->setLayout(std::make_unique<WVBoxLayout>());
+    WContainerWidget * cA = layoutGlobalA->addWidget(std::make_unique<WContainerWidget>());
+    WHBoxLayout * layoutGlobal = cA->setLayout(std::make_unique<WHBoxLayout>());
     layoutGlobal->setContentsMargins(0,0,0,0);
-    WContainerWidget * contG = layoutGlobal->addWidget(cpp14::make_unique<WContainerWidget>());
+    WContainerWidget * contG = layoutGlobal->addWidget(std::make_unique<WContainerWidget>());
     // on commence avec tableau ecogramme:
     contG->setOverflow(Wt::Overflow::Auto);
     contG->setMaximumSize("400px","100%");
@@ -21,15 +21,15 @@ matApt::matApt(std::shared_ptr<cdicoAptBase> aDicoApt):mDicoApt(aDicoApt),zbio_(
     mEco->setHeaderCount(2);
     mEco->elementAt(0,2)->setColumnSpan(6);
     // titre colonne
-    mEco->elementAt(0,2)->addWidget(cpp14::make_unique<WText>(tr("eco.NT.titre")));
-    mEco->elementAt(1,2)->addWidget(cpp14::make_unique<WText>("-3"));
-    mEco->elementAt(1,3)->addWidget(cpp14::make_unique<WText>("-2"));
-    mEco->elementAt(1,4)->addWidget(cpp14::make_unique<WText>("-1"));
-    mEco->elementAt(1,5)->addWidget(cpp14::make_unique<WText>("0"));
-    mEco->elementAt(1,6)->addWidget(cpp14::make_unique<WText>("+1"));
-    mEco->elementAt(1,7)->addWidget(cpp14::make_unique<WText>("+2"));
+    mEco->elementAt(0,2)->addWidget(std::make_unique<WText>(tr("eco.NT.titre")));
+    mEco->elementAt(1,2)->addWidget(std::make_unique<WText>("-3"));
+    mEco->elementAt(1,3)->addWidget(std::make_unique<WText>("-2"));
+    mEco->elementAt(1,4)->addWidget(std::make_unique<WText>("-1"));
+    mEco->elementAt(1,5)->addWidget(std::make_unique<WText>("0"));
+    mEco->elementAt(1,6)->addWidget(std::make_unique<WText>("+1"));
+    mEco->elementAt(1,7)->addWidget(std::make_unique<WText>("+2"));
     mEco->elementAt(2,0)->setRowSpan(14);
-    mEco->elementAt(2,0)->addWidget(cpp14::make_unique<WText>(tr("eco.NH.titre")));
+    mEco->elementAt(2,0)->addWidget(std::make_unique<WText>(tr("eco.NH.titre")));
 
     int addr(2),addc(2);
     // création de toutes les cellulles de l'écogramme
@@ -38,7 +38,7 @@ matApt::matApt(std::shared_ptr<cdicoAptBase> aDicoApt):mDicoApt(aDicoApt),zbio_(
         if (codeNH!=0){
             int row=mDicoApt->posEcoNH(codeNH)+addr;
             // ajout titre
-            mEco->elementAt(row,1)->addWidget(cpp14::make_unique<WText>(kvNH.second));
+            mEco->elementAt(row,1)->addWidget(std::make_unique<WText>(kvNH.second));
             for (auto kvNT : *mDicoApt->NT()){
                 int codeNT=kvNT.first;
                 std::tuple<int,int> ntnh(codeNT,codeNH);
@@ -61,11 +61,12 @@ matApt::matApt(std::shared_ptr<cdicoAptBase> aDicoApt):mDicoApt(aDicoApt),zbio_(
         }
     }
     // partie droite
-    WContainerWidget * contD = layoutGlobal->addWidget(cpp14::make_unique<WContainerWidget>());
-    WVBoxLayout * layoutDroite = contD->setLayout(cpp14::make_unique<WVBoxLayout>());
-    WContainerWidget * contZbio = layoutDroite->addWidget(cpp14::make_unique<WContainerWidget>());
-    WHBoxLayout * layoutzbio = contZbio->setLayout(cpp14::make_unique<WHBoxLayout>());
-    WContainerWidget * contZbioGauche = layoutzbio->addWidget(cpp14::make_unique<WContainerWidget>());
+    WContainerWidget * contD = layoutGlobal->addWidget(std::make_unique<WContainerWidget>());
+
+    WVBoxLayout * layoutDroite = contD->setLayout(std::make_unique<WVBoxLayout>());
+    WContainerWidget * contZbio = layoutDroite->addWidget(std::make_unique<WContainerWidget>());
+    WHBoxLayout * layoutzbio = contZbio->setLayout(std::make_unique<WHBoxLayout>());
+    WContainerWidget * contZbioGauche = layoutzbio->addWidget(std::make_unique<WContainerWidget>());
     contZbioGauche->addWidget(std::make_unique<Wt::WText>(tr("zbio.titre")));
     //contZbio->setMinimumSize("50%","100px");
     //contZbio->setMaximumSize("50%","300px");
@@ -85,12 +86,12 @@ matApt::matApt(std::shared_ptr<cdicoAptBase> aDicoApt):mDicoApt(aDicoApt),zbio_(
     std::string  aShp=mDicoApt->File("ZBIOSIMP");
     graphZbio = layoutzbio->addWidget(std::make_unique<zbioPainted>(aShp,mDicoApt.get()));
 
-    WContainerWidget * contApt = layoutDroite->addWidget(cpp14::make_unique<WContainerWidget>());
+    WContainerWidget * contApt = layoutDroite->addWidget(std::make_unique<WContainerWidget>());
     contApt->setOverflow(Wt::Overflow::Auto);
     mAptTable= contApt->addNew<WTable>();
     contApt->addNew<Wt::WText>(tr("matApt.asterisque.doubleApt"));
     // partie documentation
-    WContainerWidget * cB = layoutGlobalA->addWidget(cpp14::make_unique<WContainerWidget>(),1);
+    WContainerWidget * cB = layoutGlobalA->addWidget(std::make_unique<WContainerWidget>(),1);
     cB->addNew<Wt::WText>(tr("matApt.documentation"));
     cB->setOverflow(Wt::Overflow::Auto);
 }
@@ -335,18 +336,18 @@ void matApt::initAptTable(std::string aNTNHTitle){
     mAptTable->setHeaderCount(2);
     mAptTable->elementAt(0,2)->setColumnSpan(3);
     // titre colonne
-    mAptTable->elementAt(0,2)->addWidget(cpp14::make_unique<WText>( aNTNHTitle));
-    mAptTable->elementAt(1,2)->addWidget(cpp14::make_unique<WText>(tr("apt.t.O")));
-    mAptTable->elementAt(1,3)->addWidget(cpp14::make_unique<WText>(tr("apt.t.T")));
-    mAptTable->elementAt(1,4)->addWidget(cpp14::make_unique<WText>(tr("apt.t.TE")));
+    mAptTable->elementAt(0,2)->addWidget(std::make_unique<WText>( aNTNHTitle));
+    mAptTable->elementAt(1,2)->addWidget(std::make_unique<WText>(tr("apt.t.O")));
+    mAptTable->elementAt(1,3)->addWidget(std::make_unique<WText>(tr("apt.t.T")));
+    mAptTable->elementAt(1,4)->addWidget(std::make_unique<WText>(tr("apt.t.TE")));
     mAptTable->elementAt(2,0)->setRowSpan(3);
-    //mAptTable->elementAt(2,0)->addWidget(cpp14::make_unique<WText>(tr("aptZ.titre")));
+    //mAptTable->elementAt(2,0)->addWidget(std::make_unique<WText>(tr("aptZ.titre")));
 
-    mAptTable->elementAt(2,0)->addWidget(cpp14::make_unique<WText>("<strong class='vertical-text'><span>Aptitude climatique : "+WString(mDicoApt->ZBIO(zbio_))+"</span></strong>"));
+    mAptTable->elementAt(2,0)->addWidget(std::make_unique<WText>("<strong class='vertical-text'><span>Aptitude climatique : "+WString(mDicoApt->ZBIO(zbio_))+"</span></strong>"));
     mAptTable->elementAt(2,0)->addStyleClass("rel-pos");
-    mAptTable->elementAt(2,1)->addWidget(cpp14::make_unique<WText>(tr("apt.t.O")));
-    mAptTable->elementAt(3,1)->addWidget(cpp14::make_unique<WText>(tr("apt.t.T")));
-    mAptTable->elementAt(4,1)->addWidget(cpp14::make_unique<WText>(tr("apt.t.TE")));
+    mAptTable->elementAt(2,1)->addWidget(std::make_unique<WText>(tr("apt.t.O")));
+    mAptTable->elementAt(3,1)->addWidget(std::make_unique<WText>(tr("apt.t.T")));
+    mAptTable->elementAt(4,1)->addWidget(std::make_unique<WText>(tr("apt.t.TE")));
 }
 
 void matApt::compareMatApt(){

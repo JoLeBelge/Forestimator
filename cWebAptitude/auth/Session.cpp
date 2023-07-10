@@ -25,14 +25,14 @@ void Session::configureAuth()
     //myAuthService.setEmailVerificationRequired(true);
 
     std::unique_ptr<Auth::PasswordVerifier> verifier
-            = cpp14::make_unique<Auth::PasswordVerifier>();
-    verifier->addHashFunction(cpp14::make_unique<Auth::BCryptHashFunction>(7));
+            = std::make_unique<Auth::PasswordVerifier>();
+    verifier->addHashFunction(std::make_unique<Auth::BCryptHashFunction>(7));
     myPasswordService.setVerifier(std::move(verifier));
     myPasswordService.setAttemptThrottlingEnabled(true);
-    //myPasswordService.setStrengthValidator(cpp14::make_unique<Auth::PasswordStrengthValidator>());
+    //myPasswordService.setStrengthValidator(std::make_unique<Auth::PasswordStrengthValidator>());
 
     // paramètrer le validateur de password
-    std::unique_ptr<Auth::PasswordStrengthValidator> validator= cpp14::make_unique<Auth::PasswordStrengthValidator>();
+    std::unique_ptr<Auth::PasswordStrengthValidator> validator= std::make_unique<Auth::PasswordStrengthValidator>();
     //validator->setMinimumPassPhraseWords(Wt::Auth::PasswordStrengthValidator::Disabled);
     validator->setMinimumLength(Wt::Auth::PasswordStrengthType::OneCharClass, 4);
     validator->setMinimumLength(Wt::Auth::PasswordStrengthType::TwoCharClass, 4);
@@ -42,10 +42,10 @@ void Session::configureAuth()
     myPasswordService.setStrengthValidator(std::move(validator));
 
     /*if (Auth::GoogleService::configured())
-    myOAuthServices.push_back(cpp14::make_unique<Auth::GoogleService>(myAuthService));
+    myOAuthServices.push_back(std::make_unique<Auth::GoogleService>(myAuthService));
 
   if (Auth::FacebookService::configured())
-    myOAuthServices.push_back(cpp14::make_unique<Auth::FacebookService>(myAuthService));
+    myOAuthServices.push_back(std::make_unique<Auth::FacebookService>(myAuthService));
 
   for (unsigned i = 0; i < myOAuthServices.size(); ++i)
     myOAuthServices[i]->generateRedirectEndpoint();
@@ -55,7 +55,7 @@ void Session::configureAuth()
 Session::Session(const std::string& sqliteDb)
 {
     std::cout << "new Session()" << std::endl;
-    auto connection = cpp14::make_unique<Dbo::backend::Sqlite3>(sqliteDb);
+    auto connection = std::make_unique<Dbo::backend::Sqlite3>(sqliteDb);
 
     connection->setProperty("show-queries", "false");
 
@@ -75,7 +75,7 @@ Session::Session(const std::string& sqliteDb)
         std::cout << "Using existing database...";
     }
 
-    users_ = cpp14::make_unique<UserDatabase>(*this);
+    users_ = std::make_unique<UserDatabase>(*this);
     //std::cout << "done\n" << std::endl;
 }
 

@@ -8,7 +8,7 @@ matAptCS::matAptCS(cDicoApt *aDicoApt):mDicoApt(aDicoApt),zbio_(1),US_(1),mVar_(
 
     //setMaximumSize("100%","5000px");
     /* 1 Intro ---------------------------*/
-    addWidget(cpp14::make_unique<WText>(tr("CS.intro")));
+    addWidget(std::make_unique<WText>(tr("CS.intro")));
      /* 2 Zbio ---------------------------*/
     addWidget(std::make_unique<Wt::WText>(tr("matAptCS.zbio")));
 
@@ -106,7 +106,7 @@ void matAptCS::updateListeUS(){
 
     for (auto & kv : mDicoApt->aVStation(mDicoApt->ZBIO2CSid(zbio_))){
         // un boutton avec un badge de la couleur de la station
-        Wt::WPushButton* us =contListeUS->addWidget(cpp14::make_unique<Wt::WPushButton>());
+        Wt::WPushButton* us =contListeUS->addWidget(std::make_unique<Wt::WPushButton>());
         us->addStyleClass("position-relative");
         us->setTextFormat(Wt::TextFormat::XHTML);
         std::shared_ptr<color> col=CSlay->getColor(std::get<0>(kv.first));
@@ -139,7 +139,7 @@ void matAptCS::showFicheUS(int US, std::string aVar){
     if (mVar_!=""){
        usLabel+=", variante " +mVar_;
     }
-    contFicheUS->addWidget(cpp14::make_unique<WText>(tr("aptCS.titreUS").arg(mDicoApt->ZBIO(zbio_)).arg(std::to_string(US_)).arg(usLabel)));
+    contFicheUS->addWidget(std::make_unique<WText>(tr("aptCS.titreUS").arg(mDicoApt->ZBIO(zbio_)).arg(std::to_string(US_)).arg(usLabel)));
     */
 
     std::string idMessage="zbio"+std::to_string(mDicoApt->ZBIO2CSid(zbio_)) +".US"+std::to_string(US)+".part1";
@@ -166,10 +166,10 @@ void matAptCS::showFicheUS(int US, std::string aVar){
     mAptTable->setHeaderCount(2);
     mAptTable->elementAt(0,0)->setColumnSpan(3);
     // titre colonne
-    mAptTable->elementAt(0,0)->addWidget(cpp14::make_unique<WText>(tr("aptCS.titreMatApt")));
-    mAptTable->elementAt(1,0)->addWidget(cpp14::make_unique<WText>(tr("apt.t.O")));
-    mAptTable->elementAt(1,1)->addWidget(cpp14::make_unique<WText>(tr("apt.t.T")));
-    mAptTable->elementAt(1,2)->addWidget(cpp14::make_unique<WText>(tr("aptCS.t.TE")));
+    mAptTable->elementAt(0,0)->addWidget(std::make_unique<WText>(tr("aptCS.titreMatApt")));
+    mAptTable->elementAt(1,0)->addWidget(std::make_unique<WText>(tr("apt.t.O")));
+    mAptTable->elementAt(1,1)->addWidget(std::make_unique<WText>(tr("apt.t.T")));
+    mAptTable->elementAt(1,2)->addWidget(std::make_unique<WText>(tr("aptCS.t.TE")));
     int rGlob(2),cGlob(0);
     for (int apt : {1,2,3}){
         cGlob=apt-1;

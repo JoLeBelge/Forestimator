@@ -111,7 +111,7 @@ std::unique_ptr<Wt::WApplication> createAuthApplication(const Wt::WEnvironment &
         theme->setVersion(Wt::BootstrapVersion::v3);
         theme->setResponsive(true);
         app404->setInternalPathValid(false);
-        app404->root()->addWidget(cpp14::make_unique<Wt::WText>("ERREUR: Page introuvable..."));
+        app404->root()->addWidget(std::make_unique<Wt::WText>("ERREUR: Page introuvable..."));
         return app404;
     }
 

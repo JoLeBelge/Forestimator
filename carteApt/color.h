@@ -16,16 +16,23 @@ public:
         const char* c=aHex.substr(1,aHex.size()).c_str();
         sscanf(c, "%02x%02x%02x", &mR, &mG, &mB);
         // fonctionne pas si #000000
-        if (mR<0  | mG <0| mB<0){mR=0;mG=0;mB=0;mStyleClassName="toto";mHTMLcode="#000000";}
+        if ((mR < 0) | (mG < 0) | (mB < 0)){
+            mR=0;
+            mG=0;
+            mB=0;
+            mStyleClassName="toto";
+            mHTMLcode="#000000";
+        }
         //std::cout << std::to_string(mR) << ";" <<std::to_string(mG) << ";" <<std::to_string(mB) << std::endl;
         isDark();
     }
     int mR,mG,mB;
-    const void set(int &R,int &G,int &B) const{
+    void set(int &R,int &G,int &B) const{
         R=mR;
         G=mG;
         B=mB;
         //isDark();
+        return;
     }
 
     void isDark(){

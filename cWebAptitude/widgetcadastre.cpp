@@ -3,20 +3,20 @@
 widgetCadastre::widgetCadastre(cadastre * aCad):mCad(aCad),WTable()
 {
     int row(0);
-    elementAt(row,0)->addWidget(cpp14::make_unique<WLabel>(tr("cadastre.commune")));
-    commune_ = elementAt(0,1)->addWidget(cpp14::make_unique<WComboBox>());
+    elementAt(row,0)->addWidget(std::make_unique<WLabel>(tr("cadastre.commune")));
+    commune_ = elementAt(0,1)->addWidget(std::make_unique<WComboBox>());
     ++row;
-    elementAt(row,0)->addWidget(cpp14::make_unique<WLabel>(tr("cadastre.division")));
-    division_ = elementAt(row,1)->addWidget(cpp14::make_unique<WComboBox>());
+    elementAt(row,0)->addWidget(std::make_unique<WLabel>(tr("cadastre.division")));
+    division_ = elementAt(row,1)->addWidget(std::make_unique<WComboBox>());
     ++row;
     // cette partie est grisée tant que commune et division ne sont pas rempli
-    elementAt(row,0)->addWidget(cpp14::make_unique<WLabel>(tr("cadastre.section")));
-    section_ = elementAt(row,1)->addWidget(cpp14::make_unique<WComboBox>());
+    elementAt(row,0)->addWidget(std::make_unique<WLabel>(tr("cadastre.section")));
+    section_ = elementAt(row,1)->addWidget(std::make_unique<WComboBox>());
     ++row;
-    elementAt(row,0)->addWidget(cpp14::make_unique<WLabel>(tr("cadastre.paca")));
-    paCa_ = elementAt(row,1)->addWidget(cpp14::make_unique<WComboBox>());
+    elementAt(row,0)->addWidget(std::make_unique<WLabel>(tr("cadastre.paca")));
+    paCa_ = elementAt(row,1)->addWidget(std::make_unique<WComboBox>());
     ++row;
-    submit_ = elementAt(row,0)->addWidget(cpp14::make_unique<WPushButton>(tr("cadastre.submit")));
+    submit_ = elementAt(row,0)->addWidget(std::make_unique<WPushButton>(tr("cadastre.submit")));
     submit_->clicked().connect(this, &widgetCadastre::submit);
 
     aMLabelCom.emplace(std::make_pair(0,0));

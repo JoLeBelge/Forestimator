@@ -1,6 +1,4 @@
-#pragma once
 #include "cwebaptitude.h"
-//#include "auth.h"
 
 extern bool globTest;
 
@@ -12,7 +10,7 @@ cWebAptitude::cWebAptitude(AuthApplication *app, Auth::AuthWidget* authWidget_)
     setContentAlignment(Wt::AlignmentFlag::Top);// j'ai mis ça sur deux ou trois conteneur car sinon j'ai un bug avec la taille de la page "catalogue station" qui augmente sa taille à l'infini (voir post sur e layout manager for a container which does not have a height that is constrained somehow, you need to specify AlignTop in the alignment flags of WContainerWidget::setLayout().
     GDALAllRegister();
     mApp = app;
-    mApp->setLoadingIndicator(cpp14::make_unique<Wt::WOverlayLoadingIndicator>());
+    mApp->setLoadingIndicator(std::make_unique<Wt::WOverlayLoadingIndicator>());
     mApp->loadingIndicator()->setMessage(tr("defaultLoadingI"));
 
     // std::cout << "nombre de couleurs: " << mDico->colors.size() << std::endl;
@@ -31,12 +29,12 @@ cWebAptitude::cWebAptitude(AuthApplication *app, Auth::AuthWidget* authWidget_)
     setPadding(0);
 
     /*	NAVIGATION BAR	*/
-    navigation = this->addWidget(cpp14::make_unique<WNavigationBar>());
+    navigation = this->addWidget(std::make_unique<WNavigationBar>());
     navigation->setResponsive(true);
     navigation->addStyleClass("carto_menu");
     navigation->setTitle("<strong>Forestimator</strong>"); // PL request !
 
-    std::unique_ptr<WMenu> menu_ = cpp14::make_unique<WMenu>();
+    std::unique_ptr<WMenu> menu_ = std::make_unique<WMenu>();
     WMenu * navbar_menu = navigation->addMenu(std::move(menu_), Wt::AlignmentFlag::Right);
 
     // menu app
@@ -75,10 +73,10 @@ cWebAptitude::cWebAptitude(AuthApplication *app, Auth::AuthWidget* authWidget_)
     // load DOC page
     top_stack->addNew<presentationPage>(mDico,mApp);
     // load MAP page
-    std::unique_ptr<WContainerWidget> content_app = cpp14::make_unique<WContainerWidget>();
+    std::unique_ptr<WContainerWidget> content_app = std::make_unique<WContainerWidget>();
     content_app->setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Middle);
     content_app->addStyleClass("carto_div");
-    WHBoxLayout * layout_app = content_app->setLayout(cpp14::make_unique<WHBoxLayout>());
+    WHBoxLayout * layout_app = content_app->setLayout(std::make_unique<WHBoxLayout>());
     layout_app->setContentsMargins(0,0,0,0);
     content_app->setHeight("100%"); // oui ça ca marche bien! reste plus qu'à empêcher la carte de s'escamoter.
     content_app->setOverflow(Overflow::Visible); // non pas d'overflow pour la carte, qui est dans page_carto
@@ -91,7 +89,7 @@ cWebAptitude::cWebAptitude(AuthApplication *app, Auth::AuthWidget* authWidget_)
 
     /*	MAP	*/
     if (globTest){std::cout << "create map" << std::endl;}
-    auto map = cpp14::make_unique<WOpenLayers>(mDico);
+    auto map = std::make_unique<WOpenLayers>(mDico);
     mMap = map.get();
     mMap->setWidth("100%");
     mMap->setMinimumSize(400,0);
@@ -99,17 +97,17 @@ cWebAptitude::cWebAptitude(AuthApplication *app, Auth::AuthWidget* authWidget_)
     layout_app->addWidget(std::move(map), 0);
 
     /*  Panel droit avec boutons et couches selectionnees */
-    auto content_couches = layout_app->addWidget(cpp14::make_unique<WContainerWidget>());
+    auto content_couches = layout_app->addWidget(std::make_unique<WContainerWidget>());
     content_couches->setId("content_couches");
     //content_couches->setOverflow(Overflow::Auto);
     content_couches->addStyleClass("content_couches");
     //load_content_couches(content_couches); // moved after mGroupL initialization !! non c'est juste la création du panier qu'il faut mettre après, le reste (création conteneur et layout) je dois le faire ici pour avoir mes Menuitem avant de créer class dialogu
-    auto layout = content_couches->setLayout(cpp14::make_unique<WHBoxLayout>());
+    auto layout = content_couches->setLayout(std::make_unique<WHBoxLayout>());
     content_couches->setPadding(0);
     layout->setContentsMargins(0,0,0,0);
 
-    auto menu_gauche = layout->addWidget(cpp14::make_unique<WContainerWidget>());
-    auto content_panier = layout->addWidget(cpp14::make_unique<WContainerWidget>());
+    auto menu_gauche = layout->addWidget(std::make_unique<WContainerWidget>());
+    auto content_panier = layout->addWidget(std::make_unique<WContainerWidget>());
 
     menu_gauche->setWidth(60);
     menu_gauche->addStyleClass("menu_gauche");
@@ -159,38 +157,38 @@ cWebAptitude::cWebAptitude(AuthApplication *app, Auth::AuthWidget* authWidget_)
     // info point
     dialog_info = layout_app->addChild(Wt::cpp14::make_unique<dialog>("Info ponctuelle",menuitem_simplepoint,&mApp->environment()));
 
-    auto content_info = dialog_info->contents()->addWidget(cpp14::make_unique<WContainerWidget>());
+    auto content_info = dialog_info->contents()->addWidget(std::make_unique<WContainerWidget>());
     //content_info->setOverflow(Overflow::Auto);
     content_info->addStyleClass("content_info");
 
     // analyse
     dialog_anal = layout_app->addChild(Wt::cpp14::make_unique<dialog>("Analyse surfacique",menuitem_analyse,&mApp->environment()));
 
-    //auto content_anal = dialog_anal->contents()->addWidget(cpp14::make_unique<WContainerWidget>());
+    //auto content_anal = dialog_anal->contents()->addWidget(std::make_unique<WContainerWidget>());
     //content_anal->setOverflow(Overflow::Auto);
     //content_anal->addStyleClass("content_anal");
 
     // catalogue
     dialog_catalog = layout_app->addChild(Wt::cpp14::make_unique<dialog>("Catalogue des couches",menuitem_catalog,&mApp->environment()));
 
-    auto content_catalog = dialog_catalog->contents()->addWidget(cpp14::make_unique<WContainerWidget>());
+    auto content_catalog = dialog_catalog->contents()->addWidget(std::make_unique<WContainerWidget>());
     content_catalog->addStyleClass("content_catalog");
 
     // cadastre
     dialog_cadastre = layout_app->addChild(Wt::cpp14::make_unique<dialog>("Recherche cadastrale",menuitem_cadastre,&mApp->environment()));
     // legende
     dialog_legend = layout_app->addChild(Wt::cpp14::make_unique<dialog>("Légende",menuitem_legend,&mApp->environment()));
-    mLegendW = dialog_legend->contents()->addWidget(cpp14::make_unique<WContainerWidget>());
+    mLegendW = dialog_legend->contents()->addWidget(std::make_unique<WContainerWidget>());
     //mLegendW->setOverflow(Overflow::Auto);
     mLegendW->addStyleClass("content_legend");
 
 
     widgetCadastre * content_cadastre;
-    content_cadastre = dialog_cadastre->contents()->addWidget(cpp14::make_unique<widgetCadastre>(mDico->mCadastre.get()));
+    content_cadastre = dialog_cadastre->contents()->addWidget(std::make_unique<widgetCadastre>(mDico->mCadastre.get()));
     content_cadastre->addStyleClass("content_cadastre");
 
-    //stack_info = content_info_->addWidget(cpp14::make_unique<WStackedWidget>());
-    //stack_info = dialog_cont->contents()->addWidget(cpp14::make_unique<WStackedWidget>());
+    //stack_info = content_info_->addWidget(std::make_unique<WStackedWidget>());
+    //stack_info = dialog_cont->contents()->addWidget(std::make_unique<WStackedWidget>());
     //stack_info->setOverflow(Overflow::Auto);
     //stack_info->addStyleClass("content_info_stack");
     
@@ -211,7 +209,7 @@ cWebAptitude::cWebAptitude(AuthApplication *app, Auth::AuthWidget* authWidget_)
 
     /* CHARGE ONGLET ANALYSES */
     //printf("create PA\n");
-    mPA = dialog_anal->contents()->addWidget(cpp14::make_unique<parcellaire>(mGroupL,mApp,page_camembert));
+    mPA = dialog_anal->contents()->addWidget(std::make_unique<parcellaire>(mGroupL,mApp,page_camembert));
     mPA->addStyleClass("content_analyse");
 
     mGroupL->updateGL();// updaGL utilise des pointeurs d'autres classe, donc je dois le faire après avoir instancier toutes les autres classes... StatWindows, SimplePoint et parcellaire

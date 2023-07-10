@@ -12,6 +12,9 @@
 #include <unistd.h>
 #include "color.h"
 
+#pragma GCC diagnostic ignored "-Wunused-function"
+#pragma GCC diagnostic ignored "-Wreorder"
+
 enum class FeRe {Feuillus,
                  Resineux,
                  Autre
@@ -414,7 +417,7 @@ public:
             int nt0=std::get<0>(ntnh0);
             int nh0=std::get<1>(ntnh0);
             aRes = mDico->AptNonContraignante(getApt(nt0,nh0,aZbio,false));
-            for (int c(1); c<aVNtnh4Comparison.size();c++){
+            for (size_t c(1); c < aVNtnh4Comparison.size();c++){
                 std::tuple<int,int> ntnh = aVNtnh4Comparison.at(c);
                 int nt=std::get<0>(ntnh);
                 int nh=std::get<1>(ntnh);
@@ -473,8 +476,8 @@ public:
 private:
     FeRe mFeRe;
     TypeCarte mType;
-    cdicoAptBase * mDico;
-    std::string mCode, mNomFR, mF_R,mPrefix;
+    cdicoAptBase *mDico;
+    std::string mCode, mNomFR, mF_R, mPrefix;
 };
 
 class WMSinfo

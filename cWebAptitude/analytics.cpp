@@ -127,8 +127,8 @@ PageAnalytics::PageAnalytics(const Wt::WEnvironment& env, std::string aFileDB) :
     nbMonthSelection_->changed().connect(std::bind(&PageAnalytics::changeGraph,this));*/
 
     //Wt::WContainerWidget * contentChart = layout->addWidget(Wt::cpp14::make_unique<Wt::WContainerWidget>(),0);
-    //mChart = layout->addWidget(cpp14::make_unique<Chart::WCartesianChart>());
-    mChart = root()->addWidget(cpp14::make_unique<Chart::WCartesianChart>());
+    //mChart = layout->addWidget(std::make_unique<Chart::WCartesianChart>());
+    mChart = root()->addWidget(std::make_unique<Chart::WCartesianChart>());
 
 
     // ok alors je sais pas trop pourquoi mais une fois que j'ai fini cette boucle je ne peux plus en refaire une autre. L'objet logsGraph est vide par après...
@@ -174,7 +174,7 @@ PageAnalytics::PageAnalytics(const Wt::WEnvironment& env, std::string aFileDB) :
     /*
      * Add the first column as line series.
      *  */
-    auto s = cpp14::make_unique<Chart::WDataSeries>(1, Chart::SeriesType::Line);
+    auto s = std::make_unique<Chart::WDataSeries>(1, Chart::SeriesType::Line);
     s->setShadow(WShadow(3, 3, WColor(0, 0, 0, 127), 3));
     mChart->addSeries(std::move(s));
 

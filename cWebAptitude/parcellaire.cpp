@@ -20,7 +20,9 @@ parcellaire::parcellaire(groupLayers *aGL, Wt::WApplication* app, statWindow *st
 
     setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Left);
     setInline(0);
-    addWidget(cpp14::make_unique<WText>(tr("anaStep1")));
+
+    addWidget(std::make_unique<WText>(tr("anaStep1")));
+    //mParent->addWidget(std::make_unique<Wt::WText>(tr("infoParcellaire")));
 
     fu =addNew<Wt::WFileUpload>();
     fu->setFileTextSize(globVolMaxShp); // Set the maximum file size. il faut également changer param max-request-size dans wt_config
@@ -30,21 +32,22 @@ parcellaire::parcellaire(groupLayers *aGL, Wt::WApplication* app, statWindow *st
     fu->addStyleClass("btn-file");
     addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
 
-    msg = addWidget(cpp14::make_unique<Wt::WText>());
+    msg = addWidget(std::make_unique<Wt::WText>());
     msg->setInline(0);
-    addWidget(cpp14::make_unique<WText>(tr("anaStep2")));
+    addWidget(std::make_unique<WText>(tr("anaStep2")));
 
-    mContSelect4D= addWidget(cpp14::make_unique<Wt::WContainerWidget>());
+    mContSelect4D= addWidget(std::make_unique<Wt::WContainerWidget>());
 
-    addWidget(cpp14::make_unique<WText>(tr("anaStep3")));
+    addWidget(std::make_unique<WText>(tr("anaStep3")));
 
-    downloadRasterBt = addWidget(cpp14::make_unique<Wt::WPushButton>(tr("parcellaire.tele.btn")));
+
+    downloadRasterBt = addWidget(std::make_unique<Wt::WPushButton>(tr("parcellaire.tele.btn")));
     downloadRasterBt->setStyleClass("btn btn-success");
     downloadRasterBt->setWidth(200);
     downloadRasterBt->setInline(0);
     downloadRasterBt->disable();
-    addWidget(cpp14::make_unique<Wt::WBreak>());
-    anaOnAllPolygBt = addWidget(cpp14::make_unique<Wt::WPushButton>(tr("parcellaire.ana.btn")));
+    addWidget(std::make_unique<Wt::WBreak>());
+    anaOnAllPolygBt = addWidget(std::make_unique<Wt::WPushButton>(tr("parcellaire.ana.btn")));
     anaOnAllPolygBt->setStyleClass("btn btn-success");
     anaOnAllPolygBt->setWidth(200);
     anaOnAllPolygBt->setInline(0);
@@ -351,7 +354,7 @@ void parcellaire::downloadRaster(){
         m_app->loadingIndicator()->setMessage(tr("defaultLoadingI"));
 
         // bof ça marche paaaaas avec unique ptr, je sais pas pk wt renvoi vers une page "nothing to say about that"
-        //std::unique_ptr<WFileResource> fileResource = cpp14::make_unique<Wt::WFileResource>("plain/text",mFullPath+"_raster.zip");
+        //std::unique_ptr<WFileResource> fileResource = std::make_unique<Wt::WFileResource>("plain/text",mFullPath+"_raster.zip");
         //WFileResource * fileResource_ = fileResource->get();
 
         WFileResource * fileResource = new Wt::WFileResource("plain/text",mFullPath+"_raster.zip");

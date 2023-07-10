@@ -6,25 +6,25 @@ uploadCarte::uploadCarte(WContainerWidget *parent, groupLayers * aGL, parcellair
     mParent->setMargin(20,Wt::Side::Bottom | Wt::Side::Top);
     mParent->setInline(0);
 
-    mParent->addWidget(cpp14::make_unique<Wt::WText>(tr("infoTelechargement")));
+    mParent->addWidget(std::make_unique<Wt::WText>(tr("infoTelechargement")));
 
     mParent->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
     //mParent->addWidget(std::unique_ptr<Wt::WContainerWidget>(mGL->afficheSelect4Stat()));
     mParent->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
 
-    mParent->addWidget(cpp14::make_unique<WText>("<h4>Télécharger le parcellaire</h4>"));
-    mParent->addWidget(cpp14::make_unique<Wt::WText>(tr("infoTelechargementShp")));
+    mParent->addWidget(std::make_unique<WText>("<h4>Télécharger le parcellaire</h4>"));
+    mParent->addWidget(std::make_unique<Wt::WText>(tr("infoTelechargementShp")));
     mParent->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
-    uploadBtShp = mParent->addWidget(cpp14::make_unique<Wt::WPushButton>("Télécharger"));
+    uploadBtShp = mParent->addWidget(std::make_unique<Wt::WPushButton>("Télécharger"));
     uploadBtShp->setInline(0);
     mParent->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
-    mParent->addWidget(cpp14::make_unique<WText>("<h4>Télécharger les cartes raster</h4>"));
-    mParent->addWidget(cpp14::make_unique<Wt::WText>(tr("infoTelechargementRaster")));
+    mParent->addWidget(std::make_unique<WText>("<h4>Télécharger les cartes raster</h4>"));
+    mParent->addWidget(std::make_unique<Wt::WText>(tr("infoTelechargementRaster")));
     mParent->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
     mCB_clip= mParent->addWidget(Wt::cpp14::make_unique<Wt::WCheckBox>(tr("cb_decoupeShp")));
     mCB_clip->setInline(0);
     // il faut lier cette checkbox avec signaux en provenance de parcellaire. Si shp valide ; checkbox true
-    uploadBtRaster = mParent->addWidget(cpp14::make_unique<Wt::WPushButton>("Télécharger"));
+    uploadBtRaster = mParent->addWidget(std::make_unique<Wt::WPushButton>("Télécharger"));
     uploadBtRaster->setInline(0);
 
     uploadBtShp->clicked().connect(this ,&uploadCarte::uploadShp);

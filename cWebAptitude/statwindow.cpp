@@ -11,22 +11,22 @@ statWindow::statWindow(groupLayers * aGL):mDico(aGL->Dico()), mApp(aGL->m_app),m
     addStyleClass("statWindow");
 
     WContainerWidget * contTitre_ =  addWidget(Wt::cpp14::make_unique<Wt::WContainerWidget>());
-    mTitre = contTitre_->addWidget(cpp14::make_unique<WText>());
+    mTitre = contTitre_->addWidget(std::make_unique<WText>());
     mTitre->setId("statWindowTitre");
-    contTitre_->addWidget(cpp14::make_unique<WText>(tr("infoDansVisuStat")));
+    contTitre_->addWidget(std::make_unique<WText>(tr("infoDansVisuStat")));
     // bouton retour
-    auto * tpl = contTitre_->addWidget(cpp14::make_unique<Wt::WTemplate>(tr("bouton_retour_parcelaire")));
+    auto * tpl = contTitre_->addWidget(std::make_unique<Wt::WTemplate>(tr("bouton_retour_parcelaire")));
     WPushButton * retour = tpl->bindWidget("retour", Wt::cpp14::make_unique<WPushButton>("Retour"));
     retour->setLink(WLink(LinkType::InternalPath, "/cartographie"));
     // bouton export PDF
-    createPdfBut = contTitre_->addWidget(cpp14::make_unique<WPushButton>("Export PDF"));
+    createPdfBut = contTitre_->addWidget(std::make_unique<WPushButton>("Export PDF"));
 
-    mCarteGenCont = addWidget(cpp14::make_unique<WContainerWidget>());
+    mCarteGenCont = addWidget(std::make_unique<WContainerWidget>());
     mCarteGenCont->setId("carteGenStat");
     mCarteGenCont->setInline(0);
     mCarteGenCont->setOverflow(Wt::Overflow::Auto);
 
-    mAptTable = addWidget(cpp14::make_unique<WTable>());
+    mAptTable = addWidget(std::make_unique<WTable>());
     mAptTable->setId("AptitudeTable");
     mAptTable->setHeaderCount(1);
     mAptTable->columnAt(0)->setWidth("60%");
@@ -34,7 +34,7 @@ statWindow::statWindow(groupLayers * aGL):mDico(aGL->Dico()), mApp(aGL->m_app),m
     mAptTable->setWidth(Wt::WLength("90%"));
     mAptTable->toggleStyleClass("table-striped",true);
 
-    mAllStatIndivCont = addWidget(cpp14::make_unique<WContainerWidget>());
+    mAllStatIndivCont = addWidget(std::make_unique<WContainerWidget>());
     mAllStatIndivCont->setId("AllStatIndividuelle");
 
     mIGN= mDico->getLayerBase("IGNgrfmn");
@@ -70,17 +70,17 @@ void statWindow::add1Aptitude(std::shared_ptr<layerStatChart> lstat){
     int row=mAptTable->rowCount();
     if (row==0){
         mAptTable->elementAt(0, 0)->setColumnSpan(2);
-        mAptTable->elementAt(0, 0)->addWidget(cpp14::make_unique<WText>(tr("StatWTitreTabApt")));
+        mAptTable->elementAt(0, 0)->addWidget(std::make_unique<WText>(tr("StatWTitreTabApt")));
         mAptTable->elementAt(0, 0)->setContentAlignment(AlignmentFlag::Top | AlignmentFlag::Center);
         mAptTable->elementAt(0, 0)->setPadding(10);
-        mAptTable->elementAt(1, 0)->addWidget(cpp14::make_unique<WText>("Essence"));
-        mAptTable->elementAt(1, 1)->addWidget(cpp14::make_unique<WText>("Aptitude"));
+        mAptTable->elementAt(1, 0)->addWidget(std::make_unique<WText>("Essence"));
+        mAptTable->elementAt(1, 1)->addWidget(std::make_unique<WText>("Aptitude"));
         mAptTable->elementAt(1, 0)->setContentAlignment(AlignmentFlag::Top | AlignmentFlag::Center);
         mAptTable->elementAt(1, 1)->setContentAlignment(AlignmentFlag::Top | AlignmentFlag::Center);
         row=2;
     }
 
-    mAptTable->elementAt(row, 0)->addWidget(cpp14::make_unique<WText>(lstat->Lay()->getLegendLabel(false)));
+    mAptTable->elementAt(row, 0)->addWidget(std::make_unique<WText>(lstat->Lay()->getLegendLabel(false)));
     // ajout de la barre de statistique
     mAptTable->elementAt(row, 1)->addWidget(lstat->getBarStat());
     mAptTable->elementAt(row, 1)->setContentAlignment(AlignmentFlag::Top | AlignmentFlag::Center);
@@ -109,19 +109,19 @@ void statWindow::generateGenCarte(OGRFeature * poFeature){
 
     std::cout << "statWindow::generateGenCarte ---" << std::endl;
 
-    WVBoxLayout * layoutV =mCarteGenCont->setLayout(cpp14::make_unique<WVBoxLayout>());
-    layoutV->addWidget(cpp14::make_unique<WText>("<h4>Aperçu</h4>"));
+    WVBoxLayout * layoutV =mCarteGenCont->setLayout(std::make_unique<WVBoxLayout>());
+    layoutV->addWidget(std::make_unique<WText>("<h4>Aperçu</h4>"));
     //aRes->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
-    WContainerWidget * aContCarte = layoutV->addWidget(cpp14::make_unique<WContainerWidget>());
-    WHBoxLayout * layoutH = aContCarte->setLayout(cpp14::make_unique<WHBoxLayout>());
+    WContainerWidget * aContCarte = layoutV->addWidget(std::make_unique<WContainerWidget>());
+    WHBoxLayout * layoutH = aContCarte->setLayout(std::make_unique<WHBoxLayout>());
     // ajout de la carte pour cette couche
     staticMap sm(mIGN,poFeature->GetGeometryRef());
-    Wt::WImage * im =layoutH->addWidget(cpp14::make_unique<Wt::WImage>(sm.getWLinkRel()),0);
+    Wt::WImage * im =layoutH->addWidget(std::make_unique<Wt::WImage>(sm.getWLinkRel()),0);
     im->resize(350,"100%");
     // need to set it here after initialization of the map id !
 
     // description générale ; lecture des attribut du polygone?calcul de pente, zone bioclim, et élévation
-    WContainerWidget * aContInfo = layoutH->addWidget(cpp14::make_unique<WContainerWidget>());
+    WContainerWidget * aContInfo = layoutH->addWidget(std::make_unique<WContainerWidget>());
 
     // je refais les calculs pour les couches qui m'intéressent
 
@@ -131,33 +131,33 @@ void statWindow::generateGenCarte(OGRFeature * poFeature){
     // info de surface, en ha et en m2
     OGRMultiPolygon * pol =poFeature->GetGeometryRef()->toMultiPolygon();
     double surf_m=pol->get_Area();
-    aContInfo->addWidget(cpp14::make_unique<WText>(Wt::WString::tr("report.analyse.surf.area").arg(roundDouble(surf_m/10000.0)).arg(roundDouble(surf_m,0))));
+    aContInfo->addWidget(std::make_unique<WText>(Wt::WString::tr("report.analyse.surf.area").arg(roundDouble(surf_m/10000.0)).arg(roundDouble(surf_m,0))));
 
-    aContInfo->addWidget(cpp14::make_unique<WText>(Wt::WString::tr("report.analyse.surf.zbio.t")));
+    aContInfo->addWidget(std::make_unique<WText>(Wt::WString::tr("report.analyse.surf.zbio.t")));
 
-    aContInfo->addWidget(cpp14::make_unique<WText>(mZBIO->summaryStat(poFeature->GetGeometryRef())));
+    aContInfo->addWidget(std::make_unique<WText>(mZBIO->summaryStat(poFeature->GetGeometryRef())));
 
-    aContInfo->addWidget(cpp14::make_unique<WText>(Wt::WString::tr("report.analyse.surf.relief.t")));
+    aContInfo->addWidget(std::make_unique<WText>(Wt::WString::tr("report.analyse.surf.relief.t")));
 
-    aContInfo->addWidget(cpp14::make_unique<WText>("Altitude maximum : "+ statMNT.getMax() + " m"));
-    aContInfo->addWidget(cpp14::make_unique<WBreak>());
-    aContInfo->addWidget(cpp14::make_unique<WText>("Altitude moyenne : "+ statMNT.getMean()+ " m"));
-    aContInfo->addWidget(cpp14::make_unique<WBreak>());
-    aContInfo->addWidget(cpp14::make_unique<WText>("Altitude minimum : "+ statMNT.getMin()+ " m"));
-    aContInfo->addWidget(cpp14::make_unique<WBreak>());
-    aContInfo->addWidget(cpp14::make_unique<WText>("Pente moyenne : "+ statPente.getMean()+ " %"));
-    aContInfo->addWidget(cpp14::make_unique<WBreak>());
+    aContInfo->addWidget(std::make_unique<WText>("Altitude maximum : "+ statMNT.getMax() + " m"));
+    aContInfo->addWidget(std::make_unique<WBreak>());
+    aContInfo->addWidget(std::make_unique<WText>("Altitude moyenne : "+ statMNT.getMean()+ " m"));
+    aContInfo->addWidget(std::make_unique<WBreak>());
+    aContInfo->addWidget(std::make_unique<WText>("Altitude minimum : "+ statMNT.getMin()+ " m"));
+    aContInfo->addWidget(std::make_unique<WBreak>());
+    aContInfo->addWidget(std::make_unique<WText>("Pente moyenne : "+ statPente.getMean()+ " %"));
+    aContInfo->addWidget(std::make_unique<WBreak>());
 
     // analyse pédo surfacique
 
     surfPedo statPedo(mDico->mPedo,poFeature->GetGeometryRef());
-    aContInfo->addWidget(cpp14::make_unique<WText>(Wt::WString::tr("report.analyse.surf.pedo.t")));
-    aContInfo->addWidget(cpp14::make_unique<WText>("Texture : "+ statPedo.getSummary(PEDO::TEXTURE)));
-    aContInfo->addWidget(cpp14::make_unique<WBreak>());
-    aContInfo->addWidget(cpp14::make_unique<WText>("Drainage : "+ statPedo.getSummary(PEDO::DRAINAGE)));
-    aContInfo->addWidget(cpp14::make_unique<WBreak>());
-    aContInfo->addWidget(cpp14::make_unique<WText>("Profondeur : "+ statPedo.getSummary(PEDO::PROFONDEUR)));
-    aContInfo->addWidget(cpp14::make_unique<WBreak>());
+    aContInfo->addWidget(std::make_unique<WText>(Wt::WString::tr("report.analyse.surf.pedo.t")));
+    aContInfo->addWidget(std::make_unique<WText>("Texture : "+ statPedo.getSummary(PEDO::TEXTURE)));
+    aContInfo->addWidget(std::make_unique<WBreak>());
+    aContInfo->addWidget(std::make_unique<WText>("Drainage : "+ statPedo.getSummary(PEDO::DRAINAGE)));
+    aContInfo->addWidget(std::make_unique<WBreak>());
+    aContInfo->addWidget(std::make_unique<WText>("Profondeur : "+ statPedo.getSummary(PEDO::PROFONDEUR)));
+    aContInfo->addWidget(std::make_unique<WBreak>());
 }
 
 

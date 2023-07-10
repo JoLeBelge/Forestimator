@@ -14,7 +14,7 @@ presentationPage::presentationPage(cDicoApt *aDico, AuthApplication *app):mDico(
         cont->addNew<Wt::WText>(Wt::WText::tr("presentation-ad"+std::to_string(i)));
     }
     // j'ai testé toutes les solutions trouvées sur le net, asio de boost, plein de timer (souvent bloquant), finalement le Wtimer est juste super
-   Wt::WTimer * timer = this->addChild(cpp14::make_unique<Wt::WTimer>());
+   Wt::WTimer * timer = this->addChild(std::make_unique<Wt::WTimer>());
    timer->setInterval(std::chrono::seconds(7));
    timer->timeout().connect(this, &presentationPage::bannerAnimation);
    timer->start();*/
@@ -34,14 +34,14 @@ presentationPage::presentationPage(cDicoApt *aDico, AuthApplication *app):mDico(
     auto subMenu = std::make_unique<Wt::WMenu>(subStack.get());
     auto subMenu_ = subMenu.get();
     subMenu_->addStyleClass("nav-pills nav-stacked submenu submenuPresentation");
-    subMenu_->setWidth(200);
+    subMenu_->setWidth(1000);
 
     subMenu_->setInternalPathEnabled("/documentation");
 
     // probleme https://redmine.webtoolkit.eu/boards/2/topics/1206, j'ai plein de session qui se lancent quand je veux accèder à l'internal path d'une documentation
 
     // introduction forestimator
-    //std::unique_ptr<Wt::WMenuItem> item = std::make_unique<Wt::WMenuItem>("Forestimator : présentation", cpp14::make_unique<Wt::WText>(WString::tr("page_presentation")));
+    //std::unique_ptr<Wt::WMenuItem> item = std::make_unique<Wt::WMenuItem>("Forestimator : présentation", std::make_unique<Wt::WText>(WString::tr("page_presentation")));
     std::unique_ptr<Wt::WMenuItem> item = std::make_unique<Wt::WMenuItem>("Forestimator : présentation");
     Wt::WContainerWidget * c0 = new Wt::WContainerWidget();
     c0->addNew<WText>(WString::tr("ref.article.forestimator"));
@@ -49,7 +49,7 @@ presentationPage::presentationPage(cDicoApt *aDico, AuthApplication *app):mDico(
     item->setContents(std::unique_ptr<Wt::WContainerWidget>(c0));
     subMenu_->addItem(std::move(item));
 
-    std::unique_ptr<Wt::WMenuItem> item2 = std::make_unique<Wt::WMenuItem>("Crédit et contact", cpp14::make_unique<Wt::WText>(WString::tr("page_presentation.credit")));
+    std::unique_ptr<Wt::WMenuItem> item2 = std::make_unique<Wt::WMenuItem>("Crédit et contact", std::make_unique<Wt::WText>(WString::tr("page_presentation.credit")));
     subMenu_->addItem(std::move(item2));
 
     std::unique_ptr<Wt::WMenuItem> item3 = std::make_unique<Wt::WMenuItem>("Téléchargement");
@@ -62,7 +62,7 @@ presentationPage::presentationPage(cDicoApt *aDico, AuthApplication *app):mDico(
     t->elementAt(0, 0)->setColumnSpan(4);
     t->elementAt(0, 0)->setContentAlignment(AlignmentFlag::Top | AlignmentFlag::Center);
     t->elementAt(0, 0)->setPadding(10);
-    t->elementAt(0, 0)->addWidget(cpp14::make_unique<WText>(tr("titre.tab.download")));
+    t->elementAt(0, 0)->addWidget(std::make_unique<WText>(tr("titre.tab.download")));
 
     // on les présente par groupe de couches
     for (std::string gr : mDico->Dico_groupe){
@@ -77,22 +77,22 @@ presentationPage::presentationPage(cDicoApt *aDico, AuthApplication *app):mDico(
 
             int r=t->rowCount();
             t->elementAt(r, 0)->setColumnSpan(4);
-            t->elementAt(r, 0)->addWidget(cpp14::make_unique<WText>(WString::fromUTF8("<h4>"+mDico->groupeLabel(gr)+"</h4>")));
+            t->elementAt(r, 0)->addWidget(std::make_unique<WText>(WString::fromUTF8("<h4>"+mDico->groupeLabel(gr)+"</h4>")));
             t->elementAt(r, 0)->addStyleClass("bold");
-            t->elementAt(r+1, 1)->addWidget(cpp14::make_unique<WText>(tr("colWMS.tab.download")));
-            t->elementAt(r+1, 2)->addWidget(cpp14::make_unique<WText>(tr("colWMSname.tab.download")));
-            t->elementAt(r+1, 3)->addWidget(cpp14::make_unique<WText>(tr("colSize.tab.download")));
+            t->elementAt(r+1, 1)->addWidget(std::make_unique<WText>(tr("colWMS.tab.download")));
+            t->elementAt(r+1, 2)->addWidget(std::make_unique<WText>(tr("colWMSname.tab.download")));
+            t->elementAt(r+1, 3)->addWidget(std::make_unique<WText>(tr("colSize.tab.download")));
 
             for (std::shared_ptr<layerBase> l : mDico->VlayersForGroupe(gr)){
                 if (l->getCatLayer()!=TypeLayer::Externe & !l->Expert() & mDico->lay4Visu(l->Code()) & l->getFilesize()<globMaxDownloadFileS){
                     int row=t->rowCount();
-                    t->elementAt(row, 0)->addWidget(cpp14::make_unique<WText>(WString::fromUTF8(l->Nom())));
-                    WText * url =t->elementAt(row, 1)->addWidget(cpp14::make_unique<WText>(WString::fromUTF8(l->WMSURL())));
+                    t->elementAt(row, 0)->addWidget(std::make_unique<WText>(WString::fromUTF8(l->Nom())));
+                    WText * url =t->elementAt(row, 1)->addWidget(std::make_unique<WText>(WString::fromUTF8(l->WMSURL())));
                     url->addStyleClass("mya");
-                    t->elementAt(row, 2)->addWidget(cpp14::make_unique<WText>(WString::fromUTF8(l->WMSLayerName())));
-                    t->elementAt(row, 3)->addWidget(cpp14::make_unique<WText>(WString::fromUTF8(roundDouble(l->getFilesize(),1)+ " Mo")));
+                    t->elementAt(row, 2)->addWidget(std::make_unique<WText>(WString::fromUTF8(l->WMSLayerName())));
+                    t->elementAt(row, 3)->addWidget(std::make_unique<WText>(WString::fromUTF8(roundDouble(l->getFilesize(),1)+ " Mo")));
 
-                    Wt::WPushButton * b = t->elementAt(row, 4)->addWidget(cpp14::make_unique<Wt::WPushButton>("télécharger"));
+                    Wt::WPushButton * b = t->elementAt(row, 4)->addWidget(std::make_unique<Wt::WPushButton>("télécharger"));
                     t->elementAt(row, 4)->setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Middle);
                     Wt::WLink loadLink = Wt::WLink("/telechargement/"+l->Code());
                     b->clicked().connect([=]{m_app->addLog(l->Code(),typeLog::dsingleRW);
@@ -114,7 +114,7 @@ presentationPage::presentationPage(cDicoApt *aDico, AuthApplication *app):mDico(
                     b->setLink(loadLink);// le lien pointe vers une ressource qui est générée dans main.cpp
                     // qml
                     if (l->hasSymbology()){
-                        Wt::WPushButton * b2 = t->elementAt(row, 5)->addWidget(cpp14::make_unique<Wt::WPushButton>("télécharger le qml"));
+                        Wt::WPushButton * b2 = t->elementAt(row, 5)->addWidget(std::make_unique<Wt::WPushButton>("télécharger le qml"));
                         t->elementAt(row, 5)->setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Middle);
                         Wt::WLink loadLink2 = Wt::WLink("/telechargement/"+l->Code()+"qml");
                         //b->clicked().connect([=]{m_app->addLog(l->Code(),typeLog::dsingleRW);});
@@ -131,7 +131,10 @@ presentationPage::presentationPage(cDicoApt *aDico, AuthApplication *app):mDico(
     for( auto kv : *mDico->layerMTD()){
         LayerMTD lMTD=kv.second;
         if (lMTD.code()!="ES_EP"){
+
         std::unique_ptr<Wt::WMenuItem> item = std::make_unique<Wt::WMenuItem>(lMTD.Label(), cpp14::make_unique<Wt::WText>(getHtml(&lMTD)));
+
+
         subMenu_->addItem(std::move(item));
         } else {
             std::unique_ptr<Wt::WMenuItem> mi = std::make_unique<Wt::WMenuItem>(lMTD.Label());
@@ -154,7 +157,7 @@ presentationPage::presentationPage(cDicoApt *aDico, AuthApplication *app):mDico(
         }
     }
 
-    std::unique_ptr<Wt::WMenuItem> item4 = std::make_unique<Wt::WMenuItem>("Forestimator API", cpp14::make_unique<Wt::WText>(WString::tr("docu.api")));
+    std::unique_ptr<Wt::WMenuItem> item4 = std::make_unique<Wt::WMenuItem>("Forestimator API", std::make_unique<Wt::WText>(WString::tr("docu.api")));
     subMenu_->addItem(std::move(item4));
 
 
