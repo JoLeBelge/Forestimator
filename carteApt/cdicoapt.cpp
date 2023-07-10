@@ -17,35 +17,9 @@ cDicoApt::cDicoApt(std::string aBDFile):cdicoAptBase(aBDFile)
         mCadastre= std::make_shared<cadastre>(*db_);
         if (globTest){   std::cout << "cadastre done" << std::endl;}
 
-
         sqlite3_stmt * stmt;
-        //pour l'instant je ne sélectionne pas les stations qui ne sont pas cartographiées ; celles qui ont été regroupée en une station carto.
-        // c'est faux vu que je prends les variantes pour l'Ardenne
-        std::string SQLstring="SELECT ZBIO,stat_id,Station_carto,var,nom_var FROM dico_station WHERE stat_id=stat_num;";
-        sqlite3_prepare_v2( *db_, SQLstring.c_str(), -1, &stmt, NULL );
-        while(sqlite3_step(stmt) == SQLITE_ROW)
-        {
-            if (sqlite3_column_type(stmt, 0)!=SQLITE_NULL && sqlite3_column_type(stmt, 1)!=SQLITE_NULL){
 
-                int aA=sqlite3_column_int( stmt, 0 );
-                int aB=sqlite3_column_int( stmt, 1 );
-                std::string aC=std::string( (char *)sqlite3_column_text( stmt, 2 ) );
-                std::string aD(""),aF("");
-                if (sqlite3_column_type(stmt, 3)!=SQLITE_NULL){
-                aD=std::string( (char *)sqlite3_column_text( stmt, 3 ) );
-                }
-                if (sqlite3_column_type(stmt, 4)!=SQLITE_NULL){
-                aF=std::string( (char *)sqlite3_column_text( stmt, 4 ) );
-                }
-                Dico_station[aA].emplace(std::make_pair(std::make_tuple(aB,aD),aC));
-                Dico_station_var[aA].emplace(std::make_pair(std::make_tuple(aB,aD),aF));
-
-                //std::cout << " station " << aB << ", variante " << aD << std::endl;
-            }
-        }
-        sqlite3_finalize(stmt);
-
-        SQLstring="SELECT Code, id_projet, version, id_reference, Nom, copyrigth,ordre, NomShort,keep FROM carteMTD;";
+        std::string SQLstring="SELECT Code, id_projet, version, id_reference, Nom, copyrigth,ordre, NomShort,keep FROM carteMTD;";
         sqlite3_prepare_v2( *db_, SQLstring.c_str(), -1, &stmt, NULL );
         while(sqlite3_step(stmt) == SQLITE_ROW)
         {
