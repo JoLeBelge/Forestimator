@@ -99,31 +99,32 @@ int main(int argc, char *argv[])
     if (vm.count("MNH_TS") && vm["MNH_TS"].as<bool>()){
 
         GDALAllRegister();
+        std::string outPath;
         std::cout << "loop on file in " << adirBD << std::endl;
         for(auto & p : boost::filesystem::directory_iterator(adirBD)){
             std::string mnhPath= p.path().string();
+            outPath=p.path().parent_path().parent_path().string() +"/MNHClip/";
+            boost::filesystem::create_directory(outPath);
             // clip avec la limite de la RW
-            std::string aCommand ="gdalwarp -co 'COMPRESS=DEFLATE' -cutline "+ columnPath +" -crop_to_cutline -dstnodata 32767 "+mnhPath+ "/home/jo/Documents/Carto/MNH_TS/MNHClip/mnh2015.tif";
+            std::string aCommand ="gdalwarp -co 'COMPRESS=DEFLATE' -co 'TILED=YES' -cutline "+ columnPath +" -crop_to_cutline -dstnodata 32767 "+mnhPath+ " "+ outPath + p.path().filename().string();
             std::cout << aCommand << "\n";
             system(aCommand.c_str());
-
+            aCommand ="gdaladdo -r average "+ outPath + p.path().filename().string()+ " 2 4 8 16 32 64";
+            std::cout << aCommand << "\n";
+            system(aCommand.c_str());
         }
 
-
-        for(auto & p : boost::filesystem::directory_iterator(adirBD)){
+        for(auto & p : boost::filesystem::directory_iterator(outPath)){
             std::string mnhPath= p.path().string();
-
-
-
             std::cout << "mnh " << mnhPath << std::endl;
             int y= std::stoi(mnhPath.substr(mnhPath.size()-8,mnhPath.size()-4));
             GDALDataset * DS = (GDALDataset *) GDALOpen( mnhPath.c_str(), GA_Update );
             DS->SetMetadataItem("Titre","Modèle Numérique de Hauteur de la canopée forestière");
             DS->SetMetadataItem("Année", std::to_string(y).c_str());
             DS->SetMetadataItem("Crédit","Gembloux Agro-Bio Tech");
-            DS->SetMetadataItem("Unit","Les valeurs brutes du raster exprimment la hauteur en centimètre. Un gain de 0.01 permet d'obtenir la hauteur en mètre");
-            DS->SetMetadataItem("scale_data","1");
-            DS->SetMetadataItem("scale_factor","0.01");
+            DS->SetMetadataItem("Unit","Les valeurs brutes du raster expriment la hauteur en centimètre. Un gain de 0.01 permet d'obtenir la hauteur en mètre (appliqué par défaut par QGis)");
+            //DS->SetMetadataItem("scale_data","1");
+            //DS->SetMetadataItem("scale_factor","0.01"); // je crois que ça sert à rien.
             DS->GetRasterBand(1)->SetScale(0.01);
             GDALClose(DS);
         }
