@@ -85,12 +85,12 @@ AuthApplication::AuthApplication(const Wt::WEnvironment& env, cDicoApt *dico)
 
     loadStyles();
 
-    auto layout = root()->setLayout(Wt::cpp14::make_unique<Wt::WVBoxLayout>());
+    auto layout = root()->setLayout(std::make_unique<Wt::WVBoxLayout>());
     root()->setMargin(0);
     root()->setPadding(0);
 
     //layout->addWidget(std::move(loadAuthWidget()));
-    dialog_auth = layout->addChild(Wt::cpp14::make_unique<Wt::WDialog>("Connexion"));
+    dialog_auth = layout->addChild(std::make_unique<Wt::WDialog>("Connexion"));
     dialog_auth->setResizable(true);
     dialog_auth->setModal(true);
     dialog_auth->setMaximumSize(700,600);
@@ -100,7 +100,7 @@ AuthApplication::AuthApplication(const Wt::WEnvironment& env, cDicoApt *dico)
     dialog_auth->setClosable(true);
     dialog_auth->contents()->addWidget(std::move(loadAuthWidget()));
 
-    cWebApt = layout->addWidget(Wt::cpp14::make_unique<cWebAptitude>(this, authWidget_));
+    cWebApt = layout->addWidget(std::make_unique<cWebAptitude>(this, authWidget_));
 
     root()->addStyleClass("layout_main");
     loaded_=true;

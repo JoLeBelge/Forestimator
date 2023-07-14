@@ -156,7 +156,7 @@ void matApt::displayMatApt(){
                 //if(aV.at(n)->Code()=="EC"){ std::cout << " érable champêtre, aptitude zbio climatique " << aV.at(n)->getApt(zbio_) << ", aptitude HT " << aV.at(n)->getApt(nt,nh,zbio_,false) << std::endl;}
 
                 c->clicked().connect([=] {
-                    Wt::WMessageBox * messageBox = this->addChild(Wt::cpp14::make_unique<Wt::WMessageBox>(
+                    Wt::WMessageBox * messageBox = this->addChild(std::make_unique<Wt::WMessageBox>(
                                                                       aV.at(n)->Nom(),
                                                                       "",
                                                                       Wt::Icon::Information,
@@ -473,7 +473,7 @@ void matApt::compareMatApt(){
                     });
                     c->setToolTip(aV1.at(n)->Nom());
                     c->clicked().connect([=] {
-                        Wt::WMessageBox * messageBox = this->addChild(Wt::cpp14::make_unique<Wt::WMessageBox>(
+                        Wt::WMessageBox * messageBox = this->addChild(std::make_unique<Wt::WMessageBox>(
                                                                           aV1.at(n)->Nom(),
                                                                           "",
                                                                           Wt::Icon::Information,
@@ -519,7 +519,7 @@ void matApt::compareMatApt(){
                     });
                     c->setToolTip(aV2.at(n)->Nom());
                     c->clicked().connect([=] {
-                        Wt::WMessageBox * messageBox = this->addChild(Wt::cpp14::make_unique<Wt::WMessageBox>(
+                        Wt::WMessageBox * messageBox = this->addChild(std::make_unique<Wt::WMessageBox>(
                                                                           aV2.at(n)->Nom(),
                                                                           "",
                                                                           Wt::Icon::Information,
@@ -675,6 +675,11 @@ void zbioPainted::paintEvent(Wt::WPaintDevice *paintDevice){
                 }
                 break;
             }
+               default:
+
+                {
+                    std::cout << "poFeature->GetGeometryRef()->getGeometryType() = " << poFeature->GetGeometryRef()->getGeometryType() << "is not handled in switch at line 658" << std::endl;
+                }
             }
         }
     }
@@ -721,7 +726,7 @@ void zbioPainted::drawPol(OGRPolygon * pol, WPainter *painter){
         }
 
         painter->drawLines(aVLines);
-        //std::unique_ptr<Wt::WRectArea> rectA = Wt::cpp14::make_unique<Wt::WRectArea>(posX_.at(codeNT), posY_.at(codeNH), pixPerLevel,pixPerLevel);
+        //std::unique_ptr<Wt::WRectArea> rectA = std::make_unique<Wt::WRectArea>(posX_.at(codeNT), posY_.at(codeNH), pixPerLevel,pixPerLevel);
         //rectA->setToolTip(label);
         //addArea(std::move(rectA));
     } else { std::cout << "polygone is null" << std::endl;}
@@ -764,7 +769,7 @@ void matApt::comparison4predicted(){
         //mVNtnh4Comparison.push_back(mVPredictedNtnh.at(mVPredictedNtnh.size()-1));
         compareMatApt();
     } else {
-        Wt::WMessageBox * messageBox = this->addChild(Wt::cpp14::make_unique<Wt::WMessageBox>(
+        Wt::WMessageBox * messageBox = this->addChild(std::make_unique<Wt::WMessageBox>(
                                                           tr("matApt.compare4Predicted"),
                                                           tr("matApt.compare4Predicted.noPrediction"),
                                                           Wt::Icon::Critical,

@@ -11,8 +11,8 @@ simplepoint::simplepoint(groupLayers *aGL, WContainerWidget *parent):mGL(aGL)
     mParent->setInline(0);// si pas inline Et bizarrement si pas de setMargin autre que 0, pas de scrollbar pour l'overflow!
 
     mIntroTxt = mParent->addWidget(std::make_unique<WText>(tr("sp_infoclic")));
-    mParent->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
-    createPdfBut = mParent->addWidget(Wt::cpp14::make_unique<WPushButton>(tr("ana.pt.export.pdf")));
+    mParent->addWidget(std::make_unique<Wt::WBreak>());
+    createPdfBut = mParent->addWidget(std::make_unique<WPushButton>(tr("ana.pt.export.pdf")));
     //createPdfBut->clicked().connect(this,&simplepoint::export2pdfTitreDialog);
 
     mAptAllEss = mParent->addWidget(std::make_unique<WTable>());
@@ -25,7 +25,7 @@ simplepoint::simplepoint(groupLayers *aGL, WContainerWidget *parent):mGL(aGL)
     mDetAptFEE->setWidth(Wt::WLength("90%"));
     mDetAptFEE->toggleStyleClass("table-striped",true);
 
-    mParent->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
+    mParent->addWidget(std::make_unique<Wt::WBreak>());
     mContEco = mParent->addWidget(std::make_unique<Wt::WContainerWidget>());
     mContEco->setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Center);
 
@@ -111,7 +111,7 @@ void simplepoint::detailCalculAptFEE(ST * aST){
     }
     // un titre pour l'écogramme
     mContEco->addWidget(std::make_unique<WText>(tr("titreEcogramme")));
-    mEcoEss = mContEco->addWidget(Wt::cpp14::make_unique<EcogrammeEss>(Ess.get(),aST));
+    mEcoEss = mContEco->addWidget(std::make_unique<EcogrammeEss>(Ess.get(),aST));
     mContEco->addWidget(std::make_unique<WText>(tr("legendEcogramme")));
 }
 
@@ -236,7 +236,7 @@ void simplepoint::afficheAptAllEss(){
     if (mGL->mStation->isOK()){
 
         // TITRE
-        Wt::WDialog * dialog = this->addChild(Wt::cpp14::make_unique<Wt::WDialog>("Titre du rapport pdf"));
+        Wt::WDialog * dialog = this->addChild(std::make_unique<Wt::WDialog>("Titre du rapport pdf"));
         Wt::WLabel *label = dialog->contents()->addNew<Wt::WLabel>("Titre: ");
         Wt::WLineEdit *edit =dialog->contents()->addNew<Wt::WLineEdit>();
         edit->setText(tr("report.analyse.point.titre"));
@@ -256,7 +256,7 @@ void simplepoint::afficheAptAllEss(){
         dialog->show();
     }else{
     // pas de station donc pas d'export
-        WMessageBox * messageBox =addChild(Wt::cpp14::make_unique<Wt::WMessageBox>(tr("ana.point.titre"),
+        WMessageBox * messageBox =addChild(std::make_unique<Wt::WMessageBox>(tr("ana.point.titre"),
                                                                                    tr("ana.point.error.exportpdf.noStation"),
                                                                                    Wt::Icon::Information,
                                                                                    Wt::StandardButton::Ok));

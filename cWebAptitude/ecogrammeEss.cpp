@@ -50,7 +50,7 @@ void EcogrammeEss::draw(Wt::WPainter *painter){
                 double w(0.9*pixPerLevel),h(0.9*pixPerLevel);
                 painter->drawEllipse(x, y, w,h);
 
-                std::unique_ptr<Wt::WRectArea> rectPtr = Wt::cpp14::make_unique<Wt::WRectArea>(x, y, w,h);
+                std::unique_ptr<Wt::WRectArea> rectPtr = std::make_unique<Wt::WRectArea>(x, y, w,h);
                 rectPtr->setToolTip(tr("eco.ntnh").arg(mDico->NT(codeNT)).arg(mDico->NH(codeNH)));
                 rectPtr->setCursor(Wt::Cursor::IBeam);
                 this->addArea(std::move(rectPtr));

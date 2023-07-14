@@ -473,7 +473,7 @@ void batonnetApt::paintEvent(Wt::WPaintDevice *paintDevice){
         double width=kv.second*(mW/100.0);
         painter.drawRect(xcumul, 0, width, mH);
 
-        std::unique_ptr<Wt::WRectArea> rectPtr = Wt::cpp14::make_unique<Wt::WRectArea>(xcumul, 0, int(width), mH);
+        std::unique_ptr<Wt::WRectArea> rectPtr = std::make_unique<Wt::WRectArea>(xcumul, 0, int(width), mH);
         std::string aLabel(kv.first+": "+ std::to_string(kv.second)+"%");
         rectPtr->setToolTip(aLabel);
         rectPtr->setCursor(Wt::Cursor::IBeam);
