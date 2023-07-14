@@ -34,7 +34,7 @@ presentationPage::presentationPage(cDicoApt *aDico, AuthApplication *app):mDico(
     auto subMenu = std::make_unique<Wt::WMenu>(subStack.get());
     auto subMenu_ = subMenu.get();
     subMenu_->addStyleClass("nav-pills nav-stacked submenu submenuPresentation");
-    subMenu_->setWidth(1000);
+    subMenu_->setWidth(200);
 
     subMenu_->setInternalPathEnabled("/documentation");
 
