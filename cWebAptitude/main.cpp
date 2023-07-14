@@ -97,7 +97,7 @@ std::unique_ptr<Wt::WApplication> createAuthApplication(const Wt::WEnvironment &
     }else if (env.internalPath().rfind("/auth",0)==0){ /* authentification links ! */
         ;
     }else if (env.internalPath() == "/stats_analytics"){
-        auto app = Wt::cpp14::make_unique<PageAnalytics>(env,dico->File("docroot")+"analytics.db");
+        auto app = std::make_unique<PageAnalytics>(env,dico->File("docroot")+"analytics.db");
         return app;
     }else{
         std::cout << "internal path pas geré : " << env.internalPath() << std::endl;
@@ -106,7 +106,7 @@ std::unique_ptr<Wt::WApplication> createAuthApplication(const Wt::WEnvironment &
         // stats trafic web
         Analytics anal(dico->File("docroot")+"analytics.db");
 
-        auto app404 = Wt::cpp14::make_unique<Wt::WApplication>(env);
+        auto app404 = std::make_unique<Wt::WApplication>(env);
         auto theme = std::make_shared<Wt::WBootstrapTheme>();
         theme->setVersion(Wt::BootstrapVersion::v3);
         theme->setResponsive(true);
@@ -116,7 +116,7 @@ std::unique_ptr<Wt::WApplication> createAuthApplication(const Wt::WEnvironment &
     }
 
 
-    return Wt::cpp14::make_unique<AuthApplication>(env,dico);
+    return std::make_unique<AuthApplication>(env,dico);
 }
 
 void layerResource::handleRequest(const Http::Request &request, Http::Response &response){

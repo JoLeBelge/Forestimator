@@ -28,7 +28,7 @@ parcellaire::parcellaire(groupLayers *aGL, Wt::WApplication* app, statWindow *st
     fu->setMultiple(true);
     fu->setInline(0);
     fu->addStyleClass("btn-file");
-    addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
+    addWidget(std::make_unique<Wt::WBreak>());
 
     msg = addWidget(std::make_unique<Wt::WText>());
     msg->setInline(0);
@@ -268,7 +268,7 @@ bool parcellaire::computeGlobalGeom(std::string extension="",bool limitSize=1){
             } else {
                 // message box
                 auto messageBox =
-                        addChild(Wt::cpp14::make_unique<Wt::WMessageBox>(
+                        addChild(std::make_unique<Wt::WMessageBox>(
                                      "Import du shapefile polygone",
                                      tr("parcellaire.upload.size")
                                      ,
@@ -367,7 +367,7 @@ void parcellaire::upload(){
     }else {
         // geopackage
         auto messageBox =
-                addChild(Wt::cpp14::make_unique<Wt::WMessageBox>(
+                addChild(std::make_unique<Wt::WMessageBox>(
                              "Chargement de polygones au format Geopackage",
                              tr("analyse.surf.msg.ImportGeopackage")
                              ,
@@ -484,7 +484,7 @@ void parcellaire::downloadRaster(){
 
     } else {
         auto messageBox =
-                addChild(Wt::cpp14::make_unique<Wt::WMessageBox>(
+                addChild(std::make_unique<Wt::WMessageBox>(
                              "Sélection des couches à exporter",
                              tr("download.lay.error.noLay")
                              ,
@@ -536,7 +536,7 @@ void parcellaire::selectPolygon(double x, double y){
                     } else {
                         // message box
                         auto messageBox =
-                                addChild(Wt::cpp14::make_unique<Wt::WMessageBox>(
+                                addChild(std::make_unique<Wt::WMessageBox>(
                                              "Analyse surfacique",
                                              tr("parcellaire.upload.size")
                                              ,
@@ -596,7 +596,7 @@ void parcellaire::anaAllPol(){
     if (mGL->getNumSelect4Download()> 4){
 
         auto messageBox =
-                addChild(Wt::cpp14::make_unique<Wt::WMessageBox>(
+                addChild(std::make_unique<Wt::WMessageBox>(
                              "Analyse surfacique",
                              tr("parcellaire.anaAllPol.maxProcess")
                              ,
@@ -622,4 +622,147 @@ void parcellaire::anaAllPol(){
         } else { std::cout << "select dataset mDS is null " << std::endl;}
     }
     //}
+}
+
+// le nouveau toGeoJson ; effectue un changement de src
+bool parcellaire::to31370AndGeoJson(){
+    bool aRes=true;
+    std::cout << " parcellaire::toGeoJson() ... " ;
+    // 0) suppression des polygones foireux - radical mais c'est l'utilisateur qui doit gérer ses propres merdes
+    bool testEPSG(1);
+    GDALDataset * DS =  (GDALDataset*) GDALOpenEx( fileName().c_str(), GDAL_OF_VECTOR | GDAL_OF_UPDATE, NULL, NULL, NULL );
+    if( DS != NULL )
+    {
+        OGRLayer * lay = DS->GetLayer(0);
+        OGRSpatialReference * oSRS=lay->GetSpatialRef();
+        if (oSRS==NULL){
+            testEPSG=0;
+        } else {
+            int EPSG =  oSRS->GetEPSGGeogCS();
+            std::cout << "EPSG : " << EPSG << std::endl;
+            if (EPSG==-1){testEPSG=0;}
+        }
+        OGRFeature *poFeature;
+        OGRGeometry * poGeom;
+
+        while( (poFeature = lay->GetNextFeature()) != NULL )
+        {
+            poGeom=poFeature->GetGeometryRef();
+            if (poGeom->IsValid()!=1) { std::cout << "géométrie feature " << poFeature->GetFID() << " is invalid" << std::endl;
+                lay->DeleteFeature(poFeature->GetFID());// on est en lecture seule, donc ça ne devrai rien faire je crois. inutile?  GDAL_OF_READONLY
+            }
+        }
+
+         GDALClose(DS);
+        if (!testEPSG){
+
+            //https://gdal-dev.osgeo.narkive.com/6bntm7AI/assigning-spatialreference-to-ogrlayer
+            // assez dificile de définir un spatial ref pour un shp existant...
+
+            Wt::WDialog * dialogBox = addChild(std::make_unique<Wt::WDialog>("Système de projection"));
+            dialogBox->setModal(true);
+            dialogBox->contents()->setOverflow(Overflow::Scroll);
+            dialogBox->setClosable(false);
+            dialogBox->contents()->addNew<Wt::WText>(tr("parcellaire.loadshp.srcNotDefined"));
+            Wt::WComboBox * epsgSel =dialogBox->contents()->addNew<Wt::WComboBox>();
+            epsgSel->addItem("Belge Lambert 72");
+            epsgSel->addItem("WGS 84");
+            epsgSel->setCurrentIndex(0);
+            Wt::WPushButton *ok =
+                    dialogBox->footer()->addNew<Wt::WPushButton>("OK");
+            ok->setDefault(true);
+            ok->clicked().connect([=] {
+                dialogBox->accept();
+            });
+            dialogBox->finished().connect([=] {
+                int inputEPSG(31370);
+                if( epsgSel->currentIndex()==1){inputEPSG=4326;}
+                std::cout << "epsg input " << inputEPSG << std::endl;
+                removeChild(dialogBox);
+                //to31370AndGeoJsonGDAL(inputEPSG);
+                OGRSpatialReference src;
+                src.importFromEPSG(inputEPSG);
+
+                if (mExtention=="shp"){
+                    // création du prj file
+                    std::ofstream out;
+                    out.open(mFullPath+".prj");
+                    char * wkt;
+                   src.exportToWkt(&wkt);
+                    out << wkt << "\n";
+                    out.close();
+                }
+                to31370AndGeoJsonGDAL();
+                return aRes;
+
+            });
+            dialogBox->show();
+
+        } else {
+            to31370AndGeoJsonGDAL();
+            return aRes;
+        }
+
+    } else {
+        std::cout << " pas possible de lire fichier " << fileName() << std::endl;
+        return 0;
+    }
+    // check le code EPSG - sur serveur j'ai un probleme avec les couche qui sont en user Defined scr 100036, la reprojection en BL72 me met le shp en décalage de 100 m
+
+}
+
+
+void parcellaire::to31370AndGeoJsonGDAL(){
+
+    std::string  output(geoJsonName().c_str());
+    const char *outPath=output.c_str();
+
+    GDALDatasetH hSrcDS  = GDALOpenEx( fileName().c_str(), GDAL_OF_VECTOR | GDAL_OF_READONLY, NULL, NULL, NULL );
+    char** papszArgv = nullptr;
+
+    /*if (inputEPSG!=-1){
+        std::string command ="EPSG:"+std::to_string(inputEPSG);
+        papszArgv = CSLAddString(papszArgv, "-s_srs");
+        papszArgv = CSLAddString(papszArgv, command.c_str());
+        std::cout << "command " << command << std::endl;
+    }*/
+
+    papszArgv = CSLAddString(papszArgv, "-t_srs"); // target src with reprojection
+    papszArgv = CSLAddString(papszArgv, "EPSG:31370");
+    GDALVectorTranslateOptions * option = GDALVectorTranslateOptionsNew(papszArgv, nullptr);
+    if( option ){
+        // 1 on converti en geojson pour ol
+        GDALDatasetH hOutDS = GDALVectorTranslate(outPath,nullptr,1,&hSrcDS,option,nullptr);
+        if( hOutDS ){
+            GDALClose(hOutDS);
+        } else { std::cout << "changement de src par GDALVectorTranslate vers geojson; echec" << std::endl;}
+    } else {
+        std::cout << "options shp to geojson pas correctement parsées " << std::endl;
+    }
+    GDALVectorTranslateOptionsFree(option);
+    GDALClose(hSrcDS);
+    // la source devient le geojson
+    papszArgv = nullptr;
+    hSrcDS  =  GDALOpenEx( outPath, GDAL_OF_VECTOR | GDAL_OF_READONLY, NULL, NULL, NULL );
+    papszArgv = CSLAddString(papszArgv, "-overwrite");
+    GDALVectorTranslateOptions * option2 = GDALVectorTranslateOptionsNew(papszArgv, nullptr);
+    if( option2 ){
+        // 2) on s'assure que le shp soit en BL72
+        GDALDatasetH hOutDS = GDALVectorTranslate(fileName().c_str(),nullptr,1,&hSrcDS,option2,nullptr);
+        if( hOutDS ){
+            GDALClose(hOutDS);
+        }
+    }
+    GDALVectorTranslateOptionsFree(option2);
+    GDALClose(hSrcDS);
+
+    mGL->m_app->addLog("upload a shp");
+    if (computeGlobalGeom()){
+        hasValidShp=true;
+        downloadRasterBt->enable();
+        anaOnAllPolygBt->enable();
+        display();
+        mGL->mMap->setToolTip(tr("tooltipMap2"));
+    }
+     msg->setText(tr("analyse.surf.msg.uploadOK"));
 }

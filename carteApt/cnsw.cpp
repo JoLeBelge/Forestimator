@@ -49,6 +49,11 @@ std::vector<std::string> cnsw::displayInfo(double x, double y,PEDO p){
             if (p!="/"){aRes.push_back(p);}
             break;
         }
+        default:
+
+         {
+             std::cout << "p = " << p << "is not handled in switch at line 55 in cnsw.cpp" << std::endl;
+         }
         }
     }
     return aRes;
@@ -443,6 +448,9 @@ std::string surfPedo::getSummary(PEDO p){
         aRes= dProf;
         break;
     }
+    default:{
+        std::cout << "p = " << p << "is not handled in switch at line 452 in cnsw.cpp" << std::endl;
+        }
 
     }
     return aRes;
