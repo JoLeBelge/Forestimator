@@ -30,7 +30,7 @@ parcellaire::parcellaire(groupLayers *aGL, Wt::WApplication* app, statWindow *st
     fu->setMultiple(true);
     fu->setInline(0);
     fu->addStyleClass("btn-file");
-    addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
+    addWidget(std::make_unique<Wt::WBreak>());
 
     msg = addWidget(std::make_unique<Wt::WText>());
     msg->setInline(0);
@@ -168,7 +168,7 @@ bool parcellaire::computeGlobalGeom(std::string extension,bool limitSize){
             } else {
                 // message box
                 auto messageBox =
-                        addChild(Wt::cpp14::make_unique<Wt::WMessageBox>(
+                        addChild(std::make_unique<Wt::WMessageBox>(
                                      "Import du shapefile polygone",
                                      tr("parcellaire.upload.size")
                                      ,
@@ -258,7 +258,7 @@ void parcellaire::upload(){
     }else {
         // geopackage
         auto messageBox =
-                addChild(Wt::cpp14::make_unique<Wt::WMessageBox>(
+                addChild(std::make_unique<Wt::WMessageBox>(
                              "Chargement de polygones au format Geopackage",
                              tr("analyse.surf.msg.ImportGeopackage")
                              ,
@@ -363,7 +363,7 @@ void parcellaire::downloadRaster(){
 
     } else {
         auto messageBox =
-                addChild(Wt::cpp14::make_unique<Wt::WMessageBox>(
+                addChild(std::make_unique<Wt::WMessageBox>(
                              "Sélection des couches à exporter",
                              tr("download.lay.error.noLay")
                              ,
@@ -415,7 +415,7 @@ void parcellaire::selectPolygon(double x, double y){
                     } else {
                         // message box
                         auto messageBox =
-                                addChild(Wt::cpp14::make_unique<Wt::WMessageBox>(
+                                addChild(std::make_unique<Wt::WMessageBox>(
                                              "Analyse surfacique",
                                              tr("parcellaire.upload.size")
                                              ,
@@ -458,7 +458,7 @@ void parcellaire::anaAllPol(){
     if (mGL->getNumSelect4Download()> 4){
 
         auto messageBox =
-                addChild(Wt::cpp14::make_unique<Wt::WMessageBox>(
+                addChild(std::make_unique<Wt::WMessageBox>(
                              "Analyse surfacique",
                              tr("parcellaire.anaAllPol.maxProcess")
                              ,
@@ -521,7 +521,7 @@ bool parcellaire::to31370AndGeoJson(){
             //https://gdal-dev.osgeo.narkive.com/6bntm7AI/assigning-spatialreference-to-ogrlayer
             // assez dificile de définir un spatial ref pour un shp existant...
 
-            Wt::WDialog * dialogBox = addChild(Wt::cpp14::make_unique<Wt::WDialog>("Système de projection"));
+            Wt::WDialog * dialogBox = addChild(std::make_unique<Wt::WDialog>("Système de projection"));
             dialogBox->setModal(true);
             dialogBox->contents()->setOverflow(Overflow::Scroll);
             dialogBox->setClosable(false);

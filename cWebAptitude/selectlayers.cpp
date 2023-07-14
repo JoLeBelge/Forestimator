@@ -119,7 +119,7 @@ void baseSelectLayers::SelectLayer(bool select,std::shared_ptr<Layer> l,bool aff
         if (select) mLayersCBox.at(l)->setChecked(false);
         if (afficheMsg){
             auto messageBox =
-                    addChild(Wt::cpp14::make_unique<Wt::WMessageBox>(
+                    addChild(std::make_unique<Wt::WMessageBox>(
                                  "Sélection des couches",
                                  "<p>Vous avez atteint le maximun de " + std::to_string(nbMax)+ " couches</p>"
                                                                                                 "<p>Veillez déselectionner une couche avant d'en sélectionner une nouvelle</p>",

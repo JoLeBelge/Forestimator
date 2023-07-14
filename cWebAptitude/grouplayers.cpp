@@ -47,12 +47,12 @@ groupLayers::groupLayers(AuthApplication *app, cWebAptitude * cWebApt):
     mTitle = mLegendDiv->addWidget(std::make_unique<WText>(WString::tr("legendMsg")));
 
     /* Liste cartes 1	*/
-    std::unique_ptr<Wt::WTree> tree = Wt::cpp14::make_unique<Wt::WTree>();
+    std::unique_ptr<Wt::WTree> tree = std::make_unique<Wt::WTree>();
     tree->setSelectionMode(Wt::SelectionMode::Extended);
     tree->addStyleClass("tree_left");
-    //auto folderIcon = Wt::cpp14::make_unique<Wt::WIconPair>("icons/yellow-folder-closed.png", "icons/yellow-folder-open.png", false);
+    //auto folderIcon = std::make_unique<Wt::WIconPair>("icons/yellow-folder-closed.png", "icons/yellow-folder-open.png", false);
 
-    auto main_node = Wt::cpp14::make_unique<Wt::WTreeNode>(tr("groupeCoucheAll")); // std::move(folderIcon) // pour mettre des icones ouvert/fermé !
+    auto main_node = std::make_unique<Wt::WTreeNode>(tr("groupeCoucheAll")); // std::move(folderIcon) // pour mettre des icones ouvert/fermé !
     tree->setTreeRoot(std::move(main_node));
     tree->treeRoot()->label()->setTextFormat(Wt::TextFormat::Plain);
     tree->treeRoot()->setLoadPolicy(Wt::ContentLoading::NextLevel);
@@ -62,7 +62,7 @@ groupLayers::groupLayers(AuthApplication *app, cWebAptitude * cWebApt):
     // ajout des nodes pour les groupes de couches
     for (std::string gr :mDico->Dico_groupe){
 
-        std::unique_ptr<Wt::WTreeNode> node1 = Wt::cpp14::make_unique<Wt::WTreeNode>(mDico->groupeLabel(gr));
+        std::unique_ptr<Wt::WTreeNode> node1 = std::make_unique<Wt::WTreeNode>(mDico->groupeLabel(gr));
         node1->addStyleClass("tree_node");
         Wt::WTreeNode * n= tree->treeRoot()->addChildNode(std::move(node1));
         n->label()->clicked().connect([=]{
@@ -83,7 +83,7 @@ groupLayers::groupLayers(AuthApplication *app, cWebAptitude * cWebApt):
             WText * wtext=NULL;
             Wt::WTreeNode * n=NULL;
             if (aMNodes.find(mDico->lay2groupe(pair.first))!=aMNodes.end()){
-                n = aMNodes.at(mDico->lay2groupe(pair.first))->addChildNode(Wt::cpp14::make_unique<Wt::WTreeNode>(""));
+                n = aMNodes.at(mDico->lay2groupe(pair.first))->addChildNode(std::make_unique<Wt::WTreeNode>(""));
                 wtext=n->label();
 
                 // 2) création de la couche
@@ -112,7 +112,7 @@ groupLayers::groupLayers(AuthApplication *app, cWebAptitude * cWebApt):
         WText * wtext=NULL;
         Wt::WTreeNode * n=NULL;
         if (aMNodes.find(mDico->lay2groupe(aLB->Code()))!=aMNodes.end()){
-            n = aMNodes.at(mDico->lay2groupe(aLB->Code()))->addChildNode(Wt::cpp14::make_unique<Wt::WTreeNode>(""));
+            n = aMNodes.at(mDico->lay2groupe(aLB->Code()))->addChildNode(std::make_unique<Wt::WTreeNode>(""));
             wtext=n->label();
             // 2) création de la couche
             std::shared_ptr<Layer> aL=std::make_shared<Layer>(this,aLB,wtext);
@@ -185,7 +185,7 @@ void groupLayers::clickOnName(std::string aCode){
 
     // changer le mode CS vs FEE de grouplayer, utilise pour le tableau d'aptitude
     // attention de ne pas prendre la couche "CS_FEE" dans le tas (pour Chêne Sessile).
-    if (type == TypeLayer::CS | type == TypeLayer::KK | (type == TypeLayer::Station & aCode.substr(0,2)=="CS")){
+    if ((type == TypeLayer::CS) | (type == TypeLayer::KK) | (type == TypeLayer::Station & aCode.substr(0,2)=="CS")){
         if (globTest){ std::cout << " passe en mode classif CS , couche " << aCode << std::endl;}
         mTypeClassifST=TypeClassifST::CS;
     } else{ mTypeClassifST=TypeClassifST::FEE;
@@ -267,7 +267,7 @@ void groupLayers::extractInfo(double x, double y){
                                       +"overlay.setPosition(coordinate);"
                                       );
                 // comment créer le boutton pour que le polgyone du cadastre serve pour l'analyse surfacique? vu que je passe par du javascript pour la fenetre, je ne peux pas y ajouter de boutton...
-                WDialog * dialogPtr =  mParent->addChild(Wt::cpp14::make_unique<Wt::WDialog>("Charger la parcelle cadastrale"));
+                WDialog * dialogPtr =  mParent->addChild(std::make_unique<Wt::WDialog>("Charger la parcelle cadastrale"));
                 dialogPtr->contents()->addNew<Wt::WText>(tr("msg.charger.poly.capa"));
                 WPushButton *ok = dialogPtr->footer()->addNew<Wt::WPushButton>("Oui");
                 ok->setDefault(false);
@@ -509,14 +509,14 @@ void groupLayers::updateLegende(const std::shared_ptr<Layer> l){
     if (l->getCatLayer()!=TypeLayer::Externe){
         Wt::WAnimation animation(Wt::AnimationEffect::SlideInFromTop, Wt::TimingFunction::EaseOut, 100);
 
-        auto panel = Wt::cpp14::make_unique<Wt::WPanel>();
+        auto panel = std::make_unique<Wt::WPanel>();
         panel->setTitle("<h3>"+l->getLegendLabel()+"</h3>");
         panel->addStyleClass("centered-example");
         panel->setCollapsible(true);
         panel->setAnimation(animation);
         //panel->setCollapsed(false);
 
-        auto tab = Wt::cpp14::make_unique<WTable>();
+        auto tab = std::make_unique<WTable>();
         tab->setHeaderCount(1);
         tab->setWidth(Wt::WLength("90%"));
         tab->toggleStyleClass("table-striped",true);
@@ -583,7 +583,7 @@ void groupLayers::exportLayMapView(){
 
         // si la couche est un raster de valeur continue avec gain et offset, prévenir l'utilisateur avec une boite de dialogue
         if (l->getTypeVar()==TypeVar::Continu && l->Gain()!=1.0){
-            Wt::WMessageBox * messageBox = this->addChild(Wt::cpp14::make_unique<Wt::WMessageBox>(
+            Wt::WMessageBox * messageBox = this->addChild(std::make_unique<Wt::WMessageBox>(
                                                               "Attention",
                                                              tr("msg.Gain.info").arg(l->Gain()),
                                                               Wt::Icon::Information,
@@ -622,7 +622,7 @@ void groupLayers::exportLayMapView(){
             m_app->addLog(l->Code(),typeLog::dsingle);
             m_app->redirect(fileResource->url());
         } else {
-            Wt::WMessageBox * messageBox = this->addChild(Wt::cpp14::make_unique<Wt::WMessageBox>(
+            Wt::WMessageBox * messageBox = this->addChild(std::make_unique<Wt::WMessageBox>(
                                                               "Erreur",
                                                               "<p> Cette couche ne peut être découpée sur cette emprise, essayer avec une zone plus petite.</p>",
                                                               Wt::Icon::Critical,
@@ -638,7 +638,7 @@ void groupLayers::exportLayMapView(){
         m_app->loadingIndicator()->setMessage(tr("defaultLoadingI"));
 
     }else {
-        Wt::WMessageBox * messageBox = this->addChild(Wt::cpp14::make_unique<Wt::WMessageBox>(
+        Wt::WMessageBox * messageBox = this->addChild(std::make_unique<Wt::WMessageBox>(
                                                           "Erreur",
                                                           "<p> Cette couche ne peut être téléchargé, veillez essayer avec une autres couche.</p>",
                                                           Wt::Icon::Critical,
@@ -812,7 +812,7 @@ void groupLayers::loadExtents(std::string id){
         });
         WAnchor *del = mExtentDiv->addNew<Wt::WAnchor>(WLink(""),"(x)");
         del->clicked().connect([=]{
-            WDialog * dialogPtr =  mParent->addChild(Wt::cpp14::make_unique<Wt::WDialog>(tr("extent_del_comfirm")));
+            WDialog * dialogPtr =  mParent->addChild(std::make_unique<Wt::WDialog>(tr("extent_del_comfirm")));
             WPushButton *ok = dialogPtr->footer()->addNew<Wt::WPushButton>("Supprimer");
             ok->setDefault(false);
             ok->clicked().connect([=]{

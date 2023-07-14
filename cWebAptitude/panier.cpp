@@ -14,7 +14,7 @@ panier::panier(AuthApplication *app, cWebAptitude * cWebApt): WContainerWidget()
     mTable->toggleStyleClass("table-striped",true);
 
     // extent div si user connecté
-    this->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
+    this->addWidget(std::make_unique<Wt::WBreak>());
     Wt::WContainerWidget * mExtentDivGlob = this->addWidget(std::make_unique<WContainerWidget>());
     Wt::WContainerWidget * mExtentDiv;
     WPushButton * button_e = mExtentDivGlob->addWidget(std::make_unique<WPushButton>(tr("afficher_extent")));
@@ -33,7 +33,7 @@ panier::panier(AuthApplication *app, cWebAptitude * cWebApt): WContainerWidget()
     mExtentDiv->addStyleClass("div_extent");
     mExtentDiv->hide();
 
-    this->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
+    this->addWidget(std::make_unique<Wt::WBreak>());
     this->addWidget(std::make_unique<WText>(tr("coucheStep3")));
     WPushButton * bExportTiff = this->addWidget(std::make_unique<WPushButton>("Télécharger"));
     bExportTiff->setToolTip(tr("panier.download_tooltip"));
@@ -51,7 +51,7 @@ void panier::addMap(std::string aCode, std::shared_ptr<Layer> l){
     // vérifie qu'elle n'est pas déjà dans le panier
     for (std::shared_ptr<Layer> l : mVLs){
         if (l->Code()==aCode){
-            Wt::WMessageBox * messageBox = this->addChild(Wt::cpp14::make_unique<Wt::WMessageBox>("Sélection d'une carte","<p>Cette couche est déjà dans votre sélection</p>",Wt::Icon::Critical,Wt::StandardButton::Ok));
+            Wt::WMessageBox * messageBox = this->addChild(std::make_unique<Wt::WMessageBox>("Sélection d'une carte","<p>Cette couche est déjà dans votre sélection</p>",Wt::Icon::Critical,Wt::StandardButton::Ok));
             messageBox->setModal(true);
             messageBox->buttonClicked().connect([=] {
                 this->removeChild(messageBox);
@@ -110,11 +110,11 @@ void panier::addMap(std::string aCode, std::shared_ptr<Layer> l){
         if (answer == Wt::StandardButton::Yes){
             if(mVLs.size()>1){
                 // del in vector
-                int i=0;
-                for (i; i<mVLs.size(); i++){
+                size_t i;
+                for (i = 0; i < mVLs.size(); i++){
 
-                    if(mVLs.at(i)==l){
-                        mVLs.erase(mVLs.begin()+i);
+                    if(mVLs.at(i) == l){
+                        mVLs.erase(mVLs.begin() + i);
                         break;
                     }
                 }
@@ -125,7 +125,7 @@ void panier::addMap(std::string aCode, std::shared_ptr<Layer> l){
                 mGroupL->updateLegendeDiv(mVLs);
                 mGroupL->updateActiveLay(mVLs.at(0)->Code());
             } else {
-                Wt::WMessageBox * messageBox = this->addChild(Wt::cpp14::make_unique<Wt::WMessageBox>("Retirer une carte","<p>Il ne reste que cette couche dans votre sélection</p>",Wt::Icon::Critical,Wt::StandardButton::Ok));
+                Wt::WMessageBox * messageBox = this->addChild(std::make_unique<Wt::WMessageBox>("Retirer une carte","<p>Il ne reste que cette couche dans votre sélection</p>",Wt::Icon::Critical,Wt::StandardButton::Ok));
                 messageBox->setModal(true);
                 messageBox->buttonClicked().connect([=] {
                     this->removeChild(messageBox);
@@ -140,11 +140,11 @@ void panier::addMap(std::string aCode, std::shared_ptr<Layer> l){
     bvis->setToolTip(tr("panier.movedown"));
     bvis->clicked().connect([=] {
         if (mVLs.size()==1) return; // skipt 1 element
-        int i=0;
-        for (i; i<mVLs.size(); i++){
+        size_t i;
+        for (i = 0; i<mVLs.size(); i++){
             if(mVLs.at(i)==l){break;}
         }
-        if (i==mVLs.size()-1) return; // skipt last element
+        if (i == mVLs.size()-1) return; // skipt last element
         // move in vector
         iter_swap(mVLs.begin() + i, mVLs.begin() + i + 1);
         // move row in table

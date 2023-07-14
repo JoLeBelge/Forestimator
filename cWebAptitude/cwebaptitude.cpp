@@ -65,7 +65,7 @@ cWebAptitude::cWebAptitude(AuthApplication *app, Auth::AuthWidget* authWidget_)
     */
 
     // main stack : DOC and MAP and RESULTS divs
-    top_stack  = this->addWidget(Wt::cpp14::make_unique<Wt::WStackedWidget>());
+    top_stack  = this->addWidget(std::make_unique<Wt::WStackedWidget>());
     top_stack->setMargin(0);
     //top_stack->setHeight("100%");
     top_stack->setOverflow(Overflow::Auto);
@@ -115,7 +115,7 @@ cWebAptitude::cWebAptitude(AuthApplication *app, Auth::AuthWidget* authWidget_)
     content_panier->addNew<Wt::WText>(tr("panier.header"));
     content_panier->setWidth("100%");
 
-    auto menu = menu_gauche->addWidget(Wt::cpp14::make_unique<WMenu>());
+    auto menu = menu_gauche->addWidget(std::make_unique<WMenu>());
     //menu->setStyleClass("nav nav-pills nav-stacked");
     menu->setStyleClass("nav-stacked");
     menu->addStyleClass("nav-apt");
@@ -155,29 +155,29 @@ cWebAptitude::cWebAptitude(AuthApplication *app, Auth::AuthWidget* authWidget_)
     /*  DIALOGS info_point-légende-analyse-catalogue-cadastre */
 
     // info point
-    dialog_info = layout_app->addChild(Wt::cpp14::make_unique<dialog>("Info ponctuelle",menuitem_simplepoint,&mApp->environment()));
+    dialog_info = layout_app->addChild(std::make_unique<dialog>("Info ponctuelle",menuitem_simplepoint,&mApp->environment()));
 
     auto content_info = dialog_info->contents()->addWidget(std::make_unique<WContainerWidget>());
     //content_info->setOverflow(Overflow::Auto);
     content_info->addStyleClass("content_info");
 
     // analyse
-    dialog_anal = layout_app->addChild(Wt::cpp14::make_unique<dialog>("Analyse surfacique",menuitem_analyse,&mApp->environment()));
+    dialog_anal = layout_app->addChild(std::make_unique<dialog>("Analyse surfacique",menuitem_analyse,&mApp->environment()));
 
     //auto content_anal = dialog_anal->contents()->addWidget(std::make_unique<WContainerWidget>());
     //content_anal->setOverflow(Overflow::Auto);
     //content_anal->addStyleClass("content_anal");
 
     // catalogue
-    dialog_catalog = layout_app->addChild(Wt::cpp14::make_unique<dialog>("Catalogue des couches",menuitem_catalog,&mApp->environment()));
+    dialog_catalog = layout_app->addChild(std::make_unique<dialog>("Catalogue des couches",menuitem_catalog,&mApp->environment()));
 
     auto content_catalog = dialog_catalog->contents()->addWidget(std::make_unique<WContainerWidget>());
     content_catalog->addStyleClass("content_catalog");
 
     // cadastre
-    dialog_cadastre = layout_app->addChild(Wt::cpp14::make_unique<dialog>("Recherche cadastrale",menuitem_cadastre,&mApp->environment()));
+    dialog_cadastre = layout_app->addChild(std::make_unique<dialog>("Recherche cadastrale",menuitem_cadastre,&mApp->environment()));
     // legende
-    dialog_legend = layout_app->addChild(Wt::cpp14::make_unique<dialog>("Légende",menuitem_legend,&mApp->environment()));
+    dialog_legend = layout_app->addChild(std::make_unique<dialog>("Légende",menuitem_legend,&mApp->environment()));
     mLegendW = dialog_legend->contents()->addWidget(std::make_unique<WContainerWidget>());
     //mLegendW->setOverflow(Overflow::Auto);
     mLegendW->addStyleClass("content_legend");
@@ -202,7 +202,7 @@ cWebAptitude::cWebAptitude(AuthApplication *app, Auth::AuthWidget* authWidget_)
     //load_content_couches(content_couches);
     if (globTest){ printf("done\n");}
 
-    mPanier = content_panier->addWidget(Wt::cpp14::make_unique<panier>(mApp, this));
+    mPanier = content_panier->addWidget(std::make_unique<panier>(mApp, this));
 
     statWindow * page_camembert = top_stack->addNew<statWindow>(mGroupL);
 
