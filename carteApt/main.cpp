@@ -50,7 +50,7 @@ int main(int argc, char *argv[])
     bool carteNT(0),cartepH(0),carteFEE(0),carteCS(0),matApt(0),carteNH(0);
     if (vm.count("carteNT")) {carteNT=vm["carteNT"].as<bool>();}
     if (vm.count("cartepH")) {cartepH=vm["cartepH"].as<bool>();}
-     if (vm.count("carteNH")) {carteNH=vm["carteNH"].as<bool>();}
+    if (vm.count("carteNH")) {carteNH=vm["carteNH"].as<bool>();}
     if (vm.count("aptFEE")) {carteFEE=vm["aptFEE"].as<bool>();}
     if (vm.count("aptCS")) {carteCS=vm["aptCS"].as<bool>();}
     if (vm.count("matApt")) {matApt=vm["matApt"].as<bool>();}
@@ -73,7 +73,7 @@ int main(int argc, char *argv[])
         cDicoApt dico(adirBD);
         cApliCarteApt aACA(&dico);
 
-// je boucle les layersbase et non les essences car j'ai besoin du chemin d'accès au raster
+        // je boucle les layersbase et non les essences car j'ai besoin du chemin d'accès au raster
         for (std::pair<std::string,std::shared_ptr<layerBase>>  kv : dico.VlayerBase()){
 
             std::string essCode(kv.second->EssCode()); //essCode =="AG"  | essCode =="AP" |essCode =="EK") |essCode =="PG" essCode =="PY" |essCode =="PZ"
@@ -83,49 +83,86 @@ int main(int argc, char *argv[])
             }
 
             if (carteCS &&(kv.second->getCatLayer()==TypeLayer::CS)){
-               std::shared_ptr<cEss> ess = dico.getEss(essCode);
+                std::shared_ptr<cEss> ess = dico.getEss(essCode);
                 aACA.carteAptCS(ess,kv.second->getPathTif(),true);
             }
         }
     }
     if (matApt){
-            cDicoApt dico(adirBD);
-            std::string aFileScribusTemp("/home/lisein/matAptRW2021/MatApt_Eco_RW.sla");
-            for (int rn(1); rn <11;rn++){
-                matriceApt(&dico, aFileScribusTemp, rn);
-            }
+        cDicoApt dico(adirBD);
+        std::string aFileScribusTemp("/home/lisein/matAptRW2021/MatApt_Eco_RW.sla");
+        for (int rn(1); rn <11;rn++){
+            matriceApt(&dico, aFileScribusTemp, rn);
+        }
     }
 
     if (vm.count("MNH_TS") && vm["MNH_TS"].as<bool>()){
 
         GDALAllRegister();
+        std::string outPath;
         std::cout << "loop on file in " << adirBD << std::endl;
-        for(auto & p : boost::filesystem::directory_iterator(adirBD)){
+        /*for(auto & p : boost::filesystem::directory_iterator(adirBD)){
             std::string mnhPath= p.path().string();
+            outPath=p.path().parent_path().parent_path().string() +"/MNHClip/";
+            boost::filesystem::create_directory(outPath);
             // clip avec la limite de la RW
-            std::string aCommand ="gdalwarp -co 'COMPRESS=DEFLATE' -cutline "+ columnPath +" -crop_to_cutline -dstnodata 32767 "+mnhPath+ "/home/jo/Documents/Carto/MNH_TS/MNHClip/mnh2015.tif";
+            //std::string aCommand ="gdalwarp -co 'COMPRESS=DEFLATE' -co 'TILED=YES' --config GDAL_CACHEMAX 512 -co NUM_THREADS=ALL_CPUS -co BIGTIFF=YES -cutline "+ columnPath +" -crop_to_cutline -dstnodata 32767 "+mnhPath+ " "+ outPath + p.path().filename().string();
+
+            // en fait c'est tout de même très long, plus de 30 minutes par raster. Je devrais travailler autrement, avec un masque au format raster par exemple
+
             std::cout << aCommand << "\n";
             system(aCommand.c_str());
-
-        }
-
+            aCommand ="gdaladdo -r average "+ outPath + p.path().filename().string()+ " 2 4 8 16 32 64";
+            std::cout << aCommand << "\n";
+            system(aCommand.c_str());
+        }*/
+        if(0){
+        std::string aMask("/home/jo/Documents/Carto/MNH_TS/limitesWaGSD2.tif");
+        GDALDataset * DSmask = (GDALDataset *) GDALOpen( aMask.c_str(), GA_ReadOnly );
+        int x=DSmask->GetRasterBand(1)->GetXSize();
+        float *scanlineMask = (float *) CPLMalloc( sizeof( float ) *x );
 
         for(auto & p : boost::filesystem::directory_iterator(adirBD)){
             std::string mnhPath= p.path().string();
-
-
-
             std::cout << "mnh " << mnhPath << std::endl;
             int y= std::stoi(mnhPath.substr(mnhPath.size()-8,mnhPath.size()-4));
             GDALDataset * DS = (GDALDataset *) GDALOpen( mnhPath.c_str(), GA_Update );
             DS->SetMetadataItem("Titre","Modèle Numérique de Hauteur de la canopée forestière");
             DS->SetMetadataItem("Année", std::to_string(y).c_str());
             DS->SetMetadataItem("Crédit","Gembloux Agro-Bio Tech");
-            DS->SetMetadataItem("Unit","Les valeurs brutes du raster exprimment la hauteur en centimètre. Un gain de 0.01 permet d'obtenir la hauteur en mètre");
-            DS->SetMetadataItem("scale_data","1");
-            DS->SetMetadataItem("scale_factor","0.01");
+            DS->SetMetadataItem("Unit","Les valeurs brutes du raster expriment la hauteur en centimètre. Un gain de 0.01 permet d'obtenir la hauteur en mètre (appliqué par défaut par QGis)");
+            //DS->SetMetadataItem("scale_data","1");
+            //DS->SetMetadataItem("scale_factor","0.01"); // je crois que ça sert à rien.
             DS->GetRasterBand(1)->SetScale(0.01);
+            float *scanline = (float *) CPLMalloc( sizeof( float ) * x );
+            for ( int row = 0; row < DSmask->GetRasterBand(1)->GetYSize(); row++ ){
+                DSmask->GetRasterBand(1)->RasterIO( GF_Read, 0, row, x, 1, scanlineMask, x,1, GDT_Float32, 0, 0 );
+                DS->GetRasterBand(1)->RasterIO( GF_Read, 0, row, x, 1, scanline, x,1, GDT_Float32, 0, 0 );
+                // iterate on pixels in row
+                for (int col = 0; col < x; col++)
+                {
+                     if(scanlineMask[ col ]==0){scanline[col]=32767;//std::cout << " no data found " << std::endl;
+                     }
+                }
+                if (row%(DSmask->GetRasterBand(1)->GetYSize()/10)==0){std::cout <<  "..."<< std::endl;}
+
+                DS->GetRasterBand(1)->RasterIO( GF_Write, 0, row, x, 1, scanline, x, 1,GDT_Float32, 0, 0 );
+            }
             GDALClose(DS);
+        }
+
+        GDALClose(DSmask);
+
+        // fonctionne bien, assez rapide (10' par raster) mais passe de 4Gb à 8, donc je devrais recompresser après pour gain de place
+        }
+
+        for(auto & p : boost::filesystem::directory_iterator(adirBD)){
+            std::string mnhPath= p.path().string();
+            outPath="/home/jo/Documents/Carto/MNH_TS/MNH/";
+            boost::filesystem::create_directory(outPath);
+            std::string aCommand ="gdalwarp -co 'COMPRESS=DEFLATE' -co 'TILED=YES' --config GDAL_CACHEMAX 512 -co NUM_THREADS=ALL_CPUS -co BIGTIFF=YES "+mnhPath+ " "+ outPath + p.path().filename().string();
+            std::cout << aCommand << "\n";
+            system(aCommand.c_str());
         }
 
     }

@@ -809,7 +809,7 @@ int rasterFiles::getValue(double x, double y){
             scanPix = (float *) CPLMalloc( sizeof( float ) * 1 );
             // lecture du pixel
             mBand->RasterIO( GF_Read, col, row, 1, 1, scanPix, 1,1, GDT_Float32, 0, 0 );
-            aRes=scanPix[0];
+            aRes=scanPix[0];//*mBand->GetScale(); non car c'est un integer qui est renvoyé par ma fonction getVal, donc si j'applique un gain pour avoir un float, je vais perdre les chiffres après la virgule
             CPLFree(scanPix);
 
             mBand=NULL;
