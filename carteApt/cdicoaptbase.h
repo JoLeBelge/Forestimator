@@ -12,8 +12,14 @@
 #include <unistd.h>
 #include "color.h"
 
+#include <Wt/Dbo/Dbo.h>
+#include <Wt/Dbo/backend/Sqlite3.h>
+#include <Wt/WSignal.h>
+
 #pragma GCC diagnostic ignored "-Wunused-function"
 #pragma GCC diagnostic ignored "-Wreorder"
+
+namespace dbo = Wt::Dbo;
 
 enum class FeRe {Feuillus,
                  Resineux,
@@ -46,8 +52,38 @@ static size_t write_data(void *ptr, size_t size, size_t nmemb, void *stream)
 
 class cEss;
 class WMSinfo;
-
 class cdicoAptBase; // utilisé par plusieurs appli (Forestimator, phytospy)
+
+class caracteristiqueCS{
+public:
+    caracteristiqueCS(int zbio,int station_id,int VCP, int SES,int SC,int RCS, int PB);
+    caracteristiqueCS():zbio(0),station_id(0),VCP(0),SES(0),SC(0),RCS(0),PB(0),sens_CC(0),tass_sol(0),N2000(""),N2000_maj(""),Wal(""),Wal_maj(""){}
+    int VCP,SES,SC,RCS,PB, sens_CC	,tass_sol;
+    int zbio,station_id;
+    std::string Wal,Wal_maj,N2000,N2000_maj;
+    template<class Action>
+       void persist(Action& a)
+       {
+           dbo::field(a, zbio,     "zbio");
+           dbo::field(a, station_id, "station_id");
+           dbo::field(a, VCP,     "vcp");
+           dbo::field(a, SES,    "SES");
+           dbo::field(a, SC,    "SC"); // microclimat
+           dbo::field(a, RCS,    "RCS");
+           dbo::field(a, PB,    "PB");
+           dbo::field(a, Wal,    "Wal");
+           dbo::field(a, Wal_maj,    "Wal_maj");
+           dbo::field(a, N2000,    "N2000");
+           dbo::field(a, N2000_maj,    "N2000_maj");
+           dbo::field(a, sens_CC,    "sens_CC");// macroclimat
+           dbo::field(a, tass_sol,    "tass_sol");
+           //dbo::field(a, vcp,    "vcp"); -> mm que VCP donc je charge pas
+           //prod_b -> mm que PB donc je charge pas
+       }
+       caracteristiqueCS(const caracteristiqueCS * c):zbio(c->zbio),station_id(c->station_id),VCP(c->VCP),SES(c->SES),SC(c->SC),RCS(c->RCS),PB(c->PB),Wal(c->Wal),Wal_maj(c->Wal_maj),N2000(c->N2000),N2000_maj(c->N2000_maj),sens_CC(c->sens_CC),tass_sol(c->tass_sol){}
+    private:
+};
+
 
 class cdicoAptBase : public std::enable_shared_from_this<cdicoAptBase>
 {
@@ -306,6 +342,21 @@ public:
     return aRes;
     }
 
+    caracteristiqueCS getKKCS(int zbio, int station_id){
+        caracteristiqueCS aRes;
+        std::pair<int, int> key(zbio,station_id);
+        if (Dico_US2KK.find(key)!=Dico_US2KK.end()){aRes=Dico_US2KK.at(key);}
+        return aRes;
+    }
+
+    int rasterValHabitats(std::string aCode){
+        int aRes(0);
+        if (Dico_code2rasterValHabitat.find(aCode)!=Dico_code2rasterValHabitat.end()){aRes=Dico_code2rasterValHabitat.at(aCode);}
+        return aRes;
+    }
+
+
+
 protected:
     std::string mBDpath;
     sqlite3 **db_;
@@ -376,6 +427,11 @@ protected:
 
     // key ; code le la couche layer. value ; les infos nécessaire pour charger le wms
     std::map<std::string,WMSinfo>  Dico_WMS;
+
+    std::map<std::string,int>  Dico_code2rasterValHabitat;
+    //std::map<std::string,std::string>  Dico_code2NomHabitat; // pas besoin non?
+    std::map<std::string,std::string> Dico_codeKK2Nom;
+    std::map<std::pair<int,int>,caracteristiqueCS> Dico_US2KK;
 
     // clé ; code ess. val ; pointeur vers essence
     std::map<std::string,std::shared_ptr<cEss>> mVEss;

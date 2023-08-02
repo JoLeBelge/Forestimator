@@ -4,6 +4,8 @@
 namespace po = boost::program_options;
 using namespace std;
 
+
+extern bool globTest;
 // écrire double dans cout avec 2 décimales
 #include <iomanip>
 // 2021 03 24 seb voudrai les matrices d'aptitude pour la RW, je vais utiliser forestimator plutôt que la BD FEE
@@ -43,6 +45,8 @@ int main(int argc, char *argv[])
     po::store(po::parse_command_line(argc, argv, desc), vm);
     po::notify(vm);
 
+    globTest=1;
+
     if (vm.count("help")) {
         cout << desc << "\n";
         return 1;
@@ -73,6 +77,7 @@ int main(int argc, char *argv[])
         cDicoApt dico(adirBD);
         cApliCarteApt aACA(&dico);
 
+        if(0){
         // je boucle les layersbase et non les essences car j'ai besoin du chemin d'accès au raster
         for (std::pair<std::string,std::shared_ptr<layerBase>>  kv : dico.VlayerBase()){
 
@@ -85,7 +90,13 @@ int main(int argc, char *argv[])
             if (carteCS &&(kv.second->getCatLayer()==TypeLayer::CS)){
                 std::shared_ptr<cEss> ess = dico.getEss(essCode);
                 aACA.carteAptCS(ess,kv.second->getPathTif(),true);
-            }
+            }   
+        }
+
+        }else{
+            //espace test pour les cartes dérivées des CS
+            aACA.carteDeriveCS();
+
         }
     }
     if (matApt){
@@ -156,13 +167,18 @@ int main(int argc, char *argv[])
         // fonctionne bien, assez rapide (10' par raster) mais passe de 4Gb à 8, donc je devrais recompresser après pour gain de place
         }
 
+
+         // compression, descendre à 4 ou 5 Gb par raster. Mais merde, gdalwarp enlève le gain! heureusement gdaltranslate fonctionne mieux
         for(auto & p : boost::filesystem::directory_iterator(adirBD)){
             std::string mnhPath= p.path().string();
+            int y= std::stoi(mnhPath.substr(mnhPath.size()-8,mnhPath.size()-4));
+            //if (y>2009){
             outPath="/home/jo/Documents/Carto/MNH_TS/MNH/";
             boost::filesystem::create_directory(outPath);
-            std::string aCommand ="gdalwarp -co 'COMPRESS=DEFLATE' -co 'TILED=YES' --config GDAL_CACHEMAX 512 -co NUM_THREADS=ALL_CPUS -co BIGTIFF=YES "+mnhPath+ " "+ outPath + p.path().filename().string();
+            std::string aCommand ="gdal_translate -co 'COMPRESS=DEFLATE' -co 'TILED=YES' --config GDAL_CACHEMAX 512 -co NUM_THREADS=ALL_CPUS -co BIGTIFF=YES "+mnhPath+ " "+ outPath + p.path().filename().string();
             std::cout << aCommand << "\n";
             system(aCommand.c_str());
+            //}
         }
 
     }

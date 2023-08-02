@@ -29,6 +29,8 @@ public:
     void carteAptFEE(std::shared_ptr<cEss> aEss, std::string aOut, bool force=false);
     void carteAptCS(std::shared_ptr<cEss> aEss, std::string aOut, bool force=false);
 
+    void carteDeriveCS();
+
     // gdal_translate pour compresser les résultats (à postériori, maintenant je le compresse au moment de la création des cartes.)
     //void compressTif(std::string input);
 

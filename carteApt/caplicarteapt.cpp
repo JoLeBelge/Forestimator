@@ -223,6 +223,8 @@ void cApliCarteApt::carteAptCS(std::shared_ptr<cEss> aEss, std::string aOut, boo
                     st = scanlineCS1[ col ];
                     //if (zbio==3 | zbio==5) st = scanlineCS3[ col ];
                     apt = aEss->getApt(zbio,st);
+                    //if(zbio==2 & st==10){std::cout << " apt pour " << aEss->Nom() << " zbio 2 et station 10 est " << apt << std::endl;}
+
                 }
                 scanline[ col ] = apt;
             }
@@ -243,102 +245,255 @@ void cApliCarteApt::carteAptCS(std::shared_ptr<cEss> aEss, std::string aOut, boo
     }
 }
 
-/*
-void cApliCarteApt::carteKKCS(cKKCS * aKK, std::string aOut, bool force)
-{
+void cApliCarteApt::carteDeriveCS(){
 
-    if (!exists(aOut) | force){
-        std::cout << "création carte potentiel/risque sylvicole/environnement du CS pour KK " << aKK->Nom() << std::endl;
-        // create a copy d'une des couches pour que ce soit une carte d'aptitude
-        const char *pszFormat = "GTiff";
-        GDALDriver *poDriver;
-        poDriver = GetGDALDriverManager()->GetDriverByName(pszFormat);
-        if( poDriver == NULL )
-            exit( 1 );
+    std::cout << "création carte dérivées CS" << std::endl;
+    // create a copy d'une des couches pour les couches résultats
+    const char *pszFormat = "GTiff";
+    GDALDriver *poDriver;
+    poDriver = GetGDALDriverManager()->GetDriverByName(pszFormat);
+    if( poDriver == NULL )
+        exit( 1 );
+    char **papszOptions = NULL;
+    papszOptions = CSLSetNameValue( papszOptions, "COMPRESS", "DEFLATE" );
+    OGRSpatialReference  * spatialReference=new OGRSpatialReference;
+    spatialReference->importFromEPSG(31370);
+    float *scanlineCS1 = (float *) CPLMalloc( sizeof( float ) * x );
+    float *scanlineCS3 = (float *) CPLMalloc( sizeof( float ) * x );
+    float *scanlineZBIO = (float *) CPLMalloc( sizeof( float ) * x );
+    float *scanline = (float *) CPLMalloc( sizeof( float ) * x );
+    int step= y/10;
+    year_month_day today = year_month_day{floor<days>(std::chrono::system_clock::now())};
+    std::string d = "carte dérivée du catalogue de stations générée le " + format("%F",today);
+    GDALRasterBand *outBand;
 
-        const char * destFile=aOut.c_str();
+    /**** sensibilité climatique ****/
+    std::cout << "sensibilite climatique" << std::endl;
+    std::string aOut=dico->File("sens_CC");
+    GDALDataset* poDstDS = poDriver->CreateCopy( aOut.c_str(), poDatNH, FALSE, papszOptions,NULL, NULL );
+    poDstDS->SetSpatialRef(spatialReference);
+    poDstDS->SetMetadataItem("Version",d.c_str());
+    poDstDS->SetMetadataItem("Crédit","Lisein Jonathan, Simon Toessens et Claessens Hugues Gembloux Agro-Bio Tech");
+    outBand = poDstDS->GetRasterBand(1);
+    outBand->SetNoDataValue(0);
 
-        char **papszOptions = NULL;
-        papszOptions = CSLSetNameValue( papszOptions, "COMPRESS", "DEFLATE" );
-        GDALDataset* poDstDS = poDriver->CreateCopy( destFile, poDatNH, FALSE, papszOptions,NULL, NULL );
-
-        GDALRasterBand *outBand;
-        outBand = poDstDS->GetRasterBand(1);
-        std::cout << "copy of raster done" << std::endl;
-
-        float *scanlineCS1;
-        scanlineCS1 = (float *) CPLMalloc( sizeof( float ) * x );
-        float *scanlineCS2;
-        scanlineCS2 = (float *) CPLMalloc( sizeof( float ) * x );
-        float *scanlineCS3;
-        scanlineCS3 = (float *) CPLMalloc( sizeof( float ) * x );
-        float *scanlineCS10;
-        scanlineCS10 = (float *) CPLMalloc( sizeof( float ) * x );
-        float *scanlineZBIO;
-        scanlineZBIO = (float *) CPLMalloc( sizeof( float ) * x );
-
-        float *scanline;
-        scanline = (float *) CPLMalloc( sizeof( float ) * x );
-
-        int c(0);
-         int step= y/100;
-        // boucle sur les pixels de la RW
-        for ( int row = 0; row < y; row++ )
+    for ( int row = 0; row < y; row++ )
+    {
+        CS1Band->RasterIO( GF_Read, 0, row, x, 1, scanlineCS1, x,1, GDT_Float32, 0, 0 );
+        CS3Band->RasterIO( GF_Read, 0, row, x, 1, scanlineCS3, x,1, GDT_Float32, 0, 0 );
+        ZBIOBand->RasterIO( GF_Read, 0, row, x, 1, scanlineZBIO, x,1, GDT_Float32, 0, 0 );
+        // iterate on pixels in row
+#pragma omp parallel num_threads(6)
         {
-            CS1Band->RasterIO( GF_Read, 0, row, x, 1, scanlineCS1, x,1, GDT_Float32, 0, 0 );
-            CS2Band->RasterIO( GF_Read, 0, row, x, 1, scanlineCS2, x,1, GDT_Float32, 0, 0 );
-            CS3Band->RasterIO( GF_Read, 0, row, x, 1, scanlineCS3, x,1, GDT_Float32, 0, 0 );
-            CS10Band->RasterIO( GF_Read, 0, row, x, 1, scanlineCS10, x,1, GDT_Float32, 0, 0 );
-            ZBIOBand->RasterIO( GF_Read, 0, row, x, 1, scanlineZBIO, x,1, GDT_Float32, 0, 0 );
-            // iterate on pixels in row
-            for (int col = 0; col < x; col++)
-            {
-                //std::cout << "start col " << col << std::endl;
-                int apt(0), st(0);
-                int zbio = scanlineZBIO[ col ];
-                // un test pour tenter de gagner de la vitesse de temps de calcul - masque pour travailler que sur la partie pour laquelle on a des CS
-                if (zbio==1 | zbio==2 |zbio==3 |zbio==5|zbio==10 ){
-                    if (zbio==1) st = scanlineCS1[ col ];
-                    if (zbio==2) st = scanlineCS2[ col ];
-                    if (zbio==3) st = scanlineCS3[ col ];
-                    if (zbio==5) st = scanlineCS3[ col ];
-                    if (zbio==10) st = scanlineCS10[ col ];
-
-                        apt = aKK->getEchelle(zbio,st);
-
-
-                }
-                if ((col%step==0) && row%step==0){
-                    std::cout << ".." ;
-                    /* if (aMEss.at("EP").getApt(nt,nh,zbio)!=0){
-                    std::cout << " row " << row << " col " << col << "  ";
-                    std::cout << " nh =" << nh << " soit " << dico.NH(nh) << " nt " <<nt << " soit " << dico.NT(nt) << " zbio " << zbio << " soit " << dico.ZBIO(zbio) ;
-                    std::cout << " aptitude pour Epicea commun " << dico.code2Apt(aMEss.at("EP").getApt(nt,nh,zbio)) << std::endl;
-                }
-
-                }
-                scanline[ col ] = apt;
+#pragma omp for
+        for (int col = 0; col < x; col++)
+        {
+            int val(0), st(0);
+            int zbio = scanlineZBIO[ col ];
+            if (zbio==1 | zbio==2 |zbio==10 ){
+                st = scanlineCS1[ col ];
+                //if (zbio==3 | zbio==5) st = scanlineCS3[ col ];
+                // valeur pour la sensibilité climatique
+                val = dico->getKKCS(dico->ZBIO2CSid(zbio),st).sens_CC;
             }
-            // écriture du résultat dans le fichier de destination
-            //if (row%step==0){std::cout << "write row " << row << " in dest file" << std::endl;}
-            outBand->RasterIO( GF_Write, 0, row, x, 1, scanline, x, 1,GDT_Float32, 0, 0 );
-            if (row%step==0){std::cout<< std::endl;}
+            scanline[ col ] = val;
         }
-
-
-        if( poDstDS != NULL ){ GDALClose( (GDALDatasetH) poDstDS );}
-
-        // copie du fichier de style qgis
-        std::string aStyleFile=dico->Files()->at("styleKK");
-        boost::filesystem::copy_file(aStyleFile,aOut.substr(0,aOut.size()-3)+"qml",boost::filesystem::copy_option::overwrite_if_exists);
-
-        std::cout << " done " << std::endl;
-
-    }else {
-        std::cout << aOut << " existe déjà " << std::endl;
+        }
+        // écriture du résultat dans le fichier de destination
+        outBand->RasterIO( GF_Write, 0, row, x, 1, scanline, x, 1,GDT_Float32, 0, 0 );
+        if (row%step==0){std::cout<< "-" << std::endl;}
     }
+    if( poDstDS != NULL ){ GDALClose( (GDALDatasetH) poDstDS );}
 
-}*/
+    /**** tassement du sol ****/
+    std::cout << "tassement du sol" << std::endl;
+    aOut=dico->File("tass_sol");
+    poDstDS = poDriver->CreateCopy( aOut.c_str(), poDatNH, FALSE, papszOptions,NULL, NULL );
+    poDstDS->SetSpatialRef(spatialReference);
+    poDstDS->SetMetadataItem("Version",d.c_str());
+    poDstDS->SetMetadataItem("Crédit","Lisein Jonathan, Simon Toessens et Claessens Hugues Gembloux Agro-Bio Tech");
+    outBand = poDstDS->GetRasterBand(1);
+    outBand->SetNoDataValue(0);
+
+    for ( int row = 0; row < y; row++ )
+    {
+        CS1Band->RasterIO( GF_Read, 0, row, x, 1, scanlineCS1, x,1, GDT_Float32, 0, 0 );
+        CS3Band->RasterIO( GF_Read, 0, row, x, 1, scanlineCS3, x,1, GDT_Float32, 0, 0 );
+        ZBIOBand->RasterIO( GF_Read, 0, row, x, 1, scanlineZBIO, x,1, GDT_Float32, 0, 0 );
+        // iterate on pixels in row
+#pragma omp parallel num_threads(6)
+        {
+#pragma omp for
+        for (int col = 0; col < x; col++)
+        {
+            int val(0), st(0);
+            int zbio = scanlineZBIO[ col ];
+            if (zbio==1 | zbio==2 |zbio==10 ){
+                st = scanlineCS1[ col ];
+                //if (zbio==3 | zbio==5) st = scanlineCS3[ col ];
+                val = dico->getKKCS(dico->ZBIO2CSid(zbio),st).tass_sol;
+            }
+            scanline[ col ] = val;
+        }
+        }
+        // écriture du résultat dans le fichier de destination
+        outBand->RasterIO( GF_Write, 0, row, x, 1, scanline, x, 1,GDT_Float32, 0, 0 );
+        if (row%step==0){std::cout<< "-" << std::endl;}
+    }
+    if( poDstDS != NULL ){ GDALClose( (GDALDatasetH) poDstDS );}
+
+    /**** production de bois ****/
+    std::cout << "production de bois" << std::endl;
+    aOut=dico->File("prod_b");
+    poDstDS = poDriver->CreateCopy( aOut.c_str(), poDatNH, FALSE, papszOptions,NULL, NULL );
+    poDstDS->SetSpatialRef(spatialReference);
+    poDstDS->SetMetadataItem("Version",d.c_str());
+    poDstDS->SetMetadataItem("Crédit","Lisein Jonathan, Simon Toessens et Claessens Hugues Gembloux Agro-Bio Tech");
+    outBand = poDstDS->GetRasterBand(1);
+    outBand->SetNoDataValue(0);
+
+    for ( int row = 0; row < y; row++ )
+    {
+        CS1Band->RasterIO( GF_Read, 0, row, x, 1, scanlineCS1, x,1, GDT_Float32, 0, 0 );
+        CS3Band->RasterIO( GF_Read, 0, row, x, 1, scanlineCS3, x,1, GDT_Float32, 0, 0 );
+        ZBIOBand->RasterIO( GF_Read, 0, row, x, 1, scanlineZBIO, x,1, GDT_Float32, 0, 0 );
+        // iterate on pixels in row
+#pragma omp parallel num_threads(6)
+        {
+#pragma omp for
+        for (int col = 0; col < x; col++)
+        {
+            int val(0), st(0);
+            int zbio = scanlineZBIO[ col ];
+            if (zbio==1 | zbio==2 |zbio==10 ){
+                st = scanlineCS1[ col ];
+                //if (zbio==3 | zbio==5) st = scanlineCS3[ col ];
+                val = dico->getKKCS(dico->ZBIO2CSid(zbio),st).PB;
+            }
+            scanline[ col ] = val;
+        }
+        }
+        // écriture du résultat dans le fichier de destination
+        outBand->RasterIO( GF_Write, 0, row, x, 1, scanline, x, 1,GDT_Float32, 0, 0 );
+        if (row%step==0){std::cout<< "-" << std::endl;}
+    }
+    if( poDstDS != NULL ){ GDALClose( (GDALDatasetH) poDstDS );}
+
+    /**** Valeur conservatoire potentielle ****/
+    std::cout << "Valeur conservatoire potentielle" << std::endl;
+    aOut=dico->File("vcp");
+    poDstDS = poDriver->CreateCopy( aOut.c_str(), poDatNH, FALSE, papszOptions,NULL, NULL );
+    poDstDS->SetSpatialRef(spatialReference);
+    poDstDS->SetMetadataItem("Version",d.c_str());
+    poDstDS->SetMetadataItem("Crédit","Lisein Jonathan, Simon Toessens et Claessens Hugues Gembloux Agro-Bio Tech");
+    outBand = poDstDS->GetRasterBand(1);
+    outBand->SetNoDataValue(0);
+
+    for ( int row = 0; row < y; row++ )
+    {
+        CS1Band->RasterIO( GF_Read, 0, row, x, 1, scanlineCS1, x,1, GDT_Float32, 0, 0 );
+        CS3Band->RasterIO( GF_Read, 0, row, x, 1, scanlineCS3, x,1, GDT_Float32, 0, 0 );
+        ZBIOBand->RasterIO( GF_Read, 0, row, x, 1, scanlineZBIO, x,1, GDT_Float32, 0, 0 );
+        // iterate on pixels in row
+#pragma omp parallel num_threads(6)
+        {
+#pragma omp for
+        for (int col = 0; col < x; col++)
+        {
+            int val(0), st(0);
+            int zbio = scanlineZBIO[ col ];
+            if (zbio==1 | zbio==2 |zbio==10 ){
+                st = scanlineCS1[ col ];
+                //if (zbio==3 | zbio==5) st = scanlineCS3[ col ];
+                val = dico->getKKCS(dico->ZBIO2CSid(zbio),st).VCP;
+            }
+            scanline[ col ] = val;
+        }
+        }
+        // écriture du résultat dans le fichier de destination
+        outBand->RasterIO( GF_Write, 0, row, x, 1, scanline, x, 1,GDT_Float32, 0, 0 );
+        if (row%step==0){std::cout<< "-" << std::endl;}
+    }
+    if( poDstDS != NULL ){ GDALClose( (GDALDatasetH) poDstDS );}
+
+    /**** Habitats N2K ****/
+    std::cout << "habitats natura 2000" << std::endl;
+    aOut=dico->File("N2000_maj");
+    poDstDS = poDriver->CreateCopy( aOut.c_str(), poDatNH, FALSE, papszOptions,NULL, NULL );
+    poDstDS->SetSpatialRef(spatialReference);
+    poDstDS->SetMetadataItem("Version",d.c_str());
+    poDstDS->SetMetadataItem("Crédit","Lisein Jonathan, Simon Toessens et Claessens Hugues Gembloux Agro-Bio Tech");
+    outBand = poDstDS->GetRasterBand(1);
+    outBand->SetNoDataValue(0);
+
+    for ( int row = 0; row < y; row++ )
+    {
+        CS1Band->RasterIO( GF_Read, 0, row, x, 1, scanlineCS1, x,1, GDT_Float32, 0, 0 );
+        CS3Band->RasterIO( GF_Read, 0, row, x, 1, scanlineCS3, x,1, GDT_Float32, 0, 0 );
+        ZBIOBand->RasterIO( GF_Read, 0, row, x, 1, scanlineZBIO, x,1, GDT_Float32, 0, 0 );
+        // iterate on pixels in row
+#pragma omp parallel num_threads(6)
+        {
+#pragma omp for
+        for (int col = 0; col < x; col++)
+        {
+            int val(0), st(0);
+            int zbio = scanlineZBIO[ col ];
+            if (zbio==1 | zbio==2 |zbio==10 ){
+                st = scanlineCS1[ col ];
+                //if (zbio==3 | zbio==5) st = scanlineCS3[ col ];
+                std::string hab=dico->getKKCS(dico->ZBIO2CSid(zbio),st).N2000_maj;
+                val = dico->rasterValHabitats(hab);
+            }
+            scanline[ col ] = val;
+        }
+        }
+        // écriture du résultat dans le fichier de destination
+        outBand->RasterIO( GF_Write, 0, row, x, 1, scanline, x, 1,GDT_Float32, 0, 0 );
+        if (row%step==0){std::cout<< "-" << std::endl;}
+    }
+    if( poDstDS != NULL ){ GDALClose( (GDALDatasetH) poDstDS );}
+
+    /**** Habitats WalEunis ****/
+    std::cout << "habitats WalEunis" << std::endl;
+    aOut=dico->File("WalEunis_maj");
+    poDstDS = poDriver->CreateCopy( aOut.c_str(), poDatNH, FALSE, papszOptions,NULL, NULL );
+    poDstDS->SetSpatialRef(spatialReference);
+    poDstDS->SetMetadataItem("Version",d.c_str());
+    poDstDS->SetMetadataItem("Crédit","Lisein Jonathan, Simon Toessens et Claessens Hugues Gembloux Agro-Bio Tech");
+    outBand = poDstDS->GetRasterBand(1);
+    outBand->SetNoDataValue(0);
+
+    for ( int row = 0; row < y; row++ )
+    {
+        CS1Band->RasterIO( GF_Read, 0, row, x, 1, scanlineCS1, x,1, GDT_Float32, 0, 0 );
+        CS3Band->RasterIO( GF_Read, 0, row, x, 1, scanlineCS3, x,1, GDT_Float32, 0, 0 );
+        ZBIOBand->RasterIO( GF_Read, 0, row, x, 1, scanlineZBIO, x,1, GDT_Float32, 0, 0 );
+        // iterate on pixels in row
+#pragma omp parallel num_threads(6)
+        {
+#pragma omp for
+        for (int col = 0; col < x; col++)
+        {
+            int val(0), st(0);
+            int zbio = scanlineZBIO[ col ];
+            if (zbio==1 | zbio==2 |zbio==10 ){
+                st = scanlineCS1[ col ];
+                //if (zbio==3 | zbio==5) st = scanlineCS3[ col ];
+                std::string hab=dico->getKKCS(dico->ZBIO2CSid(zbio),st).Wal_maj;
+                val = dico->rasterValHabitats(hab);
+            }
+            scanline[ col ] = val;
+        }
+        }
+        // écriture du résultat dans le fichier de destination
+        outBand->RasterIO( GF_Write, 0, row, x, 1, scanline, x, 1,GDT_Float32, 0, 0 );
+        if (row%step==0){std::cout<< "-" << std::endl;}
+    }
+    if( poDstDS != NULL ){ GDALClose( (GDALDatasetH) poDstDS );}
+
+    std::cout << " done " << std::endl;
+}
 
 void cApliCarteApt::toPol(std::string input, std::string output)
 {

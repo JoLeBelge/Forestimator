@@ -3,14 +3,12 @@
 #include "cdicoaptbase.h"
 #include  "cnsw.h"
 #include "layerbase.h"
-
 #include "cadastre.h"
 
 std::string removeAccents(std::string aStr);
 std::string putInBalise(std::string aCont,std::string aBalise);
 
 //extern std::string dirBD;
-
 
 class cdicoAptBase;
 class color;
@@ -22,27 +20,6 @@ class cadastre;
 class LayerMTD;
 
 enum typeAna {ponctuel,surfacique,dicoTable};
-
-class caracteristiqueCS{
-public:
-    caracteristiqueCS(int zbio,int station_id,int VCP, int SES,int SC,int RCS, int PB);
-    caracteristiqueCS():zbio(0),station_id(0),VCP(0),SES(0),SC(0),RCS(0),PB(0){}
-    int VCP,SES,SC,RCS,PB;
-    int zbio,station_id;
-    template<class Action>
-       void persist(Action& a)
-       {
-           dbo::field(a, zbio,     "zbio");
-           dbo::field(a, station_id, "station_id");
-           dbo::field(a, VCP,     "VCP");
-           dbo::field(a, SES,    "SES");
-           dbo::field(a, SC,    "SC");
-           dbo::field(a, RCS,    "RCS");
-           dbo::field(a, PB,    "PB");
-       }
-       caracteristiqueCS(const caracteristiqueCS * c):zbio(c->zbio),station_id(c->station_id),VCP(c->VCP),SES(c->SES),SC(c->SC),RCS(c->RCS),PB(c->PB){}
-    private:
-};
 
 // toute les informations/ dico que j'ai besoin pour le soft
 class cDicoApt : public cdicoAptBase
@@ -67,7 +44,6 @@ public:
     std::vector<std::string> parseCompoArg(std::string aArgs);
     std::string parsePointArg(std::string aArgs);
     /*************************/
-
     std::map<int,std::string> getDicoRaster(std::string aCode);
     std::map<std::string,std::string>  * Files(){return  &Dico_GISfile;}
     // code carte vers type carte code : NH.tif
@@ -77,23 +53,9 @@ public:
     std::map<std::string,std::string>  * RasterNom(){return  &Dico_RasterNomComplet;}
     std::map<std::string,bool>  * RasterExpert(){return  &Dico_RasterExpert;}
 
-
-    //std::map<std::string,std::string>  * codeKK2Nom(){return  &Dico_codeKK2Nom;}
-    //std::map<std::string,std::string>  * codeKK2NomCol(){return  &Dico_codeKK2NomCol;}
-    //std::map<int,int>  * echelleFact(){return  &Dico_echelleFact;}
-    //std::map<int,std::string>  * echelleFactNom(){return  &Dico_echelleFactNom;}
-    //std::map<int,std::string>  * echellePotCat(){return  &Dico_echellePotCat;}
-
-    std::map<std::string,std::string>  * codeSt2Habitat(){return  &Dico_codeSt2Habitat;}
-    std::map<int,std::string>  * id2Hab(){return  &Dico_id2Habitat;}
-    // clé : risque id. value; catégorie ID
-
-
     std::map<int, std::shared_ptr<color>>  codeApt2col(){return  Dico_codeApt2col;}
 
     std::string BDpath(){return mBDpath;}
-
-
     std::string RasterNom(std::string aCode){
         std::string aRes("not found");
         if (Dico_RasterNomComplet.find(aCode)!=Dico_RasterNomComplet.end()){aRes=Dico_RasterNomComplet.at(aCode);}
@@ -151,7 +113,6 @@ public:
 
     std::string stationEtVar(int aZbio, int aSt,std::string aVar="a"){
         std::string aRes=station(aZbio,aSt,aVar);
-        std::cout << "stationEtVar  " << aRes << std::endl;
         if (Dico_station_varName.find(aZbio)!=Dico_station_varName.end()){
             if (Dico_station_varName.at(aZbio).find(std::make_tuple(aSt,aVar))!=Dico_station_varName.at(aZbio).end()){
                 aRes+=" "+Dico_station_varName.at(aZbio).at(std::make_tuple(aSt,aVar));
@@ -179,17 +140,6 @@ public:
     std::string codeKK2Nom(std::string aCode){
         std::string aRes("not found\n");
         if (Dico_codeKK2Nom.find(aCode)!=Dico_codeKK2Nom.end()){aRes=Dico_codeKK2Nom.at(aCode);}
-        return aRes;
-    }
-    /*int echelleFact(int aCode){
-        int aRes(0);
-        if (Dico_echelleFact.find(aCode)!=Dico_echelleFact.end()){aRes=Dico_echelleFact.at(aCode);}
-        return aRes;
-    }*/
-
-    int habitatId(std::string aCode){
-        int aRes(0);
-        if (Dico_codeSt2idHab.find(aCode)!=Dico_codeSt2idHab.end()){aRes=Dico_codeSt2idHab.at(aCode);}
         return aRes;
     }
 
@@ -255,19 +205,15 @@ public:
         return aRes;
     }
 
-
     std::map<std::string,LayerMTD> * layerMTD();
 
-
-
     // pour debug
-    void summaryRasterFile(){
+   /* void summaryRasterFile(){
         for (auto kv : Dico_GISfile){
             std::string code=kv.first;
             std::cout << "raster layer " << code << ", nom " << RasterNom(code) << ", fichier " << File(code) << " catégorie " << RasterCategorie(code) << std::endl;
         }
-    }
-
+    }*/
 
     std::map<std::string,std::shared_ptr<layerBase>> VlayerBase(){return mVlayerBase;}
     bool hasLayerBase(std::string aCode){
@@ -291,13 +237,6 @@ public:
         }
        return aRes;
    }
-
-    caracteristiqueCS getKKCS(int zbio, int station_id){
-        caracteristiqueCS aRes;
-        std::pair<int, int> key(zbio,station_id);
-        if (Dico_US2KK.find(key)!=Dico_US2KK.end()){aRes=Dico_US2KK.at(key);}
-        return aRes;
-    }
     // dans l'ordre que l'on souhaite!
     std::vector<std::string> Dico_groupe;
 
@@ -305,24 +244,9 @@ private:
 
     // code groupe 2 label groupe
     std::map<std::string,std::string> Dico_groupeLabel;
-    std::map<std::string,std::string>  Dico_codeSt2Habitat;
-    std::map<int,std::string>  Dico_id2Habitat;
-    std::map<std::string,int> Dico_codeSt2idHab;
     std::map<std::string,LayerMTD>  Dico_layerMTD;
 
-    std::map<std::string,std::string> Dico_codeKK2Nom;
-   // std::map<std::string,std::string> Dico_codeKK2NomCol;
-    // il y a 9 niveau dans l'échelle, mais on simplifie en 3 catégories pour les cartes de risque et potentiel sylv
-    //std::map<int,int> Dico_echelleFact;
-    //std::map<int,std::string> Dico_echelleFactNom;
-    // de la catégorie ver le nom
-    //std::map<int,std::string> Dico_echellePotCat;
-
-    std::map<std::pair<int,int>,caracteristiqueCS> Dico_US2KK;
-
-
     std::map<std::string,std::shared_ptr<layerBase>> mVlayerBase;
-
 };
 
 class ST{

@@ -27,21 +27,14 @@ double getQ95(std::vector<double> aVHs);
 // Du coup toute mes classe qui terminent par Base sont des classes SANS Wt qui sont intégrée dans le dictionnaire et qui sont donc utilisée pour les traitements API et autre du genre
 
 class LayerMTD; // classe tout à fait à par qui sert uniquement à générer la rubrique de documentation de forestimator pour cette couche
-
 class basicStat;
-
 class cEss; // avec les aptitudes de l'essence
-class cKKCS; // ce qui caractérise les stations ; potentiel sylvicole, facteur écologique, risques
-
 class color;
 
 class rasterFiles; // une classe dédiée uniquemnent à l'export et au clip des couches.
 // rasterinfo hérite de rasterFile
 class layerBase;
-
 class layerStat;
-
-
 
 enum class TypeVar {Classe,
                     Continu

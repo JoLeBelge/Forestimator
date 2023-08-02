@@ -88,63 +88,8 @@ cDicoApt::cDicoApt(std::string aBDFile):cdicoAptBase(aBDFile)
         }
         sqlite3_finalize(stmt);
 
-        SQLstring="SELECT code,val FROM dico_caracteristiqueCS;";
-        sqlite3_prepare_v2( *db_, SQLstring.c_str(), -1, &stmt, NULL );
-        while(sqlite3_step(stmt) == SQLITE_ROW)
-        {
-            if (sqlite3_column_type(stmt, 0)!=SQLITE_NULL && sqlite3_column_type(stmt, 1)!=SQLITE_NULL){
-                std::string aA=std::string( (char *)sqlite3_column_text( stmt, 0 ));
-                std::string aB=std::string( (char *)sqlite3_column_text( stmt, 1 ));
-                //std::string aC=std::string( (char *)sqlite3_column_text( stmt, 2 ));
-                Dico_codeKK2Nom.emplace(std::make_pair(aA,aB));
-                //Dico_codeKK2NomCol.emplace(std::make_pair(aA,aC));
-            }
-        }
-        sqlite3_finalize(stmt);
 
-        /*SQLstring="SELECT id,cat_id,nom FROM dico_echelleFact;";
-        sqlite3_prepare_v2( *db_, SQLstring.c_str(), -1, &stmt, NULL );
 
-        while(sqlite3_step(stmt) == SQLITE_ROW)
-        {
-            if (sqlite3_column_type(stmt, 0)!=SQLITE_NULL && sqlite3_column_type(stmt, 1)!=SQLITE_NULL){
-                int aA=sqlite3_column_int( stmt, 0 );
-                int aB=sqlite3_column_int( stmt, 1 );
-                std::string aC=std::string( (char *)sqlite3_column_text( stmt, 2 ));
-                Dico_echelleFact.emplace(std::make_pair(aA,aB));
-                Dico_echelleFactNom.emplace(std::make_pair(aB,aC));
-            }
-        }
-        sqlite3_finalize(stmt);
-        */
-        SQLstring="SELECT id,Nom_fr_wal, WalEunis FROM dico_habitat;";
-        sqlite3_prepare_v2( *db_, SQLstring.c_str(), -1, &stmt, NULL );
-        while(sqlite3_step(stmt) == SQLITE_ROW)
-        {
-            if (sqlite3_column_type(stmt, 0)!=SQLITE_NULL && sqlite3_column_type(stmt, 1)!=SQLITE_NULL){
-                int aA=sqlite3_column_int( stmt, 0 );
-                std::string aB=std::string( (char *)sqlite3_column_text( stmt, 1 ));
-                std::string aC=std::string( (char *)sqlite3_column_text( stmt, 2 ));
-                Dico_id2Habitat.emplace(std::make_pair(aA,aB));
-                Dico_codeSt2Habitat.emplace(std::make_pair(aC,aB));
-                Dico_codeSt2idHab.emplace(std::make_pair(aC,aA));
-            }
-        }
-        sqlite3_finalize(stmt);
-
-        /*SQLstring="SELECT DISTINCT N_cat_pot,Cat_pot FROM dico_echellePotentiel;";
-        sqlite3_prepare_v2( *db_, SQLstring.c_str(), -1, &stmt, NULL );
-        while(sqlite3_step(stmt) == SQLITE_ROW)
-        {
-            if (sqlite3_column_type(stmt, 0)!=SQLITE_NULL && sqlite3_column_type(stmt, 1)!=SQLITE_NULL){
-
-                std::string aB=std::string( (char *)sqlite3_column_text( stmt, 1 ));
-
-                int aA=sqlite3_column_int( stmt, 0 );
-                Dico_echellePotCat.emplace(std::make_pair(aA,aB));
-            }
-        }
-        sqlite3_finalize(stmt);*/
         SQLstring="SELECT raster_val,Nom FROM dico_topo;";
         sqlite3_prepare_v2( *db_, SQLstring.c_str(), -1, &stmt, NULL );
         while(sqlite3_step(stmt) == SQLITE_ROW)
@@ -186,11 +131,6 @@ cDicoApt::cDicoApt(std::string aBDFile):cdicoAptBase(aBDFile)
         sqlite3_finalize(stmt);
 
 
-
-
-        if (globTest){   std::cout << "crée toute les essences " << std::endl;}
-
-
         // toutes les layerbase
         if (globTest){   std::cout << "crée toute les layerbase " << std::endl;}
         for (auto & pair : Dico_RasterType){
@@ -204,28 +144,6 @@ cDicoApt::cDicoApt(std::string aBDFile):cdicoAptBase(aBDFile)
         //std::cout << "close connection (dicoApt)" << std::endl;
         closeConnection();
 
-        // lecture de table avec dbo
-        std::unique_ptr<dbo::backend::Sqlite3> sqlite3{new dbo::backend::Sqlite3(mBDpath)};
-        Wt::Dbo::Session session;
-        session.setConnection(std::move(sqlite3));
-        session.mapClass<caracteristiqueCS>("caracteristiqueCS");
-        dbo::Transaction transaction{session};
-        // je met tout ça dans une map
-        //typedef dbo::collection< dbo::ptr<caracteristiqueCS> > collectionKKCS;
-        //collectionKKCS col = session.find<caracteristiqueCS>().where("zbio = ?").bind(1);
-        // les collection  de type dbo ne fonctionnent pas pour moi, en tout cas quand j'effectue l'itération avec un for (auto : ), c'est toujours le mm élément qu'il me retourne size() fois.
-        //dbo::collection<dbo::ptr<caracteristiqueCS>>::const_iterator i = col.begin();
-        //while(i != col.end())
-        /*{
-        std::cout << "station id: " << (*i)->station_id;
-        i++;
-        }*/
-        for (int us(1);us <18;us++){
-           dbo::ptr<caracteristiqueCS>  pt = session.find<caracteristiqueCS>().where("zbio = ?").bind(1).where("station_id = ?").bind(us);
-           caracteristiqueCS  kkCSCopy(pt.get());
-           //std::cout <<"encore une caracteristiqueCS " << kkCSCopy.station_id << " , " << kkCSCopy.zbio <<  std::endl;
-           Dico_US2KK.emplace(std::make_pair(std::make_pair(kkCSCopy.zbio,kkCSCopy.station_id),kkCSCopy));
-        }
     }
 
     std::cout << "done " << std::endl;

@@ -135,7 +135,10 @@ cdicoAptBase::cdicoAptBase(std::string aBDFile):mBDpath(aBDFile),ptDb_(NULL)
 
                     std::string aA=std::string( (char *)sqlite3_column_text( stmt, 0 ) );
                     std::string aB=std::string( (char *)sqlite3_column_text( stmt, 1 ) );
-                    std::string aC=std::string( (char *)sqlite3_column_text( stmt, 2 ) );
+                    std::string aC("");
+                    if(sqlite3_column_type(stmt, 2)!=SQLITE_NULL){
+                        aC=std::string( (char *)sqlite3_column_text( stmt, 2 ) );
+                    }
                     Dico_GISfile.emplace(std::make_pair(aA,aB+"/"+aC));
                     Dico_RasterTable.emplace(std::make_pair(aA,table));
                     std::string groupe("REF");
@@ -204,6 +207,7 @@ cdicoAptBase::cdicoAptBase(std::string aBDFile):mBDpath(aBDFile),ptDb_(NULL)
                 }
             }
             sqlite3_finalize(stmt);
+
 
         }
 
@@ -314,6 +318,32 @@ cdicoAptBase::cdicoAptBase(std::string aBDFile):mBDpath(aBDFile),ptDb_(NULL)
         }
         sqlite3_finalize(stmt);
 
+        SQLstring="SELECT code,val FROM dico_caracteristiqueCS;";
+        sqlite3_prepare_v2( *db_, SQLstring.c_str(), -1, &stmt, NULL );
+        while(sqlite3_step(stmt) == SQLITE_ROW)
+        {
+            if (sqlite3_column_type(stmt, 0)!=SQLITE_NULL && sqlite3_column_type(stmt, 1)!=SQLITE_NULL){
+                std::string aA=std::string( (char *)sqlite3_column_text( stmt, 0 ));
+                std::string aB=std::string( (char *)sqlite3_column_text( stmt, 1 ));
+                Dico_codeKK2Nom.emplace(std::make_pair(aA,aB));
+            }
+        }
+        sqlite3_finalize(stmt);
+
+        SQLstring="SELECT code_exact,noms_complets,raster_val from dico_habitats;";
+        sqlite3_prepare_v2( *db_, SQLstring.c_str(), -1, &stmt, NULL );
+        while(sqlite3_step(stmt) == SQLITE_ROW)
+        {
+            if (sqlite3_column_type(stmt, 0)!=SQLITE_NULL && sqlite3_column_type(stmt, 1)!=SQLITE_NULL){
+                std::string aA=std::string( (char *)sqlite3_column_text( stmt, 0 ));
+                std::string aB=std::string( (char *)sqlite3_column_text( stmt, 1 ));
+                int aC=sqlite3_column_int( stmt, 2 );
+                //Dico_code2NomHabitat.emplace(std::make_pair(aA,aB));
+                Dico_code2rasterValHabitat.emplace(std::make_pair(aA,aC));
+            }
+        }
+        sqlite3_finalize(stmt);
+
         // toutes les essences de la classe essence
         for (auto & pair : *codeEs2Nom()){
             mVEss.emplace(std::make_pair(pair.first,std::make_shared<cEss>(pair.first,this)));
@@ -321,6 +351,29 @@ cdicoAptBase::cdicoAptBase(std::string aBDFile):mBDpath(aBDFile),ptDb_(NULL)
 
         std::cout << "close connection (dicoAptBase)" << std::endl;
         closeConnection();
+
+        // lecture de table avec dbo
+        std::unique_ptr<dbo::backend::Sqlite3> sqlite3{new dbo::backend::Sqlite3(mBDpath)};
+        Wt::Dbo::Session session;
+        session.setConnection(std::move(sqlite3));
+        session.mapClass<caracteristiqueCS>("caracteristiqueCS");
+        dbo::Transaction transaction{session};
+        // je met tout ça dans une map
+        //typedef dbo::collection< dbo::ptr<caracteristiqueCS> > collectionKKCS;
+        //collectionKKCS col = session.find<caracteristiqueCS>().where("zbio = ?").bind(1);
+        // les collection  de type dbo ne fonctionnent pas pour moi, en tout cas quand j'effectue l'itération avec un for (auto : ), c'est toujours le mm élément qu'il me retourne size() fois.
+        //dbo::collection<dbo::ptr<caracteristiqueCS>>::const_iterator i = col.begin();
+        //while(i != col.end())
+        /*{
+        std::cout << "station id: " << (*i)->station_id;
+        i++;
+        }*/
+        for (int us(1);us <18;us++){
+           dbo::ptr<caracteristiqueCS>  pt = session.find<caracteristiqueCS>().where("zbio = ?").bind(1).where("station_id = ?").bind(us);
+           caracteristiqueCS  kkCSCopy(pt.get());
+           if (globTest){std::cout <<"encore une caracteristiqueCS " << kkCSCopy.station_id << " , " << kkCSCopy.zbio <<  std::endl;}
+           Dico_US2KK.emplace(std::make_pair(std::make_pair(kkCSCopy.zbio,kkCSCopy.station_id),kkCSCopy));
+        }
 
     }
 
