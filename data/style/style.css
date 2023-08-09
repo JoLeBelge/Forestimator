@@ -324,6 +324,7 @@ display:block;
 .submenuPresentation{
 text-align: left;
 max-height: 1000px;
+max-width:200px;
 }
 
 .button_carto{
