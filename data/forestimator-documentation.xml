@@ -105,6 +105,8 @@ Une documentation plus exhaustive de la méthode est disponible sous format pdf:
 <message id="ES_EP.ref">
 <h4>Référence</h4>
 <br></br><br></br>
+	<div class="csl-entry">Gilles, Arthur, Jonathan Lisein, Nicolas Latte, Philippe Lejeune, et Hugues Claessens. 2023. «&nbsp; <mark>Est-ce la fin de la crise des scolytes ? Suivi du phénomène par télédétection<mark> &nbsp;». <i>Silva Belgica</i> 2023 (3). Consulter en ligne <a target="_blank" rel="noopener noreferrer"  href="https://orbi.uliege.be/bitstream/2268/303916/1/Gilles%20A.%2c%20et%20al.%20Est-ce%20la%20fin%20crise%20scolyte_Silva%203_Vulg2023.pdf">ici</a>.</div>
+ <br></br><br></br>
  <div class="csl-entry">Dutrieux, R., Féret, J.-B., Ose, K., 2021. Mise au point d’une méthode reproductible pour le suivi généralisé des dégats de scolytes par télédétection satellitaire. ONF Rendez-vous techniques 37–44.  Consulter en ligne <a target="_blank" rel="noopener noreferrer"  href="https://www.onf.fr/onf/+/cec::les-rendez-vous-techniques-de-lonf-no69-70.html">ici</a>. </div>
  <br></br><br></br>
  <div class="csl-entry">DUTRIEUX, R., FERET, J.-B., OSE, K., DE BOISSIEU, F., 2021. Package Fordead. Portail Data INRAE. <a target="_blank" rel="noopener noreferrer"  href="https://doi.org/10.15454/4TEO6H">https://doi.org/10.15454/4TEO6H</a></div>
@@ -325,8 +327,16 @@ Enfin, outre ces considérations purement microclimatiques, on note que bien sou
 CartoWeb est un service de visualisation à l’écran des données topographiques les plus récentes de l’IGN.
 </message>
 
-<message id="MNH2019.description">
-La hauteur de la canopée forestière est calculée au départ d'une judicieuse combinaison de la hauteur du sol (MNT - Relief de la Wallonie) et de la hauteur de la surface de la canopée restituée par photogrammétrie. Les chercheurs forestiers font usage de la photogrammétrie moderne affin de modéliser la hauteur de la canopée forestière depuis des images aériennes acquises chaque année en Région Wallonne. Bien que la précision de cette méthode ne soit pas celle obtenue avec des campagnes de mesure de laser aérien (LiDAR), elle permet à moindre cout de disposer de mesure récente de hauteur de la végétation.
+<message id="MNH.description">
+La hauteur de la canopée forestière est calculée au départ d'une judicieuse combinaison de la hauteur du sol (MNT - Relief de la Wallonie) et de la hauteur de la surface de la canopée, soit restituée par photogrammétrie, soit déterminé par mesure LiDAR. Les chercheurs forestiers font usage de la photogrammétrie moderne affin de modéliser la hauteur de la canopée forestière depuis des images aériennes acquises chaque année en Région Wallonne. Bien que la précision de cette méthode ne soit pas celle obtenue avec des campagnes de mesure de laser aérien (LiDAR), elle permet à moindre cout de disposer de mesure récente de hauteur de la végétation.
+
+<br></br>
+<h4>Une série temporelle de Modèle Numérique de Hauteur</h4>
+Une série temporelle de Modèles Numérique de Hauteur est ainsi mise à disposition sur le portail cartographique Forestimator : les années pour lesquelles la hauteur est modélisée sont 2006, 2009, 2012, 2014 (première acquisition LiDAR sur l'ensemble de la région Wallonne), 2015, 2016, 2018, 2019, 2020 et 2021 (deuxième acquisition LiDAR). Cette série temporelle peut avantageusement être utilisée pour la détection des zones de coupes ou d'éclaircie ainsi que pour la modélisation de la croissance en hauteur des peuplements équiens.
+
+<h4>Note pour les usagers qui souhaitent télécharger et utiliser les MNHs</h4>
+Affin de minimiser le volume de donnée informatique, les MNH sont disponibles au téléchargement à une résolution de 2 mètres (format raster). Par ailleurs, les valeurs renseignées dans la couche cartographique raster sont le plus souvent exprimée en cm et non en mètre. Un gain de 0.01 doit donc être appliqué en multipliant la valeur des pixels pour obtenir la mesure en mètre. 
+
 <div>
 <img src="../img/CHM_schema.jpg" alt="" width="60%"/>
 <br></br>

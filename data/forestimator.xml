@@ -725,22 +725,12 @@ detAptFEE
 <message id="menu.button.tooltip.legend">Légende</message>
 <message id="menu.button.tooltip.login">Se connecter / déconnecter</message>
 
-<!--<message id="desc.home">Forestimator: outils cartographiques pour la gestion des forêts Wallonnes</message>
-<message id="desc.pres">Présentation et explication des fonctionnalités du site web</message>
-<message id="desc.surf">Analyse Surfacique : statistique sur une surface d'intérêt</message>
-<message id="desc.point">Info ponctuelle : description d'une station</message>-->
-
 <message id="meta.desc.carto">Forestimator est un portail web de cartographie des stations et des peuplements forestiers.
 De nombreuses couches cartographiques y sont disponibles à la consultation et au téléchargement.
 Une analyse des conditions environnementales des stations de Wallonie permet de déterminer l'adéquation essence-station la plus pertinente pour une sylviculture efficace. 
-De nombreuses cartes sont disponibles : l'aptitude des essences au sens du Fichier Écologique des Essences, les cartes de composition, les zones bioclimatiques, les cartes de niveaux hydriques et des niveaux trophiques. 
-Des modèles dendrométriques sont implémenté pour l'estimation de la densité des peuplements sur base des modèles numériques de hauteur de la canopée.
-
+De nombreuses cartes sont disponibles : l'aptitude des essences au sens du Fichier Écologique des Essences, les cartes de composition, les zones bioclimatiques, les cartes de niveaux hydriques et des niveaux trophiques. Les guides de stations de la Wallonie sont également présentés, ainsi que les cartes de recommandation pour chacune des essences forestières.
+Des modèles dendrométriques sont implémenté pour l'estimation de la densité des peuplements sur base des modèles numériques de hauteur de la canopée. Une série temporelle de Modèle Numérique de Hauteur couvrant la période 2006-2021 sont consultable pour l'ensemble de la région Wallonne.
  </message>
- <!--
- aptitudes des essences - fichier écologique des essences -  - composition spécifique - crise du scolyte - Wallonie - écogramme hydro-trophique - modèle numérique de hauteur - zone bioclimatique - niveau trophique hydrique - masque forestier - téléchargement - système d'information géographique - Catalogue de station - Sapin pectiné-Sapin de Vancouver-Sapin de Nordmann-Sapin noble-Cèdre de l'Atlas-Cyprès de Lawson-Mélèze d'Europe-Mélèze du Japon-Mélèze hybride-Épicéa commun-Épicea de Sitka-Pin de Koekelare-Pin laricio de Corse-Pin noir d'Autriche-Pin sylvestre-Douglas-Thuya géant-Tsuga hétérophylle-Érable sycomore-Hêtre-Frêne-Chêne sessile-Chêne pédonculé-Chêne rouge d'Amérique-Érable plane-Merisier-Peuplier baumier-Peuplier noir hybride-Aulne glutineux-Charme-Bouleau verruqueux-Bouleau pubescent-Châtaignier-Noyer noir-Noyer commun-Noyer hybride-Robinier-Alisier torminal-Tilleul à petites feuilles-Tilleul à grandes feuilles-Érable champêtre-Caryers-Tulipier de Virginie-Pommier sauvage-Peuplier grisard-Peuplier tremble-Poirier sauvage-Saule blanc-Sorbier des oiseleurs-Cormier-Orme champêtre-Orme de montagne-If commun-Orme lisse-Peuplier noir - Lisein Jonathan - Philippe Lejeune - Hugues Claessens - Samuel Quevauvillers - Ardenne centro-orientale - Basse et moyenne Ardenne - Basse Lorraine - Fagne - Famenne - Calestienne - Haute Lorraine - Hesbino-Brabançon - Plaines et Vallées Scaldisiennes - Condroz - Sambre et Meuse - Thiérache - Haute Ardenne - Calestienne - lidar - canopée -Carte numérique des sols de Wallonie
-
- -->
 
 <message id="meta.desc.documentation">Des outils cartographiques qui sont une aide à la gestion des ressources forestières de Wallonie</message>
 <message id="meta.titre.documentation">Documentation des couches cartographiques consultables sur Forestimator</message>
@@ -769,7 +759,7 @@ Des modèles dendrométriques sont implémenté pour l'estimation de la densité
 <message id="meta.desc.sous_secteurs-et-topo">Sous-secteurs radiatifs et situation topographique sont deux manières de représenter la position d'une station forestière dans le paysage. La topographie de la station va avoir de multiples influences sur les conditions environnementales ; température, humidité.</message>
 <message id="meta.titre.sous_secteurs-et-topo">Les sous-secteurs radiatifs et la situation topographiques des stations forestières</message>
 
-<message id="meta.desc.hauteur-de-la-v_g_tation">Les Modèles Numériques de Hauteur de la végétation, ou Modèle Numérique de Canopée, sont des couches cartographiques qui décrivent la hauteur de la canopée. La hauteur des arbres est un paramètre de structure qui permet de caractériser un peuplement, du point de vue de sa maturité et de sa densité.</message>
+<message id="meta.desc.hauteur-de-la-v_g_tation">Les Modèles Numériques de Hauteur de la végétation, ou Modèle Numérique de Canopée, sont des couches cartographiques qui décrivent la hauteur de la canopée. La hauteur des arbres est un paramètre de structure qui permet de caractériser un peuplement, du point de vue de sa maturité et de sa densité. Le portail cartographique propose la visualisation et le téléchargement d'une série temporelle de modèle numérique de hauteur, s'étalant entre 2006 et 2021. Cette série temporelle est obtenue par combinaison des Modèles Numériques de Hauteur issues des deux campagnes LiDAR (2014 et 2021) avec les modèles numériques de hauteurs calculé par photogrammétrie sur base des images aériennes de la région Wallonne.</message>
 <message id="meta.titre.hauteur-de-la-v_g_tation">Les Modèles Numériques de Hauteur de la végétation.</message>
 
 <message id="meta.desc.forestimator-_-pr_sentation">Au service des forestiers de Wallonie, Forestimator permet à quiconque de consulter et de télécharger des informations cartographiques décrivant les stations forestières et les peuplements.</message>
