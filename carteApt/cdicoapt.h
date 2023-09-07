@@ -121,7 +121,6 @@ public:
         return aRes;
     }
 
-
     std::map<std::tuple<int, std::string>,std::string> aVStation(int aZbio){
         std::map<std::tuple<int, std::string>,std::string> aRes;
         if (Dico_station.find(aZbio)!=Dico_station.end()){
@@ -129,7 +128,6 @@ public:
         }
         return aRes;
     }
-
 
     std::string rasterCat(std::string aCode){
         std::string aRes("");

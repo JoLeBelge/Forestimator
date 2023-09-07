@@ -371,7 +371,7 @@ cdicoAptBase::cdicoAptBase(std::string aBDFile):mBDpath(aBDFile),ptDb_(NULL)
         for (int us(1);us <18;us++){
            dbo::ptr<caracteristiqueCS>  pt = session.find<caracteristiqueCS>().where("zbio = ?").bind(1).where("station_id = ?").bind(us);
            caracteristiqueCS  kkCSCopy(pt.get());
-           if (globTest){std::cout <<"encore une caracteristiqueCS " << kkCSCopy.station_id << " , " << kkCSCopy.zbio <<  std::endl;}
+         //  if (globTest){std::cout <<"encore une caracteristiqueCS " << kkCSCopy.station_id << " , " << kkCSCopy.zbio <<  std::endl;}
            Dico_US2KK.emplace(std::make_pair(std::make_pair(kkCSCopy.zbio,kkCSCopy.station_id),kkCSCopy));
         }
 

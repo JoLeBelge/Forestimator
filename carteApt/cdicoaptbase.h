@@ -56,9 +56,9 @@ class cdicoAptBase; // utilisé par plusieurs appli (Forestimator, phytospy)
 
 class caracteristiqueCS{
 public:
-    caracteristiqueCS(int zbio,int station_id,int VCP, int SES,int SC,int RCS, int PB);
-    caracteristiqueCS():zbio(0),station_id(0),VCP(0),SES(0),SC(0),RCS(0),PB(0),sens_CC(0),tass_sol(0),N2000(""),N2000_maj(""),Wal(""),Wal_maj(""){}
-    int VCP,SES,SC,RCS,PB, sens_CC	,tass_sol;
+    caracteristiqueCS(int zbio,int station_id,int VCP, int SES,int SCC,int RCS, int PB);
+    caracteristiqueCS():zbio(0),station_id(0),VCP(0),SES(0),SCC(0),RCS(0),PB(0),tass_sol(0),N2000(""),N2000_maj(""),Wal(""),Wal_maj(""){}
+    int VCP,SES,SCC,RCS,PB,tass_sol;
     int zbio,station_id;
     std::string Wal,Wal_maj,N2000,N2000_maj;
     template<class Action>
@@ -66,21 +66,20 @@ public:
        {
            dbo::field(a, zbio,     "zbio");
            dbo::field(a, station_id, "station_id");
-           dbo::field(a, VCP,     "vcp");
+           dbo::field(a, VCP,     "VCP");
            dbo::field(a, SES,    "SES");
-           dbo::field(a, SC,    "SC"); // microclimat
+           dbo::field(a, SCC,    "SCC"); //sensibilité aux changement climatique, plus de microclimat
            dbo::field(a, RCS,    "RCS");
            dbo::field(a, PB,    "PB");
            dbo::field(a, Wal,    "Wal");
            dbo::field(a, Wal_maj,    "Wal_maj");
            dbo::field(a, N2000,    "N2000");
            dbo::field(a, N2000_maj,    "N2000_maj");
-           dbo::field(a, sens_CC,    "sens_CC");// macroclimat
            dbo::field(a, tass_sol,    "tass_sol");
-           //dbo::field(a, vcp,    "vcp"); -> mm que VCP donc je charge pas
+
            //prod_b -> mm que PB donc je charge pas
        }
-       caracteristiqueCS(const caracteristiqueCS * c):zbio(c->zbio),station_id(c->station_id),VCP(c->VCP),SES(c->SES),SC(c->SC),RCS(c->RCS),PB(c->PB),Wal(c->Wal),Wal_maj(c->Wal_maj),N2000(c->N2000),N2000_maj(c->N2000_maj),sens_CC(c->sens_CC),tass_sol(c->tass_sol){}
+       caracteristiqueCS(const caracteristiqueCS * c):zbio(c->zbio),station_id(c->station_id),VCP(c->VCP),SES(c->SES),SCC(c->SCC),RCS(c->RCS),PB(c->PB),Wal(c->Wal),Wal_maj(c->Wal_maj),N2000(c->N2000),N2000_maj(c->N2000_maj),tass_sol(c->tass_sol){}
     private:
 };
 

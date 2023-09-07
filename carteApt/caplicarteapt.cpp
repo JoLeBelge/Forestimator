@@ -269,7 +269,7 @@ void cApliCarteApt::carteDeriveCS(){
 
     /**** sensibilité climatique ****/
     std::cout << "sensibilite climatique" << std::endl;
-    std::string aOut=dico->File("sens_CC");
+    std::string aOut=dico->File("SCC");
     GDALDataset* poDstDS = poDriver->CreateCopy( aOut.c_str(), poDatNH, FALSE, papszOptions,NULL, NULL );
     poDstDS->SetSpatialRef(spatialReference);
     poDstDS->SetMetadataItem("Version",d.c_str());
@@ -294,7 +294,7 @@ void cApliCarteApt::carteDeriveCS(){
                 st = scanlineCS1[ col ];
                 //if (zbio==3 | zbio==5) st = scanlineCS3[ col ];
                 // valeur pour la sensibilité climatique
-                val = dico->getKKCS(dico->ZBIO2CSid(zbio),st).sens_CC;
+                val = dico->getKKCS(dico->ZBIO2CSid(zbio),st).SCC;
             }
             scanline[ col ] = val;
         }
