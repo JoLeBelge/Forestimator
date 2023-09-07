@@ -770,9 +770,9 @@ La composition spécifique est renseignée par 9 couches cartographiques, indiqu
 <message id="meta.titre.composition-des-essences">Composition des essences forestières en forêt wallonne</message>
 
 <message id="meta.desc.crise-du-scolyte"> Les scolytes sont des insectes ravageurs qui sont naturellement présents en forêt. 
-Les typographes ont profité des conditions météorologiques propices de 2018 pour se multiplier au point de provoquer une crise sanitaire qui touche durement l'épicéa en Europe.
-Les dégâts qu'ils ont provoqués sont quantifiés et spatialisés par télédétection au moyen de nombreuses prises de vues satellites. 
-Un suivi de l'état sanitaire des pessières est réalisé en vue d'identifier la dynamique des foyers d'infections. </message>
+Les typographes ont profité des conditions météorologiques propices de 2018 pour se multiplier au point de provoquer une crise sanitaire qui touche durement l'épicéa en Europe, et notamment en Wallonie.
+Les dégâts qu'ils ont provoqués sont quantifiés et spatialisés pour la Région Wallonne par télédétection, au moyen de nombreuses prises de vues satellites. 
+Un suivi de l'état sanitaire des pessières est réalisé en vue d'identifier la dynamique des foyers d'infections et afin de quantifier l'ampleur des dégats. </message>
 <message id="meta.titre.crise-du-scolyte">La crise du scolyte (typographe) en pessière Wallonne</message>
 
 <message id="meta.desc.mod_le-dendro"> Les peuplements résineux d'épicéa commun et de douglas font l'objet d'une description dendrométriques en terme de hauteur dominante, de surface terrière, de volume à l'hectare, de nombre de tiges par hectare et de circonférence moyenne. Toutes ces informations sont calculées depuis un modèle numérique de hauteur et sont valables pour l'année 2018.</message>
