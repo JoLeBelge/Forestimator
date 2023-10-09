@@ -91,8 +91,7 @@
             <user-agent>.*NetSystemsResearch.*</user-agent>
             <user-agent>.*Turnitin.*</user-agent>
             <user-agent>.*bot.*</user-agent>
-           
-            
+            <user-agent>^(?=\s*$)</user-agent><!-- empty string -->
             
 		</user-agents>
 		
