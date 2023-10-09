@@ -30,7 +30,6 @@ SOURCES += main.cpp \
     api/cnswresource.cpp \
     auth/Session.cpp \
     auth/User.cpp \
-    auth/auth.cpp \
     cadastre.cpp \
     ../carteApt/matapt.cpp \
     mataptcs.cpp \
@@ -61,7 +60,6 @@ HEADERS += \
     api/cnswresource.h \
     auth/Session.h \
     auth/User.h \
-    auth/auth.h \
     cadastre.h \
     main.h \
     ../carteApt/matapt.h \

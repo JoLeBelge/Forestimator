@@ -16,10 +16,10 @@ using namespace Wt;
 class presentationPage : public Wt::WContainerWidget
 {
 public:
-    presentationPage(cDicoApt * aDico,AuthApplication* app);
+    presentationPage(cDicoApt * aDico,cWebAptitude* app);
     cDicoApt * mDico;
 private:
-    AuthApplication* m_app;
+    cWebAptitude* m_app;
 
 };
 

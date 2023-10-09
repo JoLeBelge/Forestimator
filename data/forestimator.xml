@@ -709,6 +709,10 @@ detAptFEE
 <message id="parcellaire.tele.btn">Télécharger les cartes</message>
 <message id="parcellaire.ana.btn">Analyse sur tous les polygones</message>
 
+<message id="parcellaire.anaAllPol.envoiEmail"> Nous enverrons les résultats de l'analyse surfacique pour votre couche de polygones par email dès que ceux-ci seront effectués. </message>
+
+<message id="parcellaire.anaAllPol.connect"> Vous devez préhalablement vous connecter à votre compte Forestimator pour effectuer des analyses sur tout les polygones de votre couche de polygones. Les résultats vous seront en effet envoyés par email à l'adresse associée à votre compte </message>
+
 <message id="parcellaire.loadshp.srcNotDefined">Le système de projection de votre shapefile n'est pas défini. Vous pouvez définir le système de coordonnée dans votre logiciel de Système d'information Géographique et effectuer à nouveau le chargement de la couche dans Forestimator, ou vous pouver choisir le système de coordonnée dans la liste ci-dessous et vérifier visuellement que votre couche cartographique s'affiche à sa localisation présumée. <br> </br> </message>
 
 <message id="api.msg.error.tool.name">Aucune carte ou traitement de ce nom.</message>

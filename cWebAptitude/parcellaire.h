@@ -1,6 +1,7 @@
 #ifndef PARCELLAIRE_H
 #define PARCELLAIRE_H
 #pragma once
+
 #include "grouplayers.h"
 #include <Wt/WBreak.h>
 #include <Wt/WContainerWidget.h>
@@ -33,7 +34,7 @@ class cDicoApt;
 class parcellaire: public WContainerWidget
 {
 public:
-    parcellaire(groupLayers * aGL, Wt::WApplication* app,statWindow * statW);
+    parcellaire(groupLayers * aGL, cWebAptitude * app,statWindow * statW);
     ~parcellaire();
     void cleanShpFile();
     bool to31370AndGeoJson();// boite de dialogue pour choisir src si jamais la couche n'en a pas de défini
@@ -78,7 +79,7 @@ private:
     Wt::WFileUpload *fu;
     Wt::WPushButton  *downloadRasterBt;
     Wt::WPushButton  *anaOnAllPolygBt;
-    Wt::WApplication* m_app;
+    cWebAptitude* m_app;
     Wt::WText * msg;
     groupLayers * mGL;
     cDicoApt  * mDico;

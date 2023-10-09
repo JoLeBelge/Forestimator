@@ -3,7 +3,7 @@
 //int nbAds(5); // Ads = advertising
 int globMaxDownloadFileS(1000);
 // creation d'une bannières de pub (ads banner) pour faire défiler des informations descriptives du sites
-presentationPage::presentationPage(cDicoApt *aDico, AuthApplication *app):mDico(aDico),m_app(app)
+presentationPage::presentationPage(cDicoApt *aDico, cWebAptitude *app):mDico(aDico),m_app(app)
 {
     /* OLD mettre la bannière dans un stacked widget, je pense que c'est pas la super solution..
     adsBanner = addNew<WStackedWidget>();

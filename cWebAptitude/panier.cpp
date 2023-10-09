@@ -1,8 +1,8 @@
 #include "panier.h"
 
 extern bool globTest;
-panier::panier(AuthApplication *app, cWebAptitude * cWebApt): WContainerWidget() ,
-    mDico(app->mDico),m_app(app),mcWebAptitude(cWebApt),mMap(cWebApt->mMap),mGroupL(cWebApt->mGroupL)
+panier::panier(cWebAptitude * cWebApt): WContainerWidget() ,
+    mDico(cWebApt->mDico),m_app(cWebApt),mMap(cWebApt->mMap),mGroupL(cWebApt->mGroupL)
 {
     this->setMaximumSize(500,700);
 
@@ -40,8 +40,8 @@ panier::panier(AuthApplication *app, cWebAptitude * cWebApt): WContainerWidget()
     bExportTiff->clicked().connect(mGroupL->slotMapExport);
     //bExportTiff->clicked().connect(this,&groupLayers::updateMapExtentAndCropIm);
 
-    mcWebAptitude->mGroupL->mExtentDivGlob=mExtentDivGlob;
-    mcWebAptitude->mGroupL->mExtentDiv=mExtentDiv;
+    m_app->mGroupL->mExtentDivGlob=mExtentDivGlob;
+    m_app->mGroupL->mExtentDiv=mExtentDiv;
 }
 
 
@@ -79,7 +79,7 @@ void panier::addMap(std::string aCode, std::shared_ptr<Layer> l){
             bvis->setIcon("resources/eye_visible.png");
         else
             bvis->setIcon("resources/eye_notvisible.png");
-        mcWebAptitude->doJavaScript("activeLayers['"+aCode+"']?.setVisible(!activeLayers['"+aCode+"']?.values_.visible);");
+        m_app->doJavaScript("activeLayers['"+aCode+"']?.setVisible(!activeLayers['"+aCode+"']?.values_.visible);");
     });
     /* bouton transparent/opaque */
     bvis = r->elementAt(2)->addWidget(std::make_unique<WPushButton>("T"));
@@ -92,7 +92,7 @@ void panier::addMap(std::string aCode, std::shared_ptr<Layer> l){
             bvis->setText("T");
         else
             bvis->setText("O");
-        mcWebAptitude->doJavaScript("activeLayers['"+aCode+"']?.setOpacity(activeLayers['"+aCode+"']?.getOpacity()==1?0.5:1);");
+        m_app->doJavaScript("activeLayers['"+aCode+"']?.setOpacity(activeLayers['"+aCode+"']?.getOpacity()==1?0.5:1);");
     });
 
     int row=mTable->rowCount();
@@ -121,7 +121,7 @@ void panier::addMap(std::string aCode, std::shared_ptr<Layer> l){
                 // del row in table
                 mTable->removeRow(i);
                 // del layer
-                mcWebAptitude->doJavaScript("map.removeLayer(activeLayers['"+aCode+"']);delete activeLayers['"+aCode+"'];");
+                m_app->doJavaScript("map.removeLayer(activeLayers['"+aCode+"']);delete activeLayers['"+aCode+"'];");
                 mGroupL->updateLegendeDiv(mVLs);
                 mGroupL->updateActiveLay(mVLs.at(0)->Code());
             } else {
@@ -150,7 +150,7 @@ void panier::addMap(std::string aCode, std::shared_ptr<Layer> l){
         // move row in table
         mTable->moveRow(i,i+1);
         // move layer
-        mcWebAptitude->doJavaScript("moveLayerUp('"+aCode+"');");
+        m_app->doJavaScript("moveLayerUp('"+aCode+"');");
         mGroupL->updateActiveLay(mVLs.at(0)->Code());
     });
     bvis = r->elementAt(5)->addWidget(std::make_unique<WPushButton>(""));
@@ -169,7 +169,7 @@ void panier::addMap(std::string aCode, std::shared_ptr<Layer> l){
         // move row in table
         mTable->moveRow(i,i-1);
         // move layer
-         mcWebAptitude->doJavaScript("moveLayerDown('"+aCode+"');");
+         m_app->doJavaScript("moveLayerDown('"+aCode+"');");
          mGroupL->updateActiveLay(mVLs.at(0)->Code());
     });
 }

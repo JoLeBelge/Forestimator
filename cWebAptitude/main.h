@@ -1,7 +1,7 @@
 #ifndef MAIN_H
 #define MAIN_H
 
-#include "auth.h"
+#include "cwebaptitude.h"
 #include "Session.h"
 #include <Wt/WApplication.h>
 #include <Wt/WEnvironment.h>
@@ -17,7 +17,7 @@ namespace po = boost::program_options;
 #include "./libzippp/src/libzippp.h"
 using namespace libzippp;
 
-std::unique_ptr<Wt::WApplication> createAuthApplication(const Wt::WEnvironment &env, cDicoApt * dico);
+std::unique_ptr<Wt::WApplication> createWebAptitudeApplication(const Wt::WEnvironment &env, cDicoApt * dico);
 
 int main(int argc, char **argv);
 

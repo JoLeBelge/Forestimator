@@ -1,7 +1,7 @@
 #include "statwindow.h"
 extern bool globTest;
 
-statWindow::statWindow(groupLayers * aGL):mDico(aGL->Dico()), mApp(aGL->m_app),mGL(aGL)//, sigImgPDF(this,"pdf"), slotImgPDF(this)
+statWindow::statWindow(groupLayers * aGL):mDico(aGL->Dico()), m_app(aGL->m_app),mGL(aGL)//, sigImgPDF(this,"pdf"), slotImgPDF(this)
 {
     if (globTest){std::cout << "statWindow::statWindow" << std::endl;}
     setId("statWindow");
@@ -19,7 +19,7 @@ statWindow::statWindow(groupLayers * aGL):mDico(aGL->Dico()), mApp(aGL->m_app),m
     WPushButton * retour = tpl->bindWidget("retour", Wt::cpp14::make_unique<WPushButton>("Retour"));
     retour->setLink(WLink(LinkType::InternalPath, "/cartographie"));
     // bouton export PDF
-    createPdfBut = contTitre_->addWidget(std::make_unique<WPushButton>("Export PDF"));
+    createPdfBut = contTitre_->addWidget(std::make_unique<WPushButton>(tr("ana.pt.export.pdf")));
 
     mCarteGenCont = addWidget(std::make_unique<WContainerWidget>());
     mCarteGenCont->setId("carteGenStat");

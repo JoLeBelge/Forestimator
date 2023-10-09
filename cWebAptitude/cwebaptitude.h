@@ -1,15 +1,19 @@
 #ifndef CWEBAPTITUDE_H
 #define CWEBAPTITUDE_H
 #pragma once
+
+#include <Wt/WBootstrap5Theme.h>
+#include <stdio.h>
+#include "Session.h"
 #include <iostream>
 #include "grouplayers.h"
 #include "parcellaire.h"
 //#include "uploadcarte.h"
-#include "auth.h"
 #include <Wt/WContainerWidget.h>
 #include <Wt/WVBoxLayout.h>
 #include <Wt/WHBoxLayout.h>
 #include <Wt/WApplication.h>
+#include <Wt/Auth/AuthWidget.h>
 #include <Wt/WText.h>
 #include <Wt/WStringUtil.h>
 #include <Wt/WWidget.h>
@@ -34,7 +38,15 @@
 
 #include <curl/curl.h>
 
-class AuthApplication;
+
+using namespace std;
+using namespace Wt;
+
+#include "../stationDescriptor/rapidxml/rapidxml.hpp"
+using namespace rapidxml;
+
+extern bool globTest;
+
 class parcellaire;
 class panier;
 
@@ -65,18 +77,29 @@ private:
     const WEnvironment * env_;
 };
 
-class cWebAptitude : public Wt::WContainerWidget
+class cWebAptitude : public Wt::WApplication
 {
 public:
 
-    cWebAptitude(AuthApplication *app, Wt::Auth::AuthWidget* authWidget_);
     ~cWebAptitude(){delete mGroupL;}
+    cWebAptitude(const Wt::WEnvironment& env, cDicoApt * dico);
+    void loadStyles();
+    std::unique_ptr<Wt::Auth::AuthWidget> loadAuthWidget();
+    void authEvent();
+    bool isLoggedIn();
+    void logout();
+    Wt::Auth::User getUser();
+
+    void addLog(std::string page,typeLog cat=typeLog::page);   // ajoute un record aux stat web
+
+    cDicoApt * mDico;
+    Analytics mAnal;
+    Wt::WDialog *dialog_auth;
 
     void handlePathChange();
 
     /** VARS GLOBALES  **/
     WOpenLayers * mMap;
-
     Wt::WNavigationBar * navigation;
     Wt::WStackedWidget * top_stack;// celui qui navige entre la page de garde (home), la page de présentation et les volets analyse/carto
     Wt::Auth::AuthWidget* authWidget;
@@ -89,7 +112,7 @@ public:
     dialog *dialog_anal,*dialog_info,*dialog_catalog,*dialog_cadastre,*dialog_legend;
     panier * mPanier;
 
-    // cacher tout les dialogues ou les rendre visibles lorsqu'on change de page, ex vers documentation
+    // cacher tout les dialogues ou les rendre visibles lorsqu'on change de page, ex vers documentation ou vers fenetre authentification
     void showDialogues(bool b=true){
         if (b){
           dialog_anal->myshow();
@@ -112,9 +135,9 @@ public:
       parcellaire * mPA;
 private:
     void load_content_couches(WContainerWidget * content);
-    AuthApplication * mApp;
-    cDicoApt * mDico;
 
+    Session session_;
+    bool loaded_=false; // sert à éviter que void authEvent ne crash si refresh la page et que user connecté...
 
     Wt::WColor col_sel = Wt::WColor(23,87,23);
     Wt::WColor col_not_sel = Wt::WColor("transparent");

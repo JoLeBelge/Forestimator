@@ -1,8 +1,8 @@
 #ifndef STATWINDOW_H
 #define STATWINDOW_H
+#include "cwebaptitude.h"
 #include "grouplayers.h"
 #include "layerstatchart.h"
-#include "auth/auth.h"
 #include <hpdf.h>
 #include <Wt/WResource.h>
 #include <Wt/Http/Request.h>
@@ -13,9 +13,7 @@
 //#include "wkhtml/wkhtmlutil.h"
 
 class statWindow;
-
-
-
+class cWebAptitude;
 
 class statWindow : public Wt::WContainerWidget
 {
@@ -42,7 +40,7 @@ public:
      groupLayers*mGL;
 private:
 
-    AuthApplication * mApp;
+    cWebAptitude * m_app;
     Wt::WVBoxLayout * layout;
 
     // pour la carte de localisation

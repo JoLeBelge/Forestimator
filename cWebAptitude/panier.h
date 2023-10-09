@@ -10,12 +10,11 @@
 class panier: public WContainerWidget
 {
 public:
-    panier(AuthApplication* app, cWebAptitude * cWebApt);
+    panier(cWebAptitude * cWebApt);
 
     // var globales
     cDicoApt * mDico;
-    AuthApplication * m_app;
-    cWebAptitude * mcWebAptitude;
+    cWebAptitude * m_app;
     WOpenLayers * mMap;
     groupLayers * mGroupL;
 

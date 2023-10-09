@@ -24,7 +24,6 @@
 #include "Wt/WFileResource.h"
 #include "./libzippp/src/libzippp.h"
 #include <string.h>
-#include "auth.h"
 #include "selectlayers.h"
 #include "statHdomCompo.h"
 
@@ -92,7 +91,7 @@ protected:
 class groupLayers: public WContainerWidget, public groupStat
 {
 public:
-    groupLayers(AuthApplication* app, cWebAptitude * cWebApt);
+    groupLayers(cWebAptitude * cWebApt);
     ~groupLayers();
 
     void clickOnName(std::string aCode);
@@ -137,7 +136,7 @@ public:
 
     //Wt::WProgressBar *mPBar;
     // pour faire un processEvent, seul moyen de refresh de la progressbar.
-    AuthApplication* m_app;
+    cWebAptitude* m_app;
 
     std::vector<rasterFiles> getSelect4Download();
     //std::vector<rasterFiles> getSelect4Stat();

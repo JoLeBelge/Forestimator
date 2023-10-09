@@ -6,10 +6,9 @@ int maxSizePix4Export(130000);
 
 extern bool globTest;
 
-groupLayers::groupLayers(AuthApplication *app, cWebAptitude * cWebApt):
-    mDico(app->mDico)
-  ,m_app(app)
-  ,mcWebAptitude(cWebApt)
+groupLayers::groupLayers(cWebAptitude * cWebApt):
+    mDico(cWebApt->mDico)
+  ,m_app(cWebApt)
   ,mMap(cWebApt->mMap)
   ,mTypeClassifST(FEE)
   ,mParent(cWebApt->mGroupLayerW)
@@ -135,7 +134,7 @@ groupLayers::groupLayers(AuthApplication *app, cWebAptitude * cWebApt):
     mStation = new ST(mDico);
 
     /*   AUTRES DIV   */
-    mAnaPoint = new simplepoint(this, mcWebAptitude->mSimplepointW);
+    mAnaPoint = new simplepoint(this, m_app->mSimplepointW);
 
     // updateGL pour cacher les couches expert
     //updateGL(); // -> bougé dans classe parent cwebapt car segfault not init refs !
@@ -199,8 +198,8 @@ void groupLayers::clickOnName(std::string aCode){
         }
     }
     // ajout de la carte après le "diplaylayer" sinon ordre du code js pas bon? ben oui car couche pas encore dans activeLayers[]
-    mcWebAptitude->mPanier->addMap(aCode, layer);
-    updateLegendeDiv(mcWebAptitude->mPanier->mVLs);
+    m_app->mPanier->addMap(aCode, layer);
+    updateLegendeDiv(m_app->mPanier->mVLs);
 }
 
 /**
@@ -261,7 +260,7 @@ void groupLayers::extractInfo(double x, double y){
             if (( l->IsActive() && l->Code()=="Cadastre")){
 
                 ptCadastre * ptCad = new ptCadastre(mDico->mCadastre,x,y);
-                ptCad->sendPolygone().connect(std::bind(&parcellaire::polygoneCadastre,mcWebAptitude->mPA,std::placeholders::_1,std::placeholders::_2));
+                ptCad->sendPolygone().connect(std::bind(&parcellaire::polygoneCadastre,m_app->mPA,std::placeholders::_1,std::placeholders::_2));
                 mParent->doJavaScript("content.innerHTML = '"+ptCad->displayAllInfoInOverlay()+ "';"
                                       +"var coordinate = ["+std::to_string(x) + ","+ std::to_string(y) +"];"
                                       +"overlay.setPosition(coordinate);"
@@ -468,10 +467,10 @@ void groupLayers::updateGL(){
     mAnaPoint->createPdfBut->setLink(pdfLink);
 
     // report analyse surfacique
-    auto pdfSurf = std::make_shared<surfPdfResource>(mcWebAptitude->mPA->mStatW);
+    auto pdfSurf = std::make_shared<surfPdfResource>(m_app->mPA->mStatW);
     auto pdfLink2 = Wt::WLink(pdfSurf);
     pdfLink2.setTarget(Wt::LinkTarget::NewWindow);
-    mcWebAptitude->mPA->mStatW->createPdfBut->setLink(pdfLink2);
+    m_app->mPA->mStatW->createPdfBut->setLink(pdfLink2);
 
     // boucle sur les layers et envoi du signal pour cacher ou rendre visible les checkbox
     for (std::shared_ptr<Layer> l : mVLs){

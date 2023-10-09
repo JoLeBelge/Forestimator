@@ -6,7 +6,7 @@ int globVolMaxShp(10000);// en ko // n'as pas l'air de fonctionner comme je le s
 
 extern bool globTest;
 
-parcellaire::parcellaire(groupLayers *aGL, Wt::WApplication* app, statWindow *statW):mGL(aGL),centerX(0.0),centerY(0.0),mClientName(""),mName(""),mFullPath(""),m_app(app),fu(NULL),msg(NULL)
+parcellaire::parcellaire(groupLayers *aGL, cWebAptitude *app, statWindow *statW):mGL(aGL),centerX(0.0),centerY(0.0),mClientName(""),mName(""),mFullPath(""),m_app(app),fu(NULL),msg(NULL)
   ,hasValidShp(0)
   ,downloadRasterBt(NULL)
   ,mStatW(statW)
@@ -455,7 +455,26 @@ void parcellaire::polygoneCadastre(std::string aFileGeoJson, std::string aLabelN
 }
 
 void parcellaire::anaAllPol(){
-    if (mGL->getNumSelect4Download()> 4){
+    // on a besoin que l'utilisateur soit connecté pour avoir son adresse email pour lui envoyer les résultats.
+    if (!m_app->isLoggedIn()){
+        auto messageBox =
+                addChild(Wt::cpp14::make_unique<Wt::WMessageBox>(
+                             "Analyse surfacique",
+                             tr("parcellaire.anaAllPol.connect")
+                             ,
+                             Wt::Icon::Information,
+                             Wt::StandardButton::Ok));
+
+        messageBox->setModal(true);
+        messageBox->buttonClicked().connect([=] {
+            removeChild(messageBox);
+            m_app->showDialogues(0); // les autres fenetres
+            m_app->dialog_auth->show();
+            m_app->dialog_auth->raiseToFront();
+        });
+        messageBox->show();
+
+   /* } else if (mGL->getNumSelect4Download()> 4){
 
         auto messageBox =
                 addChild(Wt::cpp14::make_unique<Wt::WMessageBox>(
@@ -470,7 +489,22 @@ void parcellaire::anaAllPol(){
             removeChild(messageBox);
         });
         messageBox->show();
+        */
     } else {
+
+        auto messageBox =
+                addChild(Wt::cpp14::make_unique<Wt::WMessageBox>(
+                             "Analyse surfacique",
+                             tr("parcellaire.anaAllPol.envoiEmail")
+                             ,
+                             Wt::Icon::Information,
+                             Wt::StandardButton::Ok));
+
+        messageBox->setModal(true);
+        messageBox->buttonClicked().connect([=] {
+            removeChild(messageBox);
+        });
+        messageBox->show();
 
         std::string input(geoJsonName());// lecture du geojson et pas du shp, comme cela compatible avec polygone du cadastre.
         const char *inputPath=input.c_str();

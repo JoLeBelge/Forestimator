@@ -42,7 +42,6 @@ int main(int argc, char **argv)
         // pour avoir la table dictionnaire
         server.addResource(&resource, "/api/${tool}");
 
-
         cnswresource cnswr(dico->File("TMPDIR")+"/");
         server.addResource(&cnswr, "/CNSW");
 
@@ -62,7 +61,7 @@ int main(int argc, char **argv)
             }
         }
 
-        server.addEntryPoint(Wt::EntryPointType::Application, std::bind(&createAuthApplication,std::placeholders::_1, dico));
+        server.addEntryPoint(Wt::EntryPointType::Application, std::bind(&createWebAptitudeApplication,std::placeholders::_1, dico));
         Session::configureAuth();
 
         server.run();
@@ -75,7 +74,7 @@ int main(int argc, char **argv)
     }
 }
 
-std::unique_ptr<Wt::WApplication> createAuthApplication(const Wt::WEnvironment &env, cDicoApt *dico)
+std::unique_ptr<Wt::WApplication> createWebAptitudeApplication(const Wt::WEnvironment &env, cDicoApt *dico)
 {
     //std::cout << env.internalPath() << " " << env.deploymentPath() << std::endl;
     //std::cout << env.getParameter("a0") << std::endl;
@@ -116,7 +115,7 @@ std::unique_ptr<Wt::WApplication> createAuthApplication(const Wt::WEnvironment &
     }
 
 
-    return Wt::cpp14::make_unique<AuthApplication>(env,dico);
+    return Wt::cpp14::make_unique<cWebAptitude>(env,dico);
 }
 
 void layerResource::handleRequest(const Http::Request &request, Http::Response &response){
