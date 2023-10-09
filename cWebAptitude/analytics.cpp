@@ -232,25 +232,18 @@ PageAnalytics::PageAnalytics(const Wt::WEnvironment& env, std::string aFileDB) :
     table4->elementAt(0, 1)->addNew<Wt::WText>("Nombre d'utilisateur");
 
     //q="SELECT COUNT(*)as nb FROM (SELECT COUNT(*)as nb FROM log  WHERE ip != '127.0.0.1' AND ip NOT LIKE '%139.165%' AND date LIKE '%2022-02%' GROUP BY ip);";
-
+    row=1;
+    for (int y(2022);y <2024;y++){
     for (int m(1);m <13;m++){
         std::string month = std::to_string(m);
         if (month.size()==1){month="0"+ month;}
-        int nb=session.query<int>("SELECT COUNT(*) as nb FROM (SELECT COUNT(*) as nb FROM log  WHERE ip != '127.0.0.1' AND ip NOT LIKE '%139.165%' AND date LIKE '%2022-"+month+"%' GROUP BY ip)");
-        table4->elementAt(m,0)->addWidget(Wt::cpp14::make_unique<Wt::WText>(month));
-        table4->elementAt(m,0)->setContentAlignment(AlignmentFlag::Right);
-        table4->elementAt(m,1)->addWidget(Wt::cpp14::make_unique<Wt::WText>(std::to_string(nb)));
-        table4->elementAt(m,1)->setContentAlignment(AlignmentFlag::Center);
+        int nb=session.query<int>("SELECT COUNT(*) as nb FROM (SELECT COUNT(*) as nb FROM log  WHERE ip != '127.0.0.1' AND ip NOT LIKE '%139.165%' AND date LIKE '%"+std::to_string(y)+"-"+month+"%' GROUP BY ip)");
+        table4->elementAt(row,0)->addWidget(Wt::cpp14::make_unique<Wt::WText>(month));
+        table4->elementAt(row,0)->setContentAlignment(AlignmentFlag::Right);
+        table4->elementAt(row,1)->addWidget(Wt::cpp14::make_unique<Wt::WText>(std::to_string(nb)));
+        table4->elementAt(row,1)->setContentAlignment(AlignmentFlag::Center);
+        row++;
     }
-
-    for (int m(1);m <6;m++){
-        std::string month = std::to_string(m);
-        if (month.size()==1){month="0"+ month;}
-        int nb=session.query<int>("SELECT COUNT(*) as nb FROM (SELECT COUNT(*) as nb FROM log  WHERE ip != '127.0.0.1' AND ip NOT LIKE '%139.165%' AND date LIKE '%2023-"+month+"%' GROUP BY ip)");
-        table4->elementAt(m+12,0)->addWidget(Wt::cpp14::make_unique<Wt::WText>(month));
-        table4->elementAt(m+12,0)->setContentAlignment(AlignmentFlag::Right);
-        table4->elementAt(m+12,1)->addWidget(Wt::cpp14::make_unique<Wt::WText>(std::to_string(nb)));
-        table4->elementAt(m+12,1)->setContentAlignment(AlignmentFlag::Center);
     }
 
     // tableau brut des 100 derniers logs
