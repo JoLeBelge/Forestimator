@@ -194,6 +194,7 @@ void groupLayers::clickOnName(std::string aCode){
     for (std::shared_ptr<Layer> l : mVLs){
         if (l->IsActive()){
             l->displayLayer();
+            m_app->addLog("display layer "+l->Code(),typeLog::selectLayer);
             break;
         }
     }
