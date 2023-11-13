@@ -1,10 +1,14 @@
 
 #include "main.h"
+// Threadpool implementation TT
+#include "./threadpool/Task.hpp"
+#include "./threadpool/Pool.hpp"
 
+static Pool* pool;
 extern bool globTest;
 extern std::string columnPath;
 
-int main(int argc, char **argv)
+int launchForestimator(int argc, char **argv)
 {
     po::options_description desc("Allowed options");
     desc.add_options()
@@ -67,7 +71,7 @@ int main(int argc, char **argv)
 
         server.run();
     } catch (Wt::WServer::Exception& e) {
-        std::cerr << e.what() << std::endl;
+        std::cerr << "sError" << e.what() << std::endl;
     } catch (Wt::Dbo::Exception &e) {
         std::cerr << "Dbo exception: " << e.what() << std::endl;
     } catch (std::exception &e) {
@@ -84,7 +88,7 @@ std::unique_ptr<Wt::WApplication> createAuthApplication(const Wt::WEnvironment &
     std::cout << "ip: " << env.headerValue("Client-IP") << std::endl;
     std::cout << "ua: " << env.headerValue("User-Agent") << std::endl;*/
 
-    if (env.internalPath() == "/documentation" | env.internalPath().substr(0,14)== "/documentation"){
+    if (env.internalPath() == "/documentation" || env.internalPath().substr(0,14)== "/documentation"){
         ;
     }else if (env.internalPath() == "/cartographie"){
         ;
@@ -143,4 +147,21 @@ void layerResource::handleRequest(const Http::Request &request, Http::Response &
     handleRequestPiecewise(request, response, r);
 }
 
+class ForestimatorMainTask : public Task {
+    int *argc;
+    char ***argv;
+    void run() override {
+        launchForestimator(*argc, *argv);
+        return;
+    }
+public:
+    ForestimatorMainTask(int *argc, char ***argv) : argc(argc), argv(argv){}
+};
+
+int main(int argc, char **argv){
+    int nThreads = 1;
+    pool = new Pool(new ForestimatorMainTask(&argc, &argv), nThreads);
+    pool->start();
+    delete(pool);
+}
 
