@@ -8,7 +8,11 @@ matAptCS::matAptCS(cDicoApt *aDicoApt):mDicoApt(aDicoApt),zbio_(1),US_(1),mVar_(
 
     //setMaximumSize("100%","5000px");
     /* 1 Intro ---------------------------*/
+<<<<<<< HEAD
+    addWidget(cpp14::make_unique<WText>(tr("CS.intro")));
+=======
     addWidget(std::make_unique<WText>(tr("CS.intro")));
+>>>>>>> b6b7b9d8b6002d737fe630d0fc2e28adae0a78b3
      /* 2 Zbio ---------------------------*/
     addWidget(std::make_unique<Wt::WText>(tr("matAptCS.zbio")));
 
@@ -85,9 +89,24 @@ matAptCS::matAptCS(cDicoApt *aDicoApt):mDicoApt(aDicoApt),zbio_(1),US_(1),mVar_(
     }
 
      /* 4 Description de unités stationnelles ---------------------------*/
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+    contFicheUS = layoutGlobal->addWidget(std::make_unique<WContainerWidget>());
+    mAptTable = layoutGlobal->addWidget(std::make_unique<WTable>());
+    updateListeUS();
+=======
+=======
+>>>>>>> 9bef7ba (merge with master)
     contFicheUS = addWidget(cpp14::make_unique<WContainerWidget>());
     contFicheUS->setId("ficheUS");
     //contFicheUS->setHeight(Wt::WLength(2000.0));
+>>>>>>> 36e9392 (page Catalogue)
+=======
+    contFicheUS = addWidget(cpp14::make_unique<WContainerWidget>());
+    contFicheUS->setId("ficheUS");
+    //contFicheUS->setHeight(Wt::WLength(2000.0));
+>>>>>>> b6b7b9d8b6002d737fe630d0fc2e28adae0a78b3
 
     updateListeUS();
     setHeight(Wt::WLength(3000));
