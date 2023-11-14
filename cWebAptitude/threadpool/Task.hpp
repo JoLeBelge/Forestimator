@@ -11,7 +11,11 @@ protected:
 private:
     long TaskID;
 
+<<<<<<< HEAD
     int finished = 0;
+=======
+    //int finished = 0;
+>>>>>>> b6b7b9d8b6002d737fe630d0fc2e28adae0a78b3
 public:
     Task(){
         taskMutexStats.lock();

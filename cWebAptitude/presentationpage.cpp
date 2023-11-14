@@ -131,10 +131,17 @@ presentationPage::presentationPage(cDicoApt *aDico, AuthApplication *app):mDico(
     for( auto kv : *mDico->layerMTD()){
         LayerMTD lMTD=kv.second;
         if (lMTD.code()!="ES_EP"){
+<<<<<<< HEAD
 =======
         std::unique_ptr<Wt::WMenuItem> item = std::make_unique<Wt::WMenuItem>(lMTD.Label(), cpp14::make_unique<Wt::WText>(getHtml(&lMTD)));
 
 >>>>>>> a9b8835 (table caracteristiqueCS : change nom de colonne et ajout colonne zbio)
+=======
+
+        std::unique_ptr<Wt::WMenuItem> item = std::make_unique<Wt::WMenuItem>(lMTD.Label(), cpp14::make_unique<Wt::WText>(getHtml(&lMTD)));
+
+
+>>>>>>> b6b7b9d8b6002d737fe630d0fc2e28adae0a78b3
         subMenu_->addItem(std::move(item));
         } else {
             std::unique_ptr<Wt::WMenuItem> mi = std::make_unique<Wt::WMenuItem>(lMTD.Label());

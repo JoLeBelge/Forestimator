@@ -1,4 +1,3 @@
-
 #include "main.h"
 // Threadpool implementation TT
 #include "./threadpool/Task.hpp"
@@ -147,6 +146,7 @@ void layerResource::handleRequest(const Http::Request &request, Http::Response &
     handleRequestPiecewise(request, response, r);
 }
 
+<<<<<<< HEAD
 class ForestimatorMainTask : public Task {
     int *argc;
     char ***argv;
@@ -157,6 +157,12 @@ class ForestimatorMainTask : public Task {
 public:
     ForestimatorMainTask(int *argc, char ***argv) : argc(argc), argv(argv){}
 };
+=======
+void ForestimatorMainTask::run(){
+        launchForestimator(*argc, *argv);
+        return;
+    }
+>>>>>>> b6b7b9d8b6002d737fe630d0fc2e28adae0a78b3
 
 int main(int argc, char **argv){
     int nThreads = 1;

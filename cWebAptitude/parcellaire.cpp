@@ -89,6 +89,7 @@ void parcellaire::cleanShpFile(){
     mExtention="";
 }
 
+<<<<<<< HEAD
 // le nouveau toGeoJson ; effectue un changement de src
 bool parcellaire::to31370AndGeoJson(){
     bool aRes=true;
@@ -194,6 +195,10 @@ bool parcellaire::to31370AndGeoJson(){
 }
 
 bool parcellaire::computeGlobalGeom(std::string extension="",bool limitSize=1){
+=======
+
+bool parcellaire::computeGlobalGeom(std::string extension,bool limitSize){
+>>>>>>> b6b7b9d8b6002d737fe630d0fc2e28adae0a78b3
     //std::cout << "computeGlobalGeom " << std::endl;
     bool aRes(0);
     if (extension==""){extension=mExtention;}
@@ -346,6 +351,7 @@ void parcellaire::upload(){
 
     // ici je converti en json et affichage dans ol
     if (isShp){
+<<<<<<< HEAD
         if (nbFiles==3){
         msg->setText(tr("analyse.surf.msg.uploadOK"));
         if (globTest){std::cout << "Téléchargement du shp effectué avec succès.. " << std::endl ;}
@@ -363,6 +369,33 @@ void parcellaire::upload(){
     } else {
         msg->setText(tr("analyse.surf.msg.shpIncomplete"));
         cleanShpFile();
+=======
+        if (nbFiles>2){ // au minimum shp shx dbf
+            msg->setText(tr("analyse.surf.msg.uploadOK"));
+            if (globTest){std::cout << "Téléchargement du shp effectué avec succès.. " << std::endl ;}
+            mLabelName="";
+            to31370AndGeoJson();
+        } else {
+            msg->setText(tr("analyse.surf.msg.shpIncomplete"));
+            cleanShpFile();
+        }
+    }else {
+        // geopackage
+        auto messageBox =
+                addChild(std::make_unique<Wt::WMessageBox>(
+                             "Chargement de polygones au format Geopackage",
+                             tr("analyse.surf.msg.ImportGeopackage")
+                             ,
+                             Wt::Icon::Warning,
+                             Wt::StandardButton::Ok));
+        messageBox->setModal(true);
+        messageBox->buttonClicked().connect([=] {
+            removeChild(messageBox);
+        });
+        messageBox->show();
+        mLabelName="";
+        to31370AndGeoJson();
+>>>>>>> b6b7b9d8b6002d737fe630d0fc2e28adae0a78b3
     }
     }else {
         // geopackage
@@ -576,23 +609,6 @@ void parcellaire::polygoneCadastre(std::string aFileGeoJson, std::string aLabelN
 }
 
 void parcellaire::anaAllPol(){
-    // message box
-    /*if (!globTest){
-        auto messageBox =
-                addChild(Wt::cpp14::make_unique<Wt::WMessageBox>(
-                             "Analyse surfacique",
-                             tr("parcellaire.anaAllPol")
-                             ,
-                             Wt::Icon::Information,
-                             Wt::StandardButton::Ok));
-
-        messageBox->setModal(true);
-        messageBox->buttonClicked().connect([=] {
-            removeChild(messageBox);
-        });
-        messageBox->show();
-    }else {*/
-
     if (mGL->getNumSelect4Download()> 4){
 
         auto messageBox =
@@ -610,6 +626,26 @@ void parcellaire::anaAllPol(){
         messageBox->show();
     } else {
 
+<<<<<<< HEAD
+    if (mGL->getNumSelect4Download()> 4){
+
+        auto messageBox =
+                addChild(std::make_unique<Wt::WMessageBox>(
+                             "Analyse surfacique",
+                             tr("parcellaire.anaAllPol.maxProcess")
+                             ,
+                             Wt::Icon::Information,
+                             Wt::StandardButton::Ok));
+
+        messageBox->setModal(true);
+        messageBox->buttonClicked().connect([=] {
+            removeChild(messageBox);
+        });
+        messageBox->show();
+    } else {
+
+=======
+>>>>>>> b6b7b9d8b6002d737fe630d0fc2e28adae0a78b3
         std::string input(geoJsonName());// lecture du geojson et pas du shp, comme cela compatible avec polygone du cadastre.
         const char *inputPath=input.c_str();
         GDALDataset * mDS =  (GDALDataset*) GDALOpenEx( inputPath, GDAL_OF_VECTOR | GDAL_OF_READONLY, NULL, NULL, NULL );
