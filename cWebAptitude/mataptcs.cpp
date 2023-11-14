@@ -8,7 +8,7 @@ matAptCS::matAptCS(cDicoApt *aDicoApt):mDicoApt(aDicoApt),zbio_(1),US_(1),mVar_(
 
     //setMaximumSize("100%","5000px");
     /* 1 Intro ---------------------------*/
-    addWidget(cpp14::make_unique<WText>(tr("CS.intro")));
+    addWidget(std::make_unique<WText>(tr("CS.intro")));
      /* 2 Zbio ---------------------------*/
     addWidget(std::make_unique<Wt::WText>(tr("matAptCS.zbio")));
 
