@@ -12,7 +12,7 @@ static const int MIN_THREADS = 1;
 
 struct Pool{
 private:
-    int nThreads;
+    size_t nThreads;
     Task* mainTask;
     void waitForThreadsToFinish();
     int valid = 1;
@@ -20,7 +20,7 @@ private:
 public:
     cpu_set_t cpuset;
     static int ID;
-    Pool(Task* mainTask, int nThreads) : mainTask(mainTask), nThreads(nThreads + MIN_THREADS){
+    Pool(Task* mainTask, size_t nThreads) : nThreads(nThreads + MIN_THREADS), mainTask(mainTask) {
         for (size_t j = 0; j < nThreads; j++)
             CPU_SET(j, &cpuset);
     }
@@ -46,7 +46,7 @@ public:
         int idle = 1;
         int working = 0;
         std::vector<CoreThread*>* cThreads;
-        int* nThreads;
+        size_t* nThreads;
         int* valid;
         ThreadQueue* myTasks;
 
@@ -58,7 +58,7 @@ public:
         void run();
         void pushTask(Task* task);
         int empty();
-        CoreThread(std::vector<CoreThread*>* cThreads, int* nThreads, int* valid) : threadID(ID++), myTasks(new ThreadQueue()), cThreads(cThreads), nThreads(nThreads), valid(valid){}
+        CoreThread(std::vector<CoreThread*>* cThreads, size_t* nThreads, int* valid) : threadID(ID++), cThreads(cThreads), nThreads(nThreads), valid(valid), myTasks(new ThreadQueue()){}
         int getUnfinishdTasks();
         void startWork();
         void suspendWork();

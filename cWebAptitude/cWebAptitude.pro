@@ -40,8 +40,6 @@ SOURCES += main.cpp \
     threadpool/Task.cpp \
     threadpool/ThreadPool.cpp \
     threadpool/ThreadQueue.cpp \
-    threadpool/boltzmann.c \
-    threadpool/testPoolTheWE.cpp \
     widgetcadastre.cpp \
     wopenlayers.cpp \
     cwebaptitude.cpp \
@@ -101,8 +99,3 @@ HEADERS += \
     ../stationDescriptor/rapidxml/rapidxml_iterators.hpp
 
 DISTFILES += \
-    threadpool/a.out \
-    threadpool/boltzmann \
-    threadpool/newtest \
-    threadpool/out.txt \
-    threadpool/speed.csv

@@ -1,8 +1,4 @@
-
 #include "main.h"
-// Threadpool implementation TT
-#include "./threadpool/Task.hpp"
-#include "./threadpool/Pool.hpp"
 
 static Pool* pool;
 extern bool globTest;
@@ -71,7 +67,7 @@ int launchForestimator(int argc, char **argv)
 
         server.run();
     } catch (Wt::WServer::Exception& e) {
-        std::cerr << "sError" << e.what() << std::endl;
+        std::cerr << e.what() << std::endl;
     } catch (Wt::Dbo::Exception &e) {
         std::cerr << "Dbo exception: " << e.what() << std::endl;
     } catch (std::exception &e) {
@@ -147,16 +143,10 @@ void layerResource::handleRequest(const Http::Request &request, Http::Response &
     handleRequestPiecewise(request, response, r);
 }
 
-class ForestimatorMainTask : public Task {
-    int *argc;
-    char ***argv;
-    void run() override {
+void ForestimatorMainTask::run(){
         launchForestimator(*argc, *argv);
         return;
     }
-public:
-    ForestimatorMainTask(int *argc, char ***argv) : argc(argc), argv(argv){}
-};
 
 int main(int argc, char **argv){
     int nThreads = 1;
