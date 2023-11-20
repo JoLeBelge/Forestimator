@@ -16,6 +16,8 @@ namespace po = boost::program_options;
 #include "analytics.h"
 #include "./libzippp/src/libzippp.h"
 using namespace libzippp;
+#include "./threadpool/Task.hpp"
+#include "./threadpool/Pool.hpp"
 
 std::unique_ptr<Wt::WApplication> createWebAptitudeApplication(const Wt::WEnvironment &env, cDicoApt * dico);
 
@@ -38,5 +40,14 @@ std::shared_ptr<layerBase> ml;
 bool mQml;
 
 };
+
+class ForestimatorMainTask : public Task {
+    int *argc;
+    char ***argv;
+    void run() override;
+public:
+    ForestimatorMainTask(int *argc, char ***argv) : argc(argc), argv(argv){}
+};
+
 
 #endif // MAIN_H

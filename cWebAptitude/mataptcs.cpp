@@ -8,13 +8,14 @@ matAptCS::matAptCS(cDicoApt *aDicoApt):mDicoApt(aDicoApt),zbio_(1),US_(1),mVar_(
 
     //setMaximumSize("100%","5000px");
     /* 1 Intro ---------------------------*/
+
     addWidget(std::make_unique<WText>(tr("CS.intro")));
      /* 2 Zbio ---------------------------*/
     addWidget(std::make_unique<Wt::WText>(tr("matAptCS.zbio")));
 
     zbioSelection_  =addWidget(std::make_unique<Wt::WComboBox>());
     for (const auto &kv : *mDicoApt->ZBIO()){
-        if(kv.first==1 | kv.first==2 |kv.first==3 | kv.first==10 | kv.first==5){
+        if((kv.first == 1) | (kv.first == 2) | (kv.first == 3) | (kv.first == 10) | (kv.first == 5)){
             zbioSelection_->addItem(kv.second);
         }
     }
@@ -26,9 +27,9 @@ matAptCS::matAptCS(cDicoApt *aDicoApt):mDicoApt(aDicoApt),zbio_(1),US_(1),mVar_(
 
     Wt::WTemplate * tpl = addWidget(cpp14::make_unique<Wt::WTemplate>(tr("template.CS")));
     std::string  aShp=mDicoApt->File("ZBIOSIMP");
-    graphZbio = tpl->bindWidget("graphZbio", Wt::cpp14::make_unique<zbioPainted>(aShp,mDicoApt));
-    contListeUS = tpl->bindWidget("listeUS", Wt::cpp14::make_unique<WContainerWidget>());
-    WContainerWidget * contlisteEss = tpl->bindWidget("listeEssence", Wt::cpp14::make_unique<WContainerWidget>());
+    graphZbio = tpl->bindWidget("graphZbio", std::make_unique<zbioPainted>(aShp,mDicoApt));
+    contListeUS = tpl->bindWidget("listeUS", std::make_unique<WContainerWidget>());
+    WContainerWidget * contlisteEss = tpl->bindWidget("listeEssence", std::make_unique<WContainerWidget>());
     contlisteEss->setStyleClass("row");
     contlisteEss->addNew<Wt::WText>(tr("listeEss.CS.titre"));
     // création de la liste de toutes les essences
@@ -56,7 +57,7 @@ matAptCS::matAptCS(cDicoApt *aDicoApt):mDicoApt(aDicoApt),zbio_(1),US_(1),mVar_(
 
          t->clicked().connect([=] {
              t->setStyleClass("ess");
-             Wt::WMessageBox * messageBox = this->addChild(Wt::cpp14::make_unique<Wt::WMessageBox>(
+             Wt::WMessageBox * messageBox = this->addChild(std::make_unique<Wt::WMessageBox>(
                                                                ess->Nom(),
                                                                "",
                                                                Wt::Icon::Information,
@@ -88,6 +89,7 @@ matAptCS::matAptCS(cDicoApt *aDicoApt):mDicoApt(aDicoApt),zbio_(1),US_(1),mVar_(
     contFicheUS = addWidget(cpp14::make_unique<WContainerWidget>());
     contFicheUS->setId("ficheUS");
     //contFicheUS->setHeight(Wt::WLength(2000.0));
+
 
     updateListeUS();
     setHeight(Wt::WLength(3000));
@@ -197,7 +199,7 @@ void matAptCS::showFicheUS(int US, std::string aVar){
             });
             c->setToolTip(aV.at(n)->Nom());
             c->clicked().connect([=] {
-                Wt::WMessageBox * messageBox = this->addChild(Wt::cpp14::make_unique<Wt::WMessageBox>(
+                Wt::WMessageBox * messageBox = this->addChild(std::make_unique<Wt::WMessageBox>(
                                                                   aV.at(n)->Nom(),
                                                                   "",
                                                                   Wt::Icon::Information,
@@ -235,27 +237,28 @@ void matAptCS::showFicheUS(int US, std::string aVar){
 
     int val=mDicoApt->getKKCS(mDicoApt->ZBIO2CSid(zbio_),US_).VCP;
     Wt::WTemplate * tpl = contFicheUS->addNew<Wt::WTemplate>(tr("template.CS.progressBar").arg(mDicoApt->codeKK2Nom("VCP")));
-    Wt::WContainerWidget * cont = tpl->bindWidget("progress", Wt::cpp14::make_unique<Wt::WContainerWidget>());
+    Wt::WContainerWidget * cont = tpl->bindWidget("progress", std::make_unique<Wt::WContainerWidget>());
     cont->setStyleClass("syntheseCS"+std::to_string(val));
 
     val=mDicoApt->getKKCS(mDicoApt->ZBIO2CSid(zbio_),US_).SES;
     tpl = contFicheUS->addNew<Wt::WTemplate>(tr("template.CS.progressBar").arg(mDicoApt->codeKK2Nom("SES")));
-    cont = tpl->bindWidget("progress", Wt::cpp14::make_unique<Wt::WContainerWidget>());
+    cont = tpl->bindWidget("progress", std::make_unique<Wt::WContainerWidget>());
     cont->setStyleClass("syntheseCS"+std::to_string(val));
 
     val=mDicoApt->getKKCS(mDicoApt->ZBIO2CSid(zbio_),US_).SCC;
     tpl = contFicheUS->addNew<Wt::WTemplate>(tr("template.CS.progressBar").arg(mDicoApt->codeKK2Nom("SCC")));
     cont = tpl->bindWidget("progress", Wt::cpp14::make_unique<Wt::WContainerWidget>());
+
     cont->setStyleClass("syntheseCS"+std::to_string(val));
 
     val=mDicoApt->getKKCS(mDicoApt->ZBIO2CSid(zbio_),US_).RCS;
     tpl = contFicheUS->addNew<Wt::WTemplate>(tr("template.CS.progressBar").arg(mDicoApt->codeKK2Nom("RCS")));
-    cont = tpl->bindWidget("progress", Wt::cpp14::make_unique<Wt::WContainerWidget>());
+    cont = tpl->bindWidget("progress", std::make_unique<Wt::WContainerWidget>());
     cont->setStyleClass("syntheseCS"+std::to_string(val));
 
     val=mDicoApt->getKKCS(mDicoApt->ZBIO2CSid(zbio_),US_).PB;
     tpl = contFicheUS->addNew<Wt::WTemplate>(tr("template.CS.progressBar").arg(mDicoApt->codeKK2Nom("PB")));
-    cont = tpl->bindWidget("progress", Wt::cpp14::make_unique<Wt::WContainerWidget>());
+    cont = tpl->bindWidget("progress", std::make_unique<Wt::WContainerWidget>());
     cont->setStyleClass("syntheseCS"+std::to_string(val));
 
     idMessage="zbio"+std::to_string(mDicoApt->ZBIO2CSid(zbio_)) +".US"+std::to_string(US)+".part3";

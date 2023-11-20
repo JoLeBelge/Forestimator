@@ -190,7 +190,7 @@ statCellule::statCellule(std::vector<double> * aVHs, int aSurf, bool computeDend
 
         // calcul de l'écart type pour gha (besoin dans simreg, capsis)
         double sq_diff_sum(0);
-        for(int i = 0; i < vGha.size(); ++i) {
+        for(size_t i = 0; i < vGha.size(); ++i) {
             double diff = vGha.at(i) - mGha;
             sq_diff_sum += diff * diff;
         }
@@ -199,7 +199,7 @@ statCellule::statCellule(std::vector<double> * aVHs, int aSurf, bool computeDend
 
         // calcul de l'écart type pour cmoy (besoin dans simreg, capsis)
         sq_diff_sum=0;
-        for(int i = 0; i < vCmoy.size(); ++i) {
+        for(size_t i = 0; i < vCmoy.size(); ++i) {
             double diff = vCmoy.at(i) - mCmoy;
             sq_diff_sum += diff * diff;
         }

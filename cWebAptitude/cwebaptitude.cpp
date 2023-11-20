@@ -2,6 +2,7 @@
 
 extern bool globTest;
 
+
 /*
 void cWebAptitude::load_content_couches(WContainerWidget * content){
 
