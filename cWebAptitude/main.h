@@ -16,8 +16,7 @@ namespace po = boost::program_options;
 #include "analytics.h"
 #include "./libzippp/src/libzippp.h"
 using namespace libzippp;
-#include "./threadpool/Task.hpp"
-#include "./threadpool/Pool.hpp"
+#include "./threadpool/ThreadPool.hpp"
 
 std::unique_ptr<Wt::WApplication> createWebAptitudeApplication(const Wt::WEnvironment &env, cDicoApt * dico);
 

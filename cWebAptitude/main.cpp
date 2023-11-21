@@ -1,9 +1,5 @@
 #include "main.h"
-// Threadpool implementation TT
-#include "./threadpool/Task.hpp"
-#include "./threadpool/Pool.hpp"
 
-static Pool* pool;
 extern bool globTest;
 extern std::string columnPath;
 

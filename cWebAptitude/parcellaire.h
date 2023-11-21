@@ -22,6 +22,8 @@
 #include <functional> //--> pour bind
 #include "./libzippp/src/libzippp.h"
 using namespace libzippp;
+#include "threadpool/ThreadPool.hpp"
+
 
 class groupLayers;
 class statWindow;
@@ -69,6 +71,14 @@ public:
     void polygoneCadastre(std::string aFileGeoJson, std::string aLabelName="");
 
     statWindow * mStatW;
+
+    class TaskAnaAllPoll : public Task {
+        parcellaire *parcelle;
+        void run() override;
+    public:
+        TaskAnaAllPoll(parcellaire *parcelle) : parcelle(parcelle){}
+    };
+
 private:
 
     // Full path ; là ou est sauvé le shp localement, mName ; le nom du shp tels qu'il était chez le client
