@@ -92,6 +92,9 @@
             <user-agent>.*Turnitin.*</user-agent>
             <user-agent>.*bot.*</user-agent>
             <user-agent>^(?=\s*$)</user-agent><!-- empty string -->
+            <user-agent>.*CensysInspect.*</user-agent>
+            <user-agent>.*NetcraftSurveyAgent.*</user-agent>
+            
             
 		</user-agents>
 		
