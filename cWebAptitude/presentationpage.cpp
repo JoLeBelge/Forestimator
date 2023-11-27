@@ -34,7 +34,7 @@ presentationPage::presentationPage(cDicoApt *aDico, cWebAptitude *app):mDico(aDi
     auto subMenu = std::make_unique<Wt::WMenu>(subStack.get());
     auto subMenu_ = subMenu.get();
     subMenu_->addStyleClass("nav-pills nav-stacked submenu submenuPresentation");
-    subMenu_->setWidth(1000);
+    subMenu_->setWidth(200);
 
     subMenu_->setInternalPathEnabled("/documentation");
 
@@ -98,7 +98,7 @@ presentationPage::presentationPage(cDicoApt *aDico, cWebAptitude *app):mDico(aDi
                     b->clicked().connect([=]{m_app->addLog(l->Code(),typeLog::dsingleRW);
                         // si la couche est un raster de valeur continue avec gain et offset, prévenir l'utilisateur avec une boite de dialogue
                         if (l->getTypeVar()==TypeVar::Continu && l->Gain()!=1.0){
-                            Wt::WMessageBox * messageBox = this->addChild(Wt::cpp14::make_unique<Wt::WMessageBox>(
+                            Wt::WMessageBox * messageBox = this->addChild(std::make_unique<Wt::WMessageBox>(
                                                                               "Attention",
                                                                              tr("msg.Gain.info").arg(l->Gain()),
                                                                               Wt::Icon::Information,
@@ -131,7 +131,6 @@ presentationPage::presentationPage(cDicoApt *aDico, cWebAptitude *app):mDico(aDi
     for( auto kv : *mDico->layerMTD()){
         LayerMTD lMTD=kv.second;
         if (lMTD.code()!="ES_EP"){
-
         std::unique_ptr<Wt::WMenuItem> item = std::make_unique<Wt::WMenuItem>(lMTD.Label(), cpp14::make_unique<Wt::WText>(getHtml(&lMTD)));
 
 

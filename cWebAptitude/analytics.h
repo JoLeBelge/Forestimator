@@ -37,7 +37,7 @@ using namespace Wt;
 //using namespace date;
 
 //pour pouvoir classer les logs en différentes catégories. attention, ne pas changer l'ordre sinon la valeur de l'entier change et on est paumé
-enum typeLog {unknown,page,extend,danap,anas,dsingle,dmulti,danas,dsingleRW};
+enum typeLog {unknown,page,extend,danap,anas,dsingle,dmulti,danas,dsingleRW,selectLayer};
 // danap download pdf analyse ponctuelle.
 // anas analyse surfacique
 // dsingle download une carte
@@ -161,6 +161,9 @@ public:
             break;
         case 6:
             aRes="télécharge plusieurs cartes";
+            break;
+        case 9:
+            aRes="afficher une carte";
             break;
         default:
             break;

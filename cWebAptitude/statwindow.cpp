@@ -10,13 +10,13 @@ statWindow::statWindow(groupLayers * aGL):mDico(aGL->Dico()), m_app(aGL->m_app),
     setOverflow(Overflow::Auto);
     addStyleClass("statWindow");
 
-    WContainerWidget * contTitre_ =  addWidget(Wt::cpp14::make_unique<Wt::WContainerWidget>());
+    WContainerWidget * contTitre_ =  addWidget(std::make_unique<Wt::WContainerWidget>());
     mTitre = contTitre_->addWidget(std::make_unique<WText>());
     mTitre->setId("statWindowTitre");
     contTitre_->addWidget(std::make_unique<WText>(tr("infoDansVisuStat")));
     // bouton retour
     auto * tpl = contTitre_->addWidget(std::make_unique<Wt::WTemplate>(tr("bouton_retour_parcelaire")));
-    WPushButton * retour = tpl->bindWidget("retour", Wt::cpp14::make_unique<WPushButton>("Retour"));
+    WPushButton * retour = tpl->bindWidget("retour", std::make_unique<WPushButton>("Retour"));
     retour->setLink(WLink(LinkType::InternalPath, "/cartographie"));
     // bouton export PDF
     createPdfBut = contTitre_->addWidget(std::make_unique<WPushButton>(tr("ana.pt.export.pdf")));
@@ -111,7 +111,7 @@ void statWindow::generateGenCarte(OGRFeature * poFeature){
 
     WVBoxLayout * layoutV =mCarteGenCont->setLayout(std::make_unique<WVBoxLayout>());
     layoutV->addWidget(std::make_unique<WText>("<h4>Aperçu</h4>"));
-    //aRes->addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
+    //aRes->addWidget(std::make_unique<Wt::WBreak>());
     WContainerWidget * aContCarte = layoutV->addWidget(std::make_unique<WContainerWidget>());
     WHBoxLayout * layoutH = aContCarte->setLayout(std::make_unique<WHBoxLayout>());
     // ajout de la carte pour cette couche

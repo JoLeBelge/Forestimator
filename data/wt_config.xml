@@ -2,6 +2,8 @@
  <server>
     <application-settings location="*">
     	<properties>
+    	        	<property name="auth-mail-sender-name">Forestimator</property>
+        		<property name="auth-mail-sender-address">noreply-auth@forestimator.uliege.be</property>
 			<!-- You can use the following properties to configure SMTP settings -->
 			<!-- The host to identify as (defaults to localhost if not specified) -->
 			<property name="smtp-self-host">forestimator.gembloux.ulg.ac.be</property>

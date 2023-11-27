@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "WStreamResource.C": "cpp"
+    },
+    "cmake.configureOnOpen": false
+}

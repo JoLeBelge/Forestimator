@@ -20,9 +20,7 @@ parcellaire::parcellaire(groupLayers *aGL, cWebAptitude *app, statWindow *statW)
 
     setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Left);
     setInline(0);
-
-    addWidget(std::make_unique<WText>(tr("anaStep1")));
-    //mParent->addWidget(std::make_unique<Wt::WText>(tr("infoParcellaire")));
+    addWidget(cpp14::make_unique<WText>(tr("anaStep1")));
 
     fu =addNew<Wt::WFileUpload>();
     fu->setFileTextSize(globVolMaxShp); // Set the maximum file size. il faut également changer param max-request-size dans wt_config
@@ -30,7 +28,7 @@ parcellaire::parcellaire(groupLayers *aGL, cWebAptitude *app, statWindow *statW)
     fu->setMultiple(true);
     fu->setInline(0);
     fu->addStyleClass("btn-file");
-    addWidget(Wt::cpp14::make_unique<Wt::WBreak>());
+    addWidget(std::make_unique<Wt::WBreak>());
 
     msg = addWidget(std::make_unique<Wt::WText>());
     msg->setInline(0);
@@ -40,8 +38,7 @@ parcellaire::parcellaire(groupLayers *aGL, cWebAptitude *app, statWindow *statW)
 
     addWidget(std::make_unique<WText>(tr("anaStep3")));
 
-
-    downloadRasterBt = addWidget(std::make_unique<Wt::WPushButton>(tr("parcellaire.tele.btn")));
+    downloadRasterBt = addWidget(cpp14::make_unique<Wt::WPushButton>(tr("parcellaire.tele.btn")));
     downloadRasterBt->setStyleClass("btn btn-success");
     downloadRasterBt->setWidth(200);
     downloadRasterBt->setInline(0);
@@ -91,7 +88,6 @@ void parcellaire::cleanShpFile(){
     // je devrait réinitialiser les nom mFullPath et autre ici aussi?
     mExtention="";
 }
-
 
 bool parcellaire::computeGlobalGeom(std::string extension,bool limitSize){
     //std::cout << "computeGlobalGeom " << std::endl;
@@ -168,7 +164,7 @@ bool parcellaire::computeGlobalGeom(std::string extension,bool limitSize){
             } else {
                 // message box
                 auto messageBox =
-                        addChild(Wt::cpp14::make_unique<Wt::WMessageBox>(
+                        addChild(std::make_unique<Wt::WMessageBox>(
                                      "Import du shapefile polygone",
                                      tr("parcellaire.upload.size")
                                      ,
@@ -246,31 +242,53 @@ void parcellaire::upload(){
 
     // ici je converti en json et affichage dans ol
     if (isShp){
-        if (nbFiles>2){ // au minimum shp shx dbf
-            msg->setText(tr("analyse.surf.msg.uploadOK"));
-            if (globTest){std::cout << "Téléchargement du shp effectué avec succès.. " << std::endl ;}
-            mLabelName="";
-            to31370AndGeoJson();
-        } else {
-            msg->setText(tr("analyse.surf.msg.shpIncomplete"));
-            cleanShpFile();
+        if (nbFiles==3){
+        msg->setText(tr("analyse.surf.msg.uploadOK"));
+        if (globTest){std::cout << "Téléchargement du shp effectué avec succès.. " << std::endl ;}
+        mLabelName="";
+        if (to31370AndGeoJson()){
+            mGL->m_app->addLog("upload a shp");
+            if (computeGlobalGeom()){
+                hasValidShp=true;
+                downloadRasterBt->enable();
+                anaOnAllPolygBt->enable();
+                display();
+                mGL->mMap->setToolTip(tr("tooltipMap2"));
+            }
         }
+    } else {
+        msg->setText(tr("analyse.surf.msg.shpIncomplete"));
+        cleanShpFile();
+
+    }
     }else {
         // geopackage
         auto messageBox =
-                addChild(Wt::cpp14::make_unique<Wt::WMessageBox>(
+                addChild(std::make_unique<Wt::WMessageBox>(
                              "Chargement de polygones au format Geopackage",
                              tr("analyse.surf.msg.ImportGeopackage")
                              ,
                              Wt::Icon::Warning,
                              Wt::StandardButton::Ok));
+
         messageBox->setModal(true);
         messageBox->buttonClicked().connect([=] {
             removeChild(messageBox);
         });
         messageBox->show();
+
         mLabelName="";
-        to31370AndGeoJson();
+        if (to31370AndGeoJson()){
+            mGL->m_app->addLog("upload a shp gpkg");
+            if (computeGlobalGeom()){
+                hasValidShp=true;
+                downloadRasterBt->enable();
+                anaOnAllPolygBt->enable();
+                display();
+                mGL->mMap->setToolTip(tr("tooltipMap2"));
+            }
+        }
+        msg->setText(tr("analyse.surf.msg.uploadOK"));
     }
 }
 
@@ -363,7 +381,7 @@ void parcellaire::downloadRaster(){
 
     } else {
         auto messageBox =
-                addChild(Wt::cpp14::make_unique<Wt::WMessageBox>(
+                addChild(std::make_unique<Wt::WMessageBox>(
                              "Sélection des couches à exporter",
                              tr("download.lay.error.noLay")
                              ,
@@ -415,7 +433,7 @@ void parcellaire::selectPolygon(double x, double y){
                     } else {
                         // message box
                         auto messageBox =
-                                addChild(Wt::cpp14::make_unique<Wt::WMessageBox>(
+                                addChild(std::make_unique<Wt::WMessageBox>(
                                              "Analyse surfacique",
                                              tr("parcellaire.upload.size")
                                              ,
@@ -454,11 +472,10 @@ void parcellaire::polygoneCadastre(std::string aFileGeoJson, std::string aLabelN
     }
 }
 
-void parcellaire::anaAllPol(){
-    // on a besoin que l'utilisateur soit connecté pour avoir son adresse email pour lui envoyer les résultats.
-    if (!m_app->isLoggedIn()){
+void parcellaire::TaskAnaAllPoll::run(){
+    if (!parcelle->m_app->isLoggedIn()){
         auto messageBox =
-                addChild(Wt::cpp14::make_unique<Wt::WMessageBox>(
+                parcelle->addChild(Wt::cpp14::make_unique<Wt::WMessageBox>(
                              "Analyse surfacique",
                              tr("parcellaire.anaAllPol.connect")
                              ,
@@ -467,10 +484,10 @@ void parcellaire::anaAllPol(){
 
         messageBox->setModal(true);
         messageBox->buttonClicked().connect([=] {
-            removeChild(messageBox);
-            m_app->showDialogues(0); // les autres fenetres
-            m_app->dialog_auth->show();
-            m_app->dialog_auth->raiseToFront();
+            parcelle->removeChild(messageBox);
+            parcelle->m_app->showDialogues(0); // les autres fenetres
+            parcelle->m_app->dialog_auth->show();
+            parcelle->m_app->dialog_auth->raiseToFront();
         });
         messageBox->show();
 
@@ -493,7 +510,7 @@ void parcellaire::anaAllPol(){
     } else {
 
         auto messageBox =
-                addChild(Wt::cpp14::make_unique<Wt::WMessageBox>(
+                parcelle->addChild(Wt::cpp14::make_unique<Wt::WMessageBox>(
                              "Analyse surfacique",
                              tr("parcellaire.anaAllPol.envoiEmail")
                              ,
@@ -502,22 +519,26 @@ void parcellaire::anaAllPol(){
 
         messageBox->setModal(true);
         messageBox->buttonClicked().connect([=] {
-            removeChild(messageBox);
+            parcelle->removeChild(messageBox);
         });
         messageBox->show();
 
-        std::string input(geoJsonName());// lecture du geojson et pas du shp, comme cela compatible avec polygone du cadastre.
+        std::string input(parcelle->geoJsonName());// lecture du geojson et pas du shp, comme cela compatible avec polygone du cadastre.
         const char *inputPath=input.c_str();
         GDALDataset * mDS =  (GDALDataset*) GDALOpenEx( inputPath, GDAL_OF_VECTOR | GDAL_OF_READONLY, NULL, NULL, NULL );
         if( mDS != NULL )
         {
             // layer
             OGRLayer * lay = mDS->GetLayer(0);
-            mGL->computeStatAllPol(lay);
+            parcelle->mGL->computeStatAllPol(lay);
             GDALClose(mDS);
         } else { std::cout << "select dataset mDS is null " << std::endl;}
     }
-    //}
+}
+
+void parcellaire::anaAllPol(){
+    pool->add(new parcellaire::TaskAnaAllPoll(this));
+    return;
 }
 
 // le nouveau toGeoJson ; effectue un changement de src
@@ -555,7 +576,7 @@ bool parcellaire::to31370AndGeoJson(){
             //https://gdal-dev.osgeo.narkive.com/6bntm7AI/assigning-spatialreference-to-ogrlayer
             // assez dificile de définir un spatial ref pour un shp existant...
 
-            Wt::WDialog * dialogBox = addChild(Wt::cpp14::make_unique<Wt::WDialog>("Système de projection"));
+            Wt::WDialog * dialogBox = addChild(std::make_unique<Wt::WDialog>("Système de projection"));
             dialogBox->setModal(true);
             dialogBox->contents()->setOverflow(Overflow::Scroll);
             dialogBox->setClosable(false);

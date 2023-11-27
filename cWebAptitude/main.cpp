@@ -1,10 +1,9 @@
-
 #include "main.h"
 
 extern bool globTest;
 extern std::string columnPath;
 
-int main(int argc, char **argv)
+int launchForestimator(int argc, char **argv)
 {
     po::options_description desc("Allowed options");
     desc.add_options()
@@ -66,7 +65,7 @@ int main(int argc, char **argv)
 
         server.run();
     } catch (Wt::WServer::Exception& e) {
-        std::cerr << e.what() << std::endl;
+        std::cerr << "sError" << e.what() << std::endl;
     } catch (Wt::Dbo::Exception &e) {
         std::cerr << "Dbo exception: " << e.what() << std::endl;
     } catch (std::exception &e) {
@@ -83,7 +82,7 @@ std::unique_ptr<Wt::WApplication> createWebAptitudeApplication(const Wt::WEnviro
     std::cout << "ip: " << env.headerValue("Client-IP") << std::endl;
     std::cout << "ua: " << env.headerValue("User-Agent") << std::endl;*/
 
-    if (env.internalPath() == "/documentation" | env.internalPath().substr(0,14)== "/documentation"){
+    if (env.internalPath() == "/documentation" || env.internalPath().substr(0,14)== "/documentation"){
         ;
     }else if (env.internalPath() == "/cartographie"){
         ;
@@ -96,7 +95,7 @@ std::unique_ptr<Wt::WApplication> createWebAptitudeApplication(const Wt::WEnviro
     }else if (env.internalPath().rfind("/auth",0)==0){ /* authentification links ! */
         ;
     }else if (env.internalPath() == "/stats_analytics"){
-        auto app = Wt::cpp14::make_unique<PageAnalytics>(env,dico->File("docroot")+"analytics.db");
+        auto app = std::make_unique<PageAnalytics>(env,dico->File("docroot")+"analytics.db");
         return app;
     }else{
         std::cout << "internal path pas geré : " << env.internalPath() << std::endl;
@@ -105,7 +104,7 @@ std::unique_ptr<Wt::WApplication> createWebAptitudeApplication(const Wt::WEnviro
         // stats trafic web
         Analytics anal(dico->File("docroot")+"analytics.db");
 
-        auto app404 = Wt::cpp14::make_unique<Wt::WApplication>(env);
+        auto app404 = std::make_unique<Wt::WApplication>(env);
         auto theme = std::make_shared<Wt::WBootstrapTheme>();
         theme->setVersion(Wt::BootstrapVersion::v3);
         theme->setResponsive(true);
@@ -114,8 +113,8 @@ std::unique_ptr<Wt::WApplication> createWebAptitudeApplication(const Wt::WEnviro
         return app404;
     }
 
-
     return Wt::cpp14::make_unique<cWebAptitude>(env,dico);
+
 }
 
 void layerResource::handleRequest(const Http::Request &request, Http::Response &response){
@@ -142,4 +141,16 @@ void layerResource::handleRequest(const Http::Request &request, Http::Response &
     handleRequestPiecewise(request, response, r);
 }
 
+
+void ForestimatorMainTask::run(){
+        launchForestimator(*argc, *argv);
+        return;
+    }
+
+int main(int argc, char **argv){
+    int nThreads = 1;
+    pool = new Pool(new ForestimatorMainTask(&argc, &argv), nThreads);
+    pool->start();
+    delete(pool);
+}
 

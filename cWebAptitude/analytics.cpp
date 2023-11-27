@@ -4,9 +4,9 @@ extern bool globTest;
 
 Analytics::Analytics(std::string aFileDB) : session()
 {
-    //auto sqlite3 = Wt::cpp14::make_unique<dbo::backend::Sqlite3>(sqliteDb);
-    //auto sqlite3 = Wt::cpp14::make_unique<dbo::backend::Sqlite3>("/data1/Forestimator/data/analytics.db");
-    auto sqlite3 = Wt::cpp14::make_unique<dbo::backend::Sqlite3>(aFileDB);
+    //auto sqlite3 = std::make_unique<dbo::backend::Sqlite3>(sqliteDb);
+    //auto sqlite3 = std::make_unique<dbo::backend::Sqlite3>("/data1/Forestimator/data/analytics.db");
+    auto sqlite3 = std::make_unique<dbo::backend::Sqlite3>(aFileDB);
     sqlite3->setProperty("show-queries", "false");
 
     session.setConnection(std::move(sqlite3));
@@ -87,7 +87,7 @@ PageAnalytics::PageAnalytics(const Wt::WEnvironment& env, std::string aFileDB) :
     messageResourceBundle().use(docRoot() + "/forestimator");
     messageResourceBundle().use(docRoot() + "/forestimator-documentation");
 
-    auto sqlite3 = Wt::cpp14::make_unique<dbo::backend::Sqlite3>(aFileDB);
+    auto sqlite3 = std::make_unique<dbo::backend::Sqlite3>(aFileDB);
     sqlite3->setProperty("show-queries", "false");
     //sqlite3->setProperty("show-queries", "true");
     session.setConnection(std::move(sqlite3));
@@ -114,7 +114,7 @@ PageAnalytics::PageAnalytics(const Wt::WEnvironment& env, std::string aFileDB) :
     setTitle("Forestimator - Stats");
 
 
-    //Wt::WVBoxLayout * layout = root()->setLayout(Wt::cpp14::make_unique<Wt::WVBoxLayout>());
+    //Wt::WVBoxLayout * layout = root()->setLayout(std::make_unique<Wt::WVBoxLayout>());
     root()->setMargin(0);
     root()->setPadding(0);
     root()->setOverflow(Wt::Overflow::Scroll);
@@ -126,7 +126,7 @@ PageAnalytics::PageAnalytics(const Wt::WEnvironment& env, std::string aFileDB) :
     }
     nbMonthSelection_->changed().connect(std::bind(&PageAnalytics::changeGraph,this));*/
 
-    //Wt::WContainerWidget * contentChart = layout->addWidget(Wt::cpp14::make_unique<Wt::WContainerWidget>(),0);
+    //Wt::WContainerWidget * contentChart = layout->addWidget(std::make_unique<Wt::WContainerWidget>(),0);
     //mChart = layout->addWidget(std::make_unique<Chart::WCartesianChart>());
     mChart = root()->addWidget(std::make_unique<Chart::WCartesianChart>());
 
@@ -180,11 +180,11 @@ PageAnalytics::PageAnalytics(const Wt::WEnvironment& env, std::string aFileDB) :
 
 
     // tableau de synthèse
-   // Wt::WContainerWidget * content2 = layout->addWidget(Wt::cpp14::make_unique<Wt::WContainerWidget>());
-    Wt::WContainerWidget * content2 = root()->addWidget(Wt::cpp14::make_unique<Wt::WContainerWidget>());
+   // Wt::WContainerWidget * content2 = layout->addWidget(std::make_unique<Wt::WContainerWidget>());
+    Wt::WContainerWidget * content2 = root()->addWidget(std::make_unique<Wt::WContainerWidget>());
     content2->setOverflow(Wt::Overflow::Scroll);
     content2->addNew<Wt::WText>(Wt::WText::tr("analytic.tab1"));
-    auto table2 = content2->addWidget(Wt::cpp14::make_unique<Wt::WTable>());
+    auto table2 = content2->addWidget(std::make_unique<Wt::WTable>());
     table2->setHeaderCount(1);
     table2->setWidth(Wt::WLength("100%"));
     table2->toggleStyleClass("table-striped",true);
@@ -194,16 +194,16 @@ PageAnalytics::PageAnalytics(const Wt::WEnvironment& env, std::string aFileDB) :
     //0 page,extend,danap,anas,dsingle,dmulti,danas,dsingleRW;
     // Sélection par catégorie de log
    // std::string q="SELECT COUNT(*)as nb, cat FROM log  WHERE ip != '127.0.0.1' AND ip NOT LIKE '%139.165%' GROUP BY cat;";
-    for (int cat(1);cat <9;cat++){
+    for (int cat(1);cat <10;cat++){
         int nb=session.query<int>("SELECT COUNT(*) FROM log  WHERE ip != '127.0.0.1' AND ip NOT LIKE '%139.165.%' AND cat="+std::to_string(cat)+" GROUP BY cat");
-        table2->elementAt(cat,0)->addWidget(Wt::cpp14::make_unique<Wt::WText>(getCat(cat)));
+        table2->elementAt(cat,0)->addWidget(std::make_unique<Wt::WText>(getCat(cat)));
         table2->elementAt(cat,0)->setContentAlignment(AlignmentFlag::Right);
-        table2->elementAt(cat,1)->addWidget(Wt::cpp14::make_unique<Wt::WText>(std::to_string(nb)));
-         table2->elementAt(cat,1)->setContentAlignment(AlignmentFlag::Center);
+        table2->elementAt(cat,1)->addWidget(std::make_unique<Wt::WText>(std::to_string(nb)));
+        table2->elementAt(cat,1)->setContentAlignment(AlignmentFlag::Center);
     }
 
     content2->addNew<Wt::WText>("tableau de synthèse (utilisation via réseau de l'Ulg) :");
-    auto table3 = content2->addWidget(Wt::cpp14::make_unique<Wt::WTable>());
+    auto table3 = content2->addWidget(std::make_unique<Wt::WTable>());
     table3->setHeaderCount(1);
     table3->setWidth(Wt::WLength("100%"));
     table3->toggleStyleClass("table-striped",true);
@@ -214,17 +214,17 @@ PageAnalytics::PageAnalytics(const Wt::WEnvironment& env, std::string aFileDB) :
     // connexion par wifi depuis Ulg : donne l'IP 127.0.0.1
     // Sélection par catégorie de log
     // q="SELECT COUNT(*)as nb, cat FROM log  WHERE ip != '127.0.0.1' AND ip LIKE '%139.165%' GROUP BY cat;";
-    for (int cat(1);cat <9;cat++){
+    for (int cat(1);cat <10;cat++){
         int nb=session.query<int>("SELECT COUNT(*) FROM log  WHERE ip != '127.0.0.1' AND ip LIKE '%139.165.%' AND cat="+std::to_string(cat)+" GROUP BY cat");
-        table3->elementAt(cat,0)->addWidget(Wt::cpp14::make_unique<Wt::WText>(getCat(cat)));
+        table3->elementAt(cat,0)->addWidget(std::make_unique<Wt::WText>(getCat(cat)));
         table3->elementAt(cat,0)->setContentAlignment(AlignmentFlag::Right);
-        table3->elementAt(cat,1)->addWidget(Wt::cpp14::make_unique<Wt::WText>(std::to_string(nb)));
+        table3->elementAt(cat,1)->addWidget(std::make_unique<Wt::WText>(std::to_string(nb)));
          table3->elementAt(cat,1)->setContentAlignment(AlignmentFlag::Center);
     }
 
 
     content2->addNew<Wt::WText>(Wt::WText::tr("analytic.tabUser"));
-    auto table4 = content2->addWidget(Wt::cpp14::make_unique<Wt::WTable>());
+    auto table4 = content2->addWidget(std::make_unique<Wt::WTable>());
     table4->setHeaderCount(1);
     table4->setWidth(Wt::WLength("100%"));
     table4->toggleStyleClass("table-striped",true);
@@ -237,21 +237,23 @@ PageAnalytics::PageAnalytics(const Wt::WEnvironment& env, std::string aFileDB) :
     for (int m(1);m <13;m++){
         std::string month = std::to_string(m);
         if (month.size()==1){month="0"+ month;}
+
         int nb=session.query<int>("SELECT COUNT(*) as nb FROM (SELECT COUNT(*) as nb FROM log  WHERE ip != '127.0.0.1' AND ip NOT LIKE '%139.165%' AND date LIKE '%"+std::to_string(y)+"-"+month+"%' GROUP BY ip)");
-        table4->elementAt(row,0)->addWidget(Wt::cpp14::make_unique<Wt::WText>(month));
+        table4->elementAt(row,0)->addWidget(Wt::cpp14::make_unique<Wt::WText>(month+"-"+std::to_string(y)));
         table4->elementAt(row,0)->setContentAlignment(AlignmentFlag::Right);
         table4->elementAt(row,1)->addWidget(Wt::cpp14::make_unique<Wt::WText>(std::to_string(nb)));
         table4->elementAt(row,1)->setContentAlignment(AlignmentFlag::Center);
         row++;
     }
+    
     }
 
     // tableau brut des 100 derniers logs
-   // Wt::WContainerWidget * content = layout->addWidget(Wt::cpp14::make_unique<Wt::WContainerWidget>());
-    Wt::WContainerWidget * content = root()->addWidget(Wt::cpp14::make_unique<Wt::WContainerWidget>());
+   // Wt::WContainerWidget * content = layout->addWidget(std::make_unique<Wt::WContainerWidget>());
+    Wt::WContainerWidget * content = root()->addWidget(std::make_unique<Wt::WContainerWidget>());
     content->setOverflow(Wt::Overflow::Scroll);
     content->addNew<Wt::WText>(WText::tr("analytic.rawData"));
-    auto table = content->addWidget(Wt::cpp14::make_unique<Wt::WTable>());
+    auto table = content->addWidget(std::make_unique<Wt::WTable>());
     table->setHeaderCount(1);
     table->setWidth(Wt::WLength("100%"));
     table->toggleStyleClass("table-striped",true);
@@ -271,12 +273,12 @@ PageAnalytics::PageAnalytics(const Wt::WEnvironment& env, std::string aFileDB) :
 
             time_t now=log->datum;
             //tm *ltm = localtime(&now);
-            table->elementAt(i,0)->addWidget(Wt::cpp14::make_unique<Wt::WText>(std::to_string(i)));
-            table->elementAt(i,1)->addWidget(Wt::cpp14::make_unique<Wt::WText>(ctime(&now)));
-            table->elementAt(i,2)->addWidget(Wt::cpp14::make_unique<Wt::WText>(log->ip));
-            table->elementAt(i,3)->addWidget(Wt::cpp14::make_unique<Wt::WText>(log->client));
-            table->elementAt(i,4)->addWidget(Wt::cpp14::make_unique<Wt::WText>(log->ipath));
-            table->elementAt(i,5)->addWidget(Wt::cpp14::make_unique<Wt::WText>(log->getCat()));
+            table->elementAt(i,0)->addWidget(std::make_unique<Wt::WText>(std::to_string(i)));
+            table->elementAt(i,1)->addWidget(std::make_unique<Wt::WText>(ctime(&now)));
+            table->elementAt(i,2)->addWidget(std::make_unique<Wt::WText>(log->ip));
+            table->elementAt(i,3)->addWidget(std::make_unique<Wt::WText>(log->client));
+            table->elementAt(i,4)->addWidget(std::make_unique<Wt::WText>(log->ipath));
+            table->elementAt(i,5)->addWidget(std::make_unique<Wt::WText>(log->getCat()));
 
             i++;
         }
