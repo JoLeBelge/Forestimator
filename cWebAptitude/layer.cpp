@@ -137,9 +137,9 @@ void Layer::displayLayer() const{
     //mWtText->doJavaScript(JScommand);
     mGroupL->mParent->doJavaScript(JScommand);
 
-    /*if (globTest) {
+    if (globTest) {
         std::cout << " javascript pour ajouter une couche "<< std::endl;
-        std::cout << JScommand << std::endl;}*/
+        std::cout << JScommand << std::endl;}
 }
 
 std::vector<std::string> Layer::displayInfo(double x, double y){

@@ -819,5 +819,7 @@ Un suivi de l'état sanitaire des pessières est réalisé en vue d'identifier l
 
 <message id="analyse.surf.msg.ImportGeopackage"> Vous avez chargé une couche vectorielle au format Geopackage. La première couche du geopackage va être utilisée </message>
 
-
+<message id="Wt.WMessageBox.Yes"> Oui</message>
+<message id="Wt.WMessageBox.No"> Non</message>
+<message id="Wt.WMessageBox.Cancel"> Annuler</message>
 </messages>
