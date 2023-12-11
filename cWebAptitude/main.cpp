@@ -151,6 +151,7 @@ int main(int argc, char **argv){
     int nThreads = 1;
     pool = new Pool(new ForestimatorMainTask(&argc, &argv), nThreads);
     pool->start();
+    std::cout << "delete pool" << std::endl;
     delete(pool);
 }
 
