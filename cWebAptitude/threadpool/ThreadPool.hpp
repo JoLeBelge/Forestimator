@@ -4,6 +4,6 @@
 #include "Task.hpp"
 #include "Pool.hpp"
 
-static Pool* pool;
+extern Pool *pool;
 
 #endif

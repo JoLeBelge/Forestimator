@@ -236,7 +236,10 @@ void parcellaire::upload(){
         //boost::filesystem::rename(file.spoolFileName(),mFullPath+a.extension().c_str());
         // sur server boost::filesystem::rename: Invalid cross-device link:  car /data1 et tmp sont sur des différents volumes.
         //solution ; copy! de toute manière tmp/ est pugé souvent
-        boost::filesystem::copy(file.spoolFileName(),mFullPath+a.extension().c_str());
+        std::cout << "ACHTUNG: " << mFullPath+a.extension().c_str() << ";;;" << std::endl;
+        string it = "cp " + file.spoolFileName() + " " + mFullPath + a.extension().c_str();
+        std::system(it.c_str());
+        //boost::filesystem::copy(file.spoolFileName(),mFullPath+a.extension().c_str());
         if ((a.extension().string()==".shp") | (a.extension().string()==".shx" )| (a.extension().string()==".dbf")) {nbFiles++; isShp=1 ;mExtention="shp";}
     }
 
@@ -474,11 +477,13 @@ void parcellaire::polygoneCadastre(std::string aFileGeoJson, std::string aLabelN
 
 void parcellaire::TaskAnaAllPoll::run(){
     if (!parcelle->m_app->isLoggedIn()){
+         std::cout << parcelle->id();
+         std::cout << "Et oui, le threadpool marche... Mais il faut regarder les variables à líntérieur du thread qui sont isolés du reste...\n";
+
         auto messageBox =
-                parcelle->addChild(Wt::cpp14::make_unique<Wt::WMessageBox>(
+                parcelle->addChild(std::make_unique<Wt::WMessageBox>(
                              "Analyse surfacique",
-                             tr("parcellaire.anaAllPol.connect")
-                             ,
+                             tr("parcellaire.anaAllPol.connect"),
                              Wt::Icon::Information,
                              Wt::StandardButton::Ok));
 
