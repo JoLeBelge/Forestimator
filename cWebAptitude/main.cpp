@@ -41,8 +41,8 @@ int launchForestimator(int argc, char **argv)
         // pour avoir la table dictionnaire
         server.addResource(&resource, "/api/${tool}");
 
-        cnswresource cnswr(dico->File("TMPDIR")+"/");
-        server.addResource(&cnswr, "/CNSW");
+        //cnswresource cnswr(dico->File("TMPDIR")+"/");
+        //server.addResource(&cnswr, "/CNSW");
 
         // fileResource pour les cartes à l'échelle de toute la RW
         for (auto kv : dico->VlayerBase()){
@@ -151,6 +151,7 @@ int main(int argc, char **argv){
     int nThreads = 1;
     pool = new Pool(new ForestimatorMainTask(&argc, &argv), nThreads);
     pool->start();
+    std::cout << "delete pool" << std::endl;
     delete(pool);
 }
 

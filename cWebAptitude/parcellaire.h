@@ -76,7 +76,7 @@ public:
         parcellaire *parcelle;
         void run() override;
     public:
-        TaskAnaAllPoll(parcellaire *parcelle) : parcelle(parcelle){}
+        TaskAnaAllPoll(parcellaire *parcelle) : parcelle(parcelle){std::cout << "créateur de TaskAnaAllPoll" << std::endl;}
     };
 
 private:

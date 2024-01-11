@@ -31,6 +31,7 @@ void cnswresource::handleRequest(const Request& request, Response& response) {
     // largeur de l'emprise au sol
     double W=(Xmax-Xmin);
     std::string url="https://geoservices.wallonie.be/arcgis/rest/services/SOL_SOUS_SOL/CNSW/MapServer/export?";
+    url="https://geoservices.wallonie.be/arcgis/rest/services/SOL_SOUS_SOL/CNSW/MapServer/WmsServer?";
 
     response.setMimeType("image/png");
     std::ostream& out = response.out();
@@ -95,7 +96,8 @@ void cnswresource::handleRequest(const Request& request, Response& response) {
         }
 
         // image 2: PTS (couleur parlante)
-        url="https://geoservices.wallonie.be/arcgis/rest/services/SOL_SOUS_SOL/CNSW__PRINC_TYPES_SOLS/MapServer/export?"+sRequest;
+        //url="https://geoservices.wallonie.be/arcgis/rest/services/SOL_SOUS_SOL/CNSW__PRINC_TYPES_SOLS/MapServer/export?"+sRequest;
+        url+=sRequest;
         if (globTest){std::cout << "url 2 : " << url << std::endl;}
         name0 = std::tmpnam(nullptr);
         std::string name2 = mTmpDir+name0.substr(5,name0.size()-5)+".png";
