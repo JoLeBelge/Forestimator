@@ -4,16 +4,16 @@
 <p class="lead">
 <h3>Fichier écologique des essences et Guide des stations forestières : des outils complémentaires</h3>
 Le Fichier Ecologique des Essences (FEE) et le Guide des stations forestières sont deux outils complémentaires qui ont pour vocation d’aider les forestiers dans leurs démarches de description stationnelle, de choix des essences et de gestion forestière.
-Le fichier écologique des essences catégorise les stations selon trois facteurs écologiques que sont les niveaux <mark>bioclimatique, hydrique et trophique</mark> ; les 2 derniers étant représentés sous la forme d’un écogramme. C’est un outil orienté « aptitude des essences », qui comporte des fiches très informatives sur les atouts et sensibilités de chaque essence forestière. 
-La classification très systématique des stations convient particulièrement à une utilisation à l’échelle de l’ensemble de la Région Wallonne.
+Le fichier écologique des essences catégorise les stations selon trois facteurs écologiques que sont les niveaux <mark>bioclimatique, hydrique et trophique</mark> ; les 2 derniers étant représentés sous la forme d’un écogramme. C’est un outil orienté « aptitude des essences », qui comporte des fiches très informatives sur les atouts et les sensibilités de chaque essence forestière. 
+La classification très systématique des stations convient particulièrement à une utilisation à l’échelle de l’ensemble de la Région wallonne.
 <br></br>
-A une échelle plus régionale, comme pour les trois zones bioclimatiques d'Ardenne, le guide des stations est un outil orienté « gestion des stations », qui <mark>découpe le territoire en milieux-types, bien reconnaissables pour le forestier de terrain</mark>. En plus d’un choix d’essences approprié, le guide délivre des conseils de gestion spécifiques aux stations, par exemple en termes de protection des sols ou de promotion de la biodiversité.
+À une échelle plus régionale, comme pour les trois zones bioclimatiques d'Ardenne, le guide des stations est un outil orienté « gestion des stations », qui <mark>découpe le territoire en milieux-types, bien reconnaissables pour le forestier de terrain</mark>. En plus d’un choix d’essences approprié, le guide délivre des conseils de gestion spécifiques aux stations, par exemple en termes de protection des sols ou de promotion de la biodiversité.
 </p>
 
-Une plus ample comparaison de l'approche FEE versus guide de station est fournie dans l'article de suivant : <div class="csl-entry">Maus, Lucie, Jonathan Lisein, et Hugues Claessens. 2021. «&nbsp; <a target="_blank" rel="noopener noreferrer"  href="https://orbi.uliege.be/bitstream/2268/304665/1/Foret.Nature%20-%20HS02%20-%20p36-39.pdf">Le guide d’identification des stations forestières de l’Oesling</a>&nbsp;». <i>Forêt.Nature</i> hors série n° 2.</div> 
+Une plus ample comparaison de l'approche FEE versus guide des stations est fournie dans l'article suivant : <div class="csl-entry">Maus, Lucie, Jonathan Lisein, et Hugues Claessens. 2021. «<a target="_blank" rel="noopener noreferrer"  href="https://orbi.uliege.be/bitstream/2268/304665/1/Foret.Nature%20-%20HS02%20-%20p36-39.pdf">Le guide d’identification des stations forestières de l’Oesling</a>&nbsp;». <i>Forêt.Nature</i> hors série n° 2.</div> 
 
 <h3>Guide des stations: quel développement pour la Wallonie</h3>
-<p>Pour l'instant, les Guides de Stations de l'Ardenne et de la Lorraine ont été réalisé. 
+<p>Pour l'instant, les Guides des Stations de l'Ardenne et de la Lorraine ont été réalisés. 
 Les couches cartographiques sont disponibles sur demande.
 Les niveaux d’aptitude des essences pour les unités stationnelles sont présentés ci-dessous.</p>
 
@@ -26,7 +26,7 @@ descriptives.</p>
 	<div class="col-4 col-aptCS1" style="width:30%; height:25px;"> </div>
 	<div class="col-8 text-end"> <h6> Conseillée, en tenant compte de ses faiblesses (tolérance) </h6> </div>
 	<div class="col-4 col-aptCS2" style="width:30%; height:25px;"> </div>
-	<div class="col-8 text-end"> <h6> A n'envisager qu'en accompagnement (tolérance élargie) </h6> </div>
+	<div class="col-8 text-end"> <h6> À n'envisager qu'en accompagnement (tolérance élargie) </h6> </div>
 	<div class="col-4 col-aptCS3" style="width:30%; height:25px;"> </div>
 	<div class="col-8 text-end"> <h6> Ne pas envisager (exclusion) </h6> </div>
 	<div class="col-4 col-aptCS4" style="width:30%; height:25px;"> </div>
@@ -46,7 +46,7 @@ descriptives.</p>
   </span>
  </message>
 
-<message id="matAptCS.msg.noUS4Zbio"> Pour le moment, il n'existe pas de catalogue de station pour la zone bioclimatique {1}. </message>
+<message id="matAptCS.msg.noUS4Zbio"> Pour le moment, il n'existe pas de guide des stations pour la zone bioclimatique {1}. </message>
 <message id="matAptCS.zbio"> <h3>Choix de la zone bioclimatique</h3> </message>
 <message id="matAptCS.US"> <h3>Unités Stationnelles pour {1}</h3> </message>
 <message id="apt.t.O"> Optimum</message>

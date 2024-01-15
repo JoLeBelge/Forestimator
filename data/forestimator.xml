@@ -328,10 +328,10 @@ a second line.)
 <message id="page_presentation">
 <div class="form">
   <p>
-    <h3>Forestimator: outils cartographiques pour la gestion des forêts Wallonnes</h3>
+    <h3>Forestimator: outils cartographiques pour la gestion des forêts wallonnes</h3>
 Forestimator, c'est une boite à outils entièrement gratuite développée par l'unité de <a target="_blank" rel="noopener noreferrer" href="https://www.gembloux.ulg.ac.be/gestion-des-ressources-forestieres/">Gestion des Ressources Forestières</a> de Gembloux Agro-Bio Tech (ULiège). Les résultats de diverses recherches y sont rassemblés afin d'en faciliter la consultation et le téléchargement par les praticiens forestiers.
 
-Cette application web de cartographie permet une visualisation des informations relatives à la description des stations forestières, aux peuplements en place et à l'aptitude des essences telles que définie dans <a href="https://www.fichierecologique.be">le fichier écologique des essences (FEE)</a>. Les cartes peuvent y être téléchargées par ceux qui souhaitent utiliser leur propre logiciel de Système d'Information Géographique. Forestimator compte également une série d'analyses que l'utilisateur peut effectuer en chargeant le ou les polygone(s) délimitant une zone d'intérêt. Ainsi, par exemple, la proportion en surface pour laquelle une essence présente une adéquation optimale avec la zone en question est déterminée et présentée de manière à appuyer le choix des essences lors des opérations de plantation ou de régénération naturelles.
+Cette application web de cartographie permet une visualisation des informations relatives à la description des stations forestières, aux peuplements en place et à l'aptitude des essences telle que définie dans <a href="https://www.fichierecologique.be">le fichier écologique des essences (FEE)</a>. Les cartes peuvent y être téléchargées par ceux qui souhaitent utiliser leur propre logiciel de Système d'Information Géographique. Forestimator compte également une série d'analyses que l'utilisateur peut effectuer en chargeant le ou les polygone(s) délimitant une zone d'intérêt. Ainsi, par exemple, la proportion en surface pour laquelle une essence présente une adéquation optimale avec la zone en question est déterminée et présentée de manière à appuyer le choix des essences lors des opérations de plantation ou de régénération naturelles.
  </p>
  
     <p>
@@ -354,7 +354,7 @@ Cette application web de cartographie permet une visualisation des informations 
 		<h3>Télécharger une carte</h3>
 
 		Les cartes au format raster peuvent être découpées sur l'emprise de votre choix. L'emprise est celle affichée dans la page cartographie et peut être modifiée en effectuant un zoom avant ou arrière et en effectuant des déplacements en vue de centrer la carte sur une zone qui retient votre intérêt.
-		La carte et un fichier de symbologie (signification des codes couleurs) utilisable dans le logiciel <b>QGIS</b> sont téléchargeables en cliquant sur le bouton de téléchargement situé tout en bas de l'encart de droite.
+		La carte et un fichier de symbologie (signification des codes couleurs) utilisables dans le logiciel <b>QGIS</b> sont téléchargeables en cliquant sur le bouton de téléchargement situé tout en bas de l'encart de droite.
 	</div>
 </div>
 
@@ -366,11 +366,11 @@ Cette application web de cartographie permet une visualisation des informations 
 	<div id="part2" class="unfold">
 		C'est bien là que se situe tout l'intérêt des outils de consultation des informations cartographiques utiles aux forestiers ; <b>disposer en un double-clic de la description synthétique d'une station et du peuplement en place</b>. 
 		Ainsi, un double-clic sur une position de la carte va permettre l'affichage, dans la page d'info ponctuelle, de la carte d'identité de cette station.
-		Premièrement, le tableau d'aptitude pour cette station est présenté. Les essences sont représentées par leur acronymes et sont classées dans 4 colonnes qui correspondent aux 4 aptitudes ; optimum (en vert foncé), tolérance (en vert clair), tolérance élargie (en orange) et exclusion (en rouge).
+		Premièrement, le tableau d'aptitude pour cette station est présenté. Les essences sont représentées par leur acronyme et sont classées dans 4 colonnes qui correspondent aux 4 aptitudes ; optimum (en vert foncé), tolérance (en vert clair), tolérance élargie (en orange) et exclusion (en rouge).
 		<div>
 			<img src="/img/tableApt.png" alt="pour une station donnée, le tableau d'aptitude des essences" width="500px"/> 
 		 	<br></br>
-			Le tableau d'aptitude, qui apparaît lorsqu'on double-clique sur une station, renseigne l'aptitude pour toutes les essences forestières. Une info-bulle s'affiche lorsqu'on pointe la souris sur les codes essences en deux lettres et affiche le nom complet de l'essence forestière. Les codes essences sont affichés en gris dans le cas d'une <u>double aptitude</u> (ex; Tolérance/Tolérance élargie pour le Hêtre), cette double aptitude est renseignée dans l'info-bulle qui s'affiche lorsqu'on déplace la souris sur le code essence.
+			Le tableau d'aptitude, qui apparaît lorsqu'on double-clique sur une station, renseigne l'aptitude pour toutes les essences forestières. Une info-bulle s'affiche lorsqu'on pointe la souris sur les codes essences en deux lettres et affiche le nom complet de l'essence forestière. Les codes essence sont affichés en gris dans le cas d'une <u>double aptitude</u> (ex; Tolérance/Tolérance élargie pour le hêtre), cette double aptitude est renseignée dans l'info-bulle qui s'affiche lorsqu'on déplace la souris sur le code essence.
 		</div>
 		<br></br>
 
@@ -380,7 +380,7 @@ Cette application web de cartographie permet une visualisation des informations 
 		<div>
 			<img src="/img/ecogramme.png" alt="position de la station en mauve dans l'écogramme de l'essence" width="350px"  />
 		 	<br></br>
-			Lors d'un double-clic sur une station, si la carte affichée est une carte d'aptitude, la niche écologique de l'essence ainsi que la position de la station dans l'écogramme (station représentée par le carré mauve) sont également renseignés.
+			Lors d'un double-clic sur une station, si la carte affichée est une carte d'aptitude, la niche écologique de l'essence ainsi que la position de la station dans l'écogramme (station représentée par le carré mauve) sont également renseignées.
 		</div>
 		<h3>Génération d'un rapport</h3>
 
@@ -395,9 +395,9 @@ Cette application web de cartographie permet une visualisation des informations 
 		<!--<span class="unfold-icon"></span><span class="fold-icon"></span>-->Rubrique Analyse surfacique : statistique sur une surface d'intérêt  <!--<span class="unfold-icon"></span><span class="fold-icon"></span>-->
 	</label></p>
 	<div id="part3" class="unfold">
-		La description d'une station sous forme de position ponctuelle suit une méthodologie relativement directe, dans la mesure ou les caractéristiques sont lues sur chacune des cartes pour cette position donnée. Par contre, un aménagiste qui souhaite obtenir une synthèse des caractéristiques stationnelles et des peuplements en place pour une surface donnée, représentant tantôt une parcelle, tantôt un massif dans son ensemble, dois passer par une phase de calcul des statistiques pour cette surface. Des outils d'analyses sont implémentés dans Forestimator et permettent de répondre aux besoins les plus récurrents des cartographes forestiers.
+		La description d'une station sous forme de position ponctuelle suit une méthodologie relativement directe, dans la mesure où les caractéristiques sont lues sur chacune des cartes pour cette position donnée. Par contre, un aménagiste qui souhaite obtenir une synthèse des caractéristiques stationnelles et des peuplements en place pour une surface donnée, représentant tantôt une parcelle, tantôt un massif dans son ensemble, doit passer par une phase de calcul des statistiques pour cette surface. Des outils d'analyses sont implémentés dans Forestimator et permettent de répondre aux besoins les plus récurrents des cartographes forestiers.
 
-		<h3>Importer un shapefile</h3>
+		<h3>Importer une couche de polygones</h3>
 
 		La rubrique "Analyse surfacique" permet à l'utilisateur de sélectionner sur son ordinateur les 4 fichiers (.shp, .shx, .dbf, et .prj) constituant le shapefile de polygones définissant sa zone d'intérêt. Une couche cartographique au format Géopackage (.gpkg) est également compatible avec le géoportail Forestimator. Le shapefile doit obligatoirement contenir un ou des polygones et la surface totale des polygones ne doit pas excéder 2500 hectares.
 		Une fois le shapefile importé vers Forestimator, celui-ci apparaîtra en bleu sur la carte.
@@ -416,7 +416,7 @@ Cette application web de cartographie permet une visualisation des informations 
 
 <h3>Téléchargement d'un ensemble de cartes sur l'emprise du shapefile</h3>
 
-		Les utilisateurs désireux d'effectuer la mise en page de carte par eux-mêmes, voire d'effectuer des calculs propres à des besoins spécifiques, peuvent télécharger un ensemble de cartes sur l'emprise de leur shapefile. Le bouton <b>Télécharger les cartes</b> permet un découpage simultané de toutes les cartes sélectionnées pour l'analyse surfacique et leur téléchargement sous forme d'une archive compressée.
+		Les utilisateurs désireux d'effectuer la mise en page de cartes par eux-mêmes, voire d'effectuer des calculs propres à des besoins spécifiques, peuvent télécharger un ensemble de cartes sur l'emprise de leur shapefile. Le bouton <b>Télécharger les cartes</b> permet un découpage simultané de toutes les cartes sélectionnées pour l'analyse surfacique et leur téléchargement sous forme d'une archive compressée.
 	</div>
 </div>
 </p>
@@ -700,20 +700,20 @@ detAptFEE
 
 <message id="report.ban"><img src="PATH/resources/DJI_0497_navbar.JPG" width="500px"  border-radius="30px" /></message>
 
-<message id="download.lay.error.noLay"><p>Aucune carte sélectionnée. Veuillez sélectionner les couches à exporter à l'étape numéro 2 de la page analyse</p></message>
+<message id="download.lay.error.noLay"><p>Aucune carte sélectionnée. Veuillez sélectionner les couches à exporter à l'étape numéro 2 de l'outil d'analyse surfacique</p></message>
 
-<message id="parcellaire.upload.size"><p> La surface du ou des polygones est trop importante que pour effectuer une analyse surfacique.</p></message>
+<message id="parcellaire.upload.size"><p> La surface du ou des polygones est trop importante pour effectuer une analyse surfacique.</p></message>
 <message id="parcellaire.anaAllPol"><p> Indisponible pour le moment, en cours de développement...</p></message>
 <message id="parcellaire.anaAllPol.maxProcess"><p> Si vous souhaitez effectuer des analyses sur tous les polygones, vous ne pouvez sélectionner que maximum 4 analyses différentes.</p></message>
 
 <message id="parcellaire.tele.btn">Télécharger les cartes</message>
 <message id="parcellaire.ana.btn">Analyse sur tous les polygones</message>
 
-<message id="parcellaire.anaAllPol.envoiEmail"> Nous enverrons les résultats de l'analyse surfacique pour votre couche de polygones par email dès que ceux-ci seront effectués. </message>
+<message id="parcellaire.anaAllPol.envoiEmail"> Nous enverrons les résultats de l'analyse surfacique pour votre couche de polygones par e-mail dès que ceux-ci seront effectués. </message>
 
-<message id="parcellaire.anaAllPol.connect"> Vous devez préhalablement vous connecter à votre compte Forestimator pour effectuer des analyses sur tout les polygones de votre couche de polygones. Les résultats vous seront en effet envoyés par email à l'adresse associée à votre compte </message>
+<message id="parcellaire.anaAllPol.connect"> Vous devez préalablement vous connecter à votre compte Forestimator pour effectuer des analyses sur tous les polygones de votre couche de polygones. Les résultats vous seront en effet envoyés par e-mail à l'adresse associée à votre compte </message>
 
-<message id="parcellaire.loadshp.srcNotDefined">Le système de projection de votre shapefile n'est pas défini. Vous pouvez définir le système de coordonnée dans votre logiciel de Système d'information Géographique et effectuer à nouveau le chargement de la couche dans Forestimator, ou vous pouver choisir le système de coordonnée dans la liste ci-dessous et vérifier visuellement que votre couche cartographique s'affiche à sa localisation présumée. <br> </br> </message>
+<message id="parcellaire.loadshp.srcNotDefined">Le système de projection de votre shapefile n'est pas défini. Vous pouvez définir le système de coordonnées dans votre logiciel de Système d'information Géographique et effectuer à nouveau le chargement de la couche dans Forestimator, ou vous pouvez choisir le système de coordonnées dans la liste ci-dessous et vérifier visuellement que votre couche cartographique s'affiche à sa localisation présumée. <br> </br> </message>
 
 <message id="api.msg.error.tool.name">Aucune carte ou traitement de ce nom.</message>
 <message id="api.msg.error.polyg1">Veuillez utiliser le format Géojson pour votre polygone</message>
@@ -733,7 +733,7 @@ detAptFEE
 De nombreuses couches cartographiques y sont disponibles à la consultation et au téléchargement.
 Une analyse des conditions environnementales des stations de Wallonie permet de déterminer l'adéquation essence-station la plus pertinente pour une sylviculture efficace. 
 De nombreuses cartes sont disponibles : l'aptitude des essences au sens du Fichier Écologique des Essences, les cartes de composition, les zones bioclimatiques, les cartes de niveaux hydriques et des niveaux trophiques. Les guides de stations de la Wallonie sont également présentés, ainsi que les cartes de recommandation pour chacune des essences forestières.
-Des modèles dendrométriques sont implémenté pour l'estimation de la densité des peuplements sur base des modèles numériques de hauteur de la canopée. Une série temporelle de Modèle Numérique de Hauteur couvrant la période 2006-2021 sont consultable pour l'ensemble de la région Wallonne.
+Des modèles dendrométriques sont implémentés pour l'estimation de la densité des peuplements sur base des modèles numériques de hauteur de la canopée. Une série temporelle de Modèles Numériques de Hauteur couvrant la période 2006-2021 sont consultables pour l'ensemble de la région wallonne.
  </message>
 
 <message id="meta.desc.documentation">Des outils cartographiques qui sont une aide à la gestion des ressources forestières de Wallonie</message>
@@ -803,8 +803,8 @@ Un suivi de l'état sanitaire des pessières est réalisé en vue d'identifier l
 <p>Notons Y la valeur de la variable d'intérêt, b la valeur du gain et DN la "Digital Number", soit la valeur renseignée dans le raster pour un pixel donnée. La formulation est donc la suivante:  Y = b*DN </p></message>
 
 
-<message id="analytic.tab1"><h4>tableau de synthèse (hors utilisation via réseau de l'Ulg) </h4>
-<p> Ces statistiques de fréquentation sont calculées pour différents usages de Forestimator, se déclinant en autant de <mark> catégorie</mark>. L'usage le plus fréquent, correspondant à la catégorie <strong> page </strong>, correspond à la consulation des pages du site Forestimator. Un utilisateur consultant le même jour deux pages différentes du site enregistrera deux consultation. </p>
+<message id="analytic.tab1"><h4>tableau de synthèse (hors utilisation via le réseau de l'Ulg) </h4>
+<p> Ces statistiques de fréquentation sont calculées pour différents usages de Forestimator, se déclinant en autant de <mark> catégories</mark>. L'usage le plus fréquent, correspondant à la catégorie <strong> page </strong>, correspond à la consultation des pages du site Forestimator. Un utilisateur consultant le même jour deux pages différentes du site enregistrera deux consultations. </p>
 </message>
 
 <message id="analytic.tabUser"><h4>tableau de synthèse (hors utilisation via réseau de l'Ulg) </h4>
@@ -812,12 +812,12 @@ Un suivi de l'état sanitaire des pessières est réalisé en vue d'identifier l
 </message>
 
 <message id="analytic.rawData"><h4>Dernieres stats brutes</h4>
-<p> Ces enregistrement de fréquentation sont effectués pour certains usage du portail Forestimator. Par exemple, la consultation d'un page fera l'objet d'une observation, mais pas l'utilisation de l'API. Ces observations ne prennent pas en compte les nombreux robot d'indexation qui consultent le site. Si une page web est consultée plusieur fois par jour depuis le même ordinateur, seul la première consultation est enregistrée. Ce ne sont donc pas à proprement parler des "observations brutes" </p>
+<p> Ces enregistrements de fréquentation sont effectués pour certains usages du portail Forestimator. Par exemple, la consultation d'une page fera l'objet d'une observation, mais pas l'utilisation de l'API. Ces observations ne prennent pas en compte les nombreux robots d'indexation qui consultent le site. Si une page Web est consultée plusieur fois par jour depuis le même ordinateur, seule la première consultation est enregistrée. Ce ne sont donc pas à proprement parler des "observations brutes" </p>
 </message>
 
 <message id="analyse.surf.msg.shpIncomplete">Veillez sélectionner les 3 fichiers du shapefile (shp, shx et dbf).  </message>
 
-<message id="analyse.surf.msg.ImportGeopackage"> Vous avez chargé une couche vectorielle au format Geopackage. La première couche du geopackage va être utilisée </message>
+<message id="analyse.surf.msg.ImportGeopackage"> Vous avez chargé une couche vectorielle au format Geopackage. La première couche du geopackage va être utilisée. </message>
 
 <message id="Wt.WMessageBox.Yes"> Oui</message>
 <message id="Wt.WMessageBox.No"> Non</message>
