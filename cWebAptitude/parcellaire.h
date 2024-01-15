@@ -72,11 +72,14 @@ public:
 
     statWindow * mStatW;
 
-    class TaskAnaAllPoll : public Task {
-        parcellaire *parcelle;
+    void doComputingTask();
+
+    class TaskComputing : public Task {
+        std::string geoJsonName;
+        groupLayers *mGL;
         void run() override;
     public:
-        TaskAnaAllPoll(parcellaire *parcelle) : parcelle(parcelle){std::cout << "créateur de TaskAnaAllPoll" << std::endl;}
+        TaskComputing (std::string geoJsonName, groupLayers *mGL) : geoJsonName(geoJsonName), mGL(mGL){std::cout << "créateur de TaskAnaAllPoll" << std::endl;}
     };
 
 private:

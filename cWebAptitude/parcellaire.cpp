@@ -475,81 +475,26 @@ void parcellaire::polygoneCadastre(std::string aFileGeoJson, std::string aLabelN
     }
 }
 
-void parcellaire::TaskAnaAllPoll::run(){
-    std::cout << "TaskAnaAllPoll::run()" << std::endl;
-    if (!parcelle->m_app->isLoggedIn()){
-         std::cout << parcelle->id();
-         std::cout << "Et oui, le threadpool marche... Mais il faut regarder les variables à líntérieur du thread qui sont isolés du reste...\n";
 
-        auto messageBox =
-                parcelle->addChild(std::make_unique<Wt::WMessageBox>(
-                             "Analyse surfacique",
-                             tr("parcellaire.anaAllPol.connect"),
-                             Wt::Icon::Information,
-                             Wt::StandardButton::Ok));
-
-        messageBox->setModal(true);
-        messageBox->buttonClicked().connect([=] {
-            parcelle->removeChild(messageBox);
-            parcelle->m_app->showDialogues(0); // les autres fenetres
-            parcelle->m_app->dialog_auth->show();
-            parcelle->m_app->dialog_auth->raiseToFront();
-        });
-        messageBox->show();
-
-   /* } else if (mGL->getNumSelect4Download()> 4){
-
-        auto messageBox =
-                addChild(Wt::cpp14::make_unique<Wt::WMessageBox>(
-                             "Analyse surfacique",
-                             tr("parcellaire.anaAllPol.maxProcess")
-                             ,
-                             Wt::Icon::Information,
-                             Wt::StandardButton::Ok));
-
-        messageBox->setModal(true);
-        messageBox->buttonClicked().connect([=] {
-            removeChild(messageBox);
-        });
-        messageBox->show();
-        */
-    } else {
-
-        auto messageBox =
-                parcelle->addChild(Wt::cpp14::make_unique<Wt::WMessageBox>(
-                             "Analyse surfacique",
-                             tr("parcellaire.anaAllPol.envoiEmail")
-                             ,
-                             Wt::Icon::Information,
-                             Wt::StandardButton::Ok));
-
-        messageBox->setModal(true);
-        messageBox->buttonClicked().connect([=] {
-            parcelle->removeChild(messageBox);
-        });
-        messageBox->show();
-
-        std::string input(parcelle->geoJsonName());// lecture du geojson et pas du shp, comme cela compatible avec polygone du cadastre.
-        const char *inputPath=input.c_str();
-        GDALDataset * mDS =  (GDALDataset*) GDALOpenEx( inputPath, GDAL_OF_VECTOR | GDAL_OF_READONLY, NULL, NULL, NULL );
-        if( mDS != NULL )
-        {
-            // layer
-            OGRLayer * lay = mDS->GetLayer(0);
-            parcelle->mGL->computeStatAllPol(lay);
-            GDALClose(mDS);
-        } else { std::cout << "select dataset mDS is null " << std::endl;}
-    }
-}
-
-/*void parcellaire::anaAllPol(){
-
-    //std::cout << "pool get finished task" << pool->getNunfinishedTasks() << std::endl; échoue donc on a pas accès à l'objet pool (global , instantié dans main.cpp)
-    //pool->add(new parcellaire::TaskAnaAllPoll(this));
+void parcellaire::doComputingTask(){
+    cout << "  get unfinished running tasks" << pool->getNunfinishedTasks() << std::endl;// échoue? donc on a pas accès à l'objet pool (global , instantié dans main.cpp)
+    pool->add(new parcellaire::TaskComputing(geoJsonName(), mGL));
 
     return;
-}*/
+}
 
+void parcellaire::TaskComputing::run(){
+    std::string input(geoJsonName);// lecture du geojson et pas du shp, comme cela compatible avec polygone du cadastre.
+    const char *inputPath=input.c_str();
+    GDALDataset * mDS =  (GDALDataset*) GDALOpenEx( inputPath, GDAL_OF_VECTOR | GDAL_OF_READONLY, NULL, NULL, NULL );
+    if( mDS != NULL )
+    {
+        // layer
+        OGRLayer * lay = mDS->GetLayer(0);
+        mGL->computeStatAllPol(lay);
+        GDALClose(mDS);
+    } else { std::cout << "select dataset mDS is null " << std::endl;}
+}
 
 void parcellaire::anaAllPol(){
 
@@ -587,7 +532,7 @@ void parcellaire::anaAllPol(){
         });
         messageBox->show();
         */
-    } else {
+        } else {
 
         auto messageBox =
                 addChild(Wt::cpp14::make_unique<Wt::WMessageBox>(
@@ -603,7 +548,7 @@ void parcellaire::anaAllPol(){
         });
         messageBox->show();
 
-        std::string input(geoJsonName());// lecture du geojson et pas du shp, comme cela compatible avec polygone du cadastre.
+        /*std::string input(geoJsonName());// lecture du geojson et pas du shp, comme cela compatible avec polygone du cadastre.
         const char *inputPath=input.c_str();
         GDALDataset * mDS =  (GDALDataset*) GDALOpenEx( inputPath, GDAL_OF_VECTOR | GDAL_OF_READONLY, NULL, NULL, NULL );
         if( mDS != NULL )
@@ -612,7 +557,7 @@ void parcellaire::anaAllPol(){
             OGRLayer * lay = mDS->GetLayer(0);
             mGL->computeStatAllPol(lay);
             GDALClose(mDS);
-        } else { std::cout << "select dataset mDS is null " << std::endl;}
+        } else { std::cout << "select dataset mDS is null " << std::endl;}*/
     }
 }
 
