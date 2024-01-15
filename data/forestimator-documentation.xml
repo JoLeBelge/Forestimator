@@ -194,10 +194,7 @@ La cartographie se présente sous la forme d’une collection de couches cartogr
 Pour chaque essence, une carte renseigne le pourcentage en GHA (valeur variant de 0 à 100%). 
 En plus de ces 9 rasters, une couche synthétique nommée "Essence majoritaire" renseigne l'essence majoritaire du peuplement. 
 </p>
-<!--La composition spécifique attribuée à un pixel résulte de l’analyse du peuplement dans lequel il se trouve. Cette carte fournit donc une information valorisable à l’échelle de la parcelle et non de l’arbre.</p>
 
-            <p><img src="../img/compo.jpg" alt="" width="60%"/></p>
-            <p>Illustration de la cartographie des essences pour la bande « chênes » et la bande « hêtre » à l’échelle de la région wallonne.</p>-->
 </message>
 
 <message id="COMPO.version">
@@ -319,7 +316,7 @@ Enfin, outre ces considérations purement microclimatiques, on note que bien sou
 
 <message id="MNT.description">
 <p>Modèle Numérique de Terrain (MNT) de la Wallonie d'une résolution d'un mètre issu d'acquisitions LiDAR effectuées entre le 12/12/2012 et le 09/03/2014.</p>
-<p>Un Modèle Numérique de Terrain (MNT) est une représentation de l'altitude du sol d'une zone déterminée et exclut tous les éléments situés à la surface du sol (bâtiments, ponts, végétation, véhicules, etc.). Cette donnée raster fournit une information sur l'altitude du sol (Z) en tout point du territoire wallon. Il s'agit d'une couverture brute, non lissée.L'acquisition de la donnée a été réalisée avec la technologie LiDAR.Certaines parties très réduites du territoire (notamment les plans d'eau) n'ont pu faire l'objet d'une acquisition de données par la méthode LiDAR. Néanmoins, pour fournir une information sur l'altimétrie (Z) dans ces zones, une interpolation a été réalisée afin de garantir une continuité sur toute la Wallonie.</p>
+<p>Un Modèle Numérique de Terrain (MNT) est une représentation de l'altitude du sol d'une zone déterminée et exclut tous les éléments situés à la surface du sol (bâtiments, ponts, végétation, véhicules, etc.). Cette donnée raster fournit une information sur l'altitude du sol (Z) en tout point du territoire wallon. Il s'agit d'une couverture brute, non lissée.L'acquisition de la donnée a été réalisée avec la technologie LiDAR. Certaines parties très réduites du territoire (notamment les plans d'eau) n'ont pu faire l'objet d'une acquisition de données par la méthode LiDAR. Néanmoins, pour fournir une information sur l'altimétrie (Z) dans ces zones, une interpolation a été réalisée afin de garantir une continuité sur toute la Wallonie.</p>
 <p>Le système de coordonnées de la donnée est le Lambert Belge 72 (EPSG:31370). La référence altimétrique est le Deuxième Nivellement Général (EPSG:5710). La précision planimétrique est inférieure à la résolution du MNS (1 m), et la précision altimétrique est de l'ordre de 0,12 m en absolu sur l'ensemble du territoire.</p>
 </message>
 
@@ -328,14 +325,14 @@ CartoWeb est un service de visualisation à l’écran des données topographiqu
 </message>
 
 <message id="MNH.description">
-La hauteur de la canopée forestière est calculée au départ d'une judicieuse combinaison de la hauteur du sol (MNT - Relief de la Wallonie) et de la hauteur de la surface de la canopée, soit restituée par photogrammétrie, soit déterminé par mesure LiDAR. Les chercheurs forestiers font usage de la photogrammétrie moderne affin de modéliser la hauteur de la canopée forestière depuis des images aériennes acquises chaque année en Région Wallonne. Bien que la précision de cette méthode ne soit pas celle obtenue avec des campagnes de mesure de laser aérien (LiDAR), elle permet à moindre cout de disposer de mesure récente de hauteur de la végétation.
+La hauteur de la canopée forestière est calculée au départ d'une judicieuse combinaison de la hauteur du sol (MNT - Relief de la Wallonie) et de la hauteur de la surface de la canopée, soit restituée par photogrammétrie, soit déterminée par mesure LiDAR. Les chercheurs forestiers font usage de la photogrammétrie moderne afin de modéliser la hauteur de la canopée forestière depuis des images aériennes acquises chaque année en Région wallonne. Bien que la précision de cette méthode ne soit pas celle obtenue avec des campagnes de mesure de laser aérien (LiDAR), elle permet à moindre coût de disposer de mesures récentes de hauteur de la végétation.
 
 <br></br>
-<h4>Une série temporelle de Modèle Numérique de Hauteur</h4>
-Une série temporelle de Modèles Numérique de Hauteur est ainsi mise à disposition sur le portail cartographique Forestimator : les années pour lesquelles la hauteur est modélisée sont 2006, 2009, 2012, 2014 (première acquisition LiDAR sur l'ensemble de la région Wallonne), 2015, 2016, 2018, 2019, 2020 et 2021 (deuxième acquisition LiDAR). Cette série temporelle peut avantageusement être utilisée pour la détection des zones de coupes ou d'éclaircie ainsi que pour la modélisation de la croissance en hauteur des peuplements équiens.
+<h4>Une série temporelle de Modèles Numériques de Hauteur</h4>
+Une série temporelle de Modèles Numérique de Hauteur est ainsi mise à disposition sur le portail cartographique Forestimator : les années pour lesquelles la hauteur est modélisée sont 2006, 2009, 2012, 2014 (première acquisition LiDAR sur l'ensemble de la région wallonne), 2015, 2016, 2018, 2019, 2020 et 2021 (deuxième acquisition LiDAR). Cette série temporelle peut avantageusement être utilisée pour la détection des zones de coupes ou d'éclaircie ainsi que pour la modélisation de la croissance en hauteur des peuplements équiens.
 
 <h4>Note pour les usagers qui souhaitent télécharger et utiliser les MNHs</h4>
-Affin de minimiser le volume de donnée informatique, les MNH sont disponibles au téléchargement à une résolution de 2 mètres (format raster). Par ailleurs, les valeurs renseignées dans la couche cartographique raster sont le plus souvent exprimée en cm et non en mètre. Un gain de 0.01 doit donc être appliqué en multipliant la valeur des pixels pour obtenir la mesure en mètre. 
+Affin de minimiser le volume de données informatiques, les MNH sont disponibles au téléchargement à une résolution de 2 mètres (format raster). Par ailleurs, les valeurs renseignées dans la couche cartographique raster sont le plus souvent exprimées en cm et non en mètre. Un gain de 0.01 doit donc être appliqué en multipliant la valeur des pixels pour obtenir la mesure en mètre. 
 
 <div>
 <img src="../img/CHM_schema.jpg" alt="" width="60%"/>

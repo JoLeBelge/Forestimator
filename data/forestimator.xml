@@ -10,37 +10,6 @@
  <message id="ana.point.titre">  Forestimator - info ponctuelle </message>
  <message id="ana.point.error.exportpdf.noStation"> Aucune analyse ponctuelle à exporter en pdf  </message>
 
-<!-- OLD OLD
-<message id="infoTelechargement">
-Plusieurs possibilités vous sont proposées. Vous avez la possibilité de télécharger votre shapefile précédemment chargé via l'onglet "Plan d'Aménagement". Les statistiques calculées pour les couches (exemple : couches d'aptitude) seront disponibles dans la table d'attributs. Vous avez la possibilité de télécharger les couches raster correspondant uniquement à l'étendue de votre zone d'intérêt, c'est-à-dire l'emprise du shapefile que vous avez chargé. Vous pouvez également télécharger les couches raster sur l'ensemble de la Région Wallonne, mais la taille des fichiers sera alors conséquente.
-</message>
- <message id="infoTelechargementShp">
-Sélectionnez ci-dessus les couches pour lesquelles vous désirez ajouter les statistiques dans la table d'attributs de votre shapefile. Ensuite, appuyez sur le bouton de téléchargement.</message>
-
-  <message id="infoTelechargementRaster">Sélectionnez ci-dessus les couches que vous désirez télécharger. Il est préférable de découper la couche sur l'emprise d'un shapefile que vous aurez préalablement chargé via l'onglet "plan d'aménagement".</message>
- 
- <message id="cb_decoupeShp">Découper les cartes avec l'emprise du shp</message>
-
-
- <message id="infoParcellaire">Chargez un shapefile au format ESRI afin d'effectuer le calcul de statistique pour les aptitudes des essences (Fichier Écologique des Essences) qui seront ajoutées dans la table d'attribut de votre shapefile. Vous pouvez également télécharger les cartes qui vous intéressent sur l'emprise de votre shapefile.</message>
-
-<message id="infoChoixLayerStat">Vous pouvez choisir dans le tableau ci-dessous les essences pour lesquelles vous souhaitez effectuer le calcul de statistique.</message>
-
-<message id="infoCalculStat">Par défaut, le calcul de statistique sur les cartes d'aptitude détermine la proportion de surface pour laquelle l'essence est strictement en Optimum. Vous avez néanmoins le choix avec l'option ci-dessous de calculer la proportion de surface pour laquelle l'essence est en Optimum ou en Tolérance.</message>
-
-<message id="cb_fusionAptOT">Calcul de la proportion de surface en Optimum ou en Tolérance</message>
-
-<message id="infoVisuStat">La visualisation des statistiques permet un affichage des proportions de surface pour chaque classe d'aptitude. Pour l'instant, il s'agit uniquement des statistiques pour l'ensemble de tous les polygones de votre shapefile.</message>
-
-
-<message id="infoDownloadClippedRaster">
-<h4>Télécharger les couches géographiques au format raster</h4>
-Vous pouvez télécharger les cartes listées ci-dessous qui seront découpées sur l'emprise de votre shapefile. Une visualisation des statistiques de ces couches pour un polygone donné est également possible en appuyant sur le polygone tout en gardant la touche SHIFT enfoncée.
-</message>
-
- -->
-
-
 <message id="tooltipMap1">Double-cliquer sur une station pour afficher sa description dans l'onglet légende.</message>
 
 <message id="tooltipMap2">Double-cliquer sur une station pour afficher sa description dans l'onglet "Info Ponctuelle". Enfoncez la touche SHIFT et cliquez sur un polygone de votre shapefile pour afficher les statistiques. Les couches sélectionnées dans la section "Analyse" feront l'objet d'une synthèse sur cette surface. </message>
@@ -69,7 +38,6 @@ Vous pouvez télécharger les cartes listées ci-dessous qui seront découpées 
 <message id="panier.download_tooltip">Permet de télécharger la carte sélectionnée (en gras) au format TIF selon l'emprise actuelle</message>
 
 
-
 <message id="anaStep1"><h3>1 : Sélectionner une couche de référence</h3></message>
 <message id="anaStep2"><h3>2 : Sélectionner l'analyse</h3></message>
 <message id="anaStep3"><h3>3 : Exécuter l'analyse</h3> <br></br>
@@ -85,9 +53,7 @@ Effectuer une analyse pour un polygone de votre shapefile en cliquant dessus tou
 <message id="groupeCoucheThem">Conditions stationnelles</message>
 <message id="groupeCouchePeup">Cartographie des peuplements</message>
 <message id="groupeCoucheAptFEE">Aptitude des essences</message>
-<message id="groupeCoucheAptCS">Aptitude des essences (Catalogue de stations)</message>
-<!--<message id="groupeCoucheKKCS">Habitats et potentiel sylvicole</message>-->
-<message id="groupeCoucheKKCS">Couches thématiques (Catalogue de stations)</message>
+<message id="groupeCoucheAptCS">Essences recommandées par les Guides des stations</message>
 
 <message id="titreEcogramme"><h4>Écogramme : aptitude hydro-trophique pour cette zone bioclimatique</h4></message>
 <message id="legendEcogrammeOLD">L'abscisse représente les niveaux trophiques, allant du plus acide à gauche vers les sols carbonatés à droite. L'ordonnée représente le gradient hydrique, avec les stations sèches en haut, humide en bas, et à régime hydrique alternatif sur l'encart à part en bas.</message>
@@ -126,9 +92,6 @@ Effectuer une analyse pour un polygone de votre shapefile en cliquant dessus tou
   <message id="Wt.Auth.passwdqc.reason-seq">
     Mot de passe trop basique
   </message>
-
-<!-- LoginWidget -->
-
   <message id="Wt.Auth.login-form-title">Connexion</message>
   <message id="Wt.Auth.login-form-info"></message>
   <message id="Wt.Auth.user-name">Nom d'utilisateur</message>
@@ -156,8 +119,6 @@ Effectuer une analyse pour un polygone de votre shapefile en cliquant dessus tou
   
   <message id="Wt.Auth.logout">Se déconnecter</message>
   <message id="Wt.Auth.throttle-retry">Réessayer dans {1}s</message>
-
-  <!-- RegistrationWidget -->
 
   <message id="Wt.Auth.registration-form-title">Inscription</message>
   <message id="Wt.Auth.registration-form-info">Compléter les informations pour vous enregistrer.</message>
@@ -763,7 +724,7 @@ Des modèles dendrométriques sont implémentés pour l'estimation de la densit�
 <message id="meta.desc.sous_secteurs-et-topo">Sous-secteurs radiatifs et situation topographique sont deux manières de représenter la position d'une station forestière dans le paysage. La topographie de la station va avoir de multiples influences sur les conditions environnementales ; température, humidité.</message>
 <message id="meta.titre.sous_secteurs-et-topo">Les sous-secteurs radiatifs et la situation topographiques des stations forestières</message>
 
-<message id="meta.desc.hauteur-de-la-v_g_tation">Les Modèles Numériques de Hauteur de la végétation, ou Modèle Numérique de Canopée, sont des couches cartographiques qui décrivent la hauteur de la canopée. La hauteur des arbres est un paramètre de structure qui permet de caractériser un peuplement, du point de vue de sa maturité et de sa densité. Le portail cartographique propose la visualisation et le téléchargement d'une série temporelle de modèle numérique de hauteur, s'étalant entre 2006 et 2021. Cette série temporelle est obtenue par combinaison des Modèles Numériques de Hauteur issues des deux campagnes LiDAR (2014 et 2021) avec les modèles numériques de hauteurs calculé par photogrammétrie sur base des images aériennes de la région Wallonne.</message>
+<message id="meta.desc.hauteur-de-la-v_g_tation">Les Modèles Numériques de Hauteur de la végétation, ou Modèle Numérique de Canopée, sont des couches cartographiques qui décrivent la hauteur de la canopée. La hauteur des arbres est un paramètre de structure qui permet de caractériser un peuplement, du point de vue de sa maturité et de sa densité. Le portail cartographique propose la visualisation et le téléchargement d'une série temporelle de modèle numérique de hauteur, s'étalant entre 2006 et 2021. Cette série temporelle est obtenue par combinaison des Modèles Numériques de Hauteur issues des deux campagnes LiDAR (2014 et 2021) avec les modèles numériques de hauteurs calculé par photogrammétrie sur base des images aériennes de la région wallonne.</message>
 <message id="meta.titre.hauteur-de-la-v_g_tation">Les Modèles Numériques de Hauteur de la végétation.</message>
 
 <message id="meta.desc.forestimator-_-pr_sentation">Au service des forestiers de Wallonie, Forestimator permet à quiconque de consulter et de télécharger des informations cartographiques décrivant les stations forestières et les peuplements.</message>
@@ -775,21 +736,21 @@ La composition spécifique est renseignée par 9 couches cartographiques, indiqu
 
 <message id="meta.desc.crise-du-scolyte"> Les scolytes sont des insectes ravageurs qui sont naturellement présents en forêt. 
 Les typographes ont profité des conditions météorologiques propices de 2018 pour se multiplier au point de provoquer une crise sanitaire qui touche durement l'épicéa en Europe, et notamment en Wallonie.
-Les dégâts qu'ils ont provoqués sont quantifiés et spatialisés pour la Région Wallonne par télédétection, au moyen de nombreuses prises de vues satellites. 
+Les dégâts qu'ils ont provoqués sont quantifiés et spatialisés pour la Région wallonne par télédétection, au moyen de nombreuses prises de vues satellites. 
 Un suivi de l'état sanitaire des pessières est réalisé en vue d'identifier la dynamique des foyers d'infections et afin de quantifier l'ampleur des dégats. </message>
-<message id="meta.titre.crise-du-scolyte">La crise du scolyte (typographe) en pessière Wallonne</message>
+<message id="meta.titre.crise-du-scolyte">La crise du scolyte (typographe) en pessière wallonne</message>
 
 <message id="meta.desc.mod_le-dendro"> Les peuplements résineux d'épicéa commun et de douglas font l'objet d'une description dendrométriques en terme de hauteur dominante, de surface terrière, de volume à l'hectare, de nombre de tiges par hectare et de circonférence moyenne. Toutes ces informations sont calculées depuis un modèle numérique de hauteur et sont valables pour l'année 2018.</message>
 <message id="meta.titre.mod_le-dendro">Description dendrométrique des peuplements résineux</message>
 
-<message id="meta.desc.masque-forestier"> Cela semble simple, mais discriminer précisément les zones forestières, haies et arbres isolés d'une part, des surfaces non boisées d'autre part, n'est pas trivial. Le masque forestier est dédié à cet usage : il nous informe ou se trouve la forêt en Région Wallonne. </message>
+<message id="meta.desc.masque-forestier"> Cela semble simple, mais discriminer précisément les zones forestières, haies et arbres isolés d'une part, des surfaces non boisées d'autre part, n'est pas trivial. Le masque forestier est dédié à cet usage : il nous informe ou se trouve la forêt en Région wallonne. </message>
 <message id="meta.titre.masque-forestier">Le masque forestier nous renseigne là où il y a de la forêt</message>
 
 <message id="meta.titre.forestimator-api">Les géo-services de la plateforme Forestimator</message>
 <message id="meta.desc.forestimator-api">Des géo-services permettent d'effectuer des calculs à l'échelle d'une surface délimitée par un polygone, dans le but de préparer un plan d'aménagement sur une propriété forestière. </message>
 
 <message id="meta.titre.forestimator-api">Capacité de Réserve en eau des sols</message>
-<message id="meta.desc.r_serve-en-eau"> Cartographie de la réserve eau des sols pour une meilleure perception de la vulnérabilité des stations forestières.</message>
+<message id="meta.desc.r_serve-en-eau"> Cartographie de la réserve en eau des sols pour une meilleure perception de la vulnérabilité des stations forestières.</message>
 
 
 <message id="cadastre.commune">Commune / INS</message>

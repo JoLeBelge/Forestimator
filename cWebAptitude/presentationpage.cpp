@@ -1,24 +1,9 @@
 #include "presentationpage.h"
 
-//int nbAds(5); // Ads = advertising
 int globMaxDownloadFileS(1000);
-// creation d'une bannières de pub (ads banner) pour faire défiler des informations descriptives du sites
+
 presentationPage::presentationPage(cDicoApt *aDico, cWebAptitude *app):mDico(aDico),m_app(app)
 {
-    /* OLD mettre la bannière dans un stacked widget, je pense que c'est pas la super solution..
-    adsBanner = addNew<WStackedWidget>();
-    // chargement des contenus de la bannière
-    for (int i(1); i<nbAds+1;i++){
-        Wt::WContainerWidget * cont =adsBanner->addNew<WContainerWidget>();
-        //cont->addStyleClass("carto_menu"); non car contient l'image de fond
-        cont->addNew<Wt::WText>(Wt::WText::tr("presentation-ad"+std::to_string(i)));
-    }
-    // j'ai testé toutes les solutions trouvées sur le net, asio de boost, plein de timer (souvent bloquant), finalement le Wtimer est juste super
-   Wt::WTimer * timer = this->addChild(std::make_unique<Wt::WTimer>());
-   timer->setInterval(std::chrono::seconds(7));
-   timer->timeout().connect(this, &presentationPage::bannerAnimation);
-   timer->start();*/
-
 
     // création d'un menu à gauche, co dans wt widget gallery
     Wt::WHBoxLayout * hLayout = setLayout(std::make_unique<Wt::WHBoxLayout>());
@@ -38,10 +23,7 @@ presentationPage::presentationPage(cDicoApt *aDico, cWebAptitude *app):mDico(aDi
 
     subMenu_->setInternalPathEnabled("/documentation");
 
-    // probleme https://redmine.webtoolkit.eu/boards/2/topics/1206, j'ai plein de session qui se lancent quand je veux accèder à l'internal path d'une documentation
-
     // introduction forestimator
-    //std::unique_ptr<Wt::WMenuItem> item = std::make_unique<Wt::WMenuItem>("Forestimator : présentation", std::make_unique<Wt::WText>(WString::tr("page_presentation")));
     std::unique_ptr<Wt::WMenuItem> item = std::make_unique<Wt::WMenuItem>("Forestimator : présentation");
     Wt::WContainerWidget * c0 = new Wt::WContainerWidget();
     c0->addNew<WText>(WString::tr("ref.article.forestimator"));
@@ -117,7 +99,6 @@ presentationPage::presentationPage(cDicoApt *aDico, cWebAptitude *app):mDico(aDi
                         Wt::WPushButton * b2 = t->elementAt(row, 5)->addWidget(std::make_unique<Wt::WPushButton>("télécharger le qml"));
                         t->elementAt(row, 5)->setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Middle);
                         Wt::WLink loadLink2 = Wt::WLink("/telechargement/"+l->Code()+"qml");
-                        //b->clicked().connect([=]{m_app->addLog(l->Code(),typeLog::dsingleRW);});
                         b2->setLink(loadLink2);
                     }
                 }
@@ -169,7 +150,5 @@ presentationPage::presentationPage(cDicoApt *aDico, cWebAptitude *app):mDico(aDi
 
     hLayout->addWidget(std::move(subMenu));
     hLayout->addWidget(std::move(subStack),1);
-
-
 
 }
