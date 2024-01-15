@@ -4,8 +4,17 @@ import 'package:url_launcher/url_launcher.dart';
 import 'dart:math';
 import 'package:latlong2/latlong.dart';
 import 'package:proj4dart/proj4dart.dart' as proj4;
+import 'dico/dicoApt.dart';
+import 'package:provider/provider.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
-void main() {
+void main() async {
+  sqfliteFfiInit();
+  databaseFactory = databaseFactoryFfi;
+
+  dicoAptProvider dico = new dicoAptProvider();
+  await dico.init();
+
   runApp(const MyApp());
 }
 
