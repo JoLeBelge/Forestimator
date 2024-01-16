@@ -7,6 +7,7 @@ import 'package:proj4dart/proj4dart.dart' as proj4;
 import 'dico/dicoApt.dart';
 import 'package:provider/provider.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'dart:math' as math;
 
 void main() async {
   sqfliteFfiInit();
@@ -71,13 +72,33 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
 
-  var maxZoom = (256).toDouble();
+  Point ptEpioux = Point(217200.0, 50100.0);
+  //var maxZoom = (256).toDouble();
+  var zoomI = (6).toDouble();
+  var aproj4string = proj4.Projection.add('EPSG:31370',
+      '+proj=lcc +lat_1=51.16666723333333 +lat_2=49.8333339 +lat_0=90 +lon_0=4.367486666666666 +x_0=150000.013 +y_0=5400088.438 +ellps=intl +towgs84=-106.8686,52.2978,-103.7239,0.3366,-0.457,1.8422,-1.2747 +units=m +no_defs +type=crs');
+  final epsg31370Bounds = Bounds<double>(
+    Point<double>(42250.0, 21170.0), // lower left
+    Point<double>(295170.0, 167700.0), // upper right
+  );
 
-  var epsg31370CRS = Proj4Crs.fromFactory(
-    code: 'EPSG:31370',
-    proj4Projection: proj4.Projection.add('EPSG:31370',
-        '+proj=lcc +lat_1=51.16666723333333 +lat_2=49.8333339 +lat_0=90 +lon_0=4.367486666666666 +x_0=150000.013 +y_0=5400088.438 +ellps=intl +towgs84=-106.8686,52.2978,-103.7239,0.3366,-0.457,1.8422,-1.2747 +units=m +no_defs +type=crs'),
-    resolutions: const <double>[
+  double tileSize = 256.0;
+  List<double> getResolutions(double maxX, double minX, int zoom,
+      [double tileSize = 256.0]) {
+    var size = (maxX - minX) / tileSize;
+
+    return List.generate(zoom, (z) => size / math.pow(2, z));
+  }
+
+  //List<double> resolutions = getResolutions(295170.0, 42250.0, 8,256.0);
+
+  late var epsg31370CRS = Proj4Crs.fromFactory(
+      code: 'EPSG:31370',
+      proj4Projection: aproj4string,
+      origins: [ptEpioux],
+      bounds: epsg31370Bounds,
+      resolutions: getResolutions(295170.0, 42250.0, 8,
+          256.0) /*const <double>[
       32768,
       16384,
       8192,
@@ -100,8 +121,8 @@ class _MyHomePageState extends State<MyHomePage> {
       4.0,
       2.0
     ],
-    transformation: null,
-  );
+    transformation: null,*/
+      );
 
   void _incrementCounter() {
     setState(() {
@@ -117,9 +138,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return FlutterMap(
-      options: const MapOptions(
-        initialZoom: 0.0,
-      ),
+      options: MapOptions(crs: epsg31370CRS, initialZoom: zoomI, maxZoom: 8),
       children: [
         TileLayer(
           //urlTemplate: 'https://gxgfservcarto.gxabt.ulg.ac.be/cgi-bin/mnh_wms/{z}/{x}/{y}.png',
@@ -132,7 +151,7 @@ class _MyHomePageState extends State<MyHomePage> {
             crs: epsg31370CRS,
             transparent: false,
           ),
-          tileSize: 512,
+          tileSize: tileSize,
         ),
         RichAttributionWidget(
           attributions: [
@@ -148,7 +167,8 @@ class _MyHomePageState extends State<MyHomePage> {
             Marker(
               width: 5.0,
               height: 5.0,
-              point: LatLng(49.9333339, 4.66748666666667),
+              point: LatLng(5.6,
+                  50.0), //epsg31370CRS.pointToLatLng(ptEpioux, 0.0),fonctionne pas , pas bon signe
               child: const FlutterLogo(),
             ),
           ],
