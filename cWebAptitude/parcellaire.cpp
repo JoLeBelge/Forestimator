@@ -478,8 +478,8 @@ void parcellaire::polygoneCadastre(std::string aFileGeoJson, std::string aLabelN
 
 void parcellaire::doComputingTask(){
     cout << "  get unfinished running tasks" << pool->getNunfinishedTasks() << std::endl;// échoue? donc on a pas accès à l'objet pool (global , instantié dans main.cpp)
-    pool->add(new parcellaire::TaskComputing(geoJsonName(), mGL));
 
+    pool->add(new parcellaire::TaskComputing(geoJsonName(), mGL));
     return;
 }
 
@@ -547,7 +547,7 @@ void parcellaire::anaAllPol(){
             removeChild(messageBox);
         });
         messageBox->show();
-
+        this->doComputingTask(); // Demarre le threadpool
         /*std::string input(geoJsonName());// lecture du geojson et pas du shp, comme cela compatible avec polygone du cadastre.
         const char *inputPath=input.c_str();
         GDALDataset * mDS =  (GDALDataset*) GDALOpenEx( inputPath, GDAL_OF_VECTOR | GDAL_OF_READONLY, NULL, NULL, NULL );
