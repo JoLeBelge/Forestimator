@@ -486,13 +486,16 @@ void parcellaire::doComputingTask(){
 void parcellaire::TaskComputing::run(){
     std::string input(geoJsonName);// lecture du geojson et pas du shp, comme cela compatible avec polygone du cadastre.
     const char *inputPath=input.c_str();
+    cout << input.c_str();
     GDALDataset * mDS =  (GDALDataset*) GDALOpenEx( inputPath, GDAL_OF_VECTOR | GDAL_OF_READONLY, NULL, NULL, NULL );
     if( mDS != NULL )
     {
         // layer
         OGRLayer * lay = mDS->GetLayer(0);
         mGL->computeStatAllPol(lay);
-        GDALClose(mDS);
+
+        GDALClose(mDS); // Les breakpoints vont jusqu'ici...
+
     } else { std::cout << "select dataset mDS is null " << std::endl;}
 }
 
@@ -547,8 +550,9 @@ void parcellaire::anaAllPol(){
             removeChild(messageBox);
         });
         messageBox->show();
-        this->doComputingTask(); // Demarre le threadpool
-        /*std::string input(geoJsonName());// lecture du geojson et pas du shp, comme cela compatible avec polygone du cadastre.
+        //this->doComputingTask(); // Demarre le threadpool
+
+        std::string input(geoJsonName());// lecture du geojson et pas du shp, comme cela compatible avec polygone du cadastre.
         const char *inputPath=input.c_str();
         GDALDataset * mDS =  (GDALDataset*) GDALOpenEx( inputPath, GDAL_OF_VECTOR | GDAL_OF_READONLY, NULL, NULL, NULL );
         if( mDS != NULL )
@@ -557,7 +561,7 @@ void parcellaire::anaAllPol(){
             OGRLayer * lay = mDS->GetLayer(0);
             mGL->computeStatAllPol(lay);
             GDALClose(mDS);
-        } else { std::cout << "select dataset mDS is null " << std::endl;}*/
+        } else { std::cout << "select dataset mDS is null " << std::endl;}
     }
 }
 
