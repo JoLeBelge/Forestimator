@@ -85,7 +85,8 @@ class layerBase {
 class dicoAptProvider {
   late Database db; // execution error
   final databaseName =
-      '/home/jo/app/Forestimator/carteApt/data/aptitudeEssDB.db';
+      /*'/home/jo/app/Forestimator/carteApt/data/aptitudeEssDB.db';*/
+      '/home/tt/Desktop/Forestimator/dataBases:-)/aptitudeEssDB.db';
   Map<String, Color> colors = {};
 
   Future<void> init() async {

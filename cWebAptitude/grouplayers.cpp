@@ -349,7 +349,7 @@ void groupLayers::computeStatGlob(OGRGeometry *poGeomGlobale){
 }
 
 
-void groupLayers::computeStatAllPol(OGRLayer * lay){
+void groupLayers::computeStatAllPol(OGRLayer * lay, WFileResource *fileRessource){
     std::cout << " computeStatAllPol::computeStatAllPol " << std::endl;
     std::string name0 = std::tmpnam(nullptr);
     std::string name1 = name0.substr(5,name0.size()-5);
@@ -400,11 +400,12 @@ void groupLayers::computeStatAllPol(OGRLayer * lay){
 
     aFile.close();
 
-    WFileResource *fileResource = new Wt::WFileResource("text/xml",aOut);
-    fileResource->suggestFileName("Forestimator-statistiques.xml");
-    m_app->redirect(fileResource->url());
-
+    fileRessource->setFileName(aOut);
+    /*
+    fileRessource->suggestFileName("Forestimator-statistiques.xml");
+    m_app->redirect(fileRessource->url());
     m_app->addLog("compute stat AllPol, "+std::to_string(getNumSelect4Download())+" traitements",typeLog::anas); // add some web stats
+    */
 }
 
 /**
