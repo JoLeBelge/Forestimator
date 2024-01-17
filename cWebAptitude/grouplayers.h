@@ -123,7 +123,7 @@ public:
     void computeStatGlob(OGRGeometry *poGeomGlobale);
 
     // avec un retour qui est un fichier texte à télécharger
-    void computeStatAllPol(OGRLayer * lay);
+    void computeStatAllPol(OGRLayer * lay, WFileResource *fileRessource);
 
     ST * mStation;
     std::vector<std::shared_ptr<Layer>> Layers(){ return mVLs;}

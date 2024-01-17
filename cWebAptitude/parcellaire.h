@@ -77,9 +77,13 @@ public:
     class TaskComputing : public Task {
         std::string geoJsonName;
         groupLayers *mGL;
+        WFileResource *fileRessource;
         void run() override;
     public:
-        TaskComputing (std::string geoJsonName, groupLayers *mGL) : geoJsonName(geoJsonName), mGL(mGL){std::cout << "créateur de TaskAnaAllPoll" << std::endl;}
+        TaskComputing (std::string geoJsonName, groupLayers *mGL, WFileResource *fileRessource) :
+            geoJsonName(geoJsonName), mGL(mGL), fileRessource(fileRessource){
+            std::cout << "créateur de TaskAnaAllPoll" << std::endl;
+        }
     };
 
 private:
