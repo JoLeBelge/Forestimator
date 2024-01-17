@@ -1,0 +1,24 @@
+To do list fforestimator
+------------------------
+
+-chemin accès BD aptitudeEssDB.db sur les différentes machines de développements (TT et jo) et sur les devices (mobile android) -> ajouter dans "assets" de l'appli
+-sharded lib sqflite pour android?
+
+JO -> dicoCNSW pour couche raster associée? outch..
+
+TT ->création interface graphique pour le catalogue de couches carto+ ma selection de couche
+TT ->création interface graphique pour afficher la légende d'une couche (utilisation dicoVal et dicoCol de layerBase)
+- connexion avec GPS mobile et center la carte sur la position 
+TT -> création interface graphique pour afficher le résultat d'une analyse ponctuelle (avec event onTap sur la map, par exemple)
+
+- analyse ponctuelle avec accès internet ; requête à l'API Forestitmator 
+	 JO-> API forestimator ; output en json pour fforestimator. Une requête unique pour plusieurs couches/traitements (voir comment j'ai fait pour "aptitude")
+	 -> output en json, pour chaque couche ; deux format, un format "raw" avec valeur raster, un format "décodé" avec les significations (ex; CNSW). 
+
+JO -> FMTC des tuiles WMS
+Jo -> bulk download raster clipped (dans une bd sqlite en BLOB?) 
+Jo-> modif api Forestimator pour requêtes d'un raster sur un extend donné
+Jo-> lecture tif sous android (dart Images?) 
+
+
+
