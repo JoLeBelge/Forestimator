@@ -4,8 +4,8 @@ build-carteApt/
 build-WebAptitude/
 build-WebAptitudeDebug/
 build-stationDescriptor/
-carteApt/data/aptitudeEssDB.db
-carteApt/data/aptitudeEssDB.db-*
+#carteApt/data/aptitudeEssDB.db
+#carteApt/data/aptitudeEssDB.db-*
 carteApt/data/carteFEE_NTpH.db-*
 carteApt/carteApt.pro.*
 cWebAptitude/cWebAptitude.pro.user.*
