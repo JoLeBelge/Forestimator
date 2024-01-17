@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -72,11 +74,13 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
 
-  Point ptEpioux = Point(217200.0, 50100.0);
-  //var maxZoom = (256).toDouble();
-  var zoomI = (6).toDouble();
-  var aproj4string = proj4.Projection.add('EPSG:31370',
-      '+proj=lcc +lat_1=51.16666723333333 +lat_2=49.8333339 +lat_0=90 +lon_0=4.367486666666666 +x_0=150000.013 +y_0=5400088.438 +ellps=intl +towgs84=-106.8686,52.2978,-103.7239,0.3366,-0.457,1.8422,-1.2747 +units=m +no_defs +type=crs');
+//https://github.com/fleaflet/flutter_map/blob/master/example/lib/pages/custom_crs/custom_crs.dart
+  late proj4.Projection epsg4326 = proj4.Projection.get('EPSG:4326')!;
+  // si epsg31370 est dans la db proj 4, on prend, sinon on définit
+  proj4.Projection epsg31370 = proj4.Projection.get('EPSG:31370') ??
+      proj4.Projection.add('EPSG:31370',
+          '+proj=lcc +lat_1=51.16666723333333 +lat_2=49.8333339 +lat_0=90 +lon_0=4.367486666666666 +x_0=150000.013 +y_0=5400088.438 +ellps=intl +towgs84=-106.8686,52.2978,-103.7239,0.3366,-0.457,1.8422,-1.2747 +units=m +no_defs +type=crs');
+// map extend in BL72.
   final epsg31370Bounds = Bounds<double>(
     Point<double>(42250.0, 21170.0), // lower left
     Point<double>(295170.0, 167700.0), // upper right
@@ -85,44 +89,16 @@ class _MyHomePageState extends State<MyHomePage> {
   double tileSize = 256.0;
   List<double> getResolutions(double maxX, double minX, int zoom,
       [double tileSize = 256.0]) {
-    var size = (maxX - minX) / tileSize;
-
+    // résolution numéro 1: une tile pour tout l'extend de la Wallonie
+    var size = (maxX - minX) / (tileSize);
     return List.generate(zoom, (z) => size / math.pow(2, z));
   }
 
-  //List<double> resolutions = getResolutions(295170.0, 42250.0, 8,256.0);
-
   late var epsg31370CRS = Proj4Crs.fromFactory(
       code: 'EPSG:31370',
-      proj4Projection: aproj4string,
-      origins: [ptEpioux],
+      proj4Projection: epsg31370,
       bounds: epsg31370Bounds,
-      resolutions: getResolutions(295170.0, 42250.0, 8,
-          256.0) /*const <double>[
-      32768,
-      16384,
-      8192,
-      4096,
-      2048,
-      1024,
-      512,
-      256,
-      128,
-    ],
-    scales: const <double>[
-      1024.0,
-      512.0,
-      256.0,
-      128.0,
-      64.0,
-      32.0,
-      16.0,
-      8.0,
-      4.0,
-      2.0
-    ],
-    transformation: null,*/
-      );
+      resolutions: getResolutions(295170.0, 42250.0, 8, 256.0));
 
   void _incrementCounter() {
     setState(() {
@@ -137,12 +113,36 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    proj4.Point ptEpioux = proj4.Point(x: 217200.0, y: 50100.0);
+    proj4.Point ptBotLeft = proj4.Point(
+        x: epsg31370Bounds.bottomLeft.x, y: epsg31370Bounds.bottomLeft.y);
+    proj4.Point ptTopR = proj4.Point(
+        x: epsg31370Bounds.topRight.x, y: epsg31370Bounds.topRight.y);
+
+    // WARNING lat =y lon=x
+    LatLng latlonEpioux = LatLng(epsg31370.transform(epsg4326, ptEpioux).y,
+        epsg31370.transform(epsg4326, ptEpioux).x);
+
+    // contraindre la vue de la map sur la zone de la Wallonie. ajout d'un peu de marge
+    double margeInDegree = 0.1;
+    LatLng latlonBL = LatLng(
+        epsg31370.transform(epsg4326, ptBotLeft).y + margeInDegree,
+        epsg31370.transform(epsg4326, ptBotLeft).x - margeInDegree);
+    LatLng latlonTR = LatLng(
+        epsg31370.transform(epsg4326, ptTopR).y - margeInDegree,
+        epsg31370.transform(epsg4326, ptTopR).x + margeInDegree);
+
     return FlutterMap(
-      options: MapOptions(crs: epsg31370CRS, initialZoom: zoomI, maxZoom: 8),
+      options: MapOptions(
+        crs: epsg31370CRS,
+        initialZoom: 2,
+        maxZoom: 7,
+        initialCenter: latlonEpioux,
+        cameraConstraint: CameraConstraint.contain(
+            bounds: LatLngBounds.fromPoints([latlonBL, latlonTR])),
+      ),
       children: [
         TileLayer(
-          //urlTemplate: 'https://gxgfservcarto.gxabt.ulg.ac.be/cgi-bin/mnh_wms/{z}/{x}/{y}.png',
-          //userAgentPackageName: 'com.example.app',
           wmsOptions: WMSTileLayerOptions(
             baseUrl:
                 "http://gxgfservcarto.gxabt.ulg.ac.be/cgi-bin/forestimator?",
@@ -151,6 +151,7 @@ class _MyHomePageState extends State<MyHomePage> {
             crs: epsg31370CRS,
             transparent: false,
           ),
+          //maxNativeZoom: 7,
           tileSize: tileSize,
         ),
         RichAttributionWidget(
@@ -165,10 +166,9 @@ class _MyHomePageState extends State<MyHomePage> {
         MarkerLayer(
           markers: [
             Marker(
-              width: 5.0,
-              height: 5.0,
-              point: LatLng(5.6,
-                  50.0), //epsg31370CRS.pointToLatLng(ptEpioux, 0.0),fonctionne pas , pas bon signe
+              width: 50.0,
+              height: 50.0,
+              point: latlonEpioux,
               child: const FlutterLogo(),
             ),
           ],

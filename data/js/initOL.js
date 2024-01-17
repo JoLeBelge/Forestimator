@@ -112,7 +112,7 @@ le tileGrid est une astuce assez lourde à mettre en place pour le chargement de
 var resolutions = new Array(22);
 var startResolution = (extent[2]-extent[0]) / 512;
 for (var i = 0, ii = resolutions.length; i < ii; ++i) {
-	resolutions[i] = startResolution / Math.pow(2, i);
+	resolutions[i] = startResolution / Math.pow(2, i);	
 }
 tileGrid = new ol.tilegrid.TileGrid({
 	extent: extent,
@@ -120,7 +120,7 @@ tileGrid = new ol.tilegrid.TileGrid({
 	tileSize: [512, 512]
 });
 
-//console.log(resolutions);
+console.log(resolutions);
 
 //var res_ndvi=[384.02176,192.01088,96.00544,48.00272,24.00136,12.00068,6.00034,3.00017];
 var res_ndvi=[384.0576,192.0288,96.0144,48.0072,24.0036,12.0018,6.0009,3.00045];
