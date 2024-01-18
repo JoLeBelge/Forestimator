@@ -26,6 +26,9 @@ int launchForestimator(int argc, char **argv)
     cDicoApt *dico=new cDicoApt(aBD);
 
     stationDescResource resource(dico);
+    rasterClipResource rClipRaster(dico);
+    anaPonctuelleResource anaPonctResource(dico);
+
     try {
         Wt::WServer server{argc, argv, WTHTTP_CONFIGURATION};
 
@@ -40,6 +43,11 @@ int launchForestimator(int argc, char **argv)
 
         // pour avoir la table dictionnaire
         server.addResource(&resource, "/api/${tool}");
+
+        // exemple http://localhost:8085/api/clipRast/layerCode/EP_FEE/xmin/200000.0/ymin/80000.0/xmax/250000.0/ymax/100000.0/toto.tif
+        server.addResource(&rClipRaster, "/api/clipRast/layerCode/${layerCode}/xmin/${xmin}/ymin/${ymin}/xmax/${xmax}/ymax/${ymax}");
+
+        server.addResource(&anaPonctResource, "/api/anaPt/layers/${listLayerCode}/x/${x}/y/${y}");
 
         //cnswresource cnswr(dico->File("TMPDIR")+"/");
         //server.addResource(&cnswr, "/CNSW");

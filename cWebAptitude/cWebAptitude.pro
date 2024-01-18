@@ -27,7 +27,9 @@ DEPENDPATH += $$PWD../stationDescriptor/rapidxml/
 SOURCES += main.cpp \
     ../carteApt/cdicoaptbase.cpp \
     analytics.cpp \
+    api/anaponctuelleresource.cpp \
     api/cnswresource.cpp \
+    api/rasterclipresource.cpp \
     auth/Session.cpp \
     auth/User.cpp \
     cadastre.cpp \
@@ -61,7 +63,9 @@ SOURCES += main.cpp \
 HEADERS += \
     ../carteApt/cdicoaptbase.h \
     analytics.h \
+    api/anaponctuelleresource.h \
     api/cnswresource.h \
+    api/rasterclipresource.h \
     auth/Session.h \
     auth/User.h \
     cadastre.h \
