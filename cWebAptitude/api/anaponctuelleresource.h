@@ -8,6 +8,8 @@
 #include "cdicoapt.h"
 #include "layerbase.h"
 #include <Wt/WFileUpload.h>
+#include <iostream>
+#include <iomanip>
 using namespace Wt;
 
 class anaPonctuelleResource : public Wt::WResource
