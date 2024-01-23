@@ -62,7 +62,6 @@ int launchForestimator(int argc, char **argv)
 
         server.addEntryPoint(Wt::EntryPointType::Application, std::bind(&createWebAptitudeApplication,std::placeholders::_1, dico));
         Session::configureAuth();
-
         server.run();
     } catch (Wt::WServer::Exception& e) {
         std::cerr << "sError" << e.what() << std::endl;
@@ -112,7 +111,6 @@ std::unique_ptr<Wt::WApplication> createWebAptitudeApplication(const Wt::WEnviro
         app404->root()->addWidget(std::make_unique<Wt::WText>("ERREUR: Page introuvable..."));
         return app404;
     }
-
     return Wt::cpp14::make_unique<cWebAptitude>(env,dico);
 
 }

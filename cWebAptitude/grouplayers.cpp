@@ -349,7 +349,7 @@ void groupLayers::computeStatGlob(OGRGeometry *poGeomGlobale){
 }
 
 
-void groupLayers::computeStatAllPol(OGRLayer * lay, WFileResource *fileRessource){
+void groupLayers::computeStatAllPol(OGRLayer * lay, WFileResource *fileResource){
     std::cout << " computeStatAllPol::computeStatAllPol " << std::endl;
     std::string name0 = std::tmpnam(nullptr);
     std::string name1 = name0.substr(5,name0.size()-5);
@@ -400,10 +400,11 @@ void groupLayers::computeStatAllPol(OGRLayer * lay, WFileResource *fileRessource
 
     aFile.close();
 
-    fileRessource->setFileName(aOut);
+    fileResource->setFileName(aOut);
+    fileResource->suggestFileName("Forestimator-statistiques.xml");
     /*
-    fileRessource->suggestFileName("Forestimator-statistiques.xml");
-    m_app->redirect(fileRessource->url());
+    fileResource->suggestFileName("Forestimator-statistiques.xml");
+    m_app->redirect(fileResource->url());
     m_app->addLog("compute stat AllPol, "+std::to_string(getNumSelect4Download())+" traitements",typeLog::anas); // add some web stats
     */
 }
@@ -616,7 +617,7 @@ void groupLayers::exportLayMapView(){
             m_app->processEvents();
             zf->close();
             delete zf;
-            // le fileressources sera détruit au moment de la destruction GroupL
+            // le fileResources sera détruit au moment de la destruction GroupL
             //std::unique_ptr<WFileResource> fileResource = std::make_unique<Wt::WFileResource>("plain/text",archiveFileName);
             WFileResource * fileResource = new Wt::WFileResource("plain/text",archiveFileName);
             fileResource->suggestFileName(mClientName+".zip");

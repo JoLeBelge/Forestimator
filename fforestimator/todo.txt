@@ -16,7 +16,7 @@ TT -> création interface graphique pour afficher le résultat d'une analyse pon
 	 -> output en json, pour chaque couche ; deux format, un format "raw" avec valeur raster, un format "décodé" avec les significations (ex; CNSW). 
 
 JO -> FMTC des tuiles WMS
-Jo -> bulk download raster clipped (dans une bd sqlite en BLOB?) 
+Jo -> bulk download raster clipped (dans une bd sqlite en BLOB?)
 Jo-> modif api Forestimator pour requêtes d'un raster sur un extend donné
 Jo-> lecture tif sous android (dart Images?) 
 

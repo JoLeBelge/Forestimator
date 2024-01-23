@@ -483,9 +483,9 @@ void parcellaire::doComputingTask(){
     int getNum4Download = 0;
     WFileResource *fileResource = new Wt::WFileResource();
     fileResource->setMimeType("txt/html");
-    pool->add(new parcellaire::TaskComputing(geoJsonName(), mGL, fileResource));
-    pool->waitOnWorkerToFinished();
-    fileResource->suggestFileName("Forestimator-statistiques.xml");
+    pool->add(new parcellaire::TaskComputing(geoJsonName(), mGL, fileResource, &m_app));
+    pool->waitOnWorkerToFinished();//TODO This has to go in order to get back results asyncronously! Either email or build a loop to receive them back into server.
+    //fileResource->suggestFileName("Forestimator-statistiques.xml");
     m_app->redirect(fileResource->url());
     m_app->addLog("compute stat AllPol, "+std::to_string(getNum4Download)+" traitements",typeLog::anas); // add some web stats
     return;
@@ -500,10 +500,11 @@ void parcellaire::TaskComputing::run(){
     {
         // layer
         OGRLayer * lay = mDS->GetLayer(0);
-        mGL->computeStatAllPol(lay, fileRessource);
-
+        mGL->computeStatAllPol(lay, fileResource);
+        //(*app)->redirect(fileResource->url());
+        //(*app)->addLog("compute stat AllPol, "+std::to_string(0)+" traitements",typeLog::anas);
         GDALClose(mDS);
-        cout << "still alive" << std::endl;
+
     } else { std::cout << "select dataset mDS is null " << std::endl;}
 }
 
