@@ -5,8 +5,6 @@ import 'pages/map.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'dart:io' show Platform;
 
-import 'package:http/http.dart' as http;
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 

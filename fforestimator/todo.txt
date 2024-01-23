@@ -1,9 +1,11 @@
 To do list fforestimator
 ------------------------
 
+deboggage Forestimator web sous qt n'est plus fonctionnel, demander a tt
+
 -désactiver rotation de la carte (sur mobile c'est pénible)
 -onTap: analyse surfacique
--analyse ponctuelle avec accès internet ; requête à l'API Forestitmator 
+-analyse ponctuelle avec accès internet ; requête à l'API Forestitmator
 
 JO-> API forestimator ; output en json pour fforestimator. Une requête unique pour plusieurs couches/traitements -> DONE
 
