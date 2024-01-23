@@ -1,6 +1,10 @@
 import 'dart:ui';
-
 import 'package:sqflite/sqflite.dart';
+import 'package:path/path.dart';
+import 'package:path_provider/path_provider.dart';
+import 'dart:typed_data';
+import 'dart:io';
+import 'package:flutter/services.dart';
 
 class layerBase {
   String? mNom, mNomCourt;
@@ -77,24 +81,45 @@ class layerBase {
         mDicoVal.length.toString() +
         ' dicoCol size ' +
         mDicoCol.length.toString();
-    //res += mDicoVal.length.toString();
     return res;
   }
 }
 
 class dicoAptProvider {
-  late Database db; // execution error
-  final databaseName =
-      '/home/jo/app/Forestimator/carteApt/data/aptitudeEssDB.db';
-      /*'/home/tt/Desktop/Forestimator/dataBases:-)/aptitudeEssDB.db';*/
+  late Database db;
   Map<String, Color> colors = {};
 
   Future<void> init() async {
-    db = await openDatabase(
-      databaseName,
-      version: 1,
-      //onCreate: _onCreate,
-    );
+    //final dbPath = await getDatabasesPath(); plante sous android
+    Directory docDir = await getApplicationDocumentsDirectory();
+    final path = join(docDir.path, "fforestimator.db");
+// Check if the database exists
+    var exists = await databaseExists(path);
+
+    if (!exists) {
+      // Should happen only the first time you launch your application
+      print("Creating new copy from asset");
+
+      // Make sure the parent directory exists
+      try {
+        await Directory(dirname(path)).create(recursive: true);
+      } catch (_) {}
+
+      // Create the writable database file from the bundled  (asset bulk) fforestimator.db database file:
+      ByteData data =
+          await rootBundle.load(url.join("assets", "db/fforestimator.db"));
+      List<int> bytes =
+          data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
+
+      // Write and flush the bytes written
+      await File(path).writeAsBytes(bytes, flush: true);
+    } else {
+      print("Opening existing database");
+    }
+
+    db = await openDatabase(path, version: 1, readOnly: true
+        //onCreate: _onCreate,
+        );
     // lecture des couleurs
     List<Map<String, dynamic>> result = await db.query('dico_color');
     for (var r in result) {

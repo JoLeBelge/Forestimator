@@ -12,6 +12,8 @@ namespace po = boost::program_options;
 #include <Wt/Auth/PasswordService.h>
 #include <Wt/WFileResource.h>
 #include "api/stationdescresource.h"
+#include "api/rasterclipresource.h"
+#include "api/anaponctuelleresource.h"
 #include "api/cnswresource.h"
 #include "analytics.h"
 #include "./libzippp/src/libzippp.h"
