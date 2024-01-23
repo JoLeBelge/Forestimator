@@ -35,12 +35,9 @@ class _MyApp extends State<MyApp> {
   static const TextStyle optionStyle =
       TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
 
-  static const List<Widget> _widgetOptions = <Widget>[
+  static List<Widget> _widgetOptions = <Widget>[
     mapPage(title: 'Flutter Demo Home Page'),
-    Text(
-      'todo layer selection',
-      style: optionStyle,
-    ),
+    LayerView(),
     Text(
       'todo analysis',
       style: optionStyle,
