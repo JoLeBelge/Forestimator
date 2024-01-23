@@ -31,13 +31,25 @@ class _mapPageState extends State<mapPage> {
     if (_position != null) {
       //print("postion x " + _position?.latitude.toString() ?? "0" );// + " " + _position?.longitude.toString());
       print(_position?.latitude.toString() ??
-          "empty positions"); // + " " + _position?.longitude.toString());
+          "empty position"); // + " " + _position?.longitude.toString());
       print("anaPonctOnline");
-      String url =
-          "http://localhost:8085/api/anaPt/layers/EP_FEE+EP_CS+MNH2019+CNSW/x/200000.3/y/80000.1";
+      // on projete en BL72, seul src de Forestimator web pour le moment
+      proj4.Point ptBL72 = epsg4326.transform(
+          epsg31370,
+          proj4.Point(
+              x: _position?.longitude ?? 0.0, y: _position?.latitude ?? 0.0));
+      String layersAnaPt = "CNSW+Topo+AE+MNT+slope+ZBIO+CS_A+NT+NH";
+      // todo : ajouter la couche active - et la matrice d'aptitude je suppose? FEE et CS?
+      String url = "http://localhost:8085/api/anaPt/layers/" +
+          layersAnaPt +
+          "/x/" +
+          ptBL72.x.toString() +
+          "/y/" +
+          ptBL72.y.toString();
+      print(url);
       var res = await http.get(Uri.parse(url));
       print(res.body);
-      data = jsonDecode(res.body);
+      data = jsonDecode(res.body); // à présenter dans la fenetre "ana ponct"
     }
     setState(() {});
   }

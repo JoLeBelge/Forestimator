@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dico/dicoApt.dart';
 import 'pages/map.dart';
-//import 'package:provider/provider.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'dart:io' show Platform;
 import 'pages/layerView.dart';
