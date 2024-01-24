@@ -249,8 +249,8 @@ void groupLayers::extractInfo(double x, double y){
                 }
             }
 
-            // si la couche active est la CNSW, on affiche les info pédo dans la fenetre "overlay"
-            if (( l->IsActive() && l->Code()=="CNSWrest")){
+            // si la couche active est la CNSW, on affiche les info pédo dans la fenetre "overlay". Attention, CNSWrast n'est plus "Externe" maintenant que j'y ai associé la couche raster.
+            if (( l->IsActive() && l->Code()=="CNSWrast")){
                 mParent->doJavaScript("content.innerHTML = '"+ptPed.displayAllInfoInOverlay()+ "';"
                                       +"var coordinate = ["+std::to_string(x) + ","+ std::to_string(y) +"];"
                                       +"overlay.setPosition(coordinate);"
@@ -349,7 +349,7 @@ void groupLayers::computeStatGlob(OGRGeometry *poGeomGlobale){
 }
 
 
-void groupLayers::computeStatAllPol(OGRLayer * lay){
+void groupLayers::computeStatAllPol(OGRLayer * lay, WFileResource *fileResource){
     std::cout << " computeStatAllPol::computeStatAllPol " << std::endl;
     std::string name0 = std::tmpnam(nullptr);
     std::string name1 = name0.substr(5,name0.size()-5);
@@ -400,11 +400,13 @@ void groupLayers::computeStatAllPol(OGRLayer * lay){
 
     aFile.close();
 
-    WFileResource *fileResource = new Wt::WFileResource("text/xml",aOut);
+    fileResource->setFileName(aOut);
+    fileResource->suggestFileName("Forestimator-statistiques.xml");
+    /*
     fileResource->suggestFileName("Forestimator-statistiques.xml");
     m_app->redirect(fileResource->url());
-
     m_app->addLog("compute stat AllPol, "+std::to_string(getNumSelect4Download())+" traitements",typeLog::anas); // add some web stats
+    */
 }
 
 /**
@@ -615,7 +617,7 @@ void groupLayers::exportLayMapView(){
             m_app->processEvents();
             zf->close();
             delete zf;
-            // le fileressources sera détruit au moment de la destruction GroupL
+            // le fileResources sera détruit au moment de la destruction GroupL
             //std::unique_ptr<WFileResource> fileResource = std::make_unique<Wt::WFileResource>("plain/text",archiveFileName);
             WFileResource * fileResource = new Wt::WFileResource("plain/text",archiveFileName);
             fileResource->suggestFileName(mClientName+".zip");

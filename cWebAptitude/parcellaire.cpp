@@ -478,21 +478,33 @@ void parcellaire::polygoneCadastre(std::string aFileGeoJson, std::string aLabelN
 
 void parcellaire::doComputingTask(){
     cout << "  get unfinished running tasks" << pool->getNunfinishedTasks() << std::endl;// échoue? donc on a pas accès à l'objet pool (global , instantié dans main.cpp)
-    pool->add(new parcellaire::TaskComputing(geoJsonName(), mGL));
 
+    std::string fileName = "";
+    int getNum4Download = 0;
+    WFileResource *fileResource = new Wt::WFileResource();
+    fileResource->setMimeType("txt/html");
+    pool->add(new parcellaire::TaskComputing(geoJsonName(), mGL, fileResource, &m_app));
+    pool->waitOnWorkerToFinished();//TODO This has to go in order to get back results asyncronously! Either email or build a loop to receive them back into server.
+    //fileResource->suggestFileName("Forestimator-statistiques.xml");
+    m_app->redirect(fileResource->url());
+    m_app->addLog("compute stat AllPol, "+std::to_string(getNum4Download)+" traitements",typeLog::anas); // add some web stats
     return;
 }
 
 void parcellaire::TaskComputing::run(){
     std::string input(geoJsonName);// lecture du geojson et pas du shp, comme cela compatible avec polygone du cadastre.
     const char *inputPath=input.c_str();
+    cout << input.c_str();
     GDALDataset * mDS =  (GDALDataset*) GDALOpenEx( inputPath, GDAL_OF_VECTOR | GDAL_OF_READONLY, NULL, NULL, NULL );
     if( mDS != NULL )
     {
         // layer
         OGRLayer * lay = mDS->GetLayer(0);
-        mGL->computeStatAllPol(lay);
+        mGL->computeStatAllPol(lay, fileResource);
+        //(*app)->redirect(fileResource->url());
+        //(*app)->addLog("compute stat AllPol, "+std::to_string(0)+" traitements",typeLog::anas);
         GDALClose(mDS);
+
     } else { std::cout << "select dataset mDS is null " << std::endl;}
 }
 
@@ -547,6 +559,7 @@ void parcellaire::anaAllPol(){
             removeChild(messageBox);
         });
         messageBox->show();
+        this->doComputingTask(); // Demarre le threadpool
 
         /*std::string input(geoJsonName());// lecture du geojson et pas du shp, comme cela compatible avec polygone du cadastre.
         const char *inputPath=input.c_str();

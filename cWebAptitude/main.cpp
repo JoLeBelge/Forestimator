@@ -26,6 +26,9 @@ int launchForestimator(int argc, char **argv)
     cDicoApt *dico=new cDicoApt(aBD);
 
     stationDescResource resource(dico);
+    rasterClipResource rClipRaster(dico);
+    anaPonctuelleResource anaPonctResource(dico);
+
     try {
         Wt::WServer server{argc, argv, WTHTTP_CONFIGURATION};
 
@@ -40,6 +43,12 @@ int launchForestimator(int argc, char **argv)
 
         // pour avoir la table dictionnaire
         server.addResource(&resource, "/api/${tool}");
+
+        // exemple http://localhost:8085/api/clipRast/layerCode/EP_FEE/xmin/200000.0/ymin/80000.0/xmax/250000.0/ymax/100000.0/toto.tif
+        server.addResource(&rClipRaster, "/api/clipRast/layerCode/${layerCode}/xmin/${xmin}/ymin/${ymin}/xmax/${xmax}/ymax/${ymax}");
+
+        // http://localhost:8085/api/anaPt/layers/EP_FEE+EP_CS+MNH2019+CNSW/x/200000.3/y/80000.1
+        server.addResource(&anaPonctResource, "/api/anaPt/layers/${listLayerCode}/x/${x}/y/${y}");
 
         //cnswresource cnswr(dico->File("TMPDIR")+"/");
         //server.addResource(&cnswr, "/CNSW");
@@ -62,7 +71,6 @@ int launchForestimator(int argc, char **argv)
 
         server.addEntryPoint(Wt::EntryPointType::Application, std::bind(&createWebAptitudeApplication,std::placeholders::_1, dico));
         Session::configureAuth();
-
         server.run();
     } catch (Wt::WServer::Exception& e) {
         std::cerr << "sError" << e.what() << std::endl;
@@ -112,7 +120,6 @@ std::unique_ptr<Wt::WApplication> createWebAptitudeApplication(const Wt::WEnviro
         app404->root()->addWidget(std::make_unique<Wt::WText>("ERREUR: Page introuvable..."));
         return app404;
     }
-
     return Wt::cpp14::make_unique<cWebAptitude>(env,dico);
 
 }

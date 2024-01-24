@@ -1,6 +1,10 @@
 import 'dart:ui';
-
 import 'package:sqflite/sqflite.dart';
+import 'package:path/path.dart';
+import 'package:path_provider/path_provider.dart';
+import 'dart:typed_data';
+import 'dart:io';
+import 'package:flutter/services.dart';
 
 class layerBase {
   String? mNom, mNomCourt;
@@ -16,7 +20,7 @@ class layerBase {
 
   //String mNomFile,mDir; mPathQml mPathRaster,
 
-// frommap avec liste d'instantation, inspiré de https://medium.com/@lumeilin/using-sqlite-in-flutter-59b27b099123
+// frommap avec liste d'instanciation, inspiré de https://medium.com/@lumeilin/using-sqlite-in-flutter-59b27b099123
 
 // named constructor
   layerBase.fromMap(final Map<String, dynamic> map)
@@ -25,6 +29,7 @@ class layerBase {
         mNomCourt = map['NomCourt'],
         //mPathRaster = map['Dir3'], //+ '/' + map['Nom'], // pas si simple, chemin d'accès sur le mobile. Utile que si bulk download des raster
         mExpert = map['expert'] == 0 ? false : true,
+        mGroupe = map['groupe'],
         mUrl = map['WMSurl'],
         mWMSLayerName = map['WMSlayer'],
         mWMSattribution = map['WMSattribution'],
@@ -37,7 +42,7 @@ class layerBase {
         mDicoVal = {},
         mDicoCol = {};
 
-  Future<void> fillDico_Val(Database db) async {
+  Future<void> fillLayerDico(dicoAptProvider dico) async {
     if (mCategorie != 'Externe' && nom_dico != null) {
       String myquery = 'SELECT ' +
           nom_field_raster.toString() +
@@ -49,48 +54,89 @@ class layerBase {
         myquery += ' WHERE ' + condition.toString();
       }
       myquery += ';';
-      List<Map<String, dynamic>> adicoval = await db.rawQuery(myquery);
+      List<Map<String, dynamic>> adicoval = await dico.db.rawQuery(myquery);
       for (var r in adicoval) {
-        mDicoVal[r['rast']] = r['val'].toString();
-        // création de ma couleur
-        // faut tester si c'est un code hexa ou un nom de couleur
-        //mDicoCol[r['rast']] = HexColor(r['col']);
+        if (r['col'] == null) {
+          // c'est le cas pour dico_MNT par exemple
+          print("couleur null dans table ${nom_dico}");
+        } else {
+          mDicoVal[r['rast']] = r['val'].toString();
+          // test si c'est un code hexa ou un nom de couleur. Si null, le toString renvoie 'null'. pas très pratique évidemment
+          String colcode = r['col'].toString(); // ?? '#FFFFFF';
+          if (colcode.substring(0, 1) == '#') {
+            mDicoCol[r['rast']] = HexColor(colcode);
+          } else if (dico.colors.containsKey(colcode)) {
+            mDicoCol[r['rast']] =
+                dico.colors[colcode] ?? Color.fromRGBO(255, 255, 255, 1.0);
+          } else {
+            print("couleur ${colcode} n'est pas définie dans le dico.colors");
+          }
+        }
       }
     }
+  }
 
-    @override
-    String toString() {
-      String res = "layerbase code ${mCode}, name ${mNom}, dicoVal size ";
-      res += mDicoVal.length.toString();
-      return res;
-    }
+  String toString() {
+    String res = "layerbase code ${mCode}, name ${mNom}, dicoVal size " +
+        mDicoVal.length.toString() +
+        ' dicoCol size ' +
+        mDicoCol.length.toString();
+    return res;
   }
 }
 
 class dicoAptProvider {
-  late Database db; // execution error
-  final databaseName =
-      '/home/jo/app/Forestimator/carteApt/data/aptitudeEssDB.db';
+  late Database db;
   Map<String, Color> colors = {};
 
   Future<void> init() async {
-    db = await openDatabase(
-      databaseName,
-      version: 1,
-      //onCreate: _onCreate,
-    );
+    //final dbPath = await getDatabasesPath(); plante sous android
+    Directory docDir = await getApplicationDocumentsDirectory();
+    final path = join(docDir.path, "fforestimator.db");
+// Check if the database exists
+    var exists = await databaseExists(path);
+
+    if (!exists) {
+      // Should happen only the first time you launch your application
+      print("Creating new copy from asset");
+
+      // Make sure the parent directory exists
+      try {
+        await Directory(dirname(path)).create(recursive: true);
+      } catch (_) {}
+
+      // Create the writable database file from the bundled  (asset bulk) fforestimator.db database file:
+      ByteData data =
+          await rootBundle.load(url.join("assets", "db/fforestimator.db"));
+      List<int> bytes =
+          data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
+
+      // Write and flush the bytes written
+      await File(path).writeAsBytes(bytes, flush: true);
+    } else {
+      print("Opening existing database");
+    }
+
+    db = await openDatabase(path, version: 1, readOnly: true
+        //onCreate: _onCreate,
+        );
     // lecture des couleurs
     List<Map<String, dynamic>> result = await db.query('dico_color');
+    for (var r in result) {
+      colors[r['Col']] = Color.fromRGBO(r['R'], r['G'], r['B'], 1.0);
+    }
     result = await db.query('dico_colGrey');
+    for (var r in result) {
+      colors[r['Col']] = Color.fromRGBO(r['R'], r['G'], r['B'], 1.0);
+    }
     result = await db.query('dico_viridisColors');
-
-    for (var row in result) {
-      //colors.add(layerBase.fromMap(row));
+    for (var r in result) {
+      colors[r['id'].toString()] = HexColor(r['hex']);
     }
     // lecture des layerbase
     getLayers().then((mylist) {
-      for (var l in mylist) {
-        print(l.mCode);
+      for (layerBase l in mylist) {
+        print(l.toString());
       }
       db.close();
     });
@@ -108,7 +154,7 @@ class dicoAptProvider {
       res.add(layerBase.fromMap(row));
     }
     for (layerBase l in res) {
-      await l.fillDico_Val(db);
+      await l.fillLayerDico(this);
     }
     return res;
   }
