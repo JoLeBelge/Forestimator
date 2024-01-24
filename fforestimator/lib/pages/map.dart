@@ -39,7 +39,7 @@ class _mapPageState extends State<mapPage> {
           proj4.Point(
               x: _position?.longitude ?? 0.0, y: _position?.latitude ?? 0.0));
       String layersAnaPt = "CNSWrast+Topo+AE+MNT+slope+ZBIO+CS_A+NT+NH";
-      // todo : ajouter la couche active - et la matrice d'aptitude je suppose? FEE et CS?
+      // todo : ajouter la couche active - et la matrice d'aptitude FEE et CS déterminée en locale avec getApt?
       String url = "https://forestimator.gembloux.ulg.ac.be/api/anaPt/layers/" +
           layersAnaPt +
           "/x/" +
