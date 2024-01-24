@@ -40,7 +40,7 @@ class _mapPageState extends State<mapPage> {
               x: _position?.longitude ?? 0.0, y: _position?.latitude ?? 0.0));
       String layersAnaPt = "CNSWrast+Topo+AE+MNT+slope+ZBIO+CS_A+NT+NH";
       // todo : ajouter la couche active - et la matrice d'aptitude je suppose? FEE et CS?
-      String url = "http://localhost:8085/api/anaPt/layers/" +
+      String url = "https://forestimator.gembloux.ulg.ac.be/api/anaPt/layers/" +
           layersAnaPt +
           "/x/" +
           ptBL72.x.toString() +
