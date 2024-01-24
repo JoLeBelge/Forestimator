@@ -38,7 +38,7 @@ class _mapPageState extends State<mapPage> {
           epsg31370,
           proj4.Point(
               x: _position?.longitude ?? 0.0, y: _position?.latitude ?? 0.0));
-      String layersAnaPt = "CNSW+Topo+AE+MNT+slope+ZBIO+CS_A+NT+NH";
+      String layersAnaPt = "CNSWrast+Topo+AE+MNT+slope+ZBIO+CS_A+NT+NH";
       // todo : ajouter la couche active - et la matrice d'aptitude je suppose? FEE et CS?
       String url = "http://localhost:8085/api/anaPt/layers/" +
           layersAnaPt +
