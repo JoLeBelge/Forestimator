@@ -1,0 +1,37 @@
+PROCESSING "BANDS=1" 
+   CLASSITEM "[pixel]" 
+   CLASS 
+      NAME "Conseillée sans réserve"
+      EXPRESSION "1"
+      STYLE 
+          COLOR "#00A200"
+       END
+   END
+   CLASS 
+      NAME "Conseillée, en tenant compte de ses faiblesses"
+      EXPRESSION "2"
+      STYLE 
+          COLOR "#C5E0B4"
+       END
+   END
+   CLASS 
+      NAME "A n'envisager qu'en accompagnement"
+      EXPRESSION "3"
+      STYLE 
+          COLOR "#F4B183"
+       END
+   END
+   CLASS 
+      NAME "Ne pas envisager"
+      EXPRESSION "4"
+      STYLE 
+          COLOR "#FD6E6B"
+   	END
+   END
+   CLASS 
+      NAME "pas de donnée"
+      EXPRESSION "0"
+      STYLE 
+          COLOR 255 255 255
+       END
+   END

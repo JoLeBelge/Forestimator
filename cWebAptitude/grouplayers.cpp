@@ -249,8 +249,8 @@ void groupLayers::extractInfo(double x, double y){
                 }
             }
 
-            // si la couche active est la CNSW, on affiche les info pédo dans la fenetre "overlay"
-            if (( l->IsActive() && l->Code()=="CNSWrest")){
+            // si la couche active est la CNSW, on affiche les info pédo dans la fenetre "overlay". Attention, CNSWrast n'est plus "Externe" maintenant que j'y ai associé la couche raster.
+            if (( l->IsActive() && l->Code()=="CNSWrast")){
                 mParent->doJavaScript("content.innerHTML = '"+ptPed.displayAllInfoInOverlay()+ "';"
                                       +"var coordinate = ["+std::to_string(x) + ","+ std::to_string(y) +"];"
                                       +"overlay.setPosition(coordinate);"
