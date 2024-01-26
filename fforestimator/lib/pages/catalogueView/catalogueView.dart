@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:fforestimator/globals.dart' as gl;
-import 'package:fforestimator/dico/category.dart';
+import 'package:fforestimator/pages/catalogueView/category.dart';
 
 class CatalogueView extends StatefulWidget {
   const CatalogueView({super.key});

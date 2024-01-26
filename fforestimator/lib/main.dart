@@ -4,7 +4,7 @@ import 'package:fforestimator/globals.dart' as gl;
 import 'package:fforestimator/pages/map.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'dart:io' show Platform;
-import 'package:fforestimator/pages/catalogueView.dart';
+import 'package:fforestimator/pages/catalogueView/catalogueView.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
