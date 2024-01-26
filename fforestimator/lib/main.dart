@@ -6,7 +6,7 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'dart:io' show Platform;
 
 import 'package:http/http.dart' as http;
-import 'pages/layerView.dart';
+import 'pages/catalogueView.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -22,31 +22,34 @@ void main() async {
   runApp(MyApp());
 }
 
-class MyApp extends StatefulWidget {
-  MyApp({super.key});
 
+class MyApp extends StatefulWidget {
+  const MyApp({super.key});
   @override
   State<MyApp> createState() => _MyApp();
 }
 
 class _MyApp extends State<MyApp> {
   int _selectedIndex = 0;
-
   static const TextStyle optionStyle =
       TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
 
-  static List<Widget> _widgetOptions = <Widget>[
-    mapPage(title: 'Flutter Demo Home Page'),
-    LayerView(),
-    Text(
+  
+
+  static final List<Widget> _widgetOptions = <Widget>[
+    const mapPage(title: 'Flutter Demo Home Page'),
+    CatalogueView(),
+    const Text(
       'todo analysis',
       style: optionStyle,
     ),
-    Text(
+    const Text(
       'todo settings',
       style: optionStyle,
     ),
   ];
+
+  _MyApp();
 
   void _onItemTapped(int index) {
     setState(() {

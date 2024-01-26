@@ -15,8 +15,6 @@ class mapPage extends StatefulWidget {
 }
 
 class _mapPageState extends State<mapPage> {
-  int _counter = 0;
-
 //https://github.com/fleaflet/flutter_map/blob/master/example/lib/pages/custom_crs/custom_crs.dart
   late proj4.Projection epsg4326 = proj4.Projection.get('EPSG:4326')!;
   // si epsg31370 est dans la db proj 4, on prend, sinon on définit
@@ -43,12 +41,6 @@ class _mapPageState extends State<mapPage> {
       bounds: epsg31370Bounds,
       resolutions: getResolutions(295170.0, 42250.0, 8, 256.0));
 
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     proj4.Point ptEpioux = proj4.Point(x: 217200.0, y: 50100.0);
@@ -73,7 +65,7 @@ class _mapPageState extends State<mapPage> {
     return FlutterMap(
       options: MapOptions(
         crs: epsg31370CRS,
-        initialZoom: 2,
+        initialZoom: 4,
         maxZoom: 7,
         initialCenter: latlonEpioux,
         cameraConstraint: CameraConstraint.contain(
