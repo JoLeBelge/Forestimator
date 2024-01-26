@@ -1,5 +1,6 @@
+import 'package:fforestimator/dico/dicoApt.dart';
 import 'package:flutter/material.dart';
-import 'dico/dicoApt.dart';
+import 'globals.dart' as gl;
 import 'pages/map.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'dart:io' show Platform;
@@ -13,10 +14,10 @@ void main() async {
     databaseFactory = databaseFactoryFfi;
   }
 
-  dicoAptProvider dico = dicoAptProvider();
-  await dico.init();
+  gl.dico = dicoAptProvider();
+  await gl.dico.init();
 
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 
@@ -26,16 +27,15 @@ class MyApp extends StatefulWidget {
   State<MyApp> createState() => _MyApp();
 }
 
+
 class _MyApp extends State<MyApp> {
   int _selectedIndex = 0;
   static const TextStyle optionStyle =
       TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
 
-  
-
   static final List<Widget> _widgetOptions = <Widget>[
     const mapPage(title: 'Flutter Demo Home Page'),
-    CatalogueView(),
+    const CatalogueView(),
     const Text(
       'todo analysis',
       style: optionStyle,
@@ -54,7 +54,7 @@ class _MyApp extends State<MyApp> {
     });
   }
 
-  // This widget is the root of your application.
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
