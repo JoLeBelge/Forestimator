@@ -1,10 +1,10 @@
 import 'package:fforestimator/dico/dicoApt.dart';
 import 'package:flutter/material.dart';
-import 'globals.dart' as gl;
-import 'pages/map.dart';
+import 'package:fforestimator/globals.dart' as gl;
+import 'package:fforestimator/pages/map.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'dart:io' show Platform;
-import 'pages/catalogueView.dart';
+import 'package:fforestimator/pages/catalogueView.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

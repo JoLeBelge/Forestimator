@@ -1,8 +1,6 @@
-import 'dart:ui';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
-import 'dart:typed_data';
 import 'dart:io';
 import 'package:flutter/services.dart';
 
@@ -76,6 +74,7 @@ class layerBase {
     }
   }
 
+  @override
   String toString() {
     String res = "layerbase code ${mCode}, name ${mNom}, dicoVal size " +
         mDicoVal.length.toString() +
@@ -138,7 +137,6 @@ class dicoAptProvider {
       for (layerBase l in mylist) {
         print(l.toString());
       }
-      db.close();
     });
   }
 

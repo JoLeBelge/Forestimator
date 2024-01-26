@@ -1,33 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
-
-// stores ExpansionPanel state information
-class Item {
-  Item({
-    required this.expandedValue,
-    required this.headerValue,
-    this.isExpanded = false,
-  });
-
-  String expandedValue;
-  String headerValue;
-  bool isExpanded;
-}
-
-List<Item> getCategories() {
-  return <Item>[
-    Item(expandedValue: "Couches", headerValue: "Tous les cartes"),
-    Item(expandedValue: "Couches", headerValue: "Cartes de référence"),
-    Item(expandedValue: "Couches", headerValue: "Conditions stationelles"),
-    Item(
-        expandedValue: "Couches",
-        headerValue: "Cartographie des peuplement forestiers"),
-    Item(
-        expandedValue: "Couches",
-        headerValue: "Adéquation des essences aux conditions stationelles"),
-    Item(expandedValue: "Couches", headerValue: "Guide des stations"),
-    Item(expandedValue: "Couches", headerValue: "Etat sanitaire de la pessière")
-  ];
-}
+import 'package:fforestimator/globals.dart' as gl;
+import 'package:fforestimator/dico/category.dart';
 
 class CatalogueView extends StatefulWidget {
   const CatalogueView({super.key});
@@ -36,30 +11,75 @@ class CatalogueView extends StatefulWidget {
 }
 
 class _CatalogueView extends State<CatalogueView> {
-  final List<Item> _data = getCategories();
+  static List<Category> _categories = [];
+  static bool finishedInitializingCategories = false;
 
   @override
   Widget build(BuildContext context) {
-    return Scrollbar(
-        child: SingleChildScrollView(
-      child: Container(
-        child: _buildPanel(),
-      ),
-    ));
+    if (finishedInitializingCategories) {
+      return Scrollbar(
+          child: SingleChildScrollView(
+        child: Container(
+          child: _buildPanel(),
+        ),
+      ));
+    } else {
+      return const CircularProgressIndicator();
+    }
   }
 
   Widget _buildPanel() {
     return ExpansionPanelList(
       expansionCallback: (int index, bool isExpanded) {
         setState(() {
-          _data[index].isExpanded = isExpanded;
+          _categories[index].isExpanded = isExpanded;
         });
       },
-      children: _data.map<ExpansionPanel>((Item item) {
+      children: _categories.map<ExpansionPanel>((Category item) {
         return ExpansionPanel(
           headerBuilder: (BuildContext context, bool isExpanded) {
             return ListTile(
-              title: Text(item.headerValue),
+              title: Text(item.name),
+            );
+          },
+          body: _buildLayerListPerTopic(),
+          isExpanded: item.isExpanded,
+        );
+      }).toList(),
+    );
+  }
+
+  void _getCategories() async {
+    List<Map<String, dynamic>> result =
+        await gl.dico.db.query('groupe_couche', where: 'expert=0');
+    for (var row in result) {
+      _categories += [Category(name: row['label'], filter: row['code'])];
+    }
+    setState(() {
+      finishedInitializingCategories = true;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    if (!finishedInitializingCategories){
+      _getCategories();
+      }
+  }
+
+  Widget _buildLayerListPerTopic() {
+    return ExpansionPanelList(
+      expansionCallback: (int index, bool isExpanded) {
+        setState(() {
+          _categories[index].isExpanded = isExpanded;
+        });
+      },
+      children: _categories.map<ExpansionPanel>((Category item) {
+        return ExpansionPanel(
+          headerBuilder: (BuildContext context, bool isExpanded) {
+            return ListTile(
+              title: Text(item.name),
             );
           },
           body: Scrollbar(
@@ -70,52 +90,12 @@ class _CatalogueView extends State<CatalogueView> {
                     maxHeight: MediaQuery.of(context).size.height * .5),
                 child: ListView(
                   clipBehavior: Clip.antiAlias,
-                  children: const <Widget>[
-                    Card(
-                        child: ListTile(
-                            title: Text(
-                                'Les couches seront chargés en ListTile'))),
+                  children: <Widget>[
+                    Card(child: ListTile(title: Text('gl.dico.db.query()'))),
                     Card(
                       child: ListTile(
                         leading: FlutterLogo(),
                         title: Text('One-line with leading widget'),
-                      ),
-                    ),
-                    Card(
-                      child: ListTile(
-                        title: Text('One-line with trailing widget'),
-                        trailing: Icon(Icons.more_vert),
-                      ),
-                    ),
-                    Card(
-                      child: ListTile(
-                        leading: FlutterLogo(),
-                        title: Text('One-line with both widgets'),
-                        trailing: Icon(Icons.more_vert),
-                      ),
-                    ),
-                    Card(
-                      child: ListTile(
-                        title: Text('One-line dense ListTile'),
-                        dense: true,
-                      ),
-                    ),
-                    Card(
-                      child: ListTile(
-                        leading: FlutterLogo(size: 56.0),
-                        title: Text('Two-line ListTile'),
-                        subtitle: Text('Here is a second line'),
-                        trailing: Icon(Icons.more_vert),
-                      ),
-                    ),
-                    Card(
-                      child: ListTile(
-                        leading: FlutterLogo(size: 72.0),
-                        title: Text('Three-line ListTile'),
-                        subtitle: Text(
-                            'A sufficiently long subtitle warrants three lines.'),
-                        trailing: Icon(Icons.more_vert),
-                        isThreeLine: true,
                       ),
                     ),
                   ],

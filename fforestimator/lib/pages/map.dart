@@ -118,7 +118,7 @@ class _mapPageState extends State<mapPage> {
               bounds: LatLngBounds.fromPoints([latlonBL, latlonTR])),
           onMapReady: () async {
             _position = await acquireUserLocation();
-            if (_position != null) {
+            /*if (_position != null) {//TODO: Ceci tue l'appli!
               // IMPORTANT: rebuild location layer when permissions are granted
               setState(() {
                 _mapController.move(
@@ -126,7 +126,7 @@ class _mapPageState extends State<mapPage> {
                         _position?.longitude ?? 0.0),
                     16);
               });
-            }
+            }*/
           },
         ),
         children: [
