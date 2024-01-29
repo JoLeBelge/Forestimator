@@ -4,7 +4,7 @@ import 'package:fforestimator/globals.dart' as gl;
 import 'package:fforestimator/pages/map.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'dart:io' show Platform;
-import 'package:fforestimator/pages/catalogueView/catalogueView.dart';
+import 'package:fforestimator/pages/catalogueView/catalogueLayerView.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -35,7 +35,7 @@ class _MyApp extends State<MyApp> {
 
   static final List<Widget> _widgetOptions = <Widget>[
     const mapPage(title: 'Flutter Demo Home Page'),
-    const CatalogueView(),
+    CatalogueLayerView(),
     const Text(
       'todo analysis',
       style: optionStyle,

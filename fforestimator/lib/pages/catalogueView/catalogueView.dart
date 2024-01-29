@@ -45,7 +45,9 @@ class _CatalogueView extends State<CatalogueView> {
               title: Text(item.name),
             );
           },
-          body: CategoryView(category: item,),
+          body: CategoryView(
+            category: item,
+          ),
           isExpanded: item.isExpanded,
         );
       }).toList(),
@@ -126,8 +128,8 @@ class _CategoryView extends State<CategoryView> {
   void _getLayerData() async {
     List<Map<String, dynamic>> result = await gl.dico.db
         .query('fichiersGis', where: 'expert=0 AND groupe IS NOT NULL');
-    result +=
-        await gl.dico.db.query('layerApt', where: 'expert=0 AND groupe IS NOT NULL');
+    result += await gl.dico.db
+        .query('layerApt', where: 'expert=0 AND groupe IS NOT NULL');
     for (var row in result) {
       if (widget.category.filter == row['groupe']) {
         _layerTiles += [
@@ -146,5 +148,39 @@ class _CategoryView extends State<CategoryView> {
     if (!_finishedInitializingCategory) {
       _getLayerData();
     }
+  }
+}
+
+class SelectedLayerView extends StatefulWidget {
+  final List<LayerTile> selectedLayer;
+  const SelectedLayerView({super.key, required this.selectedLayer});
+  @override
+  State<SelectedLayerView> createState() => _SelectedLayerView();
+}
+
+class _SelectedLayerView extends State<SelectedLayerView> {
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      children: [
+        ListTile(
+          shape: RoundedRectangleBorder( borderRadius: BorderRadius.circular(10.0), side: BorderSide.none),
+          tileColor: Colors.blueAccent,
+          title: widget.selectedLayer.length > 0
+              ? Text(widget.selectedLayer[0].name)
+              : Text('Pas de couche selectionnée.'),
+        ),
+        ListTile(
+          title: widget.selectedLayer.length > 1
+              ? Text(widget.selectedLayer[1].name)
+              : Text('Pas de couche selectionnée.'),
+        ),
+        ListTile(
+          title: widget.selectedLayer.length > 2
+              ? Text(widget.selectedLayer[2].name)
+              : Text('Pas de couche selectionnée.'),
+        ),
+      ],
+    );
   }
 }
