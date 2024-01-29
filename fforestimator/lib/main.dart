@@ -46,7 +46,6 @@ class _MyApp extends State<MyApp> {
     ),
   ];
 
-  _MyApp();
 
   void _onItemTapped(int index) {
     setState(() {

@@ -1,8 +1,11 @@
+import 'dart:ffi';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:fforestimator/globals.dart' as gl;
-import 'package:fforestimator/pages/catalogueView/category.dart';
+import 'package:fforestimator/pages/catalogueView/categoryTile.dart';
+import 'package:fforestimator/pages/catalogueView/layerTile.dart';
+import 'package:flutter_map/flutter_map.dart';
 
 class CatalogueView extends StatefulWidget {
   const CatalogueView({super.key});
@@ -42,7 +45,7 @@ class _CatalogueView extends State<CatalogueView> {
               title: Text(item.name),
             );
           },
-          body: _buildLayerListPerTopic(),
+          body: CategoryView(category: item,),
           isExpanded: item.isExpanded,
         );
       }).toList(),
@@ -63,54 +66,85 @@ class _CatalogueView extends State<CatalogueView> {
   @override
   void initState() {
     super.initState();
-    if (!finishedInitializingCategories){
+    if (!finishedInitializingCategories) {
       _getCategories();
-      }
+    }
+  }
+}
+
+class CategoryView extends StatefulWidget {
+  final Category category;
+  const CategoryView({super.key, required this.category});
+  @override
+  State<CategoryView> createState() => _CategoryView();
+}
+
+class _CategoryView extends State<CategoryView> {
+  List<LayerTile> _layerTiles = [];
+  bool _finishedInitializingCategory = false;
+
+  @override
+  Widget build(BuildContext context) {
+    if (_finishedInitializingCategory) {
+      return Container(
+          constraints: BoxConstraints(
+              maxWidth: MediaQuery.of(context).size.width * .95,
+              maxHeight: MediaQuery.of(context).size.height * .5),
+          child: Scrollbar(
+              child: SingleChildScrollView(
+            child: Container(
+              child: _buildPanel(),
+            ),
+          )));
+    } else {
+      return const CircularProgressIndicator();
+    }
   }
 
-  Widget _buildLayerListPerTopic() {
+  Widget _buildPanel() {
     return ExpansionPanelList(
       expansionCallback: (int index, bool isExpanded) {
         setState(() {
-          _categories[index].isExpanded = isExpanded;
+          _layerTiles[index].isExpanded = isExpanded;
         });
       },
-      children: _categories.map<ExpansionPanel>((Category item) {
+      children: _layerTiles.map<ExpansionPanel>((LayerTile item) {
         return ExpansionPanel(
           headerBuilder: (BuildContext context, bool isExpanded) {
+            print(item.name);
             return ListTile(
               title: Text(item.name),
             );
           },
-          body: Scrollbar(
-            child: Row(children: <Widget>[
-              Container(
-                constraints: BoxConstraints(
-                    maxWidth: MediaQuery.of(context).size.width * .95,
-                    maxHeight: MediaQuery.of(context).size.height * .5),
-                child: ListView(
-                  clipBehavior: Clip.antiAlias,
-                  children: <Widget>[
-                    Card(child: ListTile(title: Text('gl.dico.db.query()'))),
-                    Card(
-                      child: ListTile(
-                        leading: FlutterLogo(),
-                        title: Text('One-line with leading widget'),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                constraints: BoxConstraints(
-                    maxWidth: MediaQuery.of(context).size.width * .05,
-                    maxHeight: MediaQuery.of(context).size.height * .5),
-              ),
-            ]),
-          ),
+          body: Text('nana'), //_buildLayerListPerTopic(),
           isExpanded: item.isExpanded,
         );
       }).toList(),
     );
+  }
+
+  void _getLayerData() async {
+    List<Map<String, dynamic>> result = await gl.dico.db
+        .query('fichiersGis', where: 'expert=0 AND groupe IS NOT NULL');
+    result +=
+        await gl.dico.db.query('layerApt', where: 'expert=0 AND groupe IS NOT NULL');
+    for (var row in result) {
+      if (widget.category.filter == row['groupe']) {
+        _layerTiles += [
+          LayerTile(name: row['NomCourt'], filter: row['groupe'])
+        ];
+      }
+    }
+    setState(() {
+      _finishedInitializingCategory = true;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    if (!_finishedInitializingCategory) {
+      _getLayerData();
+    }
   }
 }
