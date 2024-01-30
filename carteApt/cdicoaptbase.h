@@ -526,11 +526,11 @@ public:
     cdicoAptBase * Dico(){return mDico;}
     std::string printRisque();
 
-    TypeCarte Type(){return mType;}
+    //TypeCarte Type(){return mType;}
 
 private:
     FeRe mFeRe;
-    TypeCarte mType;
+    //TypeCarte mType;
     cdicoAptBase *mDico;
     std::string mCode, mNomFR, mF_R, mPrefix;
 };

@@ -1,20 +1,16 @@
 To do list fforestimator
 ------------------------
 
-Jo-> ajout couche raster CNSW et dicoCNSW implémenté coté web et coté mobile, co fait pour carteApt compute NT
-
-deboggage Forestimator web sous qt n'est plus fonctionnel, demander a tt
+Jo-> dicoCNSW co fait pour carteApt compute NT
+Jo-> classe essence et methode aptitude
 
 -désactiver rotation de la carte (sur mobile c'est pénible)
--onTap: analyse surfacique
--analyse ponctuelle avec accès internet ; requête à l'API Forestitmator
 
 TT ->création interface graphique pour le catalogue de couches carto+ ma selection de couche
 TT ->création interface graphique pour afficher la légende d'une couche (utilisation dicoVal et dicoCol de layerBase)-> intégré dans inteface "catalogue/selection de couche"
-- connexion avec GPS mobile et center la carte sur la position 
+
 TT -> création interface graphique pour afficher le résultat d'une analyse ponctuelle (avec event onTap sur la map, par exemple)
 TT -> création interface graphique pour gestion de projet offline avec téléchargement des rasters.
-
 
 JO -> FMTC des tuiles WMS
 Jo -> bulk download raster clipped (dans une bd sqlite en BLOB?)  
