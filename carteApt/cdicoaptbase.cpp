@@ -463,7 +463,7 @@ std::map<int,std::map<int,int>> cdicoAptBase::getRisqueTopo(std::string aCodeEs)
 
     sqlite3_stmt * stmt;
     // hors Ardenne
-    std::string SQLstring="SELECT Secteurfroid,Secteurneutre,Secteurchaud,fond_Vallee FROM Risque_topoFEE WHERE Code_Fr='"+ aCodeEs+"';";
+    std::string SQLstring="SELECT Secteurfroid,Secteurneutre,Secteurchaud,Fond_vallee FROM Risque_topoFEE WHERE Code_Fr='"+ aCodeEs+"';";
     boost::replace_all(SQLstring, "'", "\"");
     sqlite3_prepare_v2( *db_, SQLstring.c_str(), -1, &stmt, NULL );//preparing the statement
     while(sqlite3_step(stmt) == SQLITE_ROW)
@@ -526,9 +526,7 @@ std::map<int,std::map<std::tuple<int, std::string>,int>> cdicoAptBase::getCSApt(
                 var=std::string( (char *)sqlite3_column_text( stmt, 2 ) );
                 }
                 int codeApt=Apt(apt);
-                //if (var=="" | var=="a"){ // pour l'instant, je ne considère que la variance "a" des stations.
                 aRes[zbio].emplace(std::make_pair(std::make_tuple(station,var),codeApt));
-                //}
             }
         }
         sqlite3_finalize(stmt);

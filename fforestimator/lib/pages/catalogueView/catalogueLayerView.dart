@@ -17,7 +17,7 @@ class _CatalogueLayerView extends State<CatalogueLayerView> {
         child: SearchBarView(),
         constraints: BoxConstraints(
             maxWidth: MediaQuery.of(context).size.width * .98,
-                        minHeight: MediaQuery.of(context).size.height * .075,
+            minHeight: MediaQuery.of(context).size.height * .075,
             maxHeight: MediaQuery.of(context).size.height * .075),
       ),
       Container(

@@ -63,11 +63,11 @@ class _CatalogueView extends State<CatalogueView> {
     );
   }
 
-  void _getCategories() async {
-    List<Map<String, dynamic>> result =
-        await gl.dico.db.query('groupe_couche', where: 'expert=0');
-    for (var row in result) {
-      _categories += [Category(name: row['label'], filter: row['code'])];
+  void _getCategories() {
+    for (groupe_couche gr in gl.dico.mGrCouches) {
+      if (!gr.mExpert) {
+        _categories += [Category(name: gr.mLabel, filter: gr.mCode)];
+      }
     }
     setState(() {
       finishedInitializingCategories = true;
@@ -148,7 +148,7 @@ class _CategoryView extends State<CategoryView> {
   }
 
   void _getLayerData() async {
-    Map<String, LayerBase> mp = gl.dico.mLayerBases;
+    Map<String, layerBase> mp = gl.dico.mLayerBases;
     for (var key in mp.values) {
       if (widget.category.filter == key.mGroupe) {
         _layerTiles += [LayerTile(name: key.mNom!, filter: key.mGroupe!)];
