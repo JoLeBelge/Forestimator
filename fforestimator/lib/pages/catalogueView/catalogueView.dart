@@ -41,6 +41,7 @@ class _CatalogueView extends State<CatalogueView> {
 
   Widget _buildPanel() {
     return ExpansionPanelList(
+      expandIconColor: Colors.black,
       expansionCallback: (int index, bool isExpanded) {
         setState(() {
           _categories[index].isExpanded = isExpanded;
@@ -48,8 +49,10 @@ class _CatalogueView extends State<CatalogueView> {
       },
       children: _categories.map<ExpansionPanel>((Category item) {
         return ExpansionPanel(
+          backgroundColor: Colors.grey,
           headerBuilder: (BuildContext context, bool isExpanded) {
             return ListTile(
+              iconColor: Colors.grey,
               title: Text(item.name),
             );
           },
@@ -129,15 +132,33 @@ class _CategoryView extends State<CategoryView> {
         return ExpansionPanel(
           headerBuilder: (BuildContext context, bool isExpanded) {
             return ListTile(
+              tileColor: item.selected &&
+                      gl.interfaceSelectedLayerKeys.contains(item.name)
+                  ? Colors.lightGreen
+                  : Colors.grey,
               title: Text(item.name),
-              leading: IconButton(
-                  icon: const Icon(Icons.get_app_rounded),
-                  onPressed: () {
-                    setState(() {
-                      gl.interfaceSelectedLayerKeys.add(item.name);
-                      widget.refreshView();
-                    });
-                  }),
+              leading: item.selected &&
+                      gl.interfaceSelectedLayerKeys.contains(item.name)
+                  ? IconButton(
+                      icon: const Icon(Icons.upload_rounded),
+                      onPressed: () {
+                        setState(() {
+                          gl.interfaceSelectedLayerKeys.remove(item.name);
+                          item.selected = false;
+                          widget.refreshView();
+                        });
+                      })
+                  : IconButton(
+                      icon: const Icon(Icons.download_rounded),
+                      onPressed: () {
+                        setState(() {
+                          if (gl.interfaceSelectedLayerKeys.length < 3) {
+                            gl.interfaceSelectedLayerKeys.add(item.name);
+                            item.selected = true;
+                            widget.refreshView();
+                          }
+                        });
+                      }),
             );
           },
           body: Text('nana'),
@@ -169,7 +190,8 @@ class _CategoryView extends State<CategoryView> {
 }
 
 class SelectedLayerView extends StatefulWidget {
-  const SelectedLayerView({super.key});
+  final Function refreshView;
+  const SelectedLayerView({required this.refreshView, super.key});
   @override
   State<SelectedLayerView> createState() => _SelectedLayerView();
 }
@@ -178,26 +200,27 @@ class _SelectedLayerView extends State<SelectedLayerView> {
   @override
   Widget build(BuildContext context) {
     return ListView(
-      children: [
-        ListTile(
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10.0), side: BorderSide.none),
-          tileColor: Colors.blueAccent,
-          title: gl.interfaceSelectedLayerKeys.length > 0
-              ? Text(gl.interfaceSelectedLayerKeys[0])
-              : Text('Pas de couche selectionnée.'),
-        ),
-        ListTile(
-          title: gl.interfaceSelectedLayerKeys.length > 1
-              ? Text(gl.interfaceSelectedLayerKeys[1])
-              : Text('Pas de couche selectionnée.'),
-        ),
-        ListTile(
-          title: gl.interfaceSelectedLayerKeys.length > 2
-              ? Text(gl.interfaceSelectedLayerKeys[2])
-              : Text('Pas de couche selectionnée.'),
-        ),
-      ],
+      children: List<Widget>.generate(
+        3,
+        (i) => gl.interfaceSelectedLayerKeys.length > i
+            ? ListTile(
+                trailing: IconButton(
+                  icon: Icon(Icons.delete_rounded),
+                  onPressed: () {
+                    setState(() {
+                      gl.interfaceSelectedLayerKeys.remove(
+                          gl.interfaceSelectedLayerKeys[
+                              i]); 
+                      widget.refreshView();
+                    });
+                  },
+                ),
+                title: Text(gl.interfaceSelectedLayerKeys[i]),
+              )
+            : const ListTile(
+                title: Text('Pas de couche selectionnée.'),
+              ),
+      ),
     );
   }
 }

@@ -28,7 +28,7 @@ class _CatalogueLayerView extends State<CatalogueLayerView> {
             maxHeight: MediaQuery.of(context).size.height * .6),
       ),
       Container(
-        child: SelectedLayerView(),
+        child: SelectedLayerView(refreshView: refreshView),
         constraints: BoxConstraints(
             maxWidth: MediaQuery.of(context).size.width * .98,
             maxHeight: MediaQuery.of(context).size.height * .25),
