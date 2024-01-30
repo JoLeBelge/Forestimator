@@ -1,13 +1,8 @@
-import 'dart:ffi';
-import 'dart:io';
-import 'dart:ui';
-
 import 'package:fforestimator/dico/dicoApt.dart';
 import 'package:flutter/material.dart';
 import 'package:fforestimator/globals.dart' as gl;
 import 'package:fforestimator/pages/catalogueView/categoryTile.dart';
 import 'package:fforestimator/pages/catalogueView/layerTile.dart';
-import 'package:flutter_map/flutter_map.dart';
 
 ScrollController it = ScrollController();
 ClampingScrollPhysics that = ClampingScrollPhysics();
@@ -132,12 +127,12 @@ class _CategoryView extends State<CategoryView> {
         return ExpansionPanel(
           headerBuilder: (BuildContext context, bool isExpanded) {
             return ListTile(
-              tileColor: item.selected &&
+              tileColor: item.selected ||
                       gl.interfaceSelectedLayerKeys.contains(item.key)
                   ? Colors.lightGreen
                   : Colors.grey,
               title: Text(item.name),
-              leading: item.selected &&
+              leading: item.selected ||
                       gl.interfaceSelectedLayerKeys.contains(item.key)
                   ? IconButton(
                       icon: const Icon(Icons.upload_rounded),

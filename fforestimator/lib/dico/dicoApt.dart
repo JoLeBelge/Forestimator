@@ -117,7 +117,7 @@ class layerBase {
           nom_field_raster.toString() +
           ' as rast, ' +
           nom_field_value.toString() +
-          ' as val, col FROM ' +
+          ' as val, "col" FROM ' +
           nom_dico.toString();
       if (condition != null) {
         myquery += ' WHERE ' + condition.toString();
@@ -156,6 +156,7 @@ class layerBase {
 }
 
 class dicoAptProvider {
+  bool finishedLoading = false;
   late Database db;
   Map<String, Color> colors = {};
   Map<String, layerBase> mLayerBases = {};
@@ -258,6 +259,7 @@ class dicoAptProvider {
     }
 
     db.close();
+    finishedLoading = true;
   }
 
   int Apt(String codeAptStr) {

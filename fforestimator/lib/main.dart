@@ -16,7 +16,7 @@ void main() async {
 
   gl.dico = dicoAptProvider();
   await gl.dico.init();
-
+  while(!gl.dico.finishedLoading){}
   runApp(const MyApp());
 }
 
