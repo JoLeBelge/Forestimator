@@ -623,3 +623,64 @@ int cleNH(const siglePedo *s, int AE, int SS){
 
     return aRes;
 }
+
+void calculProf(std::string adirBD){
+    std::cout << "calcul Carte des profondeurs " << std::endl;
+    GDALAllRegister();
+    std::unique_ptr<cDicoCartepH> dico= std::make_unique<cDicoCartepH>(adirBD);
+
+    std::string aCNSWpath(dico->File("CNSW"));
+    GDALDataset  * poDatCNSW = (GDALDataset *) GDALOpen( aCNSWpath.c_str(), GA_ReadOnly );
+    if( poDatCNSW == NULL )
+    {
+        std::cout << "je n'ai pas lu le fichier " << aCNSWpath << std::endl;
+    }
+    int x=poDatCNSW->GetRasterBand(1)->GetXSize();
+    int y=poDatCNSW->GetRasterBand(1)->GetYSize();
+
+    std::string aOut(dico->File("Prof"));
+
+    const char *pszFormat = "GTiff";
+    GDALDriver *poDriver;
+    poDriver = GetGDALDriverManager()->GetDriverByName(pszFormat);
+    const char * destFile=aOut.c_str();
+    char **papszOptions = NULL;
+    papszOptions = CSLSetNameValue( papszOptions, "COMPRESS", "DEFLATE" );
+    GDALDataset* poDstDS = poDriver->CreateCopy( destFile, poDatCNSW, FALSE, papszOptions,NULL, NULL );
+    GDALRasterBand *outBand;
+    outBand = poDstDS->GetRasterBand(1);
+    std::cout << "copy of raster done" << std::endl;
+
+    int step= y/100;
+    float *scanlineCNSW= (float *) CPLMalloc( sizeof( float ) * x );
+    float *scanline = (float *) CPLMalloc( sizeof( float ) * x );
+    // boucle sur les pixels
+    int c(0);
+    for ( int row = 0; row < y; row++ )
+    {
+        poDatCNSW->GetRasterBand(1)->RasterIO(GF_Read, 0, row, x, 1, scanlineCNSW, x,1, GDT_Float32, 0, 0 );
+
+        // iterate on pixels in row
+        for (int col = 0; col < x; col++)
+        {
+            int epaisseurCM(0);
+            int cnsw = scanlineCNSW[ col ];
+            if (cnsw!=0){ // si cnsw ==0, bug de création de l'objet siglePedo!
+                const siglePedo *s=dico->getSiglePedoPtr(cnsw);
+                epaisseurCM=dico->getEpaisseur(cnsw);
+                if (s->getPHASE_5()=="P" && s->getMAT_TEXT()=="G"){epaisseurCM=6;}
+            }
+            scanline[ col ] = epaisseurCM;
+        }
+        // écriture du résultat dans le fichier de destination
+        outBand->RasterIO( GF_Write, 0, row, x, 1, scanline, x, 1,GDT_Float32, 0, 0 );
+        if (row%step==0){std::cout << c << " pct"<< std::endl;c++;}
+    }
+    CPLFree(scanline);
+    CPLFree(scanlineCNSW);
+
+
+    GDALClose(poDstDS);
+    GDALClose(poDatCNSW);
+
+}

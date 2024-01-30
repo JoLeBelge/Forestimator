@@ -3,138 +3,18 @@ import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 import 'package:flutter/services.dart';
-import 'package:tuple/tuple.dart';
-
-class Ess {
-  String? mCode;
-  String? mNomFR;
-  int? mF_R;
-  String? mPrefix;
-
-  // aptitude ecograme : clé chaine charactère ; c'est la combinaison ntxnh du genre "A2p5" ou "Mm4
-  Map<int, Map<String, int>> mEcoVal;
-  // aptitude pour chaque zone bioclim
-  Map<int, int> mAptZbio;
-  // aptitude pour catalogue de station
-  // clé ; zone bioclim/ région. Value ; une map -> clé = identifiant de la station (id + variante) Value ; aptitude
-  Map<int, Map<Tuple2<int, String>, int>> mAptCS;
-  // clé ; zone bioclim/ région. Value ; une map -> clé ; id situation topo. valeur ; code risque
-  Map<int, Map<int, int>> mRisqueTopo;
-
-  Ess.fromMap(final Map<String, dynamic> map)
-      : mCode = map['Code_FR'],
-        mNomFR = map['Ess_FR'],
-        mPrefix = map['prefix'],
-        mF_R = map['FeRe'],
-        mEcoVal = {},
-        mAptZbio = {},
-        mAptCS = {},
-        mRisqueTopo = {};
-
-  Future<void> fillApt(dicoAptProvider dico) async {
-    // aptitude hydro-trophique ; une matrice par zbioclimatique
-    String myquery =
-        'SELECT CodeNTNH,"1","2","3","4","5","6","7","8","9","10" FROM AptFEE WHERE CODE_ESSENCE="' +
-            mCode.toString() +
-            '";';
-    List<Map<String, dynamic>> aAptEco = await dico.db.rawQuery(myquery);
-    for (int zbio = 1; zbio <= 10; zbio++) {
-      Map<String, int> EcoOneZbio = {};
-      for (var r in aAptEco) {
-        String apt = r[zbio.toString()];
-        String codeNTNH = dico.code2NTNH(r['CodeNTNH']);
-        // convertion apt code Str vers code integer
-        int codeApt = dico.Apt(apt);
-        EcoOneZbio.addEntries({codeNTNH: codeApt}.entries);
-      }
-      mEcoVal[zbio] = EcoOneZbio;
-    }
-
-    // aptitude climatique ; une aptitude pour chacune des 10 zones climatiques
-    myquery =
-        'SELECT "1","2","3","4","5","6","7","8","9","10" FROM AptFEE_ZBIO WHERE CODE_ESSENCE="' +
-            mCode.toString() +
-            '";';
-    List<Map<String, dynamic>> aAptZbio = await dico.db.rawQuery(myquery);
-    for (var r in aAptZbio) {
-      for (int zbio = 1; zbio <= 10; zbio++) {
-        String apt = r[zbio.toString()];
-        // convertion apt code Str vers code integer
-        int codeApt = dico.Apt(apt);
-        mAptZbio.addEntries({zbio: codeApt}.entries);
-      }
-    }
-
-    // risque topographique ; permet de compenser une aptitude en bien (surcote) ou en mal (souscote)
-    myquery =
-        'SELECT Secteurfroid,Secteurneutre,Secteurchaud,Fond_vallee,SF_Ardenne,FV_Ardenne FROM Risque_topoFEE WHERE Code_Fr="' +
-            mCode.toString() +
-            '";';
-    List<Map<String, dynamic>> rTopo = await dico.db.rawQuery(myquery);
-    for (int zbio = 1; zbio <= 10; zbio++) {
-      Map<int, int> rTopoOneZbio = {};
-      for (var r in rTopo) {
-        int codeRisque1 = dico.Risque(r['Secteurfroid']);
-        int codeRisque4 = dico.Risque(r['Fond_vallee']);
-        int codeRisque2 = dico.Risque(r['Secteurneutre']);
-        int codeRisque3 = dico.Risque(r['Secteurchaud']);
-        if (zbio == 1 || zbio == 2 || zbio == 10) {
-          // pour l'ardenne
-          if (r['SF_Ardenne'] != null) {
-            codeRisque1 = dico.Risque(r['SF_Ardenne']);
-          }
-          if (r['FV_Ardenne'] != null) {
-            codeRisque4 = dico.Risque(r['FV_Ardenne']);
-          }
-        }
-        rTopoOneZbio.addEntries({
-          1: codeRisque1,
-          2: codeRisque2,
-          3: codeRisque3,
-          4: codeRisque4
-        }.entries);
-      }
-      mRisqueTopo[zbio] = rTopoOneZbio;
-    }
-
-    // aptitude CS
-    for (int zbio = 1; zbio <= 10; zbio++) {
-      myquery = "SELECT stat_id," +
-          mCode.toString() +
-          ",var FROM AptCS WHERE ZBIO=" +
-          zbio.toString() +
-          ";";
-      try {
-        List<Map<String, dynamic>> aptCS = await dico.db.rawQuery(myquery);
-        if (aptCS.length > 0) {
-          Map<Tuple2<int, String>, int> aptCSOneZbio = {};
-          for (var r in aptCS) {
-            if (r[mCode.toString()] != null) {
-              int codeApt = dico.Apt(r[mCode.toString()]);
-              String variante = "";
-              r['var'] != null ? variante = r['var'] : variante = "";
-              int station = r['stat_id'];
-              aptCSOneZbio
-                  .addEntries({Tuple2(station, variante): codeApt}.entries);
-            }
-          }
-          mAptCS[zbio] = aptCSOneZbio;
-        }
-      } catch (e) {}
-    }
-  } // fin fillApt
-}
+import 'package:fforestimator/dico/ess.dart';
 
 class aptitude {
   late int mCodeNum;
   String? mLabelApt;
-  String? mCode;
+  late String mCode;
 //String? mEquiv;
   int? mEquCodeNonContr;
   int? mEquiv;
   int? mOrdreContrainte;
-  int? mSurcote;
-  int? mSouscote;
+  late int mSurcote;
+  late int mSouscote;
 
   aptitude.fromMap(final Map<String, dynamic> map)
       : mCodeNum = map['Num'],
@@ -155,6 +35,23 @@ class risque {
       : mCode = map['code'],
         mRisque = map['risque'],
         mCategorie = map['categorie'];
+}
+
+class station {
+  late int mStationId;
+  late int mZbio;
+  late String mNomStationCarto;
+  late String mNomVar;
+  late bool mVarMaj;
+  late String mVar;
+
+  station.fromMap(final Map<String, dynamic> map)
+      : mStationId = map['stat_id'],
+        mZbio = map['ZBIO'],
+        mNomStationCarto = map['Station_carto'],
+        mNomVar = map['nom_var'] != null ? map['nom_var'] : '',
+        mVarMaj = map['varMajoritaire'] == 1 ? true : false,
+        mVar = map['var'] != null ? map['var'] : '';
 }
 
 class zbio {
@@ -181,7 +78,7 @@ class groupe_couche {
 
 class layerBase {
   String? mNom, mNomCourt;
-  bool? mExpert; // l'app mobile n'as pas besoin de cette info, non?
+  bool? mExpert;
   String? mCode;
   String? mUrl, mWMSLayerName, mWMSattribution;
   String? mGroupe;
@@ -190,7 +87,6 @@ class layerBase {
   String? nom_field_raster, nom_field_value, nom_dico, condition;
   Map<int, String> mDicoVal; // valeur raster vers signification
   Map<int, Color> mDicoCol; // valeur raster vers couleur
-
   //String mNomFile,mDir; mPathQml mPathRaster,
 
 // frommap avec liste d'instanciation, inspiré de https://medium.com/@lumeilin/using-sqlite-in-flutter-59b27b099123
@@ -268,6 +164,7 @@ class dicoAptProvider {
   List<risque> mRisques = [];
   List<zbio> mZbio = [];
   List<groupe_couche> mGrCouches = [];
+  List<station> mStations = [];
   Map<int, String> dico_code2NTNH = {};
 
   Future<void> init() async {
@@ -348,6 +245,10 @@ class dicoAptProvider {
     for (var row in result) {
       mGrCouches.add(groupe_couche.fromMap(row));
     }
+    result = await db.query('dico_station', where: 'stat_id=stat_num');
+    for (var row in result) {
+      mStations.add(station.fromMap(row));
+    }
 
     // lecture des essences
     result = await db.query('dico_essences');
@@ -379,12 +280,67 @@ class dicoAptProvider {
     return aRes;
   }
 
-  int Risque(String aStr) {
+  int getRisque(String aStr) {
     int aRes = 0;
     for (risque r in mRisques) {
       if (r.mRisque == aStr) {
         aRes = r.mCode;
         break;
+      }
+    }
+    return aRes;
+  }
+
+  int risqueCat(int aCode) {
+    int aRes = 0;
+    for (risque r in mRisques) {
+      if (r.mCode == aCode) {
+        aRes = r.mCategorie;
+        break;
+      }
+    }
+    return aRes;
+  }
+
+  int AptSurcote(int aCode) {
+    int aRes = aCode;
+    for (aptitude apt in mAptitudes) {
+      if (apt.mCode == aCode) {
+        aRes = apt.mSurcote;
+        break;
+      }
+    }
+    return aRes;
+  }
+
+  int AptSouscote(int aCode) {
+    int aRes = aCode;
+    for (aptitude apt in mAptitudes) {
+      if (apt.mCode == aCode) {
+        aRes = apt.mSouscote;
+        break;
+      }
+    }
+    return aRes;
+  }
+
+  int zbio2CSid(int aCode) {
+    int aRes = 0;
+    for (zbio z in mZbio) {
+      if (z.mCode == aCode) {
+        aRes = z.mCSid!;
+        break;
+      }
+    }
+    return aRes;
+  }
+
+  String getStationMaj(int zbio, int US) {
+    String aRes = "";
+    int zbioKey = zbio2CSid(zbio);
+    for (station st in mStations) {
+      if (st.mZbio == zbioKey && st.mVarMaj) {
+        aRes = st.mVar;
       }
     }
     return aRes;

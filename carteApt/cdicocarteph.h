@@ -33,6 +33,7 @@ public:
         mPHASE_1=p->getPHASE_1();
         mPHASE_2=p->getPHASE_2();
         mPHASE_4=p->getPHASE_4();
+        mPHASE_5=p->getPHASE_5();
         mPHASE_6=p->getPHASE_6();
 
         mCHARGE=p->getCHARGE();
@@ -55,6 +56,7 @@ public:
     std::string getPHASE_1() const {return mPHASE_1;}
     std::string getPHASE_2() const {return mPHASE_2;}
     std::string getPHASE_4() const {return mPHASE_4;}
+     std::string getPHASE_5() const {return mPHASE_5;}
     std::string getPHASE_6() const {return mPHASE_6;}
     std::string getCHARGE() const {return mCHARGE;}
 
@@ -103,6 +105,7 @@ public:
         dbo::field(a, mPHASE_1, "PHASE_1");
         dbo::field(a, mPHASE_2, "PHASE_2");
         dbo::field(a, mPHASE_4, "PHASE_4");
+        dbo::field(a, mPHASE_5, "PHASE_5");
         dbo::field(a, mPHASE_6, "PHASE_6");
         dbo::field(a, mCHARGE,     "CHARGE");
         dbo::field(a, mDRAINAGE,    "DRAINAGE");
@@ -117,9 +120,8 @@ public:
     std::string mMAT_TEXT_SIMP;
 private:
     bool mCalcaire,mSsriche,mProfond,mAlluvion,mPodzol,mPodzolique,mSuperficiel,mTourbe,mLimon, mCalcaireLorraine,mFauxCalcaireLorraine,mArgileBlanche;
-    std::string SUBSTRAT,mMAT_TEXT, mPHASE_1, mPHASE_2,mPHASE_4, mPHASE_6, mCHARGE, mDRAINAGE, mDEV_PROFIL, mSER_SPEC;
+    std::string SUBSTRAT,mMAT_TEXT, mPHASE_1, mPHASE_2,mPHASE_4,mPHASE_5, mPHASE_6, mCHARGE, mDRAINAGE, mDEV_PROFIL, mSER_SPEC;
     int INDEX_;
-
 };
 
 class cDicoCartepH
@@ -150,6 +152,12 @@ public:
     std::string getMatTextSimp(std::string aText){
         std::string aRes="";
         if(Dico_MAT_TEXT.find(aText)!=Dico_MAT_TEXT.end()){aRes=Dico_MAT_TEXT.at(aText);}
+        return aRes;
+    }
+
+    int getEpaisseur(int aSolIndex){
+        int aRes(0);
+        if (Dico_IndexSiglePed2Epaisseur.find(aSolIndex)!=Dico_IndexSiglePed2Epaisseur.end()){aRes=Dico_IndexSiglePed2Epaisseur.at(aSolIndex);}
         return aRes;
     }
 
@@ -204,6 +212,8 @@ private:
     std::map<int,std::string> Dico_PTS;
     std::map<int,int> Dico_Zbio2RN;
     std::map<int,int> Dico_IndexSiglePed2PTS;
+    std::map<int,int> Dico_IndexSiglePed2Epaisseur;
+    //std::map<int,int> Dico_Epaisseur2rastCode;
     std::map<int,double> Dico_PTS2pH;
     std::map<std::vector<int>,double> Dico_PTSetRN2pH;
     // le nombre de mesure - en dessous de 2 on prends pas (correction 2021 06)
