@@ -13,7 +13,8 @@ ScrollController it = ScrollController();
 ClampingScrollPhysics that = ClampingScrollPhysics();
 
 class CatalogueView extends StatefulWidget {
-  const CatalogueView({super.key});
+  final Function refreshView;
+  const CatalogueView({required this.refreshView, super.key});
   @override
   State<CatalogueView> createState() => _CatalogueView();
 }
@@ -53,6 +54,7 @@ class _CatalogueView extends State<CatalogueView> {
             );
           },
           body: CategoryView(
+            refreshView: widget.refreshView,
             category: item,
           ),
           isExpanded: item.isExpanded,
@@ -83,7 +85,9 @@ class _CatalogueView extends State<CatalogueView> {
 
 class CategoryView extends StatefulWidget {
   final Category category;
-  const CategoryView({super.key, required this.category});
+  final Function refreshView;
+  const CategoryView(
+      {super.key, required this.category, required this.refreshView});
   @override
   State<CategoryView> createState() => _CategoryView();
 }
@@ -127,10 +131,11 @@ class _CategoryView extends State<CategoryView> {
             return ListTile(
               title: Text(item.name),
               leading: IconButton(
-                  icon: Icon(Icons.get_app_rounded),
+                  icon: const Icon(Icons.get_app_rounded),
                   onPressed: () {
                     setState(() {
-                      //TODO:Put Layer in selected list});
+                      gl.interfaceSelectedLayerKeys.add(item.name);
+                      widget.refreshView();
                     });
                   }),
             );
@@ -164,8 +169,7 @@ class _CategoryView extends State<CategoryView> {
 }
 
 class SelectedLayerView extends StatefulWidget {
-  final List<LayerTile> selectedLayer;
-  const SelectedLayerView({super.key, required this.selectedLayer});
+  const SelectedLayerView({super.key});
   @override
   State<SelectedLayerView> createState() => _SelectedLayerView();
 }
@@ -179,18 +183,18 @@ class _SelectedLayerView extends State<SelectedLayerView> {
           shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10.0), side: BorderSide.none),
           tileColor: Colors.blueAccent,
-          title: widget.selectedLayer.length > 0
-              ? Text(widget.selectedLayer[0].name)
+          title: gl.interfaceSelectedLayerKeys.length > 0
+              ? Text(gl.interfaceSelectedLayerKeys[0])
               : Text('Pas de couche selectionnée.'),
         ),
         ListTile(
-          title: widget.selectedLayer.length > 1
-              ? Text(widget.selectedLayer[1].name)
+          title: gl.interfaceSelectedLayerKeys.length > 1
+              ? Text(gl.interfaceSelectedLayerKeys[1])
               : Text('Pas de couche selectionnée.'),
         ),
         ListTile(
-          title: widget.selectedLayer.length > 2
-              ? Text(widget.selectedLayer[2].name)
+          title: gl.interfaceSelectedLayerKeys.length > 2
+              ? Text(gl.interfaceSelectedLayerKeys[2])
               : Text('Pas de couche selectionnée.'),
         ),
       ],
