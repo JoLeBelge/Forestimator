@@ -13,7 +13,8 @@ ScrollController it = ScrollController();
 ClampingScrollPhysics that = ClampingScrollPhysics();
 
 class CatalogueView extends StatefulWidget {
-  const CatalogueView({super.key});
+  final Function refreshView;
+  const CatalogueView({required this.refreshView, super.key});
   @override
   State<CatalogueView> createState() => _CatalogueView();
 }
@@ -40,6 +41,7 @@ class _CatalogueView extends State<CatalogueView> {
 
   Widget _buildPanel() {
     return ExpansionPanelList(
+      expandIconColor: Colors.black,
       expansionCallback: (int index, bool isExpanded) {
         setState(() {
           _categories[index].isExpanded = isExpanded;
@@ -47,12 +49,15 @@ class _CatalogueView extends State<CatalogueView> {
       },
       children: _categories.map<ExpansionPanel>((Category item) {
         return ExpansionPanel(
+          backgroundColor: Colors.grey,
           headerBuilder: (BuildContext context, bool isExpanded) {
             return ListTile(
+              iconColor: Colors.grey,
               title: Text(item.name),
             );
           },
           body: CategoryView(
+            refreshView: widget.refreshView,
             category: item,
           ),
           isExpanded: item.isExpanded,
@@ -83,7 +88,9 @@ class _CatalogueView extends State<CatalogueView> {
 
 class CategoryView extends StatefulWidget {
   final Category category;
-  const CategoryView({super.key, required this.category});
+  final Function refreshView;
+  const CategoryView(
+      {super.key, required this.category, required this.refreshView});
   @override
   State<CategoryView> createState() => _CategoryView();
 }
@@ -96,7 +103,7 @@ class _CategoryView extends State<CategoryView> {
     if (_finishedInitializingCategory) {
       return Container(
           constraints: BoxConstraints(
-              maxWidth: MediaQuery.of(context).size.width * .95,
+              maxWidth: MediaQuery.of(context).size.width * 1.0,
               maxHeight: _layerTiles.length *
                   100 *
                   MediaQuery.of(context).size.width *
@@ -125,14 +132,33 @@ class _CategoryView extends State<CategoryView> {
         return ExpansionPanel(
           headerBuilder: (BuildContext context, bool isExpanded) {
             return ListTile(
+              tileColor: item.selected &&
+                      gl.interfaceSelectedLayerKeys.contains(item.name)
+                  ? Colors.lightGreen
+                  : Colors.grey,
               title: Text(item.name),
-              leading: IconButton(
-                  icon: Icon(Icons.get_app_rounded),
-                  onPressed: () {
-                    setState(() {
-                      //TODO:Put Layer in selected list});
-                    });
-                  }),
+              leading: item.selected &&
+                      gl.interfaceSelectedLayerKeys.contains(item.name)
+                  ? IconButton(
+                      icon: const Icon(Icons.upload_rounded),
+                      onPressed: () {
+                        setState(() {
+                          gl.interfaceSelectedLayerKeys.remove(item.name);
+                          item.selected = false;
+                          widget.refreshView();
+                        });
+                      })
+                  : IconButton(
+                      icon: const Icon(Icons.download_rounded),
+                      onPressed: () {
+                        setState(() {
+                          if (gl.interfaceSelectedLayerKeys.length < 3) {
+                            gl.interfaceSelectedLayerKeys.add(item.name);
+                            item.selected = true;
+                            widget.refreshView();
+                          }
+                        });
+                      }),
             );
           },
           body: Text('nana'),
@@ -164,8 +190,8 @@ class _CategoryView extends State<CategoryView> {
 }
 
 class SelectedLayerView extends StatefulWidget {
-  final List<LayerTile> selectedLayer;
-  const SelectedLayerView({super.key, required this.selectedLayer});
+  final Function refreshView;
+  const SelectedLayerView({required this.refreshView, super.key});
   @override
   State<SelectedLayerView> createState() => _SelectedLayerView();
 }
@@ -174,26 +200,65 @@ class _SelectedLayerView extends State<SelectedLayerView> {
   @override
   Widget build(BuildContext context) {
     return ListView(
-      children: [
-        ListTile(
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10.0), side: BorderSide.none),
-          tileColor: Colors.blueAccent,
-          title: widget.selectedLayer.length > 0
-              ? Text(widget.selectedLayer[0].name)
-              : Text('Pas de couche selectionnée.'),
-        ),
-        ListTile(
-          title: widget.selectedLayer.length > 1
-              ? Text(widget.selectedLayer[1].name)
-              : Text('Pas de couche selectionnée.'),
-        ),
-        ListTile(
-          title: widget.selectedLayer.length > 2
-              ? Text(widget.selectedLayer[2].name)
-              : Text('Pas de couche selectionnée.'),
-        ),
-      ],
+      children: List<Widget>.generate(
+        3,
+        (i) => gl.interfaceSelectedLayerKeys.length > i
+            ? ListTile(
+                leading: Container(
+                  constraints: BoxConstraints(
+                    maxHeight: MediaQuery.of(context).size.height * .04,
+                    maxWidth: MediaQuery.of(context).size.width * .35,
+                  ),
+                  child: Row(children: <Widget>[
+                    IconButton(
+                      icon: Icon(Icons.keyboard_arrow_up_rounded),
+                      onPressed: () {
+                        setState(() {
+                          if (i > 0){
+                            String tmp = gl.interfaceSelectedLayerKeys[i];
+                            gl.interfaceSelectedLayerKeys[i] = gl.interfaceSelectedLayerKeys[i - 1];
+                            gl.interfaceSelectedLayerKeys[i - 1] = tmp;
+                          }
+                          widget.refreshView();
+                        });
+                      },
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.keyboard_arrow_down_rounded),
+                      onPressed: () {
+                        setState(() {
+                          if (gl.interfaceSelectedLayerKeys.length > i + 1){
+                            String tmp = gl.interfaceSelectedLayerKeys[i];
+                            gl.interfaceSelectedLayerKeys[i] = gl.interfaceSelectedLayerKeys[i + 1];
+                            gl.interfaceSelectedLayerKeys[i + 1] = tmp;
+                          }
+                          widget.refreshView();
+                        });
+                      },
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.delete_rounded),
+                      onPressed: () {
+                        setState(() {
+                          gl.interfaceSelectedLayerKeys
+                              .remove(gl.interfaceSelectedLayerKeys[i]);
+                          widget.refreshView();
+                        });
+                      },
+                    ),
+                  ]),
+                ),
+                title: Text(gl.interfaceSelectedLayerKeys[i]),
+              )
+            : ListTile(
+                leading: Container(
+                    constraints: BoxConstraints(
+                  maxHeight: MediaQuery.of(context).size.height * .04,
+                  maxWidth: MediaQuery.of(context).size.width * .35,
+                )),
+                title: Text('Pas de couche selectionnée.'),
+              ),
+      ),
     );
   }
 }
