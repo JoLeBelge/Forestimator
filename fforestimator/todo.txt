@@ -7,7 +7,7 @@ Jo-> classe essence et methode aptitude
 -désactiver rotation de la carte (sur mobile c'est pénible)
 
 TT ->création interface graphique pour le catalogue de couches carto+ ma selection de couche
-TT ->création interface graphique pour afficher la légende d'une couche (utilisation dicoVal et dicoCol de layerBase)-> intégré dans inteface "catalogue/selection de couche"
+TT ->création interface graphique pour afficher la légende d'une couche (utilisation dicoVal et dicoCol de LayerBase)-> intégré dans inteface "catalogue/selection de couche"
 
 TT -> création interface graphique pour afficher le résultat d'une analyse ponctuelle (avec event onTap sur la map, par exemple)
 TT -> création interface graphique pour gestion de projet offline avec téléchargement des rasters.

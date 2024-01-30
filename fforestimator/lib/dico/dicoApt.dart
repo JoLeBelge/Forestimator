@@ -73,7 +73,7 @@ class aptitude {
         mSouscote = map['souscote'];
 }
 
-class layerBase {
+class LayerBase {
   String? mNom, mNomCourt;
   bool? mExpert; // l'app mobile n'as pas besoin de cette info, non?
   String? mCode;
@@ -90,7 +90,7 @@ class layerBase {
 // frommap avec liste d'instanciation, inspiré de https://medium.com/@lumeilin/using-sqlite-in-flutter-59b27b099123
 
 // named constructor
-  layerBase.fromMap(final Map<String, dynamic> map)
+  LayerBase.fromMap(final Map<String, dynamic> map)
       : mNom = map['NomComplet'],
         mCode = map['Code'],
         mNomCourt = map['NomCourt'],
@@ -156,7 +156,7 @@ class layerBase {
 class dicoAptProvider {
   late Database db;
   Map<String, Color> colors = {};
-  Map<String, layerBase> mLayerBases = {};
+  Map<String, LayerBase> mLayerBases = {};
   Map<String, Ess> mEssences = {};
   List<aptitude> mAptitudes = [];
   Map<int, String> dico_code2NTNH = {};
@@ -209,11 +209,11 @@ class dicoAptProvider {
     result =
         await db.query('fichiersGIS', where: 'groupe IS NOT NULL AND expert=0');
     for (var row in result) {
-      mLayerBases[row['Code']] = layerBase.fromMap(row);
+      mLayerBases[row['Code']] = LayerBase.fromMap(row);
     }
     result = await db.query('layerApt');
     for (var row in result) {
-      mLayerBases[row['Code']] = layerBase.fromMap(row);
+      mLayerBases[row['Code']] = LayerBase.fromMap(row);
     }
     for (String code in mLayerBases.keys) {
       await mLayerBases[code]?.fillLayerDico(this);
@@ -257,6 +257,8 @@ class dicoAptProvider {
     return aRes;
   }
 }
+
+
 
 class HexColor extends Color {
   static int _getColorFromHex(String hexColor) {

@@ -129,7 +129,9 @@ class _CategoryView extends State<CategoryView> {
               leading: IconButton(
                   icon: Icon(Icons.get_app_rounded),
                   onPressed: () {
-                    setState(() {//TODO:Put Layer in selected list});
+                    setState(() {
+                      //TODO:Put Layer in selected list});
+                    });
                   }),
             );
           },
@@ -141,10 +143,10 @@ class _CategoryView extends State<CategoryView> {
   }
 
   void _getLayerData() async {
-    List<layerBase> ls = await gl.dico.getLayers();
-    for (var row in ls) {
-      if (widget.category.filter == row.mGroupe) {
-        _layerTiles += [LayerTile(name: row.mNomCourt!, filter: row.mGroupe!)];
+    Map<String, LayerBase> mp = gl.dico.mLayerBases;
+    for (var key in mp.values) {
+      if (widget.category.filter == key.mGroupe) {
+        _layerTiles += [LayerTile(name: key.mNom!, filter: key.mGroupe!)];
       }
     }
     setState(() {
