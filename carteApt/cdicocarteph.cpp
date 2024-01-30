@@ -129,10 +129,21 @@ cDicoCartepH::cDicoCartepH(std::string aBDFile):mBDpath(aBDFile)
             }
         }
 
+        SQLstring="SELECT SOLS_EPAIS_CV_MBL.INDEX_SOL, dico_EPAIS_CV_MBL.raster FROM SOLS_EPAIS_CV_MBL INNER JOIN dico_EPAIS_CV_MBL ON SOLS_EPAIS_CV_MBL.C_EPAIS = dico_EPAIS_CV_MBL.C_EPAIS;";
 
+        sqlite3_reset(stmt);
+        sqlite3_prepare_v2( db_, SQLstring.c_str(), -1, &stmt, NULL );
+        while(sqlite3_step(stmt) == SQLITE_ROW)
+        {
+            if (sqlite3_column_type(stmt, 0)!=SQLITE_NULL && sqlite3_column_type(stmt, 1)!=SQLITE_NULL){
+
+                int aA=sqlite3_column_int( stmt, 0 );
+                int aB=sqlite3_column_int( stmt, 1 );
+                Dico_IndexSiglePed2Epaisseur.emplace(std::make_pair(aA,aB));
+            }
+        }
 
         sqlite3_finalize(stmt);
-
 
     }
 

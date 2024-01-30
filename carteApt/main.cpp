@@ -26,6 +26,8 @@ extern string columnPath;
 
 //./carteApt --aptFEE 1 --pathBD "/home/jo/app/Forestimator/carteApt/data/aptitudeEssDB.db" --colPath Dir3
 
+//./carteApt --carteProf 1 --pathBD "/home/jo/app/Forestimator/carteApt/data/carteFEE_NTpH.db"
+
 int main(int argc, char *argv[])
 {
     po::options_description desc("options pour l'outil de calcul des cartes ");
@@ -34,6 +36,7 @@ int main(int argc, char *argv[])
             ("carteNT", po::value<bool>(), "calcul de la carte des NT")
             ("cartepH", po::value<bool>(), "calcul de la carte des pH")
             ("carteNH", po::value<bool>(), "calcul de la carte des NH")
+            ("carteProf", po::value<bool>(), "calcul de la carte des Profondeurs")
             ("aptFEE", po::value<bool>(), "calcul des cartes d'aptitude du FEE")
             ("aptCS", po::value<bool>(), "calcul des cartes d'aptitude du CS")
             ("MNH_TS", po::value<bool>(), "preparation de la série temporelle de MNH pour Forestimator")
@@ -51,17 +54,16 @@ int main(int argc, char *argv[])
         cout << desc << "\n";
         return 1;
     }
-    bool carteNT(0),cartepH(0),carteFEE(0),carteCS(0),matApt(0),carteNH(0);
+    bool carteNT(0),cartepH(0),carteFEE(0),carteCS(0),matApt(0),carteNH(0), carteProf(0);
     if (vm.count("carteNT")) {carteNT=vm["carteNT"].as<bool>();}
     if (vm.count("cartepH")) {cartepH=vm["cartepH"].as<bool>();}
     if (vm.count("carteNH")) {carteNH=vm["carteNH"].as<bool>();}
+     if (vm.count("carteProf")) {carteProf=vm["carteProf"].as<bool>();}
     if (vm.count("aptFEE")) {carteFEE=vm["aptFEE"].as<bool>();}
     if (vm.count("aptCS")) {carteCS=vm["aptCS"].as<bool>();}
     if (vm.count("matApt")) {matApt=vm["matApt"].as<bool>();}
     if (vm.count("pathBD")) {adirBD=vm["pathBD"].as<std::string>();}
     if (vm.count("colPath")) {columnPath=vm["colPath"].as<std::string>();}
-
-
 
     // attention, les chemins d'accès pour les inputs et output ne sont pas les même pour cAppliCartepH que pour cApliCarteApt!! ne pas se gourer.
     if (carteNT | cartepH) {
@@ -70,6 +72,9 @@ int main(int argc, char *argv[])
 
     if (carteNH) {
         calculNH(adirBD);
+    }
+    if (carteProf) {
+        calculProf(adirBD);
     }
 
     if (carteFEE | carteCS) {

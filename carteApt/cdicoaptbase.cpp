@@ -548,7 +548,7 @@ std::string roundDouble(double d, int precisionVal){
 }
 
 cEss::cEss(std::string aCodeEs, cdicoAptBase *aDico):mCode(aCodeEs),mNomFR(aDico->accroEss2Nom(aCodeEs)),mDico(aDico)
-  ,mType(Apt),mPrefix(aDico->accroEss2prefix(aCodeEs)){
+  ,mPrefix(aDico->accroEss2prefix(aCodeEs)){ //,mType(Apt)
     //std::cout << "creation de l'essence " << mNomFR << std::endl;
     mEcoVal = aDico->getFEEApt(mCode);
     mAptCS = aDico->getCSApt(mCode);

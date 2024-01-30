@@ -18,6 +18,8 @@ int cleNH(const siglePedo *s, int AE, int SS);
 
 void calculNH(std::string adirBD);// pas besoin d'une appli pour ça.
 
+void calculProf(std::string adirBD);// pas besoin d'une appli pour ça.
+
 
 class cAppliCartepH
 {
