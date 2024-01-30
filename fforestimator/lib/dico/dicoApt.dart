@@ -3,6 +3,75 @@ import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 import 'package:flutter/services.dart';
+import 'package:tuple/tuple.dart';
+
+class Ess {
+  String? mCode;
+  String? mNomFR;
+  int? mF_R;
+  String? mPrefix;
+
+  // aptitude ecograme : clé chaine charactère ; c'est la combinaison ntxnh du genre "A2p5" ou "Mm4
+  Map<int, Map<String, int>> mEcoVal;
+  // aptitude pour chaque zone bioclim
+  Map<int, int> mAptZbio;
+  // aptitude pour catalogue de station
+  // clé ; zone bioclim/ région. Value ; une map -> clé = identifiant de la station (id + variante) Value ; aptitude
+  Map<int, Map<Tuple2<int, String>, int>> mAptCS;
+  // clé ; zone bioclim/ région. Value ; une map -> clé ; id situation topo. valeur ; code risque
+  Map<int, Map<int, int>> mRisqueTopo;
+
+  Ess.fromMap(final Map<String, dynamic> map)
+      : mCode = map['Code_FR'],
+        mNomFR = map['Ess_FR'],
+        mPrefix = map['prefix'],
+        mF_R = map['FeRe'],
+        mEcoVal = {},
+        mAptZbio = {},
+        mAptCS = {},
+        mRisqueTopo = {};
+
+  Future<void> fillApt(dicoAptProvider dico) async {
+    String myquery =
+        "SELECT CodeNTNH,'1','2','3','4','5','6','7','8','9','10' FROM AptFEE WHERE CODE_ESSENCE='" +
+            mCode.toString() +
+            "';";
+    List<Map<String, dynamic>> aAptEco = await dico.db.rawQuery(myquery);
+    for (int zbio = 1; zbio <= 10; zbio++) {
+      Map<String, int> EcoOneZbio = {};
+      for (var r in aAptEco) {
+        String apt = r[zbio.toString()];
+        String codeNTNH = dico.code2NTNH(r['CodeNTNH']);
+        // convertion apt code Str vers code integer
+        int codeApt = dico.Apt(apt);
+        EcoOneZbio.addEntries({codeNTNH: codeApt}.entries);
+      }
+      mEcoVal[zbio] = EcoOneZbio;
+    }
+  }
+}
+
+class aptitude {
+  late int mCodeNum;
+  String? mLabelApt;
+  String? mCode;
+//String? mEquiv;
+  int? mEquCodeNonContr;
+  int? mEquiv;
+  int? mOrdreContrainte;
+  int? mSurcote;
+  int? mSouscote;
+
+  aptitude.fromMap(final Map<String, dynamic> map)
+      : mCodeNum = map['Num'],
+        mLabelApt = map['Aptitude'],
+        mCode = map['Code_Aptitude'],
+        mEquCodeNonContr = map['EquCodeNonContr'],
+        mEquiv = map['Equiv2Code'],
+        mOrdreContrainte = map['OrdreContrainte'],
+        mSurcote = map['surcote'],
+        mSouscote = map['souscote'];
+}
 
 class layerBase {
   String? mNom, mNomCourt;
@@ -87,6 +156,10 @@ class layerBase {
 class dicoAptProvider {
   late Database db;
   Map<String, Color> colors = {};
+  Map<String, layerBase> mLayerBases = {};
+  Map<String, Ess> mEssences = {};
+  List<aptitude> mAptitudes = [];
+  Map<int, String> dico_code2NTNH = {};
 
   Future<void> init() async {
     //final dbPath = await getDatabasesPath(); plante sous android
@@ -133,28 +206,55 @@ class dicoAptProvider {
       colors[r['id'].toString()] = HexColor(r['hex']);
     }
     // lecture des layerbase
-    getLayers().then((mylist) {
-      for (layerBase l in mylist) {
-        print(l.toString());
-      }
-    });
-  }
-
-  Future<List<layerBase>> getLayers() async {
-    List<layerBase> res = [];
-    List<Map<String, dynamic>> result =
+    result =
         await db.query('fichiersGIS', where: 'groupe IS NOT NULL AND expert=0');
     for (var row in result) {
-      res.add(layerBase.fromMap(row));
+      mLayerBases[row['Code']] = layerBase.fromMap(row);
     }
     result = await db.query('layerApt');
     for (var row in result) {
-      res.add(layerBase.fromMap(row));
+      mLayerBases[row['Code']] = layerBase.fromMap(row);
     }
-    for (layerBase l in res) {
-      await l.fillLayerDico(this);
+    for (String code in mLayerBases.keys) {
+      await mLayerBases[code]?.fillLayerDico(this);
+      print(mLayerBases[code].toString());
     }
-    return res;
+    // lecture du dico aptitude
+    result = await db.query('dico_apt');
+    for (var row in result) {
+      mAptitudes.add(aptitude.fromMap(row));
+    }
+    // dico_NTNH
+    result = await db.rawQuery('SELECT ID,concat2 FROM dico_NTNH;');
+    for (var row in result) {
+      dico_code2NTNH[row['ID']] = row['concat2'];
+    }
+
+    // lecture des essences
+    result = await db.query('dico_essences');
+    for (var row in result) {
+      mEssences[row['Code_FR']] = Ess.fromMap(row);
+    }
+  }
+
+  int Apt(String codeAptStr) {
+    int aRes = 777;
+    for (aptitude apt in mAptitudes) {
+      if (apt.mCode == codeAptStr) {
+        aRes = apt.mCodeNum;
+      }
+    }
+    return aRes;
+  }
+
+  String code2NTNH(int aCode) {
+    String aRes = "ND";
+    dico_code2NTNH.forEach((k, v) {
+      if (k == aCode) {
+        aRes = v;
+      }
+    });
+    return aRes;
   }
 }
 
