@@ -169,6 +169,16 @@ class zbio {
         mCSid = map['CSid'];
 }
 
+class groupe_couche {
+  late String mCode;
+  late String mLabel;
+  late bool mExpert;
+  groupe_couche.fromMap(final Map<String, dynamic> map)
+      : mCode = map['code'],
+        mLabel = map['label'],
+        mExpert = map['expert'] == 0 ? false : true;
+}
+
 class layerBase {
   String? mNom, mNomCourt;
   bool? mExpert; // l'app mobile n'as pas besoin de cette info, non?
@@ -257,6 +267,7 @@ class dicoAptProvider {
   List<aptitude> mAptitudes = [];
   List<risque> mRisques = [];
   List<zbio> mZbio = [];
+  List<groupe_couche> mGrCouches = [];
   Map<int, String> dico_code2NTNH = {};
 
   Future<void> init() async {
@@ -317,12 +328,10 @@ class dicoAptProvider {
       await mLayerBases[code]?.fillLayerDico(this);
       //print(mLayerBases[code].toString());
     }
-    // lecture du dico aptitude
     result = await db.query('dico_apt');
     for (var row in result) {
       mAptitudes.add(aptitude.fromMap(row));
     }
-    // lecture du dico risque
     result = await db.query('dico_risque');
     for (var row in result) {
       mRisques.add(risque.fromMap(row));
@@ -331,10 +340,13 @@ class dicoAptProvider {
     for (var row in result) {
       mZbio.add(zbio.fromMap(row));
     }
-    // dico_NTNH
     result = await db.rawQuery('SELECT ID,concat2 FROM dico_NTNH;');
     for (var row in result) {
       dico_code2NTNH[row['ID']] = row['concat2'];
+    }
+    result = await db.query('groupe_couche');
+    for (var row in result) {
+      mGrCouches.add(groupe_couche.fromMap(row));
     }
 
     // lecture des essences
