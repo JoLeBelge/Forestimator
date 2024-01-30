@@ -164,7 +164,8 @@ class _SelectedLayerView extends State<SelectedLayerView> {
     return ListView(
       children: [
         ListTile(
-          shape: RoundedRectangleBorder( borderRadius: BorderRadius.circular(10.0), side: BorderSide.none),
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10.0), side: BorderSide.none),
           tileColor: Colors.blueAccent,
           title: widget.selectedLayer.length > 0
               ? Text(widget.selectedLayer[0].name)

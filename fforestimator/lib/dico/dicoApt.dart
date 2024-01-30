@@ -32,10 +32,11 @@ class Ess {
         mRisqueTopo = {};
 
   Future<void> fillApt(dicoAptProvider dico) async {
+    // aptitude hydro-trophique ; une matrice par zbioclimatique
     String myquery =
-        "SELECT CodeNTNH,'1','2','3','4','5','6','7','8','9','10' FROM AptFEE WHERE CODE_ESSENCE='" +
+        'SELECT CodeNTNH,"1","2","3","4","5","6","7","8","9","10" FROM AptFEE WHERE CODE_ESSENCE="' +
             mCode.toString() +
-            "';";
+            '";';
     List<Map<String, dynamic>> aAptEco = await dico.db.rawQuery(myquery);
     for (int zbio = 1; zbio <= 10; zbio++) {
       Map<String, int> EcoOneZbio = {};
@@ -48,7 +49,80 @@ class Ess {
       }
       mEcoVal[zbio] = EcoOneZbio;
     }
-  }
+
+    // aptitude climatique ; une aptitude pour chacune des 10 zones climatiques
+    myquery =
+        'SELECT "1","2","3","4","5","6","7","8","9","10" FROM AptFEE_ZBIO WHERE CODE_ESSENCE="' +
+            mCode.toString() +
+            '";';
+    List<Map<String, dynamic>> aAptZbio = await dico.db.rawQuery(myquery);
+    for (var r in aAptZbio) {
+      for (int zbio = 1; zbio <= 10; zbio++) {
+        String apt = r[zbio.toString()];
+        // convertion apt code Str vers code integer
+        int codeApt = dico.Apt(apt);
+        mAptZbio.addEntries({zbio: codeApt}.entries);
+      }
+    }
+
+    // risque topographique ; permet de compenser une aptitude en bien (surcote) ou en mal (souscote)
+    myquery =
+        'SELECT Secteurfroid,Secteurneutre,Secteurchaud,Fond_vallee,SF_Ardenne,FV_Ardenne FROM Risque_topoFEE WHERE Code_Fr="' +
+            mCode.toString() +
+            '";';
+    List<Map<String, dynamic>> rTopo = await dico.db.rawQuery(myquery);
+    for (int zbio = 1; zbio <= 10; zbio++) {
+      Map<int, int> rTopoOneZbio = {};
+      for (var r in rTopo) {
+        int codeRisque1 = dico.Risque(r['Secteurfroid']);
+        int codeRisque4 = dico.Risque(r['Fond_vallee']);
+        int codeRisque2 = dico.Risque(r['Secteurneutre']);
+        int codeRisque3 = dico.Risque(r['Secteurchaud']);
+        if (zbio == 1 || zbio == 2 || zbio == 10) {
+          // pour l'ardenne
+          if (r['SF_Ardenne'] != null) {
+            codeRisque1 = dico.Risque(r['SF_Ardenne']);
+          }
+          if (r['FV_Ardenne'] != null) {
+            codeRisque4 = dico.Risque(r['FV_Ardenne']);
+          }
+        }
+        rTopoOneZbio.addEntries({
+          1: codeRisque1,
+          2: codeRisque2,
+          3: codeRisque3,
+          4: codeRisque4
+        }.entries);
+      }
+      mRisqueTopo[zbio] = rTopoOneZbio;
+    }
+
+    // aptitude CS
+    for (int zbio = 1; zbio <= 10; zbio++) {
+      myquery = "SELECT stat_id," +
+          mCode.toString() +
+          ",var FROM AptCS WHERE ZBIO=" +
+          zbio.toString() +
+          ";";
+      try {
+        List<Map<String, dynamic>> aptCS = await dico.db.rawQuery(myquery);
+        if (aptCS.length > 0) {
+          Map<Tuple2<int, String>, int> aptCSOneZbio = {};
+          for (var r in aptCS) {
+            if (r[mCode.toString()] != null) {
+              int codeApt = dico.Apt(r[mCode.toString()]);
+              String variante = "";
+              r['var'] != null ? variante = r['var'] : variante = "";
+              int station = r['stat_id'];
+              aptCSOneZbio
+                  .addEntries({Tuple2(station, variante): codeApt}.entries);
+            }
+          }
+          mAptCS[zbio] = aptCSOneZbio;
+        }
+      } catch (e) {}
+    }
+  } // fin fillApt
 }
 
 class aptitude {
@@ -71,6 +145,28 @@ class aptitude {
         mOrdreContrainte = map['OrdreContrainte'],
         mSurcote = map['surcote'],
         mSouscote = map['souscote'];
+}
+
+class risque {
+  late int mCode;
+  String? mRisque;
+  late int mCategorie;
+  risque.fromMap(final Map<String, dynamic> map)
+      : mCode = map['code'],
+        mRisque = map['risque'],
+        mCategorie = map['categorie'];
+}
+
+class zbio {
+  late int mCode;
+  String? mNom;
+  String? mCS_lay;
+  int? mCSid;
+  zbio.fromMap(final Map<String, dynamic> map)
+      : mCode = map['Zbio'],
+        mNom = map['Nom'],
+        mCS_lay = map['CS_lay'],
+        mCSid = map['CSid'];
 }
 
 class layerBase {
@@ -159,6 +255,8 @@ class dicoAptProvider {
   Map<String, layerBase> mLayerBases = {};
   Map<String, Ess> mEssences = {};
   List<aptitude> mAptitudes = [];
+  List<risque> mRisques = [];
+  List<zbio> mZbio = [];
   Map<int, String> dico_code2NTNH = {};
 
   Future<void> init() async {
@@ -217,12 +315,21 @@ class dicoAptProvider {
     }
     for (String code in mLayerBases.keys) {
       await mLayerBases[code]?.fillLayerDico(this);
-      print(mLayerBases[code].toString());
+      //print(mLayerBases[code].toString());
     }
     // lecture du dico aptitude
     result = await db.query('dico_apt');
     for (var row in result) {
       mAptitudes.add(aptitude.fromMap(row));
+    }
+    // lecture du dico risque
+    result = await db.query('dico_risque');
+    for (var row in result) {
+      mRisques.add(risque.fromMap(row));
+    }
+    result = await db.query('dico_zbio');
+    for (var row in result) {
+      mZbio.add(zbio.fromMap(row));
     }
     // dico_NTNH
     result = await db.rawQuery('SELECT ID,concat2 FROM dico_NTNH;');
@@ -234,7 +341,10 @@ class dicoAptProvider {
     result = await db.query('dico_essences');
     for (var row in result) {
       mEssences[row['Code_FR']] = Ess.fromMap(row);
+      await mEssences[row['Code_FR']]?.fillApt(this);
     }
+
+    db.close();
   }
 
   int Apt(String codeAptStr) {
@@ -254,6 +364,17 @@ class dicoAptProvider {
         aRes = v;
       }
     });
+    return aRes;
+  }
+
+  int Risque(String aStr) {
+    int aRes = 0;
+    for (risque r in mRisques) {
+      if (r.mRisque == aStr) {
+        aRes = r.mCode;
+        break;
+      }
+    }
     return aRes;
   }
 }
