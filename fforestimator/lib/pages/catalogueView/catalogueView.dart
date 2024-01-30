@@ -133,17 +133,17 @@ class _CategoryView extends State<CategoryView> {
           headerBuilder: (BuildContext context, bool isExpanded) {
             return ListTile(
               tileColor: item.selected &&
-                      gl.interfaceSelectedLayerKeys.contains(item.name)
+                      gl.interfaceSelectedLayerKeys.contains(item.key)
                   ? Colors.lightGreen
                   : Colors.grey,
               title: Text(item.name),
               leading: item.selected &&
-                      gl.interfaceSelectedLayerKeys.contains(item.name)
+                      gl.interfaceSelectedLayerKeys.contains(item.key)
                   ? IconButton(
                       icon: const Icon(Icons.upload_rounded),
                       onPressed: () {
                         setState(() {
-                          gl.interfaceSelectedLayerKeys.remove(item.name);
+                          gl.interfaceSelectedLayerKeys.remove(item.key);
                           item.selected = false;
                           widget.refreshView();
                         });
@@ -153,7 +153,7 @@ class _CategoryView extends State<CategoryView> {
                       onPressed: () {
                         setState(() {
                           if (gl.interfaceSelectedLayerKeys.length < 3) {
-                            gl.interfaceSelectedLayerKeys.add(item.name);
+                            gl.interfaceSelectedLayerKeys.add(item.key);
                             item.selected = true;
                             widget.refreshView();
                           }
@@ -170,9 +170,11 @@ class _CategoryView extends State<CategoryView> {
 
   void _getLayerData() async {
     Map<String, layerBase> mp = gl.dico.mLayerBases;
-    for (var key in mp.values) {
-      if (widget.category.filter == key.mGroupe) {
-        _layerTiles += [LayerTile(name: key.mNom!, filter: key.mGroupe!)];
+    for (var key in mp.keys) {
+      if (widget.category.filter == mp[key]!.mGroupe) {
+        _layerTiles += [
+          LayerTile(name: mp[key]!.mNom!, filter: mp[key]!.mGroupe!, key: key)
+        ];
       }
     }
     setState(() {
@@ -199,67 +201,77 @@ class SelectedLayerView extends StatefulWidget {
 class _SelectedLayerView extends State<SelectedLayerView> {
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      children: List<Widget>.generate(
-        3,
-        (i) => gl.interfaceSelectedLayerKeys.length > i
-            ? ListTile(
-                leading: Container(
-                  constraints: BoxConstraints(
+    {
+      //List<dynamic> _layer = gl.dico.mLayerBases.;
+      return ListView(
+        children: List<Widget>.generate(
+          3,
+          (i) => gl.interfaceSelectedLayerKeys.length > i
+              ? ListTile(
+                  leading: Container(
+                    constraints: BoxConstraints(
+                      maxHeight: MediaQuery.of(context).size.height * .04,
+                      maxWidth: MediaQuery.of(context).size.width * .35,
+                    ),
+                    child: Row(children: <Widget>[
+                      IconButton(
+                        icon: const Icon(Icons.keyboard_arrow_up_rounded),
+                        onPressed: () {
+                          setState(() {
+                            if (i > 0) {
+                              String tmp = gl.interfaceSelectedLayerKeys[i];
+                              gl.interfaceSelectedLayerKeys[i] =
+                                  gl.interfaceSelectedLayerKeys[i - 1];
+                              gl.interfaceSelectedLayerKeys[i - 1] = tmp;
+                            }
+                            widget.refreshView();
+                          });
+                        },
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.keyboard_arrow_down_rounded),
+                        onPressed: () {
+                          setState(() {
+                            if (gl.interfaceSelectedLayerKeys.length > i + 1) {
+                              String tmp = gl.interfaceSelectedLayerKeys[i];
+                              gl.interfaceSelectedLayerKeys[i] =
+                                  gl.interfaceSelectedLayerKeys[i + 1];
+                              gl.interfaceSelectedLayerKeys[i + 1] = tmp;
+                            }
+                            widget.refreshView();
+                          });
+                        },
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.delete_rounded),
+                        onPressed: () {
+                          setState(() {
+                            gl.interfaceSelectedLayerKeys
+                                .remove(gl.interfaceSelectedLayerKeys[i]);
+                            widget.refreshView();
+                          });
+                        },
+                      ),
+                    ]),
+                  ),
+                  title: Text(
+                    gl.dico.mLayerBases.keys
+                            .contains(gl.interfaceSelectedLayerKeys[i])
+                        ? gl.dico.mLayerBases[gl.interfaceSelectedLayerKeys[i]]!
+                            .mNom!
+                        : gl.interfaceSelectedLayerKeys[i],
+                  ))
+              : ListTile(
+                  leading: Container(
+                      constraints: BoxConstraints(
                     maxHeight: MediaQuery.of(context).size.height * .04,
                     maxWidth: MediaQuery.of(context).size.width * .35,
-                  ),
-                  child: Row(children: <Widget>[
-                    IconButton(
-                      icon: Icon(Icons.keyboard_arrow_up_rounded),
-                      onPressed: () {
-                        setState(() {
-                          if (i > 0){
-                            String tmp = gl.interfaceSelectedLayerKeys[i];
-                            gl.interfaceSelectedLayerKeys[i] = gl.interfaceSelectedLayerKeys[i - 1];
-                            gl.interfaceSelectedLayerKeys[i - 1] = tmp;
-                          }
-                          widget.refreshView();
-                        });
-                      },
-                    ),
-                    IconButton(
-                      icon: Icon(Icons.keyboard_arrow_down_rounded),
-                      onPressed: () {
-                        setState(() {
-                          if (gl.interfaceSelectedLayerKeys.length > i + 1){
-                            String tmp = gl.interfaceSelectedLayerKeys[i];
-                            gl.interfaceSelectedLayerKeys[i] = gl.interfaceSelectedLayerKeys[i + 1];
-                            gl.interfaceSelectedLayerKeys[i + 1] = tmp;
-                          }
-                          widget.refreshView();
-                        });
-                      },
-                    ),
-                    IconButton(
-                      icon: Icon(Icons.delete_rounded),
-                      onPressed: () {
-                        setState(() {
-                          gl.interfaceSelectedLayerKeys
-                              .remove(gl.interfaceSelectedLayerKeys[i]);
-                          widget.refreshView();
-                        });
-                      },
-                    ),
-                  ]),
+                  )),
+                  title: const Text('Pas de couche selectionnée.'),
                 ),
-                title: Text(gl.interfaceSelectedLayerKeys[i]),
-              )
-            : ListTile(
-                leading: Container(
-                    constraints: BoxConstraints(
-                  maxHeight: MediaQuery.of(context).size.height * .04,
-                  maxWidth: MediaQuery.of(context).size.width * .35,
-                )),
-                title: Text('Pas de couche selectionnée.'),
-              ),
-      ),
-    );
+        ),
+      );
+    }
   }
 }
 

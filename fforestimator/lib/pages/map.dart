@@ -7,7 +7,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:fforestimator/locationIndicator/animated_location_indicator.dart';
 import 'package:http/http.dart' as http;
-
+import 'package:fforestimator/globals.dart' as gl;
 import 'dart:convert';
 
 class mapPage extends StatefulWidget {
@@ -135,7 +135,15 @@ class _mapPageState extends State<mapPage> {
               baseUrl:
                   "http://gxgfservcarto.gxabt.ulg.ac.be/cgi-bin/forestimator?",
               format: 'image/png',
-              layers: const ["MasqueForet"],
+              layers: [
+                gl.interfaceSelectedLayerKeys.contains('Masque Foret')
+                    ? 'MasqueForet'
+                    : gl.interfaceSelectedLayerKeys.isNotEmpty && gl.dico.mLayerBases.keys
+                            .contains(gl.interfaceSelectedLayerKeys[0])
+                        ? gl.dico.mLayerBases[gl.interfaceSelectedLayerKeys[0]]!
+                            .mWMSLayerName!
+                        : ''
+              ],
               crs: epsg31370CRS,
               transparent: false,
             ),
