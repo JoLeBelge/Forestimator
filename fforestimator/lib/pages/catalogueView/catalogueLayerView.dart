@@ -16,21 +16,21 @@ class _CatalogueLayerView extends State<CatalogueLayerView> {
       Container(
         child: SearchBarView(),
         constraints: BoxConstraints(
-            maxWidth: MediaQuery.of(context).size.width * .98,
+            maxWidth: MediaQuery.of(context).size.width * 1.0,
             minHeight: MediaQuery.of(context).size.height * .075,
             maxHeight: MediaQuery.of(context).size.height * .075),
       ),
       Container(
         child: CatalogueView(refreshView: refreshView),
         constraints: BoxConstraints(
-            maxWidth: MediaQuery.of(context).size.width * .98,
+            maxWidth: MediaQuery.of(context).size.width * 1.0,
             minHeight: MediaQuery.of(context).size.height * .6,
             maxHeight: MediaQuery.of(context).size.height * .6),
       ),
       Container(
         child: SelectedLayerView(refreshView: refreshView),
         constraints: BoxConstraints(
-            maxWidth: MediaQuery.of(context).size.width * .98,
+            maxWidth: MediaQuery.of(context).size.width * 1.0,
             maxHeight: MediaQuery.of(context).size.height * .25),
       )
     ]);

@@ -103,7 +103,7 @@ class _CategoryView extends State<CategoryView> {
     if (_finishedInitializingCategory) {
       return Container(
           constraints: BoxConstraints(
-              maxWidth: MediaQuery.of(context).size.width * .95,
+              maxWidth: MediaQuery.of(context).size.width * 1.0,
               maxHeight: _layerTiles.length *
                   100 *
                   MediaQuery.of(context).size.width *
@@ -204,20 +204,58 @@ class _SelectedLayerView extends State<SelectedLayerView> {
         3,
         (i) => gl.interfaceSelectedLayerKeys.length > i
             ? ListTile(
-                trailing: IconButton(
-                  icon: Icon(Icons.delete_rounded),
-                  onPressed: () {
-                    setState(() {
-                      gl.interfaceSelectedLayerKeys.remove(
-                          gl.interfaceSelectedLayerKeys[
-                              i]); 
-                      widget.refreshView();
-                    });
-                  },
+                leading: Container(
+                  constraints: BoxConstraints(
+                    maxHeight: MediaQuery.of(context).size.height * .04,
+                    maxWidth: MediaQuery.of(context).size.width * .35,
+                  ),
+                  child: Row(children: <Widget>[
+                    IconButton(
+                      icon: Icon(Icons.keyboard_arrow_up_rounded),
+                      onPressed: () {
+                        setState(() {
+                          if (i > 0){
+                            String tmp = gl.interfaceSelectedLayerKeys[i];
+                            gl.interfaceSelectedLayerKeys[i] = gl.interfaceSelectedLayerKeys[i - 1];
+                            gl.interfaceSelectedLayerKeys[i - 1] = tmp;
+                          }
+                          widget.refreshView();
+                        });
+                      },
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.keyboard_arrow_down_rounded),
+                      onPressed: () {
+                        setState(() {
+                          if (gl.interfaceSelectedLayerKeys.length > i + 1){
+                            String tmp = gl.interfaceSelectedLayerKeys[i];
+                            gl.interfaceSelectedLayerKeys[i] = gl.interfaceSelectedLayerKeys[i + 1];
+                            gl.interfaceSelectedLayerKeys[i + 1] = tmp;
+                          }
+                          widget.refreshView();
+                        });
+                      },
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.delete_rounded),
+                      onPressed: () {
+                        setState(() {
+                          gl.interfaceSelectedLayerKeys
+                              .remove(gl.interfaceSelectedLayerKeys[i]);
+                          widget.refreshView();
+                        });
+                      },
+                    ),
+                  ]),
                 ),
                 title: Text(gl.interfaceSelectedLayerKeys[i]),
               )
-            : const ListTile(
+            : ListTile(
+                leading: Container(
+                    constraints: BoxConstraints(
+                  maxHeight: MediaQuery.of(context).size.height * .04,
+                  maxWidth: MediaQuery.of(context).size.width * .35,
+                )),
                 title: Text('Pas de couche selectionnée.'),
               ),
       ),
