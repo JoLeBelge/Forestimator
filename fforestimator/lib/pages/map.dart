@@ -10,6 +10,8 @@ import 'package:http/http.dart' as http;
 import 'package:fforestimator/globals.dart' as gl;
 import 'dart:convert';
 
+import 'package:fforestimator/pages/anaPt/requestedLayer.dart';
+
 class mapPage extends StatefulWidget {
   const mapPage({super.key, required this.title});
 
@@ -46,8 +48,14 @@ class _mapPageState extends State<mapPage> {
           ptBL72.y.toString();
       print(url);
       var res = await http.get(Uri.parse(url));
-      print(res.body);
-      data = jsonDecode(res.body); // à présenter dans la fenetre "ana ponct"
+      //print(res.body);
+      data = jsonDecode(res.body);
+      List<layerAnaPt> requestedLayers = [];
+      for (var r in data["RequestedLayers"]) {
+        requestedLayers.add(layerAnaPt.fromMap(r));
+      }
+      // pour la construction du tableau d'aptitude
+      aptsFEE apts = aptsFEE(requestedLayers);
     }
     setState(() {});
   }
@@ -138,8 +146,9 @@ class _mapPageState extends State<mapPage> {
               layers: [
                 gl.interfaceSelectedLayerKeys.contains('Masque Foret')
                     ? 'MasqueForet'
-                    : gl.interfaceSelectedLayerKeys.isNotEmpty && gl.dico.mLayerBases.keys
-                            .contains(gl.interfaceSelectedLayerKeys[0])
+                    : gl.interfaceSelectedLayerKeys.isNotEmpty &&
+                            gl.dico.mLayerBases.keys
+                                .contains(gl.interfaceSelectedLayerKeys[0])
                         ? gl.dico.mLayerBases[gl.interfaceSelectedLayerKeys[0]]!
                             .mWMSLayerName!
                         : ''
