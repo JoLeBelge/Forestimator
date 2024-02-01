@@ -77,7 +77,7 @@ class groupe_couche {
 }
 
 class layerBase {
-  String? mNom, mNomCourt;
+  late String mNom, mNomCourt;
   bool? mExpert;
   String? mCode;
   String? mUrl, mWMSLayerName, mWMSattribution;
@@ -232,7 +232,7 @@ class dicoAptProvider {
     }
     for (String code in mLayerBases.keys) {
       await mLayerBases[code]?.fillLayerDico(this);
-      //print(mLayerBases[code].toString());
+      print(mLayerBases[code].toString());
     }
     result = await db.query('dico_apt');
     for (var row in result) {

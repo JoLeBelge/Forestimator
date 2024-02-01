@@ -1,12 +1,15 @@
 To do list fforestimator
 ------------------------
 
+-maj asset sur emulator (db pas copiée à nouveau depuis les assets)
+-TileLayer; en avoir plus qu'une, pour superposer CNSW à Topo par exemple. Trois maximum dans selected layer, ça c'est bon.
+
 Jo-> dicoCNSW co fait pour carteApt compute NT
-Jo-> classe essence et methode aptitude
+Jo-> création du tableau d'aptitude pour anaPt
 
--désactiver rotation de la carte (sur mobile c'est pénible)
+-désactiver rotation de la carte
+-map_controller et centrage sur position gps ; rendre opérationnel (à nouveau)
 
-TT ->création interface graphique pour le catalogue de couches carto+ ma selection de couche
 TT ->création interface graphique pour afficher la légende d'une couche (utilisation dicoVal et dicoCol de LayerBase)-> intégré dans inteface "catalogue/selection de couche"
 
 TT -> création interface graphique pour afficher le résultat d'une analyse ponctuelle (avec event onTap sur la map, par exemple)

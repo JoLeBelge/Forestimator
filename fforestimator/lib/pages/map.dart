@@ -23,13 +23,6 @@ class _mapPageState extends State<mapPage> {
 
   Position? _position;
 
-  /*void _anaPonctOnline() async {
-    
-     
-    }
-    setState(() {});
-  }*/
-
 //https://github.com/fleaflet/flutter_map/blob/master/example/lib/pages/custom_crs/custom_crs.dart
   late proj4.Projection epsg4326 = proj4.Projection.get('EPSG:4326')!;
   // si epsg31370 est dans la db proj 4, on prend, sinon on définit
@@ -108,20 +101,23 @@ class _mapPageState extends State<mapPage> {
             children: [
               TileLayer(
                 wmsOptions: WMSTileLayerOptions(
-                  baseUrl:
-                      "http://gxgfservcarto.gxabt.ulg.ac.be/cgi-bin/forestimator?",
+                  baseUrl: (gl.interfaceSelectedLayerKeys.isNotEmpty &&
+                              gl.dico.mLayerBases.keys
+                                  .contains(gl.interfaceSelectedLayerKeys[0])
+                          ? gl
+                              .dico
+                              .mLayerBases[gl.interfaceSelectedLayerKeys[0]]!
+                              .mUrl!
+                          : gl.dico.mLayerBases[gl.defaultLayer]!.mUrl!) +
+                      "?",
                   format: 'image/png',
                   layers: [
-                    gl.interfaceSelectedLayerKeys.contains('Masque Foret')
-                        ? 'MasqueForet'
-                        : gl.interfaceSelectedLayerKeys.isNotEmpty &&
-                                gl.dico.mLayerBases.keys
-                                    .contains(gl.interfaceSelectedLayerKeys[0])
-                            ? gl
-                                .dico
-                                .mLayerBases[gl.interfaceSelectedLayerKeys[0]]!
-                                .mWMSLayerName!
-                            : ''
+                    gl.interfaceSelectedLayerKeys.isNotEmpty &&
+                            gl.dico.mLayerBases.keys
+                                .contains(gl.interfaceSelectedLayerKeys[0])
+                        ? gl.dico.mLayerBases[gl.interfaceSelectedLayerKeys[0]]!
+                            .mWMSLayerName!
+                        : gl.dico.mLayerBases[gl.defaultLayer]!.mWMSLayerName!
                   ],
                   crs: epsg31370CRS,
                   transparent: false,

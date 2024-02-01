@@ -1,4 +1,5 @@
 import 'package:fforestimator/dico/dicoApt.dart';
+import 'package:fforestimator/pages/anaPt/anaPtpage.dart';
 import 'package:flutter/material.dart';
 import 'package:fforestimator/globals.dart' as gl;
 import 'package:fforestimator/pages/map.dart';
@@ -40,14 +41,13 @@ class _MyApp extends State<MyApp> {
 
   var data;
 
+  List<layerAnaPt> requestedLayers = [];
+
   _MyApp() {
     _widgetOptions = <Widget>[
       mapPage(runAnaPt: _runAnapt, title: 'Flutter Demo Home Page'),
       CatalogueLayerView(),
-      const Text(
-        'todo analysis',
-        style: optionStyle,
-      ),
+      anaPtpage(requestedLayers),
       const Text(
         'todo settings',
         style: optionStyle,
@@ -61,10 +61,16 @@ class _MyApp extends State<MyApp> {
     });
   }
 
-  void _runAnapt(proj4.Point ptBL72) async {
-    // todo : ajouter la ou les couches actives
+  Future _runAnapt(proj4.Point ptBL72) async {
+    String layers4AnaPt = gl.layersAnaPt;
+    for (String lCode in gl.interfaceSelectedLayerKeys) {
+      if (gl.dico.getLayerBase(lCode).mCategorie != "Externe") {
+        layers4AnaPt += "+" + lCode;
+      }
+    }
+
     String url = "https://forestimator.gembloux.ulg.ac.be/api/anaPt/layers/" +
-        gl.layersAnaPt +
+        layers4AnaPt +
         "/x/" +
         ptBL72.x.toString() +
         "/y/" +
@@ -73,14 +79,12 @@ class _MyApp extends State<MyApp> {
     var res = await http.get(Uri.parse(url));
     //print(res.body);
     data = jsonDecode(res.body);
-    List<layerAnaPt> requestedLayers = [];
+//if (data["")
+    requestedLayers.clear();
     for (var r in data["RequestedLayers"]) {
       requestedLayers.add(layerAnaPt.fromMap(r));
     }
-    // pour la construction du tableau d'aptitude
-    aptsFEE apts = aptsFEE(requestedLayers);
-
-    _onItemTapped(3);
+    _onItemTapped(2);
   }
 
   @override
@@ -114,12 +118,12 @@ class _MyApp extends State<MyApp> {
                 icon: Icon(Icons.analytics),
                 label: 'analyse ponctuelle',
                 backgroundColor: Colors.green,
-              ),
+              ), /*
               BottomNavigationBarItem(
                 icon: Icon(Icons.settings),
                 label: 'paramètres',
                 backgroundColor: Colors.green,
-              ),
+              ),*/
             ],
             currentIndex: _selectedIndex,
             selectedItemColor: Color.fromARGB(255, 255, 255, 255),
