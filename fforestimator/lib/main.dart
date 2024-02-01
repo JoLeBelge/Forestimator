@@ -2,9 +2,14 @@ import 'package:fforestimator/dico/dicoApt.dart';
 import 'package:flutter/material.dart';
 import 'package:fforestimator/globals.dart' as gl;
 import 'package:fforestimator/pages/map.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'dart:io' show Platform;
 import 'package:fforestimator/pages/catalogueView/catalogueLayerView.dart';
+import 'package:proj4dart/proj4dart.dart' as proj4;
+import 'package:http/http.dart' as http;
+import 'package:fforestimator/pages/anaPt/requestedLayer.dart';
+import 'dart:convert';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,10 +21,9 @@ void main() async {
 
   gl.dico = dicoAptProvider();
   await gl.dico.init();
-  while(!gl.dico.finishedLoading){}
+  while (!gl.dico.finishedLoading) {}
   runApp(const MyApp());
 }
-
 
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
@@ -27,25 +31,29 @@ class MyApp extends StatefulWidget {
   State<MyApp> createState() => _MyApp();
 }
 
-
 class _MyApp extends State<MyApp> {
   int _selectedIndex = 0;
   static const TextStyle optionStyle =
       TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
 
-  static final List<Widget> _widgetOptions = <Widget>[
-    const mapPage(title: 'Flutter Demo Home Page'),
-    CatalogueLayerView(),
-    const Text(
-      'todo analysis',
-      style: optionStyle,
-    ),
-    const Text(
-      'todo settings',
-      style: optionStyle,
-    ),
-  ];
+  late final List<Widget> _widgetOptions;
 
+  var data;
+
+  _MyApp() {
+    _widgetOptions = <Widget>[
+      mapPage(runAnaPt: _runAnapt, title: 'Flutter Demo Home Page'),
+      CatalogueLayerView(),
+      const Text(
+        'todo analysis',
+        style: optionStyle,
+      ),
+      const Text(
+        'todo settings',
+        style: optionStyle,
+      ),
+    ];
+  }
 
   void _onItemTapped(int index) {
     setState(() {
@@ -53,6 +61,27 @@ class _MyApp extends State<MyApp> {
     });
   }
 
+  void _runAnapt(proj4.Point ptBL72) async {
+    // todo : ajouter la ou les couches actives
+    String url = "https://forestimator.gembloux.ulg.ac.be/api/anaPt/layers/" +
+        gl.layersAnaPt +
+        "/x/" +
+        ptBL72.x.toString() +
+        "/y/" +
+        ptBL72.y.toString();
+    print(url);
+    var res = await http.get(Uri.parse(url));
+    //print(res.body);
+    data = jsonDecode(res.body);
+    List<layerAnaPt> requestedLayers = [];
+    for (var r in data["RequestedLayers"]) {
+      requestedLayers.add(layerAnaPt.fromMap(r));
+    }
+    // pour la construction du tableau d'aptitude
+    aptsFEE apts = aptsFEE(requestedLayers);
+
+    _onItemTapped(3);
+  }
 
   @override
   Widget build(BuildContext context) {

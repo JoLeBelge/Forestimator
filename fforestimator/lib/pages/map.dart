@@ -6,14 +6,11 @@ import 'dart:math';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:fforestimator/locationIndicator/animated_location_indicator.dart';
-import 'package:http/http.dart' as http;
 import 'package:fforestimator/globals.dart' as gl;
-import 'dart:convert';
-
-import 'package:fforestimator/pages/anaPt/requestedLayer.dart';
 
 class mapPage extends StatefulWidget {
-  const mapPage({super.key, required this.title});
+  final Function runAnaPt;
+  const mapPage({required this.runAnaPt, super.key, required this.title});
 
   final String title;
 
@@ -25,40 +22,13 @@ class _mapPageState extends State<mapPage> {
   final _mapController = MapController();
 
   Position? _position;
-  var data;
 
-  void _anaPonctOnline() async {
-    if (_position != null) {
-      //print("postion x " + _position?.latitude.toString() ?? "0" );// + " " + _position?.longitude.toString());
-      print(_position?.latitude.toString() ??
-          "empty position"); // + " " + _position?.longitude.toString());
-      print("anaPonctOnline");
-      // on projete en BL72, seul src de Forestimator web pour le moment
-      proj4.Point ptBL72 = epsg4326.transform(
-          epsg31370,
-          proj4.Point(
-              x: _position?.longitude ?? 0.0, y: _position?.latitude ?? 0.0));
-      String layersAnaPt = "CNSWrast+Topo+AE+MNT+slope+ZBIO+CS_A+NT+NH";
-      // todo : ajouter la couche active - et la matrice d'aptitude FEE et CS déterminée en locale avec getApt?
-      String url = "https://forestimator.gembloux.ulg.ac.be/api/anaPt/layers/" +
-          layersAnaPt +
-          "/x/" +
-          ptBL72.x.toString() +
-          "/y/" +
-          ptBL72.y.toString();
-      print(url);
-      var res = await http.get(Uri.parse(url));
-      //print(res.body);
-      data = jsonDecode(res.body);
-      List<layerAnaPt> requestedLayers = [];
-      for (var r in data["RequestedLayers"]) {
-        requestedLayers.add(layerAnaPt.fromMap(r));
-      }
-      // pour la construction du tableau d'aptitude
-      aptsFEE apts = aptsFEE(requestedLayers);
+  /*void _anaPonctOnline() async {
+    
+     
     }
     setState(() {});
-  }
+  }*/
 
 //https://github.com/fleaflet/flutter_map/blob/master/example/lib/pages/custom_crs/custom_crs.dart
   late proj4.Projection epsg4326 = proj4.Projection.get('EPSG:4326')!;
@@ -108,25 +78,23 @@ class _mapPageState extends State<mapPage> {
         epsg31370.transform(epsg4326, ptTopR).x + margeInDegree);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Forestimator"),
-        backgroundColor: Colors.red,
-      ),
-      persistentFooterButtons: <Widget>[
-        IconButton(icon: Icon(Icons.map), onPressed: () => _anaPonctOnline()),
-      ],
-      body: FlutterMap(
-        mapController: _mapController,
-        options: MapOptions(
-          crs: epsg31370CRS,
-          initialZoom: 2,
-          maxZoom: 7,
-          initialCenter: latlonEpioux,
-          cameraConstraint: CameraConstraint.contain(
-              bounds: LatLngBounds.fromPoints([latlonBL, latlonTR])),
-          onMapReady: () async {
-            _position = await acquireUserLocation();
-            /*if (_position != null) {//TODO: Ceci tue l'appli!
+        appBar: AppBar(
+          title: Text("Forestimator"),
+          backgroundColor: Colors.red,
+        ),
+        body: Stack(children: <Widget>[
+          FlutterMap(
+            mapController: _mapController,
+            options: MapOptions(
+              crs: epsg31370CRS,
+              initialZoom: 2,
+              maxZoom: 7,
+              initialCenter: latlonEpioux,
+              cameraConstraint: CameraConstraint.contain(
+                  bounds: LatLngBounds.fromPoints([latlonBL, latlonTR])),
+              onMapReady: () async {
+                _position = await acquireUserLocation();
+                /*if (_position != null) {//TODO: Ceci tue l'appli!
               // IMPORTANT: rebuild location layer when permissions are granted
               setState(() {
                 _mapController.move(
@@ -135,55 +103,88 @@ class _mapPageState extends State<mapPage> {
                     16);
               });
             }*/
-          },
-        ),
-        children: [
-          TileLayer(
-            wmsOptions: WMSTileLayerOptions(
-              baseUrl:
-                  "http://gxgfservcarto.gxabt.ulg.ac.be/cgi-bin/forestimator?",
-              format: 'image/png',
-              layers: [
-                gl.interfaceSelectedLayerKeys.contains('Masque Foret')
-                    ? 'MasqueForet'
-                    : gl.interfaceSelectedLayerKeys.isNotEmpty &&
-                            gl.dico.mLayerBases.keys
-                                .contains(gl.interfaceSelectedLayerKeys[0])
-                        ? gl.dico.mLayerBases[gl.interfaceSelectedLayerKeys[0]]!
-                            .mWMSLayerName!
-                        : ''
-              ],
-              crs: epsg31370CRS,
-              transparent: false,
+              },
             ),
-            //maxNativeZoom: 7,
-            tileSize: tileSize,
-          ),
-          RichAttributionWidget(
-            attributions: [
-              TextSourceAttribution(
-                'OpenStreetMap contributors',
-                onTap: () =>
-                    launchUrl(Uri.parse('https://openstreetmap.org/copyright')),
+            children: [
+              TileLayer(
+                wmsOptions: WMSTileLayerOptions(
+                  baseUrl:
+                      "http://gxgfservcarto.gxabt.ulg.ac.be/cgi-bin/forestimator?",
+                  format: 'image/png',
+                  layers: [
+                    gl.interfaceSelectedLayerKeys.contains('Masque Foret')
+                        ? 'MasqueForet'
+                        : gl.interfaceSelectedLayerKeys.isNotEmpty &&
+                                gl.dico.mLayerBases.keys
+                                    .contains(gl.interfaceSelectedLayerKeys[0])
+                            ? gl
+                                .dico
+                                .mLayerBases[gl.interfaceSelectedLayerKeys[0]]!
+                                .mWMSLayerName!
+                            : ''
+                  ],
+                  crs: epsg31370CRS,
+                  transparent: false,
+                ),
+                //maxNativeZoom: 7,
+                tileSize: tileSize,
               ),
+              /*RichAttributionWidget(
+                attributions: [
+                  TextSourceAttribution(
+                    'OpenStreetMap contributors',
+                    onTap: () => launchUrl(
+                        Uri.parse('https://openstreetmap.org/copyright')),
+                  ),
+                ],
+              ),*/
+              MarkerLayer(
+                markers: [
+                  Marker(
+                    width: 50.0,
+                    height: 50.0,
+                    point: latlonEpioux,
+                    child: const FlutterLogo(),
+                  ),
+                ],
+              ),
+              const AnimatedLocationLayer(
+                  // cameraTrackingMode: CameraTrackingMode.locationAndOrientation,
+                  ),
             ],
           ),
-          MarkerLayer(
-            markers: [
-              Marker(
-                width: 50.0,
-                height: 50.0,
-                point: latlonEpioux,
-                child: const FlutterLogo(),
-              ),
-            ],
+          /*Align(
+            alignment: Alignment.bottomRight,
+            // add your floating action button
+            child: FloatingActionButton(
+              onPressed: () {},
+              child: Icon(Icons.map),
+            ),
+          ),*/
+          Align(
+            alignment: Alignment.bottomCenter,
+            // add your floating action button
+            child: FloatingActionButton(
+              onPressed: () {
+                //_anaPonctOnline();
+                if (_position != null) {
+                  //print("postion x " + _position?.latitude.toString() ?? "0" );// + " " + _position?.longitude.toString());
+                  print(_position?.latitude.toString() ??
+                      "empty position"); // + " " + _position?.longitude.toString());
+                  print("anaPonctOnline");
+                  // on projete en BL72, seul src de Forestimator web pour le moment
+                  proj4.Point ptBL72 = epsg4326.transform(
+                      epsg31370,
+                      proj4.Point(
+                          x: _position?.longitude ?? 0.0,
+                          y: _position?.latitude ?? 0.0));
+                  widget.runAnaPt(ptBL72);
+                }
+              },
+              child: Icon(Icons.gps_fixed),
+            ),
           ),
-          const AnimatedLocationLayer(
-              // cameraTrackingMode: CameraTrackingMode.locationAndOrientation,
-              ),
-        ],
-      ),
-    );
+        ]));
   }
 }
 
