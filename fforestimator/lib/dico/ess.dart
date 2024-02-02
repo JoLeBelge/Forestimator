@@ -4,7 +4,7 @@ import 'package:fforestimator/globals.dart' as gl;
 import 'package:fforestimator/dico/dicoApt.dart';
 
 class Ess {
-  String? mCode;
+  late String mCode;
   String? mNomFR;
   int? mF_R;
   String? mPrefix;
@@ -18,6 +18,10 @@ class Ess {
   Map<int, Map<Tuple2<int, String>, int>> mAptCS;
   // clé ; zone bioclim/ région. Value ; une map -> clé ; id situation topo. valeur ; code risque
   Map<int, Map<int, int>> mRisqueTopo;
+
+  bool hasFEEapt() {
+    return mAptZbio.length == 10;
+  }
 
   int getApt(int aZbio) {
     int aRes = 0;
@@ -53,7 +57,7 @@ class Ess {
   }
 
   int getAptHT(int aCodeNT, int aCodeNH, int aZbio,
-      {bool hierachique = true, int aTopo = 666}) {
+      {bool hierarchique = true, int aTopo = 666}) {
     int aRes = 12; // indéterminé zone batie ; par défaut
     if (aCodeNT == 0 && aCodeNH != 0) {
       aRes = 11;
@@ -69,9 +73,17 @@ class Ess {
         aRes = mEcoVal[aZbio]![codeNTNH]!;
       }
     }
+    if (hierarchique && mAptZbio.containsKey(aZbio)) {
+      int aZbioApt = mAptZbio[aZbio]!;
 
-    // to be continued
-
+      if (aTopo != 666) {
+        // c'est sur cette aptitude que l'on applique un facteur de correction
+        aZbioApt = corrigAptBioRisqueTopo(aZbioApt, aTopo, aZbio);
+      }
+      if (gl.dico.AptContraignante(aRes) < gl.dico.AptContraignante(aZbioApt)) {
+        aRes = aZbioApt;
+      }
+    }
     return aRes;
   }
 

@@ -11,7 +11,7 @@ class aptitude {
   late String mCode;
 //String? mEquiv;
   int? mEquCodeNonContr;
-  int? mEquiv;
+  late int mAptContraigante;
   int? mOrdreContrainte;
   late int mSurcote;
   late int mSouscote;
@@ -21,7 +21,7 @@ class aptitude {
         mLabelApt = map['Aptitude'],
         mCode = map['Code_Aptitude'],
         mEquCodeNonContr = map['EquCodeNonContr'],
-        mEquiv = map['Equiv2Code'],
+        mAptContraigante = map['Equiv2Code'],
         mOrdreContrainte = map['OrdreContrainte'],
         mSurcote = map['surcote'],
         mSouscote = map['souscote'];
@@ -77,7 +77,7 @@ class groupe_couche {
 }
 
 class layerBase {
-  String? mNom, mNomCourt;
+  late String mNom, mNomCourt;
   bool? mExpert;
   String? mCode;
   String? mUrl, mWMSLayerName, mWMSattribution;
@@ -110,6 +110,14 @@ class layerBase {
         mGain = map['gain'],
         mDicoVal = {},
         mDicoCol = {};
+
+  String getValLabel(int aRastValue) {
+    String aRes = "";
+    if (mDicoVal.containsKey(aRastValue)) {
+      aRes = mDicoVal[aRastValue]!;
+    }
+    return aRes;
+  }
 
   Future<void> fillLayerDico(dicoAptProvider dico) async {
     if (mCategorie != 'Externe' && nom_dico != null) {
@@ -224,7 +232,7 @@ class dicoAptProvider {
     }
     for (String code in mLayerBases.keys) {
       await mLayerBases[code]?.fillLayerDico(this);
-      //print(mLayerBases[code].toString());
+      print(mLayerBases[code].toString());
     }
     result = await db.query('dico_apt');
     for (var row in result) {
@@ -260,6 +268,22 @@ class dicoAptProvider {
 
     db.close();
     finishedLoading = true;
+  }
+
+  Ess getEss(String aCode) {
+    if (mEssences.containsKey(aCode)) {
+      return mEssences[aCode]!;
+    } else {
+      throw "oops no essences " + aCode;
+    }
+  }
+
+  layerBase getLayerBase(String aCode) {
+    if (mLayerBases.containsKey(aCode)) {
+      return mLayerBases[aCode]!;
+    } else {
+      throw "oops no layerBase " + aCode;
+    }
   }
 
   int Apt(String codeAptStr) {
@@ -307,7 +331,7 @@ class dicoAptProvider {
   int AptSurcote(int aCode) {
     int aRes = aCode;
     for (aptitude apt in mAptitudes) {
-      if (apt.mCode == aCode) {
+      if (apt.mCodeNum == aCode) {
         aRes = apt.mSurcote;
         break;
       }
@@ -318,8 +342,19 @@ class dicoAptProvider {
   int AptSouscote(int aCode) {
     int aRes = aCode;
     for (aptitude apt in mAptitudes) {
-      if (apt.mCode == aCode) {
+      if (apt.mCodeNum == aCode) {
         aRes = apt.mSouscote;
+        break;
+      }
+    }
+    return aRes;
+  }
+
+  int AptContraignante(int aCode) {
+    int aRes = 0;
+    for (aptitude apt in mAptitudes) {
+      if (apt.mCodeNum == aCode) {
+        aRes = apt.mAptContraigante;
         break;
       }
     }
