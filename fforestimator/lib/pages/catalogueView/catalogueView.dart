@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:fforestimator/globals.dart' as gl;
 import 'package:fforestimator/pages/catalogueView/categoryTile.dart';
 import 'package:fforestimator/pages/catalogueView/layerTile.dart';
+import 'package:fforestimator/pages/catalogueView/legendView.dart';
 
 ScrollController it = ScrollController();
 ClampingScrollPhysics that = ClampingScrollPhysics();
@@ -44,10 +45,10 @@ class _CatalogueView extends State<CatalogueView> {
       },
       children: _categories.map<ExpansionPanel>((Category item) {
         return ExpansionPanel(
-          backgroundColor: Colors.grey,
+          backgroundColor: Colors.grey[200],
           headerBuilder: (BuildContext context, bool isExpanded) {
             return ListTile(
-              iconColor: Colors.grey,
+              iconColor: Colors.red,
               title: Text(item.name),
             );
           },
@@ -125,11 +126,12 @@ class _CategoryView extends State<CategoryView> {
       },
       children: _layerTiles.map<ExpansionPanel>((LayerTile item) {
         return ExpansionPanel(
+          backgroundColor: Colors.grey[200],
           headerBuilder: (BuildContext context, bool isExpanded) {
             return ListTile(
               tileColor: gl.interfaceSelectedLayerKeys.contains(item.key)
                   ? Colors.lightGreen
-                  : Colors.grey,
+                  : Colors.grey[200],
               title: Text(item.name),
               leading: gl.interfaceSelectedLayerKeys.contains(item.key)
                   ? IconButton(
@@ -146,7 +148,7 @@ class _CategoryView extends State<CategoryView> {
                       onPressed: () {
                         setState(() {
                           if (gl.interfaceSelectedLayerKeys.length < 3) {
-                            gl.interfaceSelectedLayerKeys.add(item.key);
+                            gl.interfaceSelectedLayerKeys.insert(0, item.key);
                             item.selected = true;
                             widget.refreshView();
                           }
@@ -154,7 +156,19 @@ class _CategoryView extends State<CategoryView> {
                       }),
             );
           },
-          body: Text('nana'),
+          body: LegendView(
+            layerKey: item.key,
+            constraintsText: BoxConstraints(
+                minWidth: MediaQuery.of(context).size.width * .4,
+                maxWidth: MediaQuery.of(context).size.width * .4,
+                minHeight: MediaQuery.of(context).size.height * .02,
+                maxHeight: MediaQuery.of(context).size.height * .02),
+            constraintsColors: BoxConstraints(
+                minWidth: MediaQuery.of(context).size.width * .4,
+                maxWidth: MediaQuery.of(context).size.width * .4,
+                minHeight: MediaQuery.of(context).size.height * .02,
+                maxHeight: MediaQuery.of(context).size.height * .02),
+          ),
           isExpanded: item.isExpanded,
         );
       }).toList(),
