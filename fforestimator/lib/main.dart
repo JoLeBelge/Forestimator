@@ -22,7 +22,7 @@ void main() async {
 
   gl.dico = dicoAptProvider();
   await gl.dico.init();
-  while (!gl.dico.finishedLoading) {}
+  //while (!gl.dico.finishedLoading) {}
   runApp(const MyApp());
 }
 
@@ -126,7 +126,7 @@ class _MyApp extends State<MyApp> {
               ),*/
             ],
             currentIndex: _selectedIndex,
-            selectedItemColor: Color.fromARGB(255, 255, 255, 255),
+            selectedItemColor: Colors.grey[300],
             onTap: _onItemTapped,
           ),
         ));

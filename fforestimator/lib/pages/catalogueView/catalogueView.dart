@@ -45,6 +45,7 @@ class _CatalogueView extends State<CatalogueView> {
       },
       children: _categories.map<ExpansionPanel>((Category item) {
         return ExpansionPanel(
+          canTapOnHeader: true,
           backgroundColor: Colors.grey[200],
           headerBuilder: (BuildContext context, bool isExpanded) {
             return ListTile(
@@ -126,6 +127,7 @@ class _CategoryView extends State<CategoryView> {
       },
       children: _layerTiles.map<ExpansionPanel>((LayerTile item) {
         return ExpansionPanel(
+          canTapOnHeader: true,
           backgroundColor: Colors.grey[200],
           headerBuilder: (BuildContext context, bool isExpanded) {
             return ListTile(
@@ -135,7 +137,7 @@ class _CategoryView extends State<CategoryView> {
               title: Text(item.name),
               leading: gl.interfaceSelectedLayerKeys.contains(item.key)
                   ? IconButton(
-                      icon: const Icon(Icons.upload_rounded),
+                      icon: const Icon(Icons.layers_clear),
                       onPressed: () {
                         setState(() {
                           gl.interfaceSelectedLayerKeys.remove(item.key);
@@ -144,10 +146,16 @@ class _CategoryView extends State<CategoryView> {
                         });
                       })
                   : IconButton(
-                      icon: const Icon(Icons.download_rounded),
+                      icon: const Icon(Icons.layers),
                       onPressed: () {
                         setState(() {
                           if (gl.interfaceSelectedLayerKeys.length < 3) {
+                            gl.interfaceSelectedLayerKeys.insert(0, item.key);
+                            item.selected = true;
+                            widget.refreshView();
+                          }
+                          else{
+                            gl.interfaceSelectedLayerKeys.removeLast();
                             gl.interfaceSelectedLayerKeys.insert(0, item.key);
                             item.selected = true;
                             widget.refreshView();
@@ -251,7 +259,7 @@ class _SelectedLayerView extends State<SelectedLayerView> {
                         },
                       ),
                       IconButton(
-                        icon: const Icon(Icons.delete_rounded),
+                        icon: const Icon(Icons.layers_clear_rounded),
                         onPressed: () {
                           setState(() {
                             gl.interfaceSelectedLayerKeys

@@ -7,10 +7,10 @@ To do list fforestimator
 Jo-> dicoCNSW co fait pour carteApt compute NT
 Jo-> création du tableau d'aptitude pour anaPt
 
--désactiver rotation de la carte
+ok -désactiver rotation de la carte
 -map_controller et centrage sur position gps ; rendre opérationnel (à nouveau)
 
-TT ->création interface graphique pour afficher la légende d'une couche (utilisation dicoVal et dicoCol de LayerBase)-> intégré dans inteface "catalogue/selection de couche"
+ok TT ->création interface graphique pour afficher la légende d'une couche (utilisation dicoVal et dicoCol de LayerBase)-> intégré dans inteface "catalogue/selection de couche"
 
 TT -> création interface graphique pour afficher le résultat d'une analyse ponctuelle (avec event onTap sur la map, par exemple)
 TT -> création interface graphique pour gestion de projet offline avec téléchargement des rasters.
@@ -22,6 +22,7 @@ Jo-> lecture tif sous android (dart Images?)
 
 simple example geolocator
 https://github.com/OPENER-next/animated_location_indicator
+
 --> modifier le code pour ne pas tourner la carte lorsqu'on change de position (pas utile)
 
 

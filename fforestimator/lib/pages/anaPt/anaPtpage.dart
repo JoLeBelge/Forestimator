@@ -20,7 +20,7 @@ class _anaPtpageState extends State<anaPtpage> {
       body: widget.requestedLayers.length > 0
           ? ListView.builder(
               itemBuilder: (context, index) {
-                return ListTile(  
+                return ListTile(
                   title: Text(gl.dico
                       .getLayerBase(widget.requestedLayers[index].mCode)
                       .mNom),
