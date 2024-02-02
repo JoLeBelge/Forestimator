@@ -136,9 +136,9 @@ class _mapPageState extends State<mapPage> {
                   "http://gxgfservcarto.gxabt.ulg.ac.be/cgi-bin/forestimator?",
               format: 'image/png',
               layers: [
-                gl.interfaceSelectedLayerKeys.contains('Masque Foret')
+                gl.interfaceSelectedLayerKeys.isEmpty
                     ? 'MasqueForet'
-                    : gl.interfaceSelectedLayerKeys.isNotEmpty && gl.dico.mLayerBases.keys
+                    : gl.dico.mLayerBases.keys
                             .contains(gl.interfaceSelectedLayerKeys[0])
                         ? gl.dico.mLayerBases[gl.interfaceSelectedLayerKeys[0]]!
                             .mWMSLayerName!

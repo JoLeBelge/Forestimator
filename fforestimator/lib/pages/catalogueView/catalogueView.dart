@@ -127,13 +127,11 @@ class _CategoryView extends State<CategoryView> {
         return ExpansionPanel(
           headerBuilder: (BuildContext context, bool isExpanded) {
             return ListTile(
-              tileColor: item.selected ||
-                      gl.interfaceSelectedLayerKeys.contains(item.key)
+              tileColor: gl.interfaceSelectedLayerKeys.contains(item.key)
                   ? Colors.lightGreen
                   : Colors.grey,
               title: Text(item.name),
-              leading: item.selected ||
-                      gl.interfaceSelectedLayerKeys.contains(item.key)
+              leading: gl.interfaceSelectedLayerKeys.contains(item.key)
                   ? IconButton(
                       icon: const Icon(Icons.upload_rounded),
                       onPressed: () {
@@ -166,7 +164,7 @@ class _CategoryView extends State<CategoryView> {
   void _getLayerData() async {
     Map<String, layerBase> mp = gl.dico.mLayerBases;
     for (var key in mp.keys) {
-      if (widget.category.filter == mp[key]!.mGroupe) {
+      if (widget.category.filter == mp[key]!.mGroupe && mp[key]!.mExpert!) {
         _layerTiles += [
           LayerTile(name: mp[key]!.mNom!, filter: mp[key]!.mGroupe!, key: key)
         ];
@@ -204,13 +202,14 @@ class _SelectedLayerView extends State<SelectedLayerView> {
           (i) => gl.interfaceSelectedLayerKeys.length > i
               ? ListTile(
                   leading: Container(
+                    color: Colors.amber,
                     constraints: BoxConstraints(
                       maxHeight: MediaQuery.of(context).size.height * .04,
                       maxWidth: MediaQuery.of(context).size.width * .35,
                     ),
                     child: Row(children: <Widget>[
                       IconButton(
-                        icon: const Icon(Icons.keyboard_arrow_up_rounded),
+                        icon: const Icon(Icons.arrow_upward_rounded),
                         onPressed: () {
                           setState(() {
                             if (i > 0) {
@@ -224,7 +223,7 @@ class _SelectedLayerView extends State<SelectedLayerView> {
                         },
                       ),
                       IconButton(
-                        icon: const Icon(Icons.keyboard_arrow_down_rounded),
+                        icon: const Icon(Icons.arrow_downward_rounded),
                         onPressed: () {
                           setState(() {
                             if (gl.interfaceSelectedLayerKeys.length > i + 1) {

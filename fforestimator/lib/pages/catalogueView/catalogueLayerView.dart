@@ -14,6 +14,7 @@ class _CatalogueLayerView extends State<CatalogueLayerView> {
   Widget build(BuildContext context) {
     return Column(children: [
       Container(
+        color: Colors.grey,
         child: SearchBarView(),
         constraints: BoxConstraints(
             maxWidth: MediaQuery.of(context).size.width * 1.0,
@@ -21,6 +22,7 @@ class _CatalogueLayerView extends State<CatalogueLayerView> {
             maxHeight: MediaQuery.of(context).size.height * .075),
       ),
       Container(
+        color: Colors.grey,
         child: CatalogueView(refreshView: refreshView),
         constraints: BoxConstraints(
             maxWidth: MediaQuery.of(context).size.width * 1.0,
@@ -28,6 +30,7 @@ class _CatalogueLayerView extends State<CatalogueLayerView> {
             maxHeight: MediaQuery.of(context).size.height * .6),
       ),
       Container(
+        color: Colors.grey,
         child: SelectedLayerView(refreshView: refreshView),
         constraints: BoxConstraints(
             maxWidth: MediaQuery.of(context).size.width * 1.0,
