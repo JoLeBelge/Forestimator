@@ -78,7 +78,7 @@ class groupe_couche {
 
 class layerBase {
   late String mNom, mNomCourt;
-  bool? mExpert;
+  late bool mExpert;
   String? mCode;
   String? mUrl, mWMSLayerName, mWMSattribution;
   String? mGroupe;
@@ -183,7 +183,9 @@ class dicoAptProvider {
 // Check if the database exists
     var exists = await databaseExists(path);
 
-    if (!exists) {
+    // if (!exists) {
+    // pour l'instant maj à chaque fois des assets sur l'émulateur
+    if (true) {
       // Should happen only the first time you launch your application
       print("Creating new copy from asset");
 
@@ -193,6 +195,7 @@ class dicoAptProvider {
       } catch (_) {}
 
       // Create the writable database file from the bundled  (asset bulk) fforestimator.db database file:
+      // the bundled resource itself can't be directly opened as a file on Android -> c'est bien dommage
       ByteData data =
           await rootBundle.load(url.join("assets", "db/fforestimator.db"));
       List<int> bytes =
@@ -221,8 +224,7 @@ class dicoAptProvider {
       colors[r['id'].toString()] = HexColor(r['hex']);
     }
     // lecture des layerbase
-    result =
-        await db.query('fichiersGIS', where: 'groupe IS NOT NULL AND expert=0');
+    result = await db.query('fichiersGIS', where: 'groupe IS NOT NULL');
     for (var row in result) {
       mLayerBases[row['Code']] = layerBase.fromMap(row);
     }
