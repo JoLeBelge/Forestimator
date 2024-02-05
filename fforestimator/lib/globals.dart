@@ -8,4 +8,4 @@ String defaultLayer = "IGN";
 // list to memorize the keys of selected layer to show in interface.
 List<String> interfaceSelectedLayerKeys = [defaultLayer];
 
-String layersAnaPt = "CNSWrast+Topo+AE+MNT+slope+ZBIO+CS_A+NT+NH";
+String layersAnaPt = "ZBIO+CNSWrast+MNT+slope+CS_A+NT+NH+Topo+AE+brol";

@@ -83,14 +83,14 @@ class layerBase {
   String? mUrl, mWMSLayerName, mWMSattribution;
   String? mGroupe;
   String? mCategorie;
-  num? mGain;
+  late String mTypeVar;
+  late double mGain;
   String? nom_field_raster, nom_field_value, nom_dico, condition;
   Map<int, String> mDicoVal; // valeur raster vers signification
   Map<int, Color> mDicoCol; // valeur raster vers couleur
   //String mNomFile,mDir; mPathQml mPathRaster,
 
 // frommap avec liste d'instanciation, inspiré de https://medium.com/@lumeilin/using-sqlite-in-flutter-59b27b099123
-
 // named constructor
   layerBase.fromMap(final Map<String, dynamic> map)
       : mNom = map['NomComplet'],
@@ -107,7 +107,8 @@ class layerBase {
         nom_field_value = map['nom_field_value'],
         nom_dico = map['nom_dico'],
         condition = map['condition'],
-        mGain = map['gain'],
+        mTypeVar = map['TypeVar'],
+        mGain = map['gain'] == null ? 66.6 : map['gain'],
         mDicoVal = {},
         mDicoCol = {};
 
@@ -115,8 +116,21 @@ class layerBase {
     String aRes = "";
     if (mDicoVal.containsKey(aRastValue)) {
       aRes = mDicoVal[aRastValue]!;
+      return aRes;
+    }
+    if (mTypeVar == 'Continu' && mGain != 66.6) {
+      double d = aRastValue * mGain;
+      aRes = d.toStringAsFixed(1);
     }
     return aRes;
+  }
+
+  Color getValColor(int aRastValue) {
+    Color col = HexColor('#FFFFFF');
+    if (mDicoCol.containsKey(aRastValue)) {
+      col = mDicoCol[aRastValue]!;
+    }
+    return col;
   }
 
   Future<void> fillLayerDico(dicoAptProvider dico) async {
@@ -133,11 +147,11 @@ class layerBase {
       myquery += ';';
       List<Map<String, dynamic>> adicoval = await dico.db.rawQuery(myquery);
       for (var r in adicoval) {
+        mDicoVal[r['rast']] = r['val'].toString();
         if (r['col'] == null) {
-          // c'est le cas pour dico_MNT par exemple
+          // c'est le cas pour dico_MNT par exemple, mais pour CNSW également
           print("couleur null dans table ${nom_dico}");
         } else {
-          mDicoVal[r['rast']] = r['val'].toString();
           // test si c'est un code hexa ou un nom de couleur. Si null, le toString renvoie 'null'. pas très pratique évidemment
           String colcode = r['col'].toString(); // ?? '#FFFFFF';
           if (colcode.substring(0, 1) == '#') {
