@@ -23,6 +23,10 @@ class Ess {
     return mAptZbio.length == 10;
   }
 
+  bool hasCSapt() {
+    return mAptCS.isNotEmpty;
+  }
+
   int getApt(int aZbio) {
     int aRes = 0;
     if (mAptZbio.containsKey(aZbio)) {
@@ -143,6 +147,15 @@ class Ess {
         String codeNTNH = dico.code2NTNH(r['CodeNTNH']);
         // convertion apt code Str vers code integer
         int codeApt = dico.Apt(apt);
+        /*if (mCode == "CR" && zbio == 2) {
+          print(r['CodeNTNH'].toString() +
+              "= " +
+              codeNTNH +
+              " , aptitude = " +
+              apt +
+              " soit code " +
+              codeApt.toString());
+        }*/
         EcoOneZbio.addEntries({codeNTNH: codeApt}.entries);
       }
       mEcoVal[zbio] = EcoOneZbio;

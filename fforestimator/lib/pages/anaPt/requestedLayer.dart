@@ -20,13 +20,14 @@ class layerAnaPt {
 class aptsFEE {
   // key=code essence. val = code aptitude (numérique)
   Map<String, int> mApts = {};
+  Map<String, bool> mCompensations = {};
   late int NT, NH, ZBIO, Topo;
   late bool ready;
 
   Map<String, int> getListEss(codeApt) {
     Map<String, int> aRes = {};
     for (String esCode in mApts.keys) {
-      if (gl.dico.AptNonContraignante(mApts[esCode]!) == codeApt) {
+      if (gl.dico.AptContraignante(mApts[esCode]!) == codeApt) {
         aRes.addEntries({esCode: mApts[esCode]!}.entries);
       }
     }
@@ -69,28 +70,25 @@ class aptsFEE {
     }
 
     //Ess ep = gl.dico.getEss("EP"); // situation de compensation pour l'epicea*/
-    ZBIO = 3;
+    /*ZBIO = 3;
     NT = -1 + 10;
     NH = 1 + 10;
     Topo = 1;
-    ready = true;
+    ready = true;*/
 
     if (ready) {
-      /*print("ZBIO " +
-          ZBIO.toString() +
-          " NT " +
-          NT.toString() +
-          " NH " +
-          NH.toString() +
-          " Topo " +
-          Topo.toString());*/
       for (Ess es in gl.dico.mEssences.values) {
         if (es.hasFEEapt()) {
-          mApts.addEntries({
-            es.mCode: es.getAptHT(NT, NH, ZBIO, hierarchique: true, aTopo: Topo)
-          }.entries);
-
-          /*  print("ess " + es.mNomFR!);
+          int aptHT =
+              es.getAptHT(NT, NH, ZBIO, hierarchique: true, aTopo: Topo);
+          mApts.addEntries({es.mCode: aptHT}.entries);
+          bool aCompensation = Topo != 2 &&
+                  aptHT != es.getAptHT(NT, NH, ZBIO, hierarchique: true)
+              ? true
+              : false;
+          mCompensations.addEntries({es.mCode: aCompensation}.entries);
+          /*
+          print("ess " + es.mNomFR!);
           print("ess apt zbio " + es.getApt(ZBIO).toString());
           print("ess apt HT " +
               es.getAptHT(NT, NH, ZBIO, hierarchique: false).toString());
@@ -100,7 +98,58 @@ class aptsFEE {
                   .toString());*/
         }
       }
-      //
+    }
+  }
+}
+
+// listing des propositions d'essences du Guide des stations
+class propositionGS {
+  // key=code essence. val = code proposition
+  Map<String, int> mApts = {};
+  late int US, ZBIO;
+  //late String aVariante;
+  late bool ready;
+
+  Map<String, int> getListEss(codeApt) {
+    Map<String, int> aRes = {};
+    for (String esCode in mApts.keys) {
+      if (mApts[esCode] == codeApt) {
+        aRes.addEntries({esCode: mApts[esCode]!}.entries);
+      }
+    }
+    return aRes;
+  }
+
+  propositionGS(List<layerAnaPt> layersAnaP) {
+    int test = 0;
+    for (layerAnaPt l in layersAnaP) {
+      if (l.mCode == "ZBIO" && l.mFoundRastFile) {
+        ZBIO = l.mRastValue;
+        if (gl.dico.getLayerBase("ZBIO").mDicoVal.containsKey(ZBIO)) {
+          ++test;
+        }
+      }
+      if (l.mCode == "CS_A" && l.mFoundRastFile) {
+        US = l.mRastValue;
+        if (gl.dico.getLayerBase("CS_A").mDicoVal.containsKey(US)) {
+          ++test;
+        }
+      }
+    }
+
+    if (test == 2) {
+      ready = true;
+    } else {
+      ready = false;
+    }
+
+    if (ready) {
+      for (Ess es in gl.dico.mEssences.values) {
+        if (es.hasCSapt()) {
+          int recom = es.getAptCS(ZBIO, US);
+          mApts.addEntries({es.mCode: recom}.entries);
+        }
+      }
     }
   }
 }

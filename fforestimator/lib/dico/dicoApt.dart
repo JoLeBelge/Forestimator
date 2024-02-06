@@ -7,7 +7,7 @@ import 'package:fforestimator/dico/ess.dart';
 
 class aptitude {
   late int mCodeNum;
-  String? mLabelApt;
+  String mLabelApt;
   late String mCode;
 //String? mEquiv;
   late int mEquCodeNonContr;
@@ -312,6 +312,16 @@ class dicoAptProvider {
     return aRes;
   }
 
+  String AptLabel(int codeApt) {
+    String aRes = "";
+    for (aptitude apt in mAptitudes) {
+      if (apt.mCodeNum == codeApt) {
+        aRes = apt.mLabelApt;
+      }
+    }
+    return aRes;
+  }
+
   String code2NTNH(int aCode) {
     String aRes = "ND";
     dico_code2NTNH.forEach((k, v) {
@@ -403,8 +413,9 @@ class dicoAptProvider {
     String aRes = "";
     int zbioKey = zbio2CSid(zbio);
     for (station st in mStations) {
-      if (st.mZbio == zbioKey && st.mVarMaj) {
+      if (st.mZbio == zbioKey && st.mStationId == US && st.mVarMaj) {
         aRes = st.mVar;
+        break;
       }
     }
     return aRes;
