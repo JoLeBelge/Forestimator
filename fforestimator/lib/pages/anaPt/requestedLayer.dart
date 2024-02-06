@@ -18,9 +18,20 @@ class layerAnaPt {
 
 // listing de toutes les aptitudes pour création du tableau d'aptitude
 class aptsFEE {
+  // key=code essence. val = code aptitude (numérique)
   Map<String, int> mApts = {};
   late int NT, NH, ZBIO, Topo;
   late bool ready;
+
+  Map<String, int> getListEss(codeApt) {
+    Map<String, int> aRes = {};
+    for (String esCode in mApts.keys) {
+      if (gl.dico.AptNonContraignante(mApts[esCode]!) == codeApt) {
+        aRes.addEntries({esCode: mApts[esCode]!}.entries);
+      }
+    }
+    return aRes;
+  }
 
   aptsFEE(List<layerAnaPt> layersAnaP) {
     int test = 0;

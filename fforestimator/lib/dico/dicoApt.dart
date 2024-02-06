@@ -10,7 +10,7 @@ class aptitude {
   String? mLabelApt;
   late String mCode;
 //String? mEquiv;
-  int? mEquCodeNonContr;
+  late int mEquCodeNonContr;
   late int mAptContraigante;
   int? mOrdreContrainte;
   late int mSurcote;
@@ -371,6 +371,17 @@ class dicoAptProvider {
     for (aptitude apt in mAptitudes) {
       if (apt.mCodeNum == aCode) {
         aRes = apt.mAptContraigante;
+        break;
+      }
+    }
+    return aRes;
+  }
+
+  int AptNonContraignante(int aCode) {
+    int aRes = 0;
+    for (aptitude apt in mAptitudes) {
+      if (apt.mCodeNum == aCode) {
+        aRes = apt.mEquCodeNonContr;
         break;
       }
     }

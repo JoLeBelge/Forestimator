@@ -5,8 +5,8 @@ import 'package:fforestimator/dico/dicoApt.dart';
 
 class Ess {
   late String mCode;
-  String? mNomFR;
-  int? mF_R;
+  late String mNomFR;
+  late int mF_R;
   String? mPrefix;
 
   // aptitude ecograme : clé chaine charactère ; c'est la combinaison ntxnh du genre "A2p5" ou "Mm4
