@@ -153,8 +153,7 @@ class _CategoryView extends State<CategoryView> {
                             gl.interfaceSelectedLayerKeys.insert(0, item.key);
                             item.selected = true;
                             widget.refreshView();
-                          }
-                          else{
+                          } else {
                             gl.interfaceSelectedLayerKeys.removeLast();
                             gl.interfaceSelectedLayerKeys.insert(0, item.key);
                             item.selected = true;
@@ -186,9 +185,9 @@ class _CategoryView extends State<CategoryView> {
   void _getLayerData() async {
     Map<String, layerBase> mp = gl.dico.mLayerBases;
     for (var key in mp.keys) {
-      if (widget.category.filter == mp[key]!.mGroupe && mp[key]!.mExpert!) {
+      if (widget.category.filter == mp[key]!.mGroupe && !mp[key]!.mExpert) {
         _layerTiles += [
-          LayerTile(name: mp[key]!.mNom!, filter: mp[key]!.mGroupe!, key: key)
+          LayerTile(name: mp[key]!.mNom, filter: mp[key]!.mGroupe!, key: key)
         ];
       }
     }

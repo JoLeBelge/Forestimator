@@ -1,6 +1,11 @@
 TO DO forestimator WEB
 ----------------------
 
+Quand le Guide des stations d'ardenne sera imprimé:
+-renommer carte de recommandation, faire attention à la légende (concordance des termes avec contenu du GS)
+-creation WMS pour cartes dérivées.
+-documentation en ligne : le pdf (entre-autre)
+
 réunion PL 23/11/2020
 -analyse Compo ; présence pour chaque essences plus typologie des peuplements (celle de IFPRW j'imagine - phil vois avec HC - moi je peux voir ce qu'on utilisais pour IFA - IFG)
 
