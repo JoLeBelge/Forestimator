@@ -106,28 +106,51 @@ class _mapPageState extends State<mapPage> {
               },
             ),
             children: gl.interfaceSelectedLayerKeys.isNotEmpty
-                ? List<TileLayer>.generate(
-                    gl.interfaceSelectedLayerKeys.length,
-                    (i) => TileLayer(
-                      wmsOptions: WMSTileLayerOptions(
-                        baseUrl: gl
+                ? List<Widget>.generate(
+                      gl.interfaceSelectedLayerKeys.length,
+                      (i) => TileLayer(
+                        wmsOptions: WMSTileLayerOptions(
+                          baseUrl: gl
+                                  .dico
+                                  .mLayerBases[gl.interfaceSelectedLayerKeys[
+                                      gl.interfaceSelectedLayerKeys.length -
+                                          i -
+                                          1]]!
+                                  .mUrl! +
+                              "?",
+                          format: 'image/png',
+                          layers: [
+                            gl
                                 .dico
-                                .mLayerBases[gl.interfaceSelectedLayerKeys[gl.interfaceSelectedLayerKeys.length - i - 1]]!
-                                .mUrl! +
-                            "?",
-                        format: 'image/png',
-                        layers: [
-                          gl.dico.mLayerBases[gl.interfaceSelectedLayerKeys[gl.interfaceSelectedLayerKeys.length - i - 1]]!
-                              .mWMSLayerName!,
-                        ],
-                        crs: epsg31370CRS,
-                        transparent: true,
+                                .mLayerBases[gl.interfaceSelectedLayerKeys[
+                                    gl.interfaceSelectedLayerKeys.length -
+                                        i -
+                                        1]]!
+                                .mWMSLayerName!,
+                          ],
+                          crs: epsg31370CRS,
+                          transparent: true,
+                        ),
+                        //maxNativeZoom: 7,
+                        tileSize: tileSize,
                       ),
-                      //maxNativeZoom: 7,
-                      tileSize: tileSize,
-                    ),
-                  )
-                : [
+                    ) +
+                    <Widget>[
+                      MarkerLayer(
+                        markers: [
+                          Marker(
+                            width: 50.0,
+                            height: 50.0,
+                            point: latlonEpioux,
+                            child: const FlutterLogo(),
+                          ),
+                        ],
+                      ),
+                      const AnimatedLocationLayer(
+                          // cameraTrackingMode: CameraTrackingMode.locationAndOrientation,
+                          ),
+                    ]
+                : <Widget>[
                       TileLayer(
                         wmsOptions: WMSTileLayerOptions(
                           baseUrl: (gl.interfaceSelectedLayerKeys.isNotEmpty &&
@@ -153,7 +176,7 @@ class _mapPageState extends State<mapPage> {
                         tileSize: tileSize,
                       )
                     ] +
-                    [
+                    <Widget>[
                       /*RichAttributionWidget(
                 attributions: [
                   TextSourceAttribution(
@@ -163,19 +186,19 @@ class _mapPageState extends State<mapPage> {
                   ),
                 ],
               ),*/
-                      /*MarkerLayer(
-                markers: [
-                  Marker(
-                    width: 50.0,
-                    height: 50.0,
-                    point: latlonEpioux,
-                    child: const FlutterLogo(),
-                  ),
-                ],
-              ),*/
-                      /*const AnimatedLocationLayer(
-                  // cameraTrackingMode: CameraTrackingMode.locationAndOrientation,
-                  ),*/
+                      MarkerLayer(
+                        markers: [
+                          Marker(
+                            width: 50.0,
+                            height: 50.0,
+                            point: latlonEpioux,
+                            child: const FlutterLogo(),
+                          ),
+                        ],
+                      ),
+                      const AnimatedLocationLayer(
+                          // cameraTrackingMode: CameraTrackingMode.locationAndOrientation,
+                          ),
                     ],
           ),
 
