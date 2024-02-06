@@ -216,7 +216,6 @@ class _SelectedLayerView extends State<SelectedLayerView> {
   @override
   Widget build(BuildContext context) {
     {
-      //List<dynamic> _layer = gl.dico.mLayerBases.;
       return ListView(
         children: List<Widget>.generate(
           3,

@@ -79,6 +79,8 @@ class _mapPageState extends State<mapPage> {
           FlutterMap(
             mapController: _mapController,
             options: MapOptions(
+              backgroundColor: Colors.transparent,
+              keepAlive: true,
               interactionOptions: const InteractionOptions(
                   flags: InteractiveFlag.drag |
                       InteractiveFlag.pinchZoom |
@@ -103,34 +105,56 @@ class _mapPageState extends State<mapPage> {
             }*/
               },
             ),
-            children: [
-              TileLayer(
-                wmsOptions: WMSTileLayerOptions(
-                  baseUrl: (gl.interfaceSelectedLayerKeys.isNotEmpty &&
-                              gl.dico.mLayerBases.keys
-                                  .contains(gl.interfaceSelectedLayerKeys[0])
-                          ? gl
-                              .dico
-                              .mLayerBases[gl.interfaceSelectedLayerKeys[0]]!
-                              .mUrl!
-                          : gl.dico.mLayerBases[gl.defaultLayer]!.mUrl!) +
-                      "?",
-                  format: 'image/png',
-                  layers: [
-                    gl.interfaceSelectedLayerKeys.isNotEmpty &&
-                            gl.dico.mLayerBases.keys
-                                .contains(gl.interfaceSelectedLayerKeys[0])
-                        ? gl.dico.mLayerBases[gl.interfaceSelectedLayerKeys[0]]!
-                            .mWMSLayerName!
-                        : gl.dico.mLayerBases[gl.defaultLayer]!.mWMSLayerName!
-                  ],
-                  crs: epsg31370CRS,
-                  transparent: false,
-                ),
-                //maxNativeZoom: 7,
-                tileSize: tileSize,
-              ),
-              /*RichAttributionWidget(
+            children: gl.interfaceSelectedLayerKeys.isNotEmpty
+                ? List<TileLayer>.generate(
+                    gl.interfaceSelectedLayerKeys.length,
+                    (i) => TileLayer(
+                      wmsOptions: WMSTileLayerOptions(
+                        baseUrl: gl
+                                .dico
+                                .mLayerBases[gl.interfaceSelectedLayerKeys[gl.interfaceSelectedLayerKeys.length - i - 1]]!
+                                .mUrl! +
+                            "?",
+                        format: 'image/png',
+                        layers: [
+                          gl.dico.mLayerBases[gl.interfaceSelectedLayerKeys[gl.interfaceSelectedLayerKeys.length - i - 1]]!
+                              .mWMSLayerName!,
+                        ],
+                        crs: epsg31370CRS,
+                        transparent: true,
+                      ),
+                      //maxNativeZoom: 7,
+                      tileSize: tileSize,
+                    ),
+                  )
+                : [
+                      TileLayer(
+                        wmsOptions: WMSTileLayerOptions(
+                          baseUrl: (gl.interfaceSelectedLayerKeys.isNotEmpty &&
+                                      gl.dico.mLayerBases.keys.contains(
+                                          gl.interfaceSelectedLayerKeys[0])
+                                  ? gl
+                                      .dico
+                                      .mLayerBases[
+                                          gl.interfaceSelectedLayerKeys[0]]!
+                                      .mUrl!
+                                  : gl.dico.mLayerBases[gl.defaultLayer]!
+                                      .mUrl!) +
+                              "?",
+                          format: 'image/png',
+                          layers: [
+                            gl.dico.mLayerBases[gl.defaultLayer]!
+                                .mWMSLayerName!,
+                          ],
+                          crs: epsg31370CRS,
+                          transparent: true,
+                        ),
+                        //maxNativeZoom: 7,
+                        tileSize: tileSize,
+                      )
+                    ] +
+                    [
+                      /*RichAttributionWidget(
                 attributions: [
                   TextSourceAttribution(
                     'OpenStreetMap contributors',
@@ -139,7 +163,7 @@ class _mapPageState extends State<mapPage> {
                   ),
                 ],
               ),*/
-              MarkerLayer(
+                      /*MarkerLayer(
                 markers: [
                   Marker(
                     width: 50.0,
@@ -148,12 +172,13 @@ class _mapPageState extends State<mapPage> {
                     child: const FlutterLogo(),
                   ),
                 ],
-              ),
-              const AnimatedLocationLayer(
+              ),*/
+                      /*const AnimatedLocationLayer(
                   // cameraTrackingMode: CameraTrackingMode.locationAndOrientation,
-                  ),
-            ],
+                  ),*/
+                    ],
           ),
+
           /*Align(
             alignment: Alignment.bottomRight,
             // add your floating action button
