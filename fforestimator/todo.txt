@@ -12,6 +12,8 @@ TT et Jo -> création interface graphique pour afficher le résultat d'une analy
 	-trier essences par ordre alpha
 	-force face au changement climatique tableau ess GS?
 	-si tab vide (aucune essence à l'optimum par ex), suppression
+	-résumé atout/faiblesses de l'unité stationnelle - bof
+	-logo pour les couches carto en fonction de leurs classes (différencier couches peuplement de couches stations par exemple. ajout Composition dans anaPt?
 	
 TT -> création interface graphique pour gestion de projet offline avec téléchargement des rasters.
 

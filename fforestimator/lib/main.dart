@@ -79,7 +79,6 @@ class _MyApp extends State<MyApp> {
     var res = await http.get(Uri.parse(url));
     //print(res.body);
     data = jsonDecode(res.body);
-//if (data["")
     requestedLayers.clear();
     for (var r in data["RequestedLayers"]) {
       requestedLayers.add(layerAnaPt.fromMap(r));
@@ -96,12 +95,10 @@ class _MyApp extends State<MyApp> {
           useMaterial3: true,
         ),
         home: Scaffold(
-          body: Center(
-            child: _widgetOptions.elementAt(_selectedIndex),
+          body: IndexedStack(
+            index: _selectedIndex,
+            children: _widgetOptions,
           ),
-          /*Center(
-            child: mapPage(title: 'Flutter Demo Home Page'),
-          ),*/
           bottomNavigationBar: BottomNavigationBar(
             items: const <BottomNavigationBarItem>[
               BottomNavigationBarItem(
@@ -118,12 +115,7 @@ class _MyApp extends State<MyApp> {
                 icon: Icon(Icons.analytics),
                 label: 'analyse ponctuelle',
                 backgroundColor: Colors.green,
-              ), /*
-              BottomNavigationBarItem(
-                icon: Icon(Icons.settings),
-                label: 'paramètres',
-                backgroundColor: Colors.green,
-              ),*/
+              ),
             ],
             currentIndex: _selectedIndex,
             selectedItemColor: Colors.grey[300],
