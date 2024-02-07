@@ -10,6 +10,7 @@ import 'package:fforestimator/globals.dart' as gl;
 
 class mapPage extends StatefulWidget {
   final Function runAnaPt;
+
   const mapPage({required this.runAnaPt, super.key, required this.title});
 
   final String title;
@@ -61,6 +62,9 @@ class _mapPageState extends State<mapPage> {
     LatLng latlonEpioux = LatLng(epsg31370.transform(epsg4326, ptEpioux).y,
         epsg31370.transform(epsg4326, ptEpioux).x);
 
+    gl.currentPositionOnMap = latlonEpioux;
+    gl.currentZoom = 3.0;
+
     // contraindre la vue de la map sur la zone de la Wallonie. ajout d'un peu de marge
     double margeInDegree = 0.1;
     LatLng latlonBL = LatLng(
@@ -87,9 +91,9 @@ class _mapPageState extends State<mapPage> {
                       InteractiveFlag.pinchMove |
                       InteractiveFlag.doubleTapZoom),
               crs: epsg31370CRS,
-              initialZoom: 2,
+              initialZoom: gl.currentZoom,
               maxZoom: 7,
-              initialCenter: latlonEpioux,
+              initialCenter: gl.currentPositionOnMap,
               cameraConstraint: CameraConstraint.contain(
                   bounds: LatLngBounds.fromPoints([latlonBL, latlonTR])),
               onMapReady: () async {
