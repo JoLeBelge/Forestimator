@@ -5,8 +5,8 @@ import 'package:fforestimator/dico/dicoApt.dart';
 
 class Ess {
   late String mCode;
-  String? mNomFR;
-  int? mF_R;
+  late String mNomFR;
+  late int mF_R;
   String? mPrefix;
 
   // aptitude ecograme : clé chaine charactère ; c'est la combinaison ntxnh du genre "A2p5" ou "Mm4
@@ -21,6 +21,10 @@ class Ess {
 
   bool hasFEEapt() {
     return mAptZbio.length == 10;
+  }
+
+  bool hasCSapt() {
+    return mAptCS.isNotEmpty;
   }
 
   int getApt(int aZbio) {
@@ -143,6 +147,15 @@ class Ess {
         String codeNTNH = dico.code2NTNH(r['CodeNTNH']);
         // convertion apt code Str vers code integer
         int codeApt = dico.Apt(apt);
+        /*if (mCode == "CR" && zbio == 2) {
+          print(r['CodeNTNH'].toString() +
+              "= " +
+              codeNTNH +
+              " , aptitude = " +
+              apt +
+              " soit code " +
+              codeApt.toString());
+        }*/
         EcoOneZbio.addEntries({codeNTNH: codeApt}.entries);
       }
       mEcoVal[zbio] = EcoOneZbio;

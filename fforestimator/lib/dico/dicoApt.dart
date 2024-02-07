@@ -7,10 +7,10 @@ import 'package:fforestimator/dico/ess.dart';
 
 class aptitude {
   late int mCodeNum;
-  String? mLabelApt;
+  String mLabelApt;
   late String mCode;
 //String? mEquiv;
-  int? mEquCodeNonContr;
+  late int mEquCodeNonContr;
   late int mAptContraigante;
   int? mOrdreContrainte;
   late int mSurcote;
@@ -312,6 +312,16 @@ class dicoAptProvider {
     return aRes;
   }
 
+  String AptLabel(int codeApt) {
+    String aRes = "";
+    for (aptitude apt in mAptitudes) {
+      if (apt.mCodeNum == codeApt) {
+        aRes = apt.mLabelApt;
+      }
+    }
+    return aRes;
+  }
+
   String code2NTNH(int aCode) {
     String aRes = "ND";
     dico_code2NTNH.forEach((k, v) {
@@ -377,6 +387,17 @@ class dicoAptProvider {
     return aRes;
   }
 
+  int AptNonContraignante(int aCode) {
+    int aRes = 0;
+    for (aptitude apt in mAptitudes) {
+      if (apt.mCodeNum == aCode) {
+        aRes = apt.mEquCodeNonContr;
+        break;
+      }
+    }
+    return aRes;
+  }
+
   int zbio2CSid(int aCode) {
     int aRes = 0;
     for (zbio z in mZbio) {
@@ -392,8 +413,9 @@ class dicoAptProvider {
     String aRes = "";
     int zbioKey = zbio2CSid(zbio);
     for (station st in mStations) {
-      if (st.mZbio == zbioKey && st.mVarMaj) {
+      if (st.mZbio == zbioKey && st.mStationId == US && st.mVarMaj) {
         aRes = st.mVar;
+        break;
       }
     }
     return aRes;
