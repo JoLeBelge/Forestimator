@@ -82,7 +82,7 @@ class layerBase {
   String? mCode;
   String? mUrl, mWMSLayerName, mWMSattribution;
   String? mGroupe;
-  String? mCategorie;
+  late String mCategorie;
   late String mTypeVar;
   late double mGain;
   String? nom_field_raster, nom_field_value, nom_dico, condition;
@@ -114,14 +114,17 @@ class layerBase {
 
   String getValLabel(int aRastValue) {
     String aRes = "";
+    // attention aux MNH qui ont à la fois un dico pour la légende couleur, et à la fois un gain (pour la vrai valeur)
+    if (mTypeVar == 'Continu' && mGain != 66.6) {
+      double d = aRastValue * mGain;
+      aRes = d.toStringAsFixed(1);
+      return aRes;
+    }
     if (mDicoVal.containsKey(aRastValue)) {
       aRes = mDicoVal[aRastValue]!;
       return aRes;
     }
-    if (mTypeVar == 'Continu' && mGain != 66.6) {
-      double d = aRastValue * mGain;
-      aRes = d.toStringAsFixed(1);
-    }
+
     return aRes;
   }
 

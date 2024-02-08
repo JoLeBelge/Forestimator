@@ -2,7 +2,7 @@ import 'package:fforestimator/dico/dicoApt.dart';
 import "package:flutter/material.dart";
 import 'package:fforestimator/pages/anaPt/requestedLayer.dart';
 import 'package:fforestimator/globals.dart' as gl;
-import 'package:flutter_map/flutter_map.dart';
+import 'package:fforestimator/myicons.dart';
 
 class anaPtpage extends StatefulWidget {
   List<layerAnaPt> requestedLayers = [];
@@ -14,12 +14,6 @@ class anaPtpage extends StatefulWidget {
 class _anaPtpageState extends State<anaPtpage> {
   @override
   Widget build(BuildContext context) {
-    int nb = 0;
-    for (layerAnaPt l in widget.requestedLayers) {
-      if (l.mFoundRastFile && l.mRastValue != 0) {
-        nb = nb + 1;
-      }
-    }
     // pour la construction du tableau d'aptitude
     aptsFEE apts = aptsFEE(widget.requestedLayers);
     propositionGS aptsGS = propositionGS(widget.requestedLayers);
@@ -32,24 +26,7 @@ class _anaPtpageState extends State<anaPtpage> {
         body: SingleChildScrollView(
             physics: ScrollPhysics(),
             child: Column(children: [
-              nb > 0
-                  ? ListView.builder(
-                      itemBuilder: (context, index) {
-                        if (widget.requestedLayers[index].mFoundRastFile &&
-                            widget.requestedLayers[index].mRastValue != 0) {
-                          // si la valeur est 0 c'est du No Data -> on choisit de ne rien afficher
-                          return layerAnaPtListTile(
-                              data: widget.requestedLayers[index]);
-                        }
-                      },
-                      itemCount: widget.requestedLayers.length,
-                      shrinkWrap: true,
-                      physics: NeverScrollableScrollPhysics(),
-                    )
-                  : Center(
-                      child:
-                          Text("aucune information disponible pour ce point"),
-                    ),
+              _anaPtListLayers(context, widget.requestedLayers),
               apts.ready ? _tabAptFEE(context, apts) : Container(),
               aptsGS.ready ? _tabPropositionCS(context, aptsGS) : Container(),
             ])));
@@ -65,11 +42,14 @@ class layerAnaPtListTile extends StatelessWidget {
     layerBase l = gl.dico.getLayerBase(data.mCode);
     return ListTile(
       leading: Container(
-        child: CircleAvatar(
+          child: l.mGroupe == "ST"
+              ? Icon(CustomIcons.landscape_mountain_svgrepo_com)
+              : Icon(CustomIcons.mountains_svgrepo_com)),
+      /*CircleAvatar(
           radius: 25,
           backgroundColor: l.getValColor(data.mRastValue),
-        ),
-      ),
+        ),*/
+      //),
       title: Text(l.mNom),
       subtitle: Text(l.getValLabel(data.mRastValue)),
     );
@@ -196,6 +176,36 @@ class essencesListViewGS extends StatelessWidget {
           // ajout force face aux changements climatiques?
         );
       },
+    );
+  }
+}
+
+Widget _anaPtListLayers(
+    BuildContext context, List<layerAnaPt> requestedLayers) {
+  /* plus nécessaire car requestedLayers est purgé avant l'envoi à anaPtpage
+  int nb = 0;
+  for (layerAnaPt l in requestedLayers) {
+    if (l.mFoundRastFile && l.mRastValue != 0) {
+      nb = nb + 1;
+    }
+  }*/
+
+  if (requestedLayers.length > 0) {
+    return ListView.builder(
+      itemBuilder: (context, index) {
+        //if (requestedLayers[index].mFoundRastFile &&
+        //  requestedLayers[index].mRastValue != 0) {
+
+        return layerAnaPtListTile(data: requestedLayers[index]);
+        //}
+      },
+      itemCount: requestedLayers.length,
+      shrinkWrap: true,
+      physics: NeverScrollableScrollPhysics(),
+    );
+  } else {
+    return Center(
+      child: Text("aucune information disponible pour ce point"),
     );
   }
 }

@@ -14,6 +14,11 @@ class layerAnaPt {
         mFoundRastFile = map['foundRastFile'],
         mRastValue = map["rastValue"],
         mValue = map["value"];
+
+  /*@override
+  int compareTo(other) {
+    return this.mRastValue.compareTo(other.mRastValue);
+  }*/
 }
 
 // listing de toutes les aptitudes pour création du tableau d'aptitude

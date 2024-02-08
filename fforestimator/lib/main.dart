@@ -83,6 +83,18 @@ class _MyApp extends State<MyApp> {
     for (var r in data["RequestedLayers"]) {
       requestedLayers.add(layerAnaPt.fromMap(r));
     }
+    requestedLayers.removeWhere((element) => element.mFoundLayer == 0);
+    // un peu radical mais me fait bugger mon affichage par la suite donc je retire
+    requestedLayers.removeWhere((element) => element.mRastValue == 0);
+
+    // on les trie sur base des catégories de couches
+    requestedLayers.sort((a, b) => gl.dico
+        .getLayerBase(a.mCode)
+        .mCategorie
+        .compareTo(gl.dico.getLayerBase(b.mCode).mCategorie));
+    // depuis l'ajout de IndexedStack pour garder l'état de la page map, la page ana ponctuelle ne se met plus a jour. Donc je la recrée après chaque requetes
+    _widgetOptions.removeAt(2);
+    _widgetOptions.insert(2, anaPtpage(requestedLayers));
     _onItemTapped(2);
   }
 
