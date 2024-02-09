@@ -22,8 +22,6 @@ class mapPage extends StatefulWidget {
 class _mapPageState extends State<mapPage> {
   final _mapController = MapController();
 
-  Position? _position;
-
 //https://github.com/fleaflet/flutter_map/blob/master/example/lib/pages/custom_crs/custom_crs.dart
   late proj4.Projection epsg4326 = proj4.Projection.get('EPSG:4326')!;
   // si epsg31370 est dans la db proj 4, on prend, sinon on définit
@@ -48,7 +46,7 @@ class _mapPageState extends State<mapPage> {
       code: 'EPSG:31370',
       proj4Projection: epsg31370,
       bounds: epsg31370Bounds,
-      resolutions: getResolutions(295170.0, 42250.0, 8, 256.0));
+      resolutions: getResolutions(295170.0, 42250.0, 15, 256.0));
 
   @override
   Widget build(BuildContext context) {
@@ -62,8 +60,7 @@ class _mapPageState extends State<mapPage> {
     LatLng latlonEpioux = LatLng(epsg31370.transform(epsg4326, ptEpioux).y,
         epsg31370.transform(epsg4326, ptEpioux).x);
 
-    gl.currentPositionOnMap = latlonEpioux;
-    gl.currentZoom = 3.0;
+
 
     // contraindre la vue de la map sur la zone de la Wallonie. ajout d'un peu de marge
     double margeInDegree = 0.1;
@@ -76,29 +73,31 @@ class _mapPageState extends State<mapPage> {
 
     return Scaffold(
         appBar: AppBar(
-          title: Text("Forestimator"),
-          backgroundColor: Colors.red,
+          title: Text("Forestimator", textScaler: TextScaler.linear(0.75),),toolbarHeight: 20.0,
+          backgroundColor: gl.colorAgroBioTech,
+          
         ),
         body: Stack(children: <Widget>[
           FlutterMap(
-            mapController: _mapController,
-            options: MapOptions(
-              backgroundColor: Colors.transparent,
-              keepAlive: true,
-              interactionOptions: const InteractionOptions(
-                  flags: InteractiveFlag.drag |
-                      InteractiveFlag.pinchZoom |
-                      InteractiveFlag.pinchMove |
-                      InteractiveFlag.doubleTapZoom),
-              crs: epsg31370CRS,
-              initialZoom: gl.currentZoom,
-              maxZoom: 7,
-              initialCenter: gl.currentPositionOnMap,
-              cameraConstraint: CameraConstraint.contain(
-                  bounds: LatLngBounds.fromPoints([latlonBL, latlonTR])),
-              onMapReady: () async {
-                _position = await acquireUserLocation();
-                /*if (_position != null) {//TODO: Ceci tue l'appli!
+              mapController: _mapController,
+              options: MapOptions(
+                backgroundColor: Colors.transparent,
+                keepAlive: true,
+                interactionOptions: const InteractionOptions(
+                    flags: InteractiveFlag.drag |
+                        InteractiveFlag.pinchZoom |
+                        InteractiveFlag.pinchMove |
+                        InteractiveFlag.doubleTapZoom),
+                crs: epsg31370CRS,
+                initialZoom: 4.0,
+                maxZoom: 15,
+                initialCenter: latlonEpioux,
+                cameraConstraint: CameraConstraint.contain(
+                    bounds: LatLngBounds.fromPoints([latlonBL, latlonTR])),
+                onMapReady: () async {
+                  gl.position = await acquireUserLocation();
+                  await refreshAnalysisPosition();
+                  /*if (_position != null) {//TODO: Ceci tue l'appli!
               // IMPORTANT: rebuild location layer when permissions are granted
               setState(() {
                 _mapController.move(
@@ -107,104 +106,52 @@ class _mapPageState extends State<mapPage> {
                     16);
               });
             }*/
-              },
-            ),
-            children: gl.interfaceSelectedLayerKeys.isNotEmpty
-                ? List<Widget>.generate(
-                      gl.interfaceSelectedLayerKeys.length,
-                      (i) => TileLayer(
-                        wmsOptions: WMSTileLayerOptions(
-                          baseUrl: gl
-                                  .dico
-                                  .mLayerBases[gl.interfaceSelectedLayerKeys[
-                                      gl.interfaceSelectedLayerKeys.length -
-                                          i -
-                                          1]]!
-                                  .mUrl! +
-                              "?",
-                          format: 'image/png',
-                          layers: [
-                            gl
+                },
+              ),
+              children: List<Widget>.generate(
+                    gl.interfaceSelectedLayerKeys.length,
+                    (i) => TileLayer(
+                      wmsOptions: WMSTileLayerOptions(
+                        baseUrl: gl
                                 .dico
                                 .mLayerBases[gl.interfaceSelectedLayerKeys[
                                     gl.interfaceSelectedLayerKeys.length -
                                         i -
                                         1]]!
-                                .mWMSLayerName!,
-                          ],
-                          crs: epsg31370CRS,
-                          transparent: true,
-                        ),
-                        //maxNativeZoom: 7,
-                        tileSize: tileSize,
-                      ),
-                    ) +
-                    <Widget>[
-                      MarkerLayer(
-                        markers: [
-                          Marker(
-                            width: 50.0,
-                            height: 50.0,
-                            point: latlonEpioux,
-                            child: const FlutterLogo(),
-                          ),
+                                .mUrl! +
+                            "?",
+                        format: 'image/png',
+                        layers: [
+                          gl
+                              .dico
+                              .mLayerBases[gl.interfaceSelectedLayerKeys[
+                                  gl.interfaceSelectedLayerKeys.length -
+                                      i -
+                                      1]]!
+                              .mWMSLayerName!,
                         ],
+                        crs: epsg31370CRS,
+                        transparent: true,
                       ),
-                      const AnimatedLocationLayer(
-                          // cameraTrackingMode: CameraTrackingMode.locationAndOrientation,
-                          ),
-                    ]
-                : <Widget>[
-                      TileLayer(
-                        wmsOptions: WMSTileLayerOptions(
-                          baseUrl: (gl.interfaceSelectedLayerKeys.isNotEmpty &&
-                                      gl.dico.mLayerBases.keys.contains(
-                                          gl.interfaceSelectedLayerKeys[0])
-                                  ? gl
-                                      .dico
-                                      .mLayerBases[
-                                          gl.interfaceSelectedLayerKeys[0]]!
-                                      .mUrl!
-                                  : gl.dico.mLayerBases[gl.defaultLayer]!
-                                      .mUrl!) +
-                              "?",
-                          format: 'image/png',
-                          layers: [
-                            gl.dico.mLayerBases[gl.defaultLayer]!
-                                .mWMSLayerName!,
-                          ],
-                          crs: epsg31370CRS,
-                          transparent: true,
+                      //maxNativeZoom: 7,
+                      tileSize: tileSize,
+                    ),
+                  ) +
+                  <Widget>[
+                    MarkerLayer(
+                      markers: [
+                        Marker(
+                          width: 50.0,
+                          height: 50.0,
+                          point: latlonEpioux,
+                          child: const FlutterLogo(),
                         ),
-                        //maxNativeZoom: 7,
-                        tileSize: tileSize,
-                      )
-                    ] +
-                    <Widget>[
-                      /*RichAttributionWidget(
-                attributions: [
-                  TextSourceAttribution(
-                    'OpenStreetMap contributors',
-                    onTap: () => launchUrl(
-                        Uri.parse('https://openstreetmap.org/copyright')),
-                  ),
-                ],
-              ),*/
-                      MarkerLayer(
-                        markers: [
-                          Marker(
-                            width: 50.0,
-                            height: 50.0,
-                            point: latlonEpioux,
-                            child: const FlutterLogo(),
-                          ),
-                        ],
-                      ),
-                      const AnimatedLocationLayer(
-                          // cameraTrackingMode: CameraTrackingMode.locationAndOrientation,
-                          ),
-                    ],
-          ),
+                      ],
+                    ),
+                    const AnimatedLocationLayer(
+                        // cameraTrackingMode: CameraTrackingMode.locationAndOrientation,
+                        ),
+                  ]),
 
           /*Align(
             alignment: Alignment.bottomRight,
@@ -214,30 +161,23 @@ class _mapPageState extends State<mapPage> {
               child: Icon(Icons.map),
             ),
           ),*/
-          Align(
-            alignment: Alignment.bottomCenter,
-            // add your floating action button
-            child: FloatingActionButton(
-              onPressed: () {
-                //_anaPonctOnline();
-                if (_position != null) {
-                  //print("postion x " + _position?.latitude.toString() ?? "0" );// + " " + _position?.longitude.toString());
-                  print(_position?.latitude.toString() ??
-                      "empty position"); // + " " + _position?.longitude.toString());
-                  print("anaPonctOnline");
-                  // on projete en BL72, seul src de Forestimator web pour le moment
-                  proj4.Point ptBL72 = epsg4326.transform(
-                      epsg31370,
-                      proj4.Point(
-                          x: _position?.longitude ?? 0.0,
-                          y: _position?.latitude ?? 0.0));
-                  widget.runAnaPt(ptBL72);
-                }
-              },
-              child: Icon(Icons.gps_fixed),
-            ),
-          ),
+          
         ]));
+  }
+
+  Future<void> refreshAnalysisPosition() async{
+    if (gl.position != null) {
+      //print("postion x " + _position?.latitude.toString() ?? "0" );// + " " + _position?.longitude.toString());
+      print(gl.position?.latitude.toString() ??
+          "empty position"); // + " " + _position?.longitude.toString());
+      print("anaPonctOnline");
+      // on projete en BL72, seul src de Forestimator web pour le moment
+      proj4.Point ptBL72 = epsg4326.transform(
+          epsg31370,
+          proj4.Point(
+              x: gl.position?.longitude ?? 0.0, y: gl.position?.latitude ?? 0.0));
+      widget.runAnaPt(ptBL72);
+    }
   }
 }
 
@@ -255,6 +195,7 @@ Future<Position?> acquireUserLocation() async {
   }
 
   try {
+    
     return await Geolocator.getCurrentPosition();
   } on LocationServiceDisabledException {
     return null;

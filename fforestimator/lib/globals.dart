@@ -1,7 +1,8 @@
 library fforestimator.globals;
 
 import 'package:fforestimator/dico/dicoApt.dart';
-import 'package:latlong2/latlong.dart';
+import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 
 late dicoAptProvider dico;
 
@@ -12,5 +13,10 @@ List<String> interfaceSelectedLayerKeys = [defaultLayer];
 String layersAnaPt =
     "ZBIO+CNSWrast+CS_A+MNT+slope+NT+NH+Topo+AE+COMPOALL+MNH2021+brol";
 
-late LatLng currentPositionOnMap;
-late double currentZoom;
+Position? position;
+
+const Color colorAgroBioTech = Color.fromRGBO(185, 205, 118, 1.0);
+const Color colorDeselected = Color.fromARGB(255, 46, 46, 46);
+const Color colorUliege = Color.fromRGBO(00, 112, 127, 1.0);
+const Color colorBack = Color.fromRGBO(255, 120, 30, 1);
+

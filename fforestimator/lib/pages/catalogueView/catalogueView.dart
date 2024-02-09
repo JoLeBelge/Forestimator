@@ -6,7 +6,7 @@ import 'package:fforestimator/pages/catalogueView/layerTile.dart';
 import 'package:fforestimator/pages/catalogueView/legendView.dart';
 
 ScrollController it = ScrollController();
-ClampingScrollPhysics that = ClampingScrollPhysics();
+ClampingScrollPhysics that = const ClampingScrollPhysics();
 
 class CatalogueView extends StatefulWidget {
   final Function refreshView;
@@ -140,9 +140,11 @@ class _CategoryView extends State<CategoryView> {
                       icon: const Icon(Icons.layers_clear),
                       onPressed: () {
                         setState(() {
-                          gl.interfaceSelectedLayerKeys.remove(item.key);
-                          item.selected = false;
-                          widget.refreshView();
+                          if (gl.interfaceSelectedLayerKeys.length > 1) {
+                            gl.interfaceSelectedLayerKeys.remove(item.key);
+                            item.selected = false;
+                            widget.refreshView();
+                          }
                         });
                       })
                   : IconButton(
@@ -260,9 +262,11 @@ class _SelectedLayerView extends State<SelectedLayerView> {
                         icon: const Icon(Icons.layers_clear_rounded),
                         onPressed: () {
                           setState(() {
-                            gl.interfaceSelectedLayerKeys
-                                .remove(gl.interfaceSelectedLayerKeys[i]);
-                            widget.refreshView();
+                            if (gl.interfaceSelectedLayerKeys.length > 1) {
+                              gl.interfaceSelectedLayerKeys
+                                  .remove(gl.interfaceSelectedLayerKeys[i]);
+                              widget.refreshView();
+                            }
                           });
                         },
                       ),

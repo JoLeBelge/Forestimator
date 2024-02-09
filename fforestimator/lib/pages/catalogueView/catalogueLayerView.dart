@@ -3,7 +3,7 @@ import 'package:fforestimator/pages/catalogueView/layerTile.dart';
 import 'package:flutter/material.dart';
 
 class CatalogueLayerView extends StatefulWidget {
-  CatalogueLayerView({super.key});
+  const CatalogueLayerView({super.key});
   @override
   State<CatalogueLayerView> createState() => _CatalogueLayerView();
 }

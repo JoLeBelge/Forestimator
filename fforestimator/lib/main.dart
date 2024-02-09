@@ -3,6 +3,7 @@ import 'package:fforestimator/pages/anaPt/anaPtpage.dart';
 import 'package:flutter/material.dart';
 import 'package:fforestimator/globals.dart' as gl;
 import 'package:fforestimator/pages/map.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'dart:io' show Platform;
@@ -34,26 +35,31 @@ class MyApp extends StatefulWidget {
 
 class _MyApp extends State<MyApp> {
   int _selectedIndex = 0;
+  bool _showCompleteLayerSelectionScreen = false;
+  bool _showAnalysisResultScreen = false;
+
   static const TextStyle optionStyle =
       TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
-
-  late final List<Widget> _widgetOptions;
 
   var data;
 
   List<layerAnaPt> requestedLayers = [];
 
-  _MyApp() {
-    _widgetOptions = <Widget>[
-      mapPage(runAnaPt: _runAnapt, title: 'Flutter Demo Home Page'),
-      CatalogueLayerView(),
-      anaPtpage(requestedLayers),
-      const Text(
-        'todo settings',
-        style: optionStyle,
-      ),
-    ];
+  void _switchLayerViewPage() {
+    setState(() {
+      _showCompleteLayerSelectionScreen = !_showCompleteLayerSelectionScreen;
+      _showAnalysisResultScreen = false;
+    });
   }
+
+  void _switchAnalysisViewPage() {
+    setState(() {
+      _showAnalysisResultScreen = !_showAnalysisResultScreen;
+      _showCompleteLayerSelectionScreen = false;
+    });
+  }
+
+  _MyApp() {}
 
   void _onItemTapped(int index) {
     setState(() {
@@ -93,8 +99,8 @@ class _MyApp extends State<MyApp> {
         .mCategorie
         .compareTo(gl.dico.getLayerBase(b.mCode).mCategorie));
     // depuis l'ajout de IndexedStack pour garder l'état de la page map, la page ana ponctuelle ne se met plus a jour. Donc je la recrée après chaque requetes
-    _widgetOptions.removeAt(2);
-    _widgetOptions.insert(2, anaPtpage(requestedLayers));
+    //widgetOptions.removeAt(2);
+    //widgetOptions.insert(2, anaPtpage(requestedLayers));
     _onItemTapped(2);
   }
 
@@ -107,11 +113,50 @@ class _MyApp extends State<MyApp> {
           useMaterial3: true,
         ),
         home: Scaffold(
-          body: IndexedStack(
-            index: _selectedIndex,
-            children: _widgetOptions,
-          ),
-          bottomNavigationBar: BottomNavigationBar(
+          body: Center(
+              child: Stack(
+            children: <Widget>[
+              mapPage(runAnaPt: _runAnapt, title: 'Flutter Demo Home Page'),
+              Column(children: [
+                Container(
+                    constraints: BoxConstraints(
+                        minHeight: MediaQuery.of(context).size.height * .925,
+                        maxHeight: MediaQuery.of(context).size.height * .925,
+                        minWidth: MediaQuery.of(context).size.width,
+                        maxWidth: MediaQuery.of(context).size.width),
+                    child: _showCompleteLayerSelectionScreen
+                        ? const CatalogueLayerView()
+                        : _showAnalysisResultScreen
+                            ? anaPtpage(requestedLayers)
+                            : null),
+                Container(
+                    constraints: BoxConstraints(
+                        minHeight: MediaQuery.of(context).size.height * .075),
+                    child: Row(children: [
+                      _showCompleteLayerSelectionScreen
+                          ? FloatingActionButton(
+                              backgroundColor: gl.colorAgroBioTech,
+                              onPressed: _switchLayerViewPage,
+                              child: const Icon(Icons.arrow_back, color: gl.colorBack))
+                          : FloatingActionButton(
+                              backgroundColor: gl.colorAgroBioTech,
+                              onPressed: _switchLayerViewPage,
+                              child: const Icon(Icons.layers_rounded, color: gl.colorUliege,)),
+                      _showAnalysisResultScreen
+                          ? FloatingActionButton(
+                              backgroundColor: gl.colorAgroBioTech,
+                              onPressed: _switchAnalysisViewPage,
+                              child: const Icon(Icons.arrow_back, color: gl.colorBack))
+                          : FloatingActionButton(
+                              backgroundColor: gl.colorAgroBioTech,
+                              onPressed: _switchAnalysisViewPage,
+                              child: const Icon(Icons.analytics_rounded, color: gl.colorUliege,)),
+                    ]))
+              ])
+              //anaPtpage(requestedLayers),
+            ],
+          )),
+          /*bottomNavigationBar: BottomNavigationBar(
             items: const <BottomNavigationBarItem>[
               BottomNavigationBarItem(
                 icon: Icon(Icons.landslide),
@@ -132,7 +177,7 @@ class _MyApp extends State<MyApp> {
             currentIndex: _selectedIndex,
             selectedItemColor: Colors.grey[300],
             onTap: _onItemTapped,
-          ),
+          ),*/
         ));
   }
 }
