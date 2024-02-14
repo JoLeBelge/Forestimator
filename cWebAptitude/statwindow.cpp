@@ -229,4 +229,6 @@ void surfPdfResource::handleRequest(const Http::Request &request, Http::Response
 
     response.out (). write ((char *) buf, size);
     delete [] buf;
+
+    mSW->mGL->m_app->addLog("pdf ana surf", typeLog::danas);
 }

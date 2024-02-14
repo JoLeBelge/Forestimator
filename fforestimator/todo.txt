@@ -2,7 +2,6 @@ To do list fforestimator
 ------------------------
 
 -TileLayer; en avoir plus qu'une, pour superposer CNSW à Topo par exemple. Trois maximum dans selected layer, ça c'est bon.
-Jo-> création du tableau de proposition guide des stations pour anaPt
 
 -map_controller et centrage sur position gps ; rendre opérationnel (à nouveau)
 

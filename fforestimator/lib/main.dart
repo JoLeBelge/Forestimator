@@ -34,7 +34,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyApp extends State<MyApp> {
-  int _selectedIndex = 0;
+  //int _selectedIndex = 0;
   bool _showCompleteLayerSelectionScreen = false;
   bool _showAnalysisResultScreen = false;
 
@@ -61,12 +61,6 @@ class _MyApp extends State<MyApp> {
 
   _MyApp() {}
 
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
-
   Future _runAnapt(proj4.Point ptBL72) async {
     String layers4AnaPt = gl.layersAnaPt;
     for (String lCode in gl.interfaceSelectedLayerKeys) {
@@ -83,7 +77,7 @@ class _MyApp extends State<MyApp> {
         ptBL72.y.toString();
     print(url);
     var res = await http.get(Uri.parse(url));
-    //print(res.body);
+    print(res.body);
     data = jsonDecode(res.body);
     requestedLayers.clear();
     for (var r in data["RequestedLayers"]) {
@@ -96,12 +90,10 @@ class _MyApp extends State<MyApp> {
     // on les trie sur base des catégories de couches
     requestedLayers.sort((a, b) => gl.dico
         .getLayerBase(a.mCode)
-        .mCategorie
-        .compareTo(gl.dico.getLayerBase(b.mCode).mCategorie));
-    // depuis l'ajout de IndexedStack pour garder l'état de la page map, la page ana ponctuelle ne se met plus a jour. Donc je la recrée après chaque requetes
-    //widgetOptions.removeAt(2);
-    //widgetOptions.insert(2, anaPtpage(requestedLayers));
-    _onItemTapped(2);
+        .mGroupe
+        .compareTo(gl.dico.getLayerBase(b.mCode).mGroupe));
+
+    _switchAnalysisViewPage();
   }
 
   @override
@@ -137,47 +129,32 @@ class _MyApp extends State<MyApp> {
                           ? FloatingActionButton(
                               backgroundColor: gl.colorAgroBioTech,
                               onPressed: _switchLayerViewPage,
-                              child: const Icon(Icons.arrow_back, color: gl.colorBack))
+                              child: const Icon(Icons.arrow_back,
+                                  color: gl.colorBack))
                           : FloatingActionButton(
                               backgroundColor: gl.colorAgroBioTech,
                               onPressed: _switchLayerViewPage,
-                              child: const Icon(Icons.layers_rounded, color: gl.colorUliege,)),
+                              child: const Icon(
+                                Icons.layers_rounded,
+                                color: gl.colorUliege,
+                              )),
                       _showAnalysisResultScreen
                           ? FloatingActionButton(
                               backgroundColor: gl.colorAgroBioTech,
                               onPressed: _switchAnalysisViewPage,
-                              child: const Icon(Icons.arrow_back, color: gl.colorBack))
+                              child: const Icon(Icons.arrow_back,
+                                  color: gl.colorBack))
                           : FloatingActionButton(
                               backgroundColor: gl.colorAgroBioTech,
                               onPressed: _switchAnalysisViewPage,
-                              child: const Icon(Icons.analytics_rounded, color: gl.colorUliege,)),
+                              child: const Icon(
+                                Icons.analytics_rounded,
+                                color: gl.colorUliege,
+                              )),
                     ]))
               ])
-              //anaPtpage(requestedLayers),
             ],
           )),
-          /*bottomNavigationBar: BottomNavigationBar(
-            items: const <BottomNavigationBarItem>[
-              BottomNavigationBarItem(
-                icon: Icon(Icons.landslide),
-                label: 'Carte',
-                backgroundColor: Colors.green,
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.layers),
-                label: 'selection des couches',
-                backgroundColor: Colors.green,
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.analytics),
-                label: 'analyse ponctuelle',
-                backgroundColor: Colors.green,
-              ),
-            ],
-            currentIndex: _selectedIndex,
-            selectedItemColor: Colors.grey[300],
-            onTap: _onItemTapped,
-          ),*/
         ));
   }
 }

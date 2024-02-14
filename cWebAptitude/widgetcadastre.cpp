@@ -1,6 +1,6 @@
 #include "widgetcadastre.h"
 
-widgetCadastre::widgetCadastre(cadastre * aCad):mCad(aCad),WTable()
+widgetCadastre::widgetCadastre(cadastre * aCad, cWebAptitude *app):mCad(aCad),WTable(),m_app(app)
 {
     int row(0);
     elementAt(row,0)->addWidget(std::make_unique<WLabel>(tr("cadastre.commune")));
@@ -102,6 +102,8 @@ void widgetCadastre::refreshPaCa(){
 void widgetCadastre::submit(){
     // converti le polygone choisi en json et envoie le signal à parcellaire qui prend la relève pour l'affichage.
     if (commune_->currentIndex()!=0){
+
+   m_app->addLog("recherche cadastrale",typeLog::rechercheCadastre);
 
     if (division_->currentIndex()==0){
         // commune

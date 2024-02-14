@@ -194,7 +194,9 @@ void groupLayers::clickOnName(std::string aCode){
     for (std::shared_ptr<Layer> l : mVLs){
         if (l->IsActive()){
             l->displayLayer();
+            if (l->Code()!="IGN"){
             m_app->addLog("display layer "+l->Code(),typeLog::selectLayer);
+            }
             break;
         }
     }
@@ -475,6 +477,7 @@ void groupLayers::updateGL(){
     pdfLink2.setTarget(Wt::LinkTarget::NewWindow);
     m_app->mPA->mStatW->createPdfBut->setLink(pdfLink2);
 
+
     // boucle sur les layers et envoi du signal pour cacher ou rendre visible les checkbox
     for (std::shared_ptr<Layer> l : mVLs){
         l->ExpertMode(expertMode);
@@ -618,7 +621,6 @@ void groupLayers::exportLayMapView(){
             zf->close();
             delete zf;
             // le fileResources sera détruit au moment de la destruction GroupL
-            //std::unique_ptr<WFileResource> fileResource = std::make_unique<Wt::WFileResource>("plain/text",archiveFileName);
             WFileResource * fileResource = new Wt::WFileResource("plain/text",archiveFileName);
             fileResource->suggestFileName(mClientName+".zip");
             m_app->addLog(l->Code(),typeLog::dsingle);

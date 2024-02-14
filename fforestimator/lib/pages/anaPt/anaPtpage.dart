@@ -41,10 +41,14 @@ class layerAnaPtListTile extends StatelessWidget {
   Widget build(BuildContext context) {
     layerBase l = gl.dico.getLayerBase(data.mCode);
     return ListTile(
-      leading: Container(
-          child: l.mGroupe == "ST"
-              ? Icon(CustomIcons.landscape_mountain_svgrepo_com)
-              : Icon(CustomIcons.mountains_svgrepo_com)),
+      leading: switch (l.mGroupe!) {
+        "ST" => Icon(CustomIcons.montain),
+        "PEUP" => Icon(CustomIcons.forest),
+        "CS" => Icon(CustomIcons.mountains),
+        "REF" => Icon(Icons.location_on),
+        _ => Icon(Icons.location_on),
+      },
+
       /*CircleAvatar(
           radius: 25,
           backgroundColor: l.getValColor(data.mRastValue),
