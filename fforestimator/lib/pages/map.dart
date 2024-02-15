@@ -86,10 +86,12 @@ class _mapPageState extends State<mapPage> {
                 backgroundColor: Colors.transparent,
                 keepAlive: true,
                 interactionOptions: const InteractionOptions(
-                    flags: InteractiveFlag.drag |
-                        InteractiveFlag.pinchZoom |
-                        InteractiveFlag.pinchMove |
-                        InteractiveFlag.doubleTapZoom),
+                  enableMultiFingerGestureRace: false,
+                  flags: InteractiveFlag.drag |
+                      InteractiveFlag.pinchZoom |
+                      InteractiveFlag.pinchMove |
+                      InteractiveFlag.doubleTapZoom,
+                ),
                 onLongPress: (tapPosition, point) => {
                   //proj4.Point ptBL72 = epsg4326.transform(epsg31370,proj4.Point(x: point.longitude, y: point.latitude))
                   widget.runAnaPt(epsg4326.transform(epsg31370,
@@ -105,15 +107,16 @@ class _mapPageState extends State<mapPage> {
                 onMapReady: () async {
                   gl.position = await acquireUserLocation();
                   //await refreshAnalysisPosition();
-                  /*if (_position != null) {//TODO: Ceci tue l'appli!
-              // IMPORTANT: rebuild location layer when permissions are granted
-              setState(() {
-                _mapController.move(
-                    LatLng(_position?.latitude ?? 0.0,
-                        _position?.longitude ?? 0.0),
-                    16);
-              });
-            }*/
+                  if (gl.position != null) {
+                    //TODO: Ceci tue l'appli!
+                    // IMPORTANT: rebuild location layer when permissions are granted
+                    setState(() {
+                      _mapController.move(
+                          LatLng(gl.position?.latitude ?? 0.0,
+                              gl.position?.longitude ?? 0.0),
+                          16);
+                    });
+                  }
                 },
               ),
               children: List<Widget>.generate(

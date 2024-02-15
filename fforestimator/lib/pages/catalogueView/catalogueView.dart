@@ -108,6 +108,7 @@ class _CategoryView extends State<CategoryView> {
           child: Scrollbar(
               controller: it,
               child: SingleChildScrollView(
+                controller: it,
                 physics: that,
                 child: Container(
                   child: _buildPanel(),

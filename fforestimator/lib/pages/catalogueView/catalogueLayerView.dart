@@ -39,9 +39,7 @@ class _CatalogueLayerView extends State<CatalogueLayerView> {
     ]);
   }
 
-  void refreshView(){
-    setState(() {
-      
-    });
+  void refreshView() {
+    setState(() {});
   }
 }

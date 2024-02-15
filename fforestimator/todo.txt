@@ -1,18 +1,9 @@
 To do list fforestimator
 ------------------------
-
--TileLayer; en avoir plus qu'une, pour superposer CNSW à Topo par exemple. Trois maximum dans selected layer, ça c'est bon.
+legender le logo compensation matrice aptitude (en modifiant le texte de subtitle ListTile?)
+-TileLayer; superposer CNSW à Topo.
 
 -map_controller et centrage sur position gps ; rendre opérationnel (à nouveau)
-
-TT et Jo -> création interface graphique pour afficher le résultat d'une analyse ponctuelle
-	-legender le logo compensation matrice aptitude
-	-rendre la presentation des "sections" plus sexy
-	-trier essences par ordre alpha
-	-force face au changement climatique tableau ess GS?
-	-si tab vide (aucune essence à l'optimum par ex), suppression
-	-résumé atout/faiblesses de l'unité stationnelle - bof
-	-logo pour les couches carto en fonction de leurs classes (différencier couches peuplement de couches stations par exemple. ajout Composition dans anaPt?
 	
 TT -> création interface graphique pour gestion de projet offline avec téléchargement des rasters.
 

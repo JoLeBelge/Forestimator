@@ -109,50 +109,52 @@ class _MyApp extends State<MyApp> {
               child: Stack(
             children: <Widget>[
               mapPage(runAnaPt: _runAnapt, title: 'Flutter Demo Home Page'),
-              Column(children: [
-                Container(
-                    constraints: BoxConstraints(
-                        minHeight: MediaQuery.of(context).size.height * .925,
-                        maxHeight: MediaQuery.of(context).size.height * .925,
-                        minWidth: MediaQuery.of(context).size.width,
-                        maxWidth: MediaQuery.of(context).size.width),
-                    child: _showCompleteLayerSelectionScreen
-                        ? const CatalogueLayerView()
-                        : _showAnalysisResultScreen
-                            ? anaPtpage(requestedLayers)
-                            : null),
-                Container(
-                    constraints: BoxConstraints(
-                        minHeight: MediaQuery.of(context).size.height * .075),
-                    child: Row(children: [
-                      _showCompleteLayerSelectionScreen
-                          ? FloatingActionButton(
-                              backgroundColor: gl.colorAgroBioTech,
-                              onPressed: _switchLayerViewPage,
-                              child: const Icon(Icons.arrow_back,
-                                  color: gl.colorBack))
-                          : FloatingActionButton(
-                              backgroundColor: gl.colorAgroBioTech,
-                              onPressed: _switchLayerViewPage,
-                              child: const Icon(
-                                Icons.layers_rounded,
-                                color: gl.colorUliege,
-                              )),
-                      _showAnalysisResultScreen
-                          ? FloatingActionButton(
-                              backgroundColor: gl.colorAgroBioTech,
-                              onPressed: _switchAnalysisViewPage,
-                              child: const Icon(Icons.arrow_back,
-                                  color: gl.colorBack))
-                          : FloatingActionButton(
-                              backgroundColor: gl.colorAgroBioTech,
-                              onPressed: _switchAnalysisViewPage,
-                              child: const Icon(
-                                Icons.analytics_rounded,
-                                color: gl.colorUliege,
-                              )),
-                    ]))
-              ])
+              SingleChildScrollView(
+                child: Column(children: [
+                  Container(
+                      constraints: BoxConstraints(
+                          minHeight: MediaQuery.of(context).size.height * .925,
+                          maxHeight: MediaQuery.of(context).size.height * .925,
+                          minWidth: MediaQuery.of(context).size.width,
+                          maxWidth: MediaQuery.of(context).size.width),
+                      child: _showCompleteLayerSelectionScreen
+                          ? const CatalogueLayerView()
+                          : _showAnalysisResultScreen
+                              ? anaPtpage(requestedLayers)
+                              : null),
+                  Container(
+                      constraints: BoxConstraints(
+                          minHeight: MediaQuery.of(context).size.height * .075),
+                      child: Row(children: [
+                        _showCompleteLayerSelectionScreen
+                            ? FloatingActionButton(
+                                backgroundColor: gl.colorAgroBioTech,
+                                onPressed: _switchLayerViewPage,
+                                child: const Icon(Icons.arrow_back,
+                                    color: gl.colorBack))
+                            : FloatingActionButton(
+                                backgroundColor: gl.colorAgroBioTech,
+                                onPressed: _switchLayerViewPage,
+                                child: const Icon(
+                                  Icons.layers_rounded,
+                                  color: gl.colorUliege,
+                                )),
+                        _showAnalysisResultScreen
+                            ? FloatingActionButton(
+                                backgroundColor: gl.colorAgroBioTech,
+                                onPressed: _switchAnalysisViewPage,
+                                child: const Icon(Icons.arrow_back,
+                                    color: gl.colorBack))
+                            : FloatingActionButton(
+                                backgroundColor: gl.colorAgroBioTech,
+                                onPressed: _switchAnalysisViewPage,
+                                child: const Icon(
+                                  Icons.analytics_rounded,
+                                  color: gl.colorUliege,
+                                )),
+                      ]))
+                ]),
+              )
             ],
           )),
         ));
