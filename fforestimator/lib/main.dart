@@ -3,8 +3,6 @@ import 'package:fforestimator/pages/anaPt/anaPtpage.dart';
 import 'package:flutter/material.dart';
 import 'package:fforestimator/globals.dart' as gl;
 import 'package:fforestimator/pages/map.dart';
-import 'package:flutter_map/flutter_map.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'dart:io' show Platform;
 import 'package:fforestimator/pages/catalogueView/catalogueLayerView.dart';
@@ -12,6 +10,7 @@ import 'package:proj4dart/proj4dart.dart' as proj4;
 import 'package:http/http.dart' as http;
 import 'package:fforestimator/pages/anaPt/requestedLayer.dart';
 import 'dart:convert';
+import 'package:go_router/go_router.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -62,15 +61,15 @@ class _MyApp extends State<MyApp> {
   _MyApp() {}
 
   Future _runAnapt(proj4.Point ptBL72) async {
-    String layers4AnaPt = gl.layersAnaPt;
-    for (String lCode in gl.interfaceSelectedLayerKeys) {
+    String layersAnaPt = "";
+    for (String lCode in gl.anaPtSelectedLayerKeys) {
       if (gl.dico.getLayerBase(lCode).mCategorie != "Externe") {
-        layers4AnaPt += "+" + lCode;
+        layersAnaPt += "+" + lCode;
       }
     }
 
     String url = "https://forestimator.gembloux.ulg.ac.be/api/anaPt/layers/" +
-        layers4AnaPt +
+        layersAnaPt +
         "/x/" +
         ptBL72.x.toString() +
         "/y/" +
@@ -96,67 +95,119 @@ class _MyApp extends State<MyApp> {
     _switchAnalysisViewPage();
   }
 
+  late final _router = GoRouter(
+    routes: [
+      GoRoute(
+        name: 'map',
+        path: '/',
+        pageBuilder: (context, state) => MaterialPage(
+          key: state.pageKey,
+          child: Stack(children: <Widget>[
+            mapPage(runAnaPt: _runAnapt),
+            Container(
+              constraints: BoxConstraints(
+                  minHeight: MediaQuery.of(context).size.height * .075),
+              child: Row(children: [
+                FloatingActionButton(
+                    backgroundColor: gl.colorAgroBioTech,
+                    onPressed: () {
+                      return context.go("/catalogue");
+                    },
+                    child: const Icon(Icons.arrow_back, color: gl.colorBack))
+              ]),
+            )
+          ]),
+        ),
+      ),
+      GoRoute(
+        name: 'catalogue',
+        path: '/catalogue',
+        pageBuilder: (context, state) => MaterialPage(
+          key: state.pageKey,
+          child: Stack(children: <Widget>[
+            CatalogueLayerView(),
+            Container(
+              constraints: BoxConstraints(
+                  minHeight: MediaQuery.of(context).size.height * .075),
+              child: Row(children: [
+                FloatingActionButton(
+                    backgroundColor: gl.colorAgroBioTech,
+                    onPressed: () {
+                      return context.go("/");
+                    },
+                    child: const Icon(Icons.arrow_back, color: gl.colorBack))
+              ]),
+            )
+          ]),
+        ),
+      ),
+    ],
+    initialLocation: "/",
+  );
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-        title: 'Mobile Forestimator',
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-          useMaterial3: true,
-        ),
-        home: Scaffold(
+    return MaterialApp.router(
+      routerDelegate: _router.routerDelegate,
+      routeInformationParser: _router.routeInformationParser,
+      routeInformationProvider: _router.routeInformationProvider,
+      title: 'Mobile Forestimator',
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        useMaterial3: true,
+      ),
+      /* home: Scaffold(
           body: Center(
               child: Stack(
             children: <Widget>[
-              mapPage(runAnaPt: _runAnapt, title: 'Flutter Demo Home Page'),
-              SingleChildScrollView(
-                child: Column(children: [
-                  Container(
-                      constraints: BoxConstraints(
-                          minHeight: MediaQuery.of(context).size.height * .925,
-                          maxHeight: MediaQuery.of(context).size.height * .925,
-                          minWidth: MediaQuery.of(context).size.width,
-                          maxWidth: MediaQuery.of(context).size.width),
-                      child: _showCompleteLayerSelectionScreen
-                          ? const CatalogueLayerView()
-                          : _showAnalysisResultScreen
-                              ? anaPtpage(requestedLayers)
-                              : null),
-                  Container(
-                      constraints: BoxConstraints(
-                          minHeight: MediaQuery.of(context).size.height * .075),
-                      child: Row(children: [
-                        _showCompleteLayerSelectionScreen
-                            ? FloatingActionButton(
-                                backgroundColor: gl.colorAgroBioTech,
-                                onPressed: _switchLayerViewPage,
-                                child: const Icon(Icons.arrow_back,
-                                    color: gl.colorBack))
-                            : FloatingActionButton(
-                                backgroundColor: gl.colorAgroBioTech,
-                                onPressed: _switchLayerViewPage,
-                                child: const Icon(
-                                  Icons.layers_rounded,
-                                  color: gl.colorUliege,
-                                )),
-                        _showAnalysisResultScreen
-                            ? FloatingActionButton(
-                                backgroundColor: gl.colorAgroBioTech,
-                                onPressed: _switchAnalysisViewPage,
-                                child: const Icon(Icons.arrow_back,
-                                    color: gl.colorBack))
-                            : FloatingActionButton(
-                                backgroundColor: gl.colorAgroBioTech,
-                                onPressed: _switchAnalysisViewPage,
-                                child: const Icon(
-                                  Icons.analytics_rounded,
-                                  color: gl.colorUliege,
-                                )),
-                      ]))
-                ]),
-              )
+              mapPage(runAnaPt: _runAnapt),
+              Column(children: [
+                Container(
+                    constraints: BoxConstraints(
+                        minHeight: MediaQuery.of(context).size.height * .925,
+                        maxHeight: MediaQuery.of(context).size.height * .925,
+                        minWidth: MediaQuery.of(context).size.width,
+                        maxWidth: MediaQuery.of(context).size.width),
+                    child: _showCompleteLayerSelectionScreen
+                        ? const CatalogueLayerView()
+                        : _showAnalysisResultScreen
+                            ? anaPtpage(requestedLayers)
+                            : null),
+                Container(
+                    constraints: BoxConstraints(
+                        minHeight: MediaQuery.of(context).size.height * .075),
+                    child: Row(children: [
+                      _showCompleteLayerSelectionScreen
+                          ? FloatingActionButton(
+                              backgroundColor: gl.colorAgroBioTech,
+                              onPressed: _switchLayerViewPage,
+                              child: const Icon(Icons.arrow_back,
+                                  color: gl.colorBack))
+                          : FloatingActionButton(
+                              backgroundColor: gl.colorAgroBioTech,
+                              onPressed: _switchLayerViewPage,
+                              child: const Icon(
+                                Icons.layers_rounded,
+                                color: gl.colorUliege,
+                              )),
+                      _showAnalysisResultScreen
+                          ? FloatingActionButton(
+                              backgroundColor: gl.colorAgroBioTech,
+                              onPressed: _switchAnalysisViewPage,
+                              child: const Icon(Icons.arrow_back,
+                                  color: gl.colorBack))
+                          : FloatingActionButton(
+                              backgroundColor: gl.colorAgroBioTech,
+                              onPressed: _switchAnalysisViewPage,
+                              child: const Icon(
+                                Icons.analytics_rounded,
+                                color: gl.colorUliege,
+                              )),
+                    ]))
+              ]),
             ],
           )),
-        ));
+        )*/
+    );
   }
 }

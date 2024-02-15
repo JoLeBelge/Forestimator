@@ -11,9 +11,7 @@ import 'package:fforestimator/globals.dart' as gl;
 class mapPage extends StatefulWidget {
   final Function runAnaPt;
 
-  const mapPage({required this.runAnaPt, super.key, required this.title});
-
-  final String title;
+  const mapPage({required this.runAnaPt, super.key});
 
   @override
   State<mapPage> createState() => _mapPageState();
@@ -107,7 +105,7 @@ class _mapPageState extends State<mapPage> {
                 onMapReady: () async {
                   gl.position = await acquireUserLocation();
                   //await refreshAnalysisPosition();
-                  if (gl.position != null) {
+                  /* if (gl.position != null) {
                     //TODO: Ceci tue l'appli!
                     // IMPORTANT: rebuild location layer when permissions are granted
                     setState(() {
@@ -116,7 +114,7 @@ class _mapPageState extends State<mapPage> {
                               gl.position?.longitude ?? 0.0),
                           16);
                     });
-                  }
+                  }*/
                 },
               ),
               children: List<Widget>.generate(
