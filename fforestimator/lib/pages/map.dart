@@ -73,8 +73,9 @@ class _mapPageState extends State<mapPage> {
 
     return Scaffold(
         appBar: AppBar(
-          title: Text("Forestimator", textScaler: TextScaler.linear(0.75),),toolbarHeight: 20.0,
+         toolbarHeight: MediaQuery.of(context).size.height * 0.0,
           backgroundColor: gl.colorAgroBioTech,
+          foregroundColor: Colors.black,
           
         ),
         body: Stack(children: <Widget>[

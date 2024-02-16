@@ -1,6 +1,7 @@
 import 'package:fforestimator/pages/catalogueView/catalogueView.dart';
 import 'package:fforestimator/pages/catalogueView/layerTile.dart';
 import 'package:flutter/material.dart';
+import 'package:fforestimator/globals.dart' as gl;
 
 class CatalogueLayerView extends StatefulWidget {
   const CatalogueLayerView({super.key});
@@ -14,12 +15,12 @@ class _CatalogueLayerView extends State<CatalogueLayerView> {
   Widget build(BuildContext context) {
     return Column(children: [
       Container(
-        color: Colors.grey[200],
-        child: SearchBarView(),
+        color: gl.colorAgroBioTech,
+        child: Text('Selection des couches'),
         constraints: BoxConstraints(
             maxWidth: MediaQuery.of(context).size.width * 1.0,
-            minHeight: MediaQuery.of(context).size.height * .075,
-            maxHeight: MediaQuery.of(context).size.height * .075),
+            minHeight: MediaQuery.of(context).size.height * .027,
+            maxHeight: MediaQuery.of(context).size.height * .027),
       ),
       Container(
         color: Colors.grey[200],

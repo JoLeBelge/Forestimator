@@ -322,3 +322,4 @@ class _SearchBarView extends State<SearchBarView> {
     //return SearchBar(controller: widget._searchIt,);
   }
 }
+

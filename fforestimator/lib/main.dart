@@ -120,8 +120,8 @@ class _MyApp extends State<MyApp> {
               Column(children: [
                 Container(
                     constraints: BoxConstraints(
-                        minHeight: MediaQuery.of(context).size.height * .925,
-                        maxHeight: MediaQuery.of(context).size.height * .925,
+                        minHeight: MediaQuery.of(context).size.height - 56,
+                        maxHeight: MediaQuery.of(context).size.height - 56,
                         minWidth: MediaQuery.of(context).size.width,
                         maxWidth: MediaQuery.of(context).size.width),
                     child: _showCompleteLayerSelectionScreen
@@ -130,27 +130,34 @@ class _MyApp extends State<MyApp> {
                             ? anaPtpage(requestedLayers)
                             : null),
                 Container(
-                    constraints: BoxConstraints(
-                        minHeight: MediaQuery.of(context).size.height * .075),
+                    constraints: BoxConstraints(minHeight: 56),
                     child: Row(children: [
                       _showCompleteLayerSelectionScreen
                           ? FloatingActionButton(
                               backgroundColor: gl.colorAgroBioTech,
                               onPressed: _switchLayerViewPage,
-                              child: const Icon(Icons.arrow_back, color: gl.colorBack))
+                              child: const Icon(Icons.arrow_back,
+                                  color: gl.colorBack))
                           : FloatingActionButton(
                               backgroundColor: gl.colorAgroBioTech,
                               onPressed: _switchLayerViewPage,
-                              child: const Icon(Icons.layers_rounded, color: gl.colorUliege,)),
+                              child: const Icon(
+                                Icons.layers_rounded,
+                                color: gl.colorUliege,
+                              )),
                       _showAnalysisResultScreen
                           ? FloatingActionButton(
                               backgroundColor: gl.colorAgroBioTech,
                               onPressed: _switchAnalysisViewPage,
-                              child: const Icon(Icons.arrow_back, color: gl.colorBack))
+                              child: const Icon(Icons.arrow_back,
+                                  color: gl.colorBack))
                           : FloatingActionButton(
                               backgroundColor: gl.colorAgroBioTech,
                               onPressed: _switchAnalysisViewPage,
-                              child: const Icon(Icons.analytics_rounded, color: gl.colorUliege,)),
+                              child: const Icon(
+                                Icons.analytics_rounded,
+                                color: gl.colorUliege,
+                              )),
                     ]))
               ])
               //anaPtpage(requestedLayers),
