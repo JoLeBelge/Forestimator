@@ -783,4 +783,5 @@ Un suivi de l'état sanitaire des pessières est réalisé en vue d'identifier l
 <message id="Wt.WMessageBox.Yes"> Oui</message>
 <message id="Wt.WMessageBox.No"> Non</message>
 <message id="Wt.WMessageBox.Cancel"> Annuler</message>
+<message id="eco.ntnh"> Niveau trophique {1}, Niveau hydrique {2}</message>
 </messages>

@@ -81,7 +81,7 @@ class layerBase {
   late bool mExpert;
   String? mCode;
   String? mUrl, mWMSLayerName, mWMSattribution;
-  String? mGroupe;
+  late String mGroupe;
   late String mCategorie;
   late String mTypeVar;
   late double mGain;
@@ -109,6 +109,25 @@ class layerBase {
         condition = map['condition'],
         mTypeVar = map['TypeVar'],
         mGain = map['gain'] == null ? 66.6 : map['gain'],
+        mDicoVal = {},
+        mDicoCol = {};
+
+  layerBase()
+      : mNom = '',
+        mCode = 'toto',
+        mNomCourt = '',
+        mExpert = true,
+        mGroupe = '',
+        mUrl = '',
+        mWMSLayerName = '',
+        mWMSattribution = '',
+        mCategorie = '',
+        nom_field_raster = '',
+        nom_field_value = '',
+        nom_dico = '',
+        condition = '',
+        mTypeVar = '',
+        mGain = 0,
         mDicoVal = {},
         mDicoCol = {};
 
@@ -301,7 +320,9 @@ class dicoAptProvider {
     if (mLayerBases.containsKey(aCode)) {
       return mLayerBases[aCode]!;
     } else {
-      throw "oops no layerBase " + aCode;
+      print("oops no layerBase " + aCode);
+      return layerBase();
+      //throw "oops no layerBase " + aCode;
     }
   }
 

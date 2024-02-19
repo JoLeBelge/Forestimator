@@ -93,11 +93,12 @@ class CategoryView extends StatefulWidget {
 }
 
 class _CategoryView extends State<CategoryView> {
-  List<LayerTile> _layerTiles = [];
-  bool _finishedInitializingCategory = false;
+  static Map<Category, List<LayerTile>> _layerTiles = {};
+  static Map<Category, bool> _finishedInitializingCategory = {};
+  static Map<String, LegendView> _legendViews = {};
   @override
   Widget build(BuildContext context) {
-    if (_finishedInitializingCategory) {
+    if (_finishedInitializingCategory[widget.category]!) {
       return Container(
           constraints: BoxConstraints(
               maxWidth: MediaQuery.of(context).size.width * 1.0,
@@ -108,6 +109,7 @@ class _CategoryView extends State<CategoryView> {
           child: Scrollbar(
               controller: it,
               child: SingleChildScrollView(
+                controller: it,
                 physics: that,
                 child: Container(
                   child: _buildPanel(),
@@ -122,10 +124,25 @@ class _CategoryView extends State<CategoryView> {
     return ExpansionPanelList(
       expansionCallback: (int index, bool isExpanded) {
         setState(() {
-          _layerTiles[index].isExpanded = isExpanded;
+          _layerTiles[widget.category]![index].isExpanded = isExpanded;
         });
       },
-      children: _layerTiles.map<ExpansionPanel>((LayerTile item) {
+      children: _layerTiles[widget.category]!.map<ExpansionPanel>((LayerTile item) {
+        if (_legendViews[item.key] == null){
+          _legendViews[item.key] = LegendView(
+            layerKey: item.key,
+            constraintsText: BoxConstraints(
+                minWidth: MediaQuery.of(context).size.width * .4,
+                maxWidth: MediaQuery.of(context).size.width * .4,
+                minHeight: MediaQuery.of(context).size.height * .02,
+                maxHeight: MediaQuery.of(context).size.height * .02),
+            constraintsColors: BoxConstraints(
+                minWidth: MediaQuery.of(context).size.width * .4,
+                maxWidth: MediaQuery.of(context).size.width * .4,
+                minHeight: MediaQuery.of(context).size.height * .02,
+                maxHeight: MediaQuery.of(context).size.height * .02),
+          );
+        }
         return ExpansionPanel(
           canTapOnHeader: true,
           backgroundColor: Colors.grey[200],
@@ -165,19 +182,7 @@ class _CategoryView extends State<CategoryView> {
                       }),
             );
           },
-          body: LegendView(
-            layerKey: item.key,
-            constraintsText: BoxConstraints(
-                minWidth: MediaQuery.of(context).size.width * .4,
-                maxWidth: MediaQuery.of(context).size.width * .4,
-                minHeight: MediaQuery.of(context).size.height * .02,
-                maxHeight: MediaQuery.of(context).size.height * .02),
-            constraintsColors: BoxConstraints(
-                minWidth: MediaQuery.of(context).size.width * .4,
-                maxWidth: MediaQuery.of(context).size.width * .4,
-                minHeight: MediaQuery.of(context).size.height * .02,
-                maxHeight: MediaQuery.of(context).size.height * .02),
-          ),
+          body: _legendViews[item.key]!,
           isExpanded: item.isExpanded,
         );
       }).toList(),
@@ -188,20 +193,24 @@ class _CategoryView extends State<CategoryView> {
     Map<String, layerBase> mp = gl.dico.mLayerBases;
     for (var key in mp.keys) {
       if (widget.category.filter == mp[key]!.mGroupe && !mp[key]!.mExpert) {
-        _layerTiles += [
-          LayerTile(name: mp[key]!.mNom, filter: mp[key]!.mGroupe!, key: key)
-        ];
+        if (_layerTiles[widget.category] == null){
+          _layerTiles[widget.category] = [];
+        }
+        _layerTiles[widget.category]!.add(LayerTile(name: mp[key]!.mNom, filter: mp[key]!.mGroupe, key: key));
       }
     }
     setState(() {
-      _finishedInitializingCategory = true;
+      _finishedInitializingCategory[widget.category] = true;
     });
   }
 
   @override
   void initState() {
     super.initState();
-    if (!_finishedInitializingCategory) {
+    if (_finishedInitializingCategory[widget.category] == null){
+      _finishedInitializingCategory[widget.category] = false;
+    }
+    if (!_finishedInitializingCategory[widget.category]!) {
       _getLayerData();
     }
   }

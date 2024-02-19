@@ -348,11 +348,11 @@ void parcellaire::downloadRaster(){
 
     std::vector<rasterFiles> vRs=mGL->getSelect4Download();
     if (vRs.size()>0){
-
+        m_app->addLog("download "+vRs.size(),typeLog::dmulti);
         m_app->loadingIndicator()->setMessage(tr("LoadingI4"));
         m_app->loadingIndicator()->show();
         // crée l'archive
-        ZipArchive* zf = new ZipArchive(mFullPath+"_raster.zip");
+        ZipArchive* zf = new ZipArchive(mFullPath+"_ForestimatorRaster.zip");
         zf->open(ZipArchive::WRITE);
         // crop les raster selectionnés
 
@@ -373,10 +373,6 @@ void parcellaire::downloadRaster(){
         delete zf;
         m_app->loadingIndicator()->hide();
         m_app->loadingIndicator()->setMessage(tr("defaultLoadingI"));
-
-        // bof ça marche paaaaas avec unique ptr, je sais pas pk wt renvoi vers une page "nothing to say about that"
-        //std::unique_ptr<WFileResource> fileResource = std::make_unique<Wt::WFileResource>("plain/text",mFullPath+"_raster.zip");
-        //WFileResource * fileResource_ = fileResource->get();
 
         WFileResource * fileResource = new Wt::WFileResource("plain/text",mFullPath+"_raster.zip");
         fileResource->suggestFileName(mClientName+"_raster.zip");

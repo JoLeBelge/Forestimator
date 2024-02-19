@@ -11,6 +11,7 @@
 #include <Wt/WSignal.h>
 #include <vector>
 #include <algorithm>
+#include "cwebaptitude.h"
 
 using namespace Wt;
 
@@ -27,7 +28,7 @@ namespace Wt {
 class widgetCadastre : public WTable
 {
 public:
-    widgetCadastre(cadastre * aCad);
+    widgetCadastre(cadastre * aCad, cWebAptitude *app);
 
     void refreshDivision();
     void refreshSection();
@@ -52,6 +53,8 @@ private:
     WComboBox * section_;
     WComboBox * paCa_;
     WPushButton *submit_;
+
+    cWebAptitude * m_app;
 
     // clé ; index dans combobox. val= clé (INS commune , code Division)
     std::map<int,int> aMLabelCom;

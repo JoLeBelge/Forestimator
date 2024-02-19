@@ -84,6 +84,11 @@ Correction d'un oubli sur les séries spéciales pédologiques;
 On estime que la profondeur de sol d'une série spéciale "P" (base de grand versant) équivaut à une profondeur 2 (en fonction du SS, NH différent).
 </message>
 
+<message id="ES_EP.projet">
+Entre 2017 et 2022, Gembloux Agro Bio-Tech (Université de Liège) a participé au projet  <a href="https://www.regiowood2.info/fr">Regiowood-II</a> en collaboration avec le CNPF Grand-Est et l’IDF.
+<a href="https://www.regiowood2.info/fr">Regiowood-II</a> est un projet financé par le programme Interreg « Grand Région » englobant la Lorraine, la Wallonie, le Luxembourg et 3 länders allemands (Rhénanie Palatinat, Sarre et Bade-Wurtemberg).
+</message>
+
 <message id="ES_EP.description">
 <h4>Cartographie des foyers de scolytes sur base d'images satellites</h4>
 
@@ -95,7 +100,7 @@ On estime que la profondeur de sol d'une série spéciale "P" (base de grand ver
 <br></br>
 L'idée générale est de se calquer sur la méthodologie de l'INRAE (INRAE, UMR TETIS, R. Dutrieux, K. Ose, J.-B. Féret) développée depuis 2017. Celle-ci consiste à surveiller l'évolution saisonnière d'un indice spectral calculé sur base de séries temporelles d'images Sentinel-2. L'information est résumée sous forme d'une carte d'état sanitaire par an.
 <br></br>
-Une documentation plus exhaustive de la méthode est disponible sous format pdf:
+L'article de <a target="_blank" rel="noopener noreferrer" href="https://doi.org/10.1007/s10661-024-12372-0">Gilles et al.</a> de 2024 présente la démarche scientifique ainsi que les résultats découlant de nos analyses. Une documentation de la méthode rédigée en français est également disponible sous format pdf:
 <a target="_blank" rel="noopener noreferrer" href="/pdf/methodoAnalyseSentinel2TimeSerie2021.pdf" download="detectionScolyte">
   <img src="/img/typographe.jpeg" alt="document pdf" width="104" height="142"> </img>
 </a>
@@ -105,6 +110,8 @@ Une documentation plus exhaustive de la méthode est disponible sous format pdf:
 <message id="ES_EP.ref">
 <h4>Référence</h4>
 <br></br><br></br>
+<div class="csl-entry">Gilles, Arthur, Jonathan Lisein, Juliette Cansell, Nicolas Latte, Christian Piedallu, et Hugues Claessens. 2024. «&nbsp;Spatial and remote sensing monitoring shows the end of the bark beetle outbreak on Belgian and north-eastern France Norway spruce (Picea abies) stands.&nbsp;» <i>Environmental Monitoring and Assessment</i> 196 (3). <a target="_blank" rel="noopener noreferrer" href="https://doi.org/10.1007/s10661-024-12372-0">https://doi.org/10.1007/s10661-024-12372-0</a>.</div>
+ <br></br><br></br>
 	<div class="csl-entry">Gilles, Arthur, Jonathan Lisein, Nicolas Latte, Philippe Lejeune, et Hugues Claessens. 2023. « <mark>Est-ce la fin de la crise des scolytes ? Suivi du phénomène par télédétection</mark> ». <i>Silva Belgica</i> 2023 (3). Consulter en ligne <a target="_blank" rel="noopener noreferrer"  href="https://orbi.uliege.be/bitstream/2268/303916/1/Gilles%20A.%2c%20et%20al.%20Est-ce%20la%20fin%20crise%20scolyte_Silva%203_Vulg2023.pdf">ici</a>.</div>
  <br></br><br></br>
  <div class="csl-entry">Dutrieux, R., Féret, J.-B., Ose, K., 2021. Mise au point d’une méthode reproductible pour le suivi généralisé des dégats de scolytes par télédétection satellitaire. ONF Rendez-vous techniques 37–44.  Consulter en ligne <a target="_blank" rel="noopener noreferrer"  href="https://www.onf.fr/onf/+/cec::les-rendez-vous-techniques-de-lonf-no69-70.html">ici</a>. </div>

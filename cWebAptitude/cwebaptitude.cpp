@@ -46,7 +46,6 @@ void cWebAptitude::handlePathChange()
     }else if (internalPath() == "/cartographie" || internalPath() == "/" || internalPath() == ""){
         top_stack->setCurrentIndex(1);
         menuitem_app->select();
-        //navigation->setTitle(tr("titre.carto"));
         removeMetaHeader(MetaHeaderType::Meta,"description");
         addMetaHeader(MetaHeaderType::Meta,"description", Wt::WString::tr("meta.desc.carto"), "fr");
         showDialogues(1);
@@ -391,7 +390,7 @@ cWebAptitude::cWebAptitude(const Wt::WEnvironment& env, cDicoApt *dico)
 
 
     widgetCadastre * content_cadastre;
-    content_cadastre = dialog_cadastre->contents()->addWidget(std::make_unique<widgetCadastre>(mDico->mCadastre.get()));
+    content_cadastre = dialog_cadastre->contents()->addWidget(std::make_unique<widgetCadastre>(mDico->mCadastre.get(),this));
     content_cadastre->addStyleClass("content_cadastre");
 
     //stack_info = content_info_->addWidget(std::make_unique<WStackedWidget>());

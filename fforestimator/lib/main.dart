@@ -3,8 +3,6 @@ import 'package:fforestimator/pages/anaPt/anaPtpage.dart';
 import 'package:flutter/material.dart';
 import 'package:fforestimator/globals.dart' as gl;
 import 'package:fforestimator/pages/map.dart';
-import 'package:flutter_map/flutter_map.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'dart:io' show Platform;
 import 'package:fforestimator/pages/catalogueView/catalogueLayerView.dart';
@@ -12,6 +10,7 @@ import 'package:proj4dart/proj4dart.dart' as proj4;
 import 'package:http/http.dart' as http;
 import 'package:fforestimator/pages/anaPt/requestedLayer.dart';
 import 'dart:convert';
+import 'package:go_router/go_router.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -34,7 +33,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyApp extends State<MyApp> {
-  int _selectedIndex = 0;
+  //int _selectedIndex = 0;
   bool _showCompleteLayerSelectionScreen = false;
   bool _showAnalysisResultScreen = false;
 
@@ -61,29 +60,23 @@ class _MyApp extends State<MyApp> {
 
   _MyApp() {}
 
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
-
   Future _runAnapt(proj4.Point ptBL72) async {
-    String layers4AnaPt = gl.layersAnaPt;
-    for (String lCode in gl.interfaceSelectedLayerKeys) {
+    String layersAnaPt = "";
+    for (String lCode in gl.anaPtSelectedLayerKeys) {
       if (gl.dico.getLayerBase(lCode).mCategorie != "Externe") {
-        layers4AnaPt += "+" + lCode;
+        layersAnaPt += "+" + lCode;
       }
     }
 
     String url = "https://forestimator.gembloux.ulg.ac.be/api/anaPt/layers/" +
-        layers4AnaPt +
+        layersAnaPt +
         "/x/" +
         ptBL72.x.toString() +
         "/y/" +
         ptBL72.y.toString();
     print(url);
     var res = await http.get(Uri.parse(url));
-    //print(res.body);
+    print(res.body);
     data = jsonDecode(res.body);
     requestedLayers.clear();
     for (var r in data["RequestedLayers"]) {
@@ -96,27 +89,78 @@ class _MyApp extends State<MyApp> {
     // on les trie sur base des catégories de couches
     requestedLayers.sort((a, b) => gl.dico
         .getLayerBase(a.mCode)
-        .mCategorie
-        .compareTo(gl.dico.getLayerBase(b.mCode).mCategorie));
-    // depuis l'ajout de IndexedStack pour garder l'état de la page map, la page ana ponctuelle ne se met plus a jour. Donc je la recrée après chaque requetes
-    //widgetOptions.removeAt(2);
-    //widgetOptions.insert(2, anaPtpage(requestedLayers));
-    _onItemTapped(2);
+        .mGroupe
+        .compareTo(gl.dico.getLayerBase(b.mCode).mGroupe));
+
+    _switchAnalysisViewPage();
   }
+
+  late final _router = GoRouter(
+    routes: [
+      GoRoute(
+        name: 'map',
+        path: '/',
+        pageBuilder: (context, state) => MaterialPage(
+          key: state.pageKey,
+          child: Stack(children: <Widget>[
+            mapPage(runAnaPt: _runAnapt),
+            Container(
+              constraints: BoxConstraints(
+                  minHeight: MediaQuery.of(context).size.height * .075),
+              child: Row(children: [
+                FloatingActionButton(
+                    backgroundColor: gl.colorAgroBioTech,
+                    onPressed: () {
+                      return context.go("/catalogue");
+                    },
+                    child: const Icon(Icons.arrow_back, color: gl.colorBack))
+              ]),
+            )
+          ]),
+        ),
+      ),
+      GoRoute(
+        name: 'catalogue',
+        path: '/catalogue',
+        pageBuilder: (context, state) => MaterialPage(
+          key: state.pageKey,
+          child: Stack(children: <Widget>[
+            CatalogueLayerView(),
+            Container(
+              constraints: BoxConstraints(
+                  minHeight: MediaQuery.of(context).size.height * .075),
+              child: Row(children: [
+                FloatingActionButton(
+                    backgroundColor: gl.colorAgroBioTech,
+                    onPressed: () {
+                      return context.go("/");
+                    },
+                    child: const Icon(Icons.arrow_back, color: gl.colorBack))
+              ]),
+            )
+          ]),
+        ),
+      ),
+    ],
+    initialLocation: "/",
+  );
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-        title: 'Mobile Forestimator',
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-          useMaterial3: true,
-        ),
-        home: Scaffold(
+    return MaterialApp.router(
+      routerDelegate: _router.routerDelegate,
+      routeInformationParser: _router.routeInformationParser,
+      routeInformationProvider: _router.routeInformationProvider,
+      title: 'Mobile Forestimator',
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        useMaterial3: true,
+      ),
+      /* home: Scaffold(
           body: Center(
               child: Stack(
             children: <Widget>[
-              mapPage(runAnaPt: _runAnapt, title: 'Flutter Demo Home Page'),
+              mapPage(runAnaPt: _runAnapt),
               Column(children: [
                 Container(
                     constraints: BoxConstraints(
@@ -159,32 +203,10 @@ class _MyApp extends State<MyApp> {
                                 color: gl.colorUliege,
                               )),
                     ]))
-              ])
-              //anaPtpage(requestedLayers),
+              ]),
             ],
           )),
-          /*bottomNavigationBar: BottomNavigationBar(
-            items: const <BottomNavigationBarItem>[
-              BottomNavigationBarItem(
-                icon: Icon(Icons.landslide),
-                label: 'Carte',
-                backgroundColor: Colors.green,
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.layers),
-                label: 'selection des couches',
-                backgroundColor: Colors.green,
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.analytics),
-                label: 'analyse ponctuelle',
-                backgroundColor: Colors.green,
-              ),
-            ],
-            currentIndex: _selectedIndex,
-            selectedItemColor: Colors.grey[300],
-            onTap: _onItemTapped,
-          ),*/
-        ));
+        )*/
+    );
   }
 }

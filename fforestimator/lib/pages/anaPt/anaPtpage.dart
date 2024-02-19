@@ -21,14 +21,16 @@ class _anaPtpageState extends State<anaPtpage> {
     return Scaffold(
         backgroundColor: Colors.grey[200],
         appBar: AppBar(
-          title: Text("analyse pour cette position"),
+          title: Text("Analyse pour cette position"),
         ),
         body: SingleChildScrollView(
             physics: ScrollPhysics(),
             child: Column(children: [
               _anaPtListLayers(context, widget.requestedLayers),
-              apts.ready ? _tabAptFEE(context, apts) : Container(),
-              aptsGS.ready ? _tabPropositionCS(context, aptsGS) : Container(),
+              SizedBox(height: 15),
+              if (apts.ready) Card(child: _tabAptFEE(context, apts)),
+              SizedBox(height: 15),
+              if (aptsGS.ready) Card(child: _tabPropositionCS(context, aptsGS)),
             ])));
   }
 }
@@ -41,26 +43,40 @@ class layerAnaPtListTile extends StatelessWidget {
   Widget build(BuildContext context) {
     layerBase l = gl.dico.getLayerBase(data.mCode);
     return ListTile(
-      leading: Container(
-          child: l.mGroupe == "ST"
-              ? Icon(CustomIcons.landscape_mountain_svgrepo_com)
-              : Icon(CustomIcons.mountains_svgrepo_com)),
-      /*CircleAvatar(
-          radius: 25,
-          backgroundColor: l.getValColor(data.mRastValue),
-        ),*/
-      //),
+      leading: switch (l.mGroupe) {
+        "ST" => Icon(CustomIcons.montain),
+        "PEUP" => Icon(CustomIcons.forest),
+        "CS" => Icon(CustomIcons.mountains),
+        "REF" => Icon(Icons.location_on),
+        _ => Icon(Icons.location_on),
+      },
       title: Text(l.mNom),
-      subtitle: Text(l.getValLabel(data.mRastValue)),
+      subtitle: Row(children: <Widget>[
+        Text(l.getValLabel(data.mRastValue),
+            style: TextStyle(
+              fontSize: 16.0,
+              fontWeight: FontWeight.w500,
+            )),
+        SizedBox(width: 20),
+        if (l.getValColor(data.mRastValue).value != 4294967295)
+          CircleAvatar(
+            radius: 10,
+            backgroundColor: l.getValColor(data.mRastValue),
+          ),
+      ]),
     );
   }
 }
 
 Widget _tabAptFEE(BuildContext context, aptsFEE apts) {
   return Column(children: [
+    SizedBox(height: 10),
     Container(
-        color: Colors.amber,
-        child: Text("Matrice d'aptitude du Fichier Ecologique des Essences")),
+        child: Text("Aptitude du Fichier Ecologique des Essences",
+            style: TextStyle(
+              fontSize: 18.0,
+              fontWeight: FontWeight.w600,
+            ))),
     DefaultTabController(
       length: 3,
       child: Column(
@@ -95,24 +111,25 @@ class essencesListView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Map<String, int> mEss = apts.getListEss(codeApt);
+    // tri par ordre alphabétique des essences
+    List<String> code = mEss.keys.toList();
+    code.sort(
+        (a, b) => gl.dico.getEss(a).mNomFR.compareTo(gl.dico.getEss(b).mNomFR));
+
     return ListView.builder(
       itemCount: mEss.length,
       shrinkWrap: true,
       physics: NeverScrollableScrollPhysics(),
       itemBuilder: (context, index) {
         return ListTile(
-          /*leading: Image.asset("assets/images/icon" +
-              (gl.dico.getEss(mEss.keys.elementAt(index)).mF_R == 1
-                  ? "Deciduous.png"
-                  : "Conifer.png")),*/
-          leading: Icon(gl.dico.getEss(mEss.keys.elementAt(index)).mF_R == 1
-              ? Icons.forest_rounded
+          leading: Icon(gl.dico.getEss(code.elementAt(index)).mF_R == 1
+              ? CustomIcons.tree
               : Icons.forest_outlined),
-          title: Text(gl.dico.getEss(mEss.keys.elementAt(index)).mNomFR),
-          subtitle: codeApt != mEss.values.elementAt(index)
-              ? Text(gl.dico.AptLabel(mEss.values.elementAt(index)))
+          title: Text(gl.dico.getEss(code.elementAt(index)).mNomFR),
+          subtitle: codeApt != mEss[code.elementAt(index)]
+              ? Text(gl.dico.AptLabel(mEss[code.elementAt(index)]!))
               : null,
-          trailing: apts.mCompensations[mEss.keys.elementAt(index)]!
+          trailing: apts.mCompensations[code.elementAt(index)]!
               ? Icon(Icons.balance_rounded)
               : null,
         );
@@ -123,9 +140,13 @@ class essencesListView extends StatelessWidget {
 
 Widget _tabPropositionCS(BuildContext context, propositionGS apts) {
   return Column(children: [
+    SizedBox(height: 10),
     Container(
-        color: Colors.amber,
-        child: Text("Propositions d'Essences selon le Guide de Station")),
+        child: Text("Propositions d'Essences du Guide de Station",
+            style: TextStyle(
+              fontSize: 18.0,
+              fontWeight: FontWeight.w600,
+            ))),
     DefaultTabController(
       length: 3,
       child: Column(
@@ -133,12 +154,9 @@ Widget _tabPropositionCS(BuildContext context, propositionGS apts) {
         children: <Widget>[
           Container(
             child: TabBar(tabs: [
-              Tab(text: "très adéquates"),
-              Tab(text: "adéquates"),
-              Tab(text: "accompagnement"),
-              /*Tab(icon: Icon(Icons.thumb_up)),
-              Tab(icon: Icon(Icons.thumbs_up_down)),
-              Tab(icon: Icon(Icons.thumb_down)),*/
+              Tab(text: "Très adéquates"),
+              Tab(text: "Adéquates"),
+              Tab(text: "Secondaires"),
             ]),
           ),
           Container(
@@ -163,17 +181,20 @@ class essencesListViewGS extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Map<String, int> mEss = apts.getListEss(codeApt);
+    // tri par ordre alphabétique des essences
+    List<String> code = mEss.keys.toList();
+    code.sort(
+        (a, b) => gl.dico.getEss(a).mNomFR.compareTo(gl.dico.getEss(b).mNomFR));
     return ListView.builder(
       itemCount: mEss.length,
       shrinkWrap: true,
       physics: NeverScrollableScrollPhysics(),
       itemBuilder: (context, index) {
         return ListTile(
-          leading: Icon(gl.dico.getEss(mEss.keys.elementAt(index)).mF_R == 1
-              ? Icons.forest_rounded
+          leading: Icon(gl.dico.getEss(code.elementAt(index)).mF_R == 1
+              ? CustomIcons.tree
               : Icons.forest_outlined),
-          title: Text(gl.dico.getEss(mEss.keys.elementAt(index)).mNomFR),
-          // ajout force face aux changements climatiques?
+          title: Text(gl.dico.getEss(code.elementAt(index)).mNomFR),
         );
       },
     );

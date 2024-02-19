@@ -11,9 +11,7 @@ import 'package:fforestimator/globals.dart' as gl;
 class mapPage extends StatefulWidget {
   final Function runAnaPt;
 
-  const mapPage({required this.runAnaPt, super.key, required this.title});
-
-  final String title;
+  const mapPage({required this.runAnaPt, super.key});
 
   @override
   State<mapPage> createState() => _mapPageState();
@@ -21,6 +19,7 @@ class mapPage extends StatefulWidget {
 
 class _mapPageState extends State<mapPage> {
   final _mapController = MapController();
+  LatLng? _pt;
 
 //https://github.com/fleaflet/flutter_map/blob/master/example/lib/pages/custom_crs/custom_crs.dart
   late proj4.Projection epsg4326 = proj4.Projection.get('EPSG:4326')!;
@@ -60,8 +59,6 @@ class _mapPageState extends State<mapPage> {
     LatLng latlonEpioux = LatLng(epsg31370.transform(epsg4326, ptEpioux).y,
         epsg31370.transform(epsg4326, ptEpioux).x);
 
-
-
     // contraindre la vue de la map sur la zone de la Wallonie. ajout d'un peu de marge
     double margeInDegree = 0.1;
     LatLng latlonBL = LatLng(
@@ -73,10 +70,12 @@ class _mapPageState extends State<mapPage> {
 
     return Scaffold(
         appBar: AppBar(
-         toolbarHeight: MediaQuery.of(context).size.height * 0.0,
+          title: Text(
+            "Forestimator",
+            textScaler: TextScaler.linear(0.75),
+          ),
+          toolbarHeight: 20.0,
           backgroundColor: gl.colorAgroBioTech,
-          foregroundColor: Colors.black,
-          
         ),
         body: Stack(children: <Widget>[
           FlutterMap(
@@ -85,10 +84,18 @@ class _mapPageState extends State<mapPage> {
                 backgroundColor: Colors.transparent,
                 keepAlive: true,
                 interactionOptions: const InteractionOptions(
-                    flags: InteractiveFlag.drag |
-                        InteractiveFlag.pinchZoom |
-                        InteractiveFlag.pinchMove |
-                        InteractiveFlag.doubleTapZoom),
+                  enableMultiFingerGestureRace: false,
+                  flags: InteractiveFlag.drag |
+                      InteractiveFlag.pinchZoom |
+                      InteractiveFlag.pinchMove |
+                      InteractiveFlag.doubleTapZoom,
+                ),
+                onLongPress: (tapPosition, point) => {
+                  //proj4.Point ptBL72 = epsg4326.transform(epsg31370,proj4.Point(x: point.longitude, y: point.latitude))
+                  widget.runAnaPt(epsg4326.transform(epsg31370,
+                      proj4.Point(x: point.longitude, y: point.latitude))),
+                  _updatePtMarker(point),
+                },
                 crs: epsg31370CRS,
                 initialZoom: 4.0,
                 maxZoom: 15,
@@ -97,16 +104,17 @@ class _mapPageState extends State<mapPage> {
                     bounds: LatLngBounds.fromPoints([latlonBL, latlonTR])),
                 onMapReady: () async {
                   gl.position = await acquireUserLocation();
-                  await refreshAnalysisPosition();
-                  /*if (_position != null) {//TODO: Ceci tue l'appli!
-              // IMPORTANT: rebuild location layer when permissions are granted
-              setState(() {
-                _mapController.move(
-                    LatLng(_position?.latitude ?? 0.0,
-                        _position?.longitude ?? 0.0),
-                    16);
-              });
-            }*/
+                  //await refreshAnalysisPosition();
+                  /* if (gl.position != null) {
+                    //TODO: Ceci tue l'appli!
+                    // IMPORTANT: rebuild location layer when permissions are granted
+                    setState(() {
+                      _mapController.move(
+                          LatLng(gl.position?.latitude ?? 0.0,
+                              gl.position?.longitude ?? 0.0),
+                          16);
+                    });
+                  }*/
                 },
               ),
               children: List<Widget>.generate(
@@ -144,8 +152,8 @@ class _mapPageState extends State<mapPage> {
                         Marker(
                           width: 50.0,
                           height: 50.0,
-                          point: latlonEpioux,
-                          child: const FlutterLogo(),
+                          point: _pt ?? LatLng(0.0, 0.0),
+                          child: const Icon(Icons.location_on),
                         ),
                       ],
                     ),
@@ -153,20 +161,10 @@ class _mapPageState extends State<mapPage> {
                         // cameraTrackingMode: CameraTrackingMode.locationAndOrientation,
                         ),
                   ]),
-
-          /*Align(
-            alignment: Alignment.bottomRight,
-            // add your floating action button
-            child: FloatingActionButton(
-              onPressed: () {},
-              child: Icon(Icons.map),
-            ),
-          ),*/
-          
         ]));
   }
 
-  Future<void> refreshAnalysisPosition() async{
+  Future<void> refreshAnalysisPosition() async {
     if (gl.position != null) {
       //print("postion x " + _position?.latitude.toString() ?? "0" );// + " " + _position?.longitude.toString());
       print(gl.position?.latitude.toString() ??
@@ -176,9 +174,16 @@ class _mapPageState extends State<mapPage> {
       proj4.Point ptBL72 = epsg4326.transform(
           epsg31370,
           proj4.Point(
-              x: gl.position?.longitude ?? 0.0, y: gl.position?.latitude ?? 0.0));
+              x: gl.position?.longitude ?? 0.0,
+              y: gl.position?.latitude ?? 0.0));
       widget.runAnaPt(ptBL72);
     }
+  }
+
+  void _updatePtMarker(LatLng pt) {
+    setState(() {
+      _pt = pt;
+    });
   }
 }
 
@@ -196,7 +201,6 @@ Future<Position?> acquireUserLocation() async {
   }
 
   try {
-    
     return await Geolocator.getCurrentPosition();
   } on LocationServiceDisabledException {
     return null;

@@ -4,8 +4,7 @@ extern bool globTest;
 
 Analytics::Analytics(std::string aFileDB) : session()
 {
-    //auto sqlite3 = std::make_unique<dbo::backend::Sqlite3>(sqliteDb);
-    //auto sqlite3 = std::make_unique<dbo::backend::Sqlite3>("/data1/Forestimator/data/analytics.db");
+
     auto sqlite3 = std::make_unique<dbo::backend::Sqlite3>(aFileDB);
     sqlite3->setProperty("show-queries", "false");
 
@@ -63,12 +62,6 @@ bool Analytics::logExist(const Wt::WEnvironment &env, std::string page, typeLog 
     bool aRes(1);
     dbo::Transaction transaction{session};
 
-    /*dbo::ptr<Log> logPtr = session.find<Log>().where("date = ?").bind(Wt::WDate::currentDate().toString("yyyy-MM-dd")).where("ipath = ?").bind(page).where("ip = ?").bind(env.clientAddress());
-        if (logPtr.get()==nullptr){aRes=0;} else{
-         if (globTest){std::cout << " le log existe déjà pour cet utilisateur !" << std::endl;}
-        }
-        */
-
     int c=session.query<int>("select count(1) from Log").where("date = ?").bind(Wt::WDate::currentDate().toString("yyyy-MM-dd")).where("ipath = ?").bind(page).where("ip = ?").bind(env.clientAddress()).where("cat = ?").bind((int (cat)));
     if (c==0){
         aRes=0;
@@ -89,7 +82,7 @@ PageAnalytics::PageAnalytics(const Wt::WEnvironment& env, std::string aFileDB) :
 
     auto sqlite3 = std::make_unique<dbo::backend::Sqlite3>(aFileDB);
     sqlite3->setProperty("show-queries", "false");
-    //sqlite3->setProperty("show-queries", "true");
+
     session.setConnection(std::move(sqlite3));
     session.mapClass<Log>("log");
     if (globTest){std::cout << " statistiques brutes : début de transaction avec la BD analytics " << std::endl;}
@@ -113,8 +106,6 @@ PageAnalytics::PageAnalytics(const Wt::WEnvironment& env, std::string aFileDB) :
     //std::cout << " date limite : " << dateLim.toString() << ", date ajd " << curDate.toString() << " en time_t ça donne " << timeLim << std::endl;
     setTitle("Forestimator - Stats");
 
-
-    //Wt::WVBoxLayout * layout = root()->setLayout(std::make_unique<Wt::WVBoxLayout>());
     root()->setMargin(0);
     root()->setPadding(0);
     root()->setOverflow(Wt::Overflow::Scroll);
@@ -138,10 +129,9 @@ PageAnalytics::PageAnalytics(const Wt::WEnvironment& env, std::string aFileDB) :
     //time_t t=time(0);
     model = std::make_shared<WStandardItemModel>();
 
-    mChart->resize(800, 500);    // WPaintedWidget must be given an explicit size.
+    mChart->resize(800, 500);
     mChart->setMinimumSize(800, 500);
-    mChart->setMargin(20, Side::Top | Side::Bottom); // Add margin vertically.
-    //aChart->setMargin(WLength::Auto, Side::Left | Side::Right); // Center horizontally. il faut mettre des marges, qui sont comtpée au départ du cammembert, pour mettre les label
+    mChart->setMargin(20, Side::Top | Side::Bottom);
     mChart->setMargin(50, Side::Left | Side::Right);
 
     mChart->setModel(model);
@@ -150,9 +140,7 @@ PageAnalytics::PageAnalytics(const Wt::WEnvironment& env, std::string aFileDB) :
     mChart->setType(Chart::ChartType::Scatter);
     mChart->axis(Chart::Axis::X).setScale(Chart::AxisScale::Date);
 
-    //setChart(3);
-
-    std::cout << "PageAnalytics::setChart " << std::endl;
+    //std::cout << "PageAnalytics::setChart " << std::endl;
     Wt::WDate curDate=Wt::WDate::currentDate();
     Wt::WDate dateLim=curDate.addMonths(-3);
     int nbd=dateLim.daysTo(curDate);
@@ -167,7 +155,7 @@ PageAnalytics::PageAnalytics(const Wt::WEnvironment& env, std::string aFileDB) :
         //int count = session.query<int>("select count(1) from log").where("date = ?").bind(ad).groupBy("ip");
         int count = session.query<int>("SELECT COUNT(*) AS col0 FROM (SELECT DISTINCT ip, date FROM log)  where (date = '"+ad.toString("yyyy-MM-dd").toUTF8()+"')");
         model->setData(row, 0, ad);
-        model->setData(row, 1, count);// je met row à la place du nombre de vue pour l'instant
+        model->setData(row, 1, count);
         row++;
     }
 
@@ -178,9 +166,7 @@ PageAnalytics::PageAnalytics(const Wt::WEnvironment& env, std::string aFileDB) :
     s->setShadow(WShadow(3, 3, WColor(0, 0, 0, 127), 3));
     mChart->addSeries(std::move(s));
 
-
     // tableau de synthèse
-   // Wt::WContainerWidget * content2 = layout->addWidget(std::make_unique<Wt::WContainerWidget>());
     Wt::WContainerWidget * content2 = root()->addWidget(std::make_unique<Wt::WContainerWidget>());
     content2->setOverflow(Wt::Overflow::Scroll);
     content2->addNew<Wt::WText>(Wt::WText::tr("analytic.tab1"));
@@ -228,12 +214,12 @@ PageAnalytics::PageAnalytics(const Wt::WEnvironment& env, std::string aFileDB) :
     table4->setHeaderCount(1);
     table4->setWidth(Wt::WLength("100%"));
     table4->toggleStyleClass("table-striped",true);
-    table4->elementAt(0, 0)->addNew<Wt::WText>("mois de l'année 2022 et 2023");
+    table4->elementAt(0, 0)->addNew<Wt::WText>("année et mois");
     table4->elementAt(0, 1)->addNew<Wt::WText>("Nombre d'utilisateur");
 
     //q="SELECT COUNT(*)as nb FROM (SELECT COUNT(*)as nb FROM log  WHERE ip != '127.0.0.1' AND ip NOT LIKE '%139.165%' AND date LIKE '%2022-02%' GROUP BY ip);";
     row=1;
-    for (int y(2022);y <2024;y++){
+    for (int y(2022);y <2025;y++){
     for (int m(1);m <13;m++){
         std::string month = std::to_string(m);
         if (month.size()==1){month="0"+ month;}
@@ -249,7 +235,6 @@ PageAnalytics::PageAnalytics(const Wt::WEnvironment& env, std::string aFileDB) :
     }
 
     // tableau brut des 100 derniers logs
-   // Wt::WContainerWidget * content = layout->addWidget(std::make_unique<Wt::WContainerWidget>());
     Wt::WContainerWidget * content = root()->addWidget(std::make_unique<Wt::WContainerWidget>());
     content->setOverflow(Wt::Overflow::Scroll);
     content->addNew<Wt::WText>(WText::tr("analytic.rawData"));
@@ -284,15 +269,6 @@ PageAnalytics::PageAnalytics(const Wt::WEnvironment& env, std::string aFileDB) :
         }
 
     }
-
-
-
-
-}
-
-void PageAnalytics::setChart(int nbMonth){
-
-    // on dirait pas que je puisse facilement changer l'entièretée du model, genre le vider des données et ensuite le reremplir..
 
 
 
