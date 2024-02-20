@@ -7,7 +7,7 @@ class Ess {
   late String mCode;
   late String mNomFR;
   late int mF_R;
-  String? mPrefix;
+  late String mPrefix;
 
   // aptitude ecograme : clé chaine charactère ; c'est la combinaison ntxnh du genre "A2p5" ou "Mm4
   Map<int, Map<String, int>> mEcoVal;
@@ -121,6 +121,10 @@ class Ess {
       aRes = mRisqueTopo[zbio]![topo]!;
     }
     return aRes;
+  }
+
+  String getNameAndPrefix() {
+    return mPrefix + mNomFR;
   }
 
   Ess.fromMap(final Map<String, dynamic> map)

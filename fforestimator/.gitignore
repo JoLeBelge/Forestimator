@@ -42,3 +42,7 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# les pdf des assets sont sans doutes un peu lourds à mettre sur le dépot
+
+/assets/pdf/*

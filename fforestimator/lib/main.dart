@@ -3,14 +3,14 @@ import 'package:fforestimator/pages/anaPt/anaPtpage.dart';
 import 'package:flutter/material.dart';
 import 'package:fforestimator/globals.dart' as gl;
 import 'package:fforestimator/pages/map.dart';
+import 'package:fforestimator/pages/fichePdf.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
-import 'dart:io' show Platform;
 import 'package:fforestimator/pages/catalogueView/catalogueLayerView.dart';
-import 'package:proj4dart/proj4dart.dart' as proj4;
-import 'package:http/http.dart' as http;
-import 'package:fforestimator/pages/anaPt/requestedLayer.dart';
-import 'dart:convert';
 import 'package:go_router/go_router.dart';
+import 'dart:async';
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
+import 'package:flutter/services.dart';
 
 // Stateful nested navigation based on:
 // https://github.com/flutter/packages/blob/main/packages/go_router/example/lib/stateful_shell_route.dart
@@ -56,6 +56,9 @@ void main() async {
 
   gl.dico = dicoAptProvider();
   await gl.dico.init();
+
+  // copier tout les pdf de l'asset bundle vers un fichier utilisable par la librairie flutter_pdfviewer
+
   //while (!gl.dico.finishedLoading) {}
   runApp(const MyApp());
 }
@@ -70,7 +73,36 @@ class _MyApp extends State<MyApp> {
   static const TextStyle optionStyle =
       TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
 
+  late String _pathExternalStorage;
+
   _MyApp() {}
+
+  Future<File> fromAsset(String asset, String filename) async {
+    // To open from assets, you can copy them to the app storage folder, and the access them "locally"
+    Completer<File> completer = Completer();
+
+    try {
+      //var dir = await getApplicationDocumentsDirectory();
+      var dir = await getExternalStorageDirectory();
+      //print("tata" + );
+      _pathExternalStorage = dir!.path;
+      File file = File("${dir?.path}/$filename");
+      var data = await rootBundle.load(asset);
+      var bytes = data.buffer.asUint8List();
+      await file.writeAsBytes(bytes, flush: true);
+      completer.complete(file);
+    } catch (e) {
+      throw Exception('Error parsing asset file!');
+    }
+
+    return completer.future;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    fromAsset('assets/pdf/FEE-HE.pdf', 'FEE-HE.pdf').then((f) {});
+  }
 
   late final _router = GoRouter(
     initialLocation: '/',
@@ -99,6 +131,13 @@ class _MyApp extends State<MyApp> {
                   GoRoute(
                     path: 'anaPt',
                     builder: (context, state) => anaPtpage(gl.requestedLayers),
+                  ),
+                  GoRoute(
+                    path: 'fiche-esssence/HE',
+                    builder: (context, state) => PDFScreen(
+                        path: _pathExternalStorage + "/FEE-HE.pdf",
+                        titre: "fiche-essence " +
+                            gl.dico.getEss("HE").getNameAndPrefix()),
                   ),
                 ],
               ),

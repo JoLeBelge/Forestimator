@@ -3,6 +3,7 @@ import "package:flutter/material.dart";
 import 'package:fforestimator/pages/anaPt/requestedLayer.dart';
 import 'package:fforestimator/globals.dart' as gl;
 import 'package:fforestimator/myicons.dart';
+import 'package:go_router/go_router.dart';
 
 class anaPtpage extends StatefulWidget {
   List<layerAnaPt> requestedLayers = [];
@@ -130,8 +131,15 @@ class essencesListView extends StatelessWidget {
               ? Text(gl.dico.AptLabel(mEss[code.elementAt(index)]!))
               : null,
           trailing: apts.mCompensations[code.elementAt(index)]!
-              ? Icon(Icons.balance_rounded)
+              ? IconButton(
+                  icon: const Icon(Icons.balance_rounded),
+                  onPressed: () {},
+                  tooltip:
+                      "La situation topographique provoque un effet de compensation (positif ou négatif) sur l'aptitude de cette essence")
               : null,
+          onTap: () {
+            context.go("/fiche-esssence/HE");
+          },
         );
       },
     );
