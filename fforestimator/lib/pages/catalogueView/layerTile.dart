@@ -5,6 +5,7 @@ class LayerTile {
     required this.filter,
     this.isExpanded = false,
     this.selected = false,
+    this.extern = false,
   });
 
   String key;
@@ -12,4 +13,5 @@ class LayerTile {
   String filter;
   bool isExpanded;
   bool selected;
+  bool extern;
 }

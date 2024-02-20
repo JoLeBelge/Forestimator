@@ -163,11 +163,13 @@ class _CategoryView extends State<CategoryView> {
 
   Color selectLayerBarColor(LayerTile lt) {
     if (gl.interfaceSelectedLayerKeys.contains(lt.key) &&
-        gl.anaPtSelectedLayerKeys.contains(lt.key))
+        gl.anaPtSelectedLayerKeys.contains(lt.key)) {
       return Colors.red;
-    else if (gl.interfaceSelectedLayerKeys.contains(lt.key))
+    } else if (gl.interfaceSelectedLayerKeys.contains(lt.key)) {
       return gl.colorAgroBioTech;
-    else if (gl.anaPtSelectedLayerKeys.contains(lt.key)) return gl.colorUliege;
+    } else if (gl.anaPtSelectedLayerKeys.contains(lt.key)) {
+      return gl.colorUliege;
+    }
     return Colors.grey[200]!;
   }
 
@@ -207,27 +209,30 @@ class _CategoryView extends State<CategoryView> {
                       }
                     });
                   }),
-          gl.anaPtSelectedLayerKeys.contains(lt.key)
-              ? IconButton(
-                  icon: const Icon(Icons.show_chart),
-                  onPressed: () {
-                    setState(() {
-                      if (gl.anaPtSelectedLayerKeys.length > 1) {
-                        gl.anaPtSelectedLayerKeys.remove(lt.key);
-                        lt.selected = false;
+          if (widget.category.filter != "APT_CS" &&
+              widget.category.filter != "APT_FEE" &&
+              !lt.extern)
+            gl.anaPtSelectedLayerKeys.contains(lt.key)
+                ? IconButton(
+                    icon: const Icon(Icons.show_chart),
+                    onPressed: () {
+                      setState(() {
+                        if (gl.anaPtSelectedLayerKeys.length > 1) {
+                          gl.anaPtSelectedLayerKeys.remove(lt.key);
+                          lt.selected = false;
+                          widget.refreshView();
+                        }
+                      });
+                    })
+                : IconButton(
+                    icon: const Icon(Icons.chair),
+                    onPressed: () {
+                      setState(() {
+                        gl.anaPtSelectedLayerKeys.insert(0, lt.key);
+                        lt.selected = true;
                         widget.refreshView();
-                      }
-                    });
-                  })
-              : IconButton(
-                  icon: const Icon(Icons.chair),
-                  onPressed: () {
-                    setState(() {
-                      gl.anaPtSelectedLayerKeys.insert(0, lt.key);
-                      lt.selected = true;
-                      widget.refreshView();
-                    });
-                  }),
+                      });
+                    }),
         ]));
   }
 
@@ -239,7 +244,7 @@ class _CategoryView extends State<CategoryView> {
           _layerTiles[widget.category] = [];
         }
         _layerTiles[widget.category]!.add(
-            LayerTile(name: mp[key]!.mNom, filter: mp[key]!.mGroupe, key: key));
+            LayerTile(name: mp[key]!.mNom, filter: mp[key]!.mGroupe, key: key, extern: mp[key]!.mCategorie == "Externe"));
       }
     }
     setState(() {
