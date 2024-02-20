@@ -82,7 +82,6 @@ class _MapPageState extends State<mapPage> {
         .getLayerBase(a.mCode)
         .mGroupe
         .compareTo(gl.dico.getLayerBase(b.mCode).mGroupe));
-    //return _router.go("/anaPt");
   }
 
   @override
@@ -134,9 +133,9 @@ class _MapPageState extends State<mapPage> {
                       InteractiveFlag.pinchMove |
                       InteractiveFlag.doubleTapZoom,
                 ),
-                onLongPress: (tapPosition, point) => {
+                onLongPress: (tapPosition, point) async => {
                   //proj4.Point ptBL72 = epsg4326.transform(epsg31370,proj4.Point(x: point.longitude, y: point.latitude))
-                  _runAnaPt(epsg4326.transform(epsg31370,
+                  await _runAnaPt(epsg4326.transform(epsg31370,
                       proj4.Point(x: point.longitude, y: point.latitude))),
                   _updatePtMarker(point),
                   context.go("/anaPt"),

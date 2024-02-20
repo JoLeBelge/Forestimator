@@ -2,11 +2,9 @@ To do list fforestimator
 ------------------------
 
 COURT TERME
-Jo -> legender le logo compensation matrice aptitude -> ouvrir une nouvelle page d'explication.
+Jo -> legender le logo compensation matrice aptitude -> tooltip onTap?
 Jo -> affichage de pdf pour les fiches-essences et les fiches-stations
 TT -> CatalogueView
-	-> mettre en couleur les listTiles des couches sélectionnées pour l'affichage sur la map
-	VV ajout d'un bouton de sélection des layers pour les utiliser pour l'analyse ponctuelle (pas pour les couches de groupe "APT_CS" ou "APT_FEE") De plus, pas de bouton pour les couches de mCategorie== "Externe"). Les couches sélectionnées sont ajoutées à gl.anaPtSelectedLayerKeys
 MOYEN TERME-> ajout d'un bouton de sélection des layers pour le téléchargement (utilisation offline). pareil, on stoque les codes layers dans un vecteur qui sera utilisé pour le bulk download  / usage offline.
 	JO et TT-> ajout d'un descriptif, meme court, pour chacune des layers. éventuellement sous forme de pdf? y réfléchir
 	

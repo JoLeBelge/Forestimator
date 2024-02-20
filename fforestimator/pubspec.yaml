@@ -50,6 +50,7 @@ dependencies:
   latlong2: ^0.9.0
   flutter_sensors: ^1.0.1
   go_router: ^13.2.0
+  flutter_pdfview: ^1.2.7
 
 dev_dependencies:
   flutter_test:
@@ -77,6 +78,7 @@ flutter:
   assets:
      - assets/db/fforestimator.db
      - assets/images/
+     - assets/pdf/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

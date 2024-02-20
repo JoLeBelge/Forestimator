@@ -4,6 +4,8 @@ import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:fforestimator/dico/ess.dart';
+import 'dart:async';
+import 'package:flutter/services.dart';
 
 class aptitude {
   late int mCodeNum;
@@ -216,6 +218,10 @@ class dicoAptProvider {
     //final dbPath = await getDatabasesPath(); plante sous android
     Directory docDir = await getApplicationDocumentsDirectory();
     final path = join(docDir.path, "fforestimator.db");
+
+    Directory docDir2 = await getApplicationDocumentsDirectory();
+    print("toto " + docDir2.path);
+
 // Check if the database exists
     var exists = await databaseExists(path);
 
