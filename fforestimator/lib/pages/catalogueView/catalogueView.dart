@@ -127,8 +127,9 @@ class _CategoryView extends State<CategoryView> {
           _layerTiles[widget.category]![index].isExpanded = isExpanded;
         });
       },
-      children: _layerTiles[widget.category]!.map<ExpansionPanel>((LayerTile item) {
-        if (_legendViews[item.key] == null){
+      children:
+          _layerTiles[widget.category]!.map<ExpansionPanel>((LayerTile item) {
+        if (_legendViews[item.key] == null) {
           _legendViews[item.key] = LegendView(
             layerKey: item.key,
             constraintsText: BoxConstraints(
@@ -148,38 +149,9 @@ class _CategoryView extends State<CategoryView> {
           backgroundColor: Colors.grey[200],
           headerBuilder: (BuildContext context, bool isExpanded) {
             return ListTile(
-              tileColor: gl.interfaceSelectedLayerKeys.contains(item.key)
-                  ? Colors.lightGreen
-                  : Colors.grey[200],
+              tileColor: selectLayerBarColor(item),
               title: Text(item.name),
-              leading: gl.interfaceSelectedLayerKeys.contains(item.key)
-                  ? IconButton(
-                      icon: const Icon(Icons.layers_clear),
-                      onPressed: () {
-                        setState(() {
-                          if (gl.interfaceSelectedLayerKeys.length > 1) {
-                            gl.interfaceSelectedLayerKeys.remove(item.key);
-                            item.selected = false;
-                            widget.refreshView();
-                          }
-                        });
-                      })
-                  : IconButton(
-                      icon: const Icon(Icons.layers),
-                      onPressed: () {
-                        setState(() {
-                          if (gl.interfaceSelectedLayerKeys.length < 3) {
-                            gl.interfaceSelectedLayerKeys.insert(0, item.key);
-                            item.selected = true;
-                            widget.refreshView();
-                          } else {
-                            gl.interfaceSelectedLayerKeys.removeLast();
-                            gl.interfaceSelectedLayerKeys.insert(0, item.key);
-                            item.selected = true;
-                            widget.refreshView();
-                          }
-                        });
-                      }),
+              leading: selectLayerBar(item),
             );
           },
           body: _legendViews[item.key]!,
@@ -189,14 +161,85 @@ class _CategoryView extends State<CategoryView> {
     );
   }
 
+  Color selectLayerBarColor(LayerTile lt) {
+    if (gl.interfaceSelectedLayerKeys.contains(lt.key) &&
+        gl.anaPtSelectedLayerKeys.contains(lt.key))
+      return Colors.red;
+    else if (gl.interfaceSelectedLayerKeys.contains(lt.key))
+      return gl.colorAgroBioTech;
+    else if (gl.anaPtSelectedLayerKeys.contains(lt.key)) return gl.colorUliege;
+    return Colors.grey[200]!;
+  }
+
+  Widget selectLayerBar(LayerTile lt) {
+    return Container(
+        constraints: BoxConstraints(
+            minWidth: MediaQuery.of(context).size.width * .25,
+            maxWidth: MediaQuery.of(context).size.width * .25,
+            minHeight: MediaQuery.of(context).size.height * .04,
+            maxHeight: MediaQuery.of(context).size.height * .04),
+        child: Row(children: [
+          gl.interfaceSelectedLayerKeys.contains(lt.key)
+              ? IconButton(
+                  icon: const Icon(Icons.layers_clear),
+                  onPressed: () {
+                    setState(() {
+                      if (gl.interfaceSelectedLayerKeys.length > 1) {
+                        gl.interfaceSelectedLayerKeys.remove(lt.key);
+                        lt.selected = false;
+                        widget.refreshView();
+                      }
+                    });
+                  })
+              : IconButton(
+                  icon: const Icon(Icons.layers),
+                  onPressed: () {
+                    setState(() {
+                      if (gl.interfaceSelectedLayerKeys.length < 3) {
+                        gl.interfaceSelectedLayerKeys.insert(0, lt.key);
+                        lt.selected = true;
+                        widget.refreshView();
+                      } else {
+                        gl.interfaceSelectedLayerKeys.removeLast();
+                        gl.interfaceSelectedLayerKeys.insert(0, lt.key);
+                        lt.selected = true;
+                        widget.refreshView();
+                      }
+                    });
+                  }),
+          gl.anaPtSelectedLayerKeys.contains(lt.key)
+              ? IconButton(
+                  icon: const Icon(Icons.show_chart),
+                  onPressed: () {
+                    setState(() {
+                      if (gl.anaPtSelectedLayerKeys.length > 1) {
+                        gl.anaPtSelectedLayerKeys.remove(lt.key);
+                        lt.selected = false;
+                        widget.refreshView();
+                      }
+                    });
+                  })
+              : IconButton(
+                  icon: const Icon(Icons.chair),
+                  onPressed: () {
+                    setState(() {
+                      gl.anaPtSelectedLayerKeys.insert(0, lt.key);
+                      lt.selected = true;
+                      widget.refreshView();
+                    });
+                  }),
+        ]));
+  }
+
   void _getLayerData() async {
     Map<String, layerBase> mp = gl.dico.mLayerBases;
     for (var key in mp.keys) {
       if (widget.category.filter == mp[key]!.mGroupe && !mp[key]!.mExpert) {
-        if (_layerTiles[widget.category] == null){
+        if (_layerTiles[widget.category] == null) {
           _layerTiles[widget.category] = [];
         }
-        _layerTiles[widget.category]!.add(LayerTile(name: mp[key]!.mNom, filter: mp[key]!.mGroupe, key: key));
+        _layerTiles[widget.category]!.add(
+            LayerTile(name: mp[key]!.mNom, filter: mp[key]!.mGroupe, key: key));
       }
     }
     setState(() {
@@ -207,7 +250,7 @@ class _CategoryView extends State<CategoryView> {
   @override
   void initState() {
     super.initState();
-    if (_finishedInitializingCategory[widget.category] == null){
+    if (_finishedInitializingCategory[widget.category] == null) {
       _finishedInitializingCategory[widget.category] = false;
     }
     if (!_finishedInitializingCategory[widget.category]!) {
@@ -331,4 +374,3 @@ class _SearchBarView extends State<SearchBarView> {
     //return SearchBar(controller: widget._searchIt,);
   }
 }
-
