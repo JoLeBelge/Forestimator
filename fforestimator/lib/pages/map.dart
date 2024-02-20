@@ -7,11 +7,13 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:fforestimator/locationIndicator/animated_location_indicator.dart';
 import 'package:fforestimator/globals.dart' as gl;
+import 'package:http/http.dart' as http;
+import 'package:fforestimator/pages/anaPt/requestedLayer.dart';
+
+import 'dart:convert';
 
 class mapPage extends StatefulWidget {
-  final Function runAnaPt;
-
-  const mapPage({required this.runAnaPt, super.key});
+  const mapPage({super.key});
 
   @override
   State<mapPage> createState() => _mapPageState();
@@ -20,6 +22,7 @@ class mapPage extends StatefulWidget {
 class _mapPageState extends State<mapPage> {
   final _mapController = MapController();
   LatLng? _pt;
+  var data;
 
 //https://github.com/fleaflet/flutter_map/blob/master/example/lib/pages/custom_crs/custom_crs.dart
   late proj4.Projection epsg4326 = proj4.Projection.get('EPSG:4326')!;
@@ -46,6 +49,40 @@ class _mapPageState extends State<mapPage> {
       proj4Projection: epsg31370,
       bounds: epsg31370Bounds,
       resolutions: getResolutions(295170.0, 42250.0, 15, 256.0));
+
+  Future _runAnaPt(proj4.Point ptBL72) async {
+    String layersAnaPt = "";
+    for (String lCode in gl.anaPtSelectedLayerKeys) {
+      if (gl.dico.getLayerBase(lCode).mCategorie != "Externe") {
+        layersAnaPt += "+" + lCode;
+      }
+    }
+
+    String url = "https://forestimator.gembloux.ulg.ac.be/api/anaPt/layers/" +
+        layersAnaPt +
+        "/x/" +
+        ptBL72.x.toString() +
+        "/y/" +
+        ptBL72.y.toString();
+    print(url);
+    var res = await http.get(Uri.parse(url));
+    print(res.body);
+    data = jsonDecode(res.body);
+    gl.requestedLayers.clear();
+    for (var r in data["RequestedLayers"]) {
+      gl.requestedLayers.add(layerAnaPt.fromMap(r));
+    }
+    gl.requestedLayers.removeWhere((element) => element.mFoundLayer == 0);
+    // un peu radical mais me fait bugger mon affichage par la suite donc je retire
+    gl.requestedLayers.removeWhere((element) => element.mRastValue == 0);
+
+    // on les trie sur base des catégories de couches
+    gl.requestedLayers.sort((a, b) => gl.dico
+        .getLayerBase(a.mCode)
+        .mGroupe
+        .compareTo(gl.dico.getLayerBase(b.mCode).mGroupe));
+    //return _router.go("/anaPt");
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -92,7 +129,7 @@ class _mapPageState extends State<mapPage> {
                 ),
                 onLongPress: (tapPosition, point) => {
                   //proj4.Point ptBL72 = epsg4326.transform(epsg31370,proj4.Point(x: point.longitude, y: point.latitude))
-                  widget.runAnaPt(epsg4326.transform(epsg31370,
+                  _runAnaPt(epsg4326.transform(epsg31370,
                       proj4.Point(x: point.longitude, y: point.latitude))),
                   _updatePtMarker(point),
                 },
@@ -176,7 +213,7 @@ class _mapPageState extends State<mapPage> {
           proj4.Point(
               x: gl.position?.longitude ?? 0.0,
               y: gl.position?.latitude ?? 0.0));
-      widget.runAnaPt(ptBL72);
+      _runAnaPt(ptBL72);
     }
   }
 

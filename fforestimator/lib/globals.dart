@@ -3,12 +3,15 @@ library fforestimator.globals;
 import 'package:fforestimator/dico/dicoApt.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:fforestimator/pages/anaPt/requestedLayer.dart';
 
 late dicoAptProvider dico;
 
 String defaultLayer = "IGN";
 // list to memorize the keys of selected layer to show in interface.
 List<String> interfaceSelectedLayerKeys = [defaultLayer];
+
+List<layerAnaPt> requestedLayers = [];
 
 List<String> anaPtSelectedLayerKeys = [
   "ZBIO",
