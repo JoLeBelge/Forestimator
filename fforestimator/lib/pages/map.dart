@@ -17,10 +17,10 @@ class mapPage extends StatefulWidget {
   const mapPage({super.key});
 
   @override
-  State<mapPage> createState() => _mapPageState();
+  State<mapPage> createState() => _MapPageState();
 }
 
-class _mapPageState extends State<mapPage> {
+class _MapPageState extends State<mapPage> {
   final _mapController = MapController();
   LatLng? _pt;
   var data;
@@ -83,6 +83,12 @@ class _mapPageState extends State<mapPage> {
         .mGroupe
         .compareTo(gl.dico.getLayerBase(b.mCode).mGroupe));
     //return _router.go("/anaPt");
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    gl.refreshMap = setState;
   }
 
   @override

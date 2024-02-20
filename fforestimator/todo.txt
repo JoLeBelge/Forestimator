@@ -15,7 +15,7 @@ MOYEN TERME-> ajout d'un bouton de sélection des layers pour le téléchargemen
 
 -TileLayer; superposer CNSW à Topo.
 
-TT -> map_controller et centrage sur position gps ; rendre opérationnel (à nouveau)
+TT -> map_controller et centrage sur position gps ; rendre opérationnel (à nouveau) et aussi le changement actif des cartes...
 	
 TT -> création nouvelle page pour gestion de projet offline avec téléchargement des rasters.
 

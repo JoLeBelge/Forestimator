@@ -187,9 +187,11 @@ class _CategoryView extends State<CategoryView> {
                   onPressed: () {
                     setState(() {
                       if (gl.interfaceSelectedLayerKeys.length > 1) {
-                        gl.interfaceSelectedLayerKeys.remove(lt.key);
                         lt.selected = false;
                         widget.refreshView();
+                        gl.refreshMap(() {
+                          gl.interfaceSelectedLayerKeys.remove(lt.key);
+                        });
                       }
                     });
                   })
@@ -198,14 +200,18 @@ class _CategoryView extends State<CategoryView> {
                   onPressed: () {
                     setState(() {
                       if (gl.interfaceSelectedLayerKeys.length < 3) {
-                        gl.interfaceSelectedLayerKeys.insert(0, lt.key);
                         lt.selected = true;
                         widget.refreshView();
+                        gl.refreshMap(() {
+                          gl.interfaceSelectedLayerKeys.insert(0, lt.key);
+                        });
                       } else {
-                        gl.interfaceSelectedLayerKeys.removeLast();
-                        gl.interfaceSelectedLayerKeys.insert(0, lt.key);
                         lt.selected = true;
                         widget.refreshView();
+                        gl.refreshMap(() {
+                          gl.interfaceSelectedLayerKeys.removeLast();
+                          gl.interfaceSelectedLayerKeys.insert(0, lt.key);
+                        });
                       }
                     });
                   }),
@@ -243,8 +249,11 @@ class _CategoryView extends State<CategoryView> {
         if (_layerTiles[widget.category] == null) {
           _layerTiles[widget.category] = [];
         }
-        _layerTiles[widget.category]!.add(
-            LayerTile(name: mp[key]!.mNom, filter: mp[key]!.mGroupe, key: key, extern: mp[key]!.mCategorie == "Externe"));
+        _layerTiles[widget.category]!.add(LayerTile(
+            name: mp[key]!.mNom,
+            filter: mp[key]!.mGroupe,
+            key: key,
+            extern: mp[key]!.mCategorie == "Externe"));
       }
     }
     setState(() {
@@ -261,6 +270,7 @@ class _CategoryView extends State<CategoryView> {
     if (!_finishedInitializingCategory[widget.category]!) {
       _getLayerData();
     }
+    gl.refreshCatalogueView = setState;
   }
 }
 
@@ -320,9 +330,11 @@ class _SelectedLayerView extends State<SelectedLayerView> {
                         onPressed: () {
                           setState(() {
                             if (gl.interfaceSelectedLayerKeys.length > 1) {
-                              gl.interfaceSelectedLayerKeys
-                                  .remove(gl.interfaceSelectedLayerKeys[i]);
                               widget.refreshView();
+                              gl.refreshMap(() {
+                                gl.interfaceSelectedLayerKeys
+                                    .remove(gl.interfaceSelectedLayerKeys[i]);
+                              });
                             }
                           });
                         },
