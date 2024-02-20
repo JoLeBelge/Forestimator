@@ -3,7 +3,7 @@ import 'package:fforestimator/pages/anaPt/anaPtpage.dart';
 import 'package:flutter/material.dart';
 import 'package:fforestimator/globals.dart' as gl;
 import 'package:fforestimator/pages/map.dart';
-import 'package:fforestimator/pages/fichePdf.dart';
+import 'package:fforestimator/pages/pdfScreen.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:fforestimator/pages/catalogueView/catalogueLayerView.dart';
 import 'package:go_router/go_router.dart';
