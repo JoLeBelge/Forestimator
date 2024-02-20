@@ -148,9 +148,9 @@ class _MapPageState extends State<mapPage> {
                     bounds: LatLngBounds.fromPoints([latlonBL, latlonTR])),
                 onMapReady: () async {
                   gl.position = await acquireUserLocation();
-                  //await refreshAnalysisPosition();
-                  /* if (gl.position != null) {
-                    //TODO: Ceci tue l'appli!
+                  await refreshAnalysisPosition();
+                  if (gl.position != null) {
+                    //TODO: Ca semble marcher
                     // IMPORTANT: rebuild location layer when permissions are granted
                     setState(() {
                       _mapController.move(
@@ -158,7 +158,7 @@ class _MapPageState extends State<mapPage> {
                               gl.position?.longitude ?? 0.0),
                           16);
                     });
-                  }*/
+                  }
                 },
               ),
               children: List<Widget>.generate(

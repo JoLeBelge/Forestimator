@@ -302,12 +302,14 @@ class _SelectedLayerView extends State<SelectedLayerView> {
                         onPressed: () {
                           setState(() {
                             if (i > 0) {
-                              String tmp = gl.interfaceSelectedLayerKeys[i];
-                              gl.interfaceSelectedLayerKeys[i] =
-                                  gl.interfaceSelectedLayerKeys[i - 1];
-                              gl.interfaceSelectedLayerKeys[i - 1] = tmp;
+                              gl.refreshMap(() {
+                                String tmp = gl.interfaceSelectedLayerKeys[i];
+                                gl.interfaceSelectedLayerKeys[i] =
+                                    gl.interfaceSelectedLayerKeys[i - 1];
+                                gl.interfaceSelectedLayerKeys[i - 1] = tmp;
+                              });
+                              widget.refreshView();
                             }
-                            widget.refreshView();
                           });
                         },
                       ),
@@ -316,12 +318,14 @@ class _SelectedLayerView extends State<SelectedLayerView> {
                         onPressed: () {
                           setState(() {
                             if (gl.interfaceSelectedLayerKeys.length > i + 1) {
-                              String tmp = gl.interfaceSelectedLayerKeys[i];
-                              gl.interfaceSelectedLayerKeys[i] =
-                                  gl.interfaceSelectedLayerKeys[i + 1];
-                              gl.interfaceSelectedLayerKeys[i + 1] = tmp;
+                              gl.refreshMap(() {
+                                String tmp = gl.interfaceSelectedLayerKeys[i];
+                                gl.interfaceSelectedLayerKeys[i] =
+                                    gl.interfaceSelectedLayerKeys[i + 1];
+                                gl.interfaceSelectedLayerKeys[i + 1] = tmp;
+                              });
+                              widget.refreshView();
                             }
-                            widget.refreshView();
                           });
                         },
                       ),
