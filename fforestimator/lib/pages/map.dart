@@ -9,6 +9,7 @@ import 'package:fforestimator/locationIndicator/animated_location_indicator.dart
 import 'package:fforestimator/globals.dart' as gl;
 import 'package:http/http.dart' as http;
 import 'package:fforestimator/pages/anaPt/requestedLayer.dart';
+import 'package:go_router/go_router.dart';
 
 import 'dart:convert';
 
@@ -132,6 +133,7 @@ class _mapPageState extends State<mapPage> {
                   _runAnaPt(epsg4326.transform(epsg31370,
                       proj4.Point(x: point.longitude, y: point.latitude))),
                   _updatePtMarker(point),
+                  context.go("/anaPt"),
                 },
                 crs: epsg31370CRS,
                 initialZoom: 4.0,
