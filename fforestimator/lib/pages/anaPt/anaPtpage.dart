@@ -65,6 +65,11 @@ class layerAnaPtListTile extends StatelessWidget {
             backgroundColor: l.getValColor(data.mRastValue),
           ),
       ]),
+      onTap: () {
+        if (l.hasDoc()) {
+          context.go("/" + l.getFicheRoute());
+        }
+      },
     );
   }
 }
@@ -72,12 +77,14 @@ class layerAnaPtListTile extends StatelessWidget {
 Widget _tabAptFEE(BuildContext context, aptsFEE apts) {
   return Column(children: [
     SizedBox(height: 10),
-    Container(
-        child: Text("Aptitude du Fichier Ecologique des Essences",
-            style: TextStyle(
-              fontSize: 18.0,
-              fontWeight: FontWeight.w600,
-            ))),
+    Center(
+      child: Text("Aptitude du Fichier Ecologique des Essences",
+          style: TextStyle(
+            fontSize: 18.0,
+            fontWeight: FontWeight.w600,
+          ),
+          textAlign: TextAlign.center),
+    ),
     DefaultTabController(
       length: 3,
       child: Column(
@@ -138,7 +145,8 @@ class essencesListView extends StatelessWidget {
                       "La situation topographique provoque un effet de compensation (positif ou négatif) sur l'aptitude de cette essence")
               : null,
           onTap: () {
-            context.go("/fiche-esssence/HE");
+            context.go(
+                "/" + gl.dico.getEss(code.elementAt(index)).getFicheRoute());
           },
         );
       },
@@ -149,12 +157,14 @@ class essencesListView extends StatelessWidget {
 Widget _tabPropositionCS(BuildContext context, propositionGS apts) {
   return Column(children: [
     SizedBox(height: 10),
-    Container(
-        child: Text("Propositions d'Essences du Guide de Station",
-            style: TextStyle(
-              fontSize: 18.0,
-              fontWeight: FontWeight.w600,
-            ))),
+    Center(
+      child: Text("Propositions d'Essences du Guide de Station",
+          style: TextStyle(
+            fontSize: 18.0,
+            fontWeight: FontWeight.w600,
+          ),
+          textAlign: TextAlign.center),
+    ),
     DefaultTabController(
       length: 3,
       child: Column(

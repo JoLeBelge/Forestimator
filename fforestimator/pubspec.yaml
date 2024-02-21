@@ -78,6 +78,7 @@ flutter:
   assets:
      - assets/db/fforestimator.db
      - assets/images/
+     - assets/fichesEss/
      - assets/pdf/
 
   # An image asset can refer to one or more resolution-specific "variants", see

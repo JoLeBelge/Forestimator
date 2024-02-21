@@ -14,11 +14,6 @@ class layerAnaPt {
         mFoundRastFile = map['foundRastFile'],
         mRastValue = map["rastValue"],
         mValue = map["value"];
-
-  /*@override
-  int compareTo(other) {
-    return this.mRastValue.compareTo(other.mRastValue);
-  }*/
 }
 
 // listing de toutes les aptitudes pour création du tableau d'aptitude
@@ -74,25 +69,16 @@ class aptsFEE {
       ready = false;
     }
 
-    //Ess ep = gl.dico.getEss("EP"); // situation de compensation pour l'epicea*/
-    /*ZBIO = 3;
-    NT = -1 + 10;
-    NH = 1 + 10;
-    Topo = 1;
-    ready = true;*/
-
     if (ready) {
-      for (Ess es in gl.dico.mEssences.values) {
-        if (es.hasFEEapt()) {
-          int aptHT =
-              es.getAptHT(NT, NH, ZBIO, hierarchique: true, aTopo: Topo);
-          mApts.addEntries({es.mCode: aptHT}.entries);
-          bool aCompensation = Topo != 2 &&
-                  aptHT != es.getAptHT(NT, NH, ZBIO, hierarchique: true)
-              ? true
-              : false;
-          mCompensations.addEntries({es.mCode: aCompensation}.entries);
-          /*
+      for (Ess es in gl.dico.getFEEess()) {
+        int aptHT = es.getAptHT(NT, NH, ZBIO, hierarchique: true, aTopo: Topo);
+        mApts.addEntries({es.mCode: aptHT}.entries);
+        bool aCompensation =
+            Topo != 2 && aptHT != es.getAptHT(NT, NH, ZBIO, hierarchique: true)
+                ? true
+                : false;
+        mCompensations.addEntries({es.mCode: aCompensation}.entries);
+        /*
           print("ess " + es.mNomFR!);
           print("ess apt zbio " + es.getApt(ZBIO).toString());
           print("ess apt HT " +
@@ -101,7 +87,6 @@ class aptsFEE {
               es
                   .getAptHT(NT, NH, ZBIO, hierarchique: true, aTopo: Topo)
                   .toString());*/
-        }
       }
     }
   }
