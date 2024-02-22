@@ -5,7 +5,6 @@ import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:fforestimator/dico/ess.dart';
 import 'dart:async';
-import 'package:flutter/services.dart';
 
 class aptitude {
   late int mCodeNum;
@@ -81,12 +80,14 @@ class groupe_couche {
 class layerBase {
   late String mNom, mNomCourt;
   late bool mExpert;
-  String? mCode;
-  String? mUrl, mWMSLayerName, mWMSattribution;
+  late String mCode;
+  late String mUrl, mWMSLayerName, mWMSattribution, mTypeGeoservice;
   late String mGroupe;
   late String mCategorie;
   late String mTypeVar;
   late double mGain;
+  late String mPdfName;
+  late int mPdfPage;
   String? nom_field_raster, nom_field_value, nom_dico, condition;
   Map<int, String> mDicoVal; // valeur raster vers signification
   Map<int, Color> mDicoCol; // valeur raster vers couleur
@@ -101,9 +102,12 @@ class layerBase {
         //mPathRaster = map['Dir3'], //+ '/' + map['Nom'], // pas si simple, chemin d'accès sur le mobile. Utile que si bulk download des raster
         mExpert = map['expert'] == 0 ? false : true,
         mGroupe = map['groupe'],
-        mUrl = map['WMSurl'],
-        mWMSLayerName = map['WMSlayer'],
-        mWMSattribution = map['WMSattribution'],
+        mUrl = map['WMSurl'] == null ? "" : map['WMSurl'],
+        mWMSLayerName = map['WMSlayer'] == null ? "" : map['WMSlayer'],
+        mWMSattribution =
+            map['WMSattribution'] == null ? "" : map['WMSattribution'],
+        mTypeGeoservice =
+            map['typeGeoservice'] == null ? "" : map['typeGeoservice'],
         mCategorie = map['Categorie'],
         nom_field_raster = map['nom_field_raster'],
         nom_field_value = map['nom_field_value'],
@@ -111,6 +115,8 @@ class layerBase {
         condition = map['condition'],
         mTypeVar = map['TypeVar'],
         mGain = map['gain'] == null ? 66.6 : map['gain'],
+        mPdfPage = map['pdfPage'] == null ? 1 : map['pdfPage'],
+        mPdfName = map['pdfName'] == null ? "" : map['pdfName'],
         mDicoVal = {},
         mDicoCol = {};
 
@@ -130,8 +136,18 @@ class layerBase {
         condition = '',
         mTypeVar = '',
         mGain = 0,
+        mPdfName = '',
+        mPdfPage = 1,
         mDicoVal = {},
         mDicoCol = {};
+
+  bool hasDoc() {
+    return mPdfName != "";
+  }
+
+  String getFicheRoute() {
+    return mCode;
+  }
 
   String getValLabel(int aRastValue) {
     String aRes = "";
@@ -220,7 +236,6 @@ class dicoAptProvider {
     final path = join(docDir.path, "fforestimator.db");
 
     Directory docDir2 = await getApplicationDocumentsDirectory();
-    print("toto " + docDir2.path);
 
 // Check if the database exists
     var exists = await databaseExists(path);
@@ -229,7 +244,7 @@ class dicoAptProvider {
     // pour l'instant maj à chaque fois des assets sur l'émulateur
     if (true) {
       // Should happen only the first time you launch your application
-      print("Creating new copy from asset");
+      //print("Creating new copy from asset");
 
       // Make sure the parent directory exists
       try {
@@ -320,6 +335,14 @@ class dicoAptProvider {
     } else {
       throw "oops no essences " + aCode;
     }
+  }
+
+  List<Ess> getFEEess() {
+    return mEssences.values.where((i) => i.hasFEEapt()).toList();
+  }
+
+  List<layerBase> getLayersWithDoc() {
+    return mLayerBases.values.where((i) => i.mPdfName != "").toList();
   }
 
   layerBase getLayerBase(String aCode) {

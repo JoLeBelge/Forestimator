@@ -1,4 +1,5 @@
 import 'package:fforestimator/dico/dicoApt.dart';
+import 'package:fforestimator/dico/ess.dart';
 import 'package:fforestimator/pages/anaPt/anaPtpage.dart';
 import 'package:flutter/material.dart';
 import 'package:fforestimator/globals.dart' as gl;
@@ -11,40 +12,9 @@ import 'dart:async';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter/services.dart';
-
-// Stateful nested navigation based on:
-// https://github.com/flutter/packages/blob/main/packages/go_router/example/lib/stateful_shell_route.dart
-class ScaffoldWithNestedNavigation extends StatelessWidget {
-  const ScaffoldWithNestedNavigation({Key? key, required this.navigationShell})
-      : super(key: key ?? const ValueKey('ScaffoldWithNestedNavigation'));
-  final StatefulNavigationShell navigationShell;
-
-  void _goBranch(int index) {
-    navigationShell.goBranch(
-      index,
-      // A common pattern when using bottom navigation bars is to support
-      // navigating to the initial location when tapping the item that is
-      // already active. This example demonstrates how to support this behavior,
-      // using the initialLocation parameter of goBranch.
-      initialLocation: index == navigationShell.currentIndex,
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: navigationShell,
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: navigationShell.currentIndex,
-        destinations: const [
-          NavigationDestination(label: 'Section A', icon: Icon(Icons.home)),
-          NavigationDestination(label: 'Section B', icon: Icon(Icons.settings)),
-        ],
-        onDestinationSelected: _goBranch,
-      ),
-    );
-  }
-}
+import 'package:fforestimator/scaffoldNavigation.dart';
+import 'dart:convert';
+import 'package:path/path.dart' as path;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -57,9 +27,6 @@ void main() async {
   gl.dico = dicoAptProvider();
   await gl.dico.init();
 
-  // copier tout les pdf de l'asset bundle vers un fichier utilisable par la librairie flutter_pdfviewer
-
-  //while (!gl.dico.finishedLoading) {}
   runApp(const MyApp());
 }
 
@@ -80,16 +47,16 @@ class _MyApp extends State<MyApp> {
   Future<File> fromAsset(String asset, String filename) async {
     // To open from assets, you can copy them to the app storage folder, and the access them "locally"
     Completer<File> completer = Completer();
-
     try {
-      //var dir = await getApplicationDocumentsDirectory();
-      var dir = await getExternalStorageDirectory();
-      //print("tata" + );
+      var dir = await getApplicationDocumentsDirectory();
+      //var dir = await getExternalStorageDirectory();
       _pathExternalStorage = dir!.path;
       File file = File("${dir?.path}/$filename");
-      var data = await rootBundle.load(asset);
-      var bytes = data.buffer.asUint8List();
-      await file.writeAsBytes(bytes, flush: true);
+      if (await file.exists() == false) {
+        var data = await rootBundle.load(asset);
+        var bytes = data.buffer.asUint8List();
+        await file.writeAsBytes(bytes, flush: true);
+      }
       completer.complete(file);
     } catch (e) {
       throw Exception('Error parsing asset file!');
@@ -98,18 +65,33 @@ class _MyApp extends State<MyApp> {
     return completer.future;
   }
 
+  Future _listAndCopyPdfassets() async {
+    // load as string
+    final manifestcontent =
+        //await defaultassetbundle.of(context).loadstring('assetmanifest.json');
+        await rootBundle.loadString('AssetManifest.json');
+    // decode to map
+    final Map<String, dynamic> manifestmap = json.decode(manifestcontent);
+
+    // filter by extension
+    List<String> list =
+        manifestmap.keys.where((path) => path.endsWith('.pdf')).toList();
+    for (String f in list) {
+      fromAsset(f, path.basename(f));
+    }
+  }
+
   @override
   void initState() {
     super.initState();
-    //fromAsset('assets/pdf/FEE-HE.pdf', 'FEE-HE.pdf').then((f) {});
+    // copier tout les pdf de l'asset bundle vers un fichier utilisable par la librairie flutter_pdfviewer
+    _listAndCopyPdfassets();
   }
 
   late final _router = GoRouter(
     initialLocation: '/',
     navigatorKey: _rootNavigatorKey,
     routes: [
-      // Stateful nested navigation based on:
-      // https://github.com/flutter/packages/blob/main/packages/go_router/example/lib/stateful_shell_route.dart
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
           // the UI shell
@@ -125,22 +107,56 @@ class _MyApp extends State<MyApp> {
                 path: '/',
                 pageBuilder: (context, state) =>
                     const NoTransitionPage(child: mapPage()),
-                //),
                 routes: [
-                  // child route
-                  GoRoute(
-                    path: 'anaPt',
-                    builder: (context, state) => anaPtpage(gl.requestedLayers),
-                  ),
-                  GoRoute(
-                    path: 'fiche-esssence/HE',
-                    builder: (context, state) => PDFScreen(
-                        path: _pathExternalStorage + "/FEE-HE.pdf",
-                        titre: "fiche-essence " +
-                            gl.dico.getEss("HE").getNameAndPrefix()),
-                  ),
+                  ...[
+                    // child route
+                    GoRoute(
+                      path: 'anaPt',
+                      builder: (context, state) =>
+                          anaPtpage(gl.requestedLayers),
+                    ),
+                  ],
+                  ...gl.dico.getFEEess().map<GoRoute>((Ess item) {
+                    return GoRoute(
+                      path: item.getFicheRoute(),
+                      builder: (context, state) => (Platform.isAndroid ||
+                              Platform.isIOS)
+                          ? PDFScreen(
+                              path: _pathExternalStorage +
+                                  "/FEE-" +
+                                  item.mCode +
+                                  ".pdf",
+                              titre: "fiche-essence " + item.getNameAndPrefix(),
+                            )
+                          : Scaffold(
+                              appBar: AppBar(
+                                title: Text("view pdf"),
+                              ),
+                              body: Text(_pathExternalStorage +
+                                  "/FEE-" +
+                                  item.mCode +
+                                  ".pdf"),
+                            ),
+                    );
+                  }).toList(),
+                  ...gl.dico.getLayersWithDoc().map<GoRoute>((layerBase item) {
+                    return GoRoute(
+                      path: item.getFicheRoute(),
+                      builder: (context, state) => (Platform.isAndroid ||
+                              Platform.isIOS)
+                          ? PDFScreen(
+                              path: _pathExternalStorage + "/" + item.mPdfName,
+                              titre: "documentation carte " + item.mNomCourt)
+                          : Scaffold(
+                              appBar: AppBar(
+                                title: Text("view pdf"),
+                              ),
+                              body: Text("toto"),
+                            ),
+                    );
+                  }).toList(),
                 ],
-              ),
+              )
             ],
           ),
           // second branch (B)
@@ -153,14 +169,6 @@ class _MyApp extends State<MyApp> {
                 pageBuilder: (context, state) => const NoTransitionPage(
                   child: CatalogueLayerView(),
                 ),
-                /* routes: [
-                    // child route
-                    GoRoute(
-                      path: 'details',
-                      builder: (context, state) =>
-                          const DetailsScreen(label: 'B'),
-                    ),
-                  ],*/
               ),
             ],
           ),
@@ -185,57 +193,6 @@ class _MyApp extends State<MyApp> {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      /* home: Scaffold(
-          body: Center(
-              child: Stack(
-            children: <Widget>[
-              mapPage(runAnaPt: _runAnapt),
-              Column(children: [
-                Container(
-                    constraints: BoxConstraints(
-                        minHeight: MediaQuery.of(context).size.height - 56,
-                        maxHeight: MediaQuery.of(context).size.height - 56,
-                        minWidth: MediaQuery.of(context).size.width,
-                        maxWidth: MediaQuery.of(context).size.width),
-                    child: _showCompleteLayerSelectionScreen
-                        ? const CatalogueLayerView()
-                        : _showAnalysisResultScreen
-                            ? anaPtpage(requestedLayers)
-                            : null),
-                Container(
-                    constraints: BoxConstraints(minHeight: 56),
-                    child: Row(children: [
-                      _showCompleteLayerSelectionScreen
-                          ? FloatingActionButton(
-                              backgroundColor: gl.colorAgroBioTech,
-                              onPressed: _switchLayerViewPage,
-                              child: const Icon(Icons.arrow_back,
-                                  color: gl.colorBack))
-                          : FloatingActionButton(
-                              backgroundColor: gl.colorAgroBioTech,
-                              onPressed: _switchLayerViewPage,
-                              child: const Icon(
-                                Icons.layers_rounded,
-                                color: gl.colorUliege,
-                              )),
-                      _showAnalysisResultScreen
-                          ? FloatingActionButton(
-                              backgroundColor: gl.colorAgroBioTech,
-                              onPressed: _switchAnalysisViewPage,
-                              child: const Icon(Icons.arrow_back,
-                                  color: gl.colorBack))
-                          : FloatingActionButton(
-                              backgroundColor: gl.colorAgroBioTech,
-                              onPressed: _switchAnalysisViewPage,
-                              child: const Icon(
-                                Icons.analytics_rounded,
-                                color: gl.colorUliege,
-                              )),
-                    ]))
-              ]),
-            ],
-          )),
-        )*/
     );
   }
 }

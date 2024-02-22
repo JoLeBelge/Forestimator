@@ -4,6 +4,7 @@ import 'package:fforestimator/dico/dicoApt.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:fforestimator/pages/anaPt/requestedLayer.dart';
+import 'package:go_router/go_router.dart';
 
 late dicoAptProvider dico;
 
@@ -34,5 +35,5 @@ const Color colorDeselected = Color.fromARGB(255, 46, 46, 46);
 const Color colorUliege = Color.fromRGBO(00, 112, 127, 1.0);
 const Color colorBack = Color.fromRGBO(255, 120, 30, 1);
 
-Function refreshMap = (){};
-Function refreshCatalogueView = (){};
+Function refreshMap = () {};
+Function refreshCatalogueView = () {};

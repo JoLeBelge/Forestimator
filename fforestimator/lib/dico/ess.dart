@@ -19,6 +19,10 @@ class Ess {
   // clé ; zone bioclim/ région. Value ; une map -> clé ; id situation topo. valeur ; code risque
   Map<int, Map<int, int>> mRisqueTopo;
 
+  String getFicheRoute() {
+    return 'fiche-esssence/' + mCode;
+  }
+
   bool hasFEEapt() {
     return mAptZbio.length == 10;
   }

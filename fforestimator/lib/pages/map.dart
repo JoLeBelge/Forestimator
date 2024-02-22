@@ -1,3 +1,4 @@
+import 'package:fforestimator/dico/dicoApt.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:proj4dart/proj4dart.dart' as proj4;
@@ -52,6 +53,7 @@ class _MapPageState extends State<mapPage> {
       resolutions: getResolutions(295170.0, 42250.0, 15, 256.0));
 
   Future _runAnaPt(proj4.Point ptBL72) async {
+    print("anaPonctOnline");
     String layersAnaPt = "";
     for (String lCode in gl.anaPtSelectedLayerKeys) {
       if (gl.dico.getLayerBase(lCode).mCategorie != "Externe") {
@@ -65,9 +67,9 @@ class _MapPageState extends State<mapPage> {
         ptBL72.x.toString() +
         "/y/" +
         ptBL72.y.toString();
-    print(url);
+    //print(url);
     var res = await http.get(Uri.parse(url));
-    print(res.body);
+    //print(res.body);
     data = jsonDecode(res.body);
     gl.requestedLayers.clear();
     for (var r in data["RequestedLayers"]) {
@@ -161,35 +163,33 @@ class _MapPageState extends State<mapPage> {
                   }
                 },
               ),
-              children: List<Widget>.generate(
-                    gl.interfaceSelectedLayerKeys.length,
-                    (i) => TileLayer(
+              children: gl.interfaceSelectedLayerKeys.reversed
+                      .map<Widget>((String codeLayer) {
+                    layerBase l = gl.dico.getLayerBase(codeLayer);
+                    String baseUrl = l.mUrl;
+                    if (l.mTypeGeoservice == "ArcGisRest") {
+                      baseUrl += "WMSServer?";
+                      print(baseUrl);
+                      print(l.mWMSLayerName);
+                    } else {
+                      baseUrl += "?";
+                    }
+
+                    return TileLayer(
+                      userAgentPackageName: "com.fforestimator.app",
                       wmsOptions: WMSTileLayerOptions(
-                        baseUrl: gl
-                                .dico
-                                .mLayerBases[gl.interfaceSelectedLayerKeys[
-                                    gl.interfaceSelectedLayerKeys.length -
-                                        i -
-                                        1]]!
-                                .mUrl! +
-                            "?",
+                        baseUrl: baseUrl,
                         format: 'image/png',
                         layers: [
-                          gl
-                              .dico
-                              .mLayerBases[gl.interfaceSelectedLayerKeys[
-                                  gl.interfaceSelectedLayerKeys.length -
-                                      i -
-                                      1]]!
-                              .mWMSLayerName!,
+                          l.mWMSLayerName,
                         ],
                         crs: epsg31370CRS,
-                        transparent: true,
+                        transparent: false,
                       ),
                       //maxNativeZoom: 7,
                       tileSize: tileSize,
-                    ),
-                  ) +
+                    );
+                  }).toList() +
                   <Widget>[
                     MarkerLayer(
                       markers: [
@@ -210,17 +210,14 @@ class _MapPageState extends State<mapPage> {
 
   Future<void> refreshAnalysisPosition() async {
     if (gl.position != null) {
-      //print("postion x " + _position?.latitude.toString() ?? "0" );// + " " + _position?.longitude.toString());
-      print(gl.position?.latitude.toString() ??
-          "empty position"); // + " " + _position?.longitude.toString());
-      print("anaPonctOnline");
+      //print(gl.position?.latitude.toString() ?? "empty position"); // + " " + _position?.longitude.toString());
       // on projete en BL72, seul src de Forestimator web pour le moment
       proj4.Point ptBL72 = epsg4326.transform(
           epsg31370,
           proj4.Point(
               x: gl.position?.longitude ?? 0.0,
               y: gl.position?.latitude ?? 0.0));
-      _runAnaPt(ptBL72);
+      //_runAnaPt(ptBL72);  // non il faut un bouton integré à la carte pour que l'utilisateur effectue une analyse ponctuelle là ou ce situe son GPS
     }
   }
 
