@@ -133,7 +133,8 @@ class _MapPageState extends State<mapPage> {
                   flags: InteractiveFlag.drag |
                       InteractiveFlag.pinchZoom |
                       InteractiveFlag.pinchMove |
-                      InteractiveFlag.doubleTapZoom,
+                      InteractiveFlag.doubleTapZoom |
+                      InteractiveFlag.scrollWheelZoom,
                 ),
                 onLongPress: (tapPosition, point) async => {
                   //proj4.Point ptBL72 = epsg4326.transform(epsg31370,proj4.Point(x: point.longitude, y: point.latitude))
@@ -143,8 +144,9 @@ class _MapPageState extends State<mapPage> {
                   context.go("/anaPt"),
                 },
                 crs: epsg31370CRS,
-                initialZoom: 4.0,
-                maxZoom: 15,
+                initialZoom: 8.0,
+                maxZoom: 14,
+                minZoom: 7,
                 initialCenter: latlonEpioux,
                 cameraConstraint: CameraConstraint.contain(
                     bounds: LatLngBounds.fromPoints([latlonBL, latlonTR])),
@@ -158,7 +160,7 @@ class _MapPageState extends State<mapPage> {
                       _mapController.move(
                           LatLng(gl.position?.latitude ?? 0.0,
                               gl.position?.longitude ?? 0.0),
-                          16);
+                          8);
                     });
                   }
                 },
@@ -166,25 +168,16 @@ class _MapPageState extends State<mapPage> {
               children: gl.interfaceSelectedLayerKeys.reversed
                       .map<Widget>((String codeLayer) {
                     layerBase l = gl.dico.getLayerBase(codeLayer);
-                    String baseUrl = l.mUrl;
-                    if (l.mTypeGeoservice == "ArcGisRest") {
-                      baseUrl += "WMSServer?";
-                      print(baseUrl);
-                      print(l.mWMSLayerName);
-                    } else {
-                      baseUrl += "?";
-                    }
-
                     return TileLayer(
-                      userAgentPackageName: "com.fforestimator.app",
+                      userAgentPackageName: "com.example.fforestimator",
                       wmsOptions: WMSTileLayerOptions(
-                        baseUrl: baseUrl,
+                        baseUrl: l.mUrl + "?",
                         format: 'image/png',
                         layers: [
                           l.mWMSLayerName,
                         ],
                         crs: epsg31370CRS,
-                        transparent: false,
+                        transparent: true,
                       ),
                       //maxNativeZoom: 7,
                       tileSize: tileSize,
