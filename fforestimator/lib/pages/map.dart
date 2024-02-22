@@ -1,3 +1,4 @@
+import 'package:fforestimator/dico/dicoApt.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:proj4dart/proj4dart.dart' as proj4;
@@ -162,35 +163,33 @@ class _MapPageState extends State<mapPage> {
                   }
                 },
               ),
-              children: List<Widget>.generate(
-                    gl.interfaceSelectedLayerKeys.length,
-                    (i) => TileLayer(
+              children: gl.interfaceSelectedLayerKeys.reversed
+                      .map<Widget>((String codeLayer) {
+                    layerBase l = gl.dico.getLayerBase(codeLayer);
+                    String baseUrl = l.mUrl;
+                    if (l.mTypeGeoservice == "ArcGisRest") {
+                      baseUrl += "WMSServer?";
+                      print(baseUrl);
+                      print(l.mWMSLayerName);
+                    } else {
+                      baseUrl += "?";
+                    }
+
+                    return TileLayer(
+                      userAgentPackageName: "com.fforestimator.app",
                       wmsOptions: WMSTileLayerOptions(
-                        baseUrl: gl
-                                .dico
-                                .mLayerBases[gl.interfaceSelectedLayerKeys[
-                                    gl.interfaceSelectedLayerKeys.length -
-                                        i -
-                                        1]]!
-                                .mUrl! +
-                            "?",
+                        baseUrl: baseUrl,
                         format: 'image/png',
                         layers: [
-                          gl
-                              .dico
-                              .mLayerBases[gl.interfaceSelectedLayerKeys[
-                                  gl.interfaceSelectedLayerKeys.length -
-                                      i -
-                                      1]]!
-                              .mWMSLayerName!,
+                          l.mWMSLayerName,
                         ],
                         crs: epsg31370CRS,
-                        transparent: true,
+                        transparent: false,
                       ),
                       //maxNativeZoom: 7,
                       tileSize: tileSize,
-                    ),
-                  ) +
+                    );
+                  }).toList() +
                   <Widget>[
                     MarkerLayer(
                       markers: [

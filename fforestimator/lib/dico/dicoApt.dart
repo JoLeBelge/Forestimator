@@ -81,7 +81,7 @@ class layerBase {
   late String mNom, mNomCourt;
   late bool mExpert;
   late String mCode;
-  String? mUrl, mWMSLayerName, mWMSattribution;
+  late String mUrl, mWMSLayerName, mWMSattribution, mTypeGeoservice;
   late String mGroupe;
   late String mCategorie;
   late String mTypeVar;
@@ -102,9 +102,12 @@ class layerBase {
         //mPathRaster = map['Dir3'], //+ '/' + map['Nom'], // pas si simple, chemin d'accès sur le mobile. Utile que si bulk download des raster
         mExpert = map['expert'] == 0 ? false : true,
         mGroupe = map['groupe'],
-        mUrl = map['WMSurl'],
-        mWMSLayerName = map['WMSlayer'],
-        mWMSattribution = map['WMSattribution'],
+        mUrl = map['WMSurl'] == null ? "" : map['WMSurl'],
+        mWMSLayerName = map['WMSlayer'] == null ? "" : map['WMSlayer'],
+        mWMSattribution =
+            map['WMSattribution'] == null ? "" : map['WMSattribution'],
+        mTypeGeoservice =
+            map['typeGeoservice'] == null ? "" : map['typeGeoservice'],
         mCategorie = map['Categorie'],
         nom_field_raster = map['nom_field_raster'],
         nom_field_value = map['nom_field_value'],
