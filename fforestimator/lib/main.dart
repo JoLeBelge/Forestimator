@@ -101,7 +101,7 @@ class _MyApp extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    fromAsset('assets/pdf/FEE-HE.pdf', 'FEE-HE.pdf').then((f) {});
+    //fromAsset('assets/pdf/FEE-HE.pdf', 'FEE-HE.pdf').then((f) {});
   }
 
   late final _router = GoRouter(
