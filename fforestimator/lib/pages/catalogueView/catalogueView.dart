@@ -245,7 +245,9 @@ class _CategoryView extends State<CategoryView> {
   void _getLayerData() async {
     Map<String, layerBase> mp = gl.dico.mLayerBases;
     for (var key in mp.keys) {
-      if (widget.category.filter == mp[key]!.mGroupe && !mp[key]!.mExpert) {
+      if (widget.category.filter == mp[key]!.mGroupe &&
+          !mp[key]!.mExpert &&
+          mp[key]?.mTypeGeoservice == "") {
         if (_layerTiles[widget.category] == null) {
           _layerTiles[widget.category] = [];
         }
