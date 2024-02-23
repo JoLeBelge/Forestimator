@@ -34,6 +34,9 @@ const Color colorAgroBioTech = Color.fromRGBO(185, 205, 118, 1.0);
 const Color colorDeselected = Color.fromARGB(255, 46, 46, 46);
 const Color colorUliege = Color.fromRGBO(00, 112, 127, 1.0);
 const Color colorBack = Color.fromRGBO(255, 120, 30, 1);
+const Color colorBackground = Color.fromRGBO(202, 202, 202, 1);
+const Color colorBackgroundSecondary = Color.fromRGBO(243, 243, 243, 1);
 
 Function refreshMap = () {};
 Function refreshCatalogueView = () {};
+Function refreshCurrentThreeLayer = () {};

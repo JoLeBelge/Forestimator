@@ -4,10 +4,12 @@ import 'package:fforestimator/globals.dart' as gl;
 class LegendView extends StatefulWidget {
   final String layerKey;
   final BoxConstraints constraintsText, constraintsColors;
+  final Color color;
   const LegendView(
       {required this.layerKey,
       required this.constraintsText,
       required this.constraintsColors,
+      required this.color,
       super.key});
   @override
   State<LegendView> createState() => _LegendView();
@@ -24,14 +26,12 @@ class _LegendView extends State<LegendView> {
 
     return Center(
         child: Container(
-      color: Colors.grey[200],
+      color: widget.color,
       constraints: BoxConstraints(
         minWidth:
             widget.constraintsText.minWidth + widget.constraintsColors.minWidth,
         maxWidth:
             widget.constraintsText.maxWidth + widget.constraintsColors.maxWidth,
-        //minHeight: widget.constraintsText.minWidth + widget.constraintsColors.maxWidth,
-        //maxHeight: widget.constraintsText.minWidth + widget.constraintsColors.maxWidth
       ),
       child: Column(
         children: [

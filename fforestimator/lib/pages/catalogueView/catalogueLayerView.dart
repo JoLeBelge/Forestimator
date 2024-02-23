@@ -14,21 +14,24 @@ class _CatalogueLayerView extends State<CatalogueLayerView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(children: [
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        
+        children: [
         Container(
-          color: Colors.grey[200],
+          color: gl.colorBackground,
           child: CatalogueView(refreshView: refreshView),
           constraints: BoxConstraints(
               maxWidth: MediaQuery.of(context).size.width * 1.0,
-              minHeight: MediaQuery.of(context).size.height * .6,
-              maxHeight: MediaQuery.of(context).size.height * .6),
+              minHeight: MediaQuery.of(context).size.height * .73,
+              maxHeight: MediaQuery.of(context).size.height * .73),
         ),
         Container(
-          color: Colors.grey[200],
+          color: gl.colorBackground,
           child: SelectedLayerView(refreshView: refreshView),
           constraints: BoxConstraints(
               maxWidth: MediaQuery.of(context).size.width * 1.0,
-              maxHeight: MediaQuery.of(context).size.height * .25),
+              maxHeight: MediaQuery.of(context).size.height * .175),
         )
       ]),
     );

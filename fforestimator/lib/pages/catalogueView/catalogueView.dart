@@ -22,14 +22,12 @@ class _CatalogueView extends State<CatalogueView> {
   @override
   Widget build(BuildContext context) {
     if (finishedInitializingCategories) {
-      return Scrollbar(
-          controller: it,
-          child: SingleChildScrollView(
-            physics: that,
-            child: Container(
-              child: _buildPanel(),
-            ),
-          ));
+      return SingleChildScrollView(
+        physics: that,
+        child: Container(
+          child: _buildPanel(),
+        ),
+      );
     } else {
       return const CircularProgressIndicator();
     }
@@ -46,7 +44,7 @@ class _CatalogueView extends State<CatalogueView> {
       children: _categories.map<ExpansionPanel>((Category item) {
         return ExpansionPanel(
           canTapOnHeader: true,
-          backgroundColor: Colors.grey[200],
+          backgroundColor: gl.colorBackground,
           headerBuilder: (BuildContext context, bool isExpanded) {
             return ListTile(
               iconColor: Colors.red,
@@ -95,7 +93,8 @@ class CategoryView extends StatefulWidget {
 class _CategoryView extends State<CategoryView> {
   static Map<Category, List<LayerTile>> _layerTiles = {};
   static Map<Category, bool> _finishedInitializingCategory = {};
-  static Map<String, LegendView> _legendViews = {};
+  bool _flipForBackground = false;
+
   @override
   Widget build(BuildContext context) {
     if (_finishedInitializingCategory[widget.category]!) {
@@ -129,9 +128,33 @@ class _CategoryView extends State<CategoryView> {
       },
       children:
           _layerTiles[widget.category]!.map<ExpansionPanel>((LayerTile item) {
-        if (_legendViews[item.key] == null) {
-          _legendViews[item.key] = LegendView(
+        return ExpansionPanel(
+          canTapOnHeader: true,
+          backgroundColor: _getswitchBackgroundColorForList(),
+          headerBuilder: (BuildContext context, bool isExpanded) {
+            return ColoredBox(
+              color: _getswitchBackgroundColorForList(),
+              child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Container(
+                      constraints: BoxConstraints(
+                        maxWidth: MediaQuery.of(context).size.width * .55,
+                        maxHeight: MediaQuery.of(context).size.width * .2 > 48
+                            ? MediaQuery.of(context).size.width * .2
+                            : 48,
+                        minHeight: 48,
+                      ),
+                      child:
+                          Text(item.name, textScaler: TextScaler.linear(1.2)),
+                    ),
+                    selectLayerBar(item),
+                  ]),
+            );
+          },
+          body: LegendView(
             layerKey: item.key,
+            color: _getBackgroundColorForList(),
             constraintsText: BoxConstraints(
                 minWidth: MediaQuery.of(context).size.width * .4,
                 maxWidth: MediaQuery.of(context).size.width * .4,
@@ -142,103 +165,132 @@ class _CategoryView extends State<CategoryView> {
                 maxWidth: MediaQuery.of(context).size.width * .4,
                 minHeight: MediaQuery.of(context).size.height * .02,
                 maxHeight: MediaQuery.of(context).size.height * .02),
-          );
-        }
-        return ExpansionPanel(
-          canTapOnHeader: true,
-          backgroundColor: Colors.grey[200],
-          headerBuilder: (BuildContext context, bool isExpanded) {
-            return ListTile(
-              tileColor: selectLayerBarColor(item),
-              title: Text(item.name),
-              leading: selectLayerBar(item),
-            );
-          },
-          body: _legendViews[item.key]!,
+          ),
           isExpanded: item.isExpanded,
         );
       }).toList(),
     );
   }
 
-  Color selectLayerBarColor(LayerTile lt) {
-    if (gl.interfaceSelectedLayerKeys.contains(lt.key) &&
-        gl.anaPtSelectedLayerKeys.contains(lt.key)) {
-      return Colors.red;
-    } else if (gl.interfaceSelectedLayerKeys.contains(lt.key)) {
-      return gl.colorAgroBioTech;
-    } else if (gl.anaPtSelectedLayerKeys.contains(lt.key)) {
-      return gl.colorUliege;
-    }
-    return Colors.grey[200]!;
-  }
-
   Widget selectLayerBar(LayerTile lt) {
+    double barWidth = 48.0;
+    if (widget.category.filter != "APT_CS" &&
+        widget.category.filter != "APT_FEE" &&
+        !lt.extern) barWidth = 96.0;
+
     return Container(
         constraints: BoxConstraints(
-            minWidth: MediaQuery.of(context).size.width * .25,
-            maxWidth: MediaQuery.of(context).size.width * .25,
-            minHeight: MediaQuery.of(context).size.height * .04,
-            maxHeight: MediaQuery.of(context).size.height * .04),
+          maxWidth: barWidth,
+          minWidth: barWidth,
+          maxHeight: MediaQuery.of(context).size.width * .04 > 48
+              ? MediaQuery.of(context).size.width * .04
+              : 48,
+          minHeight: 48,
+        ),
         child: Row(children: [
-          gl.interfaceSelectedLayerKeys.contains(lt.key)
-              ? IconButton(
-                  icon: const Icon(Icons.layers_clear),
-                  onPressed: () {
-                    setState(() {
-                      if (gl.interfaceSelectedLayerKeys.length > 1) {
-                        lt.selected = false;
-                        widget.refreshView();
-                        gl.refreshMap(() {
-                          gl.interfaceSelectedLayerKeys.remove(lt.key);
-                        });
-                      }
-                    });
-                  })
-              : IconButton(
-                  icon: const Icon(Icons.layers),
-                  onPressed: () {
-                    setState(() {
-                      if (gl.interfaceSelectedLayerKeys.length < 3) {
-                        lt.selected = true;
-                        widget.refreshView();
-                        gl.refreshMap(() {
-                          gl.interfaceSelectedLayerKeys.insert(0, lt.key);
-                        });
-                      } else {
-                        lt.selected = true;
-                        widget.refreshView();
-                        gl.refreshMap(() {
-                          gl.interfaceSelectedLayerKeys.removeLast();
-                          gl.interfaceSelectedLayerKeys.insert(0, lt.key);
-                        });
-                      }
-                    });
-                  }),
           if (widget.category.filter != "APT_CS" &&
               widget.category.filter != "APT_FEE" &&
               !lt.extern)
             gl.anaPtSelectedLayerKeys.contains(lt.key)
-                ? IconButton(
-                    icon: const Icon(Icons.show_chart),
-                    onPressed: () {
-                      setState(() {
-                        if (gl.anaPtSelectedLayerKeys.length > 1) {
-                          gl.anaPtSelectedLayerKeys.remove(lt.key);
-                          lt.selected = false;
-                          widget.refreshView();
-                        }
-                      });
-                    })
-                : IconButton(
-                    icon: const Icon(Icons.chair),
-                    onPressed: () {
-                      setState(() {
-                        gl.anaPtSelectedLayerKeys.insert(0, lt.key);
-                        lt.selected = true;
-                        widget.refreshView();
-                      });
-                    }),
+                ? Container(
+                    decoration: const BoxDecoration(
+                        shape: BoxShape.circle, color: gl.colorUliege),
+                    constraints: const BoxConstraints(
+                      maxWidth: 48,
+                      minWidth: 48,
+                      maxHeight: 48,
+                      minHeight: 48,
+                    ),
+                    padding: EdgeInsets.all(0),
+                    child: IconButton(
+                        icon: const Icon(Icons.show_chart, size: 28),
+                        onPressed: () {
+                          setState(() {
+                            if (gl.anaPtSelectedLayerKeys.length > 1) {
+                              gl.anaPtSelectedLayerKeys.remove(lt.key);
+                              lt.selected = false;
+                              widget.refreshView();
+                            }
+                          });
+                        }))
+                : Container(
+                    decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: _getBackgroundColorForList()),
+                    constraints: const BoxConstraints(
+                      maxWidth: 48,
+                      minWidth: 48,
+                      maxHeight: 48,
+                      minHeight: 48,
+                    ),
+                    padding: EdgeInsets.all(0),
+                    child: IconButton(
+                        icon: const Icon(Icons.chair, size: 28),
+                        onPressed: () {
+                          setState(() {
+                            gl.anaPtSelectedLayerKeys.insert(0, lt.key);
+                            lt.selected = true;
+                            widget.refreshView();
+                          });
+                        }),
+                  ),
+          gl.interfaceSelectedLayerKeys.contains(lt.key)
+              ? Container(
+                  decoration: const BoxDecoration(
+                      shape: BoxShape.circle, color: gl.colorAgroBioTech),
+                  constraints: const BoxConstraints(
+                    maxWidth: 48,
+                    minWidth: 48,
+                    maxHeight: 48,
+                    minHeight: 48,
+                  ),
+                  padding: EdgeInsets.all(0),
+                  child: IconButton(
+                      icon: const Icon(Icons.layers_clear, size: 28),
+                      onPressed: () {
+                        setState(() {
+                          if (gl.interfaceSelectedLayerKeys.length > 1) {
+                            lt.selected = false;
+                            widget.refreshView();
+                            gl.refreshMap(() {
+                              gl.interfaceSelectedLayerKeys.remove(lt.key);
+                            });
+                          }
+                        });
+                      }),
+                )
+              : Container(
+                  decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: _getBackgroundColorForList()),
+                  constraints: const BoxConstraints(
+                    maxWidth: 48,
+                    minWidth: 48,
+                    maxHeight: 48,
+                    minHeight: 48,
+                  ),
+                  padding: EdgeInsets.all(0),
+                  child: IconButton(
+                      icon: const Icon(Icons.layers, size: 28),
+                      onPressed: () {
+                        setState(() {
+                          if (gl.interfaceSelectedLayerKeys.length < 3) {
+                            lt.selected = true;
+                            widget.refreshView();
+                            gl.refreshMap(() {
+                              gl.interfaceSelectedLayerKeys.insert(0, lt.key);
+                            });
+                          } else {
+                            lt.selected = true;
+                            widget.refreshView();
+                            gl.refreshMap(() {
+                              gl.interfaceSelectedLayerKeys.removeLast();
+                              gl.interfaceSelectedLayerKeys.insert(0, lt.key);
+                            });
+                          }
+                        });
+                      }),
+                ),
         ]));
   }
 
@@ -258,9 +310,27 @@ class _CategoryView extends State<CategoryView> {
             extern: mp[key]!.mCategorie == "Externe"));
       }
     }
+
     setState(() {
       _finishedInitializingCategory[widget.category] = true;
     });
+  }
+
+  Color _getBackgroundColorForList() {
+    if (_flipForBackground) {
+      return gl.colorBackground;
+    }
+    return gl.colorBackgroundSecondary;
+  }
+
+  Color _getswitchBackgroundColorForList() {
+    _flipForBackground = !_flipForBackground;
+    return _getBackgroundColorForList();
+  }
+
+  Color _initSwitchBackgroundColorForList() {
+    _flipForBackground = false;
+    return _getBackgroundColorForList();
   }
 
   @override
@@ -287,113 +357,104 @@ class _SelectedLayerView extends State<SelectedLayerView> {
   @override
   Widget build(BuildContext context) {
     {
-      return ListView(
+      return ReorderableListView(
+        buildDefaultDragHandles: false,
+        padding: const EdgeInsets.symmetric(horizontal: 0),
+        onReorder: (int oldIndex, int newIndex) {
+          setState(() {
+            if (oldIndex < newIndex) {
+              newIndex -= 1;
+            }
+            if (gl.interfaceSelectedLayerKeys.length < newIndex + 1 ||
+                gl.interfaceSelectedLayerKeys.length < oldIndex + 1) {
+              return;
+            }
+            gl.refreshMap(() {
+              final String item =
+                  gl.interfaceSelectedLayerKeys.removeAt(oldIndex);
+              gl.interfaceSelectedLayerKeys.insert(newIndex, item);
+            });
+          });
+        },
         children: List<Widget>.generate(
           3,
           (i) => gl.interfaceSelectedLayerKeys.length > i
-              ? ListTile(
-                  leading: Container(
-                    color: Colors.amber,
-                    constraints: BoxConstraints(
-                      maxHeight: MediaQuery.of(context).size.height * .04,
-                      maxWidth: MediaQuery.of(context).size.width * .35,
-                    ),
-                    child: Row(children: <Widget>[
-                      IconButton(
-                        icon: const Icon(Icons.arrow_upward_rounded),
-                        onPressed: () {
-                          setState(() {
-                            if (i > 0) {
-                              gl.refreshMap(() {
-                                String tmp = gl.interfaceSelectedLayerKeys[i];
-                                gl.interfaceSelectedLayerKeys[i] =
-                                    gl.interfaceSelectedLayerKeys[i - 1];
-                                gl.interfaceSelectedLayerKeys[i - 1] = tmp;
-                              });
-                              widget.refreshView();
-                            }
-                          });
-                        },
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.arrow_downward_rounded),
-                        onPressed: () {
-                          setState(() {
-                            if (gl.interfaceSelectedLayerKeys.length > i + 1) {
-                              gl.refreshMap(() {
-                                String tmp = gl.interfaceSelectedLayerKeys[i];
-                                gl.interfaceSelectedLayerKeys[i] =
-                                    gl.interfaceSelectedLayerKeys[i + 1];
-                                gl.interfaceSelectedLayerKeys[i + 1] = tmp;
-                              });
-                              widget.refreshView();
-                            }
-                          });
-                        },
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.layers_clear_rounded),
-                        onPressed: () {
-                          setState(() {
-                            if (gl.interfaceSelectedLayerKeys.length > 1) {
-                              widget.refreshView();
-                              gl.refreshMap(() {
-                                gl.interfaceSelectedLayerKeys
-                                    .remove(gl.interfaceSelectedLayerKeys[i]);
-                              });
-                            }
-                          });
-                        },
-                      ),
-                    ]),
-                  ),
-                  title: Text(
-                    gl.dico.mLayerBases.keys
-                            .contains(gl.interfaceSelectedLayerKeys[i])
-                        ? gl.dico.mLayerBases[gl.interfaceSelectedLayerKeys[i]]!
-                            .mNom!
-                        : gl.interfaceSelectedLayerKeys[i],
-                  ))
+              ? ColoredBox(
+                  key: Key('$i'),
+                  color: gl.colorBackground,
+                  child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Container(
+                          color: gl.colorBackground,
+                          constraints: BoxConstraints(
+                            maxHeight: 48,
+                            maxWidth: MediaQuery.of(context).size.width * .65,
+                          ),
+                          child: Text(
+                            textScaler: TextScaler.linear(1.2),
+                            gl.dico.mLayerBases.keys
+                                    .contains(gl.interfaceSelectedLayerKeys[i])
+                                ? gl
+                                    .dico
+                                    .mLayerBases[
+                                        gl.interfaceSelectedLayerKeys[i]]!
+                                    .mNom
+                                : gl.interfaceSelectedLayerKeys[i],
+                          ),
+                        ),
+                        Container(
+                            color: gl.colorBackground,
+                            constraints: BoxConstraints(
+                              maxHeight:
+                                  MediaQuery.of(context).size.width * .04 > 48
+                                      ? MediaQuery.of(context).size.width * .04
+                                      : 48,
+                              minHeight: 48,
+                              maxWidth: 100,
+                              minWidth: 100,
+                            ),
+                            child: Row(children: [
+                              IconButton(
+                                icon: const Icon(Icons.layers_clear_rounded,
+                                    size: 28),
+                                onPressed: () {
+                                  setState(() {
+                                    if (gl.interfaceSelectedLayerKeys.length >
+                                        1) {
+                                      widget.refreshView();
+                                      gl.refreshMap(() {
+                                        gl.interfaceSelectedLayerKeys.remove(
+                                            gl.interfaceSelectedLayerKeys[i]);
+                                      });
+                                    }
+                                  });
+                                },
+                              ),
+                              Container(
+                                width: 48,
+                                height: 48,
+                                padding: const EdgeInsets.symmetric(),
+                                child: ReorderableDragStartListener(
+                                  index: i,
+                                  child: const Icon(Icons.drag_indicator,
+                                      size: 28),
+                                ),
+                              ),
+                            ])),
+                      ]),
+                )
               : ListTile(
-                  leading: Container(
+                  key: Key('$i'),
+                  /*leading: Container(
                       constraints: BoxConstraints(
                     maxHeight: MediaQuery.of(context).size.height * .04,
                     maxWidth: MediaQuery.of(context).size.width * .35,
-                  )),
+                  )),*/
                   title: const Text('Pas de couche selectionnée.'),
                 ),
         ),
       );
     }
-  }
-}
-
-class SearchBarView extends StatefulWidget {
-  SearchController _searchIt = SearchController();
-  SearchBarView({super.key});
-  @override
-  State<SearchBarView> createState() => _SearchBarView();
-}
-
-class _SearchBarView extends State<SearchBarView> {
-  @override
-  Widget build(BuildContext context) {
-    return SearchAnchor(builder: (context, _searchIt) {
-      return SearchBar();
-    }, suggestionsBuilder: (context, _searchIt) {
-      return <Widget>[
-        Tooltip(
-          message: 'Change brightness mode',
-          child: IconButton(
-            onPressed: () {
-              setState(() {});
-            },
-            icon: const Icon(Icons.wb_sunny_outlined),
-            selectedIcon: const Icon(Icons.brightness_2_outlined),
-          ),
-        )
-      ];
-    });
-    //return SearchBar(controller: widget._searchIt,);
   }
 }
