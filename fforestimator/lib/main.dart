@@ -139,22 +139,6 @@ class _MyApp extends State<MyApp> {
                             ),
                     );
                   }).toList(),
-                  ...gl.dico.getLayersWithDoc().map<GoRoute>((layerBase item) {
-                    return GoRoute(
-                      path: item.getFicheRoute(),
-                      builder: (context, state) => (Platform.isAndroid ||
-                              Platform.isIOS)
-                          ? PDFScreen(
-                              path: _pathExternalStorage + "/" + item.mPdfName,
-                              titre: "documentation carte " + item.mNomCourt)
-                          : Scaffold(
-                              appBar: AppBar(
-                                title: Text("view pdf"),
-                              ),
-                              body: Text("toto"),
-                            ),
-                    );
-                  }).toList(),
                 ],
               )
             ],
@@ -165,10 +149,31 @@ class _MyApp extends State<MyApp> {
             routes: [
               // top route inside branch
               GoRoute(
-                path: '/catalogue',
+                path: "/" + gl.basePathbranchA,
                 pageBuilder: (context, state) => const NoTransitionPage(
                   child: CatalogueLayerView(),
                 ),
+                routes:
+                    gl.dico.getLayersWithDoc().map<GoRoute>((layerBase item) {
+                  return GoRoute(
+                    path: item.getFicheRoute() + "/:currentPage",
+                    name: item.mCode,
+                    builder: (context, state) => (Platform.isAndroid ||
+                            Platform.isIOS)
+                        ? PDFScreen(
+                            path: _pathExternalStorage + "/" + item.mPdfName,
+                            titre: "documentation", //+ item.mNomCourt,
+                            currentPage:
+                                int.parse(state.pathParameters['currentPage']!),
+                          )
+                        : Scaffold(
+                            appBar: AppBar(
+                              title: Text("view pdf"),
+                            ),
+                            body: Text("toto"),
+                          ),
+                  );
+                }).toList(),
               ),
             ],
           ),

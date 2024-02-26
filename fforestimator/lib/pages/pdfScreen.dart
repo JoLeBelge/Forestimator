@@ -5,8 +5,10 @@ import 'dart:async';
 class PDFScreen extends StatefulWidget {
   late final String path;
   late final String titre;
+  late final int currentPage;
 
-  PDFScreen({Key? key, required this.path, required this.titre})
+  PDFScreen(
+      {Key? key, required this.path, required this.titre, this.currentPage = 0})
       : super(key: key);
 
   _PDFScreenState createState() => _PDFScreenState();
@@ -16,7 +18,7 @@ class _PDFScreenState extends State<PDFScreen> with WidgetsBindingObserver {
   final Completer<PDFViewController> _controller =
       Completer<PDFViewController>();
   int? pages = 0;
-  int? currentPage = 0;
+  //int? currentPage = 0;
   bool isReady = false;
   String errorMessage = '';
 
@@ -41,7 +43,7 @@ class _PDFScreenState extends State<PDFScreen> with WidgetsBindingObserver {
             autoSpacing: false,
             pageFling: true,
             pageSnap: true,
-            defaultPage: currentPage!,
+            defaultPage: widget.currentPage,
             fitPolicy: FitPolicy.BOTH,
             preventLinkNavigation:
                 false, // if set to true the link is handled in flutter
@@ -72,7 +74,7 @@ class _PDFScreenState extends State<PDFScreen> with WidgetsBindingObserver {
             onPageChanged: (int? page, int? total) {
               //print('page change: $page/$total');
               setState(() {
-                currentPage = page;
+                widget.currentPage = page!;
               });
             },
           ),
