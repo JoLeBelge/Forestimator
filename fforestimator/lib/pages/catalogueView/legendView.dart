@@ -42,7 +42,7 @@ class _LegendView extends State<LegendView> {
                   "Consulter la documentation relative à la cette couche cartographique"),
               leading: IconButton(
                   onPressed: () {
-                    context.goNamed(widget.layerKey, pathParameters: {
+                    GoRouter.of(context).goNamed(widget.layerKey, pathParameters: {
                       'currentPage': gl.dico
                           .getLayerBase(widget.layerKey)
                           .mPdfPage
