@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:fforestimator/dico/ess.dart';
 import 'dart:async';
+import 'package:fforestimator/globals.dart' as gl;
 
 class aptitude {
   late int mCodeNum;
@@ -115,7 +116,7 @@ class layerBase {
         condition = map['condition'],
         mTypeVar = map['TypeVar'],
         mGain = map['gain'] == null ? 66.6 : map['gain'],
-        mPdfPage = map['pdfPage'] == null ? 1 : map['pdfPage'],
+        mPdfPage = map['pdfPage'] == null ? 0 : map['pdfPage'] - 1,
         mPdfName = map['pdfName'] == null ? "" : map['pdfName'],
         mDicoVal = {},
         mDicoCol = {};
@@ -145,8 +146,12 @@ class layerBase {
     return mPdfName != "";
   }
 
+  //String getFicheRoute({bool complete = false}) {
+  //if (complete) {
+  //  return "/" + gl.basePathbranchA + "/documentation/" + mCode;
+  //}
   String getFicheRoute() {
-    return mCode;
+    return "documentation/" + mCode;
   }
 
   String getValLabel(int aRastValue) {

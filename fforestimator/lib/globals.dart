@@ -8,6 +8,8 @@ import 'package:go_router/go_router.dart';
 
 late dicoAptProvider dico;
 
+String basePathbranchA = "catalogue";
+
 String defaultLayer = "IGN";
 // list to memorize the keys of selected layer to show in interface.
 List<String> interfaceSelectedLayerKeys = [defaultLayer];

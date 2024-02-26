@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fforestimator/globals.dart' as gl;
+import 'package:go_router/go_router.dart';
 
 class LegendView extends StatefulWidget {
   final String layerKey;
@@ -35,6 +36,24 @@ class _LegendView extends State<LegendView> {
       ),
       child: Column(
         children: [
+          if (gl.dico.getLayerBase(widget.layerKey).hasDoc())
+            ListTile(
+              title: Text(
+                  "Consulter la documentation relative à la cette couche cartographique"),
+              leading: IconButton(
+                  onPressed: () {
+                    context.goNamed(widget.layerKey, pathParameters: {
+                      'currentPage': gl.dico
+                          .getLayerBase(widget.layerKey)
+                          .mPdfPage
+                          .toString()
+                    });
+                    //context.go(gl.dico
+                    //   .getLayerBase(widget.layerKey)
+                    //  .getFicheRoute(complete: true));
+                  },
+                  icon: Icon(Icons.access_alarm)),
+            ),
           Container(
               constraints: BoxConstraints(
                   maxHeight: MediaQuery.of(context).size.height * .03),
@@ -96,8 +115,11 @@ class _LegendView extends State<LegendView> {
       double graduatedHeight = MediaQuery.of(context).size.height * .02;
       _magicNumber = 37;
       _graduatedMode = true;
-      _constraintsLeft = _initConstraints(graduatedHeight, graduatedHeight,
-          widget.constraintsText.maxWidth * 1.15, widget.constraintsText.maxWidth * 1.15);
+      _constraintsLeft = _initConstraints(
+          graduatedHeight,
+          graduatedHeight,
+          widget.constraintsText.maxWidth * 1.15,
+          widget.constraintsText.maxWidth * 1.15);
       _constraintsRight = _initConstraints(
           heightPerColorTile,
           heightPerColorTile,
