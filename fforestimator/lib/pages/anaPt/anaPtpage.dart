@@ -67,7 +67,7 @@ class layerAnaPtListTile extends StatelessWidget {
       ]),
       onTap: () {
         if (l.hasDoc()) {
-          context.go("/" + l.getFicheRoute());
+          GoRouter.of(context).push("/" + l.getFicheRoute());
         }
       },
     );
@@ -145,7 +145,7 @@ class essencesListView extends StatelessWidget {
                       "La situation topographique provoque un effet de compensation (positif ou négatif) sur l'aptitude de cette essence")
               : null,
           onTap: () {
-            context.go(
+            GoRouter.of(context).push(
                 "/" + gl.dico.getEss(code.elementAt(index)).getFicheRoute());
           },
         );

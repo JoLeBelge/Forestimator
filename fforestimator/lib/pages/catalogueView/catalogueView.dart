@@ -379,9 +379,11 @@ class _SelectedLayerView extends State<SelectedLayerView> {
         children: List<Widget>.generate(
           3,
           (i) => gl.interfaceSelectedLayerKeys.length > i
-              ? ColoredBox(
+              ? Card(
                   key: Key('$i'),
                   color: gl.colorBackground,
+                  surfaceTintColor: gl.colorBackgroundSecondary,
+                  shadowColor: const Color.fromARGB(255, 44, 44, 44),
                   child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
