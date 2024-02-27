@@ -3,22 +3,19 @@ To do list fforestimator
 
 priorité ; afficher toutes les pages de documentations dans branche B  avec appel depuis la branche A
 
--légende des layers ; uniquement si couleur associée dans le dictionnaire (pour retirer les légendes trop longue de CNSW)
-
 COURT TERME
 Jo -> legender le logo compensation matrice aptitude -> tooltip onTap?
-Jo -> documentation pour layers ; continuer, utiliser page number
 
 TT -> CatalogueView
-MOYEN TERME-> ajout d'un bouton de sélection des layers pour le téléchargement (utilisation offline). pareil, on stoque les codes layers dans un vecteur qui sera utilisé pour le bulk download  / usage offline.
+MOYEN TERME-> ajout d'un bouton de sélection des layers pour le téléchargement (utilisation offline). pareil, on stoque les codes layers dans un vecteur qui sera utilisé pour le bulk download  / usage offline. -> commencer par utiliser la selection pour l'analyse ponctuelle.
 	
 TT -> création nouvelle page pour gestion de projet offline avec téléchargement des rasters.
-
--Export du résulat de l'analyse ponctuelle sous format pdf.
 
 
 MOYEN TERME
 JO -> FMTC des tuiles WMS
 Jo -> bulk download raster clipped (dans une bd sqlite en BLOB?)  
 Jo-> lecture tif sous android (dart Images?)
+
+Jo ou TT -Export du résulat de l'analyse ponctuelle sous format pdf.
 

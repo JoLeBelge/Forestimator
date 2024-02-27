@@ -19,7 +19,10 @@ class Ess {
   // clé ; zone bioclim/ région. Value ; une map -> clé ; id situation topo. valeur ; code risque
   Map<int, Map<int, int>> mRisqueTopo;
 
-  String getFicheRoute() {
+  String getFicheRoute({bool complete = false}) {
+    if (complete) {
+      return "/" + gl.basePathbranchA + "/fiche-esssence/" + mCode;
+    }
     return 'fiche-esssence/' + mCode;
   }
 
