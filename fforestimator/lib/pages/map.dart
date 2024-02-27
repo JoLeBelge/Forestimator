@@ -141,7 +141,7 @@ class _MapPageState extends State<mapPage> {
                   await _runAnaPt(epsg4326.transform(epsg31370,
                       proj4.Point(x: point.longitude, y: point.latitude))),
                   _updatePtMarker(point),
-                  context.go("/anaPt"),
+                  GoRouter.of(context).push("/anaPt"),
                 },
                 crs: epsg31370CRS,
                 initialZoom: 8.0,
