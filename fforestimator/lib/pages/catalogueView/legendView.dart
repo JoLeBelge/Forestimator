@@ -64,7 +64,7 @@ class _LegendView extends State<LegendView> {
                       .getNameAndPrefix()),
               leading: IconButton(
                   onPressed: () {
-                    context.go(gl.dico
+                    GoRouter.of(context).push(gl.dico
                         .getEss(
                             gl.dico.getLayerBase(widget.layerKey).getEssCode())
                         .getFicheRoute(complete: true));

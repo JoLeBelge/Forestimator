@@ -67,7 +67,7 @@ class layerAnaPtListTile extends StatelessWidget {
       ]),
       onTap: () {
         if (l.hasDoc()) {
-          GoRouter.of(context).push("/" + l.getFicheRoute());
+          GoRouter.of(context).push("/" + gl.basePathbranchA + '/' + l.getFicheRoute() + '/0');
         }
       },
     );

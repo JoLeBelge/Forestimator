@@ -155,6 +155,7 @@ class _MyApp extends State<MyApp> {
                 ),
                 routes: [
                   ...gl.dico.getLayersWithDoc().map<GoRoute>((layerBase item) {
+                    print("HALLLOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO" + item.getFicheRoute());
                     return GoRoute(
                       path: item.getFicheRoute() + "/:currentPage",
                       name: item.mCode,
