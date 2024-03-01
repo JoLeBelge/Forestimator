@@ -80,7 +80,7 @@ class groupe_couche {
 
 class layerBase {
   late String mNom, mNomCourt;
-  late bool mExpert;
+  late bool mExpert, mVisu;
   late String mCode;
   late String mUrl, mWMSLayerName, mWMSattribution, mTypeGeoservice;
   late String mGroupe;
@@ -102,6 +102,7 @@ class layerBase {
         mNomCourt = map['NomCourt'],
         //mPathRaster = map['Dir3'], //+ '/' + map['Nom'], // pas si simple, chemin d'accès sur le mobile. Utile que si bulk download des raster
         mExpert = map['expert'] == 0 ? false : true,
+        mVisu = map['visu'] == 0 ? false : true,
         mGroupe = map['groupe'],
         mUrl = map['WMSurl'] == null ? "" : map['WMSurl'],
         mWMSLayerName = map['WMSlayer'] == null ? "" : map['WMSlayer'],
@@ -154,6 +155,14 @@ class layerBase {
     return "documentation/" + mCode;
   }
 
+  String getEssCode() {
+    String es = "toto";
+    if (mGroupe == "APT_FEE" || mGroupe == "APT_CS") {
+      es = mCode.substring(0, 2);
+    }
+    return es;
+  }
+
   String getValLabel(int aRastValue) {
     String aRes = "";
     // attention aux MNH qui ont à la fois un dico pour la légende couleur, et à la fois un gain (pour la vrai valeur)
@@ -168,6 +177,14 @@ class layerBase {
     }
 
     return aRes;
+  }
+
+  List<int> getDicoValForLegend() {
+    // garder uniquement les valeurs pour lesquelles on a à la fois la légende texte et la couleur associée
+    List<int> l1 = List<int>.from(mDicoVal.keys);
+    List<int> l2 = List<int>.from(mDicoCol.keys);
+    l1.removeWhere((item) => !l2.contains(item));
+    return l1;
   }
 
   Color getValColor(int aRastValue) {

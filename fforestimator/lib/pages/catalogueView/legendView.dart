@@ -48,11 +48,28 @@ class _LegendView extends State<LegendView> {
                           .mPdfPage
                           .toString()
                     });
-                    //context.go(gl.dico
-                    //   .getLayerBase(widget.layerKey)
-                    //  .getFicheRoute(complete: true));
                   },
-                  icon: Icon(Icons.access_alarm)),
+                  icon: Icon(Icons.picture_as_pdf)),
+            ),
+          if ((gl.dico.getLayerBase(widget.layerKey).mGroupe == "APT_FEE" ||
+                  gl.dico.getLayerBase(widget.layerKey).mGroupe == "APT_CS") &&
+              gl.dico
+                  .getEss(gl.dico.getLayerBase(widget.layerKey).getEssCode())
+                  .hasFEEapt())
+            ListTile(
+              title: Text("Consulter la fiche-essence " +
+                  gl.dico
+                      .getEss(
+                          gl.dico.getLayerBase(widget.layerKey).getEssCode())
+                      .getNameAndPrefix()),
+              leading: IconButton(
+                  onPressed: () {
+                    context.go(gl.dico
+                        .getEss(
+                            gl.dico.getLayerBase(widget.layerKey).getEssCode())
+                        .getFicheRoute(complete: true));
+                  },
+                  icon: Icon(Icons.picture_as_pdf)),
             ),
           Container(
               constraints: BoxConstraints(
@@ -62,8 +79,11 @@ class _LegendView extends State<LegendView> {
             Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: List.generate(
-                    gl.dico.mLayerBases[widget.layerKey]!.mDicoVal.length, (i) {
-                  var key = gl.dico.mLayerBases[widget.layerKey]!.mDicoVal.keys
+                    gl.dico.mLayerBases[widget.layerKey]!
+                        .getDicoValForLegend()
+                        .length, (i) {
+                  var key = gl.dico.mLayerBases[widget.layerKey]!
+                      .getDicoValForLegend()
                       .elementAt(i);
                   if (_graduatedMode) {
                     if (i % _magicNumber == 0 ||

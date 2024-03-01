@@ -153,27 +153,51 @@ class _MyApp extends State<MyApp> {
                 pageBuilder: (context, state) => const NoTransitionPage(
                   child: CatalogueLayerView(),
                 ),
-                routes:
-                    gl.dico.getLayersWithDoc().map<GoRoute>((layerBase item) {
-                  return GoRoute(
-                    path: item.getFicheRoute() + "/:currentPage",
-                    name: item.mCode,
-                    builder: (context, state) => (Platform.isAndroid ||
-                            Platform.isIOS)
-                        ? PDFScreen(
-                            path: _pathExternalStorage + "/" + item.mPdfName,
-                            titre: "documentation", //+ item.mNomCourt,
-                            currentPage:
-                                int.parse(state.pathParameters['currentPage']!),
-                          )
-                        : Scaffold(
-                            appBar: AppBar(
-                              title: Text("view pdf"),
+                routes: [
+                  ...gl.dico.getLayersWithDoc().map<GoRoute>((layerBase item) {
+                    return GoRoute(
+                      path: item.getFicheRoute() + "/:currentPage",
+                      name: item.mCode,
+                      builder: (context, state) => (Platform.isAndroid ||
+                              Platform.isIOS)
+                          ? PDFScreen(
+                              path: _pathExternalStorage + "/" + item.mPdfName,
+                              titre: "documentation", //+ item.mNomCourt,
+                              currentPage: int.parse(
+                                  state.pathParameters['currentPage']!),
+                            )
+                          : Scaffold(
+                              appBar: AppBar(
+                                title: Text("view pdf"),
+                              ),
+                              body: Text("toto"),
                             ),
-                            body: Text("toto"),
-                          ),
-                  );
-                }).toList(),
+                    );
+                  }).toList(),
+                  ...gl.dico.getFEEess().map<GoRoute>((Ess item) {
+                    return GoRoute(
+                      path: item.getFicheRoute(),
+                      builder: (context, state) =>
+                          (Platform.isAndroid || Platform.isIOS)
+                              ? PDFScreen(
+                                  path: _pathExternalStorage +
+                                      "/FEE-" +
+                                      item.mCode +
+                                      ".pdf",
+                                  titre: item.mNomFR,
+                                )
+                              : Scaffold(
+                                  appBar: AppBar(
+                                    title: Text("view pdf"),
+                                  ),
+                                  body: Text(_pathExternalStorage +
+                                      "/FEE-" +
+                                      item.mCode +
+                                      ".pdf"),
+                                ),
+                    );
+                  }).toList(),
+                ],
               ),
             ],
           ),

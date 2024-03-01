@@ -150,7 +150,9 @@ public:
     // hauteur en mètres de la couche MNH2019 que j'ai convertie en 8bits
     double H(int aVal,double aGain=0.2){
         double aRes(0.0);
-        if (aVal<255 && aVal>0){aRes=aVal*aGain;}
+        // attention, jai des MNH en 16bit donc on peut dépasser 255
+        //if (aVal<255 && aVal>0){aRes=aVal*aGain;}
+        if (aVal>0){aRes=aVal*aGain;}
         //std::cout << " hauteur DN " << aVal << " devient " << aRes << std::endl;
         return aRes;
     }

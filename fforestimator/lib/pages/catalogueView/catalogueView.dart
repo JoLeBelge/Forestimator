@@ -203,7 +203,7 @@ class _CategoryView extends State<CategoryView> {
                     ),
                     padding: EdgeInsets.all(0),
                     child: IconButton(
-                        icon: const Icon(Icons.show_chart, size: 28),
+                        icon: const Icon(Icons.location_on, size: 28),
                         onPressed: () {
                           setState(() {
                             if (gl.anaPtSelectedLayerKeys.length > 1) {
@@ -225,7 +225,7 @@ class _CategoryView extends State<CategoryView> {
                     ),
                     padding: EdgeInsets.all(0),
                     child: IconButton(
-                        icon: const Icon(Icons.chair, size: 28),
+                        icon: const Icon(Icons.location_off, size: 28),
                         onPressed: () {
                           setState(() {
                             gl.anaPtSelectedLayerKeys.insert(0, lt.key);
@@ -299,6 +299,7 @@ class _CategoryView extends State<CategoryView> {
     for (var key in mp.keys) {
       if (widget.category.filter == mp[key]!.mGroupe &&
           !mp[key]!.mExpert &&
+          mp[key]!.mVisu &&
           mp[key]?.mTypeGeoservice == "") {
         if (_layerTiles[widget.category] == null) {
           _layerTiles[widget.category] = [];

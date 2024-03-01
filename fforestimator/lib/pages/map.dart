@@ -146,7 +146,7 @@ class _MapPageState extends State<mapPage> {
                 crs: epsg31370CRS,
                 initialZoom: 8.0,
                 maxZoom: 14,
-                minZoom: 7,
+                minZoom: 4,
                 initialCenter: latlonEpioux,
                 cameraConstraint: CameraConstraint.contain(
                     bounds: LatLngBounds.fromPoints([latlonBL, latlonTR])),
