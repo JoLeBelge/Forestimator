@@ -149,13 +149,12 @@ class _MyApp extends State<MyApp> {
             routes: [
               // top route inside branch
               GoRoute(
-                path: "/" + gl.basePathbranchA,
+                path: "/" + gl.basePathbranchB,
                 pageBuilder: (context, state) => const NoTransitionPage(
                   child: CatalogueLayerView(),
                 ),
                 routes: [
                   ...gl.dico.getLayersWithDoc().map<GoRoute>((layerBase item) {
-                    print("HALLLOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO" + item.getFicheRoute());
                     return GoRoute(
                       path: item.getFicheRoute() + "/:currentPage",
                       name: item.mCode,
