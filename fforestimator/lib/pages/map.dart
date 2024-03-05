@@ -146,7 +146,7 @@ class _MapPageState extends State<mapPage> {
                 crs: epsg31370CRS,
                 initialZoom: 8.0,
                 maxZoom: 14,
-                minZoom: 4,
+                minZoom: 0,
                 initialCenter: latlonEpioux,
                 cameraConstraint: CameraConstraint.contain(
                     bounds: LatLngBounds.fromPoints([latlonBL, latlonTR])),
@@ -169,6 +169,7 @@ class _MapPageState extends State<mapPage> {
                       .map<Widget>((String codeLayer) {
                     layerBase l = gl.dico.getLayerBase(codeLayer);
                     return TileLayer(
+                      tileBuilder: coordinateDebugTileBuilder,
                       userAgentPackageName: "com.example.fforestimator",
                       wmsOptions: WMSTileLayerOptions(
                         baseUrl: l.mUrl + "?",
