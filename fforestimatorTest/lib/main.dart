@@ -15,8 +15,6 @@ String out = '/home/jo/Images/chatGPT_crop.png';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // File fileIm = File('/home/jo/Images/chatGPT.png');
-
   final File fileIm = File(
       '/home/jo/Documents/carteApt/colorMappingTest/out/aptitudeFEE_BV.png');
   gl.Fullimage = img.PngDecoder().decode(await fileIm.readAsBytes())!;

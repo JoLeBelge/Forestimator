@@ -17,7 +17,6 @@ class cropImFileTileProvider extends TileProvider {
     final nwPoint = coordinates.scaleBy(tileSizePoint);
     final nwCoords = mycrs.pointToLatLng(nwPoint, coordinates.z.toDouble());
     final nw = mycrs.projection.project(nwCoords);
-
     Bounds<double> b = mycrs.projection.bounds!;
 
     /*print("nord w " + nw.toString());
@@ -45,14 +44,8 @@ class cropImFileTileProvider extends TileProvider {
 
     img.Image cropped = img.copyCrop(gl.Fullimage,
         x: xOffset, y: yOffset, width: initImSize, height: initImSize);
-    //if (coordinates.z < 7) {
     img.Image resized = img.copyResize(cropped, width: tileSize);
     return MemoryImage(img.encodePng(resized));
-    /*} else {
-      return MemoryImage(img.encodePng(cropped));
-    }*/
-
-    //    x: xOffset, y: yOffset, width: tileSize, height: tileSize);
-    //File(out).writeAsBytes(img.encodePng(cropped));
+  
   }
 }

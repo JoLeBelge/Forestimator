@@ -1,8 +1,6 @@
 To do list fforestimator
 ------------------------
 
-ok ; afficher toutes les pages de documentations dans branche B  avec appel depuis la branche A
-
 COURT TERME
 Jo -> legender le logo compensation matrice aptitude -> tooltip onTap?
 
