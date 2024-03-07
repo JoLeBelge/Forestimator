@@ -84,7 +84,9 @@ flutter:
   # https://flutter.dev/assets-and-images/#resolution-aware
 
   #onts:
-
+  assets:
+     - assets/aptitudeFEE_BV.png  
+     - assets/aptitudeFEE_BV_DZ2.png  
 
   #       - asset: fonts/Schyler-Italic.ttf
   #         style: italic

@@ -4,16 +4,18 @@ To do list fforestimator
 COURT TERME
 Jo -> legender le logo compensation matrice aptitude -> tooltip onTap?
 
+gestion mapController avec et sans position GPS ; s'inspirer de Qfield
+
 TT -> CatalogueView
 MOYEN TERME-> ajout d'un bouton de sélection des layers pour le téléchargement (utilisation offline). pareil, on stoque les codes layers dans un vecteur qui sera utilisé pour le bulk download  / usage offline. -> commencer par utiliser la selection pour l'analyse ponctuelle.
-	
-TT -> création nouvelle page pour gestion de projet offline avec téléchargement des rasters.
 
 
-MOYEN TERME
-JO -> FMTC des tuiles WMS
-Jo -> bulk download raster clipped (dans une bd sqlite en BLOB?)  
-Jo-> lecture tif sous android (dart Images?)
+MOYEN TERME - offline mapping 
+TileLayer pour une carte png non tuilée -> PngDecoder->decode() très lent, implémenter quelque chose du style  PngDecoder->decodeImagePart(x0, y0) pour ne lire qu'une petite partie.
+
+Lecture d'une valeur d'un pixel pour les raster (anaPt offline) -> pareil, créé un TiffDecoder spécifique qui ne lit que la partie de l'image qui nous intéresse.
+
+Jo -> bulk download des raster pour anaPonctuelle
 
 Jo ou TT -Export du résulat de l'analyse ponctuelle sous format pdf.
 

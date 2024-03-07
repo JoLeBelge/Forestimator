@@ -2,13 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:test_fluttermap/globals.dart' as gl;
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
-import 'package:path/path.dart' as path;
+import 'package:path/path.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:proj4dart/proj4dart.dart' as proj4;
 import 'dart:math';
 import 'package:image/image.dart' as img;
 import 'package:test_fluttermap/cropImTileProvider.dart';
+import 'package:flutter/services.dart';
 
 String out = '/home/jo/Images/chatGPT_crop.png';
 
@@ -17,10 +18,27 @@ void main() async {
 
   final File fileIm = File(
       '/home/jo/Documents/carteApt/colorMappingTest/out/aptitudeFEE_BV.png');
-  gl.Fullimage = img.PngDecoder().decode(await fileIm.readAsBytes())!;
+
+  //await fileIm.readAsBytes();
+  // une image un peu plus petite car sinon ça ne veux pas fonctionner sur mon emulator ou sur mon smartphone
+  ByteData data =
+      await rootBundle.load(url.join("assets", "aptitudeFEE_BV_DZ2.png"));
+
+  /*myPngDecoder _decoder = myPngDecoder();
+  _decoder.startDecode(data.buffer.asUint8List());
+
+  // je pense que c'est la position du début de chacun des chunks du fichier (offset). en tout cas nombre constant entre chacunes des valeurs, un peu plus élevé que le nombre de colonne du raster
+
+  print("decoder idat : " + _decoder.infoI.idat.toString());*/
+
+  gl.Fullimage = img.PngDecoder().decode(data.buffer.asUint8List())!;
+
+  //img.TiffDecoder().startDecode();
+  /*img.PngDecoder().decode(bytes)
+
   img.Image cropped =
       img.copyCrop(gl.Fullimage, x: 0, y: 0, width: 100, height: 100);
-  File(out).writeAsBytes(img.encodePng(cropped));
+  File(out).writeAsBytes(img.encodePng(cropped));*/
 
   runApp(const mapPage());
 }
@@ -72,8 +90,8 @@ class _MapPageState extends State<mapPage> {
         Point<double>(42250.0, 21170.0)
       ]); // ATTENTION sans l'origine définie ici, les tuiles partent de la position (0,0) ce qui est incompatible avec les tuiles résultant de gdla2tiles
 
-  img.Image cropped =
-      img.copyCrop(gl.Fullimage, x: 0, y: 0, width: 256, height: 256);
+  //img.Image cropped =
+  //  img.copyCrop(gl.Fullimage, x: 0, y: 0, width: 256, height: 256);
 
   @override
   void initState() {
@@ -149,8 +167,8 @@ class _MapPageState extends State<mapPage> {
                   urlTemplate:
                       "/home/jo/Documents/carteApt/colorMappingTest/out/tile4/{z}/{x}/{y}.png",
                   //maxNativeZoom: 7,
-                  minNativeZoom: 6,
-                  // minZoom: 6,
+                  minNativeZoom: 8,
+                  minZoom: 8,
                 ),
                 if (true)
                   TileLayer(
