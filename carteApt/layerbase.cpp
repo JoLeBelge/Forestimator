@@ -819,6 +819,31 @@ int rasterFiles::getValue(double x, double y){
     return aRes;
 }
 
+void layerBase::createRasterColorInterpPalette(GDALRasterBand * aBand){
+
+    aBand->SetColorInterpretation(GCI_PaletteIndex);
+
+    GDALColorTable colors = GDALColorTable();
+    GDALColorEntry nd;
+    nd.c1=255;
+    nd.c2=255;
+    nd.c3=255;
+    nd.c4=0;
+    colors.SetColorEntry(0,&nd);
+
+    // set color for each value
+    for (auto kv : mDicoCol){
+    //    int, std::shared_ptr<color>
+    std::shared_ptr<color> col = kv.second;
+    GDALColorEntry e;
+    e.c1=col->mR;
+    e.c2=col->mG;
+    e.c3=col->mB;
+    colors.SetColorEntry(kv.first,&e);
+    }
+    aBand->SetColorTable(&colors);
+}
+
 
 double rasterFiles::getValueDouble(double x, double y){
 

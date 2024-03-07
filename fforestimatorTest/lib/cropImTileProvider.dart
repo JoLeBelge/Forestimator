@@ -30,7 +30,7 @@ class cropImFileTileProvider extends TileProvider {
 
     //print("x y offset : " + xOffset.toString() + " , " + yOffset.toString());
     */
-    double resolution = 20.0;
+    double resolution = 10.0;
     int xOffset = ((nw.x - b.topLeft.x) / resolution).round();
     int yOffset = ((b.bottomRight.y - nw.y) / resolution)
         .round(); //--> soit-disant bottomRigth mais contient le ymax (top dans src donc)

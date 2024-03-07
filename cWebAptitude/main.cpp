@@ -46,6 +46,8 @@ int launchForestimator(int argc, char **argv)
 
         // exemple http://localhost:8085/api/clipRast/layerCode/EP_FEE/xmin/200000.0/ymin/80000.0/xmax/250000.0/ymax/100000.0/toto.tif
         server.addResource(&rClipRaster, "/api/clipRast/layerCode/${layerCode}/xmin/${xmin}/ymin/${ymin}/xmax/${xmax}/ymax/${ymax}");
+        server.addResource(&rClipRaster, "/api/clipRast/layerCode/${layerCode}/");
+        // pour créer le raster avec palette de couleur (fforestimator)
 
         // http://localhost:8085/api/anaPt/layers/EP_FEE+EP_CS+MNH2019+CNSW/x/200000.3/y/80000.1
         server.addResource(&anaPonctResource, "/api/anaPt/layers/${listLayerCode}/x/${x}/y/${y}");

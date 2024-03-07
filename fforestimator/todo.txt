@@ -12,10 +12,12 @@ MOYEN TERME-> ajout d'un bouton de sélection des layers pour le téléchargemen
 
 MOYEN TERME - offline mapping 
 TileLayer pour une carte png non tuilée -> PngDecoder->decode() très lent, implémenter quelque chose du style  PngDecoder->decodeImagePart(x0, y0) pour ne lire qu'une petite partie.
+--> j'ai essayé mais c'est obscur car il faut décompressé les chunks avant de comprendre le nombres de pixels que ceux-ci couvrent, donc pas évident.
+--> mais tifDecoder plus efficace, beaucoup plus rapide (5x plus rapide sur linux, 3x sur android Core3)
 
-Lecture d'une valeur d'un pixel pour les raster (anaPt offline) -> pareil, créé un TiffDecoder spécifique qui ne lit que la partie de l'image qui nous intéresse.
+Lecture d'une valeur d'un pixel pour les raster (anaPt offline) -> pareil, créer un TiffDecoder spécifique qui ne lit que la partie de l'image qui nous intéresse.--> la TifImage est découpée en chunk/tuile qui fonc une ligne à chaque fois, donc très facile de ne lire que la ligne qui nous intéresse!
 
-Jo -> bulk download des raster pour anaPonctuelle
+TT -> interface graphique et réalisation du download des raster pour anaPonctuelle/ visulation offline
 
 Jo ou TT -Export du résulat de l'analyse ponctuelle sous format pdf.
 

@@ -310,6 +310,8 @@ public:
         return aRes;
     }
 
+    void createRasterColorInterpPalette(GDALRasterBand * aBand);
+
 protected:
     TypeCarte mTypeCarte;
     TypeVar mTypeVar; // var continue ou discontinue, pour le calcul de statistique

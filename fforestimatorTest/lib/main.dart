@@ -10,33 +10,40 @@ import 'dart:math';
 import 'package:image/image.dart' as img;
 import 'package:test_fluttermap/cropImTileProvider.dart';
 import 'package:flutter/services.dart';
+import 'myPngDecoder.dart';
 
 String out = '/home/jo/Images/chatGPT_crop.png';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  final File fileIm = File(
-      '/home/jo/Documents/carteApt/colorMappingTest/out/aptitudeFEE_BV.png');
+  final File fileIm =
+      File('/home/jo/Documents/carteApt/colorMappingTest/aptitudeFEE_BV.tif');
 
-  //await fileIm.readAsBytes();
-  // une image un peu plus petite car sinon ça ne veux pas fonctionner sur mon emulator ou sur mon smartphone
+  // un tif avec une palette de couleur qui correspond au dicocol de la layer base. TifDecoder se charge d'appliquer cette palette.
   ByteData data =
-      await rootBundle.load(url.join("assets", "aptitudeFEE_BV_DZ2.png"));
+      await rootBundle.load(url.join("assets", "BV_FEE_colorP.tif"));
 
   /*myPngDecoder _decoder = myPngDecoder();
   _decoder.startDecode(data.buffer.asUint8List());
-
   // je pense que c'est la position du début de chacun des chunks du fichier (offset). en tout cas nombre constant entre chacunes des valeurs, un peu plus élevé que le nombre de colonne du raster
-
   print("decoder idat : " + _decoder.infoI.idat.toString());*/
 
-  gl.Fullimage = img.PngDecoder().decode(data.buffer.asUint8List())!;
+  if (false) {
+    final stopwatch = Stopwatch()..start();
+    gl.Fullimage = myPngDecoder(x0: 5000, y0: 2000, wSub: 500, hSub: 500)
+        .decode(data.buffer.asUint8List())!;
+    print('myPngDecode with 500x500 pix + executed in ${stopwatch.elapsed}');
+    File(out).writeAsBytes(img.encodePng(gl.Fullimage));
+    stopwatch.start();
+    gl.Fullimage = img.PngDecoder().decode(data.buffer.asUint8List())!;
+    print('PngDecode executed in ${stopwatch.elapsed}');
+  }
+  final stopwatch = Stopwatch()..start();
+  gl.Fullimage = img.TiffDecoder().decode(data.buffer.asUint8List())!;
+  print('TifDecode executed in ${stopwatch.elapsed}');
 
-  //img.TiffDecoder().startDecode();
-  /*img.PngDecoder().decode(bytes)
-
-  img.Image cropped =
+  /*img.Image cropped =
       img.copyCrop(gl.Fullimage, x: 0, y: 0, width: 100, height: 100);
   File(out).writeAsBytes(img.encodePng(cropped));*/
 

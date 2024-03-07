@@ -86,8 +86,7 @@ flutter:
   #onts:
   assets:
      - assets/aptitudeFEE_BV.png  
-     - assets/aptitudeFEE_BV_DZ2.png  
-
+     - assets/
   #       - asset: fonts/Schyler-Italic.ttf
   #         style: italic
   #   - family: Trajan Pro
