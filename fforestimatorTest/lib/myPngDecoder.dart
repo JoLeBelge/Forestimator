@@ -15,6 +15,8 @@ import 'package:image/src/formats/tiff/tiff_fax_decoder.dart';
 import 'package:image/src/formats/tiff/tiff_lzw_decoder.dart';
 import 'package:image/src/util/bit_utils.dart';
 
+// ligne 850 ; myTifDecoder suivi de myTifImage, pour l'instant est identique à ceux de la librairie image. mais on devra a minima les modifier pour lire un pixel unique pour lanalyse ponctuelle offline.
+
 /// Decode a PNG encoded image.
 class myPngDecoder extends Decoder {
   final _info = InternalPngInfo();

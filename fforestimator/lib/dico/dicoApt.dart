@@ -89,6 +89,7 @@ class layerBase {
   late double mGain;
   late String mPdfName;
   late int mPdfPage;
+  late double mRes;
   String? nom_field_raster, nom_field_value, nom_dico, condition;
   Map<int, String> mDicoVal; // valeur raster vers signification
   Map<int, Color> mDicoCol; // valeur raster vers couleur
@@ -119,6 +120,7 @@ class layerBase {
         mGain = map['gain'] == null ? 66.6 : map['gain'],
         mPdfPage = map['pdfPage'] == null ? 0 : map['pdfPage'] - 1,
         mPdfName = map['pdfName'] == null ? "" : map['pdfName'],
+        mRes = map['res'] == null ? 0 : map['res'],
         mDicoVal = {},
         mDicoCol = {};
 
@@ -141,7 +143,8 @@ class layerBase {
         mPdfName = '',
         mPdfPage = 1,
         mDicoVal = {},
-        mDicoCol = {};
+        mDicoCol = {},
+        mRes = 0.0;
 
   bool hasDoc() {
     return mPdfName != "";

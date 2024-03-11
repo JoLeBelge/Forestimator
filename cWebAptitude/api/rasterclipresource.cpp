@@ -3,6 +3,7 @@
 extern int maxSizePix4Export;
 
 void rasterClipResource::handleRequest(const Http::Request &request,Http::Response &response){
+    std::cout << "rasterClipResource:: handle request" << std::endl;
 
     auto params = request.urlParams();
     std::string lCode("");
@@ -93,29 +94,37 @@ void rasterClipResource::handleRequest(const Http::Request &request,Http::Respon
                 pCroppedRaster->GetRasterBand(1)->RasterIO( GF_Write, 0, row, xSize,1, scanline, xSize, 1,GDT_Float32, 0, 0 );
             }
             CPLFree(scanline);
+            // on définit la palette de couleur associé à ce raster croppé
+            l->createRasterColorInterpPalette(pCroppedRaster->GetRasterBand(1));
+            GDALClose(pInputRaster);
+            if( pCroppedRaster != NULL ){GDALClose( (GDALDatasetH) pCroppedRaster );}
+            std::ifstream r(out, std::ios::in | std::ios::binary);
+            response.addHeader("Content-Type","image/tiff");
+            response.out() << r.rdbuf();
+            r.close();
 
         } else {
-            pCroppedRaster = pDriver->CreateCopy(out, pInputRaster,FALSE, papszOptions,NULL,NULL);
-            if( pCroppedRaster != NULL ){GDALClose( (GDALDatasetH) pCroppedRaster );}
-            // je le referme et réouvre car sinon "Cannot modify tag "PhotometricInterpretation" while writing"
-          pCroppedRaster = (GDALDataset*) GDALOpen(out, GA_Update);
+            // je met des test pour sécuriser le fait qu'on ne demande pas le téléchargement de couche raster trop lourde; test sur la résolution?
+            if (transform[1]>=10){
+                pCroppedRaster = pDriver->CreateCopy(out, pInputRaster,FALSE, papszOptions,NULL,NULL);
+                if( pCroppedRaster != NULL ){GDALClose( (GDALDatasetH) pCroppedRaster );}
+                // je le referme et réouvre car sinon "Cannot modify tag "PhotometricInterpretation" while writing"
+                pCroppedRaster = (GDALDataset*) GDALOpen(out, GA_Update);
+
+                // on définit la palette de couleur associé à ce raster croppé
+                l->createRasterColorInterpPalette(pCroppedRaster->GetRasterBand(1));
+                GDALClose(pInputRaster);
+                if( pCroppedRaster != NULL ){GDALClose( (GDALDatasetH) pCroppedRaster );}
+                std::ifstream r(out, std::ios::in | std::ios::binary);
+                response.addHeader("Content-Type","image/tiff");
+                response.out() << r.rdbuf();
+                r.close();
+            } else {
+                response.addHeader("Content-Type","text/plain; charset=utf-8");
+                response.out() << " la résolution de ce raster (" << l->Code() << ") est trop fine, vous ne pouvez pas utiliser cet outil pour son téléchargement. Résolution : " << transform[1] << " m par pixel" <<std::endl;
+            }
 
         }
-
-        // on définit la palette de couleur associé à ce raster croppé
-        l->createRasterColorInterpPalette(pCroppedRaster->GetRasterBand(1));
-
-
-        GDALClose(pInputRaster);
-        if( pCroppedRaster != NULL ){GDALClose( (GDALDatasetH) pCroppedRaster );}
-
-        std::ifstream r(out, std::ios::in | std::ios::binary);
-        /*if (!r) {
-
-        }*/
-        response.addHeader("Content-Type","image/tiff");
-        response.out() << r.rdbuf();
-        r.close();
 
 
     } else {

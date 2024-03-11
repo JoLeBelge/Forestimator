@@ -21,6 +21,8 @@ void main() async {
       File('/home/jo/Documents/carteApt/colorMappingTest/aptitudeFEE_BV.tif');
 
   // un tif avec une palette de couleur qui correspond au dicocol de la layer base. TifDecoder se charge d'appliquer cette palette.
+  // j'ai généré ce tif avec palette avec l'api de forestimator (en local, pas encore pushé sur le server)
+  //http://localhost:8085/api/clipRast/layerCode/BV_FEE/BV_FEE_colorP.tif
   ByteData data =
       await rootBundle.load(url.join("assets", "BV_FEE_colorP.tif"));
 
