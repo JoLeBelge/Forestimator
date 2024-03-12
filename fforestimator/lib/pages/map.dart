@@ -88,10 +88,15 @@ class _MapPageState extends State<mapPage> {
         .compareTo(gl.dico.getLayerBase(b.mCode).mGroupe));
   }
 
+  late tifFileTileProvider _provider;
+
   @override
   void initState() {
     super.initState();
     gl.refreshMap = setState;
+    _provider = tifFileTileProvider(
+        mycrs: epsg31370CRS, sourceImPath: "BV_FEE_colorP.tif");
+    _provider.init();
   }
 
   @override
@@ -170,13 +175,10 @@ class _MapPageState extends State<mapPage> {
               children: gl.interfaceSelectedLayerKeys.reversed
                       .map<Widget>((String codeLayer) {
                     layerBase l = gl.dico.getLayerBase(codeLayer);
-                   // on testera si il c'est un tifFileProvider ou si c'est le TileProvider par defaut pour les WMS
-                    if (true) {
-                       tifFileTileProvider myProvider = tifFileTileProvider(
-                        mycrs: epsg31370CRS, sourceImPath: "BV_FEE_colorP.tif");
-                        await myProvider.init();
+                    // on testera si il c'est un tifFileProvider ou si c'est le TileProvider par defaut pour les WMS
+                    if (_provider.loaded) {
                       return TileLayer(
-                        tileProvider: myProvider,
+                        tileProvider: _provider,
                         minNativeZoom: 8,
                         minZoom: 8,
                       );

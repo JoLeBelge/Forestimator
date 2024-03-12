@@ -11,6 +11,10 @@ class tifFileTileProvider extends TileProvider {
   int tileSize = 256;
   img.Image? _sourceImage;
   String sourceImPath;
+  bool _loaded = false;
+
+bool get loaded => _loaded;
+
   tifFileTileProvider(
       {super.headers, required this.mycrs, required this.sourceImPath});
 
@@ -19,6 +23,7 @@ class tifFileTileProvider extends TileProvider {
     ByteData data =
         await rootBundle.load(url.join("assets", "BV_FEE_colorP.tif"));
     _sourceImage = img.TiffDecoder().decode(data.buffer.asUint8List())!;
+    _loaded = true;
   }
 
   @override

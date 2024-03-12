@@ -85,7 +85,7 @@ flutter:
 
   #onts:
   assets:
-     - assets/aptitudeFEE_BV.png  
+     #- aptitudeFEE_BV.png
      - assets/
   #       - asset: fonts/Schyler-Italic.ttf
   #         style: italic
