@@ -16,7 +16,18 @@ String queryApiRastDownload =
 
 String defaultLayer = "IGN";
 // list to memorize the keys of selected layer to show in interface.
-List<String> interfaceSelectedLayerKeys = [defaultLayer];
+
+class selectedLayer {
+  String mCode;
+  bool offline;
+  String sourceImagePath;
+  selectedLayer(
+      {required this.mCode, this.offline = false, this.sourceImagePath = ""});
+}
+
+List<selectedLayer> interfaceSelectedLayerKeys = [
+  selectedLayer(mCode: defaultLayer)
+];
 
 List<layerAnaPt> requestedLayers = [];
 

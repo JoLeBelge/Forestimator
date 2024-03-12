@@ -168,10 +168,8 @@ class _MapPageState extends State<mapPage> {
                 },
               ),
               children: gl.interfaceSelectedLayerKeys.reversed
-                      .map<Widget>((String codeLayer) {
-                    layerBase l = gl.dico.getLayerBase(codeLayer);
-                   // on testera si il c'est un tifFileProvider ou si c'est le TileProvider par defaut pour les WMS
-                    if (true) {
+                      .map<Widget>((gl.selectedLayer selLayer) {
+                    if (selLayer.offline) {
                        tifFileTileProvider myProvider = tifFileTileProvider(
                         mycrs: epsg31370CRS, sourceImPath: "BV_FEE_colorP.tif");
                         await myProvider.init();
@@ -181,6 +179,7 @@ class _MapPageState extends State<mapPage> {
                         minZoom: 8,
                       );
                     } else {
+                    layerBase l = gl.dico.getLayerBase(selLayer.mCode);
                       return TileLayer(
                         userAgentPackageName: "com.example.fforestimator",
                         wmsOptions: WMSTileLayerOptions(
