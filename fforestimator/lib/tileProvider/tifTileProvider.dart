@@ -1,7 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter/material.dart';
-import 'package:test_fluttermap/globals.dart' as gl;
 import 'package:image/image.dart' as img;
 import 'dart:math';
 import 'package:flutter/services.dart';
@@ -10,7 +9,7 @@ import 'package:path/path.dart';
 class tifFileTileProvider extends TileProvider {
   final Proj4Crs mycrs;
   int tileSize = 256;
-  late img.Image _sourceImage;
+  img.Image? _sourceImage;
   String sourceImPath;
   tifFileTileProvider(
       {super.headers, required this.mycrs, required this.sourceImPath});
@@ -57,8 +56,7 @@ class tifFileTileProvider extends TileProvider {
           (tileSize.toDouble() / pow(2, (coordinates.z - zFullIm)).toDouble())
               .round();
     }
-
-    img.Image cropped = img.copyCrop(gl.Fullimage,
+    img.Image cropped = img.copyCrop(_sourceImage!,
         x: xOffset, y: yOffset, width: initImSize, height: initImSize);
     img.Image resized = img.copyResize(cropped, width: tileSize);
     return MemoryImage(img.encodePng(resized));

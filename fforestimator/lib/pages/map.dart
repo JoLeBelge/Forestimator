@@ -1,4 +1,5 @@
 import 'package:fforestimator/dico/dicoApt.dart';
+import 'package:fforestimator/tileProvider/tifTileProvider.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:proj4dart/proj4dart.dart' as proj4;
@@ -11,6 +12,7 @@ import 'package:fforestimator/globals.dart' as gl;
 import 'package:http/http.dart' as http;
 import 'package:fforestimator/pages/anaPt/requestedLayer.dart';
 import 'package:go_router/go_router.dart';
+import 'package:fforestimator/tileProvider/tifTileProvider.dart';
 
 import 'dart:convert';
 
@@ -168,21 +170,32 @@ class _MapPageState extends State<mapPage> {
               children: gl.interfaceSelectedLayerKeys.reversed
                       .map<Widget>((String codeLayer) {
                     layerBase l = gl.dico.getLayerBase(codeLayer);
-                    return TileLayer(
-                      tileBuilder: coordinateDebugTileBuilder,
-                      userAgentPackageName: "com.example.fforestimator",
-                      wmsOptions: WMSTileLayerOptions(
-                        baseUrl: l.mUrl + "?",
-                        format: 'image/png',
-                        layers: [
-                          l.mWMSLayerName,
-                        ],
-                        crs: epsg31370CRS,
-                        transparent: true,
-                      ),
-                      //maxNativeZoom: 7,
-                      tileSize: tileSize,
-                    );
+                   // on testera si il c'est un tifFileProvider ou si c'est le TileProvider par defaut pour les WMS
+                    if (true) {
+                       tifFileTileProvider myProvider = tifFileTileProvider(
+                        mycrs: epsg31370CRS, sourceImPath: "BV_FEE_colorP.tif");
+                        await myProvider.init();
+                      return TileLayer(
+                        tileProvider: myProvider,
+                        minNativeZoom: 8,
+                        minZoom: 8,
+                      );
+                    } else {
+                      return TileLayer(
+                        userAgentPackageName: "com.example.fforestimator",
+                        wmsOptions: WMSTileLayerOptions(
+                          baseUrl: l.mUrl + "?",
+                          format: 'image/png',
+                          layers: [
+                            l.mWMSLayerName,
+                          ],
+                          crs: epsg31370CRS,
+                          transparent: true,
+                        ),
+                        //maxNativeZoom: 7,
+                        tileSize: tileSize,
+                      );
+                    }
                   }).toList() +
                   <Widget>[
                     MarkerLayer(
