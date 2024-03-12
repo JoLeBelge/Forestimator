@@ -120,7 +120,7 @@ class layerBase {
         mGain = map['gain'] == null ? 66.6 : map['gain'],
         mPdfPage = map['pdfPage'] == null ? 0 : map['pdfPage'] - 1,
         mPdfName = map['pdfName'] == null ? "" : map['pdfName'],
-        mRes = map['res'] == null ? 0 : map['res'],
+        mRes = map['res'] == null ? 0.0 : map['res'],
         mDicoVal = {},
         mDicoCol = {};
 
