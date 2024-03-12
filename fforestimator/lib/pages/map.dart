@@ -88,10 +88,15 @@ class _MapPageState extends State<mapPage> {
         .compareTo(gl.dico.getLayerBase(b.mCode).mGroupe));
   }
 
+  late tifFileTileProvider _provider;
+
   @override
   void initState() {
     super.initState();
     gl.refreshMap = setState;
+    _provider = tifFileTileProvider(
+        mycrs: epsg31370CRS, sourceImPath: "BV_FEE_colorP.tif");
+    _provider.init();
   }
 
   @override
@@ -169,17 +174,14 @@ class _MapPageState extends State<mapPage> {
               ),
               children: gl.interfaceSelectedLayerKeys.reversed
                       .map<Widget>((gl.selectedLayer selLayer) {
-                    if (selLayer.offline) {
-                       tifFileTileProvider myProvider = tifFileTileProvider(
-                        mycrs: epsg31370CRS, sourceImPath: "BV_FEE_colorP.tif");
-                        await myProvider.init();
+                    if (selLayer.offline && _provider.loaded) {
                       return TileLayer(
-                        tileProvider: myProvider,
+                        tileProvider: _provider,
                         minNativeZoom: 8,
                         minZoom: 8,
                       );
                     } else {
-                    layerBase l = gl.dico.getLayerBase(selLayer.mCode);
+                      layerBase l = gl.dico.getLayerBase(selLayer.mCode);
                       return TileLayer(
                         userAgentPackageName: "com.example.fforestimator",
                         wmsOptions: WMSTileLayerOptions(

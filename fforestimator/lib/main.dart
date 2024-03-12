@@ -108,37 +108,10 @@ class _MyApp extends State<MyApp> {
                 pageBuilder: (context, state) =>
                     const NoTransitionPage(child: mapPage()),
                 routes: [
-                  ...[
-                    // child route
-                    GoRoute(
-                      path: 'anaPt',
-                      builder: (context, state) =>
-                          anaPtpage(gl.requestedLayers),
-                    ),
-                  ],
-                  ...gl.dico.getFEEess().map<GoRoute>((Ess item) {
-                    return GoRoute(
-                      path: item.getFicheRoute(),
-                      builder: (context, state) => (Platform.isAndroid ||
-                              Platform.isIOS)
-                          ? PDFScreen(
-                              path: _pathExternalStorage +
-                                  "/FEE-" +
-                                  item.mCode +
-                                  ".pdf",
-                              titre: "fiche-essence " + item.getNameAndPrefix(),
-                            )
-                          : Scaffold(
-                              appBar: AppBar(
-                                title: Text("view pdf"),
-                              ),
-                              body: Text(_pathExternalStorage +
-                                  "/FEE-" +
-                                  item.mCode +
-                                  ".pdf"),
-                            ),
-                    );
-                  }).toList(),
+                  GoRoute(
+                    path: 'anaPt',
+                    builder: (context, state) => anaPtpage(gl.requestedLayers),
+                  ),
                 ],
               )
             ],

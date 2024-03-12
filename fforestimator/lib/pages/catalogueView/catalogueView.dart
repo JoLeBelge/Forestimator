@@ -278,14 +278,16 @@ class _CategoryView extends State<CategoryView> {
                             lt.selected = true;
                             widget.refreshView();
                             gl.refreshMap(() {
-                              gl.interfaceSelectedLayerKeys.insert(0, lt.key);
+                              gl.interfaceSelectedLayerKeys
+                                  .insert(0, gl.selectedLayer(mCode: lt.key));
                             });
                           } else {
                             lt.selected = true;
                             widget.refreshView();
                             gl.refreshMap(() {
                               gl.interfaceSelectedLayerKeys.removeLast();
-                              gl.interfaceSelectedLayerKeys.insert(0, lt.key);
+                              gl.interfaceSelectedLayerKeys
+                                  .insert(0, gl.selectedLayer(mCode: lt.key));
                             });
                           }
                         });
@@ -371,7 +373,7 @@ class _SelectedLayerView extends State<SelectedLayerView> {
               return;
             }
             gl.refreshMap(() {
-              final String item =
+              final gl.selectedLayer item =
                   gl.interfaceSelectedLayerKeys.removeAt(oldIndex);
               gl.interfaceSelectedLayerKeys.insert(newIndex, item);
             });
@@ -401,9 +403,9 @@ class _SelectedLayerView extends State<SelectedLayerView> {
                                 ? gl
                                     .dico
                                     .mLayerBases[
-                                        gl.interfaceSelectedLayerKeys[i]]!
+                                        gl.interfaceSelectedLayerKeys[i].mCode]!
                                     .mNom
-                                : gl.interfaceSelectedLayerKeys[i],
+                                : gl.interfaceSelectedLayerKeys[i].mCode,
                           ),
                         ),
                         Container(
