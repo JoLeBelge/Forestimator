@@ -81,6 +81,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.6"
+  dart_jts:
+    dependency: transitive
+    description:
+      name: dart_jts
+      sha256: fddf640b9369a08c0028d3dcbda5a08ea63f6d4cdb17da9822dca31cbedab516
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.2.6"
   dbus:
     dependency: transitive
     description:
@@ -168,6 +176,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.1.1"
+  geoimage:
+    dependency: "direct main"
+    description:
+      name: geoimage
+      sha256: aa1de97b5c74bc98df1a8ca26ac2ebc6f76c6e4694d0b69dfd0096e670b93b72
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.4.0"
   geolocator:
     dependency: "direct main"
     description:

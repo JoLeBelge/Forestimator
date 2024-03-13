@@ -1,7 +1,7 @@
 To do list fforestimator
 ------------------------
 
-Jo -> Lecture d'une valeur d'un pixel pour les raster (anaPt offline) -> pareil, créer un TiffDecoder spécifique qui ne lit que la partie de l'image qui nous intéresse.--> la TifImage est découpée en chunk/tuile qui fonc une ligne à chaque fois, donc très facile de ne lire que la ligne qui nous intéresse!
+Jo -> anaPtOffline
 
 Jo -> legender le logo compensation matrice aptitude -> tooltip onTap?
 

@@ -11,6 +11,7 @@ import 'package:image/image.dart' as img;
 import 'package:test_fluttermap/cropImTileProvider.dart';
 import 'package:flutter/services.dart';
 import 'myPngDecoder.dart';
+import 'myTifDecoder.dart';
 
 String out = '/home/jo/Images/chatGPT_crop.png';
 
@@ -19,6 +20,13 @@ void main() async {
 
   final File fileIm =
       File('/home/jo/Documents/carteApt/colorMappingTest/aptitudeFEE_BV.tif');
+
+  ByteData data =
+      await rootBundle.load(url.join("assets", "BV_FEE_colorP.tif"));
+
+  onePixGeotifDecoder myDecoder = onePixGeotifDecoder(x: 273023.0, y: 138347.0);
+  int val = myDecoder.getVal(data.buffer.asUint8List());
+  print("val : " + val.toString());
 
   // un tif avec une palette de couleur qui correspond au dicocol de la layer base. TifDecoder se charge d'appliquer cette palette.
   // j'ai généré ce tif avec palette avec l'api de forestimator (en local, pas encore pushé sur le server)
