@@ -1,23 +1,16 @@
 To do list fforestimator
 ------------------------
 
-COURT TERME
+Jo -> Lecture d'une valeur d'un pixel pour les raster (anaPt offline) -> pareil, créer un TiffDecoder spécifique qui ne lit que la partie de l'image qui nous intéresse.--> la TifImage est découpée en chunk/tuile qui fonc une ligne à chaque fois, donc très facile de ne lire que la ligne qui nous intéresse!
+
 Jo -> legender le logo compensation matrice aptitude -> tooltip onTap?
 
-gestion mapController avec et sans position GPS ; s'inspirer de Qfield
-
-TT -> CatalogueView
-MOYEN TERME-> ajout d'un bouton de sélection des layers pour le téléchargement (utilisation offline). pareil, on stoque les codes layers dans un vecteur qui sera utilisé pour le bulk download  / usage offline. -> commencer par utiliser la selection pour l'analyse ponctuelle.
-
-
-MOYEN TERME - offline mapping 
-TileLayer pour une carte png non tuilée -> PngDecoder->decode() très lent, implémenter quelque chose du style  PngDecoder->decodeImagePart(x0, y0) pour ne lire qu'une petite partie.
---> j'ai essayé mais c'est obscur car il faut décompressé les chunks avant de comprendre le nombres de pixels que ceux-ci couvrent, donc pas évident.
---> mais tifDecoder plus efficace, beaucoup plus rapide (5x plus rapide sur linux, 3x sur android Core3)
-
-Lecture d'une valeur d'un pixel pour les raster (anaPt offline) -> pareil, créer un TiffDecoder spécifique qui ne lit que la partie de l'image qui nous intéresse.--> la TifImage est découpée en chunk/tuile qui fonc une ligne à chaque fois, donc très facile de ne lire que la ligne qui nous intéresse!
+TT ->gestion mapController avec et sans position GPS ; s'inspirer de Qfield
 
 TT -> interface graphique et réalisation du download des raster pour anaPonctuelle/ visulation offline
+-> offir la possibilité de télécharger un lot de raster pour l'analyse ponctuelle offline LORS DE LA PREMIERE UTILISATION de l'app: ZBIO, NT, NH, TOPO, GS_Ardenne et CNSWrast. 
 
 Jo ou TT -Export du résulat de l'analyse ponctuelle sous format pdf.
+
+DATE PREMIERE RELEASE : 19/04 (semaine forêt étudiant GRF)
 

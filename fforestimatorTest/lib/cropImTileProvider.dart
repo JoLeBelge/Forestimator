@@ -12,6 +12,10 @@ class tifFileTileProvider extends TileProvider {
   int tileSize = 256;
   late img.Image _sourceImage;
   String sourceImPath;
+  bool _loaded = false;
+
+  bool get loaded => _loaded;
+
   tifFileTileProvider(
       {super.headers, required this.mycrs, required this.sourceImPath});
 
@@ -20,6 +24,7 @@ class tifFileTileProvider extends TileProvider {
     ByteData data =
         await rootBundle.load(url.join("assets", "BV_FEE_colorP.tif"));
     _sourceImage = img.TiffDecoder().decode(data.buffer.asUint8List())!;
+    _loaded = true;
   }
 
   @override
@@ -58,7 +63,7 @@ class tifFileTileProvider extends TileProvider {
               .round();
     }
 
-    img.Image cropped = img.copyCrop(gl.Fullimage,
+    img.Image cropped = img.copyCrop(_sourceImage,
         x: xOffset, y: yOffset, width: initImSize, height: initImSize);
     img.Image resized = img.copyResize(cropped, width: tileSize);
     return MemoryImage(img.encodePng(resized));

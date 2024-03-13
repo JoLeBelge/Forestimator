@@ -23,14 +23,14 @@ void main() async {
   // un tif avec une palette de couleur qui correspond au dicocol de la layer base. TifDecoder se charge d'appliquer cette palette.
   // j'ai généré ce tif avec palette avec l'api de forestimator (en local, pas encore pushé sur le server)
   //http://localhost:8085/api/clipRast/layerCode/BV_FEE/BV_FEE_colorP.tif
-  ByteData data =
-      await rootBundle.load(url.join("assets", "BV_FEE_colorP.tif"));
+  /*ByteData data =
+      await rootBundle.load(url.join("assets", "BV_FEE_colorP.tif"));*/
 
   /*myPngDecoder _decoder = myPngDecoder();
   _decoder.startDecode(data.buffer.asUint8List());
   // je pense que c'est la position du début de chacun des chunks du fichier (offset). en tout cas nombre constant entre chacunes des valeurs, un peu plus élevé que le nombre de colonne du raster
   print("decoder idat : " + _decoder.infoI.idat.toString());*/
-
+/*
   if (false) {
     final stopwatch = Stopwatch()..start();
     gl.Fullimage = myPngDecoder(x0: 5000, y0: 2000, wSub: 500, hSub: 500)
@@ -41,9 +41,11 @@ void main() async {
     gl.Fullimage = img.PngDecoder().decode(data.buffer.asUint8List())!;
     print('PngDecode executed in ${stopwatch.elapsed}');
   }
+  */
   final stopwatch = Stopwatch()..start();
-  gl.Fullimage = img.TiffDecoder().decode(data.buffer.asUint8List())!;
-  print('TifDecode executed in ${stopwatch.elapsed}');
+
+  //gl.Fullimage = img.TiffDecoder().decode(data.buffer.asUint8List())!;
+  //print('TifDecode executed in ${stopwatch.elapsed}');
 
   /*img.Image cropped =
       img.copyCrop(gl.Fullimage, x: 0, y: 0, width: 100, height: 100);
@@ -102,10 +104,15 @@ class _MapPageState extends State<mapPage> {
   //img.Image cropped =
   //  img.copyCrop(gl.Fullimage, x: 0, y: 0, width: 256, height: 256);
 
+  late tifFileTileProvider _provider;
+
   @override
   void initState() {
     super.initState();
     gl.refreshMap = setState;
+    _provider = tifFileTileProvider(
+        mycrs: epsg31370CRS, sourceImPath: "BV_FEE_colorP.tif");
+    _provider.init();
   }
 
   @override
@@ -169,16 +176,15 @@ class _MapPageState extends State<mapPage> {
                     bounds: LatLngBounds.fromPoints([latlonBL, latlonTR])),
               ),
               children: [
-                TileLayer(
-                  //tileBuilder: mycoordinateDebugTileBuilder, // très utile pour visualiser comment sont réparties les tuiles celon les conventions de flutter_map
-                  // tileProvider: gdal2tilesFileTileProvider(mycrs: epsg31370CRS),
-                  tileProvider: cropImFileTileProvider(mycrs: epsg31370CRS),
-                  urlTemplate:
-                      "/home/jo/Documents/carteApt/colorMappingTest/out/tile4/{z}/{x}/{y}.png",
-                  //maxNativeZoom: 7,
-                  minNativeZoom: 8,
-                  minZoom: 8,
-                ),
+                if (_provider.loaded)
+                  TileLayer(
+                    //tileBuilder: mycoordinateDebugTileBuilder, // très utile pour visualiser comment sont réparties les tuiles celon les conventions de flutter_map
+                    // tileProvider: gdal2tilesFileTileProvider(mycrs: epsg31370CRS),
+                    tileProvider: _provider,
+                    //maxNativeZoom: 7,
+                    minNativeZoom: 8,
+                    minZoom: 8,
+                  ),
                 if (true)
                   TileLayer(
                     // tileBuilder: mycoordinateDebugTileBuilder,

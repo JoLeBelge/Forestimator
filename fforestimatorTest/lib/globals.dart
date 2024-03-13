@@ -5,7 +5,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image/image.dart' as img;
 
-late img.Image Fullimage;
+//late img.Image Fullimage;
 
 String defaultLayer = "IGN";
 // list to memorize the keys of selected layer to show in interface.

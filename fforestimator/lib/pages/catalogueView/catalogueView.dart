@@ -398,8 +398,8 @@ class _SelectedLayerView extends State<SelectedLayerView> {
                           ),
                           child: Text(
                             textScaler: TextScaler.linear(1.2),
-                            gl.dico.mLayerBases.keys
-                                    .contains(gl.interfaceSelectedLayerKeys[i])
+                            gl.dico.mLayerBases.keys.contains(
+                                    gl.interfaceSelectedLayerKeys[i].mCode)
                                 ? gl
                                     .dico
                                     .mLayerBases[
