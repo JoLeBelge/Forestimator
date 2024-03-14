@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:fforestimator/dico/dicoApt.dart';
 import 'package:flutter/material.dart';
 import 'package:fforestimator/globals.dart' as gl;
@@ -234,7 +236,7 @@ class _CategoryView extends State<CategoryView> {
                           });
                         }),
                   ),
-          gl.interfaceSelectedLayerKeys.contains(lt.key)
+          _isSelectedLayer(lt.key)
               ? Container(
                   decoration: const BoxDecoration(
                       shape: BoxShape.circle, color: gl.colorAgroBioTech),
@@ -253,7 +255,7 @@ class _CategoryView extends State<CategoryView> {
                             lt.selected = false;
                             widget.refreshView();
                             gl.refreshMap(() {
-                              gl.interfaceSelectedLayerKeys.remove(lt.key);
+                              _removeLayerFromList(lt.key);
                             });
                           }
                         });
@@ -317,6 +319,26 @@ class _CategoryView extends State<CategoryView> {
     setState(() {
       _finishedInitializingCategory[widget.category] = true;
     });
+  }
+
+  void _removeLayerFromList(String key) {
+    gl.selectedLayer? sL = null;
+    for (var layer in gl.interfaceSelectedLayerKeys) {
+      if (layer.mCode == key) {
+        sL = layer;
+      }
+    }
+    if (sL != null)
+      gl.interfaceSelectedLayerKeys.remove(sL);
+  }
+
+  bool _isSelectedLayer(String key) {
+    for (var layer in gl.interfaceSelectedLayerKeys) {
+      if (layer.mCode == key) {
+        return true;
+      }
+    }
+    return false;
   }
 
   Color _getBackgroundColorForList() {

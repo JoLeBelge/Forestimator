@@ -13,7 +13,7 @@ class tifFileTileProvider extends TileProvider {
   String sourceImPath;
   bool _loaded = false;
 
-bool get loaded => _loaded;
+  bool get loaded => _loaded;
 
   tifFileTileProvider(
       {super.headers, required this.mycrs, required this.sourceImPath});

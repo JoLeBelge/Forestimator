@@ -95,8 +95,9 @@ class _MapPageState extends State<mapPage> {
     super.initState();
     gl.refreshMap = setState;
     _provider = tifFileTileProvider(
-        mycrs: epsg31370CRS, sourceImPath: "BV_FEE_colorP.tif");
-    _provider.init();
+                          mycrs: epsg31370CRS,
+                          sourceImPath: "BV_FEE_colorP.tif");
+                    _provider.init();
   }
 
   @override
@@ -174,7 +175,7 @@ class _MapPageState extends State<mapPage> {
               ),
               children: gl.interfaceSelectedLayerKeys.reversed
                       .map<Widget>((gl.selectedLayer selLayer) {
-                    if (selLayer.offline && _provider.loaded) {
+                    if (_provider.loaded) {
                       return TileLayer(
                         tileProvider: _provider,
                         minNativeZoom: 8,
