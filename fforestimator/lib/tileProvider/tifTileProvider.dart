@@ -50,17 +50,15 @@ class tifFileTileProvider extends TileProvider {
     int yOffset = ((b.bottomRight.y - nw.y) / resolution)
         .round(); //--> soit-disant bottomRigth mais contient le ymax (top dans src donc)
 
-    int zFullIm = 7; // raster avec résolution de 10m/pixel
-    if (resolution == 20.0) {
+    // je devrais lire  GeoInfo geoi = GeoInfo(im); comme dans onePixGeoTifDecoder pour adapter le code à des raster qui ont une autre résolution.
+    int zFullIm =
+        7; // raster avec résolution de 10m/pixel. fonctionne tant que la map est paramétrée avec scr getResolutions2()
+
+    /* if (resolution == 20.0) { 
       zFullIm = 6;
-    }
-    int initImSize = (zFullIm + 1 - coordinates.z) *
-        tileSize; // pour les zoom plus petit que 7
-    if (coordinates.z > zFullIm) {
-      initImSize =
-          (tileSize.toDouble() / pow(2, (coordinates.z - zFullIm)).toDouble())
-              .round();
-    }
+    }*/
+    int initImSize = (pow(2, (zFullIm - coordinates.z)) * tileSize).toInt();
+
     img.Image cropped = img.copyCrop(_sourceImage!,
         x: xOffset, y: yOffset, width: initImSize, height: initImSize);
     img.Image resized = img.copyResize(cropped, width: tileSize);

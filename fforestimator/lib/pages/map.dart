@@ -41,18 +41,25 @@ class _MapPageState extends State<mapPage> {
   );
 
   double tileSize = 256.0;
-  List<double> getResolutions(double maxX, double minX, int zoom,
+
+  List<double> getResolutions2(int nbzoom) {
+    // résolution numéro 1: une tile pour tout l'extend de la Wallonie
+    var maxResolution = 1280;
+    return List.generate(nbzoom, (z) => maxResolution / pow(2, z));
+  }
+  /*List<double> getResolutions(double maxX, double minX, int zoom,
       [double tileSize = 256.0]) {
     // résolution numéro 1: une tile pour tout l'extend de la Wallonie
     var size = (maxX - minX) / (tileSize);
     return List.generate(zoom, (z) => size / pow(2, z));
-  }
+  }*/
 
   late var epsg31370CRS = Proj4Crs.fromFactory(
       code: 'EPSG:31370',
       proj4Projection: epsg31370,
       bounds: epsg31370Bounds,
-      resolutions: getResolutions(295170.0, 42250.0, 15, 256.0));
+      resolutions: getResolutions2(11));
+  //resolutions: getResolutions(295170.0, 42250.0, 15, 256.0));
 
   Future _runAnaPt(proj4.Point ptBL72) async {
     print("anaPonctOnline");
@@ -95,9 +102,8 @@ class _MapPageState extends State<mapPage> {
     super.initState();
     gl.refreshMap = setState;
     _provider = tifFileTileProvider(
-                          mycrs: epsg31370CRS,
-                          sourceImPath: "BV_FEE_colorP.tif");
-                    _provider.init();
+        mycrs: epsg31370CRS, sourceImPath: "BV_FEE_colorP.tif");
+    _provider.init();
   }
 
   @override
@@ -178,8 +184,8 @@ class _MapPageState extends State<mapPage> {
                     if (_provider.loaded) {
                       return TileLayer(
                         tileProvider: _provider,
-                        minNativeZoom: 8,
-                        minZoom: 8,
+                        // minNativeZoom: 8,
+                        minZoom: 5,
                       );
                     } else {
                       layerBase l = gl.dico.getLayerBase(selLayer.mCode);
