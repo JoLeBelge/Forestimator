@@ -4,7 +4,6 @@ import 'package:fforestimator/dico/dicoApt.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:fforestimator/pages/anaPt/requestedLayer.dart';
-import 'package:go_router/go_router.dart';
 
 late dicoAptProvider dico;
 
@@ -42,7 +41,16 @@ List<String> anaPtSelectedLayerKeys = [
   "Topo",
   "AE",
   "COMPOALL",
-  "MNH2021"
+  "MNH2021",
+];
+
+List<String> downloadableLayerKeys = [
+  "ZBIO",
+  "NT",
+  "NH",
+  "Topo",
+  "GS_Ardenne",
+  "CNSWrast",
 ];
 
 Position? position;
