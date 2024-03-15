@@ -49,7 +49,7 @@ List<String> downloadableLayerKeys = [
   "NT",
   "NH",
   "Topo",
-  "GS_Ardenne",
+  "CS_A",
   "CNSWrast",
 ];
 
