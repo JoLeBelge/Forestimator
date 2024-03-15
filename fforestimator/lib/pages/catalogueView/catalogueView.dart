@@ -1,6 +1,5 @@
-import 'dart:ffi';
-
 import 'package:fforestimator/dico/dicoApt.dart';
+import 'package:fforestimator/progressBar.dart';
 import 'package:flutter/material.dart';
 import 'package:fforestimator/globals.dart' as gl;
 import 'package:fforestimator/pages/catalogueView/categoryTile.dart';
@@ -147,30 +146,42 @@ class _CategoryView extends State<CategoryView> {
                             : 48,
                         minHeight: 48,
                       ),
-                      child:
-                          Text(item.name, textScaler: TextScaler.linear(1.2)),
+                      child: Text(item.name,
+                          textScaler: const TextScaler.linear(1.2)),
                     ),
                     selectLayerBar(item),
                   ]),
             );
           },
-          body: LegendView(
-            layerKey: item.key,
-            color: _getBackgroundColorForList(),
-            constraintsText: BoxConstraints(
-                minWidth: MediaQuery.of(context).size.width * .4,
-                maxWidth: MediaQuery.of(context).size.width * .4,
-                minHeight: MediaQuery.of(context).size.height * .02,
-                maxHeight: MediaQuery.of(context).size.height * .02),
-            constraintsColors: BoxConstraints(
-                minWidth: MediaQuery.of(context).size.width * .4,
-                maxWidth: MediaQuery.of(context).size.width * .4,
-                minHeight: MediaQuery.of(context).size.height * .02,
-                maxHeight: MediaQuery.of(context).size.height * .02),
-          ),
+          body: _expandedLegendView(item),
           isExpanded: item.isExpanded,
         );
       }).toList(),
+    );
+  }
+
+  Widget _expandedLegendView(LayerTile lt) {
+    return Column(
+      children: <Widget>[
+        if (lt.downloadable)
+          ColoredBox(
+              color: gl.colorAgroBioTech,
+              child: ProgressBar()),
+        LegendView(
+          layerKey: lt.key,
+          color: _getBackgroundColorForList(),
+          constraintsText: BoxConstraints(
+              minWidth: MediaQuery.of(context).size.width * .4,
+              maxWidth: MediaQuery.of(context).size.width * .4,
+              minHeight: MediaQuery.of(context).size.height * .02,
+              maxHeight: MediaQuery.of(context).size.height * .02),
+          constraintsColors: BoxConstraints(
+              minWidth: MediaQuery.of(context).size.width * .4,
+              maxWidth: MediaQuery.of(context).size.width * .4,
+              minHeight: MediaQuery.of(context).size.height * .02,
+              maxHeight: MediaQuery.of(context).size.height * .02),
+        ),
+      ],
     );
   }
 
@@ -203,7 +214,7 @@ class _CategoryView extends State<CategoryView> {
                       maxHeight: 48,
                       minHeight: 48,
                     ),
-                    padding: EdgeInsets.all(0),
+                    padding: const EdgeInsets.all(0),
                     child: IconButton(
                         icon: const Icon(Icons.location_on, size: 28),
                         onPressed: () {
@@ -225,7 +236,7 @@ class _CategoryView extends State<CategoryView> {
                       maxHeight: 48,
                       minHeight: 48,
                     ),
-                    padding: EdgeInsets.all(0),
+                    padding: const EdgeInsets.all(0),
                     child: IconButton(
                         icon: const Icon(Icons.location_off, size: 28),
                         onPressed: () {
@@ -246,7 +257,7 @@ class _CategoryView extends State<CategoryView> {
                     maxHeight: 48,
                     minHeight: 48,
                   ),
-                  padding: EdgeInsets.all(0),
+                  padding: const EdgeInsets.all(0),
                   child: IconButton(
                       icon: const Icon(Icons.layers_clear, size: 28),
                       onPressed: () {
@@ -271,7 +282,7 @@ class _CategoryView extends State<CategoryView> {
                     maxHeight: 48,
                     minHeight: 48,
                   ),
-                  padding: EdgeInsets.all(0),
+                  padding: const EdgeInsets.all(0),
                   child: IconButton(
                       icon: const Icon(Icons.layers, size: 28),
                       onPressed: () {
@@ -298,6 +309,13 @@ class _CategoryView extends State<CategoryView> {
         ]));
   }
 
+  bool _isDownloadableLayer(String key) {
+    if (gl.downloadableLayerKeys.contains(key)) {
+      return true;
+    }
+    return false;
+  }
+
   void _getLayerData() async {
     Map<String, layerBase> mp = gl.dico.mLayerBases;
     for (var key in mp.keys) {
@@ -312,6 +330,7 @@ class _CategoryView extends State<CategoryView> {
             name: mp[key]!.mNom,
             filter: mp[key]!.mGroupe,
             key: key,
+            downloadable: _isDownloadableLayer(key),
             extern: mp[key]!.mCategorie == "Externe"));
       }
     }
@@ -322,14 +341,15 @@ class _CategoryView extends State<CategoryView> {
   }
 
   void _removeLayerFromList(String key) {
-    gl.selectedLayer? sL = null;
+    gl.selectedLayer? sL;
     for (var layer in gl.interfaceSelectedLayerKeys) {
       if (layer.mCode == key) {
         sL = layer;
       }
     }
-    if (sL != null)
+    if (sL != null) {
       gl.interfaceSelectedLayerKeys.remove(sL);
+    }
   }
 
   bool _isSelectedLayer(String key) {

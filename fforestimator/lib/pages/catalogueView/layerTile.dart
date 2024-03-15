@@ -3,6 +3,7 @@ class LayerTile {
     required this.key,
     required this.name,
     required this.filter,
+    this.downloadable = false,
     this.isExpanded = false,
     this.selected = false,
     this.extern = false,
@@ -14,4 +15,5 @@ class LayerTile {
   bool isExpanded;
   bool selected;
   bool extern;
+  bool downloadable;
 }
