@@ -13,6 +13,7 @@ import 'package:http/http.dart' as http;
 import 'package:fforestimator/pages/anaPt/requestedLayer.dart';
 import 'package:go_router/go_router.dart';
 import 'package:fforestimator/tileProvider/tifTileProvider.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 
 import 'dart:convert';
 
@@ -62,29 +63,42 @@ class _MapPageState extends State<mapPage> {
   //resolutions: getResolutions(295170.0, 42250.0, 15, 256.0));
 
   Future _runAnaPt(proj4.Point ptBL72) async {
-    print("anaPonctOnline");
-    String layersAnaPt = "";
-    for (String lCode in gl.anaPtSelectedLayerKeys) {
-      if (gl.dico.getLayerBase(lCode).mCategorie != "Externe") {
-        layersAnaPt += "+" + lCode;
+    gl.requestedLayers.clear();
+    ConnectivityResult conRes = await Connectivity().checkConnectivity();
+    print(conRes);
+    if (conRes != ConnectivityResult.none &&
+        conRes != ConnectivityResult.wifi) {
+      // sur mon pc ; wifi mais pas accès internet (car pas authentifié ulg user sur le wifi)
+      print("anaPonctOnline");
+      String layersAnaPt = "";
+      for (String lCode in gl.anaPtSelectedLayerKeys) {
+        if (gl.dico.getLayerBase(lCode).mCategorie != "Externe") {
+          layersAnaPt += "+" + lCode;
+        }
+      }
+
+      String url = "https://forestimator.gembloux.ulg.ac.be/api/anaPt/layers/" +
+          layersAnaPt +
+          "/x/" +
+          ptBL72.x.toString() +
+          "/y/" +
+          ptBL72.y.toString();
+      //print(url);
+      var res = await http.get(Uri.parse(url));
+      //print(res.body);
+      data = jsonDecode(res.body);
+
+      for (var r in data["RequestedLayers"]) {
+        gl.requestedLayers.add(layerAnaPt.fromMap(r));
+      }
+      gl.requestedLayers.removeWhere((element) => element.mFoundLayer == 0);
+    } else {
+      print("anaPonctOffline");
+
+      for (layerBase l in gl.dico.getLayersOffline()) {
+        print(l.toString());
       }
     }
-
-    String url = "https://forestimator.gembloux.ulg.ac.be/api/anaPt/layers/" +
-        layersAnaPt +
-        "/x/" +
-        ptBL72.x.toString() +
-        "/y/" +
-        ptBL72.y.toString();
-    //print(url);
-    var res = await http.get(Uri.parse(url));
-    //print(res.body);
-    data = jsonDecode(res.body);
-    gl.requestedLayers.clear();
-    for (var r in data["RequestedLayers"]) {
-      gl.requestedLayers.add(layerAnaPt.fromMap(r));
-    }
-    gl.requestedLayers.removeWhere((element) => element.mFoundLayer == 0);
     // un peu radical mais me fait bugger mon affichage par la suite donc je retire
     gl.requestedLayers.removeWhere((element) => element.mRastValue == 0);
 
