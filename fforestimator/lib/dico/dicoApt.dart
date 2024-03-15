@@ -80,8 +80,8 @@ class groupe_couche {
 }
 
 class layerBase {
-  late String mNom, mNomCourt;
-  late bool mExpert, mVisu;
+  late String mNom, mNomCourt, mNomRaster;
+  late bool mExpert, mVisu, mOffline;
   late String mCode;
   late String mUrl, mWMSLayerName, mWMSattribution, mTypeGeoservice;
   late String mGroupe;
@@ -122,8 +122,10 @@ class layerBase {
         mPdfPage = map['pdfPage'] == null ? 0 : map['pdfPage'] - 1,
         mPdfName = map['pdfName'] == null ? "" : map['pdfName'],
         mRes = map['res'] == null ? 0.0 : map['res'],
+        mNomRaster = map['Nom'],
         mDicoVal = {},
-        mDicoCol = {};
+        mDicoCol = {},
+        mOffline = false;
 
   layerBase()
       : mNom = '',
@@ -245,6 +247,10 @@ class layerBase {
         mDicoCol.length.toString();
     return res;
   }
+
+  void setHasOffline(bool offline) {
+    mOffline = true;
+  }
 }
 
 class dicoAptProvider {
@@ -259,13 +265,14 @@ class dicoAptProvider {
   List<groupe_couche> mGrCouches = [];
   List<station> mStations = [];
   Map<int, String> dico_code2NTNH = {};
+  late Directory docDir;
 
   Future<void> init() async {
     //final dbPath = await getDatabasesPath(); plante sous android
-    Directory docDir = await getApplicationDocumentsDirectory();
-    final path = join(docDir.path, "fforestimator.db");
+    docDir = await getApplicationDocumentsDirectory();
+    print("document directory path : " + docDir.path);
 
-    Directory docDir2 = await getApplicationDocumentsDirectory();
+    final path = join(docDir.path, "fforestimator.db");
 
 // Check if the database exists
     var exists = await databaseExists(path);
@@ -321,7 +328,7 @@ class dicoAptProvider {
     }
     for (String code in mLayerBases.keys) {
       await mLayerBases[code]?.fillLayerDico(this);
-      print(mLayerBases[code].toString());
+      //print(mLayerBases[code].toString());
     }
     result = await db.query('dico_apt');
     for (var row in result) {
@@ -357,6 +364,8 @@ class dicoAptProvider {
 
     db.close();
     finishedLoading = true;
+
+    checkLayerBaseOfflineRessource();
   }
 
   Ess getEss(String aCode) {
@@ -373,6 +382,10 @@ class dicoAptProvider {
 
   List<layerBase> getLayersWithDoc() {
     return mLayerBases.values.where((i) => i.mPdfName != "").toList();
+  }
+
+  List<layerBase> getLayersOffline() {
+    return mLayerBases.values.where((i) => i.mOffline).toList();
   }
 
   layerBase getLayerBase(String aCode) {
@@ -502,6 +515,16 @@ class dicoAptProvider {
       }
     }
     return aRes;
+  }
+
+  void checkLayerBaseOfflineRessource() async {
+    for (layerBase l in mLayerBases.values) {
+      File file = File("${docDir?.path}/${l.mNomRaster}");
+      if (await file.exists() == true) {
+        l.setHasOffline(true);
+      }
+    }
+    return;
   }
 }
 

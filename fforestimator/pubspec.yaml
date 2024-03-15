@@ -48,6 +48,8 @@ dependencies:
   geolocator: ^10.1.0 
   geolocator_linux: ^0.2.0+1 # la version geolocator_linux de geolocator 10.1 est la 0.1.3 buggée
 
+  connectivity_plus: ^5.0.2
+
   latlong2: ^0.9.0
   flutter_sensors: ^1.0.1
   go_router: ^13.2.0
