@@ -67,7 +67,8 @@ class _MapPageState extends State<mapPage> {
     ConnectivityResult conRes = await Connectivity().checkConnectivity();
     print(conRes);
     if (conRes != ConnectivityResult.none &&
-        conRes != ConnectivityResult.wifi) {
+        conRes != ConnectivityResult.wifi &&
+        false) {
       // sur mon pc ; wifi mais pas accès internet (car pas authentifié ulg user sur le wifi)
       print("anaPonctOnline");
       String layersAnaPt = "";
@@ -96,9 +97,11 @@ class _MapPageState extends State<mapPage> {
       print("anaPonctOffline");
 
       for (layerBase l in gl.dico.getLayersOffline()) {
-        print(l.toString());
+        int val = await l.getValXY(ptBL72);
+        gl.requestedLayers.add(layerAnaPt(mCode: l.mCode, mRastValue: val));
       }
     }
+
     // un peu radical mais me fait bugger mon affichage par la suite donc je retire
     gl.requestedLayers.removeWhere((element) => element.mRastValue == 0);
 
@@ -116,7 +119,7 @@ class _MapPageState extends State<mapPage> {
     super.initState();
     gl.refreshMap = setState;
     _provider = tifFileTileProvider(
-        mycrs: epsg31370CRS, sourceImPath: "BV_FEE_colorP.tif");
+        mycrs: epsg31370CRS, sourceImPath: gl.dico.getRastPath("BV_FEE"));
     _provider.init();
   }
 
@@ -173,7 +176,7 @@ class _MapPageState extends State<mapPage> {
                 },
                 crs: epsg31370CRS,
                 initialZoom: 8.0,
-                maxZoom: 14,
+                maxZoom: 10,
                 minZoom: 0,
                 initialCenter: latlonEpioux,
                 cameraConstraint: CameraConstraint.contain(

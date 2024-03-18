@@ -5,6 +5,7 @@ import 'package:image/image.dart' as img;
 import 'dart:math';
 import 'package:flutter/services.dart';
 import 'package:path/path.dart';
+import 'dart:io';
 
 class tifFileTileProvider extends TileProvider {
   final Proj4Crs mycrs;
@@ -20,9 +21,14 @@ class tifFileTileProvider extends TileProvider {
 
   Future init() async {
     print("init tifFileTileProvider by loading source image in memory");
-    ByteData data =
-        await rootBundle.load(url.join("assets", "BV_FEE_colorP.tif"));
-    _sourceImage = img.TiffDecoder().decode(data.buffer.asUint8List())!;
+    final File fileIm = File(sourceImPath);
+    bool e = await fileIm.exists();
+
+    print("file exist" + e.toString());
+    Uint8List bytes = await fileIm.readAsBytes();
+    //ByteData data = await rootBundle.load(url.join("assets", "BV_FEE_colorP.tif"));
+    //_sourceImage = img.TiffDecoder().decode(data.buffer.asUint8List())!;
+    _sourceImage = img.TiffDecoder().decode(bytes)!;
     _loaded = true;
   }
 

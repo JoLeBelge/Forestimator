@@ -61,6 +61,10 @@ class tifFileTileProvider extends TileProvider {
       initImSize =
           (tileSize.toDouble() / pow(2, (coordinates.z - zFullIm)).toDouble())
               .round();
+      print("zoom " +
+          coordinates.z.toString() +
+          " initImSize " +
+          initImSize.toString());
     }
 
     img.Image cropped = img.copyCrop(_sourceImage,

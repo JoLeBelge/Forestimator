@@ -7,6 +7,8 @@ import 'package:flutter/services.dart';
 import 'package:fforestimator/dico/ess.dart';
 import 'dart:async';
 import 'package:fforestimator/globals.dart' as gl;
+import 'package:fforestimator/pages/anaPt/onePixGeotifDecoder.dart';
+import 'package:proj4dart/proj4dart.dart' as proj4;
 
 class aptitude {
   late int mCodeNum;
@@ -250,6 +252,13 @@ class layerBase {
 
   void setHasOffline(bool offline) {
     mOffline = true;
+  }
+
+  Future<int> getValXY(proj4.Point pt) async {
+    final File fileIm = File("${gl.dico.docDir?.path}/${mNomRaster}");
+    onePixGeotifDecoder myDecoder = onePixGeotifDecoder(x: pt.x, y: pt.y);
+    Uint8List bytes = await fileIm.readAsBytes();
+    return myDecoder.getVal(bytes);
   }
 }
 
@@ -519,12 +528,17 @@ class dicoAptProvider {
 
   void checkLayerBaseOfflineRessource() async {
     for (layerBase l in mLayerBases.values) {
-      File file = File("${docDir?.path}/${l.mNomRaster}");
+      File file = File(getRastPath(l.mCode));
       if (await file.exists() == true) {
         l.setHasOffline(true);
       }
     }
     return;
+  }
+
+  String getRastPath(String aLayerCode) {
+    layerBase l = getLayerBase(aLayerCode);
+    return "${docDir?.path}/${l.mNomRaster}";
   }
 }
 

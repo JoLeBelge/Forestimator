@@ -8,6 +8,12 @@ class layerAnaPt {
   late int mRastValue;
   late String mValue;
 
+  layerAnaPt({required this.mCode, required this.mRastValue}) {
+    mValue = gl.dico.getLayerBase(mCode).getValLabel(mRastValue);
+    mFoundLayer = true;
+    mFoundRastFile = true;
+  }
+
   layerAnaPt.fromMap(final Map<String, dynamic> map)
       : mCode = map['layerCode'],
         mFoundLayer = map['foundLayer'],
