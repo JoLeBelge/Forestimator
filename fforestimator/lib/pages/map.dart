@@ -112,6 +112,13 @@ class _MapPageState extends State<mapPage> {
         .compareTo(gl.dico.getLayerBase(b.mCode).mGroupe));
   }
 
+    bool _isDownloadableLayer(String key) {
+    if (gl.downloadableLayerKeys.contains(key)) {
+      return true;
+    }
+    return false;
+  }
+
   late tifFileTileProvider _provider;
 
   @override
@@ -119,7 +126,7 @@ class _MapPageState extends State<mapPage> {
     super.initState();
     gl.refreshMap = setState;
     _provider = tifFileTileProvider(
-        mycrs: epsg31370CRS, sourceImPath: gl.dico.getRastPath("BV_FEE"));
+        mycrs: epsg31370CRS, sourceImPath: gl.dico.getRastPath("Topo"));
     _provider.init();
   }
 
@@ -153,6 +160,7 @@ class _MapPageState extends State<mapPage> {
           toolbarHeight: 20.0,
           backgroundColor: gl.colorAgroBioTech,
         ),
+        
         body: Stack(children: <Widget>[
           FlutterMap(
               mapController: _mapController,
@@ -198,7 +206,11 @@ class _MapPageState extends State<mapPage> {
               ),
               children: gl.interfaceSelectedLayerKeys.reversed
                       .map<Widget>((gl.selectedLayer selLayer) {
-                    if (_provider.loaded) {
+                    if (_isDownloadableLayer(selLayer.mCode)) {
+                      print("that is et");
+                      print(gl.dico.getRastPath(selLayer.mCode));
+                      _provider.sourceImPath = gl.dico.getRastPath(selLayer.mCode);
+                      _provider.init();
                       return TileLayer(
                         tileProvider: _provider,
                         // minNativeZoom: 8,
