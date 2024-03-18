@@ -165,9 +165,9 @@ class _CategoryView extends State<CategoryView> {
     return Column(
       children: <Widget>[
         if (lt.downloadable)
-          const ColoredBox(
+          ColoredBox(
               color: gl.colorAgroBioTech,
-              child: FileDownloader()),
+              child: FileDownloader(lt)),
         LegendView(
           layerKey: lt.key,
           color: _getBackgroundColorForList(),
