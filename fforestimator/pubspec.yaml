@@ -43,6 +43,7 @@ dependencies:
   path_provider: ^2.1.2
   http: ^1.0.0
   tuple: ^2.0.2
+  flutter_downloader: ^1.11.6
 
   geolocator: ^10.1.0 
   geolocator_linux: ^0.2.0+1 # la version geolocator_linux de geolocator 10.1 est la 0.1.3 buggée

@@ -1,5 +1,6 @@
 import 'package:fforestimator/dico/dicoApt.dart';
-import 'package:fforestimator/progressBar.dart';
+import 'package:fforestimator/tools/fileDownloader.dart';
+import 'package:fforestimator/tools/progressBar.dart';
 import 'package:flutter/material.dart';
 import 'package:fforestimator/globals.dart' as gl;
 import 'package:fforestimator/pages/catalogueView/categoryTile.dart';
@@ -164,9 +165,9 @@ class _CategoryView extends State<CategoryView> {
     return Column(
       children: <Widget>[
         if (lt.downloadable)
-          ColoredBox(
+          const ColoredBox(
               color: gl.colorAgroBioTech,
-              child: ProgressBar()),
+              child: FileDownloader()),
         LegendView(
           layerKey: lt.key,
           color: _getBackgroundColorForList(),

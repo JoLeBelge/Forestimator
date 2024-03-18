@@ -15,6 +15,7 @@ import 'package:flutter/services.dart';
 import 'package:fforestimator/scaffoldNavigation.dart';
 import 'dart:convert';
 import 'package:path/path.dart' as path;
+import 'package:flutter_downloader/flutter_downloader.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -22,8 +23,14 @@ void main() async {
   if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
     sqfliteFfiInit();
     databaseFactory = databaseFactoryFfi;
+  } else {
+    await FlutterDownloader.initialize(
+        debug:
+            true, // optional: set to false to disable printing logs to console (default: true)
+        ignoreSsl:
+            true // option: set to false to disable working with http links (default: false)
+        );
   }
-
   gl.dico = dicoAptProvider();
   await gl.dico.init();
 
