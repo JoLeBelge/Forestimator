@@ -112,7 +112,7 @@ class _MapPageState extends State<mapPage> {
         .compareTo(gl.dico.getLayerBase(b.mCode).mGroupe));
   }
 
-    bool _isDownloadableLayer(String key) {
+  bool _isDownloadableLayer(String key) {
     if (gl.downloadableLayerKeys.contains(key)) {
       return true;
     }
@@ -160,7 +160,6 @@ class _MapPageState extends State<mapPage> {
           toolbarHeight: 20.0,
           backgroundColor: gl.colorAgroBioTech,
         ),
-        
         body: Stack(children: <Widget>[
           FlutterMap(
               mapController: _mapController,
@@ -209,7 +208,8 @@ class _MapPageState extends State<mapPage> {
                     if (_isDownloadableLayer(selLayer.mCode)) {
                       print("that is et");
                       print(gl.dico.getRastPath(selLayer.mCode));
-                      _provider.sourceImPath = gl.dico.getRastPath(selLayer.mCode);
+                      _provider.sourceImPath =
+                          gl.dico.getRastPath(selLayer.mCode);
                       _provider.init();
                       return TileLayer(
                         tileProvider: _provider,
