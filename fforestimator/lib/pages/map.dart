@@ -118,7 +118,7 @@ class _MapPageState extends State<mapPage> {
     return false;
   }
 
-  tifFileTileProvider ?_provider;
+  tifFileTileProvider? _provider;
 
   @override
   void initState() {
@@ -205,18 +205,6 @@ class _MapPageState extends State<mapPage> {
               children: gl.interfaceSelectedLayerKeys.reversed
                       .map<Widget>((gl.selectedLayer selLayer) {
                     if (_isDownloadableLayer(selLayer.mCode)) {
-<<<<<<< HEAD
-                      print("that is et");
-                      print(gl.dico.getRastPath(selLayer.mCode));
-                      _provider.sourceImPath =
-                          gl.dico.getRastPath(selLayer.mCode);
-                      _provider.init();
-                      return TileLayer(
-                        tileProvider: _provider,
-                        // minNativeZoom: 8,
-                        minZoom: 5,
-                      );
-=======
                       if (_provider == null ||
                           _provider?.layerCode != selLayer.mCode) {
                         if (_provider != null) {
@@ -236,7 +224,6 @@ class _MapPageState extends State<mapPage> {
                               minZoom: 5,
                             )
                           : Container();
->>>>>>> 01376471901d3610fbb4f2ce056e4ac983b4d753
                     } else {
                       layerBase l = gl.dico.getLayerBase(selLayer.mCode);
                       return TileLayer(

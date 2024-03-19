@@ -1,16 +1,11 @@
 To do list fforestimator
 ------------------------
 
-Jo -> anaPtOffline
-
-Jo -> legender le logo compensation matrice aptitude -> tooltip onTap?
+Jo -Export du résulat de l'analyse ponctuelle sous format pdf.
 
 TT ->gestion mapController avec et sans position GPS ; s'inspirer de Qfield
 
-TT -> interface graphique et réalisation du download des raster pour anaPonctuelle/ visulation offline
--> offir la possibilité de télécharger un lot de raster pour l'analyse ponctuelle offline LORS DE LA PREMIERE UTILISATION de l'app: ZBIO, NT, NH, TOPO, GS_Ardenne et CNSWrast. 
-
-Jo ou TT -Export du résulat de l'analyse ponctuelle sous format pdf.
+TT -> interface graphique et réalisation du download des raster pour usage offline
 
 DATE PREMIERE RELEASE : 19/04 (semaine forêt étudiant GRF)
 
