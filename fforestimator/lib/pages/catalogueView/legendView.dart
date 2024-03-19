@@ -36,41 +36,7 @@ class _LegendView extends State<LegendView> {
       ),
       child: Column(
         children: [
-          if (gl.dico.getLayerBase(widget.layerKey).hasDoc())
-            ListTile(
-              title: Text(
-                  "Consulter la documentation relative à la cette couche cartographique"),
-              leading: IconButton(
-                  onPressed: () {
-                    GoRouter.of(context).pushNamed(widget.layerKey, pathParameters: {
-                      'currentPage': gl.dico
-                          .getLayerBase(widget.layerKey)
-                          .mPdfPage
-                          .toString()
-                    });
-                  },
-                  icon: Icon(Icons.picture_as_pdf)),
-            ),
-          if ((gl.dico.getLayerBase(widget.layerKey).mGroupe == "APT_FEE" ||
-                  gl.dico.getLayerBase(widget.layerKey).mGroupe == "APT_CS") &&
-              gl.dico
-                  .getEss(gl.dico.getLayerBase(widget.layerKey).getEssCode())
-                  .hasFEEapt())
-            ListTile(
-              title: Text("Consulter la fiche-essence " +
-                  gl.dico
-                      .getEss(
-                          gl.dico.getLayerBase(widget.layerKey).getEssCode())
-                      .getNameAndPrefix()),
-              leading: IconButton(
-                  onPressed: () {
-                    GoRouter.of(context).push(gl.dico
-                        .getEss(
-                            gl.dico.getLayerBase(widget.layerKey).getEssCode())
-                        .getFicheRoute(complete: true));
-                  },
-                  icon: Icon(Icons.picture_as_pdf)),
-            ),
+          
           Container(
               constraints: BoxConstraints(
                   maxHeight: MediaQuery.of(context).size.height * .03),

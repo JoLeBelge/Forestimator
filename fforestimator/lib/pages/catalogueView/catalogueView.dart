@@ -1,13 +1,14 @@
 import 'dart:io';
 
 import 'package:fforestimator/dico/dicoApt.dart';
-import 'package:fforestimator/tools/fileDownloader.dart';
+import 'package:fforestimator/tools/layerDownloader.dart';
 import 'package:fforestimator/tools/progressBar.dart';
 import 'package:flutter/material.dart';
 import 'package:fforestimator/globals.dart' as gl;
 import 'package:fforestimator/pages/catalogueView/categoryTile.dart';
 import 'package:fforestimator/pages/catalogueView/layerTile.dart';
 import 'package:fforestimator/pages/catalogueView/legendView.dart';
+import 'package:go_router/go_router.dart';
 
 ScrollController it = ScrollController();
 ClampingScrollPhysics that = const ClampingScrollPhysics();
@@ -167,7 +168,99 @@ class _CategoryView extends State<CategoryView> {
     return Column(
       children: <Widget>[
         if (lt.downloadable)
-          ColoredBox(color: gl.colorAgroBioTech, child: FileDownloader(lt)),
+          ColoredBox(color: gl.colorBackground, child: LayerDownloader(lt)),
+        if (gl.dico.getLayerBase(lt.key).mUsedForAnalysis)
+          ColoredBox(
+              color: gl.colorBackgroundSecondary,
+              child: gl.anaPtSelectedLayerKeys.contains(lt.key)
+                  ? Row(children: [
+                      Container(
+                          constraints: const BoxConstraints(
+                            maxWidth: 48,
+                            minWidth: 48,
+                            maxHeight: 48,
+                            minHeight: 48,
+                          ),
+                          padding: const EdgeInsets.all(0),
+                          child: IconButton(
+                              icon: const Icon(Icons.location_on, size: 28),
+                              onPressed: () {
+                                setState(() {
+                                  if (gl.anaPtSelectedLayerKeys.length > 1) {
+                                    gl.anaPtSelectedLayerKeys.remove(lt.key);
+                                    lt.selected = false;
+                                    widget.refreshView();
+                                  }
+                                });
+                              })),
+                      Container(
+                          constraints: const BoxConstraints(
+                              maxWidth: 256,
+                              minWidth: 48,
+                              maxHeight: 48,
+                              minHeight: 48),
+                          child: const Text(
+                              "La couche est selectionnée pour l'analyse ponctuelle."))
+                    ])
+                  : Row(children: [
+                      Container(
+                        constraints: const BoxConstraints(
+                          maxWidth: 48,
+                          minWidth: 48,
+                          maxHeight: 48,
+                          minHeight: 48,
+                        ),
+                        padding: const EdgeInsets.all(0),
+                        child: IconButton(
+                            icon: const Icon(Icons.location_off, size: 28),
+                            onPressed: () {
+                              setState(() {
+                                gl.anaPtSelectedLayerKeys.insert(0, lt.key);
+                                lt.selected = true;
+                                widget.refreshView();
+                              });
+                            }),
+                      ),
+                      Container(
+                          constraints: const BoxConstraints(
+                              maxWidth: 256,
+                              minWidth: 48,
+                              maxHeight: 48,
+                              minHeight: 48),
+                          child: const Text(
+                              "La couche n'est pas selectionnée pour l'analyse ponctuelle."))
+                    ])),
+        if (gl.dico.getLayerBase(lt.key).hasDoc())
+          ListTile(
+            title: Text(
+                "Consulter la documentation relative à la cette couche cartographique"),
+            leading: IconButton(
+                onPressed: () {
+                  GoRouter.of(context).pushNamed(lt.key, pathParameters: {
+                    'currentPage':
+                        gl.dico.getLayerBase(lt.key).mPdfPage.toString()
+                  });
+                },
+                icon: Icon(Icons.picture_as_pdf)),
+          ),
+        if ((gl.dico.getLayerBase(lt.key).mGroupe == "APT_FEE" ||
+                gl.dico.getLayerBase(lt.key).mGroupe == "APT_CS") &&
+            gl.dico
+                .getEss(gl.dico.getLayerBase(lt.key).getEssCode())
+                .hasFEEapt())
+          ListTile(
+            title: Text("Consulter la fiche-essence " +
+                gl.dico
+                    .getEss(gl.dico.getLayerBase(lt.key).getEssCode())
+                    .getNameAndPrefix()),
+            leading: IconButton(
+                onPressed: () {
+                  GoRouter.of(context).push(gl.dico
+                      .getEss(gl.dico.getLayerBase(lt.key).getEssCode())
+                      .getFicheRoute(complete: true));
+                },
+                icon: Icon(Icons.picture_as_pdf)),
+          ),
         LegendView(
           layerKey: lt.key,
           color: _getBackgroundColorForList(),
