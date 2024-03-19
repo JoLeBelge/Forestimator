@@ -251,6 +251,8 @@ class layerBase {
   }
 
   void setHasOffline(bool offline) {
+    print("offline layer;");
+    print(this.toString());
     mOffline = true;
   }
 
