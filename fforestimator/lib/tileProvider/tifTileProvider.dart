@@ -13,24 +13,33 @@ class tifFileTileProvider extends TileProvider {
   img.Image? _sourceImage;
   String sourceImPath;
   bool _loaded = false;
+  String layerCode;
 
   bool get loaded => _loaded;
 
-  tifFileTileProvider(
-      {super.headers, required this.mycrs, required this.sourceImPath});
+  Function refreshView;
 
-  Future init() async {
+  tifFileTileProvider(
+      {super.headers,
+      required this.mycrs,
+      required this.sourceImPath,
+      required this.layerCode,
+      required this.refreshView});
+
+  void init() async {
     print("init tifFileTileProvider by loading source image in memory");
     final File fileIm = File(sourceImPath);
     bool e = await fileIm.exists();
 
     print("file exist" + e.toString());
-    if (e){
-    Uint8List bytes = await fileIm.readAsBytes();
-    //ByteData data = await rootBundle.load(url.join("assets", "BV_FEE_colorP.tif"));
-    //_sourceImage = img.TiffDecoder().decode(data.buffer.asUint8List())!;
-    _sourceImage = img.TiffDecoder().decode(bytes)!;
-    _loaded = true;
+    if (e) {
+      Uint8List bytes = await fileIm.readAsBytes();
+      //ByteData data = await rootBundle.load(url.join("assets", "BV_FEE_colorP.tif"));
+      //_sourceImage = img.TiffDecoder().decode(data.buffer.asUint8List())!;
+      _sourceImage = img.TiffDecoder().decode(bytes)!;
+      refreshView(() {
+        _loaded = true;
+      });
     }
   }
 

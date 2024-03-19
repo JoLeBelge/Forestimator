@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:fforestimator/dico/dicoApt.dart';
 import 'package:fforestimator/tools/fileDownloader.dart';
 import 'package:fforestimator/tools/progressBar.dart';
@@ -123,7 +125,14 @@ class _CategoryView extends State<CategoryView> {
 
   Widget _buildPanel() {
     return ExpansionPanelList(
-      expansionCallback: (int index, bool isExpanded) {
+      expansionCallback: (int index, bool isExpanded) async {
+        final File file = File(gl.dico.docDir.path +
+              "/" +
+              gl.dico
+                  .getLayerBase(_layerTiles[widget.category]![index].key)
+                  .mNomRaster);
+        _layerTiles[widget.category]![index].savedOnDisk =
+              await file.exists();
         setState(() {
           _layerTiles[widget.category]![index].isExpanded = isExpanded;
         });
@@ -165,9 +174,7 @@ class _CategoryView extends State<CategoryView> {
     return Column(
       children: <Widget>[
         if (lt.downloadable)
-          ColoredBox(
-              color: gl.colorAgroBioTech,
-              child: FileDownloader(lt)),
+          ColoredBox(color: gl.colorAgroBioTech, child: FileDownloader(lt)),
         LegendView(
           layerKey: lt.key,
           color: _getBackgroundColorForList(),

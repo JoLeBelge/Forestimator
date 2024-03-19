@@ -12,7 +12,6 @@ import 'package:fforestimator/globals.dart' as gl;
 import 'package:http/http.dart' as http;
 import 'package:fforestimator/pages/anaPt/requestedLayer.dart';
 import 'package:go_router/go_router.dart';
-import 'package:fforestimator/tileProvider/tifTileProvider.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 
 import 'dart:convert';
@@ -112,22 +111,23 @@ class _MapPageState extends State<mapPage> {
         .compareTo(gl.dico.getLayerBase(b.mCode).mGroupe));
   }
 
-    bool _isDownloadableLayer(String key) {
+  bool _isDownloadableLayer(String key) {
     if (gl.downloadableLayerKeys.contains(key)) {
       return true;
     }
     return false;
   }
 
-  late tifFileTileProvider _provider;
+  tifFileTileProvider ?_provider;
 
   @override
   void initState() {
     super.initState();
     gl.refreshMap = setState;
-    _provider = tifFileTileProvider(
-        mycrs: epsg31370CRS, sourceImPath: gl.dico.getRastPath("Topo"));
-    _provider.init();
+  }
+
+  void refreshView(void Function() f) {
+    setState(f);
   }
 
   @override
@@ -153,14 +153,13 @@ class _MapPageState extends State<mapPage> {
 
     return Scaffold(
         appBar: AppBar(
-          title: Text(
+          title: const Text(
             "Forestimator",
             textScaler: TextScaler.linear(0.75),
           ),
           toolbarHeight: 20.0,
           backgroundColor: gl.colorAgroBioTech,
         ),
-        
         body: Stack(children: <Widget>[
           FlutterMap(
               mapController: _mapController,
@@ -193,7 +192,6 @@ class _MapPageState extends State<mapPage> {
                   gl.position = await acquireUserLocation();
                   await refreshAnalysisPosition();
                   if (gl.position != null) {
-                    //TODO: Ca semble marcher
                     // IMPORTANT: rebuild location layer when permissions are granted
                     setState(() {
                       _mapController.move(
@@ -207,15 +205,25 @@ class _MapPageState extends State<mapPage> {
               children: gl.interfaceSelectedLayerKeys.reversed
                       .map<Widget>((gl.selectedLayer selLayer) {
                     if (_isDownloadableLayer(selLayer.mCode)) {
-                      print("that is et");
-                      print(gl.dico.getRastPath(selLayer.mCode));
-                      _provider.sourceImPath = gl.dico.getRastPath(selLayer.mCode);
-                      _provider.init();
-                      return TileLayer(
-                        tileProvider: _provider,
-                        // minNativeZoom: 8,
-                        minZoom: 5,
-                      );
+                      if (_provider == null ||
+                          _provider?.layerCode != selLayer.mCode) {
+                        if (_provider != null) {
+                          _provider?.dispose();
+                        }
+                        _provider = tifFileTileProvider(
+                            refreshView: refreshView,
+                            mycrs: epsg31370CRS,
+                            sourceImPath: gl.dico.getRastPath(selLayer.mCode),
+                            layerCode: selLayer.mCode);
+                        _provider?.init();
+                      }
+                      return _provider!.loaded
+                          ? TileLayer(
+                              tileProvider: _provider,
+                              // minNativeZoom: 8,
+                              minZoom: 5,
+                            )
+                          : Container();
                     } else {
                       layerBase l = gl.dico.getLayerBase(selLayer.mCode);
                       return TileLayer(
