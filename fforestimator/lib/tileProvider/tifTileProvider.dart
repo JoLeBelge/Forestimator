@@ -6,6 +6,7 @@ import 'dart:math';
 import 'package:flutter/services.dart';
 import 'package:path/path.dart';
 import 'dart:io';
+import 'dart:convert';
 
 class tifFileTileProvider extends TileProvider {
   final Proj4Crs mycrs;
@@ -37,9 +38,7 @@ class tifFileTileProvider extends TileProvider {
       //ByteData data = await rootBundle.load(url.join("assets", "BV_FEE_colorP.tif"));
       //_sourceImage = img.TiffDecoder().decode(data.buffer.asUint8List())!;
       _sourceImage = img.TiffDecoder().decode(bytes)!;
-      refreshView(() {
-        _loaded = true;
-      });
+      _loaded = true;
     }
   }
 
@@ -75,10 +74,17 @@ class tifFileTileProvider extends TileProvider {
       zFullIm = 6;
     }*/
     int initImSize = (pow(2, (zFullIm - coordinates.z)) * tileSize).toInt();
-
-    img.Image cropped = img.copyCrop(_sourceImage!,
-        x: xOffset, y: yOffset, width: initImSize, height: initImSize);
-    img.Image resized = img.copyResize(cropped, width: tileSize);
-    return MemoryImage(img.encodePng(resized));
+    if (_sourceImage != null) {
+      img.Image cropped = img.copyCrop(_sourceImage!,
+          x: xOffset, y: yOffset, width: initImSize, height: initImSize);
+      img.Image resized = img.copyResize(cropped, width: tileSize);
+      return MemoryImage(img.encodePng(resized));
+    } else {
+      Uint8List blankBytes = Base64Codec()
+          .decode("R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7");
+      return MemoryImage(
+        blankBytes,
+      );
+    }
   }
 }

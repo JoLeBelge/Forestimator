@@ -118,7 +118,7 @@ class _MapPageState extends State<mapPage> {
     return false;
   }
 
-  tifFileTileProvider ?_provider;
+  tifFileTileProvider? _provider;
 
   @override
   void initState() {
