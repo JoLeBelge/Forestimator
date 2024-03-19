@@ -26,13 +26,13 @@ class _FileDownloaderState extends State<FileDownloader> {
             maxHeight: MediaQuery.of(context).size.height * .1),
         child: const Text("Downloads are not supported yet."),
       );
-    } else if (widget.layer.savedOnDisk) {
+    } else if (gl.dico.getLayerBase(widget.layer.key).mOffline) {
       return IconButton(
           onPressed: () async {
             await fileDelete(join(gl.dico.docDir.path,
                 gl.dico.getLayerBase(widget.layer.key).mNomRaster));
             setState(() {
-              widget.layer.savedOnDisk = false;
+              gl.dico.getLayerBase(widget.layer.key).mOffline = false;
             });
           },
           icon: const Icon(Icons.delete));
@@ -41,7 +41,7 @@ class _FileDownloaderState extends State<FileDownloader> {
           onPressed: () async {
             await _downloadFile();
             setState(() {
-              widget.layer.savedOnDisk = true;
+              gl.dico.getLayerBase(widget.layer.key).mOffline = true;
             });
           },
           icon: const Icon(Icons.download));

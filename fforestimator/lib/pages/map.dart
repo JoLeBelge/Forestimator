@@ -204,7 +204,7 @@ class _MapPageState extends State<mapPage> {
               ),
               children: gl.interfaceSelectedLayerKeys.reversed
                       .map<Widget>((gl.selectedLayer selLayer) {
-                    if (_isDownloadableLayer(selLayer.mCode)) {
+                    if (gl.dico.getLayerBase(selLayer.mCode).mOffline) {
                       if (_provider == null ||
                           _provider?.layerCode != selLayer.mCode) {
                         if (_provider != null) {
