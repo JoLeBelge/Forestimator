@@ -119,7 +119,7 @@ class _MapPageState extends State<mapPage> {
     super.initState();
     gl.refreshMap = setState;
     _provider = tifFileTileProvider(
-        mycrs: epsg31370CRS, sourceImPath: "BV_FEE_colorP.tif");
+        mycrs: epsg31370CRS, sourceImPath: "/home/jo/Documents/CNSW.tif");
     _provider.init();
   }
 

@@ -88,11 +88,22 @@ class _MyApp extends State<MyApp> {
     }
   }
 
+  void _lookForDownloadedFiles() async {
+    // Downloaded Layers
+    for (var layerCode in gl.dico.mLayerBases.keys) {
+      final File file = File(gl.dico.docDir.path +
+          "/" +
+          gl.dico.getLayerBase(layerCode).mNomRaster);
+      gl.dico.getLayerBase(layerCode).mOffline = await file.exists();
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     // copier tout les pdf de l'asset bundle vers un fichier utilisable par la librairie flutter_pdfviewer
     _listAndCopyPdfassets();
+    _lookForDownloadedFiles();
   }
 
   late final _router = GoRouter(

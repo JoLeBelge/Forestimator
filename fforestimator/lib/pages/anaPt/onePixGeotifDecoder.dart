@@ -54,8 +54,15 @@ class onePixGeotifDecoder extends Decoder {
     final data = _input.toList(0, byteCount);
     List<int> outData = const ZLibDecoder().decodeBytes(data);
     //print("list int = " + outData.toString());
-    //byteData = InputBuffer(outData);
-    aRes = outData[uv.x.toInt()];
+    //print("taille :  " + outData.length.toString());
+
+    if (im.bitsPerSample == 16) {
+      aRes = (outData[(uv.x.toInt() * 2) - 1] << 8) + outData[uv.x.toInt() * 2];
+      print("int16: " + aRes.toString());
+    } else {
+      //byteData = InputBuffer(outData);
+      aRes = outData[uv.x.toInt()];
+    }
 
     return aRes;
   }

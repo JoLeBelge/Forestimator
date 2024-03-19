@@ -32,15 +32,20 @@ class tifFileTileProvider extends TileProvider {
     final File fileIm = File(sourceImPath);
     bool e = await fileIm.exists();
 
-    print("file exist" + e.toString());
+    print("file exist " + e.toString());
     if (e) {
       Uint8List bytes = await fileIm.readAsBytes();
-      //ByteData data = await rootBundle.load(url.join("assets", "BV_FEE_colorP.tif"));
-      //_sourceImage = img.TiffDecoder().decode(data.buffer.asUint8List())!;
-      _sourceImage = img.TiffDecoder().decode(bytes)!;
-      refreshView(() {
-        _loaded = true;
-      });
+
+      img.TiffInfo _tiffInfo = img.TiffDecoder().startDecode(bytes)!;
+      img.TiffImage tifIm = _tiffInfo!.images[0];
+      int bps = tifIm.bitsPerSample;
+      // le décodage d'un tif 16 bits semble poser problème, donc on restreint aux 8bits
+      if (bps <= 8) {
+        _sourceImage = img.TiffDecoder().decode(bytes);
+        refreshView(() {
+          _loaded = true;
+        });
+      }
     }
   }
 

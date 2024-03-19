@@ -33,6 +33,7 @@ class _anaPtpageState extends State<anaPtpage> {
               IconButton(
                   icon: const Icon(Icons.picture_as_pdf, size: 28),
                   onPressed: () {
+                    // j'aimerai ouvrir un nouvelle page pour demander le nom du fichier pdf -> voir exportPdfDialog . Pour l'instant je fait sans
                     makePdf(widget.requestedLayers, "toto.pdf");
                   }),
               _anaPtListLayers(context, widget.requestedLayers),

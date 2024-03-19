@@ -126,13 +126,6 @@ class _CategoryView extends State<CategoryView> {
   Widget _buildPanel() {
     return ExpansionPanelList(
       expansionCallback: (int index, bool isExpanded) async {
-        final File file = File(gl.dico.docDir.path +
-              "/" +
-              gl.dico
-                  .getLayerBase(_layerTiles[widget.category]![index].key)
-                  .mNomRaster);
-        _layerTiles[widget.category]![index].savedOnDisk =
-              await file.exists();
         setState(() {
           _layerTiles[widget.category]![index].isExpanded = isExpanded;
         });
