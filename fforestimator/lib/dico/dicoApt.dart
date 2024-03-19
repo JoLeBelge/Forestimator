@@ -96,6 +96,7 @@ class layerBase {
   String? nom_field_raster, nom_field_value, nom_dico, condition;
   Map<int, String> mDicoVal; // valeur raster vers signification
   Map<int, Color> mDicoCol; // valeur raster vers couleur
+  late bool mUsedForAnalysis;
   //String mNomFile,mDir; mPathQml mPathRaster,
 
 // frommap avec liste d'instanciation, inspiré de https://medium.com/@lumeilin/using-sqlite-in-flutter-59b27b099123
@@ -127,7 +128,8 @@ class layerBase {
         mNomRaster = map['Nom'],
         mDicoVal = {},
         mDicoCol = {},
-        mOffline = false;
+        mOffline = false,
+        mUsedForAnalysis = false;
 
   layerBase()
       : mNom = '',
@@ -149,7 +151,8 @@ class layerBase {
         mPdfPage = 1,
         mDicoVal = {},
         mDicoCol = {},
-        mRes = 0.0;
+        mRes = 0.0,
+        mUsedForAnalysis = false;
 
   bool hasDoc() {
     return mPdfName != "";
@@ -377,6 +380,7 @@ class dicoAptProvider {
     finishedLoading = true;
 
     checkLayerBaseOfflineRessource();
+    checkLayerBaseForAnalysis();
   }
 
   Ess getEss(String aCode) {
@@ -533,6 +537,18 @@ class dicoAptProvider {
       File file = File(getRastPath(l.mCode));
       if (await file.exists() == true) {
         l.setHasOffline(true);
+      }
+    }
+    return;
+  }
+
+  void checkLayerBaseForAnalysis() async {
+    for (layerBase l in mLayerBases.values) {
+      File file = File(getRastPath(l.mCode));
+      if (l.mGroupe != "APT_CS" &&
+          l.mGroupe != "APT_FEE" &&
+          l.mCategorie != "externe") {
+        l.mUsedForAnalysis = true;
       }
     }
     return;
