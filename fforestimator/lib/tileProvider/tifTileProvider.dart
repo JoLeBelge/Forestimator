@@ -38,13 +38,9 @@ class tifFileTileProvider extends TileProvider {
       //ByteData data = await rootBundle.load(url.join("assets", "BV_FEE_colorP.tif"));
       //_sourceImage = img.TiffDecoder().decode(data.buffer.asUint8List())!;
       _sourceImage = img.TiffDecoder().decode(bytes)!;
-<<<<<<< HEAD
-      _loaded = true;
-=======
       refreshView(() {
         _loaded = true;
       });
->>>>>>> 01376471901d3610fbb4f2ce056e4ac983b4d753
     }
   }
 
