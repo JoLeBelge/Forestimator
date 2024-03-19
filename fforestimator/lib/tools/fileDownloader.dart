@@ -16,21 +16,36 @@ class FileDownloader extends StatefulWidget {
 class _FileDownloaderState extends State<FileDownloader> {
   @override
   Widget build(BuildContext context) {
-    return (Platform.isWindows || Platform.isLinux || Platform.isMacOS)
-        ? Container(
-            color: gl.colorBackground,
-            constraints: BoxConstraints(
-                minWidth: MediaQuery.of(context).size.width * 1,
-                maxWidth: MediaQuery.of(context).size.width * 1,
-                minHeight: MediaQuery.of(context).size.height * .1,
-                maxHeight: MediaQuery.of(context).size.height * .1),
-            child: const Text("Downloads are not supported yet."),
-          )
-        : IconButton(
-            onPressed: () async {
-              await _downloadFile();
-            },
-            icon: Icon(Icons.download));
+    if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+      return Container(
+        color: gl.colorBackground,
+        constraints: BoxConstraints(
+            minWidth: MediaQuery.of(context).size.width * 1,
+            maxWidth: MediaQuery.of(context).size.width * 1,
+            minHeight: MediaQuery.of(context).size.height * .1,
+            maxHeight: MediaQuery.of(context).size.height * .1),
+        child: const Text("Downloads are not supported yet."),
+      );
+    } else if (widget.layer.savedOnDisk) {
+      return IconButton(
+          onPressed: () async {
+            await fileDelete(join(gl.dico.docDir.path,
+                gl.dico.getLayerBase(widget.layer.key).mNomRaster));
+            setState(() {
+              widget.layer.savedOnDisk = false;
+            });
+          },
+          icon: const Icon(Icons.delete));
+    } else {
+      return IconButton(
+          onPressed: () async {
+            await _downloadFile();
+            setState(() {
+              widget.layer.savedOnDisk = true;
+            });
+          },
+          icon: const Icon(Icons.download));
+    }
     Container(
       constraints: BoxConstraints(
           minWidth: MediaQuery.of(context).size.width * 1,
@@ -43,6 +58,7 @@ class _FileDownloaderState extends State<FileDownloader> {
       ),
     );
   }
+
 
   Future<String?> _downloadFile() async {
     late Future<String?> taskId;
@@ -59,5 +75,18 @@ class _FileDownloaderState extends State<FileDownloader> {
       );
     }
     return taskId;
+  }
+
+  static Future<bool> fileExists(String path) async {
+    final File file = File(path);
+    return file.exists();
+  }
+
+  static Future<bool> fileDelete(String path) async {
+    final File file = File(path);
+    if (await file.exists()) {
+      file.delete();
+    }
+    return fileExists(path);
   }
 }

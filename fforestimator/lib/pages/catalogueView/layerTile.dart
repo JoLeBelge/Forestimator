@@ -16,4 +16,5 @@ class LayerTile {
   bool selected;
   bool extern;
   bool downloadable;
+  bool savedOnDisk = false;
 }
