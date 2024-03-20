@@ -83,7 +83,7 @@ class groupe_couche {
 
 class layerBase {
   late String mNom, mNomCourt, mNomRaster;
-  late bool mExpert, mVisu, mOffline;
+  late bool mExpert, mVisu, mOffline, mIsDownloadableRW;
   late String mCode;
   late String mUrl, mWMSLayerName, mWMSattribution, mTypeGeoservice;
   late String mGroupe;
@@ -129,7 +129,9 @@ class layerBase {
         mDicoVal = {},
         mDicoCol = {},
         mOffline = false,
-        mUsedForAnalysis = false;
+        mUsedForAnalysis = false {
+    mIsDownloadableRW = mRes >= 10 ? true : false;
+  }
 
   layerBase()
       : mNom = '',

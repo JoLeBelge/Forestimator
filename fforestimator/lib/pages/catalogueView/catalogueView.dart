@@ -403,6 +403,7 @@ class _CategoryView extends State<CategoryView> {
         ]));
   }
 
+// downloadableLayerKeys contient la liste des couches qu'on voudrai télécharger par défaut pour tout les utilisateurs. mais le fait qu'elle soit téléchargeable est définit dans layerbase.mIsDownloadableRW
   bool _isDownloadableLayer(String key) {
     if (gl.downloadableLayerKeys.contains(key)) {
       return true;
@@ -424,7 +425,7 @@ class _CategoryView extends State<CategoryView> {
             name: mp[key]!.mNom,
             filter: mp[key]!.mGroupe,
             key: key,
-            downloadable: _isDownloadableLayer(key),
+            downloadable: mp[key]!.mIsDownloadableRW,
             extern: mp[key]!.mCategorie == "Externe"));
       }
     }
