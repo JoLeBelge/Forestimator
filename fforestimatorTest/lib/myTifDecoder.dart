@@ -1,3 +1,4 @@
+import 'dart:ffi';
 import 'dart:typed_data';
 import 'package:archive/archive.dart';
 import 'package:image/image.dart';
@@ -52,8 +53,9 @@ class onePixGeotifDecoder extends Decoder {
     final byteCount = im.tileByteCounts![tileIndex];
 
     final data = _input.toList(0, byteCount);
+    // fonctionne que pour les raster en 8 bits. uint16 comme CNSW.tif -> retourne pas la bonne valeur.
     List<int> outData = const ZLibDecoder().decodeBytes(data);
-    //print("list int = " + outData.toString());
+    print("list int = " + outData.toString());
     //byteData = InputBuffer(outData);
     aRes = outData[uv.x.toInt()];
 
