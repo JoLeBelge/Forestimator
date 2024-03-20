@@ -4,6 +4,7 @@ import 'package:fforestimator/dico/dicoApt.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:fforestimator/pages/anaPt/requestedLayer.dart';
+import 'package:proj4dart/proj4dart.dart' as proj4;
 
 late dicoAptProvider dico;
 
@@ -11,7 +12,7 @@ String basePathbranchB = "catalogue";
 
 // ajouter le code le la couche à la fin de cette requete. fonctionne que pour layerbase avec mRes <= 10m sinon je considère que c'est trop volumineux
 String queryApiRastDownload =
-   "https://forestimator.gembloux.ulg.ac.be/api/rastPColor/layerCode";
+    "https://forestimator.gembloux.ulg.ac.be/api/rastPColor/layerCode";
 
 String defaultLayer = "IGN";
 // list to memorize the keys of selected layer to show in interface.
@@ -54,6 +55,7 @@ List<String> downloadableLayerKeys = [
 ];
 
 Position? position;
+late proj4.Point pt;
 
 const Color colorAgroBioTech = Color.fromRGBO(185, 205, 118, 1.0);
 const Color colorDeselected = Color.fromARGB(255, 46, 46, 46);

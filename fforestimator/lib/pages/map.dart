@@ -63,6 +63,7 @@ class _MapPageState extends State<mapPage> {
 
   Future _runAnaPt(proj4.Point ptBL72) async {
     gl.requestedLayers.clear();
+    gl.pt = ptBL72;
     ConnectivityResult conRes = await Connectivity().checkConnectivity();
     print(conRes);
     if (conRes != ConnectivityResult.none &&

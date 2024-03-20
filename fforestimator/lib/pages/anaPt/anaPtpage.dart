@@ -1,9 +1,12 @@
 import 'package:fforestimator/dico/dicoApt.dart';
 import "package:flutter/material.dart";
 import 'package:fforestimator/pages/anaPt/requestedLayer.dart';
+import 'package:fforestimator/pages/anaPt/anaPtpdf.dart';
 import 'package:fforestimator/globals.dart' as gl;
 import 'package:fforestimator/myicons.dart';
 import 'package:go_router/go_router.dart';
+import 'dart:typed_data';
+import 'dart:io';
 
 class anaPtpage extends StatefulWidget {
   List<layerAnaPt> requestedLayers = [];
@@ -27,6 +30,12 @@ class _anaPtpageState extends State<anaPtpage> {
         body: SingleChildScrollView(
             physics: ScrollPhysics(),
             child: Column(children: [
+              IconButton(
+                  icon: const Icon(Icons.picture_as_pdf, size: 28),
+                  onPressed: () {
+                    // j'aimerai ouvrir un nouvelle page pour demander le nom du fichier pdf -> voir exportPdfDialog . Pour l'instant je fait sans
+                    makePdf(widget.requestedLayers, "toto.pdf");
+                  }),
               _anaPtListLayers(context, widget.requestedLayers),
               SizedBox(height: 15),
               if (apts.ready) Card(child: _tabAptFEE(context, apts)),
