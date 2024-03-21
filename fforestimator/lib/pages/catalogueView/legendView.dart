@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:fforestimator/globals.dart' as gl;
-import 'package:go_router/go_router.dart';
 
 class LegendView extends StatefulWidget {
   final String layerKey;

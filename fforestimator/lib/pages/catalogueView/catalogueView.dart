@@ -137,25 +137,22 @@ class _CategoryView extends State<CategoryView> {
           canTapOnHeader: true,
           backgroundColor: _getswitchBackgroundColorForList(),
           headerBuilder: (BuildContext context, bool isExpanded) {
-            return ColoredBox(
-              color: _getswitchBackgroundColorForList(),
-              child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Container(
-                      constraints: BoxConstraints(
-                        maxWidth: MediaQuery.of(context).size.width * .55,
-                        maxHeight: MediaQuery.of(context).size.width * .2 > 48
-                            ? MediaQuery.of(context).size.width * .2
-                            : 48,
-                        minHeight: 48,
-                      ),
-                      child: Text(item.name,
-                          textScaler: const TextScaler.linear(1.2)),
+            return Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(
+                    constraints: BoxConstraints(
+                      maxWidth: MediaQuery.of(context).size.width * .55,
+                      maxHeight: MediaQuery.of(context).size.width * .2 > 48
+                          ? MediaQuery.of(context).size.width * .2
+                          : 48,
+                      minHeight: 48,
                     ),
-                    selectLayerBar(item),
-                  ]),
-            );
+                    child: Text(item.name,
+                        textScaler: const TextScaler.linear(1.2)),
+                  ),
+                  selectLayerBar(item),
+                ]);
           },
           body: _expandedLegendView(item),
           isExpanded: item.isExpanded,
@@ -322,8 +319,8 @@ class _CategoryView extends State<CategoryView> {
                         }))
                 : Container(
                     decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: _getBackgroundColorForList()),
+                      shape: BoxShape.circle,
+                    ),
                     constraints: const BoxConstraints(
                       maxWidth: 48,
                       minWidth: 48,
@@ -368,8 +365,8 @@ class _CategoryView extends State<CategoryView> {
                 )
               : Container(
                   decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: _getBackgroundColorForList()),
+                    shape: BoxShape.circle,
+                  ),
                   constraints: const BoxConstraints(
                     maxWidth: 48,
                     minWidth: 48,
