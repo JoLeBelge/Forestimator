@@ -1,8 +1,5 @@
-import 'dart:io';
-
 import 'package:fforestimator/dico/dicoApt.dart';
 import 'package:fforestimator/tools/layerDownloader.dart';
-import 'package:fforestimator/tools/progressBar.dart';
 import 'package:flutter/material.dart';
 import 'package:fforestimator/globals.dart' as gl;
 import 'package:fforestimator/pages/catalogueView/categoryTile.dart';
@@ -15,13 +12,16 @@ ClampingScrollPhysics that = const ClampingScrollPhysics();
 
 class CatalogueView extends StatefulWidget {
   final Function refreshView;
-  const CatalogueView({required this.refreshView, super.key});
+  final String mode;
+  const CatalogueView(
+      {required this.refreshView, required this.mode, super.key});
   @override
   State<CatalogueView> createState() => _CatalogueView();
 }
 
 class _CatalogueView extends State<CatalogueView> {
   static List<Category> _categories = [];
+  static List<Category> _offline = [Category(name: "Couches à télécharger.", filter: "offline")];
   static bool finishedInitializingCategories = false;
 
   @override
@@ -30,7 +30,9 @@ class _CatalogueView extends State<CatalogueView> {
       return SingleChildScrollView(
         physics: that,
         child: Container(
-          child: _buildPanel(),
+          child: widget.mode == "category"
+              ? _buildCategoryPanel()
+              : _buildOfflinePanel(),
         ),
       );
     } else {
@@ -38,7 +40,7 @@ class _CatalogueView extends State<CatalogueView> {
     }
   }
 
-  Widget _buildPanel() {
+  Widget _buildCategoryPanel() {
     return ExpansionPanelList(
       expandIconColor: Colors.black,
       expansionCallback: (int index, bool isExpanded) {
@@ -47,6 +49,34 @@ class _CatalogueView extends State<CatalogueView> {
         });
       },
       children: _categories.map<ExpansionPanel>((Category item) {
+        return ExpansionPanel(
+          canTapOnHeader: true,
+          backgroundColor: gl.colorBackground,
+          headerBuilder: (BuildContext context, bool isExpanded) {
+            return ListTile(
+              iconColor: Colors.red,
+              title: Text(item.name),
+            );
+          },
+          body: CategoryView(
+            refreshView: widget.refreshView,
+            category: item,
+          ),
+          isExpanded: item.isExpanded,
+        );
+      }).toList(),
+    );
+  }
+
+  Widget _buildOfflinePanel() {
+    return ExpansionPanelList(
+      expandIconColor: Colors.black,
+      expansionCallback: (int index, bool isExpanded) {
+        setState(() {
+          _offline[index].isExpanded = isExpanded;
+        });
+      },
+      children: _offline.map<ExpansionPanel>((Category item) {
         return ExpansionPanel(
           canTapOnHeader: true,
           backgroundColor: gl.colorBackground,
@@ -96,13 +126,13 @@ class CategoryView extends StatefulWidget {
 }
 
 class _CategoryView extends State<CategoryView> {
-  static Map<Category, List<LayerTile>> _layerTiles = {};
-  static Map<Category, bool> _finishedInitializingCategory = {};
+  static Map<String, List<LayerTile>> _layerTiles = {};
+  static Map<String, bool> _finishedInitializingCategory = {};
   bool _flipForBackground = false;
 
   @override
   Widget build(BuildContext context) {
-    if (_finishedInitializingCategory[widget.category]!) {
+    if (_finishedInitializingCategory[widget.category.filter]!) {
       return Container(
           constraints: BoxConstraints(
               maxWidth: MediaQuery.of(context).size.width * 1.0,
@@ -128,11 +158,11 @@ class _CategoryView extends State<CategoryView> {
     return ExpansionPanelList(
       expansionCallback: (int index, bool isExpanded) async {
         setState(() {
-          _layerTiles[widget.category]![index].isExpanded = isExpanded;
+          _layerTiles[widget.category.filter]![index].isExpanded = isExpanded;
         });
       },
       children:
-          _layerTiles[widget.category]!.map<ExpansionPanel>((LayerTile item) {
+          _layerTiles[widget.category.filter]!.map<ExpansionPanel>((LayerTile item) {
         return ExpansionPanel(
           canTapOnHeader: true,
           backgroundColor: _getswitchBackgroundColorForList(),
@@ -410,25 +440,40 @@ class _CategoryView extends State<CategoryView> {
 
   void _getLayerData() async {
     Map<String, layerBase> mp = gl.dico.mLayerBases;
-    for (var key in mp.keys) {
-      if (widget.category.filter == mp[key]!.mGroupe &&
-          !mp[key]!.mExpert &&
-          mp[key]!.mVisu &&
-          mp[key]?.mTypeGeoservice == "") {
-        if (_layerTiles[widget.category] == null) {
-          _layerTiles[widget.category] = [];
+    if (widget.category.filter == "category") {
+      for (var key in mp.keys) {
+        if (widget.category.filter == mp[key]!.mGroupe &&
+            !mp[key]!.mExpert &&
+            mp[key]!.mVisu &&
+            mp[key]?.mTypeGeoservice == "") {
+          if (_layerTiles[widget.category.filter] == null) {
+            _layerTiles[widget.category.filter] = [];
+          }
+          _layerTiles[widget.category.filter]!.add(LayerTile(
+              name: mp[key]!.mNom,
+              filter: mp[key]!.mGroupe,
+              key: key,
+              downloadable: mp[key]!.mIsDownloadableRW,
+              extern: mp[key]!.mCategorie == "Externe"));
         }
-        _layerTiles[widget.category]!.add(LayerTile(
-            name: mp[key]!.mNom,
-            filter: mp[key]!.mGroupe,
-            key: key,
-            downloadable: mp[key]!.mIsDownloadableRW,
-            extern: mp[key]!.mCategorie == "Externe"));
+      }
+    }
+    else{
+      _layerTiles[widget.category.filter] = [];
+      for (var key in mp.keys){
+        if (mp[key]!.mIsDownloadableRW){
+          _layerTiles[widget.category.filter]!.add(LayerTile(
+              name: mp[key]!.mNom,
+              filter: mp[key]!.mGroupe,
+              key: key,
+              downloadable: mp[key]!.mIsDownloadableRW,
+              extern: mp[key]!.mCategorie == "Externe"));
+        }
       }
     }
 
     setState(() {
-      _finishedInitializingCategory[widget.category] = true;
+      _finishedInitializingCategory[widget.category.filter] = true;
     });
   }
 
@@ -473,10 +518,10 @@ class _CategoryView extends State<CategoryView> {
   @override
   void initState() {
     super.initState();
-    if (_finishedInitializingCategory[widget.category] == null) {
-      _finishedInitializingCategory[widget.category] = false;
+    if (_finishedInitializingCategory[widget.category.filter] == null) {
+      _finishedInitializingCategory[widget.category.filter] = false;
     }
-    if (!_finishedInitializingCategory[widget.category]!) {
+    if (!_finishedInitializingCategory[widget.category.filter]!) {
       _getLayerData();
     }
     gl.refreshCatalogueView = setState;

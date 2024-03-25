@@ -9,6 +9,7 @@ import 'package:proj4dart/proj4dart.dart' as proj4;
 late dicoAptProvider dico;
 
 String basePathbranchB = "catalogue";
+String basePathbranchC = "offline";
 
 // ajouter le code le la couche à la fin de cette requete. fonctionne que pour layerbase avec mRes <= 10m sinon je considère que c'est trop volumineux
 String queryApiRastDownload =

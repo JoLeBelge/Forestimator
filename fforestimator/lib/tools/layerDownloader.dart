@@ -1,4 +1,6 @@
 import 'dart:io';
+import 'dart:isolate';
+import 'dart:ui';
 import 'package:fforestimator/pages/catalogueView/layerTile.dart';
 import 'package:flutter/material.dart';
 import 'package:fforestimator/globals.dart' as gl;
@@ -14,6 +16,9 @@ class LayerDownloader extends StatefulWidget {
 }
 
 class _LayerDownloaderState extends State<LayerDownloader> {
+  static double downloadState = 0.0;
+  ReceivePort _port = ReceivePort();
+
   @override
   Widget build(BuildContext context) {
     if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
@@ -26,7 +31,9 @@ class _LayerDownloaderState extends State<LayerDownloader> {
             maxHeight: MediaQuery.of(context).size.height * .1),
         child: const Text("Downloads are not supported yet."),
       );
-    } else if (gl.dico.getLayerBase(widget.layer.key).mOffline) {
+    }
+    if (gl.dico.getLayerBase(widget.layer.key).mOffline ||
+        downloadState == 1.0) {
       return Row(children: [
         IconButton(
             onPressed: () async {
@@ -34,6 +41,7 @@ class _LayerDownloaderState extends State<LayerDownloader> {
                   gl.dico.getLayerBase(widget.layer.key).mNomRaster));
               setState(() {
                 gl.dico.getLayerBase(widget.layer.key).mOffline = false;
+                downloadState == 0.0;
               });
             },
             icon: const Icon(Icons.delete)),
@@ -42,13 +50,13 @@ class _LayerDownloaderState extends State<LayerDownloader> {
                 maxWidth: 256, minWidth: 48, maxHeight: 48, minHeight: 48),
             child: const Text("La couche est enregistré."))
       ]);
-    } else {
+    } else if (downloadState == 0.0) {
       return Row(children: [
         IconButton(
             onPressed: () async {
-              await _downloadFile();
+              _downloadFile();
               setState(() {
-                gl.dico.getLayerBase(widget.layer.key).mOffline = true;
+                downloadState = 0.001;
               });
             },
             icon: const Icon(Icons.download)),
@@ -58,18 +66,23 @@ class _LayerDownloaderState extends State<LayerDownloader> {
             child: const Text(
                 "La couche peut être téléchargé pour l'utilisation hors ligne."))
       ]);
+    } else {
+      final tasks = FlutterDownloader.loadTasksWithRawQuery(
+          query: "SELECT * FROM task WHERE status=3");
+      print(tasks.toString());
+
+      return Container(
+        constraints: BoxConstraints(
+            minWidth: MediaQuery.of(context).size.width * 1,
+            maxWidth: MediaQuery.of(context).size.width * 1,
+            minHeight: MediaQuery.of(context).size.height * .15,
+            maxHeight: MediaQuery.of(context).size.height * .15),
+        child: LinearProgressIndicator(
+          value: downloadState,
+          semanticsLabel: 'Linear progress indicator',
+        ),
+      );
     }
-    Container(
-      constraints: BoxConstraints(
-          minWidth: MediaQuery.of(context).size.width * 1,
-          maxWidth: MediaQuery.of(context).size.width * 1,
-          minHeight: MediaQuery.of(context).size.height * .15,
-          maxHeight: MediaQuery.of(context).size.height * .15),
-      child: LinearProgressIndicator(
-        value: 0.5,
-        semanticsLabel: 'Linear progress indicator',
-      ),
-    );
   }
 
   Future<String?> _downloadFile() async {
@@ -100,5 +113,37 @@ class _LayerDownloaderState extends State<LayerDownloader> {
       file.delete();
     }
     return fileExists(path);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    IsolateNameServer.registerPortWithName(
+        _port.sendPort, 'downloader_send_port');
+    _port.listen((dynamic data) {
+      String id = data[0];
+      DownloadTaskStatus status = DownloadTaskStatus.fromInt(data[1]);
+      int progress = data[2];
+      setState((){ });
+    });
+
+    FlutterDownloader.registerCallback(downloadCallback);
+  }
+
+  @override
+  void dispose() {
+    IsolateNameServer.removePortNameMapping('downloader_send_port');
+    super.dispose();
+  }
+
+  @pragma('vm:entry-point')
+  static void downloadCallback(String id, int status, int progress) {
+    downloadState = (progress - 100) / 100;
+    print(downloadState);
+
+    final SendPort? send =
+        IsolateNameServer.lookupPortByName('downloader_send_port');
+    send?.send([id, status, progress]);
   }
 }

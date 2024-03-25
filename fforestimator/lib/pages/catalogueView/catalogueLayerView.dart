@@ -14,13 +14,10 @@ class _CatalogueLayerView extends State<CatalogueLayerView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        
-        children: [
+      body: Column(mainAxisAlignment: MainAxisAlignment.end, children: [
         Container(
           color: gl.colorBackground,
-          child: CatalogueView(refreshView: refreshView),
+          child: CatalogueView(refreshView: refreshView, mode: "category"),
           constraints: BoxConstraints(
               maxWidth: MediaQuery.of(context).size.width * 1.0,
               minHeight: MediaQuery.of(context).size.height * .73,
