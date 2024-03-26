@@ -49,11 +49,8 @@ class _LayerDownloaderState extends State<LayerDownloader> {
                   .whenComplete(() {
                 widget.rebuildWidgetTree(() {
                   gl.dico.getLayerBase(widget.layer.key).mOffline = false;
+                  _downloadStates[widget.layer.key] == 0.0;
                 });
-              });
-
-              setState(() {
-                _downloadStates[widget.layer.key] == 0.0;
               });
             },
             icon: const Icon(Icons.delete)),
@@ -122,14 +119,18 @@ class _LayerDownloaderState extends State<LayerDownloader> {
       String id = data[0];
       DownloadTaskStatus status = DownloadTaskStatus.fromInt(data[1]);
       int progress = data[2];
+      print(progress);
       if (progress > 100) {
         progress -= 100;
       }
+      widget.rebuildWidgetTree((){});
       setState(() {
-        _downloadStates[_taskIDToLayerCode[id]!] = progress / 100.0;
+        if (status == DownloadTaskStatus.running) {
+          _downloadStates[_taskIDToLayerCode[id]!] = progress / 100.0;
+        }
         if (status == DownloadTaskStatus.complete) {
           gl.dico.getLayerBase(_taskIDToLayerCode[id]!).mOffline = true;
-          _downloadStates[_taskIDToLayerCode[id]!] = 0.0;
+          _downloadStates[_taskIDToLayerCode[id]!] = 1.0;
         }
       });
     });
