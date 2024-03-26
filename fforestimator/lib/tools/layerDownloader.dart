@@ -9,14 +9,16 @@ import 'package:path/path.dart';
 
 class LayerDownloader extends StatefulWidget {
   final LayerTile layer;
-  const LayerDownloader(this.layer, {super.key});
+  final Function rebuildWidgetTree;
+  const LayerDownloader(this.layer, this.rebuildWidgetTree, {super.key});
 
   @override
   State<LayerDownloader> createState() => _LayerDownloaderState();
 }
 
 class _LayerDownloaderState extends State<LayerDownloader> {
-  static double downloadState = 0.0;
+  static Map<String, double> _downloadStates = {};
+  static Map<String?, String> _taskIDToLayerCode = {};
   ReceivePort _port = ReceivePort();
 
   @override
@@ -32,16 +34,26 @@ class _LayerDownloaderState extends State<LayerDownloader> {
         child: const Text("Downloads are not supported yet."),
       );
     }
-    if (gl.dico.getLayerBase(widget.layer.key).mOffline ||
-        downloadState == 1.0) {
+    if (_downloadStates[widget.layer.key] == null) {
+      _downloadStates[widget.layer.key] = 0.0;
+    } else if (_downloadStates[widget.layer.key]! > 0.0 &&
+        _downloadStates[widget.layer.key]! < 1.0) {
+      return LinearProgressIndicator(value: _downloadStates[widget.layer.key]);
+    }
+    if (gl.dico.getLayerBase(widget.layer.key).mOffline) {
       return Row(children: [
         IconButton(
             onPressed: () async {
               await fileDelete(join(gl.dico.docDir.path,
-                  gl.dico.getLayerBase(widget.layer.key).mNomRaster));
+                      gl.dico.getLayerBase(widget.layer.key).mNomRaster))
+                  .whenComplete(() {
+                widget.rebuildWidgetTree(() {
+                  gl.dico.getLayerBase(widget.layer.key).mOffline = false;
+                });
+              });
+
               setState(() {
-                gl.dico.getLayerBase(widget.layer.key).mOffline = false;
-                downloadState == 0.0;
+                _downloadStates[widget.layer.key] == 0.0;
               });
             },
             icon: const Icon(Icons.delete)),
@@ -50,13 +62,14 @@ class _LayerDownloaderState extends State<LayerDownloader> {
                 maxWidth: 256, minWidth: 48, maxHeight: 48, minHeight: 48),
             child: const Text("La couche est enregistré."))
       ]);
-    } else if (downloadState == 0.0) {
+    } else {
       return Row(children: [
         IconButton(
             onPressed: () async {
-              _downloadFile();
+              String? it = await _downloadFile();
               setState(() {
-                downloadState = 0.001;
+                _downloadStates[widget.layer.key] = 0.001;
+                _taskIDToLayerCode[it] = widget.layer.key;
               });
             },
             icon: const Icon(Icons.download)),
@@ -66,22 +79,6 @@ class _LayerDownloaderState extends State<LayerDownloader> {
             child: const Text(
                 "La couche peut être téléchargé pour l'utilisation hors ligne."))
       ]);
-    } else {
-      final tasks = FlutterDownloader.loadTasksWithRawQuery(
-          query: "SELECT * FROM task WHERE status=3");
-      print(tasks.toString());
-
-      return Container(
-        constraints: BoxConstraints(
-            minWidth: MediaQuery.of(context).size.width * 1,
-            maxWidth: MediaQuery.of(context).size.width * 1,
-            minHeight: MediaQuery.of(context).size.height * .15,
-            maxHeight: MediaQuery.of(context).size.height * .15),
-        child: LinearProgressIndicator(
-          value: downloadState,
-          semanticsLabel: 'Linear progress indicator',
-        ),
-      );
     }
   }
 
@@ -121,14 +118,25 @@ class _LayerDownloaderState extends State<LayerDownloader> {
 
     IsolateNameServer.registerPortWithName(
         _port.sendPort, 'downloader_send_port');
-    _port.listen((dynamic data) {
+    _port.listen((dynamic data) async {
       String id = data[0];
       DownloadTaskStatus status = DownloadTaskStatus.fromInt(data[1]);
       int progress = data[2];
-      setState((){ });
+      if (progress > 100) {
+        progress -= 100;
+      }
+      setState(() {
+        _downloadStates[_taskIDToLayerCode[id]!] = progress / 100.0;
+        if (status == DownloadTaskStatus.complete) {
+          gl.dico.getLayerBase(_taskIDToLayerCode[id]!).mOffline = true;
+          _downloadStates[_taskIDToLayerCode[id]!] = 0.0;
+        }
+      });
     });
-
-    FlutterDownloader.registerCallback(downloadCallback);
+    FlutterDownloader.registerCallback(
+      downloadCallback,
+      step: 1,
+    );
   }
 
   @override
@@ -139,9 +147,6 @@ class _LayerDownloaderState extends State<LayerDownloader> {
 
   @pragma('vm:entry-point')
   static void downloadCallback(String id, int status, int progress) {
-    downloadState = (progress - 100) / 100;
-    print(downloadState);
-
     final SendPort? send =
         IsolateNameServer.lookupPortByName('downloader_send_port');
     send?.send([id, status, progress]);

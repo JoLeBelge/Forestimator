@@ -68,3 +68,4 @@ const Color colorBackgroundSecondary = Color.fromRGBO(243, 243, 243, 1);
 Function refreshMap = () {};
 Function refreshCatalogueView = () {};
 Function refreshCurrentThreeLayer = () {};
+
