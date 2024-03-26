@@ -17,7 +17,7 @@ class _CatalogueLayerView extends State<CatalogueLayerView> {
       body: Column(mainAxisAlignment: MainAxisAlignment.end, children: [
         Container(
           color: gl.colorBackground,
-          child: CatalogueView(refreshView: refreshView, mode: "category"),
+          child: CatalogueView(refreshView: refreshView),
           constraints: BoxConstraints(
               maxWidth: MediaQuery.of(context).size.width * 1.0,
               minHeight: MediaQuery.of(context).size.height * .73,

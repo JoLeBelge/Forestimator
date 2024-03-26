@@ -12,16 +12,13 @@ ClampingScrollPhysics that = const ClampingScrollPhysics();
 
 class CatalogueView extends StatefulWidget {
   final Function refreshView;
-  final String mode;
-  const CatalogueView(
-      {required this.refreshView, required this.mode, super.key});
+  const CatalogueView({required this.refreshView, super.key});
   @override
   State<CatalogueView> createState() => _CatalogueView();
 }
 
 class _CatalogueView extends State<CatalogueView> {
   static List<Category> _categories = [];
-  static List<Category> _offline = [Category(name: "Couches à télécharger.", filter: "offline")];
   static bool finishedInitializingCategories = false;
 
   @override
@@ -29,11 +26,7 @@ class _CatalogueView extends State<CatalogueView> {
     if (finishedInitializingCategories) {
       return SingleChildScrollView(
         physics: that,
-        child: Container(
-          child: widget.mode == "category"
-              ? _buildCategoryPanel()
-              : _buildOfflinePanel(),
-        ),
+        child: Container(child: _buildCategoryPanel()),
       );
     } else {
       return const CircularProgressIndicator();
@@ -49,34 +42,6 @@ class _CatalogueView extends State<CatalogueView> {
         });
       },
       children: _categories.map<ExpansionPanel>((Category item) {
-        return ExpansionPanel(
-          canTapOnHeader: true,
-          backgroundColor: gl.colorBackground,
-          headerBuilder: (BuildContext context, bool isExpanded) {
-            return ListTile(
-              iconColor: Colors.red,
-              title: Text(item.name),
-            );
-          },
-          body: CategoryView(
-            refreshView: widget.refreshView,
-            category: item,
-          ),
-          isExpanded: item.isExpanded,
-        );
-      }).toList(),
-    );
-  }
-
-  Widget _buildOfflinePanel() {
-    return ExpansionPanelList(
-      expandIconColor: Colors.black,
-      expansionCallback: (int index, bool isExpanded) {
-        setState(() {
-          _offline[index].isExpanded = isExpanded;
-        });
-      },
-      children: _offline.map<ExpansionPanel>((Category item) {
         return ExpansionPanel(
           canTapOnHeader: true,
           backgroundColor: gl.colorBackground,
@@ -161,8 +126,8 @@ class _CategoryView extends State<CategoryView> {
           _layerTiles[widget.category.filter]![index].isExpanded = isExpanded;
         });
       },
-      children:
-          _layerTiles[widget.category.filter]!.map<ExpansionPanel>((LayerTile item) {
+      children: _layerTiles[widget.category.filter]!
+          .map<ExpansionPanel>((LayerTile item) {
         return ExpansionPanel(
           canTapOnHeader: true,
           backgroundColor: _getswitchBackgroundColorForList(),
@@ -440,35 +405,21 @@ class _CategoryView extends State<CategoryView> {
 
   void _getLayerData() async {
     Map<String, layerBase> mp = gl.dico.mLayerBases;
-    if (widget.category.filter == "category") {
-      for (var key in mp.keys) {
-        if (widget.category.filter == mp[key]!.mGroupe &&
-            !mp[key]!.mExpert &&
-            mp[key]!.mVisu &&
-            mp[key]?.mTypeGeoservice == "") {
-          if (_layerTiles[widget.category.filter] == null) {
-            _layerTiles[widget.category.filter] = [];
-          }
-          _layerTiles[widget.category.filter]!.add(LayerTile(
-              name: mp[key]!.mNom,
-              filter: mp[key]!.mGroupe,
-              key: key,
-              downloadable: mp[key]!.mIsDownloadableRW,
-              extern: mp[key]!.mCategorie == "Externe"));
+
+    for (var key in mp.keys) {
+      if (widget.category.filter == mp[key]!.mGroupe &&
+          !mp[key]!.mExpert &&
+          mp[key]!.mVisu &&
+          mp[key]?.mTypeGeoservice == "") {
+        if (_layerTiles[widget.category.filter] == null) {
+          _layerTiles[widget.category.filter] = [];
         }
-      }
-    }
-    else{
-      _layerTiles[widget.category.filter] = [];
-      for (var key in mp.keys){
-        if (mp[key]!.mIsDownloadableRW){
-          _layerTiles[widget.category.filter]!.add(LayerTile(
-              name: mp[key]!.mNom,
-              filter: mp[key]!.mGroupe,
-              key: key,
-              downloadable: mp[key]!.mIsDownloadableRW,
-              extern: mp[key]!.mCategorie == "Externe"));
-        }
+        _layerTiles[widget.category.filter]!.add(LayerTile(
+            name: mp[key]!.mNom,
+            filter: mp[key]!.mGroupe,
+            key: key,
+            downloadable: mp[key]!.mIsDownloadableRW,
+            extern: mp[key]!.mCategorie == "Externe"));
       }
     }
 
