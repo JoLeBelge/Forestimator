@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF8"?>
+<messages xmlns:if="Wt.WTemplate.conditions"
+	  nplurals="2"
+	  plural="n == 1 ? 0 : 1">
+
+<message id="titre">  <h1> Formulaire d'encodage d'ancienne coupe Rase </h1> 
+<br></br>
+<p>
+Dans le cadre du Projet "le Suivi temporel de la reconstitution forestière dans les mises à blanc en libre évolution - analyse
+de la dynamique naturelle et propositions de sylvicultures adaptées"
+</p>
+<br></br>
+</message>
+
+<message id="sectionEncoder"> <h3> Vos données personnelles </h3>
+<!--<p>La personne de contact qui connait le mieux la vieille coupe rase (par exemple, le gestionnaire) est renseignée plus bas, les champs ci-dessous sont utilisés pour identifier la personne qui remplis le présent formulaire.</p>-->
+</message>
+
+<message id="nom"> Nom : </message>
+<message id="prenom"> Prénom :</message>
+<message id="contact"> Votre contact: email et/ou téléphone </message>
+<message id="contactACR"> Contact du gestionnaire forestier : nom, email et/ou téléphone </message>
+
+<message id="sectionVCR"> <h3> Description de l'ancienne coupe rase </h3>
+La description encodée ici est une description globale, des inventaires de terrain permettrons ultérieurement de dresser une description plus détaillée.
+</message>
+
+<message id="anneeVCR"> Année de la coupe rase :</message>
+<message id="regeNat"> régénération naturelle présente (préciser les essences les plus présentes)</message>
+<message id="vegeBloquante"> présence de végétation bloquante (préciser espère, ex: ronce, fougère)</message>
+
+<message id="descriptionVCR"> Renseignez ici une description de la coupe rase, ou toute autres informations utiles (ex: historique de gestion, type de station forestière, ect)</message>
+
+<message id="titreLocalisation"> <h3> Localisation de la coupe rase </h3>
+<p>Vous pouvez renseigner la localisation de la coupe rase en digitalisant le contour de la parcelle sur la carte ci-dessous. La navigation au sein de la carte peut s'effectuer par l'utilisation de la souris, mais vous pouvez également sélectionner le nom de la commune sur laquelle se situe l'ancienne coupe rase.</p>
+</message>
+<message id="titreCatalogue"> <h4> Afficher une couche cartographique en cliquant sur son nom </h4> </message>
+<message id="cadastre.choisir"> Choisissez la commune sur laquelle se situe l'ancienne coupe rase</message>
+<message id="titreCommune"><h4>Choisissez sur une commune pour centrer la carte sur celle-ci</h4></message>
+
+
+<message id="saveACR.msg.titre">Encodage d'ancienne coupe rase</message>
+<message id="saveACR.msg.done">Vos données ont été correctement encodée. Nous vous remercions pour votre participation. Nous reviendrons vers vous pour de plus amples informations.</message>
+
+</messages>

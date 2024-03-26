@@ -135,7 +135,6 @@ cWebAptitude::cWebAptitude(const Wt::WEnvironment& env, cDicoApt *dico)
         if (forestimator){
 
             theFile.open(docRoot() + "/forestimator.xml");} else {
-            //std::cout << " toto !!!!\n\n\n" << std::endl;
             aFile=mDico->File("TMPDIR")+"textePhytospy.csv";
             theFile.open("/home/jo/app/phytospy/data/phytoTool.xml");
             messageResourceBundle().use("/home/jo/app/phytospy/data/phytoTool");

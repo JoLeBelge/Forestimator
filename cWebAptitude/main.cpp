@@ -107,6 +107,9 @@ std::unique_ptr<Wt::WApplication> createWebAptitudeApplication(const Wt::WEnviro
     }else if (env.internalPath() == "/stats_analytics"){
         auto app = std::make_unique<PageAnalytics>(env,dico->File("docroot")+"analytics.db");
         return app;
+    }else if (env.internalPath() == "/encodage.coupe.rase"){
+        auto app = std::make_unique<formVielleCoupeRase>(env,dico, dico->File("docroot")+"ACR.db");
+        return app;
     }else{
         std::cout << "internal path pas geré : " << env.internalPath() << std::endl;
 

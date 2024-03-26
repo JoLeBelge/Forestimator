@@ -19,6 +19,7 @@ namespace po = boost::program_options;
 #include "./libzippp/src/libzippp.h"
 using namespace libzippp;
 #include "./threadpool/ThreadPool.hpp"
+#include "formviellecouperase.h"
 
 std::unique_ptr<Wt::WApplication> createWebAptitudeApplication(const Wt::WEnvironment &env, cDicoApt * dico);
 

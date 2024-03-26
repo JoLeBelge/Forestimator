@@ -34,6 +34,7 @@ SOURCES += main.cpp \
     auth/User.cpp \
     cadastre.cpp \
     ../carteApt/matapt.cpp \
+    formviellecouperase.cpp \
     mataptcs.cpp \
     panier.cpp \
     simplepoint.cpp \
@@ -69,6 +70,7 @@ HEADERS += \
     auth/Session.h \
     auth/User.h \
     cadastre.h \
+    formviellecouperase.h \
     main.h \
     ../carteApt/matapt.h \
     mataptcs.h \
