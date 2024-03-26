@@ -26,12 +26,57 @@ class _OfflineView extends State<OfflineView> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Column(mainAxisAlignment: MainAxisAlignment.start, children: [
+        gl.offlineMode
+            ? Container(
+                color: gl.colorBackgroundSecondary,
+                constraints: BoxConstraints(
+                    maxWidth: MediaQuery.of(context).size.width * 1.0,
+                    minHeight: MediaQuery.of(context).size.height * .1,
+                    maxHeight: MediaQuery.of(context).size.height * .1),
+                child: TextButton.icon(
+                  onPressed: () {
+                    setState(() {
+                      gl.offlineMode = false;
+                    });
+                  },
+                  icon: Icon(
+                    Icons.download_for_offline,
+                    color: gl.colorUliege,
+                  ),
+                  label: Text(
+                    "Desactivez le mode hors ligne.",
+                    style: TextStyle(color: gl.colorUliege),
+                  ),
+                ),
+              )
+            : Container(
+                color: gl.colorBackgroundSecondary,
+                constraints: BoxConstraints(
+                    maxWidth: MediaQuery.of(context).size.width * 1.0,
+                    minHeight: MediaQuery.of(context).size.height * .1,
+                    maxHeight: MediaQuery.of(context).size.height * .1),
+                child: TextButton.icon(
+                  onPressed: () {
+                    setState(() {
+                      gl.offlineMode = true;
+                    });
+                  },
+                  icon: Icon(
+                    Icons.download_for_offline,
+                    color: gl.colorAgroBioTech,
+                  ),
+                  label: Text(
+                    "Activez le mode hors ligne.",
+                    style: TextStyle(color: gl.colorAgroBioTech),
+                  ),
+                ),
+              ),
         Container(
           color: gl.colorBackground,
           constraints: BoxConstraints(
               maxWidth: MediaQuery.of(context).size.width * 1.0,
-              minHeight: MediaQuery.of(context).size.height * .9,
-              maxHeight: MediaQuery.of(context).size.height * .9),
+              minHeight: MediaQuery.of(context).size.height * .8,
+              maxHeight: MediaQuery.of(context).size.height * .8),
           child: SingleChildScrollView(
             child: _buildOfflineCategory(),
           ),
@@ -49,6 +94,7 @@ class _OfflineView extends State<OfflineView> {
         });
       },
       children: _categories.map<ExpansionPanel>((Category category) {
+        category.isExpanded = true;
         return ExpansionPanel(
           canTapOnHeader: true,
           backgroundColor: gl.colorBackground,
@@ -127,9 +173,12 @@ class _OfflineView extends State<OfflineView> {
         constraints:
             const BoxConstraints(maxWidth: 128, minHeight: 32, maxHeight: 32),
         child: gl.dico.getLayerBase(lt.key).mOffline
-            ? Text("Available", style: TextStyle(color: gl.colorAgroBioTech),)
+            ? Text(
+                "Enregistré",
+                style: TextStyle(color: gl.colorAgroBioTech),
+              )
             : Text(
-                "Downloadable",
+                "Téléchargable",
                 style: TextStyle(color: gl.colorUliege),
               ));
   }
@@ -138,7 +187,9 @@ class _OfflineView extends State<OfflineView> {
     return Column(
       children: <Widget>[
         if (lt.downloadable)
-          ColoredBox(color: gl.colorBackground, child: LayerDownloader(lt, rebuildWidgetTree)),
+          ColoredBox(
+              color: gl.colorBackground,
+              child: LayerDownloader(lt, rebuildWidgetTree)),
         if (gl.dico.getLayerBase(lt.key).hasDoc())
           ListTile(
             title: Text(
@@ -200,7 +251,7 @@ class _OfflineView extends State<OfflineView> {
     }
   }
 
-  void rebuildWidgetTree(var setter) async{
+  void rebuildWidgetTree(var setter) async {
     setState(setter);
     gl.dico.checkLayerBaseOfflineRessource();
   }

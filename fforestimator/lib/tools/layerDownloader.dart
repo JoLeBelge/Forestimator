@@ -36,8 +36,8 @@ class _LayerDownloaderState extends State<LayerDownloader> {
     }
     if (_downloadStates[widget.layer.key] == null) {
       _downloadStates[widget.layer.key] = 0.0;
-    } else if (_downloadStates[widget.layer.key]! > 0.0 &&
-        _downloadStates[widget.layer.key]! < 1.0) {
+    } else if (_downloadStates[widget.layer.key]! != 0.0 &&
+        _downloadStates[widget.layer.key]! != 1.0) {
       return LinearProgressIndicator(value: _downloadStates[widget.layer.key]);
     }
     if (gl.dico.getLayerBase(widget.layer.key).mOffline) {
@@ -123,20 +123,19 @@ class _LayerDownloaderState extends State<LayerDownloader> {
       if (progress > 100) {
         progress -= 100;
       }
-      widget.rebuildWidgetTree((){});
-      setState(() {
-        if (status == DownloadTaskStatus.running) {
-          _downloadStates[_taskIDToLayerCode[id]!] = progress / 100.0;
-        }
-        if (status == DownloadTaskStatus.complete) {
-          gl.dico.getLayerBase(_taskIDToLayerCode[id]!).mOffline = true;
-          _downloadStates[_taskIDToLayerCode[id]!] = 1.0;
-        }
-      });
+      if (status == DownloadTaskStatus.running) {
+        //_downloadStates[_taskIDToLayerCode[id]!] = progress / 100.0;
+      }
+      if (status == DownloadTaskStatus.complete) {
+        gl.dico.getLayerBase(_taskIDToLayerCode[id]!).mOffline = true;
+        _downloadStates[_taskIDToLayerCode[id]!] = 1.0;
+        widget.rebuildWidgetTree(() {});
+      }
+      setState(() {});
     });
     FlutterDownloader.registerCallback(
       downloadCallback,
-      step: 1,
+      step: 10,
     );
   }
 

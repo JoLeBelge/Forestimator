@@ -11,6 +11,8 @@ late dicoAptProvider dico;
 String basePathbranchB = "catalogue";
 String basePathbranchC = "offline";
 
+bool offlineMode = false;
+
 // ajouter le code le la couche à la fin de cette requete. fonctionne que pour layerbase avec mRes <= 10m sinon je considère que c'est trop volumineux
 String queryApiRastDownload =
     "https://forestimator.gembloux.ulg.ac.be/api/rastPColor/layerCode";
