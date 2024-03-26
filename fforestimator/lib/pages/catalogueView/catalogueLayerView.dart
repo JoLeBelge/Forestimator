@@ -14,10 +14,7 @@ class _CatalogueLayerView extends State<CatalogueLayerView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        
-        children: [
+      body: Column(mainAxisAlignment: MainAxisAlignment.end, children: [
         Container(
           color: gl.colorBackground,
           child: CatalogueView(refreshView: refreshView),

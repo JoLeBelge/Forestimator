@@ -1,6 +1,7 @@
 import 'package:fforestimator/dico/dicoApt.dart';
 import 'package:fforestimator/dico/ess.dart';
 import 'package:fforestimator/pages/anaPt/anaPtpage.dart';
+import 'package:fforestimator/pages/offlinePage/offlineView.dart';
 import 'package:flutter/material.dart';
 import 'package:fforestimator/globals.dart' as gl;
 import 'package:fforestimator/pages/map.dart';
@@ -193,6 +194,15 @@ class _MyApp extends State<MyApp> {
               ),
             ],
           ),
+          StatefulShellBranch(navigatorKey: _shellNavigatorCKey, routes: [
+            // top route inside branch
+            GoRoute(
+              path: "/" + gl.basePathbranchC,
+              pageBuilder: (context, state) => const NoTransitionPage(
+                child: OfflineView(),
+              ),
+            )
+          ]),
         ],
       ),
     ],
@@ -202,6 +212,7 @@ class _MyApp extends State<MyApp> {
   final _rootNavigatorKey = GlobalKey<NavigatorState>();
   final _shellNavigatorAKey = GlobalKey<NavigatorState>(debugLabel: 'shellA');
   final _shellNavigatorBKey = GlobalKey<NavigatorState>(debugLabel: 'shellB');
+  final _shellNavigatorCKey = GlobalKey<NavigatorState>(debugLabel: 'shellC');
 
   @override
   Widget build(BuildContext context) {

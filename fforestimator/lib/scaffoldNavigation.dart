@@ -28,6 +28,7 @@ class ScaffoldWithNestedNavigation extends StatelessWidget {
         destinations: const [
           NavigationDestination(label: 'Carte', icon: Icon(Icons.map)),
           NavigationDestination(label: 'Catalogue', icon: Icon(Icons.layers)),
+          NavigationDestination(label: 'Offline Mode', icon: Icon(Icons.offline_bolt))
         ],
         onDestinationSelected: _goBranch,
       ),

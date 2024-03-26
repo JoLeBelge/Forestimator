@@ -1,8 +1,5 @@
-import 'dart:io';
-
 import 'package:fforestimator/dico/dicoApt.dart';
 import 'package:fforestimator/tools/layerDownloader.dart';
-import 'package:fforestimator/tools/progressBar.dart';
 import 'package:flutter/material.dart';
 import 'package:fforestimator/globals.dart' as gl;
 import 'package:fforestimator/pages/catalogueView/categoryTile.dart';
@@ -29,16 +26,14 @@ class _CatalogueView extends State<CatalogueView> {
     if (finishedInitializingCategories) {
       return SingleChildScrollView(
         physics: that,
-        child: Container(
-          child: _buildPanel(),
-        ),
+        child: Container(child: _buildCategoryPanel()),
       );
     } else {
       return const CircularProgressIndicator();
     }
   }
 
-  Widget _buildPanel() {
+  Widget _buildCategoryPanel() {
     return ExpansionPanelList(
       expandIconColor: Colors.black,
       expansionCallback: (int index, bool isExpanded) {
@@ -96,13 +91,13 @@ class CategoryView extends StatefulWidget {
 }
 
 class _CategoryView extends State<CategoryView> {
-  static Map<Category, List<LayerTile>> _layerTiles = {};
-  static Map<Category, bool> _finishedInitializingCategory = {};
+  static Map<String, List<LayerTile>> _layerTiles = {};
+  static Map<String, bool> _finishedInitializingCategory = {};
   bool _flipForBackground = false;
 
   @override
   Widget build(BuildContext context) {
-    if (_finishedInitializingCategory[widget.category]!) {
+    if (_finishedInitializingCategory[widget.category.filter]!) {
       return Container(
           constraints: BoxConstraints(
               maxWidth: MediaQuery.of(context).size.width * 1.0,
@@ -128,11 +123,11 @@ class _CategoryView extends State<CategoryView> {
     return ExpansionPanelList(
       expansionCallback: (int index, bool isExpanded) async {
         setState(() {
-          _layerTiles[widget.category]![index].isExpanded = isExpanded;
+          _layerTiles[widget.category.filter]![index].isExpanded = isExpanded;
         });
       },
-      children:
-          _layerTiles[widget.category]!.map<ExpansionPanel>((LayerTile item) {
+      children: _layerTiles[widget.category.filter]!
+          .map<ExpansionPanel>((LayerTile item) {
         return ExpansionPanel(
           canTapOnHeader: true,
           backgroundColor: _getswitchBackgroundColorForList(),
@@ -165,7 +160,7 @@ class _CategoryView extends State<CategoryView> {
     return Column(
       children: <Widget>[
         if (lt.downloadable)
-          ColoredBox(color: gl.colorBackground, child: LayerDownloader(lt)),
+          ColoredBox(color: gl.colorBackground, child: LayerDownloader(lt,gl.refreshCatalogueView)),
         if (gl.dico.getLayerBase(lt.key).mUsedForAnalysis)
           ColoredBox(
               color: gl.colorBackgroundSecondary,
@@ -410,15 +405,16 @@ class _CategoryView extends State<CategoryView> {
 
   void _getLayerData() async {
     Map<String, layerBase> mp = gl.dico.mLayerBases;
+
     for (var key in mp.keys) {
       if (widget.category.filter == mp[key]!.mGroupe &&
           !mp[key]!.mExpert &&
           mp[key]!.mVisu &&
           mp[key]?.mTypeGeoservice == "") {
-        if (_layerTiles[widget.category] == null) {
-          _layerTiles[widget.category] = [];
+        if (_layerTiles[widget.category.filter] == null) {
+          _layerTiles[widget.category.filter] = [];
         }
-        _layerTiles[widget.category]!.add(LayerTile(
+        _layerTiles[widget.category.filter]!.add(LayerTile(
             name: mp[key]!.mNom,
             filter: mp[key]!.mGroupe,
             key: key,
@@ -428,7 +424,7 @@ class _CategoryView extends State<CategoryView> {
     }
 
     setState(() {
-      _finishedInitializingCategory[widget.category] = true;
+      _finishedInitializingCategory[widget.category.filter] = true;
     });
   }
 
@@ -473,10 +469,10 @@ class _CategoryView extends State<CategoryView> {
   @override
   void initState() {
     super.initState();
-    if (_finishedInitializingCategory[widget.category] == null) {
-      _finishedInitializingCategory[widget.category] = false;
+    if (_finishedInitializingCategory[widget.category.filter] == null) {
+      _finishedInitializingCategory[widget.category.filter] = false;
     }
-    if (!_finishedInitializingCategory[widget.category]!) {
+    if (!_finishedInitializingCategory[widget.category.filter]!) {
       _getLayerData();
     }
     gl.refreshCatalogueView = setState;
