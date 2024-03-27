@@ -37,7 +37,7 @@ de la dynamique naturelle et propositions de sylvicultures adaptées"
 <message id="kit"> Souhaitez-vous recevoir les résultats du projet de suivi des anciennes coupes rases?</message>
 
 <message id="initPol">Réinitialiser tout le contour </message>
-<message id="cancelPoint">Supprimer le dernier points </message>
+<message id="cancelPoint">Supprimer le dernier point </message>
 <message id="submit">J'ai fini! Soumettre</message>
 
 <message id="map.tooltip">Cliquer pour dessiner le contour de la coupe rase. Pour finir le contour, joignez le dernier point avec le premier point et cliquez à nouveau</message>

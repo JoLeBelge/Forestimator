@@ -93,7 +93,7 @@ formVielleCoupeRase::formVielleCoupeRase(const WEnvironment &env, cDicoApt *dico
     WHBoxLayout * layoutH = cont->setLayout(Wt::cpp14::make_unique<Wt::WHBoxLayout>());
     auto smart_map = std::make_unique<Wol>();
     Wol * map = smart_map.get();
-    std::ifstream t("/home/jo/app/Forestimator/data/js/initOL_vcr.js");
+    std::ifstream t(mDico->File("docroot")+"/js/initOL_vcr.js");
     std::stringstream ss;
     ss << t.rdbuf();
     //std::cout << "initialize map wol " << std::endl;

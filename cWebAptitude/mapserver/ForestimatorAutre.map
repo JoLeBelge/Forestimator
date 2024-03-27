@@ -6839,5 +6839,23 @@ END
    		END
    		TEMPLATE "../template.html"
    	END
+   	        LAYER
+  		NAME "MNH2022"
+   		TYPE RASTER
+   		STATUS ON
+   		PROJECTION
+      			"init=epsg:31370"
+   		END
+   		DATA "printemps_tiles.vrt" 
+   		PROCESSING "BANDS=1" 
+   		OFFSITE 0 0 0
+
+   		INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_MNH.map"
+   		METADATA
+      			"wms_title"           "Modèle Numérique de Hauteur 2022 Printemps"
+      			"wms_srs"             "EPSG:31370"
+   		END
+   		TEMPLATE "../template.html"
+   	END
 
 END
