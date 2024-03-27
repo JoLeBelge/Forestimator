@@ -19,6 +19,7 @@
 #include <Wt/WSignal.h>
 #include <Wt/WJavaScriptSlot.h>
 #include <Wt/WMessageBox.h>
+#include "Wt/WTemplate.h"
 
 #include <Wt/WItemDelegate.h>
 #include <Wt/WStandardItem.h>
@@ -43,14 +44,19 @@ public:
     OGREnvelope computeGlobalGeom(std::string aFile);
     void validDraw(std::string geojson);
 
+    void vider(bool all=1);
+
     WLineEdit *nomEncoderEdit_;
     WLineEdit *prenomEncoderEdit_;
     WLineEdit *contactEncoderEdit_;
+    WCheckBox * keepInTouch;
     WLineEdit *ContactEdit_;
     WComboBox *anneeVCREdit_;
     WLineEdit *regeNatEdit_;
     WLineEdit *vegeBloquanteEdit_;
     WTextArea *VCRdescriptionEdit_;
+
+    WPushButton * bCancel;
 
     WComboBox * commune_;
     // clé ; index dans combobox. val= clé (INS commune , code Division)

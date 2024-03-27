@@ -3,32 +3,18 @@
 extern bool globTest;
 
 formVielleCoupeRase::formVielleCoupeRase(const WEnvironment &env, cDicoApt *dico, std::string aFileDB) : Wt::WApplication(env),
-    session(),mDico(dico),polygValid(0),mBDFile(aFileDB)
+    session(),mDico(dico),polygValid(0),mBDFile(aFileDB),keepInTouch(0)
 {
-    root()->setMargin(30);
-    root()->setPadding(10);
-    root()->setOverflow(Overflow::Scroll);
-    root()->addStyleClass("frameEncodage");
-
     loadStyles();
-    Wt::WVBoxLayout* layout = root()->setLayout(Wt::cpp14::make_unique<Wt::WVBoxLayout>());
-
     WLabel *label;
 
     messageResourceBundle().use(docRoot() + "/encodageVCR");
-    //auto sqlite3 = std::make_unique<dbo::backend::Sqlite3>(aFileDB);
-
     setTitle(WString("Suivi Coupe Rase"));
-
-    Wt::WContainerWidget  * cont= layout->addWidget(std::make_unique<WContainerWidget>());
-    cont->addStyleClass("encodage");
-    cont->setOverflow(Overflow::Visible);
-
+    Wt::WTemplate * tpl = root()->addWidget(cpp14::make_unique<Wt::WTemplate>(WString::tr("template")));
+    WContainerWidget * cont = tpl->bindWidget("contTitre", std::make_unique<WContainerWidget>());
     cont->addNew<Wt::WText>(WString::tr("titre"));
 
-    cont= layout->addWidget(std::make_unique<WContainerWidget>());
-    cont->addStyleClass("encodage");
-    cont->setOverflow(Overflow::Scroll);
+    cont = tpl->bindWidget("contACR", std::make_unique<WContainerWidget>());
     cont->addNew<Wt::WText>(WString::tr("sectionEncoder"));
 
     WTable * table= cont->addNew<WTable>();
@@ -38,24 +24,25 @@ formVielleCoupeRase::formVielleCoupeRase(const WEnvironment &env, cDicoApt *dico
     table->elementAt(row,1)->setMinimumSize("300px", "300px");
     label = table->elementAt(row,0)->addWidget(std::make_unique<WLabel>(WString::tr("nom")));
     label->setBuddy(nomEncoderEdit_);
-    nomEncoderEdit_->setPlaceholderText("Ex: Dupont");
-    //nomEncoderEdit_->setValidator(std::make_shared<WValidator>(true));
+    nomEncoderEdit_->setPlaceholderText(WString::tr("nom.ph"));
     nomEncoderEdit_->setMinimumSize("200px", "100%");
     ++row;
     prenomEncoderEdit_ = table->elementAt(row,1)->addWidget(std::make_unique<WLineEdit>());
     label = table->elementAt(row,0)->addWidget(std::make_unique<WLabel>(WString::tr("prenom")));
     label->setBuddy(prenomEncoderEdit_);
-    prenomEncoderEdit_->setPlaceholderText("Ex: Albert");
-    //prenomEncoderEdit_->setValidator(std::make_shared<WValidator>(true));
+    prenomEncoderEdit_->setPlaceholderText(WString::tr("prenom.ph"));
     ++row;
     contactEncoderEdit_= table->elementAt(row,1)->addWidget(std::make_unique<WLineEdit>());
     label = table->elementAt(row,0)->addWidget(std::make_unique<WLabel>(WString::tr("contact")));
-    contactEncoderEdit_->setPlaceholderText("Ex: dupont.albert@forest.be - teléphone 0475221309");
+    contactEncoderEdit_->setPlaceholderText(WString::tr("contact.ph"));
     contactEncoderEdit_->setValidator(std::make_shared<WValidator>(true));
+    ++row;
+    keepInTouch= table->elementAt(row,1)->addWidget(std::make_unique<WCheckBox>());
+    label = table->elementAt(row,0)->addWidget(std::make_unique<WLabel>(WString::tr("kit")));
     ++row;
     ContactEdit_= table->elementAt(row,1)->addWidget(std::make_unique<WLineEdit>());
     label = table->elementAt(row,0)->addWidget(std::make_unique<WLabel>(WString::tr("contactACR")));
-    ContactEdit_->setPlaceholderText("Ex: gestionnaire: rege.nat@hotmail.com");
+    ContactEdit_->setPlaceholderText(WString::tr("contactACR.ph"));
 
     cont->addNew<Wt::WText>(WString::tr("sectionVCR"));
     table= cont->addNew<WTable>();
@@ -73,44 +60,43 @@ formVielleCoupeRase::formVielleCoupeRase(const WEnvironment &env, cDicoApt *dico
     ++row;
     regeNatEdit_= table->elementAt(row,0)->addWidget(std::make_unique<WLineEdit>());
     regeNatEdit_->setMinimumSize("200px", "100%");
-    regeNatEdit_->setPlaceholderText("Ex: Bouleaux - Sorbier des oiseleurs - un peu d'Epicéa");
+    regeNatEdit_->setPlaceholderText(WString::tr("regeNat.ph"));
     ++row;
     label = table->elementAt(row,0)->addWidget(std::make_unique<WLabel>(WString::tr("vegeBloquante")));
     ++row;
     vegeBloquanteEdit_= table->elementAt(row,0)->addWidget(std::make_unique<WLineEdit>());
     vegeBloquanteEdit_->setMinimumSize("200px", "100%");
-    vegeBloquanteEdit_->setPlaceholderText("Ex: Fougère aigle sur 75% de la coupe rase");
+    vegeBloquanteEdit_->setPlaceholderText(WString::tr("vegeBloquante.ph"));
     ++row;
     label = table->elementAt(row,0)->addWidget(std::make_unique<WLabel>(WString::tr("descriptionVCR")));
     ++row;
     VCRdescriptionEdit_= table->elementAt(row,0)->addWidget(std::make_unique<WTextArea>());
     VCRdescriptionEdit_->setColumns(40);
     VCRdescriptionEdit_->setRows(5);
-    VCRdescriptionEdit_->setPlaceholderText("Ex: La régénation naturelle a été complêtée 5ans après la coupe de placeaux de tilleul à petite feuille");
+    VCRdescriptionEdit_->setPlaceholderText(WString::tr("descriptionVCR.ph"));
 
     nomEncoderEdit_->enterPressed().connect(prenomEncoderEdit_, &WWidget::setFocus);
     prenomEncoderEdit_->enterPressed().connect(contactEncoderEdit_, &WWidget::setFocus);
-    contactEncoderEdit_->enterPressed().connect(anneeVCREdit_, &WWidget::setFocus);
+    contactEncoderEdit_->enterPressed().connect(ContactEdit_, &WWidget::setFocus);
+    ContactEdit_->enterPressed().connect(anneeVCREdit_, &WWidget::setFocus);
     anneeVCREdit_->changed().connect(regeNatEdit_, &WWidget::setFocus);
     regeNatEdit_->enterPressed().connect(vegeBloquanteEdit_, &WWidget::setFocus);
     vegeBloquanteEdit_->enterPressed().connect(VCRdescriptionEdit_, &WWidget::setFocus);
 
-    cont= layout->addWidget(std::make_unique<WContainerWidget>());
+    cont = tpl->bindWidget("contLoca", std::make_unique<WContainerWidget>());
     cont->addStyleClass("encodage");
-    cont->setOverflow(Overflow::Scroll);
+
     WVBoxLayout * la = cont->setLayout(Wt::cpp14::make_unique<Wt::WVBoxLayout>());
     cont= la->addWidget(std::make_unique<WContainerWidget>());
-    //cont->setOverflow(Overflow::Visible);
     cont->addWidget(std::make_unique<Wt::WText>(WString::tr("titreLocalisation")));
     cont= la->addWidget(std::make_unique<WContainerWidget>());
-    //cont->setOverflow(Overflow::Visible);
     WHBoxLayout * layoutH = cont->setLayout(Wt::cpp14::make_unique<Wt::WHBoxLayout>());
     auto smart_map = std::make_unique<Wol>();
     Wol * map = smart_map.get();
     std::ifstream t("/home/jo/app/Forestimator/data/js/initOL_vcr.js");
     std::stringstream ss;
     ss << t.rdbuf();
-    std::cout << "initialize map wol " << std::endl;
+    //std::cout << "initialize map wol " << std::endl;
     doJavaScript(ss.str());
     layoutH->addWidget(std::move(smart_map));
 
@@ -139,32 +125,26 @@ formVielleCoupeRase::formVielleCoupeRase(const WEnvironment &env, cDicoApt *dico
         wtext1->clicked().connect([=] {this->displayLayer(aL1->Code());});
     }
     cont->addNew<WBreak>();
-    WPushButton * bCancel =cont->addNew<WPushButton>("Réinitialiser tout le contour");
+    bCancel =cont->addNew<WPushButton>(WString::tr("initPol"));
     bCancel->setMinimumSize("100%"," ");
     bCancel->addStyleClass("btn btn-danger");
-    bCancel->clicked().connect([=] {doJavaScript("acr_src.clear();map.addInteraction(draw);");});
-    WPushButton * bUndo =cont->addNew<WPushButton>("Supprimer le dernier points");
+    bCancel->clicked().connect([=] {doJavaScript("acr_src.clear();map.addInteraction(draw);"); polygValid=0;});
+    WPushButton * bUndo =cont->addNew<WPushButton>(WString::tr("cancelPoint"));
     bUndo->setMinimumSize("100%"," ");
     bUndo->clicked().connect([=] {doJavaScript("draw.removeLastPoint();");});
     map->polygGeojson().connect(std::bind(&formVielleCoupeRase::validDraw,this, std::placeholders::_1));
 
-
-    WPushButton * bSubmit =  cont->addNew<WPushButton>("J'ai fini! Soumettre");
+    WPushButton * bSubmit =  cont->addNew<WPushButton>(WString::tr("submit"));
     bSubmit->setMinimumSize("70%","100px");
     bSubmit->addStyleClass("btn btn-success");
     bSubmit->clicked().connect([=] {submit();});
-
-    /*cont= layout->addWidget(std::make_unique<WContainerWidget>());
-    cont->addStyleClass("encodage");*/
-
 }
 
 void formVielleCoupeRase::submit(){
     if (contactEncoderEdit_->validate()!=ValidationState::Valid){
         Wt::WMessageBox * messageBox = this->addChild(std::make_unique<Wt::WMessageBox>(
                                                           "Votre contact",
-                                                          "Renseignez-nous un moyen pour vous contacter svp"
-                                                            ,
+                                                          "Renseignez-nous un moyen pour vous contacter svp",
                                                           Wt::Icon::Information,
                                                           Wt::StandardButton::Ok));
         messageBox->setModal(true);
@@ -190,27 +170,60 @@ void formVielleCoupeRase::submit(){
         sqlite3 *db_;
         rc = sqlite3_open(mBDFile.c_str(), &db_);
         if( rc )  {} else {
-                std::cout << " sauve la coupe rase " << std::endl;
+                //std::cout << " sauve la coupe rase " << std::endl;
                 sqlite3_stmt * stmt;
-                std::string SQLstring="INSERT INTO acr (id_plot,KEEP3) VALUES ("+contactEncoderEdit_->valueText().toUTF8()+",1);";
+                std::string SQLstring="INSERT INTO acr (nom,prenom,contact,keepInTouch,contact2,anneeCoupe,regeNat,vegeBloquante,descr,surf,polygon) VALUES ('"
+                        +nomEncoderEdit_->valueText().toUTF8()+"',"
+                        +"'"+prenomEncoderEdit_->valueText().toUTF8()+"',"
+                        +"'"+contactEncoderEdit_->valueText().toUTF8()+"',"
+                        +std::to_string(keepInTouch->isChecked())+","
+                        +"'"+ContactEdit_->valueText().toUTF8()+"',"
+                        +"'"+anneeVCREdit_->currentText().toUTF8()+"',"
+                        +"'"+regeNatEdit_->valueText().toUTF8()+"',"
+                        +"'"+vegeBloquanteEdit_->valueText().toUTF8()+"',"
+                        +"'"+VCRdescriptionEdit_->valueText().toUTF8()+"',"
+                        +std::to_string(surf)+","
+                        +"'"+polyg+"');";
+                //std::cout << "sql : " << SQLstring << std::endl;
                 sqlite3_prepare_v2(db_, SQLstring.c_str(), -1, &stmt, NULL );
                 // applique l'update
                 sqlite3_step( stmt );
                 sqlite3_finalize(stmt);
 
-                Wt::WMessageBox * messageBox = this->addChild(Wt::cpp14::make_unique<Wt::WMessageBox>(
-                                                                  WString::tr("saveACR.msg.titre"),
-                                                                  WString::tr("saveACR.msg.done"),
-                                                                  Wt::Icon::Information,
-                                                                  Wt::StandardButton::Ok));
-                messageBox->setModal(true);
-                messageBox->buttonClicked().connect([=] {
-                    this->removeChild(messageBox);
-                });
-                messageBox->show();
+
+
             }
         sqlite3_close(db_);
+
+        Wt::StandardButton answer = Wt::WMessageBox::show( WString::tr("saveACR.msg.titre"),
+                                                           WString::tr("saveACR.msg.cont"),
+                                                           Wt::StandardButton::Yes | Wt::StandardButton::No);
+        if (answer == Wt::StandardButton::Yes){
+        vider(0);
+        } else {
+        vider();
+        }
+
+
     }
+}
+
+void formVielleCoupeRase::vider(bool all){
+    //std::cout << "vider formulaire"<< std::endl;
+   if(all){
+   nomEncoderEdit_->setText("");
+   prenomEncoderEdit_->setText("");
+   contactEncoderEdit_->setText("");
+   keepInTouch->setChecked(0);
+   ContactEdit_->setText("");
+   }
+   anneeVCREdit_->setCurrentIndex(0);
+   regeNatEdit_->setText("");
+   vegeBloquanteEdit_->setText("");
+   VCRdescriptionEdit_->setText("");
+   polygValid=0;
+   polyg="";
+   doJavaScript("acr_src.clear();map.addInteraction(draw);");
 }
 
 void formVielleCoupeRase::loadStyles(){
@@ -239,6 +252,8 @@ Wol::Wol():slot(this),polygGeojson_(this,"toto")
     setOverflow(Overflow::Visible);
     setId("map");
 
+    setToolTip(Wt::WString::tr("map.tooltip"));
+
     // à chaque click le slot est appellé, et quand un polygone est fini, ça déclenche sa validation
     slot.setJavaScript
             ("function (){"
@@ -248,7 +263,6 @@ Wol::Wol():slot(this),polygGeojson_(this,"toto")
              "}}"
              );
     this->clicked().connect(this->slot);
-
 }
 
 void formVielleCoupeRase::displayLayer(std::string aCode) {
@@ -343,7 +357,6 @@ OGREnvelope formVielleCoupeRase::computeGlobalGeom(std::string aFile){
         int nbValidPol(0);
         while( (poFeature = lay->GetNextFeature()) != NULL )
         {
-            //OGRGeometry * tmp=OGRGeometryFactory::forceTo((poFeature->GetGeometryRef()));
             poFeature->GetGeometryRef()->flattenTo2D();
             switch (poFeature->GetGeometryRef()->getGeometryType()){
             case (wkbPolygon):
@@ -365,7 +378,6 @@ OGREnvelope formVielleCoupeRase::computeGlobalGeom(std::string aFile){
                     poGeom=poGeomM->getGeometryRef(i);
                     poGeom->closeRings();
                     poGeom = poGeom->Buffer(0.0);
-                    //if (poFeature->GetGeometryRef()->getGeometryType()==wkbPolygon)
                     err = multi->addGeometry(poGeom);
                     if (err==OGRERR_NONE) nbValidPol++;
                 }
@@ -382,8 +394,7 @@ OGREnvelope formVielleCoupeRase::computeGlobalGeom(std::string aFile){
             OGRFeature::DestroyFeature(poFeature);
         }
         if (nbValidPol>0){poGeom2 = multi->UnionCascaded();
-
-            poGeom2 =poGeom2->Buffer(1.0);// ça marche bien on dirait! je sais pas si c'est le buffer 1 ou le simplify 1 qui enlève les inner ring (hole) qui restent.
+            poGeom2 =poGeom2->Buffer(1.0);
             OGRGeometry * geomGlob = poGeom2->Simplify(1.0);
             geomGlob->getEnvelope(&env);
         }
@@ -395,7 +406,7 @@ OGREnvelope formVielleCoupeRase::computeGlobalGeom(std::string aFile){
 }
 
 void formVielleCoupeRase::validDraw(std::string geojson){
-    std::cout << "valid draw \n" << geojson << std::endl;
+    //std::cout << "valid draw \n" << geojson << std::endl;
     std::string name0 = std::tmpnam(nullptr);
     std::string name1 = name0.substr(5,name0.size()-5);
     std::string aOut = mDico->File("TMPDIR")+"/"+name1+".geojson";
@@ -411,7 +422,7 @@ void formVielleCoupeRase::validDraw(std::string geojson){
         while( (poFeature = lay->GetNextFeature()) != NULL )
         {
          surf=OGR_G_Area(poFeature->GetGeometryRef())/10000.0;
-         std::cout << "surface " << surf<< std::endl;
+         //std::cout << "surface " << surf<< std::endl;
          polygValid=1;
          polyg=poFeature->GetGeometryRef()->exportToJson();
         }
@@ -420,7 +431,6 @@ void formVielleCoupeRase::validDraw(std::string geojson){
         std::cout << "validDraw : je n'arrive pas à ouvrir " << aOut<< std::endl;
     }
     GDALClose(DS);
-
 }
 
 
