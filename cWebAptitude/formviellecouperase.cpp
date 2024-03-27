@@ -14,7 +14,7 @@ formVielleCoupeRase::formVielleCoupeRase(const WEnvironment &env, cDicoApt *dico
     WContainerWidget * cont = tpl->bindWidget("contTitre", std::make_unique<WContainerWidget>());
     cont->addNew<Wt::WText>(WString::tr("titre"));
 
-    cont = tpl->bindWidget("contACR", std::make_unique<WContainerWidget>());
+    cont = tpl->bindWidget("contContact", std::make_unique<WContainerWidget>());
     cont->addNew<Wt::WText>(WString::tr("sectionEncoder"));
 
     WTable * table= cont->addNew<WTable>();
@@ -38,19 +38,22 @@ formVielleCoupeRase::formVielleCoupeRase(const WEnvironment &env, cDicoApt *dico
     contactEncoderEdit_->setValidator(std::make_shared<WValidator>(true));
     ++row;
     keepInTouch= table->elementAt(row,1)->addWidget(std::make_unique<WCheckBox>());
+    keepInTouch->setMinimumSize("30px","30px");
     label = table->elementAt(row,0)->addWidget(std::make_unique<WLabel>(WString::tr("kit")));
     ++row;
     ContactEdit_= table->elementAt(row,1)->addWidget(std::make_unique<WLineEdit>());
     label = table->elementAt(row,0)->addWidget(std::make_unique<WLabel>(WString::tr("contactACR")));
     ContactEdit_->setPlaceholderText(WString::tr("contactACR.ph"));
 
+
+    cont = tpl->bindWidget("contACR", std::make_unique<WContainerWidget>());
     cont->addNew<Wt::WText>(WString::tr("sectionVCR"));
     table= cont->addNew<WTable>();
     row=0;
     label = table->elementAt(row,0)->addWidget(std::make_unique<WLabel>(WString::tr("anneeVCR")));
     ++row;
     anneeVCREdit_= table->elementAt(row,0)->addWidget(std::make_unique<WComboBox>());
-     anneeVCREdit_->addItem("en quelle année a eu lieu la coupe?");
+    anneeVCREdit_->addItem("en quelle année a eu lieu la coupe?");
     for (int y(2019);y>2009;y--){
         anneeVCREdit_->addItem("coupé en "+std::to_string(y)+" (il y a "+std::to_string(2024-y)+" ans)");
     }
@@ -59,13 +62,13 @@ formVielleCoupeRase::formVielleCoupeRase(const WEnvironment &env, cDicoApt *dico
     label = table->elementAt(row,0)->addWidget(std::make_unique<WLabel>(WString::tr("regeNat")));
     ++row;
     regeNatEdit_= table->elementAt(row,0)->addWidget(std::make_unique<WLineEdit>());
-    regeNatEdit_->setMinimumSize("200px", "100%");
+    //regeNatEdit_->setMinimumSize("200px", "100%");
     regeNatEdit_->setPlaceholderText(WString::tr("regeNat.ph"));
     ++row;
     label = table->elementAt(row,0)->addWidget(std::make_unique<WLabel>(WString::tr("vegeBloquante")));
     ++row;
     vegeBloquanteEdit_= table->elementAt(row,0)->addWidget(std::make_unique<WLineEdit>());
-    vegeBloquanteEdit_->setMinimumSize("200px", "100%");
+    //vegeBloquanteEdit_->setMinimumSize("200px", "100%");
     vegeBloquanteEdit_->setPlaceholderText(WString::tr("vegeBloquante.ph"));
     ++row;
     label = table->elementAt(row,0)->addWidget(std::make_unique<WLabel>(WString::tr("descriptionVCR")));
@@ -78,7 +81,9 @@ formVielleCoupeRase::formVielleCoupeRase(const WEnvironment &env, cDicoApt *dico
     nomEncoderEdit_->enterPressed().connect(prenomEncoderEdit_, &WWidget::setFocus);
     prenomEncoderEdit_->enterPressed().connect(contactEncoderEdit_, &WWidget::setFocus);
     contactEncoderEdit_->enterPressed().connect(ContactEdit_, &WWidget::setFocus);
-    ContactEdit_->enterPressed().connect(anneeVCREdit_, &WWidget::setFocus);
+
+    //contactEncoderEdit_->enterPressed().connect(ContactEdit_, &WWidget::setFocus);
+   // ContactEdit_->enterPressed().connect(commune_, &WWidget::set);
     anneeVCREdit_->changed().connect(regeNatEdit_, &WWidget::setFocus);
     regeNatEdit_->enterPressed().connect(vegeBloquanteEdit_, &WWidget::setFocus);
     vegeBloquanteEdit_->enterPressed().connect(VCRdescriptionEdit_, &WWidget::setFocus);
@@ -121,6 +126,7 @@ formVielleCoupeRase::formVielleCoupeRase(const WEnvironment &env, cDicoApt *dico
         std::shared_ptr<layerBase> aL1=mDico->getLayerBase(code);
         WText * wtext1= cont->addNew<Wt::WText>(aL1->Nom());
         wtext1->addStyleClass("encodageLayer");
+        wtext1->decorationStyle().setCursor(Cursor::PointingHand);
         cont->addNew<WBreak>();
         wtext1->clicked().connect([=] {this->displayLayer(aL1->Code());});
     }
@@ -134,9 +140,11 @@ formVielleCoupeRase::formVielleCoupeRase(const WEnvironment &env, cDicoApt *dico
     bUndo->clicked().connect([=] {doJavaScript("draw.removeLastPoint();");});
     map->polygGeojson().connect(std::bind(&formVielleCoupeRase::validDraw,this, std::placeholders::_1));
 
-    WPushButton * bSubmit =  cont->addNew<WPushButton>(WString::tr("submit"));
-    bSubmit->setMinimumSize("70%","100px");
-    bSubmit->addStyleClass("btn btn-success");
+
+    WPushButton * bSubmit = tpl->bindWidget("bsubmit", std::make_unique<WPushButton>(WString::tr("submit")));
+
+    //bSubmit->setMinimumSize("70%","100px");
+    //bSubmit->addStyleClass("btn btn-success");
     bSubmit->clicked().connect([=] {submit();});
 }
 
@@ -156,7 +164,7 @@ void formVielleCoupeRase::submit(){
         Wt::WMessageBox * messageBox = this->addChild(std::make_unique<Wt::WMessageBox>(
                                                           "Emplacement de la coupe rase",
                                                           "Veillez localiser la coupe rase et dessiner le contour de la parcelle sur la carte"
-                                                            ,
+                                                          ,
                                                           Wt::Icon::Information,
                                                           Wt::StandardButton::Ok));
         messageBox->setModal(true);
@@ -170,38 +178,38 @@ void formVielleCoupeRase::submit(){
         sqlite3 *db_;
         rc = sqlite3_open(mBDFile.c_str(), &db_);
         if( rc )  {} else {
-                //std::cout << " sauve la coupe rase " << std::endl;
-                sqlite3_stmt * stmt;
-                std::string SQLstring="INSERT INTO acr (nom,prenom,contact,keepInTouch,contact2,anneeCoupe,regeNat,vegeBloquante,descr,surf,polygon) VALUES ('"
-                        +nomEncoderEdit_->valueText().toUTF8()+"',"
-                        +"'"+prenomEncoderEdit_->valueText().toUTF8()+"',"
-                        +"'"+contactEncoderEdit_->valueText().toUTF8()+"',"
-                        +std::to_string(keepInTouch->isChecked())+","
-                        +"'"+ContactEdit_->valueText().toUTF8()+"',"
-                        +"'"+anneeVCREdit_->currentText().toUTF8()+"',"
-                        +"'"+regeNatEdit_->valueText().toUTF8()+"',"
-                        +"'"+vegeBloquanteEdit_->valueText().toUTF8()+"',"
-                        +"'"+VCRdescriptionEdit_->valueText().toUTF8()+"',"
-                        +std::to_string(surf)+","
-                        +"'"+polyg+"');";
-                //std::cout << "sql : " << SQLstring << std::endl;
-                sqlite3_prepare_v2(db_, SQLstring.c_str(), -1, &stmt, NULL );
-                // applique l'update
-                sqlite3_step( stmt );
-                sqlite3_finalize(stmt);
+            //std::cout << " sauve la coupe rase " << std::endl;
+            sqlite3_stmt * stmt;
+            std::string SQLstring="INSERT INTO acr (nom,prenom,contact,keepInTouch,contact2,anneeCoupe,regeNat,vegeBloquante,descr,surf,polygon) VALUES ('"
+                    +nomEncoderEdit_->valueText().toUTF8()+"',"
+                    +"'"+prenomEncoderEdit_->valueText().toUTF8()+"',"
+                    +"'"+contactEncoderEdit_->valueText().toUTF8()+"',"
+                    +std::to_string(keepInTouch->isChecked())+","
+                    +"'"+ContactEdit_->valueText().toUTF8()+"',"
+                    +"'"+anneeVCREdit_->currentText().toUTF8()+"',"
+                    +"'"+regeNatEdit_->valueText().toUTF8()+"',"
+                    +"'"+vegeBloquanteEdit_->valueText().toUTF8()+"',"
+                    +"'"+VCRdescriptionEdit_->valueText().toUTF8()+"',"
+                    +std::to_string(surf)+","
+                    +"'"+polyg+"');";
+            //std::cout << "sql : " << SQLstring << std::endl;
+            sqlite3_prepare_v2(db_, SQLstring.c_str(), -1, &stmt, NULL );
+            // applique l'update
+            sqlite3_step( stmt );
+            sqlite3_finalize(stmt);
 
 
 
-            }
+        }
         sqlite3_close(db_);
 
         Wt::StandardButton answer = Wt::WMessageBox::show( WString::tr("saveACR.msg.titre"),
                                                            WString::tr("saveACR.msg.cont"),
                                                            Wt::StandardButton::Yes | Wt::StandardButton::No);
         if (answer == Wt::StandardButton::Yes){
-        vider(0);
+            vider(0);
         } else {
-        vider();
+            vider();
         }
 
 
@@ -209,28 +217,27 @@ void formVielleCoupeRase::submit(){
 }
 
 void formVielleCoupeRase::vider(bool all){
-    //std::cout << "vider formulaire"<< std::endl;
-   if(all){
-   nomEncoderEdit_->setText("");
-   prenomEncoderEdit_->setText("");
-   contactEncoderEdit_->setText("");
-   keepInTouch->setChecked(0);
-   ContactEdit_->setText("");
-   }
-   anneeVCREdit_->setCurrentIndex(0);
-   regeNatEdit_->setText("");
-   vegeBloquanteEdit_->setText("");
-   VCRdescriptionEdit_->setText("");
-   polygValid=0;
-   polyg="";
-   doJavaScript("acr_src.clear();map.addInteraction(draw);");
+    std::cout << "vider formulaire"<< std::endl;
+    if(all){
+        nomEncoderEdit_->setText("");
+        prenomEncoderEdit_->setText("");
+        contactEncoderEdit_->setText("");
+        keepInTouch->setChecked(0);
+        ContactEdit_->setText("");
+    }
+    anneeVCREdit_->setCurrentIndex(0);
+    regeNatEdit_->setText("");
+    vegeBloquanteEdit_->setText("");
+    VCRdescriptionEdit_->setText("");
+    polygValid=0;
+    polyg="";
+    doJavaScript("acr_src.clear();map.addInteraction(draw);");
+    doJavaScript("document.body.scrollTop = 0; // For Safari");
+    doJavaScript("document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera");
 }
 
 void formVielleCoupeRase::loadStyles(){
-    //std::shared_ptr<Wt::WBootstrap5Theme> theme = std::make_shared<Wt::WBootstrap5Theme>();
-    auto theme = std::make_shared<Wt::WBootstrapTheme>();
-    theme->setVersion(Wt::BootstrapVersion::v3);
-    theme->setResponsive(true);
+    std::shared_ptr<Wt::WBootstrap5Theme> theme = std::make_shared<Wt::WBootstrap5Theme>();
     setTheme(theme);
     useStyleSheet("resources/themes/default/wt.css");
     useStyleSheet("style/style.css");
@@ -421,10 +428,10 @@ void formVielleCoupeRase::validDraw(std::string geojson){
         OGRFeature *poFeature;
         while( (poFeature = lay->GetNextFeature()) != NULL )
         {
-         surf=OGR_G_Area(poFeature->GetGeometryRef())/10000.0;
-         //std::cout << "surface " << surf<< std::endl;
-         polygValid=1;
-         polyg=poFeature->GetGeometryRef()->exportToJson();
+            surf=OGR_G_Area(poFeature->GetGeometryRef())/10000.0;
+            //std::cout << "surface " << surf<< std::endl;
+            polygValid=1;
+            polyg=poFeature->GetGeometryRef()->exportToJson();
         }
         doJavaScript("map.removeInteraction(draw);");
     }else {
