@@ -58,6 +58,7 @@ dependencies:
   geoimage: ^0.4.0
 
   pdf: ^3.10.8
+  flutter_logs: ^2.1.11
 
 dev_dependencies:
   flutter_test:

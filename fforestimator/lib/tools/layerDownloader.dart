@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:fforestimator/globals.dart' as gl;
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:path/path.dart';
+import 'package:flutter_logs/flutter_logs.dart';
 
 class LayerDownloader extends StatefulWidget {
   final LayerTile layer;
@@ -119,14 +120,18 @@ class _LayerDownloaderState extends State<LayerDownloader> {
       String id = data[0];
       DownloadTaskStatus status = DownloadTaskStatus.fromInt(data[1]);
       int progress = data[2];
-      print(progress);
       if (progress > 100) {
         progress -= 100;
       }
+      if (status == DownloadTaskStatus.enqueued) {
+        FlutterLogs.logInfo("download", "started", "Download enqueued");
+      }
       if (status == DownloadTaskStatus.running) {
         //_downloadStates[_taskIDToLayerCode[id]!] = progress / 100.0;
+        FlutterLogs.logInfo("download", "running", "Download running");
       }
       if (status == DownloadTaskStatus.complete) {
+        FlutterLogs.logInfo("download", "completed", "Download finished");
         gl.dico.getLayerBase(_taskIDToLayerCode[id]!).mOffline = true;
         _downloadStates[_taskIDToLayerCode[id]!] = 1.0;
         widget.rebuildWidgetTree(() {});

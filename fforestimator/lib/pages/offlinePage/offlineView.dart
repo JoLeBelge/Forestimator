@@ -2,7 +2,6 @@ import 'package:fforestimator/dico/dicoApt.dart';
 import 'package:fforestimator/pages/catalogueView/catalogueView.dart';
 import 'package:fforestimator/pages/catalogueView/categoryTile.dart';
 import 'package:fforestimator/pages/catalogueView/layerTile.dart';
-import 'package:fforestimator/pages/catalogueView/legendView.dart';
 import 'package:fforestimator/tools/layerDownloader.dart';
 import 'package:flutter/material.dart';
 import 'package:fforestimator/globals.dart' as gl;
@@ -57,8 +56,10 @@ class _OfflineView extends State<OfflineView> {
                     maxHeight: MediaQuery.of(context).size.height * .1),
                 child: TextButton.icon(
                   onPressed: () {
-                    setState(() {
-                      gl.offlineMode = true;
+                    gl.rebuildWholeWidgetTree(() {
+                      setState(() {
+                        gl.offlineMode = true;
+                      });
                     });
                   },
                   icon: Icon(
