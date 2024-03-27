@@ -789,6 +789,23 @@ transition-duration: 0.5s;
 	background-color: #00a200;	
 }
 
+.frameEncodage{
+background: green;
+display: block;	
+}
+.encodage{
+background: lightgrey;	
+overflow: visible;
+}
+
+.encodageLayer{
+font-size: 14pt;
+background: green;	
+padding-left: 20px;
+}
+
+  
+
 
 
 
