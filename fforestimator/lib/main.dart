@@ -17,6 +17,7 @@ import 'package:fforestimator/scaffoldNavigation.dart';
 import 'dart:convert';
 import 'package:path/path.dart' as path;
 import 'package:flutter_downloader/flutter_downloader.dart';
+import 'package:flutter_logs/flutter_logs.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -34,6 +35,23 @@ void main() async {
   }
   gl.dico = dicoAptProvider();
   await gl.dico.init();
+
+  //Initialize Logging
+  await FlutterLogs.initLogs(
+      logLevelsEnabled: [
+        LogLevel.INFO,
+        LogLevel.WARNING,
+        LogLevel.ERROR,
+        LogLevel.SEVERE
+      ],
+      timeStampFormat: TimeStampFormat.TIME_FORMAT_READABLE,
+      directoryStructure: DirectoryStructure.FOR_DATE,
+      logTypesEnabled: ["device", "network", "errors"],
+      logFileExtension: LogFileExtension.LOG,
+      logsWriteDirectoryName: "MyLogs",
+      logsExportDirectoryName: "MyLogs/Exported",
+      debugFileOperations: true,
+      isDebuggable: true);
 
   runApp(const MyApp());
 }
@@ -105,6 +123,7 @@ class _MyApp extends State<MyApp> {
     super.initState();
     // copier tout les pdf de l'asset bundle vers un fichier utilisable par la librairie flutter_pdfviewer
     _listAndCopyPdfassets();
+    gl.rebuildWholeWidgetTree = setState;
     //_lookForDownloadedFiles();
   }
 
