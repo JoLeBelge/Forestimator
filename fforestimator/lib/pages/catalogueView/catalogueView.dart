@@ -160,7 +160,9 @@ class _CategoryView extends State<CategoryView> {
     return Column(
       children: <Widget>[
         if (lt.downloadable)
-          ColoredBox(color: gl.colorBackground, child: LayerDownloader(lt,gl.refreshCatalogueView)),
+          ColoredBox(
+              color: gl.colorBackground,
+              child: LayerDownloader(lt, gl.refreshCatalogueView)),
         if (gl.dico.getLayerBase(lt.key).mUsedForAnalysis)
           ColoredBox(
               color: gl.colorBackgroundSecondary,
@@ -290,7 +292,7 @@ class _CategoryView extends State<CategoryView> {
           if (widget.category.filter != "APT_CS" &&
               widget.category.filter != "APT_FEE" &&
               !lt.extern)
-            gl.anaPtSelectedLayerKeys.contains(lt.key)
+            /*gl.anaPtSelectedLayerKeys.contains(lt.key)
                 ? Container(
                     decoration: const BoxDecoration(
                         shape: BoxShape.circle, color: gl.colorUliege),
@@ -332,66 +334,66 @@ class _CategoryView extends State<CategoryView> {
                             widget.refreshView();
                           });
                         }),
+                  ),*/
+            _isSelectedLayer(lt.key)
+                ? Container(
+                    decoration: const BoxDecoration(
+                        shape: BoxShape.circle, color: gl.colorAgroBioTech),
+                    constraints: const BoxConstraints(
+                      maxWidth: 48,
+                      minWidth: 48,
+                      maxHeight: 48,
+                      minHeight: 48,
+                    ),
+                    padding: const EdgeInsets.all(0),
+                    child: IconButton(
+                        icon: const Icon(Icons.layers_clear, size: 28),
+                        onPressed: () {
+                          setState(() {
+                            if (gl.interfaceSelectedLayerKeys.length > 1) {
+                              lt.selected = false;
+                              widget.refreshView();
+                              gl.refreshMap(() {
+                                _removeLayerFromList(lt.key);
+                              });
+                            }
+                          });
+                        }),
+                  )
+                : Container(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                    ),
+                    constraints: const BoxConstraints(
+                      maxWidth: 48,
+                      minWidth: 48,
+                      maxHeight: 48,
+                      minHeight: 48,
+                    ),
+                    padding: const EdgeInsets.all(0),
+                    child: IconButton(
+                        icon: const Icon(Icons.layers, size: 28),
+                        onPressed: () {
+                          setState(() {
+                            if (gl.interfaceSelectedLayerKeys.length < 3) {
+                              lt.selected = true;
+                              widget.refreshView();
+                              gl.refreshMap(() {
+                                gl.interfaceSelectedLayerKeys
+                                    .insert(0, gl.selectedLayer(mCode: lt.key));
+                              });
+                            } else {
+                              lt.selected = true;
+                              widget.refreshView();
+                              gl.refreshMap(() {
+                                gl.interfaceSelectedLayerKeys.removeLast();
+                                gl.interfaceSelectedLayerKeys
+                                    .insert(0, gl.selectedLayer(mCode: lt.key));
+                              });
+                            }
+                          });
+                        }),
                   ),
-          _isSelectedLayer(lt.key)
-              ? Container(
-                  decoration: const BoxDecoration(
-                      shape: BoxShape.circle, color: gl.colorAgroBioTech),
-                  constraints: const BoxConstraints(
-                    maxWidth: 48,
-                    minWidth: 48,
-                    maxHeight: 48,
-                    minHeight: 48,
-                  ),
-                  padding: const EdgeInsets.all(0),
-                  child: IconButton(
-                      icon: const Icon(Icons.layers_clear, size: 28),
-                      onPressed: () {
-                        setState(() {
-                          if (gl.interfaceSelectedLayerKeys.length > 1) {
-                            lt.selected = false;
-                            widget.refreshView();
-                            gl.refreshMap(() {
-                              _removeLayerFromList(lt.key);
-                            });
-                          }
-                        });
-                      }),
-                )
-              : Container(
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                  ),
-                  constraints: const BoxConstraints(
-                    maxWidth: 48,
-                    minWidth: 48,
-                    maxHeight: 48,
-                    minHeight: 48,
-                  ),
-                  padding: const EdgeInsets.all(0),
-                  child: IconButton(
-                      icon: const Icon(Icons.layers, size: 28),
-                      onPressed: () {
-                        setState(() {
-                          if (gl.interfaceSelectedLayerKeys.length < 3) {
-                            lt.selected = true;
-                            widget.refreshView();
-                            gl.refreshMap(() {
-                              gl.interfaceSelectedLayerKeys
-                                  .insert(0, gl.selectedLayer(mCode: lt.key));
-                            });
-                          } else {
-                            lt.selected = true;
-                            widget.refreshView();
-                            gl.refreshMap(() {
-                              gl.interfaceSelectedLayerKeys.removeLast();
-                              gl.interfaceSelectedLayerKeys
-                                  .insert(0, gl.selectedLayer(mCode: lt.key));
-                            });
-                          }
-                        });
-                      }),
-                ),
         ]));
   }
 

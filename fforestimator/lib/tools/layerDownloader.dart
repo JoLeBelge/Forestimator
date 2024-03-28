@@ -138,10 +138,13 @@ class _LayerDownloaderState extends State<LayerDownloader> {
       }
       setState(() {});
     });
-    FlutterDownloader.registerCallback(
-      downloadCallback,
-      step: 10,
-    );
+
+    if (Platform.isAndroid || Platform.isAndroid) {
+      FlutterDownloader.registerCallback(
+        downloadCallback,
+        step: 10,
+      );
+    }
   }
 
   @override

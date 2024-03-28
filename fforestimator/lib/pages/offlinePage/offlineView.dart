@@ -227,16 +227,14 @@ class _OfflineView extends State<OfflineView> {
   }
 
   void _getLayerData() async {
-    Map<String, layerBase> mp = gl.dico.mLayerBases;
-    for (var key in mp.keys) {
-      if (mp[key]!.mIsDownloadableRW) {
-        _downlodableLayerTiles.add(LayerTile(
-            name: mp[key]!.mNom,
-            filter: mp[key]!.mGroupe,
-            key: key,
-            downloadable: mp[key]!.mIsDownloadableRW,
-            extern: mp[key]!.mCategorie == "Externe"));
-      }
+    // on affiche uniquement les couches déjà téléchargées - en tout cas pour la première release
+    for (layerBase l in gl.dico.getLayersOffline()) {
+      _downlodableLayerTiles.add(LayerTile(
+          name: l.mNom,
+          filter: l.mGroupe,
+          key: l.mCode,
+          downloadable: l.mIsDownloadableRW,
+          extern: l.mCategorie == "Externe"));
     }
 
     setState(() {
