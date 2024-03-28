@@ -17,7 +17,7 @@ bool _finishedInitializingCategory = false;
 
 class _OfflineView extends State<OfflineView> {
   final List<Category> _categories = [
-    Category(name: "Couches à télécharger.", filter: "offline")
+    Category(name: "Couches téléchargées.", filter: "offline")
   ];
   final List<LayerTile> _downlodableLayerTiles = [];
 
@@ -30,8 +30,8 @@ class _OfflineView extends State<OfflineView> {
                 color: gl.colorBackgroundSecondary,
                 constraints: BoxConstraints(
                     maxWidth: MediaQuery.of(context).size.width * 1.0,
-                    minHeight: MediaQuery.of(context).size.height * .1,
-                    maxHeight: MediaQuery.of(context).size.height * .1),
+                    minHeight: MediaQuery.of(context).size.height * .15,
+                    maxHeight: MediaQuery.of(context).size.height * .15),
                 child: TextButton.icon(
                   onPressed: () {
                     setState(() {
@@ -52,8 +52,8 @@ class _OfflineView extends State<OfflineView> {
                 color: gl.colorBackgroundSecondary,
                 constraints: BoxConstraints(
                     maxWidth: MediaQuery.of(context).size.width * 1.0,
-                    minHeight: MediaQuery.of(context).size.height * .1,
-                    maxHeight: MediaQuery.of(context).size.height * .1),
+                    minHeight: MediaQuery.of(context).size.height * .15,
+                    maxHeight: MediaQuery.of(context).size.height * .15),
                 child: TextButton.icon(
                   onPressed: () {
                     gl.rebuildWholeWidgetTree(() {
@@ -76,8 +76,8 @@ class _OfflineView extends State<OfflineView> {
           color: gl.colorBackground,
           constraints: BoxConstraints(
               maxWidth: MediaQuery.of(context).size.width * 1.0,
-              minHeight: MediaQuery.of(context).size.height * .8,
-              maxHeight: MediaQuery.of(context).size.height * .8),
+              minHeight: MediaQuery.of(context).size.height * .75,
+              maxHeight: MediaQuery.of(context).size.height * .75),
           child: SingleChildScrollView(
             child: _buildOfflineCategory(),
           ),
@@ -190,7 +190,7 @@ class _OfflineView extends State<OfflineView> {
         if (lt.downloadable)
           ColoredBox(
               color: gl.colorBackground,
-              child: LayerDownloader(lt, rebuildWidgetTree)),
+              child: LayerDownloader(lt, rebuildWidgetTreeForLayerDownloader)),
         if (gl.dico.getLayerBase(lt.key).hasDoc())
           ListTile(
             title: Text(
@@ -228,8 +228,11 @@ class _OfflineView extends State<OfflineView> {
 
   void _getLayerData() async {
     Map<String, layerBase> mp = gl.dico.mLayerBases;
+    while(_downlodableLayerTiles.isNotEmpty){
+      _downlodableLayerTiles.removeLast();
+    }
     for (var key in mp.keys) {
-      if (mp[key]!.mIsDownloadableRW) {
+      if (mp[key]!.mOffline) {
         _downlodableLayerTiles.add(LayerTile(
             name: mp[key]!.mNom,
             filter: mp[key]!.mGroupe,
@@ -252,8 +255,9 @@ class _OfflineView extends State<OfflineView> {
     }
   }
 
-  void rebuildWidgetTree(var setter) async {
+  void rebuildWidgetTreeForLayerDownloader(var setter) async {
     setState(setter);
+    _getLayerData();
     gl.dico.checkLayerBaseOfflineRessource();
   }
 }

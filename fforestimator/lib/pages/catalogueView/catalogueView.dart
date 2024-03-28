@@ -44,7 +44,7 @@ class _CatalogueView extends State<CatalogueView> {
       children: _categories.map<ExpansionPanel>((Category item) {
         return ExpansionPanel(
           canTapOnHeader: true,
-          backgroundColor: gl.colorBackground,
+          backgroundColor: gl.colorBackgroundSecondary,
           headerBuilder: (BuildContext context, bool isExpanded) {
             return ListTile(
               iconColor: Colors.red,
@@ -130,7 +130,7 @@ class _CategoryView extends State<CategoryView> {
           .map<ExpansionPanel>((LayerTile item) {
         return ExpansionPanel(
           canTapOnHeader: true,
-          backgroundColor: _getswitchBackgroundColorForList(),
+          backgroundColor: gl.colorBackgroundSecondary,
           headerBuilder: (BuildContext context, bool isExpanded) {
             return Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -160,7 +160,7 @@ class _CategoryView extends State<CategoryView> {
     return Column(
       children: <Widget>[
         if (lt.downloadable)
-          ColoredBox(color: gl.colorBackground, child: LayerDownloader(lt,gl.refreshCatalogueView)),
+          ColoredBox(color: gl.colorBackgroundSecondary, child: LayerDownloader(lt,gl.refreshCatalogueView)),
         if (gl.dico.getLayerBase(lt.key).mUsedForAnalysis)
           ColoredBox(
               color: gl.colorBackgroundSecondary,
@@ -255,7 +255,7 @@ class _CategoryView extends State<CategoryView> {
           ),
         LegendView(
           layerKey: lt.key,
-          color: _getBackgroundColorForList(),
+          color: gl.colorBackgroundSecondary,
           constraintsText: BoxConstraints(
               minWidth: MediaQuery.of(context).size.width * .4,
               maxWidth: MediaQuery.of(context).size.width * .4,
@@ -514,14 +514,14 @@ class _SelectedLayerView extends State<SelectedLayerView> {
           (i) => gl.interfaceSelectedLayerKeys.length > i
               ? Card(
                   key: Key('$i'),
-                  color: gl.colorBackground,
+                  color: gl.colorBackgroundSecondary,
                   surfaceTintColor: gl.colorBackgroundSecondary,
                   shadowColor: const Color.fromARGB(255, 44, 44, 44),
                   child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
                         Container(
-                          color: gl.colorBackground,
+                          color: gl.colorBackgroundSecondary,
                           constraints: BoxConstraints(
                             maxHeight: 48,
                             maxWidth: MediaQuery.of(context).size.width * .65,
@@ -539,7 +539,7 @@ class _SelectedLayerView extends State<SelectedLayerView> {
                           ),
                         ),
                         Container(
-                            color: gl.colorBackground,
+                            color: gl.colorBackgroundSecondary,
                             constraints: BoxConstraints(
                               maxHeight:
                                   MediaQuery.of(context).size.width * .04 > 48

@@ -113,7 +113,7 @@ class _LayerDownloaderState extends State<LayerDownloader> {
   @override
   void initState() {
     super.initState();
-
+    //This part sucks. its executed at 'progress' = 0 -409600 100
     IsolateNameServer.registerPortWithName(
         _port.sendPort, 'downloader_send_port');
     _port.listen((dynamic data) async {
@@ -140,7 +140,7 @@ class _LayerDownloaderState extends State<LayerDownloader> {
     });
     FlutterDownloader.registerCallback(
       downloadCallback,
-      step: 10,
+      step: 50,
     );
   }
 

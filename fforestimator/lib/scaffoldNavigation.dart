@@ -2,7 +2,6 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 import 'package:fforestimator/globals.dart' as gl;
 
-
 // Stateful nested navigation based on:
 // https://github.com/flutter/packages/blob/main/packages/go_router/example/lib/stateful_shell_route.dart
 class ScaffoldWithNestedNavigation extends StatelessWidget {
@@ -26,14 +25,16 @@ class ScaffoldWithNestedNavigation extends StatelessWidget {
     return Scaffold(
       body: navigationShell,
       bottomNavigationBar: NavigationBar(
+        height: MediaQuery.of(context).size.height * 0.08,
         selectedIndex: navigationShell.currentIndex,
         destinations: const [
           NavigationDestination(label: 'Carte', icon: Icon(Icons.map)),
           NavigationDestination(label: 'Catalogue', icon: Icon(Icons.layers)),
-          NavigationDestination(label: 'Offline Mode', icon: Icon(Icons.offline_bolt))
+          NavigationDestination(
+              label: 'Offline Mode', icon: Icon(Icons.offline_bolt))
         ],
         onDestinationSelected: _goBranch,
-        backgroundColor: gl.offlineMode?gl.colorAgroBioTech:gl.colorUliege,
+        backgroundColor: gl.offlineMode ? gl.colorAgroBioTech : gl.colorUliege,
       ),
     );
   }
