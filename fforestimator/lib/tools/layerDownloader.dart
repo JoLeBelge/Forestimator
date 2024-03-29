@@ -49,8 +49,7 @@ class _LayerDownloaderState extends State<LayerDownloader> {
             maxWidth: MediaQuery.of(context).size.width * 1,
             minHeight: MediaQuery.of(context).size.height * .1,
             maxHeight: MediaQuery.of(context).size.height * .1),
-        child:
-            const Text("Downloading!"),
+        child: const Text("Downloading!"),
       );
     }
     if (gl.dico.getLayerBase(widget.layer.key).mOffline) {
@@ -76,9 +75,10 @@ class _LayerDownloaderState extends State<LayerDownloader> {
       return Row(children: [
         IconButton(
             onPressed: () async {
-              setState(() async {
+              var it = await _downloadFile();
+              setState(() {
                 _downloadStates[widget.layer.key] = 0.01;
-                _taskIDToLayerCode[await _downloadFile()] = widget.layer.key;
+                _taskIDToLayerCode[it] = widget.layer.key;
               });
             },
             icon: const Icon(Icons.download)),

@@ -74,3 +74,6 @@ Function refreshCatalogueView = () {};
 Function refreshCurrentThreeLayer = () {};
 
 Function ?rebuildNavigatorBar;
+
+int nOnlineLayer = 3;
+int nOfflineLayer = 1;

@@ -402,7 +402,11 @@ class dicoAptProvider {
   }
 
   List<layerBase> getLayersOffline() {
-    return mLayerBases.values.where((i) => i.mOffline).toList();
+    List<layerBase> that = mLayerBases.values.where((i) => i.mOffline).toList();
+    if (that.isEmpty){
+      return [layerBase()..mCode = gl.defaultLayer];
+    }
+    return that;
   }
 
   layerBase getLayerBase(String aCode) {

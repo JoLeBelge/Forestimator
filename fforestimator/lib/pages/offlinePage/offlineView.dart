@@ -41,6 +41,7 @@ class _OfflineView extends State<OfflineView> {
                     setState(() {
                       gl.offlineMode = false;
                       gl.rebuildNavigatorBar!();
+                      gl.refreshCurrentThreeLayer();
                     });
                   },
                   icon: Icon(
@@ -62,8 +63,24 @@ class _OfflineView extends State<OfflineView> {
                 child: TextButton.icon(
                   onPressed: () {
                     setState(() {
+                      while (gl.interfaceSelectedLayerKeys.length > 1) {
+                        if (gl.interfaceSelectedLayerKeys.first.offline) {
+                          gl.interfaceSelectedLayerKeys.removeLast();
+                        } else {
+                          gl.interfaceSelectedLayerKeys.removeAt(0);
+                        }
+                      }
+
+                      if (!gl.interfaceSelectedLayerKeys.first.offline) {
+                        gl.interfaceSelectedLayerKeys.clear();
+                        gl.interfaceSelectedLayerKeys.insert(
+                            0,
+                            gl.selectedLayer(
+                                mCode: gl.dico.getLayersOffline().first.mCode));
+                      }
                       gl.offlineMode = true;
                       gl.rebuildNavigatorBar!();
+                      gl.refreshCurrentThreeLayer();
                     });
                   },
                   icon: Icon(

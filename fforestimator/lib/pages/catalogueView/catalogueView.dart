@@ -278,7 +278,7 @@ class _CategoryView extends State<CategoryView> {
     if (widget.category.filter != "APT_CS" &&
         widget.category.filter != "APT_FEE" &&
         !lt.extern) barWidth = 96.0;
-
+    int nLayer = gl.offlineMode ? gl.nOfflineLayer : gl.nOnlineLayer;
     return Container(
         constraints: BoxConstraints(
           maxWidth: barWidth,
@@ -374,8 +374,9 @@ class _CategoryView extends State<CategoryView> {
                     child: IconButton(
                         icon: const Icon(Icons.layers, size: 28),
                         onPressed: () {
+                          if(!gl.offlineMode || (gl.offlineMode && gl.dico.getLayerBase(lt.key).mOffline))
                           setState(() {
-                            if (gl.interfaceSelectedLayerKeys.length < 3) {
+                            if (gl.interfaceSelectedLayerKeys.length < nLayer) {
                               lt.selected = true;
                               widget.refreshView();
                               gl.refreshMap(() {
@@ -392,6 +393,7 @@ class _CategoryView extends State<CategoryView> {
                               });
                             }
                           });
+                          //TODO else popup warning: file is not on disk
                         }),
                   ),
         ]));
@@ -451,23 +453,6 @@ class _CategoryView extends State<CategoryView> {
     return false;
   }
 
-  Color _getBackgroundColorForList() {
-    if (_flipForBackground) {
-      return gl.colorBackground;
-    }
-    return gl.colorBackgroundSecondary;
-  }
-
-  Color _getswitchBackgroundColorForList() {
-    _flipForBackground = !_flipForBackground;
-    return _getBackgroundColorForList();
-  }
-
-  Color _initSwitchBackgroundColorForList() {
-    _flipForBackground = false;
-    return _getBackgroundColorForList();
-  }
-
   @override
   void initState() {
     super.initState();
@@ -490,8 +475,17 @@ class SelectedLayerView extends StatefulWidget {
 
 class _SelectedLayerView extends State<SelectedLayerView> {
   @override
+  void initState() {
+    gl.refreshCurrentThreeLayer = () => setState(
+          () {},
+        );
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     {
+      int nLayer = gl.offlineMode ? gl.nOfflineLayer : gl.nOnlineLayer;
       return ReorderableListView(
         buildDefaultDragHandles: false,
         padding: const EdgeInsets.symmetric(horizontal: 0),
@@ -512,7 +506,7 @@ class _SelectedLayerView extends State<SelectedLayerView> {
           });
         },
         children: List<Widget>.generate(
-          3,
+          gl.offlineMode ? 1 : 3,
           (i) => gl.interfaceSelectedLayerKeys.length > i
               ? Card(
                   key: Key('$i'),
