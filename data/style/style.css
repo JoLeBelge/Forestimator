@@ -790,20 +790,27 @@ transition-duration: 0.5s;
 }
 
 .frameEncodage{
-background: green;
+background: lightgreen;
 display: block;	
 }
 .encodage{
 background: lightgrey;	
 overflow: visible;
+padding: 10px;
 }
 
 .encodageLayer{
-font-size: 14pt;
-background: green;	
-padding-left: 20px;
+font-size: 16pt;
+/*background-color: green;	*/
+padding-left: 0px;
+font-weight: bold;
+border: 1px solid black; /* add a border */
+/*background-color: red;  set the background color to red */
 }
 
+.mybtn{
+min-width:100.0px;min-height:100.0px;align-self: center;
+}
   
 
 

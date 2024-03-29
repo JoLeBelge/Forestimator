@@ -66,10 +66,10 @@ class _MapPageState extends State<mapPage> {
     gl.pt = ptBL72;
     ConnectivityResult conRes = await Connectivity().checkConnectivity();
     print(conRes);
-    if (conRes != ConnectivityResult.none &&
-        conRes != ConnectivityResult.wifi &&
-        false) {
-      // sur mon pc ; wifi mais pas accès internet (car pas authentifié ulg user sur le wifi)
+    if (!gl.offlineMode) {
+      //conRes != ConnectivityResult.none &&
+      //  conRes != ConnectivityResult.wifi
+
       print("anaPonctOnline");
       String layersAnaPt = "";
       for (String lCode in gl.anaPtSelectedLayerKeys) {

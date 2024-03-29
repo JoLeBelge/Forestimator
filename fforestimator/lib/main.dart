@@ -32,26 +32,26 @@ void main() async {
         ignoreSsl:
             true // option: set to false to disable working with http links (default: false)
         );
+
+    //Initialize Logging
+    await FlutterLogs.initLogs(
+        logLevelsEnabled: [
+          LogLevel.INFO,
+          LogLevel.WARNING,
+          LogLevel.ERROR,
+          LogLevel.SEVERE
+        ],
+        timeStampFormat: TimeStampFormat.TIME_FORMAT_READABLE,
+        directoryStructure: DirectoryStructure.FOR_DATE,
+        logTypesEnabled: ["device", "network", "errors"],
+        logFileExtension: LogFileExtension.TXT,
+        logsWriteDirectoryName: "MyLogs",
+        logsExportDirectoryName: "MyLogs/Exported",
+        debugFileOperations: true,
+        isDebuggable: true);
   }
   gl.dico = dicoAptProvider();
   await gl.dico.init();
-
-  //Initialize Logging
-  await FlutterLogs.initLogs(
-      logLevelsEnabled: [
-        LogLevel.INFO,
-        LogLevel.WARNING,
-        LogLevel.ERROR,
-        LogLevel.SEVERE
-      ],
-      timeStampFormat: TimeStampFormat.TIME_FORMAT_READABLE,
-      directoryStructure: DirectoryStructure.FOR_DATE,
-      logTypesEnabled: ["device", "network", "errors"],
-      logFileExtension: LogFileExtension.LOG,
-      logsWriteDirectoryName: "MyLogs",
-      logsExportDirectoryName: "MyLogs/Exported",
-      debugFileOperations: true,
-      isDebuggable: true);
 
   runApp(const MyApp());
 }
@@ -106,17 +106,6 @@ class _MyApp extends State<MyApp> {
       fromAsset(f, path.basename(f));
     }
   }
-
-  // voir void checkLayerBaseOfflineRessource() async de cDicoAptProvider qui fait la mm chose
-  /*void _lookForDownloadedFiles() async {
-    // Downloaded Layers
-    for (var layerCode in gl.dico.mLayerBases.keys) {
-      final File file = File(gl.dico.docDir.path +
-          "/" +
-          gl.dico.getLayerBase(layerCode).mNomRaster);
-      gl.dico.getLayerBase(layerCode).mOffline = await file.exists();
-    }
-  }*/
 
   @override
   void initState() {
