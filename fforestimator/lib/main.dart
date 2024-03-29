@@ -112,7 +112,7 @@ class _MyApp extends State<MyApp> {
     super.initState();
     // copier tout les pdf de l'asset bundle vers un fichier utilisable par la librairie flutter_pdfviewer
     _listAndCopyPdfassets();
-    gl.rebuildWholeWidgetTree = setState;
+    gl.rebuildWholeWidgetTree;
     //_lookForDownloadedFiles();
   }
 
@@ -122,7 +122,6 @@ class _MyApp extends State<MyApp> {
     routes: [
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
-          // the UI shell
           return ScaffoldWithNestedNavigation(navigationShell: navigationShell);
         },
         branches: [

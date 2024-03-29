@@ -1,6 +1,7 @@
 library fforestimator.globals;
 
 import 'package:fforestimator/dico/dicoApt.dart';
+import 'package:fforestimator/scaffoldNavigation.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:fforestimator/pages/anaPt/requestedLayer.dart';
@@ -72,3 +73,4 @@ Function refreshMap = () {};
 Function refreshCatalogueView = () {};
 Function refreshCurrentThreeLayer = () {};
 
+Function ?rebuildNavigatorBar;

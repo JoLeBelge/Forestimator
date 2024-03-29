@@ -40,6 +40,7 @@ class _OfflineView extends State<OfflineView> {
                   onPressed: () {
                     setState(() {
                       gl.offlineMode = false;
+                      gl.rebuildNavigatorBar!();
                     });
                   },
                   icon: Icon(
@@ -60,10 +61,9 @@ class _OfflineView extends State<OfflineView> {
                     maxHeight: MediaQuery.of(context).size.height * .15),
                 child: TextButton.icon(
                   onPressed: () {
-                    gl.rebuildWholeWidgetTree(() {
-                      setState(() {
-                        gl.offlineMode = true;
-                      });
+                    setState(() {
+                      gl.offlineMode = true;
+                      gl.rebuildNavigatorBar!();
                     });
                   },
                   icon: Icon(
@@ -261,7 +261,8 @@ class _OfflineView extends State<OfflineView> {
   }
 
   Future<void> reloadLayerData() async {
-    print("forget itiaqhgoihqgp,;oi;qjogjk^pqog:po;lqpogqg654654g8q1b068q4g2r6ze87");
+    print(
+        "forget itiaqhgoihqgp,;oi;qjogjk^pqog:po;lqpogqg654654g8q1b068q4g2r6ze87");
     _getLayerData();
   }
 
