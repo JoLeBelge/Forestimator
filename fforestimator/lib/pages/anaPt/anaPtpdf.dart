@@ -1,5 +1,7 @@
+import 'package:fforestimator/dico/dicoApt.dart';
 import 'package:fforestimator/pages/anaPt/anaPtpage.dart';
 import 'package:fforestimator/pages/anaPt/requestedLayer.dart';
+import 'package:pdf/pdf.dart';
 import 'dart:io';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:fforestimator/dico/ess.dart';
@@ -9,42 +11,10 @@ import 'package:fforestimator/globals.dart' as gl;
 import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:proj4dart/proj4dart.dart' as proj4;
+import 'package:intl/intl.dart';
 
-class exportPdfDialog extends StatefulWidget {
-  List<layerAnaPt> requestedLayers = [];
-  @override
-  exportPdfDialog(this.requestedLayers);
-  State<exportPdfDialog> createState() => _exportPdfDialogState();
-}
-
-class _exportPdfDialogState extends State<exportPdfDialog> {
-  late String _filename;
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-        backgroundColor: Colors.grey[200],
-        appBar: AppBar(
-          title: Text("Export d'un pdf"),
-        ),
-        body: Center(
-          child: TextField(
-            onChanged: (value) {
-              setState(() {
-                _filename = value;
-              });
-            },
-            onSubmitted: (value) {
-              makePdf(widget.requestedLayers, _filename);
-            },
-            decoration: InputDecoration(
-              hintText: 'Choisisez un nom pour le fichier pdf',
-            ),
-          ),
-        ));
-  }
-}
-
-Future makePdf(List<layerAnaPt> layers, String fileName) async {
+Future makePdf(
+    List<layerAnaPt> layers, String fileName, String locationName) async {
   final pdf = pw.Document();
   final imageLogo = pw.MemoryImage((await rootBundle
           .load('assets/images/GRF_nouveau_logo_uliege-retina.jpg'))
@@ -53,34 +23,67 @@ Future makePdf(List<layerAnaPt> layers, String fileName) async {
   final now = DateTime.now();
 
   pdf.addPage(pw.Page(build: (context) {
-    return pw.Column(children: [
-      pw.Row(
-        mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+    return pw.Column(
+        crossAxisAlignment: pw.CrossAxisAlignment.start,
         children: [
-          pw.Column(
+          pw.Row(
+            mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
             children: [
-              pw.Text("Analyse ponctuelle Forestimator"),
-              pw.SizedBox(height: 5),
-              pw.Text("Réalisé sans connextion internet, le " + now.toString()),
-              pw.SizedBox(height: 5),
-              pw.Text("X:" + gl.pt.x.toInt.toString()),
-              pw.Text("Y:" + gl.pt.y.toInt.toString()),
+              pw.Column(
+                children: [
+                  pw.Text("Analyse ponctuelle Forestimator",
+                      style: pw.TextStyle(
+                          fontSize: 18, color: PdfColor.fromHex("255f19"))),
+                  pw.SizedBox(height: 30),
+                  PaddedText((gl.offlineMode
+                          ? "Réalisé en mode hors-ligne"
+                          : "Réalisé avec connexion internet") +
+                      " le " +
+                      DateFormat('yyyy-MM-dd').format(now)),
+                ],
+                crossAxisAlignment: pw.CrossAxisAlignment.start,
+              ),
+              pw.SizedBox(
+                height: 150,
+                width: 150,
+                child: pw.Image(imageLogo),
+              )
             ],
-            crossAxisAlignment: pw.CrossAxisAlignment.start,
-          ),
-          pw.SizedBox(
-            height: 150,
-            width: 150,
-            child: pw.Image(imageLogo),
-          )
-        ],
-      ) // first row
-    ]);
+          ), //first row
+          PaddedText("Localisation: " + locationName, pad: 3),
+          PaddedText("Coordonnée (EPSG:31370) ", pad: 3),
+          PaddedText("X: " + gl.pt.x.toInt().toString(), pad: 3),
+          PaddedText("Y: " + gl.pt.y.toInt().toString(), pad: 3),
+          pw.SizedBox(height: 10),
+          pw.Text("Couches cartographiques analysées",
+              style: pw.TextStyle(fontSize: 16)),
+          pw.SizedBox(height: 20),
+          ...layers
+              .where((i) => i.mRastValue != 0)
+              .map<pw.Widget>((layerAnaPt a) {
+            layerBase l = gl.dico.getLayerBase(a.mCode);
+            return PaddedText(l.mNom + " : " + l.getValLabel(a.mRastValue));
+          }).toList(),
+        ]);
   }));
   String? dir = await getDownloadPath();
   File out = File(dir! + "/" + fileName);
+  if (await out.exists()) {
+    // on renomme le pdf
+    int nb = 2;
+    do {
+      out = File(dir! +
+          "/" +
+          fileName.substring(0, fileName.length - 4) +
+          nb.toString() +
+          ".pdf");
+      nb++;
+      print(out.path);
+    } while (await out.exists());
+  }
   out.writeAsBytes(await pdf.save(), flush: true);
-  print("make pdf is done, written on " + out.path.toString());
+
+  //print("make pdf is done, written on " + out.path.toString());
 }
 
 Future<String?> getDownloadPath() async {
@@ -100,3 +103,16 @@ Future<String?> getDownloadPath() async {
   }
   return directory?.path;
 }
+
+pw.Widget PaddedText(
+  final String text, {
+  final pw.TextAlign align = pw.TextAlign.left,
+  final double pad = 5.0,
+}) =>
+    pw.Padding(
+      padding: pw.EdgeInsets.all(pad),
+      child: pw.Text(
+        text,
+        textAlign: align,
+      ),
+    );

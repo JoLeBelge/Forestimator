@@ -76,7 +76,7 @@ class _MyApp extends State<MyApp> {
     try {
       var dir = await getApplicationDocumentsDirectory();
       //var dir = await getExternalStorageDirectory();
-      _pathExternalStorage = dir!.path;
+      _pathExternalStorage = dir.path;
       File file = File("${dir?.path}/$filename");
       if (await file.exists() == false) {
         var data = await rootBundle.load(asset);

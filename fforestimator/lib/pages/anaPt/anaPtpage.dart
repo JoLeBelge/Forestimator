@@ -16,6 +16,8 @@ class anaPtpage extends StatefulWidget {
 }
 
 class _anaPtpageState extends State<anaPtpage> {
+  late TextEditingController controllerPdfName;
+  late TextEditingController controllerLocationName;
   @override
   Widget build(BuildContext context) {
     // pour la construction du tableau d'aptitude
@@ -32,9 +34,41 @@ class _anaPtpageState extends State<anaPtpage> {
             child: Column(children: [
               IconButton(
                   icon: const Icon(Icons.picture_as_pdf, size: 28),
-                  onPressed: () {
-                    // j'aimerai ouvrir un nouvelle page pour demander le nom du fichier pdf -> voir exportPdfDialog . Pour l'instant je fait sans
-                    makePdf(widget.requestedLayers, "toto.pdf");
+                  onPressed: () async {
+                    List<String>? l = await openDialog();
+                    String? pdf = l?.elementAt(0);
+                    String? locationName = l?.elementAt(1);
+                    if (pdf!.isEmpty) {
+                      pdf = "analysePonctuelleForestimator.pdf";
+                    }
+                    if (pdf.length < 4 ||
+                        pdf.substring(pdf.length - 4) != ".pdf") {
+                      pdf = pdf + ".pdf";
+                    }
+                    if (locationName!.isEmpty) {
+                      locationName = "une position";
+                    }
+                    // création du pdf
+                    makePdf(widget.requestedLayers, pdf!, locationName!);
+                    // confirmation que le pdf a été créé
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: Text("Export pdf"),
+                          content: Text("Export pdf effectué avec succès."),
+                          actions: [
+                            TextButton(
+                              child: Text("OK"),
+                              onPressed: () {
+                                Navigator.of(context, rootNavigator: true)
+                                    .pop();
+                              },
+                            ),
+                          ],
+                        );
+                      },
+                    );
                   }),
               _anaPtListLayers(context, widget.requestedLayers),
               SizedBox(height: 15),
@@ -43,6 +77,46 @@ class _anaPtpageState extends State<anaPtpage> {
               if (aptsGS.ready) Card(child: _tabPropositionCS(context, aptsGS)),
             ])));
   }
+
+  Future<List<String>?> openDialog() => showDialog<List<String>>(
+      context: context,
+      builder: (context) => AlertDialog(
+            title: Text("Nom du pdf et de la localisation"),
+            content: SingleChildScrollView(
+                physics: ScrollPhysics(),
+                child: Column(children: [
+                  TextField(
+                      controller: controllerPdfName,
+                      autofocus: true,
+                      decoration: InputDecoration(
+                          hintText: "analysePonctuelleForestimator.pdf")),
+                  TextField(
+                      controller: controllerLocationName,
+                      decoration: InputDecoration(hintText: "Ex: Point 5")),
+                ])),
+            actions: [
+              TextButton(onPressed: submit, child: Text("Générer le pdf"))
+            ],
+          ));
+
+  void submit() {
+    Navigator.of(context, rootNavigator: true)
+        .pop([controllerPdfName.text, controllerLocationName.text]);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    controllerPdfName = TextEditingController();
+    controllerLocationName = TextEditingController();
+  }
+
+  /*@override
+  void dispose() {
+    super.dispose();
+    controllerLocationName.dispose();
+    controllerPdfName.dispose();
+  }*/
 }
 
 class layerAnaPtListTile extends StatelessWidget {

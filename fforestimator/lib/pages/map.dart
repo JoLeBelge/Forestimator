@@ -5,6 +5,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:proj4dart/proj4dart.dart' as proj4;
 import 'package:flutter/material.dart';
 import 'dart:math';
+import 'dart:io';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:fforestimator/locationIndicator/animated_location_indicator.dart';
@@ -63,12 +64,14 @@ class _MapPageState extends State<mapPage> {
 
   Future _runAnaPt(proj4.Point ptBL72) async {
     gl.requestedLayers.clear();
+    data = "";
+
     gl.pt = ptBL72;
     ConnectivityResult conRes = await Connectivity().checkConnectivity();
-    print(conRes);
+    //print(conRes);
     if (!gl.offlineMode) {
       //conRes != ConnectivityResult.none &&
-      //  conRes != ConnectivityResult.wifi
+      //conRes != ConnectivityResult.wifi
 
       print("anaPonctOnline");
       String layersAnaPt = "";
@@ -85,13 +88,21 @@ class _MapPageState extends State<mapPage> {
           "/y/" +
           ptBL72.y.toString();
       //print(url);
-      var res = await http.get(Uri.parse(url));
-      //print(res.body);
-      data = jsonDecode(res.body);
 
-      for (var r in data["RequestedLayers"]) {
-        gl.requestedLayers.add(layerAnaPt.fromMap(r));
+      try {
+        var res = await http.get(Uri.parse(url));
+        if (res.statusCode != 200) throw HttpException('${res.statusCode}');
+        data = jsonDecode(res.body);
+        //print(res.body);
+        // si pas de connexion internet, va tenter de lire data comme une map alors que c'est vide, erreur. donc dans le bloc try catch aussi
+        for (var r in data["RequestedLayers"]) {
+          gl.requestedLayers.add(layerAnaPt.fromMap(r));
+        }
+      } on SocketException {
+        // afficher l'info à l'utilisateur?
+        print('No Internet connection 😑');
       }
+
       gl.requestedLayers.removeWhere((element) => element.mFoundLayer == 0);
     } else {
       print("anaPonctOffline");
