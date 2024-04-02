@@ -42,6 +42,7 @@ class _OfflineView extends State<OfflineView> {
                       gl.offlineMode = false;
                       gl.rebuildNavigatorBar!();
                       gl.refreshCurrentThreeLayer();
+                      gl.refreshMap(() {});
                     });
                   },
                   icon: Icon(
@@ -81,6 +82,7 @@ class _OfflineView extends State<OfflineView> {
                       gl.offlineMode = true;
                       gl.rebuildNavigatorBar!();
                       gl.refreshCurrentThreeLayer();
+                      gl.refreshMap(() {});
                     });
                   },
                   icon: Icon(

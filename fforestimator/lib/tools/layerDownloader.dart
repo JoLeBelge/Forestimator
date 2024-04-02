@@ -43,14 +43,18 @@ class _LayerDownloaderState extends State<LayerDownloader> {
     } else if (_downloadStates[widget.layer.key]! != 0.0 &&
         _downloadStates[widget.layer.key]! != 1.0) {
       return Container(
-        color: gl.colorBackground,
-        constraints: BoxConstraints(
-            minWidth: MediaQuery.of(context).size.width * 1,
-            maxWidth: MediaQuery.of(context).size.width * 1,
-            minHeight: MediaQuery.of(context).size.height * .1,
-            maxHeight: MediaQuery.of(context).size.height * .1),
-        child: const Text("Downloading!"),
-      );
+          color: gl.colorBackground,
+          constraints: BoxConstraints(
+              minWidth: MediaQuery.of(context).size.width * 1,
+              maxWidth: MediaQuery.of(context).size.width * 1,
+              minHeight: MediaQuery.of(context).size.height * .1,
+              maxHeight: MediaQuery.of(context).size.height * .1),
+          child: LinearProgressIndicator(
+            value: _downloadStates[widget.layer.key]! < 1.0 &&
+                    _downloadStates[widget.layer.key]! > 0.0
+                ? _downloadStates[widget.layer.key]!
+                : 0.5,
+          ));
     }
     if (gl.dico.getLayerBase(widget.layer.key).mOffline) {
       return Row(children: [
@@ -126,6 +130,8 @@ class _LayerDownloaderState extends State<LayerDownloader> {
     super.initState();
     //This part sucks. its executed at 'progress' = 0 -409600 100
     //Its worse. If you call reloadLayerTileLists to reorder the lists, the communication between main and downloader breaks => No way to know anything about your download anymore.
+
+    
     IsolateNameServer.registerPortWithName(
         _port.sendPort, 'downloader_send_port');
     _port.listen((dynamic data) async {
@@ -134,17 +140,18 @@ class _LayerDownloaderState extends State<LayerDownloader> {
       int progress = data[2];
       if (progress > 100) {
         progress -= 100;
+      } else if (progress < 0) {
+        progress = 0;
       }
       if (status == DownloadTaskStatus.enqueued) {
         FlutterLogs.logInfo("download", "started", "Download enqueued");
-      }
-      if (status == DownloadTaskStatus.running) {
+      } else if (status == DownloadTaskStatus.running) {
         setState(() {
-          _downloadStates[_taskIDToLayerCode[id]!] = 50.0;
+          _downloadStates[_taskIDToLayerCode[id]!] = progress / 100.0;
         });
-        FlutterLogs.logInfo("download", "running", "Download running");
-      }
-      if (status == DownloadTaskStatus.complete) {
+        FlutterLogs.logInfo("download", "running",
+            "Download running " + (progress / 100.0).toString());
+      } else if (status == DownloadTaskStatus.complete) {
         FlutterLogs.logInfo("download", "completed", "Download finished");
         gl.dico.getLayerBase(_taskIDToLayerCode[id]!).mOffline = true;
         _downloadStates[_taskIDToLayerCode[id]!] = 1.0;
@@ -152,13 +159,22 @@ class _LayerDownloaderState extends State<LayerDownloader> {
         widget.rebuildWidgetTree(() {
           gl.dico.checkLayerBaseOfflineRessource();
         });
+      } else if (status == DownloadTaskStatus.failed) {
+        setState(() {
+          gl.dico.getLayerBase(_taskIDToLayerCode[id]!).mOffline = false;
+          _downloadStates[_taskIDToLayerCode[id]!] = 0.0;
+        });
+        FlutterLogs.logInfo("download", "FAILED", "Download failed");
+      } else {
+        FlutterLogs.logInfo("download", "NOT IMPLEMENTED",
+            "DownloadTaskStatus. is not implemented");
       }
     });
 
     if (Platform.isAndroid || Platform.isIOS) {
       FlutterDownloader.registerCallback(
         downloadCallback,
-        step: 1,
+        step: 50,
       );
     }
   }
