@@ -10,7 +10,7 @@ TT -> gerer permission
 TT -> logger
 TT -> gestion mapController avec et sans position GPS ; s'inspirer de Qfield, boutton GPS on off, GPS centrage/non centrage
 TT -> progress bar téléchargement.
-TT -> si mode offline, 1) on réduit la taille des couches à visualiser à une seule!, 2) on retirer les carte online de cette sélection 3) on ajoute la première offline si aucune agen
+vv -> si mode offline, 1) on réduit la taille des couches à visualiser à une seule!, 2) on retirer les carte online de cette sélection 3) on ajoute la première offline si aucune agen
 
 DATE PREMIERE RELEASE : 19/04 (semaine forêt étudiant GRF)
 
