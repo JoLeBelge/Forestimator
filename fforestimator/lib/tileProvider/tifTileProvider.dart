@@ -42,6 +42,12 @@ class tifFileTileProvider extends TileProvider {
       // le décodage d'un tif 16 bits semble poser problème, donc on restreint aux 8bits
       if (bps <= 8) {
         _sourceImage = img.TiffDecoder().decode(bytes);
+
+        //img.Pixel p =_sourceImage?.getPixelSafe(5000, 5000);
+        //print("value is " +p;
+        //p = _sourceImage?.getPixelSafe(6000, 6000);
+        //print("value is " + !p.index.toString);
+
         refreshView(() {
           _loaded = true;
         });
@@ -80,12 +86,14 @@ class tifFileTileProvider extends TileProvider {
     /* if (resolution == 20.0) { 
       zFullIm = 6;
     }*/
+
     int initImSize = (pow(2, (zFullIm - coordinates.z)) * tileSize).toInt();
     if (_sourceImage != null) {
       img.Image cropped = img.copyCrop(_sourceImage!,
           x: xOffset, y: yOffset, width: initImSize, height: initImSize);
       img.Image resized = img.copyResize(cropped, width: tileSize);
-      return MemoryImage(img.encodePng(resized));
+      //File("/home/jo/test.tif").writeAsBytes(img.encodeTiff(resized)); // un truc en gris rgb mm valeur partour
+      return MemoryImage(img.encodePng(resized, singleFrame: true));
     } else {
       Uint8List blankBytes = Base64Codec()
           .decode("R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7");

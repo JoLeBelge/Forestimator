@@ -73,7 +73,7 @@ class _MapPageState extends State<mapPage> {
       //conRes != ConnectivityResult.none &&
       //conRes != ConnectivityResult.wifi
 
-      print("anaPonctOnline");
+      //print("anaPonctOnline");
       String layersAnaPt = "";
       for (String lCode in gl.anaPtSelectedLayerKeys) {
         if (gl.dico.getLayerBase(lCode).mCategorie != "Externe") {
@@ -98,14 +98,18 @@ class _MapPageState extends State<mapPage> {
         for (var r in data["RequestedLayers"]) {
           gl.requestedLayers.add(layerAnaPt.fromMap(r));
         }
-      } on SocketException {
+      } catch (e) {
+        // handshake et/ou socketExeption
+        print('There was an error: ${e}');
+      }
+      /*} on (SocketException) {
         // afficher l'info à l'utilisateur?
         print('No Internet connection 😑');
-      }
+      }*/
 
       gl.requestedLayers.removeWhere((element) => element.mFoundLayer == 0);
     } else {
-      print("anaPonctOffline");
+      //print("anaPonctOffline");
 
       for (layerBase l in gl.dico.getLayersOffline()) {
         int val = await l.getValXY(ptBL72);

@@ -18,6 +18,7 @@ import 'dart:convert';
 import 'package:path/path.dart' as path;
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_logs/flutter_logs.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -67,8 +68,25 @@ class _MyApp extends State<MyApp> {
       TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
 
   late String _pathExternalStorage;
+  //late final SharedPreferences prefs;
 
   _MyApp() {}
+
+  Future readPreference() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    final bool? aOfflineMode = prefs.getBool('offlineMode');
+    if (aOfflineMode != null) {
+      gl.offlineMode = aOfflineMode;
+    }
+
+    final List<String>? aAnaPtSelectedLayerKeys =
+        prefs.getStringList('anaPtSelectedLayerKeys');
+
+    if (aAnaPtSelectedLayerKeys != null) {
+      gl.anaPtSelectedLayerKeys = aAnaPtSelectedLayerKeys;
+    }
+  }
 
   Future<File> fromAsset(String asset, String filename) async {
     // To open from assets, you can copy them to the app storage folder, and the access them "locally"
@@ -112,6 +130,7 @@ class _MyApp extends State<MyApp> {
     super.initState();
     // copier tout les pdf de l'asset bundle vers un fichier utilisable par la librairie flutter_pdfviewer
     _listAndCopyPdfassets();
+    readPreference();
     gl.rebuildWholeWidgetTree = setState;
     //_lookForDownloadedFiles();
   }

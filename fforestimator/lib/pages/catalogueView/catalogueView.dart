@@ -6,6 +6,7 @@ import 'package:fforestimator/pages/catalogueView/categoryTile.dart';
 import 'package:fforestimator/pages/catalogueView/layerTile.dart';
 import 'package:fforestimator/pages/catalogueView/legendView.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 ScrollController it = ScrollController();
 ClampingScrollPhysics that = const ClampingScrollPhysics();
@@ -179,11 +180,16 @@ class _CategoryView extends State<CategoryView> {
                           child: IconButton(
                               icon: const Icon(Icons.location_on, size: 28),
                               onPressed: () {
-                                setState(() {
+                                setState(() async {
                                   if (gl.anaPtSelectedLayerKeys.length > 1) {
                                     gl.anaPtSelectedLayerKeys.remove(lt.key);
                                     lt.selected = false;
                                     widget.refreshView();
+                                    final SharedPreferences prefs =
+                                        await SharedPreferences.getInstance();
+                                    await prefs.setStringList(
+                                        'anaPtSelectedLayerKeys',
+                                        gl.anaPtSelectedLayerKeys);
                                   }
                                 });
                               })),
@@ -208,10 +214,15 @@ class _CategoryView extends State<CategoryView> {
                         child: IconButton(
                             icon: const Icon(Icons.location_off, size: 28),
                             onPressed: () {
-                              setState(() {
+                              setState(() async {
                                 gl.anaPtSelectedLayerKeys.insert(0, lt.key);
                                 lt.selected = true;
                                 widget.refreshView();
+                                final SharedPreferences prefs =
+                                    await SharedPreferences.getInstance();
+                                await prefs.setStringList(
+                                    'anaPtSelectedLayerKeys',
+                                    gl.anaPtSelectedLayerKeys);
                               });
                             }),
                       ),
@@ -379,16 +390,14 @@ class _CategoryView extends State<CategoryView> {
                               lt.selected = true;
                               widget.refreshView();
                               gl.refreshMap(() {
-                                gl.interfaceSelectedLayerKeys
-                                    .insert(0, gl.selectedLayer(mCode: lt.key));
+                                _addLayerToList(lt.key);
                               });
                             } else {
                               lt.selected = true;
                               widget.refreshView();
                               gl.refreshMap(() {
                                 gl.interfaceSelectedLayerKeys.removeLast();
-                                gl.interfaceSelectedLayerKeys
-                                    .insert(0, gl.selectedLayer(mCode: lt.key));
+                                _addLayerToList(lt.key);
                               });
                             }
                           });
@@ -440,6 +449,11 @@ class _CategoryView extends State<CategoryView> {
     if (sL != null) {
       gl.interfaceSelectedLayerKeys.remove(sL);
     }
+  }
+
+  void _addLayerToList(String key) {
+    gl.interfaceSelectedLayerKeys.insert(0, gl.selectedLayer(mCode: key));
+    //sauver dans shared_preference
   }
 
   bool _isSelectedLayer(String key) {

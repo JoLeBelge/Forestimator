@@ -228,7 +228,7 @@ class layerBase {
           // sinon cnsw prends trop de temps, une couleur pour les 6000 sigles
           if (r['col'] == null) {
             // c'est le cas pour dico_MNT par exemple, mais pour CNSW également
-            print("couleur null dans table ${nom_dico}");
+            // print("couleur null dans table ${nom_dico}");
           } else {
             // test si c'est un code hexa ou un nom de couleur. Si null, le toString renvoie 'null'. pas très pratique évidemment
             String colcode = r['col'].toString(); // ?? '#FFFFFF';
@@ -237,8 +237,8 @@ class layerBase {
             } else if (dico.colors.containsKey(colcode)) {
               mDicoCol[r['rast']] =
                   dico.colors[colcode] ?? Color.fromRGBO(255, 255, 255, 1.0);
-            } else {
-              print("couleur ${colcode} n'est pas définie dans le dico.colors");
+              // } else {
+              //print("couleur ${colcode} n'est pas définie dans le dico.colors");
             }
           }
         }
@@ -256,8 +256,8 @@ class layerBase {
   }
 
   void setHasOffline(bool offline) {
-    print("offline layer;");
-    print(this.toString());
+    //print("offline layer;");
+    //print(this.toString());
     mOffline = true;
   }
 
@@ -286,7 +286,7 @@ class dicoAptProvider {
   Future<void> init() async {
     //final dbPath = await getDatabasesPath(); plante sous android
     docDir = await getApplicationDocumentsDirectory();
-    print("document directory path : " + docDir.path);
+    //print("document directory path : " + docDir.path);
 
     final path = join(docDir.path, "fforestimator.db");
 
