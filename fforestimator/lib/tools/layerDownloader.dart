@@ -11,7 +11,10 @@ import 'package:flutter_logs/flutter_logs.dart';
 class LayerDownloader extends StatefulWidget {
   final LayerTile layer;
   final Function rebuildWidgetTree;
-  const LayerDownloader(this.layer, this.rebuildWidgetTree, {super.key});
+  final Function reloadLayerTileLists;
+  const LayerDownloader(
+      this.layer, this.rebuildWidgetTree, this.reloadLayerTileLists,
+      {super.key});
 
   @override
   State<LayerDownloader> createState() => _LayerDownloaderState();
@@ -39,7 +42,15 @@ class _LayerDownloaderState extends State<LayerDownloader> {
       _downloadStates[widget.layer.key] = 0.0;
     } else if (_downloadStates[widget.layer.key]! != 0.0 &&
         _downloadStates[widget.layer.key]! != 1.0) {
-      return LinearProgressIndicator(value: _downloadStates[widget.layer.key]);
+      return Container(
+        color: gl.colorBackground,
+        constraints: BoxConstraints(
+            minWidth: MediaQuery.of(context).size.width * 1,
+            maxWidth: MediaQuery.of(context).size.width * 1,
+            minHeight: MediaQuery.of(context).size.height * .1,
+            maxHeight: MediaQuery.of(context).size.height * .1),
+        child: const Text("Downloading!"),
+      );
     }
     if (gl.dico.getLayerBase(widget.layer.key).mOffline) {
       return Row(children: [
@@ -64,9 +75,9 @@ class _LayerDownloaderState extends State<LayerDownloader> {
       return Row(children: [
         IconButton(
             onPressed: () async {
-              String? it = await _downloadFile();
+              var it = await _downloadFile();
               setState(() {
-                _downloadStates[widget.layer.key] = 0.001;
+                _downloadStates[widget.layer.key] = 0.01;
                 _taskIDToLayerCode[it] = widget.layer.key;
               });
             },
@@ -113,7 +124,8 @@ class _LayerDownloaderState extends State<LayerDownloader> {
   @override
   void initState() {
     super.initState();
-
+    //This part sucks. its executed at 'progress' = 0 -409600 100
+    //Its worse. If you call reloadLayerTileLists to reorder the lists, the communication between main and downloader breaks => No way to know anything about your download anymore.
     IsolateNameServer.registerPortWithName(
         _port.sendPort, 'downloader_send_port');
     _port.listen((dynamic data) async {
@@ -127,22 +139,26 @@ class _LayerDownloaderState extends State<LayerDownloader> {
         FlutterLogs.logInfo("download", "started", "Download enqueued");
       }
       if (status == DownloadTaskStatus.running) {
-        //_downloadStates[_taskIDToLayerCode[id]!] = progress / 100.0;
+        setState(() {
+          _downloadStates[_taskIDToLayerCode[id]!] = 50.0;
+        });
         FlutterLogs.logInfo("download", "running", "Download running");
       }
       if (status == DownloadTaskStatus.complete) {
         FlutterLogs.logInfo("download", "completed", "Download finished");
         gl.dico.getLayerBase(_taskIDToLayerCode[id]!).mOffline = true;
         _downloadStates[_taskIDToLayerCode[id]!] = 1.0;
-        widget.rebuildWidgetTree(() {});
+
+        widget.rebuildWidgetTree(() {
+          gl.dico.checkLayerBaseOfflineRessource();
+        });
       }
-      setState(() {});
     });
 
-    if (Platform.isAndroid || Platform.isAndroid) {
+    if (Platform.isAndroid || Platform.isIOS) {
       FlutterDownloader.registerCallback(
         downloadCallback,
-        step: 10,
+        step: 1,
       );
     }
   }

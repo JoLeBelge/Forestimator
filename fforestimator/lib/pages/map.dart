@@ -220,7 +220,8 @@ class _MapPageState extends State<mapPage> {
               ),
               children: gl.interfaceSelectedLayerKeys.reversed
                       .map<Widget>((gl.selectedLayer selLayer) {
-                    if (gl.dico.getLayerBase(selLayer.mCode).mOffline) {
+                    if (gl.offlineMode &&
+                        gl.dico.getLayerBase(selLayer.mCode).mOffline) {
                       if (_provider == null ||
                           _provider?.layerCode != selLayer.mCode) {
                         if (_provider != null) {
@@ -242,20 +243,22 @@ class _MapPageState extends State<mapPage> {
                           : Container();
                     } else {
                       layerBase l = gl.dico.getLayerBase(selLayer.mCode);
-                      return TileLayer(
-                        userAgentPackageName: "com.example.fforestimator",
-                        wmsOptions: WMSTileLayerOptions(
-                          baseUrl: l.mUrl + "?",
-                          format: 'image/png',
-                          layers: [
-                            l.mWMSLayerName,
-                          ],
-                          crs: epsg31370CRS,
-                          transparent: true,
-                        ),
-                        //maxNativeZoom: 7,
-                        tileSize: tileSize,
-                      );
+                      return gl.offlineMode
+                          ? Text("Cette couche n'est pas affichée.")
+                          : TileLayer(
+                              userAgentPackageName: "com.example.fforestimator",
+                              wmsOptions: WMSTileLayerOptions(
+                                baseUrl: l.mUrl + "?",
+                                format: 'image/png',
+                                layers: [
+                                  l.mWMSLayerName,
+                                ],
+                                crs: epsg31370CRS,
+                                transparent: true,
+                              ),
+                              //maxNativeZoom: 7,
+                              tileSize: tileSize,
+                            );
                     }
                   }).toList() +
                   <Widget>[

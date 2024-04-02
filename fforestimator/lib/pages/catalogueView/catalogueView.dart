@@ -45,7 +45,7 @@ class _CatalogueView extends State<CatalogueView> {
       children: _categories.map<ExpansionPanel>((Category item) {
         return ExpansionPanel(
           canTapOnHeader: true,
-          backgroundColor: gl.colorBackground,
+          backgroundColor: gl.colorBackgroundSecondary,
           headerBuilder: (BuildContext context, bool isExpanded) {
             return ListTile(
               iconColor: Colors.red,
@@ -131,7 +131,7 @@ class _CategoryView extends State<CategoryView> {
           .map<ExpansionPanel>((LayerTile item) {
         return ExpansionPanel(
           canTapOnHeader: true,
-          backgroundColor: _getswitchBackgroundColorForList(),
+          backgroundColor: gl.colorBackgroundSecondary,
           headerBuilder: (BuildContext context, bool isExpanded) {
             return Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -162,8 +162,8 @@ class _CategoryView extends State<CategoryView> {
       children: <Widget>[
         if (lt.downloadable)
           ColoredBox(
-              color: gl.colorBackground,
-              child: LayerDownloader(lt, gl.refreshCatalogueView)),
+              color: gl.colorBackgroundSecondary,
+              child: LayerDownloader(lt, gl.refreshCatalogueView, () {})),
         if (gl.dico.getLayerBase(lt.key).mUsedForAnalysis)
           ColoredBox(
               color: gl.colorBackgroundSecondary,
@@ -268,7 +268,7 @@ class _CategoryView extends State<CategoryView> {
           ),
         LegendView(
           layerKey: lt.key,
-          color: _getBackgroundColorForList(),
+          color: gl.colorBackgroundSecondary,
           constraintsText: BoxConstraints(
               minWidth: MediaQuery.of(context).size.width * .4,
               maxWidth: MediaQuery.of(context).size.width * .4,
@@ -289,7 +289,7 @@ class _CategoryView extends State<CategoryView> {
     if (widget.category.filter != "APT_CS" &&
         widget.category.filter != "APT_FEE" &&
         !lt.extern) barWidth = 96.0;
-
+    int nLayer = gl.offlineMode ? gl.nOfflineLayer : gl.nOnlineLayer;
     return Container(
         constraints: BoxConstraints(
           maxWidth: barWidth,
@@ -385,8 +385,9 @@ class _CategoryView extends State<CategoryView> {
                     child: IconButton(
                         icon: const Icon(Icons.layers, size: 28),
                         onPressed: () {
+                          if(!gl.offlineMode || (gl.offlineMode && gl.dico.getLayerBase(lt.key).mOffline))
                           setState(() {
-                            if (gl.interfaceSelectedLayerKeys.length < 3) {
+                            if (gl.interfaceSelectedLayerKeys.length < nLayer) {
                               lt.selected = true;
                               widget.refreshView();
                               gl.refreshMap(() {
@@ -401,6 +402,7 @@ class _CategoryView extends State<CategoryView> {
                               });
                             }
                           });
+                          //TODO else popup warning: file is not on disk
                         }),
                   ),
         ]));
@@ -465,23 +467,6 @@ class _CategoryView extends State<CategoryView> {
     return false;
   }
 
-  Color _getBackgroundColorForList() {
-    if (_flipForBackground) {
-      return gl.colorBackground;
-    }
-    return gl.colorBackgroundSecondary;
-  }
-
-  Color _getswitchBackgroundColorForList() {
-    _flipForBackground = !_flipForBackground;
-    return _getBackgroundColorForList();
-  }
-
-  Color _initSwitchBackgroundColorForList() {
-    _flipForBackground = false;
-    return _getBackgroundColorForList();
-  }
-
   @override
   void initState() {
     super.initState();
@@ -504,8 +489,17 @@ class SelectedLayerView extends StatefulWidget {
 
 class _SelectedLayerView extends State<SelectedLayerView> {
   @override
+  void initState() {
+    gl.refreshCurrentThreeLayer = () => setState(
+          () {},
+        );
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     {
+      int nLayer = gl.offlineMode ? gl.nOfflineLayer : gl.nOnlineLayer;
       return ReorderableListView(
         buildDefaultDragHandles: false,
         padding: const EdgeInsets.symmetric(horizontal: 0),
@@ -526,18 +520,18 @@ class _SelectedLayerView extends State<SelectedLayerView> {
           });
         },
         children: List<Widget>.generate(
-          3,
+          gl.offlineMode ? 1 : 3,
           (i) => gl.interfaceSelectedLayerKeys.length > i
               ? Card(
                   key: Key('$i'),
-                  color: gl.colorBackground,
+                  color: gl.colorBackgroundSecondary,
                   surfaceTintColor: gl.colorBackgroundSecondary,
                   shadowColor: const Color.fromARGB(255, 44, 44, 44),
                   child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
                         Container(
-                          color: gl.colorBackground,
+                          color: gl.colorBackgroundSecondary,
                           constraints: BoxConstraints(
                             maxHeight: 48,
                             maxWidth: MediaQuery.of(context).size.width * .65,
@@ -555,7 +549,7 @@ class _SelectedLayerView extends State<SelectedLayerView> {
                           ),
                         ),
                         Container(
-                            color: gl.colorBackground,
+                            color: gl.colorBackgroundSecondary,
                             constraints: BoxConstraints(
                               maxHeight:
                                   MediaQuery.of(context).size.width * .04 > 48

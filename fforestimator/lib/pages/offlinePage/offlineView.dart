@@ -17,9 +17,13 @@ bool _finishedInitializingCategory = false;
 
 class _OfflineView extends State<OfflineView> {
   final List<Category> _categories = [
-    Category(name: "Couches à télécharger.", filter: "offline")
+    Category(name: "Couches enregistrées.", filter: "offline"),
+    Category(name: "Couches à télécharger", filter: "online")
   ];
-  final List<LayerTile> _downlodableLayerTiles = [];
+  final Map<String, List<LayerTile>> _downlodableLayerTiles = {
+    "offline": [],
+    "online": []
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -30,12 +34,14 @@ class _OfflineView extends State<OfflineView> {
                 color: gl.colorBackgroundSecondary,
                 constraints: BoxConstraints(
                     maxWidth: MediaQuery.of(context).size.width * 1.0,
-                    minHeight: MediaQuery.of(context).size.height * .1,
-                    maxHeight: MediaQuery.of(context).size.height * .1),
+                    minHeight: MediaQuery.of(context).size.height * .15,
+                    maxHeight: MediaQuery.of(context).size.height * .15),
                 child: TextButton.icon(
                   onPressed: () {
                     setState(() {
                       gl.offlineMode = false;
+                      gl.rebuildNavigatorBar!();
+                      gl.refreshCurrentThreeLayer();
                     });
                   },
                   icon: Icon(
@@ -52,14 +58,29 @@ class _OfflineView extends State<OfflineView> {
                 color: gl.colorBackgroundSecondary,
                 constraints: BoxConstraints(
                     maxWidth: MediaQuery.of(context).size.width * 1.0,
-                    minHeight: MediaQuery.of(context).size.height * .1,
-                    maxHeight: MediaQuery.of(context).size.height * .1),
+                    minHeight: MediaQuery.of(context).size.height * .15,
+                    maxHeight: MediaQuery.of(context).size.height * .15),
                 child: TextButton.icon(
                   onPressed: () {
-                    gl.rebuildWholeWidgetTree(() {
-                      setState(() {
-                        gl.offlineMode = true;
-                      });
+                    setState(() {
+                      while (gl.interfaceSelectedLayerKeys.length > 1) {
+                        if (gl.interfaceSelectedLayerKeys.first.offline) {
+                          gl.interfaceSelectedLayerKeys.removeLast();
+                        } else {
+                          gl.interfaceSelectedLayerKeys.removeAt(0);
+                        }
+                      }
+
+                      if (!gl.interfaceSelectedLayerKeys.first.offline) {
+                        gl.interfaceSelectedLayerKeys.clear();
+                        gl.interfaceSelectedLayerKeys.insert(
+                            0,
+                            gl.selectedLayer(
+                                mCode: gl.dico.getLayersOffline().first.mCode));
+                      }
+                      gl.offlineMode = true;
+                      gl.rebuildNavigatorBar!();
+                      gl.refreshCurrentThreeLayer();
                     });
                   },
                   icon: Icon(
@@ -76,8 +97,8 @@ class _OfflineView extends State<OfflineView> {
           color: gl.colorBackground,
           constraints: BoxConstraints(
               maxWidth: MediaQuery.of(context).size.width * 1.0,
-              minHeight: MediaQuery.of(context).size.height * .8,
-              maxHeight: MediaQuery.of(context).size.height * .8),
+              minHeight: MediaQuery.of(context).size.height * .75,
+              maxHeight: MediaQuery.of(context).size.height * .75),
           child: SingleChildScrollView(
             child: _buildOfflineCategory(),
           ),
@@ -95,7 +116,6 @@ class _OfflineView extends State<OfflineView> {
         });
       },
       children: _categories.map<ExpansionPanel>((Category category) {
-        category.isExpanded = true;
         return ExpansionPanel(
           canTapOnHeader: true,
           backgroundColor: gl.colorBackground,
@@ -127,20 +147,22 @@ class _OfflineView extends State<OfflineView> {
                   controller: it,
                   physics: that,
                   child: Container(
-                    child: _buildPanel(),
+                    child: _buildPanel(category),
                   ),
                 )))
         : CircularProgressIndicator();
   }
 
-  Widget _buildPanel() {
+  Widget _buildPanel(Category category) {
     return ExpansionPanelList(
       expansionCallback: (int index, bool isExpanded) async {
         setState(() {
-          _downlodableLayerTiles[index].isExpanded = isExpanded;
+          _downlodableLayerTiles[category.filter]![index].isExpanded =
+              isExpanded;
         });
       },
-      children: _downlodableLayerTiles.map<ExpansionPanel>((LayerTile item) {
+      children: _downlodableLayerTiles[category.filter]!
+          .map<ExpansionPanel>((LayerTile item) {
         return ExpansionPanel(
           canTapOnHeader: true,
           backgroundColor: gl.colorBackgroundSecondary,
@@ -190,7 +212,8 @@ class _OfflineView extends State<OfflineView> {
         if (lt.downloadable)
           ColoredBox(
               color: gl.colorBackground,
-              child: LayerDownloader(lt, rebuildWidgetTree)),
+              child: LayerDownloader(
+                  lt, rebuildWidgetTreeForLayerDownloader, reloadLayerData)),
         if (gl.dico.getLayerBase(lt.key).hasDoc())
           ListTile(
             title: Text(
@@ -226,20 +249,38 @@ class _OfflineView extends State<OfflineView> {
     );
   }
 
-  void _getLayerData() async {
-    // on affiche uniquement les couches déjà téléchargées - en tout cas pour la première release
-    for (layerBase l in gl.dico.getLayersOffline()) {
-      _downlodableLayerTiles.add(LayerTile(
-          name: l.mNom,
-          filter: l.mGroupe,
-          key: l.mCode,
-          downloadable: l.mIsDownloadableRW,
-          extern: l.mCategorie == "Externe"));
+  void _getLayerData() {
+    Map<String, layerBase> mp = gl.dico.mLayerBases;
+    _downlodableLayerTiles["offline"]!.clear();
+    _downlodableLayerTiles["online"]!.clear();
+
+    for (var key in mp.keys) {
+      if (mp[key]!.mOffline) {
+        _downlodableLayerTiles["offline"]!.add(LayerTile(
+            name: mp[key]!.mNom,
+            filter: mp[key]!.mGroupe,
+            key: key,
+            downloadable: mp[key]!.mIsDownloadableRW,
+            extern: mp[key]!.mCategorie == "Externe"));
+      } else if (mp[key]!.mIsDownloadableRW) {
+        _downlodableLayerTiles["online"]!.add(LayerTile(
+            name: mp[key]!.mNom,
+            filter: mp[key]!.mGroupe,
+            key: key,
+            downloadable: mp[key]!.mIsDownloadableRW,
+            extern: mp[key]!.mCategorie == "Externe"));
+      }
     }
 
     setState(() {
       _finishedInitializingCategory = true;
     });
+  }
+
+  Future<void> reloadLayerData() async {
+    print(
+        "forget itiaqhgoihqgp,;oi;qjogjk^pqog:po;lqpogqg654654g8q1b068q4g2r6ze87");
+    _getLayerData();
   }
 
   @override
@@ -250,8 +291,7 @@ class _OfflineView extends State<OfflineView> {
     }
   }
 
-  void rebuildWidgetTree(var setter) async {
+  void rebuildWidgetTreeForLayerDownloader(var setter) async {
     setState(setter);
-    gl.dico.checkLayerBaseOfflineRessource();
   }
 }

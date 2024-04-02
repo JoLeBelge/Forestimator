@@ -45,7 +45,7 @@ void main() async {
         timeStampFormat: TimeStampFormat.TIME_FORMAT_READABLE,
         directoryStructure: DirectoryStructure.FOR_DATE,
         logTypesEnabled: ["device", "network", "errors"],
-        logFileExtension: LogFileExtension.LOG,
+        logFileExtension: LogFileExtension.TXT,
         logsWriteDirectoryName: "MyLogs",
         logsExportDirectoryName: "MyLogs/Exported",
         debugFileOperations: true,
@@ -131,8 +131,7 @@ class _MyApp extends State<MyApp> {
     // copier tout les pdf de l'asset bundle vers un fichier utilisable par la librairie flutter_pdfviewer
     _listAndCopyPdfassets();
     readPreference();
-    gl.rebuildWholeWidgetTree = setState;
-    //_lookForDownloadedFiles();
+    gl.rebuildWholeWidgetTree;
   }
 
   late final _router = GoRouter(
@@ -141,7 +140,6 @@ class _MyApp extends State<MyApp> {
     routes: [
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
-          // the UI shell
           return ScaffoldWithNestedNavigation(navigationShell: navigationShell);
         },
         branches: [
