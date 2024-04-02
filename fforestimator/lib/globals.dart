@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:fforestimator/pages/anaPt/requestedLayer.dart';
 import 'package:proj4dart/proj4dart.dart' as proj4;
+import 'package:latlong2/latlong.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 late dicoAptProvider dico;
 
@@ -19,6 +21,7 @@ String queryApiRastDownload =
     "https://forestimator.gembloux.ulg.ac.be/api/rastPColor/layerCode";
 
 String defaultLayer = "IGN";
+List<String> interfaceSelectedLCode = ["IGN"];
 // list to memorize the keys of selected layer to show in interface.
 
 class selectedLayer {
@@ -29,9 +32,22 @@ class selectedLayer {
       {required this.mCode, this.offline = false, this.sourceImagePath = ""});
 }
 
-List<selectedLayer> interfaceSelectedLayerKeys = [
-  selectedLayer(mCode: defaultLayer)
-];
+List<selectedLayer> interfaceSelectedLayerKeys = [];
+
+void refreshInterfaceSelectedL() {
+  interfaceSelectedLayerKeys =
+      interfaceSelectedLCode.map<selectedLayer>((String aCode) {
+    return selectedLayer(mCode: aCode);
+  }).toList();
+}
+
+List<String> getInterfaceSelectedLCode() {
+  List<String> aRes = [];
+  for (selectedLayer l in interfaceSelectedLayerKeys) {
+    aRes.insert(aRes.length, l.mCode);
+  }
+  return aRes;
+}
 
 List<layerAnaPt> requestedLayers = [];
 
@@ -73,7 +89,35 @@ Function refreshMap = () {};
 Function refreshCatalogueView = () {};
 Function refreshCurrentThreeLayer = () {};
 
-Function ?rebuildNavigatorBar;
+Function? rebuildNavigatorBar;
 
 int nOnlineLayer = 3;
 int nOfflineLayer = 1;
+
+//proj4.Point ptCenter = proj4.Point(x: 217200.0, y: 50100.0); // epioux
+// WARNING lat =y lon=x
+LatLng latlonCenter = const LatLng(49.76, 5.32);
+double mapZoom = 7.0;
+
+void removeLayerFromList(String key) async {
+  selectedLayer? sL;
+  for (var layer in interfaceSelectedLayerKeys) {
+    if (layer.mCode == key) {
+      sL = layer;
+    }
+  }
+  if (sL != null) {
+    interfaceSelectedLayerKeys.remove(sL);
+  }
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  await prefs.setStringList(
+      'interfaceSelectedLCode', getInterfaceSelectedLCode());
+}
+
+void addLayerToList(String key) async {
+  interfaceSelectedLayerKeys.insert(0, selectedLayer(mCode: key));
+  //sauver dans shared_preference
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  await prefs.setStringList(
+      'interfaceSelectedLCode', getInterfaceSelectedLCode());
+}

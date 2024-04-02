@@ -1,12 +1,13 @@
 To do list fforestimator
 ------------------------
- 
-Jo - affichage tif 16 bits ; on attends la prochaine release du package image, bug résolu à prioro
-Jo -> sauvegarder state app ; liste carte à afficher, offline versus online, dernier map extend, liste carte pour analyse ponctuelle
-Jo -> page offline ; afficher par defaut les cartes téléchargées uniquement, ajout boutton pour afficher carte
+
+TT -> pop_up lors du premier lancement de l'app ; proposition de télécharger toutes les couches offline de la liste anaPtSelectedLayerKeys
+
+Jo -> pop_up pour informer à l'utilisateur qu'il n'as pas internet (1; analyse ponctuelle online, 2) affichage d'une carte online en mode offline)
+
+JO ou TT -> page offline ; afficher par defaut les cartes téléchargées uniquement, ajout boutton pour afficher carte
 
 TT -> gerer permission
-TT -> logger
 TT -> gestion mapController avec et sans position GPS ; s'inspirer de Qfield, boutton GPS on off, GPS centrage/non centrage
 TT -> progress bar téléchargement.
 

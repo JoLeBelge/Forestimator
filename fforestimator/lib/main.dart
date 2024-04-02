@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:fforestimator/globals.dart' as gl;
 import 'package:fforestimator/pages/map.dart';
 import 'package:fforestimator/pages/pdfScreen.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:fforestimator/pages/catalogueView/catalogueLayerView.dart';
 import 'package:go_router/go_router.dart';
@@ -68,7 +69,6 @@ class _MyApp extends State<MyApp> {
       TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
 
   late String _pathExternalStorage;
-  //late final SharedPreferences prefs;
 
   _MyApp() {}
 
@@ -85,6 +85,24 @@ class _MyApp extends State<MyApp> {
 
     if (aAnaPtSelectedLayerKeys != null) {
       gl.anaPtSelectedLayerKeys = aAnaPtSelectedLayerKeys;
+    }
+
+    final List<String>? ainterfaceSelectedLCode =
+        prefs.getStringList('interfaceSelectedLCode');
+    if (ainterfaceSelectedLCode != null) {
+      gl.interfaceSelectedLCode = ainterfaceSelectedLCode;
+    }
+    gl.refreshInterfaceSelectedL();
+
+    double? lat = prefs.getDouble('mapCenterLat');
+    double? lon = prefs.getDouble('mapCenterLon');
+    if (lat != null && lon != null) {
+      gl.latlonCenter = LatLng(lat, lon);
+    }
+
+    double? aZoom = prefs.getDouble('mapZoom');
+    if (aZoom != null) {
+      gl.mapZoom = aZoom;
     }
   }
 

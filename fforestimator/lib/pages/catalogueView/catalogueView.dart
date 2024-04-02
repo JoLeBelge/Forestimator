@@ -42,14 +42,18 @@ class _CatalogueView extends State<CatalogueView> {
           _categories[index].isExpanded = isExpanded;
         });
       },
+      //dividerColor: Colors.amber,
       children: _categories.map<ExpansionPanel>((Category item) {
         return ExpansionPanel(
           canTapOnHeader: true,
-          backgroundColor: gl.colorBackgroundSecondary,
+          backgroundColor: Colors.blueAccent, //.colorBackgroundSecondary,
           headerBuilder: (BuildContext context, bool isExpanded) {
-            return ListTile(
-              iconColor: Colors.red,
-              title: Text(item.name),
+            // c'est pas gagné, voir similaire pour expansionTile customisatin https://github.com/flutter/flutter/issues/24917
+            return Container(
+              child: ListTile(
+                title: Text(item.name),
+              ),
+              color: gl.colorBackgroundSecondary,
             );
           },
           body: CategoryView(
@@ -127,6 +131,7 @@ class _CategoryView extends State<CategoryView> {
           _layerTiles[widget.category.filter]![index].isExpanded = isExpanded;
         });
       },
+      dividerColor: Colors.cyan,
       children: _layerTiles[widget.category.filter]!
           .map<ExpansionPanel>((LayerTile item) {
         return ExpansionPanel(
@@ -138,7 +143,9 @@ class _CategoryView extends State<CategoryView> {
                 children: [
                   Container(
                     constraints: BoxConstraints(
-                      maxWidth: MediaQuery.of(context).size.width * .55,
+                      maxWidth: MediaQuery.of(context).size.width * .2 > 48
+                          ? MediaQuery.of(context).size.width * .2
+                          : 48,
                       maxHeight: MediaQuery.of(context).size.width * .2 > 48
                           ? MediaQuery.of(context).size.width * .2
                           : 48,
@@ -179,19 +186,19 @@ class _CategoryView extends State<CategoryView> {
                           padding: const EdgeInsets.all(0),
                           child: IconButton(
                               icon: const Icon(Icons.location_on, size: 28),
-                              onPressed: () {
-                                setState(() async {
+                              onPressed: () async {
+                                setState(() {
                                   if (gl.anaPtSelectedLayerKeys.length > 1) {
                                     gl.anaPtSelectedLayerKeys.remove(lt.key);
                                     lt.selected = false;
                                     widget.refreshView();
-                                    final SharedPreferences prefs =
-                                        await SharedPreferences.getInstance();
-                                    await prefs.setStringList(
-                                        'anaPtSelectedLayerKeys',
-                                        gl.anaPtSelectedLayerKeys);
                                   }
                                 });
+                                final SharedPreferences prefs =
+                                    await SharedPreferences.getInstance();
+                                await prefs.setStringList(
+                                    'anaPtSelectedLayerKeys',
+                                    gl.anaPtSelectedLayerKeys);
                               })),
                       Container(
                           constraints: const BoxConstraints(
@@ -213,17 +220,17 @@ class _CategoryView extends State<CategoryView> {
                         padding: const EdgeInsets.all(0),
                         child: IconButton(
                             icon: const Icon(Icons.location_off, size: 28),
-                            onPressed: () {
-                              setState(() async {
+                            onPressed: () async {
+                              setState(() {
                                 gl.anaPtSelectedLayerKeys.insert(0, lt.key);
                                 lt.selected = true;
                                 widget.refreshView();
-                                final SharedPreferences prefs =
-                                    await SharedPreferences.getInstance();
-                                await prefs.setStringList(
-                                    'anaPtSelectedLayerKeys',
-                                    gl.anaPtSelectedLayerKeys);
                               });
+                              final SharedPreferences prefs =
+                                  await SharedPreferences.getInstance();
+                              await prefs.setStringList(
+                                  'anaPtSelectedLayerKeys',
+                                  gl.anaPtSelectedLayerKeys);
                             }),
                       ),
                       Container(
@@ -286,9 +293,9 @@ class _CategoryView extends State<CategoryView> {
 
   Widget selectLayerBar(LayerTile lt) {
     double barWidth = 48.0;
-    if (widget.category.filter != "APT_CS" &&
+    /*if (widget.category.filter != "APT_CS" &&
         widget.category.filter != "APT_FEE" &&
-        !lt.extern) barWidth = 96.0;
+        !lt.extern) barWidth = 96.0;*/
     int nLayer = gl.offlineMode ? gl.nOfflineLayer : gl.nOnlineLayer;
     return Container(
         constraints: BoxConstraints(
@@ -300,10 +307,10 @@ class _CategoryView extends State<CategoryView> {
           minHeight: 48,
         ),
         child: Row(children: [
-          if (widget.category.filter != "APT_CS" &&
+          /*if (widget.category.filter != "APT_CS" &&
               widget.category.filter != "APT_FEE" &&
               !lt.extern)
-            /*gl.anaPtSelectedLayerKeys.contains(lt.key)
+            gl.anaPtSelectedLayerKeys.contains(lt.key)
                 ? Container(
                     decoration: const BoxDecoration(
                         shape: BoxShape.circle, color: gl.colorUliege),
@@ -346,65 +353,67 @@ class _CategoryView extends State<CategoryView> {
                           });
                         }),
                   ),*/
-            _isSelectedLayer(lt.key)
-                ? Container(
-                    decoration: const BoxDecoration(
-                        shape: BoxShape.circle, color: gl.colorAgroBioTech),
-                    constraints: const BoxConstraints(
-                      maxWidth: 48,
-                      minWidth: 48,
-                      maxHeight: 48,
-                      minHeight: 48,
-                    ),
-                    padding: const EdgeInsets.all(0),
-                    child: IconButton(
-                        icon: const Icon(Icons.layers_clear, size: 28),
-                        onPressed: () {
-                          setState(() {
-                            if (gl.interfaceSelectedLayerKeys.length > 1) {
-                              lt.selected = false;
-                              widget.refreshView();
-                              gl.refreshMap(() {
-                                _removeLayerFromList(lt.key);
-                              });
-                            }
-                          });
-                        }),
-                  )
-                : Container(
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                    ),
-                    constraints: const BoxConstraints(
-                      maxWidth: 48,
-                      minWidth: 48,
-                      maxHeight: 48,
-                      minHeight: 48,
-                    ),
-                    padding: const EdgeInsets.all(0),
-                    child: IconButton(
-                        icon: const Icon(Icons.layers, size: 28),
-                        onPressed: () {
-                          if(!gl.offlineMode || (gl.offlineMode && gl.dico.getLayerBase(lt.key).mOffline))
+          _isSelectedLayer(lt.key)
+              ? Container(
+                  decoration: const BoxDecoration(
+                      shape: BoxShape.circle, color: gl.colorAgroBioTech),
+                  constraints: const BoxConstraints(
+                    maxWidth: 48,
+                    minWidth: 48,
+                    maxHeight: 48,
+                    minHeight: 48,
+                  ),
+                  padding: const EdgeInsets.all(0),
+                  child: IconButton(
+                      icon: const Icon(Icons.layers_clear, size: 28),
+                      onPressed: () {
+                        setState(() {
+                          if (gl.interfaceSelectedLayerKeys.length > 1) {
+                            lt.selected = false;
+                            widget.refreshView();
+                            gl.refreshMap(() {
+                              gl.removeLayerFromList(lt.key);
+                            });
+                          }
+                        });
+                      }),
+                )
+              : Container(
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                  ),
+                  constraints: const BoxConstraints(
+                    maxWidth: 48,
+                    minWidth: 48,
+                    maxHeight: 48,
+                    minHeight: 48,
+                  ),
+                  padding: const EdgeInsets.all(0),
+                  child: IconButton(
+                      icon: const Icon(Icons.layers, size: 28),
+                      onPressed: () {
+                        if (!gl.offlineMode ||
+                            (gl.offlineMode &&
+                                gl.dico.getLayerBase(lt.key).mOffline))
                           setState(() {
                             if (gl.interfaceSelectedLayerKeys.length < nLayer) {
                               lt.selected = true;
                               widget.refreshView();
                               gl.refreshMap(() {
-                                _addLayerToList(lt.key);
+                                gl.addLayerToList(lt.key);
                               });
                             } else {
                               lt.selected = true;
                               widget.refreshView();
                               gl.refreshMap(() {
                                 gl.interfaceSelectedLayerKeys.removeLast();
-                                _addLayerToList(lt.key);
+                                gl.addLayerToList(lt.key);
                               });
                             }
                           });
-                          //TODO else popup warning: file is not on disk
-                        }),
-                  ),
+                        //TODO else popup warning: file is not on disk
+                      }),
+                ),
         ]));
   }
 
@@ -439,23 +448,6 @@ class _CategoryView extends State<CategoryView> {
     setState(() {
       _finishedInitializingCategory[widget.category.filter] = true;
     });
-  }
-
-  void _removeLayerFromList(String key) {
-    gl.selectedLayer? sL;
-    for (var layer in gl.interfaceSelectedLayerKeys) {
-      if (layer.mCode == key) {
-        sL = layer;
-      }
-    }
-    if (sL != null) {
-      gl.interfaceSelectedLayerKeys.remove(sL);
-    }
-  }
-
-  void _addLayerToList(String key) {
-    gl.interfaceSelectedLayerKeys.insert(0, gl.selectedLayer(mCode: key));
-    //sauver dans shared_preference
   }
 
   bool _isSelectedLayer(String key) {
@@ -569,8 +561,9 @@ class _SelectedLayerView extends State<SelectedLayerView> {
                                         1) {
                                       widget.refreshView();
                                       gl.refreshMap(() {
-                                        gl.interfaceSelectedLayerKeys.remove(
-                                            gl.interfaceSelectedLayerKeys[i]);
+                                        gl.removeLayerFromList(gl
+                                            .interfaceSelectedLayerKeys[i]
+                                            .mCode);
                                       });
                                     }
                                   });

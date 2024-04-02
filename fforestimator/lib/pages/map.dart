@@ -14,6 +14,7 @@ import 'package:http/http.dart' as http;
 import 'package:fforestimator/pages/anaPt/requestedLayer.dart';
 import 'package:go_router/go_router.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'dart:convert';
 
@@ -148,15 +149,10 @@ class _MapPageState extends State<mapPage> {
 
   @override
   Widget build(BuildContext context) {
-    proj4.Point ptEpioux = proj4.Point(x: 217200.0, y: 50100.0);
     proj4.Point ptBotLeft = proj4.Point(
         x: epsg31370Bounds.bottomLeft.x, y: epsg31370Bounds.bottomLeft.y);
     proj4.Point ptTopR = proj4.Point(
         x: epsg31370Bounds.topRight.x, y: epsg31370Bounds.topRight.y);
-
-    // WARNING lat =y lon=x
-    LatLng latlonEpioux = LatLng(epsg31370.transform(epsg4326, ptEpioux).y,
-        epsg31370.transform(epsg4326, ptEpioux).x);
 
     // contraindre la vue de la map sur la zone de la Wallonie. ajout d'un peu de marge
     double margeInDegree = 0.1;
@@ -197,16 +193,26 @@ class _MapPageState extends State<mapPage> {
                   _updatePtMarker(point),
                   GoRouter.of(context).push("/anaPt"),
                 },
+                onPositionChanged: (position, e) async {
+                  LatLng c = _mapController.camera.center;
+                  final SharedPreferences prefs =
+                      await SharedPreferences.getInstance();
+                  prefs.setDouble('mapCenterLat', c.latitude);
+                  prefs.setDouble('mapCenterLon', c.longitude);
+
+                  double aZoom = _mapController.camera.zoom;
+                  prefs.setDouble('mapZoom', aZoom);
+                },
                 crs: epsg31370CRS,
                 initialZoom: 8.0,
                 maxZoom: 10,
                 minZoom: 0,
-                initialCenter: latlonEpioux,
+                initialCenter: gl.latlonCenter,
                 cameraConstraint: CameraConstraint.contain(
                     bounds: LatLngBounds.fromPoints([latlonBL, latlonTR])),
                 onMapReady: () async {
                   gl.position = await acquireUserLocation();
-                  await refreshAnalysisPosition();
+                  //await refreshAnalysisPosition();
                   if (gl.position != null) {
                     // IMPORTANT: rebuild location layer when permissions are granted
                     setState(() {
@@ -214,6 +220,11 @@ class _MapPageState extends State<mapPage> {
                           LatLng(gl.position?.latitude ?? 0.0,
                               gl.position?.longitude ?? 0.0),
                           8);
+                    });
+                    // si on refusait d'allumer le GPS, alors la carte ne s'affichait jamais, c'est pourquoi il y a le else et le code ci-dessous
+                  } else {
+                    setState(() {
+                      _mapController.move(gl.latlonCenter, gl.mapZoom);
                     });
                   }
                 },
@@ -277,19 +288,6 @@ class _MapPageState extends State<mapPage> {
                         ),
                   ]),
         ]));
-  }
-
-  Future<void> refreshAnalysisPosition() async {
-    if (gl.position != null) {
-      //print(gl.position?.latitude.toString() ?? "empty position"); // + " " + _position?.longitude.toString());
-      // on projete en BL72, seul src de Forestimator web pour le moment
-      proj4.Point ptBL72 = epsg4326.transform(
-          epsg31370,
-          proj4.Point(
-              x: gl.position?.longitude ?? 0.0,
-              y: gl.position?.latitude ?? 0.0));
-      //_runAnaPt(ptBL72);  // non il faut un bouton integré à la carte pour que l'utilisateur effectue une analyse ponctuelle là ou ce situe son GPS
-    }
   }
 
   void _updatePtMarker(LatLng pt) {

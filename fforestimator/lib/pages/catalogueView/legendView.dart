@@ -35,11 +35,11 @@ class _LegendView extends State<LegendView> {
       ),
       child: Column(
         children: [
-          
-          Container(
-              constraints: BoxConstraints(
-                  maxHeight: MediaQuery.of(context).size.height * .03),
-              child: const Text('Légende')),
+          if (gl.dico.getLayerBase(widget.layerKey).mCategorie != "Externe")
+            Container(
+                constraints: BoxConstraints(
+                    maxHeight: MediaQuery.of(context).size.height * .03),
+                child: const Text('Légende')),
           Row(children: [
             Column(
                 crossAxisAlignment: CrossAxisAlignment.end,

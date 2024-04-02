@@ -403,7 +403,7 @@ class dicoAptProvider {
 
   List<layerBase> getLayersOffline() {
     List<layerBase> that = mLayerBases.values.where((i) => i.mOffline).toList();
-    if (that.isEmpty){
+    if (that.isEmpty) {
       return [layerBase()..mCode = gl.defaultLayer];
     }
     return that;
@@ -553,7 +553,7 @@ class dicoAptProvider {
       File file = File(getRastPath(l.mCode));
       if (l.mGroupe != "APT_CS" &&
           l.mGroupe != "APT_FEE" &&
-          l.mCategorie != "externe") {
+          l.mCategorie != "Externe") {
         l.mUsedForAnalysis = true;
       }
     }

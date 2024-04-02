@@ -6,6 +6,7 @@ import 'package:fforestimator/tools/layerDownloader.dart';
 import 'package:flutter/material.dart';
 import 'package:fforestimator/globals.dart' as gl;
 import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class OfflineView extends StatefulWidget {
   const OfflineView({super.key});
@@ -37,13 +38,16 @@ class _OfflineView extends State<OfflineView> {
                     minHeight: MediaQuery.of(context).size.height * .15,
                     maxHeight: MediaQuery.of(context).size.height * .15),
                 child: TextButton.icon(
-                  onPressed: () {
+                  onPressed: () async {
                     setState(() {
                       gl.offlineMode = false;
                       gl.rebuildNavigatorBar!();
                       gl.refreshCurrentThreeLayer();
                       gl.refreshMap(() {});
                     });
+                    final SharedPreferences prefs =
+                        await SharedPreferences.getInstance();
+                    await prefs.setBool('offlineMode', gl.offlineMode);
                   },
                   icon: Icon(
                     Icons.download_for_offline,
@@ -62,7 +66,7 @@ class _OfflineView extends State<OfflineView> {
                     minHeight: MediaQuery.of(context).size.height * .15,
                     maxHeight: MediaQuery.of(context).size.height * .15),
                 child: TextButton.icon(
-                  onPressed: () {
+                  onPressed: () async {
                     setState(() {
                       while (gl.interfaceSelectedLayerKeys.length > 1) {
                         if (gl.interfaceSelectedLayerKeys.first.offline) {
@@ -84,6 +88,11 @@ class _OfflineView extends State<OfflineView> {
                       gl.refreshCurrentThreeLayer();
                       gl.refreshMap(() {});
                     });
+                    final SharedPreferences prefs =
+                        await SharedPreferences.getInstance();
+                    await prefs.setStringList('interfaceSelectedLCode',
+                        gl.getInterfaceSelectedLCode());
+                    await prefs.setBool('offlineMode', gl.offlineMode);
                   },
                   icon: Icon(
                     Icons.download_for_offline,
