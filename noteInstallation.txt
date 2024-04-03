@@ -1,5 +1,5 @@
-Notes sur l'installation de Forestimator
-----------------------------------------
+Notes sur l'installation de Forestimator Web (aka cWebAptitude)
+--------------------------------------------
 
 1) packages généraux/ installation via sudo
 -------------------------------------------
@@ -19,7 +19,7 @@ contenu git/config LOCAL pour Forestimator:
 	bare = false
 	logallrefupdates = true
 [remote "origin"]
-	url = https://JoLeBelge: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@github.com/JoLeBelge//Forestimator.git
+	url = https://JoLeBelge:MYKEY@github.com/JoLeBelge//Forestimator.git
 	fetch = +refs/heads/*:refs/remotes/origin/*
 [branch "master"]
 	remote = origin
@@ -33,8 +33,7 @@ Contenu git config GLOBAL, accessible via git config --global --edit
         user = JoLeBelge
         email = liseinjon@hotmail.com
         name = lisein
-        #password=joaigun1
-        password = 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
+        password = MYKEY
 [credential]
         helper = cache
         
@@ -78,13 +77,10 @@ sudo make install
 ------
 git clone https://github.com/emweb/wt.git Wt
 
-Sur ordi Assus lisein, changer les paramètres de cmake pour wt GM_INCLUDE_DIR, GM_LIB et GM_PREFIX comme ceci;
-
-cmake -DWT_WRASTERIMAGE_IMPLEMENTATION="GraphicsMagick" -DGM_INCLUDE_DIR="/usr/local/include/GraphicsMagick" -DGM_LIB="/usr/local/lib/libGraphicsMagick.so" -DGM_PREFIX="/usr/local/include/GraphicsMagick" ..
 make -j8
 make install
 
-les librairies Wt sont dans /usr/local/lib, il faut ajouter ce chemin dans notre config de la manière suivante:
+les librairies Wt sont dans /usr/local/lib, il faut ajouter ce chemin dans notre config linux de la manière suivante:
 gedit /etc/ld.so.conf
 ajout ligne /usr/local/lib
 puis
@@ -93,7 +89,6 @@ sudo ldconfig
 3) Compilation cWebAptitude
 ---------------------------
 Maintenant que toutes les dépendances sont installées, on peut compiler Forestimator. Soit via Qt-creator, soit en ligne de commande avec qmake
-
 
 4) chemin d'accès aux couches cartographiques
 

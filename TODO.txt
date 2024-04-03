@@ -1,13 +1,10 @@
 TO DO forestimator WEB
 ----------------------
 
+-refactor cWebAptitude ; renommer forestimatorWeb ?
+-migrer code sur un dépot neuf pour mettre en public ; ça empêchera aux public d'avoir accès à tout les anciens commits
+
 Quand le Guide des stations d'ardenne sera imprimé:
 -renommer carte de recommandation, faire attention à la légende (concordance des termes avec contenu du GS)
 -creation WMS pour cartes dérivées.
 -documentation en ligne : le pdf (entre-autre)
-
-réunion PL 23/11/2020
--analyse Compo ; présence pour chaque essences plus typologie des peuplements (celle de IFPRW j'imagine - phil vois avec HC - moi je peux voir ce qu'on utilisais pour IFA - IFG)
-
---> s'inspirer de https://map.gis-gr.eu/ pour sélection de couches (coté rendu visuel). fait avec https://docs.mapbox.com/mapbox-gl-js
---> ajout mode dessin de polygones?
