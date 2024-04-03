@@ -25,7 +25,6 @@ formVielleCoupeRase::formVielleCoupeRase(const WEnvironment &env, cDicoApt *dico
     label = table->elementAt(row,0)->addWidget(std::make_unique<WLabel>(WString::tr("nom")));
     label->setBuddy(nomEncoderEdit_);
     nomEncoderEdit_->setPlaceholderText(WString::tr("nom.ph"));
-    nomEncoderEdit_->setMinimumSize("200px", "100%");
     ++row;
     prenomEncoderEdit_ = table->elementAt(row,1)->addWidget(std::make_unique<WLineEdit>());
     label = table->elementAt(row,0)->addWidget(std::make_unique<WLabel>(WString::tr("prenom")));
@@ -36,6 +35,8 @@ formVielleCoupeRase::formVielleCoupeRase(const WEnvironment &env, cDicoApt *dico
     label = table->elementAt(row,0)->addWidget(std::make_unique<WLabel>(WString::tr("contact")));
     contactEncoderEdit_->setPlaceholderText(WString::tr("contact.ph"));
     contactEncoderEdit_->setValidator(std::make_shared<WValidator>(true));
+    contactEncoderEdit_->validator()->setInvalidBlankText("Nous avons besoin de pouvoir vous contacter");
+    contactEncoderEdit_->addStyleClass("textEdit");
     ++row;
     keepInTouch= table->elementAt(row,1)->addWidget(std::make_unique<WCheckBox>());
     keepInTouch->setMinimumSize("30px","30px");
@@ -44,11 +45,11 @@ formVielleCoupeRase::formVielleCoupeRase(const WEnvironment &env, cDicoApt *dico
     ContactEdit_= table->elementAt(row,1)->addWidget(std::make_unique<WLineEdit>());
     label = table->elementAt(row,0)->addWidget(std::make_unique<WLabel>(WString::tr("contactACR")));
     ContactEdit_->setPlaceholderText(WString::tr("contactACR.ph"));
-
-
+    ContactEdit_->addStyleClass("textEdit");
     cont = tpl->bindWidget("contACR", std::make_unique<WContainerWidget>());
     cont->addNew<Wt::WText>(WString::tr("sectionVCR"));
     table= cont->addNew<WTable>();
+    table->addStyleClass("table-encodage");
     row=0;
     label = table->elementAt(row,0)->addWidget(std::make_unique<WLabel>(WString::tr("anneeVCR")));
     ++row;
@@ -58,6 +59,28 @@ formVielleCoupeRase::formVielleCoupeRase(const WEnvironment &env, cDicoApt *dico
         anneeVCREdit_->addItem("coupé en "+std::to_string(y)+" (il y a "+std::to_string(2024-y)+" ans)");
     }
     anneeVCREdit_->addItem("coupé avant 2009 (plus de 15 ans)");
+    ++row;
+    label = table->elementAt(row,0)->addWidget(std::make_unique<WLabel>(WString::tr("vosRef")));
+    ++row;
+    vosrefEdit_= table->elementAt(row,0)->addWidget(std::make_unique<WLineEdit>());
+    vosrefEdit_->setPlaceholderText(WString::tr("vosRef.ph"));
+    row++;
+    label = table->elementAt(row,0)->addWidget(std::make_unique<WLabel>(WString::tr("objectif")));
+    objectifEdit_= table->elementAt(row,0)->addWidget(std::make_unique<WComboBox>());
+    objectifEdit_->addItem(WString::tr("objectif0"));
+    objectifEdit_->addItem(WString::tr("objectif1"));
+    objectifEdit_->addItem(WString::tr("objectif2"));
+    objectifEdit_->addItem(WString::tr("objectif3"));
+    ++row;
+    label = table->elementAt(row,0)->addWidget(std::make_unique<WLabel>(WString::tr("sp")));
+    ++row;
+    spEdit_= table->elementAt(row,0)->addWidget(std::make_unique<WLineEdit>());
+    spEdit_->setPlaceholderText(WString::tr("sp.ph"));
+    ++row;
+    label = table->elementAt(row,0)->addWidget(std::make_unique<WLabel>(WString::tr("sanit")));
+    ++row;
+    sanitEdit_= table->elementAt(row,0)->addWidget(std::make_unique<WLineEdit>());
+    sanitEdit_->setPlaceholderText(WString::tr("sanit.ph"));
     ++row;
     label = table->elementAt(row,0)->addWidget(std::make_unique<WLabel>(WString::tr("regeNat")));
     ++row;
@@ -71,6 +94,33 @@ formVielleCoupeRase::formVielleCoupeRase(const WEnvironment &env, cDicoApt *dico
     //vegeBloquanteEdit_->setMinimumSize("200px", "100%");
     vegeBloquanteEdit_->setPlaceholderText(WString::tr("vegeBloquante.ph"));
     ++row;
+    label = table->elementAt(row,0)->addWidget(std::make_unique<WLabel>(WString::tr("itineraire")));
+    itineraireEdit_= table->elementAt(row,0)->addWidget(std::make_unique<WComboBox>());
+    itineraireEdit_->addItem(WString::tr("itineraire0"));
+    itineraireEdit_->addItem(WString::tr("itineraire1"));
+    itineraireEdit_->addItem(WString::tr("itineraire2"));
+    itineraireEdit_->addItem(WString::tr("itineraire3"));
+    ++row;
+    label = table->elementAt(row,0)->addWidget(std::make_unique<WLabel>(WString::tr("trav.sylvi")));
+    ++row;
+    travSylviEdit_= table->elementAt(row,0)->addWidget(std::make_unique<WLineEdit>());
+    travSylviEdit_->setPlaceholderText(WString::tr("trav.sylvi.ph"));
+    ++row;
+    label = table->elementAt(row,0)->addWidget(std::make_unique<WLabel>(WString::tr("plantation")));
+    ++row;
+    plantationEdit_= table->elementAt(row,0)->addWidget(std::make_unique<WLineEdit>());
+    plantationEdit_->setPlaceholderText(WString::tr("plantation.ph"));
+    ++row;
+    label = table->elementAt(row,0)->addWidget(std::make_unique<WLabel>(WString::tr("hauteur")));
+    ++row;
+    hauteurEdit_= table->elementAt(row,0)->addWidget(std::make_unique<WLineEdit>());
+    hauteurEdit_->setPlaceholderText(WString::tr("hauteur.ph"));
+    ++row;
+    label = table->elementAt(row,0)->addWidget(std::make_unique<WLabel>(WString::tr("gibier")));
+    ++row;
+    gibierEdit_= table->elementAt(row,0)->addWidget(std::make_unique<WLineEdit>());
+    gibierEdit_->setPlaceholderText(WString::tr("gibier.ph"));
+    ++row;
     label = table->elementAt(row,0)->addWidget(std::make_unique<WLabel>(WString::tr("descriptionVCR")));
     ++row;
     VCRdescriptionEdit_= table->elementAt(row,0)->addWidget(std::make_unique<WTextArea>());
@@ -80,13 +130,22 @@ formVielleCoupeRase::formVielleCoupeRase(const WEnvironment &env, cDicoApt *dico
 
     nomEncoderEdit_->enterPressed().connect(prenomEncoderEdit_, &WWidget::setFocus);
     prenomEncoderEdit_->enterPressed().connect(contactEncoderEdit_, &WWidget::setFocus);
-    contactEncoderEdit_->enterPressed().connect(ContactEdit_, &WWidget::setFocus);
+    contactEncoderEdit_->enterPressed().connect(keepInTouch, &WWidget::setFocus);
+    keepInTouch->enterPressed().connect(ContactEdit_, &WWidget::setFocus);
 
-    //contactEncoderEdit_->enterPressed().connect(ContactEdit_, &WWidget::setFocus);
-   // ContactEdit_->enterPressed().connect(commune_, &WWidget::set);
-    anneeVCREdit_->changed().connect(regeNatEdit_, &WWidget::setFocus);
+
+    anneeVCREdit_->changed().connect(vosrefEdit_, &WWidget::setFocus);
+    vosrefEdit_->enterPressed().connect(objectifEdit_, &WWidget::setFocus);
+    objectifEdit_->changed().connect(spEdit_, &WWidget::setFocus);
+    spEdit_->enterPressed().connect(sanitEdit_, &WWidget::setFocus);
+    sanitEdit_->enterPressed().connect(regeNatEdit_, &WWidget::setFocus);
     regeNatEdit_->enterPressed().connect(vegeBloquanteEdit_, &WWidget::setFocus);
-    vegeBloquanteEdit_->enterPressed().connect(VCRdescriptionEdit_, &WWidget::setFocus);
+    vegeBloquanteEdit_->enterPressed().connect(itineraireEdit_, &WWidget::setFocus);
+    itineraireEdit_->changed().connect(travSylviEdit_, &WWidget::setFocus);
+    travSylviEdit_->enterPressed().connect(plantationEdit_, &WWidget::setFocus);
+    plantationEdit_->enterPressed().connect(hauteurEdit_, &WWidget::setFocus);
+    hauteurEdit_->enterPressed().connect(gibierEdit_, &WWidget::setFocus);
+    gibierEdit_->enterPressed().connect(VCRdescriptionEdit_, &WWidget::setFocus);
 
     cont = tpl->bindWidget("contLoca", std::make_unique<WContainerWidget>());
     cont->addStyleClass("encodage");
@@ -124,13 +183,16 @@ formVielleCoupeRase::formVielleCoupeRase(const WEnvironment &env, cDicoApt *dico
     std::vector<std::string> vLs={"IGN", "ortho2020"};
     for (std::string code : vLs){
         std::shared_ptr<layerBase> aL1=mDico->getLayerBase(code);
-        WText * wtext1= cont->addNew<Wt::WText>(aL1->Nom());
-        wtext1->addStyleClass("encodageLayer");
-        wtext1->decorationStyle().setCursor(Cursor::PointingHand);
+        WPushButton * but = cont->addNew<Wt::WPushButton>(aL1->Nom());
+        but->addStyleClass("mybtn2");
+        //WText * wtext1= cont->addNew<Wt::WText>(aL1->Nom());
+        //wtext1->addStyleClass("encodageLayer");
+        //wtext1->decorationStyle().setCursor(Cursor::PointingHand);
         cont->addNew<WBreak>();
-        wtext1->clicked().connect([=] {this->displayLayer(aL1->Code());});
+        but->clicked().connect([=] {this->displayLayer(aL1->Code());});
     }
     cont->addNew<WBreak>();
+    cont->addNew<Wt::WText>(WString::tr("btnPolyg"));
     bCancel =cont->addNew<WPushButton>(WString::tr("initPol"));
     bCancel->setMinimumSize("100%"," ");
     bCancel->addStyleClass("btn btn-danger");
@@ -140,11 +202,7 @@ formVielleCoupeRase::formVielleCoupeRase(const WEnvironment &env, cDicoApt *dico
     bUndo->clicked().connect([=] {doJavaScript("draw.removeLastPoint();");});
     map->polygGeojson().connect(std::bind(&formVielleCoupeRase::validDraw,this, std::placeholders::_1));
 
-
     WPushButton * bSubmit = tpl->bindWidget("bsubmit", std::make_unique<WPushButton>(WString::tr("submit")));
-
-    //bSubmit->setMinimumSize("70%","100px");
-    //bSubmit->addStyleClass("btn btn-success");
     bSubmit->clicked().connect([=] {submit();});
 }
 
@@ -178,28 +236,37 @@ void formVielleCoupeRase::submit(){
         sqlite3 *db_;
         rc = sqlite3_open(mBDFile.c_str(), &db_);
         if( rc )  {} else {
+
+            WLocalDateTime d= WLocalDateTime::currentDateTime();
             //std::cout << " sauve la coupe rase " << std::endl;
             sqlite3_stmt * stmt;
-            std::string SQLstring="INSERT INTO acr (nom,prenom,contact,keepInTouch,contact2,anneeCoupe,regeNat,vegeBloquante,descr,surf,polygon) VALUES ('"
-                    +nomEncoderEdit_->valueText().toUTF8()+"',"
-                    +"'"+prenomEncoderEdit_->valueText().toUTF8()+"',"
-                    +"'"+contactEncoderEdit_->valueText().toUTF8()+"',"
+            std::string SQLstring="INSERT INTO acr (date,vosRef,nom,prenom,contact,keepInTouch,contact2,anneeCoupe,regeNat,vegeBloquante,objectif,spCoupe,sanitCoupe,itineraire,travaux,plantation,hauteur,gibier,descr,surf,polygon) VALUES ('"
+                    +d.toString().toUTF8()+"',"
+                    +"'"+format4SQL(vosrefEdit_->valueText().toUTF8())+"',"
+                    +"'"+format4SQL(nomEncoderEdit_->valueText().toUTF8())+"',"
+                    +"'"+format4SQL(prenomEncoderEdit_->valueText().toUTF8())+"',"
+                    +"'"+format4SQL(contactEncoderEdit_->valueText().toUTF8())+"',"
                     +std::to_string(keepInTouch->isChecked())+","
-                    +"'"+ContactEdit_->valueText().toUTF8()+"',"
-                    +"'"+anneeVCREdit_->currentText().toUTF8()+"',"
-                    +"'"+regeNatEdit_->valueText().toUTF8()+"',"
-                    +"'"+vegeBloquanteEdit_->valueText().toUTF8()+"',"
-                    +"'"+VCRdescriptionEdit_->valueText().toUTF8()+"',"
+                    +"'"+format4SQL(ContactEdit_->valueText().toUTF8())+"',"
+                    +"'"+format4SQL(anneeVCREdit_->currentText().toUTF8())+"',"
+                    +"'"+format4SQL(regeNatEdit_->valueText().toUTF8())+"',"
+                    +"'"+format4SQL(vegeBloquanteEdit_->valueText().toUTF8())+"',"
+                    +"'"+format4SQL(objectifEdit_->currentText().toUTF8())+"',"
+                    +"'"+format4SQL(spEdit_->valueText().toUTF8())+"',"
+                    +"'"+format4SQL(sanitEdit_->valueText().toUTF8())+"',"
+                    +"'"+format4SQL(itineraireEdit_->currentText().toUTF8())+"',"
+                    +"'"+format4SQL(travSylviEdit_->valueText().toUTF8())+"',"
+                    +"'"+format4SQL(plantationEdit_->valueText().toUTF8())+"',"
+                    +"'"+format4SQL(hauteurEdit_->valueText().toUTF8())+"',"
+                    +"'"+format4SQL(gibierEdit_->valueText().toUTF8())+"',"
+                    +"'"+format4SQL(VCRdescriptionEdit_->valueText().toUTF8())+"',"
                     +std::to_string(surf)+","
                     +"'"+polyg+"');";
-            //std::cout << "sql : " << SQLstring << std::endl;
+            std::cout << "sql : " << SQLstring << std::endl;
             sqlite3_prepare_v2(db_, SQLstring.c_str(), -1, &stmt, NULL );
             // applique l'update
             sqlite3_step( stmt );
             sqlite3_finalize(stmt);
-
-
-
         }
         sqlite3_close(db_);
 
@@ -216,8 +283,14 @@ void formVielleCoupeRase::submit(){
     }
 }
 
+std::string formVielleCoupeRase::format4SQL(std::string aString){
+
+        boost::replace_all(aString,"'","\"");
+        return aString;
+}
+
 void formVielleCoupeRase::vider(bool all){
-    std::cout << "vider formulaire"<< std::endl;
+    //std::cout << "vider formulaire"<< std::endl;
     if(all){
         nomEncoderEdit_->setText("");
         prenomEncoderEdit_->setText("");

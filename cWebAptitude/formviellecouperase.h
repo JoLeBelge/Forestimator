@@ -26,8 +26,11 @@
 #include <Wt/WComboBox.h>
 #include <Wt/Dbo/WtSqlTraits.h>
 #include <Wt/WBootstrap5Theme.h>
+#include <Wt/WLocalDateTime.h>
 #include <cdicoapt.h>
 #include <sqlite3.h>
+
+
 
 using namespace Wt;
 namespace dbo = Wt::Dbo;
@@ -46,6 +49,9 @@ public:
 
     void vider(bool all=1);
 
+    std::string format4SQL(std::string aString);
+
+
     WLineEdit *nomEncoderEdit_;
     WLineEdit *prenomEncoderEdit_;
     WLineEdit *contactEncoderEdit_;
@@ -55,6 +61,16 @@ public:
     WLineEdit *regeNatEdit_;
     WLineEdit *vegeBloquanteEdit_;
     WTextArea *VCRdescriptionEdit_;
+
+    WLineEdit *vosrefEdit_;
+    WComboBox *objectifEdit_;
+    WLineEdit *spEdit_;
+    WLineEdit *sanitEdit_;
+    WComboBox *itineraireEdit_;
+    WLineEdit *travSylviEdit_;
+    WLineEdit *plantationEdit_;
+    WLineEdit *hauteurEdit_;
+    WLineEdit *gibierEdit_;
 
     WPushButton * bCancel;
 

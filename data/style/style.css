@@ -811,6 +811,20 @@ border: 1px solid black; /* add a border */
 .mybtn{
 min-width:100.0px;min-height:100.0px;align-self: center;
 }
+
+.mybtn2{
+min-width: 50%;
+}
+
+.textEdit{
+box-sizing: content-box;
+}
+
+
+.table-encodage > tbody > tr > td {
+  height: 40px;
+  vertical-align: bottom;
+ }
   
 
 
