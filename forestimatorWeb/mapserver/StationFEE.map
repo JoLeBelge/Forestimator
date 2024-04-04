@@ -1,0 +1,930 @@
+MAP
+	NAME		"station_FEE"
+	EXTENT	42250.0001199999969685 21170.0001200000115205 295170.0001199999824166 167700.0001200000115205
+	SIZE           800 800
+	SHAPEPATH      "/media/Data10/Forestimator/Station/"
+	IMAGECOLOR     255 255 255
+
+	PROJECTION
+		"init=epsg:31370"
+	END
+	
+	WEB
+		METADATA
+	    	"wms_label"           "Serveur WMS des cartes de description stationnelle du Fichier Ecologique des Essences"
+	    	"wms_onlineresource"  "http://gxgfservcarto.gxabt.ulg.ac.be/cgi-bin/station_fee?"
+			"wms_service_onlineresource"   "http://gxgfservcarto.gxabt.ulg.ac.be/cgi-bin/station_fee?"
+	    	"wms_srs"             "EPSG:31370"
+			"wms_enable_request"  "*"
+	  	END
+  	END
+LAYER
+  NAME "AE"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+   DATA "AE_RW_202301.tif" 
+   PROCESSING "BANDS=1" 
+   CLASSITEM "[pixel]" 
+   CLASS 
+      NAME "Sans apport d'eau"
+      EXPRESSION "1"
+      STYLE 
+          COLOR 215 222 216
+       END
+   END
+   CLASS 
+      NAME "Apport variable"
+      EXPRESSION "2"
+      STYLE 
+          COLOR 37 161 214
+       END
+   END
+   CLASS 
+      NAME "Apport permanent"
+      EXPRESSION "3"
+      STYLE 
+          COLOR 25 30 160
+       END
+   END
+ METADATA
+      "wms_title"           "Situation d'apport en eau hors précipitation"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+
+LAYER
+  NAME "CS_Ardenne"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+   DATA "GSA_202310_v6_RW.tif" 
+   PROCESSING "BANDS=1" 
+   CLASSITEM "[pixel]" 
+   CLASS 
+      NAME "Tourbières acides"
+      EXPRESSION "1"
+      STYLE 
+          COLOR 0 0 0
+       END
+   END
+   CLASS 
+      NAME "Marais et sources"
+      EXPRESSION "2"
+      STYLE 
+          COLOR 23 45 242
+       END
+   END
+   CLASS 
+      NAME "Argiles blanches humides"
+      EXPRESSION "3"
+      STYLE 
+          COLOR 109 117 114
+       END
+   END
+   CLASS 
+      NAME "Sols blanchis à régime hydrique alternatif"
+      EXPRESSION "4"
+      STYLE 
+          COLOR 223 200 165
+       END
+   END
+   CLASS 
+      NAME "Sols bruns à régime hydrique alternatif"
+      EXPRESSION "5"
+      STYLE 
+          COLOR 182 128 2
+       END
+   END
+   CLASS 
+      NAME "Terrasses alluviales humides"
+      EXPRESSION "6"
+      STYLE 
+          COLOR 80 153 243
+       END
+   END
+   CLASS 
+      NAME "Terrasses alluviales fraiche"
+      EXPRESSION "7"
+      STYLE 
+          COLOR 132 233 253
+       END
+   END
+   CLASS 
+      NAME "Vallon frais"
+      EXPRESSION "8"
+      STYLE 
+          COLOR 98 249 196
+       END
+   END
+   CLASS 
+      NAME "Ravins hygrosciaphiles"
+      EXPRESSION "9"
+      STYLE 
+          COLOR 254 85 248
+       END
+   END
+   CLASS 
+      NAME "Versants chauds au sol superficiel"
+      EXPRESSION "10"
+      STYLE 
+          COLOR 254 47 3
+       END
+   END
+   CLASS 
+      NAME "Versants chauds"
+      EXPRESSION "11"
+      STYLE 
+          COLOR 249 155 31
+       END
+   END
+   CLASS 
+      NAME "Versants frais pauvres"
+      EXPRESSION "12"
+      STYLE 
+          COLOR 204 134 213
+       END
+   END
+   CLASS 
+      NAME "Versants frais riches"
+      EXPRESSION "13"
+      STYLE 
+          COLOR 121 6 187
+       END
+   END
+   CLASS 
+      NAME "Sols profonds des plateaux"
+      EXPRESSION "14"
+      STYLE 
+          COLOR 153 235 130
+       END
+   END
+   CLASS 
+      NAME "Sols peu profonds des plateaux"
+      EXPRESSION "15"
+      STYLE 
+          COLOR 13 186 4
+       END
+   END
+   CLASS 
+      NAME "Sols superficiels des plateaux"
+      EXPRESSION "16"
+      STYLE 
+          COLOR 20 112 14
+       END
+   END
+   CLASS 
+      NAME "Affleurements rocheux"
+      EXPRESSION "17"
+      STYLE 
+          COLOR 205 191 188
+       END
+   END
+   CLASS 
+      NAME "Non définis"
+      EXPRESSION "0"
+      STYLE 
+          COLOR 255 255 255
+       END
+   END
+ METADATA
+      "wms_title"           "Catalogue de station Ardenne"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+
+LAYER
+  NAME "CS3"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+   DATA "CS_zbio35.tif" 
+   PROCESSING "BANDS=1" 
+   CLASSITEM "[pixel]" 
+   CLASS 
+      NAME "Tourbieres"
+      EXPRESSION "1"
+      STYLE 
+          COLOR 4 6 2
+       END
+   END
+   CLASS 
+      NAME "Marais"
+      EXPRESSION "2"
+      STYLE 
+          COLOR 25 30 160
+       END
+   END
+   CLASS 
+      NAME "Argiles blanches humides"
+      EXPRESSION "3"
+      STYLE 
+          COLOR 116 113 115
+       END
+   END
+   CLASS 
+      NAME "Argiles blanches à RHA"
+      EXPRESSION "4"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+   CLASS 
+      NAME "Plateaux et versants sub-humides, acidoclines"
+      EXPRESSION "5"
+      STYLE 
+          COLOR 195 161 39
+       END
+   END
+   CLASS 
+      NAME "Terrasses alluviales humides"
+      EXPRESSION "6"
+      STYLE 
+          COLOR 75 145 195
+       END
+   END
+   CLASS 
+      NAME "Terrasses alluviales et fonds de vallees frais"
+      EXPRESSION "7"
+      STYLE 
+          COLOR 37 161 214
+       END
+   END
+   CLASS 
+      NAME "Stations xero-oligotrophes"
+      EXPRESSION "9"
+      STYLE 
+          COLOR 236 36 42
+       END
+   END
+   CLASS 
+      NAME "Versants chauds superficiels, meso-oligotrophes"
+      EXPRESSION "10"
+      STYLE 
+          COLOR 233 142 226
+       END
+   END
+   CLASS 
+      NAME "Versants chauds, meso-oligotrophes"
+      EXPRESSION "11"
+      STYLE 
+          COLOR 199 84 182
+       END
+   END
+   CLASS 
+      NAME "Stations oligotrophes des versants frais"
+      EXPRESSION "12"
+      STYLE 
+          COLOR 123 135 144
+       END
+   END
+   CLASS 
+      NAME "Stations hygrosciaphiles acidoclines"
+      EXPRESSION "14"
+      STYLE 
+          COLOR 49 158 54
+       END
+   END
+   CLASS 
+      NAME "Plateaux oligotrophes"
+      EXPRESSION "15"
+      STYLE 
+          COLOR 199 84 182
+       END
+   END
+   CLASS 
+      NAME "Plateaux meso-oligotrophes"
+      EXPRESSION "16"
+      STYLE 
+          COLOR 76 188 138
+       END
+   END
+   CLASS 
+      NAME "Plateaux acidoclines"
+      EXPRESSION "17"
+      STYLE 
+          COLOR 138 219 250
+       END
+   END
+   CLASS 
+      NAME "Lithosols"
+      EXPRESSION "18"
+      STYLE 
+          COLOR 215 222 216
+       END
+   END
+ METADATA
+      "wms_title"           "Catalogue de station Lorraine"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+LAYER
+  NAME "MNH2019"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+   DATA "mnh_2019.tif" 
+   PROCESSING "BANDS=1" 
+   CLASSITEM "[pixel]" 
+   CLASS 
+      NAME "0"
+      EXPRESSION "0"
+      STYLE 
+          COLOR 68 1 84
+       END
+   END
+   CLASS 
+      NAME "1"
+      EXPRESSION "5"
+      STYLE 
+          COLOR 70 12 95
+       END
+   END
+   CLASS 
+      NAME "2"
+      EXPRESSION "10"
+      STYLE 
+          COLOR 72 23 105
+       END
+   END
+   CLASS 
+      NAME "3"
+      EXPRESSION "15"
+      STYLE 
+          COLOR 72 32 114
+       END
+   END
+   CLASS 
+      NAME "4"
+      EXPRESSION "20"
+      STYLE 
+          COLOR 71 42 122
+       END
+   END
+   CLASS 
+      NAME "5"
+      EXPRESSION "25"
+      STYLE 
+          COLOR 69 51 127
+       END
+   END
+   CLASS 
+      NAME "6"
+      EXPRESSION "30"
+      STYLE 
+          COLOR 67 61 132
+       END
+   END
+   CLASS 
+      NAME "7"
+      EXPRESSION "35"
+      STYLE 
+          COLOR 64 69 136
+       END
+   END
+   CLASS 
+      NAME "8"
+      EXPRESSION "40"
+      STYLE 
+          COLOR 61 78 138
+       END
+   END
+   CLASS 
+      NAME "9"
+      EXPRESSION "45"
+      STYLE 
+          COLOR 57 86 140
+       END
+   END
+   CLASS 
+      NAME "10"
+      EXPRESSION "50"
+      STYLE 
+          COLOR 53 94 141
+       END
+   END
+   CLASS 
+      NAME "11"
+      EXPRESSION "55"
+      STYLE 
+          COLOR 50 101 142
+       END
+   END
+   CLASS 
+      NAME "12"
+      EXPRESSION "60"
+      STYLE 
+          COLOR 46 109 142
+       END
+   END
+   CLASS 
+      NAME "13"
+      EXPRESSION "65"
+      STYLE 
+          COLOR 43 115 142
+       END
+   END
+   CLASS 
+      NAME "14"
+      EXPRESSION "70"
+      STYLE 
+          COLOR 41 123 142
+       END
+   END
+   CLASS 
+      NAME "15"
+      EXPRESSION "75"
+      STYLE 
+          COLOR 38 130 142
+       END
+   END
+   CLASS 
+      NAME "16"
+      EXPRESSION "80"
+      STYLE 
+          COLOR 35 137 142
+       END
+   END
+   CLASS 
+      NAME "17"
+      EXPRESSION "85"
+      STYLE 
+          COLOR 32 144 141
+       END
+   END
+   CLASS 
+      NAME "18"
+      EXPRESSION "90"
+      STYLE 
+          COLOR 31 151 139
+       END
+   END
+   CLASS 
+      NAME "19"
+      EXPRESSION "95"
+      STYLE 
+          COLOR 30 159 137
+       END
+   END
+   CLASS 
+      NAME "20"
+      EXPRESSION "100"
+      STYLE 
+          COLOR 33 165 133
+       END
+   END
+   CLASS 
+      NAME "21"
+      EXPRESSION "105"
+      STYLE 
+          COLOR 38 172 130
+       END
+   END
+   CLASS 
+      NAME "22"
+      EXPRESSION "110"
+      STYLE 
+          COLOR 46 179 124
+       END
+   END
+   CLASS 
+      NAME "23"
+      EXPRESSION "115"
+      STYLE 
+          COLOR 57 186 118
+       END
+   END
+   CLASS 
+      NAME "24"
+      EXPRESSION "120"
+      STYLE 
+          COLOR 70 192 111
+       END
+   END
+   CLASS 
+      NAME "25"
+      EXPRESSION "125"
+      STYLE 
+          COLOR 85 198 103
+       END
+   END
+   CLASS 
+      NAME "26"
+      EXPRESSION "130"
+      STYLE 
+          COLOR 101 203 94
+       END
+   END
+   CLASS 
+      NAME "27"
+      EXPRESSION "135"
+      STYLE 
+          COLOR 118 209 83
+       END
+   END
+   CLASS 
+      NAME "28"
+      EXPRESSION "140"
+      STYLE 
+          COLOR 137 213 72
+       END
+   END
+   CLASS 
+      NAME "29"
+      EXPRESSION "145"
+      STYLE 
+          COLOR 156 217 59
+       END
+   END
+   CLASS 
+      NAME "30"
+      EXPRESSION "150"
+      STYLE 
+          COLOR 176 221 47
+       END
+   END
+   CLASS 
+      NAME "31"
+      EXPRESSION "155"
+      STYLE 
+          COLOR 196 224 34
+       END
+   END
+   CLASS 
+      NAME "32"
+      EXPRESSION "160"
+      STYLE 
+          COLOR 216 226 25
+       END
+   END
+   CLASS 
+      NAME "33"
+      EXPRESSION "165"
+      STYLE 
+          COLOR 235 229 27
+       END
+   END
+   CLASS 
+      NAME "34"
+      EXPRESSION "170"
+      STYLE 
+          COLOR 253 231 37
+       END
+   END
+   CLASS 
+      NAME "0"
+      EXPRESSION "255"
+      STYLE 
+          COLOR 255 255 255
+       END
+   END
+ METADATA
+      "wms_title"           "MNH photogrammétrique de 2019"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+LAYER
+  NAME "NH"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+   DATA "NH202006.tif" 
+   PROCESSING "BANDS=1" 
+   CLASSITEM "[pixel]" 
+   CLASS 
+      NAME "-4"
+      EXPRESSION "6"
+      STYLE 
+          COLOR 255 44 220
+       END
+   END
+   CLASS 
+      NAME "-3"
+      EXPRESSION "7"
+      STYLE 
+          COLOR 11 15 255
+       END
+   END
+   CLASS 
+      NAME "-2"
+      EXPRESSION "8"
+      STYLE 
+          COLOR 38 154 255
+       END
+   END
+   CLASS 
+      NAME "-1"
+      EXPRESSION "9"
+      STYLE 
+          COLOR 84 255 224
+       END
+   END
+   CLASS 
+      NAME "0"
+      EXPRESSION "10"
+      STYLE 
+          COLOR 13 152 29
+       END
+   END
+   CLASS 
+      NAME "1"
+      EXPRESSION "11"
+      STYLE 
+          COLOR 75 255 99
+       END
+   END
+   CLASS 
+      NAME "2"
+      EXPRESSION "12"
+      STYLE 
+          COLOR 187 255 123
+       END
+   END
+   CLASS 
+      NAME "3"
+      EXPRESSION "13"
+      STYLE 
+          COLOR 237 255 101
+       END
+   END
+   CLASS 
+      NAME "4"
+      EXPRESSION "14"
+      STYLE 
+          COLOR 225 126 12
+       END
+   END
+   CLASS 
+      NAME "5"
+      EXPRESSION "15"
+      STYLE 
+          COLOR 255 77 18
+       END
+   END
+   CLASS 
+      NAME "-1RHA"
+      EXPRESSION "17"
+      STYLE 
+          COLOR 215 222 216
+       END
+   END
+   CLASS 
+      NAME "-2RHA"
+      EXPRESSION "18"
+      STYLE 
+          COLOR 203 207 194
+       END
+   END
+   CLASS 
+      NAME "-3RHA"
+      EXPRESSION "19"
+      STYLE 
+          COLOR 4 6 2
+       END
+   END
+ METADATA
+      "wms_title"           "Niveaux Hydrique"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+LAYER
+  NAME "NT"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+   DATA "NT2023.tif" 
+   PROCESSING "BANDS=1" 
+   CLASSITEM "[pixel]" 
+   CLASS 
+      NAME "-3"
+      EXPRESSION "7"
+      STYLE 
+          COLOR 255 10 210
+       END
+   END
+   CLASS 
+      NAME "-2"
+      EXPRESSION "8"
+      STYLE 
+          COLOR 240 0 56
+       END
+   END
+   CLASS 
+      NAME "-1"
+      EXPRESSION "9"
+      STYLE 
+          COLOR 253 150 4
+       END
+   END
+   CLASS 
+      NAME "0"
+      EXPRESSION "10"
+      STYLE 
+          COLOR 255 245 55
+       END
+   END
+   CLASS 
+      NAME "1"
+      EXPRESSION "11"
+      STYLE 
+          COLOR 89 192 255
+       END
+   END
+   CLASS 
+      NAME "2"
+      EXPRESSION "12"
+      STYLE 
+          COLOR 22 107 255
+       END
+   END
+ METADATA
+      "wms_title"           "Niveaux Trophiques"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+LAYER
+  NAME "SS"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+   DATA "SS_W_201911.tif" 
+   PROCESSING "BANDS=1" 
+   CLASSITEM "[pixel]" 
+   CLASS 
+      NAME "Sous-secteur froid"
+      EXPRESSION "1"
+      STYLE 
+          COLOR 25 30 160
+       END
+   END
+   CLASS 
+      NAME "Sous-secteur neutre"
+      EXPRESSION "2"
+      STYLE 
+          COLOR 215 222 216
+       END
+   END
+   CLASS 
+      NAME "Sous-secteur chaud"
+      EXPRESSION "3"
+      STYLE 
+          COLOR 236 36 42
+       END
+   END
+ METADATA
+      "wms_title"           "Sous-secteur radiatif"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+LAYER
+  NAME "Topo"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+   DATA "TOPO2020.tif" 
+   PROCESSING "BANDS=1" 
+   CLASSITEM "[pixel]" 
+   CLASS 
+      NAME "Versant nord"
+      EXPRESSION "1"
+      STYLE 
+          COLOR 25 30 160
+       END
+   END
+   CLASS 
+      NAME "Plateau et faible pente"
+      EXPRESSION "2"
+      STYLE 
+          COLOR 215 222 216
+       END
+   END
+   CLASS 
+      NAME "Versant sud"
+      EXPRESSION "3"
+      STYLE 
+          COLOR 236 36 42
+       END
+   END
+   CLASS 
+      NAME "Fond de vallee etroite"
+      EXPRESSION "4"
+      STYLE 
+          COLOR 4 6 2
+       END
+   END
+ METADATA
+      "wms_title"           "Situation Topographique"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+LAYER
+  NAME "ZBIO"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+   DATA "ZBIO.tif" 
+   PROCESSING "BANDS=1" 
+   CLASSITEM "[pixel]" 
+   CLASS 
+      NAME "Ardenne centro-orientale"
+      EXPRESSION "1"
+      STYLE 
+          COLOR 49 158 54
+       END
+   END
+   CLASS 
+      NAME "Basse et moyenne Ardenne"
+      EXPRESSION "2"
+      STYLE 
+          COLOR 76 188 138
+       END
+   END
+   CLASS 
+      NAME "Basse Lorraine"
+      EXPRESSION "3"
+      STYLE 
+          COLOR 233 142 226
+       END
+   END
+   CLASS 
+      NAME "Fagne - Famenne - Calestienne"
+      EXPRESSION "4"
+      STYLE 
+          COLOR 37 161 214
+       END
+   END
+   CLASS 
+      NAME "Haute Lorraine"
+      EXPRESSION "5"
+      STYLE 
+          COLOR 199 84 182
+       END
+   END
+   CLASS 
+      NAME "Hesbino-Brabançon"
+      EXPRESSION "6"
+      STYLE 
+          COLOR 195 161 39
+       END
+   END
+   CLASS 
+      NAME "Plaines et Vallees Scaldisiennes"
+      EXPRESSION "7"
+      STYLE 
+          COLOR 236 36 42
+       END
+   END
+   CLASS 
+      NAME "Condroz - Sambre et Meuse"
+      EXPRESSION "8"
+      STYLE 
+          COLOR 247 237 24
+       END
+   END
+   CLASS 
+      NAME "Thierache"
+      EXPRESSION "9"
+      STYLE 
+          COLOR 25 30 160
+       END
+   END
+   CLASS 
+      NAME "Haute Ardenne"
+      EXPRESSION "10"
+      STYLE 
+          COLOR 36 84 4
+       END
+   END
+ METADATA
+      "wms_title"           "Zone Bioclimatique"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+END

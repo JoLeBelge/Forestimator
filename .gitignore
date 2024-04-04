@@ -1,15 +1,14 @@
 build/
 build-*/
 build-carteApt/
-build-WebAptitude/
-build-WebAptitudeDebug/
+build-forestimatorWeb/
 build-stationDescriptor/
 carteApt/data/aptitudeEssDB.db
 carteApt/data/aptitudeEssDB.db-*
 carteApt/data/carteFEE_NTpH.db-*
 carteApt/carteApt.pro.*
-cWebAptitude/cWebAptitude.pro.user.*
-cWebAptitude/cWebAptitude.pro.user
+forestimatorWeb/forestimatorWeb.pro.user.*
+forestimatorWeb/forestimatorWeb.pro.user
 data/tmp
 data/auth*.db*
 data/extents*.db*
@@ -20,7 +19,7 @@ data/ACR.db*
 stationDescriptor/stationDescriptor.pro.*
 carteApt/*.autosave
 stationDescriptor/*.autosave
-cWebAptitude/*.autosave
+forestimatorWeb/*.autosave
 carteApt/scriptR_AE_SS/.Rhistory
 carteApt/cleanCarteAE/*.pro.user*
 

@@ -1,0 +1,6861 @@
+MAP
+	NAME		"forestimator"
+	EXTENT	42250.0001199999969685 21170.0001200000115205 295170.0001199999824166 167700.0001200000115205
+	SIZE           800 800
+	SHAPEPATH      "/media/Data10/Forestimator/Autre/"
+	IMAGECOLOR     255 255 255
+	IMAGETYPE      PNG
+
+	PROJECTION
+		"init=epsg:31370"
+	END
+	
+	WEB
+		METADATA
+	    	"wms_label"           "Serveur WWS de divers cartes utilisées dans la plateforme Forestimator"
+	    	"wms_onlineresource"  "http://gxgfservcarto.gxabt.ulg.ac.be/cgi-bin/forestimator?"
+			"wms_service_onlineresource"   "http://gxgfservcarto.gxabt.ulg.ac.be/cgi-bin/forestimator?"
+	    	"wms_srs"             "EPSG:31370"
+			"wms_enable_request"  "*"
+	  	END
+  	END
+
+ 	LAYER
+        NAME "ProBos"
+        TYPE RASTER
+        STATUS ON
+		PROJECTION
+			"init=epsg:31370"
+	  	END
+		DATA "composition.tif"
+		PROCESSING "BANDS=1"
+		CLASSITEM "[pixel]"
+        
+		CLASS
+		  EXPRESSION "1"
+		  STYLE
+		    COLOR 62 192 40
+		  END
+		END
+		CLASS
+		  EXPRESSION "2"
+		  STYLE
+		    COLOR 246 149 30
+		  END
+		END
+		CLASS
+		  EXPRESSION "3"
+		  STYLE
+		    COLOR 226 19 47
+		  END
+		END
+		CLASS
+		  EXPRESSION "4"
+		  STYLE
+		    COLOR 136 69 211
+		  END
+		END
+		CLASS
+		  EXPRESSION "5"
+		  STYLE
+		    COLOR 228 247 8
+		  END
+		END
+		CLASS
+		  EXPRESSION "6"
+		  STYLE
+		    COLOR 17 172 233
+		  END
+		END
+		CLASS
+		  EXPRESSION "7"
+		  STYLE
+		    COLOR 238 40 209
+		  END
+		END
+		CLASS
+		  EXPRESSION "8"
+		  STYLE
+		    COLOR 17 96 180
+		  END
+		END
+		CLASS
+		  EXPRESSION "9"
+		  STYLE
+		    COLOR 144 159 152
+		  END
+		END
+		OFFSITE 0 0 0
+		METADATA
+      		"wms_title"           "Carte des essences Interreg ProBos"
+      		"wms_srs"             "EPSG:31370"
+   		END
+   		TEMPLATE "../template.html"
+	END
+ 	LAYER
+        NAME "MasqueForet"
+        TYPE RASTER
+        STATUS ON
+		
+		DATA "Forest_Mask_2006_2009-2010_2012-2013_2016_2018_Final.tif"
+		PROJECTION
+			"init=epsg:31370"
+	  	END
+
+		PROCESSING "BANDS=1"
+		CLASSITEM "[pixel]"
+		CLASS
+		  EXPRESSION "1"
+		  STYLE
+		    COLOR 0 100 0
+		  END
+		END
+		OFFSITE 0 0 0
+
+		METADATA
+	    	"wms_title"           "Masque Forêt"
+	    	"wms_srs"             "EPSG:31370"
+	  	END
+		TEMPLATE "../template.html"
+    END
+
+ 	LAYER
+        NAME "plS2_falseColor_2020_05"
+        TYPE RASTER
+        STATUS ON
+		
+		DATA "IR_R_G_8bits_L72.tif"
+		PROJECTION
+			"init=epsg:31370"
+	  	END
+		METADATA
+	    	"wms_title"           "vue Sat (planetScope + Sentinel2) en fausse couleur de 2020 05"
+	    	"wms_srs"             "EPSG:31370"
+	  	END
+		TEMPLATE "../template.html"
+    END
+    
+    LAYER
+        NAME "plS2_falseColor_052021"
+        TYPE RASTER
+        STATUS ON
+		
+		DATA "PlS2_202105_b8b4b3_BL72.tif"
+		 PROCESSING "SCALE_1=10,160" 
+		 PROCESSING "SCALE_2=0,80" 
+		 PROCESSING "SCALE_1=0,60" 
+		 OFFSITE 0 0 0 
+		PROJECTION
+			"init=epsg:31370"
+	  	END
+		METADATA
+	    	"wms_title"           "vue Sat (planetScope + Sentinel2) en fausse couleur de 2021 05"
+	    	"wms_srs"             "EPSG:31370"
+	  	END
+		TEMPLATE "../template.html"
+    END
+        LAYER
+        NAME "plS2_falseColor_082022"
+        TYPE RASTER
+        STATUS ON
+		
+		DATA "PlS2_202208_b8b4b3_BL72.tif"
+		PROCESSING "SCALE_1=10,160" 
+		 PROCESSING "SCALE_2=0,80" 
+		 PROCESSING "SCALE_1=0,60" 
+		  OFFSITE 0 0 0 
+		PROJECTION
+			"init=epsg:31370"
+	  	END
+		METADATA
+	    	"wms_title"           "vue Sat (planetScope + Sentinel2) en fausse couleur de 2022 08"
+	    	"wms_srs"             "EPSG:31370"
+	  	END
+		TEMPLATE "../template.html"
+    END
+
+LAYER
+  NAME "MNT"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+   DATA "MNT_10m_WALLONIA16b.tif" 
+   PROCESSING "BANDS=1" 
+   CLASSITEM "[pixel]" 
+   CLASS 
+      NAME "0"
+      EXPRESSION ([pixel] <= 30)
+      STYLE 
+          COLOR 0 0 0
+       END
+   END
+   CLASS 
+      NAME "3"
+      EXPRESSION ([pixel]>30 AND [pixel]<=60)
+      STYLE 
+          COLOR 1 1 1
+       END
+   END
+   CLASS 
+      NAME "6"
+      EXPRESSION ([pixel]>60 AND [pixel]<=90)
+      STYLE 
+          COLOR 2 2 2
+       END
+   END
+   CLASS 
+      NAME "9"
+      EXPRESSION ([pixel]>90 AND [pixel]<=120)
+      STYLE 
+          COLOR 3 3 3
+       END
+   END
+   CLASS 
+      NAME "12"
+      EXPRESSION ([pixel]>120 AND [pixel]<=150)
+      STYLE 
+          COLOR 4 4 4
+       END
+   END
+   CLASS 
+      NAME "15"
+      EXPRESSION ([pixel]>150 AND [pixel]<=180)
+      STYLE 
+          COLOR 5 5 5
+       END
+   END
+   CLASS 
+      NAME "18"
+      EXPRESSION ([pixel]>180 AND [pixel]<=210)
+      STYLE 
+          COLOR 6 6 6
+       END
+   END
+   CLASS 
+      NAME "21"
+      EXPRESSION ([pixel]>210 AND [pixel]<=240)
+      STYLE 
+          COLOR 7 7 7
+       END
+   END
+   CLASS 
+      NAME "24"
+      EXPRESSION ([pixel]>240 AND [pixel]<=270)
+      STYLE 
+          COLOR 8 8 8
+       END
+   END
+   CLASS 
+      NAME "27"
+      EXPRESSION ([pixel]>270 AND [pixel]<=300)
+      STYLE 
+          COLOR 9 9 9
+       END
+   END
+   CLASS 
+      NAME "30"
+      EXPRESSION ([pixel]>300 AND [pixel]<=330)
+      STYLE 
+          COLOR 10 10 10
+       END
+   END
+   CLASS 
+      NAME "33"
+      EXPRESSION ([pixel]>330 AND [pixel]<=360)
+      STYLE 
+          COLOR 11 11 11
+       END
+   END
+   CLASS 
+      NAME "36"
+      EXPRESSION ([pixel]>360 AND [pixel]<=390)
+      STYLE 
+          COLOR 12 12 12
+       END
+   END
+   CLASS 
+      NAME "39"
+      EXPRESSION ([pixel]>390 AND [pixel]<=420)
+      STYLE 
+          COLOR 13 13 13
+       END
+   END
+   CLASS 
+      NAME "42"
+      EXPRESSION ([pixel]>420 AND [pixel]<=450)
+      STYLE 
+          COLOR 14 14 14
+       END
+   END
+   CLASS 
+      NAME "45"
+      EXPRESSION ([pixel]>450 AND [pixel]<=480)
+      STYLE 
+          COLOR 15 15 15
+       END
+   END
+   CLASS 
+      NAME "48"
+      EXPRESSION ([pixel]>480 AND [pixel]<=510)
+      STYLE 
+          COLOR 16 16 16
+       END
+   END
+   CLASS 
+      NAME "51"
+      EXPRESSION ([pixel]>510 AND [pixel]<=540)
+      STYLE 
+          COLOR 17 17 17
+       END
+   END
+   CLASS 
+      NAME "54"
+      EXPRESSION ([pixel]>540 AND [pixel]<=570)
+      STYLE 
+          COLOR 18 18 18
+       END
+   END
+   CLASS 
+      NAME "57"
+      EXPRESSION ([pixel]>570 AND [pixel]<=600)
+      STYLE 
+          COLOR 19 19 19
+       END
+   END
+   CLASS 
+      NAME "60"
+      EXPRESSION ([pixel]>600 AND [pixel]<=630)
+      STYLE 
+          COLOR 20 20 20
+       END
+   END
+   CLASS 
+      NAME "63"
+      EXPRESSION ([pixel]>630 AND [pixel]<=660)
+      STYLE 
+          COLOR 21 21 21
+       END
+   END
+   CLASS 
+      NAME "66"
+      EXPRESSION ([pixel]>660 AND [pixel]<=690)
+      STYLE 
+          COLOR 22 22 22
+       END
+   END
+   CLASS 
+      NAME "69"
+      EXPRESSION ([pixel]>690 AND [pixel]<=720)
+      STYLE 
+          COLOR 23 23 23
+       END
+   END
+   CLASS 
+      NAME "72"
+      EXPRESSION ([pixel]>720 AND [pixel]<=750)
+      STYLE 
+          COLOR 24 24 24
+       END
+   END
+   CLASS 
+      NAME "75"
+      EXPRESSION ([pixel]>750 AND [pixel]<=780)
+      STYLE 
+          COLOR 25 25 25
+       END
+   END
+   CLASS 
+      NAME "78"
+      EXPRESSION ([pixel]>780 AND [pixel]<=810)
+      STYLE 
+          COLOR 26 26 26
+       END
+   END
+   CLASS 
+      NAME "81"
+      EXPRESSION ([pixel]>810 AND [pixel]<=840)
+      STYLE 
+          COLOR 27 27 27
+       END
+   END
+   CLASS 
+      NAME "84"
+      EXPRESSION ([pixel]>840 AND [pixel]<=870)
+      STYLE 
+          COLOR 28 28 28
+       END
+   END
+   CLASS 
+      NAME "87"
+      EXPRESSION ([pixel]>870 AND [pixel]<=900)
+      STYLE 
+          COLOR 29 29 29
+       END
+   END
+   CLASS 
+      NAME "90"
+      EXPRESSION ([pixel]>900 AND [pixel]<=930)
+      STYLE 
+          COLOR 30 30 30
+       END
+   END
+   CLASS 
+      NAME "93"
+      EXPRESSION ([pixel]>930 AND [pixel]<=960)
+      STYLE 
+          COLOR 31 31 31
+       END
+   END
+   CLASS 
+      NAME "96"
+      EXPRESSION ([pixel]>960 AND [pixel]<=990)
+      STYLE 
+          COLOR 32 32 32
+       END
+   END
+   CLASS 
+      NAME "99"
+      EXPRESSION ([pixel]>990 AND [pixel]<=1020)
+      STYLE 
+          COLOR 33 33 33
+       END
+   END
+   CLASS 
+      NAME "102"
+      EXPRESSION ([pixel]>1020 AND [pixel]<=1050)
+      STYLE 
+          COLOR 34 34 34
+       END
+   END
+   CLASS 
+      NAME "105"
+      EXPRESSION ([pixel]>1050 AND [pixel]<=1080)
+      STYLE 
+          COLOR 35 35 35
+       END
+   END
+   CLASS 
+      NAME "108"
+      EXPRESSION ([pixel]>1080 AND [pixel]<=1110)
+      STYLE 
+          COLOR 36 36 36
+       END
+   END
+   CLASS 
+      NAME "111"
+      EXPRESSION ([pixel]>1110 AND [pixel]<=1140)
+      STYLE 
+          COLOR 37 37 37
+       END
+   END
+   CLASS 
+      NAME "114"
+      EXPRESSION ([pixel]>1140 AND [pixel]<=1170)
+      STYLE 
+          COLOR 38 38 38
+       END
+   END
+   CLASS 
+      NAME "117"
+      EXPRESSION ([pixel]>1170 AND [pixel]<=1200)
+      STYLE 
+          COLOR 39 39 39
+       END
+   END
+   CLASS 
+      NAME "120"
+      EXPRESSION ([pixel]>1200 AND [pixel]<=1230)
+      STYLE 
+          COLOR 40 40 40
+       END
+   END
+   CLASS 
+      NAME "123"
+      EXPRESSION ([pixel]>1230 AND [pixel]<=1260)
+      STYLE 
+          COLOR 41 41 41
+       END
+   END
+   CLASS 
+      NAME "126"
+      EXPRESSION ([pixel]>1260 AND [pixel]<=1290)
+      STYLE 
+          COLOR 42 42 42
+       END
+   END
+   CLASS 
+      NAME "129"
+      EXPRESSION ([pixel]>1290 AND [pixel]<=1320)
+      STYLE 
+          COLOR 43 43 43
+       END
+   END
+   CLASS 
+      NAME "132"
+      EXPRESSION ([pixel]>1320 AND [pixel]<=1350)
+      STYLE 
+          COLOR 44 44 44
+       END
+   END
+   CLASS 
+      NAME "135"
+      EXPRESSION ([pixel]>1350 AND [pixel]<=1380)
+      STYLE 
+          COLOR 45 45 45
+       END
+   END
+   CLASS 
+      NAME "138"
+      EXPRESSION ([pixel]>1380 AND [pixel]<=1410)
+      STYLE 
+          COLOR 46 46 46
+       END
+   END
+   CLASS 
+      NAME "141"
+      EXPRESSION ([pixel]>1410 AND [pixel]<=1440)
+      STYLE 
+          COLOR 47 47 47
+       END
+   END
+   CLASS 
+      NAME "144"
+      EXPRESSION ([pixel]>1440 AND [pixel]<=1470)
+      STYLE 
+          COLOR 48 48 48
+       END
+   END
+   CLASS 
+      NAME "147"
+      EXPRESSION ([pixel]>1470 AND [pixel]<=1500)
+      STYLE 
+          COLOR 49 49 49
+       END
+   END
+   CLASS 
+      NAME "150"
+      EXPRESSION ([pixel]>1500 AND [pixel]<=1530)
+      STYLE 
+          COLOR 50 50 50
+       END
+   END
+   CLASS 
+      NAME "153"
+      EXPRESSION ([pixel]>1530 AND [pixel]<=1560)
+      STYLE 
+          COLOR 51 51 51
+       END
+   END
+   CLASS 
+      NAME "156"
+      EXPRESSION ([pixel]>1560 AND [pixel]<=1590)
+      STYLE 
+          COLOR 52 52 52
+       END
+   END
+   CLASS 
+      NAME "159"
+      EXPRESSION ([pixel]>1590 AND [pixel]<=1620)
+      STYLE 
+          COLOR 53 53 53
+       END
+   END
+   CLASS 
+      NAME "162"
+      EXPRESSION ([pixel]>1620 AND [pixel]<=1650)
+      STYLE 
+          COLOR 54 54 54
+       END
+   END
+   CLASS 
+      NAME "165"
+      EXPRESSION ([pixel]>1650 AND [pixel]<=1680)
+      STYLE 
+          COLOR 55 55 55
+       END
+   END
+   CLASS 
+      NAME "168"
+      EXPRESSION ([pixel]>1680 AND [pixel]<=1710)
+      STYLE 
+          COLOR 56 56 56
+       END
+   END
+   CLASS 
+      NAME "171"
+      EXPRESSION ([pixel]>1710 AND [pixel]<=1740)
+      STYLE 
+          COLOR 57 57 57
+       END
+   END
+   CLASS 
+      NAME "174"
+      EXPRESSION ([pixel]>1740 AND [pixel]<=1770)
+      STYLE 
+          COLOR 58 58 58
+       END
+   END
+   CLASS 
+      NAME "177"
+      EXPRESSION ([pixel]>1770 AND [pixel]<=1800)
+      STYLE 
+          COLOR 59 59 59
+       END
+   END
+   CLASS 
+      NAME "180"
+      EXPRESSION ([pixel]>1800 AND [pixel]<=1830)
+      STYLE 
+          COLOR 60 60 60
+       END
+   END
+   CLASS 
+      NAME "183"
+      EXPRESSION ([pixel]>1830 AND [pixel]<=1860)
+      STYLE 
+          COLOR 61 61 61
+       END
+   END
+   CLASS 
+      NAME "186"
+      EXPRESSION ([pixel]>1860 AND [pixel]<=1890)
+      STYLE 
+          COLOR 62 62 62
+       END
+   END
+   CLASS 
+      NAME "189"
+      EXPRESSION ([pixel]>1890 AND [pixel]<=1920)
+      STYLE 
+          COLOR 63 63 63
+       END
+   END
+   CLASS 
+      NAME "192"
+      EXPRESSION ([pixel]>1920 AND [pixel]<=1950)
+      STYLE 
+          COLOR 64 64 64
+       END
+   END
+   CLASS 
+      NAME "195"
+      EXPRESSION ([pixel]>1950 AND [pixel]<=1980)
+      STYLE 
+          COLOR 65 65 65
+       END
+   END
+   CLASS 
+      NAME "198"
+      EXPRESSION ([pixel]>1980 AND [pixel]<=2010)
+      STYLE 
+          COLOR 66 66 66
+       END
+   END
+   CLASS 
+      NAME "201"
+      EXPRESSION ([pixel]>2010 AND [pixel]<=2040)
+      STYLE 
+          COLOR 67 67 67
+       END
+   END
+   CLASS 
+      NAME "204"
+      EXPRESSION ([pixel]>2040 AND [pixel]<=2070)
+      STYLE 
+          COLOR 68 68 68
+       END
+   END
+   CLASS 
+      NAME "207"
+      EXPRESSION ([pixel]>2070 AND [pixel]<=2100)
+      STYLE 
+          COLOR 69 69 69
+       END
+   END
+   CLASS 
+      NAME "210"
+      EXPRESSION ([pixel]>2100 AND [pixel]<=2130)
+      STYLE 
+          COLOR 70 70 70
+       END
+   END
+   CLASS 
+      NAME "213"
+      EXPRESSION ([pixel]>2130 AND [pixel]<=2160)
+      STYLE 
+          COLOR 71 71 71
+       END
+   END
+   CLASS 
+      NAME "216"
+      EXPRESSION ([pixel]>2160 AND [pixel]<=2190)
+      STYLE 
+          COLOR 72 72 72
+       END
+   END
+   CLASS 
+      NAME "219"
+      EXPRESSION ([pixel]>2190 AND [pixel]<=2220)
+      STYLE 
+          COLOR 73 73 73
+       END
+   END
+   CLASS 
+      NAME "222"
+      EXPRESSION ([pixel]>2220 AND [pixel]<=2250)
+      STYLE 
+          COLOR 74 74 74
+       END
+   END
+   CLASS 
+      NAME "225"
+      EXPRESSION ([pixel]>2250 AND [pixel]<=2280)
+      STYLE 
+          COLOR 75 75 75
+       END
+   END
+   CLASS 
+      NAME "228"
+      EXPRESSION ([pixel]>2280 AND [pixel]<=2310)
+      STYLE 
+          COLOR 76 76 76
+       END
+   END
+   CLASS 
+      NAME "231"
+      EXPRESSION ([pixel]>2310 AND [pixel]<=2340)
+      STYLE 
+          COLOR 77 77 77
+       END
+   END
+   CLASS 
+      NAME "234"
+      EXPRESSION ([pixel]>2340 AND [pixel]<=2370)
+      STYLE 
+          COLOR 78 78 78
+       END
+   END
+   CLASS 
+      NAME "237"
+      EXPRESSION ([pixel]>2370 AND [pixel]<=2400)
+      STYLE 
+          COLOR 79 79 79
+       END
+   END
+   CLASS 
+      NAME "240"
+      EXPRESSION ([pixel]>2400 AND [pixel]<=2430)
+      STYLE 
+          COLOR 80 80 80
+       END
+   END
+   CLASS 
+      NAME "243"
+      EXPRESSION ([pixel]>2430 AND [pixel]<=2460)
+      STYLE 
+          COLOR 81 81 81
+       END
+   END
+   CLASS 
+      NAME "246"
+      EXPRESSION ([pixel]>2460 AND [pixel]<=2490)
+      STYLE 
+          COLOR 82 82 82
+       END
+   END
+   CLASS 
+      NAME "249"
+      EXPRESSION ([pixel]>2490 AND [pixel]<=2520)
+      STYLE 
+          COLOR 83 83 83
+       END
+   END
+   CLASS 
+      NAME "252"
+      EXPRESSION ([pixel]>2520 AND [pixel]<=2550)
+      STYLE 
+          COLOR 84 84 84
+       END
+   END
+   CLASS 
+      NAME "255"
+      EXPRESSION ([pixel]>2550 AND [pixel]<=2580)
+      STYLE 
+          COLOR 85 85 85
+       END
+   END
+   CLASS 
+      NAME "258"
+      EXPRESSION ([pixel]>2580 AND [pixel]<=2610)
+      STYLE 
+          COLOR 86 86 86
+       END
+   END
+   CLASS 
+      NAME "261"
+      EXPRESSION ([pixel]>2610 AND [pixel]<=2640)
+      STYLE 
+          COLOR 87 87 87
+       END
+   END
+   CLASS 
+      NAME "264"
+      EXPRESSION ([pixel]>2640 AND [pixel]<=2670)
+      STYLE 
+          COLOR 88 88 88
+       END
+   END
+   CLASS 
+      NAME "267"
+      EXPRESSION ([pixel]>2670 AND [pixel]<=2700)
+      STYLE 
+          COLOR 89 89 89
+       END
+   END
+   CLASS 
+      NAME "270"
+      EXPRESSION ([pixel]>2700 AND [pixel]<=2730)
+      STYLE 
+          COLOR 90 90 90
+       END
+   END
+   CLASS 
+      NAME "273"
+      EXPRESSION ([pixel]>2730 AND [pixel]<=2760)
+      STYLE 
+          COLOR 91 91 91
+       END
+   END
+   CLASS 
+      NAME "276"
+      EXPRESSION ([pixel]>2760 AND [pixel]<=2790)
+      STYLE 
+          COLOR 92 92 92
+       END
+   END
+   CLASS 
+      NAME "279"
+      EXPRESSION ([pixel]>2790 AND [pixel]<=2820)
+      STYLE 
+          COLOR 93 93 93
+       END
+   END
+   CLASS 
+      NAME "282"
+      EXPRESSION ([pixel]>2820 AND [pixel]<=2850)
+      STYLE 
+          COLOR 94 94 94
+       END
+   END
+   CLASS 
+      NAME "285"
+      EXPRESSION ([pixel]>2850 AND [pixel]<=2880)
+      STYLE 
+          COLOR 95 95 95
+       END
+   END
+   CLASS 
+      NAME "288"
+      EXPRESSION ([pixel]>2880 AND [pixel]<=2910)
+      STYLE 
+          COLOR 96 96 96
+       END
+   END
+   CLASS 
+      NAME "291"
+      EXPRESSION ([pixel]>2910 AND [pixel]<=2940)
+      STYLE 
+          COLOR 97 97 97
+       END
+   END
+   CLASS 
+      NAME "294"
+      EXPRESSION ([pixel]>2940 AND [pixel]<=2970)
+      STYLE 
+          COLOR 98 98 98
+       END
+   END
+   CLASS 
+      NAME "297"
+      EXPRESSION ([pixel]>2970 AND [pixel]<=3000)
+      STYLE 
+          COLOR 99 99 99
+       END
+   END
+   CLASS 
+      NAME "300"
+      EXPRESSION ([pixel]>3000 AND [pixel]<=3030)
+      STYLE 
+          COLOR 100 100 100
+       END
+   END
+   CLASS 
+      NAME "303"
+      EXPRESSION ([pixel]>3030 AND [pixel]<=3060)
+      STYLE 
+          COLOR 101 101 101
+       END
+   END
+   CLASS 
+      NAME "306"
+      EXPRESSION ([pixel]>3060 AND [pixel]<=3090)
+      STYLE 
+          COLOR 102 102 102
+       END
+   END
+   CLASS 
+      NAME "309"
+      EXPRESSION ([pixel]>3090 AND [pixel]<=3120)
+      STYLE 
+          COLOR 103 103 103
+       END
+   END
+   CLASS 
+      NAME "312"
+      EXPRESSION ([pixel]>3120 AND [pixel]<=3150)
+      STYLE 
+          COLOR 104 104 104
+       END
+   END
+   CLASS 
+      NAME "315"
+      EXPRESSION ([pixel]>3150 AND [pixel]<=3180)
+      STYLE 
+          COLOR 105 105 105
+       END
+   END
+   CLASS 
+      NAME "318"
+      EXPRESSION ([pixel]>3180 AND [pixel]<=3210)
+      STYLE 
+          COLOR 106 106 106
+       END
+   END
+   CLASS 
+      NAME "321"
+      EXPRESSION ([pixel]>3210 AND [pixel]<=3240)
+      STYLE 
+          COLOR 107 107 107
+       END
+   END
+   CLASS 
+      NAME "324"
+      EXPRESSION ([pixel]>3240 AND [pixel]<=3270)
+      STYLE 
+          COLOR 108 108 108
+       END
+   END
+   CLASS 
+      NAME "327"
+      EXPRESSION ([pixel]>3270 AND [pixel]<=3300)
+      STYLE 
+          COLOR 109 109 109
+       END
+   END
+   CLASS 
+      NAME "330"
+      EXPRESSION ([pixel]>3300 AND [pixel]<=3330)
+      STYLE 
+          COLOR 110 110 110
+       END
+   END
+   CLASS 
+      NAME "333"
+      EXPRESSION ([pixel]>3330 AND [pixel]<=3360)
+      STYLE 
+          COLOR 111 111 111
+       END
+   END
+   CLASS 
+      NAME "336"
+      EXPRESSION ([pixel]>3360 AND [pixel]<=3390)
+      STYLE 
+          COLOR 112 112 112
+       END
+   END
+   CLASS 
+      NAME "339"
+      EXPRESSION ([pixel]>3390 AND [pixel]<=3420)
+      STYLE 
+          COLOR 113 113 113
+       END
+   END
+   CLASS 
+      NAME "342"
+      EXPRESSION ([pixel]>3420 AND [pixel]<=3450)
+      STYLE 
+          COLOR 114 114 114
+       END
+   END
+   CLASS 
+      NAME "345"
+      EXPRESSION ([pixel]>3450 AND [pixel]<=3480)
+      STYLE 
+          COLOR 115 115 115
+       END
+   END
+   CLASS 
+      NAME "348"
+      EXPRESSION ([pixel]>3480 AND [pixel]<=3510)
+      STYLE 
+          COLOR 116 116 116
+       END
+   END
+   CLASS 
+      NAME "351"
+      EXPRESSION ([pixel]>3510 AND [pixel]<=3540)
+      STYLE 
+          COLOR 117 117 117
+       END
+   END
+   CLASS 
+      NAME "354"
+      EXPRESSION ([pixel]>3540 AND [pixel]<=3570)
+      STYLE 
+          COLOR 118 118 118
+       END
+   END
+   CLASS 
+      NAME "357"
+      EXPRESSION ([pixel]>3570 AND [pixel]<=3600)
+      STYLE 
+          COLOR 119 119 119
+       END
+   END
+   CLASS 
+      NAME "360"
+      EXPRESSION ([pixel]>3600 AND [pixel]<=3630)
+      STYLE 
+          COLOR 120 120 120
+       END
+   END
+   CLASS 
+      NAME "363"
+      EXPRESSION ([pixel]>3630 AND [pixel]<=3660)
+      STYLE 
+          COLOR 121 121 121
+       END
+   END
+   CLASS 
+      NAME "366"
+      EXPRESSION ([pixel]>3660 AND [pixel]<=3690)
+      STYLE 
+          COLOR 122 122 122
+       END
+   END
+   CLASS 
+      NAME "369"
+      EXPRESSION ([pixel]>3690 AND [pixel]<=3720)
+      STYLE 
+          COLOR 123 123 123
+       END
+   END
+   CLASS 
+      NAME "372"
+      EXPRESSION ([pixel]>3720 AND [pixel]<=3750)
+      STYLE 
+          COLOR 124 124 124
+       END
+   END
+   CLASS 
+      NAME "375"
+      EXPRESSION ([pixel]>3750 AND [pixel]<=3780)
+      STYLE 
+          COLOR 125 125 125
+       END
+   END
+   CLASS 
+      NAME "378"
+      EXPRESSION ([pixel]>3780 AND [pixel]<=3810)
+      STYLE 
+          COLOR 126 126 126
+       END
+   END
+   CLASS 
+      NAME "381"
+      EXPRESSION ([pixel]>3810 AND [pixel]<=3840)
+      STYLE 
+          COLOR 127 127 127
+       END
+   END
+   CLASS 
+      NAME "384"
+      EXPRESSION ([pixel]>3840 AND [pixel]<=3870)
+      STYLE 
+          COLOR 128 128 128
+       END
+   END
+   CLASS 
+      NAME "387"
+      EXPRESSION ([pixel]>3870 AND [pixel]<=3900)
+      STYLE 
+          COLOR 129 129 129
+       END
+   END
+   CLASS 
+      NAME "390"
+      EXPRESSION ([pixel]>3900 AND [pixel]<=3930)
+      STYLE 
+          COLOR 130 130 130
+       END
+   END
+   CLASS 
+      NAME "393"
+      EXPRESSION ([pixel]>3930 AND [pixel]<=3960)
+      STYLE 
+          COLOR 131 131 131
+       END
+   END
+   CLASS 
+      NAME "396"
+      EXPRESSION ([pixel]>3960 AND [pixel]<=3990)
+      STYLE 
+          COLOR 132 132 132
+       END
+   END
+   CLASS 
+      NAME "399"
+      EXPRESSION ([pixel]>3990 AND [pixel]<=4020)
+      STYLE 
+          COLOR 133 133 133
+       END
+   END
+   CLASS 
+      NAME "402"
+      EXPRESSION ([pixel]>4020 AND [pixel]<=4050)
+      STYLE 
+          COLOR 134 134 134
+       END
+   END
+   CLASS 
+      NAME "405"
+      EXPRESSION ([pixel]>4050 AND [pixel]<=4080)
+      STYLE 
+          COLOR 135 135 135
+       END
+   END
+   CLASS 
+      NAME "408"
+      EXPRESSION ([pixel]>4080 AND [pixel]<=4110)
+      STYLE 
+          COLOR 136 136 136
+       END
+   END
+   CLASS 
+      NAME "411"
+      EXPRESSION ([pixel]>4110 AND [pixel]<=4140)
+      STYLE 
+          COLOR 137 137 137
+       END
+   END
+   CLASS 
+      NAME "414"
+      EXPRESSION ([pixel]>4140 AND [pixel]<=4170)
+      STYLE 
+          COLOR 138 138 138
+       END
+   END
+   CLASS 
+      NAME "417"
+      EXPRESSION ([pixel]>4170 AND [pixel]<=4200)
+      STYLE 
+          COLOR 139 139 139
+       END
+   END
+   CLASS 
+      NAME "420"
+      EXPRESSION ([pixel]>4200 AND [pixel]<=4230)
+      STYLE 
+          COLOR 140 140 140
+       END
+   END
+   CLASS 
+      NAME "423"
+      EXPRESSION ([pixel]>4230 AND [pixel]<=4260)
+      STYLE 
+          COLOR 141 141 141
+       END
+   END
+   CLASS 
+      NAME "426"
+      EXPRESSION ([pixel]>4260 AND [pixel]<=4290)
+      STYLE 
+          COLOR 142 142 142
+       END
+   END
+   CLASS 
+      NAME "429"
+      EXPRESSION ([pixel]>4290 AND [pixel]<=4320)
+      STYLE 
+          COLOR 143 143 143
+       END
+   END
+   CLASS 
+      NAME "432"
+      EXPRESSION ([pixel]>4320 AND [pixel]<=4350)
+      STYLE 
+          COLOR 144 144 144
+       END
+   END
+   CLASS 
+      NAME "435"
+      EXPRESSION ([pixel]>4350 AND [pixel]<=4380)
+      STYLE 
+          COLOR 145 145 145
+       END
+   END
+   CLASS 
+      NAME "438"
+      EXPRESSION ([pixel]>4380 AND [pixel]<=4410)
+      STYLE 
+          COLOR 146 146 146
+       END
+   END
+   CLASS 
+      NAME "441"
+      EXPRESSION ([pixel]>4410 AND [pixel]<=4440)
+      STYLE 
+          COLOR 147 147 147
+       END
+   END
+   CLASS 
+      NAME "444"
+      EXPRESSION ([pixel]>4440 AND [pixel]<=4470)
+      STYLE 
+          COLOR 148 148 148
+       END
+   END
+   CLASS 
+      NAME "447"
+      EXPRESSION ([pixel]>4470 AND [pixel]<=4500)
+      STYLE 
+          COLOR 149 149 149
+       END
+   END
+   CLASS 
+      NAME "450"
+      EXPRESSION ([pixel]>4500 AND [pixel]<=4530)
+      STYLE 
+          COLOR 150 150 150
+       END
+   END
+   CLASS 
+      NAME "453"
+      EXPRESSION ([pixel]>4530 AND [pixel]<=4560)
+      STYLE 
+          COLOR 151 151 151
+       END
+   END
+   CLASS 
+      NAME "456"
+      EXPRESSION ([pixel]>4560 AND [pixel]<=4590)
+      STYLE 
+          COLOR 152 152 152
+       END
+   END
+   CLASS 
+      NAME "459"
+      EXPRESSION ([pixel]>4590 AND [pixel]<=4620)
+      STYLE 
+          COLOR 153 153 153
+       END
+   END
+   CLASS 
+      NAME "462"
+      EXPRESSION ([pixel]>4620 AND [pixel]<=4650)
+      STYLE 
+          COLOR 154 154 154
+       END
+   END
+   CLASS 
+      NAME "465"
+      EXPRESSION ([pixel]>4650 AND [pixel]<=4680)
+      STYLE 
+          COLOR 155 155 155
+       END
+   END
+   CLASS 
+      NAME "468"
+      EXPRESSION ([pixel]>4680 AND [pixel]<=4710)
+      STYLE 
+          COLOR 156 156 156
+       END
+   END
+   CLASS 
+      NAME "471"
+      EXPRESSION ([pixel]>4710 AND [pixel]<=4740)
+      STYLE 
+          COLOR 157 157 157
+       END
+   END
+   CLASS 
+      NAME "474"
+      EXPRESSION ([pixel]>4740 AND [pixel]<=4770)
+      STYLE 
+          COLOR 158 158 158
+       END
+   END
+   CLASS 
+      NAME "477"
+      EXPRESSION ([pixel]>4770 AND [pixel]<=4800)
+      STYLE 
+          COLOR 159 159 159
+       END
+   END
+   CLASS 
+      NAME "480"
+      EXPRESSION ([pixel]>4800 AND [pixel]<=4830)
+      STYLE 
+          COLOR 160 160 160
+       END
+   END
+   CLASS 
+      NAME "483"
+      EXPRESSION ([pixel]>4830 AND [pixel]<=4860)
+      STYLE 
+          COLOR 161 161 161
+       END
+   END
+   CLASS 
+      NAME "486"
+      EXPRESSION ([pixel]>4860 AND [pixel]<=4890)
+      STYLE 
+          COLOR 162 162 162
+       END
+   END
+   CLASS 
+      NAME "489"
+      EXPRESSION ([pixel]>4890 AND [pixel]<=4920)
+      STYLE 
+          COLOR 163 163 163
+       END
+   END
+   CLASS 
+      NAME "492"
+      EXPRESSION ([pixel]>4920 AND [pixel]<=4950)
+      STYLE 
+          COLOR 164 164 164
+       END
+   END
+   CLASS 
+      NAME "495"
+      EXPRESSION ([pixel]>4950 AND [pixel]<=4980)
+      STYLE 
+          COLOR 165 165 165
+       END
+   END
+   CLASS 
+      NAME "498"
+      EXPRESSION ([pixel]>4980 AND [pixel]<=5010)
+      STYLE 
+          COLOR 166 166 166
+       END
+   END
+   CLASS 
+      NAME "501"
+      EXPRESSION ([pixel]>5010 AND [pixel]<=5040)
+      STYLE 
+          COLOR 167 167 167
+       END
+   END
+   CLASS 
+      NAME "504"
+      EXPRESSION ([pixel]>5040 AND [pixel]<=5070)
+      STYLE 
+          COLOR 168 168 168
+       END
+   END
+   CLASS 
+      NAME "507"
+      EXPRESSION ([pixel]>5070 AND [pixel]<=5100)
+      STYLE 
+          COLOR 169 169 169
+       END
+   END
+   CLASS 
+      NAME "510"
+      EXPRESSION ([pixel]>5100 AND [pixel]<=5130)
+      STYLE 
+          COLOR 170 170 170
+       END
+   END
+   CLASS 
+      NAME "513"
+      EXPRESSION ([pixel]>5130 AND [pixel]<=5160)
+      STYLE 
+          COLOR 171 171 171
+       END
+   END
+   CLASS 
+      NAME "516"
+      EXPRESSION ([pixel]>5160 AND [pixel]<=5190)
+      STYLE 
+          COLOR 172 172 172
+       END
+   END
+   CLASS 
+      NAME "519"
+      EXPRESSION ([pixel]>5190 AND [pixel]<=5220)
+      STYLE 
+          COLOR 173 173 173
+       END
+   END
+   CLASS 
+      NAME "522"
+      EXPRESSION ([pixel]>5220 AND [pixel]<=5250)
+      STYLE 
+          COLOR 174 174 174
+       END
+   END
+   CLASS 
+      NAME "525"
+      EXPRESSION ([pixel]>5250 AND [pixel]<=5280)
+      STYLE 
+          COLOR 175 175 175
+       END
+   END
+   CLASS 
+      NAME "528"
+      EXPRESSION ([pixel]>5280 AND [pixel]<=5310)
+      STYLE 
+          COLOR 176 176 176
+       END
+   END
+   CLASS 
+      NAME "531"
+      EXPRESSION ([pixel]>5310 AND [pixel]<=5340)
+      STYLE 
+          COLOR 177 177 177
+       END
+   END
+   CLASS 
+      NAME "534"
+      EXPRESSION ([pixel]>5340 AND [pixel]<=5370)
+      STYLE 
+          COLOR 178 178 178
+       END
+   END
+   CLASS 
+      NAME "537"
+      EXPRESSION ([pixel]>5370 AND [pixel]<=5400)
+      STYLE 
+          COLOR 179 179 179
+       END
+   END
+   CLASS 
+      NAME "540"
+      EXPRESSION ([pixel]>5400 AND [pixel]<=5430)
+      STYLE 
+          COLOR 180 180 180
+       END
+   END
+   CLASS 
+      NAME "543"
+      EXPRESSION ([pixel]>5430 AND [pixel]<=5460)
+      STYLE 
+          COLOR 181 181 181
+       END
+   END
+   CLASS 
+      NAME "546"
+      EXPRESSION ([pixel]>5460 AND [pixel]<=5490)
+      STYLE 
+          COLOR 182 182 182
+       END
+   END
+   CLASS 
+      NAME "549"
+      EXPRESSION ([pixel]>5490 AND [pixel]<=5520)
+      STYLE 
+          COLOR 183 183 183
+       END
+   END
+   CLASS 
+      NAME "552"
+      EXPRESSION ([pixel]>5520 AND [pixel]<=5550)
+      STYLE 
+          COLOR 184 184 184
+       END
+   END
+   CLASS 
+      NAME "555"
+      EXPRESSION ([pixel]>5550 AND [pixel]<=5580)
+      STYLE 
+          COLOR 185 185 185
+       END
+   END
+   CLASS 
+      NAME "558"
+      EXPRESSION ([pixel]>5580 AND [pixel]<=5610)
+      STYLE 
+          COLOR 186 186 186
+       END
+   END
+   CLASS 
+      NAME "561"
+      EXPRESSION ([pixel]>5610 AND [pixel]<=5640)
+      STYLE 
+          COLOR 187 187 187
+       END
+   END
+   CLASS 
+      NAME "564"
+      EXPRESSION ([pixel]>5640 AND [pixel]<=5670)
+      STYLE 
+          COLOR 188 188 188
+       END
+   END
+   CLASS 
+      NAME "567"
+      EXPRESSION ([pixel]>5670 AND [pixel]<=5700)
+      STYLE 
+          COLOR 189 189 189
+       END
+   END
+   CLASS 
+      NAME "570"
+      EXPRESSION ([pixel]>5700 AND [pixel]<=5730)
+      STYLE 
+          COLOR 190 190 190
+       END
+   END
+   CLASS 
+      NAME "573"
+      EXPRESSION ([pixel]>5730 AND [pixel]<=5760)
+      STYLE 
+          COLOR 191 191 191
+       END
+   END
+   CLASS 
+      NAME "576"
+      EXPRESSION ([pixel]>5760 AND [pixel]<=5790)
+      STYLE 
+          COLOR 192 192 192
+       END
+   END
+   CLASS 
+      NAME "579"
+      EXPRESSION ([pixel]>5790 AND [pixel]<=5820)
+      STYLE 
+          COLOR 193 193 193
+       END
+   END
+   CLASS 
+      NAME "582"
+      EXPRESSION ([pixel]>5820 AND [pixel]<=5850)
+      STYLE 
+          COLOR 194 194 194
+       END
+   END
+   CLASS 
+      NAME "585"
+      EXPRESSION ([pixel]>5850 AND [pixel]<=5880)
+      STYLE 
+          COLOR 195 195 195
+       END
+   END
+   CLASS 
+      NAME "588"
+      EXPRESSION ([pixel]>5880 AND [pixel]<=5910)
+      STYLE 
+          COLOR 196 196 196
+       END
+   END
+   CLASS 
+      NAME "591"
+      EXPRESSION ([pixel]>5910 AND [pixel]<=5940)
+      STYLE 
+          COLOR 197 197 197
+       END
+   END
+   CLASS 
+      NAME "594"
+      EXPRESSION ([pixel]>5940 AND [pixel]<=5970)
+      STYLE 
+          COLOR 198 198 198
+       END
+   END
+   CLASS 
+      NAME "597"
+      EXPRESSION ([pixel]>5970 AND [pixel]<=6000)
+      STYLE 
+          COLOR 199 199 199
+       END
+   END
+   CLASS 
+      NAME "600"
+      EXPRESSION ([pixel]>6000 AND [pixel]<=6030)
+      STYLE 
+          COLOR 200 200 200
+       END
+   END
+   CLASS 
+      NAME "603"
+      EXPRESSION ([pixel]>6030 AND [pixel]<=6060)
+      STYLE 
+          COLOR 201 201 201
+       END
+   END
+   CLASS 
+      NAME "606"
+      EXPRESSION ([pixel]>6060 AND [pixel]<=6090)
+      STYLE 
+          COLOR 202 202 202
+       END
+   END
+   CLASS 
+      NAME "609"
+      EXPRESSION ([pixel]>6090 AND [pixel]<=6120)
+      STYLE 
+          COLOR 203 203 203
+       END
+   END
+   CLASS 
+      NAME "612"
+      EXPRESSION ([pixel]>6120 AND [pixel]<=6150)
+      STYLE 
+          COLOR 204 204 204
+       END
+   END
+   CLASS 
+      NAME "615"
+      EXPRESSION ([pixel]>6150 AND [pixel]<=6180)
+      STYLE 
+          COLOR 205 205 205
+       END
+   END
+   CLASS 
+      NAME "618"
+      EXPRESSION ([pixel]>6180 AND [pixel]<=6210)
+      STYLE 
+          COLOR 206 206 206
+       END
+   END
+   CLASS 
+      NAME "621"
+      EXPRESSION ([pixel]>6210 AND [pixel]<=6240)
+      STYLE 
+          COLOR 207 207 207
+       END
+   END
+   CLASS 
+      NAME "624"
+      EXPRESSION ([pixel]>6240 AND [pixel]<=6270)
+      STYLE 
+          COLOR 208 208 208
+       END
+   END
+   CLASS 
+      NAME "627"
+      EXPRESSION ([pixel]>6270 AND [pixel]<=6300)
+      STYLE 
+          COLOR 209 209 209
+       END
+   END
+   CLASS 
+      NAME "630"
+      EXPRESSION ([pixel]>6300 AND [pixel]<=6330)
+      STYLE 
+          COLOR 210 210 210
+       END
+   END
+   CLASS 
+      NAME "633"
+      EXPRESSION ([pixel]>6330 AND [pixel]<=6360)
+      STYLE 
+          COLOR 211 211 211
+       END
+   END
+   CLASS 
+      NAME "636"
+      EXPRESSION ([pixel]>6360 AND [pixel]<=6390)
+      STYLE 
+          COLOR 212 212 212
+       END
+   END
+   CLASS 
+      NAME "639"
+      EXPRESSION ([pixel]>6390 AND [pixel]<=6420)
+      STYLE 
+          COLOR 213 213 213
+       END
+   END
+   CLASS 
+      NAME "642"
+      EXPRESSION ([pixel]>6420 AND [pixel]<=6450)
+      STYLE 
+          COLOR 214 214 214
+       END
+   END
+   CLASS 
+      NAME "645"
+      EXPRESSION ([pixel]>6450 AND [pixel]<=6480)
+      STYLE 
+          COLOR 215 215 215
+       END
+   END
+   CLASS 
+      NAME "648"
+      EXPRESSION ([pixel]>6480 AND [pixel]<=6510)
+      STYLE 
+          COLOR 216 216 216
+       END
+   END
+   CLASS 
+      NAME "651"
+      EXPRESSION ([pixel]>6510 AND [pixel]<=6540)
+      STYLE 
+          COLOR 217 217 217
+       END
+   END
+   CLASS 
+      NAME "654"
+      EXPRESSION ([pixel]>6540 AND [pixel]<=6570)
+      STYLE 
+          COLOR 218 218 218
+       END
+   END
+   CLASS 
+      NAME "657"
+      EXPRESSION ([pixel]>6570 AND [pixel]<=6600)
+      STYLE 
+          COLOR 219 219 219
+       END
+   END
+   CLASS 
+      NAME "660"
+      EXPRESSION ([pixel]>6600 AND [pixel]<=6630)
+      STYLE 
+          COLOR 220 220 220
+       END
+   END
+   CLASS 
+      NAME "663"
+      EXPRESSION ([pixel]>6630 AND [pixel]<=6660)
+      STYLE 
+          COLOR 221 221 221
+       END
+   END
+   CLASS 
+      NAME "666"
+      EXPRESSION ([pixel]>6660 AND [pixel]<=6690)
+      STYLE 
+          COLOR 222 222 222
+       END
+   END
+   CLASS 
+      NAME "669"
+      EXPRESSION ([pixel]>6690 AND [pixel]<=6720)
+      STYLE 
+          COLOR 223 223 223
+       END
+   END
+   CLASS 
+      NAME "672"
+      EXPRESSION ([pixel]>6720 AND [pixel]<=6750)
+      STYLE 
+          COLOR 224 224 224
+       END
+   END
+   CLASS 
+      NAME "675"
+      EXPRESSION ([pixel]>6750 AND [pixel]<=6780)
+      STYLE 
+          COLOR 225 225 225
+       END
+   END
+   CLASS 
+      NAME "678"
+      EXPRESSION ([pixel]>6780 AND [pixel]<=6810)
+      STYLE 
+          COLOR 226 226 226
+       END
+   END
+   CLASS 
+      NAME "681"
+      EXPRESSION ([pixel]>6810 AND [pixel]<=6840)
+      STYLE 
+          COLOR 227 227 227
+       END
+   END
+   CLASS 
+      NAME "684"
+      EXPRESSION ([pixel]>6840 AND [pixel]<=6870)
+      STYLE 
+          COLOR 228 228 228
+       END
+   END
+   CLASS 
+      NAME "687"
+      EXPRESSION ([pixel]>6870 AND [pixel]<=6900)
+      STYLE 
+          COLOR 229 229 229
+       END
+   END
+   CLASS 
+      NAME "690"
+      EXPRESSION ([pixel]>6900 AND [pixel]<=6930)
+      STYLE 
+          COLOR 230 230 230
+       END
+   END
+   CLASS 
+      NAME "693"
+      EXPRESSION ([pixel]>6930 AND [pixel]<=6960)
+      STYLE 
+          COLOR 231 231 231
+       END
+   END
+   CLASS 
+      NAME "696"
+      EXPRESSION ([pixel]>6960 AND [pixel]<=6990)
+      STYLE 
+          COLOR 232 232 232
+       END
+   END
+   CLASS 
+      NAME "699"
+      EXPRESSION ([pixel]>6990)
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+	OFFSITE 0 0 0
+
+ METADATA
+      "wms_title"           "Relief (modèle numérique de terrain)"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+LAYER
+  NAME "pente"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+   DATA "slope.tif" 
+   PROCESSING "BANDS=1" 
+   CLASSITEM "[pixel]" 
+ CLASS 
+      NAME "0"
+      EXPRESSION "0"
+      STYLE 
+          COLOR 0 0 0
+       END
+   END
+   CLASS 
+      NAME "1"
+      EXPRESSION "1"
+      STYLE 
+          COLOR 0 0 0
+       END
+   END
+   CLASS 
+      NAME "2"
+      EXPRESSION "2"
+      STYLE 
+          COLOR 0 0 0
+       END
+   END
+   CLASS 
+      NAME "3"
+      EXPRESSION "3"
+      STYLE 
+          COLOR 0 0 0
+       END
+   END
+   CLASS 
+      NAME "4"
+      EXPRESSION "4"
+      STYLE 
+          COLOR 6 6 6
+       END
+   END
+   CLASS 
+      NAME "5"
+      EXPRESSION "5"
+      STYLE 
+          COLOR 12 12 12
+       END
+   END
+   CLASS 
+      NAME "6"
+      EXPRESSION "6"
+      STYLE 
+          COLOR 18 18 18
+       END
+   END
+   CLASS 
+      NAME "7"
+      EXPRESSION "7"
+      STYLE 
+          COLOR 24 24 24
+       END
+   END
+   CLASS 
+      NAME "8"
+      EXPRESSION "8"
+      STYLE 
+          COLOR 30 30 30
+       END
+   END
+   CLASS 
+      NAME "9"
+      EXPRESSION "9"
+      STYLE 
+          COLOR 36 36 36
+       END
+   END
+   CLASS 
+      NAME "10"
+      EXPRESSION "10"
+      STYLE 
+          COLOR 42 42 42
+       END
+   END
+   CLASS 
+      NAME "11"
+      EXPRESSION "11"
+      STYLE 
+          COLOR 48 48 48
+       END
+   END
+   CLASS 
+      NAME "12"
+      EXPRESSION "12"
+      STYLE 
+          COLOR 54 54 54
+       END
+   END
+   CLASS 
+      NAME "13"
+      EXPRESSION "13"
+      STYLE 
+          COLOR 60 60 60
+       END
+   END
+   CLASS 
+      NAME "14"
+      EXPRESSION "14"
+      STYLE 
+          COLOR 66 66 66
+       END
+   END
+   CLASS 
+      NAME "15"
+      EXPRESSION "15"
+      STYLE 
+          COLOR 72 72 72
+       END
+   END
+   CLASS 
+      NAME "16"
+      EXPRESSION "16"
+      STYLE 
+          COLOR 78 78 78
+       END
+   END
+   CLASS 
+      NAME "17"
+      EXPRESSION "17"
+      STYLE 
+          COLOR 84 84 84
+       END
+   END
+   CLASS 
+      NAME "18"
+      EXPRESSION "18"
+      STYLE 
+          COLOR 90 90 90
+       END
+   END
+   CLASS 
+      NAME "19"
+      EXPRESSION "19"
+      STYLE 
+          COLOR 96 96 96
+       END
+   END
+   CLASS 
+      NAME "20"
+      EXPRESSION "20"
+      STYLE 
+          COLOR 102 102 102
+       END
+   END
+   CLASS 
+      NAME "21"
+      EXPRESSION "21"
+      STYLE 
+          COLOR 108 108 108
+       END
+   END
+   CLASS 
+      NAME "22"
+      EXPRESSION "22"
+      STYLE 
+          COLOR 114 114 114
+       END
+   END
+   CLASS 
+      NAME "23"
+      EXPRESSION "23"
+      STYLE 
+          COLOR 120 120 120
+       END
+   END
+   CLASS 
+      NAME "24"
+      EXPRESSION "24"
+      STYLE 
+          COLOR 126 126 126
+       END
+   END
+   CLASS 
+      NAME "25"
+      EXPRESSION "25"
+      STYLE 
+          COLOR 132 132 132
+       END
+   END
+   CLASS 
+      NAME "26"
+      EXPRESSION "26"
+      STYLE 
+          COLOR 138 138 138
+       END
+   END
+   CLASS 
+      NAME "27"
+      EXPRESSION "27"
+      STYLE 
+          COLOR 144 144 144
+       END
+   END
+   CLASS 
+      NAME "28"
+      EXPRESSION "28"
+      STYLE 
+          COLOR 150 150 150
+       END
+   END
+   CLASS 
+      NAME "29"
+      EXPRESSION "29"
+      STYLE 
+          COLOR 156 156 156
+       END
+   END
+   CLASS 
+      NAME "30"
+      EXPRESSION "30"
+      STYLE 
+          COLOR 162 162 162
+       END
+   END
+   CLASS 
+      NAME "31"
+      EXPRESSION "31"
+      STYLE 
+          COLOR 168 168 168
+       END
+   END
+   CLASS 
+      NAME "32"
+      EXPRESSION "32"
+      STYLE 
+          COLOR 174 174 174
+       END
+   END
+   CLASS 
+      NAME "33"
+      EXPRESSION "33"
+      STYLE 
+          COLOR 180 180 180
+       END
+   END
+   CLASS 
+      NAME "34"
+      EXPRESSION "34"
+      STYLE 
+          COLOR 186 186 186
+       END
+   END
+   CLASS 
+      NAME "35"
+      EXPRESSION "35"
+      STYLE 
+          COLOR 192 192 192
+       END
+   END
+   CLASS 
+      NAME "36"
+      EXPRESSION "36"
+      STYLE 
+          COLOR 198 198 198
+       END
+   END
+   CLASS 
+      NAME "37"
+      EXPRESSION "37"
+      STYLE 
+          COLOR 204 204 204
+       END
+   END
+   CLASS 
+      NAME "38"
+      EXPRESSION "38"
+      STYLE 
+          COLOR 210 210 210
+       END
+   END
+   CLASS 
+      NAME "39"
+      EXPRESSION "39"
+      STYLE 
+          COLOR 216 216 216
+       END
+   END
+   CLASS 
+      NAME "40"
+      EXPRESSION "40"
+      STYLE 
+          COLOR 222 222 222
+       END
+   END
+   CLASS 
+      NAME "41"
+      EXPRESSION "41"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "42"
+      EXPRESSION "42"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "43"
+      EXPRESSION "43"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "44"
+      EXPRESSION "44"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "45"
+      EXPRESSION "45"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "46"
+      EXPRESSION "46"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "47"
+      EXPRESSION "47"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "48"
+      EXPRESSION "48"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "49"
+      EXPRESSION "49"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "50"
+      EXPRESSION "50"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "51"
+      EXPRESSION "51"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "52"
+      EXPRESSION "52"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "53"
+      EXPRESSION "53"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "54"
+      EXPRESSION "54"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "55"
+      EXPRESSION "55"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "56"
+      EXPRESSION "56"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "57"
+      EXPRESSION "57"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "58"
+      EXPRESSION "58"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "59"
+      EXPRESSION "59"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "60"
+      EXPRESSION "60"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "61"
+      EXPRESSION "61"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "62"
+      EXPRESSION "62"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "63"
+      EXPRESSION "63"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "64"
+      EXPRESSION "64"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "65"
+      EXPRESSION "65"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "66"
+      EXPRESSION "66"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "67"
+      EXPRESSION "67"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "68"
+      EXPRESSION "68"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "69"
+      EXPRESSION "69"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "70"
+      EXPRESSION "70"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "71"
+      EXPRESSION "71"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "72"
+      EXPRESSION "72"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "73"
+      EXPRESSION "73"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "74"
+      EXPRESSION "74"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "75"
+      EXPRESSION "75"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "76"
+      EXPRESSION "76"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "77"
+      EXPRESSION "77"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "78"
+      EXPRESSION "78"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "79"
+      EXPRESSION "79"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "80"
+      EXPRESSION "80"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "81"
+      EXPRESSION "81"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "82"
+      EXPRESSION "82"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "83"
+      EXPRESSION "83"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "84"
+      EXPRESSION "84"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "85"
+      EXPRESSION "85"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "86"
+      EXPRESSION "86"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "87"
+      EXPRESSION "87"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "88"
+      EXPRESSION "88"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "89"
+      EXPRESSION "89"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "90"
+      EXPRESSION "90"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "91"
+      EXPRESSION "91"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "92"
+      EXPRESSION "92"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "93"
+      EXPRESSION "93"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "94"
+      EXPRESSION "94"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "95"
+      EXPRESSION "95"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "96"
+      EXPRESSION "96"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "97"
+      EXPRESSION "97"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "98"
+      EXPRESSION "98"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "99"
+      EXPRESSION "99"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+   CLASS 
+      NAME "100"
+      EXPRESSION "100"
+      STYLE 
+          COLOR 233 233 233
+       END
+   END
+ METADATA
+      "wms_title"           "Pente (pourcent)"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+LAYER
+  NAME "COMPO1"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+   DATA "compo_1_AU.tif" 
+   PROCESSING "BANDS=1" 
+   CLASSITEM "[pixel]" 
+   CLASS 
+      NAME "0"
+      EXPRESSION "0"
+      STYLE 
+          COLOR 68 1 84
+       END
+   END
+   CLASS 
+      NAME "1"
+      EXPRESSION "1"
+      STYLE 
+          COLOR 68 1 84
+       END
+   END
+   CLASS 
+      NAME "2"
+      EXPRESSION "2"
+      STYLE 
+          COLOR 68 1 84
+       END
+   END
+   CLASS 
+      NAME "3"
+      EXPRESSION "3"
+      STYLE 
+          COLOR 70 12 95
+       END
+   END
+   CLASS 
+      NAME "4"
+      EXPRESSION "4"
+      STYLE 
+          COLOR 70 12 95
+       END
+   END
+   CLASS 
+      NAME "5"
+      EXPRESSION "5"
+      STYLE 
+          COLOR 70 12 95
+       END
+   END
+   CLASS 
+      NAME "6"
+      EXPRESSION "6"
+      STYLE 
+          COLOR 72 23 105
+       END
+   END
+   CLASS 
+      NAME "7"
+      EXPRESSION "7"
+      STYLE 
+          COLOR 72 23 105
+       END
+   END
+   CLASS 
+      NAME "8"
+      EXPRESSION "8"
+      STYLE 
+          COLOR 72 23 105
+       END
+   END
+   CLASS 
+      NAME "9"
+      EXPRESSION "9"
+      STYLE 
+          COLOR 72 32 114
+       END
+   END
+   CLASS 
+      NAME "10"
+      EXPRESSION "10"
+      STYLE 
+          COLOR 72 32 114
+       END
+   END
+   CLASS 
+      NAME "11"
+      EXPRESSION "11"
+      STYLE 
+          COLOR 72 32 114
+       END
+   END
+   CLASS 
+      NAME "12"
+      EXPRESSION "12"
+      STYLE 
+          COLOR 71 42 122
+       END
+   END
+   CLASS 
+      NAME "13"
+      EXPRESSION "13"
+      STYLE 
+          COLOR 71 42 122
+       END
+   END
+   CLASS 
+      NAME "14"
+      EXPRESSION "14"
+      STYLE 
+          COLOR 71 42 122
+       END
+   END
+   CLASS 
+      NAME "15"
+      EXPRESSION "15"
+      STYLE 
+          COLOR 69 51 127
+       END
+   END
+   CLASS 
+      NAME "16"
+      EXPRESSION "16"
+      STYLE 
+          COLOR 69 51 127
+       END
+   END
+   CLASS 
+      NAME "17"
+      EXPRESSION "17"
+      STYLE 
+          COLOR 69 51 127
+       END
+   END
+   CLASS 
+      NAME "18"
+      EXPRESSION "18"
+      STYLE 
+          COLOR 67 61 132
+       END
+   END
+   CLASS 
+      NAME "19"
+      EXPRESSION "19"
+      STYLE 
+          COLOR 67 61 132
+       END
+   END
+   CLASS 
+      NAME "20"
+      EXPRESSION "20"
+      STYLE 
+          COLOR 67 61 132
+       END
+   END
+   CLASS 
+      NAME "21"
+      EXPRESSION "21"
+      STYLE 
+          COLOR 64 69 136
+       END
+   END
+   CLASS 
+      NAME "22"
+      EXPRESSION "22"
+      STYLE 
+          COLOR 64 69 136
+       END
+   END
+   CLASS 
+      NAME "23"
+      EXPRESSION "23"
+      STYLE 
+          COLOR 64 69 136
+       END
+   END
+   CLASS 
+      NAME "24"
+      EXPRESSION "24"
+      STYLE 
+          COLOR 61 78 138
+       END
+   END
+   CLASS 
+      NAME "25"
+      EXPRESSION "25"
+      STYLE 
+          COLOR 61 78 138
+       END
+   END
+   CLASS 
+      NAME "26"
+      EXPRESSION "26"
+      STYLE 
+          COLOR 61 78 138
+       END
+   END
+   CLASS 
+      NAME "27"
+      EXPRESSION "27"
+      STYLE 
+          COLOR 57 86 140
+       END
+   END
+   CLASS 
+      NAME "28"
+      EXPRESSION "28"
+      STYLE 
+          COLOR 57 86 140
+       END
+   END
+   CLASS 
+      NAME "29"
+      EXPRESSION "29"
+      STYLE 
+          COLOR 57 86 140
+       END
+   END
+   CLASS 
+      NAME "30"
+      EXPRESSION "30"
+      STYLE 
+          COLOR 53 94 141
+       END
+   END
+   CLASS 
+      NAME "31"
+      EXPRESSION "31"
+      STYLE 
+          COLOR 53 94 141
+       END
+   END
+   CLASS 
+      NAME "32"
+      EXPRESSION "32"
+      STYLE 
+          COLOR 53 94 141
+       END
+   END
+   CLASS 
+      NAME "33"
+      EXPRESSION "33"
+      STYLE 
+          COLOR 50 101 142
+       END
+   END
+   CLASS 
+      NAME "34"
+      EXPRESSION "34"
+      STYLE 
+          COLOR 50 101 142
+       END
+   END
+   CLASS 
+      NAME "35"
+      EXPRESSION "35"
+      STYLE 
+          COLOR 50 101 142
+       END
+   END
+   CLASS 
+      NAME "36"
+      EXPRESSION "36"
+      STYLE 
+          COLOR 46 109 142
+       END
+   END
+   CLASS 
+      NAME "37"
+      EXPRESSION "37"
+      STYLE 
+          COLOR 46 109 142
+       END
+   END
+   CLASS 
+      NAME "38"
+      EXPRESSION "38"
+      STYLE 
+          COLOR 46 109 142
+       END
+   END
+   CLASS 
+      NAME "39"
+      EXPRESSION "39"
+      STYLE 
+          COLOR 43 115 142
+       END
+   END
+   CLASS 
+      NAME "40"
+      EXPRESSION "40"
+      STYLE 
+          COLOR 43 115 142
+       END
+   END
+   CLASS 
+      NAME "41"
+      EXPRESSION "41"
+      STYLE 
+          COLOR 43 115 142
+       END
+   END
+   CLASS 
+      NAME "42"
+      EXPRESSION "42"
+      STYLE 
+          COLOR 41 123 142
+       END
+   END
+   CLASS 
+      NAME "43"
+      EXPRESSION "43"
+      STYLE 
+          COLOR 41 123 142
+       END
+   END
+   CLASS 
+      NAME "44"
+      EXPRESSION "44"
+      STYLE 
+          COLOR 41 123 142
+       END
+   END
+   CLASS 
+      NAME "45"
+      EXPRESSION "45"
+      STYLE 
+          COLOR 38 130 142
+       END
+   END
+   CLASS 
+      NAME "46"
+      EXPRESSION "46"
+      STYLE 
+          COLOR 38 130 142
+       END
+   END
+   CLASS 
+      NAME "47"
+      EXPRESSION "47"
+      STYLE 
+          COLOR 38 130 142
+       END
+   END
+   CLASS 
+      NAME "48"
+      EXPRESSION "48"
+      STYLE 
+          COLOR 35 137 142
+       END
+   END
+   CLASS 
+      NAME "49"
+      EXPRESSION "49"
+      STYLE 
+          COLOR 35 137 142
+       END
+   END
+   CLASS 
+      NAME "50"
+      EXPRESSION "50"
+      STYLE 
+          COLOR 35 137 142
+       END
+   END
+   CLASS 
+      NAME "51"
+      EXPRESSION "51"
+      STYLE 
+          COLOR 32 144 141
+       END
+   END
+   CLASS 
+      NAME "52"
+      EXPRESSION "52"
+      STYLE 
+          COLOR 32 144 141
+       END
+   END
+   CLASS 
+      NAME "53"
+      EXPRESSION "53"
+      STYLE 
+          COLOR 32 144 141
+       END
+   END
+   CLASS 
+      NAME "54"
+      EXPRESSION "54"
+      STYLE 
+          COLOR 31 151 139
+       END
+   END
+   CLASS 
+      NAME "55"
+      EXPRESSION "55"
+      STYLE 
+          COLOR 31 151 139
+       END
+   END
+   CLASS 
+      NAME "56"
+      EXPRESSION "56"
+      STYLE 
+          COLOR 31 151 139
+       END
+   END
+   CLASS 
+      NAME "57"
+      EXPRESSION "57"
+      STYLE 
+          COLOR 30 159 137
+       END
+   END
+   CLASS 
+      NAME "58"
+      EXPRESSION "58"
+      STYLE 
+          COLOR 30 159 137
+       END
+   END
+   CLASS 
+      NAME "59"
+      EXPRESSION "59"
+      STYLE 
+          COLOR 30 159 137
+       END
+   END
+   CLASS 
+      NAME "60"
+      EXPRESSION "60"
+      STYLE 
+          COLOR 33 165 133
+       END
+   END
+   CLASS 
+      NAME "61"
+      EXPRESSION "61"
+      STYLE 
+          COLOR 33 165 133
+       END
+   END
+   CLASS 
+      NAME "62"
+      EXPRESSION "62"
+      STYLE 
+          COLOR 33 165 133
+       END
+   END
+   CLASS 
+      NAME "63"
+      EXPRESSION "63"
+      STYLE 
+          COLOR 38 172 130
+       END
+   END
+   CLASS 
+      NAME "64"
+      EXPRESSION "64"
+      STYLE 
+          COLOR 38 172 130
+       END
+   END
+   CLASS 
+      NAME "65"
+      EXPRESSION "65"
+      STYLE 
+          COLOR 38 172 130
+       END
+   END
+   CLASS 
+      NAME "66"
+      EXPRESSION "66"
+      STYLE 
+          COLOR 46 179 124
+       END
+   END
+   CLASS 
+      NAME "67"
+      EXPRESSION "67"
+      STYLE 
+          COLOR 46 179 124
+       END
+   END
+   CLASS 
+      NAME "68"
+      EXPRESSION "68"
+      STYLE 
+          COLOR 46 179 124
+       END
+   END
+   CLASS 
+      NAME "69"
+      EXPRESSION "69"
+      STYLE 
+          COLOR 57 186 118
+       END
+   END
+   CLASS 
+      NAME "70"
+      EXPRESSION "70"
+      STYLE 
+          COLOR 57 186 118
+       END
+   END
+   CLASS 
+      NAME "71"
+      EXPRESSION "71"
+      STYLE 
+          COLOR 57 186 118
+       END
+   END
+   CLASS 
+      NAME "72"
+      EXPRESSION "72"
+      STYLE 
+          COLOR 70 192 111
+       END
+   END
+   CLASS 
+      NAME "73"
+      EXPRESSION "73"
+      STYLE 
+          COLOR 70 192 111
+       END
+   END
+   CLASS 
+      NAME "74"
+      EXPRESSION "74"
+      STYLE 
+          COLOR 70 192 111
+       END
+   END
+   CLASS 
+      NAME "75"
+      EXPRESSION "75"
+      STYLE 
+          COLOR 85 198 103
+       END
+   END
+   CLASS 
+      NAME "76"
+      EXPRESSION "76"
+      STYLE 
+          COLOR 85 198 103
+       END
+   END
+   CLASS 
+      NAME "77"
+      EXPRESSION "77"
+      STYLE 
+          COLOR 85 198 103
+       END
+   END
+   CLASS 
+      NAME "78"
+      EXPRESSION "78"
+      STYLE 
+          COLOR 101 203 94
+       END
+   END
+   CLASS 
+      NAME "79"
+      EXPRESSION "79"
+      STYLE 
+          COLOR 101 203 94
+       END
+   END
+   CLASS 
+      NAME "80"
+      EXPRESSION "80"
+      STYLE 
+          COLOR 101 203 94
+       END
+   END
+   CLASS 
+      NAME "81"
+      EXPRESSION "81"
+      STYLE 
+          COLOR 118 209 83
+       END
+   END
+   CLASS 
+      NAME "82"
+      EXPRESSION "82"
+      STYLE 
+          COLOR 118 209 83
+       END
+   END
+   CLASS 
+      NAME "83"
+      EXPRESSION "83"
+      STYLE 
+          COLOR 118 209 83
+       END
+   END
+   CLASS 
+      NAME "84"
+      EXPRESSION "84"
+      STYLE 
+          COLOR 137 213 72
+       END
+   END
+   CLASS 
+      NAME "85"
+      EXPRESSION "85"
+      STYLE 
+          COLOR 137 213 72
+       END
+   END
+   CLASS 
+      NAME "86"
+      EXPRESSION "86"
+      STYLE 
+          COLOR 137 213 72
+       END
+   END
+   CLASS 
+      NAME "87"
+      EXPRESSION "87"
+      STYLE 
+          COLOR 156 217 59
+       END
+   END
+   CLASS 
+      NAME "88"
+      EXPRESSION "88"
+      STYLE 
+          COLOR 156 217 59
+       END
+   END
+   CLASS 
+      NAME "89"
+      EXPRESSION "89"
+      STYLE 
+          COLOR 156 217 59
+       END
+   END
+   CLASS 
+      NAME "90"
+      EXPRESSION "90"
+      STYLE 
+          COLOR 176 221 47
+       END
+   END
+   CLASS 
+      NAME "91"
+      EXPRESSION "91"
+      STYLE 
+          COLOR 176 221 47
+       END
+   END
+   CLASS 
+      NAME "92"
+      EXPRESSION "92"
+      STYLE 
+          COLOR 176 221 47
+       END
+   END
+   CLASS 
+      NAME "93"
+      EXPRESSION "93"
+      STYLE 
+          COLOR 196 224 34
+       END
+   END
+   CLASS 
+      NAME "94"
+      EXPRESSION "94"
+      STYLE 
+          COLOR 196 224 34
+       END
+   END
+   CLASS 
+      NAME "95"
+      EXPRESSION "95"
+      STYLE 
+          COLOR 196 224 34
+       END
+   END
+   CLASS 
+      NAME "96"
+      EXPRESSION "96"
+      STYLE 
+          COLOR 216 226 25
+       END
+   END
+   CLASS 
+      NAME "97"
+      EXPRESSION "97"
+      STYLE 
+          COLOR 216 226 25
+       END
+   END
+   CLASS 
+      NAME "98"
+      EXPRESSION "98"
+      STYLE 
+          COLOR 216 226 25
+       END
+   END
+   CLASS 
+      NAME "99"
+      EXPRESSION "99"
+      STYLE 
+          COLOR 235 229 27
+       END
+   END
+   CLASS 
+      NAME "100"
+      EXPRESSION "100"
+      STYLE 
+          COLOR 235 229 27
+       END
+   END
+ METADATA
+      "wms_title"           "Autre essence"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+LAYER
+  NAME "COMPO2"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+   DATA "compo_2_BO.tif" 
+   PROCESSING "BANDS=1" 
+   CLASSITEM "[pixel]" 
+   CLASS 
+      NAME "0"
+      EXPRESSION "0"
+      STYLE 
+          COLOR 68 1 84
+       END
+   END
+   CLASS 
+      NAME "1"
+      EXPRESSION "1"
+      STYLE 
+          COLOR 68 1 84
+       END
+   END
+   CLASS 
+      NAME "2"
+      EXPRESSION "2"
+      STYLE 
+          COLOR 68 1 84
+       END
+   END
+   CLASS 
+      NAME "3"
+      EXPRESSION "3"
+      STYLE 
+          COLOR 70 12 95
+       END
+   END
+   CLASS 
+      NAME "4"
+      EXPRESSION "4"
+      STYLE 
+          COLOR 70 12 95
+       END
+   END
+   CLASS 
+      NAME "5"
+      EXPRESSION "5"
+      STYLE 
+          COLOR 70 12 95
+       END
+   END
+   CLASS 
+      NAME "6"
+      EXPRESSION "6"
+      STYLE 
+          COLOR 72 23 105
+       END
+   END
+   CLASS 
+      NAME "7"
+      EXPRESSION "7"
+      STYLE 
+          COLOR 72 23 105
+       END
+   END
+   CLASS 
+      NAME "8"
+      EXPRESSION "8"
+      STYLE 
+          COLOR 72 23 105
+       END
+   END
+   CLASS 
+      NAME "9"
+      EXPRESSION "9"
+      STYLE 
+          COLOR 72 32 114
+       END
+   END
+   CLASS 
+      NAME "10"
+      EXPRESSION "10"
+      STYLE 
+          COLOR 72 32 114
+       END
+   END
+   CLASS 
+      NAME "11"
+      EXPRESSION "11"
+      STYLE 
+          COLOR 72 32 114
+       END
+   END
+   CLASS 
+      NAME "12"
+      EXPRESSION "12"
+      STYLE 
+          COLOR 71 42 122
+       END
+   END
+   CLASS 
+      NAME "13"
+      EXPRESSION "13"
+      STYLE 
+          COLOR 71 42 122
+       END
+   END
+   CLASS 
+      NAME "14"
+      EXPRESSION "14"
+      STYLE 
+          COLOR 71 42 122
+       END
+   END
+   CLASS 
+      NAME "15"
+      EXPRESSION "15"
+      STYLE 
+          COLOR 69 51 127
+       END
+   END
+   CLASS 
+      NAME "16"
+      EXPRESSION "16"
+      STYLE 
+          COLOR 69 51 127
+       END
+   END
+   CLASS 
+      NAME "17"
+      EXPRESSION "17"
+      STYLE 
+          COLOR 69 51 127
+       END
+   END
+   CLASS 
+      NAME "18"
+      EXPRESSION "18"
+      STYLE 
+          COLOR 67 61 132
+       END
+   END
+   CLASS 
+      NAME "19"
+      EXPRESSION "19"
+      STYLE 
+          COLOR 67 61 132
+       END
+   END
+   CLASS 
+      NAME "20"
+      EXPRESSION "20"
+      STYLE 
+          COLOR 67 61 132
+       END
+   END
+   CLASS 
+      NAME "21"
+      EXPRESSION "21"
+      STYLE 
+          COLOR 64 69 136
+       END
+   END
+   CLASS 
+      NAME "22"
+      EXPRESSION "22"
+      STYLE 
+          COLOR 64 69 136
+       END
+   END
+   CLASS 
+      NAME "23"
+      EXPRESSION "23"
+      STYLE 
+          COLOR 64 69 136
+       END
+   END
+   CLASS 
+      NAME "24"
+      EXPRESSION "24"
+      STYLE 
+          COLOR 61 78 138
+       END
+   END
+   CLASS 
+      NAME "25"
+      EXPRESSION "25"
+      STYLE 
+          COLOR 61 78 138
+       END
+   END
+   CLASS 
+      NAME "26"
+      EXPRESSION "26"
+      STYLE 
+          COLOR 61 78 138
+       END
+   END
+   CLASS 
+      NAME "27"
+      EXPRESSION "27"
+      STYLE 
+          COLOR 57 86 140
+       END
+   END
+   CLASS 
+      NAME "28"
+      EXPRESSION "28"
+      STYLE 
+          COLOR 57 86 140
+       END
+   END
+   CLASS 
+      NAME "29"
+      EXPRESSION "29"
+      STYLE 
+          COLOR 57 86 140
+       END
+   END
+   CLASS 
+      NAME "30"
+      EXPRESSION "30"
+      STYLE 
+          COLOR 53 94 141
+       END
+   END
+   CLASS 
+      NAME "31"
+      EXPRESSION "31"
+      STYLE 
+          COLOR 53 94 141
+       END
+   END
+   CLASS 
+      NAME "32"
+      EXPRESSION "32"
+      STYLE 
+          COLOR 53 94 141
+       END
+   END
+   CLASS 
+      NAME "33"
+      EXPRESSION "33"
+      STYLE 
+          COLOR 50 101 142
+       END
+   END
+   CLASS 
+      NAME "34"
+      EXPRESSION "34"
+      STYLE 
+          COLOR 50 101 142
+       END
+   END
+   CLASS 
+      NAME "35"
+      EXPRESSION "35"
+      STYLE 
+          COLOR 50 101 142
+       END
+   END
+   CLASS 
+      NAME "36"
+      EXPRESSION "36"
+      STYLE 
+          COLOR 46 109 142
+       END
+   END
+   CLASS 
+      NAME "37"
+      EXPRESSION "37"
+      STYLE 
+          COLOR 46 109 142
+       END
+   END
+   CLASS 
+      NAME "38"
+      EXPRESSION "38"
+      STYLE 
+          COLOR 46 109 142
+       END
+   END
+   CLASS 
+      NAME "39"
+      EXPRESSION "39"
+      STYLE 
+          COLOR 43 115 142
+       END
+   END
+   CLASS 
+      NAME "40"
+      EXPRESSION "40"
+      STYLE 
+          COLOR 43 115 142
+       END
+   END
+   CLASS 
+      NAME "41"
+      EXPRESSION "41"
+      STYLE 
+          COLOR 43 115 142
+       END
+   END
+   CLASS 
+      NAME "42"
+      EXPRESSION "42"
+      STYLE 
+          COLOR 41 123 142
+       END
+   END
+   CLASS 
+      NAME "43"
+      EXPRESSION "43"
+      STYLE 
+          COLOR 41 123 142
+       END
+   END
+   CLASS 
+      NAME "44"
+      EXPRESSION "44"
+      STYLE 
+          COLOR 41 123 142
+       END
+   END
+   CLASS 
+      NAME "45"
+      EXPRESSION "45"
+      STYLE 
+          COLOR 38 130 142
+       END
+   END
+   CLASS 
+      NAME "46"
+      EXPRESSION "46"
+      STYLE 
+          COLOR 38 130 142
+       END
+   END
+   CLASS 
+      NAME "47"
+      EXPRESSION "47"
+      STYLE 
+          COLOR 38 130 142
+       END
+   END
+   CLASS 
+      NAME "48"
+      EXPRESSION "48"
+      STYLE 
+          COLOR 35 137 142
+       END
+   END
+   CLASS 
+      NAME "49"
+      EXPRESSION "49"
+      STYLE 
+          COLOR 35 137 142
+       END
+   END
+   CLASS 
+      NAME "50"
+      EXPRESSION "50"
+      STYLE 
+          COLOR 35 137 142
+       END
+   END
+   CLASS 
+      NAME "51"
+      EXPRESSION "51"
+      STYLE 
+          COLOR 32 144 141
+       END
+   END
+   CLASS 
+      NAME "52"
+      EXPRESSION "52"
+      STYLE 
+          COLOR 32 144 141
+       END
+   END
+   CLASS 
+      NAME "53"
+      EXPRESSION "53"
+      STYLE 
+          COLOR 32 144 141
+       END
+   END
+   CLASS 
+      NAME "54"
+      EXPRESSION "54"
+      STYLE 
+          COLOR 31 151 139
+       END
+   END
+   CLASS 
+      NAME "55"
+      EXPRESSION "55"
+      STYLE 
+          COLOR 31 151 139
+       END
+   END
+   CLASS 
+      NAME "56"
+      EXPRESSION "56"
+      STYLE 
+          COLOR 31 151 139
+       END
+   END
+   CLASS 
+      NAME "57"
+      EXPRESSION "57"
+      STYLE 
+          COLOR 30 159 137
+       END
+   END
+   CLASS 
+      NAME "58"
+      EXPRESSION "58"
+      STYLE 
+          COLOR 30 159 137
+       END
+   END
+   CLASS 
+      NAME "59"
+      EXPRESSION "59"
+      STYLE 
+          COLOR 30 159 137
+       END
+   END
+   CLASS 
+      NAME "60"
+      EXPRESSION "60"
+      STYLE 
+          COLOR 33 165 133
+       END
+   END
+   CLASS 
+      NAME "61"
+      EXPRESSION "61"
+      STYLE 
+          COLOR 33 165 133
+       END
+   END
+   CLASS 
+      NAME "62"
+      EXPRESSION "62"
+      STYLE 
+          COLOR 33 165 133
+       END
+   END
+   CLASS 
+      NAME "63"
+      EXPRESSION "63"
+      STYLE 
+          COLOR 38 172 130
+       END
+   END
+   CLASS 
+      NAME "64"
+      EXPRESSION "64"
+      STYLE 
+          COLOR 38 172 130
+       END
+   END
+   CLASS 
+      NAME "65"
+      EXPRESSION "65"
+      STYLE 
+          COLOR 38 172 130
+       END
+   END
+   CLASS 
+      NAME "66"
+      EXPRESSION "66"
+      STYLE 
+          COLOR 46 179 124
+       END
+   END
+   CLASS 
+      NAME "67"
+      EXPRESSION "67"
+      STYLE 
+          COLOR 46 179 124
+       END
+   END
+   CLASS 
+      NAME "68"
+      EXPRESSION "68"
+      STYLE 
+          COLOR 46 179 124
+       END
+   END
+   CLASS 
+      NAME "69"
+      EXPRESSION "69"
+      STYLE 
+          COLOR 57 186 118
+       END
+   END
+   CLASS 
+      NAME "70"
+      EXPRESSION "70"
+      STYLE 
+          COLOR 57 186 118
+       END
+   END
+   CLASS 
+      NAME "71"
+      EXPRESSION "71"
+      STYLE 
+          COLOR 57 186 118
+       END
+   END
+   CLASS 
+      NAME "72"
+      EXPRESSION "72"
+      STYLE 
+          COLOR 70 192 111
+       END
+   END
+   CLASS 
+      NAME "73"
+      EXPRESSION "73"
+      STYLE 
+          COLOR 70 192 111
+       END
+   END
+   CLASS 
+      NAME "74"
+      EXPRESSION "74"
+      STYLE 
+          COLOR 70 192 111
+       END
+   END
+   CLASS 
+      NAME "75"
+      EXPRESSION "75"
+      STYLE 
+          COLOR 85 198 103
+       END
+   END
+   CLASS 
+      NAME "76"
+      EXPRESSION "76"
+      STYLE 
+          COLOR 85 198 103
+       END
+   END
+   CLASS 
+      NAME "77"
+      EXPRESSION "77"
+      STYLE 
+          COLOR 85 198 103
+       END
+   END
+   CLASS 
+      NAME "78"
+      EXPRESSION "78"
+      STYLE 
+          COLOR 101 203 94
+       END
+   END
+   CLASS 
+      NAME "79"
+      EXPRESSION "79"
+      STYLE 
+          COLOR 101 203 94
+       END
+   END
+   CLASS 
+      NAME "80"
+      EXPRESSION "80"
+      STYLE 
+          COLOR 101 203 94
+       END
+   END
+   CLASS 
+      NAME "81"
+      EXPRESSION "81"
+      STYLE 
+          COLOR 118 209 83
+       END
+   END
+   CLASS 
+      NAME "82"
+      EXPRESSION "82"
+      STYLE 
+          COLOR 118 209 83
+       END
+   END
+   CLASS 
+      NAME "83"
+      EXPRESSION "83"
+      STYLE 
+          COLOR 118 209 83
+       END
+   END
+   CLASS 
+      NAME "84"
+      EXPRESSION "84"
+      STYLE 
+          COLOR 137 213 72
+       END
+   END
+   CLASS 
+      NAME "85"
+      EXPRESSION "85"
+      STYLE 
+          COLOR 137 213 72
+       END
+   END
+   CLASS 
+      NAME "86"
+      EXPRESSION "86"
+      STYLE 
+          COLOR 137 213 72
+       END
+   END
+   CLASS 
+      NAME "87"
+      EXPRESSION "87"
+      STYLE 
+          COLOR 156 217 59
+       END
+   END
+   CLASS 
+      NAME "88"
+      EXPRESSION "88"
+      STYLE 
+          COLOR 156 217 59
+       END
+   END
+   CLASS 
+      NAME "89"
+      EXPRESSION "89"
+      STYLE 
+          COLOR 156 217 59
+       END
+   END
+   CLASS 
+      NAME "90"
+      EXPRESSION "90"
+      STYLE 
+          COLOR 176 221 47
+       END
+   END
+   CLASS 
+      NAME "91"
+      EXPRESSION "91"
+      STYLE 
+          COLOR 176 221 47
+       END
+   END
+   CLASS 
+      NAME "92"
+      EXPRESSION "92"
+      STYLE 
+          COLOR 176 221 47
+       END
+   END
+   CLASS 
+      NAME "93"
+      EXPRESSION "93"
+      STYLE 
+          COLOR 196 224 34
+       END
+   END
+   CLASS 
+      NAME "94"
+      EXPRESSION "94"
+      STYLE 
+          COLOR 196 224 34
+       END
+   END
+   CLASS 
+      NAME "95"
+      EXPRESSION "95"
+      STYLE 
+          COLOR 196 224 34
+       END
+   END
+   CLASS 
+      NAME "96"
+      EXPRESSION "96"
+      STYLE 
+          COLOR 216 226 25
+       END
+   END
+   CLASS 
+      NAME "97"
+      EXPRESSION "97"
+      STYLE 
+          COLOR 216 226 25
+       END
+   END
+   CLASS 
+      NAME "98"
+      EXPRESSION "98"
+      STYLE 
+          COLOR 216 226 25
+       END
+   END
+   CLASS 
+      NAME "99"
+      EXPRESSION "99"
+      STYLE 
+          COLOR 235 229 27
+       END
+   END
+   CLASS 
+      NAME "100"
+      EXPRESSION "100"
+      STYLE 
+          COLOR 235 229 27
+       END
+   END
+ METADATA
+      "wms_title"           "Présence des bouleaux"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+LAYER
+  NAME "COMPO3"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+   DATA "compo_3_CH.tif" 
+   PROCESSING "BANDS=1" 
+   CLASSITEM "[pixel]" 
+   CLASS 
+      NAME "0"
+      EXPRESSION "0"
+      STYLE 
+          COLOR 68 1 84
+       END
+   END
+   CLASS 
+      NAME "1"
+      EXPRESSION "1"
+      STYLE 
+          COLOR 68 1 84
+       END
+   END
+   CLASS 
+      NAME "2"
+      EXPRESSION "2"
+      STYLE 
+          COLOR 68 1 84
+       END
+   END
+   CLASS 
+      NAME "3"
+      EXPRESSION "3"
+      STYLE 
+          COLOR 70 12 95
+       END
+   END
+   CLASS 
+      NAME "4"
+      EXPRESSION "4"
+      STYLE 
+          COLOR 70 12 95
+       END
+   END
+   CLASS 
+      NAME "5"
+      EXPRESSION "5"
+      STYLE 
+          COLOR 70 12 95
+       END
+   END
+   CLASS 
+      NAME "6"
+      EXPRESSION "6"
+      STYLE 
+          COLOR 72 23 105
+       END
+   END
+   CLASS 
+      NAME "7"
+      EXPRESSION "7"
+      STYLE 
+          COLOR 72 23 105
+       END
+   END
+   CLASS 
+      NAME "8"
+      EXPRESSION "8"
+      STYLE 
+          COLOR 72 23 105
+       END
+   END
+   CLASS 
+      NAME "9"
+      EXPRESSION "9"
+      STYLE 
+          COLOR 72 32 114
+       END
+   END
+   CLASS 
+      NAME "10"
+      EXPRESSION "10"
+      STYLE 
+          COLOR 72 32 114
+       END
+   END
+   CLASS 
+      NAME "11"
+      EXPRESSION "11"
+      STYLE 
+          COLOR 72 32 114
+       END
+   END
+   CLASS 
+      NAME "12"
+      EXPRESSION "12"
+      STYLE 
+          COLOR 71 42 122
+       END
+   END
+   CLASS 
+      NAME "13"
+      EXPRESSION "13"
+      STYLE 
+          COLOR 71 42 122
+       END
+   END
+   CLASS 
+      NAME "14"
+      EXPRESSION "14"
+      STYLE 
+          COLOR 71 42 122
+       END
+   END
+   CLASS 
+      NAME "15"
+      EXPRESSION "15"
+      STYLE 
+          COLOR 69 51 127
+       END
+   END
+   CLASS 
+      NAME "16"
+      EXPRESSION "16"
+      STYLE 
+          COLOR 69 51 127
+       END
+   END
+   CLASS 
+      NAME "17"
+      EXPRESSION "17"
+      STYLE 
+          COLOR 69 51 127
+       END
+   END
+   CLASS 
+      NAME "18"
+      EXPRESSION "18"
+      STYLE 
+          COLOR 67 61 132
+       END
+   END
+   CLASS 
+      NAME "19"
+      EXPRESSION "19"
+      STYLE 
+          COLOR 67 61 132
+       END
+   END
+   CLASS 
+      NAME "20"
+      EXPRESSION "20"
+      STYLE 
+          COLOR 67 61 132
+       END
+   END
+   CLASS 
+      NAME "21"
+      EXPRESSION "21"
+      STYLE 
+          COLOR 64 69 136
+       END
+   END
+   CLASS 
+      NAME "22"
+      EXPRESSION "22"
+      STYLE 
+          COLOR 64 69 136
+       END
+   END
+   CLASS 
+      NAME "23"
+      EXPRESSION "23"
+      STYLE 
+          COLOR 64 69 136
+       END
+   END
+   CLASS 
+      NAME "24"
+      EXPRESSION "24"
+      STYLE 
+          COLOR 61 78 138
+       END
+   END
+   CLASS 
+      NAME "25"
+      EXPRESSION "25"
+      STYLE 
+          COLOR 61 78 138
+       END
+   END
+   CLASS 
+      NAME "26"
+      EXPRESSION "26"
+      STYLE 
+          COLOR 61 78 138
+       END
+   END
+   CLASS 
+      NAME "27"
+      EXPRESSION "27"
+      STYLE 
+          COLOR 57 86 140
+       END
+   END
+   CLASS 
+      NAME "28"
+      EXPRESSION "28"
+      STYLE 
+          COLOR 57 86 140
+       END
+   END
+   CLASS 
+      NAME "29"
+      EXPRESSION "29"
+      STYLE 
+          COLOR 57 86 140
+       END
+   END
+   CLASS 
+      NAME "30"
+      EXPRESSION "30"
+      STYLE 
+          COLOR 53 94 141
+       END
+   END
+   CLASS 
+      NAME "31"
+      EXPRESSION "31"
+      STYLE 
+          COLOR 53 94 141
+       END
+   END
+   CLASS 
+      NAME "32"
+      EXPRESSION "32"
+      STYLE 
+          COLOR 53 94 141
+       END
+   END
+   CLASS 
+      NAME "33"
+      EXPRESSION "33"
+      STYLE 
+          COLOR 50 101 142
+       END
+   END
+   CLASS 
+      NAME "34"
+      EXPRESSION "34"
+      STYLE 
+          COLOR 50 101 142
+       END
+   END
+   CLASS 
+      NAME "35"
+      EXPRESSION "35"
+      STYLE 
+          COLOR 50 101 142
+       END
+   END
+   CLASS 
+      NAME "36"
+      EXPRESSION "36"
+      STYLE 
+          COLOR 46 109 142
+       END
+   END
+   CLASS 
+      NAME "37"
+      EXPRESSION "37"
+      STYLE 
+          COLOR 46 109 142
+       END
+   END
+   CLASS 
+      NAME "38"
+      EXPRESSION "38"
+      STYLE 
+          COLOR 46 109 142
+       END
+   END
+   CLASS 
+      NAME "39"
+      EXPRESSION "39"
+      STYLE 
+          COLOR 43 115 142
+       END
+   END
+   CLASS 
+      NAME "40"
+      EXPRESSION "40"
+      STYLE 
+          COLOR 43 115 142
+       END
+   END
+   CLASS 
+      NAME "41"
+      EXPRESSION "41"
+      STYLE 
+          COLOR 43 115 142
+       END
+   END
+   CLASS 
+      NAME "42"
+      EXPRESSION "42"
+      STYLE 
+          COLOR 41 123 142
+       END
+   END
+   CLASS 
+      NAME "43"
+      EXPRESSION "43"
+      STYLE 
+          COLOR 41 123 142
+       END
+   END
+   CLASS 
+      NAME "44"
+      EXPRESSION "44"
+      STYLE 
+          COLOR 41 123 142
+       END
+   END
+   CLASS 
+      NAME "45"
+      EXPRESSION "45"
+      STYLE 
+          COLOR 38 130 142
+       END
+   END
+   CLASS 
+      NAME "46"
+      EXPRESSION "46"
+      STYLE 
+          COLOR 38 130 142
+       END
+   END
+   CLASS 
+      NAME "47"
+      EXPRESSION "47"
+      STYLE 
+          COLOR 38 130 142
+       END
+   END
+   CLASS 
+      NAME "48"
+      EXPRESSION "48"
+      STYLE 
+          COLOR 35 137 142
+       END
+   END
+   CLASS 
+      NAME "49"
+      EXPRESSION "49"
+      STYLE 
+          COLOR 35 137 142
+       END
+   END
+   CLASS 
+      NAME "50"
+      EXPRESSION "50"
+      STYLE 
+          COLOR 35 137 142
+       END
+   END
+   CLASS 
+      NAME "51"
+      EXPRESSION "51"
+      STYLE 
+          COLOR 32 144 141
+       END
+   END
+   CLASS 
+      NAME "52"
+      EXPRESSION "52"
+      STYLE 
+          COLOR 32 144 141
+       END
+   END
+   CLASS 
+      NAME "53"
+      EXPRESSION "53"
+      STYLE 
+          COLOR 32 144 141
+       END
+   END
+   CLASS 
+      NAME "54"
+      EXPRESSION "54"
+      STYLE 
+          COLOR 31 151 139
+       END
+   END
+   CLASS 
+      NAME "55"
+      EXPRESSION "55"
+      STYLE 
+          COLOR 31 151 139
+       END
+   END
+   CLASS 
+      NAME "56"
+      EXPRESSION "56"
+      STYLE 
+          COLOR 31 151 139
+       END
+   END
+   CLASS 
+      NAME "57"
+      EXPRESSION "57"
+      STYLE 
+          COLOR 30 159 137
+       END
+   END
+   CLASS 
+      NAME "58"
+      EXPRESSION "58"
+      STYLE 
+          COLOR 30 159 137
+       END
+   END
+   CLASS 
+      NAME "59"
+      EXPRESSION "59"
+      STYLE 
+          COLOR 30 159 137
+       END
+   END
+   CLASS 
+      NAME "60"
+      EXPRESSION "60"
+      STYLE 
+          COLOR 33 165 133
+       END
+   END
+   CLASS 
+      NAME "61"
+      EXPRESSION "61"
+      STYLE 
+          COLOR 33 165 133
+       END
+   END
+   CLASS 
+      NAME "62"
+      EXPRESSION "62"
+      STYLE 
+          COLOR 33 165 133
+       END
+   END
+   CLASS 
+      NAME "63"
+      EXPRESSION "63"
+      STYLE 
+          COLOR 38 172 130
+       END
+   END
+   CLASS 
+      NAME "64"
+      EXPRESSION "64"
+      STYLE 
+          COLOR 38 172 130
+       END
+   END
+   CLASS 
+      NAME "65"
+      EXPRESSION "65"
+      STYLE 
+          COLOR 38 172 130
+       END
+   END
+   CLASS 
+      NAME "66"
+      EXPRESSION "66"
+      STYLE 
+          COLOR 46 179 124
+       END
+   END
+   CLASS 
+      NAME "67"
+      EXPRESSION "67"
+      STYLE 
+          COLOR 46 179 124
+       END
+   END
+   CLASS 
+      NAME "68"
+      EXPRESSION "68"
+      STYLE 
+          COLOR 46 179 124
+       END
+   END
+   CLASS 
+      NAME "69"
+      EXPRESSION "69"
+      STYLE 
+          COLOR 57 186 118
+       END
+   END
+   CLASS 
+      NAME "70"
+      EXPRESSION "70"
+      STYLE 
+          COLOR 57 186 118
+       END
+   END
+   CLASS 
+      NAME "71"
+      EXPRESSION "71"
+      STYLE 
+          COLOR 57 186 118
+       END
+   END
+   CLASS 
+      NAME "72"
+      EXPRESSION "72"
+      STYLE 
+          COLOR 70 192 111
+       END
+   END
+   CLASS 
+      NAME "73"
+      EXPRESSION "73"
+      STYLE 
+          COLOR 70 192 111
+       END
+   END
+   CLASS 
+      NAME "74"
+      EXPRESSION "74"
+      STYLE 
+          COLOR 70 192 111
+       END
+   END
+   CLASS 
+      NAME "75"
+      EXPRESSION "75"
+      STYLE 
+          COLOR 85 198 103
+       END
+   END
+   CLASS 
+      NAME "76"
+      EXPRESSION "76"
+      STYLE 
+          COLOR 85 198 103
+       END
+   END
+   CLASS 
+      NAME "77"
+      EXPRESSION "77"
+      STYLE 
+          COLOR 85 198 103
+       END
+   END
+   CLASS 
+      NAME "78"
+      EXPRESSION "78"
+      STYLE 
+          COLOR 101 203 94
+       END
+   END
+   CLASS 
+      NAME "79"
+      EXPRESSION "79"
+      STYLE 
+          COLOR 101 203 94
+       END
+   END
+   CLASS 
+      NAME "80"
+      EXPRESSION "80"
+      STYLE 
+          COLOR 101 203 94
+       END
+   END
+   CLASS 
+      NAME "81"
+      EXPRESSION "81"
+      STYLE 
+          COLOR 118 209 83
+       END
+   END
+   CLASS 
+      NAME "82"
+      EXPRESSION "82"
+      STYLE 
+          COLOR 118 209 83
+       END
+   END
+   CLASS 
+      NAME "83"
+      EXPRESSION "83"
+      STYLE 
+          COLOR 118 209 83
+       END
+   END
+   CLASS 
+      NAME "84"
+      EXPRESSION "84"
+      STYLE 
+          COLOR 137 213 72
+       END
+   END
+   CLASS 
+      NAME "85"
+      EXPRESSION "85"
+      STYLE 
+          COLOR 137 213 72
+       END
+   END
+   CLASS 
+      NAME "86"
+      EXPRESSION "86"
+      STYLE 
+          COLOR 137 213 72
+       END
+   END
+   CLASS 
+      NAME "87"
+      EXPRESSION "87"
+      STYLE 
+          COLOR 156 217 59
+       END
+   END
+   CLASS 
+      NAME "88"
+      EXPRESSION "88"
+      STYLE 
+          COLOR 156 217 59
+       END
+   END
+   CLASS 
+      NAME "89"
+      EXPRESSION "89"
+      STYLE 
+          COLOR 156 217 59
+       END
+   END
+   CLASS 
+      NAME "90"
+      EXPRESSION "90"
+      STYLE 
+          COLOR 176 221 47
+       END
+   END
+   CLASS 
+      NAME "91"
+      EXPRESSION "91"
+      STYLE 
+          COLOR 176 221 47
+       END
+   END
+   CLASS 
+      NAME "92"
+      EXPRESSION "92"
+      STYLE 
+          COLOR 176 221 47
+       END
+   END
+   CLASS 
+      NAME "93"
+      EXPRESSION "93"
+      STYLE 
+          COLOR 196 224 34
+       END
+   END
+   CLASS 
+      NAME "94"
+      EXPRESSION "94"
+      STYLE 
+          COLOR 196 224 34
+       END
+   END
+   CLASS 
+      NAME "95"
+      EXPRESSION "95"
+      STYLE 
+          COLOR 196 224 34
+       END
+   END
+   CLASS 
+      NAME "96"
+      EXPRESSION "96"
+      STYLE 
+          COLOR 216 226 25
+       END
+   END
+   CLASS 
+      NAME "97"
+      EXPRESSION "97"
+      STYLE 
+          COLOR 216 226 25
+       END
+   END
+   CLASS 
+      NAME "98"
+      EXPRESSION "98"
+      STYLE 
+          COLOR 216 226 25
+       END
+   END
+   CLASS 
+      NAME "99"
+      EXPRESSION "99"
+      STYLE 
+          COLOR 235 229 27
+       END
+   END
+   CLASS 
+      NAME "100"
+      EXPRESSION "100"
+      STYLE 
+          COLOR 235 229 27
+       END
+   END
+ METADATA
+      "wms_title"           "Présence des chênes indigènes"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+LAYER
+  NAME "COMPO4"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+   DATA "compo_4_DO.tif" 
+   PROCESSING "BANDS=1" 
+   CLASSITEM "[pixel]" 
+   CLASS 
+      NAME "0"
+      EXPRESSION "0"
+      STYLE 
+          COLOR 68 1 84
+       END
+   END
+   CLASS 
+      NAME "1"
+      EXPRESSION "1"
+      STYLE 
+          COLOR 68 1 84
+       END
+   END
+   CLASS 
+      NAME "2"
+      EXPRESSION "2"
+      STYLE 
+          COLOR 68 1 84
+       END
+   END
+   CLASS 
+      NAME "3"
+      EXPRESSION "3"
+      STYLE 
+          COLOR 70 12 95
+       END
+   END
+   CLASS 
+      NAME "4"
+      EXPRESSION "4"
+      STYLE 
+          COLOR 70 12 95
+       END
+   END
+   CLASS 
+      NAME "5"
+      EXPRESSION "5"
+      STYLE 
+          COLOR 70 12 95
+       END
+   END
+   CLASS 
+      NAME "6"
+      EXPRESSION "6"
+      STYLE 
+          COLOR 72 23 105
+       END
+   END
+   CLASS 
+      NAME "7"
+      EXPRESSION "7"
+      STYLE 
+          COLOR 72 23 105
+       END
+   END
+   CLASS 
+      NAME "8"
+      EXPRESSION "8"
+      STYLE 
+          COLOR 72 23 105
+       END
+   END
+   CLASS 
+      NAME "9"
+      EXPRESSION "9"
+      STYLE 
+          COLOR 72 32 114
+       END
+   END
+   CLASS 
+      NAME "10"
+      EXPRESSION "10"
+      STYLE 
+          COLOR 72 32 114
+       END
+   END
+   CLASS 
+      NAME "11"
+      EXPRESSION "11"
+      STYLE 
+          COLOR 72 32 114
+       END
+   END
+   CLASS 
+      NAME "12"
+      EXPRESSION "12"
+      STYLE 
+          COLOR 71 42 122
+       END
+   END
+   CLASS 
+      NAME "13"
+      EXPRESSION "13"
+      STYLE 
+          COLOR 71 42 122
+       END
+   END
+   CLASS 
+      NAME "14"
+      EXPRESSION "14"
+      STYLE 
+          COLOR 71 42 122
+       END
+   END
+   CLASS 
+      NAME "15"
+      EXPRESSION "15"
+      STYLE 
+          COLOR 69 51 127
+       END
+   END
+   CLASS 
+      NAME "16"
+      EXPRESSION "16"
+      STYLE 
+          COLOR 69 51 127
+       END
+   END
+   CLASS 
+      NAME "17"
+      EXPRESSION "17"
+      STYLE 
+          COLOR 69 51 127
+       END
+   END
+   CLASS 
+      NAME "18"
+      EXPRESSION "18"
+      STYLE 
+          COLOR 67 61 132
+       END
+   END
+   CLASS 
+      NAME "19"
+      EXPRESSION "19"
+      STYLE 
+          COLOR 67 61 132
+       END
+   END
+   CLASS 
+      NAME "20"
+      EXPRESSION "20"
+      STYLE 
+          COLOR 67 61 132
+       END
+   END
+   CLASS 
+      NAME "21"
+      EXPRESSION "21"
+      STYLE 
+          COLOR 64 69 136
+       END
+   END
+   CLASS 
+      NAME "22"
+      EXPRESSION "22"
+      STYLE 
+          COLOR 64 69 136
+       END
+   END
+   CLASS 
+      NAME "23"
+      EXPRESSION "23"
+      STYLE 
+          COLOR 64 69 136
+       END
+   END
+   CLASS 
+      NAME "24"
+      EXPRESSION "24"
+      STYLE 
+          COLOR 61 78 138
+       END
+   END
+   CLASS 
+      NAME "25"
+      EXPRESSION "25"
+      STYLE 
+          COLOR 61 78 138
+       END
+   END
+   CLASS 
+      NAME "26"
+      EXPRESSION "26"
+      STYLE 
+          COLOR 61 78 138
+       END
+   END
+   CLASS 
+      NAME "27"
+      EXPRESSION "27"
+      STYLE 
+          COLOR 57 86 140
+       END
+   END
+   CLASS 
+      NAME "28"
+      EXPRESSION "28"
+      STYLE 
+          COLOR 57 86 140
+       END
+   END
+   CLASS 
+      NAME "29"
+      EXPRESSION "29"
+      STYLE 
+          COLOR 57 86 140
+       END
+   END
+   CLASS 
+      NAME "30"
+      EXPRESSION "30"
+      STYLE 
+          COLOR 53 94 141
+       END
+   END
+   CLASS 
+      NAME "31"
+      EXPRESSION "31"
+      STYLE 
+          COLOR 53 94 141
+       END
+   END
+   CLASS 
+      NAME "32"
+      EXPRESSION "32"
+      STYLE 
+          COLOR 53 94 141
+       END
+   END
+   CLASS 
+      NAME "33"
+      EXPRESSION "33"
+      STYLE 
+          COLOR 50 101 142
+       END
+   END
+   CLASS 
+      NAME "34"
+      EXPRESSION "34"
+      STYLE 
+          COLOR 50 101 142
+       END
+   END
+   CLASS 
+      NAME "35"
+      EXPRESSION "35"
+      STYLE 
+          COLOR 50 101 142
+       END
+   END
+   CLASS 
+      NAME "36"
+      EXPRESSION "36"
+      STYLE 
+          COLOR 46 109 142
+       END
+   END
+   CLASS 
+      NAME "37"
+      EXPRESSION "37"
+      STYLE 
+          COLOR 46 109 142
+       END
+   END
+   CLASS 
+      NAME "38"
+      EXPRESSION "38"
+      STYLE 
+          COLOR 46 109 142
+       END
+   END
+   CLASS 
+      NAME "39"
+      EXPRESSION "39"
+      STYLE 
+          COLOR 43 115 142
+       END
+   END
+   CLASS 
+      NAME "40"
+      EXPRESSION "40"
+      STYLE 
+          COLOR 43 115 142
+       END
+   END
+   CLASS 
+      NAME "41"
+      EXPRESSION "41"
+      STYLE 
+          COLOR 43 115 142
+       END
+   END
+   CLASS 
+      NAME "42"
+      EXPRESSION "42"
+      STYLE 
+          COLOR 41 123 142
+       END
+   END
+   CLASS 
+      NAME "43"
+      EXPRESSION "43"
+      STYLE 
+          COLOR 41 123 142
+       END
+   END
+   CLASS 
+      NAME "44"
+      EXPRESSION "44"
+      STYLE 
+          COLOR 41 123 142
+       END
+   END
+   CLASS 
+      NAME "45"
+      EXPRESSION "45"
+      STYLE 
+          COLOR 38 130 142
+       END
+   END
+   CLASS 
+      NAME "46"
+      EXPRESSION "46"
+      STYLE 
+          COLOR 38 130 142
+       END
+   END
+   CLASS 
+      NAME "47"
+      EXPRESSION "47"
+      STYLE 
+          COLOR 38 130 142
+       END
+   END
+   CLASS 
+      NAME "48"
+      EXPRESSION "48"
+      STYLE 
+          COLOR 35 137 142
+       END
+   END
+   CLASS 
+      NAME "49"
+      EXPRESSION "49"
+      STYLE 
+          COLOR 35 137 142
+       END
+   END
+   CLASS 
+      NAME "50"
+      EXPRESSION "50"
+      STYLE 
+          COLOR 35 137 142
+       END
+   END
+   CLASS 
+      NAME "51"
+      EXPRESSION "51"
+      STYLE 
+          COLOR 32 144 141
+       END
+   END
+   CLASS 
+      NAME "52"
+      EXPRESSION "52"
+      STYLE 
+          COLOR 32 144 141
+       END
+   END
+   CLASS 
+      NAME "53"
+      EXPRESSION "53"
+      STYLE 
+          COLOR 32 144 141
+       END
+   END
+   CLASS 
+      NAME "54"
+      EXPRESSION "54"
+      STYLE 
+          COLOR 31 151 139
+       END
+   END
+   CLASS 
+      NAME "55"
+      EXPRESSION "55"
+      STYLE 
+          COLOR 31 151 139
+       END
+   END
+   CLASS 
+      NAME "56"
+      EXPRESSION "56"
+      STYLE 
+          COLOR 31 151 139
+       END
+   END
+   CLASS 
+      NAME "57"
+      EXPRESSION "57"
+      STYLE 
+          COLOR 30 159 137
+       END
+   END
+   CLASS 
+      NAME "58"
+      EXPRESSION "58"
+      STYLE 
+          COLOR 30 159 137
+       END
+   END
+   CLASS 
+      NAME "59"
+      EXPRESSION "59"
+      STYLE 
+          COLOR 30 159 137
+       END
+   END
+   CLASS 
+      NAME "60"
+      EXPRESSION "60"
+      STYLE 
+          COLOR 33 165 133
+       END
+   END
+   CLASS 
+      NAME "61"
+      EXPRESSION "61"
+      STYLE 
+          COLOR 33 165 133
+       END
+   END
+   CLASS 
+      NAME "62"
+      EXPRESSION "62"
+      STYLE 
+          COLOR 33 165 133
+       END
+   END
+   CLASS 
+      NAME "63"
+      EXPRESSION "63"
+      STYLE 
+          COLOR 38 172 130
+       END
+   END
+   CLASS 
+      NAME "64"
+      EXPRESSION "64"
+      STYLE 
+          COLOR 38 172 130
+       END
+   END
+   CLASS 
+      NAME "65"
+      EXPRESSION "65"
+      STYLE 
+          COLOR 38 172 130
+       END
+   END
+   CLASS 
+      NAME "66"
+      EXPRESSION "66"
+      STYLE 
+          COLOR 46 179 124
+       END
+   END
+   CLASS 
+      NAME "67"
+      EXPRESSION "67"
+      STYLE 
+          COLOR 46 179 124
+       END
+   END
+   CLASS 
+      NAME "68"
+      EXPRESSION "68"
+      STYLE 
+          COLOR 46 179 124
+       END
+   END
+   CLASS 
+      NAME "69"
+      EXPRESSION "69"
+      STYLE 
+          COLOR 57 186 118
+       END
+   END
+   CLASS 
+      NAME "70"
+      EXPRESSION "70"
+      STYLE 
+          COLOR 57 186 118
+       END
+   END
+   CLASS 
+      NAME "71"
+      EXPRESSION "71"
+      STYLE 
+          COLOR 57 186 118
+       END
+   END
+   CLASS 
+      NAME "72"
+      EXPRESSION "72"
+      STYLE 
+          COLOR 70 192 111
+       END
+   END
+   CLASS 
+      NAME "73"
+      EXPRESSION "73"
+      STYLE 
+          COLOR 70 192 111
+       END
+   END
+   CLASS 
+      NAME "74"
+      EXPRESSION "74"
+      STYLE 
+          COLOR 70 192 111
+       END
+   END
+   CLASS 
+      NAME "75"
+      EXPRESSION "75"
+      STYLE 
+          COLOR 85 198 103
+       END
+   END
+   CLASS 
+      NAME "76"
+      EXPRESSION "76"
+      STYLE 
+          COLOR 85 198 103
+       END
+   END
+   CLASS 
+      NAME "77"
+      EXPRESSION "77"
+      STYLE 
+          COLOR 85 198 103
+       END
+   END
+   CLASS 
+      NAME "78"
+      EXPRESSION "78"
+      STYLE 
+          COLOR 101 203 94
+       END
+   END
+   CLASS 
+      NAME "79"
+      EXPRESSION "79"
+      STYLE 
+          COLOR 101 203 94
+       END
+   END
+   CLASS 
+      NAME "80"
+      EXPRESSION "80"
+      STYLE 
+          COLOR 101 203 94
+       END
+   END
+   CLASS 
+      NAME "81"
+      EXPRESSION "81"
+      STYLE 
+          COLOR 118 209 83
+       END
+   END
+   CLASS 
+      NAME "82"
+      EXPRESSION "82"
+      STYLE 
+          COLOR 118 209 83
+       END
+   END
+   CLASS 
+      NAME "83"
+      EXPRESSION "83"
+      STYLE 
+          COLOR 118 209 83
+       END
+   END
+   CLASS 
+      NAME "84"
+      EXPRESSION "84"
+      STYLE 
+          COLOR 137 213 72
+       END
+   END
+   CLASS 
+      NAME "85"
+      EXPRESSION "85"
+      STYLE 
+          COLOR 137 213 72
+       END
+   END
+   CLASS 
+      NAME "86"
+      EXPRESSION "86"
+      STYLE 
+          COLOR 137 213 72
+       END
+   END
+   CLASS 
+      NAME "87"
+      EXPRESSION "87"
+      STYLE 
+          COLOR 156 217 59
+       END
+   END
+   CLASS 
+      NAME "88"
+      EXPRESSION "88"
+      STYLE 
+          COLOR 156 217 59
+       END
+   END
+   CLASS 
+      NAME "89"
+      EXPRESSION "89"
+      STYLE 
+          COLOR 156 217 59
+       END
+   END
+   CLASS 
+      NAME "90"
+      EXPRESSION "90"
+      STYLE 
+          COLOR 176 221 47
+       END
+   END
+   CLASS 
+      NAME "91"
+      EXPRESSION "91"
+      STYLE 
+          COLOR 176 221 47
+       END
+   END
+   CLASS 
+      NAME "92"
+      EXPRESSION "92"
+      STYLE 
+          COLOR 176 221 47
+       END
+   END
+   CLASS 
+      NAME "93"
+      EXPRESSION "93"
+      STYLE 
+          COLOR 196 224 34
+       END
+   END
+   CLASS 
+      NAME "94"
+      EXPRESSION "94"
+      STYLE 
+          COLOR 196 224 34
+       END
+   END
+   CLASS 
+      NAME "95"
+      EXPRESSION "95"
+      STYLE 
+          COLOR 196 224 34
+       END
+   END
+   CLASS 
+      NAME "96"
+      EXPRESSION "96"
+      STYLE 
+          COLOR 216 226 25
+       END
+   END
+   CLASS 
+      NAME "97"
+      EXPRESSION "97"
+      STYLE 
+          COLOR 216 226 25
+       END
+   END
+   CLASS 
+      NAME "98"
+      EXPRESSION "98"
+      STYLE 
+          COLOR 216 226 25
+       END
+   END
+   CLASS 
+      NAME "99"
+      EXPRESSION "99"
+      STYLE 
+          COLOR 235 229 27
+       END
+   END
+   CLASS 
+      NAME "100"
+      EXPRESSION "100"
+      STYLE 
+          COLOR 235 229 27
+       END
+   END
+ METADATA
+      "wms_title"           "Présence du douglas"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+LAYER
+  NAME "COMPO5"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+   DATA "compo_5_EP.tif" 
+   PROCESSING "BANDS=1" 
+   CLASSITEM "[pixel]" 
+   CLASS 
+      NAME "0"
+      EXPRESSION "0"
+      STYLE 
+          COLOR 68 1 84
+       END
+   END
+   CLASS 
+      NAME "1"
+      EXPRESSION "1"
+      STYLE 
+          COLOR 68 1 84
+       END
+   END
+   CLASS 
+      NAME "2"
+      EXPRESSION "2"
+      STYLE 
+          COLOR 68 1 84
+       END
+   END
+   CLASS 
+      NAME "3"
+      EXPRESSION "3"
+      STYLE 
+          COLOR 70 12 95
+       END
+   END
+   CLASS 
+      NAME "4"
+      EXPRESSION "4"
+      STYLE 
+          COLOR 70 12 95
+       END
+   END
+   CLASS 
+      NAME "5"
+      EXPRESSION "5"
+      STYLE 
+          COLOR 70 12 95
+       END
+   END
+   CLASS 
+      NAME "6"
+      EXPRESSION "6"
+      STYLE 
+          COLOR 72 23 105
+       END
+   END
+   CLASS 
+      NAME "7"
+      EXPRESSION "7"
+      STYLE 
+          COLOR 72 23 105
+       END
+   END
+   CLASS 
+      NAME "8"
+      EXPRESSION "8"
+      STYLE 
+          COLOR 72 23 105
+       END
+   END
+   CLASS 
+      NAME "9"
+      EXPRESSION "9"
+      STYLE 
+          COLOR 72 32 114
+       END
+   END
+   CLASS 
+      NAME "10"
+      EXPRESSION "10"
+      STYLE 
+          COLOR 72 32 114
+       END
+   END
+   CLASS 
+      NAME "11"
+      EXPRESSION "11"
+      STYLE 
+          COLOR 72 32 114
+       END
+   END
+   CLASS 
+      NAME "12"
+      EXPRESSION "12"
+      STYLE 
+          COLOR 71 42 122
+       END
+   END
+   CLASS 
+      NAME "13"
+      EXPRESSION "13"
+      STYLE 
+          COLOR 71 42 122
+       END
+   END
+   CLASS 
+      NAME "14"
+      EXPRESSION "14"
+      STYLE 
+          COLOR 71 42 122
+       END
+   END
+   CLASS 
+      NAME "15"
+      EXPRESSION "15"
+      STYLE 
+          COLOR 69 51 127
+       END
+   END
+   CLASS 
+      NAME "16"
+      EXPRESSION "16"
+      STYLE 
+          COLOR 69 51 127
+       END
+   END
+   CLASS 
+      NAME "17"
+      EXPRESSION "17"
+      STYLE 
+          COLOR 69 51 127
+       END
+   END
+   CLASS 
+      NAME "18"
+      EXPRESSION "18"
+      STYLE 
+          COLOR 67 61 132
+       END
+   END
+   CLASS 
+      NAME "19"
+      EXPRESSION "19"
+      STYLE 
+          COLOR 67 61 132
+       END
+   END
+   CLASS 
+      NAME "20"
+      EXPRESSION "20"
+      STYLE 
+          COLOR 67 61 132
+       END
+   END
+   CLASS 
+      NAME "21"
+      EXPRESSION "21"
+      STYLE 
+          COLOR 64 69 136
+       END
+   END
+   CLASS 
+      NAME "22"
+      EXPRESSION "22"
+      STYLE 
+          COLOR 64 69 136
+       END
+   END
+   CLASS 
+      NAME "23"
+      EXPRESSION "23"
+      STYLE 
+          COLOR 64 69 136
+       END
+   END
+   CLASS 
+      NAME "24"
+      EXPRESSION "24"
+      STYLE 
+          COLOR 61 78 138
+       END
+   END
+   CLASS 
+      NAME "25"
+      EXPRESSION "25"
+      STYLE 
+          COLOR 61 78 138
+       END
+   END
+   CLASS 
+      NAME "26"
+      EXPRESSION "26"
+      STYLE 
+          COLOR 61 78 138
+       END
+   END
+   CLASS 
+      NAME "27"
+      EXPRESSION "27"
+      STYLE 
+          COLOR 57 86 140
+       END
+   END
+   CLASS 
+      NAME "28"
+      EXPRESSION "28"
+      STYLE 
+          COLOR 57 86 140
+       END
+   END
+   CLASS 
+      NAME "29"
+      EXPRESSION "29"
+      STYLE 
+          COLOR 57 86 140
+       END
+   END
+   CLASS 
+      NAME "30"
+      EXPRESSION "30"
+      STYLE 
+          COLOR 53 94 141
+       END
+   END
+   CLASS 
+      NAME "31"
+      EXPRESSION "31"
+      STYLE 
+          COLOR 53 94 141
+       END
+   END
+   CLASS 
+      NAME "32"
+      EXPRESSION "32"
+      STYLE 
+          COLOR 53 94 141
+       END
+   END
+   CLASS 
+      NAME "33"
+      EXPRESSION "33"
+      STYLE 
+          COLOR 50 101 142
+       END
+   END
+   CLASS 
+      NAME "34"
+      EXPRESSION "34"
+      STYLE 
+          COLOR 50 101 142
+       END
+   END
+   CLASS 
+      NAME "35"
+      EXPRESSION "35"
+      STYLE 
+          COLOR 50 101 142
+       END
+   END
+   CLASS 
+      NAME "36"
+      EXPRESSION "36"
+      STYLE 
+          COLOR 46 109 142
+       END
+   END
+   CLASS 
+      NAME "37"
+      EXPRESSION "37"
+      STYLE 
+          COLOR 46 109 142
+       END
+   END
+   CLASS 
+      NAME "38"
+      EXPRESSION "38"
+      STYLE 
+          COLOR 46 109 142
+       END
+   END
+   CLASS 
+      NAME "39"
+      EXPRESSION "39"
+      STYLE 
+          COLOR 43 115 142
+       END
+   END
+   CLASS 
+      NAME "40"
+      EXPRESSION "40"
+      STYLE 
+          COLOR 43 115 142
+       END
+   END
+   CLASS 
+      NAME "41"
+      EXPRESSION "41"
+      STYLE 
+          COLOR 43 115 142
+       END
+   END
+   CLASS 
+      NAME "42"
+      EXPRESSION "42"
+      STYLE 
+          COLOR 41 123 142
+       END
+   END
+   CLASS 
+      NAME "43"
+      EXPRESSION "43"
+      STYLE 
+          COLOR 41 123 142
+       END
+   END
+   CLASS 
+      NAME "44"
+      EXPRESSION "44"
+      STYLE 
+          COLOR 41 123 142
+       END
+   END
+   CLASS 
+      NAME "45"
+      EXPRESSION "45"
+      STYLE 
+          COLOR 38 130 142
+       END
+   END
+   CLASS 
+      NAME "46"
+      EXPRESSION "46"
+      STYLE 
+          COLOR 38 130 142
+       END
+   END
+   CLASS 
+      NAME "47"
+      EXPRESSION "47"
+      STYLE 
+          COLOR 38 130 142
+       END
+   END
+   CLASS 
+      NAME "48"
+      EXPRESSION "48"
+      STYLE 
+          COLOR 35 137 142
+       END
+   END
+   CLASS 
+      NAME "49"
+      EXPRESSION "49"
+      STYLE 
+          COLOR 35 137 142
+       END
+   END
+   CLASS 
+      NAME "50"
+      EXPRESSION "50"
+      STYLE 
+          COLOR 35 137 142
+       END
+   END
+   CLASS 
+      NAME "51"
+      EXPRESSION "51"
+      STYLE 
+          COLOR 32 144 141
+       END
+   END
+   CLASS 
+      NAME "52"
+      EXPRESSION "52"
+      STYLE 
+          COLOR 32 144 141
+       END
+   END
+   CLASS 
+      NAME "53"
+      EXPRESSION "53"
+      STYLE 
+          COLOR 32 144 141
+       END
+   END
+   CLASS 
+      NAME "54"
+      EXPRESSION "54"
+      STYLE 
+          COLOR 31 151 139
+       END
+   END
+   CLASS 
+      NAME "55"
+      EXPRESSION "55"
+      STYLE 
+          COLOR 31 151 139
+       END
+   END
+   CLASS 
+      NAME "56"
+      EXPRESSION "56"
+      STYLE 
+          COLOR 31 151 139
+       END
+   END
+   CLASS 
+      NAME "57"
+      EXPRESSION "57"
+      STYLE 
+          COLOR 30 159 137
+       END
+   END
+   CLASS 
+      NAME "58"
+      EXPRESSION "58"
+      STYLE 
+          COLOR 30 159 137
+       END
+   END
+   CLASS 
+      NAME "59"
+      EXPRESSION "59"
+      STYLE 
+          COLOR 30 159 137
+       END
+   END
+   CLASS 
+      NAME "60"
+      EXPRESSION "60"
+      STYLE 
+          COLOR 33 165 133
+       END
+   END
+   CLASS 
+      NAME "61"
+      EXPRESSION "61"
+      STYLE 
+          COLOR 33 165 133
+       END
+   END
+   CLASS 
+      NAME "62"
+      EXPRESSION "62"
+      STYLE 
+          COLOR 33 165 133
+       END
+   END
+   CLASS 
+      NAME "63"
+      EXPRESSION "63"
+      STYLE 
+          COLOR 38 172 130
+       END
+   END
+   CLASS 
+      NAME "64"
+      EXPRESSION "64"
+      STYLE 
+          COLOR 38 172 130
+       END
+   END
+   CLASS 
+      NAME "65"
+      EXPRESSION "65"
+      STYLE 
+          COLOR 38 172 130
+       END
+   END
+   CLASS 
+      NAME "66"
+      EXPRESSION "66"
+      STYLE 
+          COLOR 46 179 124
+       END
+   END
+   CLASS 
+      NAME "67"
+      EXPRESSION "67"
+      STYLE 
+          COLOR 46 179 124
+       END
+   END
+   CLASS 
+      NAME "68"
+      EXPRESSION "68"
+      STYLE 
+          COLOR 46 179 124
+       END
+   END
+   CLASS 
+      NAME "69"
+      EXPRESSION "69"
+      STYLE 
+          COLOR 57 186 118
+       END
+   END
+   CLASS 
+      NAME "70"
+      EXPRESSION "70"
+      STYLE 
+          COLOR 57 186 118
+       END
+   END
+   CLASS 
+      NAME "71"
+      EXPRESSION "71"
+      STYLE 
+          COLOR 57 186 118
+       END
+   END
+   CLASS 
+      NAME "72"
+      EXPRESSION "72"
+      STYLE 
+          COLOR 70 192 111
+       END
+   END
+   CLASS 
+      NAME "73"
+      EXPRESSION "73"
+      STYLE 
+          COLOR 70 192 111
+       END
+   END
+   CLASS 
+      NAME "74"
+      EXPRESSION "74"
+      STYLE 
+          COLOR 70 192 111
+       END
+   END
+   CLASS 
+      NAME "75"
+      EXPRESSION "75"
+      STYLE 
+          COLOR 85 198 103
+       END
+   END
+   CLASS 
+      NAME "76"
+      EXPRESSION "76"
+      STYLE 
+          COLOR 85 198 103
+       END
+   END
+   CLASS 
+      NAME "77"
+      EXPRESSION "77"
+      STYLE 
+          COLOR 85 198 103
+       END
+   END
+   CLASS 
+      NAME "78"
+      EXPRESSION "78"
+      STYLE 
+          COLOR 101 203 94
+       END
+   END
+   CLASS 
+      NAME "79"
+      EXPRESSION "79"
+      STYLE 
+          COLOR 101 203 94
+       END
+   END
+   CLASS 
+      NAME "80"
+      EXPRESSION "80"
+      STYLE 
+          COLOR 101 203 94
+       END
+   END
+   CLASS 
+      NAME "81"
+      EXPRESSION "81"
+      STYLE 
+          COLOR 118 209 83
+       END
+   END
+   CLASS 
+      NAME "82"
+      EXPRESSION "82"
+      STYLE 
+          COLOR 118 209 83
+       END
+   END
+   CLASS 
+      NAME "83"
+      EXPRESSION "83"
+      STYLE 
+          COLOR 118 209 83
+       END
+   END
+   CLASS 
+      NAME "84"
+      EXPRESSION "84"
+      STYLE 
+          COLOR 137 213 72
+       END
+   END
+   CLASS 
+      NAME "85"
+      EXPRESSION "85"
+      STYLE 
+          COLOR 137 213 72
+       END
+   END
+   CLASS 
+      NAME "86"
+      EXPRESSION "86"
+      STYLE 
+          COLOR 137 213 72
+       END
+   END
+   CLASS 
+      NAME "87"
+      EXPRESSION "87"
+      STYLE 
+          COLOR 156 217 59
+       END
+   END
+   CLASS 
+      NAME "88"
+      EXPRESSION "88"
+      STYLE 
+          COLOR 156 217 59
+       END
+   END
+   CLASS 
+      NAME "89"
+      EXPRESSION "89"
+      STYLE 
+          COLOR 156 217 59
+       END
+   END
+   CLASS 
+      NAME "90"
+      EXPRESSION "90"
+      STYLE 
+          COLOR 176 221 47
+       END
+   END
+   CLASS 
+      NAME "91"
+      EXPRESSION "91"
+      STYLE 
+          COLOR 176 221 47
+       END
+   END
+   CLASS 
+      NAME "92"
+      EXPRESSION "92"
+      STYLE 
+          COLOR 176 221 47
+       END
+   END
+   CLASS 
+      NAME "93"
+      EXPRESSION "93"
+      STYLE 
+          COLOR 196 224 34
+       END
+   END
+   CLASS 
+      NAME "94"
+      EXPRESSION "94"
+      STYLE 
+          COLOR 196 224 34
+       END
+   END
+   CLASS 
+      NAME "95"
+      EXPRESSION "95"
+      STYLE 
+          COLOR 196 224 34
+       END
+   END
+   CLASS 
+      NAME "96"
+      EXPRESSION "96"
+      STYLE 
+          COLOR 216 226 25
+       END
+   END
+   CLASS 
+      NAME "97"
+      EXPRESSION "97"
+      STYLE 
+          COLOR 216 226 25
+       END
+   END
+   CLASS 
+      NAME "98"
+      EXPRESSION "98"
+      STYLE 
+          COLOR 216 226 25
+       END
+   END
+   CLASS 
+      NAME "99"
+      EXPRESSION "99"
+      STYLE 
+          COLOR 235 229 27
+       END
+   END
+   CLASS 
+      NAME "100"
+      EXPRESSION "100"
+      STYLE 
+          COLOR 235 229 27
+       END
+   END
+ METADATA
+      "wms_title"           "Présence de l'épicea"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+LAYER
+  NAME "COMPO6"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+   DATA "compo_6_HE.tif" 
+   PROCESSING "BANDS=1" 
+INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_presence.map"
+ METADATA
+      "wms_title"           "Présence du hêtre"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+LAYER
+  NAME "COMPO7"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+   DATA "compo_7_MZ.tif" 
+   PROCESSING "BANDS=1" 
+INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_presence.map"
+ METADATA
+      "wms_title"           "Présence des mélèzes"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+LAYER
+  NAME "COMPO8"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+   DATA "compo_8_PE.tif" 
+   PROCESSING "BANDS=1" 
+	INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_presence.map"
+ METADATA
+      "wms_title"           "Présence de peuplier"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+LAYER
+  NAME "COMPO9"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+   DATA "compo_9_PI.tif" 
+   PROCESSING "BANDS=1" 
+INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_presence.map"
+ METADATA
+      "wms_title"           "Présence des pins"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+LAYER
+NAME "ES_EP_2016"
+GROUP "ES_EP_2016_PYR"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+   MAXSCALEDENOM 100000.00
+   DATA "ES/etatSanitaire_2016_BL72_masq_evol_co.tif" 
+   PROCESSING "BANDS=1" 
+INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_ES.map"
+ METADATA
+      "wms_title"           "Etat Sanitaire Pessière 2016"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+LAYER
+NAME "ES_EP_2017"
+GROUP "ES_EP_2017_PYR"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+    MAXSCALEDENOM 100000.00
+   DATA "ES/etatSanitaire_2017_BL72_masq_evol_co.tif" 
+   PROCESSING "BANDS=1" 
+INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_ES.map"
+ METADATA
+      "wms_title"           "Etat Sanitaire Pessière 2017"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+LAYER
+NAME "ES_EP_2018"
+GROUP "ES_EP_2018_PYR"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+    MAXSCALEDENOM 100000.00
+   DATA "ES/etatSanitaire_2018_BL72_masq_evol_co.tif" 
+   PROCESSING "BANDS=1" 
+INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_ES.map"
+ METADATA
+      "wms_title"           "Etat Sanitaire Pessière 2018"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+LAYER
+NAME "ES_EP_2019"
+GROUP "ES_EP_2019_PYR"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+    MAXSCALEDENOM 100000.00
+   DATA "ES/etatSanitaire_2019_BL72_masq_evol_co.tif" 
+   PROCESSING "BANDS=1" 
+INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_ES.map"
+ METADATA
+      "wms_title"           "Etat Sanitaire Pessière 2019"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+LAYER
+NAME "ES_EP_2020"
+GROUP "ES_EP_2020_PYR"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+    MAXSCALEDENOM 100000.00
+   DATA "ES/etatSanitaire_2020_BL72_masq_evol_co.tif" 
+   PROCESSING "BANDS=1" 
+INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_ES.map"
+ METADATA
+      "wms_title"           "Etat Sanitaire Pessière 2020"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+LAYER
+NAME "ES_EP_2021"
+GROUP "ES_EP_2021_PYR"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+    MAXSCALEDENOM 100000.00
+   DATA "ES/etatSanitaire_2021_BL72_masq_evol_co.tif" 
+   PROCESSING "BANDS=1" 
+INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_ES.map"
+ METADATA
+      "wms_title"           "Etat Sanitaire Pessière 2021"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+LAYER
+NAME "ES_EP_2022"
+GROUP "ES_EP_2022_PYR"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+    MAXSCALEDENOM 100000.00
+   DATA "ES/etatSanitaire_2022_BL72_masq_evol_co.tif" 
+   PROCESSING "BANDS=1" 
+ 
+ INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_ES.map"
+ METADATA
+      "wms_title"           "Etat Sanitaire Pessière 2022"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+LAYER
+NAME "ES_EP_2023"
+GROUP "ES_EP_2023_PYR"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+    MAXSCALEDENOM 100000.00
+   DATA "ES/etatSanitaire_2023_BL72_masq_evol_co.tif" 
+   PROCESSING "BANDS=1" 
+ 
+ INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_ES.map"
+ METADATA
+      "wms_title"           "Etat Sanitaire Pessière 2023"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+LAYER
+  NAME "COMPOALL"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+   DATA "compo_all_sp.tif" 
+   PROCESSING "BANDS=1" 
+   CLASSITEM "[pixel]" 
+      CLASS 
+      NAME "NL - Non_Ligneous"
+      EXPRESSION "0"
+      STYLE 
+          COLOR 255 255 255
+       END
+   END
+   CLASS 
+      NAME "AU - Others"
+      EXPRESSION "1"
+      STYLE 
+          COLOR 166 206 227
+       END
+   END
+   CLASS 
+      NAME "BO - Birchs"
+      EXPRESSION "2"
+      STYLE 
+          COLOR 31 120 180
+       END
+   END
+   CLASS 
+      NAME "CH - Oaks"
+      EXPRESSION "3"
+      STYLE 
+          COLOR 178 223 138
+       END
+   END
+   CLASS 
+      NAME "DO - Douglas_fir"
+      EXPRESSION "4"
+      STYLE 
+          COLOR 51 160 44
+       END
+   END
+   CLASS 
+      NAME "EP - Spruces"
+      EXPRESSION "5"
+      STYLE 
+      	COLOR 251 154 153
+       END
+   END
+   CLASS 
+      NAME "HE - Beech"
+      EXPRESSION "6"
+      STYLE 
+          COLOR 227 26 28
+       END
+   END
+   CLASS 
+      NAME "MZ - Larchs"
+      EXPRESSION "7"
+      STYLE 
+          COLOR 253 191 111
+       END
+   END
+   CLASS 
+      NAME "PE - Poplars"
+      EXPRESSION "8"
+      STYLE 
+          COLOR 255 127 0
+       END
+   END
+      CLASS 
+      NAME "PI - Pines"
+      EXPRESSION "9"
+      STYLE 
+          COLOR 202 178 214
+       END
+   END
+ METADATA
+      "wms_title"           "Carte de composition ; espèce majoritaire"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+LAYER
+  NAME "SWC"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+   DATA "soilWaterCapacity.tif" 
+   PROCESSING "BANDS=1" 
+   CLASSITEM "[pixel]" 
+      CLASS 
+      NAME "Contrainte Extrème (de 0 à 40 mm)"
+      EXPRESSION ([pixel]>-1 AND [pixel]<=40)
+      STYLE 
+          COLOR 132 17 119
+       END
+   END
+   CLASS 
+      NAME "Contrainte Majeure (de 40 à 70 mm)"
+      EXPRESSION ([pixel]>40 AND [pixel]<=70)
+      STYLE 
+          COLOR 183 59 31
+       END
+   END
+   CLASS 
+      NAME "Contrainte Forte (de 70 à 100 mm)"
+      EXPRESSION ([pixel]>70 AND [pixel]<=100)
+      STYLE 
+          COLOR 193 116 28
+       END
+   END
+   CLASS 
+      NAME "Contrainte Moyenne (de 100 mm à 150 mm)"
+      EXPRESSION ([pixel]>100 AND [pixel]<=150)
+      STYLE 
+          COLOR 255 220 63
+       END
+   END
+   CLASS 
+      NAME "Contrainte Faible (de 150 mm à 200 mm)"
+       EXPRESSION ([pixel]>150 AND [pixel]<=200)
+      STYLE 
+          COLOR 45 103 22
+       END
+   END
+   CLASS 
+      NAME "Aucune Contrainte ( plus de 200 mm)"
+       EXPRESSION ([pixel]>200)
+      STYLE 
+      	COLOR 19 38 160
+       END
+   END
+
+ METADATA
+      "wms_title"           "Réserve en eau du sol"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+
+LAYER
+	NAME "ES_EP_2016_SURV"
+	GROUP "ES_EP_2016_PYR"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+   MINSCALEDENOM 100000.00
+   DATA "ES/etatSanitaire_2016_BL72_masq_evol_co_tmp_surv.tif" 
+   PROCESSING "BANDS=1" 
+INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_ES_SURV.map"
+ METADATA
+      "wms_title"           "Etat Sanitaire Pessière 2016 - 1:100.000"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+
+LAYER
+	NAME "ES_EP_2017_SURV"
+	GROUP "ES_EP_2017_PYR"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+   MINSCALEDENOM 100000.00
+   DATA "ES/etatSanitaire_2017_BL72_masq_evol_co_tmp_surv.tif" 
+   PROCESSING "BANDS=1" 
+INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_ES_SURV.map"
+ METADATA
+      "wms_title"           "Etat Sanitaire Pessière 2017 - 1:100.000"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+
+LAYER
+	NAME "ES_EP_2018_SURV"
+	GROUP "ES_EP_2018_PYR"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+   MINSCALEDENOM 100000.00
+   DATA "ES/etatSanitaire_2018_BL72_masq_evol_co_tmp_surv.tif" 
+   PROCESSING "BANDS=1" 
+INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_ES_SURV.map"
+ METADATA
+      "wms_title"           "Etat Sanitaire Pessière 2018 - 1:100.000"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+
+LAYER
+	NAME "ES_EP_2019_SURV"
+	GROUP "ES_EP_2019_PYR"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+   MINSCALEDENOM 100000.00
+   DATA "ES/etatSanitaire_2019_BL72_masq_evol_co_tmp_surv.tif" 
+   PROCESSING "BANDS=1" 
+	INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_ES_SURV.map"
+ METADATA
+      "wms_title"           "Etat Sanitaire Pessière 2019 - 1:100.000"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+
+LAYER
+	NAME "ES_EP_2020_SURV"
+	GROUP "ES_EP_2020_PYR"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+   MINSCALEDENOM 100000.00
+   DATA "ES/etatSanitaire_2020_BL72_masq_evol_co_tmp_surv.tif" 
+   PROCESSING "BANDS=1" 
+INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_ES_SURV.map"
+ METADATA
+      "wms_title"           "Etat Sanitaire Pessière 2020 - 1:100.000"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+
+LAYER
+	NAME "ES_EP_2021_SURV"
+	GROUP "ES_EP_2021_PYR"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+   MINSCALEDENOM 100000.00
+   DATA "ES/etatSanitaire_2021_BL72_masq_evol_co_tmp_surv.tif" 
+   PROCESSING "BANDS=1" 
+	INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_ES_SURV.map"
+ METADATA
+      "wms_title"           "Etat Sanitaire Pessière 2021 - 1:100.000"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+
+LAYER
+	NAME "ES_EP_2022_SURV"
+	GROUP "ES_EP_2022_PYR"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+   MINSCALEDENOM 100000.00
+   DATA "ES/etatSanitaire_2022_BL72_masq_evol_co_tmp_surv.tif" 
+   PROCESSING "BANDS=1" 
+
+  INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_ES_SURV.map"
+ METADATA
+      "wms_title"           "Etat Sanitaire Pessière 2022 - 1:100.000"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+
+	LAYER
+  		NAME "MNH2006"
+   		TYPE RASTER
+   		STATUS ON
+   		PROJECTION
+      			"init=epsg:31370"
+   		END
+   		DATA "mnh2006.tif" 
+   		PROCESSING "BANDS=1" 
+   		OFFSITE 0 0 0
+
+   		INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_MNH.map"
+   		METADATA
+      			"wms_title"           "Modèle Numérique de Hauteur 2006"
+      			"wms_srs"             "EPSG:31370"
+   		END
+   		TEMPLATE "../template.html"
+   	END
+   	
+   	LAYER
+  		NAME "MNH2009"
+   		TYPE RASTER
+   		STATUS ON
+   		PROJECTION
+      			"init=epsg:31370"
+   		END
+   		DATA "mnh2009.tif" 
+   		PROCESSING "BANDS=1" 
+   		OFFSITE 0 0 0
+
+   		INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_MNH.map"
+   		METADATA
+      			"wms_title"           "Modèle Numérique de Hauteur 2009"
+      			"wms_srs"             "EPSG:31370"
+   		END
+   		TEMPLATE "../template.html"
+   	END
+   	  LAYER
+  		NAME "MNH2012"
+   		TYPE RASTER
+   		STATUS ON
+   		PROJECTION
+      			"init=epsg:31370"
+   		END
+   		DATA "mnh2012.tif" 
+   		PROCESSING "BANDS=1" 
+   		OFFSITE 0 0 0
+
+   		INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_MNH.map"
+   		METADATA
+      			"wms_title"           "Modèle Numérique de Hauteur 2012"
+      			"wms_srs"             "EPSG:31370"
+   		END
+   		TEMPLATE "../template.html"
+   	END
+   	   LAYER
+  		NAME "MNH2014"
+   		TYPE RASTER
+   		STATUS ON
+   		PROJECTION
+      			"init=epsg:31370"
+   		END
+   		DATA "mnh2014.tif" 
+   		PROCESSING "BANDS=1" 
+   		OFFSITE 0 0 0
+
+   		INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_MNH.map"
+   		METADATA
+      			"wms_title"           "Modèle Numérique de Hauteur 2014"
+      			"wms_srs"             "EPSG:31370"
+   		END
+   		TEMPLATE "../template.html"
+   	END
+   	  LAYER
+  		NAME "MNH2015"
+   		TYPE RASTER
+   		STATUS ON
+   		PROJECTION
+      			"init=epsg:31370"
+   		END
+   		DATA "mnh2015.tif" 
+   		PROCESSING "BANDS=1" 
+   		OFFSITE 0 0 0
+
+   		INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_MNH.map"
+   		METADATA
+      			"wms_title"           "Modèle Numérique de Hauteur 2015"
+      			"wms_srs"             "EPSG:31370"
+   		END
+   		TEMPLATE "../template.html"
+   	END
+   	 LAYER
+  		NAME "MNH2016"
+   		TYPE RASTER
+   		STATUS ON
+   		PROJECTION
+      			"init=epsg:31370"
+   		END
+   		DATA "mnh2016.tif" 
+   		PROCESSING "BANDS=1" 
+   		OFFSITE 0 0 0
+
+   		INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_MNH.map"
+   		METADATA
+      			"wms_title"           "Modèle Numérique de Hauteur 2016"
+      			"wms_srs"             "EPSG:31370"
+   		END
+   		TEMPLATE "../template.html"
+   	END
+   	  LAYER
+  		NAME "MNH2018"
+   		TYPE RASTER
+   		STATUS ON
+   		PROJECTION
+      			"init=epsg:31370"
+   		END
+   		DATA "mnh2018.tif" 
+   		PROCESSING "BANDS=1" 
+   		OFFSITE 0 0 0
+
+   		INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_MNH.map"
+   		METADATA
+      			"wms_title"           "Modèle Numérique de Hauteur 2018"
+      			"wms_srs"             "EPSG:31370"
+   		END
+   		TEMPLATE "../template.html"
+   	END
+   	 LAYER
+  		NAME "MNH2019"
+   		TYPE RASTER
+   		STATUS ON
+   		PROJECTION
+      			"init=epsg:31370"
+   		END
+   		DATA "mnh2019.tif" 
+   		PROCESSING "BANDS=1" 
+   		OFFSITE 0 0 0
+
+   		INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_MNH.map"
+   		METADATA
+      			"wms_title"           "Modèle Numérique de Hauteur 2019"
+      			"wms_srs"             "EPSG:31370"
+   		END
+   		TEMPLATE "../template.html"
+   	END
+   	  LAYER
+  		NAME "MNH2020"
+   		TYPE RASTER
+   		STATUS ON
+   		PROJECTION
+      			"init=epsg:31370"
+   		END
+   		DATA "mnh2020.tif" 
+   		PROCESSING "BANDS=1" 
+   		OFFSITE 0 0 0
+
+   		INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_MNH.map"
+   		METADATA
+      			"wms_title"           "Modèle Numérique de Hauteur 2020"
+      			"wms_srs"             "EPSG:31370"
+   		END
+   		TEMPLATE "../template.html"
+   	END
+   	   	LAYER
+  		NAME "MNH2021"
+   		TYPE RASTER
+   		STATUS ON
+   		PROJECTION
+      			"init=epsg:31370"
+   		END
+   		DATA "mnh2021.tif" 
+   		PROCESSING "BANDS=1" 
+   		OFFSITE 0 0 0
+
+   		INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_MNH.map"
+   		METADATA
+      			"wms_title"           "Modèle Numérique de Hauteur 2021"
+      			"wms_srs"             "EPSG:31370"
+   		END
+   		TEMPLATE "../template.html"
+   	END
+   	        LAYER
+  		NAME "MNH2022"
+   		TYPE RASTER
+   		STATUS ON
+   		PROJECTION
+      			"init=epsg:31370"
+   		END
+   		DATA "printemps_tiles.vrt" 
+   		PROCESSING "BANDS=1" 
+   		OFFSITE 0 0 0
+
+   		INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_MNH.map"
+   		METADATA
+      			"wms_title"           "Modèle Numérique de Hauteur 2022 Printemps"
+      			"wms_srs"             "EPSG:31370"
+   		END
+   		TEMPLATE "../template.html"
+   	END
+
+END
