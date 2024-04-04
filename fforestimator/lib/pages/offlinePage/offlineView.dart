@@ -19,7 +19,7 @@ bool _finishedInitializingCategory = false;
 class _OfflineView extends State<OfflineView> {
   final List<Category> _categories = [
     Category(name: "Couches enregistrées.", filter: "offline"),
-    Category(name: "Couches à télécharger", filter: "online")
+    //Category(name: "Couches à télécharger", filter: "online")
   ];
   final Map<String, List<LayerTile>> _downlodableLayerTiles = {
     "offline": [],
@@ -137,7 +137,7 @@ class _OfflineView extends State<OfflineView> {
             );
           },
           body: _buildOfflineList(category),
-          isExpanded: category.isExpanded,
+          isExpanded: true,//category.isExpanded,
         );
       }).toList(),
     );

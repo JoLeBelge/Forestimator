@@ -287,6 +287,15 @@ class _MapPageState extends State<mapPage> {
                         // cameraTrackingMode: CameraTrackingMode.locationAndOrientation,
                         ),
                   ]),
+          IconButton(
+              onPressed: () async {
+                if (await Geolocator.getCurrentPosition() == await Geolocator.getLastKnownPosition()) {
+                  print("huhu location service enabled");
+                } else {
+                  print("location service out");
+                }
+              },
+              icon: Icon(Icons.gps_fixed))
         ]));
   }
 

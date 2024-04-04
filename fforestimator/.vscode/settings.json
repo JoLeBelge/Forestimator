@@ -1,3 +1,4 @@
 {
-    "cmake.sourceDirectory": "/home/tt/Desktop/Forestimator/Forestimator/fforestimator/linux"
+    "cmake.sourceDirectory": "/home/tt/Desktop/Forestimator/Forestimator/fforestimator/linux",
+    "java.configuration.updateBuildConfiguration": "interactive"
 }
