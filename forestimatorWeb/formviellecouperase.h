@@ -66,10 +66,10 @@ public:
     WComboBox *objectifEdit_;
     WLineEdit *spEdit_;
     WLineEdit *sanitEdit_;
-    WComboBox *itineraireEdit_;
+    //WComboBox *itineraireEdit_;
     WLineEdit *travSylviEdit_;
     WLineEdit *plantationEdit_;
-    WLineEdit *hauteurEdit_;
+   // WLineEdit *hauteurEdit_;
     WLineEdit *gibierEdit_;
 
     WPushButton * bCancel;

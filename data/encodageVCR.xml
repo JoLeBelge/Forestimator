@@ -15,15 +15,21 @@ La Faculté de Gembloux Agro-Bio Tech (ULiège) a initié, en collaboration avec
 		<div >
 		 <img src="/img/CoupeRaseNisramont1LR.jpg" alt="coupe rase en libre évolution avec une régénération naturelle satisfaisante" style="display: block;margin-left: auto;margin-right: auto;width: 30%;"  />
 		</div>
+		Nous collecterons les informations de manière cartographique, mais nous nous engageons évidemment à ne jamais visiter ou renseigner ces sites sans votre accord.
 	</div>
+	
+
 
 	
 	<div style="margin: 3px 0px; flex: 1 1 auto; overflow: visible;"></div>
 	${contContact class="encodage" style="margin: 3px 0px; flex: 1 1 auto; overflow: visible;"}
 	<div style="margin: 3px 0px; flex: 1 1 auto; overflow: visible;"></div>
 	${contLoca}
+	
 	<div style="margin: 3px 0px; flex: 1 1 auto; overflow: visible;"></div>
-	${contACR class="encodage" style="margin: 3px 0px; flex: 1 1 auto; overflow: visible;"}
+	${contACR1 class="encodage" style="margin: 3px 0px; flex: 1 1 auto; overflow: visible;"}
+	<div style="margin: 3px 0px; flex: 1 1 auto; overflow: visible;"></div>
+	${contACR2 class="encodage" style="margin: 3px 0px; flex: 1 1 auto; overflow: visible;"}
 	<div style="margin: 3px 0px; flex: 1 1 auto; overflow: visible;"></div>
 	${bsubmit class="btn btn-success with-label mybtn"}
 	
@@ -50,12 +56,16 @@ La Faculté de Gembloux Agro-Bio Tech (ULiège) a initié, en collaboration avec
 
 <message id="map.tooltip">Cliquez pour dessiner le contour de la coupe rase. Pour finir le contour, joignez le dernier point avec le premier point et cliquez à nouveau</message>
 
-<message id="sectionVCR"> <h3> Description de l'ancienne coupe rase </h3>
-La description encodée ici est une description globale, des inventaires de terrain permettront ensuite de fournir une description plus précise.
+<message id="sectionVCR1"> <h3> Description de l'ancienne coupe rase </h3>
+<!--La description encodée ici est une description globale, des inventaires de terrain permettront ensuite de fournir une description plus précise.-->
 </message>
 
-<message id="anneeVCR"> Année de la coupe rase :</message>
-<message id="regeNat"> Régénération naturelle présente (précisez les essences les plus présentes)</message>
+<message id="sectionVCR2"> <h3> Description facultative </h3>
+<!--La description encodée ici est une description globale, des inventaires de terrain permettront ensuite de fournir une description plus précise.-->
+</message>
+
+<message id="anneeVCR"> Anciennetée de la coupe rase :</message>
+<message id="regeNat"> Quelles sont les essences les plus présentes dans la régénération naturelle?</message>
 <message id="regeNat.ph"> Ex: Bouleaux - Epicéa - Sorbier des oiseleurs </message>
 <message id="vegeBloquante"> Présence de végétation bloquante (précisez les espèces, ex: ronce, fougère)</message>
 <message id="vegeBloquante.ph"> Ex: Fougère aigle sur 75% de la coupe rase</message>
@@ -99,14 +109,20 @@ Vos données ont été encodées de manière adéquate. Nous vous remercions pou
 <message id="itineraire2"> Régénération naturelle </message>
 <message id="itineraire3"> Régénération naturelle avec des plantations d'enrichissement </message>
 
+<message id="anneeCoupe0"> Depuis compbien de temps a eu lieu la coupe? </message>
+<message id="anneeCoupe1"> moins de 5 ans </message>
+<message id="anneeCoupe2"> entre 5 et 10 ans </message>
+<message id="anneeCoupe3"> entre 10 et 15 ans </message>
+<message id="anneeCoupe4"> il y a plus de 15 ans </message>
+
 <message id="plantation">  Si vous avez fait des plantations, quelles espèces et combien de tiges par espèce avez-vous plantées sur la parcelle ? Quelle est l'année de plantation ?  </message>
 <message id="plantation.ph"> Ex: Plantation d'enrichissement de placeaux de tilleuls à grandes feuilles (90 tiges) </message>
 
 <message id="hauteur">  Quelle est la hauteur approximative (en mètres) des tiges dominantes actuellement présentes sur la parcelle ?  </message>
 <message id="hauteur.ph"> Ex: les bouleaux font 12 mètres </message>
 
-<message id="gibier">  Quelles sont les mesures anti-dégâts de gibier mises en place ou qui vont être mises en place sur votre parcelle ?  </message>
-<message id="gibier.ph"> Ex: clôture, protections individuelles, Trico, pas de protection... </message>
+<message id="gibier">  Avez-vous protégé vos arbres contre les dégâts de gibier?  </message>
+<message id="gibier.ph"> Ex: oui (protections individuelles) </message>
 
 <message id="btnPolyg"> Vous pouvez réinitialiser le contour de la coupe avec les bouttons ci-dessous  </message>
 
