@@ -12,9 +12,9 @@ Cependant, afin d'atteindre un public plus vaste, en particulier les plus jeunes
 
 ## Pourquoi partager ces codes informatiques?
 
-Les forces vives de notre équipe ne sont pas des informaticiens: nos codes ne sont pas toujours à prendre en exemple. 
+Les forces vives de notre équipe ne sont pas des informaticiens: nos codes ne sont pas tous à prendre en exemple. 
 Cependant, étant donné que notre travail a largement **bénéficié de librairies open source**, il est essentiel de partager les résultats, que ce soit pour exprimer une certaine reconnaissance envers les créateurs des outils que nous utilisons, ou pour inspirer d'autres développeurs qui souhaiteraient avoir un exemple.
 
 GDAL est utilisé de manière intensive pour les traitements cartographiques, tels que le calcul de cartes aux format raster. La librairie [Wt](https://www.webtoolkit.eu/wt) sert pour la création de l'interface web, main dans la main avec [Openlayers](https://openlayers.org/). Flutter et le package [flutter_map](https://pub.dev/packages/flutter_map) sont utilisés pour le développement de l'application Android
 
-contact: liseinjon@hotmail.com
+contact: JO.Lisein@uliege.be
