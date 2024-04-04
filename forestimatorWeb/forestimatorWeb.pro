@@ -1,17 +1,13 @@
 TEMPLATE = app
-TARGET = WebAptitude
+TARGET = forestimatorWeb
 INCLUDEPATH += .
 CONFIG -= qt
 QT -= gui
 QT += sql
-#QMAKE_CXXFLAGS += -ggdb3 # pour utiliser valgrind et pointer la ligne du code qui va pas #QMAKE_CXXFLAGS += -g
-#QMAKE_CC = gcc-10
-#QMAKE_CXX = g++-10
 CONFIG += c++17
 
 LIBS = -lcurl -lgdal -lwthttp -lwt -lboost_system -lboost_iostreams  -lboost_filesystem -lboost_program_options -lcrypt -pthread -lwtdbo -lwtdbosqlite3 -lzip -lhpdf -lsqlite3
 
-#LIBS += -L$$PWD/usr/include/gdal/ -lgdal
 DEPENDPATH += /usr/include/gdal/
 INCLUDEPATH += /usr/include/gdal/
 
@@ -50,7 +46,6 @@ SOURCES += main.cpp \
     grouplayers.cpp \
     parcellaire.cpp \
     layerstatchart.cpp \
-    #uploadcarte.cpp \
     libzippp/src/libzippp.cpp \
     ecogrammeEss.cpp \
     statwindow.cpp \
@@ -88,7 +83,6 @@ HEADERS += \
     grouplayers.h \
     parcellaire.h \
     layerstatchart.h \
-    #uploadcarte.h \
     libzippp/src/libzippp.h \
     ecogrammeEss.h \
     statwindow.h \

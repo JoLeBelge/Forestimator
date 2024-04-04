@@ -14,6 +14,7 @@ import 'package:http/http.dart' as http;
 import 'package:fforestimator/pages/anaPt/requestedLayer.dart';
 import 'package:go_router/go_router.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'dart:convert';
@@ -68,7 +69,7 @@ class _MapPageState extends State<mapPage> {
     data = "";
 
     gl.pt = ptBL72;
-    ConnectivityResult conRes = await Connectivity().checkConnectivity();
+    //ConnectivityResult conRes = await Connectivity().checkConnectivity();
     //print(conRes);
     if (!gl.offlineMode) {
       //conRes != ConnectivityResult.none &&

@@ -1,4 +1,4 @@
-Notes sur l'installation de Forestimator Web (aka cWebAptitude)
+Notes sur l'installation de Forestimator Web
 --------------------------------------------
 
 1) packages généraux/ installation via sudo
@@ -24,7 +24,7 @@ contenu git/config LOCAL pour Forestimator:
 [branch "master"]
 	remote = origin
 	merge = refs/heads/master
-[submodule "cWebAptitude/libzippp"]
+[submodule "forestimatorWeb/libzippp"]
 	url = https://github.com/ctabin/libzippp
 	active = true
 	
@@ -46,7 +46,7 @@ git submodule update
 
 installation de libzipp (est en sous-module dans Forestimator)
 sudo apt install zlib1g-dev libzip-dev liblzma-dev libbz2-dev
-cd cWebAptitude/libzippp/
+cd forestimatorWeb/libzippp/
 mkdir build && cd build
 cmake .. -DCMAKE_BUILD_TYPE=Release
 make && make install
@@ -86,7 +86,7 @@ ajout ligne /usr/local/lib
 puis
 sudo ldconfig
 
-3) Compilation cWebAptitude
+3) Compilation forestimatorWeb
 ---------------------------
 Maintenant que toutes les dépendances sont installées, on peut compiler Forestimator. Soit via Qt-creator, soit en ligne de commande avec qmake
 
