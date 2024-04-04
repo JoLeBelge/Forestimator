@@ -3,7 +3,6 @@ build-*/
 build-carteApt/
 build-forestimatorWeb/
 build-stationDescriptor/
-carteApt/data/aptitudeEssDB.db
 carteApt/data/aptitudeEssDB.db-*
 carteApt/data/carteFEE_NTpH.db-*
 carteApt/carteApt.pro.*
