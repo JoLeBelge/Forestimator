@@ -26,7 +26,7 @@ LAYER
       "init=epsg:31370"
    END
    DATA "recommandation_AG.tif" 
-   INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_recommandationGS.map"
+   INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
    METADATA
       "wms_title"           "recommandation pour le Sapin de Vancouver"
       "wms_srs"             "EPSG:31370"
@@ -41,7 +41,7 @@ LAYER
       "init=epsg:31370"
    END
    DATA "recommandation_AN.tif" 
-   INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_recommandationGS.map"
+   INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
  METADATA
       "wms_title"           "recommandation pour le Sapin noble"
       "wms_srs"             "EPSG:31370"
@@ -56,7 +56,7 @@ LAYER
       "init=epsg:31370"
    END
    DATA "recommandation_AP.tif" 
-INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_recommandationGS.map"
+INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
  METADATA
       "wms_title"           "recommandation pour le Sapin pectiné"
       "wms_srs"             "EPSG:31370"
@@ -71,7 +71,7 @@ LAYER
       "init=epsg:31370"
    END
    DATA "recommandation_AX.tif" 
-INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_recommandationGS.map"
+INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
  METADATA
       "wms_title"           "recommandation pour l'Aulne glutineux"
       "wms_srs"             "EPSG:31370"
@@ -86,7 +86,7 @@ LAYER
       "init=epsg:31370"
    END
    DATA "recommandation_BP.tif" 
-INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_recommandationGS.map"
+INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
  METADATA
       "wms_title"           "recommandation pour le Bouleau pubescent"
       "wms_srs"             "EPSG:31370"
@@ -101,7 +101,7 @@ LAYER
       "init=epsg:31370"
    END
    DATA "recommandation_BV.tif" 
-INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_recommandationGS.map"
+INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
  METADATA
       "wms_title"           "recommandation pour le Bouleau verruqueux"
       "wms_srs"             "EPSG:31370"
@@ -116,7 +116,7 @@ LAYER
       "init=epsg:31370"
    END
    DATA "recommandation_CA.tif" 
-INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_recommandationGS.map"
+INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
  METADATA
       "wms_title"           "recommandation pour le Charme"
       "wms_srs"             "EPSG:31370"
@@ -131,7 +131,7 @@ LAYER
       "init=epsg:31370"
    END
    DATA "recommandation_CD.tif" 
-INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_recommandationGS.map"
+INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
  METADATA
       "wms_title"           "recommandation pour le Cèdre de lAtlas"
       "wms_srs"             "EPSG:31370"
@@ -146,7 +146,7 @@ LAYER
       "init=epsg:31370"
    END
    DATA "recommandation_CO.tif" 
-INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_recommandationGS.map"
+INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
  METADATA
       "wms_title"           "recommandation pour le Cormier"
       "wms_srs"             "EPSG:31370"
@@ -161,7 +161,7 @@ LAYER
       "init=epsg:31370"
    END
    DATA "recommandation_CP.tif" 
-INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_recommandationGS.map"
+INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
  METADATA
       "wms_title"           "recommandation pour le Chêne pédonculé"
       "wms_srs"             "EPSG:31370"
@@ -176,7 +176,7 @@ LAYER
       "init=epsg:31370"
    END
    DATA "recommandation_CR.tif" 
-INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_recommandationGS.map"
+INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
  METADATA
       "wms_title"           "recommandation pour le Chêne rouge dAmérique"
       "wms_srs"             "EPSG:31370"
@@ -191,7 +191,7 @@ LAYER
       "init=epsg:31370"
    END
    DATA "recommandation_CS.tif" 
-INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_recommandationGS.map"
+INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
  METADATA
       "wms_title"           "recommandation pour le Chêne sessile"
       "wms_srs"             "EPSG:31370"
@@ -206,7 +206,7 @@ LAYER
       "init=epsg:31370"
    END
    DATA "recommandation_CT.tif" 
-INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_recommandationGS.map"
+INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
  METADATA
       "wms_title"           "recommandation pour le Châtaignier"
       "wms_srs"             "EPSG:31370"
@@ -221,7 +221,7 @@ LAYER
       "init=epsg:31370"
    END
    DATA "recommandation_CY.tif" 
-INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_recommandationGS.map"
+INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
  METADATA
       "wms_title"           "recommandation pour le Cyprès de Lawson"
       "wms_srs"             "EPSG:31370"
@@ -236,7 +236,7 @@ LAYER
       "init=epsg:31370"
    END
    DATA "recommandation_DO.tif" 
-INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_recommandationGS.map"
+INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
  METADATA
       "wms_title"           "recommandation pour le Douglas"
       "wms_srs"             "EPSG:31370"
@@ -251,7 +251,7 @@ LAYER
       "init=epsg:31370"
    END
    DATA "recommandation_EC.tif" 
-INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_recommandationGS.map"
+INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
  METADATA
       "wms_title"           "recommandation pour l'Érable champêtre"
       "wms_srs"             "EPSG:31370"
@@ -266,7 +266,7 @@ LAYER
       "init=epsg:31370"
    END
    DATA "recommandation_EK.tif" 
-INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_recommandationGS.map"
+INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
  METADATA
       "wms_title"           "recommandation pour l'Épicea de Sitka"
       "wms_srs"             "EPSG:31370"
@@ -281,7 +281,7 @@ LAYER
       "init=epsg:31370"
    END
    DATA "recommandation_EL.tif" 
-INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_recommandationGS.map"
+INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
  METADATA
       "wms_title"           "recommandation pour l'Érable plane"
       "wms_srs"             "EPSG:31370"
@@ -296,7 +296,7 @@ LAYER
       "init=epsg:31370"
    END
    DATA "recommandation_EP.tif" 
-INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_recommandationGS.map"
+INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
  METADATA
       "wms_title"           "recommandation pour l'Épicéa commun"
       "wms_srs"             "EPSG:31370"
@@ -311,7 +311,7 @@ LAYER
       "init=epsg:31370"
    END
    DATA "recommandation_ES.tif" 
-INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_recommandationGS.map"
+INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
  METADATA
       "wms_title"           "recommandation pour le Érable sycomore"
       "wms_srs"             "EPSG:31370"
@@ -326,7 +326,7 @@ LAYER
       "init=epsg:31370"
    END
    DATA "recommandation_FR.tif" 
-INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_recommandationGS.map"
+INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
  METADATA
       "wms_title"           "recommandation pour le Frêne"
       "wms_srs"             "EPSG:31370"
@@ -341,7 +341,7 @@ LAYER
       "init=epsg:31370"
    END
    DATA "recommandation_HE.tif" 
-INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_recommandationGS.map"
+INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
  METADATA
       "wms_title"           "recommandation pour le Hêtre"
       "wms_srs"             "EPSG:31370"
@@ -356,7 +356,7 @@ LAYER
       "init=epsg:31370"
    END
    DATA "recommandation_IF.tif" 
-INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_recommandationGS.map"
+INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
  METADATA
       "wms_title"           "recommandation pour l'If commun"
       "wms_srs"             "EPSG:31370"
@@ -371,7 +371,7 @@ LAYER
       "init=epsg:31370"
    END
    DATA "recommandation_JH.tif" 
-INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_recommandationGS.map"
+INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
  METADATA
       "wms_title"           "recommandation pour le Noyer hybride"
       "wms_srs"             "EPSG:31370"
@@ -386,7 +386,7 @@ LAYER
       "init=epsg:31370"
    END
    DATA "recommandation_JN.tif" 
-INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_recommandationGS.map"
+INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
  METADATA
       "wms_title"           "recommandation pour le Noyer noir"
       "wms_srs"             "EPSG:31370"
@@ -401,7 +401,7 @@ LAYER
       "init=epsg:31370"
    END
    DATA "recommandation_JR.tif" 
-INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_recommandationGS.map"
+INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
  METADATA
       "wms_title"           "recommandation pour le Noyer commun"
       "wms_srs"             "EPSG:31370"
@@ -416,7 +416,7 @@ LAYER
       "init=epsg:31370"
    END
    DATA "recommandation_ME.tif" 
-INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_recommandationGS.map"
+INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
  METADATA
       "wms_title"           "recommandation pour le Mélèze dEurope"
       "wms_srs"             "EPSG:31370"
@@ -431,7 +431,7 @@ LAYER
       "init=epsg:31370"
    END
    DATA "recommandation_MH.tif" 
-INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_recommandationGS.map"
+INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
  METADATA
       "wms_title"           "recommandation pour le Mélèze hybride"
       "wms_srs"             "EPSG:31370"
@@ -446,7 +446,7 @@ LAYER
       "init=epsg:31370"
    END
    DATA "recommandation_MJ.tif" 
-INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_recommandationGS.map"
+INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
  METADATA
       "wms_title"           "recommandation pour le Mélèze du Japon"
       "wms_srs"             "EPSG:31370"
@@ -461,7 +461,7 @@ LAYER
       "init=epsg:31370"
    END
    DATA "recommandation_MR.tif" 
-INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_recommandationGS.map"
+INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
  METADATA
       "wms_title"           "recommandation pour le Merisier"
       "wms_srs"             "EPSG:31370"
@@ -476,7 +476,7 @@ LAYER
       "init=epsg:31370"
    END
    DATA "recommandation_NO.tif" 
-INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_recommandationGS.map"
+INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
  METADATA
       "wms_title"           "recommandation pour le Sapin de Nordmann"
       "wms_srs"             "EPSG:31370"
@@ -491,7 +491,7 @@ LAYER
       "init=epsg:31370"
    END
    DATA "recommandation_OC.tif" 
-INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_recommandationGS.map"
+INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
  METADATA
       "wms_title"           "recommandation pour l'Orme champêtre"
       "wms_srs"             "EPSG:31370"
@@ -506,7 +506,7 @@ LAYER
       "init=epsg:31370"
    END
    DATA "recommandation_OL.tif" 
-INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_recommandationGS.map"
+INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
  METADATA
       "wms_title"           "recommandation pour l'Orme lisse"
       "wms_srs"             "EPSG:31370"
@@ -521,7 +521,7 @@ LAYER
       "init=epsg:31370"
    END
    DATA "recommandation_OM.tif" 
-INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_recommandationGS.map"
+INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
  METADATA
       "wms_title"           "recommandation pour l'Orme de montagne"
       "wms_srs"             "EPSG:31370"
@@ -536,7 +536,7 @@ LAYER
       "init=epsg:31370"
    END
    DATA "recommandation_PA.tif" 
-INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_recommandationGS.map"
+INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
  METADATA
       "wms_title"           "recommandation pour le Pin noir dAutriche"
       "wms_srs"             "EPSG:31370"
@@ -551,7 +551,7 @@ LAYER
       "init=epsg:31370"
    END
    DATA "recommandation_PC.tif" 
-INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_recommandationGS.map"
+INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
  METADATA
       "wms_title"           "recommandation pour le Pin laricio de Corse"
       "wms_srs"             "EPSG:31370"
@@ -566,7 +566,7 @@ LAYER
       "init=epsg:31370"
    END
    DATA "recommandation_PG.tif" 
-INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_recommandationGS.map"
+INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
  METADATA
       "wms_title"           "recommandation pour le Peuplier grisard"
       "wms_srs"             "EPSG:31370"
@@ -581,7 +581,7 @@ LAYER
       "init=epsg:31370"
    END
    DATA "recommandation_PK.tif" 
-INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_recommandationGS.map"
+INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
  METADATA
       "wms_title"           "recommandation pour le Pin de Koekelare"
       "wms_srs"             "EPSG:31370"
@@ -596,7 +596,7 @@ LAYER
       "init=epsg:31370"
    END
    DATA "recommandation_PM.tif" 
-INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_recommandationGS.map"
+INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
  METADATA
       "wms_title"           "recommandation pour le Pommier sauvage"
       "wms_srs"             "EPSG:31370"
@@ -611,7 +611,7 @@ LAYER
       "init=epsg:31370"
    END
    DATA "recommandation_PN.tif" 
-INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_recommandationGS.map"
+INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
  METADATA
       "wms_title"           "recommandation pour le Peuplier noir"
       "wms_srs"             "EPSG:31370"
@@ -626,7 +626,7 @@ LAYER
       "init=epsg:31370"
    END
    DATA "recommandation_PO.tif" 
-INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_recommandationGS.map"
+INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
  METADATA
       "wms_title"           "recommandation pour le Poirier sauvage"
       "wms_srs"             "EPSG:31370"
@@ -641,7 +641,7 @@ LAYER
       "init=epsg:31370"
    END
    DATA "recommandation_PS.tif" 
-INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_recommandationGS.map"
+INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
  METADATA
       "wms_title"           "recommandation pour le Pin sylvestre"
       "wms_srs"             "EPSG:31370"
@@ -656,7 +656,7 @@ LAYER
       "init=epsg:31370"
    END
    DATA "recommandation_PT.tif" 
-INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_recommandationGS.map"
+INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
  METADATA
       "wms_title"           "recommandation pour le Peuplier tremble"
       "wms_srs"             "EPSG:31370"
@@ -671,7 +671,7 @@ LAYER
       "init=epsg:31370"
    END
    DATA "recommandation_PY.tif" 
-INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_recommandationGS.map"
+INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
  METADATA
       "wms_title"           "recommandation pour le Peuplier noir hybride"
       "wms_srs"             "EPSG:31370"
@@ -686,7 +686,7 @@ LAYER
       "init=epsg:31370"
    END
    DATA "recommandation_PZ.tif" 
-INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_recommandationGS.map"
+INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
  METADATA
       "wms_title"           "recommandation pour le Peuplier baumier"
       "wms_srs"             "EPSG:31370"
@@ -701,7 +701,7 @@ LAYER
       "init=epsg:31370"
    END
    DATA "recommandation_RO.tif" 
-INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_recommandationGS.map"
+INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
  METADATA
       "wms_title"           "recommandation pour le Robinier"
       "wms_srs"             "EPSG:31370"
@@ -716,7 +716,7 @@ LAYER
       "init=epsg:31370"
    END
    DATA "recommandation_RY.tif" 
-INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_recommandationGS.map"
+INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
  METADATA
       "wms_title"           "Aptitude desCaryers"
       "wms_srs"             "EPSG:31370"
@@ -731,7 +731,7 @@ LAYER
       "init=epsg:31370"
    END
    DATA "recommandation_SA.tif" 
-INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_recommandationGS.map"
+INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
  METADATA
       "wms_title"           "recommandation pour le Saule blanc"
       "wms_srs"             "EPSG:31370"
@@ -746,7 +746,7 @@ LAYER
       "init=epsg:31370"
    END
    DATA "recommandation_SO.tif" 
-INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_recommandationGS.map"
+INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
  METADATA
       "wms_title"           "recommandation pour le Sorbier des oiseleurs"
       "wms_srs"             "EPSG:31370"
@@ -761,7 +761,7 @@ LAYER
       "init=epsg:31370"
    END
    DATA "recommandation_ST.tif" 
-INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_recommandationGS.map"
+INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
  METADATA
       "wms_title"           "recommandation pour l'Alisier torminal"
       "wms_srs"             "EPSG:31370"
@@ -776,7 +776,7 @@ LAYER
       "init=epsg:31370"
    END
    DATA "recommandation_TC.tif" 
-INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_recommandationGS.map"
+INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
  METADATA
       "wms_title"           "recommandation pour le Tilleul à petites feuilles"
       "wms_srs"             "EPSG:31370"
@@ -791,7 +791,7 @@ LAYER
       "init=epsg:31370"
    END
    DATA "recommandation_TH.tif" 
-INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_recommandationGS.map"
+INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
  METADATA
       "wms_title"           "recommandation pour le Thuya géant"
       "wms_srs"             "EPSG:31370"
@@ -806,7 +806,7 @@ LAYER
       "init=epsg:31370"
    END
    DATA "recommandation_TP.tif" 
-INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_recommandationGS.map"
+INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
  METADATA
       "wms_title"           "recommandation pour le Tilleul à grandes feuilles"
       "wms_srs"             "EPSG:31370"
@@ -821,7 +821,7 @@ LAYER
       "init=epsg:31370"
    END
    DATA "recommandation_TU.tif" 
-INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_recommandationGS.map"
+INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
  METADATA
       "wms_title"           "recommandation pour le Tulipier de Virginie"
       "wms_srs"             "EPSG:31370"
@@ -836,7 +836,7 @@ LAYER
       "init=epsg:31370"
    END
    DATA "recommandation_TY.tif" 
-INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_recommandationGS.map"
+INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_recommandationGS.map"
  METADATA
       "wms_title"           "recommandation pour le Tsuga hétérophylle"
       "wms_srs"             "EPSG:31370"

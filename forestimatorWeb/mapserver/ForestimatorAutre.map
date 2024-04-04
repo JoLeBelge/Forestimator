@@ -6177,7 +6177,7 @@ LAYER
    END
    DATA "compo_6_HE.tif" 
    PROCESSING "BANDS=1" 
-INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_presence.map"
+INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_presence.map"
  METADATA
       "wms_title"           "Présence du hêtre"
       "wms_srs"             "EPSG:31370"
@@ -6193,7 +6193,7 @@ LAYER
    END
    DATA "compo_7_MZ.tif" 
    PROCESSING "BANDS=1" 
-INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_presence.map"
+INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_presence.map"
  METADATA
       "wms_title"           "Présence des mélèzes"
       "wms_srs"             "EPSG:31370"
@@ -6209,7 +6209,7 @@ LAYER
    END
    DATA "compo_8_PE.tif" 
    PROCESSING "BANDS=1" 
-	INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_presence.map"
+	INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_presence.map"
  METADATA
       "wms_title"           "Présence de peuplier"
       "wms_srs"             "EPSG:31370"
@@ -6225,7 +6225,7 @@ LAYER
    END
    DATA "compo_9_PI.tif" 
    PROCESSING "BANDS=1" 
-INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_presence.map"
+INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_presence.map"
  METADATA
       "wms_title"           "Présence des pins"
       "wms_srs"             "EPSG:31370"
@@ -6243,7 +6243,7 @@ GROUP "ES_EP_2016_PYR"
    MAXSCALEDENOM 100000.00
    DATA "ES/etatSanitaire_2016_BL72_masq_evol_co.tif" 
    PROCESSING "BANDS=1" 
-INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_ES.map"
+INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_ES.map"
  METADATA
       "wms_title"           "Etat Sanitaire Pessière 2016"
       "wms_srs"             "EPSG:31370"
@@ -6261,7 +6261,7 @@ GROUP "ES_EP_2017_PYR"
     MAXSCALEDENOM 100000.00
    DATA "ES/etatSanitaire_2017_BL72_masq_evol_co.tif" 
    PROCESSING "BANDS=1" 
-INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_ES.map"
+INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_ES.map"
  METADATA
       "wms_title"           "Etat Sanitaire Pessière 2017"
       "wms_srs"             "EPSG:31370"
@@ -6279,7 +6279,7 @@ GROUP "ES_EP_2018_PYR"
     MAXSCALEDENOM 100000.00
    DATA "ES/etatSanitaire_2018_BL72_masq_evol_co.tif" 
    PROCESSING "BANDS=1" 
-INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_ES.map"
+INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_ES.map"
  METADATA
       "wms_title"           "Etat Sanitaire Pessière 2018"
       "wms_srs"             "EPSG:31370"
@@ -6297,7 +6297,7 @@ GROUP "ES_EP_2019_PYR"
     MAXSCALEDENOM 100000.00
    DATA "ES/etatSanitaire_2019_BL72_masq_evol_co.tif" 
    PROCESSING "BANDS=1" 
-INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_ES.map"
+INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_ES.map"
  METADATA
       "wms_title"           "Etat Sanitaire Pessière 2019"
       "wms_srs"             "EPSG:31370"
@@ -6315,7 +6315,7 @@ GROUP "ES_EP_2020_PYR"
     MAXSCALEDENOM 100000.00
    DATA "ES/etatSanitaire_2020_BL72_masq_evol_co.tif" 
    PROCESSING "BANDS=1" 
-INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_ES.map"
+INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_ES.map"
  METADATA
       "wms_title"           "Etat Sanitaire Pessière 2020"
       "wms_srs"             "EPSG:31370"
@@ -6333,7 +6333,7 @@ GROUP "ES_EP_2021_PYR"
     MAXSCALEDENOM 100000.00
    DATA "ES/etatSanitaire_2021_BL72_masq_evol_co.tif" 
    PROCESSING "BANDS=1" 
-INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_ES.map"
+INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_ES.map"
  METADATA
       "wms_title"           "Etat Sanitaire Pessière 2021"
       "wms_srs"             "EPSG:31370"
@@ -6352,7 +6352,7 @@ GROUP "ES_EP_2022_PYR"
    DATA "ES/etatSanitaire_2022_BL72_masq_evol_co.tif" 
    PROCESSING "BANDS=1" 
  
- INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_ES.map"
+ INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_ES.map"
  METADATA
       "wms_title"           "Etat Sanitaire Pessière 2022"
       "wms_srs"             "EPSG:31370"
@@ -6371,7 +6371,7 @@ GROUP "ES_EP_2023_PYR"
    DATA "ES/etatSanitaire_2023_BL72_masq_evol_co.tif" 
    PROCESSING "BANDS=1" 
  
- INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_ES.map"
+ INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_ES.map"
  METADATA
       "wms_title"           "Etat Sanitaire Pessière 2023"
       "wms_srs"             "EPSG:31370"
@@ -6535,7 +6535,7 @@ LAYER
    MINSCALEDENOM 100000.00
    DATA "ES/etatSanitaire_2016_BL72_masq_evol_co_tmp_surv.tif" 
    PROCESSING "BANDS=1" 
-INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_ES_SURV.map"
+INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_ES_SURV.map"
  METADATA
       "wms_title"           "Etat Sanitaire Pessière 2016 - 1:100.000"
       "wms_srs"             "EPSG:31370"
@@ -6554,7 +6554,7 @@ LAYER
    MINSCALEDENOM 100000.00
    DATA "ES/etatSanitaire_2017_BL72_masq_evol_co_tmp_surv.tif" 
    PROCESSING "BANDS=1" 
-INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_ES_SURV.map"
+INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_ES_SURV.map"
  METADATA
       "wms_title"           "Etat Sanitaire Pessière 2017 - 1:100.000"
       "wms_srs"             "EPSG:31370"
@@ -6573,7 +6573,7 @@ LAYER
    MINSCALEDENOM 100000.00
    DATA "ES/etatSanitaire_2018_BL72_masq_evol_co_tmp_surv.tif" 
    PROCESSING "BANDS=1" 
-INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_ES_SURV.map"
+INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_ES_SURV.map"
  METADATA
       "wms_title"           "Etat Sanitaire Pessière 2018 - 1:100.000"
       "wms_srs"             "EPSG:31370"
@@ -6592,7 +6592,7 @@ LAYER
    MINSCALEDENOM 100000.00
    DATA "ES/etatSanitaire_2019_BL72_masq_evol_co_tmp_surv.tif" 
    PROCESSING "BANDS=1" 
-	INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_ES_SURV.map"
+	INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_ES_SURV.map"
  METADATA
       "wms_title"           "Etat Sanitaire Pessière 2019 - 1:100.000"
       "wms_srs"             "EPSG:31370"
@@ -6611,7 +6611,7 @@ LAYER
    MINSCALEDENOM 100000.00
    DATA "ES/etatSanitaire_2020_BL72_masq_evol_co_tmp_surv.tif" 
    PROCESSING "BANDS=1" 
-INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_ES_SURV.map"
+INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_ES_SURV.map"
  METADATA
       "wms_title"           "Etat Sanitaire Pessière 2020 - 1:100.000"
       "wms_srs"             "EPSG:31370"
@@ -6630,7 +6630,7 @@ LAYER
    MINSCALEDENOM 100000.00
    DATA "ES/etatSanitaire_2021_BL72_masq_evol_co_tmp_surv.tif" 
    PROCESSING "BANDS=1" 
-	INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_ES_SURV.map"
+	INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_ES_SURV.map"
  METADATA
       "wms_title"           "Etat Sanitaire Pessière 2021 - 1:100.000"
       "wms_srs"             "EPSG:31370"
@@ -6650,7 +6650,7 @@ LAYER
    DATA "ES/etatSanitaire_2022_BL72_masq_evol_co_tmp_surv.tif" 
    PROCESSING "BANDS=1" 
 
-  INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_ES_SURV.map"
+  INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_ES_SURV.map"
  METADATA
       "wms_title"           "Etat Sanitaire Pessière 2022 - 1:100.000"
       "wms_srs"             "EPSG:31370"
@@ -6669,7 +6669,7 @@ END
    		PROCESSING "BANDS=1" 
    		OFFSITE 0 0 0
 
-   		INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_MNH.map"
+   		INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_MNH.map"
    		METADATA
       			"wms_title"           "Modèle Numérique de Hauteur 2006"
       			"wms_srs"             "EPSG:31370"
@@ -6688,7 +6688,7 @@ END
    		PROCESSING "BANDS=1" 
    		OFFSITE 0 0 0
 
-   		INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_MNH.map"
+   		INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_MNH.map"
    		METADATA
       			"wms_title"           "Modèle Numérique de Hauteur 2009"
       			"wms_srs"             "EPSG:31370"
@@ -6706,7 +6706,7 @@ END
    		PROCESSING "BANDS=1" 
    		OFFSITE 0 0 0
 
-   		INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_MNH.map"
+   		INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_MNH.map"
    		METADATA
       			"wms_title"           "Modèle Numérique de Hauteur 2012"
       			"wms_srs"             "EPSG:31370"
@@ -6724,7 +6724,7 @@ END
    		PROCESSING "BANDS=1" 
    		OFFSITE 0 0 0
 
-   		INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_MNH.map"
+   		INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_MNH.map"
    		METADATA
       			"wms_title"           "Modèle Numérique de Hauteur 2014"
       			"wms_srs"             "EPSG:31370"
@@ -6742,7 +6742,7 @@ END
    		PROCESSING "BANDS=1" 
    		OFFSITE 0 0 0
 
-   		INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_MNH.map"
+   		INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_MNH.map"
    		METADATA
       			"wms_title"           "Modèle Numérique de Hauteur 2015"
       			"wms_srs"             "EPSG:31370"
@@ -6760,7 +6760,7 @@ END
    		PROCESSING "BANDS=1" 
    		OFFSITE 0 0 0
 
-   		INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_MNH.map"
+   		INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_MNH.map"
    		METADATA
       			"wms_title"           "Modèle Numérique de Hauteur 2016"
       			"wms_srs"             "EPSG:31370"
@@ -6778,7 +6778,7 @@ END
    		PROCESSING "BANDS=1" 
    		OFFSITE 0 0 0
 
-   		INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_MNH.map"
+   		INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_MNH.map"
    		METADATA
       			"wms_title"           "Modèle Numérique de Hauteur 2018"
       			"wms_srs"             "EPSG:31370"
@@ -6796,7 +6796,7 @@ END
    		PROCESSING "BANDS=1" 
    		OFFSITE 0 0 0
 
-   		INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_MNH.map"
+   		INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_MNH.map"
    		METADATA
       			"wms_title"           "Modèle Numérique de Hauteur 2019"
       			"wms_srs"             "EPSG:31370"
@@ -6814,7 +6814,7 @@ END
    		PROCESSING "BANDS=1" 
    		OFFSITE 0 0 0
 
-   		INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_MNH.map"
+   		INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_MNH.map"
    		METADATA
       			"wms_title"           "Modèle Numérique de Hauteur 2020"
       			"wms_srs"             "EPSG:31370"
@@ -6832,7 +6832,7 @@ END
    		PROCESSING "BANDS=1" 
    		OFFSITE 0 0 0
 
-   		INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_MNH.map"
+   		INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_MNH.map"
    		METADATA
       			"wms_title"           "Modèle Numérique de Hauteur 2021"
       			"wms_srs"             "EPSG:31370"
@@ -6850,7 +6850,7 @@ END
    		PROCESSING "BANDS=1" 
    		OFFSITE 0 0 0
 
-   		INCLUDE "/home/carto/app/Forestimator/cWebAptitude/mapserver/symbol_MNH.map"
+   		INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_MNH.map"
    		METADATA
       			"wms_title"           "Modèle Numérique de Hauteur 2022 Printemps"
       			"wms_srs"             "EPSG:31370"
