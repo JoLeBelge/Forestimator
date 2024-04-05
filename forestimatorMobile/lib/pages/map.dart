@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:fforestimator/dico/dicoApt.dart';
 import 'package:fforestimator/tileProvider/tifTileProvider.dart';
+import 'package:flutter_logs/flutter_logs.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:proj4dart/proj4dart.dart' as proj4;
@@ -30,6 +33,8 @@ class _MapPageState extends State<mapPage> {
   final _mapController = MapController();
   LatLng? _pt;
   var data;
+  Geolocator? _geolocator;
+  Position? _position;
 
 //https://github.com/fleaflet/flutter_map/blob/master/example/lib/pages/custom_crs/custom_crs.dart
   late proj4.Projection epsg4326 = proj4.Projection.get('EPSG:4326')!;
@@ -142,6 +147,16 @@ class _MapPageState extends State<mapPage> {
   void initState() {
     super.initState();
     gl.refreshMap = setState;
+    _geolocator = Geolocator();
+    LocationSettings locationOptions = const LocationSettings(
+        accuracy: LocationAccuracy.high, distanceFilter: 1);
+    StreamSubscription positionStream =
+        Geolocator.getPositionStream(locationSettings: locationOptions)
+            .listen((Position position) {
+      setState(() {
+        gl.position = position;
+      });
+    });
   }
 
   void refreshView(void Function() f) {
@@ -212,7 +227,8 @@ class _MapPageState extends State<mapPage> {
                 cameraConstraint: CameraConstraint.contain(
                     bounds: LatLngBounds.fromPoints([latlonBL, latlonTR])),
                 onMapReady: () async {
-                  gl.position = await acquireUserLocation();
+                  updateLocation();
+
                   //await refreshAnalysisPosition();
                   if (gl.position != null) {
                     // IMPORTANT: rebuild location layer when permissions are granted
@@ -220,7 +236,7 @@ class _MapPageState extends State<mapPage> {
                       _mapController.move(
                           LatLng(gl.position?.latitude ?? 0.0,
                               gl.position?.longitude ?? 0.0),
-                          8);
+                          9);
                     });
                     // si on refusait d'allumer le GPS, alors la carte ne s'affichait jamais, c'est pourquoi il y a le else et le code ci-dessous
                   } else {
@@ -288,15 +304,50 @@ class _MapPageState extends State<mapPage> {
                         // cameraTrackingMode: CameraTrackingMode.locationAndOrientation,
                         ),
                   ]),
-          IconButton(
-              onPressed: () async {
-                if (await Geolocator.getCurrentPosition() == await Geolocator.getLastKnownPosition()) {
-                  print("huhu location service enabled");
-                } else {
-                  print("location service out");
-                }
-              },
-              icon: Icon(Icons.gps_fixed))
+          gl.position != null
+              ? Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+                  Column(mainAxisAlignment: MainAxisAlignment.end, children: [
+                    IconButton(
+                        iconSize: 40.0,
+                        color: gl.colorAgroBioTech,
+                        onPressed: () async {
+                          await _runAnaPt(epsg4326.transform(
+                              epsg31370,
+                              proj4.Point(
+                                  x: gl.position?.longitude ?? 0.0,
+                                  y: gl.position?.latitude ?? 0.0)));
+                          GoRouter.of(context).push("/anaPt");
+                        },
+                        icon: Icon(Icons.analytics)),
+                    IconButton(
+                        iconSize: 40.0,
+                        color: Colors.red,
+                        onPressed: () async {
+                          if (gl.position != null) {
+                            setState(() {
+                              _mapController.move(
+                                  LatLng(gl.position?.latitude ?? 0.0,
+                                      gl.position?.longitude ?? 0.0),
+                                  8);
+                            });
+                          }
+                        },
+                        icon: Icon(Icons.gps_fixed)),
+                  ])
+                ])
+              : Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+                  Column(mainAxisAlignment: MainAxisAlignment.end, children: [
+                    IconButton(
+                        iconSize: 40.0,
+                        color: Colors.black,
+                        onPressed: () async {
+                          if (gl.position != null) {
+                            setState(() {});
+                          }
+                        },
+                        icon: Icon(Icons.gps_fixed))
+                  ])
+                ])
         ]));
   }
 
@@ -304,6 +355,24 @@ class _MapPageState extends State<mapPage> {
     setState(() {
       _pt = pt;
     });
+  }
+
+  void updateLocation() async {
+    try {
+      Position newPosition = await Geolocator.getCurrentPosition(
+              desiredAccuracy: LocationAccuracy.best)
+          .timeout(new Duration(seconds: 3));
+
+      setState(() {
+        gl.position = newPosition;
+      });
+    } catch (e) {
+      setState(() {
+        gl.position = null;
+      });
+      FlutterLogs.logError("gps", "position",
+          "error while waiting on position. ${e.toString()}");
+    }
   }
 }
 
