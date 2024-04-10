@@ -88,7 +88,7 @@ Function rebuildWholeWidgetTree = () {};
 Function refreshMap = () {};
 Function refreshCatalogueView = () {};
 Function refreshCurrentThreeLayer = () {};
-
+Function rebuildOfflineView = () {};
 Function? rebuildNavigatorBar;
 
 int nOnlineLayer = 3;

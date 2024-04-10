@@ -131,7 +131,6 @@ class _LayerDownloaderState extends State<LayerDownloader> {
     //This part sucks. its executed at 'progress' = 0 -409600 100
     //Its worse. If you call reloadLayerTileLists to reorder the lists, the communication between main and downloader breaks => No way to know anything about your download anymore.
 
-    
     IsolateNameServer.registerPortWithName(
         _port.sendPort, 'downloader_send_port');
     _port.listen((dynamic data) async {
@@ -153,9 +152,10 @@ class _LayerDownloaderState extends State<LayerDownloader> {
             "Download running " + (progress / 100.0).toString());
       } else if (status == DownloadTaskStatus.complete) {
         FlutterLogs.logInfo("download", "completed", "Download finished");
-        gl.dico.getLayerBase(_taskIDToLayerCode[id]!).mOffline = true;
         _downloadStates[_taskIDToLayerCode[id]!] = 1.0;
-
+        gl.rebuildOfflineView(() {
+          gl.dico.getLayerBase(_taskIDToLayerCode[id]!).mOffline = true;
+        });
         widget.rebuildWidgetTree(() {
           gl.dico.checkLayerBaseOfflineRessource();
         });

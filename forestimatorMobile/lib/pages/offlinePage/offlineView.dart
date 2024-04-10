@@ -137,7 +137,7 @@ class _OfflineView extends State<OfflineView> {
             );
           },
           body: _buildOfflineList(category),
-          isExpanded: true,//category.isExpanded,
+          isExpanded: true, //category.isExpanded,
         );
       }).toList(),
     );
@@ -183,7 +183,9 @@ class _OfflineView extends State<OfflineView> {
                 children: [
                   Container(
                     constraints: BoxConstraints(
-                      maxWidth: MediaQuery.of(context).size.width * .55,
+                      maxWidth: MediaQuery.of(context).size.width * .2 > 144
+                          ? MediaQuery.of(context).size.width * .2
+                          : 144,
                       maxHeight: MediaQuery.of(context).size.width * .2 > 48
                           ? MediaQuery.of(context).size.width * .2
                           : 48,
@@ -193,6 +195,7 @@ class _OfflineView extends State<OfflineView> {
                         textScaler: const TextScaler.linear(1.2)),
                   ),
                   _downloadedControlBar(item),
+                  _selectLayerButton(item),
                 ]);
           },
           body: _expandedLegendView(item),
@@ -215,6 +218,82 @@ class _OfflineView extends State<OfflineView> {
                 "Téléchargable",
                 style: TextStyle(color: gl.colorUliege),
               ));
+  }
+
+  Widget _selectLayerButton(LayerTile lt) {
+    int nLayer = gl.offlineMode ? gl.nOfflineLayer : gl.nOnlineLayer;
+    return _isSelectedLayer(lt.key)
+        ? Container(
+            decoration: const BoxDecoration(
+                shape: BoxShape.circle, color: gl.colorAgroBioTech),
+            constraints: const BoxConstraints(
+              maxWidth: 48,
+              minWidth: 48,
+              maxHeight: 48,
+              minHeight: 48,
+            ),
+            padding: const EdgeInsets.all(0),
+            child: IconButton(
+                icon: const Icon(Icons.layers_clear, size: 28),
+                onPressed: () {
+                  setState(() {
+                    if (gl.interfaceSelectedLayerKeys.length > 1) {
+                      setState(() {
+                        lt.selected = false;
+                      });
+                      gl.refreshMap(() {
+                        gl.removeLayerFromList(lt.key);
+                      });
+                    }
+                  });
+                }),
+          )
+        : Container(
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+            ),
+            constraints: const BoxConstraints(
+              maxWidth: 48,
+              minWidth: 48,
+              maxHeight: 48,
+              minHeight: 48,
+            ),
+            padding: const EdgeInsets.all(0),
+            child: IconButton(
+                icon: const Icon(Icons.layers, size: 28),
+                onPressed: () {
+                  if (!gl.offlineMode ||
+                      (gl.offlineMode && gl.dico.getLayerBase(lt.key).mOffline))
+                    setState(() {
+                      if (gl.interfaceSelectedLayerKeys.length < nLayer) {
+                        setState(() {
+                          lt.selected = true;
+                        });
+                        gl.refreshMap(() {
+                          gl.addLayerToList(lt.key);
+                        });
+                      } else {
+                        setState(() {
+                          lt.selected = true;
+                        });
+                        gl.refreshMap(() {
+                          gl.interfaceSelectedLayerKeys.removeLast();
+                          gl.addLayerToList(lt.key);
+                        });
+                      }
+                    });
+                  //TODO else popup warning: file is not on disk
+                }),
+          );
+  }
+
+  bool _isSelectedLayer(String key) {
+    for (var layer in gl.interfaceSelectedLayerKeys) {
+      if (layer.mCode == key) {
+        return true;
+      }
+    }
+    return false;
   }
 
   Widget _expandedLegendView(LayerTile lt) {
@@ -289,8 +368,6 @@ class _OfflineView extends State<OfflineView> {
   }
 
   Future<void> reloadLayerData() async {
-    print(
-        "forget itiaqhgoihqgp,;oi;qjogjk^pqog:po;lqpogqg654654g8q1b068q4g2r6ze87");
     _getLayerData();
   }
 
@@ -300,6 +377,7 @@ class _OfflineView extends State<OfflineView> {
     if (!_finishedInitializingCategory) {
       _getLayerData();
     }
+    gl.rebuildOfflineView = setState;
   }
 
   void rebuildWidgetTreeForLayerDownloader(var setter) async {

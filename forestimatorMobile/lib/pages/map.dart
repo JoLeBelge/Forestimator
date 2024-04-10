@@ -35,6 +35,7 @@ class _MapPageState extends State<mapPage> {
   var data;
   Geolocator? _geolocator;
   Position? _position;
+  StreamSubscription? _positionStream;
 
 //https://github.com/fleaflet/flutter_map/blob/master/example/lib/pages/custom_crs/custom_crs.dart
   late proj4.Projection epsg4326 = proj4.Projection.get('EPSG:4326')!;
@@ -150,11 +151,12 @@ class _MapPageState extends State<mapPage> {
     _geolocator = Geolocator();
     LocationSettings locationOptions = const LocationSettings(
         accuracy: LocationAccuracy.high, distanceFilter: 1);
-    StreamSubscription positionStream =
+    _positionStream =
         Geolocator.getPositionStream(locationSettings: locationOptions)
-            .listen((Position position) {
+            .listen((Position? position) {
       setState(() {
-        gl.position = position;
+
+        if (position != null) gl.position = position;
       });
     });
   }
@@ -215,7 +217,7 @@ class _MapPageState extends State<mapPage> {
                       await SharedPreferences.getInstance();
                   prefs.setDouble('mapCenterLat', c.latitude);
                   prefs.setDouble('mapCenterLon', c.longitude);
-
+                  _positionStream!.resume();
                   double aZoom = _mapController.camera.zoom;
                   prefs.setDouble('mapZoom', aZoom);
                 },

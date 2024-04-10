@@ -143,9 +143,9 @@ class _CategoryView extends State<CategoryView> {
                 children: [
                   Container(
                     constraints: BoxConstraints(
-                      maxWidth: MediaQuery.of(context).size.width * .2 > 48
+                      maxWidth: MediaQuery.of(context).size.width * .2 > 144
                           ? MediaQuery.of(context).size.width * .2
-                          : 48,
+                          : 144,
                       maxHeight: MediaQuery.of(context).size.width * .2 > 48
                           ? MediaQuery.of(context).size.width * .2
                           : 48,
@@ -291,8 +291,23 @@ class _CategoryView extends State<CategoryView> {
     );
   }
 
+  Widget _downloadedControlBar(LayerTile lt) {
+    return Container(
+        constraints:
+            const BoxConstraints(maxWidth: 128, minHeight: 32, maxHeight: 32),
+        child: gl.dico.getLayerBase(lt.key).mOffline
+            ? Text(
+                "Enregistré",
+                style: TextStyle(color: gl.colorAgroBioTech),
+              )
+            : Text(
+                "Téléchargable",
+                style: TextStyle(color: gl.colorUliege),
+              ));
+  }
+
   Widget selectLayerBar(LayerTile lt) {
-    double barWidth = 48.0;
+    double barWidth = 128.0 + 48;
     /*if (widget.category.filter != "APT_CS" &&
         widget.category.filter != "APT_FEE" &&
         !lt.extern) barWidth = 96.0;*/
@@ -306,7 +321,10 @@ class _CategoryView extends State<CategoryView> {
               : 48,
           minHeight: 48,
         ),
-        child: Row(children: [
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+          _downloadedControlBar(lt),
           /*if (widget.category.filter != "APT_CS" &&
               widget.category.filter != "APT_FEE" &&
               !lt.extern)
