@@ -151,14 +151,11 @@ class _MapPageState extends State<mapPage> {
     _geolocator = Geolocator();
     LocationSettings locationOptions = const LocationSettings(
         accuracy: LocationAccuracy.high, distanceFilter: 1);
-    _positionStream =
-        Geolocator.getPositionStream(locationSettings: locationOptions)
-            .listen((Position? position) {
-      setState(() {
-
-        if (position != null) gl.position = position;
-      });
-    });
+    /*Geolocator.getPositionStream(locationSettings: locationOptions)
+        .listen((Position? position) {
+      gl.position = position;
+      setState(() {});
+    });*/
   }
 
   void refreshView(void Function() f) {
@@ -217,7 +214,7 @@ class _MapPageState extends State<mapPage> {
                       await SharedPreferences.getInstance();
                   prefs.setDouble('mapCenterLat', c.latitude);
                   prefs.setDouble('mapCenterLon', c.longitude);
-                  _positionStream!.resume();
+                  updateLocation();
                   double aZoom = _mapController.camera.zoom;
                   prefs.setDouble('mapZoom', aZoom);
                 },
@@ -274,7 +271,7 @@ class _MapPageState extends State<mapPage> {
                     } else {
                       layerBase l = gl.dico.getLayerBase(selLayer.mCode);
                       return gl.offlineMode
-                          ? Text("Cette couche n'est pas affichée.")
+                          ? const Text("Vous n'avez pas encore téléchargé des couches.")
                           : TileLayer(
                               userAgentPackageName: "com.example.fforestimator",
                               wmsOptions: WMSTileLayerOptions(
@@ -297,7 +294,7 @@ class _MapPageState extends State<mapPage> {
                         Marker(
                           width: 50.0,
                           height: 50.0,
-                          point: _pt ?? LatLng(0.0, 0.0),
+                          point: _pt ?? const LatLng(0.0, 0.0),
                           child: const Icon(Icons.location_on),
                         ),
                       ],
@@ -320,7 +317,7 @@ class _MapPageState extends State<mapPage> {
                                   y: gl.position?.latitude ?? 0.0)));
                           GoRouter.of(context).push("/anaPt");
                         },
-                        icon: Icon(Icons.analytics)),
+                        icon: const Icon(Icons.analytics)),
                     IconButton(
                         iconSize: 40.0,
                         color: Colors.red,
@@ -334,7 +331,7 @@ class _MapPageState extends State<mapPage> {
                             });
                           }
                         },
-                        icon: Icon(Icons.gps_fixed)),
+                        icon: const Icon(Icons.gps_fixed)),
                   ])
                 ])
               : Row(mainAxisAlignment: MainAxisAlignment.end, children: [
@@ -347,7 +344,7 @@ class _MapPageState extends State<mapPage> {
                             setState(() {});
                           }
                         },
-                        icon: Icon(Icons.gps_fixed))
+                        icon: const Icon(Icons.gps_fixed))
                   ])
                 ])
         ]));

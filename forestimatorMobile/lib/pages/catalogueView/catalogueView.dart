@@ -50,10 +50,10 @@ class _CatalogueView extends State<CatalogueView> {
           headerBuilder: (BuildContext context, bool isExpanded) {
             // c'est pas gagné, voir similaire pour expansionTile customisatin https://github.com/flutter/flutter/issues/24917
             return Container(
+              color: gl.colorBackgroundSecondary,
               child: ListTile(
                 title: Text(item.name),
               ),
-              color: gl.colorBackgroundSecondary,
             );
           },
           body: CategoryView(
@@ -96,9 +96,8 @@ class CategoryView extends StatefulWidget {
 }
 
 class _CategoryView extends State<CategoryView> {
-  static Map<String, List<LayerTile>> _layerTiles = {};
-  static Map<String, bool> _finishedInitializingCategory = {};
-  bool _flipForBackground = false;
+  static final Map<String, List<LayerTile>> _layerTiles = {};
+  static final Map<String, bool> _finishedInitializingCategory = {};
 
   @override
   Widget build(BuildContext context) {
@@ -244,7 +243,7 @@ class _CategoryView extends State<CategoryView> {
                     ])),
         if (gl.dico.getLayerBase(lt.key).hasDoc())
           ListTile(
-            title: Text(
+            title: const Text(
                 "Consulter la documentation relative à la cette couche cartographique"),
             leading: IconButton(
                 onPressed: () {
@@ -253,7 +252,7 @@ class _CategoryView extends State<CategoryView> {
                         gl.dico.getLayerBase(lt.key).mPdfPage.toString()
                   });
                 },
-                icon: Icon(Icons.picture_as_pdf)),
+                icon: const Icon(Icons.picture_as_pdf)),
           ),
         if ((gl.dico.getLayerBase(lt.key).mGroupe == "APT_FEE" ||
                 gl.dico.getLayerBase(lt.key).mGroupe == "APT_CS") &&
@@ -271,7 +270,7 @@ class _CategoryView extends State<CategoryView> {
                       .getEss(gl.dico.getLayerBase(lt.key).getEssCode())
                       .getFicheRoute(complete: true));
                 },
-                icon: Icon(Icons.picture_as_pdf)),
+                icon: const Icon(Icons.picture_as_pdf)),
           ),
         LegendView(
           layerKey: lt.key,
@@ -296,14 +295,18 @@ class _CategoryView extends State<CategoryView> {
         constraints:
             const BoxConstraints(maxWidth: 128, minHeight: 32, maxHeight: 32),
         child: gl.dico.getLayerBase(lt.key).mOffline
-            ? Text(
+            ? const Text(
                 "Enregistré",
                 style: TextStyle(color: gl.colorAgroBioTech),
               )
-            : Text(
-                "Téléchargable",
-                style: TextStyle(color: gl.colorUliege),
-              ));
+            : gl.dico.getLayerBase(lt.key).mIsDownloadableRW
+                ? const Text(
+                    "Téléchargable",
+                    style: TextStyle(color: gl.colorUliege),
+                  )
+                : const Text(
+                    "",
+                  ));
   }
 
   Widget selectLayerBar(LayerTile lt) {
@@ -321,9 +324,8 @@ class _CategoryView extends State<CategoryView> {
               : 48,
           minHeight: 48,
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
+        child:
+            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
           _downloadedControlBar(lt),
           /*if (widget.category.filter != "APT_CS" &&
               widget.category.filter != "APT_FEE" &&
@@ -397,7 +399,7 @@ class _CategoryView extends State<CategoryView> {
                       }),
                 )
               : Container(
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     shape: BoxShape.circle,
                   ),
                   constraints: const BoxConstraints(
@@ -412,7 +414,7 @@ class _CategoryView extends State<CategoryView> {
                       onPressed: () {
                         if (!gl.offlineMode ||
                             (gl.offlineMode &&
-                                gl.dico.getLayerBase(lt.key).mOffline))
+                                gl.dico.getLayerBase(lt.key).mOffline)) {
                           setState(() {
                             if (gl.interfaceSelectedLayerKeys.length < nLayer) {
                               lt.selected = true;
@@ -429,6 +431,7 @@ class _CategoryView extends State<CategoryView> {
                               });
                             }
                           });
+                        }
                         //TODO else popup warning: file is not on disk
                       }),
                 ),
@@ -466,6 +469,10 @@ class _CategoryView extends State<CategoryView> {
     setState(() {
       _finishedInitializingCategory[widget.category.filter] = true;
     });
+  }
+
+  void rebuildWidgetTreeForLayerDownloader(var setter) async {
+    setState(setter);
   }
 
   bool _isSelectedLayer(String key) {
@@ -509,7 +516,6 @@ class _SelectedLayerView extends State<SelectedLayerView> {
   @override
   Widget build(BuildContext context) {
     {
-      int nLayer = gl.offlineMode ? gl.nOfflineLayer : gl.nOnlineLayer;
       return ReorderableListView(
         buildDefaultDragHandles: false,
         padding: const EdgeInsets.symmetric(horizontal: 0),

@@ -5,10 +5,12 @@ TT -> pop_up lors du premier lancement de l'app ; proposition de télécharger t
 
 Jo -> pop_up pour informer à l'utilisateur qu'il n'as pas internet (1; analyse ponctuelle online, 2) affichage d'une carte online en mode offline)
 
-JO ou TT -> page offline ; afficher par defaut les cartes téléchargées uniquement, ajout boutton pour afficher carte
+vv -> page offline ; afficher par defaut les cartes téléchargées uniquement, ajout boutton pour afficher carte
+
+-> Popup avec progress quand on charge et travail une map en offline...
 
 TT -> gerer permission
-TT -> gestion mapController avec et sans position GPS ; s'inspirer de Qfield, boutton GPS on off, GPS centrage/non centrage
+v -> gestion mapController avec et sans position GPS ; s'inspirer de Qfield, boutton GPS on off, GPS centrage/non centrage
 TT -> progress bar téléchargement.
 
 DATE PREMIERE RELEASE : 19/04 (semaine forêt étudiant GRF)
