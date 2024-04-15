@@ -319,10 +319,7 @@ class _OfflineView extends State<OfflineView> {
     return Column(
       children: <Widget>[
         if (lt.downloadable)
-          ColoredBox(
-              color: gl.colorBackground,
-              child: LayerDownloader(
-                  lt, rebuildWidgetTreeForLayerDownloader, reloadLayerData)),
+          ColoredBox(color: gl.colorBackground, child: LayerDownloader(lt)),
         if (gl.dico.getLayerBase(lt.key).hasDoc())
           ListTile(
             title: Text(
@@ -396,12 +393,13 @@ class _OfflineView extends State<OfflineView> {
     if (!_finishedInitializingCategory) {
       _getLayerData();
     }
-    gl.rebuildOfflineView = rebuildWidgetTreeForLayerDownloader;
+    gl.rebuildOfflineView = rebuildOfflineWidgetTreeForLayerDownloader;
     gl.removeFromOfflineList = removeFromList;
     gl.addToOfflineList = addToList;
   }
 
-  void rebuildWidgetTreeForLayerDownloader(void Function() setter) async {
+  void rebuildOfflineWidgetTreeForLayerDownloader(
+      void Function() setter) async {
     setState(setter);
   }
 }

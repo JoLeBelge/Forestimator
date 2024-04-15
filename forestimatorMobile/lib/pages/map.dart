@@ -356,7 +356,7 @@ class _MapPageState extends State<mapPage> {
     });
   }
 
-  bool _refreshLocation = false;
+  static bool _refreshLocation = false;
 
   void updateLocation() async {
     try {

@@ -160,6 +160,7 @@ class _MyApp extends State<MyApp> {
     _listAndCopyPdfassets();
     readPreference();
     gl.rebuildWholeWidgetTree = setState;
+    
   }
 
   late final _router = GoRouter(

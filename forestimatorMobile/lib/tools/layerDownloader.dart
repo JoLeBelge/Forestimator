@@ -10,12 +10,8 @@ import 'package:flutter_logs/flutter_logs.dart';
 
 class LayerDownloader extends StatefulWidget {
   final LayerTile layer;
-  final Function rebuildWidgetTree;
-  final Function reloadLayerTileLists;
   final bool? autoDownloadLayer;
-  const LayerDownloader(
-      this.layer, this.rebuildWidgetTree, this.reloadLayerTileLists,
-      {super.key, this.autoDownloadLayer});
+  const LayerDownloader(this.layer, {super.key, this.autoDownloadLayer});
 
   @override
   State<LayerDownloader> createState() => _LayerDownloaderState();
@@ -64,11 +60,13 @@ class _LayerDownloaderState extends State<LayerDownloader> {
               await fileDelete(join(gl.dico.docDir.path,
                       gl.dico.getLayerBase(widget.layer.key).mNomRaster))
                   .whenComplete(() {
-                widget.rebuildWidgetTree(() {
+                setState(() {
                   gl.dico.getLayerBase(widget.layer.key).mOffline = false;
                   _downloadStates[widget.layer.key] == 0.0;
                   gl.removeFromOfflineList(widget.layer.key);
                 });
+                gl.refreshWholeCatalogueView(() {});
+                gl.rebuildOfflineView(() {});
               });
             },
             icon: const Icon(Icons.delete)),
@@ -84,7 +82,7 @@ class _LayerDownloaderState extends State<LayerDownloader> {
               var it = await _downloadFile();
               _downloadStates[widget.layer.key] = 0.01;
               _taskIDToLayerCode[it] = widget.layer.key;
-              widget.rebuildWidgetTree(() {
+              setState(() {
                 gl.offlineMode = gl.offlineMode;
               });
             },
@@ -155,14 +153,14 @@ class _LayerDownloaderState extends State<LayerDownloader> {
             "Download running " + (progress / 100.0).toString());
       } else if (status == DownloadTaskStatus.complete) {
         FlutterLogs.logInfo("download", "completed", "Download finished");
-        _downloadStates[_taskIDToLayerCode[id]!] = 1.0;
-        gl.rebuildOfflineView(() {
+        setState(() {
+          _downloadStates[_taskIDToLayerCode[id]!] = 1.0;
           gl.dico.getLayerBase(_taskIDToLayerCode[id]!).mOffline = true;
           gl.addToOfflineList(_taskIDToLayerCode[id]!);
-        });
-        widget.rebuildWidgetTree(() {
           gl.dico.checkLayerBaseOfflineRessource();
         });
+        gl.refreshWholeCatalogueView(() {});
+        gl.rebuildOfflineView(() {});
       } else if (status == DownloadTaskStatus.failed) {
         setState(() {
           gl.dico.getLayerBase(_taskIDToLayerCode[id]!).mOffline = false;
@@ -185,7 +183,7 @@ class _LayerDownloaderState extends State<LayerDownloader> {
 
   @override
   void dispose() {
-    IsolateNameServer.removePortNameMapping('downloader_send_port');
+    //IsolateNameServer.removePortNameMapping('downloader_send_port');
     super.dispose();
   }
 

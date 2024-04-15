@@ -83,6 +83,10 @@ class _CatalogueView extends State<CatalogueView> {
     if (!finishedInitializingCategories) {
       _getCategories();
     }
+    gl.refreshWholeCatalogueView = rebuildWidgetTreeForLayerDownloader;
+  }
+  void rebuildWidgetTreeForLayerDownloader(void Function() setter) async {
+    setState(setter);
   }
 }
 
@@ -169,7 +173,7 @@ class _CategoryView extends State<CategoryView> {
         if (lt.downloadable)
           ColoredBox(
               color: gl.colorBackgroundSecondary,
-              child: LayerDownloader(lt, gl.refreshCatalogueView, () {})),
+              child: LayerDownloader(lt)),
         if (gl.dico.getLayerBase(lt.key).mUsedForAnalysis)
           ColoredBox(
               color: gl.colorBackgroundSecondary,
@@ -489,7 +493,7 @@ class _CategoryView extends State<CategoryView> {
     if (!_finishedInitializingCategory[widget.category.filter]!) {
       _getLayerData();
     }
-    gl.refreshCatalogueView = setState;
+    gl.refreshCatalogueView = rebuildWidgetTreeForLayerDownloader;
   }
 
   void rebuildWidgetTreeForLayerDownloader(void Function() setter) async {
