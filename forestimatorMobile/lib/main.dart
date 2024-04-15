@@ -2,6 +2,7 @@ import 'package:fforestimator/dico/dicoApt.dart';
 import 'package:fforestimator/dico/ess.dart';
 import 'package:fforestimator/pages/anaPt/anaPtpage.dart';
 import 'package:fforestimator/pages/offlinePage/offlineView.dart';
+import 'package:fforestimator/tools/notification.dart';
 import 'package:flutter/material.dart';
 import 'package:fforestimator/globals.dart' as gl;
 import 'package:fforestimator/pages/map.dart';
@@ -69,6 +70,7 @@ class _MyApp extends State<MyApp> {
       TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
 
   late String _pathExternalStorage;
+  bool _initializedPersistentValues = false;
 
   _MyApp() {}
 
@@ -85,6 +87,11 @@ class _MyApp extends State<MyApp> {
 
     if (aAnaPtSelectedLayerKeys != null) {
       gl.anaPtSelectedLayerKeys = aAnaPtSelectedLayerKeys;
+    }
+
+    final bool? firstTimeUse = prefs.getBool('firstTimeUse');
+    if (firstTimeUse != null) {
+      gl.firstTimeUse = firstTimeUse;
     }
 
     final List<String>? ainterfaceSelectedLCode =
@@ -104,6 +111,9 @@ class _MyApp extends State<MyApp> {
     if (aZoom != null) {
       gl.mapZoom = aZoom;
     }
+    setState(() {
+      _initializedPersistentValues = true;
+    });
   }
 
   Future<File> fromAsset(String asset, String filename) async {
@@ -149,7 +159,7 @@ class _MyApp extends State<MyApp> {
     // copier tout les pdf de l'asset bundle vers un fichier utilisable par la librairie flutter_pdfviewer
     _listAndCopyPdfassets();
     readPreference();
-    gl.rebuildWholeWidgetTree;
+    gl.rebuildWholeWidgetTree = setState;
   }
 
   late final _router = GoRouter(
@@ -259,6 +269,46 @@ class _MyApp extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
+    if (!_initializedPersistentValues) {
+      return const MaterialApp(home: CircularProgressIndicator());
+    } else if (gl.firstTimeUse) {
+      return MaterialApp(
+          home: PopupNotification(
+        title: "FirstTimeUse",
+        accept: "oui",
+        onAccept: () async {
+          setState(() {
+            gl.firstTimeUse = false;
+          });
+          final SharedPreferences prefs = await SharedPreferences.getInstance();
+          await prefs.setBool('firstTimeUse', gl.firstTimeUse);
+          for (var key in gl.downloadableLayerKeys) {
+            if (!(Platform.isWindows || Platform.isLinux || Platform.isMacOS)) {
+              FlutterDownloader.enqueue(
+                url: gl.queryApiRastDownload +
+                    "/" +
+                    gl.dico.getLayerBase(key).mCode,
+                fileName: gl.dico.getLayerBase(key).mNomRaster,
+                savedDir: gl.dico.docDir.path,
+                showNotification: false,
+                openFileFromNotification: false,
+                timeout: 15000,
+              );
+            }
+          }
+        },
+        decline: "non",
+        onDecline: () async {
+          setState(() {
+            gl.firstTimeUse = false;
+          });
+          final SharedPreferences prefs = await SharedPreferences.getInstance();
+          await prefs.setBool('firstTimeUse', gl.firstTimeUse);
+        },
+        dialog:
+            "Autorisez vous l'aplication à télécharger un jeu de couches pour l'utilisation de l'analyse hors ligne?",
+      ));
+    }
     return MaterialApp.router(
       routerDelegate: _router.routerDelegate,
       routeInformationParser: _router.routeInformationParser,

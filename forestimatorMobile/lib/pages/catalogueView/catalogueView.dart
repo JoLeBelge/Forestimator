@@ -471,10 +471,6 @@ class _CategoryView extends State<CategoryView> {
     });
   }
 
-  void rebuildWidgetTreeForLayerDownloader(var setter) async {
-    setState(setter);
-  }
-
   bool _isSelectedLayer(String key) {
     for (var layer in gl.interfaceSelectedLayerKeys) {
       if (layer.mCode == key) {
@@ -494,6 +490,10 @@ class _CategoryView extends State<CategoryView> {
       _getLayerData();
     }
     gl.refreshCatalogueView = setState;
+  }
+
+  void rebuildWidgetTreeForLayerDownloader(void Function() setter) async {
+    setState(setter);
   }
 }
 

@@ -12,9 +12,10 @@ class LayerDownloader extends StatefulWidget {
   final LayerTile layer;
   final Function rebuildWidgetTree;
   final Function reloadLayerTileLists;
+  final bool? autoDownloadLayer;
   const LayerDownloader(
       this.layer, this.rebuildWidgetTree, this.reloadLayerTileLists,
-      {super.key});
+      {super.key, this.autoDownloadLayer});
 
   @override
   State<LayerDownloader> createState() => _LayerDownloaderState();
@@ -66,6 +67,7 @@ class _LayerDownloaderState extends State<LayerDownloader> {
                 widget.rebuildWidgetTree(() {
                   gl.dico.getLayerBase(widget.layer.key).mOffline = false;
                   _downloadStates[widget.layer.key] == 0.0;
+                  gl.removeFromOfflineList(widget.layer.key);
                 });
               });
             },
@@ -80,9 +82,10 @@ class _LayerDownloaderState extends State<LayerDownloader> {
         IconButton(
             onPressed: () async {
               var it = await _downloadFile();
-              setState(() {
-                _downloadStates[widget.layer.key] = 0.01;
-                _taskIDToLayerCode[it] = widget.layer.key;
+              _downloadStates[widget.layer.key] = 0.01;
+              _taskIDToLayerCode[it] = widget.layer.key;
+              widget.rebuildWidgetTree(() {
+                gl.offlineMode = gl.offlineMode;
               });
             },
             icon: const Icon(Icons.download)),
@@ -155,6 +158,7 @@ class _LayerDownloaderState extends State<LayerDownloader> {
         _downloadStates[_taskIDToLayerCode[id]!] = 1.0;
         gl.rebuildOfflineView(() {
           gl.dico.getLayerBase(_taskIDToLayerCode[id]!).mOffline = true;
+          gl.addToOfflineList(_taskIDToLayerCode[id]!);
         });
         widget.rebuildWidgetTree(() {
           gl.dico.checkLayerBaseOfflineRessource();

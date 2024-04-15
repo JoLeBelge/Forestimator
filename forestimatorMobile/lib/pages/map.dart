@@ -356,8 +356,15 @@ class _MapPageState extends State<mapPage> {
     });
   }
 
+  bool _refreshLocation = false;
+
   void updateLocation() async {
     try {
+      if (_refreshLocation)
+        return;
+      else
+        _refreshLocation = true;
+      
       Position newPosition = await Geolocator.getCurrentPosition(
               desiredAccuracy: LocationAccuracy.best)
           .timeout(new Duration(seconds: 3));
@@ -365,10 +372,12 @@ class _MapPageState extends State<mapPage> {
       setState(() {
         gl.position = newPosition;
       });
-    } catch (e) {
+      _refreshLocation = false;
+    } catch (e) { // We keep the old position.
       setState(() {
-        gl.position = null;
+        gl.position = gl.position;
       });
+      _refreshLocation = false;
       FlutterLogs.logError("gps", "position",
           "error while waiting on position. ${e.toString()}");
     }

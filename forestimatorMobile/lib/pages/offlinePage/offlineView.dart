@@ -118,6 +118,25 @@ class _OfflineView extends State<OfflineView> {
     );
   }
 
+  void addToList(String key) {
+    _downlodableLayerTiles["offline"]!.add(LayerTile(
+      key: key,
+      name: gl.dico.getLayerBase(key).mNom,
+      filter: gl.dico.getLayerBase(key).mGroupe,
+      extern: gl.dico.getLayerBase(key).mCategorie == "Externe",
+      downloadable: gl.dico.getLayerBase(key).mIsDownloadableRW,
+    ));
+  }
+
+  void removeFromList(String key) {
+    for (var it in _downlodableLayerTiles["offline"]!) {
+      if (it.key == key) {
+        _downlodableLayerTiles["offline"]!.remove(it);
+        break;
+      }
+    }
+  }
+
   Widget _buildOfflineCategory() {
     return ExpansionPanelList(
       expandIconColor: Colors.black,
@@ -377,10 +396,12 @@ class _OfflineView extends State<OfflineView> {
     if (!_finishedInitializingCategory) {
       _getLayerData();
     }
-    gl.rebuildOfflineView = setState;
+    gl.rebuildOfflineView = rebuildWidgetTreeForLayerDownloader;
+    gl.removeFromOfflineList = removeFromList;
+    gl.addToOfflineList = addToList;
   }
 
-  void rebuildWidgetTreeForLayerDownloader(var setter) async {
+  void rebuildWidgetTreeForLayerDownloader(void Function() setter) async {
     setState(setter);
   }
 }

@@ -91,8 +91,13 @@ Function refreshCurrentThreeLayer = () {};
 Function rebuildOfflineView = () {};
 Function? rebuildNavigatorBar;
 
+Function addToOfflineList = () {};
+Function removeFromOfflineList = () {};
+
 int nOnlineLayer = 3;
 int nOfflineLayer = 1;
+
+bool firstTimeUse = true;
 
 //proj4.Point ptCenter = proj4.Point(x: 217200.0, y: 50100.0); // epioux
 // WARNING lat =y lon=x

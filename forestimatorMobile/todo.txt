@@ -11,7 +11,10 @@ vv -> page offline ; afficher par defaut les cartes téléchargées uniquement, 
 
 TT -> gerer permission
 v -> gestion mapController avec et sans position GPS ; s'inspirer de Qfield, boutton GPS on off, GPS centrage/non centrage
+    -> problème avec le stream
+
 TT -> progress bar téléchargement.
+    -> Ca foire pour le telechargement après qu'on à supprimé une couche...
 
 DATE PREMIERE RELEASE : 19/04 (semaine forêt étudiant GRF)
 
