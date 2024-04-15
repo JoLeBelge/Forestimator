@@ -40,7 +40,7 @@ class _ScaffoldWithNestedNavigation
     return Scaffold(
       body: widget.navigationShell,
       bottomNavigationBar: NavigationBar(
-        height: MediaQuery.of(context).size.height * 0.08,
+        height: MediaQuery.of(context).size.height * 0.07,
         selectedIndex: widget.navigationShell.currentIndex,
         destinations: const [
           NavigationDestination(label: 'Carte', icon: Icon(Icons.map)),

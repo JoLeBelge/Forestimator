@@ -20,8 +20,8 @@ class _CatalogueLayerView extends State<CatalogueLayerView> {
           child: CatalogueView(refreshView: refreshView),
           constraints: BoxConstraints(
               maxWidth: MediaQuery.of(context).size.width * 1.0,
-              minHeight: MediaQuery.of(context).size.height * .73,
-              maxHeight: MediaQuery.of(context).size.height * .73),
+              minHeight: MediaQuery.of(context).size.height * .75,
+              maxHeight: MediaQuery.of(context).size.height * .75),
         ),
         Container(
           color: gl.colorBackground,

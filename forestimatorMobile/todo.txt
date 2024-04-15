@@ -2,7 +2,7 @@ To do list fforestimator
 ------------------------
 
 v -> pop_up lors du premier lancement de l'app ; proposition de télécharger toutes les couches offline de la liste anaPtSelectedLayerKeys
-    -> faut ammeiloerer le download
+    -> faut ammeiloerer le download pour avoir un feedback.
 
 Jo -> pop_up pour informer à l'utilisateur qu'il n'as pas internet (1; analyse ponctuelle online, 2) affichage d'une carte online en mode offline)
 

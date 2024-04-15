@@ -179,14 +179,29 @@ class _MapPageState extends State<mapPage> {
         epsg31370.transform(epsg4326, ptTopR).x + margeInDegree);
 
     return Scaffold(
-        appBar: AppBar(
-          title: const Text(
-            "Forestimator",
-            textScaler: TextScaler.linear(0.75),
-          ),
-          toolbarHeight: 20.0,
-          backgroundColor: gl.colorAgroBioTech,
-        ),
+        appBar: gl.offlineMode
+            ? AppBar(
+                title: const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text("Forestimator offline/terrain",
+                          textScaler: TextScaler.linear(0.75),
+                          style: TextStyle(color: Colors.black)),
+                    ]),
+                toolbarHeight: 20.0,
+                backgroundColor: gl.colorAgroBioTech,
+              )
+            : AppBar(
+                title: const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text("Forestimator online",
+                          textScaler: TextScaler.linear(0.75),
+                          style: TextStyle(color: Colors.white)),
+                    ]),
+                toolbarHeight: 20.0,
+                backgroundColor: gl.colorUliege,
+              ),
         body: Stack(children: <Widget>[
           FlutterMap(
               mapController: _mapController,
@@ -271,7 +286,8 @@ class _MapPageState extends State<mapPage> {
                     } else {
                       layerBase l = gl.dico.getLayerBase(selLayer.mCode);
                       return gl.offlineMode
-                          ? const Text("Vous n'avez pas encore téléchargé des couches.")
+                          ? const Text(
+                              "Vous n'avez pas encore téléchargé des couches.")
                           : TileLayer(
                               userAgentPackageName: "com.example.fforestimator",
                               wmsOptions: WMSTileLayerOptions(
@@ -364,7 +380,7 @@ class _MapPageState extends State<mapPage> {
         return;
       else
         _refreshLocation = true;
-      
+
       Position newPosition = await Geolocator.getCurrentPosition(
               desiredAccuracy: LocationAccuracy.best)
           .timeout(new Duration(seconds: 3));
@@ -373,7 +389,8 @@ class _MapPageState extends State<mapPage> {
         gl.position = newPosition;
       });
       _refreshLocation = false;
-    } catch (e) { // We keep the old position.
+    } catch (e) {
+      // We keep the old position.
       setState(() {
         gl.position = gl.position;
       });
