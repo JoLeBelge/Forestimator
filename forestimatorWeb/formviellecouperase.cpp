@@ -305,14 +305,14 @@ void formVielleCoupeRase::submit(){
             vider();
         }
 
-
+        sendSummaryMail();
     }
 }
 
 std::string formVielleCoupeRase::format4SQL(std::string aString){
 
-        boost::replace_all(aString,"'","\"");
-        return aString;
+    boost::replace_all(aString,"'","\"");
+    return aString;
 }
 
 void formVielleCoupeRase::vider(bool all){
@@ -537,6 +537,40 @@ void formVielleCoupeRase::validDraw(std::string geojson){
         std::cout << "validDraw : je n'arrive pas à ouvrir " << aOut<< std::endl;
     }
     GDALClose(DS);
+}
+
+void formVielleCoupeRase::sendSummaryMail(){
+    Wt::Mail::Message mail =Wt::Mail::Message();
+    //mail.addHeader();
+    mail.setFrom(Wt::Mail::Mailbox("JO.Lisein@uliege.be", "Lisein Jonathan"));
+    mail.setBody(
+                "\nVos données ont été encodée:"+
+                Wt::WString::tr("mail.contact").toUTF8()+
+                vosrefEdit_->valueText().toUTF8()+"\n"+
+                nomEncoderEdit_->valueText().toUTF8()+"\n"+
+                prenomEncoderEdit_->valueText().toUTF8()+"\n"+
+                contactEncoderEdit_->valueText().toUTF8()+"\n"
+                /* +"'"+format4SQL(ContactEdit_->valueText().toUTF8())+"',"
+                             +"'"+format4SQL(anneeVCREdit_->currentText().toUTF8())+"',"
+                             +"'"+format4SQL(regeNatEdit_->valueText().toUTF8())+"',"
+                             +"'"+format4SQL(vegeBloquanteEdit_->valueText().toUTF8())+"',"
+                             +"'"+format4SQL(objectifEdit_->currentText().toUTF8())+"',"
+                             +"'"+format4SQL(spEdit_->valueText().toUTF8())+"',"
+                             +"'"+format4SQL(sanitEdit_->valueText().toUTF8())+"',"
+                             //+"'"+format4SQL(itineraireEdit_->currentText().toUTF8())+"',"
+                             +"'"+format4SQL(travSylviEdit_->valueText().toUTF8())+"',"
+                             +"'"+format4SQL(plantationEdit_->valueText().toUTF8())+"',"
+                             //+"'"+format4SQL(hauteurEdit_->valueText().toUTF8())+"',"
+                             +"'"+format4SQL(gibierEdit_->valueText().toUTF8())+"',"
+                             +"'"+format4SQL(VCRdescriptionEdit_->valueText().toUTF8())+"',"
+                             +std::to_string(surf)+","
+                             +"'"+polyg+"');";*/
+                );
+    mail.setSubject(Wt::WString::tr("mail.titre").toUTF8());
+    mail.addRecipient(Wt::Mail::RecipientType::To,Mail::Mailbox(contactEncoderEdit_->valueText().toUTF8(),nomEncoderEdit_->valueText().toUTF8()) );
+            Mail::Client client;
+    std::cout << "connexion clien pour email : " << client.connect() << std::endl;
+    client.send(mail);
 }
 
 

@@ -11,7 +11,7 @@
 
 <h3>Les coupes rases abandonnées peuvent-elles produire du bois de qualité ?</h3>
 <br></br>
-La Faculté de Gembloux Agro-Bio Tech (ULiège) a initié, en collaboration avec les experts forestiers (FNEF) et la cellule d’appui (CAPFP), une étude visant à évaluer objectivement dans quelle mesure la régénération naturelle, au besoin enrichie, peut produire des peuplements de valeur économique, paysagère et écologique sur de grandes mises à blanc, et à définir les moyens pour y parvenir. Nous sommes à la recherche de situations actuellement connues de <b class="text-success">coupes rases anciennes non replantées</b>, que la régénération y soit réussie ou non, dans lesquelles les propriétaires peuvent nous renseigner sur les éventuelles interventions qui y ont été menées. Vous pouvez nous aider en remplissant le formulaire ci-dessous, ou en nous contactant par mail ou téléphone : Mr Lisein (<a href = "mailto: liseinjon@hotmail.com">liseinjon@hotmail.com</a> - 0475221309)
+La Faculté de Gembloux Agro-Bio Tech (ULiège) a initié, en collaboration avec les experts forestiers (FNEF) et la cellule d’appui (CAPFP), une étude visant à évaluer objectivement dans quelle mesure la régénération naturelle, au besoin enrichie, peut produire des peuplements de valeur économique, paysagère et écologique sur de grandes mises à blanc, et à définir les moyens pour y parvenir. Nous sommes à la recherche de situations actuellement connues de <b class="text-success">coupes rases anciennes non replantées</b>, que la régénération y soit réussie ou non, dans lesquelles les propriétaires peuvent nous renseigner sur les éventuelles interventions qui y ont été menées. Vous pouvez nous aider en remplissant le formulaire ci-dessous, ou en nous contactant par mail ou téléphone : Mr Lisein (<a href = "mailto: liseinjon@hotmail.com">JO.Lisein@uliege.be</a> - 0475221309)
 		<div >
 		 <img src="/img/CoupeRaseNisramont1LR.jpg" alt="coupe rase en libre évolution avec une régénération naturelle satisfaisante" style="display: block;margin-left: auto;margin-right: auto;width: 30%;"  />
 		</div>
@@ -129,5 +129,8 @@ Vos données ont été encodées de manière adéquate. Nous vous remercions pou
 <message id="Wt.WMessageBox.Yes"> Oui</message>
 <message id="Wt.WMessageBox.No"> Non</message>
 <message id="Wt.WMessageBox.Cancel"> Annuler</message>
+
+<message id="mail.titre"> encodage d'anciennes coupes rases non replantées </message>
+<message id="mail.contact">  Vos données personnelles </message>
 
 </messages>

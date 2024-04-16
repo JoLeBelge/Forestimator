@@ -29,6 +29,8 @@
 #include <Wt/WLocalDateTime.h>
 #include <cdicoapt.h>
 #include <sqlite3.h>
+#include <Wt/Mail/Message.h>
+#include <Wt/Mail/Client.h>
 
 
 
@@ -42,6 +44,7 @@ public:
 
     void loadStyles();
     void submit();
+    void sendSummaryMail();
     void displayLayer(std::string aCode);
     void displayCommune();
     OGREnvelope computeGlobalGeom(std::string aFile);
