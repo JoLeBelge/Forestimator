@@ -20,6 +20,7 @@
 #include <Wt/WJavaScriptSlot.h>
 #include <Wt/WMessageBox.h>
 #include "Wt/WTemplate.h"
+#include "layerstatchart.h"
 
 #include <Wt/WItemDelegate.h>
 #include <Wt/WStandardItem.h>
@@ -54,12 +55,12 @@ public:
 
     std::string format4SQL(std::string aString);
 
-
     WLineEdit *nomEncoderEdit_;
     WLineEdit *prenomEncoderEdit_;
     WLineEdit *contactEncoderEdit_;
+    WLineEdit *contactEncoderGSMEdit_;
     WCheckBox * keepInTouch;
-    WLineEdit *ContactEdit_;
+    WComboBox *typeContactEdit_;
     WComboBox *anneeVCREdit_;
     WLineEdit *regeNatEdit_;
     WLineEdit *vegeBloquanteEdit_;
@@ -69,10 +70,8 @@ public:
     WComboBox *objectifEdit_;
     WLineEdit *spEdit_;
     WLineEdit *sanitEdit_;
-    //WComboBox *itineraireEdit_;
     WLineEdit *travSylviEdit_;
     WLineEdit *plantationEdit_;
-   // WLineEdit *hauteurEdit_;
     WLineEdit *gibierEdit_;
 
     WPushButton * bCancel;
@@ -82,9 +81,13 @@ public:
     std::map<int,int> aMLabelCom;
 
 private:
+
+    std::string SQLstring;
+
     double surf;
     bool polygValid;
     std::string polyg;
+    OGRGeometry * geom;
     std::string mBDFile;
     dbo::Session session;
 

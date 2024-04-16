@@ -44,10 +44,23 @@ La Faculté de Gembloux Agro-Bio Tech (ULiège) a initié, en collaboration avec
 <message id="nom.ph"> Ex: Dupont </message>
 <message id="prenom"> Prénom :</message>
 <message id="prenom.ph"> Ex: Albert</message>
-<message id="contact"> Votre contact: email et/ou téléphone </message>
-<message id="contact.ph"> Ex: dupont.albert@forest.be - téléphone 0475221309 </message>
+<message id="contact"> Votre contact: email </message>
+<message id="contact.ph"> Ex: dupont.albert@forest.be</message>
+
+<message id="contact.gsm"> Votre contact: téléphone </message>
+<message id="contact.gsm.ph"> Ex: 0475221309 </message>
 <message id="contactACR"> Contact du gestionnaire forestier : nom, email et/ou téléphone </message>
 <message id="contactACR.ph"> Ex: gestionnaire: rege.nat@hotmail.com</message>
+
+<message id="typeEncoder"> Vous êtes ?</message>
+<message id="typeEncoder0"> Choisissez  </message>
+<message id="typeEncoder1"> Propriétaire privé </message>
+<message id="typeEncoder2"> FNEF </message>
+<message id="typeEncoder3"> Cellule d'appui </message>
+<message id="typeEncoder4"> DNF </message>
+<message id="typeEncoder5"> Autre </message>
+
+
 <message id="kit"> Souhaitez-vous recevoir les résultats du projet de suivi des anciennes coupes rases?</message>
 
 <message id="initPol">Réinitialiser tout le contour </message>
@@ -132,5 +145,6 @@ Vos données ont été encodées de manière adéquate. Nous vous remercions pou
 
 <message id="mail.titre"> encodage d'anciennes coupes rases non replantées </message>
 <message id="mail.contact">  Vos données personnelles </message>
+<message id="mail.acr">  Description de l'ancienne coupe rase: </message>
 
 </messages>

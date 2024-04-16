@@ -37,17 +37,26 @@ formVielleCoupeRase::formVielleCoupeRase(const WEnvironment &env, cDicoApt *dico
     contactEncoderEdit_->setValidator(std::make_shared<WValidator>(true));
     contactEncoderEdit_->validator()->setInvalidBlankText("Nous avons besoin de pouvoir vous contacter");
     contactEncoderEdit_->addStyleClass("textEdit");
+     ++row;
+    contactEncoderGSMEdit_= table->elementAt(row,1)->addWidget(std::make_unique<WLineEdit>());
+    label = table->elementAt(row,0)->addWidget(std::make_unique<WLabel>(WString::tr("contact.gsm")));
+    contactEncoderGSMEdit_->setPlaceholderText(WString::tr("contact.gsm.ph"));
     ++row;
     keepInTouch= table->elementAt(row,1)->addWidget(std::make_unique<WCheckBox>());
     keepInTouch->setMinimumSize("30px","30px");
     label = table->elementAt(row,0)->addWidget(std::make_unique<WLabel>(WString::tr("kit")));
     ++row;
-    ContactEdit_= table->elementAt(row,1)->addWidget(std::make_unique<WLineEdit>());
-    label = table->elementAt(row,0)->addWidget(std::make_unique<WLabel>(WString::tr("contactACR")));
-    ContactEdit_->setPlaceholderText(WString::tr("contactACR.ph"));
-    ContactEdit_->addStyleClass("textEdit");
-
-
+    //ContactEdit_= table->elementAt(row,1)->addWidget(std::make_unique<WLineEdit>());
+    typeContactEdit_= table->elementAt(row,1)->addWidget(std::make_unique<WComboBox>());
+    label = table->elementAt(row,0)->addWidget(std::make_unique<WLabel>(WString::tr("typeEncoder")));
+    //ContactEdit_->setPlaceholderText(WString::tr("contactACR.ph"));
+    //ContactEdit_->addStyleClass("textEdit");
+    typeContactEdit_->addItem(WString::tr("typeEncoder0"));
+    typeContactEdit_->addItem(WString::tr("typeEncoder1"));
+    typeContactEdit_->addItem(WString::tr("typeEncoder2"));
+    typeContactEdit_->addItem(WString::tr("typeEncoder3"));
+    typeContactEdit_->addItem(WString::tr("typeEncoder4"));
+    typeContactEdit_->addItem(WString::tr("typeEncoder5"));
 
     cont = tpl->bindWidget("contACR1", std::make_unique<WContainerWidget>());
     cont->addNew<Wt::WText>(WString::tr("sectionVCR1"));
@@ -144,8 +153,9 @@ formVielleCoupeRase::formVielleCoupeRase(const WEnvironment &env, cDicoApt *dico
 
     nomEncoderEdit_->enterPressed().connect(prenomEncoderEdit_, &WWidget::setFocus);
     prenomEncoderEdit_->enterPressed().connect(contactEncoderEdit_, &WWidget::setFocus);
-    contactEncoderEdit_->enterPressed().connect(keepInTouch, &WWidget::setFocus);
-    keepInTouch->enterPressed().connect(ContactEdit_, &WWidget::setFocus);
+    contactEncoderEdit_->enterPressed().connect(contactEncoderGSMEdit_, &WWidget::setFocus);
+    contactEncoderGSMEdit_->enterPressed().connect(keepInTouch, &WWidget::setFocus);
+    keepInTouch->enterPressed().connect(typeContactEdit_, &WWidget::setFocus);
 
     anneeVCREdit_->changed().connect(vosrefEdit_, &WWidget::setFocus);
     vosrefEdit_->enterPressed().connect(objectifEdit_, &WWidget::setFocus);
@@ -266,14 +276,15 @@ void formVielleCoupeRase::submit(){
             WLocalDateTime d= WLocalDateTime::currentDateTime();
             //std::cout << " sauve la coupe rase " << std::endl;
             sqlite3_stmt * stmt;
-            std::string SQLstring="INSERT INTO acr (date,vosRef,nom,prenom,contact,keepInTouch,contact2,anneeCoupe,regeNat,vegeBloquante,objectif,spCoupe,sanitCoupe,travaux,plantation,gibier,descr,surf,polygon) VALUES ('"
+            SQLstring="INSERT INTO acr (date,vosRef,nom,prenom,contact,gsm,keepInTouch,typeContact,anneeCoupe,regeNat,vegeBloquante,objectif,spCoupe,sanitCoupe,travaux,plantation,gibier,descr,surf,polygon) VALUES ('"
                     +d.toString().toUTF8()+"',"
                     +"'"+format4SQL(vosrefEdit_->valueText().toUTF8())+"',"
                     +"'"+format4SQL(nomEncoderEdit_->valueText().toUTF8())+"',"
                     +"'"+format4SQL(prenomEncoderEdit_->valueText().toUTF8())+"',"
                     +"'"+format4SQL(contactEncoderEdit_->valueText().toUTF8())+"',"
+                    +"'"+format4SQL(contactEncoderGSMEdit_->valueText().toUTF8())+"',"
                     +std::to_string(keepInTouch->isChecked())+","
-                    +"'"+format4SQL(ContactEdit_->valueText().toUTF8())+"',"
+                    +"'"+format4SQL(typeContactEdit_->currentText().toUTF8())+"',"
                     +"'"+format4SQL(anneeVCREdit_->currentText().toUTF8())+"',"
                     +"'"+format4SQL(regeNatEdit_->valueText().toUTF8())+"',"
                     +"'"+format4SQL(vegeBloquanteEdit_->valueText().toUTF8())+"',"
@@ -288,13 +299,15 @@ void formVielleCoupeRase::submit(){
                     +"'"+format4SQL(VCRdescriptionEdit_->valueText().toUTF8())+"',"
                     +std::to_string(surf)+","
                     +"'"+polyg+"');";
-            std::cout << "sql : " << SQLstring << std::endl;
+            //std::cout << "sql : " << SQLstring << std::endl;
             sqlite3_prepare_v2(db_, SQLstring.c_str(), -1, &stmt, NULL );
             // applique l'update
             sqlite3_step( stmt );
             sqlite3_finalize(stmt);
         }
         sqlite3_close(db_);
+
+        sendSummaryMail();
 
         Wt::StandardButton answer = Wt::WMessageBox::show( WString::tr("saveACR.msg.titre"),
                                                            WString::tr("saveACR.msg.cont"),
@@ -305,7 +318,7 @@ void formVielleCoupeRase::submit(){
             vider();
         }
 
-        sendSummaryMail();
+
     }
 }
 
@@ -321,13 +334,21 @@ void formVielleCoupeRase::vider(bool all){
         nomEncoderEdit_->setText("");
         prenomEncoderEdit_->setText("");
         contactEncoderEdit_->setText("");
+        contactEncoderGSMEdit_->setText("");
         keepInTouch->setChecked(0);
-        ContactEdit_->setText("");
+        typeContactEdit_->setCurrentIndex(0);
     }
     anneeVCREdit_->setCurrentIndex(0);
     regeNatEdit_->setText("");
     vegeBloquanteEdit_->setText("");
     VCRdescriptionEdit_->setText("");
+    vosrefEdit_->setText("");
+    objectifEdit_->setCurrentIndex(0);
+    spEdit_->setText("");
+    sanitEdit_->setText("");
+    travSylviEdit_->setText("");
+    plantationEdit_->setText("");
+    gibierEdit_->setText("");
     polygValid=0;
     polyg="";
     doJavaScript("acr_src.clear();map.addInteraction(draw);");
@@ -524,6 +545,7 @@ void formVielleCoupeRase::validDraw(std::string geojson){
     if( DS != NULL )
     {
         OGRLayer * lay = DS->GetLayer(0);
+
         OGRFeature *poFeature;
         while( (poFeature = lay->GetNextFeature()) != NULL )
         {
@@ -531,6 +553,7 @@ void formVielleCoupeRase::validDraw(std::string geojson){
             //std::cout << "surface " << surf<< std::endl;
             polygValid=1;
             polyg=poFeature->GetGeometryRef()->exportToJson();
+            geom = poFeature->GetGeometryRef();
         }
         doJavaScript("map.removeInteraction(draw);");
     }else {
@@ -544,32 +567,55 @@ void formVielleCoupeRase::sendSummaryMail(){
     //mail.addHeader();
     mail.setFrom(Wt::Mail::Mailbox("JO.Lisein@uliege.be", "Lisein Jonathan"));
     mail.setBody(
-                "\nVos données ont été encodée:"+
-                Wt::WString::tr("mail.contact").toUTF8()+
+                "\nVos données ont été encodée.\n"+
+                Wt::WString::tr("mail.contact").toUTF8()+"\n--------------------------\n"+
                 vosrefEdit_->valueText().toUTF8()+"\n"+
                 nomEncoderEdit_->valueText().toUTF8()+"\n"+
                 prenomEncoderEdit_->valueText().toUTF8()+"\n"+
-                contactEncoderEdit_->valueText().toUTF8()+"\n"
-                /* +"'"+format4SQL(ContactEdit_->valueText().toUTF8())+"',"
-                             +"'"+format4SQL(anneeVCREdit_->currentText().toUTF8())+"',"
-                             +"'"+format4SQL(regeNatEdit_->valueText().toUTF8())+"',"
-                             +"'"+format4SQL(vegeBloquanteEdit_->valueText().toUTF8())+"',"
-                             +"'"+format4SQL(objectifEdit_->currentText().toUTF8())+"',"
-                             +"'"+format4SQL(spEdit_->valueText().toUTF8())+"',"
-                             +"'"+format4SQL(sanitEdit_->valueText().toUTF8())+"',"
-                             //+"'"+format4SQL(itineraireEdit_->currentText().toUTF8())+"',"
-                             +"'"+format4SQL(travSylviEdit_->valueText().toUTF8())+"',"
-                             +"'"+format4SQL(plantationEdit_->valueText().toUTF8())+"',"
-                             //+"'"+format4SQL(hauteurEdit_->valueText().toUTF8())+"',"
-                             +"'"+format4SQL(gibierEdit_->valueText().toUTF8())+"',"
-                             +"'"+format4SQL(VCRdescriptionEdit_->valueText().toUTF8())+"',"
-                             +std::to_string(surf)+","
-                             +"'"+polyg+"');";*/
+                contactEncoderEdit_->valueText().toUTF8()+"\n"+
+                contactEncoderGSMEdit_->valueText().toUTF8()+"\n"+
+                typeContactEdit_->valueText().toUTF8()+"\n\n"+
+                Wt::WString::tr("mail.acr").toUTF8()+"\n\n"+
+                Wt::WString::tr("anneeVCR").toUTF8()+"\n"+
+                anneeVCREdit_->currentText().toUTF8()+"\n"+
+                Wt::WString::tr("regeNat").toUTF8()+"\n"+
+                regeNatEdit_->valueText().toUTF8()+"\n"+
+                Wt::WString::tr("vegeBloquante").toUTF8()+"\n"+
+                vegeBloquanteEdit_->valueText().toUTF8()+"\n"+
+                Wt::WString::tr("objectif").toUTF8()+"\n"+
+                objectifEdit_->currentText().toUTF8()+"\n"+
+                Wt::WString::tr("sp").toUTF8()+"\n"+
+                spEdit_->valueText().toUTF8()+"\n"+
+                Wt::WString::tr("sanit").toUTF8()+"\n"+
+                sanitEdit_->valueText().toUTF8()+"\n"+
+                Wt::WString::tr("trav.sylvi").toUTF8()+"\n"+
+                travSylviEdit_->valueText().toUTF8()+"\n"+
+                Wt::WString::tr("plantation").toUTF8()+"\n"+
+                plantationEdit_->valueText().toUTF8()+"\n"+
+                Wt::WString::tr("gibier").toUTF8()+"\n"+
+                gibierEdit_->valueText().toUTF8()+"\n"+
+                Wt::WString::tr("descriptionVCR").toUTF8()+"\n"+
+                VCRdescriptionEdit_->valueText().toUTF8()+"\n"+
+                "Surface de la coupe rase (ha) : "+
+                Wt::WString(std::to_string(surf)).toUTF8()+"\n"
                 );
     mail.setSubject(Wt::WString::tr("mail.titre").toUTF8());
     mail.addRecipient(Wt::Mail::RecipientType::To,Mail::Mailbox(contactEncoderEdit_->valueText().toUTF8(),nomEncoderEdit_->valueText().toUTF8()) );
-            Mail::Client client;
-    std::cout << "connexion clien pour email : " << client.connect() << std::endl;
+
+    // création de la figure de localisation
+    staticMap sm(mDico->getLayerBase("IGN"),geom);
+    std::ifstream in;
+    in.open(sm.getFileName(), std::ios::in);
+    mail.addAttachment("image/png","localisationCoupe.png",&in);
+    Mail::Client client;
+    client.connect();
+    client.send(mail);
+    in.close();// après l'envoi!! car le addAttachement pointe ver le ifstream!
+    mail =Wt::Mail::Message();
+    mail.addRecipient(Wt::Mail::RecipientType::To,Mail::Mailbox("liseinjon@hotmail.com","Lisein Jonathan"));
+    mail.setFrom(Wt::Mail::Mailbox("JO.Lisein@uliege.be", "Lisein Jonathan"));
+    mail.setSubject("ACR - encodage");
+    mail.setBody(SQLstring);
     client.send(mail);
 }
 

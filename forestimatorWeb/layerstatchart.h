@@ -56,6 +56,7 @@ public:
     double xGeo2Im(double x);
     double yGeo2Im(double y);
     std::string getFileName(){return mFileName;}
+    std::string getFileNameRel(){return mFileNameRel;}
     //Wt::WLink getWLink(){return Wt::WLink(mFileNameRel);}
     // le pdf renderer il aime pas les chemin en relatif pour les image
     Wt::WLink getWLinkRel(){return Wt::WLink(mFileNameRel);}
