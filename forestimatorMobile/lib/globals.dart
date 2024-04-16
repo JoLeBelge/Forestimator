@@ -84,16 +84,16 @@ const Color colorBack = Color.fromRGBO(255, 120, 30, 1);
 const Color colorBackground = Color.fromRGBO(202, 202, 202, 1);
 const Color colorBackgroundSecondary = Color.fromRGBO(243, 243, 243, 1);
 
-Function rebuildWholeWidgetTree = (void Function) {};
-Function refreshMap = (void Function) {};
-Function refreshCatalogueView = (void Function) {};
-Function refreshWholeCatalogueView = (void Function) {};
-Function refreshCurrentThreeLayer = (void Function) {};
-Function rebuildOfflineView = (void Function) {};
+Function refreshMap = (Function f) {
+  f();
+};
+Function refreshWholeCatalogueView = (void Function() setter) async {};
+Function refreshCurrentThreeLayer = () {};
+Function rebuildOfflineView = (void Function() setter) async {};
 Function? rebuildNavigatorBar;
 
-Function addToOfflineList = () {};
-Function removeFromOfflineList = () {};
+Function addToOfflineList = (var x) {};
+Function removeFromOfflineList = (var x) {};
 
 int nOnlineLayer = 3;
 int nOfflineLayer = 1;

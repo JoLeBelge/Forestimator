@@ -493,11 +493,6 @@ class _CategoryView extends State<CategoryView> {
     if (!_finishedInitializingCategory[widget.category.filter]!) {
       _getLayerData();
     }
-    gl.refreshCatalogueView = rebuildWidgetTreeForLayerDownloader;
-  }
-
-  void rebuildWidgetTreeForLayerDownloader(void Function() setter) async {
-    setState(setter);
   }
 }
 

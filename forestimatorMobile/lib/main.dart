@@ -159,8 +159,6 @@ class _MyApp extends State<MyApp> {
     // copier tout les pdf de l'asset bundle vers un fichier utilisable par la librairie flutter_pdfviewer
     _listAndCopyPdfassets();
     readPreference();
-    gl.rebuildWholeWidgetTree = setState;
-    
   }
 
   late final _router = GoRouter(
