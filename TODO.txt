@@ -1,9 +1,6 @@
 TO DO forestimator WEB
 ----------------------
 
--refactor cWebAptitude ; renommer forestimatorWeb ?
--migrer code sur un dépot neuf pour mettre en public ; ça empêchera aux public d'avoir accès à tout les anciens commits
-
 Quand le Guide des stations d'ardenne sera imprimé:
 -renommer carte de recommandation, faire attention à la légende (concordance des termes avec contenu du GS)
 -creation WMS pour cartes dérivées.

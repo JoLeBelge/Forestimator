@@ -19,6 +19,7 @@ import 'package:go_router/go_router.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import 'dart:convert';
 
@@ -402,21 +403,26 @@ class _MapPageState extends State<mapPage> {
 }
 
 Future<Position?> acquireUserLocation() async {
-  LocationPermission permission = await Geolocator.checkPermission();
-  if (permission == LocationPermission.denied) {
-    permission = await Geolocator.requestPermission();
+  // faudra faire du tri dans le code, j'ajoute vite fait le permission_handler
+  if (await Permission.location.request().isGranted) {
+    LocationPermission permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        return null;
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
       return null;
     }
-  }
 
-  if (permission == LocationPermission.deniedForever) {
-    return null;
-  }
-
-  try {
-    return await Geolocator.getCurrentPosition();
-  } on LocationServiceDisabledException {
+    try {
+      return await Geolocator.getCurrentPosition();
+    } on LocationServiceDisabledException {
+      return null;
+    }
+  } else {
     return null;
   }
 }

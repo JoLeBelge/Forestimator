@@ -5,14 +5,10 @@ v -> pop_up lors du premier lancement de l'app ; proposition de télécharger to
     -> faut ammeiloerer le download pour avoir un feedback.
 
 Jo -> pop_up pour informer à l'utilisateur qu'il n'as pas internet (1; analyse ponctuelle online, 2) affichage d'une carte online en mode offline)
+Jo -> page offline ; cacher affichage de CNSW en offline (16bits)
+Jo -> sauver le pdf analyse ponctuelle -> vérif que ça fonctionne...
 
-vv -> page offline ; afficher par defaut les cartes téléchargées uniquement, ajout boutton pour afficher carte
-
--> Popup avec progress quand on charge et travail sur une map en offline...
-
-TT -> gerer permission
-v -> gestion mapController avec et sans position GPS ; s'inspirer de Qfield, boutton GPS on off, GPS centrage/non centrage
-    -> problème avec le stream, mais ça marche aussi sans.
+TT -> gerer permission (GPS, internet)
 
 TT -> progress bar téléchargement.
     -> Il y a de l'espoir...

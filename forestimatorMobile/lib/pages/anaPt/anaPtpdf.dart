@@ -1,5 +1,4 @@
 import 'package:fforestimator/dico/dicoApt.dart';
-import 'package:fforestimator/pages/anaPt/anaPtpage.dart';
 import 'package:fforestimator/pages/anaPt/requestedLayer.dart';
 import 'package:pdf/pdf.dart';
 import 'dart:io';
@@ -9,9 +8,10 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:fforestimator/globals.dart' as gl;
 import 'package:flutter/services.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:proj4dart/proj4dart.dart' as proj4;
 import 'package:intl/intl.dart';
+import 'package:downloadsfolder/downloadsfolder.dart';
+import 'package:flutter_logs/flutter_logs.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 Future makePdf(
     List<layerAnaPt> layers, String fileName, String locationName) async {
@@ -66,42 +66,31 @@ Future makePdf(
           }).toList(),
         ]);
   }));
-  String? dir = await getDownloadPath();
-  File out = File(dir! + "/" + fileName);
-  if (await out.exists()) {
-    // on renomme le pdf
-    int nb = 2;
-    do {
-      out = File(dir! +
-          "/" +
-          fileName.substring(0, fileName.length - 4) +
-          nb.toString() +
-          ".pdf");
-      nb++;
-      print(out.path);
-    } while (await out.exists());
-  }
-  out.writeAsBytes(await pdf.save(), flush: true);
 
-  //print("make pdf is done, written on " + out.path.toString());
-}
-
-Future<String?> getDownloadPath() async {
-  Directory? directory;
-  try {
-    if (Platform.isIOS | Platform.isLinux) {
-      directory = await getApplicationDocumentsDirectory();
-    } else {
-      directory = Directory('/storage/emulated/0/Download');
-      // Put file in global download folder, if for an unknown reason it didn't exist, we fallback
-      // ignore: avoid_slow_async_io
-      if (!await directory.exists())
-        directory = await getExternalStorageDirectory();
+  if (await Permission.manageExternalStorage.request().isGranted) {
+    // Either the permission was already granted before or the user just granted it.
+    String? dir = await getDownloadDirectoryPath();
+    if (dir != null) {
+      FlutterLogs.logInfo("anaPt", "pdf", "downloadDirPath. ${dir!}");
+      File out = File(dir! + "/" + fileName);
+      if (await out.exists()) {
+        // on renomme le pdf
+        int nb = 2;
+        do {
+          out = File(dir! +
+              "/" +
+              fileName.substring(0, fileName.length - 4) +
+              nb.toString() +
+              ".pdf");
+          nb++;
+          //print(out.path);
+        } while (await out.exists());
+      }
+      out.writeAsBytes(await pdf.save(), flush: true);
+      FlutterLogs.logError("anaPt", "pdf", "pdf exported to. ${out.path}");
     }
-  } catch (err, stack) {
-    print("Cannot get download folder path");
   }
-  return directory?.path;
+  //print("make pdf is done, written on " + out.path.toString());
 }
 
 pw.Widget PaddedText(

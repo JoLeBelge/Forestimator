@@ -273,7 +273,7 @@ class _MyApp extends State<MyApp> {
     } else if (gl.firstTimeUse) {
       return MaterialApp(
           home: PopupNotification(
-        title: "FirstTimeUse",
+        title: "Bienvenu",
         accept: "oui",
         onAccept: () async {
           setState(() {
@@ -305,7 +305,7 @@ class _MyApp extends State<MyApp> {
           await prefs.setBool('firstTimeUse', gl.firstTimeUse);
         },
         dialog:
-            "Autorisez vous l'aplication à télécharger un jeu de couches pour l'utilisation de l'analyse hors ligne?",
+            "Autorisez vous l'aplication à télécharger un jeu de couches pour l'utilisation de l'analyse hors ligne? Ces couches couvrent toutes la Région Wallonne et totalisent +- 100 Mo.",
       ));
     }
     return MaterialApp.router(
