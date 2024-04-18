@@ -11,7 +11,6 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:downloadsfolder/downloadsfolder.dart';
 import 'package:flutter_logs/flutter_logs.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 Future makePdf(
     List<layerAnaPt> layers, String fileName, String locationName) async {
@@ -67,30 +66,28 @@ Future makePdf(
         ]);
   }));
 
-  if (await Permission.manageExternalStorage.request().isGranted) {
-    // Either the permission was already granted before or the user just granted it.
-    String? dir = await getDownloadDirectoryPath();
-    if (dir != null) {
-      FlutterLogs.logInfo("anaPt", "pdf", "downloadDirPath. ${dir!}");
-      File out = File(dir! + "/" + fileName);
-      if (await out.exists()) {
-        // on renomme le pdf
-        int nb = 2;
-        do {
-          out = File(dir! +
-              "/" +
-              fileName.substring(0, fileName.length - 4) +
-              nb.toString() +
-              ".pdf");
-          nb++;
-          //print(out.path);
-        } while (await out.exists());
-      }
-      out.writeAsBytes(await pdf.save(), flush: true);
-      FlutterLogs.logError("anaPt", "pdf", "pdf exported to. ${out.path}");
+  String? dir = await getDownloadDirectoryPath();
+
+  if (dir != null) {
+    File out = File(dir! + "/" + fileName);
+    if (await out.exists()) {
+      // on renomme le pdf
+      int nb = 2;
+      do {
+        out = File(dir! +
+            "/" +
+            fileName.substring(0, fileName.length - 4) +
+            nb.toString() +
+            ".pdf");
+        nb++;
+        //print(out.path);
+      } while (await out.exists());
     }
+    out.writeAsBytes(await pdf.save(), flush: true);
+    FlutterLogs.logError("anaPt", "pdf", "pdf exported to. ${out.path}");
+  } else {
+    FlutterLogs.logError("anaPt", "pdf", "downloadDirPath is null");
   }
-  //print("make pdf is done, written on " + out.path.toString());
 }
 
 pw.Widget PaddedText(

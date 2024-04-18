@@ -7,6 +7,7 @@ import 'package:fforestimator/myicons.dart';
 import 'package:go_router/go_router.dart';
 import 'dart:typed_data';
 import 'dart:io';
+import 'package:permission_handler/permission_handler.dart';
 
 class anaPtpage extends StatefulWidget {
   List<layerAnaPt> requestedLayers = [];
@@ -35,40 +36,65 @@ class _anaPtpageState extends State<anaPtpage> {
               IconButton(
                   icon: const Icon(Icons.picture_as_pdf, size: 28),
                   onPressed: () async {
-                    List<String>? l = await openDialog();
-                    String? pdf = l?.elementAt(0);
-                    String? locationName = l?.elementAt(1);
-                    if (pdf!.isEmpty) {
-                      pdf = "analysePonctuelleForestimator.pdf";
+                    if (await Permission.manageExternalStorage
+                            .request()
+                            .isGranted ||
+                        await Permission.storage.request().isGranted) {
+                      List<String>? l = await openDialog();
+                      String? pdf = l?.elementAt(0);
+                      String? locationName = l?.elementAt(1);
+                      if (pdf!.isEmpty) {
+                        pdf = "analysePonctuelleForestimator.pdf";
+                      }
+                      if (pdf.length < 4 ||
+                          pdf.substring(pdf.length - 4) != ".pdf") {
+                        pdf = pdf + ".pdf";
+                      }
+                      if (locationName!.isEmpty) {
+                        locationName = "une position";
+                      }
+                      // création du pdf
+                      makePdf(widget.requestedLayers, pdf!, locationName!);
+                      // confirmation que le pdf a été créé
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: Text("Export pdf"),
+                            content: Text("Export pdf effectué avec succès."),
+                            actions: [
+                              TextButton(
+                                child: Text("OK"),
+                                onPressed: () {
+                                  Navigator.of(context, rootNavigator: true)
+                                      .pop();
+                                },
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    } else {
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: Text("Export pdf"),
+                            content: Text(
+                                "Vous n'avez pas accordé l'autorisation d'écrire dans le dossier de téléchargement."),
+                            actions: [
+                              TextButton(
+                                child: Text("OK"),
+                                onPressed: () {
+                                  Navigator.of(context, rootNavigator: true)
+                                      .pop();
+                                },
+                              ),
+                            ],
+                          );
+                        },
+                      );
                     }
-                    if (pdf.length < 4 ||
-                        pdf.substring(pdf.length - 4) != ".pdf") {
-                      pdf = pdf + ".pdf";
-                    }
-                    if (locationName!.isEmpty) {
-                      locationName = "une position";
-                    }
-                    // création du pdf
-                    makePdf(widget.requestedLayers, pdf!, locationName!);
-                    // confirmation que le pdf a été créé
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                          title: Text("Export pdf"),
-                          content: Text("Export pdf effectué avec succès."),
-                          actions: [
-                            TextButton(
-                              child: Text("OK"),
-                              onPressed: () {
-                                Navigator.of(context, rootNavigator: true)
-                                    .pop();
-                              },
-                            ),
-                          ],
-                        );
-                      },
-                    );
                   }),
               _anaPtListLayers(context, widget.requestedLayers),
               SizedBox(height: 15),

@@ -76,50 +76,60 @@ class _MapPageState extends State<mapPage> {
     data = "";
 
     gl.pt = ptBL72;
-    //ConnectivityResult conRes = await Connectivity().checkConnectivity();
-    //print(conRes);
+
+    bool internet = await InternetConnection().hasInternetAccess;
     if (!gl.offlineMode) {
-      //conRes != ConnectivityResult.none &&
-      //conRes != ConnectivityResult.wifi
-
-      //print("anaPonctOnline");
-      String layersAnaPt = "";
-      for (String lCode in gl.anaPtSelectedLayerKeys) {
-        if (gl.dico.getLayerBase(lCode).mCategorie != "Externe") {
-          layersAnaPt += "+" + lCode;
+      if (internet) {
+        String layersAnaPt = "";
+        for (String lCode in gl.anaPtSelectedLayerKeys) {
+          if (gl.dico.getLayerBase(lCode).mCategorie != "Externe") {
+            layersAnaPt += "+" + lCode;
+          }
         }
-      }
 
-      String url = "https://forestimator.gembloux.ulg.ac.be/api/anaPt/layers/" +
-          layersAnaPt +
-          "/x/" +
-          ptBL72.x.toString() +
-          "/y/" +
-          ptBL72.y.toString();
-      //print(url);
+        String url =
+            "https://forestimator.gembloux.ulg.ac.be/api/anaPt/layers/" +
+                layersAnaPt +
+                "/x/" +
+                ptBL72.x.toString() +
+                "/y/" +
+                ptBL72.y.toString();
+        try {
+          var res = await http.get(Uri.parse(url));
+          if (res.statusCode != 200) throw HttpException('${res.statusCode}');
+          data = jsonDecode(res.body);
 
-      try {
-        var res = await http.get(Uri.parse(url));
-        if (res.statusCode != 200) throw HttpException('${res.statusCode}');
-        data = jsonDecode(res.body);
-        //print(res.body);
-        // si pas de connexion internet, va tenter de lire data comme une map alors que c'est vide, erreur. donc dans le bloc try catch aussi
-        for (var r in data["RequestedLayers"]) {
-          gl.requestedLayers.add(layerAnaPt.fromMap(r));
+          // si pas de connexion internet, va tenter de lire data comme une map alors que c'est vide, erreur. donc dans le bloc try catch aussi
+          for (var r in data["RequestedLayers"]) {
+            gl.requestedLayers.add(layerAnaPt.fromMap(r));
+          }
+        } catch (e) {
+          // handshake et/ou socketExeption
+          print('There was an error: ');
+          FlutterLogs.logError("anaPt", "online",
+              "error while waiting for forestimatorWeb answer. ${e}");
         }
-      } catch (e) {
-        // handshake et/ou socketExeption
-        print('There was an error: ${e}');
+        gl.requestedLayers.removeWhere((element) => element.mFoundLayer == 0);
+      } else {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text("Analyse ponctuelle online"),
+              content: Text("Vous n'avez accès à internet."),
+              actions: [
+                TextButton(
+                  child: Text("OK"),
+                  onPressed: () {
+                    Navigator.of(context, rootNavigator: true).pop();
+                  },
+                ),
+              ],
+            );
+          },
+        );
       }
-      /*} on (SocketException) {
-        // afficher l'info à l'utilisateur?
-        print('No Internet connection 😑');
-      }*/
-
-      gl.requestedLayers.removeWhere((element) => element.mFoundLayer == 0);
     } else {
-      //print("anaPonctOffline");
-
       for (layerBase l in gl.dico.getLayersOffline()) {
         int val = await l.getValXY(ptBL72);
         gl.requestedLayers.add(layerAnaPt(mCode: l.mCode, mRastValue: val));
@@ -242,6 +252,15 @@ class _MapPageState extends State<mapPage> {
                 cameraConstraint: CameraConstraint.contain(
                     bounds: LatLngBounds.fromPoints([latlonBL, latlonTR])),
                 onMapReady: () async {
+                  Permission.locationWhenInUse.request();
+                  if (await Permission.locationWhenInUse.isGranted) {
+                    Permission.locationAlways.request();
+                  }
+                  Permission.manageExternalStorage
+                      .request(); // pour nouvelle version de android
+                  Permission.storage
+                      .request(); // pour ancienne version de android
+
                   updateLocation();
 
                   //await refreshAnalysisPosition();
@@ -288,7 +307,7 @@ class _MapPageState extends State<mapPage> {
                       layerBase l = gl.dico.getLayerBase(selLayer.mCode);
                       return gl.offlineMode
                           ? const Text(
-                              "Vous n'avez pas encore téléchargé des couches.")
+                              "Vous n'avez pas encore téléchargé de couche cartographique pour un usage hors-ligne.")
                           : TileLayer(
                               userAgentPackageName: "com.example.fforestimator",
                               wmsOptions: WMSTileLayerOptions(
@@ -403,23 +422,12 @@ class _MapPageState extends State<mapPage> {
 }
 
 Future<Position?> acquireUserLocation() async {
-  // faudra faire du tri dans le code, j'ajoute vite fait le permission_handler
   if (await Permission.location.request().isGranted) {
-    LocationPermission permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        return null;
-      }
-    }
-
-    if (permission == LocationPermission.deniedForever) {
-      return null;
-    }
-
     try {
       return await Geolocator.getCurrentPosition();
     } on LocationServiceDisabledException {
+      return null;
+    } catch (e) {
       return null;
     }
   } else {
