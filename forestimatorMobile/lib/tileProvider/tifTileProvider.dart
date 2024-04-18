@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:image/image.dart' as img;
 import 'dart:math';
 import 'package:flutter/services.dart';
-import 'package:path/path.dart';
 import 'dart:io';
 import 'dart:convert';
 
@@ -15,6 +14,7 @@ class tifFileTileProvider extends TileProvider {
   String sourceImPath;
   bool _loaded = false;
   String layerCode;
+  Uint8List? bytes;
 
   bool get loaded => _loaded;
 
@@ -33,14 +33,14 @@ class tifFileTileProvider extends TileProvider {
     bool e = await fileIm.exists();
     //print("file exist " + e.toString());
     if (e) {
-      Uint8List bytes = await fileIm.readAsBytes();
+      bytes = await fileIm.readAsBytes();
 
-      img.TiffInfo _tiffInfo = img.TiffDecoder().startDecode(bytes)!;
+      img.TiffInfo _tiffInfo = img.TiffDecoder().startDecode(bytes!)!;
       img.TiffImage tifIm = _tiffInfo!.images[0];
       int bps = tifIm.bitsPerSample;
       // le décodage d'un tif 16 bits avec ColorMap sera effectif pour la prochaine sortie du package image (flutter)
       if (bps <= 8) {
-        _sourceImage = img.TiffDecoder().decode(bytes);
+        _sourceImage = img.TiffDecoder().decode(bytes!);
         refreshView(() {
           _loaded = true;
         });
@@ -89,5 +89,13 @@ class tifFileTileProvider extends TileProvider {
         blankBytes,
       );
     }
+  }
+
+  @override
+  void dispose() {
+    bytes!.clear();
+    _sourceImage = img.Image.empty();
+
+    super.dispose(); // This will free the memory space allocated to the page
   }
 }

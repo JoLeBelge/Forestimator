@@ -1,23 +1,18 @@
 To do list fforestimator
 ------------------------
-TT/Jo -> barre de progression chargement image offline + essayer de comprendre pouquoi c'est très lent par moment et très rapide à d'autre moment (bug?)
 
-TT/Jo -> selction couche à afficher 
-		-> mode online interdire le fait d'afficher deux carte offline à la fois
+TT/Jo -> selction couche à afficher
 	  	-> si passage à offline et une couche offline déjà sélectionnée, c'est celle-là qu'on affiche et non pas la première de la liste
+	  	-> garder un vecteur de 3 couches à afficher, même en mode offline! ça sera plus simple.
 	  	
-	
+estétique : mettre un peu de marge gauche pour les ExpansionPanel qui montrent les couches carto
+selected layer ; ajouter une icone pour montrer si il s'agit d'une couche online ou offline.
+	  	  	
 v -> pop_up lors du premier lancement de l'app ; proposition de télécharger toutes les couches offline de la liste anaPtSelectedLayerKeys
     -> faut ammeiloerer le download pour avoir un feedback.
 TT -> progress bar téléchargement.
     -> Il y a de l'espoir...
-
-Jo -> pop_up pour informer à l'utilisateur qu'il n'as pas internet 
-	vv  -> 1; analyse ponctuelle online
-	todo -> 2) affichage d'une carte online en mode offline)
 	
-Jo -> page offline ; cacher affichage de CNSW en offline (16bits)
-vv -> sauver le pdf analyse ponctuelle -> vérif que ça fonctionne, sur toute les version d'android
-
+Jo -> page offline ; cacher affichage de CNSW en offline, ou afficher un msg
 
 DATE PREMIERE RELEASE : 19/04 (semaine forêt étudiant GRF)

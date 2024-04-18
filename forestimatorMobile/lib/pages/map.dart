@@ -9,18 +9,16 @@ import 'package:proj4dart/proj4dart.dart' as proj4;
 import 'package:flutter/material.dart';
 import 'dart:math';
 import 'dart:io';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:fforestimator/locationIndicator/animated_location_indicator.dart';
 import 'package:fforestimator/globals.dart' as gl;
 import 'package:http/http.dart' as http;
 import 'package:fforestimator/pages/anaPt/requestedLayer.dart';
 import 'package:go_router/go_router.dart';
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:permission_handler/permission_handler.dart';
-
+import 'package:fforestimator/tools/notification.dart';
 import 'dart:convert';
 
 class mapPage extends StatefulWidget {
@@ -114,18 +112,7 @@ class _MapPageState extends State<mapPage> {
         showDialog(
           context: context,
           builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text("Analyse ponctuelle online"),
-              content: Text("Vous n'avez accès à internet."),
-              actions: [
-                TextButton(
-                  child: Text("OK"),
-                  onPressed: () {
-                    Navigator.of(context, rootNavigator: true).pop();
-                  },
-                ),
-              ],
-            );
+            return PopupNoInternet();
           },
         );
       }
@@ -169,7 +156,7 @@ class _MapPageState extends State<mapPage> {
     });*/
   }
 
-  void refreshView(void Function() f) {
+  void refreshView(void Function() f) async {
     setState(f);
   }
 
@@ -263,7 +250,6 @@ class _MapPageState extends State<mapPage> {
 
                   updateLocation();
 
-                  //await refreshAnalysisPosition();
                   if (gl.position != null) {
                     // IMPORTANT: rebuild location layer when permissions are granted
                     setState(() {
@@ -282,12 +268,15 @@ class _MapPageState extends State<mapPage> {
               ),
               children: gl.interfaceSelectedLayerKeys.reversed
                       .map<Widget>((gl.selectedLayer selLayer) {
-                    if (gl.offlineMode &&
+                    // if (gl.offlineMode && ça c'est pas juste car on peux afficher des cartes offline dans le mode online
+                    if (selLayer.offline &&
                         gl.dico.getLayerBase(selLayer.mCode).mOffline) {
                       if (_provider == null ||
                           _provider?.layerCode != selLayer.mCode) {
                         if (_provider != null) {
                           _provider?.dispose();
+                          _provider =
+                              null; // normalement le garbage collector effectue le dispose pour nous.
                         }
                         _provider = tifFileTileProvider(
                             refreshView: refreshView,
@@ -306,7 +295,16 @@ class _MapPageState extends State<mapPage> {
                     } else {
                       layerBase l = gl.dico.getLayerBase(selLayer.mCode);
                       return gl.offlineMode
-                          ? const Text(
+                          ? /*ça va pas car si je ferme le popUp toute l'app crash PopupNotification(
+                              title: "Attention",
+                              accept: "ok",
+                              onAccept: () {
+                                Navigator.of(context, rootNavigator: true)
+                                    .pop();
+                              },
+                              dialog:
+                                  "Vous n'avez pas encore téléchargé de couche cartographique pour un usage hors-ligne.")*/
+                          const Text(
                               "Vous n'avez pas encore téléchargé de couche cartographique pour un usage hors-ligne.")
                           : TileLayer(
                               userAgentPackageName: "com.example.fforestimator",
@@ -319,7 +317,6 @@ class _MapPageState extends State<mapPage> {
                                 crs: epsg31370CRS,
                                 transparent: true,
                               ),
-                              //maxNativeZoom: 7,
                               tileSize: tileSize,
                             );
                     }
@@ -382,7 +379,7 @@ class _MapPageState extends State<mapPage> {
                         },
                         icon: const Icon(Icons.gps_fixed))
                   ])
-                ])
+                ]),
         ]));
   }
 

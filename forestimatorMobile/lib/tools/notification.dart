@@ -39,3 +39,23 @@ class PopupNotification extends StatelessWidget {
     );
   }
 }
+
+class PopupNoInternet extends StatelessWidget {
+  const PopupNoInternet({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text("Oups"),
+      content: Text("Vous n'avez pas accès à internet."),
+      actions: <Widget>[
+        TextButton(
+          child: Text("OK"),
+          onPressed: () {
+            Navigator.of(context, rootNavigator: true).pop();
+          },
+        ),
+      ],
+    );
+  }
+}
