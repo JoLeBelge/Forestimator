@@ -476,7 +476,7 @@ class _SelectedLayerView extends State<SelectedLayerView> {
                   surfaceTintColor: gl.colorBackgroundSecondary,
                   shadowColor: const Color.fromARGB(255, 44, 44, 44),
                   child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: <Widget>[
                         Container(
                           color: gl.colorBackgroundSecondary,
@@ -499,7 +499,7 @@ class _SelectedLayerView extends State<SelectedLayerView> {
                                       ? MediaQuery.of(context).size.width * .04
                                       : 48,
                               minHeight: 48,
-                              maxWidth: MediaQuery.of(context).size.width * .35,
+                              maxWidth: MediaQuery.of(context).size.width * .34,
                               minWidth: 150,
                             ),
                             child: Row(children: [

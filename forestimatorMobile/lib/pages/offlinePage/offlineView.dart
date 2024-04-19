@@ -45,9 +45,9 @@ class _OfflineView extends State<OfflineView> {
                       gl.offlineMode = false;
                       gl.rebuildNavigatorBar!();
                       gl.refreshCurrentThreeLayer();
-                      gl.refreshMap(() {});
+                      //gl.refreshMap(() {});
                     });
-                    if (await InternetConnection().hasInternetAccess) {
+                    if (!await InternetConnection().hasInternetAccess) {
                       showDialog(
                         context: context,
                         builder: (BuildContext context) {
@@ -251,12 +251,10 @@ class _OfflineView extends State<OfflineView> {
                 onPressed: () {
                   setState(() {
                     if (gl.interfaceSelectedLayerKeys.length > 1) {
-                      setState(() {
-                        lt.selected = false;
-                      });
-                      gl.refreshMap(() {
-                        gl.removeLayerFromList(lt.key, offline: true);
-                      });
+                      lt.selected = false;
+                      gl.removeLayerFromList(lt.key, offline: true);
+                      gl.refreshCurrentThreeLayer();
+                      gl.refreshMap(() {});
                     }
                   });
                 }),
@@ -275,28 +273,12 @@ class _OfflineView extends State<OfflineView> {
             child: IconButton(
                 icon: const Icon(Icons.layers, size: 28),
                 onPressed: () {
-                  if (!gl.offlineMode ||
-                      (gl.offlineMode && gl.dico.getLayerBase(lt.key).mOffline))
-                    setState(() {
-                      if (gl.interfaceSelectedLayerKeys.length <
-                          gl.nMaxSelectedLayer) {
-                        setState(() {
-                          lt.selected = true;
-                        });
-                        gl.refreshMap(() {
-                          gl.addLayerToList(lt.key);
-                        });
-                      } else {
-                        setState(() {
-                          lt.selected = true;
-                        });
-                        gl.refreshMap(() {
-                          gl.interfaceSelectedLayerKeys.removeLast();
-                          gl.addLayerToList(lt.key);
-                        });
-                      }
-                    });
-                  //TODO else popup warning: file is not on disk
+                  setState(() {
+                    lt.selected = true;
+                    gl.addLayerToList(lt.key, offline: true);
+                    gl.refreshMap(() {});
+                    gl.refreshCurrentThreeLayer();
+                  });
                 }),
           );
   }
@@ -365,6 +347,9 @@ class _OfflineView extends State<OfflineView> {
     }
 
     setState(() {
+      gl.refreshOfflineView = () => setState(
+            () {},
+          );
       _finishedInitializingCategory = true;
     });
   }

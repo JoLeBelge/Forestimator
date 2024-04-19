@@ -225,11 +225,11 @@ class _MapPageState extends State<mapPage> {
                   LatLng c = _mapController.camera.center;
                   final SharedPreferences prefs =
                       await SharedPreferences.getInstance();
-                  prefs.setDouble('mapCenterLat', c.latitude);
-                  prefs.setDouble('mapCenterLon', c.longitude);
+                  await prefs.setDouble('mapCenterLat', c.latitude);
+                  await prefs.setDouble('mapCenterLon', c.longitude);
                   updateLocation();
                   double aZoom = _mapController.camera.zoom;
-                  prefs.setDouble('mapZoom', aZoom);
+                  await prefs.setDouble('mapZoom', aZoom);
                 },
                 crs: epsg31370CRS,
                 initialZoom: 8.0,
@@ -274,7 +274,7 @@ class _MapPageState extends State<mapPage> {
                       if (_provider == null ||
                           _provider?.layerCode != selLayer.mCode) {
                         if (_provider != null) {
-                          _provider?.dispose();
+                          //_provider?.dispose();
                           _provider =
                               null; // normalement le garbage collector effectue le dispose pour nous.
                         }
@@ -292,33 +292,24 @@ class _MapPageState extends State<mapPage> {
                               minZoom: 5,
                             )
                           : Container();
+                    } else if (selLayer.offline) {
+                      // deuxième carte offline ; on ne fait rien avec, un seul provider
+                      return Container();
                     } else {
                       layerBase l = gl.dico.getLayerBase(selLayer.mCode);
-                      return gl.offlineMode
-                          ? /*ça va pas car si je ferme le popUp toute l'app crash PopupNotification(
-                              title: "Attention",
-                              accept: "ok",
-                              onAccept: () {
-                                Navigator.of(context, rootNavigator: true)
-                                    .pop();
-                              },
-                              dialog:
-                                  "Vous n'avez pas encore téléchargé de couche cartographique pour un usage hors-ligne.")*/
-                          const Text(
-                              "Vous n'avez pas encore téléchargé de couche cartographique pour un usage hors-ligne.")
-                          : TileLayer(
-                              userAgentPackageName: "com.example.fforestimator",
-                              wmsOptions: WMSTileLayerOptions(
-                                baseUrl: l.mUrl + "?",
-                                format: 'image/png',
-                                layers: [
-                                  l.mWMSLayerName,
-                                ],
-                                crs: epsg31370CRS,
-                                transparent: true,
-                              ),
-                              tileSize: tileSize,
-                            );
+                      return TileLayer(
+                        userAgentPackageName: "com.example.forestimator",
+                        wmsOptions: WMSTileLayerOptions(
+                          baseUrl: l.mUrl + "?",
+                          format: 'image/png',
+                          layers: [
+                            l.mWMSLayerName,
+                          ],
+                          crs: epsg31370CRS,
+                          transparent: true,
+                        ),
+                        tileSize: tileSize,
+                      );
                     }
                   }).toList() +
                   <Widget>[

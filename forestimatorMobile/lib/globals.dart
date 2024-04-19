@@ -45,7 +45,8 @@ void refreshInterfaceSelectedL() {
     if (interfaceSelectedLOffline.length > i) {
       offline = interfaceSelectedLOffline.elementAt(i);
     }
-    addLayerToList(interfaceSelectedLCode.elementAt(i), offline: offline);
+    addLayerToList(interfaceSelectedLCode.elementAt(i),
+        offline: offline, savePref: false);
   }
 }
 
@@ -105,6 +106,7 @@ Function refreshMap = (Function f) {
 };
 Function refreshWholeCatalogueView = (void Function() setter) async {};
 Function refreshCurrentThreeLayer = () {};
+Function refreshOfflineView = () {};
 Function rebuildOfflineView = (void Function() setter) async {};
 Function? rebuildNavigatorBar;
 
@@ -135,8 +137,9 @@ void removeLayerFromList(String key, {bool offline = false}) async {
 
 void savePrefSelLay() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
-  prefs.setStringList('interfaceSelectedLCode', getInterfaceSelectedLCode());
-  prefs.setStringList(
+  await prefs.setStringList(
+      'interfaceSelectedLCode', getInterfaceSelectedLCode());
+  await prefs.setStringList(
       'interfaceSelectedLOffline', getInterfaceSelectedLOffline());
 }
 
@@ -144,14 +147,16 @@ void changeSelectedLayerModeOffline() {
   // check si il y a au moins une carte offline dans la selection
   if (interfaceSelectedLayerKeys.where((i) => i.offline).toList().length == 0) {
     // si non on en ajoute une
-    if (interfaceSelectedLayerKeys.length == 3 &&
-        dico.getLayersOffline().length > 0) {
-      interfaceSelectedLayerKeys.removeLast();
+    if (dico.getLayersOffline().length > 0) {
+      if (interfaceSelectedLayerKeys.length == 3) {
+        interfaceSelectedLayerKeys.removeLast();
+      }
       interfaceSelectedLayerKeys.insert(
         0,
         selectedLayer(
             mCode: dico.getLayersOffline().first.mCode, offline: true),
       );
+      savePrefSelLay();
     }
   }
 }

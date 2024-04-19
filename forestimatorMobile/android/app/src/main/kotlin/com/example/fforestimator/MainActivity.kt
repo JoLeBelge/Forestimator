@@ -1,4 +1,4 @@
-package com.example.fforestimator
+package com.example.forestimator
 
 import io.flutter.embedding.android.FlutterActivity
 

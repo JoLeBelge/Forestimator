@@ -24,7 +24,7 @@ if (flutterVersionName == null) {
 }
 
 android {
-    namespace "com.example.fforestimator"
+    namespace "com.example.forestimator"
     compileSdkVersion 34 // pour permisson_handler c'est 33 qui est préconisé, mais pour d'autres package c'est 34 au minimum..
     ndkVersion flutter.ndkVersion
 
@@ -43,7 +43,7 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId "com.example.fforestimator"
+        applicationId "com.example.forestimator"
         // You can update the following values to match your application needs.
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
         //minSdkVersion flutter.minSdkVersion // changé sinon build rale à cause de multidex
