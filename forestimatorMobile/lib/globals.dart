@@ -1,7 +1,6 @@
 library fforestimator.globals;
 
 import 'package:fforestimator/dico/dicoApt.dart';
-import 'package:fforestimator/scaffoldNavigation.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:fforestimator/pages/anaPt/requestedLayer.dart';
@@ -22,7 +21,7 @@ String queryApiRastDownload =
 
 String defaultLayer = "IGN";
 List<String> interfaceSelectedLCode = ["IGN"];
-// list to memorize the keys of selected layer to show in interface.
+List<bool> interfaceSelectedLOffline = [false];
 
 class selectedLayer {
   String mCode;
@@ -34,17 +33,34 @@ class selectedLayer {
 
 List<selectedLayer> interfaceSelectedLayerKeys = [];
 
+String getFirstSelLayOffline() {
+  List<selectedLayer> l =
+      interfaceSelectedLayerKeys.where((i) => i.offline).toList();
+  return l.length > 0 ? l.first.mCode : "toto";
+}
+
 void refreshInterfaceSelectedL() {
-  interfaceSelectedLayerKeys =
-      interfaceSelectedLCode.map<selectedLayer>((String aCode) {
-    return selectedLayer(mCode: aCode);
-  }).toList();
+  for (int i = 0; i < interfaceSelectedLCode.length; i++) {
+    bool offline = false;
+    if (interfaceSelectedLOffline.length > i) {
+      offline = interfaceSelectedLOffline.elementAt(i);
+    }
+    addLayerToList(interfaceSelectedLCode.elementAt(i), offline: offline);
+  }
 }
 
 List<String> getInterfaceSelectedLCode() {
   List<String> aRes = [];
   for (selectedLayer l in interfaceSelectedLayerKeys) {
     aRes.insert(aRes.length, l.mCode);
+  }
+  return aRes;
+}
+
+List<String> getInterfaceSelectedLOffline() {
+  List<String> aRes = [];
+  for (selectedLayer l in interfaceSelectedLayerKeys) {
+    aRes.insert(aRes.length, l.offline.toString());
   }
   return aRes;
 }
@@ -95,8 +111,7 @@ Function? rebuildNavigatorBar;
 Function addToOfflineList = (var x) {};
 Function removeFromOfflineList = (var x) {};
 
-int nOnlineLayer = 3;
-int nOfflineLayer = 1;
+int nMaxSelectedLayer = 3;
 
 bool firstTimeUse = true;
 
@@ -105,25 +120,59 @@ bool firstTimeUse = true;
 LatLng latlonCenter = const LatLng(49.76, 5.32);
 double mapZoom = 7.0;
 
-void removeLayerFromList(String key) async {
+void removeLayerFromList(String key, {bool offline = false}) async {
   selectedLayer? sL;
   for (var layer in interfaceSelectedLayerKeys) {
-    if (layer.mCode == key) {
+    if (layer.mCode == key && layer.offline == offline) {
       sL = layer;
     }
   }
   if (sL != null) {
     interfaceSelectedLayerKeys.remove(sL);
   }
-  final SharedPreferences prefs = await SharedPreferences.getInstance();
-  await prefs.setStringList(
-      'interfaceSelectedLCode', getInterfaceSelectedLCode());
+  savePrefSelLay();
 }
 
-void addLayerToList(String key) async {
-  interfaceSelectedLayerKeys.insert(0, selectedLayer(mCode: key));
-  //sauver dans shared_preference
+void savePrefSelLay() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
-  await prefs.setStringList(
-      'interfaceSelectedLCode', getInterfaceSelectedLCode());
+  prefs.setStringList('interfaceSelectedLCode', getInterfaceSelectedLCode());
+  prefs.setStringList(
+      'interfaceSelectedLOffline', getInterfaceSelectedLOffline());
+}
+
+void changeSelectedLayerModeOffline() {
+  // check si il y a au moins une carte offline dans la selection
+  if (interfaceSelectedLayerKeys.where((i) => i.offline).toList().length == 0) {
+    // si non on en ajoute une
+    if (interfaceSelectedLayerKeys.length == 3 &&
+        dico.getLayersOffline().length > 0) {
+      interfaceSelectedLayerKeys.removeLast();
+      interfaceSelectedLayerKeys.insert(
+        0,
+        selectedLayer(
+            mCode: dico.getLayersOffline().first.mCode, offline: true),
+      );
+    }
+  }
+}
+
+void addLayerToList(String key,
+    {bool offline = false, bool savePref = true}) async {
+  interfaceSelectedLayerKeys.insert(
+      0, selectedLayer(mCode: key, offline: offline));
+  if (interfaceSelectedLayerKeys.length > 3) {
+    interfaceSelectedLayerKeys.removeLast();
+  }
+  if (savePref) {
+    savePrefSelLay();
+  }
+}
+
+bool isSelectedLayer(String key, {offline = false}) {
+  for (var layer in interfaceSelectedLayerKeys) {
+    if (layer.mCode == key && layer.offline == offline) {
+      return true;
+    }
+  }
+  return false;
 }

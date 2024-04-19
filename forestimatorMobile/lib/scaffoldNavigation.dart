@@ -13,7 +13,7 @@ class ScaffoldWithNestedNavigation extends StatefulWidget {
 }
 
 class _ScaffoldWithNestedNavigation
-    extends State<ScaffoldWithNestedNavigation> {  
+    extends State<ScaffoldWithNestedNavigation> {
   void _goBranch(int index) {
     widget.navigationShell.goBranch(
       index,
@@ -44,9 +44,10 @@ class _ScaffoldWithNestedNavigation
         selectedIndex: widget.navigationShell.currentIndex,
         destinations: const [
           NavigationDestination(label: 'Carte', icon: Icon(Icons.map)),
-          NavigationDestination(label: 'Catalogue', icon: Icon(Icons.layers)),
           NavigationDestination(
-              label: 'Offline Mode', icon: Icon(Icons.offline_bolt))
+              label: 'Couches Online', icon: Icon(Icons.layers)),
+          NavigationDestination(
+              label: 'Couches Offline', icon: Icon(Icons.offline_bolt))
         ],
         onDestinationSelected: _goBranch,
         backgroundColor: gl.offlineMode ? gl.colorAgroBioTech : gl.colorUliege,

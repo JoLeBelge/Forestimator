@@ -85,6 +85,7 @@ class _CatalogueView extends State<CatalogueView> {
     }
     gl.refreshWholeCatalogueView = rebuildWidgetTreeForLayerDownloader;
   }
+
   void rebuildWidgetTreeForLayerDownloader(void Function() setter) async {
     setState(setter);
   }
@@ -172,8 +173,7 @@ class _CategoryView extends State<CategoryView> {
       children: <Widget>[
         if (lt.downloadable)
           ColoredBox(
-              color: gl.colorBackgroundSecondary,
-              child: LayerDownloader(lt)),
+              color: gl.colorBackgroundSecondary, child: LayerDownloader(lt)),
         if (gl.dico.getLayerBase(lt.key).mUsedForAnalysis)
           ColoredBox(
               color: gl.colorBackgroundSecondary,
@@ -318,7 +318,6 @@ class _CategoryView extends State<CategoryView> {
     /*if (widget.category.filter != "APT_CS" &&
         widget.category.filter != "APT_FEE" &&
         !lt.extern) barWidth = 96.0;*/
-    int nLayer = gl.offlineMode ? gl.nOfflineLayer : gl.nOnlineLayer;
     return Container(
         constraints: BoxConstraints(
           maxWidth: barWidth,
@@ -331,53 +330,7 @@ class _CategoryView extends State<CategoryView> {
         child:
             Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
           _downloadedControlBar(lt),
-          /*if (widget.category.filter != "APT_CS" &&
-              widget.category.filter != "APT_FEE" &&
-              !lt.extern)
-            gl.anaPtSelectedLayerKeys.contains(lt.key)
-                ? Container(
-                    decoration: const BoxDecoration(
-                        shape: BoxShape.circle, color: gl.colorUliege),
-                    constraints: const BoxConstraints(
-                      maxWidth: 48,
-                      minWidth: 48,
-                      maxHeight: 48,
-                      minHeight: 48,
-                    ),
-                    padding: const EdgeInsets.all(0),
-                    child: IconButton(
-                        icon: const Icon(Icons.location_on, size: 28),
-                        onPressed: () {
-                          setState(() {
-                            if (gl.anaPtSelectedLayerKeys.length > 1) {
-                              gl.anaPtSelectedLayerKeys.remove(lt.key);
-                              lt.selected = false;
-                              widget.refreshView();
-                            }
-                          });
-                        }))
-                : Container(
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                    ),
-                    constraints: const BoxConstraints(
-                      maxWidth: 48,
-                      minWidth: 48,
-                      maxHeight: 48,
-                      minHeight: 48,
-                    ),
-                    padding: const EdgeInsets.all(0),
-                    child: IconButton(
-                        icon: const Icon(Icons.location_off, size: 28),
-                        onPressed: () {
-                          setState(() {
-                            gl.anaPtSelectedLayerKeys.insert(0, lt.key);
-                            lt.selected = true;
-                            widget.refreshView();
-                          });
-                        }),
-                  ),*/
-          _isSelectedLayer(lt.key)
+          gl.isSelectedLayer(lt.key, offline: false)
               ? Container(
                   decoration: const BoxDecoration(
                       shape: BoxShape.circle, color: gl.colorAgroBioTech),
@@ -396,7 +349,7 @@ class _CategoryView extends State<CategoryView> {
                             lt.selected = false;
                             widget.refreshView();
                             gl.refreshMap(() {
-                              gl.removeLayerFromList(lt.key);
+                              gl.removeLayerFromList(lt.key, offline: false);
                             });
                           }
                         });
@@ -414,30 +367,19 @@ class _CategoryView extends State<CategoryView> {
                   ),
                   padding: const EdgeInsets.all(0),
                   child: IconButton(
-                      icon: const Icon(Icons.layers, size: 28),
-                      onPressed: () {
-                        if (!gl.offlineMode ||
-                            (gl.offlineMode &&
-                                gl.dico.getLayerBase(lt.key).mOffline)) {
-                          setState(() {
-                            if (gl.interfaceSelectedLayerKeys.length < nLayer) {
-                              lt.selected = true;
-                              widget.refreshView();
-                              gl.refreshMap(() {
-                                gl.addLayerToList(lt.key);
-                              });
-                            } else {
-                              lt.selected = true;
-                              widget.refreshView();
-                              gl.refreshMap(() {
-                                gl.interfaceSelectedLayerKeys.removeLast();
-                                gl.addLayerToList(lt.key);
-                              });
-                            }
-                          });
-                        }
-                        //TODO else popup warning: file is not on disk
-                      }),
+                    icon: const Icon(Icons.layers, size: 28),
+                    onPressed: () {
+                      setState(() {
+                        lt.selected = true;
+                        widget.refreshView();
+                        gl.refreshMap(() {
+                          gl.addLayerToList(lt.key, offline: false);
+                        });
+                      });
+                    },
+                    // TODO ; popUpNoInternet si pas d'accès au réseau
+                    //TODO else popup warning: file is not on disk -> non car on affiche ici uniquement les layer online, que l'on soit en mode online ou offline.
+                  ),
                 ),
         ]));
   }
@@ -473,15 +415,6 @@ class _CategoryView extends State<CategoryView> {
     setState(() {
       _finishedInitializingCategory[widget.category.filter] = true;
     });
-  }
-
-  bool _isSelectedLayer(String key) {
-    for (var layer in gl.interfaceSelectedLayerKeys) {
-      if (layer.mCode == key) {
-        return true;
-      }
-    }
-    return false;
   }
 
   @override
@@ -535,7 +468,7 @@ class _SelectedLayerView extends State<SelectedLayerView> {
           });
         },
         children: List<Widget>.generate(
-          gl.offlineMode ? 1 : 3,
+          gl.nMaxSelectedLayer,
           (i) => gl.interfaceSelectedLayerKeys.length > i
               ? Card(
                   key: Key('$i'),
@@ -552,16 +485,11 @@ class _SelectedLayerView extends State<SelectedLayerView> {
                             maxWidth: MediaQuery.of(context).size.width * .65,
                           ),
                           child: Text(
-                            textScaler: TextScaler.linear(1.2),
-                            gl.dico.mLayerBases.keys.contains(
-                                    gl.interfaceSelectedLayerKeys[i].mCode)
-                                ? gl
-                                    .dico
-                                    .mLayerBases[
-                                        gl.interfaceSelectedLayerKeys[i].mCode]!
-                                    .mNom
-                                : gl.interfaceSelectedLayerKeys[i].mCode,
-                          ),
+                              textScaler: TextScaler.linear(1.2),
+                              gl.dico
+                                  .getLayerBase(
+                                      gl.interfaceSelectedLayerKeys[i].mCode)
+                                  .mNom),
                         ),
                         Container(
                             color: gl.colorBackgroundSecondary,
@@ -571,8 +499,8 @@ class _SelectedLayerView extends State<SelectedLayerView> {
                                       ? MediaQuery.of(context).size.width * .04
                                       : 48,
                               minHeight: 48,
-                              maxWidth: 100,
-                              minWidth: 100,
+                              maxWidth: MediaQuery.of(context).size.width * .35,
+                              minWidth: 150,
                             ),
                             child: Row(children: [
                               IconButton(
@@ -584,14 +512,30 @@ class _SelectedLayerView extends State<SelectedLayerView> {
                                         1) {
                                       widget.refreshView();
                                       gl.refreshMap(() {
-                                        gl.removeLayerFromList(gl
-                                            .interfaceSelectedLayerKeys[i]
-                                            .mCode);
+                                        gl.removeLayerFromList(
+                                            gl.interfaceSelectedLayerKeys[i]
+                                                .mCode,
+                                            offline: gl
+                                                .interfaceSelectedLayerKeys[i]
+                                                .offline);
                                       });
                                     }
                                   });
                                 },
                               ),
+                              gl.interfaceSelectedLayerKeys[i].offline
+                                  ? Container(
+                                      width: 48,
+                                      height: 48,
+                                      padding: const EdgeInsets.symmetric(),
+                                      child: const Icon(Icons.save, size: 28),
+                                    )
+                                  : Container(
+                                      width: 48,
+                                      height: 48,
+                                      padding: const EdgeInsets.symmetric(),
+                                      child: const Icon(Icons.wifi, size: 28),
+                                    ),
                               Container(
                                 width: 48,
                                 height: 48,

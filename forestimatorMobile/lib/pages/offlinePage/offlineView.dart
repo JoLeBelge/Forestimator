@@ -78,23 +78,8 @@ class _OfflineView extends State<OfflineView> {
                 child: TextButton.icon(
                   onPressed: () async {
                     setState(() {
-                      while (gl.interfaceSelectedLayerKeys.length > 1) {
-                        if (gl.interfaceSelectedLayerKeys.first.offline) {
-                          gl.interfaceSelectedLayerKeys.removeLast();
-                        } else {
-                          gl.interfaceSelectedLayerKeys.removeAt(0);
-                        }
-                      }
+                      gl.changeSelectedLayerModeOffline();
 
-                      if (!gl.interfaceSelectedLayerKeys.first.offline) {
-                        gl.interfaceSelectedLayerKeys.clear();
-                        gl.interfaceSelectedLayerKeys.insert(
-                          0,
-                          gl.selectedLayer(
-                              mCode: gl.dico.getLayersOffline().first.mCode,
-                              offline: true),
-                        );
-                      }
                       gl.offlineMode = true;
                       gl.rebuildNavigatorBar!();
                       gl.refreshCurrentThreeLayer();
@@ -102,8 +87,6 @@ class _OfflineView extends State<OfflineView> {
                     });
                     final SharedPreferences prefs =
                         await SharedPreferences.getInstance();
-                    await prefs.setStringList('interfaceSelectedLCode',
-                        gl.getInterfaceSelectedLCode());
                     await prefs.setBool('offlineMode', gl.offlineMode);
                   },
                   icon: Icon(
@@ -252,8 +235,7 @@ class _OfflineView extends State<OfflineView> {
   }
 
   Widget _selectLayerButton(LayerTile lt) {
-    int nLayer = gl.offlineMode ? gl.nOfflineLayer : gl.nOnlineLayer;
-    return _isSelectedLayer(lt.key)
+    return gl.isSelectedLayer(lt.key, offline: true)
         ? Container(
             decoration: const BoxDecoration(
                 shape: BoxShape.circle, color: gl.colorAgroBioTech),
@@ -273,7 +255,7 @@ class _OfflineView extends State<OfflineView> {
                         lt.selected = false;
                       });
                       gl.refreshMap(() {
-                        gl.removeLayerFromList(lt.key);
+                        gl.removeLayerFromList(lt.key, offline: true);
                       });
                     }
                   });
@@ -296,7 +278,8 @@ class _OfflineView extends State<OfflineView> {
                   if (!gl.offlineMode ||
                       (gl.offlineMode && gl.dico.getLayerBase(lt.key).mOffline))
                     setState(() {
-                      if (gl.interfaceSelectedLayerKeys.length < nLayer) {
+                      if (gl.interfaceSelectedLayerKeys.length <
+                          gl.nMaxSelectedLayer) {
                         setState(() {
                           lt.selected = true;
                         });
@@ -316,15 +299,6 @@ class _OfflineView extends State<OfflineView> {
                   //TODO else popup warning: file is not on disk
                 }),
           );
-  }
-
-  bool _isSelectedLayer(String key) {
-    for (var layer in gl.interfaceSelectedLayerKeys) {
-      if (layer.mCode == key) {
-        return true;
-      }
-    }
-    return false;
   }
 
   Widget _expandedLegendView(LayerTile lt) {

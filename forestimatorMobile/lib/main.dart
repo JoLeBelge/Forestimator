@@ -35,7 +35,6 @@ void main() async {
         ignoreSsl:
             true // option: set to false to disable working with http links (default: false)
         );
-
     //Initialize Logging
     await FlutterLogs.initLogs(
         logLevelsEnabled: [
@@ -98,6 +97,13 @@ class _MyApp extends State<MyApp> {
         prefs.getStringList('interfaceSelectedLCode');
     if (ainterfaceSelectedLCode != null) {
       gl.interfaceSelectedLCode = ainterfaceSelectedLCode;
+    }
+    final List<String>? ainterfaceSelectedLOffline =
+        prefs.getStringList('interfaceSelectedLOffline');
+    if (ainterfaceSelectedLOffline != null) {
+      gl.interfaceSelectedLOffline = ainterfaceSelectedLOffline.map<bool>((e) {
+        return e == "true";
+      }).toList();
     }
     gl.refreshInterfaceSelectedL();
 

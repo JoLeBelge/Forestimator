@@ -268,9 +268,9 @@ class _MapPageState extends State<mapPage> {
               ),
               children: gl.interfaceSelectedLayerKeys.reversed
                       .map<Widget>((gl.selectedLayer selLayer) {
-                    // if (gl.offlineMode && ça c'est pas juste car on peux afficher des cartes offline dans le mode online
                     if (selLayer.offline &&
-                        gl.dico.getLayerBase(selLayer.mCode).mOffline) {
+                        gl.dico.getLayerBase(selLayer.mCode).mOffline &&
+                        (selLayer.mCode == gl.getFirstSelLayOffline())) {
                       if (_provider == null ||
                           _provider?.layerCode != selLayer.mCode) {
                         if (_provider != null) {

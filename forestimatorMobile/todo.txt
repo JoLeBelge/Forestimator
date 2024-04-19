@@ -1,18 +1,15 @@
 To do list fforestimator
 ------------------------
 
-TT/Jo -> selction couche à afficher
-	  	-> si passage à offline et une couche offline déjà sélectionnée, c'est celle-là qu'on affiche et non pas la première de la liste
-	  	-> garder un vecteur de 3 couches à afficher, même en mode offline! ça sera plus simple.
+Jo -> page ana Pt : afficher clairement si on est offline ou online, c'est là que ce joue la grosse différence
+   -> Mode Offline ; sert à faire des analyses ponctuelle offline! ouvrir un dialogBox lors de la première fois que l'utilisateur active le offline.
+	car en fait on peut afficher des carte online en mode offline et on peut afficher des cartes offline en mode online.
 	  	
-estétique : mettre un peu de marge gauche pour les ExpansionPanel qui montrent les couches carto
-selected layer ; ajouter une icone pour montrer si il s'agit d'une couche online ou offline.
-	  	  	
-v -> pop_up lors du premier lancement de l'app ; proposition de télécharger toutes les couches offline de la liste anaPtSelectedLayerKeys
-    -> faut ammeiloerer le download pour avoir un feedback.
-TT -> progress bar téléchargement.
-    -> Il y a de l'espoir...
-	
-Jo -> page offline ; cacher affichage de CNSW en offline, ou afficher un msg
+	  	
+TT -> estétique : mettre un peu de marge gauche pour les ExpansionPanel qui montrent les couches carto
+	-> progress bar téléchargement (Il y a de l'espoir)
+	-> téléchargement d'une couche ; le lancer uniquement si il y a un accès internet, sinon popUpnoInternet
+    	-> faut ammeiloerer le download pour avoir un feedback.
+
 
 DATE PREMIERE RELEASE : 19/04 (semaine forêt étudiant GRF)
