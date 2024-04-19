@@ -20,6 +20,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:fforestimator/tools/notification.dart';
 import 'dart:convert';
+import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
 
 class mapPage extends StatefulWidget {
   const mapPage({super.key});
@@ -323,9 +324,10 @@ class _MapPageState extends State<mapPage> {
                         ),
                       ],
                     ),
-                    const AnimatedLocationLayer(
-                        // cameraTrackingMode: CameraTrackingMode.locationAndOrientation,
-                        ),
+                    CurrentLocationLayer(),
+                    //const AnimatedLocationLayer(
+                    // cameraTrackingMode: CameraTrackingMode.locationAndOrientation,
+                    //),
                   ]),
           gl.position != null
               ? Row(mainAxisAlignment: MainAxisAlignment.end, children: [

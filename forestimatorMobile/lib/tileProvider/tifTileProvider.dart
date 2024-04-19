@@ -14,7 +14,6 @@ class tifFileTileProvider extends TileProvider {
   String sourceImPath;
   bool _loaded = false;
   String layerCode;
-  Uint8List? bytes;
 
   bool get loaded => _loaded;
 
@@ -33,7 +32,7 @@ class tifFileTileProvider extends TileProvider {
     bool e = await fileIm.exists();
     //print("file exist " + e.toString());
     if (e) {
-      bytes = await fileIm.readAsBytes();
+      Uint8List? bytes = await fileIm.readAsBytes();
 
       img.TiffInfo _tiffInfo = img.TiffDecoder().startDecode(bytes!)!;
       img.TiffImage tifIm = _tiffInfo!.images[0];
@@ -91,11 +90,11 @@ class tifFileTileProvider extends TileProvider {
     }
   }
 
-  @override
+  /*@override
   void dispose() {
-    bytes!.clear();
+    //bytes!.clear();
     _sourceImage = img.Image.empty();
 
     super.dispose(); // This will free the memory space allocated to the page
-  }
+  }*/
 }
