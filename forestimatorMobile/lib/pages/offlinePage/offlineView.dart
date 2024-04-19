@@ -7,8 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:fforestimator/globals.dart' as gl;
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:fforestimator/tools/notification.dart';
-import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 
 class OfflineView extends StatefulWidget {
   const OfflineView({super.key});
@@ -45,16 +43,8 @@ class _OfflineView extends State<OfflineView> {
                       gl.offlineMode = false;
                       gl.rebuildNavigatorBar!();
                       gl.refreshCurrentThreeLayer();
-                      //gl.refreshMap(() {});
+                      gl.refreshMap(() {});
                     });
-                    if (!await InternetConnection().hasInternetAccess) {
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return PopupNoInternet();
-                        },
-                      );
-                    }
                     final SharedPreferences prefs =
                         await SharedPreferences.getInstance();
                     await prefs.setBool('offlineMode', gl.offlineMode);
@@ -64,7 +54,7 @@ class _OfflineView extends State<OfflineView> {
                     color: gl.colorUliege,
                   ),
                   label: Text(
-                    "Désactivez le mode hors ligne.",
+                    "Desactivez le mode hors ligne.",
                     style: TextStyle(color: gl.colorUliege),
                   ),
                 ),
@@ -78,8 +68,21 @@ class _OfflineView extends State<OfflineView> {
                 child: TextButton.icon(
                   onPressed: () async {
                     setState(() {
-                      gl.changeSelectedLayerModeOffline();
+                      while (gl.interfaceSelectedLayerKeys.length > 1) {
+                        if (gl.interfaceSelectedLayerKeys.first.offline) {
+                          gl.interfaceSelectedLayerKeys.removeLast();
+                        } else {
+                          gl.interfaceSelectedLayerKeys.removeAt(0);
+                        }
+                      }
 
+                      if (!gl.interfaceSelectedLayerKeys.first.offline) {
+                        gl.interfaceSelectedLayerKeys.clear();
+                        gl.interfaceSelectedLayerKeys.insert(
+                            0,
+                            gl.selectedLayer(
+                                mCode: gl.dico.getLayersOffline().first.mCode));
+                      }
                       gl.offlineMode = true;
                       gl.rebuildNavigatorBar!();
                       gl.refreshCurrentThreeLayer();
@@ -87,6 +90,8 @@ class _OfflineView extends State<OfflineView> {
                     });
                     final SharedPreferences prefs =
                         await SharedPreferences.getInstance();
+                    await prefs.setStringList('interfaceSelectedLCode',
+                        gl.getInterfaceSelectedLCode());
                     await prefs.setBool('offlineMode', gl.offlineMode);
                   },
                   icon: Icon(
@@ -235,7 +240,8 @@ class _OfflineView extends State<OfflineView> {
   }
 
   Widget _selectLayerButton(LayerTile lt) {
-    return gl.isSelectedLayer(lt.key, offline: true)
+    int nLayer = 3;
+    return _isSelectedLayer(lt.key)
         ? Container(
             decoration: const BoxDecoration(
                 shape: BoxShape.circle, color: gl.colorAgroBioTech),
@@ -251,10 +257,14 @@ class _OfflineView extends State<OfflineView> {
                 onPressed: () {
                   setState(() {
                     if (gl.interfaceSelectedLayerKeys.length > 1) {
-                      lt.selected = false;
-                      gl.removeLayerFromList(lt.key, offline: true);
+                      setState(() {
+                        lt.selected = false;
+                      });
+                      gl.refreshMap(() {
+                        gl.removeLayerFromList(lt.key);
+                      });
                       gl.refreshCurrentThreeLayer();
-                      gl.refreshMap(() {});
+                      gl.refreshWholeCatalogueView((){});
                     }
                   });
                 }),
@@ -273,14 +283,40 @@ class _OfflineView extends State<OfflineView> {
             child: IconButton(
                 icon: const Icon(Icons.layers, size: 28),
                 onPressed: () {
-                  setState(() {
-                    lt.selected = true;
-                    gl.addLayerToList(lt.key, offline: true);
-                    gl.refreshMap(() {});
-                    gl.refreshCurrentThreeLayer();
-                  });
+                  if (!gl.offlineMode ||
+                      (gl.offlineMode && gl.dico.getLayerBase(lt.key).mOffline))
+                    setState(() {
+                      if (gl.interfaceSelectedLayerKeys.length < nLayer) {
+                        setState(() {
+                          lt.selected = true;
+                        });
+                        gl.refreshMap(() {
+                          gl.addLayerToList(lt.key);
+                        });
+                      } else {
+                        setState(() {
+                          lt.selected = true;
+                        });
+                        gl.refreshMap(() {
+                          gl.interfaceSelectedLayerKeys.removeLast();
+                          gl.addLayerToList(lt.key);
+                        });
+                        gl.refreshCurrentThreeLayer();
+                        gl.refreshWholeCatalogueView((){});
+                      }
+                    });
+                  //TODO else popup warning: file is not on disk
                 }),
           );
+  }
+
+  bool _isSelectedLayer(String key) {
+    for (var layer in gl.interfaceSelectedLayerKeys) {
+      if (layer.mCode == key) {
+        return true;
+      }
+    }
+    return false;
   }
 
   Widget _expandedLegendView(LayerTile lt) {
@@ -347,9 +383,6 @@ class _OfflineView extends State<OfflineView> {
     }
 
     setState(() {
-      gl.refreshOfflineView = () => setState(
-            () {},
-          );
       _finishedInitializingCategory = true;
     });
   }

@@ -107,22 +107,25 @@ class _CategoryView extends State<CategoryView> {
   @override
   Widget build(BuildContext context) {
     if (_finishedInitializingCategory[widget.category.filter]!) {
-      return Container(
-          constraints: BoxConstraints(
-              maxWidth: MediaQuery.of(context).size.width * 1.0,
-              maxHeight: _layerTiles.length *
-                  100 *
-                  MediaQuery.of(context).size.width *
-                  0.1),
-          child: Scrollbar(
-              controller: it,
-              child: SingleChildScrollView(
+      return Row(children: [
+        Container(constraints: const BoxConstraints(minWidth: 5),),
+        Container(
+            constraints: BoxConstraints(
+                maxWidth: MediaQuery.of(context).size.width * 1.0 - 5,
+                maxHeight: _layerTiles.length *
+                    100 *
+                    MediaQuery.of(context).size.width *
+                    0.1),
+            child: Scrollbar(
                 controller: it,
-                physics: that,
-                child: Container(
-                  child: _buildPanel(),
-                ),
-              )));
+                child: SingleChildScrollView(
+                  controller: it,
+                  physics: that,
+                  child: Container(
+                    child: _buildPanel(),
+                  ),
+                ))),
+      ]);
     } else {
       return const CircularProgressIndicator();
     }
@@ -351,6 +354,7 @@ class _CategoryView extends State<CategoryView> {
                             gl.refreshMap(() {
                               gl.removeLayerFromList(lt.key, offline: false);
                             });
+                            gl.rebuildOfflineView(() {});
                           }
                         });
                       }),
@@ -375,6 +379,7 @@ class _CategoryView extends State<CategoryView> {
                         gl.refreshMap(() {
                           gl.addLayerToList(lt.key, offline: false);
                         });
+                        gl.rebuildOfflineView(() {});
                       });
                     },
                     // TODO ; popUpNoInternet si pas d'accès au réseau
@@ -476,16 +481,19 @@ class _SelectedLayerView extends State<SelectedLayerView> {
                   surfaceTintColor: gl.colorBackgroundSecondary,
                   shadowColor: const Color.fromARGB(255, 44, 44, 44),
                   child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
                         Container(
                           color: gl.colorBackgroundSecondary,
                           constraints: BoxConstraints(
-                            maxHeight: 48,
-                            maxWidth: MediaQuery.of(context).size.width * .65,
+                            maxHeight: 36,
+                            maxWidth: MediaQuery.of(context).size.width - 150,
                           ),
                           child: Text(
-                              textScaler: TextScaler.linear(1.2),
+                              textScaler: gl.dico
+                                  .getLayerBase(
+                                      gl.interfaceSelectedLayerKeys[i].mCode)
+                                  .mNom.length < 25 ? TextScaler.linear(1.2) : TextScaler.linear(0.9),
                               gl.dico
                                   .getLayerBase(
                                       gl.interfaceSelectedLayerKeys[i].mCode)
@@ -499,7 +507,7 @@ class _SelectedLayerView extends State<SelectedLayerView> {
                                       ? MediaQuery.of(context).size.width * .04
                                       : 48,
                               minHeight: 48,
-                              maxWidth: MediaQuery.of(context).size.width * .34,
+                              maxWidth: 150,
                               minWidth: 150,
                             ),
                             child: Row(children: [
@@ -511,14 +519,14 @@ class _SelectedLayerView extends State<SelectedLayerView> {
                                     if (gl.interfaceSelectedLayerKeys.length >
                                         1) {
                                       widget.refreshView();
-                                      gl.refreshMap(() {
-                                        gl.removeLayerFromList(
-                                            gl.interfaceSelectedLayerKeys[i]
-                                                .mCode,
-                                            offline: gl
-                                                .interfaceSelectedLayerKeys[i]
-                                                .offline);
-                                      });
+                                      gl.refreshMap(() {});
+                                      gl.removeLayerFromList(
+                                          gl.interfaceSelectedLayerKeys[i]
+                                              .mCode,
+                                          offline: gl
+                                              .interfaceSelectedLayerKeys[i]
+                                              .offline);
+                                      gl.rebuildOfflineView(() {});
                                     }
                                   });
                                 },
