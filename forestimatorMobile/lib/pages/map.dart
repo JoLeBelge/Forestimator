@@ -299,7 +299,7 @@ class _MapPageState extends State<mapPage> {
                     } else {
                       layerBase l = gl.dico.getLayerBase(selLayer.mCode);
                       return TileLayer(
-                        userAgentPackageName: "com.example.forestimator",
+                        userAgentPackageName: "com.forestimator",
                         wmsOptions: WMSTileLayerOptions(
                           baseUrl: l.mUrl + "?",
                           format: 'image/png',
