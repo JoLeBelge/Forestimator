@@ -312,13 +312,15 @@ cWebAptitude::cWebAptitude(const Wt::WEnvironment& env, cDicoApt *dico)
     layoutD->setContentsMargins(0,0,0,0);
 
     auto menu_gauche = layoutD->addWidget(std::make_unique<WContainerWidget>());
-    auto content_panier = layoutD->addWidget(std::make_unique<WContainerWidget>());
+    WContainerWidget * content_panier = layoutD->addWidget(std::make_unique<WContainerWidget>());
 
     menu_gauche->setWidth(60);
     menu_gauche->addStyleClass("menu_gauche");
 
     content_panier->addNew<Wt::WText>(WString::tr("panier.header"));
     content_panier->setWidth("100%");
+    //content_panier->setId("content_panier");
+    content_panier->setOverflow(Overflow::Scroll);
 
     auto menu = menu_gauche->addWidget(Wt::cpp14::make_unique<WMenu>());
     //menu->setStyleClass("nav nav-pills nav-stacked");

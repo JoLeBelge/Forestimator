@@ -38,6 +38,45 @@
 using namespace Wt;
 namespace dbo = Wt::Dbo;
 
+class acr{
+public:
+    std::string     date,vosRef,nom,prenom,contact,gsm;
+    bool     keepInTouch;
+    std::string typeContact,anneeCoupe,regeNat,vegeBloquante,objectif,spCoupe,sanitCoupe,travaux,plantation,gibier,descr,surf,polygon;
+    int id;
+
+    template<class Action>
+    void persist(Action& a)
+    {
+        dbo::field(a, id,    "id");
+        dbo::field(a, date,    "date");
+        dbo::field(a, vosRef,       "vosRef");
+        dbo::field(a, nom,   "nom");
+        dbo::field(a, prenom,    "prenom");
+        dbo::field(a, contact,  "contact");
+        dbo::field(a, typeContact,  "typeContact");
+        dbo::field(a, anneeCoupe,  "anneeCoupe");
+        dbo::field(a, regeNat,  "regeNat");
+        dbo::field(a, typeContact,  "typeContact");
+        dbo::field(a, anneeCoupe,  "anneeCoupe");
+        dbo::field(a, regeNat,  "regeNat");
+        dbo::field(a, vegeBloquante,  "vegeBloquante");
+        dbo::field(a, objectif,  "objectif");
+        dbo::field(a, spCoupe,  "spCoupe");
+        dbo::field(a, sanitCoupe,  "sanitCoupe");
+        dbo::field(a, travaux,  "travaux");
+        dbo::field(a, plantation,  "plantation");
+        dbo::field(a, gibier,  "gibier");
+        dbo::field(a, descr,  "descr");
+        dbo::field(a, surf,  "surf");
+        dbo::field(a, polygon,  "polygon");
+        dbo::field(a, keepInTouch,  "keepInTouch");
+    }
+
+};
+
+
+
 class formVielleCoupeRase : public WApplication
 {
 public:
@@ -112,6 +151,14 @@ public:
     JSignal<std::string>  polygGeojson_;
     JSignal<std::string>& polygGeojson() { return polygGeojson_; }
     JSlot slot;
+};
+
+class ACRAnalytics : public Wt::WApplication
+{
+public:
+    ACRAnalytics(const Wt::WEnvironment& env, std::string aFileDB);
+private:
+      dbo::Session session;
 };
 
 #endif // FORMVIELLECOUPERASE_H

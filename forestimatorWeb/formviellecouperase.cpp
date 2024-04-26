@@ -37,7 +37,7 @@ formVielleCoupeRase::formVielleCoupeRase(const WEnvironment &env, cDicoApt *dico
     contactEncoderEdit_->setValidator(std::make_shared<WValidator>(true));
     contactEncoderEdit_->validator()->setInvalidBlankText("Nous avons besoin de pouvoir vous contacter");
     contactEncoderEdit_->addStyleClass("textEdit");
-     ++row;
+    ++row;
     contactEncoderGSMEdit_= table->elementAt(row,1)->addWidget(std::make_unique<WLineEdit>());
     label = table->elementAt(row,0)->addWidget(std::make_unique<WLabel>(WString::tr("contact.gsm")));
     contactEncoderGSMEdit_->setPlaceholderText(WString::tr("contact.gsm.ph"));
@@ -621,3 +621,82 @@ void formVielleCoupeRase::sendSummaryMail(){
 
 
 
+ACRAnalytics::ACRAnalytics(const Wt::WEnvironment& env, std::string aFileDB) : Wt::WApplication(env),
+    session()
+{
+    messageResourceBundle().use(docRoot() + "/encodageVCR");
+    std::shared_ptr<Wt::WBootstrap5Theme> theme = std::make_shared<Wt::WBootstrap5Theme>();
+    setTheme(theme);
+    // tout les style de wt gallery
+    //useStyleSheet("resources/themes/bootstrap/5/bootstrap.bundle.min.css");
+    //useStyleSheet("resources/themes/bootstrap/5/main.css");
+
+    // CSS custom pour faire beau
+    useStyleSheet("style/style.css");
+
+    auto sqlite3 = std::make_unique<dbo::backend::Sqlite3>(aFileDB);
+    sqlite3->setProperty("show-queries", "false");
+    session.setConnection(std::move(sqlite3));
+    session.mapClass<acr>("acr");
+    typedef dbo::collection< dbo::ptr<acr> > obs;
+
+    dbo::Transaction transaction{session};
+    setTitle("Encodage anciennes coupes rases");
+    root()->setMargin(0);
+    root()->setPadding(0);
+
+    Wt::WContainerWidget * content = root()->addWidget(std::make_unique<Wt::WContainerWidget>());
+    content->setOverflow(Wt::Overflow::Scroll);
+    content->addNew<Wt::WText>(WText::tr("coupe.rase.view"));
+    Wt::WTable* table = content->addWidget(std::make_unique<Wt::WTable>());
+    table->setHeaderCount(1);
+    table->setWidth(Wt::WLength("100%"));
+    //table->toggleStyleClass("table-striped",true);
+
+    table->elementAt(0, 0)->addNew<Wt::WText>("id");
+    table->elementAt(0, 1)->addNew<Wt::WText>("Date");
+    table->elementAt(0, 2)->addNew<Wt::WText>("vosRef");
+    table->elementAt(0, 3)->addNew<Wt::WText>("nom");
+    table->elementAt(0, 4)->addNew<Wt::WText>("prenom");
+    table->elementAt(0, 5)->addNew<Wt::WText>("contact");
+    //table->elementAt(0, 5)->addNew<Wt::WText>("gsm");
+    table->elementAt(0, 6)->addNew<Wt::WText>("typeContact");
+    table->elementAt(0, 7)->addNew<Wt::WText>("anneeCoupe");
+    table->elementAt(0, 8)->addNew<Wt::WText>("regeNat");
+    table->elementAt(0, 9)->addNew<Wt::WText>("vegeBloquante");
+    table->elementAt(0, 10)->addNew<Wt::WText>("objectif");
+    table->elementAt(0, 11)->addNew<Wt::WText>("spCoupe");
+    table->elementAt(0,12)->addNew<Wt::WText>("sanitCoupe");
+    table->elementAt(0, 13)->addNew<Wt::WText>("travaux");
+    table->elementAt(0, 14)->addNew<Wt::WText>("plantation");
+    table->elementAt(0, 15)->addNew<Wt::WText>("gibier");
+    table->elementAt(0, 16)->addNew<Wt::WText>("descr");
+    table->elementAt(0, 17)->addNew<Wt::WText>("surf");
+
+    obs rec = session.find<acr>();//.orderBy("datum DESC").limit(100);
+    int i=1;
+    for (const dbo::ptr<acr> &log : rec){
+        // ici si un logs dans la db a un identifiant NULL (si on a oublié de coché "auto-increment" pour colonne id - on se retrouve avec un déréférencement.
+        if (log.get()!=nullptr){
+            table->elementAt(i,0)->addWidget(std::make_unique<Wt::WText>(std::to_string(log->id)));
+            table->elementAt(i,1)->addWidget(std::make_unique<Wt::WText>(log->date));
+            table->elementAt(i,2)->addWidget(std::make_unique<Wt::WText>(log->vosRef));
+            table->elementAt(i,3)->addWidget(std::make_unique<Wt::WText>(log->nom));
+            table->elementAt(i,4)->addWidget(std::make_unique<Wt::WText>(log->prenom));
+            table->elementAt(i,5)->addWidget(std::make_unique<Wt::WText>(log->contact));
+            table->elementAt(i,6)->addWidget(std::make_unique<Wt::WText>(log->typeContact));
+            table->elementAt(i,7)->addWidget(std::make_unique<Wt::WText>(log->anneeCoupe));
+            table->elementAt(i,8)->addWidget(std::make_unique<Wt::WText>(log->regeNat));
+            table->elementAt(i,9)->addWidget(std::make_unique<Wt::WText>(log->vegeBloquante));
+            table->elementAt(i,10)->addWidget(std::make_unique<Wt::WText>(log->objectif));
+            table->elementAt(i,11)->addWidget(std::make_unique<Wt::WText>(log->spCoupe));
+            table->elementAt(i,12)->addWidget(std::make_unique<Wt::WText>(log->sanitCoupe));
+            table->elementAt(i,13)->addWidget(std::make_unique<Wt::WText>(log->travaux));
+            table->elementAt(i,14)->addWidget(std::make_unique<Wt::WText>(log->plantation));
+            table->elementAt(i,15)->addWidget(std::make_unique<Wt::WText>(log->gibier));
+            table->elementAt(i,16)->addWidget(std::make_unique<Wt::WText>(log->descr));
+            table->elementAt(i,17)->addWidget(std::make_unique<Wt::WText>(log->surf));
+            i++;
+        }
+    }
+}

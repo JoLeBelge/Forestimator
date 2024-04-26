@@ -10,7 +10,7 @@ import 'package:flutter/material.dart';
 import 'dart:math';
 import 'dart:io';
 import 'package:geolocator/geolocator.dart';
-import 'package:fforestimator/locationIndicator/animated_location_indicator.dart';
+//import 'package:fforestimator/locationIndicator/animated_location_indicator.dart';
 import 'package:fforestimator/globals.dart' as gl;
 import 'package:http/http.dart' as http;
 import 'package:fforestimator/pages/anaPt/requestedLayer.dart';

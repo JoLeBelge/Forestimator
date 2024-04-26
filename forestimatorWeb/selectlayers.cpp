@@ -1,50 +1,5 @@
 #include "selectlayers.h"
 
-/*
-selectLayers4Stat::selectLayers4Stat(groupLayers * aGL){
-    //std::cout << "creation de selectLayers4Stat " << std::endl;
-
-    mGL=aGL;
-    mVpLs=aGL->Layers();
-    nbMax=10;
-
-    // ajout des noeuds racine des groupes de couches et création de la checkbox pour le groupe
-    for (auto & kv : mLayerGroupNode){
-        WTreeTableNode * n=kv.second;
-        WCheckBox * checkB =new Wt::WCheckBox();
-        checkB->changed().connect([=]{SelectLayerGroup(checkB->isChecked(),kv.first);});
-        n->setColumnWidget(1, std::unique_ptr<Wt::WCheckBox>(checkB));
-
-        if ((kv.first == TypeLayer::FEE) | (kv.first == TypeLayer::Peuplement )){
-            treeTable->treeRoot()->addChildNode(std::unique_ptr<Wt::WTreeTableNode>(n));
-        }
-    }
-
-    // création des noeuds pour chaque couche et de sa checkbox et ajout dans le treetable dans le bon groupe de couche
-    for (std::shared_ptr<Layer> l : mVpLs){
-
-        if ((l->getCatLayer()!=TypeLayer::Externe) && (l->getCatLayer()==TypeLayer::FEE | l->getCatLayer()==TypeLayer::Peuplement)){
-            bool selected(0);
-            if ((l->Code()=="HE_FEE")| (l->Code()=="CS_FEE") | (l->Code()=="CP_FEE") | (l->Code()=="EP_FEE") | (l->Code()=="DO_FEE") | (l->Code()=="ME_FEE")){ selected=1;}
-
-            mSelectedLayers.emplace(std::make_pair(l,selected));
-            // checkBox
-            Wt::WCheckBox * checkB =new Wt::WCheckBox();
-            checkB->setChecked(selected);
-            checkB->changed().connect([=]{SelectLayer(checkB->isChecked(),l);});
-            mLayersCBox.emplace(std::make_pair(l,checkB));
-            // tree node
-            Wt::WTreeTableNode * n=new Wt::WTreeTableNode(l->getShortLabel());
-            l->changeExpertMode().connect(n,&Wt::WTreeTableNode::setNodeVisible);
-            mLayersNode.emplace(std::make_pair(l,n));
-            n->setColumnWidget(1, std::unique_ptr<Wt::WCheckBox>(checkB));
-            // ajout au noeux racine opportun
-            mLayerGroupNode.at(l->getCatLayer())->addChildNode(std::unique_ptr<Wt::WTreeTableNode>(n));
-        }
-    }
-}
-*/
-
 std::vector<std::shared_ptr<Layer>> baseSelectLayers::getSelectedLayer(){
     std::vector<std::shared_ptr<Layer>> aRes;
     for (auto kv : mSelectedLayers){

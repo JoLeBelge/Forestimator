@@ -255,7 +255,6 @@ PageAnalytics::PageAnalytics(const Wt::WEnvironment& env, std::string aFileDB) :
         // ici si un logs dans la db a un identifiant NULL (si on a oublié de coché "auto-increment" pour colonne id - on se retrouve avec un déréférencement.
         if (log.get()!=nullptr){
             //if (globTest){std::cout << " log " << log->datum << " : " << log->ip << " : " << log->ipath << std::endl;}
-
             time_t now=log->datum;
             //tm *ltm = localtime(&now);
             table->elementAt(i,0)->addWidget(std::make_unique<Wt::WText>(std::to_string(i)));
@@ -264,13 +263,9 @@ PageAnalytics::PageAnalytics(const Wt::WEnvironment& env, std::string aFileDB) :
             table->elementAt(i,3)->addWidget(std::make_unique<Wt::WText>(log->client));
             table->elementAt(i,4)->addWidget(std::make_unique<Wt::WText>(log->ipath));
             table->elementAt(i,5)->addWidget(std::make_unique<Wt::WText>(log->getCat()));
-
             i++;
         }
 
     }
-
-
-
 
 }

@@ -2,7 +2,7 @@ name: fforestimator
 description: Une application cartographique pour les forestiers wallons qui permet d'obtenir de nombreux renseignements sur les stations forestières et sur les peuplements en place.
 
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
-version: 0.9.0
+version: 1.0.0+2
 
 environment:
   sdk: '>=3.0.6 <4.0.0'
