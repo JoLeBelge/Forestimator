@@ -70,7 +70,7 @@ var _view = new ol.View({
 	extent: extent,
 	zoom: 9,
 	minZoom: 0,
-	maxZoom: 10
+	maxZoom: 14
 })
 
 // create map here
