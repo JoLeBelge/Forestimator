@@ -183,15 +183,10 @@ void surfPdfResource::handleRequest(const Http::Request &request, Http::Response
 
     mSW->mTitre->htmlText(o);
     mSW->mCarteGenCont->htmlText(o);
-    // toujours le même problème ; le htmlText renseigne le chemin d'accès à des images en ommettant le docroot, alors que le pdfrenderer lui à besoin du chemin d'accès complêt.
-    //htmlText=o.str();
-    //boost::replace_all(htmlText,"src=\"","src=\""+mSW->mDico->File("docroot"));
     boost::replace_all(tp,"mCarteGenCont",o.str());
 
     o.str("");// en faut au lieu de vider à chaque fois le streamstream, je peux ajouter tout mon htmltext dedans
     mSW->mAllStatIndivCont->htmlText(o);
-    //htmlText=o.str();
-    //boost::replace_all(htmlText,"src=\"","src=\""+mSW->mDico->File("docroot"));
     boost::replace_all(tp,"mAllStatIndivCont",o.str());
 
     o.str("");
@@ -203,22 +198,17 @@ void surfPdfResource::handleRequest(const Http::Request &request, Http::Response
                 // problème : le layerStatChart d'une aptitude dois pouvoir utiliser la méthode getChart au lieu de getBarStat
                std::unique_ptr<WContainerWidget> toto= chart->getChart(1);
                toto->htmlText(o);
-               //toto->hide();
                mSW->mAllStatIndivCont->addWidget(std::move(toto));// rigolo, ça bug pas quand je déplace l'objet ici, mais si je ne fait rien avec, ça bug. Ces smartptr sont peut-être pas assez malin pour cette situation présente.
-               // peut-être que la suppression de la tableView supprime le model qui va avec?
-               //toto.reset();
-
             }
         }
     }
-    //std::cout << o.str() << std::endl;
     boost::replace_all(tp,"mApt",o.str());
-    // toujours le même problème ; le htmlText renseigne le chemin d'accès à des images en ommettant le docroot, alors que le pdfrenderer lui à besoin du chemin d'accès complêt.
+    // le htmlText renseigne le chemin d'accès à des images en ommettant le docroot, alors que le pdfrenderer lui à besoin du chemin d'accès complêt.
     boost::replace_all(tp,"src=\"","src=\""+mSW->mDico->File("docroot"));
 
     o.str("");
     o.clear();
-    //std::cout << tp << std::endl;
+
     renderer.render(tp);
     response.setMimeType("application/pdf");
     HPDF_SaveToStream (pdf);
@@ -229,6 +219,5 @@ void surfPdfResource::handleRequest(const Http::Request &request, Http::Response
 
     response.out (). write ((char *) buf, size);
     delete [] buf;
-
     mSW->mGL->m_app->addLog("pdf ana surf", typeLog::danas);
 }

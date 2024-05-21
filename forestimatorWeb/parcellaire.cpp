@@ -223,7 +223,7 @@ void parcellaire::upload(){
     anaOnAllPolygBt->disable();
     cleanShpFile();
     boost::filesystem::path p(fu->clientFileName().toUTF8()), p2(this->fu->spoolFileName());
-    this->mClientName = p.stem().c_str();
+    mClientName = p.stem().c_str();
 
     mName = ((std::string) p2.filename().c_str()) + "-"+ mClientName;
     mFullPath = this->mDico->File("TMPDIR")+ mName;
@@ -236,10 +236,9 @@ void parcellaire::upload(){
         //boost::filesystem::rename(file.spoolFileName(),mFullPath+a.extension().c_str());
         // sur server boost::filesystem::rename: Invalid cross-device link:  car /data1 et tmp sont sur des différents volumes.
         //solution ; copy! de toute manière tmp/ est pugé souvent
-        std::cout << "ACHTUNG: " << mFullPath+a.extension().c_str() << ";;;" << std::endl;
+        //std::cout << "ACHTUNG: " << mFullPath+a.extension().c_str() << ";" << std::endl;
         string it = "cp " + file.spoolFileName() + " " + mFullPath + a.extension().c_str();
         std::system(it.c_str());
-        //boost::filesystem::copy(file.spoolFileName(),mFullPath+a.extension().c_str());
         if ((a.extension().string()==".shp") | (a.extension().string()==".shx" )| (a.extension().string()==".dbf")) {nbFiles++; isShp=1 ;mExtention="shp";}
     }
 
@@ -473,18 +472,26 @@ void parcellaire::polygoneCadastre(std::string aFileGeoJson, std::string aLabelN
 
 
 void parcellaire::doComputingTask(){
-    cout << "  get unfinished running tasks" << pool->getNunfinishedTasks() << std::endl;// échoue? donc on a pas accès à l'objet pool (global , instantié dans main.cpp)
+    if (globTest){cout << "  get unfinished running tasks" << pool->getNunfinishedTasks() << std::endl;}// échoue? donc on a pas accès à l'objet pool (global , instantié dans main.cpp)
 
     std::string fileName = "";
     int getNum4Download = 0;
     WFileResource *fileResource = new Wt::WFileResource();
     fileResource->setMimeType("txt/html");
     pool->add(new parcellaire::TaskComputing(geoJsonName(), mGL, fileResource, &m_app));
-    pool->waitOnWorkerToFinished();//TODO This has to go in order to get back results asyncronously! Either email or build a loop to receive them back into server.
-    //fileResource->suggestFileName("Forestimator-statistiques.xml");
-    m_app->redirect(fileResource->url());
-    m_app->addLog("compute stat AllPol, "+std::to_string(getNum4Download)+" traitements",typeLog::anas); // add some web stats
-    return;
+    //pool->waitOnWorkerToFinished();//TODO This has to go in order to get back results asyncronously! Either email or build a loop to receive them back into server.
+    Wt::Mail::Message mail =Wt::Mail::Message();
+    //mail.addHeader();
+    mail.setFrom(Wt::Mail::Mailbox("JO.Lisein@uliege.be", "Lisein Jonathan"));
+    mail.setBody(
+                Wt::WString::tr("mail.anasMulti.body").arg(m_app->getUser().identity(Wt::Auth::Identity::LoginName)).arg(mLabelName==""?mClientName:mLabelName).arg(fileResource->url())
+                );
+    mail.setSubject(Wt::WString::tr("mail.anasMulti.title").toUTF8());
+    mail.addRecipient(Wt::Mail::RecipientType::To,Mail::Mailbox(m_app->getUser().email()==""? m_app->getUser().unverifiedEmail() : m_app->getUser().email() ) );
+    Mail::Client client;
+    client.connect();
+    client.send(mail);
+    m_app->addLog("compute stat AllPol, "+std::to_string(getNum4Download)+" traitements",typeLog::anasMulti);
 }
 
 void parcellaire::TaskComputing::run(){
@@ -556,17 +563,6 @@ void parcellaire::anaAllPol(){
         });
         messageBox->show();
         this->doComputingTask(); // Demarre le threadpool
-
-        /*std::string input(geoJsonName());// lecture du geojson et pas du shp, comme cela compatible avec polygone du cadastre.
-        const char *inputPath=input.c_str();
-        GDALDataset * mDS =  (GDALDataset*) GDALOpenEx( inputPath, GDAL_OF_VECTOR | GDAL_OF_READONLY, NULL, NULL, NULL );
-        if( mDS != NULL )
-        {
-            // layer
-            OGRLayer * lay = mDS->GetLayer(0);
-            mGL->computeStatAllPol(lay);
-            GDALClose(mDS);
-        } else { std::cout << "select dataset mDS is null " << std::endl;}*/
     }
 }
 

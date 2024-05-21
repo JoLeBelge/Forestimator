@@ -46,8 +46,7 @@ private:
     int mW,mH;
 };
 
-// une carte statique mais généré au format img en local (server side) car ol ça commence à fair ch*
-// en remplacement de olOneLay, plus de flexibilité et format img server-side pour export en pdf, avec choix de la résolution
+// une carte statique mais généré au format img en local (server side)
 class  staticMap
 {
 public:
@@ -57,7 +56,6 @@ public:
     double yGeo2Im(double y);
     std::string getFileName(){return mFileName;}
     std::string getFileNameRel(){return mFileNameRel;}
-    //Wt::WLink getWLink(){return Wt::WLink(mFileNameRel);}
     // le pdf renderer il aime pas les chemin en relatif pour les image
     Wt::WLink getWLinkRel(){return Wt::WLink(mFileNameRel);}
     Wt::WLink getWLink(){return Wt::WLink(mFileName);}
@@ -85,7 +83,6 @@ class layerStatChart : public layerStat
 {
 public:
     layerStatChart(std::shared_ptr<Layer> aLay, std::map<std::string,int> aStat, OGRGeometry * poGeom);
-
     // chart ; une carte individuelle + tableau
     std::unique_ptr<WContainerWidget> getChart(bool forRenderingInPdf=0);
     // barstat; pour aptitude, les statistiques des aptitudes résumées sous forme de battonnet

@@ -161,7 +161,6 @@ staticMap::staticMap(std::shared_ptr<layerBase> aLay, OGRGeometry *poGeom, OGREn
     // nécessaire pour Wlink
     mFileNameRel = "tmp/"+name1+".png";
 
-    // tellement dangereux pour les memory leak!! a changer
     if (ext==NULL){
         ext= new OGREnvelope;
         poGeom->getEnvelope(ext);
@@ -188,7 +187,6 @@ staticMap::staticMap(std::shared_ptr<layerBase> aLay, OGRGeometry *poGeom, OGREn
     mSy=(double)mSx*(mWy/mWx);
 
     //std::cout << ext->MinX << ", " << ext->MinY << ", " << ext->MaxX << ", " << ext->MaxY << std::endl;
-
     // d'abord transformer la couche wms en image locale, puis réouvrir et y dessiner le polygone
     if (mLay->wms2jpg(ext,mSx,mSy,mFileName)) {
 
@@ -243,7 +241,6 @@ staticMap::staticMap(std::shared_ptr<layerBase> aLay, OGRGeometry *poGeom, OGREn
             break;
         }
         drawScaleLine(&painter);
-
         pngImage.done();
         std::ofstream f(mFileName, std::ios::out | std::ios::binary);
         pngImage.write(f);

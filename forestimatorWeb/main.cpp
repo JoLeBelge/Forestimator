@@ -28,9 +28,11 @@ int launchForestimator(int argc, char **argv)
     stationDescResource resource(dico);
     rasterClipResource rClipRaster(dico);
     anaPonctuelleResource anaPonctResource(dico);
+    staticMapResource smResource(dico);
 
     try {
         Wt::WServer server{argc, argv, WTHTTP_CONFIGURATION};
+
 
         // set first ressources with sub-folder /api/
         // then add entry point for the web site
@@ -47,7 +49,9 @@ int launchForestimator(int argc, char **argv)
         // exemple http://localhost:8085/api/clipRast/layerCode/EP_FEE/xmin/200000.0/ymin/80000.0/xmax/250000.0/ymax/100000.0/toto.tif
         server.addResource(&rClipRaster, "/api/clipRast/layerCode/${layerCode}/xmin/${xmin}/ymin/${ymin}/xmax/${xmax}/ymax/${ymax}");
         server.addResource(&rClipRaster, "/api/rastPColor/layerCode/${layerCode}");
-        // pour créer le raster avec palette de couleur (fforestimator)
+        // pour créer le raster avec palette de couleur (forestimator Mobile)
+
+        server.addResource(&smResource, "/api/staticMap/layerCode/${layerCode}/polygon/${pol}");
 
         // http://localhost:8085/api/anaPt/layers/EP_FEE+EP_CS+MNH2019+CNSW/x/200000.3/y/80000.1
         server.addResource(&anaPonctResource, "/api/anaPt/layers/${listLayerCode}/x/${x}/y/${y}");

@@ -26,6 +26,7 @@ SOURCES += main.cpp \
     api/anaponctuelleresource.cpp \
     api/cnswresource.cpp \
     api/rasterclipresource.cpp \
+    api/staticmapresource.cpp \
     auth/Session.cpp \
     auth/User.cpp \
     cadastre.cpp \
@@ -62,6 +63,7 @@ HEADERS += \
     api/anaponctuelleresource.h \
     api/cnswresource.h \
     api/rasterclipresource.h \
+    api/staticmapresource.h \
     auth/Session.h \
     auth/User.h \
     cadastre.h \

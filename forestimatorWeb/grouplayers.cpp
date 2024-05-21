@@ -352,7 +352,7 @@ void groupLayers::computeStatGlob(OGRGeometry *poGeomGlobale){
 
 
 void groupLayers::computeStatAllPol(OGRLayer * lay, WFileResource *fileResource){
-    std::cout << " computeStatAllPol::computeStatAllPol " << std::endl;
+    //std::cout << " computeStatAllPol::computeStatAllPol " << std::endl;
     std::string name0 = std::tmpnam(nullptr);
     std::string name1 = name0.substr(5,name0.size()-5);
     std::string aOut = mDico->File("TMPDIR")+"/"+name1+".xml";
@@ -370,7 +370,6 @@ void groupLayers::computeStatAllPol(OGRLayer * lay, WFileResource *fileResource)
         for (int f(0);f<def->GetFieldCount();f++){
             aFile << "<" <<def->GetFieldDefn(f)->GetNameRef()<<">" << poFeature->GetFieldAsString(f)<<"</" <<def->GetFieldDefn(f)->GetNameRef()<<">" "\n";
         }
-
         OGRGeometry * poGeom = poFeature->GetGeometryRef();
         poGeom->closeRings();
         poGeom->flattenTo2D();
@@ -378,7 +377,6 @@ void groupLayers::computeStatAllPol(OGRLayer * lay, WFileResource *fileResource)
         poGeom->exportToWkt(&polWkt);
         for (auto & l: getSelectedLayer4Download() ){
              aFile << "<processing>\n" ;
-
             if (l->Code()=="MNH2019"){
                 aFile << "<processingName>hdom2019</processingName>\n" ;
                 aFile << mDico->geoservice("hdom","MNH2019",polWkt,typeAna::surfacique,1);
@@ -395,20 +393,11 @@ void groupLayers::computeStatAllPol(OGRLayer * lay, WFileResource *fileResource)
         }
         aFile << "</feature>\n" ;
     }
-     aFile << "</layerStat>\n";
-
-    // pour les statistiques globales, on prend toutes les couches selectionnées par select4Download
-
+    aFile << "</layerStat>\n";
 
     aFile.close();
-
     fileResource->setFileName(aOut);
     fileResource->suggestFileName("Forestimator-statistiques.xml");
-    /*
-    fileResource->suggestFileName("Forestimator-statistiques.xml");
-    m_app->redirect(fileResource->url());
-    m_app->addLog("compute stat AllPol, "+std::to_string(getNumSelect4Download())+" traitements",typeLog::anas); // add some web stats
-    */
 }
 
 /**

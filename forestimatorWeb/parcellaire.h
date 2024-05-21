@@ -17,6 +17,8 @@
 #include "Wt/WLoadingIndicator.h"
 #include "statwindow.h"
 #include "widgetcadastre.h"
+#include <Wt/Mail/Message.h>
+#include <Wt/Mail/Client.h>
 
 #include "boost/filesystem.hpp"
 #include <functional> //--> pour bind
@@ -83,7 +85,7 @@ public:
     public:
         TaskComputing (std::string geoJsonName, groupLayers *mGL, WFileResource *fileResource, cWebAptitude **app) :
             geoJsonName(geoJsonName), mGL(mGL), fileResource(fileResource), app(app){
-            std::cout << "créateur de TaskAnaAllPoll" << std::endl;
+            //if(globTest){std::cout << "créateur de TaskAnaAllPoll" << std::endl;}
         }
     };
 

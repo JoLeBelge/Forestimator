@@ -45,7 +45,7 @@ std::string cDicoApt::geoservice(std::string aTool, std::string aArgs, std::stri
                         }
                     }
                 } else if (aTool==nameDendroTool){
-                    if (globTest) {std::cout << "dendro 2018 api " << std::endl;}
+                    //if (globTest) {std::cout << "dendro 2018 api " << std::endl;}
                     if (!xml){aResponse+="hdom;vha;gha;nha;cmoy\n";}
                     std::shared_ptr<layerBase> l=getLayerBase("MNH2018P95");
                     statDendroBase stat(l,pol,1);
@@ -88,15 +88,15 @@ std::string cDicoApt::geoservice(std::string aTool, std::string aArgs, std::stri
                     aResponse+=surf.getSummaryAPI();
 
                 } else if (hasLayerBase(aTool)) {
-                    if (globTest) {std::cout << " API sur layerBase " << std::endl;}
+                    //if (globTest) {std::cout << " API sur layerBase " << std::endl;}
 
                     std::shared_ptr<layerBase> l=getLayerBase(aTool);
                     // analyse surfacique ; basic stat pour les var continue
                     switch (l->getTypeVar()) {
                     case TypeVar::Continu:{
-                        std::cout << " api compute basic stat on polyg " << std::endl;
+                        //std::cout << " api compute basic stat on polyg " << std::endl;
                         basicStat stat=l->computeBasicStatOnPolyg(pol);
-                        std::cout << " done " << std::endl;
+                        //std::cout << " done " << std::endl;
                         if (!xml){
                             aResponse+="mean;"+stat.getMean()+"\n";
                             aResponse+="max;"+stat.getMax()+"\n";
@@ -203,43 +203,6 @@ bool cDicoApt::checkTool(std::string aTool){
     // traitements qui ne sont pas des cartes
     if (aTool=="hdom"   | aTool=="aptitude" | aTool=="dendro2018" | aTool=="CNSW"){ aRes=1;} //| aTool=="compo"
     return aRes;
-}
-
-OGRGeometry * cDicoApt::checkPolyg(std::string aPolyg){
-    //bool aRes(0);
-    OGRGeometry * pol=NULL;
-    // lecture du polygone
-    /*OGRSpatialReference src;
-    src.importFromWkt()
-     OGRErr err=src.SetWellKnownGeogCS( "EPSG:31370" );
-     std::cout << "OGR error setwellKnownGeog : " << err << std::endl; // failure! je sais pas pk
-    */
-    OGRErr err=OGRGeometryFactory::createFromWkt(aPolyg.c_str(),NULL,&pol);
-    if(globTest){std::cout << "createFromWkt OGR error : " << err << std::endl;}
-    //std::cout << "src " << src.exportToProj4();
-    // isValid() fonctionne mais par contre le destroyGeom doit être suivi d'un pol=NULL sinon bug
-    if (err==OGRERR_NONE && pol!=NULL){
-        pol->MakeValid();
-        // j'ai des pol invalides qui sont des multipolygones avec self intersection, je garde que le premier polygone. solution rapide...
-        if (!pol->IsValid() & pol->toGeometryCollection()->getNumGeometries()>1){
-            if(OGR_G_Area(pol->toGeometryCollection()->getGeometryRef(0))>100 & pol->toGeometryCollection()->getGeometryRef(0)->IsValid()){
-                pol=pol->toGeometryCollection()->getGeometryRef(0);
-            }
-        }
-        if(pol->IsValid()){
-            //std::cout << " geométrie valide " << pol->getGeometryName() << std::endl;
-            int aSurfha=OGR_G_Area(pol)/10000;
-            if (aSurfha>globMaxSurf){OGRGeometryFactory::destroyGeometry(pol);pol=NULL;}
-        } else {
-            std::cout << " geométrie invalide " << pol->getGeometryName() << " nombre de geometrie " << pol->toGeometryCollection()->getNumGeometries()<< std::endl;
-            OGRGeometryFactory::destroyGeometry(pol);pol=NULL;}
-    } else {
-        std::cout << " OGRErr lors de l'import du wkt" << std::endl;
-        OGRGeometryFactory::destroyGeometry(pol);pol=NULL;}
-
-    //if (aRes==0){mResponse="Veillez utiliser le format wkt pour le polygone (projeté en BL72, epsg 31370).";}//Wt::WText::tr("api.msg.error.polyg1").toUTF8();}}
-    if(globTest){std::cout << "checkPolyg API done "<< std::endl;}
-    return pol;
 }
 
 OGRPoint * cDicoApt::checkPoint(std::string aPolyg){

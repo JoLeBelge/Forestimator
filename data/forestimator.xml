@@ -210,41 +210,28 @@ A bientôt sur http://forestimator.gembloux.ulg.ac.be
   <message id="Wt.Auth.lostpasswordmail.body">
 Bonjour {1},
 
-This mail has been sent to you, because someone (presumably you?)
-indicated that he wishes to choose a new password, because the current
-password escapes his mind.
+C'est email vous est envoyé car quelqu'un (probablement vous?) souhaite choisir un nouveau mot de passe pour votre compte d'accès au portail cartographique Forestimator.
 
-If you requested this, then choose a new password by clicking on the
-following link or copying the URL into your browser. If you didn't
-request this, you can safely ignore and discard this email.
- 
-Please copy and paste the following URL into your browser: (Note: be
-sure to copy the entire URL, including any part of it which goes onto
-a second line.)
+Si c'est bien vous, vous pouvez réinitialiser votre mot de passe en cliquant sur le lien ci-dessous. Sinon, vous pouvez ignorer cet email en toute sécurité.
  
 {3} 
 
+Bien à vous,
+L'équipe Forestimator
 
   </message>
 
   <message id="Wt.Auth.lostpasswordmail.htmlbody">
-    <h3>Hello {1},</h3>
+    <h3>Bonjour {1},</h3>
 
-    <p>This mail has been sent to you, because someone (presumably
-    you?)  indicated that he wishes to choose a new password, because
-    the current password escapes his mind.</p>
+    <p>C'est email vous est envoyé car quelqu'un (probablement vous?) souhaite choisir un nouveau mot de passe pour votre compte d'accès au portail cartographique Forestimator.</p>
 
-    <p>If you requested this, then choose a new password by clicking
-    on the following link or copying the URL into your browser. If you
-    didn't request this, you can safely ignore and discard this
-    email.</p>
+    <p>Si c'est bien vous, vous pouvez réinitialiser votre mot de passe en cliquant sur le lien ci-dessous. Sinon, vous pouvez ignorer cet email en toute sécurité.</p>
  
-    <p>Please <a href="{3}">click here to choose a new password</a> or
-    copy and paste the following URL into your browser: <i>(Note: be
-    sure to copy the entire URL, including any part of it which goes
-    onto a second line.)</i></p>
-    
+    <p><a href="{3}">lien de réinitialisation</a></p>
     <b>{3}</b>
+    Bien à vous,
+L'équipe Forestimator
 
   </message>
   <message id="Wt.Auth.template.login">
@@ -784,4 +771,17 @@ Un suivi de l'état sanitaire des pessières est réalisé en vue d'identifier l
 <message id="Wt.WMessageBox.No"> Non</message>
 <message id="Wt.WMessageBox.Cancel"> Annuler</message>
 <message id="eco.ntnh"> Niveau trophique {1}, Niveau hydrique {2}</message>
+
+ <message id="mail.anasMulti.body">
+    Bonjour {1},
+
+    Vous trouverez ci-dessous un lien pour télécharger les résultats de l'analyse surfacique pour vos polygones ({2}). 
+    
+    https://forestimator.gembloux.ulg.ac.be/{3}
+    
+    En vous souhaitant bonne réception,
+    
+    l'équipe Forestimator
+  </message>
+  <message id="mail.anasMulti.title">Forestimator : analyse surfacique pour un ensemble de polygones </message>
 </messages>

@@ -62,7 +62,7 @@ statHdomBase::statHdomBase(std::shared_ptr<layerBase> aLay, OGRGeometry * poGeom
 
 statDendroBase::statDendroBase(std::shared_ptr<layerBase> aLay, OGRGeometry * poGeom, bool api):statHdomBase(aLay,poGeom,0)
 {
-    if (globTest){std::cout << "statDendro" << std::endl;}
+    //if (globTest){std::cout << "statDendro" << std::endl;}
     predictDendroPix();
 
 }
@@ -138,7 +138,7 @@ statCellule::statCellule(std::vector<double> * aVHs, int aSurf, bool computeDend
     double hSum(0);
 
     if (computeDendro){
-        if (globTest){std::cout << "statCellule::statCellule dendro" << std::endl;}
+        //if (globTest){std::cout << "statCellule::statCellule dendro" << std::endl;}
 
         double vhaSum(0.0),cmoySum(0.0),ghaSum(0.0),nhaSum(0.0),hdomSum(0);
 
@@ -1550,7 +1550,7 @@ bool layerBase::wms2jpg(OGREnvelope  * extent, int aSx, int aSy, std::string aOu
                                      //"<Version>1.3.0</Version>"
                                      "<ServerUrl>%s?</ServerUrl>"
                                      "<SRS>EPSG:31370</SRS>"
-                                     //"<CRS>EPSG:3812</CRS>" pour version 1.3.0
+                                     //"<CRS>EPSG:31370</CRS>" //pour version 1.3.0
                                      "<ImageFormat>image/jpeg</ImageFormat>"
                                      "<Layers>%s</Layers>"
                                      "<Styles></Styles>"
@@ -1579,7 +1579,9 @@ bool layerBase::wms2jpg(OGREnvelope  * extent, int aSx, int aSy, std::string aOu
                                      );
 
     //"<Cache><Type>file</Type><Expires>%d</Expires></Cache>"
-    //std::cout << connStr << std::endl;
+    if (globTest){
+        std::cout <<mUrl << std::endl;
+        std::cout << connStr << std::endl;}
     GDALDataset *pDS = static_cast<GDALDataset*>(GDALOpenEx(connStr, GDAL_OF_RASTER, nullptr, nullptr, nullptr));
     if( pDS != NULL ){
 
