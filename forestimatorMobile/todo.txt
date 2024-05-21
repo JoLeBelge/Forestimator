@@ -1,15 +1,18 @@
 To do list fforestimator
 ------------------------
 
-Jo -> page ana Pt : afficher clairement si on est offline ou online, c'est là que ce joue la grosse différence
-   -> Mode Offline ; sert à faire des analyses ponctuelle offline! ouvrir un dialogBox lors de la première fois que l'utilisateur active le offline.
-	car en fait on peut afficher des carte online en mode offline et on peut afficher des cartes offline en mode online.
-	  	
-	  	
-TT ok estétique : mettre un peu de marge gauche pour les ExpansionPanel qui montrent les couches carto
-	-> progress bar téléchargement (Il y a de l'espoir)
-	-> téléchargement d'une couche ; le lancer uniquement si il y a un accès internet, sinon popUpnoInternet
-    	-> faut ammeiloerer le download pour avoir un feedback.
+-> page ana Pt : afficher clairement si on est offline ou online, c'est là que ce joue la grosse différence
+-> Mode Offline ; sert à faire de la visualisation et des analyses ponctuelle offline! ouvrir un dialogBox lors de la première fois que l'utilisateur active le offline.
 
 
-DATE PREMIERE RELEASE : 19/04 (semaine forêt étudiant GRF)
+-> téléchargement progress bar , le lancer uniquement si il y a un accès internet, sinon popUpnoInternet, feedback quand -téléchargement complêt (popup également?)
+
+
+-> réactiver carte GS sur forestimator Mobile
+
+retours testeurs:
+-----------------
+
+GLigot : position sur carte pas clair (quand c'est position grace à internet et non pas GPS, pas de rond bleu pour afficher la position)
+Jo : message téléchargement des cartes au démarrage ; pas clair. faute d'orthographe téléchargable et label pas visible sur tablette
+
