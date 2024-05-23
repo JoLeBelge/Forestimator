@@ -21,6 +21,8 @@ class LayerMTD;
 
 enum typeAna {ponctuel,surfacique,dicoTable};
 
+extern int globMaxSurf;
+
 // toute les informations/ dico que j'ai besoin pour le soft
 class cDicoApt : public cdicoAptBase
 {
@@ -35,7 +37,7 @@ public:
     std::string geoservice(std::string aTool,std::string aArgs,std::string aPolyg,typeAna aType,bool xml=0);
     bool checkTool(std::string aTool);
     OGRLayer * uploadLayer(std::string aShpToUpload);
-    OGRGeometry * checkPolyg(std::string aPolyg);
+    OGRGeometry * checkPolyg(std::string aPolyg, int maxSurf=globMaxSurf);
     OGRPoint * checkPoint(std::string aPolyg);
     // pour commencer, uniquement une liste de code de carte d'aptitude (AG_FEE, ...)
     std::vector<std::string> parseAptArg(std::string aArgs);

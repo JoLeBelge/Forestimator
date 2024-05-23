@@ -3,21 +3,29 @@ extern bool globTest;
 void staticMapResource::handleRequest(const Http::Request &request,Http::Response &response){
         if (globTest) {std::cout << "staticMapResource:: handle request" << std::endl;}
         auto params = request.urlParams();
-        std::string lCode(""),aPolyg("");
+        std::string lCode(""),aPolyg(""),aEnv("");
 
         for (const auto &param : params) {
             const auto &name = param.first;
             const auto &value = param.second;
             if (name=="layerCode") {lCode=value;}
             if (name=="pol") {aPolyg=value;}
+            if (name=="env") {aEnv=value;}
         }
         GDALAllRegister();
 
         if (mDico->hasLayerBase(lCode)){
         std::shared_ptr<layerBase> l =mDico->getLayerBase(lCode);
         OGRGeometry * pol=mDico->checkPolyg(aPolyg);
+        OGRGeometry * envGeom=mDico->checkPolyg(aEnv,10000);
          if (pol!=NULL){
-         staticMap sm(l,pol);
+         OGREnvelope * env= new OGREnvelope;
+             if (envGeom!=NULL){
+                 envGeom->getEnvelope(env);
+             } else {
+                 env=NULL;
+             }
+         staticMap sm(l,pol,env);
          std::ifstream r(sm.getFileName(), std::ios::in | std::ios::binary);
          response.addHeader("Content-Type","image/png");
          response.out() << r.rdbuf();

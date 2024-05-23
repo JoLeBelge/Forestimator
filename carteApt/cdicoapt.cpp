@@ -2,7 +2,7 @@
 
 std::string dirBD("/home/jo/Documents/carteApt/Forestimator/carteApt/data/aptitudeEssDB.db");
 bool globTest(0);
-extern int globMaxSurf;
+
 
 cDicoApt::cDicoApt(std::string aBDFile):cdicoAptBase(aBDFile)
 {
@@ -389,13 +389,12 @@ std::string removeAccents(std::string aStr){
     return aStr;
 }
 
-OGRGeometry * cDicoApt::checkPolyg(std::string aPolyg){
-    //bool aRes(0);
+OGRGeometry * cDicoApt::checkPolyg(std::string aPolyg, int maxSurf){
+
     OGRGeometry * pol=NULL;
     // lecture du polygone
     OGRErr err=OGRGeometryFactory::createFromWkt(aPolyg.c_str(),NULL,&pol);
 
-    //std::cout << "src " << src.exportToProj4();
     // isValid() fonctionne mais par contre le destroyGeom doit être suivi d'un pol=NULL sinon bug
     if (err==OGRERR_NONE && pol!=NULL){
         pol->MakeValid();
@@ -408,7 +407,9 @@ OGRGeometry * cDicoApt::checkPolyg(std::string aPolyg){
         if(pol->IsValid()){
             //std::cout << " geométrie valide " << pol->getGeometryName() << std::endl;
             int aSurfha=OGR_G_Area(pol)/10000;
-            if (aSurfha>globMaxSurf){OGRGeometryFactory::destroyGeometry(pol);pol=NULL;}
+            if (aSurfha>maxSurf){OGRGeometryFactory::destroyGeometry(pol);pol=NULL;
+                std::cout << " surface de géométrie trop important :" << std::to_string(aSurfha) << " ..." << std::endl;
+            }
         } else {
             std::cout << " geométrie invalide " << pol->getGeometryName() << " nombre de geometrie " << pol->toGeometryCollection()->getNumGeometries()<< std::endl;
             OGRGeometryFactory::destroyGeometry(pol);pol=NULL;}

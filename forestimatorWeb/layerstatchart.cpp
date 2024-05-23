@@ -164,6 +164,12 @@ staticMap::staticMap(std::shared_ptr<layerBase> aLay, OGRGeometry *poGeom, OGREn
     if (ext==NULL){
         ext= new OGREnvelope;
         poGeom->getEnvelope(ext);
+        // agrandir un peu l'extend de la carte car sinon le polygone peut-être partiellement visible seulemement
+        int buf = (ext->MaxX-ext->MinX)/5;
+        ext->MaxX+=buf;
+        ext->MaxY+=buf;
+        ext->MinX-=buf;
+        ext->MinY-=buf;
     }
     // si la géométrie est un point, alors j'agrandi sinon division par 0== bug
     if (ext->MaxX-ext->MinX<10) {
@@ -173,12 +179,7 @@ staticMap::staticMap(std::shared_ptr<layerBase> aLay, OGRGeometry *poGeom, OGREn
         ext->MinX-=bufPt;
         ext->MinY-=bufPt;
     }
-    // agrandir un peu l'extend de la carte car sinon le polygone peut-être partiellement visible seulemement
-    int buf = (ext->MaxX-ext->MinX)/5;
-    ext->MaxX+=buf;
-    ext->MaxY+=buf;
-    ext->MinX-=buf;
-    ext->MinY-=buf;
+
 
     // taille de l'emprise de l'image
     mWx=ext->MaxX-ext->MinX;

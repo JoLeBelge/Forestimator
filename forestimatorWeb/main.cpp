@@ -52,6 +52,7 @@ int launchForestimator(int argc, char **argv)
         // pour créer le raster avec palette de couleur (forestimator Mobile)
 
         server.addResource(&smResource, "/api/staticMap/layerCode/${layerCode}/polygon/${pol}");
+        server.addResource(&smResource, "/api/staticMap/layerCode/${layerCode}/env/${env}/polygon/${pol}");
 
         // http://localhost:8085/api/anaPt/layers/EP_FEE+EP_CS+MNH2019+CNSW/x/200000.3/y/80000.1
         server.addResource(&anaPonctResource, "/api/anaPt/layers/${listLayerCode}/x/${x}/y/${y}");
