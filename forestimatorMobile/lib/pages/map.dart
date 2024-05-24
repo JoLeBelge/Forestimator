@@ -10,7 +10,7 @@ import 'package:flutter/material.dart';
 import 'dart:math';
 import 'dart:io';
 import 'package:geolocator/geolocator.dart';
-//import 'package:fforestimator/locationIndicator/animated_location_indicator.dart';
+import 'package:fforestimator/locationIndicator/animated_location_indicator.dart';
 import 'package:fforestimator/globals.dart' as gl;
 import 'package:http/http.dart' as http;
 import 'package:fforestimator/pages/anaPt/requestedLayer.dart';
@@ -32,6 +32,7 @@ class mapPage extends StatefulWidget {
 class _MapPageState extends State<mapPage> {
   final _mapController = MapController();
   LatLng? _pt;
+  bool _doingAnaPt = false;
   var data;
   Geolocator? _geolocator;
   Position? _position;
@@ -216,11 +217,20 @@ class _MapPageState extends State<mapPage> {
                       InteractiveFlag.scrollWheelZoom,
                 ),
                 onLongPress: (tapPosition, point) async => {
-                  //proj4.Point ptBL72 = epsg4326.transform(epsg31370,proj4.Point(x: point.longitude, y: point.latitude))
-                  await _runAnaPt(epsg4326.transform(epsg31370,
-                      proj4.Point(x: point.longitude, y: point.latitude))),
-                  _updatePtMarker(point),
-                  GoRouter.of(context).push("/anaPt"),
+                  if (!_doingAnaPt)
+                    {
+                      setState(() {
+                        _doingAnaPt = true;
+                      }),
+                      //proj4.Point ptBL72 = epsg4326.transform(epsg31370,proj4.Point(x: point.longitude, y: point.latitude))
+                      await _runAnaPt(epsg4326.transform(epsg31370,
+                          proj4.Point(x: point.longitude, y: point.latitude))),
+                      _updatePtMarker(point),
+                      setState(() {
+                        _doingAnaPt = false;
+                      }),
+                      GoRouter.of(context).push("/anaPt"),
+                    }
                 },
                 onPositionChanged: (position, e) async {
                   LatLng c = _mapController.camera.center;
@@ -324,10 +334,10 @@ class _MapPageState extends State<mapPage> {
                         ),
                       ],
                     ),
-                    CurrentLocationLayer(),
-                    //const AnimatedLocationLayer(
-                    // cameraTrackingMode: CameraTrackingMode.locationAndOrientation,
-                    //),
+                    //CurrentLocationLayer(),
+                    const AnimatedLocationLayer(
+                      cameraTrackingMode: CameraTrackingMode.none,
+                    ),
                   ]),
           gl.position != null
               ? Row(mainAxisAlignment: MainAxisAlignment.end, children: [
@@ -336,12 +346,22 @@ class _MapPageState extends State<mapPage> {
                         iconSize: 40.0,
                         color: gl.colorAgroBioTech,
                         onPressed: () async {
-                          await _runAnaPt(epsg4326.transform(
-                              epsg31370,
-                              proj4.Point(
-                                  x: gl.position?.longitude ?? 0.0,
-                                  y: gl.position?.latitude ?? 0.0)));
-                          GoRouter.of(context).push("/anaPt");
+                          if (!_doingAnaPt) {
+                            setState(() {
+                              _doingAnaPt = true;
+                            });
+                            await _runAnaPt(epsg4326.transform(
+                                epsg31370,
+                                proj4.Point(
+                                    x: gl.position?.longitude ?? 0.0,
+                                    y: gl.position?.latitude ?? 0.0)));
+                            _updatePtMarker(LatLng(gl.position?.latitude ?? 0.0,
+                                gl.position?.longitude ?? 0.0));
+                            GoRouter.of(context).push("/anaPt");
+                            setState(() {
+                              _doingAnaPt = false;
+                            });
+                          }
                         },
                         icon: const Icon(Icons.analytics)),
                     IconButton(
@@ -390,9 +410,8 @@ class _MapPageState extends State<mapPage> {
         return;
       else
         _refreshLocation = true;
-
       Position newPosition = await Geolocator.getCurrentPosition(
-              desiredAccuracy: LocationAccuracy.best)
+              desiredAccuracy: LocationAccuracy.high)
           .timeout(new Duration(seconds: 3));
 
       setState(() {

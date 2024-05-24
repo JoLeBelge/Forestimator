@@ -108,7 +108,9 @@ class _CategoryView extends State<CategoryView> {
   Widget build(BuildContext context) {
     if (_finishedInitializingCategory[widget.category.filter]!) {
       return Row(children: [
-        Container(constraints: const BoxConstraints(minWidth: 5),),
+        Container(
+          constraints: const BoxConstraints(minWidth: 5),
+        ),
         Container(
             constraints: BoxConstraints(
                 maxWidth: MediaQuery.of(context).size.width * 1.0 - 5,
@@ -308,7 +310,7 @@ class _CategoryView extends State<CategoryView> {
               )
             : gl.dico.getLayerBase(lt.key).mIsDownloadableRW
                 ? const Text(
-                    "Téléchargable",
+                    "Téléchargeable",
                     style: TextStyle(color: gl.colorUliege),
                   )
                 : const Text(
@@ -402,9 +404,11 @@ class _CategoryView extends State<CategoryView> {
 
     for (var key in mp.keys) {
       if (widget.category.filter == mp[key]!.mGroupe &&
-          !mp[key]!.mExpert &&
-          mp[key]!.mVisu &&
-          mp[key]?.mTypeGeoservice == "") {
+              !mp[key]!.mExpert &&
+              mp[key]!.mVisu &&
+              mp[key]?.mTypeGeoservice ==
+                  "" // "arcgisRest c'est pour le vectoriel, pas actif sous flutter"
+          ) {
         if (_layerTiles[widget.category.filter] == null) {
           _layerTiles[widget.category.filter] = [];
         }
@@ -491,9 +495,14 @@ class _SelectedLayerView extends State<SelectedLayerView> {
                           ),
                           child: Text(
                               textScaler: gl.dico
-                                  .getLayerBase(
-                                      gl.interfaceSelectedLayerKeys[i].mCode)
-                                  .mNom.length < 25 ? TextScaler.linear(1.2) : TextScaler.linear(0.9),
+                                          .getLayerBase(gl
+                                              .interfaceSelectedLayerKeys[i]
+                                              .mCode)
+                                          .mNom
+                                          .length <
+                                      25
+                                  ? TextScaler.linear(1.2)
+                                  : TextScaler.linear(0.9),
                               gl.dico
                                   .getLayerBase(
                                       gl.interfaceSelectedLayerKeys[i].mCode)

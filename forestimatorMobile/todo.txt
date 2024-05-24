@@ -1,18 +1,29 @@
 To do list fforestimator
 ------------------------
 
+v- analyse ponctuelle online ; empecher d'en effectuer plusieurs en meme temps !! sinon affiche plusieurs résultat d'un coup, ne veux rien dire.
+
+
+-> permission request ; 
+[ERROR:flutter/runtime/dart_vm_initializer.cc(41)] Unhandled Exception: PlatformException(PermissionHandler.PermissionManager, A request for permissions is already running, please wait for it to finish before doing another request (note that you can request multiple permissions at the same time)., null, null)
+
 -> page ana Pt : afficher clairement si on est offline ou online, c'est là que ce joue la grosse différence
--> Mode Offline ; sert à faire de la visualisation et des analyses ponctuelle offline! ouvrir un dialogBox lors de la première fois que l'utilisateur active le offline.
 
+-> Mode Offline ; catalogue online pas accessible (grisé)
+-> Mode Online ; catalogue offline accessible 
 
--> téléchargement progress bar , le lancer uniquement si il y a un accès internet, sinon popUpnoInternet, feedback quand -téléchargement complêt (popup également?)
-
+-> téléchargement progress bar , le lancer uniquement si il y a un accès internet, sinon popUpnoInternet, feedback quand -téléchargement complêt (notification)
 
 -> réactiver carte GS sur forestimator Mobile
 
 retours testeurs:
 -----------------
 
-GLigot : position sur carte pas clair (quand c'est position grace à internet et non pas GPS, pas de rond bleu pour afficher la position)
-Jo : message téléchargement des cartes au démarrage ; pas clair. faute d'orthographe téléchargable et label pas visible sur tablette
+GLigot : position sur carte pas clair (quand c'est position grace à internet et non pas GPS, pas de rond bleu pour afficher la position - non c'est quand on donne les droits lors du premier usage? )
+
+ca a peut etre un lien avec l'erreur dans la console à propos des permission request..
+https://github.com/Baseflow/flutter-permission-handler/issues/783
+
+Jo : label téléchargeable  pas visible sur tablette - pas assez de place pour lui..
+Ger : ajouter cadastre (non car pas de WMS, juste service arcgisRest qui va pas avec flutter) et natura 2000 (N2K 
 

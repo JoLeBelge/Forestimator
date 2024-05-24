@@ -21,6 +21,9 @@ import 'package:path/path.dart' as path;
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_logs/flutter_logs.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+//import 'package:permission_handler/permission_handler.dart';
+import 'dart:isolate';
+import 'dart:ui';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -35,6 +38,10 @@ void main() async {
         ignoreSsl:
             true // option: set to false to disable working with http links (default: false)
         );
+    FlutterDownloader.registerCallback(
+      TestClass.downloadCallback,
+      step: 1,
+    );
     //Initialize Logging
     await FlutterLogs.initLogs(
         logLevelsEnabled: [
@@ -56,6 +63,20 @@ void main() async {
   await gl.dico.init();
 
   runApp(const MyApp());
+}
+
+@pragma('vm:entry-point')
+class TestClass {
+  @pragma('vm:entry-point')
+  static void downloadCallback(String id, int status, int progress) {
+    final SendPort? send =
+        IsolateNameServer.lookupPortByName('downloader_send_port');
+
+    // on peut pas faire le log d'ici car les logs ne sont pas instancié pour cette classe.
+    //FlutterLogs.logInfo("download", "downloadCallback", progress.toString());
+
+    send?.send([id, status, progress]);
+  }
 }
 
 class MyApp extends StatefulWidget {
@@ -287,6 +308,8 @@ class _MyApp extends State<MyApp> {
           });
           final SharedPreferences prefs = await SharedPreferences.getInstance();
           await prefs.setBool('firstTimeUse', gl.firstTimeUse);
+          // pas bon car si le téléchargement n'est pas lancé depuis layerDownloader, pas de progressbar, pas de lien entre taskId et layerCode
+          /*
           for (var key in gl.downloadableLayerKeys) {
             if (!(Platform.isWindows || Platform.isLinux || Platform.isMacOS)) {
               FlutterDownloader.enqueue(
@@ -300,7 +323,7 @@ class _MyApp extends State<MyApp> {
                 timeout: 15000,
               );
             }
-          }
+          }*/
         },
         decline: "non",
         onDecline: () async {
@@ -311,7 +334,7 @@ class _MyApp extends State<MyApp> {
           await prefs.setBool('firstTimeUse', gl.firstTimeUse);
         },
         dialog:
-            "Autorisez vous l'aplication à télécharger un jeu de couches pour l'utilisation de l'analyse hors ligne? Ces couches couvrent toutes la Région Wallonne et totalisent +- 100 Mo.",
+            "Autorisez vous l'aplication à télécharger un jeu de couches pour une utilisation hors ligne? Ces couches couvrent toutes la Région Wallonne et totalisent +- 100 Mo.",
       ));
     }
     return MaterialApp.router(

@@ -42,8 +42,9 @@ class _OfflineView extends State<OfflineView> {
                     setState(() {
                       gl.offlineMode = false;
                       gl.rebuildNavigatorBar!();
-                      gl.refreshCurrentThreeLayer();
-                      gl.refreshMap(() {});
+                      // pas nécéssaire vu que de offline vers online on peut garder la même sélection de couche (les cartes offlines peuvent être affichées en mode online, c'est l'inverse qui ne va pas)
+                      //gl.refreshCurrentThreeLayer();
+                      //gl.refreshMap(() {});
                     });
                     final SharedPreferences prefs =
                         await SharedPreferences.getInstance();
@@ -68,7 +69,8 @@ class _OfflineView extends State<OfflineView> {
                 child: TextButton.icon(
                   onPressed: () async {
                     setState(() {
-                      while (gl.interfaceSelectedLayerKeys.length > 1) {
+                      gl.changeSelectedLayerModeOffline();
+                      /*while (gl.interfaceSelectedLayerKeys.length > 1) {
                         if (gl.interfaceSelectedLayerKeys.first.offline) {
                           gl.interfaceSelectedLayerKeys.removeLast();
                         } else {
@@ -82,7 +84,7 @@ class _OfflineView extends State<OfflineView> {
                             0,
                             gl.selectedLayer(
                                 mCode: gl.dico.getLayersOffline().first.mCode));
-                      }
+                      }*/
                       gl.offlineMode = true;
                       gl.rebuildNavigatorBar!();
                       gl.refreshCurrentThreeLayer();
@@ -234,7 +236,7 @@ class _OfflineView extends State<OfflineView> {
                 style: TextStyle(color: gl.colorAgroBioTech),
               )
             : Text(
-                "Téléchargable",
+                "Téléchargeable",
                 style: TextStyle(color: gl.colorUliege),
               ));
   }
@@ -261,10 +263,10 @@ class _OfflineView extends State<OfflineView> {
                         lt.selected = false;
                       });
                       gl.refreshMap(() {
-                        gl.removeLayerFromList(lt.key);
+                        gl.removeLayerFromList(lt.key, offline: true);
                       });
                       gl.refreshCurrentThreeLayer();
-                      gl.refreshWholeCatalogueView((){});
+                      gl.refreshWholeCatalogueView(() {});
                     }
                   });
                 }),
@@ -291,7 +293,7 @@ class _OfflineView extends State<OfflineView> {
                           lt.selected = true;
                         });
                         gl.refreshMap(() {
-                          gl.addLayerToList(lt.key);
+                          gl.addLayerToList(lt.key, offline: true);
                         });
                       } else {
                         setState(() {
@@ -299,11 +301,11 @@ class _OfflineView extends State<OfflineView> {
                         });
                         gl.refreshMap(() {
                           gl.interfaceSelectedLayerKeys.removeLast();
-                          gl.addLayerToList(lt.key);
+                          gl.addLayerToList(lt.key, offline: true);
                         });
-                        gl.refreshCurrentThreeLayer();
-                        gl.refreshWholeCatalogueView((){});
                       }
+                      gl.refreshCurrentThreeLayer();
+                      gl.refreshWholeCatalogueView(() {});
                     });
                   //TODO else popup warning: file is not on disk
                 }),
@@ -312,7 +314,7 @@ class _OfflineView extends State<OfflineView> {
 
   bool _isSelectedLayer(String key) {
     for (var layer in gl.interfaceSelectedLayerKeys) {
-      if (layer.mCode == key) {
+      if (layer.mCode == key && layer.offline == true) {
         return true;
       }
     }

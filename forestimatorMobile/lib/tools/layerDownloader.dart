@@ -83,7 +83,7 @@ class _LayerDownloaderState extends State<LayerDownloader> {
               _downloadStates[widget.layer.key] = 0.01;
               _taskIDToLayerCode[it] = widget.layer.key;
               setState(() {
-                gl.offlineMode = gl.offlineMode;
+                //gl.offlineMode = gl.offlineMode;
               });
             },
             icon: const Icon(Icons.download)),
@@ -91,7 +91,7 @@ class _LayerDownloaderState extends State<LayerDownloader> {
             constraints: const BoxConstraints(
                 maxWidth: 256, minWidth: 48, maxHeight: 48, minHeight: 48),
             child: const Text(
-                "La couche peut être téléchargé pour l'utilisation hors ligne."))
+                "La couche peut être téléchargée pour l'utilisation hors ligne."))
       ]);
     }
   }
@@ -135,61 +135,59 @@ class _LayerDownloaderState extends State<LayerDownloader> {
         _port.sendPort, 'downloader_send_port');
     _port.listen((dynamic data) async {
       String id = data[0];
-      DownloadTaskStatus status = DownloadTaskStatus.fromInt(data[1]);
-      int progress = data[2];
-      if (progress > 100) {
+      if (_taskIDToLayerCode[id] == widget.layer.key) {
+        DownloadTaskStatus status = DownloadTaskStatus.fromInt(data[1]);
+        double progress = (data[2] / -409600);
+        /*if (progress > 100) {
         progress -= 100;
       } else if (progress < 0) {
         progress = 0;
-      }
-      if (status == DownloadTaskStatus.enqueued) {
-        FlutterLogs.logInfo("download", "started", "Download enqueued");
-      } else if (status == DownloadTaskStatus.running) {
-        setState(() {
-          _downloadStates[_taskIDToLayerCode[id]!] = progress / 100.0;
-        });
-        FlutterLogs.logInfo("download", "running",
-            "Download running " + (progress / 100.0).toString());
-      } else if (status == DownloadTaskStatus.complete) {
-        FlutterLogs.logInfo("download", "completed", "Download finished");
-        setState(() {
-          _downloadStates[_taskIDToLayerCode[id]!] = 1.0;
-          gl.dico.getLayerBase(_taskIDToLayerCode[id]!).mOffline = true;
-          gl.addToOfflineList(_taskIDToLayerCode[id]!);
-          gl.dico.checkLayerBaseOfflineRessource();
-        });
-        gl.refreshWholeCatalogueView(() {});
-        gl.rebuildOfflineView(() {});
-      } else if (status == DownloadTaskStatus.failed) {
-        setState(() {
-          gl.dico.getLayerBase(_taskIDToLayerCode[id]!).mOffline = false;
-          _downloadStates[_taskIDToLayerCode[id]!] = 0.0;
-        });
-        FlutterLogs.logInfo("download", "FAILED", "Download failed");
-      } else {
-        FlutterLogs.logInfo("download", "NOT IMPLEMENTED",
-            "DownloadTaskStatus. is not implemented");
+      }*/
+        if (status == DownloadTaskStatus.enqueued) {
+          FlutterLogs.logInfo("download", "started", "Download enqueued");
+        } else if (status == DownloadTaskStatus.running) {
+          setState(() {
+            _downloadStates[_taskIDToLayerCode[id]!] = progress;
+
+            /// 100.0;
+          });
+          FlutterLogs.logInfo("download", "running",
+              "Download running " + (progress).toString()); // / 100.0
+        } else if (status == DownloadTaskStatus.complete) {
+          FlutterLogs.logInfo("download", "completed", "Download finished");
+          setState(() {
+            _downloadStates[_taskIDToLayerCode[id]!] = 1.0;
+            gl.dico.getLayerBase(_taskIDToLayerCode[id]!).mOffline = true;
+            gl.addToOfflineList(_taskIDToLayerCode[id]!);
+            gl.dico.checkLayerBaseOfflineRessource();
+          });
+          gl.refreshWholeCatalogueView(() {});
+          gl.rebuildOfflineView(() {});
+        } else if (status == DownloadTaskStatus.failed) {
+          setState(() {
+            gl.dico.getLayerBase(_taskIDToLayerCode[id]!).mOffline = false;
+            _downloadStates[_taskIDToLayerCode[id]!] = 0.0;
+          });
+          FlutterLogs.logInfo("download", "FAILED", "Download failed");
+        } else {
+          FlutterLogs.logInfo("download", "NOT IMPLEMENTED",
+              "DownloadTaskStatus. is not implemented");
+        }
       }
     });
 
+    /*register callback after start download!!
     if (Platform.isAndroid || Platform.isIOS) {
       FlutterDownloader.registerCallback(
         downloadCallback,
         step: 50,
       );
-    }
+    }*/
   }
 
   @override
   void dispose() {
     //IsolateNameServer.removePortNameMapping('downloader_send_port');
     super.dispose();
-  }
-
-  @pragma('vm:entry-point')
-  static void downloadCallback(String id, int status, int progress) {
-    final SendPort? send =
-        IsolateNameServer.lookupPortByName('downloader_send_port');
-    send?.send([id, status, progress]);
   }
 }

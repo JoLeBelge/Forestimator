@@ -91,6 +91,8 @@ List<String> downloadableLayerKeys = [
   "CNSWrast",
 ];
 
+bool doDownload = false;
+
 Position? position;
 late proj4.Point pt;
 
@@ -144,21 +146,23 @@ void savePrefSelLay() async {
 }
 
 void changeSelectedLayerModeOffline() {
+  interfaceSelectedLayerKeys.removeWhere((element) => element.offline == false);
   // check si il y a au moins une carte offline dans la selection
-  if (interfaceSelectedLayerKeys.where((i) => i.offline).toList().length == 0) {
-    // si non on en ajoute une
+  ///if (interfaceSelectedLayerKeys.where((i) => i.offline).toList().length == 0) {
+  if (interfaceSelectedLayerKeys.length == 0) {
+    // si non on en ajoute une si on en a
     if (dico.getLayersOffline().length > 0) {
-      if (interfaceSelectedLayerKeys.length == 3) {
-        interfaceSelectedLayerKeys.removeLast();
-      }
+      // if (interfaceSelectedLayerKeys.length == 3) {
+      //   interfaceSelectedLayerKeys.removeLast();
+      // }
       interfaceSelectedLayerKeys.insert(
         0,
         selectedLayer(
             mCode: dico.getLayersOffline().first.mCode, offline: true),
       );
-      savePrefSelLay();
     }
   }
+  savePrefSelLay();
 }
 
 void addLayerToList(String key,
