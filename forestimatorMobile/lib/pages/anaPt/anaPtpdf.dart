@@ -63,7 +63,7 @@ Future makePdf(
         ]);
   }));
 
-  String? dir = await getDownloadDirectoryPath();
+  String? dir = await getDownloadDirectory().toString();
 
   if (dir != null) {
     File out = File(dir! + "/" + fileName);

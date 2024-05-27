@@ -20,7 +20,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:fforestimator/tools/notification.dart';
 import 'dart:convert';
-import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
+//import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
 
 class mapPage extends StatefulWidget {
   const mapPage({super.key});
@@ -250,14 +250,15 @@ class _MapPageState extends State<mapPage> {
                 cameraConstraint: CameraConstraint.contain(
                     bounds: LatLngBounds.fromPoints([latlonBL, latlonTR])),
                 onMapReady: () async {
-                  Permission.locationWhenInUse.request();
+                  /*Permission.locationWhenInUse.request();
                   if (await Permission.locationWhenInUse.isGranted) {
                     Permission.locationAlways.request();
                   }
                   Permission.manageExternalStorage
                       .request(); // pour nouvelle version de android
                   Permission.storage
-                      .request(); // pour ancienne version de android
+                      .request();
+                      */ // pour ancienne version de android
 
                   updateLocation();
 
@@ -431,7 +432,7 @@ class _MapPageState extends State<mapPage> {
 }
 
 Future<Position?> acquireUserLocation() async {
-  if (await Permission.location.request().isGranted) {
+  if (await Permission.location.isGranted) {
     try {
       return await Geolocator.getCurrentPosition();
     } on LocationServiceDisabledException {

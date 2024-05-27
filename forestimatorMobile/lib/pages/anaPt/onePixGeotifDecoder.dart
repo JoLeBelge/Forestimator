@@ -58,7 +58,7 @@ class onePixGeotifDecoder extends Decoder {
 
     if (im.bitsPerSample == 16) {
       aRes = (outData[(uv.x.toInt() * 2) - 1] << 8) + outData[uv.x.toInt() * 2];
-      print("int16: " + aRes.toString());
+      //print("int16: " + aRes.toString());
     } else {
       //byteData = InputBuffer(outData);
       aRes = outData[uv.x.toInt()];

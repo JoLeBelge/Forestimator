@@ -1,13 +1,13 @@
 To do list fforestimator
 ------------------------
+-> page ana Pt : afficher clairement si on est offline ou online, c'est là que ce joue la grosse différence
+
+lecture 16bits ; toujours problématique, déjà le fait de lire toute l'image c'est pas une approche très efficiente. Donc dans un premier temps, ne pas visualiser la CNSW -> label pour le dire clairement (uniquement là pour stat ponctuelle).
 
 v- analyse ponctuelle online ; empecher d'en effectuer plusieurs en meme temps !! sinon affiche plusieurs résultat d'un coup, ne veux rien dire.
 
-
 -> permission request ; 
 [ERROR:flutter/runtime/dart_vm_initializer.cc(41)] Unhandled Exception: PlatformException(PermissionHandler.PermissionManager, A request for permissions is already running, please wait for it to finish before doing another request (note that you can request multiple permissions at the same time)., null, null)
-
--> page ana Pt : afficher clairement si on est offline ou online, c'est là que ce joue la grosse différence
 
 -> Mode Offline ; catalogue online pas accessible (grisé)
 -> Mode Online ; catalogue offline accessible 
@@ -25,5 +25,9 @@ ca a peut etre un lien avec l'erreur dans la console à propos des permission re
 https://github.com/Baseflow/flutter-permission-handler/issues/783
 
 Jo : label téléchargeable  pas visible sur tablette - pas assez de place pour lui..
-Ger : ajouter cadastre (non car pas de WMS, juste service arcgisRest qui va pas avec flutter) et natura 2000 (N2K 
+Ger : ajouter cadastre (non car pas de WMS, juste service arcgisRest qui va pas avec flutter) et natura 2000 (N2K)
+
+Sam : catalogues ; problème de padding, margin, et le top parfois est tronqué, le header de smartphone interfère avec l'affichage.
+Aussi il y a des "<" pour dérouler même si pas d'info derrière, à enlever ?
+AnaPt : Problème, la liste déroulante ne va pas jusqu'en bas.. pas de scrol? bizarre
 

@@ -21,7 +21,7 @@ import 'package:path/path.dart' as path;
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_logs/flutter_logs.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-//import 'package:permission_handler/permission_handler.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'dart:isolate';
 import 'dart:ui';
 
@@ -303,6 +303,11 @@ class _MyApp extends State<MyApp> {
         title: "Bienvenu",
         accept: "oui",
         onAccept: () async {
+          Map<Permission, PermissionStatus> statuses = await [
+            Permission.location,
+            Permission.storage,
+            Permission.manageExternalStorage
+          ].request();
           setState(() {
             gl.firstTimeUse = false;
           });
@@ -327,6 +332,11 @@ class _MyApp extends State<MyApp> {
         },
         decline: "non",
         onDecline: () async {
+          Map<Permission, PermissionStatus> statuses = await [
+            Permission.location,
+            Permission.storage,
+            Permission.manageExternalStorage
+          ].request();
           setState(() {
             gl.firstTimeUse = false;
           });
