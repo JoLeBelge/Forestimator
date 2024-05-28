@@ -73,7 +73,7 @@ class _LayerDownloaderState extends State<LayerDownloader> {
         Container(
             constraints: const BoxConstraints(
                 maxWidth: 256, minWidth: 48, maxHeight: 48, minHeight: 48),
-            child: const Text("La couche est enregistré."))
+            child: const Text("La couche est enregistrée."))
       ]);
     } else {
       return Row(children: [
@@ -133,7 +133,7 @@ class _LayerDownloaderState extends State<LayerDownloader> {
 
     IsolateNameServer.registerPortWithName(
         _port.sendPort, 'downloader_send_port');
-    _port.listen((dynamic data) async {
+    _port.listen((dynamic data) {
       String id = data[0];
       if (_taskIDToLayerCode[id] == widget.layer.key) {
         DownloadTaskStatus status = DownloadTaskStatus.fromInt(data[1]);
@@ -174,6 +174,7 @@ class _LayerDownloaderState extends State<LayerDownloader> {
               "DownloadTaskStatus. is not implemented");
         }
       }
+      FlutterDownloader.registerCallback(downloadCallback);
     });
 
     /*register callback after start download!!
@@ -185,9 +186,18 @@ class _LayerDownloaderState extends State<LayerDownloader> {
     }*/
   }
 
+  @pragma('vm:entry-point')
+  static void downloadCallback(String id, int status, int progress) {
+    final SendPort? send =
+        IsolateNameServer.lookupPortByName('downloader_send_port');
+    if (send != null) {
+      send.send([id, status, progress]);
+    }
+  }
+
   @override
   void dispose() {
-    //IsolateNameServer.removePortNameMapping('downloader_send_port');
+    IsolateNameServer.removePortNameMapping('downloader_send_port');
     super.dispose();
   }
 }

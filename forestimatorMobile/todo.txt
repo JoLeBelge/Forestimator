@@ -1,20 +1,16 @@
 To do list fforestimator
 ------------------------
--> page ana Pt : afficher clairement si on est offline ou online, c'est là que ce joue la grosse différence
 
-lecture 16bits ; toujours problématique, déjà le fait de lire toute l'image c'est pas une approche très efficiente. Donc dans un premier temps, ne pas visualiser la CNSW -> label pour le dire clairement (uniquement là pour stat ponctuelle).
+TT -> Mode Offline ; catalogue online pas accessible (grisé)
+TT -> Mode Online ; catalogue offline accessible 
+TT -> dupliquer le "panier" avec la sélection des 3 couches, pour un affichage dans la partie 
+TT -> downloader ; on oublie la barre de progression, mais au moins avoir un refresh quand le téléchargement est fini (ne fonctionne plus ou n'as jamais fonctionné..). ET une boite de dialogue Forestimator également pour signaler le succès du téléchargement
+TT -> downloader ; téléchargement du lot de couche lors du premier démarrage ; pour l'instant le code est commenté, le rendre opérationnel à nouveau
 
-v- analyse ponctuelle online ; empecher d'en effectuer plusieurs en meme temps !! sinon affiche plusieurs résultat d'un coup, ne veux rien dire.
-
--> permission request ; 
-[ERROR:flutter/runtime/dart_vm_initializer.cc(41)] Unhandled Exception: PlatformException(PermissionHandler.PermissionManager, A request for permissions is already running, please wait for it to finish before doing another request (note that you can request multiple permissions at the same time)., null, null)
-
--> Mode Offline ; catalogue online pas accessible (grisé)
--> Mode Online ; catalogue offline accessible 
-
--> téléchargement progress bar , le lancer uniquement si il y a un accès internet, sinon popUpnoInternet, feedback quand -téléchargement complêt (notification)
-
--> réactiver carte GS sur forestimator Mobile
+Jo -> page ana Pt : afficher clairement si on est offline ou online, c'est là que ce joue la grosse différence
+Jo lecture 16bits : désactiver -> label pour le dire clairement (uniquement là pour stat ponctuelle).
+Jo -> réactiver carte GS sur forestimator Mobile
+Jo "<" pour dérouler même si pas d'info derrière, à enlever ?
 
 retours testeurs:
 -----------------
