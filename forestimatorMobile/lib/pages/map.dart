@@ -325,19 +325,19 @@ class _MapPageState extends State<mapPage> {
                     }
                   }).toList() +
                   <Widget>[
+                    //CurrentLocationLayer(),
+                    const AnimatedLocationLayer(
+                      cameraTrackingMode: CameraTrackingMode.none,
+                    ),
                     MarkerLayer(
                       markers: [
                         Marker(
-                          width: 50.0,
-                          height: 50.0,
+                          width: 70.0,
+                          height: 70.0,
                           point: _pt ?? const LatLng(0.0, 0.0),
                           child: const Icon(Icons.location_on),
                         ),
                       ],
-                    ),
-                    //CurrentLocationLayer(),
-                    const AnimatedLocationLayer(
-                      cameraTrackingMode: CameraTrackingMode.none,
                     ),
                   ]),
           gl.position != null

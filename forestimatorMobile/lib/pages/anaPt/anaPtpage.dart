@@ -33,13 +33,16 @@ class _anaPtpageState extends State<anaPtpage> {
         body: SingleChildScrollView(
             physics: ScrollPhysics(),
             child: Column(children: [
+              Text(
+                  gl.offlineMode
+                      ? "Analyse réalisée hors-ligne"
+                      : "Analyse réalisée en ligne",
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
               IconButton(
                   icon: const Icon(Icons.picture_as_pdf, size: 28),
                   onPressed: () async {
-                    if (await Permission.manageExternalStorage
-                            .request()
-                            .isGranted ||
-                        await Permission.storage.request().isGranted) {
+                    if (await Permission.manageExternalStorage.isGranted ||
+                        await Permission.storage.isGranted) {
                       List<String>? l = await openDialog();
                       String? pdf = l?.elementAt(0);
                       String? locationName = l?.elementAt(1);
@@ -60,7 +63,7 @@ class _anaPtpageState extends State<anaPtpage> {
                         context: context,
                         builder: (BuildContext context) {
                           return AlertDialog(
-                            title: Text("Export pdf"),
+                            title: Text("Export du pdf"),
                             content: Text("Export pdf effectué avec succès."),
                             actions: [
                               TextButton(
@@ -79,7 +82,7 @@ class _anaPtpageState extends State<anaPtpage> {
                         context: context,
                         builder: (BuildContext context) {
                           return AlertDialog(
-                            title: Text("Export pdf"),
+                            title: Text("Export du pdf"),
                             content: Text(
                                 "Vous n'avez pas accordé l'autorisation d'écrire dans le dossier de téléchargement."),
                             actions: [
@@ -356,7 +359,7 @@ Widget _anaPtListLayers(
     );
   } else {
     return Center(
-      child: Text("aucune information disponible pour ce point"),
+      child: Text("Aucune information disponible pour ce point"),
     );
   }
 }

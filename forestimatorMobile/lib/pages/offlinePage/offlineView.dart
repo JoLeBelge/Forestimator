@@ -55,7 +55,7 @@ class _OfflineView extends State<OfflineView> {
                     color: gl.colorUliege,
                   ),
                   label: Text(
-                    "Desactivez le mode hors ligne.",
+                    "Désactivez le mode hors ligne.",
                     style: TextStyle(color: gl.colorUliege),
                   ),
                 ),
@@ -70,21 +70,6 @@ class _OfflineView extends State<OfflineView> {
                   onPressed: () async {
                     setState(() {
                       gl.changeSelectedLayerModeOffline();
-                      /*while (gl.interfaceSelectedLayerKeys.length > 1) {
-                        if (gl.interfaceSelectedLayerKeys.first.offline) {
-                          gl.interfaceSelectedLayerKeys.removeLast();
-                        } else {
-                          gl.interfaceSelectedLayerKeys.removeAt(0);
-                        }
-                      }
-
-                      if (!gl.interfaceSelectedLayerKeys.first.offline) {
-                        gl.interfaceSelectedLayerKeys.clear();
-                        gl.interfaceSelectedLayerKeys.insert(
-                            0,
-                            gl.selectedLayer(
-                                mCode: gl.dico.getLayersOffline().first.mCode));
-                      }*/
                       gl.offlineMode = true;
                       gl.rebuildNavigatorBar!();
                       gl.refreshCurrentThreeLayer();
@@ -127,6 +112,7 @@ class _OfflineView extends State<OfflineView> {
       filter: gl.dico.getLayerBase(key).mGroupe,
       extern: gl.dico.getLayerBase(key).mCategorie == "Externe",
       downloadable: gl.dico.getLayerBase(key).mIsDownloadableRW,
+      bits: gl.dico.getLayerBase(key).mBits,
     ));
   }
 
@@ -216,7 +202,8 @@ class _OfflineView extends State<OfflineView> {
                         textScaler: const TextScaler.linear(1.2)),
                   ),
                   _downloadedControlBar(item),
-                  _selectLayerButton(item),
+                  if (gl.dico.getLayerBase(item.key).mBits == 8)
+                    _selectLayerButton(item),
                 ]);
           },
           body: _expandedLegendView(item),
@@ -357,6 +344,9 @@ class _OfflineView extends State<OfflineView> {
                 },
                 icon: Icon(Icons.picture_as_pdf)),
           ),
+        if (gl.dico.getLayerBase(lt.key).mBits == 16)
+          Text(
+              "Cette couche est utilisée pour les analyses ponctuelles mais vous ne pouvez pas la visualiser"),
       ],
     );
   }

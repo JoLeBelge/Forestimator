@@ -7,10 +7,10 @@ TT -> dupliquer le "panier" avec la sélection des 3 couches, pour un affichage 
 TT -> downloader ; on oublie la barre de progression, mais au moins avoir un refresh quand le téléchargement est fini (ne fonctionne plus ou n'as jamais fonctionné..). ET une boite de dialogue Forestimator également pour signaler le succès du téléchargement
 TT -> downloader ; téléchargement du lot de couche lors du premier démarrage ; pour l'instant le code est commenté, le rendre opérationnel à nouveau
 
-Jo -> page ana Pt : afficher clairement si on est offline ou online, c'est là que ce joue la grosse différence
-Jo lecture 16bits : désactiver -> label pour le dire clairement (uniquement là pour stat ponctuelle).
-Jo -> réactiver carte GS sur forestimator Mobile
-Jo "<" pour dérouler même si pas d'info derrière, à enlever ?
+vv -> page ana Pt : afficher clairement si on est offline ou online, c'est là que ce joue la grosse différence
+vv lecture 16bits : désactiver + label pour le dire clairement 
+vv -> réactiver carte GS sur forestimator Mobile
+
 
 retours testeurs:
 -----------------

@@ -7,6 +7,7 @@ class LayerTile {
     this.isExpanded = false,
     this.selected = false,
     this.extern = false,
+    this.bits = 8,
   });
 
   String key;
@@ -16,4 +17,5 @@ class LayerTile {
   bool selected;
   bool extern;
   bool downloadable;
+  int bits;
 }

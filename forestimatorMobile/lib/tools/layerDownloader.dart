@@ -10,8 +10,7 @@ import 'package:flutter_logs/flutter_logs.dart';
 
 class LayerDownloader extends StatefulWidget {
   final LayerTile layer;
-  final bool? autoDownloadLayer;
-  const LayerDownloader(this.layer, {super.key, this.autoDownloadLayer});
+  const LayerDownloader(this.layer, {super.key});
 
   @override
   State<LayerDownloader> createState() => _LayerDownloaderState();
@@ -19,8 +18,9 @@ class LayerDownloader extends StatefulWidget {
 
 class _LayerDownloaderState extends State<LayerDownloader> {
   static Map<String, double> _downloadStates = {};
-  static Map<String?, String> _taskIDToLayerCode = {};
-  ReceivePort _port = ReceivePort();
+  //static Map<String?, String> _taskIDToLayerCode = {};
+  //ReceivePort _port = ReceivePort();
+  bool _isDownloading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +35,7 @@ class _LayerDownloaderState extends State<LayerDownloader> {
         child: const Text("Downloads are not supported yet."),
       );
     }
-    if (_downloadStates[widget.layer.key] == null) {
+    /* if (_downloadStates[widget.layer.key] == null) {
       _downloadStates[widget.layer.key] = 0.0;
     } else if (_downloadStates[widget.layer.key]! != 0.0 &&
         _downloadStates[widget.layer.key]! != 1.0) {
@@ -52,7 +52,7 @@ class _LayerDownloaderState extends State<LayerDownloader> {
                 ? _downloadStates[widget.layer.key]!
                 : 0.5,
           ));
-    }
+    }*/
     if (gl.dico.getLayerBase(widget.layer.key).mOffline) {
       return Row(children: [
         IconButton(
@@ -75,13 +75,19 @@ class _LayerDownloaderState extends State<LayerDownloader> {
                 maxWidth: 256, minWidth: 48, maxHeight: 48, minHeight: 48),
             child: const Text("La couche est enregistrée."))
       ]);
+    } else if (_isDownloading) {
+      return Container(
+          constraints: const BoxConstraints(
+              maxWidth: 256, minWidth: 48, maxHeight: 48, minHeight: 48),
+          child: const Text("en téléchargement."));
     } else {
       return Row(children: [
         IconButton(
             onPressed: () async {
               var it = await _downloadFile();
-              _downloadStates[widget.layer.key] = 0.01;
-              _taskIDToLayerCode[it] = widget.layer.key;
+              //_downloadStates[widget.layer.key] = 0.01;
+              //_taskIDToLayerCode[it] = widget.layer.key;
+              _isDownloading = true;
               setState(() {
                 //gl.offlineMode = gl.offlineMode;
               });
@@ -97,44 +103,30 @@ class _LayerDownloaderState extends State<LayerDownloader> {
   }
 
   Future<String?> _downloadFile() async {
-    late Future<String?> taskId;
+    //late Future<String?> taskId;
+    late String? taskId;
     if (!(Platform.isWindows || Platform.isLinux || Platform.isMacOS)) {
-      taskId = FlutterDownloader.enqueue(
+      taskId = await FlutterDownloader.enqueue(
         url: gl.queryApiRastDownload +
             "/" +
             gl.dico.getLayerBase(widget.layer.key).mCode,
         fileName: gl.dico.getLayerBase(widget.layer.key).mNomRaster,
         savedDir: gl.dico.docDir.path,
-        showNotification: false,
+        showNotification: true,
         openFileFromNotification: false,
         timeout: 15000,
       );
     }
+
     return taskId;
   }
 
-  static Future<bool> fileExists(String path) async {
-    final File file = File(path);
-    return file.exists();
-  }
-
-  static Future<bool> fileDelete(String path) async {
-    final File file = File(path);
-    if (await file.exists()) {
-      file.delete();
-    }
-    return fileExists(path);
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    //This part sucks. its executed at 'progress' = 0 -409600 100
-
+  /*void _bindBackgroundIsolate() {
     IsolateNameServer.registerPortWithName(
         _port.sendPort, 'downloader_send_port');
     _port.listen((dynamic data) {
       String id = data[0];
+      print("inside bindBackgroundIsolate!!");
       if (_taskIDToLayerCode[id] == widget.layer.key) {
         DownloadTaskStatus status = DownloadTaskStatus.fromInt(data[1]);
         double progress = (data[2] / -409600);
@@ -174,8 +166,27 @@ class _LayerDownloaderState extends State<LayerDownloader> {
               "DownloadTaskStatus. is not implemented");
         }
       }
-      FlutterDownloader.registerCallback(downloadCallback);
+      //FlutterDownloader.registerCallback(downloadCallback);
     });
+  }*/
+
+  static Future<bool> fileExists(String path) async {
+    final File file = File(path);
+    return file.exists();
+  }
+
+  static Future<bool> fileDelete(String path) async {
+    final File file = File(path);
+    if (await file.exists()) {
+      file.delete();
+    }
+    return fileExists(path);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    //This part sucks. its executed at 'progress' = 0 -409600 100
 
     /*register callback after start download!!
     if (Platform.isAndroid || Platform.isIOS) {
@@ -186,18 +197,19 @@ class _LayerDownloaderState extends State<LayerDownloader> {
     }*/
   }
 
-  @pragma('vm:entry-point')
+  /* @pragma('vm:entry-point')
   static void downloadCallback(String id, int status, int progress) {
-    final SendPort? send =
-        IsolateNameServer.lookupPortByName('downloader_send_port');
-    if (send != null) {
-      send.send([id, status, progress]);
-    }
-  }
+    //print("callback here and there");
+    final SendPort send =
+        IsolateNameServer.lookupPortByName('downloader_send_port')!;
+    //if (send != null) {
+    send.send([id, status, progress]);
+    //}
+  }*/
 
   @override
   void dispose() {
-    IsolateNameServer.removePortNameMapping('downloader_send_port');
+    //IsolateNameServer.removePortNameMapping('downloader_send_port');
     super.dispose();
   }
 }

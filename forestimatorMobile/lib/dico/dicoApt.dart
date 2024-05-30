@@ -97,6 +97,7 @@ class layerBase {
   Map<int, String> mDicoVal; // valeur raster vers signification
   Map<int, Color> mDicoCol; // valeur raster vers couleur
   late bool mUsedForAnalysis;
+  late int mBits;
   //String mNomFile,mDir; mPathQml mPathRaster,
 
 // frommap avec liste d'instanciation, inspiré de https://medium.com/@lumeilin/using-sqlite-in-flutter-59b27b099123
@@ -129,6 +130,7 @@ class layerBase {
         mDicoVal = {},
         mDicoCol = {},
         mOffline = false,
+        mBits = map['Bits'] == null ? 8 : map['Bits'],
         mUsedForAnalysis = false {
     mIsDownloadableRW = mRes >= 10 ? true : false;
   }

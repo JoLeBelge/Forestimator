@@ -573,7 +573,9 @@ class _SelectedLayerView extends State<SelectedLayerView> {
                     maxHeight: MediaQuery.of(context).size.height * .04,
                     maxWidth: MediaQuery.of(context).size.width * .35,
                   )),*/
-                  title: const Text('Pas de couche selectionnée.'),
+                  //title: const Text('Pas de couche selectionnée.'),
+                  title: const Text(
+                      ''), // le texte "pas de couches sélectionnée avait perturbé un des testeurs, on met rien
                 ),
         ),
       );

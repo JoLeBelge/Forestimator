@@ -38,10 +38,7 @@ void main() async {
         ignoreSsl:
             true // option: set to false to disable working with http links (default: false)
         );
-    FlutterDownloader.registerCallback(
-      TestClass.downloadCallback,
-      step: 1,
-    );
+
     //Initialize Logging
     await FlutterLogs.initLogs(
         logLevelsEnabled: [
@@ -65,20 +62,6 @@ void main() async {
   runApp(const MyApp());
 }
 
-@pragma('vm:entry-point')
-class TestClass {
-  @pragma('vm:entry-point')
-  static void downloadCallback(String id, int status, int progress) {
-    final SendPort? send =
-        IsolateNameServer.lookupPortByName('downloader_send_port');
-
-    // on peut pas faire le log d'ici car les logs ne sont pas instancié pour cette classe.
-    //FlutterLogs.logInfo("download", "downloadCallback", progress.toString());
-
-    send?.send([id, status, progress]);
-  }
-}
-
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
   @override
@@ -91,6 +74,7 @@ class _MyApp extends State<MyApp> {
 
   late String _pathExternalStorage;
   bool _initializedPersistentValues = false;
+  ReceivePort _port = ReceivePort();
 
   _MyApp() {}
 
@@ -186,6 +170,9 @@ class _MyApp extends State<MyApp> {
     // copier tout les pdf de l'asset bundle vers un fichier utilisable par la librairie flutter_pdfviewer
     _listAndCopyPdfassets();
     readPreference();
+
+    _bindBackgroundIsolate();
+    FlutterDownloader.registerCallback(downloadCallback);
   }
 
   late final _router = GoRouter(
@@ -240,7 +227,7 @@ class _MyApp extends State<MyApp> {
                             )
                           : Scaffold(
                               appBar: AppBar(
-                                title: Text("view pdf"),
+                                title: Text("pdf"),
                               ),
                               body: Text("toto"),
                             ),
@@ -260,7 +247,7 @@ class _MyApp extends State<MyApp> {
                                 )
                               : Scaffold(
                                   appBar: AppBar(
-                                    title: Text("view pdf"),
+                                    title: Text("pdf"),
                                   ),
                                   body: Text(_pathExternalStorage +
                                       "/FEE-" +
@@ -344,18 +331,45 @@ class _MyApp extends State<MyApp> {
           await prefs.setBool('firstTimeUse', gl.firstTimeUse);
         },
         dialog:
-            "Autorisez vous l'aplication à télécharger un jeu de couches pour une utilisation hors ligne? Ces couches couvrent toutes la Région Wallonne et totalisent +- 100 Mo.",
+            "Autorisez-vous l'aplication à télécharger un jeu de couches pour une utilisation hors ligne? Ces couches couvrent toutes la Région Wallonne et totalisent +- 100 Mo.",
       ));
     }
     return MaterialApp.router(
       routerDelegate: _router.routerDelegate,
       routeInformationParser: _router.routeInformationParser,
       routeInformationProvider: _router.routeInformationProvider,
-      title: 'Mobile Forestimator',
+      title: 'Forestimator',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
     );
+  }
+
+  void _bindBackgroundIsolate() {
+    IsolateNameServer.registerPortWithName(
+        _port.sendPort, 'downloader_send_port');
+    _port.listen((dynamic data) {
+      String id = data[0];
+      //print("inside bindBackgroundIsolate!!");
+      DownloadTaskStatus status = DownloadTaskStatus.fromInt(data[1]);
+      if (status == DownloadTaskStatus.complete) {
+        setState(() {
+          gl.dico.checkLayerBaseOfflineRessource();
+          gl.refreshWholeCatalogueView();
+          gl.refreshOfflineView();
+        });
+      }
+    });
+  }
+
+  @pragma('vm:entry-point')
+  static void downloadCallback(String id, int status, int progress) {
+    //print("callback here and there");
+    final SendPort send =
+        IsolateNameServer.lookupPortByName('downloader_send_port')!;
+    //if (send != null) {
+    send.send([id, status, progress]);
+    //}
   }
 }
