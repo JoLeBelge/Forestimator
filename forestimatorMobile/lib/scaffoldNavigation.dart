@@ -42,11 +42,13 @@ class _ScaffoldWithNestedNavigation
       bottomNavigationBar: NavigationBar(
         height: MediaQuery.of(context).size.height * 0.07,
         selectedIndex: widget.navigationShell.currentIndex,
-        destinations: const [
-          NavigationDestination(label: 'Carte', icon: Icon(Icons.map)),
+        destinations: [
+          const NavigationDestination(label: 'Carte', icon: Icon(Icons.map)),
           NavigationDestination(
-              label: 'Couches Online', icon: Icon(Icons.layers)),
-          NavigationDestination(
+              label: 'Couches Online',
+              icon: const Icon(Icons.layers),
+              enabled: !gl.offlineMode),
+          const NavigationDestination(
               label: 'Couches Offline', icon: Icon(Icons.offline_bolt))
         ],
         onDestinationSelected: _goBranch,
