@@ -147,16 +147,9 @@ void savePrefSelLay() async {
 
 void changeSelectedLayerModeOffline() {
   interfaceSelectedLayerKeys.removeWhere((element) => element.offline == false);
-  // check si il y a au moins une carte offline dans la selection
-  ///if (interfaceSelectedLayerKeys.where((i) => i.offline).toList().length == 0) {
-
-  // si non on en ajoute une si on en a
-
-  if (dico.getLayersOffline().where((i) => i.mBits == 8).toList().length > 0) {
-    // if (interfaceSelectedLayerKeys.length == 3) {
-    //   interfaceSelectedLayerKeys.removeLast();
-    // }
-
+  // check si il y a au moins une carte offline sur le téléphone et on l'ajoute à la sélection si il n'y en avait aucune
+  if (dico.getLayersOffline().where((i) => i.mBits == 8).toList().length > 0 &&
+      interfaceSelectedLayerKeys.length == 0) {
     interfaceSelectedLayerKeys.insert(
       0,
       selectedLayer(
@@ -168,8 +161,13 @@ void changeSelectedLayerModeOffline() {
               .mCode,
           offline: true),
     );
+  } else {
+    // on ne garde qu'une seule couche
+    while (interfaceSelectedLayerKeys.length > 1) {
+      interfaceSelectedLayerKeys.removeLast();
+    }
   }
-  //}
+
   savePrefSelLay();
 }
 
@@ -177,8 +175,15 @@ void addLayerToList(String key,
     {bool offline = false, bool savePref = true}) async {
   interfaceSelectedLayerKeys.insert(
       0, selectedLayer(mCode: key, offline: offline));
-  if (interfaceSelectedLayerKeys.length > 3) {
-    interfaceSelectedLayerKeys.removeLast();
+
+  if (!offlineMode) {
+    if (interfaceSelectedLayerKeys.length > 3) {
+      interfaceSelectedLayerKeys.removeLast();
+    }
+  } else {
+    while (interfaceSelectedLayerKeys.length > 1) {
+      interfaceSelectedLayerKeys.removeLast();
+    }
   }
   if (savePref) {
     savePrefSelLay();

@@ -1,30 +1,16 @@
-To do list fforestimator
+To do list forestimator
 ------------------------
+Jo -> ajouter les crédits dans la description des couches carto, avec logo spw et IGN
 
-TT -> dupliquer le "panier" avec la sélection des 3 couches, pour un affichage dans la partie 
--> ou alors on ne peux afficher que une couche unique en mode offline, et du coup, pas besoin de panier. pas mal comme compromis..
-
-
-vv -> Mode Offline ; catalogue online pas accessible (grisé)
-vv -> Mode Online ; catalogue offline accessible 
-vv -> downloader ; on oublie la barre de progression, mais au moins avoir un refresh quand le téléchargement est fini (ne fonctionne plus ou n'as jamais fonctionné..). ET une boite de dialogue Forestimator également pour signaler le succès du téléchargement
-vv -> downloader ; téléchargement du lot de couche lors du premier démarrage ; pour l'instant le code est commenté, le rendre opérationnel à nouveau
-
-vv -> page ana Pt : afficher clairement si on est offline ou online, c'est là que ce joue la grosse différence
-vv lecture 16bits : désactiver + label pour le dire clairement 
-vv -> réactiver carte GS sur forestimator Mobile
-Jo -> ajouter les crédits dans la description des couches carto, avec logo spw
-
+label téléchargeable  pas visible sur tablette - pas assez de place pour lui. 
+Alignement des label "enregistré" qui est érratique pour l'instant
+un peu de margin gauche pour le nom des couches
 
 retours testeurs:
 -----------------
 
 GLigot : position sur carte pas clair (quand c'est position grace à internet et non pas GPS, pas de rond bleu pour afficher la position - non c'est quand on donne les droits lors du premier usage? )
 
-ca a peut etre un lien avec l'erreur dans la console à propos des permission request..
-https://github.com/Baseflow/flutter-permission-handler/issues/783
-
-Jo : label téléchargeable  pas visible sur tablette - pas assez de place pour lui..
 Ger : ajouter cadastre (non car pas de WMS, juste service arcgisRest qui va pas avec flutter) et natura 2000 (N2K)
 
 Sam : catalogues ; problème de padding, margin, et le top parfois est tronqué, le header de smartphone interfère avec l'affichage.
