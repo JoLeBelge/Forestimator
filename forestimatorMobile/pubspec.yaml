@@ -13,7 +13,7 @@ dependencies:
   sqflite: ^2.3.0
   sqflite_common_ffi: ^2.3.2
   sidebarx: ^0.17.1
-  flutter_map: ^6.1.0
+  flutter_map: ^7.0.0
   path_provider: ^2.1.2
   http: ^1.0.0
   tuple: ^2.0.2

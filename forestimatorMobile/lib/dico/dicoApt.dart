@@ -540,7 +540,7 @@ class dicoAptProvider {
     return aRes;
   }
 
-  void checkLayerBaseOfflineRessource() async {
+  Future<void> checkLayerBaseOfflineRessource() async {
     for (layerBase l in mLayerBases.values) {
       File file = File(getRastPath(l.mCode));
       if (await file.exists() == true) {

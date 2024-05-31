@@ -346,21 +346,62 @@ class _MyApp extends State<MyApp> {
     );
   }
 
-  void _bindBackgroundIsolate() {
+  void _bindBackgroundIsolate() async {
     IsolateNameServer.registerPortWithName(
         _port.sendPort, 'downloader_send_port');
-    _port.listen((dynamic data) {
+    await for (dynamic data in _port) {
+//    _port.listen((dynamic data) {
       String id = data[0];
       //print("inside bindBackgroundIsolate!!");
       DownloadTaskStatus status = DownloadTaskStatus.fromInt(data[1]);
       if (status == DownloadTaskStatus.complete) {
-        setState(() {
-          gl.dico.checkLayerBaseOfflineRessource();
-          gl.refreshWholeCatalogueView();
-          gl.refreshOfflineView();
-        });
+        final context = _rootNavigatorKey.currentContext;
+        if (context != null) {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text("Téléchargement"),
+                content: Text("Une carte a été téléchargée avec succès."),
+                actions: [
+                  TextButton(
+                    child: Text("OK"),
+                    onPressed: () {
+                      Navigator.of(context, rootNavigator: true).pop();
+                    },
+                  ),
+                ],
+              );
+            },
+          );
+        }
+        await gl.dico.checkLayerBaseOfflineRessource();
+        gl.refreshWholeCatalogueView(() {});
+        gl.rebuildOfflineView(() {});
+      } else if (status == DownloadTaskStatus.failed) {
+        final context = _rootNavigatorKey.currentContext;
+        if (context != null) {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text("Téléchargement"),
+                content: Text(
+                    "Le téléchargement d'une carte a échoué. Réessayez plus tard."),
+                actions: [
+                  TextButton(
+                    child: Text("OK"),
+                    onPressed: () {
+                      Navigator.of(context, rootNavigator: true).pop();
+                    },
+                  ),
+                ],
+              );
+            },
+          );
+        }
       }
-    });
+    }
   }
 
   @pragma('vm:entry-point')

@@ -86,7 +86,7 @@ class _CatalogueView extends State<CatalogueView> {
     gl.refreshWholeCatalogueView = rebuildWidgetTreeForLayerDownloader;
   }
 
-  void rebuildWidgetTreeForLayerDownloader(void Function() setter) async {
+  void rebuildWidgetTreeForLayerDownloader(void Function() setter) {
     setState(setter);
   }
 }

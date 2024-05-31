@@ -108,11 +108,11 @@ Function refreshMap = (Function f) {
 };
 Function refreshWholeCatalogueView = (void Function() setter) async {};
 Function refreshCurrentThreeLayer = () {};
-Function refreshOfflineView = () {};
+//Function refreshOfflineView = () {};
 Function rebuildOfflineView = (void Function() setter) async {};
 Function? rebuildNavigatorBar;
 
-Function addToOfflineList = (var x) {};
+//Function addToOfflineList = (var x) {};
 Function removeFromOfflineList = (var x) {};
 
 int nMaxSelectedLayer = 3;

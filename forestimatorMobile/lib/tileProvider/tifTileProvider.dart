@@ -52,7 +52,12 @@ class tifFileTileProvider extends TileProvider {
   ImageProvider getImage(TileCoordinates coordinates, TileLayer options) {
     int tileSize = 256;
     final tileSizePoint = Point(tileSize, tileSize);
-    final nwPoint = coordinates.scaleBy(tileSizePoint);
+
+    // final nwPoint = coordinates.scaleBy(tileSizePoint) - daptation for flutter_map 7.0.0 (scaleBy depreciated)
+
+    final Point nwPoint =
+        Point(coordinates.x * tileSize, coordinates.y * tileSize);
+
     final nwCoords = mycrs.pointToLatLng(nwPoint, coordinates.z.toDouble());
     final nw = mycrs.projection.project(nwCoords);
     Bounds<double> b = mycrs.projection.bounds!;

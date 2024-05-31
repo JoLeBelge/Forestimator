@@ -112,7 +112,7 @@ class _LayerDownloaderState extends State<LayerDownloader> {
             gl.dico.getLayerBase(widget.layer.key).mCode,
         fileName: gl.dico.getLayerBase(widget.layer.key).mNomRaster,
         savedDir: gl.dico.docDir.path,
-        showNotification: true,
+        showNotification: false,
         openFileFromNotification: false,
         timeout: 15000,
       );

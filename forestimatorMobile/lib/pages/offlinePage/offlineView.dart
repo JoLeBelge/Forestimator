@@ -105,7 +105,7 @@ class _OfflineView extends State<OfflineView> {
     );
   }
 
-  void addToList(String key) {
+  /*void addToList(String key) {
     _downlodableLayerTiles["offline"]!.add(LayerTile(
       key: key,
       name: gl.dico.getLayerBase(key).mNom,
@@ -123,7 +123,7 @@ class _OfflineView extends State<OfflineView> {
         break;
       }
     }
-  }
+  }*/
 
   Widget _buildOfflineCategory() {
     return ExpansionPanelList(
@@ -379,10 +379,6 @@ class _OfflineView extends State<OfflineView> {
     });
   }
 
-  Future<void> reloadLayerData() async {
-    _getLayerData();
-  }
-
   @override
   void initState() {
     super.initState();
@@ -390,12 +386,15 @@ class _OfflineView extends State<OfflineView> {
       _getLayerData();
     }
     gl.rebuildOfflineView = rebuildOfflineWidgetTreeForLayerDownloader;
-    gl.removeFromOfflineList = removeFromList;
-    gl.addToOfflineList = addToList;
+
+    // je commente car le rebuildOfflineView remet la liste à jour, donc pas besoin de addToList et removeFromList
+    //gl.removeFromOfflineList = removeFromList;
+    //gl.addToOfflineList = addToList;
   }
 
   void rebuildOfflineWidgetTreeForLayerDownloader(
       void Function() setter) async {
+    _getLayerData();
     setState(setter);
   }
 }
