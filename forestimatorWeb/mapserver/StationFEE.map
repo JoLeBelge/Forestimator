@@ -67,49 +67,49 @@ LAYER
    PROCESSING "BANDS=1" 
    CLASSITEM "[pixel]" 
    CLASS 
-      NAME "Tourbières acides"
+      NAME "Tourbière acide"
       EXPRESSION "1"
       STYLE 
           COLOR 0 0 0
        END
    END
    CLASS 
-      NAME "Marais et sources"
+      NAME "Marais et source"
       EXPRESSION "2"
       STYLE 
           COLOR 23 45 242
        END
    END
    CLASS 
-      NAME "Argiles blanches humides"
+      NAME "Argile blanche humide"
       EXPRESSION "3"
       STYLE 
           COLOR 109 117 114
        END
    END
    CLASS 
-      NAME "Sols blanchis à régime hydrique alternatif"
+      NAME "Sol blanchi à régime hydrique alternatif"
       EXPRESSION "4"
       STYLE 
           COLOR 223 200 165
        END
    END
    CLASS 
-      NAME "Sols bruns à régime hydrique alternatif"
+      NAME "Sol brun à régime hydrique alternatif"
       EXPRESSION "5"
       STYLE 
           COLOR 182 128 2
        END
    END
    CLASS 
-      NAME "Terrasses alluviales humides"
+      NAME "Terrasse alluviale humide"
       EXPRESSION "6"
       STYLE 
           COLOR 80 153 243
        END
    END
    CLASS 
-      NAME "Terrasses alluviales fraiche"
+      NAME "Terrasse alluviale fraiche"
       EXPRESSION "7"
       STYLE 
           COLOR 132 233 253
@@ -123,56 +123,56 @@ LAYER
        END
    END
    CLASS 
-      NAME "Ravins hygrosciaphiles"
+      NAME "Ravin hygrosciaphile"
       EXPRESSION "9"
       STYLE 
           COLOR 254 85 248
        END
    END
    CLASS 
-      NAME "Versants chauds au sol superficiel"
+      NAME "Versant chauds au sol superficiel"
       EXPRESSION "10"
       STYLE 
           COLOR 254 47 3
        END
    END
    CLASS 
-      NAME "Versants chauds"
+      NAME "Versant chaud"
       EXPRESSION "11"
       STYLE 
           COLOR 249 155 31
        END
    END
    CLASS 
-      NAME "Versants frais pauvres"
+      NAME "Versant frais pauvre"
       EXPRESSION "12"
       STYLE 
           COLOR 204 134 213
        END
    END
    CLASS 
-      NAME "Versants frais riches"
+      NAME "Versant frais riche"
       EXPRESSION "13"
       STYLE 
           COLOR 121 6 187
        END
    END
    CLASS 
-      NAME "Sols profonds des plateaux"
+      NAME "Sol profond des plateaux"
       EXPRESSION "14"
       STYLE 
           COLOR 153 235 130
        END
    END
    CLASS 
-      NAME "Sols peu profonds des plateaux"
+      NAME "Sol peu profond des plateaux"
       EXPRESSION "15"
       STYLE 
           COLOR 13 186 4
        END
    END
    CLASS 
-      NAME "Sols superficiels des plateaux"
+      NAME "Sol superficiel des plateaux"
       EXPRESSION "16"
       STYLE 
           COLOR 20 112 14
