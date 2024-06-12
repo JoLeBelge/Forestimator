@@ -198,10 +198,12 @@ class _OfflineView extends State<OfflineView> {
                           : 48,
                       minHeight: 48,
                     ),
+                    padding: const EdgeInsets.only(left: 8),
                     child: Text(item.name,
                         textScaler: const TextScaler.linear(1.2)),
                   ),
-                  _downloadedControlBar(item),
+                  //_downloadedControlBar(item),
+                  item.downloadedControlBar(),
                   if (gl.dico.getLayerBase(item.key).mBits == 8)
                     _selectLayerButton(item),
                 ]);
@@ -213,7 +215,7 @@ class _OfflineView extends State<OfflineView> {
     );
   }
 
-  Widget _downloadedControlBar(LayerTile lt) {
+  /*Widget _downloadedControlBar(LayerTile lt) {
     return Container(
         constraints:
             const BoxConstraints(maxWidth: 128, minHeight: 32, maxHeight: 32),
@@ -226,7 +228,7 @@ class _OfflineView extends State<OfflineView> {
                 "Téléchargeable",
                 style: TextStyle(color: gl.colorUliege),
               ));
-  }
+  }*/
 
   Widget _selectLayerButton(LayerTile lt) {
     int nLayer = 3;
@@ -326,6 +328,7 @@ class _OfflineView extends State<OfflineView> {
                 },
                 icon: Icon(Icons.picture_as_pdf)),
           ),
+        lt.attribution(),
         if ((gl.dico.getLayerBase(lt.key).mGroupe == "APT_FEE" ||
                 gl.dico.getLayerBase(lt.key).mGroupe == "APT_CS") &&
             gl.dico
@@ -345,8 +348,11 @@ class _OfflineView extends State<OfflineView> {
                 icon: Icon(Icons.picture_as_pdf)),
           ),
         if (gl.dico.getLayerBase(lt.key).mBits == 16)
-          Text(
-              "Cette couche est utilisée pour les analyses ponctuelles mais vous ne pouvez pas la visualiser"),
+          ListTile(
+            title: Text(
+                "Cette couche est utilisée pour les analyses ponctuelles mais vous ne pouvez pas la visualiser"),
+            leading: Icon(Icons.warning),
+          ),
       ],
     );
   }

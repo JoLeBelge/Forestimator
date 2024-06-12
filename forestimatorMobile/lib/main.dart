@@ -33,10 +33,10 @@ void main() async {
     databaseFactory = databaseFactoryFfi;
   } else {
     await FlutterDownloader.initialize(
-        debug:
-            true, // optional: set to false to disable printing logs to console (default: true)
-        ignoreSsl:
-            true // option: set to false to disable working with http links (default: false)
+        debug: gl
+            .debug, // optional: set to false to disable printing logs to console (default: true)
+        ignoreSsl: gl
+            .debug // option: set to false to disable working with http links (default: false)
         );
 
     //Initialize Logging
@@ -300,8 +300,6 @@ class _MyApp extends State<MyApp> {
           });
           final SharedPreferences prefs = await SharedPreferences.getInstance();
           await prefs.setBool('firstTimeUse', gl.firstTimeUse);
-          // pas bon car si le téléchargement n'est pas lancé depuis layerDownloader, pas de progressbar, pas de lien entre taskId et layerCode
-          /*
           for (var key in gl.downloadableLayerKeys) {
             if (!(Platform.isWindows || Platform.isLinux || Platform.isMacOS)) {
               FlutterDownloader.enqueue(
@@ -315,7 +313,7 @@ class _MyApp extends State<MyApp> {
                 timeout: 15000,
               );
             }
-          }*/
+          }
         },
         decline: "non",
         onDecline: () async {

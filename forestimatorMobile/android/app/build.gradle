@@ -67,7 +67,7 @@ android {
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId "com.forestimator"
-        versionCode 2// Change to a higher number
+        //versionCode 2// Change to a higher number
         versionName "1.0.0"
         // You can update the following values to match your application needs.
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.

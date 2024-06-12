@@ -91,6 +91,7 @@ class layerBase {
   late String mTypeVar;
   late double mGain;
   late String mPdfName;
+  late String mLogoAttributionFile;
   late int mPdfPage;
   late double mRes;
   String? nom_field_raster, nom_field_value, nom_dico, condition;
@@ -133,6 +134,26 @@ class layerBase {
         mBits = map['Bits'] == null ? 8 : map['Bits'],
         mUsedForAnalysis = false {
     mIsDownloadableRW = mRes >= 10 ? true : false;
+    mLogoAttributionFile = logoAttributionFile(mWMSattribution);
+  }
+
+  String logoAttributionFile(String mWMSattribution) {
+    String aRes = "";
+    switch (mWMSattribution) {
+      case "Service Public de la Wallonie":
+        aRes = 'assets/images/spw_fr_LR.png';
+        break;
+      case "IGN/NGI":
+        aRes = 'assets/images/LOGO_NGI_LR.jpg';
+        break;
+      case "UCL":
+        aRes = 'assets/images/UCLouvain_logo.png';
+        break;
+      case "Gembloux Agro-Bio Tech":
+        aRes = 'assets/images/uLIEGE_Gembloux_AgroBioTech_Logo_CMJN_pos.png';
+        break;
+    }
+    return aRes;
   }
 
   layerBase()
@@ -162,10 +183,6 @@ class layerBase {
     return mPdfName != "";
   }
 
-  //String getFicheRoute({bool complete = false}) {
-  //if (complete) {
-  //  return "/" + gl.basePathbranchA + "/documentation/" + mCode;
-  //}
   String getFicheRoute() {
     return "documentation/" + mCode;
   }
@@ -258,8 +275,6 @@ class layerBase {
   }
 
   void setHasOffline(bool offline) {
-    //print("offline layer;");
-    //print(this.toString());
     mOffline = true;
   }
 
@@ -295,9 +310,9 @@ class dicoAptProvider {
 // Check if the database exists
     var exists = await databaseExists(path);
 
-    // if (!exists) {
-    // pour l'instant maj à chaque fois des assets sur l'émulateur
-    if (true) {
+    if (!exists) {
+      // pour  maj à chaque fois des assets durant phase de développement
+      // if (true) {
       // Should happen only the first time you launch your application
       //print("Creating new copy from asset");
 
@@ -315,14 +330,13 @@ class dicoAptProvider {
 
       // Write and flush the bytes written
       await File(path).writeAsBytes(bytes, flush: true);
-    } else {
-      print("Opening existing database");
+      //} else {
+      //  print("Opening existing database");
     }
 
     db = await openDatabase(path, version: 1, readOnly: true
         //onCreate: _onCreate,
         );
-    // lecture des couleurs
     List<Map<String, dynamic>> result = await db.query('dico_color');
     for (var r in result) {
       colors[r['Col']] = Color.fromRGBO(r['R'], r['G'], r['B'], 1.0);

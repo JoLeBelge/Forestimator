@@ -1,10 +1,13 @@
 To do list forestimator
 ------------------------
-Jo -> ajouter les crédits dans la description des couches carto, avec logo spw et IGN
 
-label téléchargeable  pas visible sur tablette - pas assez de place pour lui. 
+-copyrigth pour couche MNH photo et Lidar; définir.
+
+bug analyse ponctuelle offline quand une des cartes offline est corrompue; je ne sais pas reproduire l'erreur..
+
+-carte de recommandation GS!! ajout
+
 Alignement des label "enregistré" qui est érratique pour l'instant
-un peu de margin gauche pour le nom des couches
 
 retours testeurs:
 -----------------

@@ -160,6 +160,7 @@ class _CategoryView extends State<CategoryView> {
                           : 48,
                       minHeight: 48,
                     ),
+                    padding: const EdgeInsets.all(8.0),
                     child: Text(item.name,
                         textScaler: const TextScaler.linear(1.2)),
                   ),
@@ -191,7 +192,7 @@ class _CategoryView extends State<CategoryView> {
                             maxHeight: 48,
                             minHeight: 48,
                           ),
-                          padding: const EdgeInsets.all(0),
+                          padding: const EdgeInsets.only(left: 8),
                           child: IconButton(
                               icon: const Icon(Icons.location_on, size: 28),
                               onPressed: () async {
@@ -281,6 +282,7 @@ class _CategoryView extends State<CategoryView> {
                 },
                 icon: const Icon(Icons.picture_as_pdf)),
           ),
+        lt.attribution(),
         LegendView(
           layerKey: lt.key,
           color: gl.colorBackgroundSecondary,
@@ -299,7 +301,7 @@ class _CategoryView extends State<CategoryView> {
     );
   }
 
-  Widget _downloadedControlBar(LayerTile lt) {
+  /* Widget _downloadedControlBar(LayerTile lt) {
     return Container(
         constraints:
             const BoxConstraints(maxWidth: 128, minHeight: 32, maxHeight: 32),
@@ -316,7 +318,7 @@ class _CategoryView extends State<CategoryView> {
                 : const Text(
                     "",
                   ));
-  }
+  }*/
 
   Widget selectLayerBar(LayerTile lt) {
     double barWidth = 128.0 + 48;
@@ -334,7 +336,8 @@ class _CategoryView extends State<CategoryView> {
         ),
         child:
             Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-          _downloadedControlBar(lt),
+          //_downloadedControlBar(lt),
+          lt.downloadedControlBar(),
           gl.isSelectedLayer(lt.key, offline: false)
               ? Container(
                   decoration: const BoxDecoration(
