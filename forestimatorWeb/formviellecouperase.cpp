@@ -700,3 +700,207 @@ ACRAnalytics::ACRAnalytics(const Wt::WEnvironment& env, std::string aFileDB) : W
         }
     }
 }
+
+
+encodageRelTerrain::encodageRelTerrain(const Wt::WEnvironment& env, std::string aFileDB) : Wt::WApplication(env),
+    session()
+{
+    messageResourceBundle().use(docRoot() + "/encodageVCR");
+    std::shared_ptr<Wt::WBootstrap5Theme> theme = std::make_shared<Wt::WBootstrap5Theme>();
+    setTheme(theme);
+    useStyleSheet("style/style.css");
+    auto sqlite3 = std::make_unique<dbo::backend::Sqlite3>(aFileDB);
+    sqlite3->setProperty("show-queries", "false");
+    session.setConnection(std::move(sqlite3));
+    session.mapClass<arbre>("arbres");
+    session.mapClass<ue>("UE");
+    session.mapClass<ACR_ter>("ACR_ter");
+
+
+
+    try {
+        session.createTables();
+        std::cout << "Created analytics database." << std::endl;
+    } catch (Wt::Dbo::Exception e){
+        std::cout << "table creation failed"<< e.code() << std::endl;
+    }
+    setTitle("Encodage relevé terrain anciennes coupes rases");
+    root()->setMargin(0);
+    root()->setPadding(0);
+
+    Wt::WContainerWidget * content = root()->addWidget(std::make_unique<Wt::WContainerWidget>());
+    content->setOverflow(Wt::Overflow::Scroll);
+    content->addNew<WText>("ACR id");
+    ACR_id=content->addNew<WLineEdit>("");
+    ACR_id->setValidator(std::make_shared<WIntValidator>(0,500));
+    content->addNew<WText>("UE id");
+    UE_id=content->addNew<WLineEdit>("");
+    UE_id->setValidator(std::make_shared<WIntValidator>(0,50));
+    tabNewEU = content->addWidget(std::make_unique<Wt::WTable>());
+    tabNewEU->setHeaderCount(1);
+    tabNewEU->setWidth(Wt::WLength("90%"));
+    tabNewEU->elementAt(0,0)->addNew<WText>("Type");
+    tabNewEU->elementAt(0,1)->addNew<WText>("Arbres");
+    tabNewEU->elementAt(0,2)->addNew<WText>("Ess");
+    tabNewEU->elementAt(0,3)->addNew<WText>("Circ");
+    tabNewEU->elementAt(0,4)->addNew<WText>("Statut");
+    tabNewEU->elementAt(0,5)->addNew<WText>("Régé");
+    tabNewEU->elementAt(0,6)->addNew<WText>("Hauteur");
+    tabNewEU->elementAt(0,7)->addNew<WText>("Distance");
+    tabNewEU->elementAt(0,8)->addNew<WText>("Azimut");
+    tabNewEU->elementAt(0,9)->addNew<WText>("Défaut");
+    tabNewEU->elementAt(0,10)->addNew<WText>("Remarque");
+
+    for (int i(0) ; i<10 ; i++){
+
+
+
+        std::unique_ptr<arbreGUI>  tree = std::make_unique<arbreGUI>(&session,tabNewEU->rowAt(i+1));
+        if (i<4){
+            tree->quadrat->setText(WString("Q{1}").arg(i+1));
+            tree->type->setText("Arbustif");
+        } else if (i>3 && i<8){
+            tree->quadrat->setText(WString("Q{1}").arg(i-3));
+            tree->type->setText("Arboré");
+        } else {
+            tree->type->setText("Avenir");
+            tree->quadrat->setText(WString("A{1}").arg(i-7));
+        }
+
+       tabNewEU->elementAt(i+1,10)->enterPressed().connect(tabNewEU->elementAt(i+2,2), &WWidget::setFocus);
+
+       vArbres.push_back(std::move(tree));
+
+
+        //tabNewEU->rowAt(i+1)->elementAt(1)->addEventSignal();
+    }
+
+    WComboBox * comboA1 = tabNewEU->elementAt(9,11)->addNew<WComboBox>();
+    WComboBox * comboA2 = tabNewEU->elementAt(10,11)->addNew<WComboBox>();
+
+    comboA1->addItem("-");
+    comboA1->addItem("Q1");
+    comboA1->addItem("Q2");
+    comboA1->addItem("Q3");
+    comboA1->addItem("Q4");
+
+    comboA2->addItem("-");
+    comboA2->addItem("Q1");
+    comboA2->addItem("Q2");
+    comboA2->addItem("Q3");
+    comboA2->addItem("Q4");
+
+    comboA1->changed().connect([=] {
+        if(comboA1->valueText().toUTF8()== "Q1"){
+            vArbres.at(8)->setLike(vArbres.at(4).get());
+           } else if(comboA1->valueText().toUTF8()== "Q2"){
+            vArbres.at(8)->setLike(vArbres.at(5).get());
+           } else if(comboA1->valueText().toUTF8()== "Q3"){
+            vArbres.at(8)->setLike(vArbres.at(6).get());
+           } else if(comboA1->valueText().toUTF8()== "Q4"){
+            vArbres.at(8)->setLike(vArbres.at(7).get());
+           }
+        vArbres.at(8)->rmq->setText(comboA1->valueText());
+    });
+
+    comboA2->changed().connect([=] {
+        if(comboA2->valueText().toUTF8()== "Q1"){
+            vArbres.at(9)->setLike(vArbres.at(4).get());
+           } else if(comboA1->valueText().toUTF8()== "Q2"){
+            vArbres.at(9)->setLike(vArbres.at(5).get());
+           } else if(comboA1->valueText().toUTF8()== "Q3"){
+            vArbres.at(9)->setLike(vArbres.at(6).get());
+           } else if(comboA1->valueText().toUTF8()== "Q4"){
+            vArbres.at(9)->setLike(vArbres.at(7).get());
+           }
+        vArbres.at(9)->rmq->setText(comboA1->valueText());
+    });
+
+
+    submitUE=content->addNew<WPushButton>("ajouter l'UE");
+    submitUE->clicked().connect(this,&encodageRelTerrain::ajoutUE);
+
+    tabAllEU = content->addWidget(std::make_unique<Wt::WTable>());
+    tabAllEU->setHeaderCount(1);
+    tabAllEU->setWidth(Wt::WLength("90%"));
+}
+
+void encodageRelTerrain::ajoutUE(){
+
+    // d'abord un premier check
+    if (ACR_id->valueText().toUTF8()==""){
+        Wt::WMessageBox * messageBox = this->addChild(std::make_unique<Wt::WMessageBox>(
+                                                          "Identifiant de l'ancienne coupe rase",
+                                                          "Renseignez l'identifiant de l'ancienne coupe rase, svp",
+                                                          Wt::Icon::Information,
+                                                          Wt::StandardButton::Ok));
+        messageBox->setModal(true);
+        messageBox->buttonClicked().connect([=] {
+            this->removeChild(messageBox);
+        });
+        messageBox->show();
+    }else if (UE_id->valueText().toUTF8()==""){
+        Wt::WMessageBox * messageBox = this->addChild(std::make_unique<Wt::WMessageBox>(
+                                                          "Identifiant de l'unité d'échantillonnage",
+                                                          "Renseignez l'identifiant de l'UE, svp",
+                                                          Wt::Icon::Information,
+                                                          Wt::StandardButton::Ok));
+        messageBox->setModal(true);
+        messageBox->buttonClicked().connect([=] {
+            this->removeChild(messageBox);
+        });
+        messageBox->show();
+
+    }else{
+        int acr = std::stoi(ACR_id->valueText().toUTF8());
+        int ue = std::stoi(UE_id->valueText().toUTF8());
+
+        for (std::unique_ptr<arbreGUI> &  tree : vArbres ){
+            tree->add(acr,ue);
+            tree->clear();
+        }
+
+        displayACR(acr);
+    }
+
+
+
+}
+
+void encodageRelTerrain::displayACR(int acr_id){
+    tabAllEU->clear();
+    tabAllEU->elementAt(0,0)->addNew<WText>("ACR_id");
+    tabAllEU->elementAt(0,1)->addNew<WText>("UE");
+    tabAllEU->elementAt(0,2)->addNew<WText>("Type");
+    tabAllEU->elementAt(0,3)->addNew<WText>("Arbres");
+    tabAllEU->elementAt(0,4)->addNew<WText>("Ess");
+    tabAllEU->elementAt(0,5)->addNew<WText>("Circ");
+    tabAllEU->elementAt(0,6)->addNew<WText>("Statut");
+    tabAllEU->elementAt(0,7)->addNew<WText>("Régé");
+    tabAllEU->elementAt(0,8)->addNew<WText>("Hauteur");
+    tabAllEU->elementAt(0,9)->addNew<WText>("Distance");
+    tabAllEU->elementAt(0,10)->addNew<WText>("Azimut");
+    tabAllEU->elementAt(0,11)->addNew<WText>("Défaut");
+    tabAllEU->elementAt(0,12)->addNew<WText>("Remarque");
+    typedef dbo::collection< dbo::ptr<arbre> > arbres;
+    dbo::Transaction transaction(session);
+    arbres vt = session.find<arbre>().where("id_ACR = ?").bind(acr_id);
+    int i=1;
+    for (const dbo::ptr<arbre> &t : vt){
+        tabAllEU->elementAt(i,0)->addNew<Wt::WText>(std::to_string(t->ACR));
+        tabAllEU->elementAt(i,1)->addNew<Wt::WText>(std::to_string(t->UE));
+        tabAllEU->elementAt(i,2)->addNew<Wt::WText>(t->type);
+        tabAllEU->elementAt(i,3)->addNew<Wt::WText>(t->quadrat);
+        tabAllEU->elementAt(i,4)->addNew<Wt::WText>(t->ess);
+        tabAllEU->elementAt(i,5)->addNew<Wt::WText>(t->circ);
+        tabAllEU->elementAt(i,6)->addNew<Wt::WText>(std::to_string(t->statut));
+        tabAllEU->elementAt(i,7)->addNew<Wt::WText>(std::to_string(t->rege));
+        tabAllEU->elementAt(i,8)->addNew<Wt::WText>(t->Ht);
+        tabAllEU->elementAt(i,9)->addNew<Wt::WText>(t->dist);
+        tabAllEU->elementAt(i,10)->addNew<Wt::WText>(std::to_string(t->azim));
+        tabAllEU->elementAt(i,11)->addNew<Wt::WText>(std::to_string(t->defaut));
+        tabAllEU->elementAt(i,12)->addNew<Wt::WText>(t->rmq);
+        i++;
+    }
+
+}
