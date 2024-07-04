@@ -34,6 +34,9 @@
 #include <Wt/Mail/Message.h>
 #include <Wt/Mail/Client.h>
 
+#include "Wt/WDoubleValidator.h"
+#include "Wt/WValidator.h"
+
 #include <Wt/Dbo/Dbo.h>
 
 
@@ -88,7 +91,7 @@ public:
     int statut;
     int rege;
     std::string Ht;
-    std::string circ;
+    int circ;
     std::string dist;
     int azim;
     int defaut;
@@ -101,7 +104,7 @@ public:
         dbo::field(a, UE,    "UE");
         dbo::field(a, type,  "type");
         dbo::field(a, quadrat,  "quadrat");
-         dbo::field(a, ess,       "ess");
+        dbo::field(a, ess,       "ess");
         dbo::field(a, statut,    "statut");
         dbo::field(a, rege,       "rege");
         dbo::field(a, Ht,  "Ht");
@@ -117,102 +120,118 @@ class arbreGUI  : public std::enable_shared_from_this<arbreGUI>
 {
 public:
 
-   dbo::Session * session;
+    dbo::Session * session;
 
-   WTableRow * row;
-   WLineEdit *type,*quadrat,*circ,*statut,*rege,*dist,*azim,*defaut,*rmq,*Ht;
+    WTableRow * row;
+    WLineEdit *type,*quadrat,*circ,*statut,*rege,*dist,*azim,*defaut,*rmq,*Ht;
 
-   WLineEdit *ess;
+    WLineEdit *ess;
 
-   arbreGUI(dbo::Session * session,WTableRow * row):session(session),row(row){
-      type =row->elementAt(0)->addNew<WLineEdit>();
-      quadrat =row->elementAt(1)->addNew<WLineEdit>();
-      ess =row->elementAt(2)->addNew<WLineEdit>();
+    arbreGUI(dbo::Session * session,WTableRow * row):session(session),row(row){
+        type =row->elementAt(0)->addNew<WLineEdit>();
+        quadrat =row->elementAt(1)->addNew<WLineEdit>();
+        ess =row->elementAt(2)->addNew<WLineEdit>();
 
-      //ess =row->elementAt(2)->addNew<WComboBox>();
-      //typeContactEdit_->addItem(WString::tr("typeEncoder0"));
+        //ess =row->elementAt(2)->addNew<WComboBox>();
+        //typeContactEdit_->addItem(WString::tr("typeEncoder0"));
 
-      circ =row->elementAt(3)->addNew<WLineEdit>();
-      statut =row->elementAt(4)->addNew<WLineEdit>();
-      rege =row->elementAt(5)->addNew<WLineEdit>();
-      Ht =row->elementAt(6)->addNew<WLineEdit>();
-      dist =row->elementAt(7)->addNew<WLineEdit>();
-      azim =row->elementAt(8)->addNew<WLineEdit>();
-      defaut =row->elementAt(9)->addNew<WLineEdit>();
-      rmq =row->elementAt(10)->addNew<WLineEdit>();
+        circ =row->elementAt(3)->addNew<WLineEdit>();
+        statut =row->elementAt(4)->addNew<WLineEdit>();
+        rege =row->elementAt(5)->addNew<WLineEdit>();
+        Ht =row->elementAt(6)->addNew<WLineEdit>();
+        dist =row->elementAt(7)->addNew<WLineEdit>();
+        azim =row->elementAt(8)->addNew<WLineEdit>();
+        defaut =row->elementAt(9)->addNew<WLineEdit>();
+        rmq =row->elementAt(10)->addNew<WLineEdit>();
 
-      type->enterPressed().connect(quadrat, &WWidget::setFocus);
-      quadrat->enterPressed().connect(ess, &WWidget::setFocus);
-      ess->enterPressed().connect(circ, &WWidget::setFocus);
-      circ->enterPressed().connect(statut, &WWidget::setFocus);
-      statut->enterPressed().connect(rege, &WWidget::setFocus);
-      rege->enterPressed().connect(Ht, &WWidget::setFocus);
-      Ht->enterPressed().connect(dist, &WWidget::setFocus);
-      dist->enterPressed().connect(azim, &WWidget::setFocus);
-      azim->enterPressed().connect(defaut, &WWidget::setFocus);
-      defaut->enterPressed().connect(rmq, &WWidget::setFocus);
+        type->enterPressed().connect(quadrat, &WWidget::setFocus);
+        quadrat->enterPressed().connect(ess, &WWidget::setFocus);
+        ess->enterPressed().connect(circ, &WWidget::setFocus);
+        circ->enterPressed().connect(statut, &WWidget::setFocus);
+        statut->enterPressed().connect(rege, &WWidget::setFocus);
+        rege->enterPressed().connect(Ht, &WWidget::setFocus);
+        Ht->enterPressed().connect(dist, &WWidget::setFocus);
+        dist->enterPressed().connect(azim, &WWidget::setFocus);
+        azim->enterPressed().connect(defaut, &WWidget::setFocus);
+        defaut->enterPressed().connect(rmq, &WWidget::setFocus);
 
-      circ->setValidator(std::make_shared<WIntValidator>(0,1000));
-      //const std::shared_ptr<WDoubleValidator> val = std::make_shared<WDoubleValidator>(0.0,15.0);
+        circ->setValidator(std::make_shared<WIntValidator>(0,1000));
+        dist->setValidator(std::make_shared<WDoubleValidator>(0.0,11.0));
+        Ht->setValidator(std::make_shared<WDoubleValidator>(0.0,50.0));
+        statut->setValidator(std::make_shared<WIntValidator>(0,20));
+        rege->setValidator(std::make_shared<WIntValidator>(0,20));
+        azim->setValidator(std::make_shared<WIntValidator>(0,360));
 
-      statut->setValidator(std::make_shared<WIntValidator>(0,20));
-      rege->setValidator(std::make_shared<WIntValidator>(0,20));
-      azim->setValidator(std::make_shared<WIntValidator>(0,360));
+    }
+    void add(int acr_id, int ue_id){
 
-   }
-   void add(int acr_id, int ue_id){
-       //std::cout << "tree add()"<<std::endl;
-       dbo::Transaction transaction(*session);
-       std::unique_ptr<arbre> tree = std::make_unique<arbre>();
-       tree->ACR = acr_id;
-       tree->UE = ue_id;
-       tree->type = type->valueText().toUTF8();
-       tree->quadrat = quadrat->valueText().toUTF8();
-       tree->ess = ess->valueText().toUTF8();
-       tree->Ht =Ht->valueText().toUTF8();
-       tree->circ = circ->valueText().toUTF8();
-        if(statut->valueText().toUTF8()!=""){tree->statut = std::stoi(statut->valueText().toUTF8());}
-       if(rege->valueText().toUTF8()!=""){tree->rege = std::stoi( rege->valueText().toUTF8());}
-       tree->dist =  dist->valueText().toUTF8();
-       if(azim->valueText().toUTF8()!=""){tree->azim = std::stoi( azim->valueText().toUTF8());}
-       if(defaut->valueText().toUTF8()!=""){tree->defaut = std::stoi(defaut->valueText().toUTF8());}
-       tree->rmq = rmq->valueText().toUTF8();
+        //if (dist->validate()==ValidationState::Valid && Ht->validate()==ValidationState::Valid){
+            //std::cout << "tree add()"<<std::endl;
 
-       if (tree->ess!=""){
-       dbo::ptr<arbre> treePtr = session->add(std::move(tree));
-       }
-   }
+            std::unique_ptr<arbre> tree = std::make_unique<arbre>();
+            tree->ACR = acr_id;
+            tree->UE = ue_id;
+            tree->type = type->valueText().toUTF8();
+            tree->quadrat = quadrat->valueText().toUTF8();
+            tree->ess = ess->valueText().toUTF8();
 
-   void clear(){
-       //std::cout << "tree clear()"<<std::endl;
-       ess->setText("");
-       circ->setText("");
-       statut->setText("");
-       rege->setText("");
-       dist->setText("");
-       azim->setText("");
-       defaut->setText("");
-       Ht->setText("");
-       rmq->setText("");
-   }
+            //if(Ht->valueText().toUTF8()!=""){
+            //std::cout << "Ht to double " ;
+            tree->Ht = Ht->valueText().toUTF8();//std::stod(Ht->valueText().toUTF8());
+            //std::cout << "done" << std::endl;
+            //}
+            //if(dist->valueText().toUTF8()!=""){
+            //std::cout << "dist to double " ;
+            tree->dist = dist->valueText().toUTF8();//std::stod( dist->valueText().toUTF8());
+            //std::cout << "done" << std::endl;
+            //}
+            if(circ->valueText().toUTF8()!=""){tree->circ = std::stoi(statut->valueText().toUTF8());}
+            if(statut->valueText().toUTF8()!=""){tree->statut = std::stoi(statut->valueText().toUTF8());}
+            if(rege->valueText().toUTF8()!=""){tree->rege = std::stoi( rege->valueText().toUTF8());}
+            if(azim->valueText().toUTF8()!=""){tree->azim = std::stoi( azim->valueText().toUTF8());}
+            if(defaut->valueText().toUTF8()!=""){tree->defaut = std::stoi(defaut->valueText().toUTF8());}
+            tree->rmq = rmq->valueText().toUTF8();
+            if (tree->ess!=""){
+                dbo::Transaction transaction(*session);
+                dbo::ptr<arbre> treePtr = session->add(std::move(tree));
+            }
+        //}
+    }
 
-   void setLike(arbreGUI* b){
-       ess->setText(b->ess->valueText());
-       circ->setText(b->circ->valueText());
-       statut->setText(b->statut->valueText());
-       rege->setText(b->rege->valueText());
-       dist->setText(b->dist->valueText());
-       azim->setText(b->azim->valueText());
-       defaut->setText(b->defaut->valueText());
-       Ht->setText(b->Ht->valueText());
-   }
+    bool isValid(){
+        return dist->validate()==ValidationState::Valid && Ht->validate()==ValidationState::Valid;
+    }
+
+    void clear(){
+        //std::cout << "tree clear()"<<std::endl;
+        ess->setText("");
+        circ->setText("");
+        statut->setText("");
+        rege->setText("");
+        dist->setText("");
+        azim->setText("");
+        defaut->setText("");
+        Ht->setText("");
+        rmq->setText("");
+    }
+
+    void setLike(arbreGUI* b){
+        ess->setText(b->ess->valueText());
+        circ->setText(b->circ->valueText());
+        statut->setText(b->statut->valueText());
+        rege->setText(b->rege->valueText());
+        dist->setText(b->dist->valueText());
+        azim->setText(b->azim->valueText());
+        defaut->setText(b->defaut->valueText());
+        Ht->setText(b->Ht->valueText());
+    }
 };
 
 class ue{
 public:
     int id;
     int id_ACR;
-    string bloquant,gps,rmq,rmqGPS;
+    string bloquant,gps,rmq,rmqGPS, compo;
     template<class Action>
     void persist(Action& a)
     {
@@ -221,6 +240,7 @@ public:
         dbo::field(a, bloquant,   "bloquant");
         dbo::field(a, gps,   "gpsLabel");
         dbo::field(a, rmqGPS,   "rmqGPS");
+        dbo::field(a, compo,   "compo");
         dbo::field(a, rmq,   "rmq");
     }
 };
@@ -322,25 +342,25 @@ class ACRAnalytics : public Wt::WApplication
 public:
     ACRAnalytics(const Wt::WEnvironment& env, std::string aFileDB);
 private:
-      dbo::Session session;
+    dbo::Session session;
 };
 
 class encodageRelTerrain : public Wt::WApplication
 {
 public:
     encodageRelTerrain(const Wt::WEnvironment& env, std::string aFileDB);
-    WPushButton * submitUE;
+    WPushButton * submitUE,* loadUE;
 
     std::vector<std::unique_ptr<arbreGUI>> vArbres;
     void ajoutUE();
     void displayACR(int acr_id);
 
     Wt::WTable* tabNewEU, *tabAllEU;
-    Wt::WLineEdit * ACR_id, * UE_id;
+    Wt::WLineEdit * ACR_id, * UE_id, * gpsLabel, *gpsRmq, * compo, *ueRmq;
 
 
 private:
-      dbo::Session session;
+    dbo::Session session;
 };
 
 #endif // FORMVIELLECOUPERASE_H
