@@ -826,6 +826,10 @@ box-sizing: content-box;
   vertical-align: bottom;
  }
   
+  
+ .tabEncod{
+ table-layout: fixed;
+ }
 
 
 
