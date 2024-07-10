@@ -831,6 +831,10 @@ box-sizing: content-box;
  table-layout: fixed;
  }
 
-
+.delim{
+background: lightgreen;
+display: block;
+height: 10px;	
+}
 
 

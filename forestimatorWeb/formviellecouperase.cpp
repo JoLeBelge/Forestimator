@@ -734,6 +734,17 @@ encodageRelTerrain::encodageRelTerrain(const Wt::WEnvironment& env, std::string 
     content->addNew<WText>("ACR id");
     ACR_id=content->addNew<WLineEdit>("");
     ACR_id->setValidator(std::make_shared<WIntValidator>(0,500));
+    loadUE=content->addNew<WPushButton>("afficher les données pour cette ancienne coupe rase");
+    loadUE->clicked().connect([=] {
+        if (ACR_id->valueText().toUTF8()!=""){
+            int acr = std::stoi(ACR_id->valueText().toUTF8());
+            displayACR(acr);
+        }
+    });
+
+    Wt::WContainerWidget * delim = content->addNew<WContainerWidget>();
+    delim->addStyleClass("delim");
+
     content->addNew<WText>("UE id");
     UE_id=content->addNew<WLineEdit>("");
     UE_id->setValidator(std::make_shared<WIntValidator>(0,50));
@@ -746,13 +757,14 @@ encodageRelTerrain::encodageRelTerrain(const Wt::WEnvironment& env, std::string 
     content->addNew<WText>("Remarques");
     ueRmq=content->addNew<WLineEdit>("");
 
-    loadUE=content->addNew<WPushButton>("afficher les données pour cette ancienne coupe rase");
-    loadUE->clicked().connect([=] {
-        if (ACR_id->valueText().toUTF8()!=""){
-         int acr = std::stoi(ACR_id->valueText().toUTF8());
-         displayACR(acr);
-        }
-    });
+    ACR_id->enterPressed().connect(UE_id, &WWidget::setFocus);
+    UE_id->enterPressed().connect(gpsLabel, &WWidget::setFocus);
+    gpsLabel->enterPressed().connect(gpsRmq, &WWidget::setFocus);
+    gpsRmq->enterPressed().connect(compo, &WWidget::setFocus);
+    compo->enterPressed().connect(ueRmq, &WWidget::setFocus);
+
+    delim = content->addNew<WContainerWidget>();
+    delim->addStyleClass("delim");
 
     tabNewEU = content->addWidget(std::make_unique<Wt::WTable>());
     tabNewEU->addStyleClass("table");
@@ -779,7 +791,7 @@ encodageRelTerrain::encodageRelTerrain(const Wt::WEnvironment& env, std::string 
             tree->type->setText("Arbustif");
         } else if (i>3 && i<8){
             tree->quadrat->setText(WString("Q{1}").arg(i-3));
-            tree->type->setText("Arboré");
+            tree->type->setText("Arbore");
         } else {
             tree->type->setText("Avenir");
             tree->quadrat->setText(WString("A{1}").arg(i-7));
@@ -833,6 +845,9 @@ encodageRelTerrain::encodageRelTerrain(const Wt::WEnvironment& env, std::string 
 
     submitUE=content->addNew<WPushButton>("ajouter l'UE");
     submitUE->clicked().connect(this,&encodageRelTerrain::ajoutUE);
+
+    delim = content->addNew<WContainerWidget>();
+    delim->addStyleClass("delim");
 
     tabAllEU = content->addWidget(std::make_unique<Wt::WTable>());
     tabAllEU->setHeaderCount(1);
@@ -914,7 +929,7 @@ void encodageRelTerrain::ajoutUE(){
             } else {
 
                 // sauver la ligne UE
-                std::cout << "ue add()"<<std::endl;
+                if (globTest) {std::cout << "ue add()"<<std::endl;}
 
                 std::unique_ptr<ue> u = std::make_unique<ue>();
                 u->id_ACR = acr;
@@ -926,6 +941,8 @@ void encodageRelTerrain::ajoutUE(){
 
                 //dbo::Transaction transaction(session);
                 dbo::ptr<ue> anUE = session.add(std::move(u));
+
+                if (globTest) {std::cout << " ue ajoutée à BD " << std::endl;}
 
                 // sauver les arbres
                 for (std::unique_ptr<arbreGUI> &  tree : vArbres ){
@@ -939,12 +956,24 @@ void encodageRelTerrain::ajoutUE(){
                 compo->setValueText("");
                 ueRmq->setValueText("");
                 displayACR(acr);
+
+                Wt::WMessageBox * messageBox = this->addChild(std::make_unique<Wt::WMessageBox>(
+                                                                  "bravo",
+                                                                  "L'ue a correctement été enregistrée",
+                                                                  Wt::Icon::Information,
+                                                                  Wt::StandardButton::Ok));
+                messageBox->setModal(true);
+                messageBox->buttonClicked().connect([=] {
+                    this->removeChild(messageBox);
+                });
+                messageBox->show();
             }
         }
     }
 }
 
 void encodageRelTerrain::displayACR(int acr_id){
+    if (globTest) {std::cout << " displayACR " << std::endl;}
     tabAllEU->clear();
     tabAllEU->elementAt(0,0)->addNew<WText>("ACR_id");
     tabAllEU->elementAt(0,1)->addNew<WText>("UE");
@@ -963,6 +992,7 @@ void encodageRelTerrain::displayACR(int acr_id){
     dbo::Transaction transaction(session);
     arbres vt = session.find<arbre>().where("id_ACR = ?").bind(acr_id);
     int i=1;
+    if (globTest) {std::cout << "found " << vt.size() << " tree for ACR " << acr_id << std::endl;}
     for (dbo::ptr<arbre> &t : vt){
         // je crée des wLineEdit pour pouvoir modifier les encodages? ce serait judicieux, flexible.
         tabAllEU->elementAt(i,0)->addNew<Wt::WLineEdit>(std::to_string(t->ACR));
@@ -994,7 +1024,7 @@ void encodageRelTerrain::displayACR(int acr_id){
                 t.modify()->type = type->valueText().toUTF8();
                 t.modify()->quadrat = quadrat->valueText().toUTF8();
                 t.modify()->ess = ess->valueText().toUTF8();
-               // if(Ht->valueText().toUTF8()!=""){t.modify()->Ht = std::stod( Ht->valueText().toUTF8());}
+                // if(Ht->valueText().toUTF8()!=""){t.modify()->Ht = std::stod( Ht->valueText().toUTF8());}
                 t.modify()->Ht =  Ht->valueText().toUTF8();
                 if(circ->valueText().toUTF8()!=""){t.modify()->circ = std::stoi(statut->valueText().toUTF8());}
                 if(statut->valueText().toUTF8()!=""){t.modify()->statut = std::stoi(statut->valueText().toUTF8());}

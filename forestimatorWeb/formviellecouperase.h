@@ -165,8 +165,7 @@ public:
     }
     void add(int acr_id, int ue_id){
 
-        //if (dist->validate()==ValidationState::Valid && Ht->validate()==ValidationState::Valid){
-            //std::cout << "tree add()"<<std::endl;
+        if (dist->validate()==ValidationState::Valid && Ht->validate()==ValidationState::Valid){
 
             std::unique_ptr<arbre> tree = std::make_unique<arbre>();
             tree->ACR = acr_id;
@@ -185,17 +184,24 @@ public:
             tree->dist = dist->valueText().toUTF8();//std::stod( dist->valueText().toUTF8());
             //std::cout << "done" << std::endl;
             //}
-            if(circ->valueText().toUTF8()!=""){tree->circ = std::stoi(statut->valueText().toUTF8());}
-            if(statut->valueText().toUTF8()!=""){tree->statut = std::stoi(statut->valueText().toUTF8());}
-            if(rege->valueText().toUTF8()!=""){tree->rege = std::stoi( rege->valueText().toUTF8());}
-            if(azim->valueText().toUTF8()!=""){tree->azim = std::stoi( azim->valueText().toUTF8());}
-            if(defaut->valueText().toUTF8()!=""){tree->defaut = std::stoi(defaut->valueText().toUTF8());}
+            if(circ->valueText().toUTF8()!=""){
+                tree->circ = std::stoi(circ->valueText().toUTF8());}
+            if(statut->valueText().toUTF8()!=""){
+                tree->statut = std::stoi(statut->valueText().toUTF8());}
+            if(rege->valueText().toUTF8()!=""){
+                tree->rege = std::stoi( rege->valueText().toUTF8());}
+            if(azim->valueText().toUTF8()!=""){
+                tree->azim = std::stoi( azim->valueText().toUTF8());}
+            if(defaut->valueText().toUTF8()!=""){
+                tree->defaut = std::stoi(defaut->valueText().toUTF8());}
             tree->rmq = rmq->valueText().toUTF8();
             if (tree->ess!=""){
+                //std::cout << "tree add()"<<std::endl;
                 dbo::Transaction transaction(*session);
                 dbo::ptr<arbre> treePtr = session->add(std::move(tree));
+                //std::cout << "done"<<std::endl;
             }
-        //}
+        }
     }
 
     bool isValid(){
