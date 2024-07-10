@@ -734,7 +734,23 @@ encodageRelTerrain::encodageRelTerrain(const Wt::WEnvironment& env, std::string 
     content->addNew<WText>("ACR id");
     ACR_id=content->addNew<WLineEdit>("");
     ACR_id->setValidator(std::make_shared<WIntValidator>(0,500));
-    loadUE=content->addNew<WPushButton>("afficher les données pour cette ancienne coupe rase");
+
+    content->addNew<WText>("date des mesures");
+    date=content->addNew<WLineEdit>("");
+
+    content->addNew<WText>("opérateurs");
+    ope=content->addNew<WLineEdit>("");
+
+    content->addNew<WText>("gps");
+    gps=content->addNew<WLineEdit>("");
+
+    content->addNew<WText>("Remarque Générale");
+    ACRrmq=content->addNew<WTextArea>("");
+
+    saveACRbut=content->addNew<WPushButton>("sauver les infos ACR");
+    saveACRbut->clicked().connect(this,&encodageRelTerrain::saveACR);
+
+    loadUE=content->addNew<WPushButton>("afficher arbres ACR");
     loadUE->clicked().connect([=] {
         if (ACR_id->valueText().toUTF8()!=""){
             int acr = std::stoi(ACR_id->valueText().toUTF8());
@@ -748,7 +764,7 @@ encodageRelTerrain::encodageRelTerrain(const Wt::WEnvironment& env, std::string 
     content->addNew<WText>("UE id");
     UE_id=content->addNew<WLineEdit>("");
     UE_id->setValidator(std::make_shared<WIntValidator>(0,50));
-    content->addNew<WText>("GPS label");
+    content->addNew<WText>("GPS label (facultatif!!");
     gpsLabel=content->addNew<WLineEdit>("");
     content->addNew<WText>("GPS remarque");
     gpsRmq=content->addNew<WLineEdit>("");
@@ -858,6 +874,33 @@ encodageRelTerrain::encodageRelTerrain(const Wt::WEnvironment& env, std::string 
 
 }
 
+void encodageRelTerrain::saveACR(){
+    if (ACR_id->valueText().toUTF8()!=""){
+        int acr = std::stoi(ACR_id->valueText().toUTF8());
+
+        std::unique_ptr<ACR_ter> a = std::make_unique<ACR_ter>();
+        a->id_ACR = acr;
+        a->gps = gpsLabel->valueText().toUTF8();
+        a->date = date->valueText().toUTF8();
+        a->ope = compo->valueText().toUTF8();
+        a->rmq = ACRrmq->valueText().toUTF8();
+        dbo::Transaction transaction(session);
+        dbo::ptr<ACR_ter> anACR = session.add(std::move(a));
+
+        Wt::WMessageBox * messageBox = this->addChild(std::make_unique<Wt::WMessageBox>(
+                                                          "Ancienne coupe rase",
+                                                          "les infos de l'ancienne coupe rase ont été enregistrée. Vous pouvez à présent encoder les UE",
+                                                          Wt::Icon::Information,
+                                                          Wt::StandardButton::Ok));
+        messageBox->setModal(true);
+        messageBox->buttonClicked().connect([=] {
+            this->removeChild(messageBox);
+        });
+        messageBox->show();
+    }
+}
+
+
 void encodageRelTerrain::ajoutUE(){
 
     // d'abord un premier check
@@ -896,7 +939,7 @@ void encodageRelTerrain::ajoutUE(){
         if (vt.size()>0){
             Wt::WMessageBox * messageBox = this->addChild(std::make_unique<Wt::WMessageBox>(
                                                               "Il existe déjà des arbres pour cette UE et cette ancienne coupe rase",
-                                                              "Désolé, vous ne pouvez pas enoder de nouveaux arbres si l'UE en contient déjà",
+                                                              "Vous allez ajouter des arbres à une placette (UE) déjà existante",
                                                               Wt::Icon::Information,
                                                               Wt::StandardButton::Ok));
             messageBox->setModal(true);
@@ -905,72 +948,71 @@ void encodageRelTerrain::ajoutUE(){
             });
             messageBox->show();
 
-        }else{
+        }
 
-            bool allValid(1);
+
+        bool allValid(1);
+        for (std::unique_ptr<arbreGUI> &  tree : vArbres ){
+            if (!tree->isValid()){allValid=0;}
+        }
+
+
+        if (!allValid){
+            Wt::WMessageBox * messageBox = this->addChild(std::make_unique<Wt::WMessageBox>(
+                                                              "Vérifiez l'encodage des arbres",
+                                                              "Vous avez renseigné certaines valeurs de distance ou de hauteur qui ne sont pas valides",
+                                                              Wt::Icon::Critical,
+                                                              Wt::StandardButton::Ok));
+            messageBox->setModal(true);
+            messageBox->buttonClicked().connect([=] {
+                this->removeChild(messageBox);
+            });
+            messageBox->show();
+        } else {
+
+            // sauver la ligne UE
+            if (globTest) {std::cout << "ue add()"<<std::endl;}
+
+            std::unique_ptr<ue> u = std::make_unique<ue>();
+            u->id_ACR = acr;
+            u->id = ue_id;
+            u->gps = gpsLabel->valueText().toUTF8();
+            u->rmqGPS = gpsRmq->valueText().toUTF8();
+            u->compo = compo->valueText().toUTF8();
+            u->rmq = ueRmq->valueText().toUTF8();
+
+            //dbo::Transaction transaction(session);
+            dbo::ptr<ue> anUE = session.add(std::move(u));
+
+            if (globTest) {std::cout << " ue ajoutée à BD " << std::endl;}
+
+            // sauver les arbres
             for (std::unique_ptr<arbreGUI> &  tree : vArbres ){
-                if (!tree->isValid()){allValid=0;}
+                tree->add(acr,ue_id);
+                tree->clear();
             }
 
+            UE_id->setValueText(std::to_string(ue_id+1));
+            gpsLabel->setValueText("");
+            gpsRmq->setValueText("");
+            compo->setValueText("");
+            ueRmq->setValueText("");
+            displayACR(acr);
 
-            if (!allValid){
-                Wt::WMessageBox * messageBox = this->addChild(std::make_unique<Wt::WMessageBox>(
-                                                                  "Vérifiez l'encodage des arbres",
-                                                                  "Vous avez renseigné certaines valeurs de distance ou de hauteur qui ne sont pas valides",
-                                                                  Wt::Icon::Critical,
-                                                                  Wt::StandardButton::Ok));
-                messageBox->setModal(true);
-                messageBox->buttonClicked().connect([=] {
-                    this->removeChild(messageBox);
-                });
-                messageBox->show();
-
-
-            } else {
-
-                // sauver la ligne UE
-                if (globTest) {std::cout << "ue add()"<<std::endl;}
-
-                std::unique_ptr<ue> u = std::make_unique<ue>();
-                u->id_ACR = acr;
-                u->id = ue_id;
-                u->gps = gpsLabel->valueText().toUTF8();
-                u->rmqGPS = gpsRmq->valueText().toUTF8();
-                u->compo = compo->valueText().toUTF8();
-                u->rmq = ueRmq->valueText().toUTF8();
-
-                //dbo::Transaction transaction(session);
-                dbo::ptr<ue> anUE = session.add(std::move(u));
-
-                if (globTest) {std::cout << " ue ajoutée à BD " << std::endl;}
-
-                // sauver les arbres
-                for (std::unique_ptr<arbreGUI> &  tree : vArbres ){
-                    tree->add(acr,ue_id);
-                    tree->clear();
-                }
-
-                UE_id->setValueText(std::to_string(ue_id+1));
-                gpsLabel->setValueText("");
-                gpsRmq->setValueText("");
-                compo->setValueText("");
-                ueRmq->setValueText("");
-                displayACR(acr);
-
-                Wt::WMessageBox * messageBox = this->addChild(std::make_unique<Wt::WMessageBox>(
-                                                                  "bravo",
-                                                                  "L'ue a correctement été enregistrée",
-                                                                  Wt::Icon::Information,
-                                                                  Wt::StandardButton::Ok));
-                messageBox->setModal(true);
-                messageBox->buttonClicked().connect([=] {
-                    this->removeChild(messageBox);
-                });
-                messageBox->show();
-            }
+            Wt::WMessageBox * messageBox = this->addChild(std::make_unique<Wt::WMessageBox>(
+                                                              "bravo",
+                                                              "L'ue a correctement été enregistrée",
+                                                              Wt::Icon::Information,
+                                                              Wt::StandardButton::Ok));
+            messageBox->setModal(true);
+            messageBox->buttonClicked().connect([=] {
+                this->removeChild(messageBox);
+            });
+            messageBox->show();
         }
     }
 }
+
 
 void encodageRelTerrain::displayACR(int acr_id){
     if (globTest) {std::cout << " displayACR " << std::endl;}
@@ -1038,6 +1080,17 @@ void encodageRelTerrain::displayACR(int acr_id){
                 if (t->ess!=""){
                     dbo::Transaction transaction(session);
                     t.flush();
+
+                    Wt::WMessageBox * messageBox = this->addChild(std::make_unique<Wt::WMessageBox>(
+                                                                      "Modification d'un Arbre",
+                                                                      "l'arbre a correctement été modifié",
+                                                                      Wt::Icon::Information,
+                                                                      Wt::StandardButton::Ok));
+                    messageBox->setModal(true);
+                    messageBox->buttonClicked().connect([=] {
+                        this->removeChild(messageBox);
+                    });
+                    messageBox->show();
                 }
             }
         });

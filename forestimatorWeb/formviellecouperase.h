@@ -355,14 +355,21 @@ class encodageRelTerrain : public Wt::WApplication
 {
 public:
     encodageRelTerrain(const Wt::WEnvironment& env, std::string aFileDB);
-    WPushButton * submitUE,* loadUE;
+    WPushButton * submitUE,* loadUE, * saveACRbut;
+
+    void saveACR();
 
     std::vector<std::unique_ptr<arbreGUI>> vArbres;
     void ajoutUE();
     void displayACR(int acr_id);
 
     Wt::WTable* tabNewEU, *tabAllEU;
-    Wt::WLineEdit * ACR_id, * UE_id, * gpsLabel, *gpsRmq, * compo, *ueRmq;
+    //UE
+    Wt::WLineEdit * UE_id, * gpsLabel, *gpsRmq, * compo, *ueRmq;
+    // ACR
+    Wt::WLineEdit * ACR_id, * date, * ope, * gps;
+
+    WTextArea * ACRrmq;
 
 
 private:
