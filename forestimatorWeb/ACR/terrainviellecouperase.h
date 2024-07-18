@@ -1,5 +1,5 @@
-#ifndef FORMVIELLECOUPERASE_H
-#define FORMVIELLECOUPERASE_H
+#ifndef TERRAINVIELLECOUPERASE_H
+#define TERRAINVIELLECOUPERASE_H
 #include <Wt/WApplication.h>
 #include <Wt/WEnvironment.h>
 #include <Wt/WString.h>
@@ -22,7 +22,6 @@
 #include <Wt/WMessageBox.h>
 #include "Wt/WTemplate.h"
 #include "layerstatchart.h"
-
 #include <Wt/WItemDelegate.h>
 #include <Wt/WStandardItem.h>
 #include <Wt/WComboBox.h>
@@ -33,52 +32,13 @@
 #include <sqlite3.h>
 #include <Wt/Mail/Message.h>
 #include <Wt/Mail/Client.h>
-
 #include "Wt/WDoubleValidator.h"
 #include "Wt/WValidator.h"
 
 #include <Wt/Dbo/Dbo.h>
 
-
-
 using namespace Wt;
 namespace dbo = Wt::Dbo;
-
-class acr{
-public:
-    std::string     date,vosRef,nom,prenom,contact,gsm;
-    bool     keepInTouch;
-    std::string typeContact,anneeCoupe,regeNat,vegeBloquante,objectif,spCoupe,sanitCoupe,travaux,plantation,gibier,descr,surf,polygon;
-    int id;
-
-    template<class Action>
-    void persist(Action& a)
-    {
-        dbo::field(a, id,    "id");
-        dbo::field(a, date,    "date");
-        dbo::field(a, vosRef,       "vosRef");
-        dbo::field(a, nom,   "nom");
-        dbo::field(a, prenom,    "prenom");
-        dbo::field(a, contact,  "contact");
-        dbo::field(a, typeContact,  "typeContact");
-        dbo::field(a, anneeCoupe,  "anneeCoupe");
-        dbo::field(a, regeNat,  "regeNat");
-        dbo::field(a, typeContact,  "typeContact");
-        dbo::field(a, anneeCoupe,  "anneeCoupe");
-        dbo::field(a, vegeBloquante,  "vegeBloquante");
-        dbo::field(a, objectif,  "objectif");
-        dbo::field(a, spCoupe,  "spCoupe");
-        dbo::field(a, sanitCoupe,  "sanitCoupe");
-        dbo::field(a, travaux,  "travaux");
-        dbo::field(a, plantation,  "plantation");
-        dbo::field(a, gibier,  "gibier");
-        dbo::field(a, descr,  "descr");
-        dbo::field(a, surf,  "surf");
-        dbo::field(a, polygon,  "polygon");
-        dbo::field(a, keepInTouch,  "keepInTouch");
-    }
-
-};
 
 class arbre{
 public:
@@ -132,27 +92,24 @@ public:
         quadrat =row->elementAt(1)->addNew<WLineEdit>();
         ess =row->elementAt(2)->addNew<WLineEdit>();
 
-        //ess =row->elementAt(2)->addNew<WComboBox>();
-        //typeContactEdit_->addItem(WString::tr("typeEncoder0"));
-
-        circ =row->elementAt(3)->addNew<WLineEdit>();
-        statut =row->elementAt(4)->addNew<WLineEdit>();
-        rege =row->elementAt(5)->addNew<WLineEdit>();
+        dist =row->elementAt(3)->addNew<WLineEdit>();
+        circ =row->elementAt(4)->addNew<WLineEdit>();
+        azim =row->elementAt(5)->addNew<WLineEdit>();
         Ht =row->elementAt(6)->addNew<WLineEdit>();
-        dist =row->elementAt(7)->addNew<WLineEdit>();
-        azim =row->elementAt(8)->addNew<WLineEdit>();
+        statut =row->elementAt(7)->addNew<WLineEdit>();
+        rege =row->elementAt(8)->addNew<WLineEdit>();
         defaut =row->elementAt(9)->addNew<WLineEdit>();
         rmq =row->elementAt(10)->addNew<WLineEdit>();
 
         type->enterPressed().connect(quadrat, &WWidget::setFocus);
         quadrat->enterPressed().connect(ess, &WWidget::setFocus);
-        ess->enterPressed().connect(circ, &WWidget::setFocus);
-        circ->enterPressed().connect(statut, &WWidget::setFocus);
+        ess->enterPressed().connect(dist, &WWidget::setFocus);
+        dist->enterPressed().connect(circ, &WWidget::setFocus);
+        circ->enterPressed().connect(azim, &WWidget::setFocus);
+        azim->enterPressed().connect(Ht, &WWidget::setFocus);
+        Ht->enterPressed().connect(statut, &WWidget::setFocus);
         statut->enterPressed().connect(rege, &WWidget::setFocus);
-        rege->enterPressed().connect(Ht, &WWidget::setFocus);
-        Ht->enterPressed().connect(dist, &WWidget::setFocus);
-        dist->enterPressed().connect(azim, &WWidget::setFocus);
-        azim->enterPressed().connect(defaut, &WWidget::setFocus);
+        rege->enterPressed().connect(defaut, &WWidget::setFocus);
         defaut->enterPressed().connect(rmq, &WWidget::setFocus);
 
         circ->setValidator(std::make_shared<WIntValidator>(0,1000));
@@ -166,24 +123,14 @@ public:
     void add(int acr_id, int ue_id){
 
         if (dist->validate()==ValidationState::Valid && Ht->validate()==ValidationState::Valid){
-
             std::unique_ptr<arbre> tree = std::make_unique<arbre>();
             tree->ACR = acr_id;
             tree->UE = ue_id;
             tree->type = type->valueText().toUTF8();
             tree->quadrat = quadrat->valueText().toUTF8();
             tree->ess = ess->valueText().toUTF8();
-
-            //if(Ht->valueText().toUTF8()!=""){
-            //std::cout << "Ht to double " ;
-            tree->Ht = Ht->valueText().toUTF8();//std::stod(Ht->valueText().toUTF8());
-            //std::cout << "done" << std::endl;
-            //}
-            //if(dist->valueText().toUTF8()!=""){
-            //std::cout << "dist to double " ;
-            tree->dist = dist->valueText().toUTF8();//std::stod( dist->valueText().toUTF8());
-            //std::cout << "done" << std::endl;
-            //}
+            tree->Ht = Ht->valueText().toUTF8();
+            tree->dist = dist->valueText().toUTF8();
             if(circ->valueText().toUTF8()!=""){
                 tree->circ = std::stoi(circ->valueText().toUTF8());}
             if(statut->valueText().toUTF8()!=""){
@@ -199,7 +146,6 @@ public:
                 //std::cout << "tree add()"<<std::endl;
                 dbo::Transaction transaction(*session);
                 dbo::ptr<arbre> treePtr = session->add(std::move(tree));
-                //std::cout << "done"<<std::endl;
             }
         }
     }
@@ -209,7 +155,6 @@ public:
     }
 
     void clear(){
-        //std::cout << "tree clear()"<<std::endl;
         ess->setText("");
         circ->setText("");
         statut->setText("");
@@ -238,6 +183,7 @@ public:
     int id;
     int id_ACR;
     string bloquant,gps,rmq,rmqGPS, compo;
+    int ori;
     template<class Action>
     void persist(Action& a)
     {
@@ -247,6 +193,7 @@ public:
         dbo::field(a, gps,   "gpsLabel");
         dbo::field(a, rmqGPS,   "rmqGPS");
         dbo::field(a, compo,   "compo");
+        dbo::field(a, ori,   "ori");
         dbo::field(a, rmq,   "rmq");
     }
 };
@@ -267,90 +214,6 @@ public:
 };
 
 
-class formVielleCoupeRase : public WApplication
-{
-public:
-    formVielleCoupeRase(const Wt::WEnvironment& env, cDicoApt * dico, std::string aFileDB);
-
-    void loadStyles();
-    void submit();
-    void sendSummaryMail();
-    void displayLayer(std::string aCode);
-    void displayCommune();
-    OGREnvelope computeGlobalGeom(std::string aFile);
-    void validDraw(std::string geojson);
-
-    void vider(bool all=1);
-
-    std::string format4SQL(std::string aString);
-
-    WLineEdit *nomEncoderEdit_;
-    WLineEdit *prenomEncoderEdit_;
-    WLineEdit *contactEncoderEdit_;
-    WLineEdit *contactEncoderGSMEdit_;
-    WCheckBox * keepInTouch;
-    WComboBox *typeContactEdit_;
-    WComboBox *anneeVCREdit_;
-    WLineEdit *regeNatEdit_;
-    WLineEdit *vegeBloquanteEdit_;
-    WTextArea *VCRdescriptionEdit_;
-
-    WLineEdit *vosrefEdit_;
-    WComboBox *objectifEdit_;
-    WLineEdit *spEdit_;
-    WLineEdit *sanitEdit_;
-    WLineEdit *travSylviEdit_;
-    WLineEdit *plantationEdit_;
-    WLineEdit *gibierEdit_;
-
-    WPushButton * bCancel;
-
-    WComboBox * commune_;
-    // clé ; index dans combobox. val= clé (INS commune , code Division)
-    std::map<int,int> aMLabelCom;
-
-private:
-
-    std::string SQLstring;
-
-    double surf;
-    bool polygValid;
-    std::string polyg;
-    OGRGeometry * geom;
-    std::string mBDFile;
-    dbo::Session session;
-
-    cDicoApt * mDico;
-};
-
-class Wol: public WContainerWidget
-{
-public:
-    Wol();
-
-    void updateView(){
-        doJavaScript("refreshLayers();");
-    }
-
-    virtual void layoutSizeChanged(int width, int height)
-    {
-        WContainerWidget::layoutSizeChanged(width, height);
-        doJavaScript("map.updateSize();");
-    }
-
-    JSignal<std::string>  polygGeojson_;
-    JSignal<std::string>& polygGeojson() { return polygGeojson_; }
-    JSlot slot;
-};
-
-class ACRAnalytics : public Wt::WApplication
-{
-public:
-    ACRAnalytics(const Wt::WEnvironment& env, std::string aFileDB);
-private:
-    dbo::Session session;
-};
-
 class encodageRelTerrain : public Wt::WApplication
 {
 public:
@@ -365,15 +228,18 @@ public:
 
     Wt::WTable* tabNewEU, *tabAllEU;
     //UE
-    Wt::WLineEdit * UE_id, * gpsLabel, *gpsRmq, * compo, *ueRmq;
+    Wt::WLineEdit * UE_id, * gpsLabel, *gpsRmq, * compo, *ueRmq, * ori;
     // ACR
     Wt::WLineEdit * ACR_id, * date, * ope, * gps;
 
     WTextArea * ACRrmq;
+
+    WComboBox * comboA1, * comboA2;
 
 
 private:
     dbo::Session session;
 };
 
-#endif // FORMVIELLECOUPERASE_H
+
+#endif // TERRAINVIELLECOUPERASE_H

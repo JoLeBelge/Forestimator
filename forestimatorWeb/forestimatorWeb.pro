@@ -22,6 +22,8 @@ DEPENDPATH += $$PWD../stationDescriptor/rapidxml/
 
 SOURCES += main.cpp \
     ../carteApt/cdicoaptbase.cpp \
+    ACR/terrainviellecouperase.cpp \
+    ACR/formviellecouperase.cpp \
     analytics.cpp \
     api/anaponctuelleresource.cpp \
     api/cnswresource.cpp \
@@ -31,7 +33,6 @@ SOURCES += main.cpp \
     auth/User.cpp \
     cadastre.cpp \
     ../carteApt/matapt.cpp \
-    formviellecouperase.cpp \
     mataptcs.cpp \
     panier.cpp \
     simplepoint.cpp \
@@ -59,6 +60,8 @@ SOURCES += main.cpp \
 
 HEADERS += \
     ../carteApt/cdicoaptbase.h \
+    ACR/terrainviellecouperase.h \
+    ACR/formviellecouperase.h \
     analytics.h \
     api/anaponctuelleresource.h \
     api/cnswresource.h \
@@ -67,7 +70,6 @@ HEADERS += \
     auth/Session.h \
     auth/User.h \
     cadastre.h \
-    formviellecouperase.h \
     main.h \
     ../carteApt/matapt.h \
     mataptcs.h \

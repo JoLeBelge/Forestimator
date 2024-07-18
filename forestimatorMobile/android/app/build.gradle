@@ -73,7 +73,7 @@ android {
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
         //minSdkVersion flutter.minSdkVersion // changé sinon build rale à cause de multidex
         minSdkVersion 21
-        targetSdkVersion flutter.targetSdkVersion
+        targetSdkVersion 34 // je change ça pour respecter les expectations de google play store, 07/2024
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
     }
