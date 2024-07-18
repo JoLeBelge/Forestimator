@@ -14,7 +14,7 @@ data/extents*.db*
 data/analytics*.db*
 data/cadastre.db*
 data/VCR.db*
-data/ACR.db*
+data/ACR*.db*
 stationDescriptor/stationDescriptor.pro.*
 carteApt/*.autosave
 stationDescriptor/*.autosave
