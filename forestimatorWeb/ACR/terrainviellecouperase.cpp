@@ -112,10 +112,10 @@ encodageRelTerrain::encodageRelTerrain(const Wt::WEnvironment& env, std::string 
 
         std::unique_ptr<arbreGUI>  tree = std::make_unique<arbreGUI>(&session,tabNewEU->rowAt(i+1));
         if (i>3 && i<8){
-            tree->quadrat->setText(WString("Q{1}").arg(i+1));
+            tree->quadrat->setText(WString("Q{1}").arg(i-3));
             tree->type->setText("Arbustif");
         } else if (i<4){
-            tree->quadrat->setText(WString("Q{1}").arg(i-3));
+            tree->quadrat->setText(WString("Q{1}").arg(i+1));
             tree->type->setText("Arbore");
         } else {
             tree->type->setText("Avenir");
@@ -145,26 +145,26 @@ encodageRelTerrain::encodageRelTerrain(const Wt::WEnvironment& env, std::string 
 
     comboA1->changed().connect([=] {
         if(comboA1->valueText().toUTF8()== "Q1"){
-            vArbres.at(8)->setLike(vArbres.at(4).get());
+            vArbres.at(8)->setLike(vArbres.at(0).get());
         } else if(comboA1->valueText().toUTF8()== "Q2"){
-            vArbres.at(8)->setLike(vArbres.at(5).get());
+            vArbres.at(8)->setLike(vArbres.at(1).get());
         } else if(comboA1->valueText().toUTF8()== "Q3"){
-            vArbres.at(8)->setLike(vArbres.at(6).get());
+            vArbres.at(8)->setLike(vArbres.at(2).get());
         } else if(comboA1->valueText().toUTF8()== "Q4"){
-            vArbres.at(8)->setLike(vArbres.at(7).get());
+            vArbres.at(8)->setLike(vArbres.at(3).get());
         }
         vArbres.at(8)->rmq->setText(comboA1->valueText());
     });
 
     comboA2->changed().connect([=] {
         if(comboA2->valueText().toUTF8()== "Q1"){
-            vArbres.at(9)->setLike(vArbres.at(4).get());
+            vArbres.at(9)->setLike(vArbres.at(0).get());
         } else if(comboA2->valueText().toUTF8()== "Q2"){
-            vArbres.at(9)->setLike(vArbres.at(5).get());
+            vArbres.at(9)->setLike(vArbres.at(1).get());
         } else if(comboA2->valueText().toUTF8()== "Q3"){
-            vArbres.at(9)->setLike(vArbres.at(6).get());
+            vArbres.at(9)->setLike(vArbres.at(2).get());
         } else if(comboA2->valueText().toUTF8()== "Q4"){
-            vArbres.at(9)->setLike(vArbres.at(7).get());
+            vArbres.at(9)->setLike(vArbres.at(3).get());
         }
         vArbres.at(9)->rmq->setText(comboA2->valueText());
     });
