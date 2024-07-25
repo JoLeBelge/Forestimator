@@ -42,7 +42,7 @@ encodageRelTerrain::encodageRelTerrain(const Wt::WEnvironment& env, std::string 
     content->addNew<WText>("opérateurs");
     ope=content->addNew<WLineEdit>("");
 
-    content->addNew<WText>("gps");
+    content->addNew<WText>("gps(X5 ou RS2+)");
     gps=content->addNew<WLineEdit>("");
 
     content->addNew<WText>("Remarque Générale");
@@ -191,9 +191,9 @@ void encodageRelTerrain::saveACR(){
 
         std::unique_ptr<ACR_ter> a = std::make_unique<ACR_ter>();
         a->id_ACR = acr;
-        a->gps = gpsLabel->valueText().toUTF8();
+        a->gps = gps->valueText().toUTF8();
         a->date = date->valueText().toUTF8();
-        a->ope = compo->valueText().toUTF8();
+        a->ope = ope->valueText().toUTF8();
         a->rmq = ACRrmq->valueText().toUTF8();
         dbo::Transaction transaction(session);
         dbo::ptr<ACR_ter> anACR = session.add(std::move(a));
@@ -307,7 +307,7 @@ void encodageRelTerrain::ajoutUE(){
             gpsLabel->setValueText("");
             gpsRmq->setValueText("");
             compo->setValueText("");
-            ori->setValueText("");
+            //ori->setValueText("");
             ueRmq->setValueText("");
 
             comboA1->setCurrentIndex(0);
