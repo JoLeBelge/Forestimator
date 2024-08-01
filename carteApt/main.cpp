@@ -82,13 +82,13 @@ int main(int argc, char *argv[])
         cDicoApt dico(adirBD);
         cApliCarteApt aACA(&dico);
 
-        if(0){
+        if(1){
         // je boucle les layersbase et non les essences car j'ai besoin du chemin d'accès au raster
         for (std::pair<std::string,std::shared_ptr<layerBase>>  kv : dico.VlayerBase()){
 
             std::string essCode(kv.second->EssCode()); //essCode =="AG"  | essCode =="AP" |essCode =="EK") |essCode =="PG" essCode =="PY" |essCode =="PZ"
 
-            if (carteFEE &&(kv.second->getCatLayer()==TypeLayer::FEE)){
+            if (carteFEE &&(kv.second->getCatLayer()==TypeLayer::FEE & essCode =="BP" )){
                 aACA.carteAptFEE(dico.getEss(essCode),kv.second->getPathTif(),true);
             }
 

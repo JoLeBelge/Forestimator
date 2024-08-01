@@ -403,5 +403,74 @@ La photointerprétation a été réalisée sur 4221 points sur l'ensemble de la 
 <message id="msg.charger.poly.capa"> Afficher la parcelle cadastre contenant cette position? Cet affichage sert pour effectuer des analyses surfaciques sur cette zone.</message>
 
 
+<message id="confidentialite">
+ <p class="u-excerpt">L'Université de Liège entend respecter le Règlement Général pour la Protection des Données (RGPD - Règlement européen 2016/679 du 27 avril 2016) organisant le traitement de données à caractère personnel et la réglementation belge pertinente en vigueur.</p>
+ <p style="text-align: justify;">Le responsable des traitements de données à caractère personnel est l’Université de Liège dont le siège social se situe Place du 20-Août, 7 à 4000 Liège. L’Université de Liège est une institution publique qui possède une double personnalité juridique : elle agit, d'une part, en tant que Communauté française de Belgique (dont elle est un organe déconcentré) (0807.970.507) et, d'autre part, en qualité d'établissement public déconcentré et autonome, appelé « le Patrimoine de l'Université de Liège » (0325.777.171). Elle est dûment représentée par Madame Anne-Sophie Nyssen, Rectrice.</p>
+ <h2>Traitement de données à caractère personnel</h2>
+ <p>Les données à caractère personnel doivent être entendues, au sens du RGPD, comme «&nbsp;toute information se rapportant à une personne physique identifiée ou identifiable.&nbsp;» Ces données rassemblent toutes les informations permettant d’identifier une personne physique, «&nbsp;directement ou indirectement, notamment par référence à un identifiant, tel qu'un nom, un numéro d'identification, des données de localisation, un identifiant en ligne, ou à un ou plusieurs éléments spécifiques propres à son identité physique, physiologique, génétique, psychique, économique, culturelle ou sociale.&nbsp;»</p>
+ <p>Le traitement de ces données est entendu au sens large. Cela inclue «&nbsp;la collecte, l'enregistrement, l'organisation, la structuration, la conservation, l'adaptation ou la modification, l'extraction, la consultation, l'utilisation, la communication par transmission, la diffusion ou toute autre forme de mise à disposition, le rapprochement ou l'interconnexion, la limitation, l'effacement ou la destruction.&nbsp;»</p>
+ <p>Les données à caractère personnel de l'utilisateur recueillies par le biais de formulaires en ligne ne seront traitées par l'ULiège que dans les limites nécessaires aux finalités indiquées à l'occasion de la collecte de ces données. Les données à caractère personnel ne sont transmises qu'au personnel chargé de réaliser les finalités exposées à l'occasion de la collecte de ces données.</p>
+ <p>Les données à caractère personnel des utilisateurs collectées par l’entremise des fomulaires du présent site ne sont en aucun cas traitées à des fins commerciales. Plus généralement, elles ne seront ni transmises ni cédées à d'autres organisations, sauf accord exprès de l'utilisateur.</p>
+ 
+ <h2>Forestimator</h2>
+ 
+ Forestimator se décline en une version web et en une version mobile (application android pour smartphone). L'application smartphone fonctionne main dans la main avec la version web, en effectuant des requêtes quand le mode online est activé. Par exemple, une analyse ponctuelle effectuée sur l'application forestimator va envoyer une requête à la version web de forestimator, qui renverra la description de la station et des peuplements en place à l'application.
+ 
+ <h2>Données utilisateur de l'application mobile Forestimator</h2>
+ Aucune donnée relative aux utilisateurs n'est collectée par l'application mobile.
+ 
+ <h2>Cookies du site web forestimator</h2>
+ 
+ <p>Le présent site (Forestimator) utilise les <em>cookies</em> suivants&nbsp;:</p>
+ 
+ <p>Ces <em>cookies </em>sont utilisés dans le seul but de collecter des informations relatives à l'utilisation du site. Les informations collectées ne permettent pas directement une identification personnelle de l'utilisateur. Conformément à l'avis de l'Autorité de Protection des Données : <a href="https://www.autoriteprotectiondonnees.be/professionnel/themes/cookies">https://www.autoriteprotectiondonnees.be/professionnel/themes/cookies</a></p>
+ 
+ <p>Ces derniers cookies sont optionnels. Ils sont dès lors soumis au consentement de l’utilisateur. Lors de la connexion initiale, l’utilisateur est invité à indiquer son choix quant à ces cookies. Ce choix est alors enregistré pour la session.</p>
+ 
+ <h3>Droits de la personne concernée</h3>
+ <p>Comme le prévoit le RGPD (Art. 15 à 23), chaque personne concernée par le traitement de données peut, en justifiant de son identité, exercer une série de droits&nbsp;:</p>
+ <ul>
+  <li>obtenir, sans frais, une copie des données à caractère personnel la concernant faisant l’objet d’un traitement par l’ULiège et, le cas échéant, toute information disponible sur leur finalité, leur origine et leur destination;</li>
+  <li>obtenir, sans frais, la rectification de toute donnée à caractère personnel inexacte la concernant ainsi que d’obtenir que les données incomplètes soient complétées&nbsp;;</li>
+  <li>obtenir, sous réserve des conditions prévues par la réglementation (cf. ci-après) et sans frais, l’effacement de données à caractère personnel la concernant;</li>
+  <li>obtenir, sous réserve des conditions prévues par la réglementation et sans frais, la limitation du traitement de données à caractère personnel la concernant;</li>
+  <li>obtenir, sans frais, la portabilité des données à caractère personnel la concernant et qu’elle a fournies à l’Université, c’est - à - dire de recevoir, sans frais, les données dans un format structuré couramment utilisé, à la condition que le traitement soit fondé sur le consentement ou sur un contrat et qu’il soit effectué à l’aide de procédés automatisés ;</li>
+  <li>s’opposer, sous réserve des conditions prévues par la réglementation et sans frais, pour des raisons tenant à sa situation particulière, au traitement des données à caractère personnel la concernant ;</li>
+  <li>introduire une réclamation auprès de l’Autorité de protection des données (<a href="https://www.autoriteprotectiondonnees.be" target="_blank" rel="noopener">https://www.autoriteprotectiondonnees.be</a>, <a href="mailto:contact@apd-gba.be">contact@apd-gba.be</a>).</li>
+ </ul>
+ <h2>Conditions d’exercice des droits</h2>
+ <p>Certains de ces droits sont soumis à des conditions.</p>
+ <h3>Droit d’effacement (Article 17 du RGPD)</h3>
+ <p>L’effacement de données à caractère personnel la concernant peut être exercé par une personne :</p>
+ <ul>
+  <li>si ces données ne sont plus nécessaires au regard des finalités pour lesquelles elles ont été collectées ;</li>
+  <li>si la personne concernée retire le consentement sur lequel est fondé le traitement et qu’il n’existe pas d’autre fondement juridique au traitement ;</li>
+  <li>si la personne concernée s’oppose au traitement et qu’il n’existe pas de motif légitime impérieux pour le traitement ou si la personne concernée s’oppose à un traitement à des fins de prospection ;</li>
+  <li>si les données à caractère personnel ont fait l’objet d’un traitement illicite ;</li>
+  <li>si les données à caractère personnel doivent être effacées pour respecter une obligation légale prévue par le droit de l’Union ou par le droit belge ;</li>
+  <li>si les données à caractère personnel ont été collectées dans le cadre de l’offre de services de la société de l’information.</li>
+ </ul>
+ <h3>Droit de limitation (Article 18 du RGPD)</h3>
+ <p>La limitation du traitement de données à caractère personnel la concernant peut être exercée par une personne :</p>
+ <ul>
+  <li>si la personne concernée en conteste l’exactitude, pendant la temps permettant au responsable du traitement de vérifier l’exactitude des données à caractère personnel ;</li>
+  <li>si le traitement est illicite et que la personne concernée s’oppose à l’effacement des données et exige à la place la limitation de leur utilisation ;</li>
+  <li>si l’ULiège n’a plus besoin des données à caractère personnel aux fins du traitement mais celles-ci sont encore nécessaires à la personne concernée pour la constatation, l’exercice ou la défense de droits en justice ;</li>
+  <li>si la personne concernée s’est opposée au traitement, pendant la vérification portant sur le point de savoir si les motifs légitimes poursuivis par le responsable du traitement prévalent sur ceux de la personne concernée.</li>
+ </ul>
+ <h3>Droit d’opposition (Article 21 du RGPD)</h3>
+ <p>Le droit d’opposition peut être exercé par la personne concernée pour des raisons tenant à sa situation particulière, relativement au traitement des données à caractère personnel la concernant fondé sur le consentement ou l’intérêt légitime, à moins que l’ULiège ne démontre qu’il existe des motifs légitimes et impérieux pour le traitement qui prévalent sur les intérêts et les droits et libertés de la personne concernée, ou pour la constatation, l’exercice ou la défense de droits en justice.</p>
+ <h2>Contact</h2>
+ <p>Pour toute question concernant la politique de Vie privée de l’Université de Liège ou demande d’exercice de ces droits, vous pouvez vous adresser au Délégué à la protection des données de l’Université, soit par courrier électronique (<a href="mailto:dpo@uliege.be">dpo@uliege.be</a>), soit par lettre datée et signée à l’adresse suivante&nbsp;:</p>
+ <p>Université de Liège</p>
+ <p>M. le Délégué à la protection des données,</p>
+ <p>Bât. B9 Cellule "GDPR",</p>
+ <p>Quartier Village 3,</p>
+ <p>Boulevard de Colonster 2,</p>
+ <p>4000 Liège, Belgique.</p>
+ 
+ </message>
+
+
 </messages>
 

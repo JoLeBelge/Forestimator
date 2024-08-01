@@ -142,11 +142,15 @@ presentationPage::presentationPage(cDicoApt *aDico, cWebAptitude *app):mDico(aDi
 
 
     std::unique_ptr<Wt::WMenuItem> item5 = std::make_unique<Wt::WMenuItem>("Guide des Stations");
-
     item5->setContents(std::make_unique<matAptCS>(mDico));
     item5->contents()->setMaximumSize("100%","5000px");
-
     subMenu_->addItem(std::move(item5));
+
+    std::unique_ptr<Wt::WMenuItem> item6 = std::make_unique<Wt::WMenuItem>("Confidentialité");
+    Wt::WContainerWidget * c6 = new Wt::WContainerWidget();
+    c6->addNew<WText>(Wt::WString::tr("confidentialite"));
+    item6->setContents(std::unique_ptr<Wt::WContainerWidget>(c6));
+    subMenu_->addItem(std::move(item6));
 
     hLayout->addWidget(std::move(subMenu));
     hLayout->addWidget(std::move(subStack),1);

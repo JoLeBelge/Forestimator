@@ -13,15 +13,15 @@ SOURCES += main.cpp \
     capplicarteph.cpp \
     cnsw.cpp \
     layerbase.cpp\
-    ../cWebAptitude/cadastre.cpp
+    ../forestimatorWeb/cadastre.cpp
 
 LIBS += -lgdal -lsqlite3 -lboost_system -lboost_filesystem -lwt -lwtdbo -lwtdbosqlite3 -lboost_program_options -fopenmp
 
 DEPENDPATH += /usr/include/gdal/
 INCLUDEPATH += /usr/include/gdal/
 
-INCLUDEPATH += $$PWD/../cWebAptitude/
-DEPENDPATH += $$PWD/../cWebAptitude/
+INCLUDEPATH += $$PWD/../forestimatorWeb/
+DEPENDPATH += $$PWD/../forestimatorWeb/
 
 INCLUDEPATH += $$PWD/date/include/date/
 DEPENDPATH += $$PWD/date/include/date/
@@ -35,4 +35,4 @@ HEADERS += \
     capplicarteph.h \
     cnsw.h \
     layerbase.h
-    ../cWebAptitude/cadastre.h
+    ../forestimatorWeb/cadastre.h
