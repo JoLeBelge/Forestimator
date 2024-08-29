@@ -91,5 +91,9 @@
       <loc>http://forestimator.gembloux.ulg.ac.be/documentation/guide-des-stations</loc>
       <changefreq>monthly</changefreq>
    </url>
+      <url>
+      <loc>http://forestimator.gembloux.ulg.ac.be/documentation/confidentialit_</loc>
+      <changefreq>monthly</changefreq>
+   </url>
    
 </urlset>
