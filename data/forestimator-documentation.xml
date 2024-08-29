@@ -404,7 +404,7 @@ La photointerprétation a été réalisée sur 4221 points sur l'ensemble de la 
 
 
 <message id="confidentialite">
- <p class="u-excerpt">L'Université de Liège entend respecter le Règlement Général pour la Protection des Données (RGPD - Règlement européen 2016/679 du 27 avril 2016) organisant le traitement de données à caractère personnel et la réglementation belge pertinente en vigueur.</p>
+ <p class="u-excerpt">Forestimator (version application et version web) est un logiciel mis à votre disposition par le Service de Gestion des ressources forestières de Gembloux Agro-Bio Tech (Université de Liège). L'Université de Liège entend respecter le Règlement Général pour la Protection des Données (RGPD - Règlement européen 2016/679 du 27 avril 2016) organisant le traitement de données à caractère personnel et la réglementation belge pertinente en vigueur.</p>
  <p style="text-align: justify;">Le responsable des traitements de données à caractère personnel est l’Université de Liège dont le siège social se situe Place du 20-Août, 7 à 4000 Liège. L’Université de Liège est une institution publique qui possède une double personnalité juridique : elle agit, d'une part, en tant que Communauté française de Belgique (dont elle est un organe déconcentré) (0807.970.507) et, d'autre part, en qualité d'établissement public déconcentré et autonome, appelé « le Patrimoine de l'Université de Liège » (0325.777.171). Elle est dûment représentée par Madame Anne-Sophie Nyssen, Rectrice.</p>
  <h2>Traitement de données à caractère personnel</h2>
  <p>Les données à caractère personnel doivent être entendues, au sens du RGPD, comme «&nbsp;toute information se rapportant à une personne physique identifiée ou identifiable.&nbsp;» Ces données rassemblent toutes les informations permettant d’identifier une personne physique, «&nbsp;directement ou indirectement, notamment par référence à un identifiant, tel qu'un nom, un numéro d'identification, des données de localisation, un identifiant en ligne, ou à un ou plusieurs éléments spécifiques propres à son identité physique, physiologique, génétique, psychique, économique, culturelle ou sociale.&nbsp;»</p>
@@ -419,14 +419,20 @@ La photointerprétation a été réalisée sur 4221 points sur l'ensemble de la 
  <h2>Données utilisateur de l'application mobile Forestimator</h2>
  Aucune donnée relative aux utilisateurs n'est collectée par l'application mobile.
  
- <h2>Cookies du site web forestimator</h2>
+ <h2>Cookies et données utilisés par le site web forestimator</h2>
  
  <p>Le présent site (Forestimator) utilise les <em>cookies</em> suivants&nbsp;:</p>
  
- <p>Ces <em>cookies </em>sont utilisés dans le seul but de collecter des informations relatives à l'utilisation du site. Les informations collectées ne permettent pas directement une identification personnelle de l'utilisateur. Conformément à l'avis de l'Autorité de Protection des Données : <a href="https://www.autoriteprotectiondonnees.be/professionnel/themes/cookies">https://www.autoriteprotectiondonnees.be/professionnel/themes/cookies</a></p>
+<p><mark> Cookies de préférences (cookies-pref) </mark> : ces cookies sont strictement nécessaires et permettent de mémoriser vos choix d'acceptation ou de refus des cookies.</p>
  
- <p>Ces derniers cookies sont optionnels. Ils sont dès lors soumis au consentement de l’utilisateur. Lors de la connexion initiale, l’utilisateur est invité à indiquer son choix quant à ces cookies. Ce choix est alors enregistré pour la session.</p>
- 
+<p> <mark> Cookies d'authentification (logincookie) </mark> : l'authentification est nécessaire pour certains usage, tels que la sauvegarde de vos zones d'intérêts (extends) ou l'analyse surfacique pour toutes les parcelles d'une couche de polygones. Si vous choississez que forestimator se connecte automatiquement à votre compte en cochant l'option "Se souvenir de moi", nous utilisons des cookies d'authentification. Dans le cas contraire, aucun cookie n'est utilisé pour l'authentification.: l'authentification est nécessaire pour certains usage, tels que la sauvegarde de vos zones d'intérêts (extends) ou l'analyse surfacique pour toutes les parcelles d'une couche de polygones. Si vous choississez que forestimator se connecte automatiquement à votre compte en cochant l'option "Se souvenir de moi", nous utilisons des cookies d'authentification. Ces cookies sont conservés durant 2 semaines. Dans le cas contraire, aucun cookie n'est utilisé pour l'authentification. </p>
+
+<p> Conformément à l'avis de l'Autorité de Protection des Données (<a href="https://www.autoriteprotectiondonnees.be/professionnel/themes/cookies">https://www.autoriteprotectiondonnees.be/professionnel/themes/cookies</a>), les cookies d'authentification sont optionnels. Ils sont dès lors soumis au consentement de l’utilisateur. Lors de la connexion initiale, l’utilisateur est invité à indiquer son choix quant à ces cookies. Ce choix est alors enregistré pour la session.
+</p>
+
+<p>
+Pour réaliser des statistiques, Forestimator collecte également et traite <mark>des données de connexion</mark> (<em>Session ID, adresses IP et user agents</em>). Ces données sont utilisés dans le seul but de collecter des informations relatives à l'utilisation du site et sont traitées sur base de notre intérêt légitime. Les informations collectées ne permettent pas directement une identification personnelle de l'utilisateur. Ces données sont conservées pour une durée maximale de deux ans.</p>
+
  <h3>Droits de la personne concernée</h3>
  <p>Comme le prévoit le RGPD (Art. 15 à 23), chaque personne concernée par le traitement de données peut, en justifiant de son identité, exercer une série de droits&nbsp;:</p>
  <ul>
