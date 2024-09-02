@@ -25,7 +25,7 @@ LAYER
    PROJECTION
       "init=epsg:31370"
    END
-   DATA "AE_RW_202301.tif" 
+   DATA "AE_RW_202408.tif" 
    PROCESSING "BANDS=1" 
    CLASSITEM "[pixel]" 
    CLASS 
@@ -602,7 +602,7 @@ LAYER
    PROJECTION
       "init=epsg:31370"
    END
-   DATA "NH202006.tif" 
+   DATA "NH202408.tif" 
    PROCESSING "BANDS=1" 
    CLASSITEM "[pixel]" 
    CLASS 
@@ -679,21 +679,21 @@ LAYER
       NAME "-1RHA"
       EXPRESSION "17"
       STYLE 
-          COLOR 215 222 216
+          COLOR "#b0abb0"
        END
    END
    CLASS 
       NAME "-2RHA"
       EXPRESSION "18"
       STYLE 
-          COLOR 203 207 194
+          COLOR "#63666d"
        END
    END
    CLASS 
       NAME "-3RHA"
       EXPRESSION "19"
       STYLE 
-          COLOR 4 6 2
+          COLOR "#303235"
        END
    END
  METADATA

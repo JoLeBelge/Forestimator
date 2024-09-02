@@ -1,3 +1,7 @@
+# 2024 08 30 bug large zone apport variable au sud de l'ardenne. C'est la carte d'aléa d'inondation qui est foireuse à cet endroit.. je la modifie à la main
+# je la modife pour mettre à jour CODEALEA=0 pour  "fid" =5106302 OR  "fid" =5106642 OR  "fid" =5106641 OR  "fid" =5122794 
+#gdal_rasterize -te 42250.0 21170.0 295170.0 167700.0 -tr 10 10 -ot UInt16 -a CODEALEA -l merged aleaInondation2020.gpkg aleaInondation2024.tif
+
 2023 01 04
 Simon Tossens me signale quelques zones qui sont foireuses sur la carte d'apport en eau de 2019.
 Je met les scripts R dans le dépot forestimator pour archivage. mais ces scripts ne respectent plus ma manière de travailler:
@@ -47,6 +51,7 @@ MNT.path = "/home/jo/Documents/Carto/MNT/MNT_10m_WALLONIA.tif"
 
 #gdal_rasterize -te 42250.0 21170.0 295170.0 167700.0 -tr 10 10 -ot UInt16 -a CODEALEA -l selected aleaInondation2020.gpkg aleaInondation2020.tif
 
+
 path.hydro = "/home/jo/Documents/Carto/NH_RW2019/data/hydro/reseau_hydro_scenic_tmp.shp"
 
 r.mnt <- rast(MNT.path)
@@ -54,7 +59,7 @@ v.hydro <-
   read_sf(dsn = "/home/jo/Documents/Carto/NH_RW2019/data/hydro/", layer = "reseau_hydro_scenic_tmp")
 
 
-rast.ai.path <- "/home/jo/Documents/Carto/NH_RW2019/data/alea_Inondation2022/aleaInondation2020.tif"
+rast.ai.path <- "/home/jo/Documents/Carto/NH_RW2019/data/alea_Inondation2022/aleaInondation2024.tif"
 
 #v.ai <-
   #read_sf(dsn = "/home/jo/Documents/Carto/NH_RW2019/data/alea_inondation_20070626", layer = "alea_inondation_20070626")
@@ -74,7 +79,7 @@ rayon.tpi.inv = 200
 #,rayon.tpi.norm=100
 seuil.tpi = -12
 META = T
-filename <- "AE_W_202301"
+filename <- "AE_W_202408"
 
 r.ae <- init(r.ai, 0)
 
@@ -262,8 +267,7 @@ r.ae <- ifel(r.ae == 0 &  r.apport.nappe == 1,     3, r.ae)
 # version 2019 ; j'utilisais les seuils de 2 m et 3 m pour le mnt rel, je dois descendre car trop élevé. j'essaie 1m et 2 m
 r.ae <-
   ifel(r.ae == 0 & mnt.rel < 1 & r.buf.hydro.perm == 1,     1, r.ae)
-r.ae <-
-  ifel(r.ae == 0 & r.ai == 1,                                        2, r.ae) #alea 1 = très faible probabilité
+r.ae <- ifel(r.ae == 0 & r.ai == 1,                                        2, r.ae) #alea 1 = très faible probabilité
 r.ae <-
   ifel(r.ae == 0 & mnt.rel < 2 & r.buf.hydro.perm == 1,     2, r.ae)
 r.ae <-
@@ -311,7 +315,7 @@ r.ae.reclass <-
 writeRaster(r.ae.reclass,
             filename = paste0(filename, "B.tif"),
             overwrite = TRUE)
-if (quietly == F) {
+
   cat(
     paste(
       "fin carto des apport d'eau (Sevrin Damien 2008 + Fran?ois Ridremont 2016 + Jo lisein 2017, 2019 et 2023). \nVoir le Fichier ",
@@ -320,9 +324,8 @@ if (quietly == F) {
       sep = ""
     )
   )
-}
+
 
 #puis je fait des post-traitement avec lib élise
-enfin, je compresse
-
-gdal_translate -co "COMPRESS=DEFLATE" AE_W_202301_clean.tif AE_RW_202301.tif
+#enfin, je compresse
+#gdal_translate -co "COMPRESS=DEFLATE" AE_W_202408_clean.tif AE_RW_202408.tif
