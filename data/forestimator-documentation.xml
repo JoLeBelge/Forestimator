@@ -144,10 +144,12 @@ Une ligne du temps est symbolisée par la fonction harmonique qui représente la
 </message>
 
 <message id="Aptitude.version">
-Carte d'aptitude du FEE : version de mai 2023.
+Carte d'aptitude du FEE : version de septembre 2024.
 </message>
 
 <message id="Aptitude.logs">
+Septembre 2024 : actualisation de toutes les cartes suite à la mise à jours de la carte des niveaux hydriques (car maj des Apports d'eau).
+
 Mai 2023 : actualisation de toutes les cartes suite à la mise à jours de la carte des niveaux hydriques et trophiques.
 
 Octobre 2021 : actualisation de toutes les cartes d'aptitudes du FEE suite à la mise à jour de la carte des niveaux hydriques. Par ailleurs, le système de calcul de compensations liés à la situation topographique est amélioré (compensation uniquement sur l'aptitude climatique et pas hydro-trophique, et correction du bug des aptitudes Tolérance élargie pour les résineux qui ne devaient pas exister par définition).

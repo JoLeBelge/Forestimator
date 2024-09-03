@@ -80,9 +80,9 @@ int launchForestimator(int argc, char **argv)
         Wt::WFileResource * fileResource = new Wt::WFileResource("application/x-sqlite3",dico->File("docroot")+"ACR.db");
         fileResource->suggestFileName("ACR.db");
         server.addResource(fileResource, "/telechargement/ACR");
-        Wt::WFileResource * fileResource2 = new Wt::WFileResource("application/x-sqlite3",dico->File("docroot")+"ACR_terrain.db");
-        fileResource2->suggestFileName("ACR_terrain.db");
-        server.addResource(fileResource2, "/telechargement/ACR_terrain");
+        //Wt::WFileResource * fileResource2 = new Wt::WFileResource("application/x-sqlite3",dico->File("docroot")+"ACR_terrain.db");
+        //fileResource2->suggestFileName("ACR_terrain.db");
+        //server.addResource(fileResource2, "/telechargement/ACR_terrain");
 
         server.addEntryPoint(Wt::EntryPointType::Application, std::bind(&createWebAptitudeApplication,std::placeholders::_1, dico));
         Session::configureAuth();
@@ -127,7 +127,7 @@ std::unique_ptr<Wt::WApplication> createWebAptitudeApplication(const Wt::WEnviro
         auto app = std::make_unique<ACRAnalytics>(env,dico->File("docroot")+"ACR.db");
         return app;
 }else if (env.internalPath() == "/encodage.terrain"){
-    auto app = std::make_unique<encodageRelTerrain>(env,dico->File("docroot")+"ACR_terrain.db");
+    auto app = std::make_unique<encodageRelTerrain>(env,dico->File("docroot")+"ACR.db");
     return app;
 }else{
         std::cout << "internal path pas geré : " << env.internalPath() << std::endl;
