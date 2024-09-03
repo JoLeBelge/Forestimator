@@ -54,6 +54,7 @@ Entre Vesdre et Meuse --> Gbax NT -2, Gbbx NT 0.
 
 </message>
 
+<message id="AE.version">version de 2024 09 </message>
 <message id="AE.logs">
 
 <h5>Modifications de 2024</h5>
@@ -77,6 +78,8 @@ Entre Vesdre et Meuse --> Gbax NT -2, Gbbx NT 0.
 3) changement des seuils de <em style="font-style: oblique;">topographic position index</em> utilisés pour le classement des apports variable dans les zones encaissées afin de <u>réduire considérablement la surface de ces zones qui remontaient trop dans le haut des pentes de vallons et vallées</u>. --> changement majeur
 <br></br>
 </message>
+
+<message id="NH.version">version de 2024 09 </message>
 
 <message id="NH.logs">
 <h5>Modifications de 2014</h5>
