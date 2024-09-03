@@ -1,0 +1,789 @@
+<?xml version="1.0" encoding="UTF8"?>
+<messages xmlns:if="Wt.WTemplate.conditions"
+	  nplurals="2"
+	  plural="n == 1 ? 0 : 1">
+<!-- Note : certain message doivent être devant car sinon ils n'overload pas celui de base en anglais... -->
+<message id="titre.presentation">   <strong>Forestimator - documentation</strong> </message>
+ <message id="titre.carto">   <strong>Forestimator - cartographie</strong> </message>
+ <message id="titre.ana.surf">    <strong>Forestimator - analyse</strong>  </message>
+
+ <message id="ana.point.titre">  Forestimator - info ponctuelle </message>
+ <message id="ana.point.error.exportpdf.noStation"> Aucune analyse ponctuelle à exporter en pdf  </message>
+
+<message id="tooltipMap1">Double-cliquer sur une station pour afficher sa description dans l'onglet légende.</message>
+
+<message id="tooltipMap2">Double-cliquer sur une station pour afficher sa description dans l'onglet "Info Ponctuelle". Enfoncez la touche SHIFT et cliquez sur un polygone de votre shapefile pour afficher les statistiques. Les couches sélectionnées dans la section "Analyse" feront l'objet d'une synthèse sur cette surface. </message>
+
+<message id="infoDansVisuStat">Les statistiques sont calculées pour les couches sélectionnées dans la section "Analyse". </message>
+
+<message id="toolTipActiveLayer">Cliquer sur la case à cocher "Afficher la légende" ci-dessus pour visualiser la signification des couleurs de cette carte. </message>
+
+<message id="legendMsg"><i>Veuillez d'abord ajouter une carte dans votre sélection de cartes pour afficher une légende.</i> </message>
+<message id="legendTitre"><h3>Légende de la carte :</h3> </message>
+<message id="legendCheckbox">Afficher la légende</message>
+
+<message id="coucheStep1"><h3>Double-cliquer sur une couche pour l'ajouter à votre sélection</h3> </message>
+<message id="coucheStep3"><h3>Exporter l'extrait de la couche thématique</h3></message>
+
+<!-- PANIER -->
+<message id="afficher_extent">Emprises...</message>
+<message id="afficher_extent_tooltip">Permet d'enregistrer et de charger vos emprises de carte existantes. Se déplacer et zoomer à un endroit au choix pour sauvegarder cet emplacement afin d'y revenir plus tard.</message>
+<message id="sauver_extent">Enregistrer</message>
+<message id="extent_del_comfirm">Voulez-vous supprimer cette emprise ?</message>
+<message id="panier.header"><h3>Ma sélection de cartes</h3></message>
+<message id="panier.transparent">Transparent / Opaque</message>
+<message id="panier.delete">Enlever cette couche de votre sélection</message>
+<message id="panier.movedown">Déplacer cette couche vers le bas</message>
+<message id="panier.moveup">Déplacer cette couche vers le haut</message>
+<message id="panier.download_tooltip">Permet de télécharger la carte sélectionnée (en gras) au format TIF selon l'emprise actuelle</message>
+
+
+<message id="anaStep1"><h3>1 : Sélectionner une couche de référence</h3></message>
+<message id="anaStep2"><h3>2 : Sélectionner l'analyse</h3></message>
+<message id="anaStep3"><h3>3 : Exécuter l'analyse</h3> <br></br>
+Effectuer une analyse pour un polygone de votre shapefile en cliquant dessus tout en maintenant la touche shift enfoncée. L'analyse portera sur les cartes sélectionnées ci-dessus.
+</message>
+
+
+<!-- label page anayle simple -->
+<message id="sp_infoclic"><i>Double-cliquer dans la carte pour afficher les infos ponctuelles à cet endroit.</i></message>
+
+<!--label dans le treelist de couches -->
+<message id="groupeCoucheAll">Couches</message>
+<message id="groupeCoucheThem">Conditions stationnelles</message>
+<message id="groupeCouchePeup">Cartographie des peuplements</message>
+<message id="groupeCoucheAptFEE">Aptitude des essences</message>
+<message id="groupeCoucheAptCS">Essences recommandées par les Guides des stations</message>
+
+<message id="titreEcogramme"><h4>Écogramme : aptitude hydro-trophique pour cette zone bioclimatique</h4></message>
+<message id="legendEcogrammeOLD">L'abscisse représente les niveaux trophiques, allant du plus acide à gauche vers les sols carbonatés à droite. L'ordonnée représente le gradient hydrique, avec les stations sèches en haut, humide en bas, et à régime hydrique alternatif sur l'encart à part en bas.</message>
+
+<message id="legendEcogramme">L'abscisse représente les niveaux trophiques, l'ordonnée représente le gradient hydrique.</message>
+
+<message id="defaultLoadingI">Chargement...</message>
+<message id="LoadingI1">Calcul des statistiques pour ce polygone</message>
+<message id="LoadingI2">Calcul des statistiques pour le parcellaire et ajout dans la table d'attribut</message>
+<message id="LoadingI3">Découpage de la carte sélectionnée sur l'emprise actuelle</message>
+<message id="LoadingI4">Découpage de(s) carte(s) sur l'emprise du parcellaire</message>
+<message id="StatWTitreTabApt"><h4>Tableau des aptitudes des essences </h4></message>
+
+<message id="bouton_retour_parcelaire"><div class="bouton_retour">${retour class="btn-info"}</div></message>
+
+<message id="Wt.WMessageBox.Cancel">Annuler</message>
+
+  <message id="Wt.Auth.passwdqc.reason-short">
+    Trop court
+  </message>
+  <message id="Wt.Auth.passwdqc.reason-long">
+    Trop long
+  </message>
+  <message id="Wt.Auth.passwdqc.reason-simpleshort">
+    Pas assez de caractères différents ou spéciaux pour cette longueur
+  </message>
+  <message id="Wt.Auth.passwdqc.reason-simple">
+    Pas assez de caractères différents ou spéciaux
+  </message>
+  <message id="Wt.Auth.passwdqc.reason-personal">
+    Basé sur des informations personnelles
+  </message>
+  <message id="Wt.Auth.passwdqc.reason-word">
+    Basé sur un mot du dictionnaire
+  </message>
+  <message id="Wt.Auth.passwdqc.reason-seq">
+    Mot de passe trop basique
+  </message>
+  <message id="Wt.Auth.login-form-title">Connexion</message>
+  <message id="Wt.Auth.login-form-info"></message>
+  <message id="Wt.Auth.user-name">Nom d'utilisateur</message>
+  <message id="Wt.Auth.user-name-info">Entrez votre nom d'utilisateur</message>
+  <message id="Wt.Auth.user-name-invalid">Invalide</message>
+  <message id="Wt.Auth.email">Adresse e-mail</message>
+  <message id="Wt.Auth.email-info">Entrez votre adresse e-mail</message>
+  <message id="Wt.Auth.optional-email-info">
+    Entrez votre adresse e-mail (optionnel)
+  </message>
+  <message id="Wt.Auth.password">Mot de passe</message>
+  <message id="Wt.Auth.password-info">Entrez votre mot de passe</message>
+  <message id="Wt.Auth.remember-me">Se souvenir de moi</message>
+  <message id="Wt.Auth.remember-me-info.days">
+    <plural case="0">Keeps login for one day</plural>
+    <plural case="1">Keeps login for {1} days</plural>
+  </message>
+  <message id="Wt.Auth.login">Connexion</message>
+  <message id="Wt.Auth.remember-me-info.weeks">
+    <plural case="0">Keeps login for one week</plural>
+    <plural case="1">Rester connecté pendant {1} semaines</plural>
+  </message>
+  <message id="Wt.Auth.lost-password">Mot de passe oublié ?</message>
+  <message id="Wt.Auth.register">S'inscrire</message>
+  
+  <message id="Wt.Auth.logout">Se déconnecter</message>
+  <message id="Wt.Auth.throttle-retry">Réessayer dans {1}s</message>
+
+  <message id="Wt.Auth.registration-form-title">Inscription</message>
+  <message id="Wt.Auth.registration-form-info">Compléter les informations pour vous enregistrer.</message>
+  <message id="Wt.Auth.password-registration">S'enregistrer avec un nom d'utilisateur et un mot de passe :</message>
+  <message id="Wt.Auth.oauth-registration">Register with an identity provider:</message>
+  <message id="Wt.Auth.or-oauth-registration">Or, register with an identity provider:</message>
+  <message id="Wt.Auth.valid">Valide</message>
+  <message id="Wt.Auth.choose-password">Choisir un mot de passe</message>
+  <message id="Wt.Auth.choose-password-info">Choisir un mot de passe</message>
+  <message id="Wt.Auth.repeat-password">Répéter le mot de passe</message>
+  <message id="Wt.Auth.repeat-password-info">Répéter le mot de passe</message>
+  <message id="Wt.Auth.email-invalid">Adresse e-mail invalide</message>
+  <message id="Wt.Auth.email-exists">Adresse e-mail déjà utilisée</message>
+  <message id="Wt.Auth.oauth">Your external account</message>
+  <message id="Wt.Auth.oauth-info">Choose one of your accounts</message>
+  <message id="Wt.Auth.user-name-exists">Ce nom d'utilisateur existe déjà</message>
+  <message id="Wt.Auth.confirm-is-you">Ce nom d'utilisateur existe déjà, est-ce vous?</message>
+  <message id="Wt.Auth.user-name-tooshort">Nombre de caractères min. {1}</message>
+  <message id="Wt.Auth.password-tooshort">Nombre de caractères min. {1}</message>
+  <message id="Wt.Auth.passwords-dont-match">Les mots de passe sont différents</message>
+  <message id="Wt.Auth.registration">Inscription</message>
+
+  <message id="Wt.Auth.error-user-invalid">Inscription échouée.</message>
+  <message id="Wt.Auth.email-unverified">Veuillez confirmer votre compte via l'e-mail envoyé.</message>
+  <message id="Wt.Auth.confirm-email-first">
+    <h5>Bienvenue!</h5>
+
+    Vous pourrez vous connecter dès que vous aurez validé votre compte via l'e-mail que nous vous avons envoyé !
+  </message>
+
+  <!-- PasswordPromptDialog -->
+
+  <message id="Wt.Auth.enter-password">Entrer votre mot de passe</message>
+  <message id="Wt.Auth.password-prompt-form-title">Entrer votre mot de passe</message>
+  <message id="Wt.Auth.password-prompt-form-info"></message>
+  <message id="Wt.Auth.password-invalid">Mot de passe invalide</message>
+
+  <!-- UpdatePasswordWidget -->
+
+  <message id="Wt.Auth.updatepassword">Modifier le mot de passe</message>
+  <message id="Wt.Auth.update-password-form-title">Modifier le mot de passe</message>
+  <message id="Wt.Auth.update-password-form-info">Entrer un nouveau mot de passe ci-dessous</message>
+
+  <!-- LostPasswordDialog -->
+
+  <message id="Wt.Auth.lostpassword">Vous avez oublié votre mot de passe ?</message>
+  <message id="Wt.Auth.lost-password-form-title">Récupérer votre mot de passe</message>
+  <message id="Wt.Auth.lost-password-form-info">Veuillez entrer votre adresse e-mail pour recevoir les instructions pour récupérer votre mot de passe.</message>
+  <message id="Wt.Auth.send">Envoyer</message>
+
+  <!-- Message boxes -->
+
+  <message id="Wt.Auth.error">Erreur</message>
+  <message id="Wt.Auth.notice">Notice</message>
+
+  <!-- Emails -->
+
+  <message id="Wt.Auth.confirmmail.subject">Forestimator : Activation de votre compte</message>
+
+  <message id="Wt.Auth.confirmmail.body">
+Bonjour {1},
+
+Merci de vous être enregistré sur le site web Forestimator.
+
+Pour terminer votre inscription, vous devez activer votre compte en cliquant sur le lien ci-dessous ou en faisant un copier-coller du lien dans votre navigateur.
+ 
+{3}
+
+
+A bientôt sur http://forestimator.gembloux.ulg.ac.be
+  </message>
+
+  <message id="Wt.Auth.confirmmail.htmlbody">
+    <h3>Bonjour {1},</h3>
+
+    <p>Merci de vous être enregistré sur le site web Forestimator.</p>
+
+    <p>Pour terminer votre inscription, vous devez activer votre compte en cliquant sur le lien ci-dessous ou en faisant un copier-coller du lien dans votre navigateur.</p>
+ 
+    <p>Lien d'activation : <a href="{3}">cliquer ici pour activer votre compte</a></p>
+    
+    <b>{3}</b>
+
+	<p>A bientôt sur <a href="http://forestimator.gembloux.ulg.ac.be/">Forestimator</a></p>
+  </message>
+
+  <message id="Wt.Auth.lostpasswordmail.subject">Forestimator : récupération de mot de passe</message>
+
+  <message id="Wt.Auth.lostpasswordmail.body">
+Bonjour {1},
+
+C'est email vous est envoyé car quelqu'un (probablement vous?) souhaite choisir un nouveau mot de passe pour votre compte d'accès au portail cartographique Forestimator.
+
+Si c'est bien vous, vous pouvez réinitialiser votre mot de passe en cliquant sur le lien ci-dessous. Sinon, vous pouvez ignorer cet email en toute sécurité.
+ 
+{3} 
+
+Bien à vous,
+L'équipe Forestimator
+
+  </message>
+
+  <message id="Wt.Auth.lostpasswordmail.htmlbody">
+    <h3>Bonjour {1},</h3>
+
+    <p>C'est email vous est envoyé car quelqu'un (probablement vous?) souhaite choisir un nouveau mot de passe pour votre compte d'accès au portail cartographique Forestimator.</p>
+
+    <p>Si c'est bien vous, vous pouvez réinitialiser votre mot de passe en cliquant sur le lien ci-dessous. Sinon, vous pouvez ignorer cet email en toute sécurité.</p>
+ 
+    <p><a href="{3}">lien de réinitialisation</a></p>
+    <b>{3}</b>
+    Bien à vous,
+L'équipe Forestimator
+
+  </message>
+  <message id="Wt.Auth.template.login">
+    <div class="span8 offset2 Wt-auth-login">
+      <legend>${tr:Wt.Auth.login-form-title}</legend>
+      <p>${tr:Wt.Auth.login-form-info}</p>
+
+      <div class="form-horizontal">
+	${<if:passwords>}
+	  ${block:Wt.Auth.field2 user-name user-name-label}
+	  ${block:Wt.Auth.field password}
+	  ${block:Wt.Auth.field remember-me}
+	${</if:passwords>}
+
+	${<if:oauth>}
+	  <div class="control-group">
+	    <div class="controls">
+	      <p>Or login using:</p>
+	      ${icons}
+	    </div>
+	  </div>
+	${</if:oauth>}
+
+	<div class="form-actions">
+	  <p>${login class="btn-primary"}</p>
+	  <p>${lost-password class="btn-link"} ${sep}
+	  ${register class="btn-link"}</p>
+	</div>
+      </div>
+    </div>
+  </message>
+
+<!-- OLD
+<message id="presentation-ad1"> Une plateforme de diffusion des outils de gestion forestière</message>
+<message id="presentation-ad2"> Description stationnelle et carte d'aptitude des essences</message>
+<message id="presentation-ad3"> Description des peuplements en place</message>
+<message id="presentation-ad4"> Visualisation et téléchargement des cartes et de la documentation</message>
+<message id="presentation-ad5"> Analyse statistique préalable à la préparation du plan d'aménagement</message>
+-->
+
+
+<message id="page_presentation">
+<div class="form">
+  <p>
+    <h3>Forestimator: outils cartographiques pour la gestion des forêts wallonnes</h3>
+Forestimator, c'est une boite à outils entièrement gratuite développée par l'unité de <a target="_blank" rel="noopener noreferrer" href="https://www.gembloux.ulg.ac.be/gestion-des-ressources-forestieres/">Gestion des Ressources Forestières</a> de Gembloux Agro-Bio Tech (ULiège). Les résultats de diverses recherches y sont rassemblés afin d'en faciliter la consultation et le téléchargement par les praticiens forestiers.
+
+Cette application web de cartographie permet une visualisation des informations relatives à la description des stations forestières, aux peuplements en place et à l'aptitude des essences telle que définie dans <a href="https://www.fichierecologique.be">le fichier écologique des essences (FEE)</a>. Les cartes peuvent y être téléchargées par ceux qui souhaitent utiliser leur propre logiciel de Système d'Information Géographique. Forestimator compte également une série d'analyses que l'utilisateur peut effectuer en chargeant le ou les polygone(s) délimitant une zone d'intérêt. Ainsi, par exemple, la proportion en surface pour laquelle une essence présente une adéquation optimale avec la zone en question est déterminée et présentée de manière à appuyer le choix des essences lors des opérations de plantation ou de régénération naturelles.
+ </p>
+ 
+    <p>
+
+<div style="margin:auto;"><p style="margin: 15px;">
+	<!--<input id="toggle1" class="unfolder" type="checkbox"/>-->
+	<label for="toggle1" class="toggle-label">
+		<!--<span class="unfold-icon"></span><span class="fold-icon"></span>-->Page Cartographie : Visualisation et téléchargement  <!--<span class="unfold-icon"></span><span class="fold-icon"></span>-->
+	</label>
+	</p>
+	<div id="part1" class="unfold">
+		<h3>Visualiser une carte</h3>
+		Le choix de la carte à afficher s'effectue via le "Catalogue de couche" en double-cliquant sur son nom. La légende (signification des couleurs) est consultable dans la rubrique "Légende", mais à tout moment, un double-clic sur une position en particulier de la carte ouvre une fenêtre qui renseigne la signification de la carte pour cet endroit donné. 
+		<div>
+		 <img src="/img/popupLegende.png" alt="fenêtre popup qui renseigne la valeur en un point donné" width="700px"  />
+		</div>
+		<br></br>
+		L'action de double-cliquer sur une position de la carte (rond mauve sur la figure) ouvre une fenêtre qui renseigne la valeur pour cette position.
+		 
+		<h3>Télécharger une carte</h3>
+
+		Les cartes au format raster peuvent être découpées sur l'emprise de votre choix. L'emprise est celle affichée dans la page cartographie et peut être modifiée en effectuant un zoom avant ou arrière et en effectuant des déplacements en vue de centrer la carte sur une zone qui retient votre intérêt.
+		La carte et un fichier de symbologie (signification des codes couleurs) utilisables dans le logiciel <b>QGIS</b> sont téléchargeables en cliquant sur le bouton de téléchargement situé tout en bas de l'encart de droite.
+	</div>
+</div>
+
+<div style="margin:auto;"><p style="margin: 15px;">
+	<!--<input id="toggle2" class="unfolder" type="checkbox"/>-->
+	<label for="toggle2" class="toggle-label">
+		<!--<span class="unfold-icon"></span><span class="fold-icon"></span>-->Rubrique info ponctuelle : description d'une station  <!--<span class="unfold-icon"></span><span class="fold-icon"></span>-->
+	</label></p>
+	<div id="part2" class="unfold">
+		C'est bien là que se situe tout l'intérêt des outils de consultation des informations cartographiques utiles aux forestiers ; <b>disposer en un double-clic de la description synthétique d'une station et du peuplement en place</b>. 
+		Ainsi, un double-clic sur une position de la carte va permettre l'affichage, dans la page d'info ponctuelle, de la carte d'identité de cette station.
+		Premièrement, le tableau d'aptitude pour cette station est présenté. Les essences sont représentées par leur acronyme et sont classées dans 4 colonnes qui correspondent aux 4 aptitudes ; optimum (en vert foncé), tolérance (en vert clair), tolérance élargie (en orange) et exclusion (en rouge).
+		<div>
+			<img src="/img/tableApt.png" alt="pour une station donnée, le tableau d'aptitude des essences" width="500px"/> 
+		 	<br></br>
+			Le tableau d'aptitude, qui apparaît lorsqu'on double-clique sur une station, renseigne l'aptitude pour toutes les essences forestières. Une info-bulle s'affiche lorsqu'on pointe la souris sur les codes essences en deux lettres et affiche le nom complet de l'essence forestière. Les codes essence sont affichés en gris dans le cas d'une <u>double aptitude</u> (ex; Tolérance/Tolérance élargie pour le hêtre), cette double aptitude est renseignée dans l'info-bulle qui s'affiche lorsqu'on déplace la souris sur le code essence.
+		</div>
+		<br></br>
+
+		Deuxièmement, les caractéristiques stationnelles et du peuplement en place pour la station sélectionnée vont être énumérées dans un tableau s'intitulant "Description de la station forestière".  
+<br></br>
+		Enfin, si la carte affichée est une carte d'aptitude pour l'une des essences, une section supplémentaire s'affichera et renseignera le cheminement effectué pour la détermination de l'aptitude de l'essence. L'aptitude des essences est en effet fonction de l'aptitude bioclimatique d'une part, de l'aptitude hydro-trophique d'autre part et des éventuels facteurs de compensation liés à la topographie. Nous renvoyons l'utilisateur vers le guide méthodologique du <a target="_blank" rel="noopener noreferrer" href="https://www.fichierecologique.be">Fichier Écologique des Essences (FEE)</a>, qui se trouve sous la rubrique aide du site <a target="_blank" rel="noopener noreferrer" href="https://www.fichierecologique.be">www.fichierecologique.be</a>. C'est dans cette section qu'est également présenté l'écogramme de l'espèce pour laquelle la carte d'aptitude est affichée, avec un rectangle mauve situant la station au sein de cet écogramme et de la niche écologique de l'essence.
+		<div>
+			<img src="/img/ecogramme.png" alt="position de la station en mauve dans l'écogramme de l'essence" width="350px"  />
+		 	<br></br>
+			Lors d'un double-clic sur une station, si la carte affichée est une carte d'aptitude, la niche écologique de l'essence ainsi que la position de la station dans l'écogramme (station représentée par le carré mauve) sont également renseignées.
+		</div>
+		<h3>Génération d'un rapport</h3>
+
+		Les résultats de l'analyse ponctuelle peuvent être obtenus sous forme d'un document PDF que l'utilisateur peut télécharger au moyen du bouton <b>export PDF</b>.
+
+	</div>
+</div>
+
+<div style="margin:auto;"><p style="margin: 15px;">
+<!--	<input id="toggle3" class="unfolder" type="checkbox"/>-->
+	<label for="toggle3" class="toggle-label">
+		<!--<span class="unfold-icon"></span><span class="fold-icon"></span>-->Rubrique Analyse surfacique : statistique sur une surface d'intérêt  <!--<span class="unfold-icon"></span><span class="fold-icon"></span>-->
+	</label></p>
+	<div id="part3" class="unfold">
+		La description d'une station sous forme de position ponctuelle suit une méthodologie relativement directe, dans la mesure où les caractéristiques sont lues sur chacune des cartes pour cette position donnée. Par contre, un aménagiste qui souhaite obtenir une synthèse des caractéristiques stationnelles et des peuplements en place pour une surface donnée, représentant tantôt une parcelle, tantôt un massif dans son ensemble, doit passer par une phase de calcul des statistiques pour cette surface. Des outils d'analyses sont implémentés dans Forestimator et permettent de répondre aux besoins les plus récurrents des cartographes forestiers.
+
+		<h3>Importer une couche de polygones</h3>
+
+		La rubrique "Analyse surfacique" permet à l'utilisateur de sélectionner sur son ordinateur les 4 fichiers (.shp, .shx, .dbf, et .prj) constituant le shapefile de polygones définissant sa zone d'intérêt. Une couche cartographique au format Géopackage (.gpkg) est également compatible avec le géoportail Forestimator. Le shapefile doit obligatoirement contenir un ou des polygones et la surface totale des polygones ne doit pas excéder 2500 hectares.
+		Une fois le shapefile importé vers Forestimator, celui-ci apparaîtra en bleu sur la carte.
+
+		<div>
+			<img src="/img/importShp.png" alt="importer un shapefile de polygones dans Forestimator pour y effectuer des analyses surfaciques" width="500px"  />
+		 	<br></br>
+			Lorsque votre shapefile est importé dans l'application web Forestimator, celui-ci s'affiche en bleu sur la carte. 
+		</div>
+
+		<h3>Analyse pour un polygone unique et génération d'un rapport sous forme visuelle</h3>
+
+		Une analyse détaillée est effectuée pour un seul polygone du shapefile. La sélection des couches pour lesquelles seront effectuées les analyses détaillées s'effectue en cochant les cases à cocher situées sous la rubrique intitulée <b>"2 : Sélectionner l'analyse"</b>.
+
+		Le calcul des statistiques est réalisé en effectuant <b>un clic gauche sur le polygone de votre choix</b>, tout en maintenant enfoncée <b>la touche shift</b>. Une page affiche alors les résultats en trois sections distinctes : une carte de localisation générale ainsi qu'une description de la topographie et de la pédologie de cette zone d'intérêt, le tableau d'aptitude des essences et une dernière section qui présente, pour ce polygone donné, les cartes de description des conditions stationnelles et des caractéristiques du peuplement en place. Un tableau de statistiques accompagne chacunes des cartes individuelles.
+
+<h3>Téléchargement d'un ensemble de cartes sur l'emprise du shapefile</h3>
+
+		Les utilisateurs désireux d'effectuer la mise en page de cartes par eux-mêmes, voire d'effectuer des calculs propres à des besoins spécifiques, peuvent télécharger un ensemble de cartes sur l'emprise de leur shapefile. Le bouton <b>Télécharger les cartes</b> permet un découpage simultané de toutes les cartes sélectionnées pour l'analyse surfacique et leur téléchargement sous forme d'une archive compressée.
+	</div>
+</div>
+</p>
+</div>
+
+<h3> Référence </h3>
+
+<div class="csl-entry">Lisein, J., Claessens, H., Quevauvillers, S., Lejeune, P. 2022. <a target="_blank" rel="noopener noreferrer" href="https://hdl.handle.net/2268/291563">Forestimator : un nouveau portail cartographique pour l'information forestière en Wallonie.</a>
+ Forêt.Nature 162, 40–47.</div>
+
+</message>
+
+
+<message id="page_presentation.credit"> 
+Le développement de ce site internet est financé par l'Accord Cadre de Recherches et Vulgarisation Forestières.
+Le contenu cartographique est en grande partie issu des recherches menées au sein de l'unité de <a target="_blank" rel="noopener noreferrer" href="https://www.gembloux.ulg.ac.be/gestion-des-ressources-forestieres/">Gestion des Ressources Forestières</a> de Gembloux Agro-Bio Tech (ULiège).
+<br></br>
+<br></br>
+Personne de contact : Lejeune Philippe - <font color="blue">p.lejeune@uliege.be</font>.
+<br></br>
+<br></br>
+Réalisation : Lisein Jonathan - <font color="blue">JO.Lisein@uliege.be</font>, Hugues Claessens, Samuel Quevauvillers et Thierry Thissen.
+<br></br>
+Depuis 2014, l'ensemble du code source de la plateforme forestimator est disponible en libre accès (voir le <a target="_blank" rel="noopener noreferrer" href="https://github.com/JoLeBelge/Forestimator">dépot github</a>).
+</message>
+
+<message id="docu.api"> 
+La plateforme web Forestimator sert de vitrine ; les informations et les traitements y sont présentés au grand public via une interface conviviale.
+<br></br>
+Par ailleurs, Forestimator fournit des webservices pour les développeurs soucieux d'utiliser les résultats de traitements (analyse ponctuelle ou surfacique) dans leurs plateforme web. Cette page d'aide décrit le fonctionnement de l'API (Application Programming Interface) de Forestimator.
+<h3>Aide</h3>
+Pour afficher la liste des couches et des traitements disponibles;
+<br></br><br></br>
+<a target="_blank" rel="noopener noreferrer" href="https://forestimator.gembloux.ulg.ac.be/api/help">https://forestimator.gembloux.ulg.ac.be/api/help</a>
+<br></br><br></br>
+<h3>Dictionnaire des couches cartographiques</h3>
+La majorité des couches cartographiques sont au format raster. Les variables de classes stoquées dans les couches raster sont renseignées au moyen d'une valeur entière. Il évidemment est nécessaire de connaitre la signification des valeurs entières pour correctement appréhender la couche raster ou les résultats d'analyses relatifs à cette couches : c'est le rôle du dictionnaire de la couche de fournir ces renseignement.
+<br></br>
+Les dictionnaires de couches sont disponibles en renseignant le nom de la carte de la manière suivate (exemple pour l'aptitude du hêtre) :
+<br></br><br></br>
+<a target="_blank" rel="noopener noreferrer" href="https://forestimator.gembloux.ulg.ac.be/api/HE_FEE">https://forestimator.gembloux.ulg.ac.be/api/<font color="blue">HE_FEE</font></a>
+<br></br><br></br>
+Voici ce que serveur retourne comme réponse :
+<br></br>
+<code class="hljs">
+<span class="hljs-comment">
+1;Optimum<br></br>
+2;Tolérance<br></br>
+3;Tolérance élargie<br></br>
+4;Exclusion<br></br>
+5;Optimum/Tolérance<br></br>
+6;Optimum/Tolérance élargie<br></br>
+7;Optimum/Exclusion<br></br>
+8;Tolérance/Tolérance élargie<br></br>
+9;Tolérance/Exclusion<br></br>
+10;Tolérance élargie/Exclusion<br></br>
+11;Indéterminé<br></br>
+12;Indéterminé (Zone batie)<br></br>
+</span></code>
+<br></br>
+
+<h3>Analyse ponctuelle</h3>
+Les analyses sont effectuées pour une position donnée sur une couche définie.
+La syntaxe générale est la suivante :
+<br></br><br></br>
+https://forestimator.gembloux.ulg.ac.be/api/<font color="blue">CODE_COUCHE</font>/point/<font color="blue">POINT_FORMAT_WKT</font>
+<br></br><br></br>
+Ci-dessous un exemple avec la couche de la carte de l'essence majoritaire du peuplement :
+<br></br><br></br>
+<a target="_blank" rel="noopener noreferrer" href="https://forestimator.gembloux.ulg.ac.be/api/COMPOALL/point/POINT (217256.9 50427.0)">https://forestimator.gembloux.ulg.ac.be/api/<font color="blue">COMPOALL</font>/point/<font color="blue">POINT (217256.9 50427.0)</font></a>
+<br></br>
+<br></br>
+Le dictionnaire de cette couche (sous ce lien : <a target="_blank" rel="noopener noreferrer" href="https://forestimator.gembloux.ulg.ac.be/api/COMPOALL/">https://forestimator.gembloux.ulg.ac.be/api/<font color="blue">COMPOALL</font>/</a>) nous renseigne que la valeur 5 signifie que l'essence majoritaire est l'épicéa commun.
+<br></br>
+<span class="hljs-comment">5;EP - Spruces</span>
+<br></br><br></br>
+
+<h3>Analyse surfacique</h3>
+La syntaxe générale est la suivante :
+<br></br><br></br>
+https://forestimator.gembloux.ulg.ac.be/api/<font color="blue">CODE_COUCHE_OU_NOM_TRAITEMENT</font>/polygon/<font color="blue">POLYGONE_FORMAT_WKT</font>
+<br></br><br></br>
+CODE_COUCHE_OU_NOM_TRAITEMENT; consultez la page <a target="_blank" rel="noopener noreferrer" href="https://forestimator.gembloux.ulg.ac.be/api/help">https://forestimator.gembloux.ulg.ac.be/api/help</a> pour avoir la liste.
+<br></br><br></br>
+POLYGONE_FORMAT_WKT; le polygone délimitant la surface de terrain pour laquelle vous souhaitez effectuer les analyses. Le format doit être le WKT, le système de projection doit être en Belge Lambert 72. De plus, la géométrie du polygone doit être valide et sa surface ne peut dépasser 200 ha.
+<br></br><br></br>
+<p style="margin-bottom:0.2cm;margin-top:0.2cm">
+Certains traitements acceptent des arguments qui permettent de modifier leurs comportement par défaut. Dans ce cas, la syntaxe sera la suivante:
+<br></br><br></br>
+https://forestimator.gembloux.ulg.ac.be/api/<font color="blue">CODE_COUCHE_OU_NOM_TRAITEMENT</font>/args/<font color="blue">ARGUMENTS_OPTIONNEL</font>/polygon/<font color="blue">POLYGONE_FORMAT_WKT</font>
+<br></br><br></br>
+</p>
+<h3>Exemples</h3>
+<p style="margin-bottom:0.2cm;margin-top:0.2cm">
+<a target="_blank" rel="noopener noreferrer" href="https://forestimator.gembloux.ulg.ac.be/api/aptitude/polygon/POLYGON ((208118.986622118 113943.623825983,208387.928131752 113684.230535628,208211.816531718 113533.580853657,207902.029861846 113854.507112691,208118.986622118 113943.623825983))">
+https://forestimator.gembloux.ulg.ac.be/api/<font color="blue">aptitude</font>/polygon/POLYGON ((208118.986622118 113943.623825983,208387.928131752 113684.230535628,208211.816531718 113533.580853657,207902.029861846 113854.507112691,208118.986622118 113943.623825983))</a>
+</p>
+<p style="margin-bottom:0.2cm;margin-top:0.2cm">
+<a target="_blank" rel="noopener noreferrer" href="https://forestimator.gembloux.ulg.ac.be/api/aptitude/args/HE,DO,AG/polygon/POLYGON ((208118.986622118 113943.623825983,208387.928131752 113684.230535628,208211.816531718 113533.580853657,207902.029861846 113854.507112691,208118.986622118 113943.623825983))">
+https://forestimator.gembloux.ulg.ac.be/api/<font color="blue">aptitude</font>/args/<font color="blue">HE,DO,AG</font>/polygon/POLYGON ((208118.986622118 113943.623825983,208387.928131752 113684.230535628,208211.816531718 113533.580853657,207902.029861846 113854.507112691,208118.986622118 113943.623825983))</a>
+</p>
+<p style="margin-bottom:0.2cm;margin-top:0.2cm;">
+<a target="_blank" rel="noopener noreferrer" href="https://forestimator.gembloux.ulg.ac.be/api/hdom/polygon/POLYGON ((208118.986622118 113943.623825983,208387.928131752 113684.230535628,208211.816531718 113533.580853657,207902.029861846 113854.507112691,208118.986622118 113943.623825983))">
+https://forestimator.gembloux.ulg.ac.be/api/<font color="blue">hdom</font>/polygon/POLYGON ((208118.986622118 113943.623825983,208387.928131752 113684.230535628,208211.816531718 113533.580853657,207902.029861846 113854.507112691,208118.986622118 113943.623825983))</a>
+</p>
+<p style="margin-bottom:0.2cm;margin-top:0.2cm;">
+<a target="_blank" rel="noopener noreferrer" href="https://forestimator.gembloux.ulg.ac.be/api/dendro2018/polygon/POLYGON ((208118.986622118 113943.623825983,208387.928131752 113684.230535628,208211.816531718 113533.580853657,207902.029861846 113854.507112691,208118.986622118 113943.623825983))">
+https://forestimator.gembloux.ulg.ac.be/api/<font color="blue">dendro2018</font>/polygon/POLYGON ((208118.986622118 113943.623825983,208387.928131752 113684.230535628,208211.816531718 113533.580853657,207902.029861846 113854.507112691,208118.986622118 113943.623825983))</a>
+</p>
+
+<p style="margin-bottom:0.2cm;margin-top:0.2cm;">
+<a target="_blank" rel="noopener noreferrer" href="https://forestimator.gembloux.ulg.ac.be/api/CNSW/polygon/POLYGON ((208118.986622118 113943.623825983,208387.928131752 113684.230535628,208211.816531718 113533.580853657,207902.029861846 113854.507112691,208118.986622118 113943.623825983))">
+https://forestimator.gembloux.ulg.ac.be/api/<font color="blue">CNSW</font>/polygon/POLYGON ((208118.986622118 113943.623825983,208387.928131752 113684.230535628,208211.816531718 113533.580853657,207902.029861846 113854.507112691,208118.986622118 113943.623825983))</a>
+</p>
+<!--
+<p style="margin-bottom:0.2cm;margin-top:0.2cm;">
+http://forestimator.gembloux.ulg.ac.be/api/<font color="blue">compo</font>/polygon/POLYGON ((208118.986622118 113943.623825983,208387.928131752 113684.230535628,208211.816531718 113533.580853657,207902.029861846 113854.507112691,208118.986622118 113943.623825983))
+</p>-->
+
+
+<br></br>
+<h3>Exemples de script R pour traiter plusieurs polygones</h3>
+
+<code class="hljs"><span class="hljs-comment"># librairie pour effectuer des requêtes sur un webserver</span><br></br>
+<span class="hljs-keyword">require</span>(curl)<br></br>
+<span class="hljs-comment"># librairie pour la lecture de shapefile</span><br></br>
+<span class="hljs-keyword">library</span>(sf)<br></br>
+
+server.api &lt;- <span class="hljs-string">"https://forestimator.gembloux.ulg.ac.be/api/"</span><br></br>
+<span class="hljs-comment"># attention à bien mettre le s de httpS dans l'adresse, sinon sous windows ça ne fonctionne pas.</span><br></br>
+
+shp.path &lt;- <span class="hljs-string">"/home/lisein/Documents/carteApt/autres/shpTest/epioux_sample.shp"</span><br></br>
+parcellaire.shp &lt;- st_read(shp.path)<br></br>
+
+<span class="hljs-comment"># attention, la méthode fonctionne pour des POLYGONES et des MULTIPOLYGONES dont la géométrie est valide. Si géométrie pas valide, je ne garanti pas l'exactitude du résultat.</span><br></br>
+<span class="hljs-comment"># boucle sur les polygones du shapefile</span><br></br>
+<span class="hljs-keyword">for</span> (polNum <span class="hljs-keyword">in</span> <span class="hljs-number">1</span>:nrow(parcellaire.shp)){<br></br>
+  cat(paste0(<span class="hljs-string">"traitement du polygone numéro "</span>, polNum,<span class="hljs-string">"\n"</span>))<br></br>
+  wkt.pol &lt;- st_as_text(parcellaire.shp$geometry[polNum])<br></br>
+
+  <span class="hljs-comment">#cat(paste0("wkt polygone : \n ", wkt.pol,"\n"))</span><br></br>
+  my.request &lt;- paste0(server.api,<span class="hljs-string">"dendro2018/polygon/"</span>,wkt.pol)<br></br>
+  <span class="hljs-comment"># remplacement des espaces par le symbole consacré</span><br></br>
+  my.request &lt;- gsub(<span class="hljs-string">" "</span>, <span class="hljs-string">"%20"</span>, my.request, fixed = <span class="hljs-literal">TRUE</span>)<br></br>
+  <span class="hljs-comment"># on effectue la requete auprès du serveur - résultat sauvé en mémoire sous forme hexadécimale (=raw)</span><br></br>
+  req.res &lt;- curl_fetch_memory(my.request)<br></br>
+  <span class="hljs-comment"># on écrit dans la console (ou ailleurs) la réponse du serveur</span><br></br>
+  cat(rawToChar(req.res$content))<br></br>
+  
+  cat(<span class="hljs-string">"\n"</span>)<br></br>
+}
+<br></br></code>
+
+
+
+
+</message>
+
+<message id="analyse.surf.msg.uploadOK"> Téléchargement de la couche cartographique effectué avec succès. </message>
+
+
+<message id="report.analyse.surf.hdom.t"> <h4> Hauteur dominante calculée sur le MNH  (modèle pour pessière)</h4> </message>
+<message id="report.analyse.surf.hdom.nb"> Nombre de Hdom mesurées (surface de 1 are) </message>
+
+<message id="report.analyse.surf.dendro.t"> <h4> Description dendrométrique (modèle pour pessière)  </h4> </message>
+<message id="report.analyse.surf.classeHauteur.t"> <h4> Répartition de la surface par classe de hauteur (tous peuplements)</h4> </message>
+<message id="report.analyse.surf.area"> <h4> Surface de la parcelle </h4> surface de {1} ha, soit {2} mètre carré. </message>
+<message id="report.analyse.surf.compo.t"> <h4> Composition  </h4> </message>
+<message id="report.analyse.surf.zbio.t"> <h4> Zone bioclimatique  </h4> </message>
+<message id="report.analyse.surf.relief.t"> <h4> Relief  </h4> </message>
+<message id="report.analyse.surf.pedo.t"> <h4> Pédologie  </h4> </message>
+
+<message id="report.analyse.point.titre">Analyse ponctuelle</message>
+
+<message id="report.analyse.point">
+<div>
+      <h1>TITRE_REPPORT</h1>
+
+      <style>
+	span.special {
+	  color: #FF0000;
+	  font-weight: bold;
+	}
+
+	#legendAcroEs {
+	  font-size: 8pt;
+	  margin-left: auto;
+	  margin-right: auto;
+	}
+	#infoT {
+	  font-size: 10pt;
+	  margin-left: auto;
+	  margin-right: auto;
+	}
+
+	#main_table .special {
+	  color: #FF0000;
+	}
+
+	#main_table th {
+	  border-bottom: 1px solid black;
+	}
+	
+	.E{background-color:rgb(255,0,0);}
+	.O{background-color:rgb(36,84,4);}
+	.T{background-color:rgb(103,206,34);}
+	.TE{background-color:rgb(239,161,25);}
+
+      </style>
+
+<div>
+<h2>TITRE_CARTE </h2>
+<img src="PATH_CARTE" style="width:350.0px;height:350.0px;margin:0px 3px 0px 3px;" />
+<!--LEGEND_CARTE si je veux la légende couleur il faut ajouter de manière automatique les couleurs dans les styles ci-dessus, je le ferai ultérieurement-->
+<br></br>
+Copyright ; © CartoWeb.be – IGN/NGI.
+Position de la station (Belge Lambert 72) : 
+POSITION_PTX, POSITION_PTY.
+</div>
+
+<P style="page-break-before: always"/>
+<div>
+${AptTable}
+</div>
+
+<div>
+<h2>Liste des acronymes des essences </h2>
+${legendAcro}
+</div> 
+
+<!--<P style="page-break-before: always"/>-->
+<div>
+${InfoT}
+</div>
+
+REPORT_ECO
+
+</div>
+ 
+</message>
+
+
+<message id="report.eco"> 
+<P style="page-break-before: always"/>
+<div>
+<h2>TITRE_ECO </h2>
+<img src="PATH_ECO" style="width:350.0px;height:600.0px;margin:0px 3px 0px 3px;" />
+</div>
+<div>
+detAptFEE
+</div>
+</message>
+
+
+<message id="titre-InfoTableAna-point"> <h4>Description de la station forestière</h4></message>
+
+<message id="report.analyse.surf">
+	<div>
+		  <h1>TITRE_REPPORT </h1>
+		  <style>
+		span.special {
+		  color: #FF0000;
+		  font-weight: bold;
+		}
+		#main_table {
+		  font-size: 8pt;
+		  margin-left: auto;
+		  margin-right: auto;
+		}
+		#main_table .special {
+		  color: #FF0000;
+		}
+		#main_table th {
+		  border-bottom: 1px solid black;
+		}
+		  </style>
+		<div>mCarteGenCont</div>
+		<div>mApt</div>
+		<div>mAllStatIndivCont</div>
+	</div>
+</message>
+
+
+<message id="report.ban"><img src="PATH/resources/DJI_0497_navbar.JPG" width="500px"  border-radius="30px" /></message>
+
+<message id="download.lay.error.noLay"><p>Aucune carte sélectionnée. Veuillez sélectionner les couches à exporter à l'étape numéro 2 de l'outil d'analyse surfacique</p></message>
+
+<message id="parcellaire.upload.size"><p> La surface du ou des polygones est trop importante pour effectuer une analyse surfacique.</p></message>
+<message id="parcellaire.anaAllPol"><p> Indisponible pour le moment, en cours de développement...</p></message>
+<message id="parcellaire.anaAllPol.maxProcess"><p> Si vous souhaitez effectuer des analyses sur tous les polygones, vous ne pouvez sélectionner que maximum 4 analyses différentes.</p></message>
+
+<message id="parcellaire.tele.btn">Télécharger les cartes</message>
+<message id="parcellaire.ana.btn">Analyse sur tous les polygones</message>
+
+<message id="parcellaire.anaAllPol.envoiEmail"> Nous enverrons les résultats de l'analyse surfacique pour votre couche de polygones par e-mail dès que ceux-ci seront effectués. </message>
+
+<message id="parcellaire.anaAllPol.connect"> Vous devez préalablement vous connecter à votre compte Forestimator pour effectuer des analyses sur tous les polygones de votre couche de polygones. Les résultats vous seront en effet envoyés par e-mail à l'adresse associée à votre compte </message>
+
+<message id="parcellaire.loadshp.srcNotDefined">Le système de projection de votre shapefile n'est pas défini. Vous pouvez définir le système de coordonnées dans votre logiciel de Système d'information Géographique et effectuer à nouveau le chargement de la couche dans Forestimator, ou vous pouvez choisir le système de coordonnées dans la liste ci-dessous et vérifier visuellement que votre couche cartographique s'affiche à sa localisation présumée. <br> </br> </message>
+
+<message id="api.msg.error.tool.name">Aucune carte ou traitement de ce nom.</message>
+<message id="api.msg.error.polyg1">Veuillez utiliser le format Géojson pour votre polygone</message>
+
+<message id="menu.button.tooltip.home">Accueil</message>
+<message id="menu.button.tooltip.doc">Documentation</message>
+<message id="menu.button.tooltip.carto">Cartographie</message>
+<message id="menu.button.tooltip.point">Info ponctuelle</message>
+<message id="menu.button.tooltip.surf">Analyse surfacique</message>
+<message id="menu.button.tooltip.panier_collapse">Réduire / Agrandir</message>
+<message id="menu.button.tooltip.catalog">Catalogue de couches cartographiques</message>
+<message id="menu.button.tooltip.cadastre">Recherche cadastrale</message>
+<message id="menu.button.tooltip.legend">Légende</message>
+<message id="menu.button.tooltip.login">Se connecter / déconnecter</message>
+
+<message id="meta.desc.carto">Forestimator est un portail web de cartographie des stations et des peuplements forestiers.
+De nombreuses couches cartographiques y sont disponibles à la consultation et au téléchargement.
+Une analyse des conditions environnementales des stations de Wallonie permet de déterminer l'adéquation essence-station la plus pertinente pour une sylviculture efficace. 
+De nombreuses cartes sont disponibles : l'aptitude des essences au sens du Fichier Écologique des Essences, les cartes de composition, les zones bioclimatiques, les cartes de niveaux hydriques et des niveaux trophiques. Les guides de stations de la Wallonie sont également présentés, ainsi que les cartes de recommandation pour chacune des essences forestières.
+Des modèles dendrométriques sont implémentés pour l'estimation de la densité des peuplements sur base des modèles numériques de hauteur de la canopée. Une série temporelle de Modèles Numériques de Hauteur couvrant la période 2006-2021 sont consultables pour l'ensemble de la région wallonne.
+ </message>
+
+<message id="meta.desc.documentation">Des outils cartographiques qui sont une aide à la gestion des ressources forestières de Wallonie</message>
+<message id="meta.titre.documentation">Documentation des couches cartographiques consultables sur Forestimator</message>
+
+<message id="meta.desc.cr_dit-et-contact">Plateforme web développée par l'unité de Gestion des Ressources Forestière (ULiège - Gembloux Agro-Bio Tech)</message>
+<message id="meta.titre.cr_dit-et-contact">Contactez l'équipe de chercheurs de Forestimator</message>
+
+<message id="meta.desc.aptitude-des-essences">L'aptitude des essences forestières, leur capacité à produire du bois de qualité pour une station donnée</message>
+<message id="meta.titre.aptitude-des-essences">L'aptitude sylvicole des essences forestières</message>
+
+<message id="meta.desc.ecogramme">L'écogramme est une typologie des stations forestières qui représente dans une matrice à deux dimensions les gradients environnementaux. Premièrement, le niveau trophique (fertilité) des sols détermine le développement des essences forestières. Deuxièmement, le niveau hydrique (humidité) des stations forestières joue un rôle prépondérant dans la croissance des arbres.</message>
+<message id="meta.titre.ecogramme">L'écogramme hydro-trophique du Fichier Écologique des Essences</message>
+
+<message id="meta.desc.zone-bioclimatique">Les 10 zones bioclimatiques de Wallonie sont cartographiées. On y distingue l'Ardenne centro-orientale, la Basse et moyenne Ardenne, la Basse Lorraine, la Fagne - Famenne - Calestienne, la Haute Lorraine, le Hesbino-Brabançon, les Plaines et Vallées Scaldisiennes, le Condroz Sambre et Meuse, la Thiérache  et enfin la Haute Ardenne. Ces zones bioclimatiques remplacent les régions naturelles.</message>
+<message id="meta.titre.zone-bioclimatique">Les zones bioclimatiques de Wallonie</message>
+
+<message id="meta.desc.niveaux-trophiques">Le niveau trophique permet de caractériser la fertilité d'un sol forestier. Il est utilisé pour déterminer l'aptitude des essences forestières. On distingue 6 niveaux, qui suivent le gradient d'acidité du sol : hyper-oligotrophe, oligotrophe, méso-oligotrophe, mésotrophe, eutrophe et carbonaté.</message>
+<message id="meta.titre.niveaux-trophiques">Les niveaux trophiques du fichier écologique des essences</message>
+
+<message id="meta.desc.niveaux-hydriques">Le niveau hydrique permet de caractériser la disponibilité en eau et en oxygène d'un sol forestier. Il est utilisé pour déterminer l'aptitude des essences forestières. On distingue 13 niveaux, qui combinent le gradient d'hypoxie (manque d'oxygène) et de disponibilité en eau.</message>
+<message id="meta.titre.niveaux-hydriques">Les niveaux hydriques du fichier écologique des essences</message>
+
+<message id="meta.desc.apport-d_eau">L'apport en eau latéral est l'apport par écoulement ou remontée de la nappe phréatique. Il s'agit donc de l'eau qui ne provient pas des précipitations, et qui est intimement liée à la topographie. Par exemple, un bas de grand versant sera alimenté par intermittence en eau de ruissellement. </message>
+<message id="meta.titre.apport-d_eau">L'apport en eau hors précipitation</message>
+
+<message id="meta.desc.sous_secteurs-et-topo">Sous-secteurs radiatifs et situation topographique sont deux manières de représenter la position d'une station forestière dans le paysage. La topographie de la station va avoir de multiples influences sur les conditions environnementales ; température, humidité.</message>
+<message id="meta.titre.sous_secteurs-et-topo">Les sous-secteurs radiatifs et la situation topographiques des stations forestières</message>
+
+<message id="meta.desc.hauteur-de-la-v_g_tation">Les Modèles Numériques de Hauteur de la végétation, ou Modèle Numérique de Canopée, sont des couches cartographiques qui décrivent la hauteur de la canopée. La hauteur des arbres est un paramètre de structure qui permet de caractériser un peuplement, du point de vue de sa maturité et de sa densité. Le portail cartographique propose la visualisation et le téléchargement d'une série temporelle de modèle numérique de hauteur, s'étalant entre 2006 et 2021. Cette série temporelle est obtenue par combinaison des Modèles Numériques de Hauteur issues des deux campagnes LiDAR (2014 et 2021) avec les modèles numériques de hauteurs calculé par photogrammétrie sur base des images aériennes de la région wallonne.</message>
+<message id="meta.titre.hauteur-de-la-v_g_tation">Les Modèles Numériques de Hauteur de la végétation.</message>
+
+<message id="meta.desc.forestimator-_-pr_sentation">Au service des forestiers de Wallonie, Forestimator permet à quiconque de consulter et de télécharger des informations cartographiques décrivant les stations forestières et les peuplements.</message>
+<message id="meta.titre.forestimator-_-pr_sentation">Présentation du portail web Forestimator</message>
+
+<message id="meta.desc.composition-des-essences">La connaissance d'une forêt passe par la description des espèces qui s'y développent. 
+La composition spécifique est renseignée par 9 couches cartographiques, indiquant la proportion en surface terrière des épicéas, chênes, hêtres, douglas, pins, peupliers, mélèzes, bouleaux et autres </message>
+<message id="meta.titre.composition-des-essences">Composition des essences forestières en forêt wallonne</message>
+
+<message id="meta.desc.crise-du-scolyte"> Les scolytes sont des insectes ravageurs qui sont naturellement présents en forêt. 
+Les typographes ont profité des conditions météorologiques propices de 2018 pour se multiplier au point de provoquer une crise sanitaire qui touche durement l'épicéa en Europe, et notamment en Wallonie.
+Les dégâts qu'ils ont provoqués sont quantifiés et spatialisés pour la Région wallonne par télédétection, au moyen de nombreuses prises de vues satellites. 
+Un suivi de l'état sanitaire des pessières est réalisé en vue d'identifier la dynamique des foyers d'infections et afin de quantifier l'ampleur des dégats. </message>
+<message id="meta.titre.crise-du-scolyte">La crise du scolyte (typographe) en pessière wallonne</message>
+
+<message id="meta.desc.mod_le-dendro"> Les peuplements résineux d'épicéa commun et de douglas font l'objet d'une description dendrométriques en terme de hauteur dominante, de surface terrière, de volume à l'hectare, de nombre de tiges par hectare et de circonférence moyenne. Toutes ces informations sont calculées depuis un modèle numérique de hauteur et sont valables pour l'année 2018.</message>
+<message id="meta.titre.mod_le-dendro">Description dendrométrique des peuplements résineux</message>
+
+<message id="meta.desc.masque-forestier"> Cela semble simple, mais discriminer précisément les zones forestières, haies et arbres isolés d'une part, des surfaces non boisées d'autre part, n'est pas trivial. Le masque forestier est dédié à cet usage : il nous informe ou se trouve la forêt en Région wallonne. </message>
+<message id="meta.titre.masque-forestier">Le masque forestier nous renseigne là où il y a de la forêt</message>
+
+<message id="meta.titre.forestimator-api">Les géo-services de la plateforme Forestimator</message>
+<message id="meta.desc.forestimator-api">Des géo-services permettent d'effectuer des calculs à l'échelle d'une surface délimitée par un polygone, dans le but de préparer un plan d'aménagement sur une propriété forestière. </message>
+
+<message id="meta.titre.forestimator-api">Capacité de Réserve en eau des sols</message>
+<message id="meta.desc.r_serve-en-eau"> Cartographie de la réserve en eau des sols pour une meilleure perception de la vulnérabilité des stations forestières.</message>
+
+
+<message id="cadastre.commune">Commune / INS</message>
+<message id="cadastre.division">Division</message>
+<message id="cadastre.section">Section</message>
+<message id="cadastre.paca">Parcelle cadastrale</message>
+<message id="cadastre.submit">Rechercher</message>
+<message id="cadastre.choisir">Choisissez une option -----</message>
+
+<message id="msg.Gain.info"><p> Cette couche cartographique décrit une variable continue dont la valeur est calculée suivant le gain (égal à <font color="blue">{1}</font>) et la valeur numérique du raster.</p>
+<p>Notons Y la valeur de la variable d'intérêt, b la valeur du gain et DN la "Digital Number", soit la valeur renseignée dans le raster pour un pixel donnée. La formulation est donc la suivante:  Y = b*DN </p></message>
+
+
+<message id="analytic.tab1"><h4>tableau de synthèse (hors utilisation via le réseau de l'Ulg) </h4>
+<p> Ces statistiques de fréquentation sont calculées pour différents usages de Forestimator, se déclinant en autant de <mark> catégories</mark>. L'usage le plus fréquent, correspondant à la catégorie <strong> page </strong>, correspond à la consultation des pages du site Forestimator. Un utilisateur consultant le même jour deux pages différentes du site enregistrera deux consultations. </p>
+</message>
+
+<message id="analytic.tabUser"><h4>tableau de synthèse (hors utilisation via réseau de l'Ulg) </h4>
+<p> Ces statistiques de fréquentation sont calculées pour observer combien d'utilisateurs différents utilisent Forestimator. Une même adresse ip ne sera comptabilisée qu'une seule fois par mois, même si un utilisateur consulte plusieurs pages ou la même page chaque jour du mois. </p>
+</message>
+
+<message id="analytic.rawData"><h4>Dernieres stats brutes</h4>
+<p> Ces enregistrements de fréquentation sont effectués pour certains usages du portail Forestimator. Par exemple, la consultation d'une page fera l'objet d'une observation, mais pas l'utilisation de l'API. Ces observations ne prennent pas en compte les nombreux robots d'indexation qui consultent le site. Si une page Web est consultée plusieur fois par jour depuis le même ordinateur, seule la première consultation est enregistrée. Ce ne sont donc pas à proprement parler des "observations brutes" </p>
+</message>
+
+<message id="analyse.surf.msg.shpIncomplete">Veillez sélectionner les 3 fichiers du shapefile (shp, shx et dbf).  </message>
+
+<message id="analyse.surf.msg.ImportGeopackage"> Vous avez chargé une couche vectorielle au format Geopackage. La première couche du geopackage va être utilisée. </message>
+
+<message id="Wt.WMessageBox.Yes"> Oui</message>
+<message id="Wt.WMessageBox.No"> Non</message>
+<message id="Wt.WMessageBox.Cancel"> Annuler</message>
+<message id="eco.ntnh"> Niveau trophique {1}, Niveau hydrique {2}</message>
+
+ <message id="mail.anasMulti.body">
+    Bonjour {1},
+
+    Vous trouverez ci-dessous un lien pour télécharger les résultats de l'analyse surfacique pour vos polygones ({2}). 
+    
+    https://forestimator.gembloux.ulg.ac.be/{3}
+    
+    En vous souhaitant bonne réception,
+    
+    l'équipe Forestimator
+  </message>
+  <message id="mail.anasMulti.title">Forestimator : analyse surfacique pour un ensemble de polygones </message>
+</messages>
