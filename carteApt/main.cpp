@@ -88,7 +88,7 @@ int main(int argc, char *argv[])
 
             std::string essCode(kv.second->EssCode()); //essCode =="AG"  | essCode =="AP" |essCode =="EK") |essCode =="PG" essCode =="PY" |essCode =="PZ"
 
-            if (carteFEE &&(kv.second->getCatLayer()==TypeLayer::FEE & essCode =="BP" )){
+            if (carteFEE &&(kv.second->getCatLayer()==TypeLayer::FEE)){
                 aACA.carteAptFEE(dico.getEss(essCode),kv.second->getPathTif(),true);
             }
 
