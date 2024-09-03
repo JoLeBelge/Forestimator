@@ -1,7 +1,7 @@
 #include "cleanAE.h"
 
 
-std::string pathAE("/home/jo/Documents/Carto/NH_RW2019/AE_W_202301.tif");
+std::string pathAE("/home/jo/Documents/Carto/NH_RW2019/AE_W_202408.tif");
 
 int main(int argc, char *argv[])
 {
@@ -58,28 +58,47 @@ int main(int argc, char *argv[])
 
         std::cout << "clean apports permanent\n";
 
-        int Val2Clean(3),ValConflict1(2),ValCopain(2),seuilVois(5);
-        /*for (int iter(1); iter <3;iter++){
+        int Val2Clean(2),ValConflict1(3),ValCopain(3),seuilVois(5);
+        for (int iter(1); iter <3;iter++){
         // 49-25 = 24.
         seuilVois=14;
-        fillHole(aIn,Val2Clean,ValCopain,ValConflict1,seuilVois,int(3),int(2));
+        fillHole(aIn,Val2Clean,ValCopain,ValConflict1,seuilVois,int(2));
         // 9pow 2= 81 - 5pow2=56
-        seuilVois=30;
-        fillHole(aIn,Val2Clean,ValCopain,ValConflict1,seuilVois, int(4),int(2));
-        }*/
+        //seuilVois=30;
+        //fillHole(aIn,Val2Clean,ValCopain,ValConflict1,seuilVois,int(2));
+        }
 
-        cleanVoisinage(aIn,Val2Clean,666,int(5));
-        //cleanVoisinage(aIn,2,666,int(5));
-        fillHole(aIn,2,3,3,18,int(2));
-        fillHole(aIn,2,3,3,18,int(2));
+
+        Val2Clean=3;ValConflict1=1;ValCopain=666;
+        for (int iter(1); iter <2;iter++){
+        // 49-25 = 24.
+        seuilVois=14;
+        fillHole(aIn,Val2Clean,ValCopain,ValConflict1,seuilVois,int(2));
+        // 9pow 2= 81 - 5pow2=56
+        //seuilVois=30;
+        //fillHole(aIn,Val2Clean,ValCopain,ValConflict1,seuilVois,int(2));
+        }
+
 
         cleanVoisinage(aIn,1,666,int(7));
+        cleanVoisinage(aIn,1,666,int(7));
+        cleanVoisinage(aIn,1,666,int(7));
+
+        // retirer les pixels 3 isolé dans du 2
+        cleanVoisinage(aIn,2,666,int(7));
+
+        // erode des 3 isolé en bordure des 2
+        seuilVois=8;
+        fillHole(aIn,1,2,2,seuilVois,int(1));
+
+
+
 
         // sauver resultat
         std::string aOut=pathAE.substr(0,pathAE.size()-4)+"_clean.tif";
         Tiff_Im::CreateFromIm(*aIn,aOut);
         copyTifMTD(pathAE,aOut);
-
+        compressTif(aOut);
 
         break;
     }
@@ -172,6 +191,7 @@ void fillHole(Im2D_U_INT1 * aIn,int Val2Clean, int ValCopain,int ValConflict1, i
 
     // 49 pixels de voisinage  si aSz1 est de 3 (3+1+3) pow 2
     // si sz=2, 25 pixels
+    // Si sz=1; 9
     ELISE_COPY(aIn->all_pts(),rect_som(IbinTmp->in(0),aSz1),ImNbVois.oclip());
     delete IbinTmp;
     ELISE_COPY(select(aIn->all_pts(),ImNbVois.in()>=seuilVois && Im.in()==1),Val2Clean,aIn->oclip());

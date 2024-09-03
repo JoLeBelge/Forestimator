@@ -56,6 +56,11 @@ Entre Vesdre et Meuse --> Gbax NT -2, Gbbx NT 0.
 
 <message id="AE.logs">
 
+<h5>Modifications de 2024</h5>
+
+1) Suppression des quelques zones de plateaux au sud de l'Ardenne en faible aléa d'inondation -> pas d'apport variable. 
+<br></br>
+
 <h5>Modifications de 2023</h5>
 
 1) diminution des zones d'apport variables qui remontaient trop dans les pentes
@@ -74,6 +79,10 @@ Entre Vesdre et Meuse --> Gbax NT -2, Gbbx NT 0.
 </message>
 
 <message id="NH.logs">
+<h5>Modifications de 2014</h5>
+Prise en compte de la dernière version des apports en eau.
+<br></br>
+
 <h5>Modifications de 2019</h5>
 Correction d'un oubli sur les séries spéciales pédologiques;
 <br></br>

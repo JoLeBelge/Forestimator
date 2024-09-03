@@ -329,7 +329,7 @@ class _MyApp extends State<MyApp> {
           await prefs.setBool('firstTimeUse', gl.firstTimeUse);
         },
         dialog:
-            "Autorisez-vous l'aplication à télécharger un jeu de couches pour une utilisation hors ligne? Ces couches couvrent toutes la Région Wallonne et totalisent +- 100 Mo.",
+            "Forestimator mobile ne collecte aucune information personnelle. Notre politique de confidentialité est consultable au https://forestimator.gembloux.ulg.ac.be/documentation/confidentialit_. Autorisez-vous l'aplication à télécharger un jeu de couches pour une utilisation hors ligne? Ces couches couvrent toutes la Région Wallonne et totalisent +- 100 Mo.",
       ));
     }
     return MaterialApp.router(
@@ -404,7 +404,6 @@ class _MyApp extends State<MyApp> {
 
   @pragma('vm:entry-point')
   static void downloadCallback(String id, int status, int progress) {
-    //print("callback here and there");
     final SendPort send =
         IsolateNameServer.lookupPortByName('downloader_send_port')!;
     //if (send != null) {
