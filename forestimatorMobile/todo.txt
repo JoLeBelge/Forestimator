@@ -1,11 +1,8 @@
 To do list forestimator
 ------------------------
 
--copyrigth pour couche MNH photo et Lidar; définir.
-
+-> publish for iOS
 bug analyse ponctuelle offline quand une des cartes offline est corrompue; je ne sais pas reproduire l'erreur..
-
--carte de recommandation GS!! ajout
 
 Alignement des label "enregistré" qui est érratique pour l'instant
 

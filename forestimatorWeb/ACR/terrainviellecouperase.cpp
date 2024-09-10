@@ -351,8 +351,8 @@ void encodageRelTerrain::displayACR(int acr_id){
     if (globTest) {std::cout << "found " << vt.size() << " tree for ACR " << acr_id << std::endl;}
     for (dbo::ptr<arbre> &t : vt){
         // je crée des wLineEdit pour pouvoir modifier les encodages? ce serait judicieux, flexible.
-        tabAllEU->elementAt(i,0)->addNew<Wt::WLineEdit>(std::to_string(t->ACR));
-        tabAllEU->elementAt(i,1)->addNew<Wt::WLineEdit>(std::to_string(t->UE));
+        Wt::WLineEdit * acr =tabAllEU->elementAt(i,0)->addNew<Wt::WLineEdit>(std::to_string(t->ACR));
+        Wt::WLineEdit * ue =tabAllEU->elementAt(i,1)->addNew<Wt::WLineEdit>(std::to_string(t->UE));
         Wt::WLineEdit * type=tabAllEU->elementAt(i,2)->addNew<Wt::WLineEdit>(t->type);
         Wt::WLineEdit * quadrat=tabAllEU->elementAt(i,3)->addNew<Wt::WLineEdit>(t->quadrat);
         Wt::WLineEdit * ess=tabAllEU->elementAt(i,4)->addNew<Wt::WLineEdit>(t->ess);
@@ -366,6 +366,8 @@ void encodageRelTerrain::displayACR(int acr_id){
         Wt::WLineEdit * rmq=tabAllEU->elementAt(i,12)->addNew<Wt::WLineEdit>(t->rmq);
         WPushButton * mod  =tabAllEU->elementAt(i,13)->addNew<Wt::WPushButton>("Modifier");
         //WPushButton * supprimer  =tabAllEU->elementAt(i,14)->addNew<Wt::WPushButton>("supprimer");
+        acr->setValidator(std::make_shared<WIntValidator>(0,1000));
+        ue->setValidator(std::make_shared<WIntValidator>(0,100));
         circ->setValidator(std::make_shared<WIntValidator>(0,1000));
         statut->setValidator(std::make_shared<WIntValidator>(0,20));
         rege->setValidator(std::make_shared<WIntValidator>(0,20));
@@ -377,6 +379,9 @@ void encodageRelTerrain::displayACR(int acr_id){
         mod->clicked().connect([=] {
 
             if (dist->validate()==ValidationState::Valid && Ht->validate()==ValidationState::Valid){
+
+                if(ue->valueText().toUTF8()!=""){t.modify()->UE = std::stoi(ue->valueText().toUTF8());}
+                if(acr->valueText().toUTF8()!=""){t.modify()->ACR = std::stoi(ue->valueText().toUTF8());}
                 t.modify()->type = type->valueText().toUTF8();
                 t.modify()->quadrat = quadrat->valueText().toUTF8();
                 t.modify()->ess = ess->valueText().toUTF8();
