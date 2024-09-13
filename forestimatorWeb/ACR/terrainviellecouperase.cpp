@@ -381,16 +381,14 @@ void encodageRelTerrain::displayACR(int acr_id){
             if (dist->validate()==ValidationState::Valid && Ht->validate()==ValidationState::Valid){
 
                 if(ue->valueText().toUTF8()!=""){t.modify()->UE = std::stoi(ue->valueText().toUTF8());}
-                if(acr->valueText().toUTF8()!=""){t.modify()->ACR = std::stoi(ue->valueText().toUTF8());}
+                if(acr->valueText().toUTF8()!=""){t.modify()->ACR = std::stoi(acr->valueText().toUTF8());}
                 t.modify()->type = type->valueText().toUTF8();
                 t.modify()->quadrat = quadrat->valueText().toUTF8();
                 t.modify()->ess = ess->valueText().toUTF8();
-                // if(Ht->valueText().toUTF8()!=""){t.modify()->Ht = std::stod( Ht->valueText().toUTF8());}
                 t.modify()->Ht =  Ht->valueText().toUTF8();
-                if(circ->valueText().toUTF8()!=""){t.modify()->circ = std::stoi(statut->valueText().toUTF8());}
+                if(circ->valueText().toUTF8()!=""){t.modify()->circ = std::stoi(circ->valueText().toUTF8());}
                 if(statut->valueText().toUTF8()!=""){t.modify()->statut = std::stoi(statut->valueText().toUTF8());}
                 if(rege->valueText().toUTF8()!=""){t.modify()->rege = std::stoi( rege->valueText().toUTF8());}
-                //if(dist->valueText().toUTF8()!=""){t.modify()->dist = std::stod( dist->valueText().toUTF8());}
                 t.modify()->dist =  dist->valueText().toUTF8();
                 if(azim->valueText().toUTF8()!=""){t.modify()->azim = std::stoi( azim->valueText().toUTF8());}
                 if(defaut->valueText().toUTF8()!=""){t.modify()->defaut = std::stoi(defaut->valueText().toUTF8());}
