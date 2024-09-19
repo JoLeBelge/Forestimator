@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF8"?>
+<messages xmlns:if="Wt.WTemplate.conditions"
+	  nplurals="2"
+	  plural="n == 1 ? 0 : 1">
+
+<message id="template">
+
+<div class="frameEncodage" style="height:100.0%;padding:10px 15px 10px 15px;margin-top:30.0px;margin-right:30.0px;margin-bottom:30.0px;margin-left:30.0px;display:flex;box-sizing:border-box;-webkit-box-sizing:border-box;flex-flow:column;-webkit-flex-flow:column;">
+	<div class="encodage" style="margin: 3px 0px; overflow: visible; flex: 1 1 auto;">
+	<h1> Formulaire d'encodage d'anciennes coupes rases non replantées </h1>
+
+<h3>Les coupes rases abandonnées peuvent-elles produire du bois de qualité ?</h3>
+<br></br>
+La Faculté de Gembloux Agro-Bio Tech (ULiège) a initié, en collaboration avec les experts forestiers (FNEF) et la cellule d’appui (CAPFP), une étude visant à évaluer objectivement dans quelle mesure la régénération naturelle, au besoin enrichie, peut produire des peuplements de valeur économique, paysagère et écologique sur de grandes mises à blanc, et à définir les moyens pour y parvenir. Nous sommes à la recherche de situations actuellement connues de <b class="text-success">coupes rases anciennes non replantées</b>, que la régénération y soit réussie ou non, dans lesquelles les propriétaires peuvent nous renseigner sur les éventuelles interventions qui y ont été menées. Vous pouvez nous aider en remplissant le formulaire ci-dessous, ou en nous contactant par mail ou téléphone : Mr Lisein (<a href = "mailto: liseinjon@hotmail.com">JO.Lisein@uliege.be</a> - 0475221309)
+		<div >
+		 <img src="/img/CoupeRaseNisramont1LR.jpg" alt="coupe rase en libre évolution avec une régénération naturelle satisfaisante" style="display: block;margin-left: auto;margin-right: auto;width: 30%;"  />
+		</div>
+		Nous collecterons les informations de manière cartographique, mais nous nous engageons évidemment à ne jamais visiter ou renseigner ces sites sans votre accord.
+	</div>
+	
+
+
+	
+	<div style="margin: 3px 0px; flex: 1 1 auto; overflow: visible;"></div>
+	${contContact class="encodage" style="margin: 3px 0px; flex: 1 1 auto; overflow: visible;"}
+	<div style="margin: 3px 0px; flex: 1 1 auto; overflow: visible;"></div>
+	${contLoca}
+	
+	<div style="margin: 3px 0px; flex: 1 1 auto; overflow: visible;"></div>
+	${contACR1 class="encodage" style="margin: 3px 0px; flex: 1 1 auto; overflow: visible;"}
+	<div style="margin: 3px 0px; flex: 1 1 auto; overflow: visible;"></div>
+	${contACR2 class="encodage" style="margin: 3px 0px; flex: 1 1 auto; overflow: visible;"}
+	<div style="margin: 3px 0px; flex: 1 1 auto; overflow: visible;"></div>
+	${bsubmit class="btn btn-success with-label mybtn"}
+	
+</div>
+</message>
+
+<message id="sectionEncoder"> <h3> Vos données personnelles </h3>
+<!--<p>La personne de contact qui connait le mieux la vieille coupe rase (par exemple, le gestionnaire) est renseignée plus bas, les champs ci-dessous sont utilisés pour identifier la personne qui remplit le présent formulaire.</p>-->
+</message>
+
+<message id="nom"> Nom : </message>
+<message id="nom.ph"> Ex: Dupont </message>
+<message id="prenom"> Prénom :</message>
+<message id="prenom.ph"> Ex: Albert</message>
+<message id="contact"> Votre contact: email </message>
+<message id="contact.ph"> Ex: dupont.albert@forest.be</message>
+
+<message id="contact.gsm"> Votre contact: téléphone </message>
+<message id="contact.gsm.ph"> Ex: 0475221309 </message>
+<message id="contactACR"> Contact du gestionnaire forestier : nom, email et/ou téléphone </message>
+<message id="contactACR.ph"> Ex: gestionnaire: rege.nat@hotmail.com</message>
+
+<message id="typeEncoder"> Vous êtes ?</message>
+<message id="typeEncoder0"> Choisissez  </message>
+<message id="typeEncoder1"> Propriétaire privé </message>
+<message id="typeEncoder2"> FNEF </message>
+<message id="typeEncoder3"> Cellule d'appui </message>
+<message id="typeEncoder4"> DNF </message>
+<message id="typeEncoder5"> Autre </message>
+
+
+<message id="kit"> Souhaitez-vous recevoir les résultats du projet de suivi des anciennes coupes rases?</message>
+
+<message id="initPol">Réinitialiser tout le contour </message>
+<message id="cancelPoint">Supprimer le dernier point </message>
+<message id="submit">J'ai fini! Soumettre</message>
+
+<message id="map.tooltip">Cliquez pour dessiner le contour de la coupe rase. Pour finir le contour, joignez le dernier point avec le premier point et cliquez à nouveau</message>
+
+<message id="sectionVCR1"> <h3> Description de l'ancienne coupe rase </h3>
+<!--La description encodée ici est une description globale, des inventaires de terrain permettront ensuite de fournir une description plus précise.-->
+</message>
+
+<message id="sectionVCR2"> <h3> Description facultative </h3>
+<!--La description encodée ici est une description globale, des inventaires de terrain permettront ensuite de fournir une description plus précise.-->
+</message>
+
+<message id="anneeVCR"> Anciennetée de la coupe rase :</message>
+<message id="regeNat"> Quelles sont les essences les plus présentes dans la régénération naturelle?</message>
+<message id="regeNat.ph"> Ex: Bouleaux - Epicéa - Sorbier des oiseleurs </message>
+<message id="vegeBloquante"> Présence de végétation bloquante (précisez les espèces, ex: ronce, fougère)</message>
+<message id="vegeBloquante.ph"> Ex: Fougère aigle sur 75% de la coupe rase</message>
+
+<message id="descriptionVCR"> Renseignez ici vos éventuels commentaires ou toutes autres informations utiles</message>
+<message id="descriptionVCR.ph"> Ex: La végétation naturelle est présente en quantitée mais est abroutie par le gibier</message>
+
+<message id="titreLocalisation"> <h3> Localisation de la coupe rase </h3>
+<p>La localisation de la coupe rase doit être indiquée en numérisant le contour de la parcelle sur la carte ci-dessous. On peut naviguer sur la carte en utilisant la souris, mais il est également possible de choisir le nom de la commune où se trouve l'ancienne coupe rase (menu déroulant à droite). Pour commencer la numérisation du contour, effectuez un simple clic gauche sur la carte.</p>
+</message>
+<message id="titreCatalogue"> <h4> Affichez une couche cartographique en cliquant sur son nom </h4> </message>
+<message id="cadastre.choisir"> Choisissez une commune</message>
+<message id="titreCommune"><h4>Choisissez une commune pour centrer la carte sur celle-ci</h4></message>
+
+<message id="saveACR.msg.titre">Encodage d'ancienne coupe rase</message>
+<message id="saveACR.msg.cont">
+Vos données ont été encodées de manière adéquate. Nous vous remercions pour votre participation. Souhaitez-vous encoder une autre coupe rase?
+</message>
+
+
+<message id="sp"> Quelles étaient les espèces présentes dans le peuplement avant la coupe rase ?  </message>
+<message id="sp.ph"> Ex: Epicéa </message>
+
+<message id="sanit"> Est-ce que la coupe a été réalisée pour des raisons sanitaires ? Si oui, quel était le problème sanitaire ?  </message>
+<message id="sanit.ph"> Ex: Oui. Chalarose </message>
+
+<message id="trav.sylvi">Avez-vous réalisé des travaux sylvicoles sur la parcelle ? Si oui, quels travaux et en quelles années ?  </message>
+<message id="trav.sylvi.ph"> Ex: Gyrobroyage, andainage, fraisage, plantations, dégagements, dépressages </message>
+
+<message id="objectif"> Quels sont vos objectifs pour cette parcelle ?  </message>
+<message id="objectif0"> Sélectionnez l'objectif principal si opportun </message>
+<message id="objectif1"> Vocation économique - production de bois  </message>
+<message id="objectif2"> Vocation sociale - régénérer une belle forêt pour s'y divertir  </message>
+<message id="objectif3"> Vocation écologique - restauration d’habitats, protection des sols, protection de la biodiversité </message>
+<message id="vosRef"> Votre référence pour cette coupe rase (facultatif) </message>
+<message id="vosRef.ph"> Ex : parcelle 5   </message>
+
+<message id="itineraire">  Quel est le type d'itinéraire choisi pour régénérer la forêt ?  </message>
+<message id="itineraire0"> Choisissez l'itinéraire suivi si opportun </message>
+<message id="itineraire1"> Plantation </message>
+<message id="itineraire2"> Régénération naturelle </message>
+<message id="itineraire3"> Régénération naturelle avec des plantations d'enrichissement </message>
+
+<message id="anneeCoupe0"> Depuis compbien de temps a eu lieu la coupe? </message>
+<message id="anneeCoupe1"> moins de 5 ans </message>
+<message id="anneeCoupe2"> entre 5 et 10 ans </message>
+<message id="anneeCoupe3"> entre 10 et 15 ans </message>
+<message id="anneeCoupe4"> il y a plus de 15 ans </message>
+
+<message id="plantation">  Si vous avez fait des plantations, quelles espèces et combien de tiges par espèce avez-vous plantées sur la parcelle ? Quelle est l'année de plantation ?  </message>
+<message id="plantation.ph"> Ex: Plantation d'enrichissement de placeaux de tilleuls à grandes feuilles (90 tiges) </message>
+
+<message id="hauteur">  Quelle est la hauteur approximative (en mètres) des tiges dominantes actuellement présentes sur la parcelle ?  </message>
+<message id="hauteur.ph"> Ex: les bouleaux font 12 mètres </message>
+
+<message id="gibier">  Avez-vous protégé vos arbres contre les dégâts de gibier?  </message>
+<message id="gibier.ph"> Ex: oui (protections individuelles) </message>
+
+<message id="btnPolyg"> Vous pouvez réinitialiser le contour de la coupe avec les bouttons ci-dessous  </message>
+
+<message id="Wt.WMessageBox.Yes"> Oui</message>
+<message id="Wt.WMessageBox.No"> Non</message>
+<message id="Wt.WMessageBox.Cancel"> Annuler</message>
+
+<message id="mail.titre"> encodage d'anciennes coupes rases non replantées </message>
+<message id="mail.contact">  Vos données personnelles </message>
+<message id="mail.acr">  Description de l'ancienne coupe rase: </message>
+
+<message id="coupe.rase.view">Voici les coupes rases qui ont été enregistrées précédemment</message>
+
+</messages>

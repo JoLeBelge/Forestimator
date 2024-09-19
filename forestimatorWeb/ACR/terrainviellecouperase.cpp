@@ -11,6 +11,8 @@ encodageRelTerrain::encodageRelTerrain(const Wt::WEnvironment& env, std::string 
     setTheme(theme);
     useStyleSheet("style/style.css");
     useStyleSheet("resources/themes/default/wt.css");
+
+
     auto sqlite3 = std::make_unique<dbo::backend::Sqlite3>(aFileDB);
     sqlite3->setProperty("show-queries", "false");
     session.setConnection(std::move(sqlite3));

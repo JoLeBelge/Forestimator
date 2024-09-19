@@ -24,6 +24,7 @@ SOURCES += main.cpp \
     ../carteApt/cdicoaptbase.cpp \
     ACR/terrainviellecouperase.cpp \
     ACR/formviellecouperase.cpp \
+    desserteForest/desserteForest.cpp \
     analytics.cpp \
     api/anaponctuelleresource.cpp \
     api/cnswresource.cpp \
@@ -62,6 +63,7 @@ HEADERS += \
     ../carteApt/cdicoaptbase.h \
     ACR/terrainviellecouperase.h \
     ACR/formviellecouperase.h \
+    desserteForest/desserteForest.h \
     analytics.h \
     api/anaponctuelleresource.h \
     api/cnswresource.h \

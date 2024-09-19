@@ -21,6 +21,7 @@ using namespace libzippp;
 #include "./threadpool/ThreadPool.hpp"
 #include "ACR/formviellecouperase.h"
 #include "ACR/terrainviellecouperase.h"
+#include "desserteForest/desserteForest.h"
 #include "api/staticmapresource.h"
 
 std::unique_ptr<Wt::WApplication> createWebAptitudeApplication(const Wt::WEnvironment &env, cDicoApt * dico);
