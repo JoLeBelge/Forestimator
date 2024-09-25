@@ -1,9 +1,9 @@
-#include "desserteForest.h"
+﻿#include "desserteForest.h"
 
 extern bool globTest;
 
 formDesserteForest::formDesserteForest(const WEnvironment &env, cDicoApt *dico, std::string aFileDB) : Wt::WApplication(env),
-    session(),mDico(dico),polygValid(0),mBDFile(aFileDB),keepInTouch(0)
+    session(),mDico(dico),polygValid(0),mBDFile(aFileDB)
 {
     loadStyles();
     WLabel *label;
@@ -42,10 +42,6 @@ formDesserteForest::formDesserteForest(const WEnvironment &env, cDicoApt *dico, 
     label = table->elementAt(row,0)->addWidget(std::make_unique<WLabel>(WString::tr("contact.gsm")));
     contactEncoderGSMEdit_->setPlaceholderText(WString::tr("contact.gsm.ph"));
     ++row;
-    keepInTouch= table->elementAt(row,1)->addWidget(std::make_unique<WCheckBox>());
-    keepInTouch->setMinimumSize("30px","30px");
-    label = table->elementAt(row,0)->addWidget(std::make_unique<WLabel>(WString::tr("kit")));
-    ++row;
 
     typeContactEdit_= table->elementAt(row,1)->addWidget(std::make_unique<WComboBox>());
     label = table->elementAt(row,0)->addWidget(std::make_unique<WLabel>(WString::tr("typeEncoder")));
@@ -57,117 +53,27 @@ formDesserteForest::formDesserteForest(const WEnvironment &env, cDicoApt *dico, 
     typeContactEdit_->addItem(WString::tr("typeEncoder4"));
     typeContactEdit_->addItem(WString::tr("typeEncoder5"));
 
-    cont = tpl->bindWidget("contACR1", std::make_unique<WContainerWidget>());
-    cont->addNew<Wt::WText>(WString::tr("sectionVCR1"));
-    table= cont->addNew<WTable>();
-    table->addStyleClass("table-encodage");
-    row=0;
-    label = table->elementAt(row,0)->addWidget(std::make_unique<WLabel>(WString::tr("anneeVCR")));
-    ++row;
-    anneeVCREdit_= table->elementAt(row,0)->addWidget(std::make_unique<WComboBox>());
-    anneeVCREdit_->addItem(WString::tr("anneeCoupe0"));
-    anneeVCREdit_->addItem(WString::tr("anneeCoupe1"));
-    anneeVCREdit_->addItem(WString::tr("anneeCoupe2"));
-    anneeVCREdit_->addItem(WString::tr("anneeCoupe3"));
-    anneeVCREdit_->addItem(WString::tr("anneeCoupe4"));
-    //++row;
-
-    cont = tpl->bindWidget("contACR2", std::make_unique<WContainerWidget>());
-    cont->addNew<Wt::WText>(WString::tr("sectionVCR2"));
-    table= cont->addNew<WTable>();
-    table->addStyleClass("table-encodage");
-    row=0;
-
-    label = table->elementAt(row,0)->addWidget(std::make_unique<WLabel>(WString::tr("vosRef")));
-    ++row;
-    vosrefEdit_= table->elementAt(row,0)->addWidget(std::make_unique<WLineEdit>());
-    vosrefEdit_->setPlaceholderText(WString::tr("vosRef.ph"));
     row++;
-    label = table->elementAt(row,0)->addWidget(std::make_unique<WLabel>(WString::tr("objectif")));
-    objectifEdit_= table->elementAt(row,0)->addWidget(std::make_unique<WComboBox>());
-    objectifEdit_->addItem(WString::tr("objectif0"));
-    objectifEdit_->addItem(WString::tr("objectif1"));
-    objectifEdit_->addItem(WString::tr("objectif2"));
-    objectifEdit_->addItem(WString::tr("objectif3"));
+    contactPresicionEdit_= table->elementAt(row,1)->addWidget(std::make_unique<WLineEdit>());
+    table->elementAt(row,0)->addWidget(std::make_unique<WLabel>(WString::tr("contact.precision")));
+    row++;
+    typeamEdit_= table->elementAt(row,1)->addWidget(std::make_unique<WComboBox>());
+    table->elementAt(row,0)->addWidget(std::make_unique<WLabel>(WString::tr("type.am")));
+    typeamEdit_->addItem(WString::tr("type.am0"));
+    typeamEdit_->addItem(WString::tr("type.am1"));
+    typeamEdit_->addItem(WString::tr("type.am2"));
+    typeamEdit_->addItem(WString::tr("type.am3"));
+    typeamEdit_->addItem(WString::tr("type.am4"));
+    typeamEdit_->addItem(WString::tr("type.am5"));
+    typeamEdit_->addItem(WString::tr("type.am6"));
+    row++;
+    typeProprioEdit_= table->elementAt(row,1)->addWidget(std::make_unique<WComboBox>());
+    table->elementAt(row,0)->addWidget(std::make_unique<WLabel>(WString::tr("proprio.am")));
+    typeProprioEdit_->addItem(WString::tr("proprio.am0"));
+    typeProprioEdit_->addItem(WString::tr("proprio.am1"));
+    typeProprioEdit_->addItem(WString::tr("proprio.am2"));
+    typeProprioEdit_->addItem(WString::tr("proprio.am3"));
 
-    ++row;
-    label = table->elementAt(row,0)->addWidget(std::make_unique<WLabel>(WString::tr("sp")));
-    ++row;
-    spEdit_= table->elementAt(row,0)->addWidget(std::make_unique<WLineEdit>());
-    spEdit_->setPlaceholderText(WString::tr("sp.ph"));
-    ++row;
-    label = table->elementAt(row,0)->addWidget(std::make_unique<WLabel>(WString::tr("sanit")));
-    ++row;
-    sanitEdit_= table->elementAt(row,0)->addWidget(std::make_unique<WLineEdit>());
-    sanitEdit_->setPlaceholderText(WString::tr("sanit.ph"));
-    ++row;
-    label = table->elementAt(row,0)->addWidget(std::make_unique<WLabel>(WString::tr("regeNat")));
-    ++row;
-    regeNatEdit_= table->elementAt(row,0)->addWidget(std::make_unique<WLineEdit>());
-    //regeNatEdit_->setMinimumSize("200px", "100%");
-    regeNatEdit_->setPlaceholderText(WString::tr("regeNat.ph"));
-    ++row;
-    label = table->elementAt(row,0)->addWidget(std::make_unique<WLabel>(WString::tr("vegeBloquante")));
-    ++row;
-    vegeBloquanteEdit_= table->elementAt(row,0)->addWidget(std::make_unique<WLineEdit>());
-    //vegeBloquanteEdit_->setMinimumSize("200px", "100%");
-    vegeBloquanteEdit_->setPlaceholderText(WString::tr("vegeBloquante.ph"));
-    /*++row;
-    label = table->elementAt(row,0)->addWidget(std::make_unique<WLabel>(WString::tr("itineraire")));
-    ++row;
-    itineraireEdit_= table->elementAt(row,0)->addWidget(std::make_unique<WComboBox>());
-    itineraireEdit_->addItem(WString::tr("itineraire0"));
-    itineraireEdit_->addItem(WString::tr("itineraire1"));
-    itineraireEdit_->addItem(WString::tr("itineraire2"));
-    itineraireEdit_->addItem(WString::tr("itineraire3"));
-    */
-    ++row;
-    label = table->elementAt(row,0)->addWidget(std::make_unique<WLabel>(WString::tr("trav.sylvi")));
-    ++row;
-    travSylviEdit_= table->elementAt(row,0)->addWidget(std::make_unique<WLineEdit>());
-    travSylviEdit_->setPlaceholderText(WString::tr("trav.sylvi.ph"));
-    ++row;
-    label = table->elementAt(row,0)->addWidget(std::make_unique<WLabel>(WString::tr("plantation")));
-    ++row;
-    plantationEdit_= table->elementAt(row,0)->addWidget(std::make_unique<WLineEdit>());
-    plantationEdit_->setPlaceholderText(WString::tr("plantation.ph"));
-    //++row;
-    /*label = table->elementAt(row,0)->addWidget(std::make_unique<WLabel>(WString::tr("hauteur")));
-    ++row;
-    hauteurEdit_= table->elementAt(row,0)->addWidget(std::make_unique<WLineEdit>());
-    hauteurEdit_->setPlaceholderText(WString::tr("hauteur.ph"));
-    */
-    ++row;
-    label = table->elementAt(row,0)->addWidget(std::make_unique<WLabel>(WString::tr("gibier")));
-    ++row;
-    gibierEdit_= table->elementAt(row,0)->addWidget(std::make_unique<WLineEdit>());
-    gibierEdit_->setPlaceholderText(WString::tr("gibier.ph"));
-    ++row;
-    label = table->elementAt(row,0)->addWidget(std::make_unique<WLabel>(WString::tr("descriptionVCR")));
-    ++row;
-    VCRdescriptionEdit_= table->elementAt(row,0)->addWidget(std::make_unique<WTextArea>());
-    VCRdescriptionEdit_->setColumns(40);
-    VCRdescriptionEdit_->setRows(5);
-    VCRdescriptionEdit_->setPlaceholderText(WString::tr("descriptionVCR.ph"));
-
-    nomEncoderEdit_->enterPressed().connect(prenomEncoderEdit_, &WWidget::setFocus);
-    prenomEncoderEdit_->enterPressed().connect(contactEncoderEdit_, &WWidget::setFocus);
-    contactEncoderEdit_->enterPressed().connect(contactEncoderGSMEdit_, &WWidget::setFocus);
-    contactEncoderGSMEdit_->enterPressed().connect(keepInTouch, &WWidget::setFocus);
-    keepInTouch->enterPressed().connect(typeContactEdit_, &WWidget::setFocus);
-
-    anneeVCREdit_->changed().connect(vosrefEdit_, &WWidget::setFocus);
-    vosrefEdit_->enterPressed().connect(objectifEdit_, &WWidget::setFocus);
-    objectifEdit_->changed().connect(spEdit_, &WWidget::setFocus);
-    spEdit_->enterPressed().connect(sanitEdit_, &WWidget::setFocus);
-    sanitEdit_->enterPressed().connect(regeNatEdit_, &WWidget::setFocus);
-    regeNatEdit_->enterPressed().connect(vegeBloquanteEdit_, &WWidget::setFocus);
-    vegeBloquanteEdit_->enterPressed().connect(travSylviEdit_, &WWidget::setFocus);
-    //itineraireEdit_->changed().connect(travSylviEdit_, &WWidget::setFocus);
-    travSylviEdit_->enterPressed().connect(plantationEdit_, &WWidget::setFocus);
-    plantationEdit_->enterPressed().connect(gibierEdit_, &WWidget::setFocus);
-    //hauteurEdit_->enterPressed().connect(gibierEdit_, &WWidget::setFocus);
-    gibierEdit_->enterPressed().connect(VCRdescriptionEdit_, &WWidget::setFocus);
 
     cont = tpl->bindWidget("contLoca", std::make_unique<WContainerWidget>());
     cont->addStyleClass("encodage");
@@ -175,6 +81,16 @@ formDesserteForest::formDesserteForest(const WEnvironment &env, cDicoApt *dico, 
     WVBoxLayout * la = cont->setLayout(Wt::cpp14::make_unique<Wt::WVBoxLayout>());
     cont= la->addWidget(std::make_unique<WContainerWidget>());
     cont->addWidget(std::make_unique<Wt::WText>(WString::tr("titreLocalisation")));
+
+    // choix de la géométrie
+    cont->addWidget(std::make_unique<Wt::WText>(WString::tr("choix.am")));
+    choixAM_ = cont->addWidget(std::make_unique<Wt::WComboBox>());
+    choixAM_->addItem(WString::tr("choix.am0"));
+    choixAM_->addItem(WString::tr("choix.am1"));
+    choixAM_->addItem(WString::tr("choix.am2"));
+
+    choixAM_->changed().connect(std::bind(&formDesserteForest::changeGeom, this));
+
     cont= la->addWidget(std::make_unique<WContainerWidget>());
     WHBoxLayout * layoutH = cont->setLayout(Wt::cpp14::make_unique<Wt::WHBoxLayout>());
     auto smart_map = std::make_unique<Wol>();
@@ -206,9 +122,6 @@ formDesserteForest::formDesserteForest(const WEnvironment &env, cDicoApt *dico, 
         std::shared_ptr<layerBase> aL1=mDico->getLayerBase(code);
         WPushButton * but = cont->addNew<Wt::WPushButton>(aL1->Nom());
         but->addStyleClass("mybtn2");
-        //WText * wtext1= cont->addNew<Wt::WText>(aL1->Nom());
-        //wtext1->addStyleClass("encodageLayer");
-        //wtext1->decorationStyle().setCursor(Cursor::PointingHand);
         cont->addNew<WBreak>();
         but->clicked().connect([=] {this->displayLayer(aL1->Code());});
     }
@@ -222,6 +135,24 @@ formDesserteForest::formDesserteForest(const WEnvironment &env, cDicoApt *dico, 
     bUndo->setMinimumSize("100%"," ");
     bUndo->clicked().connect([=] {doJavaScript("draw.removeLastPoint();");});
     map->polygGeojson().connect(std::bind(&formDesserteForest::validDraw,this, std::placeholders::_1));
+
+    cont = tpl->bindWidget("contDesserte", std::make_unique<WContainerWidget>());
+    table= cont->addNew<WTable>();
+    table->addStyleClass("table-encodage");
+    row=0;
+    table->elementAt(row,0)->addWidget(std::make_unique<WLabel>(WString::tr("desc.am")));
+    row++;
+    descriptionAmEdit_= table->elementAt(row,0)->addWidget(std::make_unique<WTextArea>());
+    descriptionAmEdit_->setColumns(40);
+    descriptionAmEdit_->setRows(5);
+    row++;
+    table->elementAt(row,0)->addWidget(std::make_unique<WLabel>(WString::tr("desc.deposant")));
+    row++;
+    deposant = table->elementAt(row,0)->addWidget(std::make_unique<WComboBox>());
+    deposant->addItem(WString::tr("desc.deposant0"));
+    deposant->addItem(WString::tr("desc.deposant1"));
+    deposant->addItem(WString::tr("desc.deposant2"));
+    deposant->addItem(WString::tr("desc.deposant3"));
 
     WPushButton * bSubmit = tpl->bindWidget("bsubmit", std::make_unique<WPushButton>(WString::tr("submit")));
     bSubmit->clicked().connect([=] {submit();});
@@ -241,9 +172,8 @@ void formDesserteForest::submit(){
         messageBox->show();
     } else if(!polygValid){
         Wt::WMessageBox * messageBox = this->addChild(std::make_unique<Wt::WMessageBox>(
-                                                          "Emplacement de la coupe rase",
-                                                          "Veillez localiser la coupe rase et dessiner le contour de la parcelle sur la carte"
-                                                          ,
+                                                          Wt::WString::tr("dessinNonValid.t"),
+                                                          Wt::WString::tr("dessinNonValid.c"),
                                                           Wt::Icon::Information,
                                                           Wt::StandardButton::Ok));
         messageBox->setModal(true);
@@ -251,20 +181,7 @@ void formDesserteForest::submit(){
             this->removeChild(messageBox);
         });
         messageBox->show();
-    } else if(anneeVCREdit_->currentIndex()==0){
-        Wt::WMessageBox * messageBox = this->addChild(std::make_unique<Wt::WMessageBox>(
-                                                          "Anciennetée de la coupe rase",
-                                                          "Veillez nous renseigner l'anciennetée de la coupe rase (menu déroulant)"
-                                                          ,
-                                                          Wt::Icon::Information,
-                                                          Wt::StandardButton::Ok));
-        messageBox->setModal(true);
-        messageBox->buttonClicked().connect([=] {
-            this->removeChild(messageBox);
-        });
-        messageBox->show();
-
-    } else {
+} else {
         // sauver la coupe rase dans la BD
         int rc;
         sqlite3 *db_;
@@ -276,26 +193,13 @@ void formDesserteForest::submit(){
             sqlite3_stmt * stmt;
             SQLstring="INSERT INTO acr (date,vosRef,nom,prenom,contact,gsm,keepInTouch,typeContact,anneeCoupe,regeNat,vegeBloquante,objectif,spCoupe,sanitCoupe,travaux,plantation,gibier,descr,surf,polygon) VALUES ('"
                     +d.toString().toUTF8()+"',"
-                    +"'"+format4SQL(vosrefEdit_->valueText().toUTF8())+"',"
                     +"'"+format4SQL(nomEncoderEdit_->valueText().toUTF8())+"',"
                     +"'"+format4SQL(prenomEncoderEdit_->valueText().toUTF8())+"',"
                     +"'"+format4SQL(contactEncoderEdit_->valueText().toUTF8())+"',"
                     +"'"+format4SQL(contactEncoderGSMEdit_->valueText().toUTF8())+"',"
-                    +std::to_string(keepInTouch->isChecked())+","
                     +"'"+format4SQL(typeContactEdit_->currentText().toUTF8())+"',"
-                    +"'"+format4SQL(anneeVCREdit_->currentText().toUTF8())+"',"
-                    +"'"+format4SQL(regeNatEdit_->valueText().toUTF8())+"',"
-                    +"'"+format4SQL(vegeBloquanteEdit_->valueText().toUTF8())+"',"
-                    +"'"+format4SQL(objectifEdit_->currentText().toUTF8())+"',"
-                    +"'"+format4SQL(spEdit_->valueText().toUTF8())+"',"
-                    +"'"+format4SQL(sanitEdit_->valueText().toUTF8())+"',"
-                    +"'"+format4SQL(travSylviEdit_->valueText().toUTF8())+"',"
-                    +"'"+format4SQL(plantationEdit_->valueText().toUTF8())+"',"
-                    +"'"+format4SQL(gibierEdit_->valueText().toUTF8())+"',"
-                    +"'"+format4SQL(VCRdescriptionEdit_->valueText().toUTF8())+"',"
-                    +std::to_string(surf)+","
                     +"'"+polyg+"');";
-            //std::cout << "sql : " << SQLstring << std::endl;
+            std::cout << "sql : " << SQLstring << std::endl;
             sqlite3_prepare_v2(db_, SQLstring.c_str(), -1, &stmt, NULL );
             // applique l'update
             sqlite3_step( stmt );
@@ -324,27 +228,34 @@ std::string formDesserteForest::format4SQL(std::string aString){
     return aString;
 }
 
+void formDesserteForest::changeGeom(){
+    std::string stgeom("LineString");
+    switch (choixAM_->currentIndex()) {
+    case 0:
+        stgeom="LineString";
+        break;
+    case 1:
+         stgeom="Point";
+        break;
+    case 2:
+         stgeom="Polygon";
+        break;
+    default:
+        break;
+    }
+    std::string js ="map.removeInteraction(draw); draw = new ol.interaction.Draw({source: acr_src,type: '"+stgeom+"',}); acr_src.clear();map.addInteraction(draw);";
+    doJavaScript(js);
+    //std::cout << js << std::endl;
+}
+
 void formDesserteForest::vider(bool all){
-    //std::cout << "vider formulaire"<< std::endl;
     if(all){
         nomEncoderEdit_->setText("");
         prenomEncoderEdit_->setText("");
         contactEncoderEdit_->setText("");
         contactEncoderGSMEdit_->setText("");
-        keepInTouch->setChecked(0);
         typeContactEdit_->setCurrentIndex(0);
     }
-    anneeVCREdit_->setCurrentIndex(0);
-    regeNatEdit_->setText("");
-    vegeBloquanteEdit_->setText("");
-    VCRdescriptionEdit_->setText("");
-    vosrefEdit_->setText("");
-    objectifEdit_->setCurrentIndex(0);
-    spEdit_->setText("");
-    sanitEdit_->setText("");
-    travSylviEdit_->setText("");
-    plantationEdit_->setText("");
-    gibierEdit_->setText("");
     polygValid=0;
     polyg="";
     doJavaScript("acr_src.clear();map.addInteraction(draw);");
@@ -522,7 +433,7 @@ void formDesserteForest::validDraw(std::string geojson){
         OGRFeature *poFeature;
         while( (poFeature = lay->GetNextFeature()) != NULL )
         {
-            surf=OGR_G_Area(poFeature->GetGeometryRef())/10000.0;
+            //surf=OGR_G_Area(poFeature->GetGeometryRef())/10000.0;
             //std::cout << "surface " << surf<< std::endl;
             polygValid=1;
             polyg=poFeature->GetGeometryRef()->exportToJson();
@@ -542,35 +453,12 @@ void formDesserteForest::sendSummaryMail(){
     mail.setBody(
                 "\nVos données ont été encodée.\n"+
                 Wt::WString::tr("mail.contact").toUTF8()+"\n--------------------------\n"+
-                vosrefEdit_->valueText().toUTF8()+"\n"+
                 nomEncoderEdit_->valueText().toUTF8()+"\n"+
                 prenomEncoderEdit_->valueText().toUTF8()+"\n"+
                 contactEncoderEdit_->valueText().toUTF8()+"\n"+
                 contactEncoderGSMEdit_->valueText().toUTF8()+"\n"+
                 typeContactEdit_->valueText().toUTF8()+"\n\n"+
-                Wt::WString::tr("mail.acr").toUTF8()+"\n\n"+
-                Wt::WString::tr("anneeVCR").toUTF8()+"\n"+
-                anneeVCREdit_->currentText().toUTF8()+"\n"+
-                Wt::WString::tr("regeNat").toUTF8()+"\n"+
-                regeNatEdit_->valueText().toUTF8()+"\n"+
-                Wt::WString::tr("vegeBloquante").toUTF8()+"\n"+
-                vegeBloquanteEdit_->valueText().toUTF8()+"\n"+
-                Wt::WString::tr("objectif").toUTF8()+"\n"+
-                objectifEdit_->currentText().toUTF8()+"\n"+
-                Wt::WString::tr("sp").toUTF8()+"\n"+
-                spEdit_->valueText().toUTF8()+"\n"+
-                Wt::WString::tr("sanit").toUTF8()+"\n"+
-                sanitEdit_->valueText().toUTF8()+"\n"+
-                Wt::WString::tr("trav.sylvi").toUTF8()+"\n"+
-                travSylviEdit_->valueText().toUTF8()+"\n"+
-                Wt::WString::tr("plantation").toUTF8()+"\n"+
-                plantationEdit_->valueText().toUTF8()+"\n"+
-                Wt::WString::tr("gibier").toUTF8()+"\n"+
-                gibierEdit_->valueText().toUTF8()+"\n"+
-                Wt::WString::tr("descriptionVCR").toUTF8()+"\n"+
-                VCRdescriptionEdit_->valueText().toUTF8()+"\n"+
-                "Surface de la coupe rase (ha) : "+
-                Wt::WString(std::to_string(surf)).toUTF8()+"\n"
+                Wt::WString::tr("mail.acr").toUTF8()+"\n\n"
                 );
     mail.setSubject(Wt::WString::tr("mail.titre").toUTF8());
     mail.addRecipient(Wt::Mail::RecipientType::To,Mail::Mailbox(contactEncoderEdit_->valueText().toUTF8(),nomEncoderEdit_->valueText().toUTF8()) );

@@ -7,29 +7,50 @@
 
 <div class="frameEncodage" style="height:100.0%;padding:10px 15px 10px 15px;margin-top:30.0px;margin-right:30.0px;margin-bottom:30.0px;margin-left:30.0px;display:flex;box-sizing:border-box;-webkit-box-sizing:border-box;flex-flow:column;-webkit-flex-flow:column;">
 	<div class="encodage" style="margin: 3px 0px; overflow: visible; flex: 1 1 auto;">
-	<h1> Formulaire d'encodage d'anciennes coupes rases non replantées </h1>
-
-<h3>Les coupes rases abandonnées peuvent-elles produire du bois de qualité ?</h3>
-<br></br>
-La Faculté de Gembloux Agro-Bio Tech (ULiège) a initié, en collaboration avec les experts forestiers (FNEF) et la cellule d’appui (CAPFP), une étude visant à évaluer objectivement dans quelle mesure la régénération naturelle, au besoin enrichie, peut produire des peuplements de valeur économique, paysagère et écologique sur de grandes mises à blanc, et à définir les moyens pour y parvenir. Nous sommes à la recherche de situations actuellement connues de <b class="text-success">coupes rases anciennes non replantées</b>, que la régénération y soit réussie ou non, dans lesquelles les propriétaires peuvent nous renseigner sur les éventuelles interventions qui y ont été menées. Vous pouvez nous aider en remplissant le formulaire ci-dessous, ou en nous contactant par mail ou téléphone : Mr Lisein (<a href = "mailto: liseinjon@hotmail.com">JO.Lisein@uliege.be</a> - 0475221309)
-		<div >
-		 <img src="/img/CoupeRaseNisramont1LR.jpg" alt="coupe rase en libre évolution avec une régénération naturelle satisfaisante" style="display: block;margin-left: auto;margin-right: auto;width: 30%;"  />
+	<h1> Desserte forestière déficitaire  </h1>
+	<h2> formulaire d’encodage  </h2>
+			<div >
+		 <img src="/img/desserte.png" alt="Desserte forestière déficitaire" style="display: block;margin-left: auto;margin-right: auto;width: 40%;"  />
 		</div>
-		Nous collecterons les informations de manière cartographique, mais nous nous engageons évidemment à ne jamais visiter ou renseigner ces sites sans votre accord.
-	</div>
-	
+<br></br>
+Un appel à projets est actuellement lancé par le Service Public de Wallonie pour des investissements relatifs à des « dessertes forestières ».
+<br></br>
+Plus précisément, cela concerne des investissements relatifs à :
+<ul>
+  <li>«La création de places de dépôt des bois dans l’objectif d’éviter des distances de débardage trop longues (diminution des problématiques de compaction…) et de favoriser les chargements en toute sécurité en veillant à éviter le lit majeur des cours d’eau,</li>
+  <li>la création de places de retournement afin de faciliter et sécuriser les opérations de chargement de bois et de diminuer les problématiques de compaction des sols, d’érosion, de ruissellement,…</li>
+  <li>les travaux d’adaptation du réseau viaire de façon à améliorer la gestion du risque d’érosion et d’inondation dans des zones vulnérables (saignées latérales, revers d’eau, noues de décantation…) ;</li>
+  <li>les travaux d’adaptation du réseau de dessertes permettant la réduction de l’impact des activités d’exploitation sur les sols et sur l’eau, pour la préservation des zones sensibles, et ce, par exemple, par la création de ponts et passages en zones humides. »</li>
+</ul>
+<br></br>
+Les porteurs de projets doivent être propriétaires (publics ou privés, personnes physiques ou morales) de parcelles boisées situées en Wallonie. L’appel à projet se clôturera le 01/03/2025.
+<br></br>
+Le dépôt d’un tel projet ne peut s’improviser tant sur un plan technique qu’administratif ! 
 
+<figure class="highlight">
+La Cellule d’Appui à la Petite Forêt Privée (FBW) et la Société Royale Forestière de Belgique proposent à tout propriétaire/gestionnaire forestier qui souhaiterait faire part de besoins en matière d’amélioration de la desserte forestière de compléter dans un premier temps le formulaire ci-dessous.
+Une analyse de ces « déclarations d’intérêt » sera ensuite réalisée afin de dresser un constat sur les besoins en matière d’amélioration de la desserte forestière. 
+La SRFB accompagnera certains porteurs de projets qui souhaiteraient répondre à l’appel à projets lancé actuellement par le SPW.
+Les informations sont collectées de manière cartographique, mais les données reçues ne seront pas publiées. Elles seront analysées en les globalisant et en les anonymisant. Ceci afin de rapporter auprès des instances régionales l’intérêt des propriétaires et gestionnaires forestiers pour des investissements en matière de desserte forestière.
+ Les chemins privés ne seront jamais visités sans l’accord préalable de leurs propriétaires.
+</figure>
 
+Le formulaire est prévu pour un type d’aménagement à la fois.
+Cela peut concerner des éléments linéaires (un tronçon de desserte homogène) mais aussi ponctuels (comme par exemple un passage à gué) ou surfacique (comme par exemple une aire de dépôt).
+Si vous souhaitez encoder plusieurs aménagements (plusieurs tronçons, un tronçon et une aire de dépôt etc), vous êtes invité à répéter l’encodage pour chaque aménagement. Les données générales (vos coordonnées) seront répétées par défaut d’un aménagement à l’autre.
+ 
+ <div >
+		 <img src="/img/desserte2.jpg" alt="Chargement de grume en forêt" style="display: block;margin-left: auto;margin-right: auto;width: 40%;"  />
+</div>
+</div>
 	
 	<div style="margin: 3px 0px; flex: 1 1 auto; overflow: visible;"></div>
 	${contContact class="encodage" style="margin: 3px 0px; flex: 1 1 auto; overflow: visible;"}
 	<div style="margin: 3px 0px; flex: 1 1 auto; overflow: visible;"></div>
 	${contLoca}
-	
 	<div style="margin: 3px 0px; flex: 1 1 auto; overflow: visible;"></div>
-	${contACR1 class="encodage" style="margin: 3px 0px; flex: 1 1 auto; overflow: visible;"}
 	<div style="margin: 3px 0px; flex: 1 1 auto; overflow: visible;"></div>
-	${contACR2 class="encodage" style="margin: 3px 0px; flex: 1 1 auto; overflow: visible;"}
+	${contDesserte class="encodage" style="margin: 3px 0px; flex: 1 1 auto; overflow: visible;"}
 	<div style="margin: 3px 0px; flex: 1 1 auto; overflow: visible;"></div>
 	${bsubmit class="btn btn-success with-label mybtn"}
 	
@@ -37,7 +58,6 @@ La Faculté de Gembloux Agro-Bio Tech (ULiège) a initié, en collaboration avec
 </message>
 
 <message id="sectionEncoder"> <h3> Vos données personnelles </h3>
-<!--<p>La personne de contact qui connait le mieux la vieille coupe rase (par exemple, le gestionnaire) est renseignée plus bas, les champs ci-dessous sont utilisés pour identifier la personne qui remplit le présent formulaire.</p>-->
 </message>
 
 <message id="nom"> Nom : </message>
@@ -49,104 +69,79 @@ La Faculté de Gembloux Agro-Bio Tech (ULiège) a initié, en collaboration avec
 
 <message id="contact.gsm"> Votre contact: téléphone </message>
 <message id="contact.gsm.ph"> Ex: 0475221309 </message>
-<message id="contactACR"> Contact du gestionnaire forestier : nom, email et/ou téléphone </message>
-<message id="contactACR.ph"> Ex: gestionnaire: rege.nat@hotmail.com</message>
 
 <message id="typeEncoder"> Vous êtes ?</message>
 <message id="typeEncoder0"> Choisissez  </message>
 <message id="typeEncoder1"> Propriétaire privé </message>
-<message id="typeEncoder2"> FNEF </message>
-<message id="typeEncoder3"> Cellule d'appui </message>
-<message id="typeEncoder4"> DNF </message>
+<message id="typeEncoder2"> Gestionnaire forestier privé </message>
+<message id="typeEncoder3"> DNF </message>
+<message id="typeEncoder4"> Administration publique (commune…) </message>
 <message id="typeEncoder5"> Autre </message>
 
+<message id="contact.precision"> Précisions </message>
 
-<message id="kit"> Souhaitez-vous recevoir les résultats du projet de suivi des anciennes coupes rases?</message>
+<message id="type.am"> Type d’aménagement </message>
+<message id="type.am0"> création d’une nouvelle desserte </message>
+<message id="type.am1"> agrandissement en largeur ou en longueur d’une desserte existante</message>
+<message id="type.am2"> amélioration du revêtement d’une desserte existante</message>
+<message id="type.am3"> création ou amélioration d’une aire de stockage</message>
+<message id="type.am4"> amélioration d’un franchissement de cours d’eau</message>
+<message id="type.am5"> autre aménagement en lien avec le ruissellement des eaux</message>
+<message id="type.am6"> autre</message>
 
-<message id="initPol">Réinitialiser tout le contour </message>
+<message id="proprio.am"> Propriétaire actuelle de la desserte (attention à bien mentionner le type de propriété de la desserte et non des parcelles jouxtant celle-ci) </message>
+<message id="proprio.am0">privé-un seul propriétaire </message>
+<message id="proprio.am1">privé- multipropriétaires </message>
+<message id="proprio.am2">public </message>
+<message id="proprio.am3">mixte (public et privé) </message>
+
+<message id="initPol">Réinitialiser tout le dessin </message>
 <message id="cancelPoint">Supprimer le dernier point </message>
 <message id="submit">J'ai fini! Soumettre</message>
 
-<message id="map.tooltip">Cliquez pour dessiner le contour de la coupe rase. Pour finir le contour, joignez le dernier point avec le premier point et cliquez à nouveau</message>
+<message id="map.tooltip">Pour commencer la numérisation, effectuez un simple clic gauche sur la carte.</message>
 
-<message id="sectionVCR1"> <h3> Description de l'ancienne coupe rase </h3>
-<!--La description encodée ici est une description globale, des inventaires de terrain permettront ensuite de fournir une description plus précise.-->
+
+<message id="titreLocalisation"> <h3> Localisation de la desserte </h3>
+<p>La localisation de la desserte doit être indiquée en dessinant le tronçon sur la carte ci-dessous. Il est possible de naviguer sur la carte en utilisant la souris ou de centrer sur la commune concernée en choisissant le nom de la commune (menu déroulant à droite). Pour terminer le dessin d'un tronçon, effectuez un double-clic. Pour terminer le dessin d'un polygone, cliquer sur le premier point de son contour.</p>
 </message>
 
-<message id="sectionVCR2"> <h3> Description facultative </h3>
-<!--La description encodée ici est une description globale, des inventaires de terrain permettront ensuite de fournir une description plus précise.-->
-</message>
+<message id="choix.am">Choisissez le type d’aménagement</message>
+<message id="choix.am0">linéaire (tronçon de desserte)</message>
+<message id="choix.am1">ponctuel (passage à gué…)</message>
+<message id="choix.am2">surfacique (aire de dépôt de bois…)</message>
 
-<message id="anneeVCR"> Anciennetée de la coupe rase :</message>
-<message id="regeNat"> Quelles sont les essences les plus présentes dans la régénération naturelle?</message>
-<message id="regeNat.ph"> Ex: Bouleaux - Epicéa - Sorbier des oiseleurs </message>
-<message id="vegeBloquante"> Présence de végétation bloquante (précisez les espèces, ex: ronce, fougère)</message>
-<message id="vegeBloquante.ph"> Ex: Fougère aigle sur 75% de la coupe rase</message>
-
-<message id="descriptionVCR"> Renseignez ici vos éventuels commentaires ou toutes autres informations utiles</message>
-<message id="descriptionVCR.ph"> Ex: La végétation naturelle est présente en quantitée mais est abroutie par le gibier</message>
-
-<message id="titreLocalisation"> <h3> Localisation de la coupe rase </h3>
-<p>La localisation de la coupe rase doit être indiquée en numérisant le contour de la parcelle sur la carte ci-dessous. On peut naviguer sur la carte en utilisant la souris, mais il est également possible de choisir le nom de la commune où se trouve l'ancienne coupe rase (menu déroulant à droite). Pour commencer la numérisation du contour, effectuez un simple clic gauche sur la carte.</p>
-</message>
 <message id="titreCatalogue"> <h4> Affichez une couche cartographique en cliquant sur son nom </h4> </message>
-<message id="cadastre.choisir"> Choisissez une commune</message>
+<message id="cadastre.choisir">Choisissez une commune</message>
 <message id="titreCommune"><h4>Choisissez une commune pour centrer la carte sur celle-ci</h4></message>
 
-<message id="saveACR.msg.titre">Encodage d'ancienne coupe rase</message>
+<message id="desc.am">Description de l’aménagement envisagé</message>
+
+<message id="desc.deposant">Envisagez-vous de déposer vous-même un dossier dans le cadre de l’appel à projets en cours</message>
+<message id="desc.deposant0">Oui, à titre personnel </message>
+<message id="desc.deposant1">Oui, pour un collectif</message>
+<message id="desc.deposant2">Je ne sais pas encore</message>
+<message id="desc.deposant3">Non </message>
+
+
+<message id="saveACR.msg.titre">Encodage desserte </message>
 <message id="saveACR.msg.cont">
-Vos données ont été encodées de manière adéquate. Nous vous remercions pour votre participation. Souhaitez-vous encoder une autre coupe rase?
+Vos données ont été encodées de manière adéquate. Nous vous remercions pour votre participation. Souhaitez-vous encoder une autre desserte, passage à gué ou aire de dépôt de bois?
 </message>
 
-
-<message id="sp"> Quelles étaient les espèces présentes dans le peuplement avant la coupe rase ?  </message>
-<message id="sp.ph"> Ex: Epicéa </message>
-
-<message id="sanit"> Est-ce que la coupe a été réalisée pour des raisons sanitaires ? Si oui, quel était le problème sanitaire ?  </message>
-<message id="sanit.ph"> Ex: Oui. Chalarose </message>
-
-<message id="trav.sylvi">Avez-vous réalisé des travaux sylvicoles sur la parcelle ? Si oui, quels travaux et en quelles années ?  </message>
-<message id="trav.sylvi.ph"> Ex: Gyrobroyage, andainage, fraisage, plantations, dégagements, dépressages </message>
-
-<message id="objectif"> Quels sont vos objectifs pour cette parcelle ?  </message>
-<message id="objectif0"> Sélectionnez l'objectif principal si opportun </message>
-<message id="objectif1"> Vocation économique - production de bois  </message>
-<message id="objectif2"> Vocation sociale - régénérer une belle forêt pour s'y divertir  </message>
-<message id="objectif3"> Vocation écologique - restauration d’habitats, protection des sols, protection de la biodiversité </message>
-<message id="vosRef"> Votre référence pour cette coupe rase (facultatif) </message>
-<message id="vosRef.ph"> Ex : parcelle 5   </message>
-
-<message id="itineraire">  Quel est le type d'itinéraire choisi pour régénérer la forêt ?  </message>
-<message id="itineraire0"> Choisissez l'itinéraire suivi si opportun </message>
-<message id="itineraire1"> Plantation </message>
-<message id="itineraire2"> Régénération naturelle </message>
-<message id="itineraire3"> Régénération naturelle avec des plantations d'enrichissement </message>
-
-<message id="anneeCoupe0"> Depuis compbien de temps a eu lieu la coupe? </message>
-<message id="anneeCoupe1"> moins de 5 ans </message>
-<message id="anneeCoupe2"> entre 5 et 10 ans </message>
-<message id="anneeCoupe3"> entre 10 et 15 ans </message>
-<message id="anneeCoupe4"> il y a plus de 15 ans </message>
-
-<message id="plantation">  Si vous avez fait des plantations, quelles espèces et combien de tiges par espèce avez-vous plantées sur la parcelle ? Quelle est l'année de plantation ?  </message>
-<message id="plantation.ph"> Ex: Plantation d'enrichissement de placeaux de tilleuls à grandes feuilles (90 tiges) </message>
-
-<message id="hauteur">  Quelle est la hauteur approximative (en mètres) des tiges dominantes actuellement présentes sur la parcelle ?  </message>
-<message id="hauteur.ph"> Ex: les bouleaux font 12 mètres </message>
-
-<message id="gibier">  Avez-vous protégé vos arbres contre les dégâts de gibier?  </message>
-<message id="gibier.ph"> Ex: oui (protections individuelles) </message>
-
-<message id="btnPolyg"> Vous pouvez réinitialiser le contour de la coupe avec les bouttons ci-dessous  </message>
+<message id="btnPolyg"> Vous pouvez réinitialiser le dessin avec les bouttons ci-dessous  </message>
 
 <message id="Wt.WMessageBox.Yes"> Oui</message>
 <message id="Wt.WMessageBox.No"> Non</message>
 <message id="Wt.WMessageBox.Cancel"> Annuler</message>
 
-<message id="mail.titre"> encodage d'anciennes coupes rases non replantées </message>
-<message id="mail.contact">  Vos données personnelles </message>
-<message id="mail.acr">  Description de l'ancienne coupe rase: </message>
+<message id="dessinNonValid.t"> Emplacement de la coupe rase</message>
+<message id="dessinNonValid.c"> Veillez localiser la coupe rase et dessiner le contour de la parcelle sur la carte</message>
 
-<message id="coupe.rase.view">Voici les coupes rases qui ont été enregistrées précédemment</message>
+
+<message id="mail.titre"> desserte forestière </message>
+<message id="mail.contact">  Vos données personnelles </message>
+<message id="mail.acr">  Description de votre encodage: </message>
+
 
 </messages>

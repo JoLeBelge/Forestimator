@@ -58,27 +58,23 @@ public:
 
     std::string format4SQL(std::string aString);
 
+    void changeGeom();
+
     WLineEdit *nomEncoderEdit_;
     WLineEdit *prenomEncoderEdit_;
     WLineEdit *contactEncoderEdit_;
     WLineEdit *contactEncoderGSMEdit_;
-    WCheckBox * keepInTouch;
-    WComboBox *typeContactEdit_;
-    WComboBox *anneeVCREdit_;
-    WLineEdit *regeNatEdit_;
-    WLineEdit *vegeBloquanteEdit_;
-    WTextArea *VCRdescriptionEdit_;
 
-    WLineEdit *vosrefEdit_;
-    WComboBox *objectifEdit_;
-    WLineEdit *spEdit_;
-    WLineEdit *sanitEdit_;
-    WLineEdit *travSylviEdit_;
-    WLineEdit *plantationEdit_;
-    WLineEdit *gibierEdit_;
+    WComboBox *typeContactEdit_;
+    WLineEdit *contactPresicionEdit_;
+    WComboBox *typeamEdit_;
+    WComboBox * typeProprioEdit_;
+
+    WComboBox * choixAM_;
+    WTextArea *descriptionAmEdit_;
+    WComboBox * deposant;
 
     WPushButton * bCancel;
-
     WComboBox * commune_;
     // clé ; index dans combobox. val= clé (INS commune , code Division)
     std::map<int,int> aMLabelCom;
@@ -86,8 +82,6 @@ public:
 private:
 
     std::string SQLstring;
-
-    double surf;
     bool polygValid;
     std::string polyg;
     OGRGeometry * geom;

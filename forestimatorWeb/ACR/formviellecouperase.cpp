@@ -164,10 +164,8 @@ formVielleCoupeRase::formVielleCoupeRase(const WEnvironment &env, cDicoApt *dico
     sanitEdit_->enterPressed().connect(regeNatEdit_, &WWidget::setFocus);
     regeNatEdit_->enterPressed().connect(vegeBloquanteEdit_, &WWidget::setFocus);
     vegeBloquanteEdit_->enterPressed().connect(travSylviEdit_, &WWidget::setFocus);
-    //itineraireEdit_->changed().connect(travSylviEdit_, &WWidget::setFocus);
     travSylviEdit_->enterPressed().connect(plantationEdit_, &WWidget::setFocus);
     plantationEdit_->enterPressed().connect(gibierEdit_, &WWidget::setFocus);
-    //hauteurEdit_->enterPressed().connect(gibierEdit_, &WWidget::setFocus);
     gibierEdit_->enterPressed().connect(VCRdescriptionEdit_, &WWidget::setFocus);
 
     cont = tpl->bindWidget("contLoca", std::make_unique<WContainerWidget>());

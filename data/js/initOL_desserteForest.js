@@ -98,7 +98,14 @@ map = new ol.Map({
 	stroke: new ol.style.Stroke({
 		color: 'rgba(0, 255,0, 1.0)',
 		width: 5
-	  })
+	  }),
+	 image: new ol.style.Circle({
+        radius: 7,
+        fill: new ol.style.Fill({color: 'black'}),
+        stroke: new ol.style.Stroke({
+          color: [255,0,0], width: 2
+        })
+      })
 });
 
 acr_src = new ol.source.Vector({
