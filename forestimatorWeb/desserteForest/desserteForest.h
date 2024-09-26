@@ -36,10 +36,38 @@
 #include "Wt/WValidator.h"
 #include <Wt/Dbo/Dbo.h>
 
+// pour objet Wol
 #include "ACR/formviellecouperase.h"
 
 using namespace Wt;
 namespace dbo = Wt::Dbo;
+
+// pas sur que la classe soit nécéssaire vu que je n'utilise pas wt::dbo. Sauf pour créer la BD la première fois
+class desserte{
+public:
+    std::string date,nom,prenom,mail,tel;
+    int typeGeom;
+    std::string typeContact,descr,geom,contactPrecision, typeAM,typeProprio,deposant;
+    int id;
+    template<class Action>
+    void persist(Action& a)
+    {
+       // dbo::field(a, id,    "id");
+        dbo::field(a, date,    "date");
+        dbo::field(a, nom,   "nom");
+        dbo::field(a, prenom,    "prenom");
+        dbo::field(a, mail,  "mail");
+        dbo::field(a, tel,  "tel");
+        dbo::field(a, typeContact,  "typeContact");
+        dbo::field(a, contactPrecision,  "contactPrecision");
+        dbo::field(a, typeAM,  "typeAM");
+        dbo::field(a, typeProprio,  "typeProprio");
+        dbo::field(a, deposant,  "deposant");
+        dbo::field(a, typeGeom,  "typeGeom");
+        dbo::field(a, descr,  "descr");
+        dbo::field(a, geom,  "geom");
+    }
+};
 
 class formDesserteForest : public WApplication
 {
@@ -53,26 +81,22 @@ public:
     void displayCommune();
     OGREnvelope computeGlobalGeom(std::string aFile);
     void validDraw(std::string geojson);
-
     void vider(bool all=1);
-
     std::string format4SQL(std::string aString);
-
     void changeGeom();
 
-    WLineEdit *nomEncoderEdit_;
-    WLineEdit *prenomEncoderEdit_;
-    WLineEdit *contactEncoderEdit_;
-    WLineEdit *contactEncoderGSMEdit_;
+    WLineEdit *nom;
+    WLineEdit *prenom;
+    WLineEdit *mail;
+    WLineEdit *tel;
+    WComboBox *typeContact;
+    WLineEdit *contactPresicion;
 
-    WComboBox *typeContactEdit_;
-    WLineEdit *contactPresicionEdit_;
-    WComboBox *typeamEdit_;
-    WComboBox * typeProprioEdit_;
-
-    WComboBox * choixAM_;
-    WTextArea *descriptionAmEdit_;
-    WComboBox * deposant;
+    WComboBox *typeAM;
+    WComboBox *typeProprio;
+    WComboBox *choixAM;
+    WComboBox *deposant;
+    WTextArea *description;
 
     WPushButton * bCancel;
     WComboBox * commune_;
@@ -83,7 +107,7 @@ private:
 
     std::string SQLstring;
     bool polygValid;
-    std::string polyg;
+    std::string aGeom;
     OGRGeometry * geom;
     std::string mBDFile;
     dbo::Session session;

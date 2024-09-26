@@ -235,9 +235,24 @@ staticMap::staticMap(std::shared_ptr<layerBase> aLay, OGRGeometry *poGeom, OGREn
             painter.drawEllipse(rect);
             break;
         }
+        case wkbLineString:
+        {
+            OGRPoint ptTemp1, ptTemp2;
+            OGRLineString * l = poGeom->toLineString();
+            std::vector<Wt::WLineF> aVLines;
+            int NumberOfVertices =l->getNumPoints();
+            for ( int k = 0; k < NumberOfVertices-1; k++ )
+            {
+                l ->getPoint(k,&ptTemp1);
+                l->getPoint(k+1,&ptTemp2);
+                aVLines.push_back(WLineF(xGeo2Im(ptTemp1.getX()),yGeo2Im(ptTemp1.getY()),xGeo2Im(ptTemp2.getX()),yGeo2Im(ptTemp2.getY())));
+            }
+            painter.drawLines(aVLines);
+            break;
+        }
 
         default:
-            std::cout << "Geometrie " << poGeom->getGeometryName() << " non pris en charge " << std::endl;
+            std::cout << "Geometrie " << poGeom->getGeometryName() << " non pris en charge (static map)" << std::endl;
 
             break;
         }

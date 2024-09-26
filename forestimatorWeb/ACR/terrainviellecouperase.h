@@ -188,7 +188,7 @@ public:
     void persist(Action& a)
     {
         dbo::field(a, id_ACR,    "id_ACR");
-        dbo::field(a, id,    "ue");
+        dbo::field(a, id,    "ue"); // faire attention à ne pas créer un champ nommé id car Wt utilise déjà un champs avec ce nom
         dbo::field(a, bloquant,   "bloquant");
         dbo::field(a, gps,   "gpsLabel");
         dbo::field(a, rmqGPS,   "rmqGPS");

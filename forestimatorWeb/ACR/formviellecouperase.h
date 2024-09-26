@@ -50,7 +50,7 @@ public:
     template<class Action>
     void persist(Action& a)
     {
-        dbo::field(a, id,    "id");
+      //  dbo::field(a, id,    "id");
         dbo::field(a, date,    "date");
         dbo::field(a, vosRef,       "vosRef");
         dbo::field(a, nom,   "nom");
@@ -59,8 +59,6 @@ public:
         dbo::field(a, typeContact,  "typeContact");
         dbo::field(a, anneeCoupe,  "anneeCoupe");
         dbo::field(a, regeNat,  "regeNat");
-        dbo::field(a, typeContact,  "typeContact");
-        dbo::field(a, anneeCoupe,  "anneeCoupe");
         dbo::field(a, vegeBloquante,  "vegeBloquante");
         dbo::field(a, objectif,  "objectif");
         dbo::field(a, spCoupe,  "spCoupe");
