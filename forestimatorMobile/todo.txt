@@ -1,7 +1,10 @@
 To do list forestimator
 ------------------------
 
--> publish for iOS
+-GSA : ajout pdf pour unite stationnelle, et logo pour sensibilité des essences face au CC
+
+-> publish for iOS. en cours
+
 bug analyse ponctuelle offline quand une des cartes offline est corrompue; je ne sais pas reproduire l'erreur..
 
 Alignement des label "enregistré" qui est érratique pour l'instant
@@ -15,5 +18,5 @@ Ger : ajouter cadastre (non car pas de WMS, juste service arcgisRest qui va pas 
 
 Sam : catalogues ; problème de padding, margin, et le top parfois est tronqué, le header de smartphone interfère avec l'affichage.
 Aussi il y a des "<" pour dérouler même si pas d'info derrière, à enlever ?
-AnaPt : Problème, la liste déroulante ne va pas jusqu'en bas.. pas de scrol? bizarre
+
 
