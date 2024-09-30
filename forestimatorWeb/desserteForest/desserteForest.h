@@ -47,6 +47,7 @@ class desserte{
 public:
     std::string date,nom,prenom,mail,tel;
     int typeGeom;
+    bool     checkRepresentant;
     std::string typeContact,descr,geom,contactPrecision, typeAM,typeProprio,deposant;
     int id;
     template<class Action>
@@ -60,6 +61,7 @@ public:
         dbo::field(a, tel,  "tel");
         dbo::field(a, typeContact,  "typeContact");
         dbo::field(a, contactPrecision,  "contactPrecision");
+        dbo::field(a, checkRepresentant,  "checkRepresentant");
         dbo::field(a, typeAM,  "typeAM");
         dbo::field(a, typeProprio,  "typeProprio");
         dbo::field(a, deposant,  "deposant");
@@ -91,6 +93,7 @@ public:
     WLineEdit *tel;
     WComboBox *typeContact;
     WLineEdit *contactPresicion;
+    WCheckBox * checkRepresentant;
 
     WComboBox *typeAM;
     WComboBox *typeProprio;

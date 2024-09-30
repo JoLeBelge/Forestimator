@@ -86,7 +86,10 @@ formDesserteForest::formDesserteForest(const WEnvironment &env, cDicoApt *dico, 
     typeProprio->addItem(WString::tr("proprio.am1"));
     typeProprio->addItem(WString::tr("proprio.am2"));
     typeProprio->addItem(WString::tr("proprio.am3"));
-
+    ++row;
+    checkRepresentant= table->elementAt(row,1)->addWidget(std::make_unique<WCheckBox>());
+    checkRepresentant->setMinimumSize("30px","30px");
+    label = table->elementAt(row,0)->addWidget(std::make_unique<WLabel>(WString::tr("checkRepresentant")));
 
     cont = tpl->bindWidget("contLoca", std::make_unique<WContainerWidget>());
     cont->addStyleClass("encodage");
@@ -211,7 +214,7 @@ void formDesserteForest::submit(){
             WLocalDateTime d= WLocalDateTime::currentDateTime();
             //std::cout << " sauve la coupe rase " << std::endl;
             sqlite3_stmt * stmt;
-            SQLstring="INSERT INTO desserte (version,date,nom,prenom,mail,tel,typeContact,contactPrecision,typeAM,typeProprio,deposant,typeGeom,descr,geom) VALUES (0,'"
+            SQLstring="INSERT INTO desserte (version,date,nom,prenom,mail,tel,typeContact,contactPrecision,checkRepresentant,typeAM,typeProprio,deposant,typeGeom,descr,geom) VALUES (0,'"
                     +d.toString().toUTF8()+"',"
                     +"'"+format4SQL(nom->valueText().toUTF8())+"',"
                     +"'"+format4SQL(prenom->valueText().toUTF8())+"',"
@@ -219,6 +222,7 @@ void formDesserteForest::submit(){
                     +"'"+format4SQL(tel->valueText().toUTF8())+"',"
                     +"'"+format4SQL(typeContact->currentText().toUTF8())+"',"
                     +"'"+format4SQL(contactPresicion->valueText().toUTF8())+"',"
+                    +std::to_string(checkRepresentant->isChecked())+","
                     +"'"+format4SQL(typeAM->currentText().toUTF8())+"',"
                     +"'"+format4SQL(typeProprio->currentText().toUTF8())+"',"
                     +"'"+format4SQL(deposant->currentText().toUTF8())+"',"

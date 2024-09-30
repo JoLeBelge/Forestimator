@@ -137,17 +137,19 @@ Vos données ont été encodées de manière adéquate. Nous vous remercions pou
 
 <message id="btnPolyg"> Vous pouvez réinitialiser le dessin avec les bouttons ci-dessous  </message>
 
-<message id="Wt.WMessageBox.Yes"> Oui</message>
-<message id="Wt.WMessageBox.No"> Non</message>
-<message id="Wt.WMessageBox.Cancel"> Annuler</message>
+<message id="Wt.WMessageBox.Yes">Oui</message>
+<message id="Wt.WMessageBox.No">Non</message>
+<message id="Wt.WMessageBox.Cancel">Annuler</message>
 
-<message id="dessinNonValid.t"> Emplacement de la coupe rase</message>
-<message id="dessinNonValid.c"> Veillez localiser la coupe rase et dessiner le contour de la parcelle sur la carte</message>
+<message id="dessinNonValid.t">Emplacement de la coupe rase</message>
+<message id="dessinNonValid.c">Veillez localiser la coupe rase et dessiner le contour de la parcelle sur la carte</message>
 
 
-<message id="mail.titre"> desserte forestière </message>
-<message id="mail.contact">  Vos données personnelles </message>
-<message id="mail.acr">  Description de votre encodage: </message>
+<message id="mail.titre">desserte forestière </message>
+<message id="mail.contact">Vos données personnelles </message>
+<message id="mail.acr">Description de votre encodage: </message>
+
+<message id="checkRepresentant">Je suis/la structure que je représente est directement concerné(e) par le tronçon/la zone décrit(e) (utilisateur en tant que propriétaire ou joignant)</message>
 
 
 </messages>

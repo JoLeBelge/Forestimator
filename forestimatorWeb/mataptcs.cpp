@@ -206,7 +206,7 @@ void matAptCS::showFicheUS(int US, std::string aVar){
                                                                   Wt::StandardButton::Ok));
                 messageBox->contents()->addNew<Wt::WText>("Recommandation pour cette essence : " + mDicoApt->code2AptFull(aV.at(n)->getApt(zbio_,US_,mVar_)));
                 messageBox->contents()->addNew<Wt::WBreak>();
-                messageBox->contents()->addNew<Wt::WText>("Sensibilité climatique : to come soon"));
+                messageBox->contents()->addNew<Wt::WText>("Sensibilité climatique : to come soon");
                 messageBox->contents()->addNew<Wt::WBreak>();
 
                 Wt::WLink l("https://www.fichierecologique.be/resources/fee/FEE-"+aV.at(n)->Code()+".pdf");
