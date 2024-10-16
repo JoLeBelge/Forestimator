@@ -46,12 +46,12 @@ matAptCS::matAptCS(cDicoApt *aDicoApt):mDicoApt(aDicoApt),zbio_(1),US_(1),mVar_(
          rowCont->addNew<Wt::WBreak>();
          t->mouseWentOver().connect([=] {
              displayNiche(ess->Code());
-             graphZbio->displayAptMap(ess->Code());
+             //graphZbio->displayAptMap(ess->Code());
              t->setStyleClass("currentEss");
          });
          t->mouseWentOut().connect([=] {
              resetNiche();
-             graphZbio->selectZbio(zbio_);
+             //graphZbio->selectZbio(zbio_);
              t->setStyleClass("ess");
          });
 
