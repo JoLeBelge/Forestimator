@@ -97,6 +97,7 @@ public:
     std::map<int,int> getZBIOApt(std::string aCodeEs);
     std::map<int,std::map<int,int>> getRisqueTopo(std::string aCodeEs);
     std::map<int, std::map<std::tuple<int, std::string>, int> > getCSApt(std::string aCodeEs);
+    std::map<int,std::map<std::tuple<int, std::string>,int>> getCSRisqueClim(std::string aCodeEs);
 
 
     std::map<int,std::string>  * NH(){return  &Dico_NH;}
@@ -169,6 +170,11 @@ public:
     int Apt(std::string aCode){
         int aRes(777);
         if (Dico_Apt.find(aCode)!=Dico_Apt.end()){aRes=Dico_Apt.at(aCode);}
+        return aRes;
+    }
+   std::string CSClim(int aCode){
+        std::string aRes("");
+        if (Dico_CSClim.find(aCode)!=Dico_CSClim.end()){aRes=Dico_CSClim.at(aCode);}
         return aRes;
     }
 
@@ -402,6 +408,8 @@ protected:
     std::map<int,int>  Dico_AptDouble2AptNonContr;
     std::map<int,int>  Dico_AptSouscote;
     std::map<int,int>  Dico_AptSurcote;
+    std::map<int,std::string>  Dico_CSClim;
+    std::map<int,std::string>  Dico_CSClim2col;
     // les codes aptitudes sont classé dans un ordre fonction de la contrainte, permet de comparer deux aptitude
     std::map<int,int>  Dico_Apt2OrdreContr;
     std::map<int,std::string> Dico_risque;
@@ -448,6 +456,7 @@ public:
     int getApt(int aZbio);
     // retourne l'aptitude du catalogue de station
     int getApt(int aZbio, int US, std::string aVar="");
+    int getCSClim(int US, std::string aVar="");
     bool hasCSApt(){
         bool aRes(1);
         if (mAptCS.size()==0) {
@@ -510,6 +519,8 @@ public:
     // aptitude pour catalogue de station
     // clé ; zone bioclim/ région. Value ; une map -> clé = identifiant de la station (id + variante) Value ; aptitude
     std::map<int,std::map<std::tuple<int, std::string>,int>> mAptCS;
+    // sensibilité climatique
+     std::map<int,std::map<std::tuple<int, std::string>,int>> mCSClim;
     // clé ; zone bioclim/ région. Value ; une map -> clé ; id situation topo. valeur ; code risque
     std::map<int,std::map<int,int>> mRisqueTopo;
 

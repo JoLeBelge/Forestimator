@@ -3,20 +3,31 @@
 <message id="CS.intro"> <h1>Guide des Stations</h1> 
 <p class="lead">
 <h3>Fichier écologique des essences et Guide des stations forestières : des outils complémentaires</h3>
+<br></br>
 Le Fichier Ecologique des Essences (FEE) et le Guide des stations forestières sont deux outils complémentaires qui ont pour vocation d’aider les forestiers dans leurs démarches de description stationnelle, de choix des essences et de gestion forestière.
 Le fichier écologique des essences catégorise les stations selon trois facteurs écologiques que sont les niveaux <mark>bioclimatique, hydrique et trophique</mark> ; les 2 derniers étant représentés sous la forme d’un écogramme. C’est un outil orienté « aptitude des essences », qui comporte des fiches très informatives sur les atouts et les sensibilités de chaque essence forestière. 
 La classification très systématique des stations convient particulièrement à une utilisation à l’échelle de l’ensemble de la Région wallonne.
 <br></br>
 À une échelle plus régionale, comme pour les trois zones bioclimatiques d'Ardenne, le guide des stations est un outil orienté « gestion des stations », qui <mark>découpe le territoire en milieux-types, bien reconnaissables pour le forestier de terrain</mark>. En plus d’un choix d’essences approprié, le guide délivre des conseils de gestion spécifiques aux stations, par exemple en termes de protection des sols ou de promotion de la biodiversité.
 </p>
+<br></br>
 
 Une plus ample comparaison de l'approche FEE versus guide des stations est fournie dans l'article suivant : <div class="csl-entry">Maus, Lucie, Jonathan Lisein, et Hugues Claessens. 2021. «<a target="_blank" rel="noopener noreferrer"  href="https://orbi.uliege.be/bitstream/2268/304665/1/Foret.Nature%20-%20HS02%20-%20p36-39.pdf">Le guide d’identification des stations forestières de l’Oesling</a>&nbsp;». <i>Forêt.Nature</i> hors série n° 2.</div> 
-
-La présentation des guides de stations de l'Ardenne est quand à elle disponible dans l'article suivant : <div class="csl-entry">Tossens, Simon, Jonathan Lisein, Sophie Cordier, et Hugues Claessens. 2024. «<a target="_blank" rel="noopener noreferrer"  href="https://orbi.uliege.be/handle/2268/316284">Guide des stations forestières d’Ardenne</a>&nbsp;». <i>Forêt.Nature</i>, n<sup>o</sup> 170 (mars).</div>
-
+<br></br>
+La présentation des guides de stations de l'Ardenne est quand à elle disponible dans l'article suivant : <div class="csl-entry">Simon Tossens, Jonathan Lisein, Sophie Cordier, et Hugues Claessens. 2024. «<a target="_blank" rel="noopener noreferrer"  href="https://orbi.uliege.be/handle/2268/316284">Guide des stations forestières d’Ardenne</a>&nbsp;». <i>Forêt.Nature</i>, n<sup>o</sup> 170 (mars).</div>
+<br></br>
 <h3>Guide des stations: quel développement pour la Wallonie</h3>
-<p>Pour l'instant, les Guides des Stations de l'Ardenne et de la Lorraine ont été réalisés. 
-Les couches cartographiques sont disponibles sur demande.
+<br></br>
+<p>Pour l'instant, le Guide des Stations de l'Ardenne est publié: 
+
+<figure class="highlight">
+<img src="../img/CS/GSA.png" alt="guide des stations d'Ardenne" style="width:400.0px"/> 
+<figcaption class="figure-caption">Découvrez le Guide des stations d'Ardenne : 
+<br></br> <a target="_blank" rel="noopener noreferrer" href="https://ediwall.wallonie.be/faune-flore-habitats-no-12-guide-des-stations-forestieres-de-wallonie-tome-1-l-ardenne-2024-papier-130636?ref=130636_0">Commandez la version papier ici.</a></figcaption>
+<br></br>
+</figure>
+
+<h3>Légende</h3>
 Les niveaux d’aptitude des essences pour les unités stationnelles sont présentés ci-dessous.</p>
 
 <br></br>
@@ -37,12 +48,12 @@ descriptives.</p>
 
 </message>
 
-<message id="matAptCS.badge">  US {1}
+<message id="matAptCS.badge">  A{1}
   <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill" style="background-color:{3};">
     {2}
     <span class="visually-hidden">variante</span>
   </span> </message>
- <message id="matAptCS.nobadge">  US {1}
+ <message id="matAptCS.nobadge">  A{1}
   <span class="position-absolute top-0 start-100 translate-middle p-2 border border-light rounded-circle" style="background-color:{2};">
     <span class="visually-hidden">hep</span>
   </span>

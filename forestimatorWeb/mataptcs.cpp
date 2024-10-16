@@ -15,7 +15,7 @@ matAptCS::matAptCS(cDicoApt *aDicoApt):mDicoApt(aDicoApt),zbio_(1),US_(1),mVar_(
 
     zbioSelection_  =addWidget(std::make_unique<Wt::WComboBox>());
     for (const auto &kv : *mDicoApt->ZBIO()){
-        if((kv.first == 1) | (kv.first == 2) | (kv.first == 3) | (kv.first == 10) | (kv.first == 5)){
+        if((kv.first == 1) | (kv.first == 2)  | (kv.first == 10)){//| (kv.first == 3)  | (kv.first == 5)
             zbioSelection_->addItem(kv.second);
         }
     }
@@ -88,8 +88,6 @@ matAptCS::matAptCS(cDicoApt *aDicoApt):mDicoApt(aDicoApt),zbio_(1),US_(1),mVar_(
      /* 4 Description de unités stationnelles ---------------------------*/
     contFicheUS = addWidget(cpp14::make_unique<WContainerWidget>());
     contFicheUS->setId("ficheUS");
-    //contFicheUS->setHeight(Wt::WLength(2000.0));
-
 
     updateListeUS();
     setHeight(Wt::WLength(3000));
@@ -149,6 +147,9 @@ void matAptCS::showFicheUS(int US, std::string aVar){
     if (s.toUTF8().substr(0,2)!="??"){
     contFicheUS->addNew<Wt::WText>(tr(idMessage));
     }
+    // consultation du pdf
+    WAnchor * a = contFicheUS->addNew<WAnchor>(WLink("pdf/US-A"+std::to_string(US_)+".pdf"));
+    a->setImage(std::make_unique<Wt::WImage>(WLink("img/CS/US-A"+std::to_string(US_)+".jpeg"),"illustration de l'unité stationnelle"));
 
     for (int apt : {1,2,3}){
         std::vector<cEss*> aV;
@@ -179,7 +180,7 @@ void matAptCS::showFicheUS(int US, std::string aVar){
         t1->setStyleClass("table-apt");
         std::string styleName("table-apt"+std::to_string(apt));
         mAptTable->elementAt(rGlob,cGlob)->addStyleClass(styleName);
-        std::string styleNameCol("col-aptCS"+std::to_string(apt));
+        //std::string styleNameCol("col-aptCS"+std::to_string(apt));
         int r(0),col(0);
         std::vector<cEss*> aV=mVEss.at(apt-1);
         int ncells=std::ceil(std::sqrt(aV.size()));
@@ -187,6 +188,7 @@ void matAptCS::showFicheUS(int US, std::string aVar){
             WContainerWidget * c = t1->elementAt(r,col)->addNew<WContainerWidget>();
             std::string essCode(aV.at(n)->Code());
             c->addStyleClass("circle_eco");
+            std::string styleNameCol("col-aptCSClim"+std::to_string(aV.at(n)->getCSClim(US_,mVar_)));
             c->addStyleClass(styleNameCol);
             // check si double apt
             if (mDicoApt->isDoubleApt(aV.at(n)->getApt(zbio_,US_,mVar_))){essCode+="*";}
@@ -206,7 +208,7 @@ void matAptCS::showFicheUS(int US, std::string aVar){
                                                                   Wt::StandardButton::Ok));
                 messageBox->contents()->addNew<Wt::WText>("Recommandation pour cette essence : " + mDicoApt->code2AptFull(aV.at(n)->getApt(zbio_,US_,mVar_)));
                 messageBox->contents()->addNew<Wt::WBreak>();
-                messageBox->contents()->addNew<Wt::WText>("Sensibilité climatique : to come soon");
+                messageBox->contents()->addNew<Wt::WText>("Sensibilité climatique : "+mDicoApt->CSClim(aV.at(n)->getCSClim(US_,mVar_)));
                 messageBox->contents()->addNew<Wt::WBreak>();
 
                 Wt::WLink l("https://www.fichierecologique.be/resources/fee/FEE-"+aV.at(n)->Code()+".pdf");
@@ -276,7 +278,7 @@ void matAptCS::changeZbio(){
         if (kv.second==zbioSelection_->currentText()){zbio_=kv.first;}
     }
     graphZbio->selectZbio(zbio_);
-    mAptTable->clear();
+    contFicheUS->clear();
     updateListeUS();
 }
 

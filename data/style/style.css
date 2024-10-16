@@ -789,6 +789,19 @@ transition-duration: 0.5s;
 	background-color: #00a200;	
 }
 
+.col-aptCSClim1{
+	background-color: #ccf5b9;	
+}
+.col-aptCSClim2{
+	background-color: #f8d1f8;	
+}
+.col-aptCSClim3{
+	background-color: #dc74e9;
+}
+.col-aptCSClim4{
+	background-color: #801584;	
+}
+
 .frameEncodage{
 background: lightgreen;
 display: block;	

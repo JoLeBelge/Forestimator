@@ -344,6 +344,20 @@ cdicoAptBase::cdicoAptBase(std::string aBDFile):mBDpath(aBDFile),ptDb_(NULL)
         }
         sqlite3_finalize(stmt);
 
+        SQLstring="SELECT label,code,col from dico_CSClim;";
+        sqlite3_prepare_v2( *db_, SQLstring.c_str(), -1, &stmt, NULL );
+        while(sqlite3_step(stmt) == SQLITE_ROW)
+        {
+            if (sqlite3_column_type(stmt, 0)!=SQLITE_NULL && sqlite3_column_type(stmt, 1)!=SQLITE_NULL){
+                std::string aA=std::string( (char *)sqlite3_column_text( stmt, 0 ));
+                int aB=sqlite3_column_int( stmt,1 );
+                std::string aC=std::string( (char *)sqlite3_column_text( stmt, 2 ));
+                Dico_CSClim.emplace(std::make_pair(aB,aA));
+                Dico_CSClim2col.emplace(std::make_pair(aB,aC));
+            }
+        }
+        sqlite3_finalize(stmt);
+
         // toutes les essences de la classe essence
         for (auto & pair : *codeEs2Nom()){
             mVEss.emplace(std::make_pair(pair.first,std::make_shared<cEss>(pair.first,this)));
@@ -531,8 +545,32 @@ std::map<int,std::map<std::tuple<int, std::string>,int>> cdicoAptBase::getCSApt(
         }
         sqlite3_finalize(stmt);
     }
+    return aRes;
+}
 
+std::map<int,std::map<std::tuple<int, std::string>,int>> cdicoAptBase::getCSRisqueClim(std::string aCodeEs){
+    std::map<int,std::map<std::tuple<int, std::string>,int>> aRes;
 
+    sqlite3_stmt * stmt;
+    // boucle sur tout les identifiants de zbio mais attention, les catalogues de station ne couvrent pas tout donc vérif si ND
+    for(auto&& zbio : Dico_ZBIO | boost::adaptors::map_keys){
+        std::string SQLstring="SELECT stat_id,"+aCodeEs+",var FROM AptCSClim WHERE ZBIO="+ std::to_string(zbio)+";";
+        //std::cout << SQLstring << std::endl;
+        sqlite3_prepare_v2( *db_, SQLstring.c_str(), -1, &stmt, NULL );//preparing the statement
+        while(sqlite3_step(stmt) == SQLITE_ROW)
+        {
+            if (sqlite3_column_type(stmt, 0)!=SQLITE_NULL && sqlite3_column_type(stmt, 1)!=SQLITE_NULL){
+                int station=sqlite3_column_int( stmt, 0 );
+                int clim=sqlite3_column_int( stmt, 1 );
+                 std::string var="";
+                if(sqlite3_column_type(stmt, 2)!=SQLITE_NULL){
+                var=std::string( (char *)sqlite3_column_text( stmt, 2 ) );
+                }
+                aRes[zbio].emplace(std::make_pair(std::make_tuple(station,var),clim));
+            }
+        }
+        sqlite3_finalize(stmt);
+    }
     return aRes;
 }
 
@@ -552,6 +590,7 @@ cEss::cEss(std::string aCodeEs, cdicoAptBase *aDico):mCode(aCodeEs),mNomFR(aDico
     //std::cout << "creation de l'essence " << mNomFR << std::endl;
     mEcoVal = aDico->getFEEApt(mCode);
     mAptCS = aDico->getCSApt(mCode);
+    mCSClim = aDico->getCSRisqueClim(mCode);
     mAptZbio = aDico->getZBIOApt(mCode);
     mRisqueTopo = aDico->getRisqueTopo(mCode);
     mFeRe = aDico->accroEss2FeRe(aCodeEs);
@@ -608,6 +647,26 @@ int cEss::getApt(int aZbio, int US, std::string aVar){
     }
 
     if (aRes>9){aRes=0;}
+    return aRes;
+}
+
+int cEss::getCSClim(int US, std::string aVar){
+    int aRes(0);
+    if (mCSClim.find(2)!=mCSClim.end()){
+        std::map<std::tuple<int, std::string>,int> * clim=&mAptCS.at(2);
+        // on prend par défaut la station majoritaire
+        std::string var=mDico->getStationMaj(2,US);
+        std::tuple<int,std::string> aUSkey=std::make_tuple(US,var);
+        if (clim->find(aUSkey)!=clim->end()){
+            aRes=clim->at(aUSkey);
+        }
+
+        // si l'utilisateur a renseigné une variante avec l'argument aVar:
+        if (clim->find(std::make_tuple(US,aVar))!=clim->end()){
+            aRes=clim->at(std::make_tuple(US,aVar));
+        }
+    }
+    //if (aRes>9){aRes=0;}
     return aRes;
 }
 
