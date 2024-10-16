@@ -63,7 +63,7 @@ LAYER
    PROJECTION
       "init=epsg:31370"
    END
-   DATA "GSA_202310_v6_RW.tif" 
+   DATA "GSA_V7_202409_RW.tif" 
    PROCESSING "BANDS=1" 
    CLASSITEM "[pixel]" 
    CLASS 
