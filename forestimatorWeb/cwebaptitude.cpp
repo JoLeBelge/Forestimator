@@ -4,14 +4,6 @@ extern bool globTest;
 
 
 /*
-void cWebAptitude::load_content_couches(WContainerWidget * content){
-
-    // TODO charger le panier
-}
-*/
-
-
-/*
  * Redirections en fonction du internal path
  * (ne pas oublier de compléter dans le main.cpp si internalpath changés - S.Q.)
  */
@@ -39,8 +31,6 @@ void cWebAptitude::handlePathChange()
         } else {
              changeHeader("documentation");
         }
-        //mApp->removeMetaHeader(MetaHeaderType::Meta,"description");
-        //mApp->addMetaHeader(MetaHeaderType::Meta,"description", tr("meta.desc.documentation"), "fr");
 
         showDialogues(0);
     }else if (internalPath() == "/cartographie" || internalPath() == "/" || internalPath() == ""){
@@ -51,9 +41,6 @@ void cWebAptitude::handlePathChange()
         showDialogues(1);
     }else if (internalPath() == "/resultat"){
         top_stack->setCurrentIndex(2);
-        showDialogues(0);
-    }else if (internalPath() == "/parametres"){
-        doJavaScript("alert('Pas encore implémenté...')");
         showDialogues(0);
     }else{
         std::cout << "m_app->internalPath() " << internalPath() << std::endl;
@@ -91,10 +78,6 @@ dialog::dialog(const WString& windowTitle, Wt::WMenuItem * aMenu, const WEnviron
 
     contents()->setOverflow(Overflow::Scroll);
     setClosable(true);
-    // resize(400,700);
-    //dialogPtr->resize(contParent->width(), contParent->height()/2.0);
-    //std::cout << " taille parent ; " << contParent->width().value()<<  ", " << contParent->height().value() << std::endl;
-    //dialogPtr->setMaximumSize("50%","50%");
 
     // faire les liens entre le boutton menu et l'affichage de la fenetre
     finished().connect([=] {mMenu->decorationStyle().setBackgroundColor(col_not_sel); mShow=0;});
@@ -263,11 +246,6 @@ cWebAptitude::cWebAptitude(const Wt::WEnvironment& env, cDicoApt *dico)
             dialog_auth->raiseToFront();
         }
     });
-
-    // pas encore implémenté
-    /*navbar_menu->addItem("resources/configuration_center_icon_149956.png","")
-            ->setLink(WLink(LinkType::InternalPath, "/parametres"));
-    */
 
     // main stack : DOC and MAP and RESULTS divs
     top_stack  = contPrincipal->addWidget(Wt::cpp14::make_unique<Wt::WStackedWidget>());

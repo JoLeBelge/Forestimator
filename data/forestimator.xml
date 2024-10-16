@@ -682,7 +682,7 @@ detAptFEE
 <message id="meta.desc.carto">Forestimator est un portail web de cartographie des stations et des peuplements forestiers.
 De nombreuses couches cartographiques y sont disponibles à la consultation et au téléchargement.
 Une analyse des conditions environnementales des stations de Wallonie permet de déterminer l'adéquation essence-station la plus pertinente pour une sylviculture efficace. 
-De nombreuses cartes sont disponibles : l'aptitude des essences au sens du Fichier Écologique des Essences, les cartes de composition, les zones bioclimatiques, les cartes de niveaux hydriques et des niveaux trophiques. Les guides de stations de la Wallonie sont également présentés, ainsi que les cartes de recommandation pour chacune des essences forestières.
+De nombreuses cartes sont disponibles : l'aptitude des essences au sens du Fichier Écologique des Essences, les cartes de composition, les zones bioclimatiques, les cartes de niveaux hydriques et des niveaux trophiques. Les guides de stations forestières de la Wallonie sont également présentés, ainsi que les cartes de recommandation pour chacune des essences forestières.
 Des modèles dendrométriques sont implémentés pour l'estimation de la densité des peuplements sur base des modèles numériques de hauteur de la canopée. Une série temporelle de Modèles Numériques de Hauteur couvrant la période 2006-2021 sont consultables pour l'ensemble de la région wallonne.
  </message>
 
@@ -738,8 +738,14 @@ Un suivi de l'état sanitaire des pessières est réalisé en vue d'identifier l
 <message id="meta.titre.forestimator-api">Les géo-services de la plateforme Forestimator</message>
 <message id="meta.desc.forestimator-api">Des géo-services permettent d'effectuer des calculs à l'échelle d'une surface délimitée par un polygone, dans le but de préparer un plan d'aménagement sur une propriété forestière. </message>
 
-<message id="meta.titre.forestimator-api">Capacité de Réserve en eau des sols</message>
+<message id="meta.titre.forestimator-api">Les géo-services en ligne de commande de forestimator</message>
 <message id="meta.desc.r_serve-en-eau"> Cartographie de la réserve en eau des sols pour une meilleure perception de la vulnérabilité des stations forestières.</message>
+
+<message id="meta.titre.forestimator-api">Les géo-services en ligne de commande de forestimator</message>
+<message id="meta.desc.r_serve-en-eau"> Cartographie de la réserve en eau des sols pour une meilleure perception de la vulnérabilité des stations forestières.</message>
+
+<message id="meta.titre.guide-des-stations">Guide des stations forestières de Wallonie</message>
+<message id="meta.desc.guide-des-stations">Les conditions environnementales des forêts Wallonnes sont découpés en entités bien reconnaissables pour lesquelles une gestion forestière adaptée est proposée.</message>
 
 
 <message id="cadastre.commune">Commune / INS</message>

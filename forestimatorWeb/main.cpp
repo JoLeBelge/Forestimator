@@ -76,12 +76,12 @@ int launchForestimator(int argc, char **argv)
             }
         }
 
-      /*  for (int i(1);i<18;i++){
+        for (int i(1);i<18;i++){
             std::string aName("US-A"+std::to_string(i)+".pdf");
             Wt::WFileResource * fileResource3 = new Wt::WFileResource("application/pdf",dico->File("docroot")+"pdf/"+aName);
             fileResource3->suggestFileName(aName);
             server.addResource(fileResource3, "/telechargement/"+aName);
-        }*/
+        }
 
         Wt::WFileResource * fileResource3 = new Wt::WFileResource("application/pdf",dico->File("docroot")+"pdf/methodoInventaireTerrainJeunePeup.pdf");
         fileResource3->suggestFileName("methodoInventaireAncienneCoupeRase.pdf");

@@ -236,7 +236,7 @@ void groupLayers::extractInfo(double x, double y){
                     if (l->l4StatP()){
                         mAnaPoint->add1InfoRaster(layerLabelAndValue);
                     }
-                    if (( l->IsActive())){
+                    if ((l->IsActive()) && l->Code() !="CS_A"){
                         // affiche une popup pour indiquer la valeur pour cette couche
                         // attention, il faut escaper les caractères à problèmes du genre apostrophe
                         boost::replace_all(layerLabelAndValue.at(1),"'","\\'"); // javascript bug si jamais l'apostrophe n'est pas escapée
@@ -244,10 +244,23 @@ void groupLayers::extractInfo(double x, double y){
                         mParent->doJavaScript("content.innerHTML = '<p>"+layerLabelAndValue.at(0)+":</p><code>"+ layerLabelAndValue.at(1)+ "</code>';"
                                               +"var coordinate = ["+std::to_string(x) + ","+ std::to_string(y) +"];"
                                               +"overlay.setPosition(coordinate);"
-                                              //+"overlay.setPosition(coordinate);"
                                               );
-                    }
+                    } else if ((l->IsActive()) && l->Code() =="CS_A"){
+                         int aVal=l->getValue(x,y);
+                        // affiche une popup pour indiquer la valeur pour cette couche
+                        // attention, il faut escaper les caractères à problèmes du genre apostrophe
+                        boost::replace_all(layerLabelAndValue.at(1),"'","\\'"); // javascript bug si jamais l'apostrophe n'est pas escapée
+                        boost::replace_all(layerLabelAndValue.at(0),"'","\\'");
 
+                        if (aVal!=0){std::string js="content.innerHTML = '<p>"+layerLabelAndValue.at(0)+":</p><code>"+ layerLabelAndValue.at(1)+ "</code> <br></br> <a href=\"https://forestimator.gembloux.ulg.ac.be/telechargement/US-A"+std::to_string(aVal)+".pdf\" target=\"_blank\" rel=\"noopener\">Consulter la description de la station forestière</a>';"
+                                                                      +"var coordinate = ["+std::to_string(x) + ","+ std::to_string(y) +"];"
+                                                                      +"overlay.setPosition(coordinate);";
+                        //std::cout << "js : " << js << std::endl;
+                        mParent->doJavaScript(js);
+                        }
+
+
+                }
                 }
             }
 
