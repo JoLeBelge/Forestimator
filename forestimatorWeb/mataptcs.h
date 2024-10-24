@@ -17,7 +17,7 @@ public:
 
 private:
      cDicoApt * mDicoApt;
-    // un tableau 3 colonne pour les aptitudes
+    // un tableau 1 colonne qui liste les essences groupées par classes des 7 valeurs d'aptitude
      Wt::WTable * mAptTable;
      WComboBox * zbioSelection_;
      WContainerWidget * contListeUS, *contFicheUS;

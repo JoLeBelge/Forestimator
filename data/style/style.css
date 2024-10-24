@@ -776,14 +776,23 @@ transition-duration: 0.5s;
 	background-color: #00a200;	
 }
 
-.col-aptCS4{
+.col-aptCS7{
 	background-color: #fd6e6b;	
 }
-.col-aptCS3{
+.col-aptCS6{
+	background-color: #fff06b;	
+}
+.col-aptCS5{
+	background-color: #eefcc8;	
+}
+.col-aptCS4{
 	background-color: #f4b183;	
 }
+.col-aptCS3{
+	background-color: #c0f7d7;	
+}
 .col-aptCS2{
-	background-color: #c5e0b4;	
+	background-color: #9cd891;	
 }
 .col-aptCS1{
 	background-color: #00a200;	
@@ -849,5 +858,15 @@ background: lightgreen;
 display: block;
 height: 10px;	
 }
+
+.table-recommand > tbody > tr > td {
+  padding: 4px;
+  padding-top: 4px;
+  padding-right: 4px;
+  padding-bottom: 4px;
+  padding-left: 4px;
+  vertical-align: middle;
+  }
+  
 
 

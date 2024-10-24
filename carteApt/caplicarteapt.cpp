@@ -184,6 +184,7 @@ void cApliCarteApt::carteAptCS(std::shared_ptr<cEss> aEss, std::string aOut, boo
         const char * destFile=aOut.c_str();
         char **papszOptions = NULL;
         papszOptions = CSLSetNameValue( papszOptions, "COMPRESS", "DEFLATE" ); // fonctionne pas trop car si je relance un gdal_translate compress==deflate sur le résultat, je descend de 20 à 4Mo
+        papszOptions = CSLSetNameValue( papszOptions, "PREDICTOR", "2" );
         GDALDataset* poDstDS = poDriver->CreateCopy( destFile, poDatNH, FALSE, papszOptions,NULL, NULL );
         OGRSpatialReference  * spatialReference=new OGRSpatialReference;
         spatialReference->importFromEPSG(31370);

@@ -117,6 +117,7 @@ void simplepoint::detailCalculAptFEE(ST * aST){
 
 void simplepoint::afficheAptAllEss(){
     if (globTest){std::cout << "simplepoint::afficheAptAllEss" << std::endl;}
+    if (mGL->mTypeClassifST==TypeClassifST::FEE){
     std::map<std::string, int> Apts = mGL->apts();
     if (Apts.size()>1){
          if (globTest){std::cout << "Apts.size() : " << Apts.size() << std::endl;}
@@ -230,6 +231,7 @@ void simplepoint::afficheAptAllEss(){
         }
     } else {
         std::cout << "simplePoint affiche tableau apt : pas d'essence pour le tableau" << std::endl;
+    }
     }
 }
 

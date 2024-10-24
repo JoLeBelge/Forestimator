@@ -167,6 +167,12 @@ public:
         if (Dico_code2AptFull.find(aCode)!=Dico_code2AptFull.end()){aRes=Dico_code2AptFull.at(aCode);}
         return aRes;
     }
+
+    std::string code2Recommandation(int aCode){
+        std::string aRes("not found\n");
+        if (Dico_code2Recommandation.find(aCode)!=Dico_code2Recommandation.end()){aRes=Dico_code2Recommandation.at(aCode);}
+        return aRes;
+    }
     int Apt(std::string aCode){
         int aRes(777);
         if (Dico_Apt.find(aCode)!=Dico_Apt.end()){aRes=Dico_Apt.at(aCode);}
@@ -408,6 +414,7 @@ protected:
     std::map<int,int>  Dico_AptDouble2AptNonContr;
     std::map<int,int>  Dico_AptSouscote;
     std::map<int,int>  Dico_AptSurcote;
+    std::map<int,std::string>  Dico_code2Recommandation;
     std::map<int,std::string>  Dico_CSClim;
     std::map<int,std::string>  Dico_CSClim2col;
     // les codes aptitudes sont classé dans un ordre fonction de la contrainte, permet de comparer deux aptitude

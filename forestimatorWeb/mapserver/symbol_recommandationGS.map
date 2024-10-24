@@ -1,7 +1,7 @@
 PROCESSING "BANDS=1" 
    CLASSITEM "[pixel]" 
    CLASS 
-      NAME "Conseillée sans réserve"
+      NAME "Conseillée"
       EXPRESSION "1"
       STYLE 
           COLOR "#00A200"
@@ -11,19 +11,40 @@ PROCESSING "BANDS=1"
       NAME "Conseillée, en tenant compte de ses faiblesses"
       EXPRESSION "2"
       STYLE 
-          COLOR "#C5E0B4"
+          COLOR "#9cd891"
+       END
+   END
+   CLASS 
+      NAME "Convient actuellement mais risques climatiques à long terme"
+      EXPRESSION "3"
+      STYLE 
+          COLOR #c0f7d7"
        END
    END
    CLASS 
       NAME "A n'envisager qu'en accompagnement"
-      EXPRESSION "3"
+      EXPRESSION "4"
       STYLE 
-          COLOR "#F4B183"
-       END
+          COLOR "#f4b183"
+   	END
+   END
+   CLASS 
+      NAME "Déconseillée au vu des risques climatiques trop importants"
+      EXPRESSION "5"
+      STYLE 
+          COLOR "#eefcc8"
+   	END
+   END
+   CLASS 
+      NAME "Très fortement déconseillée au vu des risques climatiques importants"
+      EXPRESSION "6"
+      STYLE 
+          COLOR "#fff06b"
+   	END
    END
    CLASS 
       NAME "Ne pas envisager"
-      EXPRESSION "4"
+      EXPRESSION "7"
       STYLE 
           COLOR "#FD6E6B"
    	END

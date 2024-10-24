@@ -186,17 +186,13 @@ public:
     // bof finalement c'est mieux le conteneur parent
     Wt::WContainerWidget     * mParent;
 
+    TypeClassifST mTypeClassifST; // 2 modes de classification des stations forestières ; FEE et CS. important de savoir le mode pour savoir quel tableau d'aptitude afficher quand on double-click sur une station
+
 private:
 
     std::vector<std::shared_ptr<Layer>> mVLs;
-    TypeClassifST mTypeClassifST; // 2 modes de classification des stations forestières ; FEE et CS. important de savoir le mode pour savoir quel tableau d'aptitude afficher quand on double-click sur une station
-
     cDicoApt * mDico;
-
     sqlite3 *db_;
-
-
-
     JSignal<double, double, double, double>  sigMapExport;
     OGREnvelope mMapExtent;
     void updateMapExtentAndCropIm(double topX, double topY, double bottomX, double bottomY){

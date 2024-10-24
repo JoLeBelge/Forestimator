@@ -344,6 +344,18 @@ cdicoAptBase::cdicoAptBase(std::string aBDFile):mBDpath(aBDFile),ptDb_(NULL)
         }
         sqlite3_finalize(stmt);
 
+        SQLstring="SELECT raster_val,label from dico_recommandation;";
+        sqlite3_prepare_v2( *db_, SQLstring.c_str(), -1, &stmt, NULL );
+        while(sqlite3_step(stmt) == SQLITE_ROW)
+        {
+            if (sqlite3_column_type(stmt, 0)!=SQLITE_NULL && sqlite3_column_type(stmt, 1)!=SQLITE_NULL){
+                std::string aB=std::string( (char *)sqlite3_column_text( stmt, 1 ));
+                int aA=sqlite3_column_int( stmt, 0 );
+                Dico_code2Recommandation.emplace(std::make_pair(aA,aB));
+            }
+        }
+        sqlite3_finalize(stmt);
+
         SQLstring="SELECT label,code,col from dico_CSClim;";
         sqlite3_prepare_v2( *db_, SQLstring.c_str(), -1, &stmt, NULL );
         while(sqlite3_step(stmt) == SQLITE_ROW)
@@ -661,10 +673,12 @@ int cEss::getApt(int aZbio, int US, std::string aVar, bool withClim){
             aClim=clim->at(std::make_tuple(US,aVar));
         }
 
-        // on combine recommandation avec clim
+        // on combine recommandation avec clim - cela donne de 0 à 13
         if (aRes==4){aRes=13;} else if (aRes!=0){
         aRes=(aRes-1)*4+aClim;}
-        // attention si exclusion (apt==4), clim = 9
+        // maintenant on regroupe certaine classes ensemble
+        std::map<int,int> lut = {{0,0},{1, 1}, {2, 1}, {3, 3}, {4, 5},{5, 2},{6, 2},{7, 3},{8, 6},{9, 2},{10, 4},{11, 4},{12, 4},{13, 7}};
+        aRes=lut.at(aRes);
     }
     return aRes;
 }

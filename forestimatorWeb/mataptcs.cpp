@@ -111,14 +111,16 @@ void matAptCS::updateListeUS(){
         us->setTextFormat(Wt::TextFormat::XHTML);
         std::shared_ptr<color> col=CSlay->getColor(std::get<0>(kv.first));
 
-        if (std::get<1>(kv.first)==""){
-            us->setText(tr("matAptCS.nobadge").arg(std::to_string(std::get<0>(kv.first))).arg(col->getRGB()));
-        }else{
-            us->setText(tr("matAptCS.badge").arg(std::to_string(std::get<0>(kv.first))).arg(std::get<1>(kv.first)).arg(col->getRGB()));
-        }
+        us->setText(tr("matAptCS.nobadge").arg(std::to_string(std::get<0>(kv.first))).arg(col->getRGB()));
+        //if (std::get<1>(kv.first)==""){
+        //    us->setText(tr("matAptCS.nobadge").arg(std::to_string(std::get<0>(kv.first))).arg(col->getRGB()));
+        //}else{
+        //    us->setText(tr("matAptCS.badge").arg(std::to_string(std::get<0>(kv.first))).arg(std::get<1>(kv.first)).arg(col->getRGB()));
+        //}
 
-        us->setToolTip(mDicoApt->stationEtVar(mDicoApt->ZBIO2CSid(zbio_),std::get<0>(kv.first),std::get<1>(kv.first)));
+        //us->setToolTip(mDicoApt->stationEtVar(mDicoApt->ZBIO2CSid(zbio_),std::get<0>(kv.first),std::get<1>(kv.first)));
 
+        us->setToolTip(mDicoApt->station(mDicoApt->ZBIO2CSid(zbio_),std::get<0>(kv.first),std::get<1>(kv.first)));
         us->clicked().connect([=]{this->showFicheUS(std::get<0>(kv.first),std::get<1>(kv.first));});
         mMapButtonUS.emplace(std::make_pair(kv.first,us));
     }
@@ -134,29 +136,23 @@ void matAptCS::showFicheUS(int US, std::string aVar){
     mVEss.clear();
     contFicheUS->clear();
 
-    /*
-    std::string usLabel=mDicoApt->aVStation(mDicoApt->ZBIO2CSid(zbio_)).at(std::make_tuple(US_,mVar_));
-    if (mVar_!=""){
-       usLabel+=", variante " +mVar_;
-    }
-    contFicheUS->addWidget(std::make_unique<WText>(tr("aptCS.titreUS").arg(mDicoApt->ZBIO(zbio_)).arg(std::to_string(US_)).arg(usLabel)));
-    */
+    Wt::WTemplate * tpl = contFicheUS->addWidget(cpp14::make_unique<Wt::WTemplate>(tr("template.CS.fiche")));
 
-    std::string idMessage="zbio"+std::to_string(mDicoApt->ZBIO2CSid(zbio_)) +".US"+std::to_string(US)+".part1";
-    WString s=Wt::WString::tr(idMessage);
-    if (s.toUTF8().substr(0,2)!="??"){
-    contFicheUS->addNew<Wt::WText>(tr(idMessage));
-    }
+    Wt::WContainerWidget * cont = tpl->bindWidget("teaser", std::make_unique<Wt::WContainerWidget>());
+
+
     // consultation du pdf
-    WAnchor * a = contFicheUS->addNew<WAnchor>(WLink("pdf/US-A"+std::to_string(US_)+".pdf"));
+    WAnchor * a = cont->addNew<WAnchor>(WLink("pdf/US-A"+std::to_string(US_)+".pdf"));
     a->setImage(std::make_unique<Wt::WImage>(WLink("img/CS/US-A"+std::to_string(US_)+".jpeg"),"illustration de l'unité stationnelle"));
 
-    for (int apt : {1,2,3}){
+    // 7 classe d'apt, moins 1 qui est l'exclusion
+    std::vector<int> apts = {1,2,3,4,5,6};
+    for (int apt : apts){
         std::vector<cEss*> aV;
         for (const auto &kv : mDicoApt->getAllEss()){
             cEss * ess = kv.second.get();
             if (ess->hasCSApt()){
-                if (mDicoApt->AptNonContraignante(ess->getApt(zbio_,US_,mVar_))==apt){
+                if (ess->getApt(zbio_,US_,mVar_)==apt){
                     aV.push_back(ess);
                 }
             }
@@ -164,53 +160,39 @@ void matAptCS::showFicheUS(int US, std::string aVar){
         mVEss.push_back(aV);
     }
     // maintenant que les essences sont triées, update table apt
-    mAptTable = contFicheUS->addWidget(cpp14::make_unique<WTable>());
-    mAptTable->setStyleClass("table-AptGlob");
-    mAptTable->setHeaderCount(2);
-    mAptTable->elementAt(0,0)->setColumnSpan(3);
-    // titre colonne
-    mAptTable->elementAt(0,0)->addWidget(std::make_unique<WText>(tr("aptCS.titreMatApt")));
-    mAptTable->elementAt(1,0)->addWidget(std::make_unique<WText>(tr("apt.t.O")));
-    mAptTable->elementAt(1,1)->addWidget(std::make_unique<WText>(tr("apt.t.T")));
-    mAptTable->elementAt(1,2)->addWidget(std::make_unique<WText>(tr("aptCS.t.TE")));
-    int rGlob(2),cGlob(0);
-    for (int apt : {1,2,3}){
-        cGlob=apt-1;
-        Wt::WTable * t1 = mAptTable->elementAt(rGlob,cGlob)->addNew<Wt::WTable>();
-        t1->setStyleClass("table-apt");
-        std::string styleName("table-apt"+std::to_string(apt));
-        mAptTable->elementAt(rGlob,cGlob)->addStyleClass(styleName);
-        //std::string styleNameCol("col-aptCS"+std::to_string(apt));
-        int r(0),col(0);
-        std::vector<cEss*> aV=mVEss.at(apt-1);
-        int ncells=std::ceil(std::sqrt(aV.size()));
+    //contFicheUS->addWidget(Wt::WText::tr("t"));
+
+    cont = tpl->bindWidget("listeEssence", std::make_unique<Wt::WContainerWidget>());
+    mAptTable = cont->addWidget(cpp14::make_unique<WTable>());
+    int r(0);
+    mAptTable->setStyleClass("table-recommand");
+    for (std::vector<cEss*> aV : mVEss){
         for (int n(0);n<aV.size();n++){
-            WContainerWidget * c = t1->elementAt(r,col)->addNew<WContainerWidget>();
+            WContainerWidget * c = mAptTable->elementAt(r,0)->addNew<WContainerWidget>();
             std::string essCode(aV.at(n)->Code());
             c->addStyleClass("circle_eco");
-            std::string styleNameCol("col-aptCSClim"+std::to_string(aV.at(n)->getCSClim(US_,mVar_)));
+            std::string styleNameCol("col-aptCS"+std::to_string(aV.at(n)->getApt(zbio_,US_,mVar_)));
             c->addStyleClass(styleNameCol);
-            // check si double apt
-            if (mDicoApt->isDoubleApt(aV.at(n)->getApt(zbio_,US_,mVar_))){essCode+="*";}
+            c->setToolTip(aV.at(n)->Nom());
             c->addNew<Wt::WText>(essCode);
             c->mouseWentOver().connect([=] {
                 hoverBubble(c,1);
+                displayNiche(aV.at(n)->Code());
             });
             c->mouseWentOut().connect([=] {
                 hoverBubble(c,0);
+               resetNiche();
             });
-            c->setToolTip(aV.at(n)->Nom());
             c->clicked().connect([=] {
                 Wt::WMessageBox * messageBox = this->addChild(std::make_unique<Wt::WMessageBox>(
                                                                   aV.at(n)->Nom(),
                                                                   "",
                                                                   Wt::Icon::Information,
                                                                   Wt::StandardButton::Ok));
-                messageBox->contents()->addNew<Wt::WText>("Recommandation pour cette essence : " + mDicoApt->code2AptFull(aV.at(n)->getApt(zbio_,US_,mVar_)));
+                messageBox->contents()->addNew<Wt::WText>("Recommandation pour cette essence : " + mDicoApt->code2Recommandation(aV.at(n)->getApt(zbio_,US_,mVar_)));
+                //messageBox->contents()->addNew<Wt::WBreak>();
+                //messageBox->contents()->addNew<Wt::WText>("Sensibilité climatique : "+mDicoApt->CSClim(aV.at(n)->getCSClim(US_,mVar_)));
                 messageBox->contents()->addNew<Wt::WBreak>();
-                messageBox->contents()->addNew<Wt::WText>("Sensibilité climatique : "+mDicoApt->CSClim(aV.at(n)->getCSClim(US_,mVar_)));
-                messageBox->contents()->addNew<Wt::WBreak>();
-
                 Wt::WLink l("https://www.fichierecologique.be/resources/fee/FEE-"+aV.at(n)->Code()+".pdf");
                 l.setTarget(Wt::LinkTarget::NewWindow);
                 Wt::WString s("Fiche-essence disponible ici");
@@ -224,11 +206,12 @@ void matAptCS::showFicheUS(int US, std::string aVar){
                 });
                 messageBox->show();
             });
-            col++;
-            if (col+1>ncells){col=0;r++;}
+            WText * t = mAptTable->elementAt(r,1)->addNew<WText>(aV.at(n)->Nom());
+            r++;
         }
     }
 
+    /*
     idMessage="zbio"+std::to_string(mDicoApt->ZBIO2CSid(zbio_)) +".US"+std::to_string(US)+".part2";
     s=Wt::WString::tr(idMessage);
     if (s.toUTF8().substr(0,2)!="??"){
@@ -270,6 +253,7 @@ void matAptCS::showFicheUS(int US, std::string aVar){
     if (s.toUTF8().substr(0,2)!="??"){
     contFicheUS->addNew<Wt::WText>(tr(idMessage));
     }
+    */
     doJavaScript("ficheUS.scrollIntoView({ behavior: 'smooth', block: 'start' })");
 }
 
@@ -295,7 +279,7 @@ void matAptCS::displayNiche(std::string aEssCode){
         // récupérer l'aptitude
         int apt=ess->getApt(zbio_,us,var);
         // choisir la couleur en fonction de l'aptitude  - attention, couleur Apt CS et non pas FEE
-        std::string styleName("col-aptCS"+std::to_string(mDicoApt->AptNonContraignante(apt)));
+        std::string styleName("col-aptCS"+std::to_string(apt));
         kv.second->addStyleClass(styleName);
     }
 }
@@ -306,6 +290,9 @@ void matAptCS::resetNiche(){
         kv.second->removeStyleClass("col-aptCS2");
         kv.second->removeStyleClass("col-aptCS3");
         kv.second->removeStyleClass("col-aptCS4");
+        kv.second->removeStyleClass("col-aptCS5");
+        kv.second->removeStyleClass("col-aptCS6");
+        kv.second->removeStyleClass("col-aptCS7");
     }
 }
 
