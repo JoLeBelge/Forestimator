@@ -36,6 +36,8 @@ dependencies:
   intl: ^0.19.0
   downloadsfolder: ^1.1.0
   permission_handler: ^11.3.1
+  device_info_plus: ^9.0.0
+  memory_info: ^0.0.4
 
 dev_dependencies:
   flutter_test:

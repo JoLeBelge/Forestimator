@@ -1,6 +1,7 @@
 To do list forestimator
 ------------------------
 
+-si pas assez de RAM, ne pas autoriser l'affichage offline (ou du moins avoir une technique pour que le bug ne dure pas trop dans le temps..)
 -GSA : ajout pdf pour unite stationnelle, et logo pour sensibilité des essences face au CC
 
 -> publish for iOS. en cours

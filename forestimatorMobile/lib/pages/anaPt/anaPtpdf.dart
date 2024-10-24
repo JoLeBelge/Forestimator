@@ -6,11 +6,11 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:fforestimator/globals.dart' as gl;
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
-import 'package:downloadsfolder/downloadsfolder.dart';
+
 import 'package:flutter_logs/flutter_logs.dart';
 
-Future makePdf(
-    List<layerAnaPt> layers, String fileName, String locationName) async {
+Future makePdf(List<layerAnaPt> layers, String fileName, String dir,
+    String locationName) async {
   final pdf = pw.Document();
   final imageLogo = pw.MemoryImage((await rootBundle
           .load('assets/images/GRF_nouveau_logo_uliege-retina.jpg'))
@@ -62,8 +62,6 @@ Future makePdf(
           }).toList(),
         ]);
   }));
-
-  String? dir = await getDownloadDirectory().toString();
 
   if (dir != null) {
     File out = File(dir! + "/" + fileName);

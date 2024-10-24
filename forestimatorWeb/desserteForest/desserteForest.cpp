@@ -69,7 +69,12 @@ formDesserteForest::formDesserteForest(const WEnvironment &env, cDicoApt *dico, 
     row++;
     contactPresicion= table->elementAt(row,1)->addWidget(std::make_unique<WLineEdit>());
     table->elementAt(row,0)->addWidget(std::make_unique<WLabel>(WString::tr("contact.precision")));
-    row++;
+
+    cont = tpl->bindWidget("contAmenagement", std::make_unique<WContainerWidget>());
+    cont->addNew<Wt::WText>(WString::tr("sectionAme"));
+
+    table= cont->addNew<WTable>();
+    row=0;
     typeAM= table->elementAt(row,1)->addWidget(std::make_unique<WComboBox>());
     table->elementAt(row,0)->addWidget(std::make_unique<WLabel>(WString::tr("type.am")));
     typeAM->addItem(WString::tr("type.am0"));

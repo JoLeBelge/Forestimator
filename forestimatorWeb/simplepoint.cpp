@@ -140,6 +140,10 @@ void simplepoint::afficheAptAllEss(){
             case 4:
                 E.emplace(kv);
                 break;
+
+            default:
+                std::cout << "aptitude code non pris en compte" << std::endl;
+                break;
             }
         }
 
