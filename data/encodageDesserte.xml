@@ -33,6 +33,8 @@ Si vous souhaitez encoder plusieurs aménagements (plusieurs tronçons, un tron�
 	<div style="margin: 3px 0px; flex: 1 1 auto; overflow: visible;"></div>
 	${contContact class="encodage" style="margin: 3px 0px; flex: 1 1 auto; overflow: visible;"}
 	<div style="margin: 3px 0px; flex: 1 1 auto; overflow: visible;"></div>
+	${contAmenagement class="encodage" style="margin: 3px 0px; flex: 1 1 auto; overflow: visible;"}
+	<div style="margin: 3px 0px; flex: 1 1 auto; overflow: visible;"></div>
 	${contLoca}
 	<div style="margin: 3px 0px; flex: 1 1 auto; overflow: visible;"></div>
 	<div style="margin: 3px 0px; flex: 1 1 auto; overflow: visible;"></div>
@@ -43,8 +45,8 @@ Si vous souhaitez encoder plusieurs aménagements (plusieurs tronçons, un tron�
 </div>
 </message>
 
-<message id="sectionEncoder"> <h3> Vos données personnelles </h3>
-</message>
+<message id="sectionEncoder"> <h3> Vos données personnelles </h3></message>
+<message id="sectionAme"> <h3> Type d'aménagement </h3></message>
 
 <message id="nom"> Nom : </message>
 <message id="nom.ph"> Ex: Dupont </message>

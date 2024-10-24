@@ -24,6 +24,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'dart:isolate';
 import 'dart:ui';
+import 'package:memory_info/memory_info.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -69,6 +70,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyApp extends State<MyApp> {
+  Memory? _memory;
   static const TextStyle optionStyle =
       TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
 
@@ -77,6 +79,27 @@ class _MyApp extends State<MyApp> {
   ReceivePort _port = ReceivePort();
 
   _MyApp() {}
+
+  Future<void> getMemoryInfo() async {
+    Memory? memory;
+    // Platform messages may fail, so we use a try/catch PlatformException.
+    // We also handle the message potentially returning null.
+    try {
+      memory = await MemoryInfoPlugin().memoryInfo;
+    } on PlatformException catch (e) {
+      print('error $e');
+    }
+
+    // If the widget was removed from the tree while the asynchronous platform
+    // message was in flight, we want to discard the reply rather than calling
+    // setState to update our non-existent appearance.
+
+    if (memory != null)
+      setState(() {
+        _memory = memory;
+        print('memory freeMem:' + memory!.freeMem.toString());
+      });
+  }
 
   Future readPreference() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -170,6 +193,7 @@ class _MyApp extends State<MyApp> {
     // copier tout les pdf de l'asset bundle vers un fichier utilisable par la librairie flutter_pdfviewer
     _listAndCopyPdfassets();
     readPreference();
+    getMemoryInfo();
 
     _bindBackgroundIsolate();
     FlutterDownloader.registerCallback(downloadCallback);

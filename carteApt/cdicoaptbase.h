@@ -455,7 +455,7 @@ public:
     // retourne l'aptitude global de la zone bioclimatique
     int getApt(int aZbio);
     // retourne l'aptitude du catalogue de station
-    int getApt(int aZbio, int US, std::string aVar="");
+    int getApt(int aZbio, int US, std::string aVar="", bool withClim=true);
     int getCSClim(int US, std::string aVar="");
     bool hasCSApt(){
         bool aRes(1);

@@ -242,6 +242,7 @@ class layerBase {
       List<Map<String, dynamic>> adicoval = await dico.db.rawQuery(myquery);
 
       for (var r in adicoval) {
+        // int DN = int.parse(r['rast']);
         mDicoVal[r['rast']] = r['val'].toString();
         if (adicoval.length < 300) {
           // sinon cnsw prends trop de temps, une couleur pour les 6000 sigles

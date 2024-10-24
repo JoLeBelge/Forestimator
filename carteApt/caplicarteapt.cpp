@@ -183,7 +183,7 @@ void cApliCarteApt::carteAptCS(std::shared_ptr<cEss> aEss, std::string aOut, boo
 
         const char * destFile=aOut.c_str();
         char **papszOptions = NULL;
-        papszOptions = CSLSetNameValue( papszOptions, "COMPRESS", "DEFLATE" );
+        papszOptions = CSLSetNameValue( papszOptions, "COMPRESS", "DEFLATE" ); // fonctionne pas trop car si je relance un gdal_translate compress==deflate sur le résultat, je descend de 20 à 4Mo
         GDALDataset* poDstDS = poDriver->CreateCopy( destFile, poDatNH, FALSE, papszOptions,NULL, NULL );
         OGRSpatialReference  * spatialReference=new OGRSpatialReference;
         spatialReference->importFromEPSG(31370);
@@ -191,9 +191,9 @@ void cApliCarteApt::carteAptCS(std::shared_ptr<cEss> aEss, std::string aOut, boo
         year_month_day today = year_month_day{floor<days>(std::chrono::system_clock::now())};
         std::string d = "carte de recommandation générée le " + format("%F",today);
         poDstDS->SetMetadataItem("Essence Forestière",aEss->Nom().c_str());
-        poDstDS->SetMetadataItem("carte de recommandation pour une essence","Catalogue de Station");
+        poDstDS->SetMetadataItem("carte de recommandation pour une essence","Guide des Stations");
         poDstDS->SetMetadataItem("Version",d.c_str());
-        poDstDS->SetMetadataItem("Crédit","Lisein Jonathan, Simon Toessens et Claessens Hugues Gembloux Agro-Bio Tech");
+        poDstDS->SetMetadataItem("Crédit","Lisein Jonathan, Toessens Simon et Claessens Hugues - Gembloux Agro-Bio Tech");
         GDALRasterBand *outBand;
         outBand = poDstDS->GetRasterBand(1);
         outBand->SetNoDataValue(0);
@@ -233,6 +233,31 @@ void cApliCarteApt::carteAptCS(std::shared_ptr<cEss> aEss, std::string aOut, boo
             outBand->RasterIO( GF_Write, 0, row, x, 1, scanline, x, 1,GDT_Float32, 0, 0 );
             if (row%step==0){std::cout<< "-" << std::endl;}
         }
+
+        // set rasterColorInterpretation - après écriture du raster sinon rale - non il rale de toute façon mais ça fonctionne.
+        std::shared_ptr<layerBase> lb = dico->getLayerBase("EP_CS");
+
+        outBand->SetColorInterpretation(GCI_PaletteIndex);
+
+        GDALColorTable colors = GDALColorTable();
+        GDALColorEntry nd;
+        nd.c1=255;
+        nd.c2=255;
+        nd.c3=255;
+        nd.c4=0;
+        colors.SetColorEntry(0,&nd);
+
+        // set color for each value
+        for (auto kv : lb->getDicoCol()){
+        //    int, std::shared_ptr<color>
+        std::shared_ptr<color> col = kv.second;
+        GDALColorEntry e;
+        e.c1=col->mR;
+        e.c2=col->mG;
+        e.c3=col->mB;
+        colors.SetColorEntry(kv.first,&e);
+        }
+        outBand->SetColorTable(&colors);
 
         if( poDstDS != NULL ){ GDALClose( (GDALDatasetH) poDstDS );}
         // copie du fichier de style qgis
