@@ -8,27 +8,7 @@
 <div class="frameEncodage" style="height:100.0%;padding:10px 15px 10px 15px;margin-top:30.0px;margin-right:30.0px;margin-bottom:30.0px;margin-left:30.0px;display:flex;box-sizing:border-box;-webkit-box-sizing:border-box;flex-flow:column;-webkit-flex-flow:column;">
 	<div class="encodage" style="margin: 3px 0px; overflow: visible; flex: 1 1 auto;">
 	<h1> Desserte forestière déficitaire  </h1>
-	<h2> formulaire d’encodage  </h2>
-			<div >
-		 <img src="/img/desserte.png" alt="Desserte forestière déficitaire" style="display: block;margin-left: auto;margin-right: auto;width: 40%;"  />
-		</div>
-<br></br>
-Un <b>appel à projets</b> est actuellement lancé par le Service Public de Wallonie pour des investissements relatifs à des « dessertes forestières ».
-<br></br>
-Plus précisément, cela concerne des investissements relatifs à :
-<br></br><br></br>
-<ul>
-  <li>«La création de places de dépôt des bois dans l’objectif d’éviter des distances de débardage trop longues (diminution des problématiques de compaction…) et de favoriser les chargements en toute sécurité en veillant à éviter le lit majeur des cours d’eau,</li>
-  <li>la création de places de retournement afin de faciliter et sécuriser les opérations de chargement de bois et de diminuer les problématiques de compaction des sols, d’érosion, de ruissellement,…</li>
-  <li>les travaux d’adaptation du réseau viaire de façon à améliorer la gestion du risque d’érosion et d’inondation dans des zones vulnérables (saignées latérales, revers d’eau, noues de décantation…) ;</li>
-  <li>les travaux d’adaptation du réseau de dessertes permettant la réduction de l’impact des activités d’exploitation sur les sols et sur l’eau, pour la préservation des zones sensibles, et ce, par exemple, par la création de ponts et passages en zones humides. »</li>
-</ul>
-<br></br>
-Les porteurs de projets doivent être propriétaires (publics ou privés, personnes physiques ou morales) de parcelles boisées situées en Wallonie. L’appel à projet se clôturera le 01/03/2025.
-<br></br>
-Le dépôt d’un tel projet ne peut s’improviser tant sur un plan technique qu’administratif ! 
 
-<br></br><br></br>
 <b>La Cellule d’Appui à la Petite Forêt Privée (FBW) et la Société Royale Forestière de Belgique proposent à tout propriétaire/gestionnaire forestier qui souhaiterait faire part de besoins en matière d’amélioration de la desserte forestière de compléter dans un premier temps le formulaire ci-dessous.
 <br></br><br></br>
 Une analyse de ces « déclarations d’intérêt » sera ensuite réalisée afin de dresser un constat sur les besoins en matière d’amélioration de la desserte forestière. 
@@ -40,7 +20,7 @@ Les informations sont collectées de manière cartographique, mais les données 
 Les chemins privés ne seront jamais visités sans l’accord préalable de leurs propriétaires.</b>
 <br></br>
 <br></br>
-
+<h2> formulaire d’encodage  </h2>
 Le formulaire est prévu pour un type d’aménagement à la fois.
 Cela peut concerner des éléments linéaires (un tronçon de desserte homogène) mais aussi ponctuels (comme par exemple un passage à gué) ou surfacique (comme par exemple une aire de dépôt).
 Si vous souhaitez encoder plusieurs aménagements (plusieurs tronçons, un tronçon et une aire de dépôt etc), vous êtes invité à répéter l’encodage pour chaque aménagement. Les données générales (vos coordonnées) seront répétées par défaut d’un aménagement à l’autre.
@@ -95,7 +75,7 @@ Si vous souhaitez encoder plusieurs aménagements (plusieurs tronçons, un tron�
 <message id="type.am5">autre aménagement en lien avec le ruissellement des eaux</message>
 <message id="type.am6">autre</message>
 
-<message id="proprio.am"> Propriétaire actuelle de la desserte (attention à bien mentionner le type de propriété de la desserte et non des parcelles jouxtant celle-ci) </message>
+<message id="proprio.am"> Propriétaire actuel de la desserte (attention à bien mentionner le type de propriété de la desserte et non des parcelles jouxtant celle-ci) </message>
 <message id="proprio.am0">privé-un seul propriétaire </message>
 <message id="proprio.am1">privé- multipropriétaires </message>
 <message id="proprio.am2">public </message>
@@ -123,7 +103,7 @@ Si vous souhaitez encoder plusieurs aménagements (plusieurs tronçons, un tron�
 
 <message id="desc.am">Description de l’aménagement envisagé</message>
 
-<message id="desc.deposant">Envisagez-vous de déposer vous-même un dossier dans le cadre de l’appel à projets en cours</message>
+<message id="desc.deposant">Envisagez-vous de déposer un dossier dans le cadre de l’appel à projets en cours de la PAC ( Appel à projets dans le cadre de l'intervention 357 - Investissement dans des infrastructures sylvicoles liés au changement climatique (dessertes forestières) - Portail de l'agriculture wallonne (wallonie.be), sachant que le porteur de projet préfinance les travaux et prend la responsabilité de la bonne exécution de ceux-ci ?</message>
 <message id="desc.deposant0">Oui, à titre personnel </message>
 <message id="desc.deposant1">Oui, pour un collectif</message>
 <message id="desc.deposant2">Je ne sais pas encore</message>
