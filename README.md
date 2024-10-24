@@ -8,7 +8,7 @@ Qu'il s'agisse de l'identification des espèces présentes à partir d'images sa
 Afin de faciliter la diffusion précise des couches cartographiques, nous avons développé un **portail cartographique** : [Forestimator](https://forestimator.gembloux.ulg.ac.be/). 
 Ce geoportail permet la consultation et le téléchargement de nombreuses cartes qui s'étendent sur l'ensemble de la Wallonie (Belgique), à commencer par la carte de composition des essences qui a suscité un énorme intérêt au sein de la communauté des gestionnaires et scientifiques forestiers.
 
-Cependant, afin d'atteindre un public plus vaste, en particulier les plus jeunes, nous avons décliné Forestimator en une version pour téléphone portable. La version Android sera mise en ligne à l'été 2024.
+Cependant, afin d'atteindre un public plus vaste, en particulier les plus jeunes, nous avons décliné Forestimator en une version pour téléphone portable. La version Android est en ligne depuis 2024.
 
 ## Pourquoi partager ces codes informatiques?
 

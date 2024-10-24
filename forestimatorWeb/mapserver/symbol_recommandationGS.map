@@ -18,7 +18,7 @@ PROCESSING "BANDS=1"
       NAME "Convient actuellement mais risques climatiques à long terme"
       EXPRESSION "3"
       STYLE 
-          COLOR #c0f7d7"
+          COLOR "#c0f7d7"
        END
    END
    CLASS 
