@@ -48,7 +48,7 @@ public:
     std::string date,nom,prenom,mail,tel;
     int typeGeom;
     bool     checkRepresentant;
-    std::string typeContact,descr,geom,contactPrecision, typeAM,typeProprio,deposant;
+    std::string typeContact,descr,geom,contactPrecision, typeAM,typeProprio,deposant, acAdmin;
     int id;
     template<class Action>
     void persist(Action& a)
@@ -65,6 +65,7 @@ public:
         dbo::field(a, typeAM,  "typeAM");
         dbo::field(a, typeProprio,  "typeProprio");
         dbo::field(a, deposant,  "deposant");
+        dbo::field(a, acAdmin,  "acAdmin");
         dbo::field(a, typeGeom,  "typeGeom");
         dbo::field(a, descr,  "descr");
         dbo::field(a, geom,  "geom");
@@ -94,6 +95,8 @@ public:
     WComboBox *typeContact;
     WLineEdit *contactPresicion;
     WCheckBox * checkRepresentant;
+
+    WComboBox *acAdmin;
 
     WComboBox *typeAM;
     WComboBox *typeProprio;

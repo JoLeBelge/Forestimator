@@ -164,7 +164,10 @@ formDesserteForest::formDesserteForest(const WEnvironment &env, cDicoApt *dico, 
     description= table->elementAt(row,0)->addWidget(std::make_unique<WTextArea>());
     description->setColumns(40);
     description->setRows(5);
-    row++;
+
+    table->elementAt(row,0)->addWidget(std::make_unique<WLabel>(WString::tr("secFinale.titre")));
+    row=0;
+    table= cont->addNew<WTable>();
     table->elementAt(row,0)->addWidget(std::make_unique<WLabel>(WString::tr("desc.deposant")));
     row++;
     deposant = table->elementAt(row,0)->addWidget(std::make_unique<WComboBox>());
@@ -172,6 +175,12 @@ formDesserteForest::formDesserteForest(const WEnvironment &env, cDicoApt *dico, 
     deposant->addItem(WString::tr("desc.deposant1"));
     deposant->addItem(WString::tr("desc.deposant2"));
     deposant->addItem(WString::tr("desc.deposant3"));
+    row++;
+    label = table->elementAt(row,0)->addWidget(std::make_unique<WLabel>(WString::tr("acAdmin")));
+    row++;
+    acAdmin= table->elementAt(row,0)->addWidget(std::make_unique<WComboBox>());
+    acAdmin->addItem(WString::tr("choix.acAdm0"));
+    acAdmin->addItem(WString::tr("choix.acAdm1"));
 
     WPushButton * bSubmit = tpl->bindWidget("bsubmit", std::make_unique<WPushButton>(WString::tr("submit")));
     bSubmit->clicked().connect([=] {submit();});
@@ -219,7 +228,7 @@ void formDesserteForest::submit(){
             WLocalDateTime d= WLocalDateTime::currentDateTime();
             //std::cout << " sauve la coupe rase " << std::endl;
             sqlite3_stmt * stmt;
-            SQLstring="INSERT INTO desserte (version,date,nom,prenom,mail,tel,typeContact,contactPrecision,checkRepresentant,typeAM,typeProprio,deposant,typeGeom,descr,geom) VALUES (0,'"
+            SQLstring="INSERT INTO desserte (version,date,nom,prenom,mail,tel,typeContact,contactPrecision,checkRepresentant,typeAM,typeProprio,deposant,typeGeom,descr,acAdmin,geom) VALUES (0,'"
                     +d.toString().toUTF8()+"',"
                     +"'"+format4SQL(nom->valueText().toUTF8())+"',"
                     +"'"+format4SQL(prenom->valueText().toUTF8())+"',"
@@ -233,6 +242,7 @@ void formDesserteForest::submit(){
                     +"'"+format4SQL(deposant->currentText().toUTF8())+"',"
                     +std::to_string(choixAM->currentIndex()+1)+","
                     +"'"+format4SQL(description->valueText().toUTF8())+"',"
+                    +"'"+format4SQL(acAdmin->valueText().toUTF8())+"',"
                     +"'"+aGeom+"');";
             //std::cout << "sql : " << SQLstring << std::endl;
             sqlite3_prepare_v2(db_, SQLstring.c_str(), -1, &stmt, NULL );
@@ -485,7 +495,10 @@ void formDesserteForest::sendSummaryMail(){
     Wt::Mail::Message amail =Wt::Mail::Message();
     //mail.addHeader();
     //mail.setFrom(Wt::Mail::Mailbox("JO.Lisein@uliege.be", "Lisein Jonathan"));
-    amail.setFrom(Wt::Mail::Mailbox("v.colson@filiereboiswallonie.be","Vincent Colson"));
+    //amail.setFrom(Wt::Mail::Mailbox("v.colson@filiereboiswallonie.be","Vincent Colson"));
+
+    amail.setFrom(Wt::Mail::Mailbox("louanne.collin@srfb-kbbm.be","Louanne Collin"));
+
     amail.setBody(
                 "\nVos données ont été encodée.\n"+
                 Wt::WString::tr("mail.contact").toUTF8()+"\n--------------------------\n"+
@@ -499,6 +512,7 @@ void formDesserteForest::sendSummaryMail(){
                 "Propriétaire:"+typeProprio->valueText().toUTF8()+"\n\n"+
                 "Qui dépose le projet:"+deposant->valueText().toUTF8()+"\n\n"+
                 "Description de l'aménagement:"+description->valueText().toUTF8()+"\n\n"+
+                "Accompagnement administratif SRFB :"+acAdmin->valueText().toUTF8()+"\n\n"+
                 Wt::WString::tr("mail.acr").toUTF8()+"\n\n"
                 );
     amail.setSubject(Wt::WString::tr("mail.titre").toUTF8());
@@ -514,7 +528,7 @@ void formDesserteForest::sendSummaryMail(){
     client.send(amail);
     in.close();// après l'envoi!! car le addAttachement pointe ver le ifstream!
     amail =Wt::Mail::Message();
-    amail.addRecipient(Wt::Mail::RecipientType::To,Mail::Mailbox("v.colson@filiereboiswallonie.be","Vincent Colson"));
+    //amail.addRecipient(Wt::Mail::RecipientType::To,Mail::Mailbox("v.colson@filiereboiswallonie.be","Vincent Colson"));
     //amail.setFrom(Wt::Mail::Mailbox("JO.Lisein@uliege.be", "Lisein Jonathan"));
     amail.setSubject("Desserte Forestière - encodage");
     amail.setBody(SQLstring);

@@ -7,10 +7,6 @@ matAptCS::matAptCS(cDicoApt *aDicoApt):mDicoApt(aDicoApt),zbio_(1),US_(1),mVar_(
     setId("pageCS");
 
     //setMaximumSize("100%","5000px");
-    /* 1 Intro ---------------------------*/
-
-    addWidget(std::make_unique<WText>(tr("CS.intro")));
-     /* 2 Zbio ---------------------------*/
     addWidget(std::make_unique<Wt::WText>(tr("matAptCS.zbio")));
 
     zbioSelection_  =addWidget(std::make_unique<Wt::WComboBox>());
@@ -254,7 +250,7 @@ void matAptCS::showFicheUS(int US, std::string aVar){
     contFicheUS->addNew<Wt::WText>(tr(idMessage));
     }
     */
-    doJavaScript("ficheUS.scrollIntoView({ behavior: 'smooth', block: 'start' })");
+    //doJavaScript("ficheUS.scrollIntoView({ behavior: 'smooth', block: 'start' })");
 }
 
 void matAptCS::changeZbio(){

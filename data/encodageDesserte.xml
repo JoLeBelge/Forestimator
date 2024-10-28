@@ -9,15 +9,11 @@
 	<div class="encodage" style="margin: 3px 0px; overflow: visible; flex: 1 1 auto;">
 	<h1> Desserte forestière déficitaire  </h1>
 
-<b>La Cellule d’Appui à la Petite Forêt Privée (FBW) et la Société Royale Forestière de Belgique proposent à tout propriétaire/gestionnaire forestier qui souhaiterait faire part de besoins en matière d’amélioration de la desserte forestière de compléter dans un premier temps le formulaire ci-dessous.
+<b> La Cellule d’Appui à la Petite Forêt Privée (un service de Filière Bois Wallonie) et la Société Royale Forestière de Belgique proposent à tout propriétaire/gestionnaire forestier qui le souhaite de faire part de ses besoins/attentes en matière d’amélioration de la desserte forestière (chemins mais aussi aménagements associés tels que des franchissements de cours d’eau ou des aires de dépôt de bois).
 <br></br><br></br>
-Une analyse de ces « déclarations d’intérêt » sera ensuite réalisée afin de dresser un constat sur les besoins en matière d’amélioration de la desserte forestière. 
+Les informations sont collectées de manière cartographique, mais les données reçues ne seront pas publiées. Elles seront analysées en les globalisant et en les anonymisant. Ceci afin de rapporter auprès des instances régionales l’intérêt des propriétaires et gestionnaires forestiers pour des investissements en matière de desserte forestière. Les chemins privés ne seront par ailleurs jamais visités sans l’accord préalable de leurs propriétaires.
 <br></br><br></br>
-La SRFB accompagnera certains porteurs de projets qui souhaiteraient répondre à l’appel à projets lancé actuellement par le SPW.
-<br></br><br></br>
-Les informations sont collectées de manière cartographique, mais les données reçues ne seront pas publiées. Elles seront analysées en les globalisant et en les anonymisant. Ceci afin de rapporter auprès des instances régionales l’intérêt des propriétaires et gestionnaires forestiers pour des investissements en matière de desserte forestière.
-<br></br><br></br>
-Les chemins privés ne seront jamais visités sans l’accord préalable de leurs propriétaires.</b>
+En marge de cette compilation des marques d’intérêt de propriétaires et gestionnaires, nous vous informons qu’<a href="https://agriculture.wallonie.be/home/aides/pac-2023-2027-description-des-interventions/aides-aux-investissements-nouveaute-2024/appel-a-projets-dans-le-cadre-de-l-intervention-357-investissement-dans-des-infrastructures-sylvicoles-lies-au-changement-climatique-dessertes-forestieres.html" target="_blank" rel="noopener">une mesure d’aide de la PAC</a> est actuellement dédicacée à des améliorations de la desserte forestière. Le budget disponible est relativement limité et le dossier à compléter nécessite une certaine expertise.  La SRFB envisage d’accompagner certains porteurs de projets qui souhaiteraient introduire une telle demande de financement.</b>
 <br></br>
 <br></br>
 <h2> formulaire d’encodage  </h2>
@@ -45,6 +41,20 @@ Si vous souhaitez encoder plusieurs aménagements (plusieurs tronçons, un tron�
 </div>
 </message>
 
+<message id="typeEncoder">Vous êtes ?</message>
+<message id="typeEncoder0">Choisissez</message>
+<message id="typeEncoder1">Propriétaire privé</message>
+<message id="typeEncoder2">Gestionnaire forestier privé</message>
+<message id="typeEncoder3">DNF</message>
+<message id="typeEncoder4">Administration publique (commune…)</message>
+<message id="typeEncoder5">Autre</message>
+
+<message id="contact.precision"> Précisions </message>
+
+
+<message id="checkRepresentant">Je suis/la structure que je représente est directement concerné(e) par le tronçon/la zone décrit(e) (utilisateur en tant que propriétaire ou joignant)</message>
+
+
 <message id="sectionEncoder"> <h3> Vos données personnelles </h3></message>
 <message id="sectionAme"> <h3> Type d'aménagement </h3></message>
 
@@ -58,15 +68,6 @@ Si vous souhaitez encoder plusieurs aménagements (plusieurs tronçons, un tron�
 <message id="contact.gsm"> Votre contact: téléphone </message>
 <message id="contact.gsm.ph"> Ex: 0475221309 </message>
 
-<message id="typeEncoder">Vous êtes ?</message>
-<message id="typeEncoder0">Choisissez</message>
-<message id="typeEncoder1">Propriétaire privé</message>
-<message id="typeEncoder2">Gestionnaire forestier privé</message>
-<message id="typeEncoder3">DNF</message>
-<message id="typeEncoder4">Administration publique (commune…)</message>
-<message id="typeEncoder5">Autre</message>
-
-<message id="contact.precision"> Précisions </message>
 
 <message id="type.am">Type d’aménagement</message>
 <message id="type.am0">création d’une nouvelle desserte</message>
@@ -103,9 +104,12 @@ Si vous souhaitez encoder plusieurs aménagements (plusieurs tronçons, un tron�
 <message id="cadastre.choisir">Choisissez une commune</message>
 <message id="titreCommune"><h4>Choisissez une commune pour centrer la carte sur celle-ci</h4></message>
 
+
+<message id="secFinale.titre"> <br></br><h3>Appel à projet en cours de la PAC</h3> <br></br></message>
+
 <message id="desc.am">Description de l’aménagement envisagé</message>
 
-<message id="desc.deposant">Envisagez-vous de déposer un dossier dans le cadre de l’appel à projets en cours de la PAC ( Appel à projets dans le cadre de l'intervention 357 - Investissement dans des infrastructures sylvicoles liés au changement climatique (dessertes forestières) - Portail de l'agriculture wallonne (wallonie.be), sachant que le porteur de projet préfinance les travaux et prend la responsabilité de la bonne exécution de ceux-ci ?</message>
+<message id="desc.deposant">Envisagez-vous de déposer un dossier dans le cadre de <a href="https://agriculture.wallonie.be/home/aides/pac-2023-2027-description-des-interventions/aides-aux-investissements-nouveaute-2024/appel-a-projets-dans-le-cadre-de-l-intervention-357-investissement-dans-des-infrastructures-sylvicoles-lies-au-changement-climatique-dessertes-forestieres.html" target="_blank" rel="noopener">l’appel à projets en cours de la PAC</a>, sachant que le porteur de projet préfinance les travaux et prend la responsabilité de la bonne exécution de ceux-ci ?</message>
 <message id="desc.deposant0">Oui, à titre personnel </message>
 <message id="desc.deposant1">Oui, pour un collectif</message>
 <message id="desc.deposant2">Je ne sais pas encore</message>
@@ -117,7 +121,7 @@ Si vous souhaitez encoder plusieurs aménagements (plusieurs tronçons, un tron�
 Vos données ont été encodées de manière adéquate. Nous vous remercions pour votre participation. Souhaitez-vous encoder une autre desserte, passage à gué ou aire de dépôt de bois?
 </message>
 
-<message id="btnPolyg"> Vous pouvez réinitialiser le dessin avec les bouttons ci-dessous  </message>
+<message id="btnPolyg"> Vous pouvez réinitialiser le dessin avec les boutons ci-dessous  </message>
 
 <message id="Wt.WMessageBox.Yes">Oui</message>
 <message id="Wt.WMessageBox.No">Non</message>
@@ -131,7 +135,12 @@ Vos données ont été encodées de manière adéquate. Nous vous remercions pou
 <message id="mail.contact">Vos données personnelles </message>
 <message id="mail.acr">Description de votre encodage: </message>
 
-<message id="checkRepresentant">Je suis/la structure que je représente est directement concerné(e) par le tronçon/la zone décrit(e) (utilisateur en tant que propriétaire ou joignant)</message>
+<message id="acAdmin">Si oui, souhaiteriez-vous bénéficier d’un accompagnement administratif pour le dépôt du projet, par la SRFB  </message>
+<message id="choix.acAdm0">Non</message>
+<message id="choix.acAdm1">Oui</message>
+
+
+
 
 
 </messages>

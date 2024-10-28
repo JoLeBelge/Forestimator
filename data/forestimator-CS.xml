@@ -1,51 +1,118 @@
 <messages>
 
-<message id="CS.intro"> <h1>Guide des Stations</h1> 
-<p class="lead">
-<h3>Fichier écologique des essences et Guide des stations forestières : des outils complémentaires</h3>
+<message id="CS.intro"> <h1>Guide des stations forestières d’Ardenne</h1> 
 <br></br>
-Le Fichier Ecologique des Essences (FEE) et le Guide des stations forestières sont deux outils complémentaires qui ont pour vocation d’aider les forestiers dans leurs démarches de description stationnelle, de choix des essences et de gestion forestière.
-Le fichier écologique des essences catégorise les stations selon trois facteurs écologiques que sont les niveaux <mark>bioclimatique, hydrique et trophique</mark> ; les 2 derniers étant représentés sous la forme d’un écogramme. C’est un outil orienté « aptitude des essences », qui comporte des fiches très informatives sur les atouts et les sensibilités de chaque essence forestière. 
-La classification très systématique des stations convient particulièrement à une utilisation à l’échelle de l’ensemble de la Région wallonne.
+<h3>Introduction, enjeux et définitions</h3>
 <br></br>
-À une échelle plus régionale, comme pour les trois zones bioclimatiques d'Ardenne, le guide des stations est un outil orienté « gestion des stations », qui <mark>découpe le territoire en milieux-types, bien reconnaissables pour le forestier de terrain</mark>. En plus d’un choix d’essences approprié, le guide délivre des conseils de gestion spécifiques aux stations, par exemple en termes de protection des sols ou de promotion de la biodiversité.
-</p>
+Développé à Gembloux Agro-Bio Tech dans le cadre du plan quinquennal de recherches forestières, le <i>Guide des stations forestières d’Ardenne</i> est un nouvel outil conçu pour les gestionnaires forestiers, en forêt publique ou privée. Il se base sur l’identification des types de station et propose des recommandations de gestion adaptées à chacun, en intégrant notamment les enjeux climatiques. Il se présente sous la forme d’un livre imprimé, <a target="_blank" rel="noopener noreferrer" href="https://ediwall.wallonie.be/faune-flore-habitats-no-12-guide-des-stations-forestieres-de-wallonie-tome-1-l-ardenne-2024-papier-130636?ref=130636_0">disponible à l’achat</a> aux éditions Ediwall, mais il a aussi été traduit en plusieurs cartes numériques, consultables sur Forestimator (web et smartphone).
+<br></br><br></br>
+Définies comme des étendues de superficies variables et homogènes dans leurs conditions physiques et biologiques (climat, topographie, sol, composition floristique et structure de la végétation spontanée), les « <mark> stations forestières</mark> » se succèdent et s’entre-mêlent dans le continuum écologique du paysage forestier, au gré des multiples variations écologiques qui façonnent les milieux naturels. 
+<br></br><br></br>
+Bien qu’elles fassent partie depuis longtemps du vocabulaire des gestionnaires, qui perçoivent souvent bien la diversité de stations présentes sur le territoire dont ils ont la charge, identifier les transitions entre stations, leurs contraintes écologiques spécifiques et les méthodes de gestion adéquates, est une démarche longue et complexe tant les facteurs qui interviennent sont nombreux. 
+<br></br><br></br>
+Le guide répond à ces difficultés en définissant sur l’Ardenne 17 types de station, qu’une clé d’identification pratique et validée par un groupe de travail permet d’identifier sur le terrain. Chaque type de station fait ensuite l’objet d’une fiche descriptive qui, d’une part, décrit les caractéristiques écologiques du type de station (position dans le paysage, profil pédologique et propriétés, flore indicatrice et phytosociologie, microclimat) et d’autre part, liste leurs <mark>contraintes sylvicoles spécifiques</mark> et propose des <mark>recommandations de gestion adaptées</mark>. Parmi ces recommandations se trouvent des propositions de choix d’essences adéquates, qui intègrent différents niveaux d’aptitude et de risques face aux changements climatiques (à moyen et long termes), des conseils de gestion pratique (timing des interventions, potentiel d’accueil de biodiversité, potentiel de production…), des propositions de mélanges opportuns et les tentations à éviter.
+<br></br><br></br>
+Développé sur base d’une approche terrain, ce guide a pour objectif de faciliter la compréhension du territoire et des possibles qu’il offre, en présentant l’information de manière centralisée et facilement utilisable sur le terrain. Par ailleurs, les forêts wallonnes subissent depuis deux décennies les effets d’importants changements climatiques, de crises sanitaires, d’évolutions socio-économiques ou encore de problèmes cynégétiques, qui ajoutent de nouvelles dimensions à la gestion forestière. Dans ce contexte où prudence et réflexion doivent être de mise, il vise à apporter des réponses aux gestionnaires forestiers pour les aider dans leurs prises de décisions. Pour cela, les changements climatiques futurs et les sensibilités spécifiques des essences et des types de station ont été particulièrement pris en compte, dans une optique de gestion orientée vers la durabilité et la résilience des écosystèmes forestiers.
+<br></br><br></br>
+Le tome 1 porte sur l’Ardenne et est désormais disponible chez Ediwall. Il est le premier tome d’une série qui s’étendra dans les prochaines années aux autres régions de Wallonie, à savoir la Fagne-Famenne-Calestienne, le Condroz et la Thiérache, la Lorraine belge et éventuellement le Nord du sillon Sambre et Meuse. Ces ouvrages s’inscrivent dans la continuité des outils d’analyse stationnelle que sont le <a target="_blank" rel="noopener noreferrer" href="https://www.fichierecologique.be/#!/">Fichier écologiques des essences</a> et le <a target="_blank" rel="noopener noreferrer" href="https://librairie.foretnature.be/product/guide-dinterpretation-de-la-flore-indicatrice-en-foret/">Guide d’interprétation de la flore indicatrice en forêt</a> (Claessens et Al., 2021). Ils vont toutefois plus loin en apportant les informations nécessaires pour une compréhension plus experte des stations et de leur évolution dans le cadre des changements climatiques, en proposant des recommandations de gestion adaptées à ces évolutions et à leurs incertitudes.
+<br></br><br></br>
+Pour plus d’informations sur les guides de stations forestières, vous pouvez consulter :
+<br></br><br></br>
+
+une comparaison plus approfondie entre le Fichier écologique des essences et les guides de station : <div class="csl-entry">Lucie Maus, Jonathan Lisein, et Hugues Claessens. 2021. «<a target="_blank" rel="noopener noreferrer"  href="https://orbi.uliege.be/bitstream/2268/304665/1/Foret.Nature%20-%20HS02%20-%20p36-39.pdf">Le guide d’identification des stations forestières de l’Oesling</a>&nbsp;». <i>Forêt.Nature</i> hors série n° 2.</div> 
+<br></br>
+un article de présentation du guide des stations d’Ardenne : <div class="csl-entry">Simon Tossens, Jonathan Lisein, Sophie Cordier, et Hugues Claessens. 2024. «<a target="_blank" rel="noopener noreferrer"  href="https://orbi.uliege.be/handle/2268/316284">Guide des stations forestières d’Ardenne</a>&nbsp;». <i>Forêt.Nature</i>, n<sup>o</sup> 170 (mars).</div>
 <br></br>
 
-Une plus ample comparaison de l'approche FEE versus guide des stations est fournie dans l'article suivant : <div class="csl-entry">Maus, Lucie, Jonathan Lisein, et Hugues Claessens. 2021. «<a target="_blank" rel="noopener noreferrer"  href="https://orbi.uliege.be/bitstream/2268/304665/1/Foret.Nature%20-%20HS02%20-%20p36-39.pdf">Le guide d’identification des stations forestières de l’Oesling</a>&nbsp;». <i>Forêt.Nature</i> hors série n° 2.</div> 
-<br></br>
-La présentation des guides de stations de l'Ardenne est quand à elle disponible dans l'article suivant : <div class="csl-entry">Simon Tossens, Jonathan Lisein, Sophie Cordier, et Hugues Claessens. 2024. «<a target="_blank" rel="noopener noreferrer"  href="https://orbi.uliege.be/handle/2268/316284">Guide des stations forestières d’Ardenne</a>&nbsp;». <i>Forêt.Nature</i>, n<sup>o</sup> 170 (mars).</div>
-<br></br>
-<h3>Guide des stations: quel développement pour la Wallonie</h3>
-<br></br>
-<p>Pour l'instant, le Guide des Stations de l'Ardenne est publié: 
+<h3>Outils cartographiques</h3>
 
-<figure class="highlight">
-<img src="../img/CS/GSA.png" alt="guide des stations d'Ardenne" style="width:400.0px"/> 
-<figcaption class="figure-caption">Découvrez le Guide des stations d'Ardenne : 
-<br></br> <a target="_blank" rel="noopener noreferrer" href="https://ediwall.wallonie.be/faune-flore-habitats-no-12-guide-des-stations-forestieres-de-wallonie-tome-1-l-ardenne-2024-papier-130636?ref=130636_0">Commandez la version papier ici.</a></figcaption>
-<br></br>
-</figure>
+En plus de la version papier, une carte numérique des types de station forestière d’Ardenne a été produite, disponible sur ce site dans l’onglet « Cartographie » . De cette carte, de nombreuses cartes dérivées ont été produites en utilisant les informations reprises dans les fiches descriptives des types de stations, comme par exemple :
+<br></br><br></br>
+<ul>
+  <li>les cartes de suggestion d’essence par type de station (1 couche par essence), qui sont dérivées des tableaux d’essences conseillées du guide imprimé ;</li>
+  <li>une carte des risques de tassement par type de station ;</li>
+  <li>une carte de potentiel de production par type de station ;</li>
+  <li>une carte des sensibilités climatiques par type de station ;</li>
+  <li>...</li>
+</ul>
 
-<h3>Légende</h3>
-Les niveaux d’aptitude des essences pour les unités stationnelles sont présentés ci-dessous.</p>
+
+Ces cartes sont également accessibles sur ce site dans l’onglet « Cartographie ».
+<br></br>
+
+<h3>Construction des cartes de suggestion d’essence</h3>
+<br></br>
+Dans l’outil papier, nos conseils en matière de choix d’essence s’exprimaient en deux composantes complémentaires et présentées côte à côtes dans les tableaux d’essences conseillées : 
+<br></br>
+<ul>
+  <li>la suggestion d’adéquation des essences sur la station dans les conditions climatiques actuelles, définie plus ou moins en phase avec le Fichier écologique des essences, dont les informations sont parfois déjà dépassées (figure 1) ; </li>
+  <br></br>
+  <li>une estimation prospective de l’évolution à plus long terme (celui d’une révolution sylvicole) de cette adéquation, en confrontant l’écologie des essences à la tendance évolutive des conditions écologiques de la station sous l’effet des changements climatiques présentés en introduction (figure 2). </li>
+</ul>
 
 <br></br>
-<p>Légende des niveaux d’aptitude et signification des abréviations utilisées dans les tableaux d’essences des fiches
-descriptives.</p>
 <div class="row">
-	<div class="col-12 text-center"> <h5> Légende des aptitudes </h5> </div>
-	<div class="col-8 text-end"> <h6> Conseillée sans réserve (optimum) </h6> </div>
-	<div class="col-4 col-aptCS1" style="width:30%; height:25px;"> </div>
-	<div class="col-8 text-end"> <h6> Conseillée, en tenant compte de ses faiblesses (tolérance) </h6> </div>
-	<div class="col-4 col-aptCS2" style="width:30%; height:25px;"> </div>
-	<div class="col-8 text-end"> <h6> À n'envisager qu'en accompagnement (tolérance élargie) </h6> </div>
-	<div class="col-4 col-aptCS3" style="width:30%; height:25px;"> </div>
-	<div class="col-8 text-end"> <h6> Ne pas envisager (exclusion) </h6> </div>
+	<div class="col-12 text-center"> <h5> Adéquations stationnelles (contexte actuel) </h5> </div>
+	<div class="col-4 col-adeCS0" style="width:30%; height:25px;"> </div>
+	<div class="col-8 text-start"> <h6> Station ou variante absente de la région bioclimatique (n'existe pas) </h6> </div>
+	<div class="col-4 col-aptCS7" style="width:30%; height:25px;"> </div>
+	<div class="col-8 text-start"> <h6> Ne pas envisager </h6> </div>
 	<div class="col-4 col-aptCS4" style="width:30%; height:25px;"> </div>
+	<div class="col-8 text-start"> <h6> À n'envisager qu'en accompagnement </h6> </div>
+	<div class="col-4 col-aptCS2" style="width:30%; height:25px;"> </div>
+	<div class="col-8 text-start"> <h6> Conseillée, en tenant compte de ses faiblesses </h6> </div>
+	<div class="col-4 col-aptCS1" style="width:30%; height:25px;"> </div>
+	<div class="col-8 text-start"> <h6> Conseillée </h6> </div>
+</div>
+<p>Figure 1 : légende des suggestions d’essences dans les conditions climatiques actuelles, utilisées dans les tableaux d’essences conseillées dans le guide des stations d’Ardenne (livre imprimé).</p>
+<br></br>
+<div class="container overflow-hidden">
+<div class="row gy-3">
+	<div class="col-2 text-center"> <h5> Code couleur </h5> </div>
+	<div class="col-10 text-center"> <h5> Comportement des essences face aux changements climatiques </h5> </div>
+	<div class="col-2"> 
+	<div class="row"> <div class="col-6 text-center"> A</div>   <div class="col-6 text-center"> LT</div> </div>
+	<div class="row"> <div class="col-6 col-aptCSClimOrigin1" style="height:25px;" > </div>   <div class="col-6 col-aptCSClimOrigin1" style="height:25px;"> </div> </div>
+	</div>
+	<div class="col-10 text-start"> Essences faiblement affectées par les CC sur ce type de station. Peu de modifications des aptitudes stationnelles sont attendues. </div>
+	
+	<div class="col-2"> 
+	<div class="row"> <div class="col-6 text-center"> A</div>   <div class="col-6 text-center"> LT</div> </div>
+	<div class="row"> <div class="col-6 col-aptCSClimOrigin1" style="height:25px;" > </div>   <div class="col-6 col-aptCSClimOrigin2" style="height:25px;"> </div> </div>
+	</div>
+	<div class="col-10 text-start"> Essences dont la production risque d'être impactée par des dépérissements conséquents sur ce type de station : baser la gestion sur ces essences est risqué mais elles peuvent être entretenues en mélange si elles sont présentes ou s'installent naturellement. </div>
+	
+	<div class="col-2"> 
+	<div class="row"> <div class="col-6 text-center"> A</div>   <div class="col-6 text-center"> LT</div> </div>
+	<div class="row"> <div class="col-6 col-aptCSClimOrigin2" style="height:25px;" > </div>   <div class="col-6 col-aptCSClimOrigin1" style="height:25px;"> </div> </div>
+	</div>
+	<div class="col-10 text-start"> « Essences d'avenir » potentielles, dont l'installation peut commencer à s'envisager. Les risques à court et moyen termes sont présents car l'essence n'est pas encore tout à fait adaptée au froid du climat actuel. À long terme, il est probable que ces risques diminuent. </div>
+	
+<div class="col-2"> 
+	<div class="row"> <div class="col-6 text-center"> A</div>   <div class="col-6 text-center"> LT</div> </div>
+	<div class="row"> <div class="col-6 col-aptCSClimOrigin2" style="height:25px;" > </div>   <div class="col-6 col-aptCSClimOrigin3" style="height:25px;"> </div> </div>
+	</div>
+	<div class="col-10 text-start"> Essences amenées à dépérir sur la station concernée : ne plus les installer, éventuellement tirer parti temporairement de leur régénération naturelle dans un rôle sylvicole d'accompagnement. </div>
+</div>
 </div>
 <br></br>
+<p>Figure 2 : légende des catégories de risques climatiques utilisées dans les tableaux d’essences conseillées guide des stations d’Ardenne (livre imprimé).</p>
+<br></br><br></br>
 
+
+Pour produire les <mark>cartes numériques de suggestion d’essences</mark>, nous avons dû <mark>rassembler ces deux composantes</mark> en une seule légende, afin que les deux informations soient prises en compte. La conversion est présentée par la figure ci-dessous (figure 3). Elle présente le gros avantage d’inclure les risques climatiques spécifiques à chaque couple « station-essence ». Pour plus d’informations sur l’utilisation des guides de station, veuillez consulter le guide d’utilisation complet du guide des station, disponible <a target="_blank" rel="noopener noreferrer" href="/pdf/methodo-GSA.pdf" download="methodo-GSA">ici</a>
+
+<img src="/img/legendeCarteSuggestion.png" width="800px" alt="legende carte de suggestion"/>
+<br></br>
+Figure 3 : conversion des tableaux d’essences conseillées du guide des stations d’Ardenne (livre imprimé) en légende cartographique pour les cartes numériques de suggestions d’essences
+<br></br><br></br>
+<h3>A LIRE AVANT UTILISATION DES CARTES :</h3>
+<br></br>
+<ol>
+    <li>Les cartes produites simplifient la réalité car la variabilité stationnelle sur le terrain est bien trop importante pour qu’un produit cartographique puisse représenter sa complexité. Par conséquent ces cartes fonctionnent bien pour dégager les tendances stationnelles à l’échelle d’une région ou d’un massif forestier. Elle peuvent par exemple être très utiles pour réaliser des aménagements forestiers. En revanche, pour une utilisation ponctuelle qui nécessite de la précision dans la détermination du type de station, il est vivement recommandé d’aller vérifier sur place avec le guide au format livre pour vérifier le diagnostic stationnel.</li>
+    <br></br>
+    <li> Nos conseils en matière de choix d’essence sont le produit d’une réflexion approfondie visant à faire coïncider l’autécologie de chaque essence aux conditions écologiques spécifiques de chaque type de station, en intégrant les changements climatiques et les dépérissements observés jusqu’à présent (2023). Ils ont été élaborés dans une logique de durabilité des peuplements forestiers, en restant prudent face aux incertitudes liées aux changements climatiques notamment. Il revient à l’utilisateur d’en tirer ses conclusions avec intelligence et selon les risques qu’il souhaite prendre.</li>
+</ol>
 </message>
 
 <message id="matAptCS.badge">  A{1}
