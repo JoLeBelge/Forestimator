@@ -208,6 +208,7 @@ public:
     }
 
     std::map<std::string,LayerMTD> * layerMTD();
+    LayerMTD getLayerMTD(std::string aCode);
 
     // pour debug
    /* void summaryRasterFile(){

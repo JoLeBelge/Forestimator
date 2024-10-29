@@ -21,7 +21,7 @@ void cWebAptitude::handlePathChange()
         // une description différentes pour chaques page de documentation. Il faut préhalablement retirer la description, sinon ça n'aura pas d'effet
         // fonctionne pas si session avec javascript, mais pour les robots ça va quand-même. Sur mon navigateur, le meta descr c'est celui de la première page consultée de la session
         // check si j'ai un header description pour cette sous-section, sinon celui général à la page documentation
-
+        if (globTest){std::cout << "section Documentation : "<< internalPath() << std::endl;}
         if (found!=std::string::npos && found + docInternalP.length()+1 < internalPath().size()){// test sur la longueur car il faut gérer le cas ou on a juste un backslach : /documentation/
         std::string sectionDoc=internalPath().erase(0, found + docInternalP.length()+1);
         // retirer l'éventuel baslach en fin de url

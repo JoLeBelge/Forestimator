@@ -187,6 +187,16 @@ public:
 class LayerMTD{
 public:
     LayerMTD(){}
+    LayerMTD (const LayerMTD &l)
+    {
+        mCode=l.mCode;
+        mNom=l.mNom;
+        mShortName=l.mShortName;
+        mProjet=l.mDescr;
+        mVersion=l.mVersion;
+        mCopyR=l.mCopyR;
+        mVRefs=l.mVRefs;
+    }
     void setCode(std::string aCode){mCode=aCode;}
     void setNom(std::string aNom){mNom=aNom;}
     void setLabel(std::string a){mShortName=a;}

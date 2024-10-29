@@ -325,6 +325,14 @@ WMSinfo * cDicoApt::getWMSinfo(std::string aCode){
 
 std::map<std::string,LayerMTD> * cDicoApt::layerMTD(){return &Dico_layerMTD;}
 
+LayerMTD cDicoApt::getLayerMTD(std::string aCode){
+    LayerMTD l;
+    for (auto &kv: Dico_layerMTD){
+        if (kv.second.code()==aCode){l=kv.second;}
+    }
+    return l;
+}
+
 TypeCarte str2TypeCarte(const std::string& str)
 {
     TypeCarte aRes=SS;

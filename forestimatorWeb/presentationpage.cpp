@@ -17,24 +17,99 @@ presentationPage::presentationPage(cDicoApt *aDico, cWebAptitude *app):mDico(aDi
     subStack->setOverflow(Wt::Overflow::Auto);
 
     auto menu = std::make_unique<Wt::WMenu>(subStack.get());
-    auto menu_ = menu.get();
-    //menu_->addStyleClass("nav-pills nav-stacked submenu submenuPresentation");
+    menu_ = menu.get();
     menu_->addStyleClass("flex-column");
-    //subMenu_->setWidth(200);
-
     menu_->setInternalPathEnabled("/documentation");
 
-    // introduction forestimator
-    std::unique_ptr<Wt::WMenuItem> item = std::make_unique<Wt::WMenuItem>("Forestimator : présentation");
+    // forestimator
+    auto subMenuPtr = std::make_unique<Wt::WMenu>(subStack.get());
+    auto subMenu = subMenuPtr.get();
+    std::unique_ptr<Wt::WMenuItem>  item = std::make_unique<Wt::WMenuItem>("Forestimator");
+    item->setMenu(std::move(subMenuPtr));
+    auto   item_ = menu_->addItem(std::move(item));
+    subMenu->addStyleClass("nav-stacked submenu");
+    subMenu->setInternalPathEnabled("/documentation");// pour rester cohérent avec ancien lien url et avec les chemins d'accès relatif des images dans la page
+
+    item = std::make_unique<Wt::WMenuItem>("Forestimator : présentation");
     Wt::WContainerWidget * c0 = new Wt::WContainerWidget();
     c0->addNew<WText>(WString::tr("ref.article.forestimator"));
     c0->addNew<WText>(WString::tr("page_presentation"));
     item->setContents(std::unique_ptr<Wt::WContainerWidget>(c0));
-    menu_->addItem(std::move(item));
+    subMenu->addItem(std::move(item));
 
-    std::unique_ptr<Wt::WMenuItem> item2 = std::make_unique<Wt::WMenuItem>("Crédit et contact", std::make_unique<Wt::WText>(WString::tr("page_presentation.credit")));
-    menu_->addItem(std::move(item2));
+    item = std::make_unique<Wt::WMenuItem>("Crédit et contact", std::make_unique<Wt::WText>(WString::tr("page_presentation.credit")));
+    subMenu->addItem(std::move(item));
 
+    item = std::make_unique<Wt::WMenuItem>("Forestimator API", std::make_unique<Wt::WText>(WString::tr("docu.api")));
+    subMenu->addItem(std::move(item));
+    std::unique_ptr<Wt::WMenuItem> item6 = std::make_unique<Wt::WMenuItem>("Confidentialité");
+    Wt::WContainerWidget * c6 = new Wt::WContainerWidget();
+    c6->addNew<WText>(Wt::WString::tr("confidentialite"));
+    item6->setContents(std::unique_ptr<Wt::WContainerWidget>(c6));
+    subMenu->addItem(std::move(item6));
+
+    downloadPage();
+
+    subMenuPtr = std::make_unique<Wt::WMenu>(subStack.get());
+    subMenu = subMenuPtr.get();
+
+    item = std::make_unique<Wt::WMenuItem>("Fichier Ecologique des Essences");
+    //item->setPathComponent("aptitude-des-essences");
+    item->setMenu(std::move(subMenuPtr));
+    item_ = menu_->addItem(std::move(item));
+    subMenu->addStyleClass("nav-stacked submenu");
+    //subMenu->setInternalPathEnabled("/documentation/" + item_->pathComponent());
+    subMenu->setInternalPathEnabled("/documentation");// pour rester cohérent avec ancien lien url et avec les chemins d'accès relatif des images dans la page
+    for (std::string c : {"Aptitude","Eco","ZBIO","NH", "NT","TOPOetSS", "AE" }){
+    LayerMTD lMTD =mDico->getLayerMTD(c);
+    std::unique_ptr<Wt::WMenuItem> item2 = std::make_unique<Wt::WMenuItem>(lMTD.Label(), cpp14::make_unique<Wt::WText>(getHtml(&lMTD)));
+    //item2->setPathComponent("");
+    subMenu->addItem(std::move(item2));
+    }
+
+    subMenuPtr = std::make_unique<Wt::WMenu>(subStack.get());
+    subMenu = subMenuPtr.get();
+    item = std::make_unique<Wt::WMenuItem>("Peuplements forestiers");
+    item->setMenu(std::move(subMenuPtr));
+    item_ = menu_->addItem(std::move(item));
+    subMenu->addStyleClass("nav-stacked submenu");
+    //subMenu->setInternalPathEnabled("/documentation/" + item_->pathComponent());
+    subMenu->setInternalPathEnabled("/documentation");// pour rester cohérent avec ancien lien url et avec les chemins d'accès relatif des images dans la page
+
+    LayerMTD lMTD =mDico->getLayerMTD("MF");
+    std::unique_ptr<Wt::WMenuItem> item2 = std::make_unique<Wt::WMenuItem>(lMTD.Label(), cpp14::make_unique<Wt::WText>(getHtml(&lMTD)));
+    item2->setPathComponent("");
+    subMenu->addItem(std::move(item2));
+
+    for (std::string c : {"COMPO","MNH","dendro"}){
+    LayerMTD lMTD =mDico->getLayerMTD(c);
+    std::unique_ptr<Wt::WMenuItem> item2 = std::make_unique<Wt::WMenuItem>(lMTD.Label(), cpp14::make_unique<Wt::WText>(getHtml(&lMTD)));
+    //item2->setPathComponent("");
+    subMenu->addItem(std::move(item2));
+    }
+    subMenu->addItem(std::move(scolytePage()));
+
+
+    // je restructure le GS en sous -sections. je dois donc créer un menu dans le menu, co exemple widget gallery
+    subMenuPtr = std::make_unique<Wt::WMenu>(subStack.get());
+    subMenu = subMenuPtr.get();
+    std::unique_ptr<Wt::WMenuItem> item5 = std::make_unique<Wt::WMenuItem>("Guide des Stations");
+    item5->setMenu(std::move(subMenuPtr));
+    auto   aitem = menu_->addItem(std::move(item5));
+    subMenu->addStyleClass("nav-stacked submenu");
+    subMenu->setInternalPathEnabled("/documentation/" + aitem->pathComponent());
+    aitem->setContents(std::make_unique<WText>(tr("CS.intro")));
+
+    std::unique_ptr<Wt::WMenuItem> aitem2 = std::make_unique<Wt::WMenuItem>("Fiches stations");
+    aitem2->setContents(std::make_unique<matAptCS>(mDico));
+    subMenu->addItem(std::move(aitem2));
+    /*****************************************************************/
+
+    hLayout->addWidget(std::move(menu));
+    hLayout->addWidget(std::move(subStack),1);
+}
+
+void presentationPage::downloadPage(){
     std::unique_ptr<Wt::WMenuItem> item3 = std::make_unique<Wt::WMenuItem>("Téléchargement");
     Wt::WContainerWidget * c = new Wt::WContainerWidget();
     c->addNew<WText>(WString::tr("intro_telechargement"));
@@ -109,63 +184,26 @@ presentationPage::presentationPage(cDicoApt *aDico, cWebAptitude *app):mDico(aDi
     item3->setContents(std::unique_ptr<Wt::WContainerWidget>(c));
 
     menu_->addItem(std::move(item3));
+}
 
-    for( auto kv : *mDico->layerMTD()){
-        LayerMTD lMTD=kv.second;
-        if (lMTD.code()!="ES_EP"){
-        std::unique_ptr<Wt::WMenuItem> item = std::make_unique<Wt::WMenuItem>(lMTD.Label(), cpp14::make_unique<Wt::WText>(getHtml(&lMTD)));
+std::unique_ptr<Wt::WMenuItem> presentationPage::scolytePage(){
 
-        menu_->addItem(std::move(item));
-        } else {
-            std::unique_ptr<Wt::WMenuItem> mi = std::make_unique<Wt::WMenuItem>(lMTD.Label());
-            Wt::WContainerWidget * ac = new Wt::WContainerWidget();
-            ac->addNew<WText>(getHtml(&lMTD));
-            // ajout d'un média video via librairie wt
-
-            ac->addNew<WText>(tr("ES_EP.video"));
-            std::string mp4Video = "video/Argonne-illuCriseSco.mp4";
-            //std::string ogvVideo = "https://www.webtoolkit.eu/videos/sintel_trailer.ogv";
-            // Define poster image location
-            std::string poster = "img/scoMM.png";
-            Wt::WVideo * video = ac->addNew<Wt::WVideo>();
-            video->addSource(Wt::WLink(mp4Video),"");
-            video->setPoster(poster);
-            video->setAlternativeContent(std::make_unique<Wt::WImage>(Wt::WLink(poster)));
-            video->resize(640, 360);
-            mi->setContents(std::unique_ptr<Wt::WContainerWidget>(ac));
-            menu_->addItem(std::move(mi));
-        }
-    }
-
-    std::unique_ptr<Wt::WMenuItem> item4 = std::make_unique<Wt::WMenuItem>("Forestimator API", std::make_unique<Wt::WText>(WString::tr("docu.api")));
-    menu_->addItem(std::move(item4));
-
-
-    // je restructure le GS en sous -sections. je dois donc créer un menu dans le menu, co exemple widget gallery
-    auto subMenuPtr = std::make_unique<Wt::WMenu>(subStack.get());
-    auto subMenu = subMenuPtr.get();
-    std::unique_ptr<Wt::WMenuItem> item5 = std::make_unique<Wt::WMenuItem>("Guide des Stations");
-    item5->setMenu(std::move(subMenuPtr));
-    auto   aitem = menu_->addItem(std::move(item5));
-    subMenu->addStyleClass("nav-stacked submenu");
-
-    subMenu->setInternalPathEnabled("/documentation/" + aitem->pathComponent());
-    //aitem->setPathComponent("");
-    //subMenu->setInternalPathEnabled("/toto/" + aitem->pathComponent());
-    aitem->setContents(std::make_unique<WText>(tr("CS.intro")));
-
-    std::unique_ptr<Wt::WMenuItem> aitem2 = std::make_unique<Wt::WMenuItem>("Fiches stations");
-    aitem2->setContents(std::make_unique<matAptCS>(mDico));
-    subMenu->addItem(std::move(aitem2));
-    /*****************************************************************/
-
-    std::unique_ptr<Wt::WMenuItem> item6 = std::make_unique<Wt::WMenuItem>("Confidentialité");
-    Wt::WContainerWidget * c6 = new Wt::WContainerWidget();
-    c6->addNew<WText>(Wt::WString::tr("confidentialite"));
-    item6->setContents(std::unique_ptr<Wt::WContainerWidget>(c6));
-    menu_->addItem(std::move(item6));
-
-    hLayout->addWidget(std::move(menu));
-    hLayout->addWidget(std::move(subStack),1);
-
+    LayerMTD lMTD=mDico->getLayerMTD("ES_EP");
+    std::unique_ptr<Wt::WMenuItem> mi = std::make_unique<Wt::WMenuItem>(lMTD.Label());
+    Wt::WContainerWidget * ac = new Wt::WContainerWidget();
+    ac->addNew<WText>(getHtml(&lMTD));
+    // ajout d'un média video via librairie wt
+    ac->addNew<WText>(tr("ES_EP.video"));
+    std::string mp4Video = "video/Argonne-illuCriseSco.mp4";
+    //std::string ogvVideo = "https://www.webtoolkit.eu/videos/sintel_trailer.ogv";
+    // Define poster image location
+    std::string poster = "img/scoMM.png";
+    Wt::WVideo * video = ac->addNew<Wt::WVideo>();
+    video->addSource(Wt::WLink(mp4Video),"");
+    video->setPoster(poster);
+    video->setAlternativeContent(std::make_unique<Wt::WImage>(Wt::WLink(poster)));
+    video->resize(640, 360);
+    mi->setContents(std::unique_ptr<Wt::WContainerWidget>(ac));
+    //menu_->addItem(std::move(mi));
+    return mi;
 }

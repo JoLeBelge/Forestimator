@@ -20,6 +20,9 @@ public:
     cDicoApt * mDico;
 private:
     cWebAptitude* m_app;
+    Wt::WMenu * menu_;
+    void downloadPage();
+    std::unique_ptr<WMenuItem> scolytePage();
 
 };
 

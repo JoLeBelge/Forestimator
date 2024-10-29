@@ -52,7 +52,7 @@ Si vous souhaitez encoder plusieurs aménagements (plusieurs tronçons, un tron�
 <message id="contact.precision"> Précisions </message>
 
 
-<message id="checkRepresentant">Je suis/la structure que je représente est directement concerné(e) par le tronçon/la zone décrit(e) (utilisateur en tant que propriétaire ou joignant)</message>
+<message id="checkRepresentant">Je suis/la structure que je représente est directement concerné(e) par le tronçon/la zone décrit(e) (utilisateur en tant que propriétaire ou riverain direct de celle-ci)"</message>
 
 
 <message id="sectionEncoder"> <h3> Vos données personnelles </h3></message>
@@ -78,7 +78,7 @@ Si vous souhaitez encoder plusieurs aménagements (plusieurs tronçons, un tron�
 <message id="type.am5">autre aménagement en lien avec le ruissellement des eaux</message>
 <message id="type.am6">autre</message>
 
-<message id="proprio.am"> Propriétaire actuel de la desserte (attention à bien mentionner le type de propriété de la desserte et non des parcelles jouxtant celle-ci) </message>
+<message id="proprio.am"> Propriétaire actuel de la desserte (attention à bien mentionner le type de propriétaire de la desserte et non des parcelles jouxtant celle-ci) </message>
 <message id="proprio.am0">privé-un seul propriétaire </message>
 <message id="proprio.am1">privé- multipropriétaires </message>
 <message id="proprio.am2">public </message>
