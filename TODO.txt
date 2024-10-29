@@ -1,11 +1,8 @@
 TO DO forestimator WEB
 ----------------------
 
+-restructurer documentation en sous-section ; une section FEE avec NH NT Aptitude Ecogramme Zbio SS AE
+
 -integrer symbologie dans les métadonnées des raster (comme pour forestimator mobile)
 
 -bug si je retire trop vite les cartes sélectionnées du panier (avec enter du clavier pour valider messagebox)
-
-Quand le Guide des stations d'ardenne sera imprimé:
--renommer carte de recommandation, faire attention à la légende (concordance des termes avec contenu du GS)
-
--documentation en ligne : le pdf (entre-autre)

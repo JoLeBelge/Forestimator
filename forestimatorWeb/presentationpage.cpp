@@ -148,7 +148,10 @@ presentationPage::presentationPage(cDicoApt *aDico, cWebAptitude *app):mDico(aDi
     item5->setMenu(std::move(subMenuPtr));
     auto   aitem = menu_->addItem(std::move(item5));
     subMenu->addStyleClass("nav-stacked submenu");
+
     subMenu->setInternalPathEnabled("/documentation/" + aitem->pathComponent());
+    //aitem->setPathComponent("");
+    //subMenu->setInternalPathEnabled("/toto/" + aitem->pathComponent());
     aitem->setContents(std::make_unique<WText>(tr("CS.intro")));
 
     std::unique_ptr<Wt::WMenuItem> aitem2 = std::make_unique<Wt::WMenuItem>("Fiches stations");

@@ -508,12 +508,12 @@ void formDesserteForest::sendSummaryMail(){
                 tel->valueText().toUTF8()+"\n"+
                 typeContact->valueText().toUTF8()+"\n\n"+
                 contactPresicion->valueText().toUTF8()+"\n\n"+
+                Wt::WString::tr("mail.acr").toUTF8()+"\n\n"+
                 "type d'aménagement:"+typeAM->valueText().toUTF8()+"\n\n"+
                 "Propriétaire:"+typeProprio->valueText().toUTF8()+"\n\n"+
                 "Qui dépose le projet:"+deposant->valueText().toUTF8()+"\n\n"+
                 "Description de l'aménagement:"+description->valueText().toUTF8()+"\n\n"+
-                "Accompagnement administratif SRFB :"+acAdmin->valueText().toUTF8()+"\n\n"+
-                Wt::WString::tr("mail.acr").toUTF8()+"\n\n"
+                "Accompagnement administratif SRFB :"+acAdmin->valueText().toUTF8()+"\n\n"
                 );
     amail.setSubject(Wt::WString::tr("mail.titre").toUTF8());
     amail.addRecipient(Wt::Mail::RecipientType::To,Mail::Mailbox(mail->valueText().toUTF8(),nom->valueText().toUTF8()) );
@@ -527,9 +527,12 @@ void formDesserteForest::sendSummaryMail(){
     client.connect();
     client.send(amail);
     in.close();// après l'envoi!! car le addAttachement pointe ver le ifstream!
+
+    // mail confirmation encodage requete SQL
     amail =Wt::Mail::Message();
+    amail.addRecipient(Wt::Mail::RecipientType::To,Wt::Mail::Mailbox("louanne.collin@srfb-kbbm.be","Louanne Collin"));
     //amail.addRecipient(Wt::Mail::RecipientType::To,Mail::Mailbox("v.colson@filiereboiswallonie.be","Vincent Colson"));
-    //amail.setFrom(Wt::Mail::Mailbox("JO.Lisein@uliege.be", "Lisein Jonathan"));
+    amail.setFrom(Wt::Mail::Mailbox("JO.Lisein@uliege.be", "Lisein Jonathan"));
     amail.setSubject("Desserte Forestière - encodage");
     amail.setBody(SQLstring);
     client.send(amail);

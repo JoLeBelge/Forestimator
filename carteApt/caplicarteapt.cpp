@@ -299,7 +299,7 @@ void cApliCarteApt::carteDeriveCS(){
     GDALDataset* poDstDS = poDriver->CreateCopy( aOut.c_str(), poDatNH, FALSE, papszOptions,NULL, NULL );
     poDstDS->SetSpatialRef(spatialReference);
     poDstDS->SetMetadataItem("Version",d.c_str());
-    poDstDS->SetMetadataItem("Crédit","Lisein Jonathan, Simon Toessens et Claessens Hugues Gembloux Agro-Bio Tech");
+    poDstDS->SetMetadataItem("Crédit","Jonathan Lisein , Simon Toessens et Claessens Hugues Gembloux Agro-Bio Tech");
     outBand = poDstDS->GetRasterBand(1);
     outBand->SetNoDataValue(0);
 

@@ -82,7 +82,7 @@ int main(int argc, char *argv[])
         cDicoApt dico(adirBD);
         cApliCarteApt aACA(&dico);
 
-        if(1){
+        if(0){
         // je boucle les layersbase et non les essences car j'ai besoin du chemin d'accès au raster
         for (std::pair<std::string,std::shared_ptr<layerBase>>  kv : dico.VlayerBase()){
 
@@ -99,8 +99,8 @@ int main(int argc, char *argv[])
         }
 
         }
-            //espace test pour les cartes dérivées des CS
-         //   aACA.carteDeriveCS();
+            // les cartes dérivées des CS
+       aACA.carteDeriveCS();
 
     }
     if (matApt){

@@ -25,7 +25,11 @@ void cWebAptitude::handlePathChange()
         if (found!=std::string::npos && found + docInternalP.length()+1 < internalPath().size()){// test sur la longueur car il faut gérer le cas ou on a juste un backslach : /documentation/
         std::string sectionDoc=internalPath().erase(0, found + docInternalP.length()+1);
         // retirer l'éventuel baslach en fin de url
-        sectionDoc.erase(std::remove(sectionDoc.begin(), sectionDoc.end(), '/'), sectionDoc.end());
+        if (sectionDoc.back()=='/'){
+            //sectionDoc.pop_back();
+            sectionDoc.erase(sectionDoc.size()-1);
+        }
+        //sectionDoc.erase(std::remove(sectionDoc.begin(), sectionDoc.end(), '/'), sectionDoc.end());
         if (globTest){std::cout << "section Documentation : "<< sectionDoc << std::endl;}
         changeHeader(sectionDoc);
         } else {
