@@ -493,7 +493,8 @@ void formDesserteForest::validDraw(std::string geojson){
 
 void formDesserteForest::sendSummaryMail(){
     Wt::Mail::Message amail =Wt::Mail::Message();
-    //mail.addHeader();
+    //amail.addHeader();
+
     //mail.setFrom(Wt::Mail::Mailbox("JO.Lisein@uliege.be", "Lisein Jonathan"));
     //amail.setFrom(Wt::Mail::Mailbox("v.colson@filiereboiswallonie.be","Vincent Colson"));
 
@@ -519,20 +520,23 @@ void formDesserteForest::sendSummaryMail(){
     amail.addRecipient(Wt::Mail::RecipientType::To,Mail::Mailbox(mail->valueText().toUTF8(),nom->valueText().toUTF8()) );
 
     // création de la figure de localisation
-    std::ifstream in;
-    if(1){ staticMap sm(mDico->getLayerBase("IGN"),geom);
-    in.open(sm.getFileName(), std::ios::in);
-    amail.addAttachment("image/png","localisationDesserte.png",&in);}
+    //std::ifstream in;
+    //if(1){
+
+    //staticMap sm(mDico->getLayerBase("IGN"),geom);
+    //in.open(sm.getFileName(), std::ios::in);
+    //amail.addAttachment("image/png","localisationDesserte.png",&in);}
     Mail::Client client;
     client.connect();
     client.send(amail);
-    in.close();// après l'envoi!! car le addAttachement pointe ver le ifstream!
+    //in.close();// après l'envoi!! car le addAttachement pointe ver le ifstream!
 
     // mail confirmation encodage requete SQL
     amail =Wt::Mail::Message();
     amail.addRecipient(Wt::Mail::RecipientType::To,Wt::Mail::Mailbox("louanne.collin@srfb-kbbm.be","Louanne Collin"));
     //amail.addRecipient(Wt::Mail::RecipientType::To,Mail::Mailbox("v.colson@filiereboiswallonie.be","Vincent Colson"));
-    amail.setFrom(Wt::Mail::Mailbox("JO.Lisein@uliege.be", "Lisein Jonathan"));
+    //amail.setFrom(Wt::Mail::Mailbox("JO.Lisein@uliege.be", "Lisein Jonathan"));
+    amail.setFrom(Wt::Mail::Mailbox("liseinjon@hotmail.com", "Lisein Jonathan"));
     amail.setSubject("Desserte Forestière - encodage");
     amail.setBody(SQLstring);
     client.send(amail);
