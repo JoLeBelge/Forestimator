@@ -170,7 +170,7 @@ cdicoAptBase::cdicoAptBase(std::string aBDFile):mBDpath(aBDFile),ptDb_(NULL)
 
                 for (auto kv : Dico_GISfile){
                     if(!boost::filesystem::exists(kv.second)){
-                        std::cout << " fichier " << kv.second << " n'existe pas " << std::endl;
+                        //std::cout << " fichier " << kv.second << " n'existe pas " << std::endl;
                     }
 
                 }

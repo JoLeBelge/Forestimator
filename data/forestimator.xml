@@ -274,6 +274,15 @@ L'équipe Forestimator
 
 
 <message id="page_presentation">
+
+<figure class="highlight">
+<img src="/img/forestimatorArt.jpg" alt="Forestimator article" style="width:100.0px"/> 
+<figcaption class="figure-caption">Cet article de vulgarisation présente le portail cartographique Forestimator :
+<br></br> <a target="_blank" rel="noopener noreferrer" href="https://hdl.handle.net/2268/291563"> Forestimator : un nouveau portail cartographique pour l'information forestière en Wallonie. <br></br> Lisein, Jonathan ; Claessens, Hugues ; Quevauvillers, Samuel et Lejeune, Philippe. 2022 • In <em>Forêt.Nature, 162</em>, p. 40-47.</a></figcaption>
+<br></br>
+</figure>
+
+
 <div class="form">
   <p>
     <h3>Forestimator: outils cartographiques pour la gestion des forêts wallonnes</h3>
@@ -392,6 +401,7 @@ Depuis 2024, l'ensemble du code source de la plateforme forestimator est disponi
 </message>
 
 <message id="docu.api"> 
+<h3>Forestimator API</h3>
 La plateforme web Forestimator sert de vitrine ; les informations et les traitements y sont présentés au grand public via une interface conviviale.
 <br></br>
 Par ailleurs, Forestimator fournit des webservices pour les développeurs soucieux d'utiliser les résultats de traitements (analyse ponctuelle ou surfacique) dans leurs plateforme web. Cette page d'aide décrit le fonctionnement de l'API (Application Programming Interface) de Forestimator.

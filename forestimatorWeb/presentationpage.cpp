@@ -28,13 +28,10 @@ presentationPage::presentationPage(cDicoApt *aDico, cWebAptitude *app):mDico(aDi
     item->setMenu(std::move(subMenuPtr));
     auto   item_ = menu_->addItem(std::move(item));
     subMenu->addStyleClass("nav-stacked submenu");
-    subMenu->setInternalPathEnabled("/documentation");// pour rester cohérent avec ancien lien url et avec les chemins d'accès relatif des images dans la page
-
+    subMenu->setInternalPathEnabled("/documentation/"+item_->pathComponent());
     item = std::make_unique<Wt::WMenuItem>("Forestimator : présentation");
-    Wt::WContainerWidget * c0 = new Wt::WContainerWidget();
-    c0->addNew<WText>(WString::tr("ref.article.forestimator"));
-    c0->addNew<WText>(WString::tr("page_presentation"));
-    item->setContents(std::unique_ptr<Wt::WContainerWidget>(c0));
+    item->setContents(std::make_unique<WText>(WString::tr("page_presentation")));
+    item->setPathComponent("");
     subMenu->addItem(std::move(item));
 
     item = std::make_unique<Wt::WMenuItem>("Crédit et contact", std::make_unique<Wt::WText>(WString::tr("page_presentation.credit")));
@@ -42,29 +39,22 @@ presentationPage::presentationPage(cDicoApt *aDico, cWebAptitude *app):mDico(aDi
 
     item = std::make_unique<Wt::WMenuItem>("Forestimator API", std::make_unique<Wt::WText>(WString::tr("docu.api")));
     subMenu->addItem(std::move(item));
-    std::unique_ptr<Wt::WMenuItem> item6 = std::make_unique<Wt::WMenuItem>("Confidentialité");
-    Wt::WContainerWidget * c6 = new Wt::WContainerWidget();
-    c6->addNew<WText>(Wt::WString::tr("confidentialite"));
-    item6->setContents(std::unique_ptr<Wt::WContainerWidget>(c6));
-    subMenu->addItem(std::move(item6));
-
-    downloadPage();
+    subMenu->addItem(std::move(downloadPage()));
 
     subMenuPtr = std::make_unique<Wt::WMenu>(subStack.get());
     subMenu = subMenuPtr.get();
-
     item = std::make_unique<Wt::WMenuItem>("Fichier Ecologique des Essences");
-    //item->setPathComponent("aptitude-des-essences");
     item->setMenu(std::move(subMenuPtr));
     item_ = menu_->addItem(std::move(item));
     subMenu->addStyleClass("nav-stacked submenu");
-    //subMenu->setInternalPathEnabled("/documentation/" + item_->pathComponent());
-    subMenu->setInternalPathEnabled("/documentation");// pour rester cohérent avec ancien lien url et avec les chemins d'accès relatif des images dans la page
-    for (std::string c : {"Aptitude","Eco","ZBIO","NH", "NT","TOPOetSS", "AE" }){
+    subMenu->setInternalPathEnabled("/documentation/" + item_->pathComponent());
+    int i(0);
+    for (std::string c : {"Aptitude","ECO","ZBIO","NH", "NT","TOPOetSS", "AE" }){
     LayerMTD lMTD =mDico->getLayerMTD(c);
     std::unique_ptr<Wt::WMenuItem> item2 = std::make_unique<Wt::WMenuItem>(lMTD.Label(), cpp14::make_unique<Wt::WText>(getHtml(&lMTD)));
-    //item2->setPathComponent("");
+    if (i==0){item2->setPathComponent("");}
     subMenu->addItem(std::move(item2));
+    i++;
     }
 
     subMenuPtr = std::make_unique<Wt::WMenu>(subStack.get());
@@ -73,44 +63,48 @@ presentationPage::presentationPage(cDicoApt *aDico, cWebAptitude *app):mDico(aDi
     item->setMenu(std::move(subMenuPtr));
     item_ = menu_->addItem(std::move(item));
     subMenu->addStyleClass("nav-stacked submenu");
-    //subMenu->setInternalPathEnabled("/documentation/" + item_->pathComponent());
-    subMenu->setInternalPathEnabled("/documentation");// pour rester cohérent avec ancien lien url et avec les chemins d'accès relatif des images dans la page
-
-    LayerMTD lMTD =mDico->getLayerMTD("MF");
-    std::unique_ptr<Wt::WMenuItem> item2 = std::make_unique<Wt::WMenuItem>(lMTD.Label(), cpp14::make_unique<Wt::WText>(getHtml(&lMTD)));
-    item2->setPathComponent("");
-    subMenu->addItem(std::move(item2));
-
-    for (std::string c : {"COMPO","MNH","dendro"}){
+    subMenu->setInternalPathEnabled("/documentation/" + item_->pathComponent());
+    i=0;
+    for (std::string c : {"MF","COMPO","MNH","dendro"}){
     LayerMTD lMTD =mDico->getLayerMTD(c);
     std::unique_ptr<Wt::WMenuItem> item2 = std::make_unique<Wt::WMenuItem>(lMTD.Label(), cpp14::make_unique<Wt::WText>(getHtml(&lMTD)));
-    //item2->setPathComponent("");
+     if (i==0){item2->setPathComponent("");}
     subMenu->addItem(std::move(item2));
     }
     subMenu->addItem(std::move(scolytePage()));
 
-
-    // je restructure le GS en sous -sections. je dois donc créer un menu dans le menu, co exemple widget gallery
     subMenuPtr = std::make_unique<Wt::WMenu>(subStack.get());
     subMenu = subMenuPtr.get();
-    std::unique_ptr<Wt::WMenuItem> item5 = std::make_unique<Wt::WMenuItem>("Guide des Stations");
-    item5->setMenu(std::move(subMenuPtr));
-    auto   aitem = menu_->addItem(std::move(item5));
+    item = std::make_unique<Wt::WMenuItem>("Guide des Stations");
+    item->setMenu(std::move(subMenuPtr));
+    item_ = menu_->addItem(std::move(item));
     subMenu->addStyleClass("nav-stacked submenu");
-    subMenu->setInternalPathEnabled("/documentation/" + aitem->pathComponent());
-    aitem->setContents(std::make_unique<WText>(tr("CS.intro")));
+    subMenu->setInternalPathEnabled("/documentation/" + item_->pathComponent());
+    //item_->setContents(std::make_unique<WText>(tr("CS.intro")));
 
-    std::unique_ptr<Wt::WMenuItem> aitem2 = std::make_unique<Wt::WMenuItem>("Fiches stations");
-    aitem2->setContents(std::make_unique<matAptCS>(mDico));
-    subMenu->addItem(std::move(aitem2));
+    std::unique_ptr<Wt::WMenuItem> item2 = std::make_unique<Wt::WMenuItem>("Présentation");
+    item2->setContents(std::make_unique<WText>(tr("CS.intro")));
+    item2->setPathComponent("");
+    subMenu->addItem(std::move(item2));
+    item2 = std::make_unique<Wt::WMenuItem>("Fiches stations");
+    item2->setContents(std::make_unique<matAptCS>(mDico));
+    subMenu->addItem(std::move(item2));
     /*****************************************************************/
 
+
+    // dernière page est différente, car pas de sous-menu
+
+    item = std::make_unique<Wt::WMenuItem>("Confidentialité");
+    item->setContents(std::make_unique<WText>(Wt::WString::tr("confidentialite")));
+    menu_->addItem(std::move(item));
+    //subMenu->setInternalPathEnabled("/documentation/" + item_->pathComponent());
+
     hLayout->addWidget(std::move(menu));
-    hLayout->addWidget(std::move(subStack),1);
+    stack_ =hLayout->addWidget(std::move(subStack),1);
 }
 
-void presentationPage::downloadPage(){
-    std::unique_ptr<Wt::WMenuItem> item3 = std::make_unique<Wt::WMenuItem>("Téléchargement");
+std::unique_ptr<WMenuItem> presentationPage::downloadPage(){
+    std::unique_ptr<Wt::WMenuItem> item = std::make_unique<Wt::WMenuItem>("Téléchargement");
     Wt::WContainerWidget * c = new Wt::WContainerWidget();
     c->addNew<WText>(WString::tr("intro_telechargement"));
     Wt::WTable * t = c->addNew<Wt::WTable>();
@@ -181,9 +175,9 @@ void presentationPage::downloadPage(){
             }
         }
     }
-    item3->setContents(std::unique_ptr<Wt::WContainerWidget>(c));
+    item->setContents(std::unique_ptr<Wt::WContainerWidget>(c));
 
-    menu_->addItem(std::move(item3));
+    return item;
 }
 
 std::unique_ptr<Wt::WMenuItem> presentationPage::scolytePage(){
@@ -206,4 +200,26 @@ std::unique_ptr<Wt::WMenuItem> presentationPage::scolytePage(){
     mi->setContents(std::unique_ptr<Wt::WContainerWidget>(ac));
     //menu_->addItem(std::move(mi));
     return mi;
+}
+
+void presentationPage::handlePathChanged(std::string path){
+    if (globTest){ std::cout << "presentationPage::handlepathChange " << path << std::endl;}
+
+    if (path.find("forestimator")!=std::string::npos){
+        std::cout << "fo" << std::endl;
+    //menu_->itemAt(0)->select();
+    menu_->itemAt(0)->menu()->select(0);
+    }else  if (path.find("fichier-ecologique-des-essences")!=std::string::npos){
+     std::cout << "fee"  << std::endl;
+    //menu_->itemAt(1)->select();
+    menu_->itemAt(1)->menu()->select(0);
+    }else  if (path.find("peuplements-forestiers")!=std::string::npos){
+        std::cout << "pe f"  << std::endl;
+    //menu_->itemAt(2)->select();
+    menu_->itemAt(2)->menu()->select(0);
+    }else  if (path.find("guide-des-stations")!=std::string::npos ){
+        std::cout << "gsa"  << std::endl;
+    //menu_->itemAt(3)->select();
+    menu_->itemAt(3)->menu()->select(0);
+    }
 }

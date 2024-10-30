@@ -188,7 +188,7 @@ Les modèles dendrométriques ont été réalisés dans le cadre des actions 0.8
 Les recherches réalisées portaient sur l’évaluation la qualité de modèles prédictifs des paramètres dendrométriques suivants: Hauteur dominante (HDOM), Volume par hectare (VHA) et Circonférence moyenne (CMOY). Ces modèles sont construits sur base du modèle numérique de hauteur photogrammétrique couvrant l’ensemble du territoire wallon acquis en 2018 à une résolution de 50 cm. Cette donnée initiale a été rééchantillonnée à une résolution de 5m, en sélectionnant au sein de chaque fenêtre de 5m le percentile 95 comme valeur finale. 
 Les modèles repris au sein de la Table 1 ont été ajustés sur base d’un réseau de 1051 placettes résineuses représentatif de la forêt résineuse wallonne (Figure 1). Ce réseau est essentiellement situé au sein de pessières (79%), de douglasaies (5%) et de mélézières (3%). Le reste du réseau étant constitué de mélanges divers ou de peuplements composés d’essences résineuses plus rares. La donnée de départ couvrant l’ensemble du territoire wallon, la plateforme peut donc en théorie fournir des valeurs pour ces paramètre en dehors de leur zone d’application. Il est donc essentiel que l’utilisateur restreigne par lui-même son usage aux seuls peuplements résineux. 
 <p></p>
-            <p><img src="../img/dendroPLA.png" alt="carte Placettes" width="90%"/></p>
+            <p><img src="/img/dendroPLA.png" alt="carte Placettes" width="90%"/></p>
             <p>Réseau de placettes utilisé pour la calibration des modèles prédictifs</p>  
 </message>
 
@@ -268,19 +268,19 @@ Les couches cartographiques téléchargeables sont listées dans le tableau ci-d
 <message id="ZBIO.description">
 <p>La détermination des conditions climatiques de la station s’appuie sur la carte des régions bioclimatiques de Wallonie. Dix régions différentes sont identifiées. Pour chacune d’elles un ensemble de variables climatiques importantes pour l’arbre sont définies.</p>
             <p></p>
-            <p><img src="../img/zbio.jpg" alt="" width="90%"/></p>
+            <p><img src="/img/zbio.jpg" alt="" width="90%"/></p>
 </message>
 
 <message id="NH.description">
 <p>Le niveau hydrique traduit la disponibilité des ressources en eau de la station. Dans le cas des sols humides, il exprime également le manque d’oxygénation du sol. L’évaluation du niveau hydrique faite par le Fichier écologique des essences repose sur une échelle de 13 niveaux. Il est évalué grâce à une clé dichotomique qui repose sur les caractéristiques du sol et la position de la station.</p>
     
-            <p><img src="../img/nh.jpg" alt=""width="90%"/></p>
+            <p><img src="/img/nh.jpg" alt=""width="90%"/></p>
 </message>
 
 <message id="NT.description">
   <p>Le niveau trophique traduit la disponibilité des ressources en éléments minéraux de la station. Il est évalué grâce à une clé dichotomique qui repose sur les caractéristiques du sol.</p>
             <p></p>
-            <p><img src="../img/nt.jpg" alt="" width="90%"/></p>
+            <p><img src="/img/nt.jpg" alt="" width="90%"/></p>
 </message>
 
 <message id="AE.description">
@@ -288,7 +288,7 @@ Les couches cartographiques téléchargeables sont listées dans le tableau ci-d
             <p><strong>Classe C : zone d’apports d’eau permanents.</strong> Zone constamment alimentée en eau, qui est liée au réseau hydrographique par sa position de fond de vallée ou en relation avec des zones de sources. Ce sont le plus souvent des sols alluvionnaires.</p>
             <p><strong>Classe B : zone d’apports d’eau variables.</strong> Zone située dans des bas de versants, replats, concavités, vallons. Lors des périodes pluvieuses, les sols de ces situations topographiques sont occasionnellement réalimentés en eau par les écoulements provenant du versant (ruissellements, écoulements hypodermiques, etc.). Ils ont donc un statut hydrique amélioré par rapport aux plateaux et aux versants.</p>
             <p><strong>Classe A : zone sans apports d’eau latéraux.</strong> Zone où l’humidité du sol est essentiellement liée aux pluies et à la capacité de rétention et de percolation des sols. Il s’agit de sols de plateau ou de pente (pleine pente, hauts de versant, convexités) où l’eau s’évacue rapidement en suivant le relief. Dans ce cas, la situation se rétablit généralement en cours de saison de végétation par la consommation d'eau par la végétation. On qualifie de "sols à régime hydrique alternatif" (RHA) ces sols engorgés pendant une partie de l'année.</p>
-   <p><img src="../img/ae.png" alt="" width="90%"/></p>
+   <p><img src="/img/ae.png" alt="" width="90%"/></p>
 </message>
 
 <message id="TOPOetSS.description">
@@ -304,10 +304,10 @@ Les couches cartographiques téléchargeables sont listées dans le tableau ci-d
 Enfin, outre ces considérations purement microclimatiques, on note que bien souvent, les situations de pentes fortes s’accompagnent d’une profondeur de sol réduite (bien que ceci ne soit pas systématique), induisant de ce fait un risque pour les espèces à fort besoin en eau. 
 </p>
             <p></p>
-            <p><img src="../img/topo.jpg" alt="" width="90%"/></p>
+            <p><img src="/img/topo.jpg" alt="" width="90%"/></p>
             
              <p>Les sous-secteurs et les situations topographiques sont déterminées à partir du <strong>Modèle Numérique de Terrain (MNT)</strong>, couche cartographique décrivant le relief, en utilisant différents indices topographiques qui sont résumés dans la figure ci-dessous</p>
-            <p><img src="../img/topo_illu.png" alt="" width="70%"/></p>
+            <p><img src="/img/topo_illu.png" alt="" width="70%"/></p>
 </message>
 
 <message id="Aptitude.description">
@@ -319,7 +319,7 @@ Enfin, outre ces considérations purement microclimatiques, on note que bien sou
             <p><strong>Tolérance élargie.</strong>S’il n’est pas envisageable de produire du bois de qualité sur la station, l’essence n’est pas forcément à exclure. <strong>Si elle est capable d’y survivre et de se reproduire, avec certes une productivité dérisoire ou une forme rédhibitoire, elle peut toutefois apporter ses services à l’écosystème ou au peuplement principal. </strong>Dans ces situations, l’utilisation de l’essence se limite alors à un rôle d’accompagnement pour des raisons écologiques ou sylvicoles. Il va de soi que l’on réserve cette classe d’aptitude aux essences qui sont bénéfiques à l’écosystème par leur fane, leur couvert, leur biodiversité associée ou toute autre caractéristique positive (cas de l’aulne glutineux sur argiles blanches en Haute Ardenne, par exemple).</p>
             <p><strong>Exclusion.</strong>L’essence est <strong>incapable de se développer à long terme sur la station</strong>, très sensible aux dépérissements, aux maladies, aux chablis, aux gelées, <em>etc</em>. En d’autres termes, les contraintes environnementales sont rédhibitoires.</p>
             <p></p>
-            <p><img src="../img/aptitude.jpg"  width="90%" alt=""/></p>
+            <p><img src="/img/aptitude.jpg"  width="90%" alt=""/></p>
             
             <h3> Les matrices d'aptitude  </h3>
          Les matrices d'aptitude renseignent les essences forestières qui sont en adéquation avec les conditions stationnelles. Les conditions climatiques sont renseignées via la zone bioclimatique alors que les conditions hydro-trophiques reflètent une position au sein de l'écogramme. Les matrices d'aptitude sont consultables sur le site <a target="_blank" rel="noopener noreferrer" href="http://phytospy.gembloux.ulg.ac.be/matrice-aptitude"> phytoSpy</a>.
@@ -332,7 +332,7 @@ Enfin, outre ces considérations purement microclimatiques, on note que bien sou
             <p><strong>Le niveau zéro de chacun des axes a été défini comme une situation sans contrainte écologique particulière</strong>, offrant, <em>a priori</em>, des conditions de croissance optimales pour la majorité des essences. En conséquence, plus on s’éloigne de cette zone centrale de l’écogramme, plus les contraintes écologiques s’amplifient : sécheresse, manque d’oxygène, présence de carbonates de calcium, carences en éléments minéraux, <em>etc. </em></p>
             <p>La zone dans laquelle une essence est à l’optimum renseigne sur la diversité des stations où elle croît. Au plus cette zone est large, au plus l’essence a une large amplitude écologique.</p>
             <p></p>
-            <p><img src="../img/ecogrammeLecture.jpg" alt="" width="90%"/></p>
+            <p><img src="/img/ecogrammeLecture.jpg" alt="" width="90%"/></p>
 </message>
 
 <message id="MNT.description">
@@ -356,7 +356,7 @@ Une série temporelle de Modèles Numérique de Hauteur est ainsi mise à dispos
 Affin de minimiser le volume de données informatiques, les MNH sont disponibles au téléchargement à une résolution de 2 mètres (format raster). Par ailleurs, les valeurs renseignées dans la couche cartographique raster sont le plus souvent exprimées en cm et non en mètre. Un gain de 0.01 doit donc être appliqué en multipliant la valeur des pixels pour obtenir la mesure en mètre. 
 
 <div>
-<img src="../img/CHM_schema.jpg" alt="" width="60%"/>
+<img src="/img/CHM_schema.jpg" alt="" width="60%"/>
 <br></br>
 Illustration de la détermination d'un modèle numérique de hauteur de la canopée. Le trait bleau représente la hauteur du sol mesurée par LiDAR et le trait rouge épouse la hauteur de la canopée mesurée par photogrammétrie.
 </div>
@@ -406,7 +406,7 @@ La photointerprétation a été réalisée sur 4221 points sur l'ensemble de la 
 <message id="ref.article.forestimator">
 
 <figure class="highlight">
-<img src="../img/forestimatorArt.jpg" alt="Forestimator article" style="width:100.0px"/> 
+<img src="/img/forestimatorArt.jpg" alt="Forestimator article" style="width:100.0px"/> 
 <figcaption class="figure-caption">Cet article de vulgarisation présente le portail cartographique Forestimator :
 <br></br> <a target="_blank" rel="noopener noreferrer" href="https://hdl.handle.net/2268/291563"> Forestimator : un nouveau portail cartographique pour l'information forestière en Wallonie. <br></br> Lisein, Jonathan ; Claessens, Hugues ; Quevauvillers, Samuel et Lejeune, Philippe. 2022 • In <em>Forêt.Nature, 162</em>, p. 40-47.</a></figcaption>
 <br></br>

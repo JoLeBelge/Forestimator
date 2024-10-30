@@ -72,7 +72,7 @@ Session::Session(const std::string& sqliteDb)
         std::cout << "Created database." << std::endl;
     } catch (std::exception& e) {
         //std::cerr << e.what() << std::endl;
-        std::cout << "Using existing database...";
+        //std::cout << "Using existing database...";
     }
 
     users_ = std::make_unique<UserDatabase>(*this);

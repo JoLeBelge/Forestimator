@@ -15,7 +15,7 @@ Analytics::Analytics(std::string aFileDB) : session()
         session.createTables();
         std::cout << "Created analytics database." << std::endl;
     } catch (std::exception& e) {
-        std::cout << "Using existing analytics database...";
+        //std::cout << "Using existing analytics database...";
     }
 
 }
@@ -60,6 +60,7 @@ void Analytics::addLogApache(const Wt::WEnvironment &env, std::string page){
 
 bool Analytics::logExist(const Wt::WEnvironment &env, std::string page, typeLog cat){
     bool aRes(1);
+
     dbo::Transaction transaction{session};
 
     int c=session.query<int>("select count(1) from Log").where("date = ?").bind(Wt::WDate::currentDate().toString("yyyy-MM-dd")).where("ipath = ?").bind(page).where("ip = ?").bind(env.clientAddress()).where("cat = ?").bind((int (cat)));
@@ -68,7 +69,7 @@ bool Analytics::logExist(const Wt::WEnvironment &env, std::string page, typeLog 
     } else{
         // log brut data anyway
         addLogApache(env,page);
-        if (globTest){std::cout << " le log existe déjà pour cet utilisateur !" << std::endl;}
+        //if (globTest){std::cout << " le log existe déjà pour cet utilisateur !" << std::endl;}
     }
     return aRes;
 }

@@ -908,12 +908,13 @@ std::string getHtml(LayerMTD * lMTD){
         proj="<h4>Projet </h4>" +lMTD->Projet();
         } else {proj="";}
     }else { proj="<h4>Projet  </h4>"+proj;}
-     if (proj!="" && isValidHtml(proj)){aRes+=proj;} else if (globTest){ std::cout << " pas de documentation pour le projet - carte " <<  lMTD->code() << std::endl;}
+     if (proj!="" && isValidHtml(proj)){aRes+=proj;} //else if (globTest){ std::cout << " pas de documentation pour le projet - carte " <<  lMTD->code() << std::endl;}
     // si il y a un message avec le bon id, on le prend
 
      std::string descr(WString::tr(lMTD->code()+".description").toUTF8());
      if (descr.substr(0,2)=="??"){
          descr="<h4>Description </h4>" + lMTD->Descr();
+         if (globTest){ std::cout <<  lMTD->code() <<" lMTD->Descr() " << lMTD->Descr() << std::endl;}
      }else { descr="<h4>Description  </h4>"+descr;}
      if (descr!="" && isValidHtml(descr)){aRes+=descr;} else if (globTest){ std::cout << " pas de documentation pour la description - carte " <<  lMTD->code() << std::endl;}
 
@@ -925,18 +926,18 @@ std::string getHtml(LayerMTD * lMTD){
         } else{ version="";}
     } else { version="<h4>Version  </h4>"+version;}
 
-    if (version!="" && isValidHtml(version)){aRes+=version;} else if (globTest){ std::cout << " pas de documentation pour la version - carte " <<  lMTD->code() << std::endl;}
+    if (version!="" && isValidHtml(version)){aRes+=version;} //else if (globTest){ std::cout << " pas de documentation pour la version - carte " <<  lMTD->code() << std::endl;}
 
     // test si il existe un message dans le xml qui contient les logs de changements pour cette carte
     std::string logs(WString::tr(lMTD->code()+".logs").toUTF8());
     if (logs.substr(0,2)!="??"){
         std::string html="<h4>Information de modification </h4>" +logs;
-        if (isValidHtml(logs)){aRes+=html;} else if (globTest){ std::cout << " pas de documentation pour les logs - carte " <<  lMTD->code() << std::endl;}
+        if (isValidHtml(logs)){aRes+=html;} //else if (globTest){ std::cout << " pas de documentation pour les logs - carte " <<  lMTD->code() << std::endl;}
     }
 
     if (lMTD->CopyR()!=""){
         std::string html="<h4>Copyright </h4>" +lMTD->CopyR();
-        if (isValidHtml(html)){aRes+=html;} else if (globTest){ std::cout << " pas de documentation pour le copyrigth - carte " <<  lMTD->code() << std::endl;}
+        if (isValidHtml(html)){aRes+=html;} //else if (globTest){ std::cout << " pas de documentation pour le copyrigth - carte " <<  lMTD->code() << std::endl;}
     } 
 
     std::string ref(WString::tr(lMTD->code()+".ref").toUTF8());
@@ -949,7 +950,7 @@ std::string getHtml(LayerMTD * lMTD){
             aRes+=html;
         }
     }else{
-        if (isValidHtml(ref)){aRes+=ref;} else if (globTest){ std::cout << " pas de référence - carte " <<  lMTD->code() << std::endl;}
+        if (isValidHtml(ref)){aRes+=ref;} //else if (globTest){ std::cout << " pas de référence - carte " <<  lMTD->code() << std::endl;}
     }
 
     return aRes;
@@ -959,7 +960,7 @@ bool isValidHtml(std::string text){
     bool aRes(0);
     Wt::WText t(text);
     if (t.textFormat() ==Wt::TextFormat::XHTML){ aRes=1;} else {
-        std::cout << " attention, le texte " << text << " n'est pas un code html valide " << std::endl;
+        //std::cout << " attention, le texte " << text << " n'est pas un code html valide " << std::endl;
     }
     return aRes;
 }

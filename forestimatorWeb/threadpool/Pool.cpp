@@ -15,7 +15,7 @@ void Pool::add(Task* task){
 
 void Pool::waitForThreadsToFinish(){
     for (size_t i = 1; i < nThreads; i++){
-        std::cout << "Here" << i << std::endl;
+        //std::cout << "Here" << i << std::endl;
         cThreads[i]->finish.wait();
     }
     return;

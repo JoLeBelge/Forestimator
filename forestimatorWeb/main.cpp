@@ -147,7 +147,7 @@ std::unique_ptr<Wt::WApplication> createWebAptitudeApplication(const Wt::WEnviro
         std::cout << "internal path pas geré : " << env.internalPath() << std::endl;
 
         // stats trafic web
-        Analytics anal(dico->File("docroot")+"analytics.db");
+        //Analytics anal(dico->File("docroot")+"analytics.db");
 
         auto app404 = std::make_unique<Wt::WApplication>(env);
         auto theme = std::make_shared<Wt::WBootstrapTheme>();

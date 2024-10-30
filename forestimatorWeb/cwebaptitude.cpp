@@ -15,13 +15,14 @@ void cWebAptitude::handlePathChange()
     if (internalPath() == "/documentation" | found!=std::string::npos){
         top_stack->setCurrentIndex(0);
         menuitem_documentation->select();
+
         //navigation->setTitle(tr("titre.presentation"));
        // mApp->addMetaHeader("description", tr("desc.pres"), "fr");
 
         // une description différentes pour chaques page de documentation. Il faut préhalablement retirer la description, sinon ça n'aura pas d'effet
         // fonctionne pas si session avec javascript, mais pour les robots ça va quand-même. Sur mon navigateur, le meta descr c'est celui de la première page consultée de la session
         // check si j'ai un header description pour cette sous-section, sinon celui général à la page documentation
-        if (globTest){std::cout << "section Documentation : "<< internalPath() << std::endl;}
+        if (globTest){std::cout << "handlepathChange documentation : "<< internalPath() << std::endl;}
         if (found!=std::string::npos && found + docInternalP.length()+1 < internalPath().size()){// test sur la longueur car il faut gérer le cas ou on a juste un backslach : /documentation/
         std::string sectionDoc=internalPath().erase(0, found + docInternalP.length()+1);
         // retirer l'éventuel baslach en fin de url
@@ -29,13 +30,12 @@ void cWebAptitude::handlePathChange()
             //sectionDoc.pop_back();
             sectionDoc.erase(sectionDoc.size()-1);
         }
+
         //sectionDoc.erase(std::remove(sectionDoc.begin(), sectionDoc.end(), '/'), sectionDoc.end());
-        if (globTest){std::cout << "section Documentation : "<< sectionDoc << std::endl;}
         changeHeader(sectionDoc);
         } else {
              changeHeader("documentation");
         }
-
         showDialogues(0);
     }else if (internalPath() == "/cartographie" || internalPath() == "/" || internalPath() == ""){
         top_stack->setCurrentIndex(1);
@@ -108,6 +108,9 @@ cWebAptitude::cWebAptitude(const Wt::WEnvironment& env, cDicoApt *dico)
     : Wt::WApplication(env),
       session_(docRoot() + "/auth.db"),mDico(dico),mAnal(dico->File("docroot")+"analytics.db")
 {
+    //std::cout << "internal path : " << internalPath()<< std::endl;
+    //
+    //std::string ointernalPath(internalPath());
     // charge le xml avec tout le texte qui sera chargé via la fonction tr()
     messageResourceBundle().use(docRoot() + "/forestimator");
     messageResourceBundle().use(docRoot() + "/forestimator-documentation");
@@ -258,7 +261,7 @@ cWebAptitude::cWebAptitude(const Wt::WEnvironment& env, cDicoApt *dico)
     top_stack->setOverflow(Overflow::Auto);
     top_stack->addStyleClass("stackfit");
     // load DOC page
-    top_stack->addNew<presentationPage>(mDico,this);
+    presentationP= top_stack->addNew<presentationPage>(mDico,this);
     // load MAP page
     std::unique_ptr<WContainerWidget> content_app = std::make_unique<WContainerWidget>();
     content_app->setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Middle);
@@ -368,18 +371,11 @@ cWebAptitude::cWebAptitude(const Wt::WEnvironment& env, cDicoApt *dico)
     // legende
     dialog_legend = layout_app->addChild(Wt::cpp14::make_unique<dialog>("Légende",menuitem_legend,&environment()));
     mLegendW = dialog_legend->contents()->addWidget(std::make_unique<WContainerWidget>());
-    //mLegendW->setOverflow(Overflow::Auto);
     mLegendW->addStyleClass("content_legend");
-
 
     widgetCadastre * content_cadastre;
     content_cadastre = dialog_cadastre->contents()->addWidget(std::make_unique<widgetCadastre>(mDico->mCadastre.get(),this));
     content_cadastre->addStyleClass("content_cadastre");
-
-    //stack_info = content_info_->addWidget(std::make_unique<WStackedWidget>());
-    //stack_info = dialog_cont->contents()->addWidget(std::make_unique<WStackedWidget>());
-    //stack_info->setOverflow(Overflow::Auto);
-    //stack_info->addStyleClass("content_info_stack");
 
     mSimplepointW = content_info;
     mGroupLayerW  = content_catalog;
@@ -395,7 +391,6 @@ cWebAptitude::cWebAptitude(const Wt::WEnvironment& env, cDicoApt *dico)
 
     statWindow * page_camembert = top_stack->addNew<statWindow>(mGroupL);
 
-
     /* CHARGE ONGLET ANALYSES */
     //printf("create PA\n");
     mPA = dialog_anal->contents()->addWidget(std::make_unique<parcellaire>(mGroupL,this,page_camembert));
@@ -408,22 +403,16 @@ cWebAptitude::cWebAptitude(const Wt::WEnvironment& env, cDicoApt *dico)
     /*	ACTIONS	: on connect les events aux méthodes	*/
     // dans wt_config, mettre à 500 milliseconde au lieu de 200 pour le double click
     mMap->xy().connect(std::bind(&groupLayers::extractInfo,mGroupL, std::placeholders::_1,std::placeholders::_2));
-    //
     mMap->xySelect().connect(std::bind(&parcellaire::selectPolygon,mPA, std::placeholders::_1,std::placeholders::_2));
     //mMap->polygId().connect(std::bind(&parcellaire::computeStatAndVisuSelectedPol,mPA, std::placeholders::_1));
     //mMap->getMapExtendSignal().connect(std::bind(&WOpenLayers::updateMapExtend,mMap,std::placeholders::_1,std::placeholders::_2,std::placeholders::_3,std::placeholders::_4));
 
-    //layout_carto->addWidget(std::move(content_info), 1);
-    //dialog_cont->contents()->addChild(std::move(content_info));
-    //dialog_cont->contents()->addNew<Wt::WLabel>("Cell location (A1..Z999)");
-    //top_stack->addWidget(std::move(container_home));
-
     //cadastre
-
     content_cadastre->sendPolygone().connect(std::bind(&parcellaire::polygoneCadastre,mPA,std::placeholders::_1,std::placeholders::_2));
 
     internalPathChanged().connect(this, &cWebAptitude::handlePathChange);
     // force first route
+    //setInternalPath(ointernalPath);
     handlePathChange();
 
     root()->addStyleClass("layout_main");

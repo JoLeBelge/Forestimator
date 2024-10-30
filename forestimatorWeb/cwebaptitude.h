@@ -49,6 +49,7 @@ extern bool globTest;
 
 class parcellaire;
 class panier;
+class presentationPage;
 
 
 class dialog : public Wt::WDialog
@@ -105,6 +106,7 @@ public:
     Wt::Auth::AuthWidget* authWidget;
     Wt::WPushButton *b_login;
     groupLayers * mGroupL;
+    presentationPage * presentationP;
 
     //WStackedWidget * stack_info; // cause que je dois changer de current index après avoir mis à jour la légende que je clique sur une station
     WContainerWidget *mSimplepointW, *mGroupLayerW, *mLegendW;

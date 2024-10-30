@@ -137,7 +137,7 @@ cDicoApt::cDicoApt(std::string aBDFile):cdicoAptBase(aBDFile)
         for (auto & pair : Dico_RasterType){
             std::shared_ptr<layerBase> l=std::make_shared<layerBase>(pair.first,this);
             if (l->getCatLayer()!=TypeLayer::Externe & !l->rasterExist()){
-                std::cout << " \n Attention layerBase " << l->Code() << ", fichier " << l->getPathTif() << " inexistant" << std::endl;
+                std::cout << "Attention layerBase " << l->Code() << ", fichier " << l->getPathTif() << " inexistant" << std::endl;
             }
 
             mVlayerBase.emplace(std::make_pair(pair.first,l));
@@ -328,8 +328,9 @@ std::map<std::string,LayerMTD> * cDicoApt::layerMTD(){return &Dico_layerMTD;}
 LayerMTD cDicoApt::getLayerMTD(std::string aCode){
     LayerMTD l;
     for (auto &kv: Dico_layerMTD){
-        if (kv.second.code()==aCode){l=kv.second;}
+        if (kv.second.code()==aCode){l=kv.second; return l;}
     }
+    std::cout << "layerMTD vide pour code " << aCode << std::endl;
     return l;
 }
 
