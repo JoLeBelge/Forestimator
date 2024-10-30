@@ -15,80 +15,86 @@
    </url>
    
    <url>
-      <loc>http://forestimator.gembloux.ulg.ac.be/documentation/forestimator-_-pr_sentation</loc>
+      <loc>http://forestimator.gembloux.ulg.ac.be/documentation/forestimator</loc>
       <changefreq>monthly</changefreq>
    </url>
    <url>
-      <loc>http://forestimator.gembloux.ulg.ac.be/documentation/cr_dit-et-contact</loc>
-      <changefreq>monthly</changefreq>
-   </url>
-      <url>
-      <loc>http://forestimator.gembloux.ulg.ac.be/documentation/aptitude-des-essences</loc>
+      <loc>http://forestimator.gembloux.ulg.ac.be/documentation/forestimator/cr_dit-et-contact</loc>
       <changefreq>monthly</changefreq>
    </url>
          <url>
-      <loc>http://forestimator.gembloux.ulg.ac.be/documentation/ecogramme</loc>
-      <changefreq>monthly</changefreq>
-   </url>
-   
-   <url>
-      <loc>http://forestimator.gembloux.ulg.ac.be/documentation/zone-bioclimatique</loc>
-      <changefreq>monthly</changefreq>
-   </url>
-   
-   <url>
-      <loc>http://forestimator.gembloux.ulg.ac.be/documentation/niveaux-trophiques</loc>
-      <changefreq>monthly</changefreq>
-   </url>
-   
-   <url>
-      <loc>http://forestimator.gembloux.ulg.ac.be/documentation/niveaux-hydriques</loc>
-      <changefreq>monthly</changefreq>
-   </url>
-   
-   <url>
-      <loc>http://forestimator.gembloux.ulg.ac.be/documentation/apport-d_eau</loc>
-      <changefreq>monthly</changefreq>
-   </url>
-   
-      <url>
-      <loc>http://forestimator.gembloux.ulg.ac.be/documentation/sous_secteurs-et-topo</loc>
-      <changefreq>monthly</changefreq>
-   </url>
-   <url>
-      <loc>http://forestimator.gembloux.ulg.ac.be/documentation/hauteur-de-la-v_g_tation</loc>
-      <changefreq>monthly</changefreq>
-   </url>
-     <url>
-      <loc>http://forestimator.gembloux.ulg.ac.be/documentation/composition-des-essences</loc>
-      <changefreq>monthly</changefreq>
-   </url>
-   <url>
-      <loc>http://forestimator.gembloux.ulg.ac.be/documentation/crise-du-scolyte</loc>
-      <changefreq>monthly</changefreq>
-   </url>
-   <url>
-      <loc>http://forestimator.gembloux.ulg.ac.be/documentation/mod_le-dendro</loc>
+      <loc>http://forestimator.gembloux.ulg.ac.be/documentation/forestimator/t_l_chargement</loc>
       <changefreq>monthly</changefreq>
    </url>
     <url>
-      <loc>http://forestimator.gembloux.ulg.ac.be/documentation/masque-forestier</loc>
+      <loc>http://forestimator.gembloux.ulg.ac.be/documentation/forestimator/forestimator-api</loc>
       <changefreq>monthly</changefreq>
    </url>
       <url>
-      <loc>http://forestimator.gembloux.ulg.ac.be/documentation/forestimator-api</loc>
+      <loc>http://forestimator.gembloux.ulg.ac.be/documentation/fichier-ecologique-des-essences</loc>
       <changefreq>monthly</changefreq>
    </url>
+         <url>
+      <loc>http://forestimator.gembloux.ulg.ac.be/documentation/fichier-ecologique-des-essences/ecogramme</loc>
+      <changefreq>monthly</changefreq>
+   </url>
+   
+   <url>
+      <loc>http://forestimator.gembloux.ulg.ac.be/documentation/fichier-ecologique-des-essences/zone-bioclimatique</loc>
+      <changefreq>monthly</changefreq>
+   </url>
+   
+   <url>
+      <loc>http://forestimator.gembloux.ulg.ac.be/documentation/fichier-ecologique-des-essences/niveaux-trophiques</loc>
+      <changefreq>monthly</changefreq>
+   </url>
+   
+   <url>
+      <loc>http://forestimator.gembloux.ulg.ac.be/documentation/fichier-ecologique-des-essences/niveaux-hydriques</loc>
+      <changefreq>monthly</changefreq>
+   </url>
+   
+   <url>
+      <loc>http://forestimator.gembloux.ulg.ac.be/documentation/fichier-ecologique-des-essences/apport-d_eau</loc>
+      <changefreq>monthly</changefreq>
+   </url>
+   
+      <url>
+      <loc>http://forestimator.gembloux.ulg.ac.be/documentation/fichier-ecologique-des-essences/sous_secteurs-et-topo</loc>
+      <changefreq>monthly</changefreq>
+   </url>
+   <url>
+      <loc>http://forestimator.gembloux.ulg.ac.be/documentation/peuplements-forestiers/hauteur-de-la-v_g_tation</loc>
+      <changefreq>monthly</changefreq>
+   </url>
+     <url>
+      <loc>http://forestimator.gembloux.ulg.ac.be/documentation/peuplements-forestiers/composition-des-essences</loc>
+      <changefreq>monthly</changefreq>
+   </url>
+   <url>
+      <loc>http://forestimator.gembloux.ulg.ac.be/documentation/peuplements-forestiers/crise-du-scolyte</loc>
+      <changefreq>monthly</changefreq>
+   </url>
+   <url>
+      <loc>http://forestimator.gembloux.ulg.ac.be/documentation/peuplements-forestiers/mod_le-dendro</loc>
+      <changefreq>monthly</changefreq>
+   </url>
+    <url>
+      <loc>http://forestimator.gembloux.ulg.ac.be/documentation/peuplements-forestiers</loc>
+      <changefreq>monthly</changefreq>
+   </url>
+
    <url>
       <loc>http://forestimator.gembloux.ulg.ac.be/documentation/r_serve-en-eau</loc>
       <changefreq>monthly</changefreq>
    </url>
-      <url>
-      <loc>http://forestimator.gembloux.ulg.ac.be/documentation/t_l_chargement</loc>
-      <changefreq>monthly</changefreq>
-   </url>
+
    <url>
       <loc>http://forestimator.gembloux.ulg.ac.be/documentation/guide-des-stations</loc>
+      <changefreq>monthly</changefreq>
+   </url>
+      <url>
+      <loc>http://forestimator.gembloux.ulg.ac.be/documentation/guide-des-stations/fiches-stations</loc>
       <changefreq>monthly</changefreq>
    </url>
       <url>

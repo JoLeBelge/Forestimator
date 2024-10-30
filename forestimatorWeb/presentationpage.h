@@ -17,13 +17,16 @@ class presentationPage : public Wt::WContainerWidget
 {
 public:
     presentationPage(cDicoApt * aDico,cWebAptitude* app);
-    cDicoApt * mDico;
-    void handlePathChanged(std::string path);
-    Wt::WStackedWidget * stack_;
 
 private:
+    cDicoApt * mDico;
     cWebAptitude* m_app;
-    Wt::WMenu * menu_;
+    Wt::WStackedWidget *contentsStack_;
+    Wt::WPushButton *openMenuButton_;
+    bool menuOpen_;
+    void toggleMenu();
+    void openMenu();
+    void closeMenu();
 
     std::unique_ptr<WMenuItem> downloadPage();
     std::unique_ptr<WMenuItem> scolytePage();

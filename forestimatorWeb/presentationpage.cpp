@@ -2,31 +2,39 @@
 
 int globMaxDownloadFileS(1000);
 
+const std::string showMenuText = "<i class='fa fa-bars' aria-hidden='true'></i> Afficher le menu";
+const std::string closeMenuText = "<i class='fa fa-bars' aria-hidden='true'></i> Fermer le menu";
+
 presentationPage::presentationPage(cDicoApt *aDico, cWebAptitude *app):mDico(aDico),m_app(app)
+  ,openMenuButton_(nullptr)
+  ,menuOpen_(false)
 {
+    Wt::WTemplate * tpl = addWidget(cpp14::make_unique<Wt::WTemplate>(WString::tr("tpl:widget-gallery")));
+    contentsStack_ = contentsStack_ = tpl->bindWidget("contents",std::make_unique<WStackedWidget>() );
 
-    // création d'un menu à gauche, co dans wt widget gallery
-    Wt::WHBoxLayout * hLayout = setLayout(std::make_unique<Wt::WHBoxLayout>());
-    
-    hLayout->setContentsMargins(0, 0, 0, 0);
-    setContentAlignment(Wt::AlignmentFlag::Top);
+    Wt::WAnimation animation(Wt::AnimationEffect::Fade,
+                              Wt::TimingFunction::Linear,
+                              200);
+    contentsStack_->setTransitionAnimation(animation, true);
 
-    std::unique_ptr<Wt::WStackedWidget> subStack = std::make_unique<Wt::WStackedWidget>();
-    subStack->addStyleClass("contents");
-    subStack->setContentAlignment(AlignmentFlag::Left);
-    subStack->setOverflow(Wt::Overflow::Auto);
+    Wt::WMenu* menu =tpl->bindWidget("menu",std::make_unique<WMenu>(contentsStack_) );
+    menu->addStyleClass("flex-column");
+    menu->setInternalPathEnabled("/documentation");
 
-    auto menu = std::make_unique<Wt::WMenu>(subStack.get());
-    menu_ = menu.get();
-    menu_->addStyleClass("flex-column");
-    menu_->setInternalPathEnabled("/documentation");
+    openMenuButton_ = tpl->bindWidget("open-menu",std::make_unique<WPushButton>() );
+    openMenuButton_->setTextFormat(Wt::TextFormat::UnsafeXHTML);
+    openMenuButton_->setText(showMenuText);
+
+    openMenuButton_->clicked().connect(this, &presentationPage::toggleMenu);
+    auto contentsCover = tpl->bindWidget("contents-cover",std::make_unique<Wt::WContainerWidget>() );
+    contentsCover->clicked().connect(this, &presentationPage::closeMenu);
 
     // forestimator
-    auto subMenuPtr = std::make_unique<Wt::WMenu>(subStack.get());
+    auto subMenuPtr = std::make_unique<Wt::WMenu>(contentsStack_);
     auto subMenu = subMenuPtr.get();
     std::unique_ptr<Wt::WMenuItem>  item = std::make_unique<Wt::WMenuItem>("Forestimator");
     item->setMenu(std::move(subMenuPtr));
-    auto   item_ = menu_->addItem(std::move(item));
+    auto   item_ = menu->addItem(std::move(item));
     subMenu->addStyleClass("nav-stacked submenu");
     subMenu->setInternalPathEnabled("/documentation/"+item_->pathComponent());
     item = std::make_unique<Wt::WMenuItem>("Forestimator : présentation");
@@ -41,13 +49,13 @@ presentationPage::presentationPage(cDicoApt *aDico, cWebAptitude *app):mDico(aDi
     subMenu->addItem(std::move(item));
     subMenu->addItem(std::move(downloadPage()));
 
-    subMenuPtr = std::make_unique<Wt::WMenu>(subStack.get());
+    subMenuPtr = std::make_unique<Wt::WMenu>(contentsStack_);
     subMenu = subMenuPtr.get();
-    item = std::make_unique<Wt::WMenuItem>("Fichier Ecologique des Essences");
-    item->setMenu(std::move(subMenuPtr));
-    item_ = menu_->addItem(std::move(item));
     subMenu->addStyleClass("nav-stacked submenu");
     subMenu->setInternalPathEnabled("/documentation/" + item_->pathComponent());
+    item = std::make_unique<Wt::WMenuItem>("Fichier Ecologique des Essences");
+    item->setMenu(std::move(subMenuPtr));
+    menu->addItem(std::move(item));
     int i(0);
     for (std::string c : {"Aptitude","ECO","ZBIO","NH", "NT","TOPOetSS", "AE" }){
     LayerMTD lMTD =mDico->getLayerMTD(c);
@@ -57,11 +65,11 @@ presentationPage::presentationPage(cDicoApt *aDico, cWebAptitude *app):mDico(aDi
     i++;
     }
 
-    subMenuPtr = std::make_unique<Wt::WMenu>(subStack.get());
+    subMenuPtr = std::make_unique<Wt::WMenu>(contentsStack_);
     subMenu = subMenuPtr.get();
     item = std::make_unique<Wt::WMenuItem>("Peuplements forestiers");
     item->setMenu(std::move(subMenuPtr));
-    item_ = menu_->addItem(std::move(item));
+    item_ = menu->addItem(std::move(item));
     subMenu->addStyleClass("nav-stacked submenu");
     subMenu->setInternalPathEnabled("/documentation/" + item_->pathComponent());
     i=0;
@@ -70,14 +78,15 @@ presentationPage::presentationPage(cDicoApt *aDico, cWebAptitude *app):mDico(aDi
     std::unique_ptr<Wt::WMenuItem> item2 = std::make_unique<Wt::WMenuItem>(lMTD.Label(), cpp14::make_unique<Wt::WText>(getHtml(&lMTD)));
      if (i==0){item2->setPathComponent("");}
     subMenu->addItem(std::move(item2));
+    i++;
     }
     subMenu->addItem(std::move(scolytePage()));
 
-    subMenuPtr = std::make_unique<Wt::WMenu>(subStack.get());
+    subMenuPtr = std::make_unique<Wt::WMenu>(contentsStack_);
     subMenu = subMenuPtr.get();
     item = std::make_unique<Wt::WMenuItem>("Guide des Stations");
     item->setMenu(std::move(subMenuPtr));
-    item_ = menu_->addItem(std::move(item));
+    item_ = menu->addItem(std::move(item));
     subMenu->addStyleClass("nav-stacked submenu");
     subMenu->setInternalPathEnabled("/documentation/" + item_->pathComponent());
     //item_->setContents(std::make_unique<WText>(tr("CS.intro")));
@@ -89,18 +98,16 @@ presentationPage::presentationPage(cDicoApt *aDico, cWebAptitude *app):mDico(aDi
     item2 = std::make_unique<Wt::WMenuItem>("Fiches stations");
     item2->setContents(std::make_unique<matAptCS>(mDico));
     subMenu->addItem(std::move(item2));
-    /*****************************************************************/
 
-
-    // dernière page est différente, car pas de sous-menu
+    for (std::string c : {"IGN","MNT","SWC"}){
+    LayerMTD lMTD =mDico->getLayerMTD(c);
+    std::unique_ptr<Wt::WMenuItem> item2 = std::make_unique<Wt::WMenuItem>(lMTD.Label(), cpp14::make_unique<Wt::WText>(getHtml(&lMTD)));
+    menu->addItem(std::move(item2));
+    }
 
     item = std::make_unique<Wt::WMenuItem>("Confidentialité");
     item->setContents(std::make_unique<WText>(Wt::WString::tr("confidentialite")));
-    menu_->addItem(std::move(item));
-    //subMenu->setInternalPathEnabled("/documentation/" + item_->pathComponent());
-
-    hLayout->addWidget(std::move(menu));
-    stack_ =hLayout->addWidget(std::move(subStack),1);
+    menu->addItem(std::move(item));
 }
 
 std::unique_ptr<WMenuItem> presentationPage::downloadPage(){
@@ -198,28 +205,37 @@ std::unique_ptr<Wt::WMenuItem> presentationPage::scolytePage(){
     video->setAlternativeContent(std::make_unique<Wt::WImage>(Wt::WLink(poster)));
     video->resize(640, 360);
     mi->setContents(std::unique_ptr<Wt::WContainerWidget>(ac));
-    //menu_->addItem(std::move(mi));
     return mi;
 }
 
-void presentationPage::handlePathChanged(std::string path){
-    if (globTest){ std::cout << "presentationPage::handlepathChange " << path << std::endl;}
 
-    if (path.find("forestimator")!=std::string::npos){
-        std::cout << "fo" << std::endl;
-    //menu_->itemAt(0)->select();
-    menu_->itemAt(0)->menu()->select(0);
-    }else  if (path.find("fichier-ecologique-des-essences")!=std::string::npos){
-     std::cout << "fee"  << std::endl;
-    //menu_->itemAt(1)->select();
-    menu_->itemAt(1)->menu()->select(0);
-    }else  if (path.find("peuplements-forestiers")!=std::string::npos){
-        std::cout << "pe f"  << std::endl;
-    //menu_->itemAt(2)->select();
-    menu_->itemAt(2)->menu()->select(0);
-    }else  if (path.find("guide-des-stations")!=std::string::npos ){
-        std::cout << "gsa"  << std::endl;
-    //menu_->itemAt(3)->select();
-    menu_->itemAt(3)->menu()->select(0);
-    }
+void presentationPage::toggleMenu()
+{
+  if (menuOpen_) {
+    closeMenu();
+  } else {
+    openMenu();
+  }
+}
+
+void presentationPage::openMenu()
+{
+  if (menuOpen_)
+    return;
+
+  openMenuButton_->setText(closeMenuText);
+  addStyleClass("menu-open");
+
+  menuOpen_ = true;
+}
+
+void presentationPage::closeMenu()
+{
+  if (!menuOpen_)
+    return;
+
+  openMenuButton_->setText(showMenuText);
+  removeStyleClass("menu-open");
+
+  menuOpen_ = false;
 }

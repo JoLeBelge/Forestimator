@@ -431,6 +431,7 @@ void cWebAptitude::loadStyles(){
     useStyleSheet("style/filedrop.css");
     useStyleSheet("style/form.css");
     useStyleSheet("resources/jPlayer/skin/jplayer.blue.monday.css");
+    useStyleSheet("style/widgetgallery.css");
     // CSS custom pour faire beau
     useStyleSheet("style/style.css");
 

@@ -403,17 +403,6 @@ La photointerprétation a été réalisée sur 4221 points sur l'ensemble de la 
 
 <message id="ana.pt.export.pdf">Export PDF</message>
 
-<message id="ref.article.forestimator">
-
-<figure class="highlight">
-<img src="/img/forestimatorArt.jpg" alt="Forestimator article" style="width:100.0px"/> 
-<figcaption class="figure-caption">Cet article de vulgarisation présente le portail cartographique Forestimator :
-<br></br> <a target="_blank" rel="noopener noreferrer" href="https://hdl.handle.net/2268/291563"> Forestimator : un nouveau portail cartographique pour l'information forestière en Wallonie. <br></br> Lisein, Jonathan ; Claessens, Hugues ; Quevauvillers, Samuel et Lejeune, Philippe. 2022 • In <em>Forêt.Nature, 162</em>, p. 40-47.</a></figcaption>
-<br></br>
-</figure>
-
-</message>
-
 <message id="msg.charger.poly.capa"> Afficher la parcelle cadastre contenant cette position? Cet affichage sert pour effectuer des analyses surfaciques sur cette zone.</message>
 
 
