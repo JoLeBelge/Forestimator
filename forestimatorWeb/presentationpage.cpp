@@ -52,8 +52,8 @@ presentationPage::presentationPage(cDicoApt *aDico, cWebAptitude *app):mDico(aDi
     subMenuPtr = std::make_unique<Wt::WMenu>(contentsStack_);
     subMenu = subMenuPtr.get();
     subMenu->addStyleClass("nav-stacked submenu");
-    subMenu->setInternalPathEnabled("/documentation/" + item_->pathComponent());
     item = std::make_unique<Wt::WMenuItem>("Fichier Ecologique des Essences");
+    subMenu->setInternalPathEnabled("/documentation/" + item->pathComponent());
     item->setMenu(std::move(subMenuPtr));
     menu->addItem(std::move(item));
     int i(0);
