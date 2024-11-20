@@ -227,7 +227,9 @@ Octobre 2021 ; passage à une résolution de 2,5 m (auparavant 10 m). Les cartes
 </message>
 
 <message id="ES_EP.logs">
-version : 2023 08 11, pour avoir une première idée de l'ampleur des attaques en 2023.
+version : 2024 11 20, mise à jour, ajout année 2024 et changement du masque épicéa qui débordait hors de la forêt en lisières sud et ouest
+
+2023 08 11, pour avoir une première idée de l'ampleur des attaques en 2023.
 
 Novembre 2022 : Deux changements importants : premièrement, les années correspondent maintenant au saison de végétation et non plus à l'année civile. Donc la carte d'état sanitaire de 2021 correspond à la période entre mai 2021 et avril 2022. Un dépérissement constaté en sortie d'hiver, ex. avril 2022, sera considéré comme étant lié à la saison de végétation de l'année précédente, ex. 2021. Deuxièmement, la méthode de détection de sol nul est modifiée et est maintenant indentique à celle dans FORDEAD. 
 

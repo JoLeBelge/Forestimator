@@ -6379,6 +6379,25 @@ GROUP "ES_EP_2023_PYR"
    TEMPLATE "../template.html"
 END
 LAYER
+NAME "ES_EP_2024"
+GROUP "ES_EP_2024_PYR"
+   TYPE RASTER
+   STATUS ON
+   PROJECTION
+      "init=epsg:31370"
+   END
+    MAXSCALEDENOM 100000.00
+   DATA "ES/etatSanitaire_2024_BL72_masq_evol_co.tif" 
+   PROCESSING "BANDS=1" 
+ 
+ INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_ES.map"
+ METADATA
+      "wms_title"           "Etat Sanitaire Pessière 2024"
+      "wms_srs"             "EPSG:31370"
+   END
+   TEMPLATE "../template.html"
+END
+LAYER
   NAME "COMPOALL"
    TYPE RASTER
    STATUS ON
