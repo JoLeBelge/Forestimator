@@ -352,7 +352,16 @@ public:
          }
     return aRes;
     }
-
+    bool isStationMaj(int zbio,int US, std::string var){
+    bool aRes(0);
+        int zbioKey=ZBIO2CSid(zbio);
+         if (Dico_station_varMaj.find(zbioKey)!=Dico_station_varMaj.end()){
+             if (Dico_station_varMaj.at(zbioKey).find(US)!=Dico_station_varMaj.at(zbioKey).end()){
+                 if (Dico_station_varMaj.at(zbioKey).at(US)==var){aRes=1;}
+             }
+         }
+    return aRes;
+    }
     caracteristiqueCS getKKCS(int zbio, int station_id){
         caracteristiqueCS aRes;
         std::pair<int, int> key(zbio,station_id);
