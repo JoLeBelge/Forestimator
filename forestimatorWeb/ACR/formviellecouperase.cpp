@@ -297,7 +297,7 @@ void formVielleCoupeRase::submit(){
                     +"'"+format4SQL(VCRdescriptionEdit_->valueText().toUTF8())+"',"
                     +std::to_string(surf)+","
                     +"'"+polyg+"');";
-            //std::cout << "sql : " << SQLstring << std::endl;
+            if (globTest){ std::cout << "sql : " << SQLstring << std::endl;}
             sqlite3_prepare_v2(db_, SQLstring.c_str(), -1, &stmt, NULL );
             // applique l'update
             sqlite3_step( stmt );
@@ -305,6 +305,7 @@ void formVielleCoupeRase::submit(){
         }
         sqlite3_close(db_);
 
+        // on dirait que ça fait bugger l'appli quand elle tourne sur mon pc
         sendSummaryMail();
 
         Wt::StandardButton answer = Wt::WMessageBox::show( WString::tr("saveACR.msg.titre"),
@@ -531,7 +532,7 @@ OGREnvelope formVielleCoupeRase::computeGlobalGeom(std::string aFile){
 }
 
 void formVielleCoupeRase::validDraw(std::string geojson){
-    //std::cout << "valid draw \n" << geojson << std::endl;
+     if (globTest){std::cout << "valid draw \n" << geojson << std::endl;}
     std::string name0 = std::tmpnam(nullptr);
     std::string name1 = name0.substr(5,name0.size()-5);
     std::string aOut = mDico->File("TMPDIR")+"/"+name1+".geojson";
@@ -558,6 +559,7 @@ void formVielleCoupeRase::validDraw(std::string geojson){
         std::cout << "validDraw : je n'arrive pas à ouvrir " << aOut<< std::endl;
     }
     GDALClose(DS);
+     if (globTest){std::cout << "draw is "<< std::to_string(polygValid) << "\n" << std::endl;}
 }
 
 void formVielleCoupeRase::sendSummaryMail(){

@@ -15,13 +15,13 @@
 #include <Wt/Dbo/Dbo.h>
 #include <Wt/Dbo/backend/Sqlite3.h>
 
-
 namespace dbo = Wt::Dbo;
 
 //juin 2021 je vais refaire le code pour carte NT ici aussi, et utiliser ce dictionnaire
 class siglePedo;
 class cDicoCartepH;
 
+int cleNH(const siglePedo *s, int AE, int SS);
 
 class siglePedo{
 public:
@@ -42,6 +42,9 @@ public:
         mSER_SPEC=p->getSER_SPEC();
         prepare();
     }
+
+    // créer un sigle pédo depuis les relevés des placettes IPRFW suivi pédo
+    siglePedo(std::string texture, std::string drainage,std::string profil, std::string charge, int profIPRFW, cDicoCartepH * dico);
 
     void cat() const{ std::cout << "sol index " << INDEX_ << " Substrat " << SUBSTRAT << " Texture " << mMAT_TEXT << " mPHASE_1 " << mPHASE_1 << " Charge " << mCHARGE << " drainage " << mDRAINAGE << " PROFIL " << mDEV_PROFIL << " MAT text simp "<< mMAT_TEXT_SIMP <<  std::endl;
                       std::cout << "mText_ZSP " <<mText_ZSP << " mText_LAEU " << mText_LAEU << " mTextG " << mTextG << " mText_ZSPenrichi " << mText_ZSPenrichi << std::endl;
@@ -202,6 +205,17 @@ public:
 
         return aRes;
     }
+
+    /*siglePedo * getSiglePedoPtr(std::string aSigle){
+        std::cout << "je veux charger le signe pedo " << aSigle << std::endl;
+            dbo::Transaction transaction{session};
+            dbo::ptr<siglePedo> s = session.find<siglePedo>().where("SIGLE_PEDO=?").bind(aSigle);
+            siglePedo * s2=new siglePedo(s);
+            s2->setMAT_TEXT_SIMP(getMatTextSimp(s2->getMAT_TEXT()));
+            // refaire prepare sinon les critères qui utilisent MAT_TEXT_SIMP ne vont pas fonctionner...
+            s2->prepare();
+            return s2;
+    }*/
 
 private:
     std::string mBDpath;
