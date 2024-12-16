@@ -177,7 +177,10 @@ formVielleCoupeRase::formVielleCoupeRase(const WEnvironment &env, cDicoApt *dico
     cont= la->addWidget(std::make_unique<WContainerWidget>());
     WHBoxLayout * layoutH = cont->setLayout(Wt::cpp14::make_unique<Wt::WHBoxLayout>());
     auto smart_map = std::make_unique<Wol>();
-    Wol * map = smart_map.get();
+    map = smart_map.get();
+
+    map->polygGeojson().connect(std::bind(&formVielleCoupeRase::validDraw,this, std::placeholders::_1));
+
     std::ifstream t(mDico->File("docroot")+"/js/initOL_vcr.js");
     std::stringstream ss;
     ss << t.rdbuf();
@@ -221,13 +224,14 @@ formVielleCoupeRase::formVielleCoupeRase(const WEnvironment &env, cDicoApt *dico
     WPushButton * bUndo =cont->addNew<WPushButton>(WString::tr("cancelPoint"));
     bUndo->setMinimumSize("100%"," ");
     bUndo->clicked().connect([=] {doJavaScript("draw.removeLastPoint();");});
-    map->polygGeojson().connect(std::bind(&formVielleCoupeRase::validDraw,this, std::placeholders::_1));
+
 
     WPushButton * bSubmit = tpl->bindWidget("bsubmit", std::make_unique<WPushButton>(WString::tr("submit")));
     bSubmit->clicked().connect([=] {submit();});
 }
 
 void formVielleCoupeRase::submit(){
+
     if (contactEncoderEdit_->validate()!=ValidationState::Valid){
         Wt::WMessageBox * messageBox = this->addChild(std::make_unique<Wt::WMessageBox>(
                                                           "Votre contact",
@@ -239,6 +243,7 @@ void formVielleCoupeRase::submit(){
             this->removeChild(messageBox);
         });
         messageBox->show();
+
     } else if(!polygValid){
         Wt::WMessageBox * messageBox = this->addChild(std::make_unique<Wt::WMessageBox>(
                                                           "Emplacement de la coupe rase",
@@ -388,7 +393,10 @@ Wol::Wol():slot(this),polygGeojson_(this,"toto")
              + polygGeojson_.createCall({"str"}) +
              "}}"
              );
+    // attention, ne se déclenche pas si clic droit de la souris!
     this->clicked().connect(this->slot);
+    // ça c'est plus safe meme si du coup ça fait beaucoup travailler pour rien.
+    this->mouseWentOut().connect(this->slot);
 }
 
 void formVielleCoupeRase::displayLayer(std::string aCode) {
@@ -532,7 +540,7 @@ OGREnvelope formVielleCoupeRase::computeGlobalGeom(std::string aFile){
 }
 
 void formVielleCoupeRase::validDraw(std::string geojson){
-     if (globTest){std::cout << "valid draw \n" << geojson << std::endl;}
+
     std::string name0 = std::tmpnam(nullptr);
     std::string name1 = name0.substr(5,name0.size()-5);
     std::string aOut = mDico->File("TMPDIR")+"/"+name1+".geojson";
@@ -559,7 +567,6 @@ void formVielleCoupeRase::validDraw(std::string geojson){
         std::cout << "validDraw : je n'arrive pas à ouvrir " << aOut<< std::endl;
     }
     GDALClose(DS);
-     if (globTest){std::cout << "draw is "<< std::to_string(polygValid) << "\n" << std::endl;}
 }
 
 void formVielleCoupeRase::sendSummaryMail(){

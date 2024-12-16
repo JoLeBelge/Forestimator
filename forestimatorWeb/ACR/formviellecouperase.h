@@ -73,6 +73,27 @@ public:
     }
 };
 
+class Wol: public WContainerWidget
+{
+public:
+    Wol();
+
+    void updateView(){
+        doJavaScript("refreshLayers();");
+    }
+
+    virtual void layoutSizeChanged(int width, int height)
+    {
+        WContainerWidget::layoutSizeChanged(width, height);
+        doJavaScript("map.updateSize();");
+    }
+
+    JSignal<std::string>  polygGeojson_;
+    JSignal<std::string>& polygGeojson() { return polygGeojson_; }
+    JSlot slot;
+};
+
+
 class formVielleCoupeRase : public WApplication
 {
 public:
@@ -125,29 +146,11 @@ private:
     OGRGeometry * geom;
     std::string mBDFile;
     dbo::Session session;
+    Wol * map;
 
     cDicoApt * mDico;
 };
 
-class Wol: public WContainerWidget
-{
-public:
-    Wol();
-
-    void updateView(){
-        doJavaScript("refreshLayers();");
-    }
-
-    virtual void layoutSizeChanged(int width, int height)
-    {
-        WContainerWidget::layoutSizeChanged(width, height);
-        doJavaScript("map.updateSize();");
-    }
-
-    JSignal<std::string>  polygGeojson_;
-    JSignal<std::string>& polygGeojson() { return polygGeojson_; }
-    JSlot slot;
-};
 
 class ACRAnalytics : public Wt::WApplication
 {
