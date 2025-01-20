@@ -11,9 +11,12 @@ public:
     color(const color &aCol):mR(aCol.mR),mG(aCol.mG),mB(aCol.mB),mStyleClassName(aCol.mStyleClassName),mHTMLcode(aCol.mHTMLcode),mDark(aCol.mDark){}
 
     color(std::string aHex,std::string name):mStyleClassName(name),mHTMLcode(aHex){
-    //color(std::string aHex):mStyleClassName(aHex),mHTMLcode(aHex){
+        //color(std::string aHex):mStyleClassName(aHex),mHTMLcode(aHex){
         // j'enlève le diaise qui semble ne pas convenir
-        const char* c=aHex.substr(1,aHex.size()).c_str();
+        const char* c=aHex.c_str();
+        if(aHex.at(0)=='#'){
+            c=aHex.substr(1,aHex.size()).c_str();
+        }
         sscanf(c, "%02x%02x%02x", &mR, &mG, &mB);
         // fonctionne pas si #000000
         if ((mR < 0) | (mG < 0) | (mB < 0)){
@@ -36,7 +39,7 @@ public:
     }
 
     void isDark(){
-       double hsp = 0.299 * pow(mR,2) + 0.587 * pow(mG,2) + 0.114 * pow(mB,2);
+        double hsp = 0.299 * pow(mR,2) + 0.587 * pow(mG,2) + 0.114 * pow(mB,2);
         //if (hsp<127.5) {mDark=true;} else {mDark=false;}
         if (hsp<210) {mDark=true;} else {mDark=false;}
     }

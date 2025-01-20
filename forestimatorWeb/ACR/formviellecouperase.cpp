@@ -310,7 +310,7 @@ void formVielleCoupeRase::submit(){
         }
         sqlite3_close(db_);
 
-        // on dirait que ça fait bugger l'appli quand elle tourne sur mon pc
+
         sendSummaryMail();
 
         Wt::StandardButton answer = Wt::WMessageBox::show( WString::tr("saveACR.msg.titre"),

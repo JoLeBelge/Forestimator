@@ -95,6 +95,10 @@ int launchForestimator(int argc, char **argv)
         fileResource2->suggestFileName("desserteForest.db");
         server.addResource(fileResource2, "/telechargement/desserteForest");
 
+        Wt::WFileResource * fileResource4 = new Wt::WFileResource("application/pdf",dico->File("docroot")+"pdf/invitationCarrefourForestier2025.pdf");
+        fileResource4->suggestFileName("invitationCarrefourForestier2025.pdf");
+        server.addResource(fileResource4, "/CF");
+
         server.addEntryPoint(Wt::EntryPointType::Application, std::bind(&createWebAptitudeApplication,std::placeholders::_1, dico));
         Session::configureAuth();
         server.run();

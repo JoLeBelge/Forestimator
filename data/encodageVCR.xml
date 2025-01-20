@@ -54,11 +54,11 @@ La Faculté de Gembloux Agro-Bio Tech (ULiège) a initié, en collaboration avec
 
 <message id="typeEncoder"> Vous êtes ?</message>
 <message id="typeEncoder0"> Choisissez  </message>
-<message id="typeEncoder1"> Propriétaire privé </message>
-<message id="typeEncoder2"> FNEF </message>
-<message id="typeEncoder3"> Cellule d'appui </message>
-<message id="typeEncoder4"> DNF </message>
-<message id="typeEncoder5"> Autre </message>
+<message id="typeEncoder1">Propriétaire privé</message>
+<message id="typeEncoder2">FNEF</message>
+<message id="typeEncoder3">Cellule d'appui</message>
+<message id="typeEncoder4">DNF</message>
+<message id="typeEncoder5">Autre</message>
 
 
 <message id="kit"> Souhaitez-vous recevoir les résultats du projet de suivi des anciennes coupes rases?</message>
@@ -122,7 +122,7 @@ Vos données ont été encodées de manière adéquate. Nous vous remercions pou
 <message id="itineraire2"> Régénération naturelle </message>
 <message id="itineraire3"> Régénération naturelle avec des plantations d'enrichissement </message>
 
-<message id="anneeCoupe0"> Depuis compbien de temps a eu lieu la coupe? </message>
+<message id="anneeCoupe0"> Depuis combien de temps a eu lieu la coupe? </message>
 <message id="anneeCoupe1"> moins de 5 ans </message>
 <message id="anneeCoupe2"> entre 5 et 10 ans </message>
 <message id="anneeCoupe3"> entre 10 et 15 ans </message>
