@@ -82,7 +82,7 @@ int main(int argc, char *argv[])
         cDicoApt dico(adirBD);
         cApliCarteApt aACA(&dico);
 
-        if(0){
+        if(1){
         // je boucle les layersbase et non les essences car j'ai besoin du chemin d'accès au raster
         for (std::pair<std::string,std::shared_ptr<layerBase>>  kv : dico.VlayerBase()){
 
@@ -92,7 +92,7 @@ int main(int argc, char *argv[])
                 aACA.carteAptFEE(dico.getEss(essCode),kv.second->getPathTif(),true);
             }
 
-            if (carteCS &&(kv.second->getCatLayer()==TypeLayer::CS)){// && essCode =="EP"  | essCode =="CS"){
+            if (carteCS &&(kv.second->getCatLayer()==TypeLayer::CS) && essCode =="EP" ){// && essCode =="EP"  | essCode =="CS"){
                 std::shared_ptr<cEss> ess = dico.getEss(essCode);
                 aACA.carteAptCS(ess,kv.second->getPathTif(),true);
             }   
@@ -100,7 +100,7 @@ int main(int argc, char *argv[])
 
         }
             // les cartes dérivées des CS
-       aACA.carteDeriveCS();
+       //aACA.carteDeriveCS();
 
     }
     if (matApt){

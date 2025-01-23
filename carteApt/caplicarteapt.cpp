@@ -225,7 +225,8 @@ void cApliCarteApt::carteAptCS(std::shared_ptr<cEss> aEss, std::string aOut, boo
                     //if (zbio==3 | zbio==5) st = scanlineCS3[ col ];
                     apt = aEss->getApt(zbio,st);
                     //if(zbio==2 & st==10){std::cout << " apt pour " << aEss->Nom() << " zbio 2 et station 10 est " << apt << std::endl;}
-
+                    // version "aptitude CS sans le risque climatique, pour illu dans lettre OWSF
+                    //apt = aEss->getApt(zbio,st,"",0);
                 }
                 scanline[ col ] = apt;
             }

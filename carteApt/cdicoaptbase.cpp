@@ -663,7 +663,10 @@ int cEss::getApt(int aZbio, int US, std::string aVar, bool withClim){
     // combinaison recommandation avec risque climatique (4 classes x 4 classes)
     if (withClim){
         int aClim(0);
-        std::map<std::tuple<int, std::string>,int> * clim=& mCSClim.at(2);
+
+        aClim=getCSClim(aZbio,US,aVar);
+        //std::cout << "risque climatique pour zbio " << aZbio << " US " << US << " et variante " << aVar << " : " <<aClim << std::endl;
+        /*std::map<std::tuple<int, std::string>,int> * clim=& mCSClim.at(2);
 
         if (clim->find(aUSkey)!=clim->end()){
             aClim=clim->at(aUSkey);
@@ -671,7 +674,7 @@ int cEss::getApt(int aZbio, int US, std::string aVar, bool withClim){
         // si l'utilisateur a renseigné une variante avec l'argument aVar:
         if (clim->find(std::make_tuple(US,aVar))!=clim->end()){
             aClim=clim->at(std::make_tuple(US,aVar));
-        }
+        }*/
 
         // on combine recommandation avec clim - cela donne de 0 à 13
         if (aRes==4){aRes=13;} else if (aRes!=0){
@@ -683,10 +686,11 @@ int cEss::getApt(int aZbio, int US, std::string aVar, bool withClim){
     return aRes;
 }
 
-int cEss::getCSClim(int US, std::string aVar){
+int cEss::getCSClim(int zbio, int US, std::string aVar){
     int aRes(0);
-    if (mCSClim.find(2)!=mCSClim.end()){
-        std::map<std::tuple<int, std::string>,int> * clim=&mAptCS.at(2);
+    if (zbio==1){zbio=2;}
+    if (mCSClim.find(zbio)!=mCSClim.end()){
+        std::map<std::tuple<int, std::string>,int> * clim=&mCSClim.at(zbio);
         // on prend par défaut la station majoritaire
         std::string var=mDico->getStationMaj(2,US);
         std::tuple<int,std::string> aUSkey=std::make_tuple(US,var);

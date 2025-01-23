@@ -144,6 +144,12 @@ std::unique_ptr<Wt::WApplication> createWebAptitudeApplication(const Wt::WEnviro
     }else if (env.internalPath() == "/encodage.desserteForest"){
             auto app = std::make_unique<formDesserteForest>(env,dico, dico->File("docroot")+"desserteForest.db");
             return app;
+    }else if (env.internalPath() == "/invitationCF"){
+    auto app = std::make_unique<Wt::WApplication>(env);
+    app->messageResourceBundle().use(app->docRoot() + "/forestimator");
+    app->setTitle(WString("invitation Carrefour Forestier"));
+    app->root()->addNew<Wt::WText>(WString::tr("insertCF"));
+    return app;
 }else if (env.internalPath() == "/encodage.terrain"){
     auto app = std::make_unique<encodageRelTerrain>(env,dico->File("docroot")+"ACR.db");
     return app;

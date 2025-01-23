@@ -32,6 +32,7 @@ void cWebAptitude::handlePathChange()
         }
 
         //sectionDoc.erase(std::remove(sectionDoc.begin(), sectionDoc.end(), '/'), sectionDoc.end());
+        if (globTest){std::cout << "section doc : "<< sectionDoc << std::endl;}
         changeHeader(sectionDoc);
         } else {
              changeHeader("documentation");
@@ -417,6 +418,31 @@ cWebAptitude::cWebAptitude(const Wt::WEnvironment& env, cDicoApt *dico)
 
     root()->addStyleClass("layout_main");
     loaded_=true;
+
+    std::string coName="invitationCF";
+
+    //std::string co =*env.getCookie(coName);
+   // std::cout << "cookies values " << co << std::endl;
+
+    //this->removeCookie(coName);
+    if (!env.getCookie(coName)){
+    Wt::WMessageBox * messageBox = this->addChild(std::make_unique<Wt::WMessageBox>(
+                                                      "9ieme Carrefour forestier",
+                                                      WString::tr("insertCF"),
+                                                      Wt::Icon::None,
+                                                      Wt::StandardButton::Ok));
+    messageBox->setHeight("100%");
+    messageBox->setWidth("50%");
+    messageBox->contents()->setOverflow(Overflow::Scroll);
+    messageBox->setModal(true);
+    messageBox->buttonClicked().connect([=] {
+        this->removeChild(messageBox);
+        // une semaine
+        Http::Cookie coCF(coName, "1", std::chrono::seconds(604800));
+        this->setCookie(coCF);
+    });
+    messageBox->show();
+    }
 }
 
 void cWebAptitude::loadStyles(){

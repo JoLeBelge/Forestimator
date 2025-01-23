@@ -1,10 +1,13 @@
 To do list forestimator
 ------------------------
 
--si pas assez de RAM, ne pas autoriser l'affichage offline (ou du moins avoir une technique pour que le bug ne dure pas trop dans le temps..)
--limiter les niveaux de zoom quand on affiche une carte offline ->limiter le temps de latence.
--GSA : integration
+-1) GSA : détermination de la vulnérabilité des essences
 -retirer logs
+-si pas assez de RAM, ne pas autoriser l'affichage offline
+-limiter les niveaux de zoom quand on affiche une carte offline ->limiter le temps de latence. facile à implémenter et efficace
+-affichage de la cnsw 16 bits tiff?
+
+
 
 -> publish for iOS. en cours
 

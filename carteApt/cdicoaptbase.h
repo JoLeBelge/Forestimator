@@ -472,7 +472,7 @@ public:
     int getApt(int aZbio);
     // retourne l'aptitude du catalogue de station
     int getApt(int aZbio, int US, std::string aVar="", bool withClim=true);
-    int getCSClim(int US, std::string aVar="");
+    int getCSClim(int zbio, int US, std::string aVar="");
     bool hasCSApt(){
         bool aRes(1);
         if (mAptCS.size()==0) {

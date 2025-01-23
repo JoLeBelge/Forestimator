@@ -28,6 +28,7 @@
 #include "statwindow.h"
 #include "simplepoint.h"
 #include "Wt/WEnvironment.h"
+#include "Wt/Http/Cookie.h"
 
 #include <Wt/WIntValidator.h>
 #include <Wt/WLineEdit.h>

@@ -32,7 +32,7 @@
       </minMaxOrigin>
       <colorPalette>
         <paletteEntry color="#a6d93e" label="pas de donnée" alpha="0" value="0"/>
-        <paletteEntry color="#00a200" label="Conseillée" alpha="255" value="2"/>
+        <paletteEntry color="#00a200" label="Conseillée" alpha="255" value="1"/>
         <paletteEntry color="#9cd891" label="Conseillée, en tenant compte de ses faiblesses" alpha="255" value="2"/>
         <paletteEntry color="#c0f7d7" label="Convient actuellement mais risques climatiques à long terme" alpha="255" value="3"/>
         <paletteEntry color="#f4b183" label="A n'envisager qu'en accompagnement" alpha="255" value="4"/>
