@@ -200,3 +200,20 @@ bool isSelectedLayer(String key, {offline = false}) {
   }
   return false;
 }
+
+Map<int, int> lutVulnerabiliteCS = {
+  0: 0,
+  1: 1,
+  2: 1,
+  3: 3,
+  4: 5,
+  5: 2,
+  6: 2,
+  7: 3,
+  8: 6,
+  9: 2,
+  10: 4,
+  11: 4,
+  12: 4,
+  13: 7
+};

@@ -42,6 +42,15 @@ class risque {
         mCategorie = map['categorie'];
 }
 
+class vulnerabilite {
+  late int mCode;
+  String? mVulnerabilite;
+  vulnerabilite.fromMap(final Map<String, dynamic> map)
+      : mCode = map['raster_val'],
+        mVulnerabilite = map['label'];
+  //mCategorie = map['categorie'];
+}
+
 class station {
   late int mStationId;
   late int mZbio;
@@ -183,8 +192,13 @@ class layerBase {
     return mPdfName != "";
   }
 
-  String getFicheRoute() {
-    return "documentation/" + mCode;
+  String getFicheRoute({int us = 0}) {
+    // cas particulier du GSA ou j'ai un pdf différent par station
+    if (mCode == "CS_A") {
+      return gl.dico.getStationPdf(us);
+    } else {
+      return "documentation/" + mCode;
+    }
   }
 
   String getEssCode() {
@@ -294,7 +308,10 @@ class dicoAptProvider {
   Map<String, layerBase> mLayerBases = {};
   Map<String, Ess> mEssences = {};
   List<aptitude> mAptitudes = [];
-  List<risque> mRisques = [];
+  List<vulnerabilite> mVulnerabilite =
+      []; // carte recommandation CS = carte de vulnerabilite
+  List<risque> mRisques =
+      []; // attention, risque Topo FEE, pas risque Climatique CS
   List<zbio> mZbio = [];
   List<groupe_couche> mGrCouches = [];
   List<station> mStations = [];
@@ -363,6 +380,10 @@ class dicoAptProvider {
     result = await db.query('dico_zbio');
     for (var row in result) {
       mZbio.add(zbio.fromMap(row));
+    }
+    result = await db.query('dico_recommandation');
+    for (var row in result) {
+      mVulnerabilite.add(vulnerabilite.fromMap(row));
     }
     result = await db.rawQuery('SELECT ID,concat2 FROM dico_NTNH;');
     for (var row in result) {
@@ -455,6 +476,16 @@ class dicoAptProvider {
     return aRes;
   }
 
+  String vulnerabiliteLabel(int aCode) {
+    String aRes = "";
+    for (vulnerabilite v in mVulnerabilite) {
+      if (v.mCode == aCode) {
+        aRes = v.mVulnerabilite!;
+      }
+    }
+    return aRes;
+  }
+
   int getRisque(String aStr) {
     int aRes = 0;
     for (risque r in mRisques) {
@@ -542,6 +573,19 @@ class dicoAptProvider {
       }
     }
     return aRes;
+  }
+
+  List<String> getAllStationFiches() {
+    // en l'état, uniquement fonctionnel pour l'Ardenne
+    List<station> that =
+        mStations.where((i) => i.mVarMaj & (i.mZbio == 1)).toList();
+    List<String> aRes =
+        that.map((item) => getStationPdf(item.mStationId)).toList();
+    return aRes;
+  }
+
+  String getStationPdf(int us) {
+    return "US-A" + us.toString() + ".pdf";
   }
 
   Future<void> checkLayerBaseOfflineRessource() async {

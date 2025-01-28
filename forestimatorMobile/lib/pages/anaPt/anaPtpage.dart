@@ -194,8 +194,11 @@ class layerAnaPtListTile extends StatelessWidget {
       ]),
       onTap: () {
         if (l.hasDoc()) {
-          GoRouter.of(context)
-              .push("/" + gl.basePathbranchB + '/' + l.getFicheRoute() + '/0');
+          GoRouter.of(context).push("/" +
+              gl.basePathbranchB +
+              '/' +
+              l.getFicheRoute(us: data.mRastValue) +
+              '/0');
         }
       },
     );
@@ -288,7 +291,7 @@ Widget _tabPropositionCS(BuildContext context, propositionGS apts) {
   return Column(children: [
     SizedBox(height: 10),
     Center(
-      child: Text("Propositions d'Essences du Guide de Station",
+      child: Text("Propositions d'Essences du Guide des Stations",
           style: TextStyle(
             fontSize: 18.0,
             fontWeight: FontWeight.w600,
@@ -296,15 +299,18 @@ Widget _tabPropositionCS(BuildContext context, propositionGS apts) {
           textAlign: TextAlign.center),
     ),
     DefaultTabController(
-      length: 3,
+      length: 4,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           Container(
             child: TabBar(tabs: [
-              Tab(text: "Très adéquates"),
-              Tab(text: "Adéquates"),
-              Tab(text: "Secondaires"),
+              Tab(text: gl.dico.vulnerabiliteLabel(1)),
+              Tab(text: gl.dico.vulnerabiliteLabel(2)),
+              Tab(text: gl.dico.vulnerabiliteLabel(3)),
+              Tab(text: gl.dico.vulnerabiliteLabel(4)),
+              //  Tab(text: "Déconseillé"),
+              //  Tab(text: "Très fortement déconseillé"),
             ]),
           ),
           Container(
@@ -314,6 +320,9 @@ Widget _tabPropositionCS(BuildContext context, propositionGS apts) {
               essencesListViewGS(apts: apts, codeApt: 1),
               essencesListViewGS(apts: apts, codeApt: 2),
               essencesListViewGS(apts: apts, codeApt: 3),
+              essencesListViewGS(apts: apts, codeApt: 4),
+              //  essencesListViewGS(apts: apts, codeApt: 5),
+              //  essencesListViewGS(apts: apts, codeApt: 6),
             ]),
           ),
         ],
@@ -324,7 +333,7 @@ Widget _tabPropositionCS(BuildContext context, propositionGS apts) {
 
 class essencesListViewGS extends StatelessWidget {
   propositionGS apts;
-  int codeApt;
+  int codeApt; // maintentant c'est plus un code de vulnérabilités
   essencesListViewGS({required this.apts, required this.codeApt});
   @override
   Widget build(BuildContext context) {
@@ -334,15 +343,25 @@ class essencesListViewGS extends StatelessWidget {
     code.sort(
         (a, b) => gl.dico.getEss(a).mNomFR.compareTo(gl.dico.getEss(b).mNomFR));
     return ListView.builder(
-      itemCount: mEss.length,
+      itemCount: mEss.length + 1,
       shrinkWrap: true,
       physics: NeverScrollableScrollPhysics(),
       itemBuilder: (context, index) {
+        if (index == 0) {
+          // Add an extra item pour afficher la catégorie de recommandation d'essence
+          return ListTile(
+            /* leading: CircleAvatar(
+              radius: 10,
+              backgroundColor: Colors.purple,
+            ),*/
+            title: Text(gl.dico.vulnerabiliteLabel(codeApt)),
+          );
+        }
         return ListTile(
-          leading: Icon(gl.dico.getEss(code.elementAt(index)).mF_R == 1
+          leading: Icon(gl.dico.getEss(code.elementAt(index - 1)).mF_R == 1
               ? CustomIcons.tree
               : Icons.forest_outlined),
-          title: Text(gl.dico.getEss(code.elementAt(index)).mNomFR),
+          title: Text(gl.dico.getEss(code.elementAt(index - 1)).mNomFR),
         );
       },
     );

@@ -7,7 +7,7 @@ import 'package:fforestimator/globals.dart' as gl;
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
-import 'package:flutter_logs/flutter_logs.dart';
+//import 'package:flutter_logs/flutter_logs.dart';
 
 Future makePdf(List<layerAnaPt> layers, String fileName, String dir,
     String locationName) async {
@@ -79,9 +79,9 @@ Future makePdf(List<layerAnaPt> layers, String fileName, String dir,
       } while (await out.exists());
     }
     out.writeAsBytes(await pdf.save(), flush: true);
-    FlutterLogs.logError("anaPt", "pdf", "pdf exported to. ${out.path}");
+    // FlutterLogs.logError("anaPt", "pdf", "pdf exported to. ${out.path}");
   } else {
-    FlutterLogs.logError("anaPt", "pdf", "downloadDirPath is null");
+    //FlutterLogs.logError("anaPt", "pdf", "downloadDirPath is null");
   }
 }
 

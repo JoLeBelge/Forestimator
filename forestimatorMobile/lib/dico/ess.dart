@@ -16,6 +16,8 @@ class Ess {
   // aptitude pour catalogue de station
   // clé ; zone bioclim/ région. Value ; une map -> clé = identifiant de la station (id + variante) Value ; aptitude
   Map<int, Map<Tuple2<int, String>, int>> mAptCS;
+  // clé ; zone bioclim/ région. Value ; une map -> clé = identifiant de la station (id + variante) Value ; risque climatique (court et long terme)
+  Map<int, Map<Tuple2<int, String>, int>> mRisqueCS;
   // clé ; zone bioclim/ région. Value ; une map -> clé ; id situation topo. valeur ; code risque
   Map<int, Map<int, int>> mRisqueTopo;
 
@@ -46,7 +48,6 @@ class Ess {
     int aRes = 0;
     if (mAptCS.containsKey(aZbio)) {
       Map<Tuple2<int, String>, int> Apt = mAptCS[aZbio]!;
-
       // on prend par défaut la station majoritaire
       String variante = gl.dico.getStationMaj(aZbio, US);
       Tuple2<int, String> aUSkey = Tuple2(US, variante);
@@ -60,9 +61,41 @@ class Ess {
           aRes = Apt[aUSkey]!;
         }
       }
+      // risque climatique
+      int aClim = getCSClim(aZbio, US, aVar: aVar);
+      // on regroupe aptitude et risque clim
+      if (aRes == 4) {
+        aRes = 13;
+      } else if (aRes != 0) {
+        aRes = (aRes - 1) * 4 + aClim;
+      }
+      // maintenant on regroupe certaine classes ensemble
+      aRes = gl.lutVulnerabiliteCS[aRes]!;
     }
-    if (aRes > 9) {
-      aRes = 0;
+    return aRes;
+  }
+
+  int getCSClim(int zbio, int US, {String aVar = ''}) {
+    int aRes = 9;
+    if (zbio == 1) {
+      zbio = 2;
+    }
+    if (mRisqueCS.containsKey(zbio)) {
+      Map<Tuple2<int, String>, int> clim = mRisqueCS[zbio]!;
+      // on prend par défaut la station majoritaire
+      String variante = gl.dico.getStationMaj(zbio, US);
+      Tuple2<int, String> aUSkey = Tuple2(US, variante);
+
+      if (clim.containsKey(aUSkey)) {
+        aRes = clim[aUSkey]!;
+      }
+      // si l'utilisateur a renseigné une variante avec l'argument aVar:
+      if (aVar != '') {
+        aUSkey = Tuple2(US, aVar);
+        if (clim.containsKey(aUSkey)) {
+          aRes = clim[aUSkey]!;
+        }
+      }
     }
     return aRes;
   }
@@ -142,14 +175,15 @@ class Ess {
         mEcoVal = {},
         mAptZbio = {},
         mAptCS = {},
-        mRisqueTopo = {};
+        mRisqueTopo = {},
+        mRisqueCS = {};
 
   Future<void> fillApt(dicoAptProvider dico) async {
     // aptitude hydro-trophique ; une matrice par zbioclimatique
     String myquery =
-        'SELECT CodeNTNH,"1","2","3","4","5","6","7","8","9","10" FROM AptFEE WHERE CODE_ESSENCE="' +
+        "SELECT CodeNTNH,`1`,`2`,`3`,`4`,`5`,`6`,`7`,`8`,`9`,`10` FROM AptFEE WHERE CODE_ESSENCE='" +
             mCode.toString() +
-            '";';
+            "';";
     List<Map<String, dynamic>> aAptEco = await dico.db.rawQuery(myquery);
     for (int zbio = 1; zbio <= 10; zbio++) {
       Map<String, int> EcoOneZbio = {};
@@ -174,9 +208,9 @@ class Ess {
 
     // aptitude climatique ; une aptitude pour chacune des 10 zones climatiques
     myquery =
-        'SELECT "1","2","3","4","5","6","7","8","9","10" FROM AptFEE_ZBIO WHERE CODE_ESSENCE="' +
+        "SELECT `1`,`2`,`3`,`4`,`5`,`6`,`7`,`8`,`9`,`10` FROM AptFEE_ZBIO WHERE CODE_ESSENCE='" +
             mCode.toString() +
-            '";';
+            "';";
     List<Map<String, dynamic>> aAptZbio = await dico.db.rawQuery(myquery);
     for (var r in aAptZbio) {
       for (int zbio = 1; zbio <= 10; zbio++) {
@@ -189,9 +223,9 @@ class Ess {
 
     // risque topographique ; permet de compenser une aptitude en bien (surcote) ou en mal (souscote)
     myquery =
-        'SELECT Secteurfroid,Secteurneutre,Secteurchaud,Fond_vallee,SF_Ardenne,FV_Ardenne FROM Risque_topoFEE WHERE Code_Fr="' +
+        "SELECT Secteurfroid,Secteurneutre,Secteurchaud,Fond_vallee,SF_Ardenne,FV_Ardenne FROM Risque_topoFEE WHERE Code_Fr='" +
             mCode.toString() +
-            '";';
+            "';";
     List<Map<String, dynamic>> rTopo = await dico.db.rawQuery(myquery);
     for (int zbio = 1; zbio <= 10; zbio++) {
       Map<int, int> rTopoOneZbio = {};
@@ -241,6 +275,29 @@ class Ess {
             }
           }
           mAptCS[zbio] = aptCSOneZbio;
+        }
+      } catch (e) {}
+      // risque climatique CS - attention ça n'as rien à voir avec le risque de la situation topographique (FEE)
+      myquery = "SELECT stat_id," +
+          mCode.toString() +
+          ",var FROM AptCSClim WHERE ZBIO=" +
+          zbio.toString() +
+          ";";
+      try {
+        List<Map<String, dynamic>> risqueCS = await dico.db.rawQuery(myquery);
+        if (risqueCS.length > 0) {
+          Map<Tuple2<int, String>, int> risqueCSOneZbio = {};
+          for (var r in risqueCS) {
+            if (r[mCode.toString()] != null) {
+              int risque = r[mCode.toString()]; //int.parse(mCode);
+              String variante = "";
+              r['var'] != null ? variante = r['var'] : variante = "";
+              int station = r['stat_id'];
+              risqueCSOneZbio
+                  .addEntries({Tuple2(station, variante): risque}.entries);
+            }
+          }
+          mRisqueCS[zbio] = risqueCSOneZbio;
         }
       } catch (e) {}
     }

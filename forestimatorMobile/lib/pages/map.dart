@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:fforestimator/dico/dicoApt.dart';
 import 'package:fforestimator/tileProvider/tifTileProvider.dart';
-import 'package:flutter_logs/flutter_logs.dart';
+//import 'package:flutter_logs/flutter_logs.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:proj4dart/proj4dart.dart' as proj4;
@@ -105,9 +105,9 @@ class _MapPageState extends State<mapPage> {
           }
         } catch (e) {
           // handshake et/ou socketExeption
-          print('There was an error: ');
-          FlutterLogs.logError("anaPt", "online",
-              "error while waiting for forestimatorWeb answer. ${e}");
+          //print('There was an error: ');
+          /*FlutterLogs.logError("anaPt", "online",
+              "error while waiting for forestimatorWeb answer. ${e}");*/
         }
         gl.requestedLayers.removeWhere((element) => element.mFoundLayer == 0);
       } else {
@@ -245,7 +245,8 @@ class _MapPageState extends State<mapPage> {
                 crs: epsg31370CRS,
                 initialZoom: 8.0,
                 maxZoom: 10,
-                minZoom: 0,
+                minZoom:
+                    2, // pour les cartes offline, il faudrait informer l'utilisateur du fait que si le zoom est trop peu élevé, la carte ne s'affiche pas
                 initialCenter: gl.latlonCenter,
                 cameraConstraint: CameraConstraint.contain(
                     bounds: LatLngBounds.fromPoints([latlonBL, latlonTR])),
@@ -301,7 +302,8 @@ class _MapPageState extends State<mapPage> {
                           ? TileLayer(
                               tileProvider: _provider,
                               // minNativeZoom: 8,
-                              minZoom: 5,
+                              minZoom:
+                                  7, // si minZoom de la map est moins restrictif (moins élevé) que celui-ci, la carte ne s'affiche juste pas (écran blanc)
                             )
                           : Container();
                     } else if (selLayer.offline) {
@@ -425,8 +427,7 @@ class _MapPageState extends State<mapPage> {
         gl.position = gl.position;
       });
       _refreshLocation = false;
-      FlutterLogs.logError("gps", "position",
-          "error while waiting on position. ${e.toString()}");
+      //FlutterLogs.logError("gps", "position", "error while waiting on position. ${e.toString()}");
     }
   }
 }

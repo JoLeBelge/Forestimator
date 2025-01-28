@@ -1,13 +1,9 @@
 To do list forestimator
 ------------------------
 
--1) GSA : détermination de la vulnérabilité des essences
--retirer logs
+-click sur essence recommandée par GSA : doit ouvrir la fiche-essence
 -si pas assez de RAM, ne pas autoriser l'affichage offline
--limiter les niveaux de zoom quand on affiche une carte offline ->limiter le temps de latence. facile à implémenter et efficace
--affichage de la cnsw 16 bits tiff?
-
-
+-affichage de la cnsw 16 bits tiff? et même choisir une autre résolution pour l'affichage que pour l'analyse? pk pas pour certaine des layers (zbio -> basser résolution, CNSW -> trop de polygone, ect)
 
 -> publish for iOS. en cours
 

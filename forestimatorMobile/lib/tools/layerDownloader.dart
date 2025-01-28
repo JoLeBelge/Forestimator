@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:fforestimator/globals.dart' as gl;
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:path/path.dart';
-import 'package:flutter_logs/flutter_logs.dart';
+//import 'package:flutter_logs/flutter_logs.dart';
 
 class LayerDownloader extends StatefulWidget {
   final LayerTile layer;

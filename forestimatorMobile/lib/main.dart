@@ -19,7 +19,7 @@ import 'package:fforestimator/scaffoldNavigation.dart';
 import 'dart:convert';
 import 'package:path/path.dart' as path;
 import 'package:flutter_downloader/flutter_downloader.dart';
-import 'package:flutter_logs/flutter_logs.dart';
+//import 'package:flutter_logs/flutter_logs.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'dart:isolate';
@@ -41,7 +41,7 @@ void main() async {
         );
 
     //Initialize Logging
-    await FlutterLogs.initLogs(
+    /*await FlutterLogs.initLogs(
         logLevelsEnabled: [
           LogLevel.INFO,
           LogLevel.WARNING,
@@ -55,7 +55,7 @@ void main() async {
         logsWriteDirectoryName: "MyLogs",
         logsExportDirectoryName: "MyLogs/Exported",
         debugFileOperations: true,
-        isDebuggable: true);
+        isDebuggable: true);*/
   }
   gl.dico = dicoAptProvider();
   await gl.dico.init();
@@ -90,14 +90,10 @@ class _MyApp extends State<MyApp> {
       print('error $e');
     }
 
-    // If the widget was removed from the tree while the asynchronous platform
-    // message was in flight, we want to discard the reply rather than calling
-    // setState to update our non-existent appearance.
-
     if (memory != null)
       setState(() {
         _memory = memory;
-        print('memory freeMem:' + memory!.freeMem.toString());
+        //print('memory freeMem:' + memory!.freeMem.toString());
       });
   }
 
@@ -277,6 +273,26 @@ class _MyApp extends State<MyApp> {
                                       "/FEE-" +
                                       item.mCode +
                                       ".pdf"),
+                                ),
+                    );
+                  }).toList(),
+                  ...gl.dico.getAllStationFiches().map<GoRoute>((String item) {
+                    //print("create go route " + item);
+                    return GoRoute(
+                      path: item + "/:currentPage",
+                      builder: (context, state) =>
+                          (Platform.isAndroid || Platform.isIOS)
+                              ? PDFScreen(
+                                  path: _pathExternalStorage + "/" + item,
+                                  titre: item,
+                                  currentPage: int.parse(
+                                      state.pathParameters['currentPage']!),
+                                )
+                              : Scaffold(
+                                  appBar: AppBar(
+                                    title: Text("pdf"),
+                                  ),
+                                  body: Text(_pathExternalStorage + item),
                                 ),
                     );
                   }).toList(),
