@@ -4,6 +4,7 @@ void staticMapResource::handleRequest(const Http::Request &request,Http::Respons
         if (globTest) {std::cout << "staticMapResource:: handle request" << std::endl;}
         auto params = request.urlParams();
         std::string lCode(""),aPolyg(""),aEnv("");
+        int aSz=500;
 
         for (const auto &param : params) {
             const auto &name = param.first;
@@ -11,6 +12,7 @@ void staticMapResource::handleRequest(const Http::Request &request,Http::Respons
             if (name=="layerCode") {lCode=value;}
             if (name=="pol") {aPolyg=value;}
             if (name=="env") {aEnv=value;}
+            if (name=="sz") {aSz=std::stoi(value);}
         }
         GDALAllRegister();
 
@@ -25,7 +27,8 @@ void staticMapResource::handleRequest(const Http::Request &request,Http::Respons
              } else {
                  env=NULL;
              }
-         staticMap sm(l,pol,env);
+             std::cout << "static map avec sz de " << aSz << std::endl;
+         staticMap sm(l,pol,env,aSz);
          std::ifstream r(sm.getFileName(), std::ios::in | std::ios::binary);
          response.addHeader("Content-Type","image/png");
          response.out() << r.rdbuf();

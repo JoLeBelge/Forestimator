@@ -153,7 +153,7 @@ std::unique_ptr<Wt::WContainerWidget> layerStatChart::getBarStat(){
 }
 
 
-staticMap::staticMap(std::shared_ptr<layerBase> aLay, OGRGeometry *poGeom, OGREnvelope *env):mLay(aLay),mSx(500),mSy(500),ext(env){
+staticMap::staticMap(std::shared_ptr<layerBase> aLay, OGRGeometry *poGeom, OGREnvelope *env, int aSz):mLay(aLay),mSx(aSz),mSy(aSz),ext(env){
     //std::cout << "staticMap::staticMap" << std::endl;
     std::string name0 = std::tmpnam(nullptr);
     std::string name1 = name0.substr(5,name0.size()-5);

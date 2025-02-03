@@ -1579,9 +1579,9 @@ bool layerBase::wms2jpg(OGREnvelope  * extent, int aSx, int aSy, std::string aOu
                                      );
 
     //"<Cache><Type>file</Type><Expires>%d</Expires></Cache>"
-    /*if (globTest){
+    if (globTest){
         std::cout <<mUrl << std::endl;
-        std::cout << connStr << std::endl;}*/
+        std::cout << connStr << std::endl;}
     GDALDataset *pDS = static_cast<GDALDataset*>(GDALOpenEx(connStr, GDAL_OF_RASTER, nullptr, nullptr, nullptr));
     if( pDS != NULL ){
 

@@ -88,7 +88,6 @@ std::string cDicoApt::geoservice(std::string aTool, std::string aArgs, std::stri
                     aResponse+=surf.getSummaryAPI();
 
                 } else if (hasLayerBase(aTool)) {
-                    //if (globTest) {std::cout << " API sur layerBase " << std::endl;}
 
                     std::shared_ptr<layerBase> l=getLayerBase(aTool);
                     // analyse surfacique ; basic stat pour les var continue
@@ -109,11 +108,14 @@ std::string cDicoApt::geoservice(std::string aTool, std::string aArgs, std::stri
                         break;
                     }
                     case TypeVar::Classe:{
-                        /*std::cout << " api compute valeur majoritaire " << std::endl;
-                std::pair<int,double> p= l->valMajoritaire(pol);
-                aResponse+="maj;"+std::to_string(p.first)+"\n";
-                aResponse+="pct;"+roundDouble(p.second,0)+"\n";
-                */
+
+                        // option pour avoir uniquement la classe majoritaire
+                        if (aArgs=="maj"){
+                      std::pair<int,double> p= l->valMajoritaire(pol);
+                      //aResponse+="maj;pct\n";
+                      aResponse+=std::to_string(p.first)+";"+roundDouble(p.second,0);//+"\n";
+                        } else {
+
                         std::map<int,double> stat=l->computeStat2(pol);
                         std::string aL1,aL2;
                         bool test(1);// detecte la première ligne
@@ -139,6 +141,8 @@ std::string cDicoApt::geoservice(std::string aTool, std::string aArgs, std::stri
                         }
 
                         if (!xml){aResponse+=aL2+"\n"+aL1+"\n";}
+
+                        }
 
                         break;
                     }
