@@ -44,6 +44,10 @@ dev_dependencies:
     sdk: flutter
 
   flutter_lints: ^4.0.0
+# Here i try to solve an issue that occurs while compiling for iOS
+dependency_overrides:
+  win32: ^5.5.4
+# end
 
 # The following section is specific to Flutter packages.
 flutter:
