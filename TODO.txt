@@ -1,3 +1,5 @@
+-ajout tableau aptitude pour GS FFC pour création des cartes de recommandation
+
 TO DO forestimator WEB
 ----------------------
 
