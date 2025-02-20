@@ -27,7 +27,7 @@ void staticMapResource::handleRequest(const Http::Request &request,Http::Respons
              } else {
                  env=NULL;
              }
-             std::cout << "static map avec sz de " << aSz << std::endl;
+
          staticMap sm(l,pol,env,aSz);
          std::ifstream r(sm.getFileName(), std::ios::in | std::ios::binary);
          response.addHeader("Content-Type","image/png");

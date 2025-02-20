@@ -419,12 +419,8 @@ cWebAptitude::cWebAptitude(const Wt::WEnvironment& env, cDicoApt *dico)
     root()->addStyleClass("layout_main");
     loaded_=true;
 
+    /*
     std::string coName="invitationCF";
-
-    //std::string co =*env.getCookie(coName);
-   // std::cout << "cookies values " << co << std::endl;
-
-    //this->removeCookie(coName);
     if (!env.getCookie(coName)){
     Wt::WMessageBox * messageBox = this->addChild(std::make_unique<Wt::WMessageBox>(
                                                       "9ieme Carrefour forestier",
@@ -442,7 +438,7 @@ cWebAptitude::cWebAptitude(const Wt::WEnvironment& env, cDicoApt *dico)
         this->setCookie(coCF);
     });
     messageBox->show();
-    }
+    }*/
 }
 
 void cWebAptitude::loadStyles(){
