@@ -92,7 +92,7 @@ int main(int argc, char *argv[])
                 aACA.carteAptFEE(dico.getEss(essCode),kv.second->getPathTif(),true);
             }
 
-            if (carteCS &&(kv.second->getCatLayer()==TypeLayer::CS) && essCode =="EP" ){// && essCode =="EP"  | essCode =="CS"){
+            if (carteCS &&(kv.second->getCatLayer()==TypeLayer::CS) && essCode =="CS" ){// && essCode =="EP"  | essCode =="CS"){
                 std::shared_ptr<cEss> ess = dico.getEss(essCode);
                 aACA.carteAptCS(ess,kv.second->getPathTif(),true);
             }   
