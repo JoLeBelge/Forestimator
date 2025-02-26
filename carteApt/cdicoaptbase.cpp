@@ -31,7 +31,7 @@ cdicoAptBase::cdicoAptBase(std::string aBDFile):mBDpath(aBDFile),ptDb_(NULL)
 
         sqlite3_finalize(stmt);
 
-        SQLstring="SELECT ZBIO,stat_id,Station_carto,var,nom_var,varMajoritaire FROM dico_station WHERE stat_id=stat_num;";
+        SQLstring="SELECT ZBIO,stat_id,Station_carto,var,nom_var,varMajoritaire, stat_num FROM dico_station;"; //WHERE stat_id=
         sqlite3_prepare_v2( *db_, SQLstring.c_str(), -1, &stmt, NULL );
         while(sqlite3_step(stmt) == SQLITE_ROW)
         {
@@ -51,13 +51,15 @@ cdicoAptBase::cdicoAptBase(std::string aBDFile):mBDpath(aBDFile),ptDb_(NULL)
                 if (sqlite3_column_type(stmt, 5)!=SQLITE_NULL){
                 varMaj=sqlite3_column_int( stmt, 5 ) ;
                 }
+                int aG=sqlite3_column_int( stmt, 6 );
                 Dico_station[aA].emplace(std::make_pair(std::make_tuple(aB,aD),aC));
                 Dico_station_varName[aA].emplace(std::make_pair(std::make_tuple(aB,aD),aF));
                 if (varMaj==1){
                    Dico_station_varMaj[aA].emplace(std::make_pair(aB,aD));
                 }
+                Dico_station_statNum[aA].emplace(std::make_pair(aG,aB));
 
-                //std::cout << " station " << aB << ", variante " << aD << std::endl;
+                //std::cout << "zbio " << aA << " station " << aB << ", variante " << aD << std::endl;
             }
         }
         sqlite3_finalize(stmt);
@@ -643,7 +645,7 @@ int cEss::getApt(int aCodeNT, int aCodeNH, int aZbio, bool hierachique,int aTopo
 int cEss::getApt(int aZbio, int US, std::string aVar, bool withClim){
     int aRes(0);
     // on prend par défaut la station majoritaire
-    std::string var=mDico->getStationMaj(aZbio,US);
+    std::string var=mDico->getStationMaj(aZbio,US);   
     std::tuple<int,std::string> aUSkey=std::make_tuple(US,var);
 
     if (mAptCS.find(aZbio)!=mAptCS.end()){
@@ -657,6 +659,7 @@ int cEss::getApt(int aZbio, int US, std::string aVar, bool withClim){
             aRes=Apt->at(std::make_tuple(US,aVar));
         }
     }
+
 
     if (aRes>9){aRes=0;}
 
@@ -681,7 +684,10 @@ int cEss::getApt(int aZbio, int US, std::string aVar, bool withClim){
         aRes=(aRes-1)*4+aClim;}
         // maintenant on regroupe certaine classes ensemble
         std::map<int,int> lut = {{0,0},{1, 1}, {2, 1}, {3, 3}, {4, 5},{5, 2},{6, 2},{7, 3},{8, 6},{9, 2},{10, 4},{11, 4},{12, 4},{13, 7}};
+        if (lut.find(aRes)==lut.end()){std::cout << "attention, aptitude avec sensibilité bioclim de " << aRes << std::endl;
+        aRes=7;} else{
         aRes=lut.at(aRes);
+        }
     }
     return aRes;
 }

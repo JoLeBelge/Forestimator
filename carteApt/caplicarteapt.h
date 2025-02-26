@@ -59,9 +59,7 @@ private:
     GDALRasterBand * TopoBand;
  // CS
     GDALDataset  * poDatCS1;// Ardenne
-    GDALDataset  * poDatCS3;// Loraine
     GDALRasterBand * CS1Band;
-    GDALRasterBand * CS3Band;
 };
 
 #endif // CAPLICARTEAPT_H

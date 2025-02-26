@@ -352,6 +352,16 @@ public:
          }
     return aRes;
     }
+    int getStationIDFromStatNum(int zbio,int US){
+    int aRes=0;
+    int zbioKey=ZBIO2CSid(zbio);
+         if (Dico_station_statNum.find(zbioKey)!=Dico_station_statNum.end()){
+             if (Dico_station_statNum.at(zbioKey).find(US)!=Dico_station_statNum.at(zbioKey).end()){
+                 aRes=Dico_station_statNum.at(zbioKey).at(US);
+             }
+         }
+    return aRes;
+    }
     bool isStationMaj(int zbio,int US, std::string var){
     bool aRes(0);
         int zbioKey=ZBIO2CSid(zbio);
@@ -447,6 +457,8 @@ protected:
     std::map<int,std::map<std::tuple<int, std::string>,std::string>>  Dico_station_varName;
     // bool pour savoir si c'est la variante majoritaire. clé 1 zbio clé 2 US val var code
     std::map<int,std::map<int,std::string>>  Dico_station_varMaj;
+    // clé 1 : zbio, clé 2: id station+variance,value ; raster_val
+    std::map<int,std::map<int,int>>  Dico_station_statNum;
 
     // key ; code le la couche layer. value ; les infos nécessaire pour charger le wms
     std::map<std::string,WMSinfo>  Dico_WMS;

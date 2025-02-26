@@ -1,6 +1,6 @@
 #include "caplicarteapt.h"
 
-cApliCarteApt::cApliCarteApt(cDicoApt *aDico):dico(aDico),poDatNH(NULL),poDatZBIO(NULL),poDatTopo(NULL),poDatNT(NULL),poDatCS1(NULL),poDatCS3(NULL)
+cApliCarteApt::cApliCarteApt(cDicoApt *aDico):dico(aDico),poDatNH(NULL),poDatZBIO(NULL),poDatTopo(NULL),poDatNT(NULL),poDatCS1(NULL)
 {
     std::cout << "constructeur de cApliCarteApt " << std::endl;
     // carte d'aptitude pour FEE
@@ -53,20 +53,15 @@ cApliCarteApt::cApliCarteApt(cDicoApt *aDico):dico(aDico),poDatNH(NULL),poDatZBI
     {
         std::cout << "je n'ai pas lu le fichier " << dico->Files()->at("CS_A") << std::endl;
     }
-    poDatCS3 = (GDALDataset *) GDALOpen(dico->Files()->at("CS3").c_str(), GA_ReadOnly );
-    if( poDatCS3 == NULL )
-    {
-        std::cout << "je n'ai pas lu le fichier " << dico->Files()->at("CS3") << std::endl;
-    }
+
     CS1Band = poDatCS1->GetRasterBand( 1 );
-    CS3Band = poDatCS3->GetRasterBand( 1 );
+
 }
 
 cApliCarteApt::~cApliCarteApt()
 {
     std::cout << "destructeur de c appli Carte Apt " << std::endl;
     if( poDatCS1 != NULL ){GDALClose( poDatCS1 );}
-    if( poDatCS3 != NULL ){GDALClose( poDatCS3 );}
     if( poDatTopo != NULL ){GDALClose( poDatTopo );}
     if( poDatNH != NULL ){GDALClose( poDatNH);}
     if( poDatNT != NULL ){GDALClose(poDatNT);}
@@ -194,13 +189,12 @@ void cApliCarteApt::carteAptCS(std::shared_ptr<cEss> aEss, std::string aOut, boo
         poDstDS->SetMetadataItem("Essence Forestière",aEss->Nom().c_str());
         poDstDS->SetMetadataItem("carte de recommandation pour une essence","Guide des Stations");
         poDstDS->SetMetadataItem("Version",d.c_str());
-        poDstDS->SetMetadataItem("Crédit","Lisein Jonathan, Toessens Simon et Claessens Hugues - Gembloux Agro-Bio Tech");
+        poDstDS->SetMetadataItem("Crédit","Lisein Jonathan, Toessens Simon, Cubelier Pauline et Claessens Hugues - Gembloux Agro-Bio Tech");
         GDALRasterBand *outBand;
         outBand = poDstDS->GetRasterBand(1);
         outBand->SetNoDataValue(0);
 
         float *scanlineCS1 = (float *) CPLMalloc( sizeof( float ) * x );
-        float *scanlineCS3 = (float *) CPLMalloc( sizeof( float ) * x );
         float *scanlineZBIO = (float *) CPLMalloc( sizeof( float ) * x );
         float *scanline = (float *) CPLMalloc( sizeof( float ) * x );
 
@@ -209,7 +203,7 @@ void cApliCarteApt::carteAptCS(std::shared_ptr<cEss> aEss, std::string aOut, boo
         for ( int row = 0; row < y; row++ )
         {
             CS1Band->RasterIO( GF_Read, 0, row, x, 1, scanlineCS1, x,1, GDT_Float32, 0, 0 );
-            CS3Band->RasterIO( GF_Read, 0, row, x, 1, scanlineCS3, x,1, GDT_Float32, 0, 0 );
+
             ZBIOBand->RasterIO( GF_Read, 0, row, x, 1, scanlineZBIO, x,1, GDT_Float32, 0, 0 );
             // iterate on pixels in row
 #pragma omp parallel num_threads(6)
@@ -220,11 +214,12 @@ void cApliCarteApt::carteAptCS(std::shared_ptr<cEss> aEss, std::string aOut, boo
                 int apt(0), st(0);
                 int zbio = scanlineZBIO[ col ];
 
-                if (zbio==1 | zbio==2 |zbio==10 ){
+                if (zbio==1 | zbio==2 |zbio==10 | zbio== 4 ){
                     st = scanlineCS1[ col ];
-                    //if (zbio==3 | zbio==5) st = scanlineCS3[ col ];
-                    apt = aEss->getApt(zbio,st);
-                    //if(zbio==2 & st==10){std::cout << " apt pour " << aEss->Nom() << " zbio 2 et station 10 est " << apt << std::endl;}
+                    int US=dico->getStationIDFromStatNum(zbio,st);
+                    //if (zbio== 4) { std::cout << "stat num pour " << st << " est " << US << std::endl;}
+                    apt = aEss->getApt(zbio,US);
+
                     // version "aptitude CS sans le risque climatique, pour illu dans lettre OWSF
                     //apt = aEss->getApt(zbio,st,"",0);
                 }
@@ -286,7 +281,6 @@ void cApliCarteApt::carteDeriveCS(){
     OGRSpatialReference  * spatialReference=new OGRSpatialReference;
     spatialReference->importFromEPSG(31370);
     float *scanlineCS1 = (float *) CPLMalloc( sizeof( float ) * x );
-    float *scanlineCS3 = (float *) CPLMalloc( sizeof( float ) * x );
     float *scanlineZBIO = (float *) CPLMalloc( sizeof( float ) * x );
     float *scanline = (float *) CPLMalloc( sizeof( float ) * x );
     int step= y/10;
@@ -307,7 +301,6 @@ void cApliCarteApt::carteDeriveCS(){
     for ( int row = 0; row < y; row++ )
     {
         CS1Band->RasterIO( GF_Read, 0, row, x, 1, scanlineCS1, x,1, GDT_Float32, 0, 0 );
-        CS3Band->RasterIO( GF_Read, 0, row, x, 1, scanlineCS3, x,1, GDT_Float32, 0, 0 );
         ZBIOBand->RasterIO( GF_Read, 0, row, x, 1, scanlineZBIO, x,1, GDT_Float32, 0, 0 );
         // iterate on pixels in row
 #pragma omp parallel num_threads(6)
@@ -345,7 +338,6 @@ void cApliCarteApt::carteDeriveCS(){
     for ( int row = 0; row < y; row++ )
     {
         CS1Band->RasterIO( GF_Read, 0, row, x, 1, scanlineCS1, x,1, GDT_Float32, 0, 0 );
-        CS3Band->RasterIO( GF_Read, 0, row, x, 1, scanlineCS3, x,1, GDT_Float32, 0, 0 );
         ZBIOBand->RasterIO( GF_Read, 0, row, x, 1, scanlineZBIO, x,1, GDT_Float32, 0, 0 );
         // iterate on pixels in row
 #pragma omp parallel num_threads(6)
@@ -382,7 +374,7 @@ void cApliCarteApt::carteDeriveCS(){
     for ( int row = 0; row < y; row++ )
     {
         CS1Band->RasterIO( GF_Read, 0, row, x, 1, scanlineCS1, x,1, GDT_Float32, 0, 0 );
-        CS3Band->RasterIO( GF_Read, 0, row, x, 1, scanlineCS3, x,1, GDT_Float32, 0, 0 );
+
         ZBIOBand->RasterIO( GF_Read, 0, row, x, 1, scanlineZBIO, x,1, GDT_Float32, 0, 0 );
         // iterate on pixels in row
 #pragma omp parallel num_threads(6)
@@ -419,7 +411,6 @@ void cApliCarteApt::carteDeriveCS(){
     for ( int row = 0; row < y; row++ )
     {
         CS1Band->RasterIO( GF_Read, 0, row, x, 1, scanlineCS1, x,1, GDT_Float32, 0, 0 );
-        CS3Band->RasterIO( GF_Read, 0, row, x, 1, scanlineCS3, x,1, GDT_Float32, 0, 0 );
         ZBIOBand->RasterIO( GF_Read, 0, row, x, 1, scanlineZBIO, x,1, GDT_Float32, 0, 0 );
         // iterate on pixels in row
 #pragma omp parallel num_threads(6)
@@ -456,7 +447,7 @@ void cApliCarteApt::carteDeriveCS(){
     for ( int row = 0; row < y; row++ )
     {
         CS1Band->RasterIO( GF_Read, 0, row, x, 1, scanlineCS1, x,1, GDT_Float32, 0, 0 );
-        CS3Band->RasterIO( GF_Read, 0, row, x, 1, scanlineCS3, x,1, GDT_Float32, 0, 0 );
+
         ZBIOBand->RasterIO( GF_Read, 0, row, x, 1, scanlineZBIO, x,1, GDT_Float32, 0, 0 );
         // iterate on pixels in row
 #pragma omp parallel num_threads(6)
@@ -494,7 +485,7 @@ void cApliCarteApt::carteDeriveCS(){
     for ( int row = 0; row < y; row++ )
     {
         CS1Band->RasterIO( GF_Read, 0, row, x, 1, scanlineCS1, x,1, GDT_Float32, 0, 0 );
-        CS3Band->RasterIO( GF_Read, 0, row, x, 1, scanlineCS3, x,1, GDT_Float32, 0, 0 );
+
         ZBIOBand->RasterIO( GF_Read, 0, row, x, 1, scanlineZBIO, x,1, GDT_Float32, 0, 0 );
         // iterate on pixels in row
 #pragma omp parallel num_threads(6)
@@ -629,7 +620,6 @@ void cApliCarteApt::codeMapServer(std::string inputData, std::string layerName, 
 }
 
 
-
 std::string MSClass(std::string label, std::string expression, color col){
 
     std::string aRes=
@@ -642,110 +632,3 @@ std::string MSClass(std::string label, std::string expression, color col){
             std::string("   END\n");
     return aRes;
 }
-
-
-
-/*
-void cApliCarteApt::tiletoPNG(std::string aDir,TypeCarte aType){
-
-    std::vector<std::string> aVFiles;
-    // en deux étape car si j'ajoute des fichiers durant la boucle recursive dir it, il peut planter (bug)
-    for(auto & p : boost::filesystem::recursive_directory_iterator(aDir)){
-        std::string ext= p.path().extension().string();
-        if (ext==".tif"){
-            //std::string fname=p.path().filename().string();
-            // std::cout << fname << std::endl;
-            //this->toPNG(p.path().string(),p.path().string()+".png");
-            aVFiles.push_back(p.path().string());
-        }
-    }
-    for (auto & imFile : aVFiles){
-        this->toPNG(imFile,imFile+".png",aType);
-    }
-}
-
-void cApliCarteApt::createTile(std::string input, std::string outDir, TypeCarte aType, bool force){
-
-    if (exists(input)){
-        std::cout << "création des tuiles pour  " << input << std::endl;
-        int count(0);
-        // préhalable; check si les png existent déjà, car si oui, pas nécessaire de refaire tourner le tuilage
-        if(exists(outDir)){
-            for(auto & p : boost::filesystem::recursive_directory_iterator(outDir)){
-                std::string ext= p.path().extension().string();
-                if (ext==".png"){
-                    count++;
-                }
-            }
-        }
-        // si plus de 50 png, je juge que le job est déjà fait.
-        if (count<50 | force){
-            // 0 clean et create le directory output
-            if(exists(outDir))
-            {
-                boost::filesystem::remove_all(outDir);
-            }
-            boost::filesystem::create_directory(outDir);
-
-            // 1 gdal_retile
-            std::string aCommand= std::string("gdal_retile.py -ot Byte -ps 512 512 -overlap 0 -levels 5 ")
-                    + "-targetDir "+outDir+" "
-                    + ""+input+ "";
-            std::cout << aCommand << "\n";
-            system(aCommand.c_str());
-            // 2 conversion to png
-            this->tiletoPNG(outDir,aType);
-            // 3 effacer les tif
-            std::vector<std::string> aVFiles;
-            // en deux étape car si j'ajoute des fichiers durant la boucle recursive dir it, il peut planter (bug)
-            for(auto & p : boost::filesystem::recursive_directory_iterator(outDir)){
-                std::string ext= p.path().extension().string();
-                if (ext==".tif"){
-                    aVFiles.push_back(p.path().string());
-                }
-            }
-            for (auto & imFile : aVFiles){
-                boost::filesystem::remove(imFile);
-            }
-            std::cout << " done " << std::endl;
-        } else {
-            std::cout << "Il semblerai que les tuiles existent déjà, utiliser argument force pour refaire le tuilage. " << std::endl;
-        }
-
-    }else {
-        std::cout << input << " n'existe pas. pas de tuilage. " << std::endl;
-    }
-}
-*/
-/*
-void cApliCarteApt::cropImWithPol(std::string inputRaster, std::string inputVector, std::string aOut){
-    std::cout << " cropImWithPol" << std::endl;
-    if (exists(inputRaster) && exists(inputVector)){
-        // lecture du shp
-        GDALDriver *shpDriver;
-        const char *pszFormat = "ESRI Shapefile";
-        GDALDataset *shp;
-        // datasource
-        shpDriver =GetGDALDriverManager()->GetDriverByName(pszFormat);
-        if( shpDriver == NULL )
-        {
-            printf( "%s driver not available.\n", pszFormat );
-            exit( 1 );
-        }
-        //std::cout << " driver ok" << std::endl;
-        shp = (GDALDataset*) GDALOpenEx( inputVector.c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL );
-        // layer
-        OGRLayer * lay = shp->GetLayer(0);
-        //std::cout << lay->GetName() << std::endl;
-        OGREnvelope ext;
-        OGRFeature * fet =lay->GetFeature(0);
-        fet->GetGeometryRef()->getEnvelope(&ext);
-
-        double width((ext.MaxX-ext.MinX)), height((ext.MaxY-ext.MinY));
-        // std::cout << " x " << width<< " y " << height << std::endl;
-        cropIm(inputRaster, aOut, ext.MinX,ext.MaxY, width, height);
-
-    } else {
-        std::cout << " attention, un des fichiers input n'existe pas : " << inputRaster << " ou " << inputVector << std::endl;
-    }
-}*/

@@ -11,12 +11,13 @@ matAptCS::matAptCS(cDicoApt *aDicoApt):mDicoApt(aDicoApt),zbio_(1),US_(1),mVar_(
 
     zbioSelection_  =addWidget(std::make_unique<Wt::WComboBox>());
     for (const auto &kv : *mDicoApt->ZBIO()){
-        if((kv.first == 1) | (kv.first == 2)  | (kv.first == 10)){//| (kv.first == 3)  | (kv.first == 5)
+        if((kv.first == 1) | (kv.first == 2)  | (kv.first == 10) | (kv.first == 4)){//| (kv.first == 3)  | (kv.first == 5)
             zbioSelection_->addItem(kv.second);
         }
     }
     zbioSelection_->changed().connect(std::bind(&matAptCS::changeZbio,this));
     zbioSelection_->setCurrentIndex(0);
+    prefixZbio_="A";
 
     addNew<Wt::WBreak>();
     addNew<Wt::WBreak>();
@@ -110,7 +111,7 @@ void matAptCS::updateListeUS(){
         us->setTextFormat(Wt::TextFormat::XHTML);
         std::shared_ptr<color> col=CSlay->getColor(std::get<0>(kv.first));
 
-        us->setText(tr("matAptCS.nobadge").arg(std::to_string(std::get<0>(kv.first))).arg(col->getRGB()).arg(stationName));
+        us->setText(tr("matAptCS.nobadge").arg(prefixZbio_).arg(std::to_string(std::get<0>(kv.first))).arg(stationName).arg(col->getRGB()));
         us->addStyleClass("us-button");
 
         //if (std::get<1>(kv.first)==""){
@@ -143,10 +144,12 @@ void matAptCS::showFicheUS(int US, std::string aVar){
 
     Wt::WContainerWidget * cont = tpl->bindWidget("teaser", std::make_unique<Wt::WContainerWidget>());
 
+    // consultation du pdf - si il existe.
 
-    // consultation du pdf
+    if (boost::filesystem::exists(mDicoApt->File("docroot")+"/pdf/US-"+prefixZbio_+std::to_string(US_)+".pdf")){
     WAnchor * a = cont->addNew<WAnchor>(WLink("pdf/US-A"+std::to_string(US_)+".pdf"));
     a->setImage(std::make_unique<Wt::WImage>(WLink("img/CS/US-A"+std::to_string(US_)+".jpeg"),"illustration de l'unité stationnelle"));
+    }
 
     // 7 classe d'apt, moins 1 qui est l'exclusion
     std::vector<int> apts = {1,2,3,4,5,6};
@@ -264,6 +267,9 @@ void matAptCS::changeZbio(){
     for (auto & kv : *mDicoApt->ZBIO()){
         if (kv.second==zbioSelection_->currentText()){zbio_=kv.first;}
     }
+    if (zbio_==1 | zbio_==2 | zbio_==10){prefixZbio_="A";}
+    if (zbio_==4){prefixZbio_="F";}
+
     graphZbio->selectZbio(zbio_);
     contFicheUS->clear();
     updateListeUS();
