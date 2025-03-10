@@ -91,8 +91,8 @@ int main(int argc, char *argv[])
             if (carteFEE &&(kv.second->getCatLayer()==TypeLayer::FEE)){
                 aACA.carteAptFEE(dico.getEss(essCode),kv.second->getPathTif(),true);
             }
-
-            if (carteCS &&(kv.second->getCatLayer()==TypeLayer::CS)){// && essCode =="CS" ){// && essCode =="EP"  | essCode =="CS"){
+//|essCode =="JR" |essCode =="JH" |essCode =="NO" |essCode =="PN"|essCode =="PK"|essCode =="PC"|essCode =="PS" |essCode =="CR"  |
+            if (carteCS &&(kv.second->getCatLayer()==TypeLayer::CS) && (essCode =="AB"  | essCode =="CB" | essCode =="CO" |essCode =="PN")){
                 std::shared_ptr<cEss> ess = dico.getEss(essCode);
                 aACA.carteAptCS(ess,kv.second->getPathTif(),true);
             }   
