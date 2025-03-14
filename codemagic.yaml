@@ -66,7 +66,7 @@ workflows:
         distribution_type: app_store
         bundle_identifier: be.uliege.mobile.ios.forestimator
       vars:
-        APP_STORE_APPLE_ID: 1555555551
+        APP_STORE_APPLE_ID: 6741913469
       flutter: stable
     scripts:
       - name: Set up code signing settings on Xcode project
@@ -98,8 +98,7 @@ workflows:
     publishing:
       email:
         recipients:
-          - user_1@example.com
-          - user_2@example.com
+         - tthissen@uliege.be
         notify:
           success: true
           failure: false
