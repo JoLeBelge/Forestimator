@@ -2,17 +2,8 @@ workflows:
   ios-workflow:
     name: iOS Workflow
     max_build_duration: 120
-    environment:
-      ios_signing:
-        distribution_type: app_store
-        bundle_identifier: be.uliege.mobile.ios.forestimator
-      vars:
-        APP_STORE_APPLE_ID: 6741913469
       flutter: stable
     scripts:
-      - name: Set up code signing settings on Xcode project
-        script: | 
-          xcode-project use-profiles
       - name: Get Flutter packages
         script: | 
           flutter pub get
@@ -36,12 +27,5 @@ workflows:
       - build/ios/ipa/*.ipa
       - /tmp/xcodebuild_logs/*.log
       - flutter_drive.log
-    publishing:
-        email:
-        recipients:
-         - tthissen@uliege.be
-        notify:
-          success: true
-          failure: false
 
 
