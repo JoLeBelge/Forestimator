@@ -36,7 +36,7 @@ android {
     ndkVersion flutter.ndkVersion
 
  	signingConfigs {
-        /*release {
+        release {
             if (System.getenv()["CI"]) { // CI=true is exported by Codemagic
                 storeFile file(System.getenv()["CM_KEYSTORE_PATH"])
                 storePassword System.getenv()["CM_KEYSTORE_PASSWORD"]
@@ -48,7 +48,7 @@ android {
                 storeFile keystoreProperties['storeFile'] ? file(keystoreProperties['storeFile']) : null
                 storePassword keystoreProperties['storePassword']
             }
-        }*/
+        }
     }
 
     compileOptions {

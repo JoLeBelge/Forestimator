@@ -1,11 +1,11 @@
 #!/bin/sh
 # This is a generated file; do not edit or check into version control.
-export "FLUTTER_ROOT=/home/jo/snap/flutter/common/flutter"
-export "FLUTTER_APPLICATION_PATH=/home/jo/app/Forestimator/forestimatorMobile"
+export "FLUTTER_ROOT=/home/tt/Work/flutter"
+export "FLUTTER_APPLICATION_PATH=/home/tt/Work/ProjectsRazer/Forestimator/Forestimator/Forestimator/forestimatorMobile"
 export "COCOAPODS_PARALLEL_CODE_SIGN=true"
 export "FLUTTER_BUILD_DIR=build"
 export "FLUTTER_BUILD_NAME=1.0.0"
-export "FLUTTER_BUILD_NUMBER=7"
+export "FLUTTER_BUILD_NUMBER=8"
 export "DART_OBFUSCATION=false"
 export "TRACK_WIDGET_CREATION=true"
 export "TREE_SHAKE_ICONS=false"
