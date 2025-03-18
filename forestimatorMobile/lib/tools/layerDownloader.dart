@@ -11,9 +11,9 @@ import 'package:path/path.dart';
 class LayerDownloader extends StatefulWidget {
   final LayerTile layer;
   const LayerDownloader(this.layer, {super.key});
-/*
+
   @override
-  State<LayerDownloader> createState() => _LayerDownloaderState(); IOS Bug*/
+  State<LayerDownloader> createState() => _LayerDownloaderState();
 }
 
 class _LayerDownloaderState extends State<LayerDownloader> {
