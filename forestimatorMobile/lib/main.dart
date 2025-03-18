@@ -18,7 +18,7 @@ import 'package:flutter/services.dart';
 import 'package:fforestimator/scaffoldNavigation.dart';
 import 'dart:convert';
 import 'package:path/path.dart' as path;
-import 'package:flutter_downloader/flutter_downloader.dart';
+// import 'package:flutter_downloader/flutter_downloader.dart';
 //import 'package:flutter_logs/flutter_logs.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -29,6 +29,7 @@ import 'package:memory_info/memory_info.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  /* ---DOWNLOADER IOS BUG---
   if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
     sqfliteFfiInit();
     databaseFactory = databaseFactoryFfi;
@@ -39,7 +40,7 @@ void main() async {
         ignoreSsl: gl
             .debug // option: set to false to disable working with http links (default: false)
         );
-
+ 
     //Initialize Logging
     /*await FlutterLogs.initLogs(
         logLevelsEnabled: [
@@ -56,7 +57,7 @@ void main() async {
         logsExportDirectoryName: "MyLogs/Exported",
         debugFileOperations: true,
         isDebuggable: true);*/
-  }
+  }*/
   gl.dico = dicoAptProvider();
   await gl.dico.init();
 
@@ -192,7 +193,8 @@ class _MyApp extends State<MyApp> {
     getMemoryInfo();
 
     _bindBackgroundIsolate();
-    FlutterDownloader.registerCallback(downloadCallback);
+
+    // ---DOWNLOADER IOS BUG--- FlutterDownloader.registerCallback(downloadCallback);
   }
 
   late final _router = GoRouter(
@@ -341,6 +343,7 @@ class _MyApp extends State<MyApp> {
           final SharedPreferences prefs = await SharedPreferences.getInstance();
           await prefs.setBool('firstTimeUse', gl.firstTimeUse);
           for (var key in gl.downloadableLayerKeys) {
+            /* ---DOWNLOADER IOS BUG---
             if (!(Platform.isWindows || Platform.isLinux || Platform.isMacOS)) {
               FlutterDownloader.enqueue(
                 url: gl.queryApiRastDownload +
@@ -352,7 +355,7 @@ class _MyApp extends State<MyApp> {
                 openFileFromNotification: false,
                 timeout: 15000,
               );
-            }
+            } ---DOWNLOADER IOS BUG---*/
           }
         },
         decline: "non",
@@ -391,6 +394,7 @@ class _MyApp extends State<MyApp> {
 //    _port.listen((dynamic data) {
       String id = data[0];
       //print("inside bindBackgroundIsolate!!");
+      /* IOS BUG Downloader
       DownloadTaskStatus status = DownloadTaskStatus.fromInt(data[1]);
       if (status == DownloadTaskStatus.complete) {
         final context = _rootNavigatorKey.currentContext;
@@ -439,6 +443,7 @@ class _MyApp extends State<MyApp> {
           );
         }
       }
+      */
     }
   }
 

@@ -179,7 +179,7 @@ class _CategoryView extends State<CategoryView> {
       children: <Widget>[
         if (lt.downloadable)
           ColoredBox(
-              color: gl.colorBackgroundSecondary, child: LayerDownloader(lt)),
+              color: gl.colorBackgroundSecondary, child: Container()),/*LayerDownloader(lt)), IOS*/
         if (gl.dico.getLayerBase(lt.key).mUsedForAnalysis)
           ColoredBox(
               color: gl.colorBackgroundSecondary,
