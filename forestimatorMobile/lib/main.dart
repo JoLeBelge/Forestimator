@@ -27,7 +27,7 @@ import 'dart:ui';
 import 'package:memory_info/memory_info.dart';
 
 void main() async {
-  // IOS WidgetsFlutterBinding.ensureInitialized();
+  WidgetsFlutterBinding.ensureInitialized();
 
   /* ---DOWNLOADER IOS BUG---
   if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
