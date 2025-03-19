@@ -318,7 +318,7 @@ class dicoAptProvider {
   Map<int, String> dico_code2NTNH = {};
   late Directory docDir;
 
-  Future<void> init() async {
+  Future<String> init() async {
     //final dbPath = await getDatabasesPath(); plante sous android
 
     
@@ -410,7 +410,8 @@ class dicoAptProvider {
 
     checkLayerBaseOfflineRessource();
     checkLayerBaseForAnalysis();
-  
+    
+    return "1" + path + exists.toString();
   }
 
   Ess getEss(String aCode) {

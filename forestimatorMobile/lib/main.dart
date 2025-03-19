@@ -59,9 +59,17 @@ void main() async {
         isDebuggable: true);*/
   }*/
   gl.dico = dicoAptProvider();
-  await gl.dico.init();
+  String it = "0";
+  try {
+    it = await gl.dico.init();
+} on Exception catch (e) {
+  runApp(HelloWorldApp(e.toString()));
+} catch (e) {
+  runApp(HelloWorldApp(e.toString()));
+}
+  runApp(HelloWorldApp(it));
 
-  runApp(const MyApp());
+  //runApp(const MyApp());
 }
 
 class HelloWorldApp extends StatelessWidget {
