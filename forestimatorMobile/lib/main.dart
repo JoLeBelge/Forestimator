@@ -61,7 +61,6 @@ void main() async {
   gl.dico = dicoAptProvider();
   await gl.dico.init();
 
-  runApp(const MyApp());
   try {
     await gl.dico.init();
 } on Exception catch (e) {
