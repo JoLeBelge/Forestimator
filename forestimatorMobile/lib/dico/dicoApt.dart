@@ -348,7 +348,7 @@ class dicoAptProvider {
     for (var r in result) {
       colors[r['Col']] = Color.fromRGBO(r['R'], r['G'], r['B'], 1.0);
     }
-    /*
+    
     result = await db.query('dico_colGrey');
   
     for (var r in result) {
@@ -412,7 +412,7 @@ class dicoAptProvider {
 
     checkLayerBaseOfflineRessource();
     checkLayerBaseForAnalysis();
-    */
+    
     return "1" + path + exists.toString();
   }
 
