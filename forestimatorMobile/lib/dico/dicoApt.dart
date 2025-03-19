@@ -324,10 +324,9 @@ class dicoAptProvider {
     
     docDir = await getApplicationDocumentsDirectory();
     final path = join(await getDatabasesPath(), "db/fforestimator.db");
-    //var exists = await databaseExists(path);
-    /*
-    //if (!exists) {
-    if (true) {
+    var exists = await databaseExists(path);
+    
+    if (!exists){
       // pour  maj à chaque fois des assets car sinon quand je fait une maj de l'app sur google play store et que la BD a changé, c'est l'ancienne bd qui est utilisée vu qu'elle existe déjà
 
       try {
@@ -342,7 +341,7 @@ class dicoAptProvider {
           data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
       await File(path).writeAsBytes(bytes, flush: true);
     }
-    */
+    
     db = await openDatabase(path, version: 1, readOnly: true  );
     /*
     List<Map<String, dynamic>> result = await db.query('dico_color');
