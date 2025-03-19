@@ -67,9 +67,9 @@ void main() async {
 } catch (e) {
   runApp(HelloWorldApp(e.toString()));
 }
-  runApp(HelloWorldApp(it));
+ // runApp(HelloWorldApp(it));
 
-  //runApp(const MyApp());
+  runApp(const MyApp());
 }
 
 class HelloWorldApp extends StatelessWidget {
