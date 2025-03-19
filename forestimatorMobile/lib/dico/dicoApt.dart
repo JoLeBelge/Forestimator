@@ -343,7 +343,7 @@ class dicoAptProvider {
       return "0";
     }
     
-    //db = await openDatabase(path, version: 1, readOnly: true  );
+    db = await openDatabase(path, readOnly: true  );
     /*
     List<Map<String, dynamic>> result = await db.query('dico_color');
     for (var r in result) {
