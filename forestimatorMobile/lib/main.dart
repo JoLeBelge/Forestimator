@@ -62,7 +62,35 @@ void main() async {
   await gl.dico.init();
 
   runApp(const MyApp());
+  try {
+    await gl.dico.init();
+} on Exception catch (e) {
+  runApp(HelloWorldApp(e.toString()));
+} catch (e) {
+  runApp(HelloWorldApp(e.toString()));
 }
+  runApp(const MyApp());
+}
+
+class HelloWorldApp extends StatelessWidget {
+  String it;
+  HelloWorldApp(this.it, {super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: Scaffold(
+        appBar: AppBar(
+          title: const Text('ERROR'),
+        ),
+        body : Center(
+            child: Text(it),
+          ),
+        )
+      );
+  }
+}
+
 
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
