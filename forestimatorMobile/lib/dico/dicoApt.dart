@@ -320,6 +320,8 @@ class dicoAptProvider {
 
   Future<void> init() async {
     //final dbPath = await getDatabasesPath(); plante sous android
+
+    /*
     docDir = await getApplicationDocumentsDirectory();
     final path = join(docDir.path, "fforestimator.db");
     var exists = await databaseExists(path);
@@ -410,6 +412,7 @@ class dicoAptProvider {
 
     checkLayerBaseOfflineRessource();
     checkLayerBaseForAnalysis();
+    */
   }
 
   Ess getEss(String aCode) {
