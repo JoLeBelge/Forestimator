@@ -323,7 +323,7 @@ class dicoAptProvider {
 
     
     docDir = await getApplicationDocumentsDirectory();
-    final path = join(await getDatabasesPath(), "db/fforestimator.db");
+    final path = join(docDir.path, "db/fforestimator.db");
     var exists = await databaseExists(path);
     
     if (!exists){
