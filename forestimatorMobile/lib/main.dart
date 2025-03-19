@@ -59,15 +59,7 @@ void main() async {
         isDebuggable: true);*/
   }*/
   gl.dico = dicoAptProvider();
-  String it = "0";
-  try {
-    it = await gl.dico.init();
-} on Exception catch (e) {
-  runApp(HelloWorldApp(e.toString()));
-} catch (e) {
-  runApp(HelloWorldApp(e.toString()));
-}
- // runApp(HelloWorldApp(it));
+  await gl.dico.init();
 
   runApp(const MyApp());
 }
