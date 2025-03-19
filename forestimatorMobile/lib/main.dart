@@ -64,25 +64,6 @@ void main() async {
   runApp(const MyApp());
 }
 
-class HelloWorldApp extends StatelessWidget {
-  const HelloWorldApp({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Hello ios App'),
-        ),
-        body : const Center(
-            child: Text('Hello, IOS!!!'),
-          ),
-        )
-      );
-  }
-}
-
-
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
   @override

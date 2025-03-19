@@ -321,11 +321,11 @@ class dicoAptProvider {
   Future<void> init() async {
     //final dbPath = await getDatabasesPath(); plante sous android
 
-    /*
+    
     docDir = await getApplicationDocumentsDirectory();
     final path = join(docDir.path, "fforestimator.db");
     var exists = await databaseExists(path);
-
+    /*
     //if (!exists) {
     if (true) {
       // pour  maj à chaque fois des assets car sinon quand je fait une maj de l'app sur google play store et que la BD a changé, c'est l'ancienne bd qui est utilisée vu qu'elle existe déjà
