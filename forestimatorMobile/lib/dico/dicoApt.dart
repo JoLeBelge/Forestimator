@@ -324,7 +324,7 @@ class dicoAptProvider {
     
     docDir = await getApplicationDocumentsDirectory();
     final path = join(docDir.path, "fforestimator.db");
-    var exists = await databaseExists(path);
+    //var exists = await databaseExists(path);
     /*
     //if (!exists) {
     if (true) {
@@ -342,10 +342,11 @@ class dicoAptProvider {
           data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
       await File(path).writeAsBytes(bytes, flush: true);
     }
-*/
+    */
     db = await openDatabase(path, version: 1, readOnly: true
         //onCreate: _onCreate,
         );
+    /*
     List<Map<String, dynamic>> result = await db.query('dico_color');
     for (var r in result) {
       colors[r['Col']] = Color.fromRGBO(r['R'], r['G'], r['B'], 1.0);
@@ -412,7 +413,7 @@ class dicoAptProvider {
 
     checkLayerBaseOfflineRessource();
     checkLayerBaseForAnalysis();
-  
+    */
   }
 
   Ess getEss(String aCode) {
