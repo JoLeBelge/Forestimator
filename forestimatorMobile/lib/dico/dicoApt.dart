@@ -363,6 +363,7 @@ class dicoAptProvider {
     for (var row in result) {
       mLayerBases[row['Code']] = layerBase.fromMap(row);
     }
+    /*
     result = await db.query('layerApt');
     for (var row in result) {
       mLayerBases[row['Code']] = layerBase.fromMap(row);
@@ -412,8 +413,8 @@ class dicoAptProvider {
 
     checkLayerBaseOfflineRessource();
     checkLayerBaseForAnalysis();
-    
-    return "1" + path + exists.toString();
+    */
+    return "1" + path + exists.toString() +result.first.toString();
   }
 
   Ess getEss(String aCode) {
