@@ -27,7 +27,7 @@ import 'dart:ui';
 import 'package:memory_info/memory_info.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  // IOS WidgetsFlutterBinding.ensureInitialized();
 
   /* ---DOWNLOADER IOS BUG---
   if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
@@ -58,8 +58,8 @@ void main() async {
         debugFileOperations: true,
         isDebuggable: true);*/
   }*/
-  gl.dico = dicoAptProvider();
-  await gl.dico.init();
+  // IOS gl.dico = dicoAptProvider();
+  // IOS await gl.dico.init();
 
   runApp(const HelloWorldApp());
 }
@@ -72,10 +72,10 @@ class HelloWorldApp extends StatelessWidget {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('Hello World App'),
+          title: const Text('Hello ios App'),
         ),
         body : const Center(
-            child: Text('Hello, World!!!'),
+            child: Text('Hello, IOS!!!'),
           ),
         )
       );
