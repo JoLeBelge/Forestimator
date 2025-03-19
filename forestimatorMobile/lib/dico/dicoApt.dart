@@ -350,16 +350,18 @@ class dicoAptProvider {
     for (var r in result) {
       colors[r['Col']] = Color.fromRGBO(r['R'], r['G'], r['B'], 1.0);
     }
-    /*
+    
     result = await db.query('dico_colGrey');
   
     for (var r in result) {
       colors[r['Col']] = Color.fromRGBO(r['R'], r['G'], r['B'], 1.0);
     }
+    
     result = await db.query('dico_viridisColors');
     for (var r in result) {
       colors[r['id'].toString()] = HexColor(r['hex']);
     }
+    /*
     // lecture des layerbase
     result = await db.query('fichiersGIS', where: 'groupe IS NOT NULL');
     for (var row in result) {
