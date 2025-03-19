@@ -61,8 +61,27 @@ void main() async {
   gl.dico = dicoAptProvider();
   await gl.dico.init();
 
-  runApp(const MyApp());
+  runApp(const HelloWorldApp());
 }
+
+class HelloWorldApp extends StatelessWidget {
+  const HelloWorldApp({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: Scaffold(
+        appBar: AppBar(
+          title: const Text('Hello World App'),
+        ),
+        body : const Center(
+            child: Text('Hello, World!!!'),
+          ),
+        )
+      );
+  }
+}
+
 
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
