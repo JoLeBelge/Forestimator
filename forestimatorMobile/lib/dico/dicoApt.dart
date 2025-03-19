@@ -409,11 +409,10 @@ class dicoAptProvider {
     }
 
     db.close();
-    finishedLoading = true;
-
     checkLayerBaseOfflineRessource();
     checkLayerBaseForAnalysis();
     */
+    finishedLoading = true;
     return "1" + path + exists.toString() ;//+result.first.toString();
   }
 

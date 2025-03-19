@@ -67,6 +67,9 @@ void main() async {
 } catch (e) {
   runApp(HelloWorldApp(e.toString()));
 }
+  while (!gl.dico.finishedLoading){
+    sleep(const Duration(seconds:1));
+  }
   runApp(HelloWorldApp(it));
 
   //runApp(const MyApp());
