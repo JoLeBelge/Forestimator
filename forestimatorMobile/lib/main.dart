@@ -73,8 +73,8 @@ void main() async {
 }
 
 class HelloWorldApp extends StatelessWidget {
-  String it;
-  HelloWorldApp(this.it, {super.key});
+  final String it;
+  const HelloWorldApp(this.it, {super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -323,7 +323,7 @@ class dicoAptProvider {
 
     
     docDir = await getApplicationDocumentsDirectory();
-    final path = join(await getDatabasesPath(), "fforestimator.db");
+    final path = join(await getDatabasesPath(), "db/fforestimator.db");
     //var exists = await databaseExists(path);
     /*
     //if (!exists) {
@@ -343,9 +343,7 @@ class dicoAptProvider {
       await File(path).writeAsBytes(bytes, flush: true);
     }
     */
-    db = await openDatabase(path, version: 1, readOnly: true,
-        //onCreate: _onCreate,
-        );
+    //db = await openDatabase(path, version: 1, readOnly: true  );
     /*
     List<Map<String, dynamic>> result = await db.query('dico_color');
     for (var r in result) {
