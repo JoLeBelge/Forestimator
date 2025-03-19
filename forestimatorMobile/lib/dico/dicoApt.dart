@@ -318,14 +318,15 @@ class dicoAptProvider {
   Map<int, String> dico_code2NTNH = {};
   late Directory docDir;
 
-  Future<void> init() async {
+  Future<String> init() async {
     //final dbPath = await getDatabasesPath(); plante sous android
-    docDir = await getApplicationDocumentsDirectory();
-    final path = join(docDir.path, "fforestimator.db");
-    var exists = await databaseExists(path);
 
-    //if (!exists) {
-    if (true) {
+    
+    docDir = await getApplicationDocumentsDirectory();
+    final path = join(docDir.path, "db/fforestimator.db");
+    var exists = await databaseExists(path);
+    
+    if (!exists){
       // pour  maj à chaque fois des assets car sinon quand je fait une maj de l'app sur google play store et que la BD a changé, c'est l'ancienne bd qui est utilisée vu qu'elle existe déjà
 
       try {
@@ -340,27 +341,33 @@ class dicoAptProvider {
           data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
       await File(path).writeAsBytes(bytes, flush: true);
     }
+    
+    db = await openDatabase(path);
 
-    db = await openDatabase(path, version: 1, readOnly: true
-        //onCreate: _onCreate,
-        );
+
     List<Map<String, dynamic>> result = await db.query('dico_color');
+    
     for (var r in result) {
       colors[r['Col']] = Color.fromRGBO(r['R'], r['G'], r['B'], 1.0);
     }
+    
     result = await db.query('dico_colGrey');
+  
     for (var r in result) {
       colors[r['Col']] = Color.fromRGBO(r['R'], r['G'], r['B'], 1.0);
     }
+    
     result = await db.query('dico_viridisColors');
     for (var r in result) {
       colors[r['id'].toString()] = HexColor(r['hex']);
     }
+  
     // lecture des layerbase
     result = await db.query('fichiersGIS', where: 'groupe IS NOT NULL');
     for (var row in result) {
       mLayerBases[row['Code']] = layerBase.fromMap(row);
     }
+    
     result = await db.query('layerApt');
     for (var row in result) {
       mLayerBases[row['Code']] = layerBase.fromMap(row);
@@ -407,9 +414,10 @@ class dicoAptProvider {
 
     db.close();
     finishedLoading = true;
-
     checkLayerBaseOfflineRessource();
     checkLayerBaseForAnalysis();
+    
+    return "1" + path + exists.toString()+result.first.toString()+colors.length.toString();
   }
 
   Ess getEss(String aCode) {

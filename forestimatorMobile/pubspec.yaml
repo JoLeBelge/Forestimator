@@ -2,7 +2,7 @@ name: fforestimator
 description: Une application cartographique pour les forestiers wallons qui permet d'obtenir de nombreux renseignements sur les stations forestières et sur les peuplements en place.
 
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
-version: 1.0.0+8
+version: 1.0.0+11
 
 environment:
   sdk: '>=3.0.6 <4.0.0'
@@ -17,7 +17,7 @@ dependencies:
   path_provider: ^2.1.2
   http: ^1.0.0
   tuple: ^2.0.2
-  flutter_downloader: ^1.11.7
+  #flutter_downloader: ^1.11.7
   geolocator: ^12.0.0 
   geolocator_linux: ^0.2.0+1 # la version geolocator_linux de geolocator 10.1 est la 0.1.3 buggée
   connectivity_plus: ^6.0.1 # te dis si tu es connecté au wifi ou à la data, mais pas si tu as accès à internet. pas suffisant donc
