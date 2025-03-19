@@ -323,7 +323,7 @@ class dicoAptProvider {
 
     
     docDir = await getApplicationDocumentsDirectory();
-    final path = join(docDir.path, "fforestimator.db");
+    final path = join(await getDatabasesPath(), "fforestimator.db");
     //var exists = await databaseExists(path);
     /*
     //if (!exists) {
@@ -343,7 +343,7 @@ class dicoAptProvider {
       await File(path).writeAsBytes(bytes, flush: true);
     }
     */
-    db = await openDatabase(path, version: 1, readOnly: true
+    db = await openDatabase(path, version: 1, readOnly: true,
         //onCreate: _onCreate,
         );
     /*
