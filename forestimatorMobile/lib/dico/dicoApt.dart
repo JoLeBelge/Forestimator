@@ -325,9 +325,9 @@ class dicoAptProvider {
     docDir = await getApplicationDocumentsDirectory();
     final path = join(docDir.path, "fforestimator.db");
     var exists = await databaseExists(path);
-    
-    if (!exists) {
-
+    /*
+    //if (!exists) {
+    if (true) {
       // pour  maj à chaque fois des assets car sinon quand je fait une maj de l'app sur google play store et que la BD a changé, c'est l'ancienne bd qui est utilisée vu qu'elle existe déjà
 
       try {
@@ -342,7 +342,7 @@ class dicoAptProvider {
           data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
       await File(path).writeAsBytes(bytes, flush: true);
     }
-
+*/
     db = await openDatabase(path, version: 1, readOnly: true
         //onCreate: _onCreate,
         );
@@ -412,7 +412,7 @@ class dicoAptProvider {
 
     checkLayerBaseOfflineRessource();
     checkLayerBaseForAnalysis();
-
+  
   }
 
   Ess getEss(String aCode) {
