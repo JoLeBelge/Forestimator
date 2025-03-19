@@ -419,7 +419,7 @@ La photointerprétation a été réalisée sur 4221 points sur l'ensemble de la 
  
  <h2>Forestimator</h2>
  
- Forestimator se décline en une version web et en une version mobile (application android pour smartphone). L'application smartphone fonctionne main dans la main avec la version web, en effectuant des requêtes quand le mode online est activé. Par exemple, une analyse ponctuelle effectuée sur l'application forestimator va envoyer une requête à la version web de forestimator, qui renverra la description de la station et des peuplements en place à l'application.
+ Forestimator se décline en une version web et en une version mobile (application iOS et android pour smartphone). L'application smartphone fonctionne main dans la main avec la version web, en effectuant des requêtes quand le mode online est activé. Par exemple, une analyse ponctuelle effectuée sur l'application forestimator va envoyer une requête à la version web de forestimator, qui renverra la description de la station et des peuplements en place à l'application.
  
  <h2>Données utilisateur de l'application mobile Forestimator</h2>
  Aucune donnée relative aux utilisateurs n'est collectée par l'application mobile.

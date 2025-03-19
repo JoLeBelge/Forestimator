@@ -223,7 +223,7 @@ Widget _tabAptFEE(BuildContext context, aptsFEE apts) {
         children: <Widget>[
           Container(
             child: TabBar(tabs: [
-              Tab(text: "Optitum"),
+              Tab(text: "Optimum"),
               Tab(text: "Tolérance"),
               Tab(text: "Tolérance élargie"),
             ]),
