@@ -414,7 +414,7 @@ class dicoAptProvider {
     checkLayerBaseOfflineRessource();
     checkLayerBaseForAnalysis();
     */
-    return "1" + path + exists.toString() +result.first.toString();
+    return "1" + path + exists.toString() ;//+result.first.toString();
   }
 
   Ess getEss(String aCode) {
