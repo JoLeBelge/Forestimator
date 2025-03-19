@@ -361,7 +361,7 @@ class dicoAptProvider {
     for (var r in result) {
       colors[r['id'].toString()] = HexColor(r['hex']);
     }
-    /*
+  
     // lecture des layerbase
     result = await db.query('fichiersGIS', where: 'groupe IS NOT NULL');
     for (var row in result) {
@@ -416,8 +416,8 @@ class dicoAptProvider {
     finishedLoading = true;
     checkLayerBaseOfflineRessource();
     checkLayerBaseForAnalysis();
-    */
-    finishedLoading = true;
+    
+    //finishedLoading = true;
     return "1" + path + exists.toString()+result.first.toString()+colors.length.toString();
   }
 
