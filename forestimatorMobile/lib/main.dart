@@ -61,7 +61,7 @@ void main() async {
   gl.dico = dicoAptProvider();
   await gl.dico.init();
 
-  runApp(const HelloWorldApp());
+  runApp(const MyApp());
 }
 
 class HelloWorldApp extends StatelessWidget {
