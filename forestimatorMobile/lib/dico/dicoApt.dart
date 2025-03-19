@@ -343,7 +343,7 @@ class dicoAptProvider {
     }
     
     db = await openDatabase(path, readOnly: true);
-    /*
+    
     List<Map<String, dynamic>> result = await db.query('dico_color');
     for (var r in result) {
       colors[r['Col']] = Color.fromRGBO(r['R'], r['G'], r['B'], 1.0);
@@ -411,7 +411,7 @@ class dicoAptProvider {
     db.close();
     checkLayerBaseOfflineRessource();
     checkLayerBaseForAnalysis();
-    */
+    
     finishedLoading = true;
     return "1" + path + exists.toString() ;//+result.first.toString();
   }
