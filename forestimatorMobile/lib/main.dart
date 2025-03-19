@@ -58,7 +58,7 @@ void main() async {
         debugFileOperations: true,
         isDebuggable: true);*/
   }*/
-  // IOS gl.dico = dicoAptProvider();
+  gl.dico = dicoAptProvider();
   // IOS await gl.dico.init();
 
   runApp(const HelloWorldApp());
