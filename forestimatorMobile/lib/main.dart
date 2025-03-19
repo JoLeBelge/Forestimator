@@ -70,9 +70,9 @@ void main() async {
   while (!gl.dico.finishedLoading){
     sleep(const Duration(seconds:1));
   }
-  runApp(HelloWorldApp(it));
+  //runApp(HelloWorldApp(it));
 
-  //runApp(const MyApp());
+  runApp(const MyApp());
 }
 
 class HelloWorldApp extends StatelessWidget {

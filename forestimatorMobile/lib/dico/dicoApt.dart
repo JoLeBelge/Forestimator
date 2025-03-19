@@ -417,7 +417,6 @@ class dicoAptProvider {
     checkLayerBaseOfflineRessource();
     checkLayerBaseForAnalysis();
     
-    //finishedLoading = true;
     return "1" + path + exists.toString()+result.first.toString()+colors.length.toString();
   }
 
