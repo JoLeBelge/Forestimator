@@ -1,12 +1,5 @@
--ajout tableau aptitude pour GS FFC pour création des cartes de recommandation
-une modif
-
 TO DO forestimator WEB
 ----------------------
-
-modif de jo
-
--restructurer documentation en sous-section ; une section FEE avec NH NT Aptitude Ecogramme Zbio SS AE
 
 -integrer symbologie dans les métadonnées des raster (comme pour forestimator mobile)
 

@@ -1,0 +1,45 @@
+Compilation et publication de l'app pour iOS
+
+Thierry s'est chargé du portage de l'app vers apple, avec la plateforme codemagic pour la compilation et le mac pour 
+
+1) edition du code, test de l'app en mode développeur, publication de l'app en mode release vers l'app store avec l'appli transporter
+
+Codemagic
+---------
+
+en ligne, définition de 2 workflow :
+-un débug, avec un certifical de developper, pour test sur le mac
+-un release, avec certifical de publication (et le build en mode release)
+
+Attention, ces workflow sont définit avec l'interface graphique de Codemagic (pas le fichier yalm) et sont lié au compte github de Thierry. Donc je dois les refaire si je veux publier...
+
+Les workflow utilisent les ficher de .provision (profile) qui incluent le certificat p12 + le app id
+
+Apple Developper (pas meme chose que app store connect)
+----------------
+
+je peux générer des certificats ET des "Profile" (provision).
+Une partie des certificats , la partie public, est téléchargée. Les deux certificats sont sur le mac de A. Buche. Je peux les retrouver avec l'app KeyChain. Mais de toute manière ces certificats ont une durée limitée et doivent être renouvellé chaque année.
+
+Transporter
+-----------
+
+permet d'envoyer le fichier ipa issu de la compilation directement dans le app store. Facile à utiliser sur mac.
+
+XCode
+-----
+
+N'a pas été paramètré correctement sur le mac de A Buche, mais idéalement, c'est ça qui remplace Codemagic premièrement, et surtout, une compilation en debug permet de cibler la ligne de commande fautive du code. Le débug que Thierry a effectué est "à l'aveugle", cad à l'ancienne. 
+
+Adaptation du code flutter pour iOS
+-----------------------------------
+
+1) retiré flutter_downloader
+2) retiré des arguments optionnels (type read-only) de la lecture de la BD sqlite
+3) remettre la condition if(!exist) qui contient le code qui copie la bd sqlite des assets vers le dossier concacré à l'appli 
+
+Ce qui bug sur l'app iOS
+------------------------
+
+-pas de lien avec le GPS
+-pas de mode offline (vu que flutter_downloader est retiré)
