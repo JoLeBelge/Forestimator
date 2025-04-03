@@ -185,6 +185,156 @@ LAYER
           COLOR 205 191 188
        END
    END
+   
+   CLASS 
+      NAME "Affleurements rocheux"
+      EXPRESSION "101"
+      STYLE 
+          COLOR '#7c7c7c'
+       END
+   END
+   CLASS 
+      NAME "Ravin hygrosciaphile"
+      EXPRESSION "102"
+      STYLE 
+          COLOR '#e728f1'
+       END
+   END
+   
+   CLASS 
+      NAME "Sol profond peu caillouteux"
+      EXPRESSION "103"
+      STYLE 
+          COLOR '#8b5f01'
+       END
+   END
+    CLASS 
+      NAME "Vallon frais"
+      EXPRESSION "104"
+      STYLE 
+          COLOR '#b3e3ef'
+       END
+   END
+   CLASS 
+      NAME "Marais et source"
+      EXPRESSION "105"
+      STYLE 
+          COLOR '#000204'
+       END
+   END
+   CLASS 
+      NAME "Terrasse alluviale humide"
+      EXPRESSION "106"
+      STYLE 
+          COLOR '#0d3ad4'
+       END
+   END
+    CLASS 
+      NAME "Terrasse alluviale humide"
+      EXPRESSION "107"
+      STYLE 
+          COLOR '#4bbefd'
+       END
+   END
+      CLASS 
+      NAME "Station xéro-thermique (schisto-)calcaire"
+      EXPRESSION "108"
+      STYLE 
+          COLOR '#fdff77'
+       END
+   END
+   CLASS 
+      NAME "Versant frais (schisto-)calcaire"
+      EXPRESSION "109"
+      STYLE 
+          COLOR '#72cc8a'
+       END
+   END
+   CLASS 
+      NAME "Versant frais (schisto-)calcaire profond"
+      EXPRESSION "110"
+      STYLE 
+          COLOR '#436940'
+       END
+   END
+      CLASS 
+      NAME "Versant chaud (schisto-)calcaire"
+      EXPRESSION "111"
+      STYLE 
+          COLOR '#fdd300'
+       END
+   END
+      CLASS 
+      NAME ""
+      EXPRESSION "112"
+      STYLE 
+          COLOR '#c4c9c7'
+       END
+   END
+      CLASS 
+      NAME ""
+      EXPRESSION "113"
+      STYLE 
+          COLOR '#a0c260'
+       END
+   END
+         CLASS 
+      NAME ""
+      EXPRESSION "114"
+      STYLE 
+          COLOR '#ff8c00'
+       END
+   END
+         CLASS 
+      NAME ""
+      EXPRESSION "115"
+      STYLE 
+          COLOR '#c3944e'
+       END
+   END
+   CLASS 
+      NAME ""
+      EXPRESSION "116"
+      STYLE 
+          COLOR '#fb7a9a'
+       END
+   END
+   CLASS 
+      NAME ""
+      EXPRESSION "117"
+      STYLE 
+          COLOR '#cb0505'
+       END
+   END
+   CLASS 
+      NAME ""
+      EXPRESSION "118"
+      STYLE 
+          COLOR '#8dec82'
+       END
+   END
+   CLASS 
+      NAME ""
+      EXPRESSION "119"
+      STYLE 
+          COLOR '#fdb9f0'
+       END
+   END
+   CLASS 
+      NAME ""
+      EXPRESSION "120"
+      STYLE 
+          COLOR '#c699f4'
+       END
+   END
+   CLASS 
+      NAME ""
+      EXPRESSION "121"
+      STYLE 
+          COLOR '#815acc'
+       END
+   END
+  
    CLASS 
       NAME "Non définis"
       EXPRESSION "0"
