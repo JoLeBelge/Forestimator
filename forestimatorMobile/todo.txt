@@ -1,13 +1,13 @@
 To do list forestimator
 ------------------------
 
--click sur essence recommandée par GSA : doit ouvrir la fiche-essence
+-click sur essence recommandée par GSA : doit ouvrir la fiche-essence (le fait pour ES FEE mais pas pour ES GSA)
 -si pas assez de RAM, ne pas autoriser l'affichage offline
 -affichage de la cnsw 16 bits tiff? et même choisir une autre résolution pour l'affichage que pour l'analyse? pk pas pour certaine des layers (zbio -> basser résolution, CNSW -> trop de polygone, ect)
 
 bug analyse ponctuelle offline quand une des cartes offline est corrompue; je ne sais pas reproduire l'erreur..
 
-Alignement des label "enregistré" qui est érratique pour l'instant
+Alignement des label "enregistré" qui est érratique pour l'instant. Tester différente "densité" pour l'émulateur et vérifier que ça va bien à chaque fois
 
 retours testeurs:
 -----------------
