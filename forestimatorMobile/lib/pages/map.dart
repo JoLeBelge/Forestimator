@@ -45,10 +45,10 @@ class _MapPageState extends State<mapPage> {
       proj4.Projection.add('EPSG:31370',
           '+proj=lcc +lat_1=51.16666723333333 +lat_2=49.8333339 +lat_0=90 +lon_0=4.367486666666666 +x_0=150000.013 +y_0=5400088.438 +ellps=intl +towgs84=-106.8686,52.2978,-103.7239,0.3366,-0.457,1.8422,-1.2747 +units=m +no_defs +type=crs');
 // map extend in BL72.
-  final epsg31370Bounds = Bounds<double>(
+  /*final epsg31370Bounds = Bounds<double>(
     Point<double>(42250.0, 21170.0), // lower left
     Point<double>(295170.0, 167700.0), // upper right
-  );
+  );*/
 
   double tileSize = 256.0;
 
@@ -67,7 +67,7 @@ class _MapPageState extends State<mapPage> {
   late var epsg31370CRS = Proj4Crs.fromFactory(
       code: 'EPSG:31370',
       proj4Projection: epsg31370,
-      bounds: epsg31370Bounds,
+      bounds: Rect.fromLTRB(42250.0, 295170.0, 21170.0, 167700.0),
       resolutions: getResolutions2(11));
   //resolutions: getResolutions(295170.0, 42250.0, 15, 256.0));
 

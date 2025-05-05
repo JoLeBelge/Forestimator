@@ -18,8 +18,7 @@ dependencies:
   http: ^1.0.0
   tuple: ^2.0.2
   flutter_downloader: ^1.11.7
-  geolocator: ^14.0.0 
-  #geolocator_linux: ^0.2.0+1 # la version geolocator_linux de geolocator 10.1 est la 0.1.3 buggée
+  geolocator: ^14.0.0
   connectivity_plus: ^6.0.1 # te dis si tu es connecté au wifi ou à la data, mais pas si tu as accès à internet. pas suffisant donc
   internet_connection_checker_plus: ^2.3.0
   latlong2: ^0.9.0
