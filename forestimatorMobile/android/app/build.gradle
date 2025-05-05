@@ -32,7 +32,7 @@ def keystoreProperties = new Properties()
 
 android {
     namespace "com.forestimator"
-    compileSdkVersion 34 // pour permisson_handler c'est 33 qui est préconisé, mais pour d'autres package c'est 34 au minimum..
+    compileSdkVersion 35 // pour permisson_handler c'est 33 qui est préconisé, mais pour d'autres package c'est 34 au minimum..
     ndkVersion flutter.ndkVersion
 
  	signingConfigs {

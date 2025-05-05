@@ -59,39 +59,14 @@ void main() async {
         isDebuggable: true);*/
   }*/
   gl.dico = dicoAptProvider();
-  String it = "0";
-  try {
-    it = await gl.dico.init();
-} on Exception catch (e) {
-  runApp(HelloWorldApp(e.toString()));
-} catch (e) {
-  runApp(HelloWorldApp(e.toString()));
-}
+  await gl.dico.init();
+
   while (!gl.dico.finishedLoading){
     sleep(const Duration(seconds:1));
   }
   //runApp(HelloWorldApp(it));
 
   runApp(const MyApp());
-}
-
-class HelloWorldApp extends StatelessWidget {
-  final String it;
-  const HelloWorldApp(this.it, {super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('ERROR'),
-        ),
-        body : Center(
-            child: Text(it),
-          ),
-        )
-      );
-  }
 }
 
 
