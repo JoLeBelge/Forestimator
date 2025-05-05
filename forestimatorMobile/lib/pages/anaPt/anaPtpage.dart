@@ -7,7 +7,7 @@ import 'package:fforestimator/myicons.dart';
 import 'package:go_router/go_router.dart';
 import 'dart:io';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:device_info_plus/device_info_plus.dart';
+//import 'package:device_info_plus/device_info_plus.dart';
 //import 'package:downloadsfolder/downloadsfolder.dart';
 //import 'package:path_provider/path_provider.dart';
 
@@ -43,12 +43,12 @@ class _anaPtpageState extends State<anaPtpage> {
               IconButton(
                   icon: const Icon(Icons.picture_as_pdf, size: 28),
                   onPressed: () async {
-                    var deviceInfo = await DeviceInfoPlugin().androidInfo;
+                    //var deviceInfo = await DeviceInfoPlugin().androidInfo;
                     // Your app has write permission by default in all public directories on external storage. (Android 13+ )-> request retourne denied sans boite de dialogue
-                    bool isPermitted =
-                        (Platform.isAndroid && deviceInfo.version.sdkInt > 32)
-                            ? true
-                            : await Permission.storage.request().isGranted;
+                    bool isPermitted = true;
+                    //(Platform.isAndroid && deviceInfo.version.sdkInt > 32)
+                    //  ? true
+                    //  : await Permission.storage.request().isGranted;
                     if (isPermitted) {
                       //await Permission.manageExternalStorage
                       //   .request()
