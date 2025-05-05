@@ -1,8 +1,58 @@
-To do list forestimator
-------------------------
+To do list forestimator Mobile
+------------------------------
+
+AJOUT DE COUCHES
+
+-ajouter WMS cadastre avec option de transparence (option transparence pour toutes les cartes)
+ 	- pour l'instant le cadastre a un service arcgisRest qui va pas avec flutter. héberger notre propre WMS avec l'autorisation du fédéral?
+ 	
+-ajouter couche Natura 2000 (N2K)
+-ajouter couche plan de secteur
+-ajouter couches dendros de philippe L
+
+SECURITE ET ROBUSTESSE
+
+-système de vérification automatisé sur l'état de fonctionnement de Forestimator Web. Avec envoi de SMS et/ou de email en cas de coupure de Forestimator Web
+-système de vérification de la disponibilité des couches WMSs?
+
+-Compatibilité du code iphone et Android
+
+CONSOLIDATION 
+
+-téléchargement des couches en local : barre de progression. Iphone : à implémenter
+-analyse ponctuelle : quand internet n'est pas disponible, afficher la boite de dialogue "vous n'avez pas accès à internet". Pour l'instant, cela fonctionne mais même quand la data est activée si jamais un autre process utilise toute la bande passante.
+
+-séparation visuelle de la partie "panier" de la partie "catalogue de couche"
+
+-demande d'autorisation pour position GPS -> Android : consolider (préciser si les droits ont été accordé ou non). Iphone : développer.
+
+-ajout d'une barre d'échelle à la carte
+-si pas assez de RAM, ne pas autoriser l'affichage offline sur toute la RW? ou en tout cas éviter que le smartphone bug en essayant d'afficher la carte offline
+
+NOUVELLES OPTIONS
+
+-outils de recherche de lieu: ville/ rue?/ commune? A priori un outil qui ne fonctionne que en mode online
+
+-gestion de projets et téléchargement de couche offline sur l'extend du projet uniquement. Un projet = un extend. puis des couches offlines sur cet extend.
+
+-ajout d'une couche "polygone" propre à l'utilisateur (soit issu de digitalisation, soit une parcelle du cadastre, cf forestimator Web).
+
+COMMUNICATION/ DOCUMENTATION
+
+-manuel d'utilisation. Avec une partie sur l'occtroi des droits pour la géolocalisation.
+-vidéo d'utilisation
+
+AUTRE
+
+voir appli SW MAPS (https://aviyaantech.com/SwMaps/) entre autre pour la manière dont les bouttons sont implémentés sur la carte (bouttons de digitalisation, mesure de distance, ajoute de points, etc). Et la manière de gérer et créer des projets.
+
+
+JO
+--
+
 
 -click sur essence recommandée par GSA : doit ouvrir la fiche-essence (le fait pour ES FEE mais pas pour ES GSA)
--si pas assez de RAM, ne pas autoriser l'affichage offline
+
 -affichage de la cnsw 16 bits tiff? et même choisir une autre résolution pour l'affichage que pour l'analyse? pk pas pour certaine des layers (zbio -> basser résolution, CNSW -> trop de polygone, ect)
 
 bug analyse ponctuelle offline quand une des cartes offline est corrompue; je ne sais pas reproduire l'erreur..
@@ -14,7 +64,7 @@ retours testeurs:
 
 GLigot : position sur carte pas clair (quand c'est position grace à internet et non pas GPS, pas de rond bleu pour afficher la position - non c'est quand on donne les droits lors du premier usage? )
 
-Ger : ajouter cadastre (non car pas de WMS, juste service arcgisRest qui va pas avec flutter) et natura 2000 (N2K)
+
 
 Sam : catalogues ; problème de padding, margin, et le top parfois est tronqué, le header de smartphone interfère avec l'affichage.
 Aussi il y a des "<" pour dérouler même si pas d'info derrière, à enlever ?

@@ -351,7 +351,8 @@ void parcellaire::downloadRaster(){
         m_app->loadingIndicator()->setMessage(tr("LoadingI4"));
         m_app->loadingIndicator()->show();
         // crée l'archive
-        ZipArchive* zf = new ZipArchive(mFullPath+"_ForestimatorRaster.zip");
+        std::string suffix="_ForestimatorRaster.zip";
+        ZipArchive* zf = new ZipArchive(mFullPath+suffix);
         zf->open(ZipArchive::WRITE);
         // crop les raster selectionnés
 
@@ -373,7 +374,7 @@ void parcellaire::downloadRaster(){
         m_app->loadingIndicator()->hide();
         m_app->loadingIndicator()->setMessage(tr("defaultLoadingI"));
 
-        WFileResource * fileResource = new Wt::WFileResource("plain/text",mFullPath+"_raster.zip");
+        WFileResource * fileResource = new Wt::WFileResource("plain/text",mFullPath+suffix);
         fileResource->suggestFileName(mClientName+"_raster.zip");
         m_app->redirect(fileResource->url());
 
