@@ -5,7 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_map/flutter_map.dart';
-import 'package:flutter_sensors/flutter_sensors.dart';
+//import 'package:flutter_sensors/flutter_sensors.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 
@@ -142,19 +142,19 @@ class _AnimatedLocationLayerState extends State<AnimatedLocationLayer>
   MapCamera get _mapCamera => MapCamera.of(context);
 
   StreamSubscription<Position>? _locationStreamSub;
-  StreamSubscription<SensorEvent>? _orientationStreamSub;
+  /*StreamSubscription<SensorEvent>? _orientationStreamSub;*/
 
   late final StreamSubscription<ServiceStatus> _serviceStatusStreamSub;
 
   @override
   void initState() {
     super.initState();
-    _setupSensorStreams();
+    //_setupSensorStreams();
 
     _serviceStatusStreamSub =
         Geolocator.getServiceStatusStream().listen((event) {
       _cleanupSensorStreams();
-      _setupSensorStreams();
+      //_setupSensorStreams();
     });
 
     _controller.addListener(_updateCamera);
@@ -164,7 +164,7 @@ class _AnimatedLocationLayerState extends State<AnimatedLocationLayer>
   void didUpdateWidget(covariant AnimatedLocationLayer oldWidget) {
     super.didUpdateWidget(oldWidget);
     _cleanupSensorStreams();
-    _setupSensorStreams();
+    //_setupSensorStreams();
 
     if (widget.controller != oldWidget.controller) {
       (oldWidget.controller ?? _internalController)
@@ -205,7 +205,7 @@ class _AnimatedLocationLayerState extends State<AnimatedLocationLayer>
       ),
     );
   }
-
+/*
   void _setupSensorStreams() async {
     final locationServiceEnabled = await Geolocator.isLocationServiceEnabled();
     if (locationServiceEnabled) {
@@ -218,8 +218,8 @@ class _AnimatedLocationLayerState extends State<AnimatedLocationLayer>
           distanceFilter: widget.locationDifferenceThreshold,
         )).listen(_handlePositionEvent, onError: (_) {});
       }
-    }
-
+    }*/
+/*
     if (!Platform.isLinux &&
         await SensorManager().isSensorAvailable(Sensors.ROTATION)) {
       final stream = await SensorManager().sensorUpdates(
@@ -229,12 +229,12 @@ class _AnimatedLocationLayerState extends State<AnimatedLocationLayer>
       _orientationStreamSub = stream.listen(_handleAbsoluteOrientationEvent);
     }
   }
-
+*/
   void _cleanupSensorStreams() {
     _locationStreamSub?.cancel();
-    _orientationStreamSub?.cancel();
+    //_orientationStreamSub?.cancel();
     _locationStreamSub = null;
-    _orientationStreamSub = null;
+    //_orientationStreamSub = null;
   }
 
   double get _scale => _location != null
@@ -246,13 +246,15 @@ class _AnimatedLocationLayerState extends State<AnimatedLocationLayer>
     if (location == null) return false;
     final accuracyInPixel = _accuracy / _scale;
     final biggestSize = max(accuracyInPixel, 100);
-    final positionInPixel = _mapCamera.project(location);
+    final positionInPixel = _mapCamera.projectAtZoom(location); //project -> projectAtZoom
+    
     final sw =
-        Point(positionInPixel.x + biggestSize, positionInPixel.y - biggestSize);
+        Offset(positionInPixel.dx + biggestSize, positionInPixel.dy - biggestSize);
     final ne =
-        Point(positionInPixel.x - biggestSize, positionInPixel.y + biggestSize);
+        Offset(positionInPixel.dx - biggestSize, positionInPixel.dy + biggestSize);
+        
 
-    return _mapCamera.pixelBounds.containsPartialBounds(Bounds(sw, ne));
+    return _mapCamera.pixelBounds.overlaps(Rect.fromPoints(sw, ne)); //inside Bounds -> overlaps
   }
 
   void _handlePositionEvent(Position event) {
@@ -268,7 +270,7 @@ class _AnimatedLocationLayerState extends State<AnimatedLocationLayer>
       });
     }
   }
-
+/*
   void _handleAbsoluteOrientationEvent(SensorEvent event) {
     final double newOrientation;
 
@@ -306,7 +308,7 @@ class _AnimatedLocationLayerState extends State<AnimatedLocationLayer>
       }
     }
   }
-
+*/
   /// Handles camera position and rotation updates when the AnimatedLocationController changes
 
   void _updateCamera() async {
