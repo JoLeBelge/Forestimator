@@ -36,7 +36,7 @@ encodageRelTerrain::encodageRelTerrain(const Wt::WEnvironment& env, std::string 
     content->setOverflow(Wt::Overflow::Scroll);
     content->addNew<WText>("ACR id");
     ACR_id=content->addNew<WLineEdit>("");
-    ACR_id->setValidator(std::make_shared<WIntValidator>(0,500));
+    ACR_id->setValidator(std::make_shared<WIntValidator>(0,2000));
 
     content->addNew<WText>("date des mesures");
     date=content->addNew<WLineEdit>("");
@@ -77,6 +77,17 @@ encodageRelTerrain::encodageRelTerrain(const Wt::WEnvironment& env, std::string 
     compo=content->addNew<WLineEdit>("");
     content->addNew<WText>("Remarques");
     ueRmq=content->addNew<WLineEdit>("");
+    content->addNew<WText>("Blocage Secteur 1");
+    blocageS1=content->addNew<WLineEdit>("");
+    content->addNew<WText>("Blocage Secteur 2");
+    blocageS2=content->addNew<WLineEdit>("");
+    content->addNew<WText>("Gibier Secteur 1");
+    gibierS1=content->addNew<WLineEdit>("");
+    content->addNew<WText>("Gibier Secteur 2");
+    gibierS2=content->addNew<WLineEdit>("");
+
+    blocageS1->setValidator(std::make_shared<WIntValidator>(0,100));
+    blocageS2->setValidator(std::make_shared<WIntValidator>(0,100));
 
     ACR_id->enterPressed().connect(date, &WWidget::setFocus);
     date->enterPressed().connect(ope, &WWidget::setFocus);
@@ -89,6 +100,10 @@ encodageRelTerrain::encodageRelTerrain(const Wt::WEnvironment& env, std::string 
     gpsRmq->enterPressed().connect(ori, &WWidget::setFocus);
     ori->enterPressed().connect(compo, &WWidget::setFocus);
     compo->enterPressed().connect(ueRmq, &WWidget::setFocus);
+    ueRmq->enterPressed().connect(blocageS1, &WWidget::setFocus);
+    blocageS1->enterPressed().connect(blocageS2, &WWidget::setFocus);
+    blocageS2->enterPressed().connect(gibierS1, &WWidget::setFocus);
+    gibierS1->enterPressed().connect(gibierS2, &WWidget::setFocus);
 
     delim = content->addNew<WContainerWidget>();
     delim->addStyleClass("delim");
@@ -109,6 +124,11 @@ encodageRelTerrain::encodageRelTerrain(const Wt::WEnvironment& env, std::string 
     tabNewEU->elementAt(0,8)->addNew<WText>("Régé");
     tabNewEU->elementAt(0,9)->addNew<WText>("Défaut");
     tabNewEU->elementAt(0,10)->addNew<WText>("Remarque");
+    tabNewEU->elementAt(0,11)->addNew<WText>("Objectif");
+    tabNewEU->elementAt(0,12)->addNew<WText>("travaux P");
+    tabNewEU->elementAt(0,13)->addNew<WText>("travaux F");
+    tabNewEU->elementAt(0,14)->addNew<WText>("retard Inter");
+    tabNewEU->elementAt(0,15)->addNew<WText>("h bille");
 
     for (int i(0) ; i<10 ; i++){
 
@@ -130,8 +150,8 @@ encodageRelTerrain::encodageRelTerrain(const Wt::WEnvironment& env, std::string 
         vArbres.push_back(std::move(tree));
     }
 
-    comboA1 = tabNewEU->elementAt(9,11)->addNew<WComboBox>();
-    comboA2 = tabNewEU->elementAt(10,11)->addNew<WComboBox>();
+    comboA1 = tabNewEU->elementAt(9,16)->addNew<WComboBox>();
+    comboA2 = tabNewEU->elementAt(10,16)->addNew<WComboBox>();
 
     comboA1->addItem("-");
     comboA1->addItem("Q1");
@@ -197,6 +217,7 @@ void encodageRelTerrain::saveACR(){
         a->date = date->valueText().toUTF8();
         a->ope = ope->valueText().toUTF8();
         a->rmq = ACRrmq->valueText().toUTF8();
+
         dbo::Transaction transaction(session);
         dbo::ptr<ACR_ter> anACR = session.add(std::move(a));
 
@@ -294,6 +315,11 @@ void encodageRelTerrain::ajoutUE(){
             if(ori->valueText().toUTF8()!=""){u->ori = std::stoi(ori->valueText().toUTF8());}
             u->rmq = ueRmq->valueText().toUTF8();
 
+            if(blocageS1->valueText().toUTF8()!=""){u->blocageSecteur1= std::stoi(blocageS1->valueText().toUTF8());}
+            if(blocageS2->valueText().toUTF8()!=""){u->blocageSecteur2= std::stoi(blocageS2->valueText().toUTF8());}
+             u->gibierSecteur1 = gibierS1->valueText().toUTF8();
+             u->gibierSecteur2 = gibierS2->valueText().toUTF8();
+
             //dbo::Transaction transaction(session);
             dbo::ptr<ue> anUE = session.add(std::move(u));
 
@@ -311,6 +337,10 @@ void encodageRelTerrain::ajoutUE(){
             compo->setValueText("");
             //ori->setValueText("");
             ueRmq->setValueText("");
+            gibierS1->setValueText("");
+            gibierS2->setValueText("");
+            blocageS1->setValueText("");
+            blocageS2->setValueText("");
 
             comboA1->setCurrentIndex(0);
             comboA2->setCurrentIndex(0);

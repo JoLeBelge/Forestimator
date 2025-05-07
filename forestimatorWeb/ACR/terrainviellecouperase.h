@@ -56,6 +56,8 @@ public:
     int azim;
     int defaut;
     std::string rmq;
+    int AO_objectif, AO_travauxFutur, AO_travauxPasse, AO_retardIntervention ;
+    string AO_hbille;
 
     template<class Action>
     void persist(Action& a)
@@ -73,6 +75,11 @@ public:
         dbo::field(a, azim,  "azim");
         dbo::field(a, defaut,  "defaut");
         dbo::field(a, rmq,   "rmq");
+        dbo::field(a, AO_objectif,   "AO_objectif");
+        dbo::field(a, AO_travauxPasse,   "AO_travauxPasse");
+        dbo::field(a, AO_travauxFutur,   "AO_travauxFutur");
+        dbo::field(a, AO_retardIntervention,   "AO_retardIntervention");
+        dbo::field(a, AO_hbille,   "AO_hbille");
     }
 };
 
@@ -84,6 +91,8 @@ public:
 
     WTableRow * row;
     WLineEdit *type,*quadrat,*circ,*statut,*rege,*dist,*azim,*defaut,*rmq,*Ht;
+
+    WLineEdit *objectif,*travauxPasse,*travauxFutur,*retardIntervention,*hbille;
 
     WLineEdit *ess;
 
@@ -100,6 +109,11 @@ public:
         rege =row->elementAt(8)->addNew<WLineEdit>();
         defaut =row->elementAt(9)->addNew<WLineEdit>();
         rmq =row->elementAt(10)->addNew<WLineEdit>();
+        objectif=row->elementAt(11)->addNew<WLineEdit>();
+        travauxPasse=row->elementAt(12)->addNew<WLineEdit>();
+        travauxFutur=row->elementAt(13)->addNew<WLineEdit>();
+        retardIntervention=row->elementAt(14)->addNew<WLineEdit>();
+        hbille=row->elementAt(15)->addNew<WLineEdit>();
 
         type->enterPressed().connect(quadrat, &WWidget::setFocus);
         quadrat->enterPressed().connect(ess, &WWidget::setFocus);
@@ -111,13 +125,23 @@ public:
         statut->enterPressed().connect(rege, &WWidget::setFocus);
         rege->enterPressed().connect(defaut, &WWidget::setFocus);
         defaut->enterPressed().connect(rmq, &WWidget::setFocus);
+        rmq->enterPressed().connect(objectif, &WWidget::setFocus);
+        objectif->enterPressed().connect(travauxPasse, &WWidget::setFocus);
+        travauxPasse->enterPressed().connect(travauxFutur, &WWidget::setFocus);
+        travauxFutur->enterPressed().connect(retardIntervention, &WWidget::setFocus);
+        retardIntervention->enterPressed().connect(hbille, &WWidget::setFocus);
 
         circ->setValidator(std::make_shared<WIntValidator>(0,1000));
         dist->setValidator(std::make_shared<WDoubleValidator>(0.0,11.0));
         Ht->setValidator(std::make_shared<WDoubleValidator>(0.0,50.0));
-        statut->setValidator(std::make_shared<WIntValidator>(0,20));
+        statut->setValidator(std::make_shared<WIntValidator>(0,200));
         rege->setValidator(std::make_shared<WIntValidator>(0,20));
         azim->setValidator(std::make_shared<WIntValidator>(0,360));
+        hbille->setValidator(std::make_shared<WDoubleValidator>(0.0,40.0));
+        objectif->setValidator(std::make_shared<WIntValidator>(0,1000));
+        travauxPasse->setValidator(std::make_shared<WIntValidator>(0,1000));
+        travauxFutur->setValidator(std::make_shared<WIntValidator>(0,1000));
+        retardIntervention->setValidator(std::make_shared<WIntValidator>(0,1000));
 
     }
     void add(int acr_id, int ue_id){
@@ -142,6 +166,17 @@ public:
             if(defaut->valueText().toUTF8()!=""){
                 tree->defaut = std::stoi(defaut->valueText().toUTF8());}
             tree->rmq = rmq->valueText().toUTF8();
+            if(defaut->valueText().toUTF8()!=""){
+                tree->defaut = std::stoi(defaut->valueText().toUTF8());}
+            if(objectif->valueText().toUTF8()!=""){
+                tree->AO_objectif = std::stoi(objectif->valueText().toUTF8());}
+            if(retardIntervention->valueText().toUTF8()!=""){
+                tree->AO_retardIntervention = std::stoi(retardIntervention->valueText().toUTF8());}
+            if(travauxFutur->valueText().toUTF8()!=""){
+                tree->AO_travauxFutur = std::stoi(travauxFutur->valueText().toUTF8());}
+            if(travauxPasse->valueText().toUTF8()!=""){
+                tree->AO_travauxPasse = std::stoi(travauxPasse->valueText().toUTF8());}
+            tree->AO_hbille= hbille->valueText().toUTF8();
             if (tree->ess!=""){
                 //std::cout << "tree add()"<<std::endl;
                 dbo::Transaction transaction(*session);
@@ -164,6 +199,11 @@ public:
         defaut->setText("");
         Ht->setText("");
         rmq->setText("");
+        hbille->setText("");
+        objectif->setText("");
+        travauxFutur->setText("");
+        travauxPasse->setText("");
+        retardIntervention->setText("");
     }
 
     void setLike(arbreGUI* b){
@@ -175,6 +215,11 @@ public:
         azim->setText(b->azim->valueText());
         defaut->setText(b->defaut->valueText());
         Ht->setText(b->Ht->valueText());
+        objectif->setText(b->objectif->valueText());
+        retardIntervention->setText(b->retardIntervention->valueText());
+        travauxFutur->setText(b->travauxFutur->valueText());
+        travauxPasse->setText(b->travauxPasse->valueText());
+        hbille->setText(b->hbille->valueText());
     }
 };
 
@@ -184,6 +229,8 @@ public:
     int id_ACR;
     string bloquant,gps,rmq,rmqGPS, compo;
     int ori;
+    int blocageSecteur1, blocageSecteur2;
+    string gibierSecteur1, gibierSecteur2;
     template<class Action>
     void persist(Action& a)
     {
@@ -195,6 +242,10 @@ public:
         dbo::field(a, compo,   "compo");
         dbo::field(a, ori,   "ori");
         dbo::field(a, rmq,   "rmq");
+        dbo::field(a, blocageSecteur1,   "blocageS1");
+        dbo::field(a, blocageSecteur2,   "blocageS2");
+        dbo::field(a, gibierSecteur1,   "gibierS1");
+        dbo::field(a, gibierSecteur2,   "gibierS2");
     }
 };
 
@@ -228,7 +279,7 @@ public:
 
     Wt::WTable* tabNewEU, *tabAllEU;
     //UE
-    Wt::WLineEdit * UE_id, * gpsLabel, *gpsRmq, * compo, *ueRmq, * ori;
+    Wt::WLineEdit * UE_id, * gpsLabel, *gpsRmq, * compo, *ueRmq, * ori, * gibierS1, *gibierS2, * blocageS1, * blocageS2;
     // ACR
     Wt::WLineEdit * ACR_id, * date, * ope, * gps;
 
