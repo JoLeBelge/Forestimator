@@ -4,7 +4,7 @@ import 'dart:ui';
 import 'package:fforestimator/pages/catalogueView/layerTile.dart';
 import 'package:flutter/material.dart';
 import 'package:fforestimator/globals.dart' as gl;
-// import 'package:flutter_downloader/flutter_downloader.dart';
+import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:path/path.dart';
 //import 'package:flutter_logs/flutter_logs.dart';
 
@@ -105,7 +105,6 @@ class _LayerDownloaderState extends State<LayerDownloader> {
   Future<String?> _downloadFile() async {
     //late Future<String?> taskId;
     late String? taskId;
-    /* ---DOWNLOADER IOS BUG---
     if (!(Platform.isWindows || Platform.isLinux || Platform.isMacOS)) {
       taskId = await FlutterDownloader.enqueue(
         url: gl.queryApiRastDownload +
@@ -120,8 +119,6 @@ class _LayerDownloaderState extends State<LayerDownloader> {
     }
 
     return taskId;
-    ---DOWNLOADER IOS BUG--- */ 
-    return "23";
   }
 
   /*void _bindBackgroundIsolate() {

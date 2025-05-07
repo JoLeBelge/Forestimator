@@ -247,6 +247,7 @@ class _AnimatedLocationLayerState extends State<AnimatedLocationLayer>
     final accuracyInPixel = _accuracy / _scale;
     final biggestSize = max(accuracyInPixel, 100);
     final positionInPixel = _mapCamera.projectAtZoom(location); //project -> projectAtZoom
+
     
     final sw =
         Offset(positionInPixel.dx + biggestSize, positionInPixel.dy - biggestSize);
@@ -256,6 +257,8 @@ class _AnimatedLocationLayerState extends State<AnimatedLocationLayer>
 
     return _mapCamera.pixelBounds.overlaps(Rect.fromPoints(sw, ne)); //inside Bounds -> overlaps
   }
+
+
 
   void _handlePositionEvent(Position event) {
     setState(() {

@@ -49,7 +49,7 @@ class _MapPageState extends State<mapPage> {
     Offset(42250.0, 21170.0), // lower left
     Offset(295170.0, 167700.0), // upper right
   );
-
+  
   double tileSize = 256.0;
 
   List<double> getResolutions2(int nbzoom) {
@@ -67,7 +67,7 @@ class _MapPageState extends State<mapPage> {
   late var epsg31370CRS = Proj4Crs.fromFactory(
       code: 'EPSG:31370',
       proj4Projection: epsg31370,
-      bounds: Rect.fromLTRB(42250.0, 295170.0, 21170.0, 167700.0),
+      bounds: epsg31370Bounds,
       resolutions: getResolutions2(11));
   //resolutions: getResolutions(295170.0, 42250.0, 15, 256.0));
 
@@ -249,6 +249,7 @@ class _MapPageState extends State<mapPage> {
                     2, // pour les cartes offline, il faudrait informer l'utilisateur du fait que si le zoom est trop peu élevé, la carte ne s'affiche pas
                 initialCenter: gl.latlonCenter,
                 cameraConstraint: CameraConstraint.contain(
+                  
                     bounds: LatLngBounds.fromPoints([latlonBL, latlonTR])),
                 onMapReady: () async {
                   /*Permission.locationWhenInUse.request();
@@ -303,7 +304,7 @@ class _MapPageState extends State<mapPage> {
                               tileProvider: _provider,
                               // minNativeZoom: 8,
                               minZoom:
-                                  7, // si minZoom de la map est moins restrictif (moins élevé) que celui-ci, la carte ne s'affiche juste pas (écran blanc)
+                                  2, // si minZoom de la map est moins restrictif (moins élevé) que celui-ci, la carte ne s'affiche juste pas (écran blanc)
                             )
                           : Container();
                     } else if (selLayer.offline) {
@@ -322,7 +323,7 @@ class _MapPageState extends State<mapPage> {
                           crs: epsg31370CRS,
                           transparent: true,
                         ),
-                        tileSize: tileSize,
+                        tileDimension: tileSize.round(),
                       );
                     }
                   }).toList() +
@@ -414,7 +415,7 @@ class _MapPageState extends State<mapPage> {
       else
         _refreshLocation = true;
       Position newPosition = await Geolocator.getCurrentPosition(
-              desiredAccuracy: LocationAccuracy.high)
+              /*desiredAccuracy: LocationAccuracy.high*/)
           .timeout(new Duration(seconds: 3));
 
       setState(() {
