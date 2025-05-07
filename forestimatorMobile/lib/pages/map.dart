@@ -45,10 +45,10 @@ class _MapPageState extends State<mapPage> {
       proj4.Projection.add('EPSG:31370',
           '+proj=lcc +lat_1=51.16666723333333 +lat_2=49.8333339 +lat_0=90 +lon_0=4.367486666666666 +x_0=150000.013 +y_0=5400088.438 +ellps=intl +towgs84=-106.8686,52.2978,-103.7239,0.3366,-0.457,1.8422,-1.2747 +units=m +no_defs +type=crs');
 // map extend in BL72.
-  /*final epsg31370Bounds = Bounds<double>(
-    Point<double>(42250.0, 21170.0), // lower left
-    Point<double>(295170.0, 167700.0), // upper right
-  );*/
+  final epsg31370Bounds = Rect.fromPoints(
+    Offset(42250.0, 21170.0), // lower left
+    Offset(295170.0, 167700.0), // upper right
+  );
 
   double tileSize = 256.0;
 
@@ -165,9 +165,9 @@ class _MapPageState extends State<mapPage> {
   @override
   Widget build(BuildContext context) {
     proj4.Point ptBotLeft = proj4.Point(
-        x: epsg31370Bounds.bottomLeft.x, y: epsg31370Bounds.bottomLeft.y);
+        x: epsg31370Bounds.bottomLeft.dx, y: epsg31370Bounds.bottomLeft.dy);
     proj4.Point ptTopR = proj4.Point(
-        x: epsg31370Bounds.topRight.x, y: epsg31370Bounds.topRight.y);
+        x: epsg31370Bounds.topRight.dx, y: epsg31370Bounds.topRight.dy);
 
     // contraindre la vue de la map sur la zone de la Wallonie. ajout d'un peu de marge
     double margeInDegree = 0.1;

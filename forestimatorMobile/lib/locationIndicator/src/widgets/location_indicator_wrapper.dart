@@ -97,24 +97,24 @@ class _FlowPositionDelegate extends FlowDelegate {
 
   @override
   void paintChildren(FlowPaintingContext context) {
-    final absPixelPosition = mapCamera.project(position.value);
+    final absPixelPosition = mapCamera.projectAtZoom(position.value); //project -> projectAtZoom
     final relPixelPosition =
-        absPixelPosition - mapCamera.pixelOrigin.toDoublePoint();
+        absPixelPosition - mapCamera.pixelOrigin; // ToDouble is not necessary
 
     for (var i = 0; i < context.childCount; i++) {
       final halfChildSize = context.getChildSize(i)! / 2;
-      final sw = Point(absPixelPosition.x + halfChildSize.width,
-          absPixelPosition.y - halfChildSize.height);
-      final ne = Point(absPixelPosition.x - halfChildSize.width,
-          absPixelPosition.y + halfChildSize.height);
+      final sw = Offset(absPixelPosition.dx + halfChildSize.width,
+          absPixelPosition.dy - halfChildSize.height);
+      final ne = Offset(absPixelPosition.dx - halfChildSize.width,
+          absPixelPosition.dy + halfChildSize.height);
       // only render visible widgets
-      if (mapCamera.pixelBounds.containsPartialBounds(Bounds(sw, ne))) {
+      if (mapCamera.pixelBounds.overlaps(Rect.fromPoints(sw, ne))) { //inside Bounds -> overlaps
         context.paintChild(
           i,
           transform: Matrix4.translationValues(
             // center all widgets
-            relPixelPosition.x - halfChildSize.width,
-            relPixelPosition.y - halfChildSize.height,
+            relPixelPosition.dx - halfChildSize.width,
+            relPixelPosition.dy - halfChildSize.height,
             0,
           ),
         );

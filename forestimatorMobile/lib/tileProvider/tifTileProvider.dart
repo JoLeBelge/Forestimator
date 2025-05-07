@@ -55,12 +55,12 @@ class tifFileTileProvider extends TileProvider {
 
     // final nwPoint = coordinates.scaleBy(tileSizePoint) - daptation for flutter_map 7.0.0 (scaleBy depreciated)
 
-    final Point nwPoint =
-        Point(coordinates.x * tileSize, coordinates.y * tileSize);
+    final Offset nwPoint =
+        Offset(coordinates.x.toDouble() * tileSize, coordinates.y.toDouble() * tileSize);
 
-    final nwCoords = mycrs.pointToLatLng(nwPoint, coordinates.z.toDouble());
+    final nwCoords = mycrs.offsetToLatLng(nwPoint, coordinates.z.toDouble());
     final nw = mycrs.projection.project(nwCoords);
-    Bounds<double> b = mycrs.projection.bounds!;
+    Rect b = mycrs.projection.bounds!;
 
     /*print("nord w " + nw.toString());
     print("se " + se.toString());
@@ -73,8 +73,8 @@ class tifFileTileProvider extends TileProvider {
     //print("x y offset : " + xOffset.toString() + " , " + yOffset.toString());
     */
     double resolution = 10.0;
-    int xOffset = ((nw.x - b.topLeft.x) / resolution).round();
-    int yOffset = ((b.bottomRight.y - nw.y) / resolution)
+    int xOffset = ((nw.dx - b.topLeft.dx) / resolution).round();
+    int yOffset = ((b.bottomRight.dy - nw.dy) / resolution)
         .round(); //--> soit-disant bottomRigth mais contient le ymax (top dans src donc)
 
     // je devrais lire  GeoInfo geoi = GeoInfo(im); comme dans onePixGeoTifDecoder pour adapter le code à des raster qui ont une autre résolution.
