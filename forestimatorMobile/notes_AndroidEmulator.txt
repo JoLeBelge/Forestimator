@@ -1,0 +1,25 @@
+Je veux des screenshot pas trop mal pour la présentation mais l'émulateur par défaut que j'ai avec Visual Code et Android studio a une forme un peu trop alongée.. 
+Si je lance moi-même mon emulator, je peux spécifier la taille de l'écran. Top.
+
+/home/jo/Android/Sdk/emulator/emulator -avd Pixel_3a_API_34_extension_level_7_x86_64 -skin 1080x1920
+
+/home/jo/Android/Sdk/emulator/emulator -avd Pixel_3a_API_34_extension_level_7_x86_64 -skin 1580x2220 -gpu on -no-snapshot-load
+
+-> ne fonctionne plus, depuis que j'ai essayé de charger la carte offline dans forestimator
+
+refonctionne si j'augmente la RAM à 4 GB ici
+
+gedit ~/.android/avd/Pixel_3a_API_34_extension_level_7_x86_64.avd/config.ini
+
+adb reboot bootloader
+
+adb shell mount -o rw,remount /system 
+
+adb push prjTP14/ /storage/self/primary/Download 
+
+adb pull "/storage/emulated/0/Android/data/ch.opengis.qfield/files/Imported Projects/export" ./
+
+# changer la "skin" pour ne pas avoir de coins round. Puis j'ai ajouté une image systeme qui contenait le play store pour avoir la version forestiamator publiée en ligne
+
+~/Android/Sdk/skins/pixel_8a/
+

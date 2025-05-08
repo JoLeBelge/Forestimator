@@ -23,7 +23,8 @@ DEPENDPATH += $$PWD../stationDescriptor/rapidxml/
 SOURCES += main.cpp \
     ../carteApt/cdicoaptbase.cpp \
     ACR/terrainviellecouperase.cpp \
-    ACR/formviellecouperase.cpp \
+    #ACR/formviellecouperase.cpp \
+    OGF/formOGF.cpp \
     desserteForest/desserteForest.cpp \
     analytics.cpp \
     api/anaponctuelleresource.cpp \
@@ -62,7 +63,8 @@ SOURCES += main.cpp \
 HEADERS += \
     ../carteApt/cdicoaptbase.h \
     ACR/terrainviellecouperase.h \
-    ACR/formviellecouperase.h \
+    #ACR/formviellecouperase.h \
+    OGF/formOGF.h \
     desserteForest/desserteForest.h \
     analytics.h \
     api/anaponctuelleresource.h \
