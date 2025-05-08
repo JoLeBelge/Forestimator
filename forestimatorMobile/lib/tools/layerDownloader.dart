@@ -1,6 +1,4 @@
 import 'dart:io';
-import 'dart:isolate';
-import 'dart:ui';
 import 'package:fforestimator/pages/catalogueView/layerTile.dart';
 import 'package:flutter/material.dart';
 import 'package:fforestimator/globals.dart' as gl;
@@ -84,7 +82,7 @@ class _LayerDownloaderState extends State<LayerDownloader> {
       return Row(children: [
         IconButton(
             onPressed: () async {
-              var it = await _downloadFile();
+              await _downloadFile();
               //_downloadStates[widget.layer.key] = 0.01;
               //_taskIDToLayerCode[it] = widget.layer.key;
               _isDownloading = true;

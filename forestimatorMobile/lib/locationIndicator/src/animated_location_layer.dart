@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:math';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -17,7 +16,6 @@ import '/locationIndicator/src/widgets/accuracy_indicator.dart';
 import '/locationIndicator/src/widgets/location_indicator.dart';
 import '/locationIndicator/src/widgets/orientation_indicator.dart';
 
-import 'dart:io' show Platform;
 
 enum CameraTrackingMode {
   /// The map camera won't follow the user's location.
@@ -260,7 +258,7 @@ class _AnimatedLocationLayerState extends State<AnimatedLocationLayer>
 
 
 
-  void _handlePositionEvent(Position event) {
+  /*void _handlePositionEvent(Position event) {
     setState(() {
       _location = LatLng(event.latitude, event.longitude);
     });
@@ -272,7 +270,7 @@ class _AnimatedLocationLayerState extends State<AnimatedLocationLayer>
         _accuracy = newAccuracy;
       });
     }
-  }
+  }*/
 /*
   void _handleAbsoluteOrientationEvent(SensorEvent event) {
     final double newOrientation;
