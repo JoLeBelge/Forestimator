@@ -314,7 +314,7 @@ class _OfflineView extends State<OfflineView> {
     return Column(
       children: <Widget>[
         if (lt.downloadable)
-          ColoredBox(color: gl.colorBackground, child:  Container()),/*LayerDownloader(lt)), IOS*/
+          ColoredBox(color: gl.colorBackground, child:  LayerDownloader(lt)),
         if (gl.dico.getLayerBase(lt.key).hasDoc())
           ListTile(
             title: Text(
