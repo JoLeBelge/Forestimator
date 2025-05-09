@@ -395,13 +395,13 @@ class _CategoryView extends State<CategoryView> {
   }
 
 // downloadableLayerKeys contient la liste des couches qu'on voudrai télécharger par défaut pour tout les utilisateurs. mais le fait qu'elle soit téléchargeable est définit dans layerbase.mIsDownloadableRW
-  bool _isDownloadableLayer(String key) {
+/*  bool _isDownloadableLayer(String key) {
     if (gl.downloadableLayerKeys.contains(key)) {
       return true;
     }
     return false;
   }
-
+*/
   void _getLayerData() async {
     Map<String, layerBase> mp = gl.dico.mLayerBases;
 

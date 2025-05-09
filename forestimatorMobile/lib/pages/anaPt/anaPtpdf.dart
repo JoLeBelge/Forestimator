@@ -63,13 +63,13 @@ Future makePdf(List<layerAnaPt> layers, String fileName, String dir,
         ]);
   }));
 
-  if (dir != null) {
-    File out = File(dir! + "/" + fileName);
+  
+    File out = File(dir + "/" + fileName);
     if (await out.exists()) {
       // on renomme le pdf
       int nb = 2;
       do {
-        out = File(dir! +
+        out = File(dir +
             "/" +
             fileName.substring(0, fileName.length - 4) +
             nb.toString() +
@@ -80,9 +80,7 @@ Future makePdf(List<layerAnaPt> layers, String fileName, String dir,
     }
     out.writeAsBytes(await pdf.save(), flush: true);
     // FlutterLogs.logError("anaPt", "pdf", "pdf exported to. ${out.path}");
-  } else {
-    //FlutterLogs.logError("anaPt", "pdf", "downloadDirPath is null");
-  }
+  
 }
 
 pw.Widget PaddedText(
