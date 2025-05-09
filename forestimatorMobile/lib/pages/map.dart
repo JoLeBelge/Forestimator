@@ -18,7 +18,6 @@ import 'package:fforestimator/pages/anaPt/requestedLayer.dart';
 import 'package:go_router/go_router.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:fforestimator/tools/notification.dart';
 import 'dart:convert';
 //import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
@@ -158,22 +157,17 @@ class _MapPageState extends State<mapPage> {
     super.initState();
     initPermissions();
     gl.refreshMap = setState;
-    /*_geolocator = Geolocator();
-    LocationSettings locationOptions = const LocationSettings(
-        accuracy: LocationAccuracy.high, distanceFilter: 1);
-    Geolocator.getPositionStream(locationSettings: locationOptions)
-        .listen((Position? position) {
-      gl.position = position;
-      setState(() {});
-    });*/
+    initOtherValuesOnce();
   }
 
   void refreshView(void Function() f) async {
     setState(f);
   }
 
-  @override
-  Widget build(BuildContext context) {
+  LatLng latlonBL = LatLng(0.0,0.0);
+  LatLng latlonTR = LatLng(0.0,0.0);
+
+  void initOtherValuesOnce(){
     proj4.Point ptBotLeft = proj4.Point(
       x: epsg31370Bounds.bottomLeft.dx,
       y: epsg31370Bounds.bottomLeft.dy,
@@ -185,15 +179,18 @@ class _MapPageState extends State<mapPage> {
 
     // contraindre la vue de la map sur la zone de la Wallonie. ajout d'un peu de marge
     double margeInDegree = 0.1;
-    LatLng latlonBL = LatLng(
+    latlonBL = LatLng(
       epsg31370.transform(epsg4326, ptBotLeft).y + margeInDegree,
       epsg31370.transform(epsg4326, ptBotLeft).x - margeInDegree,
     );
-    LatLng latlonTR = LatLng(
+    latlonTR = LatLng(
       epsg31370.transform(epsg4326, ptTopR).y - margeInDegree,
       epsg31370.transform(epsg4326, ptTopR).x + margeInDegree,
     );
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return handlePermissionForLocation(
       refreshParentWidgetTree: refreshView,
       child: Scaffold(
@@ -268,14 +265,13 @@ class _MapPageState extends State<mapPage> {
                         },
                     },
                 onPositionChanged: (position, e) async {
-                  LatLng c = _mapController.camera.center;
-                  final SharedPreferences prefs =
-                      await SharedPreferences.getInstance();
-                  await prefs.setDouble('mapCenterLat', c.latitude);
-                  await prefs.setDouble('mapCenterLon', c.longitude);
+                  LatLng c = position.center;
                   updateLocation();
-                  double aZoom = _mapController.camera.zoom;
-                  await prefs.setDouble('mapZoom', aZoom);
+                  _writeNewPositionToMemory(
+                    c.longitude,
+                    c.latitude,
+                    position.zoom,
+                  );
                 },
                 crs: epsg31370CRS,
                 initialZoom: 8.0,
@@ -298,7 +294,6 @@ class _MapPageState extends State<mapPage> {
                       */ // pour ancienne version de android
 
                   updateLocation();
-
                   if (gl.position != null) {
                     // IMPORTANT: rebuild location layer when permissions are granted
                     setState(() {
@@ -307,7 +302,7 @@ class _MapPageState extends State<mapPage> {
                           gl.position?.latitude ?? 0.0,
                           gl.position?.longitude ?? 0.0,
                         ),
-                        9,
+                        gl.mapZoom,
                       );
                     });
                     // si on refusait d'allumer le GPS, alors la carte ne s'affichait jamais, c'est pourquoi il y a le else et le code ci-dessous
@@ -469,6 +464,13 @@ class _MapPageState extends State<mapPage> {
     );
   }
 
+  void _writeNewPositionToMemory(double lon, double lat, double zoom) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setDouble('mapCenterLat', lat);
+    await prefs.setDouble('mapCenterLon', lon);
+    await prefs.setDouble('mapZoom', zoom);
+  }
+
   void _updatePtMarker(LatLng pt) {
     setState(() {
       _pt = pt;
@@ -500,10 +502,95 @@ class _MapPageState extends State<mapPage> {
       //FlutterLogs.logError("gps", "position", "error while waiting on position. ${e.toString()}");
     }
   }
+
+  MapOptions _getOptions() {
+    return MapOptions(
+      backgroundColor: Colors.transparent,
+      keepAlive: true,
+      interactionOptions: const InteractionOptions(
+        enableMultiFingerGestureRace: false,
+        flags:
+            InteractiveFlag.drag |
+            InteractiveFlag.pinchZoom |
+            InteractiveFlag.pinchMove |
+            InteractiveFlag.doubleTapZoom |
+            InteractiveFlag.scrollWheelZoom,
+      ),
+      onLongPress:
+          (tapPosition, point) async => {
+            if (!_doingAnaPt)
+              {
+                setState(() {
+                  _doingAnaPt = true;
+                }),
+                //proj4.Point ptBL72 = epsg4326.transform(epsg31370,proj4.Point(x: point.longitude, y: point.latitude))
+                await _runAnaPt(
+                  epsg4326.transform(
+                    epsg31370,
+                    proj4.Point(x: point.longitude, y: point.latitude),
+                  ),
+                ),
+                _updatePtMarker(point),
+                setState(() {
+                  _doingAnaPt = false;
+                }),
+                GoRouter.of(context).push("/anaPt"),
+              },
+          },
+      onPositionChanged: (position, e) async {
+        LatLng c = _mapController.camera.center;
+        final SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.setDouble('mapCenterLat', c.latitude);
+        await prefs.setDouble('mapCenterLon', c.longitude);
+        updateLocation();
+        double aZoom = _mapController.camera.zoom;
+        await prefs.setDouble('mapZoom', aZoom);
+      },
+      crs: epsg31370CRS,
+      initialZoom: 8.0,
+      maxZoom: 10,
+      minZoom:
+          2, // pour les cartes offline, il faudrait informer l'utilisateur du fait que si le zoom est trop peu élevé, la carte ne s'affiche pas
+      initialCenter: gl.latlonCenter,
+      cameraConstraint: CameraConstraint.contain(
+        bounds: LatLngBounds.fromPoints([latlonBL, latlonTR]),
+      ),
+      onMapReady: () async {
+        /*Permission.locationWhenInUse.request();
+                  if (await Permission.locationWhenInUse.isGranted) {
+                    Permission.locationAlways.request();
+                  }
+                  Permission.manageExternalStorage
+                      .request(); // pour nouvelle version de android
+                  Permission.storage
+                      .request();
+                      */ // pour ancienne version de android
+
+        updateLocation();
+        if (gl.position != null) {
+          // IMPORTANT: rebuild location layer when permissions are granted
+          setState(() {
+            _mapController.move(
+              LatLng(
+                gl.position?.latitude ?? 0.0,
+                gl.position?.longitude ?? 0.0,
+              ),
+              9,
+            );
+          });
+          // si on refusait d'allumer le GPS, alors la carte ne s'affichait jamais, c'est pourquoi il y a le else et le code ci-dessous
+        } else {
+          setState(() {
+            _mapController.move(gl.latlonCenter, gl.mapZoom);
+          });
+        }
+      },
+    );
+  }
 }
 
 Future<Position?> acquireUserLocation() async {
-  if (await Permission.location.isGranted) {
+  if (locationGranted()) {
     try {
       return await Geolocator.getCurrentPosition();
     } on LocationServiceDisabledException {

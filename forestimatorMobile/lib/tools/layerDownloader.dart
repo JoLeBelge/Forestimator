@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:fforestimator/pages/catalogueView/layerTile.dart';
+import 'package:fforestimator/tools/handlePermissions.dart';
 import 'package:flutter/material.dart';
 import 'package:fforestimator/globals.dart' as gl;
 import 'package:flutter_downloader/flutter_downloader.dart';
@@ -22,6 +23,12 @@ class _LayerDownloaderState extends State<LayerDownloader> {
 
   @override
   Widget build(BuildContext context) {
+    return handlePermissionForStorage(child: buildDL(context), refreshParentWidgetTree: setState);
+  }
+
+
+
+  Widget buildDL(BuildContext context) {
     if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
       return Container(
         color: gl.colorBackground,
@@ -33,6 +40,7 @@ class _LayerDownloaderState extends State<LayerDownloader> {
         child: const Text("Downloads are not supported yet."),
       );
     }
+
     /* if (_downloadStates[widget.layer.key] == null) {
       _downloadStates[widget.layer.key] = 0.0;
     } else if (_downloadStates[widget.layer.key]! != 0.0 &&
