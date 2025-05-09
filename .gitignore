@@ -23,4 +23,5 @@ forestimatorWeb/*.autosave
 carteApt/scriptR_AE_SS/.Rhistory
 carteApt/cleanCarteAE/*.pro.user*
 data/desserteForest.db*
+data/OGF.db*
 

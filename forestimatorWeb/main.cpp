@@ -33,7 +33,6 @@ int launchForestimator(int argc, char **argv)
     try {
         Wt::WServer server{argc, argv, WTHTTP_CONFIGURATION};
 
-
         // set first ressources with sub-folder /api/
         // then add entry point for the web site
         server.addResource(&resource, "/api/${tool}/args/${toolarg}/polygon/${pol}");
@@ -137,21 +136,15 @@ std::unique_ptr<Wt::WApplication> createWebAptitudeApplication(const Wt::WEnviro
     }else if (env.internalPath() == "/stats_analytics"){
         auto app = std::make_unique<PageAnalytics>(env,dico->File("docroot")+"analytics.db");
         return app;
-    }else if (env.internalPath() == "/encodage.coupe.rase"){
+    }else if (env.internalPath() == "/encodage.OGF"){
+            auto app = std::make_unique<formOGF>(env,dico, dico->File("docroot")+"OGF.db");
+            return app;
+ /*   }else if (env.internalPath() == "/encodage.coupe.rase"){
         auto app = std::make_unique<formVielleCoupeRase>(env,dico, dico->File("docroot")+"ACR.db");
-        return app;
-    }else if (env.internalPath() == "/coupe.rase.view"){
-        auto app = std::make_unique<ACRAnalytics>(env,dico->File("docroot")+"ACR.db");
         return app;
     }else if (env.internalPath() == "/encodage.desserteForest"){
             auto app = std::make_unique<formDesserteForest>(env,dico, dico->File("docroot")+"desserteForest.db");
-            return app;
-    }else if (env.internalPath() == "/invitationCF"){
-    auto app = std::make_unique<Wt::WApplication>(env);
-    app->messageResourceBundle().use(app->docRoot() + "/forestimator");
-    app->setTitle(WString("invitation Carrefour Forestier"));
-    app->root()->addNew<Wt::WText>(WString::tr("insertCF"));
-    return app;
+            return app;*/
 }else if (env.internalPath() == "/encodage.terrain"){
     auto app = std::make_unique<encodageRelTerrain>(env,dico->File("docroot")+"ACR.db");
     return app;
@@ -210,4 +203,3 @@ int main(int argc, char **argv){
     std::cout << "delete pool" << std::endl;
     delete(pool);
 }
-

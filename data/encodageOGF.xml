@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF8"?>
+<messages xmlns:if="Wt.WTemplate.conditions"
+	  nplurals="2"
+	  plural="n == 1 ? 0 : 1">
+
+<message id="template">
+
+<div class="frameEncodage" style="height:100.0%;padding:10px 15px 10px 15px;margin-top:30.0px;margin-right:30.0px;margin-bottom:30.0px;margin-left:30.0px;display:flex;box-sizing:border-box;-webkit-box-sizing:border-box;flex-flow:column;-webkit-flex-flow:column;">
+	<div class="encodage" style="margin: 3px 0px; overflow: visible; flex: 1 1 auto;">
+	<h1> Formulaire d'encodage des forêts subnaturelles </h1>
+
+<h3>Localisation des forêts subnaturelle</h3>
+BLABLABLA intro
+<br></br>
+ Vous pouvez nous aider en remplissant le formulaire ci-dessous, ou en nous contactant par mail ou téléphone : Mr Lisein (<a href = "mailto: liseinjon@hotmail.com">JO.Lisein@uliege.be</a> - 0475221309)
+		<div >
+		 <img src="/img/OGF.jpg" alt="forêt subnaturelle" style="display: block;margin-left: auto;margin-right: auto;width: 50%;"  />
+		</div>
+		Nous collecterons les informations de manière cartographique, mais nous nous engageons évidemment à ne jamais visiter ou renseigner ces sites sans votre accord.
+	</div>
+	
+	<div style="margin: 3px 0px; flex: 1 1 auto; overflow: visible;"></div>
+	${contContact class="encodage" style="margin: 3px 0px; flex: 1 1 auto; overflow: visible;"}
+	<div style="margin: 3px 0px; flex: 1 1 auto; overflow: visible;"></div>
+	${contLoca}
+	
+	<div style="margin: 3px 0px; flex: 1 1 auto; overflow: visible;"></div>
+	${contACR1 class="encodage" style="margin: 3px 0px; flex: 1 1 auto; overflow: visible;"}
+	<div style="margin: 3px 0px; flex: 1 1 auto; overflow: visible;"></div>
+	${contACR2 class="encodage" style="margin: 3px 0px; flex: 1 1 auto; overflow: visible;"}
+	<div style="margin: 3px 0px; flex: 1 1 auto; overflow: visible;"></div>
+	${bsubmit class="btn btn-success with-label mybtn"}
+	
+</div>
+</message>
+
+<message id="sectionEncoder"> <h3> Vos données personnelles </h3></message>
+
+<message id="nom"> Nom : </message>
+<message id="nom.ph"> Ex: Dupont </message>
+<message id="prenom"> Prénom :</message>
+<message id="prenom.ph"> Ex: Albert</message>
+<message id="contact"> Votre contact: email </message>
+<message id="contact.ph"> Ex: dupont.albert@forest.be</message>
+
+<message id="contact.gsm"> Votre contact: téléphone </message>
+<message id="contact.gsm.ph"> Ex: 0475221309 </message>
+<message id="contactACR"> Contact du gestionnaire forestier : nom, email et/ou téléphone </message>
+<message id="contactACR.ph"> Ex: gestionnaire: rege.nat@hotmail.com</message>
+
+
+<message id="initPol">Réinitialiser tout le contour </message>
+<message id="cancelPoint">Supprimer le dernier point </message>
+<message id="submit">J'ai fini! Soumettre</message>
+
+<message id="map.tooltip">Cliquez pour dessiner le contour de la forêt subnaturelle. Pour finir le contour, joignez le dernier point avec le premier point et cliquez à nouveau</message>
+
+<message id="sectionVCR1"> <h3> Description de la forêt subnaturelle </h3>
+</message>
+
+<message id="descriptionVCR.ph"> Renseignez ici par exemple les essences majoritaires et l'année des dernières interventions sylvicoles ainsi que tout autres renseignement que vous jugez utiles</message>
+<message id="descriptionVCR"> Description de la forêt subnaturelle</message>
+
+
+
+<message id="titreLocalisation"> <h3> Localisation de la forêt subnaturelle </h3>
+<p>La localisation de la forêt subnaturelle doit être indiquée en numérisant le contour de la parcelle sur la carte ci-dessous. On peut naviguer sur la carte en utilisant la souris, mais il est également possible de choisir le nom de la commune où se trouve la forêt subnaturelle (menu déroulant à droite). Pour commencer la numérisation du contour, effectuez un simple clic gauche sur la carte.</p>
+</message>
+<message id="titreCatalogue"> <h4> Affichez une couche cartographique en cliquant sur son nom </h4> </message>
+<message id="cadastre.choisir"> Choisissez une commune</message>
+<message id="titreCommune"><h4>Choisissez une commune pour centrer la carte sur celle-ci</h4></message>
+
+<message id="saveACR.msg.titre">Encodage de la forêt subnaturelle</message>
+<message id="saveACR.msg.cont">
+Vos données ont été encodées de manière adéquate. Nous vous remercions pour votre participation. Souhaitez-vous encoder une autre forêt subnaturelle?
+</message>
+
+<message id="vosRef"> Votre référence pour cette forêt subnaturelle (facultatif) </message>
+<message id="vosRef.ph"> Ex : Comp 8 - parcelle 45 </message>
+
+<message id="btnPolyg"> Vous pouvez réinitialiser le contour de la parcelle avec les bouttons ci-dessous  </message>
+
+<message id="Wt.WMessageBox.Yes"> Oui</message>
+<message id="Wt.WMessageBox.No"> Non</message>
+<message id="Wt.WMessageBox.Cancel"> Annuler</message>
+
+<message id="mail.titre"> encodage de forêt subnaturelle </message>
+<message id="mail.contact">  Vos données personnelles </message>
+<message id="mail.acr">  Description de la forêt subnaturelle: </message>
+
+<message id="coupe.rase.view">Voici les parcelles qui ont été enregistrées précédemment</message>
+
+</messages>
