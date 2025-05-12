@@ -6933,7 +6933,7 @@ END
    		END
    		DATA "dendro/dendro_vha_8bits.tif" 
    		PROCESSING "BANDS=1" 
-   		OFFSITE 255 255 255
+   		OFFSITE 0 0 0
 
    		INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_vha.map"
    		METADATA
