@@ -164,10 +164,10 @@ class _MapPageState extends State<mapPage> {
     setState(f);
   }
 
-  LatLng latlonBL = LatLng(0.0,0.0);
-  LatLng latlonTR = LatLng(0.0,0.0);
+  LatLng latlonBL = LatLng(0.0, 0.0);
+  LatLng latlonTR = LatLng(0.0, 0.0);
 
-  void initOtherValuesOnce(){
+  void initOtherValuesOnce() {
     proj4.Point ptBotLeft = proj4.Point(
       x: epsg31370Bounds.bottomLeft.dx,
       y: epsg31370Bounds.bottomLeft.dy,
@@ -265,11 +265,11 @@ class _MapPageState extends State<mapPage> {
                         },
                     },
                 onPositionChanged: (position, e) async {
-                  LatLng c = position.center;
+                  if (!e) return;
                   updateLocation();
                   _writeNewPositionToMemory(
-                    c.longitude,
-                    c.latitude,
+                    position.center.longitude,
+                    position.center.latitude,
                     position.zoom,
                   );
                 },
