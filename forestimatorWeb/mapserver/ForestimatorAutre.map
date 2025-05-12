@@ -24,9 +24,9 @@ MAP
   	NAME "parcellaire"
   	TYPE POLYGON
   	STATUS ON
-  	CONNECTIONTYPE OGR
-  	CONNECTION "parcellaire_PA.gpkg"
-  	DATA "parcellaire_PA"           
+  		CONNECTIONTYPE OGR
+  		CONNECTION "parcellaire_PA.gpkg"
+  		DATA "parcellaire_PA"           
   	PROCESSING "CLOSE_CONNECTION=DEFER"
   	PROCESSING "LABEL_NO_CLIP=True"
   	CLASS

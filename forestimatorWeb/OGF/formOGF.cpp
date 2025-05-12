@@ -118,7 +118,7 @@ formOGF::formOGF(const WEnvironment &env, cDicoApt *dico, std::string aFileDB) :
     commune_->changed().connect(std::bind(&formOGF::displayCommune, this));
 
     cont->addNew<Wt::WText>(WString::tr("titreCatalogue"));
-    std::vector<std::string> vLs={"IGN", "ortho2020", "ortho2023", "Cadastre"};
+    std::vector<std::string> vLs={"IGN", "ortho2020", "ortho2023", "Cadastre", "parcellaireDNF"};
     for (std::string code : vLs){
         std::shared_ptr<layerBase> aL1=mDico->getLayerBase(code);
         WPushButton * but = cont->addNew<Wt::WPushButton>(aL1->Nom());
