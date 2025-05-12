@@ -5,14 +5,12 @@ import 'package:fforestimator/pages/anaPt/anaPtpdf.dart';
 import 'package:fforestimator/globals.dart' as gl;
 import 'package:fforestimator/myicons.dart';
 import 'package:go_router/go_router.dart';
-import 'dart:io';
-import 'package:permission_handler/permission_handler.dart';
 //import 'package:device_info_plus/device_info_plus.dart';
 //import 'package:downloadsfolder/downloadsfolder.dart';
 //import 'package:path_provider/path_provider.dart';
 
 class anaPtpage extends StatefulWidget {
-  List<layerAnaPt> requestedLayers = [];
+  final List<layerAnaPt> requestedLayers;
   @override
   anaPtpage(this.requestedLayers);
   State<anaPtpage> createState() => _anaPtpageState();
@@ -72,7 +70,7 @@ class _anaPtpageState extends State<anaPtpage> {
                       // String dir =
                       //  await getExternalStorageDirectories().toString();
                       String dir = "/storage/emulated/0/Download/";
-                      makePdf(widget.requestedLayers, pdf!, dir, locationName!);
+                      makePdf(widget.requestedLayers, pdf, dir, locationName);
                       // confirmation que le pdf a été créé
                       showDialog(
                         context: context,
@@ -92,7 +90,7 @@ class _anaPtpageState extends State<anaPtpage> {
                           );
                         },
                       );
-                    } else {
+                    } /*else {
                       showDialog(
                         context: context,
                         builder: (BuildContext context) {
@@ -112,7 +110,7 @@ class _anaPtpageState extends State<anaPtpage> {
                           );
                         },
                       );
-                    }
+                    }*/
                   }),
               _anaPtListLayers(context, widget.requestedLayers),
               SizedBox(height: 15),
@@ -244,8 +242,8 @@ Widget _tabAptFEE(BuildContext context, aptsFEE apts) {
 }
 
 class essencesListView extends StatelessWidget {
-  aptsFEE apts;
-  int codeApt;
+  final aptsFEE apts;
+  final int codeApt;
   essencesListView({required this.apts, required this.codeApt});
   @override
   Widget build(BuildContext context) {
@@ -332,8 +330,8 @@ Widget _tabPropositionCS(BuildContext context, propositionGS apts) {
 }
 
 class essencesListViewGS extends StatelessWidget {
-  propositionGS apts;
-  int codeApt; // maintentant c'est plus un code de vulnérabilités
+  final propositionGS apts;
+  final int codeApt; // maintentant c'est plus un code de vulnérabilités
   essencesListViewGS({required this.apts, required this.codeApt});
   @override
   Widget build(BuildContext context) {

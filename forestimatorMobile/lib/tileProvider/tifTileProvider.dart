@@ -27,31 +27,32 @@ class tifFileTileProvider extends TileProvider {
       required this.refreshView});
 
   void init() async {
-    //print("init tifFileTileProvider by loading source image in memory");
+    print("init tifFileTileProvider by loading source image in memory");
     final File fileIm = File(sourceImPath);
     bool e = await fileIm.exists();
-    //print("file exist " + e.toString());
     if (e) {
       Uint8List? bytes = await fileIm.readAsBytes();
 
-      img.TiffInfo _tiffInfo = img.TiffDecoder().startDecode(bytes!)!;
+      img.TiffInfo _tiffInfo = img.TiffDecoder().startDecode(bytes)!;
       img.TiffImage tifIm = _tiffInfo.images[0];
       int bps = tifIm.bitsPerSample;
+      print("file loaded in öeöory " + e.toString());
       // le décodage d'un tif 16 bits avec ColorMap sera effectif pour la prochaine sortie du package image (flutter)
       // testé avec image 4.2, imageDecoder (android graphic) ; Input was incomplete-> il faut probablement encore convertir en 8bit apres lecture de la 16 bits avec colormap.
       if (bps <= 8) {
-        _sourceImage = img.TiffDecoder().decode(bytes!);
+        _sourceImage = img.TiffDecoder().decode(bytes);
         refreshView(() {
           _loaded = true;
         });
       }
     }
+    print("file decoded in öeöory " + e.toString());
   }
 
   @override
   ImageProvider getImage(TileCoordinates coordinates, TileLayer options) {
     int tileSize = 256;
-    final tileSizePoint = Point(tileSize, tileSize);
+    // final tileSizePoint = Point(tileSize, tileSize);
 
     // final nwPoint = coordinates.scaleBy(tileSizePoint) - daptation for flutter_map 7.0.0 (scaleBy depreciated)
 
@@ -72,6 +73,7 @@ class tifFileTileProvider extends TileProvider {
 
     //print("x y offset : " + xOffset.toString() + " , " + yOffset.toString());
     */
+  
     double resolution = 10.0;
     int xOffset = ((nw.dx - b.topLeft.dx) / resolution).round();
     int yOffset = ((b.bottomRight.dy - nw.dy) / resolution)

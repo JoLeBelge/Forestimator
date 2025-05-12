@@ -19,7 +19,6 @@ import 'package:fforestimator/scaffoldNavigation.dart';
 import 'dart:convert';
 import 'package:path/path.dart' as path;
 import 'package:flutter_downloader/flutter_downloader.dart';
-//import 'package:flutter_logs/flutter_logs.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'dart:isolate';
@@ -29,18 +28,17 @@ import 'package:memory_info/memory_info.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-
   if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
     sqfliteFfiInit();
     databaseFactory = databaseFactoryFfi;
   } else {
     await FlutterDownloader.initialize(
-        debug: gl
-            .debug, // optional: set to false to disable printing logs to console (default: true)
-        ignoreSsl: gl
-            .debug // option: set to false to disable working with http links (default: false)
-        );
- 
+      debug:
+          gl.debug, // optional: set to false to disable printing logs to console (default: true)
+      ignoreSsl:
+          gl.debug, // option: set to false to disable working with http links (default: false)
+    );
+
     //Initialize Logging
     /*await FlutterLogs.initLogs(
         logLevelsEnabled: [
@@ -61,12 +59,11 @@ void main() async {
   gl.dico = dicoAptProvider();
   await gl.dico.init();
 
-  while (!gl.dico.finishedLoading){
-    sleep(const Duration(seconds:1));
+  while (!gl.dico.finishedLoading) {
+    sleep(const Duration(seconds: 1));
   }
   runApp(const MyApp());
 }
-
 
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
@@ -76,8 +73,10 @@ class MyApp extends StatefulWidget {
 
 class _MyApp extends State<MyApp> {
   Memory? _memory;
-  static const TextStyle optionStyle =
-      TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
+  static const TextStyle optionStyle = TextStyle(
+    fontSize: 30,
+    fontWeight: FontWeight.bold,
+  );
 
   late String _pathExternalStorage;
   bool _initializedPersistentValues = false;
@@ -110,8 +109,9 @@ class _MyApp extends State<MyApp> {
       gl.offlineMode = aOfflineMode;
     }
 
-    final List<String>? aAnaPtSelectedLayerKeys =
-        prefs.getStringList('anaPtSelectedLayerKeys');
+    final List<String>? aAnaPtSelectedLayerKeys = prefs.getStringList(
+      'anaPtSelectedLayerKeys',
+    );
 
     if (aAnaPtSelectedLayerKeys != null) {
       gl.anaPtSelectedLayerKeys = aAnaPtSelectedLayerKeys;
@@ -122,17 +122,20 @@ class _MyApp extends State<MyApp> {
       gl.firstTimeUse = firstTimeUse;
     }
 
-    final List<String>? ainterfaceSelectedLCode =
-        prefs.getStringList('interfaceSelectedLCode');
+    final List<String>? ainterfaceSelectedLCode = prefs.getStringList(
+      'interfaceSelectedLCode',
+    );
     if (ainterfaceSelectedLCode != null) {
       gl.interfaceSelectedLCode = ainterfaceSelectedLCode;
     }
-    final List<String>? ainterfaceSelectedLOffline =
-        prefs.getStringList('interfaceSelectedLOffline');
+    final List<String>? ainterfaceSelectedLOffline = prefs.getStringList(
+      'interfaceSelectedLOffline',
+    );
     if (ainterfaceSelectedLOffline != null) {
-      gl.interfaceSelectedLOffline = ainterfaceSelectedLOffline.map<bool>((e) {
-        return e == "true";
-      }).toList();
+      gl.interfaceSelectedLOffline =
+          ainterfaceSelectedLOffline.map<bool>((e) {
+            return e == "true";
+          }).toList();
     }
     gl.refreshInterfaceSelectedL();
 
@@ -158,7 +161,7 @@ class _MyApp extends State<MyApp> {
       var dir = await getApplicationDocumentsDirectory();
       //var dir = await getExternalStorageDirectory();
       _pathExternalStorage = dir.path;
-      File file = File("${dir?.path}/$filename");
+      File file = File("${dir.path}/$filename");
       if (await file.exists() == false) {
         var data = await rootBundle.load(asset);
         var bytes = data.buffer.asUint8List();
@@ -175,8 +178,8 @@ class _MyApp extends State<MyApp> {
   Future _listAndCopyPdfassets() async {
     // load as string
     final manifestcontent =
-        //await defaultassetbundle.of(context).loadstring('assetmanifest.json');
-        await rootBundle.loadString('AssetManifest.json');
+    //await defaultassetbundle.of(context).loadstring('assetmanifest.json');
+    await rootBundle.loadString('AssetManifest.json');
     // decode to map
     final Map<String, dynamic> manifestmap = json.decode(manifestcontent);
 
@@ -195,7 +198,6 @@ class _MyApp extends State<MyApp> {
     _listAndCopyPdfassets();
     readPreference();
     getMemoryInfo();
-
     _bindBackgroundIsolate();
 
     FlutterDownloader.registerCallback(downloadCallback);
@@ -217,15 +219,16 @@ class _MyApp extends State<MyApp> {
               // top route inside branch
               GoRoute(
                 path: '/',
-                pageBuilder: (context, state) =>
-                    const NoTransitionPage(child: mapPage()),
+                pageBuilder:
+                    (context, state) =>
+                        const NoTransitionPage(child: mapPage()),
                 routes: [
                   GoRoute(
                     path: 'anaPt',
                     builder: (context, state) => anaPtpage(gl.requestedLayers),
                   ),
                 ],
-              )
+              ),
             ],
           ),
           // second branch (B)
@@ -235,92 +238,100 @@ class _MyApp extends State<MyApp> {
               // top route inside branch
               GoRoute(
                 path: "/" + gl.basePathbranchB,
-                pageBuilder: (context, state) => const NoTransitionPage(
-                  child: CatalogueLayerView(),
-                ),
+                pageBuilder:
+                    (context, state) =>
+                        const NoTransitionPage(child: CatalogueLayerView()),
                 routes: [
                   ...gl.dico.getLayersWithDoc().map<GoRoute>((layerBase item) {
                     return GoRoute(
                       path: item.getFicheRoute() + "/:currentPage",
                       name: item.mCode,
-                      builder: (context, state) => (Platform.isAndroid ||
-                              Platform.isIOS)
-                          ? PDFScreen(
-                              path: _pathExternalStorage + "/" + item.mPdfName,
-                              titre: "documentation", //+ item.mNomCourt,
-                              currentPage: int.parse(
-                                  state.pathParameters['currentPage']!),
-                            )
-                          : Scaffold(
-                              appBar: AppBar(
-                                title: Text("pdf"),
-                              ),
-                              body: Text("toto"),
-                            ),
+                      builder:
+                          (context, state) =>
+                              (Platform.isAndroid || Platform.isIOS)
+                                  ? PDFScreen(
+                                    path:
+                                        _pathExternalStorage +
+                                        "/" +
+                                        item.mPdfName,
+                                    titre: "documentation", //+ item.mNomCourt,
+                                    currentPage: int.parse(
+                                      state.pathParameters['currentPage']!,
+                                    ),
+                                  )
+                                  : Scaffold(
+                                    appBar: AppBar(title: Text("pdf")),
+                                    body: Text("toto"),
+                                  ),
                     );
                   }).toList(),
                   ...gl.dico.getFEEess().map<GoRoute>((Ess item) {
                     return GoRoute(
                       path: item.getFicheRoute(),
-                      builder: (context, state) =>
-                          (Platform.isAndroid || Platform.isIOS)
-                              ? PDFScreen(
-                                  path: _pathExternalStorage +
-                                      "/FEE-" +
-                                      item.mCode +
-                                      ".pdf",
-                                  titre: item.mNomFR,
-                                )
-                              : Scaffold(
-                                  appBar: AppBar(
-                                    title: Text("pdf"),
+                      builder:
+                          (context, state) =>
+                              (Platform.isAndroid || Platform.isIOS)
+                                  ? PDFScreen(
+                                    path:
+                                        _pathExternalStorage +
+                                        "/FEE-" +
+                                        item.mCode +
+                                        ".pdf",
+                                    titre: item.mNomFR,
+                                  )
+                                  : Scaffold(
+                                    appBar: AppBar(title: Text("pdf")),
+                                    body: Text(
+                                      _pathExternalStorage +
+                                          "/FEE-" +
+                                          item.mCode +
+                                          ".pdf",
+                                    ),
                                   ),
-                                  body: Text(_pathExternalStorage +
-                                      "/FEE-" +
-                                      item.mCode +
-                                      ".pdf"),
-                                ),
                     );
                   }).toList(),
                   ...gl.dico.getAllStationFiches().map<GoRoute>((String item) {
                     //print("create go route " + item);
                     return GoRoute(
                       path: item + "/:currentPage",
-                      builder: (context, state) =>
-                          (Platform.isAndroid || Platform.isIOS)
-                              ? PDFScreen(
-                                  path: _pathExternalStorage + "/" + item,
-                                  titre: item,
-                                  currentPage: int.parse(
-                                      state.pathParameters['currentPage']!),
-                                )
-                              : Scaffold(
-                                  appBar: AppBar(
-                                    title: Text("pdf"),
+                      builder:
+                          (context, state) =>
+                              (Platform.isAndroid || Platform.isIOS)
+                                  ? PDFScreen(
+                                    path: _pathExternalStorage + "/" + item,
+                                    titre: item,
+                                    currentPage: int.parse(
+                                      state.pathParameters['currentPage']!,
+                                    ),
+                                  )
+                                  : Scaffold(
+                                    appBar: AppBar(title: Text("pdf")),
+                                    body: Text(_pathExternalStorage + item),
                                   ),
-                                  body: Text(_pathExternalStorage + item),
-                                ),
                     );
                   }).toList(),
                 ],
               ),
             ],
           ),
-          StatefulShellBranch(navigatorKey: _shellNavigatorCKey, routes: [
-            // top route inside branch
-            GoRoute(
-              path: "/" + gl.basePathbranchC,
-              pageBuilder: (context, state) => const NoTransitionPage(
-                child: OfflineView(),
+          StatefulShellBranch(
+            navigatorKey: _shellNavigatorCKey,
+            routes: [
+              // top route inside branch
+              GoRoute(
+                path: "/" + gl.basePathbranchC,
+                pageBuilder:
+                    (context, state) =>
+                        const NoTransitionPage(child: OfflineView()),
               ),
-            )
-          ]),
+            ],
+          ),
         ],
       ),
     ],
   );
 
-// private navigators
+  // private navigators
   final _rootNavigatorKey = GlobalKey<NavigatorState>();
   final _shellNavigatorAKey = GlobalKey<NavigatorState>(debugLabel: 'shellA');
   final _shellNavigatorBKey = GlobalKey<NavigatorState>(debugLabel: 'shellB');
@@ -332,52 +343,54 @@ class _MyApp extends State<MyApp> {
       return const MaterialApp(home: CircularProgressIndicator());
     } else if (gl.firstTimeUse) {
       return MaterialApp(
-          home: PopupNotification(
-        title: "Bienvenu",
-        accept: "oui",
-        onAccept: () async {
-          Map<Permission, PermissionStatus> statuses = await [
-            Permission.location,
-            Permission.storage,
-            Permission.manageExternalStorage
-          ].request();
-          setState(() {
-            gl.firstTimeUse = false;
-          });
-          final SharedPreferences prefs = await SharedPreferences.getInstance();
-          await prefs.setBool('firstTimeUse', gl.firstTimeUse);
-          for (var key in gl.downloadableLayerKeys) {
-
-            if (!(Platform.isWindows || Platform.isLinux || Platform.isMacOS)) {
-              FlutterDownloader.enqueue(
-                url: gl.queryApiRastDownload +
-                    "/" +
-                    gl.dico.getLayerBase(key).mCode,
-                fileName: gl.dico.getLayerBase(key).mNomRaster,
-                savedDir: gl.dico.docDir.path,
-                showNotification: false,
-                openFileFromNotification: false,
-                timeout: 15000,
-              );
+        home: PopupNotification(
+          title: "Bienvenu",
+          accept: "oui",
+          onAccept: () async {
+            Map<Permission, PermissionStatus> statuses =
+                await [
+                  Permission.location,
+                  Permission.storage,
+                  Permission.manageExternalStorage,
+                ].request();
+            setState(() {
+              gl.firstTimeUse = false;
+            });
+            final SharedPreferences prefs =
+                await SharedPreferences.getInstance();
+            await prefs.setBool('firstTimeUse', gl.firstTimeUse);
+            for (var key in gl.downloadableLayerKeys) {
+              if (!(Platform.isWindows ||
+                  Platform.isLinux ||
+                  Platform.isMacOS)) {
+                FlutterDownloader.enqueue(
+                  url:
+                      gl.queryApiRastDownload +
+                      "/" +
+                      gl.dico.getLayerBase(key).mCode,
+                  fileName: gl.dico.getLayerBase(key).mNomRaster,
+                  savedDir: gl.dico.docDir.path,
+                  showNotification: false,
+                  openFileFromNotification: false,
+                  timeout: 15000,
+                );
+              }
             }
-          }
-        },
-        decline: "non",
-        onDecline: () async {
-          Map<Permission, PermissionStatus> statuses = await [
-            Permission.location,
-            Permission.storage,
-            Permission.manageExternalStorage
-          ].request();
-          setState(() {
-            gl.firstTimeUse = false;
-          });
-          final SharedPreferences prefs = await SharedPreferences.getInstance();
-          await prefs.setBool('firstTimeUse', gl.firstTimeUse);
-        },
-        dialog:
-            "Forestimator mobile ne collecte aucune information personnelle. Notre politique de confidentialité est consultable au https://forestimator.gembloux.ulg.ac.be/documentation/confidentialit_. Autorisez-vous l'aplication à télécharger un jeu de couches pour une utilisation hors ligne? Ces couches couvrent toutes la Région Wallonne et totalisent +- 100 Mo.",
-      ));
+          },
+          decline: "non",
+          onDecline: () async {
+            
+            setState(() {
+              gl.firstTimeUse = false;
+            });
+            final SharedPreferences prefs =
+                await SharedPreferences.getInstance();
+            await prefs.setBool('firstTimeUse', gl.firstTimeUse);
+          },
+          dialog:
+              "Forestimator mobile ne collecte aucune information personnelle. Notre politique de confidentialité est consultable au https://forestimator.gembloux.ulg.ac.be/documentation/confidentialit_. Autorisez-vous l'aplication à télécharger un jeu de couches pour une utilisation hors ligne? Ces couches couvrent toutes la Région Wallonne et totalisent +- 100 Mo.",
+        ),
+      );
     }
     return MaterialApp.router(
       routerDelegate: _router.routerDelegate,
@@ -393,10 +406,12 @@ class _MyApp extends State<MyApp> {
 
   void _bindBackgroundIsolate() async {
     IsolateNameServer.registerPortWithName(
-        _port.sendPort, 'downloader_send_port');
+      _port.sendPort,
+      'downloader_send_port',
+    );
     await for (dynamic data in _port) {
-//    _port.listen((dynamic data) {
-      String id = data[0];
+      //    _port.listen((dynamic data) {
+      //String id = data[0];
       //print("inside bindBackgroundIsolate!!");
 
       DownloadTaskStatus status = DownloadTaskStatus.fromInt(data[1]);
@@ -433,7 +448,8 @@ class _MyApp extends State<MyApp> {
               return AlertDialog(
                 title: Text("Téléchargement"),
                 content: Text(
-                    "Le téléchargement d'une carte a échoué. Réessayez plus tard."),
+                  "Le téléchargement d'une carte a échoué. Réessayez plus tard.",
+                ),
                 actions: [
                   TextButton(
                     child: Text("OK"),

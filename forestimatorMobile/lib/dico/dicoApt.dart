@@ -1,4 +1,3 @@
-import 'package:http/http.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
@@ -294,7 +293,7 @@ class layerBase {
   }
 
   Future<int> getValXY(proj4.Point pt) async {
-    final File fileIm = File("${gl.dico.docDir?.path}/${mNomRaster}");
+    final File fileIm = File("${gl.dico.docDir.path}/${mNomRaster}");
     onePixGeotifDecoder myDecoder = onePixGeotifDecoder(x: pt.x, y: pt.y);
     Uint8List bytes = await fileIm.readAsBytes();
     return myDecoder.getVal(bytes);
@@ -609,7 +608,7 @@ class dicoAptProvider {
 
   void checkLayerBaseForAnalysis() async {
     for (layerBase l in mLayerBases.values) {
-      File file = File(getRastPath(l.mCode));
+      //File file = File(getRastPath(l.mCode));
       if (l.mGroupe != "APT_CS" &&
           l.mGroupe != "APT_FEE" &&
           l.mCategorie != "Externe") {
@@ -621,7 +620,7 @@ class dicoAptProvider {
 
   String getRastPath(String aLayerCode) {
     layerBase l = getLayerBase(aLayerCode);
-    return "${docDir?.path}/${l.mNomRaster}";
+    return "${docDir.path}/${l.mNomRaster}";
   }
 }
 

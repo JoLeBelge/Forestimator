@@ -12,12 +12,11 @@ dependencies:
     sdk: flutter
   sqflite: ^2.3.0
   sqflite_common_ffi: ^2.3.2
-  #sidebarx: ^0.17.1
   flutter_map: ^8.0.0
   path_provider: ^2.1.2
   http: ^1.0.0
   tuple: ^2.0.2
-  flutter_downloader: ^1.11.7
+  flutter_downloader: ^1.12.0
   geolocator: ^14.0.0
   connectivity_plus: ^6.0.1 # te dis si tu es connecté au wifi ou à la data, mais pas si tu as accès à internet. pas suffisant donc
   internet_connection_checker_plus: ^2.3.0
@@ -26,7 +25,7 @@ dependencies:
   go_router: ^15.1.1
   flutter_pdfview: ^1.2.7
   #flutter_map_location_marker: ^8.0.8 pas compatible avec flutter_map 7.0
-  image: ^4.2.0
+  image: ^4.5.4
 
   geoimage: ^0.4.0
   shared_preferences: ^2.2.2
@@ -35,8 +34,8 @@ dependencies:
   intl: ^0.20.2
   downloadsfolder: ^1.1.0
   permission_handler: ^12.0.0+1
-  #device_info_plus: ^10.1.2
   memory_info: ^0.0.4
+  device_info_plus: ^11.4.0
 
 dev_dependencies:
   flutter_test:

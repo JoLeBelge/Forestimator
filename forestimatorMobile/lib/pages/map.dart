@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:fforestimator/dico/dicoApt.dart';
 import 'package:fforestimator/tileProvider/tifTileProvider.dart';
+import 'package:fforestimator/tools/handlePermissions.dart';
 //import 'package:flutter_logs/flutter_logs.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
@@ -17,7 +18,6 @@ import 'package:fforestimator/pages/anaPt/requestedLayer.dart';
 import 'package:go_router/go_router.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:fforestimator/tools/notification.dart';
 import 'dart:convert';
 //import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
@@ -34,22 +34,26 @@ class _MapPageState extends State<mapPage> {
   LatLng? _pt;
   bool _doingAnaPt = false;
   var data;
+  /*
   Geolocator? _geolocator;
   Position? _position;
-  StreamSubscription? _positionStream;
+  StreamSubscription? _positionStream;*/
 
-//https://github.com/fleaflet/flutter_map/blob/master/example/lib/pages/custom_crs/custom_crs.dart
+  //https://github.com/fleaflet/flutter_map/blob/master/example/lib/pages/custom_crs/custom_crs.dart
   late proj4.Projection epsg4326 = proj4.Projection.get('EPSG:4326')!;
   // si epsg31370 est dans la db proj 4, on prend, sinon on définit
-  proj4.Projection epsg31370 = proj4.Projection.get('EPSG:31370') ??
-      proj4.Projection.add('EPSG:31370',
-          '+proj=lcc +lat_1=51.16666723333333 +lat_2=49.8333339 +lat_0=90 +lon_0=4.367486666666666 +x_0=150000.013 +y_0=5400088.438 +ellps=intl +towgs84=-106.8686,52.2978,-103.7239,0.3366,-0.457,1.8422,-1.2747 +units=m +no_defs +type=crs');
-// map extend in BL72.
+  proj4.Projection epsg31370 =
+      proj4.Projection.get('EPSG:31370') ??
+      proj4.Projection.add(
+        'EPSG:31370',
+        '+proj=lcc +lat_1=51.16666723333333 +lat_2=49.8333339 +lat_0=90 +lon_0=4.367486666666666 +x_0=150000.013 +y_0=5400088.438 +ellps=intl +towgs84=-106.8686,52.2978,-103.7239,0.3366,-0.457,1.8422,-1.2747 +units=m +no_defs +type=crs',
+      );
+  // map extend in BL72.
   final epsg31370Bounds = Rect.fromPoints(
     Offset(42250.0, 21170.0), // lower left
     Offset(295170.0, 167700.0), // upper right
   );
-  
+
   double tileSize = 256.0;
 
   List<double> getResolutions2(int nbzoom) {
@@ -65,10 +69,11 @@ class _MapPageState extends State<mapPage> {
   }*/
 
   late var epsg31370CRS = Proj4Crs.fromFactory(
-      code: 'EPSG:31370',
-      proj4Projection: epsg31370,
-      bounds: epsg31370Bounds,
-      resolutions: getResolutions2(11));
+    code: 'EPSG:31370',
+    proj4Projection: epsg31370,
+    bounds: epsg31370Bounds,
+    resolutions: getResolutions2(12),
+  );
   //resolutions: getResolutions(295170.0, 42250.0, 15, 256.0));
 
   Future _runAnaPt(proj4.Point ptBL72) async {
@@ -89,11 +94,11 @@ class _MapPageState extends State<mapPage> {
 
         String url =
             "https://forestimator.gembloux.ulg.ac.be/api/anaPt/layers/" +
-                layersAnaPt +
-                "/x/" +
-                ptBL72.x.toString() +
-                "/y/" +
-                ptBL72.y.toString();
+            layersAnaPt +
+            "/x/" +
+            ptBL72.x.toString() +
+            "/y/" +
+            ptBL72.y.toString();
         try {
           var res = await http.get(Uri.parse(url));
           if (res.statusCode != 200) throw HttpException('${res.statusCode}');
@@ -129,118 +134,144 @@ class _MapPageState extends State<mapPage> {
     gl.requestedLayers.removeWhere((element) => element.mRastValue == 0);
 
     // on les trie sur base des catégories de couches
-    gl.requestedLayers.sort((a, b) => gl.dico
-        .getLayerBase(a.mCode)
-        .mGroupe
-        .compareTo(gl.dico.getLayerBase(b.mCode).mGroupe));
+    gl.requestedLayers.sort(
+      (a, b) => gl.dico
+          .getLayerBase(a.mCode)
+          .mGroupe
+          .compareTo(gl.dico.getLayerBase(b.mCode).mGroupe),
+    );
   }
 
+  /*
   bool _isDownloadableLayer(String key) {
     if (gl.downloadableLayerKeys.contains(key)) {
       return true;
     }
     return false;
   }
-
+*/
   tifFileTileProvider? _provider;
 
   @override
   void initState() {
     super.initState();
+    initPermissions();
     gl.refreshMap = setState;
-    _geolocator = Geolocator();
-    LocationSettings locationOptions = const LocationSettings(
-        accuracy: LocationAccuracy.high, distanceFilter: 1);
-    /*Geolocator.getPositionStream(locationSettings: locationOptions)
-        .listen((Position? position) {
-      gl.position = position;
-      setState(() {});
-    });*/
+    initOtherValuesOnce();
   }
 
   void refreshView(void Function() f) async {
     setState(f);
   }
 
-  @override
-  Widget build(BuildContext context) {
+  LatLng latlonBL = LatLng(0.0, 0.0);
+  LatLng latlonTR = LatLng(0.0, 0.0);
+
+  void initOtherValuesOnce() {
     proj4.Point ptBotLeft = proj4.Point(
-        x: epsg31370Bounds.bottomLeft.dx, y: epsg31370Bounds.bottomLeft.dy);
+      x: epsg31370Bounds.bottomLeft.dx,
+      y: epsg31370Bounds.bottomLeft.dy,
+    );
     proj4.Point ptTopR = proj4.Point(
-        x: epsg31370Bounds.topRight.dx, y: epsg31370Bounds.topRight.dy);
+      x: epsg31370Bounds.topRight.dx,
+      y: epsg31370Bounds.topRight.dy,
+    );
 
     // contraindre la vue de la map sur la zone de la Wallonie. ajout d'un peu de marge
     double margeInDegree = 0.1;
-    LatLng latlonBL = LatLng(
-        epsg31370.transform(epsg4326, ptBotLeft).y + margeInDegree,
-        epsg31370.transform(epsg4326, ptBotLeft).x - margeInDegree);
-    LatLng latlonTR = LatLng(
-        epsg31370.transform(epsg4326, ptTopR).y - margeInDegree,
-        epsg31370.transform(epsg4326, ptTopR).x + margeInDegree);
+    latlonBL = LatLng(
+      epsg31370.transform(epsg4326, ptBotLeft).y + margeInDegree,
+      epsg31370.transform(epsg4326, ptBotLeft).x - margeInDegree,
+    );
+    latlonTR = LatLng(
+      epsg31370.transform(epsg4326, ptTopR).y - margeInDegree,
+      epsg31370.transform(epsg4326, ptTopR).x + margeInDegree,
+    );
+  }
 
-    return Scaffold(
-        appBar: gl.offlineMode
-            ? AppBar(
-                title: const Row(
+  @override
+  Widget build(BuildContext context) {
+    return handlePermissionForLocation(
+      refreshParentWidgetTree: refreshView,
+      child: Scaffold(
+        appBar:
+            gl.offlineMode
+                ? AppBar(
+                  title: const Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text("Forestimator offline/terrain",
-                          textScaler: TextScaler.linear(0.75),
-                          style: TextStyle(color: Colors.black)),
-                    ]),
-                toolbarHeight: 20.0,
-                backgroundColor: gl.colorAgroBioTech,
-              )
-            : AppBar(
-                title: const Row(
+                      Text(
+                        "Forestimator offline/terrain",
+                        textScaler: TextScaler.linear(0.75),
+                        style: TextStyle(color: Colors.black),
+                      ),
+                    ],
+                  ),
+                  toolbarHeight: 20.0,
+                  backgroundColor: gl.colorAgroBioTech,
+                )
+                : AppBar(
+                  title: const Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text("Forestimator online",
-                          textScaler: TextScaler.linear(0.75),
-                          style: TextStyle(color: Colors.white)),
-                    ]),
-                toolbarHeight: 20.0,
-                backgroundColor: gl.colorUliege,
-              ),
-        body: Stack(children: <Widget>[
-          FlutterMap(
+                      Text(
+                        "Forestimator online",
+                        textScaler: TextScaler.linear(0.75),
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ],
+                  ),
+                  toolbarHeight: 20.0,
+                  backgroundColor: gl.colorUliege,
+                ),
+        body: Stack(
+          children: <Widget>[
+            FlutterMap(
               mapController: _mapController,
               options: MapOptions(
                 backgroundColor: Colors.transparent,
                 keepAlive: true,
                 interactionOptions: const InteractionOptions(
                   enableMultiFingerGestureRace: false,
-                  flags: InteractiveFlag.drag |
+                  flags:
+                      InteractiveFlag.drag |
                       InteractiveFlag.pinchZoom |
                       InteractiveFlag.pinchMove |
                       InteractiveFlag.doubleTapZoom |
                       InteractiveFlag.scrollWheelZoom,
                 ),
-                onLongPress: (tapPosition, point) async => {
-                  if (!_doingAnaPt)
-                    {
-                      setState(() {
-                        _doingAnaPt = true;
-                      }),
-                      //proj4.Point ptBL72 = epsg4326.transform(epsg31370,proj4.Point(x: point.longitude, y: point.latitude))
-                      await _runAnaPt(epsg4326.transform(epsg31370,
-                          proj4.Point(x: point.longitude, y: point.latitude))),
-                      _updatePtMarker(point),
-                      setState(() {
-                        _doingAnaPt = false;
-                      }),
-                      GoRouter.of(context).push("/anaPt"),
-                    }
-                },
+                onLongPress:
+                    (tapPosition, point) async => {
+                      if (!_doingAnaPt)
+                        {
+                          setState(() {
+                            _doingAnaPt = true;
+                          }),
+                          //proj4.Point ptBL72 = epsg4326.transform(epsg31370,proj4.Point(x: point.longitude, y: point.latitude))
+                          await _runAnaPt(
+                            epsg4326.transform(
+                              epsg31370,
+                              proj4.Point(
+                                x: point.longitude,
+                                y: point.latitude,
+                              ),
+                            ),
+                          ),
+                          _updatePtMarker(point),
+                          setState(() {
+                            _doingAnaPt = false;
+                          }),
+                          GoRouter.of(context).push("/anaPt"),
+                        },
+                    },
                 onPositionChanged: (position, e) async {
-                  LatLng c = _mapController.camera.center;
-                  final SharedPreferences prefs =
-                      await SharedPreferences.getInstance();
-                  await prefs.setDouble('mapCenterLat', c.latitude);
-                  await prefs.setDouble('mapCenterLon', c.longitude);
+                  if (!e) return;
                   updateLocation();
-                  double aZoom = _mapController.camera.zoom;
-                  await prefs.setDouble('mapZoom', aZoom);
+                  _writeNewPositionToMemory(
+                    position.center.longitude,
+                    position.center.latitude,
+                    position.zoom,
+                  );
                 },
                 crs: epsg31370CRS,
                 initialZoom: 8.0,
@@ -249,8 +280,8 @@ class _MapPageState extends State<mapPage> {
                     2, // pour les cartes offline, il faudrait informer l'utilisateur du fait que si le zoom est trop peu élevé, la carte ne s'affiche pas
                 initialCenter: gl.latlonCenter,
                 cameraConstraint: CameraConstraint.contain(
-                  
-                    bounds: LatLngBounds.fromPoints([latlonBL, latlonTR])),
+                  bounds: LatLngBounds.fromPoints([latlonBL, latlonTR]),
+                ),
                 onMapReady: () async {
                   /*Permission.locationWhenInUse.request();
                   if (await Permission.locationWhenInUse.isGranted) {
@@ -263,14 +294,16 @@ class _MapPageState extends State<mapPage> {
                       */ // pour ancienne version de android
 
                   updateLocation();
-
                   if (gl.position != null) {
                     // IMPORTANT: rebuild location layer when permissions are granted
                     setState(() {
                       _mapController.move(
-                          LatLng(gl.position?.latitude ?? 0.0,
-                              gl.position?.longitude ?? 0.0),
-                          9);
+                        LatLng(
+                          gl.position?.latitude ?? 0.0,
+                          gl.position?.longitude ?? 0.0,
+                        ),
+                        gl.mapZoom,
+                      );
                     });
                     // si on refusait d'allumer le GPS, alors la carte ne s'affichait jamais, c'est pourquoi il y a le else et le code ci-dessous
                   } else {
@@ -280,8 +313,10 @@ class _MapPageState extends State<mapPage> {
                   }
                 },
               ),
-              children: gl.interfaceSelectedLayerKeys.reversed
-                      .map<Widget>((gl.selectedLayer selLayer) {
+              children:
+                  gl.interfaceSelectedLayerKeys.reversed.map<Widget>((
+                    gl.selectedLayer selLayer,
+                  ) {
                     if (selLayer.offline &&
                         gl.dico.getLayerBase(selLayer.mCode).mOffline &&
                         (selLayer.mCode == gl.getFirstSelLayOffline())) {
@@ -293,19 +328,20 @@ class _MapPageState extends State<mapPage> {
                               null; // normalement le garbage collector effectue le dispose pour nous.
                         }
                         _provider = tifFileTileProvider(
-                            refreshView: refreshView,
-                            mycrs: epsg31370CRS,
-                            sourceImPath: gl.dico.getRastPath(selLayer.mCode),
-                            layerCode: selLayer.mCode);
+                          refreshView: refreshView,
+                          mycrs: epsg31370CRS,
+                          sourceImPath: gl.dico.getRastPath(selLayer.mCode),
+                          layerCode: selLayer.mCode,
+                        );
                         _provider?.init();
                       }
                       return _provider!.loaded
                           ? TileLayer(
-                              tileProvider: _provider,
-                              // minNativeZoom: 8,
-                              minZoom:
-                                  2, // si minZoom de la map est moins restrictif (moins élevé) que celui-ci, la carte ne s'affiche juste pas (écran blanc)
-                            )
+                            tileProvider: _provider,
+                            // minNativeZoom: 8,
+                            minZoom:
+                                2, // si minZoom de la map est moins restrictif (moins élevé) que celui-ci, la carte ne s'affiche juste pas (écran blanc)
+                          )
                           : Container();
                     } else if (selLayer.offline) {
                       // deuxième carte offline ; on ne fait rien avec, un seul provider
@@ -317,9 +353,7 @@ class _MapPageState extends State<mapPage> {
                         wmsOptions: WMSTileLayerOptions(
                           baseUrl: l.mUrl + "?",
                           format: 'image/png',
-                          layers: [
-                            l.mWMSLayerName,
-                          ],
+                          layers: [l.mWMSLayerName],
                           crs: epsg31370CRS,
                           transparent: true,
                         ),
@@ -342,62 +376,99 @@ class _MapPageState extends State<mapPage> {
                         ),
                       ],
                     ),
-                  ]),
-          gl.position != null
-              ? Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-                  Column(mainAxisAlignment: MainAxisAlignment.end, children: [
-                    IconButton(
-                        iconSize: 40.0,
-                        color: gl.colorAgroBioTech,
-                        onPressed: () async {
-                          if (!_doingAnaPt) {
-                            setState(() {
-                              _doingAnaPt = true;
-                            });
-                            await _runAnaPt(epsg4326.transform(
-                                epsg31370,
-                                proj4.Point(
+                  ],
+            ),
+            gl.position != null
+                ? Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        IconButton(
+                          iconSize: 40.0,
+                          color: gl.colorAgroBioTech,
+                          onPressed: () async {
+                            if (!_doingAnaPt) {
+                              setState(() {
+                                _doingAnaPt = true;
+                              });
+                              await _runAnaPt(
+                                epsg4326.transform(
+                                  epsg31370,
+                                  proj4.Point(
                                     x: gl.position?.longitude ?? 0.0,
-                                    y: gl.position?.latitude ?? 0.0)));
-                            _updatePtMarker(LatLng(gl.position?.latitude ?? 0.0,
-                                gl.position?.longitude ?? 0.0));
-                            GoRouter.of(context).push("/anaPt");
-                            setState(() {
-                              _doingAnaPt = false;
-                            });
-                          }
-                        },
-                        icon: const Icon(Icons.analytics)),
-                    IconButton(
-                        iconSize: 40.0,
-                        color: Colors.red,
-                        onPressed: () async {
-                          if (gl.position != null) {
-                            setState(() {
-                              _mapController.move(
-                                  LatLng(gl.position?.latitude ?? 0.0,
-                                      gl.position?.longitude ?? 0.0),
-                                  8);
-                            });
-                          }
-                        },
-                        icon: const Icon(Icons.gps_fixed)),
-                  ])
-                ])
-              : Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-                  Column(mainAxisAlignment: MainAxisAlignment.end, children: [
-                    IconButton(
-                        iconSize: 40.0,
-                        color: Colors.black,
-                        onPressed: () async {
-                          if (gl.position != null) {
-                            setState(() {});
-                          }
-                        },
-                        icon: const Icon(Icons.gps_fixed))
-                  ])
-                ]),
-        ]));
+                                    y: gl.position?.latitude ?? 0.0,
+                                  ),
+                                ),
+                              );
+                              _updatePtMarker(
+                                LatLng(
+                                  gl.position?.latitude ?? 0.0,
+                                  gl.position?.longitude ?? 0.0,
+                                ),
+                              );
+                              GoRouter.of(context).push("/anaPt");
+                              setState(() {
+                                _doingAnaPt = false;
+                              });
+                            }
+                          },
+                          icon: const Icon(Icons.analytics),
+                        ),
+                        IconButton(
+                          iconSize: 40.0,
+                          color: Colors.red,
+                          onPressed: () async {
+                            if (gl.position != null) {
+                              setState(() {
+                                _mapController.move(
+                                  LatLng(
+                                    gl.position?.latitude ?? 0.0,
+                                    gl.position?.longitude ?? 0.0,
+                                  ),
+                                  8,
+                                );
+                              });
+                            }
+                          },
+                          icon: const Icon(Icons.gps_fixed),
+                        ),
+                      ],
+                    ),
+                  ],
+                )
+                : Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        IconButton(
+                          iconSize: 40.0,
+                          color: Colors.black,
+                          onPressed: () async {
+                            if (gl.position != null) {
+                              setState(() {});
+                            }
+                          },
+                          icon: const Icon(Icons.gps_fixed),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _writeNewPositionToMemory(double lon, double lat, double zoom) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setDouble('mapCenterLat', lat);
+    await prefs.setDouble('mapCenterLon', lon);
+    await prefs.setDouble('mapZoom', zoom);
   }
 
   void _updatePtMarker(LatLng pt) {
@@ -415,8 +486,8 @@ class _MapPageState extends State<mapPage> {
       else
         _refreshLocation = true;
       Position newPosition = await Geolocator.getCurrentPosition(
-              /*desiredAccuracy: LocationAccuracy.high*/)
-          .timeout(new Duration(seconds: 3));
+        /*desiredAccuracy: LocationAccuracy.high*/
+      ).timeout(new Duration(seconds: 3));
 
       setState(() {
         gl.position = newPosition;
@@ -431,10 +502,95 @@ class _MapPageState extends State<mapPage> {
       //FlutterLogs.logError("gps", "position", "error while waiting on position. ${e.toString()}");
     }
   }
+
+  MapOptions _getOptions() {
+    return MapOptions(
+      backgroundColor: Colors.transparent,
+      keepAlive: true,
+      interactionOptions: const InteractionOptions(
+        enableMultiFingerGestureRace: false,
+        flags:
+            InteractiveFlag.drag |
+            InteractiveFlag.pinchZoom |
+            InteractiveFlag.pinchMove |
+            InteractiveFlag.doubleTapZoom |
+            InteractiveFlag.scrollWheelZoom,
+      ),
+      onLongPress:
+          (tapPosition, point) async => {
+            if (!_doingAnaPt)
+              {
+                setState(() {
+                  _doingAnaPt = true;
+                }),
+                //proj4.Point ptBL72 = epsg4326.transform(epsg31370,proj4.Point(x: point.longitude, y: point.latitude))
+                await _runAnaPt(
+                  epsg4326.transform(
+                    epsg31370,
+                    proj4.Point(x: point.longitude, y: point.latitude),
+                  ),
+                ),
+                _updatePtMarker(point),
+                setState(() {
+                  _doingAnaPt = false;
+                }),
+                GoRouter.of(context).push("/anaPt"),
+              },
+          },
+      onPositionChanged: (position, e) async {
+        LatLng c = _mapController.camera.center;
+        final SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.setDouble('mapCenterLat', c.latitude);
+        await prefs.setDouble('mapCenterLon', c.longitude);
+        updateLocation();
+        double aZoom = _mapController.camera.zoom;
+        await prefs.setDouble('mapZoom', aZoom);
+      },
+      crs: epsg31370CRS,
+      initialZoom: 8.0,
+      maxZoom: 10,
+      minZoom:
+          2, // pour les cartes offline, il faudrait informer l'utilisateur du fait que si le zoom est trop peu élevé, la carte ne s'affiche pas
+      initialCenter: gl.latlonCenter,
+      cameraConstraint: CameraConstraint.contain(
+        bounds: LatLngBounds.fromPoints([latlonBL, latlonTR]),
+      ),
+      onMapReady: () async {
+        /*Permission.locationWhenInUse.request();
+                  if (await Permission.locationWhenInUse.isGranted) {
+                    Permission.locationAlways.request();
+                  }
+                  Permission.manageExternalStorage
+                      .request(); // pour nouvelle version de android
+                  Permission.storage
+                      .request();
+                      */ // pour ancienne version de android
+
+        updateLocation();
+        if (gl.position != null) {
+          // IMPORTANT: rebuild location layer when permissions are granted
+          setState(() {
+            _mapController.move(
+              LatLng(
+                gl.position?.latitude ?? 0.0,
+                gl.position?.longitude ?? 0.0,
+              ),
+              9,
+            );
+          });
+          // si on refusait d'allumer le GPS, alors la carte ne s'affichait jamais, c'est pourquoi il y a le else et le code ci-dessous
+        } else {
+          setState(() {
+            _mapController.move(gl.latlonCenter, gl.mapZoom);
+          });
+        }
+      },
+    );
+  }
 }
 
 Future<Position?> acquireUserLocation() async {
-  if (await Permission.location.isGranted) {
+  if (locationGranted()) {
     try {
       return await Geolocator.getCurrentPosition();
     } on LocationServiceDisabledException {
