@@ -9,7 +9,7 @@
 	<div class="encodage" style="margin: 3px 0px; overflow: visible; flex: 1 1 auto;">
 	<h1> Formulaire d'encodage des forêts subnaturelles </h1>
 
-<h3>Localisation des forêts subnaturelle</h3>
+<h3>Localisation des forêts subnaturelles</h3>
 BLABLABLA intro
 <br></br>
  Vous pouvez nous aider en remplissant le formulaire ci-dessous, ou en nous contactant par mail ou téléphone : Mr Lisein (<a href = "mailto: liseinjon@hotmail.com">JO.Lisein@uliege.be</a> - 0475221309)
@@ -58,7 +58,7 @@ BLABLABLA intro
 <message id="sectionVCR1"> <h3> Description de la forêt subnaturelle </h3>
 </message>
 
-<message id="descriptionVCR.ph"> Renseignez ici par exemple les essences majoritaires et l'année des dernières interventions sylvicoles ainsi que tout autres renseignement que vous jugez utiles</message>
+<message id="descriptionVCR.ph"> Renseignez ici par exemple les essences majoritaires et l'année des dernières interventions sylvicoles ainsi que tout autre renseignement que vous jugez utile</message>
 <message id="descriptionVCR"> Description de la forêt subnaturelle</message>
 
 
