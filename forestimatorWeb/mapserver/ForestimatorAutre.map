@@ -21,14 +21,11 @@ MAP
   	END
   	
   	LAYER
-  	NAME "parcellaire"
+  	NAME "parcellaire_DNF"
   	TYPE POLYGON
   	STATUS ON
-  		CONNECTIONTYPE OGR
-  		CONNECTION "parcellaire_PA.gpkg"
-  		DATA "parcellaire_PA"           
-  	PROCESSING "CLOSE_CONNECTION=DEFER"
-  	PROCESSING "LABEL_NO_CLIP=True"
+  	DATA "parcellaire_DNF.shp"  
+  	LABELITEM    "COMP"         
   	CLASS
     	NAME "Compartiments"
     	STYLE
@@ -38,12 +35,10 @@ MAP
     	END #style
     	LABEL
       		ALIGN center
-      		FONT "ubuntu"
       		TYPE TRUETYPE
-      		SIZE 15
+      		SIZE 10
       		POSITION CC
-      		COLOR 255 0 0
-      		OUTLINECOLOR 50 200 60
+      		COLOR 46 111 64
     	END #label
   	END #class
 	END #layer
