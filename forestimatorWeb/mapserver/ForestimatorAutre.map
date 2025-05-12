@@ -6923,5 +6923,25 @@ END
    		END
    		TEMPLATE "../template.html"
    	END
+   	
+   	 LAYER
+  		NAME "dendro_vha"
+   		TYPE RASTER
+   		STATUS ON
+   		PROJECTION
+      			"init=epsg:31370"
+   		END
+   		DATA "dendro/dendro_vha_8bits.tif" 
+   		PROCESSING "BANDS=1" 
+   		OFFSITE 0 0 0
+
+   		INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_vha.map"
+   		METADATA
+      			"wms_title"           "Modèle dendrométrique : Volume des peuplements (VHA) [m3/ha]"
+      			"wms_srs"             "EPSG:31370"
+   		END
+   		TEMPLATE "../template.html"
+   	END
+   	
 
 END
