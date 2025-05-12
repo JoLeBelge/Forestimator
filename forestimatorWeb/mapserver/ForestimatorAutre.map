@@ -43,6 +43,30 @@ MAP
   	END #class
 	END #layer
 
+
+	LAYER
+  	NAME "cadastre"
+  	TYPE POLYGON
+  	STATUS ON
+  	DATA "Bpn_CaPa.shp"  
+  	LABELITEM    "CaPaKey"         
+  	CLASS
+    	NAME "CaPaKey"
+    	STYLE
+      		COLOR 200 200 200
+      		OUTLINECOLOR 0 0 0
+      		WIDTH 0.1
+    	END #style
+    	LABEL
+      		ALIGN center
+      		TYPE TRUETYPE
+      		SIZE 10
+      		POSITION CC
+      		COLOR 46 111 64
+    	END #label
+  	END #class
+	END #layer
+
  	LAYER
         NAME "ProBos"
         TYPE RASTER
