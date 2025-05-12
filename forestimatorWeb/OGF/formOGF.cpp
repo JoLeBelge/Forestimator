@@ -215,7 +215,7 @@ void formOGF::submit(){
         }
         sqlite3_close(db_);*/
 
-        //sendSummaryMail();
+        sendSummaryMail();
 
         Wt::StandardButton answer = Wt::WMessageBox::show( WString::tr("saveACR.msg.titre"),
                                                            WString::tr("saveACR.msg.cont"),

@@ -45,6 +45,8 @@ COMMUNICATION/ DOCUMENTATION
 
 AUTRE
 
+-pouvoir zoomer à l'échelle d'un arbre (pour analyse ponctuelle de la hauteur - cf demande de HC)
+
 voir appli SW MAPS (https://aviyaantech.com/SwMaps/) entre autre pour la manière dont les bouttons sont implémentés sur la carte (bouttons de digitalisation, mesure de distance, ajoute de points, etc). Et la manière de gérer et créer des projets.
 
 
