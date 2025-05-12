@@ -19,6 +19,34 @@ MAP
 			"wms_enable_request"  "*"
 	  	END
   	END
+  	
+  	LAYER
+  	NAME "parcellaire"
+  	TYPE POLYGON
+  	STATUS ON
+  	CONNECTIONTYPE OGR
+  	CONNECTION "parcellaire_PA.gpkg"
+  	DATA "parcellaire_PA"           
+  	PROCESSING "CLOSE_CONNECTION=DEFER"
+  	PROCESSING "LABEL_NO_CLIP=True"
+  	CLASS
+    	NAME "Compartiments"
+    	STYLE
+      		COLOR 200 200 200
+      		OUTLINECOLOR 0 0 0
+      		WIDTH 0.1
+    	END #style
+    	LABEL
+      		ALIGN center
+      		FONT "ubuntu"
+      		TYPE TRUETYPE
+      		SIZE 15
+      		POSITION CC
+      		COLOR 255 0 0
+      		OUTLINECOLOR 50 200 60
+    	END #label
+  	END #class
+	END #layer
 
  	LAYER
         NAME "ProBos"
