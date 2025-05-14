@@ -100,6 +100,10 @@ int launchForestimator(int argc, char **argv)
         fileResource4->suggestFileName("invitationCarrefourForestier2025.pdf");
         server.addResource(fileResource4, "/CF");
 
+        Wt::WFileResource * fileResource5 = new Wt::WFileResource("application/x-sqlite3",dico->File("docroot")+"OGF.db");
+        fileResource5->suggestFileName("OGF.db");
+        server.addResource(fileResource5, "/telechargement/OGF");
+
         server.addEntryPoint(Wt::EntryPointType::Application, std::bind(&createWebAptitudeApplication,std::placeholders::_1, dico));
         Session::configureAuth();
         server.run();

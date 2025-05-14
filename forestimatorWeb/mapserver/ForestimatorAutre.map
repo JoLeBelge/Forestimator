@@ -19,6 +19,53 @@ MAP
 			"wms_enable_request"  "*"
 	  	END
   	END
+  	
+  	LAYER
+  	NAME "parcellaire_DNF"
+  	TYPE POLYGON
+  	STATUS ON
+  	DATA "parcellaire_DNF.shp"  
+  	LABELITEM    "COMP"         
+  	CLASS
+    	NAME "Compartiments"
+    	STYLE
+      		COLOR 200 200 200
+      		OUTLINECOLOR 0 0 0
+      		WIDTH 0.1
+    	END #style
+    	LABEL
+      		ALIGN center
+      		TYPE TRUETYPE
+      		SIZE 10
+      		POSITION CC
+      		COLOR 46 111 64
+    	END #label
+  	END #class
+	END #layer
+
+
+	LAYER
+  	NAME "cadastre"
+  	TYPE POLYGON
+  	STATUS ON
+  	DATA "Bpn_CaPa.shp"  
+  	LABELITEM    "CaPaKey"         
+  	CLASS
+    	NAME "CaPaKey"
+    	STYLE
+      		COLOR 200 200 200
+      		OUTLINECOLOR 0 0 0
+      		WIDTH 0.1
+    	END #style
+    	LABEL
+      		ALIGN center
+      		TYPE TRUETYPE
+      		SIZE 10
+      		POSITION CC
+      		COLOR 46 111 64
+    	END #label
+  	END #class
+	END #layer
 
  	LAYER
         NAME "ProBos"
@@ -6876,5 +6923,25 @@ END
    		END
    		TEMPLATE "../template.html"
    	END
+   	
+   	 LAYER
+  		NAME "dendro_vha"
+   		TYPE RASTER
+   		STATUS ON
+   		PROJECTION
+      			"init=epsg:31370"
+   		END
+   		DATA "dendro/dendro_vha_8bits.tif" 
+   		PROCESSING "BANDS=1" 
+   		OFFSITE 0 0 0
+
+   		INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_vha.map"
+   		METADATA
+      			"wms_title"           "Modèle dendrométrique : Volume des peuplements (VHA) [m3/ha]"
+      			"wms_srs"             "EPSG:31370"
+   		END
+   		TEMPLATE "../template.html"
+   	END
+   	
 
 END
