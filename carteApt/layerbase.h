@@ -68,13 +68,18 @@ TypeLayer str2TypeLayer(const std::string& str);
 class basicStat{
 public:
 
-    basicStat():min(0),max(0),mean(0),stdev(0),nb(0){}
+    basicStat():min(0),max(0),mean(0),stdev(0),nb(0),nbNA(0), resolution(0.0){}
     basicStat(std::map<double,int> aMapValandFrequ, double na=0.0);
     basicStat(std::vector<double> v);
     std::string getMin(){return roundDouble(min);}
     std::string getMax(){return roundDouble(max);}
     std::string getMean(){return roundDouble(mean);}
     std::string getNb(){return std::to_string(nb);}
+     std::string getNbNA(){return roundDouble(nbNA*pow(resolution,2));}
+    std::string getSum(){
+        std::cout << "mean " << mean << ", nb " << nb << ", surf " << nb*pow(resolution,2) << " m2" << std::endl;
+        return roundDouble(mean*(nb*pow(resolution,2))/10000.0);}
+
     int getNbInt(){return nb;}
     std::string getSd(){return roundDouble(stdev);}
     std::string getCV(){if (mean!=0) {return roundDouble(100.0*stdev/mean)+"%";} else { return "-1";};}
@@ -89,9 +94,12 @@ public:
     }
 
     double getMeanDbl(){return mean;}
+    int nbNA;
+    double resolution;
    private:
     double min,max,mean,stdev;
     int nb;
+
     std::map<double,int> mValFreq;// utile quand je veux des stats basiques sur un raster de variable discontinu
 };
 
@@ -246,6 +254,7 @@ public:
     GDALDataset * rasterizeGeom(OGRGeometry *poGeom);
 protected:
     std::string mPathRaster, mPathQml, mCode;
+    double mResolution;
 };
 
 class layerBase : public rasterFiles, public WMSinfo, public std::enable_shared_from_this<layerBase>

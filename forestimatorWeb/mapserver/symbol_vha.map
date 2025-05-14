@@ -47,6 +47,6 @@
    			EXPRESSION ([pixel]>222.0 AND [pixel]<255.0)
    			STYLE
 				COLORRANGE '#9cd93b' '#fde725'
-				DATARANGE 222.0 254.0
+				DATARANGE 222.0 255.0
 			END
 		END

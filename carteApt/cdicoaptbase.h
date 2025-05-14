@@ -409,6 +409,7 @@ protected:
     std::map<std::string,std::string>  Dico_RasterNomCourt;
     std::map<std::string,bool>  Dico_RasterExpert;
     std::map<std::string,double>  Dico_RasterGain;
+    std::map<std::string,double>  Dico_RasterResolution;
     // pour savoir de quelle table provient les info du raster, fichiersGIS ou layerApt, car j'ai besoin du nom de la table pour charger le dicitonnaire (pour l'instant)
     std::map<std::string,std::string>  Dico_RasterTable;
     //code ess vers nom français

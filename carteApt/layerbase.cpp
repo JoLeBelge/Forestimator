@@ -728,7 +728,7 @@ basicStat::basicStat(std::vector<double> v):mean(0),max(0),min(0),nb(0){
     stdev = std::sqrt(sq_sum / nb - mean * mean);
 }
 
-rasterFiles::rasterFiles(std::string aPathTif,std::string aCode):mPathRaster(aPathTif),mPathQml(""),mCode(aCode){
+rasterFiles::rasterFiles(std::string aPathTif,std::string aCode):mPathRaster(aPathTif),mPathQml(""),mCode(aCode), mResolution(0){
     //std::cout << "rasterFiles " << std::endl;
     checkForQml();
 }
@@ -758,6 +758,7 @@ layerBase::layerBase(std::string aCode,cDicoApt * aDico):rasterFiles(aDico->File
     mUrl=mDico->getWMSinfo(this->Code())->WMSURL();
     mWMSLayerName=mDico->getWMSinfo(this->Code())->WMSLayerName();
     mTypeWMS=mDico->getWMSinfo(this->Code())->getTypeWMS();
+    mResolution=mDico->RasterResolution(mCode);
 }
 
 layerBase::layerBase(std::shared_ptr<layerBase> aLB):rasterFiles(aLB->Dico()->File(aLB->Code()),aLB->Code()){
@@ -775,6 +776,7 @@ layerBase::layerBase(std::shared_ptr<layerBase> aLB):rasterFiles(aLB->Dico()->Fi
     mUrl=aLB->WMSURL();
     mWMSLayerName=aLB->WMSLayerName();
     mTypeWMS=aLB->getTypeWMS();
+    mResolution=aLB->mResolution;
 }
 
 std::string layerBase::NomFile(){
@@ -1170,8 +1172,11 @@ GDALDataset * rasterFiles::rasterizeGeom(OGRGeometry *poGeom){
 
 // pour les couches des variables continues
 basicStat layerBase::computeBasicStatOnPolyg(OGRGeometry * poGeom){
-    //std::cout << "compute BasicStat On Polyg" << std::endl;
+    if (globTest){std::cout << "compute BasicStat On Polyg" << std::endl;
+    //std::cout << getDicoValStr() << std::endl;
+    }
     std::map<double,int> aMapValandFrequ;
+    int nbNA(0);
 
     if (mTypeVar==TypeVar::Continu){
         // préparation du containeur du résultat
@@ -1238,6 +1243,9 @@ basicStat layerBase::computeBasicStatOnPolyg(OGRGeometry * poGeom){
                             catch (const std::invalid_argument& ia) {
                                 std::cerr << "Invalid argument pour stod computeBasicStatOnPolyg, part2: " << ia.what() << '\n';
                             }
+                        } else {
+                            // pour compter les no data et autres valeurs en dehors du dictionnaire
+                            nbNA++;
                         }
                     }
                 }
@@ -1251,7 +1259,12 @@ basicStat layerBase::computeBasicStatOnPolyg(OGRGeometry * poGeom){
         GDALClose(mGDALDat);
     }
 
-    if (aMapValandFrequ.size()>0) {return basicStat(aMapValandFrequ);} else {return  basicStat();}
+    if (aMapValandFrequ.size()>0) {
+
+        basicStat bs(aMapValandFrequ);
+        bs.nbNA=nbNA;// je veux fournir le nombre de pixel en ND
+        bs.resolution=mResolution;// je veux une somme par hectare donc j'ai besoin de la résolution des pixels
+        return bs;} else {return  basicStat();}
 
 }
 
