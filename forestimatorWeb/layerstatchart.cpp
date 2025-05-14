@@ -92,7 +92,7 @@ std::unique_ptr<WContainerWidget> layerStatChart::getChart(bool forRenderingInPd
             table->setWidth(200 + 150 + 14+2);
         } else if (mTypeVar==TypeVar::Continu){
 
-            if(mLay->Code()=="MNH2019"){
+            if(mLay->Code()!="dendro_vha"){
                 // pour MNH et MNT, pour l'instant  - recrée un vecteur stat, puis un model
                 std::map<double, double> aStat;
                 // je dois mettre et la hauteur en double, et le pct car sinon imprécision d'arrondi
@@ -139,7 +139,8 @@ std::unique_ptr<WContainerWidget> layerStatChart::getChart(bool forRenderingInPd
                 //aChart->setMargin(WLength::Auto, Side::Left | Side::Right); // Center horizontally. il faut mettre des marges, qui sont comtpée au départ du cammembert, pour mettre les label
                 aChart->setMargin(50, Side::Left | Side::Right);
 
-            }else if(mLay->Code()=="dendro_vha"){
+            }else {
+            // uniquement pour dendro_vha
 
             basicStat bs= mLay->computeBasicStatOnPolyg(mGeom);
             // ajout d'un tableau de synthèse très simple. moyenne, écart type, somme pour volume à l'hectare?
