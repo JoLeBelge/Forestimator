@@ -44,18 +44,18 @@ parcellaire::parcellaire(groupLayers *aGL, cWebAptitude *app, statWindow *statW)
     downloadRasterBt->setInline(0);
     downloadRasterBt->disable();
     addWidget(std::make_unique<Wt::WBreak>());
-    anaOnAllPolygBt = addWidget(std::make_unique<Wt::WPushButton>(tr("parcellaire.ana.btn")));
+    /*anaOnAllPolygBt = addWidget(std::make_unique<Wt::WPushButton>(tr("parcellaire.ana.btn")));
     anaOnAllPolygBt->setStyleClass("btn btn-success");
     anaOnAllPolygBt->setWidth(200);
     anaOnAllPolygBt->setInline(0);
-    anaOnAllPolygBt->disable();
+    anaOnAllPolygBt->disable();*/
 
     fu->fileTooLarge().connect([=] { msg->setText("Le fichier est trop volumineux (max "+std::to_string(globVolMaxShp)+"Ko).");});
     fu->changed().connect(this,&parcellaire::fuChanged);
     fu->uploaded().connect(this,&parcellaire::upload);
 
     downloadRasterBt->clicked().connect(this,&parcellaire::downloadRaster);
-    anaOnAllPolygBt->clicked().connect(this,&parcellaire::anaAllPol);
+    //anaOnAllPolygBt->clicked().connect(this,&parcellaire::anaAllPol);
     // ouu je pense que c'est mal, car si j'appui sur boutton télécharger les cartes, il me dis que toutes les cartes sont sélectionnées
     mContSelect4D->addWidget(std::unique_ptr<baseSelectLayers>(mGL->mSelectLayers));
 
@@ -220,7 +220,7 @@ void parcellaire::upload(){
     if (globTest){std::cout << "upload commence.. " ;}
     //computeStatButton->disable();
     downloadRasterBt->disable();
-    anaOnAllPolygBt->disable();
+    //anaOnAllPolygBt->disable();
     cleanShpFile();
     boost::filesystem::path p(fu->clientFileName().toUTF8()), p2(this->fu->spoolFileName());
     mClientName = p.stem().c_str();
@@ -253,7 +253,7 @@ void parcellaire::upload(){
             if (computeGlobalGeom()){
                 hasValidShp=true;
                 downloadRasterBt->enable();
-                anaOnAllPolygBt->enable();
+                //anaOnAllPolygBt->enable();
                 display();
                 mGL->mMap->setToolTip(tr("tooltipMap2"));
             }
@@ -285,7 +285,7 @@ void parcellaire::upload(){
             if (computeGlobalGeom()){
                 hasValidShp=true;
                 downloadRasterBt->enable();
-                anaOnAllPolygBt->enable();
+                //anaOnAllPolygBt->enable();
                 display();
                 mGL->mMap->setToolTip(tr("tooltipMap2"));
             }
@@ -465,7 +465,7 @@ void parcellaire::polygoneCadastre(std::string aFileGeoJson, std::string aLabelN
     if (computeGlobalGeom("geojson",0)){
         hasValidShp=true;
         downloadRasterBt->enable();
-        anaOnAllPolygBt->enable();
+        //anaOnAllPolygBt->enable();
         display();
         mGL->mMap->setToolTip(tr("tooltipMap2"));
     }
@@ -704,7 +704,7 @@ void parcellaire::to31370AndGeoJsonGDAL(){
     if (computeGlobalGeom()){
         hasValidShp=true;
         downloadRasterBt->enable();
-        anaOnAllPolygBt->enable();
+        //anaOnAllPolygBt->enable();
         display();
         mGL->mMap->setToolTip(tr("tooltipMap2"));
     }

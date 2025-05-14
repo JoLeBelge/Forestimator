@@ -46,6 +46,7 @@ void cadastre::loadInfo(){
     // lecture des communes
     const char *inputPath= mShpCommunePath.c_str();
     if (boost::filesystem::exists(inputPath)){
+        if (globTest){std::cout << "open gdaldataset" << std::endl;}
         GDALDataset * mDS; mDS= GDALDataset::Open(inputPath, GDAL_OF_VECTOR | GDAL_OF_READONLY);
         if( mDS == NULL )
         {

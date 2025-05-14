@@ -98,7 +98,7 @@ private:
 
     Wt::WFileUpload *fu;
     Wt::WPushButton  *downloadRasterBt;
-    Wt::WPushButton  *anaOnAllPolygBt;
+    //Wt::WPushButton  *anaOnAllPolygBt;
     cWebAptitude* m_app;
     Wt::WText * msg;
     groupLayers * mGL;
