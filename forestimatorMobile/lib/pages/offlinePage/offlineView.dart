@@ -1,6 +1,5 @@
 import 'package:fforestimator/dico/dicoApt.dart';
 import 'package:fforestimator/pages/catalogueView/catalogueView.dart';
-import 'package:fforestimator/pages/catalogueView/categoryTile.dart';
 import 'package:fforestimator/pages/catalogueView/layerTile.dart';
 import 'package:fforestimator/tools/layerDownloader.dart';
 import 'package:flutter/material.dart';
@@ -14,29 +13,25 @@ class OfflineView extends StatefulWidget {
   State<OfflineView> createState() => _OfflineView();
 }
 
-bool _finishedInitializingCategory = false;
+bool _finishedInitializingLayerData = false;
 
 class _OfflineView extends State<OfflineView> {
-  final List<Category> _categories = [
-    Category(name: "Couches enregistrées.", filter: "offline"),
-    //Category(name: "Couches à télécharger", filter: "online")
-  ];
-  final Map<String, List<LayerTile>> _downlodableLayerTiles = {
-    "offline": [],
-    "online": []
-  };
+  final List<LayerTile> _downloadedLayers = [];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(mainAxisAlignment: MainAxisAlignment.start, children: [
-        gl.offlineMode
-            ? Container(
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          gl.offlineMode
+              ? Container(
                 color: gl.colorBackgroundSecondary,
                 constraints: BoxConstraints(
-                    maxWidth: MediaQuery.of(context).size.width * 1.0,
-                    minHeight: MediaQuery.of(context).size.height * .15,
-                    maxHeight: MediaQuery.of(context).size.height * .15),
+                  maxWidth: MediaQuery.of(context).size.width * 1.0,
+                  minHeight: MediaQuery.of(context).size.height * .15,
+                  maxHeight: MediaQuery.of(context).size.height * .15,
+                ),
                 child: TextButton.icon(
                   onPressed: () async {
                     setState(() {
@@ -50,22 +45,20 @@ class _OfflineView extends State<OfflineView> {
                         await SharedPreferences.getInstance();
                     await prefs.setBool('offlineMode', gl.offlineMode);
                   },
-                  icon: Icon(
-                    Icons.download_for_offline,
-                    color: gl.colorUliege,
-                  ),
+                  icon: Icon(Icons.download_for_offline, color: gl.colorUliege),
                   label: Text(
                     "Désactivez le mode hors ligne.",
                     style: TextStyle(color: gl.colorUliege),
                   ),
                 ),
               )
-            : Container(
+              : Container(
                 color: gl.colorBackgroundSecondary,
                 constraints: BoxConstraints(
-                    maxWidth: MediaQuery.of(context).size.width * 1.0,
-                    minHeight: MediaQuery.of(context).size.height * .15,
-                    maxHeight: MediaQuery.of(context).size.height * .15),
+                  maxWidth: MediaQuery.of(context).size.width * 1.0,
+                  minHeight: MediaQuery.of(context).size.height * .15,
+                  maxHeight: MediaQuery.of(context).size.height * .15,
+                ),
                 child: TextButton.icon(
                   onPressed: () async {
                     setState(() {
@@ -77,8 +70,10 @@ class _OfflineView extends State<OfflineView> {
                     });
                     final SharedPreferences prefs =
                         await SharedPreferences.getInstance();
-                    await prefs.setStringList('interfaceSelectedLCode',
-                        gl.getInterfaceSelectedLCode());
+                    await prefs.setStringList(
+                      'interfaceSelectedLCode',
+                      gl.getInterfaceSelectedLCode(),
+                    );
                     await prefs.setBool('offlineMode', gl.offlineMode);
                   },
                   icon: Icon(
@@ -91,214 +86,152 @@ class _OfflineView extends State<OfflineView> {
                   ),
                 ),
               ),
-        Container(
-          color: gl.colorBackground,
-          constraints: BoxConstraints(
-              maxWidth: MediaQuery.of(context).size.width * 1.0,
-              minHeight: MediaQuery.of(context).size.height * .75,
-              maxHeight: MediaQuery.of(context).size.height * .75),
-          child: SingleChildScrollView(
-            child: _buildOfflineCategory(),
-          ),
+          _buildOfflineList(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildOfflineList() {
+    return Container(
+      constraints: BoxConstraints(
+        maxWidth: MediaQuery.of(context).size.width * 1.0,
+        maxHeight:
+            _downloadedLayers.length *
+            100 *
+            MediaQuery.of(context).size.width *
+            0.1,
+      ),
+      child: Scrollbar(
+        controller: it,
+        child: SingleChildScrollView(
+          controller: it,
+          physics: that,
+          child: _buildPanel(),
         ),
-      ]),
+      ),
     );
   }
 
-  /*void addToList(String key) {
-    _downlodableLayerTiles["offline"]!.add(LayerTile(
-      key: key,
-      name: gl.dico.getLayerBase(key).mNom,
-      filter: gl.dico.getLayerBase(key).mGroupe,
-      extern: gl.dico.getLayerBase(key).mCategorie == "Externe",
-      downloadable: gl.dico.getLayerBase(key).mIsDownloadableRW,
-      bits: gl.dico.getLayerBase(key).mBits,
-    ));
-  }
-
-  void removeFromList(String key) {
-    for (var it in _downlodableLayerTiles["offline"]!) {
-      if (it.key == key) {
-        _downlodableLayerTiles["offline"]!.remove(it);
-        break;
-      }
-    }
-  }*/
-
-  Widget _buildOfflineCategory() {
-    return ExpansionPanelList(
-      expandIconColor: Colors.black,
-      expansionCallback: (int index, bool isExpanded) {
-        setState(() {
-          _categories[index].isExpanded = isExpanded;
-        });
-      },
-      children: _categories.map<ExpansionPanel>((Category category) {
-        return ExpansionPanel(
-          canTapOnHeader: true,
-          backgroundColor: gl.colorBackground,
-          headerBuilder: (BuildContext context, bool isExpanded) {
-            return ListTile(
-              iconColor: Colors.red,
-              title: Text(category.name),
-            );
-          },
-          body: _buildOfflineList(category),
-          isExpanded: true, //category.isExpanded,
-        );
-      }).toList(),
-    );
-  }
-
-  Widget _buildOfflineList(Category category) {
-    return _finishedInitializingCategory
-        ? Container(
-            constraints: BoxConstraints(
-                maxWidth: MediaQuery.of(context).size.width * 1.0,
-                maxHeight: _downlodableLayerTiles.length *
-                    100 *
-                    MediaQuery.of(context).size.width *
-                    0.1),
-            child: Scrollbar(
-                controller: it,
-                child: SingleChildScrollView(
-                  controller: it,
-                  physics: that,
-                  child: Container(
-                    child: _buildPanel(category),
-                  ),
-                )))
-        : CircularProgressIndicator();
-  }
-
-  Widget _buildPanel(Category category) {
+  Widget _buildPanel() {
     return ExpansionPanelList(
       expansionCallback: (int index, bool isExpanded) async {
         setState(() {
-          _downlodableLayerTiles[category.filter]![index].isExpanded =
-              isExpanded;
+          _downloadedLayers[index].isExpanded = isExpanded;
         });
       },
-      children: _downlodableLayerTiles[category.filter]!
-          .map<ExpansionPanel>((LayerTile item) {
-        return ExpansionPanel(
-          canTapOnHeader: true,
-          backgroundColor: gl.colorBackgroundSecondary,
-          headerBuilder: (BuildContext context, bool isExpanded) {
-            return Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Container(
-                    constraints: BoxConstraints(
-                      maxWidth: MediaQuery.of(context).size.width * .2 > 144
-                          ? MediaQuery.of(context).size.width * .2
-                          : 144,
-                      maxHeight: MediaQuery.of(context).size.width * .2 > 48
-                          ? MediaQuery.of(context).size.width * .2
-                          : 48,
-                      minHeight: 48,
+      children:
+          _downloadedLayers.map<ExpansionPanel>((LayerTile item) {
+            return ExpansionPanel(
+              canTapOnHeader: true,
+              backgroundColor: gl.colorBackgroundSecondary,
+              headerBuilder: (BuildContext context, bool isExpanded) {
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Container(
+                      constraints: BoxConstraints(
+                        maxWidth:
+                            MediaQuery.of(context).size.width * .2 > 144
+                                ? MediaQuery.of(context).size.width * .2
+                                : 144,
+                        maxHeight:
+                            MediaQuery.of(context).size.width * .2 > 48
+                                ? MediaQuery.of(context).size.width * .2
+                                : 48,
+                        minHeight: 48,
+                      ),
+                      padding: const EdgeInsets.only(left: 8),
+                      child: Text(
+                        item.name,
+                        textScaler: const TextScaler.linear(1.2),
+                      ),
                     ),
-                    padding: const EdgeInsets.only(left: 8),
-                    child: Text(item.name,
-                        textScaler: const TextScaler.linear(1.2)),
-                  ),
-                  //_downloadedControlBar(item),
-                  item.downloadedControlBar(),
-                  if (gl.dico.getLayerBase(item.key).mBits == 8)
-                    _selectLayerButton(item),
-                ]);
-          },
-          body: _expandedLegendView(item),
-          isExpanded: item.isExpanded,
-        );
-      }).toList(),
+                    item.downloadedControlBar(),
+                    if (gl.dico.getLayerBase(item.key).mBits == 8)
+                      _selectLayerButton(item),
+                  ],
+                );
+              },
+              body: item.isExpanded ? _expandedLegendView(item) : Container(),
+              isExpanded: item.isExpanded,
+            );
+          }).toList(),
     );
   }
-
-  /*Widget _downloadedControlBar(LayerTile lt) {
-    return Container(
-        constraints:
-            const BoxConstraints(maxWidth: 128, minHeight: 32, maxHeight: 32),
-        child: gl.dico.getLayerBase(lt.key).mOffline
-            ? Text(
-                "Enregistré",
-                style: TextStyle(color: gl.colorAgroBioTech),
-              )
-            : Text(
-                "Téléchargeable",
-                style: TextStyle(color: gl.colorUliege),
-              ));
-  }*/
 
   Widget _selectLayerButton(LayerTile lt) {
     int nLayer = 3;
     return _isSelectedLayer(lt.key)
         ? Container(
-            decoration: const BoxDecoration(
-                shape: BoxShape.circle, color: gl.colorAgroBioTech),
-            constraints: const BoxConstraints(
-              maxWidth: 48,
-              minWidth: 48,
-              maxHeight: 48,
-              minHeight: 48,
-            ),
-            padding: const EdgeInsets.all(0),
-            child: IconButton(
-                icon: const Icon(Icons.layers_clear, size: 28),
-                onPressed: () {
+          decoration: const BoxDecoration(
+            shape: BoxShape.circle,
+            color: gl.colorAgroBioTech,
+          ),
+          constraints: const BoxConstraints(
+            maxWidth: 48,
+            minWidth: 48,
+            maxHeight: 48,
+            minHeight: 48,
+          ),
+          padding: const EdgeInsets.all(0),
+          child: IconButton(
+            icon: const Icon(Icons.layers_clear, size: 28),
+            onPressed: () {
+              setState(() {
+                if (gl.interfaceSelectedLayerKeys.length > 1) {
                   setState(() {
-                    if (gl.interfaceSelectedLayerKeys.length > 1) {
-                      setState(() {
-                        lt.selected = false;
-                      });
-                      gl.refreshMap(() {
-                        gl.removeLayerFromList(lt.key, offline: true);
-                      });
-                      gl.refreshCurrentThreeLayer();
-                      gl.refreshWholeCatalogueView(() {});
-                    }
+                    lt.selected = false;
                   });
-                }),
-          )
+                  gl.refreshMap(() {
+                    gl.removeLayerFromList(lt.key, offline: true);
+                  });
+                  gl.refreshCurrentThreeLayer();
+                  gl.refreshWholeCatalogueView(() {});
+                }
+              });
+            },
+          ),
+        )
         : Container(
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-            ),
-            constraints: const BoxConstraints(
-              maxWidth: 48,
-              minWidth: 48,
-              maxHeight: 48,
-              minHeight: 48,
-            ),
-            padding: const EdgeInsets.all(0),
-            child: IconButton(
-                icon: const Icon(Icons.layers, size: 28),
-                onPressed: () {
-                  if (!gl.offlineMode ||
-                      (gl.offlineMode && gl.dico.getLayerBase(lt.key).mOffline))
+          decoration: BoxDecoration(shape: BoxShape.circle),
+          constraints: const BoxConstraints(
+            maxWidth: 48,
+            minWidth: 48,
+            maxHeight: 48,
+            minHeight: 48,
+          ),
+          padding: const EdgeInsets.all(0),
+          child: IconButton(
+            icon: const Icon(Icons.layers, size: 28),
+            onPressed: () {
+              if (!gl.offlineMode ||
+                  (gl.offlineMode && gl.dico.getLayerBase(lt.key).mOffline)){
+                setState(() {
+                  if (gl.interfaceSelectedLayerKeys.length < nLayer) {
                     setState(() {
-                      if (gl.interfaceSelectedLayerKeys.length < nLayer) {
-                        setState(() {
-                          lt.selected = true;
-                        });
-                        gl.refreshMap(() {
-                          gl.addLayerToList(lt.key, offline: true);
-                        });
-                      } else {
-                        setState(() {
-                          lt.selected = true;
-                        });
-                        gl.refreshMap(() {
-                          gl.interfaceSelectedLayerKeys.removeLast();
-                          gl.addLayerToList(lt.key, offline: true);
-                        });
-                      }
-                      gl.refreshCurrentThreeLayer();
-                      gl.refreshWholeCatalogueView(() {});
+                      lt.selected = true;
                     });
-                  //TODO else popup warning: file is not on disk
-                }),
-          );
+                    gl.refreshMap(() {
+                      gl.addLayerToList(lt.key, offline: true);
+                    });
+                  } else {
+                    setState(() {
+                      lt.selected = true;
+                    });
+                    gl.refreshMap(() {
+                      gl.interfaceSelectedLayerKeys.removeLast();
+                      gl.addLayerToList(lt.key, offline: true);
+                    });
+                  }
+                  gl.refreshCurrentThreeLayer();
+                  gl.refreshWholeCatalogueView(() {});
+                });
+              //TODO else popup warning: file is not on disk
+              }
+            },
+          ),
+        );
   }
 
   bool _isSelectedLayer(String key) {
@@ -314,19 +247,24 @@ class _OfflineView extends State<OfflineView> {
     return Column(
       children: <Widget>[
         if (lt.downloadable)
-          ColoredBox(color: gl.colorBackground, child:  LayerDownloader(lt)),
+          ColoredBox(color: gl.colorBackground, child: LayerDownloader(lt)),
         if (gl.dico.getLayerBase(lt.key).hasDoc())
           ListTile(
             title: Text(
-                "Consulter la documentation relative à la cette couche cartographique"),
+              "Consulter la documentation relative à la cette couche cartographique",
+            ),
             leading: IconButton(
-                onPressed: () {
-                  GoRouter.of(context).pushNamed(lt.key, pathParameters: {
+              onPressed: () {
+                GoRouter.of(context).pushNamed(
+                  lt.key,
+                  pathParameters: {
                     'currentPage':
-                        gl.dico.getLayerBase(lt.key).mPdfPage.toString()
-                  });
-                },
-                icon: Icon(Icons.picture_as_pdf)),
+                        gl.dico.getLayerBase(lt.key).mPdfPage.toString(),
+                  },
+                );
+              },
+              icon: Icon(Icons.picture_as_pdf),
+            ),
           ),
         lt.attribution(),
         if ((gl.dico.getLayerBase(lt.key).mGroupe == "APT_FEE" ||
@@ -335,22 +273,27 @@ class _OfflineView extends State<OfflineView> {
                 .getEss(gl.dico.getLayerBase(lt.key).getEssCode())
                 .hasFEEapt())
           ListTile(
-            title: Text("Consulter la fiche-essence " +
-                gl.dico
-                    .getEss(gl.dico.getLayerBase(lt.key).getEssCode())
-                    .getNameAndPrefix()),
-            leading: IconButton(
-                onPressed: () {
-                  GoRouter.of(context).push(gl.dico
+            title: Text(
+              "Consulter la fiche-essence ${gl.dico
                       .getEss(gl.dico.getLayerBase(lt.key).getEssCode())
-                      .getFicheRoute(complete: true));
-                },
-                icon: Icon(Icons.picture_as_pdf)),
+                      .getNameAndPrefix()}",
+            ),
+            leading: IconButton(
+              onPressed: () {
+                GoRouter.of(context).push(
+                  gl.dico
+                      .getEss(gl.dico.getLayerBase(lt.key).getEssCode())
+                      .getFicheRoute(complete: true),
+                );
+              },
+              icon: Icon(Icons.picture_as_pdf),
+            ),
           ),
         if (gl.dico.getLayerBase(lt.key).mBits == 16)
           ListTile(
             title: Text(
-                "Cette couche est utilisée pour les analyses ponctuelles mais vous ne pouvez pas la visualiser"),
+              "Cette couche est utilisée pour les analyses ponctuelles mais vous ne pouvez pas la visualiser",
+            ),
             leading: Icon(Icons.warning),
           ),
       ],
@@ -359,36 +302,31 @@ class _OfflineView extends State<OfflineView> {
 
   void _getLayerData() {
     Map<String, layerBase> mp = gl.dico.mLayerBases;
-    _downlodableLayerTiles["offline"]!.clear();
-    _downlodableLayerTiles["online"]!.clear();
+    _downloadedLayers.clear();
 
     for (var key in mp.keys) {
-      if (mp[key]!.mOffline) {
-        _downlodableLayerTiles["offline"]!.add(LayerTile(
+      if (mp[key]!.mOffline || mp[key]!.mInDownload) {
+        _downloadedLayers.add(
+          LayerTile(
             name: mp[key]!.mNom,
             filter: mp[key]!.mGroupe,
             key: key,
             downloadable: mp[key]!.mIsDownloadableRW,
-            extern: mp[key]!.mCategorie == "Externe"));
-      } else if (mp[key]!.mIsDownloadableRW) {
-        _downlodableLayerTiles["online"]!.add(LayerTile(
-            name: mp[key]!.mNom,
-            filter: mp[key]!.mGroupe,
-            key: key,
-            downloadable: mp[key]!.mIsDownloadableRW,
-            extern: mp[key]!.mCategorie == "Externe"));
+            extern: mp[key]!.mCategorie == "Externe",
+          ),
+        );
       }
     }
 
     setState(() {
-      _finishedInitializingCategory = true;
+      _finishedInitializingLayerData = true;
     });
   }
 
   @override
   void initState() {
     super.initState();
-    if (!_finishedInitializingCategory) {
+    if (!_finishedInitializingLayerData) {
       _getLayerData();
     }
     gl.rebuildOfflineView = rebuildOfflineWidgetTreeForLayerDownloader;
@@ -399,7 +337,9 @@ class _OfflineView extends State<OfflineView> {
   }
 
   void rebuildOfflineWidgetTreeForLayerDownloader(
-      void Function() setter) async {
+    void Function() setter,
+  ) async {
+    await gl.dico.checkLayerBaseOfflineRessource();
     _getLayerData();
     setState(setter);
   }

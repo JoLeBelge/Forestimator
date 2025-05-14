@@ -91,7 +91,7 @@ class groupe_couche {
 
 class layerBase {
   late String mNom, mNomCourt, mNomRaster;
-  late bool mExpert, mVisu, mOffline, mIsDownloadableRW;
+  late bool mExpert, mVisu, mOffline, mInDownload, mIsDownloadableRW;
   late String mCode;
   late String mUrl, mWMSLayerName, mWMSattribution, mTypeGeoservice;
   late String mGroupe;
@@ -139,6 +139,7 @@ class layerBase {
         mDicoVal = {},
         mDicoCol = {},
         mOffline = false,
+        mInDownload = false,
         mBits = map['Bits'] == null ? 8 : map['Bits'],
         mUsedForAnalysis = false {
     mIsDownloadableRW = mRes >= 10 ? true : false;
@@ -290,6 +291,7 @@ class layerBase {
 
   void setHasOffline(bool offline) {
     mOffline = true;
+    mInDownload = false;
   }
 
   Future<int> getValXY(proj4.Point pt) async {

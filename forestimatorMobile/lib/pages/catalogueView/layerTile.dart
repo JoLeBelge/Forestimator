@@ -33,8 +33,10 @@ class LayerTile {
           maxWidth: 200,
           maxHeight: 64,
         ),
-        child: Image.asset(gl.dico.getLayerBase(key).mLogoAttributionFile,
-            fit: BoxFit.cover),
+        child: Image.asset(
+          gl.dico.getLayerBase(key).mLogoAttributionFile,
+          fit: BoxFit.cover,
+        ),
       ),
       trailing: const Icon(Icons.copyright),
     );
@@ -42,20 +44,28 @@ class LayerTile {
 
   Widget downloadedControlBar() {
     return Container(
-        constraints:
-            const BoxConstraints(maxWidth: 150, minHeight: 32, maxHeight: 32),
-        child: gl.dico.getLayerBase(key).mOffline
-            ? const Text(
+      constraints: const BoxConstraints(
+        maxWidth: 150,
+        minHeight: 32,
+        maxHeight: 32,
+      ),
+      child:
+          gl.dico.getLayerBase(key).mInDownload
+              ? const Text(
+                "en attente",
+                style: TextStyle(color: Color.fromARGB(255, 155, 124, 38)),
+              )
+              : gl.dico.getLayerBase(key).mOffline
+              ? const Text(
                 "Enregistré",
                 style: TextStyle(color: gl.colorAgroBioTech),
               )
-            : gl.dico.getLayerBase(key).mIsDownloadableRW
-                ? const Text(
-                    "Téléchargeable",
-                    style: TextStyle(color: gl.colorUliege),
-                  )
-                : const Text(
-                    "",
-                  ));
+              : gl.dico.getLayerBase(key).mIsDownloadableRW
+              ? const Text(
+                "Téléchargeable",
+                style: TextStyle(color: gl.colorUliege),
+              )
+              : const Text(""),
+    );
   }
 }

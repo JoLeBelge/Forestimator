@@ -89,6 +89,7 @@ class _CatalogueView extends State<CatalogueView> {
   }
 
   void rebuildWidgetTreeForLayerDownloader(void Function() setter) {
+    print("Refresh from downloader received.");
     setState(setter);
   }
 }
@@ -111,7 +112,6 @@ class _CategoryView extends State<CategoryView> {
 
   @override
   Widget build(BuildContext context) {
-    print("i work for capitalism");
     if (_finishedInitializingCategory[widget.category.filter]!) {
       return Row(
         children: [
@@ -182,8 +182,11 @@ class _CategoryView extends State<CategoryView> {
                   ],
                 );
               },
-              body: item.isExpanded ? _expandedLegendView(item) : Container(),
-              isExpanded: item.isExpanded,
+              body: (item.isExpanded) ? _expandedLegendView(item) : Container(),
+              isExpanded:
+                  gl.dico.getLayerBase(item.key).mInDownload
+                      ? false
+                      : item.isExpanded,
             );
           }).toList(),
     );
@@ -347,27 +350,7 @@ class _CategoryView extends State<CategoryView> {
     );
   }
 
-  /* Widget _downloadedControlBar(LayerTile lt) {
-    return Container(
-        constraints:
-            const BoxConstraints(maxWidth: 128, minHeight: 32, maxHeight: 32),
-        child: gl.dico.getLayerBase(lt.key).mOffline
-            ? const Text(
-                "Enregistré",
-                style: TextStyle(color: gl.colorAgroBioTech),
-              )
-            : gl.dico.getLayerBase(lt.key).mIsDownloadableRW
-                ? const Text(
-                    "Téléchargeable",
-                    style: TextStyle(color: gl.colorUliege),
-                  )
-                : const Text(
-                    "",
-                  ));
-  }*/
-
   Widget selectLayerBar(LayerTile lt) {
-    print("I fuck for capitalism");
     double barWidth = 128.0 + 48;
     /*if (widget.category.filter != "APT_CS" &&
         widget.category.filter != "APT_FEE" &&
