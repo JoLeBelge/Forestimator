@@ -2,6 +2,7 @@ import 'package:fforestimator/dico/dicoApt.dart';
 import 'package:fforestimator/dico/ess.dart';
 import 'package:fforestimator/pages/anaPt/anaPtpage.dart';
 import 'package:fforestimator/pages/offlinePage/offlineView.dart';
+import 'package:fforestimator/tools/layerDownloader.dart';
 import 'package:fforestimator/tools/notification.dart';
 import 'package:flutter/material.dart';
 import 'package:fforestimator/globals.dart' as gl;
@@ -18,7 +19,6 @@ import 'package:flutter/services.dart';
 import 'package:fforestimator/scaffoldNavigation.dart';
 import 'dart:convert';
 import 'package:path/path.dart' as path;
-import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'dart:isolate';
@@ -26,18 +26,13 @@ import 'dart:ui';
 import 'package:memory_info/memory_info.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  //WidgetsFlutterBinding.ensureInitialized();
 
   if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
     sqfliteFfiInit();
     databaseFactory = databaseFactoryFfi;
   } else {
-    await FlutterDownloader.initialize(
-      debug:
-          gl.debug, // optional: set to false to disable printing logs to console (default: true)
-      ignoreSsl:
-          gl.debug, // option: set to false to disable working with http links (default: false)
-    );
+    initDownloader();
 
     //Initialize Logging
     /*await FlutterLogs.initLogs(
@@ -56,6 +51,7 @@ void main() async {
         debugFileOperations: true,
         isDebuggable: true);*/
   }
+
   gl.dico = dicoAptProvider();
   await gl.dico.init();
 
@@ -198,9 +194,10 @@ class _MyApp extends State<MyApp> {
     _listAndCopyPdfassets();
     readPreference();
     getMemoryInfo();
-    _bindBackgroundIsolate();
-
-    FlutterDownloader.registerCallback(downloadCallback);
+    //_bindBackgroundIsolate();
+    // initDownloader();
+    //FlutterDownloader.registerCallback(downloadCallback);
+    //gl.notificationContext = _rootNavigatorKey.currentContext;
   }
 
   late final _router = GoRouter(
@@ -363,7 +360,7 @@ class _MyApp extends State<MyApp> {
               if (!(Platform.isWindows ||
                   Platform.isLinux ||
                   Platform.isMacOS)) {
-                FlutterDownloader.enqueue(
+                /*FlutterDownloader.enqueue(
                   url:
                       gl.queryApiRastDownload +
                       "/" +
@@ -373,7 +370,7 @@ class _MyApp extends State<MyApp> {
                   showNotification: false,
                   openFileFromNotification: false,
                   timeout: 15000,
-                );
+                );*/
               }
             }
           },
@@ -403,8 +400,7 @@ class _MyApp extends State<MyApp> {
       ),
     );
   }
-
-  void _bindBackgroundIsolate() async {
+  /*void _bindBackgroundIsolate() async {
     IsolateNameServer.registerPortWithName(
       _port.sendPort,
       'downloader_send_port',
@@ -470,8 +466,7 @@ class _MyApp extends State<MyApp> {
   static void downloadCallback(String id, int status, int progress) {
     final SendPort send =
         IsolateNameServer.lookupPortByName('downloader_send_port')!;
-    //if (send != null) {
     send.send([id, status, progress]);
-    //}
-  }
+    print("BELLL");
+  }*/
 }
