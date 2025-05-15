@@ -168,11 +168,11 @@ std::unique_ptr<WContainerWidget> layerStatChart::getChart(bool forRenderingInPd
                 table->elementAt(i, 1)->addWidget(std::make_unique<WText>(bs.getMean(0)));
                 table->elementAt(i, 1)->setPadding(10,Wt::Side::Left);
                 i++;
-                table->elementAt(i, 0)->addWidget(std::make_unique<WText>("Ecart-type [m3/ha]"));
+                /*table->elementAt(i, 0)->addWidget(std::make_unique<WText>("Ecart-type [m3/ha]"));
                 table->elementAt(i, 1)->addWidget(std::make_unique<WText>(bs.getSd(0)));
                 table->elementAt(i, 1)->setPadding(10,Wt::Side::Left);
-                i++;
-                table->elementAt(i, 0)->addWidget(std::make_unique<WText>("Somme [m3]"));
+                i++;*/
+                table->elementAt(i, 0)->addWidget(std::make_unique<WText>("Volume total [m3]"));
                 table->elementAt(i, 1)->addWidget(std::make_unique<WText>(bs.getSum(0)));
                 table->elementAt(i, 1)->setPadding(10,Wt::Side::Left);
             }
