@@ -90,6 +90,7 @@ void statWindow::add1layerStat(std::shared_ptr<layerStatChart> layerStat){
     // ici ça à l'air de se compliquer car je transforme un ptr layerStat en std::unique_ptr<Wt::WContainerWidget> et cela à l'air de rendre le raw pointer dandling, il sera par la suite deleted dans groupLayer et là segfault
     // donc il faut rester sur la solution qui fait que layerStat crée un chart pour l'affichage, puis crée un autre contenu pour le rendu
     mAllStatIndivCont->addWidget(layerStat->getChart());
+
     //mContStatIndiv->addWidget(std::unique_ptr<Wt::WContainerWidget>(layerStat));
     std::cout << "statWindow::add1layerStat done" << std::endl;
 }

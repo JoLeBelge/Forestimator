@@ -98,6 +98,12 @@ public:
         if (Dico_RasterGain.find(aCode)!=Dico_RasterGain.end()){aRes=Dico_RasterGain.at(aCode);}
         return aRes;
     }
+    double RasterResolution(std::string aCode){
+        double aRes(10.0);
+        if (Dico_RasterResolution.find(aCode)!=Dico_RasterResolution.end()){aRes=Dico_RasterResolution.at(aCode);
+        }
+        return aRes;
+    }
 
     std::string station(int aZbio, int aSt,std::string aVar="a"){
         std::string aRes("not found");

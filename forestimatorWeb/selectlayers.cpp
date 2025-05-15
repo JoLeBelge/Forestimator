@@ -35,8 +35,10 @@ selectLayers::selectLayers(groupLayers * aGL){
             bool selected(0);
             //if ((l->getCatLayer()==TypeLayer::FEE) && (l->Code()=="HE"| l->Code()=="CS" | l->Code()=="CP" | l->Code()=="EP" | l->Code()=="DO" | l->Code()=="ME")){ selected=1;}
             if ((l->Code()=="HE_FEE")| (l->Code()=="CS_FEE") | (l->Code()=="CP_FEE") | (l->Code()=="EP_FEE") | (l->Code()=="DO_FEE") | (l->Code()=="ME_FEE")){ selected=1;}
-            // peuplement ; sélectionné, mais pas les cartes d'état sanitaire (car
-            if (l->getCatLayer()==TypeLayer::Peuplement && (l->Code().substr(0,3)!="ES_")) { selected=1;}
+
+            //if (l->getCatLayer()==TypeLayer::Peuplement && (l->Code().substr(0,3)!="ES_")) { selected=1;}
+            if ((l->Code()=="COMPOALL")| (l->Code()=="dendro_vha")){ selected=1;}
+
 
             mSelectedLayers.emplace(std::make_pair(l,selected));
             // checkBox
