@@ -10,13 +10,31 @@
 	<h1> Formulaire d'encodage des forêts subnaturelles matures</h1>
 
 <h3>Localisation des forêts subnaturelles matures</h3>
+<br></br>
 L'union européenne demande à ses états membres de définir et cartographier leurs <mark>"old growth forests"</mark>, c'est-à-dire leurs forêts proches d'un état naturel. Il s'agit d'anciennes forêts au sens de la carte d'ancienneté des forêts de Kervyn, qui sont composées d'essences indigènes et où la gestion forestière est a été abandonnée (ou est très extensive) depuis au moins 20 ans, ce qui se traduit par l'abondance de vieux arbres et de bois mort au sol (bien au delà des seuils légaux).
 <br></br>
- Vous pouvez nous aider en remplissant le formulaire ci-dessous, ou en nous contactant par mail ou téléphone : Mr Lisein (<a href = "mailto: liseinjon@hotmail.com">JO.Lisein@uliege.be</a> - 0475221309)
-		<div >
+<br></br>
+<div >
 		 <img src="/img/OGF.jpg" alt="forêt subnaturelle" style="display: block;margin-left: auto;margin-right: auto;width: 50%;"  />
-		</div>
-		Nous collecterons les informations de manière cartographique, mais nous nous engageons évidemment à ne jamais visiter ou renseigner ces sites sans votre accord.
+</div>
+<br></br>
+Concrètement, il vous est demandé de localiser les peuplements situés sur votre triage qui auraient les caractéristiques cumulatives suivantes :
+<br></br>
+<ul>
+  <li>Peuplement ayant une surface > 2 ha d’un seul tenant</li>
+  <li>Peuplement au sein duquel plus aucune intervention sylvicole n’a eu lieu depuis plus de 20 ans</li>
+  <li>Peuplement composé d’essences indigènes </li>
+   <li>Peuplement avec présence de bois morts et de vieux arbres en abondance</li>
+</ul>
+<br></br>
+Les peuplements situés en Réserve intégrale sont ciblés mais aussi ceux qui ne le seraient pas et qui présentent l’ensemble des caractéristiques ci-dessus. 
+<br></br>
+Les données transmises seront utilisées exclusivement dans le cadre de ce travail. Les peuplements localisés permettront d’entrainer un algorithme de détection automatique par télédétection afin de fournir une méthode de recensement/cartographie des OGF pour l’ensemble du territoire wallon. Aucun autre objectif quel qu’il soit n’est poursuivi.
+<br></br>
+<br></br>
+ Vous pouvez nous aider en remplissant le formulaire ci-dessous, ou en nous contactant par mail ou par téléphone : Mr Lisein (<a href = "mailto: liseinjon@hotmail.com">JO.Lisein@uliege.be</a> - 0475221309)
+		
+	
 	</div>
 	
 	<div style="margin: 3px 0px; flex: 1 1 auto; overflow: visible;"></div>

@@ -24,14 +24,14 @@ MAP
   	NAME "parcellaire_DNF"
   	TYPE POLYGON
   	STATUS ON
-  	DATA "parcellaire_DNF.shp"  
+  	DATA "COMP_G.shp"  
   	LABELITEM    "COMP"         
   	CLASS
     	NAME "Compartiments"
     	STYLE
       		COLOR 200 200 200
       		OUTLINECOLOR 0 0 0
-      		WIDTH 0.1
+      		WIDTH 1.0
     	END #style
     	LABEL
       		ALIGN center

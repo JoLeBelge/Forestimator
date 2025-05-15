@@ -77,7 +77,7 @@ public:
     std::string getNb(){return std::to_string(nb);}
      std::string getNbNA(){return roundDouble(nbNA*pow(resolution,2));}
     std::string getSum(){
-        std::cout << "mean " << mean << ", nb " << nb << ", surf " << nb*pow(resolution,2) << " m2" << std::endl;
+        //std::cout << "mean " << mean << ", nb " << nb << ", surf " << nb*pow(resolution,2) << " m2" << std::endl;
         return roundDouble(mean*(nb*pow(resolution,2))/10000.0);}
 
     int getNbInt(){return nb;}

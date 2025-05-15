@@ -48,7 +48,7 @@ std::unique_ptr<WContainerWidget> layerStatChart::getChart(bool forRenderingInPd
     if (globTest) {std::cout << " creation d'un chart " << std::endl;}
     std::unique_ptr<WContainerWidget> aRes= std::make_unique<Wt::WContainerWidget>();
     aRes->setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Center);
-    aRes->setInline(0);
+   // aRes->setInline(0);
     aRes->setOverflow(Wt::Overflow::Auto);
     staticMap sm(mLay,mGeom);
     WContainerWidget * aContTableAndPie ;
@@ -61,16 +61,19 @@ std::unique_ptr<WContainerWidget> layerStatChart::getChart(bool forRenderingInPd
         aContTableAndPie = aRes->addWidget(std::make_unique<WContainerWidget>());
     } else {
         WVBoxLayout * layoutV = aRes->setLayout(std::make_unique<WVBoxLayout>());
-        layoutV->addWidget(std::make_unique<WText>("<h4>"+mLay->getLegendLabel(false)+"</h4>"));
+
+        WText * title =layoutV->addWidget(std::make_unique<WText>("<h4>"+mLay->getLegendLabel(false)+"</h4>"));
+        title->setTextAlignment(AlignmentFlag::Center);
         WContainerWidget * aCont = layoutV->addWidget(std::make_unique<WContainerWidget>());
         WHBoxLayout * layoutH = aCont->setLayout(std::make_unique<WHBoxLayout>());
         // je dois ajouter un conteneur pour y mettre l'image dedans, sinon mise en page foireuse
         WContainerWidget * aContIm = layoutH->addWidget(std::make_unique<WContainerWidget>(),0);
+        aContIm->setContentAlignment(AlignmentFlag::Right);
         Wt::WImage * im =aContIm->addWidget(std::make_unique<Wt::WImage>(sm.getWLinkRel()));
-        im->resize(450,450);
+        im->setMaximumSize("500px","500px");
         aContTableAndPie = layoutH->addWidget(std::make_unique<WContainerWidget>());
     }
-    aContTableAndPie->setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Center);
+    aContTableAndPie->setContentAlignment(AlignmentFlag::Left);
     aContTableAndPie->setOverflow(Wt::Overflow::Auto);
     if (mStatSimple.size()>0){
         if (mTypeVar==TypeVar::Classe){
@@ -145,6 +148,7 @@ std::unique_ptr<WContainerWidget> layerStatChart::getChart(bool forRenderingInPd
             basicStat bs= mLay->computeBasicStatOnPolyg(mGeom);
             // ajout d'un tableau de synthèse très simple. moyenne, écart type, somme pour volume à l'hectare?
             WTable * table =aContTableAndPie->addWidget(std::make_unique<WTable>());
+            table->setMargin(10, Side::Top | Side::Bottom | Side::Left);
 
             table->elementAt(0, 0)->setColumnSpan(2);
             table->elementAt(0, 0)->setContentAlignment(AlignmentFlag::Top | AlignmentFlag::Center);
@@ -159,7 +163,7 @@ std::unique_ptr<WContainerWidget> layerStatChart::getChart(bool forRenderingInPd
             table->elementAt(3, 0)->addWidget(std::make_unique<WText>("Somme [m3]"));
             table->elementAt(3, 1)->addWidget(std::make_unique<WText>(bs.getSum()));
             table->elementAt(3, 1)->setPadding(10,Wt::Side::Left);
-            table->elementAt(4, 0)->addWidget(std::make_unique<WText>("Surface sans donnée [m2]"));
+            table->elementAt(4, 0)->addWidget(std::make_unique<WText>("Surface sans données [m2]"));
             table->elementAt(4, 1)->addWidget(std::make_unique<WText>(bs.getNbNA()));
             table->elementAt(4, 1)->setPadding(10,Wt::Side::Left);
                 }
