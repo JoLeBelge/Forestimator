@@ -75,6 +75,7 @@ public:
     std::string getMax(){return roundDouble(max);}
     std::string getMean(){return roundDouble(mean);}
     std::string getNb(){return std::to_string(nb);}
+     std::string getSurfTot(){return roundDouble((nbNA+nb)*pow(resolution,2));}
      std::string getNbNA(){return roundDouble(nbNA*pow(resolution,2));}
     std::string getSum(){
         //std::cout << "mean " << mean << ", nb " << nb << ", surf " << nb*pow(resolution,2) << " m2" << std::endl;
