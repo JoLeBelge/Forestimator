@@ -73,16 +73,16 @@ public:
     basicStat(std::vector<double> v);
     std::string getMin(){return roundDouble(min);}
     std::string getMax(){return roundDouble(max);}
-    std::string getMean(){return roundDouble(mean);}
+    std::string getMean(int precisionVal=1){return roundDouble(mean,precisionVal);}
     std::string getNb(){return std::to_string(nb);}
-     std::string getSurfTot(){return roundDouble((nbNA+nb)*pow(resolution,2));}
-     std::string getNbNA(){return roundDouble(nbNA*pow(resolution,2));}
-    std::string getSum(){
+     std::string getSurfTot(int precisionVal=1){return roundDouble((nbNA+nb)*pow(resolution,2)/10000.0,precisionVal);}
+     std::string getNbNA(int precisionVal=1){return roundDouble(nbNA*pow(resolution,2)/10000.0,precisionVal);}
+    std::string getSum(int precisionVal=1){
         //std::cout << "mean " << mean << ", nb " << nb << ", surf " << nb*pow(resolution,2) << " m2" << std::endl;
-        return roundDouble(mean*(nb*pow(resolution,2))/10000.0);}
+        return roundDouble(mean*(nb*pow(resolution,2))/10000.0,precisionVal);}
 
     int getNbInt(){return nb;}
-    std::string getSd(){return roundDouble(stdev);}
+    std::string getSd(int precisionVal=1){return roundDouble(stdev,precisionVal);}
     std::string getCV(){if (mean!=0) {return roundDouble(100.0*stdev/mean)+"%";} else { return "-1";};}
 
     double getFreq(double aVal){

@@ -156,24 +156,24 @@ std::unique_ptr<WContainerWidget> layerStatChart::getChart(bool forRenderingInPd
 
                 table->elementAt(0,0)->addWidget(std::make_unique<WText>(mLay->getLegendLabel(false)));
                 int i=1;
-                table->elementAt(i, 0)->addWidget(std::make_unique<WText>("Surface totale [m2]"));
-                table->elementAt(i, 1)->addWidget(std::make_unique<WText>(bs.getSurfTot()));
+                table->elementAt(i, 0)->addWidget(std::make_unique<WText>("Surface totale [ha]"));
+                table->elementAt(i, 1)->addWidget(std::make_unique<WText>(bs.getSurfTot(2)));
                 table->elementAt(i, 1)->setPadding(10,Wt::Side::Left);
                 i++;
-                table->elementAt(i, 0)->addWidget(std::make_unique<WText>("Surface sans données [m2]"));
-                table->elementAt(i, 1)->addWidget(std::make_unique<WText>(bs.getNbNA()));
+                table->elementAt(i, 0)->addWidget(std::make_unique<WText>("Surface sans données [ha]"));
+                table->elementAt(i, 1)->addWidget(std::make_unique<WText>(bs.getNbNA(2)));
                 table->elementAt(i, 1)->setPadding(10,Wt::Side::Left);
                 i++;
                 table->elementAt(i, 0)->addWidget(std::make_unique<WText>("Moyenne [m3/ha]"));
-                table->elementAt(i, 1)->addWidget(std::make_unique<WText>(bs.getMean()));
+                table->elementAt(i, 1)->addWidget(std::make_unique<WText>(bs.getMean(0)));
                 table->elementAt(i, 1)->setPadding(10,Wt::Side::Left);
                 i++;
                 table->elementAt(i, 0)->addWidget(std::make_unique<WText>("Ecart-type [m3/ha]"));
-                table->elementAt(i, 1)->addWidget(std::make_unique<WText>(bs.getSd()));
+                table->elementAt(i, 1)->addWidget(std::make_unique<WText>(bs.getSd(0)));
                 table->elementAt(i, 1)->setPadding(10,Wt::Side::Left);
                 i++;
                 table->elementAt(i, 0)->addWidget(std::make_unique<WText>("Somme [m3]"));
-                table->elementAt(i, 1)->addWidget(std::make_unique<WText>(bs.getSum()));
+                table->elementAt(i, 1)->addWidget(std::make_unique<WText>(bs.getSum(0)));
                 table->elementAt(i, 1)->setPadding(10,Wt::Side::Left);
             }
 
