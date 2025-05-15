@@ -13,7 +13,7 @@ class aptitude {
   late int mCodeNum;
   String mLabelApt;
   late String mCode;
-//String? mEquiv;
+  //String? mEquiv;
   late int mEquCodeNonContr;
   late int mAptContraigante;
   int? mOrdreContrainte;
@@ -21,14 +21,14 @@ class aptitude {
   late int mSouscote;
 
   aptitude.fromMap(final Map<String, dynamic> map)
-      : mCodeNum = map['Num'],
-        mLabelApt = map['Aptitude'],
-        mCode = map['Code_Aptitude'],
-        mEquCodeNonContr = map['EquCodeNonContr'],
-        mAptContraigante = map['Equiv2Code'],
-        mOrdreContrainte = map['OrdreContrainte'],
-        mSurcote = map['surcote'],
-        mSouscote = map['souscote'];
+    : mCodeNum = map['Num'],
+      mLabelApt = map['Aptitude'],
+      mCode = map['Code_Aptitude'],
+      mEquCodeNonContr = map['EquCodeNonContr'],
+      mAptContraigante = map['Equiv2Code'],
+      mOrdreContrainte = map['OrdreContrainte'],
+      mSurcote = map['surcote'],
+      mSouscote = map['souscote'];
 }
 
 class risque {
@@ -36,17 +36,17 @@ class risque {
   String? mRisque;
   late int mCategorie;
   risque.fromMap(final Map<String, dynamic> map)
-      : mCode = map['code'],
-        mRisque = map['risque'],
-        mCategorie = map['categorie'];
+    : mCode = map['code'],
+      mRisque = map['risque'],
+      mCategorie = map['categorie'];
 }
 
 class vulnerabilite {
   late int mCode;
   String? mVulnerabilite;
   vulnerabilite.fromMap(final Map<String, dynamic> map)
-      : mCode = map['raster_val'],
-        mVulnerabilite = map['label'];
+    : mCode = map['raster_val'],
+      mVulnerabilite = map['label'];
   //mCategorie = map['categorie'];
 }
 
@@ -59,12 +59,12 @@ class station {
   late String mVar;
 
   station.fromMap(final Map<String, dynamic> map)
-      : mStationId = map['stat_id'],
-        mZbio = map['ZBIO'],
-        mNomStationCarto = map['Station_carto'],
-        mNomVar = map['nom_var'] != null ? map['nom_var'] : '',
-        mVarMaj = map['varMajoritaire'] == 1 ? true : false,
-        mVar = map['var'] != null ? map['var'] : '';
+    : mStationId = map['stat_id'],
+      mZbio = map['ZBIO'],
+      mNomStationCarto = map['Station_carto'],
+      mNomVar = map['nom_var'] != null ? map['nom_var'] : '',
+      mVarMaj = map['varMajoritaire'] == 1 ? true : false,
+      mVar = map['var'] != null ? map['var'] : '';
 }
 
 class zbio {
@@ -73,10 +73,10 @@ class zbio {
   String? mCS_lay;
   int? mCSid;
   zbio.fromMap(final Map<String, dynamic> map)
-      : mCode = map['Zbio'],
-        mNom = map['Nom'],
-        mCS_lay = map['CS_lay'],
-        mCSid = map['CSid'];
+    : mCode = map['Zbio'],
+      mNom = map['Nom'],
+      mCS_lay = map['CS_lay'],
+      mCSid = map['CSid'];
 }
 
 class groupe_couche {
@@ -84,9 +84,9 @@ class groupe_couche {
   late String mLabel;
   late bool mExpert;
   groupe_couche.fromMap(final Map<String, dynamic> map)
-      : mCode = map['code'],
-        mLabel = map['label'],
-        mExpert = map['expert'] == 0 ? false : true;
+    : mCode = map['code'],
+      mLabel = map['label'],
+      mExpert = map['expert'] == 0 ? false : true;
 }
 
 class layerBase {
@@ -109,39 +109,39 @@ class layerBase {
   late int mBits;
   //String mNomFile,mDir; mPathQml mPathRaster,
 
-// frommap avec liste d'instanciation, inspiré de https://medium.com/@lumeilin/using-sqlite-in-flutter-59b27b099123
-// named constructor
+  // frommap avec liste d'instanciation, inspiré de https://medium.com/@lumeilin/using-sqlite-in-flutter-59b27b099123
+  // named constructor
   layerBase.fromMap(final Map<String, dynamic> map)
-      : mNom = map['NomComplet'],
-        mCode = map['Code'],
-        mNomCourt = map['NomCourt'],
-        //mPathRaster = map['Dir3'], //+ '/' + map['Nom'], // pas si simple, chemin d'accès sur le mobile. Utile que si bulk download des raster
-        mExpert = map['expert'] == 0 ? false : true,
-        mVisu = map['visu'] == 0 ? false : true,
-        mGroupe = map['groupe'],
-        mUrl = map['WMSurl'] == null ? "" : map['WMSurl'],
-        mWMSLayerName = map['WMSlayer'] == null ? "" : map['WMSlayer'],
-        mWMSattribution =
-            map['WMSattribution'] == null ? "" : map['WMSattribution'],
-        mTypeGeoservice =
-            map['typeGeoservice'] == null ? "" : map['typeGeoservice'],
-        mCategorie = map['Categorie'],
-        nom_field_raster = map['nom_field_raster'],
-        nom_field_value = map['nom_field_value'],
-        nom_dico = map['nom_dico'],
-        condition = map['condition'],
-        mTypeVar = map['TypeVar'],
-        mGain = map['gain'] == null ? 66.6 : map['gain'],
-        mPdfPage = map['pdfPage'] == null ? 0 : map['pdfPage'] - 1,
-        mPdfName = map['pdfName'] == null ? "" : map['pdfName'],
-        mRes = map['res'] == null ? 0.0 : map['res'],
-        mNomRaster = map['Nom'],
-        mDicoVal = {},
-        mDicoCol = {},
-        mOffline = false,
-        mInDownload = false,
-        mBits = map['Bits'] == null ? 8 : map['Bits'],
-        mUsedForAnalysis = false {
+    : mNom = map['NomComplet'],
+      mCode = map['Code'],
+      mNomCourt = map['NomCourt'],
+      //mPathRaster = map['Dir3'], //+ '/' + map['Nom'], // pas si simple, chemin d'accès sur le mobile. Utile que si bulk download des raster
+      mExpert = map['expert'] == 0 ? false : true,
+      mVisu = map['visu'] == 0 ? false : true,
+      mGroupe = map['groupe'],
+      mUrl = map['WMSurl'] == null ? "" : map['WMSurl'],
+      mWMSLayerName = map['WMSlayer'] == null ? "" : map['WMSlayer'],
+      mWMSattribution =
+          map['WMSattribution'] == null ? "" : map['WMSattribution'],
+      mTypeGeoservice =
+          map['typeGeoservice'] == null ? "" : map['typeGeoservice'],
+      mCategorie = map['Categorie'],
+      nom_field_raster = map['nom_field_raster'],
+      nom_field_value = map['nom_field_value'],
+      nom_dico = map['nom_dico'],
+      condition = map['condition'],
+      mTypeVar = map['TypeVar'],
+      mGain = map['gain'] == null ? 66.6 : map['gain'],
+      mPdfPage = map['pdfPage'] == null ? 0 : map['pdfPage'] - 1,
+      mPdfName = map['pdfName'] == null ? "" : map['pdfName'],
+      mRes = map['res'] == null ? 0.0 : map['res'],
+      mNomRaster = map['Nom'],
+      mDicoVal = {},
+      mDicoCol = {},
+      mOffline = false,
+      mInDownload = false,
+      mBits = map['Bits'] == null ? 8 : map['Bits'],
+      mUsedForAnalysis = false {
     mIsDownloadableRW = mRes >= 10 ? true : false;
     mLogoAttributionFile = logoAttributionFile(mWMSattribution);
   }
@@ -166,27 +166,27 @@ class layerBase {
   }
 
   layerBase()
-      : mNom = '',
-        mCode = 'toto',
-        mNomCourt = '',
-        mExpert = true,
-        mGroupe = '',
-        mUrl = '',
-        mWMSLayerName = '',
-        mWMSattribution = '',
-        mCategorie = '',
-        nom_field_raster = '',
-        nom_field_value = '',
-        nom_dico = '',
-        condition = '',
-        mTypeVar = '',
-        mGain = 0,
-        mPdfName = '',
-        mPdfPage = 1,
-        mDicoVal = {},
-        mDicoCol = {},
-        mRes = 0.0,
-        mUsedForAnalysis = false;
+    : mNom = '',
+      mCode = 'toto',
+      mNomCourt = '',
+      mExpert = true,
+      mGroupe = '',
+      mUrl = '',
+      mWMSLayerName = '',
+      mWMSattribution = '',
+      mCategorie = '',
+      nom_field_raster = '',
+      nom_field_value = '',
+      nom_dico = '',
+      condition = '',
+      mTypeVar = '',
+      mGain = 0,
+      mPdfName = '',
+      mPdfPage = 1,
+      mDicoVal = {},
+      mDicoCol = {},
+      mRes = 0.0,
+      mUsedForAnalysis = false;
 
   bool hasDoc() {
     return mPdfName != "";
@@ -243,7 +243,8 @@ class layerBase {
 
   Future<void> fillLayerDico(dicoAptProvider dico) async {
     if (mCategorie != 'Externe' && nom_dico != null) {
-      String myquery = 'SELECT ' +
+      String myquery =
+          'SELECT ' +
           nom_field_raster.toString() +
           ' as rast, ' +
           nom_field_value.toString() +
@@ -282,7 +283,8 @@ class layerBase {
 
   @override
   String toString() {
-    String res = "layerbase code ${mCode}, name ${mNom}, dicoVal size " +
+    String res =
+        "layerbase code ${mCode}, name ${mNom}, dicoVal size " +
         mDicoVal.length.toString() +
         ' dicoCol size ' +
         mDicoCol.length.toString();
@@ -322,12 +324,11 @@ class dicoAptProvider {
   Future<String> init() async {
     //final dbPath = await getDatabasesPath(); plante sous android
 
-    
     docDir = await getApplicationDocumentsDirectory();
     final path = join(docDir.path, "db/fforestimator.db");
     var exists = await databaseExists(path);
-    
-    if (!exists){
+
+    if (!exists) {
       // Pour IOS j'ai remis la condition
       // pour  maj à chaque fois des assets car sinon quand je fait une maj de l'app sur google play store et que la BD a changé, c'est l'ancienne bd qui est utilisée vu qu'elle existe déjà
 
@@ -337,39 +338,41 @@ class dicoAptProvider {
 
       // Create the writable database file from the bundled  (asset bulk) fforestimator.db database file:
       // the bundled resource itself can't be directly opened as a file on Android -> c'est bien dommage
-      ByteData data =
-          await rootBundle.load(url.join("assets", "db/fforestimator.db"));
-      List<int> bytes =
-          data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
+      ByteData data = await rootBundle.load(
+        url.join("assets", "db/fforestimator.db"),
+      );
+      List<int> bytes = data.buffer.asUint8List(
+        data.offsetInBytes,
+        data.lengthInBytes,
+      );
       await File(path).writeAsBytes(bytes, flush: true);
     }
-    
+
     db = await openDatabase(path);
 
-
     List<Map<String, dynamic>> result = await db.query('dico_color');
-    
+
     for (var r in result) {
       colors[r['Col']] = Color.fromRGBO(r['R'], r['G'], r['B'], 1.0);
     }
-    
+
     result = await db.query('dico_colGrey');
-  
+
     for (var r in result) {
       colors[r['Col']] = Color.fromRGBO(r['R'], r['G'], r['B'], 1.0);
     }
-    
+
     result = await db.query('dico_viridisColors');
     for (var r in result) {
       colors[r['id'].toString()] = HexColor(r['hex']);
     }
-  
+
     // lecture des layerbase
     result = await db.query('fichiersGIS', where: 'groupe IS NOT NULL');
     for (var row in result) {
       mLayerBases[row['Code']] = layerBase.fromMap(row);
     }
-    
+
     result = await db.query('layerApt');
     for (var row in result) {
       mLayerBases[row['Code']] = layerBase.fromMap(row);
@@ -418,8 +421,12 @@ class dicoAptProvider {
     finishedLoading = true;
     checkLayerBaseOfflineRessource();
     checkLayerBaseForAnalysis();
-    
-    return "1" + path + exists.toString()+result.first.toString()+colors.length.toString();
+
+    return "1" +
+        path +
+        exists.toString() +
+        result.first.toString() +
+        colors.length.toString();
   }
 
   Ess getEss(String aCode) {

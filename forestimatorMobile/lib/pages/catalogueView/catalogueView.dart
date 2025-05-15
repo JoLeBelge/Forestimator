@@ -89,7 +89,6 @@ class _CatalogueView extends State<CatalogueView> {
   }
 
   void rebuildWidgetTreeForLayerDownloader(void Function() setter) {
-    print("Refresh from downloader received.");
     setState(setter);
   }
 }
@@ -182,11 +181,12 @@ class _CategoryView extends State<CategoryView> {
                   ],
                 );
               },
-              body: (item.isExpanded) ? _expandedLegendView(item) : Container(),
-              isExpanded:
-                  gl.dico.getLayerBase(item.key).mInDownload
-                      ? false
-                      : item.isExpanded,
+              body:
+                  (item.isExpanded ||
+                          gl.dico.getLayerBase(item.key).mInDownload)
+                      ? _expandedLegendView(item)
+                      : Container(),
+              isExpanded: item.isExpanded,
             );
           }).toList(),
     );

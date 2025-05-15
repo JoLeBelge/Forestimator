@@ -20,7 +20,7 @@ void initDownloader() async {
 
 class LayerDownloader extends StatefulWidget {
   final LayerTile layer;
-  const LayerDownloader(this.layer, {super.key});
+  LayerDownloader(this.layer, {super.key});
 
   @override
   State<LayerDownloader> createState() => _LayerDownloaderState();
@@ -29,13 +29,14 @@ class LayerDownloader extends StatefulWidget {
 @pragma('vm:entry-point')
 class _LayerDownloaderState extends State<LayerDownloader> {
   static final Map<String, double> _downloadStates = {};
-  static final Map<String, String?> _taskIDToLayerCode = {};
+  static final Map<String, _LayerDownloaderState> downloadIdToWidget = {};
 
   static List<Map> downloadData = [];
   final ReceivePort _port = ReceivePort();
 
   bool listenerInitialized = false;
   dynamic buildContextNotifications;
+  String? downloadId = "";
 
   @override
   Widget build(BuildContext context) {
@@ -113,14 +114,43 @@ class _LayerDownloaderState extends State<LayerDownloader> {
         ],
       );
     } else if (gl.dico.getLayerBase(widget.layer.key).mInDownload) {
-      return Container(
-        constraints: const BoxConstraints(
-          maxWidth: 256,
-          minWidth: 48,
-          maxHeight: 48,
-          minHeight: 48,
-        ),
-        child: const Text("en téléchargement."),
+      return Row(
+        children: [
+          IconButton(
+            onPressed: () async {
+              FlutterDownloader.cancel(taskId: downloadId!);
+              setState(() {
+                gl.dico.getLayerBase(widget.layer.key).mInDownload = true;
+              });
+              gl.refreshWholeCatalogueView(() {
+                gl.dico.getLayerBase(widget.layer.key).mInDownload = true;
+              });
+              gl.rebuildOfflineView(() {
+                gl.dico.getLayerBase(widget.layer.key).mInDownload = true;
+              });
+              downloadId = await _downloadFile().whenComplete(() {
+                if (!listenerInitialized) {
+                  _listenToDownloader();
+                  listenerInitialized = true;
+                }
+              });
+              setState(() {
+                downloadIdToWidget[downloadId!] = this;
+                print(downloadIdToWidget[downloadId!]);
+              });
+            },
+            icon: const Icon(Icons.repeat_rounded),
+          ),
+          Container(
+            constraints: const BoxConstraints(
+              maxWidth: 256,
+              minWidth: 48,
+              maxHeight: 48,
+              minHeight: 48,
+            ),
+            child: const Text("Réessayer."),
+          ),
+        ],
       );
     } else {
       return Row(
@@ -137,13 +167,11 @@ class _LayerDownloaderState extends State<LayerDownloader> {
               gl.rebuildOfflineView(() {
                 gl.dico.getLayerBase(widget.layer.key).mInDownload = true;
               });
-              _taskIDToLayerCode[widget.layer.key] = await _downloadFile()
-                  .whenComplete(() {
-                    if (!listenerInitialized) {
-                      _listenToDownloader();
-                      listenerInitialized = true;
-                    }
-                  });
+              downloadId = await _downloadFile();
+              setState(() {
+                downloadIdToWidget[downloadId!] = this;
+                print(downloadIdToWidget[downloadId!]);
+              });
             },
             icon: const Icon(Icons.download),
           ),
@@ -204,7 +232,7 @@ class _LayerDownloaderState extends State<LayerDownloader> {
         savedDir: gl.dico.docDir.path,
         showNotification: false,
         openFileFromNotification: false,
-        timeout: 60000,
+        timeout: 180000,
       );
     }
     return taskId;
@@ -227,6 +255,11 @@ class _LayerDownloaderState extends State<LayerDownloader> {
   void initState() {
     super.initState();
     getAllDownloads();
+    if (!listenerInitialized) {
+      FlutterDownloader.registerCallback(downloadCallback, step: 10);
+      _listenToDownloader();
+      listenerInitialized = true;
+    }
   }
 
   @override
@@ -240,18 +273,22 @@ class _LayerDownloaderState extends State<LayerDownloader> {
       _port.sendPort,
       'downloader_send_port',
     );
-    // used for setStates.
-    //TODO: add timeout that determins if dl fails
     _port.listen((dynamic data) {
-      String id = data[0];
-      print(id);
+      String idListened = data[0];
+      print("$idListened and $downloadId");
+      if (downloadIdToWidget[idListened] == null) {
+        print("keys ${downloadIdToWidget.keys}");
+        return;
+      }
+      _LayerDownloaderState downloader = downloadIdToWidget[idListened]!;
+
       DownloadTaskStatus status = DownloadTaskStatus.fromInt(data[1]);
       if (DownloadTaskStatus.enqueued == status) {
-        setState(() {
-          gl.dico.getLayerBase(widget.layer.key).mInDownload = true;
+        downloader.setState(() {
+          gl.dico.getLayerBase(downloader.widget.layer.key).mInDownload = true;
         });
         gl.refreshWholeCatalogueView(() {
-          gl.dico.getLayerBase(widget.layer.key).mInDownload = true;
+          gl.dico.getLayerBase(downloader.widget.layer.key).mInDownload = true;
         });
       }
       if (status == DownloadTaskStatus.complete) {
@@ -263,7 +300,7 @@ class _LayerDownloaderState extends State<LayerDownloader> {
               return AlertDialog(
                 title: Text("Téléchargement"),
                 content: Text(
-                  "${widget.layer.name} a été téléchargée avec succès.",
+                  "${downloader.widget.layer.name} a été téléchargée avec succès.",
                 ),
                 actions: [
                   TextButton(
@@ -278,16 +315,16 @@ class _LayerDownloaderState extends State<LayerDownloader> {
           );
         }
         setState(() {
-          gl.dico.getLayerBase(widget.layer.key).mInDownload = false;
-          gl.dico.getLayerBase(widget.layer.key).mOffline = true;
+          gl.dico.getLayerBase(downloader.widget.layer.key).mInDownload = false;
+          gl.dico.getLayerBase(downloader.widget.layer.key).mOffline = true;
         });
         gl.rebuildOfflineView(() {
-          gl.dico.getLayerBase(widget.layer.key).mOffline = true;
-          gl.dico.getLayerBase(widget.layer.key).mInDownload = false;
+          gl.dico.getLayerBase(downloader.widget.layer.key).mOffline = true;
+          gl.dico.getLayerBase(downloader.widget.layer.key).mInDownload = false;
         });
         gl.refreshWholeCatalogueView(() {
-          gl.dico.getLayerBase(widget.layer.key).mInDownload = false;
-          gl.dico.getLayerBase(widget.layer.key).mOffline = true;
+          gl.dico.getLayerBase(downloader.widget.layer.key).mInDownload = false;
+          gl.dico.getLayerBase(downloader.widget.layer.key).mOffline = true;
         });
       }
       if (DownloadTaskStatus.failed == status) {
@@ -299,7 +336,9 @@ class _LayerDownloaderState extends State<LayerDownloader> {
             builder: (BuildContext context) {
               return AlertDialog(
                 title: Text("Problèmes de connexion"),
-                content: Text("${widget.layer.name} n'a pas été téléchargée."),
+                content: Text(
+                  "${downloader.widget.layer.name} n'a pas été téléchargée.",
+                ),
                 actions: [
                   TextButton(
                     child: Text("OK"),
@@ -313,12 +352,12 @@ class _LayerDownloaderState extends State<LayerDownloader> {
           );
         }
         setState(() {
-          gl.dico.getLayerBase(widget.layer.key).mInDownload = false;
-          gl.dico.getLayerBase(widget.layer.key).mOffline = false;
+          gl.dico.getLayerBase(downloader.widget.layer.key).mInDownload = false;
+          gl.dico.getLayerBase(downloader.widget.layer.key).mOffline = false;
         });
         gl.refreshWholeCatalogueView(() {
-          gl.dico.getLayerBase(widget.layer.key).mInDownload = false;
-          gl.dico.getLayerBase(widget.layer.key).mOffline = false;
+          gl.dico.getLayerBase(downloader.widget.layer.key).mInDownload = false;
+          gl.dico.getLayerBase(downloader.widget.layer.key).mOffline = false;
         });
       }
       return;
