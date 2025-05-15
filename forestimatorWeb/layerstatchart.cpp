@@ -156,7 +156,7 @@ std::unique_ptr<WContainerWidget> layerStatChart::getChart(bool forRenderingInPd
 
                 table->elementAt(0,0)->addWidget(std::make_unique<WText>(mLay->getLegendLabel(false)));
                 int i=1;
-                table->elementAt(i, 0)->addWidget(std::make_unique<WText>("Surface totale [ha]"));
+                table->elementAt(i, 0)->addWidget(std::make_unique<WText>("Surface totale [m2]"));
                 table->elementAt(i, 1)->addWidget(std::make_unique<WText>(bs.getSurfTot()));
                 table->elementAt(i, 1)->setPadding(10,Wt::Side::Left);
                 i++;
