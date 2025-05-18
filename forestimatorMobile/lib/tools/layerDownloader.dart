@@ -8,6 +8,9 @@ import 'package:fforestimator/globals.dart' as gl;
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:path/path.dart';
 
+final Map<String, _LayerDownloaderState> _downloadIdToWidget = {};
+ForestimatorDownloader? fD;
+
 void initDownloader() async {
   WidgetsFlutterBinding.ensureInitialized();
   await FlutterDownloader.initialize(
@@ -16,6 +19,7 @@ void initDownloader() async {
     ignoreSsl:
         false, // option: set to false to disable working with http links (default: false)
   );
+  fD = ForestimatorDownloader();
 }
 
 class LayerDownloader extends StatefulWidget {
@@ -29,7 +33,6 @@ class LayerDownloader extends StatefulWidget {
 @pragma('vm:entry-point')
 class _LayerDownloaderState extends State<LayerDownloader> {
   static final Map<String, double> _downloadStates = {};
-  static final Map<String, _LayerDownloaderState> downloadIdToWidget = {};
 
   static List<Map> downloadData = [];
   final ReceivePort _port = ReceivePort();
@@ -128,15 +131,10 @@ class _LayerDownloaderState extends State<LayerDownloader> {
               gl.rebuildOfflineView(() {
                 gl.dico.getLayerBase(widget.layer.key).mInDownload = true;
               });
-              downloadId = await _downloadFile().whenComplete(() {
-                if (!listenerInitialized) {
-                  _listenToDownloader();
-                  listenerInitialized = true;
-                }
-              });
+              downloadId = await fD?.downloadFile(widget.layer.key);
               setState(() {
-                downloadIdToWidget[downloadId!] = this;
-                print(downloadIdToWidget[downloadId!]);
+                _downloadIdToWidget[downloadId!] = this;
+                print(_downloadIdToWidget[downloadId!]);
               });
             },
             icon: const Icon(Icons.repeat_rounded),
@@ -167,10 +165,10 @@ class _LayerDownloaderState extends State<LayerDownloader> {
               gl.rebuildOfflineView(() {
                 gl.dico.getLayerBase(widget.layer.key).mInDownload = true;
               });
-              downloadId = await _downloadFile();
+              downloadId = await fD?.downloadFile(widget.layer.key);
               setState(() {
-                downloadIdToWidget[downloadId!] = this;
-                print(downloadIdToWidget[downloadId!]);
+                _downloadIdToWidget[downloadId!] = this;
+                print(_downloadIdToWidget[downloadId!]);
               });
             },
             icon: const Icon(Icons.download),
@@ -212,32 +210,6 @@ class _LayerDownloaderState extends State<LayerDownloader> {
     return 0;
   }
 
-  @pragma('vm:entry-point')
-  static void downloadCallback(String id, int status, int progress) {
-    final SendPort send =
-        IsolateNameServer.lookupPortByName('downloader_send_port')!;
-    send.send([id, status, progress]);
-  }
-
-  Future<String?> _downloadFile() async {
-    late String? taskId;
-    FlutterDownloader.registerCallback(downloadCallback, step: 10);
-    if (!(Platform.isWindows || Platform.isLinux || Platform.isMacOS)) {
-      taskId = await FlutterDownloader.enqueue(
-        url:
-            gl.queryApiRastDownload +
-            "/" +
-            gl.dico.getLayerBase(widget.layer.key).mCode,
-        fileName: gl.dico.getLayerBase(widget.layer.key).mNomRaster,
-        savedDir: gl.dico.docDir.path,
-        showNotification: false,
-        openFileFromNotification: false,
-        timeout: 180000,
-      );
-    }
-    return taskId;
-  }
-
   static Future<bool> fileExists(String path) async {
     final File file = File(path);
     return file.exists();
@@ -255,17 +227,47 @@ class _LayerDownloaderState extends State<LayerDownloader> {
   void initState() {
     super.initState();
     getAllDownloads();
-    if (!listenerInitialized) {
-      FlutterDownloader.registerCallback(downloadCallback, step: 10);
-      _listenToDownloader();
-      listenerInitialized = true;
-    }
   }
 
-  @override
+}
+
+@pragma('vm:entry-point')
+class ForestimatorDownloader {
+  static Map<String, String> layerToId = {};
+  final ReceivePort _port = ReceivePort();
+
+  ForestimatorDownloader() {
+    FlutterDownloader.registerCallback(downloadCallback, step: 10);
+    _listenToDownloader();
+  }
+
+  @pragma('vm:entry-point')
+  static void downloadCallback(String id, int status, int progress) {
+    final SendPort send =
+        IsolateNameServer.lookupPortByName('downloader_send_port')!;
+    send.send([id, status, progress]);
+  }
+
   void dispose() {
     IsolateNameServer.removePortNameMapping('downloader_send_port');
-    super.dispose();
+  }
+
+  Future<String?> downloadFile(String layerKey) async {
+    late String? taskId;
+    FlutterDownloader.registerCallback(downloadCallback, step: 10);
+    if (!(Platform.isWindows || Platform.isLinux || Platform.isMacOS)) {
+      taskId = await FlutterDownloader.enqueue(
+        url:
+            "${gl.queryApiRastDownload}/${gl.dico.getLayerBase(layerKey).mCode}",
+        fileName: gl.dico.getLayerBase(layerKey).mNomRaster,
+        savedDir: gl.dico.docDir.path,
+        showNotification: false,
+        openFileFromNotification: false,
+        timeout: 180000,
+      );
+    }
+    layerToId[layerKey] = taskId!;
+    return taskId;
   }
 
   void _listenToDownloader() {
@@ -275,49 +277,38 @@ class _LayerDownloaderState extends State<LayerDownloader> {
     );
     _port.listen((dynamic data) {
       String idListened = data[0];
-      print("$idListened and $downloadId");
-      if (downloadIdToWidget[idListened] == null) {
-        print("keys ${downloadIdToWidget.keys}");
-        return;
-      }
-      _LayerDownloaderState downloader = downloadIdToWidget[idListened]!;
+      print("${data[2]}");
+      _LayerDownloaderState downloader = _downloadIdToWidget[idListened]!;
 
       DownloadTaskStatus status = DownloadTaskStatus.fromInt(data[1]);
       if (DownloadTaskStatus.enqueued == status) {
-        downloader.setState(() {
-          gl.dico.getLayerBase(downloader.widget.layer.key).mInDownload = true;
-        });
         gl.refreshWholeCatalogueView(() {
           gl.dico.getLayerBase(downloader.widget.layer.key).mInDownload = true;
         });
       }
       if (status == DownloadTaskStatus.complete) {
-        BuildContext context = buildContextNotifications as BuildContext;
-        if (context != null) {
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                title: Text("Téléchargement"),
-                content: Text(
-                  "${downloader.widget.layer.name} a été téléchargée avec succès.",
+        BuildContext context = gl.notificationContext!;
+
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text("Téléchargement"),
+              content: Text(
+                "${downloader.widget.layer.name} a été téléchargée avec succès.",
+              ),
+              actions: [
+                TextButton(
+                  child: Text("OK"),
+                  onPressed: () {
+                    Navigator.of(context, rootNavigator: true).pop();
+                  },
                 ),
-                actions: [
-                  TextButton(
-                    child: Text("OK"),
-                    onPressed: () {
-                      Navigator.of(context, rootNavigator: true).pop();
-                    },
-                  ),
-                ],
-              );
-            },
-          );
-        }
-        setState(() {
-          gl.dico.getLayerBase(downloader.widget.layer.key).mInDownload = false;
-          gl.dico.getLayerBase(downloader.widget.layer.key).mOffline = true;
-        });
+              ],
+            );
+          },
+        );
+
         gl.rebuildOfflineView(() {
           gl.dico.getLayerBase(downloader.widget.layer.key).mOffline = true;
           gl.dico.getLayerBase(downloader.widget.layer.key).mInDownload = false;
@@ -329,32 +320,28 @@ class _LayerDownloaderState extends State<LayerDownloader> {
       }
       if (DownloadTaskStatus.failed == status) {
         //download failed
-        BuildContext context = buildContextNotifications as BuildContext;
-        if (context != null) {
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                title: Text("Problèmes de connexion"),
-                content: Text(
-                  "${downloader.widget.layer.name} n'a pas été téléchargée.",
+        BuildContext context = gl.notificationContext!;
+
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text("Problèmes de connexion"),
+              content: Text(
+                "${downloader.widget.layer.name} n'a pas été téléchargée.",
+              ),
+              actions: [
+                TextButton(
+                  child: Text("OK"),
+                  onPressed: () {
+                    Navigator.of(context, rootNavigator: true).pop();
+                  },
                 ),
-                actions: [
-                  TextButton(
-                    child: Text("OK"),
-                    onPressed: () {
-                      Navigator.of(context, rootNavigator: true).pop();
-                    },
-                  ),
-                ],
-              );
-            },
-          );
-        }
-        setState(() {
-          gl.dico.getLayerBase(downloader.widget.layer.key).mInDownload = false;
-          gl.dico.getLayerBase(downloader.widget.layer.key).mOffline = false;
-        });
+              ],
+            );
+          },
+        );
+
         gl.refreshWholeCatalogueView(() {
           gl.dico.getLayerBase(downloader.widget.layer.key).mInDownload = false;
           gl.dico.getLayerBase(downloader.widget.layer.key).mOffline = false;

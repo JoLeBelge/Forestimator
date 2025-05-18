@@ -20,94 +20,84 @@ class _OfflineView extends State<OfflineView> {
 
   @override
   Widget build(BuildContext context) {
+    gl.notificationContext = context;
     return Scaffold(
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          gl.offlineMode
-              ? Container(
-                color: gl.colorBackgroundSecondary,
-                constraints: BoxConstraints(
-                  maxWidth: MediaQuery.of(context).size.width * 1.0,
-                  minHeight: MediaQuery.of(context).size.height * .15,
-                  maxHeight: MediaQuery.of(context).size.height * .15,
-                ),
-                child: TextButton.icon(
-                  onPressed: () async {
-                    setState(() {
-                      gl.offlineMode = false;
-                      gl.rebuildNavigatorBar!();
-                      // pas nécéssaire vu que de offline vers online on peut garder la même sélection de couche (les cartes offlines peuvent être affichées en mode online, c'est l'inverse qui ne va pas)
-                      //gl.refreshCurrentThreeLayer();
-                      //gl.refreshMap(() {});
-                    });
-                    final SharedPreferences prefs =
-                        await SharedPreferences.getInstance();
-                    await prefs.setBool('offlineMode', gl.offlineMode);
-                  },
-                  icon: Icon(Icons.download_for_offline, color: gl.colorUliege),
-                  label: Text(
-                    "Désactivez le mode hors ligne.",
-                    style: TextStyle(color: gl.colorUliege),
-                  ),
-                ),
-              )
-              : Container(
-                color: gl.colorBackgroundSecondary,
-                constraints: BoxConstraints(
-                  maxWidth: MediaQuery.of(context).size.width * 1.0,
-                  minHeight: MediaQuery.of(context).size.height * .15,
-                  maxHeight: MediaQuery.of(context).size.height * .15,
-                ),
-                child: TextButton.icon(
-                  onPressed: () async {
-                    setState(() {
-                      gl.changeSelectedLayerModeOffline();
-                      gl.offlineMode = true;
-                      gl.rebuildNavigatorBar!();
-                      gl.refreshCurrentThreeLayer();
-                      gl.refreshMap(() {});
-                    });
-                    final SharedPreferences prefs =
-                        await SharedPreferences.getInstance();
-                    await prefs.setStringList(
-                      'interfaceSelectedLCode',
-                      gl.getInterfaceSelectedLCode(),
-                    );
-                    await prefs.setBool('offlineMode', gl.offlineMode);
-                  },
-                  icon: Icon(
-                    Icons.download_for_offline,
-                    color: gl.colorAgroBioTech,
-                  ),
-                  label: Text(
-                    "Activez le mode hors ligne.",
-                    style: TextStyle(color: gl.colorAgroBioTech),
-                  ),
-                ),
-              ),
-          _buildOfflineList(),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildOfflineList() {
-    return Container(
-      constraints: BoxConstraints(
-        maxWidth: MediaQuery.of(context).size.width * 1.0,
-        maxHeight:
-            _downloadedLayers.length *
-            100 *
-            MediaQuery.of(context).size.width *
-            0.1,
-      ),
-      child: Scrollbar(
+      body: Scrollbar(
         controller: it,
         child: SingleChildScrollView(
           controller: it,
           physics: that,
-          child: _buildPanel(),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              gl.offlineMode
+                  ? Container(
+                    color: gl.colorBackgroundSecondary,
+                    constraints: BoxConstraints(
+                      maxWidth: MediaQuery.of(context).size.width * 1.0,
+                      minHeight: MediaQuery.of(context).size.height * .15,
+                      maxHeight: MediaQuery.of(context).size.height * .15,
+                    ),
+                    child: TextButton.icon(
+                      onPressed: () async {
+                        setState(() {
+                          gl.offlineMode = false;
+                          gl.rebuildNavigatorBar!();
+                          // pas nécéssaire vu que de offline vers online on peut garder la même sélection de couche (les cartes offlines peuvent être affichées en mode online, c'est l'inverse qui ne va pas)
+                          //gl.refreshCurrentThreeLayer();
+                          //gl.refreshMap(() {});
+                        });
+                        final SharedPreferences prefs =
+                            await SharedPreferences.getInstance();
+                        await prefs.setBool('offlineMode', gl.offlineMode);
+                      },
+                      icon: Icon(
+                        Icons.download_for_offline,
+                        color: gl.colorUliege,
+                      ),
+                      label: Text(
+                        "Désactivez le mode hors ligne.",
+                        style: TextStyle(color: gl.colorUliege),
+                      ),
+                    ),
+                  )
+                  : Container(
+                    color: gl.colorBackgroundSecondary,
+                    constraints: BoxConstraints(
+                      maxWidth: MediaQuery.of(context).size.width * 1.0,
+                      minHeight: MediaQuery.of(context).size.height * .15,
+                      maxHeight: MediaQuery.of(context).size.height * .15,
+                    ),
+                    child: TextButton.icon(
+                      onPressed: () async {
+                        setState(() {
+                          gl.changeSelectedLayerModeOffline();
+                          gl.offlineMode = true;
+                          gl.rebuildNavigatorBar!();
+                          gl.refreshCurrentThreeLayer();
+                          gl.refreshMap(() {});
+                        });
+                        final SharedPreferences prefs =
+                            await SharedPreferences.getInstance();
+                        await prefs.setStringList(
+                          'interfaceSelectedLCode',
+                          gl.getInterfaceSelectedLCode(),
+                        );
+                        await prefs.setBool('offlineMode', gl.offlineMode);
+                      },
+                      icon: Icon(
+                        Icons.download_for_offline,
+                        color: gl.colorAgroBioTech,
+                      ),
+                      label: Text(
+                        "Activez le mode hors ligne.",
+                        style: TextStyle(color: gl.colorAgroBioTech),
+                      ),
+                    ),
+                  ),
+              _buildPanel(),
+            ],
+          ),
         ),
       ),
     );
@@ -206,7 +196,7 @@ class _OfflineView extends State<OfflineView> {
             icon: const Icon(Icons.layers, size: 28),
             onPressed: () {
               if (!gl.offlineMode ||
-                  (gl.offlineMode && gl.dico.getLayerBase(lt.key).mOffline)){
+                  (gl.offlineMode && gl.dico.getLayerBase(lt.key).mOffline)) {
                 setState(() {
                   if (gl.interfaceSelectedLayerKeys.length < nLayer) {
                     setState(() {
@@ -227,7 +217,7 @@ class _OfflineView extends State<OfflineView> {
                   gl.refreshCurrentThreeLayer();
                   gl.refreshWholeCatalogueView(() {});
                 });
-              //TODO else popup warning: file is not on disk
+                //TODO else popup warning: file is not on disk
               }
             },
           ),
@@ -274,9 +264,7 @@ class _OfflineView extends State<OfflineView> {
                 .hasFEEapt())
           ListTile(
             title: Text(
-              "Consulter la fiche-essence ${gl.dico
-                      .getEss(gl.dico.getLayerBase(lt.key).getEssCode())
-                      .getNameAndPrefix()}",
+              "Consulter la fiche-essence ${gl.dico.getEss(gl.dico.getLayerBase(lt.key).getEssCode()).getNameAndPrefix()}",
             ),
             leading: IconButton(
               onPressed: () {

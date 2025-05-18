@@ -16,10 +16,9 @@ late dicoAptProvider dico;
 String basePathbranchB = "catalogue";
 String basePathbranchC = "offline";
 
-dynamic notificationContext = null;
+BuildContext? notificationContext;
 
 bool offlineMode = false;
-
 bool debug = false;
 
 // ajouter le code le la couche à la fin de cette requete. fonctionne que pour layerbase avec mRes <= 10m sinon je considère que c'est trop volumineux

@@ -191,6 +191,7 @@ class _MapPageState extends State<mapPage> {
 
   @override
   Widget build(BuildContext context) {
+    gl.notificationContext = context;
     return handlePermissionForLocation(
       refreshParentWidgetTree: refreshView,
       child: Scaffold(

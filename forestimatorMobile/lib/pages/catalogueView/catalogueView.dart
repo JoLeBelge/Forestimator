@@ -24,6 +24,7 @@ class _CatalogueView extends State<CatalogueView> {
 
   @override
   Widget build(BuildContext context) {
+    gl.notificationContext = context;
     if (finishedInitializingCategories) {
       return SingleChildScrollView(
         physics: that,
