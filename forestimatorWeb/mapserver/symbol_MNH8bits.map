@@ -1,5 +1,5 @@
    		CLASS
-   			EXPRESSION ([pixel*0.5]<=5)
+   			EXPRESSION ([pixel]<=5)
 			STYLE
 				COLORRANGE '#440154' '#472a7a'
 				DATARANGE 0.0 5.0
