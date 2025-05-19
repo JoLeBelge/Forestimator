@@ -95,7 +95,7 @@ std::unique_ptr<WContainerWidget> layerStatChart::getChart(bool forRenderingInPd
             table->setWidth(200 + 150 + 14+2);
         } else if (mTypeVar==TypeVar::Continu){
 
-            if(mLay->Code()!="dendro_vha"){
+            if(mLay->Code().substr(0,7)=="dendro_"){
                 // pour MNH et MNT, pour l'instant  - recrée un vecteur stat, puis un model
                 std::map<double, double> aStat;
                 // je dois mettre et la hauteur en double, et le pct car sinon imprécision d'arrondi
@@ -164,17 +164,21 @@ std::unique_ptr<WContainerWidget> layerStatChart::getChart(bool forRenderingInPd
                 table->elementAt(i, 1)->addWidget(std::make_unique<WText>(bs.getNbNA(2)));
                 table->elementAt(i, 1)->setPadding(10,Wt::Side::Left);
                 i++;
-                table->elementAt(i, 0)->addWidget(std::make_unique<WText>("Moyenne [m3/ha]"));
+                std::string message(WString::tr("dendro.mean."+mLay->Code()).toUTF8());
+                if (message.substr(0,2)!="??"){
+                table->elementAt(i, 0)->addWidget(std::make_unique<WText>(message));
                 table->elementAt(i, 1)->addWidget(std::make_unique<WText>(bs.getMean(0)));
                 table->elementAt(i, 1)->setPadding(10,Wt::Side::Left);
                 i++;
-                /*table->elementAt(i, 0)->addWidget(std::make_unique<WText>("Ecart-type [m3/ha]"));
-                table->elementAt(i, 1)->addWidget(std::make_unique<WText>(bs.getSd(0)));
-                table->elementAt(i, 1)->setPadding(10,Wt::Side::Left);
-                i++;*/
-                table->elementAt(i, 0)->addWidget(std::make_unique<WText>("Volume total [m3]"));
+                }
+                message(WString::tr("dendro.sum."+mLay->Code()).toUTF8());
+                if (message.substr(0,2)!="??"){
+                table->elementAt(i, 0)->addWidget(std::make_unique<WText>(message));
                 table->elementAt(i, 1)->addWidget(std::make_unique<WText>(bs.getSum(0)));
                 table->elementAt(i, 1)->setPadding(10,Wt::Side::Left);
+                i++;
+                }
+
             }
 
             // fin variables continu
