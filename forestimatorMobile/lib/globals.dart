@@ -1,12 +1,9 @@
 library fforestimator.globals;
 
-import 'dart:ffi';
-
 import 'package:fforestimator/dico/dicoApt.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:fforestimator/pages/anaPt/requestedLayer.dart';
-import 'package:pdf/widgets.dart';
 import 'package:proj4dart/proj4dart.dart' as proj4;
 import 'package:latlong2/latlong.dart';
 import 'package:shared_preferences/shared_preferences.dart';
