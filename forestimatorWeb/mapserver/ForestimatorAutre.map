@@ -6973,7 +6973,7 @@ END
    		PROCESSING "BANDS=1" 
    		OFFSITE 0 0 0
 
-   		INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_MNH8bits.map"
+   		INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_MNH.map"
    		METADATA
       			"wms_title"           "Modèle dendrométrique : hauteur dominante [m]"
       			"wms_srs"             "EPSG:31370"
