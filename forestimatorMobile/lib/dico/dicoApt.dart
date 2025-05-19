@@ -131,7 +131,7 @@ class layerBase {
       nom_dico = map['nom_dico'],
       condition = map['condition'],
       mTypeVar = map['TypeVar'],
-      mGain = map['gain'] == null ? 66.6 : map['gain'],
+      mGain = map['gain'] == null ? 66.6 : map['gain'] is String ? map['gain'] == "" ? 66.6 : double.parse(map['gain']) : map['gain'],
       mPdfPage =
           map['pdfPage'] == null
               ? 0

@@ -1,7 +1,7 @@
 #!/bin/sh
 # This is a generated file; do not edit or check into version control.
-export "FLUTTER_ROOT=/home/tt/Work/flutter"
-export "FLUTTER_APPLICATION_PATH=/home/tt/Work/ProjectsRazer/Forestimator/Forestimator/Forestimator/forestimatorMobile"
+export "FLUTTER_ROOT=/Users/macgef/Documents/SDK/flutter"
+export "FLUTTER_APPLICATION_PATH=/Users/macgef/Documents/Forestimator/forestimatorMobile"
 export "COCOAPODS_PARALLEL_CODE_SIGN=true"
 export "FLUTTER_BUILD_DIR=build"
 export "FLUTTER_BUILD_NAME=1.0.0"
