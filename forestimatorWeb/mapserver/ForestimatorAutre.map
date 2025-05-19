@@ -6972,8 +6972,9 @@ END
    		DATA "dendro/dendro_hdom_8bits.tif" 
    		PROCESSING "BANDS=1" 
    		OFFSITE 0 0 0
+   		CONFIG "gain" "0.5"
 
-   		INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_MNH.map"
+   		INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_MNH8bits.map"
    		METADATA
       			"wms_title"           "Modèle dendrométrique : hauteur dominante [m]"
       			"wms_srs"             "EPSG:31370"
