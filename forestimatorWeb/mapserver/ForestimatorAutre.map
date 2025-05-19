@@ -6980,4 +6980,23 @@ END
    		END
    		TEMPLATE "../template.html"
    	END
+   	
+   	 LAYER
+  		NAME "dendro_gha"
+   		TYPE RASTER
+   		STATUS ON
+   		PROJECTION
+      			"init=epsg:31370"
+   		END
+   		DATA "dendro/dendro_gha_8bits.tif" 
+   		PROCESSING "BANDS=1" 
+   		OFFSITE 0 0 0
+
+   		INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_MNH8bits.map"
+   		METADATA
+      			"wms_title"           "Modèle dendrométrique : surface terrière [m2/ha]"
+      			"wms_srs"             "EPSG:31370"
+   		END
+   		TEMPLATE "../template.html"
+   	END
 END
