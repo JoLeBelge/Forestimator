@@ -11,7 +11,6 @@ import 'package:flutter/material.dart';
 import 'dart:math';
 import 'dart:io';
 import 'package:geolocator/geolocator.dart';
-import 'package:fforestimator/locationIndicator/animated_location_indicator.dart';
 import 'package:fforestimator/globals.dart' as gl;
 import 'package:http/http.dart' as http;
 import 'package:fforestimator/pages/anaPt/requestedLayer.dart';
@@ -20,7 +19,7 @@ import 'package:internet_connection_checker_plus/internet_connection_checker_plu
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fforestimator/tools/notification.dart';
 import 'dart:convert';
-//import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
+import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
 
 class mapPage extends StatefulWidget {
   const mapPage({super.key});
@@ -34,10 +33,6 @@ class _MapPageState extends State<mapPage> {
   LatLng? _pt;
   bool _doingAnaPt = false;
   var data;
-  /*
-  Geolocator? _geolocator;
-  Position? _position;
-  StreamSubscription? _positionStream;*/
 
   //https://github.com/fleaflet/flutter_map/blob/master/example/lib/pages/custom_crs/custom_crs.dart
   late proj4.Projection epsg4326 = proj4.Projection.get('EPSG:4326')!;
@@ -88,17 +83,12 @@ class _MapPageState extends State<mapPage> {
         String layersAnaPt = "";
         for (String lCode in gl.anaPtSelectedLayerKeys) {
           if (gl.dico.getLayerBase(lCode).mCategorie != "Externe") {
-            layersAnaPt += "+" + lCode;
+            layersAnaPt += "+$lCode";
           }
         }
 
         String url =
-            "https://forestimator.gembloux.ulg.ac.be/api/anaPt/layers/" +
-            layersAnaPt +
-            "/x/" +
-            ptBL72.x.toString() +
-            "/y/" +
-            ptBL72.y.toString();
+            "https://forestimator.gembloux.ulg.ac.be/api/anaPt/layers/$layersAnaPt/x/${ptBL72.x}/y/${ptBL72.y}";
         try {
           var res = await http.get(Uri.parse(url));
           if (res.statusCode != 200) throw HttpException('${res.statusCode}');
@@ -284,16 +274,6 @@ class _MapPageState extends State<mapPage> {
                   bounds: LatLngBounds.fromPoints([latlonBL, latlonTR]),
                 ),
                 onMapReady: () async {
-                  /*Permission.locationWhenInUse.request();
-                  if (await Permission.locationWhenInUse.isGranted) {
-                    Permission.locationAlways.request();
-                  }
-                  Permission.manageExternalStorage
-                      .request(); // pour nouvelle version de android
-                  Permission.storage
-                      .request();
-                      */ // pour ancienne version de android
-
                   updateLocation();
                   if (gl.position != null) {
                     // IMPORTANT: rebuild location layer when permissions are granted
@@ -352,7 +332,7 @@ class _MapPageState extends State<mapPage> {
                       return TileLayer(
                         userAgentPackageName: "com.forestimator",
                         wmsOptions: WMSTileLayerOptions(
-                          baseUrl: l.mUrl + "?",
+                          baseUrl: "${l.mUrl}?",
                           format: 'image/png',
                           layers: [l.mWMSLayerName],
                           crs: epsg31370CRS,
@@ -364,8 +344,8 @@ class _MapPageState extends State<mapPage> {
                   }).toList() +
                   <Widget>[
                     //CurrentLocationLayer(),
-                    const AnimatedLocationLayer(
-                      cameraTrackingMode: CameraTrackingMode.none,
+                    AnimatedLocationMarkerLayer(
+                      position: LocationMarkerPosition(latitude:  gl.position?.latitude ?? 0.0, longitude: gl.position?.longitude ?? 0.0, accuracy: 1.0),
                     ),
                     MarkerLayer(
                       markers: [
@@ -482,13 +462,13 @@ class _MapPageState extends State<mapPage> {
 
   void updateLocation() async {
     try {
-      if (_refreshLocation)
+      if (_refreshLocation) {
         return;
-      else
+      } else {
         _refreshLocation = true;
+      }
       Position newPosition = await Geolocator.getCurrentPosition(
-        /*desiredAccuracy: LocationAccuracy.high*/
-      ).timeout(new Duration(seconds: 3));
+      ).timeout(Duration(seconds: 3));
 
       setState(() {
         gl.position = newPosition;
@@ -502,91 +482,6 @@ class _MapPageState extends State<mapPage> {
       _refreshLocation = false;
       //FlutterLogs.logError("gps", "position", "error while waiting on position. ${e.toString()}");
     }
-  }
-
-  MapOptions _getOptions() {
-    return MapOptions(
-      backgroundColor: Colors.transparent,
-      keepAlive: true,
-      interactionOptions: const InteractionOptions(
-        enableMultiFingerGestureRace: false,
-        flags:
-            InteractiveFlag.drag |
-            InteractiveFlag.pinchZoom |
-            InteractiveFlag.pinchMove |
-            InteractiveFlag.doubleTapZoom |
-            InteractiveFlag.scrollWheelZoom,
-      ),
-      onLongPress:
-          (tapPosition, point) async => {
-            if (!_doingAnaPt)
-              {
-                setState(() {
-                  _doingAnaPt = true;
-                }),
-                //proj4.Point ptBL72 = epsg4326.transform(epsg31370,proj4.Point(x: point.longitude, y: point.latitude))
-                await _runAnaPt(
-                  epsg4326.transform(
-                    epsg31370,
-                    proj4.Point(x: point.longitude, y: point.latitude),
-                  ),
-                ),
-                _updatePtMarker(point),
-                setState(() {
-                  _doingAnaPt = false;
-                }),
-                GoRouter.of(context).push("/anaPt"),
-              },
-          },
-      onPositionChanged: (position, e) async {
-        LatLng c = _mapController.camera.center;
-        final SharedPreferences prefs = await SharedPreferences.getInstance();
-        await prefs.setDouble('mapCenterLat', c.latitude);
-        await prefs.setDouble('mapCenterLon', c.longitude);
-        updateLocation();
-        double aZoom = _mapController.camera.zoom;
-        await prefs.setDouble('mapZoom', aZoom);
-      },
-      crs: epsg31370CRS,
-      initialZoom: 8.0,
-      maxZoom: 10,
-      minZoom:
-          2, // pour les cartes offline, il faudrait informer l'utilisateur du fait que si le zoom est trop peu élevé, la carte ne s'affiche pas
-      initialCenter: gl.latlonCenter,
-      cameraConstraint: CameraConstraint.contain(
-        bounds: LatLngBounds.fromPoints([latlonBL, latlonTR]),
-      ),
-      onMapReady: () async {
-        /*Permission.locationWhenInUse.request();
-                  if (await Permission.locationWhenInUse.isGranted) {
-                    Permission.locationAlways.request();
-                  }
-                  Permission.manageExternalStorage
-                      .request(); // pour nouvelle version de android
-                  Permission.storage
-                      .request();
-                      */ // pour ancienne version de android
-
-        updateLocation();
-        if (gl.position != null) {
-          // IMPORTANT: rebuild location layer when permissions are granted
-          setState(() {
-            _mapController.move(
-              LatLng(
-                gl.position?.latitude ?? 0.0,
-                gl.position?.longitude ?? 0.0,
-              ),
-              9,
-            );
-          });
-          // si on refusait d'allumer le GPS, alors la carte ne s'affichait jamais, c'est pourquoi il y a le else et le code ci-dessous
-        } else {
-          setState(() {
-            _mapController.move(gl.latlonCenter, gl.mapZoom);
-          });
-        }
-      },
-    );
   }
 }
 

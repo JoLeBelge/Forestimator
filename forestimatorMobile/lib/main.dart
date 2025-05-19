@@ -2,6 +2,7 @@ import 'package:fforestimator/dico/dicoApt.dart';
 import 'package:fforestimator/dico/ess.dart';
 import 'package:fforestimator/pages/anaPt/anaPtpage.dart';
 import 'package:fforestimator/pages/offlinePage/offlineView.dart';
+import 'package:fforestimator/tools/handlePermissions.dart';
 import 'package:fforestimator/tools/layerDownloader.dart';
 import 'package:fforestimator/tools/notification.dart';
 import 'package:flutter/material.dart';
@@ -20,9 +21,6 @@ import 'package:fforestimator/scaffoldNavigation.dart';
 import 'dart:convert';
 import 'package:path/path.dart' as path;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:permission_handler/permission_handler.dart';
-import 'dart:isolate';
-import 'dart:ui';
 import 'package:memory_info/memory_info.dart';
 
 void main() async {
@@ -76,7 +74,6 @@ class _MyApp extends State<MyApp> {
 
   late String _pathExternalStorage;
   bool _initializedPersistentValues = false;
-  ReceivePort _port = ReceivePort();
 
   _MyApp() {}
 
@@ -194,10 +191,6 @@ class _MyApp extends State<MyApp> {
     _listAndCopyPdfassets();
     readPreference();
     getMemoryInfo();
-    //_bindBackgroundIsolate();
-    // initDownloader();
-    //FlutterDownloader.registerCallback(downloadCallback);
-    //gl.notificationContext = _rootNavigatorKey.currentContext;
   }
 
   late final _router = GoRouter(
@@ -234,23 +227,21 @@ class _MyApp extends State<MyApp> {
             routes: [
               // top route inside branch
               GoRoute(
-                path: "/" + gl.basePathbranchB,
+                path: "/${gl.basePathbranchB}",
                 pageBuilder:
                     (context, state) =>
                         const NoTransitionPage(child: CatalogueLayerView()),
                 routes: [
                   ...gl.dico.getLayersWithDoc().map<GoRoute>((layerBase item) {
                     return GoRoute(
-                      path: item.getFicheRoute() + "/:currentPage",
+                      path: "${item.getFicheRoute()}/:currentPage",
                       name: item.mCode,
                       builder:
                           (context, state) =>
                               (Platform.isAndroid || Platform.isIOS)
                                   ? PDFScreen(
                                     path:
-                                        _pathExternalStorage +
-                                        "/" +
-                                        item.mPdfName,
+                                        "$_pathExternalStorage/${item.mPdfName}",
                                     titre: "documentation", //+ item.mNomCourt,
                                     currentPage: int.parse(
                                       state.pathParameters['currentPage']!,
@@ -290,12 +281,12 @@ class _MyApp extends State<MyApp> {
                   ...gl.dico.getAllStationFiches().map<GoRoute>((String item) {
                     //print("create go route " + item);
                     return GoRoute(
-                      path: item + "/:currentPage",
+                      path: "$item/:currentPage",
                       builder:
                           (context, state) =>
                               (Platform.isAndroid || Platform.isIOS)
                                   ? PDFScreen(
-                                    path: _pathExternalStorage + "/" + item,
+                                    path: "$_pathExternalStorage/$item",
                                     titre: item,
                                     currentPage: int.parse(
                                       state.pathParameters['currentPage']!,
@@ -316,7 +307,7 @@ class _MyApp extends State<MyApp> {
             routes: [
               // top route inside branch
               GoRoute(
-                path: "/" + gl.basePathbranchC,
+                path: "/${gl.basePathbranchC}",
                 pageBuilder:
                     (context, state) =>
                         const NoTransitionPage(child: OfflineView()),
@@ -344,12 +335,7 @@ class _MyApp extends State<MyApp> {
           title: "Bienvenu",
           accept: "oui",
           onAccept: () async {
-            Map<Permission, PermissionStatus> statuses =
-                await [
-                  Permission.location,
-                  Permission.storage,
-                  Permission.manageExternalStorage,
-                ].request();
+            makeAllPermissionRequests();
             setState(() {
               gl.firstTimeUse = false;
             });
@@ -357,26 +343,11 @@ class _MyApp extends State<MyApp> {
                 await SharedPreferences.getInstance();
             await prefs.setBool('firstTimeUse', gl.firstTimeUse);
             for (var key in gl.downloadableLayerKeys) {
-              if (!(Platform.isWindows ||
-                  Platform.isLinux ||
-                  Platform.isMacOS)) {
-                /*FlutterDownloader.enqueue(
-                  url:
-                      gl.queryApiRastDownload +
-                      "/" +
-                      gl.dico.getLayerBase(key).mCode,
-                  fileName: gl.dico.getLayerBase(key).mNomRaster,
-                  savedDir: gl.dico.docDir.path,
-                  showNotification: false,
-                  openFileFromNotification: false,
-                  timeout: 15000,
-                );*/
-              }
+              downloadLayer(key);
             }
           },
           decline: "non",
           onDecline: () async {
-            
             setState(() {
               gl.firstTimeUse = false;
             });
@@ -400,73 +371,4 @@ class _MyApp extends State<MyApp> {
       ),
     );
   }
-  /*void _bindBackgroundIsolate() async {
-    IsolateNameServer.registerPortWithName(
-      _port.sendPort,
-      'downloader_send_port',
-    );
-    await for (dynamic data in _port) {
-      //    _port.listen((dynamic data) {
-      //String id = data[0];
-      //print("inside bindBackgroundIsolate!!");
-
-      DownloadTaskStatus status = DownloadTaskStatus.fromInt(data[1]);
-      if (status == DownloadTaskStatus.complete) {
-        final context = _rootNavigatorKey.currentContext;
-        if (context != null) {
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                title: Text("Téléchargement"),
-                content: Text("Une carte a été téléchargée avec succès."),
-                actions: [
-                  TextButton(
-                    child: Text("OK"),
-                    onPressed: () {
-                      Navigator.of(context, rootNavigator: true).pop();
-                    },
-                  ),
-                ],
-              );
-            },
-          );
-        }
-        await gl.dico.checkLayerBaseOfflineRessource();
-        gl.refreshWholeCatalogueView(() {});
-        gl.rebuildOfflineView(() {});
-      } else if (status == DownloadTaskStatus.failed) {
-        final context = _rootNavigatorKey.currentContext;
-        if (context != null) {
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                title: Text("Téléchargement"),
-                content: Text(
-                  "Le téléchargement d'une carte a échoué. Réessayez plus tard.",
-                ),
-                actions: [
-                  TextButton(
-                    child: Text("OK"),
-                    onPressed: () {
-                      Navigator.of(context, rootNavigator: true).pop();
-                    },
-                  ),
-                ],
-              );
-            },
-          );
-        }
-      }
-    }
-  }
-
-  @pragma('vm:entry-point')
-  static void downloadCallback(String id, int status, int progress) {
-    final SendPort send =
-        IsolateNameServer.lookupPortByName('downloader_send_port')!;
-    send.send([id, status, progress]);
-    print("BELLL");
-  }*/
 }

@@ -9,6 +9,8 @@ import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:path/path.dart';
 
 final Map<String, _LayerDownloaderState> _downloadIdToWidget = {};
+final Map<String, String> _downloadIdToLayerKey = {};
+final Map<String, String> _downloadIdToLayerName = {};
 ForestimatorDownloader? fD;
 
 void initDownloader() async {
@@ -22,21 +24,22 @@ void initDownloader() async {
   fD = ForestimatorDownloader();
 }
 
+void downloadLayer(String layerKey) {
+  if (fD == null) {
+    return;
+  }
+  fD!.downloadFile(layerKey);
+}
+
 class LayerDownloader extends StatefulWidget {
   final LayerTile layer;
-  LayerDownloader(this.layer, {super.key});
+  const LayerDownloader(this.layer, {super.key});
 
   @override
   State<LayerDownloader> createState() => _LayerDownloaderState();
 }
 
-@pragma('vm:entry-point')
 class _LayerDownloaderState extends State<LayerDownloader> {
-  static final Map<String, double> _downloadStates = {};
-
-  static List<Map> downloadData = [];
-  final ReceivePort _port = ReceivePort();
-
   bool listenerInitialized = false;
   dynamic buildContextNotifications;
   String? downloadId = "";
@@ -63,21 +66,6 @@ class _LayerDownloaderState extends State<LayerDownloader> {
         child: const Text("Downloads are not supported yet."),
       );
     }
-    /*while (_isDownloading) {
-      int progress = getProgress(_taskIDToLayerCode[widget.layer.key]);
-      print(progress);
-      if (progress == 100) {
-        setState(() {
-          _isDownloading = false;
-          gl.dico.checkLayerBaseOfflineRessource();
-          gl.dico.getLayerBase(widget.layer.key).mOffline = true;
-        });
-      } else {
-        setState(() {
-          _isDownloading = true;
-        });
-      }
-    }*/
 
     if (gl.dico.getLayerBase(widget.layer.key).mOffline) {
       return Row(
@@ -92,7 +80,6 @@ class _LayerDownloaderState extends State<LayerDownloader> {
               ).whenComplete(() {
                 setState(() {
                   gl.dico.getLayerBase(widget.layer.key).mOffline = false;
-                  _downloadStates[widget.layer.key] == 0.0;
                   gl.removeFromOfflineList(widget.layer.key);
                 });
                 gl.refreshWholeCatalogueView(() {
@@ -155,7 +142,6 @@ class _LayerDownloaderState extends State<LayerDownloader> {
         children: [
           IconButton(
             onPressed: () async {
-              _downloadStates[widget.layer.key] = 0.01;
               setState(() {
                 gl.dico.getLayerBase(widget.layer.key).mInDownload = true;
               });
@@ -189,27 +175,6 @@ class _LayerDownloaderState extends State<LayerDownloader> {
     }
   }
 
-  void getAllDownloads() async {
-    downloadData = [];
-    List<DownloadTask>? getTasks = await FlutterDownloader.loadTasks();
-    getTasks?.forEach((_task) {
-      Map _map = Map();
-      _map['status'] = _task.status;
-      _map['progress'] = _task.progress;
-      _map['id'] = _task.taskId;
-      _map['filename'] = _task.filename;
-      _map['savedDirectory'] = _task.savedDir;
-      downloadData.add(_map);
-    });
-  }
-
-  int getProgress(String? id) {
-    for (Map entry in downloadData) {
-      if (entry["id"] == id) return entry["progress"];
-    }
-    return 0;
-  }
-
   static Future<bool> fileExists(String path) async {
     final File file = File(path);
     return file.exists();
@@ -226,15 +191,14 @@ class _LayerDownloaderState extends State<LayerDownloader> {
   @override
   void initState() {
     super.initState();
-    getAllDownloads();
   }
-
 }
 
 @pragma('vm:entry-point')
 class ForestimatorDownloader {
-  static Map<String, String> layerToId = {};
+  final Map<String, String> layerToId = {};
   final ReceivePort _port = ReceivePort();
+  final List<Map> downloadData = [];
 
   ForestimatorDownloader() {
     FlutterDownloader.registerCallback(downloadCallback, step: 10);
@@ -266,7 +230,9 @@ class ForestimatorDownloader {
         timeout: 180000,
       );
     }
-    layerToId[layerKey] = taskId!;
+    _downloadIdToLayerKey[taskId!] = layerKey;
+    _downloadIdToLayerName[taskId] = gl.dico.getLayerBase(layerKey).mNom;
+    layerToId[layerKey] = taskId;
     return taskId;
   }
 
@@ -277,13 +243,20 @@ class ForestimatorDownloader {
     );
     _port.listen((dynamic data) {
       String idListened = data[0];
-      print("${data[2]}");
-      _LayerDownloaderState downloader = _downloadIdToWidget[idListened]!;
+      String layerKey = "", layerName = "";
+      if(_downloadIdToWidget[idListened] != null){
+        layerKey = _downloadIdToWidget[idListened]!.widget.layer.key;
+        layerName = _downloadIdToWidget[idListened]!.widget.layer.name;
+      }
+      else{
+      layerKey = _downloadIdToLayerKey[idListened]!;
+      layerName = _downloadIdToLayerName[idListened]!;
+      }
 
       DownloadTaskStatus status = DownloadTaskStatus.fromInt(data[1]);
       if (DownloadTaskStatus.enqueued == status) {
         gl.refreshWholeCatalogueView(() {
-          gl.dico.getLayerBase(downloader.widget.layer.key).mInDownload = true;
+          gl.dico.getLayerBase(layerKey).mInDownload = true;
         });
       }
       if (status == DownloadTaskStatus.complete) {
@@ -295,7 +268,7 @@ class ForestimatorDownloader {
             return AlertDialog(
               title: Text("Téléchargement"),
               content: Text(
-                "${downloader.widget.layer.name} a été téléchargée avec succès.",
+                "$layerName a été téléchargée avec succès.",
               ),
               actions: [
                 TextButton(
@@ -310,16 +283,15 @@ class ForestimatorDownloader {
         );
 
         gl.rebuildOfflineView(() {
-          gl.dico.getLayerBase(downloader.widget.layer.key).mOffline = true;
-          gl.dico.getLayerBase(downloader.widget.layer.key).mInDownload = false;
+          gl.dico.getLayerBase(layerKey).mOffline = true;
+          gl.dico.getLayerBase(layerKey).mInDownload = false;
         });
         gl.refreshWholeCatalogueView(() {
-          gl.dico.getLayerBase(downloader.widget.layer.key).mInDownload = false;
-          gl.dico.getLayerBase(downloader.widget.layer.key).mOffline = true;
+          gl.dico.getLayerBase(layerKey).mInDownload = false;
+          gl.dico.getLayerBase(layerKey).mOffline = true;
         });
       }
       if (DownloadTaskStatus.failed == status) {
-        //download failed
         BuildContext context = gl.notificationContext!;
 
         showDialog(
@@ -328,7 +300,7 @@ class ForestimatorDownloader {
             return AlertDialog(
               title: Text("Problèmes de connexion"),
               content: Text(
-                "${downloader.widget.layer.name} n'a pas été téléchargée.",
+                "$layerName n'a pas été téléchargée.",
               ),
               actions: [
                 TextButton(
@@ -343,11 +315,32 @@ class ForestimatorDownloader {
         );
 
         gl.refreshWholeCatalogueView(() {
-          gl.dico.getLayerBase(downloader.widget.layer.key).mInDownload = false;
-          gl.dico.getLayerBase(downloader.widget.layer.key).mOffline = false;
+          gl.dico.getLayerBase(layerKey).mInDownload = false;
+          gl.dico.getLayerBase(layerKey).mOffline = false;
         });
       }
       return;
     });
+  }
+
+  void getAllDownloads() async {
+    downloadData.clear();
+    List<DownloadTask>? getTasks = await FlutterDownloader.loadTasks();
+    getTasks?.forEach((task) {
+      Map map = {};
+      map['status'] = task.status;
+      map['progress'] = task.progress;
+      map['id'] = task.taskId;
+      map['filename'] = task.filename;
+      map['savedDirectory'] = task.savedDir;
+      downloadData.add(map);
+    });
+  }
+
+  int getProgress(String? id) {
+    for (Map entry in downloadData) {
+      if (entry["id"] == id) return entry["progress"];
+    }
+    return 0;
   }
 }
