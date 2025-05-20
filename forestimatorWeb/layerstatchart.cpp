@@ -171,7 +171,7 @@ std::unique_ptr<WContainerWidget> layerStatChart::getChart(bool forRenderingInPd
                 table->elementAt(i, 1)->setPadding(10,Wt::Side::Left);
                 i++;
                 }
-                message(WString::tr("dendro.sum."+mLay->Code()).toUTF8());
+                message=WString::tr("dendro.sum."+mLay->Code()).toUTF8();
                 if (message.substr(0,2)!="??"){
                 table->elementAt(i, 0)->addWidget(std::make_unique<WText>(message));
                 table->elementAt(i, 1)->addWidget(std::make_unique<WText>(bs.getSum(0)));
