@@ -1,5 +1,6 @@
 /* Implementation of the permission_handler 12.0.0+1 Interface  */
 
+import 'dart:io';
 import 'package:fforestimator/tools/notification.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -16,21 +17,21 @@ bool askOnceForStorage = true;
 bool askOnceForNotification = true;
 
 bool getVersion = true;
-int release = 0;
-int sdkInt = 0;
+int release = 20;
+int sdkInt = 20;
 
 /* Ask permissions at start of map and if not granted ask to grant them */
 
 void initPermissions() async {
   refreshPermissionInfos();
-  if (getVersion){
+  if (getVersion && Platform.isAndroid){
     DeviceInfoPlugin infos = DeviceInfoPlugin();
     AndroidDeviceInfo androidInfo = await infos.androidInfo;
     release = int.parse(androidInfo.version.release[0] + androidInfo.version.release[1]);
     sdkInt = androidInfo.version.sdkInt;
-    getVersion = false;
     print("Android $release (sdk $sdkInt)");
   }
+  getVersion = false;
 }
 
 void refreshPermissionInfos() async{

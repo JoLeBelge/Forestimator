@@ -1,0 +1,20 @@
+{
+  "buildFiles": [
+    "/Users/macgef/Documents/SDK/flutter/packages/flutter_tools/gradle/src/main/groovy/CMakeLists.txt"
+  ],
+  "cleanCommandsComponents": [
+    [
+      "/Users/macgef/Library/Android/sdk/cmake/3.22.1/bin/ninja",
+      "-C",
+      "/Users/macgef/Documents/Forestimator/forestimatorMobile/android/app/.cxx/Debug/1ek3z2i5/x86",
+      "clean"
+    ]
+  ],
+  "buildTargetsCommandComponents": [
+    "/Users/macgef/Library/Android/sdk/cmake/3.22.1/bin/ninja",
+    "-C",
+    "/Users/macgef/Documents/Forestimator/forestimatorMobile/android/app/.cxx/Debug/1ek3z2i5/x86",
+    "{LIST_OF_TARGETS_TO_BUILD}"
+  ],
+  "libraries": {}
+}
