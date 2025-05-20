@@ -754,6 +754,13 @@ layerBase::layerBase(std::string aCode,cDicoApt * aDico):rasterFiles(aDico->File
     mTypeVar =str2TypeVar(mDico->RasterVar(mCode));
     mType =str2TypeLayer(mDico->RasterCategorie(mCode));
     mDicoVal=mDico->getDicoRaster(mCode);
+    // si pas de dictionnaire mais un gain et 8 bits je peux m'en créer un
+    if (mDicoVal.size()==0){
+        for (int i(0);i<255;i++){
+        mDicoVal.emplace(std::make_pair(i,std::to_string(i*mGain)));
+        }
+    }
+
     mDicoCol=mDico->getDicoRasterCol(mCode);
     mUrl=mDico->getWMSinfo(this->Code())->WMSURL();
     mWMSLayerName=mDico->getWMSinfo(this->Code())->WMSLayerName();
@@ -1173,7 +1180,7 @@ GDALDataset * rasterFiles::rasterizeGeom(OGRGeometry *poGeom){
 // pour les couches des variables continues
 basicStat layerBase::computeBasicStatOnPolyg(OGRGeometry * poGeom){
     if (globTest){std::cout << "compute BasicStat On Polyg" << std::endl;
-    //std::cout << getDicoValStr() << std::endl;
+    std::cout << getDicoValStr() << std::endl;
     }
     std::map<double,int> aMapValandFrequ;
     int nbNA(0);
@@ -1592,9 +1599,9 @@ bool layerBase::wms2jpg(OGREnvelope  * extent, int aSx, int aSy, std::string aOu
                                      );
 
     //"<Cache><Type>file</Type><Expires>%d</Expires></Cache>"
-    if (globTest){
+    /*if (globTest){
         std::cout <<mUrl << std::endl;
-        std::cout << connStr << std::endl;}
+        std::cout << connStr << std::endl;}*/
     GDALDataset *pDS = static_cast<GDALDataset*>(GDALOpenEx(connStr, GDAL_OF_RASTER, nullptr, nullptr, nullptr));
     if( pDS != NULL ){
 

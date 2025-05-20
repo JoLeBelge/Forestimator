@@ -143,10 +143,10 @@ std::unique_ptr<WContainerWidget> layerStatChart::getChart(bool forRenderingInPd
                 aChart->setMargin(50, Side::Left | Side::Right);
 
             }else {
-                // uniquement pour dendro_vha
+                // pour toute les couches dendro
 
                 basicStat bs= mLay->computeBasicStatOnPolyg(mGeom);
-                // ajout d'un tableau de synthèse très simple. moyenne, écart type, somme pour volume à l'hectare?
+                // ajout d'un tableau de synthèse
                 WTable * table =aContTableAndPie->addWidget(std::make_unique<WTable>());
                 table->setMargin(10, Side::Top | Side::Bottom | Side::Left);
 
