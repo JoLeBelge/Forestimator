@@ -7013,9 +7013,9 @@ END
    		DATA "dendro/dendro_cdom_8bits.tif" 
    		PROCESSING "BANDS=1" 
    		OFFSITE 0 0 0
-   		PROCESSING "SCALE=0,300" # mis un peu au hasard pour que ça donne bien visuellement
+   		PROCESSING "LUT=254:130"#purement visuel
 
-   		INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_MNH8bits.map"
+   		INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_vha.map"
    		METADATA
       			"wms_title"           "Modèle dendrométrique : circonférence dominante [cm]"
       			"wms_srs"             "EPSG:31370"
