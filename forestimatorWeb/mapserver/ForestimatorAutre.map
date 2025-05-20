@@ -7013,7 +7013,7 @@ END
    		DATA "dendro/dendro_cdom_8bits.tif" 
    		PROCESSING "BANDS=1" 
    		OFFSITE 0 0 0
-   		PROCESSING "SCALE=0,508" # mis un peu au hasard pour que ça donne bien visuellement
+   		PROCESSING "SCALE=0,300" # mis un peu au hasard pour que ça donne bien visuellement
 
    		INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_MNH8bits.map"
    		METADATA
