@@ -7002,4 +7002,24 @@ END
    		END
    		TEMPLATE "../template.html"
    	END
+   	
+   	   	LAYER
+  		NAME "dendro_cdom"
+   		TYPE RASTER
+   		STATUS ON
+   		PROJECTION
+      			"init=epsg:31370"
+   		END
+   		DATA "dendro/dendro_cdom_8bits.tif" 
+   		PROCESSING "BANDS=1" 
+   		OFFSITE 0 0 0
+   		PROCESSING "SCALE=0,508" # mis un peu au hasard pour que ça donne bien visuellement
+
+   		INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_MNH8bits.map"
+   		METADATA
+      			"wms_title"           "Modèle dendrométrique : circonférence dominante [cm]"
+      			"wms_srs"             "EPSG:31370"
+   		END
+   		TEMPLATE "../template.html"
+   	END
 END
