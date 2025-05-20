@@ -1,0 +1,52 @@
+   		CLASS
+   			EXPRESSION ([pixel]<=30)
+			STYLE
+				COLORRANGE '#440154' '#472a7a'
+				DATARANGE 0.0 30.0
+			END
+		END
+		CLASS
+   			EXPRESSION ([pixel]>30.0 AND [pixel]<=60.0)
+			STYLE
+				COLORRANGE '#472a7a' '#39568c'
+				DATARANGE 30.0 60.0
+			END
+		END
+		CLASS
+   			EXPRESSION ([pixel]>60.0 AND [pixel]<=90.0)
+			STYLE
+				COLORRANGE '#39568c' '#297b8e'
+				DATARANGE 60.0 90.0
+			END
+		END
+		CLASS
+   			EXPRESSION ([pixel]>90.0 AND [pixel]<=120.0)
+			STYLE
+				COLORRANGE '#297b8e' '#1e9f89'
+				DATARANGE 90.0 120.0
+			END
+		END
+			
+		CLASS
+   			EXPRESSION ([pixel]>120.0 AND [pixel]<=150.0)
+			STYLE
+				COLORRANGE '#1e9f89' '#46c06f'
+				DATARANGE 120.0 150.0
+			END
+		END
+			
+		CLASS
+   			EXPRESSION ([pixel]>150.0 AND [pixel]<=180.0)
+			STYLE
+				COLORRANGE '#46c06f' '#9cd93b'
+				DATARANGE 150.0 180.0
+			END
+			
+		END
+		CLASS
+   			EXPRESSION ([pixel]>180.0 AND [pixel]<=254.0)
+   			STYLE
+				COLORRANGE '#9cd93b' '#fde725'
+				DATARANGE 180.0 254
+			END
+		END

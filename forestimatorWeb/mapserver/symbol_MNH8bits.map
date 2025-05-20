@@ -1,52 +1,52 @@
    		CLASS
-   			EXPRESSION ([pixel]<=25)
+   			EXPRESSION ([pixel]<=5)
 			STYLE
 				COLORRANGE '#440154' '#472a7a'
-				DATARANGE 0.0 25
+				DATARANGE 0.0 5.0
 			END
 		END
 		CLASS
-   			EXPRESSION ([pixel]>25 AND [pixel]<=50)
+   			EXPRESSION ([pixel]>5.0 AND [pixel]<=10.0)
 			STYLE
 				COLORRANGE '#472a7a' '#39568c'
-				DATARANGE 25 50
+				DATARANGE 5.0 10.0
 			END
 		END
 		CLASS
-   			EXPRESSION ([pixel]>50 AND [pixel]<=75)
+   			EXPRESSION ([pixel]>10.0 AND [pixel]<=15.0)
 			STYLE
 				COLORRANGE '#39568c' '#297b8e'
-				DATARANGE 50 75
+				DATARANGE 10.0 15.0
 			END
 		END
 		CLASS
-   			EXPRESSION ([pixel]>75 AND [pixel]<=100)
+   			EXPRESSION ([pixel]>15.0 AND [pixel]<=20.0)
 			STYLE
 				COLORRANGE '#297b8e' '#1e9f89'
-				DATARANGE 75 100
+				DATARANGE 15.0 20.0
 			END
 		END
 			
 		CLASS
-   			EXPRESSION ([pixel]>100 AND [pixel]<=125)
+   			EXPRESSION ([pixel]>20.0 AND [pixel]<=25.0)
 			STYLE
 				COLORRANGE '#1e9f89' '#46c06f'
-				DATARANGE 100 125
+				DATARANGE 20.0 25.0
 			END
 		END
 			
 		CLASS
-   			EXPRESSION ([pixel]>125 AND [pixel]<=150)
+   			EXPRESSION ([pixel]>25.0 AND [pixel]<=30.0)
 			STYLE
 				COLORRANGE '#46c06f' '#9cd93b'
-				DATARANGE 125 150
+				DATARANGE 25.0 30.0
 			END
 			
 		END
 		CLASS
-   			EXPRESSION ([pixel]>150 AND [pixel]<=254)
+   			EXPRESSION ([pixel]>30.0 AND [pixel]<=60.0)
    			STYLE
 				COLORRANGE '#9cd93b' '#fde725'
-				DATARANGE 150 254
+				DATARANGE 30.0 35.0
 			END
 		END

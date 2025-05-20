@@ -6972,6 +6972,7 @@ END
    		DATA "dendro/dendro_hdom_8bits.tif" 
    		PROCESSING "BANDS=1" 
    		OFFSITE 0 0 0
+   		#CONFIG "gain" "0.5"
 
    		INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_MNH8bits.map"
    		METADATA
@@ -6992,7 +6993,7 @@ END
    		PROCESSING "BANDS=1" 
    		OFFSITE 0 0 0
 
-   		INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_MNH8bits.map"
+   		INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_gha.map"
    		METADATA
       			"wms_title"           "Modèle dendrométrique : surface terrière [m2/ha]"
       			"wms_srs"             "EPSG:31370"

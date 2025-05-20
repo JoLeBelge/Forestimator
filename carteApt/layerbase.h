@@ -78,7 +78,6 @@ public:
      std::string getSurfTot(int precisionVal=1){return roundDouble((nbNA+nb)*pow(resolution,2)/10000.0,precisionVal);}
      std::string getNbNA(int precisionVal=1){return roundDouble(nbNA*pow(resolution,2)/10000.0,precisionVal);}
     std::string getSum(int precisionVal=1){
-        //std::cout << "mean " << mean << ", nb " << nb << ", surf " << nb*pow(resolution,2) << " m2" << std::endl;
         return roundDouble(mean*(nb*pow(resolution,2))/10000.0,precisionVal);}
 
     int getNbInt(){return nb;}
