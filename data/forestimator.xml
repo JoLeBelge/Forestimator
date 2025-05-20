@@ -832,10 +832,10 @@ Un suivi de l'état sanitaire des pessières est réalisé en vue d'identifier l
   </message>
   
   <message id="dendro.mean.dendro_vha"> Moyenne [m3/ha]</message>
-  <message id="dendro.sum.dendro_vha"> Volume total [m3]]</message>
+  <message id="dendro.sum.dendro_vha"> Volume total [m3]</message>
   <message id="dendro.mean.dendro_gha"> Moyenne [m2/ha]</message>
   <message id="dendro.sum.dendro_nha"> Nombre de tiges total</message>
-  <message id="dendro.mean.dendro_nha"> Densité moyenne [tiges/ha]]</message>
+  <message id="dendro.mean.dendro_nha"> Densité moyenne [tiges/ha]</message>
   <message id="dendro.mean.dendro_cdom"> Circonférence dominante Moyenne [cm]</message> 
   <message id="dendro.mean.dendro_hdom"> Hauteur dominante moyenne [m]</message>
   <message id="dendro.mean.dendro_prop_fe"> Moyenne [%]</message>
