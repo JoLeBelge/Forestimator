@@ -6905,26 +6905,8 @@ END
    		END
    		TEMPLATE "../template.html"
    	END
-   	        LAYER
-  		NAME "MNH2022"
-   		TYPE RASTER
-   		STATUS ON
-   		PROJECTION
-      			"init=epsg:31370"
-   		END
-   		DATA "printemps_tiles.vrt" 
-   		PROCESSING "BANDS=1" 
-   		OFFSITE 0 0 0
-
-   		INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_MNH.map"
-   		METADATA
-      			"wms_title"           "Modèle Numérique de Hauteur 2022 Printemps"
-      			"wms_srs"             "EPSG:31370"
-   		END
-   		TEMPLATE "../template.html"
-   	END
    	
-   	 LAYER
+   	LAYER
   		NAME "dendro_vha"
    		TYPE RASTER
    		STATUS ON
@@ -6972,7 +6954,7 @@ END
    		DATA "dendro/dendro_hdom_8bits.tif" 
    		PROCESSING "BANDS=1" 
    		OFFSITE 0 0 0
-   		#CONFIG "gain" "0.5"
+  		PROCESSING "SCALE=0,508"
 
    		INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_MNH8bits.map"
    		METADATA
@@ -6992,10 +6974,30 @@ END
    		DATA "dendro/dendro_gha_8bits.tif" 
    		PROCESSING "BANDS=1" 
    		OFFSITE 0 0 0
+   		PROCESSING "SCALE=0,508"
 
    		INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_gha.map"
    		METADATA
       			"wms_title"           "Modèle dendrométrique : surface terrière [m2/ha]"
+      			"wms_srs"             "EPSG:31370"
+   		END
+   		TEMPLATE "../template.html"
+   	END
+   	LAYER
+  		NAME "dendro_nha"
+   		TYPE RASTER
+   		STATUS ON
+   		PROJECTION
+      			"init=epsg:31370"
+   		END
+   		DATA "dendro/dendro_nha_8bits.tif" 
+   		PROCESSING "BANDS=1" 
+   		OFFSITE 0 0 0
+   		PROCESSING "SCALE=0,508" # mis un peu au hasard pour que ça donne bien visuellement
+
+   		INCLUDE "/home/carto/app/Forestimator/forestimatorWeb/mapserver/symbol_MNH8bits.map"
+   		METADATA
+      			"wms_title"           "Modèle dendrométrique : nombre de tiges [/ha]"
       			"wms_srs"             "EPSG:31370"
    		END
    		TEMPLATE "../template.html"
