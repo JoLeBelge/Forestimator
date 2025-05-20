@@ -55,27 +55,7 @@ Widget handlePermissionForLocation({
   required Function refreshParentWidgetTree,
 }) {
   if (!askOnceForLocation) return child;
-  if (location.isDenied) {
-    return PopupNotification2(
-      title: "Permission pour le GPS",
-      accept: "oui",
-      onAccept: () async {
-        await Permission.location.request();
-        refreshPermissionInfos();
-        refreshParentWidgetTree(() {
-          askOnceForLocation = false;
-        });
-      },
-      decline: "non",
-      onDecline: () async {
-        refreshParentWidgetTree(() {
-          askOnceForLocation = false;
-        });
-      },
-      dialog:
-          "Forestimator mobile ne collecte aucune information personnelle. Notre politique de confidentialité est consultable au https://forestimator.gembloux.ulg.ac.be/documentation/confidentialit_. Autorisez-vous l'aplication à utiliser la position?",
-    );
-  } else if (location.isPermanentlyDenied) {
+  if (location.isPermanentlyDenied) {
     return PopupNotification2(
       title: "Permission pour le GPS deactivé",
       accept: "Ouvrir paramètres",
@@ -96,6 +76,27 @@ Widget handlePermissionForLocation({
           "Forestimator mobile ne collecte aucune information personnelle. Notre politique de confidentialité est consultable au https://forestimator.gembloux.ulg.ac.be/documentation/confidentialit_. Vous pouvez ouvrir les paramètres et autoriser l'aplication à utiliser la position.",
     );
   }
+  else if (location.isDenied) {
+    return PopupNotification2(
+      title: "Permission pour le GPS",
+      accept: "oui",
+      onAccept: () async {
+        await Permission.location.request();
+        refreshPermissionInfos();
+        refreshParentWidgetTree(() {
+          askOnceForLocation = false;
+        });
+      },
+      decline: "non",
+      onDecline: () async {
+        refreshParentWidgetTree(() {
+          askOnceForLocation = false;
+        });
+      },
+      dialog:
+          "Forestimator mobile ne collecte aucune information personnelle. Notre politique de confidentialité est consultable au https://forestimator.gembloux.ulg.ac.be/documentation/confidentialit_. Autorisez-vous l'aplication à utiliser la position?",
+    );
+  } 
   return child;
 }
 
