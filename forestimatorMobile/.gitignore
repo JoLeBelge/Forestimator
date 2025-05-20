@@ -5,11 +5,15 @@
 *.swp
 .DS_Store
 .atom/
+.build/
 .buildlog/
 .history
 .svn/
+.swiftpm/
 migrate_working_dir/
 android/key.properties
+
+
 
 # IntelliJ related
 *.iml
@@ -32,6 +36,7 @@ android/key.properties
 .pub-cache/
 .pub/
 /build/
+/assets/db/fforestimator.db
 
 # Symbolication related
 app.*.symbols
