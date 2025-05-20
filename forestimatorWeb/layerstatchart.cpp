@@ -95,7 +95,7 @@ std::unique_ptr<WContainerWidget> layerStatChart::getChart(bool forRenderingInPd
             table->setWidth(200 + 150 + 14+2);
         } else if (mTypeVar==TypeVar::Continu){
 
-            if(mLay->Code().substr(0,7)=="dendro_"){
+            if(mLay->Code().substr(0,7)!="dendro_"){
                 // pour MNH et MNT, pour l'instant  - recrée un vecteur stat, puis un model
                 std::map<double, double> aStat;
                 // je dois mettre et la hauteur en double, et le pct car sinon imprécision d'arrondi
