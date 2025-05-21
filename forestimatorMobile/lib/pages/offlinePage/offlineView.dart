@@ -22,6 +22,36 @@ class _OfflineView extends State<OfflineView> {
   Widget build(BuildContext context) {
     gl.notificationContext = context;
     return Scaffold(
+      appBar:
+          gl.offlineMode
+              ? AppBar(
+                title: const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      "Forestimator offline/terrain",
+                      textScaler: TextScaler.linear(0.75),
+                      style: TextStyle(color: Colors.black),
+                    ),
+                  ],
+                ),
+                toolbarHeight: 20.0,
+                backgroundColor: gl.colorAgroBioTech,
+              )
+              : AppBar(
+                title: const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      "Forestimator online",
+                      textScaler: TextScaler.linear(0.75),
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ],
+                ),
+                toolbarHeight: 20.0,
+                backgroundColor: gl.colorUliege,
+              ),
       body: Scrollbar(
         controller: it,
         child: SingleChildScrollView(
@@ -318,10 +348,6 @@ class _OfflineView extends State<OfflineView> {
       _getLayerData();
     }
     gl.rebuildOfflineView = rebuildOfflineWidgetTreeForLayerDownloader;
-
-    // je commente car le rebuildOfflineView remet la liste à jour, donc pas besoin de addToList et removeFromList
-    //gl.removeFromOfflineList = removeFromList;
-    //gl.addToOfflineList = addToList;
   }
 
   void rebuildOfflineWidgetTreeForLayerDownloader(

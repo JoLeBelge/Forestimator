@@ -24,8 +24,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:memory_info/memory_info.dart';
 
 void main() async {
-  //WidgetsFlutterBinding.ensureInitialized();
-
   if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
     sqfliteFfiInit();
     databaseFactory = databaseFactoryFfi;
@@ -67,15 +65,11 @@ class MyApp extends StatefulWidget {
 
 class _MyApp extends State<MyApp> {
   Memory? _memory;
-  static const TextStyle optionStyle = TextStyle(
-    fontSize: 30,
-    fontWeight: FontWeight.bold,
-  );
 
   late String _pathExternalStorage;
   bool _initializedPersistentValues = false;
 
-  _MyApp() {}
+  _MyApp();
 
   Future<void> getMemoryInfo() async {
     Memory? memory;
@@ -261,19 +255,13 @@ class _MyApp extends State<MyApp> {
                               (Platform.isAndroid || Platform.isIOS)
                                   ? PDFScreen(
                                     path:
-                                        _pathExternalStorage +
-                                        "/FEE-" +
-                                        item.mCode +
-                                        ".pdf",
+                                        "$_pathExternalStorage/FEE-${item.mCode}.pdf",
                                     titre: item.mNomFR,
                                   )
                                   : Scaffold(
                                     appBar: AppBar(title: Text("pdf")),
                                     body: Text(
-                                      _pathExternalStorage +
-                                          "/FEE-" +
-                                          item.mCode +
-                                          ".pdf",
+                                      "$_pathExternalStorage/FEE-${item.mCode}.pdf",
                                     ),
                                   ),
                     );
