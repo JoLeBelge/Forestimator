@@ -143,7 +143,7 @@ std::unique_ptr<WContainerWidget> layerStatChart::getChart(bool forRenderingInPd
                 aChart->setMargin(50, Side::Left | Side::Right);
 
             }else {
-                // pour toute les couches dendro
+                // pour toute les couches dendro 2021
 
                 basicStat bs= mLay->computeBasicStatOnPolyg(mGeom);
                 // ajout d'un tableau de synthèse
@@ -481,5 +481,3 @@ void batonnetApt::paintEvent(Wt::WPaintDevice *paintDevice){
         xcumul=xcumul+width;
     }
 }
-
-

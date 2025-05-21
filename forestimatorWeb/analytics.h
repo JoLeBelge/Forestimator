@@ -52,7 +52,8 @@ public:
     std::string     ip; // clientAddress()
     std::string     client; // userAgent()
     std::string     ipath; // internalPath() ou un message de description du log
-    int             id_user; // optionnal
+   // int             id_user; // optionnal
+    int16_t             client_id;
     int categorie;
 
     std::string getCat() const{
@@ -102,7 +103,8 @@ public:
         dbo::field(a, ip,       "ip");
         dbo::field(a, client,   "client");
         dbo::field(a, ipath,    "ipath");
-        dbo::field(a, id_user,  "id_user");
+       // dbo::field(a, id_user,  "id_user");
+        dbo::field(a, client_id,  "client_id");
         dbo::field(a, categorie,  "cat");
     }
 
@@ -114,16 +116,10 @@ class Analytics
 {
 public:
     Analytics(std::string aFileDB);
-    //Analytics(const std::string &sqliteDb);
     bool logExist(const Wt::WEnvironment &env, std::string page, typeLog cat);
-
     void addLogApache(const Wt::WEnvironment &env, std::string page);
-    void addLog(const Wt::WEnvironment &env, int user_id, std::string page,int cat=1);
-    void addLog(const Wt::WEnvironment &env, int user_id){addLog(env,user_id,env.internalPath());}
-    void addLog(const Wt::WEnvironment &env, std::string page,int cat=1){addLog(env,-1,page,cat);}
-    void addLog(const Wt::WEnvironment &env){addLog(env,-1,env.internalPath());}
-
-
+    void addLog(const Wt::WEnvironment &env, std::string page,int cat=1);
+    void addLog(const Wt::WEnvironment &env){addLog(env,env.internalPath());}
     dbo::Session session;
 };
 

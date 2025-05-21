@@ -32,7 +32,6 @@ class cEss; // avec les aptitudes de l'essence
 class color;
 
 class rasterFiles; // une classe dédiée uniquemnent à l'export et au clip des couches.
-// rasterinfo hérite de rasterFile
 class layerBase;
 class layerStat;
 
@@ -103,45 +102,12 @@ public:
     std::map<double,int> mValFreq;// utile quand je veux des stats basiques sur un raster de variable discontinu
 };
 
-
-class statCellule{
-public:
-    statCellule(std::vector<double> *aVHs, int aSurf,bool computeDendro=0);
-    //void computeHdom(){mHdom=k1hdom*mQ95+k2hdom*pow(mQ95,2);}
-
-    // OLD OLD maintenant c'est une approche pixel
-    /*
-    void computeGha(){ if (mHdom!=0.0){mGha=k1gha*mVHA/mHdom;} else {mGha=0.0;}
-                     }
-    void computeNha(){mNha=40000.0*M_PI*mGha/pow(mCmoy,2);
-                     // peut me renvoyer inf par moment
-                      if (isinf(mNha) | isnan(mNha)){mNha=0.0;}
-                     }
-    void computeCmoy(){mCmoy=(k1cmoy*(mHdom-1.3)+k2cmoy*pow((mHdom-1.3),2))*pow(mMean/mQ95,k3cmoy);}*/
-
-    //SI(Hpixi <= K2; 0; K1*(Hpixi-K2)^K3)
-
-
-
-    //void computeHdom(){
-
-    void printDetail();
-
-    double mVHA, mHdom, mGha, mCmoy, mNha, mSdGha, mSdCmoy;
-     int mSurf;
-private:
-    double mMean,mQ95;
-
-};
-
-
 class statHdomBase {
 public:
     statHdomBase(std::shared_ptr<layerBase> aLay, OGRGeometry * poGeom,bool computeStat=1);
     ~statHdomBase(){
        for (OGRPolygon * pol: mVaddPol) OGRGeometryFactory::destroyGeometry(pol);
        mVaddPol.clear();
-       mStat.clear();
        mDistFrequ.clear();
     }
     std::shared_ptr<layerBase> Lay(){return mLay;}
@@ -149,47 +115,20 @@ public:
     cDicoApt * Dico();
 
     void predictHdomHex();
-    void predictDendro(bool onlyHdomStat=1);
-
-    //std::map<std::string, double> computeDistrH();
     std::vector<std::pair<std::string,double>> computeDistrH();
 
     basicStat bshdom();
-    basicStat bsDendro(std::string aVar="hdom");
 
 protected:
+
+    std::vector<std::unique_ptr<basicStat>> mStat;
     std::shared_ptr<layerBase> mLay;
-    //std::vector<double> mStat; // un vecteur ; une valeur par cellule d'un are.
-    std::vector<std::unique_ptr<statCellule>> mStat;
-    //std::vector<std::string,double>
     std::vector<std::pair<std::string,double>>mDistFrequ;// pair avec range de valeur (genre 3-9) et proportion de la distribution
     OGRGeometry * mGeom;
     // geometrie supplémentaire à afficher sur l'image statique
     std::vector<OGRPolygon *> mVaddPol;
     int mNbOccurence;
 };
-
-// modèle reçu de jérome le 9/06/2021
-// reçu update du modèle par Adrien. 1) seul le MNH 2018 est suffisament correct (selon philippe). 2) la résolution des couches d'entrainement du modèle est de 5m ET c'est un MNH percentile 95 (on applique donc le percentile à deux reprises) 3) des modèles "pixels" sont ajustés, plus facile d'utilisation que les modèles "placettes (=objectif premier de la classe cellulle)
-//extern double k1hdom, k2hdom, k1vha,k2vha,k3vha, k1cmoy,k2cmoy;//,k3cmoyk1gha,;
-
-class statDendroBase : public statHdomBase{
-public:
-    statDendroBase(std::shared_ptr<layerBase> aLay, OGRGeometry * poGeom,bool api=0);
-    void predictDendroPix();
-    bool deserveChart();
-
-    std::string getNha();
-    std::string getVha();
-    std::string getGha();
-    std::string getHdom();
-    std::string getCmoy();
-     std::string getSdGha();
-      std::string getSdCmoy();
-};
-
-
-
 
 // pour afficher en html ou pdf les informations relatives aux couches, aux stations des cs, au méthodologies (genre calcul de hdom)
 class LayerMTD{
@@ -356,9 +295,6 @@ public:
     std::string summaryStat();
     int getO(bool mergeOT=false);// proportion en optimum
 
-    //int getFieldVal(bool mergeOT=false);
-    //std::string getFieldValStr();
-
     std::shared_ptr<layerBase> Lay(){return mLay;}
 
     std::map<std::string, int> StatSimple(){return mStatSimple;}
@@ -374,54 +310,5 @@ protected:
     int mNbPix;
     std::string mMode; // fee vs cs
 };
-
-
-/*
-class cKKCS
-{
-public:
-    cKKCS(std::string aCode,cDicoApt * aDico);
-    ~cKKCS(){
-        //std::cout << " destructeur  KKCS " << std::endl;
-        mDico=NULL;
-    }
-    std::string Nom(){return mNom;}
-    bool IsHabitat(){return mHabitat;}
-    bool IsFact(){return (mCode!="Pot_norm" && !mHabitat);}
-    bool IsPot(){return mCode=="Pot_norm";}
-    std::string summary(){return "Potentiel et risque liés au stations : " +mCode + " , "+ mNom + " , "+ mNomCol
-                +  " Echelle risque/pot zbio 1 station 1 : " + std::to_string(getEchelle(1,1));}
-    std::string NomCarte();
-    std::string shortNomCarte();
-
-    std::string NomMapServerLayer();
-    std::string NomMapServerLayerFull();
-
-    int getEchelle(int aZbio,int aSTId);
-    int getHab(int aZbio,int aSTId);
-    std::map<int,std::shared_ptr<color>> getDicoCol(){return mDicoCol;}
-    std::map<int, std::string> getDicoVal(){return mDicoVal;}
-    std::map<int, std::string> * getDicoValPtr(){return &mDicoVal;}
-    TypeCarte Type(){return mType;}
-
-private:
-    TypeCarte mType;
-    cDicoApt * mDico;
-    std::string mCode, mNom,mNomCol;
-    int mId;
-    bool mHabitat;
-    // clé ; zone bioclim/ région. Value ; une map -> clé = identifiant de la station. Value ; echelle pour le potentiel, facteur eco ou risque
-    std::map<int,std::map<int,int>> mEchelleCS;
-
-    // bon pour les habitats ce n'est pas la même structure de donnée, mais je vais tout de même utiliser cet objet aussi
-    std::map<int,std::map<int,std::vector<std::string>>> mHabitats;
-
-    // le dictionnaire des valeurs raster vers leur signification.
-    std::map<int, std::string> mDicoVal;
-    // le dictionnaire des valeurs raster vers leur signification.
-    std::map<int,std::shared_ptr<color>> mDicoCol;
-};
-*/
-
 
 #endif // LAYERBASE_H

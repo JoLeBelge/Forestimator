@@ -8,7 +8,7 @@ AJOUT DE COUCHES
  	
 -ajouter couche Natura 2000 (N2K)
 -ajouter couche plan de secteur
--ajouter couches dendros de philippe L
+-ajouter couches dendros de philippe L -> OK, mais ajout dicoLayer pour layer qui n'en n'ont pas dans flutter (ex:dendro_cdom)
 -ajouter couche nouveau masque forestier 
 
 SECURITE ET ROBUSTESSE

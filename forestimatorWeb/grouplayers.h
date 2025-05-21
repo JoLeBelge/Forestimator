@@ -25,7 +25,7 @@
 #include "./libzippp/src/libzippp.h"
 #include <string.h>
 #include "selectlayers.h"
-#include "statHdomCompo.h"
+
 
 class WOpenLayers;
 class Layer;
@@ -33,8 +33,6 @@ class groupLayers;
 class simplepoint;
 class ST;
 class layerStatChart;
-class statHdom;
-class statCompo;
 class rasterFiles;
 class baseSelectLayers;
 class selectLayers4Stat;
@@ -66,16 +64,11 @@ public:
     groupStat(){}
     ~groupStat(){clearStat();}
     std::vector<std::shared_ptr<layerStatChart>> ptrVLStat() {return mVLStat;}
-    //std::vector<std::unique_ptr<Wt::WContainerWidget>> ptrVLStatCont() {return mVLStatCont;}
-    // dans vecteur mVLStatCont std::unique_ptr<statCompo> mCompo;
-    // un autre pour les statistique des cartes variables continu (à commencer à MNH)
-    //std::vector<statHdom*> mVLStatCont;
     // j'y met directement le conteneur résultats
     std::vector<std::unique_ptr<Wt::WContainerWidget>> mVLStatCont;
 protected:
     // un vecteur pour les statistique des cartes variables de classes (majoritaire)
     std::vector<std::shared_ptr<layerStatChart>> mVLStat;
-
 
     void clearStat(){
         for (std::shared_ptr<layerStatChart> p : mVLStat)
@@ -85,7 +78,6 @@ protected:
         mVLStatCont.clear();
         mVLStat.clear();
     }
-
 };
 
 class groupLayers: public WContainerWidget, public groupStat

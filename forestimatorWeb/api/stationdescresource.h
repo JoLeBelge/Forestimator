@@ -9,7 +9,6 @@
 #include "layerbase.h"
 #include <Wt/WFileUpload.h>
 
-extern std::string nameDendroTool;
 using namespace Wt;
 
 // voir aussi te-benchmark/ example

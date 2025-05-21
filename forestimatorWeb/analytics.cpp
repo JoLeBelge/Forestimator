@@ -1,6 +1,7 @@
 #include "analytics.h"
 
 extern bool globTest;
+extern std::string cookies_clientIDName;
 
 Analytics::Analytics(std::string aFileDB) : session()
 {
@@ -21,7 +22,7 @@ Analytics::Analytics(std::string aFileDB) : session()
 }
 
 
-void Analytics::addLog(const Wt::WEnvironment &env, int user_id, std::string page, int cat){
+void Analytics::addLog(const Wt::WEnvironment &env, std::string page, int cat){
 
     if(env.agentIsSpiderBot())return;
 
@@ -33,9 +34,13 @@ void Analytics::addLog(const Wt::WEnvironment &env, int user_id, std::string pag
     log->ip = env.clientAddress();
     log->client = env.userAgent();
     log->ipath = page;
-    log->id_user = user_id;
+    //log->id_user = user_id;
     log->categorie = cat;
-
+    log->client_id=0;
+    const std::string * co =env.getCookie(cookies_clientIDName);
+    if (co){
+        log->client_id = std::stoi(*co);
+    }
     //std::cout << log->datum << log->client << log->ipath << std::endl;
 
     addLogApache(env,page);
@@ -62,8 +67,12 @@ bool Analytics::logExist(const Wt::WEnvironment &env, std::string page, typeLog 
     bool aRes(1);
 
     dbo::Transaction transaction{session};
-
-    int c=session.query<int>("select count(1) from Log").where("date = ?").bind(Wt::WDate::currentDate().toString("yyyy-MM-dd")).where("ipath = ?").bind(page).where("ip = ?").bind(env.clientAddress()).where("cat = ?").bind((int (cat)));
+    int client_id=0;
+    const std::string * co =env.getCookie(cookies_clientIDName);
+    if (co){
+        client_id = std::stoi(*co);
+    }
+    int c=session.query<int>("select count(1) from Log").where("date = ?").bind(Wt::WDate::currentDate().toString("yyyy-MM-dd")).where("ipath = ?").bind(page).where("client_id = ?").bind(client_id).where("cat = ?").bind((int (cat)));
     if (c==0){
         aRes=0;
     } else{
@@ -180,7 +189,7 @@ PageAnalytics::PageAnalytics(const Wt::WEnvironment& env, std::string aFileDB) :
 
     //0 page,extend,danap,anas,dsingle,dmulti,danas,dsingleRW;
     // Sélection par catégorie de log
-   // std::string q="SELECT COUNT(*)as nb, cat FROM log  WHERE ip != '127.0.0.1' AND ip NOT LIKE '%139.165%' GROUP BY cat;";
+    // std::string q="SELECT COUNT(*)as nb, cat FROM log  WHERE ip != '127.0.0.1' AND ip NOT LIKE '%139.165%' GROUP BY cat;";
     for (int cat(1);cat <10;cat++){
         int nb=session.query<int>("SELECT COUNT(*) FROM log  WHERE ip != '127.0.0.1' AND ip NOT LIKE '%139.165.%' AND cat="+std::to_string(cat)+" GROUP BY cat");
         table2->elementAt(cat,0)->addWidget(std::make_unique<Wt::WText>(getCat(cat)));
@@ -206,7 +215,7 @@ PageAnalytics::PageAnalytics(const Wt::WEnvironment& env, std::string aFileDB) :
         table3->elementAt(cat,0)->addWidget(std::make_unique<Wt::WText>(getCat(cat)));
         table3->elementAt(cat,0)->setContentAlignment(AlignmentFlag::Right);
         table3->elementAt(cat,1)->addWidget(std::make_unique<Wt::WText>(std::to_string(nb)));
-         table3->elementAt(cat,1)->setContentAlignment(AlignmentFlag::Center);
+        table3->elementAt(cat,1)->setContentAlignment(AlignmentFlag::Center);
     }
 
 
@@ -221,18 +230,18 @@ PageAnalytics::PageAnalytics(const Wt::WEnvironment& env, std::string aFileDB) :
     //q="SELECT COUNT(*)as nb FROM (SELECT COUNT(*)as nb FROM log  WHERE ip != '127.0.0.1' AND ip NOT LIKE '%139.165%' AND date LIKE '%2022-02%' GROUP BY ip);";
     row=1;
     for (int y(2022);y <2025;y++){
-    for (int m(1);m <13;m++){
-        std::string month = std::to_string(m);
-        if (month.size()==1){month="0"+ month;}
+        for (int m(1);m <13;m++){
+            std::string month = std::to_string(m);
+            if (month.size()==1){month="0"+ month;}
 
-        int nb=session.query<int>("SELECT COUNT(*) as nb FROM (SELECT COUNT(*) as nb FROM log  WHERE ip != '127.0.0.1' AND ip NOT LIKE '%139.165%' AND date LIKE '%"+std::to_string(y)+"-"+month+"%' GROUP BY ip)");
-        table4->elementAt(row,0)->addWidget(Wt::cpp14::make_unique<Wt::WText>(month+"-"+std::to_string(y)));
-        table4->elementAt(row,0)->setContentAlignment(AlignmentFlag::Right);
-        table4->elementAt(row,1)->addWidget(Wt::cpp14::make_unique<Wt::WText>(std::to_string(nb)));
-        table4->elementAt(row,1)->setContentAlignment(AlignmentFlag::Center);
-        row++;
-    }
-    
+            int nb=session.query<int>("SELECT COUNT(*) as nb FROM (SELECT COUNT(*) as nb FROM log  WHERE ip != '127.0.0.1' AND ip NOT LIKE '%139.165%' AND date LIKE '%"+std::to_string(y)+"-"+month+"%' GROUP BY ip)");
+            table4->elementAt(row,0)->addWidget(Wt::cpp14::make_unique<Wt::WText>(month+"-"+std::to_string(y)));
+            table4->elementAt(row,0)->setContentAlignment(AlignmentFlag::Right);
+            table4->elementAt(row,1)->addWidget(Wt::cpp14::make_unique<Wt::WText>(std::to_string(nb)));
+            table4->elementAt(row,1)->setContentAlignment(AlignmentFlag::Center);
+            row++;
+        }
+
     }
 
     // tableau brut des 100 derniers logs

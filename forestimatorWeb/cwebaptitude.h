@@ -92,6 +92,8 @@ public:
     void logout();
     Wt::Auth::User getUser();
 
+    void clientIDcookies();
+
     void addLog(std::string page,typeLog cat=typeLog::page);   // ajoute un record aux stat web
 
     cDicoApt * mDico;

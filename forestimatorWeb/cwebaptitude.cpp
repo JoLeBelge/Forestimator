@@ -1,6 +1,7 @@
 #include "cwebaptitude.h"
 
 extern bool globTest;
+std::string cookies_clientIDName="clientID";
 
 
 /*
@@ -17,25 +18,25 @@ void cWebAptitude::handlePathChange()
         menuitem_documentation->select();
 
         //navigation->setTitle(tr("titre.presentation"));
-       // mApp->addMetaHeader("description", tr("desc.pres"), "fr");
+        // mApp->addMetaHeader("description", tr("desc.pres"), "fr");
 
         // une description différentes pour chaques page de documentation. Il faut préhalablement retirer la description, sinon ça n'aura pas d'effet
         // fonctionne pas si session avec javascript, mais pour les robots ça va quand-même. Sur mon navigateur, le meta descr c'est celui de la première page consultée de la session
         // check si j'ai un header description pour cette sous-section, sinon celui général à la page documentation
         if (globTest){std::cout << "handlepathChange documentation : "<< internalPath() << std::endl;}
         if (found!=std::string::npos && found + docInternalP.length()+1 < internalPath().size()){// test sur la longueur car il faut gérer le cas ou on a juste un backslach : /documentation/
-        std::string sectionDoc=internalPath().erase(0, found + docInternalP.length()+1);
-        // retirer l'éventuel baslach en fin de url
-        if (sectionDoc.back()=='/'){
-            //sectionDoc.pop_back();
-            sectionDoc.erase(sectionDoc.size()-1);
-        }
+            std::string sectionDoc=internalPath().erase(0, found + docInternalP.length()+1);
+            // retirer l'éventuel baslach en fin de url
+            if (sectionDoc.back()=='/'){
+                //sectionDoc.pop_back();
+                sectionDoc.erase(sectionDoc.size()-1);
+            }
 
-        //sectionDoc.erase(std::remove(sectionDoc.begin(), sectionDoc.end(), '/'), sectionDoc.end());
-        if (globTest){std::cout << "section doc : "<< sectionDoc << std::endl;}
-        changeHeader(sectionDoc);
+            //sectionDoc.erase(std::remove(sectionDoc.begin(), sectionDoc.end(), '/'), sectionDoc.end());
+            if (globTest){std::cout << "section doc : "<< sectionDoc << std::endl;}
+            changeHeader(sectionDoc);
         } else {
-             changeHeader("documentation");
+            changeHeader("documentation");
         }
         showDialogues(0);
     }else if (internalPath() == "/cartographie" || internalPath() == "/" || internalPath() == ""){
@@ -64,13 +65,13 @@ void cWebAptitude::handlePathChange()
 void cWebAptitude::changeHeader(std::string aSection){
     std::string message(WString::tr("meta.desc."+aSection).toUTF8());
     if (message.substr(0,2)!="??"){
-    removeMetaHeader(MetaHeaderType::Meta,"description");
-    addMetaHeader(MetaHeaderType::Meta,"description", message, "fr");
+        removeMetaHeader(MetaHeaderType::Meta,"description");
+        addMetaHeader(MetaHeaderType::Meta,"description", message, "fr");
     }
     message=WString::tr("meta.titre."+aSection).toUTF8();
     if (message.substr(0,2)!="??"){
-    removeMetaHeader(MetaHeaderType::Meta,"titre");
-    addMetaHeader(MetaHeaderType::Meta,"titre", message, "fr");
+        removeMetaHeader(MetaHeaderType::Meta,"titre");
+        addMetaHeader(MetaHeaderType::Meta,"titre", message, "fr");
     }
 
 }
@@ -101,8 +102,6 @@ dialog::dialog(const WString& windowTitle, Wt::WMenuItem * aMenu, const WEnviron
         }
     });
 }
-
-
 
 
 cWebAptitude::cWebAptitude(const Wt::WEnvironment& env, cDicoApt *dico)
@@ -210,7 +209,7 @@ cWebAptitude::cWebAptitude(const Wt::WEnvironment& env, cDicoApt *dico)
 
     // std::cout << "nombre de couleurs: " << mDico->colors.size() << std::endl;
     for (const auto & kv : mDico->colors){
-       // std::cout << kv.first << ", " << kv.second->cat() << std::endl;
+        // std::cout << kv.first << ", " << kv.second->cat() << std::endl;
         color * col=kv.second.get();
         //std::cout << "add getStyleName() " << col.getStyleName() << std::endl;
         WCssDecorationStyle styleBgrd;
@@ -383,7 +382,7 @@ cWebAptitude::cWebAptitude(const Wt::WEnvironment& env, cDicoApt *dico)
     mGroupLayerW->setStyleClass("content_GL");
 
     /* CHARGE ONGLET COUCHES & SIMPLEPOINT */
-   if (globTest){ printf("create GL\n");}
+    if (globTest){ printf("create GL\n");}
     mGroupL = new groupLayers(this);
     //load_content_couches(content_couches);
     if (globTest){ printf("done\n");}
@@ -439,6 +438,7 @@ cWebAptitude::cWebAptitude(const Wt::WEnvironment& env, cDicoApt *dico)
     });
     messageBox->show();
     }*/
+    clientIDcookies();
 }
 
 void cWebAptitude::loadStyles(){
@@ -521,7 +521,7 @@ void cWebAptitude::authEvent() {
             mGroupL->updateGL();
         }
     }
-     showDialogues(1);
+    showDialogues(1);
 }
 
 bool cWebAptitude::isLoggedIn(){
@@ -537,15 +537,19 @@ Wt::Auth::User cWebAptitude::getUser(){
 }
 
 void cWebAptitude::addLog(std::string page, typeLog cat){
-
     // check pour ne pas ajouter dix fois sur la mm journée et pour le même utilisateur un log identique.
     if (!mAnal.logExist(this->environment(),page, cat)){
-        if (session_.login().loggedIn()) {
-            const Wt::Auth::User& u = session_.login().user();
-            mAnal.addLog(this->environment(),atol(u.id().c_str()), page,(int (cat)));
-        }else{
-            mAnal.addLog(this->environment(), page,(int (cat)));
-        }
+        mAnal.addLog(this->environment(), page,(int (cat)));
     }
 }
 
+void cWebAptitude::clientIDcookies(){
+    if (!environment().getCookie(cookies_clientIDName)){
+        int16_t bitNum = (int16_t)rand()%0x10000;
+        Http::Cookie coClientID(cookies_clientIDName, std::to_string(bitNum), std::chrono::seconds(604800));
+        setCookie(coClientID);
+        //if (globTest) {std::cout << "cookies set " << bitNum << std::endl;}
+        /*} else {
+         if (globTest) {std::cout << "cookies get " << *environment().getCookie(cookies_clientIDName) << std::endl;}
+    }*/
+    }
