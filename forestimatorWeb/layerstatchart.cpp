@@ -95,7 +95,7 @@ std::unique_ptr<WContainerWidget> layerStatChart::getChart(bool forRenderingInPd
             table->setWidth(200 + 150 + 14+2);
         } else if (mTypeVar==TypeVar::Continu){
 
-            if(mLay->Code().substr(0,7)=="dendro_"){
+            if(mLay->Code().substr(0,7)!="dendro_"){
                 // pour MNH et MNT, pour l'instant  - recrée un vecteur stat, puis un model
                 std::map<double, double> aStat;
                 // je dois mettre et la hauteur en double, et le pct car sinon imprécision d'arrondi
@@ -143,10 +143,10 @@ std::unique_ptr<WContainerWidget> layerStatChart::getChart(bool forRenderingInPd
                 aChart->setMargin(50, Side::Left | Side::Right);
 
             }else {
-                // uniquement pour dendro_vha
+                // pour toute les couches dendro 2021
 
                 basicStat bs= mLay->computeBasicStatOnPolyg(mGeom);
-                // ajout d'un tableau de synthèse très simple. moyenne, écart type, somme pour volume à l'hectare?
+                // ajout d'un tableau de synthèse
                 WTable * table =aContTableAndPie->addWidget(std::make_unique<WTable>());
                 table->setMargin(10, Side::Top | Side::Bottom | Side::Left);
 
@@ -171,7 +171,7 @@ std::unique_ptr<WContainerWidget> layerStatChart::getChart(bool forRenderingInPd
                 table->elementAt(i, 1)->setPadding(10,Wt::Side::Left);
                 i++;
                 }
-                message(WString::tr("dendro.sum."+mLay->Code()).toUTF8());
+                message=WString::tr("dendro.sum."+mLay->Code()).toUTF8();
                 if (message.substr(0,2)!="??"){
                 table->elementAt(i, 0)->addWidget(std::make_unique<WText>(message));
                 table->elementAt(i, 1)->addWidget(std::make_unique<WText>(bs.getSum(0)));
@@ -481,5 +481,3 @@ void batonnetApt::paintEvent(Wt::WPaintDevice *paintDevice){
         xcumul=xcumul+width;
     }
 }
-
-

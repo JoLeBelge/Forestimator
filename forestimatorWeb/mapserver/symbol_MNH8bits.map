@@ -47,6 +47,6 @@
    			EXPRESSION ([pixel]>30.0 AND [pixel]<=60.0)
    			STYLE
 				COLORRANGE '#9cd93b' '#fde725'
-				DATARANGE 30.0 35.0
+				DATARANGE 30.0 60.0
 			END
 		END

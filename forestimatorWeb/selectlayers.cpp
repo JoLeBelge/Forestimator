@@ -35,10 +35,7 @@ selectLayers::selectLayers(groupLayers * aGL){
             bool selected(0);
             //if ((l->getCatLayer()==TypeLayer::FEE) && (l->Code()=="HE"| l->Code()=="CS" | l->Code()=="CP" | l->Code()=="EP" | l->Code()=="DO" | l->Code()=="ME")){ selected=1;}
             if ((l->Code()=="HE_FEE")| (l->Code()=="CS_FEE") | (l->Code()=="CP_FEE") | (l->Code()=="EP_FEE") | (l->Code()=="DO_FEE") | (l->Code()=="ME_FEE")){ selected=1;}
-
-            //if (l->getCatLayer()==TypeLayer::Peuplement && (l->Code().substr(0,3)!="ES_")) { selected=1;}
             if ((l->Code()=="COMPOALL")| (l->Code()=="dendro_vha")){ selected=1;}
-
 
             mSelectedLayers.emplace(std::make_pair(l,selected));
             // checkBox
@@ -107,11 +104,7 @@ void baseSelectLayers::SelectLayerGroup(bool select,TypeLayer aType){
 std::vector<rasterFiles> baseSelectLayers::getSelectedRaster(){
     std::vector<rasterFiles> aRes;
     for (std::shared_ptr<Layer> l : getSelectedLayer()){
-        // long story, la couche compo n'est pas une couche mais un ensemble de couche qu'on affiche dans le select4Download pour pouvoir faire des analyses sur toutes les cartes de compo
-        // donc on ne veux pas télécharger juste le raster caché derrière la couche compo qui est d'ailleur l'ancienne carte de composition (1 raster pour toutes les ess)
-        if (l->Code()!="COMPO" && l->Code()!="MNH2018P95"){
         aRes.push_back(l->getRasterfile());
-        }
     }
     return aRes;
 }

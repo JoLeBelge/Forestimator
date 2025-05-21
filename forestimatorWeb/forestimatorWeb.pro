@@ -58,7 +58,6 @@ SOURCES += main.cpp \
     ../carteApt/cnsw.cpp \
     ../carteApt/layerbase.cpp \
     api/stationdescresource.cpp \
-    statHdomCompo.cpp
 
 HEADERS += \
     ../carteApt/cdicoaptbase.h \
@@ -100,7 +99,6 @@ HEADERS += \
     ../carteApt/layerbase.h \
     api/stationdescresource.h \
     ../carteApt/color.h \
-    statHdomCompo.h \
     ../stationDescriptor/rapidxml/rapidxml.hpp \
     ../stationDescriptor/rapidxml/rapidxml_iterators.hpp
 

@@ -334,26 +334,11 @@ void groupLayers::computeStatGlob(OGRGeometry *poGeomGlobale){
     // pour les statistiques globales, on prend toutes les couches selectionnées par select4Download
     for (auto & l: getSelectedLayer4Download() ){
 
-        if (l->Code()=="MNH2019"){
-            // calcul de Hdomnew statHdom(l,poGeomGlobale)
-            mVLStatCont.push_back(statHdom(l,poGeomGlobale).getResult());
-
-        } else if(l->Code()=="MNH2018P95"){
-            // calcul des params dendrométriques
-            mVLStatCont.push_back(statDendro(l,poGeomGlobale).getResult());
-
-        } else if(l->Code()=="COMPO"){
-            // calcul des probabilités de présence pour les 9 sp.
-            //mCompo = std::make_unique<statCompo>(mDico,poGeomGlobale);
-            mVLStatCont.push_back(statCompo(mDico,poGeomGlobale).getResult());
-        } else {
-
             if (l->l4Stat()){
                 // clé : la valeur au format légende (ex ; Optimum). Valeur ; pourcentage pour ce polygone
                 std::map<std::string,int> stat = l->computeStat1(poGeomGlobale);
                 mVLStat.push_back(std::make_shared<layerStatChart>(l,stat,poGeomGlobale));
             }
-        }
 
         //mPBar->setValue(mPBar->value() + 1);
         //m_app->processEvents();
@@ -393,9 +378,6 @@ void groupLayers::computeStatAllPol(OGRLayer * lay, WFileResource *fileResource)
             if (l->Code()=="MNH2019"){
                 aFile << "<processingName>hdom2019</processingName>\n" ;
                 aFile << mDico->geoservice("hdom","MNH2019",polWkt,typeAna::surfacique,1);
-            } else if(l->Code()=="MNH2018P95"){
-                 aFile << "<processingName>dendro2018</processingName>\n" ;
-                 aFile << mDico->geoservice("dendro2018","",polWkt,typeAna::surfacique,1);
            } else {
                 if (l->l4Stat()){
                      aFile << "<processingName>"+l->Code()+"</processingName>\n" ;

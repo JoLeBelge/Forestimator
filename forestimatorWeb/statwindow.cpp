@@ -55,15 +55,10 @@ void statWindow::genIndivCarteAndAptT(){
     }
 
     for (std::unique_ptr<Wt::WContainerWidget> & chart : mGL->mVLStatCont) {
-        // if (chart->deserveChart()){
-        // je veux un comportement différent pour
+
         add1layerStat(std::move(chart));
-        // }
     }
 
-    /*if (mGL->mCompo){
-        mAllStatIndivCont->addWidget(mGL->mCompo->getResult());
-    }*/
 }
 
 void statWindow::add1Aptitude(std::shared_ptr<layerStatChart> lstat){

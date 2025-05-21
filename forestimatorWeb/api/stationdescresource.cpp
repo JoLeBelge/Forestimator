@@ -1,8 +1,6 @@
-//#include "cdicoapt.h"
 #include "stationdescresource.h"
 
 int globMaxSurf(200);
-std::string nameDendroTool("dendro2018");
 extern bool globTest;
 
 std::string cDicoApt::geoservice(std::string aTool, std::string aArgs, std::string aPolyg, typeAna aType, bool xml){
@@ -16,12 +14,6 @@ std::string cDicoApt::geoservice(std::string aTool, std::string aArgs, std::stri
     GDALAllRegister();
     if (checkTool(aTool)){
 
-        // outils différent, car je teste janvier 2022 1) la réponse en xml et 2) l'api sur tout un shp
-        //if(aTool=="dendro2018"){
-
-        // finalement je vais me rabattre sur l'interface graphique de forestimator, car c'est le seul moyen que j'ai de facilement uploader un shp. Je pourrais le faire en envoyer par ex un KML dans une requete, mais c'est assez difficile de rester propre. et l'upload de fichier sans passer par fileupload, je n'y parviens pas.
-
-        //} else {
         switch(aType){
         case typeAna::surfacique:{
             OGRGeometry * pol=checkPolyg(aPolyg);
@@ -33,43 +25,19 @@ std::string cDicoApt::geoservice(std::string aTool, std::string aArgs, std::stri
                         if (!xml){aResponse+="code_mnh;moy;cv;max;min;nb\n";}
                         for (std::string code : VMNH){
                             std::shared_ptr<layerBase> l=getLayerBase(code);
-                            statHdomBase stat(l,pol,1);
-                            basicStat bs= stat.bshdom(); // a modifier quand j'aurai fini d'encoder tout les modèles de Jérome
-                            if (!xml){aResponse+=l->Code()+";"+bs.getMean()+";"+bs.getCV()+";"+bs.getMax()+";"+bs.getMin()+";"+bs.getNb()+"\n";}
-                            else { aResponse="<code_mnh>"+ l->Code()+ "</code_mnh>\n"
+                         //   statHdomBase stat(l,pol,1);
+                         //   basicStat bs= stat.bshdom();
+                         //   if (!xml){aResponse+=l->Code()+";"+bs.getMean()+";"+bs.getCV()+";"+bs.getMax()+";"+bs.getMin()+";"+bs.getNb()+"\n";}
+                         /*  else { aResponse="<code_mnh>"+ l->Code()+ "</code_mnh>\n"
                                         +"<moy>"+ bs.getMean()+ "</moy>\n"
                                         +"<cv>"+ bs.getCV()+ "</cv>\n"
                                         +"<max>"+ bs.getMax()+ "</max>\n"
                                         +"<min>"+ bs.getMin()+ "</min>\n"
                                         +"<nb>"+ bs.getNb()+ "</nb>\n";}
+                                        */
+                            aResponse="calcul de hdom indisponible pour l'instant\n";
                         }
                     }
-                } else if (aTool==nameDendroTool){
-                    //if (globTest) {std::cout << "dendro 2018 api " << std::endl;}
-                    if (!xml){aResponse+="hdom;vha;gha;nha;cmoy\n";}
-                    std::shared_ptr<layerBase> l=getLayerBase("MNH2018P95");
-                    statDendroBase stat(l,pol,1);
-                    if (!xml){aResponse+=stat.getHdom()+";"+stat.getVha()+";"+stat.getGha()+";"+stat.getNha()+";"+stat.getCmoy()+"\n";
-                    }else {
-                        aResponse=putInBalise(stat.getHdom(),"hdom")
-                                +putInBalise(stat.getVha(),"vha")
-                                +putInBalise(stat.getGha(),"gha")
-                                +putInBalise(stat.getNha(),"nha")
-                                +putInBalise(stat.getCmoy(),"cmoy");
-                    }
-
-                    /* }else if (aTool=="compo"){
-                    std::vector<std::string> VCOMPO=parseCompoArg(aArgs);
-                    if (VCOMPO.size()==0){aResponse="arguments pour traitement 'compo' ; vous avez rentré une valeur mais qui semble fausse. Entrez une liste de code de couche de probabilité de présence d'une essence forestière, séparées par une virgule\n";
-                    }else{
-                        std::vector<std::shared_ptr<layerBase>> Vlay;
-                        for (std::string code : VCOMPO){
-                            Vlay.push_back(mDico->getLayerBase(code));
-                        }
-                        statCompo stat(Vlay,mDico,pol);
-                        aResponse+=stat.getAPIresult();
-                    }*/
-
                 }else if(aTool=="aptitude"){
                     std::vector<std::string> VCApt=parseAptArg(aArgs);
                     aResponse+="code_es;type;O;T;TE;E;I\n";
@@ -165,7 +133,7 @@ std::string cDicoApt::geoservice(std::string aTool, std::string aArgs, std::stri
             if (globTest){std::cout << "api analyse ponctuelle" << std::endl;}
             OGRPoint * pt=checkPoint(aPolyg);
             if (pt!=NULL){
-                if (aTool=="hdom"   | aTool=="aptitude" | aTool=="dendro2018" ){
+                if (aTool=="hdom"   | aTool=="aptitude" ){
                     aResponse="pas de traitement ponctuel pour cet outil";
                 } else if(aTool=="CNSW"){
                     ptPedo ptPed=ptPedo(mPedo,pt->getX(),pt->getY());
@@ -205,7 +173,7 @@ bool cDicoApt::checkTool(std::string aTool){
     bool aRes(0);
     if (hasLayerBase(aTool)){ aRes=1;}
     // traitements qui ne sont pas des cartes
-    if (aTool=="hdom"   | aTool=="aptitude" | aTool=="dendro2018" | aTool=="CNSW"){ aRes=1;} //| aTool=="compo"
+    if (aTool=="hdom"   | aTool=="aptitude" | aTool=="CNSW"){ aRes=1;}
     return aRes;
 }
 
@@ -298,10 +266,8 @@ void stationDescResource::handleRequest(const Http::Request &request,Http::Respo
                           "\nListe des traitements pour analyse surfacique (analyse spécifique sur une couche ou analyse standard sur plusieurs couches) \n"
                           "----------------------------------------------------------------------------------------------------\n"
                           "hdom\n"
-                          //"compo\n"
                           "aptitude\n"
-                          "CNSW\n"
-                          +nameDendroTool+"\n";
+                          "CNSW\n";
 
         response.out() <<  "Liste des couches accessibles via API et leur url WMS\n"
                            "---------------------------\n";
@@ -317,7 +283,6 @@ void stationDescResource::handleRequest(const Http::Request &request,Http::Respo
 
         auto params = request.urlParams();
 
-        //if (params.empty()) response.out() << "(empty)\n";
         std::string aTool,aPolyg(""),aArgs;
         typeAna aMode(typeAna::surfacique);
         for (const auto &param : params) {
@@ -328,15 +293,10 @@ void stationDescResource::handleRequest(const Http::Request &request,Http::Respo
             if (name=="toolarg") {aArgs=value;}
             if (name=="pol") {aPolyg=value;}
             if (name=="pt") {aPolyg=value;aMode=typeAna::ponctuel;}
-            //response.out() << name << ": " << value << '\n';
         }
         // si pas de polygone mais bien le nom d'une couche, on délivre le dictionnaire de la couche à l'utilisateur
         if (aPolyg==""){aMode=typeAna::dicoTable;
             std::cout << " API : le polygone/ point est de "<< aPolyg << std::endl;
-        }
-
-        if (aTool==nameDendroTool) {response.addHeader("Content-Type","text/plain; charset=utf-8");}else {
-            response.addHeader("Content-Type","text/plain; charset=utf-8");
         }
 
         response.out() << mDico->geoservice(aTool,aArgs,aPolyg,aMode);

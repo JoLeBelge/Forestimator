@@ -65,14 +65,14 @@ class PopupNoInternet extends StatelessWidget {
   }
 }
 
-class PopupNotification2 extends StatelessWidget {
+class PopupPermissions extends StatelessWidget {
   final String? title;
   final String? dialog;
   final String? accept;
   final String? decline;
   final Function? onAccept;
   final Function? onDecline;
-  const PopupNotification2({
+  const PopupPermissions({
     super.key,
     this.title,
     this.accept,
@@ -89,21 +89,81 @@ class PopupNotification2 extends StatelessWidget {
       content: Text(dialog!),
       actions: <Widget>[
         TextButton(
-          onPressed:
-              () => {
-                if (onAccept != null) onAccept!(),
-              },
+          onPressed: () => {if (onAccept != null) onAccept!()},
           child: Text(accept!),
         ),
         if (decline != null)
           TextButton(
-            onPressed:
-                () => {
-                  if (onDecline != null) onDecline!(),
-                },
+            onPressed: () => {if (onDecline != null) onDecline!()},
             child: Text(decline!),
           ),
       ],
+    );
+  }
+}
+
+class PopupDownloadSuccess {
+  PopupDownloadSuccess(BuildContext context, String layerName) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Téléchargement de $layerName."),
+          content: Text("$layerName a été téléchargée avec succès."),
+          actions: [
+            TextButton(
+              child: Text("OK"),
+              onPressed: () {
+                Navigator.of(context, rootNavigator: true).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class PopupDownloadFailed {
+  PopupDownloadFailed(BuildContext context, String layerName) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Téléchargement de $layerName."),
+          content: Text("$layerName n'a pas été téléchargé."),
+          actions: [
+            TextButton(
+              child: Text("OK"),
+              onPressed: () {
+                Navigator.of(context, rootNavigator: true).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class PopupPDFSaved {
+  PopupPDFSaved(BuildContext context, String pdfName) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Export du pdf: $pdfName"),
+          content: Text("Export effectué avec succès."),
+          actions: [
+            TextButton(
+              child: Text("OK"),
+              onPressed: () {
+                Navigator.of(context, rootNavigator: true).pop();
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }

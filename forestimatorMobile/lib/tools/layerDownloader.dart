@@ -3,6 +3,7 @@ import 'dart:isolate';
 import 'dart:ui';
 import 'package:fforestimator/pages/catalogueView/layerTile.dart';
 import 'package:fforestimator/tools/handlePermissions.dart';
+import 'package:fforestimator/tools/notification.dart';
 import 'package:flutter/material.dart';
 import 'package:fforestimator/globals.dart' as gl;
 import 'package:flutter_downloader/flutter_downloader.dart';
@@ -244,13 +245,12 @@ class ForestimatorDownloader {
     _port.listen((dynamic data) {
       String idListened = data[0];
       String layerKey = "", layerName = "";
-      if(_downloadIdToWidget[idListened] != null){
+      if (_downloadIdToWidget[idListened] != null) {
         layerKey = _downloadIdToWidget[idListened]!.widget.layer.key;
         layerName = _downloadIdToWidget[idListened]!.widget.layer.name;
-      }
-      else{
-      layerKey = _downloadIdToLayerKey[idListened]!;
-      layerName = _downloadIdToLayerName[idListened]!;
+      } else {
+        layerKey = _downloadIdToLayerKey[idListened]!;
+        layerName = _downloadIdToLayerName[idListened]!;
       }
 
       DownloadTaskStatus status = DownloadTaskStatus.fromInt(data[1]);
@@ -261,26 +261,7 @@ class ForestimatorDownloader {
       }
       if (status == DownloadTaskStatus.complete) {
         BuildContext context = gl.notificationContext!;
-
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text("Téléchargement"),
-              content: Text(
-                "$layerName a été téléchargée avec succès.",
-              ),
-              actions: [
-                TextButton(
-                  child: Text("OK"),
-                  onPressed: () {
-                    Navigator.of(context, rootNavigator: true).pop();
-                  },
-                ),
-              ],
-            );
-          },
-        );
+        PopupDownloadSuccess(context, layerName);
 
         gl.rebuildOfflineView(() {
           gl.dico.getLayerBase(layerKey).mOffline = true;
@@ -294,25 +275,7 @@ class ForestimatorDownloader {
       if (DownloadTaskStatus.failed == status) {
         BuildContext context = gl.notificationContext!;
 
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text("Problèmes de connexion"),
-              content: Text(
-                "$layerName n'a pas été téléchargée.",
-              ),
-              actions: [
-                TextButton(
-                  child: Text("OK"),
-                  onPressed: () {
-                    Navigator.of(context, rootNavigator: true).pop();
-                  },
-                ),
-              ],
-            );
-          },
-        );
+        PopupDownloadFailed(context, layerName);
 
         gl.refreshWholeCatalogueView(() {
           gl.dico.getLayerBase(layerKey).mInDownload = false;

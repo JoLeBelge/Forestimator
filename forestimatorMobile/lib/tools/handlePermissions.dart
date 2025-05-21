@@ -24,17 +24,19 @@ int sdkInt = 20;
 
 void initPermissions() async {
   refreshPermissionInfos();
-  if (getVersion && Platform.isAndroid){
+  if (getVersion && Platform.isAndroid) {
     DeviceInfoPlugin infos = DeviceInfoPlugin();
     AndroidDeviceInfo androidInfo = await infos.androidInfo;
-    release = int.parse(androidInfo.version.release[0] + androidInfo.version.release[1]);
+    release = int.parse(
+      androidInfo.version.release[0] + androidInfo.version.release[1],
+    );
     sdkInt = androidInfo.version.sdkInt;
     print("Android $release (sdk $sdkInt)");
   }
   getVersion = false;
 }
 
-void refreshPermissionInfos() async{
+void refreshPermissionInfos() async {
   location = await Permission.location.status;
   storage = await Permission.storage.status;
   extStorage = await Permission.manageExternalStorage.status;
@@ -56,7 +58,7 @@ Widget handlePermissionForLocation({
 }) {
   if (!askOnceForLocation) return child;
   if (location.isPermanentlyDenied) {
-    return PopupNotification2(
+    return PopupPermissions(
       title: "Permission pour le GPS deactivé",
       accept: "Ouvrir paramètres",
       onAccept: () async {
@@ -75,9 +77,8 @@ Widget handlePermissionForLocation({
       dialog:
           "Forestimator mobile ne collecte aucune information personnelle. Notre politique de confidentialité est consultable au https://forestimator.gembloux.ulg.ac.be/documentation/confidentialit_. Vous pouvez ouvrir les paramètres et autoriser l'aplication à utiliser la position.",
     );
-  }
-  else if (location.isDenied) {
-    return PopupNotification2(
+  } else if (location.isDenied) {
+    return PopupPermissions(
       title: "Permission pour le GPS",
       accept: "oui",
       onAccept: () async {
@@ -96,7 +97,7 @@ Widget handlePermissionForLocation({
       dialog:
           "Forestimator mobile ne collecte aucune information personnelle. Notre politique de confidentialité est consultable au https://forestimator.gembloux.ulg.ac.be/documentation/confidentialit_. Autorisez-vous l'aplication à utiliser la position?",
     );
-  } 
+  }
   return child;
 }
 
@@ -106,7 +107,7 @@ Widget handlePermissionForStorage({
 }) {
   if (!askOnceForStorage) return child;
   if (release < 13 && storage.isDenied) {
-    return PopupNotification2(
+    return PopupPermissions(
       title: "Permission pour le stockage des données.",
       accept: "oui",
       onAccept: () async {
@@ -127,7 +128,7 @@ Widget handlePermissionForStorage({
           "Forestimator mobile ne collecte aucune information personnelle. Notre politique de confidentialité est consultable au https://forestimator.gembloux.ulg.ac.be/documentation/confidentialit_. Autorisez-vous l'application à stocker des données de cartographie sur votre smartphone?",
     );
   } else if (release < 13 && storage.isPermanentlyDenied) {
-    return PopupNotification2(
+    return PopupPermissions(
       title: "Permission pour le stockage des données.",
       accept: "Ouvrir paramètres",
       onAccept: () async {
@@ -154,9 +155,9 @@ Widget handlePermissionForNotifications({
   required Widget child,
   required Function refreshParentWidgetTree,
 }) {
-    if (!askOnceForNotification) return child;
+  if (!askOnceForNotification) return child;
   if (release > 8) {
-    return PopupNotification2(
+    return PopupPermissions(
       title: "Permission pour l'envoi de notifications.",
       accept: "oui",
       onAccept: () async {
@@ -176,7 +177,7 @@ Widget handlePermissionForNotifications({
           "Forestimator mobile ne collecte aucune information personnelle. Notre politique de confidentialité est consultable au https://forestimator.gembloux.ulg.ac.be/documentation/confidentialit_. Autorisez-vous l'application à stocker des données de cartographie sur votre smartphone?",
     );
   } else if (release > 13) {
-    return PopupNotification2(
+    return PopupPermissions(
       title: "Permission pour l'envoi de notifications.",
       accept: "Ouvrir paramètres",
       onAccept: () async {
