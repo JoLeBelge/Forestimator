@@ -4,6 +4,7 @@ import 'package:fforestimator/dico/dicoApt.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:fforestimator/pages/anaPt/requestedLayer.dart';
+import 'package:memory_info/memory_info.dart';
 import 'package:proj4dart/proj4dart.dart' as proj4;
 import 'package:latlong2/latlong.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -12,6 +13,8 @@ late dicoAptProvider dico;
 
 String basePathbranchB = "catalogue";
 String basePathbranchC = "offline";
+
+Memory? memory;
 
 BuildContext? notificationContext;
 
@@ -30,8 +33,11 @@ class selectedLayer {
   String mCode;
   bool offline;
   String sourceImagePath;
-  selectedLayer(
-      {required this.mCode, this.offline = false, this.sourceImagePath = ""});
+  selectedLayer({
+    required this.mCode,
+    this.offline = false,
+    this.sourceImagePath = "",
+  });
 }
 
 List<selectedLayer> interfaceSelectedLayerKeys = [];
@@ -48,8 +54,11 @@ void refreshInterfaceSelectedL() {
     if (interfaceSelectedLOffline.length > i) {
       offline = interfaceSelectedLOffline.elementAt(i);
     }
-    addLayerToList(interfaceSelectedLCode.elementAt(i),
-        offline: offline, savePref: false);
+    addLayerToList(
+      interfaceSelectedLCode.elementAt(i),
+      offline: offline,
+      savePref: false,
+    );
   }
 }
 
@@ -143,9 +152,13 @@ void removeLayerFromList(String key, {bool offline = false}) async {
 void savePrefSelLay() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   await prefs.setStringList(
-      'interfaceSelectedLCode', getInterfaceSelectedLCode());
+    'interfaceSelectedLCode',
+    getInterfaceSelectedLCode(),
+  );
   await prefs.setStringList(
-      'interfaceSelectedLOffline', getInterfaceSelectedLOffline());
+    'interfaceSelectedLOffline',
+    getInterfaceSelectedLOffline(),
+  );
 }
 
 void changeSelectedLayerModeOffline() {
@@ -156,13 +169,15 @@ void changeSelectedLayerModeOffline() {
     interfaceSelectedLayerKeys.insert(
       0,
       selectedLayer(
-          mCode: dico
-              .getLayersOffline()
-              .where((i) => i.mBits == 8)
-              .toList()
-              .first
-              .mCode,
-          offline: true),
+        mCode:
+            dico
+                .getLayersOffline()
+                .where((i) => i.mBits == 8)
+                .toList()
+                .first
+                .mCode,
+        offline: true,
+      ),
     );
   } else {
     // on ne garde qu'une seule couche
@@ -174,10 +189,15 @@ void changeSelectedLayerModeOffline() {
   savePrefSelLay();
 }
 
-void addLayerToList(String key,
-    {bool offline = false, bool savePref = true}) async {
+void addLayerToList(
+  String key, {
+  bool offline = false,
+  bool savePref = true,
+}) async {
   interfaceSelectedLayerKeys.insert(
-      0, selectedLayer(mCode: key, offline: offline));
+    0,
+    selectedLayer(mCode: key, offline: offline),
+  );
 
   if (!offlineMode) {
     if (interfaceSelectedLayerKeys.length > 3) {
@@ -216,5 +236,5 @@ Map<int, int> lutVulnerabiliteCS = {
   10: 4,
   11: 4,
   12: 4,
-  13: 7
+  13: 7,
 };

@@ -64,8 +64,6 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyApp extends State<MyApp> {
-  Memory? _memory;
-
   late String _pathExternalStorage;
   bool _initializedPersistentValues = false;
 
@@ -81,11 +79,11 @@ class _MyApp extends State<MyApp> {
       print('error $e');
     }
 
-    if (memory != null)
+    if (memory != null) {
       setState(() {
-        _memory = memory;
-        //print('memory freeMem:' + memory!.freeMem.toString());
+        gl.memory = memory;
       });
+    }
   }
 
   Future readPreference() async {
@@ -184,7 +182,6 @@ class _MyApp extends State<MyApp> {
     // copier tout les pdf de l'asset bundle vers un fichier utilisable par la librairie flutter_pdfviewer
     _listAndCopyPdfassets();
     readPreference();
-    getMemoryInfo();
   }
 
   late final _router = GoRouter(

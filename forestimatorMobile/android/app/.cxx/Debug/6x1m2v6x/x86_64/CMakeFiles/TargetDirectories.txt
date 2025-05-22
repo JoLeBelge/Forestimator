@@ -1,0 +1,2 @@
+/Users/macgef/Documents/Forestimator/forestimatorMobile/android/app/.cxx/Debug/6x1m2v6x/x86_64/CMakeFiles/edit_cache.dir
+/Users/macgef/Documents/Forestimator/forestimatorMobile/android/app/.cxx/Debug/6x1m2v6x/x86_64/CMakeFiles/rebuild_cache.dir
