@@ -551,5 +551,5 @@ void cWebAptitude::clientIDcookies(){
         //if (globTest) {std::cout << "cookies set " << bitNum << std::endl;}
         /*} else {
          if (globTest) {std::cout << "cookies get " << *environment().getCookie(cookies_clientIDName) << std::endl;}
-    }*/
-    }
+    */}
+}

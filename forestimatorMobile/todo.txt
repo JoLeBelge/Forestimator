@@ -32,7 +32,7 @@ CONSOLIDATION
 
 NOUVELLES OPTIONS
 
--outils de recherche de lieu: ville/ rue?/ commune? A priori un outil qui ne fonctionne que en mode online
+-outils de recherche de lieu -> communes, pour que le volume de donnée reste léger. utiliser flutter_typeahead et la liste des noms de communes, pour lesquelles l'extend est associé.
 
 -gestion de projets et téléchargement de couche offline sur l'extend du projet uniquement. Un projet = un extend. puis des couches offlines sur cet extend.
 
