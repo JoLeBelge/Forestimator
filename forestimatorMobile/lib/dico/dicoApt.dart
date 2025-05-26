@@ -131,7 +131,12 @@ class layerBase {
       nom_dico = map['nom_dico'],
       condition = map['condition'],
       mTypeVar = map['TypeVar'],
-      mGain = map['gain'] == null ? 66.6 : map['gain'],
+      mGain =
+          map['gain'] == null
+              ? 66.6
+              : map['gain'] is String
+              ? 66.6
+              : map['gain'],
       mPdfPage =
           map['pdfPage'] == null
               ? 0
@@ -258,18 +263,26 @@ class layerBase {
   Future<void> fillLayerDico(dicoAptProvider dico) async {
     if (mCategorie != 'Externe' && nom_dico != null) {
       String myquery =
-          'SELECT ' +
-          nom_field_raster.toString() +
-          ' as rast, ' +
-          nom_field_value.toString() +
-          ' as val, "col" FROM ' +
-          nom_dico.toString();
+          'SELECT $nom_field_raster as rast, $nom_field_value as val, "col" FROM $nom_dico';
       if (condition != null) {
-        myquery += ' WHERE ' + condition.toString();
+        myquery += ' WHERE $condition';
       }
       myquery += ';';
-      List<Map<String, dynamic>> adicoval = await dico.db.rawQuery(myquery);
-
+      List<Map<String, dynamic>> adicoval = [];
+      try {
+        adicoval = await dico.db.rawQuery(myquery);
+      } catch (e) {
+        int i = 0;
+        while (i < 255) {
+          i++;
+          adicoval.add(<String, dynamic>{
+            "rast": i,
+            "val": i * mGain,
+            "col": null,
+          });
+        }
+      }
+      print(adicoval);
       for (var r in adicoval) {
         // int DN = int.parse(r['rast']);
         mDicoVal[r['rast']] = r['val'].toString();
