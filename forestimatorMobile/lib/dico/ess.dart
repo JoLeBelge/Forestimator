@@ -100,8 +100,13 @@ class Ess {
     return aRes;
   }
 
-  int getAptHT(int aCodeNT, int aCodeNH, int aZbio,
-      {bool hierarchique = true, int aTopo = 666}) {
+  int getAptHT(
+    int aCodeNT,
+    int aCodeNH,
+    int aZbio, {
+    bool hierarchique = true,
+    int aTopo = 666,
+  }) {
     int aRes = 12; // indéterminé zone batie ; par défaut
     if (aCodeNT == 0 && aCodeNH != 0) {
       aRes = 11;
@@ -168,22 +173,22 @@ class Ess {
   }
 
   Ess.fromMap(final Map<String, dynamic> map)
-      : mCode = map['Code_FR'],
-        mNomFR = map['Ess_FR'],
-        mPrefix = map['prefix'],
-        mF_R = map['FeRe'],
-        mEcoVal = {},
-        mAptZbio = {},
-        mAptCS = {},
-        mRisqueTopo = {},
-        mRisqueCS = {};
+    : mCode = map['Code_FR'],
+      mNomFR = map['Ess_FR'],
+      mPrefix = map['prefix'],
+      mF_R = map['FeRe'],
+      mEcoVal = {},
+      mAptZbio = {},
+      mAptCS = {},
+      mRisqueTopo = {},
+      mRisqueCS = {};
 
   Future<void> fillApt(dicoAptProvider dico) async {
     // aptitude hydro-trophique ; une matrice par zbioclimatique
     String myquery =
         "SELECT CodeNTNH,`1`,`2`,`3`,`4`,`5`,`6`,`7`,`8`,`9`,`10` FROM AptFEE WHERE CODE_ESSENCE='" +
-            mCode.toString() +
-            "';";
+        mCode.toString() +
+        "';";
     List<Map<String, dynamic>> aAptEco = await dico.db.rawQuery(myquery);
     for (int zbio = 1; zbio <= 10; zbio++) {
       Map<String, int> EcoOneZbio = {};
@@ -209,8 +214,8 @@ class Ess {
     // aptitude climatique ; une aptitude pour chacune des 10 zones climatiques
     myquery =
         "SELECT `1`,`2`,`3`,`4`,`5`,`6`,`7`,`8`,`9`,`10` FROM AptFEE_ZBIO WHERE CODE_ESSENCE='" +
-            mCode.toString() +
-            "';";
+        mCode.toString() +
+        "';";
     List<Map<String, dynamic>> aAptZbio = await dico.db.rawQuery(myquery);
     for (var r in aAptZbio) {
       for (int zbio = 1; zbio <= 10; zbio++) {
@@ -224,8 +229,8 @@ class Ess {
     // risque topographique ; permet de compenser une aptitude en bien (surcote) ou en mal (souscote)
     myquery =
         "SELECT Secteurfroid,Secteurneutre,Secteurchaud,Fond_vallee,SF_Ardenne,FV_Ardenne FROM Risque_topoFEE WHERE Code_Fr='" +
-            mCode.toString() +
-            "';";
+        mCode.toString() +
+        "';";
     List<Map<String, dynamic>> rTopo = await dico.db.rawQuery(myquery);
     for (int zbio = 1; zbio <= 10; zbio++) {
       Map<int, int> rTopoOneZbio = {};
@@ -243,19 +248,22 @@ class Ess {
             codeRisque4 = dico.getRisque(r['FV_Ardenne']);
           }
         }
-        rTopoOneZbio.addEntries({
-          1: codeRisque1,
-          2: codeRisque2,
-          3: codeRisque3,
-          4: codeRisque4
-        }.entries);
+        rTopoOneZbio.addEntries(
+          {
+            1: codeRisque1,
+            2: codeRisque2,
+            3: codeRisque3,
+            4: codeRisque4,
+          }.entries,
+        );
       }
       mRisqueTopo[zbio] = rTopoOneZbio;
     }
 
     // aptitude CS
     for (int zbio = 1; zbio <= 10; zbio++) {
-      myquery = "SELECT stat_id," +
+      myquery =
+          "SELECT stat_id," +
           mCode.toString() +
           ",var FROM AptCS WHERE ZBIO=" +
           zbio.toString() +
@@ -270,15 +278,17 @@ class Ess {
               String variante = "";
               r['var'] != null ? variante = r['var'] : variante = "";
               int station = r['stat_id'];
-              aptCSOneZbio
-                  .addEntries({Tuple2(station, variante): codeApt}.entries);
+              aptCSOneZbio.addEntries(
+                {Tuple2(station, variante): codeApt}.entries,
+              );
             }
           }
           mAptCS[zbio] = aptCSOneZbio;
         }
       } catch (e) {}
       // risque climatique CS - attention ça n'as rien à voir avec le risque de la situation topographique (FEE)
-      myquery = "SELECT stat_id," +
+      myquery =
+          "SELECT stat_id," +
           mCode.toString() +
           ",var FROM AptCSClim WHERE ZBIO=" +
           zbio.toString() +
@@ -293,8 +303,9 @@ class Ess {
               String variante = "";
               r['var'] != null ? variante = r['var'] : variante = "";
               int station = r['stat_id'];
-              risqueCSOneZbio
-                  .addEntries({Tuple2(station, variante): risque}.entries);
+              risqueCSOneZbio.addEntries(
+                {Tuple2(station, variante): risque}.entries,
+              );
             }
           }
           mRisqueCS[zbio] = risqueCSOneZbio;

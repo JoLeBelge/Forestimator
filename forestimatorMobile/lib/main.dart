@@ -206,7 +206,7 @@ class _MyApp extends State<MyApp> {
                 routes: [
                   GoRoute(
                     path: 'anaPt',
-                    builder: (context, state) => anaPtpage(gl.requestedLayers),
+                    builder: (context, state) => AnaPtpage(gl.requestedLayers),
                   ),
                 ],
               ),

@@ -6,18 +6,16 @@ import 'package:fforestimator/globals.dart' as gl;
 import 'package:fforestimator/myicons.dart';
 import 'package:go_router/go_router.dart';
 import 'package:fforestimator/tools/notification.dart';
-//import 'package:device_info_plus/device_info_plus.dart';
-//import 'package:downloadsfolder/downloadsfolder.dart';
-//import 'package:path_provider/path_provider.dart';
 
-class anaPtpage extends StatefulWidget {
+class AnaPtpage extends StatefulWidget {
   final List<layerAnaPt> requestedLayers;
+  const AnaPtpage(this.requestedLayers, {super.key});
+
   @override
-  anaPtpage(this.requestedLayers);
-  State<anaPtpage> createState() => _anaPtpageState();
+  State<AnaPtpage> createState() => _AnaPtpageState();
 }
 
-class _anaPtpageState extends State<anaPtpage> {
+class _AnaPtpageState extends State<AnaPtpage> {
   late TextEditingController controllerPdfName;
   late TextEditingController controllerLocationName;
   @override
@@ -130,18 +128,11 @@ class _anaPtpageState extends State<anaPtpage> {
     controllerPdfName = TextEditingController();
     controllerLocationName = TextEditingController();
   }
-
-  /*@override
-  void dispose() {
-    super.dispose();
-    controllerLocationName.dispose();
-    controllerPdfName.dispose();
-  }*/
 }
 
-class layerAnaPtListTile extends StatelessWidget {
+class LayerAnaPtListTile extends StatelessWidget {
   final layerAnaPt data;
-  layerAnaPtListTile({required this.data});
+  const LayerAnaPtListTile({super.key, required this.data});
 
   @override
   Widget build(BuildContext context) {
@@ -172,11 +163,7 @@ class layerAnaPtListTile extends StatelessWidget {
       onTap: () {
         if (l.hasDoc()) {
           GoRouter.of(context).push(
-            "/" +
-                gl.basePathbranchB +
-                '/' +
-                l.getFicheRoute(us: data.mRastValue) +
-                '/0',
+            '/${gl.basePathbranchB}/${l.getFicheRoute(us: data.mRastValue)}/0',
           );
         }
       },
@@ -267,10 +254,7 @@ class essencesListView extends StatelessWidget {
                   : null,
           onTap: () {
             GoRouter.of(context).push(
-              "/" +
-                  gl.basePathbranchB +
-                  "/" +
-                  gl.dico.getEss(code.elementAt(index)).getFicheRoute(),
+              "/${gl.basePathbranchB}/${gl.dico.getEss(code.elementAt(index)).getFicheRoute()}",
             );
           },
         );
@@ -312,12 +296,12 @@ Widget _tabPropositionCS(BuildContext context, propositionGS apts) {
               height: MediaQuery.of(context).size.height,
               child: TabBarView(
                 children: [
-                  essencesListViewGS(apts: apts, codeApt: 1),
-                  essencesListViewGS(apts: apts, codeApt: 2),
-                  essencesListViewGS(apts: apts, codeApt: 3),
-                  essencesListViewGS(apts: apts, codeApt: 4),
-                  //  essencesListViewGS(apts: apts, codeApt: 5),
-                  //  essencesListViewGS(apts: apts, codeApt: 6),
+                  EssencesListViewGS(apts: apts, codeApt: 1),
+                  EssencesListViewGS(apts: apts, codeApt: 2),
+                  EssencesListViewGS(apts: apts, codeApt: 3),
+                  EssencesListViewGS(apts: apts, codeApt: 4),
+                  //  EssencesListViewGS(apts: apts, codeApt: 5),
+                  //  EssencesListViewGS(apts: apts, codeApt: 6),
                 ],
               ),
             ),
@@ -328,10 +312,16 @@ Widget _tabPropositionCS(BuildContext context, propositionGS apts) {
   );
 }
 
-class essencesListViewGS extends StatelessWidget {
+class EssencesListViewGS extends StatelessWidget {
   final propositionGS apts;
   final int codeApt; // maintentant c'est plus un code de vulnérabilités
-  essencesListViewGS({required this.apts, required this.codeApt});
+
+  const EssencesListViewGS({
+    super.key,
+    required this.apts,
+    required this.codeApt,
+  });
+
   @override
   Widget build(BuildContext context) {
     final Map<String, int> mEss = apts.getListEss(codeApt);
@@ -372,7 +362,7 @@ Widget _anaPtListLayers(
   BuildContext context,
   List<layerAnaPt> requestedLayers,
 ) {
-  /* plus nécessaire car requestedLayers est purgé avant l'envoi à anaPtpage
+  /* plus nécessaire car requestedLayers est purgé avant l'envoi à AnaPtpage
   int nb = 0;
   for (layerAnaPt l in requestedLayers) {
     if (l.mFoundRastFile && l.mRastValue != 0) {
@@ -380,13 +370,13 @@ Widget _anaPtListLayers(
     }
   }*/
 
-  if (requestedLayers.length > 0) {
+  if (requestedLayers.isNotEmpty) {
     return ListView.builder(
       itemBuilder: (context, index) {
         //if (requestedLayers[index].mFoundRastFile &&
         //  requestedLayers[index].mRastValue != 0) {
 
-        return layerAnaPtListTile(data: requestedLayers[index]);
+        return LayerAnaPtListTile(data: requestedLayers[index]);
         //}
       },
       itemCount: requestedLayers.length,

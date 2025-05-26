@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:fforestimator/dico/dicoApt.dart';
 import 'package:fforestimator/tileProvider/tifTileProvider.dart';
 import 'package:fforestimator/tools/handlePermissions.dart';
-//import 'package:flutter_logs/flutter_logs.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:proj4dart/proj4dart.dart' as proj4;
@@ -345,7 +344,11 @@ class _MapPageState extends State<mapPage> {
                   <Widget>[
                     //CurrentLocationLayer(),
                     AnimatedLocationMarkerLayer(
-                      position: LocationMarkerPosition(latitude:  gl.position?.latitude ?? 0.0, longitude: gl.position?.longitude ?? 0.0, accuracy: 1.0),
+                      position: LocationMarkerPosition(
+                        latitude: gl.position?.latitude ?? 0.0,
+                        longitude: gl.position?.longitude ?? 0.0,
+                        accuracy: 1.0,
+                      ),
                     ),
                     MarkerLayer(
                       markers: [
@@ -358,6 +361,26 @@ class _MapPageState extends State<mapPage> {
                       ],
                     ),
                   ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    IconButton(
+                      iconSize: 40.0,
+                      color: Colors.black,
+                      onPressed: () async {
+                        if (gl.position != null) {
+                          setState(() {});
+                        }
+                      },
+                      icon: const Icon(Icons.map),
+                    ),
+                  ],
+                ),
+              ],
             ),
             gl.position != null
                 ? Row(
@@ -467,8 +490,9 @@ class _MapPageState extends State<mapPage> {
       } else {
         _refreshLocation = true;
       }
-      Position newPosition = await Geolocator.getCurrentPosition(
-      ).timeout(Duration(seconds: 3));
+      Position newPosition = await Geolocator.getCurrentPosition().timeout(
+        Duration(seconds: 3),
+      );
 
       setState(() {
         gl.position = newPosition;
