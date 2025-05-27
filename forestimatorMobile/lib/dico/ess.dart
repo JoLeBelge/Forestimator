@@ -23,9 +23,9 @@ class Ess {
 
   String getFicheRoute({bool complete = false}) {
     if (complete) {
-      return "/" + gl.basePathbranchB + "/fiche-esssence/" + mCode;
+      return "/${gl.basePathbranchB}/fiche-esssence/$mCode";
     }
-    return 'fiche-esssence/' + mCode;
+    return 'fiche-esssence/$mCode';
   }
 
   bool hasFEEapt() {
@@ -116,7 +116,7 @@ class Ess {
       aRes = 11;
       return aRes;
     } // hors belgique ; Indéterminé mais pas zone batie
-    String codeNTNH = "h" + aCodeNH.toString() + "t" + aCodeNT.toString();
+    String codeNTNH = "h${aCodeNH}t$aCodeNT";
     if (mEcoVal.containsKey(aZbio)) {
       if (mEcoVal[aZbio]!.containsKey(codeNTNH)) {
         aRes = mEcoVal[aZbio]![codeNTNH]!;
@@ -150,7 +150,7 @@ class Ess {
     }
     // risque élevé et très élevé
     if (catRisque == 3) {
-      aRes = gl.dico.AptSouscote(aptBio);
+      aRes = gl.dico.aptSouscote(aptBio);
     }
     // attention, pour résineux, pas de Tolérance Elargie --> exclusion
     if (aRes == 3 && mF_R == 2) {
@@ -186,9 +186,7 @@ class Ess {
   Future<void> fillApt(dicoAptProvider dico) async {
     // aptitude hydro-trophique ; une matrice par zbioclimatique
     String myquery =
-        "SELECT CodeNTNH,`1`,`2`,`3`,`4`,`5`,`6`,`7`,`8`,`9`,`10` FROM AptFEE WHERE CODE_ESSENCE='" +
-        mCode.toString() +
-        "';";
+        "SELECT CodeNTNH,`1`,`2`,`3`,`4`,`5`,`6`,`7`,`8`,`9`,`10` FROM AptFEE WHERE CODE_ESSENCE='$mCode';";
     List<Map<String, dynamic>> aAptEco = await dico.db.rawQuery(myquery);
     for (int zbio = 1; zbio <= 10; zbio++) {
       Map<String, int> EcoOneZbio = {};
@@ -213,9 +211,7 @@ class Ess {
 
     // aptitude climatique ; une aptitude pour chacune des 10 zones climatiques
     myquery =
-        "SELECT `1`,`2`,`3`,`4`,`5`,`6`,`7`,`8`,`9`,`10` FROM AptFEE_ZBIO WHERE CODE_ESSENCE='" +
-        mCode.toString() +
-        "';";
+        "SELECT `1`,`2`,`3`,`4`,`5`,`6`,`7`,`8`,`9`,`10` FROM AptFEE_ZBIO WHERE CODE_ESSENCE='$mCode';";
     List<Map<String, dynamic>> aAptZbio = await dico.db.rawQuery(myquery);
     for (var r in aAptZbio) {
       for (int zbio = 1; zbio <= 10; zbio++) {
@@ -228,9 +224,7 @@ class Ess {
 
     // risque topographique ; permet de compenser une aptitude en bien (surcote) ou en mal (souscote)
     myquery =
-        "SELECT Secteurfroid,Secteurneutre,Secteurchaud,Fond_vallee,SF_Ardenne,FV_Ardenne FROM Risque_topoFEE WHERE Code_Fr='" +
-        mCode.toString() +
-        "';";
+        "SELECT Secteurfroid,Secteurneutre,Secteurchaud,Fond_vallee,SF_Ardenne,FV_Ardenne FROM Risque_topoFEE WHERE Code_Fr='$mCode';";
     List<Map<String, dynamic>> rTopo = await dico.db.rawQuery(myquery);
     for (int zbio = 1; zbio <= 10; zbio++) {
       Map<int, int> rTopoOneZbio = {};
@@ -262,15 +256,10 @@ class Ess {
 
     // aptitude CS
     for (int zbio = 1; zbio <= 10; zbio++) {
-      myquery =
-          "SELECT stat_id," +
-          mCode.toString() +
-          ",var FROM AptCS WHERE ZBIO=" +
-          zbio.toString() +
-          ";";
+      myquery = "SELECT stat_id,$mCode,var FROM AptCS WHERE ZBIO=$zbio;";
       try {
         List<Map<String, dynamic>> aptCS = await dico.db.rawQuery(myquery);
-        if (aptCS.length > 0) {
+        if (aptCS.isNotEmpty) {
           Map<Tuple2<int, String>, int> aptCSOneZbio = {};
           for (var r in aptCS) {
             if (r[mCode.toString()] != null) {
@@ -287,15 +276,10 @@ class Ess {
         }
       } catch (e) {}
       // risque climatique CS - attention ça n'as rien à voir avec le risque de la situation topographique (FEE)
-      myquery =
-          "SELECT stat_id," +
-          mCode.toString() +
-          ",var FROM AptCSClim WHERE ZBIO=" +
-          zbio.toString() +
-          ";";
+      myquery = "SELECT stat_id,$mCode,var FROM AptCSClim WHERE ZBIO=$zbio;";
       try {
         List<Map<String, dynamic>> risqueCS = await dico.db.rawQuery(myquery);
-        if (risqueCS.length > 0) {
+        if (risqueCS.isNotEmpty) {
           Map<Tuple2<int, String>, int> risqueCSOneZbio = {};
           for (var r in risqueCS) {
             if (r[mCode.toString()] != null) {

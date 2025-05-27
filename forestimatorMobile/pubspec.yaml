@@ -24,8 +24,9 @@ dependencies:
   #flutter_sensors: ^1.0.1
   go_router: ^15.1.1
   flutter_pdfview: ^1.2.7
-  flutter_map_location_marker: ^10.1.0 # pas compatible avec flutter_map 7.0
+  flutter_map_location_marker: ^10.1.0
   image: ^4.5.4
+  #display_metrics: ^2.0.1
 
   geoimage: ^0.4.0
   shared_preferences: ^2.2.2
@@ -36,6 +37,7 @@ dependencies:
   permission_handler: ^12.0.0+1
   memory_info: ^0.0.4
   device_info_plus: ^11.4.0
+  proj4dart: ^2.1.0
 
 dev_dependencies:
   flutter_test:

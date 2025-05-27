@@ -1,5 +1,3 @@
-library fforestimator.globals;
-
 import 'package:fforestimator/dico/dicoApt.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
@@ -45,7 +43,7 @@ List<selectedLayer> interfaceSelectedLayerKeys = [];
 String getFirstSelLayOffline() {
   List<selectedLayer> l =
       interfaceSelectedLayerKeys.where((i) => i.offline).toList();
-  return l.length > 0 ? l.first.mCode : "toto";
+  return l.isNotEmpty ? l.first.mCode : "toto";
 }
 
 void refreshInterfaceSelectedL() {
@@ -164,8 +162,8 @@ void savePrefSelLay() async {
 void changeSelectedLayerModeOffline() {
   interfaceSelectedLayerKeys.removeWhere((element) => element.offline == false);
   // check si il y a au moins une carte offline sur le téléphone et on l'ajoute à la sélection si il n'y en avait aucune
-  if (dico.getLayersOffline().where((i) => i.mBits == 8).toList().length > 0 &&
-      interfaceSelectedLayerKeys.length == 0) {
+  if (dico.getLayersOffline().where((i) => i.mBits == 8).toList().isNotEmpty &&
+      interfaceSelectedLayerKeys.isEmpty) {
     interfaceSelectedLayerKeys.insert(
       0,
       selectedLayer(

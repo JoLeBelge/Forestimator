@@ -9,6 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class OfflineView extends StatefulWidget {
   const OfflineView({super.key});
+
   @override
   State<OfflineView> createState() => _OfflineView();
 }

@@ -9,7 +9,7 @@ import 'package:fforestimator/globals.dart' as gl;
 import 'package:fforestimator/pages/anaPt/onePixGeotifDecoder.dart';
 import 'package:proj4dart/proj4dart.dart' as proj4;
 
-class aptitude {
+class Aptitude {
   late int mCodeNum;
   String mLabelApt;
   late String mCode;
@@ -20,7 +20,7 @@ class aptitude {
   late int mSurcote;
   late int mSouscote;
 
-  aptitude.fromMap(final Map<String, dynamic> map)
+  Aptitude.fromMap(final Map<String, dynamic> map)
     : mCodeNum = map['Num'],
       mLabelApt = map['Aptitude'],
       mCode = map['Code_Aptitude'],
@@ -62,9 +62,9 @@ class station {
     : mStationId = map['stat_id'],
       mZbio = map['ZBIO'],
       mNomStationCarto = map['Station_carto'],
-      mNomVar = map['nom_var'] != null ? map['nom_var'] : '',
+      mNomVar = map['nom_var'] ?? '',
       mVarMaj = map['varMajoritaire'] == 1 ? true : false,
-      mVar = map['var'] != null ? map['var'] : '';
+      mVar = map['var'] ?? '';
 }
 
 class zbio {
@@ -119,12 +119,10 @@ class layerBase {
       mExpert = map['expert'] == 0 ? false : true,
       mVisu = map['visu'] == 0 ? false : true,
       mGroupe = map['groupe'],
-      mUrl = map['WMSurl'] == null ? "" : map['WMSurl'],
-      mWMSLayerName = map['WMSlayer'] == null ? "" : map['WMSlayer'],
-      mWMSattribution =
-          map['WMSattribution'] == null ? "" : map['WMSattribution'],
-      mTypeGeoservice =
-          map['typeGeoservice'] == null ? "" : map['typeGeoservice'],
+      mUrl = map['WMSurl'] ?? "",
+      mWMSLayerName = map['WMSlayer'] ?? "",
+      mWMSattribution = map['WMSattribution'] ?? "",
+      mTypeGeoservice = map['typeGeoservice'] ?? "",
       mCategorie = map['Categorie'],
       nom_field_raster = map['nom_field_raster'],
       nom_field_value = map['nom_field_value'],
@@ -145,7 +143,7 @@ class layerBase {
                   ? 0
                   : int.parse(map['pdfPage']) - 1
               : map['pdfPage'] - 1,
-      mPdfName = map['pdfName'] == null ? "" : map['pdfName'],
+      mPdfName = map['pdfName'] ?? "",
       mRes =
           map['res'] == null
               ? 0.0
@@ -159,7 +157,7 @@ class layerBase {
       mDicoCol = {},
       mOffline = false,
       mInDownload = false,
-      mBits = map['Bits'] == null ? 8 : map['Bits'],
+      mBits = map['Bits'] ?? 8,
       mUsedForAnalysis = false {
     mIsDownloadableRW = mRes >= 10 ? true : false;
     mLogoAttributionFile = logoAttributionFile(mWMSattribution);
@@ -282,7 +280,6 @@ class layerBase {
           });
         }
       }
-      print(adicoval);
       for (var r in adicoval) {
         // int DN = int.parse(r['rast']);
         mDicoVal[r['rast']] = r['val'].toString();
@@ -311,10 +308,7 @@ class layerBase {
   @override
   String toString() {
     String res =
-        "layerbase code ${mCode}, name ${mNom}, dicoVal size " +
-        mDicoVal.length.toString() +
-        ' dicoCol size ' +
-        mDicoCol.length.toString();
+        "layerbase code ${mCode}, name ${mNom}, dicoVal size ${mDicoVal.length} dicoCol size ${mDicoCol.length}";
     return res;
   }
 
@@ -324,7 +318,7 @@ class layerBase {
   }
 
   Future<int> getValXY(proj4.Point pt) async {
-    final File fileIm = File("${gl.dico.docDir.path}/${mNomRaster}");
+    final File fileIm = File("${gl.dico.docDir.path}/$mNomRaster");
     onePixGeotifDecoder myDecoder = onePixGeotifDecoder(x: pt.x, y: pt.y);
     Uint8List bytes = await fileIm.readAsBytes();
     return myDecoder.getVal(bytes);
@@ -337,7 +331,7 @@ class dicoAptProvider {
   Map<String, Color> colors = {};
   Map<String, layerBase> mLayerBases = {};
   Map<String, Ess> mEssences = {};
-  List<aptitude> mAptitudes = [];
+  List<Aptitude> mAptitudes = [];
   List<vulnerabilite> mVulnerabilite =
       []; // carte recommandation CS = carte de vulnerabilite
   List<risque> mRisques =
@@ -410,7 +404,7 @@ class dicoAptProvider {
     }
     result = await db.query('dico_apt');
     for (var row in result) {
-      mAptitudes.add(aptitude.fromMap(row));
+      mAptitudes.add(Aptitude.fromMap(row));
     }
     result = await db.query('dico_risque');
     for (var row in result) {
@@ -492,7 +486,7 @@ class dicoAptProvider {
 
   int Apt(String codeAptStr) {
     int aRes = 777;
-    for (aptitude apt in mAptitudes) {
+    for (Aptitude apt in mAptitudes) {
       if (apt.mCode == codeAptStr) {
         aRes = apt.mCodeNum;
       }
@@ -502,7 +496,7 @@ class dicoAptProvider {
 
   String AptLabel(int codeApt) {
     String aRes = "";
-    for (aptitude apt in mAptitudes) {
+    for (Aptitude apt in mAptitudes) {
       if (apt.mCodeNum == codeApt) {
         aRes = apt.mLabelApt;
       }
@@ -554,7 +548,7 @@ class dicoAptProvider {
 
   int AptSurcote(int aCode) {
     int aRes = aCode;
-    for (aptitude apt in mAptitudes) {
+    for (Aptitude apt in mAptitudes) {
       if (apt.mCodeNum == aCode) {
         aRes = apt.mSurcote;
         break;
@@ -563,9 +557,9 @@ class dicoAptProvider {
     return aRes;
   }
 
-  int AptSouscote(int aCode) {
+  int aptSouscote(int aCode) {
     int aRes = aCode;
-    for (aptitude apt in mAptitudes) {
+    for (Aptitude apt in mAptitudes) {
       if (apt.mCodeNum == aCode) {
         aRes = apt.mSouscote;
         break;
@@ -576,7 +570,7 @@ class dicoAptProvider {
 
   int AptContraignante(int aCode) {
     int aRes = 0;
-    for (aptitude apt in mAptitudes) {
+    for (Aptitude apt in mAptitudes) {
       if (apt.mCodeNum == aCode) {
         aRes = apt.mAptContraigante;
         break;
@@ -587,7 +581,7 @@ class dicoAptProvider {
 
   int AptNonContraignante(int aCode) {
     int aRes = 0;
-    for (aptitude apt in mAptitudes) {
+    for (Aptitude apt in mAptitudes) {
       if (apt.mCodeNum == aCode) {
         aRes = apt.mEquCodeNonContr;
         break;
@@ -629,7 +623,7 @@ class dicoAptProvider {
   }
 
   String getStationPdf(int us) {
-    return "US-A" + us.toString() + ".pdf";
+    return "US-A$us.pdf";
   }
 
   Future<void> checkLayerBaseOfflineRessource() async {
@@ -664,7 +658,7 @@ class HexColor extends Color {
   static int _getColorFromHex(String hexColor) {
     hexColor = hexColor.toUpperCase().replaceAll("#", "");
     if (hexColor.length == 6) {
-      hexColor = "FF" + hexColor;
+      hexColor = "FF$hexColor";
     }
     return int.parse(hexColor, radix: 16);
   }

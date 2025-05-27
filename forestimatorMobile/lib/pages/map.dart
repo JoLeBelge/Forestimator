@@ -19,19 +19,27 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fforestimator/tools/notification.dart';
 import 'dart:convert';
 import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
+import 'package:fforestimator/tools/customLayer/polygon_layer.dart'
+    as draw_layer;
 
-class mapPage extends StatefulWidget {
-  const mapPage({super.key});
+class MapPage extends StatefulWidget {
+  const MapPage({super.key});
 
   @override
-  State<mapPage> createState() => _MapPageState();
+  State<MapPage> createState() => _MapPageState();
 }
 
-class _MapPageState extends State<mapPage> {
+class _MapPageState extends State<MapPage> {
   final _mapController = MapController();
   LatLng? _pt;
   bool _doingAnaPt = false;
   var data;
+  bool _toolbarExtended = false;
+  bool _modeDrawPolygon = false;
+
+  List<draw_layer.PolygonLayer> drawnLayer = [
+    draw_layer.PolygonLayer(name: "defaultDrawLayer"),
+  ];
 
   //https://github.com/fleaflet/flutter_map/blob/master/example/lib/pages/custom_crs/custom_crs.dart
   late proj4.Projection epsg4326 = proj4.Projection.get('EPSG:4326')!;
@@ -231,29 +239,35 @@ class _MapPageState extends State<mapPage> {
                       InteractiveFlag.scrollWheelZoom,
                 ),
                 onLongPress:
-                    (tapPosition, point) async => {
-                      if (!_doingAnaPt)
-                        {
+                    _modeDrawPolygon
+                        ? (tapPosition, point) async => {
                           setState(() {
-                            _doingAnaPt = true;
+                            drawnLayer.first.addPoint(point);
                           }),
-                          //proj4.Point ptBL72 = epsg4326.transform(epsg31370,proj4.Point(x: point.longitude, y: point.latitude))
-                          await _runAnaPt(
-                            epsg4326.transform(
-                              epsg31370,
-                              proj4.Point(
-                                x: point.longitude,
-                                y: point.latitude,
+                        }
+                        : (tapPosition, point) async => {
+                          if (!_doingAnaPt)
+                            {
+                              setState(() {
+                                _doingAnaPt = true;
+                              }),
+                              //proj4.Point ptBL72 = epsg4326.transform(epsg31370,proj4.Point(x: point.longitude, y: point.latitude))
+                              await _runAnaPt(
+                                epsg4326.transform(
+                                  epsg31370,
+                                  proj4.Point(
+                                    x: point.longitude,
+                                    y: point.latitude,
+                                  ),
+                                ),
                               ),
-                            ),
-                          ),
-                          _updatePtMarker(point),
-                          setState(() {
-                            _doingAnaPt = false;
-                          }),
-                          GoRouter.of(context).push("/anaPt"),
+                              _updatePtMarker(point),
+                              setState(() {
+                                _doingAnaPt = false;
+                              }),
+                              GoRouter.of(context).push("/anaPt"),
+                            },
                         },
-                    },
                 onPositionChanged: (position, e) async {
                   if (!e) return;
                   updateLocation();
@@ -351,37 +365,21 @@ class _MapPageState extends State<mapPage> {
                       ),
                     ),
                     MarkerLayer(
-                      markers: [
-                        Marker(
-                          width: 70.0,
-                          height: 70.0,
-                          point: _pt ?? const LatLng(0.0, 0.0),
-                          child: const Icon(Icons.location_on),
-                        ),
-                      ],
+                      markers:
+                          _drawnLayerPointsMarker() +
+                          [
+                            Marker(
+                              width: 70.0,
+                              height: 70.0,
+                              point: _pt ?? const LatLng(0.0, 0.0),
+                              child: const Icon(Icons.location_on),
+                            ),
+                          ],
                     ),
+                    PolygonLayer(polygons: _getPolygonesToDraw()),
                   ],
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    IconButton(
-                      iconSize: 40.0,
-                      color: Colors.black,
-                      onPressed: () async {
-                        if (gl.position != null) {
-                          setState(() {});
-                        }
-                      },
-                      icon: const Icon(Icons.map),
-                    ),
-                  ],
-                ),
-              ],
-            ),
+            _toolbarGuard(),
             gl.position != null
                 ? Row(
                   mainAxisAlignment: MainAxisAlignment.end,
@@ -465,6 +463,114 @@ class _MapPageState extends State<mapPage> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _toolbarGuard() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        Column(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            _toolbarExtended ? _toolbar() : Container(),
+            IconButton(
+              iconSize: 40.0,
+              color: Colors.black,
+              onPressed: () async {
+                setState(() {
+                  _toolbarExtended = !_toolbarExtended;
+                });
+              },
+              icon: const Icon(Icons.legend_toggle),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _toolbar() {
+    return Column(
+      children: [
+        IconButton(
+          iconSize: 40.0,
+          color: Colors.black,
+          onPressed: () async {
+            if (gl.position != null) {
+              setState(() {});
+            }
+          },
+          icon: const Icon(Icons.abc),
+        ),
+        IconButton(
+          iconSize: 40.0,
+          color: Colors.black,
+          onPressed: () async {
+            if (gl.position != null) {
+              setState(() {});
+            }
+          },
+          icon: const Icon(Icons.layers),
+        ),
+        _drawPolygonButton(),
+      ],
+    );
+  }
+
+  List<Polygon> _getPolygonesToDraw() {
+    List<Polygon> that = [];
+    for (var layer in drawnLayer) {
+      if (layer.numPoints > 2) {
+        that.add(
+          Polygon(
+            points: layer.vertexes,
+            color: Color.fromRGBO(41, 99, 234, 0.472),
+          ),
+        );
+      }
+    }
+    return that;
+  }
+
+  List<LatLng> _drawnLayerPoints() {
+    List<LatLng> all = [];
+    for (var layer in drawnLayer) {
+      for (var point in layer.vertexes) {
+        all.add(point);
+      }
+    }
+    return all;
+  }
+
+  List<Marker> _drawnLayerPointsMarker() {
+    List<Marker> all = [];
+    for (var layer in drawnLayer) {
+      for (var point in layer.vertexes) {
+        all.add(
+          Marker(
+            point: point,
+            child: Icon(Icons.circle, color: Colors.blueAccent),
+          ),
+        );
+      }
+    }
+    return all;
+  }
+
+  Widget _drawPolygonButton() {
+    return IconButton(
+      iconSize: 40.0,
+      color: _modeDrawPolygon ? Colors.blue : Colors.black,
+      onPressed: () async {
+        if (gl.position != null) {
+          setState(() {
+            _modeDrawPolygon = !_modeDrawPolygon;
+          });
+          gl.refreshMap(() {});
+        }
+      },
+      icon: const Icon(Icons.polyline),
     );
   }
 

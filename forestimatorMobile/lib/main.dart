@@ -86,7 +86,7 @@ class _MyApp extends State<MyApp> {
     }
   }
 
-  Future readPreference() async {
+  Future _readPreference() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
 
     final bool? aOfflineMode = prefs.getBool('offlineMode');
@@ -181,7 +181,7 @@ class _MyApp extends State<MyApp> {
     super.initState();
     // copier tout les pdf de l'asset bundle vers un fichier utilisable par la librairie flutter_pdfviewer
     _listAndCopyPdfassets();
-    readPreference();
+    _readPreference();
   }
 
   late final _router = GoRouter(
@@ -202,7 +202,7 @@ class _MyApp extends State<MyApp> {
                 path: '/',
                 pageBuilder:
                     (context, state) =>
-                        const NoTransitionPage(child: mapPage()),
+                        const NoTransitionPage(child: MapPage()),
                 routes: [
                   GoRoute(
                     path: 'anaPt',
@@ -243,7 +243,7 @@ class _MyApp extends State<MyApp> {
                                     body: Text("toto"),
                                   ),
                     );
-                  }).toList(),
+                  }),
                   ...gl.dico.getFEEess().map<GoRoute>((Ess item) {
                     return GoRoute(
                       path: item.getFicheRoute(),
@@ -262,7 +262,7 @@ class _MyApp extends State<MyApp> {
                                     ),
                                   ),
                     );
-                  }).toList(),
+                  }),
                   ...gl.dico.getAllStationFiches().map<GoRoute>((String item) {
                     //print("create go route " + item);
                     return GoRoute(
@@ -282,7 +282,7 @@ class _MyApp extends State<MyApp> {
                                     body: Text(_pathExternalStorage + item),
                                   ),
                     );
-                  }).toList(),
+                  }),
                 ],
               ),
             ],
@@ -315,7 +315,7 @@ class _MyApp extends State<MyApp> {
     if (!_initializedPersistentValues) {
       return const MaterialApp(home: CircularProgressIndicator());
     } else if (gl.firstTimeUse) {
-      return MaterialApp(
+      MaterialApp(
         home: PopupNotification(
           title: "Bienvenu",
           accept: "oui",
