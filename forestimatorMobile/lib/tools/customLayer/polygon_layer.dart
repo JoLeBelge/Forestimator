@@ -10,6 +10,7 @@ class PolygonLayer {
   double transparencyInside = 0.0;
   Color colorLine = ColorRgba8(255, 255, 255, 255);
   double transparencyLine = 0.0;
+  int selectedVertex = -1;
 
   PolygonLayer({required String name});
 
@@ -37,8 +38,28 @@ class PolygonLayer {
     polygonPoints.add(point);
   }
 
-  void removePoint(int index) {
-    polygonPoints.removeAt(index);
+  void removePoint(LatLng index) {
+    int i = 0;
+    for (var point in polygonPoints) {
+      if (index.latitude == point.latitude &&
+          index.longitude == point.longitude) {
+        break;
+      }
+      i++;
+    }
+    polygonPoints.removeAt(i);
+  }
+
+  void replacePoint(LatLng old, LatLng index) {
+    int i = 0;
+    for (var point in polygonPoints) {
+      if (old.latitude == point.latitude && old.longitude == point.longitude) {
+        break;
+      }
+      i++;
+    }
+    polygonPoints.removeAt(i);
+    polygonPoints.insert(i, index);
   }
 
   Color get colorSurface => colorInside;

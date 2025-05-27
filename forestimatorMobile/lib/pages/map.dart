@@ -36,6 +36,14 @@ class _MapPageState extends State<MapPage> {
   var data;
   bool _toolbarExtended = false;
   bool _modeDrawPolygon = false;
+  bool _modeDrawPolygonAddVertexes = false;
+  bool _modeDrawPolygonRemoveVertexes = false;
+  bool _modeDrawPolygonMoveVertexes = false;
+  LatLng? _selectedPointToMove;
+  double _iconSize = 50.0;
+
+  LatLng? _oldPosition;
+  LatLng? _currentPosition;
 
   List<draw_layer.PolygonLayer> drawnLayer = [
     draw_layer.PolygonLayer(name: "defaultDrawLayer"),
@@ -238,13 +246,24 @@ class _MapPageState extends State<MapPage> {
                       InteractiveFlag.doubleTapZoom |
                       InteractiveFlag.scrollWheelZoom,
                 ),
-                onLongPress:
-                    _modeDrawPolygon
+                onPointerHover: (event, point) => {_currentPosition = point},
+                onTap:
+                    _modeDrawPolygonAddVertexes
                         ? (tapPosition, point) async => {
                           setState(() {
                             drawnLayer.first.addPoint(point);
                           }),
                         }
+                        : _modeDrawPolygonMoveVertexes
+                        ? (tapPosition, point) async => {
+                          setState(() {
+                            _stopMovingSelectedPoint();
+                          }),
+                        }
+                        : (tapPosition, point) async => {},
+                onLongPress:
+                    _modeDrawPolygon
+                        ? (tapPosition, point) async => {}
                         : (tapPosition, point) async => {
                           if (!_doingAnaPt)
                             {
@@ -271,6 +290,19 @@ class _MapPageState extends State<MapPage> {
                 onPositionChanged: (position, e) async {
                   if (!e) return;
                   updateLocation();
+                  if (_selectedPointToMove != null) {
+                    drawnLayer.first.replacePoint(
+                      _selectedPointToMove!,
+                      LatLng(
+                        position.center.latitude,
+                        position.center.longitude,
+                      ),
+                    );
+                    _selectedPointToMove = LatLng(
+                      position.center.latitude,
+                      position.center.longitude,
+                    );
+                  }
                   _writeNewPositionToMemory(
                     position.center.longitude,
                     position.center.latitude,
@@ -364,19 +396,41 @@ class _MapPageState extends State<MapPage> {
                         accuracy: 1.0,
                       ),
                     ),
+                    CircleLayer(circles: _drawnLayerPointsCircleMarker()),
+                    PolygonLayer(polygons: _getPolygonesToDraw()),
                     MarkerLayer(
-                      markers:
-                          _drawnLayerPointsMarker() +
-                          [
-                            Marker(
+                      alignment: Alignment.topLeft,
+                      markers: _drawnLayerPointsMarker(),
+                    ),
+                    MarkerLayer(
+                      markers: [
+                        !_modeDrawPolygonMoveVertexes
+                            ? Marker(
                               width: 70.0,
                               height: 70.0,
                               point: _pt ?? const LatLng(0.0, 0.0),
                               child: const Icon(Icons.location_on),
+                            )
+                            : _selectedPointToMove != null
+                            ? Marker(
+                              alignment: Alignment.topLeft,
+                              width: _iconSize / 5,
+                              height: _iconSize / 5,
+                              point: _mapController.camera.center,
+                              child: const Icon(
+                                Icons.donut_large,
+                                color: Colors.red,
+                              ),
+                            )
+                            : Marker(
+                              alignment: Alignment.topLeft,
+                              width: _iconSize / 5,
+                              height: _iconSize / 5,
+                              point: _mapController.camera.center,
+                              child: const Icon(Icons.crop, color: Colors.blue),
                             ),
-                          ],
+                      ],
                     ),
-                    PolygonLayer(polygons: _getPolygonesToDraw()),
                   ],
             ),
             _toolbarGuard(),
@@ -388,7 +442,7 @@ class _MapPageState extends State<MapPage> {
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         IconButton(
-                          iconSize: 40.0,
+                          iconSize: _iconSize,
                           color: gl.colorAgroBioTech,
                           onPressed: () async {
                             if (!_doingAnaPt) {
@@ -419,7 +473,7 @@ class _MapPageState extends State<MapPage> {
                           icon: const Icon(Icons.analytics),
                         ),
                         IconButton(
-                          iconSize: 40.0,
+                          iconSize: _iconSize,
                           color: Colors.red,
                           onPressed: () async {
                             if (gl.position != null) {
@@ -447,7 +501,7 @@ class _MapPageState extends State<MapPage> {
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         IconButton(
-                          iconSize: 40.0,
+                          iconSize: _iconSize,
                           color: Colors.black,
                           onPressed: () async {
                             if (gl.position != null) {
@@ -475,12 +529,21 @@ class _MapPageState extends State<MapPage> {
           children: [
             _toolbarExtended ? _toolbar() : Container(),
             IconButton(
-              iconSize: 40.0,
-              color: Colors.black,
+              iconSize: _iconSize,
+              color: _toolbarExtended ? gl.colorAgroBioTech : Colors.black,
               onPressed: () async {
                 setState(() {
                   _toolbarExtended = !_toolbarExtended;
                 });
+                if (_toolbarExtended == false) {
+                  _modeDrawPolygon = false;
+                  _modeDrawPolygonAddVertexes = false;
+                  _modeDrawPolygonRemoveVertexes = false;
+                  _modeDrawPolygonMoveVertexes = false;
+                  setState(() {
+                    _stopMovingSelectedPoint();
+                  });
+                }
               },
               icon: const Icon(Icons.legend_toggle),
             ),
@@ -494,7 +557,7 @@ class _MapPageState extends State<MapPage> {
     return Column(
       children: [
         IconButton(
-          iconSize: 40.0,
+          iconSize: _iconSize,
           color: Colors.black,
           onPressed: () async {
             if (gl.position != null) {
@@ -504,7 +567,7 @@ class _MapPageState extends State<MapPage> {
           icon: const Icon(Icons.abc),
         ),
         IconButton(
-          iconSize: 40.0,
+          iconSize: _iconSize,
           color: Colors.black,
           onPressed: () async {
             if (gl.position != null) {
@@ -513,7 +576,76 @@ class _MapPageState extends State<MapPage> {
           },
           icon: const Icon(Icons.layers),
         ),
+        _modeDrawPolygon ? _polygonToolbar() : Container(),
         _drawPolygonButton(),
+      ],
+    );
+  }
+
+  void _stopMovingSelectedPoint() {
+    _selectedPointToMove = null;
+  }
+
+  Widget _polygonToolbar() {
+    return Column(
+      children: [
+        IconButton(
+          iconSize: _iconSize,
+          color:
+              _modeDrawPolygonMoveVertexes ? gl.colorAgroBioTech : Colors.black,
+          onPressed: () async {
+            setState(() {
+              _modeDrawPolygonMoveVertexes = !_modeDrawPolygonMoveVertexes;
+            });
+            if (_modeDrawPolygonMoveVertexes == true) {
+              _modeDrawPolygonAddVertexes = false;
+              _modeDrawPolygonRemoveVertexes = false;
+            } else {
+              setState(() {
+                _stopMovingSelectedPoint();
+              });
+            }
+          },
+          icon: const Icon(Icons.change_circle),
+        ),
+        IconButton(
+          iconSize: _iconSize,
+          color:
+              _modeDrawPolygonRemoveVertexes
+                  ? gl.colorAgroBioTech
+                  : Colors.black,
+          onPressed: () async {
+            setState(() {
+              _modeDrawPolygonRemoveVertexes = !_modeDrawPolygonRemoveVertexes;
+            });
+            if (_modeDrawPolygonRemoveVertexes == true) {
+              _modeDrawPolygonMoveVertexes = false;
+              _modeDrawPolygonAddVertexes = false;
+              setState(() {
+                _stopMovingSelectedPoint();
+              });
+            }
+          },
+          icon: const Icon(Icons.remove),
+        ),
+        IconButton(
+          iconSize: _iconSize,
+          color:
+              _modeDrawPolygonAddVertexes ? gl.colorAgroBioTech : Colors.black,
+          onPressed: () async {
+            setState(() {
+              _modeDrawPolygonAddVertexes = !_modeDrawPolygonAddVertexes;
+            });
+            if (_modeDrawPolygonAddVertexes == true) {
+              _modeDrawPolygonRemoveVertexes = false;
+              _modeDrawPolygonMoveVertexes = false;
+              setState(() {
+                _stopMovingSelectedPoint();
+              });
+            }
+          },
+          icon: const Icon(Icons.add),
+        ),
       ],
     );
   }
@@ -543,14 +675,15 @@ class _MapPageState extends State<MapPage> {
     return all;
   }
 
-  List<Marker> _drawnLayerPointsMarker() {
-    List<Marker> all = [];
+  List<CircleMarker> _drawnLayerPointsCircleMarker() {
+    List<CircleMarker> all = [];
     for (var layer in drawnLayer) {
       for (var point in layer.vertexes) {
         all.add(
-          Marker(
+          CircleMarker(
             point: point,
-            child: Icon(Icons.circle, color: Colors.blueAccent),
+            radius: _iconSize / 3,
+            color: gl.colorAgroBioTech,
           ),
         );
       }
@@ -558,16 +691,63 @@ class _MapPageState extends State<MapPage> {
     return all;
   }
 
+  List<Marker> _drawnLayerPointsMarker() {
+    List<Marker> all = [];
+    for (var layer in drawnLayer) {
+      int count = 0;
+      for (var point in layer.vertexes) {
+        all.add(
+          Marker(
+            alignment: Alignment.center,
+            width: _iconSize,
+            height: _iconSize,
+            point: point,
+            child: TextButton(
+              onPressed: () {
+                if (_modeDrawPolygonRemoveVertexes) {
+                  setState(() {
+                    layer.removePoint(point);
+                  });
+                }
+                if (_modeDrawPolygonMoveVertexes) {
+                  setState(() {
+                    _selectedPointToMove == null
+                        ? _selectedPointToMove = point
+                        : _stopMovingSelectedPoint();
+                  });
+                }
+              },
+              child: Text(
+                overflow: TextOverflow.visible,
+                "$count",
+                maxLines: 1,
+                style: TextStyle(color: Colors.black, fontSize: _iconSize / 3),
+              ),
+            ),
+          ),
+        );
+        count++;
+      }
+    }
+    return all;
+  }
+
   Widget _drawPolygonButton() {
     return IconButton(
-      iconSize: 40.0,
-      color: _modeDrawPolygon ? Colors.blue : Colors.black,
+      iconSize: _iconSize,
+      color: _modeDrawPolygon ? gl.colorAgroBioTech : Colors.black,
       onPressed: () async {
-        if (gl.position != null) {
+        setState(() {
+          _modeDrawPolygon = !_modeDrawPolygon;
+        });
+        gl.refreshMap(() {});
+        if (_modeDrawPolygon == false) {
+          _modeDrawPolygonAddVertexes = false;
+          _modeDrawPolygonRemoveVertexes = false;
+          _modeDrawPolygonMoveVertexes = false;
           setState(() {
-            _modeDrawPolygon = !_modeDrawPolygon;
+            _stopMovingSelectedPoint();
           });
-          gl.refreshMap(() {});
         }
       },
       icon: const Icon(Icons.polyline),
