@@ -1,5 +1,5 @@
 import 'dart:async';
-
+import 'package:area_polygon/area_polygon.dart';
 import 'package:fforestimator/dico/dicoApt.dart';
 import 'package:fforestimator/tileProvider/tifTileProvider.dart';
 import 'package:fforestimator/tools/handlePermissions.dart';
@@ -40,6 +40,7 @@ class _MapPageState extends State<MapPage> {
   bool _modeDrawPolygonRemoveVertexes = false;
   bool _modeDrawPolygonMoveVertexes = false;
   LatLng? _selectedPointToMove;
+  String _selectedPolyArea = "";
   double _iconSize = 50.0;
 
   LatLng? _oldPosition;
@@ -246,7 +247,6 @@ class _MapPageState extends State<MapPage> {
                       InteractiveFlag.doubleTapZoom |
                       InteractiveFlag.scrollWheelZoom,
                 ),
-                onPointerHover: (event, point) => {_currentPosition = point},
                 onTap:
                     _modeDrawPolygonAddVertexes
                         ? (tapPosition, point) async => {
@@ -298,10 +298,15 @@ class _MapPageState extends State<MapPage> {
                         position.center.longitude,
                       ),
                     );
-                    _selectedPointToMove = LatLng(
-                      position.center.latitude,
-                      position.center.longitude,
-                    );
+
+                    _selectedPolyArea =
+                        "${(_getArea(drawnLayer.first) / 1000).round() / 100} Ha";
+                    setState(() {
+                      _selectedPointToMove = LatLng(
+                        position.center.latitude,
+                        position.center.longitude,
+                      );
+                    });
                   }
                   _writeNewPositionToMemory(
                     position.center.longitude,
@@ -396,12 +401,17 @@ class _MapPageState extends State<MapPage> {
                         accuracy: 1.0,
                       ),
                     ),
-                    CircleLayer(circles: _drawnLayerPointsCircleMarker()),
-                    PolygonLayer(polygons: _getPolygonesToDraw()),
-                    MarkerLayer(
-                      alignment: Alignment.topLeft,
-                      markers: _drawnLayerPointsMarker(),
-                    ),
+                  ] +
+                  (_modeDrawPolygon
+                      ? <Widget>[
+                        CircleLayer(circles: _drawnLayerPointsCircleMarker()),
+                        PolygonLayer(polygons: _getPolygonesToDraw()),
+                        MarkerLayer(markers: _drawnLayerPointsMarker()),
+                      ]
+                      : <Widget>[
+                        PolygonLayer(polygons: _getPolygonesToDraw()),
+                      ]) +
+                  <Widget>[
                     MarkerLayer(
                       markers: [
                         !_modeDrawPolygonMoveVertexes
@@ -414,20 +424,33 @@ class _MapPageState extends State<MapPage> {
                             : _selectedPointToMove != null
                             ? Marker(
                               alignment: Alignment.topLeft,
-                              width: _iconSize / 5,
-                              height: _iconSize / 5,
+                              width: _iconSize * 2,
+                              height: _iconSize,
                               point: _mapController.camera.center,
-                              child: const Icon(
-                                Icons.donut_large,
-                                color: Colors.red,
+                              child: Row(
+                                children: [
+                                  const Icon(
+                                    Icons.donut_large,
+                                    color: Colors.red,
+                                  ),
+                                  Text(_selectedPolyArea),
+                                ],
                               ),
                             )
                             : Marker(
                               alignment: Alignment.topLeft,
-                              width: _iconSize / 5,
-                              height: _iconSize / 5,
-                              point: _mapController.camera.center,
-                              child: const Icon(Icons.crop, color: Colors.blue),
+                              width: _iconSize * 2,
+                              height: _iconSize,
+                              point: drawnLayer.first.center,
+                              child: Row(
+                                children: [
+                                  const Icon(
+                                    Icons.area_chart,
+                                    color: Colors.blue,
+                                  ),
+                                  Text(_selectedPolyArea),
+                                ],
+                              ),
                             ),
                       ],
                     ),
@@ -551,6 +574,23 @@ class _MapPageState extends State<MapPage> {
         ),
       ],
     );
+  }
+
+  Offset _sphereToCart(proj4.Point spPoint) {
+    return Offset(
+      epsg4326.transform(epsg31370, spPoint).x,
+      epsg4326.transform(epsg31370, spPoint).y,
+    );
+  }
+
+  double _getArea(draw_layer.PolygonLayer pl) {
+    List<Offset> poly = [];
+    for (LatLng point in pl.polygonPoints) {
+      poly.add(
+        _sphereToCart(proj4.Point(x: point.latitude, y: point.longitude)),
+      );
+    }
+    return calculateArea(poly);
   }
 
   Widget _toolbar() {

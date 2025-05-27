@@ -38,6 +38,7 @@ dependencies:
   memory_info: ^0.0.4
   device_info_plus: ^11.4.0
   proj4dart: ^2.1.0
+  area_polygon: ^1.0.2
 
 dev_dependencies:
   flutter_test:

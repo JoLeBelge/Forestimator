@@ -9,6 +9,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.0.7"
+  area_polygon:
+    dependency: "direct main"
+    description:
+      name: area_polygon
+      sha256: ed3072f73a922b5e7cfca79f274a750123108f0ccf3510579d2eac88424ba13a
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.2"
   args:
     dependency: transitive
     description:

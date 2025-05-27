@@ -67,4 +67,27 @@ class PolygonLayer {
   UniqueKey get id => identifier;
   List<LatLng> get vertexes => polygonPoints;
   int get numPoints => polygonPoints.length;
+  LatLng get center {
+    double x = 0.0, y = 0.0;
+    for (var point in polygonPoints) {
+      x =
+          ((x - point.latitude) > 0
+                          ? (x - point.latitude)
+                          : (point.latitude - x) / 2.0) +
+                      x >
+                  point.latitude
+              ? point.latitude
+              : x;
+      y =
+          ((y - point.longitude) > 0
+                          ? (y - point.longitude)
+                          : (point.longitude - y) / 2.0) +
+                      y >
+                  point.longitude
+              ? point.longitude
+              : y;
+    }
+
+    return LatLng(x, y);
+  }
 }
