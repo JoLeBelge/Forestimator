@@ -27,7 +27,6 @@ dependencies:
   flutter_map_location_marker: ^10.1.0
   image: ^4.5.4
   #display_metrics: ^2.0.1
-
   geoimage: ^0.4.0
   shared_preferences: ^2.2.2
   pdf: ^3.10.8
@@ -41,6 +40,7 @@ dependencies:
   area_polygon: ^1.0.2
   archive: ^4.0.7
   dart_jts: ^0.3.0+1
+  flutter_colorpicker: ^1.1.0
 
 dev_dependencies:
   flutter_test:

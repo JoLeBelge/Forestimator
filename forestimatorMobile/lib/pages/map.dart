@@ -38,11 +38,24 @@ class _MapPageState extends State<MapPage> {
   bool _modeDrawPolygonAddVertexes = false;
   bool _modeDrawPolygonRemoveVertexes = false;
   bool _modeDrawPolygonMoveVertexes = false;
+
+  bool _modeLayerProperties = false;
+  bool _modeLayerPropertiesColors = false;
+  bool _modeLayerPropertiesRename = false;
   LatLng? _selectedPointToMove;
   double _iconSize = 50.0;
 
+  // create some values
+  Color pickerColor = Color(0xff443a49);
+  Color currentColor = Color(0xff443a49);
+
+  // ValueChanged<Color> callback
+  void changeColor(Color color) {
+    setState(() => pickerColor = color);
+  }
+
   List<draw_layer.PolygonLayer> drawnLayer = [
-    draw_layer.PolygonLayer(name: "defaultDrawLayer"),
+    draw_layer.PolygonLayer(polygonName: "defaultDrawLayer"),
   ];
 
   //https://github.com/fleaflet/flutter_map/blob/master/example/lib/pages/custom_crs/custom_crs.dart
@@ -421,7 +434,7 @@ class _MapPageState extends State<MapPage> {
                             : _selectedPointToMove != null
                             ? Marker(
                               alignment: Alignment.center,
-                              width: _iconSize * 2,
+                              width: _iconSize,
                               height: _iconSize,
                               point: _mapController.camera.center,
                               child: const Icon(
@@ -431,7 +444,7 @@ class _MapPageState extends State<MapPage> {
                             )
                             : Marker(
                               alignment: Alignment.center,
-                              width: _iconSize * 2,
+                              width: _iconSize,
                               height: _iconSize,
                               point: _mapController.camera.center,
                               child: const Icon(
@@ -441,14 +454,39 @@ class _MapPageState extends State<MapPage> {
                             ),
                         Marker(
                           alignment: Alignment.topLeft,
-                          width: _iconSize * 2,
+                          width:
+                              _iconSize * 2 > drawnLayer.first.name.length * 7
+                                  ? _iconSize * 2
+                                  : drawnLayer.first.name.length * 10,
                           height: _iconSize,
                           point: drawnLayer.first.center,
-                          child: Row(
-                            children: [
-                              const Icon(Icons.area_chart, color: Colors.blue),
-                              Text(
-                                "${(drawnLayer.first.area / 1000).round() / 100} Ha",
+                          child: Column(
+                            children: <Widget>[
+                              Row(
+                                children: [
+                                  Icon(
+                                    Icons.layers,
+                                    color: drawnLayer.first.colorLine,
+                                  ),
+                                  ConstrainedBox(
+                                    constraints: BoxConstraints(minWidth: 0),
+                                    child: Text(
+                                      drawnLayer.first.name,
+                                      overflow: TextOverflow.clip,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  Icon(
+                                    Icons.area_chart,
+                                    color: drawnLayer.first.colorLine,
+                                  ),
+                                  Text(
+                                    "${(drawnLayer.first.area / 1000).round() / 100} Ha",
+                                  ),
+                                ],
                               ),
                             ],
                           ),
@@ -560,13 +598,8 @@ class _MapPageState extends State<MapPage> {
                   _toolbarExtended = !_toolbarExtended;
                 });
                 if (_toolbarExtended == false) {
-                  _modeDrawPolygon = false;
-                  _modeDrawPolygonAddVertexes = false;
-                  _modeDrawPolygonRemoveVertexes = false;
-                  _modeDrawPolygonMoveVertexes = false;
-                  setState(() {
-                    _stopMovingSelectedPoint();
-                  });
+                  _closeLayerPropertiesMenu();
+                  _closePolygonDrawMenu();
                 }
               },
               icon: const Icon(Icons.legend_toggle),
@@ -588,18 +621,10 @@ class _MapPageState extends State<MapPage> {
               setState(() {});
             }
           },
-          icon: const Icon(Icons.abc),
-        ),
-        IconButton(
-          iconSize: _iconSize,
-          color: Colors.black,
-          onPressed: () async {
-            if (gl.position != null) {
-              setState(() {});
-            }
-          },
           icon: const Icon(Icons.layers),
         ),
+        _modeLayerProperties ? _layerPropertiesMenu() : Container(),
+        _layerPropertiesButton(),
         _modeDrawPolygon ? _polygonToolbar() : Container(),
         _drawPolygonButton(),
       ],
@@ -678,12 +703,7 @@ class _MapPageState extends State<MapPage> {
     List<Polygon> that = [];
     for (var layer in drawnLayer) {
       if (layer.numPoints > 2) {
-        that.add(
-          Polygon(
-            points: layer.vertexes,
-            color: Color.fromRGBO(41, 99, 234, 0.472),
-          ),
-        );
+        that.add(Polygon(points: layer.vertexes, color: layer.colorInside));
       }
     }
     return that;
@@ -697,7 +717,7 @@ class _MapPageState extends State<MapPage> {
           CircleMarker(
             point: point,
             radius: _iconSize / 3,
-            color: gl.colorAgroBioTech,
+            color: layer.colorLine,
           ),
         );
       }
@@ -755,6 +775,99 @@ class _MapPageState extends State<MapPage> {
     return all;
   }
 
+  Widget _layerPropertiesMenu() {
+    return Column(
+      children: <Widget>[
+        IconButton(
+          iconSize: _iconSize,
+          color:
+              _modeLayerPropertiesColors ? gl.colorAgroBioTech : Colors.black,
+          onPressed: () {
+            setState(() {
+              _modeLayerPropertiesColors = !_modeLayerPropertiesColors;
+              if (_modeLayerPropertiesColors) {
+                _modeLayerPropertiesRename = false;
+              }
+            });
+            PopupNameIntroducer(
+              gl.notificationContext!,
+              drawnLayer.first.name,
+              (String nameIt) {
+                setState(() => drawnLayer.first.name = nameIt);
+              },
+              () {
+                setState(() {
+                  _modeLayerPropertiesColors = false;
+                  if (_modeLayerPropertiesColors) {
+                    _modeLayerPropertiesRename = false;
+                  }
+                });
+              },
+            );
+          },
+          icon: Icon(Icons.abc, size: _iconSize),
+        ),
+        IconButton(
+          iconSize: _iconSize,
+          color:
+              _modeLayerPropertiesRename ? gl.colorAgroBioTech : Colors.black,
+          onPressed: () {
+            setState(() {
+              _modeLayerPropertiesRename = !_modeLayerPropertiesRename;
+              if (_modeLayerPropertiesRename) {
+                _modeLayerPropertiesColors = false;
+              }
+            });
+            PopupColorChooser(
+              drawnLayer.first.colorInside,
+              gl.notificationContext!,
+              (Color col) {
+                setState(() {
+                  drawnLayer.first.setColorInside(col);
+                  drawnLayer.first.setColorLine(
+                    Color.fromRGBO(
+                      (col.r * 255).round(),
+                      (col.g * 255).round(),
+                      (col.b * 255).round(),
+                      0.8,
+                    ),
+                  );
+                });
+              },
+              () {
+                setState(() {
+                  _modeLayerPropertiesRename = false;
+                  if (_modeLayerPropertiesRename) {
+                    _modeLayerPropertiesColors = false;
+                  }
+                });
+              },
+            );
+          },
+          icon: Icon(Icons.color_lens, size: _iconSize),
+        ),
+      ],
+    );
+  }
+
+  void _closePolygonDrawMenu() {
+    setState(() {
+      _modeDrawPolygon = false;
+      _modeDrawPolygonAddVertexes = false;
+      _modeDrawPolygonRemoveVertexes = false;
+      _modeDrawPolygonMoveVertexes = false;
+      _stopMovingSelectedPoint();
+    });
+  }
+
+  void _closeLayerPropertiesMenu() {
+    setState(() {
+      _modeLayerPropertiesRename = false;
+      _modeLayerPropertiesColors = false;
+      _modeLayerProperties = false;
+    });
+  }
+
   Widget _drawPolygonButton() {
     return IconButton(
       iconSize: _iconSize,
@@ -765,15 +878,31 @@ class _MapPageState extends State<MapPage> {
         });
         gl.refreshMap(() {});
         if (_modeDrawPolygon == false) {
-          _modeDrawPolygonAddVertexes = false;
-          _modeDrawPolygonRemoveVertexes = false;
-          _modeDrawPolygonMoveVertexes = false;
-          setState(() {
-            _stopMovingSelectedPoint();
-          });
+          _closePolygonDrawMenu();
+        } else {
+          _closeLayerPropertiesMenu();
         }
       },
       icon: const Icon(Icons.polyline),
+    );
+  }
+
+  Widget _layerPropertiesButton() {
+    return IconButton(
+      iconSize: _iconSize,
+      color: _modeLayerProperties ? gl.colorAgroBioTech : Colors.black,
+      onPressed: () async {
+        setState(() {
+          _modeLayerProperties = !_modeLayerProperties;
+        });
+        gl.refreshMap(() {});
+        if (_modeLayerProperties == false) {
+          _closeLayerPropertiesMenu();
+        } else {
+          _closePolygonDrawMenu();
+        }
+      },
+      icon: const Icon(Icons.settings_display),
     );
   }
 

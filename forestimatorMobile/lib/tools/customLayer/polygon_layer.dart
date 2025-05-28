@@ -1,16 +1,15 @@
 import 'package:area_polygon/area_polygon.dart';
 import 'package:flutter/material.dart';
 import 'package:proj4dart/proj4dart.dart' as proj4;
-import 'package:image/image.dart';
 import 'package:latlong2/latlong.dart';
 
 class PolygonLayer {
   UniqueKey identifier = UniqueKey();
   String name = "";
   List<LatLng> polygonPoints = [];
-  Color colorInside = ColorRgba8(255, 255, 255, 255);
+  Color colorInside = Color.fromRGBO(255, 255, 255, 255);
   double transparencyInside = 0.0;
-  Color colorLine = ColorRgba8(255, 255, 255, 255);
+  Color colorLine = Color.fromRGBO(255, 255, 255, 255);
   double transparencyLine = 0.0;
   int selectedVertex = -1;
   double area = 0.0;
@@ -22,7 +21,9 @@ class PolygonLayer {
         '+proj=lcc +lat_1=51.16666723333333 +lat_2=49.8333339 +lat_0=90 +lon_0=4.367486666666666 +x_0=150000.013 +y_0=5400088.438 +ellps=intl +towgs84=-106.8686,52.2978,-103.7239,0.3366,-0.457,1.8422,-1.2747 +units=m +no_defs +type=crs',
       );
 
-  PolygonLayer({required String name});
+  PolygonLayer({required String polygonName}) {
+    name = polygonName;
+  }
 
   void setTransparencyLine(double value) {
     if (value >= 0.0 && value <= 1.0) {
@@ -41,7 +42,7 @@ class PolygonLayer {
   }
 
   void setColorLine(Color value) {
-    colorInside = value;
+    colorLine = value;
   }
 
   void addPoint(LatLng point) {

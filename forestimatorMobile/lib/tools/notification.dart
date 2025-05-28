@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 
 class PopupNotification extends StatelessWidget {
   final String? title;
@@ -158,6 +159,73 @@ class PopupPDFSaved {
             TextButton(
               child: Text("OK"),
               onPressed: () {
+                Navigator.of(context, rootNavigator: true).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class PopupColorChooser {
+  Color pickerColor = Color(0xff443a49);
+
+  PopupColorChooser(
+    Color currentColor,
+    BuildContext context,
+    Function(Color) colorChange,
+    Function after,
+  ) {
+    pickerColor = currentColor;
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Choisisez une couleur!"),
+          content: SingleChildScrollView(
+            child: ColorPicker(
+              pickerColor: pickerColor,
+              onColorChanged: colorChange,
+            ),
+          ),
+          actions: [
+            TextButton(
+              child: Text("OK"),
+              onPressed: () {
+                currentColor = pickerColor;
+                after();
+                Navigator.of(context, rootNavigator: true).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class PopupNameIntroducer {
+  PopupNameIntroducer(
+    BuildContext context,
+    String currentName,
+    Function(String) state,
+    Function after,
+  ) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Changez de nom"),
+          content: SingleChildScrollView(
+            child: TextFormField(initialValue: currentName, onChanged: state),
+          ),
+          actions: [
+            TextButton(
+              child: Text("Rename"),
+              onPressed: () {
+                after();
                 Navigator.of(context, rootNavigator: true).pop();
               },
             ),
