@@ -39,6 +39,8 @@ dependencies:
   device_info_plus: ^11.4.0
   proj4dart: ^2.1.0
   area_polygon: ^1.0.2
+  archive: ^4.0.7
+  dart_jts: ^0.3.0+1
 
 dev_dependencies:
   flutter_test:

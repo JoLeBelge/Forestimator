@@ -4,14 +4,14 @@ import 'package:image/image.dart';
 import 'package:geoimage/src/com/hydrologis/geoimage/core/geoinfo.dart';
 import 'package:dart_jts/dart_jts.dart';
 
-class onePixGeotifDecoder extends Decoder {
+class OnePixGeotifDecoder extends Decoder {
   TiffInfo? info;
   ExifData? exif;
   late InputBuffer _input;
   double x;
   double y;
 
-  onePixGeotifDecoder({required this.x, required this.y});
+  OnePixGeotifDecoder({required this.x, required this.y});
 
   int getVal(Uint8List bytes) {
     int aRes = 0;
@@ -24,8 +24,10 @@ class onePixGeotifDecoder extends Decoder {
     TiffImage im = info!.images[0];
     GeoInfo geoi = GeoInfo(im);
     Coordinate uv = Coordinate(0, 0);
-    geoi.worldToPixel(Coordinate(x, y),
-        uv); // determiner la position du pixel qui nous intéresse
+    geoi.worldToPixel(
+      Coordinate(x, y),
+      uv,
+    ); // determiner la position du pixel qui nous intéresse
 
     /*print("tilesY " +
         im.tilesY.toString() +

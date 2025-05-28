@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:area_polygon/area_polygon.dart';
 import 'package:fforestimator/dico/dicoApt.dart';
 import 'package:fforestimator/tileProvider/tifTileProvider.dart';
 import 'package:fforestimator/tools/handlePermissions.dart';
@@ -40,11 +39,7 @@ class _MapPageState extends State<MapPage> {
   bool _modeDrawPolygonRemoveVertexes = false;
   bool _modeDrawPolygonMoveVertexes = false;
   LatLng? _selectedPointToMove;
-  String _selectedPolyArea = "";
   double _iconSize = 50.0;
-
-  LatLng? _oldPosition;
-  LatLng? _currentPosition;
 
   List<draw_layer.PolygonLayer> drawnLayer = [
     draw_layer.PolygonLayer(name: "defaultDrawLayer"),
@@ -120,7 +115,9 @@ class _MapPageState extends State<MapPage> {
           /*FlutterLogs.logError("anaPt", "online",
               "error while waiting for forestimatorWeb answer. ${e}");*/
         }
-        gl.requestedLayers.removeWhere((element) => element.mFoundLayer == 0);
+        gl.requestedLayers.removeWhere(
+          (element) => element.mFoundLayer == false,
+        );
       } else {
         showDialog(
           context: context,
@@ -299,14 +296,14 @@ class _MapPageState extends State<MapPage> {
                       ),
                     );
 
-                    _selectedPolyArea =
-                        "${(_getArea(drawnLayer.first) / 1000).round() / 100} Ha";
                     setState(() {
                       _selectedPointToMove = LatLng(
                         position.center.latitude,
                         position.center.longitude,
                       );
                     });
+                  } else {
+                    setState(() {});
                   }
                   _writeNewPositionToMemory(
                     position.center.longitude,
@@ -423,35 +420,39 @@ class _MapPageState extends State<MapPage> {
                             )
                             : _selectedPointToMove != null
                             ? Marker(
-                              alignment: Alignment.topLeft,
+                              alignment: Alignment.center,
                               width: _iconSize * 2,
                               height: _iconSize,
                               point: _mapController.camera.center,
-                              child: Row(
-                                children: [
-                                  const Icon(
-                                    Icons.donut_large,
-                                    color: Colors.red,
-                                  ),
-                                  Text(_selectedPolyArea),
-                                ],
+                              child: const Icon(
+                                Icons.donut_large,
+                                color: Colors.red,
                               ),
                             )
                             : Marker(
-                              alignment: Alignment.topLeft,
+                              alignment: Alignment.center,
                               width: _iconSize * 2,
                               height: _iconSize,
-                              point: drawnLayer.first.center,
-                              child: Row(
-                                children: [
-                                  const Icon(
-                                    Icons.area_chart,
-                                    color: Colors.blue,
-                                  ),
-                                  Text(_selectedPolyArea),
-                                ],
+                              point: _mapController.camera.center,
+                              child: const Icon(
+                                Icons.donut_large,
+                                color: Colors.blue,
                               ),
                             ),
+                        Marker(
+                          alignment: Alignment.topLeft,
+                          width: _iconSize * 2,
+                          height: _iconSize,
+                          point: drawnLayer.first.center,
+                          child: Row(
+                            children: [
+                              const Icon(Icons.area_chart, color: Colors.blue),
+                              Text(
+                                "${(drawnLayer.first.area / 1000).round() / 100} Ha",
+                              ),
+                            ],
+                          ),
+                        ),
                       ],
                     ),
                   ],
@@ -576,23 +577,6 @@ class _MapPageState extends State<MapPage> {
     );
   }
 
-  Offset _sphereToCart(proj4.Point spPoint) {
-    return Offset(
-      epsg4326.transform(epsg31370, spPoint).x,
-      epsg4326.transform(epsg31370, spPoint).y,
-    );
-  }
-
-  double _getArea(draw_layer.PolygonLayer pl) {
-    List<Offset> poly = [];
-    for (LatLng point in pl.polygonPoints) {
-      poly.add(
-        _sphereToCart(proj4.Point(x: point.latitude, y: point.longitude)),
-      );
-    }
-    return calculateArea(poly);
-  }
-
   Widget _toolbar() {
     return Column(
       children: [
@@ -705,16 +689,6 @@ class _MapPageState extends State<MapPage> {
     return that;
   }
 
-  List<LatLng> _drawnLayerPoints() {
-    List<LatLng> all = [];
-    for (var layer in drawnLayer) {
-      for (var point in layer.vertexes) {
-        all.add(point);
-      }
-    }
-    return all;
-  }
-
   List<CircleMarker> _drawnLayerPointsCircleMarker() {
     List<CircleMarker> all = [];
     for (var layer in drawnLayer) {
@@ -751,9 +725,18 @@ class _MapPageState extends State<MapPage> {
                 }
                 if (_modeDrawPolygonMoveVertexes) {
                   setState(() {
-                    _selectedPointToMove == null
-                        ? _selectedPointToMove = point
-                        : _stopMovingSelectedPoint();
+                    if (_selectedPointToMove == null) {
+                      _selectedPointToMove = point;
+                      _mapController.move(point, gl.mapZoom);
+                    } else {
+                      if (point.latitude == _selectedPointToMove!.latitude &&
+                          point.longitude == _selectedPointToMove!.longitude) {
+                        _stopMovingSelectedPoint();
+                      } else {
+                        _selectedPointToMove = point;
+                        _mapController.move(point, gl.mapZoom);
+                      }
+                    }
                   });
                 }
               },

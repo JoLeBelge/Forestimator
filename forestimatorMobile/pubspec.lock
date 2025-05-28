@@ -2,7 +2,7 @@
 # See https://dart.dev/tools/pub/glossary#lockfile
 packages:
   archive:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: archive
       sha256: "2fde1607386ab523f7a36bb3e7edb43bd58e6edaf2ffb29d8a6d578b297fdbbd"
@@ -114,13 +114,13 @@ packages:
     source: hosted
     version: "1.2.0"
   dart_jts:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: dart_jts
-      sha256: fddf640b9369a08c0028d3dcbda5a08ea63f6d4cdb17da9822dca31cbedab516
+      sha256: f9cb8b359346f453b5bfa2186fcd7fb8a7e6fbc7e076cba46898b44edd6fd8c7
       url: "https://pub.dev"
     source: hosted
-    version: "0.2.6"
+    version: "0.3.0+1"
   dartx:
     dependency: transitive
     description:
@@ -268,10 +268,10 @@ packages:
     dependency: "direct main"
     description:
       name: geoimage
-      sha256: aa1de97b5c74bc98df1a8ca26ac2ebc6f76c6e4694d0b69dfd0096e670b93b72
+      sha256: "65a3a819c93567f555b23106ac41a346f5fe1c211973ac4ed3f11b72071f7177"
       url: "https://pub.dev"
     source: hosted
-    version: "0.4.0"
+    version: "0.4.1+3"
   geolocator:
     dependency: "direct main"
     description:

@@ -1,4 +1,6 @@
+import 'package:area_polygon/area_polygon.dart';
 import 'package:flutter/material.dart';
+import 'package:proj4dart/proj4dart.dart' as proj4;
 import 'package:image/image.dart';
 import 'package:latlong2/latlong.dart';
 
@@ -11,6 +13,14 @@ class PolygonLayer {
   Color colorLine = ColorRgba8(255, 255, 255, 255);
   double transparencyLine = 0.0;
   int selectedVertex = -1;
+  double area = 0.0;
+  late proj4.Projection epsg4326 = proj4.Projection.get('EPSG:4326')!;
+  proj4.Projection epsg31370 =
+      proj4.Projection.get('EPSG:31370') ??
+      proj4.Projection.add(
+        'EPSG:31370',
+        '+proj=lcc +lat_1=51.16666723333333 +lat_2=49.8333339 +lat_0=90 +lon_0=4.367486666666666 +x_0=150000.013 +y_0=5400088.438 +ellps=intl +towgs84=-106.8686,52.2978,-103.7239,0.3366,-0.457,1.8422,-1.2747 +units=m +no_defs +type=crs',
+      );
 
   PolygonLayer({required String name});
 
@@ -36,6 +46,7 @@ class PolygonLayer {
 
   void addPoint(LatLng point) {
     polygonPoints.add(point);
+    _computeArea();
   }
 
   void removePoint(LatLng index) {
@@ -48,6 +59,7 @@ class PolygonLayer {
       i++;
     }
     polygonPoints.removeAt(i);
+    _computeArea();
   }
 
   void replacePoint(LatLng old, LatLng index) {
@@ -60,6 +72,7 @@ class PolygonLayer {
     }
     polygonPoints.removeAt(i);
     polygonPoints.insert(i, index);
+    _computeArea();
   }
 
   Color get colorSurface => colorInside;
@@ -69,25 +82,33 @@ class PolygonLayer {
   int get numPoints => polygonPoints.length;
   LatLng get center {
     double x = 0.0, y = 0.0;
+    int i = 0;
     for (var point in polygonPoints) {
-      x =
-          ((x - point.latitude) > 0
-                          ? (x - point.latitude)
-                          : (point.latitude - x) / 2.0) +
-                      x >
-                  point.latitude
-              ? point.latitude
-              : x;
-      y =
-          ((y - point.longitude) > 0
-                          ? (y - point.longitude)
-                          : (point.longitude - y) / 2.0) +
-                      y >
-                  point.longitude
-              ? point.longitude
-              : y;
+      y += point.longitude;
+      x += point.latitude;
+      i++;
     }
+    return LatLng(x / (i > 0 ? i : 1), y / (i > 0 ? i : 1));
+  }
 
-    return LatLng(x, y);
+  Offset _sphereToCart(proj4.Point spPoint) {
+    return Offset(
+      epsg4326.transform(epsg31370, spPoint).x,
+      epsg4326.transform(epsg31370, spPoint).y,
+    );
+  }
+
+  void _computeArea() {
+    if (polygonPoints.length < 2) {
+      area = 0.0;
+      return;
+    }
+    List<Offset> poly = [];
+    for (LatLng point in polygonPoints) {
+      poly.add(
+        _sphereToCart(proj4.Point(x: point.latitude, y: point.longitude)),
+      );
+    }
+    area = calculateArea(poly);
   }
 }

@@ -319,7 +319,7 @@ class layerBase {
 
   Future<int> getValXY(proj4.Point pt) async {
     final File fileIm = File("${gl.dico.docDir.path}/$mNomRaster");
-    onePixGeotifDecoder myDecoder = onePixGeotifDecoder(x: pt.x, y: pt.y);
+    OnePixGeotifDecoder myDecoder = OnePixGeotifDecoder(x: pt.x, y: pt.y);
     Uint8List bytes = await fileIm.readAsBytes();
     return myDecoder.getVal(bytes);
   }
