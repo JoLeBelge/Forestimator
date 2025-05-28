@@ -229,12 +229,12 @@ PageAnalytics::PageAnalytics(const Wt::WEnvironment& env, std::string aFileDB) :
 
     //q="SELECT COUNT(*)as nb FROM (SELECT COUNT(*)as nb FROM log  WHERE ip != '127.0.0.1' AND ip NOT LIKE '%139.165%' AND date LIKE '%2022-02%' GROUP BY ip);";
     row=1;
-    for (int y(2022);y <2025;y++){
+    for (int y(2022);y <2026;y++){
         for (int m(1);m <13;m++){
             std::string month = std::to_string(m);
             if (month.size()==1){month="0"+ month;}
 
-            int nb=session.query<int>("SELECT COUNT(*) as nb FROM (SELECT COUNT(*) as nb FROM log  WHERE ip != '127.0.0.1' AND ip NOT LIKE '%139.165%' AND date LIKE '%"+std::to_string(y)+"-"+month+"%' GROUP BY ip)");
+            int nb=session.query<int>("SELECT COUNT(*) as nb FROM (SELECT COUNT(*) as nb FROM log  WHERE ip != '127.0.0.1' AND ip NOT LIKE '%139.165%' AND date LIKE '%"+std::to_string(y)+"-"+month+"%' GROUP BY client_id)");
             table4->elementAt(row,0)->addWidget(Wt::cpp14::make_unique<Wt::WText>(month+"-"+std::to_string(y)));
             table4->elementAt(row,0)->setContentAlignment(AlignmentFlag::Right);
             table4->elementAt(row,1)->addWidget(Wt::cpp14::make_unique<Wt::WText>(std::to_string(nb)));
@@ -255,9 +255,10 @@ PageAnalytics::PageAnalytics(const Wt::WEnvironment& env, std::string aFileDB) :
     table->elementAt(0, 0)->addNew<Wt::WText>("Numéro");
     table->elementAt(0, 1)->addNew<Wt::WText>("Date");
     table->elementAt(0, 2)->addNew<Wt::WText>("IP");
-    table->elementAt(0, 3)->addNew<Wt::WText>("Client");
-    table->elementAt(0, 4)->addNew<Wt::WText>("Page");
-    table->elementAt(0, 5)->addNew<Wt::WText>("Categorie");
+    table->elementAt(0, 3)->addNew<Wt::WText>("clientID");
+    table->elementAt(0, 4)->addNew<Wt::WText>("Client");
+    table->elementAt(0, 5)->addNew<Wt::WText>("Page");
+    table->elementAt(0, 6)->addNew<Wt::WText>("Categorie");
 
     Logs logs = session.find<Log>().orderBy("datum DESC").limit(100);
     int i=1;
@@ -270,9 +271,10 @@ PageAnalytics::PageAnalytics(const Wt::WEnvironment& env, std::string aFileDB) :
             table->elementAt(i,0)->addWidget(std::make_unique<Wt::WText>(std::to_string(i)));
             table->elementAt(i,1)->addWidget(std::make_unique<Wt::WText>(ctime(&now)));
             table->elementAt(i,2)->addWidget(std::make_unique<Wt::WText>(log->ip));
-            table->elementAt(i,3)->addWidget(std::make_unique<Wt::WText>(log->client));
-            table->elementAt(i,4)->addWidget(std::make_unique<Wt::WText>(log->ipath));
-            table->elementAt(i,5)->addWidget(std::make_unique<Wt::WText>(log->getCat()));
+            table->elementAt(i,3)->addWidget(std::make_unique<Wt::WText>(std::to_string(log->client_id)));
+            table->elementAt(i,4)->addWidget(std::make_unique<Wt::WText>(log->client));
+            table->elementAt(i,5)->addWidget(std::make_unique<Wt::WText>(log->ipath));
+            table->elementAt(i,6)->addWidget(std::make_unique<Wt::WText>(log->getCat()));
             i++;
         }
 
