@@ -2,8 +2,7 @@ import 'package:fforestimator/dico/dicoApt.dart';
 import 'package:fforestimator/dico/ess.dart';
 import 'package:fforestimator/pages/anaPt/anaPtpage.dart';
 import 'package:fforestimator/pages/offlinePage/offlineView.dart';
-import 'package:fforestimator/tools/handlePermissions.dart';
-import 'package:fforestimator/tools/layerDownloader.dart';
+import 'package:fforestimator/tools/layer_downloader.dart';
 import 'package:fforestimator/tools/notification.dart';
 import 'package:flutter/material.dart';
 import 'package:fforestimator/globals.dart' as gl;
@@ -17,7 +16,7 @@ import 'dart:async';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter/services.dart';
-import 'package:fforestimator/scaffoldNavigation.dart';
+import 'package:fforestimator/scaffold_navigation.dart';
 import 'dart:convert';
 import 'package:path/path.dart' as path;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -59,6 +58,7 @@ void main() async {
 
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
   @override
   State<MyApp> createState() => _MyApp();
 }
@@ -312,15 +312,15 @@ class _MyApp extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
+    gl.notificationContext = context;
     if (!_initializedPersistentValues) {
       return const MaterialApp(home: CircularProgressIndicator());
     } else if (gl.firstTimeUse) {
-      MaterialApp(
+      return MaterialApp(
         home: PopupNotification(
           title: "Bienvenu",
           accept: "oui",
           onAccept: () async {
-            makeAllPermissionRequests();
             setState(() {
               gl.firstTimeUse = false;
             });
@@ -341,7 +341,7 @@ class _MyApp extends State<MyApp> {
             await prefs.setBool('firstTimeUse', gl.firstTimeUse);
           },
           dialog:
-              "Forestimator mobile ne collecte aucune information personnelle. Notre politique de confidentialité est consultable au https://forestimator.gembloux.ulg.ac.be/documentation/confidentialit_. Autorisez-vous l'aplication à télécharger un jeu de couches pour une utilisation hors ligne? Ces couches couvrent toutes la Région Wallonne et totalisent +- 100 Mo.",
+              "Forestimator mobile ne collecte aucune information personnelle. Notre politique de confidentialité est consultable au https://forestimator.gembloux.ulg.ac.be/documentation/confidentialit_. Autorisez-vous l'aplication à télécharger un jeu de 7 couches pour une utilisation hors ligne? Ces couches couvrent toutes la Région Wallonne et totalisent +- 100 Mo.",
         ),
       );
     }

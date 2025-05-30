@@ -1,4 +1,5 @@
-import 'package:fforestimator/dico/dicoApt.dart';
+import 'package:fforestimator/dico/dico_apt.dart';
+import 'package:fforestimator/tools/customLayer/polygon_layer.dart' as pol;
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:fforestimator/pages/anaPt/requestedLayer.dart';
@@ -7,7 +8,7 @@ import 'package:proj4dart/proj4dart.dart' as proj4;
 import 'package:latlong2/latlong.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-late dicoAptProvider dico;
+late DicoAptProvider dico;
 
 String basePathbranchB = "catalogue";
 String basePathbranchC = "offline";
@@ -18,6 +19,12 @@ BuildContext? notificationContext;
 
 bool offlineMode = false;
 bool debug = false;
+int currentPage = 0;
+
+List<pol.PolygonLayer> polygonLayers = [
+  pol.PolygonLayer(polygonName: "Terrain"),
+];
+int selectedPolygonLayer = 0;
 
 // ajouter le code le la couche à la fin de cette requete. fonctionne que pour layerbase avec mRes <= 10m sinon je considère que c'est trop volumineux
 String queryApiRastDownload =

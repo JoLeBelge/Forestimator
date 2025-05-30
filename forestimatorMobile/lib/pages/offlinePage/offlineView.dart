@@ -1,7 +1,7 @@
 import 'package:fforestimator/dico/dicoApt.dart';
 import 'package:fforestimator/pages/catalogueView/catalogueView.dart';
 import 'package:fforestimator/pages/catalogueView/layerTile.dart';
-import 'package:fforestimator/tools/layerDownloader.dart';
+import 'package:fforestimator/tools/layer_downloader.dart';
 import 'package:flutter/material.dart';
 import 'package:fforestimator/globals.dart' as gl;
 import 'package:go_router/go_router.dart';

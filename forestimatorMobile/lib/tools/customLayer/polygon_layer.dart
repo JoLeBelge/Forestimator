@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:area_polygon/area_polygon.dart';
 import 'package:flutter/material.dart';
 import 'package:proj4dart/proj4dart.dart' as proj4;
@@ -7,12 +9,13 @@ class PolygonLayer {
   UniqueKey identifier = UniqueKey();
   String name = "";
   List<LatLng> polygonPoints = [];
-  Color colorInside = Color.fromRGBO(255, 255, 255, 255);
+  Color colorInside = Color.fromRGBO(255, 128, 164, 80);
   double transparencyInside = 0.0;
-  Color colorLine = Color.fromRGBO(255, 255, 255, 255);
+  Color colorLine = Color.fromRGBO(255, 128, 164, 80);
   double transparencyLine = 0.0;
   int selectedVertex = -1;
   double area = 0.0;
+  double perimeter = 0.0;
   late proj4.Projection epsg4326 = proj4.Projection.get('EPSG:4326')!;
   proj4.Projection epsg31370 =
       proj4.Projection.get('EPSG:31370') ??
@@ -23,6 +26,23 @@ class PolygonLayer {
 
   PolygonLayer({required String polygonName}) {
     name = polygonName;
+    Random randomColor = Random();
+    setColorInside(
+      Color.fromRGBO(
+        randomColor.nextInt(256),
+        randomColor.nextInt(256),
+        randomColor.nextInt(256),
+        0.4,
+      ),
+    );
+    setColorLine(
+      Color.fromRGBO(
+        (colorInside.r * 255).round(),
+        (colorInside.g * 255).round(),
+        (colorInside.b * 255).round(),
+        1.0,
+      ),
+    );
   }
 
   void setTransparencyLine(double value) {
@@ -48,6 +68,7 @@ class PolygonLayer {
   void addPoint(LatLng point) {
     polygonPoints.add(point);
     _computeArea();
+    _computePerimeter();
   }
 
   void removePoint(LatLng index) {
@@ -61,6 +82,7 @@ class PolygonLayer {
     }
     polygonPoints.removeAt(i);
     _computeArea();
+    _computePerimeter();
   }
 
   void replacePoint(LatLng old, LatLng index) {
@@ -74,6 +96,7 @@ class PolygonLayer {
     polygonPoints.removeAt(i);
     polygonPoints.insert(i, index);
     _computeArea();
+    _computePerimeter();
   }
 
   Color get colorSurface => colorInside;
@@ -111,5 +134,24 @@ class PolygonLayer {
       );
     }
     area = calculateArea(poly);
+  }
+
+  void _computePerimeter() {
+    if (polygonPoints.length < 2) {
+      area = 0.0;
+      return;
+    }
+    List<Offset> poly = [];
+    for (LatLng point in polygonPoints) {
+      poly.add(
+        _sphereToCart(proj4.Point(x: point.latitude, y: point.longitude)),
+      );
+    }
+    perimeter = 0.0;
+    Offset currentPoint = poly.removeLast();
+    for (Offset point in poly) {
+      perimeter = perimeter + (currentPoint - point).distance;
+      currentPoint = point;
+    }
   }
 }

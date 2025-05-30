@@ -1,7 +1,7 @@
 import 'package:tuple/tuple.dart';
 
 import 'package:fforestimator/globals.dart' as gl;
-import 'package:fforestimator/dico/dicoApt.dart';
+import 'package:fforestimator/dico/dico_apt.dart';
 
 class Ess {
   late String mCode;
@@ -183,7 +183,7 @@ class Ess {
       mRisqueTopo = {},
       mRisqueCS = {};
 
-  Future<void> fillApt(dicoAptProvider dico) async {
+  Future<void> fillApt(DicoAptProvider dico) async {
     // aptitude hydro-trophique ; une matrice par zbioclimatique
     String myquery =
         "SELECT CodeNTNH,`1`,`2`,`3`,`4`,`5`,`6`,`7`,`8`,`9`,`10` FROM AptFEE WHERE CODE_ESSENCE='$mCode';";

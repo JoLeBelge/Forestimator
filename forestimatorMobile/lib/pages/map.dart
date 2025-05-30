@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:fforestimator/dico/dicoApt.dart';
-import 'package:fforestimator/tileProvider/tifTileProvider.dart';
-import 'package:fforestimator/tools/handlePermissions.dart';
+import 'package:fforestimator/tileProvider/tif_tile_provider.dart';
+import 'package:fforestimator/tools/handle_permissions.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:proj4dart/proj4dart.dart' as proj4;
@@ -18,8 +18,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fforestimator/tools/notification.dart';
 import 'dart:convert';
 import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
-import 'package:fforestimator/tools/customLayer/polygon_layer.dart'
-    as draw_layer;
 
 class MapPage extends StatefulWidget {
   const MapPage({super.key});
@@ -42,21 +40,11 @@ class _MapPageState extends State<MapPage> {
   bool _modeLayerProperties = false;
   bool _modeLayerPropertiesColors = false;
   bool _modeLayerPropertiesRename = false;
+
+  bool _modeProjectProperties = false;
+
   LatLng? _selectedPointToMove;
   double _iconSize = 50.0;
-
-  // create some values
-  Color pickerColor = Color(0xff443a49);
-  Color currentColor = Color(0xff443a49);
-
-  // ValueChanged<Color> callback
-  void changeColor(Color color) {
-    setState(() => pickerColor = color);
-  }
-
-  List<draw_layer.PolygonLayer> drawnLayer = [
-    draw_layer.PolygonLayer(polygonName: "defaultDrawLayer"),
-  ];
 
   //https://github.com/fleaflet/flutter_map/blob/master/example/lib/pages/custom_crs/custom_crs.dart
   late proj4.Projection epsg4326 = proj4.Projection.get('EPSG:4326')!;
@@ -166,7 +154,7 @@ class _MapPageState extends State<MapPage> {
     return false;
   }
 */
-  tifFileTileProvider? _provider;
+  TifFileTileProvider? _provider;
 
   @override
   void initState() {
@@ -261,7 +249,9 @@ class _MapPageState extends State<MapPage> {
                     _modeDrawPolygonAddVertexes
                         ? (tapPosition, point) async => {
                           setState(() {
-                            drawnLayer.first.addPoint(point);
+                            gl.polygonLayers[gl.selectedPolygonLayer].addPoint(
+                              point,
+                            );
                           }),
                         }
                         : _modeDrawPolygonMoveVertexes
@@ -301,7 +291,7 @@ class _MapPageState extends State<MapPage> {
                   if (!e) return;
                   updateLocation();
                   if (_selectedPointToMove != null) {
-                    drawnLayer.first.replacePoint(
+                    gl.polygonLayers[gl.selectedPolygonLayer].replacePoint(
                       _selectedPointToMove!,
                       LatLng(
                         position.center.latitude,
@@ -343,13 +333,16 @@ class _MapPageState extends State<MapPage> {
                           gl.position?.latitude ?? 0.0,
                           gl.position?.longitude ?? 0.0,
                         ),
-                        gl.mapZoom,
+                        _mapController.camera.zoom,
                       );
                     });
                     // si on refusait d'allumer le GPS, alors la carte ne s'affichait jamais, c'est pourquoi il y a le else et le code ci-dessous
                   } else {
                     setState(() {
-                      _mapController.move(gl.latlonCenter, gl.mapZoom);
+                      _mapController.move(
+                        gl.latlonCenter,
+                        _mapController.camera.zoom,
+                      );
                     });
                   }
                 },
@@ -368,7 +361,7 @@ class _MapPageState extends State<MapPage> {
                           _provider =
                               null; // normalement le garbage collector effectue le dispose pour nous.
                         }
-                        _provider = tifFileTileProvider(
+                        _provider = TifFileTileProvider(
                           refreshView: refreshView,
                           mycrs: epsg31370CRS,
                           sourceImPath: gl.dico.getRastPath(selLayer.mCode),
@@ -423,75 +416,38 @@ class _MapPageState extends State<MapPage> {
                       ]) +
                   <Widget>[
                     MarkerLayer(
-                      markers: [
-                        !_modeDrawPolygonMoveVertexes
-                            ? Marker(
-                              width: 70.0,
-                              height: 70.0,
-                              point: _pt ?? const LatLng(0.0, 0.0),
-                              child: const Icon(Icons.location_on),
-                            )
-                            : _selectedPointToMove != null
-                            ? Marker(
-                              alignment: Alignment.center,
-                              width: _iconSize,
-                              height: _iconSize,
-                              point: _mapController.camera.center,
-                              child: const Icon(
-                                Icons.donut_large,
-                                color: Colors.red,
-                              ),
-                            )
-                            : Marker(
-                              alignment: Alignment.center,
-                              width: _iconSize,
-                              height: _iconSize,
-                              point: _mapController.camera.center,
-                              child: const Icon(
-                                Icons.donut_large,
-                                color: Colors.blue,
-                              ),
-                            ),
-                        Marker(
-                          alignment: Alignment.topLeft,
-                          width:
-                              _iconSize * 2 > drawnLayer.first.name.length * 7
-                                  ? _iconSize * 2
-                                  : drawnLayer.first.name.length * 10,
-                          height: _iconSize,
-                          point: drawnLayer.first.center,
-                          child: Column(
-                            children: <Widget>[
-                              Row(
-                                children: [
-                                  Icon(
-                                    Icons.layers,
-                                    color: drawnLayer.first.colorLine,
+                      markers:
+                          [
+                            !_modeDrawPolygonMoveVertexes
+                                ? Marker(
+                                  width: 70.0,
+                                  height: 70.0,
+                                  point: _pt ?? const LatLng(0.0, 0.0),
+                                  child: const Icon(Icons.location_on),
+                                )
+                                : _selectedPointToMove != null
+                                ? Marker(
+                                  alignment: Alignment.center,
+                                  width: _iconSize,
+                                  height: _iconSize,
+                                  point: _mapController.camera.center,
+                                  child: const Icon(
+                                    Icons.donut_large,
+                                    color: Colors.red,
                                   ),
-                                  ConstrainedBox(
-                                    constraints: BoxConstraints(minWidth: 0),
-                                    child: Text(
-                                      drawnLayer.first.name,
-                                      overflow: TextOverflow.clip,
-                                    ),
+                                )
+                                : Marker(
+                                  alignment: Alignment.center,
+                                  width: _iconSize,
+                                  height: _iconSize,
+                                  point: _mapController.camera.center,
+                                  child: const Icon(
+                                    Icons.donut_large,
+                                    color: Colors.blue,
                                   ),
-                                ],
-                              ),
-                              Row(
-                                children: [
-                                  Icon(
-                                    Icons.area_chart,
-                                    color: drawnLayer.first.colorLine,
-                                  ),
-                                  Text(
-                                    "${(drawnLayer.first.area / 1000).round() / 100} Ha",
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
+                                ),
+                          ] +
+                          _getPolygonesInfos(),
                     ),
                   ],
             ),
@@ -600,9 +556,10 @@ class _MapPageState extends State<MapPage> {
                 if (_toolbarExtended == false) {
                   _closeLayerPropertiesMenu();
                   _closePolygonDrawMenu();
+                  _closeProjectMenu();
                 }
               },
-              icon: const Icon(Icons.legend_toggle),
+              icon: const Icon(Icons.square),
             ),
           ],
         ),
@@ -613,16 +570,7 @@ class _MapPageState extends State<MapPage> {
   Widget _toolbar() {
     return Column(
       children: [
-        IconButton(
-          iconSize: _iconSize,
-          color: Colors.black,
-          onPressed: () async {
-            if (gl.position != null) {
-              setState(() {});
-            }
-          },
-          icon: const Icon(Icons.layers),
-        ),
+        _layerProjectButton(),
         _modeLayerProperties ? _layerPropertiesMenu() : Container(),
         _layerPropertiesButton(),
         _modeDrawPolygon ? _polygonToolbar() : Container(),
@@ -701,7 +649,7 @@ class _MapPageState extends State<MapPage> {
 
   List<Polygon> _getPolygonesToDraw() {
     List<Polygon> that = [];
-    for (var layer in drawnLayer) {
+    for (var layer in gl.polygonLayers) {
       if (layer.numPoints > 2) {
         that.add(Polygon(points: layer.vertexes, color: layer.colorInside));
       }
@@ -711,66 +659,62 @@ class _MapPageState extends State<MapPage> {
 
   List<CircleMarker> _drawnLayerPointsCircleMarker() {
     List<CircleMarker> all = [];
-    for (var layer in drawnLayer) {
-      for (var point in layer.vertexes) {
-        all.add(
-          CircleMarker(
-            point: point,
-            radius: _iconSize / 3,
-            color: layer.colorLine,
-          ),
-        );
-      }
+    for (var point in gl.polygonLayers[gl.selectedPolygonLayer].vertexes) {
+      all.add(
+        CircleMarker(
+          point: point,
+          radius: _iconSize / 3,
+          color: gl.polygonLayers[gl.selectedPolygonLayer].colorLine,
+        ),
+      );
     }
     return all;
   }
 
   List<Marker> _drawnLayerPointsMarker() {
     List<Marker> all = [];
-    for (var layer in drawnLayer) {
-      int count = 0;
-      for (var point in layer.vertexes) {
-        all.add(
-          Marker(
-            alignment: Alignment.center,
-            width: _iconSize,
-            height: _iconSize,
-            point: point,
-            child: TextButton(
-              onPressed: () {
-                if (_modeDrawPolygonRemoveVertexes) {
-                  setState(() {
-                    layer.removePoint(point);
-                  });
-                }
-                if (_modeDrawPolygonMoveVertexes) {
-                  setState(() {
-                    if (_selectedPointToMove == null) {
-                      _selectedPointToMove = point;
-                      _mapController.move(point, gl.mapZoom);
+    int count = 0;
+    for (var point in gl.polygonLayers[gl.selectedPolygonLayer].vertexes) {
+      all.add(
+        Marker(
+          alignment: Alignment.center,
+          width: _iconSize,
+          height: _iconSize,
+          point: point,
+          child: TextButton(
+            onPressed: () {
+              if (_modeDrawPolygonRemoveVertexes) {
+                setState(() {
+                  gl.polygonLayers[gl.selectedPolygonLayer].removePoint(point);
+                });
+              }
+              if (_modeDrawPolygonMoveVertexes) {
+                setState(() {
+                  if (_selectedPointToMove == null) {
+                    _selectedPointToMove = point;
+                    _mapController.move(point, _mapController.camera.zoom);
+                  } else {
+                    if (point.latitude == _selectedPointToMove!.latitude &&
+                        point.longitude == _selectedPointToMove!.longitude) {
+                      _stopMovingSelectedPoint();
                     } else {
-                      if (point.latitude == _selectedPointToMove!.latitude &&
-                          point.longitude == _selectedPointToMove!.longitude) {
-                        _stopMovingSelectedPoint();
-                      } else {
-                        _selectedPointToMove = point;
-                        _mapController.move(point, gl.mapZoom);
-                      }
+                      _selectedPointToMove = point;
+                      _mapController.move(point, _mapController.camera.zoom);
                     }
-                  });
-                }
-              },
-              child: Text(
-                overflow: TextOverflow.visible,
-                "$count",
-                maxLines: 1,
-                style: TextStyle(color: Colors.black, fontSize: _iconSize / 3),
-              ),
+                  }
+                });
+              }
+            },
+            child: Text(
+              overflow: TextOverflow.visible,
+              "$count",
+              maxLines: 1,
+              style: TextStyle(color: Colors.black, fontSize: _iconSize / 3),
             ),
           ),
-        );
-        count++;
-      }
+        ),
+      );
+      count++;
     }
     return all;
   }
@@ -791,9 +735,11 @@ class _MapPageState extends State<MapPage> {
             });
             PopupNameIntroducer(
               gl.notificationContext!,
-              drawnLayer.first.name,
+              gl.polygonLayers[gl.selectedPolygonLayer].name,
               (String nameIt) {
-                setState(() => drawnLayer.first.name = nameIt);
+                setState(
+                  () => gl.polygonLayers[gl.selectedPolygonLayer].name = nameIt,
+                );
               },
               () {
                 setState(() {
@@ -819,12 +765,12 @@ class _MapPageState extends State<MapPage> {
               }
             });
             PopupColorChooser(
-              drawnLayer.first.colorInside,
+              gl.polygonLayers[gl.selectedPolygonLayer].colorInside,
               gl.notificationContext!,
               (Color col) {
                 setState(() {
-                  drawnLayer.first.setColorInside(col);
-                  drawnLayer.first.setColorLine(
+                  gl.polygonLayers[gl.selectedPolygonLayer].setColorInside(col);
+                  gl.polygonLayers[gl.selectedPolygonLayer].setColorLine(
                     Color.fromRGBO(
                       (col.r * 255).round(),
                       (col.g * 255).round(),
@@ -848,6 +794,12 @@ class _MapPageState extends State<MapPage> {
         ),
       ],
     );
+  }
+
+  void _closeProjectMenu() {
+    setState(() {
+      _modeProjectProperties = false;
+    });
   }
 
   void _closePolygonDrawMenu() {
@@ -881,6 +833,7 @@ class _MapPageState extends State<MapPage> {
           _closePolygonDrawMenu();
         } else {
           _closeLayerPropertiesMenu();
+          _closeProjectMenu();
         }
       },
       icon: const Icon(Icons.polyline),
@@ -900,10 +853,87 @@ class _MapPageState extends State<MapPage> {
           _closeLayerPropertiesMenu();
         } else {
           _closePolygonDrawMenu();
+          _closeProjectMenu();
         }
       },
       icon: const Icon(Icons.settings_display),
     );
+  }
+
+  Widget _layerProjectButton() {
+    return IconButton(
+      iconSize: _iconSize,
+      color: _modeProjectProperties ? gl.colorAgroBioTech : Colors.black,
+      onPressed: () async {
+        setState(() {
+          _modeProjectProperties = !_modeProjectProperties;
+        });
+        gl.refreshMap(() {});
+        if (_modeProjectProperties == false) {
+          _closeProjectMenu();
+        } else {
+          _closeLayerPropertiesMenu();
+          _closePolygonDrawMenu();
+        }
+        PopupDrawnLayerMenu(
+          gl.notificationContext!,
+          gl.polygonLayers[gl.selectedPolygonLayer].name,
+          (LatLng pos) {
+            if (pos.longitude != 0.0 && pos.latitude != 0.0) {
+              _mapController.move(pos, _mapController.camera.zoom);
+            }
+          },
+          () {
+            setState(() {
+              _modeProjectProperties = false;
+            });
+          },
+        );
+      },
+      icon: const Icon(Icons.work),
+    );
+  }
+
+  List<Marker> _getPolygonesInfos() {
+    return List.generate(gl.polygonLayers.length, (i) {
+      return Marker(
+        alignment: Alignment.center,
+        width:
+            _iconSize * 2 > gl.polygonLayers[i].name.length * 11
+                ? _iconSize * 3
+                : gl.polygonLayers[i].name.length * 11,
+        height: _iconSize * 1.5,
+        point: gl.polygonLayers[i].center,
+        child: Column(
+          children: <Widget>[
+            Row(
+              children: [
+                Icon(Icons.layers, color: gl.polygonLayers[i].colorLine),
+                ConstrainedBox(
+                  constraints: BoxConstraints(minWidth: 0),
+                  child: Text(
+                    gl.polygonLayers[i].name,
+                    overflow: TextOverflow.clip,
+                  ),
+                ),
+              ],
+            ),
+            Row(
+              children: [
+                Icon(Icons.area_chart, color: gl.polygonLayers[i].colorLine),
+                Text("${(gl.polygonLayers[i].area / 1000).round() / 100} Ha"),
+              ],
+            ),
+            Row(
+              children: [
+                Icon(Icons.crop, color: gl.polygonLayers[i].colorLine),
+                Text("${(gl.polygonLayers[i].perimeter).round() / 1000} km"),
+              ],
+            ),
+          ],
+        ),
+      );
+    });
   }
 
   void _writeNewPositionToMemory(double lon, double lat, double zoom) async {
