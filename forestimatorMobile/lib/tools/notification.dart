@@ -1,5 +1,6 @@
 import 'package:fforestimator/globals.dart' as gl;
 import 'package:fforestimator/tools/customLayer/polygon_layer.dart';
+import 'package:fforestimator/tools/handle_permissions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:latlong2/latlong.dart';
@@ -478,6 +479,158 @@ class _DrawnLayerMenu extends State<DrawnLayerMenu> {
   }
 }
 
+Widget forestimatorSettingsVersion() {
+  return Column(
+    children: [
+      Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Text(
+            "Forestimator Mobile",
+            overflow: TextOverflow.clip,
+            textAlign: TextAlign.left,
+            textScaler: TextScaler.linear(2.0),
+          ),
+        ],
+      ),
+      Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Text(
+            "version 1.0.2-13",
+            overflow: TextOverflow.clip,
+            textAlign: TextAlign.left,
+            textScaler: TextScaler.linear(1.0),
+          ),
+        ],
+      ),
+      Image.asset("assets/images/LogoForestimator.png"),
+      Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Text(
+            "Programmé et soigné par:\nJonathan Lisein et Thierry Thissen",
+            overflow: TextOverflow.clip,
+            textAlign: TextAlign.left,
+            textScaler: TextScaler.linear(1.0),
+          ),
+        ],
+      ),
+    ],
+  );
+}
+
+Widget forestimatorSettingsPermissions() {
+  return Column(
+    children: [
+      Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Text(
+            "Gestion des permissions",
+            overflow: TextOverflow.clip,
+            textAlign: TextAlign.left,
+            textScaler: TextScaler.linear(1.5),
+          ),
+        ],
+      ),
+      Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Text(
+            "GPS: ",
+            overflow: TextOverflow.clip,
+            textAlign: TextAlign.left,
+            textScaler: TextScaler.linear(1.0),
+          ),
+          Icon(
+            getLocation() ? Icons.check_circle : Icons.circle_notifications,
+            color: getLocation() ? Colors.green : Colors.red,
+          ),
+          Text(
+            getLocation() ? "Accordé." : "Pas accordé.",
+            overflow: TextOverflow.clip,
+            textAlign: TextAlign.left,
+            textScaler: TextScaler.linear(1.0),
+          ),
+        ],
+      ),
+      Row(children: [Text("")]),
+    ],
+  );
+}
+
+class Item {
+  final Widget entry;
+  final String name;
+
+  bool isExpanded = false;
+
+  Item({required this.entry, required this.name});
+}
+
+class SettingsMenu extends StatefulWidget {
+  final Function(LatLng) state;
+
+  const SettingsMenu({super.key, required this.state});
+
+  @override
+  State<StatefulWidget> createState() => _SettingsMenu();
+}
+
+class _SettingsMenu extends State<SettingsMenu> {
+  final Color active = Colors.black;
+  final Color inactive = Colors.blueGrey;
+  final List<Item> menuItems = [];
+  bool _listInitialzed = false;
+
+  @override
+  void initState() {
+    if (!_listInitialzed) {
+      menuItems.add(
+        Item(name: "About Forestimator", entry: forestimatorSettingsVersion()),
+      );
+      menuItems.add(
+        Item(name: "Permissions", entry: forestimatorSettingsPermissions()),
+      );
+    } else {
+      _listInitialzed = true;
+    }
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: SingleChildScrollView(
+        child: Container(
+          child: ExpansionPanelList(
+            expansionCallback: (int panelIndex, bool isExpanded) {
+              setState(() {
+                menuItems[panelIndex].isExpanded = isExpanded;
+              });
+            },
+            children:
+                menuItems.map<ExpansionPanel>((Item item) {
+                  return ExpansionPanel(
+                    canTapOnHeader: true,
+                    headerBuilder: (BuildContext context, bool isExpanded) {
+                      return Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [Text(item.name)],
+                      );
+                    },
+                    body: item.isExpanded ? item.entry : Container(),
+                    isExpanded: item.isExpanded,
+                  );
+                }).toList(),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class PopupDrawnLayerMenu {
   PopupDrawnLayerMenu(
     BuildContext context,
@@ -497,6 +650,38 @@ class PopupDrawnLayerMenu {
             child: DrawnLayerMenu(state: state),
           ),
 
+          actions: [
+            TextButton(
+              child: Text("Terminé!"),
+              onPressed: () {
+                after();
+                Navigator.of(context, rootNavigator: true).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class PopupSettingsMenu {
+  PopupSettingsMenu(
+    BuildContext context,
+    String currentName,
+    Function(LatLng) state,
+    Function after,
+  ) {
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Paramètres"),
+          content: SizedBox(
+            width: MediaQuery.of(context).size.width * .95,
+            child: SettingsMenu(state: state),
+          ),
           actions: [
             TextButton(
               child: Text("Terminé!"),

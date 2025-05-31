@@ -21,6 +21,9 @@ int release = 20;
 int sdkInt = 20;
 
 /* Ask permissions at start of map and if not granted ask to grant them */
+bool getLocation() => location.isGranted;
+bool getStorage() => storage.isGranted;
+bool getExtStorage() => extStorage.isGranted;
 
 void initPermissions() async {
   refreshPermissionInfos();

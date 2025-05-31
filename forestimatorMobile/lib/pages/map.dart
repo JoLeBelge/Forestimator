@@ -34,6 +34,8 @@ class _MapPageState extends State<MapPage> {
 
   static int _mapFrameCounter = 0;
 
+  bool _settingsMenu = false;
+
   bool _toolbarExtended = false;
   bool _modeDrawPolygon = false;
   bool _modeDrawPolygonAddVertexes = false;
@@ -45,6 +47,10 @@ class _MapPageState extends State<MapPage> {
   bool _modeLayerPropertiesRename = false;
 
   bool _modeProjectProperties = false;
+
+  Color _polygonMenuColor(bool choice) => choice ? Colors.orange : Colors.brown;
+  Color _polygonMenuColorTools(bool choice) =>
+      choice ? Colors.lightGreenAccent : Colors.grey;
 
   LatLng? _selectedPointToMove;
   double _iconSize = 50.0;
@@ -457,6 +463,7 @@ class _MapPageState extends State<MapPage> {
                     ),
                   ],
             ),
+            _settingsGuard(),
             _toolbarGuard(),
             gl.position != null
                 ? Row(
@@ -567,7 +574,49 @@ class _MapPageState extends State<MapPage> {
                   _closeProjectMenu();
                 }
               },
-              icon: const Icon(Icons.square),
+              icon: const Icon(Icons.forest),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _settingsGuard() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            //_toolbarExtended ? _toolbar() : Container(),
+            IconButton(
+              iconSize: _iconSize,
+              color: _settingsMenu ? gl.colorAgroBioTech : Colors.black,
+              onPressed: () async {
+                refreshView(() {
+                  _settingsMenu = !_settingsMenu;
+                  _toolbarExtended = false;
+                  _closeLayerPropertiesMenu();
+                  _closePolygonDrawMenu();
+                  _closeProjectMenu();
+                });
+                PopupSettingsMenu(
+                  gl.notificationContext!,
+                  gl.polygonLayers[gl.selectedPolygonLayer].name,
+                  (LatLng pos) {
+                    if (pos.longitude != 0.0 && pos.latitude != 0.0) {
+                      _mapController.move(pos, _mapController.camera.zoom);
+                    }
+                  },
+                  () {
+                    refreshView(() {
+                      _settingsMenu = false;
+                    });
+                  },
+                );
+              },
+              icon: const Icon(Icons.settings),
             ),
           ],
         ),
@@ -596,8 +645,7 @@ class _MapPageState extends State<MapPage> {
       children: [
         IconButton(
           iconSize: _iconSize,
-          color:
-              _modeDrawPolygonMoveVertexes ? gl.colorAgroBioTech : Colors.black,
+          color: _polygonMenuColorTools(_modeDrawPolygonMoveVertexes),
           onPressed: () async {
             refreshView(() {
               _modeDrawPolygonMoveVertexes = !_modeDrawPolygonMoveVertexes;
@@ -611,14 +659,12 @@ class _MapPageState extends State<MapPage> {
               });
             }
           },
-          icon: const Icon(Icons.change_circle),
+          icon: const Icon(Icons.swap_horizontal_circle),
         ),
         IconButton(
           iconSize: _iconSize,
-          color:
-              _modeDrawPolygonRemoveVertexes
-                  ? gl.colorAgroBioTech
-                  : Colors.black,
+          color: _polygonMenuColorTools(_modeDrawPolygonRemoveVertexes),
+
           onPressed: () async {
             refreshView(() {
               _modeDrawPolygonRemoveVertexes = !_modeDrawPolygonRemoveVertexes;
@@ -631,12 +677,11 @@ class _MapPageState extends State<MapPage> {
               });
             }
           },
-          icon: const Icon(Icons.remove),
+          icon: const Icon(Icons.remove_circle),
         ),
         IconButton(
           iconSize: _iconSize,
-          color:
-              _modeDrawPolygonAddVertexes ? gl.colorAgroBioTech : Colors.black,
+          color: _polygonMenuColorTools(_modeDrawPolygonAddVertexes),
           onPressed: () async {
             refreshView(() {
               _modeDrawPolygonAddVertexes = !_modeDrawPolygonAddVertexes;
@@ -649,7 +694,7 @@ class _MapPageState extends State<MapPage> {
               });
             }
           },
-          icon: const Icon(Icons.add),
+          icon: const Icon(Icons.add_circle),
         ),
       ],
     );
@@ -746,8 +791,7 @@ class _MapPageState extends State<MapPage> {
       children: <Widget>[
         IconButton(
           iconSize: _iconSize,
-          color:
-              _modeLayerPropertiesColors ? gl.colorAgroBioTech : Colors.black,
+          color: _polygonMenuColorTools(_modeLayerPropertiesColors),
           onPressed: () {
             refreshView(() {
               _modeLayerPropertiesColors = !_modeLayerPropertiesColors;
@@ -773,12 +817,11 @@ class _MapPageState extends State<MapPage> {
               },
             );
           },
-          icon: Icon(Icons.abc, size: _iconSize),
+          icon: Icon(Icons.text_fields, size: _iconSize),
         ),
         IconButton(
           iconSize: _iconSize,
-          color:
-              _modeLayerPropertiesRename ? gl.colorAgroBioTech : Colors.black,
+          color: _polygonMenuColorTools(_modeLayerPropertiesRename),
           onPressed: () {
             refreshView(() {
               _modeLayerPropertiesRename = !_modeLayerPropertiesRename;
@@ -845,7 +888,7 @@ class _MapPageState extends State<MapPage> {
   Widget _drawPolygonButton() {
     return IconButton(
       iconSize: _iconSize,
-      color: _modeDrawPolygon ? gl.colorAgroBioTech : Colors.black,
+      color: _polygonMenuColor(_modeDrawPolygon),
       onPressed: () async {
         refreshView(() {
           _modeDrawPolygon = !_modeDrawPolygon;
@@ -865,7 +908,7 @@ class _MapPageState extends State<MapPage> {
   Widget _layerPropertiesButton() {
     return IconButton(
       iconSize: _iconSize,
-      color: _modeLayerProperties ? gl.colorAgroBioTech : Colors.black,
+      color: _polygonMenuColor(_modeLayerProperties),
       onPressed: () async {
         refreshView(() {
           _modeLayerProperties = !_modeLayerProperties;
@@ -885,7 +928,7 @@ class _MapPageState extends State<MapPage> {
   Widget _layerProjectButton() {
     return IconButton(
       iconSize: _iconSize,
-      color: _modeProjectProperties ? gl.colorAgroBioTech : Colors.black,
+      color: _polygonMenuColor(_modeProjectProperties),
       onPressed: () async {
         refreshView(() {
           _modeProjectProperties = !_modeProjectProperties;
@@ -912,7 +955,7 @@ class _MapPageState extends State<MapPage> {
           },
         );
       },
-      icon: const Icon(Icons.work),
+      icon: const Icon(Icons.layers),
     );
   }
 

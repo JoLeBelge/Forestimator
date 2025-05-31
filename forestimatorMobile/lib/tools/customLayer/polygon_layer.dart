@@ -181,18 +181,6 @@ class PolygonLayer {
     return i;
   }
 
-  LatLng _nextPoint(LatLng point) {
-    int index = pointIndex(point);
-    if (index < polygonPoints.length) {
-      if (index == polygonPoints.length - 1) {
-        return polygonPoints[0];
-      } else {
-        return polygonPoints[index + 1];
-      }
-    }
-    return polygonPoints[index];
-  }
-
   Offset _sphereToCart(proj4.Point spPoint) {
     return Offset(
       epsg4326.transform(epsg31370, spPoint).x,
