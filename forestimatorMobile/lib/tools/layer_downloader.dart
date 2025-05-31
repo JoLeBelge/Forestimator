@@ -2,7 +2,7 @@ import 'dart:io';
 import 'dart:isolate';
 import 'dart:ui';
 import 'package:downloadsfolder/downloadsfolder.dart';
-import 'package:fforestimator/pages/catalogueView/layerTile.dart';
+import 'package:fforestimator/pages/catalogueView/layer_tile.dart';
 import 'package:fforestimator/tools/handle_permissions.dart';
 import 'package:fforestimator/tools/notification.dart';
 import 'package:flutter/material.dart';

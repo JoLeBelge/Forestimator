@@ -1,12 +1,12 @@
+import 'package:downloadsfolder/downloadsfolder.dart';
 import 'package:sqflite/sqflite.dart';
-import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:fforestimator/dico/ess.dart';
 import 'dart:async';
 import 'package:fforestimator/globals.dart' as gl;
-import 'package:fforestimator/pages/anaPt/onePixGeotifDecoder.dart';
+import 'package:fforestimator/pages/anaPt/one_pix_geotif_decoder.dart';
 import 'package:proj4dart/proj4dart.dart' as proj4;
 
 class Aptitude {
@@ -50,7 +50,7 @@ class Vulnerabilite {
   //mCategorie = map['categorie'];
 }
 
-class station {
+class Station {
   late int mStationId;
   late int mZbio;
   late String mNomStationCarto;
@@ -58,7 +58,7 @@ class station {
   late bool mVarMaj;
   late String mVar;
 
-  station.fromMap(final Map<String, dynamic> map)
+  Station.fromMap(final Map<String, dynamic> map)
     : mStationId = map['stat_id'],
       mZbio = map['ZBIO'],
       mNomStationCarto = map['Station_carto'],
@@ -67,29 +67,29 @@ class station {
       mVar = map['var'] ?? '';
 }
 
-class zbio {
+class Zbio {
   late int mCode;
   String? mNom;
-  String? mCS_lay;
+  String? mCSLay;
   int? mCSid;
-  zbio.fromMap(final Map<String, dynamic> map)
+  Zbio.fromMap(final Map<String, dynamic> map)
     : mCode = map['Zbio'],
       mNom = map['Nom'],
-      mCS_lay = map['CS_lay'],
+      mCSLay = map['CS_lay'],
       mCSid = map['CSid'];
 }
 
-class groupe_couche {
+class GroupeCouche {
   late String mCode;
   late String mLabel;
   late bool mExpert;
-  groupe_couche.fromMap(final Map<String, dynamic> map)
+  GroupeCouche.fromMap(final Map<String, dynamic> map)
     : mCode = map['code'],
       mLabel = map['label'],
       mExpert = map['expert'] == 0 ? false : true;
 }
 
-class layerBase {
+class LayerBase {
   late String mNom, mNomCourt, mNomRaster;
   late bool mExpert, mVisu, mOffline, mInDownload, mIsDownloadableRW;
   late String mCode;
@@ -102,7 +102,7 @@ class layerBase {
   late String mLogoAttributionFile;
   late int mPdfPage;
   late double mRes;
-  String? nom_field_raster, nom_field_value, nom_dico, condition;
+  String? nomFieldRaster, nomFieldValue, nomDico, condition;
   Map<int, String> mDicoVal; // valeur raster vers signification
   Map<int, Color> mDicoCol; // valeur raster vers couleur
   late bool mUsedForAnalysis;
@@ -111,7 +111,7 @@ class layerBase {
 
   // frommap avec liste d'instanciation, inspiré de https://medium.com/@lumeilin/using-sqlite-in-flutter-59b27b099123
   // named constructor
-  layerBase.fromMap(final Map<String, dynamic> map)
+  LayerBase.fromMap(final Map<String, dynamic> map)
     : mNom = map['NomComplet'],
       mCode = map['Code'],
       mNomCourt = map['NomCourt'],
@@ -124,9 +124,9 @@ class layerBase {
       mWMSattribution = map['WMSattribution'] ?? "",
       mTypeGeoservice = map['typeGeoservice'] ?? "",
       mCategorie = map['Categorie'],
-      nom_field_raster = map['nom_field_raster'],
-      nom_field_value = map['nom_field_value'],
-      nom_dico = map['nom_dico'],
+      nomFieldRaster = map['nom_field_raster'],
+      nomFieldValue = map['nom_field_value'],
+      nomDico = map['nom_dico'],
       condition = map['condition'],
       mTypeVar = map['TypeVar'],
       mGain =
@@ -182,7 +182,7 @@ class layerBase {
     return aRes;
   }
 
-  layerBase()
+  LayerBase()
     : mNom = '',
       mCode = 'toto',
       mNomCourt = '',
@@ -192,9 +192,9 @@ class layerBase {
       mWMSLayerName = '',
       mWMSattribution = '',
       mCategorie = '',
-      nom_field_raster = '',
-      nom_field_value = '',
-      nom_dico = '',
+      nomFieldRaster = '',
+      nomFieldValue = '',
+      nomDico = '',
       condition = '',
       mTypeVar = '',
       mGain = 0,
@@ -214,7 +214,7 @@ class layerBase {
     if (mCode == "CS_A") {
       return gl.dico.getStationPdf(us);
     } else {
-      return "documentation/" + mCode;
+      return "documentation/$mCode";
     }
   }
 
@@ -259,9 +259,9 @@ class layerBase {
   }
 
   Future<void> fillLayerDico(DicoAptProvider dico) async {
-    if (mCategorie != 'Externe' && nom_dico != null) {
+    if (mCategorie != 'Externe' && nomDico != null) {
       String myquery =
-          'SELECT $nom_field_raster as rast, $nom_field_value as val, "col" FROM $nom_dico';
+          'SELECT $nomFieldRaster as rast, $nomFieldValue as val, "col" FROM $nomDico';
       if (condition != null) {
         myquery += ' WHERE $condition';
       }
@@ -308,7 +308,7 @@ class layerBase {
   @override
   String toString() {
     String res =
-        "layerbase code ${mCode}, name ${mNom}, dicoVal size ${mDicoVal.length} dicoCol size ${mDicoCol.length}";
+        "layerbase code $mCode, name $mNom, dicoVal size ${mDicoVal.length} dicoCol size ${mDicoCol.length}";
     return res;
   }
 
@@ -329,17 +329,17 @@ class DicoAptProvider {
   bool finishedLoading = false;
   late Database db;
   Map<String, Color> colors = {};
-  Map<String, layerBase> mLayerBases = {};
+  Map<String, LayerBase> mLayerBases = {};
   Map<String, Ess> mEssences = {};
   List<Aptitude> mAptitudes = [];
   List<Vulnerabilite> mVulnerabilite =
       []; // carte recommandation CS = carte de vulnerabilite
   List<Risque> mRisques =
       []; // attention, risque Topo FEE, pas risque Climatique CS
-  List<zbio> mZbio = [];
-  List<groupe_couche> mGrCouches = [];
-  List<station> mStations = [];
-  Map<int, String> dico_code2NTNH = {};
+  List<Zbio> mZbio = [];
+  List<GroupeCouche> mGrCouches = [];
+  List<Station> mStations = [];
+  Map<int, String> dicoCode2NTNH = {};
   late Directory docDir;
 
   Future<String> init() async {
@@ -391,12 +391,12 @@ class DicoAptProvider {
     // lecture des layerbase
     result = await db.query('fichiersGIS', where: 'groupe IS NOT NULL');
     for (var row in result) {
-      mLayerBases[row['Code']] = layerBase.fromMap(row);
+      mLayerBases[row['Code']] = LayerBase.fromMap(row);
     }
 
     result = await db.query('layerApt');
     for (var row in result) {
-      mLayerBases[row['Code']] = layerBase.fromMap(row);
+      mLayerBases[row['Code']] = LayerBase.fromMap(row);
     }
     for (String code in mLayerBases.keys) {
       await mLayerBases[code]?.fillLayerDico(this);
@@ -412,7 +412,7 @@ class DicoAptProvider {
     }
     result = await db.query('dico_zbio');
     for (var row in result) {
-      mZbio.add(zbio.fromMap(row));
+      mZbio.add(Zbio.fromMap(row));
     }
     result = await db.query('dico_recommandation');
     for (var row in result) {
@@ -420,15 +420,15 @@ class DicoAptProvider {
     }
     result = await db.rawQuery('SELECT ID,concat2 FROM dico_NTNH;');
     for (var row in result) {
-      dico_code2NTNH[row['ID']] = row['concat2'];
+      dicoCode2NTNH[row['ID']] = row['concat2'];
     }
     result = await db.query('groupe_couche');
     for (var row in result) {
-      mGrCouches.add(groupe_couche.fromMap(row));
+      mGrCouches.add(GroupeCouche.fromMap(row));
     }
     result = await db.query('dico_station', where: 'stat_id=stat_num');
     for (var row in result) {
-      mStations.add(station.fromMap(row));
+      mStations.add(Station.fromMap(row));
     }
 
     // lecture des essences
@@ -443,18 +443,14 @@ class DicoAptProvider {
     checkLayerBaseOfflineRessource();
     checkLayerBaseForAnalysis();
 
-    return "1" +
-        path +
-        exists.toString() +
-        result.first.toString() +
-        colors.length.toString();
+    return "1$path$exists${result.first}${colors.length}";
   }
 
   Ess getEss(String aCode) {
     if (mEssences.containsKey(aCode)) {
       return mEssences[aCode]!;
     } else {
-      throw "oops no essences " + aCode;
+      throw "oops no essences $aCode";
     }
   }
 
@@ -462,29 +458,29 @@ class DicoAptProvider {
     return mEssences.values.where((i) => i.hasFEEapt()).toList();
   }
 
-  List<layerBase> getLayersWithDoc() {
+  List<LayerBase> getLayersWithDoc() {
     return mLayerBases.values.where((i) => i.mPdfName != "").toList();
   }
 
-  List<layerBase> getLayersOffline() {
-    List<layerBase> that = mLayerBases.values.where((i) => i.mOffline).toList();
+  List<LayerBase> getLayersOffline() {
+    List<LayerBase> that = mLayerBases.values.where((i) => i.mOffline).toList();
     if (that.isEmpty) {
-      return [layerBase()..mCode = gl.defaultLayer];
+      return [LayerBase()..mCode = gl.defaultLayer];
     }
     return that;
   }
 
-  layerBase getLayerBase(String aCode) {
+  LayerBase getLayerBase(String aCode) {
     if (mLayerBases.containsKey(aCode)) {
       return mLayerBases[aCode]!;
     } else {
-      print("oops no layerBase " + aCode);
-      return layerBase();
+      print("oops no layerBase $aCode");
+      return LayerBase();
       //throw "oops no layerBase " + aCode;
     }
   }
 
-  int Apt(String codeAptStr) {
+  int apt(String codeAptStr) {
     int aRes = 777;
     for (Aptitude apt in mAptitudes) {
       if (apt.mCode == codeAptStr) {
@@ -494,7 +490,7 @@ class DicoAptProvider {
     return aRes;
   }
 
-  String AptLabel(int codeApt) {
+  String aptLabel(int codeApt) {
     String aRes = "";
     for (Aptitude apt in mAptitudes) {
       if (apt.mCodeNum == codeApt) {
@@ -506,7 +502,7 @@ class DicoAptProvider {
 
   String code2NTNH(int aCode) {
     String aRes = "ND";
-    dico_code2NTNH.forEach((k, v) {
+    dicoCode2NTNH.forEach((k, v) {
       if (k == aCode) {
         aRes = v;
       }
@@ -546,7 +542,7 @@ class DicoAptProvider {
     return aRes;
   }
 
-  int AptSurcote(int aCode) {
+  int aptSurcote(int aCode) {
     int aRes = aCode;
     for (Aptitude apt in mAptitudes) {
       if (apt.mCodeNum == aCode) {
@@ -568,7 +564,7 @@ class DicoAptProvider {
     return aRes;
   }
 
-  int AptContraignante(int aCode) {
+  int aptContraignante(int aCode) {
     int aRes = 0;
     for (Aptitude apt in mAptitudes) {
       if (apt.mCodeNum == aCode) {
@@ -579,7 +575,7 @@ class DicoAptProvider {
     return aRes;
   }
 
-  int AptNonContraignante(int aCode) {
+  int aptNonContraignante(int aCode) {
     int aRes = 0;
     for (Aptitude apt in mAptitudes) {
       if (apt.mCodeNum == aCode) {
@@ -592,7 +588,7 @@ class DicoAptProvider {
 
   int zbio2CSid(int aCode) {
     int aRes = 0;
-    for (zbio z in mZbio) {
+    for (Zbio z in mZbio) {
       if (z.mCode == aCode) {
         aRes = z.mCSid!;
         break;
@@ -601,11 +597,11 @@ class DicoAptProvider {
     return aRes;
   }
 
-  String getStationMaj(int zbio, int US) {
+  String getStationMaj(int zBio, int us) {
     String aRes = "";
-    int zbioKey = zbio2CSid(zbio);
-    for (station st in mStations) {
-      if (st.mZbio == zbioKey && st.mStationId == US && st.mVarMaj) {
+    int zbioKey = zbio2CSid(zBio);
+    for (Station st in mStations) {
+      if (st.mZbio == zbioKey && st.mStationId == us && st.mVarMaj) {
         aRes = st.mVar;
         break;
       }
@@ -615,7 +611,7 @@ class DicoAptProvider {
 
   List<String> getAllStationFiches() {
     // en l'état, uniquement fonctionnel pour l'Ardenne
-    List<station> that =
+    List<Station> that =
         mStations.where((i) => i.mVarMaj & (i.mZbio == 1)).toList();
     List<String> aRes =
         that.map((item) => getStationPdf(item.mStationId)).toList();
@@ -627,7 +623,7 @@ class DicoAptProvider {
   }
 
   Future<void> checkLayerBaseOfflineRessource() async {
-    for (layerBase l in mLayerBases.values) {
+    for (LayerBase l in mLayerBases.values) {
       File file = File(getRastPath(l.mCode));
       if (await file.exists() == true) {
         l.setHasOffline(true);
@@ -637,7 +633,7 @@ class DicoAptProvider {
   }
 
   void checkLayerBaseForAnalysis() async {
-    for (layerBase l in mLayerBases.values) {
+    for (LayerBase l in mLayerBases.values) {
       //File file = File(getRastPath(l.mCode));
       if (l.mGroupe != "APT_CS" &&
           l.mGroupe != "APT_FEE" &&
@@ -649,7 +645,7 @@ class DicoAptProvider {
   }
 
   String getRastPath(String aLayerCode) {
-    layerBase l = getLayerBase(aLayerCode);
+    LayerBase l = getLayerBase(aLayerCode);
     return "${docDir.path}/${l.mNomRaster}";
   }
 }

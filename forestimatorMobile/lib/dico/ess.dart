@@ -6,7 +6,7 @@ import 'package:fforestimator/dico/dico_apt.dart';
 class Ess {
   late String mCode;
   late String mNomFR;
-  late int mF_R;
+  late int mFR;
   late String mPrefix;
 
   // aptitude ecograme : clé chaine charactère ; c'est la combinaison ntxnh du genre "A2p5" ou "Mm4
@@ -44,25 +44,25 @@ class Ess {
     return aRes;
   }
 
-  int getAptCS(int aZbio, int US, {String aVar = ''}) {
+  int getAptCS(int aZbio, int us, {String aVar = ''}) {
     int aRes = 0;
     if (mAptCS.containsKey(aZbio)) {
-      Map<Tuple2<int, String>, int> Apt = mAptCS[aZbio]!;
+      Map<Tuple2<int, String>, int> apt = mAptCS[aZbio]!;
       // on prend par défaut la station majoritaire
-      String variante = gl.dico.getStationMaj(aZbio, US);
-      Tuple2<int, String> aUSkey = Tuple2(US, variante);
-      if (Apt.containsKey(aUSkey)) {
-        aRes = Apt[aUSkey]!;
+      String variante = gl.dico.getStationMaj(aZbio, us);
+      Tuple2<int, String> aUSkey = Tuple2(us, variante);
+      if (apt.containsKey(aUSkey)) {
+        aRes = apt[aUSkey]!;
       }
       // si l'utilisateur a renseigné une variante avec l'argument aVar:
       if (aVar != '') {
-        aUSkey = Tuple2(US, aVar);
-        if (Apt.containsKey(aUSkey)) {
-          aRes = Apt[aUSkey]!;
+        aUSkey = Tuple2(us, aVar);
+        if (apt.containsKey(aUSkey)) {
+          aRes = apt[aUSkey]!;
         }
       }
       // risque climatique
-      int aClim = getCSClim(aZbio, US, aVar: aVar);
+      int aClim = getCSClim(aZbio, us, aVar: aVar);
       // on regroupe aptitude et risque clim
       if (aRes == 4) {
         aRes = 13;
@@ -75,7 +75,7 @@ class Ess {
     return aRes;
   }
 
-  int getCSClim(int zbio, int US, {String aVar = ''}) {
+  int getCSClim(int zbio, int us, {String aVar = ''}) {
     int aRes = 9;
     if (zbio == 1) {
       zbio = 2;
@@ -83,15 +83,15 @@ class Ess {
     if (mRisqueCS.containsKey(zbio)) {
       Map<Tuple2<int, String>, int> clim = mRisqueCS[zbio]!;
       // on prend par défaut la station majoritaire
-      String variante = gl.dico.getStationMaj(zbio, US);
-      Tuple2<int, String> aUSkey = Tuple2(US, variante);
+      String variante = gl.dico.getStationMaj(zbio, us);
+      Tuple2<int, String> aUSkey = Tuple2(us, variante);
 
       if (clim.containsKey(aUSkey)) {
         aRes = clim[aUSkey]!;
       }
       // si l'utilisateur a renseigné une variante avec l'argument aVar:
       if (aVar != '') {
-        aUSkey = Tuple2(US, aVar);
+        aUSkey = Tuple2(us, aVar);
         if (clim.containsKey(aUSkey)) {
           aRes = clim[aUSkey]!;
         }
@@ -129,7 +129,7 @@ class Ess {
         // c'est sur cette aptitude que l'on applique un facteur de correction
         aZbioApt = corrigAptBioRisqueTopo(aZbioApt, aTopo, aZbio);
       }
-      if (gl.dico.AptContraignante(aRes) < gl.dico.AptContraignante(aZbioApt)) {
+      if (gl.dico.aptContraignante(aRes) < gl.dico.aptContraignante(aZbioApt)) {
         aRes = aZbioApt;
       }
     }
@@ -145,7 +145,7 @@ class Ess {
     int catRisque = gl.dico.risqueCat(risque);
     // situation favorable
     if (catRisque == 1) {
-      aRes = gl.dico.AptSurcote(aptBio);
+      aRes = gl.dico.aptSurcote(aptBio);
       return aRes;
     }
     // risque élevé et très élevé
@@ -153,7 +153,7 @@ class Ess {
       aRes = gl.dico.aptSouscote(aptBio);
     }
     // attention, pour résineux, pas de Tolérance Elargie --> exclusion
-    if (aRes == 3 && mF_R == 2) {
+    if (aRes == 3 && mFR == 2) {
       aRes = 4;
     }
     //std::cout << "Décote l'aptitude " << mDico->code2Apt(apt) << " vers " << mDico->code2Apt(aRes) << std::endl;}
@@ -176,7 +176,7 @@ class Ess {
     : mCode = map['Code_FR'],
       mNomFR = map['Ess_FR'],
       mPrefix = map['prefix'],
-      mF_R = map['FeRe'],
+      mFR = map['FeRe'],
       mEcoVal = {},
       mAptZbio = {},
       mAptCS = {},
@@ -189,12 +189,12 @@ class Ess {
         "SELECT CodeNTNH,`1`,`2`,`3`,`4`,`5`,`6`,`7`,`8`,`9`,`10` FROM AptFEE WHERE CODE_ESSENCE='$mCode';";
     List<Map<String, dynamic>> aAptEco = await dico.db.rawQuery(myquery);
     for (int zbio = 1; zbio <= 10; zbio++) {
-      Map<String, int> EcoOneZbio = {};
+      Map<String, int> ecoOneZbio = {};
       for (var r in aAptEco) {
         String apt = r[zbio.toString()];
         String codeNTNH = dico.code2NTNH(r['CodeNTNH']);
         // convertion apt code Str vers code integer
-        int codeApt = dico.Apt(apt);
+        int codeApt = dico.apt(apt);
         /*if (mCode == "CR" && zbio == 2) {
           print(r['CodeNTNH'].toString() +
               "= " +
@@ -204,9 +204,9 @@ class Ess {
               " soit code " +
               codeApt.toString());
         }*/
-        EcoOneZbio.addEntries({codeNTNH: codeApt}.entries);
+        ecoOneZbio.addEntries({codeNTNH: codeApt}.entries);
       }
-      mEcoVal[zbio] = EcoOneZbio;
+      mEcoVal[zbio] = ecoOneZbio;
     }
 
     // aptitude climatique ; une aptitude pour chacune des 10 zones climatiques
@@ -217,7 +217,7 @@ class Ess {
       for (int zbio = 1; zbio <= 10; zbio++) {
         String apt = r[zbio.toString()];
         // convertion apt code Str vers code integer
-        int codeApt = dico.Apt(apt);
+        int codeApt = dico.apt(apt);
         mAptZbio.addEntries({zbio: codeApt}.entries);
       }
     }
@@ -263,7 +263,7 @@ class Ess {
           Map<Tuple2<int, String>, int> aptCSOneZbio = {};
           for (var r in aptCS) {
             if (r[mCode.toString()] != null) {
-              int codeApt = dico.Apt(r[mCode.toString()]);
+              int codeApt = dico.apt(r[mCode.toString()]);
               String variante = "";
               r['var'] != null ? variante = r['var'] : variante = "";
               int station = r['stat_id'];
@@ -274,7 +274,9 @@ class Ess {
           }
           mAptCS[zbio] = aptCSOneZbio;
         }
-      } catch (e) {}
+      } catch (e) {
+        /*error*/
+      }
       // risque climatique CS - attention ça n'as rien à voir avec le risque de la situation topographique (FEE)
       myquery = "SELECT stat_id,$mCode,var FROM AptCSClim WHERE ZBIO=$zbio;";
       try {
@@ -294,7 +296,9 @@ class Ess {
           }
           mRisqueCS[zbio] = risqueCSOneZbio;
         }
-      } catch (e) {}
+      } catch (e) {
+        /*error*/
+      }
     }
   } // fin fillApt
 }

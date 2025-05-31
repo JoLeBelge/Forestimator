@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:fforestimator/dico/dicoApt.dart';
+import 'package:fforestimator/dico/dico_apt.dart';
 import 'package:fforestimator/tileProvider/tif_tile_provider.dart';
 import 'package:fforestimator/tools/handle_permissions.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -11,7 +11,7 @@ import 'dart:io';
 import 'package:geolocator/geolocator.dart';
 import 'package:fforestimator/globals.dart' as gl;
 import 'package:http/http.dart' as http;
-import 'package:fforestimator/pages/anaPt/requestedLayer.dart';
+import 'package:fforestimator/pages/anaPt/requested_layer.dart';
 import 'package:go_router/go_router.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -31,6 +31,9 @@ class _MapPageState extends State<MapPage> {
   LatLng? _pt;
   bool _doingAnaPt = false;
   var data;
+
+  static int _mapFrameCounter = 0;
+
   bool _toolbarExtended = false;
   bool _modeDrawPolygon = false;
   bool _modeDrawPolygonAddVertexes = false;
@@ -108,7 +111,7 @@ class _MapPageState extends State<MapPage> {
 
           // si pas de connexion internet, va tenter de lire data comme une map alors que c'est vide, erreur. donc dans le bloc try catch aussi
           for (var r in data["RequestedLayers"]) {
-            gl.requestedLayers.add(layerAnaPt.fromMap(r));
+            gl.requestedLayers.add(LayerAnaPt.fromMap(r));
           }
         } catch (e) {
           // handshake et/ou socketExeption
@@ -121,16 +124,16 @@ class _MapPageState extends State<MapPage> {
         );
       } else {
         showDialog(
-          context: context,
+          context: gl.notificationContext!,
           builder: (BuildContext context) {
             return PopupNoInternet();
           },
         );
       }
     } else {
-      for (layerBase l in gl.dico.getLayersOffline()) {
+      for (LayerBase l in gl.dico.getLayersOffline()) {
         int val = await l.getValXY(ptBL72);
-        gl.requestedLayers.add(layerAnaPt(mCode: l.mCode, mRastValue: val));
+        gl.requestedLayers.add(LayerAnaPt(mCode: l.mCode, mRastValue: val));
       }
     }
 
@@ -160,11 +163,12 @@ class _MapPageState extends State<MapPage> {
   void initState() {
     super.initState();
     initPermissions();
-    gl.refreshMap = setState;
+    gl.refreshMap = refreshView;
     initOtherValuesOnce();
   }
 
   void refreshView(void Function() f) async {
+    _mapFrameCounter++;
     setState(f);
   }
 
@@ -248,7 +252,7 @@ class _MapPageState extends State<MapPage> {
                 onTap:
                     _modeDrawPolygonAddVertexes
                         ? (tapPosition, point) async => {
-                          setState(() {
+                          refreshView(() {
                             gl.polygonLayers[gl.selectedPolygonLayer].addPoint(
                               point,
                             );
@@ -256,7 +260,7 @@ class _MapPageState extends State<MapPage> {
                         }
                         : _modeDrawPolygonMoveVertexes
                         ? (tapPosition, point) async => {
-                          setState(() {
+                          refreshView(() {
                             _stopMovingSelectedPoint();
                           }),
                         }
@@ -267,7 +271,7 @@ class _MapPageState extends State<MapPage> {
                         : (tapPosition, point) async => {
                           if (!_doingAnaPt)
                             {
-                              setState(() {
+                              refreshView(() {
                                 _doingAnaPt = true;
                               }),
                               //proj4.Point ptBL72 = epsg4326.transform(epsg31370,proj4.Point(x: point.longitude, y: point.latitude))
@@ -281,10 +285,12 @@ class _MapPageState extends State<MapPage> {
                                 ),
                               ),
                               _updatePtMarker(point),
-                              setState(() {
+                              refreshView(() {
                                 _doingAnaPt = false;
                               }),
-                              GoRouter.of(context).push("/anaPt"),
+                              GoRouter.of(
+                                gl.notificationContext!,
+                              ).push("/anaPt"),
                             },
                         },
                 onPositionChanged: (position, e) async {
@@ -299,14 +305,14 @@ class _MapPageState extends State<MapPage> {
                       ),
                     );
 
-                    setState(() {
+                    refreshView(() {
                       _selectedPointToMove = LatLng(
                         position.center.latitude,
                         position.center.longitude,
                       );
                     });
                   } else {
-                    setState(() {});
+                    refreshView(() {});
                   }
                   _writeNewPositionToMemory(
                     position.center.longitude,
@@ -320,14 +326,14 @@ class _MapPageState extends State<MapPage> {
                 minZoom:
                     2, // pour les cartes offline, il faudrait informer l'utilisateur du fait que si le zoom est trop peu élevé, la carte ne s'affiche pas
                 initialCenter: gl.latlonCenter,
-                cameraConstraint: CameraConstraint.contain(
+                cameraConstraint: CameraConstraint.containCenter(
                   bounds: LatLngBounds.fromPoints([latlonBL, latlonTR]),
                 ),
                 onMapReady: () async {
                   updateLocation();
                   if (gl.position != null) {
                     // IMPORTANT: rebuild location layer when permissions are granted
-                    setState(() {
+                    refreshView(() {
                       _mapController.move(
                         LatLng(
                           gl.position?.latitude ?? 0.0,
@@ -338,7 +344,7 @@ class _MapPageState extends State<MapPage> {
                     });
                     // si on refusait d'allumer le GPS, alors la carte ne s'affichait jamais, c'est pourquoi il y a le else et le code ci-dessous
                   } else {
-                    setState(() {
+                    refreshView(() {
                       _mapController.move(
                         gl.latlonCenter,
                         _mapController.camera.zoom,
@@ -349,7 +355,7 @@ class _MapPageState extends State<MapPage> {
               ),
               children:
                   gl.interfaceSelectedLayerKeys.reversed.map<Widget>((
-                    gl.selectedLayer selLayer,
+                    gl.SelectedLayer selLayer,
                   ) {
                     if (selLayer.offline &&
                         gl.dico.getLayerBase(selLayer.mCode).mOffline &&
@@ -381,7 +387,7 @@ class _MapPageState extends State<MapPage> {
                       // deuxième carte offline ; on ne fait rien avec, un seul provider
                       return Container();
                     } else {
-                      layerBase l = gl.dico.getLayerBase(selLayer.mCode);
+                      LayerBase l = gl.dico.getLayerBase(selLayer.mCode);
                       return TileLayer(
                         userAgentPackageName: "com.forestimator",
                         wmsOptions: WMSTileLayerOptions(
@@ -464,7 +470,7 @@ class _MapPageState extends State<MapPage> {
                           color: gl.colorAgroBioTech,
                           onPressed: () async {
                             if (!_doingAnaPt) {
-                              setState(() {
+                              refreshView(() {
                                 _doingAnaPt = true;
                               });
                               await _runAnaPt(
@@ -482,8 +488,10 @@ class _MapPageState extends State<MapPage> {
                                   gl.position?.longitude ?? 0.0,
                                 ),
                               );
-                              GoRouter.of(context).push("/anaPt");
-                              setState(() {
+                              GoRouter.of(
+                                gl.notificationContext!,
+                              ).push("/anaPt");
+                              refreshView(() {
                                 _doingAnaPt = false;
                               });
                             }
@@ -495,7 +503,7 @@ class _MapPageState extends State<MapPage> {
                           color: Colors.red,
                           onPressed: () async {
                             if (gl.position != null) {
-                              setState(() {
+                              refreshView(() {
                                 _mapController.move(
                                   LatLng(
                                     gl.position?.latitude ?? 0.0,
@@ -523,7 +531,7 @@ class _MapPageState extends State<MapPage> {
                           color: Colors.black,
                           onPressed: () async {
                             if (gl.position != null) {
-                              setState(() {});
+                              refreshView(() {});
                             }
                           },
                           icon: const Icon(Icons.gps_fixed),
@@ -550,7 +558,7 @@ class _MapPageState extends State<MapPage> {
               iconSize: _iconSize,
               color: _toolbarExtended ? gl.colorAgroBioTech : Colors.black,
               onPressed: () async {
-                setState(() {
+                refreshView(() {
                   _toolbarExtended = !_toolbarExtended;
                 });
                 if (_toolbarExtended == false) {
@@ -591,14 +599,14 @@ class _MapPageState extends State<MapPage> {
           color:
               _modeDrawPolygonMoveVertexes ? gl.colorAgroBioTech : Colors.black,
           onPressed: () async {
-            setState(() {
+            refreshView(() {
               _modeDrawPolygonMoveVertexes = !_modeDrawPolygonMoveVertexes;
             });
             if (_modeDrawPolygonMoveVertexes == true) {
               _modeDrawPolygonAddVertexes = false;
               _modeDrawPolygonRemoveVertexes = false;
             } else {
-              setState(() {
+              refreshView(() {
                 _stopMovingSelectedPoint();
               });
             }
@@ -612,13 +620,13 @@ class _MapPageState extends State<MapPage> {
                   ? gl.colorAgroBioTech
                   : Colors.black,
           onPressed: () async {
-            setState(() {
+            refreshView(() {
               _modeDrawPolygonRemoveVertexes = !_modeDrawPolygonRemoveVertexes;
             });
             if (_modeDrawPolygonRemoveVertexes == true) {
               _modeDrawPolygonMoveVertexes = false;
               _modeDrawPolygonAddVertexes = false;
-              setState(() {
+              refreshView(() {
                 _stopMovingSelectedPoint();
               });
             }
@@ -630,13 +638,13 @@ class _MapPageState extends State<MapPage> {
           color:
               _modeDrawPolygonAddVertexes ? gl.colorAgroBioTech : Colors.black,
           onPressed: () async {
-            setState(() {
+            refreshView(() {
               _modeDrawPolygonAddVertexes = !_modeDrawPolygonAddVertexes;
             });
             if (_modeDrawPolygonAddVertexes == true) {
               _modeDrawPolygonRemoveVertexes = false;
               _modeDrawPolygonMoveVertexes = false;
-              setState(() {
+              refreshView(() {
                 _stopMovingSelectedPoint();
               });
             }
@@ -659,14 +667,22 @@ class _MapPageState extends State<MapPage> {
 
   List<CircleMarker> _drawnLayerPointsCircleMarker() {
     List<CircleMarker> all = [];
+    int i = 0;
     for (var point in gl.polygonLayers[gl.selectedPolygonLayer].vertexes) {
       all.add(
         CircleMarker(
           point: point,
-          radius: _iconSize / 3,
-          color: gl.polygonLayers[gl.selectedPolygonLayer].colorLine,
+          radius:
+              gl.polygonLayers[gl.selectedPolygonLayer].isSelectedLine(i)
+                  ? _iconSize / 2.7
+                  : _iconSize / 3,
+          color:
+              gl.polygonLayers[gl.selectedPolygonLayer].isSelectedLine(i)
+                  ? gl.polygonLayers[gl.selectedPolygonLayer].colorLine
+                  : gl.polygonLayers[gl.selectedPolygonLayer].colorInside,
         ),
       );
+      i++;
     }
     return all;
   }
@@ -684,12 +700,12 @@ class _MapPageState extends State<MapPage> {
           child: TextButton(
             onPressed: () {
               if (_modeDrawPolygonRemoveVertexes) {
-                setState(() {
+                refreshView(() {
                   gl.polygonLayers[gl.selectedPolygonLayer].removePoint(point);
                 });
               }
               if (_modeDrawPolygonMoveVertexes) {
-                setState(() {
+                refreshView(() {
                   if (_selectedPointToMove == null) {
                     _selectedPointToMove = point;
                     _mapController.move(point, _mapController.camera.zoom);
@@ -702,6 +718,12 @@ class _MapPageState extends State<MapPage> {
                       _mapController.move(point, _mapController.camera.zoom);
                     }
                   }
+                });
+              }
+              if (_modeDrawPolygonAddVertexes) {
+                refreshView(() {
+                  gl.polygonLayers[gl.selectedPolygonLayer]
+                      .refreshSelectedLinePoints(point);
                 });
               }
             },
@@ -727,7 +749,7 @@ class _MapPageState extends State<MapPage> {
           color:
               _modeLayerPropertiesColors ? gl.colorAgroBioTech : Colors.black,
           onPressed: () {
-            setState(() {
+            refreshView(() {
               _modeLayerPropertiesColors = !_modeLayerPropertiesColors;
               if (_modeLayerPropertiesColors) {
                 _modeLayerPropertiesRename = false;
@@ -737,12 +759,12 @@ class _MapPageState extends State<MapPage> {
               gl.notificationContext!,
               gl.polygonLayers[gl.selectedPolygonLayer].name,
               (String nameIt) {
-                setState(
+                refreshView(
                   () => gl.polygonLayers[gl.selectedPolygonLayer].name = nameIt,
                 );
               },
               () {
-                setState(() {
+                refreshView(() {
                   _modeLayerPropertiesColors = false;
                   if (_modeLayerPropertiesColors) {
                     _modeLayerPropertiesRename = false;
@@ -758,7 +780,7 @@ class _MapPageState extends State<MapPage> {
           color:
               _modeLayerPropertiesRename ? gl.colorAgroBioTech : Colors.black,
           onPressed: () {
-            setState(() {
+            refreshView(() {
               _modeLayerPropertiesRename = !_modeLayerPropertiesRename;
               if (_modeLayerPropertiesRename) {
                 _modeLayerPropertiesColors = false;
@@ -768,7 +790,7 @@ class _MapPageState extends State<MapPage> {
               gl.polygonLayers[gl.selectedPolygonLayer].colorInside,
               gl.notificationContext!,
               (Color col) {
-                setState(() {
+                refreshView(() {
                   gl.polygonLayers[gl.selectedPolygonLayer].setColorInside(col);
                   gl.polygonLayers[gl.selectedPolygonLayer].setColorLine(
                     Color.fromRGBO(
@@ -781,7 +803,7 @@ class _MapPageState extends State<MapPage> {
                 });
               },
               () {
-                setState(() {
+                refreshView(() {
                   _modeLayerPropertiesRename = false;
                   if (_modeLayerPropertiesRename) {
                     _modeLayerPropertiesColors = false;
@@ -797,13 +819,13 @@ class _MapPageState extends State<MapPage> {
   }
 
   void _closeProjectMenu() {
-    setState(() {
+    refreshView(() {
       _modeProjectProperties = false;
     });
   }
 
   void _closePolygonDrawMenu() {
-    setState(() {
+    refreshView(() {
       _modeDrawPolygon = false;
       _modeDrawPolygonAddVertexes = false;
       _modeDrawPolygonRemoveVertexes = false;
@@ -813,7 +835,7 @@ class _MapPageState extends State<MapPage> {
   }
 
   void _closeLayerPropertiesMenu() {
-    setState(() {
+    refreshView(() {
       _modeLayerPropertiesRename = false;
       _modeLayerPropertiesColors = false;
       _modeLayerProperties = false;
@@ -825,7 +847,7 @@ class _MapPageState extends State<MapPage> {
       iconSize: _iconSize,
       color: _modeDrawPolygon ? gl.colorAgroBioTech : Colors.black,
       onPressed: () async {
-        setState(() {
+        refreshView(() {
           _modeDrawPolygon = !_modeDrawPolygon;
         });
         gl.refreshMap(() {});
@@ -845,7 +867,7 @@ class _MapPageState extends State<MapPage> {
       iconSize: _iconSize,
       color: _modeLayerProperties ? gl.colorAgroBioTech : Colors.black,
       onPressed: () async {
-        setState(() {
+        refreshView(() {
           _modeLayerProperties = !_modeLayerProperties;
         });
         gl.refreshMap(() {});
@@ -865,7 +887,7 @@ class _MapPageState extends State<MapPage> {
       iconSize: _iconSize,
       color: _modeProjectProperties ? gl.colorAgroBioTech : Colors.black,
       onPressed: () async {
-        setState(() {
+        refreshView(() {
           _modeProjectProperties = !_modeProjectProperties;
         });
         gl.refreshMap(() {});
@@ -884,7 +906,7 @@ class _MapPageState extends State<MapPage> {
             }
           },
           () {
-            setState(() {
+            refreshView(() {
               _modeProjectProperties = false;
             });
           },
@@ -899,8 +921,8 @@ class _MapPageState extends State<MapPage> {
       return Marker(
         alignment: Alignment.center,
         width:
-            _iconSize * 2 > gl.polygonLayers[i].name.length * 11
-                ? _iconSize * 3
+            _iconSize * 3 > gl.polygonLayers[i].name.length * 11
+                ? _iconSize * 4
                 : gl.polygonLayers[i].name.length * 11,
         height: _iconSize * 1.5,
         point: gl.polygonLayers[i].center,
@@ -936,15 +958,63 @@ class _MapPageState extends State<MapPage> {
     });
   }
 
+  void _writeColorToMemory(
+    String name,
+    SharedPreferences prefs,
+    Color color,
+  ) async {
+    await prefs.setInt('$name.r', (color.r * 255).round());
+    await prefs.setInt('$name.g', (color.g * 255).round());
+    await prefs.setInt('$name.b', (color.b * 255).round());
+    await prefs.setDouble('$name.a', color.a);
+  }
+
+  void _writePolygonPointsToMemory(
+    String name,
+    SharedPreferences prefs,
+    List<LatLng> polygon,
+  ) async {
+    int i = 0;
+    for (var point in polygon) {
+      await prefs.setDouble('$name.$i-lat', point.latitude);
+      await prefs.setDouble('$name.$i-lng', point.longitude);
+      i++;
+    }
+    await prefs.setInt('$name.nPolyPoints', i);
+  }
+
   void _writeNewPositionToMemory(double lon, double lat, double zoom) async {
+    if (_mapFrameCounter % 100 != 0) {
+      return;
+    }
+    print("Saving references: $lon $lat $zoom");
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setDouble('mapCenterLat', lat);
     await prefs.setDouble('mapCenterLon', lon);
     await prefs.setDouble('mapZoom', zoom);
+    int i = 0;
+    for (var polygon in gl.polygonLayers) {
+      await prefs.setString('poly$i.name', polygon.name);
+      await prefs.setDouble('poly$i.area', polygon.area);
+      await prefs.setDouble('poly$i.perimeter', polygon.perimeter);
+      await prefs.setDouble(
+        'poly$i.transparencyInside',
+        polygon.transparencyInside,
+      );
+      await prefs.setDouble(
+        'poly$i.transparencyLine',
+        polygon.transparencyLine,
+      );
+      _writeColorToMemory('poly$i.colorInside', prefs, polygon.colorInside);
+      _writeColorToMemory('poly$i.colorLine', prefs, polygon.colorLine);
+      _writePolygonPointsToMemory('poly$i.poly', prefs, polygon.polygonPoints);
+      i++;
+    }
+    await prefs.setInt('nPolys', i);
   }
 
   void _updatePtMarker(LatLng pt) {
-    setState(() {
+    refreshView(() {
       _pt = pt;
     });
   }
@@ -962,13 +1032,13 @@ class _MapPageState extends State<MapPage> {
         Duration(seconds: 3),
       );
 
-      setState(() {
+      refreshView(() {
         gl.position = newPosition;
       });
       _refreshLocation = false;
     } catch (e) {
       // We keep the old position.
-      setState(() {
+      refreshView(() {
         gl.position = gl.position;
       });
       _refreshLocation = false;

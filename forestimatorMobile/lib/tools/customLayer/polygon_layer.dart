@@ -9,6 +9,7 @@ class PolygonLayer {
   UniqueKey identifier = UniqueKey();
   String name = "";
   List<LatLng> polygonPoints = [];
+  List<int> selectedPolyLinePoints = [0, 0];
   Color colorInside = Color.fromRGBO(255, 128, 164, 80);
   double transparencyInside = 0.0;
   Color colorLine = Color.fromRGBO(255, 128, 164, 80);
@@ -65,8 +66,35 @@ class PolygonLayer {
     colorLine = value;
   }
 
+  void refreshSelectedLinePoints(LatLng? point) {
+    if (point == null) {
+      selectedPolyLinePoints = [0, 0];
+      return;
+    }
+    int index = pointIndex(point);
+    print(selectedPolyLinePoints);
+    selectedPolyLinePoints[0] = index;
+    if (polygonPoints.length == 1) {
+      selectedPolyLinePoints[1] = index;
+    } else if (polygonPoints.length - 1 == index) {
+      selectedPolyLinePoints[1] = 0;
+    } else if (polygonPoints.length - 1 > index) {
+      selectedPolyLinePoints[1] = index + 1;
+    } else {
+      print("error 1st index polygon line: $index");
+    }
+    print(selectedPolyLinePoints);
+  }
+
+  bool isSelectedLine(int i) {
+    return (i == selectedPolyLinePoints[0] || i == selectedPolyLinePoints[1])
+        ? true
+        : false;
+  }
+
   void addPoint(LatLng point) {
-    polygonPoints.add(point);
+    polygonPoints.insert(selectedPolyLinePoints[1], point);
+    refreshSelectedLinePoints(point);
     _computeArea();
     _computePerimeter();
   }
@@ -80,7 +108,33 @@ class PolygonLayer {
       }
       i++;
     }
+    int pointIsSelected = -1;
+    if (i == selectedPolyLinePoints[0] && polygonPoints.length > 2) {
+      pointIsSelected = selectedPolyLinePoints[1];
+    } else if (i == selectedPolyLinePoints[1] && polygonPoints.length > 2) {
+      pointIsSelected = selectedPolyLinePoints[0];
+    }
     polygonPoints.removeAt(i);
+    if (pointIsSelected > -1 && pointIsSelected < polygonPoints.length) {
+      refreshSelectedLinePoints(polygonPoints[pointIsSelected]);
+    } else {
+      if (polygonPoints.length == 1) {
+        refreshSelectedLinePoints(polygonPoints[0]);
+      } else if (polygonPoints.isEmpty) {
+        refreshSelectedLinePoints(null);
+      } else {
+        int selection =
+            (selectedPolyLinePoints[0] > selectedPolyLinePoints[1])
+                ? selectedPolyLinePoints[1]
+                : selectedPolyLinePoints[0];
+        refreshSelectedLinePoints(
+          polygonPoints[selection > polygonPoints.length - 1
+              ? polygonPoints.length - 1
+              : selection],
+        );
+      }
+    }
+
     _computeArea();
     _computePerimeter();
   }
@@ -113,6 +167,30 @@ class PolygonLayer {
       i++;
     }
     return LatLng(x / (i > 0 ? i : 1), y / (i > 0 ? i : 1));
+  }
+
+  int pointIndex(LatLng searchedPoint) {
+    int i = 0;
+    for (var point in polygonPoints) {
+      if (searchedPoint.latitude == point.latitude &&
+          searchedPoint.longitude == point.longitude) {
+        break;
+      }
+      i++;
+    }
+    return i;
+  }
+
+  LatLng _nextPoint(LatLng point) {
+    int index = pointIndex(point);
+    if (index < polygonPoints.length) {
+      if (index == polygonPoints.length - 1) {
+        return polygonPoints[0];
+      } else {
+        return polygonPoints[index + 1];
+      }
+    }
+    return polygonPoints[index];
   }
 
   Offset _sphereToCart(proj4.Point spPoint) {
