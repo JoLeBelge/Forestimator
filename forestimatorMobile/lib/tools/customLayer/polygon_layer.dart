@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:area_polygon/area_polygon.dart';
+import 'package:fforestimator/globals.dart' as gl;
 import 'package:flutter/material.dart';
 import 'package:proj4dart/proj4dart.dart' as proj4;
 import 'package:latlong2/latlong.dart';
@@ -72,7 +73,7 @@ class PolygonLayer {
       return;
     }
     int index = pointIndex(point);
-    print(selectedPolyLinePoints);
+    gl.print(selectedPolyLinePoints);
     selectedPolyLinePoints[0] = index;
     if (polygonPoints.length == 1) {
       selectedPolyLinePoints[1] = index;
@@ -81,9 +82,9 @@ class PolygonLayer {
     } else if (polygonPoints.length - 1 > index) {
       selectedPolyLinePoints[1] = index + 1;
     } else {
-      print("error 1st index polygon line: $index");
+      gl.print("error 1st index polygon line: $index");
     }
-    print(selectedPolyLinePoints);
+    gl.print(selectedPolyLinePoints);
   }
 
   bool isSelectedLine(int i) {

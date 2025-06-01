@@ -270,6 +270,7 @@ class LayerBase {
       try {
         adicoval = await dico.db.rawQuery(myquery);
       } catch (e) {
+        gl.print("$e");
         int i = 0;
         while (i < 255) {
           i++;
@@ -355,7 +356,9 @@ class DicoAptProvider {
 
       try {
         await Directory(dirname(path)).create(recursive: true);
-      } catch (_) {}
+      } catch (e) {
+        gl.print("$e");
+      }
 
       // Create the writable database file from the bundled  (asset bulk) fforestimator.db database file:
       // the bundled resource itself can't be directly opened as a file on Android -> c'est bien dommage
@@ -474,7 +477,7 @@ class DicoAptProvider {
     if (mLayerBases.containsKey(aCode)) {
       return mLayerBases[aCode]!;
     } else {
-      print("oops no layerBase $aCode");
+      gl.print("oops no layerBase $aCode");
       return LayerBase();
       //throw "oops no layerBase " + aCode;
     }

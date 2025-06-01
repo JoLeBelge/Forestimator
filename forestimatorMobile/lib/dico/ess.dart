@@ -275,7 +275,7 @@ class Ess {
           mAptCS[zbio] = aptCSOneZbio;
         }
       } catch (e) {
-        /*error*/
+        gl.print("$e");
       }
       // risque climatique CS - attention ça n'as rien à voir avec le risque de la situation topographique (FEE)
       myquery = "SELECT stat_id,$mCode,var FROM AptCSClim WHERE ZBIO=$zbio;";
@@ -297,7 +297,7 @@ class Ess {
           mRisqueCS[zbio] = risqueCSOneZbio;
         }
       } catch (e) {
-        /*error*/
+        gl.print("$e");
       }
     }
   } // fin fillApt

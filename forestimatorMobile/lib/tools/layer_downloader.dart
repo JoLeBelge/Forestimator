@@ -122,7 +122,7 @@ class _LayerDownloaderState extends State<LayerDownloader> {
               downloadId = await fD?.downloadFile(widget.layer.key);
               setState(() {
                 _downloadIdToWidget[downloadId!] = this;
-                print(_downloadIdToWidget[downloadId!]);
+                gl.print(_downloadIdToWidget[downloadId!]);
               });
             },
             icon: const Icon(Icons.repeat_rounded),
@@ -155,7 +155,7 @@ class _LayerDownloaderState extends State<LayerDownloader> {
               downloadId = await fD?.downloadFile(widget.layer.key);
               setState(() {
                 _downloadIdToWidget[downloadId!] = this;
-                print(_downloadIdToWidget[downloadId!]);
+                gl.print(_downloadIdToWidget[downloadId!]);
               });
             },
             icon: const Icon(Icons.download),

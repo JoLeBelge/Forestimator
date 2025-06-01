@@ -10,6 +10,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 late DicoAptProvider dico;
 
+const String forestimatorMobileVersion = "1.0.2-13";
+
 String basePathbranchB = "catalogue";
 String basePathbranchC = "offline";
 
@@ -20,6 +22,13 @@ BuildContext? notificationContext;
 bool offlineMode = false;
 bool debug = false;
 int currentPage = 0;
+
+List<String> onboardConsole = [forestimatorMobileVersion];
+int lengthLog = 1;
+@override
+void print(dynamic it) {
+  onboardConsole.add(it.toString());
+}
 
 List<pol.PolygonLayer> polygonLayers = [
   pol.PolygonLayer(polygonName: "Terrain"),
@@ -124,6 +133,8 @@ Function refreshMap = (Function f) {
   f();
 };
 Function refreshWholeCatalogueView = (void Function() setter) async {};
+Function refreshSearch = (void Function() setter) async {};
+Function refreshSettingsMenu = (void Function() setter) async {};
 Function refreshCurrentThreeLayer = () {};
 //Function refreshOfflineView = () {};
 Function rebuildOfflineView = (void Function() setter) async {};

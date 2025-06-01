@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 import 'package:archive/archive.dart';
+import 'package:fforestimator/globals.dart' as gl;
 import 'package:image/image.dart';
 import 'package:geoimage/src/com/hydrologis/geoimage/core/geoinfo.dart' as geo;
 import 'package:dart_jts/dart_jts.dart';
@@ -172,7 +173,8 @@ class OnePixGeotifDecoder extends Decoder {
         if (!img.isValid) {
           break;
         }
-      } catch (error) {
+      } catch (e) {
+        gl.print("$e");
         break;
       }
       info.images.add(img);

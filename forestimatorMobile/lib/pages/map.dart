@@ -47,6 +47,7 @@ class _MapPageState extends State<MapPage> {
   bool _modeLayerPropertiesRename = false;
 
   bool _modeProjectProperties = false;
+  bool _modeSearch = false;
 
   Color _polygonMenuColor(bool choice) => choice ? Colors.orange : Colors.brown;
   Color _polygonMenuColorTools(bool choice) =>
@@ -120,6 +121,7 @@ class _MapPageState extends State<MapPage> {
             gl.requestedLayers.add(LayerAnaPt.fromMap(r));
           }
         } catch (e) {
+          gl.print("$e");
           // handshake et/ou socketExeption
           //print('There was an error: ');
           /*FlutterLogs.logError("anaPt", "online",
@@ -604,10 +606,8 @@ class _MapPageState extends State<MapPage> {
                 PopupSettingsMenu(
                   gl.notificationContext!,
                   gl.polygonLayers[gl.selectedPolygonLayer].name,
-                  (LatLng pos) {
-                    if (pos.longitude != 0.0 && pos.latitude != 0.0) {
-                      _mapController.move(pos, _mapController.camera.zoom);
-                    }
+                  () {
+                    refreshView(() {});
                   },
                   () {
                     refreshView(() {
@@ -627,6 +627,7 @@ class _MapPageState extends State<MapPage> {
   Widget _toolbar() {
     return Column(
       children: [
+        _searchButton(),
         _layerProjectButton(),
         _modeLayerProperties ? _layerPropertiesMenu() : Container(),
         _layerPropertiesButton(),
@@ -867,6 +868,12 @@ class _MapPageState extends State<MapPage> {
     });
   }
 
+  void _closeSearchMenu() {
+    refreshView(() {
+      _modeSearch = false;
+    });
+  }
+
   void _closePolygonDrawMenu() {
     refreshView(() {
       _modeDrawPolygon = false;
@@ -959,6 +966,41 @@ class _MapPageState extends State<MapPage> {
     );
   }
 
+  Widget _searchButton() {
+    return IconButton(
+      iconSize: _iconSize,
+      color: _polygonMenuColor(_modeSearch),
+      onPressed: () async {
+        refreshView(() {
+          _modeSearch = !_modeSearch;
+        });
+        gl.refreshMap(() {});
+        if (_modeSearch == false) {
+          _closeSearchMenu();
+        } else {
+          _closeLayerPropertiesMenu();
+          _closePolygonDrawMenu();
+          _closeProjectMenu();
+        }
+        PopupSearchMenu(
+          gl.notificationContext!,
+          gl.polygonLayers[gl.selectedPolygonLayer].name,
+          (LatLng pos) {
+            if (pos.longitude != 0.0 && pos.latitude != 0.0) {
+              _mapController.move(pos, _mapController.camera.zoom);
+            }
+          },
+          () {
+            refreshView(() {
+              _modeSearch = false;
+            });
+          },
+        );
+      },
+      icon: const Icon(Icons.search),
+    );
+  }
+
   List<Marker> _getPolygonesInfos() {
     return List.generate(gl.polygonLayers.length, (i) {
       return Marker(
@@ -1030,7 +1072,7 @@ class _MapPageState extends State<MapPage> {
     if (_mapFrameCounter % 100 != 0) {
       return;
     }
-    print("Saving references: $lon $lat $zoom");
+    gl.print("Saving references: $lon $lat $zoom");
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setDouble('mapCenterLat', lat);
     await prefs.setDouble('mapCenterLon', lon);
@@ -1080,6 +1122,7 @@ class _MapPageState extends State<MapPage> {
       });
       _refreshLocation = false;
     } catch (e) {
+      gl.print("$e");
       // We keep the old position.
       refreshView(() {
         gl.position = gl.position;
@@ -1097,6 +1140,7 @@ Future<Position?> acquireUserLocation() async {
     } on LocationServiceDisabledException {
       return null;
     } catch (e) {
+      gl.print("$e");
       return null;
     }
   } else {

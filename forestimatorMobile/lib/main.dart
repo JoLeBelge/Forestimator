@@ -37,7 +37,11 @@ void main() async {
   while (!gl.dico.finishedLoading) {
     sleep(const Duration(seconds: 1));
   }
-  runApp(const MyApp());
+  try {
+    runApp(const MyApp());
+  } catch (e) {
+    gl.print("$e");
+  }
 }
 
 class MyApp extends StatefulWidget {
@@ -60,7 +64,7 @@ class _MyApp extends State<MyApp> {
     try {
       memory = await MemoryInfoPlugin().memoryInfo;
     } on PlatformException catch (e) {
-      print('error $e');
+      gl.print('error $e');
     }
 
     if (memory != null) {
@@ -191,7 +195,7 @@ class _MyApp extends State<MyApp> {
       }
       completer.complete(file);
     } catch (e) {
-      throw Exception('Error parsing asset file!');
+      gl.print("$e");
     }
 
     return completer.future;

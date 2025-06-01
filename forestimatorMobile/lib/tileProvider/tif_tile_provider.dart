@@ -1,3 +1,4 @@
+import 'package:fforestimator/globals.dart' as gl;
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter/material.dart';
 import 'package:image/image.dart' as img;
@@ -27,7 +28,7 @@ class TifFileTileProvider extends TileProvider {
   });
 
   void init() async {
-    print("init TifFileTileProvider by loading source image in memory");
+    gl.print("init TifFileTileProvider by loading source image in memory");
     final File fileIm = File(sourceImPath);
     bool e = await fileIm.exists();
     if (e) {
@@ -36,7 +37,7 @@ class TifFileTileProvider extends TileProvider {
       img.TiffInfo tiffInfo = img.TiffDecoder().startDecode(bytes)!;
       img.TiffImage tifIm = tiffInfo.images[0];
       int bps = tifIm.bitsPerSample;
-      print("file loaded in öeöory $e");
+      gl.print("file loaded in öeöory $e");
       // le décodage d'un tif 16 bits avec ColorMap sera effectif pour la prochaine sortie du package image (flutter)
       // testé avec image 4.2, imageDecoder (android graphic) ; Input was incomplete-> il faut probablement encore convertir en 8bit apres lecture de la 16 bits avec colormap.
       if (bps <= 8) {
@@ -46,7 +47,7 @@ class TifFileTileProvider extends TileProvider {
         });
       }
     }
-    print("file decoded in öeöory $e");
+    gl.print("file decoded in öeöory $e");
   }
 
   @override

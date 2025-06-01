@@ -1,6 +1,7 @@
 /* Implementation of the permission_handler 12.0.0+1 Interface  */
 
 import 'dart:io';
+import 'package:fforestimator/globals.dart' as gl;
 import 'package:fforestimator/tools/notification.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -34,7 +35,7 @@ void initPermissions() async {
       androidInfo.version.release[0] + androidInfo.version.release[1],
     );
     sdkInt = androidInfo.version.sdkInt;
-    print("Android $release (sdk $sdkInt)");
+    gl.print("Android $release (sdk $sdkInt)");
   }
   getVersion = false;
 }
