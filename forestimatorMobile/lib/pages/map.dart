@@ -30,7 +30,6 @@ class _MapPageState extends State<MapPage> {
   final _mapController = MapController();
   LatLng? _pt;
   bool _doingAnaPt = false;
-  var data;
 
   static int _mapFrameCounter = 0;
 
@@ -54,7 +53,7 @@ class _MapPageState extends State<MapPage> {
       choice ? Colors.lightGreenAccent : Colors.grey;
 
   LatLng? _selectedPointToMove;
-  double _iconSize = 50.0;
+  double iconSize = 50.0;
 
   //https://github.com/fleaflet/flutter_map/blob/master/example/lib/pages/custom_crs/custom_crs.dart
   late proj4.Projection epsg4326 = proj4.Projection.get('EPSG:4326')!;
@@ -78,12 +77,6 @@ class _MapPageState extends State<MapPage> {
     var maxResolution = 1280;
     return List.generate(nbzoom, (z) => maxResolution / pow(2, z));
   }
-  /*List<double> getResolutions(double maxX, double minX, int zoom,
-      [double tileSize = 256.0]) {
-    // résolution numéro 1: une tile pour tout l'extend de la Wallonie
-    var size = (maxX - minX) / (tileSize);
-    return List.generate(zoom, (z) => size / pow(2, z));
-  }*/
 
   late var epsg31370CRS = Proj4Crs.fromFactory(
     code: 'EPSG:31370',
@@ -91,11 +84,10 @@ class _MapPageState extends State<MapPage> {
     bounds: epsg31370Bounds,
     resolutions: getResolutions2(12),
   );
-  //resolutions: getResolutions(295170.0, 42250.0, 15, 256.0));
 
   Future _runAnaPt(proj4.Point ptBL72) async {
     gl.requestedLayers.clear();
-    data = "";
+    Map data;
 
     gl.pt = ptBL72;
 
@@ -122,10 +114,6 @@ class _MapPageState extends State<MapPage> {
           }
         } catch (e) {
           gl.print("$e");
-          // handshake et/ou socketExeption
-          //print('There was an error: ');
-          /*FlutterLogs.logError("anaPt", "online",
-              "error while waiting for forestimatorWeb answer. ${e}");*/
         }
         gl.requestedLayers.removeWhere(
           (element) => element.mFoundLayer == false,
@@ -157,14 +145,6 @@ class _MapPageState extends State<MapPage> {
     );
   }
 
-  /*
-  bool _isDownloadableLayer(String key) {
-    if (gl.downloadableLayerKeys.contains(key)) {
-      return true;
-    }
-    return false;
-  }
-*/
   TifFileTileProvider? _provider;
 
   @override
@@ -442,8 +422,8 @@ class _MapPageState extends State<MapPage> {
                                 : _selectedPointToMove != null
                                 ? Marker(
                                   alignment: Alignment.center,
-                                  width: _iconSize,
-                                  height: _iconSize,
+                                  width: iconSize,
+                                  height: iconSize,
                                   point: _mapController.camera.center,
                                   child: const Icon(
                                     Icons.donut_large,
@@ -452,8 +432,8 @@ class _MapPageState extends State<MapPage> {
                                 )
                                 : Marker(
                                   alignment: Alignment.center,
-                                  width: _iconSize,
-                                  height: _iconSize,
+                                  width: iconSize,
+                                  height: iconSize,
                                   point: _mapController.camera.center,
                                   child: const Icon(
                                     Icons.donut_large,
@@ -475,7 +455,7 @@ class _MapPageState extends State<MapPage> {
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         IconButton(
-                          iconSize: _iconSize,
+                          iconSize: iconSize,
                           color: gl.colorAgroBioTech,
                           onPressed: () async {
                             if (!_doingAnaPt) {
@@ -508,7 +488,7 @@ class _MapPageState extends State<MapPage> {
                           icon: const Icon(Icons.analytics),
                         ),
                         IconButton(
-                          iconSize: _iconSize,
+                          iconSize: iconSize,
                           color: Colors.red,
                           onPressed: () async {
                             if (gl.position != null) {
@@ -536,7 +516,7 @@ class _MapPageState extends State<MapPage> {
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         IconButton(
-                          iconSize: _iconSize,
+                          iconSize: iconSize,
                           color: Colors.black,
                           onPressed: () async {
                             if (gl.position != null) {
@@ -564,7 +544,7 @@ class _MapPageState extends State<MapPage> {
           children: [
             _toolbarExtended ? _toolbar() : Container(),
             IconButton(
-              iconSize: _iconSize,
+              iconSize: iconSize,
               color: _toolbarExtended ? gl.colorAgroBioTech : Colors.black,
               onPressed: () async {
                 refreshView(() {
@@ -593,7 +573,7 @@ class _MapPageState extends State<MapPage> {
           children: [
             //_toolbarExtended ? _toolbar() : Container(),
             IconButton(
-              iconSize: _iconSize,
+              iconSize: iconSize,
               color: _settingsMenu ? gl.colorAgroBioTech : Colors.black,
               onPressed: () async {
                 refreshView(() {
@@ -645,7 +625,7 @@ class _MapPageState extends State<MapPage> {
     return Column(
       children: [
         IconButton(
-          iconSize: _iconSize,
+          iconSize: iconSize,
           color: _polygonMenuColorTools(_modeDrawPolygonMoveVertexes),
           onPressed: () async {
             refreshView(() {
@@ -663,7 +643,7 @@ class _MapPageState extends State<MapPage> {
           icon: const Icon(Icons.swap_horizontal_circle),
         ),
         IconButton(
-          iconSize: _iconSize,
+          iconSize: iconSize,
           color: _polygonMenuColorTools(_modeDrawPolygonRemoveVertexes),
 
           onPressed: () async {
@@ -681,7 +661,7 @@ class _MapPageState extends State<MapPage> {
           icon: const Icon(Icons.remove_circle),
         ),
         IconButton(
-          iconSize: _iconSize,
+          iconSize: iconSize,
           color: _polygonMenuColorTools(_modeDrawPolygonAddVertexes),
           onPressed: () async {
             refreshView(() {
@@ -720,8 +700,8 @@ class _MapPageState extends State<MapPage> {
           point: point,
           radius:
               gl.polygonLayers[gl.selectedPolygonLayer].isSelectedLine(i)
-                  ? _iconSize / 2.7
-                  : _iconSize / 3,
+                  ? iconSize / 2.7
+                  : iconSize / 3,
           color:
               gl.polygonLayers[gl.selectedPolygonLayer].isSelectedLine(i)
                   ? gl.polygonLayers[gl.selectedPolygonLayer].colorLine
@@ -740,8 +720,8 @@ class _MapPageState extends State<MapPage> {
       all.add(
         Marker(
           alignment: Alignment.center,
-          width: _iconSize,
-          height: _iconSize,
+          width: iconSize,
+          height: iconSize,
           point: point,
           child: TextButton(
             onPressed: () {
@@ -777,7 +757,7 @@ class _MapPageState extends State<MapPage> {
               overflow: TextOverflow.visible,
               "$count",
               maxLines: 1,
-              style: TextStyle(color: Colors.black, fontSize: _iconSize / 3),
+              style: TextStyle(color: Colors.black, fontSize: iconSize / 3),
             ),
           ),
         ),
@@ -791,7 +771,7 @@ class _MapPageState extends State<MapPage> {
     return Column(
       children: <Widget>[
         IconButton(
-          iconSize: _iconSize,
+          iconSize: iconSize,
           color: _polygonMenuColorTools(_modeLayerPropertiesColors),
           onPressed: () {
             refreshView(() {
@@ -818,10 +798,10 @@ class _MapPageState extends State<MapPage> {
               },
             );
           },
-          icon: Icon(Icons.text_fields, size: _iconSize),
+          icon: Icon(Icons.text_fields, size: iconSize),
         ),
         IconButton(
-          iconSize: _iconSize,
+          iconSize: iconSize,
           color: _polygonMenuColorTools(_modeLayerPropertiesRename),
           onPressed: () {
             refreshView(() {
@@ -856,7 +836,7 @@ class _MapPageState extends State<MapPage> {
               },
             );
           },
-          icon: Icon(Icons.color_lens, size: _iconSize),
+          icon: Icon(Icons.color_lens, size: iconSize),
         ),
       ],
     );
@@ -894,7 +874,7 @@ class _MapPageState extends State<MapPage> {
 
   Widget _drawPolygonButton() {
     return IconButton(
-      iconSize: _iconSize,
+      iconSize: iconSize,
       color: _polygonMenuColor(_modeDrawPolygon),
       onPressed: () async {
         refreshView(() {
@@ -914,7 +894,7 @@ class _MapPageState extends State<MapPage> {
 
   Widget _layerPropertiesButton() {
     return IconButton(
-      iconSize: _iconSize,
+      iconSize: iconSize,
       color: _polygonMenuColor(_modeLayerProperties),
       onPressed: () async {
         refreshView(() {
@@ -934,7 +914,7 @@ class _MapPageState extends State<MapPage> {
 
   Widget _layerProjectButton() {
     return IconButton(
-      iconSize: _iconSize,
+      iconSize: iconSize,
       color: _polygonMenuColor(_modeProjectProperties),
       onPressed: () async {
         refreshView(() {
@@ -968,7 +948,7 @@ class _MapPageState extends State<MapPage> {
 
   Widget _searchButton() {
     return IconButton(
-      iconSize: _iconSize,
+      iconSize: iconSize,
       color: _polygonMenuColor(_modeSearch),
       onPressed: () async {
         refreshView(() {
@@ -1006,10 +986,10 @@ class _MapPageState extends State<MapPage> {
       return Marker(
         alignment: Alignment.center,
         width:
-            _iconSize * 3 > gl.polygonLayers[i].name.length * 11
-                ? _iconSize * 4
+            iconSize * 3 > gl.polygonLayers[i].name.length * 11
+                ? iconSize * 4
                 : gl.polygonLayers[i].name.length * 11,
-        height: _iconSize * 1.5,
+        height: iconSize * 1.5,
         point: gl.polygonLayers[i].center,
         child: Column(
           children: <Widget>[

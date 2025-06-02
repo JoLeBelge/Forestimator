@@ -69,11 +69,7 @@ class _PDFScreenState extends State<PDFScreen> with WidgetsBindingObserver {
             onViewCreated: (PDFViewController pdfViewController) {
               _controller.complete(pdfViewController);
             },
-            /*onLinkHandler: (String? uri) {
-              print('goto uri: $uri');
-            },*/
             onPageChanged: (int? page, int? total) {
-              //print('page change: $page/$total');
               setState(() {
                 gl.currentPage = page!;
               });

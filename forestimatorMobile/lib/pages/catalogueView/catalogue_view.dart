@@ -350,9 +350,6 @@ class _CategoryView extends State<CategoryView> {
 
   Widget selectLayerBar(LayerTile lt) {
     double barWidth = 128.0 + 48;
-    /*if (widget.category.filter != "APT_CS" &&
-        widget.category.filter != "APT_FEE" &&
-        !lt.extern) barWidth = 96.0;*/
     return Container(
       constraints: BoxConstraints(
         maxWidth: barWidth,
@@ -366,7 +363,6 @@ class _CategoryView extends State<CategoryView> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          //_downloadedControlBar(lt),
           lt.downloadedControlBar(),
           gl.isSelectedLayer(lt.key, offline: false)
               ? Container(
@@ -419,7 +415,6 @@ class _CategoryView extends State<CategoryView> {
                     });
                   },
                   // TODO ; popUpNoInternet si pas d'accès au réseau
-                  //TODO else popup warning: file is not on disk -> non car on affiche ici uniquement les layer online, que l'on soit en mode online ou offline.
                 ),
               ),
         ],
@@ -427,14 +422,6 @@ class _CategoryView extends State<CategoryView> {
     );
   }
 
-  // downloadableLayerKeys contient la liste des couches qu'on voudrai télécharger par défaut pour tout les utilisateurs. mais le fait qu'elle soit téléchargeable est définit dans layerbase.mIsDownloadableRW
-  /*  bool _isDownloadableLayer(String key) {
-    if (gl.downloadableLayerKeys.contains(key)) {
-      return true;
-    }
-    return false;
-  }
-*/
   void _getLayerData() async {
     Map<String, LayerBase> mp = gl.dico.mLayerBases;
 
@@ -620,12 +607,6 @@ class _SelectedLayerView extends State<SelectedLayerView> {
                   )
                   : ListTile(
                     key: Key('$i'),
-                    /*leading: Container(
-                      constraints: BoxConstraints(
-                    maxHeight: MediaQuery.of(context).size.height * .04,
-                    maxWidth: MediaQuery.of(context).size.width * .35,
-                  )),*/
-                    //title: const Text('Pas de couche selectionnée.'),
                     title: const Text(
                       '',
                     ), // le texte "pas de couches sélectionnée avait perturbé un des testeurs, on met rien

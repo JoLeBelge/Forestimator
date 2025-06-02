@@ -248,7 +248,6 @@ class _OfflineView extends State<OfflineView> {
                   gl.refreshCurrentThreeLayer();
                   gl.refreshWholeCatalogueView(() {});
                 });
-                //TODO else popup warning: file is not on disk
               }
             },
           ),
