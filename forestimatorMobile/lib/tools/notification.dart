@@ -330,6 +330,7 @@ class _DrawnLayerMenu extends State<DrawnLayerMenu> {
                             i == gl.selectedPolygonLayer
                                 ? () {
                                   setState(() {
+                                    //remove polygon
                                     if (i > 0) {
                                       gl.polygonLayers.removeAt(i);
                                       gl.selectedPolygonLayer--;
@@ -338,6 +339,7 @@ class _DrawnLayerMenu extends State<DrawnLayerMenu> {
                                       gl.polygonLayers.removeAt(i);
                                     }
                                   });
+                                  gl.saveChangesToPolygoneToPrefs = true;
                                 }
                                 : () {
                                   setState(() {});
@@ -366,9 +368,11 @@ class _DrawnLayerMenu extends State<DrawnLayerMenu> {
                                       if (nameIt.length > 10) {
                                         nameIt = nameIt.substring(0, 10);
                                       }
-                                      setState(
-                                        () => gl.polygonLayers[i].name = nameIt,
-                                      );
+                                      //change name
+                                      setState(() {
+                                        gl.polygonLayers[i].name = nameIt;
+                                        gl.saveChangesToPolygoneToPrefs = true;
+                                      });
                                     },
                                     () {
                                       setState(() {});
@@ -414,6 +418,7 @@ class _DrawnLayerMenu extends State<DrawnLayerMenu> {
                                           PopupColorChooser(
                                             gl.polygonLayers[i].colorInside,
                                             gl.notificationContext!,
+                                            //change color
                                             (Color col) {
                                               setState(() {
                                                 gl.polygonLayers[i]
@@ -428,6 +433,8 @@ class _DrawnLayerMenu extends State<DrawnLayerMenu> {
                                                       ),
                                                     );
                                               });
+                                              gl.saveChangesToPolygoneToPrefs =
+                                                  true;
                                             },
                                             () {},
                                           );
@@ -478,10 +485,12 @@ class _DrawnLayerMenu extends State<DrawnLayerMenu> {
                   ),
                 ),
                 onPressed: () {
+                  //add polygon
                   setState(() {
                     gl.polygonLayers.add(PolygonLayer(polygonName: "Nouveau"));
                     gl.selectedPolygonLayer = gl.polygonLayers.length - 1;
                   });
+                  gl.saveChangesToPolygoneToPrefs = true;
                 },
               ),
             ],
@@ -511,21 +520,19 @@ class PopupSearchMenu {
           backgroundColor: Color.fromRGBO(0, 0, 0, 0.2),
           surfaceTintColor: Colors.transparent,
           shadowColor: Colors.transparent,
-
           title: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text("Recherche en ligne", textAlign: TextAlign.justify),
             ],
           ),
-
           content: Theme(
             data: Theme.of(context).copyWith(
               canvasColor: Colors.transparent,
               shadowColor: Colors.transparent,
             ),
             child: SizedBox(
-              width: MediaQuery.of(context).size.width * 95,
+              width: MediaQuery.of(context).size.width * .95,
               child: SearchMenu(state: state),
             ),
           ),
@@ -563,10 +570,13 @@ class SearchMenu extends StatefulWidget {
   State<StatefulWidget> createState() => _SearchMenu();
 }
 
+List<TextButton> _searchResults = [];
+
 class _SearchMenu extends State<SearchMenu> {
   final Color active = Colors.black;
   final Color inactive = const Color.fromARGB(255, 92, 92, 92);
-  final List<TextButton> _searchResults = [];
+
+  int previousLength = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -575,7 +585,9 @@ class _SearchMenu extends State<SearchMenu> {
           ? setState(() {
             x();
           })
-          : () {};
+          : () {
+            x();
+          };
     };
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -589,11 +601,16 @@ class _SearchMenu extends State<SearchMenu> {
                 child: Card(
                   child: TextFormField(
                     onChanged: (that) async {
+                      if (that.length < previousLength) {
+                        previousLength = that.length;
+                        return;
+                      }
+                      previousLength = that.length;
                       if (that.length < 3) {
                         return;
                       }
                       var url = Uri.parse(
-                        'https://nominatim.openstreetmap.org/search?q=${that.replaceAll(' ', '+')}+Wallonie&format=json&addressdetails=1',
+                        'http://appliprfw.gembloux.ulg.ac.be/search?q=${that.replaceAll(' ', '+')}+Wallonie&format=json&addressdetails=1',
                       );
                       final response = await http.get(url);
                       List<Map<String, dynamic>> decodedJson;
@@ -607,9 +624,35 @@ class _SearchMenu extends State<SearchMenu> {
                             (jsonDecode(testNominatimJsonResult) as List)
                                 .cast<Map<String, dynamic>>());
                       }
+                      gl.poiMarkerList.clear();
                       _searchResults.clear();
                       gl.refreshSearch(() {
+                        gl.selectedSearchMarker = -1;
+                        gl.print("Selected searchMarker reset");
+                        int i = 0;
                         for (var entry in decodedJson) {
+                          gl.poiMarkerList.add(
+                            gl.PoiMarker(
+                              index: i++,
+                              position: LatLng(
+                                double.parse(entry['lat']),
+                                double.parse(entry['lon']),
+                              ),
+                              name: entry['name'] ?? "Noname??",
+                              address:
+                                  entry['address']['road'] ??
+                                  entry['address']['neighbourhood'] ??
+                                  entry['address']['village'] ??
+                                  entry['address']['state'] ??
+                                  "Lokolobömmele",
+                              city:
+                                  entry['address']['city'] ??
+                                  entry['address']['county'] ??
+                                  entry['address']['state'] ??
+                                  "Lokolobömmele",
+                              postcode: entry['address']['postcode'] ?? "000?",
+                            ),
+                          );
                           _searchResults.add(
                             TextButton(
                               onPressed: () {
@@ -722,14 +765,14 @@ Widget forestimatorSettingsContacts() {
   );
 }
 
-class ForestimatorConsole extends StatefulWidget {
-  const ForestimatorConsole({super.key});
+class ForestimatorLog extends StatefulWidget {
+  const ForestimatorLog({super.key});
 
   @override
-  State<StatefulWidget> createState() => _ForestimatorConsole();
+  State<StatefulWidget> createState() => _ForestimatorLog();
 }
 
-class _ForestimatorConsole extends State<ForestimatorConsole> {
+class _ForestimatorLog extends State<ForestimatorLog> {
   int lengthLog = 3;
 
   @override
@@ -744,44 +787,40 @@ class _ForestimatorConsole extends State<ForestimatorConsole> {
               child: FloatingActionButton(
                 onPressed: () {
                   setState(() {
-                    lengthLog + 5 < gl.onboardConsole.length
+                    lengthLog + 5 < gl.onboardLog.length
                         ? lengthLog = lengthLog + 5
-                        : lengthLog = gl.onboardConsole.length;
+                        : lengthLog = gl.onboardLog.length;
                   });
                 },
                 child:
-                    lengthLog != gl.onboardConsole.length
+                    lengthLog != gl.onboardLog.length
                         ? Text("Afficher +")
                         : Text("FIN"),
               ),
             ),
           ] +
           List<Widget>.generate(lengthLog, (i) {
-            return gl.onboardConsole.length - lengthLog > 0
+            return gl.onboardLog.length - lengthLog > 0
                 ? Row(
                   children: [
                     Container(
                       constraints: BoxConstraints(
                         minWidth: MediaQuery.of(context).size.width * .05,
                       ),
-                      child: Text(
-                        "${gl.onboardConsole.length - lengthLog + i}) ",
-                      ),
+                      child: Text("${gl.onboardLog.length - lengthLog + i}) "),
                     ),
                     Container(
                       constraints: BoxConstraints(
                         maxWidth: MediaQuery.of(context).size.width * .6,
                       ),
                       child: Text(
-                        gl.onboardConsole[gl.onboardConsole.length -
-                            lengthLog +
-                            i],
+                        gl.onboardLog[gl.onboardLog.length - lengthLog + i],
                         textScaler: TextScaler.linear(0.75),
                       ),
                     ),
                   ],
                 )
-                : gl.onboardConsole.length - i > 0
+                : gl.onboardLog.length - i > 0
                 ? Row(
                   children: [
                     Container(
@@ -795,7 +834,7 @@ class _ForestimatorConsole extends State<ForestimatorConsole> {
                         minWidth: MediaQuery.of(context).size.width * .6,
                       ),
                       child: Text(
-                        gl.onboardConsole[i],
+                        gl.onboardLog[i],
                         textScaler: TextScaler.linear(0.75),
                       ),
                     ),
@@ -878,7 +917,7 @@ class _SettingsMenu extends State<SettingsMenu> {
         Item(name: "Permissions", entry: forestimatorSettingsPermissions()),
         Item(name: "About Forestimator", entry: forestimatorSettingsVersion()),
         Item(name: "Contact", entry: forestimatorSettingsContacts()),
-        Item(name: "Console", entry: ForestimatorConsole()),
+        Item(name: "Debug Logs", entry: ForestimatorLog()),
       ]);
     } else {
       _listInitialzed = true;

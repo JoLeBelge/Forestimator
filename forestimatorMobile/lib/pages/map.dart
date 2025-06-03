@@ -302,7 +302,7 @@ class _MapPageState extends State<MapPage> {
                   } else {
                     refreshView(() {});
                   }
-                  _writeNewPositionToMemory(
+                  _writeDataToSharedPreferences(
                     position.center.longitude,
                     position.center.latitude,
                     position.zoom,
@@ -411,7 +411,8 @@ class _MapPageState extends State<MapPage> {
                   <Widget>[
                     MarkerLayer(
                       markers:
-                          [
+                          _placeSearchMarker() +
+                          <Marker>[
                             !_modeDrawPolygonMoveVertexes
                                 ? Marker(
                                   width: 70.0,
@@ -571,7 +572,6 @@ class _MapPageState extends State<MapPage> {
         Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            //_toolbarExtended ? _toolbar() : Container(),
             IconButton(
               iconSize: iconSize,
               color: _settingsMenu ? gl.colorAgroBioTech : Colors.black,
@@ -711,6 +711,88 @@ class _MapPageState extends State<MapPage> {
       i++;
     }
     return all;
+  }
+
+  List<Marker> _placeSearchMarker() {
+    List<Marker> all = [];
+    int i = 0;
+    for (gl.PoiMarker poi in gl.poiMarkerList) {
+      double scale = 1.5;
+      all.add(
+        Marker(
+          alignment: Alignment.bottomRight,
+          width: poi.name.length * 16,
+          height: gl.selectedSearchMarker == poi.index ? 300 : 50,
+          point: poi.position,
+          child: Column(
+            children:
+                <Widget>[
+                  TextButton(
+                    style: ButtonStyle(animationDuration: Duration(seconds: 0)),
+                    onPressed: () {
+                      refreshView(() {
+                        if (gl.selectedSearchMarker == poi.index) {
+                          gl.selectedSearchMarker = -1;
+                        } else {
+                          gl.selectedSearchMarker = poi.index;
+                        }
+                        gl.print(
+                          "Selected searchMarker = ${gl.selectedSearchMarker}",
+                        );
+                      });
+                    },
+                    child: Column(
+                      children: <Widget>[
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: <Widget>[
+                            Column(
+                              children: [
+                                Icon(
+                                  Icons.circle_notifications,
+                                  color: Colors.red,
+                                ),
+                              ],
+                            ),
+                            Text(
+                              poi.name,
+                              textScaler: TextScaler.linear(scale),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ] +
+                _getSearchInfoBox(poi, i),
+          ),
+        ),
+      );
+      i++;
+    }
+    return all;
+  }
+
+  List<Widget> _getSearchInfoBox(gl.PoiMarker poi, int i) {
+    double scale = 1.5;
+    return gl.selectedSearchMarker == i
+        ? <Widget>[
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [Text(poi.address, textScaler: TextScaler.linear(scale))],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [Text(poi.city, textScaler: TextScaler.linear(scale))],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Text(poi.postcode, textScaler: TextScaler.linear(scale)),
+            ],
+          ),
+        ]
+        : <Widget>[];
   }
 
   List<Marker> _drawnLayerPointsMarker() {
@@ -1048,34 +1130,45 @@ class _MapPageState extends State<MapPage> {
     await prefs.setInt('$name.nPolyPoints', i);
   }
 
-  void _writeNewPositionToMemory(double lon, double lat, double zoom) async {
-    if (_mapFrameCounter % 100 != 0) {
-      return;
-    }
-    gl.print("Saving references: $lon $lat $zoom");
+  void _writeDataToSharedPreferences(
+    double lon,
+    double lat,
+    double zoom,
+  ) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setDouble('mapCenterLat', lat);
-    await prefs.setDouble('mapCenterLon', lon);
-    await prefs.setDouble('mapZoom', zoom);
-    int i = 0;
-    for (var polygon in gl.polygonLayers) {
-      await prefs.setString('poly$i.name', polygon.name);
-      await prefs.setDouble('poly$i.area', polygon.area);
-      await prefs.setDouble('poly$i.perimeter', polygon.perimeter);
-      await prefs.setDouble(
-        'poly$i.transparencyInside',
-        polygon.transparencyInside,
-      );
-      await prefs.setDouble(
-        'poly$i.transparencyLine',
-        polygon.transparencyLine,
-      );
-      _writeColorToMemory('poly$i.colorInside', prefs, polygon.colorInside);
-      _writeColorToMemory('poly$i.colorLine', prefs, polygon.colorLine);
-      _writePolygonPointsToMemory('poly$i.poly', prefs, polygon.polygonPoints);
-      i++;
+    if (_mapFrameCounter % 50 == 0) {
+      await prefs.setDouble('mapCenterLat', lat);
+      await prefs.setDouble('mapCenterLon', lon);
+      await prefs.setDouble('mapZoom', zoom);
+      gl.print("position saved to prefs: $lon $lat $zoom");
     }
-    await prefs.setInt('nPolys', i);
+    if (gl.saveChangesToPolygoneToPrefs) {
+      gl.saveChangesToPolygoneToPrefs = false;
+      int i = 0;
+      for (var polygon in gl.polygonLayers) {
+        await prefs.setString('poly$i.name', polygon.name);
+        await prefs.setDouble('poly$i.area', polygon.area);
+        await prefs.setDouble('poly$i.perimeter', polygon.perimeter);
+        await prefs.setDouble(
+          'poly$i.transparencyInside',
+          polygon.transparencyInside,
+        );
+        await prefs.setDouble(
+          'poly$i.transparencyLine',
+          polygon.transparencyLine,
+        );
+        _writeColorToMemory('poly$i.colorInside', prefs, polygon.colorInside);
+        _writeColorToMemory('poly$i.colorLine', prefs, polygon.colorLine);
+        _writePolygonPointsToMemory(
+          'poly$i.poly',
+          prefs,
+          polygon.polygonPoints,
+        );
+        i++;
+      }
+      await prefs.setInt('nPolys', i);
+      gl.print("polygones saved to prefs");
+    }
   }
 
   void _updatePtMarker(LatLng pt) {

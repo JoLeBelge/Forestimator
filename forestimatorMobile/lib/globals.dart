@@ -23,11 +23,35 @@ bool offlineMode = false;
 bool debug = false;
 int currentPage = 0;
 
-List<String> onboardConsole = [forestimatorMobileVersion];
+List<String> onboardLog = [forestimatorMobileVersion];
 int lengthLog = 1;
 @override
 void print(dynamic it) {
-  onboardConsole.add(it.toString());
+  onboardLog.add(it.toString());
+}
+
+// -1 means that no marker is selected
+int selectedSearchMarker = -1;
+
+List<PoiMarker> poiMarkerList = [];
+
+bool saveChangesToPolygoneToPrefs = false;
+
+class PoiMarker {
+  final int index;
+  final LatLng position;
+  final String name;
+  final String address;
+  final String city;
+  final String postcode;
+  PoiMarker({
+    required this.index,
+    required this.position,
+    required this.name,
+    required this.address,
+    required this.city,
+    required this.postcode,
+  });
 }
 
 List<pol.PolygonLayer> polygonLayers = [

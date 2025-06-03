@@ -1,5 +1,4 @@
 import 'dart:math';
-
 import 'package:area_polygon/area_polygon.dart';
 import 'package:fforestimator/globals.dart' as gl;
 import 'package:flutter/material.dart';
@@ -98,6 +97,7 @@ class PolygonLayer {
     refreshSelectedLinePoints(point);
     _computeArea();
     _computePerimeter();
+    gl.saveChangesToPolygoneToPrefs = true;
   }
 
   void removePoint(LatLng index) {
@@ -138,6 +138,7 @@ class PolygonLayer {
 
     _computeArea();
     _computePerimeter();
+    gl.saveChangesToPolygoneToPrefs = true;
   }
 
   void replacePoint(LatLng old, LatLng index) {
@@ -152,6 +153,7 @@ class PolygonLayer {
     polygonPoints.insert(i, index);
     _computeArea();
     _computePerimeter();
+    gl.saveChangesToPolygoneToPrefs = true;
   }
 
   Color get colorSurface => colorInside;
@@ -182,7 +184,7 @@ class PolygonLayer {
     return i;
   }
 
-  Offset _sphereToCart(proj4.Point spPoint) {
+  Offset _epsg4326ToEpsg31370(proj4.Point spPoint) {
     return Offset(
       epsg4326.transform(epsg31370, spPoint).x,
       epsg4326.transform(epsg31370, spPoint).y,
@@ -194,10 +196,13 @@ class PolygonLayer {
       area = 0.0;
       return;
     }
+
     List<Offset> poly = [];
     for (LatLng point in polygonPoints) {
       poly.add(
-        _sphereToCart(proj4.Point(x: point.latitude, y: point.longitude)),
+        _epsg4326ToEpsg31370(
+          proj4.Point(x: point.latitude, y: point.longitude),
+        ),
       );
     }
     area = calculateArea(poly);
@@ -211,11 +216,13 @@ class PolygonLayer {
     List<Offset> poly = [];
     for (LatLng point in polygonPoints) {
       poly.add(
-        _sphereToCart(proj4.Point(x: point.latitude, y: point.longitude)),
+        _epsg4326ToEpsg31370(
+          proj4.Point(x: point.latitude, y: point.longitude),
+        ),
       );
     }
     perimeter = 0.0;
-    Offset currentPoint = poly.removeLast();
+    Offset currentPoint = poly.last;
     for (Offset point in poly) {
       perimeter = perimeter + (currentPoint - point).distance;
       currentPoint = point;
