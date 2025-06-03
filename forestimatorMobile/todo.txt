@@ -8,7 +8,6 @@ AJOUT DE COUCHES
  	
 -ajouter couche Natura 2000 (N2K)
 -ajouter couche plan de secteur
--ajouter couches dendros de philippe L -> OK, mais ajout dicoLayer pour layer qui n'en n'ont pas dans flutter (ex:dendro_cdom)
 -ajouter couche nouveau masque forestier 
 
 SECURITE ET ROBUSTESSE
@@ -20,23 +19,20 @@ SECURITE ET ROBUSTESSE
 
 CONSOLIDATION 
 
--téléchargement des couches en local : barre de progression. Iphone : à implémenter
+
 -analyse ponctuelle : quand internet n'est pas disponible, afficher la boite de dialogue "vous n'avez pas accès à internet". Pour l'instant, cela fonctionne mais même quand la data est activée si jamais un autre process utilise toute la bande passante.
 
 -séparation visuelle de la partie "panier" de la partie "catalogue de couche"
 
--demande d'autorisation pour position GPS -> Android : consolider (préciser si les droits ont été accordé ou non). Iphone : développer.
-
--ajout d'une barre d'échelle à la carte
--si pas assez de RAM, ne pas autoriser l'affichage offline sur toute la RW? ou en tout cas éviter que le smartphone bug en essayant d'afficher la carte offline
-
 NOUVELLES OPTIONS
 
--outils de recherche de lieu -> communes, pour que le volume de donnée reste léger. utiliser flutter_typeahead et la liste des noms de communes, pour lesquelles l'extend est associé.
+-légende d'une carte pour un point donné (pas ana ponct)
+
+-outils de recherche de lieu -> OK
 
 -gestion de projets et téléchargement de couche offline sur l'extend du projet uniquement. Un projet = un extend. puis des couches offlines sur cet extend.
 
--ajout d'une couche "polygone" propre à l'utilisateur (soit issu de digitalisation, soit une parcelle du cadastre, cf forestimator Web).
+-ajout d'une couche "polygone" propre à l'utilisateur -> OK
 
 COMMUNICATION/ DOCUMENTATION
 
@@ -46,9 +42,6 @@ COMMUNICATION/ DOCUMENTATION
 AUTRE
 
 -pouvoir zoomer à l'échelle d'un arbre (pour analyse ponctuelle de la hauteur - cf demande de HC)
-
-voir appli SW MAPS (https://aviyaantech.com/SwMaps/) entre autre pour la manière dont les bouttons sont implémentés sur la carte (bouttons de digitalisation, mesure de distance, ajoute de points, etc). Et la manière de gérer et créer des projets.
-
 
 JO
 --
@@ -66,8 +59,6 @@ retours testeurs:
 -----------------
 
 GLigot : position sur carte pas clair (quand c'est position grace à internet et non pas GPS, pas de rond bleu pour afficher la position - non c'est quand on donne les droits lors du premier usage? )
-
-
 
 Sam : catalogues ; problème de padding, margin, et le top parfois est tronqué, le header de smartphone interfère avec l'affichage.
 Aussi il y a des "<" pour dérouler même si pas d'info derrière, à enlever ?

@@ -7,13 +7,13 @@ void anaSurfResource::handleRequest(const Http::Request &request,Http::Response 
     std::string aPolyg("");
 
     // "/api/anaSurf/layers/${listLayerCode}/polygon/${pol}"
+    // "
     for (const auto &param : params) {
         const auto &name = param.first;
         const auto &value = param.second;
         if (name=="listLayerCode") {listCode=value;}
-        if (name=="polygon") {aPolyg=value;}
+        if (name=="pol") {aPolyg=value;}
     }
-
     GDALAllRegister();
 
     std::vector<std::string> aV;
@@ -26,66 +26,61 @@ void anaSurfResource::handleRequest(const Http::Request &request,Http::Response 
 
         // le double to String de response.out m'arrondi le x (et pas le y, mystère). je fait le cast moi-même
         response.out() << "{\n\"forestimatorAnalyses\":\"surface\",\n"
+                       <<       "\"surface\":"<< OGR_G_Area(pol)/10000 <<",\n"
                        <<       "\"RequestedLayers\":[\n";
-
+        int j(0);
         for (std::string code: aV){
+
+            response.out() << "    { \n\"layerCode\":\"" << code <<"\",\n";
 
             if (mDico->hasLayerBase(code)){
 
                 std::shared_ptr<layerBase> l =mDico->getLayerBase(code);
 
-                if(code=="CNSW"){
-                    surfPedo surf(mDico->mPedo,pol);
-                    response.out() << surf.getSummaryAPI() ;
-                } else if (l->getCatLayer()==TypeLayer::FEE){
-                    // response+="code_es;type;O;T;TE;E;I\n";
-
-                    std::map<int,double> stat=l->computeStat2(pol);
-
-                    //response+=l->EssCode()+";"+l->getCatLayerStr();
-                    std::map<int,double> statSimp=mDico->simplifieAptStat(stat);
-                    for (auto kv:statSimp){
-                        //response+=";"+roundDouble(kv.second);
-                    }
-                    //response+="\n";
-                    // carte dendro
-                } else if (l->getCatLayer()==TypeLayer::CS){
-
-
-                } else {
-
-
-                    // analyse surfacique ; basic stat pour les var continue
                     switch (l->getTypeVar()) {
                     case TypeVar::Continu:{
 
                         basicStat stat=l->computeBasicStatOnPolyg(pol);
-
-
-                        //  response+="mean;"+stat.getMean()+"\n";
-                        //  response+="max;"+stat.getMax()+"\n";
-                        //  response+="sd;"+stat.getSd()+"\n";
-
+                        response.out() << "        \"mean\":"<< stat.getMean()<< ",\n"
+                                       << "        \"max\":"<<  stat.getMax() << ",\n"
+                                       << "        \"sum\":"<<  stat.getSum() << ",\n"
+                                       << "        \"surf\":"<<  stat.getSurfTot(2) << ",\n"
+                                       << "        \"surfNA\":"<<  stat.getNbNA(2) << ",\n"
+                                       << "        \"sd\":" <<  stat.getSd() << "\n";
                         break;
                     }
                     case TypeVar::Classe:{
                         std::map<int,double> stat=l->computeStat2(pol);
-                        // ici je met trois balise ; nom du field, valeur raster , et pourcentage
-                        //     response+=putInBalise(l->getValLabel(kv.first),"classeName");
-                        //     response+=putInBalise(std::to_string(kv.first),"classeRasterVal");
-                        //     response+=putInBalise(roundDouble(kv.second),"pourcentage");
 
+                        if (l->getCatLayer()==TypeLayer::FEE){
+                            stat=mDico->simplifieAptStat(stat);
+                        }
+                        response.out()     << "    \"classes\":[\n";
+                        int c(0);
+                        for (auto kv:stat){
+
+                            response.out() << "        {\n"
+                                           << "        \"rastValue\":"<<  kv.first<< ",\n"
+                                           << "        \"value\":\""<<  l->getValLabel(kv.first) << "\",\n"
+                                           << "        \"prop\":" <<  roundDouble(kv.second) << "\n"
+                                           << "        }";
+                            c++;
+                            if (c<stat.size()) {response.out() << ",\n";}
+                        }
+                        response.out() << "\n      ]\n";
                         break;
                     }
                     default:
                         break;
                     }
-                }
-
                 // fin if dico has layer
             }
+            response.out()   << "    }";
+            j++;
+            if (j<aV.size()) {response.out() << ",\n";}
             // fin boucle sur layer
         }
+        response.out() << "\n ]\n}\n";
 
         OGRGeometryFactory::destroyGeometry(pol);
     } else {

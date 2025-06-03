@@ -674,6 +674,19 @@ std::map<int,double> layerBase::computeStat2(OGRGeometry * poGeom){
             }
         }
     }
+    // suppression des paires si valeur est == 0
+    for (auto it = aRes.cbegin(); it != aRes.cend() /* not hoisted */; /* no increment */)
+    {
+      if (it->second==0)
+      {
+        aRes.erase(it++);    // or "it = m.erase(it)" since C++11
+      }
+      else
+      {
+        ++it;
+      }
+    }
+
     return aRes;
 }
 

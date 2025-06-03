@@ -143,7 +143,7 @@ std::unique_ptr<WContainerWidget> layerStatChart::getChart(bool forRenderingInPd
                 aChart->setMargin(50, Side::Left | Side::Right);
 
             }else {
-                // pour toute les couches dendro 2021
+                // pour toute les couches dendro 2021 faites en 2025 (wave)
 
                 basicStat bs= mLay->computeBasicStatOnPolyg(mGeom);
                 // ajout d'un tableau de synthèse
