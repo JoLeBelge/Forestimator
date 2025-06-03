@@ -25,10 +25,10 @@ SOURCES += main.cpp \
     ACR/terrainviellecouperase.cpp \
     #ACR/formviellecouperase.cpp \
     OGF/formOGF.cpp \
+    api/anasurfresource.cpp \
     desserteForest/desserteForest.cpp \
     analytics.cpp \
     api/anaponctuelleresource.cpp \
-    api/cnswresource.cpp \
     api/rasterclipresource.cpp \
     api/staticmapresource.cpp \
     auth/Session.cpp \
@@ -64,10 +64,10 @@ HEADERS += \
     ACR/terrainviellecouperase.h \
     #ACR/formviellecouperase.h \
     OGF/formOGF.h \
+    api/anasurfresource.h \
     desserteForest/desserteForest.h \
     analytics.h \
     api/anaponctuelleresource.h \
-    api/cnswresource.h \
     api/rasterclipresource.h \
     api/staticmapresource.h \
     auth/Session.h \

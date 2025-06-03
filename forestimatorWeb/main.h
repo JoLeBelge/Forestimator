@@ -14,7 +14,7 @@ namespace po = boost::program_options;
 #include "api/stationdescresource.h"
 #include "api/rasterclipresource.h"
 #include "api/anaponctuelleresource.h"
-#include "api/cnswresource.h"
+#include "api/anasurfresource.h"
 #include "analytics.h"
 #include "./libzippp/src/libzippp.h"
 using namespace libzippp;
