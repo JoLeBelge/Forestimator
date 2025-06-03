@@ -2,7 +2,7 @@ name: fforestimator
 description: Une application cartographique pour les forestiers wallons qui permet d'obtenir de nombreux renseignements sur les stations forestières et sur les peuplements en place.
 
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
-version: 1.0.1+12
+version: 1.0.1+13
 
 environment:
   sdk: '>=3.7.2 <4.0.0'
@@ -27,7 +27,6 @@ dependencies:
   flutter_map_location_marker: ^10.1.0
   image: ^4.5.4
   #display_metrics: ^2.0.1
-
   geoimage: ^0.4.0
   shared_preferences: ^2.2.2
   pdf: ^3.10.8
@@ -41,6 +40,7 @@ dependencies:
   area_polygon: ^1.0.2
   archive: ^4.0.7
   dart_jts: ^0.3.0+1
+  flutter_colorpicker: ^1.1.0
 
 dev_dependencies:
   flutter_test:

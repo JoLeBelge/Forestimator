@@ -1,6 +1,7 @@
 /* Implementation of the permission_handler 12.0.0+1 Interface  */
 
 import 'dart:io';
+import 'package:fforestimator/globals.dart' as gl;
 import 'package:fforestimator/tools/notification.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -21,6 +22,9 @@ int release = 20;
 int sdkInt = 20;
 
 /* Ask permissions at start of map and if not granted ask to grant them */
+bool getLocation() => location.isGranted;
+bool getStorage() => storage.isGranted;
+bool getExtStorage() => extStorage.isGranted;
 
 void initPermissions() async {
   refreshPermissionInfos();
@@ -31,7 +35,7 @@ void initPermissions() async {
       androidInfo.version.release[0] + androidInfo.version.release[1],
     );
     sdkInt = androidInfo.version.sdkInt;
-    print("Android $release (sdk $sdkInt)");
+    gl.print("Android $release (sdk $sdkInt)");
   }
   getVersion = false;
 }
@@ -59,7 +63,7 @@ Widget handlePermissionForLocation({
   if (!askOnceForLocation) return child;
   if (location.isPermanentlyDenied) {
     return PopupPermissions(
-      title: "Permission pour le GPS deactivé",
+      title: "GPS desactivées",
       accept: "Ouvrir paramètres",
       onAccept: () async {
         await openAppSettings();
@@ -75,7 +79,7 @@ Widget handlePermissionForLocation({
         });
       },
       dialog:
-          "Forestimator mobile ne collecte aucune information personnelle. Notre politique de confidentialité est consultable au https://forestimator.gembloux.ulg.ac.be/documentation/confidentialit_. Vous pouvez ouvrir les paramètres et autoriser l'aplication à utiliser la position.",
+          "L'application utilise le gps pour afficher votre position actuelle sur la carte. Si vous voulez utiliser cette fonctionalité il faut donner la permission dans les parametres.\nSouhaitez vous ouvrir les parametres de votre smartphone?",
     );
   } else if (location.isDenied) {
     return PopupPermissions(
@@ -95,7 +99,7 @@ Widget handlePermissionForLocation({
         });
       },
       dialog:
-          "Forestimator mobile ne collecte aucune information personnelle. Notre politique de confidentialité est consultable au https://forestimator.gembloux.ulg.ac.be/documentation/confidentialit_. Autorisez-vous l'aplication à utiliser la position?",
+          "Forestimator mobile ne collecte aucune donnée. Notre politique de confidentialité est consultable au https://forestimator.gembloux.ulg.ac.be/documentation/confidentialit_.\nL'application utilise le gps pour afficher votre position actuelle sur la carte et seulement pendant l'utilisation. Autorisez-vous cette fonctionalité?",
     );
   }
   return child;

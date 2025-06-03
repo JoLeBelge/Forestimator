@@ -1,14 +1,14 @@
-import 'package:fforestimator/dico/dicoApt.dart';
+import 'package:fforestimator/dico/dico_apt.dart';
 import "package:flutter/material.dart";
-import 'package:fforestimator/pages/anaPt/requestedLayer.dart';
-import 'package:fforestimator/pages/anaPt/anaPtpdf.dart';
+import 'package:fforestimator/pages/anaPt/requested_layer.dart';
+import 'package:fforestimator/pages/anaPt/ana_ptpdf.dart';
 import 'package:fforestimator/globals.dart' as gl;
 import 'package:fforestimator/myicons.dart';
 import 'package:go_router/go_router.dart';
 import 'package:fforestimator/tools/notification.dart';
 
 class AnaPtpage extends StatefulWidget {
-  final List<layerAnaPt> requestedLayers;
+  final List<LayerAnaPt> requestedLayers;
   const AnaPtpage(this.requestedLayers, {super.key});
 
   @override
@@ -21,8 +21,8 @@ class _AnaPtpageState extends State<AnaPtpage> {
   @override
   Widget build(BuildContext context) {
     // pour la construction du tableau d'aptitude
-    aptsFEE apts = aptsFEE(widget.requestedLayers);
-    propositionGS aptsGS = propositionGS(widget.requestedLayers);
+    AptsFEE apts = AptsFEE(widget.requestedLayers);
+    PropositionGS aptsGS = PropositionGS(widget.requestedLayers);
 
     return Scaffold(
       backgroundColor: Colors.grey[200],
@@ -71,7 +71,7 @@ class _AnaPtpageState extends State<AnaPtpage> {
                   String dir = "/storage/emulated/0/Download/";
                   makePdf(widget.requestedLayers, pdf, dir, locationName);
                   // confirmation que le pdf a été créé
-                  PopupPDFSaved(context, pdf);
+                  PopupPDFSaved(gl.notificationContext!, pdf);
                 }
               },
             ),
@@ -131,12 +131,12 @@ class _AnaPtpageState extends State<AnaPtpage> {
 }
 
 class LayerAnaPtListTile extends StatelessWidget {
-  final layerAnaPt data;
+  final LayerAnaPt data;
   const LayerAnaPtListTile({super.key, required this.data});
 
   @override
   Widget build(BuildContext context) {
-    layerBase l = gl.dico.getLayerBase(data.mCode);
+    LayerBase l = gl.dico.getLayerBase(data.mCode);
     return ListTile(
       leading: switch (l.mGroupe) {
         "ST" => Icon(CustomIcons.montain),
@@ -153,7 +153,7 @@ class LayerAnaPtListTile extends StatelessWidget {
             style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.w500),
           ),
           SizedBox(width: 20),
-          if (l.getValColor(data.mRastValue).value != 4294967295)
+          if (l.getValColor(data.mRastValue).toARGB32() != 4294967295)
             CircleAvatar(
               radius: 10,
               backgroundColor: l.getValColor(data.mRastValue),
@@ -171,7 +171,7 @@ class LayerAnaPtListTile extends StatelessWidget {
   }
 }
 
-Widget _tabAptFEE(BuildContext context, aptsFEE apts) {
+Widget _tabAptFEE(BuildContext context, AptsFEE apts) {
   return Column(
     children: [
       SizedBox(height: 10),
@@ -187,23 +187,22 @@ Widget _tabAptFEE(BuildContext context, aptsFEE apts) {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            Container(
-              child: TabBar(
-                tabs: [
-                  Tab(text: "Optimum"),
-                  Tab(text: "Tolérance"),
-                  Tab(text: "Tolérance élargie"),
-                ],
-              ),
+            TabBar(
+              tabs: [
+                Tab(text: "Optimum"),
+                Tab(text: "Tolérance"),
+                Tab(text: "Tolérance élargie"),
+              ],
             ),
             Container(
-              //Add this to give height
-              height: MediaQuery.of(context).size.height,
+              constraints: BoxConstraints(
+                maxHeight: MediaQuery.of(context).size.height,
+              ),
               child: TabBarView(
                 children: [
-                  essencesListView(apts: apts, codeApt: 1),
-                  essencesListView(apts: apts, codeApt: 2),
-                  essencesListView(apts: apts, codeApt: 3),
+                  EssencesListView(apts: apts, codeApt: 1),
+                  EssencesListView(apts: apts, codeApt: 2),
+                  EssencesListView(apts: apts, codeApt: 3),
                 ],
               ),
             ),
@@ -214,10 +213,16 @@ Widget _tabAptFEE(BuildContext context, aptsFEE apts) {
   );
 }
 
-class essencesListView extends StatelessWidget {
-  final aptsFEE apts;
+class EssencesListView extends StatelessWidget {
+  final AptsFEE apts;
   final int codeApt;
-  essencesListView({required this.apts, required this.codeApt});
+
+  const EssencesListView({
+    super.key,
+    required this.apts,
+    required this.codeApt,
+  });
+
   @override
   Widget build(BuildContext context) {
     final Map<String, int> mEss = apts.getListEss(codeApt);
@@ -234,14 +239,14 @@ class essencesListView extends StatelessWidget {
       itemBuilder: (context, index) {
         return ListTile(
           leading: Icon(
-            gl.dico.getEss(code.elementAt(index)).mF_R == 1
+            gl.dico.getEss(code.elementAt(index)).mFR == 1
                 ? CustomIcons.tree
                 : Icons.forest_outlined,
           ),
           title: Text(gl.dico.getEss(code.elementAt(index)).mNomFR),
           subtitle:
               codeApt != mEss[code.elementAt(index)]
-                  ? Text(gl.dico.AptLabel(mEss[code.elementAt(index)]!))
+                  ? Text(gl.dico.aptLabel(mEss[code.elementAt(index)]!))
                   : null,
           trailing:
               apts.mCompensations[code.elementAt(index)]!
@@ -263,7 +268,7 @@ class essencesListView extends StatelessWidget {
   }
 }
 
-Widget _tabPropositionCS(BuildContext context, propositionGS apts) {
+Widget _tabPropositionCS(BuildContext context, PropositionGS apts) {
   return Column(
     children: [
       SizedBox(height: 10),
@@ -279,21 +284,22 @@ Widget _tabPropositionCS(BuildContext context, propositionGS apts) {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            Container(
-              child: TabBar(
-                tabs: [
-                  Tab(text: gl.dico.vulnerabiliteLabel(1)),
-                  Tab(text: gl.dico.vulnerabiliteLabel(2)),
-                  Tab(text: gl.dico.vulnerabiliteLabel(3)),
-                  Tab(text: gl.dico.vulnerabiliteLabel(4)),
-                  //  Tab(text: "Déconseillé"),
-                  //  Tab(text: "Très fortement déconseillé"),
-                ],
-              ),
+            TabBar(
+              tabs: [
+                Tab(text: gl.dico.vulnerabiliteLabel(1)),
+                Tab(text: gl.dico.vulnerabiliteLabel(2)),
+                Tab(text: gl.dico.vulnerabiliteLabel(3)),
+                Tab(text: gl.dico.vulnerabiliteLabel(4)),
+                //  Tab(text: "Déconseillé"),
+                //  Tab(text: "Très fortement déconseillé"),
+              ],
             ),
+
             Container(
+              constraints: BoxConstraints(
+                maxHeight: MediaQuery.of(context).size.height,
+              ),
               //Add this to give height
-              height: MediaQuery.of(context).size.height,
               child: TabBarView(
                 children: [
                   EssencesListViewGS(apts: apts, codeApt: 1),
@@ -313,7 +319,7 @@ Widget _tabPropositionCS(BuildContext context, propositionGS apts) {
 }
 
 class EssencesListViewGS extends StatelessWidget {
-  final propositionGS apts;
+  final PropositionGS apts;
   final int codeApt; // maintentant c'est plus un code de vulnérabilités
 
   const EssencesListViewGS({
@@ -347,7 +353,7 @@ class EssencesListViewGS extends StatelessWidget {
         }
         return ListTile(
           leading: Icon(
-            gl.dico.getEss(code.elementAt(index - 1)).mF_R == 1
+            gl.dico.getEss(code.elementAt(index - 1)).mFR == 1
                 ? CustomIcons.tree
                 : Icons.forest_outlined,
           ),
@@ -360,7 +366,7 @@ class EssencesListViewGS extends StatelessWidget {
 
 Widget _anaPtListLayers(
   BuildContext context,
-  List<layerAnaPt> requestedLayers,
+  List<LayerAnaPt> requestedLayers,
 ) {
   /* plus nécessaire car requestedLayers est purgé avant l'envoi à AnaPtpage
   int nb = 0;

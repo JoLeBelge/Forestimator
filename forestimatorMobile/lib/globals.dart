@@ -1,13 +1,16 @@
-import 'package:fforestimator/dico/dicoApt.dart';
+import 'package:fforestimator/dico/dico_apt.dart';
+import 'package:fforestimator/tools/customLayer/polygon_layer.dart' as pol;
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:fforestimator/pages/anaPt/requestedLayer.dart';
+import 'package:fforestimator/pages/anaPt/requested_layer.dart';
 import 'package:memory_info/memory_info.dart';
 import 'package:proj4dart/proj4dart.dart' as proj4;
 import 'package:latlong2/latlong.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-late dicoAptProvider dico;
+late DicoAptProvider dico;
+
+const String forestimatorMobileVersion = "1.0.2-13";
 
 String basePathbranchB = "catalogue";
 String basePathbranchC = "offline";
@@ -18,6 +21,19 @@ BuildContext? notificationContext;
 
 bool offlineMode = false;
 bool debug = false;
+int currentPage = 0;
+
+List<String> onboardConsole = [forestimatorMobileVersion];
+int lengthLog = 1;
+@override
+void print(dynamic it) {
+  onboardConsole.add(it.toString());
+}
+
+List<pol.PolygonLayer> polygonLayers = [
+  pol.PolygonLayer(polygonName: "Terrain"),
+];
+int selectedPolygonLayer = 0;
 
 // ajouter le code le la couche à la fin de cette requete. fonctionne que pour layerbase avec mRes <= 10m sinon je considère que c'est trop volumineux
 String queryApiRastDownload =
@@ -27,21 +43,21 @@ String defaultLayer = "IGN";
 List<String> interfaceSelectedLCode = ["IGN"];
 List<bool> interfaceSelectedLOffline = [false];
 
-class selectedLayer {
+class SelectedLayer {
   String mCode;
   bool offline;
   String sourceImagePath;
-  selectedLayer({
+  SelectedLayer({
     required this.mCode,
     this.offline = false,
     this.sourceImagePath = "",
   });
 }
 
-List<selectedLayer> interfaceSelectedLayerKeys = [];
+List<SelectedLayer> interfaceSelectedLayerKeys = [];
 
 String getFirstSelLayOffline() {
-  List<selectedLayer> l =
+  List<SelectedLayer> l =
       interfaceSelectedLayerKeys.where((i) => i.offline).toList();
   return l.isNotEmpty ? l.first.mCode : "toto";
 }
@@ -62,7 +78,7 @@ void refreshInterfaceSelectedL() {
 
 List<String> getInterfaceSelectedLCode() {
   List<String> aRes = [];
-  for (selectedLayer l in interfaceSelectedLayerKeys) {
+  for (SelectedLayer l in interfaceSelectedLayerKeys) {
     aRes.insert(aRes.length, l.mCode);
   }
   return aRes;
@@ -70,13 +86,13 @@ List<String> getInterfaceSelectedLCode() {
 
 List<String> getInterfaceSelectedLOffline() {
   List<String> aRes = [];
-  for (selectedLayer l in interfaceSelectedLayerKeys) {
+  for (SelectedLayer l in interfaceSelectedLayerKeys) {
     aRes.insert(aRes.length, l.offline.toString());
   }
   return aRes;
 }
 
-List<layerAnaPt> requestedLayers = [];
+List<LayerAnaPt> requestedLayers = [];
 
 List<String> anaPtSelectedLayerKeys = [
   "ZBIO",
@@ -117,6 +133,8 @@ Function refreshMap = (Function f) {
   f();
 };
 Function refreshWholeCatalogueView = (void Function() setter) async {};
+Function refreshSearch = (void Function() setter) async {};
+Function refreshSettingsMenu = (void Function() setter) async {};
 Function refreshCurrentThreeLayer = () {};
 //Function refreshOfflineView = () {};
 Function rebuildOfflineView = (void Function() setter) async {};
@@ -135,7 +153,7 @@ LatLng latlonCenter = const LatLng(49.76, 5.32);
 double mapZoom = 7.0;
 
 void removeLayerFromList(String key, {bool offline = false}) async {
-  selectedLayer? sL;
+  SelectedLayer? sL;
   for (var layer in interfaceSelectedLayerKeys) {
     if (layer.mCode == key && layer.offline == offline) {
       sL = layer;
@@ -166,7 +184,7 @@ void changeSelectedLayerModeOffline() {
       interfaceSelectedLayerKeys.isEmpty) {
     interfaceSelectedLayerKeys.insert(
       0,
-      selectedLayer(
+      SelectedLayer(
         mCode:
             dico
                 .getLayersOffline()
@@ -194,7 +212,7 @@ void addLayerToList(
 }) async {
   interfaceSelectedLayerKeys.insert(
     0,
-    selectedLayer(mCode: key, offline: offline),
+    SelectedLayer(mCode: key, offline: offline),
   );
 
   if (!offlineMode) {

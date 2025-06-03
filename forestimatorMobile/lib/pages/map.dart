@@ -1,7 +1,7 @@
 import 'dart:async';
-import 'package:fforestimator/dico/dicoApt.dart';
-import 'package:fforestimator/tileProvider/tifTileProvider.dart';
-import 'package:fforestimator/tools/handlePermissions.dart';
+import 'package:fforestimator/dico/dico_apt.dart';
+import 'package:fforestimator/tileProvider/tif_tile_provider.dart';
+import 'package:fforestimator/tools/handle_permissions.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:proj4dart/proj4dart.dart' as proj4;
@@ -11,15 +11,13 @@ import 'dart:io';
 import 'package:geolocator/geolocator.dart';
 import 'package:fforestimator/globals.dart' as gl;
 import 'package:http/http.dart' as http;
-import 'package:fforestimator/pages/anaPt/requestedLayer.dart';
+import 'package:fforestimator/pages/anaPt/requested_layer.dart';
 import 'package:go_router/go_router.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fforestimator/tools/notification.dart';
 import 'dart:convert';
 import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
-import 'package:fforestimator/tools/customLayer/polygon_layer.dart'
-    as draw_layer;
 
 class MapPage extends StatefulWidget {
   const MapPage({super.key});
@@ -32,18 +30,30 @@ class _MapPageState extends State<MapPage> {
   final _mapController = MapController();
   LatLng? _pt;
   bool _doingAnaPt = false;
-  var data;
+
+  static int _mapFrameCounter = 0;
+
+  bool _settingsMenu = false;
+
   bool _toolbarExtended = false;
   bool _modeDrawPolygon = false;
   bool _modeDrawPolygonAddVertexes = false;
   bool _modeDrawPolygonRemoveVertexes = false;
   bool _modeDrawPolygonMoveVertexes = false;
-  LatLng? _selectedPointToMove;
-  double _iconSize = 50.0;
 
-  List<draw_layer.PolygonLayer> drawnLayer = [
-    draw_layer.PolygonLayer(name: "defaultDrawLayer"),
-  ];
+  bool _modeLayerProperties = false;
+  bool _modeLayerPropertiesColors = false;
+  bool _modeLayerPropertiesRename = false;
+
+  bool _modeProjectProperties = false;
+  bool _modeSearch = false;
+
+  Color _polygonMenuColor(bool choice) => choice ? Colors.orange : Colors.brown;
+  Color _polygonMenuColorTools(bool choice) =>
+      choice ? Colors.lightGreenAccent : Colors.grey;
+
+  LatLng? _selectedPointToMove;
+  double iconSize = 50.0;
 
   //https://github.com/fleaflet/flutter_map/blob/master/example/lib/pages/custom_crs/custom_crs.dart
   late proj4.Projection epsg4326 = proj4.Projection.get('EPSG:4326')!;
@@ -67,12 +77,6 @@ class _MapPageState extends State<MapPage> {
     var maxResolution = 1280;
     return List.generate(nbzoom, (z) => maxResolution / pow(2, z));
   }
-  /*List<double> getResolutions(double maxX, double minX, int zoom,
-      [double tileSize = 256.0]) {
-    // résolution numéro 1: une tile pour tout l'extend de la Wallonie
-    var size = (maxX - minX) / (tileSize);
-    return List.generate(zoom, (z) => size / pow(2, z));
-  }*/
 
   late var epsg31370CRS = Proj4Crs.fromFactory(
     code: 'EPSG:31370',
@@ -80,11 +84,10 @@ class _MapPageState extends State<MapPage> {
     bounds: epsg31370Bounds,
     resolutions: getResolutions2(12),
   );
-  //resolutions: getResolutions(295170.0, 42250.0, 15, 256.0));
 
   Future _runAnaPt(proj4.Point ptBL72) async {
     gl.requestedLayers.clear();
-    data = "";
+    Map data;
 
     gl.pt = ptBL72;
 
@@ -107,29 +110,26 @@ class _MapPageState extends State<MapPage> {
 
           // si pas de connexion internet, va tenter de lire data comme une map alors que c'est vide, erreur. donc dans le bloc try catch aussi
           for (var r in data["RequestedLayers"]) {
-            gl.requestedLayers.add(layerAnaPt.fromMap(r));
+            gl.requestedLayers.add(LayerAnaPt.fromMap(r));
           }
         } catch (e) {
-          // handshake et/ou socketExeption
-          //print('There was an error: ');
-          /*FlutterLogs.logError("anaPt", "online",
-              "error while waiting for forestimatorWeb answer. ${e}");*/
+          gl.print("$e");
         }
         gl.requestedLayers.removeWhere(
           (element) => element.mFoundLayer == false,
         );
       } else {
         showDialog(
-          context: context,
+          context: gl.notificationContext!,
           builder: (BuildContext context) {
             return PopupNoInternet();
           },
         );
       }
     } else {
-      for (layerBase l in gl.dico.getLayersOffline()) {
+      for (LayerBase l in gl.dico.getLayersOffline()) {
         int val = await l.getValXY(ptBL72);
-        gl.requestedLayers.add(layerAnaPt(mCode: l.mCode, mRastValue: val));
+        gl.requestedLayers.add(LayerAnaPt(mCode: l.mCode, mRastValue: val));
       }
     }
 
@@ -145,25 +145,18 @@ class _MapPageState extends State<MapPage> {
     );
   }
 
-  /*
-  bool _isDownloadableLayer(String key) {
-    if (gl.downloadableLayerKeys.contains(key)) {
-      return true;
-    }
-    return false;
-  }
-*/
-  tifFileTileProvider? _provider;
+  TifFileTileProvider? _provider;
 
   @override
   void initState() {
     super.initState();
     initPermissions();
-    gl.refreshMap = setState;
+    gl.refreshMap = refreshView;
     initOtherValuesOnce();
   }
 
   void refreshView(void Function() f) async {
+    _mapFrameCounter++;
     setState(f);
   }
 
@@ -247,13 +240,15 @@ class _MapPageState extends State<MapPage> {
                 onTap:
                     _modeDrawPolygonAddVertexes
                         ? (tapPosition, point) async => {
-                          setState(() {
-                            drawnLayer.first.addPoint(point);
+                          refreshView(() {
+                            gl.polygonLayers[gl.selectedPolygonLayer].addPoint(
+                              point,
+                            );
                           }),
                         }
                         : _modeDrawPolygonMoveVertexes
                         ? (tapPosition, point) async => {
-                          setState(() {
+                          refreshView(() {
                             _stopMovingSelectedPoint();
                           }),
                         }
@@ -264,7 +259,7 @@ class _MapPageState extends State<MapPage> {
                         : (tapPosition, point) async => {
                           if (!_doingAnaPt)
                             {
-                              setState(() {
+                              refreshView(() {
                                 _doingAnaPt = true;
                               }),
                               //proj4.Point ptBL72 = epsg4326.transform(epsg31370,proj4.Point(x: point.longitude, y: point.latitude))
@@ -278,17 +273,19 @@ class _MapPageState extends State<MapPage> {
                                 ),
                               ),
                               _updatePtMarker(point),
-                              setState(() {
+                              refreshView(() {
                                 _doingAnaPt = false;
                               }),
-                              GoRouter.of(context).push("/anaPt"),
+                              GoRouter.of(
+                                gl.notificationContext!,
+                              ).push("/anaPt"),
                             },
                         },
                 onPositionChanged: (position, e) async {
                   if (!e) return;
                   updateLocation();
                   if (_selectedPointToMove != null) {
-                    drawnLayer.first.replacePoint(
+                    gl.polygonLayers[gl.selectedPolygonLayer].replacePoint(
                       _selectedPointToMove!,
                       LatLng(
                         position.center.latitude,
@@ -296,14 +293,14 @@ class _MapPageState extends State<MapPage> {
                       ),
                     );
 
-                    setState(() {
+                    refreshView(() {
                       _selectedPointToMove = LatLng(
                         position.center.latitude,
                         position.center.longitude,
                       );
                     });
                   } else {
-                    setState(() {});
+                    refreshView(() {});
                   }
                   _writeNewPositionToMemory(
                     position.center.longitude,
@@ -317,33 +314,36 @@ class _MapPageState extends State<MapPage> {
                 minZoom:
                     2, // pour les cartes offline, il faudrait informer l'utilisateur du fait que si le zoom est trop peu élevé, la carte ne s'affiche pas
                 initialCenter: gl.latlonCenter,
-                cameraConstraint: CameraConstraint.contain(
+                cameraConstraint: CameraConstraint.containCenter(
                   bounds: LatLngBounds.fromPoints([latlonBL, latlonTR]),
                 ),
                 onMapReady: () async {
                   updateLocation();
                   if (gl.position != null) {
                     // IMPORTANT: rebuild location layer when permissions are granted
-                    setState(() {
+                    refreshView(() {
                       _mapController.move(
                         LatLng(
                           gl.position?.latitude ?? 0.0,
                           gl.position?.longitude ?? 0.0,
                         ),
-                        gl.mapZoom,
+                        _mapController.camera.zoom,
                       );
                     });
                     // si on refusait d'allumer le GPS, alors la carte ne s'affichait jamais, c'est pourquoi il y a le else et le code ci-dessous
                   } else {
-                    setState(() {
-                      _mapController.move(gl.latlonCenter, gl.mapZoom);
+                    refreshView(() {
+                      _mapController.move(
+                        gl.latlonCenter,
+                        _mapController.camera.zoom,
+                      );
                     });
                   }
                 },
               ),
               children:
                   gl.interfaceSelectedLayerKeys.reversed.map<Widget>((
-                    gl.selectedLayer selLayer,
+                    gl.SelectedLayer selLayer,
                   ) {
                     if (selLayer.offline &&
                         gl.dico.getLayerBase(selLayer.mCode).mOffline &&
@@ -355,7 +355,7 @@ class _MapPageState extends State<MapPage> {
                           _provider =
                               null; // normalement le garbage collector effectue le dispose pour nous.
                         }
-                        _provider = tifFileTileProvider(
+                        _provider = TifFileTileProvider(
                           refreshView: refreshView,
                           mycrs: epsg31370CRS,
                           sourceImPath: gl.dico.getRastPath(selLayer.mCode),
@@ -375,7 +375,7 @@ class _MapPageState extends State<MapPage> {
                       // deuxième carte offline ; on ne fait rien avec, un seul provider
                       return Container();
                     } else {
-                      layerBase l = gl.dico.getLayerBase(selLayer.mCode);
+                      LayerBase l = gl.dico.getLayerBase(selLayer.mCode);
                       return TileLayer(
                         userAgentPackageName: "com.forestimator",
                         wmsOptions: WMSTileLayerOptions(
@@ -410,53 +410,42 @@ class _MapPageState extends State<MapPage> {
                       ]) +
                   <Widget>[
                     MarkerLayer(
-                      markers: [
-                        !_modeDrawPolygonMoveVertexes
-                            ? Marker(
-                              width: 70.0,
-                              height: 70.0,
-                              point: _pt ?? const LatLng(0.0, 0.0),
-                              child: const Icon(Icons.location_on),
-                            )
-                            : _selectedPointToMove != null
-                            ? Marker(
-                              alignment: Alignment.center,
-                              width: _iconSize * 2,
-                              height: _iconSize,
-                              point: _mapController.camera.center,
-                              child: const Icon(
-                                Icons.donut_large,
-                                color: Colors.red,
-                              ),
-                            )
-                            : Marker(
-                              alignment: Alignment.center,
-                              width: _iconSize * 2,
-                              height: _iconSize,
-                              point: _mapController.camera.center,
-                              child: const Icon(
-                                Icons.donut_large,
-                                color: Colors.blue,
-                              ),
-                            ),
-                        Marker(
-                          alignment: Alignment.topLeft,
-                          width: _iconSize * 2,
-                          height: _iconSize,
-                          point: drawnLayer.first.center,
-                          child: Row(
-                            children: [
-                              const Icon(Icons.area_chart, color: Colors.blue),
-                              Text(
-                                "${(drawnLayer.first.area / 1000).round() / 100} Ha",
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
+                      markers:
+                          [
+                            !_modeDrawPolygonMoveVertexes
+                                ? Marker(
+                                  width: 70.0,
+                                  height: 70.0,
+                                  point: _pt ?? const LatLng(0.0, 0.0),
+                                  child: const Icon(Icons.location_on),
+                                )
+                                : _selectedPointToMove != null
+                                ? Marker(
+                                  alignment: Alignment.center,
+                                  width: iconSize,
+                                  height: iconSize,
+                                  point: _mapController.camera.center,
+                                  child: const Icon(
+                                    Icons.donut_large,
+                                    color: Colors.red,
+                                  ),
+                                )
+                                : Marker(
+                                  alignment: Alignment.center,
+                                  width: iconSize,
+                                  height: iconSize,
+                                  point: _mapController.camera.center,
+                                  child: const Icon(
+                                    Icons.donut_large,
+                                    color: Colors.blue,
+                                  ),
+                                ),
+                          ] +
+                          _getPolygonesInfos(),
                     ),
                   ],
             ),
+            _settingsGuard(),
             _toolbarGuard(),
             gl.position != null
                 ? Row(
@@ -466,11 +455,11 @@ class _MapPageState extends State<MapPage> {
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         IconButton(
-                          iconSize: _iconSize,
+                          iconSize: iconSize,
                           color: gl.colorAgroBioTech,
                           onPressed: () async {
                             if (!_doingAnaPt) {
-                              setState(() {
+                              refreshView(() {
                                 _doingAnaPt = true;
                               });
                               await _runAnaPt(
@@ -488,8 +477,10 @@ class _MapPageState extends State<MapPage> {
                                   gl.position?.longitude ?? 0.0,
                                 ),
                               );
-                              GoRouter.of(context).push("/anaPt");
-                              setState(() {
+                              GoRouter.of(
+                                gl.notificationContext!,
+                              ).push("/anaPt");
+                              refreshView(() {
                                 _doingAnaPt = false;
                               });
                             }
@@ -497,11 +488,11 @@ class _MapPageState extends State<MapPage> {
                           icon: const Icon(Icons.analytics),
                         ),
                         IconButton(
-                          iconSize: _iconSize,
+                          iconSize: iconSize,
                           color: Colors.red,
                           onPressed: () async {
                             if (gl.position != null) {
-                              setState(() {
+                              refreshView(() {
                                 _mapController.move(
                                   LatLng(
                                     gl.position?.latitude ?? 0.0,
@@ -525,11 +516,11 @@ class _MapPageState extends State<MapPage> {
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         IconButton(
-                          iconSize: _iconSize,
+                          iconSize: iconSize,
                           color: Colors.black,
                           onPressed: () async {
                             if (gl.position != null) {
-                              setState(() {});
+                              refreshView(() {});
                             }
                           },
                           icon: const Icon(Icons.gps_fixed),
@@ -553,23 +544,59 @@ class _MapPageState extends State<MapPage> {
           children: [
             _toolbarExtended ? _toolbar() : Container(),
             IconButton(
-              iconSize: _iconSize,
+              iconSize: iconSize,
               color: _toolbarExtended ? gl.colorAgroBioTech : Colors.black,
               onPressed: () async {
-                setState(() {
+                refreshView(() {
                   _toolbarExtended = !_toolbarExtended;
                 });
                 if (_toolbarExtended == false) {
-                  _modeDrawPolygon = false;
-                  _modeDrawPolygonAddVertexes = false;
-                  _modeDrawPolygonRemoveVertexes = false;
-                  _modeDrawPolygonMoveVertexes = false;
-                  setState(() {
-                    _stopMovingSelectedPoint();
-                  });
+                  _closeLayerPropertiesMenu();
+                  _closePolygonDrawMenu();
+                  _closeProjectMenu();
                 }
               },
-              icon: const Icon(Icons.legend_toggle),
+              icon: const Icon(Icons.forest),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _settingsGuard() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            //_toolbarExtended ? _toolbar() : Container(),
+            IconButton(
+              iconSize: iconSize,
+              color: _settingsMenu ? gl.colorAgroBioTech : Colors.black,
+              onPressed: () async {
+                refreshView(() {
+                  _settingsMenu = !_settingsMenu;
+                  _toolbarExtended = false;
+                  _closeLayerPropertiesMenu();
+                  _closePolygonDrawMenu();
+                  _closeProjectMenu();
+                });
+                PopupSettingsMenu(
+                  gl.notificationContext!,
+                  gl.polygonLayers[gl.selectedPolygonLayer].name,
+                  () {
+                    refreshView(() {});
+                  },
+                  () {
+                    refreshView(() {
+                      _settingsMenu = false;
+                    });
+                  },
+                );
+              },
+              icon: const Icon(Icons.settings),
             ),
           ],
         ),
@@ -580,26 +607,10 @@ class _MapPageState extends State<MapPage> {
   Widget _toolbar() {
     return Column(
       children: [
-        IconButton(
-          iconSize: _iconSize,
-          color: Colors.black,
-          onPressed: () async {
-            if (gl.position != null) {
-              setState(() {});
-            }
-          },
-          icon: const Icon(Icons.abc),
-        ),
-        IconButton(
-          iconSize: _iconSize,
-          color: Colors.black,
-          onPressed: () async {
-            if (gl.position != null) {
-              setState(() {});
-            }
-          },
-          icon: const Icon(Icons.layers),
-        ),
+        _searchButton(),
+        _layerProjectButton(),
+        _modeLayerProperties ? _layerPropertiesMenu() : Container(),
+        _layerPropertiesButton(),
         _modeDrawPolygon ? _polygonToolbar() : Container(),
         _drawPolygonButton(),
       ],
@@ -614,61 +625,57 @@ class _MapPageState extends State<MapPage> {
     return Column(
       children: [
         IconButton(
-          iconSize: _iconSize,
-          color:
-              _modeDrawPolygonMoveVertexes ? gl.colorAgroBioTech : Colors.black,
+          iconSize: iconSize,
+          color: _polygonMenuColorTools(_modeDrawPolygonMoveVertexes),
           onPressed: () async {
-            setState(() {
+            refreshView(() {
               _modeDrawPolygonMoveVertexes = !_modeDrawPolygonMoveVertexes;
             });
             if (_modeDrawPolygonMoveVertexes == true) {
               _modeDrawPolygonAddVertexes = false;
               _modeDrawPolygonRemoveVertexes = false;
             } else {
-              setState(() {
+              refreshView(() {
                 _stopMovingSelectedPoint();
               });
             }
           },
-          icon: const Icon(Icons.change_circle),
+          icon: const Icon(Icons.swap_horizontal_circle),
         ),
         IconButton(
-          iconSize: _iconSize,
-          color:
-              _modeDrawPolygonRemoveVertexes
-                  ? gl.colorAgroBioTech
-                  : Colors.black,
+          iconSize: iconSize,
+          color: _polygonMenuColorTools(_modeDrawPolygonRemoveVertexes),
+
           onPressed: () async {
-            setState(() {
+            refreshView(() {
               _modeDrawPolygonRemoveVertexes = !_modeDrawPolygonRemoveVertexes;
             });
             if (_modeDrawPolygonRemoveVertexes == true) {
               _modeDrawPolygonMoveVertexes = false;
               _modeDrawPolygonAddVertexes = false;
-              setState(() {
+              refreshView(() {
                 _stopMovingSelectedPoint();
               });
             }
           },
-          icon: const Icon(Icons.remove),
+          icon: const Icon(Icons.remove_circle),
         ),
         IconButton(
-          iconSize: _iconSize,
-          color:
-              _modeDrawPolygonAddVertexes ? gl.colorAgroBioTech : Colors.black,
+          iconSize: iconSize,
+          color: _polygonMenuColorTools(_modeDrawPolygonAddVertexes),
           onPressed: () async {
-            setState(() {
+            refreshView(() {
               _modeDrawPolygonAddVertexes = !_modeDrawPolygonAddVertexes;
             });
             if (_modeDrawPolygonAddVertexes == true) {
               _modeDrawPolygonRemoveVertexes = false;
               _modeDrawPolygonMoveVertexes = false;
-              setState(() {
+              refreshView(() {
                 _stopMovingSelectedPoint();
               });
             }
           },
-          icon: const Icon(Icons.add),
+          icon: const Icon(Icons.add_circle),
         ),
       ],
     );
@@ -676,14 +683,9 @@ class _MapPageState extends State<MapPage> {
 
   List<Polygon> _getPolygonesToDraw() {
     List<Polygon> that = [];
-    for (var layer in drawnLayer) {
+    for (var layer in gl.polygonLayers) {
       if (layer.numPoints > 2) {
-        that.add(
-          Polygon(
-            points: layer.vertexes,
-            color: Color.fromRGBO(41, 99, 234, 0.472),
-          ),
-        );
+        that.add(Polygon(points: layer.vertexes, color: layer.colorInside));
       }
     }
     return that;
@@ -691,101 +693,393 @@ class _MapPageState extends State<MapPage> {
 
   List<CircleMarker> _drawnLayerPointsCircleMarker() {
     List<CircleMarker> all = [];
-    for (var layer in drawnLayer) {
-      for (var point in layer.vertexes) {
-        all.add(
-          CircleMarker(
-            point: point,
-            radius: _iconSize / 3,
-            color: gl.colorAgroBioTech,
-          ),
-        );
-      }
+    int i = 0;
+    for (var point in gl.polygonLayers[gl.selectedPolygonLayer].vertexes) {
+      all.add(
+        CircleMarker(
+          point: point,
+          radius:
+              gl.polygonLayers[gl.selectedPolygonLayer].isSelectedLine(i)
+                  ? iconSize / 2.7
+                  : iconSize / 3,
+          color:
+              gl.polygonLayers[gl.selectedPolygonLayer].isSelectedLine(i)
+                  ? gl.polygonLayers[gl.selectedPolygonLayer].colorLine
+                  : gl.polygonLayers[gl.selectedPolygonLayer].colorInside,
+        ),
+      );
+      i++;
     }
     return all;
   }
 
   List<Marker> _drawnLayerPointsMarker() {
     List<Marker> all = [];
-    for (var layer in drawnLayer) {
-      int count = 0;
-      for (var point in layer.vertexes) {
-        all.add(
-          Marker(
-            alignment: Alignment.center,
-            width: _iconSize,
-            height: _iconSize,
-            point: point,
-            child: TextButton(
-              onPressed: () {
-                if (_modeDrawPolygonRemoveVertexes) {
-                  setState(() {
-                    layer.removePoint(point);
-                  });
-                }
-                if (_modeDrawPolygonMoveVertexes) {
-                  setState(() {
-                    if (_selectedPointToMove == null) {
-                      _selectedPointToMove = point;
-                      _mapController.move(point, gl.mapZoom);
+    int count = 0;
+    for (var point in gl.polygonLayers[gl.selectedPolygonLayer].vertexes) {
+      all.add(
+        Marker(
+          alignment: Alignment.center,
+          width: iconSize,
+          height: iconSize,
+          point: point,
+          child: TextButton(
+            onPressed: () {
+              if (_modeDrawPolygonRemoveVertexes) {
+                refreshView(() {
+                  gl.polygonLayers[gl.selectedPolygonLayer].removePoint(point);
+                });
+              }
+              if (_modeDrawPolygonMoveVertexes) {
+                refreshView(() {
+                  if (_selectedPointToMove == null) {
+                    _selectedPointToMove = point;
+                    _mapController.move(point, _mapController.camera.zoom);
+                  } else {
+                    if (point.latitude == _selectedPointToMove!.latitude &&
+                        point.longitude == _selectedPointToMove!.longitude) {
+                      _stopMovingSelectedPoint();
                     } else {
-                      if (point.latitude == _selectedPointToMove!.latitude &&
-                          point.longitude == _selectedPointToMove!.longitude) {
-                        _stopMovingSelectedPoint();
-                      } else {
-                        _selectedPointToMove = point;
-                        _mapController.move(point, gl.mapZoom);
-                      }
+                      _selectedPointToMove = point;
+                      _mapController.move(point, _mapController.camera.zoom);
                     }
-                  });
-                }
-              },
-              child: Text(
-                overflow: TextOverflow.visible,
-                "$count",
-                maxLines: 1,
-                style: TextStyle(color: Colors.black, fontSize: _iconSize / 3),
-              ),
+                  }
+                });
+              }
+              if (_modeDrawPolygonAddVertexes) {
+                refreshView(() {
+                  gl.polygonLayers[gl.selectedPolygonLayer]
+                      .refreshSelectedLinePoints(point);
+                });
+              }
+            },
+            child: Text(
+              overflow: TextOverflow.visible,
+              "$count",
+              maxLines: 1,
+              style: TextStyle(color: Colors.black, fontSize: iconSize / 3),
             ),
           ),
-        );
-        count++;
-      }
+        ),
+      );
+      count++;
     }
     return all;
   }
 
+  Widget _layerPropertiesMenu() {
+    return Column(
+      children: <Widget>[
+        IconButton(
+          iconSize: iconSize,
+          color: _polygonMenuColorTools(_modeLayerPropertiesColors),
+          onPressed: () {
+            refreshView(() {
+              _modeLayerPropertiesColors = !_modeLayerPropertiesColors;
+              if (_modeLayerPropertiesColors) {
+                _modeLayerPropertiesRename = false;
+              }
+            });
+            PopupNameIntroducer(
+              gl.notificationContext!,
+              gl.polygonLayers[gl.selectedPolygonLayer].name,
+              (String nameIt) {
+                refreshView(
+                  () => gl.polygonLayers[gl.selectedPolygonLayer].name = nameIt,
+                );
+              },
+              () {
+                refreshView(() {
+                  _modeLayerPropertiesColors = false;
+                  if (_modeLayerPropertiesColors) {
+                    _modeLayerPropertiesRename = false;
+                  }
+                });
+              },
+            );
+          },
+          icon: Icon(Icons.text_fields, size: iconSize),
+        ),
+        IconButton(
+          iconSize: iconSize,
+          color: _polygonMenuColorTools(_modeLayerPropertiesRename),
+          onPressed: () {
+            refreshView(() {
+              _modeLayerPropertiesRename = !_modeLayerPropertiesRename;
+              if (_modeLayerPropertiesRename) {
+                _modeLayerPropertiesColors = false;
+              }
+            });
+            PopupColorChooser(
+              gl.polygonLayers[gl.selectedPolygonLayer].colorInside,
+              gl.notificationContext!,
+              (Color col) {
+                refreshView(() {
+                  gl.polygonLayers[gl.selectedPolygonLayer].setColorInside(col);
+                  gl.polygonLayers[gl.selectedPolygonLayer].setColorLine(
+                    Color.fromRGBO(
+                      (col.r * 255).round(),
+                      (col.g * 255).round(),
+                      (col.b * 255).round(),
+                      0.8,
+                    ),
+                  );
+                });
+              },
+              () {
+                refreshView(() {
+                  _modeLayerPropertiesRename = false;
+                  if (_modeLayerPropertiesRename) {
+                    _modeLayerPropertiesColors = false;
+                  }
+                });
+              },
+            );
+          },
+          icon: Icon(Icons.color_lens, size: iconSize),
+        ),
+      ],
+    );
+  }
+
+  void _closeProjectMenu() {
+    refreshView(() {
+      _modeProjectProperties = false;
+    });
+  }
+
+  void _closeSearchMenu() {
+    refreshView(() {
+      _modeSearch = false;
+    });
+  }
+
+  void _closePolygonDrawMenu() {
+    refreshView(() {
+      _modeDrawPolygon = false;
+      _modeDrawPolygonAddVertexes = false;
+      _modeDrawPolygonRemoveVertexes = false;
+      _modeDrawPolygonMoveVertexes = false;
+      _stopMovingSelectedPoint();
+    });
+  }
+
+  void _closeLayerPropertiesMenu() {
+    refreshView(() {
+      _modeLayerPropertiesRename = false;
+      _modeLayerPropertiesColors = false;
+      _modeLayerProperties = false;
+    });
+  }
+
   Widget _drawPolygonButton() {
     return IconButton(
-      iconSize: _iconSize,
-      color: _modeDrawPolygon ? gl.colorAgroBioTech : Colors.black,
+      iconSize: iconSize,
+      color: _polygonMenuColor(_modeDrawPolygon),
       onPressed: () async {
-        setState(() {
+        refreshView(() {
           _modeDrawPolygon = !_modeDrawPolygon;
         });
         gl.refreshMap(() {});
         if (_modeDrawPolygon == false) {
-          _modeDrawPolygonAddVertexes = false;
-          _modeDrawPolygonRemoveVertexes = false;
-          _modeDrawPolygonMoveVertexes = false;
-          setState(() {
-            _stopMovingSelectedPoint();
-          });
+          _closePolygonDrawMenu();
+        } else {
+          _closeLayerPropertiesMenu();
+          _closeProjectMenu();
         }
       },
       icon: const Icon(Icons.polyline),
     );
   }
 
+  Widget _layerPropertiesButton() {
+    return IconButton(
+      iconSize: iconSize,
+      color: _polygonMenuColor(_modeLayerProperties),
+      onPressed: () async {
+        refreshView(() {
+          _modeLayerProperties = !_modeLayerProperties;
+        });
+        gl.refreshMap(() {});
+        if (_modeLayerProperties == false) {
+          _closeLayerPropertiesMenu();
+        } else {
+          _closePolygonDrawMenu();
+          _closeProjectMenu();
+        }
+      },
+      icon: const Icon(Icons.settings_display),
+    );
+  }
+
+  Widget _layerProjectButton() {
+    return IconButton(
+      iconSize: iconSize,
+      color: _polygonMenuColor(_modeProjectProperties),
+      onPressed: () async {
+        refreshView(() {
+          _modeProjectProperties = !_modeProjectProperties;
+        });
+        gl.refreshMap(() {});
+        if (_modeProjectProperties == false) {
+          _closeProjectMenu();
+        } else {
+          _closeLayerPropertiesMenu();
+          _closePolygonDrawMenu();
+        }
+        PopupDrawnLayerMenu(
+          gl.notificationContext!,
+          gl.polygonLayers[gl.selectedPolygonLayer].name,
+          (LatLng pos) {
+            if (pos.longitude != 0.0 && pos.latitude != 0.0) {
+              _mapController.move(pos, _mapController.camera.zoom);
+            }
+          },
+          () {
+            refreshView(() {
+              _modeProjectProperties = false;
+            });
+          },
+        );
+      },
+      icon: const Icon(Icons.layers),
+    );
+  }
+
+  Widget _searchButton() {
+    return IconButton(
+      iconSize: iconSize,
+      color: _polygonMenuColor(_modeSearch),
+      onPressed: () async {
+        refreshView(() {
+          _modeSearch = !_modeSearch;
+        });
+        gl.refreshMap(() {});
+        if (_modeSearch == false) {
+          _closeSearchMenu();
+        } else {
+          _closeLayerPropertiesMenu();
+          _closePolygonDrawMenu();
+          _closeProjectMenu();
+        }
+        PopupSearchMenu(
+          gl.notificationContext!,
+          gl.polygonLayers[gl.selectedPolygonLayer].name,
+          (LatLng pos) {
+            if (pos.longitude != 0.0 && pos.latitude != 0.0) {
+              _mapController.move(pos, _mapController.camera.zoom);
+            }
+          },
+          () {
+            refreshView(() {
+              _modeSearch = false;
+            });
+          },
+        );
+      },
+      icon: const Icon(Icons.search),
+    );
+  }
+
+  List<Marker> _getPolygonesInfos() {
+    return List.generate(gl.polygonLayers.length, (i) {
+      return Marker(
+        alignment: Alignment.center,
+        width:
+            iconSize * 3 > gl.polygonLayers[i].name.length * 11
+                ? iconSize * 4
+                : gl.polygonLayers[i].name.length * 11,
+        height: iconSize * 1.5,
+        point: gl.polygonLayers[i].center,
+        child: Column(
+          children: <Widget>[
+            Row(
+              children: [
+                Icon(Icons.layers, color: gl.polygonLayers[i].colorLine),
+                ConstrainedBox(
+                  constraints: BoxConstraints(minWidth: 0),
+                  child: Text(
+                    gl.polygonLayers[i].name,
+                    overflow: TextOverflow.clip,
+                  ),
+                ),
+              ],
+            ),
+            Row(
+              children: [
+                Icon(Icons.area_chart, color: gl.polygonLayers[i].colorLine),
+                Text("${(gl.polygonLayers[i].area / 1000).round() / 100} Ha"),
+              ],
+            ),
+            Row(
+              children: [
+                Icon(Icons.crop, color: gl.polygonLayers[i].colorLine),
+                Text("${(gl.polygonLayers[i].perimeter).round() / 1000} km"),
+              ],
+            ),
+          ],
+        ),
+      );
+    });
+  }
+
+  void _writeColorToMemory(
+    String name,
+    SharedPreferences prefs,
+    Color color,
+  ) async {
+    await prefs.setInt('$name.r', (color.r * 255).round());
+    await prefs.setInt('$name.g', (color.g * 255).round());
+    await prefs.setInt('$name.b', (color.b * 255).round());
+    await prefs.setDouble('$name.a', color.a);
+  }
+
+  void _writePolygonPointsToMemory(
+    String name,
+    SharedPreferences prefs,
+    List<LatLng> polygon,
+  ) async {
+    int i = 0;
+    for (var point in polygon) {
+      await prefs.setDouble('$name.$i-lat', point.latitude);
+      await prefs.setDouble('$name.$i-lng', point.longitude);
+      i++;
+    }
+    await prefs.setInt('$name.nPolyPoints', i);
+  }
+
   void _writeNewPositionToMemory(double lon, double lat, double zoom) async {
+    if (_mapFrameCounter % 100 != 0) {
+      return;
+    }
+    gl.print("Saving references: $lon $lat $zoom");
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setDouble('mapCenterLat', lat);
     await prefs.setDouble('mapCenterLon', lon);
     await prefs.setDouble('mapZoom', zoom);
+    int i = 0;
+    for (var polygon in gl.polygonLayers) {
+      await prefs.setString('poly$i.name', polygon.name);
+      await prefs.setDouble('poly$i.area', polygon.area);
+      await prefs.setDouble('poly$i.perimeter', polygon.perimeter);
+      await prefs.setDouble(
+        'poly$i.transparencyInside',
+        polygon.transparencyInside,
+      );
+      await prefs.setDouble(
+        'poly$i.transparencyLine',
+        polygon.transparencyLine,
+      );
+      _writeColorToMemory('poly$i.colorInside', prefs, polygon.colorInside);
+      _writeColorToMemory('poly$i.colorLine', prefs, polygon.colorLine);
+      _writePolygonPointsToMemory('poly$i.poly', prefs, polygon.polygonPoints);
+      i++;
+    }
+    await prefs.setInt('nPolys', i);
   }
 
   void _updatePtMarker(LatLng pt) {
-    setState(() {
+    refreshView(() {
       _pt = pt;
     });
   }
@@ -803,13 +1097,14 @@ class _MapPageState extends State<MapPage> {
         Duration(seconds: 3),
       );
 
-      setState(() {
+      refreshView(() {
         gl.position = newPosition;
       });
       _refreshLocation = false;
     } catch (e) {
+      gl.print("$e");
       // We keep the old position.
-      setState(() {
+      refreshView(() {
         gl.position = gl.position;
       });
       _refreshLocation = false;
@@ -825,6 +1120,7 @@ Future<Position?> acquireUserLocation() async {
     } on LocationServiceDisabledException {
       return null;
     } catch (e) {
+      gl.print("$e");
       return null;
     }
   } else {

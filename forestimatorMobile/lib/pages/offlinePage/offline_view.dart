@@ -1,7 +1,7 @@
-import 'package:fforestimator/dico/dicoApt.dart';
-import 'package:fforestimator/pages/catalogueView/catalogueView.dart';
-import 'package:fforestimator/pages/catalogueView/layerTile.dart';
-import 'package:fforestimator/tools/layerDownloader.dart';
+import 'package:fforestimator/dico/dico_apt.dart';
+import 'package:fforestimator/pages/catalogueView/catalogue_view.dart';
+import 'package:fforestimator/pages/catalogueView/layer_tile.dart';
+import 'package:fforestimator/tools/layer_downloader.dart';
 import 'package:flutter/material.dart';
 import 'package:fforestimator/globals.dart' as gl;
 import 'package:go_router/go_router.dart';
@@ -248,7 +248,6 @@ class _OfflineView extends State<OfflineView> {
                   gl.refreshCurrentThreeLayer();
                   gl.refreshWholeCatalogueView(() {});
                 });
-                //TODO else popup warning: file is not on disk
               }
             },
           ),
@@ -320,7 +319,7 @@ class _OfflineView extends State<OfflineView> {
   }
 
   void _getLayerData() {
-    Map<String, layerBase> mp = gl.dico.mLayerBases;
+    Map<String, LayerBase> mp = gl.dico.mLayerBases;
     _downloadedLayers.clear();
 
     for (var key in mp.keys) {

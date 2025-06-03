@@ -1,24 +1,27 @@
+import 'package:fforestimator/globals.dart' as gl;
 import 'package:flutter/material.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart';
 import 'dart:async';
 
 class PDFScreen extends StatefulWidget {
-  late final String path;
-  late final String titre;
-  late final int currentPage;
+  final String path;
+  final String titre;
+  final int currentPage;
 
-  PDFScreen(
-      {Key? key, required this.path, required this.titre, this.currentPage = 0})
-      : super(key: key);
-
-  _PDFScreenState createState() => _PDFScreenState();
+  const PDFScreen({
+    super.key,
+    required this.path,
+    required this.titre,
+    this.currentPage = 0,
+  });
+  @override
+  State<StatefulWidget> createState() => _PDFScreenState();
 }
 
 class _PDFScreenState extends State<PDFScreen> with WidgetsBindingObserver {
   final Completer<PDFViewController> _controller =
       Completer<PDFViewController>();
   int? pages = 0;
-  //int? currentPage = 0;
   bool isReady = false;
   String errorMessage = '';
 
@@ -28,10 +31,7 @@ class _PDFScreenState extends State<PDFScreen> with WidgetsBindingObserver {
       appBar: AppBar(
         title: Text(widget.titre),
         actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.share),
-            onPressed: () {},
-          ),
+          IconButton(icon: Icon(Icons.share), onPressed: () {}),
         ],
       ),
       body: Stack(
@@ -43,13 +43,14 @@ class _PDFScreenState extends State<PDFScreen> with WidgetsBindingObserver {
             autoSpacing: false,
             pageFling: true,
             pageSnap: true,
-            defaultPage: widget.currentPage,
+            defaultPage:
+                widget.currentPage > 0 ? widget.currentPage : gl.currentPage,
             fitPolicy: FitPolicy.BOTH,
             preventLinkNavigation:
                 false, // if set to true the link is handled in flutter
-            onRender: (_pages) {
+            onRender: (xpages) {
               setState(() {
-                pages = _pages;
+                pages = xpages;
                 isReady = true;
               });
             },
@@ -57,36 +58,28 @@ class _PDFScreenState extends State<PDFScreen> with WidgetsBindingObserver {
               setState(() {
                 errorMessage = error.toString();
               });
-              print(error.toString());
+              gl.print(error.toString());
             },
             onPageError: (page, error) {
               setState(() {
                 errorMessage = '$page: ${error.toString()}';
               });
-              print('$page: ${error.toString()}');
+              gl.print('$page: ${error.toString()}');
             },
             onViewCreated: (PDFViewController pdfViewController) {
               _controller.complete(pdfViewController);
             },
-            /*onLinkHandler: (String? uri) {
-              print('goto uri: $uri');
-            },*/
             onPageChanged: (int? page, int? total) {
-              //print('page change: $page/$total');
               setState(() {
-                widget.currentPage = page!;
+                gl.currentPage = page!;
               });
             },
           ),
           errorMessage.isEmpty
               ? !isReady
-                  ? Center(
-                      child: CircularProgressIndicator(),
-                    )
+                  ? Center(child: CircularProgressIndicator())
                   : Container()
-              : Center(
-                  child: Text(errorMessage),
-                )
+              : Center(child: Text(errorMessage)),
         ],
       ),
       floatingActionButton: FutureBuilder<PDFViewController>(

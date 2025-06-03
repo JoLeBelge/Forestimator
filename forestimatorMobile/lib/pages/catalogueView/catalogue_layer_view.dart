@@ -1,5 +1,5 @@
-import 'package:fforestimator/pages/catalogueView/catalogueView.dart';
-import 'package:fforestimator/pages/catalogueView/layerTile.dart';
+import 'package:fforestimator/pages/catalogueView/catalogue_view.dart';
+import 'package:fforestimator/pages/catalogueView/layer_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:fforestimator/globals.dart' as gl;
 

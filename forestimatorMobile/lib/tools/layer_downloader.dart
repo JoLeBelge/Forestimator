@@ -1,13 +1,13 @@
 import 'dart:io';
 import 'dart:isolate';
 import 'dart:ui';
-import 'package:fforestimator/pages/catalogueView/layerTile.dart';
-import 'package:fforestimator/tools/handlePermissions.dart';
+import 'package:downloadsfolder/downloadsfolder.dart';
+import 'package:fforestimator/pages/catalogueView/layer_tile.dart';
+import 'package:fforestimator/tools/handle_permissions.dart';
 import 'package:fforestimator/tools/notification.dart';
 import 'package:flutter/material.dart';
 import 'package:fforestimator/globals.dart' as gl;
 import 'package:flutter_downloader/flutter_downloader.dart';
-import 'package:path/path.dart';
 
 final Map<String, _LayerDownloaderState> _downloadIdToWidget = {};
 final Map<String, String> _downloadIdToLayerKey = {};
@@ -122,7 +122,7 @@ class _LayerDownloaderState extends State<LayerDownloader> {
               downloadId = await fD?.downloadFile(widget.layer.key);
               setState(() {
                 _downloadIdToWidget[downloadId!] = this;
-                print(_downloadIdToWidget[downloadId!]);
+                gl.print(_downloadIdToWidget[downloadId!]);
               });
             },
             icon: const Icon(Icons.repeat_rounded),
@@ -155,7 +155,7 @@ class _LayerDownloaderState extends State<LayerDownloader> {
               downloadId = await fD?.downloadFile(widget.layer.key);
               setState(() {
                 _downloadIdToWidget[downloadId!] = this;
-                print(_downloadIdToWidget[downloadId!]);
+                gl.print(_downloadIdToWidget[downloadId!]);
               });
             },
             icon: const Icon(Icons.download),

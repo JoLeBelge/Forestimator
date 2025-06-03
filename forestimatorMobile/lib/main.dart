@@ -1,25 +1,25 @@
-import 'package:fforestimator/dico/dicoApt.dart';
+import 'package:downloadsfolder/downloadsfolder.dart' as path;
+import 'package:fforestimator/dico/dico_apt.dart';
 import 'package:fforestimator/dico/ess.dart';
-import 'package:fforestimator/pages/anaPt/anaPtpage.dart';
-import 'package:fforestimator/pages/offlinePage/offlineView.dart';
-import 'package:fforestimator/tools/handlePermissions.dart';
-import 'package:fforestimator/tools/layerDownloader.dart';
+import 'package:fforestimator/pages/anaPt/ana_ptpage.dart';
+import 'package:fforestimator/pages/offlinePage/offline_view.dart';
+import 'package:fforestimator/tools/customLayer/polygon_layer.dart';
+import 'package:fforestimator/tools/layer_downloader.dart';
 import 'package:fforestimator/tools/notification.dart';
 import 'package:flutter/material.dart';
 import 'package:fforestimator/globals.dart' as gl;
 import 'package:fforestimator/pages/map.dart';
-import 'package:fforestimator/pages/pdfScreen.dart';
+import 'package:fforestimator/pages/pdf_screen.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
-import 'package:fforestimator/pages/catalogueView/catalogueLayerView.dart';
+import 'package:fforestimator/pages/catalogueView/catalogue_layer_view.dart';
 import 'package:go_router/go_router.dart';
 import 'dart:async';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter/services.dart';
-import 'package:fforestimator/scaffoldNavigation.dart';
+import 'package:fforestimator/scaffold_navigation.dart';
 import 'dart:convert';
-import 'package:path/path.dart' as path;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:memory_info/memory_info.dart';
 
@@ -29,36 +29,24 @@ void main() async {
     databaseFactory = databaseFactoryFfi;
   } else {
     initDownloader();
-
-    //Initialize Logging
-    /*await FlutterLogs.initLogs(
-        logLevelsEnabled: [
-          LogLevel.INFO,
-          LogLevel.WARNING,
-          LogLevel.ERROR,
-          LogLevel.SEVERE
-        ],
-        timeStampFormat: TimeStampFormat.TIME_FORMAT_READABLE,
-        directoryStructure: DirectoryStructure.FOR_DATE,
-        logTypesEnabled: ["device", "network", "errors"],
-        logFileExtension: LogFileExtension.TXT,
-        logsWriteDirectoryName: "MyLogs",
-        logsExportDirectoryName: "MyLogs/Exported",
-        debugFileOperations: true,
-        isDebuggable: true);*/
   }
 
-  gl.dico = dicoAptProvider();
+  gl.dico = DicoAptProvider();
   await gl.dico.init();
 
   while (!gl.dico.finishedLoading) {
     sleep(const Duration(seconds: 1));
   }
-  runApp(const MyApp());
+  try {
+    runApp(const MyApp());
+  } catch (e) {
+    gl.print("$e");
+  }
 }
 
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
   @override
   State<MyApp> createState() => _MyApp();
 }
@@ -76,7 +64,7 @@ class _MyApp extends State<MyApp> {
     try {
       memory = await MemoryInfoPlugin().memoryInfo;
     } on PlatformException catch (e) {
-      print('error $e');
+      gl.print('error $e');
     }
 
     if (memory != null) {
@@ -84,6 +72,30 @@ class _MyApp extends State<MyApp> {
         gl.memory = memory;
       });
     }
+  }
+
+  Color _getColorFromMemory(String name, SharedPreferences prefs) {
+    return Color.fromRGBO(
+      prefs.getInt('$name.r')!,
+      prefs.getInt('$name.g')!,
+      prefs.getInt('$name.b')!,
+      prefs.getDouble('$name.a')!,
+    );
+  }
+
+  List<LatLng> _getPolygonFromMemory(String name, SharedPreferences prefs) {
+    List<LatLng> polygon = [];
+    int nPoints = prefs.getInt('$name.nPolyPoints')!;
+    for (int i = 0; i < nPoints; i++) {
+      polygon.add(
+        LatLng(
+          prefs.getDouble('$name.$i-lat')!,
+          prefs.getDouble('$name.$i-lng')!,
+        ),
+      );
+    }
+
+    return polygon;
   }
 
   Future _readPreference() async {
@@ -134,6 +146,35 @@ class _MyApp extends State<MyApp> {
     if (aZoom != null) {
       gl.mapZoom = aZoom;
     }
+
+    int? nPolys = prefs.getInt('nPolys');
+    if (nPolys != null && nPolys != 0) {
+      gl.polygonLayers.clear();
+      for (int i = 0; i < nPolys; i++) {
+        gl.polygonLayers.add(
+          PolygonLayer(polygonName: prefs.getString('poly$i.name')!),
+        );
+        gl.polygonLayers[i].area = prefs.getDouble('poly$i.area')!;
+        gl.polygonLayers[i].perimeter = prefs.getDouble('poly$i.perimeter')!;
+        gl.polygonLayers[i].transparencyInside =
+            prefs.getDouble('poly$i.transparencyInside')!;
+        gl.polygonLayers[i].transparencyLine =
+            prefs.getDouble('poly$i.transparencyLine')!;
+        gl.polygonLayers[i].colorInside = _getColorFromMemory(
+          'poly$i.colorInside',
+          prefs,
+        );
+        gl.polygonLayers[i].colorLine = _getColorFromMemory(
+          'poly$i.colorLine',
+          prefs,
+        );
+        gl.polygonLayers[i].polygonPoints = _getPolygonFromMemory(
+          'poly$i.poly',
+          prefs,
+        );
+      }
+    }
+
     setState(() {
       _initializedPersistentValues = true;
     });
@@ -154,7 +195,7 @@ class _MyApp extends State<MyApp> {
       }
       completer.complete(file);
     } catch (e) {
-      throw Exception('Error parsing asset file!');
+      gl.print("$e");
     }
 
     return completer.future;
@@ -223,7 +264,7 @@ class _MyApp extends State<MyApp> {
                     (context, state) =>
                         const NoTransitionPage(child: CatalogueLayerView()),
                 routes: [
-                  ...gl.dico.getLayersWithDoc().map<GoRoute>((layerBase item) {
+                  ...gl.dico.getLayersWithDoc().map<GoRoute>((LayerBase item) {
                     return GoRoute(
                       path: "${item.getFicheRoute()}/:currentPage",
                       name: item.mCode,
@@ -312,15 +353,15 @@ class _MyApp extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
+    gl.notificationContext = context;
     if (!_initializedPersistentValues) {
       return const MaterialApp(home: CircularProgressIndicator());
     } else if (gl.firstTimeUse) {
-      MaterialApp(
+      return MaterialApp(
         home: PopupNotification(
           title: "Bienvenu",
           accept: "oui",
           onAccept: () async {
-            makeAllPermissionRequests();
             setState(() {
               gl.firstTimeUse = false;
             });
@@ -341,7 +382,7 @@ class _MyApp extends State<MyApp> {
             await prefs.setBool('firstTimeUse', gl.firstTimeUse);
           },
           dialog:
-              "Forestimator mobile ne collecte aucune information personnelle. Notre politique de confidentialité est consultable au https://forestimator.gembloux.ulg.ac.be/documentation/confidentialit_. Autorisez-vous l'aplication à télécharger un jeu de couches pour une utilisation hors ligne? Ces couches couvrent toutes la Région Wallonne et totalisent +- 100 Mo.",
+              "Forestimator mobile ne collecte aucune information personnelle. Notre politique de confidentialité est consultable au https://forestimator.gembloux.ulg.ac.be/documentation/confidentialit_. Autorisez-vous l'aplication à télécharger un jeu de 7 couches pour une utilisation hors ligne? Ces couches couvrent toutes la Région Wallonne et totalisent +- 100 Mo.",
         ),
       );
     }

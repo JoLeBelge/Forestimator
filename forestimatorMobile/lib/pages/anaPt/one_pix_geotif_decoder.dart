@@ -1,7 +1,8 @@
 import 'dart:typed_data';
 import 'package:archive/archive.dart';
+import 'package:fforestimator/globals.dart' as gl;
+import 'package:geoimage/geoimage.dart';
 import 'package:image/image.dart';
-import 'package:geoimage/src/com/hydrologis/geoimage/core/geoinfo.dart';
 import 'package:dart_jts/dart_jts.dart';
 
 class OnePixGeotifDecoder extends Decoder {
@@ -29,25 +30,6 @@ class OnePixGeotifDecoder extends Decoder {
       uv,
     ); // determiner la position du pixel qui nous intéresse
 
-    /*print("tilesY " +
-        im.tilesY.toString() +
-        " TilesX " +
-        im.tilesX.toString() +
-        ", tileSize: " +
-        im.tileSize
-            .toString()); // une tuile par ligne ; ça c'est plus simple évidemment.
-    print("tile width : " +
-        im.tileWidth.toString() +
-        ", tile heigth " +
-        im.tileHeight.toString());
-    print("tiff compression " + im.compression.toString());
-    */
-
-    /*for (var tileY = 0, ti = 0; tileY < im.tilesY; ++tileY) {
-      for (var tileX = 0; tileX < im.tilesX; ++tileX, ++ti) {
-        //_decodeTile(p, image, tileX, tileY);
-      }
-    }*/
     // determiner l'offset et le byteCount de la tile qui contient la valeur du pixel que l'on souhaite - fonctionne QUE avec mes tif qui on un Tile par ligne
     final tileIndex = uv.y.toInt() * im.tilesX;
     _input.offset = im.tileOffsets![tileIndex];
@@ -55,26 +37,22 @@ class OnePixGeotifDecoder extends Decoder {
 
     final data = _input.toList(0, byteCount);
     List<int> outData = const ZLibDecoder().decodeBytes(data);
-    //print("list int = " + outData.toString());
-    //print("taille :  " + outData.length.toString());
 
     if (im.bitsPerSample == 16) {
       aRes = (outData[(uv.x.toInt() * 2) - 1] << 8) + outData[uv.x.toInt() * 2];
-      //print("int16: " + aRes.toString());
     } else {
-      //byteData = InputBuffer(outData);
       aRes = outData[uv.x.toInt()];
     }
 
     return aRes;
   }
 
-  /// Is the given file a valid TIFF image?
+  // Is the given file a valid TIFF image?
   @override
   bool isValidFile(Uint8List data) => _readHeader(InputBuffer(data)) != null;
 
-  /// Validate the file is a TIFF image and get information about it.
-  /// If the file is not a valid TIFF image, null is returned.
+  // Validate the file is a TIFF image and get information about it.
+  // If the file is not a valid TIFF image, null is returned.
   @override
   TiffInfo? startDecode(Uint8List bytes) {
     _input = InputBuffer(bytes);
@@ -85,14 +63,14 @@ class OnePixGeotifDecoder extends Decoder {
     return info;
   }
 
-  /// How many frames are available to be decoded. [startDecode] should have
-  /// been called first. Non animated image files will have a single frame.
+  // How many frames are available to be decoded. [startDecode] should have
+  // been called first. Non animated image files will have a single frame.
   @override
   int numFrames() => info != null ? info!.images.length : 0;
 
-  /// Decode a single frame from the data stat was set with [startDecode].
-  /// If [frame] is out of the range of available frames, null is returned.
-  /// Non animated image files will only have [frame] 0.
+  // Decode a single frame from the data stat was set with [startDecode].
+  // If [frame] is out of the range of available frames, null is returned.
+  // Non animated image files will only have [frame] 0.
   @override
   Image? decodeFrame(int frame) {
     if (info == null) {
@@ -172,7 +150,8 @@ class OnePixGeotifDecoder extends Decoder {
         if (!img.isValid) {
           break;
         }
-      } catch (error) {
+      } catch (e) {
+        gl.print("$e");
         break;
       }
       info.images.add(img);

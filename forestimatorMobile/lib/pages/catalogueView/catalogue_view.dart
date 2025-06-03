@@ -1,10 +1,10 @@
-import 'package:fforestimator/dico/dicoApt.dart';
-import 'package:fforestimator/tools/layerDownloader.dart';
+import 'package:fforestimator/dico/dico_apt.dart';
+import 'package:fforestimator/tools/layer_downloader.dart';
 import 'package:flutter/material.dart';
 import 'package:fforestimator/globals.dart' as gl;
-import 'package:fforestimator/pages/catalogueView/categoryTile.dart';
-import 'package:fforestimator/pages/catalogueView/layerTile.dart';
-import 'package:fforestimator/pages/catalogueView/legendView.dart';
+import 'package:fforestimator/pages/catalogueView/category_tile.dart';
+import 'package:fforestimator/pages/catalogueView/layer_tile.dart';
+import 'package:fforestimator/pages/catalogueView/legend_view.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -70,7 +70,7 @@ class _CatalogueView extends State<CatalogueView> {
   }
 
   void _getCategories() {
-    for (groupe_couche gr in gl.dico.mGrCouches) {
+    for (GroupeCouche gr in gl.dico.mGrCouches) {
       if (!gr.mExpert) {
         _categories += [Category(name: gr.mLabel, filter: gr.mCode)];
       }
@@ -314,10 +314,7 @@ class _CategoryView extends State<CategoryView> {
                 .hasFEEapt())
           ListTile(
             title: Text(
-              "Consulter la fiche-essence " +
-                  gl.dico
-                      .getEss(gl.dico.getLayerBase(lt.key).getEssCode())
-                      .getNameAndPrefix(),
+              "Consulter la fiche-essence ${gl.dico.getEss(gl.dico.getLayerBase(lt.key).getEssCode()).getNameAndPrefix()}",
             ),
             leading: IconButton(
               onPressed: () {
@@ -353,9 +350,6 @@ class _CategoryView extends State<CategoryView> {
 
   Widget selectLayerBar(LayerTile lt) {
     double barWidth = 128.0 + 48;
-    /*if (widget.category.filter != "APT_CS" &&
-        widget.category.filter != "APT_FEE" &&
-        !lt.extern) barWidth = 96.0;*/
     return Container(
       constraints: BoxConstraints(
         maxWidth: barWidth,
@@ -369,7 +363,6 @@ class _CategoryView extends State<CategoryView> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          //_downloadedControlBar(lt),
           lt.downloadedControlBar(),
           gl.isSelectedLayer(lt.key, offline: false)
               ? Container(
@@ -422,7 +415,6 @@ class _CategoryView extends State<CategoryView> {
                     });
                   },
                   // TODO ; popUpNoInternet si pas d'accès au réseau
-                  //TODO else popup warning: file is not on disk -> non car on affiche ici uniquement les layer online, que l'on soit en mode online ou offline.
                 ),
               ),
         ],
@@ -430,16 +422,8 @@ class _CategoryView extends State<CategoryView> {
     );
   }
 
-  // downloadableLayerKeys contient la liste des couches qu'on voudrai télécharger par défaut pour tout les utilisateurs. mais le fait qu'elle soit téléchargeable est définit dans layerbase.mIsDownloadableRW
-  /*  bool _isDownloadableLayer(String key) {
-    if (gl.downloadableLayerKeys.contains(key)) {
-      return true;
-    }
-    return false;
-  }
-*/
   void _getLayerData() async {
-    Map<String, layerBase> mp = gl.dico.mLayerBases;
+    Map<String, LayerBase> mp = gl.dico.mLayerBases;
 
     for (var key in mp.keys) {
       if (widget.category.filter == mp[key]!.mGroupe &&
@@ -510,7 +494,7 @@ class _SelectedLayerView extends State<SelectedLayerView> {
               return;
             }
             gl.refreshMap(() {
-              final gl.selectedLayer item = gl.interfaceSelectedLayerKeys
+              final gl.SelectedLayer item = gl.interfaceSelectedLayerKeys
                   .removeAt(oldIndex);
               gl.interfaceSelectedLayerKeys.insert(newIndex, item);
             });
@@ -623,12 +607,6 @@ class _SelectedLayerView extends State<SelectedLayerView> {
                   )
                   : ListTile(
                     key: Key('$i'),
-                    /*leading: Container(
-                      constraints: BoxConstraints(
-                    maxHeight: MediaQuery.of(context).size.height * .04,
-                    maxWidth: MediaQuery.of(context).size.width * .35,
-                  )),*/
-                    //title: const Text('Pas de couche selectionnée.'),
                     title: const Text(
                       '',
                     ), // le texte "pas de couches sélectionnée avait perturbé un des testeurs, on met rien

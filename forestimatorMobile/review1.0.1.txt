@@ -1,0 +1,43 @@
+Guideline 2.1 - Information Needed
+
+
+We need more information to continue the review.
+
+Next Steps
+
+Provide detailed answers to the following questions:
+
+- Which features in your app require background location ?
+-> The position is used only when the app runs and to put a marker on the map so that the user knows where he is.
+- How frequently is the user’s location collected? 
+-> It refreshes with the widget tree to show the location on the map, besides that there is no further usage of the gps signals.
+- What features are available to the user using their location ?
+-> They can view and center on their location on the map. The GPS symbol in the app becomes red and you can center on the gps position.
+- What happens if the user does not give permission for this app to receive their location?
+-> They cant see their location and also not center on it. The GPS symbol in the app stays black.
+- Can the user see their location in the app?
+-> Yes.
+- Can the user see the locations they have been to in the app?
+-> No. This is not an app to navigate! Its used in the belgian woods by forester and scientists to support them in their work.
+- Does this app track and show the distance a user has traveled in the app?
+-> No.
+
+
+Guideline 5.1.1 - Legal - Privacy - Data Collection and Storage
+
+Issue Description
+
+One or more purpose strings in the app do not sufficiently explain the use of protected resources. Purpose strings must clearly and completely describe the app's use of data and, in most cases, provide an example of how the data will be used.
+
+Next Steps
+
+Update the location purpose string to explain how the app will use the requested information and provide a specific example of how the data will be used. See the attached screenshot.
+
+-> At the first start the user is asked if he likes to download 7 map layer to be used in offline mode:
+"Notre politique de confidentialité est consultable au https://forestimator.gembloux.ulg.ac.be/documentation/confidentialit_. Autorisez-vous l'aplication à télécharger un jeu de 7 couches pour une utilisation hors ligne? Ces couches couvrent toutes la Région Wallonne et totalisent +- 100 Mo.",
+
+-> At Every start the app checks if it has access to the gps and asks once if the user likes to give the permission:
+"Forestimator mobile ne collecte aucune information personelle. Notre politique de confidentialité est consultable au https://forestimator.gembloux.ulg.ac.be/documentation/confidentialit_.\nL'application utilise le gps pour afficher votre position actuelle sur la carte et seulement pendant l'utilisation. Autorisez-vous cette fonctionalité?"
+
+
+The 2 string are implemented in the next version of forestimator mobile and the transition will be more linear and clear.

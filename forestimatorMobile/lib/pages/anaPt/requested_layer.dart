@@ -2,68 +2,68 @@ import 'package:fforestimator/globals.dart' as gl;
 import 'package:fforestimator/dico/ess.dart';
 
 // une classe pour lire les résultats de l'analyse ponctuelle online
-class layerAnaPt {
+class LayerAnaPt {
   late String mCode;
   late bool mFoundLayer, mFoundRastFile;
   late int mRastValue;
   late String mValue;
 
-  layerAnaPt({required this.mCode, required this.mRastValue}) {
+  LayerAnaPt({required this.mCode, required this.mRastValue}) {
     mValue = gl.dico.getLayerBase(mCode).getValLabel(mRastValue);
     mFoundLayer = true;
     mFoundRastFile = true;
   }
 
-  layerAnaPt.fromMap(final Map<String, dynamic> map)
-      : mCode = map['layerCode'],
-        mFoundLayer = map['foundLayer'],
-        mFoundRastFile = map['foundRastFile'],
-        mRastValue = map["rastValue"],
-        mValue = map["value"];
+  LayerAnaPt.fromMap(final Map<String, dynamic> map)
+    : mCode = map['layerCode'],
+      mFoundLayer = map['foundLayer'],
+      mFoundRastFile = map['foundRastFile'],
+      mRastValue = map["rastValue"],
+      mValue = map["value"];
 }
 
 // listing de toutes les aptitudes pour création du tableau d'aptitude
-class aptsFEE {
+class AptsFEE {
   // key=code essence. val = code aptitude (numérique)
   Map<String, int> mApts = {};
   Map<String, bool> mCompensations = {};
-  late int NT, NH, ZBIO, Topo;
+  late int nt, nh, zbio, topo;
   late bool ready;
 
   Map<String, int> getListEss(codeApt) {
     Map<String, int> aRes = {};
     for (String esCode in mApts.keys) {
-      if (gl.dico.AptContraignante(mApts[esCode]!) == codeApt) {
+      if (gl.dico.aptContraignante(mApts[esCode]!) == codeApt) {
         aRes.addEntries({esCode: mApts[esCode]!}.entries);
       }
     }
     return aRes;
   }
 
-  aptsFEE(List<layerAnaPt> layersAnaP) {
+  AptsFEE(List<LayerAnaPt> layersAnaP) {
     int test = 0;
-    for (layerAnaPt l in layersAnaP) {
+    for (LayerAnaPt l in layersAnaP) {
       if (l.mCode == "ZBIO" && l.mFoundRastFile) {
-        ZBIO = l.mRastValue;
-        if (gl.dico.getLayerBase("ZBIO").mDicoVal.containsKey(ZBIO)) {
+        zbio = l.mRastValue;
+        if (gl.dico.getLayerBase("ZBIO").mDicoVal.containsKey(zbio)) {
           ++test;
         }
       }
       if (l.mCode == "NT" && l.mFoundRastFile) {
-        NT = l.mRastValue;
-        if (gl.dico.getLayerBase("NT").mDicoVal.containsKey(NT)) {
+        nt = l.mRastValue;
+        if (gl.dico.getLayerBase("NT").mDicoVal.containsKey(nt)) {
           ++test;
         }
       }
       if (l.mCode == "NH" && l.mFoundRastFile) {
-        NH = l.mRastValue;
-        if (gl.dico.getLayerBase("NH").mDicoVal.containsKey(NH)) {
+        nh = l.mRastValue;
+        if (gl.dico.getLayerBase("NH").mDicoVal.containsKey(nh)) {
           ++test;
         }
       }
       if (l.mCode == "Topo" && l.mFoundRastFile) {
-        Topo = l.mRastValue;
-        if (gl.dico.getLayerBase("Topo").mDicoVal.containsKey(Topo)) {
+        topo = l.mRastValue;
+        if (gl.dico.getLayerBase("Topo").mDicoVal.containsKey(topo)) {
           ++test;
         }
       }
@@ -77,10 +77,10 @@ class aptsFEE {
 
     if (ready) {
       for (Ess es in gl.dico.getFEEess()) {
-        int aptHT = es.getAptHT(NT, NH, ZBIO, hierarchique: true, aTopo: Topo);
+        int aptHT = es.getAptHT(nt, nh, zbio, hierarchique: true, aTopo: topo);
         mApts.addEntries({es.mCode: aptHT}.entries);
         bool aCompensation =
-            Topo != 2 && aptHT != es.getAptHT(NT, NH, ZBIO, hierarchique: true)
+            topo != 2 && aptHT != es.getAptHT(nt, nh, zbio, hierarchique: true)
                 ? true
                 : false;
         mCompensations.addEntries({es.mCode: aCompensation}.entries);
@@ -99,10 +99,10 @@ class aptsFEE {
 }
 
 // listing des propositions d'essences du Guide des stations
-class propositionGS {
+class PropositionGS {
   // key=code essence. val = code proposition
   Map<String, int> mApts = {};
-  late int US, ZBIO;
+  late int us, zbio;
   //late String aVariante;
   late bool ready;
 
@@ -116,18 +116,18 @@ class propositionGS {
     return aRes;
   }
 
-  propositionGS(List<layerAnaPt> layersAnaP) {
+  PropositionGS(List<LayerAnaPt> layersAnaP) {
     int test = 0;
-    for (layerAnaPt l in layersAnaP) {
+    for (LayerAnaPt l in layersAnaP) {
       if (l.mCode == "ZBIO" && l.mFoundRastFile) {
-        ZBIO = l.mRastValue;
-        if (gl.dico.getLayerBase("ZBIO").mDicoVal.containsKey(ZBIO)) {
+        zbio = l.mRastValue;
+        if (gl.dico.getLayerBase("ZBIO").mDicoVal.containsKey(zbio)) {
           ++test;
         }
       }
       if (l.mCode == "CS_A" && l.mFoundRastFile) {
-        US = l.mRastValue;
-        if (gl.dico.getLayerBase("CS_A").mDicoVal.containsKey(US)) {
+        us = l.mRastValue;
+        if (gl.dico.getLayerBase("CS_A").mDicoVal.containsKey(us)) {
           ++test;
         }
       }
@@ -142,7 +142,7 @@ class propositionGS {
     if (ready) {
       for (Ess es in gl.dico.mEssences.values) {
         if (es.hasCSapt()) {
-          int recom = es.getAptCS(ZBIO, US);
+          int recom = es.getAptCS(zbio, us);
           mApts.addEntries({es.mCode: recom}.entries);
         }
       }

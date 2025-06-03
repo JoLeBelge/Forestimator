@@ -1,5 +1,5 @@
-import 'package:fforestimator/dico/dicoApt.dart';
-import 'package:fforestimator/pages/anaPt/requestedLayer.dart';
+import 'package:fforestimator/dico/dico_apt.dart';
+import 'package:fforestimator/pages/anaPt/requested_layer.dart';
 import 'package:pdf/pdf.dart';
 import 'dart:io';
 import 'package:pdf/widgets.dart' as pw;
@@ -10,7 +10,7 @@ import 'package:intl/intl.dart';
 //import 'package:flutter_logs/flutter_logs.dart';
 
 Future makePdf(
-  List<layerAnaPt> layers,
+  List<LayerAnaPt> layers,
   String fileName,
   String dir,
   String locationName,
@@ -42,7 +42,7 @@ Future makePdf(
                       ),
                     ),
                     pw.SizedBox(height: 30),
-                    PaddedText(
+                    paddedText(
                       "${gl.offlineMode ? "Réalisé en mode hors-ligne" : "Réalisé avec connexion internet"} le ${DateFormat('yyyy-MM-dd').format(now)}",
                     ),
                   ],
@@ -55,10 +55,10 @@ Future makePdf(
                 ),
               ],
             ), //first row
-            PaddedText("Localisation: $locationName", pad: 3),
-            PaddedText("Coordonnée (EPSG:31370) ", pad: 3),
-            PaddedText("X: ${gl.pt.x.toInt()}", pad: 3),
-            PaddedText("Y: ${gl.pt.y.toInt()}", pad: 3),
+            paddedText("Localisation: $locationName", pad: 3),
+            paddedText("Coordonnée (EPSG:31370) ", pad: 3),
+            paddedText("X: ${gl.pt.x.toInt()}", pad: 3),
+            paddedText("Y: ${gl.pt.y.toInt()}", pad: 3),
             pw.SizedBox(height: 10),
             pw.Text(
               "Couches cartographiques analysées",
@@ -66,10 +66,10 @@ Future makePdf(
             ),
             pw.SizedBox(height: 20),
             ...layers.where((i) => i.mRastValue != 0).map<pw.Widget>((
-              layerAnaPt a,
+              LayerAnaPt a,
             ) {
-              layerBase l = gl.dico.getLayerBase(a.mCode);
-              return PaddedText("${l.mNom} : ${l.getValLabel(a.mRastValue)}");
+              LayerBase l = gl.dico.getLayerBase(a.mCode);
+              return paddedText("${l.mNom} : ${l.getValLabel(a.mRastValue)}");
             }),
           ],
         );
@@ -91,7 +91,7 @@ Future makePdf(
   // FlutterLogs.logError("anaPt", "pdf", "pdf exported to. ${out.path}");
 }
 
-pw.Widget PaddedText(
+pw.Widget paddedText(
   final String text, {
   final pw.TextAlign align = pw.TextAlign.left,
   final double pad = 5.0,

@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart';
+import 'package:fforestimator/globals.dart' as gl;
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter/material.dart';
 import 'package:image/image.dart' as img;
@@ -7,7 +7,7 @@ import 'package:flutter/services.dart';
 import 'dart:io';
 import 'dart:convert';
 
-class tifFileTileProvider extends TileProvider {
+class TifFileTileProvider extends TileProvider {
   final Proj4Crs mycrs;
   int tileSize = 256;
   img.Image? _sourceImage;
@@ -19,24 +19,25 @@ class tifFileTileProvider extends TileProvider {
 
   Function refreshView;
 
-  tifFileTileProvider(
-      {super.headers,
-      required this.mycrs,
-      required this.sourceImPath,
-      required this.layerCode,
-      required this.refreshView});
+  TifFileTileProvider({
+    super.headers,
+    required this.mycrs,
+    required this.sourceImPath,
+    required this.layerCode,
+    required this.refreshView,
+  });
 
   void init() async {
-    print("init tifFileTileProvider by loading source image in memory");
+    gl.print("init TifFileTileProvider by loading source image in memory");
     final File fileIm = File(sourceImPath);
     bool e = await fileIm.exists();
     if (e) {
       Uint8List? bytes = await fileIm.readAsBytes();
 
-      img.TiffInfo _tiffInfo = img.TiffDecoder().startDecode(bytes)!;
-      img.TiffImage tifIm = _tiffInfo.images[0];
+      img.TiffInfo tiffInfo = img.TiffDecoder().startDecode(bytes)!;
+      img.TiffImage tifIm = tiffInfo.images[0];
       int bps = tifIm.bitsPerSample;
-      print("file loaded in öeöory " + e.toString());
+      gl.print("file loaded in öeöory $e");
       // le décodage d'un tif 16 bits avec ColorMap sera effectif pour la prochaine sortie du package image (flutter)
       // testé avec image 4.2, imageDecoder (android graphic) ; Input was incomplete-> il faut probablement encore convertir en 8bit apres lecture de la 16 bits avec colormap.
       if (bps <= 8) {
@@ -46,7 +47,7 @@ class tifFileTileProvider extends TileProvider {
         });
       }
     }
-    print("file decoded in öeöory " + e.toString());
+    gl.print("file decoded in öeöory $e");
   }
 
   @override
@@ -56,8 +57,10 @@ class tifFileTileProvider extends TileProvider {
 
     // final nwPoint = coordinates.scaleBy(tileSizePoint) - daptation for flutter_map 7.0.0 (scaleBy depreciated)
 
-    final Offset nwPoint =
-        Offset(coordinates.x.toDouble() * tileSize, coordinates.y.toDouble() * tileSize);
+    final Offset nwPoint = Offset(
+      coordinates.x.toDouble() * tileSize,
+      coordinates.y.toDouble() * tileSize,
+    );
 
     final nwCoords = mycrs.offsetToLatLng(nwPoint, coordinates.z.toDouble());
     final nw = mycrs.projection.project(nwCoords);
@@ -73,11 +76,12 @@ class tifFileTileProvider extends TileProvider {
 
     //print("x y offset : " + xOffset.toString() + " , " + yOffset.toString());
     */
-  
+
     double resolution = 10.0;
     int xOffset = ((nw.dx - b.topLeft.dx) / resolution).round();
-    int yOffset = ((b.bottomRight.dy - nw.dy) / resolution)
-        .round(); //--> soit-disant bottomRigth mais contient le ymax (top dans src donc)
+    int yOffset =
+        ((b.bottomRight.dy - nw.dy) / resolution)
+            .round(); //--> soit-disant bottomRigth mais contient le ymax (top dans src donc)
 
     // je devrais lire  GeoInfo geoi = GeoInfo(im); comme dans onePixGeoTifDecoder pour adapter le code à des raster qui ont une autre résolution.
     int zFullIm =
@@ -85,16 +89,20 @@ class tifFileTileProvider extends TileProvider {
 
     int initImSize = (pow(2, (zFullIm - coordinates.z)) * tileSize).toInt();
     if (_sourceImage != null) {
-      img.Image cropped = img.copyCrop(_sourceImage!,
-          x: xOffset, y: yOffset, width: initImSize, height: initImSize);
+      img.Image cropped = img.copyCrop(
+        _sourceImage!,
+        x: xOffset,
+        y: yOffset,
+        width: initImSize,
+        height: initImSize,
+      );
       img.Image resized = img.copyResize(cropped, width: tileSize);
       return MemoryImage(img.encodePng(resized, singleFrame: true));
     } else {
-      Uint8List blankBytes = Base64Codec()
-          .decode("R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7");
-      return MemoryImage(
-        blankBytes,
+      Uint8List blankBytes = Base64Codec().decode(
+        "R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7",
       );
+      return MemoryImage(blankBytes);
     }
   }
 
