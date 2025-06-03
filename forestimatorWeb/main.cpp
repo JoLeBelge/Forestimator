@@ -28,6 +28,7 @@ int launchForestimator(int argc, char **argv)
     stationDescResource resource(dico);
     rasterClipResource rClipRaster(dico);
     anaPonctuelleResource anaPonctResource(dico);
+    anaSurfResource anaSurfResource(dico);
     staticMapResource smResource(dico);
 
     try {
@@ -58,8 +59,7 @@ int launchForestimator(int argc, char **argv)
         // http://localhost:8085/api/anaPt/layers/EP_FEE+EP_CS+MNH2019+CNSW/x/200000.3/y/80000.1
         server.addResource(&anaPonctResource, "/api/anaPt/layers/${listLayerCode}/x/${x}/y/${y}");
 
-        //cnswresource cnswr(dico->File("TMPDIR")+"/");
-        //server.addResource(&cnswr, "/CNSW");
+        server.addResource(&anaSurfResource, "/api/anaSurf/layers/${listLayerCode}/polygon/${pol}");
 
         // fileResource pour les cartes à l'échelle de toute la RW
         for (auto kv : dico->VlayerBase()){
