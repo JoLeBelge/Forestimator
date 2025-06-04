@@ -1,7 +1,12 @@
+import 'dart:convert';
+import 'dart:io';
 import 'dart:math';
 import 'package:area_polygon/area_polygon.dart';
 import 'package:fforestimator/globals.dart' as gl;
+import 'package:fforestimator/tools/notification.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 import 'package:proj4dart/proj4dart.dart' as proj4;
 import 'package:latlong2/latlong.dart';
 
@@ -24,6 +29,7 @@ class PolygonLayer {
         'EPSG:31370',
         '+proj=lcc +lat_1=51.16666723333333 +lat_2=49.8333339 +lat_0=90 +lon_0=4.367486666666666 +x_0=150000.013 +y_0=5400088.438 +ellps=intl +towgs84=-106.8686,52.2978,-103.7239,0.3366,-0.457,1.8422,-1.2747 +units=m +no_defs +type=crs',
       );
+  Map<String, dynamic> decodedJson = {};
 
   PolygonLayer({required String polygonName}) {
     name = polygonName;
@@ -201,7 +207,7 @@ class PolygonLayer {
     for (LatLng point in polygonPoints) {
       poly.add(
         _epsg4326ToEpsg31370(
-          proj4.Point(x: point.latitude, y: point.longitude),
+          proj4.Point(y: point.latitude, x: point.longitude),
         ),
       );
     }
@@ -217,7 +223,7 @@ class PolygonLayer {
     for (LatLng point in polygonPoints) {
       poly.add(
         _epsg4326ToEpsg31370(
-          proj4.Point(x: point.latitude, y: point.longitude),
+          proj4.Point(y: point.latitude, x: point.longitude),
         ),
       );
     }
@@ -227,5 +233,76 @@ class PolygonLayer {
       perimeter = perimeter + (currentPoint - point).distance;
       currentPoint = point;
     }
+  }
+
+  Future<bool> onlineSurfaceAnalysis() async {
+    if (polygonPoints.length < 2) return false;
+    bool internet = await InternetConnection().hasInternetAccess;
+    if (internet) {
+      String layersAnaSurf = "";
+      for (String lCode in gl.anaSurfSelectedLayerKeys) {
+        if (gl.dico.getLayerBase(lCode).mCategorie != "Externe") {
+          layersAnaSurf += "$lCode+";
+        }
+      }
+      layersAnaSurf = layersAnaSurf.substring(0, layersAnaSurf.length - 1);
+
+      String polygon = "POLYGON ((";
+      for (LatLng point in polygonPoints) {
+        proj4.Point tLb72 = epsg4326.transform(
+          epsg31370,
+          proj4.Point(x: point.longitude, y: point.latitude),
+        );
+        polygon = "$polygon${tLb72.x} ${tLb72.y},";
+      }
+      proj4.Point tLb72 = epsg4326.transform(
+        epsg31370,
+        proj4.Point(
+          x: polygonPoints.first.longitude,
+          y: polygonPoints.first.latitude,
+        ),
+      );
+      polygon = "$polygon${tLb72.x} ${tLb72.y},";
+      polygon = "${polygon.substring(0, polygon.length - 1)}))";
+
+      String request =
+          "https://forestimator.gembloux.ulg.ac.be/api/anaSurf/layers/$layersAnaSurf/polygon/$polygon";
+      http.Response? res;
+      try {
+        res = await http.get(Uri.parse(request));
+        if (res.statusCode != 200) throw HttpException('${res.statusCode}');
+      } catch (e) {
+        gl.print("Error surface analysing request");
+        gl.print("$e");
+      }
+      try {
+        decodedJson.clear();
+        decodedJson = jsonDecode(res!.body);
+      } catch (e) {
+        gl.print("Error decoding json surface analysing request");
+        gl.print("$e");
+        try {
+          String correctedBody = res!.body.replaceAll('",\n}', '"\n}');
+          gl.print(correctedBody);
+          gl.print(res.body);
+          decodedJson = jsonDecode(correctedBody);
+          gl.print("Error corrected");
+        } catch (e) {
+          gl.print("Error cannot correct!");
+          gl.print("$e");
+        }
+      }
+      gl.print(decodedJson);
+    } else {
+      gl.print("Could not make surface analysis, no internet!");
+      showDialog(
+        context: gl.notificationContext!,
+        builder: (BuildContext context) {
+          return PopupNoInternet();
+        },
+      );
+      return false;
+    }
+    return true;
   }
 }

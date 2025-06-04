@@ -132,6 +132,16 @@ List<String> anaPtSelectedLayerKeys = [
   "MNH2021",
 ];
 
+List<String> anaSurfSelectedLayerKeys = [
+  "dendro_nha",
+  "dendro_gha",
+  "dendro_cdom",
+  "dendro_hdom",
+  "dendro_vha",
+  "HE_FEE",
+  "COMPOALL",
+];
+
 List<String> downloadableLayerKeys = [
   "ZBIO",
   "NT",

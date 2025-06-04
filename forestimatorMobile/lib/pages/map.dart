@@ -30,6 +30,7 @@ class _MapPageState extends State<MapPage> {
   final _mapController = MapController();
   LatLng? _pt;
   bool _doingAnaPt = false;
+  //bool _modeLegendInfoBeforeAna = false;
 
   static int _mapFrameCounter = 0;
 
@@ -85,6 +86,12 @@ class _MapPageState extends State<MapPage> {
     resolutions: getResolutions2(12),
   );
 
+  void _updatePtMarker(LatLng pt) {
+    refreshView(() {
+      _pt = pt;
+    });
+  }
+
   Future _runAnaPt(proj4.Point ptBL72) async {
     gl.requestedLayers.clear();
     Map data;
@@ -101,10 +108,10 @@ class _MapPageState extends State<MapPage> {
           }
         }
 
-        String url =
+        String request =
             "https://forestimator.gembloux.ulg.ac.be/api/anaPt/layers/$layersAnaPt/x/${ptBL72.x}/y/${ptBL72.y}";
         try {
-          var res = await http.get(Uri.parse(url));
+          var res = await http.get(Uri.parse(request));
           if (res.statusCode != 200) throw HttpException('${res.statusCode}');
           data = jsonDecode(res.body);
 
@@ -113,6 +120,7 @@ class _MapPageState extends State<MapPage> {
             gl.requestedLayers.add(LayerAnaPt.fromMap(r));
           }
         } catch (e) {
+          gl.print(request);
           gl.print("$e");
         }
         gl.requestedLayers.removeWhere(
@@ -252,34 +260,10 @@ class _MapPageState extends State<MapPage> {
                             _stopMovingSelectedPoint();
                           }),
                         }
-                        : (tapPosition, point) async => {},
-                onLongPress:
-                    _modeDrawPolygon
+                        : _modeDrawPolygon
                         ? (tapPosition, point) async => {}
                         : (tapPosition, point) async => {
-                          if (!_doingAnaPt)
-                            {
-                              refreshView(() {
-                                _doingAnaPt = true;
-                              }),
-                              //proj4.Point ptBL72 = epsg4326.transform(epsg31370,proj4.Point(x: point.longitude, y: point.latitude))
-                              await _runAnaPt(
-                                epsg4326.transform(
-                                  epsg31370,
-                                  proj4.Point(
-                                    x: point.longitude,
-                                    y: point.latitude,
-                                  ),
-                                ),
-                              ),
-                              _updatePtMarker(point),
-                              refreshView(() {
-                                _doingAnaPt = false;
-                              }),
-                              GoRouter.of(
-                                gl.notificationContext!,
-                              ).push("/anaPt"),
-                            },
+                          _updatePtMarker(point),
                         },
                 onPositionChanged: (position, e) async {
                   if (!e) return;
@@ -413,12 +397,59 @@ class _MapPageState extends State<MapPage> {
                       markers:
                           _placeSearchMarker() +
                           <Marker>[
-                            !_modeDrawPolygonMoveVertexes
+                            (!_modeDrawPolygonMoveVertexes) //||_modeLegendInfoBeforeAna)
                                 ? Marker(
-                                  width: 70.0,
-                                  height: 70.0,
+                                  //TODO Finish analyse ponctuelle
+                                  alignment: Alignment.centerRight,
+                                  width: MediaQuery.of(context).size.width * .5,
+                                  height:
+                                      MediaQuery.of(context).size.width * .5,
                                   point: _pt ?? const LatLng(0.0, 0.0),
-                                  child: const Icon(Icons.location_on),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          const Icon(Icons.location_on),
+                                        ],
+                                      ),
+                                      Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment
+                                                .center, //MainAxisAlignment.start,
+                                        children: [
+                                          TextButton(
+                                            onPressed: () async {
+                                              if (!_doingAnaPt) {
+                                                refreshView(() {
+                                                  _doingAnaPt = true;
+                                                  _updatePtMarker(_pt!);
+                                                });
+                                                await _runAnaPt(
+                                                  epsg4326.transform(
+                                                    epsg31370,
+                                                    proj4.Point(
+                                                      x: _pt!.longitude,
+                                                      y: _pt!.latitude,
+                                                    ),
+                                                  ),
+                                                );
+                                                refreshView(() {
+                                                  _doingAnaPt = false;
+                                                });
+                                                GoRouter.of(
+                                                  gl.notificationContext!,
+                                                ).push("/anaPt");
+                                              }
+                                            },
+                                            child: Text("Analyse Ponctuelle"),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
                                 )
                                 : _selectedPointToMove != null
                                 ? Marker(
@@ -640,7 +671,7 @@ class _MapPageState extends State<MapPage> {
               });
             }
           },
-          icon: const Icon(Icons.swap_horizontal_circle),
+          icon: const Icon(Icons.open_with_rounded),
         ),
         IconButton(
           iconSize: iconSize,
@@ -1090,7 +1121,7 @@ class _MapPageState extends State<MapPage> {
             Row(
               children: [
                 Icon(Icons.area_chart, color: gl.polygonLayers[i].colorLine),
-                Text("${(gl.polygonLayers[i].area / 1000).round() / 100} Ha"),
+                Text("${(gl.polygonLayers[i].area / 100).round() / 100} Ha"),
               ],
             ),
             Row(
@@ -1169,12 +1200,6 @@ class _MapPageState extends State<MapPage> {
       await prefs.setInt('nPolys', i);
       gl.print("polygones saved to prefs");
     }
-  }
-
-  void _updatePtMarker(LatLng pt) {
-    refreshView(() {
-      _pt = pt;
-    });
   }
 
   static bool _refreshLocation = false;

@@ -388,11 +388,11 @@ class _DrawnLayerMenu extends State<DrawnLayerMenu> {
 
                           i == gl.selectedPolygonLayer
                               ? Text(
-                                "${(gl.polygonLayers[i].area / 1000).round() / 100} Ha",
+                                "${(gl.polygonLayers[i].area / 100).round() / 100} Ha",
                                 textScaler: TextScaler.linear(1.2),
                               )
                               : Text(
-                                "${(gl.polygonLayers[i].area / 1000).round() / 100} Ha",
+                                "${(gl.polygonLayers[i].area / 100).round() / 100} Ha",
                                 textScaler: TextScaler.linear(1.0),
                               ),
                           i == gl.selectedPolygonLayer
@@ -442,6 +442,41 @@ class _DrawnLayerMenu extends State<DrawnLayerMenu> {
                                         : () {},
                                 icon: Icon(
                                   Icons.color_lens,
+                                  color:
+                                      gl.selectedPolygonLayer == i
+                                          ? active
+                                          : inactive,
+                                  size: gl.selectedPolygonLayer == i ? 30 : 20,
+                                ),
+                              ),
+                              IconButton(
+                                onPressed:
+                                    gl.selectedPolygonLayer == i
+                                        ? () async {
+                                          if (await gl.polygonLayers[i]
+                                              .onlineSurfaceAnalysis()) {
+                                            PopupResultsMenu(
+                                              gl.notificationContext!,
+                                              gl
+                                                  .polygonLayers[gl
+                                                      .selectedPolygonLayer]
+                                                  .decodedJson,
+                                              () {
+                                                setState(() {});
+                                                (() {});
+                                              },
+                                              () {
+                                                setState(() {});
+                                                (() {
+                                                  //_settingsMenu = false;
+                                                });
+                                              },
+                                            );
+                                          }
+                                        }
+                                        : () {},
+                                icon: Icon(
+                                  Icons.analytics,
                                   color:
                                       gl.selectedPolygonLayer == i
                                           ? active
@@ -609,17 +644,17 @@ class _SearchMenu extends State<SearchMenu> {
                       if (that.length < 3) {
                         return;
                       }
-                      var url = Uri.parse(
+                      var request = Uri.parse(
                         'http://appliprfw.gembloux.ulg.ac.be/search?q=${that.replaceAll(' ', '+')}+Wallonie&format=json&addressdetails=1',
                       );
-                      final response = await http.get(url);
+                      final response = await http.get(request);
                       List<Map<String, dynamic>> decodedJson;
                       try {
                         (decodedJson =
                             (jsonDecode(response.body) as List)
                                 .cast<Map<String, dynamic>>());
                       } catch (e) {
-                        gl.print("Error gecoding service! $e");
+                        gl.print("Error with answer from gecoding service! $e");
                         (decodedJson =
                             (jsonDecode(testNominatimJsonResult) as List)
                                 .cast<Map<String, dynamic>>());
@@ -650,7 +685,7 @@ class _SearchMenu extends State<SearchMenu> {
                                   entry['address']['county'] ??
                                   entry['address']['state'] ??
                                   "Lokolobömmele",
-                              postcode: entry['address']['postcode'] ?? "000?",
+                              postcode: entry['address']['postcode'] ?? "",
                             ),
                           );
                           _searchResults.add(
@@ -670,8 +705,40 @@ class _SearchMenu extends State<SearchMenu> {
                                   children: [
                                     Column(
                                       children: [
-                                        Text(entry['addresstype']),
-                                        Text(entry['display_name']),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          children: [
+                                            Container(
+                                              constraints: BoxConstraints(
+                                                maxWidth:
+                                                    MediaQuery.of(
+                                                      gl.notificationContext!,
+                                                    ).size.width *
+                                                    .7,
+                                              ),
+                                              child: Text(entry['addresstype']),
+                                            ),
+                                          ],
+                                        ),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          children: [
+                                            Container(
+                                              constraints: BoxConstraints(
+                                                maxWidth:
+                                                    MediaQuery.of(
+                                                      gl.notificationContext!,
+                                                    ).size.width *
+                                                    .7,
+                                              ),
+                                              child: Text(
+                                                entry['display_name'],
+                                              ),
+                                            ),
+                                          ],
+                                        ),
                                       ],
                                     ),
                                   ],
@@ -739,6 +806,54 @@ Widget forestimatorSettingsVersion() {
             overflow: TextOverflow.clip,
             textAlign: TextAlign.left,
             textScaler: TextScaler.linear(1.0),
+          ),
+        ],
+      ),
+      Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Container(
+            constraints: BoxConstraints(
+              maxWidth: MediaQuery.of(gl.notificationContext!).size.width * .7,
+            ),
+            child: Text(
+              "Finançements du projet",
+              overflow: TextOverflow.clip,
+              textAlign: TextAlign.justify,
+              textScaler: TextScaler.linear(1.5),
+            ),
+          ),
+        ],
+      ),
+      Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Container(
+            constraints: BoxConstraints(
+              maxWidth: MediaQuery.of(gl.notificationContext!).size.width * .7,
+            ),
+            child: Text(
+              "Le développement est financé par l'Accord Cadre de Recherches et Vulgarisation Forestières.\nLe contenu cartographique est en grande partie issu des recherches menées au sein de l'unité de Gestion des Ressources Forestières de Gembloux Agro-Bio Tech (ULiège).\n",
+              overflow: TextOverflow.clip,
+              textAlign: TextAlign.justify,
+              textScaler: TextScaler.linear(1.0),
+            ),
+          ),
+        ],
+      ),
+      Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Container(
+            constraints: BoxConstraints(
+              maxWidth: MediaQuery.of(gl.notificationContext!).size.width * .7,
+            ),
+            child: Text(
+              "Contact: Philippe Lejeune\np.lejeune@uliege.be",
+              overflow: TextOverflow.clip,
+              textAlign: TextAlign.justify,
+              textScaler: TextScaler.linear(1.0),
+            ),
           ),
         ],
       ),
@@ -886,6 +1001,30 @@ Widget forestimatorSettingsPermissions() {
   );
 }
 
+Widget forestimatorConfidentiality() {
+  return Column(
+    children: [
+      Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Container(
+            padding: EdgeInsets.all(5),
+            constraints: BoxConstraints(
+              maxWidth: MediaQuery.of(gl.notificationContext!).size.width * .7,
+            ),
+            child: Text(
+              "Forestimator mobile ne collecte aucune donnée. Notre politique de confidentialité est consultable au \nhttps://forestimator.gembloux.ulg.ac.be/documentation/confidentialit_.\nL'application utilise le gps pour afficher votre position actuelle sur la carte et seulement pendant l'utilisation.",
+              overflow: TextOverflow.clip,
+              textAlign: TextAlign.justify,
+              textScaler: TextScaler.linear(1.0),
+            ),
+          ),
+        ],
+      ),
+    ],
+  );
+}
+
 class Item {
   final Widget entry;
   final String name;
@@ -917,6 +1056,7 @@ class _SettingsMenu extends State<SettingsMenu> {
         Item(name: "Permissions", entry: forestimatorSettingsPermissions()),
         Item(name: "About Forestimator", entry: forestimatorSettingsVersion()),
         Item(name: "Contact", entry: forestimatorSettingsContacts()),
+        Item(name: "Confidentialité", entry: forestimatorConfidentiality()),
         Item(name: "Debug Logs", entry: ForestimatorLog()),
       ]);
     } else {
@@ -1031,10 +1171,262 @@ class PopupSettingsMenu {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
+          titlePadding: EdgeInsets.all(5),
+          actionsPadding: EdgeInsets.all(0),
+          contentPadding: EdgeInsets.all(0),
+          insetPadding: EdgeInsets.all(0),
+          buttonPadding: EdgeInsets.all(0),
+          iconPadding: EdgeInsets.all(0),
+          backgroundColor: gl.colorAgroBioTech,
+          surfaceTintColor: Colors.transparent,
+          shadowColor: Colors.transparent,
           title: Text("Paramètres"),
           content: SizedBox(
             width: MediaQuery.of(context).size.width * .95,
             child: SettingsMenu(state: state),
+          ),
+          actions: [
+            TextButton(
+              child: Text("Terminé!"),
+              onPressed: () {
+                after();
+                Navigator.of(context, rootNavigator: true).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+Widget _resultRow(String key, String value) {
+  return Row(
+    mainAxisAlignment: MainAxisAlignment.start,
+    children: [
+      Container(
+        padding: EdgeInsets.all(5),
+        constraints: BoxConstraints(
+          maxWidth: MediaQuery.of(gl.notificationContext!).size.width * .8,
+        ),
+        child: Text(
+          key,
+          overflow: TextOverflow.clip,
+          textAlign: TextAlign.justify,
+          textScaler: TextScaler.linear(1.0),
+        ),
+      ),
+      Container(
+        padding: EdgeInsets.all(5),
+        constraints: BoxConstraints(
+          maxWidth: MediaQuery.of(gl.notificationContext!).size.width * .8,
+        ),
+        child: Text(
+          value,
+          overflow: TextOverflow.clip,
+          textAlign: TextAlign.justify,
+          textScaler: TextScaler.linear(1.0),
+        ),
+      ),
+    ],
+  );
+}
+
+Widget _resultClassRow(Map<String, dynamic> json, mCode) {
+  Color col = Colors.transparent;
+  int key;
+  try {
+    key = gl.dico.mLayerBases[mCode]!.mDicoCol.keys.elementAt(
+      json['rastValue'],
+    );
+  } catch (e) {
+    key = -1234567891011;
+  }
+  if (key != -1234567891011) {
+    col = gl.dico.mLayerBases[mCode]!.mDicoCol[key]!;
+  }
+  return Row(
+    mainAxisAlignment: MainAxisAlignment.start,
+    children: [
+      Container(
+        color: col,
+        padding: EdgeInsets.all(5),
+        constraints: BoxConstraints(
+          minHeight: MediaQuery.of(gl.notificationContext!).size.width * .05,
+          minWidth: MediaQuery.of(gl.notificationContext!).size.width * .05,
+        ),
+        child: Container(color: col),
+      ),
+      Container(
+        padding: EdgeInsets.all(5),
+        constraints: BoxConstraints(
+          maxWidth: MediaQuery.of(gl.notificationContext!).size.width * .7,
+        ),
+        child: Text(
+          json['value'].toString(),
+          overflow: TextOverflow.clip,
+          textAlign: TextAlign.justify,
+          textScaler: TextScaler.linear(1.0),
+        ),
+      ),
+      Container(
+        padding: EdgeInsets.all(5),
+        constraints: BoxConstraints(
+          maxWidth: MediaQuery.of(gl.notificationContext!).size.width * .2,
+        ),
+        child: Text(
+          "${json['prop'].toString()}%",
+          overflow: TextOverflow.clip,
+          textAlign: TextAlign.justify,
+          textScaler: TextScaler.linear(1.0),
+        ),
+      ),
+    ],
+  );
+}
+
+Widget forestimatorResultsHeaderClasse(Map<String, dynamic> json) {
+  return Column(
+    children:
+        <Widget>[
+          Container(
+            alignment: Alignment.centerLeft,
+            padding: EdgeInsets.all(5),
+            constraints: BoxConstraints(
+              maxWidth: MediaQuery.of(gl.notificationContext!).size.width * .5,
+            ),
+            child: Text(
+              "(en % de la surface)",
+              overflow: TextOverflow.clip,
+              textAlign: TextAlign.justify,
+              textScaler: TextScaler.linear(0.75),
+            ),
+          ),
+        ] +
+        List<Widget>.generate(json['classes'].length, (i) {
+          return _resultClassRow(json['classes'][i], json['layerCode']);
+        }),
+  );
+}
+
+Widget forestimatorResultsHeaderContinue(Map<String, dynamic> json) {
+  return Column(
+    children: List<Widget>.generate(json.length, (i) {
+      return i == 0
+          ? Column()
+          : _resultRow(
+            json.keys.elementAt(i),
+            json[json.keys.elementAt(i)].toString(),
+          );
+    }),
+  );
+}
+
+class ResultsMenu extends StatefulWidget {
+  final Map<String, dynamic> json;
+
+  const ResultsMenu({super.key, required this.json});
+
+  @override
+  State<ResultsMenu> createState() => _ResultsMenu();
+}
+
+class _ResultsMenu extends State<ResultsMenu> {
+  final Color active = Colors.black;
+  final Color inactive = Colors.blueGrey;
+  final List<Item> menuItems = [];
+  bool _listInitialzed = false;
+
+  @override
+  void initState() {
+    if (!_listInitialzed) {
+      for (var result in widget.json['RequestedLayers']) {
+        if (result['mean'] != null) {
+          menuItems.add(
+            Item(
+              name: gl.dico.getLayerBase(result['layerCode']).mNom,
+              entry: forestimatorResultsHeaderContinue(result),
+            ),
+          );
+        } else {
+          menuItems.add(
+            Item(
+              name: gl.dico.getLayerBase(result['layerCode']).mNom,
+              entry: forestimatorResultsHeaderClasse(result),
+            ),
+          );
+        }
+      }
+    } else {
+      _listInitialzed = true;
+    }
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: SingleChildScrollView(
+        child: ExpansionPanelList(
+          expansionCallback: (int panelIndex, bool isExpanded) {
+            setState(() {
+              menuItems[panelIndex].isExpanded = isExpanded;
+            });
+          },
+          children:
+              menuItems.map<ExpansionPanel>((Item item) {
+                return ExpansionPanel(
+                  canTapOnHeader: true,
+                  headerBuilder: (BuildContext context, bool isExpanded) {
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [Text(item.name)],
+                    );
+                  },
+                  body: item.isExpanded ? item.entry : Container(),
+                  isExpanded: item.isExpanded,
+                );
+              }).toList(),
+        ),
+      ),
+    );
+  }
+}
+
+class PopupResultsMenu {
+  PopupResultsMenu(
+    BuildContext context,
+    Map<String, dynamic> json,
+    Function state,
+    Function after,
+  ) {
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          titlePadding: EdgeInsets.all(5),
+          actionsPadding: EdgeInsets.all(0),
+          contentPadding: EdgeInsets.all(0),
+          insetPadding: EdgeInsets.all(0),
+          buttonPadding: EdgeInsets.all(0),
+          iconPadding: EdgeInsets.all(0),
+          backgroundColor: Colors.transparent,
+          surfaceTintColor: Colors.transparent,
+          shadowColor: Colors.transparent,
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                "Résultats",
+                textScaler: TextScaler.linear(2.0),
+                style: TextStyle(color: Colors.white),
+              ),
+            ],
+          ),
+          content: SizedBox(
+            width: MediaQuery.of(context).size.width * .95,
+            child: ResultsMenu(json: json),
           ),
           actions: [
             TextButton(
