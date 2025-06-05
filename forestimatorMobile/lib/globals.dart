@@ -8,6 +8,18 @@ import 'package:proj4dart/proj4dart.dart' as proj4;
 import 'package:latlong2/latlong.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+proj4.Projection epsg4326 = proj4.Projection.get('EPSG:4326')!;
+proj4.Projection epsg31370 =
+    proj4.Projection.get('EPSG:31370') ??
+    proj4.Projection.add(
+      'EPSG:31370',
+      '+proj=lcc +lat_1=51.16666723333333 +lat_2=49.8333339 +lat_0=90 +lon_0=4.367486666666666 +x_0=150000.013 +y_0=5400088.438 +ellps=intl +towgs84=-106.8686,52.2978,-103.7239,0.3366,-0.457,1.8422,-1.2747 +units=m +no_defs +type=crs',
+    );
+
+proj4.Point epsg4326ToEpsg31370(proj4.Point spPoint) {
+  return epsg4326.transform(epsg31370, spPoint);
+}
+
 late DicoAptProvider dico;
 
 const String forestimatorMobileVersion = "1.0.2-13";
@@ -116,6 +128,7 @@ List<String> getInterfaceSelectedLOffline() {
   return aRes;
 }
 
+LayerAnaPt? anaPtPreview;
 List<LayerAnaPt> requestedLayers = [];
 
 List<String> anaPtSelectedLayerKeys = [

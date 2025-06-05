@@ -35,6 +35,7 @@ class _MapPageState extends State<MapPage> {
   static int _mapFrameCounter = 0;
 
   bool _settingsMenu = false;
+  bool _modeAnaPtPreview = true;
 
   bool _toolbarExtended = false;
   bool _modeDrawPolygon = false;
@@ -89,6 +90,7 @@ class _MapPageState extends State<MapPage> {
   void _updatePtMarker(LatLng pt) {
     refreshView(() {
       _pt = pt;
+      gl.anaPtPreview = null;
     });
   }
 
@@ -396,84 +398,9 @@ class _MapPageState extends State<MapPage> {
                     MarkerLayer(
                       markers:
                           _placeSearchMarker() +
-                          <Marker>[
-                            (!_modeDrawPolygonMoveVertexes) //||_modeLegendInfoBeforeAna)
-                                ? Marker(
-                                  //TODO Finish analyse ponctuelle
-                                  alignment: Alignment.centerRight,
-                                  width: MediaQuery.of(context).size.width * .5,
-                                  height:
-                                      MediaQuery.of(context).size.width * .5,
-                                  point: _pt ?? const LatLng(0.0, 0.0),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          const Icon(Icons.location_on),
-                                        ],
-                                      ),
-                                      Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment
-                                                .center, //MainAxisAlignment.start,
-                                        children: [
-                                          TextButton(
-                                            onPressed: () async {
-                                              if (!_doingAnaPt) {
-                                                refreshView(() {
-                                                  _doingAnaPt = true;
-                                                  _updatePtMarker(_pt!);
-                                                });
-                                                await _runAnaPt(
-                                                  epsg4326.transform(
-                                                    epsg31370,
-                                                    proj4.Point(
-                                                      x: _pt!.longitude,
-                                                      y: _pt!.latitude,
-                                                    ),
-                                                  ),
-                                                );
-                                                refreshView(() {
-                                                  _doingAnaPt = false;
-                                                });
-                                                GoRouter.of(
-                                                  gl.notificationContext!,
-                                                ).push("/anaPt");
-                                              }
-                                            },
-                                            child: Text("Analyse Ponctuelle"),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                )
-                                : _selectedPointToMove != null
-                                ? Marker(
-                                  alignment: Alignment.center,
-                                  width: iconSize,
-                                  height: iconSize,
-                                  point: _mapController.camera.center,
-                                  child: const Icon(
-                                    Icons.donut_large,
-                                    color: Colors.red,
-                                  ),
-                                )
-                                : Marker(
-                                  alignment: Alignment.center,
-                                  width: iconSize,
-                                  height: iconSize,
-                                  point: _mapController.camera.center,
-                                  child: const Icon(
-                                    Icons.donut_large,
-                                    color: Colors.blue,
-                                  ),
-                                ),
-                          ] +
-                          _getPolygonesInfos(),
+                          _placeVertexMovePointer() +
+                          _getPolygonesInfos() +
+                          _placeAnaPtMarker(),
                     ),
                   ],
             ),
@@ -751,55 +678,109 @@ class _MapPageState extends State<MapPage> {
       double scale = 1.5;
       all.add(
         Marker(
-          alignment: Alignment.bottomRight,
+          alignment: Alignment.centerRight,
           width: poi.name.length * 16,
           height: gl.selectedSearchMarker == poi.index ? 300 : 50,
           point: poi.position,
           child: Column(
-            children:
-                <Widget>[
-                  TextButton(
-                    style: ButtonStyle(animationDuration: Duration(seconds: 0)),
-                    onPressed: () {
-                      refreshView(() {
-                        if (gl.selectedSearchMarker == poi.index) {
-                          gl.selectedSearchMarker = -1;
-                        } else {
-                          gl.selectedSearchMarker = poi.index;
-                        }
-                        gl.print(
-                          "Selected searchMarker = ${gl.selectedSearchMarker}",
-                        );
-                      });
-                    },
-                    child: Column(
-                      children: <Widget>[
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: <Widget>[
-                            Column(
-                              children: [
-                                Icon(
-                                  Icons.circle_notifications,
-                                  color: Colors.red,
-                                ),
-                              ],
-                            ),
-                            Text(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              TextButton(
+                style: ButtonStyle(
+                  animationDuration: Duration(seconds: 1),
+                  backgroundColor:
+                      gl.selectedSearchMarker == i
+                          ? WidgetStateProperty<Color>.fromMap(
+                            <WidgetStatesConstraint, Color>{
+                              WidgetState.any: Colors.white,
+                            },
+                          )
+                          : WidgetStateProperty<Color>.fromMap(
+                            <WidgetStatesConstraint, Color>{
+                              WidgetState.any: Colors.transparent,
+                            },
+                          ),
+                  foregroundColor:
+                      gl.selectedSearchMarker == i
+                          ? WidgetStateProperty<Color>.fromMap(
+                            <WidgetStatesConstraint, Color>{
+                              WidgetState.any: Colors.black,
+                            },
+                          )
+                          : WidgetStateProperty<Color>.fromMap(
+                            <WidgetStatesConstraint, Color>{
+                              WidgetState.any: Colors.blueGrey,
+                            },
+                          ),
+                ),
+                onPressed: () {
+                  refreshView(() {
+                    if (gl.selectedSearchMarker == poi.index) {
+                      gl.selectedSearchMarker = -1;
+                    } else {
+                      gl.selectedSearchMarker = poi.index;
+                    }
+                    gl.print(
+                      "Selected searchMarker = ${gl.selectedSearchMarker}",
+                    );
+                  });
+                },
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children:
+                      <Widget>[
+                        gl.selectedSearchMarker == i
+                            ? Text(poi.name, textScaler: TextScaler.linear(1.0))
+                            : Text(
                               poi.name,
                               textScaler: TextScaler.linear(scale),
                             ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ] +
-                _getSearchInfoBox(poi, i),
+                      ] +
+                      _getSearchInfoBox(poi, i),
+                ),
+              ),
+            ],
           ),
         ),
       );
       i++;
+    }
+    for (gl.PoiMarker poi in gl.poiMarkerList) {
+      all.add(
+        Marker(
+          alignment: Alignment.center,
+          width: 50,
+          height: 50,
+          point: poi.position,
+          child: IconButton(
+            style: ButtonStyle(
+              animationDuration: Duration(seconds: 1),
+              backgroundColor: WidgetStateProperty<Color>.fromMap(
+                <WidgetStatesConstraint, Color>{
+                  WidgetState.any: Colors.transparent,
+                },
+              ),
+            ),
+            onPressed: () {
+              refreshView(() {
+                if (gl.selectedSearchMarker == poi.index) {
+                  gl.selectedSearchMarker = -1;
+                } else {
+                  gl.selectedSearchMarker = poi.index;
+                }
+                gl.print("Selected searchMarker = ${gl.selectedSearchMarker}");
+              });
+            },
+            icon: Icon(Icons.circle_notifications, color: Colors.red, size: 20),
+          ),
+        ),
+      );
+      i++;
+    }
+    if (gl.selectedSearchMarker > -1) {
+      final temp = all[gl.selectedSearchMarker];
+      all[gl.selectedSearchMarker] = all[all.length - 1];
+      all[all.length - 1] = temp;
     }
     return all;
   }
@@ -809,21 +790,109 @@ class _MapPageState extends State<MapPage> {
     return gl.selectedSearchMarker == i
         ? <Widget>[
           Row(
-            mainAxisAlignment: MainAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [Text(poi.address, textScaler: TextScaler.linear(scale))],
           ),
           Row(
-            mainAxisAlignment: MainAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [Text(poi.city, textScaler: TextScaler.linear(scale))],
           ),
           Row(
-            mainAxisAlignment: MainAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(poi.postcode, textScaler: TextScaler.linear(scale)),
             ],
           ),
         ]
         : <Widget>[];
+  }
+
+  List<Marker> _placeAnaPtMarker() {
+    if (_pt == null || !_modeAnaPtPreview) {
+      return [];
+    }
+    return <Marker>[
+      Marker(
+        alignment: Alignment(0.0, -3.0),
+        width: MediaQuery.of(context).size.width * .5,
+        height: MediaQuery.of(context).size.width * .1,
+        point: _pt ?? const LatLng(0.0, 0.0),
+        child: FloatingActionButton(
+          backgroundColor: Color.fromRGBO(0, 0, 0, 0.8),
+          foregroundColor: Colors.white,
+          onPressed: () async {
+            if (!_doingAnaPt) {
+              refreshView(() {
+                _doingAnaPt = true;
+              });
+              await _runAnaPt(
+                epsg4326.transform(
+                  epsg31370,
+                  proj4.Point(x: _pt!.longitude, y: _pt!.latitude),
+                ),
+              );
+              refreshView(() {
+                _doingAnaPt = false;
+              });
+              GoRouter.of(gl.notificationContext!).push("/anaPt");
+            }
+          },
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [AnaPtPreview(position: _pt!, after: () {})],
+              ),
+            ],
+          ),
+        ),
+      ),
+
+      Marker(
+        alignment: Alignment.center,
+        width: 50,
+        height: 50,
+        point: _pt ?? const LatLng(0.0, 0.0),
+        child: const Icon(Icons.donut_small),
+      ),
+      Marker(
+        alignment: Alignment.center,
+        width: 50,
+        height: 50,
+        point: _pt ?? const LatLng(0.0, 0.0),
+        child: const Icon(
+          Icons.donut_large_sharp,
+          color: Color.fromRGBO(255, 255, 255, .75),
+        ),
+      ),
+    ];
+  }
+
+  List<Marker> _placeVertexMovePointer() {
+    List<Marker> ret = [];
+    if (_modeDrawPolygonMoveVertexes && _selectedPointToMove != null) {
+      ret.add(
+        Marker(
+          alignment: Alignment.center,
+          width: iconSize * 1.1,
+          height: iconSize * 1.1,
+          point: _mapController.camera.center,
+          child: const Icon(Icons.donut_large, color: Colors.red),
+        ),
+      );
+    } else if (_modeDrawPolygonMoveVertexes) {
+      ret.add(
+        Marker(
+          alignment: Alignment.center,
+          width: iconSize,
+          height: iconSize,
+          point: _mapController.camera.center,
+          child: const Icon(Icons.donut_small, color: Colors.blue),
+        ),
+      );
+    }
+    return ret;
   }
 
   List<Marker> _drawnLayerPointsMarker() {
@@ -974,6 +1043,7 @@ class _MapPageState extends State<MapPage> {
       _modeDrawPolygonRemoveVertexes = false;
       _modeDrawPolygonMoveVertexes = false;
       _stopMovingSelectedPoint();
+      _modeAnaPtPreview = true;
     });
   }
 
@@ -996,7 +1066,9 @@ class _MapPageState extends State<MapPage> {
         gl.refreshMap(() {});
         if (_modeDrawPolygon == false) {
           _closePolygonDrawMenu();
+          _modeAnaPtPreview = true;
         } else {
+          _modeAnaPtPreview = false;
           _closeLayerPropertiesMenu();
           _closeProjectMenu();
         }
@@ -1212,7 +1284,11 @@ class _MapPageState extends State<MapPage> {
         _refreshLocation = true;
       }
       Position newPosition = await Geolocator.getCurrentPosition().timeout(
-        Duration(seconds: 3),
+        Duration(seconds: 5),
+        onTimeout: () {
+          gl.print("Geolocator timeout reached!");
+          return gl.position!;
+        },
       );
 
       refreshView(() {
@@ -1220,13 +1296,9 @@ class _MapPageState extends State<MapPage> {
       });
       _refreshLocation = false;
     } catch (e) {
+      gl.print("Exception getting position!");
       gl.print("$e");
-      // We keep the old position.
-      refreshView(() {
-        gl.position = gl.position;
-      });
       _refreshLocation = false;
-      //FlutterLogs.logError("gps", "position", "error while waiting on position. ${e.toString()}");
     }
   }
 }
@@ -1243,5 +1315,105 @@ Future<Position?> acquireUserLocation() async {
     }
   } else {
     return null;
+  }
+}
+
+class AnaPtPreview extends StatefulWidget {
+  final LatLng position;
+  final Function after;
+  const AnaPtPreview({super.key, required this.position, required this.after});
+
+  @override
+  State<StatefulWidget> createState() => _AnaPtPreview();
+}
+
+class _AnaPtPreview extends State<AnaPtPreview> {
+  bool _initialized = false;
+  LayerAnaPt? requested;
+  static LatLng? lastRequested;
+
+  @override
+  Widget build(BuildContext context) {
+    if (lastRequested == null || lastRequested != widget.position) {
+      lastRequested = widget.position;
+      proj4.Point point = proj4.Point(
+        x: widget.position.longitude,
+        y: widget.position.latitude,
+      );
+      _runAnaPtPreview(
+        gl.epsg4326ToEpsg31370(
+          proj4.Point(
+            x: widget.position.longitude,
+            y: widget.position.latitude,
+          ),
+        ),
+        widget.after,
+      );
+    }
+    return _initialized
+        ? Column(
+          children: [
+            Row(
+              children: [
+                Container(
+                  constraints: BoxConstraints(minHeight: 20, minWidth: 20),
+                  color: gl.dico
+                      .getLayerBase(requested!.mCode)
+                      .getValColor(requested!.mRastValue),
+                ),
+                Text(
+                  gl.dico
+                      .getLayerBase(requested!.mCode)
+                      .getValLabel(requested!.mRastValue),
+                ),
+              ],
+            ),
+          ],
+        )
+        : Text("--");
+  }
+
+  Future _runAnaPtPreview(proj4.Point ptBL72, Function after) async {
+    Map data;
+    bool internet = await InternetConnection().hasInternetAccess;
+    if (!gl.offlineMode) {
+      if (internet) {
+        String request =
+            "https://forestimator.gembloux.ulg.ac.be/api/anaPt/layers/${gl.getInterfaceSelectedLCode().first}/x/${ptBL72.x}/y/${ptBL72.y}";
+        try {
+          var res = await http.get(Uri.parse(request));
+          if (res.statusCode != 200) throw HttpException('${res.statusCode}');
+          data = jsonDecode(res.body);
+          gl.print(request);
+          requested = LayerAnaPt.fromMap(data["RequestedLayers"].first);
+
+          setState(() {
+            _initialized = true;
+          });
+        } catch (e) {
+          gl.print(request);
+          gl.print("$e");
+        }
+      } else {
+        showDialog(
+          context: gl.notificationContext!,
+          builder: (BuildContext context) {
+            return PopupNoInternet();
+          },
+        );
+      }
+    } else {
+      int val = await gl.dico
+          .getLayerBase(gl.interfaceSelectedLCode.first)
+          .getValXY(ptBL72);
+      requested = LayerAnaPt(
+        mCode: gl.interfaceSelectedLCode.first,
+        mRastValue: val,
+      );
+      setState(() {
+        _initialized = true;
+      });
+    }
+    after();
   }
 }

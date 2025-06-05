@@ -22,13 +22,6 @@ class PolygonLayer {
   int selectedVertex = -1;
   double area = 0.0;
   double perimeter = 0.0;
-  late proj4.Projection epsg4326 = proj4.Projection.get('EPSG:4326')!;
-  proj4.Projection epsg31370 =
-      proj4.Projection.get('EPSG:31370') ??
-      proj4.Projection.add(
-        'EPSG:31370',
-        '+proj=lcc +lat_1=51.16666723333333 +lat_2=49.8333339 +lat_0=90 +lon_0=4.367486666666666 +x_0=150000.013 +y_0=5400088.438 +ellps=intl +towgs84=-106.8686,52.2978,-103.7239,0.3366,-0.457,1.8422,-1.2747 +units=m +no_defs +type=crs',
-      );
   Map<String, dynamic> decodedJson = {};
 
   PolygonLayer({required String polygonName}) {
@@ -192,8 +185,8 @@ class PolygonLayer {
 
   Offset _epsg4326ToEpsg31370(proj4.Point spPoint) {
     return Offset(
-      epsg4326.transform(epsg31370, spPoint).x,
-      epsg4326.transform(epsg31370, spPoint).y,
+      gl.epsg4326.transform(gl.epsg31370, spPoint).x,
+      gl.epsg4326.transform(gl.epsg31370, spPoint).y,
     );
   }
 
@@ -249,14 +242,14 @@ class PolygonLayer {
 
       String polygon = "POLYGON ((";
       for (LatLng point in polygonPoints) {
-        proj4.Point tLb72 = epsg4326.transform(
-          epsg31370,
+        proj4.Point tLb72 = gl.epsg4326.transform(
+          gl.epsg31370,
           proj4.Point(x: point.longitude, y: point.latitude),
         );
         polygon = "$polygon${tLb72.x} ${tLb72.y},";
       }
-      proj4.Point tLb72 = epsg4326.transform(
-        epsg31370,
+      proj4.Point tLb72 = gl.epsg4326.transform(
+        gl.epsg31370,
         proj4.Point(
           x: polygonPoints.first.longitude,
           y: polygonPoints.first.latitude,
@@ -288,7 +281,7 @@ class PolygonLayer {
           decodedJson = jsonDecode(correctedBody);
           gl.print("Error corrected");
         } catch (e) {
-          gl.print("Error cannot correct!");
+          gl.print("Error cannot be correct!");
           gl.print("$e");
         }
       }

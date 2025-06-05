@@ -32,20 +32,12 @@ class PopupNotification extends StatelessWidget {
       content: Text(dialog!),
       actions: <Widget>[
         TextButton(
-          onPressed:
-              () => {
-                Navigator.pop(context, 'OK'),
-                if (onAccept != null) onAccept!(),
-              },
+          onPressed: () => {if (onAccept != null) onAccept!()},
           child: Text(accept!),
         ),
         if (decline != null)
           TextButton(
-            onPressed:
-                () => {
-                  Navigator.pop(context, 'NO'),
-                  if (onDecline != null) onDecline!(),
-                },
+            onPressed: () => {if (onDecline != null) onDecline!()},
             child: Text(decline!),
           ),
       ],
@@ -1340,7 +1332,7 @@ class _ResultsMenu extends State<ResultsMenu> {
   @override
   void initState() {
     if (!_listInitialzed) {
-      for (var result in widget.json['RequestedLayers']) {
+      for (var result in widget.json['RequestedLayers'] ?? {}) {
         if (result['mean'] != null) {
           menuItems.add(
             Item(

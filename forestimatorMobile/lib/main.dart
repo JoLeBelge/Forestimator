@@ -5,7 +5,6 @@ import 'package:fforestimator/pages/anaPt/ana_ptpage.dart';
 import 'package:fforestimator/pages/offlinePage/offline_view.dart';
 import 'package:fforestimator/tools/customLayer/polygon_layer.dart';
 import 'package:fforestimator/tools/layer_downloader.dart';
-import 'package:fforestimator/tools/notification.dart';
 import 'package:flutter/material.dart';
 import 'package:fforestimator/globals.dart' as gl;
 import 'package:fforestimator/pages/map.dart';
@@ -59,8 +58,6 @@ class _MyApp extends State<MyApp> {
 
   Future<void> getMemoryInfo() async {
     Memory? memory;
-    // Platform messages may fail, so we use a try/catch PlatformException.
-    // We also handle the message potentially returning null.
     try {
       memory = await MemoryInfoPlugin().memoryInfo;
     } on PlatformException catch (e) {
@@ -356,35 +353,6 @@ class _MyApp extends State<MyApp> {
     gl.notificationContext = context;
     if (!_initializedPersistentValues) {
       return const MaterialApp(home: CircularProgressIndicator());
-    } else if (gl.firstTimeUse) {
-      return MaterialApp(
-        home: PopupNotification(
-          title: "Bienvenu",
-          accept: "oui",
-          onAccept: () async {
-            setState(() {
-              gl.firstTimeUse = false;
-            });
-            final SharedPreferences prefs =
-                await SharedPreferences.getInstance();
-            await prefs.setBool('firstTimeUse', gl.firstTimeUse);
-            for (var key in gl.downloadableLayerKeys) {
-              downloadLayer(key);
-            }
-          },
-          decline: "non",
-          onDecline: () async {
-            setState(() {
-              gl.firstTimeUse = false;
-            });
-            final SharedPreferences prefs =
-                await SharedPreferences.getInstance();
-            await prefs.setBool('firstTimeUse', gl.firstTimeUse);
-          },
-          dialog:
-              "Forestimator mobile ne collecte aucune information personnelle. Notre politique de confidentialité est consultable au https://forestimator.gembloux.ulg.ac.be/documentation/confidentialit_. Autorisez-vous l'aplication à télécharger un jeu de 7 couches pour une utilisation hors ligne? Ces couches couvrent toutes la Région Wallonne et totalisent +- 100 Mo.",
-        ),
-      );
     }
     return MaterialApp.router(
       routerDelegate: _router.routerDelegate,

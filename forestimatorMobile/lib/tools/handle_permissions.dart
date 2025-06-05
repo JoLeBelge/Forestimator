@@ -11,14 +11,12 @@ PermissionStatus location = PermissionStatus.granted;
 PermissionStatus storage = PermissionStatus.granted;
 PermissionStatus storage2 = PermissionStatus.granted;
 PermissionStatus extStorage = PermissionStatus.granted;
-PermissionStatus notification = PermissionStatus.granted;
 
 bool askOnceForLocation = true;
 bool askOnceForStorage = true;
-bool askOnceForNotification = true;
 
 bool getVersion = true;
-int release = 20;
+double release = 20;
 int sdkInt = 20;
 
 /* Ask permissions at start of map and if not granted ask to grant them */
@@ -31,11 +29,16 @@ void initPermissions() async {
   if (getVersion && Platform.isAndroid) {
     DeviceInfoPlugin infos = DeviceInfoPlugin();
     AndroidDeviceInfo androidInfo = await infos.androidInfo;
-    release = int.parse(
+    release = double.parse(
       androidInfo.version.release[0] + androidInfo.version.release[1],
     );
     sdkInt = androidInfo.version.sdkInt;
     gl.print("Android $release (sdk $sdkInt)");
+  } else if (getVersion && Platform.isIOS) {
+    DeviceInfoPlugin infos = DeviceInfoPlugin();
+    IosDeviceInfo iOSInfo = await infos.iosInfo;
+    release = double.parse(iOSInfo.systemVersion);
+    gl.print("iOS $release ${iOSInfo.systemName}");
   }
   getVersion = false;
 }
@@ -44,13 +47,11 @@ void refreshPermissionInfos() async {
   location = await Permission.location.status;
   storage = await Permission.storage.status;
   extStorage = await Permission.manageExternalStorage.status;
-  notification = await Permission.notification.status; // Not used for now!
 }
 
 bool locationGranted() => location.isGranted;
 bool storageGranted() => storage.isGranted;
 bool extStorageGranted() => extStorage.isGranted;
-bool notificationsGranted() => notification.isGranted;
 
 void makeAllPermissionRequests() {
   Permission.location.request();
@@ -134,55 +135,6 @@ Widget handlePermissionForStorage({
   } else if (release < 13 && storage.isPermanentlyDenied) {
     return PopupPermissions(
       title: "Permission pour le stockage des données.",
-      accept: "Ouvrir paramètres",
-      onAccept: () async {
-        await openAppSettings();
-        refreshPermissionInfos();
-        refreshParentWidgetTree(() {
-          askOnceForStorage = false;
-        });
-      },
-      decline: "non",
-      onDecline: () async {
-        refreshParentWidgetTree(() {
-          askOnceForStorage = false;
-        });
-      },
-      dialog:
-          "Forestimator mobile ne collecte aucune information personnelle. Notre politique de confidentialité est consultable au https://forestimator.gembloux.ulg.ac.be/documentation/confidentialit_. Vous pouvez ouvrir les paramètres et autoriser l'application à stocker des données de cartographie sur votre smartphone.",
-    );
-  }
-  return child;
-}
-
-Widget handlePermissionForNotifications({
-  required Widget child,
-  required Function refreshParentWidgetTree,
-}) {
-  if (!askOnceForNotification) return child;
-  if (release > 8) {
-    return PopupPermissions(
-      title: "Permission pour l'envoi de notifications.",
-      accept: "oui",
-      onAccept: () async {
-        await Permission.notification.request();
-        refreshPermissionInfos();
-        refreshParentWidgetTree(() {
-          askOnceForNotification = false;
-        });
-      },
-      decline: "non",
-      onDecline: () async {
-        refreshParentWidgetTree(() {
-          askOnceForStorage = false;
-        });
-      },
-      dialog:
-          "Forestimator mobile ne collecte aucune information personnelle. Notre politique de confidentialité est consultable au https://forestimator.gembloux.ulg.ac.be/documentation/confidentialit_. Autorisez-vous l'application à stocker des données de cartographie sur votre smartphone?",
-    );
-  } else if (release > 13) {
-    return PopupPermissions(
-      title: "Permission pour l'envoi de notifications.",
       accept: "Ouvrir paramètres",
       onAccept: () async {
         await openAppSettings();
