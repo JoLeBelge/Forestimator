@@ -633,7 +633,7 @@ class _SearchMenu extends State<SearchMenu> {
                         return;
                       }
                       previousLength = that.length;
-                      if (that.length < 3) {
+                      if (that.length < 2) {
                         return;
                       }
                       var request = Uri.parse(
@@ -676,7 +676,7 @@ class _SearchMenu extends State<SearchMenu> {
                                   entry['address']['city'] ??
                                   entry['address']['county'] ??
                                   entry['address']['state'] ??
-                                  "Lokolobömmele",
+                                  "",
                               postcode: entry['address']['postcode'] ?? "",
                             ),
                           );
@@ -1046,7 +1046,7 @@ class _SettingsMenu extends State<SettingsMenu> {
     if (!_listInitialzed) {
       menuItems.addAll([
         Item(name: "Permissions", entry: forestimatorSettingsPermissions()),
-        Item(name: "About Forestimator", entry: forestimatorSettingsVersion()),
+        Item(name: "Sur Forestimator", entry: forestimatorSettingsVersion()),
         Item(name: "Contact", entry: forestimatorSettingsContacts()),
         Item(name: "Confidentialité", entry: forestimatorConfidentiality()),
         Item(name: "Debug Logs", entry: ForestimatorLog()),
@@ -1178,12 +1178,24 @@ class PopupSettingsMenu {
             child: SettingsMenu(state: state),
           ),
           actions: [
-            TextButton(
-              child: Text("Terminé!"),
-              onPressed: () {
-                after();
-                Navigator.of(context, rootNavigator: true).pop();
-              },
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  constraints: BoxConstraints(
+                    minHeight: 20,
+                    minWidth: MediaQuery.of(context).size.width * .75,
+                  ),
+                  child: TextButton(
+                    //backgroundColor: Colors.transparent,
+                    child: Text("Retour!", maxLines: 1),
+                    onPressed: () {
+                      after();
+                      Navigator.of(context, rootNavigator: true).pop();
+                    },
+                  ),
+                ),
+              ],
             ),
           ],
         );

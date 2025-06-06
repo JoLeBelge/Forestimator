@@ -250,11 +250,13 @@ class _MapPageState extends State<MapPage> {
                 onTap:
                     _modeDrawPolygonAddVertexes
                         ? (tapPosition, point) async => {
-                          refreshView(() {
-                            gl.polygonLayers[gl.selectedPolygonLayer].addPoint(
-                              point,
-                            );
-                          }),
+                          if (gl.polygonLayers.isNotEmpty)
+                            {
+                              refreshView(() {
+                                gl.polygonLayers[gl.selectedPolygonLayer]
+                                    .addPoint(point);
+                              }),
+                            },
                         }
                         : _modeDrawPolygonMoveVertexes
                         ? (tapPosition, point) async => {
@@ -543,7 +545,7 @@ class _MapPageState extends State<MapPage> {
                 });
                 PopupSettingsMenu(
                   gl.notificationContext!,
-                  gl.polygonLayers[gl.selectedPolygonLayer].name,
+                  "",
                   () {
                     refreshView(() {});
                   },
@@ -650,6 +652,9 @@ class _MapPageState extends State<MapPage> {
   }
 
   List<CircleMarker> _drawnLayerPointsCircleMarker() {
+    if (gl.polygonLayers.isEmpty) {
+      return [];
+    }
     List<CircleMarker> all = [];
     int i = 0;
     for (var point in gl.polygonLayers[gl.selectedPolygonLayer].vertexes) {
@@ -679,7 +684,14 @@ class _MapPageState extends State<MapPage> {
       all.add(
         Marker(
           alignment: Alignment.centerRight,
-          width: poi.name.length * 16,
+          width:
+              poi.address.length > poi.name.length
+                  ? poi.address.length > 200
+                      ? poi.address.length * 16
+                      : 220
+                  : poi.name.length > 200
+                  ? poi.name.length * 16
+                  : 220,
           height: gl.selectedSearchMarker == poi.index ? 300 : 50,
           point: poi.position,
           child: Column(
@@ -848,7 +860,6 @@ class _MapPageState extends State<MapPage> {
           ),
         ),
       ),
-
       Marker(
         alignment: Alignment.center,
         width: 50,
@@ -896,6 +907,9 @@ class _MapPageState extends State<MapPage> {
   }
 
   List<Marker> _drawnLayerPointsMarker() {
+    if (gl.polygonLayers.isEmpty) {
+      return [];
+    }
     List<Marker> all = [];
     int count = 0;
     for (var point in gl.polygonLayers[gl.selectedPolygonLayer].vertexes) {
@@ -964,11 +978,15 @@ class _MapPageState extends State<MapPage> {
             });
             PopupNameIntroducer(
               gl.notificationContext!,
-              gl.polygonLayers[gl.selectedPolygonLayer].name,
+              "",
               (String nameIt) {
-                refreshView(
-                  () => gl.polygonLayers[gl.selectedPolygonLayer].name = nameIt,
-                );
+                if (gl.polygonLayers.isNotEmpty &&
+                    gl.polygonLayers.length > gl.selectedPolygonLayer) {
+                  refreshView(
+                    () =>
+                        gl.polygonLayers[gl.selectedPolygonLayer].name = nameIt,
+                  );
+                }
               },
               () {
                 refreshView(() {
@@ -992,31 +1010,35 @@ class _MapPageState extends State<MapPage> {
                 _modeLayerPropertiesColors = false;
               }
             });
-            PopupColorChooser(
-              gl.polygonLayers[gl.selectedPolygonLayer].colorInside,
-              gl.notificationContext!,
-              (Color col) {
-                refreshView(() {
-                  gl.polygonLayers[gl.selectedPolygonLayer].setColorInside(col);
-                  gl.polygonLayers[gl.selectedPolygonLayer].setColorLine(
-                    Color.fromRGBO(
-                      (col.r * 255).round(),
-                      (col.g * 255).round(),
-                      (col.b * 255).round(),
-                      0.8,
-                    ),
-                  );
-                });
-              },
-              () {
-                refreshView(() {
-                  _modeLayerPropertiesRename = false;
-                  if (_modeLayerPropertiesRename) {
-                    _modeLayerPropertiesColors = false;
-                  }
-                });
-              },
-            );
+            if (gl.polygonLayers.isNotEmpty) {
+              PopupColorChooser(
+                gl.polygonLayers[gl.selectedPolygonLayer].colorInside,
+                gl.notificationContext!,
+                (Color col) {
+                  refreshView(() {
+                    gl.polygonLayers[gl.selectedPolygonLayer].setColorInside(
+                      col,
+                    );
+                    gl.polygonLayers[gl.selectedPolygonLayer].setColorLine(
+                      Color.fromRGBO(
+                        (col.r * 255).round(),
+                        (col.g * 255).round(),
+                        (col.b * 255).round(),
+                        0.8,
+                      ),
+                    );
+                  });
+                },
+                () {
+                  refreshView(() {
+                    _modeLayerPropertiesRename = false;
+                    if (_modeLayerPropertiesRename) {
+                      _modeLayerPropertiesColors = false;
+                    }
+                  });
+                },
+              );
+            }
           },
           icon: Icon(Icons.color_lens, size: iconSize),
         ),
@@ -1114,7 +1136,9 @@ class _MapPageState extends State<MapPage> {
         }
         PopupDrawnLayerMenu(
           gl.notificationContext!,
-          gl.polygonLayers[gl.selectedPolygonLayer].name,
+          gl.polygonLayers.isNotEmpty
+              ? gl.polygonLayers[gl.selectedPolygonLayer].name
+              : "",
           (LatLng pos) {
             if (pos.longitude != 0.0 && pos.latitude != 0.0) {
               _mapController.move(pos, _mapController.camera.zoom);
@@ -1149,7 +1173,7 @@ class _MapPageState extends State<MapPage> {
         }
         PopupSearchMenu(
           gl.notificationContext!,
-          gl.polygonLayers[gl.selectedPolygonLayer].name,
+          "",
           (LatLng pos) {
             if (pos.longitude != 0.0 && pos.latitude != 0.0) {
               _mapController.move(pos, _mapController.camera.zoom);
@@ -1328,18 +1352,13 @@ class AnaPtPreview extends StatefulWidget {
 }
 
 class _AnaPtPreview extends State<AnaPtPreview> {
-  bool _initialized = false;
-  LayerAnaPt? requested;
+  static LayerAnaPt? requested;
   static LatLng? lastRequested;
 
   @override
   Widget build(BuildContext context) {
     if (lastRequested == null || lastRequested != widget.position) {
       lastRequested = widget.position;
-      proj4.Point point = proj4.Point(
-        x: widget.position.longitude,
-        y: widget.position.latitude,
-      );
       _runAnaPtPreview(
         gl.epsg4326ToEpsg31370(
           proj4.Point(
@@ -1350,7 +1369,7 @@ class _AnaPtPreview extends State<AnaPtPreview> {
         widget.after,
       );
     }
-    return _initialized
+    return requested != null
         ? Column(
           children: [
             Row(
@@ -1387,9 +1406,7 @@ class _AnaPtPreview extends State<AnaPtPreview> {
           gl.print(request);
           requested = LayerAnaPt.fromMap(data["RequestedLayers"].first);
 
-          setState(() {
-            _initialized = true;
-          });
+          setState(() {});
         } catch (e) {
           gl.print(request);
           gl.print("$e");
@@ -1410,9 +1427,7 @@ class _AnaPtPreview extends State<AnaPtPreview> {
         mCode: gl.interfaceSelectedLCode.first,
         mRastValue: val,
       );
-      setState(() {
-        _initialized = true;
-      });
+      setState(() {});
     }
     after();
   }

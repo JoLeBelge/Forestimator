@@ -39,7 +39,7 @@ List<String> onboardLog = [forestimatorMobileVersion];
 int lengthLog = 1;
 @override
 void print(dynamic it) {
-  onboardLog.add(it.toString());
+  onboardLog.add("${DateTime.now().toString()} ${it.toString()}");
 }
 
 // -1 means that no marker is selected

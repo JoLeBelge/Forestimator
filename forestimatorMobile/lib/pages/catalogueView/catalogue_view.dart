@@ -414,7 +414,6 @@ class _CategoryView extends State<CategoryView> {
                       gl.rebuildOfflineView(() {});
                     });
                   },
-                  // TODO ; popUpNoInternet si pas d'accès au réseau
                 ),
               ),
         ],
