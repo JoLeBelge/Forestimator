@@ -1,21 +1,26 @@
 import 'dart:convert';
 
+import 'package:fforestimator/dico/dico_apt.dart';
 import 'package:fforestimator/globals.dart' as gl;
+import 'package:fforestimator/pages/catalogueView/layer_tile.dart';
+import 'package:fforestimator/pages/catalogueView/legend_view.dart';
+import 'package:fforestimator/pages/pdf_screen.dart';
 import 'package:fforestimator/tools/customLayer/polygon_layer.dart';
 import 'package:fforestimator/tools/handle_permissions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class PopupNotification extends StatelessWidget {
+class PopupDownloadRecomendedLayers extends StatelessWidget {
   final String? title;
   final String? dialog;
   final String? accept;
   final String? decline;
   final Function? onAccept;
   final Function? onDecline;
-  const PopupNotification({
+  const PopupDownloadRecomendedLayers({
     super.key,
     this.title,
     this.accept,
@@ -293,6 +298,20 @@ class _DrawnLayerMenu extends State<DrawnLayerMenu> {
             List<TextButton>.generate(
               gl.polygonLayers.isEmpty ? 0 : gl.polygonLayers.length,
               (int i) => TextButton(
+                style: ButtonStyle(
+                  fixedSize:
+                      i == gl.selectedPolygonLayer
+                          ? WidgetStateProperty<Size>.fromMap(
+                            <WidgetStatesConstraint, Size>{
+                              WidgetState.any: Size(200, 180),
+                            },
+                          )
+                          : WidgetStateProperty<Size>.fromMap(
+                            <WidgetStatesConstraint, Size>{
+                              WidgetState.any: Size(200, 120),
+                            },
+                          ),
+                ),
                 key: Key('$i'),
                 onPressed:
                     i == gl.selectedPolygonLayer
@@ -312,8 +331,8 @@ class _DrawnLayerMenu extends State<DrawnLayerMenu> {
                   shadowColor: Colors.transparent,
                   color:
                       i == gl.selectedPolygonLayer
-                          ? gl.polygonLayers[i].colorLine
-                          : gl.polygonLayers[i].colorInside,
+                          ? gl.polygonLayers[i].colorInside.withAlpha(255)
+                          : gl.polygonLayers[i].colorInside.withAlpha(150),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -755,120 +774,130 @@ class _SearchMenu extends State<SearchMenu> {
 }
 
 Widget forestimatorSettingsVersion() {
-  return Column(
-    children: [
-      Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Text(
-            "Forestimator Mobile",
-            overflow: TextOverflow.clip,
-            textAlign: TextAlign.left,
-            textScaler: TextScaler.linear(2.0),
-          ),
-        ],
-      ),
-      Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Text(
-            "version ${gl.forestimatorMobileVersion}",
-            overflow: TextOverflow.clip,
-            textAlign: TextAlign.left,
-            textScaler: TextScaler.linear(1.0),
-          ),
-        ],
-      ),
-      Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Container(
-            constraints: BoxConstraints(
-              maxWidth: MediaQuery.of(gl.notificationContext!).size.width * .5,
-            ),
-            child: Image.asset("assets/images/LogoForestimator.png"),
-          ),
-        ],
-      ),
-      Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Text(
-            "Programmé et soigné par:\nJonathan Lisein et Thierry Thissen\n",
-            overflow: TextOverflow.clip,
-            textAlign: TextAlign.left,
-            textScaler: TextScaler.linear(1.0),
-          ),
-        ],
-      ),
-      Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Container(
-            constraints: BoxConstraints(
-              maxWidth: MediaQuery.of(gl.notificationContext!).size.width * .7,
-            ),
-            child: Text(
-              "Finançements du projet",
+  return Container(
+    padding: EdgeInsets.all(7.5),
+    child: Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Text(
+              "Forestimator Mobile",
               overflow: TextOverflow.clip,
-              textAlign: TextAlign.justify,
-              textScaler: TextScaler.linear(1.5),
+              textAlign: TextAlign.left,
+              textScaler: TextScaler.linear(2.0),
             ),
-          ),
-        ],
-      ),
-      Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Container(
-            constraints: BoxConstraints(
-              maxWidth: MediaQuery.of(gl.notificationContext!).size.width * .7,
-            ),
-            child: Text(
-              "Le développement est financé par l'Accord Cadre de Recherches et Vulgarisation Forestières.\nLe contenu cartographique est en grande partie issu des recherches menées au sein de l'unité de Gestion des Ressources Forestières de Gembloux Agro-Bio Tech (ULiège).\n",
+          ],
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Text(
+              "version ${gl.forestimatorMobileVersion}",
               overflow: TextOverflow.clip,
-              textAlign: TextAlign.justify,
+              textAlign: TextAlign.left,
               textScaler: TextScaler.linear(1.0),
             ),
-          ),
-        ],
-      ),
-      Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Container(
-            constraints: BoxConstraints(
-              maxWidth: MediaQuery.of(gl.notificationContext!).size.width * .7,
+          ],
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Container(
+              constraints: BoxConstraints(
+                maxWidth:
+                    MediaQuery.of(gl.notificationContext!).size.width * .5,
+              ),
+              child: Image.asset("assets/images/LogoForestimator.png"),
             ),
-            child: Text(
-              "Contact: Philippe Lejeune\np.lejeune@uliege.be",
+          ],
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Text(
+              "Programmé et soigné par:\nJonathan Lisein et Thierry Thissen\n",
               overflow: TextOverflow.clip,
-              textAlign: TextAlign.justify,
+              textAlign: TextAlign.left,
               textScaler: TextScaler.linear(1.0),
             ),
-          ),
-        ],
-      ),
-    ],
+          ],
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Container(
+              constraints: BoxConstraints(
+                maxWidth:
+                    MediaQuery.of(gl.notificationContext!).size.width * .7,
+              ),
+              child: Text(
+                "Finançements du projet",
+                overflow: TextOverflow.clip,
+                textAlign: TextAlign.justify,
+                textScaler: TextScaler.linear(1.5),
+              ),
+            ),
+          ],
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              constraints: BoxConstraints(
+                maxWidth:
+                    MediaQuery.of(gl.notificationContext!).size.width * .9,
+              ),
+              child: Text(
+                "Le développement est financé par l'Accord Cadre de Recherches et Vulgarisation Forestières.\nLe contenu cartographique est en grande partie issu des recherches menées au sein de l'unité de Gestion des Ressources Forestières de Gembloux Agro-Bio Tech (ULiège).\n",
+                overflow: TextOverflow.clip,
+                textAlign: TextAlign.justify,
+                textScaler: TextScaler.linear(1.0),
+              ),
+            ),
+          ],
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Container(
+              constraints: BoxConstraints(
+                maxWidth:
+                    MediaQuery.of(gl.notificationContext!).size.width * .7,
+              ),
+              child: Text(
+                "Contact: Philippe Lejeune\np.lejeune@uliege.be",
+                overflow: TextOverflow.clip,
+                textAlign: TextAlign.justify,
+                textScaler: TextScaler.linear(1.0),
+              ),
+            ),
+          ],
+        ),
+      ],
+    ),
   );
 }
 
 Widget forestimatorSettingsContacts() {
-  return Column(
-    children: [
-      Image.asset("assets/images/GRF_nouveau_logo_uliege-retina.jpg"),
-      Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Text(
-            "\nSur notre Site:\nhttps://www.grf.uliege.be\nPar mail:\nJO.Lisein@uliege.be\n",
-            overflow: TextOverflow.clip,
-            textAlign: TextAlign.left,
-            textScaler: TextScaler.linear(1.0),
-          ),
-        ],
-      ),
-    ],
+  return Container(
+    padding: EdgeInsets.all(7.5),
+    child: Column(
+      children: [
+        Image.asset("assets/images/GRF_nouveau_logo_uliege-retina.jpg"),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Text(
+              "\nSur notre Site:\nhttps://www.grf.uliege.be\nPar mail:\nJO.Lisein@uliege.be\n",
+              overflow: TextOverflow.clip,
+              textAlign: TextAlign.left,
+              textScaler: TextScaler.linear(1.0),
+            ),
+          ],
+        ),
+      ],
+    ),
   );
 }
 
@@ -954,42 +983,45 @@ class _ForestimatorLog extends State<ForestimatorLog> {
 }
 
 Widget forestimatorSettingsPermissions() {
-  return Column(
-    children: [
-      Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Text(
-            "Gestion des permissions",
-            overflow: TextOverflow.clip,
-            textAlign: TextAlign.left,
-            textScaler: TextScaler.linear(1.5),
-          ),
-        ],
-      ),
-      Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Text(
-            "GPS: ",
-            overflow: TextOverflow.clip,
-            textAlign: TextAlign.left,
-            textScaler: TextScaler.linear(1.0),
-          ),
-          Icon(
-            getLocation() ? Icons.check_circle : Icons.circle_notifications,
-            color: getLocation() ? Colors.green : Colors.red,
-          ),
-          Text(
-            getLocation() ? "Accordé." : "Pas accordé.",
-            overflow: TextOverflow.clip,
-            textAlign: TextAlign.left,
-            textScaler: TextScaler.linear(1.0),
-          ),
-        ],
-      ),
-      Row(children: [Text("")]),
-    ],
+  return Container(
+    padding: EdgeInsets.all(7.5),
+    child: Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Text(
+              "Gestion des permissions",
+              overflow: TextOverflow.clip,
+              textAlign: TextAlign.left,
+              textScaler: TextScaler.linear(1.5),
+            ),
+          ],
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Text(
+              "GPS: ",
+              overflow: TextOverflow.clip,
+              textAlign: TextAlign.left,
+              textScaler: TextScaler.linear(1.0),
+            ),
+            Icon(
+              getLocation() ? Icons.check_circle : Icons.circle_notifications,
+              color: getLocation() ? Colors.green : Colors.red,
+            ),
+            Text(
+              getLocation() ? "Accordé." : "Pas accordé.",
+              overflow: TextOverflow.clip,
+              textAlign: TextAlign.left,
+              textScaler: TextScaler.linear(1.0),
+            ),
+          ],
+        ),
+        Row(children: [Text("")]),
+      ],
+    ),
   );
 }
 
@@ -997,12 +1029,12 @@ Widget forestimatorConfidentiality() {
   return Column(
     children: [
       Row(
-        mainAxisAlignment: MainAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
             padding: EdgeInsets.all(5),
             constraints: BoxConstraints(
-              maxWidth: MediaQuery.of(gl.notificationContext!).size.width * .7,
+              maxWidth: MediaQuery.of(gl.notificationContext!).size.width * .9,
             ),
             child: Text(
               "Forestimator mobile ne collecte aucune donnée. Notre politique de confidentialité est consultable au \nhttps://forestimator.gembloux.ulg.ac.be/documentation/confidentialit_.\nL'application utilise le gps pour afficher votre position actuelle sur la carte et seulement pendant l'utilisation.",
@@ -1073,7 +1105,7 @@ class _SettingsMenu extends State<SettingsMenu> {
                   canTapOnHeader: true,
                   headerBuilder: (BuildContext context, bool isExpanded) {
                     return Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [Text(item.name)],
                     );
                   },
@@ -1172,7 +1204,18 @@ class PopupSettingsMenu {
           backgroundColor: gl.colorAgroBioTech,
           surfaceTintColor: Colors.transparent,
           shadowColor: Colors.transparent,
-          title: Text("Paramètres"),
+          title: Container(
+            alignment: Alignment.center,
+            constraints: BoxConstraints(
+              minHeight: 20,
+              minWidth: MediaQuery.of(context).size.width * .8,
+            ),
+            child: Text(
+              "Paramètres",
+              maxLines: 1,
+              style: TextStyle(color: Colors.black),
+            ),
+          ),
           content: SizedBox(
             width: MediaQuery.of(context).size.width * .95,
             child: SettingsMenu(state: state),
@@ -1184,11 +1227,14 @@ class PopupSettingsMenu {
                 Container(
                   constraints: BoxConstraints(
                     minHeight: 20,
-                    minWidth: MediaQuery.of(context).size.width * .75,
+                    minWidth: MediaQuery.of(context).size.width * .8,
                   ),
                   child: TextButton(
-                    //backgroundColor: Colors.transparent,
-                    child: Text("Retour!", maxLines: 1),
+                    child: Text(
+                      "Retour!",
+                      maxLines: 1,
+                      style: TextStyle(color: Colors.black),
+                    ),
                     onPressed: () {
                       after();
                       Navigator.of(context, rootNavigator: true).pop();
@@ -1448,4 +1494,561 @@ class PopupResultsMenu {
 }
 
 String testNominatimJsonResult =
-    '[{"place_id": 94311734,"licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright","osm_type": "relation",        "osm_id": 1405439,        "lat": "50.4665284",        "lon": "4.8661892",        "class": "boundary",        "type": "administrative",        "place_rank": 14,        "importance": 0.6128825791589154,        "addresstype": "city",        "name": "Namur",        "display_name": "Namur, Wallonie, België / Belgique / Belgien",        "address": {            "city": "Namur",            "county": "Namur",            "state": "Namur",            "ISO3166-2-lvl6": "BE-WNA",            "region": "Wallonie",            "ISO3166-2-lvl4": "BE-WAL",            "country": "België / Belgique / Belgien",            "country_code": "be"        },        "boundingbox": [            "50.3872825",            "50.5311017",            "4.7230530",            "4.9843576"        ]    },    {        "place_id": 94426182,        "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",        "osm_type": "relation",        "osm_id": 1311816,        "lat": "50.2169296",        "lon": "4.8011620",        "class": "boundary",        "type": "administrative",        "place_rank": 8,        "importance": 0.5819298876612474,        "addresstype": "state",        "name": "Namur",        "display_name": "Namur, Wallonie, België / Belgique / Belgien",        "address": {            "state": "Namur",            "ISO3166-2-lvl6": "BE-WNA",            "region": "Wallonie",            "ISO3166-2-lvl4": "BE-WAL",            "country": "België / Belgique / Belgien",            "country_code": "be"        },        "boundingbox": [            "49.7855452",            "50.6484447",            "4.2857516",            "5.4026708"        ]    },    {        "place_id": 94479969,        "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",        "osm_type": "relation",        "osm_id": 1405410,        "lat": "50.4553015","lon": "4.9000918","class": "boundary","type": "administrative","place_rank": 12,"importance": 0.46874225610105,"addresstype": "county","name": "Namur","display_name": "Namur, Wallonie, België / Belgique / Belgien","address": {"county": "Namur","state": "Namur","ISO3166-2-lvl6": "BE-WNA","region": "Wallonie","ISO3166-2-lvl4": "BE-WAL","country": "België / Belgique / Belgien","country_code": "be"},"boundingbox": ["50.2614207","50.6484447","4.5573790","5.2371384"]},{"place_id": 94206695,"licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright","osm_type": "relation","osm_id": 1701297,"lat": "50.4572419","lon": "4.8497825","class": "boundary","type": "administrative","place_rank": 16,"importance": 0.18673333104448,"addresstype": "city_district","name": "Namur","display_name": "Namur, Wallonie, 5000, België / Belgique / Belgien","address": {"city_district": "Namur","city": "Namur","county": "Namur","state": "Namur","ISO3166-2-lvl6": "BE-WNA","region": "Wallonie","ISO3166-2-lvl4": "BE-WAL","postcode": "5000","country": "België / Belgique / Belgien","country_code": "be"},"boundingbox": ["50.4353622","50.4788755","4.8307218","4.9018176"]}]';
+    '[{"place_id": 94311734,"licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright","osm_type": "relation",        "osm_id": 1405439,        "lat": "50.4665284",        "lon": "4.8661892",        "class": "boundary",        "type": "administrative",        "place_rank": 14,        "importance": 0.6128825791589154,        "addresstype": "city",        "name": "ERROR",        "display_name": "Namur, Wallonie, België / Belgique / Belgien",        "address": {            "city": "Namur",            "county": "Namur",            "state": "Namur",            "ISO3166-2-lvl6": "BE-WNA",            "region": "Wallonie",            "ISO3166-2-lvl4": "BE-WAL",            "country": "België / Belgique / Belgien",            "country_code": "be"        },        "boundingbox": [            "50.3872825",            "50.5311017",            "4.7230530",            "4.9843576"        ]    },    {        "place_id": 94426182,        "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",        "osm_type": "relation",        "osm_id": 1311816,        "lat": "50.2169296",        "lon": "4.8011620",        "class": "boundary",        "type": "administrative",        "place_rank": 8,        "importance": 0.5819298876612474,        "addresstype": "state",        "name": "Namur",        "display_name": "Namur, Wallonie, België / Belgique / Belgien",        "address": {            "state": "Namur",            "ISO3166-2-lvl6": "BE-WNA",            "region": "Wallonie",            "ISO3166-2-lvl4": "BE-WAL",            "country": "België / Belgique / Belgien",            "country_code": "be"        },        "boundingbox": [            "49.7855452",            "50.6484447",            "4.2857516",            "5.4026708"        ]    },    {        "place_id": 94479969,        "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",        "osm_type": "relation",        "osm_id": 1405410,        "lat": "50.4553015","lon": "4.9000918","class": "boundary","type": "administrative","place_rank": 12,"importance": 0.46874225610105,"addresstype": "county","name": "Namur","display_name": "Namur, Wallonie, België / Belgique / Belgien","address": {"county": "Namur","state": "Namur","ISO3166-2-lvl6": "BE-WNA","region": "Wallonie","ISO3166-2-lvl4": "BE-WAL","country": "België / Belgique / Belgien","country_code": "be"},"boundingbox": ["50.2614207","50.6484447","4.5573790","5.2371384"]},{"place_id": 94206695,"licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright","osm_type": "relation","osm_id": 1701297,"lat": "50.4572419","lon": "4.8497825","class": "boundary","type": "administrative","place_rank": 16,"importance": 0.18673333104448,"addresstype": "city_district","name": "Namur","display_name": "Namur, Wallonie, 5000, België / Belgique / Belgien","address": {"city_district": "Namur","city": "Namur","county": "Namur","state": "Namur","ISO3166-2-lvl6": "BE-WNA","region": "Wallonie","ISO3166-2-lvl4": "BE-WAL","postcode": "5000","country": "België / Belgique / Belgien","country_code": "be"},"boundingbox": ["50.4353622","50.4788755","4.8307218","4.9018176"]}]';
+
+class OnlineMapStatusTool extends StatefulWidget {
+  final LayerTile layerTile;
+
+  const OnlineMapStatusTool({super.key, required this.layerTile});
+
+  @override
+  State<StatefulWidget> createState() => _OnlineMapStatusTool();
+}
+
+class _OnlineMapStatusTool extends State<OnlineMapStatusTool> {
+  @override
+  Widget build(BuildContext context) => Column(
+    children: [
+      widget.layerTile.downloadedControlBar(),
+
+      gl.anaPtSelectedLayerKeys.contains(widget.layerTile.key)
+          ? TextButton(
+            style: ButtonStyle(
+              minimumSize: WidgetStateProperty<Size>.fromMap(
+                <WidgetStatesConstraint, Size>{
+                  WidgetState.any: Size(
+                    MediaQuery.of(context).size.width * .99,
+                    MediaQuery.of(context).size.height * .075,
+                  ),
+                },
+              ),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                const Icon(Icons.location_on, size: 28, color: Colors.black),
+                Container(
+                  constraints: BoxConstraints(
+                    maxWidth: MediaQuery.of(context).size.width * .05,
+                  ),
+                ),
+                Container(
+                  constraints: BoxConstraints(
+                    maxWidth: MediaQuery.of(context).size.width * .6,
+                  ),
+                  child: Text(
+                    "La couche est selectionnée pour l'analyse ponctuelle.",
+                    style: TextStyle(color: Colors.black),
+                  ),
+                ),
+              ],
+            ),
+            onPressed: () async {
+              setState(() {
+                if (gl.anaPtSelectedLayerKeys.length > 1) {
+                  gl.anaPtSelectedLayerKeys.remove(widget.layerTile.key);
+                  widget.layerTile.selected = false;
+                }
+              });
+              final SharedPreferences prefs =
+                  await SharedPreferences.getInstance();
+              await prefs.setStringList(
+                'anaPtSelectedLayerKeys',
+                gl.anaPtSelectedLayerKeys,
+              );
+            },
+          )
+          : TextButton(
+            style: ButtonStyle(
+              minimumSize: WidgetStateProperty<Size>.fromMap(
+                <WidgetStatesConstraint, Size>{
+                  WidgetState.any: Size(
+                    MediaQuery.of(context).size.width * .99,
+                    MediaQuery.of(context).size.height * .075,
+                  ),
+                },
+              ),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                const Icon(Icons.location_off, size: 28, color: Colors.black),
+                Container(
+                  constraints: BoxConstraints(
+                    maxWidth: MediaQuery.of(context).size.width * .05,
+                  ),
+                ),
+                Container(
+                  constraints: BoxConstraints(
+                    maxWidth: MediaQuery.of(context).size.width * .6,
+                  ),
+                  child: Text(
+                    "La couche n'est pas selectionnée pour l'analyse ponctuelle.",
+                    style: TextStyle(color: Colors.black),
+                  ),
+                ),
+              ],
+            ),
+            onPressed: () async {
+              setState(() {
+                if (gl.anaPtSelectedLayerKeys.length > 1) {
+                  gl.anaPtSelectedLayerKeys.insert(0, widget.layerTile.key);
+                  widget.layerTile.selected = true;
+                }
+              });
+              final SharedPreferences prefs =
+                  await SharedPreferences.getInstance();
+              await prefs.setStringList(
+                'anaPtSelectedLayerKeys',
+                gl.anaPtSelectedLayerKeys,
+              );
+            },
+          ),
+      if (gl.dico.getLayerBase(widget.layerTile.key).hasDoc())
+        TextButton(
+          style: ButtonStyle(
+            minimumSize: WidgetStateProperty<Size>.fromMap(
+              <WidgetStatesConstraint, Size>{
+                WidgetState.any: Size(
+                  MediaQuery.of(context).size.width * .99,
+                  MediaQuery.of(context).size.height * .075,
+                ),
+              },
+            ),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              const Icon(Icons.picture_as_pdf, size: 28, color: Colors.black),
+              Container(
+                constraints: BoxConstraints(
+                  maxWidth: MediaQuery.of(context).size.width * .05,
+                ),
+              ),
+              Container(
+                constraints: BoxConstraints(
+                  maxWidth: MediaQuery.of(context).size.width * .6,
+                ),
+                child: Text(
+                  "Consulter la documentation relative à la cette couche cartographique",
+                  style: TextStyle(color: Colors.black),
+                ),
+              ),
+            ],
+          ),
+          onPressed: () {
+            PopupPdfMenu(gl.notificationContext!, widget.layerTile);
+          },
+        ),
+    ],
+  );
+}
+
+class OnlineMapMenu extends StatefulWidget {
+  final Function(LatLng) state;
+
+  const OnlineMapMenu({super.key, required this.state});
+
+  @override
+  State<StatefulWidget> createState() => _OnlineMapMenu();
+}
+
+class _OnlineMapMenu extends State<OnlineMapMenu> {
+  int _selectedCategory = -1;
+  int _selectedMap = -1;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      body: ListView(
+        padding: const EdgeInsets.symmetric(horizontal: 0),
+        children: List<TextButton>.generate(
+          gl.dico.mGrCouches.length,
+          (int i) => TextButton(
+            style: ButtonStyle(
+              minimumSize:
+                  i == _selectedCategory
+                      ? WidgetStateProperty<Size>.fromMap(
+                        <WidgetStatesConstraint, Size>{
+                          WidgetState.any: Size(
+                            MediaQuery.of(context).size.width * .99,
+                            MediaQuery.of(context).size.height * .15,
+                          ),
+                        },
+                      )
+                      : WidgetStateProperty<Size>.fromMap(
+                        <WidgetStatesConstraint, Size>{
+                          WidgetState.any: Size(
+                            MediaQuery.of(context).size.width * .99,
+                            MediaQuery.of(context).size.height * .075,
+                          ),
+                        },
+                      ),
+            ),
+            key: Key('$i'),
+            onPressed:
+                i == _selectedCategory
+                    ? () {
+                      setState(() {
+                        _selectedCategory = -1;
+                        _selectedMap = -1;
+                      });
+                    }
+                    : () {
+                      setState(() {
+                        _selectedCategory = i;
+                        _selectedMap = -1;
+                      });
+                    },
+            child: Card(
+              surfaceTintColor: Colors.transparent,
+              shadowColor: Colors.transparent,
+              color:
+                  i == _selectedCategory
+                      ? gl.colorAgroBioTech.withAlpha(25)
+                      : gl.colorAgroBioTech.withAlpha(175),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  i != _selectedCategory
+                      ? Container(
+                        alignment: Alignment.center,
+                        padding: EdgeInsets.all(3),
+                        constraints: BoxConstraints(
+                          maxWidth: MediaQuery.of(context).size.width * .99,
+                          minHeight: MediaQuery.of(context).size.width * .2,
+                        ),
+                        child: Text(
+                          gl.dico.mGrCouches[i].mLabel,
+                          textAlign: TextAlign.justify,
+                          style: TextStyle(color: Colors.black, fontSize: 22),
+                        ),
+                      )
+                      : Container(
+                        alignment: Alignment.center,
+                        padding: EdgeInsets.all(0),
+                        constraints: BoxConstraints(
+                          maxWidth: MediaQuery.of(context).size.width * .99,
+                        ),
+                        child: ListBody(
+                          children:
+                              <Widget>[
+                                Card(
+                                  color: gl.colorAgroBioTech.withAlpha(175),
+                                  child: Container(
+                                    alignment: Alignment.center,
+                                    padding: EdgeInsets.all(3),
+                                    constraints: BoxConstraints(
+                                      maxWidth:
+                                          MediaQuery.of(context).size.width *
+                                          .99,
+                                      minHeight:
+                                          MediaQuery.of(context).size.width *
+                                          .2,
+                                    ),
+                                    child: Text(
+                                      gl.dico.mGrCouches[i].mLabel,
+                                      textAlign: TextAlign.justify,
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 22,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ] +
+                              _injectLayerData(gl.dico.mGrCouches[i].mCode, (
+                                int i,
+                                LayerTile layerTile,
+                              ) {
+                                return TextButton(
+                                  style: ButtonStyle(
+                                    minimumSize:
+                                        i == _selectedMap
+                                            ? WidgetStateProperty<Size>.fromMap(
+                                              <WidgetStatesConstraint, Size>{
+                                                WidgetState.any: Size(
+                                                  MediaQuery.of(
+                                                        context,
+                                                      ).size.width *
+                                                      .99,
+                                                  MediaQuery.of(
+                                                        context,
+                                                      ).size.height *
+                                                      .1,
+                                                ),
+                                              },
+                                            )
+                                            : WidgetStateProperty<Size>.fromMap(
+                                              <WidgetStatesConstraint, Size>{
+                                                WidgetState.any: Size(
+                                                  MediaQuery.of(
+                                                        context,
+                                                      ).size.width *
+                                                      .99,
+                                                  MediaQuery.of(
+                                                        context,
+                                                      ).size.height *
+                                                      .075,
+                                                ),
+                                              },
+                                            ),
+                                  ),
+
+                                  onPressed: () {
+                                    setState(() {
+                                      _selectedMap == i
+                                          ? _selectedMap = -1
+                                          : _selectedMap = i;
+                                    });
+                                  },
+                                  child: Card(
+                                    color:
+                                        i == _selectedMap
+                                            ? Colors.white.withAlpha(255)
+                                            : Colors.white.withAlpha(150),
+                                    child:
+                                        i != _selectedMap
+                                            ? Container(
+                                              constraints: BoxConstraints(
+                                                minHeight:
+                                                    MediaQuery.of(
+                                                      context,
+                                                    ).size.width *
+                                                    .15,
+                                              ),
+                                              child: Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: [
+                                                  Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .center,
+                                                    children: [
+                                                      Container(
+                                                        constraints:
+                                                            BoxConstraints(
+                                                              maxWidth:
+                                                                  MediaQuery.of(
+                                                                    context,
+                                                                  ).size.width *
+                                                                  .8,
+                                                            ),
+                                                        child: Text(
+                                                          layerTile.name,
+                                                          textAlign:
+                                                              TextAlign.justify,
+                                                          style: TextStyle(
+                                                            color: Colors.black,
+                                                            fontSize: 18,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ],
+                                              ),
+                                            )
+                                            : Column(
+                                              children: [
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: [
+                                                    Text(layerTile.name),
+                                                  ],
+                                                ),
+                                                OnlineMapStatusTool(
+                                                  layerTile: layerTile,
+                                                ),
+                                                LegendView(
+                                                  layerKey: layerTile.key,
+                                                  color:
+                                                      gl.colorBackgroundSecondary,
+                                                  constraintsText:
+                                                      BoxConstraints(
+                                                        minWidth:
+                                                            MediaQuery.of(
+                                                              context,
+                                                            ).size.width *
+                                                            .4,
+                                                        maxWidth:
+                                                            MediaQuery.of(
+                                                              context,
+                                                            ).size.width *
+                                                            .4,
+                                                        minHeight:
+                                                            MediaQuery.of(
+                                                              context,
+                                                            ).size.height *
+                                                            .02,
+                                                        maxHeight:
+                                                            MediaQuery.of(
+                                                              context,
+                                                            ).size.height *
+                                                            .02,
+                                                      ),
+                                                  constraintsColors:
+                                                      BoxConstraints(
+                                                        minWidth:
+                                                            MediaQuery.of(
+                                                              context,
+                                                            ).size.width *
+                                                            .4,
+                                                        maxWidth:
+                                                            MediaQuery.of(
+                                                              context,
+                                                            ).size.width *
+                                                            .4,
+                                                        minHeight:
+                                                            MediaQuery.of(
+                                                              context,
+                                                            ).size.height *
+                                                            .02,
+                                                        maxHeight:
+                                                            MediaQuery.of(
+                                                              context,
+                                                            ).size.height *
+                                                            .02,
+                                                      ),
+                                                ),
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: [
+                                                    layerTile.proprietaire(),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
+                                  ),
+                                );
+                              }),
+                        ),
+                      ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  List<Widget> _injectLayerData(
+    String category,
+    Widget Function(int, LayerTile) generate,
+  ) {
+    Map<String, LayerBase> mp = gl.dico.mLayerBases;
+    List<LayerTile> layer = [];
+    for (var key in mp.keys) {
+      if (category == mp[key]!.mGroupe &&
+          !mp[key]!.mExpert &&
+          mp[key]!.mVisu &&
+          mp[key]?.mTypeGeoservice ==
+              "" // "arcgisRest c'est pour le vectoriel, pas actif sous flutter"
+              ) {
+        layer.add(
+          LayerTile(
+            name: mp[key]!.mNom,
+            filter: mp[key]!.mGroupe,
+            key: key,
+            downloadable: mp[key]!.mIsDownloadableRW,
+            extern: mp[key]!.mCategorie == "Externe",
+          ),
+        );
+      }
+    }
+    return List<Widget>.generate(layer.length, (i) {
+      return generate(i, layer[i]);
+    });
+  }
+}
+
+class PopupOnlineMapMenu {
+  PopupOnlineMapMenu(
+    BuildContext context,
+    String currentName,
+    Function(LatLng) state,
+    Function after,
+  ) {
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          titlePadding: EdgeInsets.all(5),
+          actionsPadding: EdgeInsets.all(0),
+          contentPadding: EdgeInsets.all(0),
+          insetPadding: EdgeInsets.all(0),
+          buttonPadding: EdgeInsets.all(0),
+          iconPadding: EdgeInsets.all(0),
+          backgroundColor: Color.fromRGBO(0, 0, 0, 0.2),
+          surfaceTintColor: Colors.transparent,
+          shadowColor: Colors.transparent,
+
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text("Liste des cartes en ligne", textAlign: TextAlign.justify),
+            ],
+          ),
+
+          content: Theme(
+            data: Theme.of(context).copyWith(
+              canvasColor: Colors.transparent,
+              shadowColor: Colors.transparent,
+            ),
+            child: SizedBox(
+              width: MediaQuery.of(context).size.width * 995,
+              child: OnlineMapMenu(state: state),
+            ),
+          ),
+          titleTextStyle: TextStyle(color: Colors.white, fontSize: 25),
+          actions: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  constraints: BoxConstraints(minHeight: 20, minWidth: 200),
+                  child: FloatingActionButton(
+                    backgroundColor: gl.colorAgroBioTech,
+                    child: Text("Retour!", maxLines: 1),
+                    onPressed: () {
+                      after();
+                      Navigator.of(context, rootNavigator: true).pop();
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class PopupPdfMenu {
+  PopupPdfMenu(BuildContext context, LayerTile layerTile) {
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (BuildContext context) {
+        print(
+          "${gl.pathExternalStorage}/${gl.dico.getLayerBase(layerTile.key).mPdfName}",
+        );
+        return PDFScreen(
+          path:
+              "${gl.pathExternalStorage}/${gl.dico.getLayerBase(layerTile.key).mPdfName}",
+          titre: "documentation", //+ item.mNomCourt,
+          currentPage: int.parse(
+            gl.dico.getLayerBase(layerTile.key).mPdfPage.toString(),
+          ),
+        );
+      },
+    );
+  }
+}

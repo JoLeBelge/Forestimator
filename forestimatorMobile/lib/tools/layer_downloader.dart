@@ -255,11 +255,13 @@ class ForestimatorDownloader {
 
       DownloadTaskStatus status = DownloadTaskStatus.fromInt(data[1]);
       if (DownloadTaskStatus.enqueued == status) {
+        gl.print("Downloader: new download launched.");
         gl.refreshWholeCatalogueView(() {
           gl.dico.getLayerBase(layerKey).mInDownload = true;
         });
       }
       if (status == DownloadTaskStatus.complete) {
+        gl.print("Downloader: download completed.");
         BuildContext context = gl.notificationContext!;
         PopupDownloadSuccess(context, layerName);
 
@@ -273,6 +275,7 @@ class ForestimatorDownloader {
         });
       }
       if (DownloadTaskStatus.failed == status) {
+        gl.print("Downloader: download failed.");
         BuildContext context = gl.notificationContext!;
 
         PopupDownloadFailed(context, layerName);

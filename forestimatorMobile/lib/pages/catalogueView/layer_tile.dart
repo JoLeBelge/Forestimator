@@ -26,7 +26,7 @@ class LayerTile {
     return ListTile(
       subtitle: const Text("Propriétaire de la couche cartographique"),
       title: Text(gl.dico.getLayerBase(key).mWMSattribution),
-      leading: ConstrainedBox(
+      leading: Container(
         constraints: const BoxConstraints(
           minWidth: 44,
           minHeight: 44,
@@ -39,6 +39,37 @@ class LayerTile {
         ),
       ),
       trailing: const Icon(Icons.copyright),
+    );
+  }
+
+  Container proprietaire() {
+    return Container(
+      constraints: const BoxConstraints(minWidth: 44, minHeight: 44),
+
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [Text("Propriétaire de la couche cartographique")],
+          ),
+          Container(
+            alignment: Alignment.center,
+            constraints: BoxConstraints(maxHeight: 100, maxWidth: 200),
+            child: Image.asset(
+              gl.dico.getLayerBase(key).mLogoAttributionFile,
+              fit: BoxFit.cover,
+            ),
+          ),
+          Row(
+            children: [
+              Icon(Icons.copyright),
+              Text("  "),
+              Text(gl.dico.getLayerBase(key).mWMSattribution),
+            ],
+          ),
+        ],
+      ),
     );
   }
 

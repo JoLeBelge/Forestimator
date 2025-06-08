@@ -8,6 +8,35 @@ import 'package:proj4dart/proj4dart.dart' as proj4;
 import 'package:latlong2/latlong.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+const String forestimatorMobileVersion = "1.0.2-14";
+
+class Display {
+  double? width;
+  double? height;
+  double? dpi;
+  double? aspect;
+  Orientation? orientation;
+  Display(BuildContext context) {
+    width = MediaQuery.of(context).size.width;
+    height = MediaQuery.of(context).size.height;
+    aspect = MediaQuery.of(context).size.aspectRatio;
+    dpi = MediaQuery.of(context).devicePixelRatio;
+    orientation = MediaQuery.of(context).orientation;
+  }
+
+  @override
+  String toString() {
+    return "width: ${display?.width}\nheight: ${display!.height}\ndpi: ${display!.dpi}\naspect: ${display!.aspect}\norientation: ${display!.orientation!.name}";
+  }
+}
+
+Display? display;
+
+void initializeDisplayInfos(context) {
+  display = Display(context);
+  print(display.toString());
+}
+
 proj4.Projection epsg4326 = proj4.Projection.get('EPSG:4326')!;
 proj4.Projection epsg31370 =
     proj4.Projection.get('EPSG:31370') ??
@@ -22,15 +51,12 @@ proj4.Point epsg4326ToEpsg31370(proj4.Point spPoint) {
 
 late DicoAptProvider dico;
 
-const String forestimatorMobileVersion = "1.0.2-13";
-
 String basePathbranchB = "catalogue";
 String basePathbranchC = "offline";
 
 Memory? memory;
 
 BuildContext? notificationContext;
-
 bool offlineMode = false;
 bool debug = false;
 int currentPage = 0;
@@ -78,6 +104,8 @@ String queryApiRastDownload =
 String defaultLayer = "IGN";
 List<String> interfaceSelectedLCode = ["IGN"];
 List<bool> interfaceSelectedLOffline = [false];
+
+String? pathExternalStorage;
 
 class SelectedLayer {
   String mCode;

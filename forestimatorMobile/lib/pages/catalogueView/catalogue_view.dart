@@ -26,10 +26,7 @@ class _CatalogueView extends State<CatalogueView> {
   Widget build(BuildContext context) {
     gl.notificationContext = context;
     if (finishedInitializingCategories) {
-      return SingleChildScrollView(
-        physics: that,
-        child: Container(child: _buildCategoryPanel()),
-      );
+      return SingleChildScrollView(physics: that, child: _buildCategoryPanel());
     } else {
       return const CircularProgressIndicator();
     }
@@ -50,7 +47,6 @@ class _CatalogueView extends State<CatalogueView> {
               canTapOnHeader: true,
               backgroundColor: Colors.blueAccent, //.colorBackgroundSecondary,
               headerBuilder: (BuildContext context, bool isExpanded) {
-                // c'est pas gagné, voir similaire pour expansionTile customisatin https://github.com/flutter/flutter/issues/24917
                 return Container(
                   color: gl.colorBackgroundSecondary,
                   child: ListTile(title: Text(item.name)),

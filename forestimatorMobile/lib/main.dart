@@ -51,7 +51,6 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyApp extends State<MyApp> {
-  late String _pathExternalStorage;
   bool _initializedPersistentValues = false;
 
   _MyApp();
@@ -183,7 +182,7 @@ class _MyApp extends State<MyApp> {
     try {
       var dir = await getApplicationDocumentsDirectory();
       //var dir = await getExternalStorageDirectory();
-      _pathExternalStorage = dir.path;
+      gl.pathExternalStorage = dir.path;
       File file = File("${dir.path}/$filename");
       if (await file.exists() == false) {
         var data = await rootBundle.load(asset);
@@ -270,7 +269,7 @@ class _MyApp extends State<MyApp> {
                               (Platform.isAndroid || Platform.isIOS)
                                   ? PDFScreen(
                                     path:
-                                        "$_pathExternalStorage/${item.mPdfName}",
+                                        "${gl.pathExternalStorage}/${item.mPdfName}",
                                     titre: "documentation", //+ item.mNomCourt,
                                     currentPage: int.parse(
                                       state.pathParameters['currentPage']!,
@@ -290,13 +289,13 @@ class _MyApp extends State<MyApp> {
                               (Platform.isAndroid || Platform.isIOS)
                                   ? PDFScreen(
                                     path:
-                                        "$_pathExternalStorage/FEE-${item.mCode}.pdf",
+                                        "${gl.pathExternalStorage}/FEE-${item.mCode}.pdf",
                                     titre: item.mNomFR,
                                   )
                                   : Scaffold(
                                     appBar: AppBar(title: Text("pdf")),
                                     body: Text(
-                                      "$_pathExternalStorage/FEE-${item.mCode}.pdf",
+                                      "${gl.pathExternalStorage}/FEE-${item.mCode}.pdf",
                                     ),
                                   ),
                     );
@@ -309,7 +308,7 @@ class _MyApp extends State<MyApp> {
                           (context, state) =>
                               (Platform.isAndroid || Platform.isIOS)
                                   ? PDFScreen(
-                                    path: "$_pathExternalStorage/$item",
+                                    path: "${gl.pathExternalStorage}/$item",
                                     titre: item,
                                     currentPage: int.parse(
                                       state.pathParameters['currentPage']!,
@@ -317,7 +316,9 @@ class _MyApp extends State<MyApp> {
                                   )
                                   : Scaffold(
                                     appBar: AppBar(title: Text("pdf")),
-                                    body: Text(_pathExternalStorage + item),
+                                    body: Text(
+                                      "${gl.pathExternalStorage} $item",
+                                    ),
                                   ),
                     );
                   }),
@@ -350,6 +351,7 @@ class _MyApp extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
+    gl.initializeDisplayInfos(context);
     gl.notificationContext = context;
     if (!_initializedPersistentValues) {
       return const MaterialApp(home: CircularProgressIndicator());

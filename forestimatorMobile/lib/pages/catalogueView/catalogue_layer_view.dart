@@ -17,7 +17,7 @@ class _CatalogueLayerView extends State<CatalogueLayerView> {
   @override
   Widget build(BuildContext context) {
     return gl.firstTimeUse
-        ? PopupNotification(
+        ? PopupDownloadRecomendedLayers(
           title: "Bienvenu",
           accept: "oui",
           onAccept: () async {
@@ -44,6 +44,7 @@ class _CatalogueLayerView extends State<CatalogueLayerView> {
               "Forestimator mobile ne collecte aucune information personnelle. Notre politique de confidentialité est consultable au https://forestimator.gembloux.ulg.ac.be/documentation/confidentialit_. Autorisez-vous l'aplication à télécharger un jeu de 7 couches pour une utilisation hors ligne? Ces couches couvrent toutes la Région Wallonne et totalisent +- 100 Mo.",
         )
         : Scaffold(
+          backgroundColor: Colors.transparent,
           appBar:
               gl.offlineMode
                   ? AppBar(
@@ -74,27 +75,35 @@ class _CatalogueLayerView extends State<CatalogueLayerView> {
                     toolbarHeight: 20.0,
                     backgroundColor: gl.colorUliege,
                   ),
-          body: Column(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              Container(
-                color: gl.colorBackground,
-                constraints: BoxConstraints(
-                  maxWidth: MediaQuery.of(context).size.width * 1.0,
-                  minHeight: MediaQuery.of(context).size.height * .67,
-                  maxHeight: MediaQuery.of(context).size.height * .67,
+          body: Container(
+            constraints: BoxConstraints(
+              maxWidth: MediaQuery.of(context).size.width * 1.0,
+              minHeight: MediaQuery.of(context).size.height * .8,
+              maxHeight: MediaQuery.of(context).size.height * .8,
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              spacing: 10,
+              children: [
+                Container(
+                  color: Colors.transparent,
+                  constraints: BoxConstraints(
+                    maxWidth: MediaQuery.of(context).size.width * 1.0,
+                    minHeight: MediaQuery.of(context).size.height * .60,
+                    maxHeight: MediaQuery.of(context).size.height * .60,
+                  ),
+                  child: CatalogueView(refreshView: refreshView),
                 ),
-                child: CatalogueView(refreshView: refreshView),
-              ),
-              Container(
-                color: gl.colorBackground,
-                constraints: BoxConstraints(
-                  maxWidth: MediaQuery.of(context).size.width * 1.0,
-                  maxHeight: MediaQuery.of(context).size.height * .18,
+                Container(
+                  color: Colors.transparent,
+                  constraints: BoxConstraints(
+                    maxWidth: MediaQuery.of(context).size.width * 1.0,
+                    maxHeight: MediaQuery.of(context).size.height * .16,
+                  ),
+                  child: SelectedLayerView(refreshView: refreshView),
                 ),
-                child: SelectedLayerView(refreshView: refreshView),
-              ),
-            ],
+              ],
+            ),
           ),
         );
   }
