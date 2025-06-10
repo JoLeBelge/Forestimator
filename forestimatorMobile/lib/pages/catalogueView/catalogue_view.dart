@@ -288,7 +288,7 @@ class _CategoryView extends State<CategoryView> {
         if (gl.dico.getLayerBase(lt.key).hasDoc())
           ListTile(
             title: const Text(
-              "Consulter la documentation relative à la cette couche cartographique",
+              "Consulter la documentation relative à cette couche cartographique",
             ),
             leading: IconButton(
               onPressed: () {

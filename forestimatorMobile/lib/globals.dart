@@ -10,6 +10,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 const String forestimatorMobileVersion = "1.0.2-14";
 
+bool modeMapShowPolygons = true;
+bool modeMapShowSearchMarker = true;
+bool modeMapShowCustomMarker = true;
+
 class Display {
   double? width;
   double? height;

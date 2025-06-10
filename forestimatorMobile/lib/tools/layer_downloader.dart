@@ -9,7 +9,8 @@ import 'package:flutter/material.dart';
 import 'package:fforestimator/globals.dart' as gl;
 import 'package:flutter_downloader/flutter_downloader.dart';
 
-final Map<String, _LayerDownloaderState> _downloadIdToWidget = {};
+final Map<String, Function> _downloadIdToStateFunction = {};
+final Map<String, String> _layerKeyToDownloadId = {};
 final Map<String, String> _downloadIdToLayerKey = {};
 final Map<String, String> _downloadIdToLayerName = {};
 ForestimatorDownloader? fD;
@@ -41,9 +42,7 @@ class LayerDownloader extends StatefulWidget {
 }
 
 class _LayerDownloaderState extends State<LayerDownloader> {
-  bool listenerInitialized = false;
-  dynamic buildContextNotifications;
-  String? downloadId = "";
+  String? downloadId = "null";
 
   @override
   Widget build(BuildContext context) {
@@ -54,7 +53,6 @@ class _LayerDownloaderState extends State<LayerDownloader> {
   }
 
   Widget buildDL(BuildContext context) {
-    buildContextNotifications = context;
     if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
       return Container(
         color: gl.colorBackground,
@@ -69,11 +67,21 @@ class _LayerDownloaderState extends State<LayerDownloader> {
     }
 
     if (gl.dico.getLayerBase(widget.layer.key).mOffline) {
-      return Row(
-        children: [
-          IconButton(
-            onPressed: () async {
-              await fileDelete(
+      return TextButton(
+        style: ButtonStyle(
+          minimumSize:
+              WidgetStateProperty<Size>.fromMap(<WidgetStatesConstraint, Size>{
+                WidgetState.any: Size(
+                  MediaQuery.of(context).size.width * .99,
+                  MediaQuery.of(context).size.height * .075,
+                ),
+              }),
+        ),
+        onPressed: () async {
+          PopupDoYouReally(
+            gl.notificationContext!,
+            () {
+              fileDelete(
                 join(
                   gl.dico.docDir.path,
                   gl.dico.getLayerBase(widget.layer.key).mNomRaster,
@@ -91,108 +99,174 @@ class _LayerDownloaderState extends State<LayerDownloader> {
                 });
               });
             },
-            icon: const Icon(Icons.delete),
-          ),
-          Container(
-            constraints: const BoxConstraints(
-              maxWidth: 256,
-              minWidth: 48,
-              maxHeight: 48,
-              minHeight: 48,
+            "Message",
+            "\nVoulez vous vraiment supprimer ${gl.dico.getLayerBase(widget.layer.key).mNom} de la mémoire?\nVous ne pouvez plus utiliser cette couche hors ligne après.\n",
+          );
+        },
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            const Icon(Icons.delete, size: 28, color: Colors.black),
+            Container(
+              constraints: BoxConstraints(
+                maxWidth: MediaQuery.of(context).size.width * .05,
+              ),
             ),
-            child: const Text("La couche est enregistrée."),
-          ),
-        ],
+            Container(
+              constraints: BoxConstraints(
+                maxWidth: MediaQuery.of(context).size.width * .6,
+              ),
+              child: const Text(
+                "La couche est enregistrée.",
+                style: TextStyle(color: Colors.black),
+              ),
+            ),
+          ],
+        ),
       );
     } else if (gl.dico.getLayerBase(widget.layer.key).mInDownload) {
-      return Row(
-        children: [
-          IconButton(
-            onPressed: () async {
-              FlutterDownloader.cancel(taskId: downloadId!);
-              setState(() {
-                gl.dico.getLayerBase(widget.layer.key).mInDownload = true;
-              });
-              gl.refreshWholeCatalogueView(() {
-                gl.dico.getLayerBase(widget.layer.key).mInDownload = true;
-              });
-              gl.rebuildOfflineView(() {
-                gl.dico.getLayerBase(widget.layer.key).mInDownload = true;
-              });
-              downloadId = await fD?.downloadFile(widget.layer.key);
-              setState(() {
-                _downloadIdToWidget[downloadId!] = this;
-                gl.print(_downloadIdToWidget[downloadId!]);
-              });
-            },
-            icon: const Icon(Icons.repeat_rounded),
-          ),
-          Container(
-            constraints: const BoxConstraints(
-              maxWidth: 256,
-              minWidth: 48,
-              maxHeight: 48,
-              minHeight: 48,
+      return TextButton(
+        style: ButtonStyle(
+          minimumSize:
+              WidgetStateProperty<Size>.fromMap(<WidgetStatesConstraint, Size>{
+                WidgetState.any: Size(
+                  MediaQuery.of(context).size.width * .99,
+                  MediaQuery.of(context).size.height * .075,
+                ),
+              }),
+        ),
+        onPressed: () async {
+          FlutterDownloader.cancel(taskId: downloadId!);
+          setState(() {
+            gl.dico.getLayerBase(widget.layer.key).mInDownload = true;
+          });
+          gl.refreshWholeCatalogueView(() {
+            gl.dico.getLayerBase(widget.layer.key).mInDownload = true;
+          });
+          gl.rebuildOfflineView(() {
+            gl.dico.getLayerBase(widget.layer.key).mInDownload = true;
+          });
+          downloadId = await fD?.downloadFile(widget.layer.key);
+          setState(() {
+            _layerKeyToDownloadId[widget.layer.key] = downloadId!;
+            _downloadIdToStateFunction[downloadId!] =
+                (Function f) => () {
+                  setState(() {
+                    f();
+                  });
+                };
+          });
+        },
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            const Icon(Icons.repeat_rounded, size: 28, color: Colors.black),
+            Container(
+              constraints: BoxConstraints(
+                maxWidth: MediaQuery.of(context).size.width * .05,
+              ),
             ),
-            child: const Text("Réessayer."),
-          ),
-        ],
+            Container(
+              constraints: BoxConstraints(
+                maxWidth: MediaQuery.of(context).size.width * .6,
+              ),
+              child: const Text(
+                "Relancer.",
+                style: TextStyle(color: Colors.black),
+              ),
+            ),
+          ],
+        ),
       );
     } else {
-      return Row(
-        children: [
-          IconButton(
-            onPressed: () async {
-              setState(() {
-                gl.dico.getLayerBase(widget.layer.key).mInDownload = true;
-              });
-              gl.refreshWholeCatalogueView(() {
-                gl.dico.getLayerBase(widget.layer.key).mInDownload = true;
-              });
-              gl.rebuildOfflineView(() {
-                gl.dico.getLayerBase(widget.layer.key).mInDownload = true;
-              });
-              downloadId = await fD?.downloadFile(widget.layer.key);
-              setState(() {
-                _downloadIdToWidget[downloadId!] = this;
-                gl.print(_downloadIdToWidget[downloadId!]);
-              });
-            },
-            icon: const Icon(Icons.download),
-          ),
-          Container(
-            constraints: const BoxConstraints(
-              maxWidth: 256,
-              minWidth: 48,
-              maxHeight: 48,
-              minHeight: 48,
+      return TextButton(
+        style: ButtonStyle(
+          minimumSize:
+              WidgetStateProperty<Size>.fromMap(<WidgetStatesConstraint, Size>{
+                WidgetState.any: Size(
+                  MediaQuery.of(context).size.width * .99,
+                  MediaQuery.of(context).size.height * .075,
+                ),
+              }),
+        ),
+        onPressed: () async {
+          setState(() {
+            gl.dico.getLayerBase(widget.layer.key).mInDownload = true;
+          });
+          gl.refreshWholeCatalogueView(() {
+            gl.dico.getLayerBase(widget.layer.key).mInDownload = true;
+          });
+          gl.rebuildOfflineView(() {
+            gl.dico.getLayerBase(widget.layer.key).mInDownload = true;
+          });
+          downloadId = await fD?.downloadFile(widget.layer.key);
+          setState(() {
+            _layerKeyToDownloadId[widget.layer.key] = downloadId!;
+            _downloadIdToStateFunction[downloadId!] =
+                (Function f) => setState(() {
+                  f();
+                });
+          });
+        },
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            const Icon(Icons.download, size: 28, color: Colors.black),
+            Container(
+              constraints: BoxConstraints(
+                maxWidth: MediaQuery.of(context).size.width * .05,
+              ),
             ),
-            child: const Text(
-              "La couche peut être téléchargée pour l'utilisation hors ligne.",
+            Container(
+              constraints: BoxConstraints(
+                maxWidth: MediaQuery.of(context).size.width * .6,
+              ),
+              child: const Text(
+                "La couche peut être téléchargée pour l'utilisation hors ligne.",
+                style: TextStyle(color: Colors.black),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       );
     }
-  }
-
-  static Future<bool> fileExists(String path) async {
-    final File file = File(path);
-    return file.exists();
-  }
-
-  static Future<bool> fileDelete(String path) async {
-    final File file = File(path);
-    if (await file.exists()) {
-      file.delete();
-    }
-    return fileExists(path);
   }
 
   @override
   void initState() {
+    String id = "null";
+    if (_layerKeyToDownloadId[widget.layer.key] != null) {
+      id = _layerKeyToDownloadId[widget.layer.key]!;
+      downloadId = id;
+      _downloadIdToStateFunction[id] = (Function f) {
+        setState(() {
+          f();
+        });
+      };
+    }
     super.initState();
   }
+
+  @override
+  void dispose() {
+    _downloadIdToStateFunction[downloadId!] = (Function f) {
+      f();
+    };
+    super.dispose();
+  }
+}
+
+Future<bool> fileExists(String path) async {
+  final File file = File(path);
+  return file.exists();
+}
+
+Future<bool> fileDelete(String path) async {
+  final File file = File(path);
+  if (await file.exists()) {
+    file.delete();
+  }
+  return fileExists(path);
 }
 
 @pragma('vm:entry-point')
@@ -245,18 +319,22 @@ class ForestimatorDownloader {
     _port.listen((dynamic data) {
       String idListened = data[0];
       String layerKey = "", layerName = "";
-      if (_downloadIdToWidget[idListened] != null) {
-        layerKey = _downloadIdToWidget[idListened]!.widget.layer.key;
-        layerName = _downloadIdToWidget[idListened]!.widget.layer.name;
-      } else {
-        layerKey = _downloadIdToLayerKey[idListened]!;
-        layerName = _downloadIdToLayerName[idListened]!;
+      Function widgetState = () {};
+      if (_downloadIdToStateFunction[idListened] != null) {
+        widgetState = _downloadIdToStateFunction[idListened]!;
       }
+      layerKey = _downloadIdToLayerKey[idListened]!;
+      layerName = _downloadIdToLayerName[idListened]!;
 
       DownloadTaskStatus status = DownloadTaskStatus.fromInt(data[1]);
       if (DownloadTaskStatus.enqueued == status) {
         gl.print("Downloader: new download launched.");
+
         gl.refreshWholeCatalogueView(() {
+          gl.dico.getLayerBase(layerKey).mInDownload = true;
+        });
+
+        widgetState(() {
           gl.dico.getLayerBase(layerKey).mInDownload = true;
         });
       }
@@ -264,14 +342,13 @@ class ForestimatorDownloader {
         gl.print("Downloader: download completed.");
         BuildContext context = gl.notificationContext!;
         PopupDownloadSuccess(context, layerName);
-
-        gl.rebuildOfflineView(() {
-          gl.dico.getLayerBase(layerKey).mOffline = true;
-          gl.dico.getLayerBase(layerKey).mInDownload = false;
-        });
         gl.refreshWholeCatalogueView(() {
           gl.dico.getLayerBase(layerKey).mInDownload = false;
+          gl.dico.getLayerBase(layerKey).mOffline = false;
+        });
+        widgetState(() {
           gl.dico.getLayerBase(layerKey).mOffline = true;
+          gl.dico.getLayerBase(layerKey).mInDownload = false;
         });
       }
       if (DownloadTaskStatus.failed == status) {
@@ -283,6 +360,11 @@ class ForestimatorDownloader {
         gl.refreshWholeCatalogueView(() {
           gl.dico.getLayerBase(layerKey).mInDownload = false;
           gl.dico.getLayerBase(layerKey).mOffline = false;
+        });
+
+        widgetState(() {
+          gl.dico.getLayerBase(layerKey).mOffline = false;
+          gl.dico.getLayerBase(layerKey).mInDownload = false;
         });
       }
       return;

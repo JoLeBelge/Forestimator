@@ -394,16 +394,18 @@ class _MapPageState extends State<MapPage> {
                         MarkerLayer(markers: _drawnLayerPointsMarker()),
                       ]
                       : <Widget>[
-                        PolygonLayer(polygons: _getPolygonesToDraw()),
+                        if (gl.modeMapShowPolygons)
+                          PolygonLayer(polygons: _getPolygonesToDraw()),
                       ]) +
                   <Widget>[
                     MarkerLayer(
-                      markers:
-                          _placeSearchMarker() +
-                          _placeVertexMovePointer() +
-                          _getPolygonesInfos() +
-                          _placeAnaPtMarker(),
+                      markers: _placeVertexMovePointer() + _placeAnaPtMarker(),
                     ),
+                    if (gl.modeMapShowPolygons)
+                      MarkerLayer(markers: _getPolygonesInfos()),
+                    if (gl.modeMapShowCustomMarker) MarkerLayer(markers: []),
+                    if (gl.modeMapShowSearchMarker)
+                      MarkerLayer(markers: _placeSearchMarker()),
                   ],
             ),
             _settingsGuard(),
@@ -569,7 +571,7 @@ class _MapPageState extends State<MapPage> {
       children: [
         _searchButton(),
         _layerPolygonButton(),
-        _modeLayerProperties ? _layerPropertiesMenu() : Container(),
+        _modeLayerProperties ? _layerMenu() : Container(),
         _layerPropertiesButton(),
         _modeDrawPolygon ? _polygonToolbar() : Container(),
         _drawPolygonButton(),
@@ -584,6 +586,82 @@ class _MapPageState extends State<MapPage> {
   Widget _polygonToolbar() {
     return Column(
       children: [
+        IconButton(
+          iconSize: iconSize,
+          color: _polygonMenuColorTools(_modeLayerPropertiesColors),
+          onPressed: () {
+            refreshView(() {
+              _modeLayerPropertiesColors = !_modeLayerPropertiesColors;
+              if (_modeLayerPropertiesColors) {
+                _modeLayerPropertiesRename = false;
+              }
+            });
+            PopupNameIntroducer(
+              gl.notificationContext!,
+              "",
+              (String nameIt) {
+                if (gl.polygonLayers.isNotEmpty &&
+                    gl.polygonLayers.length > gl.selectedPolygonLayer) {
+                  refreshView(
+                    () =>
+                        gl.polygonLayers[gl.selectedPolygonLayer].name = nameIt,
+                  );
+                }
+              },
+              () {
+                refreshView(() {
+                  _modeLayerPropertiesColors = false;
+                  if (_modeLayerPropertiesColors) {
+                    _modeLayerPropertiesRename = false;
+                  }
+                });
+              },
+            );
+          },
+          icon: Icon(Icons.text_fields, size: iconSize),
+        ),
+        IconButton(
+          iconSize: iconSize,
+          color: _polygonMenuColorTools(_modeLayerPropertiesRename),
+          onPressed: () {
+            refreshView(() {
+              _modeLayerPropertiesRename = !_modeLayerPropertiesRename;
+              if (_modeLayerPropertiesRename) {
+                _modeLayerPropertiesColors = false;
+              }
+            });
+            if (gl.polygonLayers.isNotEmpty) {
+              PopupColorChooser(
+                gl.polygonLayers[gl.selectedPolygonLayer].colorInside,
+                gl.notificationContext!,
+                (Color col) {
+                  refreshView(() {
+                    gl.polygonLayers[gl.selectedPolygonLayer].setColorInside(
+                      col,
+                    );
+                    gl.polygonLayers[gl.selectedPolygonLayer].setColorLine(
+                      Color.fromRGBO(
+                        (col.r * 255).round(),
+                        (col.g * 255).round(),
+                        (col.b * 255).round(),
+                        0.8,
+                      ),
+                    );
+                  });
+                },
+                () {
+                  refreshView(() {
+                    _modeLayerPropertiesRename = false;
+                    if (_modeLayerPropertiesRename) {
+                      _modeLayerPropertiesColors = false;
+                    }
+                  });
+                },
+              );
+            }
+          },
+          icon: Icon(Icons.color_lens, size: iconSize),
+        ),
         IconButton(
           iconSize: iconSize,
           color: _polygonMenuColorTools(_modeDrawPolygonMoveVertexes),
@@ -984,84 +1062,49 @@ class _MapPageState extends State<MapPage> {
     return all;
   }
 
-  Widget _layerPropertiesMenu() {
+  Widget _layerMenu() {
     return Column(
       children: <Widget>[
-        IconButton(
-          iconSize: iconSize,
-          color: _polygonMenuColorTools(_modeLayerPropertiesColors),
-          onPressed: () {
-            refreshView(() {
-              _modeLayerPropertiesColors = !_modeLayerPropertiesColors;
-              if (_modeLayerPropertiesColors) {
-                _modeLayerPropertiesRename = false;
-              }
-            });
-            PopupNameIntroducer(
-              gl.notificationContext!,
-              "",
-              (String nameIt) {
-                if (gl.polygonLayers.isNotEmpty &&
-                    gl.polygonLayers.length > gl.selectedPolygonLayer) {
-                  refreshView(
-                    () =>
-                        gl.polygonLayers[gl.selectedPolygonLayer].name = nameIt,
-                  );
-                }
-              },
-              () {
-                refreshView(() {
-                  _modeLayerPropertiesColors = false;
-                  if (_modeLayerPropertiesColors) {
-                    _modeLayerPropertiesRename = false;
-                  }
-                });
-              },
-            );
-          },
-          icon: Icon(Icons.text_fields, size: iconSize),
-        ),
         IconButton(
           iconSize: iconSize,
           color: _polygonMenuColorTools(_modeLayerPropertiesRename),
           onPressed: () {
             refreshView(() {
               _modeLayerPropertiesRename = !_modeLayerPropertiesRename;
-              if (_modeLayerPropertiesRename) {
-                _modeLayerPropertiesColors = false;
-              }
+            });
+            PopupOnlineMapMenu(gl.notificationContext!, () {
+              refreshView(() {
+                _modeLayerPropertiesRename = false;
+              });
+            });
+          },
+          icon: Icon(Icons.layers, size: iconSize),
+        ),
+        IconButton(
+          iconSize: iconSize,
+          color: _polygonMenuColorTools(_modeLayerPropertiesColors),
+          onPressed: () {
+            refreshView(() {
+              _modeLayerPropertiesColors = !_modeLayerPropertiesColors;
             });
             if (gl.polygonLayers.isNotEmpty) {
-              PopupColorChooser(
-                gl.polygonLayers[gl.selectedPolygonLayer].colorInside,
-                gl.notificationContext!,
-                (Color col) {
-                  refreshView(() {
-                    gl.polygonLayers[gl.selectedPolygonLayer].setColorInside(
-                      col,
-                    );
-                    gl.polygonLayers[gl.selectedPolygonLayer].setColorLine(
-                      Color.fromRGBO(
-                        (col.r * 255).round(),
-                        (col.g * 255).round(),
-                        (col.b * 255).round(),
-                        0.8,
-                      ),
-                    );
-                  });
-                },
-                () {
-                  refreshView(() {
-                    _modeLayerPropertiesRename = false;
-                    if (_modeLayerPropertiesRename) {
-                      _modeLayerPropertiesColors = false;
-                    }
-                  });
-                },
-              );
+              PopupLayerSwitcher(gl.notificationContext!, () {});
             }
           },
-          icon: Icon(Icons.color_lens, size: iconSize),
+          icon: Icon(Icons.remove_red_eye_outlined, size: iconSize),
+        ),
+        IconButton(
+          iconSize: iconSize,
+          color: _polygonMenuColorTools(_modeLayerPropertiesColors),
+          onPressed: () {
+            refreshView(() {
+              _modeLayerPropertiesColors = !_modeLayerPropertiesColors;
+            });
+            if (gl.polygonLayers.isNotEmpty) {
+              PopupOfflineMenu(gl.notificationContext!, () {});
+            }
+          },
+          icon: Icon(Icons.offline_bolt, size: iconSize),
         ),
       ],
     );
@@ -1155,8 +1198,8 @@ class _MapPageState extends State<MapPage> {
           _closeLayerPropertiesMenu();
           _closePolygonDrawMenu();
         }
-        PopupOnlineMapMenu(
-          //TODO PopupDrawnLayerMenu
+
+        PopupDrawnLayerMenu(
           gl.notificationContext!,
           gl.polygonLayers.isNotEmpty
               ? gl.polygonLayers[gl.selectedPolygonLayer].name
@@ -1173,7 +1216,7 @@ class _MapPageState extends State<MapPage> {
           },
         );
       },
-      icon: const Icon(Icons.layers),
+      icon: const Icon(Icons.hexagon),
     );
   }
 

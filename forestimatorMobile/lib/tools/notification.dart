@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:downloadsfolder/downloadsfolder.dart';
 import 'package:fforestimator/dico/dico_apt.dart';
 import 'package:fforestimator/globals.dart' as gl;
 import 'package:fforestimator/pages/catalogueView/layer_tile.dart';
@@ -7,6 +8,8 @@ import 'package:fforestimator/pages/catalogueView/legend_view.dart';
 import 'package:fforestimator/pages/pdf_screen.dart';
 import 'package:fforestimator/tools/customLayer/polygon_layer.dart';
 import 'package:fforestimator/tools/handle_permissions.dart';
+import 'package:fforestimator/tools/layer_downloader.dart';
+import 'package:fforestimator/tools/pretty_print_results.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:http/http.dart' as http;
@@ -340,17 +343,24 @@ class _DrawnLayerMenu extends State<DrawnLayerMenu> {
                         onPressed:
                             i == gl.selectedPolygonLayer
                                 ? () {
-                                  setState(() {
-                                    //remove polygon
-                                    if (i > 0) {
-                                      gl.polygonLayers.removeAt(i);
-                                      gl.selectedPolygonLayer--;
-                                    } else if (i == 0 &&
-                                        gl.polygonLayers.isNotEmpty) {
-                                      gl.polygonLayers.removeAt(i);
-                                    }
-                                  });
-                                  gl.saveChangesToPolygoneToPrefs = true;
+                                  PopupDoYouReally(
+                                    gl.notificationContext!,
+                                    () {
+                                      setState(() {
+                                        //remove polygon
+                                        if (i > 0) {
+                                          gl.polygonLayers.removeAt(i);
+                                          gl.selectedPolygonLayer--;
+                                        } else if (i == 0 &&
+                                            gl.polygonLayers.isNotEmpty) {
+                                          gl.polygonLayers.removeAt(i);
+                                        }
+                                      });
+                                      gl.saveChangesToPolygoneToPrefs = true;
+                                    },
+                                    "Message",
+                                    "\nVoulez vous vraiment supprimer ${gl.polygonLayers[i].name}?\n",
+                                  );
                                 }
                                 : () {
                                   setState(() {});
@@ -1053,7 +1063,7 @@ class Item {
   final Widget entry;
   final String name;
 
-  bool isExpanded = false;
+  bool isExpanded = true;
 
   Item({required this.entry, required this.name});
 }
@@ -1260,18 +1270,6 @@ Widget _resultRow(String key, String value) {
           maxWidth: MediaQuery.of(gl.notificationContext!).size.width * .8,
         ),
         child: Text(
-          key,
-          overflow: TextOverflow.clip,
-          textAlign: TextAlign.justify,
-          textScaler: TextScaler.linear(1.0),
-        ),
-      ),
-      Container(
-        padding: EdgeInsets.all(5),
-        constraints: BoxConstraints(
-          maxWidth: MediaQuery.of(gl.notificationContext!).size.width * .8,
-        ),
-        child: Text(
           value,
           overflow: TextOverflow.clip,
           textAlign: TextAlign.justify,
@@ -1359,14 +1357,18 @@ Widget forestimatorResultsHeaderClasse(Map<String, dynamic> json) {
   );
 }
 
-Widget forestimatorResultsHeaderContinue(Map<String, dynamic> json) {
+Widget forestimatorResultsHeaderContinue(
+  Map<String, dynamic> json,
+  String layerCode,
+) {
   return Column(
     children: List<Widget>.generate(json.length, (i) {
-      return i == 0
-          ? Column()
+      return i == 0 ||
+              prettyPrintContinue[layerCode]![json.keys.elementAt(i)] == null
+          ? Container()
           : _resultRow(
             json.keys.elementAt(i),
-            json[json.keys.elementAt(i)].toString(),
+            "${prettyPrintContinue[layerCode]![json.keys.elementAt(i)]}: ${json[json.keys.elementAt(i)].toString()}",
           );
     }),
   );
@@ -1395,7 +1397,10 @@ class _ResultsMenu extends State<ResultsMenu> {
           menuItems.add(
             Item(
               name: gl.dico.getLayerBase(result['layerCode']).mNom,
-              entry: forestimatorResultsHeaderContinue(result),
+              entry: forestimatorResultsHeaderContinue(
+                result,
+                result['layerCode'],
+              ),
             ),
           );
         } else {
@@ -1416,6 +1421,7 @@ class _ResultsMenu extends State<ResultsMenu> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.transparent,
       body: SingleChildScrollView(
         child: ExpansionPanelList(
           expansionCallback: (int panelIndex, bool isExpanded) {
@@ -1429,8 +1435,13 @@ class _ResultsMenu extends State<ResultsMenu> {
                   canTapOnHeader: true,
                   headerBuilder: (BuildContext context, bool isExpanded) {
                     return Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [Text(item.name)],
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          item.name,
+                          style: TextStyle(color: Colors.black, fontSize: 20),
+                        ),
+                      ],
                     );
                   },
                   body: item.isExpanded ? item.entry : Container(),
@@ -1479,12 +1490,21 @@ class PopupResultsMenu {
             child: ResultsMenu(json: json),
           ),
           actions: [
-            TextButton(
-              child: Text("Terminé!"),
-              onPressed: () {
-                after();
-                Navigator.of(context, rootNavigator: true).pop();
-              },
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  constraints: BoxConstraints(minHeight: 20, minWidth: 200),
+                  child: FloatingActionButton(
+                    backgroundColor: gl.colorAgroBioTech,
+                    child: Text("Retour!", maxLines: 1),
+                    onPressed: () {
+                      after();
+                      Navigator.of(context, rootNavigator: true).pop();
+                    },
+                  ),
+                ),
+              ],
             ),
           ],
         );
@@ -1510,7 +1530,7 @@ class _OnlineMapStatusTool extends State<OnlineMapStatusTool> {
   Widget build(BuildContext context) => Column(
     children: [
       widget.layerTile.downloadedControlBar(),
-
+      if (widget.layerTile.downloadable) LayerDownloader(widget.layerTile),
       gl.anaPtSelectedLayerKeys.contains(widget.layerTile.key)
           ? TextButton(
             style: ButtonStyle(
@@ -1630,7 +1650,7 @@ class _OnlineMapStatusTool extends State<OnlineMapStatusTool> {
                   maxWidth: MediaQuery.of(context).size.width * .6,
                 ),
                 child: Text(
-                  "Consulter la documentation relative à la cette couche cartographique",
+                  "Consulter la documentation relative à cette couche cartographique",
                   style: TextStyle(color: Colors.black),
                 ),
               ),
@@ -1640,14 +1660,58 @@ class _OnlineMapStatusTool extends State<OnlineMapStatusTool> {
             PopupPdfMenu(gl.notificationContext!, widget.layerTile);
           },
         ),
+      if ((gl.dico.getLayerBase(widget.layerTile.key).mGroupe == "APT_FEE" ||
+              gl.dico.getLayerBase(widget.layerTile.key).mGroupe == "APT_CS") &&
+          gl.dico
+              .getEss(gl.dico.getLayerBase(widget.layerTile.key).getEssCode())
+              .hasFEEapt())
+        TextButton(
+          style: ButtonStyle(
+            minimumSize: WidgetStateProperty<Size>.fromMap(
+              <WidgetStatesConstraint, Size>{
+                WidgetState.any: Size(
+                  MediaQuery.of(context).size.width * .99,
+                  MediaQuery.of(context).size.height * .075,
+                ),
+              },
+            ),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              const Icon(
+                Icons.picture_as_pdf_outlined,
+                size: 28,
+                color: Colors.black,
+              ),
+              Container(
+                constraints: BoxConstraints(
+                  maxWidth: MediaQuery.of(context).size.width * .05,
+                ),
+              ),
+              Container(
+                constraints: BoxConstraints(
+                  maxWidth: MediaQuery.of(context).size.width * .6,
+                ),
+                child: Text(
+                  "Consulter la fiche-essence ${gl.dico.getEss(gl.dico.getLayerBase(widget.layerTile.key).getEssCode()).getNameAndPrefix()}",
+                  style: TextStyle(color: Colors.black),
+                ),
+              ),
+            ],
+          ),
+          onPressed: () {
+            String path =
+                "${gl.pathExternalStorage}/FEE-${gl.dico.getEss(gl.dico.getLayerBase(widget.layerTile.key).getEssCode()).mCode}.pdf";
+            PopupPdfMenu(gl.notificationContext!, widget.layerTile, path: path);
+          },
+        ),
     ],
   );
 }
 
 class OnlineMapMenu extends StatefulWidget {
-  final Function(LatLng) state;
-
-  const OnlineMapMenu({super.key, required this.state});
+  const OnlineMapMenu({super.key});
 
   @override
   State<StatefulWidget> createState() => _OnlineMapMenu();
@@ -1968,12 +2032,8 @@ class _OnlineMapMenu extends State<OnlineMapMenu> {
 }
 
 class PopupOnlineMapMenu {
-  PopupOnlineMapMenu(
-    BuildContext context,
-    String currentName,
-    Function(LatLng) state,
-    Function after,
-  ) {
+  final Function after;
+  PopupOnlineMapMenu(BuildContext context, this.after) {
     showDialog(
       barrierDismissible: false,
       context: context,
@@ -2003,7 +2063,7 @@ class PopupOnlineMapMenu {
             ),
             child: SizedBox(
               width: MediaQuery.of(context).size.width * 995,
-              child: OnlineMapMenu(state: state),
+              child: OnlineMapMenu(),
             ),
           ),
           titleTextStyle: TextStyle(color: Colors.white, fontSize: 25),
@@ -2032,17 +2092,17 @@ class PopupOnlineMapMenu {
 }
 
 class PopupPdfMenu {
-  PopupPdfMenu(BuildContext context, LayerTile layerTile) {
+  PopupPdfMenu(BuildContext context, LayerTile layerTile, {String path = ""}) {
     showDialog(
       barrierDismissible: false,
       context: context,
       builder: (BuildContext context) {
-        print(
-          "${gl.pathExternalStorage}/${gl.dico.getLayerBase(layerTile.key).mPdfName}",
-        );
+        if (path == "") {
+          path =
+              "${gl.pathExternalStorage}/${gl.dico.getLayerBase(layerTile.key).mPdfName}";
+        }
         return PDFScreen(
-          path:
-              "${gl.pathExternalStorage}/${gl.dico.getLayerBase(layerTile.key).mPdfName}",
+          path: path,
           titre: "documentation", //+ item.mNomCourt,
           currentPage: int.parse(
             gl.dico.getLayerBase(layerTile.key).mPdfPage.toString(),
@@ -2050,5 +2110,565 @@ class PopupPdfMenu {
         );
       },
     );
+  }
+}
+
+class PopupLayerSwitcher {
+  PopupLayerSwitcher(BuildContext context, Function after) {
+    showDialog(
+      barrierDismissible: true,
+      barrierColor: Colors.black.withAlpha(100),
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          titlePadding: EdgeInsets.all(5),
+          actionsPadding: EdgeInsets.all(0),
+          contentPadding: EdgeInsets.all(0),
+          insetPadding: EdgeInsets.all(0),
+          buttonPadding: EdgeInsets.all(0),
+          iconPadding: EdgeInsets.all(0),
+          backgroundColor: Color.fromRGBO(0, 0, 0, 0.0),
+          surfaceTintColor: Colors.transparent,
+          shadowColor: Colors.transparent,
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                "Changez les cartes affichées",
+                textAlign: TextAlign.justify,
+              ),
+            ],
+          ),
+          content: Theme(
+            data: Theme.of(context).copyWith(
+              canvasColor: Colors.transparent,
+              shadowColor: Colors.transparent,
+            ),
+            child: SizedBox(
+              width: MediaQuery.of(context).size.width * .80,
+              height:
+                  MediaQuery.of(context).size.height * .2 +
+                  MediaQuery.of(context).size.width * .15,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width * .80,
+                    height: MediaQuery.of(context).size.height * .2,
+                    child: LayerSwitcher(),
+                  ),
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width * .80,
+                    height: MediaQuery.of(context).size.width * .15,
+                    child: ViewControl(),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          titleTextStyle: TextStyle(color: Colors.white, fontSize: 25),
+          actions: [],
+        );
+      },
+    );
+  }
+}
+
+class ViewControl extends StatefulWidget {
+  const ViewControl({super.key});
+  @override
+  State<ViewControl> createState() => _ViewControl();
+}
+
+class _ViewControl extends State<ViewControl> {
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: [
+        SizedBox(
+          width: MediaQuery.of(context).size.width * .15,
+          height: MediaQuery.of(context).size.width * .15,
+          child: FloatingActionButton(
+            backgroundColor:
+                gl.modeMapShowSearchMarker ? gl.colorAgroBioTech : Colors.grey,
+            onPressed: () {
+              setState(() {
+                gl.modeMapShowSearchMarker = !gl.modeMapShowSearchMarker;
+              });
+            },
+            child: Icon(
+              Icons.search_off,
+              size: MediaQuery.of(context).size.width * .13,
+              color: Colors.black,
+            ),
+          ),
+        ),
+        SizedBox(
+          width: MediaQuery.of(context).size.width * .15,
+          height: MediaQuery.of(context).size.width * .15,
+          child: FloatingActionButton(
+            backgroundColor:
+                gl.modeMapShowCustomMarker ? gl.colorAgroBioTech : Colors.grey,
+            onPressed: () {
+              setState(() {
+                gl.modeMapShowCustomMarker = !gl.modeMapShowCustomMarker;
+              });
+            },
+            child: Icon(
+              Icons.location_off_rounded,
+              size: MediaQuery.of(context).size.width * .13,
+              color: Colors.black,
+            ),
+          ),
+        ),
+        SizedBox(
+          width: MediaQuery.of(context).size.width * .15,
+          height: MediaQuery.of(context).size.width * .15,
+          child: FloatingActionButton(
+            backgroundColor:
+                gl.modeMapShowPolygons ? gl.colorAgroBioTech : Colors.grey,
+            onPressed: () {
+              setState(() {
+                gl.modeMapShowPolygons = !gl.modeMapShowPolygons;
+              });
+            },
+            child: Icon(
+              Icons.hexagon_outlined,
+              size: MediaQuery.of(context).size.width * .13,
+              color: Colors.black,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class LayerSwitcher extends StatefulWidget {
+  const LayerSwitcher({super.key});
+  @override
+  State<LayerSwitcher> createState() => _LayerSwitcher();
+}
+
+class _LayerSwitcher extends State<LayerSwitcher> {
+  @override
+  Widget build(BuildContext context) {
+    {
+      return ReorderableListView(
+        buildDefaultDragHandles: false,
+        padding: const EdgeInsets.symmetric(horizontal: 0),
+        onReorder: (int oldIndex, int newIndex) {
+          setState(() {
+            if (oldIndex < newIndex) {
+              newIndex -= 1;
+            }
+            if (gl.interfaceSelectedLayerKeys.length < newIndex + 1 ||
+                gl.interfaceSelectedLayerKeys.length < oldIndex + 1) {
+              return;
+            }
+            gl.refreshMap(() {
+              final gl.SelectedLayer item = gl.interfaceSelectedLayerKeys
+                  .removeAt(oldIndex);
+              gl.interfaceSelectedLayerKeys.insert(newIndex, item);
+            });
+          });
+        },
+        children: List<Widget>.generate(3, (i) {
+          if (gl.interfaceSelectedLayerKeys.length > i) {
+            return Card(
+              margin: EdgeInsets.all(5),
+              key: Key('$i+listOfThree'),
+              color: Colors.white,
+              surfaceTintColor: Colors.white,
+              shadowColor: const Color.fromARGB(255, 44, 44, 44),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Container(
+                    padding: EdgeInsets.all(3),
+                    constraints: BoxConstraints(
+                      maxHeight: MediaQuery.of(context).size.width * 0.105,
+                      minHeight: MediaQuery.of(context).size.width * 0.105,
+                      maxWidth: MediaQuery.of(context).size.width * 0.55,
+                      minWidth: MediaQuery.of(context).size.width * 0.55,
+                    ),
+                    child: Text(
+                      gl.dico
+                          .getLayerBase(gl.interfaceSelectedLayerKeys[i].mCode)
+                          .mNom,
+                    ),
+                  ),
+                  Container(
+                    constraints: BoxConstraints(
+                      maxHeight: MediaQuery.of(context).size.width * 0.1,
+                      minHeight: MediaQuery.of(context).size.width * 0.1,
+                      maxWidth: MediaQuery.of(context).size.width * 0.2,
+                      minWidth: MediaQuery.of(context).size.width * 0.2,
+                    ),
+                    child: Row(
+                      children: [
+                        gl.interfaceSelectedLayerKeys[i].offline
+                            ? Container(
+                              constraints: BoxConstraints(
+                                maxHeight:
+                                    MediaQuery.of(context).size.width * 0.1,
+                                minHeight:
+                                    MediaQuery.of(context).size.width * 0.1,
+                                maxWidth:
+                                    MediaQuery.of(context).size.width * 0.1,
+                                minWidth:
+                                    MediaQuery.of(context).size.width * 0.1,
+                              ),
+                              padding: const EdgeInsets.symmetric(),
+                              child: Icon(
+                                Icons.save,
+                                size: MediaQuery.of(context).size.width * 0.1,
+                              ),
+                            )
+                            : Container(
+                              constraints: BoxConstraints(
+                                maxHeight:
+                                    MediaQuery.of(context).size.width * 0.1,
+                                minHeight:
+                                    MediaQuery.of(context).size.width * 0.1,
+                                maxWidth:
+                                    MediaQuery.of(context).size.width * 0.1,
+                                minWidth:
+                                    MediaQuery.of(context).size.width * 0.1,
+                              ),
+                              padding: const EdgeInsets.symmetric(),
+                              child: Icon(
+                                Icons.wifi,
+                                size: MediaQuery.of(context).size.width * 0.1,
+                              ),
+                            ),
+                        Container(
+                          constraints: BoxConstraints(
+                            maxHeight: MediaQuery.of(context).size.width * 0.1,
+                            minHeight: MediaQuery.of(context).size.width * 0.1,
+                            maxWidth: MediaQuery.of(context).size.width * 0.1,
+                            minWidth: MediaQuery.of(context).size.width * 0.1,
+                          ),
+                          padding: const EdgeInsets.symmetric(),
+                          child: ReorderableDragStartListener(
+                            index: i,
+                            child: Icon(
+                              Icons.drag_indicator,
+                              size: MediaQuery.of(context).size.width * 0.1,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            );
+          } else {
+            return Card(key: Key('$i+listOfThree'));
+          }
+        }),
+      );
+    }
+  }
+}
+
+class PopupDoYouReally {
+  PopupDoYouReally(
+    BuildContext context,
+    Function after,
+    String title,
+    String message,
+  ) {
+    showDialog(
+      barrierDismissible: true,
+      barrierColor: Colors.black.withAlpha(100),
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          titlePadding: EdgeInsets.all(5),
+          actionsPadding: EdgeInsets.all(0),
+          contentPadding: EdgeInsets.all(0),
+          insetPadding: EdgeInsets.all(0),
+          buttonPadding: EdgeInsets.all(0),
+          iconPadding: EdgeInsets.all(0),
+          backgroundColor: Color.fromRGBO(0, 0, 0, 0.85),
+          surfaceTintColor: Colors.transparent,
+          shadowColor: Colors.transparent,
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [Text(title, textAlign: TextAlign.justify)],
+          ),
+          content: Theme(
+            data: Theme.of(context).copyWith(
+              canvasColor: Colors.transparent,
+              shadowColor: Colors.transparent,
+            ),
+            child: SizedBox(
+              width: MediaQuery.of(context).size.width * .80,
+              child: Text(
+                message,
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.white, fontSize: 24),
+              ),
+            ),
+          ),
+          titleTextStyle: TextStyle(color: Colors.white, fontSize: 25),
+          actionsAlignment: MainAxisAlignment.spaceBetween,
+          actions: [
+            FloatingActionButton(
+              onPressed: () {
+                after();
+                Navigator.of(context, rootNavigator: true).pop();
+              },
+              backgroundColor: gl.colorAgroBioTech,
+              child: Container(
+                alignment: Alignment.center,
+                constraints: BoxConstraints(
+                  maxHeight: MediaQuery.of(context).size.width * 0.1,
+                  minHeight: MediaQuery.of(context).size.width * 0.1,
+                  maxWidth: MediaQuery.of(context).size.width * 0.3,
+                  minWidth: MediaQuery.of(context).size.width * 0.3,
+                ),
+                child: Text(
+                  "Oui",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.black, fontSize: 20),
+                ),
+              ),
+            ),
+            FloatingActionButton(
+              onPressed: () {
+                Navigator.of(context, rootNavigator: true).pop();
+              },
+              backgroundColor: Colors.red,
+              child: Container(
+                alignment: Alignment.center,
+                constraints: BoxConstraints(
+                  maxHeight: MediaQuery.of(context).size.width * 0.1,
+                  minHeight: MediaQuery.of(context).size.width * 0.1,
+                  maxWidth: MediaQuery.of(context).size.width * 0.3,
+                  minWidth: MediaQuery.of(context).size.width * 0.3,
+                ),
+                child: Text(
+                  "Non",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.black, fontSize: 20),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class PopupOfflineMenu {
+  PopupOfflineMenu(BuildContext context, Function after) {
+    showDialog(
+      barrierDismissible: true,
+      barrierColor: Colors.black.withAlpha(100),
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          titlePadding: EdgeInsets.all(5),
+          actionsPadding: EdgeInsets.all(0),
+          contentPadding: EdgeInsets.all(0),
+          insetPadding: EdgeInsets.all(0),
+          buttonPadding: EdgeInsets.all(0),
+          iconPadding: EdgeInsets.all(0),
+          backgroundColor: Color.fromRGBO(0, 0, 0, 0.0),
+          surfaceTintColor: Colors.transparent,
+          shadowColor: Colors.transparent,
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                "Changez les cartes affichées",
+                textAlign: TextAlign.justify,
+              ),
+            ],
+          ),
+          content: Theme(
+            data: Theme.of(context).copyWith(
+              canvasColor: Colors.transparent,
+              shadowColor: Colors.transparent,
+            ),
+            child: SizedBox(
+              width: MediaQuery.of(context).size.width * .80,
+              height: MediaQuery.of(context).size.height * 0.8,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width * .80,
+                    height: MediaQuery.of(context).size.height * 0.8,
+                    child: OfflineMapMenu(),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          titleTextStyle: TextStyle(color: Colors.white, fontSize: 25),
+          actions: [],
+        );
+      },
+    );
+  }
+}
+
+class OfflineMapMenu extends StatefulWidget {
+  const OfflineMapMenu({super.key});
+
+  @override
+  State<StatefulWidget> createState() => _OfflineMapMenu();
+}
+
+class _OfflineMapMenu extends State<OfflineMapMenu> {
+  int _selectedMap = -1;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      body: ListView(
+        padding: const EdgeInsets.symmetric(horizontal: 0),
+        children: _injectOfflineLayerData((i, layerTile) {
+          return TextButton(
+            style: ButtonStyle(
+              maximumSize:
+                  i == _selectedMap
+                      ? WidgetStateProperty<Size>.fromMap(
+                        <WidgetStatesConstraint, Size>{
+                          WidgetState.any: Size(
+                            MediaQuery.of(context).size.width * .99,
+                            MediaQuery.of(context).size.height * .15,
+                          ),
+                        },
+                      )
+                      : WidgetStateProperty<Size>.fromMap(
+                        <WidgetStatesConstraint, Size>{
+                          WidgetState.any: Size(
+                            MediaQuery.of(context).size.width * .99,
+                            MediaQuery.of(context).size.height * .1,
+                          ),
+                        },
+                      ),
+            ),
+            key: Key('$i'),
+            onPressed:
+                i == _selectedMap
+                    ? () {
+                      setState(() {
+                        _selectedMap = -1;
+                      });
+                    }
+                    : () {
+                      setState(() {
+                        _selectedMap = i;
+                      });
+                    },
+            child: Card(
+              surfaceTintColor: Colors.transparent,
+              shadowColor: Colors.transparent,
+              color:
+                  i == _selectedMap
+                      ? gl.colorAgroBioTech.withAlpha(255)
+                      : gl.colorAgroBioTech.withAlpha(120),
+              child: Row(
+                children: [
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      IconButton(
+                        icon: Icon(
+                          Icons.delete_forever,
+                          size: MediaQuery.of(context).size.width * 0.1,
+                          color: Colors.black,
+                        ),
+                        onPressed: () {
+                          PopupDoYouReally(
+                            gl.notificationContext!,
+                            () {
+                              fileDelete(
+                                join(
+                                  gl.dico.docDir.path,
+                                  gl.dico
+                                      .getLayerBase(layerTile.key)
+                                      .mNomRaster,
+                                ),
+                              ).whenComplete(() {
+                                setState(() {
+                                  gl.dico.getLayerBase(layerTile.key).mOffline =
+                                      false;
+                                  gl.removeFromOfflineList(layerTile.key);
+                                });
+                                gl.refreshWholeCatalogueView(() {
+                                  gl.dico.getLayerBase(layerTile.key).mOffline =
+                                      false;
+                                });
+                                gl.rebuildOfflineView(() {
+                                  gl.dico.getLayerBase(layerTile.key).mOffline =
+                                      false;
+                                });
+                              });
+                            },
+
+                            "Message",
+                            "Voulez vous vraiment supprimer la carte?\nVous ne pourriez plus l'utiliser pour le mode hors ligne!",
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                  Container(
+                    alignment: Alignment.center,
+                    constraints: BoxConstraints(
+                      maxWidth: MediaQuery.of(context).size.width * .55,
+                      minHeight: MediaQuery.of(context).size.width * .15,
+                      maxHeight: MediaQuery.of(context).size.width * .15,
+                    ),
+                    child: Text(
+                      layerTile.name,
+                      style: TextStyle(color: Colors.black, fontSize: 20),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }),
+      ),
+    );
+  }
+
+  List<Widget> _injectOfflineLayerData(
+    Widget Function(int, LayerTile) listBuilder,
+  ) {
+    List<LayerTile> offlineList = [];
+
+    for (var key in gl.dico.mLayerBases.keys) {
+      if (gl.dico.mLayerBases[key]!.mOffline ||
+          gl.dico.mLayerBases[key]!.mInDownload) {
+        offlineList.add(
+          LayerTile(
+            name: gl.dico.mLayerBases[key]!.mNom,
+            filter: gl.dico.mLayerBases[key]!.mGroupe,
+            key: key,
+            downloadable: gl.dico.mLayerBases[key]!.mIsDownloadableRW,
+            extern: gl.dico.mLayerBases[key]!.mCategorie == "Externe",
+          ),
+        );
+      }
+    }
+    List<Widget> result = [];
+    int i = 0;
+    for (LayerTile layerTile in offlineList) {
+      result.add(listBuilder(i++, layerTile));
+    }
+    return result;
   }
 }
