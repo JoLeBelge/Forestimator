@@ -9,6 +9,10 @@ import 'package:latlong2/latlong.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 const String forestimatorMobileVersion = "1.0.2-14";
+const double globalMinZoom = 4.0;
+const double globalMaxZoom = 13.0;
+const double globalMinOfflineZoom = 8.0;
+const double globalMaxOfflineZoom = 13.0;
 
 bool modeMapShowPolygons = true;
 bool modeMapShowSearchMarker = true;

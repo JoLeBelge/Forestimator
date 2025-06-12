@@ -1291,6 +1291,7 @@ Widget _resultClassRow(Map<String, dynamic> json, mCode) {
     key = -1234567891011;
   }
   if (key != -1234567891011) {
+    if (key > 0) key--;
     col = gl.dico.mLayerBases[mCode]!.mDicoCol[key]!;
   }
   return Row(
@@ -1437,9 +1438,14 @@ class _ResultsMenu extends State<ResultsMenu> {
                     return Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(
-                          item.name,
-                          style: TextStyle(color: Colors.black, fontSize: 20),
+                        Container(
+                          constraints: BoxConstraints(
+                            maxWidth: MediaQuery.of(context).size.width * .7,
+                          ),
+                          child: Text(
+                            item.name,
+                            style: TextStyle(color: Colors.black, fontSize: 20),
+                          ),
                         ),
                       ],
                     );
@@ -1531,6 +1537,103 @@ class _OnlineMapStatusTool extends State<OnlineMapStatusTool> {
     children: [
       widget.layerTile.downloadedControlBar(),
       if (widget.layerTile.downloadable) LayerDownloader(widget.layerTile),
+      gl.anaSurfSelectedLayerKeys.contains(widget.layerTile.key)
+          ? TextButton(
+            style: ButtonStyle(
+              minimumSize: WidgetStateProperty<Size>.fromMap(
+                <WidgetStatesConstraint, Size>{
+                  WidgetState.any: Size(
+                    MediaQuery.of(context).size.width * .99,
+                    MediaQuery.of(context).size.height * .075,
+                  ),
+                },
+              ),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                const Icon(Icons.pentagon, size: 28, color: Colors.black),
+                Container(
+                  constraints: BoxConstraints(
+                    maxWidth: MediaQuery.of(context).size.width * .05,
+                  ),
+                ),
+                Container(
+                  constraints: BoxConstraints(
+                    maxWidth: MediaQuery.of(context).size.width * .6,
+                  ),
+                  child: Text(
+                    "La couche est selectionnée pour l'analyse surfacique.",
+                    style: TextStyle(color: Colors.black),
+                  ),
+                ),
+              ],
+            ),
+            onPressed: () async {
+              setState(() {
+                if (gl.anaSurfSelectedLayerKeys.length > 1) {
+                  gl.anaSurfSelectedLayerKeys.remove(widget.layerTile.key);
+                  widget.layerTile.selected = false;
+                }
+              });
+              final SharedPreferences prefs =
+                  await SharedPreferences.getInstance();
+              await prefs.setStringList(
+                'anaSurfSelectedLayerKeys',
+                gl.anaSurfSelectedLayerKeys,
+              );
+            },
+          )
+          : TextButton(
+            style: ButtonStyle(
+              minimumSize: WidgetStateProperty<Size>.fromMap(
+                <WidgetStatesConstraint, Size>{
+                  WidgetState.any: Size(
+                    MediaQuery.of(context).size.width * .99,
+                    MediaQuery.of(context).size.height * .075,
+                  ),
+                },
+              ),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                const Icon(
+                  Icons.pentagon_outlined,
+                  size: 28,
+                  color: Colors.black,
+                ),
+                Container(
+                  constraints: BoxConstraints(
+                    maxWidth: MediaQuery.of(context).size.width * .05,
+                  ),
+                ),
+                Container(
+                  constraints: BoxConstraints(
+                    maxWidth: MediaQuery.of(context).size.width * .6,
+                  ),
+                  child: Text(
+                    "La couche n'est pas selectionnée pour l'analyse surfacique.",
+                    style: TextStyle(color: Colors.black),
+                  ),
+                ),
+              ],
+            ),
+            onPressed: () async {
+              setState(() {
+                if (gl.anaSurfSelectedLayerKeys.length > 1) {
+                  gl.anaSurfSelectedLayerKeys.insert(0, widget.layerTile.key);
+                  widget.layerTile.selected = true;
+                }
+              });
+              final SharedPreferences prefs =
+                  await SharedPreferences.getInstance();
+              await prefs.setStringList(
+                'anaSurfSelectedLayerKeys',
+                gl.anaSurfSelectedLayerKeys,
+              );
+            },
+          ),
       gl.anaPtSelectedLayerKeys.contains(widget.layerTile.key)
           ? TextButton(
             style: ButtonStyle(
@@ -2623,6 +2726,322 @@ class _OfflineMapMenu extends State<OfflineMapMenu> {
                       ),
                     ],
                   ),
+                  Container(
+                    alignment: Alignment.center,
+                    constraints: BoxConstraints(
+                      maxWidth: MediaQuery.of(context).size.width * .55,
+                      minHeight: MediaQuery.of(context).size.width * .15,
+                      maxHeight: MediaQuery.of(context).size.width * .15,
+                    ),
+                    child: Text(
+                      layerTile.name,
+                      style: TextStyle(color: Colors.black, fontSize: 20),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }),
+      ),
+    );
+  }
+
+  List<Widget> _injectOfflineLayerData(
+    Widget Function(int, LayerTile) listBuilder,
+  ) {
+    List<LayerTile> offlineList = [];
+
+    for (var key in gl.dico.mLayerBases.keys) {
+      if (gl.dico.mLayerBases[key]!.mOffline ||
+          gl.dico.mLayerBases[key]!.mInDownload) {
+        offlineList.add(
+          LayerTile(
+            name: gl.dico.mLayerBases[key]!.mNom,
+            filter: gl.dico.mLayerBases[key]!.mGroupe,
+            key: key,
+            downloadable: gl.dico.mLayerBases[key]!.mIsDownloadableRW,
+            extern: gl.dico.mLayerBases[key]!.mCategorie == "Externe",
+          ),
+        );
+      }
+    }
+    List<Widget> result = [];
+    int i = 0;
+    for (LayerTile layerTile in offlineList) {
+      result.add(listBuilder(i++, layerTile));
+    }
+    return result;
+  }
+}
+
+class PopupMapSelectionMenu {
+  PopupMapSelectionMenu(BuildContext context, Function after) {
+    showDialog(
+      barrierDismissible: true,
+      barrierColor: Colors.black.withAlpha(100),
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          titlePadding: EdgeInsets.all(5),
+          actionsPadding: EdgeInsets.all(0),
+          contentPadding: EdgeInsets.all(0),
+          insetPadding: EdgeInsets.all(0),
+          buttonPadding: EdgeInsets.all(0),
+          iconPadding: EdgeInsets.all(0),
+          backgroundColor: Color.fromRGBO(0, 0, 0, 0.0),
+          surfaceTintColor: Colors.transparent,
+          shadowColor: Colors.transparent,
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                "Changez les cartes affichées",
+                textAlign: TextAlign.justify,
+              ),
+            ],
+          ),
+          content: Theme(
+            data: Theme.of(context).copyWith(
+              canvasColor: Colors.transparent,
+              shadowColor: Colors.transparent,
+            ),
+            child: SizedBox(
+              width: MediaQuery.of(context).size.width * .80,
+              height: MediaQuery.of(context).size.height * 0.8,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width * .80,
+                    height: MediaQuery.of(context).size.height * 0.8,
+                    child: MapSelectionMenu(),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          titleTextStyle: TextStyle(color: Colors.white, fontSize: 25),
+          actions: [],
+        );
+      },
+    );
+  }
+}
+
+class MapSelectionMenu extends StatefulWidget {
+  const MapSelectionMenu({super.key});
+
+  @override
+  State<StatefulWidget> createState() => _MapSelectionMenu();
+}
+
+class _MapSelectionMenu extends State<MapSelectionMenu> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      body: ListView(
+        padding: const EdgeInsets.symmetric(horizontal: 0),
+        children: _injectOfflineLayerData((i, layerTile) {
+          return TextButton(
+            style: ButtonStyle(
+              maximumSize:
+                  gl.isSelectedLayer(layerTile.key)
+                      ? WidgetStateProperty<Size>.fromMap(
+                        <WidgetStatesConstraint, Size>{
+                          WidgetState.any: Size(
+                            MediaQuery.of(context).size.width * .99,
+                            MediaQuery.of(context).size.height * .15,
+                          ),
+                        },
+                      )
+                      : WidgetStateProperty<Size>.fromMap(
+                        <WidgetStatesConstraint, Size>{
+                          WidgetState.any: Size(
+                            MediaQuery.of(context).size.width * .99,
+                            MediaQuery.of(context).size.height * .1,
+                          ),
+                        },
+                      ),
+            ),
+            key: Key('$i'),
+            onPressed:
+                gl.isSelectedLayer(layerTile.key)
+                    ? () {
+                      setState(() {});
+                    }
+                    : () {
+                      setState(() {});
+                    },
+            child: Card(
+              surfaceTintColor: Colors.transparent,
+              shadowColor: Colors.transparent,
+              color:
+                  gl.isSelectedLayer(layerTile.key)
+                      ? gl.colorAgroBioTech.withAlpha(255)
+                      : gl.colorAgroBioTech.withAlpha(120),
+              child: Row(
+                children: [
+                  Container(
+                    alignment: Alignment.center,
+                    constraints: BoxConstraints(
+                      maxWidth: MediaQuery.of(context).size.width * .55,
+                      minHeight: MediaQuery.of(context).size.width * .15,
+                      maxHeight: MediaQuery.of(context).size.width * .15,
+                    ),
+                    child: Text(
+                      layerTile.name,
+                      style: TextStyle(color: Colors.black, fontSize: 20),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }),
+      ),
+    );
+  }
+
+  List<Widget> _injectOfflineLayerData(
+    Widget Function(int, LayerTile) listBuilder,
+  ) {
+    List<LayerTile> offlineList = [];
+
+    for (var key in gl.dico.mLayerBases.keys) {
+      if (gl.dico.mLayerBases[key]!.mOffline ||
+          gl.dico.mLayerBases[key]!.mInDownload) {
+        offlineList.add(
+          LayerTile(
+            name: gl.dico.mLayerBases[key]!.mNom,
+            filter: gl.dico.mLayerBases[key]!.mGroupe,
+            key: key,
+            downloadable: gl.dico.mLayerBases[key]!.mIsDownloadableRW,
+            extern: gl.dico.mLayerBases[key]!.mCategorie == "Externe",
+          ),
+        );
+      }
+    }
+    List<Widget> result = [];
+    int i = 0;
+    for (LayerTile layerTile in offlineList) {
+      result.add(listBuilder(i++, layerTile));
+    }
+    return result;
+  }
+}
+
+class PopupAnalysisSelection {
+  PopupAnalysisSelection(BuildContext context, Function after) {
+    showDialog(
+      barrierDismissible: true,
+      barrierColor: Colors.black.withAlpha(100),
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          titlePadding: EdgeInsets.all(5),
+          actionsPadding: EdgeInsets.all(0),
+          contentPadding: EdgeInsets.all(0),
+          insetPadding: EdgeInsets.all(0),
+          buttonPadding: EdgeInsets.all(0),
+          iconPadding: EdgeInsets.all(0),
+          backgroundColor: Color.fromRGBO(0, 0, 0, 0.0),
+          surfaceTintColor: Colors.transparent,
+          shadowColor: Colors.transparent,
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                "Changez les cartes affichées",
+                textAlign: TextAlign.justify,
+              ),
+            ],
+          ),
+          content: Theme(
+            data: Theme.of(context).copyWith(
+              canvasColor: Colors.transparent,
+              shadowColor: Colors.transparent,
+            ),
+            child: SizedBox(
+              width: MediaQuery.of(context).size.width * .80,
+              height: MediaQuery.of(context).size.height * 0.8,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width * .80,
+                    height: MediaQuery.of(context).size.height * 0.8,
+                    child: MapSelectionMenu(),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          titleTextStyle: TextStyle(color: Colors.white, fontSize: 25),
+          actions: [],
+        );
+      },
+    );
+  }
+}
+
+class AnalysisSelection extends StatefulWidget {
+  const AnalysisSelection({super.key});
+
+  @override
+  State<StatefulWidget> createState() => _AnalysisSelection();
+}
+
+class _AnalysisSelection extends State<AnalysisSelection> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      body: ListView(
+        padding: const EdgeInsets.symmetric(horizontal: 0),
+        children: _injectOfflineLayerData((i, layerTile) {
+          return TextButton(
+            style: ButtonStyle(
+              maximumSize:
+                  gl.isSelectedLayer(layerTile.key)
+                      ? WidgetStateProperty<Size>.fromMap(
+                        <WidgetStatesConstraint, Size>{
+                          WidgetState.any: Size(
+                            MediaQuery.of(context).size.width * .99,
+                            MediaQuery.of(context).size.height * .15,
+                          ),
+                        },
+                      )
+                      : WidgetStateProperty<Size>.fromMap(
+                        <WidgetStatesConstraint, Size>{
+                          WidgetState.any: Size(
+                            MediaQuery.of(context).size.width * .99,
+                            MediaQuery.of(context).size.height * .1,
+                          ),
+                        },
+                      ),
+            ),
+            key: Key('$i'),
+            onPressed:
+                gl.isSelectedLayer(layerTile.key)
+                    ? () {
+                      setState(() {});
+                    }
+                    : () {
+                      setState(() {});
+                    },
+            child: Card(
+              surfaceTintColor: Colors.transparent,
+              shadowColor: Colors.transparent,
+              color:
+                  gl.isSelectedLayer(layerTile.key)
+                      ? gl.colorAgroBioTech.withAlpha(255)
+                      : gl.colorAgroBioTech.withAlpha(120),
+              child: Row(
+                children: [
                   Container(
                     alignment: Alignment.center,
                     constraints: BoxConstraints(

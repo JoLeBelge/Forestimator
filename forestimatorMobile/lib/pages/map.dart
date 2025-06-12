@@ -74,17 +74,17 @@ class _MapPageState extends State<MapPage> {
 
   double tileSize = 256.0;
 
-  List<double> getResolutions2(int nbzoom) {
+  List<double> getResolutions2(int nbZoom) {
     // résolution numéro 1: une tile pour tout l'extend de la Wallonie
     var maxResolution = 1280;
-    return List.generate(nbzoom, (z) => maxResolution / pow(2, z));
+    return List.generate(nbZoom, (z) => maxResolution / pow(2, z));
   }
 
   late var epsg31370CRS = Proj4Crs.fromFactory(
     code: 'EPSG:31370',
     proj4Projection: epsg31370,
     bounds: epsg31370Bounds,
-    resolutions: getResolutions2(12),
+    resolutions: getResolutions2(15),
   );
 
   void _updatePtMarker(LatLng pt) {
@@ -290,17 +290,18 @@ class _MapPageState extends State<MapPage> {
                   } else {
                     refreshView(() {});
                   }
-                  _writeDataToSharedPreferences(
+                  _writePositionDataToSharedPreferences(
                     position.center.longitude,
                     position.center.latitude,
                     position.zoom,
                   );
+                  _writeDataToSharedPreferences();
                 },
                 crs: epsg31370CRS,
-                initialZoom: 8.0,
-                maxZoom: 10,
+                initialZoom: (gl.globalMinZoom + gl.globalMaxZoom) / 2.0,
+                maxZoom: gl.globalMaxZoom,
                 minZoom:
-                    2, // pour les cartes offline, il faudrait informer l'utilisateur du fait que si le zoom est trop peu élevé, la carte ne s'affiche pas
+                    gl.globalMinZoom, // pour les cartes offline, il faudrait informer l'utilisateur du fait que si le zoom est trop peu élevé, la carte ne s'affiche pas
                 initialCenter: gl.latlonCenter,
                 cameraConstraint: CameraConstraint.containCenter(
                   bounds: LatLngBounds.fromPoints([latlonBL, latlonTR]),
@@ -338,11 +339,6 @@ class _MapPageState extends State<MapPage> {
                         (selLayer.mCode == gl.getFirstSelLayOffline())) {
                       if (_provider == null ||
                           _provider?.layerCode != selLayer.mCode) {
-                        if (_provider != null) {
-                          //_provider?.dispose();
-                          _provider =
-                              null; // normalement le garbage collector effectue le dispose pour nous.
-                        }
                         _provider = TifFileTileProvider(
                           refreshView: refreshView,
                           mycrs: epsg31370CRS,
@@ -354,9 +350,9 @@ class _MapPageState extends State<MapPage> {
                       return _provider!.loaded
                           ? TileLayer(
                             tileProvider: _provider,
-                            // minNativeZoom: 8,
+                            maxZoom: gl.globalMaxOfflineZoom,
                             minZoom:
-                                2, // si minZoom de la map est moins restrictif (moins élevé) que celui-ci, la carte ne s'affiche juste pas (écran blanc)
+                                gl.globalMinOfflineZoom, // si minZoom de la map est moins restrictif (moins élevé) que celui-ci, la carte ne s'affiche juste pas (écran blanc)
                           )
                           : Container();
                     } else if (selLayer.offline) {
@@ -378,7 +374,6 @@ class _MapPageState extends State<MapPage> {
                     }
                   }).toList() +
                   <Widget>[
-                    //CurrentLocationLayer(),
                     AnimatedLocationMarkerLayer(
                       position: LocationMarkerPosition(
                         latitude: gl.position?.latitude ?? 0.0,
@@ -1322,19 +1317,23 @@ class _MapPageState extends State<MapPage> {
     await prefs.setInt('$name.nPolyPoints', i);
   }
 
-  void _writeDataToSharedPreferences(
+  void _writePositionDataToSharedPreferences(
     double lon,
     double lat,
     double zoom,
   ) async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    if (_mapFrameCounter % 50 == 0) {
+    if (_mapFrameCounter % 100 == 0) {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setDouble('mapCenterLat', lat);
       await prefs.setDouble('mapCenterLon', lon);
       await prefs.setDouble('mapZoom', zoom);
       gl.print("position saved to prefs: $lon $lat $zoom");
     }
+  }
+
+  void _writeDataToSharedPreferences() async {
     if (gl.saveChangesToPolygoneToPrefs) {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
       gl.saveChangesToPolygoneToPrefs = false;
       int i = 0;
       for (var polygon in gl.polygonLayers) {
