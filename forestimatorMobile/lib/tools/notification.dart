@@ -16,6 +16,7 @@ import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class PopupDownloadRecomendedLayers extends StatelessWidget {
   final String? title;
@@ -886,7 +887,7 @@ Widget forestimatorSettingsVersion() {
                     MediaQuery.of(gl.notificationContext!).size.width * .7,
               ),
               child: Text(
-                "Contact: Philippe Lejeune\np.lejeune@uliege.be",
+                "Contact: Philippe Lejeune",
                 overflow: TextOverflow.clip,
                 textAlign: TextAlign.justify,
                 textScaler: TextScaler.linear(1.0),
@@ -894,9 +895,35 @@ Widget forestimatorSettingsVersion() {
             ),
           ],
         ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            TextButton(
+              onPressed: () {
+                launchURL('p.lejeune@uliege.be');
+              },
+              child: Text(
+                "p.lejeune@uliege.be",
+                overflow: TextOverflow.clip,
+                textAlign: TextAlign.left,
+                textScaler: TextScaler.linear(1.0),
+                style: TextStyle(color: Colors.black),
+              ),
+            ),
+          ],
+        ),
       ],
     ),
   );
+}
+
+void launchURL(String url) async {
+  final Uri uri = Uri.parse(url);
+  try {
+    await launchUrl(uri);
+  } catch (e) {
+    gl.print('Error: Could not launch $uri because $e');
+  }
 }
 
 Widget forestimatorSettingsContacts() {
@@ -909,10 +936,55 @@ Widget forestimatorSettingsContacts() {
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Text(
-              "\nSur notre Site:\nhttps://www.grf.uliege.be\nPar mail:\nJO.Lisein@uliege.be\n",
+              "Sur notre Site:",
               overflow: TextOverflow.clip,
               textAlign: TextAlign.left,
               textScaler: TextScaler.linear(1.0),
+            ),
+          ],
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            TextButton(
+              onPressed: () {
+                launchURL('https://www.grf.uliege.be');
+              },
+              child: Text(
+                "https://www.grf.uliege.be",
+                overflow: TextOverflow.clip,
+                textAlign: TextAlign.left,
+                textScaler: TextScaler.linear(1.0),
+                style: TextStyle(color: Colors.blue),
+              ),
+            ),
+          ],
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Text(
+              "ou par mail:",
+              overflow: TextOverflow.clip,
+              textAlign: TextAlign.left,
+              textScaler: TextScaler.linear(1.0),
+            ),
+          ],
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            TextButton(
+              onPressed: () {
+                launchURL('JO.Lisein@uliege.be');
+              },
+              child: Text(
+                "JO.Lisein@uliege.be",
+                overflow: TextOverflow.clip,
+                textAlign: TextAlign.left,
+                textScaler: TextScaler.linear(1.0),
+                style: TextStyle(color: Colors.black),
+              ),
             ),
           ],
         ),
@@ -1078,7 +1150,50 @@ Widget forestimatorConfidentiality() {
               maxWidth: MediaQuery.of(gl.notificationContext!).size.width * .9,
             ),
             child: Text(
-              "Forestimator mobile ne collecte aucune donnée. Notre politique de confidentialité est consultable au \nhttps://forestimator.gembloux.ulg.ac.be/documentation/confidentialit_.\nL'application utilise le gps pour afficher votre position actuelle sur la carte et seulement pendant l'utilisation.",
+              "Forestimator mobile ne collecte aucune donnée. Notre politique de confidentialité est consultable au:",
+              overflow: TextOverflow.clip,
+              textAlign: TextAlign.justify,
+              textScaler: TextScaler.linear(1.0),
+            ),
+          ),
+        ],
+      ),
+      Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          TextButton(
+            onPressed: () {
+              launchURL(
+                'https://forestimator.gembloux.ulg.ac.be/documentation/confidentialit_',
+              );
+            },
+            child: Container(
+              padding: EdgeInsets.all(5),
+              constraints: BoxConstraints(
+                maxWidth:
+                    MediaQuery.of(gl.notificationContext!).size.width * .8,
+              ),
+              child: Text(
+                "https://forestimator.gembloux.ulg.ac.be/documentation/confidentialit_",
+                overflow: TextOverflow.clip,
+                textAlign: TextAlign.left,
+                textScaler: TextScaler.linear(1.0),
+                style: TextStyle(color: Colors.blue),
+              ),
+            ),
+          ),
+        ],
+      ),
+      Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            padding: EdgeInsets.all(5),
+            constraints: BoxConstraints(
+              maxWidth: MediaQuery.of(gl.notificationContext!).size.width * .9,
+            ),
+            child: Text(
+              "L'application utilise le gps pour afficher votre position actuelle sur la carte et seulement pendant l'utilisation.",
               overflow: TextOverflow.clip,
               textAlign: TextAlign.justify,
               textScaler: TextScaler.linear(1.0),
@@ -1099,6 +1214,15 @@ class Item {
   Item({required this.entry, required this.name});
 }
 
+class ItemSettings {
+  final Widget entry;
+  final String name;
+
+  bool isExpanded = false;
+
+  ItemSettings({required this.entry, required this.name});
+}
+
 class SettingsMenu extends StatefulWidget {
   final Function state;
 
@@ -1111,18 +1235,27 @@ class SettingsMenu extends StatefulWidget {
 class _SettingsMenu extends State<SettingsMenu> {
   final Color active = Colors.black;
   final Color inactive = Colors.blueGrey;
-  final List<Item> menuItems = [];
+  final List<ItemSettings> menuItems = [];
   bool _listInitialzed = false;
 
   @override
   void initState() {
     if (!_listInitialzed) {
       menuItems.addAll([
-        Item(name: "Permissions", entry: forestimatorSettingsPermissions()),
-        Item(name: "Sur Forestimator", entry: forestimatorSettingsVersion()),
-        Item(name: "Contact", entry: forestimatorSettingsContacts()),
-        Item(name: "Confidentialité", entry: forestimatorConfidentiality()),
-        Item(name: "Debug Logs", entry: ForestimatorLog()),
+        ItemSettings(
+          name: "Permissions",
+          entry: forestimatorSettingsPermissions(),
+        ),
+        ItemSettings(
+          name: "À propos de Forestimator",
+          entry: forestimatorSettingsVersion(),
+        ),
+        ItemSettings(name: "Contact", entry: forestimatorSettingsContacts()),
+        ItemSettings(
+          name: "Confidentialité",
+          entry: forestimatorConfidentiality(),
+        ),
+        ItemSettings(name: "Debug Logs", entry: ForestimatorLog()),
       ]);
     } else {
       _listInitialzed = true;
@@ -1141,7 +1274,7 @@ class _SettingsMenu extends State<SettingsMenu> {
             });
           },
           children:
-              menuItems.map<ExpansionPanel>((Item item) {
+              menuItems.map<ExpansionPanel>((ItemSettings item) {
                 return ExpansionPanel(
                   canTapOnHeader: true,
                   headerBuilder: (BuildContext context, bool isExpanded) {

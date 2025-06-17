@@ -3,7 +3,6 @@ import 'dart:isolate';
 import 'dart:ui';
 import 'package:downloadsfolder/downloadsfolder.dart';
 import 'package:fforestimator/pages/catalogueView/layer_tile.dart';
-import 'package:fforestimator/tools/handle_permissions.dart';
 import 'package:fforestimator/tools/notification.dart';
 import 'package:flutter/material.dart';
 import 'package:fforestimator/globals.dart' as gl;
@@ -46,13 +45,6 @@ class _LayerDownloaderState extends State<LayerDownloader> {
 
   @override
   Widget build(BuildContext context) {
-    return handlePermissionForStorage(
-      child: buildDL(context),
-      refreshParentWidgetTree: setState,
-    );
-  }
-
-  Widget buildDL(BuildContext context) {
     if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
       return Container(
         color: gl.colorBackground,

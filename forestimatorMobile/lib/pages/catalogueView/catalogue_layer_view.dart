@@ -41,7 +41,7 @@ class _CatalogueLayerView extends State<CatalogueLayerView> {
             await prefs.setBool('firstTimeUse', gl.firstTimeUse);
           },
           dialog:
-              "Forestimator mobile ne collecte aucune information personnelle. Notre politique de confidentialité est consultable au https://forestimator.gembloux.ulg.ac.be/documentation/confidentialit_. Autorisez-vous l'aplication à télécharger un jeu de 7 couches pour une utilisation hors ligne? Ces couches couvrent toutes la Région Wallonne et totalisent +- 100 Mo.",
+              "Autorisez-vous l'aplication à télécharger un jeu de 7 couches pour une utilisation hors ligne? Ces couches couvrent toutes la Région Wallonne et totalisent +- 100 Mo.",
         )
         : Scaffold(
           backgroundColor: Colors.transparent,

@@ -100,7 +100,7 @@ Widget handlePermissionForLocation({
         });
       },
       dialog:
-          "Forestimator mobile ne collecte aucune donnée. Notre politique de confidentialité est consultable au https://forestimator.gembloux.ulg.ac.be/documentation/confidentialit_.\nL'application utilise le gps pour afficher votre position actuelle sur la carte et seulement pendant l'utilisation. Autorisez-vous cette fonctionalité?",
+          "L'application utilise le gps pour afficher votre position actuelle sur la carte et seulement pendant l'utilisation. Autorisez-vous cette fonctionalité?",
     );
   }
   return child;
@@ -130,7 +130,7 @@ Widget handlePermissionForStorage({
         });
       },
       dialog:
-          "Forestimator mobile ne collecte aucune information personnelle. Notre politique de confidentialité est consultable au https://forestimator.gembloux.ulg.ac.be/documentation/confidentialit_. Autorisez-vous l'application à stocker des données de cartographie sur votre smartphone?",
+          "Autorisez-vous l'application à stocker des resultats en forme de PDF dans le dossier 'Downloads' de votre smartphone?",
     );
   } else if (storage.isPermanentlyDenied && sdkInt < 33) {
     return PopupPermissions(
@@ -150,7 +150,7 @@ Widget handlePermissionForStorage({
         });
       },
       dialog:
-          "Forestimator mobile ne collecte aucune information personnelle. Notre politique de confidentialité est consultable au https://forestimator.gembloux.ulg.ac.be/documentation/confidentialit_. Vous pouvez ouvrir les paramètres et autoriser l'application à stocker des données de cartographie sur votre smartphone.",
+          "Vous pouvez ouvrir les paramètres et autoriser l'application à stocker des resultats en forme de PDF dans le dossier 'Downloads' de votre smartphone.",
     );
   }
   return child;

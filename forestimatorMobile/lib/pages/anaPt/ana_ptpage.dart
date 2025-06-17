@@ -40,8 +40,39 @@ class _AnaPtpageState extends State<AnaPtpage> {
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
             ),
             handlePermissionForStorage(
-              child: IconButton(
-                icon: const Icon(Icons.picture_as_pdf, size: 28),
+              child: TextButton(
+                child:
+                    getStorage()
+                        ? Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Container(
+                              alignment: Alignment.center,
+                              constraints: BoxConstraints(
+                                maxWidth:
+                                    MediaQuery.of(context).size.width * 0.075,
+                              ),
+                              child: Icon(
+                                Icons.picture_as_pdf,
+                                size: 28,
+                                color: Colors.black,
+                              ),
+                            ),
+
+                            Container(
+                              alignment: Alignment.center,
+                              constraints: BoxConstraints(
+                                maxWidth:
+                                    MediaQuery.of(context).size.width * 0.75,
+                              ),
+                              child: Text(
+                                "Saufgardez cette analyse sur votre appareil",
+                                style: TextStyle(color: Colors.black),
+                              ),
+                            ),
+                          ],
+                        )
+                        : Row(),
                 onPressed: () async {
                   //var deviceInfo = await DeviceInfoPlugin().androidInfo;
                   // Your app has write permission by default in all public directories on external storage. (Android 13+ )-> request retourne denied sans boite de dialogue
