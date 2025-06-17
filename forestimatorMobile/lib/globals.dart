@@ -14,6 +14,7 @@ const double globalMaxZoom = 13.0;
 const double globalMinOfflineZoom = 8.0;
 const double globalMaxOfflineZoom = 13.0;
 
+bool modeMapFirstTileLayerTrancparancy = true;
 bool modeMapShowPolygons = true;
 bool modeMapShowSearchMarker = true;
 bool modeMapShowCustomMarker = true;

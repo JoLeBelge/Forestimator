@@ -111,7 +111,7 @@ Widget handlePermissionForStorage({
   required Function refreshParentWidgetTree,
 }) {
   if (!askOnceForStorage) return child;
-  if (release < 13 && storage.isDenied) {
+  if (storage.isDenied) {
     return PopupPermissions(
       title: "Permission pour le stockage des données.",
       accept: "oui",
@@ -132,7 +132,7 @@ Widget handlePermissionForStorage({
       dialog:
           "Forestimator mobile ne collecte aucune information personnelle. Notre politique de confidentialité est consultable au https://forestimator.gembloux.ulg.ac.be/documentation/confidentialit_. Autorisez-vous l'application à stocker des données de cartographie sur votre smartphone?",
     );
-  } else if (release < 13 && storage.isPermanentlyDenied) {
+  } else if (storage.isPermanentlyDenied) {
     return PopupPermissions(
       title: "Permission pour le stockage des données.",
       accept: "Ouvrir paramètres",

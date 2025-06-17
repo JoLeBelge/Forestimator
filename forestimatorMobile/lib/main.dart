@@ -2,7 +2,6 @@ import 'package:downloadsfolder/downloadsfolder.dart' as path;
 import 'package:fforestimator/dico/dico_apt.dart';
 import 'package:fforestimator/dico/ess.dart';
 import 'package:fforestimator/pages/anaPt/ana_ptpage.dart';
-import 'package:fforestimator/pages/offlinePage/offline_view.dart';
 import 'package:fforestimator/tools/customLayer/polygon_layer.dart';
 import 'package:fforestimator/tools/layer_downloader.dart';
 import 'package:flutter/material.dart';
@@ -11,7 +10,6 @@ import 'package:fforestimator/pages/map.dart';
 import 'package:fforestimator/pages/pdf_screen.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
-import 'package:fforestimator/pages/catalogueView/catalogue_layer_view.dart';
 import 'package:go_router/go_router.dart';
 import 'dart:async';
 import 'dart:io';
@@ -245,21 +243,6 @@ class _MyApp extends State<MyApp> {
                     path: 'anaPt',
                     builder: (context, state) => AnaPtpage(gl.requestedLayers),
                   ),
-                ],
-              ),
-            ],
-          ),
-          // second branch (B)
-          StatefulShellBranch(
-            navigatorKey: _shellNavigatorBKey,
-            routes: [
-              // top route inside branch
-              GoRoute(
-                path: "/${gl.basePathbranchB}",
-                pageBuilder:
-                    (context, state) =>
-                        const NoTransitionPage(child: CatalogueLayerView()),
-                routes: [
                   ...gl.dico.getLayersWithDoc().map<GoRoute>((LayerBase item) {
                     return GoRoute(
                       path: "${item.getFicheRoute()}/:currentPage",
@@ -326,18 +309,6 @@ class _MyApp extends State<MyApp> {
               ),
             ],
           ),
-          StatefulShellBranch(
-            navigatorKey: _shellNavigatorCKey,
-            routes: [
-              // top route inside branch
-              GoRoute(
-                path: "/${gl.basePathbranchC}",
-                pageBuilder:
-                    (context, state) =>
-                        const NoTransitionPage(child: OfflineView()),
-              ),
-            ],
-          ),
         ],
       ),
     ],
@@ -346,8 +317,6 @@ class _MyApp extends State<MyApp> {
   // private navigators
   final _rootNavigatorKey = GlobalKey<NavigatorState>();
   final _shellNavigatorAKey = GlobalKey<NavigatorState>(debugLabel: 'shellA');
-  final _shellNavigatorBKey = GlobalKey<NavigatorState>(debugLabel: 'shellB');
-  final _shellNavigatorCKey = GlobalKey<NavigatorState>(debugLabel: 'shellC');
 
   @override
   Widget build(BuildContext context) {

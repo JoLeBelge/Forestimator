@@ -197,6 +197,7 @@ class _MapPageState extends State<MapPage> {
 
   @override
   Widget build(BuildContext context) {
+    int i = 0;
     gl.notificationContext = context;
     return handlePermissionForLocation(
       refreshParentWidgetTree: refreshView,
@@ -247,6 +248,24 @@ class _MapPageState extends State<MapPage> {
                       InteractiveFlag.doubleTapZoom |
                       InteractiveFlag.scrollWheelZoom,
                 ),
+                onLongPress: (tapPosition, point) async {
+                  if (!_doingAnaPt) {
+                    refreshView(() {
+                      _doingAnaPt = true;
+                    });
+                    await _runAnaPt(
+                      epsg4326.transform(
+                        epsg31370,
+                        proj4.Point(x: point.longitude, y: point.latitude),
+                      ),
+                    );
+                    _pt = point;
+                    refreshView(() {
+                      _doingAnaPt = false;
+                    });
+                    GoRouter.of(gl.notificationContext!).push("/anaPt");
+                  }
+                },
                 onTap:
                     _modeDrawPolygonAddVertexes
                         ? (tapPosition, point) async => {
@@ -300,8 +319,7 @@ class _MapPageState extends State<MapPage> {
                 crs: epsg31370CRS,
                 initialZoom: (gl.globalMinZoom + gl.globalMaxZoom) / 2.0,
                 maxZoom: gl.globalMaxZoom,
-                minZoom:
-                    gl.globalMinZoom, // pour les cartes offline, il faudrait informer l'utilisateur du fait que si le zoom est trop peu élevé, la carte ne s'affiche pas
+                minZoom: gl.globalMinZoom,
                 initialCenter: gl.latlonCenter,
                 cameraConstraint: CameraConstraint.containCenter(
                   bounds: LatLngBounds.fromPoints([latlonBL, latlonTR]),
@@ -309,7 +327,6 @@ class _MapPageState extends State<MapPage> {
                 onMapReady: () async {
                   updateLocation();
                   if (gl.position != null) {
-                    // IMPORTANT: rebuild location layer when permissions are granted
                     refreshView(() {
                       _mapController.move(
                         LatLng(
@@ -349,6 +366,10 @@ class _MapPageState extends State<MapPage> {
                       }
                       return _provider!.loaded
                           ? TileLayer(
+                            tileDisplay:
+                                gl.modeMapFirstTileLayerTrancparancy && i == 3
+                                    ? TileDisplay.instantaneous(opacity: 0.5)
+                                    : TileDisplay.instantaneous(opacity: 1.0),
                             tileProvider: _provider,
                             maxZoom: gl.globalMaxOfflineZoom,
                             minZoom:
@@ -360,8 +381,13 @@ class _MapPageState extends State<MapPage> {
                       return Container();
                     } else {
                       LayerBase l = gl.dico.getLayerBase(selLayer.mCode);
+                      i++;
                       return TileLayer(
                         userAgentPackageName: "com.forestimator",
+                        tileDisplay:
+                            gl.modeMapFirstTileLayerTrancparancy && i == 3
+                                ? TileDisplay.instantaneous(opacity: 0.5)
+                                : TileDisplay.instantaneous(opacity: 1.0),
                         wmsOptions: WMSTileLayerOptions(
                           baseUrl: "${l.mUrl}?",
                           format: 'image/png',
@@ -1144,7 +1170,9 @@ class _MapPageState extends State<MapPage> {
         refreshView(() {
           _modeDrawPolygon = !_modeDrawPolygon;
         });
-        gl.refreshMap(() {});
+        gl.refreshMap(() {
+          gl.modeMapShowPolygons = true;
+        });
         if (_modeDrawPolygon == false) {
           _closePolygonDrawMenu();
           _modeAnaPtPreview = true;

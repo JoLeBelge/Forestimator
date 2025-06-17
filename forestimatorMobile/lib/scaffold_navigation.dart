@@ -6,7 +6,7 @@ import 'package:fforestimator/globals.dart' as gl;
 // https://github.com/flutter/packages/blob/main/packages/go_router/example/lib/stateful_shell_route.dart
 class ScaffoldWithNestedNavigation extends StatefulWidget {
   const ScaffoldWithNestedNavigation({Key? key, required this.navigationShell})
-      : super(key: key ?? const ValueKey('ScaffoldWithNestedNavigation'));
+    : super(key: key ?? const ValueKey('ScaffoldWithNestedNavigation'));
   final StatefulNavigationShell navigationShell;
   @override
   State<StatefulWidget> createState() => _ScaffoldWithNestedNavigation();
@@ -14,7 +14,7 @@ class ScaffoldWithNestedNavigation extends StatefulWidget {
 
 class _ScaffoldWithNestedNavigation
     extends State<ScaffoldWithNestedNavigation> {
-  void _goBranch(int index) {
+  /*void _goBranch(int index) {
     widget.navigationShell.goBranch(
       index,
       // A common pattern when using bottom navigation bars is to support
@@ -23,7 +23,7 @@ class _ScaffoldWithNestedNavigation
       // using the initialLocation parameter of goBranch.
       initialLocation: index == widget.navigationShell.currentIndex,
     );
-  }
+  }*/
 
   void rebuildBarForOfflineMode() {
     setState(() {});
@@ -39,7 +39,7 @@ class _ScaffoldWithNestedNavigation
   Widget build(BuildContext context) {
     return Scaffold(
       body: widget.navigationShell,
-      bottomNavigationBar: NavigationBar(
+      /*bottomNavigationBar: NavigationBar(
         height: MediaQuery.of(context).size.height * 0.07,
         selectedIndex: widget.navigationShell.currentIndex,
         destinations: [
@@ -53,7 +53,7 @@ class _ScaffoldWithNestedNavigation
         ],
         onDestinationSelected: _goBranch,
         backgroundColor: gl.offlineMode ? gl.colorAgroBioTech : gl.colorUliege,
-      ),
+      ),*/
     );
   }
 }

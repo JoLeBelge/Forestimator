@@ -1,4 +1,5 @@
 import 'package:fforestimator/dico/dico_apt.dart';
+import 'package:fforestimator/tools/handle_permissions.dart';
 import "package:flutter/material.dart";
 import 'package:fforestimator/pages/anaPt/requested_layer.dart';
 import 'package:fforestimator/pages/anaPt/ana_ptpdf.dart';
@@ -37,44 +38,48 @@ class _AnaPtpageState extends State<AnaPtpage> {
                   : "Analyse réalisée en ligne",
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
             ),
-            IconButton(
-              icon: const Icon(Icons.picture_as_pdf, size: 28),
-              onPressed: () async {
-                //var deviceInfo = await DeviceInfoPlugin().androidInfo;
-                // Your app has write permission by default in all public directories on external storage. (Android 13+ )-> request retourne denied sans boite de dialogue
-                bool isPermitted = true;
-                //(Platform.isAndroid && deviceInfo.version.sdkInt > 32)
-                //  ? true
-                //  : await Permission.storage.request().isGranted;
-                if (isPermitted) {
-                  //await Permission.manageExternalStorage
-                  //   .request()
-                  //  .isGranted ||
-                  //await Permission.storage.request().isGranted) {
-                  List<String>? l = await openDialog();
-                  String? pdf = l?.elementAt(0);
-                  String? locationName = l?.elementAt(1);
-                  if (pdf!.isEmpty) {
-                    pdf = "analysePonctuelleForestimator.pdf";
+            handlePermissionForStorage(
+              child: IconButton(
+                icon: const Icon(Icons.picture_as_pdf, size: 28),
+                onPressed: () async {
+                  //var deviceInfo = await DeviceInfoPlugin().androidInfo;
+                  // Your app has write permission by default in all public directories on external storage. (Android 13+ )-> request retourne denied sans boite de dialogue
+                  bool isPermitted = true;
+                  //(Platform.isAndroid && deviceInfo.version.sdkInt > 32)
+                  //  ? true
+                  //  : await Permission.storage.request().isGranted;
+                  if (isPermitted) {
+                    //await Permission.manageExternalStorage
+                    //   .request()
+                    //  .isGranted ||
+                    //await Permission.storage.request().isGranted) {
+                    List<String>? l = await openDialog();
+                    String? pdf = l?.elementAt(0);
+                    String? locationName = l?.elementAt(1);
+                    if (pdf!.isEmpty) {
+                      pdf = "analysePonctuelleForestimator.pdf";
+                    }
+                    if (pdf.length < 4 ||
+                        pdf.substring(pdf.length - 4) != ".pdf") {
+                      pdf = "$pdf.pdf";
+                    }
+                    if (locationName!.isEmpty) {
+                      locationName = "une position";
+                    }
+                    // création du pdf
+                    //String? dir = await getDownloadDirectory().toString();
+                    // String dir =
+                    //  await getExternalStorageDirectories().toString();
+                    String dir = "/storage/emulated/0/Download/";
+                    makePdf(widget.requestedLayers, pdf, dir, locationName);
+                    // confirmation que le pdf a été créé
+                    PopupPDFSaved(gl.notificationContext!, pdf);
                   }
-                  if (pdf.length < 4 ||
-                      pdf.substring(pdf.length - 4) != ".pdf") {
-                    pdf = "$pdf.pdf";
-                  }
-                  if (locationName!.isEmpty) {
-                    locationName = "une position";
-                  }
-                  // création du pdf
-                  //String? dir = await getDownloadDirectory().toString();
-                  // String dir =
-                  //  await getExternalStorageDirectories().toString();
-                  String dir = "/storage/emulated/0/Download/";
-                  makePdf(widget.requestedLayers, pdf, dir, locationName);
-                  // confirmation que le pdf a été créé
-                  PopupPDFSaved(gl.notificationContext!, pdf);
-                }
-              },
+                },
+              ),
+              refreshParentWidgetTree: setState,
             ),
+
             _anaPtListLayers(context, widget.requestedLayers),
             SizedBox(height: 15),
             if (apts.ready) Card(child: _tabAptFEE(context, apts)),
