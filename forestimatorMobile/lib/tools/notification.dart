@@ -8,6 +8,7 @@ import 'package:fforestimator/pages/catalogueView/legend_view.dart';
 import 'package:fforestimator/pages/pdf_screen.dart';
 import 'package:fforestimator/tools/customLayer/polygon_layer.dart';
 import 'package:fforestimator/tools/handle_permissions.dart';
+import 'package:fforestimator/tools/handle_permissions.dart' as permissions;
 import 'package:fforestimator/tools/layer_downloader.dart';
 import 'package:fforestimator/tools/pretty_print_results.dart';
 import 'package:flutter/material.dart';
@@ -1038,27 +1039,28 @@ Widget forestimatorSettingsPermissions() {
             ),
           ],
         ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Text(
-              "Stockage des pdf: ",
-              overflow: TextOverflow.clip,
-              textAlign: TextAlign.left,
-              textScaler: TextScaler.linear(1.0),
-            ),
-            Icon(
-              getStorage() ? Icons.check_circle : Icons.circle_notifications,
-              color: getStorage() ? Colors.green : Colors.red,
-            ),
-            Text(
-              getStorage() ? "Accordé." : "Pas accordé.",
-              overflow: TextOverflow.clip,
-              textAlign: TextAlign.left,
-              textScaler: TextScaler.linear(1.0),
-            ),
-          ],
-        ),
+        if (permissions.sdkInt < 33)
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Text(
+                "Stockage des pdf: ",
+                overflow: TextOverflow.clip,
+                textAlign: TextAlign.left,
+                textScaler: TextScaler.linear(1.0),
+              ),
+              Icon(
+                getStorage() ? Icons.check_circle : Icons.circle_notifications,
+                color: getStorage() ? Colors.green : Colors.red,
+              ),
+              Text(
+                getStorage() ? "Accordé." : "Pas accordé.",
+                overflow: TextOverflow.clip,
+                textAlign: TextAlign.left,
+                textScaler: TextScaler.linear(1.0),
+              ),
+            ],
+          ),
       ],
     ),
   );

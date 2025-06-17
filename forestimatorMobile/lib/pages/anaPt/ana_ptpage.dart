@@ -21,6 +21,7 @@ class _AnaPtpageState extends State<AnaPtpage> {
   late TextEditingController controllerLocationName;
   @override
   Widget build(BuildContext context) {
+    gl.anaPtPageContext = context;
     // pour la construction du tableau d'aptitude
     AptsFEE apts = AptsFEE(widget.requestedLayers);
     PropositionGS aptsGS = PropositionGS(widget.requestedLayers);
@@ -73,7 +74,7 @@ class _AnaPtpageState extends State<AnaPtpage> {
                     String dir = "/storage/emulated/0/Download/";
                     makePdf(widget.requestedLayers, pdf, dir, locationName);
                     // confirmation que le pdf a été créé
-                    PopupPDFSaved(gl.notificationContext!, pdf);
+                    PopupPDFSaved(gl.anaPtPageContext!, pdf);
                   }
                 },
               ),

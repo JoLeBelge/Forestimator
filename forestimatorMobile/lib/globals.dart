@@ -66,6 +66,7 @@ String basePathbranchC = "offline";
 Memory? memory;
 
 BuildContext? notificationContext;
+BuildContext? anaPtPageContext;
 bool offlineMode = false;
 bool debug = false;
 int currentPage = 0;

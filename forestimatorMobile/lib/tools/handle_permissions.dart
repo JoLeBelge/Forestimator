@@ -16,8 +16,8 @@ bool askOnceForLocation = true;
 bool askOnceForStorage = true;
 
 bool getVersion = true;
-double release = 20;
-int sdkInt = 20;
+double release = 33;
+int sdkInt = 33;
 
 /* Ask permissions at start of map and if not granted ask to grant them */
 bool getLocation() => location.isGranted;
@@ -111,7 +111,7 @@ Widget handlePermissionForStorage({
   required Function refreshParentWidgetTree,
 }) {
   if (!askOnceForStorage) return child;
-  if (storage.isDenied) {
+  if (storage.isDenied && sdkInt < 33) {
     return PopupPermissions(
       title: "Permission pour le stockage des données.",
       accept: "oui",
@@ -132,7 +132,7 @@ Widget handlePermissionForStorage({
       dialog:
           "Forestimator mobile ne collecte aucune information personnelle. Notre politique de confidentialité est consultable au https://forestimator.gembloux.ulg.ac.be/documentation/confidentialit_. Autorisez-vous l'application à stocker des données de cartographie sur votre smartphone?",
     );
-  } else if (storage.isPermanentlyDenied) {
+  } else if (storage.isPermanentlyDenied && sdkInt < 33) {
     return PopupPermissions(
       title: "Permission pour le stockage des données.",
       accept: "Ouvrir paramètres",
