@@ -794,7 +794,8 @@ class _SearchMenu extends State<SearchMenu> {
   }
 }
 
-Widget forestimatorSettingsVersion() {
+int developperModeCounter = 0;
+Widget forestimatorSettingsVersion(Function state) {
   return Container(
     padding: EdgeInsets.all(7.5),
     child: Column(
@@ -829,7 +830,21 @@ Widget forestimatorSettingsVersion() {
                 maxWidth:
                     MediaQuery.of(gl.notificationContext!).size.width * .5,
               ),
-              child: Image.asset("assets/images/LogoForestimator.png"),
+              child: TextButton(
+                onPressed: () async {
+                  developperModeCounter++;
+                  if (developperModeCounter > 6) {
+                    state(() {
+                      gl.modeDevelopper = !gl.modeDevelopper;
+                    });
+                    final SharedPreferences prefs =
+                        await SharedPreferences.getInstance();
+                    await prefs.setBool('modeDevelopper', gl.modeDevelopper);
+                    developperModeCounter = 0;
+                  }
+                },
+                child: Image.asset("assets/images/LogoForestimator.png"),
+              ),
             ),
           ],
         ),
@@ -1074,7 +1089,7 @@ class _ForestimatorLog extends State<ForestimatorLog> {
   }
 }
 
-Widget forestimatorSettingsPermissions() {
+Widget forestimatorSettingsPermissions(Function state) {
   return Container(
     padding: EdgeInsets.all(7.5),
     child: Column(
@@ -1087,6 +1102,7 @@ Widget forestimatorSettingsPermissions() {
               overflow: TextOverflow.clip,
               textAlign: TextAlign.left,
               textScaler: TextScaler.linear(1.5),
+              style: TextStyle(color: Colors.black),
             ),
           ],
         ),
@@ -1098,16 +1114,30 @@ Widget forestimatorSettingsPermissions() {
               overflow: TextOverflow.clip,
               textAlign: TextAlign.left,
               textScaler: TextScaler.linear(1.0),
+              style: TextStyle(color: Colors.black),
             ),
-            Icon(
-              getLocation() ? Icons.check_circle : Icons.circle_notifications,
-              color: getLocation() ? Colors.green : Colors.red,
-            ),
-            Text(
-              getLocation() ? "Accordé." : "Pas accordé.",
-              overflow: TextOverflow.clip,
-              textAlign: TextAlign.left,
-              textScaler: TextScaler.linear(1.0),
+            TextButton(
+              onPressed: () {
+                openPhoneForestimatorSettings();
+              },
+              child: Row(
+                children: [
+                  Icon(
+                    getLocation()
+                        ? Icons.check_circle
+                        : Icons.circle_notifications,
+                    color: getLocation() ? Colors.green : Colors.red,
+                    size: 25,
+                  ),
+                  Text(
+                    getLocation() ? "Accordé." : "Pas accordé.",
+                    overflow: TextOverflow.clip,
+                    textAlign: TextAlign.left,
+                    textScaler: TextScaler.linear(1.0),
+                    style: TextStyle(color: Colors.black),
+                  ),
+                ],
+              ),
             ),
           ],
         ),
@@ -1120,16 +1150,30 @@ Widget forestimatorSettingsPermissions() {
                 overflow: TextOverflow.clip,
                 textAlign: TextAlign.left,
                 textScaler: TextScaler.linear(1.0),
+                style: TextStyle(color: Colors.black),
               ),
-              Icon(
-                getStorage() ? Icons.check_circle : Icons.circle_notifications,
-                color: getStorage() ? Colors.green : Colors.red,
-              ),
-              Text(
-                getStorage() ? "Accordé." : "Pas accordé.",
-                overflow: TextOverflow.clip,
-                textAlign: TextAlign.left,
-                textScaler: TextScaler.linear(1.0),
+              TextButton(
+                onPressed: () {
+                  openPhoneForestimatorSettings();
+                },
+                child: Row(
+                  children: [
+                    Icon(
+                      getStorage()
+                          ? Icons.check_circle
+                          : Icons.circle_notifications,
+                      color: getStorage() ? Colors.green : Colors.red,
+                      size: 25,
+                    ),
+                    Text(
+                      getStorage() ? "Accordé." : "Pas accordé.",
+                      overflow: TextOverflow.clip,
+                      textAlign: TextAlign.left,
+                      textScaler: TextScaler.linear(1.0),
+                      style: TextStyle(color: Colors.black),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
@@ -1244,18 +1288,36 @@ class _SettingsMenu extends State<SettingsMenu> {
       menuItems.addAll([
         ItemSettings(
           name: "Permissions",
-          entry: forestimatorSettingsPermissions(),
+          entry: forestimatorSettingsPermissions((Function f) {
+            _listInitialzed = false;
+            setState(f());
+          }),
         ),
         ItemSettings(
           name: "À propos de Forestimator",
-          entry: forestimatorSettingsVersion(),
+          entry: forestimatorSettingsVersion((Function f) {
+            setState(() {
+              f();
+              gl.modeDevelopper
+                  ? menuItems.add(
+                    ItemSettings(name: "Debug Logs", entry: ForestimatorLog()),
+                  )
+                  : menuItems.removeWhere(
+                    (item) => item.name == "Debug Logs" ? true : false,
+                  );
+              gl.modeDevelopper
+                  ? gl.print("Developper mode activated")
+                  : gl.print("Developper mode deactivated");
+            });
+          }),
         ),
         ItemSettings(name: "Contact", entry: forestimatorSettingsContacts()),
         ItemSettings(
           name: "Confidentialité",
           entry: forestimatorConfidentiality(),
         ),
-        ItemSettings(name: "Debug Logs", entry: ForestimatorLog()),
+        if (gl.modeDevelopper)
+          ItemSettings(name: "Debug Logs", entry: ForestimatorLog()),
       ]);
     } else {
       _listInitialzed = true;

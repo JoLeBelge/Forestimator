@@ -928,12 +928,18 @@ class _MapPageState extends State<MapPage> {
         width:
             gl.anaPtPreview == null
                 ? MediaQuery.of(context).size.width * .1
-                : MediaQuery.of(context).size.width * .15 +
+                : gl.dico
+                        .getLayerBase(gl.anaPtPreview!.mCode)
+                        .getValLabel(gl.anaPtPreview!.mRastValue)
+                        .length >
+                    3
+                ? MediaQuery.of(context).size.width * .15 +
                     gl.dico
                             .getLayerBase(gl.anaPtPreview!.mCode)
                             .getValLabel(gl.anaPtPreview!.mRastValue)
                             .length *
-                        8.0,
+                        8.0
+                : MediaQuery.of(context).size.width * .25,
         height: MediaQuery.of(context).size.width * .1,
         point: _pt ?? const LatLng(0.0, 0.0),
         child: FloatingActionButton(
@@ -1460,33 +1466,34 @@ class _AnaPtPreview extends State<AnaPtPreview> {
         widget.after,
       );
     }
-    return gl.anaPtPreview != null
-        ? Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Container(
-                  constraints: BoxConstraints(minHeight: 20, minWidth: 20),
-                  color: gl.dico
-                      .getLayerBase(gl.anaPtPreview!.mCode)
-                      .getValColor(gl.anaPtPreview!.mRastValue),
-                ),
-                Container(
-                  alignment: Alignment.center,
-                  constraints: BoxConstraints(minHeight: 20, minWidth: 20),
-                  child: Text(":"),
-                ),
-                Text(
-                  gl.dico
-                      .getLayerBase(gl.anaPtPreview!.mCode)
-                      .getValLabel(gl.anaPtPreview!.mRastValue),
-                ),
-              ],
-            ),
-          ],
-        )
-        : const CircularProgressIndicator(color: gl.colorAgroBioTech);
+    if (gl.anaPtPreview != null) {
+      Color color = gl.dico
+          .getLayerBase(gl.anaPtPreview!.mCode)
+          .getValColor(gl.anaPtPreview!.mRastValue);
+      String text = gl.dico
+          .getLayerBase(gl.anaPtPreview!.mCode)
+          .getValLabel(gl.anaPtPreview!.mRastValue);
+      return Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                constraints: BoxConstraints(minHeight: 20, minWidth: 20),
+                color: color == Colors.transparent ? Colors.white : color,
+              ),
+              Container(
+                alignment: Alignment.center,
+                constraints: BoxConstraints(minHeight: 20, minWidth: 20),
+                child: Text(":"),
+              ),
+              Text(text == "" ? "No data" : text),
+            ],
+          ),
+        ],
+      );
+    }
+    return const CircularProgressIndicator(color: gl.colorAgroBioTech);
   }
 
   Future _runAnaPtPreview(proj4.Point ptBL72, Function after) async {
@@ -1500,10 +1507,9 @@ class _AnaPtPreview extends State<AnaPtPreview> {
           var res = await http.get(Uri.parse(request));
           if (res.statusCode != 200) throw HttpException('${res.statusCode}');
           data = jsonDecode(res.body);
-          gl.print(request);
-          gl.anaPtPreview = LayerAnaPt.fromMap(data["RequestedLayers"].first);
-
-          setState(() {});
+          setState(() {
+            gl.anaPtPreview = LayerAnaPt.fromMap(data["RequestedLayers"].first);
+          });
         } catch (e) {
           gl.print(request);
           gl.print("$e");
@@ -1520,11 +1526,12 @@ class _AnaPtPreview extends State<AnaPtPreview> {
       int val = await gl.dico
           .getLayerBase(gl.interfaceSelectedLCode.first)
           .getValXY(ptBL72);
-      gl.anaPtPreview = LayerAnaPt(
-        mCode: gl.interfaceSelectedLCode.first,
-        mRastValue: val,
-      );
-      setState(() {});
+      setState(() {
+        gl.anaPtPreview = LayerAnaPt(
+          mCode: gl.interfaceSelectedLCode.first,
+          mRastValue: val,
+        );
+      });
     }
     after();
   }

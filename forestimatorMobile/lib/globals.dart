@@ -18,6 +18,7 @@ bool modeMapFirstTileLayerTrancparancy = true;
 bool modeMapShowPolygons = true;
 bool modeMapShowSearchMarker = true;
 bool modeMapShowCustomMarker = true;
+bool modeDevelopper = false;
 
 class Display {
   double? width;

@@ -24,6 +24,8 @@ bool getLocation() => location.isGranted;
 bool getStorage() => storage.isGranted;
 bool getExtStorage() => extStorage.isGranted;
 
+Future<bool> openPhoneForestimatorSettings() async => await openAppSettings();
+
 void initPermissions() async {
   refreshPermissionInfos();
   if (getVersion && Platform.isAndroid) {

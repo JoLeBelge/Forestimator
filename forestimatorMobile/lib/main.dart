@@ -95,6 +95,11 @@ class _MyApp extends State<MyApp> {
   Future _readPreference() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
 
+    final bool? modeDevelopper = prefs.getBool('modeDevelopper');
+    if (modeDevelopper != null) {
+      gl.modeDevelopper = modeDevelopper;
+    }
+
     final bool? aOfflineMode = prefs.getBool('offlineMode');
     if (aOfflineMode != null) {
       gl.offlineMode = aOfflineMode;
