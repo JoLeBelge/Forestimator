@@ -46,7 +46,8 @@ MAP
 
 	LAYER
   	NAME "cadastre"
-  	TYPE POLYGON
+  	#TYPE POLYGON
+  	TYPE LINE
   	STATUS ON
   	DATA "Bpn_CaPa.shp"  
   	LABELITEM    "CaPaKey"         
@@ -54,8 +55,8 @@ MAP
     	NAME "CaPaKey"
     	STYLE
       		COLOR 200 200 200
-      		OUTLINECOLOR 0 0 0
-      		WIDTH 0.1
+      		OUTLINECOLOR 200 200 200
+      		WIDTH 2
     	END #style
     	LABEL
       		ALIGN center
