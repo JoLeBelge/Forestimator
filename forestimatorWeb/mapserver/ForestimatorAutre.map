@@ -56,7 +56,7 @@ MAP
     	STYLE
       		COLOR 200 200 200
       		OUTLINECOLOR 200 200 200
-      		WIDTH 1
+      		WIDTH 2
     	END #style
     	LABEL
       		ALIGN center
