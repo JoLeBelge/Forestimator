@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:fforestimator/dico/dico_apt.dart';
 import 'package:fforestimator/tileProvider/tif_tile_provider.dart';
+import 'package:fforestimator/tools/color_tools.dart';
 import 'package:fforestimator/tools/handle_permissions.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -35,6 +36,7 @@ class _MapPageState extends State<MapPage> {
   static int _mapFrameCounter = 0;
 
   bool _modeAnaPtPreview = true;
+  bool _lastPressWasShort = false;
 
   bool _toolbarExtended = false;
   bool _modeDrawPolygon = false;
@@ -276,6 +278,7 @@ class _MapPageState extends State<MapPage> {
                       InteractiveFlag.scrollWheelZoom,
                 ),
                 onLongPress: (tapPosition, point) async {
+                  _lastPressWasShort = false;
                   if (!_doingAnaPt) {
                     refreshView(() {
                       _doingAnaPt = true;
@@ -313,6 +316,7 @@ class _MapPageState extends State<MapPage> {
                         : _modeDrawPolygon
                         ? (tapPosition, point) async => {}
                         : (tapPosition, point) async => {
+                          _lastPressWasShort = true,
                           _updatePtMarker(point),
                         },
                 onPositionChanged: (position, e) async {
@@ -461,6 +465,99 @@ class _MapPageState extends State<MapPage> {
                       MarkerLayer(markers: _placeSearchMarker()),
                   ],
             ),
+            if (_modeDrawPolygon && gl.polygonLayers.isNotEmpty)
+              Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Container(
+                    constraints: BoxConstraints(
+                      minHeight: MediaQuery.of(context).size.height * .04,
+                      maxHeight: MediaQuery.of(context).size.height * .1,
+                    ),
+                    child: TextButton(
+                      onLongPress:
+                          () => PopupDrawnLayerMenu(
+                            gl.notificationContext!,
+                            gl.polygonLayers[gl.selectedPolygonLayer].name,
+                            (LatLng pos) {
+                              if (pos.longitude != 0.0 && pos.latitude != 0.0) {
+                                _mapController.move(
+                                  pos,
+                                  _mapController.camera.zoom,
+                                );
+                              }
+                            },
+                            () {
+                              refreshView(() {
+                                _modeProjectProperties = false;
+                              });
+                            },
+                          ),
+                      onPressed: () {
+                        setState(() {
+                          if (gl
+                                      .polygonLayers[gl.selectedPolygonLayer]
+                                      .center
+                                      .longitude !=
+                                  0.0 &&
+                              gl
+                                      .polygonLayers[gl.selectedPolygonLayer]
+                                      .center
+                                      .latitude !=
+                                  0.0) {
+                            _mapController.move(
+                              gl.polygonLayers[gl.selectedPolygonLayer].center,
+                              _mapController.camera.zoom,
+                            );
+                          }
+                        });
+                        gl.refreshMap(() {
+                          gl.modeMapShowPolygons = true;
+                        });
+                      },
+                      child: Card(
+                        surfaceTintColor: Colors.transparent,
+                        shadowColor: Colors.transparent,
+                        color: gl
+                            .polygonLayers[gl.selectedPolygonLayer]
+                            .colorInside
+                            .withAlpha(255),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            Text(
+                              gl.polygonLayers[gl.selectedPolygonLayer].name,
+                              style: TextStyle(
+                                color: getColorTextFromBackground(
+                                  gl
+                                      .polygonLayers[gl.selectedPolygonLayer]
+                                      .colorInside
+                                      .withAlpha(255),
+                                ),
+                                fontSize:
+                                    MediaQuery.of(context).size.height * .02,
+                              ),
+                            ),
+                            Text(
+                              "${(gl.polygonLayers[gl.selectedPolygonLayer].area / 100).round() / 100} Ha",
+                              style: TextStyle(
+                                color: getColorTextFromBackground(
+                                  gl
+                                      .polygonLayers[gl.selectedPolygonLayer]
+                                      .colorInside
+                                      .withAlpha(255),
+                                ),
+                                fontSize:
+                                    MediaQuery.of(context).size.height * .02,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             _toolbarGuard(),
             gl.position != null
                 ? Row(
@@ -583,7 +680,6 @@ class _MapPageState extends State<MapPage> {
     return Column(
       children: [
         _searchButton(),
-        _layerPolygonButton(),
         _modeLayerProperties ? _layerMenu() : Container(),
         _layerPropertiesButton(),
         _modeDrawPolygon ? _polygonToolbar() : Container(),
@@ -599,82 +695,7 @@ class _MapPageState extends State<MapPage> {
   Widget _polygonToolbar() {
     return Column(
       children: [
-        IconButton(
-          iconSize: iconSize,
-          color: _polygonMenuColorTools(_modeLayerPropertiesColors),
-          onPressed: () {
-            refreshView(() {
-              _modeLayerPropertiesColors = !_modeLayerPropertiesColors;
-              if (_modeLayerPropertiesColors) {
-                _modeLayerPropertiesRename = false;
-              }
-            });
-            PopupNameIntroducer(
-              gl.notificationContext!,
-              "",
-              (String nameIt) {
-                if (gl.polygonLayers.isNotEmpty &&
-                    gl.polygonLayers.length > gl.selectedPolygonLayer) {
-                  refreshView(
-                    () =>
-                        gl.polygonLayers[gl.selectedPolygonLayer].name = nameIt,
-                  );
-                }
-              },
-              () {
-                refreshView(() {
-                  _modeLayerPropertiesColors = false;
-                  if (_modeLayerPropertiesColors) {
-                    _modeLayerPropertiesRename = false;
-                  }
-                });
-              },
-            );
-          },
-          icon: Icon(Icons.text_fields, size: iconSize),
-        ),
-        IconButton(
-          iconSize: iconSize,
-          color: _polygonMenuColorTools(_modeLayerPropertiesRename),
-          onPressed: () {
-            refreshView(() {
-              _modeLayerPropertiesRename = !_modeLayerPropertiesRename;
-              if (_modeLayerPropertiesRename) {
-                _modeLayerPropertiesColors = false;
-              }
-            });
-            if (gl.polygonLayers.isNotEmpty) {
-              PopupColorChooser(
-                gl.polygonLayers[gl.selectedPolygonLayer].colorInside,
-                gl.notificationContext!,
-                (Color col) {
-                  refreshView(() {
-                    gl.polygonLayers[gl.selectedPolygonLayer].setColorInside(
-                      col,
-                    );
-                    gl.polygonLayers[gl.selectedPolygonLayer].setColorLine(
-                      Color.fromRGBO(
-                        (col.r * 255).round(),
-                        (col.g * 255).round(),
-                        (col.b * 255).round(),
-                        0.8,
-                      ),
-                    );
-                  });
-                },
-                () {
-                  refreshView(() {
-                    _modeLayerPropertiesRename = false;
-                    if (_modeLayerPropertiesRename) {
-                      _modeLayerPropertiesColors = false;
-                    }
-                  });
-                },
-              );
-            }
-          },
-          icon: Icon(Icons.color_lens, size: iconSize),
-        ),
+        _layerPolygonButton(),
         IconButton(
           iconSize: iconSize,
           color: _polygonMenuColorTools(_modeDrawPolygonMoveVertexes),
@@ -915,66 +936,70 @@ class _MapPageState extends State<MapPage> {
       return [];
     }
     return <Marker>[
-      Marker(
-        alignment: Alignment(0.0, -3.0),
-        width:
-            gl.anaPtPreview == null
-                ? MediaQuery.of(context).size.width * .1
-                : gl.dico
-                        .getLayerBase(gl.anaPtPreview!.mCode)
-                        .getValLabel(gl.anaPtPreview!.mRastValue)
-                        .length >
-                    3
-                ? MediaQuery.of(context).size.width * .15 +
-                    gl.dico
-                            .getLayerBase(gl.anaPtPreview!.mCode)
-                            .getValLabel(gl.anaPtPreview!.mRastValue)
-                            .length *
-                        8.0
-                : MediaQuery.of(context).size.width * .25,
-        height: MediaQuery.of(context).size.width * .1,
-        point: _pt ?? const LatLng(0.0, 0.0),
-        child: FloatingActionButton(
-          backgroundColor: Color.fromRGBO(0, 0, 0, 0.8),
-          foregroundColor: Colors.white,
-          splashColor: gl.colorAgroBioTech,
-          tooltip: "Faites une Analye Pontcuelle en ligne",
+      if (_lastPressWasShort)
+        Marker(
+          alignment: Alignment(0.0, -3.0),
+          width:
+              gl.anaPtPreview == null
+                  ? MediaQuery.of(context).size.width * .1
+                  : gl.dico
+                          .getLayerBase(gl.anaPtPreview!.mCode)
+                          .getValLabel(gl.anaPtPreview!.mRastValue)
+                          .length >
+                      3
+                  ? MediaQuery.of(context).size.width * .15 +
+                      gl.dico
+                              .getLayerBase(gl.anaPtPreview!.mCode)
+                              .getValLabel(gl.anaPtPreview!.mRastValue)
+                              .length *
+                          8.0
+                  : gl.dico.getLayerBase(gl.anaPtPreview!.mCode).mCategorie !=
+                      "Externe"
+                  ? MediaQuery.of(context).size.width * .25
+                  : MediaQuery.of(context).size.width * .0,
+          height: MediaQuery.of(context).size.width * .1,
+          point: _pt ?? const LatLng(0.0, 0.0),
+          child: FloatingActionButton(
+            backgroundColor: Color.fromRGBO(0, 0, 0, 0.8),
+            foregroundColor: Colors.white,
+            splashColor: gl.colorAgroBioTech,
+            tooltip: "Faites une Analye Pontcuelle en ligne",
 
-          onPressed: () async {
-            if (!_doingAnaPt) {
-              refreshView(() {
-                _doingAnaPt = true;
-              });
-              await _runAnaPt(
-                epsg4326.transform(
-                  epsg31370,
-                  proj4.Point(x: _pt!.longitude, y: _pt!.latitude),
-                ),
-              );
-              refreshView(() {
-                _doingAnaPt = false;
-              });
-              GoRouter.of(gl.notificationContext!).push("/anaPt");
-            }
-          },
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  AnaPtPreview(
-                    position: _pt!,
-                    after: () {
-                      setState(() {});
-                    },
+            onPressed: () async {
+              if (!_doingAnaPt) {
+                refreshView(() {
+                  _doingAnaPt = true;
+                });
+                await _runAnaPt(
+                  epsg4326.transform(
+                    epsg31370,
+                    proj4.Point(x: _pt!.longitude, y: _pt!.latitude),
                   ),
-                ],
-              ),
-            ],
+                );
+                refreshView(() {
+                  _doingAnaPt = false;
+                });
+                GoRouter.of(gl.notificationContext!).push("/anaPt");
+              }
+            },
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    AnaPtPreview(
+                      position: _pt!,
+                      after: () {
+                        setState(() {});
+                      },
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
-      ),
       Marker(
         alignment: Alignment.center,
         width: 50,
@@ -1107,7 +1132,11 @@ class _MapPageState extends State<MapPage> {
               _modeLayerPropertiesColors = !_modeLayerPropertiesColors;
             });
             if (gl.polygonLayers.isNotEmpty) {
-              PopupLayerSwitcher(gl.notificationContext!, () {});
+              PopupLayerSwitcher(gl.notificationContext!, () {
+                setState(() {
+                  _modeLayerPropertiesColors = false;
+                });
+              });
             }
           },
           icon: Icon(Icons.remove_red_eye_outlined, size: iconSize),
@@ -1207,18 +1236,12 @@ class _MapPageState extends State<MapPage> {
   Widget _layerPolygonButton() {
     return IconButton(
       iconSize: iconSize,
-      color: _polygonMenuColor(_modeProjectProperties),
+      color: _polygonMenuColorTools(_modeProjectProperties),
       onPressed: () async {
         refreshView(() {
           _modeProjectProperties = !_modeProjectProperties;
         });
         gl.refreshMap(() {});
-        if (_modeProjectProperties == false) {
-          _closeProjectMenu();
-        } else {
-          _closeLayerPropertiesMenu();
-          _closePolygonDrawMenu();
-        }
 
         PopupDrawnLayerMenu(
           gl.notificationContext!,

@@ -171,37 +171,60 @@ class LayerAnaPtListTile extends StatelessWidget {
   final LayerAnaPt data;
   const LayerAnaPtListTile({super.key, required this.data});
 
+  Widget _leadingSymbol(var icon) {
+    return Container(
+      alignment: Alignment.center,
+      constraints: BoxConstraints(
+        maxWidth: MediaQuery.of(gl.notificationContext!).size.width * 0.075,
+      ),
+      child: Icon(
+        icon,
+        size: MediaQuery.of(gl.notificationContext!).size.width * 0.075,
+        color: Colors.black,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    LayerBase l = gl.dico.getLayerBase(data.mCode);
+    LayerBase layer = gl.dico.getLayerBase(data.mCode);
     return ListTile(
-      leading: switch (l.mGroupe) {
-        "ST" => Icon(CustomIcons.montain),
-        "PEUP" => Icon(CustomIcons.forest),
-        "CS" => Icon(CustomIcons.mountains),
-        "REF" => Icon(Icons.location_on),
-        _ => Icon(Icons.location_on),
+      leading: switch (layer.mGroupe) {
+        "ST" => _leadingSymbol(CustomIcons.montain),
+        "PEUP" => _leadingSymbol(CustomIcons.forest),
+        "CS" => _leadingSymbol(CustomIcons.mountains),
+        "REF" => _leadingSymbol(Icons.location_on),
+        _ => _leadingSymbol(Icons.location_on),
       },
-      title: Text(l.mNom),
+      trailing:
+          (layer.getValColor(data.mRastValue).toARGB32() != 4294967295)
+              ? CircleAvatar(
+                radius: 10,
+                backgroundColor: layer.getValColor(data.mRastValue),
+              )
+              : null,
+      title: Text(
+        layer.mNom,
+        style: TextStyle(
+          fontSize: 16.0,
+          fontWeight: FontWeight.w500,
+          color: Colors.black,
+        ),
+      ),
       subtitle: Row(
         children: <Widget>[
           Text(
-            l.getValLabel(data.mRastValue),
+            layer.getValLabel(data.mRastValue),
             style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.w500),
           ),
-          SizedBox(width: 20),
-          if (l.getValColor(data.mRastValue).toARGB32() != 4294967295)
-            CircleAvatar(
-              radius: 10,
-              backgroundColor: l.getValColor(data.mRastValue),
-            ),
         ],
       ),
       onTap: () {
-        if (l.hasDoc()) {
+        if ((layer.hasDoc() && data.mCode != "CS_A") ||
+            (layer.hasDoc() && data.mCode == "CS_A" && data.mRastValue < 99)) {
           GoRouter.of(
             context,
-          ).push('/${l.getFicheRoute(us: data.mRastValue)}/0');
+          ).push('/${layer.getFicheRoute(us: data.mRastValue)}/0');
         }
       },
     );
@@ -395,6 +418,11 @@ class EssencesListViewGS extends StatelessWidget {
                 : Icons.forest_outlined,
           ),
           title: Text(gl.dico.getEss(code.elementAt(index - 1)).mNomFR),
+          onTap: () {
+            GoRouter.of(context).push(
+              "/${gl.dico.getEss(code.elementAt(index - 1)).getFicheRoute()}",
+            );
+          },
         );
       },
     );

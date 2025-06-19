@@ -6,6 +6,7 @@ import 'package:fforestimator/globals.dart' as gl;
 import 'package:fforestimator/pages/catalogueView/layer_tile.dart';
 import 'package:fforestimator/pages/catalogueView/legend_view.dart';
 import 'package:fforestimator/pages/pdf_screen.dart';
+import 'package:fforestimator/tools/color_tools.dart';
 import 'package:fforestimator/tools/customLayer/polygon_layer.dart';
 import 'package:fforestimator/tools/handle_permissions.dart';
 import 'package:fforestimator/tools/handle_permissions.dart' as permissions;
@@ -634,46 +635,6 @@ class _SearchMenu extends State<SearchMenu> {
 
   int previousLength = 0;
 
-  Color _getColorFromName(String name) {
-    List<int> numbers = name.codeUnits;
-    int r = 0;
-    for (var i in numbers) {
-      r += i;
-    }
-    r = r % 255;
-    int g = 1;
-    for (var i in numbers) {
-      g = g * i;
-    }
-    g = g % 255;
-    int b = 0;
-    for (var i in numbers) {
-      b = b * i + i;
-    }
-    b = b % 255;
-    return Color.fromRGBO(r, g, b, 0.75);
-  }
-
-  Color _getColorTextFromBackground(Color background) {
-    List<int> values = [
-      (background.r * 255).round(),
-      (background.g * 255).round(),
-      (background.b * 255).round(),
-    ];
-    int valueAbove128 = 0;
-    for (var value in values) {
-      if (value > 127) {
-        valueAbove128++;
-      }
-    }
-
-    if (valueAbove128 < 2) {
-      return Colors.white;
-    } else {
-      return Colors.black;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     gl.refreshSearch = (Function x) {
@@ -774,8 +735,8 @@ class _SearchMenu extends State<SearchMenu> {
                             descriptionDeResultat = descriptionDeResultat
                                 .replaceAll("Belgique", "");
                           }
-                          Color boxColor = _getColorFromName(typeDeResultat!);
-                          Color textColor = _getColorTextFromBackground(
+                          Color boxColor = getColorFromName(typeDeResultat!);
+                          Color textColor = getColorTextFromBackground(
                             boxColor,
                           );
                           _searchResults.add(
@@ -2489,7 +2450,9 @@ class PopupOnlineMapMenu {
           ],
         );
       },
-    );
+    ).whenComplete(() {
+      after();
+    });
   }
 }
 
@@ -2519,7 +2482,7 @@ class PopupLayerSwitcher {
   PopupLayerSwitcher(BuildContext context, Function after) {
     showDialog(
       barrierDismissible: true,
-      barrierColor: Colors.black.withAlpha(100),
+      barrierColor: Colors.transparent,
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
@@ -2529,18 +2492,9 @@ class PopupLayerSwitcher {
           insetPadding: EdgeInsets.all(0),
           buttonPadding: EdgeInsets.all(0),
           iconPadding: EdgeInsets.all(0),
-          backgroundColor: Color.fromRGBO(0, 0, 0, 0.0),
+          backgroundColor: Color.fromRGBO(0, 0, 0, 0.5),
           surfaceTintColor: Colors.transparent,
           shadowColor: Colors.transparent,
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                "Changez les cartes affichées",
-                textAlign: TextAlign.justify,
-              ),
-            ],
-          ),
           content: Theme(
             data: Theme.of(context).copyWith(
               canvasColor: Colors.transparent,
@@ -2549,15 +2503,75 @@ class PopupLayerSwitcher {
             child: SizedBox(
               width: MediaQuery.of(context).size.width * .80,
               height:
-                  MediaQuery.of(context).size.height * .25 +
+                  MediaQuery.of(context).size.height * .05 +
+                  MediaQuery.of(context).size.height * .05 +
+                  MediaQuery.of(context).size.height * .05 +
+                  MediaQuery.of(context).size.height * .18 +
+                  MediaQuery.of(context).size.height * .3 +
                   MediaQuery.of(context).size.width * .15,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   SizedBox(
                     width: MediaQuery.of(context).size.width * .80,
-                    height: MediaQuery.of(context).size.height * .25,
+                    height: MediaQuery.of(context).size.height * .04,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          "Controlez les couches visibles",
+                          textAlign: TextAlign.justify,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: MediaQuery.of(context).size.height * .025,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width * .80,
+                    height: MediaQuery.of(context).size.height * .18,
+                    child: UpperLayerControl(),
+                  ),
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width * .80,
+                    height: MediaQuery.of(context).size.height * .04,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          "Changez les cartes affichées",
+                          textAlign: TextAlign.justify,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: MediaQuery.of(context).size.height * .025,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width * .80,
+                    height: MediaQuery.of(context).size.height * .3,
                     child: LayerSwitcher(),
+                  ),
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width * .80,
+                    height: MediaQuery.of(context).size.height * .04,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          "Catalogues des couches",
+                          textAlign: TextAlign.justify,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: MediaQuery.of(context).size.height * .025,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                   SizedBox(
                     width: MediaQuery.of(context).size.width * .80,
@@ -2572,7 +2586,9 @@ class PopupLayerSwitcher {
           actions: [],
         );
       },
-    );
+    ).whenComplete(() {
+      after();
+    });
   }
 }
 
@@ -2583,6 +2599,8 @@ class ViewControl extends StatefulWidget {
 }
 
 class _ViewControl extends State<ViewControl> {
+  bool _modeViewOfflineMap = false;
+  bool _modeViewOnlineMap = false;
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -2593,15 +2611,19 @@ class _ViewControl extends State<ViewControl> {
           height: MediaQuery.of(context).size.width * .15,
           child: FloatingActionButton(
             backgroundColor:
-                gl.modeMapShowSearchMarker ? gl.colorAgroBioTech : Colors.grey,
+                _modeViewOfflineMap ? gl.colorAgroBioTech : Colors.grey,
             onPressed: () {
               setState(() {
-                gl.modeMapShowSearchMarker = !gl.modeMapShowSearchMarker;
+                _modeViewOfflineMap = !_modeViewOfflineMap;
               });
-              gl.refreshMap(() {});
+              PopupOfflineMenu(gl.notificationContext!, () {
+                setState(() {
+                  _modeViewOfflineMap = !_modeViewOfflineMap;
+                });
+              });
             },
             child: Icon(
-              Icons.search_off,
+              Icons.download_for_offline,
               size: MediaQuery.of(context).size.width * .13,
               color: Colors.black,
             ),
@@ -2612,40 +2634,203 @@ class _ViewControl extends State<ViewControl> {
           height: MediaQuery.of(context).size.width * .15,
           child: FloatingActionButton(
             backgroundColor:
-                gl.modeMapFirstTileLayerTrancparancy
-                    ? gl.colorAgroBioTech
-                    : Colors.grey,
+                _modeViewOnlineMap ? gl.colorAgroBioTech : Colors.grey,
             onPressed: () {
               setState(() {
-                gl.modeMapFirstTileLayerTrancparancy =
-                    !gl.modeMapFirstTileLayerTrancparancy;
+                _modeViewOnlineMap = !_modeViewOnlineMap;
               });
-              gl.refreshMap(() {});
+              PopupOnlineMapMenu(gl.notificationContext!, () {
+                setState(() {
+                  _modeViewOnlineMap = false;
+                });
+              });
             },
             child: Icon(
-              Icons.opacity,
+              Icons.layers_outlined,
               size: MediaQuery.of(context).size.width * .13,
               color: Colors.black,
             ),
           ),
         ),
-        SizedBox(
-          width: MediaQuery.of(context).size.width * .15,
-          height: MediaQuery.of(context).size.width * .15,
-          child: FloatingActionButton(
-            backgroundColor:
-                gl.modeMapShowPolygons ? gl.colorAgroBioTech : Colors.grey,
-            onPressed: () {
-              setState(() {
-                gl.modeMapShowPolygons = !gl.modeMapShowPolygons;
-              });
-              gl.refreshMap(() {});
-            },
-            child: Icon(
-              Icons.hexagon_outlined,
-              size: MediaQuery.of(context).size.width * .13,
-              color: Colors.black,
-            ),
+      ],
+    );
+  }
+}
+
+class UpperLayerControl extends StatefulWidget {
+  const UpperLayerControl({super.key});
+  @override
+  State<UpperLayerControl> createState() => _UpperLayerControl();
+}
+
+class _UpperLayerControl extends State<UpperLayerControl> {
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Card(
+          margin: EdgeInsets.all(5),
+          color: Colors.white,
+          shadowColor: const Color.fromARGB(255, 44, 44, 120),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              TextButton(
+                style: ButtonStyle(
+                  minimumSize: WidgetStateProperty<Size>.fromMap(
+                    <WidgetStatesConstraint, Size>{
+                      WidgetState.any: Size(
+                        MediaQuery.of(context).size.width * .45,
+                        MediaQuery.of(context).size.height * .05,
+                      ),
+                    },
+                  ),
+                ),
+                onPressed: () {},
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 3.0),
+                  constraints: BoxConstraints(
+                    maxHeight: MediaQuery.of(context).size.height * .05,
+                    minHeight: MediaQuery.of(context).size.height * .05,
+                    maxWidth: MediaQuery.of(context).size.width * 0.45,
+                    minWidth: MediaQuery.of(context).size.width * 0.45,
+                  ),
+                  child: Text(
+                    "Marqueurs des lieux cherchés",
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: MediaQuery.of(context).size.height * .018,
+                    ),
+                  ),
+                ),
+              ),
+              Container(
+                constraints: BoxConstraints(
+                  maxHeight: MediaQuery.of(context).size.width * 0.1,
+                  minHeight: MediaQuery.of(context).size.width * 0.1,
+                  maxWidth: MediaQuery.of(context).size.width * 0.17,
+                  minWidth: MediaQuery.of(context).size.width * 0.17,
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      constraints: BoxConstraints(
+                        maxHeight: MediaQuery.of(context).size.width * 0.1,
+                        minHeight: MediaQuery.of(context).size.width * 0.1,
+                        maxWidth: MediaQuery.of(context).size.width * 0.15,
+                        minWidth: MediaQuery.of(context).size.width * 0.15,
+                      ),
+                      color: Colors.white,
+                      padding: const EdgeInsets.symmetric(),
+                      child: SizedBox(
+                        width: MediaQuery.of(context).size.width * .1,
+                        height: MediaQuery.of(context).size.width * .1,
+                        child: FloatingActionButton(
+                          backgroundColor:
+                              gl.modeMapShowSearchMarker
+                                  ? gl.colorAgroBioTech
+                                  : Colors.grey,
+                          onPressed: () {
+                            setState(() {
+                              gl.modeMapShowSearchMarker =
+                                  !gl.modeMapShowSearchMarker;
+                            });
+                            gl.refreshMap(() {});
+                          },
+                          child: Icon(
+                            Icons.remove_red_eye,
+                            size: MediaQuery.of(context).size.width * .1,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+        Card(
+          margin: EdgeInsets.all(5),
+          color: Colors.white,
+          shadowColor: const Color.fromARGB(255, 44, 44, 120),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              TextButton(
+                style: ButtonStyle(
+                  minimumSize: WidgetStateProperty<Size>.fromMap(
+                    <WidgetStatesConstraint, Size>{
+                      WidgetState.any: Size(
+                        MediaQuery.of(context).size.width * .45,
+                        MediaQuery.of(context).size.height * .05,
+                      ),
+                    },
+                  ),
+                ),
+                onPressed: () {},
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 3.0),
+                  constraints: BoxConstraints(
+                    maxHeight: MediaQuery.of(context).size.height * .05,
+                    minHeight: MediaQuery.of(context).size.height * .05,
+                    maxWidth: MediaQuery.of(context).size.width * 0.45,
+                    minWidth: MediaQuery.of(context).size.width * 0.45,
+                  ),
+                  child: Text(
+                    "Couche des polygones",
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: MediaQuery.of(context).size.height * .018,
+                    ),
+                  ),
+                ),
+              ),
+              Container(
+                constraints: BoxConstraints(
+                  maxHeight: MediaQuery.of(context).size.width * 0.1,
+                  minHeight: MediaQuery.of(context).size.width * 0.1,
+                  maxWidth: MediaQuery.of(context).size.width * 0.17,
+                  minWidth: MediaQuery.of(context).size.width * 0.17,
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      constraints: BoxConstraints(
+                        maxHeight: MediaQuery.of(context).size.width * 0.1,
+                        minHeight: MediaQuery.of(context).size.width * 0.1,
+                        maxWidth: MediaQuery.of(context).size.width * 0.15,
+                        minWidth: MediaQuery.of(context).size.width * 0.15,
+                      ),
+                      color: Colors.white,
+                      padding: const EdgeInsets.symmetric(),
+                      child: SizedBox(
+                        width: MediaQuery.of(context).size.width * .1,
+                        height: MediaQuery.of(context).size.width * .1,
+                        child: FloatingActionButton(
+                          backgroundColor:
+                              gl.modeMapShowPolygons
+                                  ? gl.colorAgroBioTech
+                                  : Colors.grey,
+                          onPressed: () {
+                            setState(() {
+                              gl.modeMapShowPolygons = !gl.modeMapShowPolygons;
+                            });
+                            gl.refreshMap(() {});
+                          },
+                          child: Icon(
+                            Icons.remove_red_eye,
+                            size: MediaQuery.of(context).size.width * .1,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ),
       ],
@@ -2688,114 +2873,184 @@ class _LayerSwitcher extends State<LayerSwitcher> {
             return Card(
               margin: EdgeInsets.all(5),
               key: Key('$i+listOfThree'),
-              color: Colors.grey,
-              shadowColor: const Color.fromARGB(255, 44, 44, 44),
+              color: Colors.white,
+              shadowColor: const Color.fromARGB(255, 44, 44, 120),
               child: ReorderableDragStartListener(
                 index: i,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    TextButton(
-                      style: ButtonStyle(
-                        minimumSize: WidgetStateProperty<Size>.fromMap(
-                          <WidgetStatesConstraint, Size>{
-                            WidgetState.any: Size(
-                              MediaQuery.of(context).size.width * .45,
-                              MediaQuery.of(context).size.width * .1,
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        TextButton(
+                          style: ButtonStyle(
+                            maximumSize: WidgetStateProperty<Size>.fromMap(
+                              <WidgetStatesConstraint, Size>{
+                                WidgetState.any: Size(
+                                  MediaQuery.of(context).size.width * .45,
+                                  MediaQuery.of(context).size.height * .1,
+                                ),
+                              },
                             ),
+                          ),
+                          onPressed: () {
+                            PopupMapSelectionMenu(
+                              gl.notificationContext!,
+                              setState,
+                            );
                           },
-                        ),
-                      ),
-                      onPressed: () {
-                        PopupMapSelectionMenu(
-                          gl.notificationContext!,
-                          setState,
-                        );
-                      },
-                      child: Container(
-                        padding: EdgeInsets.all(3),
-                        constraints: BoxConstraints(
-                          maxHeight: MediaQuery.of(context).size.width * 0.12,
-                          minHeight: MediaQuery.of(context).size.width * 0.12,
-                          maxWidth: MediaQuery.of(context).size.width * 0.45,
-                          minWidth: MediaQuery.of(context).size.width * 0.45,
-                        ),
-                        child: Text(
-                          gl.dico
-                              .getLayerBase(
-                                gl.interfaceSelectedLayerKeys[i].mCode,
-                              )
-                              .mNom,
-                          style: TextStyle(color: Colors.black),
-                        ),
-                      ),
-                    ),
-                    Container(
-                      constraints: BoxConstraints(
-                        maxHeight: MediaQuery.of(context).size.width * 0.1,
-                        minHeight: MediaQuery.of(context).size.width * 0.1,
-                        maxWidth: MediaQuery.of(context).size.width * 0.2,
-                        minWidth: MediaQuery.of(context).size.width * 0.2,
-                      ),
-                      child: Row(
-                        children: [
-                          Container(
-                            color: Colors.white,
+                          child: Container(
+                            padding: EdgeInsets.symmetric(horizontal: 3.0),
                             constraints: BoxConstraints(
                               maxHeight:
-                                  MediaQuery.of(context).size.width * 0.12,
-                              minHeight:
-                                  MediaQuery.of(context).size.width * 0.12,
-                              maxWidth: MediaQuery.of(context).size.width * 0.1,
-                              minWidth: MediaQuery.of(context).size.width * 0.1,
+                                  MediaQuery.of(context).size.height * .05,
+                              maxWidth:
+                                  MediaQuery.of(context).size.width * 0.45,
+                              minWidth:
+                                  MediaQuery.of(context).size.width * 0.45,
                             ),
-                            padding: const EdgeInsets.symmetric(),
-                            child: Image.asset(
+                            child: Text(
                               gl.dico
                                   .getLayerBase(
                                     gl.interfaceSelectedLayerKeys[i].mCode,
                                   )
-                                  .mLogoAttributionFile,
+                                  .mNom,
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize:
+                                    MediaQuery.of(context).size.height * .018,
+                              ),
                             ),
                           ),
-                          gl.interfaceSelectedLayerKeys[i].offline
-                              ? Container(
+                        ),
+                        Container(
+                          constraints: BoxConstraints(
+                            maxHeight: MediaQuery.of(context).size.width * 0.1,
+                            minHeight: MediaQuery.of(context).size.width * 0.1,
+                            maxWidth: MediaQuery.of(context).size.width * 0.22,
+                            minWidth: MediaQuery.of(context).size.width * 0.22,
+                          ),
+                          child: Row(
+                            children: [
+                              Container(
+                                color: Colors.white,
                                 constraints: BoxConstraints(
                                   maxHeight:
-                                      MediaQuery.of(context).size.width * 0.1,
+                                      MediaQuery.of(context).size.width * 0.12,
                                   minHeight:
-                                      MediaQuery.of(context).size.width * 0.1,
+                                      MediaQuery.of(context).size.width * 0.12,
                                   maxWidth:
                                       MediaQuery.of(context).size.width * 0.1,
                                   minWidth:
                                       MediaQuery.of(context).size.width * 0.1,
                                 ),
                                 padding: const EdgeInsets.symmetric(),
-                                child: Icon(
-                                  Icons.save,
-                                  size: MediaQuery.of(context).size.width * 0.1,
-                                ),
-                              )
-                              : Container(
-                                constraints: BoxConstraints(
-                                  maxHeight:
-                                      MediaQuery.of(context).size.width * 0.1,
-                                  minHeight:
-                                      MediaQuery.of(context).size.width * 0.1,
-                                  maxWidth:
-                                      MediaQuery.of(context).size.width * 0.1,
-                                  minWidth:
-                                      MediaQuery.of(context).size.width * 0.1,
-                                ),
-                                padding: const EdgeInsets.symmetric(),
-                                child: Icon(
-                                  Icons.wifi,
-                                  size: MediaQuery.of(context).size.width * 0.1,
+                                child: Image.asset(
+                                  gl.dico
+                                      .getLayerBase(
+                                        gl.interfaceSelectedLayerKeys[i].mCode,
+                                      )
+                                      .mLogoAttributionFile,
                                 ),
                               ),
+                              gl.interfaceSelectedLayerKeys[i].offline
+                                  ? Container(
+                                    constraints: BoxConstraints(
+                                      maxHeight:
+                                          MediaQuery.of(context).size.width *
+                                          0.1,
+                                      minHeight:
+                                          MediaQuery.of(context).size.width *
+                                          0.1,
+                                      maxWidth:
+                                          MediaQuery.of(context).size.width *
+                                          0.1,
+                                      minWidth:
+                                          MediaQuery.of(context).size.width *
+                                          0.1,
+                                    ),
+                                    padding: const EdgeInsets.symmetric(),
+                                    child: Icon(
+                                      Icons.save,
+                                      size:
+                                          MediaQuery.of(context).size.width *
+                                          0.1,
+                                    ),
+                                  )
+                                  : Container(
+                                    constraints: BoxConstraints(
+                                      maxHeight:
+                                          MediaQuery.of(context).size.width *
+                                          0.1,
+                                      minHeight:
+                                          MediaQuery.of(context).size.width *
+                                          0.1,
+                                      maxWidth:
+                                          MediaQuery.of(context).size.width *
+                                          0.1,
+                                      minWidth:
+                                          MediaQuery.of(context).size.width *
+                                          0.1,
+                                    ),
+                                    padding: const EdgeInsets.symmetric(),
+                                    child: Icon(
+                                      Icons.wifi,
+                                      size:
+                                          MediaQuery.of(context).size.width *
+                                          0.1,
+                                    ),
+                                  ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    if (i == 0)
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            constraints: BoxConstraints(
+                              maxHeight:
+                                  MediaQuery.of(context).size.height * 0.05,
+                              maxWidth: MediaQuery.of(context).size.width * 0.4,
+                            ),
+                            child: TextButton(
+                              style: ButtonStyle(
+                                backgroundColor:
+                                    gl.modeMapFirstTileLayerTrancparancy
+                                        ? WidgetStateProperty<Color>.fromMap(<
+                                          WidgetStatesConstraint,
+                                          Color
+                                        >{WidgetState.any: gl.colorAgroBioTech})
+                                        : WidgetStateProperty<Color>.fromMap(
+                                          <WidgetStatesConstraint, Color>{
+                                            WidgetState.any: Color.fromARGB(
+                                              255,
+                                              234,
+                                              234,
+                                              234,
+                                            ),
+                                          },
+                                        ),
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  gl.modeMapFirstTileLayerTrancparancy =
+                                      !gl.modeMapFirstTileLayerTrancparancy;
+                                });
+                                gl.refreshMap(() {});
+                              },
+                              child: Text(
+                                gl.modeMapFirstTileLayerTrancparancy
+                                    ? "Transparence 50%"
+                                    : "Transparence 0%",
+                                style: TextStyle(color: Colors.black),
+                              ),
+                            ),
+                          ),
                         ],
                       ),
-                    ),
                   ],
                 ),
               ),
@@ -2950,7 +3205,9 @@ class PopupOfflineMenu {
           actions: [],
         );
       },
-    );
+    ).whenComplete(() {
+      after();
+    });
   }
 }
 
