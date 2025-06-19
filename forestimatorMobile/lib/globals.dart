@@ -61,9 +61,6 @@ proj4.Point epsg4326ToEpsg31370(proj4.Point spPoint) {
 
 late DicoAptProvider dico;
 
-String basePathbranchB = "catalogue";
-String basePathbranchC = "offline";
-
 Memory? memory;
 
 BuildContext? notificationContext;
@@ -76,7 +73,7 @@ List<String> onboardLog = [forestimatorMobileVersion];
 int lengthLog = 1;
 @override
 void print(dynamic it) {
-  onboardLog.add("${DateTime.now().toString()} ${it.toString()}");
+  onboardLog.add("${DateTime.now().toString()}\n${it.toString()}");
 }
 
 // -1 means that no marker is selected
