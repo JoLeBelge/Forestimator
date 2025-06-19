@@ -23,7 +23,7 @@ class Ess {
 
   String getFicheRoute({bool complete = false}) {
     if (complete) {
-      return "/${gl.basePathbranchB}/fiche-esssence/$mCode";
+      return "/fiche-esssence/$mCode";
     }
     return 'fiche-esssence/$mCode';
   }

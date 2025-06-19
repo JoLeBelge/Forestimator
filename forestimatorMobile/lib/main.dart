@@ -252,7 +252,7 @@ class _MyApp extends State<MyApp> {
                     return GoRoute(
                       path: "${item.getFicheRoute()}/:currentPage",
                       name: item.mCode,
-                      builder: //Done
+                      builder:
                           (context, state) =>
                               (Platform.isAndroid || Platform.isIOS)
                                   ? PDFScreen(

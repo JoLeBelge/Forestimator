@@ -10,7 +10,8 @@ import 'package:fforestimator/tools/customLayer/polygon_layer.dart';
 import 'package:fforestimator/tools/handle_permissions.dart';
 import 'package:fforestimator/tools/handle_permissions.dart' as permissions;
 import 'package:fforestimator/tools/layer_downloader.dart';
-import 'package:fforestimator/tools/pretty_print_results.dart';
+import 'package:fforestimator/tools/pretty_print_nominatim_results.dart';
+import 'package:fforestimator/tools/pretty_print_polygon_results.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:http/http.dart' as http;
@@ -308,7 +309,7 @@ class _DrawnLayerMenu extends State<DrawnLayerMenu> {
                       i == gl.selectedPolygonLayer
                           ? WidgetStateProperty<Size>.fromMap(
                             <WidgetStatesConstraint, Size>{
-                              WidgetState.any: Size(200, 180),
+                              WidgetState.any: Size(200, 160),
                             },
                           )
                           : WidgetStateProperty<Size>.fromMap(
@@ -337,203 +338,195 @@ class _DrawnLayerMenu extends State<DrawnLayerMenu> {
                             gl.modeMapShowPolygons = true;
                           });
                         },
-                child: Card(
-                  surfaceTintColor: Colors.transparent,
-                  shadowColor: Colors.transparent,
-                  color:
-                      i == gl.selectedPolygonLayer
-                          ? gl.polygonLayers[i].colorInside.withAlpha(255)
-                          : gl.polygonLayers[i].colorInside.withAlpha(150),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      IconButton(
-                        onPressed:
-                            i == gl.selectedPolygonLayer
-                                ? () {
-                                  PopupDoYouReally(
-                                    gl.notificationContext!,
-                                    () {
-                                      setState(() {
-                                        //remove polygon
-                                        if (i > 0) {
-                                          gl.polygonLayers.removeAt(i);
-                                          gl.selectedPolygonLayer--;
-                                        } else if (i == 0 &&
-                                            gl.polygonLayers.isNotEmpty) {
-                                          gl.polygonLayers.removeAt(i);
-                                        }
-                                      });
-                                      gl.saveChangesToPolygoneToPrefs = true;
-                                    },
-                                    "Message",
-                                    "\nVoulez vous vraiment supprimer ${gl.polygonLayers[i].name}?\n",
-                                  );
-                                }
-                                : () {
-                                  setState(() {});
-                                },
-                        icon: Icon(
-                          Icons.delete_forever,
-                          color:
-                              gl.selectedPolygonLayer == i ? active : inactive,
-                          size: gl.selectedPolygonLayer == i ? 30 : 20,
-                        ),
-                      ),
-                      Column(
-                        children: [
-                          i == gl.selectedPolygonLayer
-                              ? TextButton(
-                                child: Text(
-                                  gl.polygonLayers[i].name,
-                                  style: TextStyle(color: Colors.black),
-                                  textScaler: TextScaler.linear(1.1),
-                                ),
-                                onPressed: () {
-                                  PopupNameIntroducer(
-                                    context,
-                                    gl.polygonLayers[i].name,
-                                    (String nameIt) {
-                                      if (nameIt.length > 10) {
-                                        nameIt = nameIt.substring(0, 10);
-                                      }
-                                      //change name
-                                      setState(() {
-                                        gl.polygonLayers[i].name = nameIt;
+                child: ReorderableDragStartListener(
+                  index: i,
+                  child: Card(
+                    surfaceTintColor: Colors.transparent,
+                    shadowColor: Colors.transparent,
+                    color:
+                        i == gl.selectedPolygonLayer
+                            ? gl.polygonLayers[i].colorInside.withAlpha(255)
+                            : Colors.grey.withAlpha(100),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        IconButton(
+                          onPressed:
+                              i == gl.selectedPolygonLayer
+                                  ? () {
+                                    PopupDoYouReally(
+                                      gl.notificationContext!,
+                                      () {
+                                        setState(() {
+                                          //remove polygon
+                                          if (i > 0) {
+                                            gl.polygonLayers.removeAt(i);
+                                            gl.selectedPolygonLayer--;
+                                          } else if (i == 0 &&
+                                              gl.polygonLayers.isNotEmpty) {
+                                            gl.polygonLayers.removeAt(i);
+                                          }
+                                        });
                                         gl.saveChangesToPolygoneToPrefs = true;
-                                      });
-                                    },
-                                    () {
-                                      setState(() {});
-                                    },
-                                  );
-                                },
-                              )
-                              : Text(
-                                gl.polygonLayers[i].name,
-                                style: TextStyle(color: Colors.blueGrey),
-                                textScaler: TextScaler.linear(1.0),
-                              ),
-
-                          i == gl.selectedPolygonLayer
-                              ? Text(
-                                "${(gl.polygonLayers[i].area / 100).round() / 100} Ha",
-                                textScaler: TextScaler.linear(1.2),
-                              )
-                              : Text(
-                                "${(gl.polygonLayers[i].area / 100).round() / 100} Ha",
-                                textScaler: TextScaler.linear(1.0),
-                              ),
-                          i == gl.selectedPolygonLayer
-                              ? Text(
-                                "${(gl.polygonLayers[i].perimeter).round() / 1000} km",
-                                textScaler: TextScaler.linear(1.2),
-                              )
-                              : Text(
-                                "${(gl.polygonLayers[i].perimeter).round() / 1000} km",
-                                textScaler: TextScaler.linear(1.0),
-                              ),
-                        ],
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Column(
-                            children: [
-                              IconButton(
-                                onPressed:
-                                    gl.selectedPolygonLayer == i
-                                        ? () {
-                                          PopupColorChooser(
-                                            gl.polygonLayers[i].colorInside,
-                                            gl.notificationContext!,
-                                            //change color
-                                            (Color col) {
-                                              setState(() {
-                                                gl.polygonLayers[i]
-                                                    .setColorInside(col);
-                                                gl.polygonLayers[i]
-                                                    .setColorLine(
-                                                      Color.fromRGBO(
-                                                        (col.r * 255).round(),
-                                                        (col.g * 255).round(),
-                                                        (col.b * 255).round(),
-                                                        1.0,
-                                                      ),
-                                                    );
-                                              });
-                                              gl.saveChangesToPolygoneToPrefs =
-                                                  true;
-                                            },
-                                            () {},
-                                          );
+                                      },
+                                      "Message",
+                                      "\nVoulez vous vraiment supprimer ${gl.polygonLayers[i].name}?\n",
+                                    );
+                                  }
+                                  : () {
+                                    setState(() {});
+                                  },
+                          icon: Icon(
+                            Icons.delete_forever,
+                            color:
+                                gl.selectedPolygonLayer == i
+                                    ? active
+                                    : inactive,
+                            size: gl.selectedPolygonLayer == i ? 30 : 20,
+                          ),
+                        ),
+                        Column(
+                          children: [
+                            i == gl.selectedPolygonLayer
+                                ? TextButton(
+                                  child: Text(
+                                    gl.polygonLayers[i].name,
+                                    style: TextStyle(color: Colors.black),
+                                    textScaler: TextScaler.linear(1.1),
+                                  ),
+                                  onPressed: () {
+                                    PopupNameIntroducer(
+                                      context,
+                                      gl.polygonLayers[i].name,
+                                      (String nameIt) {
+                                        if (nameIt.length > 10) {
+                                          nameIt = nameIt.substring(0, 10);
                                         }
-                                        : () {},
-                                icon: Icon(
-                                  Icons.color_lens,
-                                  color:
-                                      gl.selectedPolygonLayer == i
-                                          ? active
-                                          : inactive,
-                                  size: gl.selectedPolygonLayer == i ? 30 : 20,
+                                        //change name
+                                        setState(() {
+                                          gl.polygonLayers[i].name = nameIt;
+                                          gl.saveChangesToPolygoneToPrefs =
+                                              true;
+                                        });
+                                      },
+                                      () {
+                                        setState(() {});
+                                      },
+                                    );
+                                  },
+                                )
+                                : Text(
+                                  gl.polygonLayers[i].name,
+                                  style: TextStyle(color: Colors.blueGrey),
+                                  textScaler: TextScaler.linear(1.0),
                                 ),
-                              ),
-                              IconButton(
-                                onPressed:
-                                    gl.selectedPolygonLayer == i
-                                        ? () async {
-                                          if (await gl.polygonLayers[i]
-                                              .onlineSurfaceAnalysis()) {
-                                            PopupResultsMenu(
+
+                            i == gl.selectedPolygonLayer
+                                ? Text(
+                                  "${(gl.polygonLayers[i].area / 100).round() / 100} Ha",
+                                  textScaler: TextScaler.linear(1.2),
+                                )
+                                : Text(
+                                  "${(gl.polygonLayers[i].area / 100).round() / 100} Ha",
+                                  textScaler: TextScaler.linear(1.0),
+                                ),
+                            i == gl.selectedPolygonLayer
+                                ? Text(
+                                  "${(gl.polygonLayers[i].perimeter).round() / 1000} km",
+                                  textScaler: TextScaler.linear(1.2),
+                                )
+                                : Text(
+                                  "${(gl.polygonLayers[i].perimeter).round() / 1000} km",
+                                  textScaler: TextScaler.linear(1.0),
+                                ),
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Column(
+                              children: [
+                                IconButton(
+                                  onPressed:
+                                      gl.selectedPolygonLayer == i
+                                          ? () {
+                                            PopupColorChooser(
+                                              gl.polygonLayers[i].colorInside,
                                               gl.notificationContext!,
-                                              gl
-                                                  .polygonLayers[gl
-                                                      .selectedPolygonLayer]
-                                                  .decodedJson,
-                                              () {
-                                                setState(() {});
-                                                (() {});
-                                              },
-                                              () {
-                                                setState(() {});
-                                                (() {
-                                                  //_settingsMenu = false;
+                                              //change color
+                                              (Color col) {
+                                                setState(() {
+                                                  gl.polygonLayers[i]
+                                                      .setColorInside(col);
+                                                  gl.polygonLayers[i]
+                                                      .setColorLine(
+                                                        Color.fromRGBO(
+                                                          (col.r * 255).round(),
+                                                          (col.g * 255).round(),
+                                                          (col.b * 255).round(),
+                                                          1.0,
+                                                        ),
+                                                      );
                                                 });
+                                                gl.saveChangesToPolygoneToPrefs =
+                                                    true;
                                               },
+                                              () {},
                                             );
                                           }
-                                        }
-                                        : () {},
-                                icon: Icon(
-                                  Icons.analytics,
-                                  color:
-                                      gl.selectedPolygonLayer == i
-                                          ? active
-                                          : inactive,
-                                  size: gl.selectedPolygonLayer == i ? 30 : 20,
+                                          : () {},
+                                  icon: Icon(
+                                    Icons.color_lens,
+                                    color:
+                                        gl.selectedPolygonLayer == i
+                                            ? active
+                                            : inactive,
+                                    size:
+                                        gl.selectedPolygonLayer == i ? 30 : 20,
+                                  ),
                                 ),
-                              ),
-                            ],
-                          ),
-                          Container(
-                            width: 48,
-                            height: 48,
-                            padding: const EdgeInsets.symmetric(),
-                            child: ReorderableDragStartListener(
-                              index: i,
-                              child: Icon(
-                                Icons.drag_indicator,
-                                size: 28,
-                                color:
-                                    gl.selectedPolygonLayer == i
-                                        ? active
-                                        : inactive,
-                              ),
+                                IconButton(
+                                  onPressed:
+                                      gl.selectedPolygonLayer == i
+                                          ? () async {
+                                            if (await gl.polygonLayers[i]
+                                                .onlineSurfaceAnalysis()) {
+                                              PopupResultsMenu(
+                                                gl.notificationContext!,
+                                                gl
+                                                    .polygonLayers[gl
+                                                        .selectedPolygonLayer]
+                                                    .decodedJson,
+                                                () {
+                                                  setState(() {});
+                                                  (() {});
+                                                },
+                                                () {
+                                                  setState(() {});
+                                                  (() {
+                                                    //_settingsMenu = false;
+                                                  });
+                                                },
+                                              );
+                                            }
+                                          }
+                                          : () {},
+                                  icon: Icon(
+                                    Icons.analytics,
+                                    color:
+                                        gl.selectedPolygonLayer == i
+                                            ? active
+                                            : inactive,
+                                    size:
+                                        gl.selectedPolygonLayer == i ? 30 : 20,
+                                  ),
+                                ),
+                              ],
                             ),
-                          ),
-                        ],
-                      ),
-                    ],
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -541,15 +534,14 @@ class _DrawnLayerMenu extends State<DrawnLayerMenu> {
             [
               TextButton(
                 style: ButtonStyle(),
-                key: Key('autsch-5'),
+                key: Key('autsch-5-addPoly'),
                 child: Card(
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: [Icon(Icons.add)],
+                    children: [Icon(Icons.add, size: 30)],
                   ),
                 ),
                 onPressed: () {
-                  //add polygon
                   setState(() {
                     gl.polygonLayers.add(PolygonLayer(polygonName: "Nouveau"));
                     gl.selectedPolygonLayer = gl.polygonLayers.length - 1;
@@ -587,7 +579,7 @@ class PopupSearchMenu {
           title: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text("Recherche en ligne", textAlign: TextAlign.justify),
+              Text("Recherche d'un lieu", textAlign: TextAlign.justify),
             ],
           ),
           content: Theme(
@@ -642,6 +634,46 @@ class _SearchMenu extends State<SearchMenu> {
 
   int previousLength = 0;
 
+  Color _getColorFromName(String name) {
+    List<int> numbers = name.codeUnits;
+    int r = 0;
+    for (var i in numbers) {
+      r += i;
+    }
+    r = r % 255;
+    int g = 1;
+    for (var i in numbers) {
+      g = g * i;
+    }
+    g = g % 255;
+    int b = 0;
+    for (var i in numbers) {
+      b = b * i + i;
+    }
+    b = b % 255;
+    return Color.fromRGBO(r, g, b, 0.75);
+  }
+
+  Color _getColorTextFromBackground(Color background) {
+    List<int> values = [
+      (background.r * 255).round(),
+      (background.g * 255).round(),
+      (background.b * 255).round(),
+    ];
+    int valueAbove128 = 0;
+    for (var value in values) {
+      if (value > 127) {
+        valueAbove128++;
+      }
+    }
+
+    if (valueAbove128 < 2) {
+      return Colors.white;
+    } else {
+      return Colors.black;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     gl.refreshSearch = (Function x) {
@@ -656,14 +688,14 @@ class _SearchMenu extends State<SearchMenu> {
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: ListView(
-        padding: const EdgeInsets.symmetric(horizontal: 2),
+        padding: const EdgeInsets.symmetric(horizontal: 5),
         children:
             [
               TextButton(
-                style: ButtonStyle(),
                 key: Key('autsch-5'),
                 child: Card(
                   child: TextFormField(
+                    autocorrect: false,
                     onChanged: (that) async {
                       if (that.length < previousLength) {
                         previousLength = that.length;
@@ -683,7 +715,9 @@ class _SearchMenu extends State<SearchMenu> {
                             (jsonDecode(response.body) as List)
                                 .cast<Map<String, dynamic>>());
                       } catch (e) {
-                        gl.print("Error with answer from gecoding service! $e");
+                        gl.print(
+                          "Error with response from gecoding service! $e",
+                        );
                         (decodedJson =
                             (jsonDecode(testNominatimJsonResult) as List)
                                 .cast<Map<String, dynamic>>());
@@ -692,7 +726,6 @@ class _SearchMenu extends State<SearchMenu> {
                       _searchResults.clear();
                       gl.refreshSearch(() {
                         gl.selectedSearchMarker = -1;
-                        gl.print("Selected searchMarker reset");
                         int i = 0;
                         for (var entry in decodedJson) {
                           gl.poiMarkerList.add(
@@ -717,6 +750,34 @@ class _SearchMenu extends State<SearchMenu> {
                               postcode: entry['address']['postcode'] ?? "",
                             ),
                           );
+                          String? typeDeResultat =
+                              prettyPrintNominatimResults[entry['addresstype']];
+                          if (typeDeResultat == null) {
+                            typeDeResultat = entry['addresstype'];
+                            gl.print(
+                              "Error: not a translated addresstype: ${entry['addresstype']}",
+                            );
+                          }
+                          String? descriptionDeResultat = entry['display_name'];
+                          if (descriptionDeResultat == null) {
+                            descriptionDeResultat = "Erreur du serveur";
+                            gl.print(
+                              "Erreur du serveur geocoding : ${entry['display_name']}",
+                            );
+                          } else {
+                            descriptionDeResultat = descriptionDeResultat
+                                .replaceAll(", België /", "");
+                            descriptionDeResultat = descriptionDeResultat
+                                .replaceAll("/ Belgien", "");
+                            descriptionDeResultat = descriptionDeResultat
+                                .replaceAll("Wallonie, ", "");
+                            descriptionDeResultat = descriptionDeResultat
+                                .replaceAll("Belgique", "");
+                          }
+                          Color boxColor = _getColorFromName(typeDeResultat!);
+                          Color textColor = _getColorTextFromBackground(
+                            boxColor,
+                          );
                           _searchResults.add(
                             TextButton(
                               onPressed: () {
@@ -732,32 +793,17 @@ class _SearchMenu extends State<SearchMenu> {
                               },
                               child: Card(
                                 margin: EdgeInsets.all(10),
-                                color: Color.fromRGBO(200, 255, 150, 0.75),
+                                color: boxColor,
                                 child: Row(
                                   children: [
                                     Column(
                                       children: [
                                         Row(
                                           mainAxisAlignment:
-                                              MainAxisAlignment.start,
+                                              MainAxisAlignment.center,
                                           children: [
                                             Container(
-                                              constraints: BoxConstraints(
-                                                maxWidth:
-                                                    MediaQuery.of(
-                                                      gl.notificationContext!,
-                                                    ).size.width *
-                                                    .7,
-                                              ),
-                                              child: Text(entry['addresstype']),
-                                            ),
-                                          ],
-                                        ),
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.start,
-                                          children: [
-                                            Container(
+                                              alignment: Alignment.center,
                                               constraints: BoxConstraints(
                                                 maxWidth:
                                                     MediaQuery.of(
@@ -766,7 +812,33 @@ class _SearchMenu extends State<SearchMenu> {
                                                     .7,
                                               ),
                                               child: Text(
-                                                entry['display_name'],
+                                                typeDeResultat,
+                                                style: TextStyle(
+                                                  color: textColor,
+                                                  fontSize: 18,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          children: [
+                                            Container(
+                                              padding: EdgeInsets.all(10),
+                                              constraints: BoxConstraints(
+                                                maxWidth:
+                                                    MediaQuery.of(
+                                                      gl.notificationContext!,
+                                                    ).size.width *
+                                                    .7,
+                                              ),
+                                              child: Text(
+                                                descriptionDeResultat,
+                                                style: TextStyle(
+                                                  color: textColor,
+                                                ),
                                               ),
                                             ),
                                           ],
@@ -1591,11 +1663,12 @@ Widget forestimatorResultsHeaderContinue(
   return Column(
     children: List<Widget>.generate(json.length, (i) {
       return i == 0 ||
-              prettyPrintContinue[layerCode]![json.keys.elementAt(i)] == null
+              prettyPrintContinousResults[layerCode]![json.keys.elementAt(i)] ==
+                  null
           ? Container()
           : _resultRow(
             json.keys.elementAt(i),
-            "${prettyPrintContinue[layerCode]![json.keys.elementAt(i)]}: ${json[json.keys.elementAt(i)].toString()}",
+            "${prettyPrintContinousResults[layerCode]![json.keys.elementAt(i)]}: ${json[json.keys.elementAt(i)].toString()}",
           );
     }),
   );
@@ -2591,7 +2664,7 @@ class _LayerSwitcher extends State<LayerSwitcher> {
   Widget build(BuildContext context) {
     {
       return ReorderableListView(
-        buildDefaultDragHandles: false,
+        buildDefaultDragHandles: true,
         padding: const EdgeInsets.symmetric(horizontal: 0),
         onReorder: (int oldIndex, int newIndex) {
           setState(() {
@@ -2609,112 +2682,122 @@ class _LayerSwitcher extends State<LayerSwitcher> {
             });
           });
         },
+
         children: List<Widget>.generate(3, (i) {
           if (gl.interfaceSelectedLayerKeys.length > i) {
             return Card(
               margin: EdgeInsets.all(5),
               key: Key('$i+listOfThree'),
-              color: Colors.white,
-              surfaceTintColor: Colors.white,
+              color: Colors.grey,
               shadowColor: const Color.fromARGB(255, 44, 44, 44),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  TextButton(
-                    style: ButtonStyle(
-                      minimumSize: WidgetStateProperty<Size>.fromMap(
-                        <WidgetStatesConstraint, Size>{
-                          WidgetState.any: Size(
-                            MediaQuery.of(context).size.width * .45,
-                            MediaQuery.of(context).size.width * .1,
-                          ),
-                        },
-                      ),
-                    ),
-                    onPressed: () {
-                      PopupMapSelectionMenu(gl.notificationContext!, setState);
-                    },
-                    child: Container(
-                      padding: EdgeInsets.all(3),
-                      constraints: BoxConstraints(
-                        maxHeight: MediaQuery.of(context).size.width * 0.105,
-                        minHeight: MediaQuery.of(context).size.width * 0.105,
-                        maxWidth: MediaQuery.of(context).size.width * 0.45,
-                        minWidth: MediaQuery.of(context).size.width * 0.45,
-                      ),
-                      child: Text(
-                        gl.dico
-                            .getLayerBase(
-                              gl.interfaceSelectedLayerKeys[i].mCode,
-                            )
-                            .mNom,
-                      ),
-                    ),
-                  ),
-                  Container(
-                    constraints: BoxConstraints(
-                      maxHeight: MediaQuery.of(context).size.width * 0.1,
-                      minHeight: MediaQuery.of(context).size.width * 0.1,
-                      maxWidth: MediaQuery.of(context).size.width * 0.2,
-                      minWidth: MediaQuery.of(context).size.width * 0.2,
-                    ),
-                    child: Row(
-                      children: [
-                        gl.interfaceSelectedLayerKeys[i].offline
-                            ? Container(
-                              constraints: BoxConstraints(
-                                maxHeight:
-                                    MediaQuery.of(context).size.width * 0.1,
-                                minHeight:
-                                    MediaQuery.of(context).size.width * 0.1,
-                                maxWidth:
-                                    MediaQuery.of(context).size.width * 0.1,
-                                minWidth:
-                                    MediaQuery.of(context).size.width * 0.1,
-                              ),
-                              padding: const EdgeInsets.symmetric(),
-                              child: Icon(
-                                Icons.save,
-                                size: MediaQuery.of(context).size.width * 0.1,
-                              ),
-                            )
-                            : Container(
-                              constraints: BoxConstraints(
-                                maxHeight:
-                                    MediaQuery.of(context).size.width * 0.1,
-                                minHeight:
-                                    MediaQuery.of(context).size.width * 0.1,
-                                maxWidth:
-                                    MediaQuery.of(context).size.width * 0.1,
-                                minWidth:
-                                    MediaQuery.of(context).size.width * 0.1,
-                              ),
-                              padding: const EdgeInsets.symmetric(),
-                              child: Icon(
-                                Icons.wifi,
-                                size: MediaQuery.of(context).size.width * 0.1,
-                              ),
+              child: ReorderableDragStartListener(
+                index: i,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    TextButton(
+                      style: ButtonStyle(
+                        minimumSize: WidgetStateProperty<Size>.fromMap(
+                          <WidgetStatesConstraint, Size>{
+                            WidgetState.any: Size(
+                              MediaQuery.of(context).size.width * .45,
+                              MediaQuery.of(context).size.width * .1,
                             ),
-                        Container(
-                          constraints: BoxConstraints(
-                            maxHeight: MediaQuery.of(context).size.width * 0.1,
-                            minHeight: MediaQuery.of(context).size.width * 0.1,
-                            maxWidth: MediaQuery.of(context).size.width * 0.1,
-                            minWidth: MediaQuery.of(context).size.width * 0.1,
-                          ),
-                          padding: const EdgeInsets.symmetric(),
-                          child: ReorderableDragStartListener(
-                            index: i,
-                            child: Icon(
-                              Icons.drag_indicator,
-                              size: MediaQuery.of(context).size.width * 0.1,
-                            ),
-                          ),
+                          },
                         ),
-                      ],
+                      ),
+                      onPressed: () {
+                        PopupMapSelectionMenu(
+                          gl.notificationContext!,
+                          setState,
+                        );
+                      },
+                      child: Container(
+                        padding: EdgeInsets.all(3),
+                        constraints: BoxConstraints(
+                          maxHeight: MediaQuery.of(context).size.width * 0.12,
+                          minHeight: MediaQuery.of(context).size.width * 0.12,
+                          maxWidth: MediaQuery.of(context).size.width * 0.45,
+                          minWidth: MediaQuery.of(context).size.width * 0.45,
+                        ),
+                        child: Text(
+                          gl.dico
+                              .getLayerBase(
+                                gl.interfaceSelectedLayerKeys[i].mCode,
+                              )
+                              .mNom,
+                          style: TextStyle(color: Colors.black),
+                        ),
+                      ),
                     ),
-                  ),
-                ],
+                    Container(
+                      constraints: BoxConstraints(
+                        maxHeight: MediaQuery.of(context).size.width * 0.1,
+                        minHeight: MediaQuery.of(context).size.width * 0.1,
+                        maxWidth: MediaQuery.of(context).size.width * 0.2,
+                        minWidth: MediaQuery.of(context).size.width * 0.2,
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            color: Colors.white,
+                            constraints: BoxConstraints(
+                              maxHeight:
+                                  MediaQuery.of(context).size.width * 0.12,
+                              minHeight:
+                                  MediaQuery.of(context).size.width * 0.12,
+                              maxWidth: MediaQuery.of(context).size.width * 0.1,
+                              minWidth: MediaQuery.of(context).size.width * 0.1,
+                            ),
+                            padding: const EdgeInsets.symmetric(),
+                            child: Image.asset(
+                              gl.dico
+                                  .getLayerBase(
+                                    gl.interfaceSelectedLayerKeys[i].mCode,
+                                  )
+                                  .mLogoAttributionFile,
+                            ),
+                          ),
+                          gl.interfaceSelectedLayerKeys[i].offline
+                              ? Container(
+                                constraints: BoxConstraints(
+                                  maxHeight:
+                                      MediaQuery.of(context).size.width * 0.1,
+                                  minHeight:
+                                      MediaQuery.of(context).size.width * 0.1,
+                                  maxWidth:
+                                      MediaQuery.of(context).size.width * 0.1,
+                                  minWidth:
+                                      MediaQuery.of(context).size.width * 0.1,
+                                ),
+                                padding: const EdgeInsets.symmetric(),
+                                child: Icon(
+                                  Icons.save,
+                                  size: MediaQuery.of(context).size.width * 0.1,
+                                ),
+                              )
+                              : Container(
+                                constraints: BoxConstraints(
+                                  maxHeight:
+                                      MediaQuery.of(context).size.width * 0.1,
+                                  minHeight:
+                                      MediaQuery.of(context).size.width * 0.1,
+                                  maxWidth:
+                                      MediaQuery.of(context).size.width * 0.1,
+                                  minWidth:
+                                      MediaQuery.of(context).size.width * 0.1,
+                                ),
+                                padding: const EdgeInsets.symmetric(),
+                                child: Icon(
+                                  Icons.wifi,
+                                  size: MediaQuery.of(context).size.width * 0.1,
+                                ),
+                              ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
             );
           } else {

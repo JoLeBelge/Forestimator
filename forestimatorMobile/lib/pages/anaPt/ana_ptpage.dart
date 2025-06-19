@@ -37,7 +37,7 @@ class _AnaPtpageState extends State<AnaPtpage> {
               gl.offlineMode
                   ? "Analyse réalisée hors-ligne"
                   : "Analyse réalisée en ligne",
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             ),
             handlePermissionForStorage(
               child: TextButton(
@@ -199,9 +199,9 @@ class LayerAnaPtListTile extends StatelessWidget {
       ),
       onTap: () {
         if (l.hasDoc()) {
-          GoRouter.of(context).push(
-            '/${gl.basePathbranchB}/${l.getFicheRoute(us: data.mRastValue)}/0',
-          );
+          GoRouter.of(
+            context,
+          ).push('/${l.getFicheRoute(us: data.mRastValue)}/0');
         }
       },
     );
@@ -295,9 +295,9 @@ class EssencesListView extends StatelessWidget {
                   )
                   : null,
           onTap: () {
-            GoRouter.of(context).push(
-              "/${gl.basePathbranchB}/${gl.dico.getEss(code.elementAt(index)).getFicheRoute()}",
-            );
+            GoRouter.of(
+              context,
+            ).push("/${gl.dico.getEss(code.elementAt(index)).getFicheRoute()}");
           },
         );
       },

@@ -3,6 +3,7 @@ import 'package:fforestimator/dico/dico_apt.dart';
 import 'package:fforestimator/tileProvider/tif_tile_provider.dart';
 import 'package:fforestimator/tools/handle_permissions.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:proj4dart/proj4dart.dart' as proj4;
 import 'package:flutter/material.dart';
@@ -30,11 +31,9 @@ class _MapPageState extends State<MapPage> {
   final _mapController = MapController();
   LatLng? _pt;
   bool _doingAnaPt = false;
-  //bool _modeLegendInfoBeforeAna = false;
 
   static int _mapFrameCounter = 0;
 
-  bool _settingsMenu = false;
   bool _modeAnaPtPreview = true;
 
   bool _toolbarExtended = false;
@@ -202,36 +201,64 @@ class _MapPageState extends State<MapPage> {
     return handlePermissionForLocation(
       refreshParentWidgetTree: refreshView,
       child: Scaffold(
-        appBar:
-            gl.offlineMode
-                ? AppBar(
-                  title: const Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        "Forestimator offline/terrain",
-                        textScaler: TextScaler.linear(0.75),
-                        style: TextStyle(color: Colors.black),
-                      ),
-                    ],
-                  ),
-                  toolbarHeight: 20.0,
-                  backgroundColor: gl.colorAgroBioTech,
-                )
-                : AppBar(
-                  title: const Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        "Forestimator online",
-                        textScaler: TextScaler.linear(0.75),
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    ],
-                  ),
-                  toolbarHeight: 20.0,
-                  backgroundColor: gl.colorUliege,
+        appBar: AppBar(
+          toolbarHeight: MediaQuery.of(context).size.height * .04,
+          backgroundColor:
+              gl.offlineMode ? gl.colorAgroBioTech : gl.colorUliege,
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              IconButton(
+                iconSize: MediaQuery.of(context).size.height * .035,
+                color: gl.offlineMode ? Colors.black : Colors.white,
+                onPressed: () {
+                  PopupSettingsMenu(
+                    gl.notificationContext!,
+                    "",
+                    () {
+                      refreshView(() {});
+                    },
+                    () {
+                      refreshView(() {});
+                    },
+                  );
+                },
+                icon: Icon(Icons.settings),
+              ),
+              Container(
+                constraints: BoxConstraints(
+                  maxWidth: MediaQuery.of(context).size.width * .8,
                 ),
+                alignment: Alignment.center,
+                child: TextButton(
+                  onPressed: () {
+                    setState(() {
+                      gl.offlineMode = !gl.offlineMode;
+                    });
+                  },
+                  child:
+                      gl.offlineMode
+                          ? Text(
+                            "Forestimator offline/terrain",
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize:
+                                  MediaQuery.of(context).size.height * .02,
+                            ),
+                          )
+                          : Text(
+                            "Forestimator online",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize:
+                                  MediaQuery.of(context).size.height * .02,
+                            ),
+                          ),
+                ),
+              ),
+            ],
+          ),
+        ),
         body: Stack(
           children: <Widget>[
             FlutterMap(
@@ -367,7 +394,10 @@ class _MapPageState extends State<MapPage> {
                       return _provider!.loaded
                           ? TileLayer(
                             tileDisplay:
-                                gl.modeMapFirstTileLayerTrancparancy && i == 3
+                                gl.modeMapFirstTileLayerTrancparancy &&
+                                        i > 1 &&
+                                        gl.interfaceSelectedLayerKeys.length ==
+                                            i
                                     ? TileDisplay.instantaneous(opacity: 0.5)
                                     : TileDisplay.instantaneous(opacity: 1.0),
                             tileProvider: _provider,
@@ -385,7 +415,9 @@ class _MapPageState extends State<MapPage> {
                       return TileLayer(
                         userAgentPackageName: "com.forestimator",
                         tileDisplay:
-                            gl.modeMapFirstTileLayerTrancparancy && i == 3
+                            gl.modeMapFirstTileLayerTrancparancy &&
+                                    i > 1 &&
+                                    gl.interfaceSelectedLayerKeys.length == i
                                 ? TileDisplay.instantaneous(opacity: 0.5)
                                 : TileDisplay.instantaneous(opacity: 1.0),
                         wmsOptions: WMSTileLayerOptions(
@@ -429,7 +461,6 @@ class _MapPageState extends State<MapPage> {
                       MarkerLayer(markers: _placeSearchMarker()),
                   ],
             ),
-            _settingsGuard(),
             _toolbarGuard(),
             gl.position != null
                 ? Row(
@@ -541,45 +572,6 @@ class _MapPageState extends State<MapPage> {
                 }
               },
               icon: const Icon(Icons.forest),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _settingsGuard() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: [
-        Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            IconButton(
-              iconSize: iconSize,
-              color: _settingsMenu ? gl.colorAgroBioTech : Colors.black,
-              onPressed: () async {
-                refreshView(() {
-                  _settingsMenu = !_settingsMenu;
-                  _toolbarExtended = false;
-                  _closeLayerPropertiesMenu();
-                  _closePolygonDrawMenu();
-                  _closeProjectMenu();
-                });
-                PopupSettingsMenu(
-                  gl.notificationContext!,
-                  "",
-                  () {
-                    refreshView(() {});
-                  },
-                  () {
-                    refreshView(() {
-                      _settingsMenu = false;
-                    });
-                  },
-                );
-              },
-              icon: const Icon(Icons.settings),
             ),
           ],
         ),
@@ -1280,7 +1272,8 @@ class _MapPageState extends State<MapPage> {
           },
         );
       },
-      icon: const Icon(Icons.search),
+      //icon:const Icon(Icons.search_location),
+      icon: FaIcon(FontAwesomeIcons.magnifyingGlassLocation),
     );
   }
 

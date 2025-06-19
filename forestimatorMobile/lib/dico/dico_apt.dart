@@ -178,6 +178,9 @@ class LayerBase {
       case "Gembloux Agro-Bio Tech":
         aRes = 'assets/images/uLIEGE_Gembloux_AgroBioTech_Logo_CMJN_pos.png';
         break;
+      default:
+        aRes = "assets/images/LogoForestimator.png";
+        gl.print("Error: can't find assets path for: $mWMSattribution");
     }
     return aRes;
   }
