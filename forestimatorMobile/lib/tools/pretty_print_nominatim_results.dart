@@ -74,4 +74,5 @@ final Map<String, String> prettyPrintNominatimResults = {
   "political": "Politique",
   "administrative_fraction": "Partie de l'Administration",
   "region": "Region",
+  "scree": "Éboulis",
 };

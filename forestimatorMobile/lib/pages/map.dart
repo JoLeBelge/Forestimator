@@ -680,8 +680,7 @@ class _MapPageState extends State<MapPage> {
     return Column(
       children: [
         _searchButton(),
-        _modeLayerProperties ? _layerMenu() : Container(),
-        _layerPropertiesButton(),
+        _layerSwitcherButton(),
         _modeDrawPolygon ? _polygonToolbar() : Container(),
         _drawPolygonButton(),
       ],
@@ -1213,23 +1212,27 @@ class _MapPageState extends State<MapPage> {
     );
   }
 
-  Widget _layerPropertiesButton() {
+  Widget _layerSwitcherButton() {
     return IconButton(
       iconSize: iconSize,
       color: _polygonMenuColor(_modeLayerProperties),
       onPressed: () async {
         refreshView(() {
           _modeLayerProperties = !_modeLayerProperties;
+          if (_modeLayerProperties == false) {
+            _closeLayerPropertiesMenu();
+          } else {
+            _closePolygonDrawMenu();
+            _closeProjectMenu();
+          }
         });
-        gl.refreshMap(() {});
-        if (_modeLayerProperties == false) {
-          _closeLayerPropertiesMenu();
-        } else {
-          _closePolygonDrawMenu();
-          _closeProjectMenu();
-        }
+        PopupLayerSwitcher(gl.notificationContext!, () {
+          setState(() {
+            _modeLayerProperties = false;
+          });
+        });
       },
-      icon: const Icon(Icons.settings_display),
+      icon: const Icon(Icons.remove_red_eye),
     );
   }
 

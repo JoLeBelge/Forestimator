@@ -2090,9 +2090,8 @@ class _OnlineMapMenu extends State<OnlineMapMenu> {
       backgroundColor: Colors.transparent,
       body: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 0),
-        children: List<TextButton>.generate(
-          gl.dico.mGrCouches.length,
-          (int i) => TextButton(
+        children: _injectGroupData(
+          (int i, GroupeCouche groupe) => TextButton(
             style: ButtonStyle(
               minimumSize:
                   i == _selectedCategory
@@ -2147,7 +2146,7 @@ class _OnlineMapMenu extends State<OnlineMapMenu> {
                           minHeight: MediaQuery.of(context).size.width * .2,
                         ),
                         child: Text(
-                          gl.dico.mGrCouches[i].mLabel,
+                          groupe.mLabel,
                           textAlign: TextAlign.justify,
                           style: TextStyle(color: Colors.black, fontSize: 22),
                         ),
@@ -2175,7 +2174,7 @@ class _OnlineMapMenu extends State<OnlineMapMenu> {
                                           .2,
                                     ),
                                     child: Text(
-                                      gl.dico.mGrCouches[i].mLabel,
+                                      groupe.mLabel,
                                       textAlign: TextAlign.justify,
                                       style: TextStyle(
                                         color: Colors.black,
@@ -2185,7 +2184,7 @@ class _OnlineMapMenu extends State<OnlineMapMenu> {
                                   ),
                                 ),
                               ] +
-                              _injectLayerData(gl.dico.mGrCouches[i].mCode, (
+                              _injectLayerData(groupe.mCode, (
                                 int i,
                                 LayerTile layerTile,
                               ) {
@@ -2364,6 +2363,27 @@ class _OnlineMapMenu extends State<OnlineMapMenu> {
     );
   }
 
+  List<Widget> _injectGroupData(Widget Function(int, GroupeCouche) generate) {
+    Map<String, Null> groupesNonVides = {};
+    for (String key in gl.dico.mLayerBases.keys) {
+      if (gl.offlineMode ? gl.dico.getLayerBase(key).mOffline : true) {
+        groupesNonVides[gl.dico.getLayerBase(key).mGroupe] = null;
+      }
+    }
+    List<GroupeCouche> groupes = [];
+    for (String key in groupesNonVides.keys) {
+      for (GroupeCouche couche in gl.dico.mGrCouches) {
+        if (couche.mCode == key) {
+          groupes.add(couche);
+        }
+      }
+    }
+
+    return List<Widget>.generate(groupes.length, (i) {
+      return generate(i, groupes[i]);
+    });
+  }
+
   List<Widget> _injectLayerData(
     String category,
     Widget Function(int, LayerTile) generate,
@@ -2374,9 +2394,8 @@ class _OnlineMapMenu extends State<OnlineMapMenu> {
       if (category == mp[key]!.mGroupe &&
           !mp[key]!.mExpert &&
           mp[key]!.mVisu &&
-          mp[key]?.mTypeGeoservice ==
-              "" // "arcgisRest c'est pour le vectoriel, pas actif sous flutter"
-              ) {
+          mp[key]?.mTypeGeoservice == "" &&
+          (gl.offlineMode ? mp[key]!.mOffline : true)) {
         layer.add(
           LayerTile(
             name: mp[key]!.mNom,
@@ -2425,7 +2444,7 @@ class PopupOnlineMapMenu {
               shadowColor: Colors.transparent,
             ),
             child: SizedBox(
-              width: MediaQuery.of(context).size.width * 995,
+              width: MediaQuery.of(context).size.width * .995,
               child: OnlineMapMenu(),
             ),
           ),

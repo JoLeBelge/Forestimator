@@ -319,7 +319,6 @@ class _MyApp extends State<MyApp> {
     ],
   );
 
-  // private navigators
   final _rootNavigatorKey = GlobalKey<NavigatorState>();
   final _shellNavigatorAKey = GlobalKey<NavigatorState>(debugLabel: 'shellA');
 
