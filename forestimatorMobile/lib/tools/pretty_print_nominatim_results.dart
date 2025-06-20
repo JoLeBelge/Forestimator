@@ -75,4 +75,7 @@ final Map<String, String> prettyPrintNominatimResults = {
   "administrative_fraction": "Partie de l'Administration",
   "region": "Region",
   "scree": "Éboulis",
+  "suburb": "Banlieue",
+  "isolated_dwelling": "Habitation isolée",
+  "protected_area": "Aire protegée",
 };

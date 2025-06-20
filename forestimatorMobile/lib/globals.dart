@@ -245,24 +245,71 @@ void removeLayerFromList(String key, {bool offline = false}) async {
   if (sL != null) {
     interfaceSelectedLayerKeys.remove(sL);
   }
-  savePrefSelLay();
 }
 
-void savePrefSelLay() async {
+void replaceLayerFromList(
+  String key,
+  String replacement, {
+  bool offline = false,
+}) async {
+  SelectedLayer? sL;
+  for (var layer in interfaceSelectedLayerKeys) {
+    if (layer.mCode == key && layer.offline == offline) {
+      sL = layer;
+    }
+  }
+  if (sL != null) {
+    int index = interfaceSelectedLayerKeys.indexOf(sL);
+    interfaceSelectedLayerKeys.removeAt(index);
+    interfaceSelectedLayerKeys.insert(
+      index,
+      SelectedLayer(mCode: replacement, offline: offline),
+    );
+  }
+}
+
+void savePrefSelLayOnline() async {
+  interfaceSelectedLCode.clear();
+  for (SelectedLayer sL in interfaceSelectedLayerKeys) {
+    interfaceSelectedLCode.add(sL.mCode);
+  }
   final SharedPreferences prefs = await SharedPreferences.getInstance();
-  await prefs.setStringList(
-    'interfaceSelectedLCode',
-    getInterfaceSelectedLCode(),
-  );
-  await prefs.setStringList(
-    'interfaceSelectedLOffline',
-    getInterfaceSelectedLOffline(),
-  );
+  await prefs.setStringList('interfaceSelectedLCode', interfaceSelectedLCode);
+}
+
+void savePrefSelLayOffline() async {
+  interfaceSelectedLCode.clear();
+  for (SelectedLayer sL in interfaceSelectedLayerKeys) {
+    interfaceSelectedLCode.add(sL.mCode);
+  }
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  await prefs.setStringList('interfaceSelectedOffCode', interfaceSelectedLCode);
+}
+
+void loadPrefSelLayOnline() async {
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  interfaceSelectedLCode = prefs.getStringList('interfaceSelectedLCode')!;
+  interfaceSelectedLayerKeys.clear();
+  for (String key in interfaceSelectedLCode) {
+    interfaceSelectedLayerKeys.add(SelectedLayer(mCode: key, offline: false));
+  }
+}
+
+void loadPrefSelLayOffline() async {
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  if (prefs.getStringList('interfaceSelectedOffCode') != null) {
+    interfaceSelectedLCode = prefs.getStringList('interfaceSelectedOffCode')!;
+    interfaceSelectedLayerKeys.clear();
+    for (String key in interfaceSelectedLCode) {
+      interfaceSelectedLayerKeys.add(SelectedLayer(mCode: key, offline: true));
+    }
+  }
 }
 
 void changeSelectedLayerModeOffline() {
+  savePrefSelLayOnline();
+  loadPrefSelLayOffline();
   interfaceSelectedLayerKeys.removeWhere((element) => element.offline == false);
-  // check si il y a au moins une carte offline sur le téléphone et on l'ajoute à la sélection si il n'y en avait aucune
   if (dico.getLayersOffline().where((i) => i.mBits == 8).toList().isNotEmpty &&
       interfaceSelectedLayerKeys.isEmpty) {
     interfaceSelectedLayerKeys.insert(
@@ -279,13 +326,15 @@ void changeSelectedLayerModeOffline() {
       ),
     );
   } else {
-    // on ne garde qu'une seule couche
     while (interfaceSelectedLayerKeys.length > 1) {
       interfaceSelectedLayerKeys.removeLast();
     }
   }
+}
 
-  savePrefSelLay();
+void changeSelectedLayerModeOnline() {
+  savePrefSelLayOffline();
+  loadPrefSelLayOnline();
 }
 
 void addLayerToList(
@@ -306,9 +355,6 @@ void addLayerToList(
     while (interfaceSelectedLayerKeys.length > 1) {
       interfaceSelectedLayerKeys.removeLast();
     }
-  }
-  if (savePref) {
-    savePrefSelLay();
   }
 }
 

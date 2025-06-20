@@ -633,7 +633,8 @@ class _SearchMenu extends State<SearchMenu> {
   final Color active = Colors.black;
   final Color inactive = const Color.fromARGB(255, 92, 92, 92);
 
-  int previousLength = 0;
+  static String lastSearchKey = "";
+  static Map<String, http.Response> searchCache = {};
 
   @override
   Widget build(BuildContext context) {
@@ -657,19 +658,22 @@ class _SearchMenu extends State<SearchMenu> {
                 child: Card(
                   child: TextFormField(
                     autocorrect: false,
-                    onChanged: (that) async {
-                      if (that.length < previousLength) {
-                        previousLength = that.length;
+                    initialValue: lastSearchKey,
+                    onChanged: (searchString) async {
+                      if (searchString.length < 2) {
                         return;
                       }
-                      previousLength = that.length;
-                      if (that.length < 2) {
-                        return;
+                      lastSearchKey = searchString;
+                      http.Response response;
+                      if (searchCache[searchString] != null) {
+                        response = searchCache[searchString]!;
+                      } else {
+                        var request = Uri.parse(
+                          'http://appliprfw.gembloux.ulg.ac.be/search?q=${searchString.replaceAll(' ', '+')}+Wallonie&format=json&addressdetails=1',
+                        );
+                        response = await http.get(request);
+                        searchCache[searchString] = response;
                       }
-                      var request = Uri.parse(
-                        'http://appliprfw.gembloux.ulg.ac.be/search?q=${that.replaceAll(' ', '+')}+Wallonie&format=json&addressdetails=1',
-                      );
-                      final response = await http.get(request);
                       List<Map<String, dynamic>> decodedJson;
                       try {
                         (decodedJson =
@@ -689,28 +693,6 @@ class _SearchMenu extends State<SearchMenu> {
                         gl.selectedSearchMarker = -1;
                         int i = 0;
                         for (var entry in decodedJson) {
-                          gl.poiMarkerList.add(
-                            gl.PoiMarker(
-                              index: i++,
-                              position: LatLng(
-                                double.parse(entry['lat']),
-                                double.parse(entry['lon']),
-                              ),
-                              name: entry['name'] ?? "Noname??",
-                              address:
-                                  entry['address']['road'] ??
-                                  entry['address']['neighbourhood'] ??
-                                  entry['address']['village'] ??
-                                  entry['address']['state'] ??
-                                  "Lokolobömmele",
-                              city:
-                                  entry['address']['city'] ??
-                                  entry['address']['county'] ??
-                                  entry['address']['state'] ??
-                                  "",
-                              postcode: entry['address']['postcode'] ?? "",
-                            ),
-                          );
                           String? typeDeResultat =
                               prettyPrintNominatimResults[entry['addresstype']];
                           if (typeDeResultat == null) {
@@ -738,6 +720,23 @@ class _SearchMenu extends State<SearchMenu> {
                           Color boxColor = getColorFromName(typeDeResultat!);
                           Color textColor = getColorTextFromBackground(
                             boxColor,
+                          );
+                          gl.poiMarkerList.add(
+                            gl.PoiMarker(
+                              index: i++,
+                              position: LatLng(
+                                double.parse(entry['lat']),
+                                double.parse(entry['lon']),
+                              ),
+                              name: typeDeResultat,
+                              address: descriptionDeResultat,
+                              city:
+                                  entry['address']['city'] ??
+                                  entry['address']['county'] ??
+                                  entry['address']['state'] ??
+                                  "",
+                              postcode: entry['address']['postcode'] ?? "",
+                            ),
                           );
                           _searchResults.add(
                             TextButton(
@@ -2868,6 +2867,7 @@ class _LayerSwitcher extends State<LayerSwitcher> {
   Widget build(BuildContext context) {
     {
       return ReorderableListView(
+        scrollDirection: Axis.vertical,
         buildDefaultDragHandles: true,
         padding: const EdgeInsets.symmetric(horizontal: 0),
         onReorder: (int oldIndex, int newIndex) {
@@ -2915,6 +2915,7 @@ class _LayerSwitcher extends State<LayerSwitcher> {
                           onPressed: () {
                             PopupMapSelectionMenu(
                               gl.notificationContext!,
+                              i,
                               setState,
                             );
                           },
@@ -3024,7 +3025,7 @@ class _LayerSwitcher extends State<LayerSwitcher> {
                         ),
                       ],
                     ),
-                    if (i == 0)
+                    if (i == 0 && !gl.offlineMode)
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -3074,8 +3075,77 @@ class _LayerSwitcher extends State<LayerSwitcher> {
                 ),
               ),
             );
+          } else if (gl.offlineMode) {
+            return Card(
+              margin: EdgeInsets.all(5),
+              key: Key('$i+listOfThreeOffline'),
+              color: Colors.transparent,
+            );
           } else {
-            return Card(key: Key('$i+listOfThree'));
+            return Card(
+              margin: EdgeInsets.all(5),
+              key: Key('$i+listOfThreeEmpty'),
+              color: Colors.white,
+              shadowColor: const Color.fromARGB(255, 44, 44, 120),
+              child: ReorderableDragStartListener(
+                index: i,
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        TextButton(
+                          style: ButtonStyle(
+                            maximumSize: WidgetStateProperty<Size>.fromMap(
+                              <WidgetStatesConstraint, Size>{
+                                WidgetState.any: Size(
+                                  MediaQuery.of(context).size.width * .45,
+                                  MediaQuery.of(context).size.height * .1,
+                                ),
+                              },
+                            ),
+                          ),
+                          onPressed: () {
+                            PopupMapSelectionMenu(
+                              gl.notificationContext!,
+                              i,
+                              setState,
+                            );
+                          },
+                          child: Container(
+                            padding: EdgeInsets.symmetric(horizontal: 3.0),
+                            constraints: BoxConstraints(
+                              maxHeight:
+                                  MediaQuery.of(context).size.height * .05,
+                              maxWidth:
+                                  MediaQuery.of(context).size.width * 0.45,
+                              minWidth:
+                                  MediaQuery.of(context).size.width * 0.45,
+                            ),
+                            child: Text(
+                              "Appuyez ici pour ajouter une couche du catalogue",
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize:
+                                    MediaQuery.of(context).size.height * .018,
+                              ),
+                            ),
+                          ),
+                        ),
+                        Container(
+                          constraints: BoxConstraints(
+                            maxHeight: MediaQuery.of(context).size.width * 0.1,
+                            minHeight: MediaQuery.of(context).size.width * 0.1,
+                            maxWidth: MediaQuery.of(context).size.width * 0.22,
+                            minWidth: MediaQuery.of(context).size.width * 0.22,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            );
           }
         }),
       );
@@ -3385,7 +3455,11 @@ class _OfflineMapMenu extends State<OfflineMapMenu> {
 }
 
 class PopupMapSelectionMenu {
-  PopupMapSelectionMenu(BuildContext context, Function after) {
+  PopupMapSelectionMenu(
+    BuildContext context,
+    int interfaceSelectedPosition,
+    Function after,
+  ) {
     showDialog(
       barrierDismissible: true,
       barrierColor: Colors.black.withAlpha(100),
@@ -3424,7 +3498,7 @@ class PopupMapSelectionMenu {
                   SizedBox(
                     width: MediaQuery.of(context).size.width * .80,
                     height: MediaQuery.of(context).size.height * 0.8,
-                    child: MapSelectionMenu(after),
+                    child: MapSelectionMenu(after, interfaceSelectedPosition),
                   ),
                 ],
               ),
@@ -3440,8 +3514,9 @@ class PopupMapSelectionMenu {
 
 class MapSelectionMenu extends StatefulWidget {
   final Function after;
+  final int interfaceSelectedMapKey;
 
-  const MapSelectionMenu(this.after, {super.key});
+  const MapSelectionMenu(this.after, this.interfaceSelectedMapKey, {super.key});
 
   @override
   State<StatefulWidget> createState() => _MapSelectionMenu();
@@ -3456,9 +3531,8 @@ class _MapSelectionMenu extends State<MapSelectionMenu> {
       backgroundColor: Colors.transparent,
       body: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 0),
-        children: List<TextButton>.generate(
-          gl.dico.mGrCouches.length,
-          (int i) => TextButton(
+        children: _injectGroupData(
+          (int i, GroupeCouche groupe) => TextButton(
             style: ButtonStyle(
               minimumSize:
                   i == _selectedCategory
@@ -3511,7 +3585,7 @@ class _MapSelectionMenu extends State<MapSelectionMenu> {
                           minHeight: MediaQuery.of(context).size.width * .2,
                         ),
                         child: Text(
-                          gl.dico.mGrCouches[i].mLabel,
+                          groupe.mLabel,
                           textAlign: TextAlign.justify,
                           style: TextStyle(color: Colors.black, fontSize: 22),
                         ),
@@ -3539,7 +3613,7 @@ class _MapSelectionMenu extends State<MapSelectionMenu> {
                                           .2,
                                     ),
                                     child: Text(
-                                      gl.dico.mGrCouches[i].mLabel,
+                                      groupe.mLabel,
                                       textAlign: TextAlign.justify,
                                       style: TextStyle(
                                         color: Colors.black,
@@ -3549,7 +3623,7 @@ class _MapSelectionMenu extends State<MapSelectionMenu> {
                                   ),
                                 ),
                               ] +
-                              _injectLayerData(gl.dico.mGrCouches[i].mCode, (
+                              _injectLayerData(groupe.mCode, (
                                 int i,
                                 LayerTile layerTile,
                               ) {
@@ -3610,7 +3684,10 @@ class _MapSelectionMenu extends State<MapSelectionMenu> {
                                                   .interfaceSelectedLayerKeys
                                                   .length <
                                               3) {
-                                            gl.addLayerToList(layerTile.key);
+                                            gl.addLayerToList(
+                                              layerTile.key,
+                                              offline: gl.offlineMode,
+                                            );
                                           } else {
                                             gl.removeLayerFromList(
                                               gl
@@ -3618,7 +3695,10 @@ class _MapSelectionMenu extends State<MapSelectionMenu> {
                                                   .first
                                                   .mCode,
                                             );
-                                            gl.addLayerToList(layerTile.key);
+                                            gl.addLayerToList(
+                                              layerTile.key,
+                                              offline: gl.offlineMode,
+                                            );
                                           }
                                           gl.refreshMap(() {});
                                           widget.after(() {});
@@ -3701,6 +3781,27 @@ class _MapSelectionMenu extends State<MapSelectionMenu> {
     );
   }
 
+  List<Widget> _injectGroupData(Widget Function(int, GroupeCouche) generate) {
+    Map<String, Null> groupesNonVides = {};
+    for (String key in gl.dico.mLayerBases.keys) {
+      if (gl.offlineMode ? gl.dico.getLayerBase(key).mOffline : true) {
+        groupesNonVides[gl.dico.getLayerBase(key).mGroupe] = null;
+      }
+    }
+    List<GroupeCouche> groupes = [];
+    for (String key in groupesNonVides.keys) {
+      for (GroupeCouche couche in gl.dico.mGrCouches) {
+        if (couche.mCode == key) {
+          groupes.add(couche);
+        }
+      }
+    }
+
+    return List<Widget>.generate(groupes.length, (i) {
+      return generate(i, groupes[i]);
+    });
+  }
+
   List<Widget> _injectLayerData(
     String category,
     Widget Function(int, LayerTile) generate,
@@ -3711,9 +3812,8 @@ class _MapSelectionMenu extends State<MapSelectionMenu> {
       if (category == mp[key]!.mGroupe &&
           !mp[key]!.mExpert &&
           mp[key]!.mVisu &&
-          mp[key]?.mTypeGeoservice ==
-              "" // "arcgisRest c'est pour le vectoriel, pas actif sous flutter"
-              ) {
+          mp[key]?.mTypeGeoservice == "" &&
+          (gl.offlineMode ? mp[key]!.mOffline : true)) {
         layer.add(
           LayerTile(
             name: mp[key]!.mNom,
@@ -3730,7 +3830,7 @@ class _MapSelectionMenu extends State<MapSelectionMenu> {
     });
   }
 }
-
+/*
 class PopupAnalysisSelection {
   PopupAnalysisSelection(BuildContext context, Function after) {
     showDialog(
@@ -3888,3 +3988,4 @@ class _AnalysisSelection extends State<AnalysisSelection> {
     return result;
   }
 }
+*/

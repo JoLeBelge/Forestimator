@@ -45,8 +45,6 @@ class _MapPageState extends State<MapPage> {
   bool _modeDrawPolygonMoveVertexes = false;
 
   bool _modeLayerProperties = false;
-  bool _modeLayerPropertiesColors = false;
-  bool _modeLayerPropertiesRename = false;
 
   bool _modeProjectProperties = false;
   bool _modeSearch = false;
@@ -236,6 +234,11 @@ class _MapPageState extends State<MapPage> {
                   onPressed: () {
                     setState(() {
                       gl.offlineMode = !gl.offlineMode;
+                      if (gl.offlineMode) {
+                        gl.changeSelectedLayerModeOffline();
+                      } else {
+                        gl.changeSelectedLayerModeOnline();
+                      }
                     });
                   },
                   child:
@@ -794,16 +797,9 @@ class _MapPageState extends State<MapPage> {
       double scale = 1.5;
       all.add(
         Marker(
-          alignment: Alignment.centerRight,
-          width:
-              poi.address.length > poi.name.length
-                  ? poi.address.length > 200
-                      ? poi.address.length * 16
-                      : 220
-                  : poi.name.length > 200
-                  ? poi.name.length * 16
-                  : 220,
-          height: gl.selectedSearchMarker == poi.index ? 300 : 50,
+          alignment: Alignment(0, -.2),
+          width: 275,
+          height: 500,
           point: poi.position,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -815,24 +811,28 @@ class _MapPageState extends State<MapPage> {
                       gl.selectedSearchMarker == i
                           ? WidgetStateProperty<Color>.fromMap(
                             <WidgetStatesConstraint, Color>{
-                              WidgetState.any: Colors.white,
+                              WidgetState.any: getColorFromName(poi.name),
                             },
                           )
                           : WidgetStateProperty<Color>.fromMap(
                             <WidgetStatesConstraint, Color>{
-                              WidgetState.any: Colors.transparent,
+                              WidgetState.any: getColorFromName(poi.name),
                             },
                           ),
                   foregroundColor:
                       gl.selectedSearchMarker == i
                           ? WidgetStateProperty<Color>.fromMap(
                             <WidgetStatesConstraint, Color>{
-                              WidgetState.any: Colors.black,
+                              WidgetState.any: getColorTextFromBackground(
+                                getColorFromName(poi.name),
+                              ),
                             },
                           )
                           : WidgetStateProperty<Color>.fromMap(
                             <WidgetStatesConstraint, Color>{
-                              WidgetState.any: Colors.blueGrey,
+                              WidgetState.any: getColorTextFromBackground(
+                                getColorFromName(poi.name),
+                              ),
                             },
                           ),
                 ),
@@ -843,23 +843,26 @@ class _MapPageState extends State<MapPage> {
                     } else {
                       gl.selectedSearchMarker = poi.index;
                     }
-                    gl.print(
-                      "Selected searchMarker = ${gl.selectedSearchMarker}",
-                    );
                   });
                 },
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children:
-                      <Widget>[
-                        gl.selectedSearchMarker == i
-                            ? Text(poi.name, textScaler: TextScaler.linear(1.0))
-                            : Text(
-                              poi.name,
-                              textScaler: TextScaler.linear(scale),
-                            ),
-                      ] +
-                      _getSearchInfoBox(poi, i),
+                child: Container(
+                  constraints: BoxConstraints(maxWidth: 300),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children:
+                        <Widget>[
+                          gl.selectedSearchMarker == i
+                              ? Text(
+                                poi.name,
+                                textScaler: TextScaler.linear(1.0),
+                              )
+                              : Text(
+                                poi.name,
+                                textScaler: TextScaler.linear(scale),
+                              ),
+                        ] +
+                        _getSearchInfoBox(poi, i),
+                  ),
                 ),
               ),
             ],
@@ -909,21 +912,21 @@ class _MapPageState extends State<MapPage> {
   }
 
   List<Widget> _getSearchInfoBox(gl.PoiMarker poi, int i) {
-    double scale = 1.5;
+    double scale = 1;
     return gl.selectedSearchMarker == i
         ? <Widget>[
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: [Text(poi.address, textScaler: TextScaler.linear(scale))],
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [Text(poi.city, textScaler: TextScaler.linear(scale))],
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+
             children: [
-              Text(poi.postcode, textScaler: TextScaler.linear(scale)),
+              Container(
+                constraints: BoxConstraints(maxWidth: 200),
+                child: Text(
+                  poi.address,
+                  textScaler: TextScaler.linear(scale),
+                  maxLines: 10,
+                ),
+              ),
             ],
           ),
         ]
@@ -1105,58 +1108,6 @@ class _MapPageState extends State<MapPage> {
     return all;
   }
 
-  Widget _layerMenu() {
-    return Column(
-      children: <Widget>[
-        IconButton(
-          iconSize: iconSize,
-          color: _polygonMenuColorTools(_modeLayerPropertiesRename),
-          onPressed: () {
-            refreshView(() {
-              _modeLayerPropertiesRename = !_modeLayerPropertiesRename;
-            });
-            PopupOnlineMapMenu(gl.notificationContext!, () {
-              refreshView(() {
-                _modeLayerPropertiesRename = false;
-              });
-            });
-          },
-          icon: Icon(Icons.layers, size: iconSize),
-        ),
-        IconButton(
-          iconSize: iconSize,
-          color: _polygonMenuColorTools(_modeLayerPropertiesColors),
-          onPressed: () {
-            refreshView(() {
-              _modeLayerPropertiesColors = !_modeLayerPropertiesColors;
-            });
-            if (gl.polygonLayers.isNotEmpty) {
-              PopupLayerSwitcher(gl.notificationContext!, () {
-                setState(() {
-                  _modeLayerPropertiesColors = false;
-                });
-              });
-            }
-          },
-          icon: Icon(Icons.remove_red_eye_outlined, size: iconSize),
-        ),
-        IconButton(
-          iconSize: iconSize,
-          color: _polygonMenuColorTools(_modeLayerPropertiesColors),
-          onPressed: () {
-            refreshView(() {
-              _modeLayerPropertiesColors = !_modeLayerPropertiesColors;
-            });
-            if (gl.polygonLayers.isNotEmpty) {
-              PopupOfflineMenu(gl.notificationContext!, () {});
-            }
-          },
-          icon: Icon(Icons.offline_bolt, size: iconSize),
-        ),
-      ],
-    );
-  }
-
   void _closeProjectMenu() {
     refreshView(() {
       _modeProjectProperties = false;
@@ -1182,8 +1133,6 @@ class _MapPageState extends State<MapPage> {
 
   void _closeLayerPropertiesMenu() {
     refreshView(() {
-      _modeLayerPropertiesRename = false;
-      _modeLayerPropertiesColors = false;
       _modeLayerProperties = false;
     });
   }
