@@ -78,4 +78,7 @@ final Map<String, String> prettyPrintNominatimResults = {
   "suburb": "Banlieue",
   "isolated_dwelling": "Habitation isolée",
   "protected_area": "Aire protegée",
+  "ditch": "Fossé",
+  "healthcare": "Santé",
+  "vineyard": "Vignoble",
 };

@@ -39,17 +39,21 @@ class _MapPageState extends State<MapPage> {
   bool _lastPressWasShort = false;
 
   bool _toolbarExtended = false;
+  bool _polygonToolbarExtended = false;
+
   bool _modeDrawPolygon = false;
   bool _modeDrawPolygonAddVertexes = false;
   bool _modeDrawPolygonRemoveVertexes = false;
   bool _modeDrawPolygonMoveVertexes = false;
 
-  bool _modeLayerProperties = false;
+  bool _modeLayerSwitches = false;
 
   bool _modeProjectProperties = false;
   bool _modeSearch = false;
+  bool _modeMeasurePath = false;
 
-  Color _polygonMenuColor(bool choice) => choice ? Colors.orange : Colors.brown;
+  final List<LatLng> _measurePath = [];
+
   Color _polygonMenuColorTools(bool choice) =>
       choice ? Colors.lightGreenAccent : Colors.grey;
 
@@ -300,7 +304,13 @@ class _MapPageState extends State<MapPage> {
                   }
                 },
                 onTap:
-                    _modeDrawPolygonAddVertexes
+                    _modeMeasurePath
+                        ? (tapPosition, point) async => {
+                          setState(() {
+                            _measurePath.add(point);
+                          }),
+                        }
+                        : _modeDrawPolygonAddVertexes
                         ? (tapPosition, point) async => {
                           if (gl.polygonLayers.isNotEmpty)
                             {
@@ -466,6 +476,8 @@ class _MapPageState extends State<MapPage> {
                     if (gl.modeMapShowCustomMarker) MarkerLayer(markers: []),
                     if (gl.modeMapShowSearchMarker)
                       MarkerLayer(markers: _placeSearchMarker()),
+                    if (_modeMeasurePath)
+                      MarkerLayer(markers: _getPathMeasureMarkers()),
                   ],
             ),
             if (_modeDrawPolygon && gl.polygonLayers.isNotEmpty)
@@ -561,198 +573,17 @@ class _MapPageState extends State<MapPage> {
                   ),
                 ],
               ),
-            _toolbarGuard(),
-            gl.position != null
-                ? Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        IconButton(
-                          iconSize: iconSize,
-                          color: gl.colorAgroBioTech,
-                          onPressed: () async {
-                            if (!_doingAnaPt) {
-                              refreshView(() {
-                                _doingAnaPt = true;
-                              });
-                              await _runAnaPt(
-                                epsg4326.transform(
-                                  epsg31370,
-                                  proj4.Point(
-                                    x: gl.position?.longitude ?? 0.0,
-                                    y: gl.position?.latitude ?? 0.0,
-                                  ),
-                                ),
-                              );
-                              _updatePtMarker(
-                                LatLng(
-                                  gl.position?.latitude ?? 0.0,
-                                  gl.position?.longitude ?? 0.0,
-                                ),
-                              );
-                              GoRouter.of(
-                                gl.notificationContext!,
-                              ).push("/anaPt");
-                              refreshView(() {
-                                _doingAnaPt = false;
-                              });
-                            }
-                          },
-                          icon: const Icon(Icons.analytics),
-                        ),
-                        IconButton(
-                          iconSize: iconSize,
-                          color: Colors.red,
-                          onPressed: () async {
-                            if (gl.position != null) {
-                              refreshView(() {
-                                _mapController.move(
-                                  LatLng(
-                                    gl.position?.latitude ?? 0.0,
-                                    gl.position?.longitude ?? 0.0,
-                                  ),
-                                  8,
-                                );
-                              });
-                            }
-                          },
-                          icon: const Icon(Icons.gps_fixed),
-                        ),
-                      ],
-                    ),
-                  ],
-                )
-                : Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        IconButton(
-                          iconSize: iconSize,
-                          color: Colors.black,
-                          onPressed: () async {
-                            if (gl.position != null) {
-                              refreshView(() {});
-                            }
-                          },
-                          icon: const Icon(Icons.gps_fixed),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+            _mainMenuBar(),
+            if (_toolbarExtended) _toolBar(),
+            if (_polygonToolbarExtended) _polygonToolbar(),
           ],
         ),
       ),
     );
   }
 
-  Widget _toolbarGuard() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: [
-        Column(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            _toolbarExtended ? _toolbar() : Container(),
-            IconButton(
-              iconSize: iconSize,
-              color: _toolbarExtended ? gl.colorAgroBioTech : Colors.black,
-              onPressed: () async {
-                refreshView(() {
-                  _toolbarExtended = !_toolbarExtended;
-                });
-                if (_toolbarExtended == false) {
-                  _closeLayerPropertiesMenu();
-                  _closePolygonDrawMenu();
-                  _closeProjectMenu();
-                }
-              },
-              icon: const Icon(Icons.forest),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _toolbar() {
-    return Column(
-      children: [
-        _searchButton(),
-        _layerSwitcherButton(),
-        _modeDrawPolygon ? _polygonToolbar() : Container(),
-        _drawPolygonButton(),
-      ],
-    );
-  }
-
   void _stopMovingSelectedPoint() {
     _selectedPointToMove = null;
-  }
-
-  Widget _polygonToolbar() {
-    return Column(
-      children: [
-        _layerPolygonButton(),
-        IconButton(
-          iconSize: iconSize,
-          color: _polygonMenuColorTools(_modeDrawPolygonMoveVertexes),
-          onPressed: () async {
-            refreshView(() {
-              _modeDrawPolygonMoveVertexes = !_modeDrawPolygonMoveVertexes;
-            });
-            if (_modeDrawPolygonMoveVertexes == true) {
-              _modeDrawPolygonAddVertexes = false;
-              _modeDrawPolygonRemoveVertexes = false;
-            } else {
-              refreshView(() {
-                _stopMovingSelectedPoint();
-              });
-            }
-          },
-          icon: const Icon(Icons.open_with_rounded),
-        ),
-        IconButton(
-          iconSize: iconSize,
-          color: _polygonMenuColorTools(_modeDrawPolygonRemoveVertexes),
-
-          onPressed: () async {
-            refreshView(() {
-              _modeDrawPolygonRemoveVertexes = !_modeDrawPolygonRemoveVertexes;
-            });
-            if (_modeDrawPolygonRemoveVertexes == true) {
-              _modeDrawPolygonMoveVertexes = false;
-              _modeDrawPolygonAddVertexes = false;
-              refreshView(() {
-                _stopMovingSelectedPoint();
-              });
-            }
-          },
-          icon: const Icon(Icons.remove_circle),
-        ),
-        IconButton(
-          iconSize: iconSize,
-          color: _polygonMenuColorTools(_modeDrawPolygonAddVertexes),
-          onPressed: () async {
-            refreshView(() {
-              _modeDrawPolygonAddVertexes = !_modeDrawPolygonAddVertexes;
-            });
-            if (_modeDrawPolygonAddVertexes == true) {
-              _modeDrawPolygonRemoveVertexes = false;
-              _modeDrawPolygonMoveVertexes = false;
-              refreshView(() {
-                _stopMovingSelectedPoint();
-              });
-            }
-          },
-          icon: const Icon(Icons.add_circle),
-        ),
-      ],
-    );
   }
 
   List<Polygon> _getPolygonesToDraw() {
@@ -797,9 +628,9 @@ class _MapPageState extends State<MapPage> {
       double scale = 1.5;
       all.add(
         Marker(
-          alignment: Alignment(0, -.2),
+          alignment: Alignment(0, -.075),
           width: 275,
-          height: 500,
+          height: 1000,
           point: poi.position,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -924,6 +755,7 @@ class _MapPageState extends State<MapPage> {
                 child: Text(
                   poi.address,
                   textScaler: TextScaler.linear(scale),
+                  textAlign: TextAlign.center,
                   maxLines: 10,
                 ),
               ),
@@ -1051,6 +883,24 @@ class _MapPageState extends State<MapPage> {
     return ret;
   }
 
+  List<Marker> _getPathMeasureMarkers() {
+    List<Marker> all = [];
+    all.addAll(
+      List<Marker>.generate(_measurePath.length, (i) {
+        return Marker(
+          alignment: Alignment.center,
+          point: _measurePath[i],
+          child: CircleAvatar(
+            radius: MediaQuery.of(context).size.width * .05,
+            backgroundColor: Colors.blueGrey.withAlpha(164),
+            child: TextButton(onPressed: () {}, child: Text("$i")),
+          ),
+        );
+      }),
+    );
+    return all;
+  }
+
   List<Marker> _drawnLayerPointsMarker() {
     if (gl.polygonLayers.isEmpty) {
       return [];
@@ -1108,80 +958,289 @@ class _MapPageState extends State<MapPage> {
     return all;
   }
 
-  void _closeProjectMenu() {
-    refreshView(() {
-      _modeProjectProperties = false;
-    });
+  void _closePolygonMenu() {
+    _polygonToolbarExtended = false;
+    _modeDrawPolygon = false;
+    _modeSearch = false;
+    _modeDrawPolygonRemoveVertexes = false;
+    _modeDrawPolygonMoveVertexes = false;
+    _modeAnaPtPreview = true;
   }
 
-  void _closeSearchMenu() {
-    refreshView(() {
-      _modeSearch = false;
-    });
+  void _closeToolbarMenu() {
+    _toolbarExtended = false;
+    _modeSearch = false;
+    _modeProjectProperties = false;
+    _modeMeasurePath = false;
   }
 
-  void _closePolygonDrawMenu() {
-    refreshView(() {
-      _modeDrawPolygon = false;
-      _modeDrawPolygonAddVertexes = false;
-      _modeDrawPolygonRemoveVertexes = false;
-      _modeDrawPolygonMoveVertexes = false;
-      _stopMovingSelectedPoint();
-      _modeAnaPtPreview = true;
-    });
+  void _closeSwitchesMenu() {
+    _modeLayerSwitches = false;
   }
 
-  void _closeLayerPropertiesMenu() {
-    refreshView(() {
-      _modeLayerProperties = false;
-    });
-  }
-
-  Widget _drawPolygonButton() {
-    return IconButton(
-      iconSize: iconSize,
-      color: _polygonMenuColor(_modeDrawPolygon),
-      onPressed: () async {
-        refreshView(() {
-          _modeDrawPolygon = !_modeDrawPolygon;
-        });
-        gl.refreshMap(() {
-          gl.modeMapShowPolygons = true;
-        });
-        if (_modeDrawPolygon == false) {
-          _closePolygonDrawMenu();
-          _modeAnaPtPreview = true;
-        } else {
-          _modeAnaPtPreview = false;
-          _closeLayerPropertiesMenu();
-          _closeProjectMenu();
-        }
-      },
-      icon: const Icon(Icons.polyline),
+  Widget _mainMenuBar() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              alignment: Alignment.center,
+              constraints: BoxConstraints(
+                maxHeight: MediaQuery.of(context).size.width * .2,
+                minHeight: MediaQuery.of(context).size.width * .2,
+                maxWidth: MediaQuery.of(context).size.width * .65,
+              ),
+              child: Card(
+                color: Colors.black.withAlpha(128),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    Container(
+                      color:
+                          !_toolbarExtended
+                              ? Colors.transparent
+                              : Colors.green.withAlpha(128),
+                      child: IconButton(
+                        color: _toolbarExtended ? Colors.white : Colors.green,
+                        iconSize: MediaQuery.of(context).size.width * .12,
+                        isSelected: _toolbarExtended,
+                        onPressed: () {
+                          setState(() {
+                            _toolbarExtended = !_toolbarExtended;
+                            if (_toolbarExtended) {
+                              _closePolygonMenu();
+                              _closeSwitchesMenu();
+                            } else {
+                              _closeToolbarMenu();
+                            }
+                          });
+                        },
+                        icon: Icon(Icons.forest),
+                      ),
+                    ),
+                    Container(
+                      color:
+                          !_polygonToolbarExtended
+                              ? Colors.transparent
+                              : Colors.yellow.withAlpha(128),
+                      child: IconButton(
+                        color:
+                            _polygonToolbarExtended
+                                ? Colors.white
+                                : Colors.yellow,
+                        iconSize: MediaQuery.of(context).size.width * .12,
+                        isSelected: _polygonToolbarExtended,
+                        onPressed: () {
+                          setState(() {
+                            _polygonToolbarExtended = !_polygonToolbarExtended;
+                            _modeDrawPolygon = _polygonToolbarExtended;
+                            if (_modeDrawPolygon) {
+                              _closeSwitchesMenu();
+                              _closeToolbarMenu();
+                            } else {
+                              _closePolygonMenu();
+                            }
+                          });
+                        },
+                        icon: Icon(Icons.polyline),
+                      ),
+                    ),
+                    Container(
+                      color:
+                          !_modeLayerSwitches
+                              ? Colors.transparent
+                              : Colors.brown.withAlpha(128),
+                      child: IconButton(
+                        color: _modeLayerSwitches ? Colors.white : Colors.brown,
+                        iconSize: MediaQuery.of(context).size.width * .12,
+                        isSelected: _modeLayerSwitches,
+                        onPressed: () {
+                          setState(() {
+                            _modeLayerSwitches = true;
+                            _closePolygonMenu();
+                            _closeToolbarMenu();
+                            PopupLayerSwitcher(gl.notificationContext!, () {
+                              setState(() {
+                                _closeSwitchesMenu();
+                              });
+                            });
+                          });
+                        },
+                        icon: Icon(Icons.remove_red_eye),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
     );
   }
 
-  Widget _layerSwitcherButton() {
-    return IconButton(
-      iconSize: iconSize,
-      color: _polygonMenuColor(_modeLayerProperties),
-      onPressed: () async {
-        refreshView(() {
-          _modeLayerProperties = !_modeLayerProperties;
-          if (_modeLayerProperties == false) {
-            _closeLayerPropertiesMenu();
-          } else {
-            _closePolygonDrawMenu();
-            _closeProjectMenu();
-          }
-        });
-        PopupLayerSwitcher(gl.notificationContext!, () {
-          setState(() {
-            _modeLayerProperties = false;
-          });
-        });
-      },
-      icon: const Icon(Icons.remove_red_eye),
+  Widget _toolBar() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Container(
+              alignment: Alignment.center,
+              constraints: BoxConstraints(
+                maxHeight:
+                    gl.position != null
+                        ? MediaQuery.of(context).size.width * .75
+                        : MediaQuery.of(context).size.width * .6,
+                maxWidth: MediaQuery.of(context).size.width * .2,
+              ),
+              child: Card(
+                color: Colors.black.withAlpha(128),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    gl.position != null
+                        ? Column(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            IconButton(
+                              iconSize: MediaQuery.of(context).size.width * .12,
+                              color: gl.colorAgroBioTech,
+                              onPressed: () async {
+                                if (!_doingAnaPt) {
+                                  refreshView(() {
+                                    _doingAnaPt = true;
+                                  });
+                                  await _runAnaPt(
+                                    epsg4326.transform(
+                                      epsg31370,
+                                      proj4.Point(
+                                        x: gl.position?.longitude ?? 0.0,
+                                        y: gl.position?.latitude ?? 0.0,
+                                      ),
+                                    ),
+                                  );
+                                  _updatePtMarker(
+                                    LatLng(
+                                      gl.position?.latitude ?? 0.0,
+                                      gl.position?.longitude ?? 0.0,
+                                    ),
+                                  );
+                                  GoRouter.of(
+                                    gl.notificationContext!,
+                                  ).push("/anaPt");
+                                  refreshView(() {
+                                    _doingAnaPt = false;
+                                  });
+                                }
+                              },
+                              icon: const Icon(Icons.analytics),
+                            ),
+                            IconButton(
+                              iconSize: MediaQuery.of(context).size.width * .12,
+                              color: Colors.red,
+                              onPressed: () async {
+                                if (gl.position != null) {
+                                  refreshView(() {
+                                    _mapController.move(
+                                      LatLng(
+                                        gl.position?.latitude ?? 0.0,
+                                        gl.position?.longitude ?? 0.0,
+                                      ),
+                                      8,
+                                    );
+                                  });
+                                }
+                              },
+                              icon: Icon(Icons.gps_fixed),
+                            ),
+                          ],
+                        )
+                        : Column(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            IconButton(
+                              iconSize: MediaQuery.of(context).size.width * .12,
+                              color: Colors.black,
+                              onPressed: () async {
+                                if (gl.position != null) {
+                                  refreshView(() {});
+                                }
+                              },
+                              icon: Icon(Icons.gps_fixed),
+                            ),
+                          ],
+                        ),
+                    Container(
+                      color:
+                          !_modeMeasurePath
+                              ? Colors.transparent
+                              : Colors.lightBlue.withAlpha(128),
+                      child: IconButton(
+                        color:
+                            _modeMeasurePath ? Colors.white : Colors.lightBlue,
+                        iconSize: MediaQuery.of(context).size.width * .12,
+                        isSelected: _modeMeasurePath,
+                        onPressed: () {
+                          setState(() {
+                            _modeMeasurePath = !_modeMeasurePath;
+                            _modeAnaPtPreview = !_modeMeasurePath;
+                            _measurePath.clear();
+                          });
+                        },
+                        icon: Icon(Icons.more_horiz_outlined),
+                      ),
+                    ),
+                    Container(
+                      color:
+                          !_modeSearch
+                              ? Colors.transparent
+                              : Colors.blueGrey.withAlpha(128),
+                      child: IconButton(
+                        iconSize: MediaQuery.of(context).size.width * .12,
+                        color: _modeSearch ? Colors.white : Colors.blueGrey,
+                        onPressed: () {
+                          setState(() {
+                            _modeSearch = true;
+                          });
+                          PopupSearchMenu(
+                            gl.notificationContext!,
+                            "",
+                            (LatLng pos) {
+                              if (pos.longitude != 0.0 && pos.latitude != 0.0) {
+                                _mapController.move(
+                                  pos,
+                                  _mapController.camera.zoom,
+                                );
+                              }
+                            },
+                            () {
+                              refreshView(() {
+                                _modeSearch = false;
+                              });
+                            },
+                          );
+                        },
+                        icon: FaIcon(FontAwesomeIcons.magnifyingGlassLocation),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+        _placeholder(
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.of(context).size.width * .2,
+            minHeight: MediaQuery.of(context).size.width * .2,
+            maxWidth: MediaQuery.of(context).size.width * .1,
+          ),
+        ),
+      ],
     );
   }
 
@@ -1216,39 +1275,102 @@ class _MapPageState extends State<MapPage> {
     );
   }
 
-  Widget _searchButton() {
-    return IconButton(
-      iconSize: iconSize,
-      color: _polygonMenuColor(_modeSearch),
-      onPressed: () async {
-        refreshView(() {
-          _modeSearch = !_modeSearch;
-        });
-        gl.refreshMap(() {});
-        if (_modeSearch == false) {
-          _closeSearchMenu();
-        } else {
-          _closeLayerPropertiesMenu();
-          _closePolygonDrawMenu();
-          _closeProjectMenu();
-        }
-        PopupSearchMenu(
-          gl.notificationContext!,
-          "",
-          (LatLng pos) {
-            if (pos.longitude != 0.0 && pos.latitude != 0.0) {
-              _mapController.move(pos, _mapController.camera.zoom);
-            }
-          },
-          () {
-            refreshView(() {
-              _modeSearch = false;
-            });
-          },
-        );
-      },
-      //icon:const Icon(Icons.search_location),
-      icon: FaIcon(FontAwesomeIcons.magnifyingGlassLocation),
+  Widget _polygonToolbar() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Container(
+              alignment: Alignment.center,
+              constraints: BoxConstraints(
+                maxHeight: MediaQuery.of(context).size.width * .7,
+                minHeight: MediaQuery.of(context).size.width * .7,
+                maxWidth: MediaQuery.of(context).size.width * .2,
+              ),
+              child: Card(
+                color: Colors.black.withAlpha(128),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    _layerPolygonButton(),
+                    IconButton(
+                      iconSize: iconSize,
+                      color: _polygonMenuColorTools(
+                        _modeDrawPolygonMoveVertexes,
+                      ),
+                      onPressed: () async {
+                        refreshView(() {
+                          _modeDrawPolygonMoveVertexes =
+                              !_modeDrawPolygonMoveVertexes;
+                        });
+                        if (_modeDrawPolygonMoveVertexes == true) {
+                          _modeDrawPolygonAddVertexes = false;
+                          _modeDrawPolygonRemoveVertexes = false;
+                        } else {
+                          refreshView(() {
+                            _stopMovingSelectedPoint();
+                          });
+                        }
+                      },
+                      icon: const Icon(Icons.open_with_rounded),
+                    ),
+                    IconButton(
+                      iconSize: iconSize,
+                      color: _polygonMenuColorTools(
+                        _modeDrawPolygonRemoveVertexes,
+                      ),
+
+                      onPressed: () async {
+                        refreshView(() {
+                          _modeDrawPolygonRemoveVertexes =
+                              !_modeDrawPolygonRemoveVertexes;
+                        });
+                        if (_modeDrawPolygonRemoveVertexes == true) {
+                          _modeDrawPolygonMoveVertexes = false;
+                          _modeDrawPolygonAddVertexes = false;
+                          refreshView(() {
+                            _stopMovingSelectedPoint();
+                          });
+                        }
+                      },
+                      icon: const Icon(Icons.remove_circle),
+                    ),
+                    IconButton(
+                      iconSize: iconSize,
+                      color: _polygonMenuColorTools(
+                        _modeDrawPolygonAddVertexes,
+                      ),
+                      onPressed: () async {
+                        refreshView(() {
+                          _modeDrawPolygonAddVertexes =
+                              !_modeDrawPolygonAddVertexes;
+                        });
+                        if (_modeDrawPolygonAddVertexes == true) {
+                          _modeDrawPolygonRemoveVertexes = false;
+                          _modeDrawPolygonMoveVertexes = false;
+                          refreshView(() {
+                            _stopMovingSelectedPoint();
+                          });
+                        }
+                      },
+                      icon: const Icon(Icons.add_circle),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+        _placeholder(
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.of(context).size.width * .2,
+            minHeight: MediaQuery.of(context).size.width * .2,
+            maxWidth: MediaQuery.of(context).size.width * .1,
+          ),
+        ),
+      ],
     );
   }
 
@@ -1292,6 +1414,10 @@ class _MapPageState extends State<MapPage> {
         ),
       );
     });
+  }
+
+  Widget _placeholder({BoxConstraints? constraints, Alignment? alignement}) {
+    return Container(constraints: constraints, alignment: alignement);
   }
 
   void _writeColorToMemory(

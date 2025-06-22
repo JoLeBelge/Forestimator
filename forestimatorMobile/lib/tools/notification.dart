@@ -302,9 +302,24 @@ class _DrawnLayerMenu extends State<DrawnLayerMenu> {
           });
         },
         children:
-            List<TextButton>.generate(
-              gl.polygonLayers.isEmpty ? 0 : gl.polygonLayers.length,
-              (int i) => TextButton(
+            List<
+              TextButton
+            >.generate(gl.polygonLayers.isEmpty ? 0 : gl.polygonLayers.length, (
+              int i,
+            ) {
+              Color activeTextColor =
+                  i == gl.selectedPolygonLayer
+                      ? getColorTextFromBackground(
+                        i == gl.selectedPolygonLayer
+                            ? gl.polygonLayers[i].colorInside.withAlpha(255)
+                            : Colors.grey.withAlpha(100),
+                      )
+                      : getColorTextFromBackground(
+                        i == gl.selectedPolygonLayer
+                            ? gl.polygonLayers[i].colorInside.withAlpha(255)
+                            : Colors.grey.withAlpha(100),
+                      ).withAlpha(128);
+              return TextButton(
                 style: ButtonStyle(
                   fixedSize:
                       i == gl.selectedPolygonLayer
@@ -379,10 +394,7 @@ class _DrawnLayerMenu extends State<DrawnLayerMenu> {
                                   },
                           icon: Icon(
                             Icons.delete_forever,
-                            color:
-                                gl.selectedPolygonLayer == i
-                                    ? active
-                                    : inactive,
+                            color: activeTextColor,
                             size: gl.selectedPolygonLayer == i ? 30 : 20,
                           ),
                         ),
@@ -392,7 +404,7 @@ class _DrawnLayerMenu extends State<DrawnLayerMenu> {
                                 ? TextButton(
                                   child: Text(
                                     gl.polygonLayers[i].name,
-                                    style: TextStyle(color: Colors.black),
+                                    style: TextStyle(color: activeTextColor),
                                     textScaler: TextScaler.linear(1.1),
                                   ),
                                   onPressed: () {
@@ -418,26 +430,30 @@ class _DrawnLayerMenu extends State<DrawnLayerMenu> {
                                 )
                                 : Text(
                                   gl.polygonLayers[i].name,
-                                  style: TextStyle(color: Colors.blueGrey),
+                                  style: TextStyle(color: activeTextColor),
                                   textScaler: TextScaler.linear(1.0),
                                 ),
 
                             i == gl.selectedPolygonLayer
                                 ? Text(
                                   "${(gl.polygonLayers[i].area / 100).round() / 100} Ha",
+                                  style: TextStyle(color: activeTextColor),
                                   textScaler: TextScaler.linear(1.2),
                                 )
                                 : Text(
                                   "${(gl.polygonLayers[i].area / 100).round() / 100} Ha",
+                                  style: TextStyle(color: activeTextColor),
                                   textScaler: TextScaler.linear(1.0),
                                 ),
                             i == gl.selectedPolygonLayer
                                 ? Text(
                                   "${(gl.polygonLayers[i].perimeter).round() / 1000} km",
+                                  style: TextStyle(color: activeTextColor),
                                   textScaler: TextScaler.linear(1.2),
                                 )
                                 : Text(
                                   "${(gl.polygonLayers[i].perimeter).round() / 1000} km",
+                                  style: TextStyle(color: activeTextColor),
                                   textScaler: TextScaler.linear(1.0),
                                 ),
                           ],
@@ -478,10 +494,7 @@ class _DrawnLayerMenu extends State<DrawnLayerMenu> {
                                           : () {},
                                   icon: Icon(
                                     Icons.color_lens,
-                                    color:
-                                        gl.selectedPolygonLayer == i
-                                            ? active
-                                            : inactive,
+                                    color: activeTextColor,
                                     size:
                                         gl.selectedPolygonLayer == i ? 30 : 20,
                                   ),
@@ -514,10 +527,7 @@ class _DrawnLayerMenu extends State<DrawnLayerMenu> {
                                           : () {},
                                   icon: Icon(
                                     Icons.analytics,
-                                    color:
-                                        gl.selectedPolygonLayer == i
-                                            ? active
-                                            : inactive,
+                                    color: activeTextColor,
                                     size:
                                         gl.selectedPolygonLayer == i ? 30 : 20,
                                   ),
@@ -530,8 +540,8 @@ class _DrawnLayerMenu extends State<DrawnLayerMenu> {
                     ),
                   ),
                 ),
-              ),
-            ) +
+              );
+            }) +
             [
               TextButton(
                 style: ButtonStyle(),
@@ -564,17 +574,18 @@ class PopupSearchMenu {
     Function after,
   ) {
     showDialog(
-      barrierDismissible: false,
+      barrierDismissible: true,
+      barrierColor: Colors.transparent,
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          titlePadding: EdgeInsets.all(5),
+          titlePadding: EdgeInsets.all(0),
           actionsPadding: EdgeInsets.all(0),
           contentPadding: EdgeInsets.all(0),
           insetPadding: EdgeInsets.all(0),
           buttonPadding: EdgeInsets.all(0),
           iconPadding: EdgeInsets.all(0),
-          backgroundColor: Color.fromRGBO(0, 0, 0, 0.2),
+          backgroundColor: Color.fromRGBO(0, 0, 0, 0.7),
           surfaceTintColor: Colors.transparent,
           shadowColor: Colors.transparent,
           title: Row(
@@ -588,33 +599,22 @@ class PopupSearchMenu {
               canvasColor: Colors.transparent,
               shadowColor: Colors.transparent,
             ),
-            child: SizedBox(
-              width: MediaQuery.of(context).size.width * .95,
+            child: Container(
+              constraints: BoxConstraints(
+                minHeight: MediaQuery.of(context).size.height * .4,
+                maxHeight: MediaQuery.of(context).size.height * .8,
+              ),
+              width: MediaQuery.of(context).size.width * .85,
               child: SearchMenu(state: state),
             ),
           ),
           titleTextStyle: TextStyle(color: Colors.white, fontSize: 25),
-          actions: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  constraints: BoxConstraints(minHeight: 20, minWidth: 200),
-                  child: FloatingActionButton(
-                    backgroundColor: gl.colorAgroBioTech,
-                    child: Text("Retour!", maxLines: 1),
-                    onPressed: () {
-                      after();
-                      Navigator.of(context, rootNavigator: true).pop();
-                    },
-                  ),
-                ),
-              ],
-            ),
-          ],
+          actions: [],
         );
       },
-    );
+    ).whenComplete(() {
+      after();
+    });
   }
 }
 
@@ -627,200 +627,194 @@ class SearchMenu extends StatefulWidget {
   State<StatefulWidget> createState() => _SearchMenu();
 }
 
-List<TextButton> _searchResults = [];
-
 class _SearchMenu extends State<SearchMenu> {
   final Color active = Colors.black;
   final Color inactive = const Color.fromARGB(255, 92, 92, 92);
 
   static String lastSearchKey = "";
   static Map<String, http.Response> searchCache = {};
+  static List<TextButton> searchResults = [];
 
   @override
   Widget build(BuildContext context) {
-    gl.refreshSearch = (Function x) {
-      mounted
-          ? setState(() {
-            x();
-          })
-          : () {
-            x();
-          };
-    };
     return Scaffold(
       backgroundColor: Colors.transparent,
-      body: ListView(
-        padding: const EdgeInsets.symmetric(horizontal: 5),
-        children:
-            [
-              TextButton(
-                key: Key('autsch-5'),
-                child: Card(
-                  child: TextFormField(
-                    autocorrect: false,
-                    initialValue: lastSearchKey,
-                    onChanged: (searchString) async {
-                      if (searchString.length < 2) {
-                        return;
-                      }
-                      lastSearchKey = searchString;
-                      http.Response response;
-                      if (searchCache[searchString] != null) {
-                        response = searchCache[searchString]!;
-                      } else {
-                        var request = Uri.parse(
-                          'http://appliprfw.gembloux.ulg.ac.be/search?q=${searchString.replaceAll(' ', '+')}+Wallonie&format=json&addressdetails=1',
-                        );
-                        response = await http.get(request);
-                        searchCache[searchString] = response;
-                      }
-                      List<Map<String, dynamic>> decodedJson;
-                      try {
-                        (decodedJson =
-                            (jsonDecode(response.body) as List)
-                                .cast<Map<String, dynamic>>());
-                      } catch (e) {
+      body: Column(
+        children: [
+          Container(
+            constraints: BoxConstraints(
+              minHeight: MediaQuery.of(context).size.height * .05,
+              maxHeight: MediaQuery.of(context).size.height * .1,
+              minWidth: MediaQuery.of(context).size.width * .8,
+              maxWidth: MediaQuery.of(context).size.width * .8,
+            ),
+            child: Card(
+              child: TextFormField(
+                autocorrect: false,
+                initialValue: lastSearchKey,
+                onChanged: (searchString) async {
+                  if (searchString.length < 2) {
+                    return;
+                  }
+                  lastSearchKey = searchString;
+                  http.Response response;
+                  if (searchCache[searchString] != null) {
+                    response = searchCache[searchString]!;
+                  } else {
+                    var request = Uri.parse(
+                      'http://appliprfw.gembloux.ulg.ac.be/search?q=${searchString.replaceAll(' ', '+')}+Wallonie&format=json&addressdetails=1',
+                    );
+                    response = await http.get(request);
+                    searchCache[searchString] = response;
+                  }
+                  List<Map<String, dynamic>> decodedJson;
+                  try {
+                    (decodedJson =
+                        (jsonDecode(response.body) as List)
+                            .cast<Map<String, dynamic>>());
+                  } catch (e) {
+                    gl.print("Error with response from gecoding service! $e");
+                    (decodedJson =
+                        (jsonDecode(testNominatimJsonResult) as List)
+                            .cast<Map<String, dynamic>>());
+                  }
+                  gl.poiMarkerList.clear();
+                  searchResults.clear();
+                  setState(() {
+                    gl.selectedSearchMarker = -1;
+                    int i = 0;
+                    for (var entry in decodedJson) {
+                      String? typeDeResultat =
+                          prettyPrintNominatimResults[entry['addresstype']];
+                      if (typeDeResultat == null) {
+                        typeDeResultat = entry['addresstype'];
                         gl.print(
-                          "Error with response from gecoding service! $e",
+                          "Error: not a translated addresstype: ${entry['addresstype']}",
                         );
-                        (decodedJson =
-                            (jsonDecode(testNominatimJsonResult) as List)
-                                .cast<Map<String, dynamic>>());
                       }
-                      gl.poiMarkerList.clear();
-                      _searchResults.clear();
-                      gl.refreshSearch(() {
-                        gl.selectedSearchMarker = -1;
-                        int i = 0;
-                        for (var entry in decodedJson) {
-                          String? typeDeResultat =
-                              prettyPrintNominatimResults[entry['addresstype']];
-                          if (typeDeResultat == null) {
-                            typeDeResultat = entry['addresstype'];
-                            gl.print(
-                              "Error: not a translated addresstype: ${entry['addresstype']}",
-                            );
-                          }
-                          String? descriptionDeResultat = entry['display_name'];
-                          if (descriptionDeResultat == null) {
-                            descriptionDeResultat = "Erreur du serveur";
-                            gl.print(
-                              "Erreur du serveur geocoding : ${entry['display_name']}",
-                            );
-                          } else {
-                            descriptionDeResultat = descriptionDeResultat
-                                .replaceAll(", België /", "");
-                            descriptionDeResultat = descriptionDeResultat
-                                .replaceAll("/ Belgien", "");
-                            descriptionDeResultat = descriptionDeResultat
-                                .replaceAll("Wallonie, ", "");
-                            descriptionDeResultat = descriptionDeResultat
-                                .replaceAll("Belgique", "");
-                          }
-                          Color boxColor = getColorFromName(typeDeResultat!);
-                          Color textColor = getColorTextFromBackground(
-                            boxColor,
-                          );
-                          gl.poiMarkerList.add(
-                            gl.PoiMarker(
-                              index: i++,
-                              position: LatLng(
+                      String? descriptionDeResultat = entry['display_name'];
+                      if (descriptionDeResultat == null) {
+                        descriptionDeResultat = "Erreur du serveur";
+                        gl.print(
+                          "Erreur du serveur geocoding : ${entry['display_name']}",
+                        );
+                      } else {
+                        descriptionDeResultat = descriptionDeResultat
+                            .replaceAll(", België /", "");
+                        descriptionDeResultat = descriptionDeResultat
+                            .replaceAll("/ Belgien", "");
+                        descriptionDeResultat = descriptionDeResultat
+                            .replaceAll("Wallonie, ", "");
+                        descriptionDeResultat = descriptionDeResultat
+                            .replaceAll("Belgique", "");
+                      }
+                      Color boxColor = getColorFromName(typeDeResultat!);
+                      Color textColor = getColorTextFromBackground(boxColor);
+                      gl.poiMarkerList.add(
+                        gl.PoiMarker(
+                          index: i++,
+                          position: LatLng(
+                            double.parse(entry['lat']),
+                            double.parse(entry['lon']),
+                          ),
+                          name: typeDeResultat,
+                          address: descriptionDeResultat,
+                          city:
+                              entry['address']['city'] ??
+                              entry['address']['county'] ??
+                              entry['address']['state'] ??
+                              "",
+                          postcode: entry['address']['postcode'] ?? "",
+                        ),
+                      );
+                      searchResults.add(
+                        TextButton(
+                          onPressed: () {
+                            gl.refreshMap(() {
+                              gl.modeMapShowSearchMarker = true;
+                            });
+                            widget.state(
+                              LatLng(
                                 double.parse(entry['lat']),
                                 double.parse(entry['lon']),
                               ),
-                              name: typeDeResultat,
-                              address: descriptionDeResultat,
-                              city:
-                                  entry['address']['city'] ??
-                                  entry['address']['county'] ??
-                                  entry['address']['state'] ??
-                                  "",
-                              postcode: entry['address']['postcode'] ?? "",
-                            ),
-                          );
-                          _searchResults.add(
-                            TextButton(
-                              onPressed: () {
-                                gl.refreshMap(() {
-                                  gl.modeMapShowSearchMarker = true;
-                                });
-                                widget.state(
-                                  LatLng(
-                                    double.parse(entry['lat']),
-                                    double.parse(entry['lon']),
-                                  ),
-                                );
-                              },
-                              child: Card(
-                                margin: EdgeInsets.all(10),
-                                color: boxColor,
-                                child: Row(
+                            );
+                          },
+                          child: Card(
+                            margin: EdgeInsets.all(4),
+                            color: boxColor,
+                            child: Row(
+                              children: [
+                                Column(
                                   children: [
-                                    Column(
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
                                       children: [
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            Container(
-                                              alignment: Alignment.center,
-                                              constraints: BoxConstraints(
-                                                maxWidth:
-                                                    MediaQuery.of(
-                                                      gl.notificationContext!,
-                                                    ).size.width *
-                                                    .7,
-                                              ),
-                                              child: Text(
-                                                typeDeResultat,
-                                                style: TextStyle(
-                                                  color: textColor,
-                                                  fontSize: 18,
-                                                ),
-                                              ),
+                                        Container(
+                                          alignment: Alignment.center,
+                                          constraints: BoxConstraints(
+                                            maxWidth:
+                                                MediaQuery.of(
+                                                  gl.notificationContext!,
+                                                ).size.width *
+                                                .7,
+                                          ),
+                                          child: Text(
+                                            typeDeResultat,
+                                            style: TextStyle(
+                                              color: textColor,
+                                              fontSize: 18,
                                             ),
-                                          ],
+                                          ),
                                         ),
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.start,
-                                          children: [
-                                            Container(
-                                              padding: EdgeInsets.all(10),
-                                              constraints: BoxConstraints(
-                                                maxWidth:
-                                                    MediaQuery.of(
-                                                      gl.notificationContext!,
-                                                    ).size.width *
-                                                    .7,
-                                              ),
-                                              child: Text(
-                                                descriptionDeResultat,
-                                                style: TextStyle(
-                                                  color: textColor,
-                                                ),
-                                              ),
-                                            ),
-                                          ],
+                                      ],
+                                    ),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: [
+                                        Container(
+                                          padding: EdgeInsets.all(10),
+                                          constraints: BoxConstraints(
+                                            maxWidth:
+                                                MediaQuery.of(
+                                                  gl.notificationContext!,
+                                                ).size.width *
+                                                .75,
+                                          ),
+                                          child: Text(
+                                            descriptionDeResultat,
+                                            style: TextStyle(color: textColor),
+                                          ),
                                         ),
                                       ],
                                     ),
                                   ],
                                 ),
-                              ),
+                              ],
                             ),
-                          );
-                        }
-                      });
-                    },
-                  ),
-                ),
-                onPressed: () {
-                  setState(() {});
+                          ),
+                        ),
+                      );
+                    }
+                  });
                 },
               ),
-            ] +
-            _searchResults,
+            ),
+          ),
+          Container(
+            padding: EdgeInsets.all(0),
+            constraints: BoxConstraints(
+              minHeight: MediaQuery.of(context).size.height * .2,
+              maxHeight: MediaQuery.of(context).size.height * .7,
+            ),
+            child: ListView(
+              padding: const EdgeInsets.symmetric(horizontal: 0),
+              children: <Widget>[] + searchResults,
+            ),
+          ),
+        ],
       ),
     );
   }
