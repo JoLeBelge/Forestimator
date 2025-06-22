@@ -51,6 +51,8 @@ class _MapPageState extends State<MapPage> {
   bool _modeProjectProperties = false;
   bool _modeSearch = false;
   bool _modeMeasurePath = false;
+  bool _modeMoveMeasurePath = false;
+  int selectedMeasurePointToMove = -1;
 
   final List<LatLng> _measurePath = [];
 
@@ -304,7 +306,13 @@ class _MapPageState extends State<MapPage> {
                   }
                 },
                 onTap:
-                    _modeMeasurePath
+                    _modeMoveMeasurePath
+                        ? (tapPosition, point) async => {
+                          setState(() {
+                            _modeMoveMeasurePath = false;
+                          }),
+                        }
+                        : _modeMeasurePath
                         ? (tapPosition, point) async => {
                           setState(() {
                             _measurePath.add(point);
@@ -335,6 +343,16 @@ class _MapPageState extends State<MapPage> {
                 onPositionChanged: (position, e) async {
                   if (!e) return;
                   updateLocation();
+                  if (_modeMoveMeasurePath) {
+                    _measurePath.removeAt(selectedMeasurePointToMove);
+                    _measurePath.insert(
+                      selectedMeasurePointToMove,
+                      LatLng(
+                        position.center.latitude,
+                        position.center.longitude,
+                      ),
+                    );
+                  }
                   if (_selectedPointToMove != null) {
                     gl.polygonLayers[gl.selectedPolygonLayer].replacePoint(
                       _selectedPointToMove!,
@@ -459,6 +477,34 @@ class _MapPageState extends State<MapPage> {
                   ] +
                   (_modeDrawPolygon
                       ? <Widget>[
+                        if (gl
+                                .polygonLayers[gl.selectedPolygonLayer]
+                                .vertexes
+                                .length >
+                            1)
+                          PolylineLayer(
+                            polylines: [
+                              Polyline(
+                                points: [
+                                  gl
+                                      .polygonLayers[gl.selectedPolygonLayer]
+                                      .vertexes[gl
+                                      .polygonLayers[gl.selectedPolygonLayer]
+                                      .selectedPolyLinePoints[0]],
+                                  gl
+                                      .polygonLayers[gl.selectedPolygonLayer]
+                                      .vertexes[gl
+                                      .polygonLayers[gl.selectedPolygonLayer]
+                                      .selectedPolyLinePoints[1]],
+                                ],
+                                color:
+                                    gl
+                                        .polygonLayers[gl.selectedPolygonLayer]
+                                        .colorLine,
+                                strokeWidth: 5.0,
+                              ),
+                            ],
+                          ),
                         CircleLayer(circles: _drawnLayerPointsCircleMarker()),
                         PolygonLayer(polygons: _getPolygonesToDraw()),
                         MarkerLayer(markers: _drawnLayerPointsMarker()),
@@ -476,6 +522,16 @@ class _MapPageState extends State<MapPage> {
                     if (gl.modeMapShowCustomMarker) MarkerLayer(markers: []),
                     if (gl.modeMapShowSearchMarker)
                       MarkerLayer(markers: _placeSearchMarker()),
+                    if (_modeMeasurePath && _measurePath.length > 1)
+                      PolylineLayer(
+                        polylines: [
+                          Polyline(
+                            points: _measurePath,
+                            color: Colors.blueGrey.withAlpha(128),
+                            strokeWidth: 10.0,
+                          ),
+                        ],
+                      ),
                     if (_modeMeasurePath)
                       MarkerLayer(markers: _getPathMeasureMarkers()),
                   ],
@@ -859,7 +915,8 @@ class _MapPageState extends State<MapPage> {
 
   List<Marker> _placeVertexMovePointer() {
     List<Marker> ret = [];
-    if (_modeDrawPolygonMoveVertexes && _selectedPointToMove != null) {
+    if ((_modeDrawPolygonMoveVertexes && _selectedPointToMove != null) ||
+        (_modeMeasurePath && _modeMoveMeasurePath)) {
       ret.add(
         Marker(
           alignment: Alignment.center,
@@ -869,7 +926,7 @@ class _MapPageState extends State<MapPage> {
           child: const Icon(Icons.donut_large, color: Colors.red),
         ),
       );
-    } else if (_modeDrawPolygonMoveVertexes) {
+    } else if (_modeDrawPolygonMoveVertexes || _modeMeasurePath) {
       ret.add(
         Marker(
           alignment: Alignment.center,
@@ -880,7 +937,47 @@ class _MapPageState extends State<MapPage> {
         ),
       );
     }
+    if (_modeMeasurePath && _measurePath.length > 1) {
+      ret.add(
+        Marker(
+          alignment: Alignment(0, -1),
+          width: 100,
+          height: 25,
+          point: _mapController.camera.center,
+          child: Text("${_computePathLength().round()} metres"),
+        ),
+      );
+    }
+
     return ret;
+  }
+
+  Offset _epsg4326ToEpsg31370(proj4.Point spPoint) {
+    return Offset(
+      gl.epsg4326.transform(gl.epsg31370, spPoint).x,
+      gl.epsg4326.transform(gl.epsg31370, spPoint).y,
+    );
+  }
+
+  double _computePathLength() {
+    if (_measurePath.length < 2) {
+      return 0.0;
+    }
+    List<Offset> path = [];
+    for (LatLng point in _measurePath) {
+      path.add(
+        _epsg4326ToEpsg31370(
+          proj4.Point(y: point.latitude, x: point.longitude),
+        ),
+      );
+    }
+    double length = 0.0;
+    Offset currentPoint = path.removeAt(0);
+    for (Offset point in path) {
+      length = length + (currentPoint - point).distance;
+      currentPoint = point;
+    }
+    return length;
   }
 
   List<Marker> _getPathMeasureMarkers() {
@@ -891,9 +988,36 @@ class _MapPageState extends State<MapPage> {
           alignment: Alignment.center,
           point: _measurePath[i],
           child: CircleAvatar(
-            radius: MediaQuery.of(context).size.width * .05,
+            radius: 10.0,
             backgroundColor: Colors.blueGrey.withAlpha(164),
-            child: TextButton(onPressed: () {}, child: Text("$i")),
+            child: TextButton(
+              onPressed: () {
+                setState(() {
+                  _modeMoveMeasurePath = !_modeMoveMeasurePath;
+                  if (_modeMoveMeasurePath ||
+                      (selectedMeasurePointToMove > -1 &&
+                          selectedMeasurePointToMove != i)) {
+                    selectedMeasurePointToMove = i;
+                    _mapController.move(
+                      _measurePath[i],
+                      _mapController.camera.zoom,
+                    );
+                  } else {
+                    selectedMeasurePointToMove = -1;
+                    _mapController.move(
+                      _measurePath[i],
+                      _mapController.camera.zoom,
+                    );
+                  }
+                });
+              },
+              onLongPress: () {
+                setState(() {
+                  _measurePath.removeAt(i);
+                });
+              },
+              child: Container(width: 10, height: 10),
+            ),
           ),
         );
       }),
