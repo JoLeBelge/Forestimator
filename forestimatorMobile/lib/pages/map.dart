@@ -410,7 +410,7 @@ class _MapPageState extends State<MapPage> {
                 },
               ),
               children:
-                  gl.interfaceSelectedLayerKeys.reversed.map<Widget>((
+                  gl.selectedLayerForMap.reversed.map<Widget>((
                     gl.SelectedLayer selLayer,
                   ) {
                     if (selLayer.offline &&
@@ -431,8 +431,7 @@ class _MapPageState extends State<MapPage> {
                             tileDisplay:
                                 gl.modeMapFirstTileLayerTrancparancy &&
                                         i > 1 &&
-                                        gl.interfaceSelectedLayerKeys.length ==
-                                            i
+                                        gl.selectedLayerForMap.length == i
                                     ? TileDisplay.instantaneous(opacity: 0.5)
                                     : TileDisplay.instantaneous(opacity: 1.0),
                             tileProvider: _provider,
@@ -452,7 +451,7 @@ class _MapPageState extends State<MapPage> {
                         tileDisplay:
                             gl.modeMapFirstTileLayerTrancparancy &&
                                     i > 1 &&
-                                    gl.interfaceSelectedLayerKeys.length == i
+                                    gl.selectedLayerForMap.length == i
                                 ? TileDisplay.instantaneous(opacity: 0.5)
                                 : TileDisplay.instantaneous(opacity: 1.0),
                         wmsOptions: WMSTileLayerOptions(
@@ -940,11 +939,24 @@ class _MapPageState extends State<MapPage> {
     if (_modeMeasurePath && _measurePath.length > 1) {
       ret.add(
         Marker(
-          alignment: Alignment(0, -1),
+          alignment: Alignment(0, -2),
           width: 100,
-          height: 25,
+          height: MediaQuery.of(context).size.width * .1,
           point: _mapController.camera.center,
-          child: Text("${_computePathLength().round()} metres"),
+          child: Card(
+            color: Colors.black.withAlpha(164),
+            child: Container(
+              alignment: Alignment.center,
+              child: Text(
+                _computePathLength().round() < 10000
+                    ? _computePathLength().round() < 5000
+                        ? "${_computePathLength().round().toString()} m"
+                        : "${((_computePathLength() / 1).round() / 1000).toString()} km"
+                    : "${((_computePathLength() / 100).round() / 10).toString()} km",
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+          ),
         ),
       );
     }
@@ -1016,7 +1028,7 @@ class _MapPageState extends State<MapPage> {
                   _measurePath.removeAt(i);
                 });
               },
-              child: Container(width: 10, height: 10),
+              child: SizedBox(width: 10, height: 10),
             ),
           ),
         );
@@ -1500,38 +1512,53 @@ class _MapPageState extends State<MapPage> {
 
   List<Marker> _getPolygonesInfos() {
     return List.generate(gl.polygonLayers.length, (i) {
+      String textArea = "${(gl.polygonLayers[i].area / 100).round() / 100} Ha";
       return Marker(
         alignment: Alignment.center,
+
         width:
-            iconSize * 3 > gl.polygonLayers[i].name.length * 11
-                ? iconSize * 4
-                : gl.polygonLayers[i].name.length * 11,
-        height: iconSize * 1.5,
+            textArea.length > gl.polygonLayers[i].name.length
+                ? MediaQuery.of(context).size.width * .15 +
+                    textArea.length * MediaQuery.of(context).size.width * .02
+                : MediaQuery.of(context).size.width * .15 +
+                    gl.polygonLayers[i].name.length *
+                        MediaQuery.of(context).size.width *
+                        .02,
+        height: MediaQuery.of(context).size.width * .15,
         point: gl.polygonLayers[i].center,
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.layers, color: gl.polygonLayers[i].colorLine),
-                ConstrainedBox(
-                  constraints: BoxConstraints(minWidth: 0),
-                  child: Text(
-                    gl.polygonLayers[i].name,
-                    overflow: TextOverflow.clip,
-                  ),
+                Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Icon(
+                          Icons.layers,
+                          color: gl.polygonLayers[i].colorLine,
+                        ),
+                        Text(
+                          gl.polygonLayers[i].name,
+                          overflow: TextOverflow.clip,
+                        ),
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Icon(
+                          Icons.square_foot,
+                          color: gl.polygonLayers[i].colorLine,
+                        ),
+                        Text(textArea),
+                      ],
+                    ),
+                  ],
                 ),
-              ],
-            ),
-            Row(
-              children: [
-                Icon(Icons.area_chart, color: gl.polygonLayers[i].colorLine),
-                Text("${(gl.polygonLayers[i].area / 100).round() / 100} Ha"),
-              ],
-            ),
-            Row(
-              children: [
-                Icon(Icons.crop, color: gl.polygonLayers[i].colorLine),
-                Text("${(gl.polygonLayers[i].perimeter).round() / 1000} km"),
               ],
             ),
           ],

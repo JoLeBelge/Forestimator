@@ -1616,7 +1616,16 @@ Widget forestimatorResultsHeaderContinue(
 ) {
   return Column(
     children: List<Widget>.generate(json.length, (i) {
+      if (!(i == 0 ||
+          prettyPrintContinousResults[layerCode] == null ||
+          prettyPrintContinousResults[layerCode]![json.keys.elementAt(i)] ==
+              null)) {
+        gl.print(
+          "Error printing reults: ${prettyPrintContinousResults[layerCode]}",
+        );
+      }
       return i == 0 ||
+              prettyPrintContinousResults[layerCode] == null ||
               prettyPrintContinousResults[layerCode]![json.keys.elementAt(i)] ==
                   null
           ? Container()
@@ -2869,20 +2878,21 @@ class _LayerSwitcher extends State<LayerSwitcher> {
             if (oldIndex < newIndex) {
               newIndex -= 1;
             }
-            if (gl.interfaceSelectedLayerKeys.length < newIndex + 1 ||
-                gl.interfaceSelectedLayerKeys.length < oldIndex + 1) {
+            if (gl.selectedLayerForMap.length < newIndex + 1 ||
+                gl.selectedLayerForMap.length < oldIndex + 1) {
               return;
             }
             gl.refreshMap(() {
-              final gl.SelectedLayer item = gl.interfaceSelectedLayerKeys
-                  .removeAt(oldIndex);
-              gl.interfaceSelectedLayerKeys.insert(newIndex, item);
+              final gl.SelectedLayer item = gl.selectedLayerForMap.removeAt(
+                oldIndex,
+              );
+              gl.selectedLayerForMap.insert(newIndex, item);
             });
           });
         },
 
         children: List<Widget>.generate(3, (i) {
-          if (gl.interfaceSelectedLayerKeys.length > i) {
+          if (gl.selectedLayerForMap[i].mCode != '${i + 1}') {
             return Card(
               margin: EdgeInsets.all(5),
               key: Key('$i+listOfThree'),
@@ -2925,9 +2935,7 @@ class _LayerSwitcher extends State<LayerSwitcher> {
                             ),
                             child: Text(
                               gl.dico
-                                  .getLayerBase(
-                                    gl.interfaceSelectedLayerKeys[i].mCode,
-                                  )
+                                  .getLayerBase(gl.selectedLayerForMap[i].mCode)
                                   .mNom,
                               style: TextStyle(
                                 color: Colors.black,
@@ -2962,12 +2970,12 @@ class _LayerSwitcher extends State<LayerSwitcher> {
                                 child: Image.asset(
                                   gl.dico
                                       .getLayerBase(
-                                        gl.interfaceSelectedLayerKeys[i].mCode,
+                                        gl.selectedLayerForMap[i].mCode,
                                       )
                                       .mLogoAttributionFile,
                                 ),
                               ),
-                              gl.interfaceSelectedLayerKeys[i].offline
+                              gl.selectedLayerForMap[i].offline
                                   ? Container(
                                     constraints: BoxConstraints(
                                       maxHeight:
@@ -3658,45 +3666,24 @@ class _MapSelectionMenu extends State<MapSelectionMenu> {
                                   ),
 
                                   onPressed: () {
-                                    gl.getInterfaceSelectedLCode().contains(
-                                          layerTile.key,
-                                        )
-                                        ? setState(() {
-                                          if (gl
-                                                  .interfaceSelectedLayerKeys
-                                                  .length >
-                                              1) {
-                                            gl.removeLayerFromList(
-                                              layerTile.key,
-                                            );
-                                          }
-                                          gl.refreshMap(() {});
-                                          widget.after(() {});
-                                        })
-                                        : setState(() {
-                                          if (gl
-                                                  .interfaceSelectedLayerKeys
-                                                  .length <
-                                              3) {
-                                            gl.addLayerToList(
-                                              layerTile.key,
-                                              offline: gl.offlineMode,
-                                            );
-                                          } else {
-                                            gl.removeLayerFromList(
-                                              gl
-                                                  .interfaceSelectedLayerKeys
-                                                  .first
-                                                  .mCode,
-                                            );
-                                            gl.addLayerToList(
-                                              layerTile.key,
-                                              offline: gl.offlineMode,
-                                            );
-                                          }
-                                          gl.refreshMap(() {});
-                                          widget.after(() {});
-                                        });
+                                    setState(() {
+                                      gl.isSelectedLayer(
+                                            layerTile.key,
+                                            offline: gl.offlineMode,
+                                          )
+                                          ? gl.removeLayerFromList(
+                                            key: layerTile.key,
+                                            offline: gl.offlineMode,
+                                          )
+                                          : gl.replaceLayerFromList(
+                                            layerTile.key,
+                                            index:
+                                                widget.interfaceSelectedMapKey,
+                                            offline: gl.offlineMode,
+                                          );
+                                    });
+                                    widget.after(() {});
+                                    gl.refreshMap(() {});
                                   },
                                   child: Card(
                                     color:

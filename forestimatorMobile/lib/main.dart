@@ -133,7 +133,7 @@ class _MyApp extends State<MyApp> {
             return e == "true";
           }).toList();
     }
-    gl.refreshInterfaceSelectedL();
+    gl.initializeSelectedLayerForFlutterMap();
 
     double? lat = prefs.getDouble('mapCenterLat');
     double? lon = prefs.getDouble('mapCenterLon');

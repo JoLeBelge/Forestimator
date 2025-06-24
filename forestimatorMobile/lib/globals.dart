@@ -126,31 +126,30 @@ class SelectedLayer {
   });
 }
 
-List<SelectedLayer> interfaceSelectedLayerKeys = [];
+List<SelectedLayer> selectedLayerForMap = [
+  SelectedLayer(mCode: "3", offline: false),
+  SelectedLayer(mCode: "2", offline: false),
+  SelectedLayer(mCode: "1", offline: false),
+];
 
 String getFirstSelLayOffline() {
-  List<SelectedLayer> l =
-      interfaceSelectedLayerKeys.where((i) => i.offline).toList();
-  return l.isNotEmpty ? l.first.mCode : "toto";
+  List<SelectedLayer> l = selectedLayerForMap.where((i) => i.offline).toList();
+  return l.isNotEmpty ? l.first.mCode : "_empty_";
 }
 
-void refreshInterfaceSelectedL() {
+void initializeSelectedLayerForFlutterMap() {
   for (int i = 0; i < interfaceSelectedLCode.length; i++) {
-    bool offline = false;
-    if (interfaceSelectedLOffline.length > i) {
-      offline = interfaceSelectedLOffline.elementAt(i);
-    }
-    addLayerToList(
+    replaceLayerFromList(
       interfaceSelectedLCode.elementAt(i),
-      offline: offline,
-      savePref: false,
+      index: i,
+      offline: false,
     );
   }
 }
 
 List<String> getInterfaceSelectedLCode() {
   List<String> aRes = [];
-  for (SelectedLayer l in interfaceSelectedLayerKeys) {
+  for (SelectedLayer l in selectedLayerForMap) {
     aRes.insert(aRes.length, l.mCode);
   }
   return aRes;
@@ -158,7 +157,7 @@ List<String> getInterfaceSelectedLCode() {
 
 List<String> getInterfaceSelectedLOffline() {
   List<String> aRes = [];
-  for (SelectedLayer l in interfaceSelectedLayerKeys) {
+  for (SelectedLayer l in selectedLayerForMap) {
     aRes.insert(aRes.length, l.offline.toString());
   }
   return aRes;
@@ -235,33 +234,61 @@ bool firstTimeUse = true;
 LatLng latlonCenter = const LatLng(49.76, 5.32);
 double mapZoom = 7.0;
 
-void removeLayerFromList(String key, {bool offline = false}) async {
-  SelectedLayer? sL;
-  for (var layer in interfaceSelectedLayerKeys) {
-    if (layer.mCode == key && layer.offline == offline) {
-      sL = layer;
+void removeLayerFromList({
+  bool offline = false,
+  int index = -1,
+  String key = "",
+}) {
+  if (key == "" && index == -1) {
+    return;
+  }
+  if (key != "") {
+    SelectedLayer? sL;
+    for (var layer in selectedLayerForMap) {
+      if (layer.mCode == key && layer.offline == offline) {
+        sL = layer;
+      }
+    }
+    if (sL != null) {
+      int index = selectedLayerForMap.indexOf(sL);
+      selectedLayerForMap.removeAt(index);
+      selectedLayerForMap.insert(index, SelectedLayer(mCode: '${index + 1}'));
     }
   }
-  if (sL != null) {
-    interfaceSelectedLayerKeys.remove(sL);
+  if (index > -1) {
+    selectedLayerForMap.removeAt(index);
+    selectedLayerForMap.insert(index, SelectedLayer(mCode: '${index + 1}'));
   }
 }
 
 void replaceLayerFromList(
-  String key,
   String replacement, {
+  String key = "",
+  int index = -1,
   bool offline = false,
-}) async {
-  SelectedLayer? sL;
-  for (var layer in interfaceSelectedLayerKeys) {
-    if (layer.mCode == key && layer.offline == offline) {
-      sL = layer;
+}) {
+  if (key == "" && index == -1) {
+    return;
+  }
+  if (key != "") {
+    SelectedLayer? sL;
+    for (var layer in selectedLayerForMap) {
+      if (layer.mCode == key && layer.offline == offline) {
+        sL = layer;
+      }
+    }
+    if (sL != null) {
+      int index = selectedLayerForMap.indexOf(sL);
+      selectedLayerForMap.removeAt(index);
+      selectedLayerForMap.insert(
+        index,
+        SelectedLayer(mCode: replacement, offline: offline),
+      );
     }
   }
-  if (sL != null) {
-    int index = interfaceSelectedLayerKeys.indexOf(sL);
-    interfaceSelectedLayerKeys.removeAt(index);
-    interfaceSelectedLayerKeys.insert(
+  if (index > -1) {
+    selectedLayerForMap.removeAt(index);
+    selectedLayerForMap.insert(
       index,
       SelectedLayer(mCode: replacement, offline: offline),
     );
@@ -270,7 +297,7 @@ void replaceLayerFromList(
 
 void savePrefSelLayOnline() async {
   interfaceSelectedLCode.clear();
-  for (SelectedLayer sL in interfaceSelectedLayerKeys) {
+  for (SelectedLayer sL in selectedLayerForMap) {
     interfaceSelectedLCode.add(sL.mCode);
   }
   final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -279,7 +306,7 @@ void savePrefSelLayOnline() async {
 
 void savePrefSelLayOffline() async {
   interfaceSelectedLCode.clear();
-  for (SelectedLayer sL in interfaceSelectedLayerKeys) {
+  for (SelectedLayer sL in selectedLayerForMap) {
     interfaceSelectedLCode.add(sL.mCode);
   }
   final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -289,9 +316,9 @@ void savePrefSelLayOffline() async {
 void loadPrefSelLayOnline() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   interfaceSelectedLCode = prefs.getStringList('interfaceSelectedLCode')!;
-  interfaceSelectedLayerKeys.clear();
+  selectedLayerForMap.clear();
   for (String key in interfaceSelectedLCode) {
-    interfaceSelectedLayerKeys.add(SelectedLayer(mCode: key, offline: false));
+    selectedLayerForMap.add(SelectedLayer(mCode: key, offline: false));
   }
 }
 
@@ -299,9 +326,9 @@ void loadPrefSelLayOffline() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   if (prefs.getStringList('interfaceSelectedOffCode') != null) {
     interfaceSelectedLCode = prefs.getStringList('interfaceSelectedOffCode')!;
-    interfaceSelectedLayerKeys.clear();
+    selectedLayerForMap.clear();
     for (String key in interfaceSelectedLCode) {
-      interfaceSelectedLayerKeys.add(SelectedLayer(mCode: key, offline: true));
+      selectedLayerForMap.add(SelectedLayer(mCode: key, offline: true));
     }
   }
 }
@@ -309,10 +336,10 @@ void loadPrefSelLayOffline() async {
 void changeSelectedLayerModeOffline() {
   savePrefSelLayOnline();
   loadPrefSelLayOffline();
-  interfaceSelectedLayerKeys.removeWhere((element) => element.offline == false);
+  selectedLayerForMap.removeWhere((element) => element.offline == false);
   if (dico.getLayersOffline().where((i) => i.mBits == 8).toList().isNotEmpty &&
-      interfaceSelectedLayerKeys.isEmpty) {
-    interfaceSelectedLayerKeys.insert(
+      selectedLayerForMap.isEmpty) {
+    selectedLayerForMap.insert(
       0,
       SelectedLayer(
         mCode:
@@ -326,9 +353,12 @@ void changeSelectedLayerModeOffline() {
       ),
     );
   } else {
-    while (interfaceSelectedLayerKeys.length > 1) {
-      interfaceSelectedLayerKeys.removeLast();
+    while (selectedLayerForMap.length > 1) {
+      selectedLayerForMap.removeLast();
     }
+  }
+  if (selectedLayerForMap.isEmpty) {
+    selectedLayerForMap.insert(0, SelectedLayer(mCode: '1', offline: true));
   }
 }
 
@@ -337,29 +367,8 @@ void changeSelectedLayerModeOnline() {
   loadPrefSelLayOnline();
 }
 
-void addLayerToList(
-  String key, {
-  bool offline = false,
-  bool savePref = true,
-}) async {
-  interfaceSelectedLayerKeys.insert(
-    0,
-    SelectedLayer(mCode: key, offline: offline),
-  );
-
-  if (!offlineMode) {
-    if (interfaceSelectedLayerKeys.length > 3) {
-      interfaceSelectedLayerKeys.removeLast();
-    }
-  } else {
-    while (interfaceSelectedLayerKeys.length > 1) {
-      interfaceSelectedLayerKeys.removeLast();
-    }
-  }
-}
-
 bool isSelectedLayer(String key, {offline = false}) {
-  for (var layer in interfaceSelectedLayerKeys) {
+  for (var layer in selectedLayerForMap) {
     if (layer.mCode == key && layer.offline == offline) {
       return true;
     }

@@ -8,4 +8,5 @@ final Map<String, Map<String, String>> prettyPrintContinousResults = {
   'dendro_hdom': {'mean': "Hauteur dominante moyenne [m]"},
   'dendro_vha': {'mean': "Moyenne [m^3/ha]", 'sum': "Volume total [m^3]"},
   'dendro_prop_fe': {'mean': "Moyenne [%]"},
+  'MNH2014b': {'mean': "Hauteur moyenne mètres [m]"},
 };
