@@ -2104,85 +2104,130 @@ class _OnlineMapMenu extends State<OnlineMapMenu> {
   int _selectedCategory = -1;
   int _selectedMap = -1;
 
+  bool _showCatalogue = true;
+  final List<String> _resultOfMapSearch = [];
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      body: ListView(
-        padding: const EdgeInsets.symmetric(horizontal: 0),
-        children: _injectGroupData(
-          (int i, GroupeCouche groupe) => TextButton(
-            style: ButtonStyle(
-              minimumSize:
-                  i == _selectedCategory
-                      ? WidgetStateProperty<Size>.fromMap(
-                        <WidgetStatesConstraint, Size>{
-                          WidgetState.any: Size(
-                            MediaQuery.of(context).size.width * .99,
-                            MediaQuery.of(context).size.height * .15,
-                          ),
-                        },
-                      )
-                      : WidgetStateProperty<Size>.fromMap(
-                        <WidgetStatesConstraint, Size>{
-                          WidgetState.any: Size(
-                            MediaQuery.of(context).size.width * .99,
-                            MediaQuery.of(context).size.height * .075,
-                          ),
-                        },
-                      ),
-            ),
-            key: Key('$i'),
-            onPressed:
-                i == _selectedCategory
-                    ? () {
-                      setState(() {
-                        _selectedCategory = -1;
-                        _selectedMap = -1;
-                      });
+    return Column(
+      children: [
+        Container(
+          constraints: BoxConstraints(
+            minHeight: MediaQuery.of(context).size.height * .05,
+            maxHeight: MediaQuery.of(context).size.height * .1,
+            minWidth: MediaQuery.of(context).size.width * .7,
+            maxWidth: MediaQuery.of(context).size.width * .95,
+          ),
+          child: Card(
+            child: TextFormField(
+              textAlign: TextAlign.center,
+              autocorrect: false,
+              enableSuggestions: true,
+              onChanged: (String value) {
+                _resultOfMapSearch.clear();
+                if (value.isNotEmpty) {
+                  for (String term in value.split(' ')) {
+                    if (term != '') {
+                      for (var layer in gl.dico.mLayerBases.values) {
+                        if (layer.mNom
+                            .toLowerCase()
+                            .replaceAll('è', 'e')
+                            .replaceAll('é', 'e')
+                            .replaceAll('ê', 'e')
+                            .replaceAll('â', 'a')
+                            .replaceAll('à', 'a')
+                            .replaceAll('ç', 'c')
+                            .contains(
+                              term
+                                  .toLowerCase()
+                                  .replaceAll('è', 'e')
+                                  .replaceAll('é', 'e')
+                                  .replaceAll('ê', 'e')
+                                  .replaceAll('â', 'a')
+                                  .replaceAll('à', 'a')
+                                  .replaceAll('ç', 'c'),
+                            )) {
+                          _resultOfMapSearch.add(layer.mCode);
+                        }
+                      }
                     }
-                    : () {
-                      setState(() {
-                        _selectedCategory = i;
-                        _selectedMap = -1;
-                      });
-                    },
-            child: Card(
-              surfaceTintColor: Colors.transparent,
-              shadowColor: Colors.transparent,
-              color:
-                  i == _selectedCategory
-                      ? gl.colorAgroBioTech.withAlpha(25)
-                      : gl.colorAgroBioTech.withAlpha(175),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  i != _selectedCategory
-                      ? Container(
-                        alignment: Alignment.center,
-                        padding: EdgeInsets.all(3),
-                        constraints: BoxConstraints(
-                          maxWidth: MediaQuery.of(context).size.width * .99,
-                          minHeight: MediaQuery.of(context).size.width * .2,
+                  }
+                }
+                if (_resultOfMapSearch.isEmpty || value.isEmpty) {
+                  setState(() {
+                    _showCatalogue = true;
+                  });
+                } else {
+                  setState(() {
+                    _showCatalogue = false;
+                  });
+                }
+              },
+            ),
+          ),
+        ),
+        Container(
+          constraints: BoxConstraints(
+            minHeight: MediaQuery.of(context).size.height * .3,
+            maxHeight: MediaQuery.of(context).size.height * .8,
+            minWidth: MediaQuery.of(context).size.width * .7,
+            maxWidth: MediaQuery.of(context).size.width * .99,
+          ),
+          child:
+              _showCatalogue
+                  ? ListView(
+                    padding: const EdgeInsets.symmetric(horizontal: 0),
+                    children: _injectGroupData(
+                      (int i, GroupeCouche groupe) => TextButton(
+                        style: ButtonStyle(
+                          minimumSize:
+                              i == _selectedCategory
+                                  ? WidgetStateProperty<Size>.fromMap(<
+                                    WidgetStatesConstraint,
+                                    Size
+                                  >{
+                                    WidgetState.any: Size(
+                                      MediaQuery.of(context).size.width * .99,
+                                      MediaQuery.of(context).size.height * .15,
+                                    ),
+                                  })
+                                  : WidgetStateProperty<Size>.fromMap(<
+                                    WidgetStatesConstraint,
+                                    Size
+                                  >{
+                                    WidgetState.any: Size(
+                                      MediaQuery.of(context).size.width * .99,
+                                      MediaQuery.of(context).size.height * .075,
+                                    ),
+                                  }),
                         ),
-                        child: Text(
-                          groupe.mLabel,
-                          textAlign: TextAlign.justify,
-                          style: TextStyle(color: Colors.black, fontSize: 22),
-                        ),
-                      )
-                      : Container(
-                        alignment: Alignment.center,
-                        padding: EdgeInsets.all(0),
-                        constraints: BoxConstraints(
-                          maxWidth: MediaQuery.of(context).size.width * .99,
-                        ),
-                        child: ListBody(
-                          children:
-                              <Widget>[
-                                Card(
-                                  color: gl.colorAgroBioTech.withAlpha(175),
-                                  child: Container(
+                        key: Key('$i'),
+                        onPressed:
+                            i == _selectedCategory
+                                ? () {
+                                  setState(() {
+                                    _selectedCategory = -1;
+                                    _selectedMap = -1;
+                                  });
+                                }
+                                : () {
+                                  setState(() {
+                                    _selectedCategory = i;
+                                    _selectedMap = -1;
+                                  });
+                                },
+                        child: Card(
+                          surfaceTintColor: Colors.transparent,
+                          shadowColor: Colors.transparent,
+                          color:
+                              i == _selectedCategory
+                                  ? gl.colorAgroBioTech.withAlpha(50)
+                                  : gl.colorAgroBioTech.withAlpha(200),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              i != _selectedCategory
+                                  ? Container(
                                     alignment: Alignment.center,
                                     padding: EdgeInsets.all(3),
                                     constraints: BoxConstraints(
@@ -2195,191 +2240,400 @@ class _OnlineMapMenu extends State<OnlineMapMenu> {
                                     ),
                                     child: Text(
                                       groupe.mLabel,
-                                      textAlign: TextAlign.justify,
+                                      textAlign: TextAlign.center,
                                       style: TextStyle(
                                         color: Colors.black,
                                         fontSize: 22,
                                       ),
                                     ),
-                                  ),
-                                ),
-                              ] +
-                              _injectLayerData(groupe.mCode, (
-                                int i,
-                                LayerTile layerTile,
-                              ) {
-                                return TextButton(
-                                  style: ButtonStyle(
-                                    minimumSize:
-                                        i == _selectedMap
-                                            ? WidgetStateProperty<Size>.fromMap(
-                                              <WidgetStatesConstraint, Size>{
-                                                WidgetState.any: Size(
-                                                  MediaQuery.of(
+                                  )
+                                  : Container(
+                                    alignment: Alignment.center,
+                                    padding: EdgeInsets.all(0),
+                                    constraints: BoxConstraints(
+                                      maxWidth:
+                                          MediaQuery.of(context).size.width *
+                                          .99,
+                                    ),
+                                    child: ListBody(
+                                      children:
+                                          <Widget>[
+                                            Card(
+                                              color: gl.colorAgroBioTech
+                                                  .withAlpha(200),
+                                              child: Container(
+                                                alignment: Alignment.center,
+                                                padding: EdgeInsets.all(3),
+                                                constraints: BoxConstraints(
+                                                  maxWidth:
+                                                      MediaQuery.of(
                                                         context,
                                                       ).size.width *
                                                       .99,
-                                                  MediaQuery.of(
-                                                        context,
-                                                      ).size.height *
-                                                      .1,
-                                                ),
-                                              },
-                                            )
-                                            : WidgetStateProperty<Size>.fromMap(
-                                              <WidgetStatesConstraint, Size>{
-                                                WidgetState.any: Size(
-                                                  MediaQuery.of(
+                                                  minHeight:
+                                                      MediaQuery.of(
                                                         context,
                                                       ).size.width *
-                                                      .99,
-                                                  MediaQuery.of(
-                                                        context,
-                                                      ).size.height *
-                                                      .075,
+                                                      .2,
                                                 ),
-                                              },
+                                                child: Text(
+                                                  groupe.mLabel,
+                                                  textAlign: TextAlign.center,
+                                                  style: TextStyle(
+                                                    color: Colors.black,
+                                                    fontSize: 22,
+                                                  ),
+                                                ),
+                                              ),
                                             ),
-                                  ),
+                                          ] +
+                                          _injectLayerData(groupe.mCode, (
+                                            int i,
+                                            LayerTile layerTile,
+                                          ) {
+                                            return TextButton(
+                                              style: ButtonStyle(
+                                                minimumSize:
+                                                    i == _selectedMap
+                                                        ? WidgetStateProperty<
+                                                          Size
+                                                        >.fromMap(<
+                                                          WidgetStatesConstraint,
+                                                          Size
+                                                        >{
+                                                          WidgetState.any: Size(
+                                                            MediaQuery.of(
+                                                                  context,
+                                                                ).size.width *
+                                                                .99,
+                                                            MediaQuery.of(
+                                                                  context,
+                                                                ).size.height *
+                                                                .1,
+                                                          ),
+                                                        })
+                                                        : WidgetStateProperty<
+                                                          Size
+                                                        >.fromMap(<
+                                                          WidgetStatesConstraint,
+                                                          Size
+                                                        >{
+                                                          WidgetState.any: Size(
+                                                            MediaQuery.of(
+                                                                  context,
+                                                                ).size.width *
+                                                                .99,
+                                                            MediaQuery.of(
+                                                                  context,
+                                                                ).size.height *
+                                                                .075,
+                                                          ),
+                                                        }),
+                                              ),
 
-                                  onPressed: () {
-                                    setState(() {
-                                      _selectedMap == i
-                                          ? _selectedMap = -1
-                                          : _selectedMap = i;
-                                    });
-                                  },
-                                  child: Card(
-                                    color:
-                                        i == _selectedMap
-                                            ? Colors.white.withAlpha(255)
-                                            : Colors.white.withAlpha(150),
-                                    child:
-                                        i != _selectedMap
-                                            ? Container(
+                                              onPressed: () {
+                                                setState(() {
+                                                  _selectedMap == i
+                                                      ? _selectedMap = -1
+                                                      : _selectedMap = i;
+                                                });
+                                              },
+                                              child: Card(
+                                                color:
+                                                    i == _selectedMap
+                                                        ? Colors.white
+                                                            .withAlpha(255)
+                                                        : Colors.white
+                                                            .withAlpha(200),
+                                                child:
+                                                    i != _selectedMap
+                                                        ? Container(
+                                                          constraints:
+                                                              BoxConstraints(
+                                                                minHeight:
+                                                                    MediaQuery.of(
+                                                                      context,
+                                                                    ).size.width *
+                                                                    .15,
+                                                              ),
+                                                          child: Column(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .center,
+                                                            children: [
+                                                              Row(
+                                                                mainAxisAlignment:
+                                                                    MainAxisAlignment
+                                                                        .center,
+                                                                children: [
+                                                                  Container(
+                                                                    constraints: BoxConstraints(
+                                                                      maxWidth:
+                                                                          MediaQuery.of(
+                                                                            context,
+                                                                          ).size.width *
+                                                                          .8,
+                                                                    ),
+                                                                    child: Text(
+                                                                      layerTile
+                                                                          .name,
+                                                                      textAlign:
+                                                                          TextAlign
+                                                                              .center,
+                                                                      style: TextStyle(
+                                                                        color:
+                                                                            Colors.black,
+                                                                        fontSize:
+                                                                            18,
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        )
+                                                        : Column(
+                                                          children: [
+                                                            Row(
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .center,
+                                                              children: [
+                                                                Text(
+                                                                  layerTile
+                                                                      .name,
+                                                                ),
+                                                              ],
+                                                            ),
+                                                            OnlineMapStatusTool(
+                                                              layerTile:
+                                                                  layerTile,
+                                                            ),
+                                                            LegendView(
+                                                              layerKey:
+                                                                  layerTile.key,
+                                                              color:
+                                                                  gl.colorBackgroundSecondary,
+                                                              constraintsText: BoxConstraints(
+                                                                minWidth:
+                                                                    MediaQuery.of(
+                                                                      context,
+                                                                    ).size.width *
+                                                                    .4,
+                                                                maxWidth:
+                                                                    MediaQuery.of(
+                                                                      context,
+                                                                    ).size.width *
+                                                                    .4,
+                                                                minHeight:
+                                                                    MediaQuery.of(
+                                                                      context,
+                                                                    ).size.height *
+                                                                    .02,
+                                                                maxHeight:
+                                                                    MediaQuery.of(
+                                                                      context,
+                                                                    ).size.height *
+                                                                    .02,
+                                                              ),
+                                                              constraintsColors: BoxConstraints(
+                                                                minWidth:
+                                                                    MediaQuery.of(
+                                                                      context,
+                                                                    ).size.width *
+                                                                    .4,
+                                                                maxWidth:
+                                                                    MediaQuery.of(
+                                                                      context,
+                                                                    ).size.width *
+                                                                    .4,
+                                                                minHeight:
+                                                                    MediaQuery.of(
+                                                                      context,
+                                                                    ).size.height *
+                                                                    .02,
+                                                                maxHeight:
+                                                                    MediaQuery.of(
+                                                                      context,
+                                                                    ).size.height *
+                                                                    .02,
+                                                              ),
+                                                            ),
+                                                            Row(
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .center,
+                                                              children: [
+                                                                layerTile
+                                                                    .proprietaire(),
+                                                              ],
+                                                            ),
+                                                          ],
+                                                        ),
+                                              ),
+                                            );
+                                          }),
+                                    ),
+                                  ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  )
+                  : ListView(
+                    children: List<Widget>.generate(_resultOfMapSearch.length, (
+                      int i,
+                    ) {
+                      LayerTile layerTile = LayerTile(
+                        key: _resultOfMapSearch[i],
+                        name: gl.dico.getLayerBase(_resultOfMapSearch[i]).mNom,
+                        filter:
+                            gl.dico.getLayerBase(_resultOfMapSearch[i]).mGroupe,
+                      );
+                      return TextButton(
+                        style: ButtonStyle(
+                          minimumSize:
+                              i == _selectedMap
+                                  ? WidgetStateProperty<Size>.fromMap(
+                                    <WidgetStatesConstraint, Size>{
+                                      WidgetState.any: Size(
+                                        MediaQuery.of(context).size.width * .99,
+                                        MediaQuery.of(context).size.height * .1,
+                                      ),
+                                    },
+                                  )
+                                  : WidgetStateProperty<Size>.fromMap(<
+                                    WidgetStatesConstraint,
+                                    Size
+                                  >{
+                                    WidgetState.any: Size(
+                                      MediaQuery.of(context).size.width * .99,
+                                      MediaQuery.of(context).size.height * .075,
+                                    ),
+                                  }),
+                        ),
+
+                        onPressed: () {
+                          setState(() {
+                            _selectedMap == i
+                                ? _selectedMap = -1
+                                : _selectedMap = i;
+                          });
+                        },
+                        child: Card(
+                          color:
+                              i == _selectedMap
+                                  ? Colors.white.withAlpha(255)
+                                  : Colors.white.withAlpha(200),
+                          child:
+                              i != _selectedMap
+                                  ? Container(
+                                    constraints: BoxConstraints(
+                                      minHeight:
+                                          MediaQuery.of(context).size.width *
+                                          .15,
+                                    ),
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Container(
                                               constraints: BoxConstraints(
-                                                minHeight:
+                                                maxWidth:
                                                     MediaQuery.of(
                                                       context,
                                                     ).size.width *
-                                                    .15,
+                                                    .8,
                                               ),
-                                              child: Column(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                children: [
-                                                  Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .center,
-                                                    children: [
-                                                      Container(
-                                                        constraints:
-                                                            BoxConstraints(
-                                                              maxWidth:
-                                                                  MediaQuery.of(
-                                                                    context,
-                                                                  ).size.width *
-                                                                  .8,
-                                                            ),
-                                                        child: Text(
-                                                          layerTile.name,
-                                                          textAlign:
-                                                              TextAlign.justify,
-                                                          style: TextStyle(
-                                                            color: Colors.black,
-                                                            fontSize: 18,
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ],
+                                              child: Text(
+                                                layerTile.name,
+                                                textAlign: TextAlign.center,
+                                                style: TextStyle(
+                                                  color: Colors.black,
+                                                  fontSize: 24,
+                                                ),
                                               ),
-                                            )
-                                            : Column(
-                                              children: [
-                                                Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.center,
-                                                  children: [
-                                                    Text(layerTile.name),
-                                                  ],
-                                                ),
-                                                OnlineMapStatusTool(
-                                                  layerTile: layerTile,
-                                                ),
-                                                LegendView(
-                                                  layerKey: layerTile.key,
-                                                  color:
-                                                      gl.colorBackgroundSecondary,
-                                                  constraintsText:
-                                                      BoxConstraints(
-                                                        minWidth:
-                                                            MediaQuery.of(
-                                                              context,
-                                                            ).size.width *
-                                                            .4,
-                                                        maxWidth:
-                                                            MediaQuery.of(
-                                                              context,
-                                                            ).size.width *
-                                                            .4,
-                                                        minHeight:
-                                                            MediaQuery.of(
-                                                              context,
-                                                            ).size.height *
-                                                            .02,
-                                                        maxHeight:
-                                                            MediaQuery.of(
-                                                              context,
-                                                            ).size.height *
-                                                            .02,
-                                                      ),
-                                                  constraintsColors:
-                                                      BoxConstraints(
-                                                        minWidth:
-                                                            MediaQuery.of(
-                                                              context,
-                                                            ).size.width *
-                                                            .4,
-                                                        maxWidth:
-                                                            MediaQuery.of(
-                                                              context,
-                                                            ).size.width *
-                                                            .4,
-                                                        minHeight:
-                                                            MediaQuery.of(
-                                                              context,
-                                                            ).size.height *
-                                                            .02,
-                                                        maxHeight:
-                                                            MediaQuery.of(
-                                                              context,
-                                                            ).size.height *
-                                                            .02,
-                                                      ),
-                                                ),
-                                                Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.center,
-                                                  children: [
-                                                    layerTile.proprietaire(),
-                                                  ],
-                                                ),
-                                              ],
                                             ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  )
+                                  : Column(
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [Text(layerTile.name)],
+                                      ),
+                                      OnlineMapStatusTool(layerTile: layerTile),
+                                      LegendView(
+                                        layerKey: layerTile.key,
+                                        color: gl.colorBackgroundSecondary,
+                                        constraintsText: BoxConstraints(
+                                          minWidth:
+                                              MediaQuery.of(
+                                                context,
+                                              ).size.width *
+                                              .4,
+                                          maxWidth:
+                                              MediaQuery.of(
+                                                context,
+                                              ).size.width *
+                                              .4,
+                                          minHeight:
+                                              MediaQuery.of(
+                                                context,
+                                              ).size.height *
+                                              .02,
+                                          maxHeight:
+                                              MediaQuery.of(
+                                                context,
+                                              ).size.height *
+                                              .02,
+                                        ),
+                                        constraintsColors: BoxConstraints(
+                                          minWidth:
+                                              MediaQuery.of(
+                                                context,
+                                              ).size.width *
+                                              .4,
+                                          maxWidth:
+                                              MediaQuery.of(
+                                                context,
+                                              ).size.width *
+                                              .4,
+                                          minHeight:
+                                              MediaQuery.of(
+                                                context,
+                                              ).size.height *
+                                              .02,
+                                          maxHeight:
+                                              MediaQuery.of(
+                                                context,
+                                              ).size.height *
+                                              .02,
+                                        ),
+                                      ),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [layerTile.proprietaire()],
+                                      ),
+                                    ],
                                   ),
-                                );
-                              }),
                         ),
-                      ),
-                ],
-              ),
-            ),
-          ),
+                      );
+                    }),
+                  ),
         ),
-      ),
+      ],
     );
   }
 
@@ -2441,7 +2695,7 @@ class PopupOnlineMapMenu {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          titlePadding: EdgeInsets.all(5),
+          titlePadding: EdgeInsets.all(0),
           actionsPadding: EdgeInsets.all(0),
           contentPadding: EdgeInsets.all(0),
           insetPadding: EdgeInsets.all(0),
@@ -2450,14 +2704,7 @@ class PopupOnlineMapMenu {
           backgroundColor: Color.fromRGBO(0, 0, 0, 0.2),
           surfaceTintColor: Colors.transparent,
           shadowColor: Colors.transparent,
-
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text("Liste des cartes en ligne", textAlign: TextAlign.justify),
-            ],
-          ),
-
+          title: null,
           content: Theme(
             data: Theme.of(context).copyWith(
               canvasColor: Colors.transparent,
@@ -2475,13 +2722,13 @@ class PopupOnlineMapMenu {
               children: [
                 Container(
                   constraints: BoxConstraints(
-                    maxHeight: MediaQuery.of(context).size.width * .2,
-                    minHeight: MediaQuery.of(context).size.width * .2,
-                    minWidth: MediaQuery.of(context).size.width * .65,
-                    maxWidth: MediaQuery.of(context).size.width * .65,
+                    maxHeight: MediaQuery.of(context).size.width * .17,
+                    minHeight: MediaQuery.of(context).size.width * .17,
+                    minWidth: MediaQuery.of(context).size.width * .63,
+                    maxWidth: MediaQuery.of(context).size.width * .63,
                   ),
                   child: FloatingActionButton(
-                    backgroundColor: gl.colorAgroBioTech,
+                    backgroundColor: Colors.green,
                     child: Text("Retour!", maxLines: 1),
                     onPressed: () {
                       after();
@@ -3558,7 +3805,7 @@ class MapSelectionMenu extends StatefulWidget {
 class _MapSelectionMenu extends State<MapSelectionMenu> {
   int _selectedCategory = -1;
   bool _showCatalogue = true;
-  final List<Widget> _resultOfMapSearch = [];
+  final List<String> _resultOfMapSearch = [];
 
   @override
   Widget build(BuildContext context) {
@@ -3573,137 +3820,40 @@ class _MapSelectionMenu extends State<MapSelectionMenu> {
           ),
           child: Card(
             child: TextFormField(
+              textAlign: TextAlign.center,
+              autocorrect: false,
+              enableSuggestions: true,
               onChanged: (String value) {
                 _resultOfMapSearch.clear();
-                if (value.length > 1) {
-                  for (var layer in gl.dico.mLayerBases.values) {
-                    if (layer.mNom
-                        .toLowerCase()
-                        .replaceAll('è', 'e')
-                        .replaceAll('é', 'e')
-                        .replaceAll('ê', 'e')
-                        .replaceAll('â', 'a')
-                        .replaceAll('à', 'a')
-                        .replaceAll('ç', 'c')
-                        .contains(
-                          value
-                              .toLowerCase()
-                              .replaceAll('è', 'e')
-                              .replaceAll('é', 'e')
-                              .replaceAll('ê', 'e')
-                              .replaceAll('â', 'a')
-                              .replaceAll('à', 'a')
-                              .replaceAll('ç', 'c'),
-                        )) {
-                      _resultOfMapSearch.add(
-                        TextButton(
-                          style: ButtonStyle(
-                            minimumSize: WidgetStateProperty<Size>.fromMap(
-                              <WidgetStatesConstraint, Size>{
-                                WidgetState.any: Size(
-                                  MediaQuery.of(context).size.width * .7,
-                                  MediaQuery.of(context).size.height * .1,
-                                ),
-                              },
-                            ),
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              gl.isSelectedLayer(
-                                    layer.mCode,
-                                    offline: gl.offlineMode,
-                                  )
-                                  ? gl.slotContainsLayer(
-                                        widget.interfaceSelectedMapKey,
-                                        layer.mCode,
-                                      )
-                                      ? gl.removeLayerFromList(
-                                        index: widget.interfaceSelectedMapKey,
-                                        offline: gl.offlineMode,
-                                      )
-                                      : {
-                                        gl.replaceLayerFromList(
-                                          gl
-                                              .selectedLayerForMap[widget
-                                                  .interfaceSelectedMapKey]
-                                              .mCode,
-                                          index: gl.getIndexForLayer(
-                                            layer.mCode,
-                                          ),
-                                          offline: gl.offlineMode,
-                                        ),
-                                        gl.replaceLayerFromList(
-                                          layer.mCode,
-                                          index: widget.interfaceSelectedMapKey,
-                                          offline: gl.offlineMode,
-                                        ),
-                                      }
-                                  : gl.replaceLayerFromList(
-                                    layer.mCode,
-                                    index: widget.interfaceSelectedMapKey,
-                                    offline: gl.offlineMode,
-                                  );
-                            });
-                            widget.after(() {});
-                            gl.refreshMap(() {});
-                          },
-                          child: Card(
-                            color:
-                                gl.isSelectedLayer(
-                                      layer.mCode,
-                                      offline: gl.offlineMode,
-                                    )
-                                    ? gl.slotContainsLayer(
-                                          widget.interfaceSelectedMapKey,
-                                          layer.mCode,
-                                        )
-                                        ? Colors.orange.withAlpha(220)
-                                        : Colors.blueGrey.withAlpha(220)
-                                    : Colors.white.withAlpha(220),
-                            child: Container(
-                              constraints: BoxConstraints(
-                                minHeight:
-                                    MediaQuery.of(context).size.width * .15,
-                              ),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Container(
-                                        constraints: BoxConstraints(
-                                          maxWidth:
-                                              MediaQuery.of(
-                                                context,
-                                              ).size.width *
-                                              .6,
-                                        ),
-                                        child: Text(
-                                          layer.mNom,
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(
-                                            color: Colors.black,
-                                            fontSize:
-                                                MediaQuery.of(
-                                                  context,
-                                                ).size.width *
-                                                .05,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      );
+                if (value.isNotEmpty) {
+                  for (String term in value.split(' ')) {
+                    if (term != '') {
+                      for (var layer in gl.dico.mLayerBases.values) {
+                        if (layer.mNom
+                            .toLowerCase()
+                            .replaceAll('è', 'e')
+                            .replaceAll('é', 'e')
+                            .replaceAll('ê', 'e')
+                            .replaceAll('â', 'a')
+                            .replaceAll('à', 'a')
+                            .replaceAll('ç', 'c')
+                            .contains(
+                              term
+                                  .toLowerCase()
+                                  .replaceAll('è', 'e')
+                                  .replaceAll('é', 'e')
+                                  .replaceAll('ê', 'e')
+                                  .replaceAll('â', 'a')
+                                  .replaceAll('à', 'a')
+                                  .replaceAll('ç', 'c'),
+                            )) {
+                          _resultOfMapSearch.add(layer.mCode);
+                        }
+                      }
                     }
                   }
                 }
-                if (_resultOfMapSearch.isEmpty) {
+                if (_resultOfMapSearch.isEmpty || value.isEmpty) {
                   setState(() {
                     _showCatalogue = true;
                   });
@@ -3718,7 +3868,7 @@ class _MapSelectionMenu extends State<MapSelectionMenu> {
         ),
         Container(
           constraints: BoxConstraints(
-            minHeight: MediaQuery.of(context).size.height * .8,
+            minHeight: MediaQuery.of(context).size.height * .3,
             maxHeight: MediaQuery.of(context).size.height * .8,
             minWidth: MediaQuery.of(context).size.width * .7,
             maxWidth: MediaQuery.of(context).size.width * .8,
@@ -3988,7 +4138,106 @@ class _MapSelectionMenu extends State<MapSelectionMenu> {
                       ),
                     ),
                   )
-                  : ListView(children: <Widget>[] + _resultOfMapSearch),
+                  : ListView(
+                    children: List<Widget>.generate(_resultOfMapSearch.length, (
+                      int i,
+                    ) {
+                      String mCode = _resultOfMapSearch[i];
+                      return TextButton(
+                        style: ButtonStyle(
+                          minimumSize: WidgetStateProperty<Size>.fromMap(
+                            <WidgetStatesConstraint, Size>{
+                              WidgetState.any: Size(
+                                MediaQuery.of(context).size.width * .7,
+                                MediaQuery.of(context).size.height * .1,
+                              ),
+                            },
+                          ),
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            gl.isSelectedLayer(mCode, offline: gl.offlineMode)
+                                ? gl.slotContainsLayer(
+                                      widget.interfaceSelectedMapKey,
+                                      mCode,
+                                    )
+                                    ? gl.removeLayerFromList(
+                                      index: widget.interfaceSelectedMapKey,
+                                      offline: gl.offlineMode,
+                                    )
+                                    : {
+                                      gl.replaceLayerFromList(
+                                        gl
+                                            .selectedLayerForMap[widget
+                                                .interfaceSelectedMapKey]
+                                            .mCode,
+                                        index: gl.getIndexForLayer(mCode),
+                                        offline: gl.offlineMode,
+                                      ),
+                                      gl.replaceLayerFromList(
+                                        mCode,
+                                        index: widget.interfaceSelectedMapKey,
+                                        offline: gl.offlineMode,
+                                      ),
+                                    }
+                                : gl.replaceLayerFromList(
+                                  mCode,
+                                  index: widget.interfaceSelectedMapKey,
+                                  offline: gl.offlineMode,
+                                );
+                          });
+                          widget.after(() {});
+                          gl.refreshMap(() {});
+                        },
+                        child: Card(
+                          color:
+                              gl.isSelectedLayer(mCode, offline: gl.offlineMode)
+                                  ? gl.slotContainsLayer(
+                                        widget.interfaceSelectedMapKey,
+                                        mCode,
+                                      )
+                                      ? Colors.orange.withAlpha(220)
+                                      : Colors.blueGrey.withAlpha(220)
+                                  : Colors.white.withAlpha(220),
+                          child: Container(
+                            constraints: BoxConstraints(
+                              minHeight:
+                                  MediaQuery.of(context).size.width * .15,
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Container(
+                                      constraints: BoxConstraints(
+                                        maxWidth:
+                                            MediaQuery.of(context).size.width *
+                                            .6,
+                                      ),
+                                      child: Text(
+                                        gl.dico.getLayerBase(mCode).mNom,
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                          fontSize:
+                                              MediaQuery.of(
+                                                context,
+                                              ).size.width *
+                                              .05,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    }),
+                  ),
         ),
       ],
     );
@@ -4043,162 +4292,3 @@ class _MapSelectionMenu extends State<MapSelectionMenu> {
     });
   }
 }
-/*
-class PopupAnalysisSelection {
-  PopupAnalysisSelection(BuildContext context, Function after) {
-    showDialog(
-      barrierDismissible: true,
-      barrierColor: Colors.black.withAlpha(100),
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          titlePadding: EdgeInsets.all(5),
-          actionsPadding: EdgeInsets.all(0),
-          contentPadding: EdgeInsets.all(0),
-          insetPadding: EdgeInsets.all(0),
-          buttonPadding: EdgeInsets.all(0),
-          iconPadding: EdgeInsets.all(0),
-          backgroundColor: Color.fromRGBO(0, 0, 0, 0.0),
-          surfaceTintColor: Colors.transparent,
-          shadowColor: Colors.transparent,
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                "Changez les cartes affichées",
-                textAlign: TextAlign.justify,
-              ),
-            ],
-          ),
-          content: Theme(
-            data: Theme.of(context).copyWith(
-              canvasColor: Colors.transparent,
-              shadowColor: Colors.transparent,
-            ),
-            child: SizedBox(
-              width: MediaQuery.of(context).size.width * .80,
-              height: MediaQuery.of(context).size.height * 0.8,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  SizedBox(
-                    width: MediaQuery.of(context).size.width * .80,
-                    height: MediaQuery.of(context).size.height * 0.8,
-                    child: MapSelectionMenu(after),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          titleTextStyle: TextStyle(color: Colors.white, fontSize: 25),
-          actions: [],
-        );
-      },
-    );
-  }
-}
-
-class AnalysisSelection extends StatefulWidget {
-  const AnalysisSelection({super.key});
-
-  @override
-  State<StatefulWidget> createState() => _AnalysisSelection();
-}
-
-class _AnalysisSelection extends State<AnalysisSelection> {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      body: ListView(
-        padding: const EdgeInsets.symmetric(horizontal: 0),
-        children: _injectOfflineLayerData((i, layerTile) {
-          return TextButton(
-            style: ButtonStyle(
-              maximumSize:
-                  gl.isSelectedLayer(layerTile.key)
-                      ? WidgetStateProperty<Size>.fromMap(
-                        <WidgetStatesConstraint, Size>{
-                          WidgetState.any: Size(
-                            MediaQuery.of(context).size.width * .99,
-                            MediaQuery.of(context).size.height * .15,
-                          ),
-                        },
-                      )
-                      : WidgetStateProperty<Size>.fromMap(
-                        <WidgetStatesConstraint, Size>{
-                          WidgetState.any: Size(
-                            MediaQuery.of(context).size.width * .99,
-                            MediaQuery.of(context).size.height * .1,
-                          ),
-                        },
-                      ),
-            ),
-            key: Key('$i'),
-            onPressed:
-                gl.isSelectedLayer(layerTile.key)
-                    ? () {
-                      setState(() {});
-                    }
-                    : () {
-                      setState(() {});
-                    },
-            child: Card(
-              surfaceTintColor: Colors.transparent,
-              shadowColor: Colors.transparent,
-              color:
-                  gl.isSelectedLayer(layerTile.key)
-                      ? gl.colorAgroBioTech.withAlpha(255)
-                      : gl.colorAgroBioTech.withAlpha(120),
-              child: Row(
-                children: [
-                  Container(
-                    alignment: Alignment.center,
-                    constraints: BoxConstraints(
-                      maxWidth: MediaQuery.of(context).size.width * .55,
-                      minHeight: MediaQuery.of(context).size.width * .15,
-                      maxHeight: MediaQuery.of(context).size.width * .15,
-                    ),
-                    child: Text(
-                      layerTile.name,
-                      style: TextStyle(color: Colors.black, fontSize: 20),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
-        }),
-      ),
-    );
-  }
-
-  List<Widget> _injectOfflineLayerData(
-    Widget Function(int, LayerTile) listBuilder,
-  ) {
-    List<LayerTile> offlineList = [];
-
-    for (var key in gl.dico.mLayerBases.keys) {
-      if (gl.dico.mLayerBases[key]!.mOffline ||
-          gl.dico.mLayerBases[key]!.mInDownload) {
-        offlineList.add(
-          LayerTile(
-            name: gl.dico.mLayerBases[key]!.mNom,
-            filter: gl.dico.mLayerBases[key]!.mGroupe,
-            key: key,
-            downloadable: gl.dico.mLayerBases[key]!.mIsDownloadableRW,
-            extern: gl.dico.mLayerBases[key]!.mCategorie == "Externe",
-          ),
-        );
-      }
-    }
-    List<Widget> result = [];
-    int i = 0;
-    for (LayerTile layerTile in offlineList) {
-      result.add(listBuilder(i++, layerTile));
-    }
-    return result;
-  }
-}
-*/

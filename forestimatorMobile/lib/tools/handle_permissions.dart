@@ -18,10 +18,12 @@ bool askOnceForStorage = true;
 bool getVersion = true;
 double release = 33;
 int sdkInt = 33;
+String system = "";
 
 /* Ask permissions at start of map and if not granted ask to grant them */
 bool getLocation() => location.isGranted;
-bool getStorage() => storage.isGranted;
+bool getStorage() =>
+    system == "Android" && release < 13 ? storage.isGranted : true;
 bool getExtStorage() => extStorage.isGranted;
 
 Future<bool> openPhoneForestimatorSettings() async => await openAppSettings();
@@ -29,6 +31,7 @@ Future<bool> openPhoneForestimatorSettings() async => await openAppSettings();
 void initPermissions() async {
   refreshPermissionInfos();
   if (getVersion && Platform.isAndroid) {
+    system = "Android";
     DeviceInfoPlugin infos = DeviceInfoPlugin();
     AndroidDeviceInfo androidInfo = await infos.androidInfo;
     release = double.parse(
@@ -37,6 +40,7 @@ void initPermissions() async {
     sdkInt = androidInfo.version.sdkInt;
     gl.print("Android $release (sdk $sdkInt)");
   } else if (getVersion && Platform.isIOS) {
+    system = "iOS";
     DeviceInfoPlugin infos = DeviceInfoPlugin();
     IosDeviceInfo iOSInfo = await infos.iosInfo;
     release = double.parse(iOSInfo.systemVersion);
@@ -113,7 +117,7 @@ Widget handlePermissionForStorage({
   required Function refreshParentWidgetTree,
 }) {
   if (!askOnceForStorage) return child;
-  if (storage.isDenied && sdkInt < 33) {
+  if (storage.isDenied && release < 13) {
     return PopupPermissions(
       title: "Permission pour le stockage des données.",
       accept: "oui",
@@ -134,7 +138,7 @@ Widget handlePermissionForStorage({
       dialog:
           "Autorisez-vous l'application à stocker des resultats en forme de PDF dans le dossier 'Downloads' de votre smartphone?",
     );
-  } else if (storage.isPermanentlyDenied && sdkInt < 33) {
+  } else if (storage.isPermanentlyDenied && release < 13) {
     return PopupPermissions(
       title: "Permission pour le stockage des données.",
       accept: "Ouvrir paramètres",

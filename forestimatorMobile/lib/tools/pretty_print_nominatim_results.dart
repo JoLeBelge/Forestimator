@@ -81,4 +81,5 @@ final Map<String, String> prettyPrintNominatimResults = {
   "ditch": "Fossé",
   "healthcare": "Santé",
   "vineyard": "Vignoble",
+  "tree_row": "Rangée d’arbres",
 };
