@@ -142,6 +142,9 @@ class _MapPageState extends State<MapPage> {
         );
       }
     } else {
+      if (gl.dico.getLayersOffline().isEmpty) {
+        return;
+      }
       for (LayerBase l in gl.dico.getLayersOffline()) {
         int val = await l.getValXY(ptBL72);
         gl.requestedLayers.add(LayerAnaPt(mCode: l.mCode, mRastValue: val));
@@ -410,7 +413,7 @@ class _MapPageState extends State<MapPage> {
                 },
               ),
               children:
-                  gl.selectedLayerForMap.reversed.map<Widget>((
+                  gl.getLayersForFlutterMap().map<Widget>((
                     gl.SelectedLayer selLayer,
                   ) {
                     if (selLayer.offline &&
@@ -429,9 +432,9 @@ class _MapPageState extends State<MapPage> {
                       return _provider!.loaded
                           ? TileLayer(
                             tileDisplay:
-                                gl.modeMapFirstTileLayerTrancparancy &&
+                                gl.modeMapFirstTileLayerTransparancy &&
                                         i > 1 &&
-                                        gl.selectedLayerForMap.length == i
+                                        gl.getLayersForFlutterMap().length == i
                                     ? TileDisplay.instantaneous(opacity: 0.5)
                                     : TileDisplay.instantaneous(opacity: 1.0),
                             tileProvider: _provider,
@@ -440,18 +443,15 @@ class _MapPageState extends State<MapPage> {
                                 gl.globalMinOfflineZoom, // si minZoom de la map est moins restrictif (moins élevé) que celui-ci, la carte ne s'affiche juste pas (écran blanc)
                           )
                           : Container();
-                    } else if (selLayer.offline) {
-                      // deuxième carte offline ; on ne fait rien avec, un seul provider
-                      return Container();
                     } else {
                       LayerBase l = gl.dico.getLayerBase(selLayer.mCode);
                       i++;
                       return TileLayer(
                         userAgentPackageName: "com.forestimator",
                         tileDisplay:
-                            gl.modeMapFirstTileLayerTrancparancy &&
+                            gl.modeMapFirstTileLayerTransparancy &&
                                     i > 1 &&
-                                    gl.selectedLayerForMap.length == i
+                                    gl.getLayersForFlutterMap().length == i
                                 ? TileDisplay.instantaneous(opacity: 0.5)
                                 : TileDisplay.instantaneous(opacity: 1.0),
                         wmsOptions: WMSTileLayerOptions(

@@ -163,7 +163,7 @@ class LayerBase {
     mLogoAttributionFile = logoAttributionFile(mWMSattribution);
   }
 
-  String logoAttributionFile(String mWMSattribution) {
+  static String logoAttributionFile(String mWMSattribution) {
     String aRes = "";
     switch (mWMSattribution) {
       case "Service Public de la Wallonie":
@@ -206,7 +206,9 @@ class LayerBase {
       mDicoVal = {},
       mDicoCol = {},
       mRes = 0.0,
-      mUsedForAnalysis = false;
+      mUsedForAnalysis = false,
+      mBits = 8,
+      mLogoAttributionFile = logoAttributionFile('');
 
   bool hasDoc() {
     return mPdfName != "";
@@ -470,9 +472,6 @@ class DicoAptProvider {
 
   List<LayerBase> getLayersOffline() {
     List<LayerBase> that = mLayerBases.values.where((i) => i.mOffline).toList();
-    if (that.isEmpty) {
-      return [LayerBase()..mCode = gl.defaultLayer];
-    }
     return that;
   }
 

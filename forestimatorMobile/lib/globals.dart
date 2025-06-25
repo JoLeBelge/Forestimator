@@ -14,7 +14,7 @@ const double globalMaxZoom = 13.0;
 const double globalMinOfflineZoom = 8.0;
 const double globalMaxOfflineZoom = 13.0;
 
-bool modeMapFirstTileLayerTrancparancy = true;
+bool modeMapFirstTileLayerTransparancy = true;
 bool modeMapShowPolygons = true;
 bool modeMapShowSearchMarker = true;
 bool modeMapShowCustomMarker = true;
@@ -138,12 +138,18 @@ String getFirstSelLayOffline() {
 }
 
 void initializeSelectedLayerForFlutterMap() {
-  for (int i = 0; i < interfaceSelectedLCode.length; i++) {
-    replaceLayerFromList(
-      interfaceSelectedLCode.elementAt(i),
-      index: i,
-      offline: false,
-    );
+  if (!firstTimeUse) {
+    for (int i = 0; i < interfaceSelectedLCode.length; i++) {
+      replaceLayerFromList(
+        interfaceSelectedLCode.elementAt(i),
+        index: i,
+        offline: false,
+      );
+    }
+  } else {
+    replaceLayerFromList(defaultLayer, index: 0, offline: false);
+    removeLayerFromList(index: 1);
+    removeLayerFromList(index: 2);
   }
 }
 
@@ -218,11 +224,8 @@ Function refreshWholeCatalogueView = (void Function() setter) async {};
 Function refreshSearch = (void Function() setter) async {};
 Function refreshSettingsMenu = (void Function() setter) async {};
 Function refreshCurrentThreeLayer = () {};
-//Function refreshOfflineView = () {};
 Function rebuildOfflineView = (void Function() setter) async {};
 Function? rebuildNavigatorBar;
-
-//Function addToOfflineList = (var x) {};
 Function removeFromOfflineList = (var x) {};
 
 int nMaxSelectedLayer = 3;
@@ -239,7 +242,8 @@ void removeLayerFromList({
   int index = -1,
   String key = "",
 }) {
-  if (key == "" && index == -1) {
+  if (key != "" && index > -1) {
+    print("Error in removeLayerFromList(): key != '' && index > -1");
     return;
   }
   if (key != "") {
@@ -267,7 +271,8 @@ void replaceLayerFromList(
   int index = -1,
   bool offline = false,
 }) {
-  if (key == "" && index == -1) {
+  if (key != "" && index > -1) {
+    print("Error in replaceLayerFromList(): key != '' && index > -1");
     return;
   }
   if (key != "") {
@@ -293,6 +298,17 @@ void replaceLayerFromList(
       SelectedLayer(mCode: replacement, offline: offline),
     );
   }
+}
+
+int getIndexForLayer(String key) {
+  int index = 0;
+  for (SelectedLayer layer in selectedLayerForMap) {
+    if (layer.mCode == key) {
+      return index;
+    }
+    index++;
+  }
+  return -1;
 }
 
 void savePrefSelLayOnline() async {
@@ -334,6 +350,10 @@ void loadPrefSelLayOffline() async {
 }
 
 void changeSelectedLayerModeOffline() {
+  if (dico.getLayersOffline().isEmpty) {
+    offlineMode = false;
+    return;
+  }
   savePrefSelLayOnline();
   loadPrefSelLayOffline();
   selectedLayerForMap.removeWhere((element) => element.offline == false);
@@ -374,6 +394,26 @@ bool isSelectedLayer(String key, {offline = false}) {
     }
   }
   return false;
+}
+
+bool slotContainsLayer(int index, String key) {
+  return offlineMode
+      ? selectedLayerForMap.first.mCode == key
+      : selectedLayerForMap[index].mCode == key;
+}
+
+List<SelectedLayer> getLayersForFlutterMap() {
+  return selectedLayerForMap
+      .where(
+        (val) =>
+            !(val.mCode.length < 3 &&
+                (val.mCode.contains('1') ||
+                    val.mCode.contains('2') ||
+                    val.mCode.contains('3'))),
+      )
+      .toList()
+      .reversed
+      .toList();
 }
 
 Map<int, int> lutVulnerabiliteCS = {

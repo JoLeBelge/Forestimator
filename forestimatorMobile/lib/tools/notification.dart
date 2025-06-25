@@ -1426,10 +1426,21 @@ class PopupDrawnLayerMenu {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Container(
-                  constraints: BoxConstraints(minHeight: 20, minWidth: 200),
+                  constraints: BoxConstraints(
+                    maxHeight: MediaQuery.of(context).size.width * .2,
+                    minHeight: MediaQuery.of(context).size.width * .2,
+                    minWidth: MediaQuery.of(context).size.width * .65,
+                    maxWidth: MediaQuery.of(context).size.width * .65,
+                  ),
                   child: FloatingActionButton(
                     backgroundColor: gl.colorAgroBioTech,
-                    child: Text("Retour!", maxLines: 1),
+                    child: Text(
+                      "Retour!",
+                      maxLines: 1,
+                      style: TextStyle(
+                        fontSize: MediaQuery.of(context).size.width * 0.05,
+                      ),
+                    ),
                     onPressed: () {
                       after();
                       Navigator.of(context, rootNavigator: true).pop();
@@ -1488,8 +1499,10 @@ class PopupSettingsMenu {
               children: [
                 Container(
                   constraints: BoxConstraints(
-                    minHeight: 20,
-                    minWidth: MediaQuery.of(context).size.width * .8,
+                    maxHeight: MediaQuery.of(context).size.width * .2,
+                    minHeight: MediaQuery.of(context).size.width * .2,
+                    minWidth: MediaQuery.of(context).size.width * .65,
+                    maxWidth: MediaQuery.of(context).size.width * .65,
                   ),
                   child: TextButton(
                     child: Text(
@@ -1762,7 +1775,12 @@ class PopupResultsMenu {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Container(
-                  constraints: BoxConstraints(minHeight: 20, minWidth: 200),
+                  constraints: BoxConstraints(
+                    maxHeight: MediaQuery.of(context).size.width * .2,
+                    minHeight: MediaQuery.of(context).size.width * .2,
+                    minWidth: MediaQuery.of(context).size.width * .65,
+                    maxWidth: MediaQuery.of(context).size.width * .65,
+                  ),
                   child: FloatingActionButton(
                     backgroundColor: gl.colorAgroBioTech,
                     child: Text("Retour!", maxLines: 1),
@@ -2456,7 +2474,12 @@ class PopupOnlineMapMenu {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Container(
-                  constraints: BoxConstraints(minHeight: 20, minWidth: 200),
+                  constraints: BoxConstraints(
+                    maxHeight: MediaQuery.of(context).size.width * .2,
+                    minHeight: MediaQuery.of(context).size.width * .2,
+                    minWidth: MediaQuery.of(context).size.width * .65,
+                    maxWidth: MediaQuery.of(context).size.width * .65,
+                  ),
                   child: FloatingActionButton(
                     backgroundColor: gl.colorAgroBioTech,
                     child: Text("Retour!", maxLines: 1),
@@ -2882,17 +2905,25 @@ class _LayerSwitcher extends State<LayerSwitcher> {
                 gl.selectedLayerForMap.length < oldIndex + 1) {
               return;
             }
-            gl.refreshMap(() {
-              final gl.SelectedLayer item = gl.selectedLayerForMap.removeAt(
-                oldIndex,
-              );
-              gl.selectedLayerForMap.insert(newIndex, item);
-            });
+            String tmpKey = gl.selectedLayerForMap[newIndex].mCode;
+            gl.replaceLayerFromList(
+              gl.selectedLayerForMap[oldIndex].mCode,
+              index: newIndex,
+              offline: gl.offlineMode,
+            );
+            gl.replaceLayerFromList(
+              tmpKey,
+              index: oldIndex,
+              offline: gl.offlineMode,
+            );
+            gl.refreshMap(() {});
           });
         },
 
         children: List<Widget>.generate(3, (i) {
-          if (gl.selectedLayerForMap[i].mCode != '${i + 1}') {
+          if ((!gl.offlineMode &&
+                  !"123".contains(gl.selectedLayerForMap[i].mCode)) ||
+              (i == 0 && !"123".contains(gl.selectedLayerForMap[i].mCode))) {
             return Card(
               margin: EdgeInsets.all(5),
               key: Key('$i+listOfThree'),
@@ -3040,7 +3071,7 @@ class _LayerSwitcher extends State<LayerSwitcher> {
                             child: TextButton(
                               style: ButtonStyle(
                                 backgroundColor:
-                                    gl.modeMapFirstTileLayerTrancparancy
+                                    gl.modeMapFirstTileLayerTransparancy
                                         ? WidgetStateProperty<Color>.fromMap(<
                                           WidgetStatesConstraint,
                                           Color
@@ -3058,13 +3089,13 @@ class _LayerSwitcher extends State<LayerSwitcher> {
                               ),
                               onPressed: () {
                                 setState(() {
-                                  gl.modeMapFirstTileLayerTrancparancy =
-                                      !gl.modeMapFirstTileLayerTrancparancy;
+                                  gl.modeMapFirstTileLayerTransparancy =
+                                      !gl.modeMapFirstTileLayerTransparancy;
                                 });
                                 gl.refreshMap(() {});
                               },
                               child: Text(
-                                gl.modeMapFirstTileLayerTrancparancy
+                                gl.modeMapFirstTileLayerTransparancy
                                     ? "Transparence 50%"
                                     : "Transparence 0%",
                                 style: TextStyle(color: Colors.black),
@@ -3464,7 +3495,7 @@ class PopupMapSelectionMenu {
   ) {
     showDialog(
       barrierDismissible: true,
-      barrierColor: Colors.black.withAlpha(100),
+      barrierColor: Colors.transparent,
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
@@ -3474,14 +3505,14 @@ class PopupMapSelectionMenu {
           insetPadding: EdgeInsets.all(0),
           buttonPadding: EdgeInsets.all(0),
           iconPadding: EdgeInsets.all(0),
-          backgroundColor: Color.fromRGBO(0, 0, 0, 0.0),
+          backgroundColor: Color.fromRGBO(0, 0, 0, 0.7),
           surfaceTintColor: Colors.transparent,
           shadowColor: Colors.transparent,
           title: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                "Changez les cartes affichées",
+                "Selectionez couche ${interfaceSelectedPosition + 1}",
                 textAlign: TextAlign.justify,
               ),
             ],
@@ -3492,14 +3523,14 @@ class PopupMapSelectionMenu {
               shadowColor: Colors.transparent,
             ),
             child: SizedBox(
-              width: MediaQuery.of(context).size.width * .80,
-              height: MediaQuery.of(context).size.height * 0.8,
+              width: MediaQuery.of(context).size.width * .8,
+              height: MediaQuery.of(context).size.height * 0.9,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   SizedBox(
-                    width: MediaQuery.of(context).size.width * .80,
-                    height: MediaQuery.of(context).size.height * 0.8,
+                    width: MediaQuery.of(context).size.width * .8,
+                    height: MediaQuery.of(context).size.height * 0.9,
                     child: MapSelectionMenu(after, interfaceSelectedPosition),
                   ),
                 ],
@@ -3526,239 +3557,440 @@ class MapSelectionMenu extends StatefulWidget {
 
 class _MapSelectionMenu extends State<MapSelectionMenu> {
   int _selectedCategory = -1;
+  bool _showCatalogue = true;
+  final List<Widget> _resultOfMapSearch = [];
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      body: ListView(
-        padding: const EdgeInsets.symmetric(horizontal: 0),
-        children: _injectGroupData(
-          (int i, GroupeCouche groupe) => TextButton(
-            style: ButtonStyle(
-              minimumSize:
-                  i == _selectedCategory
-                      ? WidgetStateProperty<Size>.fromMap(
-                        <WidgetStatesConstraint, Size>{
-                          WidgetState.any: Size(
-                            MediaQuery.of(context).size.width * .99,
-                            MediaQuery.of(context).size.height * .15,
+    return Column(
+      children: [
+        Container(
+          constraints: BoxConstraints(
+            minHeight: MediaQuery.of(context).size.height * .05,
+            maxHeight: MediaQuery.of(context).size.height * .1,
+            minWidth: MediaQuery.of(context).size.width * .7,
+            maxWidth: MediaQuery.of(context).size.width * .7,
+          ),
+          child: Card(
+            child: TextFormField(
+              onChanged: (String value) {
+                _resultOfMapSearch.clear();
+                if (value.length > 1) {
+                  for (var layer in gl.dico.mLayerBases.values) {
+                    if (layer.mNom
+                        .toLowerCase()
+                        .replaceAll('è', 'e')
+                        .replaceAll('é', 'e')
+                        .replaceAll('ê', 'e')
+                        .replaceAll('â', 'a')
+                        .replaceAll('à', 'a')
+                        .replaceAll('ç', 'c')
+                        .contains(
+                          value
+                              .toLowerCase()
+                              .replaceAll('è', 'e')
+                              .replaceAll('é', 'e')
+                              .replaceAll('ê', 'e')
+                              .replaceAll('â', 'a')
+                              .replaceAll('à', 'a')
+                              .replaceAll('ç', 'c'),
+                        )) {
+                      _resultOfMapSearch.add(
+                        TextButton(
+                          style: ButtonStyle(
+                            minimumSize: WidgetStateProperty<Size>.fromMap(
+                              <WidgetStatesConstraint, Size>{
+                                WidgetState.any: Size(
+                                  MediaQuery.of(context).size.width * .7,
+                                  MediaQuery.of(context).size.height * .1,
+                                ),
+                              },
+                            ),
                           ),
-                        },
-                      )
-                      : WidgetStateProperty<Size>.fromMap(
-                        <WidgetStatesConstraint, Size>{
-                          WidgetState.any: Size(
-                            MediaQuery.of(context).size.width * .99,
-                            MediaQuery.of(context).size.height * .075,
+                          onPressed: () {
+                            setState(() {
+                              gl.isSelectedLayer(
+                                    layer.mCode,
+                                    offline: gl.offlineMode,
+                                  )
+                                  ? gl.slotContainsLayer(
+                                        widget.interfaceSelectedMapKey,
+                                        layer.mCode,
+                                      )
+                                      ? gl.removeLayerFromList(
+                                        index: widget.interfaceSelectedMapKey,
+                                        offline: gl.offlineMode,
+                                      )
+                                      : {
+                                        gl.replaceLayerFromList(
+                                          gl
+                                              .selectedLayerForMap[widget
+                                                  .interfaceSelectedMapKey]
+                                              .mCode,
+                                          index: gl.getIndexForLayer(
+                                            layer.mCode,
+                                          ),
+                                          offline: gl.offlineMode,
+                                        ),
+                                        gl.replaceLayerFromList(
+                                          layer.mCode,
+                                          index: widget.interfaceSelectedMapKey,
+                                          offline: gl.offlineMode,
+                                        ),
+                                      }
+                                  : gl.replaceLayerFromList(
+                                    layer.mCode,
+                                    index: widget.interfaceSelectedMapKey,
+                                    offline: gl.offlineMode,
+                                  );
+                            });
+                            widget.after(() {});
+                            gl.refreshMap(() {});
+                          },
+                          child: Card(
+                            color:
+                                gl.isSelectedLayer(
+                                      layer.mCode,
+                                      offline: gl.offlineMode,
+                                    )
+                                    ? gl.slotContainsLayer(
+                                          widget.interfaceSelectedMapKey,
+                                          layer.mCode,
+                                        )
+                                        ? Colors.orange.withAlpha(220)
+                                        : Colors.blueGrey.withAlpha(220)
+                                    : Colors.white.withAlpha(220),
+                            child: Container(
+                              constraints: BoxConstraints(
+                                minHeight:
+                                    MediaQuery.of(context).size.width * .15,
+                              ),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Container(
+                                        constraints: BoxConstraints(
+                                          maxWidth:
+                                              MediaQuery.of(
+                                                context,
+                                              ).size.width *
+                                              .6,
+                                        ),
+                                        child: Text(
+                                          layer.mNom,
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                            color: Colors.black,
+                                            fontSize:
+                                                MediaQuery.of(
+                                                  context,
+                                                ).size.width *
+                                                .05,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
-                        },
-                      ),
-            ),
-            key: Key('$i'),
-            onPressed:
-                i == _selectedCategory
-                    ? () {
-                      setState(() {
-                        _selectedCategory = -1;
-                      });
+                        ),
+                      );
                     }
-                    : () {
-                      setState(() {
-                        _selectedCategory = i;
-                      });
-                    },
-            child: Card(
-              surfaceTintColor: Colors.transparent,
-              shadowColor: Colors.transparent,
-              color:
-                  i == _selectedCategory
-                      ? gl.colorAgroBioTech.withAlpha(25)
-                      : gl.colorAgroBioTech.withAlpha(175),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  i != _selectedCategory
-                      ? Container(
-                        alignment: Alignment.center,
-                        padding: EdgeInsets.all(3),
-                        constraints: BoxConstraints(
-                          maxWidth: MediaQuery.of(context).size.width * .99,
-                          minHeight: MediaQuery.of(context).size.width * .2,
+                  }
+                }
+                if (_resultOfMapSearch.isEmpty) {
+                  setState(() {
+                    _showCatalogue = true;
+                  });
+                } else {
+                  setState(() {
+                    _showCatalogue = false;
+                  });
+                }
+              },
+            ),
+          ),
+        ),
+        Container(
+          constraints: BoxConstraints(
+            minHeight: MediaQuery.of(context).size.height * .8,
+            maxHeight: MediaQuery.of(context).size.height * .8,
+            minWidth: MediaQuery.of(context).size.width * .7,
+            maxWidth: MediaQuery.of(context).size.width * .8,
+          ),
+          child:
+              _showCatalogue
+                  ? ListView(
+                    children: _injectGroupData(
+                      (int i, GroupeCouche groupe) => TextButton(
+                        style: ButtonStyle(
+                          minimumSize:
+                              i == _selectedCategory
+                                  ? WidgetStateProperty<Size>.fromMap(<
+                                    WidgetStatesConstraint,
+                                    Size
+                                  >{
+                                    WidgetState.any: Size(
+                                      MediaQuery.of(context).size.width * .75,
+                                      MediaQuery.of(context).size.height * .15,
+                                    ),
+                                  })
+                                  : WidgetStateProperty<Size>.fromMap(<
+                                    WidgetStatesConstraint,
+                                    Size
+                                  >{
+                                    WidgetState.any: Size(
+                                      MediaQuery.of(context).size.width * .75,
+                                      MediaQuery.of(context).size.height * .075,
+                                    ),
+                                  }),
                         ),
-                        child: Text(
-                          groupe.mLabel,
-                          textAlign: TextAlign.justify,
-                          style: TextStyle(color: Colors.black, fontSize: 22),
-                        ),
-                      )
-                      : Container(
-                        alignment: Alignment.center,
-                        padding: EdgeInsets.all(0),
-                        constraints: BoxConstraints(
-                          maxWidth: MediaQuery.of(context).size.width * .99,
-                        ),
-                        child: ListBody(
-                          children:
-                              <Widget>[
-                                Card(
-                                  color: gl.colorAgroBioTech.withAlpha(175),
-                                  child: Container(
+                        key: Key('$i'),
+                        onPressed:
+                            i == _selectedCategory
+                                ? () {
+                                  setState(() {
+                                    _selectedCategory = -1;
+                                  });
+                                }
+                                : () {
+                                  setState(() {
+                                    _selectedCategory = i;
+                                  });
+                                },
+                        child: Card(
+                          surfaceTintColor: Colors.transparent,
+                          shadowColor: Colors.transparent,
+                          color:
+                              i == _selectedCategory
+                                  ? gl.colorAgroBioTech.withAlpha(120)
+                                  : gl.colorAgroBioTech.withAlpha(230),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              i != _selectedCategory
+                                  ? Container(
                                     alignment: Alignment.center,
-                                    padding: EdgeInsets.all(3),
+                                    padding: EdgeInsets.all(0),
                                     constraints: BoxConstraints(
                                       maxWidth:
                                           MediaQuery.of(context).size.width *
-                                          .99,
+                                          .7,
                                       minHeight:
                                           MediaQuery.of(context).size.width *
                                           .2,
                                     ),
                                     child: Text(
                                       groupe.mLabel,
-                                      textAlign: TextAlign.justify,
+                                      textAlign: TextAlign.center,
                                       style: TextStyle(
                                         color: Colors.black,
-                                        fontSize: 22,
+                                        fontSize: 24,
                                       ),
                                     ),
-                                  ),
-                                ),
-                              ] +
-                              _injectLayerData(groupe.mCode, (
-                                int i,
-                                LayerTile layerTile,
-                              ) {
-                                return TextButton(
-                                  style: ButtonStyle(
-                                    minimumSize:
-                                        gl.getInterfaceSelectedLCode().contains(
-                                              layerTile.key,
-                                            )
-                                            ? WidgetStateProperty<Size>.fromMap(
-                                              <WidgetStatesConstraint, Size>{
-                                                WidgetState.any: Size(
-                                                  MediaQuery.of(
+                                  )
+                                  : Container(
+                                    alignment: Alignment.center,
+                                    padding: EdgeInsets.all(0),
+                                    constraints: BoxConstraints(
+                                      maxWidth:
+                                          MediaQuery.of(context).size.width *
+                                          .7,
+                                    ),
+                                    child: ListBody(
+                                      children:
+                                          <Widget>[
+                                            Card(
+                                              color: gl.colorAgroBioTech
+                                                  .withAlpha(175),
+                                              child: Container(
+                                                alignment: Alignment.center,
+                                                padding: EdgeInsets.all(3),
+                                                constraints: BoxConstraints(
+                                                  maxWidth:
+                                                      MediaQuery.of(
                                                         context,
                                                       ).size.width *
-                                                      .6,
-                                                  MediaQuery.of(
-                                                        context,
-                                                      ).size.height *
-                                                      .1,
-                                                ),
-                                              },
-                                            )
-                                            : WidgetStateProperty<Size>.fromMap(
-                                              <WidgetStatesConstraint, Size>{
-                                                WidgetState.any: Size(
-                                                  MediaQuery.of(
+                                                      .7,
+                                                  minHeight:
+                                                      MediaQuery.of(
                                                         context,
                                                       ).size.width *
-                                                      .6,
-                                                  MediaQuery.of(
-                                                        context,
-                                                      ).size.height *
-                                                      .075,
+                                                      .2,
                                                 ),
-                                              },
-                                            ),
-                                  ),
-
-                                  onPressed: () {
-                                    setState(() {
-                                      gl.isSelectedLayer(
-                                            layerTile.key,
-                                            offline: gl.offlineMode,
-                                          )
-                                          ? gl.removeLayerFromList(
-                                            key: layerTile.key,
-                                            offline: gl.offlineMode,
-                                          )
-                                          : gl.replaceLayerFromList(
-                                            layerTile.key,
-                                            index:
-                                                widget.interfaceSelectedMapKey,
-                                            offline: gl.offlineMode,
-                                          );
-                                    });
-                                    widget.after(() {});
-                                    gl.refreshMap(() {});
-                                  },
-                                  child: Card(
-                                    color:
-                                        gl.getInterfaceSelectedLCode().contains(
-                                              layerTile.key,
-                                            )
-                                            ? Colors.white.withAlpha(255)
-                                            : Colors.white.withAlpha(150),
-                                    child:
-                                        !gl
-                                                .getInterfaceSelectedLCode()
-                                                .contains(layerTile.key)
-                                            ? Container(
-                                              constraints: BoxConstraints(
-                                                minHeight:
-                                                    MediaQuery.of(
-                                                      context,
-                                                    ).size.width *
-                                                    .15,
+                                                child: Text(
+                                                  groupe.mLabel,
+                                                  textAlign: TextAlign.center,
+                                                  style: TextStyle(
+                                                    color: Colors.black,
+                                                    fontSize: 24,
+                                                  ),
+                                                ),
                                               ),
-                                              child: Column(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                children: [
-                                                  Row(
+                                            ),
+                                          ] +
+                                          _injectLayerData(groupe.mCode, (
+                                            int i,
+                                            LayerTile layerTile,
+                                          ) {
+                                            return TextButton(
+                                              style: ButtonStyle(
+                                                minimumSize:
+                                                    WidgetStateProperty<
+                                                      Size
+                                                    >.fromMap(<
+                                                      WidgetStatesConstraint,
+                                                      Size
+                                                    >{
+                                                      WidgetState.any: Size(
+                                                        MediaQuery.of(
+                                                              context,
+                                                            ).size.width *
+                                                            .7,
+                                                        MediaQuery.of(
+                                                              context,
+                                                            ).size.height *
+                                                            .1,
+                                                      ),
+                                                    }),
+                                              ),
+                                              onPressed: () {
+                                                setState(() {
+                                                  gl.isSelectedLayer(
+                                                        layerTile.key,
+                                                        offline: gl.offlineMode,
+                                                      )
+                                                      ? gl.slotContainsLayer(
+                                                            widget
+                                                                .interfaceSelectedMapKey,
+                                                            layerTile.key,
+                                                          )
+                                                          ? gl.removeLayerFromList(
+                                                            index:
+                                                                widget
+                                                                    .interfaceSelectedMapKey,
+                                                            offline:
+                                                                gl.offlineMode,
+                                                          )
+                                                          : {
+                                                            gl.replaceLayerFromList(
+                                                              gl
+                                                                  .selectedLayerForMap[widget
+                                                                      .interfaceSelectedMapKey]
+                                                                  .mCode,
+                                                              index: gl
+                                                                  .getIndexForLayer(
+                                                                    layerTile
+                                                                        .key,
+                                                                  ),
+                                                              offline:
+                                                                  gl.offlineMode,
+                                                            ),
+                                                            gl.replaceLayerFromList(
+                                                              layerTile.key,
+                                                              index:
+                                                                  widget
+                                                                      .interfaceSelectedMapKey,
+                                                              offline:
+                                                                  gl.offlineMode,
+                                                            ),
+                                                          }
+                                                      : gl.replaceLayerFromList(
+                                                        layerTile.key,
+                                                        index:
+                                                            widget
+                                                                .interfaceSelectedMapKey,
+                                                        offline: gl.offlineMode,
+                                                      );
+                                                });
+                                                widget.after(() {});
+                                                gl.refreshMap(() {});
+                                              },
+                                              child: Card(
+                                                color:
+                                                    gl.isSelectedLayer(
+                                                          layerTile.key,
+                                                          offline:
+                                                              gl.offlineMode,
+                                                        )
+                                                        ? gl.slotContainsLayer(
+                                                              widget
+                                                                  .interfaceSelectedMapKey,
+                                                              layerTile.key,
+                                                            )
+                                                            ? Colors.orange
+                                                                .withAlpha(220)
+                                                            : Colors.blueGrey
+                                                                .withAlpha(220)
+                                                        : Colors.white
+                                                            .withAlpha(220),
+                                                child: Container(
+                                                  constraints: BoxConstraints(
+                                                    minHeight:
+                                                        MediaQuery.of(
+                                                          context,
+                                                        ).size.width *
+                                                        .15,
+                                                  ),
+                                                  child: Column(
                                                     mainAxisAlignment:
                                                         MainAxisAlignment
                                                             .center,
                                                     children: [
-                                                      Container(
-                                                        constraints:
-                                                            BoxConstraints(
+                                                      Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .center,
+                                                        children: [
+                                                          Container(
+                                                            constraints: BoxConstraints(
                                                               maxWidth:
                                                                   MediaQuery.of(
                                                                     context,
                                                                   ).size.width *
                                                                   .6,
                                                             ),
-                                                        child: Text(
-                                                          layerTile.name,
-                                                          textAlign:
-                                                              TextAlign.justify,
-                                                          style: TextStyle(
-                                                            color: Colors.black,
-                                                            fontSize: 18,
+                                                            child: Text(
+                                                              layerTile.name,
+                                                              textAlign:
+                                                                  TextAlign
+                                                                      .center,
+                                                              style: TextStyle(
+                                                                color:
+                                                                    Colors
+                                                                        .black,
+                                                                fontSize:
+                                                                    MediaQuery.of(
+                                                                      context,
+                                                                    ).size.width *
+                                                                    .05,
+                                                              ),
+                                                            ),
                                                           ),
-                                                        ),
+                                                        ],
                                                       ),
                                                     ],
                                                   ),
-                                                ],
-                                              ),
-                                            )
-                                            : Column(
-                                              children: [
-                                                Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.center,
-                                                  children: [
-                                                    Text(layerTile.name),
-                                                  ],
                                                 ),
-                                              ],
-                                            ),
+                                              ),
+                                            );
+                                          }),
+                                    ),
                                   ),
-                                );
-                              }),
+                            ],
+                          ),
                         ),
                       ),
-                ],
-              ),
-            ),
-          ),
+                    ),
+                  )
+                  : ListView(children: <Widget>[] + _resultOfMapSearch),
         ),
-      ),
+      ],
     );
   }
 
