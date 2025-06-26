@@ -213,9 +213,13 @@ class LayerAnaPtListTile extends StatelessWidget {
       ),
       subtitle: Row(
         children: <Widget>[
-          Text(
-            layer.getValLabel(data.mRastValue),
-            style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.w500),
+          SizedBox(
+            width: MediaQuery.of(gl.notificationContext!).size.width * 0.6,
+            height: MediaQuery.of(gl.notificationContext!).size.width * 0.1,
+            child: Text(
+              layer.getValLabel(data.mRastValue),
+              style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.w500),
+            ),
           ),
         ],
       ),

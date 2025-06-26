@@ -250,10 +250,10 @@ packages:
     dependency: "direct main"
     description:
       name: flutter_pdfview
-      sha256: "51413e36ab3f1a2fe0edf97ebfa770e20182ea4a066bc9f292920330d9245c9d"
+      sha256: c402ad1f51ba8ea73b9fb04c003ca0a9286118ba5ac9787ee2aa58956b3fcf8a
       url: "https://pub.dev"
     source: hosted
-    version: "1.4.0+1"
+    version: "1.4.1+1"
   flutter_rotation_sensor:
     dependency: transitive
     description:
@@ -340,10 +340,10 @@ packages:
     dependency: "direct main"
     description:
       name: go_router
-      sha256: f222e12c5360b0c90aae5d33e6b351a6789d4aa1c97b32691b4a30946fc91813
+      sha256: ac294be30ba841830cfa146e5a3b22bb09f8dc5a0fdd9ca9332b04b0bde99ebf
       url: "https://pub.dev"
     source: hosted
-    version: "15.2.0"
+    version: "15.2.4"
   http:
     dependency: "direct main"
     description:
@@ -436,10 +436,10 @@ packages:
     dependency: transitive
     description:
       name: logger
-      sha256: be4b23575aac7ebf01f225a241eb7f6b5641eeaf43c6a8613510fc2f8cf187d1
+      sha256: "2621da01aabaf223f8f961e751f2c943dbb374dc3559b982f200ccedadaa6999"
       url: "https://pub.dev"
     source: hosted
-    version: "2.5.0"
+    version: "2.6.0"
   logging:
     dependency: transitive
     description:

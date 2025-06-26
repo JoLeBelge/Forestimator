@@ -210,6 +210,7 @@ class _MapPageState extends State<MapPage> {
     return handlePermissionForLocation(
       refreshParentWidgetTree: refreshView,
       child: Scaffold(
+        resizeToAvoidBottomInset: true,
         appBar: AppBar(
           toolbarHeight: MediaQuery.of(context).size.height * .04,
           backgroundColor:

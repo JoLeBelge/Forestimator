@@ -311,7 +311,9 @@ class ForestimatorDownloader {
     _port.listen((dynamic data) {
       String idListened = data[0];
       String layerKey = "", layerName = "";
-      Function widgetState = () {};
+      Function widgetState = (f) {
+        f();
+      };
       if (_downloadIdToStateFunction[idListened] != null) {
         widgetState = _downloadIdToStateFunction[idListened]!;
       }
@@ -321,11 +323,6 @@ class ForestimatorDownloader {
       DownloadTaskStatus status = DownloadTaskStatus.fromInt(data[1]);
       if (DownloadTaskStatus.enqueued == status) {
         gl.print("Downloader: new download launched.");
-
-        gl.refreshWholeCatalogueView(() {
-          gl.dico.getLayerBase(layerKey).mInDownload = true;
-        });
-
         widgetState(() {
           gl.dico.getLayerBase(layerKey).mInDownload = true;
         });
@@ -334,10 +331,6 @@ class ForestimatorDownloader {
         gl.print("Downloader: download completed.");
         BuildContext context = gl.notificationContext!;
         PopupDownloadSuccess(context, layerName);
-        gl.refreshWholeCatalogueView(() {
-          gl.dico.getLayerBase(layerKey).mInDownload = false;
-          gl.dico.getLayerBase(layerKey).mOffline = false;
-        });
         widgetState(() {
           gl.dico.getLayerBase(layerKey).mOffline = true;
           gl.dico.getLayerBase(layerKey).mInDownload = false;
@@ -348,12 +341,6 @@ class ForestimatorDownloader {
         BuildContext context = gl.notificationContext!;
 
         PopupDownloadFailed(context, layerName);
-
-        gl.refreshWholeCatalogueView(() {
-          gl.dico.getLayerBase(layerKey).mInDownload = false;
-          gl.dico.getLayerBase(layerKey).mOffline = false;
-        });
-
         widgetState(() {
           gl.dico.getLayerBase(layerKey).mOffline = false;
           gl.dico.getLayerBase(layerKey).mInDownload = false;
