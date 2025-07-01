@@ -14,6 +14,8 @@ const double globalMaxZoom = 13.0;
 const double globalMinOfflineZoom = 8.0;
 const double globalMaxOfflineZoom = 13.0;
 
+Color backgroundTransparentBlackBox = Colors.black.withAlpha(180);
+
 bool modeMapFirstTileLayerTransparancy = true;
 bool modeMapShowPolygons = true;
 bool modeMapShowSearchMarker = true;

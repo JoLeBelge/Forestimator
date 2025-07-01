@@ -471,17 +471,18 @@ class _MapPageState extends State<MapPage> {
                       position: LocationMarkerPosition(
                         latitude: gl.position?.latitude ?? 0.0,
                         longitude: gl.position?.longitude ?? 0.0,
-                        accuracy: 1.0,
+                        accuracy: 10.0,
                       ),
                     ),
                   ] +
                   (_modeDrawPolygon
                       ? <Widget>[
-                        if (gl
-                                .polygonLayers[gl.selectedPolygonLayer]
-                                .vertexes
-                                .length >
-                            1)
+                        if (gl.polygonLayers.isNotEmpty &&
+                            gl
+                                    .polygonLayers[gl.selectedPolygonLayer]
+                                    .vertexes
+                                    .length >
+                                1)
                           PolylineLayer(
                             polylines: [
                               Polyline(

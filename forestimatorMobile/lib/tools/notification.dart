@@ -588,6 +588,7 @@ class PopupSearchMenu {
     Function(LatLng) state,
     Function after,
   ) {
+    _selectedSearchResultCard = -1;
     showDialog(
       barrierDismissible: true,
       barrierColor: Colors.transparent,
@@ -600,7 +601,7 @@ class PopupSearchMenu {
           insetPadding: EdgeInsets.all(0),
           buttonPadding: EdgeInsets.all(0),
           iconPadding: EdgeInsets.all(0),
-          backgroundColor: Color.fromRGBO(0, 0, 0, 0.7),
+          backgroundColor: gl.backgroundTransparentBlackBox,
           surfaceTintColor: Colors.transparent,
           shadowColor: Colors.transparent,
           title: Row(
@@ -616,20 +617,134 @@ class PopupSearchMenu {
             ),
             child: Container(
               constraints: BoxConstraints(
-                minHeight: MediaQuery.of(context).size.height * .4,
-                maxHeight: MediaQuery.of(context).size.height * .8,
+                minHeight: MediaQuery.of(context).size.height * .3,
+                maxHeight: MediaQuery.of(context).size.height * .9,
               ),
               width: MediaQuery.of(context).size.width * .85,
               child: SearchMenu(state: state),
             ),
           ),
           titleTextStyle: TextStyle(color: Colors.white, fontSize: 25),
-          actions: [],
+          actions: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [_returnButton(context, after)],
+            ),
+          ],
         );
       },
     ).whenComplete(() {
       after();
     });
+  }
+}
+
+class SearchResultCard extends StatefulWidget {
+  final Color boxColor;
+  final Function(LatLng) state;
+  final String typeDeResultat;
+  final String descriptionDeResultat;
+  final LatLng entry;
+  final int index;
+
+  const SearchResultCard({
+    super.key,
+    required this.boxColor,
+    required this.state,
+    required this.typeDeResultat,
+    required this.entry,
+    required this.descriptionDeResultat,
+    required this.index,
+  });
+
+  @override
+  State<StatefulWidget> createState() => _SearchResultCard();
+}
+
+int _selectedSearchResultCard = -1;
+Function _revertStateOfSelectedSearchResultCard = () {};
+
+class _SearchResultCard extends State<SearchResultCard> {
+  @override
+  Widget build(BuildContext context) {
+    bool selected = _selectedSearchResultCard == widget.index ? true : false;
+    return TextButton(
+      onPressed: () {
+        widget.state(widget.entry);
+        gl.refreshMap(() {
+          gl.modeMapShowSearchMarker = true;
+        });
+        selected
+            ? setState(() {
+              _selectedSearchResultCard = -1;
+              _revertStateOfSelectedSearchResultCard = () {};
+            })
+            : setState(() {
+              _selectedSearchResultCard = widget.index;
+              _revertStateOfSelectedSearchResultCard();
+              _revertStateOfSelectedSearchResultCard = () {
+                if (mounted) {
+                  setState(() {
+                    selected = false;
+                  });
+                }
+              };
+            });
+      },
+      child: Card(
+        margin: EdgeInsets.all(4),
+        color: selected ? widget.boxColor.withAlpha(255) : widget.boxColor,
+        child: Row(
+          children: [
+            Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      alignment: Alignment.center,
+                      constraints: BoxConstraints(
+                        maxWidth:
+                            MediaQuery.of(gl.notificationContext!).size.width *
+                            .7,
+                      ),
+                      child: Text(
+                        widget.typeDeResultat,
+                        style: TextStyle(
+                          color: getColorTextFromBackground(widget.boxColor),
+                          fontSize: selected ? 24 : 16,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Container(
+                      padding: EdgeInsets.all(10),
+                      constraints: BoxConstraints(
+                        maxWidth:
+                            MediaQuery.of(gl.notificationContext!).size.width *
+                            .75,
+                      ),
+                      child: Text(
+                        widget.descriptionDeResultat,
+                        textAlign: TextAlign.justify,
+                        style: TextStyle(
+                          color: getColorTextFromBackground(widget.boxColor),
+                          fontSize: selected ? 20 : 16,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
 
@@ -648,7 +763,7 @@ class _SearchMenu extends State<SearchMenu> {
 
   static String lastSearchKey = "";
   static Map<String, http.Response> searchCache = {};
-  static List<TextButton> searchResults = [];
+  static List<SearchResultCard> searchResults = [];
 
   @override
   Widget build(BuildContext context) {
@@ -677,10 +792,16 @@ class _SearchMenu extends State<SearchMenu> {
                     response = searchCache[searchString]!;
                   } else {
                     var request = Uri.parse(
-                      'http://appliprfw.gembloux.ulg.ac.be/search?q=${searchString.replaceAll(' ', '+')}+Wallonie&format=json&addressdetails=1',
+                      'http://gxgfservcarto.gxabt.ulg.ac.be:6666/search?layer=address&q=${searchString.replaceAll(' ', '+')}+Wallonie&format=json&addressdetails=1',
                     );
-                    response = await http.get(request);
-                    searchCache[searchString] = response;
+                    try {
+                      response = await http.get(request);
+                      searchCache[searchString] = response;
+                    } catch (e) {
+                      gl.print(e);
+
+                      response = http.Response("", 404);
+                    }
                   }
                   List<Map<String, dynamic>> decodedJson;
                   try {
@@ -695,125 +816,131 @@ class _SearchMenu extends State<SearchMenu> {
                   }
                   gl.poiMarkerList.clear();
                   searchResults.clear();
-                  setState(() {
-                    gl.selectedSearchMarker = -1;
-                    int i = 0;
-                    for (var entry in decodedJson) {
-                      String? typeDeResultat =
-                          prettyPrintNominatimResults[entry['addresstype']];
-                      if (typeDeResultat == null) {
-                        typeDeResultat = entry['addresstype'];
-                        gl.print(
-                          "Error: not a translated addresstype: ${entry['addresstype']}",
-                        );
-                      }
-                      String? descriptionDeResultat = entry['display_name'];
-                      if (descriptionDeResultat == null) {
-                        descriptionDeResultat = "Erreur du serveur";
-                        gl.print(
-                          "Erreur du serveur geocoding : ${entry['display_name']}",
-                        );
-                      } else {
-                        descriptionDeResultat = descriptionDeResultat
-                            .replaceAll(", België /", "");
-                        descriptionDeResultat = descriptionDeResultat
-                            .replaceAll("/ Belgien", "");
-                        descriptionDeResultat = descriptionDeResultat
-                            .replaceAll("Wallonie, ", "");
-                        descriptionDeResultat = descriptionDeResultat
-                            .replaceAll("Belgique", "");
-                      }
-                      Color boxColor = getColorFromName(typeDeResultat!);
-                      Color textColor = getColorTextFromBackground(boxColor);
-                      gl.poiMarkerList.add(
-                        gl.PoiMarker(
-                          index: i++,
-                          position: LatLng(
-                            double.parse(entry['lat']),
-                            double.parse(entry['lon']),
-                          ),
-                          name: typeDeResultat,
-                          address: descriptionDeResultat,
-                          city:
-                              entry['address']['city'] ??
-                              entry['address']['county'] ??
-                              entry['address']['state'] ??
-                              "",
-                          postcode: entry['address']['postcode'] ?? "",
-                        ),
-                      );
-                      searchResults.add(
-                        TextButton(
-                          onPressed: () {
-                            gl.refreshMap(() {
-                              gl.modeMapShowSearchMarker = true;
-                            });
-                            widget.state(
-                              LatLng(
+                  mounted
+                      ? setState(() {
+                        gl.selectedSearchMarker = -1;
+                        int i = 0;
+                        for (var entry in decodedJson) {
+                          String? typeDeResultat =
+                              prettyPrintNominatimResults[entry['addresstype']];
+                          if (typeDeResultat == null) {
+                            typeDeResultat = entry['addresstype'];
+                            gl.print(
+                              "Error: not a translated addresstype: ${entry['addresstype']}",
+                            );
+                          }
+                          String? descriptionDeResultat = entry['display_name'];
+                          if (descriptionDeResultat == null) {
+                            descriptionDeResultat = "Erreur du serveur";
+                            gl.print(
+                              "Erreur du serveur geocoding : ${entry['display_name']}",
+                            );
+                          } else {
+                            descriptionDeResultat = descriptionDeResultat
+                                .replaceAll(", België /", "");
+                            descriptionDeResultat = descriptionDeResultat
+                                .replaceAll("/ Belgien", "");
+                            descriptionDeResultat = descriptionDeResultat
+                                .replaceAll("Wallonie, ", "");
+                            descriptionDeResultat = descriptionDeResultat
+                                .replaceAll("Belgique", "");
+                          }
+                          gl.poiMarkerList.add(
+                            gl.PoiMarker(
+                              index: i++,
+                              position: LatLng(
                                 double.parse(entry['lat']),
                                 double.parse(entry['lon']),
                               ),
-                            );
-                          },
-                          child: Card(
-                            margin: EdgeInsets.all(4),
-                            color: boxColor,
-                            child: Row(
-                              children: [
-                                Column(
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Container(
-                                          alignment: Alignment.center,
-                                          constraints: BoxConstraints(
-                                            maxWidth:
-                                                MediaQuery.of(
-                                                  gl.notificationContext!,
-                                                ).size.width *
-                                                .7,
-                                          ),
-                                          child: Text(
-                                            typeDeResultat,
-                                            style: TextStyle(
-                                              color: textColor,
-                                              fontSize: 18,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      children: [
-                                        Container(
-                                          padding: EdgeInsets.all(10),
-                                          constraints: BoxConstraints(
-                                            maxWidth:
-                                                MediaQuery.of(
-                                                  gl.notificationContext!,
-                                                ).size.width *
-                                                .75,
-                                          ),
-                                          child: Text(
-                                            descriptionDeResultat,
-                                            style: TextStyle(color: textColor),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ],
+                              name: typeDeResultat!,
+                              address: descriptionDeResultat,
+                              city:
+                                  entry['address']['city'] ??
+                                  entry['address']['county'] ??
+                                  entry['address']['state'] ??
+                                  "",
+                              postcode: entry['address']['postcode'] ?? "",
                             ),
-                          ),
-                        ),
-                      );
-                    }
-                  });
+                          );
+                          searchResults.add(
+                            SearchResultCard(
+                              boxColor: getColorFromName(typeDeResultat),
+                              state: widget.state,
+                              typeDeResultat: typeDeResultat,
+                              entry: LatLng(
+                                double.parse(entry['lat']),
+                                double.parse(entry['lon']),
+                              ),
+                              descriptionDeResultat: descriptionDeResultat,
+                              index: i,
+                            ),
+                          );
+                        }
+                      })
+                      : () {
+                        {
+                          gl.selectedSearchMarker = -1;
+                          int i = 0;
+                          for (var entry in decodedJson) {
+                            String? typeDeResultat =
+                                prettyPrintNominatimResults[entry['addresstype']];
+                            if (typeDeResultat == null) {
+                              typeDeResultat = entry['addresstype'];
+                              gl.print(
+                                "Error: not a translated addresstype: ${entry['addresstype']}",
+                              );
+                            }
+                            String? descriptionDeResultat =
+                                entry['display_name'];
+                            if (descriptionDeResultat == null) {
+                              descriptionDeResultat = "Erreur du serveur";
+                              gl.print(
+                                "Erreur du serveur geocoding : ${entry['display_name']}",
+                              );
+                            } else {
+                              descriptionDeResultat = descriptionDeResultat
+                                  .replaceAll(", België /", "");
+                              descriptionDeResultat = descriptionDeResultat
+                                  .replaceAll("/ Belgien", "");
+                              descriptionDeResultat = descriptionDeResultat
+                                  .replaceAll("Wallonie, ", "");
+                              descriptionDeResultat = descriptionDeResultat
+                                  .replaceAll("Belgique", "");
+                            }
+                            Color boxColor = getColorFromName(typeDeResultat!);
+                            gl.poiMarkerList.add(
+                              gl.PoiMarker(
+                                index: i++,
+                                position: LatLng(
+                                  double.parse(entry['lat']),
+                                  double.parse(entry['lon']),
+                                ),
+                                name: typeDeResultat,
+                                address: descriptionDeResultat,
+                                city:
+                                    entry['address']['city'] ??
+                                    entry['address']['county'] ??
+                                    entry['address']['state'] ??
+                                    "",
+                                postcode: entry['address']['postcode'] ?? "",
+                              ),
+                            );
+                            searchResults.add(
+                              SearchResultCard(
+                                boxColor: boxColor,
+                                state: widget.state,
+                                typeDeResultat: typeDeResultat,
+                                entry: LatLng(
+                                  double.parse(entry['lat']),
+                                  double.parse(entry['lon']),
+                                ),
+                                descriptionDeResultat: descriptionDeResultat,
+                                index: i,
+                              ),
+                            );
+                          }
+                        }
+                      };
                 },
               ),
             ),
@@ -822,7 +949,7 @@ class _SearchMenu extends State<SearchMenu> {
             padding: EdgeInsets.all(0),
             constraints: BoxConstraints(
               minHeight: MediaQuery.of(context).size.height * .2,
-              maxHeight: MediaQuery.of(context).size.height * .7,
+              maxHeight: MediaQuery.of(context).size.height * .75,
             ),
             child: ListView(
               padding: const EdgeInsets.symmetric(horizontal: 0),
@@ -1414,7 +1541,7 @@ class PopupDrawnLayerMenu {
           insetPadding: EdgeInsets.all(0),
           buttonPadding: EdgeInsets.all(0),
           iconPadding: EdgeInsets.all(0),
-          backgroundColor: Color.fromRGBO(0, 0, 0, 0.2),
+          backgroundColor: gl.backgroundTransparentBlackBox,
           surfaceTintColor: Colors.transparent,
           shadowColor: Colors.transparent,
 
@@ -1439,36 +1566,36 @@ class PopupDrawnLayerMenu {
           actions: [
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  constraints: BoxConstraints(
-                    maxHeight: MediaQuery.of(context).size.width * .2,
-                    minHeight: MediaQuery.of(context).size.width * .2,
-                    minWidth: MediaQuery.of(context).size.width * .65,
-                    maxWidth: MediaQuery.of(context).size.width * .65,
-                  ),
-                  child: FloatingActionButton(
-                    backgroundColor: gl.colorAgroBioTech,
-                    child: Text(
-                      "Retour!",
-                      maxLines: 1,
-                      style: TextStyle(
-                        fontSize: MediaQuery.of(context).size.width * 0.05,
-                      ),
-                    ),
-                    onPressed: () {
-                      after();
-                      Navigator.of(context, rootNavigator: true).pop();
-                    },
-                  ),
-                ),
-              ],
+              children: [_returnButton(context, after)],
             ),
           ],
         );
       },
     );
   }
+}
+
+Widget _returnButton(BuildContext context, Function after) {
+  return Container(
+    constraints: BoxConstraints(
+      maxHeight: MediaQuery.of(context).size.width * .17,
+      minHeight: MediaQuery.of(context).size.width * .17,
+      minWidth: MediaQuery.of(context).size.width * .63,
+      maxWidth: MediaQuery.of(context).size.width * .63,
+    ),
+    child: FloatingActionButton(
+      backgroundColor: Colors.green,
+      child: Text(
+        "Retour!",
+        maxLines: 1,
+        style: TextStyle(fontSize: MediaQuery.of(context).size.width * 0.05),
+      ),
+      onPressed: () {
+        after();
+        Navigator.of(context, rootNavigator: true).pop();
+      },
+    ),
+  );
 }
 
 class PopupSettingsMenu {
@@ -1511,27 +1638,7 @@ class PopupSettingsMenu {
           actions: [
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  constraints: BoxConstraints(
-                    maxHeight: MediaQuery.of(context).size.width * .2,
-                    minHeight: MediaQuery.of(context).size.width * .2,
-                    minWidth: MediaQuery.of(context).size.width * .65,
-                    maxWidth: MediaQuery.of(context).size.width * .65,
-                  ),
-                  child: TextButton(
-                    child: Text(
-                      "Retour!",
-                      maxLines: 1,
-                      style: TextStyle(color: Colors.black),
-                    ),
-                    onPressed: () {
-                      after();
-                      Navigator.of(context, rootNavigator: true).pop();
-                    },
-                  ),
-                ),
-              ],
+              children: [_returnButton(context, after)],
             ),
           ],
         );
@@ -1788,24 +1895,7 @@ class PopupResultsMenu {
           actions: [
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  constraints: BoxConstraints(
-                    maxHeight: MediaQuery.of(context).size.width * .2,
-                    minHeight: MediaQuery.of(context).size.width * .2,
-                    minWidth: MediaQuery.of(context).size.width * .65,
-                    maxWidth: MediaQuery.of(context).size.width * .65,
-                  ),
-                  child: FloatingActionButton(
-                    backgroundColor: gl.colorAgroBioTech,
-                    child: Text("Retour!", maxLines: 1),
-                    onPressed: () {
-                      after();
-                      Navigator.of(context, rootNavigator: true).pop();
-                    },
-                  ),
-                ),
-              ],
+              children: [_returnButton(context, after)],
             ),
           ],
         );
@@ -2781,7 +2871,7 @@ class PopupOnlineMapMenu {
           insetPadding: EdgeInsets.all(0),
           buttonPadding: EdgeInsets.all(0),
           iconPadding: EdgeInsets.all(0),
-          backgroundColor: Color.fromRGBO(0, 0, 0, 0.2),
+          backgroundColor: gl.backgroundTransparentBlackBox,
           surfaceTintColor: Colors.transparent,
           shadowColor: Colors.transparent,
           title: null,
@@ -2799,24 +2889,7 @@ class PopupOnlineMapMenu {
           actions: [
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  constraints: BoxConstraints(
-                    maxHeight: MediaQuery.of(context).size.width * .17,
-                    minHeight: MediaQuery.of(context).size.width * .17,
-                    minWidth: MediaQuery.of(context).size.width * .63,
-                    maxWidth: MediaQuery.of(context).size.width * .63,
-                  ),
-                  child: FloatingActionButton(
-                    backgroundColor: Colors.green,
-                    child: Text("Retour!", maxLines: 1),
-                    onPressed: () {
-                      after();
-                      Navigator.of(context, rootNavigator: true).pop();
-                    },
-                  ),
-                ),
-              ],
+              children: [_returnButton(context, after)],
             ),
           ],
         );
@@ -2863,7 +2936,7 @@ class PopupLayerSwitcher {
           insetPadding: EdgeInsets.all(0),
           buttonPadding: EdgeInsets.all(0),
           iconPadding: EdgeInsets.all(0),
-          backgroundColor: Color.fromRGBO(0, 0, 0, 0.5),
+          backgroundColor: gl.backgroundTransparentBlackBox,
           surfaceTintColor: Colors.transparent,
           shadowColor: Colors.transparent,
           content: Theme(
@@ -3278,7 +3351,9 @@ class _LayerSwitcher extends State<LayerSwitcher> {
                             PopupMapSelectionMenu(
                               gl.notificationContext!,
                               i,
-                              setState,
+                              () {
+                                setState(() {});
+                              },
                             );
                           },
                           child: Container(
@@ -3466,11 +3541,13 @@ class _LayerSwitcher extends State<LayerSwitcher> {
                             ),
                           ),
                           onPressed: () {
-                            PopupMapSelectionMenu(
-                              gl.notificationContext!,
-                              i,
-                              setState,
-                            );
+                            PopupMapSelectionMenu(gl.notificationContext!, i, (
+                              f,
+                            ) {
+                              setState(() {
+                                f();
+                              });
+                            });
                           },
                           child: Container(
                             padding: EdgeInsets.symmetric(horizontal: 3.0),
@@ -3532,7 +3609,7 @@ class PopupDoYouReally {
           insetPadding: EdgeInsets.all(0),
           buttonPadding: EdgeInsets.all(0),
           iconPadding: EdgeInsets.all(0),
-          backgroundColor: Color.fromRGBO(0, 0, 0, 0.85),
+          backgroundColor: gl.backgroundTransparentBlackBox,
           surfaceTintColor: Colors.transparent,
           shadowColor: Colors.transparent,
           title: Row(
@@ -3608,7 +3685,7 @@ class PopupOfflineMenu {
   PopupOfflineMenu(BuildContext context, Function after) {
     showDialog(
       barrierDismissible: true,
-      barrierColor: Colors.black.withAlpha(100),
+      barrierColor: Colors.transparent,
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
@@ -3618,7 +3695,7 @@ class PopupOfflineMenu {
           insetPadding: EdgeInsets.all(0),
           buttonPadding: EdgeInsets.all(0),
           iconPadding: EdgeInsets.all(0),
-          backgroundColor: Color.fromRGBO(0, 0, 0, 0.0),
+          backgroundColor: gl.backgroundTransparentBlackBox,
           surfaceTintColor: Colors.transparent,
           shadowColor: Colors.transparent,
           title: Row(
@@ -3651,7 +3728,12 @@ class PopupOfflineMenu {
             ),
           ),
           titleTextStyle: TextStyle(color: Colors.white, fontSize: 25),
-          actions: [],
+          actions: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [_returnButton(context, after)],
+            ),
+          ],
         );
       },
     ).whenComplete(() {
@@ -3832,7 +3914,7 @@ class PopupMapSelectionMenu {
           insetPadding: EdgeInsets.all(0),
           buttonPadding: EdgeInsets.all(0),
           iconPadding: EdgeInsets.all(0),
-          backgroundColor: Color.fromRGBO(0, 0, 0, 0.7),
+          backgroundColor: gl.backgroundTransparentBlackBox,
           surfaceTintColor: Colors.transparent,
           shadowColor: Colors.transparent,
           title: Row(
@@ -3865,7 +3947,12 @@ class PopupMapSelectionMenu {
             ),
           ),
           titleTextStyle: TextStyle(color: Colors.white, fontSize: 25),
-          actions: [],
+          actions: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [_returnButton(context, after)],
+            ),
+          ],
         );
       },
     );
