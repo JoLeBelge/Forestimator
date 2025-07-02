@@ -1230,9 +1230,13 @@ class _MapPageState extends State<MapPage> {
               alignment: Alignment.center,
               constraints: BoxConstraints(
                 maxHeight:
-                    gl.position != null
-                        ? MediaQuery.of(context).size.width * .75
-                        : MediaQuery.of(context).size.width * .6,
+                    gl.modeDevelopper
+                        ? gl.position != null
+                            ? MediaQuery.of(context).size.width * .75
+                            : MediaQuery.of(context).size.width * .6
+                        : gl.position != null
+                        ? MediaQuery.of(context).size.width * .6
+                        : MediaQuery.of(context).size.width * .45,
                 maxWidth: MediaQuery.of(context).size.width * .2,
               ),
               child: Card(
@@ -1312,26 +1316,29 @@ class _MapPageState extends State<MapPage> {
                             ),
                           ],
                         ),
-                    Container(
-                      color:
-                          !_modeMeasurePath
-                              ? Colors.transparent
-                              : Colors.lightBlue.withAlpha(128),
-                      child: IconButton(
+                    if (gl.modeDevelopper)
+                      Container(
                         color:
-                            _modeMeasurePath ? Colors.white : Colors.lightBlue,
-                        iconSize: MediaQuery.of(context).size.width * .12,
-                        isSelected: _modeMeasurePath,
-                        onPressed: () {
-                          setState(() {
-                            _modeMeasurePath = !_modeMeasurePath;
-                            _modeAnaPtPreview = !_modeMeasurePath;
-                            _measurePath.clear();
-                          });
-                        },
-                        icon: Icon(Icons.more_horiz_outlined),
+                            !_modeMeasurePath
+                                ? Colors.transparent
+                                : Colors.lightBlue.withAlpha(128),
+                        child: IconButton(
+                          color:
+                              _modeMeasurePath
+                                  ? Colors.white
+                                  : Colors.lightBlue,
+                          iconSize: MediaQuery.of(context).size.width * .12,
+                          isSelected: _modeMeasurePath,
+                          onPressed: () {
+                            setState(() {
+                              _modeMeasurePath = !_modeMeasurePath;
+                              _modeAnaPtPreview = !_modeMeasurePath;
+                              _measurePath.clear();
+                            });
+                          },
+                          icon: Icon(Icons.more_horiz_outlined),
+                        ),
                       ),
-                    ),
                     Container(
                       color:
                           !_modeSearch

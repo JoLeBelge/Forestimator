@@ -258,12 +258,18 @@ void removeLayerFromList({
     if (sL != null) {
       int index = selectedLayerForMap.indexOf(sL);
       selectedLayerForMap.removeAt(index);
-      selectedLayerForMap.insert(index, SelectedLayer(mCode: '${index + 1}'));
+      selectedLayerForMap.insert(
+        index,
+        SelectedLayer(mCode: '${index + 1}', offline: offline),
+      );
     }
   }
   if (index > -1) {
     selectedLayerForMap.removeAt(index);
-    selectedLayerForMap.insert(index, SelectedLayer(mCode: '${index + 1}'));
+    selectedLayerForMap.insert(
+      index,
+      SelectedLayer(mCode: '${index + 1}', offline: offline),
+    );
   }
 }
 
@@ -273,10 +279,6 @@ void replaceLayerFromList(
   int index = -1,
   bool offline = false,
 }) {
-  if (key != "" && index > -1) {
-    print("Error in replaceLayerFromList(): key != '' && index > -1");
-    return;
-  }
   if (key != "") {
     SelectedLayer? sL;
     for (var layer in selectedLayerForMap) {
@@ -292,14 +294,47 @@ void replaceLayerFromList(
         SelectedLayer(mCode: replacement, offline: offline),
       );
     }
-  }
-  if (index > -1) {
+  } else if (index > -1) {
     selectedLayerForMap.removeAt(index);
     selectedLayerForMap.insert(
       index,
       SelectedLayer(mCode: replacement, offline: offline),
     );
+  } else if (getCountOfSelectedLayersForMap() == 3 ||
+      getCountOfSelectedLayersForMap() == 0) {
+    selectedLayerForMap.removeAt(0);
+    selectedLayerForMap.insert(
+      0,
+      SelectedLayer(mCode: replacement, offline: offline),
+    );
+  } else {
+    selectedLayerForMap.removeAt(getIndexForEmptySlot());
+    selectedLayerForMap.insert(
+      getIndexForEmptySlot(),
+      SelectedLayer(mCode: replacement, offline: offline),
+    );
   }
+}
+
+int getCountOfSelectedLayersForMap() {
+  int count = 0;
+  for (SelectedLayer layer in selectedLayerForMap) {
+    if (layer.mCode.length > 1) {
+      count++;
+    }
+  }
+  return count;
+}
+
+int getIndexForEmptySlot() {
+  int count = 0;
+  for (SelectedLayer layer in selectedLayerForMap) {
+    if (layer.mCode.length < 2) {
+      return count;
+    }
+    count++;
+  }
+  return count > 3 ? 0 : count;
 }
 
 int getIndexForLayer(String key) {
