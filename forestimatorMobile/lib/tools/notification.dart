@@ -2217,12 +2217,14 @@ class MapLayerSelectionButton extends StatefulWidget {
   final int selectionMode;
   final int index;
   final LayerTile layerTile;
+  final Function state;
   const MapLayerSelectionButton({
     super.key,
     required this.offlineMode,
     this.selectionMode = -1,
     required this.index,
     required this.layerTile,
+    required this.state,
   });
 
   @override
@@ -2254,7 +2256,9 @@ class _MapLayerSelectionButtonState extends State<MapLayerSelectionButton> {
       return TextButton(
         style: ButtonStyle(
           backgroundColor: WidgetStateProperty<Color>.fromMap(
-            <WidgetStatesConstraint, Color>{WidgetState.any: Colors.grey},
+            <WidgetStatesConstraint, Color>{
+              WidgetState.any: Colors.transparent,
+            },
           ),
           minimumSize:
               WidgetStateProperty<Size>.fromMap(<WidgetStatesConstraint, Size>{
@@ -2286,7 +2290,7 @@ class _MapLayerSelectionButtonState extends State<MapLayerSelectionButton> {
         style: ButtonStyle(
           backgroundColor: WidgetStateProperty<Color>.fromMap(
             <WidgetStatesConstraint, Color>{
-              WidgetState.any: Colors.red.shade300,
+              WidgetState.any: gl.colorAgroBioTech,
             },
           ),
           minimumSize:
@@ -2336,12 +2340,14 @@ class _MapLayerSelectionButtonState extends State<MapLayerSelectionButton> {
 }
 
 class OnlineMapMenu extends StatefulWidget {
+  final Function? stateOfLayerSwitcher;
   final bool offlineMode;
   final int selectionMode;
   const OnlineMapMenu({
     super.key,
     required this.offlineMode,
     this.selectionMode = -1,
+    this.stateOfLayerSwitcher,
   });
 
   @override
@@ -2357,6 +2363,13 @@ class _OnlineMapMenu extends State<OnlineMapMenu> {
 
   @override
   Widget build(BuildContext context) {
+    Function stateOfLayerSwitcher;
+    if (widget.stateOfLayerSwitcher == null) {
+      stateOfLayerSwitcher = () {};
+    } else {
+      stateOfLayerSwitcher = widget.stateOfLayerSwitcher!;
+    }
+
     return gl.firstTimeUse
         ? PopupDownloadRecomendedLayers(
           title: "Bienvenu",
@@ -2677,6 +2690,8 @@ class _OnlineMapMenu extends State<OnlineMapMenu> {
                                                                             i,
                                                                         selectionMode:
                                                                             widget.selectionMode,
+                                                                        state:
+                                                                            stateOfLayerSwitcher,
                                                                       ),
                                                                     ),
                                                                   ],
@@ -2748,6 +2763,8 @@ class _OnlineMapMenu extends State<OnlineMapMenu> {
                                                                       selectionMode:
                                                                           widget
                                                                               .selectionMode,
+                                                                      state:
+                                                                          stateOfLayerSwitcher,
                                                                     ),
                                                                   ),
                                                                 ],
@@ -2926,6 +2943,7 @@ class _OnlineMapMenu extends State<OnlineMapMenu> {
                                                   index: i,
                                                   selectionMode:
                                                       widget.selectionMode,
+                                                  state: stateOfLayerSwitcher,
                                                 ),
                                               ),
                                             ],
@@ -2995,6 +3013,7 @@ class _OnlineMapMenu extends State<OnlineMapMenu> {
                                                 index: i,
                                                 selectionMode:
                                                     widget.selectionMode,
+                                                state: stateOfLayerSwitcher,
                                               ),
                                             ),
                                           ],
@@ -3117,11 +3136,13 @@ class _OnlineMapMenu extends State<OnlineMapMenu> {
 
 class PopupOnlineMapMenu {
   final Function after;
+  final Function? stateOfLayerSwitcher;
   PopupOnlineMapMenu(
     BuildContext context,
     this.after,
     bool offlineMode,
     int selectionMode,
+    this.stateOfLayerSwitcher,
   ) {
     showDialog(
       barrierDismissible: false,
@@ -3148,6 +3169,7 @@ class PopupOnlineMapMenu {
               child: OnlineMapMenu(
                 offlineMode: offlineMode,
                 selectionMode: selectionMode,
+                stateOfLayerSwitcher: stateOfLayerSwitcher,
               ),
             ),
           ),
@@ -3357,6 +3379,7 @@ class _ViewControl extends State<ViewControl> {
                 },
                 true,
                 -1,
+                null,
               );
             },
             child: Icon(
@@ -3386,6 +3409,7 @@ class _ViewControl extends State<ViewControl> {
                   },
                   gl.offlineMode,
                   -1,
+                  null,
                 );
               },
               child: Icon(
@@ -3657,6 +3681,7 @@ class _LayerSwitcher extends State<LayerSwitcher> {
                               },
                               gl.offlineMode,
                               i,
+                              null,
                             );
                           },
                           child: Container(
@@ -3851,6 +3876,7 @@ class _LayerSwitcher extends State<LayerSwitcher> {
                               },
                               gl.offlineMode,
                               i,
+                              null,
                             );
                           },
                           child: Container(
