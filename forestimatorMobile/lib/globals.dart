@@ -334,7 +334,11 @@ int getIndexForEmptySlot() {
     }
     count++;
   }
-  return count > 3 ? 0 : count;
+  return offlineMode
+      ? 0
+      : count > 3
+      ? 0
+      : count;
 }
 
 int getIndexForLayer(String key) {

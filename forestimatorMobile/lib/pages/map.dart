@@ -211,6 +211,7 @@ class _MapPageState extends State<MapPage> {
       refreshParentWidgetTree: refreshView,
       child: Scaffold(
         resizeToAvoidBottomInset: true,
+        extendBody: true,
         appBar: AppBar(
           toolbarHeight: MediaQuery.of(context).size.height * .04,
           backgroundColor:
@@ -428,7 +429,7 @@ class _MapPageState extends State<MapPage> {
                           sourceImPath: gl.dico.getRastPath(selLayer.mCode),
                           layerCode: selLayer.mCode,
                         );
-                        _provider?.init();
+                        _provider!.init();
                       }
                       return _provider!.loaded
                           ? TileLayer(
@@ -1116,7 +1117,7 @@ class _MapPageState extends State<MapPage> {
     _modeLayerSwitches = false;
   }
 
-  Widget _mainMenuBar() {
+  Widget _mainMenuBar({bool dummy = false, Function? close}) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
@@ -1131,17 +1132,25 @@ class _MapPageState extends State<MapPage> {
                 maxWidth: MediaQuery.of(context).size.width * .65,
               ),
               child: Card(
-                color: Colors.black.withAlpha(128),
+                shadowColor: Colors.transparent,
+                color: dummy ? Colors.transparent : Colors.black.withAlpha(128),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     Container(
                       color:
-                          !_toolbarExtended
+                          dummy
+                              ? Colors.transparent
+                              : !_toolbarExtended
                               ? Colors.transparent
                               : Colors.green.withAlpha(128),
                       child: IconButton(
-                        color: _toolbarExtended ? Colors.white : Colors.green,
+                        color:
+                            dummy
+                                ? Colors.transparent
+                                : _toolbarExtended
+                                ? Colors.white
+                                : Colors.green,
                         iconSize: MediaQuery.of(context).size.width * .12,
                         isSelected: _toolbarExtended,
                         onPressed: () {
@@ -1150,6 +1159,9 @@ class _MapPageState extends State<MapPage> {
                             if (_toolbarExtended) {
                               _closePolygonMenu();
                               _closeSwitchesMenu();
+                              if (dummy) {
+                                close!();
+                              }
                             } else {
                               _closeToolbarMenu();
                             }
@@ -1160,12 +1172,16 @@ class _MapPageState extends State<MapPage> {
                     ),
                     Container(
                       color:
-                          !_polygonToolbarExtended
+                          dummy
+                              ? Colors.transparent
+                              : !_polygonToolbarExtended
                               ? Colors.transparent
                               : Colors.yellow.withAlpha(128),
                       child: IconButton(
                         color:
-                            _polygonToolbarExtended
+                            dummy
+                                ? Colors.transparent
+                                : _polygonToolbarExtended
                                 ? Colors.white
                                 : Colors.yellow,
                         iconSize: MediaQuery.of(context).size.width * .12,
@@ -1177,6 +1193,9 @@ class _MapPageState extends State<MapPage> {
                             if (_modeDrawPolygon) {
                               _closeSwitchesMenu();
                               _closeToolbarMenu();
+                              if (dummy) {
+                                close!();
+                              }
                             } else {
                               _closePolygonMenu();
                             }
@@ -1185,30 +1204,63 @@ class _MapPageState extends State<MapPage> {
                         icon: Icon(Icons.polyline),
                       ),
                     ),
-                    Container(
-                      color:
-                          !_modeLayerSwitches
-                              ? Colors.transparent
-                              : Colors.brown.withAlpha(128),
-                      child: IconButton(
-                        color: _modeLayerSwitches ? Colors.white : Colors.brown,
-                        iconSize: MediaQuery.of(context).size.width * .12,
-                        isSelected: _modeLayerSwitches,
-                        onPressed: () {
-                          setState(() {
-                            _modeLayerSwitches = true;
-                            _closePolygonMenu();
-                            _closeToolbarMenu();
-                            PopupLayerSwitcher(gl.notificationContext!, () {
+                    dummy
+                        ? Container(
+                          color: Colors.transparent,
+                          width: MediaQuery.of(context).size.width * .12,
+                          height: MediaQuery.of(context).size.width * .12,
+                          child: IconButton(
+                            color: Colors.transparent,
+                            iconSize: MediaQuery.of(context).size.width * .12,
+                            isSelected: _modeLayerSwitches,
+                            onPressed: () {
                               setState(() {
+                                _modeLayerSwitches = false;
                                 _closeSwitchesMenu();
+                                if (dummy) {
+                                  close!();
+                                }
                               });
-                            });
-                          });
-                        },
-                        icon: Icon(Icons.remove_red_eye),
-                      ),
-                    ),
+                            },
+                            icon: Icon(Icons.remove_red_eye),
+                          ),
+                        )
+                        : Container(
+                          color:
+                              !_modeLayerSwitches
+                                  ? Colors.transparent
+                                  : Colors.brown.withAlpha(128),
+                          child: IconButton(
+                            color:
+                                _modeLayerSwitches
+                                    ? Colors.white
+                                    : Colors.brown,
+                            iconSize: MediaQuery.of(context).size.width * .12,
+                            isSelected: _modeLayerSwitches,
+                            onPressed: () {
+                              setState(() {
+                                _modeLayerSwitches = true;
+                                _closePolygonMenu();
+                                _closeToolbarMenu();
+                                PopupLayerSwitcher(
+                                  gl.notificationContext!,
+                                  () {
+                                    setState(() {
+                                      _closeSwitchesMenu();
+                                    });
+                                  },
+                                  (close) {
+                                    return _mainMenuBar(
+                                      dummy: true,
+                                      close: close,
+                                    );
+                                  },
+                                );
+                              });
+                            },
+                            icon: Icon(Icons.remove_red_eye),
+                          ),
+                        ),
                   ],
                 ),
               ),

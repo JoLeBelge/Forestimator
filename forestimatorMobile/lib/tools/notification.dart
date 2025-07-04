@@ -2426,24 +2426,26 @@ class _OnlineMapMenu extends State<OnlineMapMenu> {
                       for (String term in value.split(' ')) {
                         if (term != '') {
                           for (var layer in gl.dico.mLayerBases.values) {
-                            if (layer.mNom
-                                .toLowerCase()
-                                .replaceAll('è', 'e')
-                                .replaceAll('é', 'e')
-                                .replaceAll('ê', 'e')
-                                .replaceAll('â', 'a')
-                                .replaceAll('à', 'a')
-                                .replaceAll('ç', 'c')
-                                .contains(
-                                  term
-                                      .toLowerCase()
-                                      .replaceAll('è', 'e')
-                                      .replaceAll('é', 'e')
-                                      .replaceAll('ê', 'e')
-                                      .replaceAll('â', 'a')
-                                      .replaceAll('à', 'a')
-                                      .replaceAll('ç', 'c'),
-                                )) {
+                            if (!layer.mExpert &&
+                                (widget.offlineMode ? layer.mOffline : true) &&
+                                (layer.mNom
+                                    .toLowerCase()
+                                    .replaceAll('è', 'e')
+                                    .replaceAll('é', 'e')
+                                    .replaceAll('ê', 'e')
+                                    .replaceAll('â', 'a')
+                                    .replaceAll('à', 'a')
+                                    .replaceAll('ç', 'c')
+                                    .contains(
+                                      term
+                                          .toLowerCase()
+                                          .replaceAll('è', 'e')
+                                          .replaceAll('é', 'e')
+                                          .replaceAll('ê', 'e')
+                                          .replaceAll('â', 'a')
+                                          .replaceAll('à', 'a')
+                                          .replaceAll('ç', 'c'),
+                                    ))) {
                               _resultOfMapSearch.add(layer.mCode);
                             }
                           }
@@ -3087,7 +3089,8 @@ class _OnlineMapMenu extends State<OnlineMapMenu> {
   List<Widget> _injectGroupData(Widget Function(int, GroupeCouche) generate) {
     Map<String, Null> groupesNonVides = {};
     for (String key in gl.dico.mLayerBases.keys) {
-      if (widget.offlineMode ? gl.dico.getLayerBase(key).mOffline : true) {
+      if ((widget.offlineMode ? gl.dico.getLayerBase(key).mOffline : true) &&
+          !gl.dico.getLayerBase(key).mExpert) {
         groupesNonVides[gl.dico.getLayerBase(key).mGroupe] = null;
       }
     }
@@ -3211,71 +3214,42 @@ class PopupPdfMenu {
 }
 
 class PopupLayerSwitcher {
-  PopupLayerSwitcher(BuildContext context, Function after) {
+  PopupLayerSwitcher(
+    BuildContext context,
+    Function after,
+    Function mainMenuBarDummy,
+  ) {
     showDialog(
+      useSafeArea: false,
       barrierDismissible: true,
       barrierColor: Colors.transparent,
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          titlePadding: EdgeInsets.all(5),
-          actionsPadding: EdgeInsets.all(0),
-          contentPadding: EdgeInsets.all(0),
-          insetPadding: EdgeInsets.all(0),
-          buttonPadding: EdgeInsets.all(0),
-          iconPadding: EdgeInsets.all(0),
-          backgroundColor: gl.backgroundTransparentBlackBox,
-          surfaceTintColor: Colors.transparent,
-          shadowColor: Colors.transparent,
-          content: Theme(
-            data: Theme.of(context).copyWith(
-              canvasColor: Colors.transparent,
-              shadowColor: Colors.transparent,
-            ),
-            child: SizedBox(
-              width: MediaQuery.of(context).size.width * .80,
-              height:
-                  MediaQuery.of(context).size.height * .05 +
-                  MediaQuery.of(context).size.height * .05 +
-                  MediaQuery.of(context).size.height * .05 +
-                  (_SearchMenu.searchResults.isNotEmpty
-                      ? MediaQuery.of(context).size.height * .06
-                      : 0) +
-                  (gl.polygonLayers.isNotEmpty
-                      ? MediaQuery.of(context).size.height * .06
-                      : 0) +
-                  (gl.polygonLayers.isNotEmpty ||
-                          _SearchMenu.searchResults.isNotEmpty
-                      ? MediaQuery.of(context).size.height * .05
-                      : 0) +
-                  MediaQuery.of(context).size.height * .3 +
-                  MediaQuery.of(context).size.width * .15,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  if (gl.polygonLayers.isNotEmpty ||
-                      _SearchMenu.searchResults.isNotEmpty)
-                    SizedBox(
-                      width: MediaQuery.of(context).size.width * .80,
-                      height: MediaQuery.of(context).size.height * .04,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            "Controlez les couches visibles",
-                            textAlign: TextAlign.justify,
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize:
-                                  MediaQuery.of(context).size.height * .025,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  SizedBox(
+        return Container(
+          alignment: Alignment.bottomCenter,
+          child: Stack(
+            children: [
+              AlertDialog(
+                titlePadding: EdgeInsets.all(0),
+                actionsPadding: EdgeInsets.all(0),
+                contentPadding: EdgeInsets.all(0),
+                insetPadding: EdgeInsets.all(0),
+                buttonPadding: EdgeInsets.all(0),
+                iconPadding: EdgeInsets.all(0),
+                backgroundColor: gl.backgroundTransparentBlackBox,
+                surfaceTintColor: Colors.transparent,
+                shadowColor: Colors.transparent,
+                content: Theme(
+                  data: Theme.of(context).copyWith(
+                    canvasColor: Colors.transparent,
+                    shadowColor: Colors.transparent,
+                  ),
+                  child: SizedBox(
                     width: MediaQuery.of(context).size.width * .80,
                     height:
+                        MediaQuery.of(context).size.height * .05 +
+                        MediaQuery.of(context).size.height * .05 +
+                        MediaQuery.of(context).size.height * .05 +
                         (_SearchMenu.searchResults.isNotEmpty
                             ? MediaQuery.of(context).size.height * .06
                             : 0) +
@@ -3285,59 +3259,112 @@ class PopupLayerSwitcher {
                         (gl.polygonLayers.isNotEmpty ||
                                 _SearchMenu.searchResults.isNotEmpty
                             ? MediaQuery.of(context).size.height * .05
-                            : 0),
-                    child: UpperLayerControl(),
-                  ),
-                  SizedBox(
-                    width: MediaQuery.of(context).size.width * .80,
-                    height: MediaQuery.of(context).size.height * .04,
-                    child: Row(
+                            : 0) +
+                        MediaQuery.of(context).size.height * .3 +
+                        MediaQuery.of(context).size.width * .15,
+                    child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(
-                          "Changez les cartes affichées",
-                          textAlign: TextAlign.justify,
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: MediaQuery.of(context).size.height * .025,
+                        if (gl.polygonLayers.isNotEmpty ||
+                            _SearchMenu.searchResults.isNotEmpty)
+                          SizedBox(
+                            width: MediaQuery.of(context).size.width * .80,
+                            height: MediaQuery.of(context).size.height * .04,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  "Controlez les couches visibles",
+                                  textAlign: TextAlign.justify,
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize:
+                                        MediaQuery.of(context).size.height *
+                                        .025,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width * .80,
+                          height:
+                              (_SearchMenu.searchResults.isNotEmpty
+                                  ? MediaQuery.of(context).size.height * .06
+                                  : 0) +
+                              (gl.polygonLayers.isNotEmpty
+                                  ? MediaQuery.of(context).size.height * .06
+                                  : 0) +
+                              (gl.polygonLayers.isNotEmpty ||
+                                      _SearchMenu.searchResults.isNotEmpty
+                                  ? MediaQuery.of(context).size.height * .05
+                                  : 0),
+                          child: UpperLayerControl(),
+                        ),
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width * .80,
+                          height: MediaQuery.of(context).size.height * .04,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                "Changez les cartes affichées",
+                                textAlign: TextAlign.justify,
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize:
+                                      MediaQuery.of(context).size.height * .025,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width * .80,
+                          height: MediaQuery.of(context).size.height * .3,
+                          child: LayerSwitcher(),
+                        ),
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width * .80,
+                          height: MediaQuery.of(context).size.height * .04,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                "Catalogues des couches",
+                                textAlign: TextAlign.justify,
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize:
+                                      MediaQuery.of(context).size.height * .025,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width * .80,
+                          height: MediaQuery.of(context).size.width * .15,
+                          child: ViewControl(),
                         ),
                       ],
                     ),
                   ),
-                  SizedBox(
-                    width: MediaQuery.of(context).size.width * .80,
-                    height: MediaQuery.of(context).size.height * .3,
-                    child: LayerSwitcher(),
-                  ),
-                  SizedBox(
-                    width: MediaQuery.of(context).size.width * .80,
-                    height: MediaQuery.of(context).size.height * .04,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          "Catalogues des couches",
-                          textAlign: TextAlign.justify,
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: MediaQuery.of(context).size.height * .025,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(
-                    width: MediaQuery.of(context).size.width * .80,
-                    height: MediaQuery.of(context).size.width * .15,
-                    child: ViewControl(),
-                  ),
-                ],
+                ),
+                titleTextStyle: TextStyle(color: Colors.white, fontSize: 25),
+                actions: [],
               ),
-            ),
+              Container(
+                alignment: Alignment.center,
+                child: Container(
+                  alignment: Alignment.bottomCenter,
+                  child: mainMenuBarDummy(() {
+                    Navigator.of(context, rootNavigator: true).pop();
+                  }),
+                ),
+              ),
+            ],
           ),
-          titleTextStyle: TextStyle(color: Colors.white, fontSize: 25),
-          actions: [],
         );
       },
     ).whenComplete(() {

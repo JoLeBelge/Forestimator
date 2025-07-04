@@ -1,3 +1,5 @@
+import 'dart:isolate';
+
 import 'package:fforestimator/globals.dart' as gl;
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter/material.dart';
@@ -12,7 +14,7 @@ class TifFileTileProvider extends TileProvider {
   int tileSize = 256;
   img.Image? _sourceImage;
   String sourceImPath;
-  bool _loaded = false;
+  static bool _loaded = false;
   String layerCode;
 
   bool get loaded => _loaded;
@@ -27,27 +29,34 @@ class TifFileTileProvider extends TileProvider {
     required this.refreshView,
   });
 
+  static Function? _callback;
+
   void init() async {
-    gl.print("init TifFileTileProvider by loading source image in memory");
+    _loadAndDecodeImage();
+  }
+
+  Future<bool> _loadAndDecodeImage() async {
+    print("init TifFileTileProvider by loading source image in memory");
     final File fileIm = File(sourceImPath);
-    bool e = await fileIm.exists();
+    bool e = await Isolate.run<bool>(fileIm.exists);
     if (e) {
       Uint8List? bytes = await fileIm.readAsBytes();
 
       img.TiffInfo tiffInfo = img.TiffDecoder().startDecode(bytes)!;
       img.TiffImage tifIm = tiffInfo.images[0];
       int bps = tifIm.bitsPerSample;
-      gl.print("file loaded in öeöory $e");
+      print("file loaded in memory $e");
       // le décodage d'un tif 16 bits avec ColorMap sera effectif pour la prochaine sortie du package image (flutter)
       // testé avec image 4.2, imageDecoder (android graphic) ; Input was incomplete-> il faut probablement encore convertir en 8bit apres lecture de la 16 bits avec colormap.
       if (bps <= 8) {
-        _sourceImage = img.TiffDecoder().decode(bytes);
-        refreshView(() {
-          _loaded = true;
+        _sourceImage = await Isolate.run<img.Image?>(() {
+          return img.TiffDecoder().decode(bytes);
         });
+        _loaded = true;
       }
     }
-    gl.print("file decoded in öeöory $e");
+    print("file decoded in memory $e");
+    return true;
   }
 
   @override
@@ -66,17 +75,6 @@ class TifFileTileProvider extends TileProvider {
     final nw = mycrs.projection.project(nwCoords);
     Rect b = mycrs.projection.bounds!;
 
-    /*print("nord w " + nw.toString());
-    print("se " + se.toString());
-
-    print("btopleft " +
-        b.topLeft
-            .toString()); // --> est en fait le point sud ouest en BL72, donc xmin ymin
-    print("b rigth " + b.bottomRight.toString());
-
-    //print("x y offset : " + xOffset.toString() + " , " + yOffset.toString());
-    */
-
     double resolution = 10.0;
     int xOffset = ((nw.dx - b.topLeft.dx) / resolution).round();
     int yOffset =
@@ -87,7 +85,7 @@ class TifFileTileProvider extends TileProvider {
     int zFullIm =
         7; // raster avec résolution de 10m/pixel. fonctionne tant que la map est paramétrée avec scr getResolutions2()
 
-    int initImSize = (pow(2, (zFullIm - coordinates.z)) * tileSize).toInt();
+    int initImSize = (pow(2, (zFullIm - coordinates.z)) * tileSize).round();
     if (_sourceImage != null) {
       img.Image cropped = img.copyCrop(
         _sourceImage!,
@@ -96,7 +94,11 @@ class TifFileTileProvider extends TileProvider {
         width: initImSize,
         height: initImSize,
       );
-      img.Image resized = img.copyResize(cropped, width: tileSize);
+      img.Image resized = img.copyResize(
+        cropped,
+        width: tileSize,
+        interpolation: img.Interpolation.linear,
+      );
       return MemoryImage(img.encodePng(resized, singleFrame: true));
     } else {
       Uint8List blankBytes = Base64Codec().decode(
