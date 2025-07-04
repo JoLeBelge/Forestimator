@@ -444,7 +444,63 @@ class _MapPageState extends State<MapPage> {
                             minZoom:
                                 gl.globalMinOfflineZoom, // si minZoom de la map est moins restrictif (moins élevé) que celui-ci, la carte ne s'affiche juste pas (écran blanc)
                           )
-                          : Container();
+                          : Container(
+                            alignment: Alignment.center,
+
+                            child: Card(
+                              color: gl.backgroundTransparentBlackBox,
+                              child: Container(
+                                constraints: BoxConstraints(
+                                  minHeight:
+                                      MediaQuery.of(context).size.width * .15,
+                                  minWidth:
+                                      MediaQuery.of(context).size.width * .5,
+                                  maxWidth:
+                                      MediaQuery.of(context).size.width * .5,
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    SizedBox(
+                                      width:
+                                          MediaQuery.of(context).size.width *
+                                          .3,
+                                      child: Text(
+                                        "La carte choisie est en préparation dans la mémoire.",
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize:
+                                              MediaQuery.of(
+                                                context,
+                                              ).size.width *
+                                              .03,
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      width:
+                                          MediaQuery.of(context).size.width *
+                                          .05,
+                                    ),
+                                    CircularProgressIndicator(
+                                      constraints: BoxConstraints(
+                                        minHeight:
+                                            MediaQuery.of(context).size.width *
+                                            .1,
+                                        minWidth:
+                                            MediaQuery.of(context).size.width *
+                                            .1,
+                                      ),
+                                      strokeWidth:
+                                          MediaQuery.of(context).size.width *
+                                          .02,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          );
                     } else {
                       LayerBase l = gl.dico.getLayerBase(selLayer.mCode);
                       i++;
@@ -1830,11 +1886,11 @@ class _AnaPtPreview extends State<AnaPtPreview> {
       }
     } else {
       int val = await gl.dico
-          .getLayerBase(gl.interfaceSelectedLCode.first)
+          .getLayerBase(gl.selectedLayerForMap.first.mCode)
           .getValXY(ptBL72);
       setState(() {
         gl.anaPtPreview = LayerAnaPt(
-          mCode: gl.interfaceSelectedLCode.first,
+          mCode: gl.selectedLayerForMap.first.mCode,
           mRastValue: val,
         );
       });

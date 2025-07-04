@@ -88,10 +88,10 @@ class _AnaPtpageState extends State<AnaPtpage> {
                     List<String>? l = await openDialog();
                     String? pdf = l?.elementAt(0);
                     String? locationName = l?.elementAt(1);
-                    if (pdf!.isEmpty) {
+                    if (pdf != null && pdf.isEmpty) {
                       pdf = "analysePonctuelleForestimator.pdf";
                     }
-                    if (pdf.length < 4 ||
+                    if (pdf!.length < 4 ||
                         pdf.substring(pdf.length - 4) != ".pdf") {
                       pdf = "$pdf.pdf";
                     }

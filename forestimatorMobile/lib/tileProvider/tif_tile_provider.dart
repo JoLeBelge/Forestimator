@@ -14,7 +14,7 @@ class TifFileTileProvider extends TileProvider {
   int tileSize = 256;
   img.Image? _sourceImage;
   String sourceImPath;
-  static bool _loaded = false;
+  bool _loaded = false;
   String layerCode;
 
   bool get loaded => _loaded;
@@ -29,14 +29,12 @@ class TifFileTileProvider extends TileProvider {
     required this.refreshView,
   });
 
-  static Function? _callback;
-
   void init() async {
-    _loadAndDecodeImage();
+    _loadAndDecodeImage().whenComplete(() => gl.refreshMap(() {}));
   }
 
-  Future<bool> _loadAndDecodeImage() async {
-    print("init TifFileTileProvider by loading source image in memory");
+  Future _loadAndDecodeImage() async {
+    gl.print("init TifFileTileProvider by loading source image in memory");
     final File fileIm = File(sourceImPath);
     bool e = await Isolate.run<bool>(fileIm.exists);
     if (e) {
@@ -45,7 +43,7 @@ class TifFileTileProvider extends TileProvider {
       img.TiffInfo tiffInfo = img.TiffDecoder().startDecode(bytes)!;
       img.TiffImage tifIm = tiffInfo.images[0];
       int bps = tifIm.bitsPerSample;
-      print("file loaded in memory $e");
+      gl.print("file loaded in memory $e");
       // le décodage d'un tif 16 bits avec ColorMap sera effectif pour la prochaine sortie du package image (flutter)
       // testé avec image 4.2, imageDecoder (android graphic) ; Input was incomplete-> il faut probablement encore convertir en 8bit apres lecture de la 16 bits avec colormap.
       if (bps <= 8) {
@@ -53,10 +51,9 @@ class TifFileTileProvider extends TileProvider {
           return img.TiffDecoder().decode(bytes);
         });
         _loaded = true;
+        gl.print("file decoded in memory $e");
       }
     }
-    print("file decoded in memory $e");
-    return true;
   }
 
   @override
@@ -86,6 +83,7 @@ class TifFileTileProvider extends TileProvider {
         7; // raster avec résolution de 10m/pixel. fonctionne tant que la map est paramétrée avec scr getResolutions2()
 
     int initImSize = (pow(2, (zFullIm - coordinates.z)) * tileSize).round();
+
     if (_sourceImage != null) {
       img.Image cropped = img.copyCrop(
         _sourceImage!,
@@ -107,12 +105,4 @@ class TifFileTileProvider extends TileProvider {
       return MemoryImage(blankBytes);
     }
   }
-
-  /*@override
-  void dispose() {
-    //bytes!.clear();
-    _sourceImage = img.Image.empty();
-
-    super.dispose(); // This will free the memory space allocated to the page
-  }*/
 }
