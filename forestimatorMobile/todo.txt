@@ -1,57 +1,31 @@
 To do list forestimator Mobile
 ------------------------------
 
+-affichage de la cnsw 16 bits? en ayant un raster au format png et un autre au format tiff-> combo gagnant pour gagner en rapidité d'affichage.
+
 AJOUT DE COUCHES
 
--ajouter WMS cadastre avec option de transparence (option transparence pour toutes les cartes)
- 	- pour l'instant le cadastre a un service arcgisRest qui va pas avec flutter. héberger notre propre WMS avec l'autorisation du fédéral?
- 	
 -ajouter couche Natura 2000 (N2K)
 -ajouter couche plan de secteur
--ajouter couche nouveau masque forestier 
+-ajouter couche nouveau masque forestier
 
 SECURITE ET ROBUSTESSE
 
 -système de vérification automatisé sur l'état de fonctionnement de Forestimator Web. Avec envoi de SMS et/ou de email en cas de coupure de Forestimator Web
 -système de vérification de la disponibilité des couches WMSs?
 
--Compatibilité du code iphone et Android
-
 CONSOLIDATION 
-
 
 -analyse ponctuelle : quand internet n'est pas disponible, afficher la boite de dialogue "vous n'avez pas accès à internet". Pour l'instant, cela fonctionne mais même quand la data est activée si jamais un autre process utilise toute la bande passante.
 
--séparation visuelle de la partie "panier" de la partie "catalogue de couche"
-
 NOUVELLES OPTIONS
-
--légende d'une carte pour un point donné (pas ana ponct)
-
--outils de recherche de lieu -> OK
 
 -gestion de projets et téléchargement de couche offline sur l'extend du projet uniquement. Un projet = un extend. puis des couches offlines sur cet extend.
 
--ajout d'une couche "polygone" propre à l'utilisateur -> OK
-
 COMMUNICATION/ DOCUMENTATION
 
--manuel d'utilisation. Avec une partie sur l'occtroi des droits pour la géolocalisation.
 -vidéo d'utilisation
-
-AUTRE
-
--pouvoir zoomer à l'échelle d'un arbre (pour analyse ponctuelle de la hauteur - cf demande de HC)
-
-JO
---
-
-
--click sur essence recommandée par GSA : doit ouvrir la fiche-essence (le fait pour ES FEE mais pas pour ES GSA)
-
--affichage de la cnsw 16 bits tiff? et même choisir une autre résolution pour l'affichage que pour l'analyse? pk pas pour certaine des layers (zbio -> basser résolution, CNSW -> trop de polygone, ect)
-
-bug analyse ponctuelle offline quand une des cartes offline est corrompue; je ne sais pas reproduire l'erreur..
+-tutoriel pdf
 
 Alignement des label "enregistré" qui est érratique pour l'instant. Tester différente "densité" pour l'émulateur et vérifier que ça va bien à chaque fois
 

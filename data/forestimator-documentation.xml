@@ -368,6 +368,10 @@ Illustration de la détermination d'un modèle numérique de hauteur de la canop
 La hauteur de canopée est utilisée pour la prédiction de la hauteur dominante pour les peuplements résineux de structure régulière d'épicéa et de douglas. Cette estimation est effectuée sur des surfaces de forme hexagonale de 0.1 hectare (10 ares) affin de satisfaire la définition de hauteur dominante qui correspond à la moyenne des hauteurs des plus hauts arbres sur chaque cellule d'un are.
 </message>
 
+<message id="MF.version">
+version 2025 pour l'état de la forêt en 2021
+</message>
+
 <message id="MF.description">
 Le masque forestier "2018" correspond aux étendues de forêt de plus de 20 m de largeur et 50 ares de surface (définition FAO) à l'échelle de la Wallonie.
 <br></br>
