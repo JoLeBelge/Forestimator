@@ -571,7 +571,11 @@ class _DrawnLayerMenu extends State<DrawnLayerMenu> {
                       );
                       gl.selectedPolygonLayer = gl.polygonLayers.length - 1;
                     });
-                    gl.saveChangesToPolygoneToPrefs = true;
+
+                    gl.refreshMap(() {
+                      gl.selectedPolygonLayer = gl.polygonLayers.length - 1;
+                      gl.saveChangesToPolygoneToPrefs = true;
+                    });
                   },
                 ),
               ],
@@ -2243,6 +2247,8 @@ class _MapLayerSelectionButtonState extends State<MapLayerSelectionButton> {
     for (Function function in _layerSelectionCallbacks.values) {
       function();
     }
+    gl.refreshMap(() {});
+    _LayerSwitcher.stateLayerSwitcher(() {});
   }
 
   @override
@@ -2321,7 +2327,6 @@ class _MapLayerSelectionButtonState extends State<MapLayerSelectionButton> {
                   ),
                 };
           });
-          gl.refreshMap(() {});
           _callSelectedButtonCallbacks();
         },
         child: Container(
@@ -2365,7 +2370,9 @@ class _OnlineMapMenu extends State<OnlineMapMenu> {
   Widget build(BuildContext context) {
     Function stateOfLayerSwitcher;
     if (widget.stateOfLayerSwitcher == null) {
-      stateOfLayerSwitcher = () {};
+      stateOfLayerSwitcher = (f) {
+        f();
+      };
     } else {
       stateOfLayerSwitcher = widget.stateOfLayerSwitcher!;
     }
@@ -2505,12 +2512,7 @@ class _OnlineMapMenu extends State<OnlineMapMenu> {
                             key: Key('$i'),
                             onPressed:
                                 i == _selectedCategory
-                                    ? () {
-                                      setState(() {
-                                        _selectedCategory = -1;
-                                        selectedMap = -1;
-                                      });
-                                    }
+                                    ? () {}
                                     : () {
                                       setState(() {
                                         _selectedCategory = i;
@@ -2565,31 +2567,43 @@ class _OnlineMapMenu extends State<OnlineMapMenu> {
                                         child: ListBody(
                                           children:
                                               <Widget>[
-                                                Card(
-                                                  color: gl.colorAgroBioTech
-                                                      .withAlpha(200),
-                                                  child: Container(
-                                                    alignment: Alignment.center,
-                                                    padding: EdgeInsets.all(3),
-                                                    constraints: BoxConstraints(
-                                                      maxWidth:
-                                                          MediaQuery.of(
-                                                            context,
-                                                          ).size.width *
-                                                          .99,
-                                                      minHeight:
-                                                          MediaQuery.of(
-                                                            context,
-                                                          ).size.width *
-                                                          .2,
-                                                    ),
-                                                    child: Text(
-                                                      groupe.mLabel,
-                                                      textAlign:
-                                                          TextAlign.center,
-                                                      style: TextStyle(
-                                                        color: Colors.black,
-                                                        fontSize: 22,
+                                                TextButton(
+                                                  onPressed: () {
+                                                    setState(() {
+                                                      _selectedCategory = -1;
+                                                      selectedMap = -1;
+                                                    });
+                                                  },
+                                                  child: Card(
+                                                    color: gl.colorAgroBioTech
+                                                        .withAlpha(200),
+                                                    child: Container(
+                                                      alignment:
+                                                          Alignment.center,
+                                                      padding: EdgeInsets.all(
+                                                        3,
+                                                      ),
+                                                      constraints:
+                                                          BoxConstraints(
+                                                            maxWidth:
+                                                                MediaQuery.of(
+                                                                  context,
+                                                                ).size.width *
+                                                                .99,
+                                                            minHeight:
+                                                                MediaQuery.of(
+                                                                  context,
+                                                                ).size.width *
+                                                                .2,
+                                                          ),
+                                                      child: Text(
+                                                        groupe.mLabel,
+                                                        textAlign:
+                                                            TextAlign.center,
+                                                        style: TextStyle(
+                                                          color: Colors.black,
+                                                          fontSize: 22,
+                                                        ),
                                                       ),
                                                     ),
                                                   ),
@@ -3218,6 +3232,7 @@ class PopupLayerSwitcher {
     BuildContext context,
     Function after,
     Function mainMenuBarDummy,
+    void Function(LatLng) switchToLocationInSearchMenu,
   ) {
     showDialog(
       useSafeArea: false,
@@ -3299,7 +3314,10 @@ class PopupLayerSwitcher {
                                       _SearchMenu.searchResults.isNotEmpty
                                   ? MediaQuery.of(context).size.height * .05
                                   : 0),
-                          child: UpperLayerControl(),
+                          child: UpperLayerControl(
+                            switchToLocationInSearchMenu:
+                                switchToLocationInSearchMenu,
+                          ),
                         ),
                         SizedBox(
                           width: MediaQuery.of(context).size.width * .80,
@@ -3345,7 +3363,7 @@ class PopupLayerSwitcher {
                         SizedBox(
                           width: MediaQuery.of(context).size.width * .80,
                           height: MediaQuery.of(context).size.width * .15,
-                          child: ViewControl(),
+                          child: ViewControl(_LayerSwitcher.stateLayerSwitcher),
                         ),
                       ],
                     ),
@@ -3374,7 +3392,8 @@ class PopupLayerSwitcher {
 }
 
 class ViewControl extends StatefulWidget {
-  const ViewControl({super.key});
+  final Function stateOfLayerSwitcher;
+  const ViewControl(this.stateOfLayerSwitcher, {super.key});
   @override
   State<ViewControl> createState() => _ViewControl();
 }
@@ -3406,7 +3425,7 @@ class _ViewControl extends State<ViewControl> {
                 },
                 true,
                 -1,
-                null,
+                widget.stateOfLayerSwitcher,
               );
             },
             child: Icon(
@@ -3452,7 +3471,12 @@ class _ViewControl extends State<ViewControl> {
 }
 
 class UpperLayerControl extends StatefulWidget {
-  const UpperLayerControl({super.key});
+  final void Function(LatLng) switchToLocationInSearchMenu;
+
+  const UpperLayerControl({
+    super.key,
+    required this.switchToLocationInSearchMenu,
+  });
   @override
   State<UpperLayerControl> createState() => _UpperLayerControl();
 }
@@ -3481,7 +3505,16 @@ class _UpperLayerControl extends State<UpperLayerControl> {
                       },
                     ),
                   ),
-                  onPressed: () {},
+                  onPressed: () {
+                    PopupSearchMenu(
+                      gl.notificationContext!,
+                      "",
+                      widget.switchToLocationInSearchMenu,
+                      () {
+                        setState(() {});
+                      },
+                    );
+                  },
                   child: Container(
                     padding: EdgeInsets.symmetric(horizontal: 3.0),
                     constraints: BoxConstraints(
@@ -3565,7 +3598,16 @@ class _UpperLayerControl extends State<UpperLayerControl> {
                       },
                     ),
                   ),
-                  onPressed: () {},
+                  onPressed: () {
+                    PopupDrawnLayerMenu(
+                      gl.notificationContext!,
+                      gl.polygonLayers[gl.selectedPolygonLayer].name,
+                      widget.switchToLocationInSearchMenu,
+                      () {
+                        setState(() {});
+                      },
+                    );
+                  },
                   child: Container(
                     padding: EdgeInsets.symmetric(horizontal: 3.0),
                     constraints: BoxConstraints(
@@ -3642,8 +3684,21 @@ class LayerSwitcher extends StatefulWidget {
 }
 
 class _LayerSwitcher extends State<LayerSwitcher> {
+  static Function stateLayerSwitcher = (f) {
+    f();
+  };
+
   @override
   Widget build(BuildContext context) {
+    stateLayerSwitcher = (f) {
+      if (mounted) {
+        setState(() {
+          f();
+        });
+      } else {
+        f();
+      }
+    };
     {
       return ReorderableListView(
         scrollDirection: Axis.vertical,

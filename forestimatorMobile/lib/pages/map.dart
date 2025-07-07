@@ -42,13 +42,17 @@ class _MapPageState extends State<MapPage> {
   bool _polygonToolbarExtended = false;
 
   bool _modeDrawPolygon = false;
+  bool _modePolygonList = false;
+
   bool _modeDrawPolygonAddVertexes = false;
   bool _modeDrawPolygonRemoveVertexes = false;
   bool _modeDrawPolygonMoveVertexes = false;
+  bool _modeShowButtonDrawPolygonMoveVertexes = true;
+  bool _modeShowButtonDrawPolygonRemoveVertexes = true;
+  bool _modeShowButtonDrawPolygonAddVertexes = true;
 
   bool _modeLayerSwitches = false;
 
-  bool _modeProjectProperties = false;
   bool _modeSearch = false;
   bool _modeMeasurePath = false;
   bool _modeMoveMeasurePath = false;
@@ -57,7 +61,7 @@ class _MapPageState extends State<MapPage> {
   final List<LatLng> _measurePath = [];
 
   Color _polygonMenuColorTools(bool choice) =>
-      choice ? Colors.lightGreenAccent : Colors.grey;
+      choice ? Colors.lightGreenAccent.withAlpha(128) : Colors.transparent;
 
   LatLng? _selectedPointToMove;
   double iconSize = 50.0;
@@ -337,10 +341,25 @@ class _MapPageState extends State<MapPage> {
                         ? (tapPosition, point) async => {
                           refreshView(() {
                             _stopMovingSelectedPoint();
+                            _modeShowButtonDrawPolygonAddVertexes = false;
+                            _modeShowButtonDrawPolygonMoveVertexes = true;
+                            _modeShowButtonDrawPolygonRemoveVertexes = true;
+                            _modeDrawPolygonAddVertexes = false;
+                            _modeDrawPolygonMoveVertexes = false;
+                            _modeDrawPolygonRemoveVertexes = false;
                           }),
                         }
                         : _modeDrawPolygon
-                        ? (tapPosition, point) async => {}
+                        ? (tapPosition, point) async => {
+                          refreshView(() {
+                            _modeShowButtonDrawPolygonAddVertexes = true;
+                            _modeShowButtonDrawPolygonMoveVertexes = false;
+                            _modeShowButtonDrawPolygonRemoveVertexes = false;
+                            _modeDrawPolygonAddVertexes = false;
+                            _modeDrawPolygonMoveVertexes = false;
+                            _modeDrawPolygonRemoveVertexes = false;
+                          }),
+                        }
                         : (tapPosition, point) async => {
                           _lastPressWasShort = true,
                           _updatePtMarker(point),
@@ -539,7 +558,9 @@ class _MapPageState extends State<MapPage> {
                                     .polygonLayers[gl.selectedPolygonLayer]
                                     .vertexes
                                     .length >
-                                1)
+                                1 &&
+                            !_modeShowButtonDrawPolygonMoveVertexes &&
+                            _modeDrawPolygonAddVertexes)
                           PolylineLayer(
                             polylines: [
                               Polyline(
@@ -563,9 +584,30 @@ class _MapPageState extends State<MapPage> {
                               ),
                             ],
                           ),
+
                         CircleLayer(circles: _drawnLayerPointsCircleMarker()),
                         PolygonLayer(polygons: _getPolygonesToDraw()),
                         MarkerLayer(markers: _drawnLayerPointsMarker()),
+                        if (gl.polygonLayers.isNotEmpty &&
+                            gl
+                                .polygonLayers[gl.selectedPolygonLayer]
+                                .vertexes
+                                .isNotEmpty &&
+                            !_modeShowButtonDrawPolygonAddVertexes)
+                          CircleLayer(
+                            circles: [
+                              CircleMarker(
+                                point:
+                                    gl
+                                        .polygonLayers[gl.selectedPolygonLayer]
+                                        .vertexes[gl
+                                        .polygonLayers[gl.selectedPolygonLayer]
+                                        .selectedPolyLinePoints[0]],
+                                radius: 15,
+                                color: Colors.red,
+                              ),
+                            ],
+                          ),
                       ]
                       : <Widget>[
                         if (gl.modeMapShowPolygons)
@@ -585,8 +627,8 @@ class _MapPageState extends State<MapPage> {
                         polylines: [
                           Polyline(
                             points: _measurePath,
-                            color: Colors.blueGrey.withAlpha(128),
-                            strokeWidth: 10.0,
+                            color: Colors.blueGrey.withAlpha(200),
+                            strokeWidth: 5.0,
                           ),
                         ],
                       ),
@@ -594,102 +636,225 @@ class _MapPageState extends State<MapPage> {
                       MarkerLayer(markers: _getPathMeasureMarkers()),
                   ],
             ),
-            if (_modeDrawPolygon && gl.polygonLayers.isNotEmpty)
-              Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Container(
-                    constraints: BoxConstraints(
-                      minHeight: MediaQuery.of(context).size.height * .04,
-                      maxHeight: MediaQuery.of(context).size.height * .1,
-                    ),
-                    child: TextButton(
-                      onLongPress:
-                          () => PopupDrawnLayerMenu(
-                            gl.notificationContext!,
-                            gl.polygonLayers[gl.selectedPolygonLayer].name,
-                            (LatLng pos) {
-                              if (pos.longitude != 0.0 && pos.latitude != 0.0) {
-                                _mapController.move(
-                                  pos,
-                                  _mapController.camera.zoom,
-                                );
-                              }
-                            },
-                            () {
+            (_modeDrawPolygon && gl.polygonLayers.isNotEmpty)
+                ? Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          width: MediaQuery.of(context).size.width * .98,
+                          constraints: BoxConstraints(
+                            minHeight: MediaQuery.of(context).size.height * .1,
+                            maxHeight: MediaQuery.of(context).size.height * .1,
+                          ),
+                          child: TextButton(
+                            onPressed: () {
                               refreshView(() {
-                                _modeProjectProperties = false;
+                                _modePolygonList = true;
+                              });
+                              PopupDrawnLayerMenu(
+                                gl.notificationContext!,
+                                gl.polygonLayers[gl.selectedPolygonLayer].name,
+                                (LatLng pos) {
+                                  if (pos.longitude != 0.0 &&
+                                      pos.latitude != 0.0) {
+                                    _mapController.move(
+                                      pos,
+                                      _mapController.camera.zoom,
+                                    );
+                                  }
+                                },
+                                () {
+                                  refreshView(() {
+                                    _modePolygonList = false;
+                                  });
+                                },
+                              );
+                            },
+                            onLongPress: () {
+                              setState(() {
+                                if (gl
+                                            .polygonLayers[gl
+                                                .selectedPolygonLayer]
+                                            .center
+                                            .longitude !=
+                                        0.0 &&
+                                    gl
+                                            .polygonLayers[gl
+                                                .selectedPolygonLayer]
+                                            .center
+                                            .latitude !=
+                                        0.0) {
+                                  _mapController.move(
+                                    gl
+                                        .polygonLayers[gl.selectedPolygonLayer]
+                                        .center,
+                                    _mapController.camera.zoom,
+                                  );
+                                }
+                              });
+                              gl.refreshMap(() {
+                                gl.modeMapShowPolygons = true;
                               });
                             },
+                            child: Card(
+                              surfaceTintColor: Colors.transparent,
+                              shadowColor: Colors.transparent,
+                              color: gl
+                                  .polygonLayers[gl.selectedPolygonLayer]
+                                  .colorInside
+                                  .withAlpha(255),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  Icon(
+                                    Icons.hexagon_outlined,
+                                    size:
+                                        MediaQuery.of(context).size.width * .1,
+                                    color: getColorTextFromBackground(
+                                      gl
+                                          .polygonLayers[gl
+                                              .selectedPolygonLayer]
+                                          .colorInside
+                                          .withAlpha(255),
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width:
+                                        MediaQuery.of(context).size.width * .01,
+                                  ),
+                                  Icon(
+                                    Icons.center_focus_strong,
+                                    size:
+                                        MediaQuery.of(context).size.width * .1,
+                                    color: getColorTextFromBackground(
+                                      gl
+                                          .polygonLayers[gl
+                                              .selectedPolygonLayer]
+                                          .colorInside
+                                          .withAlpha(255),
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width:
+                                        MediaQuery.of(context).size.width * .01,
+                                  ),
+                                  SizedBox(
+                                    width:
+                                        MediaQuery.of(context).size.width * .4,
+                                    child: Text(
+                                      gl
+                                          .polygonLayers[gl
+                                              .selectedPolygonLayer]
+                                          .name,
+                                      style: TextStyle(
+                                        color: getColorTextFromBackground(
+                                          gl
+                                              .polygonLayers[gl
+                                                  .selectedPolygonLayer]
+                                              .colorInside
+                                              .withAlpha(255),
+                                        ),
+                                        fontSize:
+                                            MediaQuery.of(context).size.width *
+                                            .05,
+                                      ),
+                                    ),
+                                  ),
+                                  Text(
+                                    "${(gl.polygonLayers[gl.selectedPolygonLayer].area / 100).round() / 100} Ha",
+                                    style: TextStyle(
+                                      color: getColorTextFromBackground(
+                                        gl
+                                            .polygonLayers[gl
+                                                .selectedPolygonLayer]
+                                            .colorInside
+                                            .withAlpha(255),
+                                      ),
+                                      fontSize:
+                                          MediaQuery.of(context).size.width *
+                                          .05,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
-                      onPressed: () {
-                        setState(() {
-                          if (gl
-                                      .polygonLayers[gl.selectedPolygonLayer]
-                                      .center
-                                      .longitude !=
-                                  0.0 &&
-                              gl
-                                      .polygonLayers[gl.selectedPolygonLayer]
-                                      .center
-                                      .latitude !=
-                                  0.0) {
-                            _mapController.move(
-                              gl.polygonLayers[gl.selectedPolygonLayer].center,
-                              _mapController.camera.zoom,
-                            );
-                          }
-                        });
-                        gl.refreshMap(() {
-                          gl.modeMapShowPolygons = true;
-                        });
-                      },
-                      child: Card(
-                        surfaceTintColor: Colors.transparent,
-                        shadowColor: Colors.transparent,
-                        color: gl
-                            .polygonLayers[gl.selectedPolygonLayer]
-                            .colorInside
-                            .withAlpha(255),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            Text(
-                              gl.polygonLayers[gl.selectedPolygonLayer].name,
-                              style: TextStyle(
-                                color: getColorTextFromBackground(
-                                  gl
-                                      .polygonLayers[gl.selectedPolygonLayer]
-                                      .colorInside
-                                      .withAlpha(255),
-                                ),
-                                fontSize:
-                                    MediaQuery.of(context).size.height * .02,
-                              ),
+                        ),
+                      ],
+                    ),
+                  ],
+                )
+                : _modeDrawPolygon
+                ? Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Container(
+                      constraints: BoxConstraints(
+                        minHeight: MediaQuery.of(context).size.height * .1,
+                        maxHeight: MediaQuery.of(context).size.height * .1,
+                      ),
+                      child: TextButton(
+                        onPressed:
+                            () => PopupDrawnLayerMenu(
+                              gl.notificationContext!,
+                              "",
+                              (LatLng pos) {
+                                if (pos.longitude != 0.0 &&
+                                    pos.latitude != 0.0) {
+                                  _mapController.move(
+                                    pos,
+                                    _mapController.camera.zoom,
+                                  );
+                                }
+                              },
+                              () {
+                                refreshView(() {
+                                  _modePolygonList = false;
+                                });
+                              },
                             ),
-                            Text(
-                              "${(gl.polygonLayers[gl.selectedPolygonLayer].area / 100).round() / 100} Ha",
-                              style: TextStyle(
-                                color: getColorTextFromBackground(
-                                  gl
-                                      .polygonLayers[gl.selectedPolygonLayer]
-                                      .colorInside
-                                      .withAlpha(255),
-                                ),
-                                fontSize:
-                                    MediaQuery.of(context).size.height * .02,
+                        child: Card(
+                          surfaceTintColor: Colors.transparent,
+                          shadowColor: Colors.transparent,
+                          color: gl.backgroundTransparentBlackBox,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              Icon(
+                                Icons.add,
+                                size: MediaQuery.of(context).size.width * .1,
+                                color: Colors.white,
                               ),
-                            ),
-                          ],
+                              SizedBox(
+                                width: MediaQuery.of(context).size.width * .03,
+                              ),
+                              SizedBox(
+                                width: MediaQuery.of(context).size.width * .6,
+                                child: Text(
+                                  "Tappez ici pour ajouter un Polygone",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize:
+                                        MediaQuery.of(context).size.width * .04,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ],
-              ),
+                  ],
+                )
+                : Column(),
             _mainMenuBar(),
             if (_toolbarExtended) _toolBar(),
-            if (_polygonToolbarExtended) _polygonToolbar(),
+            if (_polygonToolbarExtended && gl.polygonLayers.isNotEmpty)
+              _polygonToolbar(),
           ],
         ),
       ),
@@ -721,11 +886,15 @@ class _MapPageState extends State<MapPage> {
         CircleMarker(
           point: point,
           radius:
-              gl.polygonLayers[gl.selectedPolygonLayer].isSelectedLine(i)
+              gl.polygonLayers[gl.selectedPolygonLayer].isSelectedLine(i) &&
+                      !_modeShowButtonDrawPolygonMoveVertexes &&
+                      _modeDrawPolygonAddVertexes
                   ? iconSize / 2.7
                   : iconSize / 3,
           color:
-              gl.polygonLayers[gl.selectedPolygonLayer].isSelectedLine(i)
+              gl.polygonLayers[gl.selectedPolygonLayer].isSelectedLine(i) &&
+                      !_modeShowButtonDrawPolygonMoveVertexes &&
+                      _modeDrawPolygonAddVertexes
                   ? gl.polygonLayers[gl.selectedPolygonLayer].colorLine
                   : gl.polygonLayers[gl.selectedPolygonLayer].colorInside,
         ),
@@ -1111,33 +1280,28 @@ class _MapPageState extends State<MapPage> {
           point: point,
           child: TextButton(
             onPressed: () {
-              if (_modeDrawPolygonRemoveVertexes) {
-                refreshView(() {
-                  gl.polygonLayers[gl.selectedPolygonLayer].removePoint(point);
-                });
-              }
-              if (_modeDrawPolygonMoveVertexes) {
-                refreshView(() {
-                  if (_selectedPointToMove == null) {
-                    _selectedPointToMove = point;
-                    _mapController.move(point, _mapController.camera.zoom);
-                  } else {
-                    if (point.latitude == _selectedPointToMove!.latitude &&
-                        point.longitude == _selectedPointToMove!.longitude) {
-                      _stopMovingSelectedPoint();
-                    } else {
-                      _selectedPointToMove = point;
-                      _mapController.move(point, _mapController.camera.zoom);
-                    }
-                  }
-                });
-              }
               if (_modeDrawPolygonAddVertexes) {
                 refreshView(() {
                   gl.polygonLayers[gl.selectedPolygonLayer]
                       .refreshSelectedLinePoints(point);
                 });
+              } else {
+                refreshView(() {
+                  gl.polygonLayers[gl.selectedPolygonLayer]
+                      .refreshSelectedLinePoints(point);
+                  _modeShowButtonDrawPolygonAddVertexes = false;
+                  _modeShowButtonDrawPolygonMoveVertexes = true;
+                  _modeShowButtonDrawPolygonRemoveVertexes = true;
+                  _modeDrawPolygonAddVertexes = false;
+                  _modeDrawPolygonMoveVertexes = false;
+                  _modeDrawPolygonRemoveVertexes = false;
+                });
               }
+              /*if (_modeDrawPolygonRemoveVertexes) {
+                refreshView(() {
+                  gl.polygonLayers[gl.selectedPolygonLayer].removePoint(point);
+                });
+              }*/
             },
             child: Text(
               overflow: TextOverflow.visible,
@@ -1160,12 +1324,14 @@ class _MapPageState extends State<MapPage> {
     _modeDrawPolygonRemoveVertexes = false;
     _modeDrawPolygonMoveVertexes = false;
     _modeAnaPtPreview = true;
+    _modeShowButtonDrawPolygonAddVertexes = false;
+    _modeShowButtonDrawPolygonMoveVertexes = false;
+    _modeShowButtonDrawPolygonRemoveVertexes = false;
   }
 
   void _closeToolbarMenu() {
     _toolbarExtended = false;
     _modeSearch = false;
-    _modeProjectProperties = false;
     _modeMeasurePath = false;
   }
 
@@ -1189,7 +1355,10 @@ class _MapPageState extends State<MapPage> {
               ),
               child: Card(
                 shadowColor: Colors.transparent,
-                color: dummy ? Colors.transparent : Colors.black.withAlpha(128),
+                color:
+                    dummy
+                        ? Colors.transparent
+                        : gl.backgroundTransparentBlackBox,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
@@ -1247,6 +1416,9 @@ class _MapPageState extends State<MapPage> {
                             _polygonToolbarExtended = !_polygonToolbarExtended;
                             _modeDrawPolygon = _polygonToolbarExtended;
                             if (_modeDrawPolygon) {
+                              if (gl.polygonLayers.isNotEmpty) {
+                                _modeShowButtonDrawPolygonAddVertexes = true;
+                              }
                               _closeSwitchesMenu();
                               _closeToolbarMenu();
                               if (dummy) {
@@ -1257,7 +1429,7 @@ class _MapPageState extends State<MapPage> {
                             }
                           });
                         },
-                        icon: Icon(Icons.polyline),
+                        icon: Icon(Icons.hexagon_outlined),
                       ),
                     ),
                     dummy
@@ -1311,6 +1483,15 @@ class _MapPageState extends State<MapPage> {
                                       close: close,
                                     );
                                   },
+                                  (LatLng pos) {
+                                    if (pos.longitude != 0.0 &&
+                                        pos.latitude != 0.0) {
+                                      _mapController.move(
+                                        pos,
+                                        _mapController.camera.zoom,
+                                      );
+                                    }
+                                  },
                                 );
                               });
                             },
@@ -1348,66 +1529,71 @@ class _MapPageState extends State<MapPage> {
                 maxWidth: MediaQuery.of(context).size.width * .2,
               ),
               child: Card(
-                color: Colors.black.withAlpha(128),
+                color: gl.backgroundTransparentBlackBox,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     gl.position != null
-                        ? Column(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            IconButton(
-                              iconSize: MediaQuery.of(context).size.width * .12,
-                              color: gl.colorAgroBioTech,
-                              onPressed: () async {
-                                if (!_doingAnaPt) {
-                                  refreshView(() {
-                                    _doingAnaPt = true;
-                                  });
-                                  await _runAnaPt(
-                                    epsg4326.transform(
-                                      epsg31370,
-                                      proj4.Point(
-                                        x: gl.position?.longitude ?? 0.0,
-                                        y: gl.position?.latitude ?? 0.0,
+                        ? Card(
+                          color: Colors.orange.withAlpha(128),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              IconButton(
+                                iconSize:
+                                    MediaQuery.of(context).size.width * .12,
+                                color: gl.colorAgroBioTech,
+                                onPressed: () async {
+                                  if (!_doingAnaPt) {
+                                    refreshView(() {
+                                      _doingAnaPt = true;
+                                    });
+                                    await _runAnaPt(
+                                      epsg4326.transform(
+                                        epsg31370,
+                                        proj4.Point(
+                                          x: gl.position?.longitude ?? 0.0,
+                                          y: gl.position?.latitude ?? 0.0,
+                                        ),
                                       ),
-                                    ),
-                                  );
-                                  _updatePtMarker(
-                                    LatLng(
-                                      gl.position?.latitude ?? 0.0,
-                                      gl.position?.longitude ?? 0.0,
-                                    ),
-                                  );
-                                  GoRouter.of(
-                                    gl.notificationContext!,
-                                  ).push("/anaPt");
-                                  refreshView(() {
-                                    _doingAnaPt = false;
-                                  });
-                                }
-                              },
-                              icon: const Icon(Icons.analytics),
-                            ),
-                            IconButton(
-                              iconSize: MediaQuery.of(context).size.width * .12,
-                              color: Colors.red,
-                              onPressed: () async {
-                                if (gl.position != null) {
-                                  refreshView(() {
-                                    _mapController.move(
+                                    );
+                                    _updatePtMarker(
                                       LatLng(
                                         gl.position?.latitude ?? 0.0,
                                         gl.position?.longitude ?? 0.0,
                                       ),
-                                      8,
                                     );
-                                  });
-                                }
-                              },
-                              icon: Icon(Icons.gps_fixed),
-                            ),
-                          ],
+                                    GoRouter.of(
+                                      gl.notificationContext!,
+                                    ).push("/anaPt");
+                                    refreshView(() {
+                                      _doingAnaPt = false;
+                                    });
+                                  }
+                                },
+                                icon: const Icon(Icons.analytics),
+                              ),
+                              IconButton(
+                                iconSize:
+                                    MediaQuery.of(context).size.width * .12,
+                                color: Colors.red,
+                                onPressed: () async {
+                                  if (gl.position != null) {
+                                    refreshView(() {
+                                      _mapController.move(
+                                        LatLng(
+                                          gl.position?.latitude ?? 0.0,
+                                          gl.position?.longitude ?? 0.0,
+                                        ),
+                                        8,
+                                      );
+                                    });
+                                  }
+                                },
+                                icon: Icon(Icons.gps_fixed),
+                              ),
+                            ],
+                          ),
                         )
                         : Column(
                           mainAxisAlignment: MainAxisAlignment.end,
@@ -1497,37 +1683,6 @@ class _MapPageState extends State<MapPage> {
     );
   }
 
-  Widget _layerPolygonButton() {
-    return IconButton(
-      iconSize: iconSize,
-      color: _polygonMenuColorTools(_modeProjectProperties),
-      onPressed: () async {
-        refreshView(() {
-          _modeProjectProperties = !_modeProjectProperties;
-        });
-        gl.refreshMap(() {});
-
-        PopupDrawnLayerMenu(
-          gl.notificationContext!,
-          gl.polygonLayers.isNotEmpty
-              ? gl.polygonLayers[gl.selectedPolygonLayer].name
-              : "",
-          (LatLng pos) {
-            if (pos.longitude != 0.0 && pos.latitude != 0.0) {
-              _mapController.move(pos, _mapController.camera.zoom);
-            }
-          },
-          () {
-            refreshView(() {
-              _modeProjectProperties = false;
-            });
-          },
-        );
-      },
-      icon: const Icon(Icons.hexagon),
-    );
-  }
-
   Widget _polygonToolbar() {
     return Column(
       mainAxisAlignment: MainAxisAlignment.end,
@@ -1537,79 +1692,169 @@ class _MapPageState extends State<MapPage> {
           children: [
             Container(
               alignment: Alignment.center,
+              height:
+                  MediaQuery.of(context).size.width * .05 +
+                  (_modeShowButtonDrawPolygonMoveVertexes
+                      ? MediaQuery.of(context).size.width * .2
+                      : 0.0) +
+                  (_modeShowButtonDrawPolygonRemoveVertexes
+                      ? MediaQuery.of(context).size.width * .2
+                      : 0.0) +
+                  (_modeShowButtonDrawPolygonAddVertexes
+                      ? MediaQuery.of(context).size.width * .2
+                      : 0.0),
               constraints: BoxConstraints(
-                maxHeight: MediaQuery.of(context).size.width * .7,
-                minHeight: MediaQuery.of(context).size.width * .7,
+                minWidth: MediaQuery.of(context).size.width * .2,
                 maxWidth: MediaQuery.of(context).size.width * .2,
               ),
               child: Card(
-                color: Colors.black.withAlpha(128),
+                color: gl.backgroundTransparentBlackBox,
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    _layerPolygonButton(),
-                    IconButton(
-                      iconSize: iconSize,
-                      color: _polygonMenuColorTools(
-                        _modeDrawPolygonMoveVertexes,
+                    if (_modeShowButtonDrawPolygonMoveVertexes)
+                      Container(
+                        color: _polygonMenuColorTools(
+                          _modeDrawPolygonMoveVertexes,
+                        ),
+                        child: IconButton(
+                          color:
+                              _modeDrawPolygonMoveVertexes
+                                  ? Colors.white
+                                  : Colors.lightGreenAccent,
+                          iconSize: iconSize,
+                          onPressed: () async {
+                            refreshView(() {
+                              _modeDrawPolygonMoveVertexes =
+                                  !_modeDrawPolygonMoveVertexes;
+                            });
+                            if (_modeDrawPolygonMoveVertexes == true) {
+                              refreshView(() {
+                                LatLng point =
+                                    gl
+                                        .polygonLayers[gl.selectedPolygonLayer]
+                                        .polygonPoints[gl
+                                        .polygonLayers[gl.selectedPolygonLayer]
+                                        .selectedPolyLinePoints[0]];
+                                if (_selectedPointToMove == null) {
+                                  _selectedPointToMove = point;
+                                  _mapController.move(
+                                    point,
+                                    _mapController.camera.zoom,
+                                  );
+                                } else {
+                                  if (point.latitude ==
+                                          _selectedPointToMove!.latitude &&
+                                      point.longitude ==
+                                          _selectedPointToMove!.longitude) {
+                                    _stopMovingSelectedPoint();
+                                  } else {
+                                    _selectedPointToMove = point;
+                                    _mapController.move(
+                                      point,
+                                      _mapController.camera.zoom,
+                                    );
+                                  }
+                                }
+                              });
+                              _modeDrawPolygonAddVertexes = false;
+                              _modeDrawPolygonRemoveVertexes = false;
+                            } else {
+                              refreshView(() {
+                                _stopMovingSelectedPoint();
+                              });
+                            }
+                          },
+                          icon: const Icon(Icons.open_with_rounded),
+                        ),
                       ),
-                      onPressed: () async {
-                        refreshView(() {
-                          _modeDrawPolygonMoveVertexes =
-                              !_modeDrawPolygonMoveVertexes;
-                        });
-                        if (_modeDrawPolygonMoveVertexes == true) {
-                          _modeDrawPolygonAddVertexes = false;
-                          _modeDrawPolygonRemoveVertexes = false;
-                        } else {
-                          refreshView(() {
-                            _stopMovingSelectedPoint();
-                          });
-                        }
-                      },
-                      icon: const Icon(Icons.open_with_rounded),
-                    ),
-                    IconButton(
-                      iconSize: iconSize,
-                      color: _polygonMenuColorTools(
-                        _modeDrawPolygonRemoveVertexes,
+                    if (_modeShowButtonDrawPolygonRemoveVertexes)
+                      Container(
+                        color: _polygonMenuColorTools(
+                          _modeDrawPolygonRemoveVertexes,
+                        ),
+                        child: IconButton(
+                          iconSize: iconSize,
+                          color:
+                              _modeDrawPolygonRemoveVertexes
+                                  ? Colors.white
+                                  : Colors.lightGreenAccent,
+                          onPressed: () async {
+                            refreshView(() {
+                              _modeDrawPolygonRemoveVertexes =
+                                  !_modeDrawPolygonRemoveVertexes;
+                            });
+                            if (_modeDrawPolygonRemoveVertexes == true) {
+                              refreshView(() {
+                                gl.polygonLayers[gl.selectedPolygonLayer]
+                                    .removePoint(
+                                      gl
+                                          .polygonLayers[gl
+                                              .selectedPolygonLayer]
+                                          .polygonPoints[gl
+                                          .polygonLayers[gl
+                                              .selectedPolygonLayer]
+                                          .selectedPolyLinePoints[0]],
+                                    );
+                              });
+                              _modeDrawPolygonMoveVertexes = false;
+                              _modeDrawPolygonAddVertexes = false;
+                              _stopMovingSelectedPoint();
+                              refreshView(() {
+                                if (gl
+                                    .polygonLayers[gl.selectedPolygonLayer]
+                                    .polygonPoints
+                                    .isEmpty) {
+                                  _modeShowButtonDrawPolygonAddVertexes = true;
+                                  _modeShowButtonDrawPolygonMoveVertexes =
+                                      false;
+                                  _modeShowButtonDrawPolygonRemoveVertexes =
+                                      false;
+                                  _modeDrawPolygonAddVertexes = false;
+                                  _modeDrawPolygonMoveVertexes = false;
+                                  _modeDrawPolygonRemoveVertexes = false;
+                                } else {
+                                  _modeShowButtonDrawPolygonAddVertexes = false;
+                                  _modeShowButtonDrawPolygonMoveVertexes = true;
+                                  _modeShowButtonDrawPolygonRemoveVertexes =
+                                      true;
+                                  _modeDrawPolygonAddVertexes = false;
+                                  _modeDrawPolygonMoveVertexes = false;
+                                  _modeDrawPolygonRemoveVertexes = false;
+                                }
+                              });
+                            }
+                          },
+                          icon: const Icon(Icons.remove_circle),
+                        ),
                       ),
-
-                      onPressed: () async {
-                        refreshView(() {
-                          _modeDrawPolygonRemoveVertexes =
-                              !_modeDrawPolygonRemoveVertexes;
-                        });
-                        if (_modeDrawPolygonRemoveVertexes == true) {
-                          _modeDrawPolygonMoveVertexes = false;
-                          _modeDrawPolygonAddVertexes = false;
-                          refreshView(() {
-                            _stopMovingSelectedPoint();
-                          });
-                        }
-                      },
-                      icon: const Icon(Icons.remove_circle),
-                    ),
-                    IconButton(
-                      iconSize: iconSize,
-                      color: _polygonMenuColorTools(
-                        _modeDrawPolygonAddVertexes,
+                    if (_modeShowButtonDrawPolygonAddVertexes)
+                      Container(
+                        color: _polygonMenuColorTools(
+                          _modeDrawPolygonAddVertexes,
+                        ),
+                        child: IconButton(
+                          iconSize: iconSize,
+                          color:
+                              _modeDrawPolygonAddVertexes
+                                  ? Colors.white
+                                  : Colors.lightGreenAccent,
+                          onPressed: () async {
+                            refreshView(() {
+                              _modeDrawPolygonAddVertexes =
+                                  !_modeDrawPolygonAddVertexes;
+                            });
+                            if (_modeDrawPolygonAddVertexes == true) {
+                              _modeDrawPolygonRemoveVertexes = false;
+                              _modeDrawPolygonMoveVertexes = false;
+                              refreshView(() {
+                                _stopMovingSelectedPoint();
+                              });
+                            }
+                          },
+                          icon: const Icon(Icons.add_circle),
+                        ),
                       ),
-                      onPressed: () async {
-                        refreshView(() {
-                          _modeDrawPolygonAddVertexes =
-                              !_modeDrawPolygonAddVertexes;
-                        });
-                        if (_modeDrawPolygonAddVertexes == true) {
-                          _modeDrawPolygonRemoveVertexes = false;
-                          _modeDrawPolygonMoveVertexes = false;
-                          refreshView(() {
-                            _stopMovingSelectedPoint();
-                          });
-                        }
-                      },
-                      icon: const Icon(Icons.add_circle),
-                    ),
                   ],
                 ),
               ),

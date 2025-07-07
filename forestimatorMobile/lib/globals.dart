@@ -102,9 +102,7 @@ class PoiMarker {
   });
 }
 
-List<pol.PolygonLayer> polygonLayers = [
-  pol.PolygonLayer(polygonName: "Terrain"),
-];
+List<pol.PolygonLayer> polygonLayers = [];
 int selectedPolygonLayer = 0;
 
 // ajouter le code le la couche à la fin de cette requete. fonctionne que pour layerbase avec mRes <= 10m sinon je considère que c'est trop volumineux
@@ -300,8 +298,13 @@ void replaceLayerFromList(
       index,
       SelectedLayer(mCode: replacement, offline: offline),
     );
-  } else if (getCountOfSelectedLayersForMap() == 3 ||
-      getCountOfSelectedLayersForMap() == 0) {
+  } else if (getCountOfSelectedLayersForMap() == 3) {
+    selectedLayerForMap.removeAt(2);
+    selectedLayerForMap.insert(
+      0,
+      SelectedLayer(mCode: replacement, offline: offline),
+    );
+  } else if (getCountOfSelectedLayersForMap() == 0) {
     selectedLayerForMap.removeAt(0);
     selectedLayerForMap.insert(
       0,
@@ -310,11 +313,13 @@ void replaceLayerFromList(
   } else {
     selectedLayerForMap.removeAt(getIndexForEmptySlot());
     selectedLayerForMap.insert(
-      getIndexForEmptySlot(),
+      0,
       SelectedLayer(mCode: replacement, offline: offline),
     );
   }
 }
+
+void switchLayersByOne() {}
 
 int getCountOfSelectedLayersForMap() {
   int count = 0;
