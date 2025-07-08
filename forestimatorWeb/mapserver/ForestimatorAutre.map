@@ -141,6 +141,32 @@ MAP
    		TEMPLATE "../template.html"
 	END
  	LAYER
+        NAME "MasqueForet2022"
+        TYPE RASTER
+        STATUS ON
+		
+		DATA "Forest_Mask_2021_2022_GxABT_202503.tif"
+		PROJECTION
+			"init=epsg:31370"
+	  	END
+
+		PROCESSING "BANDS=1"
+		CLASSITEM "[pixel]"
+		CLASS
+		  EXPRESSION "1"
+		  STYLE
+		    COLOR 0 100 0
+		  END
+		END
+		OFFSITE 0 0 0
+
+		METADATA
+	    	"wms_title"           "Masque Forêt 2022"
+	    	"wms_srs"             "EPSG:31370"
+	  	END
+		TEMPLATE "../template.html"
+    END
+    LAYER
         NAME "MasqueForet"
         TYPE RASTER
         STATUS ON
