@@ -141,7 +141,7 @@ MAP
    		TEMPLATE "../template.html"
 	END
  	LAYER
-        NAME "MasqueForet2022"
+        NAME "MasqueForet"
         TYPE RASTER
         STATUS ON
 		
@@ -161,13 +161,13 @@ MAP
 		OFFSITE 0 0 0
 
 		METADATA
-	    	"wms_title"           "Masque Forêt 2022"
+	    	"wms_title"           "Masque Forêt"
 	    	"wms_srs"             "EPSG:31370"
 	  	END
 		TEMPLATE "../template.html"
     END
     LAYER
-        NAME "MasqueForet"
+        NAME "MasqueForet2018"
         TYPE RASTER
         STATUS ON
 		
@@ -187,7 +187,7 @@ MAP
 		OFFSITE 0 0 0
 
 		METADATA
-	    	"wms_title"           "Masque Forêt"
+	    	"wms_title"           "Masque Forêt 2018"
 	    	"wms_srs"             "EPSG:31370"
 	  	END
 		TEMPLATE "../template.html"
