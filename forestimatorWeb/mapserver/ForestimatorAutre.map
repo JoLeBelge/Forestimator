@@ -193,7 +193,7 @@ MAP
 		TEMPLATE "../template.html"
     END
     LAYER
-        NAME "ClassesHauteur2025"
+        NAME "ClassesDeHauteur"
         TYPE RASTER
         STATUS ON
 		
