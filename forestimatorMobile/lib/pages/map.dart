@@ -52,7 +52,7 @@ class _MapPageState extends State<MapPage> {
   bool _modeShowButtonDrawPolygonAddVertexes = true;
 
   bool _modeLayerSwitches = false;
-
+  
   bool _modeSearch = false;
   bool _modeMeasurePath = false;
   bool _modeMoveMeasurePath = false;
@@ -453,9 +453,7 @@ class _MapPageState extends State<MapPage> {
                       return _provider!.loaded
                           ? TileLayer(
                             tileDisplay:
-                                gl.modeMapFirstTileLayerTransparancy &&
-                                        i > 1 &&
-                                        gl.getLayersForFlutterMap().length == i
+                                gl.modeMapFirstTileLayerTransparancy && i == 2
                                     ? TileDisplay.instantaneous(opacity: 0.5)
                                     : TileDisplay.instantaneous(opacity: 1.0),
                             tileProvider: _provider,

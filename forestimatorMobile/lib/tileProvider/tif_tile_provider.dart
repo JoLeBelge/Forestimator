@@ -43,7 +43,7 @@ class TifFileTileProvider extends TileProvider {
       img.TiffInfo tiffInfo = img.TiffDecoder().startDecode(bytes)!;
       img.TiffImage tifIm = tiffInfo.images[0];
       int bps = tifIm.bitsPerSample;
-      gl.print("file loaded in memory $e");
+      gl.print("file with $bps loaded in memory $e");
       // le décodage d'un tif 16 bits avec ColorMap sera effectif pour la prochaine sortie du package image (flutter)
       // testé avec image 4.2, imageDecoder (android graphic) ; Input was incomplete-> il faut probablement encore convertir en 8bit apres lecture de la 16 bits avec colormap.
       if (bps <= 8) {

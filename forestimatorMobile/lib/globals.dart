@@ -346,10 +346,42 @@ int getIndexForEmptySlot() {
       : count;
 }
 
-int getIndexForLayer(String key) {
+int getCountOfflineLayerSelected() {
+  int count = 0;
+  for (SelectedLayer layer in selectedLayerForMap) {
+    if (layer.offline) {
+      count++;
+    }
+  }
+  return count;
+}
+
+int getIndexForLayer(String key, bool offline) {
   int index = 0;
   for (SelectedLayer layer in selectedLayerForMap) {
-    if (layer.mCode == key) {
+    if (layer.mCode == key && layer.offline == offline) {
+      return index;
+    }
+    index++;
+  }
+  return -1;
+}
+
+int getIndexForNextLayerOffline() {
+  int index = 0;
+  for (SelectedLayer layer in selectedLayerForMap) {
+    if (layer.offline) {
+      return index;
+    }
+    index++;
+  }
+  return -1;
+}
+
+int sameOnlineAsOfflineLayer(String key, bool offline) {
+  int index = 0;
+  for (SelectedLayer layer in selectedLayerForMap) {
+    if (layer.mCode == key && layer.offline != offline) {
       return index;
     }
     index++;

@@ -192,7 +192,32 @@ MAP
 	  	END
 		TEMPLATE "../template.html"
     END
+    LAYER
+        NAME "ClassesHauteur2025"
+        TYPE RASTER
+        STATUS ON
+		
+		DATA "cl_haut_8class_10_25_1_reg1.tif"
+		PROJECTION
+			"init=epsg:31370"
+	  	END
 
+		PROCESSING "BANDS=1"
+		CLASSITEM "[pixel]"
+		CLASS
+		  EXPRESSION "1"
+		  STYLE
+		    COLOR 0 100 0
+		  END
+		END
+		OFFSITE 0 0 0
+
+		METADATA
+	    	"wms_title"           "Classes de Hauteur"
+	    	"wms_srs"             "EPSG:31370"
+	  	END
+		TEMPLATE "../template.html"
+    END
  	LAYER
         NAME "plS2_falseColor_2020_05"
         TYPE RASTER
