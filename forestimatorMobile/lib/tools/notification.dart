@@ -12,6 +12,7 @@ import 'package:fforestimator/tools/layer_downloader.dart';
 import 'package:fforestimator/tools/pretty_print_nominatim_results.dart';
 import 'package:fforestimator/tools/pretty_print_polygon_results.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
@@ -229,6 +230,8 @@ class PopupNameIntroducer {
           title: Text("Changez de nom"),
           content: SingleChildScrollView(
             child: TextFormField(
+              maxLength: 25,
+              maxLengthEnforcement: MaxLengthEnforcement.enforced,
               onChanged: (String str) {
                 state(str);
               },
@@ -237,7 +240,7 @@ class PopupNameIntroducer {
           ),
           actions: [
             TextButton(
-              child: Text("Rename"),
+              child: Text("Renommer"),
               onPressed: () {
                 after();
                 Navigator.of(context, rootNavigator: true).pop();
@@ -414,8 +417,8 @@ class _DrawnLayerMenu extends State<DrawnLayerMenu> {
                                         context,
                                         gl.polygonLayers[i].name,
                                         (String nameIt) {
-                                          if (nameIt.length > 10) {
-                                            nameIt = nameIt.substring(0, 10);
+                                          if (nameIt.length > 25) {
+                                            nameIt = nameIt.substring(0, 25);
                                           }
                                           //change name
                                           setState(() {
@@ -1579,7 +1582,9 @@ class PopupDrawnLayerMenu {
           ],
         );
       },
-    );
+    ).whenComplete(() {
+      after();
+    });
   }
 }
 
@@ -2276,14 +2281,6 @@ class _MapLayerSelectionButtonState extends State<MapLayerSelectionButton> {
         ),
         onPressed: () {
           if (!widget.offlineMode) {
-            setState(() {
-              gl.replaceLayerFromList(
-                widget.layerTile.key,
-                index: interfaceSelectedMapSwitcherSlot,
-                offline: false,
-              );
-            });
-          } else {
             if (gl.sameOnlineAsOfflineLayer(widget.layerTile.key, false) !=
                 -1) {
               setState(() {
@@ -2291,31 +2288,79 @@ class _MapLayerSelectionButtonState extends State<MapLayerSelectionButton> {
                   widget.layerTile.key,
                   false,
                 );
-                gl.removeLayerFromList(index: index, offline: false);
-                gl.replaceLayerFromList(
-                  widget.layerTile.key,
-                  index: index,
-                  offline: true,
-                );
-              });
-            } else if (gl.getCountOfflineLayerSelected() == 0) {
-              setState(() {
-                gl.replaceLayerFromList(
-                  widget.layerTile.key,
-                  index: interfaceSelectedMapSwitcherSlot,
-                  offline: true,
-                );
-              });
-            } else if (gl.getCountOfflineLayerSelected() == 1) {
-              setState(() {
-                int index = gl.getIndexForNextLayerOffline();
                 gl.removeLayerFromList(index: index, offline: true);
                 gl.replaceLayerFromList(
                   widget.layerTile.key,
                   index: index,
-                  offline: true,
+                  offline: false,
                 );
               });
+            } else {
+              setState(() {
+                gl.replaceLayerFromList(
+                  widget.layerTile.key,
+                  index: interfaceSelectedMapSwitcherSlot,
+                  offline: false,
+                );
+              });
+            }
+          } else {
+            if (gl.getCountOfflineLayerSelected() == 0) {
+              if (gl.sameOnlineAsOfflineLayer(widget.layerTile.key, true) !=
+                  -1) {
+                setState(() {
+                  int index = gl.sameOnlineAsOfflineLayer(
+                    widget.layerTile.key,
+                    true,
+                  );
+                  gl.removeLayerFromList(index: index, offline: false);
+                  gl.replaceLayerFromList(
+                    widget.layerTile.key,
+                    index: index,
+                    offline: true,
+                  );
+                });
+              } else {
+                setState(() {
+                  gl.replaceLayerFromList(
+                    widget.layerTile.key,
+                    index: interfaceSelectedMapSwitcherSlot,
+                    offline: true,
+                  );
+                });
+              }
+            } else if (gl.getCountOfflineLayerSelected() == 1) {
+              if (gl.sameOnlineAsOfflineLayer(widget.layerTile.key, true) !=
+                  -1) {
+                setState(() {
+                  int index = gl.getIndexForNextLayerOffline();
+                  gl.replaceLayerFromList(
+                    gl.selectedLayerForMap[index].mCode,
+                    index: index,
+                    offline: false,
+                  );
+                  index = gl.sameOnlineAsOfflineLayer(
+                    widget.layerTile.key,
+                    true,
+                  );
+                  gl.removeLayerFromList(index: index, offline: false);
+                  gl.replaceLayerFromList(
+                    widget.layerTile.key,
+                    index: index,
+                    offline: true,
+                  );
+                });
+              } else {
+                setState(() {
+                  int index = gl.getIndexForNextLayerOffline();
+                  gl.removeLayerFromList(index: index, offline: true);
+                  gl.replaceLayerFromList(
+                    widget.layerTile.key,
+                    index: index,
+                    offline: true,
+                  );
+                });
+              }
             }
           }
           gl.refreshMap(() {});

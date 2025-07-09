@@ -205,6 +205,7 @@ class LayerBase {
       mPdfPage = 1,
       mDicoVal = {},
       mDicoCol = {},
+      mOffline = false,
       mRes = 0.0,
       mUsedForAnalysis = false,
       mBits = 8,

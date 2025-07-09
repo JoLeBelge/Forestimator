@@ -37,6 +37,7 @@ class _MapPageState extends State<MapPage> {
 
   bool _modeAnaPtPreview = true;
   bool _lastPressWasShort = false;
+  bool _mapControllerInit = false;
 
   bool _toolbarExtended = false;
   bool _polygonToolbarExtended = false;
@@ -52,7 +53,7 @@ class _MapPageState extends State<MapPage> {
   bool _modeShowButtonDrawPolygonAddVertexes = true;
 
   bool _modeLayerSwitches = false;
-  
+
   bool _modeSearch = false;
   bool _modeMeasurePath = false;
   bool _modeMoveMeasurePath = false;
@@ -221,7 +222,7 @@ class _MapPageState extends State<MapPage> {
           backgroundColor:
               gl.offlineMode ? gl.colorAgroBioTech : gl.colorUliege,
           title: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               IconButton(
                 iconSize: MediaQuery.of(context).size.height * .035,
@@ -240,9 +241,10 @@ class _MapPageState extends State<MapPage> {
                 },
                 icon: Icon(Icons.settings),
               ),
+              SizedBox(width: 1),
               Container(
                 constraints: BoxConstraints(
-                  maxWidth: MediaQuery.of(context).size.width * .8,
+                  maxWidth: MediaQuery.of(context).size.width * .6,
                 ),
                 alignment: Alignment.center,
                 child: TextButton(
@@ -259,7 +261,7 @@ class _MapPageState extends State<MapPage> {
                   child:
                       gl.offlineMode
                           ? Text(
-                            "Forestimator offline/terrain",
+                            "Forestimator terrain",
                             style: TextStyle(
                               color: Colors.black,
                               fontSize:
@@ -276,6 +278,24 @@ class _MapPageState extends State<MapPage> {
                           ),
                 ),
               ),
+              _mapControllerInit
+                  ? _mapController.camera.zoom.round() <
+                              gl.globalMinOfflineZoom.round() &&
+                          gl.getIndexForNextLayerOffline() > -1
+                      ? IconButton(
+                        iconSize: MediaQuery.of(context).size.height * .035,
+                        color: Colors.red,
+                        tooltip:
+                            "Si vous n'arrivez plus à visualiser les cartes hors ligne c'est que votre zoom est trop large.",
+                        onPressed: () {},
+                        icon: Icon(Icons.info_rounded),
+                      )
+                      : SizedBox(
+                        width: MediaQuery.of(context).size.height * .035 * 1.5,
+                      )
+                  : SizedBox(
+                    width: MediaQuery.of(context).size.height * .035 * 1.5,
+                  ),
             ],
           ),
         ),
@@ -366,6 +386,7 @@ class _MapPageState extends State<MapPage> {
                         },
                 onPositionChanged: (position, e) async {
                   if (!e) return;
+                  _mapControllerInit = true;
                   updateLocation();
                   if (_modeMoveMeasurePath) {
                     _measurePath.removeAt(selectedMeasurePointToMove);
@@ -708,34 +729,56 @@ class _MapPageState extends State<MapPage> {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceEvenly,
                                 children: [
-                                  Icon(
-                                    Icons.hexagon_outlined,
-                                    size:
-                                        MediaQuery.of(context).size.width * .1,
-                                    color: getColorTextFromBackground(
+                                  IconButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        if (gl
+                                                    .polygonLayers[gl
+                                                        .selectedPolygonLayer]
+                                                    .center
+                                                    .longitude !=
+                                                0.0 &&
+                                            gl
+                                                    .polygonLayers[gl
+                                                        .selectedPolygonLayer]
+                                                    .center
+                                                    .latitude !=
+                                                0.0) {
+                                          _mapController.move(
+                                            gl
+                                                .polygonLayers[gl
+                                                    .selectedPolygonLayer]
+                                                .center,
+                                            _mapController.camera.zoom,
+                                          );
+                                        }
+                                      });
+                                      gl.refreshMap(() {
+                                        gl.modeMapShowPolygons = true;
+                                      });
+                                    },
+                                    icon: Icon(
                                       gl
-                                          .polygonLayers[gl
-                                              .selectedPolygonLayer]
-                                          .colorInside
-                                          .withAlpha(255),
+                                                  .polygonLayers[gl
+                                                      .selectedPolygonLayer]
+                                                  .polygonPoints
+                                                  .length >
+                                              2
+                                          ? Icons.center_focus_strong
+                                          : Icons.center_focus_strong_outlined,
+                                      size:
+                                          MediaQuery.of(context).size.width *
+                                          .1,
+                                      color: getColorTextFromBackground(
+                                        gl
+                                            .polygonLayers[gl
+                                                .selectedPolygonLayer]
+                                            .colorInside
+                                            .withAlpha(255),
+                                      ),
                                     ),
                                   ),
-                                  SizedBox(
-                                    width:
-                                        MediaQuery.of(context).size.width * .01,
-                                  ),
-                                  Icon(
-                                    Icons.center_focus_strong,
-                                    size:
-                                        MediaQuery.of(context).size.width * .1,
-                                    color: getColorTextFromBackground(
-                                      gl
-                                          .polygonLayers[gl
-                                              .selectedPolygonLayer]
-                                          .colorInside
-                                          .withAlpha(255),
-                                    ),
-                                  ),
+
                                   SizedBox(
                                     width:
                                         MediaQuery.of(context).size.width * .01,
@@ -812,6 +855,10 @@ class _MapPageState extends State<MapPage> {
                               () {
                                 refreshView(() {
                                   _modePolygonList = false;
+                                  if (gl.polygonLayers.isNotEmpty) {
+                                    _modeShowButtonDrawPolygonAddVertexes =
+                                        true;
+                                  }
                                 });
                               },
                             ),
@@ -1506,6 +1553,13 @@ class _MapPageState extends State<MapPage> {
     );
   }
 
+  bool positionMarkerInsideViewRectangle() =>
+      gl.position != null
+          ? _mapController.camera.visibleBounds.contains(
+            LatLng(gl.position!.latitude, gl.position!.longitude),
+          )
+          : false;
+
   Widget _toolBar() {
     return Column(
       mainAxisAlignment: MainAxisAlignment.end,
@@ -1519,10 +1573,14 @@ class _MapPageState extends State<MapPage> {
                 maxHeight:
                     gl.modeDevelopper
                         ? gl.position != null
-                            ? MediaQuery.of(context).size.width * .75
+                            ? positionMarkerInsideViewRectangle()
+                                ? MediaQuery.of(context).size.width * .75
+                                : MediaQuery.of(context).size.width * .6
                             : MediaQuery.of(context).size.width * .6
                         : gl.position != null
-                        ? MediaQuery.of(context).size.width * .6
+                        ? positionMarkerInsideViewRectangle()
+                            ? MediaQuery.of(context).size.width * .6
+                            : MediaQuery.of(context).size.width * .45
                         : MediaQuery.of(context).size.width * .45,
                 maxWidth: MediaQuery.of(context).size.width * .2,
               ),
@@ -1537,40 +1595,41 @@ class _MapPageState extends State<MapPage> {
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [
-                              IconButton(
-                                iconSize:
-                                    MediaQuery.of(context).size.width * .12,
-                                color: gl.colorAgroBioTech,
-                                onPressed: () async {
-                                  if (!_doingAnaPt) {
-                                    refreshView(() {
-                                      _doingAnaPt = true;
-                                    });
-                                    await _runAnaPt(
-                                      epsg4326.transform(
-                                        epsg31370,
-                                        proj4.Point(
-                                          x: gl.position?.longitude ?? 0.0,
-                                          y: gl.position?.latitude ?? 0.0,
+                              if (positionMarkerInsideViewRectangle())
+                                IconButton(
+                                  iconSize:
+                                      MediaQuery.of(context).size.width * .12,
+                                  color: gl.colorAgroBioTech,
+                                  onPressed: () async {
+                                    if (!_doingAnaPt) {
+                                      refreshView(() {
+                                        _doingAnaPt = true;
+                                      });
+                                      await _runAnaPt(
+                                        epsg4326.transform(
+                                          epsg31370,
+                                          proj4.Point(
+                                            x: gl.position?.longitude ?? 0.0,
+                                            y: gl.position?.latitude ?? 0.0,
+                                          ),
                                         ),
-                                      ),
-                                    );
-                                    _updatePtMarker(
-                                      LatLng(
-                                        gl.position?.latitude ?? 0.0,
-                                        gl.position?.longitude ?? 0.0,
-                                      ),
-                                    );
-                                    GoRouter.of(
-                                      gl.notificationContext!,
-                                    ).push("/anaPt");
-                                    refreshView(() {
-                                      _doingAnaPt = false;
-                                    });
-                                  }
-                                },
-                                icon: const Icon(Icons.analytics),
-                              ),
+                                      );
+                                      _updatePtMarker(
+                                        LatLng(
+                                          gl.position?.latitude ?? 0.0,
+                                          gl.position?.longitude ?? 0.0,
+                                        ),
+                                      );
+                                      GoRouter.of(
+                                        gl.notificationContext!,
+                                      ).push("/anaPt");
+                                      refreshView(() {
+                                        _doingAnaPt = false;
+                                      });
+                                    }
+                                  },
+                                  icon: const Icon(Icons.analytics),
+                                ),
                               IconButton(
                                 iconSize:
                                     MediaQuery.of(context).size.width * .12,
