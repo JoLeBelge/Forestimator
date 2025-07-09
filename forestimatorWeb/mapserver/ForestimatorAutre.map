@@ -207,7 +207,49 @@ MAP
 		CLASS
 		  EXPRESSION "1"
 		  STYLE
-		    COLOR 0 100 0
+		    COLOR 235 231 109
+		  END
+		END
+      CLASS
+		  EXPRESSION "2"
+		  STYLE
+		    COLOR 255 180 180
+		  END
+		END
+      CLASS
+		  EXPRESSION "3"
+		  STYLE
+		    COLOR 255 80 80
+		  END
+		END
+      CLASS
+		  EXPRESSION "4"
+		  STYLE
+		    COLOR 200 32 30
+		  END
+		END
+      CLASS
+		  EXPRESSION "5"
+		  STYLE
+		    COLOR 106 179 243
+		  END
+		END
+      CLASS
+		  EXPRESSION "6"
+		  STYLE
+		    COLOR 62 93 231
+		  END
+		END
+      CLASS
+		  EXPRESSION "7"
+		  STYLE
+		    COLOR 55 191 75
+		  END
+		END
+      CLASS
+		  EXPRESSION "8"
+		  STYLE
+		    COLOR 29 129 29
 		  END
 		END
 		OFFSITE 0 0 0
