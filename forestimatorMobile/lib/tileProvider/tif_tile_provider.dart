@@ -36,7 +36,7 @@ class TifFileTileProvider extends TileProvider {
   Future _loadAndDecodeImage() async {
     gl.print("init TifFileTileProvider by loading source image in memory");
     final File fileIm = File(sourceImPath);
-    bool e = await Isolate.run<bool>(fileIm.exists);
+    bool e = await fileIm.exists();
     if (e) {
       Uint8List? bytes = await fileIm.readAsBytes();
 

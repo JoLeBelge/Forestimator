@@ -276,6 +276,7 @@ class PolygonLayer {
         gl.print("$e");
         try {
           String correctedBody = res!.body.replaceAll('",\n}', '"\n}');
+          correctedBody = correctedBody.replaceAll('-', '0.0');
           gl.print(correctedBody);
           gl.print(res.body);
           decodedJson = jsonDecode(correctedBody);

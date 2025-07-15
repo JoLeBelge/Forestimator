@@ -417,10 +417,6 @@ class _DrawnLayerMenu extends State<DrawnLayerMenu> {
                                         context,
                                         gl.polygonLayers[i].name,
                                         (String nameIt) {
-                                          if (nameIt.length > 25) {
-                                            nameIt = nameIt.substring(0, 25);
-                                          }
-                                          //change name
                                           setState(() {
                                             gl.polygonLayers[i].name = nameIt;
                                             gl.saveChangesToPolygoneToPrefs =
@@ -522,14 +518,15 @@ class _DrawnLayerMenu extends State<DrawnLayerMenu> {
                                                           .selectedPolygonLayer]
                                                       .decodedJson,
                                                   () {
-                                                    setState(() {});
+                                                    if (mounted) {
+                                                      setState(() {});
+                                                    }
                                                     (() {});
                                                   },
                                                   () {
-                                                    setState(() {});
-                                                    (() {
-                                                      //_settingsMenu = false;
-                                                    });
+                                                    if (mounted) {
+                                                      setState(() {});
+                                                    }
                                                   },
                                                 );
                                               }
