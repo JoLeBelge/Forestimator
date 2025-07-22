@@ -1,6 +1,4 @@
 import 'dart:convert';
-
-import 'package:downloadsfolder/downloadsfolder.dart';
 import 'package:fforestimator/dico/dico_apt.dart';
 import 'package:fforestimator/globals.dart' as gl;
 import 'package:fforestimator/pages/catalogueView/layer_tile.dart';
@@ -14,6 +12,7 @@ import 'package:fforestimator/tools/layer_downloader.dart';
 import 'package:fforestimator/tools/pretty_print_nominatim_results.dart';
 import 'package:fforestimator/tools/pretty_print_polygon_results.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
@@ -231,6 +230,8 @@ class PopupNameIntroducer {
           title: Text("Changez de nom"),
           content: SingleChildScrollView(
             child: TextFormField(
+              maxLength: 25,
+              maxLengthEnforcement: MaxLengthEnforcement.enforced,
               onChanged: (String str) {
                 state(str);
               },
@@ -239,7 +240,7 @@ class PopupNameIntroducer {
           ),
           actions: [
             TextButton(
-              child: Text("Rename"),
+              child: Text("Renommer"),
               onPressed: () {
                 after();
                 Navigator.of(context, rootNavigator: true).pop();
@@ -272,7 +273,6 @@ class _DrawnLayerMenu extends State<DrawnLayerMenu> {
       body: Container(
         constraints: BoxConstraints(minHeight: 50),
         child: ReorderableListView(
-          reverse: true,
           buildDefaultDragHandles: true,
           padding: const EdgeInsets.symmetric(horizontal: 2),
           onReorder: (int oldIndex, int newIndex) {
@@ -417,10 +417,6 @@ class _DrawnLayerMenu extends State<DrawnLayerMenu> {
                                         context,
                                         gl.polygonLayers[i].name,
                                         (String nameIt) {
-                                          if (nameIt.length > 10) {
-                                            nameIt = nameIt.substring(0, 10);
-                                          }
-                                          //change name
                                           setState(() {
                                             gl.polygonLayers[i].name = nameIt;
                                             gl.saveChangesToPolygoneToPrefs =
@@ -522,14 +518,15 @@ class _DrawnLayerMenu extends State<DrawnLayerMenu> {
                                                           .selectedPolygonLayer]
                                                       .decodedJson,
                                                   () {
-                                                    setState(() {});
+                                                    if (mounted) {
+                                                      setState(() {});
+                                                    }
                                                     (() {});
                                                   },
                                                   () {
-                                                    setState(() {});
-                                                    (() {
-                                                      //_settingsMenu = false;
-                                                    });
+                                                    if (mounted) {
+                                                      setState(() {});
+                                                    }
                                                   },
                                                 );
                                               }
@@ -1582,7 +1579,9 @@ class PopupDrawnLayerMenu {
           ],
         );
       },
-    );
+    ).whenComplete(() {
+      after();
+    });
   }
 }
 
@@ -2236,15 +2235,15 @@ class MapLayerSelectionButton extends StatefulWidget {
 }
 
 class _MapLayerSelectionButtonState extends State<MapLayerSelectionButton> {
-  static final Map<int, Function> _layerSelectionCallbacks = {
+  static final Map<int, Function> _layerSelectionSetStates = {
     -1: () {},
     0: () {},
     1: () {},
     2: () {},
   };
 
-  void _callSelectedButtonCallbacks() {
-    for (Function function in _layerSelectionCallbacks.values) {
+  void _callSelectedButtonsSetStates() {
+    for (Function function in _layerSelectionSetStates.values) {
       function();
     }
     gl.refreshMap(() {});
@@ -2253,8 +2252,11 @@ class _MapLayerSelectionButtonState extends State<MapLayerSelectionButton> {
 
   @override
   Widget build(BuildContext context) {
-    int interfaceSelectedMapKey = gl.getIndexForLayer(widget.layerTile.key);
-    _layerSelectionCallbacks[interfaceSelectedMapKey] = () {
+    int interfaceSelectedMapKey = gl.getIndexForLayer(
+      widget.layerTile.key,
+      widget.offlineMode,
+    );
+    _layerSelectionSetStates[interfaceSelectedMapKey] = () {
       if (mounted) setState(() {});
     };
     int interfaceSelectedMapSwitcherSlot = widget.selectionMode;
@@ -2275,15 +2277,91 @@ class _MapLayerSelectionButtonState extends State<MapLayerSelectionButton> {
               }),
         ),
         onPressed: () {
-          setState(() {
-            gl.replaceLayerFromList(
-              widget.layerTile.key,
-              index: interfaceSelectedMapSwitcherSlot,
-              offline: gl.offlineMode,
-            );
-          });
+          if (!widget.offlineMode) {
+            if (gl.sameOnlineAsOfflineLayer(widget.layerTile.key, false) !=
+                -1) {
+              setState(() {
+                int index = gl.sameOnlineAsOfflineLayer(
+                  widget.layerTile.key,
+                  false,
+                );
+                gl.removeLayerFromList(index: index, offline: true);
+                gl.replaceLayerFromList(
+                  widget.layerTile.key,
+                  index: index,
+                  offline: false,
+                );
+              });
+            } else {
+              setState(() {
+                gl.replaceLayerFromList(
+                  widget.layerTile.key,
+                  index: interfaceSelectedMapSwitcherSlot,
+                  offline: false,
+                );
+              });
+            }
+          } else {
+            if (gl.getCountOfflineLayerSelected() == 0) {
+              if (gl.sameOnlineAsOfflineLayer(widget.layerTile.key, true) !=
+                  -1) {
+                setState(() {
+                  int index = gl.sameOnlineAsOfflineLayer(
+                    widget.layerTile.key,
+                    true,
+                  );
+                  gl.removeLayerFromList(index: index, offline: false);
+                  gl.replaceLayerFromList(
+                    widget.layerTile.key,
+                    index: index,
+                    offline: true,
+                  );
+                });
+              } else {
+                setState(() {
+                  gl.replaceLayerFromList(
+                    widget.layerTile.key,
+                    index: interfaceSelectedMapSwitcherSlot,
+                    offline: true,
+                  );
+                });
+              }
+            } else if (gl.getCountOfflineLayerSelected() == 1) {
+              if (gl.sameOnlineAsOfflineLayer(widget.layerTile.key, true) !=
+                  -1) {
+                setState(() {
+                  int index = gl.getIndexForNextLayerOffline();
+                  gl.replaceLayerFromList(
+                    gl.selectedLayerForMap[index].mCode,
+                    index: index,
+                    offline: false,
+                  );
+                  index = gl.sameOnlineAsOfflineLayer(
+                    widget.layerTile.key,
+                    true,
+                  );
+                  gl.removeLayerFromList(index: index, offline: false);
+                  gl.replaceLayerFromList(
+                    widget.layerTile.key,
+                    index: index,
+                    offline: true,
+                  );
+                });
+              } else {
+                setState(() {
+                  int index = gl.getIndexForNextLayerOffline();
+                  gl.removeLayerFromList(index: index, offline: true);
+                  gl.replaceLayerFromList(
+                    widget.layerTile.key,
+                    index: index,
+                    offline: true,
+                  );
+                });
+              }
+            }
+          }
           gl.refreshMap(() {});
-          _callSelectedButtonCallbacks();
+          _callSelectedButtonsSetStates();
         },
         child: Icon(
           Icons.layers,
@@ -2317,7 +2395,10 @@ class _MapLayerSelectionButtonState extends State<MapLayerSelectionButton> {
                 : {
                   gl.replaceLayerFromList(
                     gl.selectedLayerForMap[interfaceSelectedMapKey].mCode,
-                    index: gl.getIndexForLayer(widget.layerTile.key),
+                    index: gl.getIndexForLayer(
+                      widget.layerTile.key,
+                      widget.offlineMode,
+                    ),
                     offline: gl.offlineMode,
                   ),
                   gl.replaceLayerFromList(
@@ -2327,7 +2408,7 @@ class _MapLayerSelectionButtonState extends State<MapLayerSelectionButton> {
                   ),
                 };
           });
-          _callSelectedButtonCallbacks();
+          _callSelectedButtonsSetStates();
         },
         child: Container(
           alignment: Alignment.center,
@@ -2558,7 +2639,7 @@ class _OnlineMapMenu extends State<OnlineMapMenu> {
                                         alignment: Alignment.center,
                                         padding: EdgeInsets.all(0),
                                         constraints: BoxConstraints(
-                                          maxWidth:
+                                          minWidth:
                                               MediaQuery.of(
                                                 context,
                                               ).size.width *
@@ -2586,6 +2667,11 @@ class _OnlineMapMenu extends State<OnlineMapMenu> {
                                                       constraints:
                                                           BoxConstraints(
                                                             maxWidth:
+                                                                MediaQuery.of(
+                                                                  context,
+                                                                ).size.width *
+                                                                .99,
+                                                            minWidth:
                                                                 MediaQuery.of(
                                                                   context,
                                                                 ).size.width *
@@ -2640,6 +2726,49 @@ class _OnlineMapMenu extends State<OnlineMapMenu> {
                                                                       MainAxisAlignment
                                                                           .spaceBetween,
                                                                   children: [
+                                                                    Column(
+                                                                      children: [
+                                                                        if (gl
+                                                                            .dico
+                                                                            .getLayerBase(
+                                                                              layerTile.key,
+                                                                            )
+                                                                            .mOffline)
+                                                                          Icon(
+                                                                            color:
+                                                                                Colors.black,
+                                                                            Icons.save,
+                                                                          ),
+                                                                        if (widget
+                                                                            .offlineMode)
+                                                                          SizedBox(
+                                                                            height:
+                                                                                MediaQuery.of(
+                                                                                  context,
+                                                                                ).size.width *
+                                                                                .05,
+                                                                          )
+                                                                        else
+                                                                          Icon(
+                                                                            color:
+                                                                                Colors.black,
+                                                                            Icons.wifi,
+                                                                          ),
+                                                                        if (!gl
+                                                                            .dico
+                                                                            .getLayerBase(
+                                                                              layerTile.key,
+                                                                            )
+                                                                            .mOffline)
+                                                                          SizedBox(
+                                                                            height:
+                                                                                MediaQuery.of(
+                                                                                  context,
+                                                                                ).size.width *
+                                                                                .05,
+                                                                          ),
+                                                                      ],
+                                                                    ),
                                                                     SizedBox(
                                                                       height:
                                                                           MediaQuery.of(
@@ -2722,6 +2851,51 @@ class _OnlineMapMenu extends State<OnlineMapMenu> {
                                                                     MainAxisAlignment
                                                                         .spaceBetween,
                                                                 children: [
+                                                                  Column(
+                                                                    children: [
+                                                                      if (gl
+                                                                          .dico
+                                                                          .getLayerBase(
+                                                                            layerTile.key,
+                                                                          )
+                                                                          .mOffline)
+                                                                        Icon(
+                                                                          color:
+                                                                              Colors.black,
+                                                                          Icons
+                                                                              .save,
+                                                                        ),
+                                                                      if (widget
+                                                                          .offlineMode)
+                                                                        SizedBox(
+                                                                          height:
+                                                                              MediaQuery.of(
+                                                                                context,
+                                                                              ).size.width *
+                                                                              .05,
+                                                                        )
+                                                                      else
+                                                                        Icon(
+                                                                          color:
+                                                                              Colors.black,
+                                                                          Icons
+                                                                              .wifi,
+                                                                        ),
+                                                                      if (!gl
+                                                                          .dico
+                                                                          .getLayerBase(
+                                                                            layerTile.key,
+                                                                          )
+                                                                          .mOffline)
+                                                                        SizedBox(
+                                                                          height:
+                                                                              MediaQuery.of(
+                                                                                context,
+                                                                              ).size.width *
+                                                                              .05,
+                                                                        ),
+                                                                    ],
+                                                                  ),
                                                                   SizedBox(
                                                                     height:
                                                                         MediaQuery.of(
@@ -2901,6 +3075,44 @@ class _OnlineMapMenu extends State<OnlineMapMenu> {
                                             mainAxisAlignment:
                                                 MainAxisAlignment.spaceBetween,
                                             children: [
+                                              Column(
+                                                children: [
+                                                  if (gl.dico
+                                                      .getLayerBase(
+                                                        layerTile.key,
+                                                      )
+                                                      .mOffline)
+                                                    Icon(
+                                                      color: Colors.black,
+                                                      Icons.save,
+                                                    ),
+                                                  if (widget.offlineMode)
+                                                    SizedBox(
+                                                      height:
+                                                          MediaQuery.of(
+                                                            context,
+                                                          ).size.width *
+                                                          .05,
+                                                    )
+                                                  else
+                                                    Icon(
+                                                      color: Colors.black,
+                                                      Icons.wifi,
+                                                    ),
+                                                  if (!gl.dico
+                                                      .getLayerBase(
+                                                        layerTile.key,
+                                                      )
+                                                      .mOffline)
+                                                    SizedBox(
+                                                      height:
+                                                          MediaQuery.of(
+                                                            context,
+                                                          ).size.width *
+                                                          .05,
+                                                    ),
+                                                ],
+                                              ),
                                               SizedBox(
                                                 height:
                                                     MediaQuery.of(
@@ -3714,15 +3926,16 @@ class _LayerSwitcher extends State<LayerSwitcher> {
               return;
             }
             String tmpKey = gl.selectedLayerForMap[newIndex].mCode;
+            bool tmpOffline = gl.selectedLayerForMap[newIndex].offline;
             gl.replaceLayerFromList(
               gl.selectedLayerForMap[oldIndex].mCode,
               index: newIndex,
-              offline: gl.offlineMode,
+              offline: gl.selectedLayerForMap[oldIndex].offline,
             );
             gl.replaceLayerFromList(
               tmpKey,
               index: oldIndex,
-              offline: gl.offlineMode,
+              offline: tmpOffline,
             );
             gl.refreshMap(() {});
           });
@@ -4090,784 +4303,5 @@ class PopupDoYouReally {
         );
       },
     );
-  }
-}
-
-class PopupOfflineMenu {
-  PopupOfflineMenu(BuildContext context, Function after) {
-    showDialog(
-      barrierDismissible: true,
-      barrierColor: Colors.transparent,
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          titlePadding: EdgeInsets.all(5),
-          actionsPadding: EdgeInsets.all(0),
-          contentPadding: EdgeInsets.all(0),
-          insetPadding: EdgeInsets.all(0),
-          buttonPadding: EdgeInsets.all(0),
-          iconPadding: EdgeInsets.all(0),
-          backgroundColor: gl.backgroundTransparentBlackBox,
-          surfaceTintColor: Colors.transparent,
-          shadowColor: Colors.transparent,
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                "Changez les cartes affichées",
-                textAlign: TextAlign.justify,
-              ),
-            ],
-          ),
-          content: Theme(
-            data: Theme.of(context).copyWith(
-              canvasColor: Colors.transparent,
-              shadowColor: Colors.transparent,
-            ),
-            child: SizedBox(
-              width: MediaQuery.of(context).size.width * .80,
-              height: MediaQuery.of(context).size.height * 0.8,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  SizedBox(
-                    width: MediaQuery.of(context).size.width * .80,
-                    height: MediaQuery.of(context).size.height * 0.8,
-                    child: OfflineMapMenu(),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          titleTextStyle: TextStyle(color: Colors.white, fontSize: 25),
-          actions: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [_returnButton(context, after)],
-            ),
-          ],
-        );
-      },
-    ).whenComplete(() {
-      after();
-    });
-  }
-}
-
-class OfflineMapMenu extends StatefulWidget {
-  const OfflineMapMenu({super.key});
-
-  @override
-  State<StatefulWidget> createState() => _OfflineMapMenu();
-}
-
-class _OfflineMapMenu extends State<OfflineMapMenu> {
-  int _selectedMap = -1;
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      body: ListView(
-        padding: const EdgeInsets.symmetric(horizontal: 0),
-        children: _injectOfflineLayerData((i, layerTile) {
-          return TextButton(
-            style: ButtonStyle(
-              maximumSize:
-                  i == _selectedMap
-                      ? WidgetStateProperty<Size>.fromMap(
-                        <WidgetStatesConstraint, Size>{
-                          WidgetState.any: Size(
-                            MediaQuery.of(context).size.width * .99,
-                            MediaQuery.of(context).size.height * .15,
-                          ),
-                        },
-                      )
-                      : WidgetStateProperty<Size>.fromMap(
-                        <WidgetStatesConstraint, Size>{
-                          WidgetState.any: Size(
-                            MediaQuery.of(context).size.width * .99,
-                            MediaQuery.of(context).size.height * .1,
-                          ),
-                        },
-                      ),
-            ),
-            key: Key('$i'),
-            onPressed:
-                i == _selectedMap
-                    ? () {
-                      setState(() {
-                        _selectedMap = -1;
-                      });
-                    }
-                    : () {
-                      setState(() {
-                        _selectedMap = i;
-                      });
-                    },
-            child: Card(
-              surfaceTintColor: Colors.transparent,
-              shadowColor: Colors.transparent,
-              color:
-                  i == _selectedMap
-                      ? gl.colorAgroBioTech.withAlpha(255)
-                      : gl.colorAgroBioTech.withAlpha(120),
-              child: Row(
-                children: [
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      IconButton(
-                        icon: Icon(
-                          Icons.delete_forever,
-                          size: MediaQuery.of(context).size.width * 0.1,
-                          color: Colors.black,
-                        ),
-                        onPressed: () {
-                          PopupDoYouReally(
-                            gl.notificationContext!,
-                            () {
-                              fileDelete(
-                                join(
-                                  gl.dico.docDir.path,
-                                  gl.dico
-                                      .getLayerBase(layerTile.key)
-                                      .mNomRaster,
-                                ),
-                              ).whenComplete(() {
-                                setState(() {
-                                  gl.dico.getLayerBase(layerTile.key).mOffline =
-                                      false;
-                                  gl.removeFromOfflineList(layerTile.key);
-                                });
-                                gl.refreshWholeCatalogueView(() {
-                                  gl.dico.getLayerBase(layerTile.key).mOffline =
-                                      false;
-                                });
-                                gl.rebuildOfflineView(() {
-                                  gl.dico.getLayerBase(layerTile.key).mOffline =
-                                      false;
-                                });
-                              });
-                            },
-
-                            "Message",
-                            "Voulez vous vraiment supprimer la carte?\nVous ne pourriez plus l'utiliser pour le mode hors ligne!",
-                          );
-                        },
-                      ),
-                    ],
-                  ),
-                  Container(
-                    alignment: Alignment.center,
-                    constraints: BoxConstraints(
-                      maxWidth: MediaQuery.of(context).size.width * .55,
-                      minHeight: MediaQuery.of(context).size.width * .15,
-                      maxHeight: MediaQuery.of(context).size.width * .15,
-                    ),
-                    child: Text(
-                      layerTile.name,
-                      style: TextStyle(color: Colors.black, fontSize: 20),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
-        }),
-      ),
-    );
-  }
-
-  List<Widget> _injectOfflineLayerData(
-    Widget Function(int, LayerTile) listBuilder,
-  ) {
-    List<LayerTile> offlineList = [];
-
-    for (var key in gl.dico.mLayerBases.keys) {
-      if (gl.dico.mLayerBases[key]!.mOffline ||
-          gl.dico.mLayerBases[key]!.mInDownload) {
-        offlineList.add(
-          LayerTile(
-            name: gl.dico.mLayerBases[key]!.mNom,
-            filter: gl.dico.mLayerBases[key]!.mGroupe,
-            key: key,
-            downloadable: gl.dico.mLayerBases[key]!.mIsDownloadableRW,
-            extern: gl.dico.mLayerBases[key]!.mCategorie == "Externe",
-          ),
-        );
-      }
-    }
-    List<Widget> result = [];
-    int i = 0;
-    for (LayerTile layerTile in offlineList) {
-      result.add(listBuilder(i++, layerTile));
-    }
-    return result;
-  }
-}
-
-class PopupMapSelectionMenu {
-  PopupMapSelectionMenu(
-    BuildContext context,
-    int interfaceSelectedPosition,
-    Function after,
-  ) {
-    showDialog(
-      barrierDismissible: true,
-      barrierColor: Colors.transparent,
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          titlePadding: EdgeInsets.all(5),
-          actionsPadding: EdgeInsets.all(0),
-          contentPadding: EdgeInsets.all(0),
-          insetPadding: EdgeInsets.all(0),
-          buttonPadding: EdgeInsets.all(0),
-          iconPadding: EdgeInsets.all(0),
-          backgroundColor: gl.backgroundTransparentBlackBox,
-          surfaceTintColor: Colors.transparent,
-          shadowColor: Colors.transparent,
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                "Selectionez couche ${interfaceSelectedPosition + 1}",
-                textAlign: TextAlign.justify,
-              ),
-            ],
-          ),
-          content: Theme(
-            data: Theme.of(context).copyWith(
-              canvasColor: Colors.transparent,
-              shadowColor: Colors.transparent,
-            ),
-            child: SizedBox(
-              width: MediaQuery.of(context).size.width * .8,
-              height: MediaQuery.of(context).size.height * 0.9,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  SizedBox(
-                    width: MediaQuery.of(context).size.width * .8,
-                    height: MediaQuery.of(context).size.height * 0.9,
-                    child: MapSelectionMenu(after, interfaceSelectedPosition),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          titleTextStyle: TextStyle(color: Colors.white, fontSize: 25),
-          actions: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [_returnButton(context, after)],
-            ),
-          ],
-        );
-      },
-    );
-  }
-}
-
-class MapSelectionMenu extends StatefulWidget {
-  final Function after;
-  final int interfaceSelectedMapKey;
-
-  const MapSelectionMenu(this.after, this.interfaceSelectedMapKey, {super.key});
-
-  @override
-  State<StatefulWidget> createState() => _MapSelectionMenu();
-}
-
-class _MapSelectionMenu extends State<MapSelectionMenu> {
-  int _selectedCategory = -1;
-  bool _showCatalogue = true;
-  final List<String> _resultOfMapSearch = [];
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Container(
-          constraints: BoxConstraints(
-            minHeight: MediaQuery.of(context).size.height * .05,
-            maxHeight: MediaQuery.of(context).size.height * .1,
-            minWidth: MediaQuery.of(context).size.width * .7,
-            maxWidth: MediaQuery.of(context).size.width * .7,
-          ),
-          child: Card(
-            child: TextFormField(
-              textAlign: TextAlign.center,
-              autocorrect: false,
-              enableSuggestions: true,
-              onChanged: (String value) {
-                _resultOfMapSearch.clear();
-                if (value.isNotEmpty) {
-                  for (String term in value.split(' ')) {
-                    if (term != '') {
-                      for (var layer in gl.dico.mLayerBases.values) {
-                        if (layer.mNom
-                            .toLowerCase()
-                            .replaceAll('è', 'e')
-                            .replaceAll('é', 'e')
-                            .replaceAll('ê', 'e')
-                            .replaceAll('â', 'a')
-                            .replaceAll('à', 'a')
-                            .replaceAll('ç', 'c')
-                            .contains(
-                              term
-                                  .toLowerCase()
-                                  .replaceAll('è', 'e')
-                                  .replaceAll('é', 'e')
-                                  .replaceAll('ê', 'e')
-                                  .replaceAll('â', 'a')
-                                  .replaceAll('à', 'a')
-                                  .replaceAll('ç', 'c'),
-                            )) {
-                          _resultOfMapSearch.add(layer.mCode);
-                        }
-                      }
-                    }
-                  }
-                }
-                if (_resultOfMapSearch.isEmpty || value.isEmpty) {
-                  setState(() {
-                    _showCatalogue = true;
-                  });
-                } else {
-                  setState(() {
-                    _showCatalogue = false;
-                  });
-                }
-              },
-            ),
-          ),
-        ),
-        Container(
-          constraints: BoxConstraints(
-            minHeight: MediaQuery.of(context).size.height * .3,
-            maxHeight: MediaQuery.of(context).size.height * .8,
-            minWidth: MediaQuery.of(context).size.width * .7,
-            maxWidth: MediaQuery.of(context).size.width * .8,
-          ),
-          child:
-              _showCatalogue
-                  ? ListView(
-                    children: _injectGroupData(
-                      (int i, GroupeCouche groupe) => TextButton(
-                        style: ButtonStyle(
-                          minimumSize:
-                              i == _selectedCategory
-                                  ? WidgetStateProperty<Size>.fromMap(<
-                                    WidgetStatesConstraint,
-                                    Size
-                                  >{
-                                    WidgetState.any: Size(
-                                      MediaQuery.of(context).size.width * .75,
-                                      MediaQuery.of(context).size.height * .15,
-                                    ),
-                                  })
-                                  : WidgetStateProperty<Size>.fromMap(<
-                                    WidgetStatesConstraint,
-                                    Size
-                                  >{
-                                    WidgetState.any: Size(
-                                      MediaQuery.of(context).size.width * .75,
-                                      MediaQuery.of(context).size.height * .075,
-                                    ),
-                                  }),
-                        ),
-                        key: Key('$i'),
-                        onPressed:
-                            i == _selectedCategory
-                                ? () {
-                                  setState(() {
-                                    _selectedCategory = -1;
-                                  });
-                                }
-                                : () {
-                                  setState(() {
-                                    _selectedCategory = i;
-                                  });
-                                },
-                        child: Card(
-                          surfaceTintColor: Colors.transparent,
-                          shadowColor: Colors.transparent,
-                          color:
-                              i == _selectedCategory
-                                  ? gl.colorAgroBioTech.withAlpha(120)
-                                  : gl.colorAgroBioTech.withAlpha(230),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              i != _selectedCategory
-                                  ? Container(
-                                    alignment: Alignment.center,
-                                    padding: EdgeInsets.all(0),
-                                    constraints: BoxConstraints(
-                                      maxWidth:
-                                          MediaQuery.of(context).size.width *
-                                          .7,
-                                      minHeight:
-                                          MediaQuery.of(context).size.width *
-                                          .2,
-                                    ),
-                                    child: Text(
-                                      groupe.mLabel,
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 24,
-                                      ),
-                                    ),
-                                  )
-                                  : Container(
-                                    alignment: Alignment.center,
-                                    padding: EdgeInsets.all(0),
-                                    constraints: BoxConstraints(
-                                      maxWidth:
-                                          MediaQuery.of(context).size.width *
-                                          .7,
-                                    ),
-                                    child: ListBody(
-                                      children:
-                                          <Widget>[
-                                            Card(
-                                              color: gl.colorAgroBioTech
-                                                  .withAlpha(175),
-                                              child: Container(
-                                                alignment: Alignment.center,
-                                                padding: EdgeInsets.all(3),
-                                                constraints: BoxConstraints(
-                                                  maxWidth:
-                                                      MediaQuery.of(
-                                                        context,
-                                                      ).size.width *
-                                                      .7,
-                                                  minHeight:
-                                                      MediaQuery.of(
-                                                        context,
-                                                      ).size.width *
-                                                      .2,
-                                                ),
-                                                child: Text(
-                                                  groupe.mLabel,
-                                                  textAlign: TextAlign.center,
-                                                  style: TextStyle(
-                                                    color: Colors.black,
-                                                    fontSize: 24,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ] +
-                                          _injectLayerData(groupe.mCode, (
-                                            int i,
-                                            LayerTile layerTile,
-                                          ) {
-                                            return TextButton(
-                                              style: ButtonStyle(
-                                                minimumSize:
-                                                    WidgetStateProperty<
-                                                      Size
-                                                    >.fromMap(<
-                                                      WidgetStatesConstraint,
-                                                      Size
-                                                    >{
-                                                      WidgetState.any: Size(
-                                                        MediaQuery.of(
-                                                              context,
-                                                            ).size.width *
-                                                            .7,
-                                                        MediaQuery.of(
-                                                              context,
-                                                            ).size.height *
-                                                            .1,
-                                                      ),
-                                                    }),
-                                              ),
-                                              onPressed: () {
-                                                setState(() {
-                                                  gl.isSelectedLayer(
-                                                        layerTile.key,
-                                                        offline: gl.offlineMode,
-                                                      )
-                                                      ? gl.slotContainsLayer(
-                                                            widget
-                                                                .interfaceSelectedMapKey,
-                                                            layerTile.key,
-                                                          )
-                                                          ? gl.removeLayerFromList(
-                                                            index:
-                                                                widget
-                                                                    .interfaceSelectedMapKey,
-                                                            offline:
-                                                                gl.offlineMode,
-                                                          )
-                                                          : {
-                                                            gl.replaceLayerFromList(
-                                                              gl
-                                                                  .selectedLayerForMap[widget
-                                                                      .interfaceSelectedMapKey]
-                                                                  .mCode,
-                                                              index: gl
-                                                                  .getIndexForLayer(
-                                                                    layerTile
-                                                                        .key,
-                                                                  ),
-                                                              offline:
-                                                                  gl.offlineMode,
-                                                            ),
-                                                            gl.replaceLayerFromList(
-                                                              layerTile.key,
-                                                              index:
-                                                                  widget
-                                                                      .interfaceSelectedMapKey,
-                                                              offline:
-                                                                  gl.offlineMode,
-                                                            ),
-                                                          }
-                                                      : gl.replaceLayerFromList(
-                                                        layerTile.key,
-                                                        index:
-                                                            widget
-                                                                .interfaceSelectedMapKey,
-                                                        offline: gl.offlineMode,
-                                                      );
-                                                });
-                                                widget.after(() {});
-                                                gl.refreshMap(() {});
-                                              },
-                                              child: Card(
-                                                color:
-                                                    gl.isSelectedLayer(
-                                                          layerTile.key,
-                                                          offline:
-                                                              gl.offlineMode,
-                                                        )
-                                                        ? gl.slotContainsLayer(
-                                                              widget
-                                                                  .interfaceSelectedMapKey,
-                                                              layerTile.key,
-                                                            )
-                                                            ? Colors.orange
-                                                                .withAlpha(220)
-                                                            : Colors.blueGrey
-                                                                .withAlpha(220)
-                                                        : Colors.white
-                                                            .withAlpha(220),
-                                                child: Container(
-                                                  constraints: BoxConstraints(
-                                                    minHeight:
-                                                        MediaQuery.of(
-                                                          context,
-                                                        ).size.width *
-                                                        .15,
-                                                  ),
-                                                  child: Column(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .center,
-                                                    children: [
-                                                      Row(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .center,
-                                                        children: [
-                                                          Container(
-                                                            constraints: BoxConstraints(
-                                                              maxWidth:
-                                                                  MediaQuery.of(
-                                                                    context,
-                                                                  ).size.width *
-                                                                  .6,
-                                                            ),
-                                                            child: Text(
-                                                              layerTile.name,
-                                                              textAlign:
-                                                                  TextAlign
-                                                                      .center,
-                                                              style: TextStyle(
-                                                                color:
-                                                                    Colors
-                                                                        .black,
-                                                                fontSize:
-                                                                    MediaQuery.of(
-                                                                      context,
-                                                                    ).size.width *
-                                                                    .05,
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ),
-                                            );
-                                          }),
-                                    ),
-                                  ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  )
-                  : ListView(
-                    children: List<Widget>.generate(_resultOfMapSearch.length, (
-                      int i,
-                    ) {
-                      String mCode = _resultOfMapSearch[i];
-                      return TextButton(
-                        style: ButtonStyle(
-                          minimumSize: WidgetStateProperty<Size>.fromMap(
-                            <WidgetStatesConstraint, Size>{
-                              WidgetState.any: Size(
-                                MediaQuery.of(context).size.width * .7,
-                                MediaQuery.of(context).size.height * .1,
-                              ),
-                            },
-                          ),
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            gl.isSelectedLayer(mCode, offline: gl.offlineMode)
-                                ? gl.slotContainsLayer(
-                                      widget.interfaceSelectedMapKey,
-                                      mCode,
-                                    )
-                                    ? gl.removeLayerFromList(
-                                      index: widget.interfaceSelectedMapKey,
-                                      offline: gl.offlineMode,
-                                    )
-                                    : {
-                                      gl.replaceLayerFromList(
-                                        gl
-                                            .selectedLayerForMap[widget
-                                                .interfaceSelectedMapKey]
-                                            .mCode,
-                                        index: gl.getIndexForLayer(mCode),
-                                        offline: gl.offlineMode,
-                                      ),
-                                      gl.replaceLayerFromList(
-                                        mCode,
-                                        index: widget.interfaceSelectedMapKey,
-                                        offline: gl.offlineMode,
-                                      ),
-                                    }
-                                : gl.replaceLayerFromList(
-                                  mCode,
-                                  index: widget.interfaceSelectedMapKey,
-                                  offline: gl.offlineMode,
-                                );
-                          });
-                          widget.after(() {});
-                          gl.refreshMap(() {});
-                        },
-                        child: Card(
-                          color:
-                              gl.isSelectedLayer(mCode, offline: gl.offlineMode)
-                                  ? gl.slotContainsLayer(
-                                        widget.interfaceSelectedMapKey,
-                                        mCode,
-                                      )
-                                      ? Colors.orange.withAlpha(220)
-                                      : Colors.blueGrey.withAlpha(220)
-                                  : Colors.white.withAlpha(220),
-                          child: Container(
-                            constraints: BoxConstraints(
-                              minHeight:
-                                  MediaQuery.of(context).size.width * .15,
-                            ),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Container(
-                                      constraints: BoxConstraints(
-                                        maxWidth:
-                                            MediaQuery.of(context).size.width *
-                                            .6,
-                                      ),
-                                      child: Text(
-                                        gl.dico.getLayerBase(mCode).mNom,
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                          color: Colors.black,
-                                          fontSize:
-                                              MediaQuery.of(
-                                                context,
-                                              ).size.width *
-                                              .05,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      );
-                    }),
-                  ),
-        ),
-      ],
-    );
-  }
-
-  List<Widget> _injectGroupData(Widget Function(int, GroupeCouche) generate) {
-    Map<String, Null> groupesNonVides = {};
-    for (String key in gl.dico.mLayerBases.keys) {
-      if (gl.offlineMode ? gl.dico.getLayerBase(key).mOffline : true) {
-        groupesNonVides[gl.dico.getLayerBase(key).mGroupe] = null;
-      }
-    }
-    List<GroupeCouche> groupes = [];
-    for (String key in groupesNonVides.keys) {
-      for (GroupeCouche couche in gl.dico.mGrCouches) {
-        if (couche.mCode == key) {
-          groupes.add(couche);
-        }
-      }
-    }
-
-    return List<Widget>.generate(groupes.length, (i) {
-      return generate(i, groupes[i]);
-    });
-  }
-
-  List<Widget> _injectLayerData(
-    String category,
-    Widget Function(int, LayerTile) generate,
-  ) {
-    Map<String, LayerBase> mp = gl.dico.mLayerBases;
-    List<LayerTile> layer = [];
-    for (var key in mp.keys) {
-      if (category == mp[key]!.mGroupe &&
-          !mp[key]!.mExpert &&
-          mp[key]!.mVisu &&
-          mp[key]?.mTypeGeoservice == "" &&
-          (gl.offlineMode ? mp[key]!.mOffline : true)) {
-        layer.add(
-          LayerTile(
-            name: mp[key]!.mNom,
-            filter: mp[key]!.mGroupe,
-            key: key,
-            downloadable: mp[key]!.mIsDownloadableRW,
-            extern: mp[key]!.mCategorie == "Externe",
-          ),
-        );
-      }
-    }
-    return List<Widget>.generate(layer.length, (i) {
-      return generate(i, layer[i]);
-    });
   }
 }

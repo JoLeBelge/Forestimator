@@ -8,7 +8,7 @@ import 'package:proj4dart/proj4dart.dart' as proj4;
 import 'package:latlong2/latlong.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-const String forestimatorMobileVersion = "1.0.2-14";
+const String forestimatorMobileVersion = "2.0.0 - build 16";
 const double globalMinZoom = 4.0;
 const double globalMaxZoom = 13.0;
 const double globalMinOfflineZoom = 8.0;
@@ -346,10 +346,42 @@ int getIndexForEmptySlot() {
       : count;
 }
 
-int getIndexForLayer(String key) {
+int getCountOfflineLayerSelected() {
+  int count = 0;
+  for (SelectedLayer layer in selectedLayerForMap) {
+    if (layer.offline) {
+      count++;
+    }
+  }
+  return count;
+}
+
+int getIndexForLayer(String key, bool offline) {
   int index = 0;
   for (SelectedLayer layer in selectedLayerForMap) {
-    if (layer.mCode == key) {
+    if (layer.mCode == key && layer.offline == offline) {
+      return index;
+    }
+    index++;
+  }
+  return -1;
+}
+
+int getIndexForNextLayerOffline() {
+  int index = 0;
+  for (SelectedLayer layer in selectedLayerForMap) {
+    if (layer.offline) {
+      return index;
+    }
+    index++;
+  }
+  return -1;
+}
+
+int sameOnlineAsOfflineLayer(String key, bool offline) {
+  int index = 0;
+  for (SelectedLayer layer in selectedLayerForMap) {
+    if (layer.mCode == key && layer.offline != offline) {
       return index;
     }
     index++;
@@ -359,11 +391,14 @@ int getIndexForLayer(String key) {
 
 void savePrefSelLayOnline() async {
   interfaceSelectedLCode.clear();
+  List<String> offlineLayer = [];
   for (SelectedLayer sL in selectedLayerForMap) {
     interfaceSelectedLCode.add(sL.mCode);
+    offlineLayer.add(dico.getLayerBase(sL.mCode).mOffline ? "t" : "n");
   }
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   await prefs.setStringList('interfaceSelectedLCode', interfaceSelectedLCode);
+  await prefs.setStringList('interfaceSelectedLCodeOfflineFlag', offlineLayer);
 }
 
 void savePrefSelLayOffline() async {
@@ -378,9 +413,18 @@ void savePrefSelLayOffline() async {
 void loadPrefSelLayOnline() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   interfaceSelectedLCode = prefs.getStringList('interfaceSelectedLCode')!;
+  List<String> offlineLayer =
+      prefs.getStringList('interfaceSelectedLCodeOfflineFlag')!;
   selectedLayerForMap.clear();
+  int index = 0;
   for (String key in interfaceSelectedLCode) {
-    selectedLayerForMap.add(SelectedLayer(mCode: key, offline: false));
+    selectedLayerForMap.add(
+      SelectedLayer(
+        mCode: key,
+        offline: offlineLayer[index] == "t" ? true : false,
+      ),
+    );
+    index++;
   }
 }
 

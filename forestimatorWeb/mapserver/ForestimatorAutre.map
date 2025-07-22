@@ -145,7 +145,7 @@ MAP
         TYPE RASTER
         STATUS ON
 		
-		DATA "Forest_Mask_2006_2009-2010_2012-2013_2016_2018_Final.tif"
+		DATA "Forest_Mask_2021_2022_GxABT_202503.tif"
 		PROJECTION
 			"init=epsg:31370"
 	  	END
@@ -166,7 +166,100 @@ MAP
 	  	END
 		TEMPLATE "../template.html"
     END
+    LAYER
+        NAME "MasqueForet2018"
+        TYPE RASTER
+        STATUS ON
+		
+		DATA "Forest_Mask_2006_2009-2010_2012-2013_2016_2018_Final.tif"
+		PROJECTION
+			"init=epsg:31370"
+	  	END
 
+		PROCESSING "BANDS=1"
+		CLASSITEM "[pixel]"
+		CLASS
+		  EXPRESSION "1"
+		  STYLE
+		    COLOR 0 100 0
+		  END
+		END
+		OFFSITE 0 0 0
+
+		METADATA
+	    	"wms_title"           "Masque Forêt 2018"
+	    	"wms_srs"             "EPSG:31370"
+	  	END
+		TEMPLATE "../template.html"
+    END
+    LAYER
+        NAME "ClassesDeHauteur"
+        TYPE RASTER
+        STATUS ON
+		
+		DATA "cl_haut_8class_10_25_1_reg1.tif"
+		PROJECTION
+			"init=epsg:31370"
+	  	END
+
+		PROCESSING "BANDS=1"
+		CLASSITEM "[pixel]"
+		CLASS
+		  EXPRESSION "1"
+		  STYLE
+		    COLOR 235 231 109
+		  END
+		END
+      CLASS
+		  EXPRESSION "2"
+		  STYLE
+		    COLOR 255 180 180
+		  END
+		END
+      CLASS
+		  EXPRESSION "3"
+		  STYLE
+		    COLOR 255 80 80
+		  END
+		END
+      CLASS
+		  EXPRESSION "4"
+		  STYLE
+		    COLOR 200 32 30
+		  END
+		END
+      CLASS
+		  EXPRESSION "5"
+		  STYLE
+		    COLOR 106 179 243
+		  END
+		END
+      CLASS
+		  EXPRESSION "6"
+		  STYLE
+		    COLOR 62 93 231
+		  END
+		END
+      CLASS
+		  EXPRESSION "7"
+		  STYLE
+		    COLOR 55 191 75
+		  END
+		END
+      CLASS
+		  EXPRESSION "8"
+		  STYLE
+		    COLOR 29 129 29
+		  END
+		END
+		OFFSITE 0 0 0
+
+		METADATA
+	    	"wms_title"           "Classes de Hauteur"
+	    	"wms_srs"             "EPSG:31370"
+	  	END
+		TEMPLATE "../template.html"
+    END
  	LAYER
         NAME "plS2_falseColor_2020_05"
         TYPE RASTER

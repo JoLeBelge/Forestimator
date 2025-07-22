@@ -6,30 +6,33 @@
 
 #include "Task.hpp"
 
-struct ThreadQueue {
+struct ThreadQueue
+{
 private:
-    struct QueueElement{
+    struct QueueElement
+    {
     private:
-        QueueElement* next;
-        QueueElement* previous;
+        QueueElement *next;
+        QueueElement *previous;
         Task *task;
 
     public:
-        QueueElement(Task *task) : task(task){}
+        QueueElement(Task *task) : task(task) {}
         void setNext(QueueElement *next);
         void setPrevious(QueueElement *previous);
-        QueueElement* getNext();
-        QueueElement* getPrevious();
-        Task* getTask();
+        QueueElement *getNext();
+        QueueElement *getPrevious();
+        Task *getTask();
     };
-    QueueElement* head = nullptr;
-    QueueElement* tail = nullptr;
+    QueueElement *head = nullptr;
+    QueueElement *tail = nullptr;
     int nTasks = 0;
     std::mutex manipulateQueueMutex;
+
 public:
-    void pushTask(Task* task);
-    Task* popTaskHead();
-    Task* popStealTaskTail();
+    void pushTask(Task *task);
+    Task *popTaskHead();
+    Task *popStealTaskTail();
     int size();
 };
 #endif
