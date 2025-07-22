@@ -994,7 +994,7 @@ int groupLayers::getNumSelect4Download() { return mSelectLayers->numSelectedLaye
 std::vector<std::shared_ptr<Layer>> groupLayers::getSelectedLayer4Download() { return mSelectLayers->getSelectedLayer(); }
 
 // crée le html en vérifiant que chaque membre de layerMTD soit bien un code html valide
-std::string getHtml(LayerMTD *lMTD)
+std::string getHtml(std::string code)
 {
 
     std::string aRes("");
