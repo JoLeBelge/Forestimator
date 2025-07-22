@@ -903,6 +903,7 @@ std::string getHtml(LayerMTD * lMTD){
     std::string version(WString::tr(lMTD->code()+".version").toUTF8());
     if (version.substr(0,2)=="??"){
         if (lMTD->Vers()!=""){
+            std::cout << "version notée dans la table layerMTD mais pas dans le bundle ressource " << std::endl;
 
         version="<h4>Version  </h4>" +lMTD->Vers();
         } else{ version="";}

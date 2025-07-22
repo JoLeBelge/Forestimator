@@ -8,6 +8,7 @@
 #include "cdicoapt.h"
 #include "layerbase.h"
 #include <Wt/WFileUpload.h>
+#include "gdal_utils.h"
 using namespace Wt;
 
 class rasterClipResource : public Wt::WResource
