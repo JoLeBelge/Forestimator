@@ -993,126 +993,67 @@ int groupLayers::getNumSelect4Download() { return mSelectLayers->numSelectedLaye
 
 std::vector<std::shared_ptr<Layer>> groupLayers::getSelectedLayer4Download() { return mSelectLayers->getSelectedLayer(); }
 
-// crée le html en vérifiant que chaque membre de layerMTD soit bien un code html valide
-std::string getHtml(std::string code)
+int isValidXmlIdentifier(std::string str){
+    if(str.find("??") == -1){
+        return 1;
+    }
+    else{
+        return 0;
+    }
+}
+
+
+std::string getHtml(std::string groupCode)
 {
-
-    std::string aRes("");
-
-    aRes += "<h3><strong>" + lMTD->Nom() + "</strong></h3>";
-
-    std::string proj(WString::tr(lMTD->code() + ".projet").toUTF8());
-    if (proj.substr(0, 2) == "??")
+    std::string title = WString::tr(groupCode + ".title").toUTF8();
+    if (!isValidXmlIdentifier(title) || !isValidHtml(title))
     {
-        if (lMTD->Projet() != "")
-        {
-            proj = "<h4>Projet </h4>" + lMTD->Projet();
-        }
-        else
-        {
-            proj = "";
-        }
-    }
-    else
-    {
-        proj = "<h4>Projet  </h4>" + proj;
-    }
-    if (proj != "" && isValidHtml(proj))
-    {
-        aRes += proj;
-    } // else if (globTest){ std::cout << " pas de documentation pour le projet - carte " <<  lMTD->code() << std::endl;}
-    // si il y a un message avec le bon id, on le prend
-
-    std::string descr(WString::tr(lMTD->code() + ".description").toUTF8());
-    if (descr.substr(0, 2) == "??")
-    {
-        descr = "<h4>Description </h4>" + lMTD->Descr();
-        if (globTest)
-        {
-            std::cout << lMTD->code() << " lMTD->Descr() " << lMTD->Descr() << std::endl;
-        }
-    }
-    else
-    {
-        descr = "<h4>Description  </h4>" + descr;
-    }
-    if (descr != "" && isValidHtml(descr))
-    {
-        aRes += descr;
-    }
-    else if (globTest)
-    {
-        std::cout << " pas de documentation pour la description - carte " << lMTD->code() << std::endl;
+        title = "";
+        cout << "Warning: Title not found in FILE: forestimator-documentation.xml for TAG: " << groupCode << ".title" << endl;
     }
 
-    std::string version(WString::tr(lMTD->code()+".version").toUTF8());
-    if (version.substr(0,2)=="??"){
-        if (lMTD->Vers()!=""){
-            std::cout << "version notée dans la table layerMTD mais pas dans le bundle ressource " << std::endl;
-
-
-            version = "<h4>Version  </h4>" + lMTD->Vers();
-        }
-        else
-        {
-            version = "";
-        }
-    }
-    else
+    std::string project = "<h4>Projet</h4>" + WString::tr(groupCode + ".projet").toUTF8();
+    if (!isValidXmlIdentifier(project) || !isValidHtml(project))
     {
-        version = "<h4>Version  </h4>" + version;
+        project = "";
+        cout << "Warning: Project name/description not found in FILE: forestimator-documentation.xml for TAG: " << groupCode << ".projet" << std::endl;
     }
 
-    if (version != "" && isValidHtml(version))
+    std::string description = "<h4>Description</h4>" + WString::tr(groupCode+ ".description").toUTF8();
+    if (!isValidXmlIdentifier(description) || !isValidHtml(description))
     {
-        aRes += version;
-    } // else if (globTest){ std::cout << " pas de documentation pour la version - carte " <<  lMTD->code() << std::endl;}
-
-    // test si il existe un message dans le xml qui contient les logs de changements pour cette carte
-    std::string logs(WString::tr(lMTD->code() + ".logs").toUTF8());
-    if (logs.substr(0, 2) != "??")
-    {
-        std::string html = "<h4>Information de modification </h4>" + logs;
-        if (isValidHtml(logs))
-        {
-            aRes += html;
-        } // else if (globTest){ std::cout << " pas de documentation pour les logs - carte " <<  lMTD->code() << std::endl;}
+        description = "";
+        cout << "Warning: No description found in FILE: forestimator-documentation.xml for TAG: " << groupCode + ".description" << std::endl;
     }
 
-    if (lMTD->CopyR() != "")
+    std::string version = "<h4>Version</h4>" + WString::tr(groupCode + ".version").toUTF8();
+    if (!isValidXmlIdentifier(version) || !isValidHtml(version))
     {
-        std::string html = "<h4>Copyright </h4>" + lMTD->CopyR();
-        if (isValidHtml(html))
-        {
-            aRes += html;
-        } // else if (globTest){ std::cout << " pas de documentation pour le copyrigth - carte " <<  lMTD->code() << std::endl;}
+        version = "";
+        cout << "Warning: No version found in FILE: forestimator-documentation.xml for TAG: " << groupCode + ".version" << std::endl;
     }
 
-    std::string ref(WString::tr(lMTD->code() + ".ref").toUTF8());
-    if (ref.substr(0, 2) == "??")
+    std::string logs = "<h4>Informations de modification</h4>" + WString::tr(groupCode + ".logs").toUTF8();
+    if (!isValidXmlIdentifier(logs) || !isValidHtml(logs))
     {
-        if (lMTD->VRefs().size() > 0)
-        {
-            std::string html = "<h4>Référence  </h4>";
-            for (std::string aref : lMTD->VRefs())
-            {
-                if (isValidHtml(aref))
-                {
-                    html += "<p>" + aref + "</p>";
-                }
-            }
-            aRes += html;
-        }
-    }
-    else
-    {
-        if (isValidHtml(ref))
-        {
-            aRes += ref;
-        } // else if (globTest){ std::cout << " pas de référence - carte " <<  lMTD->code() << std::endl;}
+        logs = "";
+        cout << "Warning: Logs not found in FILE: forestimator-documentation.xml for TAG: " << groupCode << ".logs" << endl;
     }
 
-    return aRes;
+    std::string copyright = "<h4>Copyright</h4>" + WString::tr(groupCode + ".copyright").toUTF8();
+    if (!isValidXmlIdentifier(copyright) || !isValidHtml(copyright))
+    {
+        copyright = "";
+        cout << "Warning: copyright not found in FILE: forestimator-documentation.xml for TAG: " << groupCode << ".copyright" << endl;
+    }
+
+    std::string references = "<h4>Références</h4>" + WString::tr(groupCode + ".ref").toUTF8();
+    if (!isValidXmlIdentifier(references) || !isValidHtml(references))
+    {
+        references = "";
+        cout << "Warning: References not found in FILE: forestimator-documentation.xml for TAG: " << groupCode << ".ref" << endl;
+    }
+    return title + project + description + version + logs + copyright + references;
 }
 
 bool isValidHtml(std::string text)

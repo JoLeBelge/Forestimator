@@ -55,7 +55,7 @@ double getArea(OGREnvelope * env);
 // retourne le dataset sur l'enveloppe d'un polygone
 GDALDataset * getDSonEnv(std::string inputRaster, OGRGeometry *poGeom);
 
-std::string getHtml(LayerMTD * lMTD);
+std::string getHtml(std::string);
 bool isValidHtml(std::string text);
 
 // groupLayers héritera de cette classe , ça me permet d'avoir un meilleur visu des membres dédiés aux clacul des statistiques de surface

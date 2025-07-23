@@ -58,7 +58,7 @@ presentationPage::presentationPage(cDicoApt *aDico, cWebAptitude *app) : mDico(a
   for (std::string c : {"Aptitude", "ECO", "ZBIO", "NH", "NT", "TOPOetSS", "AE"})
   {
     LayerMTD lMTD = mDico->getLayerMTD(c);
-    std::unique_ptr<Wt::WMenuItem> item2 = std::make_unique<Wt::WMenuItem>(lMTD.Label(), cpp14::make_unique<Wt::WText>(getHtml(&lMTD)));
+    std::unique_ptr<Wt::WMenuItem> item2 = std::make_unique<Wt::WMenuItem>(lMTD.Label(), cpp14::make_unique<Wt::WText>(getHtml(c)));
     if (i == 0)
     {
       item2->setPathComponent("");
@@ -78,7 +78,7 @@ presentationPage::presentationPage(cDicoApt *aDico, cWebAptitude *app) : mDico(a
   for (std::string c : {"MF", "COMPO", "MNH", "dendro"})
   {
     LayerMTD lMTD = mDico->getLayerMTD(c);
-    std::unique_ptr<Wt::WMenuItem> item2 = std::make_unique<Wt::WMenuItem>(lMTD.Label(), cpp14::make_unique<Wt::WText>(getHtml(&lMTD)));
+    std::unique_ptr<Wt::WMenuItem> item2 = std::make_unique<Wt::WMenuItem>(lMTD.Label(), cpp14::make_unique<Wt::WText>(getHtml(c)));
     if (i == 0)
     {
       item2->setPathComponent("");
@@ -108,7 +108,7 @@ presentationPage::presentationPage(cDicoApt *aDico, cWebAptitude *app) : mDico(a
   for (std::string c : {"IGN", "MNT", "SWC"})
   {
     LayerMTD lMTD = mDico->getLayerMTD(c);
-    std::unique_ptr<Wt::WMenuItem> item2 = std::make_unique<Wt::WMenuItem>(lMTD.Label(), cpp14::make_unique<Wt::WText>(getHtml(&lMTD)));
+    std::unique_ptr<Wt::WMenuItem> item2 = std::make_unique<Wt::WMenuItem>(lMTD.Label(), cpp14::make_unique<Wt::WText>(getHtml(c)));
     menu->addItem(std::move(item2));
   }
 
@@ -209,7 +209,7 @@ std::unique_ptr<Wt::WMenuItem> presentationPage::scolytePage()
   LayerMTD lMTD = mDico->getLayerMTD("ES_EP");
   std::unique_ptr<Wt::WMenuItem> mi = std::make_unique<Wt::WMenuItem>(lMTD.Label());
   Wt::WContainerWidget *ac = new Wt::WContainerWidget();
-  ac->addNew<WText>(getHtml(&lMTD));
+  ac->addNew<WText>(getHtml("ES_EP"));
   // ajout d'un média video via librairie wt
   ac->addNew<WText>(tr("ES_EP.video"));
   std::string mp4Video = "video/Argonne-illuCriseSco.mp4";
