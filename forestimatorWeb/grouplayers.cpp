@@ -993,13 +993,29 @@ int groupLayers::getNumSelect4Download() { return mSelectLayers->numSelectedLaye
 
 std::vector<std::shared_ptr<Layer>> groupLayers::getSelectedLayer4Download() { return mSelectLayers->getSelectedLayer(); }
 
-int isValidXmlIdentifier(std::string str){
-    if(str.find("??") == -1){
-        return 1;
+bool isValidXmlIdentifier(std::string str){
+    if(str.find("??") == UINTMAX_MAX){
+        return true;
     }
     else{
-        return 0;
+        return false;
     }
+}
+
+
+bool isValidHtml(std::string text)
+{
+    bool aRes(0);
+    Wt::WText t(text);
+    if (t.textFormat() == Wt::TextFormat::XHTML)
+    {
+        aRes = 1;
+    }
+    else
+    {
+        // std::cout << " attention, le texte " << text << " n'est pas un code html valide " << std::endl;
+    }
+    return aRes;
 }
 
 
@@ -1054,21 +1070,6 @@ std::string getHtml(std::string groupCode)
         cout << "Warning: References not found in FILE: forestimator-documentation.xml for TAG: " << groupCode << ".ref" << endl;
     }
     return title + project + description + version + logs + copyright + references;
-}
-
-bool isValidHtml(std::string text)
-{
-    bool aRes(0);
-    Wt::WText t(text);
-    if (t.textFormat() == Wt::TextFormat::XHTML)
-    {
-        aRes = 1;
-    }
-    else
-    {
-        // std::cout << " attention, le texte " << text << " n'est pas un code html valide " << std::endl;
-    }
-    return aRes;
 }
 
 GDALDataset *getDSonEnv(std::string inputRaster, OGRGeometry *poGeom)

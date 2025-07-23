@@ -57,8 +57,13 @@ presentationPage::presentationPage(cDicoApt *aDico, cWebAptitude *app) : mDico(a
   int i(0);
   for (std::string c : {"Aptitude", "ECO", "ZBIO", "NH", "NT", "TOPOetSS", "AE"})
   {
-    LayerMTD lMTD = mDico->getLayerMTD(c);
-    std::unique_ptr<Wt::WMenuItem> item2 = std::make_unique<Wt::WMenuItem>(lMTD.Label(), cpp14::make_unique<Wt::WText>(getHtml(c)));
+    std::string label = WString::tr(c + ".label").toUTF8();
+    if (!isValidXmlIdentifier(label) || !isValidHtml(label))
+    {
+        label = "";
+        cout << "Warning: Label not found in FILE: forestimator-documentation.xml for TAG: " << c << ".label" << endl;
+    }
+    std::unique_ptr<Wt::WMenuItem> item2 = std::make_unique<Wt::WMenuItem>(label, cpp14::make_unique<Wt::WText>(getHtml(c)));
     if (i == 0)
     {
       item2->setPathComponent("");
@@ -77,8 +82,13 @@ presentationPage::presentationPage(cDicoApt *aDico, cWebAptitude *app) : mDico(a
   i = 0;
   for (std::string c : {"MF", "COMPO", "MNH", "dendro"})
   {
-    LayerMTD lMTD = mDico->getLayerMTD(c);
-    std::unique_ptr<Wt::WMenuItem> item2 = std::make_unique<Wt::WMenuItem>(lMTD.Label(), cpp14::make_unique<Wt::WText>(getHtml(c)));
+    std::string label = WString::tr(c + ".label").toUTF8();
+    if (!isValidXmlIdentifier(label) || !isValidHtml(label))
+    {
+        label = "";
+        cout << "Warning: Label not found in FILE: forestimator-documentation.xml for TAG: " << c << ".label" << endl;
+    }
+    std::unique_ptr<Wt::WMenuItem> item2 = std::make_unique<Wt::WMenuItem>(label, cpp14::make_unique<Wt::WText>(getHtml(c)));
     if (i == 0)
     {
       item2->setPathComponent("");
@@ -107,8 +117,13 @@ presentationPage::presentationPage(cDicoApt *aDico, cWebAptitude *app) : mDico(a
 
   for (std::string c : {"IGN", "MNT", "SWC"})
   {
-    LayerMTD lMTD = mDico->getLayerMTD(c);
-    std::unique_ptr<Wt::WMenuItem> item2 = std::make_unique<Wt::WMenuItem>(lMTD.Label(), cpp14::make_unique<Wt::WText>(getHtml(c)));
+    std::string label = WString::tr(c + ".label").toUTF8();
+    if (!isValidXmlIdentifier(label) || !isValidHtml(label))
+    {
+        label = "";
+        cout << "Warning: Label not found in FILE: forestimator-documentation.xml for TAG: " << c << ".label" << endl;
+    }
+    std::unique_ptr<Wt::WMenuItem> item2 = std::make_unique<Wt::WMenuItem>(label, cpp14::make_unique<Wt::WText>(getHtml(c)));
     menu->addItem(std::move(item2));
   }
 
@@ -206,8 +221,13 @@ std::unique_ptr<WMenuItem> presentationPage::downloadPage()
 std::unique_ptr<Wt::WMenuItem> presentationPage::scolytePage()
 {
 
-  LayerMTD lMTD = mDico->getLayerMTD("ES_EP");
-  std::unique_ptr<Wt::WMenuItem> mi = std::make_unique<Wt::WMenuItem>(lMTD.Label());
+  std::string label = WString::tr("ES_EP.label").toUTF8();
+  if (!isValidXmlIdentifier(label) || !isValidHtml(label))
+  {
+      label = "";
+      cout << "Warning: Label not found in FILE: forestimator-documentation.xml for TAG: " << "ES_EP" << ".label" << endl;
+  }
+  std::unique_ptr<Wt::WMenuItem> mi = std::make_unique<Wt::WMenuItem>(label);
   Wt::WContainerWidget *ac = new Wt::WContainerWidget();
   ac->addNew<WText>(getHtml("ES_EP"));
   // ajout d'un média video via librairie wt

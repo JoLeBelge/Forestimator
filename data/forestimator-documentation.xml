@@ -528,5 +528,28 @@ Pour réaliser des statistiques, Forestimator collecte également et traite <mar
 <message id="MNT.copyright"><p><p>Propriétaire : Service public de Wallonie (SPW).</p><p> UTILISATION : Les conditions générales d'utilisation s'appliquent (<a target="_blank" href="https://geoportail.wallonie.be/files/documents/ConditionsSPW/DataSPW-CGU.pdf">https://geoportail.wallonie.be/files/documents/ConditionsSPW/DataSPW-CGU.pdf</a>) et sont étendues par les conditions particulières de type C (<a target="_blank" href="https://geoportail.wallonie.be/files/documents/ConditionsSPW/DataSPW-CPU-TypeC.pdf">https://geoportail.wallonie.be/files/documents/ConditionsSPW/DataSPW-CPU-TypeC.pdf</a>).</p></p></message>
 <message id="NH.ref"><p> <span class="csl-entry">Wampach, F., Lisein, J., Cordier, S., Ridremont, F., Claessens, H., 2017. <a target="_blank" rel="noopener noreferrer" href="https://www.fichierecologique.be/resources/FO143-47-60.pdf">Cartographie de la disponibilité en eau et en éléments nutritifs des stations forestières de Wallonie.</a> Forêt. Nature 47–60.</span></p><p>Voir le site du <a href="https://www.fichierecologique.be">Fichier Ecologique des Essences</a></p><p>  <span class="csl-entry">Petit, Sebastien, Cordier, S., Claessens, H., Ponette, Q., Vincke, C., Marchal, D., Weissen, F., 2017. Le Fichier Écologique des Essences, Seconde édition : Guide de l’utilisateur. Forêt.Nature, UCLouvain-ELIe, ULiège-GxABT, SPWARNE-DNF. Accord Cadre de Recherche et de Vulgarisation forestières.</span></p></message>
 <message id="NT.ref"><p> <span class="csl-entry">Wampach, F., Lisein, J., Cordier, S., Ridremont, F., Claessens, H., 2017. <a target="_blank" rel="noopener noreferrer" href="https://www.fichierecologique.be/resources/FO143-47-60.pdf">Cartographie de la disponibilité en eau et en éléments nutritifs des stations forestières de Wallonie.</a> Forêt. Nature 47–60.</span></p><p>Voir le site du <a href="https://www.fichierecologique.be">Fichier Ecologique des Essences</a></p><p>  <span class="csl-entry">Petit, Sebastien, Cordier, S., Claessens, H., Ponette, Q., Vincke, C., Marchal, D., Weissen, F., 2017. Le Fichier Écologique des Essences, Seconde édition : Guide de l’utilisateur. Forêt.Nature, UCLouvain-ELIe, ULiège-GxABT, SPWARNE-DNF. Accord Cadre de Recherche et de Vulgarisation forestières.</span></p></message>
+<message id="Aptitude.label">Aptitude des essences</message>
+<message id="ECO.label">Ecogramme</message>
+<message id="ZBIO.label">Zone bioclimatique</message>
+<message id="NH.label">Niveaux hydriques</message>
+<message id="NT.label">Niveaux trophiques</message>
+<message id="TOPOetSS.label">Sous-secteurs et topo</message>
+<message id="AE.label">Apport d’eau</message>
+<message id="MF.label">Masque forestier</message>
+<message id="COMPO.label">Composition des essences</message>
+<message id="MNH.label">Hauteur de la végétation</message>
+<message id="dendro.label">Modèle dendro</message>
+<message id="ES_EP.label">Crise du scolyte</message>
+<message id="IGN.label">Topographie : CartoWeb</message>
+<message id="MNT.label">Altitude du sol</message>
+<message id="SWC.label">Réserve en eau</message>
+<message id="MF.label">Masque forestier</message>
+<message id="COMPO.label">Composition des essences</message>
+<message id="MNH.label">Hauteur de la végétation</message>
+<message id="dendro.label">Modèle dendro</message>
+<message id="ES_EP.label">Crise du scolyte</message>
+<message id="IGN.label">Topographie : CartoWeb</message>
+<message id="MNT.label">Altitude du sol</message>
+<message id="SWC.label">Réserve en eau</message>
 </messages>
 

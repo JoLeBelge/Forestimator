@@ -21,59 +21,9 @@ cDicoApt::cDicoApt(std::string aBDFile):cdicoAptBase(aBDFile)
 
         sqlite3_stmt * stmt;
 
-        std::string SQLstring="SELECT Code, id_projet, version, id_reference, Nom, copyrigth,ordre, NomShort,keep FROM carteMTD;";
-        sqlite3_prepare_v2( *db_, SQLstring.c_str(), -1, &stmt, NULL );
-        while(sqlite3_step(stmt) == SQLITE_ROW)
-        {
-            if (sqlite3_column_type(stmt, 0)!=SQLITE_NULL && sqlite3_column_type(stmt, 8)!=SQLITE_NULL){
-                if (sqlite3_column_int( stmt, 8 )){// colonne keep
-                    std::string aA=std::string( (char *)sqlite3_column_text( stmt, 0 ) );
-                    LayerMTD lMTD;
-                    lMTD.setCode(aA);
-                    //if (sqlite3_column_type(stmt, 2)!=SQLITE_NULL ){lMTD.setDescr(std::string( (char *)sqlite3_column_text( stmt, 2 ) ));}
-                    if (sqlite3_column_type(stmt, 2)!=SQLITE_NULL ){lMTD.setVersion(std::string( (char *)sqlite3_column_text( stmt, 2 ) ));}
-                    if (sqlite3_column_type(stmt, 1)!=SQLITE_NULL ){
-                        SQLstring="SELECT Description FROM carteMTD_projet WHERE Code='"+std::string( (char *)sqlite3_column_text( stmt, 1 ))+"';";
-                        sqlite3_stmt * stmt2;
-                        sqlite3_prepare_v2( *db_, SQLstring.c_str(), -1, &stmt2, NULL );
-                        while(sqlite3_step(stmt2) == SQLITE_ROW)
-                        {
-                            if (sqlite3_column_type(stmt2, 0)!=SQLITE_NULL){
-                                lMTD.setProjet(std::string( (char *)sqlite3_column_text( stmt2, 0 )) );
-                            }
-                        }
-                        sqlite3_finalize(stmt2);
-                    }
-                    if (sqlite3_column_type(stmt, 3)!=SQLITE_NULL ){
-                        // le champ id est une liste de numéro sépraré par une virgule, il faut parser
-                        std::vector<std::string> aVidRef;
-                        std::string aListRef=std::string( (char *)sqlite3_column_text( stmt, 3 ));
-                        boost::split( aVidRef,aListRef,boost::is_any_of(","),boost::token_compress_on);
-                        for (std::string idRef: aVidRef){
-                            SQLstring="SELECT ref FROM carteMTD_reference WHERE id="+idRef+";";
-                            sqlite3_stmt * stmt2;
-                            sqlite3_prepare_v2( *db_, SQLstring.c_str(), -1, &stmt2, NULL );
-                            while(sqlite3_step(stmt2) == SQLITE_ROW)
-                            {
-                                if (sqlite3_column_type(stmt2, 0)!=SQLITE_NULL){
-                                    lMTD.addRef(std::string( (char *)sqlite3_column_text( stmt2, 0 )) );
-                                }
-                            }
-                            sqlite3_finalize(stmt2);
-                        }
-                    }
-                    if (sqlite3_column_type(stmt, 4)!=SQLITE_NULL ){lMTD.setNom(std::string( (char *)sqlite3_column_text( stmt, 4 ) ));}
-                    if (sqlite3_column_type(stmt, 5)!=SQLITE_NULL ){lMTD.setCopyR(std::string( (char *)sqlite3_column_text( stmt, 5 ) ));}
-                    //std::cout << " done layerMTD " << lMTD.Nom() << std::endl;
-                    std::string aB=std::string( (char *)sqlite3_column_text( stmt, 6 ) );
-                    if (sqlite3_column_type(stmt, 7)!=SQLITE_NULL ){lMTD.setLabel(std::string( (char *)sqlite3_column_text( stmt, 7 ) ));}
-                    Dico_layerMTD.emplace(std::make_pair(aB,lMTD));
-                }
-            }
-        }
-        sqlite3_finalize(stmt);
+        
 
-        SQLstring="SELECT code,label,expert FROM groupe_couche ORDER BY id;";
+        std::string SQLstring="SELECT code,label,expert FROM groupe_couche ORDER BY id;";
         sqlite3_prepare_v2( *db_, SQLstring.c_str(), -1, &stmt, NULL );
         while(sqlite3_step(stmt) == SQLITE_ROW)
         {
@@ -245,16 +195,6 @@ WMSinfo * cDicoApt::getWMSinfo(std::string aCode){
     return aRes;
 }
 
-std::map<std::string,LayerMTD> * cDicoApt::layerMTD(){return &Dico_layerMTD;}
-
-LayerMTD cDicoApt::getLayerMTD(std::string aCode){
-    LayerMTD l;
-    for (auto &kv: Dico_layerMTD){
-        if (kv.second.code()==aCode){l=kv.second; return l;}
-    }
-    std::cout << "layerMTD vide pour code " << aCode << std::endl;
-    return l;
-}
 
 TypeCarte str2TypeCarte(const std::string& str)
 {

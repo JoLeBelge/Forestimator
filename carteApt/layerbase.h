@@ -26,7 +26,6 @@ double getQ95(std::vector<double> aVHs);
 // J'aurai du avoir une classe mère qui soie indépendante de Wt et me permette de faire des stats sur des cartes, exactement comme j'en ai besoin maintenant pour stationDescriptor
 // Du coup toute mes classe qui terminent par Base sont des classes SANS Wt qui sont intégrée dans le dictionnaire et qui sont donc utilisée pour les traitements API et autre du genre
 
-class LayerMTD; // classe tout à fait à par qui sert uniquement à générer la rubrique de documentation de forestimator pour cette couche
 class basicStat;
 class cEss; // avec les aptitudes de l'essence
 class color;
@@ -128,41 +127,6 @@ protected:
     // geometrie supplémentaire à afficher sur l'image statique
     std::vector<OGRPolygon *> mVaddPol;
     int mNbOccurence;
-};
-
-// pour afficher en html ou pdf les informations relatives aux couches, aux stations des cs, au méthodologies (genre calcul de hdom)
-class LayerMTD{
-public:
-    LayerMTD(){}
-    LayerMTD (const LayerMTD &l)
-    {
-        mCode=l.mCode;
-        mNom=l.mNom;
-        mShortName=l.mShortName;
-        mProjet=l.mDescr;
-        mVersion=l.mVersion;
-        mCopyR=l.mCopyR;
-        mVRefs=l.mVRefs;
-    }
-    void setCode(std::string aCode){mCode=aCode;}
-    void setNom(std::string aNom){mNom=aNom;}
-    void setLabel(std::string a){mShortName=a;}
-    void setProjet(std::string aProj){mProjet=aProj;}
-    void setDescr(std::string aDesc){mDescr=aDesc;}
-    void setVersion(std::string aV){mVersion=aV;}
-    void addRef(std::string aVRef){mVRefs.push_back(aVRef);}
-    void setCopyR(std::string a){mCopyR=a;}
-     std::string code(){return mCode;}
-    std::string Nom(){return mNom;}
-    std::string Label(){return mShortName;}
-    std::string Descr(){return mDescr;}
-    std::string Vers(){return mVersion;}
-    std::string Projet(){return mProjet;}
-    std::string CopyR(){return mCopyR;}
-    std::vector<std::string> VRefs(){return mVRefs;}
-private:
-    std::vector<std::string> mVRefs;
-    std::string mProjet, mDescr,mVersion, mNom,mCopyR,mShortName,mCode;
 };
 
 class rasterFiles{

@@ -17,7 +17,6 @@ class layerBase;
 class ST;
 class cnsw;
 class cadastre;
-class LayerMTD;
 
 enum typeAna {ponctuel,surfacique,dicoTable};
 
@@ -213,8 +212,6 @@ public:
         return aRes;
     }
 
-    std::map<std::string,LayerMTD> * layerMTD();
-    LayerMTD getLayerMTD(std::string aCode);
 
     // pour debug
    /* void summaryRasterFile(){
@@ -253,7 +250,6 @@ private:
 
     // code groupe 2 label groupe
     std::map<std::string,std::string> Dico_groupeLabel;
-    std::map<std::string,LayerMTD>  Dico_layerMTD;
 
     std::map<std::string,std::shared_ptr<layerBase>> mVlayerBase;
 };
