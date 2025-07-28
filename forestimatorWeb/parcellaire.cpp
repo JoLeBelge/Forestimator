@@ -563,7 +563,6 @@ void parcellaire::doComputingTask()
         //client.setTransportEncryption(Wt::Mail::TransportEncryption::TLS);
         //client.setSslCertificateVerificationEnabled(true);
         //client.connect("smtp.ulg.ac.be", 465);
-        //le carto envoit à localhost port 25 à partir de son domain
         client.connect("localhost", 25);
         client.send(mail);
         m_app->addLog("Surface analysis report sent to " + m_app->getUser().email(), typeLog::anasMulti); });
