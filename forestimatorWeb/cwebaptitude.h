@@ -82,8 +82,6 @@ private:
 class cWebAptitude : public Wt::WApplication
 {
 public:
-
-    ~cWebAptitude(){delete mGroupL;}
     cWebAptitude(const Wt::WEnvironment& env, cDicoApt * dico);
     void loadStyles();
     std::unique_ptr<Wt::Auth::AuthWidget> loadAuthWidget();

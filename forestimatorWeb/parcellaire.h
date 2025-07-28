@@ -19,6 +19,7 @@
 #include "widgetcadastre.h"
 #include <Wt/Mail/Message.h>
 #include <Wt/Mail/Client.h>
+#include <memory>
 
 #include "boost/filesystem.hpp"
 #include <functional> //--> pour bind
@@ -29,6 +30,8 @@ using namespace libzippp;
 class groupLayers;
 class statWindow;
 class cDicoApt;
+
+extern Wt::WServer *globServer;
 
 // objet qui comprend le shp d'un parcellaire DNF que l'on va afficher dans openlayer
 // cet objet contient également l'interface graphique wt avec les bouttons qui permettent de charger le shp, les bouttons pour démarrer les calcul, ect
@@ -78,15 +81,13 @@ public:
     {
         std::string geoJsonName;
         groupLayers *mGL;
-        WFileResource *fileResource;
+        std::string path;
         cWebAptitude **app;
         void run() override;
 
     public:
-        TaskComputing(std::string geoJsonName, groupLayers *mGL, WFileResource *fileResource, cWebAptitude **app) : geoJsonName(geoJsonName), mGL(mGL), fileResource(fileResource), app(app)
-        {
-            // if(globTest){std::cout << "créateur de TaskAnaAllPoll" << std::endl;}
-        }
+        TaskComputing(std::string geoJsonName, groupLayers *mGL, std::string path, cWebAptitude **app) : geoJsonName(geoJsonName), mGL(mGL), path(path), app(app)
+        {}
     };
 
 private:
@@ -97,6 +98,7 @@ private:
 
     Wt::WFileUpload *fu;
     Wt::WPushButton *downloadRasterBt;
+    Wt::WPushButton *anaOnAllPolygBt;
     // Wt::WPushButton  *anaOnAllPolygBt;
     cWebAptitude *m_app;
     Wt::WText *msg;

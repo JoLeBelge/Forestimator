@@ -39,7 +39,8 @@ enum class TypeVar {Classe,
                    };
 
 enum class TypeLayer {
-    KK // les cartes dérivées des CS
+     Init
+    ,KK // les cartes dérivées des CS
     ,Station // lié à la description de la station, approche FEE ; NH NT ZBIO, mais aussi les stations du CS
     ,Externe // toutes les cartes qui ne sont pas en local ; carte IGN pour commencer
     ,FEE // aptitude

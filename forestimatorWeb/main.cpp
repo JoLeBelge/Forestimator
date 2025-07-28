@@ -1,5 +1,4 @@
 #include "main.h"
-
 extern bool globTest;
 extern std::string columnPath;
 
@@ -39,7 +38,7 @@ int launchForestimator(int argc, char **argv)
 
     try
     {
-        Wt::WServer server{argc, argv, WTHTTP_CONFIGURATION};
+        Wt::WServer server = Wt::WServer(argc, argv, WTHTTP_CONFIGURATION);
 
         // set first ressources with sub-folder /api/
         // then add entry point for the web site

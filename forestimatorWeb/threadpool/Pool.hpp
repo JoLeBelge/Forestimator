@@ -21,7 +21,7 @@ public:
     cpu_set_t cpuset;
     static int ID;
     Pool(Task* mainTask, int nThreads) : mainTask(mainTask), nThreads(nThreads + MIN_THREADS){
-        for (size_t j = 0; j < nThreads; j++)
+        for (size_t j = 0; j < size_t(nThreads); j++)
             CPU_SET(j, &cpuset);
     }
     ~Pool() {
