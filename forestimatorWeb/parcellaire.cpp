@@ -558,12 +558,11 @@ void parcellaire::doComputingTask()
     analyseSurfacique->setCallbackAfter([this, mail]() -> void
                               {
         Mail::Client client;
-        //Pour faire des test mettre adresse uliege personelle et mdp
-        //client.enableAuthentication("xxxxxxx@uliege.be", "xxxxxxxx", Wt::Mail::AuthenticationMethod::Plain);
-        //client.setTransportEncryption(Wt::Mail::TransportEncryption::TLS);
-        //client.setSslCertificateVerificationEnabled(true);
-        //client.connect("smtp.ulg.ac.be", 465);
-        client.connect("localhost", 25);
+        client.enableAuthentication("tthissen@uliege.be", "xxxxxxxx", Wt::Mail::AuthenticationMethod::Plain);
+        client.setTransportEncryption(Wt::Mail::TransportEncryption::TLS);
+        client.setSslCertificateVerificationEnabled(true);
+        client.connect("smtp.ulg.ac.be", 465);
+        //client.connect("smtp.ulg.ac.be", 25);
         client.send(mail);
         m_app->addLog("Surface analysis report sent to " + m_app->getUser().email(), typeLog::anasMulti); });
 
