@@ -17,6 +17,7 @@
 #include "Wt/WLoadingIndicator.h"
 #include "statwindow.h"
 #include "widgetcadastre.h"
+#include "tools/tools.hpp"
 #include <Wt/Mail/Message.h>
 #include <Wt/Mail/Client.h>
 #include <memory>
@@ -25,6 +26,7 @@
 #include <functional> //--> pour bind
 #include "./libzippp/src/libzippp.h"
 using namespace libzippp;
+
 #include "threadpool/ThreadPool.hpp"
 
 class groupLayers;

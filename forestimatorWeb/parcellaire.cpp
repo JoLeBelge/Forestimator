@@ -518,7 +518,6 @@ void parcellaire::selectPolygon(double x, double y)
     }
 }
 
-
 void parcellaire::polygoneCadastre(std::string aFileGeoJson, std::string aLabelName)
 {
     mFullPath = aFileGeoJson.substr(0, aFileGeoJson.size() - 8);
@@ -536,39 +535,32 @@ void parcellaire::polygoneCadastre(std::string aFileGeoJson, std::string aLabelN
     }
 }
 
-
 void parcellaire::doComputingTask()
 {
     std::string name0 = std::tmpnam(nullptr);
     std::string name1 = name0.substr(5, name0.size() - 5);
     std::string filenameOut = mDico->File("TMPDIR") + name1 + ".xml";
 
-    Wt::WFileResource *fileResource = new Wt::WFileResource(filenameOut);// REST
+    Wt::WFileResource *fileResource = new Wt::WFileResource(filenameOut); // REST
     fileResource->setMimeType("text/xml");
     fileResource->suggestFileName("Forestimator-statistiques.xml");
     fileResource->setUploadProgress(true);
 
-    Wt::Mail::Message mail = Wt::Mail::Message();
-    mail.setFrom(Wt::Mail::Mailbox("JO.Lisein@uliege.be", "Lisein Jonathan"));
-    mail.setBody(Wt::WString::tr("mail.anasMulti.body").arg(m_app->getUser().identity(Wt::Auth::Identity::LoginName)).arg(mLabelName == "" ? mClientName : mLabelName).arg(fileResource->url()).toUTF8());
-    mail.setSubject(Wt::WString::tr("mail.anasMulti.title").toUTF8());
-    mail.addRecipient(Wt::Mail::RecipientType::To, Mail::Mailbox(m_app->getUser().email() == "" ? m_app->getUser().unverifiedEmail() : m_app->getUser().email()));
+    Wt::Mail::Message mail = tools::createMail(
+        "JO.Lisein@uliege.be",
+        "Lisein Jonathan",
+        m_app->getUser().email() == "" ? m_app->getUser().unverifiedEmail() : m_app->getUser().email(),
+        Wt::WString::tr("mail.anasMulti.title").toUTF8(),
+        Wt::WString::tr("mail.anasMulti.body").arg(m_app->getUser().identity(Wt::Auth::Identity::LoginName)).arg(mLabelName == "" ? mClientName : mLabelName).arg(fileResource->url()).toUTF8());
 
     parcellaire::TaskComputing *analyseSurfacique = new parcellaire::TaskComputing(geoJsonName(), mGL, filenameOut, &m_app);
     analyseSurfacique->setCallbackAfter([this, mail]() -> void
-                              {
-        Mail::Client client;
-        client.enableAuthentication("tthissen@uliege.be", "xxxxxxxx", Wt::Mail::AuthenticationMethod::Plain);
-        client.setTransportEncryption(Wt::Mail::TransportEncryption::TLS);
-        client.setSslCertificateVerificationEnabled(true);
-        client.connect("smtp.ulg.ac.be", 465);
-        //client.connect("smtp.ulg.ac.be", 25);
-        client.send(mail);
+                                        {
+        tools::sendMail(mail);
         m_app->addLog("Surface analysis report sent to " + m_app->getUser().email(), typeLog::anasMulti); });
 
     pool->add(analyseSurfacique);
 }
-
 
 void parcellaire::TaskComputing::run()
 {
@@ -587,7 +579,6 @@ void parcellaire::TaskComputing::run()
         std::cout << "select dataset mDS is null " << std::endl;
     }
 }
-
 
 void parcellaire::anaAllPol()
 {
