@@ -27,3 +27,4 @@ data/OGF.db*
 forestimatorWeb/*.o
 forestimatorWeb/launch.sh
 forestimatorWeb/forestimatorWeb
+forestimatorWeb/Makefile
