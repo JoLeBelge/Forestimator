@@ -19,7 +19,7 @@ namespace tools
 
     bool sendMail(const Wt::Mail::Message &mail, bool useForestimatorDomain)
     {
-        ifstream configFile("../data/forestimator.cfg");
+        ifstream configFile("/home/carto/app/config/forestimator.cfg");
         string lg = "";
         string pw = "";
         if (configFile.is_open())
