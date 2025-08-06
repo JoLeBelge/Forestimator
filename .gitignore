@@ -28,3 +28,4 @@ forestimatorWeb/*.o
 forestimatorWeb/launch.sh
 forestimatorWeb/forestimatorWeb
 forestimatorWeb/Makefile
+*.log

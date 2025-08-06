@@ -19,13 +19,14 @@ namespace tools
 
     bool sendMail(const Wt::Mail::Message &mail, bool useForestimatorDomain)
     {
-        ifstream configFile("./forestimator.cfg");
+        ifstream configFile("../data/forestimator.cfg");
         string lg = "";
         string pw = "";
         if (configFile.is_open())
         {
             getline(configFile, lg);
             getline(configFile, pw);
+            cout << lg;
         }
         else
         {
