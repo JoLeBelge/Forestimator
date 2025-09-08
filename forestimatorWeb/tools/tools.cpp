@@ -19,28 +19,37 @@ namespace tools
 
     bool sendMail(const Wt::Mail::Message &mail, bool useForestimatorDomain)
     {
-        ifstream configFile("/home/carto/app/config/forestimator.cfg");
-        string lg = "";
+        ifstream configFile("./forestimator.cfg");
+        string path = "";
         string pw = "";
+        string user = "";
         if (configFile.is_open())
         {
-            getline(configFile, lg);
-            getline(configFile, pw);
-            cout << lg;
+            getline(configFile, path);
+            ifstream passwordFile(path);
+            if (passwordFile.is_open())
+            {
+                getline(passwordFile, user);
+                getline(passwordFile, pw);
+            }
+            else
+            {
+                cout << "Error: Unable to open " << path << endl;
+                cout << "Mail not sent!" << endl;
+            }
         }
         else
         {
-            cout << "Error: Unable to open configMailAccount.txt" << endl;
+            cout << "Error: Unable to open configuration file" << endl;
             cout << "Mail not sent!" << endl;
         }
 
         Wt::Mail::Client client;
-        client.enableAuthentication(lg, pw, Wt::Mail::AuthenticationMethod::Plain);
+        client.enableAuthentication(user, pw, Wt::Mail::AuthenticationMethod::Plain);
         client.setTransportEncryption(
-            useForestimatorDomain 
-            ? Wt::Mail::TransportEncryption::None 
-            : Wt::Mail::TransportEncryption::TLS
-        );
+            useForestimatorDomain
+                ? Wt::Mail::TransportEncryption::None
+                : Wt::Mail::TransportEncryption::TLS);
         client.setSslCertificateVerificationEnabled(true);
         try
         {

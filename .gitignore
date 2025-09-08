@@ -27,5 +27,7 @@ data/OGF.db*
 forestimatorWeb/*.o
 forestimatorWeb/launch.sh
 forestimatorWeb/forestimatorWeb
+forestimatorProcLauncher/logs/*
 forestimatorWeb/Makefile
 *.log
+/home/carto/app/config/forestimator.cfg
