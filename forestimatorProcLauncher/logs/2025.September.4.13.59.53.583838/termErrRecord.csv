@@ -1,0 +1,5 @@
+date, log
+2025-09-04 14:03:09.8657448 +0200 CEST m=+196.020075511,"""terminate called after throwing an instance of 'Wt::WException'
+  what():  WRasterImage::done() image could not be converted to blob - is your image type supported by GraphicsMagick?
+Magick: abort due to signal 6 (SIGABRT) "Abort"...
+"""

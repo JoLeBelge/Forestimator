@@ -1,0 +1,236 @@
+date, log
+2025-08-07 12:13:15.949663148 +0200 CEST m=+92.732750530,""" chemin bd =/home/gef/Documents/Forestimator/carteApt/data/aptitudeEssDB.db
+ colPath =Dir
+ouvre connexion avec BD dictionnaire ... avec colonne Dir pour chemin access aux fichiers
+close connection (dicoAptBase)
+ouvre connexion avec BD dictionnaire ... avec colonne Dir pour chemin access aux fichiers
+load info cadastre
+/data1/Carto/Autre/cadastre/Assembly_L72_2020/Apn_AdMu.shp n'existe pas /data1/Carto/Autre/cadastre/Belgium_L72_2020/Apn_CaDi.shp n'existe pas Attention layerBase AB_CS, fichier /data1/Carto/FEE/recommandation_AB.tif inexistant
+Attention layerBase AE, fichier /data1/Carto/FEEW2020/AE_RW_202408.tif inexistant
+Attention layerBase AG_CS, fichier /data1/Carto/FEE/recommandation_AG.tif inexistant
+Attention layerBase AG_FEE, fichier /data1/Carto/FEE/aptitudeFEE_AG.tif inexistant
+Attention layerBase AN_CS, fichier /data1/Carto/FEE/recommandation_AN.tif inexistant
+Attention layerBase AN_FEE, fichier /data1/Carto/FEE/aptitudeFEE_AN.tif inexistant
+Attention layerBase AP_CS, fichier /data1/Carto/FEE/recommandation_AP.tif inexistant
+Attention layerBase AP_FEE, fichier /data1/Carto/FEE/aptitudeFEE_AP.tif inexistant
+Attention layerBase AX_CS, fichier /data1/Carto/FEE/recommandation_AX.tif inexistant
+Attention layerBase AX_FEE, fichier /data1/Carto/FEE/aptitudeFEE_AX.tif inexistant
+Attention layerBase BP_CS, fichier /data1/Carto/FEE/recommandation_BP.tif inexistant
+Attention layerBase BP_FEE, fichier /data1/Carto/FEE/aptitudeFEE_BP.tif inexistant
+Attention layerBase BV_CS, fichier /data1/Carto/FEE/recommandation_BV.tif inexistant
+Attention layerBase BV_FEE, fichier /data1/Carto/FEE/aptitudeFEE_BV.tif inexistant
+Attention layerBase CA_CS, fichier /data1/Carto/FEE/recommandation_CA.tif inexistant
+Attention layerBase CA_FEE, fichier /data1/Carto/FEE/aptitudeFEE_CA.tif inexistant
+Attention layerBase CB_CS, fichier /data1/Carto/FEE/recommandation_CB.tif inexistant
+Attention layerBase CD_CS, fichier /data1/Carto/FEE/recommandation_CD.tif inexistant
+Attention layerBase CD_FEE, fichier /data1/Carto/FEE/aptitudeFEE_CD.tif inexistant
+Attention layerBase CLH_2025, fichier /data1/Carto/Autre/cl_haut_8class_10_25_1_reg1.tif inexistant
+Attention layerBase CNSWrast, fichier -/CNSW.tif inexistant
+Attention layerBase CO_CS, fichier /data1/Carto/FEE/recommandation_CO.tif inexistant
+Attention layerBase CP_CS, fichier /data1/Carto/FEE/recommandation_CP.tif inexistant
+Attention layerBase CP_FEE, fichier /data1/Carto/FEE/aptitudeFEE_CP.tif inexistant
+Attention layerBase CR_CS, fichier /data1/Carto/FEE/recommandation_CR.tif inexistant
+Attention layerBase CR_FEE, fichier /data1/Carto/FEE/aptitudeFEE_CR.tif inexistant
+Attention layerBase CS1, fichier /data1/Carto/CS/CS_zbio1.tif inexistant
+Attention layerBase CS10, fichier /data1/Carto/CS/CS_zbio10.tif inexistant
+Attention layerBase CS2, fichier /data1/Carto/CS/CS_zbio2.tif inexistant
+Attention layerBase CS3, fichier /data1/Carto/CS/CS_zbio35.tif inexistant
+Attention layerBase CS8, fichier /data1/Carto/CS/CS8.tif inexistant
+Attention layerBase CS_A, fichier /data1/Carto/CS/GSA_V7_202409_RW.tif inexistant
+Attention layerBase CS_CS, fichier /data1/Carto/FEE/recommandation_CS.tif inexistant
+Attention layerBase CS_FEE, fichier /data1/Carto/FEE/aptitudeFEE_CS.tif inexistant
+Attention layerBase CT_CS, fichier /data1/Carto/FEE/recommandation_CT.tif inexistant
+Attention layerBase CT_FEE, fichier /data1/Carto/FEE/aptitudeFEE_CT.tif inexistant
+Attention layerBase CY_CS, fichier /data1/Carto/FEE/recommandation_CY.tif inexistant
+Attention layerBase CY_FEE, fichier /data1/Carto/FEE/aptitudeFEE_CY.tif inexistant
+Attention layerBase DO_CS, fichier /data1/Carto/FEE/recommandation_DO.tif inexistant
+Attention layerBase DO_FEE, fichier /data1/Carto/FEE/aptitudeFEE_DO.tif inexistant
+Attention layerBase EC_CS, fichier /data1/Carto/FEE/recommandation_EC.tif inexistant
+Attention layerBase EC_FEE, fichier /data1/Carto/FEE/aptitudeFEE_EC.tif inexistant
+Attention layerBase EK_CS, fichier /data1/Carto/FEE/recommandation_EK.tif inexistant
+Attention layerBase EK_FEE, fichier /data1/Carto/FEE/aptitudeFEE_EK.tif inexistant
+Attention layerBase EL_CS, fichier /data1/Carto/FEE/recommandation_EL.tif inexistant
+Attention layerBase EL_FEE, fichier /data1/Carto/FEE/aptitudeFEE_EL.tif inexistant
+Attention layerBase EP_CS, fichier /data1/Carto/FEE/recommandation_EP.tif inexistant
+Attention layerBase EP_FEE, fichier /data1/Carto/FEE/aptitudeFEE_EP.tif inexistant
+Attention layerBase ES_CS, fichier /data1/Carto/FEE/recommandation_ES.tif inexistant
+Attention layerBase ES_EP_2016, fichier /data1/Carto/Autre/ES_EP/etatSanitaire_2016_BL72_masq_evol_co.tif inexistant
+Attention layerBase ES_EP_2017, fichier /data1/Carto/Autre/ES_EP/etatSanitaire_2017_BL72_masq_evol_co.tif inexistant
+Attention layerBase ES_EP_2018, fichier /data1/Carto/Autre/ES_EP/etatSanitaire_2018_BL72_masq_evol_co.tif inexistant
+Attention layerBase ES_EP_2019, fichier /data1/Carto/Autre/ES_EP/etatSanitaire_2019_BL72_masq_evol_co.tif inexistant
+Attention layerBase ES_EP_2020, fichier /data1/Carto/Autre/ES_EP/etatSanitaire_2020_BL72_masq_evol_co.tif inexistant
+Attention layerBase ES_EP_2021, fichier /data1/Carto/Autre/ES_EP/etatSanitaire_2021_BL72_masq_evol_co.tif inexistant
+Attention layerBase ES_EP_2022, fichier /data1/Carto/Autre/ES_EP/etatSanitaire_2022_BL72_masq_evol_co.tif inexistant
+Attention layerBase ES_EP_2023, fichier /data1/Carto/Autre/ES_EP/etatSanitaire_2023_BL72_masq_evol_co.tif inexistant
+Attention layerBase ES_EP_2024, fichier /data1/Carto/Autre/ES_EP/etatSanitaire_2024_BL72_masq_evol_co.tif inexistant
+Attention layerBase ES_FEE, fichier /data1/Carto/FEE/aptitudeFEE_ES.tif inexistant
+Attention layerBase FR_CS, fichier /data1/Carto/FEE/recommandation_FR.tif inexistant
+Attention layerBase FR_FEE, fichier /data1/Carto/FEE/aptitudeFEE_FR.tif inexistant
+Attention layerBase HE_CS, fichier /data1/Carto/FEE/recommandation_HE.tif inexistant
+Attention layerBase HE_FEE, fichier /data1/Carto/FEE/aptitudeFEE_HE.tif inexistant
+Attention layerBase JH_CS, fichier /data1/Carto/FEE/recommandation_JH.tif inexistant
+Attention layerBase JH_FEE, fichier /data1/Carto/FEE/aptitudeFEE_JH.tif inexistant
+Attention layerBase JN_CS, fichier /data1/Carto/FEE/recommandation_JN.tif inexistant
+Attention layerBase JN_FEE, fichier /data1/Carto/FEE/aptitudeFEE_JN.tif inexistant
+Attention layerBase JR_CS, fichier /data1/Carto/FEE/recommandation_JR.tif inexistant
+Attention layerBase JR_FEE, fichier /data1/Carto/FEE/aptitudeFEE_JR.tif inexistant
+Attention layerBase ME_CS, fichier /data1/Carto/FEE/recommandation_ME.tif inexistant
+Attention layerBase ME_FEE, fichier /data1/Carto/FEE/aptitudeFEE_ME.tif inexistant
+Attention layerBase MF, fichier /data1/Carto/Autre/Forest_Mask_2021_2022_GxABT_202503.tif inexistant
+Attention layerBase MF_2018, fichier /data1/Carto/Autre/Forest_Mask_2006_2009-2010_2012-2013_2016_2018_Final.tif inexistant
+Attention layerBase MH_CS, fichier /data1/Carto/FEE/recommandation_MH.tif inexistant
+Attention layerBase MH_FEE, fichier /data1/Carto/FEE/aptitudeFEE_MH.tif inexistant
+Attention layerBase MJ_CS, fichier /data1/Carto/FEE/recommandation_MJ.tif inexistant
+Attention layerBase MJ_FEE, fichier /data1/Carto/FEE/aptitudeFEE_MJ.tif inexistant
+Attention layerBase MNH2006, fichier /data1/Carto/Autre/mnh2006.tif inexistant
+Attention layerBase MNH2009, fichier /data1/Carto/Autre/mnh2009.tif inexistant
+Attention layerBase MNH2012, fichier /data1/Carto/Autre/mnh2012.tif inexistant
+Attention layerBase MNH2014, fichier /data1/Carto/Autre/MNHLidar_2m8bits.tif inexistant
+Attention layerBase MNH2014b, fichier /data1/Carto/Autre/mnh2014.tif inexistant
+Attention layerBase MNH2015, fichier /data1/Carto/Autre/mnh2015.tif inexistant
+Attention layerBase MNH2016, fichier /data1/Carto/Autre/mnh2016.tif inexistant
+Attention layerBase MNH2018, fichier /data1/Carto/Autre/mnh2018.tif inexistant
+Attention layerBase MNH2019, fichier /data1/Carto/Autre/mnh_2019.tif inexistant
+Attention layerBase MNH2019b, fichier /data1/Carto/Autre/mnh2019.tif inexistant
+Attention layerBase MNH2020, fichier /data1/Carto/Autre/mnh2020.tif inexistant
+Attention layerBase MNH2021, fichier /data1/Carto/Autre/mnh2021.tif inexistant
+Attention layerBase MNT, fichier /data1/Carto/Autre/MNT_10m_WALLONIA16b.tif inexistant
+Attention layerBase MR_CS, fichier /data1/Carto/FEE/recommandation_MR.tif inexistant
+Attention layerBase MR_FEE, fichier /data1/Carto/FEE/aptitudeFEE_MR.tif inexistant
+Attention layerBase N2000_maj, fichier /data1/Carto/FEE/N2000_maj.tif inexistant
+Attention layerBase NH, fichier /home/gef/Documents/dataBases:-)/carto/NH202408.tif inexistant
+Attention layerBase NO_CS, fichier /data1/Carto/FEE/recommandation_NO.tif inexistant
+Attention layerBase NO_FEE, fichier /data1/Carto/FEE/aptitudeFEE_NO.tif inexistant
+Attention layerBase NT, fichier /data1/Carto/FEEW2020/NT2023.tif inexistant
+Attention layerBase OL_CS, fichier /data1/Carto/FEE/recommandation_OL.tif inexistant
+Attention layerBase OM_CS, fichier /data1/Carto/FEE/recommandation_OM.tif inexistant
+Attention layerBase PA_CS, fichier /data1/Carto/FEE/recommandation_PA.tif inexistant
+Attention layerBase PA_FEE, fichier /data1/Carto/FEE/aptitudeFEE_PA.tif inexistant
+Attention layerBase PC_CS, fichier /data1/Carto/FEE/recommandation_PC.tif inexistant
+Attention layerBase PC_FEE, fichier /data1/Carto/FEE/aptitudeFEE_PC.tif inexistant
+Attention layerBase PG_CS, fichier /data1/Carto/FEE/recommandation_PG.tif inexistant
+Attention layerBase PG_FEE, fichier /data1/Carto/FEE/aptitudeFEE_PG.tif inexistant
+Attention layerBase PK_CS, fichier /data1/Carto/FEE/recommandation_PK.tif inexistant
+Attention layerBase PK_FEE, fichier /data1/Carto/FEE/aptitudeFEE_PK.tif inexistant
+Attention layerBase PM_CS, fichier /data1/Carto/FEE/recommandation_PM.tif inexistant
+Attention layerBase PM_FEE, fichier /data1/Carto/FEE/aptitudeFEE_PM.tif inexistant
+Attention layerBase PN_CS, fichier /data1/Carto/FEE/recommandation_PN.tif inexistant
+Attention layerBase PO_CS, fichier /data1/Carto/FEE/recommandation_PO.tif inexistant
+Attention layerBase PO_FEE, fichier /data1/Carto/FEE/aptitudeFEE_PO.tif inexistant
+Attention layerBase PS_CS, fichier /data1/Carto/FEE/recommandation_PS.tif inexistant
+Attention layerBase PS_FEE, fichier /data1/Carto/FEE/aptitudeFEE_PS.tif inexistant
+Attention layerBase PT_CS, fichier /data1/Carto/FEE/recommandation_PT.tif inexistant
+Attention layerBase PT_FEE, fichier /data1/Carto/FEE/aptitudeFEE_PT.tif inexistant
+Attention layerBase PY_FEE, fichier /data1/Carto/FEE/aptitudeFEE_PY.tif inexistant
+Attention layerBase PZ_CS, fichier /data1/Carto/FEE/recommandation_PZ.tif inexistant
+Attention layerBase PZ_FEE, fichier /data1/Carto/FEE/aptitudeFEE_PZ.tif inexistant
+Attention layerBase RO_CS, fichier /data1/Carto/FEE/recommandation_RO.tif inexistant
+Attention layerBase RO_FEE, fichier /data1/Carto/FEE/aptitudeFEE_RO.tif inexistant
+Attention layerBase RY_CS, fichier /data1/Carto/FEE/recommandation_RY.tif inexistant
+Attention layerBase RY_FEE, fichier /data1/Carto/FEE/aptitudeFEE_RY.tif inexistant
+Attention layerBase SA_CS, fichier /data1/Carto/FEE/recommandation_SA.tif inexistant
+Attention layerBase SA_FEE, fichier /data1/Carto/FEE/aptitudeFEE_SA.tif inexistant
+Attention layerBase SCC, fichier /data1/Carto/FEE/sens_CC.tif inexistant
+Attention layerBase SO_CS, fichier /data1/Carto/FEE/recommandation_SO.tif inexistant
+Attention layerBase SO_FEE, fichier /data1/Carto/FEE/aptitudeFEE_SO.tif inexistant
+Attention layerBase SS, fichier /data1/Carto/FEEW2020/SS_W_201911.tif inexistant
+Attention layerBase ST_CS, fichier /data1/Carto/FEE/recommandation_ST.tif inexistant
+Attention layerBase ST_FEE, fichier /data1/Carto/FEE/aptitudeFEE_ST.tif inexistant
+Attention layerBase TC_CS, fichier /data1/Carto/FEE/recommandation_TC.tif inexistant
+Attention layerBase TC_FEE, fichier /data1/Carto/FEE/aptitudeFEE_TC.tif inexistant
+Attention layerBase TH_CS, fichier /data1/Carto/FEE/recommandation_TH.tif inexistant
+Attention layerBase TH_FEE, fichier /data1/Carto/FEE/aptitudeFEE_TH.tif inexistant
+Attention layerBase TP_CS, fichier /data1/Carto/FEE/recommandation_TP.tif inexistant
+Attention layerBase TP_FEE, fichier /data1/Carto/FEE/aptitudeFEE_TP.tif inexistant
+Attention layerBase TU_CS, fichier /data1/Carto/FEE/recommandation_TU.tif inexistant
+Attention layerBase TU_FEE, fichier /data1/Carto/FEE/aptitudeFEE_TU.tif inexistant
+Attention layerBase TY_CS, fichier /data1/Carto/FEE/recommandation_TY.tif inexistant
+Attention layerBase TY_FEE, fichier /data1/Carto/FEE/aptitudeFEE_TY.tif inexistant
+Attention layerBase Topo, fichier /data1/Carto/FEEW2020/TOPO2020.tif inexistant
+Attention layerBase WalEunis_maj, fichier /data1/Carto/FEE/WalEunis_maj.tif inexistant
+Attention layerBase dendro_cdom, fichier /data1/Carto/Autre/dendro_cdom_8bits.tif inexistant
+Attention layerBase dendro_gha, fichier /data1/Carto/Autre/dendro_gha_8bits.tif inexistant
+Attention layerBase dendro_hdom, fichier /data1/Carto/Autre/dendro_hdom_8bits.tif inexistant
+Attention layerBase dendro_nha, fichier /data1/Carto/Autre/dendro_nha_8bits.tif inexistant
+Attention layerBase dendro_prop_fe, fichier /data1/Carto/Autre/dendro_prop_fe_8bits.tif inexistant
+Attention layerBase dendro_vha, fichier /data1/Carto/Autre/dendro_vha_8bits.tif inexistant
+Attention layerBase prod_b, fichier /data1/Carto/FEE/prod_b.tif inexistant
+Attention layerBase slope, fichier /data1/Carto/Autre/slope.tif inexistant
+Attention layerBase tass_sol, fichier /data1/Carto/FEE/tass_sol.tif inexistant
+Attention layerBase vcp, fichier /data1/Carto/FEE/vcp.tif inexistant
+done 
+"""
+2025-08-07 12:13:16.837690311 +0200 CEST m=+93.620777691,"""new Session()
+"""
+2025-08-07 12:13:17.34164439 +0200 CEST m=+94.124731769,"""cWebApt
+
+new Session()
+cWebApt
+
+Warning: Project name/description not found in FILE: forestimator-documentation.xml for TAG: Aptitude.projet
+Warning: copyright not found in FILE: forestimator-documentation.xml for TAG: Aptitude.copyright
+Warning: Project name/description not found in FILE: forestimator-documentation.xml for TAG: ECO.projet
+Warning: No version found in FILE: forestimator-documentation.xml for TAG: ECO.version
+Warning: copyright not found in FILE: forestimator-documentation.xml for TAG: ECO.copyright
+Warning: Project name/description not found in FILE: forestimator-documentation.xml for TAG: ZBIO.projet
+Warning: copyright not found in FILE: forestimator-documentation.xml for TAG: ZBIO.copyright
+Warning: Project name/description not found in FILE: forestimator-documentation.xml for TAG: NH.projet
+Warning: copyright not found in FILE: forestimator-documentation.xml for TAG: NH.copyright
+Warning: Project name/description not found in FILE: forestimator-documentation.xml for TAG: NT.projet
+Warning: copyright not found in FILE: forestimator-documentation.xml for TAG: NT.copyright
+Warning: Project name/description not found in FILE: forestimator-documentation.xml for TAG: TOPOetSS.projet
+Warning: copyright not found in FILE: forestimator-documentation.xml for TAG: TOPOetSS.copyright
+Warning: Project name/description not found in FILE: forestimator-documentation.xml for TAG: AE.projet
+Warning: copyright not found in FILE: forestimator-documentation.xml for TAG: AE.copyright
+Warning: Project name/description not found in FILE: forestimator-documentation.xml for TAG: MF.projet
+Warning: copyright not found in FILE: forestimator-documentation.xml for TAG: MF.copyright
+Warning: copyright not found in FILE: forestimator-documentation.xml for TAG: COMPO.copyright
+Warning: Project name/description not found in FILE: forestimator-documentation.xml for TAG: MNH.projet
+Warning: No version found in FILE: forestimator-documentation.xml for TAG: MNH.version
+Warning: copyright not found in FILE: forestimator-documentation.xml for TAG: MNH.copyright
+Warning: copyright not found in FILE: forestimator-documentation.xml for TAG: dendro.copyright
+Warning: References not found in FILE: forestimator-documentation.xml for TAG: dendro.ref
+Warning: No version found in FILE: forestimator-documentation.xml for TAG: ES_EP.version
+Warning: copyright not found in FILE: forestimator-documentation.xml for TAG: ES_EP.copyright
+/data1/phytospy/data/zbio/zbio_simp.shp : n'existe pas (zbioPainted::zbioPainted)
+Warning: Project name/description not found in FILE: forestimator-documentation.xml for TAG: IGN.projet
+Warning: No version found in FILE: forestimator-documentation.xml for TAG: IGN.version
+Warning: Project name/description not found in FILE: forestimator-documentation.xml for TAG: MNT.projet
+Warning: No version found in FILE: forestimator-documentation.xml for TAG: MNT.version
+Warning: Project name/description not found in FILE: forestimator-documentation.xml for TAG: SWC.projet
+Warning: copyright not found in FILE: forestimator-documentation.xml for TAG: SWC.copyright
+Warning: Project name/description not found in FILE: forestimator-documentation.xml for TAG: Aptitude.projet
+Warning: copyright not found in FILE: forestimator-documentation.xml for TAG: Aptitude.copyright
+Warning: Project name/description not found in FILE: forestimator-documentation.xml for TAG: ECO.projet
+Warning: No version found in FILE: forestimator-documentation.xml for TAG: ECO.version
+Warning: copyright not found in FILE: forestimator-documentation.xml for TAG: ECO.copyright
+Warning: Project name/description not found in FILE: forestimator-documentation.xml for TAG: ZBIO.projet
+Warning: copyright not found in FILE: forestimator-documentation.xml for TAG: ZBIO.copyright
+Warning: Project name/description not found in FILE: forestimator-documentation.xml for TAG: NH.projet
+Warning: copyright not found in FILE: forestimator-documentation.xml for TAG: NH.copyright
+Warning: Project name/description not found in FILE: forestimator-documentation.xml for TAG: NT.projet
+Warning: copyright not found in FILE: forestimator-documentation.xml for TAG: NT.copyright
+Warning: Project name/description not found in FILE: forestimator-documentation.xml for TAG: TOPOetSS.projet
+Warning: copyright not found in FILE: forestimator-documentation.xml for TAG: TOPOetSS.copyright
+Warning: Project name/description not found in FILE: forestimator-documentation.xml for TAG: AE.projet
+Warning: copyright not found in FILE: forestimator-documentation.xml for TAG: AE.copyright
+Warning: Project name/description not found in FILE: forestimator-documentation.xml for TAG: MF.projet
+Warning: copyright not found in FILE: forestimator-documentation.xml for TAG: MF.copyright
+Warning: copyright not found in FILE: forestimator-documentation.xml for TAG: COMPO.copyright
+Warning: Project name/description not found in FILE: forestimator-documentation.xml for TAG: MNH.projet
+Warning: No version found in FILE: forestimator-documentation.xml for TAG: MNH.version
+Warning: copyright not found in FILE: forestimator-documentation.xml for TAG: MNH.copyright
+Warning: copyright not found in FILE: forestimator-documentation.xml for TAG: dendro.copyright
+Warning: References not found in FILE: forestimator-documentation.xml for TAG: dendro.ref
+Warning: No version found in FILE: forestimator-documentation.xml for TAG: ES_EP.version
+Warning: copyright not found in FILE: forestimator-documentation.xml for TAG: ES_EP.copyright
+/data1/phytospy/data/zbio/zbio_simp.shp : n'existe pas (zbioPainted::zbioPainted)
+Warning: Project name/description not found in FILE: forestimator-documentation.xml for TAG: IGN.projet
+Warning: No version found in FILE: forestimator-documentation.xml for TAG: IGN.version
+Warning: Project name/description not found in FILE: forestimator-documentation.xml for TAG: MNT.projet
+Warning: No version found in FILE: forestimator-documentation.xml for TAG: MNT.version
+Warning: Project name/description not found in FILE: forestimator-documentation.xml for TAG: SWC.projet
+Warning: copyright not found in FILE: forestimator-documentation.xml for TAG: SWC.copyright
+done 
+done 
+"""

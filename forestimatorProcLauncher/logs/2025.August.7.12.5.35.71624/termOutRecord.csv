@@ -1,0 +1,7 @@
+date, log
+2025-08-07 12:05:35.411114261 +0200 CEST m=+0.125646777,""" chemin bd =/home/gef/Documents/Forestimator/carteApt/data/aptitudeEssDB.db
+ colPath =Dir
+ouvre connexion avec BD dictionnaire ... avec colonne Dir pour chemin access aux fichiers
+close connection (dicoAptBase)
+ouvre connexion avec BD dictionnaire ... avec colonne Dir pour chemin access aux fichiers
+"""

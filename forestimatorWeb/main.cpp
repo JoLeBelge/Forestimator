@@ -233,13 +233,15 @@ void layerResource::handleRequest(const Http::Request &request, Http::Response &
 
 void ForestimatorMainTask::run()
 {
+    //double arr[4] = {1.,2.,3.,5.};
+    //std::cout << arr[1] / 0. << std::endl;
     launchForestimator(*argc, *argv);
     return;
 }
 
 int main(int argc, char **argv)
 {
-    int nThreads = 1;
+    int nThreads = 16;
     pool = new Pool(new ForestimatorMainTask(&argc, &argv), nThreads);
     pool->start();
     std::cout << "Exit application" << std::endl;

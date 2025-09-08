@@ -1,0 +1,10 @@
+date, log
+2025-09-03 13:21:16.122420382 +0200 CEST m=+107.770468198,"""ERROR 1: GDALWMS: Unable to download block 0, 0.
+URL: server certificate verification failed. CAfile: none CRLfile: none
+  HTTP status code: 0, error: server certificate verification failed. CAfile: none CRLfile: none.
+Add the HTTP status code to <ZeroBlockHttpCodes> to ignore this error (see http://www.gdal.org/frmt_wms.html).
+"""
+2025-09-03 13:21:28.503653072 +0200 CEST m=+120.151700911,"""terminate called after throwing an instance of 'Wt::WException'
+  what():  WRasterImage::done() image could not be converted to blob - is your image type supported by GraphicsMagick?
+Magick: abort due to signal 6 (SIGABRT) "Abort"...
+"""
