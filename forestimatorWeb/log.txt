@@ -2819,3 +2819,8 @@
 127.0.0.1 - - [08/Sep/2025:13:13:55 +0100] "GET upload a shp gpkg HTTP/1.1" 200 1000 "-" "Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0"
 127.0.0.1 - - [08/Sep/2025:13:14:00 +0100] "GET Surface analysis report sent to tthissen@uliege.be HTTP/1.1" 200 1000 "-" "Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0"
 127.0.0.1 - - [08/Sep/2025:13:15:58 +0100] "GET Surface analysis report sent to tthissen@uliege.be HTTP/1.1" 200 1000 "-" "Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0"
+127.0.0.1 - - [09/Sep/2025:10:18:58 +0100] "GET /cartographie HTTP/1.1" 200 1000 "-" "Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0"
+127.0.0.1 - - [09/Sep/2025:10:19:17 +0100] "GET display layer MF HTTP/1.1" 200 1000 "-" "Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0"
+127.0.0.1 - - [09/Sep/2025:10:19:58 +0100] "GET display layer COMPO4 HTTP/1.1" 200 1000 "-" "Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0"
+127.0.0.1 - - [09/Sep/2025:10:20:03 +0100] "GET display layer EK_FEE HTTP/1.1" 200 1000 "-" "Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0"
+127.0.0.1 - - [09/Sep/2025:10:20:13 +0100] "GET /cartographie HTTP/1.1" 200 1000 "-" "Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0"

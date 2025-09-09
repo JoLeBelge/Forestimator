@@ -193,7 +193,8 @@ formDesserteForest::formDesserteForest(const WEnvironment &env, cDicoApt *dico, 
     contactPresicion->enterPressed().connect(typeAM, &WWidget::setFocus);
     typeAM->enterPressed().connect(typeProprio, &WWidget::setFocus);
     typeProprio->enterPressed().connect(choixAM, &WWidget::setFocus);
-
+    // openfileBug
+    t.close();
 }
 
 void formDesserteForest::submit(){

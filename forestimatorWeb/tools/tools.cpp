@@ -31,17 +31,22 @@ namespace tools
             {
                 getline(passwordFile, user);
                 getline(passwordFile, pw);
+                passwordFile.close();
             }
             else
             {
                 cout << "Error: Unable to open " << path << endl;
                 cout << "Mail not sent!" << endl;
+                configFile.close();
+                return false;
             }
+            configFile.close();
         }
         else
         {
             cout << "Error: Unable to open configuration file" << endl;
             cout << "Mail not sent!" << endl;
+            return false;
         }
 
         Wt::Mail::Client client;

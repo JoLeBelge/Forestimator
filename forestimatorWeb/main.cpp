@@ -229,6 +229,9 @@ void layerResource::handleRequest(const Http::Request &request, Http::Response &
     std::ifstream r(archiveName.c_str(), std::ios::in | std::ios::binary);
 
     handleRequestPiecewise(request, response, r);
+
+    // openfileBug
+    r.close();
 }
 
 void ForestimatorMainTask::run()
