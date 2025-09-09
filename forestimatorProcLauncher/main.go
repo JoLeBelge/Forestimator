@@ -59,8 +59,8 @@ type proc struct {
 }
 
 func startForestimatorWebServer() (cmd *exec.Cmd) {
-	cmd = exec.Command("sh", "launch.sh") //, "--deploy-path=/ --docroot \"/home/gef/Documents/Forestimator/data/;/favicon.ico,/google52ee6b8ebe0b4b19.html,/sitemap.xml,/resources,/style,/tmp,/data,/js,/jslib,/img,/pdf,/video,resources/themes/bootstrap/5\" --http-port 8001 --http-addr 127.0.0.1 -c /home/gef/Documents/Forestimator/data/wt_config.xml --BD \"/home/gef/Documents/Forestimator/carteApt/data/aptitudeEssDB.db\" --colPath \"Dir\" ")
-	cmd.Dir = "/home/gef/Documents/Forestimator/forestimatorWeb"
+	cmd = exec.Command("sh", "launch.sh") //, "--deploy-path=/ --docroot \"/home/carto/app/Forestimator/data/;/favicon.ico,/google52ee6b8ebe0b4b19.html,/sitemap.xml,/resources,/style,/tmp,/data,/js,/jslib,/img,/pdf,/video,resources/themes/bootstrap/5\" --http-port 8001 --http-addr 127.0.0.1 -c /home/gef/Documents/Forestimator/data/wt_config.xml --BD \"/home/gef/Documents/Forestimator/carteApt/data/aptitudeEssDB.db\" --colPath \"Dir\" ")
+	cmd.Dir = "/home/carto/app/Forestimator/forestimatorWeb"
 	return cmd
 }
 
@@ -294,6 +294,7 @@ func main() {
 	go func() {
 		for {
 			forestimator.cmd = startForestimatorWebServer()
+			log.Println(forestimator.cmd.Args)
 			forestimator.outPipe, _ = forestimator.cmd.StdoutPipe()
 			forestimator.errPipe, _ = forestimator.cmd.StderrPipe()
 			err := forestimator.cmd.Start()
@@ -314,6 +315,7 @@ func main() {
 				}()
 			} else {
 				log.Println("Failed to start Forestimator web server")
+				log.Println(err)
 			}
 			forestimator.cmd.Wait()
 			forestimator.started = false
@@ -323,7 +325,7 @@ func main() {
 		}
 	}()
 	go func() {
-		forestimator.proxy, _ = NewProxy("http://localhost:8001")
+		forestimator.proxy, _ = NewProxy("http://localhost:185")
 		for {
 			if forestimator.started {
 				director := forestimator.proxy.Director
@@ -332,7 +334,7 @@ func main() {
 					recordRequest(&forestimator, r.RequestURI)
 				}
 				http.Handle("/", forestimator.proxy)
-				log.Println(http.ListenAndServe(":8085", nil))
+				log.Println(http.ListenAndServe(":85", nil))
 				log.Println("Proxy server has stopped")
 				log.Println("Restarting now...")
 			}

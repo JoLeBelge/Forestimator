@@ -241,7 +241,7 @@ void ForestimatorMainTask::run()
 
 int main(int argc, char **argv)
 {
-    int nThreads = 16;
+    int nThreads = 2;
     pool = new Pool(new ForestimatorMainTask(&argc, &argv), nThreads);
     pool->start();
     std::cout << "Exit application" << std::endl;
