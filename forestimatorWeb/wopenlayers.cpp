@@ -76,7 +76,8 @@ WOpenLayers::WOpenLayers(cDicoApt *aDico):xy_(this,"1.0"),mDico(aDico),slot(this
     touchStarted().preventDefaultAction(true);
     touchMoved().preventDefaultAction(true);
     touchEnded().preventDefaultAction(true);
-
+    // openfileBug
+    t.close();
     }
 
     // le popup pour afficher la valeur de la couche en cours d'affichage
