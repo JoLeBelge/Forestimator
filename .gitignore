@@ -30,4 +30,5 @@ forestimatorWeb/forestimatorWeb
 forestimatorProcLauncher/logs/*
 forestimatorWeb/Makefile
 *.log
+forestimatorWeb/log.txt
 /home/carto/app/config/forestimator.cfg
