@@ -23,6 +23,9 @@
 #include <memory>
 
 #include "boost/filesystem.hpp"
+#include <boost/uuid/uuid.hpp>
+#include <boost/uuid/uuid_generators.hpp>
+#include <boost/uuid/uuid_io.hpp>
 #include <functional> //--> pour bind
 #include "./libzippp/src/libzippp.h"
 using namespace libzippp;

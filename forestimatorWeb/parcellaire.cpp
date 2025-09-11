@@ -537,21 +537,16 @@ void parcellaire::polygoneCadastre(std::string aFileGeoJson, std::string aLabelN
 
 void parcellaire::doComputingTask()
 {
-    std::string name0 = std::tmpnam(nullptr);
-    std::string name1 = name0.substr(5, name0.size() - 5);
-    std::string filenameOut = mDico->File("TMPDIR") + name1 + ".xml";
+    std::string uuid = boost::uuids::to_string(boost::uuids::random_generator()());
+    std::string filenameOut = mDico->File("TMPDIR") + uuid + ".xml";
 
-    Wt::WFileResource *fileResource = new Wt::WFileResource(filenameOut); // REST
-    fileResource->setMimeType("text/xml");
-    fileResource->suggestFileName("Forestimator-statistiques.xml");
-    fileResource->setUploadProgress(true);
-
+    std::string ressourcePath = "results/" + uuid + ".xml";
     Wt::Mail::Message mail = tools::createMail(
         "JO.Lisein@uliege.be",
         "Lisein Jonathan",
         m_app->getUser().email() == "" ? m_app->getUser().unverifiedEmail() : m_app->getUser().email(),
         Wt::WString::tr("mail.anasMulti.title").toUTF8(),
-        Wt::WString::tr("mail.anasMulti.body").arg(m_app->getUser().identity(Wt::Auth::Identity::LoginName)).arg(mLabelName == "" ? mClientName : mLabelName).arg(fileResource->url()).toUTF8());
+        Wt::WString::tr("mail.anasMulti.body").arg(m_app->getUser().identity(Wt::Auth::Identity::LoginName)).arg(mLabelName == "" ? mClientName : mLabelName).arg(ressourcePath).toUTF8());
 
     parcellaire::TaskComputing *analyseSurfacique = new parcellaire::TaskComputing(geoJsonName(), mGL, filenameOut, &m_app);
     analyseSurfacique->setCallbackAfter([this, mail]() -> void
