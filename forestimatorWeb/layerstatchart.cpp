@@ -367,6 +367,7 @@ void staticMap::addPols(std::vector<OGRPolygon *> vpol, Wt::WColor col){
 void staticMap::addImg(std::string afileName){
     std::cout << "staticMap::addImg" << std::endl;
     // création d'un wrasterImage et copier dedans l'image existante
+    // TODO: Crash lamentablement Segfault log du 11/09/2025 14:08:23 "Invalid dataset dimensions : 500 x -2147483648"
     if (exists(afileName)){
 
         // image static map

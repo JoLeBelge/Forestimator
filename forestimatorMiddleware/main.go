@@ -185,7 +185,7 @@ func recordTerminalLogs(p *proc) {
 		openFile.Write([]byte("date, log"))
 		openFile.Write([]byte("\n"))
 	}
-	text := make([]byte, p.bufferSize, p.bufferSize)
+	text := make([]byte, p.bufferSize)
 	t, _ := p.outPipe.Read(text)
 	openFile.Write([]byte(strings.Split(time.Now().String(), "+")[0]))
 	openFile.Write([]byte(",\"\"\""))
@@ -204,7 +204,7 @@ func recordErrorLogs(p *proc) {
 		openFile.Write([]byte("date, log"))
 		openFile.Write([]byte("\n"))
 	}
-	text := make([]byte, p.bufferSize, p.bufferSize)
+	text := make([]byte, p.bufferSize)
 	t, _ := p.errPipe.Read(text)
 	openFile.Write([]byte(strings.Split(time.Now().String(), "+")[0]))
 	openFile.Write([]byte(",\"\"\""))
@@ -351,8 +351,8 @@ func main() {
 
 	}()
 	go func() {
-		forestimator.proxy, _ = NewProxy("http://localhost:185")
-		forestimator.downloader, _ = NewProxy("http://localhost:8080")
+		forestimator.proxy, _ = NewProxy("http://localhost:8500")
+		forestimator.downloader, _ = NewProxy("http://localhost:8501")
 		for {
 			if forestimator.started {
 				director := forestimator.proxy.Director

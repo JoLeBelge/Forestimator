@@ -36,7 +36,7 @@ func main() {
 
 	http.HandleFunc("/results/", handleDownload)
 
-	addr := ":8080"
+	addr := ":8501"
 	log.Printf("Download server running on %s", addr)
 	log.Fatal(http.ListenAndServe(addr, nil))
 }
@@ -75,7 +75,7 @@ func handleDownload(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Serve file with download headers
-	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=%q", info.Name()))
+	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=%q", "AnalyseSurfaciqueForestimator.xml"))
 	http.ServeFile(w, r, filePath)
 }
 
