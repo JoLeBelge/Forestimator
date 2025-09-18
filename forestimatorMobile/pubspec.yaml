@@ -2,7 +2,7 @@ name: fforestimator
 description: Une application cartographique pour les forestiers wallons qui permet d'obtenir de nombreux renseignements sur les stations forestières et sur les peuplements en place.
 
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
-version: 2.0.0+20
+version: 2.0.0+21
 
 environment:
   sdk: '>=3.7.2 <4.0.0'
@@ -18,10 +18,10 @@ dependencies:
   tuple: ^2.0.2
   flutter_downloader: ^1.12.0
   geolocator: ^14.0.0
-  connectivity_plus: ^6.0.1 # te dis si tu es connecté au wifi ou à la data, mais pas si tu as accès à internet. pas suffisant donc
+  connectivity_plus: ^7.0.0 # te dis si tu es connecté au wifi ou à la data, mais pas si tu as accès à internet. pas suffisant donc
   internet_connection_checker_plus: ^2.3.0
   latlong2: ^0.9.0
-  go_router: ^15.1.1
+  go_router: ^16.2.1
   flutter_pdfview: ^1.2.7
   flutter_map_location_marker: ^10.1.0
   image: ^4.5.4
@@ -32,7 +32,7 @@ dependencies:
   downloadsfolder: ^1.1.0
   permission_handler: ^12.0.0+1
   memory_info: ^0.0.4
-  device_info_plus: ^11.4.0
+  device_info_plus: ^12.1.0
   proj4dart: ^2.1.0
   area_polygon: ^1.0.2
   archive: ^4.0.7
@@ -45,7 +45,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
 
-  flutter_lints: ^5.0.0
+  flutter_lints: ^6.0.0
 # Here i try to solve an issue that occurs while compiling for iOS - JL I comment that to compile in apk
 #  dependency_overrides:
 #  win32: ^5.5.0

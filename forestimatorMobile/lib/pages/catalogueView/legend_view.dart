@@ -208,7 +208,7 @@ class _LegendView extends State<LegendView> {
     }
   }
 
-  BoxConstraints _initConstraints(x, x_, y, y_) {
+  BoxConstraints _initConstraints(double x, x_, y, y_) {
     return BoxConstraints(
       minHeight: x,
       maxHeight: x_,

@@ -8,7 +8,7 @@ import 'package:proj4dart/proj4dart.dart' as proj4;
 import 'package:latlong2/latlong.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-const String forestimatorMobileVersion = "2.0.0 - build 16";
+const String forestimatorMobileVersion = "2.0.0 - build 21";
 const double globalMinZoom = 4.0;
 const double globalMaxZoom = 13.0;
 const double globalMinOfflineZoom = 8.0;
@@ -44,7 +44,7 @@ class Display {
 
 Display? display;
 
-void initializeDisplayInfos(context) {
+void initializeDisplayInfos(BuildContext context) {
   display = Display(context);
   print(display.toString());
 }

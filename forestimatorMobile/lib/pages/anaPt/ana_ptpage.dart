@@ -171,7 +171,7 @@ class LayerAnaPtListTile extends StatelessWidget {
   final LayerAnaPt data;
   const LayerAnaPtListTile({super.key, required this.data});
 
-  Widget _leadingSymbol(var icon) {
+  Widget _leadingSymbol(IconData icon) {
     return Container(
       alignment: Alignment.center,
       constraints: BoxConstraints(

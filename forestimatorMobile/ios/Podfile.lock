@@ -91,7 +91,7 @@ SPEC CHECKSUMS:
   connectivity_plus: cb623214f4e1f6ef8fe7403d580fdad517d2f7dd
   device_info_plus: 21fcca2080fbcd348be798aa36c3e5ed849eefbe
   downloadsfolder: 7d5c7b5d23e3c4dded522ff2a2ef14a56846378a
-  Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
+  Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
   flutter_downloader: 78da0da1084e709cbfd3b723c7ea349c71681f09
   flutter_pdfview: 32bf27bda6fd85b9dd2c09628a824df5081246cf
   flutter_rotation_sensor: bf55ead3f64f27207dacc5972fe8ebe932f3de0b
@@ -105,6 +105,6 @@ SPEC CHECKSUMS:
   sqflite_darwin: 20b2a3a3b70e43edae938624ce550a3cbf66a3d0
   url_launcher_ios: 694010445543906933d732453a59da0a173ae33d
 
-PODFILE CHECKSUM: eb9e77a5e1b146fcd48fa8ba8074fef1af6a394f
+PODFILE CHECKSUM: 4a807ffdadb45d4078d02cf5a9b4df8fa91a23d1
 
 COCOAPODS: 1.16.2
