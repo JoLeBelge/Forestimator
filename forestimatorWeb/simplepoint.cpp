@@ -389,7 +389,9 @@ void pointPdfResource::handleRequest(const Http::Request &request, Http::Respons
     unsigned int size = HPDF_GetStreamSize (pdf);
     HPDF_BYTE * buf = new HPDF_BYTE [size];
     HPDF_ReadFromStream (pdf, buf, & size);
-    HPDF_Free (pdf);
+
+    HPDF_FreeDocAll(pdf);
+    // Bug memoryleak HPDF_Free (pdf);
     response.out (). write ((char *) buf, size);
     delete [] buf;
 }

@@ -14,7 +14,8 @@
         "stdexcept": "cpp",
         "streambuf": "cpp",
         "functional": "cpp",
-        "regex": "cpp"
+        "regex": "cpp",
+        "Response.C": "cpp"
     },
     "cmake.configureOnOpen": false
 }
