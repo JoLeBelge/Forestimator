@@ -30,7 +30,7 @@ class AptsFEE {
   late int nt, nh, zbio, topo;
   late bool ready;
 
-  Map<String, int> getListEss(codeApt) {
+  Map<String, int> getListEss(int codeApt) {
     Map<String, int> aRes = {};
     for (String esCode in mApts.keys) {
       if (gl.dico.aptContraignante(mApts[esCode]!) == codeApt) {
@@ -106,7 +106,7 @@ class PropositionGS {
   //late String aVariante;
   late bool ready;
 
-  Map<String, int> getListEss(codeApt) {
+  Map<String, int> getListEss(int codeApt) {
     Map<String, int> aRes = {};
     for (String esCode in mApts.keys) {
       if (mApts[esCode] == codeApt) {
