@@ -114,7 +114,9 @@ void rasterClipResource::handleRequest(const Http::Request &request,Http::Respon
                 // on définit la palette de couleur associé à ce raster croppé
                 l->createRasterColorInterpPalette(pCroppedRaster->GetRasterBand(1));
                 GDALClose(pInputRaster);
-                if( pCroppedRaster != NULL ){GDALClose( (GDALDatasetH) pCroppedRaster );}
+                if( pCroppedRaster != NULL ){
+                    GDALClose( (GDALDatasetH) pCroppedRaster );
+                }
                 std::ifstream r(out, std::ios::in | std::ios::binary);
                 response.addHeader("Content-Type","image/tiff");
                 response.out() << r.rdbuf();

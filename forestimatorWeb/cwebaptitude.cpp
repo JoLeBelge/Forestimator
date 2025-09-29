@@ -175,6 +175,8 @@ cWebAptitude::cWebAptitude(const Wt::WEnvironment& env, cDicoApt *dico)
                     aOut <<"\n\n<br> <br/>" ;
                 }
             }
+            // bug too many open files
+            theFile.close();
         }
         std::cout << " ---------------- export done\n" << std::endl;
         aOut.close();

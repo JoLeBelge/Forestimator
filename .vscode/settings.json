@@ -1,6 +1,21 @@
 {
     "files.associations": {
-        "WStreamResource.C": "cpp"
+        "WStreamResource.C": "cpp",
+        "*.js": "cpp",
+        "system_error": "cpp",
+        "random": "cpp",
+        "fstream": "cpp",
+        "iostream": "cpp",
+        "istream": "cpp",
+        "limits": "cpp",
+        "new": "cpp",
+        "ostream": "cpp",
+        "ratio": "cpp",
+        "stdexcept": "cpp",
+        "streambuf": "cpp",
+        "functional": "cpp",
+        "regex": "cpp",
+        "Response.C": "cpp"
     },
     "cmake.configureOnOpen": false
 }
