@@ -228,6 +228,8 @@ formVielleCoupeRase::formVielleCoupeRase(const WEnvironment &env, cDicoApt *dico
 
     WPushButton * bSubmit = tpl->bindWidget("bsubmit", std::make_unique<WPushButton>(WString::tr("submit")));
     bSubmit->clicked().connect([=] {submit();});
+    // openfileBug
+    t.close();
 }
 
 void formVielleCoupeRase::submit(){
@@ -624,6 +626,7 @@ void formVielleCoupeRase::sendSummaryMail(){
     mail.setSubject("ACR - encodage");
     mail.setBody(SQLstring);
     client.send(mail);
+    // TODO: control if this mail is really sent or if we use tools.h
 }
 
 

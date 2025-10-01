@@ -177,7 +177,7 @@ void groupLayers::clickOnName(std::string aCode)
     //  udpate du rendu visuel de tout les labels de couches -- cela se situe au niveau du grouplayer
     updateActiveLay(aCode);
 
-    TypeLayer type;
+    TypeLayer type = TypeLayer::Init;
     std::shared_ptr<Layer> layer;
     for (std::shared_ptr<Layer> l : mVLs)
     {
@@ -194,7 +194,7 @@ void groupLayers::clickOnName(std::string aCode)
 
     // changer le mode CS vs FEE de grouplayer, utilise pour le tableau d'aptitude
     // attention de ne pas prendre la couche "CS_FEE" dans le tas (pour Chêne Sessile).
-    if ((type == TypeLayer::CS) | (type == TypeLayer::KK) | (type == TypeLayer::Station & aCode.substr(0, 2) == "CS"))
+    if ((type == TypeLayer::CS) || (type == TypeLayer::KK) || (type == TypeLayer::Station && aCode.substr(0, 2) == "CS"))
     {
         if (globTest)
         {
@@ -379,13 +379,9 @@ void groupLayers::computeStatGlob(OGRGeometry *poGeomGlobale)
     m_app->addLog("compute stat, " + std::to_string(getNumSelect4Download()) + " traitements", typeLog::anas); // add some web stats
 }
 
-void groupLayers::computeStatAllPol(OGRLayer *lay, WFileResource *fileResource)
+void groupLayers::computeStatAllPol(OGRLayer *lay, std::string path)
 {
-    // std::cout << " computeStatAllPol::computeStatAllPol " << std::endl;
-    std::string name0 = std::tmpnam(nullptr);
-    std::string name1 = name0.substr(5, name0.size() - 5);
-    std::string aOut = mDico->File("TMPDIR") + "/" + name1 + ".xml";
-    std::ofstream aFile(aOut.c_str());
+    std::ofstream aFile(path.c_str());
     aFile.precision(10);
 
     aFile << "<layerStat>\n";
@@ -427,10 +423,8 @@ void groupLayers::computeStatAllPol(OGRLayer *lay, WFileResource *fileResource)
         aFile << "</feature>\n";
     }
     aFile << "</layerStat>\n";
-
     aFile.close();
-    fileResource->setFileName(aOut);
-    fileResource->suggestFileName("Forestimator-statistiques.xml");
+    return;
 }
 
 /**
@@ -994,12 +988,7 @@ int groupLayers::getNumSelect4Download() { return mSelectLayers->numSelectedLaye
 std::vector<std::shared_ptr<Layer>> groupLayers::getSelectedLayer4Download() { return mSelectLayers->getSelectedLayer(); }
 
 bool isValidXmlIdentifier(std::string str){
-    if(str.find("??") == UINTMAX_MAX){
-        return true;
-    }
-    else{
-        return false;
-    }
+    return str.find("??") == UINTMAX_MAX;
 }
 
 

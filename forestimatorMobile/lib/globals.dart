@@ -8,7 +8,7 @@ import 'package:proj4dart/proj4dart.dart' as proj4;
 import 'package:latlong2/latlong.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-const String forestimatorMobileVersion = "2.0.0 - build 16";
+const String forestimatorMobileVersion = "2.0.0 - build 21";
 const double globalMinZoom = 4.0;
 const double globalMaxZoom = 13.0;
 const double globalMinOfflineZoom = 8.0;
@@ -28,26 +28,75 @@ class Display {
   double? dpi;
   double? aspect;
   Orientation? orientation;
+  double? equipixel;
+  double? equiwidth;
+  double? equiheight;
+
   Display(BuildContext context) {
     width = MediaQuery.of(context).size.width;
     height = MediaQuery.of(context).size.height;
     aspect = MediaQuery.of(context).size.aspectRatio;
     dpi = MediaQuery.of(context).devicePixelRatio;
     orientation = MediaQuery.of(context).orientation;
+    equipixel = width! > height! ? height! * .01 : width! * .01;
+    equiwidth = width! / equipixel!;
+    equiheight = height! / equipixel!;
   }
 
   @override
   String toString() {
-    return "width: ${display?.width}\nheight: ${display!.height}\ndpi: ${display!.dpi}\naspect: ${display!.aspect}\norientation: ${display!.orientation!.name}";
+    return "width: $width\nheight: $height\ndpi: $dpi\naspect: $aspect\norientation: ${orientation!.name}\nequipixel: $equipixel\nequiwidth: $equiwidth\nequiheight: $equiheight";
   }
 }
 
 Display? display;
 
-void initializeDisplayInfos(context) {
+void initializeDisplayInfos(BuildContext context) {
   display = Display(context);
   print(display.toString());
 }
+
+// Visual sizes of menus etc.
+// Menus
+double menuBarThickness = 20;
+double menuBarLength = 65;
+double iconSize = 12;
+double iconSizeSettings = 8;
+double iconSpaceBetween = 8;
+// Top Bar
+double topAppInfoBarThickness = 10;
+double topAppForestimatorFontHeight = 5;
+double topAppForestimatorFontWidth = 60;
+// Offline loading box
+double loadingMapBoxWidth = 70;
+double loadingMapBoxHeight = 15;
+// General Fonts
+double smallFontSize = 3;
+double mediumFontSize = 6;
+double largeFontSize = 12;
+// Polygons
+double chosenPolyBarWidth = 95;
+double chosenPolyBarHeight = 25;
+double infoBoxPolygon = 30;
+// AnaPtPreview
+double anaPtBoxSize = 10;
+// PopupWindows
+double popupWindowsStartHeight = 50;
+double popupWindowsWidth = 95;
+double popupReturnButtonHeight = menuBarThickness;
+double popupReturnButtonWidth = menuBarLength;
+// Popup Poly List
+double polyListCardHeight = 22;
+double polyListSelectedCardHeight = 37;
+double polyListCardWidth = 50;
+double polyListSelectedCardWidth = 100;
+// search location
+double searchBarHeight = 15;
+double searchBarWidth = 75;
+// Layer Switcher
+double layerSwitcherHeight = 75;
+double layerSwitcherCatalogueHeight = 30;
+double layerswitcherWidth = 80;
 
 proj4.Projection epsg4326 = proj4.Projection.get('EPSG:4326')!;
 proj4.Projection epsg31370 =

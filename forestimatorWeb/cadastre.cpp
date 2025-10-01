@@ -234,7 +234,10 @@ std::string cadastre::createPolygonDiv(int aDivCode){
                 if (poFeature->GetFieldAsInteger("CaDiKey")==aDivCode){
                     // j'exporte ce polygone au format json
                     aRes=saveFeatAsGEOJSON(poFeature);
-                    break;
+                    // break;
+                    GDALClose(mDS);
+                    return aRes;
+                    // bug too many files open
                 }
             }
         }
@@ -262,7 +265,10 @@ std::string cadastre::createPolygonCommune(int aINScode){
                 if (poFeature->GetFieldAsInteger("AdMuKey")==aINScode){
                     // j'exporte ce polygone au format json, je le sauve dans un fichier, me retourne le nom du fichier
                     aRes=saveFeatAsGEOJSON(poFeature);
-                    break;
+                    //break;
+                    GDALClose(mDS);
+                    return aRes;
+                    // bug too many files open
                 }
             }
         }

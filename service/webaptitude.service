@@ -3,7 +3,8 @@ Description=Server WEB Forestimator de Jo Lisein.
 
 [Service]
 Type=simple
-ExecStart=/bin/bash /data1/Forestimator/service/webaptitude.sh
+#ExecStart=/bin/bash /data1/Forestimator/service/webaptitude.sh
+ExecStart=/bin/bash /home/app/Forestimator/forestimatorProcLauncher/launch.sh
 Restart=always
 
 [Install]

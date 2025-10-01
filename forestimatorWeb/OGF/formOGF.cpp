@@ -142,6 +142,9 @@ formOGF::formOGF(const WEnvironment &env, cDicoApt *dico, std::string aFileDB) :
 
     WPushButton * bSubmit = tpl->bindWidget("bsubmit", std::make_unique<WPushButton>(WString::tr("submit")));
     bSubmit->clicked().connect([=] {submit();});
+
+    // openfileBug
+    t.close();
 }
 
 void formOGF::submit(){
@@ -495,4 +498,5 @@ void formOGF::sendSummaryMail(){
     mail.setSubject("Forêt subnaturelle - encodage");
     mail.setBody(SQLstring);
     client.send(mail);
+    //TODO: c'est qoui cette façon d'envoier un mail
 }

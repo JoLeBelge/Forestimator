@@ -1,5 +1,4 @@
 #include "main.h"
-
 extern bool globTest;
 extern std::string columnPath;
 
@@ -39,7 +38,7 @@ int launchForestimator(int argc, char **argv)
 
     try
     {
-        Wt::WServer server{argc, argv, WTHTTP_CONFIGURATION};
+        Wt::WServer server = Wt::WServer(argc, argv, WTHTTP_CONFIGURATION);
 
         // set first ressources with sub-folder /api/
         // then add entry point for the web site
@@ -230,17 +229,22 @@ void layerResource::handleRequest(const Http::Request &request, Http::Response &
     std::ifstream r(archiveName.c_str(), std::ios::in | std::ios::binary);
 
     handleRequestPiecewise(request, response, r);
+
+    // openfileBug
+    r.close();
 }
 
 void ForestimatorMainTask::run()
 {
+    //double arr[4] = {1.,2.,3.,5.};
+    //std::cout << arr[1] / 0. << std::endl;
     launchForestimator(*argc, *argv);
     return;
 }
 
 int main(int argc, char **argv)
 {
-    int nThreads = 1;
+    int nThreads = 2;
     pool = new Pool(new ForestimatorMainTask(&argc, &argv), nThreads);
     pool->start();
     std::cout << "Exit application" << std::endl;

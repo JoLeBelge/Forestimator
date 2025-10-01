@@ -543,13 +543,5 @@ Pour réaliser des statistiques, Forestimator collecte également et traite <mar
 <message id="IGN.label">Topographie : CartoWeb</message>
 <message id="MNT.label">Altitude du sol</message>
 <message id="SWC.label">Réserve en eau</message>
-<message id="MF.label">Masque forestier</message>
-<message id="COMPO.label">Composition des essences</message>
-<message id="MNH.label">Hauteur de la végétation</message>
-<message id="dendro.label">Modèle dendro</message>
-<message id="ES_EP.label">Crise du scolyte</message>
-<message id="IGN.label">Topographie : CartoWeb</message>
-<message id="MNT.label">Altitude du sol</message>
-<message id="SWC.label">Réserve en eau</message>
 </messages>
 

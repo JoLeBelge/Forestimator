@@ -19,7 +19,6 @@ void Pool::waitForThreadsToFinish()
 {
     for (size_t i = 1; i < nThreads; i++)
     {
-        // std::cout << "Here" << i << std::endl;
         cThreads[i]->finish.wait();
     }
     return;
@@ -163,6 +162,7 @@ void Pool::CoreThread::run()
             {
                 this->idle = 0;
                 task->run();
+                task->whenFinished();
                 delete (task);
             }
             else

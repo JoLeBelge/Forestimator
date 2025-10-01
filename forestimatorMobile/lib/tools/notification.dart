@@ -227,10 +227,10 @@ class PopupNameIntroducer {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text("Changez de nom"),
+          title: Text("Nommez le polygone"),
           content: SingleChildScrollView(
             child: TextFormField(
-              maxLength: 25,
+              maxLength: 22,
               maxLengthEnforcement: MaxLengthEnforcement.enforced,
               onChanged: (String str) {
                 state(str);
@@ -253,16 +253,16 @@ class PopupNameIntroducer {
   }
 }
 
-class DrawnLayerMenu extends StatefulWidget {
+class PolygonListMenu extends StatefulWidget {
   final Function(LatLng) state;
 
-  const DrawnLayerMenu({super.key, required this.state});
+  const PolygonListMenu({super.key, required this.state});
 
   @override
   State<StatefulWidget> createState() => _DrawnLayerMenu();
 }
 
-class _DrawnLayerMenu extends State<DrawnLayerMenu> {
+class _DrawnLayerMenu extends State<PolygonListMenu> {
   final Color active = Colors.black;
   final Color inactive = const Color.fromARGB(255, 92, 92, 92);
   @override
@@ -274,6 +274,10 @@ class _DrawnLayerMenu extends State<DrawnLayerMenu> {
         constraints: BoxConstraints(minHeight: 50),
         child: ReorderableListView(
           buildDefaultDragHandles: true,
+          scrollDirection:
+              gl.display!.orientation!.index == 0
+                  ? Axis.vertical
+                  : Axis.horizontal,
           padding: const EdgeInsets.symmetric(horizontal: 2),
           onReorder: (int oldIndex, int newIndex) {
             setState(() {
@@ -329,14 +333,23 @@ class _DrawnLayerMenu extends State<DrawnLayerMenu> {
                         i == gl.selectedPolygonLayer
                             ? WidgetStateProperty<Size>.fromMap(
                               <WidgetStatesConstraint, Size>{
-                                WidgetState.any: Size(200, 160),
+                                WidgetState.any: Size(
+                                  gl.display!.equipixel! *
+                                      gl.polyListSelectedCardWidth,
+                                  gl.display!.equipixel! *
+                                      gl.polyListSelectedCardHeight,
+                                ),
                               },
                             )
-                            : WidgetStateProperty<Size>.fromMap(
-                              <WidgetStatesConstraint, Size>{
-                                WidgetState.any: Size(200, 120),
-                              },
-                            ),
+                            : WidgetStateProperty<Size>.fromMap(<
+                              WidgetStatesConstraint,
+                              Size
+                            >{
+                              WidgetState.any: Size(
+                                gl.display!.equipixel! * gl.polyListCardWidth,
+                                gl.display!.equipixel! * gl.polyListCardHeight,
+                              ),
+                            }),
                   ),
                   key: Key('$i'),
                   onPressed:
@@ -366,184 +379,240 @@ class _DrawnLayerMenu extends State<DrawnLayerMenu> {
                       color:
                           i == gl.selectedPolygonLayer
                               ? gl.polygonLayers[i].colorInside.withAlpha(255)
-                              : Colors.grey.withAlpha(100),
+                              : Colors.grey.withAlpha(150),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          IconButton(
-                            onPressed:
-                                i == gl.selectedPolygonLayer
-                                    ? () {
-                                      PopupDoYouReally(
-                                        gl.notificationContext!,
-                                        () {
-                                          setState(() {
-                                            //remove polygon
-                                            if (i > 0) {
-                                              gl.polygonLayers.removeAt(i);
-                                              gl.selectedPolygonLayer--;
-                                            } else if (i == 0 &&
-                                                gl.polygonLayers.isNotEmpty) {
-                                              gl.polygonLayers.removeAt(i);
-                                            }
-                                          });
-                                          gl.saveChangesToPolygoneToPrefs =
-                                              true;
-                                        },
-                                        "Message",
-                                        "\nVoulez vous vraiment supprimer ${gl.polygonLayers[i].name}?\n",
-                                      );
-                                    }
-                                    : () {
-                                      setState(() {});
-                                    },
-                            icon: Icon(
-                              Icons.delete_forever,
-                              color: activeTextColor,
-                              size: gl.selectedPolygonLayer == i ? 30 : 20,
-                            ),
-                          ),
-                          Column(
-                            children: [
-                              i == gl.selectedPolygonLayer
-                                  ? TextButton(
-                                    child: Text(
-                                      gl.polygonLayers[i].name,
-                                      style: TextStyle(color: activeTextColor),
-                                      textScaler: TextScaler.linear(1.1),
-                                    ),
-                                    onPressed: () {
-                                      PopupNameIntroducer(
-                                        context,
-                                        gl.polygonLayers[i].name,
-                                        (String nameIt) {
-                                          setState(() {
-                                            gl.polygonLayers[i].name = nameIt;
+                          SizedBox(
+                            width: gl.display!.equipixel! * gl.iconSize * 1.1,
+                            child: IconButton(
+                              onPressed:
+                                  i == gl.selectedPolygonLayer
+                                      ? () {
+                                        PopupDoYouReally(
+                                          gl.notificationContext!,
+                                          () {
+                                            setState(() {
+                                              //remove polygon
+                                              if (i > 0) {
+                                                gl.polygonLayers.removeAt(i);
+                                                gl.selectedPolygonLayer--;
+                                              } else if (i == 0 &&
+                                                  gl.polygonLayers.isNotEmpty) {
+                                                gl.polygonLayers.removeAt(i);
+                                              }
+                                            });
                                             gl.saveChangesToPolygoneToPrefs =
                                                 true;
-                                          });
-                                        },
-                                        () {
-                                          setState(() {});
-                                        },
-                                      );
-                                    },
-                                  )
-                                  : Text(
-                                    gl.polygonLayers[i].name,
-                                    style: TextStyle(color: activeTextColor),
-                                    textScaler: TextScaler.linear(1.0),
-                                  ),
-
-                              i == gl.selectedPolygonLayer
-                                  ? Text(
-                                    "${(gl.polygonLayers[i].area / 100).round() / 100} Ha",
-                                    style: TextStyle(color: activeTextColor),
-                                    textScaler: TextScaler.linear(1.2),
-                                  )
-                                  : Text(
-                                    "${(gl.polygonLayers[i].area / 100).round() / 100} Ha",
-                                    style: TextStyle(color: activeTextColor),
-                                    textScaler: TextScaler.linear(1.0),
-                                  ),
-                              i == gl.selectedPolygonLayer
-                                  ? Text(
-                                    "${(gl.polygonLayers[i].perimeter).round() / 1000} km",
-                                    style: TextStyle(color: activeTextColor),
-                                    textScaler: TextScaler.linear(1.2),
-                                  )
-                                  : Text(
-                                    "${(gl.polygonLayers[i].perimeter).round() / 1000} km",
-                                    style: TextStyle(color: activeTextColor),
-                                    textScaler: TextScaler.linear(1.0),
-                                  ),
-                            ],
+                                          },
+                                          "Message",
+                                          "\nVoulez vous vraiment supprimer ${gl.polygonLayers[i].name}?\n",
+                                        );
+                                      }
+                                      : () {
+                                        setState(() {});
+                                      },
+                              icon: Icon(
+                                Icons.delete_forever,
+                                color: activeTextColor,
+                                size:
+                                    gl.selectedPolygonLayer == i
+                                        ? gl.display!.equipixel! *
+                                            gl.iconSize *
+                                            .75
+                                        : gl.display!.equipixel! *
+                                            gl.iconSize *
+                                            .5,
+                              ),
+                            ),
                           ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Column(
-                                children: [
-                                  IconButton(
-                                    onPressed:
-                                        gl.selectedPolygonLayer == i
-                                            ? () {
-                                              PopupColorChooser(
-                                                gl.polygonLayers[i].colorInside,
+                          SizedBox(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                i == gl.selectedPolygonLayer
+                                    ? TextButton(
+                                      child: Container(
+                                        constraints: BoxConstraints(
+                                          maxWidth:
+                                              gl.display!.orientation!.index ==
+                                                      1
+                                                  ? gl.display!.equipixel! *
+                                                      gl.polyListSelectedCardWidth *
+                                                      .5
+                                                  : gl.display!.equipixel! *
+                                                      gl.display!.equiwidth! *
+                                                      .5,
+                                        ),
+                                        child: Text(
+                                          gl.polygonLayers[i].name,
+                                          style: TextStyle(
+                                            color: activeTextColor,
+                                            fontSize:
+                                                gl.display!.equipixel! *
+                                                gl.mediumFontSize *
+                                                .85,
+                                          ),
+                                        ),
+                                      ),
+                                      onPressed: () {
+                                        PopupNameIntroducer(
+                                          context,
+                                          gl.polygonLayers[i].name,
+                                          (String nameIt) {
+                                            setState(() {
+                                              gl.polygonLayers[i].name = nameIt;
+                                              gl.saveChangesToPolygoneToPrefs =
+                                                  true;
+                                            });
+                                          },
+                                          () {
+                                            setState(() {});
+                                          },
+                                        );
+                                      },
+                                    )
+                                    : Container(
+                                      constraints: BoxConstraints(
+                                        maxWidth:
+                                            gl.display!.orientation!.index == 1
+                                                ? gl.display!.equipixel! *
+                                                    gl.polyListCardWidth *
+                                                    .5
+                                                : gl.display!.equipixel! *
+                                                    gl.polyListSelectedCardWidth *
+                                                    .5,
+                                      ),
+                                      child: Text(
+                                        gl.polygonLayers[i].name,
+                                        style: TextStyle(
+                                          color: activeTextColor,
+                                          fontSize:
+                                              gl.display!.equipixel! *
+                                              gl.mediumFontSize *
+                                              .85,
+                                        ),
+                                      ),
+                                    ),
+
+                                i == gl.selectedPolygonLayer
+                                    ? Text(
+                                      "${(gl.polygonLayers[i].area / 100).round() / 100} Ha",
+                                      style: TextStyle(
+                                        color: activeTextColor,
+                                        fontSize:
+                                            gl.display!.equipixel! *
+                                            gl.smallFontSize *
+                                            1.3,
+                                      ),
+                                    )
+                                    : SizedBox(),
+                                i == gl.selectedPolygonLayer
+                                    ? Text(
+                                      "${(gl.polygonLayers[i].perimeter).round() / 1000} km",
+                                      style: TextStyle(
+                                        color: activeTextColor,
+                                        fontSize:
+                                            gl.display!.equipixel! *
+                                            gl.smallFontSize *
+                                            1.3,
+                                      ),
+                                    )
+                                    : SizedBox(),
+                              ],
+                            ),
+                          ),
+                          SizedBox(
+                            width:
+                                gl.display!.orientation!.index == 1 &&
+                                        i != gl.selectedPolygonLayer
+                                    ? 0.0
+                                    : gl.display!.equipixel! *
+                                        gl.iconSize *
+                                        1.1,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Column(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    gl.selectedPolygonLayer == i
+                                        ? IconButton(
+                                          onPressed: () {
+                                            PopupColorChooser(
+                                              gl.polygonLayers[i].colorInside,
+                                              gl.notificationContext!,
+                                              //change color
+                                              (Color col) {
+                                                setState(() {
+                                                  gl.polygonLayers[i]
+                                                      .setColorInside(col);
+                                                  gl.polygonLayers[i]
+                                                      .setColorLine(
+                                                        Color.fromRGBO(
+                                                          (col.r * 255).round(),
+                                                          (col.g * 255).round(),
+                                                          (col.b * 255).round(),
+                                                          1.0,
+                                                        ),
+                                                      );
+                                                });
+                                                gl.saveChangesToPolygoneToPrefs =
+                                                    true;
+                                              },
+                                              () {},
+                                            );
+                                          },
+                                          icon: Icon(
+                                            Icons.color_lens,
+                                            color: activeTextColor,
+                                            size:
+                                                gl.display!.equipixel! *
+                                                gl.iconSize *
+                                                .75,
+                                          ),
+                                        )
+                                        : SizedBox(),
+                                    gl.selectedPolygonLayer == i
+                                        ? IconButton(
+                                          onPressed: () async {
+                                            if (await gl.polygonLayers[i]
+                                                .onlineSurfaceAnalysis()) {
+                                              PopupResultsMenu(
                                                 gl.notificationContext!,
-                                                //change color
-                                                (Color col) {
-                                                  setState(() {
-                                                    gl.polygonLayers[i]
-                                                        .setColorInside(col);
-                                                    gl.polygonLayers[i]
-                                                        .setColorLine(
-                                                          Color.fromRGBO(
-                                                            (col.r * 255)
-                                                                .round(),
-                                                            (col.g * 255)
-                                                                .round(),
-                                                            (col.b * 255)
-                                                                .round(),
-                                                            1.0,
-                                                          ),
-                                                        );
-                                                  });
-                                                  gl.saveChangesToPolygoneToPrefs =
-                                                      true;
+                                                gl
+                                                    .polygonLayers[gl
+                                                        .selectedPolygonLayer]
+                                                    .decodedJson,
+                                                () {
+                                                  if (mounted) {
+                                                    setState(() {});
+                                                  }
+                                                  (() {});
                                                 },
-                                                () {},
+                                                () {
+                                                  if (mounted) {
+                                                    setState(() {});
+                                                  }
+                                                },
                                               );
                                             }
-                                            : () {},
-                                    icon: Icon(
-                                      Icons.color_lens,
-                                      color: activeTextColor,
-                                      size:
-                                          gl.selectedPolygonLayer == i
-                                              ? 30
-                                              : 20,
-                                    ),
-                                  ),
-                                  IconButton(
-                                    onPressed:
-                                        gl.selectedPolygonLayer == i
-                                            ? () async {
-                                              if (await gl.polygonLayers[i]
-                                                  .onlineSurfaceAnalysis()) {
-                                                PopupResultsMenu(
-                                                  gl.notificationContext!,
-                                                  gl
-                                                      .polygonLayers[gl
-                                                          .selectedPolygonLayer]
-                                                      .decodedJson,
-                                                  () {
-                                                    if (mounted) {
-                                                      setState(() {});
-                                                    }
-                                                    (() {});
-                                                  },
-                                                  () {
-                                                    if (mounted) {
-                                                      setState(() {});
-                                                    }
-                                                  },
-                                                );
-                                              }
-                                            }
-                                            : () {},
-                                    icon: Icon(
-                                      Icons.analytics,
-                                      color: activeTextColor,
-                                      size:
-                                          gl.selectedPolygonLayer == i
-                                              ? 30
-                                              : 20,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
+                                          },
+                                          icon: Icon(
+                                            Icons.analytics,
+                                            color: activeTextColor,
+                                            size:
+                                                gl.display!.equipixel! *
+                                                gl.iconSize *
+                                                .75,
+                                          ),
+                                        )
+                                        : SizedBox(),
+                                  ],
+                                ),
+                              ],
+                            ),
                           ),
                         ],
                       ),
@@ -558,13 +627,32 @@ class _DrawnLayerMenu extends State<DrawnLayerMenu> {
                   child: Card(
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children: [Icon(Icons.add, size: 30)],
+                      children: [
+                        Icon(
+                          Icons.add,
+                          size: gl.iconSize * gl.display!.equipixel!,
+                        ),
+                      ],
                     ),
                   ),
                   onPressed: () {
                     setState(() {
                       gl.polygonLayers.add(
                         PolygonLayer(polygonName: "Nouveau"),
+                      );
+                      PopupNameIntroducer(
+                        context,
+                        "",
+                        (String nameIt) {
+                          setState(() {
+                            gl.polygonLayers[gl.polygonLayers.length - 1].name =
+                                nameIt;
+                            gl.saveChangesToPolygoneToPrefs = true;
+                          });
+                        },
+                        () {
+                          setState(() {});
+                        },
                       );
                       gl.selectedPolygonLayer = gl.polygonLayers.length - 1;
                     });
@@ -616,12 +704,15 @@ class PopupSearchMenu {
               canvasColor: Colors.transparent,
               shadowColor: Colors.transparent,
             ),
-            child: Container(
-              constraints: BoxConstraints(
-                minHeight: MediaQuery.of(context).size.height * .3,
-                maxHeight: MediaQuery.of(context).size.height * .9,
-              ),
-              width: MediaQuery.of(context).size.width * .85,
+            child: SizedBox(
+              width:
+                  gl.display!.orientation!.index == 0
+                      ? gl.display!.equipixel! * gl.popupWindowsWidth
+                      : gl.display!.equipixel! * gl.display!.equiwidth!,
+              height:
+                  gl.display!.orientation!.index == 0
+                      ? gl.display!.equipixel! * gl.display!.equiheight!
+                      : gl.display!.equipixel! * gl.display!.equiheight!,
               child: SearchMenu(state: state),
             ),
           ),
@@ -706,14 +797,20 @@ class _SearchResultCard extends State<SearchResultCard> {
                       alignment: Alignment.center,
                       constraints: BoxConstraints(
                         maxWidth:
-                            MediaQuery.of(gl.notificationContext!).size.width *
-                            .7,
+                            gl.display!.equipixel! * (gl.searchBarWidth + 5),
                       ),
                       child: Text(
                         widget.typeDeResultat,
                         style: TextStyle(
                           color: getColorTextFromBackground(widget.boxColor),
-                          fontSize: selected ? 24 : 16,
+                          fontSize:
+                              selected
+                                  ? gl.display!.equipixel! *
+                                      gl.mediumFontSize *
+                                      .9
+                                  : gl.display!.equipixel! *
+                                      gl.mediumFontSize *
+                                      .7,
                         ),
                       ),
                     ),
@@ -724,17 +821,34 @@ class _SearchResultCard extends State<SearchResultCard> {
                   children: [
                     Container(
                       padding: EdgeInsets.all(10),
-                      constraints: BoxConstraints(
-                        maxWidth:
-                            MediaQuery.of(gl.notificationContext!).size.width *
-                            .75,
-                      ),
+                      alignment: Alignment.center,
+                      constraints:
+                          gl.display!.orientation!.index == 0
+                              ? BoxConstraints(
+                                maxWidth:
+                                    gl.display!.equipixel! *
+                                    gl.display!.equiwidth! *
+                                    .6,
+                              )
+                              : BoxConstraints(
+                                maxWidth:
+                                    gl.display!.equipixel! *
+                                    gl.display!.equiwidth! *
+                                    .8,
+                              ),
                       child: Text(
                         widget.descriptionDeResultat,
                         textAlign: TextAlign.justify,
                         style: TextStyle(
                           color: getColorTextFromBackground(widget.boxColor),
-                          fontSize: selected ? 20 : 16,
+                          fontSize:
+                              selected
+                                  ? gl.display!.equipixel! *
+                                      gl.mediumFontSize *
+                                      .8
+                                  : gl.display!.equipixel! *
+                                      gl.mediumFontSize *
+                                      .6,
                         ),
                       ),
                     ),
@@ -774,10 +888,10 @@ class _SearchMenu extends State<SearchMenu> {
         children: [
           Container(
             constraints: BoxConstraints(
-              minHeight: MediaQuery.of(context).size.height * .05,
-              maxHeight: MediaQuery.of(context).size.height * .1,
-              minWidth: MediaQuery.of(context).size.width * .8,
-              maxWidth: MediaQuery.of(context).size.width * .8,
+              minHeight: gl.display!.equipixel! * gl.searchBarHeight * .8,
+              maxHeight: gl.display!.equipixel! * gl.searchBarHeight,
+              minWidth: gl.display!.equipixel! * gl.searchBarWidth,
+              maxWidth: gl.display!.equipixel! * gl.searchBarWidth,
             ),
             child: Card(
               child: TextFormField(
@@ -954,11 +1068,24 @@ class _SearchMenu extends State<SearchMenu> {
             ),
           ),
           Container(
-            padding: EdgeInsets.all(0),
-            constraints: BoxConstraints(
-              minHeight: MediaQuery.of(context).size.height * .2,
-              maxHeight: MediaQuery.of(context).size.height * .75,
-            ),
+            constraints:
+                gl.display!.orientation!.index == 0
+                    ? BoxConstraints(
+                      minHeight:
+                          gl.display!.equiheight! * gl.display!.equipixel! * .4,
+                      maxHeight:
+                          gl.display!.equiheight! *
+                          gl.display!.equipixel! *
+                          .75,
+                    )
+                    : BoxConstraints(
+                      minHeight:
+                          gl.display!.equiheight! * gl.display!.equipixel! * .3,
+                      maxHeight:
+                          gl.display!.equiheight! *
+                          gl.display!.equipixel! *
+                          .457,
+                    ),
             child: ListView(
               padding: const EdgeInsets.symmetric(horizontal: 0),
               children: <Widget>[] + searchResults,
@@ -1003,8 +1130,7 @@ Widget forestimatorSettingsVersion(Function state) {
           children: [
             Container(
               constraints: BoxConstraints(
-                maxWidth:
-                    MediaQuery.of(gl.notificationContext!).size.width * .5,
+                maxWidth: gl.display!.equipixel! * 45,
               ),
               child: TextButton(
                 onPressed: () async {
@@ -1040,8 +1166,7 @@ Widget forestimatorSettingsVersion(Function state) {
           children: [
             Container(
               constraints: BoxConstraints(
-                maxWidth:
-                    MediaQuery.of(gl.notificationContext!).size.width * .7,
+                maxWidth: gl.display!.equipixel! * 60,
               ),
               child: Text(
                 "Finançements du projet",
@@ -1057,8 +1182,7 @@ Widget forestimatorSettingsVersion(Function state) {
           children: [
             Container(
               constraints: BoxConstraints(
-                maxWidth:
-                    MediaQuery.of(gl.notificationContext!).size.width * .9,
+                maxWidth: gl.display!.equipixel! * gl.display!.equiwidth! * .9,
               ),
               child: Text(
                 "Le développement est financé par l'Accord Cadre de Recherches et Vulgarisation Forestières.\nLe contenu cartographique est en grande partie issu des recherches menées au sein de l'unité de Gestion des Ressources Forestières de Gembloux Agro-Bio Tech (ULiège).\n",
@@ -1074,8 +1198,7 @@ Widget forestimatorSettingsVersion(Function state) {
           children: [
             Container(
               constraints: BoxConstraints(
-                maxWidth:
-                    MediaQuery.of(gl.notificationContext!).size.width * .7,
+                maxWidth: gl.display!.equipixel! * gl.display!.equiwidth! * .7,
               ),
               child: Text(
                 "Contact: Philippe Lejeune",
@@ -1201,7 +1324,7 @@ class _ForestimatorLog extends State<ForestimatorLog> {
           <Widget>[
             Container(
               constraints: BoxConstraints(
-                minWidth: MediaQuery.of(context).size.width * .33,
+                minWidth: gl.display!.equipixel! * 50,
               ),
               child: FloatingActionButton(
                 onPressed: () {
@@ -1224,13 +1347,16 @@ class _ForestimatorLog extends State<ForestimatorLog> {
                   children: [
                     Container(
                       constraints: BoxConstraints(
-                        minWidth: MediaQuery.of(context).size.width * .05,
+                        minWidth: gl.display!.equipixel! * 5,
                       ),
                       child: Text("${gl.onboardLog.length - lengthLog + i}) "),
                     ),
                     Container(
                       constraints: BoxConstraints(
-                        maxWidth: MediaQuery.of(context).size.width * .6,
+                        maxWidth:
+                            gl.display!.equipixel! *
+                            gl.display!.equiwidth! *
+                            .9,
                       ),
                       child: Text(
                         gl.onboardLog[gl.onboardLog.length - lengthLog + i],
@@ -1244,13 +1370,16 @@ class _ForestimatorLog extends State<ForestimatorLog> {
                   children: [
                     Container(
                       constraints: BoxConstraints(
-                        minWidth: MediaQuery.of(context).size.width * .05,
+                        minWidth: gl.display!.equipixel! * 5,
                       ),
                       child: Text("$i"),
                     ),
                     Container(
                       constraints: BoxConstraints(
-                        minWidth: MediaQuery.of(context).size.width * .6,
+                        maxWidth:
+                            gl.display!.equipixel! *
+                            gl.display!.equiwidth! *
+                            .9,
                       ),
                       child: Text(
                         gl.onboardLog[i],
@@ -1367,7 +1496,7 @@ Widget forestimatorConfidentiality() {
           Container(
             padding: EdgeInsets.all(5),
             constraints: BoxConstraints(
-              maxWidth: MediaQuery.of(gl.notificationContext!).size.width * .9,
+              maxWidth: gl.display!.equipixel! * gl.display!.equiwidth! * .9,
             ),
             child: Text(
               "Forestimator mobile ne collecte aucune donnée. Notre politique de confidentialité est consultable au:",
@@ -1390,8 +1519,7 @@ Widget forestimatorConfidentiality() {
             child: Container(
               padding: EdgeInsets.all(5),
               constraints: BoxConstraints(
-                maxWidth:
-                    MediaQuery.of(gl.notificationContext!).size.width * .8,
+                maxWidth: gl.display!.equipixel! * gl.display!.equiwidth! * .8,
               ),
               child: Text(
                 "https://forestimator.gembloux.ulg.ac.be/documentation/confidentialit_",
@@ -1410,7 +1538,7 @@ Widget forestimatorConfidentiality() {
           Container(
             padding: EdgeInsets.all(5),
             constraints: BoxConstraints(
-              maxWidth: MediaQuery.of(gl.notificationContext!).size.width * .9,
+              maxWidth: gl.display!.equipixel! * gl.display!.equiwidth! * .9,
             ),
             child: Text(
               "L'application utilise le gps pour afficher votre position actuelle sur la carte et seulement pendant l'utilisation.",
@@ -1531,8 +1659,8 @@ class _SettingsMenu extends State<SettingsMenu> {
   }
 }
 
-class PopupDrawnLayerMenu {
-  PopupDrawnLayerMenu(
+class PopupPolygonListMenu {
+  PopupPolygonListMenu(
     BuildContext context,
     String currentName,
     Function(LatLng) state,
@@ -1556,7 +1684,14 @@ class PopupDrawnLayerMenu {
           title: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text("Liste des polygones", textAlign: TextAlign.justify),
+              Text(
+                "Liste des polygones",
+                textAlign: TextAlign.justify,
+                style: TextStyle(
+                  fontSize: gl.display!.equipixel! * gl.mediumFontSize,
+                  color: Colors.white,
+                ),
+              ),
             ],
           ),
 
@@ -1566,11 +1701,18 @@ class PopupDrawnLayerMenu {
               shadowColor: Colors.transparent,
             ),
             child: SizedBox(
-              width: MediaQuery.of(context).size.width * 95,
-              child: DrawnLayerMenu(state: state),
+              width:
+                  gl.display!.orientation!.index == 0
+                      ? gl.display!.equipixel! * gl.popupWindowsWidth
+                      : gl.display!.equipixel! * gl.display!.equiwidth!,
+              height:
+                  gl.display!.orientation!.index == 0
+                      ? gl.display!.equipixel! * gl.display!.equiheight!
+                      : gl.display!.equipixel! * gl.popupWindowsStartHeight,
+              child: PolygonListMenu(state: state),
             ),
           ),
-          titleTextStyle: TextStyle(color: Colors.white, fontSize: 25),
+
           actions: [
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -1586,19 +1728,16 @@ class PopupDrawnLayerMenu {
 }
 
 Widget _returnButton(BuildContext context, Function after) {
-  return Container(
-    constraints: BoxConstraints(
-      maxHeight: MediaQuery.of(context).size.width * .17,
-      minHeight: MediaQuery.of(context).size.width * .17,
-      minWidth: MediaQuery.of(context).size.width * .63,
-      maxWidth: MediaQuery.of(context).size.width * .63,
-    ),
+  return SizedBox(
+    height: gl.display!.equipixel! * gl.popupReturnButtonHeight,
+    width: gl.display!.equipixel! * gl.popupReturnButtonWidth,
+
     child: FloatingActionButton(
       backgroundColor: Colors.green,
       child: Text(
         "Retour!",
         maxLines: 1,
-        style: TextStyle(fontSize: MediaQuery.of(context).size.width * 0.05),
+        style: TextStyle(fontSize: gl.display!.equipixel! * gl.mediumFontSize),
       ),
       onPressed: () {
         after();
@@ -1631,10 +1770,6 @@ class PopupSettingsMenu {
           shadowColor: Colors.transparent,
           title: Container(
             alignment: Alignment.center,
-            constraints: BoxConstraints(
-              minHeight: 20,
-              minWidth: MediaQuery.of(context).size.width * .8,
-            ),
             child: Text(
               "Paramètres",
               maxLines: 1,
@@ -1642,7 +1777,7 @@ class PopupSettingsMenu {
             ),
           ),
           content: SizedBox(
-            width: MediaQuery.of(context).size.width * .95,
+            width: gl.display!.equipixel! * gl.display!.equiwidth! * .95,
             child: SettingsMenu(state: state),
           ),
           actions: [
@@ -1664,7 +1799,7 @@ Widget _resultRow(String key, String value) {
       Container(
         padding: EdgeInsets.all(5),
         constraints: BoxConstraints(
-          maxWidth: MediaQuery.of(gl.notificationContext!).size.width * .8,
+          maxWidth: gl.display!.equipixel! * gl.display!.equiwidth! * .8,
         ),
         child: Text(
           value,
@@ -1698,15 +1833,15 @@ Widget _resultClassRow(Map<String, dynamic> json, mCode) {
         color: col,
         padding: EdgeInsets.all(5),
         constraints: BoxConstraints(
-          minHeight: MediaQuery.of(gl.notificationContext!).size.width * .05,
-          minWidth: MediaQuery.of(gl.notificationContext!).size.width * .05,
+          minHeight: gl.display!.equipixel! * 5,
+          minWidth: gl.display!.equipixel! * 5,
         ),
         child: Container(color: col),
       ),
       Container(
         padding: EdgeInsets.all(5),
         constraints: BoxConstraints(
-          maxWidth: MediaQuery.of(gl.notificationContext!).size.width * .7,
+          maxWidth: gl.display!.equipixel! * gl.display!.equiwidth! * .7,
         ),
         child: Text(
           json['value'].toString(),
@@ -1718,7 +1853,7 @@ Widget _resultClassRow(Map<String, dynamic> json, mCode) {
       Container(
         padding: EdgeInsets.all(5),
         constraints: BoxConstraints(
-          maxWidth: MediaQuery.of(gl.notificationContext!).size.width * .2,
+          maxWidth: gl.display!.equipixel! * gl.display!.equiwidth! * .2,
         ),
         child: Text(
           "${json['prop'].toString()}%",
@@ -1739,7 +1874,7 @@ Widget forestimatorResultsHeaderClasse(Map<String, dynamic> json) {
             alignment: Alignment.centerLeft,
             padding: EdgeInsets.all(5),
             constraints: BoxConstraints(
-              maxWidth: MediaQuery.of(gl.notificationContext!).size.width * .5,
+              maxWidth: gl.display!.equipixel! * gl.display!.equiwidth! * .5,
             ),
             child: Text(
               "(en % de la surface)",
@@ -1847,11 +1982,20 @@ class _ResultsMenu extends State<ResultsMenu> {
                       children: [
                         Container(
                           constraints: BoxConstraints(
-                            maxWidth: MediaQuery.of(context).size.width * .7,
+                            maxWidth:
+                                gl.display!.equipixel! *
+                                gl.display!.equiwidth! *
+                                .7,
                           ),
                           child: Text(
                             item.name,
-                            style: TextStyle(color: Colors.black, fontSize: 20),
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize:
+                                  gl.mediumFontSize *
+                                  gl.display!.equipixel! *
+                                  .9,
+                            ),
                           ),
                         ),
                       ],
@@ -1899,7 +2043,7 @@ class PopupResultsMenu {
             ],
           ),
           content: SizedBox(
-            width: MediaQuery.of(context).size.width * .95,
+            width: gl.display!.equipixel! * gl.display!.equiwidth! * .95,
             child: ResultsMenu(json: json),
           ),
           actions: [
@@ -3452,6 +3596,14 @@ class PopupLayerSwitcher {
       barrierColor: Colors.transparent,
       context: context,
       builder: (BuildContext context) {
+        double menuHeight =
+            gl.display!.equiheight! * .3 +
+            gl.display!.equiheight! * .15 +
+            (_SearchMenu.searchResults.isNotEmpty ? 15 : 0) +
+            (gl.polygonLayers.isNotEmpty ? 15 : 0) +
+            (_SearchMenu.searchResults.isNotEmpty || gl.polygonLayers.isNotEmpty
+                ? 18
+                : 0);
         return Container(
           alignment: Alignment.bottomCenter,
           child: Stack(
@@ -3472,31 +3624,20 @@ class PopupLayerSwitcher {
                     shadowColor: Colors.transparent,
                   ),
                   child: SizedBox(
-                    width: MediaQuery.of(context).size.width * .80,
-                    height:
-                        MediaQuery.of(context).size.height * .05 +
-                        MediaQuery.of(context).size.height * .05 +
-                        MediaQuery.of(context).size.height * .05 +
-                        (_SearchMenu.searchResults.isNotEmpty
-                            ? MediaQuery.of(context).size.height * .06
-                            : 0) +
-                        (gl.polygonLayers.isNotEmpty
-                            ? MediaQuery.of(context).size.height * .06
-                            : 0) +
-                        (gl.polygonLayers.isNotEmpty ||
-                                _SearchMenu.searchResults.isNotEmpty
-                            ? MediaQuery.of(context).size.height * .05
-                            : 0) +
-                        MediaQuery.of(context).size.height * .3 +
-                        MediaQuery.of(context).size.width * .15,
+                    width: gl.display!.equipixel! * gl.layerswitcherWidth,
+                    height: menuHeight * gl.display!.equipixel!,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         if (gl.polygonLayers.isNotEmpty ||
                             _SearchMenu.searchResults.isNotEmpty)
                           SizedBox(
-                            width: MediaQuery.of(context).size.width * .80,
-                            height: MediaQuery.of(context).size.height * .04,
+                            width:
+                                gl.display!.equipixel! * gl.layerswitcherWidth,
+                            height:
+                                gl.display!.equipixel! *
+                                gl.mediumFontSize *
+                                1.5,
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
@@ -3506,34 +3647,26 @@ class PopupLayerSwitcher {
                                   style: TextStyle(
                                     color: Colors.white,
                                     fontSize:
-                                        MediaQuery.of(context).size.height *
-                                        .025,
+                                        gl.display!.equipixel! *
+                                        gl.mediumFontSize *
+                                        .85,
                                   ),
                                 ),
                               ],
                             ),
                           ),
                         SizedBox(
-                          width: MediaQuery.of(context).size.width * .80,
-                          height:
-                              (_SearchMenu.searchResults.isNotEmpty
-                                  ? MediaQuery.of(context).size.height * .06
-                                  : 0) +
-                              (gl.polygonLayers.isNotEmpty
-                                  ? MediaQuery.of(context).size.height * .06
-                                  : 0) +
-                              (gl.polygonLayers.isNotEmpty ||
-                                      _SearchMenu.searchResults.isNotEmpty
-                                  ? MediaQuery.of(context).size.height * .05
-                                  : 0),
+                          width: gl.display!.equipixel! * gl.layerswitcherWidth,
+
                           child: UpperLayerControl(
                             switchToLocationInSearchMenu:
                                 switchToLocationInSearchMenu,
                           ),
                         ),
                         SizedBox(
-                          width: MediaQuery.of(context).size.width * .80,
-                          height: MediaQuery.of(context).size.height * .04,
+                          width: gl.display!.equipixel! * gl.layerswitcherWidth,
+                          height:
+                              gl.display!.equipixel! * gl.mediumFontSize * 1.5,
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
@@ -3543,20 +3676,26 @@ class PopupLayerSwitcher {
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontSize:
-                                      MediaQuery.of(context).size.height * .025,
+                                      gl.display!.equipixel! *
+                                      gl.mediumFontSize *
+                                      .85,
                                 ),
                               ),
                             ],
                           ),
                         ),
                         SizedBox(
-                          width: MediaQuery.of(context).size.width * .80,
-                          height: MediaQuery.of(context).size.height * .3,
+                          width: gl.display!.equipixel! * gl.layerswitcherWidth,
+                          height:
+                              gl.display!.equipixel! *
+                              gl.display!.equiheight! *
+                              .3,
                           child: LayerSwitcher(),
                         ),
                         SizedBox(
-                          width: MediaQuery.of(context).size.width * .80,
-                          height: MediaQuery.of(context).size.height * .04,
+                          width: gl.display!.equipixel! * gl.layerswitcherWidth,
+                          height:
+                              gl.display!.equipixel! * gl.mediumFontSize * 1.5,
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
@@ -3566,22 +3705,25 @@ class PopupLayerSwitcher {
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontSize:
-                                      MediaQuery.of(context).size.height * .025,
+                                      gl.display!.equipixel! *
+                                      gl.mediumFontSize *
+                                      0.9,
                                 ),
                               ),
                             ],
                           ),
                         ),
                         SizedBox(
-                          width: MediaQuery.of(context).size.width * .80,
-                          height: MediaQuery.of(context).size.width * .15,
                           child: ViewControl(_LayerSwitcher.stateLayerSwitcher),
                         ),
                       ],
                     ),
                   ),
                 ),
-                titleTextStyle: TextStyle(color: Colors.white, fontSize: 25),
+                titleTextStyle: TextStyle(
+                  color: Colors.white,
+                  fontSize: gl.display!.equipixel! * gl.mediumFontSize * 0.9,
+                ),
                 actions: [],
               ),
               Container(
@@ -3619,8 +3761,8 @@ class _ViewControl extends State<ViewControl> {
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
         SizedBox(
-          width: MediaQuery.of(context).size.width * .15,
-          height: MediaQuery.of(context).size.width * .15,
+          width: gl.display!.equipixel! * gl.iconSize * 1.2,
+          height: gl.display!.equipixel! * gl.iconSize * 1.2,
           child: FloatingActionButton(
             backgroundColor:
                 _modeViewOfflineMap ? gl.colorAgroBioTech : Colors.grey,
@@ -3642,15 +3784,15 @@ class _ViewControl extends State<ViewControl> {
             },
             child: Icon(
               Icons.download_for_offline,
-              size: MediaQuery.of(context).size.width * .13,
+              size: gl.display!.equipixel! * gl.iconSize,
               color: Colors.black,
             ),
           ),
         ),
         if (!gl.offlineMode)
           SizedBox(
-            width: MediaQuery.of(context).size.width * .15,
-            height: MediaQuery.of(context).size.width * .15,
+            width: gl.display!.equipixel! * gl.iconSize * 1.2,
+            height: gl.display!.equipixel! * gl.iconSize * 1.2,
             child: FloatingActionButton(
               backgroundColor:
                   _modeViewOnlineMap ? gl.colorAgroBioTech : Colors.grey,
@@ -3672,7 +3814,7 @@ class _ViewControl extends State<ViewControl> {
               },
               child: Icon(
                 Icons.layers_outlined,
-                size: MediaQuery.of(context).size.width * .13,
+                size: gl.display!.equipixel! * gl.iconSize,
                 color: Colors.black,
               ),
             ),
@@ -3711,8 +3853,8 @@ class _UpperLayerControl extends State<UpperLayerControl> {
                     minimumSize: WidgetStateProperty<Size>.fromMap(
                       <WidgetStatesConstraint, Size>{
                         WidgetState.any: Size(
-                          MediaQuery.of(context).size.width * .45,
-                          MediaQuery.of(context).size.height * .05,
+                          gl.display!.equipixel! * 50,
+                          gl.display!.equipixel! * 10,
                         ),
                       },
                     ),
@@ -3728,43 +3870,44 @@ class _UpperLayerControl extends State<UpperLayerControl> {
                     );
                   },
                   child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 3.0),
+                    padding: EdgeInsets.symmetric(horizontal: 1.0),
                     constraints: BoxConstraints(
-                      maxHeight: MediaQuery.of(context).size.height * .05,
-                      minHeight: MediaQuery.of(context).size.height * .05,
-                      maxWidth: MediaQuery.of(context).size.width * 0.45,
-                      minWidth: MediaQuery.of(context).size.width * 0.45,
+                      maxHeight: gl.display!.equipixel! * 10,
+                      minHeight: gl.display!.equipixel! * 10,
+                      maxWidth: gl.display!.equipixel! * 50,
+                      minWidth: gl.display!.equipixel! * 50,
                     ),
                     child: Text(
                       "Marqueurs des lieux cherchés",
                       style: TextStyle(
                         color: Colors.black,
-                        fontSize: MediaQuery.of(context).size.height * .018,
+                        fontSize:
+                            gl.display!.equipixel! * gl.smallFontSize * 1.25,
                       ),
                     ),
                   ),
                 ),
                 Container(
                   constraints: BoxConstraints(
-                    maxHeight: MediaQuery.of(context).size.width * 0.1,
-                    minHeight: MediaQuery.of(context).size.width * 0.1,
-                    maxWidth: MediaQuery.of(context).size.width * 0.17,
-                    minWidth: MediaQuery.of(context).size.width * 0.17,
+                    maxHeight: gl.display!.equipixel! * 10,
+                    minHeight: gl.display!.equipixel! * 10,
+                    maxWidth: gl.display!.equipixel! * 17,
+                    minWidth: gl.display!.equipixel! * 17,
                   ),
                   child: Row(
                     children: [
                       Container(
                         constraints: BoxConstraints(
-                          maxHeight: MediaQuery.of(context).size.width * 0.1,
-                          minHeight: MediaQuery.of(context).size.width * 0.1,
-                          maxWidth: MediaQuery.of(context).size.width * 0.15,
-                          minWidth: MediaQuery.of(context).size.width * 0.15,
+                          maxHeight: gl.display!.equipixel! * 10,
+                          minHeight: gl.display!.equipixel! * 10,
+                          maxWidth: gl.display!.equipixel! * 15,
+                          minWidth: gl.display!.equipixel! * 15,
                         ),
                         color: Colors.white,
                         padding: const EdgeInsets.symmetric(),
                         child: SizedBox(
-                          width: MediaQuery.of(context).size.width * .1,
-                          height: MediaQuery.of(context).size.width * .1,
+                          width: gl.display!.equipixel! * 10,
+                          height: gl.display!.equipixel! * 10,
                           child: FloatingActionButton(
                             backgroundColor:
                                 gl.modeMapShowSearchMarker
@@ -3779,7 +3922,7 @@ class _UpperLayerControl extends State<UpperLayerControl> {
                             },
                             child: Icon(
                               Icons.remove_red_eye,
-                              size: MediaQuery.of(context).size.width * .1,
+                              size: gl.display!.equipixel! * 10,
                               color: Colors.black,
                             ),
                           ),
@@ -3804,14 +3947,14 @@ class _UpperLayerControl extends State<UpperLayerControl> {
                     minimumSize: WidgetStateProperty<Size>.fromMap(
                       <WidgetStatesConstraint, Size>{
                         WidgetState.any: Size(
-                          MediaQuery.of(context).size.width * .45,
-                          MediaQuery.of(context).size.height * .05,
+                          gl.display!.equipixel! * 50,
+                          gl.display!.equipixel! * 10,
                         ),
                       },
                     ),
                   ),
                   onPressed: () {
-                    PopupDrawnLayerMenu(
+                    PopupPolygonListMenu(
                       gl.notificationContext!,
                       gl.polygonLayers[gl.selectedPolygonLayer].name,
                       widget.switchToLocationInSearchMenu,
@@ -3821,43 +3964,44 @@ class _UpperLayerControl extends State<UpperLayerControl> {
                     );
                   },
                   child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 3.0),
+                    padding: EdgeInsets.symmetric(horizontal: 1.0),
                     constraints: BoxConstraints(
-                      maxHeight: MediaQuery.of(context).size.height * .05,
-                      minHeight: MediaQuery.of(context).size.height * .05,
-                      maxWidth: MediaQuery.of(context).size.width * 0.45,
-                      minWidth: MediaQuery.of(context).size.width * 0.45,
+                      maxHeight: gl.display!.equipixel! * 10,
+                      minHeight: gl.display!.equipixel! * 10,
+                      maxWidth: gl.display!.equipixel! * 50,
+                      minWidth: gl.display!.equipixel! * 50,
                     ),
                     child: Text(
                       "Couche des polygones",
                       style: TextStyle(
                         color: Colors.black,
-                        fontSize: MediaQuery.of(context).size.height * .018,
+                        fontSize:
+                            gl.display!.equipixel! * gl.smallFontSize * 1.25,
                       ),
                     ),
                   ),
                 ),
                 Container(
                   constraints: BoxConstraints(
-                    maxHeight: MediaQuery.of(context).size.width * 0.1,
-                    minHeight: MediaQuery.of(context).size.width * 0.1,
-                    maxWidth: MediaQuery.of(context).size.width * 0.17,
-                    minWidth: MediaQuery.of(context).size.width * 0.17,
+                    maxHeight: gl.display!.equipixel! * 10,
+                    minHeight: gl.display!.equipixel! * 10,
+                    maxWidth: gl.display!.equipixel! * 17,
+                    minWidth: gl.display!.equipixel! * 17,
                   ),
                   child: Row(
                     children: [
                       Container(
                         constraints: BoxConstraints(
-                          maxHeight: MediaQuery.of(context).size.width * 0.1,
-                          minHeight: MediaQuery.of(context).size.width * 0.1,
-                          maxWidth: MediaQuery.of(context).size.width * 0.15,
-                          minWidth: MediaQuery.of(context).size.width * 0.15,
+                          maxHeight: gl.display!.equipixel! * 10,
+                          minHeight: gl.display!.equipixel! * 10,
+                          maxWidth: gl.display!.equipixel! * 15,
+                          minWidth: gl.display!.equipixel! * 15,
                         ),
                         color: Colors.white,
                         padding: const EdgeInsets.symmetric(),
                         child: SizedBox(
-                          width: MediaQuery.of(context).size.width * .1,
-                          height: MediaQuery.of(context).size.width * .1,
+                          width: gl.display!.equipixel! * 10,
+                          height: gl.display!.equipixel! * 10,
                           child: FloatingActionButton(
                             backgroundColor:
                                 gl.modeMapShowPolygons
@@ -3872,7 +4016,7 @@ class _UpperLayerControl extends State<UpperLayerControl> {
                             },
                             child: Icon(
                               Icons.remove_red_eye,
-                              size: MediaQuery.of(context).size.width * .1,
+                              size: gl.display!.equipixel! * 10,
                               color: Colors.black,
                             ),
                           ),

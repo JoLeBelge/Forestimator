@@ -48,9 +48,9 @@ class _MapPageState extends State<MapPage> {
   bool _modeDrawPolygonAddVertexes = false;
   bool _modeDrawPolygonRemoveVertexes = false;
   bool _modeDrawPolygonMoveVertexes = false;
-  bool _modeShowButtonDrawPolygonMoveVertexes = true;
-  bool _modeShowButtonDrawPolygonRemoveVertexes = true;
-  bool _modeShowButtonDrawPolygonAddVertexes = true;
+  bool _modeShowButtonDrawPolygonMoveVertexes = false;
+  bool _modeShowButtonDrawPolygonRemoveVertexes = false;
+  bool _modeShowButtonDrawPolygonAddVertexes = false;
 
   bool _modeLayerSwitches = false;
 
@@ -218,14 +218,14 @@ class _MapPageState extends State<MapPage> {
         resizeToAvoidBottomInset: true,
         extendBody: true,
         appBar: AppBar(
-          toolbarHeight: MediaQuery.of(context).size.height * .04,
+          toolbarHeight: gl.display!.equipixel! * gl.topAppInfoBarThickness,
           backgroundColor:
               gl.offlineMode ? gl.colorAgroBioTech : gl.colorUliege,
           title: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               IconButton(
-                iconSize: MediaQuery.of(context).size.height * .035,
+                iconSize: gl.display!.equipixel! * gl.iconSizeSettings,
                 color: gl.offlineMode ? Colors.black : Colors.white,
                 onPressed: () {
                   PopupSettingsMenu(
@@ -244,7 +244,8 @@ class _MapPageState extends State<MapPage> {
               SizedBox(width: 1),
               Container(
                 constraints: BoxConstraints(
-                  maxWidth: MediaQuery.of(context).size.width * .6,
+                  maxWidth:
+                      gl.display!.equipixel! * gl.topAppForestimatorFontWidth,
                 ),
                 alignment: Alignment.center,
                 child: TextButton(
@@ -265,7 +266,8 @@ class _MapPageState extends State<MapPage> {
                             style: TextStyle(
                               color: Colors.black,
                               fontSize:
-                                  MediaQuery.of(context).size.height * .02,
+                                  gl.display!.equipixel! *
+                                  gl.topAppForestimatorFontHeight,
                             ),
                           )
                           : Text(
@@ -273,7 +275,8 @@ class _MapPageState extends State<MapPage> {
                             style: TextStyle(
                               color: Colors.white,
                               fontSize:
-                                  MediaQuery.of(context).size.height * .02,
+                                  gl.display!.equipixel! *
+                                  gl.topAppForestimatorFontHeight,
                             ),
                           ),
                 ),
@@ -283,7 +286,7 @@ class _MapPageState extends State<MapPage> {
                               gl.globalMinOfflineZoom.round() &&
                           gl.getIndexForNextLayerOffline() > -1
                       ? IconButton(
-                        iconSize: MediaQuery.of(context).size.height * .035,
+                        iconSize: gl.display!.equipixel! * gl.iconSizeSettings,
                         color: Colors.red,
                         tooltip:
                             "Si vous n'arrivez plus à visualiser les cartes hors ligne c'est que votre zoom est trop large.",
@@ -291,10 +294,11 @@ class _MapPageState extends State<MapPage> {
                         icon: Icon(Icons.info_rounded),
                       )
                       : SizedBox(
-                        width: MediaQuery.of(context).size.height * .035 * 1.5,
+                        width:
+                            gl.display!.equipixel! * gl.iconSizeSettings * 1.5,
                       )
                   : SizedBox(
-                    width: MediaQuery.of(context).size.height * .035 * 1.5,
+                    width: gl.display!.equipixel! * gl.iconSizeSettings * 1.5,
                   ),
             ],
           ),
@@ -490,49 +494,53 @@ class _MapPageState extends State<MapPage> {
                               child: Container(
                                 constraints: BoxConstraints(
                                   minHeight:
-                                      MediaQuery.of(context).size.width * .15,
+                                      gl.display!.equipixel! *
+                                      gl.loadingMapBoxHeight,
                                   minWidth:
-                                      MediaQuery.of(context).size.width * .5,
+                                      gl.display!.equipixel! *
+                                      gl.loadingMapBoxWidth,
                                   maxWidth:
-                                      MediaQuery.of(context).size.width * .5,
+                                      gl.display!.equipixel! *
+                                      gl.loadingMapBoxWidth,
                                 ),
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     SizedBox(
                                       width:
-                                          MediaQuery.of(context).size.width *
-                                          .3,
+                                          gl.display!.equipixel! *
+                                          gl.loadingMapBoxWidth *
+                                          .7,
                                       child: Text(
                                         "La carte choisie est en préparation dans la mémoire.",
                                         textAlign: TextAlign.center,
                                         style: TextStyle(
                                           color: Colors.white,
                                           fontSize:
-                                              MediaQuery.of(
-                                                context,
-                                              ).size.width *
-                                              .03,
+                                              gl.display!.equipixel! *
+                                              gl.smallFontSize,
                                         ),
                                       ),
                                     ),
                                     SizedBox(
                                       width:
-                                          MediaQuery.of(context).size.width *
-                                          .05,
+                                          gl.display!.equipixel! *
+                                          gl.smallFontSize,
                                     ),
                                     CircularProgressIndicator(
                                       constraints: BoxConstraints(
                                         minHeight:
-                                            MediaQuery.of(context).size.width *
-                                            .1,
+                                            gl.display!.equipixel! *
+                                            gl.largeFontSize,
                                         minWidth:
-                                            MediaQuery.of(context).size.width *
-                                            .1,
+                                            gl.display!.equipixel! *
+                                            gl.largeFontSize,
                                       ),
+                                      color: gl.colorAgroBioTech,
                                       strokeWidth:
-                                          MediaQuery.of(context).size.width *
-                                          .02,
+                                          gl.display!.equipixel! *
+                                          gl.smallFontSize *
+                                          .5,
                                     ),
                                   ],
                                 ),
@@ -660,20 +668,25 @@ class _MapPageState extends State<MapPage> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisAlignment:
+                          gl.display!.orientation!.index == 0
+                              ? MainAxisAlignment.center
+                              : MainAxisAlignment.start,
                       children: [
                         Container(
-                          width: MediaQuery.of(context).size.width * .98,
+                          width: gl.display!.equipixel! * gl.chosenPolyBarWidth,
                           constraints: BoxConstraints(
-                            minHeight: MediaQuery.of(context).size.height * .1,
-                            maxHeight: MediaQuery.of(context).size.height * .1,
+                            minHeight:
+                                gl.display!.equipixel! * gl.chosenPolyBarHeight,
+                            maxHeight:
+                                gl.display!.equipixel! * gl.chosenPolyBarHeight,
                           ),
                           child: TextButton(
                             onPressed: () {
                               refreshView(() {
                                 _modePolygonList = true;
                               });
-                              PopupDrawnLayerMenu(
+                              PopupPolygonListMenu(
                                 gl.notificationContext!,
                                 gl.polygonLayers[gl.selectedPolygonLayer].name,
                                 (LatLng pos) {
@@ -688,6 +701,14 @@ class _MapPageState extends State<MapPage> {
                                 () {
                                   refreshView(() {
                                     _modePolygonList = false;
+                                    if (gl.polygonLayers.isNotEmpty) {
+                                      _modeShowButtonDrawPolygonAddVertexes =
+                                          true;
+                                      _modeShowButtonDrawPolygonMoveVertexes =
+                                          false;
+                                      _modeShowButtonDrawPolygonRemoveVertexes =
+                                          false;
+                                    }
                                   });
                                 },
                               );
@@ -767,8 +788,7 @@ class _MapPageState extends State<MapPage> {
                                           ? Icons.center_focus_strong
                                           : Icons.center_focus_strong_outlined,
                                       size:
-                                          MediaQuery.of(context).size.width *
-                                          .1,
+                                          gl.display!.equipixel! * gl.iconSize,
                                       color: getColorTextFromBackground(
                                         gl
                                             .polygonLayers[gl
@@ -781,11 +801,9 @@ class _MapPageState extends State<MapPage> {
 
                                   SizedBox(
                                     width:
-                                        MediaQuery.of(context).size.width * .01,
-                                  ),
-                                  SizedBox(
-                                    width:
-                                        MediaQuery.of(context).size.width * .4,
+                                        gl.display!.equipixel! *
+                                        gl.chosenPolyBarWidth *
+                                        .4,
                                     child: Text(
                                       gl
                                           .polygonLayers[gl
@@ -800,8 +818,9 @@ class _MapPageState extends State<MapPage> {
                                               .withAlpha(255),
                                         ),
                                         fontSize:
-                                            MediaQuery.of(context).size.width *
-                                            .05,
+                                            gl.display!.equipixel! *
+                                            gl.mediumFontSize *
+                                            .75,
                                       ),
                                     ),
                                   ),
@@ -816,8 +835,9 @@ class _MapPageState extends State<MapPage> {
                                             .withAlpha(255),
                                       ),
                                       fontSize:
-                                          MediaQuery.of(context).size.width *
-                                          .05,
+                                          gl.display!.equipixel! *
+                                          gl.mediumFontSize *
+                                          .9,
                                     ),
                                   ),
                                 ],
@@ -833,65 +853,83 @@ class _MapPageState extends State<MapPage> {
                 ? Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    Container(
-                      constraints: BoxConstraints(
-                        minHeight: MediaQuery.of(context).size.height * .1,
-                        maxHeight: MediaQuery.of(context).size.height * .1,
-                      ),
-                      child: TextButton(
-                        onPressed:
-                            () => PopupDrawnLayerMenu(
-                              gl.notificationContext!,
-                              "",
-                              (LatLng pos) {
-                                if (pos.longitude != 0.0 &&
-                                    pos.latitude != 0.0) {
-                                  _mapController.move(
-                                    pos,
-                                    _mapController.camera.zoom,
-                                  );
-                                }
-                              },
-                              () {
-                                refreshView(() {
-                                  _modePolygonList = false;
-                                  if (gl.polygonLayers.isNotEmpty) {
-                                    _modeShowButtonDrawPolygonAddVertexes =
-                                        true;
-                                  }
-                                });
-                              },
-                            ),
-                        child: Card(
-                          surfaceTintColor: Colors.transparent,
-                          shadowColor: Colors.transparent,
-                          color: gl.backgroundTransparentBlackBox,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              Icon(
-                                Icons.add,
-                                size: MediaQuery.of(context).size.width * .1,
-                                color: Colors.white,
-                              ),
-                              SizedBox(
-                                width: MediaQuery.of(context).size.width * .03,
-                              ),
-                              SizedBox(
-                                width: MediaQuery.of(context).size.width * .6,
-                                child: Text(
-                                  "Tappez ici pour ajouter un Polygone",
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize:
-                                        MediaQuery.of(context).size.width * .04,
-                                  ),
+                    Row(
+                      mainAxisAlignment:
+                          gl.display!.orientation!.index == 0
+                              ? MainAxisAlignment.center
+                              : MainAxisAlignment.start,
+                      children: [
+                        SizedBox(
+                          height:
+                              gl.display!.equipixel! * gl.chosenPolyBarHeight,
+                          width: gl.display!.equipixel! * gl.chosenPolyBarWidth,
+                          child: TextButton(
+                            onPressed:
+                                () => PopupPolygonListMenu(
+                                  gl.notificationContext!,
+                                  "",
+                                  (LatLng pos) {
+                                    if (pos.longitude != 0.0 &&
+                                        pos.latitude != 0.0) {
+                                      _mapController.move(
+                                        pos,
+                                        _mapController.camera.zoom,
+                                      );
+                                    }
+                                  },
+                                  () {
+                                    refreshView(() {
+                                      _modePolygonList = false;
+                                      if (gl.polygonLayers.isNotEmpty) {
+                                        _modeShowButtonDrawPolygonAddVertexes =
+                                            true;
+                                        _modeShowButtonDrawPolygonMoveVertexes =
+                                            false;
+                                        _modeShowButtonDrawPolygonRemoveVertexes =
+                                            false;
+                                      }
+                                    });
+                                  },
                                 ),
+                            child: Card(
+                              surfaceTintColor: Colors.transparent,
+                              shadowColor: Colors.transparent,
+                              color: gl.backgroundTransparentBlackBox,
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  Icon(
+                                    Icons.add,
+                                    size: gl.display!.equipixel! * gl.iconSize,
+                                    color: Colors.white,
+                                  ),
+                                  SizedBox(
+                                    width:
+                                        gl.display!.equipixel! *
+                                        gl.smallFontSize,
+                                  ),
+                                  SizedBox(
+                                    width:
+                                        gl.display!.equipixel! *
+                                        gl.chosenPolyBarWidth *
+                                        .7,
+                                    child: Text(
+                                      "Tappez ici pour ajouter un Polygone",
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize:
+                                            gl.display!.equipixel! *
+                                            gl.mediumFontSize,
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ],
+                            ),
                           ),
                         ),
-                      ),
+                      ],
                     ),
                   ],
                 )
@@ -1103,13 +1141,13 @@ class _MapPageState extends State<MapPage> {
           alignment: Alignment(0.0, -3.0),
           width:
               gl.anaPtPreview == null
-                  ? MediaQuery.of(context).size.width * .1
+                  ? gl.display!.equipixel! * gl.anaPtBoxSize
                   : gl.dico
                           .getLayerBase(gl.anaPtPreview!.mCode)
                           .getValLabel(gl.anaPtPreview!.mRastValue)
                           .length >
                       3
-                  ? MediaQuery.of(context).size.width * .15 +
+                  ? gl.display!.equipixel! * gl.anaPtBoxSize * 1.5 +
                       gl.dico
                               .getLayerBase(gl.anaPtPreview!.mCode)
                               .getValLabel(gl.anaPtPreview!.mRastValue)
@@ -1117,9 +1155,9 @@ class _MapPageState extends State<MapPage> {
                           8.0
                   : gl.dico.getLayerBase(gl.anaPtPreview!.mCode).mCategorie !=
                       "Externe"
-                  ? MediaQuery.of(context).size.width * .25
-                  : MediaQuery.of(context).size.width * .0,
-          height: MediaQuery.of(context).size.width * .1,
+                  ? gl.display!.equipixel! * gl.anaPtBoxSize * 2.5
+                  : 0.0,
+          height: gl.display!.equipixel! * gl.anaPtBoxSize,
           point: _pt ?? const LatLng(0.0, 0.0),
           child: FloatingActionButton(
             backgroundColor: Color.fromRGBO(0, 0, 0, 0.8),
@@ -1213,8 +1251,8 @@ class _MapPageState extends State<MapPage> {
       ret.add(
         Marker(
           alignment: Alignment(0, -2),
-          width: 100,
-          height: MediaQuery.of(context).size.width * .1,
+          width: gl.display!.equipixel! * gl.anaPtBoxSize * 2,
+          height: gl.display!.equipixel! * gl.anaPtBoxSize,
           point: _mapController.camera.center,
           child: Card(
             color: Colors.black.withAlpha(164),
@@ -1389,14 +1427,17 @@ class _MapPageState extends State<MapPage> {
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
         Row(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment:
+              gl.display!.orientation!.index == 0
+                  ? MainAxisAlignment.center
+                  : MainAxisAlignment.end,
           children: [
             Container(
               alignment: Alignment.center,
               constraints: BoxConstraints(
-                maxHeight: MediaQuery.of(context).size.width * .2,
-                minHeight: MediaQuery.of(context).size.width * .2,
-                maxWidth: MediaQuery.of(context).size.width * .65,
+                maxHeight: gl.display!.equipixel! * gl.menuBarThickness,
+                minHeight: gl.display!.equipixel! * gl.menuBarThickness,
+                maxWidth: gl.display!.equipixel! * gl.menuBarLength,
               ),
               child: Card(
                 shadowColor: Colors.transparent,
@@ -1421,7 +1462,7 @@ class _MapPageState extends State<MapPage> {
                                 : _toolbarExtended
                                 ? Colors.white
                                 : Colors.green,
-                        iconSize: MediaQuery.of(context).size.width * .12,
+                        iconSize: gl.display!.equipixel! * gl.iconSize,
                         isSelected: _toolbarExtended,
                         onPressed: () {
                           setState(() {
@@ -1454,7 +1495,7 @@ class _MapPageState extends State<MapPage> {
                                 : _polygonToolbarExtended
                                 ? Colors.white
                                 : Colors.yellow,
-                        iconSize: MediaQuery.of(context).size.width * .12,
+                        iconSize: gl.display!.equipixel! * gl.iconSize,
                         isSelected: _polygonToolbarExtended,
                         onPressed: () {
                           setState(() {
@@ -1480,11 +1521,11 @@ class _MapPageState extends State<MapPage> {
                     dummy
                         ? Container(
                           color: Colors.transparent,
-                          width: MediaQuery.of(context).size.width * .12,
-                          height: MediaQuery.of(context).size.width * .12,
+                          width: gl.display!.equipixel! * gl.menuBarThickness,
+                          height: gl.display!.equipixel! * gl.menuBarThickness,
                           child: IconButton(
                             color: Colors.transparent,
-                            iconSize: MediaQuery.of(context).size.width * .12,
+                            iconSize: gl.display!.equipixel! * gl.iconSize,
                             isSelected: _modeLayerSwitches,
                             onPressed: () {
                               setState(() {
@@ -1508,7 +1549,7 @@ class _MapPageState extends State<MapPage> {
                                 _modeLayerSwitches
                                     ? Colors.white
                                     : Colors.brown,
-                            iconSize: MediaQuery.of(context).size.width * .12,
+                            iconSize: gl.display!.equipixel! * gl.iconSize,
                             isSelected: _modeLayerSwitches,
                             onPressed: () {
                               setState(() {
@@ -1561,6 +1602,13 @@ class _MapPageState extends State<MapPage> {
           : false;
 
   Widget _toolBar() {
+    double toolbarHeight = gl.iconSize * 2 + gl.iconSpaceBetween * 2;
+    if (gl.modeDevelopper) {
+      toolbarHeight += gl.iconSize + gl.iconSpaceBetween;
+    }
+    if (positionMarkerInsideViewRectangle()) {
+      toolbarHeight += gl.iconSize + gl.iconSpaceBetween;
+    }
     return Column(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
@@ -1570,19 +1618,8 @@ class _MapPageState extends State<MapPage> {
             Container(
               alignment: Alignment.center,
               constraints: BoxConstraints(
-                maxHeight:
-                    gl.modeDevelopper
-                        ? gl.position != null
-                            ? positionMarkerInsideViewRectangle()
-                                ? MediaQuery.of(context).size.width * .75
-                                : MediaQuery.of(context).size.width * .6
-                            : MediaQuery.of(context).size.width * .6
-                        : gl.position != null
-                        ? positionMarkerInsideViewRectangle()
-                            ? MediaQuery.of(context).size.width * .6
-                            : MediaQuery.of(context).size.width * .45
-                        : MediaQuery.of(context).size.width * .45,
-                maxWidth: MediaQuery.of(context).size.width * .2,
+                maxHeight: gl.display!.equipixel! * toolbarHeight,
+                maxWidth: gl.display!.equipixel! * gl.menuBarThickness,
               ),
               child: Card(
                 color: gl.backgroundTransparentBlackBox,
@@ -1598,7 +1635,7 @@ class _MapPageState extends State<MapPage> {
                               if (positionMarkerInsideViewRectangle())
                                 IconButton(
                                   iconSize:
-                                      MediaQuery.of(context).size.width * .12,
+                                      gl.display!.equipixel! * gl.iconSize,
                                   color: gl.colorAgroBioTech,
                                   onPressed: () async {
                                     if (!_doingAnaPt) {
@@ -1631,8 +1668,7 @@ class _MapPageState extends State<MapPage> {
                                   icon: const Icon(Icons.analytics),
                                 ),
                               IconButton(
-                                iconSize:
-                                    MediaQuery.of(context).size.width * .12,
+                                iconSize: gl.display!.equipixel! * gl.iconSize,
                                 color: Colors.red,
                                 onPressed: () async {
                                   if (gl.position != null) {
@@ -1656,7 +1692,7 @@ class _MapPageState extends State<MapPage> {
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
                             IconButton(
-                              iconSize: MediaQuery.of(context).size.width * .12,
+                              iconSize: gl.display!.equipixel! * gl.iconSize,
                               color: Colors.black,
                               onPressed: () async {
                                 if (gl.position != null) {
@@ -1678,7 +1714,7 @@ class _MapPageState extends State<MapPage> {
                               _modeMeasurePath
                                   ? Colors.white
                                   : Colors.lightBlue,
-                          iconSize: MediaQuery.of(context).size.width * .12,
+                          iconSize: gl.display!.equipixel! * gl.iconSize,
                           isSelected: _modeMeasurePath,
                           onPressed: () {
                             setState(() {
@@ -1696,7 +1732,7 @@ class _MapPageState extends State<MapPage> {
                               ? Colors.transparent
                               : Colors.blueGrey.withAlpha(128),
                       child: IconButton(
-                        iconSize: MediaQuery.of(context).size.width * .12,
+                        iconSize: gl.display!.equipixel! * gl.iconSize,
                         color: _modeSearch ? Colors.white : Colors.blueGrey,
                         onPressed: () {
                           setState(() {
@@ -1729,18 +1765,29 @@ class _MapPageState extends State<MapPage> {
             ),
           ],
         ),
-        _placeholder(
-          constraints: BoxConstraints(
-            maxHeight: MediaQuery.of(context).size.width * .2,
-            minHeight: MediaQuery.of(context).size.width * .2,
-            maxWidth: MediaQuery.of(context).size.width * .1,
+        if (gl.display!.orientation!.index == 0)
+          _placeholder(
+            constraints: BoxConstraints(
+              maxHeight: gl.display!.equipixel! * gl.menuBarThickness,
+              minHeight: gl.display!.equipixel! * gl.menuBarThickness,
+              maxWidth: gl.display!.equipixel! * gl.menuBarThickness * .5,
+            ),
           ),
-        ),
       ],
     );
   }
 
   Widget _polygonToolbar() {
+    double toolbarHeight = gl.iconSpaceBetween;
+    if (_modeShowButtonDrawPolygonMoveVertexes) {
+      toolbarHeight += gl.iconSize + gl.iconSpaceBetween;
+    }
+    if (_modeShowButtonDrawPolygonRemoveVertexes) {
+      toolbarHeight += gl.iconSize + gl.iconSpaceBetween;
+    }
+    if (_modeShowButtonDrawPolygonAddVertexes) {
+      toolbarHeight += gl.iconSize + gl.iconSpaceBetween;
+    }
     return Column(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
@@ -1749,20 +1796,10 @@ class _MapPageState extends State<MapPage> {
           children: [
             Container(
               alignment: Alignment.center,
-              height:
-                  MediaQuery.of(context).size.width * .05 +
-                  (_modeShowButtonDrawPolygonMoveVertexes
-                      ? MediaQuery.of(context).size.width * .2
-                      : 0.0) +
-                  (_modeShowButtonDrawPolygonRemoveVertexes
-                      ? MediaQuery.of(context).size.width * .2
-                      : 0.0) +
-                  (_modeShowButtonDrawPolygonAddVertexes
-                      ? MediaQuery.of(context).size.width * .2
-                      : 0.0),
+              height: gl.display!.equipixel! * toolbarHeight,
               constraints: BoxConstraints(
-                minWidth: MediaQuery.of(context).size.width * .2,
-                maxWidth: MediaQuery.of(context).size.width * .2,
+                minWidth: gl.display!.equipixel! * gl.menuBarThickness,
+                maxWidth: gl.display!.equipixel! * gl.menuBarThickness,
               ),
               child: Card(
                 color: gl.backgroundTransparentBlackBox,
@@ -1779,7 +1816,7 @@ class _MapPageState extends State<MapPage> {
                               _modeDrawPolygonMoveVertexes
                                   ? Colors.white
                                   : Colors.lightGreenAccent,
-                          iconSize: iconSize,
+                          iconSize: gl.display!.equipixel! * gl.iconSize,
                           onPressed: () async {
                             refreshView(() {
                               _modeDrawPolygonMoveVertexes =
@@ -1831,7 +1868,7 @@ class _MapPageState extends State<MapPage> {
                           _modeDrawPolygonRemoveVertexes,
                         ),
                         child: IconButton(
-                          iconSize: iconSize,
+                          iconSize: gl.display!.equipixel! * gl.iconSize,
                           color:
                               _modeDrawPolygonRemoveVertexes
                                   ? Colors.white
@@ -1891,7 +1928,7 @@ class _MapPageState extends State<MapPage> {
                           _modeDrawPolygonAddVertexes,
                         ),
                         child: IconButton(
-                          iconSize: iconSize,
+                          iconSize: gl.display!.equipixel! * gl.iconSize,
                           color:
                               _modeDrawPolygonAddVertexes
                                   ? Colors.white
@@ -1918,13 +1955,14 @@ class _MapPageState extends State<MapPage> {
             ),
           ],
         ),
-        _placeholder(
-          constraints: BoxConstraints(
-            maxHeight: MediaQuery.of(context).size.width * .2,
-            minHeight: MediaQuery.of(context).size.width * .2,
-            maxWidth: MediaQuery.of(context).size.width * .1,
+        if (gl.display!.orientation!.index == 0)
+          _placeholder(
+            constraints: BoxConstraints(
+              maxHeight: gl.display!.equipixel! * gl.menuBarThickness,
+              minHeight: gl.display!.equipixel! * gl.menuBarThickness,
+              maxWidth: gl.display!.equipixel! * gl.menuBarThickness * .5,
+            ),
           ),
-        ),
       ],
     );
   }
@@ -1937,13 +1975,11 @@ class _MapPageState extends State<MapPage> {
 
         width:
             textArea.length > gl.polygonLayers[i].name.length
-                ? MediaQuery.of(context).size.width * .15 +
-                    textArea.length * MediaQuery.of(context).size.width * .02
-                : MediaQuery.of(context).size.width * .15 +
-                    gl.polygonLayers[i].name.length *
-                        MediaQuery.of(context).size.width *
-                        .02,
-        height: MediaQuery.of(context).size.width * .15,
+                ? gl.display!.equipixel! * gl.infoBoxPolygon * 2.5 +
+                    textArea.length * gl.smallFontSize
+                : gl.display!.equipixel! * gl.infoBoxPolygon * 1.5 +
+                    gl.polygonLayers[i].name.length * gl.smallFontSize,
+        height: gl.display!.equipixel! * gl.infoBoxPolygon * 1.5,
         point: gl.polygonLayers[i].center,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
