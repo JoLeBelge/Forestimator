@@ -336,6 +336,7 @@ class _MyApp extends State<MyApp> {
       title: 'Forestimator',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        fontFamily: "Calibri",
         useMaterial3: true,
       ),
     );

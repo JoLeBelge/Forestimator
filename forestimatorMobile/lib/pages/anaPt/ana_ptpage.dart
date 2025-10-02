@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:fforestimator/dico/dico_apt.dart';
 import 'package:fforestimator/tools/handle_permissions.dart';
 import "package:flutter/material.dart";
@@ -7,6 +9,7 @@ import 'package:fforestimator/globals.dart' as gl;
 import 'package:fforestimator/myicons.dart';
 import 'package:go_router/go_router.dart';
 import 'package:fforestimator/tools/notification.dart';
+import 'package:path_provider/path_provider.dart';
 
 class AnaPtpage extends StatefulWidget {
   final List<LayerAnaPt> requestedLayers;
@@ -49,12 +52,14 @@ class _AnaPtpageState extends State<AnaPtpage> {
                             Container(
                               alignment: Alignment.center,
                               constraints: BoxConstraints(
-                                maxWidth:
-                                    MediaQuery.of(context).size.width * 0.075,
+                                maxWidth: gl.display!.equipixel! * 7.5,
                               ),
                               child: Icon(
                                 Icons.picture_as_pdf,
-                                size: 28,
+                                size:
+                                    gl.display!.equipixel! *
+                                    gl.mediumFontSize *
+                                    .85,
                                 color: Colors.black,
                               ),
                             ),
@@ -62,8 +67,7 @@ class _AnaPtpageState extends State<AnaPtpage> {
                             Container(
                               alignment: Alignment.center,
                               constraints: BoxConstraints(
-                                maxWidth:
-                                    MediaQuery.of(context).size.width * 0.75,
+                                maxWidth: gl.display!.equipixel! * 75,
                               ),
                               child: Text(
                                 "Saufgardez cette analyse sur votre appareil",
@@ -74,12 +78,7 @@ class _AnaPtpageState extends State<AnaPtpage> {
                         )
                         : Row(),
                 onPressed: () async {
-                  //var deviceInfo = await DeviceInfoPlugin().androidInfo;
-                  // Your app has write permission by default in all public directories on external storage. (Android 13+ )-> request retourne denied sans boite de dialogue
                   bool isPermitted = true;
-                  //(Platform.isAndroid && deviceInfo.version.sdkInt > 32)
-                  //  ? true
-                  //  : await Permission.storage.request().isGranted;
                   if (isPermitted) {
                     //await Permission.manageExternalStorage
                     //   .request()
@@ -98,11 +97,10 @@ class _AnaPtpageState extends State<AnaPtpage> {
                     if (locationName!.isEmpty) {
                       locationName = "une position";
                     }
-                    // création du pdf
-                    //String? dir = await getDownloadDirectory().toString();
-                    // String dir =
-                    //  await getExternalStorageDirectories().toString();
-                    String dir = "/storage/emulated/0/Download/";
+                    String dir = "/storage/emulated/0/Download";
+                    if (Platform.isIOS) {
+                      dir = (await getApplicationDocumentsDirectory()).path;
+                    }
                     makePdf(widget.requestedLayers, pdf, dir, locationName);
                     // confirmation que le pdf a été créé
                     PopupPDFSaved(gl.anaPtPageContext!, pdf);
@@ -260,7 +258,7 @@ Widget _tabAptFEE(BuildContext context, AptsFEE apts) {
             ),
             Container(
               constraints: BoxConstraints(
-                maxHeight: MediaQuery.of(context).size.height,
+                maxHeight: gl.display!.equipixel! * gl.display!.equiheight!,
               ),
               child: TabBarView(
                 children: [
@@ -361,7 +359,7 @@ Widget _tabPropositionCS(BuildContext context, PropositionGS apts) {
 
             Container(
               constraints: BoxConstraints(
-                maxHeight: MediaQuery.of(context).size.height,
+                maxHeight: gl.display!.equipixel! * gl.display!.equiheight!,
               ),
               //Add this to give height
               child: TabBarView(

@@ -289,12 +289,7 @@ class PolygonLayer {
       gl.print(decodedJson);
     } else {
       gl.print("Could not make surface analysis, no internet!");
-      showDialog(
-        context: gl.notificationContext!,
-        builder: (BuildContext context) {
-          return PopupNoInternet();
-        },
-      );
+      gl.mainStack.add(popupNoInternet());
       return false;
     }
     return true;

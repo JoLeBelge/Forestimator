@@ -56,24 +56,20 @@ class PopupDownloadRecomendedLayers extends StatelessWidget {
   }
 }
 
-class PopupNoInternet extends StatelessWidget {
-  const PopupNoInternet({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      title: Text("Oups"),
-      content: Text("Vous n'avez pas accès à internet."),
-      actions: <Widget>[
-        TextButton(
-          child: Text("OK"),
-          onPressed: () {
-            Navigator.of(context, rootNavigator: true).pop();
-          },
-        ),
-      ],
-    );
-  }
+Widget popupNoInternet() {
+  return AlertDialog(
+    title: Text("Oups"),
+    content: Text("Vous n'avez pas accès à internet."),
+    actions: <Widget>[
+      TextButton(
+        child: Text("OK"),
+        onPressed: () {
+          gl.mainStackPopLast();
+          gl.refreshMap(() {});
+        },
+      ),
+    ],
+  );
 }
 
 class PopupPermissions extends StatelessWidget {
@@ -579,24 +575,22 @@ class _DrawnLayerMenu extends State<PolygonListMenu> {
                                           onPressed: () async {
                                             if (await gl.polygonLayers[i]
                                                 .onlineSurfaceAnalysis()) {
-                                              PopupResultsMenu(
-                                                gl.notificationContext!,
-                                                gl
-                                                    .polygonLayers[gl
-                                                        .selectedPolygonLayer]
-                                                    .decodedJson,
-                                                () {
-                                                  if (mounted) {
-                                                    setState(() {});
-                                                  }
-                                                  (() {});
-                                                },
-                                                () {
-                                                  if (mounted) {
-                                                    setState(() {});
-                                                  }
-                                                },
+                                              gl.mainStack.add(
+                                                popupResultsMenu(
+                                                  gl.notificationContext!,
+                                                  gl
+                                                      .polygonLayers[gl
+                                                          .selectedPolygonLayer]
+                                                      .decodedJson,
+                                                  () {
+                                                    gl.refreshMap(() {});
+                                                  },
+                                                  () {
+                                                    gl.refreshMap(() {});
+                                                  },
+                                                ),
                                               );
+                                              gl.refreshMap(() {});
                                             }
                                           },
                                           icon: Icon(
@@ -670,20 +664,24 @@ class _DrawnLayerMenu extends State<PolygonListMenu> {
   }
 }
 
-class PopupSearchMenu {
-  PopupSearchMenu(
-    BuildContext context,
-    String currentName,
-    Function(LatLng) state,
-    Function after,
-  ) {
-    _selectedSearchResultCard = -1;
-    showDialog(
-      barrierDismissible: true,
-      barrierColor: Colors.transparent,
-      context: context,
-      builder: (BuildContext context) {
+Widget switchRowColWithOrientation(List<Widget> tree) {
+  return gl.display!.orientation!.index == 0
+      ? Column(children: tree)
+      : Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: tree);
+}
+
+Widget popupSearchMenu(
+  BuildContext context,
+  String currentName,
+  Function(LatLng) state,
+  Function after,
+) {
+  _selectedSearchResultCard = -1;
+  return MaterialApp(
+    home: OrientationBuilder(
+      builder: (context, orientation) {
         return AlertDialog(
+          alignment: Alignment.topCenter,
           titlePadding: EdgeInsets.all(0),
           actionsPadding: EdgeInsets.all(0),
           contentPadding: EdgeInsets.all(0),
@@ -693,12 +691,6 @@ class PopupSearchMenu {
           backgroundColor: gl.backgroundTransparentBlackBox,
           surfaceTintColor: Colors.transparent,
           shadowColor: Colors.transparent,
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text("Recherche d'un lieu", textAlign: TextAlign.justify),
-            ],
-          ),
           content: Theme(
             data: Theme.of(context).copyWith(
               canvasColor: Colors.transparent,
@@ -707,28 +699,27 @@ class PopupSearchMenu {
             child: SizedBox(
               width:
                   gl.display!.orientation!.index == 0
-                      ? gl.display!.equipixel! * gl.popupWindowsWidth
-                      : gl.display!.equipixel! * gl.display!.equiwidth!,
+                      ? gl.display!.equipixel! * gl.popupWindowsWidth * .95
+                      : gl.display!.equipixel! * gl.display!.equiwidth! * .9,
               height:
                   gl.display!.orientation!.index == 0
-                      ? gl.display!.equipixel! * gl.display!.equiheight!
-                      : gl.display!.equipixel! * gl.display!.equiheight!,
-              child: SearchMenu(state: state),
+                      ? gl.display!.equipixel! * gl.display!.equiheight! * .85
+                      : gl.display!.equipixel! * gl.display!.equiheight! * .8,
+              child: SearchMenu(state: state, after: after),
             ),
           ),
           titleTextStyle: TextStyle(color: Colors.white, fontSize: 25),
           actions: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [_returnButton(context, after)],
-            ),
+            if (gl.display!.orientation!.index == 0)
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [_returnButton(context, after)],
+              ),
           ],
         );
       },
-    ).whenComplete(() {
-      after();
-    });
-  }
+    ),
+  );
 }
 
 class SearchResultCard extends StatefulWidget {
@@ -787,35 +778,35 @@ class _SearchResultCard extends State<SearchResultCard> {
         margin: EdgeInsets.all(4),
         color: selected ? widget.boxColor.withAlpha(255) : widget.boxColor,
         child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Column(
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      alignment: Alignment.center,
-                      constraints: BoxConstraints(
-                        maxWidth:
-                            gl.display!.equipixel! * (gl.searchBarWidth + 5),
-                      ),
-                      child: Text(
-                        widget.typeDeResultat,
-                        style: TextStyle(
-                          color: getColorTextFromBackground(widget.boxColor),
-                          fontSize:
-                              selected
-                                  ? gl.display!.equipixel! *
-                                      gl.mediumFontSize *
-                                      .9
-                                  : gl.display!.equipixel! *
-                                      gl.mediumFontSize *
-                                      .7,
-                        ),
-                      ),
+                Container(
+                  alignment: Alignment.center,
+                  constraints:
+                      gl.display!.orientation!.index == 0
+                          ? BoxConstraints(
+                            maxWidth:
+                                gl.display!.equipixel! *
+                                (gl.searchBarWidth + 5),
+                          )
+                          : BoxConstraints(
+                            maxWidth:
+                                gl.display!.equipixel! * gl.searchBarWidth * .9,
+                          ),
+                  child: Text(
+                    widget.typeDeResultat,
+                    style: TextStyle(
+                      color: getColorTextFromBackground(widget.boxColor),
+                      fontSize:
+                          selected
+                              ? gl.display!.equipixel! * gl.mediumFontSize * .9
+                              : gl.display!.equipixel! * gl.mediumFontSize * .7,
                     ),
-                  ],
+                  ),
                 ),
+
                 Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
@@ -828,12 +819,12 @@ class _SearchResultCard extends State<SearchResultCard> {
                                 maxWidth:
                                     gl.display!.equipixel! *
                                     gl.display!.equiwidth! *
-                                    .6,
+                                    .7,
                               )
                               : BoxConstraints(
                                 maxWidth:
                                     gl.display!.equipixel! *
-                                    gl.display!.equiwidth! *
+                                    gl.searchBarWidth *
                                     .8,
                               ),
                       child: Text(
@@ -865,8 +856,9 @@ class _SearchResultCard extends State<SearchResultCard> {
 
 class SearchMenu extends StatefulWidget {
   final Function(LatLng) state;
+  final Function after;
 
-  const SearchMenu({super.key, required this.state});
+  const SearchMenu({super.key, required this.state, required this.after});
 
   @override
   State<StatefulWidget> createState() => _SearchMenu();
@@ -884,350 +876,403 @@ class _SearchMenu extends State<SearchMenu> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.transparent,
-      body: Column(
-        children: [
-          Container(
-            constraints: BoxConstraints(
-              minHeight: gl.display!.equipixel! * gl.searchBarHeight * .8,
-              maxHeight: gl.display!.equipixel! * gl.searchBarHeight,
-              minWidth: gl.display!.equipixel! * gl.searchBarWidth,
-              maxWidth: gl.display!.equipixel! * gl.searchBarWidth,
-            ),
-            child: Card(
-              child: TextFormField(
-                decoration: InputDecoration(
-                  border: InputBorder.none,
-                  hintText: "Tappez le nom d'un lieu",
-                  contentPadding: EdgeInsets.all(10),
-                  prefixIcon: Icon(Icons.search, color: Colors.black),
-                ),
-                autocorrect: false,
-                initialValue: lastSearchKey,
-                onChanged: (searchString) async {
-                  if (searchString.length < 2) {
-                    return;
-                  }
-                  lastSearchKey = searchString;
-                  http.Response response;
-                  if (searchCache[searchString] != null) {
-                    response = searchCache[searchString]!;
-                  } else {
-                    var request = Uri.parse(
-                      'http://gxgfservcarto.gxabt.ulg.ac.be:6666/search?layer=address&q=${searchString.replaceAll(' ', '+')}+Wallonie&format=json&addressdetails=1',
-                    );
-                    try {
-                      response = await http.get(request);
-                      searchCache[searchString] = response;
-                    } catch (e) {
-                      gl.print(e);
-
-                      response = http.Response("", 404);
-                    }
-                  }
-                  List<Map<String, dynamic>> decodedJson;
-                  try {
-                    (decodedJson =
-                        (jsonDecode(response.body) as List)
-                            .cast<Map<String, dynamic>>());
-                  } catch (e) {
-                    gl.print("Error with response from gecoding service! $e");
-                    (decodedJson =
-                        (jsonDecode(testNominatimJsonResult) as List)
-                            .cast<Map<String, dynamic>>());
-                  }
-                  gl.poiMarkerList.clear();
-                  searchResults.clear();
-                  _selectedSearchResultCard = -1;
-                  mounted
-                      ? setState(() {
-                        gl.selectedSearchMarker = -1;
-                        int i = 0;
-                        for (var entry in decodedJson) {
-                          String? typeDeResultat =
-                              prettyPrintNominatimResults[entry['addresstype']];
-                          if (typeDeResultat == null) {
-                            typeDeResultat = entry['addresstype'];
-                            gl.print(
-                              "Error: not a translated addresstype: ${entry['addresstype']}",
-                            );
-                          }
-                          String? descriptionDeResultat = entry['display_name'];
-                          if (descriptionDeResultat == null) {
-                            descriptionDeResultat = "Erreur du serveur";
-                            gl.print(
-                              "Erreur du serveur geocoding : ${entry['display_name']}",
-                            );
-                          } else {
-                            descriptionDeResultat = descriptionDeResultat
-                                .replaceAll(", België /", "");
-                            descriptionDeResultat = descriptionDeResultat
-                                .replaceAll("/ Belgien", "");
-                            descriptionDeResultat = descriptionDeResultat
-                                .replaceAll("Wallonie, ", "");
-                            descriptionDeResultat = descriptionDeResultat
-                                .replaceAll("Belgique", "");
-                          }
-                          gl.poiMarkerList.add(
-                            gl.PoiMarker(
-                              index: i++,
-                              position: LatLng(
-                                double.parse(entry['lat']),
-                                double.parse(entry['lon']),
-                              ),
-                              name: typeDeResultat!,
-                              address: descriptionDeResultat,
-                              city:
-                                  entry['address']['city'] ??
-                                  entry['address']['county'] ??
-                                  entry['address']['state'] ??
-                                  "",
-                              postcode: entry['address']['postcode'] ?? "",
-                            ),
-                          );
-                          searchResults.add(
-                            SearchResultCard(
-                              boxColor: getColorFromName(typeDeResultat),
-                              state: widget.state,
-                              typeDeResultat: typeDeResultat,
-                              entry: LatLng(
-                                double.parse(entry['lat']),
-                                double.parse(entry['lon']),
-                              ),
-                              descriptionDeResultat: descriptionDeResultat,
-                              index: i,
-                            ),
-                          );
-                        }
-                      })
-                      : () {
-                        {
-                          gl.selectedSearchMarker = -1;
-                          int i = 0;
-                          for (var entry in decodedJson) {
-                            String? typeDeResultat =
-                                prettyPrintNominatimResults[entry['addresstype']];
-                            if (typeDeResultat == null) {
-                              typeDeResultat = entry['addresstype'];
-                              gl.print(
-                                "Error: not a translated addresstype: ${entry['addresstype']}",
-                              );
-                            }
-                            String? descriptionDeResultat =
-                                entry['display_name'];
-                            if (descriptionDeResultat == null) {
-                              descriptionDeResultat = "Erreur du serveur";
-                              gl.print(
-                                "Erreur du serveur geocoding : ${entry['display_name']}",
-                              );
-                            } else {
-                              descriptionDeResultat = descriptionDeResultat
-                                  .replaceAll(", België /", "");
-                              descriptionDeResultat = descriptionDeResultat
-                                  .replaceAll("/ Belgien", "");
-                              descriptionDeResultat = descriptionDeResultat
-                                  .replaceAll("Wallonie, ", "");
-                              descriptionDeResultat = descriptionDeResultat
-                                  .replaceAll("Belgique", "");
-                            }
-                            Color boxColor = getColorFromName(typeDeResultat!);
-                            gl.poiMarkerList.add(
-                              gl.PoiMarker(
-                                index: i++,
-                                position: LatLng(
-                                  double.parse(entry['lat']),
-                                  double.parse(entry['lon']),
-                                ),
-                                name: typeDeResultat,
-                                address: descriptionDeResultat,
-                                city:
-                                    entry['address']['city'] ??
-                                    entry['address']['county'] ??
-                                    entry['address']['state'] ??
-                                    "",
-                                postcode: entry['address']['postcode'] ?? "",
-                              ),
-                            );
-                            searchResults.add(
-                              SearchResultCard(
-                                boxColor: boxColor,
-                                state: widget.state,
-                                typeDeResultat: typeDeResultat,
-                                entry: LatLng(
-                                  double.parse(entry['lat']),
-                                  double.parse(entry['lon']),
-                                ),
-                                descriptionDeResultat: descriptionDeResultat,
-                                index: i,
-                              ),
-                            );
-                          }
-                        }
-                      };
-                },
-              ),
-            ),
-          ),
-          Container(
-            constraints:
-                gl.display!.orientation!.index == 0
-                    ? BoxConstraints(
-                      minHeight:
-                          gl.display!.equiheight! * gl.display!.equipixel! * .4,
-                      maxHeight:
-                          gl.display!.equiheight! *
-                          gl.display!.equipixel! *
-                          .75,
-                    )
-                    : BoxConstraints(
-                      minHeight:
-                          gl.display!.equiheight! * gl.display!.equipixel! * .3,
-                      maxHeight:
-                          gl.display!.equiheight! *
-                          gl.display!.equipixel! *
-                          .457,
+      body: switchRowColWithOrientation([
+        Column(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            Column(
+              children: [
+                SizedBox(
+                  child: Text(
+                    "Recherche d'un lieu",
+                    textAlign: TextAlign.justify,
+                    style: TextStyle(
+                      fontSize:
+                          gl.display!.equipixel! * gl.mediumFontSize * .85,
+                      color: Colors.white,
                     ),
-            child: ListView(
-              padding: const EdgeInsets.symmetric(horizontal: 0),
-              children: <Widget>[] + searchResults,
+                  ),
+                ),
+                Container(
+                  constraints: BoxConstraints(
+                    minHeight:
+                        gl.display!.equipixel! * gl.searchBarHeight * .75,
+                    maxHeight: gl.display!.equipixel! * gl.searchBarHeight,
+                    minWidth: gl.display!.equipixel! * gl.searchBarWidth,
+                    maxWidth: gl.display!.equipixel! * gl.searchBarWidth,
+                  ),
+                  child: Card(
+                    child: TextFormField(
+                      decoration: InputDecoration(
+                        border: InputBorder.none,
+                        hintText: "Tappez le nom d'un lieu",
+                        contentPadding: EdgeInsets.all(10),
+                        prefixIcon: Icon(Icons.search, color: Colors.black),
+                      ),
+                      autocorrect: false,
+                      initialValue: lastSearchKey,
+                      onChanged: (searchString) async {
+                        if (searchString.length < 2) {
+                          return;
+                        }
+                        lastSearchKey = searchString;
+                        http.Response response;
+                        if (searchCache[searchString] != null) {
+                          response = searchCache[searchString]!;
+                        } else {
+                          var request = Uri.parse(
+                            'http://gxgfservcarto.gxabt.ulg.ac.be:6666/search?layer=address&q=${searchString.replaceAll(' ', '+')}+Wallonie&format=json&addressdetails=1',
+                          );
+                          try {
+                            response = await http.get(request);
+                            searchCache[searchString] = response;
+                          } catch (e) {
+                            gl.print(e);
+
+                            response = http.Response("", 404);
+                          }
+                        }
+                        List<Map<String, dynamic>> decodedJson;
+                        try {
+                          (decodedJson =
+                              (jsonDecode(response.body) as List)
+                                  .cast<Map<String, dynamic>>());
+                        } catch (e) {
+                          gl.print(
+                            "Error with response from gecoding service! $e",
+                          );
+                          (decodedJson =
+                              (jsonDecode(testNominatimJsonResult) as List)
+                                  .cast<Map<String, dynamic>>());
+                        }
+                        gl.poiMarkerList.clear();
+                        searchResults.clear();
+                        _selectedSearchResultCard = -1;
+                        mounted
+                            ? setState(() {
+                              gl.selectedSearchMarker = -1;
+                              int i = 0;
+                              for (var entry in decodedJson) {
+                                String? typeDeResultat =
+                                    prettyPrintNominatimResults[entry['addresstype']];
+                                if (typeDeResultat == null) {
+                                  typeDeResultat = entry['addresstype'];
+                                  gl.print(
+                                    "Error: not a translated addresstype: ${entry['addresstype']}",
+                                  );
+                                }
+                                String? descriptionDeResultat =
+                                    entry['display_name'];
+                                if (descriptionDeResultat == null) {
+                                  descriptionDeResultat = "Erreur du serveur";
+                                  gl.print(
+                                    "Erreur du serveur geocoding : ${entry['display_name']}",
+                                  );
+                                } else {
+                                  descriptionDeResultat = descriptionDeResultat
+                                      .replaceAll(", België /", "");
+                                  descriptionDeResultat = descriptionDeResultat
+                                      .replaceAll("/ Belgien", "");
+                                  descriptionDeResultat = descriptionDeResultat
+                                      .replaceAll("Wallonie, ", "");
+                                  descriptionDeResultat = descriptionDeResultat
+                                      .replaceAll("Belgique", "");
+                                }
+                                gl.poiMarkerList.add(
+                                  gl.PoiMarker(
+                                    index: i++,
+                                    position: LatLng(
+                                      double.parse(entry['lat']),
+                                      double.parse(entry['lon']),
+                                    ),
+                                    name: typeDeResultat!,
+                                    address: descriptionDeResultat,
+                                    city:
+                                        entry['address']['city'] ??
+                                        entry['address']['county'] ??
+                                        entry['address']['state'] ??
+                                        "",
+                                    postcode:
+                                        entry['address']['postcode'] ?? "",
+                                  ),
+                                );
+                                searchResults.add(
+                                  SearchResultCard(
+                                    boxColor: getColorFromName(typeDeResultat),
+                                    state: widget.state,
+                                    typeDeResultat: typeDeResultat,
+                                    entry: LatLng(
+                                      double.parse(entry['lat']),
+                                      double.parse(entry['lon']),
+                                    ),
+                                    descriptionDeResultat:
+                                        descriptionDeResultat,
+                                    index: i,
+                                  ),
+                                );
+                              }
+                            })
+                            : () {
+                              {
+                                gl.selectedSearchMarker = -1;
+                                int i = 0;
+                                for (var entry in decodedJson) {
+                                  String? typeDeResultat =
+                                      prettyPrintNominatimResults[entry['addresstype']];
+                                  if (typeDeResultat == null) {
+                                    typeDeResultat = entry['addresstype'];
+                                    gl.print(
+                                      "Error: not a translated addresstype: ${entry['addresstype']}",
+                                    );
+                                  }
+                                  String? descriptionDeResultat =
+                                      entry['display_name'];
+                                  if (descriptionDeResultat == null) {
+                                    descriptionDeResultat = "Erreur du serveur";
+                                    gl.print(
+                                      "Erreur du serveur geocoding : ${entry['display_name']}",
+                                    );
+                                  } else {
+                                    descriptionDeResultat =
+                                        descriptionDeResultat.replaceAll(
+                                          ", België /",
+                                          "",
+                                        );
+                                    descriptionDeResultat =
+                                        descriptionDeResultat.replaceAll(
+                                          "/ Belgien",
+                                          "",
+                                        );
+                                    descriptionDeResultat =
+                                        descriptionDeResultat.replaceAll(
+                                          "Wallonie, ",
+                                          "",
+                                        );
+                                    descriptionDeResultat =
+                                        descriptionDeResultat.replaceAll(
+                                          "Belgique",
+                                          "",
+                                        );
+                                  }
+                                  Color boxColor = getColorFromName(
+                                    typeDeResultat!,
+                                  );
+                                  gl.poiMarkerList.add(
+                                    gl.PoiMarker(
+                                      index: i++,
+                                      position: LatLng(
+                                        double.parse(entry['lat']),
+                                        double.parse(entry['lon']),
+                                      ),
+                                      name: typeDeResultat,
+                                      address: descriptionDeResultat,
+                                      city:
+                                          entry['address']['city'] ??
+                                          entry['address']['county'] ??
+                                          entry['address']['state'] ??
+                                          "",
+                                      postcode:
+                                          entry['address']['postcode'] ?? "",
+                                    ),
+                                  );
+                                  searchResults.add(
+                                    SearchResultCard(
+                                      boxColor: boxColor,
+                                      state: widget.state,
+                                      typeDeResultat: typeDeResultat,
+                                      entry: LatLng(
+                                        double.parse(entry['lat']),
+                                        double.parse(entry['lon']),
+                                      ),
+                                      descriptionDeResultat:
+                                          descriptionDeResultat,
+                                      index: i,
+                                    ),
+                                  );
+                                }
+                              }
+                            };
+                      },
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ),
-        ],
-      ),
+            if (gl.display!.orientation!.index == 1)
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [_returnButton(context, widget.after)],
+              ),
+          ],
+        ),
+        Container(
+          constraints:
+              gl.display!.orientation!.index == 0
+                  ? BoxConstraints(
+                    minHeight:
+                        gl.display!.equiheight! * gl.display!.equipixel! * .4,
+                    maxHeight:
+                        gl.display!.equiheight! * gl.display!.equipixel! * .75,
+                  )
+                  : BoxConstraints(
+                    minHeight:
+                        gl.display!.equiheight! * gl.display!.equipixel! * .5,
+                    maxHeight:
+                        gl.display!.equiheight! * gl.display!.equipixel! * .7,
+                    minWidth:
+                        gl.display!.equiwidth! * gl.display!.equipixel! * .35,
+                    maxWidth:
+                        gl.display!.equiwidth! * gl.display!.equipixel! * .35,
+                  ),
+          child: ListView(children: <Widget>[] + searchResults),
+        ),
+      ]),
     );
   }
 }
 
 int developperModeCounter = 0;
 Widget forestimatorSettingsVersion(Function state) {
-  return Container(
-    padding: EdgeInsets.all(7.5),
-    child: Column(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.start,
+  return OrientationBuilder(
+    builder: (context, orientation) {
+      return Container(
+        padding: EdgeInsets.all(7.5),
+        child: Column(
           children: [
-            Text(
-              "Forestimator Mobile",
-              overflow: TextOverflow.clip,
-              textAlign: TextAlign.left,
-              textScaler: TextScaler.linear(2.0),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Text(
+                  "Forestimator Mobile",
+                  overflow: TextOverflow.clip,
+                  textAlign: TextAlign.left,
+                  textScaler: TextScaler.linear(2.0),
+                ),
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Text(
+                  "version ${gl.forestimatorMobileVersion}",
+                  overflow: TextOverflow.clip,
+                  textAlign: TextAlign.left,
+                  textScaler: TextScaler.linear(1.0),
+                ),
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Container(
+                  constraints: BoxConstraints(
+                    maxWidth: gl.display!.equipixel! * 45,
+                  ),
+                  child: TextButton(
+                    onPressed: () async {
+                      developperModeCounter++;
+                      if (developperModeCounter > 6) {
+                        state(() {
+                          gl.modeDevelopper = !gl.modeDevelopper;
+                        });
+                        final SharedPreferences prefs =
+                            await SharedPreferences.getInstance();
+                        await prefs.setBool(
+                          'modeDevelopper',
+                          gl.modeDevelopper,
+                        );
+                        developperModeCounter = 0;
+                      }
+                    },
+                    child: Image.asset("assets/images/LogoForestimator.png"),
+                  ),
+                ),
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Text(
+                  "Programmé et soigné par:\nJonathan Lisein et Thierry Thissen\n",
+                  overflow: TextOverflow.clip,
+                  textAlign: TextAlign.left,
+                  textScaler: TextScaler.linear(1.0),
+                ),
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Container(
+                  constraints: BoxConstraints(
+                    maxWidth: gl.display!.equipixel! * 60,
+                  ),
+                  child: Text(
+                    "Finançements du projet",
+                    overflow: TextOverflow.clip,
+                    textAlign: TextAlign.justify,
+                    textScaler: TextScaler.linear(1.5),
+                  ),
+                ),
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  constraints: BoxConstraints(
+                    maxWidth:
+                        gl.display!.equipixel! * gl.display!.equiwidth! * .7,
+                  ),
+                  child: Text(
+                    "Le développement est financé par l'Accord Cadre de Recherches et Vulgarisation Forestières.\nLe contenu cartographique est en grande partie issu des recherches menées au sein de l'unité de Gestion des Ressources Forestières de Gembloux Agro-Bio Tech (ULiège).\n",
+                    textAlign: TextAlign.justify,
+                    style: TextStyle(
+                      color: Colors.black,
+                      overflow: TextOverflow.fade,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Container(
+                  constraints: BoxConstraints(
+                    maxWidth:
+                        gl.display!.equipixel! * gl.display!.equiwidth! * .7,
+                  ),
+                  child: Text(
+                    "Contact: Philippe Lejeune",
+                    overflow: TextOverflow.clip,
+                    textAlign: TextAlign.justify,
+                    textScaler: TextScaler.linear(1.0),
+                  ),
+                ),
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                TextButton(
+                  onPressed: () {
+                    launchURL('p.lejeune@uliege.be');
+                  },
+                  child: Text(
+                    "p.lejeune@uliege.be",
+                    overflow: TextOverflow.clip,
+                    textAlign: TextAlign.left,
+                    textScaler: TextScaler.linear(1.0),
+                    style: TextStyle(color: Colors.black),
+                  ),
+                ),
+              ],
             ),
           ],
         ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Text(
-              "version ${gl.forestimatorMobileVersion}",
-              overflow: TextOverflow.clip,
-              textAlign: TextAlign.left,
-              textScaler: TextScaler.linear(1.0),
-            ),
-          ],
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Container(
-              constraints: BoxConstraints(
-                maxWidth: gl.display!.equipixel! * 45,
-              ),
-              child: TextButton(
-                onPressed: () async {
-                  developperModeCounter++;
-                  if (developperModeCounter > 6) {
-                    state(() {
-                      gl.modeDevelopper = !gl.modeDevelopper;
-                    });
-                    final SharedPreferences prefs =
-                        await SharedPreferences.getInstance();
-                    await prefs.setBool('modeDevelopper', gl.modeDevelopper);
-                    developperModeCounter = 0;
-                  }
-                },
-                child: Image.asset("assets/images/LogoForestimator.png"),
-              ),
-            ),
-          ],
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Text(
-              "Programmé et soigné par:\nJonathan Lisein et Thierry Thissen\n",
-              overflow: TextOverflow.clip,
-              textAlign: TextAlign.left,
-              textScaler: TextScaler.linear(1.0),
-            ),
-          ],
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Container(
-              constraints: BoxConstraints(
-                maxWidth: gl.display!.equipixel! * 60,
-              ),
-              child: Text(
-                "Finançements du projet",
-                overflow: TextOverflow.clip,
-                textAlign: TextAlign.justify,
-                textScaler: TextScaler.linear(1.5),
-              ),
-            ),
-          ],
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              constraints: BoxConstraints(
-                maxWidth: gl.display!.equipixel! * gl.display!.equiwidth! * .9,
-              ),
-              child: Text(
-                "Le développement est financé par l'Accord Cadre de Recherches et Vulgarisation Forestières.\nLe contenu cartographique est en grande partie issu des recherches menées au sein de l'unité de Gestion des Ressources Forestières de Gembloux Agro-Bio Tech (ULiège).\n",
-                overflow: TextOverflow.clip,
-                textAlign: TextAlign.justify,
-                textScaler: TextScaler.linear(1.0),
-              ),
-            ),
-          ],
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Container(
-              constraints: BoxConstraints(
-                maxWidth: gl.display!.equipixel! * gl.display!.equiwidth! * .7,
-              ),
-              child: Text(
-                "Contact: Philippe Lejeune",
-                overflow: TextOverflow.clip,
-                textAlign: TextAlign.justify,
-                textScaler: TextScaler.linear(1.0),
-              ),
-            ),
-          ],
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            TextButton(
-              onPressed: () {
-                launchURL('p.lejeune@uliege.be');
-              },
-              child: Text(
-                "p.lejeune@uliege.be",
-                overflow: TextOverflow.clip,
-                textAlign: TextAlign.left,
-                textScaler: TextScaler.linear(1.0),
-                style: TextStyle(color: Colors.black),
-              ),
-            ),
-          ],
-        ),
-      ],
-    ),
+      );
+    },
   );
 }
 
@@ -1241,69 +1286,73 @@ void launchURL(String url) async {
 }
 
 Widget forestimatorSettingsContacts() {
-  return Container(
-    padding: EdgeInsets.all(7.5),
-    child: Column(
-      children: [
-        Image.asset("assets/images/GRF_nouveau_logo_uliege-retina.jpg"),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.start,
+  return OrientationBuilder(
+    builder: (context, orientation) {
+      return Container(
+        padding: EdgeInsets.all(7.5),
+        child: Column(
           children: [
-            Text(
-              "Sur notre Site:",
-              overflow: TextOverflow.clip,
-              textAlign: TextAlign.left,
-              textScaler: TextScaler.linear(1.0),
+            Image.asset("assets/images/GRF_nouveau_logo_uliege-retina.jpg"),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Text(
+                  "Sur notre Site:",
+                  overflow: TextOverflow.clip,
+                  textAlign: TextAlign.left,
+                  textScaler: TextScaler.linear(1.0),
+                ),
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                TextButton(
+                  onPressed: () {
+                    launchURL('https://www.grf.uliege.be');
+                  },
+                  child: Text(
+                    "https://www.grf.uliege.be",
+                    overflow: TextOverflow.clip,
+                    textAlign: TextAlign.left,
+                    textScaler: TextScaler.linear(1.0),
+                    style: TextStyle(color: Colors.blue),
+                  ),
+                ),
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Text(
+                  "ou par mail:",
+                  overflow: TextOverflow.clip,
+                  textAlign: TextAlign.left,
+                  textScaler: TextScaler.linear(1.0),
+                ),
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                TextButton(
+                  onPressed: () {
+                    launchURL('JO.Lisein@uliege.be');
+                  },
+                  child: Text(
+                    "JO.Lisein@uliege.be",
+                    overflow: TextOverflow.clip,
+                    textAlign: TextAlign.left,
+                    textScaler: TextScaler.linear(1.0),
+                    style: TextStyle(color: Colors.black),
+                  ),
+                ),
+              ],
             ),
           ],
         ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            TextButton(
-              onPressed: () {
-                launchURL('https://www.grf.uliege.be');
-              },
-              child: Text(
-                "https://www.grf.uliege.be",
-                overflow: TextOverflow.clip,
-                textAlign: TextAlign.left,
-                textScaler: TextScaler.linear(1.0),
-                style: TextStyle(color: Colors.blue),
-              ),
-            ),
-          ],
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Text(
-              "ou par mail:",
-              overflow: TextOverflow.clip,
-              textAlign: TextAlign.left,
-              textScaler: TextScaler.linear(1.0),
-            ),
-          ],
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            TextButton(
-              onPressed: () {
-                launchURL('JO.Lisein@uliege.be');
-              },
-              child: Text(
-                "JO.Lisein@uliege.be",
-                overflow: TextOverflow.clip,
-                textAlign: TextAlign.left,
-                textScaler: TextScaler.linear(1.0),
-                style: TextStyle(color: Colors.black),
-              ),
-            ),
-          ],
-        ),
-      ],
-    ),
+      );
+    },
   );
 }
 
@@ -1319,79 +1368,92 @@ class _ForestimatorLog extends State<ForestimatorLog> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children:
-          <Widget>[
-            Container(
-              constraints: BoxConstraints(
-                minWidth: gl.display!.equipixel! * 50,
-              ),
-              child: FloatingActionButton(
-                onPressed: () {
-                  setState(() {
-                    lengthLog + 5 < gl.onboardLog.length
-                        ? lengthLog = lengthLog + 5
-                        : lengthLog = gl.onboardLog.length;
-                  });
-                },
-                child:
-                    lengthLog != gl.onboardLog.length
-                        ? Text("Afficher +")
-                        : Text("FIN"),
-              ),
-            ),
-          ] +
-          List<Widget>.generate(lengthLog, (i) {
-            return gl.onboardLog.length - lengthLog > 0
-                ? Row(
-                  children: [
-                    Container(
-                      constraints: BoxConstraints(
-                        minWidth: gl.display!.equipixel! * 5,
-                      ),
-                      child: Text("${gl.onboardLog.length - lengthLog + i}) "),
-                    ),
-                    Container(
-                      constraints: BoxConstraints(
-                        maxWidth:
-                            gl.display!.equipixel! *
-                            gl.display!.equiwidth! *
-                            .9,
-                      ),
-                      child: Text(
-                        gl.onboardLog[gl.onboardLog.length - lengthLog + i],
-                        textScaler: TextScaler.linear(0.75),
-                      ),
-                    ),
-                  ],
-                )
-                : gl.onboardLog.length - i > 0
-                ? Row(
-                  children: [
-                    Container(
-                      constraints: BoxConstraints(
-                        minWidth: gl.display!.equipixel! * 5,
-                      ),
-                      child: Text("$i"),
-                    ),
-                    Container(
-                      constraints: BoxConstraints(
-                        maxWidth:
-                            gl.display!.equipixel! *
-                            gl.display!.equiwidth! *
-                            .9,
-                      ),
-                      child: Text(
-                        gl.onboardLog[i],
-                        textScaler: TextScaler.linear(0.75),
-                      ),
-                    ),
-                  ],
-                )
-                : Row();
-          }),
+    return OrientationBuilder(
+      builder: (context, orientation) {
+        return Column(
+          children:
+              <Widget>[
+                Container(
+                  constraints: BoxConstraints(
+                    minWidth: gl.display!.equipixel! * 50,
+                  ),
+                  child: FloatingActionButton(
+                    onPressed: () {
+                      setState(() {
+                        lengthLog + 5 < gl.onboardLog.length
+                            ? lengthLog = lengthLog + 5
+                            : lengthLog = gl.onboardLog.length;
+                      });
+                    },
+                    child:
+                        lengthLog != gl.onboardLog.length
+                            ? Text("Afficher +")
+                            : Text("FIN"),
+                  ),
+                ),
+              ] +
+              List<Widget>.generate(lengthLog, (i) {
+                return gl.onboardLog.length - lengthLog > 0
+                    ? Row(
+                      children: [
+                        Container(
+                          constraints: BoxConstraints(
+                            minWidth: gl.display!.equipixel! * 5,
+                          ),
+                          child: Text(
+                            "${gl.onboardLog.length - lengthLog + i}) ",
+                          ),
+                        ),
+                        Container(
+                          constraints: BoxConstraints(
+                            maxWidth:
+                                gl.display!.equipixel! *
+                                gl.display!.equiwidth! *
+                                .9,
+                          ),
+                          child: Text(
+                            gl.onboardLog[gl.onboardLog.length - lengthLog + i],
+                            textScaler: TextScaler.linear(0.75),
+                          ),
+                        ),
+                      ],
+                    )
+                    : gl.onboardLog.length - i > 0
+                    ? Row(
+                      children: [
+                        Container(
+                          constraints: BoxConstraints(
+                            minWidth: gl.display!.equipixel! * 5,
+                          ),
+                          child: Text("$i"),
+                        ),
+                        Container(
+                          constraints: BoxConstraints(
+                            maxWidth:
+                                gl.display!.equipixel! *
+                                gl.display!.equiwidth! *
+                                .9,
+                          ),
+                          child: Text(
+                            gl.onboardLog[i],
+                            textScaler: TextScaler.linear(0.75),
+                          ),
+                        ),
+                      ],
+                    )
+                    : Row();
+              }),
+        );
+      },
     );
   }
+}
+
+TextStyle styleSettingMenu() {
+  return TextStyle(
+    color: Colors.black,
+    fontSize: gl.display!.equipixel! * gl.smallFontSize * 1.2,
+  );
 }
 
 Widget forestimatorSettingsPermissions(Function state) {
@@ -1406,8 +1468,7 @@ Widget forestimatorSettingsPermissions(Function state) {
               "Gestion des permissions",
               overflow: TextOverflow.clip,
               textAlign: TextAlign.left,
-              textScaler: TextScaler.linear(1.5),
-              style: TextStyle(color: Colors.black),
+              style: styleSettingMenu(),
             ),
           ],
         ),
@@ -1418,8 +1479,7 @@ Widget forestimatorSettingsPermissions(Function state) {
               "GPS: ",
               overflow: TextOverflow.clip,
               textAlign: TextAlign.left,
-              textScaler: TextScaler.linear(1.0),
-              style: TextStyle(color: Colors.black),
+              style: styleSettingMenu(),
             ),
             TextButton(
               onPressed: () {
@@ -1432,14 +1492,13 @@ Widget forestimatorSettingsPermissions(Function state) {
                         ? Icons.check_circle
                         : Icons.circle_notifications,
                     color: getLocation() ? Colors.green : Colors.red,
-                    size: 25,
+                    size: gl.display!.equipixel! * gl.iconSize * .6,
                   ),
                   Text(
                     getLocation() ? "Accordé." : "Pas accordé.",
                     overflow: TextOverflow.clip,
                     textAlign: TextAlign.left,
-                    textScaler: TextScaler.linear(1.0),
-                    style: TextStyle(color: Colors.black),
+                    style: styleSettingMenu(),
                   ),
                 ],
               ),
@@ -1454,8 +1513,7 @@ Widget forestimatorSettingsPermissions(Function state) {
                 "Stockage des pdf: ",
                 overflow: TextOverflow.clip,
                 textAlign: TextAlign.left,
-                textScaler: TextScaler.linear(1.0),
-                style: TextStyle(color: Colors.black),
+                style: styleSettingMenu(),
               ),
               TextButton(
                 onPressed: () {
@@ -1468,14 +1526,13 @@ Widget forestimatorSettingsPermissions(Function state) {
                           ? Icons.check_circle
                           : Icons.circle_notifications,
                       color: getStorage() ? Colors.green : Colors.red,
-                      size: 25,
+                      size: gl.display!.equipixel! * gl.iconSize * .6,
                     ),
                     Text(
                       getStorage() ? "Accordé." : "Pas accordé.",
                       overflow: TextOverflow.clip,
                       textAlign: TextAlign.left,
-                      textScaler: TextScaler.linear(1.0),
-                      style: TextStyle(color: Colors.black),
+                      style: styleSettingMenu(),
                     ),
                   ],
                 ),
@@ -1488,68 +1545,77 @@ Widget forestimatorSettingsPermissions(Function state) {
 }
 
 Widget forestimatorConfidentiality() {
-  return Column(
-    children: [
-      Row(
-        mainAxisAlignment: MainAxisAlignment.center,
+  return OrientationBuilder(
+    builder: (context, orientation) {
+      return Column(
         children: [
-          Container(
-            padding: EdgeInsets.all(5),
-            constraints: BoxConstraints(
-              maxWidth: gl.display!.equipixel! * gl.display!.equiwidth! * .9,
-            ),
-            child: Text(
-              "Forestimator mobile ne collecte aucune donnée. Notre politique de confidentialité est consultable au:",
-              overflow: TextOverflow.clip,
-              textAlign: TextAlign.justify,
-              textScaler: TextScaler.linear(1.0),
-            ),
-          ),
-        ],
-      ),
-      Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          TextButton(
-            onPressed: () {
-              launchURL(
-                'https://forestimator.gembloux.ulg.ac.be/documentation/confidentialit_',
-              );
-            },
-            child: Container(
-              padding: EdgeInsets.all(5),
-              constraints: BoxConstraints(
-                maxWidth: gl.display!.equipixel! * gl.display!.equiwidth! * .8,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                padding: EdgeInsets.all(5),
+                constraints: BoxConstraints(
+                  maxWidth:
+                      gl.display!.equipixel! * gl.display!.equiwidth! * .9,
+                ),
+                child: Text(
+                  "Forestimator mobile ne collecte aucune donnée. Notre politique de confidentialité est consultable au:",
+                  overflow: TextOverflow.clip,
+                  textAlign: TextAlign.justify,
+                  style: styleSettingMenu(),
+                ),
               ),
-              child: Text(
-                "https://forestimator.gembloux.ulg.ac.be/documentation/confidentialit_",
-                overflow: TextOverflow.clip,
-                textAlign: TextAlign.left,
-                textScaler: TextScaler.linear(1.0),
-                style: TextStyle(color: Colors.blue),
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              TextButton(
+                onPressed: () {
+                  launchURL(
+                    'https://forestimator.gembloux.ulg.ac.be/documentation/confidentialit_',
+                  );
+                },
+                child: Container(
+                  padding: EdgeInsets.all(5),
+                  constraints: BoxConstraints(
+                    maxWidth:
+                        gl.display!.equipixel! * gl.display!.equiwidth! * .8,
+                  ),
+                  child: Text(
+                    "https://forestimator.gembloux.ulg.ac.be/documentation/confidentialit_",
+                    overflow: TextOverflow.clip,
+                    textAlign: TextAlign.left,
+                    style: TextStyle(
+                      color: Colors.blue,
+                      fontSize: gl.display!.equipixel! * gl.smallFontSize * 1.2,
+                    ),
+                  ),
+                ),
               ),
-            ),
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                padding: EdgeInsets.all(5),
+                constraints: BoxConstraints(
+                  maxWidth:
+                      gl.display!.equipixel! * gl.display!.equiwidth! * .9,
+                ),
+                child: Text(
+                  "L'application utilise le gps pour afficher votre position actuelle sur la carte et seulement pendant l'utilisation.",
+                  overflow: TextOverflow.clip,
+                  textAlign: TextAlign.justify,
+                  style: styleSettingMenu(),
+                ),
+              ),
+            ],
           ),
         ],
-      ),
-      Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            padding: EdgeInsets.all(5),
-            constraints: BoxConstraints(
-              maxWidth: gl.display!.equipixel! * gl.display!.equiwidth! * .9,
-            ),
-            child: Text(
-              "L'application utilise le gps pour afficher votre position actuelle sur la carte et seulement pendant l'utilisation.",
-              overflow: TextOverflow.clip,
-              textAlign: TextAlign.justify,
-              textScaler: TextScaler.linear(1.0),
-            ),
-          ),
-        ],
-      ),
-    ],
+      );
+    },
   );
 }
 
@@ -1659,17 +1725,15 @@ class _SettingsMenu extends State<SettingsMenu> {
   }
 }
 
-class PopupPolygonListMenu {
-  PopupPolygonListMenu(
-    BuildContext context,
-    String currentName,
-    Function(LatLng) state,
-    Function after,
-  ) {
-    showDialog(
-      barrierDismissible: false,
-      context: context,
-      builder: (BuildContext context) {
+Widget popupPolygonListMenu(
+  BuildContext context,
+  String currentName,
+  Function(LatLng) state,
+  Function after,
+) {
+  return MaterialApp(
+    home: OrientationBuilder(
+      builder: (context, orientation) {
         return AlertDialog(
           titlePadding: EdgeInsets.all(5),
           actionsPadding: EdgeInsets.all(0),
@@ -1714,22 +1778,32 @@ class PopupPolygonListMenu {
           ),
 
           actions: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [_returnButton(context, after)],
-            ),
+            gl.display!.orientation!.index == 0
+                ? Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [_returnButton(context, after)],
+                )
+                : Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    if (gl.display!.orientation!.index == 1)
+                      SizedBox(
+                        width: gl.display!.equipixel! * gl.iconSize * .25,
+                      ),
+                    _returnButton(context, after),
+                  ],
+                ),
           ],
         );
       },
-    ).whenComplete(() {
-      after();
-    });
-  }
+    ),
+  );
 }
 
 Widget _returnButton(BuildContext context, Function after) {
-  return SizedBox(
-    height: gl.display!.equipixel! * gl.popupReturnButtonHeight,
+  return Container(
+    padding: EdgeInsets.all(2),
+    height: gl.display!.equipixel! * gl.popupReturnButtonHeight * .8,
     width: gl.display!.equipixel! * gl.popupReturnButtonWidth,
 
     child: FloatingActionButton(
@@ -1737,27 +1811,28 @@ Widget _returnButton(BuildContext context, Function after) {
       child: Text(
         "Retour!",
         maxLines: 1,
-        style: TextStyle(fontSize: gl.display!.equipixel! * gl.mediumFontSize),
+        style: TextStyle(
+          fontSize: gl.display!.equipixel! * gl.mediumFontSize,
+          color: Colors.black,
+        ),
       ),
       onPressed: () {
         after();
-        Navigator.of(context, rootNavigator: true).pop();
+        gl.mainStackPopLast();
       },
     ),
   );
 }
 
-class PopupSettingsMenu {
-  PopupSettingsMenu(
-    BuildContext context,
-    String currentName,
-    Function state,
-    Function after,
-  ) {
-    showDialog(
-      barrierDismissible: false,
-      context: context,
-      builder: (BuildContext context) {
+Widget popupSettingsMenu(
+  BuildContext context,
+  String currentName,
+  Function state,
+  Function after,
+) {
+  return MaterialApp(
+    home: OrientationBuilder(
+      builder: (context, orientation) {
         return AlertDialog(
           titlePadding: EdgeInsets.all(5),
           actionsPadding: EdgeInsets.all(0),
@@ -1781,15 +1856,26 @@ class PopupSettingsMenu {
             child: SettingsMenu(state: state),
           ),
           actions: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [_returnButton(context, after)],
-            ),
+            gl.display!.orientation!.index == 0
+                ? Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [_returnButton(context, after)],
+                )
+                : Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    if (gl.display!.orientation!.index == 1)
+                      SizedBox(
+                        width: gl.display!.equipixel! * gl.iconSize * .25,
+                      ),
+                    _returnButton(context, after),
+                  ],
+                ),
           ],
         );
       },
-    );
-  }
+    ),
+  );
 }
 
 Widget _resultRow(String key, String value) {
@@ -2011,51 +2097,43 @@ class _ResultsMenu extends State<ResultsMenu> {
   }
 }
 
-class PopupResultsMenu {
-  PopupResultsMenu(
-    BuildContext context,
-    Map<String, dynamic> json,
-    Function state,
-    Function after,
-  ) {
-    showDialog(
-      barrierDismissible: false,
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          titlePadding: EdgeInsets.all(5),
-          actionsPadding: EdgeInsets.all(0),
-          contentPadding: EdgeInsets.all(0),
-          insetPadding: EdgeInsets.all(0),
-          buttonPadding: EdgeInsets.all(0),
-          iconPadding: EdgeInsets.all(0),
-          backgroundColor: Colors.transparent,
-          surfaceTintColor: Colors.transparent,
-          shadowColor: Colors.transparent,
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                "Résultats",
-                textScaler: TextScaler.linear(2.0),
-                style: TextStyle(color: Colors.white),
-              ),
-            ],
-          ),
-          content: SizedBox(
-            width: gl.display!.equipixel! * gl.display!.equiwidth! * .95,
-            child: ResultsMenu(json: json),
-          ),
-          actions: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [_returnButton(context, after)],
-            ),
-          ],
-        );
-      },
-    );
-  }
+Widget popupResultsMenu(
+  BuildContext context,
+  Map<String, dynamic> json,
+  Function state,
+  Function after,
+) {
+  return AlertDialog(
+    titlePadding: EdgeInsets.all(5),
+    actionsPadding: EdgeInsets.all(0),
+    contentPadding: EdgeInsets.all(0),
+    insetPadding: EdgeInsets.all(0),
+    buttonPadding: EdgeInsets.all(0),
+    iconPadding: EdgeInsets.all(0),
+    backgroundColor: Colors.transparent,
+    surfaceTintColor: Colors.transparent,
+    shadowColor: Colors.transparent,
+    title: Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(
+          "Résultats",
+          textScaler: TextScaler.linear(2.0),
+          style: TextStyle(color: Colors.white),
+        ),
+      ],
+    ),
+    content: SizedBox(
+      width: gl.display!.equipixel! * gl.display!.equiwidth! * .95,
+      child: ResultsMenu(json: json),
+    ),
+    actions: [
+      Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [_returnButton(context, after)],
+      ),
+    ],
+  );
 }
 
 String testNominatimJsonResult =
@@ -2083,8 +2161,8 @@ class _OnlineMapStatusTool extends State<OnlineMapStatusTool> {
                 minimumSize: WidgetStateProperty<Size>.fromMap(
                   <WidgetStatesConstraint, Size>{
                     WidgetState.any: Size(
-                      MediaQuery.of(context).size.width * .99,
-                      MediaQuery.of(context).size.height * .075,
+                      gl.display!.equipixel! * gl.onCatalogueWidth * .98,
+                      gl.display!.equipixel! * 15,
                     ),
                   },
                 ),
@@ -2092,15 +2170,19 @@ class _OnlineMapStatusTool extends State<OnlineMapStatusTool> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  const Icon(Icons.pentagon, size: 28, color: Colors.black),
+                  Icon(
+                    Icons.pentagon,
+                    size: gl.display!.equipixel! * gl.onCatalogueIconSize,
+                    color: Colors.black,
+                  ),
                   Container(
                     constraints: BoxConstraints(
-                      maxWidth: MediaQuery.of(context).size.width * .05,
+                      maxWidth: gl.display!.equipixel! * 5,
                     ),
                   ),
                   Container(
                     constraints: BoxConstraints(
-                      maxWidth: MediaQuery.of(context).size.width * .6,
+                      maxWidth: gl.display!.equipixel! * 60,
                     ),
                     child: Text(
                       "La couche est selectionnée pour l'analyse surfacique.",
@@ -2129,8 +2211,8 @@ class _OnlineMapStatusTool extends State<OnlineMapStatusTool> {
                 minimumSize: WidgetStateProperty<Size>.fromMap(
                   <WidgetStatesConstraint, Size>{
                     WidgetState.any: Size(
-                      MediaQuery.of(context).size.width * .99,
-                      MediaQuery.of(context).size.height * .075,
+                      gl.display!.equipixel! * gl.onCatalogueWidth * .98,
+                      gl.display!.equipixel! * 15,
                     ),
                   },
                 ),
@@ -2138,19 +2220,19 @@ class _OnlineMapStatusTool extends State<OnlineMapStatusTool> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  const Icon(
+                  Icon(
                     Icons.pentagon_outlined,
-                    size: 28,
+                    size: gl.display!.equipixel! * gl.onCatalogueIconSize,
                     color: Colors.black,
                   ),
                   Container(
                     constraints: BoxConstraints(
-                      maxWidth: MediaQuery.of(context).size.width * .05,
+                      maxWidth: gl.display!.equipixel! * 5,
                     ),
                   ),
                   Container(
                     constraints: BoxConstraints(
-                      maxWidth: MediaQuery.of(context).size.width * .6,
+                      maxWidth: gl.display!.equipixel! * 60,
                     ),
                     child: Text(
                       "La couche n'est pas selectionnée pour l'analyse surfacique.",
@@ -2180,8 +2262,8 @@ class _OnlineMapStatusTool extends State<OnlineMapStatusTool> {
                 minimumSize: WidgetStateProperty<Size>.fromMap(
                   <WidgetStatesConstraint, Size>{
                     WidgetState.any: Size(
-                      MediaQuery.of(context).size.width * .99,
-                      MediaQuery.of(context).size.height * .075,
+                      gl.display!.equipixel! * gl.onCatalogueWidth * .98,
+                      gl.display!.equipixel! * 15,
                     ),
                   },
                 ),
@@ -2189,15 +2271,19 @@ class _OnlineMapStatusTool extends State<OnlineMapStatusTool> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  const Icon(Icons.location_on, size: 28, color: Colors.black),
+                  Icon(
+                    Icons.location_on,
+                    size: gl.display!.equipixel! * gl.onCatalogueIconSize,
+                    color: Colors.black,
+                  ),
                   Container(
                     constraints: BoxConstraints(
-                      maxWidth: MediaQuery.of(context).size.width * .05,
+                      maxWidth: gl.display!.equipixel! * 5,
                     ),
                   ),
                   Container(
                     constraints: BoxConstraints(
-                      maxWidth: MediaQuery.of(context).size.width * .6,
+                      maxWidth: gl.display!.equipixel! * 60,
                     ),
                     child: Text(
                       "La couche est selectionnée pour l'analyse ponctuelle.",
@@ -2226,8 +2312,8 @@ class _OnlineMapStatusTool extends State<OnlineMapStatusTool> {
                 minimumSize: WidgetStateProperty<Size>.fromMap(
                   <WidgetStatesConstraint, Size>{
                     WidgetState.any: Size(
-                      MediaQuery.of(context).size.width * .99,
-                      MediaQuery.of(context).size.height * .075,
+                      gl.display!.equipixel! * gl.onCatalogueWidth * .98,
+                      gl.display!.equipixel! * 15,
                     ),
                   },
                 ),
@@ -2235,15 +2321,19 @@ class _OnlineMapStatusTool extends State<OnlineMapStatusTool> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  const Icon(Icons.location_off, size: 28, color: Colors.black),
+                  Icon(
+                    Icons.location_off,
+                    size: gl.display!.equipixel! * gl.onCatalogueIconSize,
+                    color: Colors.black,
+                  ),
                   Container(
                     constraints: BoxConstraints(
-                      maxWidth: MediaQuery.of(context).size.width * .05,
+                      maxWidth: gl.display!.equipixel! * 5,
                     ),
                   ),
                   Container(
                     constraints: BoxConstraints(
-                      maxWidth: MediaQuery.of(context).size.width * .6,
+                      maxWidth: gl.display!.equipixel! * 60,
                     ),
                     child: Text(
                       "La couche n'est pas selectionnée pour l'analyse ponctuelle.",
@@ -2273,8 +2363,8 @@ class _OnlineMapStatusTool extends State<OnlineMapStatusTool> {
               minimumSize: WidgetStateProperty<Size>.fromMap(
                 <WidgetStatesConstraint, Size>{
                   WidgetState.any: Size(
-                    MediaQuery.of(context).size.width * .99,
-                    MediaQuery.of(context).size.height * .075,
+                    gl.display!.equipixel! * gl.onCatalogueWidth * .98,
+                    gl.display!.equipixel! * 15,
                   ),
                 },
               ),
@@ -2282,15 +2372,19 @@ class _OnlineMapStatusTool extends State<OnlineMapStatusTool> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                const Icon(Icons.picture_as_pdf, size: 28, color: Colors.black),
+                Icon(
+                  Icons.picture_as_pdf,
+                  size: gl.display!.equipixel! * gl.onCatalogueIconSize,
+                  color: Colors.black,
+                ),
                 Container(
                   constraints: BoxConstraints(
-                    maxWidth: MediaQuery.of(context).size.width * .05,
+                    maxWidth: gl.display!.equipixel! * 5,
                   ),
                 ),
                 Container(
                   constraints: BoxConstraints(
-                    maxWidth: MediaQuery.of(context).size.width * .6,
+                    maxWidth: gl.display!.equipixel! * 60,
                   ),
                   child: Text(
                     "Consulter la documentation relative à cette couche cartographique",
@@ -2314,8 +2408,8 @@ class _OnlineMapStatusTool extends State<OnlineMapStatusTool> {
               minimumSize: WidgetStateProperty<Size>.fromMap(
                 <WidgetStatesConstraint, Size>{
                   WidgetState.any: Size(
-                    MediaQuery.of(context).size.width * .99,
-                    MediaQuery.of(context).size.height * .075,
+                    gl.display!.equipixel! * gl.onCatalogueWidth * .98,
+                    gl.display!.equipixel! * 15,
                   ),
                 },
               ),
@@ -2323,19 +2417,19 @@ class _OnlineMapStatusTool extends State<OnlineMapStatusTool> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                const Icon(
+                Icon(
                   Icons.picture_as_pdf_outlined,
-                  size: 28,
+                  size: gl.display!.equipixel! * gl.onCatalogueIconSize,
                   color: Colors.black,
                 ),
                 Container(
                   constraints: BoxConstraints(
-                    maxWidth: MediaQuery.of(context).size.width * .05,
+                    maxWidth: gl.display!.equipixel! * 5,
                   ),
                 ),
                 Container(
                   constraints: BoxConstraints(
-                    maxWidth: MediaQuery.of(context).size.width * .6,
+                    maxWidth: gl.display!.equipixel! * 60,
                   ),
                   child: Text(
                     "Consulter la fiche-essence ${gl.dico.getEss(gl.dico.getLayerBase(widget.layerTile.key).getEssCode()).getNameAndPrefix()}",
@@ -2415,8 +2509,8 @@ class _MapLayerSelectionButtonState extends State<MapLayerSelectionButton> {
           minimumSize:
               WidgetStateProperty<Size>.fromMap(<WidgetStatesConstraint, Size>{
                 WidgetState.any: Size(
-                  MediaQuery.of(context).size.width * .15,
-                  MediaQuery.of(context).size.width * .15,
+                  gl.display!.equipixel! * gl.onCatalogueLayerSelectionButton,
+                  gl.display!.equipixel! * gl.onCatalogueLayerSelectionButton,
                 ),
               }),
         ),
@@ -2509,7 +2603,7 @@ class _MapLayerSelectionButtonState extends State<MapLayerSelectionButton> {
         },
         child: Icon(
           Icons.layers,
-          size: MediaQuery.of(context).size.width * .1,
+          size: gl.display!.equipixel! * gl.onCatalogueLayerSelectionButton,
           color: Colors.black,
         ),
       );
@@ -2524,8 +2618,8 @@ class _MapLayerSelectionButtonState extends State<MapLayerSelectionButton> {
           minimumSize:
               WidgetStateProperty<Size>.fromMap(<WidgetStatesConstraint, Size>{
                 WidgetState.any: Size(
-                  MediaQuery.of(context).size.width * .15,
-                  MediaQuery.of(context).size.width * .15,
+                  gl.display!.equipixel! * gl.onCatalogueLayerSelectionButton,
+                  gl.display!.equipixel! * gl.onCatalogueLayerSelectionButton,
                 ),
               }),
         ),
@@ -2559,7 +2653,7 @@ class _MapLayerSelectionButtonState extends State<MapLayerSelectionButton> {
           child: Text(
             (interfaceSelectedMapKey + 1).toString(),
             style: TextStyle(
-              fontSize: MediaQuery.of(context).size.width * .075,
+              fontSize: gl.display!.equipixel! * gl.mediumFontSize,
               color: Colors.black,
             ),
           ),
@@ -2633,10 +2727,12 @@ class _OnlineMapMenu extends State<OnlineMapMenu> {
           children: [
             Container(
               constraints: BoxConstraints(
-                minHeight: MediaQuery.of(context).size.height * .05,
-                maxHeight: MediaQuery.of(context).size.height * .1,
-                minWidth: MediaQuery.of(context).size.width * .7,
-                maxWidth: MediaQuery.of(context).size.width * .95,
+                minHeight:
+                    gl.display!.equipixel! * gl.onCatalogueSearchBoxHeight,
+                maxHeight:
+                    gl.display!.equipixel! * gl.onCatalogueSearchBoxHeight,
+                minWidth: gl.display!.equipixel! * gl.onCatalogueWidth * .9,
+                maxWidth: gl.display!.equipixel! * gl.onCatalogueWidth * .9,
               ),
               child: Card(
                 child: TextFormField(
@@ -2699,10 +2795,12 @@ class _OnlineMapMenu extends State<OnlineMapMenu> {
             ),
             Container(
               constraints: BoxConstraints(
-                minHeight: MediaQuery.of(context).size.height * .3,
-                maxHeight: MediaQuery.of(context).size.height * .75,
-                minWidth: MediaQuery.of(context).size.width * .7,
-                maxWidth: MediaQuery.of(context).size.width * .99,
+                minHeight:
+                    gl.display!.equipixel! * gl.display!.equiheight! * .5,
+                maxHeight:
+                    gl.display!.equipixel! * gl.display!.equiheight! * .8,
+                minWidth: gl.display!.equipixel! * gl.onCatalogueWidth * .7,
+                maxWidth: gl.display!.equipixel! * gl.onCatalogueWidth,
               ),
               child:
                   _showCatalogue
@@ -2716,20 +2814,22 @@ class _OnlineMapMenu extends State<OnlineMapMenu> {
                                       ? WidgetStateProperty<Size>.fromMap(
                                         <WidgetStatesConstraint, Size>{
                                           WidgetState.any: Size(
-                                            MediaQuery.of(context).size.width *
-                                                .99,
-                                            MediaQuery.of(context).size.height *
-                                                .15,
+                                            gl.display!.equipixel! *
+                                                gl.onCatalogueWidth *
+                                                .7,
+                                            gl.display!.equipixel! *
+                                                gl.onCatalogueMapHeight,
                                           ),
                                         },
                                       )
                                       : WidgetStateProperty<Size>.fromMap(
                                         <WidgetStatesConstraint, Size>{
                                           WidgetState.any: Size(
-                                            MediaQuery.of(context).size.width *
-                                                .99,
-                                            MediaQuery.of(context).size.height *
-                                                .075,
+                                            gl.display!.equipixel! *
+                                                gl.onCatalogueWidth *
+                                                .7,
+                                            gl.display!.equipixel! *
+                                                gl.onCatalogueCategoryHeight,
                                           ),
                                         },
                                       ),
@@ -2760,22 +2860,22 @@ class _OnlineMapMenu extends State<OnlineMapMenu> {
                                         padding: EdgeInsets.all(3),
                                         constraints: BoxConstraints(
                                           maxWidth:
-                                              MediaQuery.of(
-                                                context,
-                                              ).size.width *
-                                              .99,
+                                              gl.display!.equipixel! *
+                                              gl.onCatalogueWidth *
+                                              .97,
                                           minHeight:
-                                              MediaQuery.of(
-                                                context,
-                                              ).size.width *
-                                              .2,
+                                              gl.display!.equipixel! *
+                                              gl.onCatalogueCategoryHeight,
                                         ),
                                         child: Text(
                                           groupe.mLabel,
                                           textAlign: TextAlign.center,
                                           style: TextStyle(
                                             color: Colors.black,
-                                            fontSize: 22,
+                                            fontSize:
+                                                gl.display!.equipixel! *
+                                                gl.mediumFontSize *
+                                                0.85,
                                           ),
                                         ),
                                       )
@@ -2784,10 +2884,9 @@ class _OnlineMapMenu extends State<OnlineMapMenu> {
                                         padding: EdgeInsets.all(0),
                                         constraints: BoxConstraints(
                                           minWidth:
-                                              MediaQuery.of(
-                                                context,
-                                              ).size.width *
-                                              .99,
+                                              gl.display!.equipixel! *
+                                              gl.onCatalogueWidth *
+                                              .97,
                                         ),
                                         child: ListBody(
                                           children:
@@ -2808,31 +2907,38 @@ class _OnlineMapMenu extends State<OnlineMapMenu> {
                                                       padding: EdgeInsets.all(
                                                         3,
                                                       ),
-                                                      constraints:
-                                                          BoxConstraints(
-                                                            maxWidth:
-                                                                MediaQuery.of(
-                                                                  context,
-                                                                ).size.width *
-                                                                .99,
-                                                            minWidth:
-                                                                MediaQuery.of(
-                                                                  context,
-                                                                ).size.width *
-                                                                .99,
-                                                            minHeight:
-                                                                MediaQuery.of(
-                                                                  context,
-                                                                ).size.width *
-                                                                .2,
-                                                          ),
+                                                      constraints: BoxConstraints(
+                                                        maxWidth:
+                                                            gl
+                                                                .display!
+                                                                .equipixel! *
+                                                            gl.onCatalogueWidth *
+                                                            .97,
+                                                        minWidth:
+                                                            gl
+                                                                .display!
+                                                                .equipixel! *
+                                                            gl.onCatalogueWidth *
+                                                            .97,
+                                                        minHeight:
+                                                            gl
+                                                                .display!
+                                                                .equipixel! *
+                                                            gl.onCatalogueMapHeight *
+                                                            .97,
+                                                      ),
                                                       child: Text(
                                                         groupe.mLabel,
                                                         textAlign:
                                                             TextAlign.center,
                                                         style: TextStyle(
                                                           color: Colors.black,
-                                                          fontSize: 22,
+                                                          fontSize:
+                                                              gl
+                                                                  .display!
+                                                                  .equipixel! *
+                                                              gl.mediumFontSize *
+                                                              0.85,
                                                         ),
                                                       ),
                                                     ),
@@ -2855,10 +2961,10 @@ class _OnlineMapMenu extends State<OnlineMapMenu> {
                                                           ? Container(
                                                             constraints: BoxConstraints(
                                                               minHeight:
-                                                                  MediaQuery.of(
-                                                                    context,
-                                                                  ).size.width *
-                                                                  .15,
+                                                                  gl
+                                                                      .display!
+                                                                      .equipixel! *
+                                                                  gl.onCatalogueMapHeight,
                                                             ),
                                                             child: Column(
                                                               mainAxisAlignment:
@@ -2887,10 +2993,9 @@ class _OnlineMapMenu extends State<OnlineMapMenu> {
                                                                             .offlineMode)
                                                                           SizedBox(
                                                                             height:
-                                                                                MediaQuery.of(
-                                                                                  context,
-                                                                                ).size.width *
-                                                                                .05,
+                                                                                gl.display!.equipixel! *
+                                                                                gl.iconSize *
+                                                                                .5,
                                                                           )
                                                                         else
                                                                           Icon(
@@ -2906,24 +3011,20 @@ class _OnlineMapMenu extends State<OnlineMapMenu> {
                                                                             .mOffline)
                                                                           SizedBox(
                                                                             height:
-                                                                                MediaQuery.of(
-                                                                                  context,
-                                                                                ).size.width *
-                                                                                .05,
+                                                                                gl.display!.equipixel! *
+                                                                                gl.iconSize *
+                                                                                .5,
                                                                           ),
                                                                       ],
                                                                     ),
                                                                     SizedBox(
                                                                       height:
-                                                                          MediaQuery.of(
-                                                                            context,
-                                                                          ).size.width *
-                                                                          .15,
+                                                                          gl.display!.equipixel! *
+                                                                          gl.onCatalogueMapHeight *
+                                                                          .9,
                                                                       width:
-                                                                          MediaQuery.of(
-                                                                            context,
-                                                                          ).size.width *
-                                                                          .65,
+                                                                          gl.display!.equipixel! *
+                                                                          65,
                                                                       child: TextButton(
                                                                         onPressed: () {
                                                                           setState(() {
@@ -2940,10 +3041,9 @@ class _OnlineMapMenu extends State<OnlineMapMenu> {
                                                                               Alignment.center,
                                                                           constraints: BoxConstraints(
                                                                             maxWidth:
-                                                                                MediaQuery.of(
-                                                                                  context,
-                                                                                ).size.width *
-                                                                                .8,
+                                                                                gl.display!.equipixel! *
+                                                                                gl.onCatalogueWidth *
+                                                                                .7,
                                                                           ),
                                                                           child: Text(
                                                                             layerTile.name,
@@ -2953,7 +3053,9 @@ class _OnlineMapMenu extends State<OnlineMapMenu> {
                                                                               color:
                                                                                   Colors.black,
                                                                               fontSize:
-                                                                                  18,
+                                                                                  gl.display!.equipixel! *
+                                                                                  gl.smallFontSize *
+                                                                                  1.5,
                                                                             ),
                                                                           ),
                                                                         ),
@@ -2961,15 +3063,12 @@ class _OnlineMapMenu extends State<OnlineMapMenu> {
                                                                     ),
                                                                     SizedBox(
                                                                       height:
-                                                                          MediaQuery.of(
-                                                                            context,
-                                                                          ).size.width *
-                                                                          .15,
+                                                                          gl.display!.equipixel! *
+                                                                          gl.iconSize,
                                                                       width:
-                                                                          MediaQuery.of(
-                                                                            context,
-                                                                          ).size.width *
-                                                                          .15,
+                                                                          gl.display!.equipixel! *
+                                                                          gl.iconSize *
+                                                                          1.2,
                                                                       child: MapLayerSelectionButton(
                                                                         layerTile:
                                                                             layerTile,
@@ -3013,10 +3112,8 @@ class _OnlineMapMenu extends State<OnlineMapMenu> {
                                                                           .offlineMode)
                                                                         SizedBox(
                                                                           height:
-                                                                              MediaQuery.of(
-                                                                                context,
-                                                                              ).size.width *
-                                                                              .05,
+                                                                              gl.display!.equipixel! *
+                                                                              gl.iconSize,
                                                                         )
                                                                       else
                                                                         Icon(
@@ -3033,24 +3130,22 @@ class _OnlineMapMenu extends State<OnlineMapMenu> {
                                                                           .mOffline)
                                                                         SizedBox(
                                                                           height:
-                                                                              MediaQuery.of(
-                                                                                context,
-                                                                              ).size.width *
-                                                                              .05,
+                                                                              gl.display!.equipixel! *
+                                                                              gl.onCatalogueMapHeight,
                                                                         ),
                                                                     ],
                                                                   ),
                                                                   SizedBox(
                                                                     height:
-                                                                        MediaQuery.of(
-                                                                          context,
-                                                                        ).size.width *
-                                                                        .15,
+                                                                        gl
+                                                                            .display!
+                                                                            .equipixel! *
+                                                                        gl.onCatalogueMapHeight,
                                                                     width:
-                                                                        MediaQuery.of(
-                                                                          context,
-                                                                        ).size.width *
-                                                                        .65,
+                                                                        gl
+                                                                            .display!
+                                                                            .equipixel! *
+                                                                        65,
                                                                     child: TextButton(
                                                                       onPressed: () {
                                                                         setState(() {
@@ -3071,22 +3166,26 @@ class _OnlineMapMenu extends State<OnlineMapMenu> {
                                                                           color:
                                                                               Colors.black,
                                                                           fontSize:
-                                                                              18,
+                                                                              gl.display!.equipixel! *
+                                                                              gl.smallFontSize *
+                                                                              1.5,
                                                                         ),
                                                                       ),
                                                                     ),
                                                                   ),
                                                                   SizedBox(
                                                                     height:
-                                                                        MediaQuery.of(
-                                                                          context,
-                                                                        ).size.width *
-                                                                        .15,
+                                                                        gl
+                                                                            .display!
+                                                                            .equipixel! *
+                                                                        gl.iconSize *
+                                                                        1,
                                                                     width:
-                                                                        MediaQuery.of(
-                                                                          context,
-                                                                        ).size.width *
-                                                                        .15,
+                                                                        gl
+                                                                            .display!
+                                                                            .equipixel! *
+                                                                        gl.iconSize *
+                                                                        1.2,
                                                                     child: MapLayerSelectionButton(
                                                                       layerTile:
                                                                           layerTile,
@@ -3115,47 +3214,47 @@ class _OnlineMapMenu extends State<OnlineMapMenu> {
                                                                     gl.colorBackgroundSecondary,
                                                                 constraintsText: BoxConstraints(
                                                                   minWidth:
-                                                                      MediaQuery.of(
-                                                                        context,
-                                                                      ).size.width *
-                                                                      .4,
+                                                                      gl
+                                                                          .display!
+                                                                          .equipixel! *
+                                                                      40,
                                                                   maxWidth:
-                                                                      MediaQuery.of(
-                                                                        context,
-                                                                      ).size.width *
-                                                                      .4,
+                                                                      gl
+                                                                          .display!
+                                                                          .equipixel! *
+                                                                      40,
                                                                   minHeight:
-                                                                      MediaQuery.of(
-                                                                        context,
-                                                                      ).size.height *
-                                                                      .02,
+                                                                      gl
+                                                                          .display!
+                                                                          .equipixel! *
+                                                                      2,
                                                                   maxHeight:
-                                                                      MediaQuery.of(
-                                                                        context,
-                                                                      ).size.height *
-                                                                      .02,
+                                                                      gl
+                                                                          .display!
+                                                                          .equipixel! *
+                                                                      2,
                                                                 ),
                                                                 constraintsColors: BoxConstraints(
                                                                   minWidth:
-                                                                      MediaQuery.of(
-                                                                        context,
-                                                                      ).size.width *
-                                                                      .4,
+                                                                      gl
+                                                                          .display!
+                                                                          .equipixel! *
+                                                                      40,
                                                                   maxWidth:
-                                                                      MediaQuery.of(
-                                                                        context,
-                                                                      ).size.width *
-                                                                      .4,
+                                                                      gl
+                                                                          .display!
+                                                                          .equipixel! *
+                                                                      40,
                                                                   minHeight:
-                                                                      MediaQuery.of(
-                                                                        context,
-                                                                      ).size.height *
-                                                                      .02,
+                                                                      gl
+                                                                          .display!
+                                                                          .equipixel! *
+                                                                      2,
                                                                   maxHeight:
-                                                                      MediaQuery.of(
-                                                                        context,
-                                                                      ).size.height *
-                                                                      .02,
+                                                                      gl
+                                                                          .display!
+                                                                          .equipixel! *
+                                                                      2,
                                                                 ),
                                                               ),
                                                               Row(
@@ -3207,9 +3306,7 @@ class _OnlineMapMenu extends State<OnlineMapMenu> {
                                 i != selectedMap
                                     ? Container(
                                       constraints: BoxConstraints(
-                                        minHeight:
-                                            MediaQuery.of(context).size.width *
-                                            .15,
+                                        minHeight: gl.display!.equipixel! * 15,
                                       ),
                                       child: Column(
                                         mainAxisAlignment:
@@ -3233,10 +3330,10 @@ class _OnlineMapMenu extends State<OnlineMapMenu> {
                                                   if (widget.offlineMode)
                                                     SizedBox(
                                                       height:
-                                                          MediaQuery.of(
-                                                            context,
-                                                          ).size.width *
-                                                          .05,
+                                                          gl
+                                                              .display!
+                                                              .equipixel! *
+                                                          5,
                                                     )
                                                   else
                                                     Icon(
@@ -3250,24 +3347,18 @@ class _OnlineMapMenu extends State<OnlineMapMenu> {
                                                       .mOffline)
                                                     SizedBox(
                                                       height:
-                                                          MediaQuery.of(
-                                                            context,
-                                                          ).size.width *
-                                                          .05,
+                                                          gl
+                                                              .display!
+                                                              .equipixel! *
+                                                          5,
                                                     ),
                                                 ],
                                               ),
                                               SizedBox(
                                                 height:
-                                                    MediaQuery.of(
-                                                      context,
-                                                    ).size.width *
-                                                    .15,
+                                                    gl.display!.equipixel! * 15,
                                                 width:
-                                                    MediaQuery.of(
-                                                      context,
-                                                    ).size.width *
-                                                    .65,
+                                                    gl.display!.equipixel! * 65,
                                                 child: TextButton(
                                                   onPressed: () {
                                                     setState(() {
@@ -3280,10 +3371,10 @@ class _OnlineMapMenu extends State<OnlineMapMenu> {
                                                     alignment: Alignment.center,
                                                     constraints: BoxConstraints(
                                                       maxWidth:
-                                                          MediaQuery.of(
-                                                            context,
-                                                          ).size.width *
-                                                          .65,
+                                                          gl
+                                                              .display!
+                                                              .equipixel! *
+                                                          65,
                                                     ),
                                                     child: Text(
                                                       layerTile.name,
@@ -3291,7 +3382,11 @@ class _OnlineMapMenu extends State<OnlineMapMenu> {
                                                           TextAlign.center,
                                                       style: TextStyle(
                                                         color: Colors.black,
-                                                        fontSize: 16,
+                                                        fontSize:
+                                                            gl
+                                                                .display!
+                                                                .equipixel! *
+                                                            gl.smallFontSize,
                                                       ),
                                                     ),
                                                   ),
@@ -3299,15 +3394,9 @@ class _OnlineMapMenu extends State<OnlineMapMenu> {
                                               ),
                                               SizedBox(
                                                 height:
-                                                    MediaQuery.of(
-                                                      context,
-                                                    ).size.width *
-                                                    .15,
+                                                    gl.display!.equipixel! * 15,
                                                 width:
-                                                    MediaQuery.of(
-                                                      context,
-                                                    ).size.width *
-                                                    .15,
+                                                    gl.display!.equipixel! * 15,
                                                 child: MapLayerSelectionButton(
                                                   layerTile: layerTile,
                                                   offlineMode:
@@ -3331,15 +3420,9 @@ class _OnlineMapMenu extends State<OnlineMapMenu> {
                                           children: [
                                             SizedBox(
                                               height:
-                                                  MediaQuery.of(
-                                                    context,
-                                                  ).size.width *
-                                                  .15,
+                                                  gl.display!.equipixel! * 15,
                                               width:
-                                                  MediaQuery.of(
-                                                    context,
-                                                  ).size.width *
-                                                  .65,
+                                                  gl.display!.equipixel! * 65,
                                               child: TextButton(
                                                 onPressed: () {
                                                   setState(() {
@@ -3352,17 +3435,20 @@ class _OnlineMapMenu extends State<OnlineMapMenu> {
                                                   alignment: Alignment.center,
                                                   constraints: BoxConstraints(
                                                     maxWidth:
-                                                        MediaQuery.of(
-                                                          context,
-                                                        ).size.width *
-                                                        .65,
+                                                        gl.display!.equipixel! *
+                                                        65,
                                                   ),
                                                   child: Text(
                                                     layerTile.name,
                                                     textAlign: TextAlign.center,
                                                     style: TextStyle(
                                                       color: Colors.black,
-                                                      fontSize: 16,
+                                                      fontSize:
+                                                          gl
+                                                              .display!
+                                                              .equipixel! *
+                                                          gl.smallFontSize *
+                                                          1.5,
                                                     ),
                                                   ),
                                                 ),
@@ -3370,15 +3456,9 @@ class _OnlineMapMenu extends State<OnlineMapMenu> {
                                             ),
                                             SizedBox(
                                               height:
-                                                  MediaQuery.of(
-                                                    context,
-                                                  ).size.width *
-                                                  .15,
+                                                  gl.display!.equipixel! * 15,
                                               width:
-                                                  MediaQuery.of(
-                                                    context,
-                                                  ).size.width *
-                                                  .15,
+                                                  gl.display!.equipixel! * 15,
                                               child: MapLayerSelectionButton(
                                                 layerTile: layerTile,
                                                 offlineMode: widget.offlineMode,
@@ -3398,47 +3478,23 @@ class _OnlineMapMenu extends State<OnlineMapMenu> {
                                           color: gl.colorBackgroundSecondary,
                                           constraintsText: BoxConstraints(
                                             minWidth:
-                                                MediaQuery.of(
-                                                  context,
-                                                ).size.width *
-                                                .4,
+                                                gl.display!.equipixel! * 40,
                                             maxWidth:
-                                                MediaQuery.of(
-                                                  context,
-                                                ).size.width *
-                                                .4,
+                                                gl.display!.equipixel! * 40,
                                             minHeight:
-                                                MediaQuery.of(
-                                                  context,
-                                                ).size.height *
-                                                .02,
+                                                gl.display!.equipixel! * 2,
                                             maxHeight:
-                                                MediaQuery.of(
-                                                  context,
-                                                ).size.height *
-                                                .02,
+                                                gl.display!.equipixel! * 2,
                                           ),
                                           constraintsColors: BoxConstraints(
                                             minWidth:
-                                                MediaQuery.of(
-                                                  context,
-                                                ).size.width *
-                                                .4,
+                                                gl.display!.equipixel! * 40,
                                             maxWidth:
-                                                MediaQuery.of(
-                                                  context,
-                                                ).size.width *
-                                                .4,
+                                                gl.display!.equipixel! * 40,
                                             minHeight:
-                                                MediaQuery.of(
-                                                  context,
-                                                ).size.height *
-                                                .02,
+                                                gl.display!.equipixel! * 2,
                                             maxHeight:
-                                                MediaQuery.of(
-                                                  context,
-                                                ).size.height *
-                                                .02,
+                                                gl.display!.equipixel! * 2,
                                           ),
                                         ),
                                         Row(
@@ -3507,58 +3563,53 @@ class _OnlineMapMenu extends State<OnlineMapMenu> {
   }
 }
 
-class PopupOnlineMapMenu {
-  final Function after;
-  final Function? stateOfLayerSwitcher;
-  PopupOnlineMapMenu(
-    BuildContext context,
-    this.after,
-    bool offlineMode,
-    int selectionMode,
-    this.stateOfLayerSwitcher,
-  ) {
-    showDialog(
-      barrierDismissible: false,
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          titlePadding: EdgeInsets.all(0),
-          actionsPadding: EdgeInsets.all(0),
-          contentPadding: EdgeInsets.all(0),
-          insetPadding: EdgeInsets.all(0),
-          buttonPadding: EdgeInsets.all(0),
-          iconPadding: EdgeInsets.all(0),
-          backgroundColor: gl.backgroundTransparentBlackBox,
-          surfaceTintColor: Colors.transparent,
-          shadowColor: Colors.transparent,
-          title: null,
-          content: Theme(
-            data: Theme.of(context).copyWith(
-              canvasColor: Colors.transparent,
-              shadowColor: Colors.transparent,
-            ),
-            child: SizedBox(
-              width: MediaQuery.of(context).size.width * .995,
-              child: OnlineMapMenu(
-                offlineMode: offlineMode,
-                selectionMode: selectionMode,
-                stateOfLayerSwitcher: stateOfLayerSwitcher,
-              ),
+Widget popupOnlineMapMenu(
+  BuildContext context,
+  after,
+  bool offlineMode,
+  int selectionMode,
+  stateOfLayerSwitcher,
+) {
+  return OrientationBuilder(
+    builder: (context, orientation) {
+      return AlertDialog(
+        titlePadding: EdgeInsets.all(0),
+        actionsPadding: EdgeInsets.all(0),
+        contentPadding: EdgeInsets.all(0),
+        insetPadding: EdgeInsets.all(0),
+        buttonPadding: EdgeInsets.all(0),
+        iconPadding: EdgeInsets.all(0),
+        backgroundColor: gl.backgroundTransparentBlackBox,
+        surfaceTintColor: Colors.transparent,
+        shadowColor: Colors.transparent,
+        title: null,
+        content: Theme(
+          data: Theme.of(context).copyWith(
+            canvasColor: Colors.transparent,
+            shadowColor: Colors.transparent,
+          ),
+          child: SizedBox(
+            width: gl.display!.equipixel! * gl.onCatalogueWidth,
+            child: OnlineMapMenu(
+              offlineMode: offlineMode,
+              selectionMode: selectionMode,
+              stateOfLayerSwitcher: stateOfLayerSwitcher,
             ),
           ),
-          titleTextStyle: TextStyle(color: Colors.white, fontSize: 25),
-          actions: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [_returnButton(context, after)],
-            ),
-          ],
-        );
-      },
-    ).whenComplete(() {
-      after();
-    });
-  }
+        ),
+        titleTextStyle: TextStyle(
+          color: Colors.white,
+          fontSize: gl.display!.equipixel! * gl.mediumFontSize,
+        ),
+        actions: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [_returnButton(context, after)],
+          ),
+        ],
+      );
+    },
+  );
 }
 
 class PopupPdfMenu {
@@ -3583,166 +3634,307 @@ class PopupPdfMenu {
   }
 }
 
-class PopupLayerSwitcher {
-  PopupLayerSwitcher(
-    BuildContext context,
-    Function after,
-    Function mainMenuBarDummy,
-    void Function(LatLng) switchToLocationInSearchMenu,
-  ) {
-    showDialog(
-      useSafeArea: false,
-      barrierDismissible: true,
-      barrierColor: Colors.transparent,
-      context: context,
-      builder: (BuildContext context) {
+Widget popupLayerSwitcher(
+  BuildContext context,
+  Function after,
+  Function mainMenuBarDummy,
+  void Function(LatLng) switchToLocationInSearchMenu,
+) {
+  return MaterialApp(
+    home: OrientationBuilder(
+      builder: (context, orientation) {
         double menuHeight =
-            gl.display!.equiheight! * .3 +
-            gl.display!.equiheight! * .15 +
-            (_SearchMenu.searchResults.isNotEmpty ? 15 : 0) +
-            (gl.polygonLayers.isNotEmpty ? 15 : 0) +
-            (_SearchMenu.searchResults.isNotEmpty || gl.polygonLayers.isNotEmpty
-                ? 18
-                : 0);
-        return Container(
-          alignment: Alignment.bottomCenter,
-          child: Stack(
-            children: [
-              AlertDialog(
-                titlePadding: EdgeInsets.all(0),
-                actionsPadding: EdgeInsets.all(0),
-                contentPadding: EdgeInsets.all(0),
-                insetPadding: EdgeInsets.all(0),
-                buttonPadding: EdgeInsets.all(0),
-                iconPadding: EdgeInsets.all(0),
-                backgroundColor: gl.backgroundTransparentBlackBox,
-                surfaceTintColor: Colors.transparent,
-                shadowColor: Colors.transparent,
-                content: Theme(
-                  data: Theme.of(context).copyWith(
-                    canvasColor: Colors.transparent,
-                    shadowColor: Colors.transparent,
-                  ),
-                  child: SizedBox(
-                    width: gl.display!.equipixel! * gl.layerswitcherWidth,
-                    height: menuHeight * gl.display!.equipixel!,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        if (gl.polygonLayers.isNotEmpty ||
-                            _SearchMenu.searchResults.isNotEmpty)
-                          SizedBox(
-                            width:
-                                gl.display!.equipixel! * gl.layerswitcherWidth,
-                            height:
-                                gl.display!.equipixel! *
-                                gl.mediumFontSize *
-                                1.5,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  "Controlez les couches visibles",
-                                  textAlign: TextAlign.justify,
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize:
-                                        gl.display!.equipixel! *
-                                        gl.mediumFontSize *
-                                        .85,
+            gl.display!.orientation!.index == 0
+                ? gl.display!.equiheight! * .3 +
+                    gl.display!.equiheight! * .15 +
+                    (_SearchMenu.searchResults.isNotEmpty ? 15 : 0) +
+                    (gl.polygonLayers.isNotEmpty ? 15 : 0) +
+                    (_SearchMenu.searchResults.isNotEmpty ||
+                            gl.polygonLayers.isNotEmpty
+                        ? 18
+                        : 0)
+                : gl.display!.equiheight! * .7;
+        return Stack(
+          children: [
+            AlertDialog(
+              alignment:
+                  gl.display!.orientation!.index == 0
+                      ? Alignment.center
+                      : Alignment.topCenter,
+              titlePadding: EdgeInsets.all(0),
+              actionsPadding: EdgeInsets.all(0),
+              contentPadding: EdgeInsets.all(0),
+              insetPadding: EdgeInsets.all(0),
+              buttonPadding: EdgeInsets.all(0),
+              iconPadding: EdgeInsets.all(0),
+              backgroundColor: gl.backgroundTransparentBlackBox,
+              surfaceTintColor: Colors.transparent,
+              shadowColor: Colors.transparent,
+              content: Theme(
+                data: Theme.of(context).copyWith(
+                  canvasColor: Colors.transparent,
+                  shadowColor: Colors.transparent,
+                ),
+                child: SizedBox(
+                  width:
+                      gl.display!.orientation!.index == 0
+                          ? gl.display!.equipixel! * gl.layerswitcherWidth
+                          : gl.display!.equipixel! *
+                              gl.layerswitcherWidth *
+                              2.2,
+                  height: menuHeight * gl.display!.equipixel!,
+                  child:
+                      gl.display!.orientation!.index == 0
+                          ? Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              if (gl.polygonLayers.isNotEmpty ||
+                                  _SearchMenu.searchResults.isNotEmpty)
+                                SizedBox(
+                                  width:
+                                      gl.display!.equipixel! *
+                                      gl.layerswitcherWidth,
+                                  height:
+                                      gl.display!.equipixel! *
+                                      gl.mediumFontSize *
+                                      1.5,
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        "Controlez les couches visibles",
+                                        textAlign: TextAlign.justify,
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize:
+                                              gl.display!.equipixel! *
+                                              gl.mediumFontSize *
+                                              .85,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                              ],
-                            ),
-                          ),
-                        SizedBox(
-                          width: gl.display!.equipixel! * gl.layerswitcherWidth,
+                              SizedBox(
+                                width:
+                                    gl.display!.equipixel! *
+                                    gl.layerswitcherWidth,
 
-                          child: UpperLayerControl(
-                            switchToLocationInSearchMenu:
-                                switchToLocationInSearchMenu,
-                          ),
-                        ),
-                        SizedBox(
-                          width: gl.display!.equipixel! * gl.layerswitcherWidth,
-                          height:
-                              gl.display!.equipixel! * gl.mediumFontSize * 1.5,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                "Changez les cartes affichées",
-                                textAlign: TextAlign.justify,
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize:
-                                      gl.display!.equipixel! *
-                                      gl.mediumFontSize *
-                                      .85,
+                                child: UpperLayerControl(
+                                  switchToLocationInSearchMenu:
+                                      switchToLocationInSearchMenu,
+                                ),
+                              ),
+                              SizedBox(
+                                width:
+                                    gl.display!.equipixel! *
+                                    gl.layerswitcherWidth,
+                                height:
+                                    gl.display!.equipixel! *
+                                    gl.mediumFontSize *
+                                    1.5,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      "Changez les cartes affichées",
+                                      textAlign: TextAlign.justify,
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize:
+                                            gl.display!.equipixel! *
+                                            gl.mediumFontSize *
+                                            .85,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              SizedBox(
+                                width:
+                                    gl.display!.equipixel! *
+                                    gl.layerswitcherWidth,
+                                height:
+                                    gl.display!.equipixel! *
+                                    gl.display!.equiheight! *
+                                    .3,
+                                child: LayerSwitcher(),
+                              ),
+                              SizedBox(
+                                width:
+                                    gl.display!.equipixel! *
+                                    gl.layerswitcherWidth,
+                                height:
+                                    gl.display!.equipixel! *
+                                    gl.mediumFontSize *
+                                    1.5,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      "Catalogues des couches",
+                                      textAlign: TextAlign.justify,
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize:
+                                            gl.display!.equipixel! *
+                                            gl.mediumFontSize *
+                                            0.9,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              SizedBox(
+                                child: ViewControl(
+                                  _LayerSwitcher.stateLayerSwitcher,
                                 ),
                               ),
                             ],
-                          ),
-                        ),
-                        SizedBox(
-                          width: gl.display!.equipixel! * gl.layerswitcherWidth,
-                          height:
-                              gl.display!.equipixel! *
-                              gl.display!.equiheight! *
-                              .3,
-                          child: LayerSwitcher(),
-                        ),
-                        SizedBox(
-                          width: gl.display!.equipixel! * gl.layerswitcherWidth,
-                          height:
-                              gl.display!.equipixel! * gl.mediumFontSize * 1.5,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
+                          )
+                          : Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: [
-                              Text(
-                                "Catalogues des couches",
-                                textAlign: TextAlign.justify,
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize:
-                                      gl.display!.equipixel! *
-                                      gl.mediumFontSize *
-                                      0.9,
-                                ),
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  SizedBox(
+                                    width:
+                                        gl.display!.equipixel! *
+                                        gl.layerswitcherWidth,
+                                    height:
+                                        gl.display!.equipixel! *
+                                        gl.mediumFontSize *
+                                        1.5,
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          "Changez les cartes affichées",
+                                          textAlign: TextAlign.justify,
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize:
+                                                gl.display!.equipixel! *
+                                                gl.mediumFontSize *
+                                                .85,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width:
+                                        gl.display!.equipixel! *
+                                        gl.layerswitcherWidth,
+                                    height:
+                                        gl.display!.equipixel! *
+                                        gl.display!.equiheight! *
+                                        .6,
+                                    child: LayerSwitcher(),
+                                  ),
+                                ],
+                              ),
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  if (gl.polygonLayers.isNotEmpty ||
+                                      _SearchMenu.searchResults.isNotEmpty)
+                                    SizedBox(
+                                      width:
+                                          gl.display!.equipixel! *
+                                          gl.layerswitcherWidth,
+                                      height:
+                                          gl.display!.equipixel! *
+                                          gl.mediumFontSize *
+                                          1.5,
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            "Controlez les couches visibles",
+                                            textAlign: TextAlign.justify,
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize:
+                                                  gl.display!.equipixel! *
+                                                  gl.mediumFontSize *
+                                                  .85,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  SizedBox(
+                                    width:
+                                        gl.display!.equipixel! *
+                                        gl.layerswitcherWidth,
+
+                                    child: UpperLayerControl(
+                                      switchToLocationInSearchMenu:
+                                          switchToLocationInSearchMenu,
+                                    ),
+                                  ),
+
+                                  SizedBox(
+                                    width:
+                                        gl.display!.equipixel! *
+                                        gl.layerswitcherWidth,
+                                    height:
+                                        gl.display!.equipixel! *
+                                        gl.mediumFontSize *
+                                        1.5,
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          "Catalogues des couches",
+                                          textAlign: TextAlign.justify,
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize:
+                                                gl.display!.equipixel! *
+                                                gl.mediumFontSize *
+                                                0.9,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    child: ViewControl(
+                                      _LayerSwitcher.stateLayerSwitcher,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ],
                           ),
-                        ),
-                        SizedBox(
-                          child: ViewControl(_LayerSwitcher.stateLayerSwitcher),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                titleTextStyle: TextStyle(
-                  color: Colors.white,
-                  fontSize: gl.display!.equipixel! * gl.mediumFontSize * 0.9,
-                ),
-                actions: [],
-              ),
-              Container(
-                alignment: Alignment.center,
-                child: Container(
-                  alignment: Alignment.bottomCenter,
-                  child: mainMenuBarDummy(() {
-                    Navigator.of(context, rootNavigator: true).pop();
-                  }),
                 ),
               ),
-            ],
-          ),
+              titleTextStyle: TextStyle(
+                color: Colors.white,
+                fontSize: gl.display!.equipixel! * gl.mediumFontSize * 0.9,
+              ),
+              actions: [],
+            ),
+            Container(
+              alignment: Alignment.center,
+              child: Container(
+                alignment: Alignment.bottomCenter,
+                child: mainMenuBarDummy(() {
+                  gl.mainStackPopLast();
+                }),
+              ),
+            ),
+          ],
         );
       },
-    ).whenComplete(() {
-      after();
-    });
-  }
+    ),
+  );
 }
 
 class ViewControl extends StatefulWidget {
@@ -3757,69 +3949,77 @@ class _ViewControl extends State<ViewControl> {
   bool _modeViewOnlineMap = false;
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: [
-        SizedBox(
-          width: gl.display!.equipixel! * gl.iconSize * 1.2,
-          height: gl.display!.equipixel! * gl.iconSize * 1.2,
-          child: FloatingActionButton(
-            backgroundColor:
-                _modeViewOfflineMap ? gl.colorAgroBioTech : Colors.grey,
-            onPressed: () {
-              setState(() {
-                _modeViewOfflineMap = !_modeViewOfflineMap;
-              });
-              PopupOnlineMapMenu(
-                gl.notificationContext!,
-                () {
-                  setState(() {
-                    _modeViewOfflineMap = false;
+    return OrientationBuilder(
+      builder: (context, orientation) {
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            SizedBox(
+              width: gl.display!.equipixel! * gl.iconSize * 1.2,
+              height: gl.display!.equipixel! * gl.iconSize * 1.2,
+              child: FloatingActionButton(
+                backgroundColor:
+                    _modeViewOfflineMap ? gl.colorAgroBioTech : Colors.grey,
+                onPressed: () {
+                  gl.mainStack.add(
+                    popupOnlineMapMenu(
+                      gl.notificationContext!,
+                      () {
+                        gl.refreshMap(() {
+                          _modeViewOfflineMap = false;
+                        });
+                      },
+                      true,
+                      -1,
+                      widget.stateOfLayerSwitcher,
+                    ),
+                  );
+                  gl.refreshMap(() {
+                    _modeViewOfflineMap = !_modeViewOfflineMap;
                   });
                 },
-                true,
-                -1,
-                widget.stateOfLayerSwitcher,
-              );
-            },
-            child: Icon(
-              Icons.download_for_offline,
-              size: gl.display!.equipixel! * gl.iconSize,
-              color: Colors.black,
-            ),
-          ),
-        ),
-        if (!gl.offlineMode)
-          SizedBox(
-            width: gl.display!.equipixel! * gl.iconSize * 1.2,
-            height: gl.display!.equipixel! * gl.iconSize * 1.2,
-            child: FloatingActionButton(
-              backgroundColor:
-                  _modeViewOnlineMap ? gl.colorAgroBioTech : Colors.grey,
-              onPressed: () {
-                setState(() {
-                  _modeViewOnlineMap = !_modeViewOnlineMap;
-                });
-                PopupOnlineMapMenu(
-                  gl.notificationContext!,
-                  () {
-                    setState(() {
-                      _modeViewOnlineMap = false;
-                    });
-                  },
-                  gl.offlineMode,
-                  -1,
-                  null,
-                );
-              },
-              child: Icon(
-                Icons.layers_outlined,
-                size: gl.display!.equipixel! * gl.iconSize,
-                color: Colors.black,
+                child: Icon(
+                  Icons.download_for_offline,
+                  size: gl.display!.equipixel! * gl.iconSize,
+                  color: Colors.black,
+                ),
               ),
             ),
-          ),
-      ],
+            if (!gl.offlineMode)
+              SizedBox(
+                width: gl.display!.equipixel! * gl.iconSize * 1.2,
+                height: gl.display!.equipixel! * gl.iconSize * 1.2,
+                child: FloatingActionButton(
+                  backgroundColor:
+                      _modeViewOnlineMap ? gl.colorAgroBioTech : Colors.grey,
+                  onPressed: () {
+                    gl.mainStack.add(
+                      popupOnlineMapMenu(
+                        gl.notificationContext!,
+                        () {
+                          gl.refreshMap(() {
+                            _modeViewOfflineMap = false;
+                          });
+                        },
+                        gl.offlineMode,
+                        -1,
+                        null,
+                      ),
+                    );
+                    gl.refreshMap(() {
+                      _modeViewOfflineMap = !_modeViewOfflineMap;
+                    });
+                  },
+                  child: Icon(
+                    Icons.layers_outlined,
+                    size: gl.display!.equipixel! * gl.iconSize,
+                    color: Colors.black,
+                  ),
+                ),
+              ),
+          ],
+        );
+      },
     );
   }
 }
@@ -3860,14 +4060,17 @@ class _UpperLayerControl extends State<UpperLayerControl> {
                     ),
                   ),
                   onPressed: () {
-                    PopupSearchMenu(
-                      gl.notificationContext!,
-                      "",
-                      widget.switchToLocationInSearchMenu,
-                      () {
-                        setState(() {});
-                      },
+                    gl.mainStack.add(
+                      popupSearchMenu(
+                        gl.notificationContext!,
+                        "",
+                        widget.switchToLocationInSearchMenu,
+                        () {
+                          gl.refreshMap(() {});
+                        },
+                      ),
                     );
+                    gl.refreshMap(() {});
                   },
                   child: Container(
                     padding: EdgeInsets.symmetric(horizontal: 1.0),
@@ -3954,14 +4157,17 @@ class _UpperLayerControl extends State<UpperLayerControl> {
                     ),
                   ),
                   onPressed: () {
-                    PopupPolygonListMenu(
-                      gl.notificationContext!,
-                      gl.polygonLayers[gl.selectedPolygonLayer].name,
-                      widget.switchToLocationInSearchMenu,
-                      () {
-                        setState(() {});
-                      },
+                    gl.mainStack.add(
+                      popupPolygonListMenu(
+                        gl.notificationContext!,
+                        gl.polygonLayers[gl.selectedPolygonLayer].name,
+                        widget.switchToLocationInSearchMenu,
+                        () {
+                          gl.refreshMap(() {});
+                        },
+                      ),
                     );
+                    gl.refreshMap(() {});
                   },
                   child: Container(
                     padding: EdgeInsets.symmetric(horizontal: 1.0),
@@ -4103,35 +4309,38 @@ class _LayerSwitcher extends State<LayerSwitcher> {
                       children: <Widget>[
                         TextButton(
                           style: ButtonStyle(
-                            maximumSize: WidgetStateProperty<Size>.fromMap(
-                              <WidgetStatesConstraint, Size>{
-                                WidgetState.any: Size(
-                                  MediaQuery.of(context).size.width * .45,
-                                  MediaQuery.of(context).size.height * .1,
-                                ),
-                              },
-                            ),
+                            maximumSize: WidgetStateProperty<Size>.fromMap(<
+                              WidgetStatesConstraint,
+                              Size
+                            >{
+                              WidgetState.any: Size(
+                                gl.display!.equipixel! *
+                                    gl.layerswitcherWidth *
+                                    .5,
+                                gl.display!.equipixel! * gl.layerSwitcherHeight,
+                              ),
+                            }),
                           ),
                           onPressed: () {
-                            PopupOnlineMapMenu(
-                              gl.notificationContext!,
-                              () {
-                                setState(() {});
-                              },
-                              gl.offlineMode,
-                              i,
-                              null,
+                            gl.mainStack.add(
+                              popupOnlineMapMenu(
+                                gl.notificationContext!,
+                                () {
+                                  gl.refreshMap(() {});
+                                },
+                                gl.offlineMode,
+                                i,
+                                null,
+                              ),
                             );
+                            gl.refreshMap(() {});
                           },
                           child: Container(
-                            padding: EdgeInsets.symmetric(horizontal: 3.0),
+                            padding: EdgeInsets.symmetric(horizontal: 1.0),
                             constraints: BoxConstraints(
-                              maxHeight:
-                                  MediaQuery.of(context).size.height * .05,
-                              maxWidth:
-                                  MediaQuery.of(context).size.width * 0.45,
-                              minWidth:
-                                  MediaQuery.of(context).size.width * 0.45,
+                              maxHeight: gl.display!.equipixel! * 5,
+                              maxWidth: gl.display!.equipixel! * 45,
+                              minWidth: gl.display!.equipixel! * 45,
                             ),
                             child: Text(
                               gl.dico
@@ -4140,31 +4349,27 @@ class _LayerSwitcher extends State<LayerSwitcher> {
                               style: TextStyle(
                                 color: Colors.black,
                                 fontSize:
-                                    MediaQuery.of(context).size.height * .018,
+                                    gl.display!.equipixel! * gl.smallFontSize,
                               ),
                             ),
                           ),
                         ),
                         Container(
                           constraints: BoxConstraints(
-                            maxHeight: MediaQuery.of(context).size.width * 0.1,
-                            minHeight: MediaQuery.of(context).size.width * 0.1,
-                            maxWidth: MediaQuery.of(context).size.width * 0.22,
-                            minWidth: MediaQuery.of(context).size.width * 0.22,
+                            maxHeight: gl.display!.equipixel! * 10,
+                            minHeight: gl.display!.equipixel! * 10,
+                            maxWidth: gl.display!.equipixel! * 22,
+                            minWidth: gl.display!.equipixel! * 22,
                           ),
                           child: Row(
                             children: [
                               Container(
                                 color: Colors.white,
                                 constraints: BoxConstraints(
-                                  maxHeight:
-                                      MediaQuery.of(context).size.width * 0.12,
-                                  minHeight:
-                                      MediaQuery.of(context).size.width * 0.12,
-                                  maxWidth:
-                                      MediaQuery.of(context).size.width * 0.1,
-                                  minWidth:
-                                      MediaQuery.of(context).size.width * 0.1,
+                                  maxHeight: gl.display!.equipixel! * 12,
+                                  minHeight: gl.display!.equipixel! * 12,
+                                  maxWidth: gl.display!.equipixel! * 10,
+                                  minWidth: gl.display!.equipixel! * 10,
                                 ),
                                 padding: const EdgeInsets.symmetric(),
                                 child: Image.asset(
@@ -4178,48 +4383,28 @@ class _LayerSwitcher extends State<LayerSwitcher> {
                               gl.selectedLayerForMap[i].offline
                                   ? Container(
                                     constraints: BoxConstraints(
-                                      maxHeight:
-                                          MediaQuery.of(context).size.width *
-                                          0.1,
-                                      minHeight:
-                                          MediaQuery.of(context).size.width *
-                                          0.1,
-                                      maxWidth:
-                                          MediaQuery.of(context).size.width *
-                                          0.1,
-                                      minWidth:
-                                          MediaQuery.of(context).size.width *
-                                          0.1,
+                                      maxHeight: gl.display!.equipixel! * 10,
+                                      minHeight: gl.display!.equipixel! * 10,
+                                      maxWidth: gl.display!.equipixel! * 10,
+                                      minWidth: gl.display!.equipixel! * 10,
                                     ),
                                     padding: const EdgeInsets.symmetric(),
                                     child: Icon(
                                       Icons.save,
-                                      size:
-                                          MediaQuery.of(context).size.width *
-                                          0.1,
+                                      size: gl.display!.equipixel! * 10,
                                     ),
                                   )
                                   : Container(
                                     constraints: BoxConstraints(
-                                      maxHeight:
-                                          MediaQuery.of(context).size.width *
-                                          0.1,
-                                      minHeight:
-                                          MediaQuery.of(context).size.width *
-                                          0.1,
-                                      maxWidth:
-                                          MediaQuery.of(context).size.width *
-                                          0.1,
-                                      minWidth:
-                                          MediaQuery.of(context).size.width *
-                                          0.1,
+                                      maxHeight: gl.display!.equipixel! * 10,
+                                      minHeight: gl.display!.equipixel! * 10,
+                                      maxWidth: gl.display!.equipixel! * 10,
+                                      minWidth: gl.display!.equipixel! * 10,
                                     ),
                                     padding: const EdgeInsets.symmetric(),
                                     child: Icon(
                                       Icons.wifi,
-                                      size:
-                                          MediaQuery.of(context).size.width *
-                                          0.1,
+                                      size: gl.display!.equipixel! * 10,
                                     ),
                                   ),
                             ],
@@ -4233,9 +4418,8 @@ class _LayerSwitcher extends State<LayerSwitcher> {
                         children: [
                           Container(
                             constraints: BoxConstraints(
-                              maxHeight:
-                                  MediaQuery.of(context).size.height * 0.05,
-                              maxWidth: MediaQuery.of(context).size.width * 0.4,
+                              maxHeight: gl.display!.equipixel! * 10,
+                              maxWidth: gl.display!.equipixel! * 40,
                             ),
                             child: TextButton(
                               style: ButtonStyle(
@@ -4301,49 +4485,49 @@ class _LayerSwitcher extends State<LayerSwitcher> {
                             maximumSize: WidgetStateProperty<Size>.fromMap(
                               <WidgetStatesConstraint, Size>{
                                 WidgetState.any: Size(
-                                  MediaQuery.of(context).size.width * .45,
-                                  MediaQuery.of(context).size.height * .1,
+                                  gl.display!.equipixel! * 45,
+                                  gl.display!.equipixel! * 20,
                                 ),
                               },
                             ),
                           ),
                           onPressed: () {
-                            PopupOnlineMapMenu(
-                              gl.notificationContext!,
-                              () {
-                                setState(() {});
-                              },
-                              gl.offlineMode,
-                              i,
-                              null,
+                            gl.mainStack.add(
+                              popupOnlineMapMenu(
+                                gl.notificationContext!,
+                                () {
+                                  gl.refreshMap(() {});
+                                },
+                                gl.offlineMode,
+                                i,
+                                null,
+                              ),
                             );
+                            gl.refreshMap(() {});
                           },
                           child: Container(
-                            padding: EdgeInsets.symmetric(horizontal: 3.0),
+                            padding: EdgeInsets.symmetric(horizontal: 1.0),
                             constraints: BoxConstraints(
-                              maxHeight:
-                                  MediaQuery.of(context).size.height * .05,
-                              maxWidth:
-                                  MediaQuery.of(context).size.width * 0.45,
-                              minWidth:
-                                  MediaQuery.of(context).size.width * 0.45,
+                              maxHeight: gl.display!.equipixel! * 10,
+                              maxWidth: gl.display!.equipixel! * 45,
+                              minWidth: gl.display!.equipixel! * 45,
                             ),
                             child: Text(
                               "Appuyez ici pour ajouter une couche du catalogue",
                               style: TextStyle(
                                 color: Colors.black,
                                 fontSize:
-                                    MediaQuery.of(context).size.height * .018,
+                                    gl.display!.equipixel! * gl.smallFontSize,
                               ),
                             ),
                           ),
                         ),
                         Container(
                           constraints: BoxConstraints(
-                            maxHeight: MediaQuery.of(context).size.width * 0.1,
-                            minHeight: MediaQuery.of(context).size.width * 0.1,
-                            maxWidth: MediaQuery.of(context).size.width * 0.22,
-                            minWidth: MediaQuery.of(context).size.width * 0.22,
+                            maxHeight: gl.display!.equipixel! * 10,
+                            minHeight: gl.display!.equipixel! * 10,
+                            maxWidth: gl.display!.equipixel! * 22,
+                            minWidth: gl.display!.equipixel! * 22,
                           ),
                         ),
                       ],
@@ -4391,16 +4575,22 @@ class PopupDoYouReally {
               shadowColor: Colors.transparent,
             ),
             child: SizedBox(
-              width: MediaQuery.of(context).size.width * .80,
+              width: gl.dyrDialogWidth * gl.display!.equipixel!,
               child: Text(
                 message,
                 textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.white, fontSize: 24),
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: gl.smallFontSize * 1.25 * gl.display!.equipixel!,
+                ),
               ),
             ),
           ),
-          titleTextStyle: TextStyle(color: Colors.white, fontSize: 25),
-          actionsAlignment: MainAxisAlignment.spaceBetween,
+          titleTextStyle: TextStyle(
+            color: Colors.white,
+            fontSize: gl.mediumFontSize * gl.display!.equipixel!,
+          ),
+          actionsAlignment: MainAxisAlignment.spaceAround,
           actions: [
             FloatingActionButton(
               onPressed: () {
@@ -4411,15 +4601,18 @@ class PopupDoYouReally {
               child: Container(
                 alignment: Alignment.center,
                 constraints: BoxConstraints(
-                  maxHeight: MediaQuery.of(context).size.width * 0.1,
-                  minHeight: MediaQuery.of(context).size.width * 0.1,
-                  maxWidth: MediaQuery.of(context).size.width * 0.3,
-                  minWidth: MediaQuery.of(context).size.width * 0.3,
+                  maxHeight: gl.dyrButtonsize * 0.6 * gl.display!.equipixel!,
+                  minHeight: gl.dyrButtonsize * 0.6 * gl.display!.equipixel!,
+                  maxWidth: gl.dyrButtonsize * 1.25 * gl.display!.equipixel!,
+                  minWidth: gl.dyrButtonsize * 1.25 * gl.display!.equipixel!,
                 ),
                 child: Text(
                   "Oui",
                   textAlign: TextAlign.center,
-                  style: TextStyle(color: Colors.black, fontSize: 20),
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: gl.smallFontSize * 1.25 * gl.display!.equipixel!,
+                  ),
                 ),
               ),
             ),
@@ -4431,15 +4624,18 @@ class PopupDoYouReally {
               child: Container(
                 alignment: Alignment.center,
                 constraints: BoxConstraints(
-                  maxHeight: MediaQuery.of(context).size.width * 0.1,
-                  minHeight: MediaQuery.of(context).size.width * 0.1,
-                  maxWidth: MediaQuery.of(context).size.width * 0.3,
-                  minWidth: MediaQuery.of(context).size.width * 0.3,
+                  maxHeight: gl.dyrButtonsize * .6 * gl.display!.equipixel!,
+                  minHeight: gl.dyrButtonsize * 0.6 * gl.display!.equipixel!,
+                  maxWidth: gl.dyrButtonsize * 1.25 * gl.display!.equipixel!,
+                  minWidth: gl.dyrButtonsize * 1.25 * gl.display!.equipixel!,
                 ),
                 child: Text(
                   "Non",
                   textAlign: TextAlign.center,
-                  style: TextStyle(color: Colors.black, fontSize: 20),
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: gl.smallFontSize * 1.25 * gl.display!.equipixel!,
+                  ),
                 ),
               ),
             ),
