@@ -139,12 +139,7 @@ class _MapPageState extends State<MapPage> {
           (element) => element.mFoundLayer == false,
         );
       } else {
-        showDialog(
-          context: gl.notificationContext!,
-          builder: (BuildContext context) {
-            return PopupNoInternet();
-          },
-        );
+        gl.mainStack.add(popupNoInternet());
       }
     } else {
       if (gl.dico.getLayersOffline().isEmpty) {
@@ -228,16 +223,19 @@ class _MapPageState extends State<MapPage> {
                 iconSize: gl.display!.equipixel! * gl.iconSizeSettings,
                 color: gl.offlineMode ? Colors.black : Colors.white,
                 onPressed: () {
-                  PopupSettingsMenu(
-                    gl.notificationContext!,
-                    "",
-                    () {
-                      refreshView(() {});
-                    },
-                    () {
-                      refreshView(() {});
-                    },
+                  gl.mainStack.add(
+                    popupSettingsMenu(
+                      gl.notificationContext!,
+                      "",
+                      () {
+                        refreshView(() {});
+                      },
+                      () {
+                        refreshView(() {});
+                      },
+                    ),
                   );
+                  gl.refreshMap(() {});
                 },
                 icon: Icon(Icons.settings),
               ),
@@ -303,455 +301,474 @@ class _MapPageState extends State<MapPage> {
             ],
           ),
         ),
-        body: Stack(
-          children: <Widget>[
-            FlutterMap(
-              mapController: _mapController,
-              options: MapOptions(
-                backgroundColor: Colors.transparent,
-                keepAlive: true,
-                interactionOptions: const InteractionOptions(
-                  enableMultiFingerGestureRace: false,
-                  flags:
-                      InteractiveFlag.drag |
-                      InteractiveFlag.pinchZoom |
-                      InteractiveFlag.pinchMove |
-                      InteractiveFlag.doubleTapZoom |
-                      InteractiveFlag.scrollWheelZoom,
-                ),
-                onLongPress: (tapPosition, point) async {
-                  _lastPressWasShort = false;
-                  if (!_doingAnaPt) {
-                    refreshView(() {
-                      _doingAnaPt = true;
-                    });
-                    await _runAnaPt(
-                      epsg4326.transform(
-                        epsg31370,
-                        proj4.Point(x: point.longitude, y: point.latitude),
-                      ),
-                    );
-                    _pt = point;
-                    refreshView(() {
-                      _doingAnaPt = false;
-                    });
-                    GoRouter.of(gl.notificationContext!).push("/anaPt");
-                  }
-                },
-                onTap:
-                    _modeMoveMeasurePath
-                        ? (tapPosition, point) async => {
-                          setState(() {
-                            _modeMoveMeasurePath = false;
-                          }),
-                        }
-                        : _modeMeasurePath
-                        ? (tapPosition, point) async => {
-                          setState(() {
-                            _measurePath.add(point);
-                          }),
-                        }
-                        : _modeDrawPolygonAddVertexes
-                        ? (tapPosition, point) async => {
-                          if (gl.polygonLayers.isNotEmpty)
-                            {
-                              refreshView(() {
-                                gl.polygonLayers[gl.selectedPolygonLayer]
-                                    .addPoint(point);
-                              }),
-                            },
-                        }
-                        : _modeDrawPolygonMoveVertexes
-                        ? (tapPosition, point) async => {
-                          refreshView(() {
-                            _stopMovingSelectedPoint();
-                            _modeShowButtonDrawPolygonAddVertexes = false;
-                            _modeShowButtonDrawPolygonMoveVertexes = true;
-                            _modeShowButtonDrawPolygonRemoveVertexes = true;
-                            _modeDrawPolygonAddVertexes = false;
-                            _modeDrawPolygonMoveVertexes = false;
-                            _modeDrawPolygonRemoveVertexes = false;
-                          }),
-                        }
-                        : _modeDrawPolygon
-                        ? (tapPosition, point) async => {
-                          refreshView(() {
-                            _modeShowButtonDrawPolygonAddVertexes = true;
-                            _modeShowButtonDrawPolygonMoveVertexes = false;
-                            _modeShowButtonDrawPolygonRemoveVertexes = false;
-                            _modeDrawPolygonAddVertexes = false;
-                            _modeDrawPolygonMoveVertexes = false;
-                            _modeDrawPolygonRemoveVertexes = false;
-                          }),
-                        }
-                        : (tapPosition, point) async => {
-                          _lastPressWasShort = true,
-                          _updatePtMarker(point),
-                        },
-                onPositionChanged: (position, e) async {
-                  if (!e) return;
-                  _mapControllerInit = true;
-                  updateLocation();
-                  if (_modeMoveMeasurePath) {
-                    _measurePath.removeAt(selectedMeasurePointToMove);
-                    _measurePath.insert(
-                      selectedMeasurePointToMove,
-                      LatLng(
-                        position.center.latitude,
-                        position.center.longitude,
-                      ),
-                    );
-                  }
-                  if (_selectedPointToMove != null) {
-                    gl.polygonLayers[gl.selectedPolygonLayer].replacePoint(
-                      _selectedPointToMove!,
-                      LatLng(
-                        position.center.latitude,
-                        position.center.longitude,
-                      ),
-                    );
-
-                    refreshView(() {
-                      _selectedPointToMove = LatLng(
-                        position.center.latitude,
-                        position.center.longitude,
-                      );
-                    });
-                  } else {
-                    refreshView(() {});
-                  }
-                  _writePositionDataToSharedPreferences(
-                    position.center.longitude,
-                    position.center.latitude,
-                    position.zoom,
-                  );
-                  _writeDataToSharedPreferences();
-                },
-                crs: epsg31370CRS,
-                initialZoom: (gl.globalMinZoom + gl.globalMaxZoom) / 2.0,
-                maxZoom: gl.globalMaxZoom,
-                minZoom: gl.globalMinZoom,
-                initialCenter: gl.latlonCenter,
-                cameraConstraint: CameraConstraint.containCenter(
-                  bounds: LatLngBounds.fromPoints([latlonBL, latlonTR]),
-                ),
-                onMapReady: () async {
-                  updateLocation();
-                  if (gl.position != null) {
-                    refreshView(() {
-                      _mapController.move(
-                        LatLng(
-                          gl.position?.latitude ?? 0.0,
-                          gl.position?.longitude ?? 0.0,
-                        ),
-                        _mapController.camera.zoom,
-                      );
-                    });
-                    // si on refusait d'allumer le GPS, alors la carte ne s'affichait jamais, c'est pourquoi il y a le else et le code ci-dessous
-                  } else {
-                    refreshView(() {
-                      _mapController.move(
-                        gl.latlonCenter,
-                        _mapController.camera.zoom,
-                      );
-                    });
-                  }
-                },
-              ),
+        body: OrientationBuilder(
+          builder: (context, orientation) {
+            return Stack(
               children:
-                  gl.getLayersForFlutterMap().map<Widget>((
-                    gl.SelectedLayer selLayer,
-                  ) {
-                    if (selLayer.offline &&
-                        gl.dico.getLayerBase(selLayer.mCode).mOffline &&
-                        (selLayer.mCode == gl.getFirstSelLayOffline())) {
-                      if (_provider == null ||
-                          _provider?.layerCode != selLayer.mCode) {
-                        _provider = TifFileTileProvider(
-                          refreshView: refreshView,
-                          mycrs: epsg31370CRS,
-                          sourceImPath: gl.dico.getRastPath(selLayer.mCode),
-                          layerCode: selLayer.mCode,
-                        );
-                        _provider!.init();
-                      }
-                      return _provider!.loaded
-                          ? TileLayer(
-                            tileDisplay:
-                                gl.modeMapFirstTileLayerTransparancy && i == 2
-                                    ? TileDisplay.instantaneous(opacity: 0.5)
-                                    : TileDisplay.instantaneous(opacity: 1.0),
-                            tileProvider: _provider,
-                            maxZoom: gl.globalMaxOfflineZoom,
-                            minZoom:
-                                gl.globalMinOfflineZoom, // si minZoom de la map est moins restrictif (moins élevé) que celui-ci, la carte ne s'affiche juste pas (écran blanc)
-                          )
-                          : Container(
-                            alignment: Alignment.center,
-
-                            child: Card(
-                              color: gl.backgroundTransparentBlackBox,
-                              child: Container(
-                                constraints: BoxConstraints(
-                                  minHeight:
-                                      gl.display!.equipixel! *
-                                      gl.loadingMapBoxHeight,
-                                  minWidth:
-                                      gl.display!.equipixel! *
-                                      gl.loadingMapBoxWidth,
-                                  maxWidth:
-                                      gl.display!.equipixel! *
-                                      gl.loadingMapBoxWidth,
+                  [
+                    FlutterMap(
+                      mapController: _mapController,
+                      options: MapOptions(
+                        backgroundColor: Colors.transparent,
+                        keepAlive: true,
+                        interactionOptions: const InteractionOptions(
+                          enableMultiFingerGestureRace: false,
+                          flags:
+                              InteractiveFlag.drag |
+                              InteractiveFlag.pinchZoom |
+                              InteractiveFlag.pinchMove |
+                              InteractiveFlag.doubleTapZoom |
+                              InteractiveFlag.scrollWheelZoom,
+                        ),
+                        onLongPress: (tapPosition, point) async {
+                          _lastPressWasShort = false;
+                          if (!_doingAnaPt) {
+                            refreshView(() {
+                              _doingAnaPt = true;
+                            });
+                            await _runAnaPt(
+                              epsg4326.transform(
+                                epsg31370,
+                                proj4.Point(
+                                  x: point.longitude,
+                                  y: point.latitude,
                                 ),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    SizedBox(
-                                      width:
-                                          gl.display!.equipixel! *
-                                          gl.loadingMapBoxWidth *
-                                          .7,
-                                      child: Text(
-                                        "La carte choisie est en préparation dans la mémoire.",
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize:
+                              ),
+                            );
+                            _pt = point;
+                            refreshView(() {
+                              _doingAnaPt = false;
+                            });
+                            GoRouter.of(gl.notificationContext!).push("/anaPt");
+                          }
+                        },
+                        onTap:
+                            _modeMoveMeasurePath
+                                ? (tapPosition, point) async => {
+                                  setState(() {
+                                    _modeMoveMeasurePath = false;
+                                  }),
+                                }
+                                : _modeMeasurePath
+                                ? (tapPosition, point) async => {
+                                  setState(() {
+                                    _measurePath.add(point);
+                                  }),
+                                }
+                                : _modeDrawPolygonAddVertexes
+                                ? (tapPosition, point) async => {
+                                  if (gl.polygonLayers.isNotEmpty)
+                                    {
+                                      refreshView(() {
+                                        gl
+                                            .polygonLayers[gl
+                                                .selectedPolygonLayer]
+                                            .addPoint(point);
+                                      }),
+                                    },
+                                }
+                                : _modeDrawPolygonMoveVertexes
+                                ? (tapPosition, point) async => {
+                                  refreshView(() {
+                                    _stopMovingSelectedPoint();
+                                    _modeShowButtonDrawPolygonAddVertexes =
+                                        false;
+                                    _modeShowButtonDrawPolygonMoveVertexes =
+                                        true;
+                                    _modeShowButtonDrawPolygonRemoveVertexes =
+                                        true;
+                                    _modeDrawPolygonAddVertexes = false;
+                                    _modeDrawPolygonMoveVertexes = false;
+                                    _modeDrawPolygonRemoveVertexes = false;
+                                  }),
+                                }
+                                : _modeDrawPolygon
+                                ? (tapPosition, point) async => {
+                                  refreshView(() {
+                                    _modeShowButtonDrawPolygonAddVertexes =
+                                        true;
+                                    _modeShowButtonDrawPolygonMoveVertexes =
+                                        false;
+                                    _modeShowButtonDrawPolygonRemoveVertexes =
+                                        false;
+                                    _modeDrawPolygonAddVertexes = false;
+                                    _modeDrawPolygonMoveVertexes = false;
+                                    _modeDrawPolygonRemoveVertexes = false;
+                                  }),
+                                }
+                                : (tapPosition, point) async => {
+                                  _lastPressWasShort = true,
+                                  _updatePtMarker(point),
+                                },
+                        onPositionChanged: (position, e) async {
+                          if (!e) return;
+                          _mapControllerInit = true;
+                          updateLocation();
+                          if (_modeMoveMeasurePath) {
+                            _measurePath.removeAt(selectedMeasurePointToMove);
+                            _measurePath.insert(
+                              selectedMeasurePointToMove,
+                              LatLng(
+                                position.center.latitude,
+                                position.center.longitude,
+                              ),
+                            );
+                          }
+                          if (_selectedPointToMove != null) {
+                            gl.polygonLayers[gl.selectedPolygonLayer]
+                                .replacePoint(
+                                  _selectedPointToMove!,
+                                  LatLng(
+                                    position.center.latitude,
+                                    position.center.longitude,
+                                  ),
+                                );
+
+                            refreshView(() {
+                              _selectedPointToMove = LatLng(
+                                position.center.latitude,
+                                position.center.longitude,
+                              );
+                            });
+                          } else {
+                            refreshView(() {});
+                          }
+                          _writePositionDataToSharedPreferences(
+                            position.center.longitude,
+                            position.center.latitude,
+                            position.zoom,
+                          );
+                          _writeDataToSharedPreferences();
+                        },
+                        crs: epsg31370CRS,
+                        initialZoom:
+                            (gl.globalMinZoom + gl.globalMaxZoom) / 2.0,
+                        maxZoom: gl.globalMaxZoom,
+                        minZoom: gl.globalMinZoom,
+                        initialCenter: gl.latlonCenter,
+                        cameraConstraint: CameraConstraint.containCenter(
+                          bounds: LatLngBounds.fromPoints([latlonBL, latlonTR]),
+                        ),
+                        onMapReady: () async {
+                          updateLocation();
+                          if (gl.position != null) {
+                            refreshView(() {
+                              _mapController.move(
+                                LatLng(
+                                  gl.position?.latitude ?? 0.0,
+                                  gl.position?.longitude ?? 0.0,
+                                ),
+                                _mapController.camera.zoom,
+                              );
+                            });
+                            // si on refusait d'allumer le GPS, alors la carte ne s'affichait jamais, c'est pourquoi il y a le else et le code ci-dessous
+                          } else {
+                            refreshView(() {
+                              _mapController.move(
+                                gl.latlonCenter,
+                                _mapController.camera.zoom,
+                              );
+                            });
+                          }
+                        },
+                      ),
+                      children:
+                          gl.getLayersForFlutterMap().map<Widget>((
+                            gl.SelectedLayer selLayer,
+                          ) {
+                            if (selLayer.offline &&
+                                gl.dico.getLayerBase(selLayer.mCode).mOffline &&
+                                (selLayer.mCode ==
+                                    gl.getFirstSelLayOffline())) {
+                              if (_provider == null ||
+                                  _provider?.layerCode != selLayer.mCode) {
+                                _provider = TifFileTileProvider(
+                                  refreshView: refreshView,
+                                  mycrs: epsg31370CRS,
+                                  sourceImPath: gl.dico.getRastPath(
+                                    selLayer.mCode,
+                                  ),
+                                  layerCode: selLayer.mCode,
+                                );
+                                _provider!.init();
+                              }
+                              return _provider!.loaded
+                                  ? TileLayer(
+                                    tileDisplay:
+                                        gl.modeMapFirstTileLayerTransparancy &&
+                                                i == 2
+                                            ? TileDisplay.instantaneous(
+                                              opacity: 0.5,
+                                            )
+                                            : TileDisplay.instantaneous(
+                                              opacity: 1.0,
+                                            ),
+                                    tileProvider: _provider,
+                                    maxZoom: gl.globalMaxOfflineZoom,
+                                    minZoom:
+                                        gl.globalMinOfflineZoom, // si minZoom de la map est moins restrictif (moins élevé) que celui-ci, la carte ne s'affiche juste pas (écran blanc)
+                                  )
+                                  : Container(
+                                    alignment: Alignment.center,
+
+                                    child: Card(
+                                      color: gl.backgroundTransparentBlackBox,
+                                      child: Container(
+                                        constraints: BoxConstraints(
+                                          minHeight:
                                               gl.display!.equipixel! *
-                                              gl.smallFontSize,
+                                              gl.loadingMapBoxHeight,
+                                          minWidth:
+                                              gl.display!.equipixel! *
+                                              gl.loadingMapBoxWidth,
+                                          maxWidth:
+                                              gl.display!.equipixel! *
+                                              gl.loadingMapBoxWidth,
+                                        ),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            SizedBox(
+                                              width:
+                                                  gl.display!.equipixel! *
+                                                  gl.loadingMapBoxWidth *
+                                                  .7,
+                                              child: Text(
+                                                "La carte choisie est en préparation dans la mémoire.",
+                                                textAlign: TextAlign.center,
+                                                style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize:
+                                                      gl.display!.equipixel! *
+                                                      gl.smallFontSize,
+                                                ),
+                                              ),
+                                            ),
+                                            SizedBox(
+                                              width:
+                                                  gl.display!.equipixel! *
+                                                  gl.smallFontSize,
+                                            ),
+                                            CircularProgressIndicator(
+                                              constraints: BoxConstraints(
+                                                minHeight:
+                                                    gl.display!.equipixel! *
+                                                    gl.largeFontSize,
+                                                minWidth:
+                                                    gl.display!.equipixel! *
+                                                    gl.largeFontSize,
+                                              ),
+                                              color: gl.colorAgroBioTech,
+                                              strokeWidth:
+                                                  gl.display!.equipixel! *
+                                                  gl.smallFontSize *
+                                                  .5,
+                                            ),
+                                          ],
                                         ),
                                       ),
                                     ),
-                                    SizedBox(
-                                      width:
-                                          gl.display!.equipixel! *
-                                          gl.smallFontSize,
-                                    ),
-                                    CircularProgressIndicator(
-                                      constraints: BoxConstraints(
-                                        minHeight:
-                                            gl.display!.equipixel! *
-                                            gl.largeFontSize,
-                                        minWidth:
-                                            gl.display!.equipixel! *
-                                            gl.largeFontSize,
-                                      ),
-                                      color: gl.colorAgroBioTech,
-                                      strokeWidth:
-                                          gl.display!.equipixel! *
-                                          gl.smallFontSize *
-                                          .5,
-                                    ),
-                                  ],
+                                  );
+                            } else {
+                              LayerBase l = gl.dico.getLayerBase(
+                                selLayer.mCode,
+                              );
+                              i++;
+                              return TileLayer(
+                                userAgentPackageName: "com.forestimator",
+                                tileDisplay:
+                                    gl.modeMapFirstTileLayerTransparancy &&
+                                            i > 1 &&
+                                            gl
+                                                    .getLayersForFlutterMap()
+                                                    .length ==
+                                                i
+                                        ? TileDisplay.instantaneous(
+                                          opacity: 0.5,
+                                        )
+                                        : TileDisplay.instantaneous(
+                                          opacity: 1.0,
+                                        ),
+                                wmsOptions: WMSTileLayerOptions(
+                                  baseUrl: "${l.mUrl}?",
+                                  format: 'image/png',
+                                  layers: [l.mWMSLayerName],
+                                  crs: epsg31370CRS,
+                                  transparent: true,
                                 ),
+                                tileDimension: tileSize.round(),
+                              );
+                            }
+                          }).toList() +
+                          <Widget>[
+                            AnimatedLocationMarkerLayer(
+                              position: LocationMarkerPosition(
+                                latitude: gl.position?.latitude ?? 0.0,
+                                longitude: gl.position?.longitude ?? 0.0,
+                                accuracy: 10.0,
                               ),
                             ),
-                          );
-                    } else {
-                      LayerBase l = gl.dico.getLayerBase(selLayer.mCode);
-                      i++;
-                      return TileLayer(
-                        userAgentPackageName: "com.forestimator",
-                        tileDisplay:
-                            gl.modeMapFirstTileLayerTransparancy &&
-                                    i > 1 &&
-                                    gl.getLayersForFlutterMap().length == i
-                                ? TileDisplay.instantaneous(opacity: 0.5)
-                                : TileDisplay.instantaneous(opacity: 1.0),
-                        wmsOptions: WMSTileLayerOptions(
-                          baseUrl: "${l.mUrl}?",
-                          format: 'image/png',
-                          layers: [l.mWMSLayerName],
-                          crs: epsg31370CRS,
-                          transparent: true,
-                        ),
-                        tileDimension: tileSize.round(),
-                      );
-                    }
-                  }).toList() +
-                  <Widget>[
-                    AnimatedLocationMarkerLayer(
-                      position: LocationMarkerPosition(
-                        latitude: gl.position?.latitude ?? 0.0,
-                        longitude: gl.position?.longitude ?? 0.0,
-                        accuracy: 10.0,
-                      ),
-                    ),
-                  ] +
-                  (_modeDrawPolygon
-                      ? <Widget>[
-                        if (gl.polygonLayers.isNotEmpty &&
-                            gl
-                                    .polygonLayers[gl.selectedPolygonLayer]
-                                    .vertexes
-                                    .length >
-                                1 &&
-                            !_modeShowButtonDrawPolygonMoveVertexes &&
-                            _modeDrawPolygonAddVertexes)
-                          PolylineLayer(
-                            polylines: [
-                              Polyline(
-                                points: [
-                                  gl
-                                      .polygonLayers[gl.selectedPolygonLayer]
-                                      .vertexes[gl
-                                      .polygonLayers[gl.selectedPolygonLayer]
-                                      .selectedPolyLinePoints[0]],
-                                  gl
-                                      .polygonLayers[gl.selectedPolygonLayer]
-                                      .vertexes[gl
-                                      .polygonLayers[gl.selectedPolygonLayer]
-                                      .selectedPolyLinePoints[1]],
-                                ],
-                                color:
+                          ] +
+                          (_modeDrawPolygon
+                              ? <Widget>[
+                                if (gl.polygonLayers.isNotEmpty &&
                                     gl
-                                        .polygonLayers[gl.selectedPolygonLayer]
-                                        .colorLine,
-                                strokeWidth: 5.0,
-                              ),
-                            ],
-                          ),
+                                            .polygonLayers[gl
+                                                .selectedPolygonLayer]
+                                            .vertexes
+                                            .length >
+                                        1 &&
+                                    !_modeShowButtonDrawPolygonMoveVertexes &&
+                                    _modeDrawPolygonAddVertexes)
+                                  PolylineLayer(
+                                    polylines: [
+                                      Polyline(
+                                        points: [
+                                          gl
+                                              .polygonLayers[gl
+                                                  .selectedPolygonLayer]
+                                              .vertexes[gl
+                                              .polygonLayers[gl
+                                                  .selectedPolygonLayer]
+                                              .selectedPolyLinePoints[0]],
+                                          gl
+                                              .polygonLayers[gl
+                                                  .selectedPolygonLayer]
+                                              .vertexes[gl
+                                              .polygonLayers[gl
+                                                  .selectedPolygonLayer]
+                                              .selectedPolyLinePoints[1]],
+                                        ],
+                                        color:
+                                            gl
+                                                .polygonLayers[gl
+                                                    .selectedPolygonLayer]
+                                                .colorLine,
+                                        strokeWidth: 5.0,
+                                      ),
+                                    ],
+                                  ),
 
-                        CircleLayer(circles: _drawnLayerPointsCircleMarker()),
-                        PolygonLayer(polygons: _getPolygonesToDraw()),
-                        MarkerLayer(markers: _drawnLayerPointsMarker()),
-                        if (gl.polygonLayers.isNotEmpty &&
-                            gl
-                                .polygonLayers[gl.selectedPolygonLayer]
-                                .vertexes
-                                .isNotEmpty &&
-                            !_modeShowButtonDrawPolygonAddVertexes)
-                          CircleLayer(
-                            circles: [
-                              CircleMarker(
-                                point:
+                                CircleLayer(
+                                  circles: _drawnLayerPointsCircleMarker(),
+                                ),
+                                PolygonLayer(polygons: _getPolygonesToDraw()),
+                                MarkerLayer(markers: _drawnLayerPointsMarker()),
+                                if (gl.polygonLayers.isNotEmpty &&
                                     gl
                                         .polygonLayers[gl.selectedPolygonLayer]
-                                        .vertexes[gl
-                                        .polygonLayers[gl.selectedPolygonLayer]
-                                        .selectedPolyLinePoints[0]],
-                                radius: 15,
-                                color: Colors.red,
+                                        .vertexes
+                                        .isNotEmpty &&
+                                    !_modeShowButtonDrawPolygonAddVertexes)
+                                  CircleLayer(
+                                    circles: [
+                                      CircleMarker(
+                                        point:
+                                            gl
+                                                .polygonLayers[gl
+                                                    .selectedPolygonLayer]
+                                                .vertexes[gl
+                                                .polygonLayers[gl
+                                                    .selectedPolygonLayer]
+                                                .selectedPolyLinePoints[0]],
+                                        radius: 15,
+                                        color: Colors.red,
+                                      ),
+                                    ],
+                                  ),
+                              ]
+                              : <Widget>[
+                                if (gl.modeMapShowPolygons)
+                                  PolygonLayer(polygons: _getPolygonesToDraw()),
+                              ]) +
+                          <Widget>[
+                            MarkerLayer(
+                              markers:
+                                  _placeVertexMovePointer() +
+                                  _placeAnaPtMarker(),
+                            ),
+                            if (gl.modeMapShowPolygons)
+                              MarkerLayer(markers: _getPolygonesInfos()),
+                            if (gl.modeMapShowCustomMarker)
+                              MarkerLayer(markers: []),
+                            if (gl.modeMapShowSearchMarker)
+                              MarkerLayer(markers: _placeSearchMarker()),
+                            if (_modeMeasurePath && _measurePath.length > 1)
+                              PolylineLayer(
+                                polylines: [
+                                  Polyline(
+                                    points: _measurePath,
+                                    color: Colors.blueGrey.withAlpha(200),
+                                    strokeWidth: 5.0,
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
-                      ]
-                      : <Widget>[
-                        if (gl.modeMapShowPolygons)
-                          PolygonLayer(polygons: _getPolygonesToDraw()),
-                      ]) +
-                  <Widget>[
-                    MarkerLayer(
-                      markers: _placeVertexMovePointer() + _placeAnaPtMarker(),
+                            if (_modeMeasurePath)
+                              MarkerLayer(markers: _getPathMeasureMarkers()),
+                          ],
                     ),
-                    if (gl.modeMapShowPolygons)
-                      MarkerLayer(markers: _getPolygonesInfos()),
-                    if (gl.modeMapShowCustomMarker) MarkerLayer(markers: []),
-                    if (gl.modeMapShowSearchMarker)
-                      MarkerLayer(markers: _placeSearchMarker()),
-                    if (_modeMeasurePath && _measurePath.length > 1)
-                      PolylineLayer(
-                        polylines: [
-                          Polyline(
-                            points: _measurePath,
-                            color: Colors.blueGrey.withAlpha(200),
-                            strokeWidth: 5.0,
-                          ),
-                        ],
-                      ),
-                    if (_modeMeasurePath)
-                      MarkerLayer(markers: _getPathMeasureMarkers()),
-                  ],
-            ),
-            (_modeDrawPolygon && gl.polygonLayers.isNotEmpty)
-                ? Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment:
-                          gl.display!.orientation!.index == 0
-                              ? MainAxisAlignment.center
-                              : MainAxisAlignment.start,
-                      children: [
-                        Container(
-                          width: gl.display!.equipixel! * gl.chosenPolyBarWidth,
-                          constraints: BoxConstraints(
-                            minHeight:
-                                gl.display!.equipixel! * gl.chosenPolyBarHeight,
-                            maxHeight:
-                                gl.display!.equipixel! * gl.chosenPolyBarHeight,
-                          ),
-                          child: TextButton(
-                            onPressed: () {
-                              refreshView(() {
-                                _modePolygonList = true;
-                              });
-                              PopupPolygonListMenu(
-                                gl.notificationContext!,
-                                gl.polygonLayers[gl.selectedPolygonLayer].name,
-                                (LatLng pos) {
-                                  if (pos.longitude != 0.0 &&
-                                      pos.latitude != 0.0) {
-                                    _mapController.move(
-                                      pos,
-                                      _mapController.camera.zoom,
-                                    );
-                                  }
-                                },
-                                () {
-                                  refreshView(() {
-                                    _modePolygonList = false;
-                                    if (gl.polygonLayers.isNotEmpty) {
-                                      _modeShowButtonDrawPolygonAddVertexes =
-                                          true;
-                                      _modeShowButtonDrawPolygonMoveVertexes =
-                                          false;
-                                      _modeShowButtonDrawPolygonRemoveVertexes =
-                                          false;
-                                    }
-                                  });
-                                },
-                              );
-                            },
-                            onLongPress: () {
-                              setState(() {
-                                if (gl
-                                            .polygonLayers[gl
-                                                .selectedPolygonLayer]
-                                            .center
-                                            .longitude !=
-                                        0.0 &&
-                                    gl
-                                            .polygonLayers[gl
-                                                .selectedPolygonLayer]
-                                            .center
-                                            .latitude !=
-                                        0.0) {
-                                  _mapController.move(
-                                    gl
-                                        .polygonLayers[gl.selectedPolygonLayer]
-                                        .center,
-                                    _mapController.camera.zoom,
-                                  );
-                                }
-                              });
-                              gl.refreshMap(() {
-                                gl.modeMapShowPolygons = true;
-                              });
-                            },
-                            child: Card(
-                              surfaceTintColor: Colors.transparent,
-                              shadowColor: Colors.transparent,
-                              color: gl
-                                  .polygonLayers[gl.selectedPolygonLayer]
-                                  .colorInside
-                                  .withAlpha(255),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  IconButton(
+
+                    (_modeDrawPolygon && gl.polygonLayers.isNotEmpty)
+                        ? Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment:
+                                  gl.display!.orientation!.index == 0
+                                      ? MainAxisAlignment.center
+                                      : MainAxisAlignment.start,
+                              children: [
+                                Container(
+                                  width:
+                                      gl.display!.equipixel! *
+                                      gl.chosenPolyBarWidth,
+                                  constraints: BoxConstraints(
+                                    minHeight:
+                                        gl.display!.equipixel! *
+                                        gl.chosenPolyBarHeight,
+                                    maxHeight:
+                                        gl.display!.equipixel! *
+                                        gl.chosenPolyBarHeight,
+                                  ),
+                                  child: TextButton(
                                     onPressed: () {
+                                      gl.mainStack.add(
+                                        popupPolygonListMenu(
+                                          gl.notificationContext!,
+                                          gl
+                                              .polygonLayers[gl
+                                                  .selectedPolygonLayer]
+                                              .name,
+                                          (LatLng pos) {
+                                            if (pos.longitude != 0.0 &&
+                                                pos.latitude != 0.0) {
+                                              _mapController.move(
+                                                pos,
+                                                _mapController.camera.zoom,
+                                              );
+                                            }
+                                          },
+                                          () {
+                                            refreshView(() {
+                                              _modePolygonList = false;
+                                              if (gl.polygonLayers.isNotEmpty) {
+                                                _modeShowButtonDrawPolygonAddVertexes =
+                                                    true;
+                                                _modeShowButtonDrawPolygonMoveVertexes =
+                                                    false;
+                                                _modeShowButtonDrawPolygonRemoveVertexes =
+                                                    false;
+                                              }
+                                            });
+                                          },
+                                        ),
+                                      );
+                                      refreshView(() {
+                                        _modePolygonList = true;
+                                      });
+                                    },
+                                    onLongPress: () {
                                       setState(() {
                                         if (gl
                                                     .polygonLayers[gl
@@ -778,167 +795,223 @@ class _MapPageState extends State<MapPage> {
                                         gl.modeMapShowPolygons = true;
                                       });
                                     },
-                                    icon: Icon(
-                                      gl
-                                                  .polygonLayers[gl
-                                                      .selectedPolygonLayer]
-                                                  .polygonPoints
-                                                  .length >
-                                              2
-                                          ? Icons.center_focus_strong
-                                          : Icons.center_focus_strong_outlined,
-                                      size:
-                                          gl.display!.equipixel! * gl.iconSize,
-                                      color: getColorTextFromBackground(
-                                        gl
-                                            .polygonLayers[gl
-                                                .selectedPolygonLayer]
-                                            .colorInside
-                                            .withAlpha(255),
-                                      ),
-                                    ),
-                                  ),
-
-                                  SizedBox(
-                                    width:
-                                        gl.display!.equipixel! *
-                                        gl.chosenPolyBarWidth *
-                                        .4,
-                                    child: Text(
-                                      gl
+                                    child: Card(
+                                      surfaceTintColor: Colors.transparent,
+                                      shadowColor: Colors.transparent,
+                                      color: gl
                                           .polygonLayers[gl
                                               .selectedPolygonLayer]
-                                          .name,
-                                      style: TextStyle(
-                                        color: getColorTextFromBackground(
-                                          gl
-                                              .polygonLayers[gl
-                                                  .selectedPolygonLayer]
-                                              .colorInside
-                                              .withAlpha(255),
-                                        ),
-                                        fontSize:
-                                            gl.display!.equipixel! *
-                                            gl.mediumFontSize *
-                                            .75,
+                                          .colorInside
+                                          .withAlpha(255),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceEvenly,
+                                        children: [
+                                          IconButton(
+                                            onPressed: () {
+                                              setState(() {
+                                                if (gl
+                                                            .polygonLayers[gl
+                                                                .selectedPolygonLayer]
+                                                            .center
+                                                            .longitude !=
+                                                        0.0 &&
+                                                    gl
+                                                            .polygonLayers[gl
+                                                                .selectedPolygonLayer]
+                                                            .center
+                                                            .latitude !=
+                                                        0.0) {
+                                                  _mapController.move(
+                                                    gl
+                                                        .polygonLayers[gl
+                                                            .selectedPolygonLayer]
+                                                        .center,
+                                                    _mapController.camera.zoom,
+                                                  );
+                                                }
+                                              });
+                                              gl.refreshMap(() {
+                                                gl.modeMapShowPolygons = true;
+                                              });
+                                            },
+                                            icon: Icon(
+                                              gl
+                                                          .polygonLayers[gl
+                                                              .selectedPolygonLayer]
+                                                          .polygonPoints
+                                                          .length >
+                                                      2
+                                                  ? Icons.center_focus_strong
+                                                  : Icons
+                                                      .center_focus_strong_outlined,
+                                              size:
+                                                  gl.display!.equipixel! *
+                                                  gl.iconSize,
+                                              color: getColorTextFromBackground(
+                                                gl
+                                                    .polygonLayers[gl
+                                                        .selectedPolygonLayer]
+                                                    .colorInside
+                                                    .withAlpha(255),
+                                              ),
+                                            ),
+                                          ),
+
+                                          SizedBox(
+                                            width:
+                                                gl.display!.equipixel! *
+                                                gl.chosenPolyBarWidth *
+                                                .4,
+                                            child: Text(
+                                              gl
+                                                  .polygonLayers[gl
+                                                      .selectedPolygonLayer]
+                                                  .name,
+                                              style: TextStyle(
+                                                color: getColorTextFromBackground(
+                                                  gl
+                                                      .polygonLayers[gl
+                                                          .selectedPolygonLayer]
+                                                      .colorInside
+                                                      .withAlpha(255),
+                                                ),
+                                                fontSize:
+                                                    gl.display!.equipixel! *
+                                                    gl.mediumFontSize *
+                                                    .75,
+                                              ),
+                                            ),
+                                          ),
+                                          Text(
+                                            "${(gl.polygonLayers[gl.selectedPolygonLayer].area / 100).round() / 100} Ha",
+                                            style: TextStyle(
+                                              color: getColorTextFromBackground(
+                                                gl
+                                                    .polygonLayers[gl
+                                                        .selectedPolygonLayer]
+                                                    .colorInside
+                                                    .withAlpha(255),
+                                              ),
+                                              fontSize:
+                                                  gl.display!.equipixel! *
+                                                  gl.mediumFontSize *
+                                                  .9,
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ),
                                   ),
-                                  Text(
-                                    "${(gl.polygonLayers[gl.selectedPolygonLayer].area / 100).round() / 100} Ha",
-                                    style: TextStyle(
-                                      color: getColorTextFromBackground(
-                                        gl
-                                            .polygonLayers[gl
-                                                .selectedPolygonLayer]
-                                            .colorInside
-                                            .withAlpha(255),
-                                      ),
-                                      fontSize:
-                                          gl.display!.equipixel! *
-                                          gl.mediumFontSize *
-                                          .9,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                )
-                : _modeDrawPolygon
-                ? Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment:
-                          gl.display!.orientation!.index == 0
-                              ? MainAxisAlignment.center
-                              : MainAxisAlignment.start,
-                      children: [
-                        SizedBox(
-                          height:
-                              gl.display!.equipixel! * gl.chosenPolyBarHeight,
-                          width: gl.display!.equipixel! * gl.chosenPolyBarWidth,
-                          child: TextButton(
-                            onPressed:
-                                () => PopupPolygonListMenu(
-                                  gl.notificationContext!,
-                                  "",
-                                  (LatLng pos) {
-                                    if (pos.longitude != 0.0 &&
-                                        pos.latitude != 0.0) {
-                                      _mapController.move(
-                                        pos,
-                                        _mapController.camera.zoom,
-                                      );
-                                    }
-                                  },
-                                  () {
-                                    refreshView(() {
-                                      _modePolygonList = false;
-                                      if (gl.polygonLayers.isNotEmpty) {
-                                        _modeShowButtonDrawPolygonAddVertexes =
-                                            true;
-                                        _modeShowButtonDrawPolygonMoveVertexes =
-                                            false;
-                                        _modeShowButtonDrawPolygonRemoveVertexes =
-                                            false;
-                                      }
-                                    });
-                                  },
                                 ),
-                            child: Card(
-                              surfaceTintColor: Colors.transparent,
-                              shadowColor: Colors.transparent,
-                              color: gl.backgroundTransparentBlackBox,
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  Icon(
-                                    Icons.add,
-                                    size: gl.display!.equipixel! * gl.iconSize,
-                                    color: Colors.white,
-                                  ),
-                                  SizedBox(
-                                    width:
-                                        gl.display!.equipixel! *
-                                        gl.smallFontSize,
-                                  ),
-                                  SizedBox(
-                                    width:
-                                        gl.display!.equipixel! *
-                                        gl.chosenPolyBarWidth *
-                                        .7,
-                                    child: Text(
-                                      "Tappez ici pour ajouter un Polygone",
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize:
-                                            gl.display!.equipixel! *
-                                            gl.mediumFontSize,
+                              ],
+                            ),
+                          ],
+                        )
+                        : _modeDrawPolygon
+                        ? Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment:
+                                  gl.display!.orientation!.index == 0
+                                      ? MainAxisAlignment.center
+                                      : MainAxisAlignment.start,
+                              children: [
+                                SizedBox(
+                                  height:
+                                      gl.display!.equipixel! *
+                                      gl.chosenPolyBarHeight,
+                                  width:
+                                      gl.display!.equipixel! *
+                                      gl.chosenPolyBarWidth,
+                                  child: TextButton(
+                                    onPressed: () {
+                                      gl.mainStack.add(
+                                        popupPolygonListMenu(
+                                          gl.notificationContext!,
+                                          "",
+                                          (LatLng pos) {
+                                            if (pos.longitude != 0.0 &&
+                                                pos.latitude != 0.0) {
+                                              _mapController.move(
+                                                pos,
+                                                _mapController.camera.zoom,
+                                              );
+                                            }
+                                          },
+                                          () {
+                                            refreshView(() {
+                                              _modePolygonList = false;
+                                              if (gl.polygonLayers.isNotEmpty) {
+                                                _modeShowButtonDrawPolygonAddVertexes =
+                                                    true;
+                                                _modeShowButtonDrawPolygonMoveVertexes =
+                                                    false;
+                                                _modeShowButtonDrawPolygonRemoveVertexes =
+                                                    false;
+                                              }
+                                            });
+                                          },
+                                        ),
+                                      );
+                                      refreshView(() {});
+                                    },
+
+                                    child: Card(
+                                      surfaceTintColor: Colors.transparent,
+                                      shadowColor: Colors.transparent,
+                                      color: gl.backgroundTransparentBlackBox,
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceEvenly,
+                                        children: [
+                                          Icon(
+                                            Icons.add,
+                                            size:
+                                                gl.display!.equipixel! *
+                                                gl.iconSize,
+                                            color: Colors.white,
+                                          ),
+                                          SizedBox(
+                                            width:
+                                                gl.display!.equipixel! *
+                                                gl.smallFontSize,
+                                          ),
+                                          SizedBox(
+                                            width:
+                                                gl.display!.equipixel! *
+                                                gl.chosenPolyBarWidth *
+                                                .7,
+                                            child: Text(
+                                              "Tappez ici pour ajouter un Polygone",
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize:
+                                                    gl.display!.equipixel! *
+                                                    gl.mediumFontSize,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ),
                                   ),
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                )
-                : Column(),
-            _mainMenuBar(),
-            if (_toolbarExtended) _toolBar(),
-            if (_polygonToolbarExtended && gl.polygonLayers.isNotEmpty)
-              _polygonToolbar(),
-          ],
+                          ],
+                        )
+                        : Column(),
+
+                    _mainMenuBar(),
+                    if (_toolbarExtended) _toolBar(),
+                    if (_polygonToolbarExtended && gl.polygonLayers.isNotEmpty)
+                      _polygonToolbar(),
+                  ] +
+                  gl.mainStack,
+            );
+          },
         ),
       ),
     );
@@ -1556,28 +1629,30 @@ class _MapPageState extends State<MapPage> {
                                 _modeLayerSwitches = true;
                                 _closePolygonMenu();
                                 _closeToolbarMenu();
-                                PopupLayerSwitcher(
-                                  gl.notificationContext!,
-                                  () {
-                                    setState(() {
-                                      _closeSwitchesMenu();
-                                    });
-                                  },
-                                  (close) {
-                                    return _mainMenuBar(
-                                      dummy: true,
-                                      close: close,
-                                    );
-                                  },
-                                  (LatLng pos) {
-                                    if (pos.longitude != 0.0 &&
-                                        pos.latitude != 0.0) {
-                                      _mapController.move(
-                                        pos,
-                                        _mapController.camera.zoom,
+                                gl.mainStack.add(
+                                  popupLayerSwitcher(
+                                    gl.notificationContext!,
+                                    () {
+                                      setState(() {
+                                        _closeSwitchesMenu();
+                                      });
+                                    },
+                                    (close) {
+                                      return _mainMenuBar(
+                                        dummy: true,
+                                        close: close,
                                       );
-                                    }
-                                  },
+                                    },
+                                    (LatLng pos) {
+                                      if (pos.longitude != 0.0 &&
+                                          pos.latitude != 0.0) {
+                                        _mapController.move(
+                                          pos,
+                                          _mapController.camera.zoom,
+                                        );
+                                      }
+                                    },
+                                  ),
                                 );
                               });
                             },
@@ -1738,22 +1813,25 @@ class _MapPageState extends State<MapPage> {
                           setState(() {
                             _modeSearch = true;
                           });
-                          PopupSearchMenu(
-                            gl.notificationContext!,
-                            "",
-                            (LatLng pos) {
-                              if (pos.longitude != 0.0 && pos.latitude != 0.0) {
-                                _mapController.move(
-                                  pos,
-                                  _mapController.camera.zoom,
-                                );
-                              }
-                            },
-                            () {
-                              refreshView(() {
-                                _modeSearch = false;
-                              });
-                            },
+                          gl.mainStack.add(
+                            popupSearchMenu(
+                              gl.notificationContext!,
+                              "",
+                              (LatLng pos) {
+                                if (pos.longitude != 0.0 &&
+                                    pos.latitude != 0.0) {
+                                  _mapController.move(
+                                    pos,
+                                    _mapController.camera.zoom,
+                                  );
+                                }
+                              },
+                              () {
+                                refreshView(() {
+                                  _modeSearch = false;
+                                });
+                              },
+                            ),
                           );
                         },
                         icon: FaIcon(FontAwesomeIcons.magnifyingGlassLocation),
@@ -2215,12 +2293,7 @@ class _AnaPtPreview extends State<AnaPtPreview> {
           gl.print("$e");
         }
       } else {
-        showDialog(
-          context: gl.notificationContext!,
-          builder: (BuildContext context) {
-            return PopupNoInternet();
-          },
-        );
+        gl.mainStack.add(popupNoInternet());
       }
     } else {
       int val = await gl.dico

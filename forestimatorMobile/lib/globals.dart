@@ -97,6 +97,19 @@ double searchBarWidth = 75;
 double layerSwitcherHeight = 75;
 double layerSwitcherCatalogueHeight = 30;
 double layerswitcherWidth = 80;
+// Do you really dialogue
+double dyrDialogWidth = 60;
+double dyrDialogHeight = 60;
+double dyrButtonsize = 20;
+// Online Catalogue
+double onCatalogueWidth = 98;
+double onCatalogueSearchBoxHeight = 12;
+double onCatalogueCategoryHeight = 20;
+double onCatalogueMapHeight = 20;
+double onCatalogueIconSize = 7;
+double onCatalogueLayerSelectionButton = 10;
+// Legend view
+double legendHeightColorTile = 0.01;
 
 proj4.Projection epsg4326 = proj4.Projection.get('EPSG:4326')!;
 proj4.Projection epsg31370 =
@@ -571,3 +584,9 @@ Map<int, int> lutVulnerabiliteCS = {
   12: 4,
   13: 7,
 };
+
+List<Widget> mainStack = [];
+
+void mainStackPopLast() {
+  mainStack.removeLast();
+}

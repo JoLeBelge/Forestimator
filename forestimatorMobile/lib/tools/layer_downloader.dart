@@ -49,10 +49,10 @@ class _LayerDownloaderState extends State<LayerDownloader> {
       return Container(
         color: gl.colorBackground,
         constraints: BoxConstraints(
-          minWidth: MediaQuery.of(context).size.width * 1,
-          maxWidth: MediaQuery.of(context).size.width * 1,
-          minHeight: MediaQuery.of(context).size.height * .1,
-          maxHeight: MediaQuery.of(context).size.height * .1,
+          minWidth: gl.onCatalogueWidth * gl.display!.equipixel!,
+          maxWidth: gl.onCatalogueWidth * gl.display!.equipixel!,
+          minHeight: 10 * gl.display!.equipixel!,
+          maxHeight: 10 * gl.display!.equipixel!,
         ),
         child: const Text("Downloads are not supported yet."),
       );
@@ -64,8 +64,8 @@ class _LayerDownloaderState extends State<LayerDownloader> {
           minimumSize:
               WidgetStateProperty<Size>.fromMap(<WidgetStatesConstraint, Size>{
                 WidgetState.any: Size(
-                  MediaQuery.of(context).size.width * .99,
-                  MediaQuery.of(context).size.height * .075,
+                  gl.onCatalogueWidth * gl.display!.equipixel!,
+                  gl.display!.equipixel! * 10,
                 ),
               }),
         ),
@@ -98,15 +98,17 @@ class _LayerDownloaderState extends State<LayerDownloader> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            const Icon(Icons.delete, size: 28, color: Colors.black),
+            Icon(
+              Icons.delete,
+              size: gl.onCatalogueIconSize * gl.display!.equipixel!,
+              color: Colors.black,
+            ),
             Container(
-              constraints: BoxConstraints(
-                maxWidth: MediaQuery.of(context).size.width * .05,
-              ),
+              constraints: BoxConstraints(maxWidth: 5 * gl.display!.equipixel!),
             ),
             Container(
               constraints: BoxConstraints(
-                maxWidth: MediaQuery.of(context).size.width * .6,
+                maxWidth: 60 * gl.display!.equipixel!,
               ),
               child: const Text(
                 "La couche est enregistrée.",
@@ -122,8 +124,8 @@ class _LayerDownloaderState extends State<LayerDownloader> {
           minimumSize:
               WidgetStateProperty<Size>.fromMap(<WidgetStatesConstraint, Size>{
                 WidgetState.any: Size(
-                  MediaQuery.of(context).size.width * .99,
-                  MediaQuery.of(context).size.height * .075,
+                  gl.onCatalogueWidth * gl.display!.equipixel!,
+                  10 * gl.display!.equipixel!,
                 ),
               }),
         ),
@@ -152,15 +154,19 @@ class _LayerDownloaderState extends State<LayerDownloader> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            const Icon(Icons.repeat_rounded, size: 28, color: Colors.black),
+            Icon(
+              Icons.repeat_rounded,
+              size: gl.onCatalogueIconSize * gl.display!.equipixel!,
+              color: Colors.black,
+            ),
             Container(
               constraints: BoxConstraints(
-                maxWidth: MediaQuery.of(context).size.width * .05,
+                maxWidth: 10 * gl.display!.equipixel!,
               ),
             ),
             Container(
               constraints: BoxConstraints(
-                maxWidth: MediaQuery.of(context).size.width * .6,
+                maxWidth: 60 * gl.display!.equipixel!,
               ),
               child: const Text(
                 "Relancer.",
@@ -176,8 +182,8 @@ class _LayerDownloaderState extends State<LayerDownloader> {
           minimumSize:
               WidgetStateProperty<Size>.fromMap(<WidgetStatesConstraint, Size>{
                 WidgetState.any: Size(
-                  MediaQuery.of(context).size.width * .99,
-                  MediaQuery.of(context).size.height * .075,
+                  gl.onCatalogueWidth * gl.display!.equipixel!,
+                  10 * gl.display!.equipixel!,
                 ),
               }),
         ),
@@ -203,15 +209,17 @@ class _LayerDownloaderState extends State<LayerDownloader> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            const Icon(Icons.download, size: 28, color: Colors.black),
+            Icon(
+              Icons.download,
+              size: gl.onCatalogueIconSize * gl.display!.equipixel!,
+              color: Colors.black,
+            ),
             Container(
-              constraints: BoxConstraints(
-                maxWidth: MediaQuery.of(context).size.width * .05,
-              ),
+              constraints: BoxConstraints(maxWidth: 5 * gl.display!.equipixel!),
             ),
             Container(
               constraints: BoxConstraints(
-                maxWidth: MediaQuery.of(context).size.width * .6,
+                maxWidth: 60 * gl.display!.equipixel!,
               ),
               child: const Text(
                 "La couche peut être téléchargée pour l'utilisation hors ligne.",
