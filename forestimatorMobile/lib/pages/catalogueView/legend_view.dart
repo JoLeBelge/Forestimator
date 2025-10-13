@@ -24,7 +24,6 @@ class _LegendView extends State<LegendView> {
   @override
   Widget build(BuildContext context) {
     _computeBoxContraintsPerColorTile();
-
     return Center(
       child: Container(
         color: Colors.white,
@@ -147,13 +146,13 @@ class _LegendView extends State<LegendView> {
         widget.constraintsColors.maxWidth * 0.85,
       );
     } else if (gl.dico.mLayerBases[widget.layerKey]!.mDicoCol.length > 50) {
-      double heightPerColorTile = gl.display!.equipixel! * 0.3;
+      double heightPerColorTile = gl.display!.equipixel! * 0.5;
       double graduatedHeight =
           gl.display!.equipixel! *
           gl.display!.equiheight! *
           gl.dico.mLayerBases[widget.layerKey]!.mDicoCol.length /
           11.0 *
-          .003;
+          .005;
       _magicNumber =
           (gl.dico.mLayerBases[widget.layerKey]!.mDicoCol.length / 10).toInt();
       _graduatedMode = true;
@@ -169,14 +168,14 @@ class _LegendView extends State<LegendView> {
         widget.constraintsColors.maxWidth,
         widget.constraintsColors.maxWidth,
       );
-    } else if (gl.dico.mLayerBases[widget.layerKey]!.mDicoCol.length > 30) {
-      double heightPerColorTile = gl.display!.equipixel! * 1;
+    } else if (gl.dico.mLayerBases[widget.layerKey]!.mDicoCol.length > 40) {
+      double heightPerColorTile = gl.display!.equipixel! * 1.5;
       double graduatedHeight =
           gl.display!.equipixel! *
           gl.display!.equiheight! *
           gl.dico.mLayerBases[widget.layerKey]!.mDicoCol.length /
           13.0 *
-          .01;
+          .016;
       _magicNumber =
           (gl.dico.mLayerBases[widget.layerKey]!.mDicoCol.length / 10).toInt();
       _graduatedMode = true;
@@ -194,7 +193,7 @@ class _LegendView extends State<LegendView> {
       );
     } else {
       _graduatedMode = false;
-      double heightPerColorTile = gl.display!.equipixel! * 2;
+      double heightPerColorTile = gl.display!.equipixel! * 4;
       _constraintsLeft = _initConstraints(
         heightPerColorTile,
         heightPerColorTile,

@@ -256,6 +256,10 @@ class _MapPageState extends State<MapPage> {
                         gl.changeSelectedLayerModeOnline();
                       }
                     });
+                    gl.rebuildSwitcherCatalogueButtons(() {});
+                    gl.rebuildOfflineCatalogue(() {});
+                    gl.rebuildSwitcherBox(() {});
+                    gl.rebuildLayerSwitcher(() {});
                   },
                   child:
                       gl.offlineMode

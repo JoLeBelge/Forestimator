@@ -76,7 +76,7 @@ android {
         targetSdkVersion 36 // je change ça pour respecter les expectations de google play store, 07/2024
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
-        multiDexEnabled true
+        multiDexEnabled false
     }
 
     buildTypes {
@@ -94,5 +94,6 @@ flutter {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:2.1.0"
-    implementation 'androidx.multidex:multidex:2.0.1'
+    implementation "androidx.multidex:multidex:2.0.1"
+    //implementation "com.android.tools.build:gradle:8.3.0"
 }

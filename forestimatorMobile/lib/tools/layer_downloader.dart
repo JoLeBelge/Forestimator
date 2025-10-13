@@ -83,10 +83,10 @@ class _LayerDownloaderState extends State<LayerDownloader> {
                   gl.dico.getLayerBase(widget.layer.key).mOffline = false;
                   gl.removeFromOfflineList(widget.layer.key);
                 });
-                gl.refreshWholeCatalogueView(() {
+                gl.rebuildSwitcherCatalogueButtons(() {
                   gl.dico.getLayerBase(widget.layer.key).mOffline = false;
                 });
-                gl.rebuildOfflineView(() {
+                gl.rebuildOfflineCatalogue(() {
                   gl.dico.getLayerBase(widget.layer.key).mOffline = false;
                 });
               });
@@ -134,10 +134,10 @@ class _LayerDownloaderState extends State<LayerDownloader> {
           setState(() {
             gl.dico.getLayerBase(widget.layer.key).mInDownload = true;
           });
-          gl.refreshWholeCatalogueView(() {
+          gl.rebuildSwitcherCatalogueButtons(() {
             gl.dico.getLayerBase(widget.layer.key).mInDownload = true;
           });
-          gl.rebuildOfflineView(() {
+          gl.rebuildOfflineCatalogue(() {
             gl.dico.getLayerBase(widget.layer.key).mInDownload = true;
           });
           downloadId = await fD?.downloadFile(widget.layer.key);
@@ -191,10 +191,10 @@ class _LayerDownloaderState extends State<LayerDownloader> {
           setState(() {
             gl.dico.getLayerBase(widget.layer.key).mInDownload = true;
           });
-          gl.refreshWholeCatalogueView(() {
+          gl.rebuildSwitcherCatalogueButtons(() {
             gl.dico.getLayerBase(widget.layer.key).mInDownload = true;
           });
-          gl.rebuildOfflineView(() {
+          gl.rebuildOfflineCatalogue(() {
             gl.dico.getLayerBase(widget.layer.key).mInDownload = true;
           });
           downloadId = await fD?.downloadFile(widget.layer.key);
@@ -343,6 +343,8 @@ class ForestimatorDownloader {
           gl.dico.getLayerBase(layerKey).mOffline = true;
           gl.dico.getLayerBase(layerKey).mInDownload = false;
         });
+        gl.rebuildSwitcherCatalogueButtons(() {});
+        gl.rebuildOfflineCatalogue(() {});
       }
       if (DownloadTaskStatus.failed == status) {
         gl.print("Downloader: download failed.");

@@ -218,31 +218,85 @@ class PopupNameIntroducer {
     String currentName,
     Function(String) state,
     Function after,
+    Function callbackOnStartTyping,
   ) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text("Nommez le polygone"),
-          content: SingleChildScrollView(
-            child: TextFormField(
-              maxLength: 22,
-              maxLengthEnforcement: MaxLengthEnforcement.enforced,
-              onChanged: (String str) {
-                state(str);
-              },
-              controller: TextEditingController(text: currentName),
+          content: SizedBox(
+            width:
+                gl.display!.orientation!.index == 0
+                    ? gl.menuBarLength * gl.display!.equipixel!
+                    : gl.menuBarLength * gl.display!.equipixel! * 1.75,
+            height:
+                gl.display!.orientation!.index == 0
+                    ? gl.menuBarThickness * gl.display!.equipixel! * 1.75
+                    : gl.menuBarThickness * gl.display!.equipixel! * .9,
+            child: SingleChildScrollView(
+              child: switchRowColWithOrientation([
+                SizedBox(
+                  width: gl.menuBarLength * gl.display!.equipixel!,
+                  child: TextFormField(
+                    maxLength: 22,
+                    maxLengthEnforcement: MaxLengthEnforcement.enforced,
+                    onChanged: (String str) {
+                      state(str);
+                    },
+                    onTap: () => callbackOnStartTyping(),
+                    onTapOutside: (pointer) {
+                      after();
+                    },
+                    controller: TextEditingController(text: currentName),
+                  ),
+                ),
+                SizedBox(
+                  width: gl.menuBarLength * .5 * gl.display!.equipixel!,
+                  child: TextButton(
+                    style: ButtonStyle(
+                      backgroundColor: WidgetStateProperty.fromMap(
+                        <WidgetStatesConstraint, Color>{
+                          WidgetState.any: gl.colorAgroBioTech.withAlpha(200),
+                        },
+                      ),
+                      shape: WidgetStateProperty<OutlinedBorder>.fromMap(
+                        <WidgetStatesConstraint, OutlinedBorder>{
+                          WidgetState.any: RoundedRectangleBorder(
+                            borderRadius: BorderRadiusGeometry.circular(12.0),
+                            side: BorderSide(
+                              color: Color.fromRGBO(205, 225, 138, 1.0),
+                              width: 2.0,
+                            ),
+                          ),
+                        },
+                      ),
+                      fixedSize: WidgetStateProperty.fromMap(
+                        <WidgetStatesConstraint, Size>{
+                          WidgetState.any: Size(
+                            gl.display!.equipixel! *
+                                gl.popupReturnButtonWidth *
+                                .8,
+                            gl.display!.equipixel! *
+                                gl.popupReturnButtonHeight *
+                                .6,
+                          ),
+                        },
+                      ),
+                    ),
+                    child: Text(
+                      "Renommer",
+                      style: TextStyle(color: Colors.black),
+                    ),
+                    onPressed: () {
+                      after();
+                      Navigator.of(context, rootNavigator: true).pop();
+                    },
+                  ),
+                ),
+              ]),
             ),
           ),
-          actions: [
-            TextButton(
-              child: Text("Renommer"),
-              onPressed: () {
-                after();
-                Navigator.of(context, rootNavigator: true).pop();
-              },
-            ),
-          ],
+          actions: [],
         );
       },
     );
@@ -263,6 +317,7 @@ class _PolygonListMenu extends State<PolygonListMenu> {
   final Color active = Colors.black;
   final Color inactive = const Color.fromARGB(255, 92, 92, 92);
   final ScrollController _controller = ScrollController();
+  bool _keyboard = false;
 
   void _scrollDown() {
     _controller.animateTo(
@@ -275,7 +330,7 @@ class _PolygonListMenu extends State<PolygonListMenu> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: true,
+      resizeToAvoidBottomInset: false,
       backgroundColor: Colors.transparent,
       body: switchRowColWithOrientation([
         Container(
@@ -419,7 +474,8 @@ class _PolygonListMenu extends State<PolygonListMenu> {
                                     )
                                     : i == gl.selectedPolygonLayer
                                     ? BorderSide(
-                                      color: Colors.white,
+                                      color: gl.polygonLayers[i].colorInside
+                                          .withAlpha(100),
                                       width: 2.0,
                                     )
                                     : BorderSide(
@@ -428,7 +484,6 @@ class _PolygonListMenu extends State<PolygonListMenu> {
                                       width: 4.0,
                                     ),
                           ),
-
                           surfaceTintColor: Colors.transparent,
                           shadowColor: Colors.transparent,
                           color:
@@ -569,7 +624,14 @@ class _PolygonListMenu extends State<PolygonListMenu> {
                                                     });
                                                   },
                                                   () {
-                                                    setState(() {});
+                                                    setState(() {
+                                                      _keyboard = false;
+                                                    });
+                                                  },
+                                                  () {
+                                                    setState(() {
+                                                      _keyboard = true;
+                                                    });
                                                   },
                                                 );
                                               },
@@ -717,7 +779,7 @@ class _PolygonListMenu extends State<PolygonListMenu> {
                     );
                   }) +
                   [
-                    if (gl.display!.orientation!.index == 0)
+                    if (gl.display!.orientation!.index == 0 && !_keyboard)
                       TextButton(
                         style: ButtonStyle(),
                         key: Key('autsch-5-addPoly'),
@@ -750,7 +812,14 @@ class _PolygonListMenu extends State<PolygonListMenu> {
                                 });
                               },
                               () {
-                                setState(() {});
+                                setState(() {
+                                  _keyboard = false;
+                                });
+                              },
+                              () {
+                                setState(() {
+                                  _keyboard = true;
+                                });
                               },
                             );
                             gl.selectedPolygonLayer =
@@ -775,7 +844,7 @@ class _PolygonListMenu extends State<PolygonListMenu> {
             ),
           ),
         ),
-        if (gl.display!.orientation!.index == 1)
+        if (gl.display!.orientation!.index == 1 && !_keyboard)
           Column(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
@@ -873,7 +942,14 @@ class _PolygonListMenu extends State<PolygonListMenu> {
                                       });
                                     },
                                     () {
-                                      setState(() {});
+                                      setState(() {
+                                        _keyboard = false;
+                                      });
+                                    },
+                                    () {
+                                      setState(() {
+                                        _keyboard = true;
+                                      });
                                     },
                                   );
                                 },
@@ -995,6 +1071,7 @@ class _PolygonListMenu extends State<PolygonListMenu> {
                     ),
                   ),
                 ),
+
               SizedBox(
                 width: gl.polyListSelectedCardWidth * gl.display!.equipixel!,
                 child: TextButton(
@@ -1027,7 +1104,14 @@ class _PolygonListMenu extends State<PolygonListMenu> {
                           });
                         },
                         () {
-                          setState(() {});
+                          setState(() {
+                            _keyboard = false;
+                          });
+                        },
+                        () {
+                          setState(() {
+                            _keyboard = true;
+                          });
                         },
                       );
                       gl.selectedPolygonLayer = gl.polygonLayers.length - 1;
@@ -1037,7 +1121,6 @@ class _PolygonListMenu extends State<PolygonListMenu> {
                       gl.selectedPolygonLayer = gl.polygonLayers.length - 1;
                       gl.saveChangesToPolygoneToPrefs = true;
                     });
-
                     _scrollDown();
                   },
                 ),
@@ -1051,7 +1134,7 @@ class _PolygonListMenu extends State<PolygonListMenu> {
               ),
             ],
           ),
-        if (gl.display!.orientation!.index == 0)
+        if (gl.display!.orientation!.index == 0 && !_keyboard)
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [_returnButton(context, widget.after)],
@@ -1177,7 +1260,7 @@ class _SearchResultCard extends State<SearchResultCard> {
           borderRadius: BorderRadiusGeometry.circular(12.0),
           side:
               selected
-                  ? BorderSide(color: Colors.white, width: 2.0)
+                  ? BorderSide(color: widget.boxColor, width: 2.0)
                   : BorderSide(
                     color: widget.boxColor.withAlpha(255),
                     width: 1.0,
@@ -1279,29 +1362,19 @@ class _SearchMenu extends State<SearchMenu> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       backgroundColor: Colors.transparent,
       body: switchRowColWithOrientation([
-        Container(
-          constraints:
-              gl.display!.orientation!.index == 0
-                  ? BoxConstraints(
-                    minHeight:
-                        gl.display!.equiheight! * gl.display!.equipixel! * .4,
-                    maxHeight:
-                        gl.display!.equiheight! * gl.display!.equipixel! * .70,
-                  )
-                  : BoxConstraints(
-                    minHeight:
-                        gl.display!.equiheight! * gl.display!.equipixel! * .5,
-                    maxHeight:
-                        gl.display!.equiheight! * gl.display!.equipixel! * .7,
-                    minWidth:
-                        gl.display!.equiwidth! * gl.display!.equipixel! * .35,
-                    maxWidth:
-                        gl.display!.equiwidth! * gl.display!.equipixel! * .5,
-                  ),
-          child: ListView(children: <Widget>[] + searchResults),
-        ),
+        if (gl.display!.orientation!.index == 1)
+          Container(
+            constraints: BoxConstraints(
+              minHeight: gl.display!.equiheight! * gl.display!.equipixel! * .5,
+              maxHeight: gl.display!.equiheight! * gl.display!.equipixel! * .7,
+              minWidth: gl.display!.equiwidth! * gl.display!.equipixel! * .35,
+              maxWidth: gl.display!.equiwidth! * gl.display!.equipixel! * .5,
+            ),
+            child: ListView(children: <Widget>[] + searchResults),
+          ),
         Column(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
@@ -1523,13 +1596,22 @@ class _SearchMenu extends State<SearchMenu> {
                 ),
               ],
             ),
-            if (gl.display!.orientation!.index == 1)
+            if (gl.display!.orientation!.index == 1 &&
+                MediaQuery.of(context).viewInsets.bottom == 0)
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [_returnButton(context, widget.after)],
               ),
           ],
         ),
+        if (gl.display!.orientation!.index == 0)
+          Container(
+            constraints: BoxConstraints(
+              minHeight: gl.display!.equiheight! * gl.display!.equipixel! * .4,
+              maxHeight: gl.display!.equiheight! * gl.display!.equipixel! * .70,
+            ),
+            child: ListView(children: <Widget>[] + searchResults),
+          ),
       ]),
     );
   }
@@ -2187,26 +2269,45 @@ Widget popupPolygonListMenu(
 }
 
 Widget _returnButton(BuildContext context, Function after) {
-  return Container(
-    padding: EdgeInsets.all(2),
-    height: gl.display!.equipixel! * gl.popupReturnButtonHeight * .8,
-    width: gl.display!.equipixel! * gl.popupReturnButtonWidth,
-
-    child: FloatingActionButton(
-      backgroundColor: Colors.green,
-      child: Text(
-        "Retour!",
-        maxLines: 1,
-        style: TextStyle(
-          fontSize: gl.display!.equipixel! * gl.mediumFontSize,
-          color: Colors.black,
-        ),
+  return TextButton(
+    style: ButtonStyle(
+      backgroundColor: WidgetStateProperty.fromMap(
+        <WidgetStatesConstraint, Color>{
+          WidgetState.any: gl.colorAgroBioTech.withAlpha(200),
+        },
       ),
-      onPressed: () {
-        after();
-        gl.mainStackPopLast();
-      },
+      shape: WidgetStateProperty<OutlinedBorder>.fromMap(
+        <WidgetStatesConstraint, OutlinedBorder>{
+          WidgetState.any: RoundedRectangleBorder(
+            borderRadius: BorderRadiusGeometry.circular(12.0),
+            side: BorderSide(
+              color: Color.fromRGBO(205, 225, 138, 1.0),
+              width: 2.0,
+            ),
+          ),
+        },
+      ),
+      fixedSize: WidgetStateProperty.fromMap(<WidgetStatesConstraint, Size>{
+        WidgetState.any: Size(
+          gl.display!.equipixel! * gl.popupReturnButtonWidth * .8,
+          gl.display!.equipixel! * gl.popupReturnButtonHeight * .8,
+        ),
+      }),
     ),
+
+    child: Text(
+      "Fermer",
+      maxLines: 1,
+      textAlign: TextAlign.center,
+      style: TextStyle(
+        fontSize: gl.display!.equipixel! * gl.mediumFontSize,
+        color: Colors.black,
+      ),
+    ),
+    onPressed: () {
+      after();
+      gl.mainStackPopLast();
+    },
   );
 }
 
@@ -2544,7 +2645,6 @@ class _OnlineMapStatusTool extends State<OnlineMapStatusTool> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        widget.layerTile.downloadedControlBar(),
         if (widget.layerTile.downloadable) LayerDownloader(widget.layerTile),
         gl.anaSurfSelectedLayerKeys.contains(widget.layerTile.key)
             ? TextButton(
@@ -2583,6 +2683,7 @@ class _OnlineMapStatusTool extends State<OnlineMapStatusTool> {
                 ],
               ),
               onPressed: () async {
+                gl.rebuildStatusSymbols(() {});
                 setState(() {
                   if (gl.anaSurfSelectedLayerKeys.length > 1) {
                     gl.anaSurfSelectedLayerKeys.remove(widget.layerTile.key);
@@ -2634,6 +2735,7 @@ class _OnlineMapStatusTool extends State<OnlineMapStatusTool> {
               ),
               onPressed: () async {
                 setState(() {
+                  gl.rebuildStatusSymbols(() {});
                   if (gl.anaSurfSelectedLayerKeys.length > 1) {
                     gl.anaSurfSelectedLayerKeys.insert(0, widget.layerTile.key);
                     widget.layerTile.selected = true;
@@ -2684,6 +2786,7 @@ class _OnlineMapStatusTool extends State<OnlineMapStatusTool> {
                 ],
               ),
               onPressed: () async {
+                gl.rebuildStatusSymbols(() {});
                 setState(() {
                   if (gl.anaPtSelectedLayerKeys.length > 1) {
                     gl.anaPtSelectedLayerKeys.remove(widget.layerTile.key);
@@ -2734,6 +2837,7 @@ class _OnlineMapStatusTool extends State<OnlineMapStatusTool> {
                 ],
               ),
               onPressed: () async {
+                gl.rebuildStatusSymbols(() {});
                 setState(() {
                   if (gl.anaPtSelectedLayerKeys.length > 1) {
                     gl.anaPtSelectedLayerKeys.insert(0, widget.layerTile.key);
@@ -2876,7 +2980,7 @@ class _MapLayerSelectionButtonState extends State<MapLayerSelectionButton> {
       function();
     }
     gl.refreshMap(() {});
-    _LayerSwitcher.stateLayerSwitcher(() {});
+    gl.rebuildSwitcherBox(() {});
   }
 
   @override
@@ -3059,10 +3163,12 @@ class OnlineMapMenu extends StatefulWidget {
   final bool offlineMode;
   final int selectionMode;
   final Function after;
+  final String selectedMapCode;
   const OnlineMapMenu({
     super.key,
     required this.offlineMode,
     this.selectionMode = -1,
+    this.selectedMapCode = "",
     this.stateOfLayerSwitcher,
     required this.after,
   });
@@ -3072,24 +3178,52 @@ class OnlineMapMenu extends StatefulWidget {
 }
 
 class _OnlineMapMenu extends State<OnlineMapMenu> {
-  int _selectedCategory = -1;
+  static bool modified = false;
+  static int selectedCategory = -1;
   static int selectedMap = -1;
   static LayerTile? selectedLayerTile;
+  final ScrollController _controller = ScrollController();
 
   bool _showCatalogue = true;
   final List<String> _resultOfMapSearch = [];
+
+  void scrollToBeginning(double more) {
+    _controller.animateTo(
+      _controller.position.minScrollExtent + more,
+      duration: Duration(milliseconds: 500),
+      curve: Curves.fastEaseInToSlowEaseOut,
+    );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    modified = false;
+    if (!"123".contains(widget.selectedMapCode)) {
+      selectedCategory = -1;
+      selectedMap = -1;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     Function stateOfLayerSwitcher;
     if (widget.stateOfLayerSwitcher == null) {
-      stateOfLayerSwitcher = (f) {
+      stateOfLayerSwitcher = (Function f) {
         f();
       };
     } else {
       stateOfLayerSwitcher = widget.stateOfLayerSwitcher!;
     }
-
+    gl.rebuildOfflineCatalogue = (Function f) {
+      mounted
+          ? setState(() {
+            f();
+          })
+          : (Function f) {
+            f();
+          };
+    };
     return gl.firstTimeUse
         ? PopupDownloadRecomendedLayers(
           title: "Bienvenu",
@@ -3115,7 +3249,7 @@ class _OnlineMapMenu extends State<OnlineMapMenu> {
             await prefs.setBool('firstTimeUse', gl.firstTimeUse);
           },
           dialog:
-              "Autorisez-vous l'aplication à télécharger un jeu de 7 couches pour une utilisation hors ligne? Ces couches couvrent toutes la Région Wallonne et totalisent +- 100 Mo.",
+              "Autorisez-vous l'aplication à télécharger un jeu de 6 couches pour une utilisation hors ligne? Ces couches couvrent toutes la Région Wallonne et totalisent +- 214 Mo.",
         )
         : switchRowColWithOrientation([
           Column(
@@ -3210,12 +3344,13 @@ class _OnlineMapMenu extends State<OnlineMapMenu> {
                 child:
                     _showCatalogue
                         ? ListView(
+                          controller: _controller,
                           padding: const EdgeInsets.symmetric(horizontal: 0),
                           children: _injectGroupData(
                             (int i, GroupeCouche groupe) => TextButton(
                               style: ButtonStyle(
                                 minimumSize:
-                                    i == _selectedCategory
+                                    i == selectedCategory
                                         ? WidgetStateProperty<Size>.fromMap(
                                           <WidgetStatesConstraint, Size>{
                                             WidgetState.any: Size(
@@ -3241,26 +3376,31 @@ class _OnlineMapMenu extends State<OnlineMapMenu> {
                               ),
                               key: Key('$i'),
                               onPressed:
-                                  i == _selectedCategory
+                                  i == selectedCategory
                                       ? () {}
                                       : () {
                                         setState(() {
-                                          _selectedCategory = i;
+                                          selectedCategory = i;
                                           selectedMap = -1;
                                           selectedLayerTile = null;
                                         });
+                                        scrollToBeginning(
+                                          i *
+                                              gl.onCatalogueCategoryHeight *
+                                              5.5,
+                                        );
                                       },
                               child: Card(
                                 surfaceTintColor: Colors.transparent,
                                 shadowColor: Colors.transparent,
                                 color:
-                                    i == _selectedCategory
+                                    i == selectedCategory
                                         ? gl.colorAgroBioTech.withAlpha(50)
                                         : gl.colorAgroBioTech.withAlpha(200),
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    i != _selectedCategory
+                                    i != selectedCategory
                                         ? Container(
                                           alignment: Alignment.center,
                                           padding: EdgeInsets.all(3),
@@ -3300,7 +3440,7 @@ class _OnlineMapMenu extends State<OnlineMapMenu> {
                                                   TextButton(
                                                     onPressed: () {
                                                       setState(() {
-                                                        _selectedCategory = -1;
+                                                        selectedCategory = -1;
                                                         selectedMap = -1;
                                                         selectedLayerTile =
                                                             null;
@@ -3364,6 +3504,7 @@ class _OnlineMapMenu extends State<OnlineMapMenu> {
                                                     widget.selectionMode,
                                                     stateOfLayerSwitcher,
                                                     setState,
+                                                    scrollToBeginning,
                                                     noLegend:
                                                         gl
                                                             .display!
@@ -3406,6 +3547,7 @@ class _OnlineMapMenu extends State<OnlineMapMenu> {
                                 widget.selectionMode,
                                 stateOfLayerSwitcher,
                                 setState,
+                                scrollToBeginning,
                                 noLegend: gl.display!.orientation!.index == 1,
                               );
                             },
@@ -3415,11 +3557,10 @@ class _OnlineMapMenu extends State<OnlineMapMenu> {
             ],
           ),
           Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               if (gl.display!.orientation!.index == 1)
                 Container(
-                  alignment: Alignment.center,
                   constraints: BoxConstraints(
                     maxWidth: gl.display!.equipixel! * 95,
                     maxHeight:
@@ -3434,17 +3575,17 @@ class _OnlineMapMenu extends State<OnlineMapMenu> {
                         widget.selectionMode,
                         stateOfLayerSwitcher,
                         setState,
+                        scrollToBeginning,
                       ),
                     ],
                   ),
                 ),
               Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  if (gl.display!.orientation!.index == 1)
-                    SizedBox(width: gl.display!.equipixel! * 15),
-                  _returnButton(context, widget.after),
-                ],
+                mainAxisAlignment:
+                    gl.display!.orientation!.index == 1
+                        ? MainAxisAlignment.end
+                        : MainAxisAlignment.center,
+                children: [_returnButton(context, widget.after)],
               ),
             ],
           ),
@@ -3459,10 +3600,17 @@ class _OnlineMapMenu extends State<OnlineMapMenu> {
         groupesNonVides[gl.dico.getLayerBase(key).mGroupe] = null;
       }
     }
+    int i = 0;
     List<GroupeCouche> groupes = [];
     for (String key in groupesNonVides.keys) {
       for (GroupeCouche couche in gl.dico.mGrCouches) {
         if (couche.mCode == key) {
+          i++;
+          if (couche.mCode ==
+                  gl.dico.getLayerBase(widget.selectedMapCode).mGroupe &&
+              !modified) {
+            selectedCategory = i - 1;
+          }
           groupes.add(couche);
         }
       }
@@ -3479,12 +3627,14 @@ class _OnlineMapMenu extends State<OnlineMapMenu> {
   ) {
     Map<String, LayerBase> mp = gl.dico.mLayerBases;
     List<LayerTile> layer = [];
+    int i = 0;
     for (var key in mp.keys) {
       if (category == mp[key]!.mGroupe &&
           !mp[key]!.mExpert &&
           mp[key]!.mVisu &&
           mp[key]?.mTypeGeoservice == "" &&
           (widget.offlineMode ? mp[key]!.mOffline : true)) {
+        i++;
         layer.add(
           LayerTile(
             name: mp[key]!.mNom,
@@ -3494,11 +3644,130 @@ class _OnlineMapMenu extends State<OnlineMapMenu> {
             extern: mp[key]!.mCategorie == "Externe",
           ),
         );
+        if (widget.selectedMapCode == key && !modified) {
+          selectedMap = i - 1;
+          selectedLayerTile = layer.last;
+        }
       }
     }
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) => scrollToBeginning(
+        (selectedCategory + 1) * gl.onCatalogueCategoryHeight * 5.5 +
+            selectedMap * gl.onCatalogueMapHeight * 4.5,
+      ),
+    );
     return List<Widget>.generate(layer.length, (i) {
       return generate(i, layer[i]);
     });
+  }
+}
+
+class MapStatusSymbols extends StatefulWidget {
+  final bool offlineMode;
+  final String layerCode;
+  const MapStatusSymbols({
+    super.key,
+    required this.offlineMode,
+    this.layerCode = "",
+  });
+
+  @override
+  State<StatefulWidget> createState() => _MapStatusSymbols();
+}
+
+class _MapStatusSymbols extends State<MapStatusSymbols> {
+  static final Map<String, Function> _setStateStatusMaps = {};
+  static bool _onlyOnce = true;
+  String? mapName;
+
+  @override
+  void initState() {
+    mapName = widget.layerCode;
+    _setStateStatusMaps[mapName!] = (Function f) {
+      mounted
+          ? setState(() {
+            f();
+          })
+          : f();
+    };
+    if (_onlyOnce) {
+      gl.rebuildStatusSymbols = (Function f) {
+        for (Function status in _setStateStatusMaps.values) {
+          status(f);
+        }
+      };
+      _onlyOnce = false;
+    }
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    double multi = 0.4;
+    List<Widget> statusIcons = [
+      if (gl.dico.getLayerBase(mapName!).mIsDownloadableRW &&
+          gl.dico.getLayerBase(mapName!).mOffline &&
+          !widget.offlineMode)
+        Icon(
+          color: Colors.blue,
+          Icons.save,
+          size: gl.iconSize * multi * gl.display!.equipixel!,
+        ),
+      if (gl.dico.getLayerBase(mapName!).mIsDownloadableRW &&
+          !gl.dico.getLayerBase(mapName!).mOffline &&
+          !widget.offlineMode)
+        Icon(
+          color: Colors.lightBlue,
+          Icons.file_download,
+          size: gl.iconSize * multi * gl.display!.equipixel!,
+        ),
+      if (gl.dico.getLayerBase(mapName!).mCategorie != "Externe")
+        Icon(
+          color: Colors.brown,
+          Icons.legend_toggle,
+          size: gl.iconSize * multi * gl.display!.equipixel!,
+        ),
+      if (gl.dico.getLayerBase(mapName!).hasDoc())
+        Icon(
+          color: Colors.brown,
+          Icons.picture_as_pdf,
+          size: gl.iconSize * multi * gl.display!.equipixel!,
+        ),
+      if (gl.anaSurfSelectedLayerKeys.contains(mapName!))
+        Icon(
+          color: Colors.deepOrange,
+          Icons.pentagon,
+          size: gl.iconSize * multi * gl.display!.equipixel!,
+        ),
+      if (gl.anaPtSelectedLayerKeys.contains(mapName!))
+        Icon(
+          color: Colors.deepOrange,
+          Icons.location_on,
+          size: gl.iconSize * multi * gl.display!.equipixel!,
+        ),
+    ];
+    return statusIcons.length > 3
+        ? Row(
+          children: [
+            Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: statusIcons.sublist(0, 3),
+            ),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: statusIcons.sublist(3),
+            ),
+          ],
+        )
+        : Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [Column(children: statusIcons), SizedBox()],
+        );
   }
 }
 
@@ -3508,11 +3777,22 @@ Card layerTileCard(
   bool offlineMode,
   int selectionMode,
   Function stateOfLayerSwitcher,
-  Function setState, {
+  Function setState,
+  Function scroll, {
   bool noLegend = false,
 }) {
   return layerTile != null
       ? Card(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadiusGeometry.circular(12.0),
+          side:
+              i == _OnlineMapMenu.selectedMap
+                  ? BorderSide(
+                    color: gl.colorAgroBioTech.withAlpha(255),
+                    width: 2.0,
+                  )
+                  : BorderSide(color: Colors.transparent, width: 0.0),
+        ),
         color:
             i == _OnlineMapMenu.selectedMap
                 ? Colors.white.withAlpha(255)
@@ -3529,30 +3809,16 @@ Card layerTileCard(
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Column(
-                            children: [
-                              if (gl.dico.getLayerBase(layerTile.key).mOffline)
-                                Icon(color: Colors.black, Icons.save),
-                              if (offlineMode)
-                                SizedBox(
-                                  height:
-                                      gl.display!.equipixel! * gl.iconSize * .5,
-                                )
-                              else
-                                Icon(color: Colors.black, Icons.wifi),
-                              if (!gl.dico.getLayerBase(layerTile.key).mOffline)
-                                SizedBox(
-                                  height:
-                                      gl.display!.equipixel! * gl.iconSize * .5,
-                                ),
-                            ],
+                          MapStatusSymbols(
+                            offlineMode: offlineMode,
+                            layerCode: layerTile.key,
                           ),
                           SizedBox(
                             height:
                                 gl.display!.equipixel! *
                                 gl.onCatalogueMapHeight *
                                 .9,
-                            width: gl.display!.equipixel! * 65,
+                            width: gl.display!.equipixel! * 60,
                             child: TextButton(
                               onPressed: () {
                                 setState(() {
@@ -3560,11 +3826,20 @@ Card layerTileCard(
                                       ? {
                                         _OnlineMapMenu.selectedMap = -1,
                                         _OnlineMapMenu.selectedLayerTile = null,
+                                        _OnlineMapMenu.modified = true,
                                       }
                                       : {
                                         _OnlineMapMenu.selectedMap = i,
                                         _OnlineMapMenu.selectedLayerTile =
                                             layerTile,
+                                        _OnlineMapMenu.modified = true,
+                                        scroll(
+                                          (_OnlineMapMenu.selectedCategory +
+                                                      1) *
+                                                  gl.onCatalogueCategoryHeight *
+                                                  5.5 +
+                                              i * gl.onCatalogueMapHeight * 4.5,
+                                        ),
                                       };
                                 });
                               },
@@ -3608,72 +3883,60 @@ Card layerTileCard(
                 )
                 : Column(
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Column(
-                          children: [
-                            if (gl.dico.getLayerBase(layerTile.key).mOffline)
-                              Icon(color: Colors.black, Icons.save),
-                            if (offlineMode)
-                              SizedBox(
-                                height: gl.display!.equipixel! * gl.iconSize,
-                              )
-                            else
-                              Icon(color: Colors.black, Icons.wifi),
-                            if (!gl.dico.getLayerBase(layerTile.key).mOffline)
-                              SizedBox(
-                                height:
-                                    gl.display!.equipixel! *
-                                    gl.onCatalogueMapHeight,
-                              ),
-                          ],
-                        ),
-                        SizedBox(
-                          height:
-                              gl.display!.equipixel! * gl.onCatalogueMapHeight,
-                          width: gl.display!.equipixel! * 65,
-                          child: TextButton(
-                            onPressed: () {
-                              setState(() {
-                                _OnlineMapMenu.selectedMap == i
-                                    ? {
-                                      _OnlineMapMenu.selectedMap = -1,
-                                      _OnlineMapMenu.selectedLayerTile = null,
-                                    }
-                                    : {
-                                      _OnlineMapMenu.selectedMap = i,
-                                      _OnlineMapMenu.selectedLayerTile =
-                                          layerTile,
-                                    };
-                              });
-                            },
-                            child: Text(
-                              layerTile.name,
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize:
-                                    gl.display!.equipixel! *
-                                    gl.smallFontSize *
-                                    1.5,
+                    if (gl.display!.orientation!.index == 0)
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          MapStatusSymbols(
+                            offlineMode: offlineMode,
+                            layerCode: layerTile.key,
+                          ),
+                          SizedBox(
+                            height:
+                                gl.display!.equipixel! *
+                                gl.onCatalogueMapHeight,
+                            width: gl.display!.equipixel! * 55,
+                            child: TextButton(
+                              onPressed: () {
+                                setState(() {
+                                  _OnlineMapMenu.selectedMap == i
+                                      ? {
+                                        _OnlineMapMenu.selectedMap = -1,
+                                        _OnlineMapMenu.selectedLayerTile = null,
+                                      }
+                                      : {
+                                        _OnlineMapMenu.selectedMap = i,
+                                        _OnlineMapMenu.selectedLayerTile =
+                                            layerTile,
+                                      };
+                                });
+                              },
+                              child: Text(
+                                layerTile.name,
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize:
+                                      gl.display!.equipixel! *
+                                      gl.smallFontSize *
+                                      1.5,
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                        SizedBox(
-                          height: gl.display!.equipixel! * gl.iconSize * 1,
-                          width: gl.display!.equipixel! * gl.iconSize * 1.2,
-                          child: MapLayerSelectionButton(
-                            layerTile: layerTile,
-                            offlineMode: offlineMode,
-                            index: i,
-                            selectionMode: selectionMode,
-                            state: stateOfLayerSwitcher,
+                          SizedBox(
+                            height: gl.display!.equipixel! * gl.iconSize * 1,
+                            width: gl.display!.equipixel! * gl.iconSize * 1.2,
+                            child: MapLayerSelectionButton(
+                              layerTile: layerTile,
+                              offlineMode: offlineMode,
+                              index: i,
+                              selectionMode: selectionMode,
+                              state: stateOfLayerSwitcher,
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
+                        ],
+                      ),
                     OnlineMapStatusTool(layerTile: layerTile),
                     LegendView(
                       layerKey: layerTile.key,
@@ -3722,6 +3985,7 @@ Widget popupOnlineMapMenu(
   Function after,
   bool offlineMode,
   int selectionMode,
+  String selectedLayer,
   stateOfLayerSwitcher,
 ) {
   return OrientationBuilder(
@@ -3757,6 +4021,7 @@ Widget popupOnlineMapMenu(
               selectionMode: selectionMode,
               stateOfLayerSwitcher: stateOfLayerSwitcher,
               after: after,
+              selectedMapCode: selectedLayer,
             ),
           ),
         ),
@@ -3800,17 +4065,6 @@ Widget popupLayerSwitcher(
 ) {
   return OrientationBuilder(
     builder: (context, orientation) {
-      double menuHeight =
-          gl.display!.orientation!.index == 0
-              ? gl.display!.equiheight! * .3 +
-                  gl.display!.equiheight! * .15 +
-                  (_SearchMenu.searchResults.isNotEmpty ? 15 : 0) +
-                  (gl.polygonLayers.isNotEmpty ? 15 : 0) +
-                  (_SearchMenu.searchResults.isNotEmpty ||
-                          gl.polygonLayers.isNotEmpty
-                      ? 18
-                      : 0)
-              : gl.display!.equiheight! * .7;
       return Stack(
         children: [
           AlertDialog(
@@ -3832,241 +4086,7 @@ Widget popupLayerSwitcher(
                 canvasColor: Colors.transparent,
                 shadowColor: Colors.transparent,
               ),
-              child: SizedBox(
-                width:
-                    gl.display!.orientation!.index == 0
-                        ? gl.display!.equipixel! * gl.layerswitcherWidth
-                        : gl.display!.equipixel! * gl.layerswitcherWidth * 2.2,
-                height: menuHeight * gl.display!.equipixel!,
-                child:
-                    gl.display!.orientation!.index == 0
-                        ? Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            if (gl.polygonLayers.isNotEmpty ||
-                                _SearchMenu.searchResults.isNotEmpty)
-                              SizedBox(
-                                width:
-                                    gl.display!.equipixel! *
-                                    gl.layerswitcherWidth,
-                                height:
-                                    gl.display!.equipixel! *
-                                    gl.mediumFontSize *
-                                    1.5,
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      "Controlez les couches visibles",
-                                      textAlign: TextAlign.justify,
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize:
-                                            gl.display!.equipixel! *
-                                            gl.mediumFontSize *
-                                            .85,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            SizedBox(
-                              width:
-                                  gl.display!.equipixel! *
-                                  gl.layerswitcherWidth,
-
-                              child: UpperLayerControl(
-                                switchToLocationInSearchMenu:
-                                    switchToLocationInSearchMenu,
-                              ),
-                            ),
-                            SizedBox(
-                              width:
-                                  gl.display!.equipixel! *
-                                  gl.layerswitcherWidth,
-                              height:
-                                  gl.display!.equipixel! *
-                                  gl.mediumFontSize *
-                                  1.5,
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    "Changez les cartes affichées",
-                                    textAlign: TextAlign.justify,
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize:
-                                          gl.display!.equipixel! *
-                                          gl.mediumFontSize *
-                                          .85,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            SizedBox(
-                              width:
-                                  gl.display!.equipixel! *
-                                  gl.layerswitcherWidth,
-                              height:
-                                  gl.display!.equipixel! *
-                                  gl.display!.equiheight! *
-                                  .3,
-                              child: LayerSwitcher(),
-                            ),
-                            SizedBox(
-                              width:
-                                  gl.display!.equipixel! *
-                                  gl.layerswitcherWidth,
-                              height:
-                                  gl.display!.equipixel! *
-                                  gl.mediumFontSize *
-                                  1.5,
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    "Catalogues des couches",
-                                    textAlign: TextAlign.justify,
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize:
-                                          gl.display!.equipixel! *
-                                          gl.mediumFontSize *
-                                          0.9,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            SizedBox(
-                              child: ViewControl(
-                                _LayerSwitcher.stateLayerSwitcher,
-                              ),
-                            ),
-                          ],
-                        )
-                        : Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                SizedBox(
-                                  width:
-                                      gl.display!.equipixel! *
-                                      gl.layerswitcherWidth,
-                                  height:
-                                      gl.display!.equipixel! *
-                                      gl.mediumFontSize *
-                                      1.5,
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        "Changez les cartes affichées",
-                                        textAlign: TextAlign.justify,
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize:
-                                              gl.display!.equipixel! *
-                                              gl.mediumFontSize *
-                                              .85,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                SizedBox(
-                                  width:
-                                      gl.display!.equipixel! *
-                                      gl.layerswitcherWidth,
-                                  height:
-                                      gl.display!.equipixel! *
-                                      gl.display!.equiheight! *
-                                      .6,
-                                  child: LayerSwitcher(),
-                                ),
-                              ],
-                            ),
-                            Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                if (gl.polygonLayers.isNotEmpty ||
-                                    _SearchMenu.searchResults.isNotEmpty)
-                                  SizedBox(
-                                    width:
-                                        gl.display!.equipixel! *
-                                        gl.layerswitcherWidth,
-                                    height:
-                                        gl.display!.equipixel! *
-                                        gl.mediumFontSize *
-                                        1.5,
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Text(
-                                          "Controlez les couches visibles",
-                                          textAlign: TextAlign.justify,
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize:
-                                                gl.display!.equipixel! *
-                                                gl.mediumFontSize *
-                                                .85,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                SizedBox(
-                                  width:
-                                      gl.display!.equipixel! *
-                                      gl.layerswitcherWidth,
-
-                                  child: UpperLayerControl(
-                                    switchToLocationInSearchMenu:
-                                        switchToLocationInSearchMenu,
-                                  ),
-                                ),
-
-                                SizedBox(
-                                  width:
-                                      gl.display!.equipixel! *
-                                      gl.layerswitcherWidth,
-                                  height:
-                                      gl.display!.equipixel! *
-                                      gl.mediumFontSize *
-                                      1.5,
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        "Catalogues des couches",
-                                        textAlign: TextAlign.justify,
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize:
-                                              gl.display!.equipixel! *
-                                              gl.mediumFontSize *
-                                              0.9,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                SizedBox(
-                                  child: ViewControl(
-                                    _LayerSwitcher.stateLayerSwitcher,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-              ),
+              child: LayerSwitcher(switchToLocationInSearchMenu),
             ),
             titleTextStyle: TextStyle(
               color: Colors.white,
@@ -4089,64 +4109,349 @@ Widget popupLayerSwitcher(
   );
 }
 
-class ViewControl extends StatefulWidget {
-  final Function stateOfLayerSwitcher;
-  const ViewControl(this.stateOfLayerSwitcher, {super.key});
+class LayerSwitcher extends StatefulWidget {
+  final void Function(LatLng) switchToLocationInSearchMenu;
+  const LayerSwitcher(this.switchToLocationInSearchMenu, {super.key});
   @override
-  State<ViewControl> createState() => _ViewControl();
+  State<LayerSwitcher> createState() => _LayerSwitcher();
 }
 
-class _ViewControl extends State<ViewControl> {
+class _LayerSwitcher extends State<LayerSwitcher> {
+  @override
+  Widget build(BuildContext context) {
+    gl.rebuildLayerSwitcher = (Function f) {
+      mounted
+          ? setState(() {
+            f();
+          })
+          : () {
+            f();
+          };
+    };
+    return SizedBox(
+      width:
+          gl.display!.orientation!.index == 0
+              ? gl.display!.equipixel! * gl.layerswitcherBoxWidth
+              : gl.display!.equipixel! * gl.layerswitcherBoxWidth * 2.2,
+      height:
+          gl.display!.orientation!.index == 0
+              ? gl.offlineMode
+                  ? (gl.layerSwitcherBoxHeightPortraitOffline +
+                          gl.layerswitcherButtonsBoxHeight +
+                          (gl.poiMarkerList.isNotEmpty &&
+                                  gl.polygonLayers.isNotEmpty
+                              ? gl.layerSwitcherTileHeight +
+                                  gl.layerswitcherControlBoxHeight
+                              : (gl.poiMarkerList.isNotEmpty ||
+                                      gl.polygonLayers.isNotEmpty
+                                  ? gl.layerswitcherControlBoxHeight
+                                  : 0.0))) *
+                      gl.display!.equipixel!
+                  : (gl.layerSwitcherBoxHeightPortrait +
+                          gl.layerswitcherButtonsBoxHeight +
+                          (gl.poiMarkerList.isNotEmpty &&
+                                  gl.polygonLayers.isNotEmpty
+                              ? gl.layerSwitcherTileHeight +
+                                  gl.layerswitcherControlBoxHeight
+                              : (gl.poiMarkerList.isNotEmpty ||
+                                      gl.polygonLayers.isNotEmpty
+                                  ? gl.layerswitcherControlBoxHeight
+                                  : 0.0))) *
+                      gl.display!.equipixel!
+              : gl.layerSwitcherBoxHeightLandscape * gl.display!.equipixel!,
+      child: switchRowColWithOrientation([
+        if ((gl.polygonLayers.isNotEmpty || gl.poiMarkerList.isNotEmpty) &&
+            gl.display!.orientation!.index == 0)
+          SizedBox(
+            width: gl.display!.equipixel! * gl.layerswitcherBoxWidth,
+            height:
+                (gl.poiMarkerList.isNotEmpty && gl.polygonLayers.isNotEmpty
+                    ? gl.layerSwitcherTileHeight +
+                        gl.layerswitcherControlBoxHeight
+                    : (gl.poiMarkerList.isNotEmpty ||
+                            gl.polygonLayers.isNotEmpty
+                        ? gl.layerswitcherControlBoxHeight
+                        : 0.0)) *
+                gl.display!.equipixel!,
+            child: Column(
+              children: [
+                SizedBox(
+                  width: gl.display!.equipixel! * gl.layerswitcherBoxWidth - 1,
+                  height: gl.display!.equipixel! * gl.mediumFontSize * 1.2,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "Controlez les couches visibles",
+                        textAlign: TextAlign.justify,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize:
+                              gl.display!.equipixel! * gl.mediumFontSize * .85,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                UpperLayerControl(
+                  switchToLocationInSearchMenu:
+                      widget.switchToLocationInSearchMenu,
+                ),
+              ],
+            ),
+          ),
+        SizedBox(
+          width: gl.display!.equipixel! * gl.layerswitcherBoxWidth,
+          height:
+              gl.display!.equipixel! *
+              (gl.offlineMode
+                  ? gl.layerSwitcherBoxHeightPortraitOffline
+                  : gl.layerSwitcherBoxHeightPortrait),
+          child: Column(
+            children: [
+              SizedBox(
+                width: gl.display!.equipixel! * gl.layerswitcherBoxWidth,
+                height: gl.display!.equipixel! * gl.mediumFontSize * 1.5,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      "Changez les cartes affichées",
+                      textAlign: TextAlign.justify,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize:
+                            gl.display!.equipixel! * gl.mediumFontSize * .85,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(
+                width: gl.display!.equipixel! * gl.layerswitcherBoxWidth - 1,
+                height:
+                    gl.display!.equipixel! *
+                        (gl.offlineMode
+                            ? gl.layerSwitcherBoxHeightPortraitOffline
+                            : gl.layerSwitcherBoxHeightPortrait) -
+                    gl.display!.equipixel! * gl.mediumFontSize * 1.5,
+                child: SwitcherBox(),
+              ),
+            ],
+          ),
+        ),
+        if (gl.display!.orientation!.index == 0)
+          SizedBox(
+            width: gl.display!.equipixel! * gl.layerswitcherBoxWidth - 1,
+            height: gl.display!.equipixel! * gl.layerswitcherButtonsBoxHeight,
+            child: Column(
+              children: [
+                SizedBox(
+                  width: gl.display!.equipixel! * gl.layerswitcherBoxWidth - 1,
+                  height: gl.display!.equipixel! * gl.mediumFontSize * 1.5,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "Catalogues des couches",
+                        textAlign: TextAlign.justify,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize:
+                              gl.display!.equipixel! * gl.mediumFontSize * 0.9,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(
+                  width: gl.display!.equipixel! * gl.layerswitcherBoxWidth - 1,
+                  height:
+                      gl.display!.equipixel! *
+                          gl.layerswitcherButtonsBoxHeight -
+                      gl.display!.equipixel! * gl.mediumFontSize * 1.5,
+                  child: ViewCatalogueControl(gl.rebuildSwitcherBox),
+                ),
+              ],
+            ),
+          ),
+        if (gl.display!.orientation!.index == 1)
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              if (gl.polygonLayers.isNotEmpty || gl.poiMarkerList.isNotEmpty)
+                SizedBox(
+                  width: gl.display!.equipixel! * gl.layerswitcherBoxWidth,
+                  height:
+                      (gl.poiMarkerList.isNotEmpty &&
+                              gl.polygonLayers.isNotEmpty
+                          ? gl.layerSwitcherTileHeight +
+                              gl.layerswitcherControlBoxHeight
+                          : (gl.poiMarkerList.isNotEmpty ||
+                                  gl.polygonLayers.isNotEmpty
+                              ? gl.layerswitcherControlBoxHeight
+                              : 0.0)) *
+                      gl.display!.equipixel!,
+                  child: Column(
+                    children: [
+                      SizedBox(
+                        width:
+                            gl.display!.equipixel! * gl.layerswitcherBoxWidth -
+                            1,
+                        height:
+                            gl.display!.equipixel! * gl.mediumFontSize * 1.2,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              "Controlez les couches visibles",
+                              textAlign: TextAlign.justify,
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize:
+                                    gl.display!.equipixel! *
+                                    gl.mediumFontSize *
+                                    .85,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      UpperLayerControl(
+                        switchToLocationInSearchMenu:
+                            widget.switchToLocationInSearchMenu,
+                      ),
+                    ],
+                  ),
+                ),
+              SizedBox(
+                width: gl.display!.equipixel! * gl.layerswitcherBoxWidth - 1,
+                height:
+                    gl.display!.equipixel! * gl.layerswitcherButtonsBoxHeight,
+                child: Column(
+                  children: [
+                    SizedBox(
+                      width:
+                          gl.display!.equipixel! * gl.layerswitcherBoxWidth - 1,
+                      height: gl.display!.equipixel! * gl.mediumFontSize * 1.5,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            "Catalogues des couches",
+                            textAlign: TextAlign.justify,
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize:
+                                  gl.display!.equipixel! *
+                                  gl.mediumFontSize *
+                                  0.9,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(
+                      width:
+                          gl.display!.equipixel! * gl.layerswitcherBoxWidth - 1,
+                      height:
+                          gl.display!.equipixel! *
+                              gl.layerswitcherButtonsBoxHeight -
+                          gl.display!.equipixel! * gl.mediumFontSize * 1.5,
+                      child: ViewCatalogueControl(gl.rebuildSwitcherBox),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+      ]),
+    );
+  }
+}
+
+class ViewCatalogueControl extends StatefulWidget {
+  final Function stateOfLayerSwitcher;
+  const ViewCatalogueControl(this.stateOfLayerSwitcher, {super.key});
+  @override
+  State<ViewCatalogueControl> createState() => _ViewCatalogueControl();
+}
+
+class _ViewCatalogueControl extends State<ViewCatalogueControl> {
   bool _modeViewOfflineMap = false;
   bool _modeViewOnlineMap = false;
+
+  @override
+  void initState() {
+    gl.rebuildSwitcherCatalogueButtons = (Function f) {
+      mounted
+          ? setState(() {
+            f();
+          })
+          : () {
+            f();
+          };
+    };
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return OrientationBuilder(
       builder: (context, orientation) {
+        bool offline = false;
+        for (LayerBase l in gl.dico.mLayerBases.values) {
+          if (l.mOffline) {
+            offline = true;
+            break;
+          }
+        }
         return Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            SizedBox(
-              width: gl.display!.equipixel! * gl.iconSize * 1.2,
-              height: gl.display!.equipixel! * gl.iconSize * 1.2,
-              child: FloatingActionButton(
-                backgroundColor:
-                    _modeViewOfflineMap ? gl.colorAgroBioTech : Colors.grey,
-                onPressed: () {
-                  if (!_modeViewOnlineMap && !_modeViewOnlineMap) {
-                    gl.mainStack.add(
-                      popupOnlineMapMenu(
-                        gl.notificationContext!,
-                        () {
-                          gl.refreshMap(() {
-                            _modeViewOfflineMap = false;
-                          });
-                          if (mounted) {
-                            setState(() {
+            if (offline)
+              SizedBox(
+                width: gl.display!.equipixel! * gl.iconSize * 1.2,
+                height: gl.display!.equipixel! * gl.iconSize * 1.2,
+                child: FloatingActionButton(
+                  backgroundColor:
+                      _modeViewOfflineMap ? gl.colorAgroBioTech : Colors.grey,
+                  onPressed: () {
+                    if (!_modeViewOnlineMap && !_modeViewOnlineMap) {
+                      gl.mainStack.add(
+                        popupOnlineMapMenu(
+                          gl.notificationContext!,
+                          () {
+                            gl.refreshMap(() {
                               _modeViewOfflineMap = false;
                             });
-                          }
-                        },
-                        true,
-                        -1,
-                        widget.stateOfLayerSwitcher,
-                      ),
-                    );
-                  }
-                  setState(() {
-                    _modeViewOfflineMap = true;
-                  });
-                  gl.refreshMap(() {
-                    _modeViewOfflineMap = true;
-                  });
-                },
-                child: Icon(
-                  Icons.download_for_offline,
-                  size: gl.display!.equipixel! * gl.iconSize,
-                  color: Colors.black,
+                            if (mounted) {
+                              setState(() {
+                                _modeViewOfflineMap = false;
+                              });
+                            }
+                          },
+                          true,
+                          -1,
+                          "",
+                          widget.stateOfLayerSwitcher,
+                        ),
+                      );
+                    }
+                    setState(() {
+                      _modeViewOfflineMap = true;
+                    });
+                    gl.refreshMap(() {
+                      _modeViewOfflineMap = true;
+                    });
+                  },
+                  child: Icon(
+                    Icons.download_for_offline,
+                    size: gl.display!.equipixel! * gl.iconSize,
+                    color: Colors.black,
+                  ),
                 ),
               ),
-            ),
             if (!gl.offlineMode)
               SizedBox(
                 width: gl.display!.equipixel! * gl.iconSize * 1.2,
@@ -4171,6 +4476,7 @@ class _ViewControl extends State<ViewControl> {
                           },
                           gl.offlineMode,
                           -1,
+                          "",
                           null,
                         ),
                       );
@@ -4213,197 +4519,215 @@ class _UpperLayerControl extends State<UpperLayerControl> {
     return Column(
       children: [
         if (_SearchMenu.searchResults.isNotEmpty)
-          Card(
-            margin: EdgeInsets.all(5),
-            color: Colors.white,
-            shadowColor: const Color.fromARGB(255, 44, 44, 120),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                TextButton(
-                  style: ButtonStyle(
-                    minimumSize: WidgetStateProperty<Size>.fromMap(
-                      <WidgetStatesConstraint, Size>{
-                        WidgetState.any: Size(
-                          gl.display!.equipixel! * 50,
-                          gl.display!.equipixel! * 10,
-                        ),
-                      },
-                    ),
-                  ),
-                  onPressed: () {
-                    gl.mainStack.add(
-                      popupSearchMenu(
-                        gl.notificationContext!,
-                        "",
-                        widget.switchToLocationInSearchMenu,
-                        () {
-                          gl.refreshMap(() {});
+          SizedBox(
+            height: gl.display!.equipixel! * gl.layerSwitcherTileHeight,
+            child: Card(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadiusGeometry.circular(12.0),
+                side: BorderSide(color: Colors.grey, width: 1.0),
+              ),
+              margin: EdgeInsets.all(2),
+              color: Colors.white,
+              shadowColor: const Color.fromARGB(255, 44, 44, 120),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  TextButton(
+                    style: ButtonStyle(
+                      minimumSize: WidgetStateProperty<Size>.fromMap(
+                        <WidgetStatesConstraint, Size>{
+                          WidgetState.any: Size(
+                            gl.display!.equipixel! * 50,
+                            gl.display!.equipixel! * 10,
+                          ),
                         },
                       ),
-                    );
-                    gl.refreshMap(() {});
-                  },
-                  child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 1.0),
+                    ),
+                    onPressed: () {
+                      gl.mainStack.add(
+                        popupSearchMenu(
+                          gl.notificationContext!,
+                          "",
+                          widget.switchToLocationInSearchMenu,
+                          () {
+                            gl.refreshMap(() {});
+                          },
+                        ),
+                      );
+                      gl.refreshMap(() {});
+                    },
+                    child: Container(
+                      padding: EdgeInsets.symmetric(horizontal: 1.0),
+                      alignment: Alignment.centerLeft,
+                      constraints: BoxConstraints(
+                        maxHeight: gl.display!.equipixel! * 10,
+                        minHeight: gl.display!.equipixel! * 10,
+                        maxWidth: gl.display!.equipixel! * 50,
+                        minWidth: gl.display!.equipixel! * 50,
+                      ),
+                      child: Text(
+                        "Marqueurs des lieux cherchés",
+                        textAlign: TextAlign.left,
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize:
+                              gl.display!.equipixel! * gl.smallFontSize * 1.1,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Container(
                     constraints: BoxConstraints(
                       maxHeight: gl.display!.equipixel! * 10,
                       minHeight: gl.display!.equipixel! * 10,
-                      maxWidth: gl.display!.equipixel! * 50,
-                      minWidth: gl.display!.equipixel! * 50,
+                      maxWidth: gl.display!.equipixel! * 17,
+                      minWidth: gl.display!.equipixel! * 17,
                     ),
-                    child: Text(
-                      "Marqueurs des lieux cherchés",
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize:
-                            gl.display!.equipixel! * gl.smallFontSize * 1.25,
-                      ),
-                    ),
-                  ),
-                ),
-                Container(
-                  constraints: BoxConstraints(
-                    maxHeight: gl.display!.equipixel! * 10,
-                    minHeight: gl.display!.equipixel! * 10,
-                    maxWidth: gl.display!.equipixel! * 17,
-                    minWidth: gl.display!.equipixel! * 17,
-                  ),
-                  child: Row(
-                    children: [
-                      Container(
-                        constraints: BoxConstraints(
-                          maxHeight: gl.display!.equipixel! * 10,
-                          minHeight: gl.display!.equipixel! * 10,
-                          maxWidth: gl.display!.equipixel! * 15,
-                          minWidth: gl.display!.equipixel! * 15,
-                        ),
-                        color: Colors.white,
-                        padding: const EdgeInsets.symmetric(),
-                        child: SizedBox(
-                          width: gl.display!.equipixel! * 10,
-                          height: gl.display!.equipixel! * 10,
-                          child: FloatingActionButton(
-                            backgroundColor:
-                                gl.modeMapShowSearchMarker
-                                    ? gl.colorAgroBioTech
-                                    : Colors.grey,
-                            onPressed: () {
-                              setState(() {
-                                gl.modeMapShowSearchMarker =
-                                    !gl.modeMapShowSearchMarker;
-                              });
-                              gl.refreshMap(() {});
-                            },
-                            child: Icon(
-                              Icons.remove_red_eye,
-                              size: gl.display!.equipixel! * 10,
-                              color: Colors.black,
+                    child: Row(
+                      children: [
+                        Container(
+                          constraints: BoxConstraints(
+                            maxHeight: gl.display!.equipixel! * 10,
+                            minHeight: gl.display!.equipixel! * 10,
+                            maxWidth: gl.display!.equipixel! * 15,
+                            minWidth: gl.display!.equipixel! * 15,
+                          ),
+                          color: Colors.white,
+                          padding: const EdgeInsets.symmetric(),
+                          child: SizedBox(
+                            width: gl.display!.equipixel! * 10,
+                            height: gl.display!.equipixel! * 10,
+                            child: FloatingActionButton(
+                              backgroundColor:
+                                  gl.modeMapShowSearchMarker
+                                      ? gl.colorAgroBioTech
+                                      : Colors.grey,
+                              onPressed: () {
+                                setState(() {
+                                  gl.modeMapShowSearchMarker =
+                                      !gl.modeMapShowSearchMarker;
+                                });
+                                gl.refreshMap(() {});
+                              },
+                              child: Icon(
+                                Icons.remove_red_eye,
+                                size: gl.display!.equipixel! * 10,
+                                color: Colors.black,
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         if (gl.polygonLayers.isNotEmpty)
-          Card(
-            margin: EdgeInsets.all(5),
-            color: Colors.white,
-            shadowColor: const Color.fromARGB(255, 44, 44, 120),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                TextButton(
-                  style: ButtonStyle(
-                    minimumSize: WidgetStateProperty<Size>.fromMap(
-                      <WidgetStatesConstraint, Size>{
-                        WidgetState.any: Size(
-                          gl.display!.equipixel! * 50,
-                          gl.display!.equipixel! * 10,
-                        ),
-                      },
-                    ),
-                  ),
-                  onPressed: () {
-                    gl.mainStack.add(
-                      popupPolygonListMenu(
-                        gl.notificationContext!,
-                        gl.polygonLayers[gl.selectedPolygonLayer].name,
-                        widget.switchToLocationInSearchMenu,
-                        () {
-                          gl.refreshMap(() {});
+          SizedBox(
+            height: gl.display!.equipixel! * gl.layerSwitcherTileHeight,
+            child: Card(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadiusGeometry.circular(12.0),
+                side: BorderSide(color: Colors.grey, width: 1.0),
+              ),
+              margin: EdgeInsets.all(2),
+              color: Colors.white,
+              shadowColor: const Color.fromARGB(255, 44, 44, 120),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  TextButton(
+                    style: ButtonStyle(
+                      minimumSize: WidgetStateProperty<Size>.fromMap(
+                        <WidgetStatesConstraint, Size>{
+                          WidgetState.any: Size(
+                            gl.display!.equipixel! * 50,
+                            gl.display!.equipixel! * gl.layerSwitcherTileHeight,
+                          ),
                         },
                       ),
-                    );
-                    gl.refreshMap(() {});
-                  },
-                  child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 1.0),
+                    ),
+                    onPressed: () {
+                      gl.mainStack.add(
+                        popupPolygonListMenu(
+                          gl.notificationContext!,
+                          gl.polygonLayers[gl.selectedPolygonLayer].name,
+                          widget.switchToLocationInSearchMenu,
+                          () {
+                            gl.refreshMap(() {});
+                          },
+                        ),
+                      );
+                      gl.refreshMap(() {});
+                    },
+                    child: Container(
+                      alignment: Alignment.centerLeft,
+                      padding: EdgeInsets.symmetric(horizontal: 1.0),
+                      constraints: BoxConstraints(
+                        maxHeight: gl.display!.equipixel! * 10,
+                        minHeight: gl.display!.equipixel! * 10,
+                        maxWidth: gl.display!.equipixel! * 50,
+                        minWidth: gl.display!.equipixel! * 50,
+                      ),
+                      child: Text(
+                        "Couche des polygones",
+                        textAlign: TextAlign.left,
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize:
+                              gl.display!.equipixel! * gl.smallFontSize * 1.1,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Container(
                     constraints: BoxConstraints(
                       maxHeight: gl.display!.equipixel! * 10,
                       minHeight: gl.display!.equipixel! * 10,
-                      maxWidth: gl.display!.equipixel! * 50,
-                      minWidth: gl.display!.equipixel! * 50,
+                      maxWidth: gl.display!.equipixel! * 17,
+                      minWidth: gl.display!.equipixel! * 17,
                     ),
-                    child: Text(
-                      "Couche des polygones",
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize:
-                            gl.display!.equipixel! * gl.smallFontSize * 1.25,
-                      ),
-                    ),
-                  ),
-                ),
-                Container(
-                  constraints: BoxConstraints(
-                    maxHeight: gl.display!.equipixel! * 10,
-                    minHeight: gl.display!.equipixel! * 10,
-                    maxWidth: gl.display!.equipixel! * 17,
-                    minWidth: gl.display!.equipixel! * 17,
-                  ),
-                  child: Row(
-                    children: [
-                      Container(
-                        constraints: BoxConstraints(
-                          maxHeight: gl.display!.equipixel! * 10,
-                          minHeight: gl.display!.equipixel! * 10,
-                          maxWidth: gl.display!.equipixel! * 15,
-                          minWidth: gl.display!.equipixel! * 15,
-                        ),
-                        color: Colors.white,
-                        padding: const EdgeInsets.symmetric(),
-                        child: SizedBox(
-                          width: gl.display!.equipixel! * 10,
-                          height: gl.display!.equipixel! * 10,
-                          child: FloatingActionButton(
-                            backgroundColor:
-                                gl.modeMapShowPolygons
-                                    ? gl.colorAgroBioTech
-                                    : Colors.grey,
-                            onPressed: () {
-                              setState(() {
-                                gl.modeMapShowPolygons =
-                                    !gl.modeMapShowPolygons;
-                              });
-                              gl.refreshMap(() {});
-                            },
-                            child: Icon(
-                              Icons.remove_red_eye,
-                              size: gl.display!.equipixel! * 10,
-                              color: Colors.black,
+                    child: Row(
+                      children: [
+                        Container(
+                          constraints: BoxConstraints(
+                            maxHeight: gl.display!.equipixel! * 10,
+                            minHeight: gl.display!.equipixel! * 10,
+                            maxWidth: gl.display!.equipixel! * 15,
+                            minWidth: gl.display!.equipixel! * 15,
+                          ),
+                          color: Colors.white,
+                          padding: const EdgeInsets.symmetric(),
+                          child: SizedBox(
+                            width: gl.display!.equipixel! * 10,
+                            height: gl.display!.equipixel! * 10,
+                            child: FloatingActionButton(
+                              backgroundColor:
+                                  gl.modeMapShowPolygons
+                                      ? gl.colorAgroBioTech
+                                      : Colors.grey,
+                              onPressed: () {
+                                setState(() {
+                                  gl.modeMapShowPolygons =
+                                      !gl.modeMapShowPolygons;
+                                });
+                                gl.refreshMap(() {});
+                              },
+                              child: Icon(
+                                Icons.remove_red_eye,
+                                size: gl.display!.equipixel! * 10,
+                                color: Colors.black,
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
       ],
@@ -4411,20 +4735,16 @@ class _UpperLayerControl extends State<UpperLayerControl> {
   }
 }
 
-class LayerSwitcher extends StatefulWidget {
-  const LayerSwitcher({super.key});
+class SwitcherBox extends StatefulWidget {
+  const SwitcherBox({super.key});
   @override
-  State<LayerSwitcher> createState() => _LayerSwitcher();
+  State<SwitcherBox> createState() => _SwitcherBox();
 }
 
-class _LayerSwitcher extends State<LayerSwitcher> {
-  static Function stateLayerSwitcher = (f) {
-    f();
-  };
-
+class _SwitcherBox extends State<SwitcherBox> {
   @override
   Widget build(BuildContext context) {
-    stateLayerSwitcher = (f) {
+    gl.rebuildSwitcherBox = (f) {
       if (mounted) {
         setState(() {
           f();
@@ -4468,7 +4788,14 @@ class _LayerSwitcher extends State<LayerSwitcher> {
                   !"123".contains(gl.selectedLayerForMap[i].mCode)) ||
               (i == 0 && !"123".contains(gl.selectedLayerForMap[i].mCode))) {
             return Card(
-              margin: EdgeInsets.all(5),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadiusGeometry.circular(12.0),
+                side: BorderSide(
+                  color: Color.fromRGBO(205, 225, 138, 1.0),
+                  width: 2.0,
+                ),
+              ),
+              margin: EdgeInsets.all(3),
               key: Key('$i+listOfThree'),
               color: Colors.white,
               shadowColor: const Color.fromARGB(255, 44, 44, 120),
@@ -4477,21 +4804,21 @@ class _LayerSwitcher extends State<LayerSwitcher> {
                 child: Column(
                   children: [
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      mainAxisAlignment: MainAxisAlignment.start,
                       children: <Widget>[
                         TextButton(
                           style: ButtonStyle(
-                            maximumSize: WidgetStateProperty<Size>.fromMap(<
-                              WidgetStatesConstraint,
-                              Size
-                            >{
-                              WidgetState.any: Size(
-                                gl.display!.equipixel! *
-                                    gl.layerswitcherWidth *
-                                    .5,
-                                gl.display!.equipixel! * gl.layerSwitcherHeight,
-                              ),
-                            }),
+                            fixedSize: WidgetStateProperty<Size>.fromMap(
+                              <WidgetStatesConstraint, Size>{
+                                WidgetState.any: Size(
+                                  gl.display!.equipixel! *
+                                      gl.layerswitcherBoxWidth *
+                                      .68,
+                                  gl.display!.equipixel! *
+                                      gl.layerSwitcherTileHeight,
+                                ),
+                              },
+                            ),
                           ),
                           onPressed: () {
                             gl.mainStack.add(
@@ -4502,22 +4829,20 @@ class _LayerSwitcher extends State<LayerSwitcher> {
                                 },
                                 gl.offlineMode,
                                 i,
+                                gl.selectedLayerForMap[i].mCode,
                                 null,
                               ),
                             );
                             gl.refreshMap(() {});
                           },
                           child: Container(
+                            alignment: Alignment.centerLeft,
                             padding: EdgeInsets.symmetric(horizontal: 1.0),
-                            constraints: BoxConstraints(
-                              maxHeight: gl.display!.equipixel! * 5,
-                              maxWidth: gl.display!.equipixel! * 45,
-                              minWidth: gl.display!.equipixel! * 45,
-                            ),
                             child: Text(
                               gl.dico
                                   .getLayerBase(gl.selectedLayerForMap[i].mCode)
                                   .mNom,
+                              textAlign: TextAlign.left,
                               style: TextStyle(
                                 color: Colors.black,
                                 fontSize:
@@ -4584,7 +4909,8 @@ class _LayerSwitcher extends State<LayerSwitcher> {
                         ),
                       ],
                     ),
-                    if (i == 0 && !gl.offlineMode)
+                    if (i == 0 &&
+                        !gl.offlineMode) //Pour la transparance de la première tile
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -4595,6 +4921,31 @@ class _LayerSwitcher extends State<LayerSwitcher> {
                             ),
                             child: TextButton(
                               style: ButtonStyle(
+                                shape: WidgetStateProperty.fromMap(<
+                                  WidgetStatesConstraint,
+                                  OutlinedBorder
+                                >{
+                                  WidgetState.any: RoundedRectangleBorder(
+                                    borderRadius: BorderRadiusGeometry.circular(
+                                      12.0,
+                                    ),
+                                    side: BorderSide(
+                                      color: Color.fromRGBO(205, 225, 138, 1.0),
+                                      width: 2.0,
+                                    ),
+                                  ),
+                                }),
+                                fixedSize: WidgetStateProperty<Size>.fromMap(
+                                  <WidgetStatesConstraint, Size>{
+                                    WidgetState.any: Size(
+                                      gl.display!.equipixel! *
+                                          gl.layerswitcherBoxWidth *
+                                          .5,
+                                      gl.display!.equipixel! *
+                                          gl.layerSwitcherTileHeight,
+                                    ),
+                                  },
+                                ),
                                 backgroundColor:
                                     gl.modeMapFirstTileLayerTransparancy
                                         ? WidgetStateProperty<Color>.fromMap(<
@@ -4672,6 +5023,7 @@ class _LayerSwitcher extends State<LayerSwitcher> {
                                 },
                                 gl.offlineMode,
                                 i,
+                                gl.selectedLayerForMap[i].mCode,
                                 null,
                               ),
                             );

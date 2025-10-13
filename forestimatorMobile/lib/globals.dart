@@ -31,6 +31,7 @@ class Display {
   double? equipixel;
   double? equiwidth;
   double? equiheight;
+  bool keyboardExpanded = false;
 
   Display(BuildContext context) {
     width = MediaQuery.of(context).size.width;
@@ -41,6 +42,21 @@ class Display {
     equipixel = width! > height! ? height! * .01 : width! * .01;
     equiwidth = width! / equipixel!;
     equiheight = height! / equipixel!;
+    /*if (orientation!.name == "portrait" && aspect! > 0.6) {
+      equipixel = equipixel! * aspect!;
+      equiwidth = equiwidth! * 1 / aspect!;
+      equiheight = equiheight! * 1 / aspect!;
+    }
+    if (orientation!.name == "landscape" && aspect! < 2) {
+      equipixel = equipixel! * aspect!;
+      equiwidth = equiwidth! * aspect!;
+      equiheight = equiheight! * aspect!;
+    }*/
+    if (dpi! < 2.01) {
+      equipixel = equipixel! / dpi!;
+      equiwidth = equiwidth! * dpi!;
+      equiheight = equiheight! * dpi!;
+    }
   }
 
   @override
@@ -94,9 +110,14 @@ double polyListSelectedCardWidth = 100;
 double searchBarHeight = 15;
 double searchBarWidth = 75;
 // Layer Switcher
-double layerSwitcherHeight = 75;
-double layerSwitcherCatalogueHeight = 30;
-double layerswitcherWidth = 80;
+double layerSwitcherTileHeight = 12;
+double layerswitcherBoxWidth = 80;
+double layerSwitcherBoxHeightPortrait = 5.5 * layerSwitcherTileHeight;
+double layerSwitcherBoxHeightPortraitOffline = 2.5 * layerSwitcherTileHeight;
+double layerSwitcherBoxHeightLandscape = 66;
+double layerswitcherButtonsBoxHeight = 30;
+double layerswitcherControlBoxHeight =
+    layerSwitcherTileHeight + mediumFontSize * 1.2;
 // Do you really dialogue
 double dyrDialogWidth = 60;
 double dyrDialogHeight = 60;
@@ -267,8 +288,6 @@ List<String> downloadableLayerKeys = [
   "CNSWrast",
 ];
 
-//bool doDownload = false;
-
 Position? position;
 late proj4.Point pt;
 
@@ -282,11 +301,14 @@ const Color colorBackgroundSecondary = Color.fromRGBO(243, 243, 243, 1);
 Function refreshMap = (Function f) {
   f();
 };
-Function refreshWholeCatalogueView = (void Function() setter) async {};
+Function rebuildSwitcherCatalogueButtons = (void Function() setter) async {};
 Function refreshSearch = (void Function() setter) async {};
 Function refreshSettingsMenu = (void Function() setter) async {};
 Function refreshCurrentThreeLayer = () {};
-Function rebuildOfflineView = (void Function() setter) async {};
+Function rebuildOfflineCatalogue = (void Function() setter) async {};
+Function rebuildSwitcherBox = (void Function() setter) async {};
+Function rebuildLayerSwitcher = (void Function() setter) async {};
+Function rebuildStatusSymbols = (void Function() setter) async {};
 Function? rebuildNavigatorBar;
 Function removeFromOfflineList = (var x) {};
 
@@ -380,8 +402,6 @@ void replaceLayerFromList(
     );
   }
 }
-
-void switchLayersByOne() {}
 
 int getCountOfSelectedLayersForMap() {
   int count = 0;
