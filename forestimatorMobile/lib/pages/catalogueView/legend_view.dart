@@ -40,7 +40,7 @@ class _LegendView extends State<LegendView> {
             if (gl.dico.getLayerBase(widget.layerKey).mCategorie != "Externe")
               Container(
                 constraints: BoxConstraints(
-                  maxHeight: gl.mediumFontSize * gl.display!.equipixel!,
+                  maxHeight: gl.fontSizeM * gl.display.equipixel,
                 ),
                 child: const Text('Légende'),
               ),
@@ -129,8 +129,8 @@ class _LegendView extends State<LegendView> {
 
   void _computeBoxContraintsPerColorTile() {
     if (gl.dico.mLayerBases[widget.layerKey]!.mDicoCol.length > 300) {
-      double heightPerColorTile = gl.display!.equipixel! * 0.06;
-      double graduatedHeight = gl.display!.equipixel! * 2;
+      double heightPerColorTile = gl.display.equipixel * 0.06;
+      double graduatedHeight = gl.display.equipixel * 2;
       _magicNumber = 37;
       _graduatedMode = true;
       _constraintsLeft = _initConstraints(
@@ -146,10 +146,10 @@ class _LegendView extends State<LegendView> {
         widget.constraintsColors.maxWidth * 0.85,
       );
     } else if (gl.dico.mLayerBases[widget.layerKey]!.mDicoCol.length > 50) {
-      double heightPerColorTile = gl.display!.equipixel! * 0.5;
+      double heightPerColorTile = gl.display.equipixel * 0.5;
       double graduatedHeight =
-          gl.display!.equipixel! *
-          gl.display!.equiheight! *
+          gl.display.equipixel *
+          gl.display.equiheight *
           gl.dico.mLayerBases[widget.layerKey]!.mDicoCol.length /
           11.0 *
           .005;
@@ -169,10 +169,10 @@ class _LegendView extends State<LegendView> {
         widget.constraintsColors.maxWidth,
       );
     } else if (gl.dico.mLayerBases[widget.layerKey]!.mDicoCol.length > 40) {
-      double heightPerColorTile = gl.display!.equipixel! * 1.5;
+      double heightPerColorTile = gl.display.equipixel * 1.5;
       double graduatedHeight =
-          gl.display!.equipixel! *
-          gl.display!.equiheight! *
+          gl.display.equipixel *
+          gl.display.equiheight *
           gl.dico.mLayerBases[widget.layerKey]!.mDicoCol.length /
           13.0 *
           .016;
@@ -193,7 +193,7 @@ class _LegendView extends State<LegendView> {
       );
     } else {
       _graduatedMode = false;
-      double heightPerColorTile = gl.display!.equipixel! * 4;
+      double heightPerColorTile = gl.display.equipixel * 4;
       _constraintsLeft = _initConstraints(
         heightPerColorTile,
         heightPerColorTile,
