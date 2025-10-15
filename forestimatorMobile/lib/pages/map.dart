@@ -213,14 +213,14 @@ class _MapPageState extends State<MapPage> {
         resizeToAvoidBottomInset: true,
         extendBody: true,
         appBar: AppBar(
-          toolbarHeight: gl.display!.equipixel! * gl.topAppInfoBarThickness,
+          toolbarHeight: gl.display.equipixel * gl.topAppInfoBarThickness,
           backgroundColor:
               gl.offlineMode ? gl.colorAgroBioTech : gl.colorUliege,
           title: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               IconButton(
-                iconSize: gl.display!.equipixel! * gl.iconSizeSettings,
+                iconSize: gl.display.equipixel * gl.iconSizeSettings,
                 color: gl.offlineMode ? Colors.black : Colors.white,
                 onPressed: () {
                   gl.mainStack.add(
@@ -243,7 +243,7 @@ class _MapPageState extends State<MapPage> {
               Container(
                 constraints: BoxConstraints(
                   maxWidth:
-                      gl.display!.equipixel! * gl.topAppForestimatorFontWidth,
+                      gl.display.equipixel * gl.topAppForestimatorFontWidth,
                 ),
                 alignment: Alignment.center,
                 child: TextButton(
@@ -256,6 +256,10 @@ class _MapPageState extends State<MapPage> {
                         gl.changeSelectedLayerModeOnline();
                       }
                     });
+                    gl.rebuildSwitcherCatalogueButtons(() {});
+                    gl.rebuildOfflineCatalogue(() {});
+                    gl.rebuildSwitcherBox(() {});
+                    gl.rebuildLayerSwitcher(() {});
                   },
                   child:
                       gl.offlineMode
@@ -264,7 +268,7 @@ class _MapPageState extends State<MapPage> {
                             style: TextStyle(
                               color: Colors.black,
                               fontSize:
-                                  gl.display!.equipixel! *
+                                  gl.display.equipixel *
                                   gl.topAppForestimatorFontHeight,
                             ),
                           )
@@ -273,7 +277,7 @@ class _MapPageState extends State<MapPage> {
                             style: TextStyle(
                               color: Colors.white,
                               fontSize:
-                                  gl.display!.equipixel! *
+                                  gl.display.equipixel *
                                   gl.topAppForestimatorFontHeight,
                             ),
                           ),
@@ -284,7 +288,7 @@ class _MapPageState extends State<MapPage> {
                               gl.globalMinOfflineZoom.round() &&
                           gl.getIndexForNextLayerOffline() > -1
                       ? IconButton(
-                        iconSize: gl.display!.equipixel! * gl.iconSizeSettings,
+                        iconSize: gl.display.equipixel * gl.iconSizeSettings,
                         color: Colors.red,
                         tooltip:
                             "Si vous n'arrivez plus à visualiser les cartes hors ligne c'est que votre zoom est trop large.",
@@ -292,11 +296,10 @@ class _MapPageState extends State<MapPage> {
                         icon: Icon(Icons.info_rounded),
                       )
                       : SizedBox(
-                        width:
-                            gl.display!.equipixel! * gl.iconSizeSettings * 1.5,
+                        width: gl.display.equipixel * gl.iconSizeSettings * 1.5,
                       )
                   : SizedBox(
-                    width: gl.display!.equipixel! * gl.iconSizeSettings * 1.5,
+                    width: gl.display.equipixel * gl.iconSizeSettings * 1.5,
                   ),
             ],
           ),
@@ -516,13 +519,13 @@ class _MapPageState extends State<MapPage> {
                                       child: Container(
                                         constraints: BoxConstraints(
                                           minHeight:
-                                              gl.display!.equipixel! *
+                                              gl.display.equipixel *
                                               gl.loadingMapBoxHeight,
                                           minWidth:
-                                              gl.display!.equipixel! *
+                                              gl.display.equipixel *
                                               gl.loadingMapBoxWidth,
                                           maxWidth:
-                                              gl.display!.equipixel! *
+                                              gl.display.equipixel *
                                               gl.loadingMapBoxWidth,
                                         ),
                                         child: Row(
@@ -531,7 +534,7 @@ class _MapPageState extends State<MapPage> {
                                           children: [
                                             SizedBox(
                                               width:
-                                                  gl.display!.equipixel! *
+                                                  gl.display.equipixel *
                                                   gl.loadingMapBoxWidth *
                                                   .7,
                                               child: Text(
@@ -540,29 +543,29 @@ class _MapPageState extends State<MapPage> {
                                                 style: TextStyle(
                                                   color: Colors.white,
                                                   fontSize:
-                                                      gl.display!.equipixel! *
-                                                      gl.smallFontSize,
+                                                      gl.display.equipixel *
+                                                      gl.fontSizeS,
                                                 ),
                                               ),
                                             ),
                                             SizedBox(
                                               width:
-                                                  gl.display!.equipixel! *
-                                                  gl.smallFontSize,
+                                                  gl.display.equipixel *
+                                                  gl.fontSizeS,
                                             ),
                                             CircularProgressIndicator(
                                               constraints: BoxConstraints(
                                                 minHeight:
-                                                    gl.display!.equipixel! *
-                                                    gl.largeFontSize,
+                                                    gl.display.equipixel *
+                                                    gl.fontSizeXL,
                                                 minWidth:
-                                                    gl.display!.equipixel! *
-                                                    gl.largeFontSize,
+                                                    gl.display.equipixel *
+                                                    gl.fontSizeXL,
                                               ),
                                               color: gl.colorAgroBioTech,
                                               strokeWidth:
-                                                  gl.display!.equipixel! *
-                                                  gl.smallFontSize *
+                                                  gl.display.equipixel *
+                                                  gl.fontSizeS *
                                                   .5,
                                             ),
                                           ],
@@ -715,20 +718,20 @@ class _MapPageState extends State<MapPage> {
                           children: [
                             Row(
                               mainAxisAlignment:
-                                  gl.display!.orientation!.index == 0
+                                  gl.display.orientation == Orientation.portrait
                                       ? MainAxisAlignment.center
                                       : MainAxisAlignment.start,
                               children: [
                                 Container(
                                   width:
-                                      gl.display!.equipixel! *
+                                      gl.display.equipixel *
                                       gl.chosenPolyBarWidth,
                                   constraints: BoxConstraints(
                                     minHeight:
-                                        gl.display!.equipixel! *
+                                        gl.display.equipixel *
                                         gl.chosenPolyBarHeight,
                                     maxHeight:
-                                        gl.display!.equipixel! *
+                                        gl.display.equipixel *
                                         gl.chosenPolyBarHeight,
                                   ),
                                   child: TextButton(
@@ -846,7 +849,7 @@ class _MapPageState extends State<MapPage> {
                                                   : Icons
                                                       .center_focus_strong_outlined,
                                               size:
-                                                  gl.display!.equipixel! *
+                                                  gl.display.equipixel *
                                                   gl.iconSize,
                                               color: getColorTextFromBackground(
                                                 gl
@@ -860,7 +863,7 @@ class _MapPageState extends State<MapPage> {
 
                                           SizedBox(
                                             width:
-                                                gl.display!.equipixel! *
+                                                gl.display.equipixel *
                                                 gl.chosenPolyBarWidth *
                                                 .4,
                                             child: Text(
@@ -877,8 +880,8 @@ class _MapPageState extends State<MapPage> {
                                                       .withAlpha(255),
                                                 ),
                                                 fontSize:
-                                                    gl.display!.equipixel! *
-                                                    gl.mediumFontSize *
+                                                    gl.display.equipixel *
+                                                    gl.fontSizeM *
                                                     .75,
                                               ),
                                             ),
@@ -894,8 +897,8 @@ class _MapPageState extends State<MapPage> {
                                                     .withAlpha(255),
                                               ),
                                               fontSize:
-                                                  gl.display!.equipixel! *
-                                                  gl.mediumFontSize *
+                                                  gl.display.equipixel *
+                                                  gl.fontSizeM *
                                                   .9,
                                             ),
                                           ),
@@ -914,16 +917,16 @@ class _MapPageState extends State<MapPage> {
                           children: [
                             Row(
                               mainAxisAlignment:
-                                  gl.display!.orientation!.index == 0
+                                  gl.display.orientation == Orientation.portrait
                                       ? MainAxisAlignment.center
                                       : MainAxisAlignment.start,
                               children: [
                                 SizedBox(
                                   height:
-                                      gl.display!.equipixel! *
+                                      gl.display.equipixel *
                                       gl.chosenPolyBarHeight,
                                   width:
-                                      gl.display!.equipixel! *
+                                      gl.display.equipixel *
                                       gl.chosenPolyBarWidth,
                                   child: TextButton(
                                     onPressed: () {
@@ -969,18 +972,18 @@ class _MapPageState extends State<MapPage> {
                                           Icon(
                                             Icons.add,
                                             size:
-                                                gl.display!.equipixel! *
+                                                gl.display.equipixel *
                                                 gl.iconSize,
                                             color: Colors.white,
                                           ),
                                           SizedBox(
                                             width:
-                                                gl.display!.equipixel! *
-                                                gl.smallFontSize,
+                                                gl.display.equipixel *
+                                                gl.fontSizeS,
                                           ),
                                           SizedBox(
                                             width:
-                                                gl.display!.equipixel! *
+                                                gl.display.equipixel *
                                                 gl.chosenPolyBarWidth *
                                                 .7,
                                             child: Text(
@@ -988,8 +991,8 @@ class _MapPageState extends State<MapPage> {
                                               style: TextStyle(
                                                 color: Colors.white,
                                                 fontSize:
-                                                    gl.display!.equipixel! *
-                                                    gl.mediumFontSize,
+                                                    gl.display.equipixel *
+                                                    gl.fontSizeM,
                                               ),
                                             ),
                                           ),
@@ -1214,13 +1217,13 @@ class _MapPageState extends State<MapPage> {
           alignment: Alignment(0.0, -3.0),
           width:
               gl.anaPtPreview == null
-                  ? gl.display!.equipixel! * gl.anaPtBoxSize
+                  ? gl.display.equipixel * gl.anaPtBoxSize
                   : gl.dico
                           .getLayerBase(gl.anaPtPreview!.mCode)
                           .getValLabel(gl.anaPtPreview!.mRastValue)
                           .length >
                       3
-                  ? gl.display!.equipixel! * gl.anaPtBoxSize * 1.5 +
+                  ? gl.display.equipixel * gl.anaPtBoxSize * 1.5 +
                       gl.dico
                               .getLayerBase(gl.anaPtPreview!.mCode)
                               .getValLabel(gl.anaPtPreview!.mRastValue)
@@ -1228,9 +1231,9 @@ class _MapPageState extends State<MapPage> {
                           8.0
                   : gl.dico.getLayerBase(gl.anaPtPreview!.mCode).mCategorie !=
                       "Externe"
-                  ? gl.display!.equipixel! * gl.anaPtBoxSize * 2.5
+                  ? gl.display.equipixel * gl.anaPtBoxSize * 2.5
                   : 0.0,
-          height: gl.display!.equipixel! * gl.anaPtBoxSize,
+          height: gl.display.equipixel * gl.anaPtBoxSize,
           point: _pt ?? const LatLng(0.0, 0.0),
           child: FloatingActionButton(
             backgroundColor: Color.fromRGBO(0, 0, 0, 0.8),
@@ -1324,8 +1327,8 @@ class _MapPageState extends State<MapPage> {
       ret.add(
         Marker(
           alignment: Alignment(0, -2),
-          width: gl.display!.equipixel! * gl.anaPtBoxSize * 2,
-          height: gl.display!.equipixel! * gl.anaPtBoxSize,
+          width: gl.display.equipixel * gl.anaPtBoxSize * 2,
+          height: gl.display.equipixel * gl.anaPtBoxSize,
           point: _mapController.camera.center,
           child: Card(
             color: Colors.black.withAlpha(164),
@@ -1501,16 +1504,16 @@ class _MapPageState extends State<MapPage> {
       children: [
         Row(
           mainAxisAlignment:
-              gl.display!.orientation!.index == 0
+              gl.display.orientation == Orientation.portrait
                   ? MainAxisAlignment.center
                   : MainAxisAlignment.end,
           children: [
             Container(
               alignment: Alignment.center,
               constraints: BoxConstraints(
-                maxHeight: gl.display!.equipixel! * gl.menuBarThickness,
-                minHeight: gl.display!.equipixel! * gl.menuBarThickness,
-                maxWidth: gl.display!.equipixel! * gl.menuBarLength,
+                maxHeight: gl.display.equipixel * gl.menuBarThickness,
+                minHeight: gl.display.equipixel * gl.menuBarThickness,
+                maxWidth: gl.display.equipixel * gl.menuBarLength,
               ),
               child: Card(
                 shadowColor: Colors.transparent,
@@ -1535,7 +1538,7 @@ class _MapPageState extends State<MapPage> {
                                 : _toolbarExtended
                                 ? Colors.white
                                 : Colors.green,
-                        iconSize: gl.display!.equipixel! * gl.iconSize,
+                        iconSize: gl.display.equipixel * gl.iconSize,
                         isSelected: _toolbarExtended,
                         onPressed: () {
                           setState(() {
@@ -1568,7 +1571,7 @@ class _MapPageState extends State<MapPage> {
                                 : _polygonToolbarExtended
                                 ? Colors.white
                                 : Colors.yellow,
-                        iconSize: gl.display!.equipixel! * gl.iconSize,
+                        iconSize: gl.display.equipixel * gl.iconSize,
                         isSelected: _polygonToolbarExtended,
                         onPressed: () {
                           setState(() {
@@ -1594,11 +1597,11 @@ class _MapPageState extends State<MapPage> {
                     dummy
                         ? Container(
                           color: Colors.transparent,
-                          width: gl.display!.equipixel! * gl.menuBarThickness,
-                          height: gl.display!.equipixel! * gl.menuBarThickness,
+                          width: gl.display.equipixel * gl.menuBarThickness,
+                          height: gl.display.equipixel * gl.menuBarThickness,
                           child: IconButton(
                             color: Colors.transparent,
-                            iconSize: gl.display!.equipixel! * gl.iconSize,
+                            iconSize: gl.display.equipixel * gl.iconSize,
                             isSelected: _modeLayerSwitches,
                             onPressed: () {
                               setState(() {
@@ -1622,7 +1625,7 @@ class _MapPageState extends State<MapPage> {
                                 _modeLayerSwitches
                                     ? Colors.white
                                     : Colors.brown,
-                            iconSize: gl.display!.equipixel! * gl.iconSize,
+                            iconSize: gl.display.equipixel * gl.iconSize,
                             isSelected: _modeLayerSwitches,
                             onPressed: () {
                               setState(() {
@@ -1693,8 +1696,8 @@ class _MapPageState extends State<MapPage> {
             Container(
               alignment: Alignment.center,
               constraints: BoxConstraints(
-                maxHeight: gl.display!.equipixel! * toolbarHeight,
-                maxWidth: gl.display!.equipixel! * gl.menuBarThickness,
+                maxHeight: gl.display.equipixel * toolbarHeight,
+                maxWidth: gl.display.equipixel * gl.menuBarThickness,
               ),
               child: Card(
                 color: gl.backgroundTransparentBlackBox,
@@ -1709,8 +1712,7 @@ class _MapPageState extends State<MapPage> {
                             children: [
                               if (positionMarkerInsideViewRectangle())
                                 IconButton(
-                                  iconSize:
-                                      gl.display!.equipixel! * gl.iconSize,
+                                  iconSize: gl.display.equipixel * gl.iconSize,
                                   color: gl.colorAgroBioTech,
                                   onPressed: () async {
                                     if (!_doingAnaPt) {
@@ -1743,7 +1745,7 @@ class _MapPageState extends State<MapPage> {
                                   icon: const Icon(Icons.analytics),
                                 ),
                               IconButton(
-                                iconSize: gl.display!.equipixel! * gl.iconSize,
+                                iconSize: gl.display.equipixel * gl.iconSize,
                                 color: Colors.red,
                                 onPressed: () async {
                                   if (gl.position != null) {
@@ -1767,7 +1769,7 @@ class _MapPageState extends State<MapPage> {
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
                             IconButton(
-                              iconSize: gl.display!.equipixel! * gl.iconSize,
+                              iconSize: gl.display.equipixel * gl.iconSize,
                               color: Colors.black,
                               onPressed: () async {
                                 if (gl.position != null) {
@@ -1789,7 +1791,7 @@ class _MapPageState extends State<MapPage> {
                               _modeMeasurePath
                                   ? Colors.white
                                   : Colors.lightBlue,
-                          iconSize: gl.display!.equipixel! * gl.iconSize,
+                          iconSize: gl.display.equipixel * gl.iconSize,
                           isSelected: _modeMeasurePath,
                           onPressed: () {
                             setState(() {
@@ -1807,7 +1809,7 @@ class _MapPageState extends State<MapPage> {
                               ? Colors.transparent
                               : Colors.blueGrey.withAlpha(128),
                       child: IconButton(
-                        iconSize: gl.display!.equipixel! * gl.iconSize,
+                        iconSize: gl.display.equipixel * gl.iconSize,
                         color: _modeSearch ? Colors.white : Colors.blueGrey,
                         onPressed: () {
                           setState(() {
@@ -1843,12 +1845,12 @@ class _MapPageState extends State<MapPage> {
             ),
           ],
         ),
-        if (gl.display!.orientation!.index == 0)
+        if (gl.display.orientation == Orientation.portrait)
           _placeholder(
             constraints: BoxConstraints(
-              maxHeight: gl.display!.equipixel! * gl.menuBarThickness,
-              minHeight: gl.display!.equipixel! * gl.menuBarThickness,
-              maxWidth: gl.display!.equipixel! * gl.menuBarThickness * .5,
+              maxHeight: gl.display.equipixel * gl.menuBarThickness,
+              minHeight: gl.display.equipixel * gl.menuBarThickness,
+              maxWidth: gl.display.equipixel * gl.menuBarThickness * .5,
             ),
           ),
       ],
@@ -1874,10 +1876,10 @@ class _MapPageState extends State<MapPage> {
           children: [
             Container(
               alignment: Alignment.center,
-              height: gl.display!.equipixel! * toolbarHeight,
+              height: gl.display.equipixel * toolbarHeight,
               constraints: BoxConstraints(
-                minWidth: gl.display!.equipixel! * gl.menuBarThickness,
-                maxWidth: gl.display!.equipixel! * gl.menuBarThickness,
+                minWidth: gl.display.equipixel * gl.menuBarThickness,
+                maxWidth: gl.display.equipixel * gl.menuBarThickness,
               ),
               child: Card(
                 color: gl.backgroundTransparentBlackBox,
@@ -1894,7 +1896,7 @@ class _MapPageState extends State<MapPage> {
                               _modeDrawPolygonMoveVertexes
                                   ? Colors.white
                                   : Colors.lightGreenAccent,
-                          iconSize: gl.display!.equipixel! * gl.iconSize,
+                          iconSize: gl.display.equipixel * gl.iconSize,
                           onPressed: () async {
                             refreshView(() {
                               _modeDrawPolygonMoveVertexes =
@@ -1946,7 +1948,7 @@ class _MapPageState extends State<MapPage> {
                           _modeDrawPolygonRemoveVertexes,
                         ),
                         child: IconButton(
-                          iconSize: gl.display!.equipixel! * gl.iconSize,
+                          iconSize: gl.display.equipixel * gl.iconSize,
                           color:
                               _modeDrawPolygonRemoveVertexes
                                   ? Colors.white
@@ -2006,7 +2008,7 @@ class _MapPageState extends State<MapPage> {
                           _modeDrawPolygonAddVertexes,
                         ),
                         child: IconButton(
-                          iconSize: gl.display!.equipixel! * gl.iconSize,
+                          iconSize: gl.display.equipixel * gl.iconSize,
                           color:
                               _modeDrawPolygonAddVertexes
                                   ? Colors.white
@@ -2033,12 +2035,12 @@ class _MapPageState extends State<MapPage> {
             ),
           ],
         ),
-        if (gl.display!.orientation!.index == 0)
+        if (gl.display.orientation == Orientation.portrait)
           _placeholder(
             constraints: BoxConstraints(
-              maxHeight: gl.display!.equipixel! * gl.menuBarThickness,
-              minHeight: gl.display!.equipixel! * gl.menuBarThickness,
-              maxWidth: gl.display!.equipixel! * gl.menuBarThickness * .5,
+              maxHeight: gl.display.equipixel * gl.menuBarThickness,
+              minHeight: gl.display.equipixel * gl.menuBarThickness,
+              maxWidth: gl.display.equipixel * gl.menuBarThickness * .5,
             ),
           ),
       ],
@@ -2053,11 +2055,11 @@ class _MapPageState extends State<MapPage> {
 
         width:
             textArea.length > gl.polygonLayers[i].name.length
-                ? gl.display!.equipixel! * gl.infoBoxPolygon * 2.5 +
-                    textArea.length * gl.smallFontSize
-                : gl.display!.equipixel! * gl.infoBoxPolygon * 1.5 +
-                    gl.polygonLayers[i].name.length * gl.smallFontSize,
-        height: gl.display!.equipixel! * gl.infoBoxPolygon * 1.5,
+                ? gl.display.equipixel * gl.infoBoxPolygon * 2.5 +
+                    textArea.length * gl.fontSizeS
+                : gl.display.equipixel * gl.infoBoxPolygon * 1.5 +
+                    gl.polygonLayers[i].name.length * gl.fontSizeS,
+        height: gl.display.equipixel * gl.infoBoxPolygon * 1.5,
         point: gl.polygonLayers[i].center,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -2251,27 +2253,43 @@ class _AnaPtPreview extends State<AnaPtPreview> {
       String text = gl.dico
           .getLayerBase(gl.anaPtPreview!.mCode)
           .getValLabel(gl.anaPtPreview!.mRastValue);
-      return Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Container(
-                constraints: BoxConstraints(minHeight: 20, minWidth: 20),
-                color: color == Colors.transparent ? Colors.white : color,
+      return Container(
+        alignment: Alignment.centerLeft,
+        height: gl.display.equipixel * gl.fontSizeM * 1.1,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Container(
+              constraints: BoxConstraints(
+                minHeight: gl.fontSizeM * gl.display.equipixel,
+                minWidth: gl.fontSizeM * gl.display.equipixel,
               ),
-              Container(
-                alignment: Alignment.center,
-                constraints: BoxConstraints(minHeight: 20, minWidth: 20),
-                child: Text(":"),
+              color: color == Colors.transparent ? Colors.white : color,
+            ),
+            Container(
+              constraints: BoxConstraints(
+                minHeight: gl.fontSizeM * gl.display.equipixel,
+                minWidth: gl.fontSizeM * gl.display.equipixel,
               ),
-              Text(text == "" ? "No data" : text),
-            ],
-          ),
-        ],
+              child: Text(":", textAlign: TextAlign.center),
+            ),
+            Text(
+              text == "" ? "No data" : text,
+              style: TextStyle(fontSize: gl.fontSizeM * gl.display.equipixel),
+            ),
+          ],
+        ),
       );
     }
-    return const CircularProgressIndicator(color: gl.colorAgroBioTech);
+    return CircularProgressIndicator(
+      color: gl.colorAgroBioTech,
+      constraints: BoxConstraints(
+        maxHeight: gl.display.equipixel * gl.anaPtBoxSize * .9,
+        minHeight: gl.display.equipixel * gl.anaPtBoxSize * .8,
+        maxWidth: gl.display.equipixel * gl.anaPtBoxSize * .9,
+        minWidth: gl.display.equipixel * gl.anaPtBoxSize * .8,
+      ),
+    );
   }
 
   Future _runAnaPtPreview(proj4.Point ptBL72, Function after) async {

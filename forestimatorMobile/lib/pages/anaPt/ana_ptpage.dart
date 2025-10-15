@@ -52,14 +52,11 @@ class _AnaPtpageState extends State<AnaPtpage> {
                             Container(
                               alignment: Alignment.center,
                               constraints: BoxConstraints(
-                                maxWidth: gl.display!.equipixel! * 7.5,
+                                maxWidth: gl.display.equipixel * 7.5,
                               ),
                               child: Icon(
                                 Icons.picture_as_pdf,
-                                size:
-                                    gl.display!.equipixel! *
-                                    gl.mediumFontSize *
-                                    .85,
+                                size: gl.display.equipixel * gl.fontSizeM * .85,
                                 color: Colors.black,
                               ),
                             ),
@@ -67,7 +64,7 @@ class _AnaPtpageState extends State<AnaPtpage> {
                             Container(
                               alignment: Alignment.center,
                               constraints: BoxConstraints(
-                                maxWidth: gl.display!.equipixel! * 75,
+                                maxWidth: gl.display.equipixel * 75,
                               ),
                               child: Text(
                                 "Saufgardez cette analyse sur votre appareil",
@@ -258,7 +255,7 @@ Widget _tabAptFEE(BuildContext context, AptsFEE apts) {
             ),
             Container(
               constraints: BoxConstraints(
-                maxHeight: gl.display!.equipixel! * gl.display!.equiheight!,
+                maxHeight: gl.display.equipixel * gl.display.equiheight,
               ),
               child: TabBarView(
                 children: [
@@ -359,7 +356,7 @@ Widget _tabPropositionCS(BuildContext context, PropositionGS apts) {
 
             Container(
               constraints: BoxConstraints(
-                maxHeight: gl.display!.equipixel! * gl.display!.equiheight!,
+                maxHeight: gl.display.equipixel * gl.display.equiheight,
               ),
               //Add this to give height
               child: TabBarView(

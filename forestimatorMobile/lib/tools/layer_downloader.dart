@@ -49,10 +49,10 @@ class _LayerDownloaderState extends State<LayerDownloader> {
       return Container(
         color: gl.colorBackground,
         constraints: BoxConstraints(
-          minWidth: gl.onCatalogueWidth * gl.display!.equipixel!,
-          maxWidth: gl.onCatalogueWidth * gl.display!.equipixel!,
-          minHeight: 10 * gl.display!.equipixel!,
-          maxHeight: 10 * gl.display!.equipixel!,
+          minWidth: gl.onCatalogueWidth * gl.display.equipixel,
+          maxWidth: gl.onCatalogueWidth * gl.display.equipixel,
+          minHeight: 10 * gl.display.equipixel,
+          maxHeight: 10 * gl.display.equipixel,
         ),
         child: const Text("Downloads are not supported yet."),
       );
@@ -64,8 +64,8 @@ class _LayerDownloaderState extends State<LayerDownloader> {
           minimumSize:
               WidgetStateProperty<Size>.fromMap(<WidgetStatesConstraint, Size>{
                 WidgetState.any: Size(
-                  gl.onCatalogueWidth * gl.display!.equipixel!,
-                  gl.display!.equipixel! * 10,
+                  gl.onCatalogueWidth * gl.display.equipixel,
+                  gl.display.equipixel * 10,
                 ),
               }),
         ),
@@ -83,10 +83,10 @@ class _LayerDownloaderState extends State<LayerDownloader> {
                   gl.dico.getLayerBase(widget.layer.key).mOffline = false;
                   gl.removeFromOfflineList(widget.layer.key);
                 });
-                gl.refreshWholeCatalogueView(() {
+                gl.rebuildSwitcherCatalogueButtons(() {
                   gl.dico.getLayerBase(widget.layer.key).mOffline = false;
                 });
-                gl.rebuildOfflineView(() {
+                gl.rebuildOfflineCatalogue(() {
                   gl.dico.getLayerBase(widget.layer.key).mOffline = false;
                 });
               });
@@ -100,16 +100,14 @@ class _LayerDownloaderState extends State<LayerDownloader> {
           children: [
             Icon(
               Icons.delete,
-              size: gl.onCatalogueIconSize * gl.display!.equipixel!,
+              size: gl.onCatalogueIconSize * gl.display.equipixel,
               color: Colors.black,
             ),
             Container(
-              constraints: BoxConstraints(maxWidth: 5 * gl.display!.equipixel!),
+              constraints: BoxConstraints(maxWidth: 5 * gl.display.equipixel),
             ),
             Container(
-              constraints: BoxConstraints(
-                maxWidth: 60 * gl.display!.equipixel!,
-              ),
+              constraints: BoxConstraints(maxWidth: 60 * gl.display.equipixel),
               child: const Text(
                 "La couche est enregistrée.",
                 style: TextStyle(color: Colors.black),
@@ -124,8 +122,8 @@ class _LayerDownloaderState extends State<LayerDownloader> {
           minimumSize:
               WidgetStateProperty<Size>.fromMap(<WidgetStatesConstraint, Size>{
                 WidgetState.any: Size(
-                  gl.onCatalogueWidth * gl.display!.equipixel!,
-                  10 * gl.display!.equipixel!,
+                  gl.onCatalogueWidth * gl.display.equipixel,
+                  10 * gl.display.equipixel,
                 ),
               }),
         ),
@@ -134,10 +132,10 @@ class _LayerDownloaderState extends State<LayerDownloader> {
           setState(() {
             gl.dico.getLayerBase(widget.layer.key).mInDownload = true;
           });
-          gl.refreshWholeCatalogueView(() {
+          gl.rebuildSwitcherCatalogueButtons(() {
             gl.dico.getLayerBase(widget.layer.key).mInDownload = true;
           });
-          gl.rebuildOfflineView(() {
+          gl.rebuildOfflineCatalogue(() {
             gl.dico.getLayerBase(widget.layer.key).mInDownload = true;
           });
           downloadId = await fD?.downloadFile(widget.layer.key);
@@ -156,18 +154,14 @@ class _LayerDownloaderState extends State<LayerDownloader> {
           children: [
             Icon(
               Icons.repeat_rounded,
-              size: gl.onCatalogueIconSize * gl.display!.equipixel!,
+              size: gl.onCatalogueIconSize * gl.display.equipixel,
               color: Colors.black,
             ),
             Container(
-              constraints: BoxConstraints(
-                maxWidth: 10 * gl.display!.equipixel!,
-              ),
+              constraints: BoxConstraints(maxWidth: 10 * gl.display.equipixel),
             ),
             Container(
-              constraints: BoxConstraints(
-                maxWidth: 60 * gl.display!.equipixel!,
-              ),
+              constraints: BoxConstraints(maxWidth: 60 * gl.display.equipixel),
               child: const Text(
                 "Relancer.",
                 style: TextStyle(color: Colors.black),
@@ -182,8 +176,8 @@ class _LayerDownloaderState extends State<LayerDownloader> {
           minimumSize:
               WidgetStateProperty<Size>.fromMap(<WidgetStatesConstraint, Size>{
                 WidgetState.any: Size(
-                  gl.onCatalogueWidth * gl.display!.equipixel!,
-                  10 * gl.display!.equipixel!,
+                  gl.onCatalogueWidth * gl.display.equipixel,
+                  10 * gl.display.equipixel,
                 ),
               }),
         ),
@@ -191,10 +185,10 @@ class _LayerDownloaderState extends State<LayerDownloader> {
           setState(() {
             gl.dico.getLayerBase(widget.layer.key).mInDownload = true;
           });
-          gl.refreshWholeCatalogueView(() {
+          gl.rebuildSwitcherCatalogueButtons(() {
             gl.dico.getLayerBase(widget.layer.key).mInDownload = true;
           });
-          gl.rebuildOfflineView(() {
+          gl.rebuildOfflineCatalogue(() {
             gl.dico.getLayerBase(widget.layer.key).mInDownload = true;
           });
           downloadId = await fD?.downloadFile(widget.layer.key);
@@ -211,16 +205,14 @@ class _LayerDownloaderState extends State<LayerDownloader> {
           children: [
             Icon(
               Icons.download,
-              size: gl.onCatalogueIconSize * gl.display!.equipixel!,
+              size: gl.onCatalogueIconSize * gl.display.equipixel,
               color: Colors.black,
             ),
             Container(
-              constraints: BoxConstraints(maxWidth: 5 * gl.display!.equipixel!),
+              constraints: BoxConstraints(maxWidth: 5 * gl.display.equipixel),
             ),
             Container(
-              constraints: BoxConstraints(
-                maxWidth: 60 * gl.display!.equipixel!,
-              ),
+              constraints: BoxConstraints(maxWidth: 60 * gl.display.equipixel),
               child: const Text(
                 "La couche peut être téléchargée pour l'utilisation hors ligne.",
                 style: TextStyle(color: Colors.black),
@@ -343,6 +335,8 @@ class ForestimatorDownloader {
           gl.dico.getLayerBase(layerKey).mOffline = true;
           gl.dico.getLayerBase(layerKey).mInDownload = false;
         });
+        gl.rebuildSwitcherCatalogueButtons(() {});
+        gl.rebuildOfflineCatalogue(() {});
       }
       if (DownloadTaskStatus.failed == status) {
         gl.print("Downloader: download failed.");

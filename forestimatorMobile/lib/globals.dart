@@ -23,14 +23,19 @@ bool modeMapShowCustomMarker = true;
 bool modeDevelopper = false;
 
 class Display {
-  double? width;
-  double? height;
-  double? dpi;
-  double? aspect;
-  Orientation? orientation;
-  double? equipixel;
-  double? equiwidth;
-  double? equiheight;
+  double width = -1;
+  double height = -1;
+  double dpi = -1;
+  double aspect = -1;
+  Orientation orientation = Orientation.portrait;
+  double equipixel = -1;
+  double equiwidth = -1;
+  double equiheight = -1;
+  static bool keyboardExpanded = false;
+  static bool modeSquare = false;
+  static bool modeTablet = false;
+
+  Display.empty();
 
   Display(BuildContext context) {
     width = MediaQuery.of(context).size.width;
@@ -38,65 +43,140 @@ class Display {
     aspect = MediaQuery.of(context).size.aspectRatio;
     dpi = MediaQuery.of(context).devicePixelRatio;
     orientation = MediaQuery.of(context).orientation;
-    equipixel = width! > height! ? height! * .01 : width! * .01;
-    equiwidth = width! / equipixel!;
-    equiheight = height! / equipixel!;
+
+    _tabletMode();
+    _squareMode();
+    _enforceEquiWidthHeight();
+    if (modeSquare) {
+      minEquiPixelsDisplayLandscapeHeight =
+          minEquiPixelsDisplayLandscapeWidth * .8;
+      minEquiPixelsDisplayPortraitHeight =
+          minEquiPixelsDisplayPortraitWidth * .8;
+    }
+  }
+
+  void _tabletMode() {
+    if (dpi < 2.001 && dpi * (width < height ? width : height) > 1800 ||
+        dpi < 1.75 && dpi * (width < height ? width : height) > 1320 ||
+        dpi < 1.55 && dpi * (width < height ? width : height) > 1000) {
+      if (!modeTablet) {
+        minEquiPixelsDisplayPortraitWidth = 150;
+        minEquiPixelsDisplayPortraitHeight = 300;
+        minEquiPixelsDisplayLandscapeWidth = 300;
+        minEquiPixelsDisplayLandscapeHeight = 150;
+        modeTablet = true;
+      }
+    } else {
+      if (modeTablet) {
+        minEquiPixelsDisplayPortraitWidth = 100;
+        minEquiPixelsDisplayPortraitHeight = 200;
+        minEquiPixelsDisplayLandscapeWidth = 200;
+        minEquiPixelsDisplayLandscapeHeight = 100;
+        modeTablet = false;
+      }
+    }
+  }
+
+  void _squareMode() {
+    if ((aspect > .8 && aspect < 1 / .8) || modeTablet) {
+      modeSquare = true;
+      orientation = Orientation.landscape;
+    } else {
+      modeSquare = false;
+    }
+  }
+
+  void _enforceEquiWidthHeight() {
+    if (orientation == Orientation.portrait) {
+      equipixel = height / minEquiPixelsDisplayPortraitHeight;
+      equiwidth = width / equipixel;
+      while (equiwidth < minEquiPixelsDisplayPortraitWidth) {
+        equipixel *= 0.99;
+        equiwidth = width / equipixel;
+      }
+      equiheight = height / equipixel;
+    } else {
+      equipixel = width / minEquiPixelsDisplayLandscapeWidth;
+      equiheight = height / equipixel;
+      while (equiheight < minEquiPixelsDisplayLandscapeHeight) {
+        equipixel *= 0.99;
+        equiheight = height / equipixel;
+      }
+      equiwidth = width / equipixel;
+    }
   }
 
   @override
   String toString() {
-    return "width: $width\nheight: $height\ndpi: $dpi\naspect: $aspect\norientation: ${orientation!.name}\nequipixel: $equipixel\nequiwidth: $equiwidth\nequiheight: $equiheight";
+    return "width: $width\nheight: $height\ndpi: $dpi\naspect: $aspect\norientation: ${orientation.name}\nequipixel: $equipixel\nequiwidth: $equiwidth\nequiheight: $equiheight";
   }
 }
 
-Display? display;
+Display display = Display.empty();
 
 void initializeDisplayInfos(BuildContext context) {
   display = Display(context);
   print(display.toString());
 }
 
-// Visual sizes of menus etc.
+// This has to be guaranteed on all displays to ensure correct visibility
+double minEquiPixelsDisplayPortraitWidth = 100;
+double minEquiPixelsDisplayPortraitHeight = 200;
+double minEquiPixelsDisplayLandscapeWidth = 200;
+double minEquiPixelsDisplayLandscapeHeight = 100;
+// Visual sizes of menus etc. in equipixels
+// Top Bar
+double topAppInfoBarThickness = 10;
+double topAppForestimatorFontHeight = 5;
+double topAppForestimatorFontWidth = 60;
+// PopupWindows
+double popupWindowsPortraitWidth = minEquiPixelsDisplayPortraitWidth - 5;
+double popupWindowsPortraitHeight =
+    minEquiPixelsDisplayPortraitHeight - topAppInfoBarThickness - 20;
+double popupWindowsLandscapeWidth = minEquiPixelsDisplayLandscapeWidth - 5;
+double popupWindowsLandscapeHeight =
+    minEquiPixelsDisplayLandscapeHeight - topAppInfoBarThickness - 10;
+double popupReturnButtonHeight = 16;
+double popupReturnButtonWidth = 52;
 // Menus
 double menuBarThickness = 20;
 double menuBarLength = 65;
 double iconSize = 12;
 double iconSizeSettings = 8;
 double iconSpaceBetween = 8;
-// Top Bar
-double topAppInfoBarThickness = 10;
-double topAppForestimatorFontHeight = 5;
-double topAppForestimatorFontWidth = 60;
 // Offline loading box
 double loadingMapBoxWidth = 70;
 double loadingMapBoxHeight = 15;
 // General Fonts
-double smallFontSize = 3;
-double mediumFontSize = 6;
-double largeFontSize = 12;
+double fontSizeXS = 3;
+double fontSizeS = 4;
+double fontSizeM = 5;
+double fontSizeL = 6;
+double fontSizeXL = 7;
 // Polygons
 double chosenPolyBarWidth = 95;
 double chosenPolyBarHeight = 25;
 double infoBoxPolygon = 30;
 // AnaPtPreview
-double anaPtBoxSize = 10;
-// PopupWindows
-double popupWindowsStartHeight = 50;
-double popupWindowsWidth = 95;
-double popupReturnButtonHeight = menuBarThickness;
-double popupReturnButtonWidth = menuBarLength;
+double anaPtBoxSize = 12;
 // Popup Poly List
 double polyListCardHeight = 22;
-double polyListSelectedCardHeight = 37;
-double polyListCardWidth = 50;
-double polyListSelectedCardWidth = 100;
+double polyListSelectedCardHeight = 44;
+double polyListCardWidth = 90;
+double polyListSelectedCardWidth = 95;
+double polyNewPolygonButtonHeight = 12;
 // search location
-double searchBarHeight = 15;
+double searchBarHeight = 13;
 double searchBarWidth = 75;
 // Layer Switcher
-double layerSwitcherHeight = 75;
-double layerSwitcherCatalogueHeight = 30;
-double layerswitcherWidth = 80;
+double layerSwitcherTileHeight = 12;
+double layerswitcherBoxWidth = 80;
+double layerSwitcherBoxHeightPortrait = 5.5 * layerSwitcherTileHeight;
+double layerSwitcherBoxHeightPortraitOffline = 2.5 * layerSwitcherTileHeight;
+double layerSwitcherBoxHeightLandscape = 66;
+double layerswitcherButtonsBoxHeight = 30;
+double layerswitcherControlBoxHeight =
+    layerSwitcherTileHeight + fontSizeM * 1.2;
 // Do you really dialogue
 double dyrDialogWidth = 60;
 double dyrDialogHeight = 60;
@@ -267,8 +347,6 @@ List<String> downloadableLayerKeys = [
   "CNSWrast",
 ];
 
-//bool doDownload = false;
-
 Position? position;
 late proj4.Point pt;
 
@@ -282,11 +360,14 @@ const Color colorBackgroundSecondary = Color.fromRGBO(243, 243, 243, 1);
 Function refreshMap = (Function f) {
   f();
 };
-Function refreshWholeCatalogueView = (void Function() setter) async {};
+Function rebuildSwitcherCatalogueButtons = (void Function() setter) async {};
 Function refreshSearch = (void Function() setter) async {};
 Function refreshSettingsMenu = (void Function() setter) async {};
 Function refreshCurrentThreeLayer = () {};
-Function rebuildOfflineView = (void Function() setter) async {};
+Function rebuildOfflineCatalogue = (void Function() setter) async {};
+Function rebuildSwitcherBox = (void Function() setter) async {};
+Function rebuildLayerSwitcher = (void Function() setter) async {};
+Function rebuildStatusSymbols = (void Function() setter) async {};
 Function? rebuildNavigatorBar;
 Function removeFromOfflineList = (var x) {};
 
@@ -380,8 +461,6 @@ void replaceLayerFromList(
     );
   }
 }
-
-void switchLayersByOne() {}
 
 int getCountOfSelectedLayersForMap() {
   int count = 0;

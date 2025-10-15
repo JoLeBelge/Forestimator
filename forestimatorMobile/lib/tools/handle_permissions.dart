@@ -34,9 +34,13 @@ void initPermissions() async {
     system = "Android";
     DeviceInfoPlugin infos = DeviceInfoPlugin();
     AndroidDeviceInfo androidInfo = await infos.androidInfo;
-    release = double.parse(
-      androidInfo.version.release[0] + androidInfo.version.release[1],
-    );
+    if (androidInfo.version.release.length > 1) {
+      release = double.parse(
+        androidInfo.version.release[0] + androidInfo.version.release[1],
+      );
+    } else {
+      release = double.parse(androidInfo.version.release[0]);
+    }
     sdkInt = androidInfo.version.sdkInt;
     gl.print("Android $release (sdk $sdkInt)");
   } else if (getVersion && Platform.isIOS) {

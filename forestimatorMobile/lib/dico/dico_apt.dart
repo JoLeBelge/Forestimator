@@ -209,7 +209,9 @@ class LayerBase {
       mRes = 0.0,
       mUsedForAnalysis = false,
       mBits = 8,
-      mLogoAttributionFile = logoAttributionFile('');
+      mLogoAttributionFile = logoAttributionFile(''),
+      mIsDownloadableRW = false,
+      mInDownload = false;
 
   bool hasDoc() {
     return mPdfName != "";
@@ -628,14 +630,16 @@ class DicoAptProvider {
     return "US-A$us.pdf";
   }
 
-  Future<void> checkLayerBaseOfflineRessource() async {
+  Future<int> checkLayerBaseOfflineRessource() async {
+    int countOffline = 0;
     for (LayerBase l in mLayerBases.values) {
       File file = File(getRastPath(l.mCode));
       if (await file.exists() == true) {
         l.setHasOffline(true);
+        countOffline++;
       }
     }
-    return;
+    return countOffline;
   }
 
   void checkLayerBaseForAnalysis() async {
