@@ -15,11 +15,19 @@ adb reboot bootloader
 
 adb shell mount -o rw,remount /system 
 
-adb push prjTP14/ /storage/self/primary/Download 
+cd /home/jo/Documents/Autre/formationQFieldForestimator/QGIS_14
+
+kl,
 
 adb pull "/storage/emulated/0/Android/data/ch.opengis.qfield/files/Imported Projects/export" ./
 
 # changer la "skin" pour ne pas avoir de coins round. Puis j'ai ajouté une image systeme qui contenait le play store pour avoir la version forestiamator publiée en ligne
 
 ~/Android/Sdk/skins/pixel_8a/
+
+/home/jo/Android/Sdk/emulator/emulator -avd Medium_Phone_API_VanillaIceCream -skin 1080x1920
+
+Pixel_3a_API_34_extension_level_7_x86_64
+Pixel_Fold_API_35
+
 
