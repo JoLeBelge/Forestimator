@@ -34,6 +34,10 @@ class Display {
   static bool keyboardExpanded = false;
   static bool modeSquare = false;
   static bool modeTablet = false;
+  static bool overrideModeTablet = false;
+  static bool overrideModeSquare = false;
+  static bool modeExpert = false;
+  static bool modeExpertTools = false;
 
   Display.empty();
 
@@ -47,7 +51,7 @@ class Display {
     _tabletMode();
     _squareMode();
     _enforceEquiWidthHeight();
-    if (modeSquare) {
+    if (modeSquare || overrideModeSquare) {
       minEquiPixelsDisplayLandscapeHeight =
           minEquiPixelsDisplayLandscapeWidth * .8;
       minEquiPixelsDisplayPortraitHeight =
@@ -58,7 +62,8 @@ class Display {
   void _tabletMode() {
     if (dpi < 2.001 && dpi * (width < height ? width : height) > 1800 ||
         dpi < 1.75 && dpi * (width < height ? width : height) > 1320 ||
-        dpi < 1.55 && dpi * (width < height ? width : height) > 1000) {
+        dpi < 1.55 && dpi * (width < height ? width : height) > 1000 ||
+        overrideModeTablet) {
       if (!modeTablet) {
         minEquiPixelsDisplayPortraitWidth = 150;
         minEquiPixelsDisplayPortraitHeight = 300;
@@ -78,7 +83,7 @@ class Display {
   }
 
   void _squareMode() {
-    if ((aspect > .8 && aspect < 1 / .8) || modeTablet) {
+    if ((aspect > .8 && aspect < 1 / .8) || modeTablet || overrideModeSquare) {
       modeSquare = true;
       orientation = Orientation.landscape;
     } else {
@@ -141,7 +146,8 @@ double popupReturnButtonWidth = 52;
 // Menus
 double menuBarThickness = 20;
 double menuBarLength = 65;
-double iconSize = 12;
+double iconSizeS = 9;
+double iconSizeM = 12;
 double iconSizeSettings = 8;
 double iconSpaceBetween = 8;
 // Offline loading box

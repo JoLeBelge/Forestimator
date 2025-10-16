@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:fforestimator/dico/dico_apt.dart';
 import 'package:fforestimator/tools/handle_permissions.dart';
@@ -28,10 +29,30 @@ class _AnaPtpageState extends State<AnaPtpage> {
     // pour la construction du tableau d'aptitude
     AptsFEE apts = AptsFEE(widget.requestedLayers);
     PropositionGS aptsGS = PropositionGS(widget.requestedLayers);
-
+    double boxheight = 12.0 * gl.display.equipixel;
+    double boxwidth = 80.0 * gl.display.equipixel;
+    double iconBoxWidth = 15.0 * gl.display.equipixel;
+    double sizeIcon = gl.iconSizeS * gl.display.equipixel;
+    double sizeFontTitle = gl.fontSizeL * gl.display.equipixel;
+    double sizeFontNormal = gl.fontSizeM * gl.display.equipixel;
+    double sizeFontSmall = gl.fontSizeS * gl.display.equipixel;
     return Scaffold(
       backgroundColor: Colors.grey[200],
-      appBar: AppBar(title: Text("Analyse pour cette position")),
+      appBar: AppBar(
+        title: Container(
+          alignment: Alignment.centerLeft,
+          width: boxwidth,
+          height: boxheight,
+          child: Text(
+            "Analyse pour cette position",
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              fontWeight: FontWeight.normal,
+              fontSize: sizeFontTitle,
+            ),
+          ),
+        ),
+      ),
       body: SingleChildScrollView(
         physics: ScrollPhysics(),
         child: Column(
@@ -40,10 +61,13 @@ class _AnaPtpageState extends State<AnaPtpage> {
               gl.offlineMode
                   ? "Analyse réalisée hors-ligne"
                   : "Analyse réalisée en ligne",
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: sizeFontNormal,
+              ),
             ),
             handlePermissionForStorage(
-              child: TextButton(
+              child: SizedBox(
                 child:
                     getStorage()
                         ? Row(
@@ -51,67 +75,87 @@ class _AnaPtpageState extends State<AnaPtpage> {
                           children: [
                             Container(
                               alignment: Alignment.center,
-                              constraints: BoxConstraints(
-                                maxWidth: gl.display.equipixel * 7.5,
-                              ),
+                              width: iconBoxWidth,
                               child: Icon(
                                 Icons.picture_as_pdf,
-                                size: gl.display.equipixel * gl.fontSizeM * .85,
+                                size: sizeIcon,
                                 color: Colors.black,
                               ),
                             ),
 
-                            Container(
-                              alignment: Alignment.center,
-                              constraints: BoxConstraints(
-                                maxWidth: gl.display.equipixel * 75,
-                              ),
+                            TextButton(
+                              onPressed: () async {
+                                bool isPermitted = true;
+                                if (isPermitted) {
+                                  List<String>? l = await openDialog();
+                                  String? pdf = l?.elementAt(0);
+                                  String? locationName = l?.elementAt(1);
+                                  if (pdf != null && pdf.isEmpty) {
+                                    pdf = "analysePonctuelleForestimator.pdf";
+                                  }
+                                  if (pdf!.length < 4 ||
+                                      pdf.substring(pdf.length - 4) != ".pdf") {
+                                    pdf = "$pdf.pdf";
+                                  }
+                                  if (locationName!.isEmpty) {
+                                    locationName = "une position";
+                                  }
+                                  String dir = "/storage/emulated/0/Download";
+                                  if (Platform.isIOS) {
+                                    dir =
+                                        (await getApplicationDocumentsDirectory())
+                                            .path;
+                                  }
+                                  makePdf(
+                                    widget.requestedLayers,
+                                    pdf,
+                                    dir,
+                                    locationName,
+                                  );
+                                  // confirmation que le pdf a été créé
+                                  PopupPDFSaved(gl.anaPtPageContext!, pdf);
+                                }
+                              },
                               child: Text(
                                 "Saufgardez cette analyse sur votre appareil",
-                                style: TextStyle(color: Colors.black),
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: sizeFontSmall,
+                                  fontWeight: FontWeight.normal,
+                                ),
                               ),
                             ),
                           ],
                         )
-                        : Row(),
-                onPressed: () async {
-                  bool isPermitted = true;
-                  if (isPermitted) {
-                    //await Permission.manageExternalStorage
-                    //   .request()
-                    //  .isGranted ||
-                    //await Permission.storage.request().isGranted) {
-                    List<String>? l = await openDialog();
-                    String? pdf = l?.elementAt(0);
-                    String? locationName = l?.elementAt(1);
-                    if (pdf != null && pdf.isEmpty) {
-                      pdf = "analysePonctuelleForestimator.pdf";
-                    }
-                    if (pdf!.length < 4 ||
-                        pdf.substring(pdf.length - 4) != ".pdf") {
-                      pdf = "$pdf.pdf";
-                    }
-                    if (locationName!.isEmpty) {
-                      locationName = "une position";
-                    }
-                    String dir = "/storage/emulated/0/Download";
-                    if (Platform.isIOS) {
-                      dir = (await getApplicationDocumentsDirectory()).path;
-                    }
-                    makePdf(widget.requestedLayers, pdf, dir, locationName);
-                    // confirmation que le pdf a été créé
-                    PopupPDFSaved(gl.anaPtPageContext!, pdf);
-                  }
-                },
+                        : SizedBox(),
               ),
               refreshParentWidgetTree: setState,
             ),
-
             _anaPtListLayers(context, widget.requestedLayers),
-            SizedBox(height: 15),
-            if (apts.ready) Card(child: _tabAptFEE(context, apts)),
-            SizedBox(height: 15),
-            if (aptsGS.ready) Card(child: _tabPropositionCS(context, aptsGS)),
+            if (apts.ready)
+              Card(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadiusGeometry.circular(12.0),
+                  side: BorderSide(
+                    color: Color.fromRGBO(205, 225, 138, 1.0),
+                    width: 2.0,
+                  ),
+                ),
+                child: _tabAptFEE(context, apts),
+              ),
+
+            if (aptsGS.ready)
+              Card(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadiusGeometry.circular(12.0),
+                  side: BorderSide(
+                    color: Color.fromRGBO(205, 225, 138, 1.0),
+                    width: 2.0,
+                  ),
+                ),
+                child: _tabPropositionCS(context, aptsGS),
+              ),
           ],
         ),
       ),
@@ -168,13 +212,14 @@ class LayerAnaPtListTile extends StatelessWidget {
 
   Widget _leadingSymbol(IconData icon) {
     return Container(
-      alignment: Alignment.center,
+      alignment: Alignment.centerLeft,
       constraints: BoxConstraints(
-        maxWidth: MediaQuery.of(gl.notificationContext!).size.width * 0.075,
+        maxWidth: gl.display.equipixel * gl.iconSizeS + 11,
+        maxHeight: gl.display.equipixel * gl.iconSizeS + 11,
       ),
       child: Icon(
         icon,
-        size: MediaQuery.of(gl.notificationContext!).size.width * 0.075,
+        size: gl.display.equipixel * gl.iconSizeS,
         color: Colors.black,
       ),
     );
@@ -182,50 +227,65 @@ class LayerAnaPtListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    double boxheight = 12.0 * gl.display.equipixel;
+    double boxwidth = 65.0 * gl.display.equipixel;
     LayerBase layer = gl.dico.getLayerBase(data.mCode);
-    return ListTile(
-      leading: switch (layer.mGroupe) {
-        "ST" => _leadingSymbol(CustomIcons.montain),
-        "PEUP" => _leadingSymbol(CustomIcons.forest),
-        "CS" => _leadingSymbol(CustomIcons.mountains),
-        "REF" => _leadingSymbol(Icons.location_on),
-        _ => _leadingSymbol(Icons.location_on),
-      },
-      trailing:
-          (layer.getValColor(data.mRastValue).toARGB32() != 4294967295)
-              ? CircleAvatar(
-                radius: 10,
-                backgroundColor: layer.getValColor(data.mRastValue),
-              )
-              : null,
-      title: Text(
-        layer.mNom,
-        style: TextStyle(
-          fontSize: 16.0,
-          fontWeight: FontWeight.w500,
-          color: Colors.black,
-        ),
+    return Container(
+      constraints: BoxConstraints(
+        maxHeight: boxheight * 1.6,
+        minHeight: boxheight * 1,
       ),
-      subtitle: Row(
-        children: <Widget>[
-          SizedBox(
-            width: MediaQuery.of(gl.notificationContext!).size.width * 0.6,
-            height: MediaQuery.of(gl.notificationContext!).size.width * 0.1,
-            child: Text(
-              layer.getValLabel(data.mRastValue),
-              style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.w500),
-            ),
+
+      child: ListTile(
+        leading: switch (layer.mGroupe) {
+          "ST" => _leadingSymbol(CustomIcons.montain),
+          "PEUP" => _leadingSymbol(CustomIcons.forest),
+          "CS" => _leadingSymbol(CustomIcons.mountains),
+          "REF" => _leadingSymbol(Icons.location_on),
+          _ => _leadingSymbol(Icons.location_on),
+        },
+        trailing:
+            (layer.getValColor(data.mRastValue).toARGB32() != 4294967295)
+                ? CircleAvatar(
+                  radius: 10,
+                  backgroundColor: layer.getValColor(data.mRastValue),
+                )
+                : null,
+        title: Text(
+          layer.mNom,
+          style: TextStyle(
+            fontSize: gl.display.equipixel * gl.fontSizeS,
+            fontWeight: FontWeight.w500,
+            color: Colors.black54,
           ),
-        ],
+        ),
+        subtitle: Row(
+          children: <Widget>[
+            SizedBox(
+              width: boxwidth,
+              height: boxheight,
+              child: Text(
+                layer.getValLabel(data.mRastValue),
+                style: TextStyle(
+                  fontSize: gl.display.equipixel * gl.fontSizeS,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.black,
+                ),
+              ),
+            ),
+          ],
+        ),
+        onTap: () {
+          if ((layer.hasDoc() && data.mCode != "CS_A") ||
+              (layer.hasDoc() &&
+                  data.mCode == "CS_A" &&
+                  data.mRastValue < 99)) {
+            GoRouter.of(
+              context,
+            ).push('/${layer.getFicheRoute(us: data.mRastValue)}/0');
+          }
+        },
       ),
-      onTap: () {
-        if ((layer.hasDoc() && data.mCode != "CS_A") ||
-            (layer.hasDoc() && data.mCode == "CS_A" && data.mRastValue < 99)) {
-          GoRouter.of(
-            context,
-          ).push('/${layer.getFicheRoute(us: data.mRastValue)}/0');
-        }
-      },
     );
   }
 }
@@ -233,11 +293,14 @@ class LayerAnaPtListTile extends StatelessWidget {
 Widget _tabAptFEE(BuildContext context, AptsFEE apts) {
   return Column(
     children: [
-      SizedBox(height: 10),
       Center(
         child: Text(
           "Aptitude du Fichier Ecologique des Essences",
-          style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.w600),
+          style: TextStyle(
+            fontSize: gl.display.equipixel * gl.fontSizeM,
+            fontWeight: FontWeight.w600,
+            color: Colors.black,
+          ),
           textAlign: TextAlign.center,
         ),
       ),
@@ -255,7 +318,13 @@ Widget _tabAptFEE(BuildContext context, AptsFEE apts) {
             ),
             Container(
               constraints: BoxConstraints(
-                maxHeight: gl.display.equipixel * gl.display.equiheight,
+                maxHeight:
+                    max(
+                      max(apts.getListEss(1).length, apts.getListEss(2).length),
+                      apts.getListEss(3).length,
+                    ) *
+                    gl.display.equipixel *
+                    15,
               ),
               child: TabBarView(
                 children: [
@@ -328,13 +397,16 @@ class EssencesListView extends StatelessWidget {
 }
 
 Widget _tabPropositionCS(BuildContext context, PropositionGS apts) {
+  double sizeFontTitle = gl.fontSizeL * gl.display.equipixel;
   return Column(
     children: [
-      SizedBox(height: 10),
       Center(
         child: Text(
           "Propositions d'Essences du Guide des Stations",
-          style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.w600),
+          style: TextStyle(
+            fontSize: sizeFontTitle,
+            fontWeight: FontWeight.w600,
+          ),
           textAlign: TextAlign.center,
         ),
       ),
@@ -356,9 +428,14 @@ Widget _tabPropositionCS(BuildContext context, PropositionGS apts) {
 
             Container(
               constraints: BoxConstraints(
-                maxHeight: gl.display.equipixel * gl.display.equiheight,
+                maxHeight:
+                    max(
+                      max(apts.getListEss(1).length, apts.getListEss(2).length),
+                      apts.getListEss(3).length,
+                    ) *
+                    gl.display.equipixel *
+                    15,
               ),
-              //Add this to give height
               child: TabBarView(
                 children: [
                   EssencesListViewGS(apts: apts, codeApt: 1),
@@ -432,22 +509,10 @@ Widget _anaPtListLayers(
   BuildContext context,
   List<LayerAnaPt> requestedLayers,
 ) {
-  /* plus nécessaire car requestedLayers est purgé avant l'envoi à AnaPtpage
-  int nb = 0;
-  for (layerAnaPt l in requestedLayers) {
-    if (l.mFoundRastFile && l.mRastValue != 0) {
-      nb = nb + 1;
-    }
-  }*/
-
   if (requestedLayers.isNotEmpty) {
     return ListView.builder(
       itemBuilder: (context, index) {
-        //if (requestedLayers[index].mFoundRastFile &&
-        //  requestedLayers[index].mRastValue != 0) {
-
         return LayerAnaPtListTile(data: requestedLayers[index]);
-        //}
       },
       itemCount: requestedLayers.length,
       shrinkWrap: true,

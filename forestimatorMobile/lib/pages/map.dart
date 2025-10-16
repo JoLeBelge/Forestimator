@@ -850,7 +850,7 @@ class _MapPageState extends State<MapPage> {
                                                       .center_focus_strong_outlined,
                                               size:
                                                   gl.display.equipixel *
-                                                  gl.iconSize,
+                                                  gl.iconSizeM,
                                               color: getColorTextFromBackground(
                                                 gl
                                                     .polygonLayers[gl
@@ -973,7 +973,7 @@ class _MapPageState extends State<MapPage> {
                                             Icons.add,
                                             size:
                                                 gl.display.equipixel *
-                                                gl.iconSize,
+                                                gl.iconSizeM,
                                             color: Colors.white,
                                           ),
                                           SizedBox(
@@ -1538,7 +1538,7 @@ class _MapPageState extends State<MapPage> {
                                 : _toolbarExtended
                                 ? Colors.white
                                 : Colors.green,
-                        iconSize: gl.display.equipixel * gl.iconSize,
+                        iconSize: gl.display.equipixel * gl.iconSizeM,
                         isSelected: _toolbarExtended,
                         onPressed: () {
                           setState(() {
@@ -1571,7 +1571,7 @@ class _MapPageState extends State<MapPage> {
                                 : _polygonToolbarExtended
                                 ? Colors.white
                                 : Colors.yellow,
-                        iconSize: gl.display.equipixel * gl.iconSize,
+                        iconSize: gl.display.equipixel * gl.iconSizeM,
                         isSelected: _polygonToolbarExtended,
                         onPressed: () {
                           setState(() {
@@ -1601,7 +1601,7 @@ class _MapPageState extends State<MapPage> {
                           height: gl.display.equipixel * gl.menuBarThickness,
                           child: IconButton(
                             color: Colors.transparent,
-                            iconSize: gl.display.equipixel * gl.iconSize,
+                            iconSize: gl.display.equipixel * gl.iconSizeM,
                             isSelected: _modeLayerSwitches,
                             onPressed: () {
                               setState(() {
@@ -1625,7 +1625,7 @@ class _MapPageState extends State<MapPage> {
                                 _modeLayerSwitches
                                     ? Colors.white
                                     : Colors.brown,
-                            iconSize: gl.display.equipixel * gl.iconSize,
+                            iconSize: gl.display.equipixel * gl.iconSizeM,
                             isSelected: _modeLayerSwitches,
                             onPressed: () {
                               setState(() {
@@ -1680,12 +1680,12 @@ class _MapPageState extends State<MapPage> {
           : false;
 
   Widget _toolBar() {
-    double toolbarHeight = gl.iconSize * 2 + gl.iconSpaceBetween * 2;
+    double toolbarHeight = gl.iconSizeM * 2 + gl.iconSpaceBetween * 2;
     if (gl.modeDevelopper) {
-      toolbarHeight += gl.iconSize + gl.iconSpaceBetween;
+      toolbarHeight += gl.iconSizeM + gl.iconSpaceBetween;
     }
     if (positionMarkerInsideViewRectangle()) {
-      toolbarHeight += gl.iconSize + gl.iconSpaceBetween;
+      toolbarHeight += gl.iconSizeM + gl.iconSpaceBetween;
     }
     return Column(
       mainAxisAlignment: MainAxisAlignment.end,
@@ -1712,7 +1712,7 @@ class _MapPageState extends State<MapPage> {
                             children: [
                               if (positionMarkerInsideViewRectangle())
                                 IconButton(
-                                  iconSize: gl.display.equipixel * gl.iconSize,
+                                  iconSize: gl.display.equipixel * gl.iconSizeM,
                                   color: gl.colorAgroBioTech,
                                   onPressed: () async {
                                     if (!_doingAnaPt) {
@@ -1745,7 +1745,7 @@ class _MapPageState extends State<MapPage> {
                                   icon: const Icon(Icons.analytics),
                                 ),
                               IconButton(
-                                iconSize: gl.display.equipixel * gl.iconSize,
+                                iconSize: gl.display.equipixel * gl.iconSizeM,
                                 color: Colors.red,
                                 onPressed: () async {
                                   if (gl.position != null) {
@@ -1769,7 +1769,7 @@ class _MapPageState extends State<MapPage> {
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
                             IconButton(
-                              iconSize: gl.display.equipixel * gl.iconSize,
+                              iconSize: gl.display.equipixel * gl.iconSizeM,
                               color: Colors.black,
                               onPressed: () async {
                                 if (gl.position != null) {
@@ -1780,7 +1780,7 @@ class _MapPageState extends State<MapPage> {
                             ),
                           ],
                         ),
-                    if (gl.modeDevelopper)
+                    if (gl.Display.modeExpertTools && gl.modeDevelopper)
                       Container(
                         color:
                             !_modeMeasurePath
@@ -1791,7 +1791,7 @@ class _MapPageState extends State<MapPage> {
                               _modeMeasurePath
                                   ? Colors.white
                                   : Colors.lightBlue,
-                          iconSize: gl.display.equipixel * gl.iconSize,
+                          iconSize: gl.display.equipixel * gl.iconSizeM,
                           isSelected: _modeMeasurePath,
                           onPressed: () {
                             setState(() {
@@ -1809,7 +1809,7 @@ class _MapPageState extends State<MapPage> {
                               ? Colors.transparent
                               : Colors.blueGrey.withAlpha(128),
                       child: IconButton(
-                        iconSize: gl.display.equipixel * gl.iconSize,
+                        iconSize: gl.display.equipixel * gl.iconSizeM,
                         color: _modeSearch ? Colors.white : Colors.blueGrey,
                         onPressed: () {
                           setState(() {
@@ -1860,13 +1860,13 @@ class _MapPageState extends State<MapPage> {
   Widget _polygonToolbar() {
     double toolbarHeight = gl.iconSpaceBetween;
     if (_modeShowButtonDrawPolygonMoveVertexes) {
-      toolbarHeight += gl.iconSize + gl.iconSpaceBetween;
+      toolbarHeight += gl.iconSizeM + gl.iconSpaceBetween;
     }
     if (_modeShowButtonDrawPolygonRemoveVertexes) {
-      toolbarHeight += gl.iconSize + gl.iconSpaceBetween;
+      toolbarHeight += gl.iconSizeM + gl.iconSpaceBetween;
     }
     if (_modeShowButtonDrawPolygonAddVertexes) {
-      toolbarHeight += gl.iconSize + gl.iconSpaceBetween;
+      toolbarHeight += gl.iconSizeM + gl.iconSpaceBetween;
     }
     return Column(
       mainAxisAlignment: MainAxisAlignment.end,
@@ -1896,7 +1896,7 @@ class _MapPageState extends State<MapPage> {
                               _modeDrawPolygonMoveVertexes
                                   ? Colors.white
                                   : Colors.lightGreenAccent,
-                          iconSize: gl.display.equipixel * gl.iconSize,
+                          iconSize: gl.display.equipixel * gl.iconSizeM,
                           onPressed: () async {
                             refreshView(() {
                               _modeDrawPolygonMoveVertexes =
@@ -1948,7 +1948,7 @@ class _MapPageState extends State<MapPage> {
                           _modeDrawPolygonRemoveVertexes,
                         ),
                         child: IconButton(
-                          iconSize: gl.display.equipixel * gl.iconSize,
+                          iconSize: gl.display.equipixel * gl.iconSizeM,
                           color:
                               _modeDrawPolygonRemoveVertexes
                                   ? Colors.white
@@ -2008,7 +2008,7 @@ class _MapPageState extends State<MapPage> {
                           _modeDrawPolygonAddVertexes,
                         ),
                         child: IconButton(
-                          iconSize: gl.display.equipixel * gl.iconSize,
+                          iconSize: gl.display.equipixel * gl.iconSizeM,
                           color:
                               _modeDrawPolygonAddVertexes
                                   ? Colors.white
@@ -2260,11 +2260,18 @@ class _AnaPtPreview extends State<AnaPtPreview> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Container(
+              alignment: Alignment.center,
               constraints: BoxConstraints(
                 minHeight: gl.fontSizeM * gl.display.equipixel,
                 minWidth: gl.fontSizeM * gl.display.equipixel,
               ),
-              color: color == Colors.transparent ? Colors.white : color,
+              color: Colors.white,
+              child: Container(
+                alignment: Alignment.center,
+                height: (gl.fontSizeM - .5) * gl.display.equipixel,
+                width: (gl.fontSizeM - .5) * gl.display.equipixel,
+                color: color == Colors.transparent ? Colors.white : color,
+              ),
             ),
             Container(
               constraints: BoxConstraints(
@@ -2274,8 +2281,9 @@ class _AnaPtPreview extends State<AnaPtPreview> {
               child: Text(":", textAlign: TextAlign.center),
             ),
             Text(
+              textAlign: TextAlign.center,
               text == "" ? "No data" : text,
-              style: TextStyle(fontSize: gl.fontSizeM * gl.display.equipixel),
+              style: TextStyle(fontSize: gl.fontSizeS * gl.display.equipixel),
             ),
           ],
         ),

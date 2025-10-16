@@ -27,11 +27,9 @@ class LayerTile {
       subtitle: const Text("Propriétaire de la couche cartographique"),
       title: Text(gl.dico.getLayerBase(key).mWMSattribution),
       leading: Container(
-        constraints: const BoxConstraints(
-          minWidth: 44,
-          minHeight: 44,
-          maxWidth: 200,
-          maxHeight: 64,
+        constraints: BoxConstraints(
+          maxWidth: gl.display.equipixel * gl.onCatalogueWidth * .75,
+          maxHeight: gl.display.equipixel * gl.onCatalogueWidth * .75,
         ),
         child: Image.asset(
           gl.dico.getLayerBase(key).mLogoAttributionFile,
@@ -44,29 +42,44 @@ class LayerTile {
 
   Container proprietaire() {
     return Container(
-      constraints: const BoxConstraints(minWidth: 44, minHeight: 44),
-
+      alignment: Alignment.topCenter,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [Text("Propriétaire de la couche cartographique")],
+          Container(
+            alignment: Alignment.center,
+            constraints: BoxConstraints(
+              maxWidth: gl.display.equipixel * gl.onCatalogueWidth * .8,
+            ),
+            child: Text(
+              "Propriétaire de la couche cartographique",
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: gl.display.equipixel * gl.fontSizeS),
+            ),
           ),
           Container(
             alignment: Alignment.center,
-            constraints: BoxConstraints(maxHeight: 100, maxWidth: 200),
+            constraints: BoxConstraints(
+              maxWidth: gl.display.equipixel * gl.onCatalogueWidth * .75,
+            ),
             child: Image.asset(
               gl.dico.getLayerBase(key).mLogoAttributionFile,
               fit: BoxFit.cover,
             ),
           ),
-          Row(
-            children: [
-              Icon(Icons.copyright),
-              Text("  "),
-              Text(gl.dico.getLayerBase(key).mWMSattribution),
-            ],
+          Container(
+            alignment: Alignment.center,
+            constraints: BoxConstraints(
+              maxWidth: gl.display.equipixel * gl.onCatalogueWidth * .75,
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.copyright),
+                Text("  "),
+                Text(gl.dico.getLayerBase(key).mWMSattribution),
+              ],
+            ),
           ),
         ],
       ),

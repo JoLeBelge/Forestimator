@@ -24,105 +24,111 @@ class _LegendView extends State<LegendView> {
   @override
   Widget build(BuildContext context) {
     _computeBoxContraintsPerColorTile();
-    return Center(
-      child: Container(
-        color: Colors.white,
-        constraints: BoxConstraints(
-          minWidth:
-              widget.constraintsText.minWidth +
-              widget.constraintsColors.minWidth,
-          maxWidth:
-              widget.constraintsText.maxWidth +
-              widget.constraintsColors.maxWidth,
-        ),
-        child: Column(
-          children: [
-            if (gl.dico.getLayerBase(widget.layerKey).mCategorie != "Externe")
-              Container(
-                constraints: BoxConstraints(
-                  maxHeight: gl.fontSizeM * gl.display.equipixel,
-                ),
-                child: const Text('Légende'),
+    return Container(
+      alignment: AlignmentGeometry.topCenter,
+      color: Colors.white,
+      constraints: BoxConstraints(
+        minWidth:
+            widget.constraintsText.minWidth + widget.constraintsColors.minWidth,
+        maxWidth:
+            widget.constraintsText.maxWidth + widget.constraintsColors.maxWidth,
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          if (gl.dico.getLayerBase(widget.layerKey).mCategorie != "Externe")
+            Container(
+              constraints: BoxConstraints(
+                maxHeight: gl.fontSizeM * gl.display.equipixel,
               ),
-            Row(
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: List.generate(
-                    gl.dico.mLayerBases[widget.layerKey]!
+              child: const Text('Légende'),
+            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: List.generate(
+                  gl.dico.mLayerBases[widget.layerKey]!
+                      .getDicoValForLegend()
+                      .length,
+                  (i) {
+                    var key = gl.dico.mLayerBases[widget.layerKey]!
                         .getDicoValForLegend()
-                        .length,
-                    (i) {
-                      var key = gl.dico.mLayerBases[widget.layerKey]!
-                          .getDicoValForLegend()
-                          .elementAt(i);
-                      if (_graduatedMode) {
-                        if (i % _magicNumber == 0 ||
-                            i ==
-                                gl
-                                        .dico
-                                        .mLayerBases[widget.layerKey]!
-                                        .mDicoVal
-                                        .length -
-                                    1) {
-                          return Container(
-                            constraints: _constraintsLeft,
-                            child: Text(
+                        .elementAt(i);
+                    if (_graduatedMode) {
+                      if (i % _magicNumber == 0 ||
+                          i ==
                               gl
-                                  .dico
-                                  .mLayerBases[widget.layerKey]!
-                                  .mDicoVal[key]!,
-                            ),
-                          );
-                        } else {
-                          return Container(
-                            constraints: BoxConstraints(
-                              minWidth: _constraintsLeft.minWidth,
-                              maxWidth: _constraintsLeft.maxWidth,
-                              minHeight: 0.0,
-                              maxHeight: 0.01,
-                            ),
-                          );
-                        }
-                      } else {
+                                      .dico
+                                      .mLayerBases[widget.layerKey]!
+                                      .mDicoVal
+                                      .length -
+                                  1) {
                         return Container(
-                          constraints: _constraintsLeft,
+                          alignment: AlignmentGeometry.topCenter,
+                          constraints: BoxConstraints(
+                            minWidth: 0,
+                            maxWidth: _constraintsLeft.maxWidth,
+                            minHeight: 0,
+                            maxHeight: gl.fontSizeS * gl.display.equipixel,
+                          ),
                           child: Text(
                             gl
                                 .dico
                                 .mLayerBases[widget.layerKey]!
                                 .mDicoVal[key]!,
+                            style: TextStyle(
+                              fontSize: gl.display.equipixel * gl.fontSizeXS,
+                              fontWeight: FontWeight.w300,
+                            ),
                           ),
                         );
+                      } else {
+                        return SizedBox(height: 0.3);
                       }
-                    },
-                  ),
-                ),
-                Column(
-                  children: List.generate(
-                    gl.dico.mLayerBases[widget.layerKey]!.mDicoCol.length,
-                    (i) {
-                      var key = gl
-                          .dico
-                          .mLayerBases[widget.layerKey]!
-                          .mDicoCol
-                          .keys
-                          .elementAt(i);
+                    } else {
                       return Container(
-                        color:
-                            gl
-                                .dico
-                                .mLayerBases[widget.layerKey]!
-                                .mDicoCol[key]!,
-                        constraints: _constraintsRight,
+                        constraints: _constraintsLeft,
+                        child: Text(
+                          gl.dico.mLayerBases[widget.layerKey]!.mDicoVal[key]!,
+                          style: TextStyle(
+                            fontSize: gl.display.equipixel * gl.fontSizeXS,
+                            fontWeight: FontWeight.w300,
+                          ),
+                        ),
                       );
-                    },
-                  ),
+                    }
+                  },
                 ),
-              ],
-            ),
-          ],
-        ),
+              ),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: List.generate(
+                  gl.dico.mLayerBases[widget.layerKey]!.mDicoCol.length,
+                  (i) {
+                    var key = gl
+                        .dico
+                        .mLayerBases[widget.layerKey]!
+                        .mDicoCol
+                        .keys
+                        .elementAt(i);
+                    return Container(
+                      constraints: BoxConstraints(
+                        minWidth: 0,
+                        maxWidth: _constraintsRight.maxWidth,
+                        minHeight: 0,
+                        maxHeight: _constraintsRight.maxHeight,
+                      ),
+                      color:
+                          gl.dico.mLayerBases[widget.layerKey]!.mDicoCol[key]!,
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
