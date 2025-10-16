@@ -6,10 +6,12 @@ QT -= gui
 QT += sql
 CONFIG += c++17
 
-LIBS = -lcurl -lgdal -lwthttp -lwt -lboost_system -lboost_iostreams  -lboost_filesystem -lboost_program_options -lcrypt -pthread -lwtdbo -lwtdbosqlite3 -lzip -lhpdf -lsqlite3
+LIBS = -lcurl -lwthttp -lwt -lboost_system -lboost_iostreams  -lboost_filesystem -lboost_program_options -lcrypt -pthread -lwtdbo -lwtdbosqlite3 -lzip -lhpdf -lsqlite3
 
 DEPENDPATH += /usr/include/gdal/
 INCLUDEPATH += /usr/include/gdal/
+
+LIBS += -L$$PWD/usr/include/gdal/ -lgdal
 
 INCLUDEPATH += $$PWD/../carteApt/
 INCLUDEPATH += $$PWD/auth/

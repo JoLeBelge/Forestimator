@@ -178,26 +178,33 @@ La ressource en eau constitue un des facteurs déterminants de l’adaptation de
 
 </message>
 
-<message id="dendro.projet">
-Les modèles dendrométriques ont été réalisés dans le cadre des actions 0.8 (Suivi scientifique de l'Inventaire permanent des Ressources forestières de Wallonie
-(IPRFW)) et 0.9 (CARTOFOR : recherches appliquées pour le développement à l’échelle de la Wallonie de méthodologies innovantes permettant la caractérisation et le suivi de la structure, de la composition et de l’état sanitaire des peuplements forestiers) de l’action du Plan quinquennal de Recherches forestières 2019-2024 (coordination Pr Philippe Lejeune).
-</message>
 
 <message id="dendro.description">
-Les recherches réalisées portaient sur l’évaluation la qualité de modèles prédictifs des paramètres dendrométriques suivants: Hauteur dominante (HDOM), Volume par hectare (VHA) et Circonférence moyenne (CMOY). Ces modèles sont construits sur base du modèle numérique de hauteur photogrammétrique couvrant l’ensemble du territoire wallon acquis en 2018 à une résolution de 50 cm. Cette donnée initiale a été rééchantillonnée à une résolution de 5m, en sélectionnant au sein de chaque fenêtre de 5m le percentile 95 comme valeur finale. 
-Les modèles repris au sein de la Table 1 ont été ajustés sur base d’un réseau de 1051 placettes résineuses représentatif de la forêt résineuse wallonne (Figure 1). Ce réseau est essentiellement situé au sein de pessières (79%), de douglasaies (5%) et de mélézières (3%). Le reste du réseau étant constitué de mélanges divers ou de peuplements composés d’essences résineuses plus rares. La donnée de départ couvrant l’ensemble du territoire wallon, la plateforme peut donc en théorie fournir des valeurs pour ces paramètre en dehors de leur zone d’application. Il est donc essentiel que l’utilisateur restreigne par lui-même son usage aux seuls peuplements résineux. 
-<p></p>
-            <p><img src="/img/dendroPLA.png" alt="carte Placettes" width="90%"/></p>
-            <p>Réseau de placettes utilisé pour la calibration des modèles prédictifs</p>  
+
+<span> Le Service Public de Wallonie s’est doté, en 2021-2022, d’une nouvelle couche
+lidar couvrant l’ensemble de la Wallonie. En parallèle, les images satellites multispectrales à très
+haute résolution permettent une détermination relativement précise de la composition spécifique des
+peuplements. Pour exploiter au mieux ces données, notre équipe a utilisé en 2025 de nouveaux algorithmes de classification et de prédiction de variables quantitatives. Ces algorithme mettent notamment à profit les évolutions récentes dans le domaine de l’intelligence artificielle. </span>
+<br></br>
+<br></br>
+<span>Le modèle prédictif est constitué d’un réseau neuronal qui
+présente la particularité d’estimer les <mark>six variables
+simultanément</mark> (Nha, Gha, Vha, Cdom, Hdom et proportion de feuillus). L’ajustement de ce modèle est basé
+sur un grand nombre de placettes d’inventaires provenant à la fois des Inventaires Forestiers d’Aménagement (IFA) réalisés par le DNF (3900 placettes) et de l’Inventaire Permanent des Ressources Forestières de Wallonie (IPRFW) (1800 placettes). </span>
 </message>
 
 <message id="dendro.version">
-Janvier 2022
+Juin 2025
 </message>
 
 <message id="dendro.logs">
-Janvier 2022 : implémenté les modèles dendrométriques à l'échelle de pixel de 5 m de résolution. Les paramètres dendro pour un polygone sont calculés comme la moyenne pour chaque pixels. Précédemment, par exemple dans le plug-In Qgis Forestimator, une échelle intermédiaire était utilisée entre la parcelle et le pixel. Elle correspondait à une surface de un are afin de répondre à la définition de la hauteur dominante, qui correspond à la hauteur moyenne des 100 arbres les plus hauts par hectare (donc une surface moyenne de 1 are).
+Janvier 2022 : première version.
+Juin 2025 : deuxième version, développée dans le cadre du projet WAVE.
 </message>
+
+<message id="dendro.ref"> <p> <span class="csl-entry">Philippe Lejeune, Nicolas Latte, Jérôme Perin, Jonathan Lisein, 2025. <a target="_blank" rel="noopener noreferrer" href="https://foretnature.be/wp-content/uploads/2025/07/FO175-68-79.pdf">De nouvelles couches cartographiques pour mieux décrire la forêt wallonne.</a> Forêt. Nature numéro 175, pages 68–79.</span></p> </message>
+
+
 
 <message id="COMPO.projet">
 Cette cartographie des essences forestières est le résultat de recherches menées à ULiège Gembloux Agro-Bio Tech au travers de deux projets Interreg, Forêt Pro Bos et RegioWood 2, et du projet CARTOFOR appuyé par le DNF.
@@ -511,7 +518,7 @@ Pour réaliser des statistiques, Forestimator collecte également et traite <mar
 <message id="MF.title"><h3><strong>Masque forestier 2018</strong></h3></message>
 <message id="COMPO.title"><h3><strong>Carte de composition des essences</strong></h3></message>
 <message id="MNH.title"><h3><strong>Modèle Numérique de Hauteur</strong></h3></message>
-<message id="dendro.title"><h3><strong>Modèles dendrométriques – Peuplement résineux</strong></h3></message>
+<message id="dendro.title"><h3><strong>Modèles dendrométriques</strong></h3></message>
 <message id="ES_EP.title"><h3><strong>Attaques des scolytes sur l'épicéa</strong></h3></message>
 <message id="IGN.title"><h3><strong>Topographie : CartoWeb</strong></h3></message>
 <message id="MNT.title"><h3><strong>Relief de la Wallonie - Modèle Numérique de Terrain (MNT) 2013-2014</strong></h3></message>
@@ -543,5 +550,6 @@ Pour réaliser des statistiques, Forestimator collecte également et traite <mar
 <message id="IGN.label">Topographie : CartoWeb</message>
 <message id="MNT.label">Altitude du sol</message>
 <message id="SWC.label">Réserve en eau</message>
+
 </messages>
 
