@@ -146,6 +146,7 @@ double popupReturnButtonWidth = 52;
 // Menus
 double menuBarThickness = 20;
 double menuBarLength = 65;
+double iconSizeXS = 6;
 double iconSizeS = 9;
 double iconSizeM = 12;
 double iconSizeSettings = 8;

@@ -9,7 +9,6 @@ import 'package:fforestimator/pages/anaPt/ana_ptpdf.dart';
 import 'package:fforestimator/globals.dart' as gl;
 import 'package:fforestimator/myicons.dart';
 import 'package:go_router/go_router.dart';
-import 'package:fforestimator/tools/notification.dart';
 import 'package:path_provider/path_provider.dart';
 
 class AnaPtpage extends StatefulWidget {
@@ -113,7 +112,7 @@ class _AnaPtpageState extends State<AnaPtpage> {
                                     locationName,
                                   );
                                   // confirmation que le pdf a été créé
-                                  PopupPDFSaved(gl.anaPtPageContext!, pdf);
+                                  //PopupPDFSaved(gl.anaPtPageContext!, pdf);
                                 }
                               },
                               child: Text(
@@ -238,11 +237,11 @@ class LayerAnaPtListTile extends StatelessWidget {
 
       child: ListTile(
         leading: switch (layer.mGroupe) {
-          "ST" => _leadingSymbol(CustomIcons.montain),
+          "ST" => _leadingSymbol(CustomIcons.mountain),
           "PEUP" => _leadingSymbol(CustomIcons.forest),
           "CS" => _leadingSymbol(CustomIcons.mountains),
-          "REF" => _leadingSymbol(Icons.location_on),
-          _ => _leadingSymbol(Icons.location_on),
+          "REF" => _leadingSymbol(CustomIcons.map),
+          _ => _leadingSymbol(CustomIcons.soil),
         },
         trailing:
             (layer.getValColor(data.mRastValue).toARGB32() != 4294967295)

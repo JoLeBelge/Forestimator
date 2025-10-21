@@ -44,6 +44,7 @@ class _MapPageState extends State<MapPage> {
 
   bool _modeDrawPolygon = false;
   bool _modePolygonList = false;
+  bool _modeMenuResults = false;
 
   bool _modeDrawPolygonAddVertexes = false;
   bool _modeDrawPolygonRemoveVertexes = false;
@@ -341,8 +342,20 @@ class _MapPageState extends State<MapPage> {
                             _pt = point;
                             refreshView(() {
                               _doingAnaPt = false;
+                              _modeMenuResults = true;
                             });
-                            GoRouter.of(gl.notificationContext!).push("/anaPt");
+                            gl.mainStack.add(
+                              popupAnaResultsMenu(
+                                gl.notificationContext!,
+                                gl.requestedLayers,
+                                () {
+                                  refreshView(() {});
+                                },
+                              ),
+                            );
+                            gl.refreshMap(() {});
+
+                            //GoRouter.of(gl.notificationContext!).push("/anaPt");
                           }
                         },
                         onTap:
