@@ -28,13 +28,16 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:intl/intl.dart';
 
+// A helper typedef: accepts a function to run inside a setter (used by global rebuild callbacks)
+typedef VoidSetter = void Function(void Function());
+
 class PopupDownloadRecomendedLayers extends StatelessWidget {
   final String? title;
   final String? dialog;
   final String? accept;
   final String? decline;
-  final Function? onAccept;
-  final Function? onDecline;
+  final VoidCallback? onAccept;
+  final VoidCallback? onDecline;
   const PopupDownloadRecomendedLayers({
     super.key,
     this.title,
@@ -74,7 +77,7 @@ Widget popupNoInternet() {
         child: Text("OK"),
         onPressed: () {
           gl.mainStackPopLast();
-          gl.refreshMap(() {});
+          gl.refreshMainStack(() {});
         },
       ),
     ],
@@ -86,8 +89,8 @@ class PopupPermissions extends StatelessWidget {
   final String? dialog;
   final String? accept;
   final String? decline;
-  final Function? onAccept;
-  final Function? onDecline;
+  final VoidCallback? onAccept;
+  final VoidCallback? onDecline;
   const PopupPermissions({
     super.key,
     this.title,
@@ -162,7 +165,7 @@ class PopupDownloadFailed {
   }
 }
 
-Widget popupPDFSaved(String pdfName, Function after) {
+Widget popupPDFSaved(String pdfName, VoidCallback after) {
   return AlertDialog(
     title: Text("Export du pdf: $pdfName"),
     content: Text("Export effectué avec succès."),
@@ -183,8 +186,8 @@ class PopupColorChooser {
   PopupColorChooser(
     Color currentColor,
     BuildContext context,
-    Function(Color) colorChange,
-    Function after,
+    ValueChanged<Color> colorChange,
+    VoidCallback after,
   ) {
     pickerColor = currentColor;
     showDialog(
@@ -218,9 +221,9 @@ class PopupNameIntroducer {
   PopupNameIntroducer(
     BuildContext context,
     String currentName,
-    Function(String) state,
-    Function after,
-    Function callbackOnStartTyping,
+    ValueChanged<String> state,
+    VoidCallback after,
+    VoidCallback callbackOnStartTyping,
   ) {
     showDialog(
       context: context,
@@ -305,8 +308,8 @@ class PopupNameIntroducer {
 }
 
 class PolygonListMenu extends StatefulWidget {
-  final Function(LatLng) state;
-  final Function after;
+  final ValueChanged<LatLng> state;
+  final VoidCallback after;
 
   const PolygonListMenu({super.key, required this.state, required this.after});
 
@@ -384,7 +387,7 @@ class _PolygonListMenu extends State<PolygonListMenu> {
                         gl.polygonLayers.length < oldIndex + 1) {
                       return;
                     }
-                    gl.refreshMap(() {
+                    gl.refreshMainStack(() {
                       final PolygonLayer item = gl.polygonLayers.removeAt(
                         oldIndex,
                       );
@@ -456,7 +459,7 @@ class _PolygonListMenu extends State<PolygonListMenu> {
                               setState(() {
                                 widget.state(gl.polygonLayers[i].center);
                               });
-                              gl.refreshMap(() {
+                              gl.refreshMainStack(() {
                                 gl.modeMapShowPolygons = true;
                               });
                             }
@@ -465,7 +468,7 @@ class _PolygonListMenu extends State<PolygonListMenu> {
                                 gl.selectedPolygonLayer = i;
                                 widget.state(gl.polygonLayers[i].center);
                               });
-                              gl.refreshMap(() {
+                              gl.refreshMainStack(() {
                                 gl.modeMapShowPolygons = true;
                               });
                             },
@@ -776,18 +779,20 @@ class _PolygonListMenu extends State<PolygonListMenu> {
                                                                   .selectedPolygonLayer]
                                                               .decodedJson,
                                                           () {
-                                                            gl.refreshMap(
+                                                            gl.refreshMainStack(
                                                               () {},
                                                             );
                                                           },
                                                           () {
-                                                            gl.refreshMap(
+                                                            gl.refreshMainStack(
                                                               () {},
                                                             );
                                                           },
                                                         ),
                                                       );
-                                                      gl.refreshMap(() {});
+                                                      gl.refreshMainStack(
+                                                        () {},
+                                                      );
                                                     }
                                                   },
                                                   icon: Icon(
@@ -877,7 +882,7 @@ class _PolygonListMenu extends State<PolygonListMenu> {
                     gl.selectedPolygonLayer = gl.polygonLayers.length - 1;
                   });
 
-                  gl.refreshMap(() {
+                  gl.refreshMainStack(() {
                     gl.selectedPolygonLayer = gl.polygonLayers.length - 1;
                     gl.saveChangesToPolygoneToPrefs = true;
                   });
@@ -1079,14 +1084,14 @@ class _PolygonListMenu extends State<PolygonListMenu> {
                                                     .selectedPolygonLayer]
                                                 .decodedJson,
                                             () {
-                                              gl.refreshMap(() {});
+                                              gl.refreshMainStack(() {});
                                             },
                                             () {
-                                              gl.refreshMap(() {});
+                                              gl.refreshMainStack(() {});
                                             },
                                           ),
                                         );
-                                        gl.refreshMap(() {});
+                                        gl.refreshMainStack(() {});
                                       }
                                     },
                                     icon: Icon(
@@ -1178,7 +1183,7 @@ class _PolygonListMenu extends State<PolygonListMenu> {
                       gl.selectedPolygonLayer = gl.polygonLayers.length - 1;
                     });
 
-                    gl.refreshMap(() {
+                    gl.refreshMainStack(() {
                       gl.selectedPolygonLayer = gl.polygonLayers.length - 1;
                       gl.saveChangesToPolygoneToPrefs = true;
                     });
@@ -1210,8 +1215,8 @@ Widget switchRowColWithOrientation(List<Widget> tree) {
 Widget popupSearchMenu(
   BuildContext context,
   String currentName,
-  Function(LatLng) state,
-  Function after,
+  ValueChanged<LatLng> state,
+  VoidCallback after,
 ) {
   _selectedSearchResultCard = -1;
   return MaterialApp(
@@ -1255,7 +1260,7 @@ Widget popupSearchMenu(
 
 class SearchResultCard extends StatefulWidget {
   final Color boxColor;
-  final Function(LatLng) state;
+  final ValueChanged<LatLng> state;
   final String typeDeResultat;
   final String descriptionDeResultat;
   final LatLng entry;
@@ -1276,7 +1281,7 @@ class SearchResultCard extends StatefulWidget {
 }
 
 int _selectedSearchResultCard = -1;
-Function _revertStateOfSelectedSearchResultCard = () {};
+VoidCallback _revertStateOfSelectedSearchResultCard = () {};
 
 class _SearchResultCard extends State<SearchResultCard> {
   @override
@@ -1285,7 +1290,7 @@ class _SearchResultCard extends State<SearchResultCard> {
     return TextButton(
       onPressed: () {
         widget.state(widget.entry);
-        gl.refreshMap(() {
+        gl.refreshMainStack(() {
           gl.modeMapShowSearchMarker = true;
         });
         selected
@@ -1374,8 +1379,8 @@ class _SearchResultCard extends State<SearchResultCard> {
 }
 
 class SearchMenu extends StatefulWidget {
-  final Function(LatLng) state;
-  final Function after;
+  final ValueChanged<LatLng> state;
+  final VoidCallback after;
 
   const SearchMenu({super.key, required this.state, required this.after});
 
@@ -1652,7 +1657,7 @@ class _SearchMenu extends State<SearchMenu> {
 }
 
 int developperModeCounter = 0;
-Widget forestimatorSettingsVersion(Function state) {
+Widget forestimatorSettingsVersion(VoidSetter state) {
   return OrientationBuilder(
     builder: (context, orientation) {
       return Container(
@@ -1896,7 +1901,7 @@ class _ForestimatorVariables extends State<ForestimatorVariables> {
           setState(() {
             gl.Display.modeExpert = it;
           });
-          gl.refreshMap(() {});
+          gl.refreshMainStack(() {});
         }, false),
         variableBooleanSlider(
           "Experimental Tools",
@@ -1905,7 +1910,7 @@ class _ForestimatorVariables extends State<ForestimatorVariables> {
             setState(() {
               gl.Display.modeExpertTools = it;
             });
-            gl.refreshMap(() {});
+            gl.refreshMainStack(() {});
           },
           true,
         ),
@@ -1915,7 +1920,7 @@ class _ForestimatorVariables extends State<ForestimatorVariables> {
           setState(() {
             gl.Display.overrideModeTablet = it;
           });
-          gl.refreshMap(() {});
+          gl.refreshMainStack(() {});
         }, true),
         variableBooleanSlider("Square Mode", gl.Display.overrideModeSquare, (
           bool it,
@@ -1923,7 +1928,7 @@ class _ForestimatorVariables extends State<ForestimatorVariables> {
           setState(() {
             gl.Display.overrideModeSquare = it;
           });
-          gl.refreshMap(() {});
+          gl.refreshMainStack(() {});
         }, true),
       ],
     );
@@ -1933,7 +1938,7 @@ class _ForestimatorVariables extends State<ForestimatorVariables> {
 Widget variableBooleanSlider(
   String description,
   bool boolean,
-  Function(bool) changed,
+  ValueChanged<bool> changed,
   bool dangerousToPlayWith,
 ) {
   return Row(
@@ -2074,7 +2079,7 @@ TextStyle styleSettingMenu() {
   );
 }
 
-Widget forestimatorSettingsPermissions(Function state) {
+Widget forestimatorSettingsPermissions(VoidSetter state) {
   return Container(
     padding: EdgeInsets.all(7.5),
     child: Column(
@@ -2258,7 +2263,7 @@ class ItemSettings {
 }
 
 class SettingsMenu extends StatefulWidget {
-  final Function state;
+  final VoidCallback state;
 
   const SettingsMenu({super.key, required this.state});
 
@@ -2278,14 +2283,16 @@ class _SettingsMenu extends State<SettingsMenu> {
       menuItems.addAll([
         ItemSettings(
           name: "Permissions",
-          entry: forestimatorSettingsPermissions((Function f) {
-            _listInitialzed = false;
-            setState(f());
+          entry: forestimatorSettingsPermissions((void Function() f) {
+            setState(() {
+              _listInitialzed = false;
+              f();
+            });
           }),
         ),
         ItemSettings(
           name: "À propos de Forestimator",
-          entry: forestimatorSettingsVersion((Function f) {
+          entry: forestimatorSettingsVersion((void Function() f) {
             setState(() {
               f();
               if (gl.modeDevelopper) {
@@ -2361,8 +2368,8 @@ class _SettingsMenu extends State<SettingsMenu> {
 Widget popupPolygonListMenu(
   BuildContext context,
   String currentName,
-  Function(LatLng) state,
-  Function after,
+  ValueChanged<LatLng> state,
+  VoidCallback after,
 ) {
   return MaterialApp(
     home: OrientationBuilder(
@@ -2403,7 +2410,7 @@ Widget popupPolygonListMenu(
   );
 }
 
-Widget _returnButton(BuildContext context, Function after) {
+Widget _returnButton(BuildContext context, VoidCallback after) {
   return TextButton(
     style: ButtonStyle(
       backgroundColor: WidgetStateProperty.fromMap(
@@ -2446,7 +2453,7 @@ Widget _returnButton(BuildContext context, Function after) {
   );
 }
 
-Widget _returnButtonShort(BuildContext context, Function after) {
+Widget _returnButtonShort(BuildContext context, VoidCallback after) {
   return TextButton(
     style: ButtonStyle(
       backgroundColor: WidgetStateProperty.fromMap(
@@ -2492,8 +2499,8 @@ Widget _returnButtonShort(BuildContext context, Function after) {
 Widget popupSettingsMenu(
   BuildContext context,
   String currentName,
-  Function state,
-  Function after,
+  VoidCallback state,
+  VoidCallback after,
 ) {
   return MaterialApp(
     home: OrientationBuilder(
@@ -2763,8 +2770,8 @@ class _ResultsMenu extends State<ResultsMenu> {
 Widget popupResultsMenu(
   BuildContext context,
   Map<String, dynamic> json,
-  Function state,
-  Function after,
+  VoidCallback state,
+  VoidCallback after,
 ) {
   return OrientationBuilder(
     builder: (context, orientation) {
@@ -3147,7 +3154,7 @@ class MapLayerSelectionButton extends StatefulWidget {
   final int selectionMode;
   final int index;
   final LayerTile layerTile;
-  final Function state;
+  final VoidSetter state;
   const MapLayerSelectionButton({
     super.key,
     required this.offlineMode,
@@ -3162,7 +3169,7 @@ class MapLayerSelectionButton extends StatefulWidget {
 }
 
 class _MapLayerSelectionButtonState extends State<MapLayerSelectionButton> {
-  static final Map<int, Function> _layerSelectionSetStates = {
+  static final Map<int, VoidCallback> _layerSelectionSetStates = {
     -1: () {},
     0: () {},
     1: () {},
@@ -3170,10 +3177,10 @@ class _MapLayerSelectionButtonState extends State<MapLayerSelectionButton> {
   };
 
   void _callSelectedButtonsSetStates() {
-    for (Function function in _layerSelectionSetStates.values) {
+    for (final VoidCallback function in _layerSelectionSetStates.values) {
       function();
     }
-    gl.refreshMap(() {});
+    gl.refreshMainStack(() {});
     gl.rebuildSwitcherBox(() {});
   }
 
@@ -3287,7 +3294,7 @@ class _MapLayerSelectionButtonState extends State<MapLayerSelectionButton> {
               }
             }
           }
-          gl.refreshMap(() {});
+          gl.refreshMainStack(() {});
           _callSelectedButtonsSetStates();
         },
         child: Icon(
@@ -3353,10 +3360,10 @@ class _MapLayerSelectionButtonState extends State<MapLayerSelectionButton> {
 }
 
 class OnlineMapMenu extends StatefulWidget {
-  final Function? stateOfLayerSwitcher;
+  final VoidSetter? stateOfLayerSwitcher;
   final bool offlineMode;
   final int selectionMode;
-  final Function after;
+  final VoidCallback after;
   final String selectedMapCode;
   const OnlineMapMenu({
     super.key,
@@ -3401,22 +3408,22 @@ class _OnlineMapMenu extends State<OnlineMapMenu> {
 
   @override
   Widget build(BuildContext context) {
-    Function stateOfLayerSwitcher;
+    VoidSetter stateOfLayerSwitcher;
     if (widget.stateOfLayerSwitcher == null) {
-      stateOfLayerSwitcher = (Function f) {
+      stateOfLayerSwitcher = (void Function() f) {
         f();
       };
     } else {
       stateOfLayerSwitcher = widget.stateOfLayerSwitcher!;
     }
-    gl.rebuildOfflineCatalogue = (Function f) {
-      mounted
-          ? setState(() {
-            f();
-          })
-          : (Function f) {
-            f();
-          };
+    gl.rebuildOfflineCatalogue = (void Function() f) {
+      if (mounted) {
+        setState(() {
+          f();
+        });
+      } else {
+        f();
+      }
     };
     return gl.firstTimeUse
         ? PopupDownloadRecomendedLayers(
@@ -3880,23 +3887,25 @@ class MapStatusSymbols extends StatefulWidget {
 }
 
 class _MapStatusSymbols extends State<MapStatusSymbols> {
-  static final Map<String, Function> _setStateStatusMaps = {};
+  static final Map<String, VoidSetter> _setStateStatusMaps = {};
   static bool _onlyOnce = true;
   String? mapName;
 
   @override
   void initState() {
     mapName = widget.layerCode;
-    _setStateStatusMaps[mapName!] = (Function f) {
-      mounted
-          ? setState(() {
-            f();
-          })
-          : f();
+    _setStateStatusMaps[mapName!] = (void Function() f) {
+      if (mounted) {
+        setState(() {
+          f();
+        });
+      } else {
+        f();
+      }
     };
     if (_onlyOnce) {
-      gl.rebuildStatusSymbols = (Function f) {
-        for (Function status in _setStateStatusMaps.values) {
+      gl.rebuildStatusSymbols = (void Function() f) {
+        for (final VoidSetter status in _setStateStatusMaps.values) {
           status(f);
         }
       };
@@ -3983,8 +3992,8 @@ Card layerTileCard(
   LayerTile? layerTile,
   bool offlineMode,
   int selectionMode,
-  Function stateOfLayerSwitcher,
-  Function setState, {
+  VoidSetter stateOfLayerSwitcher,
+  VoidSetter setState, {
   bool noLegend = false,
 }) {
   return layerTile != null
@@ -4193,11 +4202,11 @@ Widget stroke(double space, double thickness, Color color) {
 
 Widget popupOnlineMapMenu(
   BuildContext context,
-  Function after,
+  VoidCallback after,
   bool offlineMode,
   int selectionMode,
   String selectedLayer,
-  stateOfLayerSwitcher,
+  VoidSetter? stateOfLayerSwitcher,
 ) {
   return OrientationBuilder(
     builder: (context, orientation) {
@@ -4270,8 +4279,8 @@ class PopupPdfMenu {
 
 Widget popupLayerSwitcher(
   BuildContext context,
-  Function after,
-  Function mainMenuBarDummy,
+  VoidCallback after,
+  Widget Function(VoidCallback) mainMenuBarDummy,
   void Function(LatLng) switchToLocationInSearchMenu,
 ) {
   return OrientationBuilder(
@@ -4330,14 +4339,14 @@ class LayerSwitcher extends StatefulWidget {
 class _LayerSwitcher extends State<LayerSwitcher> {
   @override
   Widget build(BuildContext context) {
-    gl.rebuildLayerSwitcher = (Function f) {
-      mounted
-          ? setState(() {
-            f();
-          })
-          : () {
-            f();
-          };
+    gl.rebuildLayerSwitcher = (void Function() f) {
+      if (mounted) {
+        setState(() {
+          f();
+        });
+      } else {
+        f();
+      }
     };
     return SizedBox(
       width:
@@ -4569,7 +4578,7 @@ class _LayerSwitcher extends State<LayerSwitcher> {
 }
 
 class ViewCatalogueControl extends StatefulWidget {
-  final Function stateOfLayerSwitcher;
+  final VoidSetter stateOfLayerSwitcher;
   const ViewCatalogueControl(this.stateOfLayerSwitcher, {super.key});
   @override
   State<ViewCatalogueControl> createState() => _ViewCatalogueControl();
@@ -4581,14 +4590,14 @@ class _ViewCatalogueControl extends State<ViewCatalogueControl> {
 
   @override
   void initState() {
-    gl.rebuildSwitcherCatalogueButtons = (Function f) {
-      mounted
-          ? setState(() {
-            f();
-          })
-          : () {
-            f();
-          };
+    gl.rebuildSwitcherCatalogueButtons = (void Function() f) {
+      if (mounted) {
+        setState(() {
+          f();
+        });
+      } else {
+        f();
+      }
     };
     super.initState();
   }
@@ -4620,7 +4629,7 @@ class _ViewCatalogueControl extends State<ViewCatalogueControl> {
                         popupOnlineMapMenu(
                           gl.notificationContext!,
                           () {
-                            gl.refreshMap(() {
+                            gl.refreshMainStack(() {
                               _modeViewOfflineMap = false;
                             });
                             if (mounted) {
@@ -4639,7 +4648,7 @@ class _ViewCatalogueControl extends State<ViewCatalogueControl> {
                     setState(() {
                       _modeViewOfflineMap = true;
                     });
-                    gl.refreshMap(() {
+                    gl.refreshMainStack(() {
                       _modeViewOfflineMap = true;
                     });
                   },
@@ -4663,7 +4672,7 @@ class _ViewCatalogueControl extends State<ViewCatalogueControl> {
                         popupOnlineMapMenu(
                           gl.notificationContext!,
                           () {
-                            gl.refreshMap(() {
+                            gl.refreshMainStack(() {
                               _modeViewOnlineMap = false;
                             });
                             if (mounted) {
@@ -4682,7 +4691,7 @@ class _ViewCatalogueControl extends State<ViewCatalogueControl> {
                     setState(() {
                       _modeViewOnlineMap = true;
                     });
-                    gl.refreshMap(() {
+                    gl.refreshMainStack(() {
                       _modeViewOnlineMap = true;
                     });
                   },
@@ -4748,11 +4757,11 @@ class _UpperLayerControl extends State<UpperLayerControl> {
                           "",
                           widget.switchToLocationInSearchMenu,
                           () {
-                            gl.refreshMap(() {});
+                            gl.refreshMainStack(() {});
                           },
                         ),
                       );
-                      gl.refreshMap(() {});
+                      gl.refreshMainStack(() {});
                     },
                     child: Container(
                       padding: EdgeInsets.symmetric(horizontal: 1.0),
@@ -4804,7 +4813,7 @@ class _UpperLayerControl extends State<UpperLayerControl> {
                                   gl.modeMapShowSearchMarker =
                                       !gl.modeMapShowSearchMarker;
                                 });
-                                gl.refreshMap(() {});
+                                gl.refreshMainStack(() {});
                               },
                               child: Icon(
                                 Icons.remove_red_eye,
@@ -4853,11 +4862,11 @@ class _UpperLayerControl extends State<UpperLayerControl> {
                           gl.polygonLayers[gl.selectedPolygonLayer].name,
                           widget.switchToLocationInSearchMenu,
                           () {
-                            gl.refreshMap(() {});
+                            gl.refreshMainStack(() {});
                           },
                         ),
                       );
-                      gl.refreshMap(() {});
+                      gl.refreshMainStack(() {});
                     },
                     child: Container(
                       alignment: Alignment.centerLeft,
@@ -4909,7 +4918,7 @@ class _UpperLayerControl extends State<UpperLayerControl> {
                                   gl.modeMapShowPolygons =
                                       !gl.modeMapShowPolygons;
                                 });
-                                gl.refreshMap(() {});
+                                gl.refreshMainStack(() {});
                               },
                               child: Icon(
                                 Icons.remove_red_eye,
@@ -4975,7 +4984,7 @@ class _SwitcherBox extends State<SwitcherBox> {
               index: oldIndex,
               offline: tmpOffline,
             );
-            gl.refreshMap(() {});
+            gl.refreshMainStack(() {});
           });
         },
 
@@ -5021,7 +5030,7 @@ class _SwitcherBox extends State<SwitcherBox> {
                               popupOnlineMapMenu(
                                 gl.notificationContext!,
                                 () {
-                                  gl.refreshMap(() {});
+                                  gl.refreshMainStack(() {});
                                 },
                                 gl.offlineMode,
                                 i,
@@ -5029,7 +5038,7 @@ class _SwitcherBox extends State<SwitcherBox> {
                                 null,
                               ),
                             );
-                            gl.refreshMap(() {});
+                            gl.refreshMainStack(() {});
                           },
                           child: Container(
                             alignment: Alignment.centerLeft,
@@ -5104,8 +5113,12 @@ class _SwitcherBox extends State<SwitcherBox> {
                         ),
                       ],
                     ),
-                    if (i == 0 &&
-                        !gl.offlineMode) //Pour la transparance de la première tile
+                    if ((i == 0 && !gl.offlineMode) ||
+                        (i == 1 &&
+                            !gl.offlineMode &&
+                            gl
+                                .Display
+                                .modeExpertTools)) //Pour la transparance de la première tile
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -5163,7 +5176,7 @@ class _SwitcherBox extends State<SwitcherBox> {
                                   gl.modeMapFirstTileLayerTransparancy =
                                       !gl.modeMapFirstTileLayerTransparancy;
                                 });
-                                gl.refreshMap(() {});
+                                gl.refreshMainStack(() {});
                               },
                               child: Text(
                                 gl.modeMapFirstTileLayerTransparancy
@@ -5218,7 +5231,7 @@ class _SwitcherBox extends State<SwitcherBox> {
                               popupOnlineMapMenu(
                                 gl.notificationContext!,
                                 () {
-                                  gl.refreshMap(() {});
+                                  gl.refreshMainStack(() {});
                                 },
                                 gl.offlineMode,
                                 i,
@@ -5226,7 +5239,7 @@ class _SwitcherBox extends State<SwitcherBox> {
                                 null,
                               ),
                             );
-                            gl.refreshMap(() {});
+                            gl.refreshMainStack(() {});
                           },
                           child: Container(
                             padding: EdgeInsets.symmetric(horizontal: 1.0),
@@ -5268,7 +5281,7 @@ class _SwitcherBox extends State<SwitcherBox> {
 class PopupDoYouReally {
   PopupDoYouReally(
     BuildContext context,
-    Function after,
+    VoidCallback after,
     String title,
     String message,
   ) {
@@ -5371,7 +5384,7 @@ class PopupDoYouReally {
 Widget popupAnaResultsMenu(
   BuildContext context,
   List<LayerAnaPt> requestedLayers,
-  Function after,
+  VoidCallback after,
 ) {
   return OrientationBuilder(
     builder: (context, orientation) {
@@ -5411,7 +5424,7 @@ Widget popupAnaResultsMenu(
 
 class AnaResultsMenu extends StatefulWidget {
   final List<LayerAnaPt> requestedLayers;
-  final Function after;
+  final VoidCallback after;
   const AnaResultsMenu(this.after, this.requestedLayers, {super.key});
 
   @override
@@ -5486,7 +5499,12 @@ class _AnaResultsMenu extends State<AnaResultsMenu> {
                     color: Colors.white.withAlpha(200),
                     child: ListBody(
                       children: _injectLayerResults(
-                        (int i, ResultCard result) => TextButton(
+                        (
+                          int i,
+                          ResultCard result,
+                          String mCode,
+                          int mRastValue,
+                        ) => TextButton(
                           style: ButtonStyle(
                             minimumSize: WidgetStateProperty<Size>.fromMap(<
                               WidgetStatesConstraint,
@@ -5512,11 +5530,42 @@ class _AnaResultsMenu extends State<AnaResultsMenu> {
                                           gl.display.equipixel * gl.iconSizeS,
                                       height:
                                           gl.display.equipixel * gl.iconSizeS,
-                                      child: Icon(
-                                        result.leading,
-                                        color: Colors.black,
-                                        size:
-                                            gl.display.equipixel * gl.iconSizeS,
+                                      child: Stack(
+                                        children: [
+                                          Icon(
+                                            result.leading,
+                                            color: Colors.black,
+                                            size:
+                                                gl.display.equipixel *
+                                                gl.iconSizeS,
+                                          ),
+                                          if ((gl.dico
+                                                      .getLayerBase(mCode)
+                                                      .hasDoc() &&
+                                                  mCode != "CS_A") ||
+                                              (gl.dico
+                                                      .getLayerBase(mCode)
+                                                      .hasDoc() &&
+                                                  mCode == "CS_A" &&
+                                                  mRastValue < 99))
+                                            Container(
+                                              alignment: Alignment.topRight,
+                                              width:
+                                                  gl.display.equipixel *
+                                                  gl.iconSizeM,
+                                              height:
+                                                  gl.display.equipixel *
+                                                  gl.iconSizeM,
+                                              child: Icon(
+                                                Icons.picture_as_pdf_sharp,
+                                                size:
+                                                    gl.display.equipixel *
+                                                    gl.iconSizeXS *
+                                                    .7,
+                                                color: Colors.red,
+                                              ),
+                                            ),
+                                        ],
                                       ),
                                     ),
                                     SizedBox(
@@ -5733,7 +5782,6 @@ class _AnaResultsMenu extends State<AnaResultsMenu> {
                     },
                   ),
                 ),
-
                 child: Text(
                   "Enregistrer",
                   maxLines: 2,
@@ -5744,41 +5792,37 @@ class _AnaResultsMenu extends State<AnaResultsMenu> {
                   ),
                 ),
                 onPressed: () async {
-                  bool isPermitted = true;
-                  if (isPermitted) {
-                    gl.mainStack.add(
-                      popupPdfSaveDialog((
-                        String pdf,
-                        String locationName,
-                      ) async {
-                        gl.mainStackPopLast();
-                        gl.refreshMap(() {});
-                        if (pdf.isEmpty) {
-                          pdf =
-                              "analyseForestimator${DateTime.now().day}.${DateTime.now().month}.${DateTime.now().year}.pdf";
-                        }
-                        if (pdf.length < 4 ||
-                            pdf.substring(pdf.length - 4) != ".pdf") {
-                          pdf = "$pdf.pdf";
-                        }
-                        if (locationName.isEmpty) {
-                          locationName = "une position";
-                        }
-                        String dir = "/storage/emulated/0/Download";
-                        if (Platform.isIOS) {
-                          dir = (await getApplicationDocumentsDirectory()).path;
-                        }
-                        makePdf(widget.requestedLayers, pdf, dir, locationName);
-                        // confirmation que le pdf a été créé
-                        gl.mainStack.add(
-                          popupPDFSaved(pdf, () {
-                            gl.mainStackPopLast();
-                            gl.refreshMap(() {});
-                          }),
-                        );
-                      }),
-                    );
-                  }
+                  gl.mainStack.add(
+                    popupPdfSaveDialog((String pdf, String locationName) async {
+                      gl.mainStackPopLast();
+                      gl.refreshMainStack(() {});
+                      if (pdf.isEmpty) {
+                        pdf =
+                            "analyseForestimator${DateTime.now().day}.${DateTime.now().month}.${DateTime.now().year}.pdf";
+                      }
+                      if (pdf.length < 4 ||
+                          pdf.substring(pdf.length - 4) != ".pdf") {
+                        pdf = "$pdf.pdf";
+                      }
+                      if (locationName.isEmpty) {
+                        locationName = "une position";
+                      }
+                      String dir = "/storage/emulated/0/Download";
+                      if (Platform.isIOS) {
+                        dir = (await getApplicationDocumentsDirectory()).path;
+                      }
+                      makePdf(widget.requestedLayers, pdf, dir, locationName);
+                      // confirmation que le pdf a été créé
+                      gl.mainStack.add(
+                        popupPDFSaved(pdf, () {
+                          gl.mainStackPopLast();
+                          gl.refreshMainStack(() {});
+                        }),
+                      );
+                      gl.refreshMainStack(() {});
+                    }),
+                  );
+                  gl.refreshMainStack(() {});
                 },
               ),
             ],
@@ -5788,7 +5832,9 @@ class _AnaResultsMenu extends State<AnaResultsMenu> {
     ]);
   }
 
-  List<Widget> _injectLayerResults(Widget Function(int, ResultCard) generate) {
+  List<Widget> _injectLayerResults(
+    Widget Function(int, ResultCard, String, int) generate,
+  ) {
     List<ResultCard> results = [];
 
     if (widget.requestedLayers.isNotEmpty) {
@@ -5833,9 +5879,13 @@ class _AnaResultsMenu extends State<AnaResultsMenu> {
         );
       }
     }
-
     List<Widget> resultWidgets = List<Widget>.generate(results.length, (i) {
-      return generate(i, results[i]);
+      return generate(
+        i,
+        results[i],
+        widget.requestedLayers[i].mCode,
+        widget.requestedLayers[i].mRastValue,
+      );
     });
     //return resultWidgets;
     for (int i = 0; i < results.length - 1; i++) {
@@ -5883,7 +5933,7 @@ class _AnaResultsMenu extends State<AnaResultsMenu> {
                       ) *
                       gl.display.equipixel *
                       gl.iconSizeS *
-                      1.6,
+                      1.7,
                 ),
                 child: TabBarView(
                   children: [
@@ -5943,7 +5993,7 @@ class _AnaResultsMenu extends State<AnaResultsMenu> {
                       ) *
                       gl.display.equipixel *
                       gl.iconSizeS *
-                      1.6,
+                      1.64,
                 ),
                 child: TabBarView(
                   children: [
@@ -5963,7 +6013,7 @@ class _AnaResultsMenu extends State<AnaResultsMenu> {
     );
   }
 
-  Widget popupPdfSaveDialog(Function after) {
+  Widget popupPdfSaveDialog(void Function(String, String) after) {
     return AlertDialog(
       title: Text("Nom du pdf et de la localisation"),
       content: SingleChildScrollView(
@@ -6127,44 +6177,71 @@ class EssencesListViewGS extends StatelessWidget {
       shrinkWrap: true,
       physics: NeverScrollableScrollPhysics(),
       itemBuilder: (context, index) {
-        return ListTile(
-          leading:
-              gl.dico.getEss(code.elementAt(index)).mFR == 1
-                  ? SizedBox(
-                    width: gl.display.equipixel * gl.iconSizeS,
-                    height: gl.display.equipixel * gl.iconSizeS,
-                    child: Icon(
-                      CustomIcons.tree,
-                      color: Colors.black87,
-                      size: gl.display.equipixel * gl.iconSizeS,
+        return Column(
+          children: [
+            ListTile(
+              leading: Stack(
+                children: [
+                  if (gl.dico
+                      .getEss(code.elementAt(index))
+                      .getFicheRoute()
+                      .isNotEmpty)
+                    Container(
+                      alignment: Alignment.topRight,
+                      width: gl.display.equipixel * gl.iconSizeS,
+                      height: gl.display.equipixel * gl.iconSizeS,
+                      child: Icon(
+                        Icons.picture_as_pdf_sharp,
+                        size: gl.display.equipixel * gl.iconSizeXS * .5,
+                        color: Colors.red,
+                      ),
                     ),
-                  )
-                  : SizedBox(
-                    width: gl.display.equipixel * gl.iconSizeS,
-                    height: gl.display.equipixel * gl.iconSizeS,
-                    child: Icon(
-                      Icons.forest_outlined,
-                      color: Colors.black87,
-                      size: gl.display.equipixel * gl.iconSizeXS,
-                    ),
-                  ),
-
-          title: SizedBox(
-            width: gl.display.equipixel * gl.popupWindowsPortraitWidth * .6,
-            child: Text(gl.dico.getEss(code.elementAt(index)).mNomFR),
-          ),
-          subtitle:
-              codeApt != mEss[code.elementAt(index)]
-                  ? SizedBox(
-                    child: Text(gl.dico.aptLabel(mEss[code.elementAt(index)]!)),
-                  )
-                  : null,
-          trailing: SizedBox(width: gl.display.equipixel * gl.iconSizeXS),
-          onTap: () {
-            GoRouter.of(
-              context,
-            ).push("/${gl.dico.getEss(code.elementAt(index)).getFicheRoute()}");
-          },
+                  gl.dico.getEss(code.elementAt(index)).mFR == 1
+                      ? SizedBox(
+                        width: gl.display.equipixel * gl.iconSizeS,
+                        height: gl.display.equipixel * gl.iconSizeS,
+                        child: Icon(
+                          CustomIcons.tree,
+                          color: Colors.black87,
+                          size: gl.display.equipixel * gl.iconSizeS,
+                        ),
+                      )
+                      : SizedBox(
+                        width: gl.display.equipixel * gl.iconSizeS,
+                        height: gl.display.equipixel * gl.iconSizeS,
+                        child: Icon(
+                          Icons.forest_outlined,
+                          color: Colors.black87,
+                          size: gl.display.equipixel * gl.iconSizeXS,
+                        ),
+                      ),
+                ],
+              ),
+              title: SizedBox(
+                width: gl.display.equipixel * gl.popupWindowsPortraitWidth * .6,
+                child: Text(gl.dico.getEss(code.elementAt(index)).mNomFR),
+              ),
+              subtitle:
+                  codeApt != mEss[code.elementAt(index)]
+                      ? SizedBox(
+                        child: Text(
+                          gl.dico.aptLabel(mEss[code.elementAt(index)]!),
+                        ),
+                      )
+                      : null,
+              trailing: SizedBox(width: gl.display.equipixel * gl.iconSizeXS),
+              onTap: () {
+                GoRouter.of(context).push(
+                  "/${gl.dico.getEss(code.elementAt(index)).getFicheRoute()}",
+                );
+              },
+            ),
+            stroke(
+              gl.display.equipixel,
+              gl.display.equipixel * .5,
+              gl.colorAgroBioTech,
+            ),
+          ],
         );
       },
     );
@@ -6198,70 +6275,92 @@ class EssencesListView extends StatelessWidget {
     code.sort(
       (a, b) => gl.dico.getEss(a).mNomFR.compareTo(gl.dico.getEss(b).mNomFR),
     );
-
     return ListView.builder(
       itemCount: mEss.length,
       shrinkWrap: true,
       physics: NeverScrollableScrollPhysics(),
       itemBuilder: (context, index) {
-        return ListTile(
-          leading:
-              gl.dico.getEss(code.elementAt(index)).mFR == 1
-                  ? SizedBox(
-                    width: gl.display.equipixel * gl.iconSizeS,
-                    height: gl.display.equipixel * gl.iconSizeS,
-                    child: Icon(
-                      CustomIcons.tree,
-                      color: Colors.black87,
-                      size: gl.display.equipixel * gl.iconSizeS,
-                    ),
-                  )
-                  : SizedBox(
-                    width: gl.display.equipixel * gl.iconSizeS,
-                    height: gl.display.equipixel * gl.iconSizeS,
-                    child: Icon(
-                      Icons.forest_outlined,
-                      color: Colors.black87,
-                      size: gl.display.equipixel * gl.iconSizeXS,
-                    ),
-                  ),
-
-          title: SizedBox(
-            width: gl.display.equipixel * gl.popupWindowsPortraitWidth * .6,
-            child: Text(gl.dico.getEss(code.elementAt(index)).mNomFR),
-          ),
-          subtitle:
-              codeApt != mEss[code.elementAt(index)]
-                  ? SizedBox(
-                    width:
-                        gl.display.equipixel *
-                        gl.popupWindowsPortraitWidth *
-                        .7,
-                    height: gl.display.equipixel * gl.iconSizeXS,
-                    child: Text(gl.dico.aptLabel(mEss[code.elementAt(index)]!)),
-                  )
-                  : null,
-          trailing:
-              apts.mCompensations[code.elementAt(index)]!
-                  ? SizedBox(
-                    width: gl.display.equipixel * gl.iconSizeXS,
-                    child: IconButton(
-                      icon: Icon(
-                        Icons.balance_rounded,
-                        color: Colors.black87,
-                        size: gl.display.equipixel * gl.iconSizeXS,
+        return Column(
+          children: [
+            ListTile(
+              leading: Stack(
+                children: [
+                  if (gl.dico
+                      .getEss(code.elementAt(index))
+                      .getFicheRoute()
+                      .isNotEmpty)
+                    Container(
+                      alignment: Alignment.topRight,
+                      width: gl.display.equipixel * gl.iconSizeS,
+                      height: gl.display.equipixel * gl.iconSizeS,
+                      child: Icon(
+                        Icons.picture_as_pdf,
+                        size: gl.display.equipixel * gl.iconSizeXS * .5,
+                        color: Colors.red,
                       ),
-                      onPressed: () {},
-                      tooltip:
-                          "La situation topographique provoque un effet de compensation (positif ou négatif) sur l'aptitude de cette essence",
                     ),
-                  )
-                  : SizedBox(width: gl.display.equipixel * gl.iconSizeXS),
-          onTap: () {
-            GoRouter.of(
-              context,
-            ).push("/${gl.dico.getEss(code.elementAt(index)).getFicheRoute()}");
-          },
+
+                  gl.dico.getEss(code.elementAt(index)).mFR == 1
+                      ? SizedBox(
+                        width: gl.display.equipixel * gl.iconSizeS,
+                        height: gl.display.equipixel * gl.iconSizeS,
+                        child: Icon(
+                          CustomIcons.tree,
+                          color: Colors.black87,
+                          size: gl.display.equipixel * gl.iconSizeS,
+                        ),
+                      )
+                      : SizedBox(
+                        width: gl.display.equipixel * gl.iconSizeS,
+                        height: gl.display.equipixel * gl.iconSizeS,
+                        child: Icon(
+                          Icons.forest_outlined,
+                          color: Colors.black87,
+                          size: gl.display.equipixel * gl.iconSizeXS,
+                        ),
+                      ),
+                ],
+              ),
+              title: SizedBox(
+                width: gl.display.equipixel * gl.popupWindowsPortraitWidth * .6,
+                child: Text(gl.dico.getEss(code.elementAt(index)).mNomFR),
+              ),
+              subtitle:
+                  codeApt != mEss[code.elementAt(index)]
+                      ? SizedBox(
+                        child: Text(
+                          gl.dico.aptLabel(mEss[code.elementAt(index)]!),
+                        ),
+                      )
+                      : null,
+              trailing:
+                  apts.mCompensations[code.elementAt(index)]!
+                      ? SizedBox(
+                        width: gl.display.equipixel * gl.iconSizeXS,
+                        child: IconButton(
+                          icon: Icon(
+                            Icons.info_outline,
+                            color: gl.colorUliege,
+                            size: gl.display.equipixel * gl.iconSizeXS,
+                          ),
+                          onPressed: () {},
+                          tooltip:
+                              "La situation topographique provoque un effet de compensation (positif ou négatif) sur l'aptitude de cette essence",
+                        ),
+                      )
+                      : SizedBox(width: gl.display.equipixel * gl.iconSizeXS),
+              onTap: () {
+                GoRouter.of(context).push(
+                  "/${gl.dico.getEss(code.elementAt(index)).getFicheRoute()}",
+                );
+              },
+            ),
+            stroke(
+              gl.display.equipixel,
+              gl.display.equipixel * .5,
+              gl.colorAgroBioTech,
+            ),
+          ],
         );
       },
     );

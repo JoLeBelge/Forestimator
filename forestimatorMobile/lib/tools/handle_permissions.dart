@@ -69,7 +69,7 @@ void makeAllPermissionRequests() {
 
 Widget handlePermissionForLocation({
   required Widget child,
-  required Function refreshParentWidgetTree,
+  required VoidSetter refreshParentWidgetTree,
 }) {
   if (!askOnceForLocation) return child;
   if (location.isPermanentlyDenied) {
@@ -118,7 +118,7 @@ Widget handlePermissionForLocation({
 
 Widget handlePermissionForStorage({
   required Widget child,
-  required Function refreshParentWidgetTree,
+  required VoidSetter refreshParentWidgetTree,
 }) {
   if (!askOnceForStorage) return child;
   if (storage.isDenied && release < 13) {

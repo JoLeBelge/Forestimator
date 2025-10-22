@@ -170,7 +170,7 @@ class _MapPageState extends State<MapPage> {
   void initState() {
     super.initState();
     initPermissions();
-    gl.refreshMap = refreshView;
+    gl.refreshMainStack = refreshView;
     initOtherValuesOnce();
   }
 
@@ -236,7 +236,7 @@ class _MapPageState extends State<MapPage> {
                       },
                     ),
                   );
-                  gl.refreshMap(() {});
+                  gl.refreshMainStack(() {});
                 },
                 icon: Icon(Icons.settings),
               ),
@@ -353,7 +353,7 @@ class _MapPageState extends State<MapPage> {
                                 },
                               ),
                             );
-                            gl.refreshMap(() {});
+                            gl.refreshMainStack(() {});
 
                             //GoRouter.of(gl.notificationContext!).push("/anaPt");
                           }
@@ -807,7 +807,7 @@ class _MapPageState extends State<MapPage> {
                                           );
                                         }
                                       });
-                                      gl.refreshMap(() {
+                                      gl.refreshMainStack(() {
                                         gl.modeMapShowPolygons = true;
                                       });
                                     },
@@ -847,7 +847,7 @@ class _MapPageState extends State<MapPage> {
                                                   );
                                                 }
                                               });
-                                              gl.refreshMap(() {
+                                              gl.refreshMainStack(() {
                                                 gl.modeMapShowPolygons = true;
                                               });
                                             },
@@ -1511,7 +1511,7 @@ class _MapPageState extends State<MapPage> {
     _modeLayerSwitches = false;
   }
 
-  Widget _mainMenuBar({bool dummy = false, Function? close}) {
+  Widget _mainMenuBar({bool dummy = false, VoidCallback? close}) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
@@ -2235,7 +2235,7 @@ Future<Position?> acquireUserLocation() async {
 
 class AnaPtPreview extends StatefulWidget {
   final LatLng position;
-  final Function after;
+  final VoidCallback after;
   const AnaPtPreview({super.key, required this.position, required this.after});
 
   @override
@@ -2313,7 +2313,7 @@ class _AnaPtPreview extends State<AnaPtPreview> {
     );
   }
 
-  Future _runAnaPtPreview(proj4.Point ptBL72, Function after) async {
+  Future _runAnaPtPreview(proj4.Point ptBL72, VoidCallback after) async {
     Map data;
     bool internet = await InternetConnection().hasInternetAccess;
     if (!gl.offlineMode) {

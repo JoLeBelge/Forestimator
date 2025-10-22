@@ -32,3 +32,4 @@ forestimatorWeb/Makefile
 *.log
 forestimatorWeb/log.txt
 *forestimator.cfg
+VideosTuto/*

@@ -19,7 +19,7 @@ class TifFileTileProvider extends TileProvider {
 
   bool get loaded => _loaded;
 
-  Function refreshView;
+  gl.VoidSetter refreshView;
 
   TifFileTileProvider({
     super.headers,
@@ -30,7 +30,7 @@ class TifFileTileProvider extends TileProvider {
   });
 
   void init() async {
-    _loadAndDecodeImage().whenComplete(() => gl.refreshMap(() {}));
+    _loadAndDecodeImage().whenComplete(() => gl.refreshMainStack(() {}));
   }
 
   Future _loadAndDecodeImage() async {

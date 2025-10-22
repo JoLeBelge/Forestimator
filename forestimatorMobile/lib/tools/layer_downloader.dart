@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:fforestimator/globals.dart' as gl;
 import 'package:flutter_downloader/flutter_downloader.dart';
 
-final Map<String, Function> _downloadIdToStateFunction = {};
+final Map<String, VoidSetter> _downloadIdToStateFunction = {};
 final Map<String, String> _layerKeyToDownloadId = {};
 final Map<String, String> _downloadIdToLayerKey = {};
 final Map<String, String> _downloadIdToLayerName = {};
@@ -141,12 +141,11 @@ class _LayerDownloaderState extends State<LayerDownloader> {
           downloadId = await fD?.downloadFile(widget.layer.key);
           setState(() {
             _layerKeyToDownloadId[widget.layer.key] = downloadId!;
-            _downloadIdToStateFunction[downloadId!] =
-                (Function f) => () {
-                  setState(() {
-                    f();
-                  });
-                };
+            _downloadIdToStateFunction[downloadId!] = (void Function() f) {
+              setState(() {
+                f();
+              });
+            };
           });
         },
         child: Row(
@@ -194,10 +193,11 @@ class _LayerDownloaderState extends State<LayerDownloader> {
           downloadId = await fD?.downloadFile(widget.layer.key);
           setState(() {
             _layerKeyToDownloadId[widget.layer.key] = downloadId!;
-            _downloadIdToStateFunction[downloadId!] =
-                (Function f) => setState(() {
-                  f();
-                });
+            _downloadIdToStateFunction[downloadId!] = (void Function() f) {
+              setState(() {
+                f();
+              });
+            };
           });
         },
         child: Row(
@@ -230,7 +230,7 @@ class _LayerDownloaderState extends State<LayerDownloader> {
     if (_layerKeyToDownloadId[widget.layer.key] != null) {
       id = _layerKeyToDownloadId[widget.layer.key]!;
       downloadId = id;
-      _downloadIdToStateFunction[id] = (Function f) {
+      _downloadIdToStateFunction[id] = (void Function() f) {
         setState(() {
           f();
         });
@@ -241,7 +241,7 @@ class _LayerDownloaderState extends State<LayerDownloader> {
 
   @override
   void dispose() {
-    _downloadIdToStateFunction[downloadId!] = (Function f) {
+    _downloadIdToStateFunction[downloadId!] = (void Function() f) {
       f();
     };
     super.dispose();
@@ -311,7 +311,7 @@ class ForestimatorDownloader {
     _port.listen((dynamic data) {
       String idListened = data[0];
       String layerKey = "", layerName = "";
-      Function widgetState = (f) {
+      VoidSetter widgetState = (void Function() f) {
         f();
       };
       if (_downloadIdToStateFunction[idListened] != null) {
