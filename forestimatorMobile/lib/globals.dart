@@ -11,7 +11,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 // A helper typedef used across the app for setters that accept a function to run
 typedef VoidSetter = void Function(void Function());
 
-const String forestimatorMobileVersion = "2.0.0 - build 21";
+const String forestimatorMobileVersion = "2.1.0 - build 22";
 const double globalMinZoom = 4.0;
 const double globalMaxZoom = 13.0;
 const double globalMinOfflineZoom = 8.0;
@@ -24,6 +24,8 @@ bool modeMapShowPolygons = true;
 bool modeMapShowSearchMarker = true;
 bool modeMapShowCustomMarker = true;
 bool modeDevelopper = false;
+bool modeSettings = false;
+bool modeMenuResults = false;
 
 class Display {
   double width = -1;
@@ -373,13 +375,13 @@ VoidSetter refreshMainStack = (void Function() f) {
 VoidSetter rebuildSwitcherCatalogueButtons = (void Function() setter) {};
 VoidSetter refreshSearch = (void Function() setter) {};
 VoidSetter refreshSettingsMenu = (void Function() setter) {};
-VoidCallback refreshCurrentThreeLayer = () {};
 VoidSetter rebuildOfflineCatalogue = (void Function() setter) {};
 VoidSetter rebuildSwitcherBox = (void Function() setter) {};
 VoidSetter rebuildLayerSwitcher = (void Function() setter) {};
 VoidSetter rebuildStatusSymbols = (void Function() setter) {};
 VoidCallback? rebuildNavigatorBar;
 void Function(dynamic) removeFromOfflineList = (var x) {};
+Function(bool, bool) resetSelected = (bool a, bool b) {};
 
 int nMaxSelectedLayer = 3;
 
@@ -677,5 +679,9 @@ Map<int, int> lutVulnerabiliteCS = {
 List<Widget> mainStack = [];
 
 void mainStackPopLast() {
-  mainStack.removeLast();
+  if (mainStack.isNotEmpty) {
+    mainStack.removeLast();
+  } else {
+    print("Error: Stack is empty, cannot pop last element!");
+  }
 }

@@ -14,7 +14,6 @@ import 'package:geolocator/geolocator.dart';
 import 'package:fforestimator/globals.dart' as gl;
 import 'package:http/http.dart' as http;
 import 'package:fforestimator/pages/anaPt/requested_layer.dart';
-import 'package:go_router/go_router.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fforestimator/tools/notification.dart';
@@ -224,18 +223,23 @@ class _MapPageState extends State<MapPage> {
                 iconSize: gl.display.equipixel * gl.iconSizeSettings,
                 color: gl.offlineMode ? Colors.black : Colors.white,
                 onPressed: () {
-                  gl.mainStack.add(
-                    popupSettingsMenu(
-                      gl.notificationContext!,
-                      "",
-                      () {
-                        refreshView(() {});
-                      },
-                      () {
-                        refreshView(() {});
-                      },
-                    ),
-                  );
+                  if (!gl.modeSettings) {
+                    gl.mainStack.add(
+                      popupSettingsMenu(
+                        gl.notificationContext!,
+                        "",
+                        () {
+                          refreshView(() {});
+                        },
+                        () {
+                          refreshView(() {});
+                        },
+                      ),
+                    );
+                  } else {
+                    gl.mainStackPopLast();
+                    gl.modeSettings = false;
+                  }
                   gl.refreshMainStack(() {});
                 },
                 icon: Icon(Icons.settings),
@@ -354,8 +358,6 @@ class _MapPageState extends State<MapPage> {
                               ),
                             );
                             gl.refreshMainStack(() {});
-
-                            //GoRouter.of(gl.notificationContext!).push("/anaPt");
                           }
                         },
                         onTap:
@@ -1265,10 +1267,18 @@ class _MapPageState extends State<MapPage> {
                     proj4.Point(x: _pt!.longitude, y: _pt!.latitude),
                   ),
                 );
+                gl.mainStack.add(
+                  popupAnaResultsMenu(
+                    gl.notificationContext!,
+                    gl.requestedLayers,
+                    () {
+                      refreshView(() {});
+                    },
+                  ),
+                );
                 refreshView(() {
                   _doingAnaPt = false;
                 });
-                GoRouter.of(gl.notificationContext!).push("/anaPt");
               }
             },
             child: Column(
@@ -1747,9 +1757,15 @@ class _MapPageState extends State<MapPage> {
                                           gl.position?.longitude ?? 0.0,
                                         ),
                                       );
-                                      GoRouter.of(
-                                        gl.notificationContext!,
-                                      ).push("/anaPt");
+                                      gl.mainStack.add(
+                                        popupAnaResultsMenu(
+                                          gl.notificationContext!,
+                                          gl.requestedLayers,
+                                          () {
+                                            refreshView(() {});
+                                          },
+                                        ),
+                                      );
                                       refreshView(() {
                                         _doingAnaPt = false;
                                       });

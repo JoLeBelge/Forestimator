@@ -89,6 +89,10 @@ class _LayerDownloaderState extends State<LayerDownloader> {
                 gl.rebuildOfflineCatalogue(() {
                   gl.dico.getLayerBase(widget.layer.key).mOffline = false;
                 });
+                gl.rebuildStatusSymbols(() {
+                  gl.dico.getLayerBase(widget.layer.key).mOffline = false;
+                });
+                gl.resetSelected(false, true);
               });
             },
             "Message",
