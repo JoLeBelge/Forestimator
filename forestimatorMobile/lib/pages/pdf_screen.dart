@@ -28,12 +28,6 @@ class _PDFScreenState extends State<PDFScreen> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.titre),
-        actions: <Widget>[
-          IconButton(icon: Icon(Icons.share), onPressed: () {}),
-        ],
-      ),
       body: Stack(
         children: <Widget>[
           PDFView(
@@ -74,6 +68,31 @@ class _PDFScreenState extends State<PDFScreen> with WidgetsBindingObserver {
                 gl.currentPage = page!;
               });
             },
+          ),
+          Row(
+            children: [
+              TextButton(
+                child: Stack(
+                  children: [
+                    Icon(
+                      Icons.arrow_back,
+                      color: Colors.black,
+                      size: gl.iconSizeM * gl.display.equipixel,
+                    ),
+                    Icon(
+                      Icons.arrow_back,
+                      color: Colors.white,
+                      size: gl.iconSizeM * (gl.display.equipixel - .2),
+                    ),
+                  ],
+                ),
+                onPressed: () {
+                  gl.mainStackPopLast();
+                  gl.refreshMainStack(() {});
+                },
+              ),
+              //IconButton(icon: Icon(Icons.share), onPressed: () {}),
+            ],
           ),
           errorMessage.isEmpty
               ? !isReady

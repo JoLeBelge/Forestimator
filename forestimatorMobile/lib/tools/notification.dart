@@ -31,6 +31,76 @@ import 'package:intl/intl.dart';
 // A helper typedef: accepts a function to run inside a setter (used by global rebuild callbacks)
 typedef VoidSetter = void Function(void Function());
 
+ButtonStyle dialogButtonStyle({
+  double width = 0,
+  double height = 0,
+  Color color = gl.colorAgroBioTech,
+  double borderWidth = 0,
+}) {
+  return ButtonStyle(
+    backgroundColor: WidgetStateProperty.fromMap(
+      <WidgetStatesConstraint, Color>{WidgetState.any: color.withAlpha(200)},
+    ),
+    shape: WidgetStateProperty<OutlinedBorder>.fromMap(
+      <WidgetStatesConstraint, OutlinedBorder>{
+        WidgetState.any: RoundedRectangleBorder(
+          borderRadius: BorderRadiusGeometry.circular(12.0),
+          side: BorderSide(color: color, width: borderWidth),
+        ),
+      },
+    ),
+    fixedSize: WidgetStateProperty.fromMap(<WidgetStatesConstraint, Size>{
+      WidgetState.any: Size(
+        width == 0
+            ? gl.display.equipixel * gl.popupReturnButtonWidth * .7
+            : width,
+        height == 0
+            ? gl.display.equipixel * gl.popupReturnButtonHeight
+            : height,
+      ),
+    }),
+  );
+}
+
+TextStyle dialogTextButtonStyle() {
+  return TextStyle(
+    color: Colors.black,
+    fontWeight: FontWeight.w600,
+    fontSize: gl.display.equipixel * gl.fontSizeM,
+  );
+}
+
+void popupBarrierWrapper({required Widget popup, bool dismiss = true}) {
+  gl.mainStack.add(
+    OrientationBuilder(
+      builder: (context, orientation) {
+        return dismiss
+            ? TextButton(
+              style: ButtonStyle(
+                shadowColor: WidgetStateProperty.fromMap(
+                  <WidgetStatesConstraint, Color>{
+                    WidgetState.any: Colors.transparent,
+                  },
+                ),
+                backgroundColor: WidgetStateProperty.fromMap(
+                  <WidgetStatesConstraint, Color>{
+                    WidgetState.any: Colors.transparent,
+                  },
+                ),
+                animationDuration: Duration.zero,
+              ),
+              onPressed: () {
+                gl.mainStackPopLast();
+                gl.refreshMainStack(() {});
+              },
+              child: popup,
+            )
+            : popup;
+      },
+    ),
+  );
+}
+
 class PopupDownloadRecomendedLayers extends StatelessWidget {
   final String? title;
   final String? dialog;
@@ -51,17 +121,49 @@ class PopupDownloadRecomendedLayers extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text(title!),
-      content: Text(dialog!),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadiusGeometry.circular(12.0),
+        side: BorderSide(color: gl.colorAgroBioTech, width: 2.0),
+      ),
+      backgroundColor: Colors.white,
+      title: Row(
+        children: [
+          forestimatorIcon(),
+          Text(
+            title!,
+            style: TextStyle(
+              color: Colors.black,
+              fontWeight: FontWeight.w400,
+              fontSize: gl.display.equipixel * gl.fontSizeM,
+            ),
+          ),
+        ],
+      ),
+      content: Text(
+        dialog!,
+        style: TextStyle(
+          color: Colors.black,
+          fontWeight: FontWeight.w400,
+          fontSize: gl.display.equipixel * gl.fontSizeM,
+        ),
+      ),
       actions: <Widget>[
         TextButton(
+          style: dialogButtonStyle(
+            height: gl.display.equipixel * 12,
+            width: gl.display.equipixel * 20,
+          ),
           onPressed: () => {if (onAccept != null) onAccept!()},
-          child: Text(accept!),
+          child: Text(accept!, style: dialogTextButtonStyle()),
         ),
         if (decline != null)
           TextButton(
+            style: dialogButtonStyle(
+              height: gl.display.equipixel * 12,
+              width: gl.display.equipixel * 20,
+            ),
             onPressed: () => {if (onDecline != null) onDecline!()},
-            child: Text(decline!),
+            child: Text(decline!, style: dialogTextButtonStyle()),
           ),
       ],
     );
@@ -70,17 +172,54 @@ class PopupDownloadRecomendedLayers extends StatelessWidget {
 
 Widget popupNoInternet() {
   return AlertDialog(
-    title: Text("Oups"),
-    content: Text("Vous n'avez pas accès à internet."),
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadiusGeometry.circular(12.0),
+      side: BorderSide(color: gl.colorAgroBioTech, width: 2.0),
+    ),
+    backgroundColor: Colors.white,
+    title: Row(
+      children: [
+        forestimatorIcon(),
+        Text(
+          "Message",
+          style: TextStyle(
+            color: Colors.black,
+            fontWeight: FontWeight.w400,
+            fontSize: gl.display.equipixel * gl.fontSizeM,
+          ),
+        ),
+      ],
+    ),
+    content: Text(
+      "Vous n'avez pas accès à internet.",
+      style: TextStyle(
+        color: Colors.black,
+        fontWeight: FontWeight.w400,
+        fontSize: gl.display.equipixel * gl.fontSizeM,
+      ),
+    ),
     actions: <Widget>[
       TextButton(
-        child: Text("OK"),
+        style: dialogButtonStyle(
+          height: gl.display.equipixel * 12,
+          width: gl.display.equipixel * 20,
+        ),
+        child: Text("OK", style: dialogTextButtonStyle()),
         onPressed: () {
           gl.mainStackPopLast();
           gl.refreshMainStack(() {});
         },
       ),
     ],
+  );
+}
+
+Widget forestimatorIcon({double width = 0, double height = 0}) {
+  return Container(
+    padding: EdgeInsets.only(right: gl.display.equipixel * 2),
+    width: width == 0 ? gl.display.equipixel * gl.iconSizeXS : width,
+    height: height == 0 ? gl.display.equipixel * gl.iconSizeXS : height,
+    child: Image.asset("assets/images/LogoForestimator.png"),
   );
 }
 
@@ -104,17 +243,42 @@ class PopupPermissions extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text(title!),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadiusGeometry.circular(12.0),
+        side: BorderSide(color: gl.colorAgroBioTech, width: 2.0),
+      ),
+      backgroundColor: Colors.white,
+      title: Row(
+        children: [
+          forestimatorIcon(),
+          Text(
+            title!,
+            style: TextStyle(
+              color: Colors.black,
+              fontWeight: FontWeight.w400,
+              fontSize: gl.display.equipixel * gl.fontSizeM,
+            ),
+          ),
+        ],
+      ),
       content: Text(dialog!),
       actions: <Widget>[
         TextButton(
+          style: dialogButtonStyle(
+            height: gl.display.equipixel * 12,
+            width: gl.display.equipixel * 20,
+          ),
           onPressed: () => {if (onAccept != null) onAccept!()},
-          child: Text(accept!),
+          child: Text(accept!, style: dialogTextButtonStyle()),
         ),
         if (decline != null)
           TextButton(
+            style: dialogButtonStyle(
+              height: gl.display.equipixel * 12,
+              width: gl.display.equipixel * 20,
+            ),
             onPressed: () => {if (onDecline != null) onDecline!()},
-            child: Text(decline!),
+            child: Text(decline!, style: dialogTextButtonStyle()),
           ),
       ],
     );
@@ -123,45 +287,101 @@ class PopupPermissions extends StatelessWidget {
 
 class PopupDownloadSuccess {
   PopupDownloadSuccess(BuildContext context, String layerName) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text("Téléchargement de $layerName."),
-          content: Text("$layerName a été téléchargée avec succès."),
+    gl.refreshMainStack(() {
+      popupBarrierWrapper(
+        popup: AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadiusGeometry.circular(12.0),
+            side: BorderSide(color: gl.colorAgroBioTech, width: 2.0),
+          ),
+          backgroundColor: Colors.white,
+          title: Row(
+            children: [
+              forestimatorIcon(),
+              Text(
+                "Message",
+                style: TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.w400,
+                  fontSize: gl.display.equipixel * gl.fontSizeM,
+                ),
+              ),
+            ],
+          ),
+          content: Text(
+            "$layerName a été téléchargée avec succès.",
+            style: TextStyle(
+              color: Colors.black,
+              fontWeight: FontWeight.w400,
+              fontSize: gl.display.equipixel * gl.fontSizeM,
+            ),
+          ),
           actions: [
             TextButton(
-              child: Text("OK"),
+              style: dialogButtonStyle(
+                height: gl.display.equipixel * 12,
+                width: gl.display.equipixel * 20,
+              ),
+              child: Text("OK", style: dialogTextButtonStyle()),
               onPressed: () {
-                Navigator.of(context, rootNavigator: true).pop();
+                gl.mainStackPopLast();
+                gl.refreshMainStack(() {});
               },
             ),
           ],
-        );
-      },
-    );
+        ),
+      );
+    });
   }
 }
 
 class PopupDownloadFailed {
   PopupDownloadFailed(BuildContext context, String layerName) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text("Téléchargement de $layerName."),
-          content: Text("$layerName n'a pas été téléchargé."),
+    gl.refreshMainStack(() {
+      popupBarrierWrapper(
+        popup: AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadiusGeometry.circular(12.0),
+            side: BorderSide(color: gl.colorAgroBioTech, width: 2.0),
+          ),
+          backgroundColor: Colors.white,
+          title: Row(
+            children: [
+              forestimatorIcon(),
+              Text(
+                "Message",
+                style: TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.w400,
+                  fontSize: gl.display.equipixel * gl.fontSizeM,
+                ),
+              ),
+            ],
+          ),
+          content: Text(
+            "$layerName n'a pas été téléchargé.",
+            style: TextStyle(
+              color: Colors.black,
+              fontWeight: FontWeight.w400,
+              fontSize: gl.display.equipixel * gl.fontSizeM,
+            ),
+          ),
           actions: [
             TextButton(
-              child: Text("OK"),
+              style: dialogButtonStyle(
+                height: gl.display.equipixel * 12,
+                width: gl.display.equipixel * 20,
+              ),
+              child: Text("OK", style: dialogTextButtonStyle()),
               onPressed: () {
-                Navigator.of(context, rootNavigator: true).pop();
+                gl.mainStackPopLast();
+                gl.refreshMainStack(() {});
               },
             ),
           ],
-        );
-      },
-    );
+        ),
+      );
+    });
   }
 }
 
@@ -172,13 +392,35 @@ Widget popupPDFSaved(String pdfName, VoidCallback after) {
       borderRadius: BorderRadiusGeometry.circular(12.0),
       side: BorderSide(color: Color.fromRGBO(205, 225, 138, 1.0), width: 2.0),
     ),
+    backgroundColor: Colors.white,
+    title: Row(
+      children: [
+        forestimatorIcon(),
+        Text(
+          "Message",
+          style: TextStyle(
+            color: Colors.black,
+            fontWeight: FontWeight.w400,
+            fontSize: gl.display.equipixel * gl.fontSizeM,
+          ),
+        ),
+      ],
+    ),
     content: Text(
       "$pdfName à été enregistré!",
-      style: TextStyle(fontSize: gl.display.equipixel * gl.fontSizeM),
+      style: TextStyle(
+        color: Colors.black,
+        fontWeight: FontWeight.w400,
+        fontSize: gl.display.equipixel * gl.fontSizeM,
+      ),
     ),
     actions: [
       TextButton(
-        child: Text("OK"),
+        style: dialogButtonStyle(
+          height: gl.display.equipixel * 12,
+          width: gl.display.equipixel * 20,
+        ),
+        child: Text("OK", style: dialogTextButtonStyle()),
         onPressed: () {
           after();
         },
@@ -197,11 +439,22 @@ class PopupColorChooser {
     VoidCallback after,
   ) {
     pickerColor = currentColor;
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text("Choisisez une couleur!"),
+    gl.refreshMainStack(() {
+      popupBarrierWrapper(
+        popup: AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadiusGeometry.circular(12.0),
+            side: BorderSide(color: gl.colorAgroBioTech, width: 2.0),
+          ),
+          backgroundColor: Colors.white.withAlpha(200),
+          title: Text(
+            "Choisisez une couleur!",
+            style: TextStyle(
+              color: Colors.black,
+              fontWeight: FontWeight.w500,
+              fontSize: gl.display.equipixel * gl.fontSizeM,
+            ),
+          ),
           content: SingleChildScrollView(
             child: ColorPicker(
               pickerColor: pickerColor,
@@ -210,17 +463,22 @@ class PopupColorChooser {
           ),
           actions: [
             TextButton(
-              child: Text("OK"),
+              style: dialogButtonStyle(
+                height: gl.display.equipixel * 12,
+                width: gl.display.equipixel * 20,
+              ),
+              child: Text("OK", style: dialogTextButtonStyle()),
               onPressed: () {
                 currentColor = pickerColor;
+                gl.mainStackPopLast();
+                gl.refreshMainStack(() {});
                 after();
-                Navigator.of(context, rootNavigator: true).pop();
               },
             ),
           ],
-        );
-      },
-    );
+        ),
+      );
+    });
   }
 }
 
@@ -232,10 +490,14 @@ class PopupNameIntroducer {
     VoidCallback after,
     VoidCallback callbackOnStartTyping,
   ) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
+    gl.refreshMainStack(() {
+      popupBarrierWrapper(
+        popup: AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadiusGeometry.circular(12.0),
+            side: BorderSide(color: gl.colorAgroBioTech, width: 2.0),
+          ),
+          backgroundColor: Colors.white.withAlpha(200),
           content: SizedBox(
             width:
                 gl.display.orientation == Orientation.portrait
@@ -257,6 +519,8 @@ class PopupNameIntroducer {
                     },
                     onTap: () => callbackOnStartTyping(),
                     onTapOutside: (pointer) {
+                      gl.mainStackPopLast();
+                      gl.refreshMainStack(() {});
                       after();
                     },
                     controller: TextEditingController(text: currentName),
@@ -265,42 +529,15 @@ class PopupNameIntroducer {
                 SizedBox(
                   width: gl.menuBarLength * .5 * gl.display.equipixel,
                   child: TextButton(
-                    style: ButtonStyle(
-                      backgroundColor: WidgetStateProperty.fromMap(
-                        <WidgetStatesConstraint, Color>{
-                          WidgetState.any: gl.colorAgroBioTech.withAlpha(200),
-                        },
-                      ),
-                      shape: WidgetStateProperty<OutlinedBorder>.fromMap(
-                        <WidgetStatesConstraint, OutlinedBorder>{
-                          WidgetState.any: RoundedRectangleBorder(
-                            borderRadius: BorderRadiusGeometry.circular(12.0),
-                            side: BorderSide(
-                              color: Color.fromRGBO(205, 225, 138, 1.0),
-                              width: 2.0,
-                            ),
-                          ),
-                        },
-                      ),
-                      fixedSize: WidgetStateProperty.fromMap(<
-                        WidgetStatesConstraint,
-                        Size
-                      >{
-                        WidgetState.any: Size(
-                          gl.display.equipixel * gl.popupReturnButtonWidth * .8,
-                          gl.display.equipixel *
-                              gl.popupReturnButtonHeight *
-                              .6,
-                        ),
-                      }),
+                    style: dialogButtonStyle(
+                      height: gl.display.equipixel * 12,
+                      width: gl.display.equipixel * 5 * "Renommer".length,
                     ),
-                    child: Text(
-                      "Renommer",
-                      style: TextStyle(color: Colors.black),
-                    ),
+                    child: Text("Renommer", style: dialogTextButtonStyle()),
                     onPressed: () {
+                      gl.mainStackPopLast();
+                      gl.refreshMainStack(() {});
                       after();
-                      Navigator.of(context, rootNavigator: true).pop();
                     },
                   ),
                 ),
@@ -308,9 +545,9 @@ class PopupNameIntroducer {
             ),
           ),
           actions: [],
-        );
-      },
-    );
+        ),
+      );
+    });
   }
 }
 
@@ -868,21 +1105,33 @@ class _PolygonListMenu extends State<PolygonListMenu> {
                       context,
                       "",
                       (String nameIt) {
-                        setState(() {
+                        if (mounted) {
+                          setState(() {
+                            _keyboard = true;
+                          });
+                        } else {
                           gl.polygonLayers[gl.polygonLayers.length - 1].name =
                               nameIt;
                           gl.saveChangesToPolygoneToPrefs = true;
-                        });
+                        }
                       },
                       () {
-                        setState(() {
+                        if (mounted) {
+                          setState(() {
+                            _keyboard = false;
+                          });
+                        } else {
                           _keyboard = false;
-                        });
+                        }
                       },
                       () {
-                        setState(() {
+                        if (mounted) {
+                          setState(() {
+                            _keyboard = true;
+                          });
+                        } else {
                           _keyboard = true;
-                        });
+                        }
                       },
                     );
                     gl.selectedPolygonLayer = gl.polygonLayers.length - 1;
@@ -1835,7 +2084,11 @@ Widget forestimatorSettingsContacts() {
                   "Sur notre Site:",
                   overflow: TextOverflow.clip,
                   textAlign: TextAlign.left,
-                  textScaler: TextScaler.linear(1.0),
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: gl.display.equipixel * gl.fontSizeS,
+                    fontWeight: FontWeight.w400,
+                  ),
                 ),
               ],
             ),
@@ -1851,7 +2104,11 @@ Widget forestimatorSettingsContacts() {
                     overflow: TextOverflow.clip,
                     textAlign: TextAlign.left,
                     textScaler: TextScaler.linear(1.0),
-                    style: TextStyle(color: Colors.blue),
+                    style: TextStyle(
+                      color: Colors.blue,
+                      fontSize: gl.display.equipixel * gl.fontSizeS,
+                      fontWeight: FontWeight.w400,
+                    ),
                   ),
                 ),
               ],
@@ -1863,7 +2120,11 @@ Widget forestimatorSettingsContacts() {
                   "ou par mail:",
                   overflow: TextOverflow.clip,
                   textAlign: TextAlign.left,
-                  textScaler: TextScaler.linear(1.0),
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: gl.display.equipixel * gl.fontSizeS,
+                    fontWeight: FontWeight.w400,
+                  ),
                 ),
               ],
             ),
@@ -1878,8 +2139,11 @@ Widget forestimatorSettingsContacts() {
                     "JO.Lisein@uliege.be",
                     overflow: TextOverflow.clip,
                     textAlign: TextAlign.left,
-                    textScaler: TextScaler.linear(1.0),
-                    style: TextStyle(color: Colors.black),
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: gl.display.equipixel * gl.fontSizeS,
+                      fontWeight: FontWeight.w400,
+                    ),
                   ),
                 ),
               ],
@@ -1993,7 +2257,7 @@ class ForestimatorLog extends StatefulWidget {
 }
 
 class _ForestimatorLog extends State<ForestimatorLog> {
-  int lengthLog = 3;
+  int lengthLog = 10;
 
   @override
   Widget build(BuildContext context) {
@@ -2023,50 +2287,87 @@ class _ForestimatorLog extends State<ForestimatorLog> {
               ] +
               List<Widget>.generate(lengthLog, (i) {
                 return gl.onboardLog.length - lengthLog > 0
-                    ? Row(
+                    ? Column(
                       children: [
-                        Container(
-                          constraints: BoxConstraints(
-                            minWidth: gl.display.equipixel * 5,
-                          ),
-                          child: Text(
-                            "${gl.onboardLog.length - lengthLog + i}) ",
-                          ),
+                        Row(
+                          children: [
+                            Container(
+                              constraints: BoxConstraints(
+                                minWidth:
+                                    gl.display.equipixel *
+                                    "${gl.onboardLog.length - lengthLog + i})"
+                                        .length *
+                                    2,
+                              ),
+                              child: Text(
+                                "${gl.onboardLog.length - lengthLog + i})",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w400,
+                                  color: Colors.black,
+                                  fontSize:
+                                      gl.display.equipixel * gl.fontSizeXS,
+                                ),
+                              ),
+                            ),
+                            Container(
+                              constraints: BoxConstraints(
+                                maxWidth:
+                                    gl.display.equipixel *
+                                    gl.popupWindowsPortraitWidth *
+                                    .8,
+                              ),
+                              child: Text(
+                                gl.onboardLog[gl.onboardLog.length -
+                                    lengthLog +
+                                    i],
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.black,
+                                  fontSize:
+                                      gl.display.equipixel * gl.fontSizeXS,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                        Container(
-                          constraints: BoxConstraints(
-                            maxWidth:
-                                gl.display.equipixel *
-                                gl.popupWindowsPortraitWidth *
-                                .9,
+                        if (lengthLog != i + 1)
+                          stroke(
+                            gl.display.equipixel,
+                            gl.display.equipixel * .5,
+                            gl.colorAgroBioTech,
                           ),
-                          child: Text(
-                            gl.onboardLog[gl.onboardLog.length - lengthLog + i],
-                            textScaler: TextScaler.linear(0.75),
-                          ),
-                        ),
                       ],
                     )
                     : gl.onboardLog.length - i > 0
-                    ? Row(
+                    ? Column(
                       children: [
-                        Container(
-                          constraints: BoxConstraints(
-                            minWidth: gl.display.equipixel * 5,
-                          ),
-                          child: Text("$i"),
-                        ),
-                        Container(
-                          constraints: BoxConstraints(
-                            maxWidth:
-                                gl.display.equipixel *
-                                gl.popupWindowsPortraitWidth *
-                                .9,
-                          ),
-                          child: Text(
-                            gl.onboardLog[i],
-                            textScaler: TextScaler.linear(0.75),
-                          ),
+                        Row(
+                          children: [
+                            Container(
+                              constraints: BoxConstraints(
+                                minWidth:
+                                    gl.display.equipixel * "$i)".length * 2,
+                              ),
+                              child: Text(
+                                "$i)",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w400,
+                                  color: Colors.black,
+                                  fontSize:
+                                      gl.display.equipixel * gl.fontSizeXS,
+                                ),
+                              ),
+                            ),
+                            Container(
+                              constraints: BoxConstraints(
+                                maxWidth:
+                                    gl.display.equipixel *
+                                    gl.popupWindowsPortraitWidth *
+                                    .7,
+                              ),
+                              child: Text(gl.onboardLog[i]),
+                            ),
+                          ],
                         ),
                       ],
                     )
@@ -2081,7 +2382,7 @@ class _ForestimatorLog extends State<ForestimatorLog> {
 TextStyle styleSettingMenu() {
   return TextStyle(
     color: Colors.black,
-    fontSize: gl.display.equipixel * gl.fontSizeM,
+    fontSize: gl.display.equipixel * gl.fontSizeS,
   );
 }
 
@@ -2182,7 +2483,7 @@ Widget forestimatorConfidentiality() {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
-                padding: EdgeInsets.all(5),
+                padding: EdgeInsets.all(10),
                 constraints: BoxConstraints(
                   maxWidth:
                       gl.display.equipixel * gl.popupWindowsPortraitWidth * .9,
@@ -2219,7 +2520,7 @@ Widget forestimatorConfidentiality() {
                     textAlign: TextAlign.left,
                     style: TextStyle(
                       color: Colors.blue,
-                      fontSize: gl.display.equipixel * gl.fontSizeM,
+                      fontSize: gl.display.equipixel * gl.fontSizeS,
                     ),
                   ),
                 ),
@@ -2305,12 +2606,12 @@ class _SettingsMenu extends State<SettingsMenu> {
                 alignment: Alignment.center,
                 padding: EdgeInsets.all(3),
                 child: Text(
-                  "Menu",
+                  "Paramètres",
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.w400,
-                    fontSize: gl.display.equipixel * gl.fontSizeM,
+                    fontSize: gl.display.equipixel * gl.fontSizeL,
                   ),
                 ),
               ),
@@ -2345,6 +2646,10 @@ class _SettingsMenu extends State<SettingsMenu> {
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadiusGeometry.circular(
                                       12.0,
+                                    ),
+                                    side: BorderSide(
+                                      color: gl.colorAgroBioTech,
+                                      width: 2.0,
                                     ),
                                   ),
                                   surfaceTintColor: Colors.transparent,
@@ -2384,6 +2689,11 @@ class _SettingsMenu extends State<SettingsMenu> {
                                               ),
                                             ),
                                           ),
+                                          stroke(
+                                            gl.display.equipixel,
+                                            gl.display.equipixel * .5,
+                                            gl.colorAgroBioTech,
+                                          ),
                                           item.entry,
                                         ],
                                       ),
@@ -2406,11 +2716,11 @@ class _SettingsMenu extends State<SettingsMenu> {
                                       minWidth:
                                           gl.display.equipixel *
                                           gl.onCatalogueWidth *
-                                          .97,
+                                          .95,
                                       minHeight:
                                           gl.display.equipixel *
                                           gl.onCatalogueMapHeight *
-                                          .97,
+                                          .95,
                                     ),
                                     child: Text(
                                       item.name,
@@ -4257,23 +4567,26 @@ Widget popupOnlineMapMenu(
 
 class PopupPdfMenu {
   PopupPdfMenu(BuildContext context, LayerTile layerTile, {String path = ""}) {
-    showDialog(
-      barrierDismissible: false,
-      context: context,
-      builder: (BuildContext context) {
-        if (path == "") {
-          path =
-              "${gl.pathExternalStorage}/${gl.dico.getLayerBase(layerTile.key).mPdfName}";
-        }
-        return PDFScreen(
-          path: path,
-          titre: "documentation", //+ item.mNomCourt,
-          currentPage: int.parse(
-            gl.dico.getLayerBase(layerTile.key).mPdfPage.toString(),
+    gl.refreshMainStack(() {
+      if (path == "") {
+        path =
+            "${gl.pathExternalStorage}/${gl.dico.getLayerBase(layerTile.key).mPdfName}";
+      }
+      popupBarrierWrapper(
+        dismiss: false,
+        popup: SizedBox(
+          width: gl.display.equipixel * gl.display.equiwidth,
+          height: gl.display.equipixel * gl.display.equiheight,
+          child: PDFScreen(
+            path: path,
+            titre: "documentation", //+ item.mNomCourt,
+            currentPage: int.parse(
+              gl.dico.getLayerBase(layerTile.key).mPdfPage.toString(),
+            ),
           ),
-        );
-      },
-    );
+        ),
+      );
+    });
   }
 }
 
@@ -5285,12 +5598,9 @@ class PopupDoYouReally {
     String title,
     String message,
   ) {
-    showDialog(
-      barrierDismissible: true,
-      barrierColor: Colors.black.withAlpha(100),
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
+    gl.refreshMainStack(() {
+      popupBarrierWrapper(
+        popup: AlertDialog(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadiusGeometry.circular(12.0),
             side: BorderSide(
@@ -5338,8 +5648,9 @@ class PopupDoYouReally {
               padding: EdgeInsets.symmetric(vertical: gl.display.equipixel * 2),
               child: FloatingActionButton(
                 onPressed: () {
+                  gl.mainStackPopLast();
+                  gl.refreshMainStack(() {});
                   after();
-                  Navigator.of(context, rootNavigator: true).pop();
                 },
                 backgroundColor: gl.colorBack,
                 child: Container(
@@ -5365,7 +5676,8 @@ class PopupDoYouReally {
               padding: EdgeInsets.symmetric(vertical: gl.display.equipixel * 2),
               child: FloatingActionButton(
                 onPressed: () {
-                  Navigator.of(context, rootNavigator: true).pop();
+                  gl.mainStackPopLast();
+                  gl.refreshMainStack(() {});
                 },
                 backgroundColor: gl.colorAgroBioTech,
                 child: Container(
@@ -5388,9 +5700,9 @@ class PopupDoYouReally {
               ),
             ),
           ],
-        );
-      },
-    );
+        ),
+      );
+    });
   }
 }
 
