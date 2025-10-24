@@ -23,13 +23,13 @@ void main() {
           builder: (context) {
             return ElevatedButton(
               onPressed: () {
-                showDialog(
+                /*showDialog(
                   context: context,
                   builder:
-                      (c) => popupSettingsMenu(c, 'name', () {}, () {
+                      (c) => opupSettingsMenu(c, 'name', () {}, () {
                         closed = true;
                       }),
-                );
+                );*/
               },
               child: const Text('OpenSettings'),
             );

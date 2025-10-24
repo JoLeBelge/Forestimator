@@ -17,6 +17,8 @@ const double globalMaxZoom = 13.0;
 const double globalMinOfflineZoom = 8.0;
 const double globalMaxOfflineZoom = 13.0;
 
+SharedPreferences? shared;
+
 Color backgroundTransparentBlackBox = Colors.black.withAlpha(180);
 
 bool modeMapFirstTileLayerTransparancy = true;
@@ -27,6 +29,29 @@ bool modeDevelopper = false;
 bool modeSettings = false;
 bool modeMenuResults = false;
 
+class Mode {
+  static bool keyboardExpanded = false;
+  static bool square = false;
+  static bool tablet = false;
+  static bool overrideModeTablet = false;
+  static bool overrideModeSquare = false;
+  static bool _expert = false;
+  static bool _expertTools = false;
+
+  static bool get expert => _expert;
+  static bool get expertTools => _expertTools;
+
+  static set expert(bool b) {
+    _expert = b;
+    shared!.setBool('modeExpert', _expert);
+  }
+
+  static set expertTools(bool b) {
+    _expertTools = b;
+    shared!.setBool('modeExpertTools', _expertTools);
+  }
+}
+
 class Display {
   double width = -1;
   double height = -1;
@@ -36,13 +61,6 @@ class Display {
   double equipixel = -1;
   double equiwidth = -1;
   double equiheight = -1;
-  static bool keyboardExpanded = false;
-  static bool modeSquare = false;
-  static bool modeTablet = false;
-  static bool overrideModeTablet = false;
-  static bool overrideModeSquare = false;
-  static bool modeExpert = false;
-  static bool modeExpertTools = false;
 
   Display.empty();
 
@@ -56,7 +74,7 @@ class Display {
     _tabletMode();
     _squareMode();
     _enforceEquiWidthHeight();
-    if (modeSquare || overrideModeSquare) {
+    if (Mode.square || Mode.overrideModeSquare) {
       minEquiPixelsDisplayLandscapeHeight =
           minEquiPixelsDisplayLandscapeWidth * .8;
       minEquiPixelsDisplayPortraitHeight =
@@ -68,31 +86,33 @@ class Display {
     if (dpi < 2.001 && dpi * (width < height ? width : height) > 1800 ||
         dpi < 1.75 && dpi * (width < height ? width : height) > 1320 ||
         dpi < 1.55 && dpi * (width < height ? width : height) > 1000 ||
-        overrideModeTablet) {
-      if (!modeTablet) {
+        Mode.overrideModeTablet) {
+      if (!Mode.tablet) {
         minEquiPixelsDisplayPortraitWidth = 150;
         minEquiPixelsDisplayPortraitHeight = 300;
         minEquiPixelsDisplayLandscapeWidth = 300;
         minEquiPixelsDisplayLandscapeHeight = 150;
-        modeTablet = true;
+        Mode.tablet = true;
       }
     } else {
-      if (modeTablet) {
+      if (Mode.tablet) {
         minEquiPixelsDisplayPortraitWidth = 100;
         minEquiPixelsDisplayPortraitHeight = 200;
         minEquiPixelsDisplayLandscapeWidth = 200;
         minEquiPixelsDisplayLandscapeHeight = 100;
-        modeTablet = false;
+        Mode.tablet = false;
       }
     }
   }
 
   void _squareMode() {
-    if ((aspect > .8 && aspect < 1 / .8) || modeTablet || overrideModeSquare) {
-      modeSquare = true;
+    if ((aspect > .8 && aspect < 1 / .8) ||
+        Mode.tablet ||
+        Mode.overrideModeSquare) {
+      Mode.square = true;
       orientation = Orientation.landscape;
     } else {
-      modeSquare = false;
+      Mode.square = false;
     }
   }
 
@@ -549,9 +569,11 @@ void savePrefSelLayOnline() async {
     interfaceSelectedLCode.add(sL.mCode);
     offlineLayer.add(dico.getLayerBase(sL.mCode).mOffline ? "t" : "n");
   }
-  final SharedPreferences prefs = await SharedPreferences.getInstance();
-  await prefs.setStringList('interfaceSelectedLCode', interfaceSelectedLCode);
-  await prefs.setStringList('interfaceSelectedLCodeOfflineFlag', offlineLayer);
+  await shared!.setStringList('interfaceSelectedLCode', interfaceSelectedLCode);
+  await shared!.setStringList(
+    'interfaceSelectedLCodeOfflineFlag',
+    offlineLayer,
+  );
 }
 
 void savePrefSelLayOffline() async {
@@ -559,15 +581,16 @@ void savePrefSelLayOffline() async {
   for (SelectedLayer sL in selectedLayerForMap) {
     interfaceSelectedLCode.add(sL.mCode);
   }
-  final SharedPreferences prefs = await SharedPreferences.getInstance();
-  await prefs.setStringList('interfaceSelectedOffCode', interfaceSelectedLCode);
+  await shared!.setStringList(
+    'interfaceSelectedOffCode',
+    interfaceSelectedLCode,
+  );
 }
 
 void loadPrefSelLayOnline() async {
-  final SharedPreferences prefs = await SharedPreferences.getInstance();
-  interfaceSelectedLCode = prefs.getStringList('interfaceSelectedLCode')!;
+  interfaceSelectedLCode = shared!.getStringList('interfaceSelectedLCode')!;
   List<String> offlineLayer =
-      prefs.getStringList('interfaceSelectedLCodeOfflineFlag')!;
+      shared!.getStringList('interfaceSelectedLCodeOfflineFlag')!;
   selectedLayerForMap.clear();
   int index = 0;
   for (String key in interfaceSelectedLCode) {
@@ -582,9 +605,8 @@ void loadPrefSelLayOnline() async {
 }
 
 void loadPrefSelLayOffline() async {
-  final SharedPreferences prefs = await SharedPreferences.getInstance();
-  if (prefs.getStringList('interfaceSelectedOffCode') != null) {
-    interfaceSelectedLCode = prefs.getStringList('interfaceSelectedOffCode')!;
+  if (shared!.getStringList('interfaceSelectedOffCode') != null) {
+    interfaceSelectedLCode = shared!.getStringList('interfaceSelectedOffCode')!;
     selectedLayerForMap.clear();
     for (String key in interfaceSelectedLCode) {
       selectedLayerForMap.add(SelectedLayer(mCode: key, offline: true));

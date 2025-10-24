@@ -20,11 +20,9 @@ import 'package:flutter/services.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
-import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:intl/intl.dart';
 
@@ -70,33 +68,70 @@ TextStyle dialogTextButtonStyle() {
   );
 }
 
-void popupBarrierWrapper({required Widget popup, bool dismiss = true}) {
+void popupBarrierWrapper({
+  required Widget popup,
+  bool dismiss = true,
+  VoidCallback? after,
+  VoidCallback? barrierHit,
+}) {
   gl.mainStack.add(
-    OrientationBuilder(
-      builder: (context, orientation) {
-        return dismiss
-            ? TextButton(
+    Stack(
+      children: [
+        OrientationBuilder(
+          builder: (context, orientation) {
+            return TextButton(
               style: ButtonStyle(
+                shape: WidgetStateProperty.fromMap(
+                  <WidgetStatesConstraint, ContinuousRectangleBorder>{
+                    WidgetState.any: ContinuousRectangleBorder(),
+                  },
+                ),
                 shadowColor: WidgetStateProperty.fromMap(
                   <WidgetStatesConstraint, Color>{
                     WidgetState.any: Colors.transparent,
                   },
                 ),
-                backgroundColor: WidgetStateProperty.fromMap(
+                backgroundColor:
+                    WidgetStateProperty.fromMap(<WidgetStatesConstraint, Color>{
+                      WidgetState.any:
+                          dismiss
+                              ? Colors.transparent
+                              : gl.backgroundTransparentBlackBox,
+                    }),
+                overlayColor: WidgetStateProperty.fromMap(
                   <WidgetStatesConstraint, Color>{
                     WidgetState.any: Colors.transparent,
                   },
                 ),
                 animationDuration: Duration.zero,
               ),
-              onPressed: () {
-                gl.mainStackPopLast();
-                gl.refreshMainStack(() {});
-              },
-              child: popup,
-            )
-            : popup;
-      },
+              onPressed:
+                  dismiss
+                      ? () {
+                        after == null
+                            ? gl.print(
+                              "popup wrapper: Voidcall after() was null!",
+                            )
+                            : after();
+                        gl.mainStackPopLast();
+                        gl.refreshMainStack(() {});
+                      }
+                      : () {
+                        barrierHit == null
+                            ? gl.print(
+                              "popup wrapper: Voidcall barrierHit() was null!",
+                            )
+                            : barrierHit();
+                      },
+              child: SizedBox(
+                width: gl.display.equipixel * gl.display.equiwidth,
+                height: gl.display.equipixel * gl.display.equiheight,
+              ),
+            );
+          },
+        ),
+        popup,
+      ],
     ),
   );
 }
@@ -289,6 +324,7 @@ class PopupDownloadSuccess {
   PopupDownloadSuccess(BuildContext context, String layerName) {
     gl.refreshMainStack(() {
       popupBarrierWrapper(
+        dismiss: false,
         popup: AlertDialog(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadiusGeometry.circular(12.0),
@@ -339,6 +375,7 @@ class PopupDownloadFailed {
   PopupDownloadFailed(BuildContext context, String layerName) {
     gl.refreshMainStack(() {
       popupBarrierWrapper(
+        dismiss: false,
         popup: AlertDialog(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadiusGeometry.circular(12.0),
@@ -441,14 +478,16 @@ class PopupColorChooser {
     pickerColor = currentColor;
     gl.refreshMainStack(() {
       popupBarrierWrapper(
+        dismiss: true,
         popup: AlertDialog(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadiusGeometry.circular(12.0),
             side: BorderSide(color: gl.colorAgroBioTech, width: 2.0),
           ),
-          backgroundColor: Colors.white.withAlpha(200),
+          backgroundColor: Colors.white,
           title: Text(
-            "Choisisez une couleur!",
+            "Choisissez une couleur!",
+            textAlign: TextAlign.center,
             style: TextStyle(
               color: Colors.black,
               fontWeight: FontWeight.w500,
@@ -492,12 +531,13 @@ class PopupNameIntroducer {
   ) {
     gl.refreshMainStack(() {
       popupBarrierWrapper(
+        dismiss: true,
         popup: AlertDialog(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadiusGeometry.circular(12.0),
             side: BorderSide(color: gl.colorAgroBioTech, width: 2.0),
           ),
-          backgroundColor: Colors.white.withAlpha(200),
+          backgroundColor: Colors.white,
           content: SizedBox(
             width:
                 gl.display.orientation == Orientation.portrait
@@ -531,9 +571,9 @@ class PopupNameIntroducer {
                   child: TextButton(
                     style: dialogButtonStyle(
                       height: gl.display.equipixel * 12,
-                      width: gl.display.equipixel * 5 * "Renommer".length,
+                      width: gl.display.equipixel * 10 * "Ok".length,
                     ),
-                    child: Text("Renommer", style: dialogTextButtonStyle()),
+                    child: Text("Ok", style: dialogTextButtonStyle()),
                     onPressed: () {
                       gl.mainStackPopLast();
                       gl.refreshMainStack(() {});
@@ -1955,12 +1995,7 @@ Widget forestimatorSettingsVersion(VoidSetter state) {
                         state(() {
                           gl.modeDevelopper = !gl.modeDevelopper;
                         });
-                        final SharedPreferences prefs =
-                            await SharedPreferences.getInstance();
-                        await prefs.setBool(
-                          'modeDevelopper',
-                          gl.modeDevelopper,
-                        );
+                        gl.shared!.setBool('modeDevelopper', gl.modeDevelopper);
                         developperModeCounter = 0;
                       }
                     },
@@ -2167,36 +2202,33 @@ class _ForestimatorVariables extends State<ForestimatorVariables> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        variableBooleanSlider("Expert Mode", gl.Display.modeExpert, (bool it) {
+        variableBooleanSlider("Expert Mode", gl.Mode.expert, (bool it) {
           setState(() {
-            gl.Display.modeExpert = it;
+            gl.Mode.expert = it;
           });
           gl.refreshMainStack(() {});
         }, false),
-        variableBooleanSlider(
-          "Experimental Tools",
-          gl.Display.modeExpertTools,
-          (bool it) {
-            setState(() {
-              gl.Display.modeExpertTools = it;
-            });
-            gl.refreshMainStack(() {});
-          },
-          true,
-        ),
-        variableBooleanSlider("Tablet Mode", gl.Display.overrideModeTablet, (
+        variableBooleanSlider("Experimental Tools", gl.Mode.expertTools, (
           bool it,
         ) {
           setState(() {
-            gl.Display.overrideModeTablet = it;
+            gl.Mode.expertTools = it;
           });
           gl.refreshMainStack(() {});
         }, true),
-        variableBooleanSlider("Square Mode", gl.Display.overrideModeSquare, (
+        variableBooleanSlider("Tablet Mode", gl.Mode.overrideModeTablet, (
           bool it,
         ) {
           setState(() {
-            gl.Display.overrideModeSquare = it;
+            gl.Mode.overrideModeTablet = it;
+          });
+          gl.refreshMainStack(() {});
+        }, true),
+        variableBooleanSlider("Square Mode", gl.Mode.overrideModeSquare, (
+          bool it,
+        ) {
+          setState(() {
+            gl.Mode.overrideModeSquare = it;
           });
           gl.refreshMainStack(() {});
         }, true),
@@ -2852,7 +2884,6 @@ Widget popupPolygonListMenu(
               child: PolygonListMenu(state: state, after: after),
             ),
           ),
-
           actions: [],
         );
       },
@@ -2910,47 +2941,56 @@ Widget _returnButton(
   );
 }
 
-Widget popupSettingsMenu(
-  BuildContext context,
-  String currentName,
-  VoidCallback state,
-  VoidCallback after,
-) {
-  gl.modeSettings = true;
-  return OrientationBuilder(
-    builder: (context, orientation) {
-      return AlertDialog(
-        alignment: Alignment.center,
-        titlePadding: EdgeInsets.all(0),
-        actionsPadding: EdgeInsets.all(0),
-        contentPadding: EdgeInsets.all(0),
-        insetPadding: EdgeInsets.all(0),
-        buttonPadding: EdgeInsets.all(0),
-        iconPadding: EdgeInsets.all(0),
-        backgroundColor: gl.backgroundTransparentBlackBox,
-        surfaceTintColor: Colors.transparent,
-        shadowColor: Colors.transparent,
-        content: Theme(
-          data: Theme.of(context).copyWith(
-            canvasColor: Colors.transparent,
+class PopupSettingsMenu {
+  PopupSettingsMenu(
+    BuildContext context,
+    String currentName,
+    VoidCallback state,
+    VoidCallback after,
+  ) {
+    gl.modeSettings = true;
+    popupBarrierWrapper(
+      after: () {
+        gl.modeSettings = false;
+      },
+      dismiss: true,
+      popup: OrientationBuilder(
+        builder: (context, orientation) {
+          return AlertDialog(
+            alignment: Alignment.center,
+            titlePadding: EdgeInsets.all(0),
+            actionsPadding: EdgeInsets.all(0),
+            contentPadding: EdgeInsets.all(0),
+            insetPadding: EdgeInsets.all(0),
+            buttonPadding: EdgeInsets.all(0),
+            iconPadding: EdgeInsets.all(0),
+            backgroundColor: gl.backgroundTransparentBlackBox,
+            surfaceTintColor: Colors.transparent,
             shadowColor: Colors.transparent,
-          ),
-          child: SizedBox(
-            width:
-                gl.display.orientation == Orientation.portrait
-                    ? gl.display.equipixel * gl.popupWindowsPortraitWidth
-                    : gl.display.equipixel * gl.popupWindowsLandscapeWidth,
-            height:
-                gl.display.orientation == Orientation.portrait
-                    ? gl.display.equipixel * gl.popupWindowsPortraitHeight + 1
-                    : gl.display.equipixel * gl.popupWindowsLandscapeHeight,
-            child: SettingsMenu(state: state, after: after),
-          ),
-        ),
-        actions: [],
-      );
-    },
-  );
+            content: Theme(
+              data: Theme.of(context).copyWith(
+                canvasColor: Colors.transparent,
+                shadowColor: Colors.transparent,
+              ),
+              child: SizedBox(
+                width:
+                    gl.display.orientation == Orientation.portrait
+                        ? gl.display.equipixel * gl.popupWindowsPortraitWidth
+                        : gl.display.equipixel * gl.popupWindowsLandscapeWidth,
+                height:
+                    gl.display.orientation == Orientation.portrait
+                        ? gl.display.equipixel * gl.popupWindowsPortraitHeight +
+                            1
+                        : gl.display.equipixel * gl.popupWindowsLandscapeHeight,
+                child: SettingsMenu(state: state, after: after),
+              ),
+            ),
+            actions: [],
+          );
+        },
+      ),
+    );
+  }
 }
 
 Widget _resultRow(String key, String value) {
@@ -3184,9 +3224,7 @@ class _OnlineMapStatusTool extends State<OnlineMapStatusTool> {
                     widget.layerTile.selected = false;
                   }
                 });
-                final SharedPreferences prefs =
-                    await SharedPreferences.getInstance();
-                await prefs.setStringList(
+                gl.shared!.setStringList(
                   'anaSurfSelectedLayerKeys',
                   gl.anaSurfSelectedLayerKeys,
                 );
@@ -3235,9 +3273,7 @@ class _OnlineMapStatusTool extends State<OnlineMapStatusTool> {
                     widget.layerTile.selected = true;
                   }
                 });
-                final SharedPreferences prefs =
-                    await SharedPreferences.getInstance();
-                await prefs.setStringList(
+                gl.shared!.setStringList(
                   'anaSurfSelectedLayerKeys',
                   gl.anaSurfSelectedLayerKeys,
                 );
@@ -3292,9 +3328,7 @@ class _OnlineMapStatusTool extends State<OnlineMapStatusTool> {
                     widget.layerTile.selected = false;
                   }
                 });
-                final SharedPreferences prefs =
-                    await SharedPreferences.getInstance();
-                await prefs.setStringList(
+                gl.shared!.setStringList(
                   'anaPtSelectedLayerKeys',
                   gl.anaPtSelectedLayerKeys,
                 );
@@ -3343,9 +3377,7 @@ class _OnlineMapStatusTool extends State<OnlineMapStatusTool> {
                     widget.layerTile.selected = true;
                   }
                 });
-                final SharedPreferences prefs =
-                    await SharedPreferences.getInstance();
-                await prefs.setStringList(
+                gl.shared!.setStringList(
                   'anaPtSelectedLayerKeys',
                   gl.anaPtSelectedLayerKeys,
                 );
@@ -3394,7 +3426,7 @@ class _OnlineMapStatusTool extends State<OnlineMapStatusTool> {
               ],
             ),
             onPressed: () {
-              PopupPdfMenu(gl.notificationContext!, widget.layerTile);
+              PopupPdfMenu(widget.layerTile.key);
             },
           ),
         if ((gl.dico.getLayerBase(widget.layerTile.key).mGroupe == "APT_FEE" ||
@@ -3441,11 +3473,7 @@ class _OnlineMapStatusTool extends State<OnlineMapStatusTool> {
             onPressed: () {
               String path =
                   "${gl.pathExternalStorage}/FEE-${gl.dico.getEss(gl.dico.getLayerBase(widget.layerTile.key).getEssCode()).mCode}.pdf";
-              PopupPdfMenu(
-                gl.notificationContext!,
-                widget.layerTile,
-                path: path,
-              );
+              PopupPdfMenu(widget.layerTile.key, path: path);
             },
           ),
       ],
@@ -3743,9 +3771,7 @@ class _OnlineMapMenu extends State<OnlineMapMenu> {
             setState(() {
               gl.firstTimeUse = false;
             });
-            final SharedPreferences prefs =
-                await SharedPreferences.getInstance();
-            await prefs.setBool('firstTimeUse', gl.firstTimeUse);
+            gl.shared!.setBool('firstTimeUse', gl.firstTimeUse);
             for (var key in gl.downloadableLayerKeys) {
               downloadLayer(key);
             }
@@ -3755,9 +3781,7 @@ class _OnlineMapMenu extends State<OnlineMapMenu> {
             setState(() {
               gl.firstTimeUse = false;
             });
-            final SharedPreferences prefs =
-                await SharedPreferences.getInstance();
-            await prefs.setBool('firstTimeUse', gl.firstTimeUse);
+            gl.shared!.setBool('firstTimeUse', gl.firstTimeUse);
           },
           dialog:
               "Autorisez-vous l'aplication à télécharger un jeu de 6 couches pour une utilisation hors ligne? Ces couches couvrent toutes la Région Wallonne et totalisent +- 214 Mo.",
@@ -3792,7 +3816,7 @@ class _OnlineMapMenu extends State<OnlineMapMenu> {
                         for (String term in value.split(' ')) {
                           if (term != '') {
                             for (var layer in gl.dico.mLayerBases.values) {
-                              if ((!layer.mExpert || gl.Display.modeExpert) &&
+                              if ((!layer.mExpert || gl.Mode.expert) &&
                                   (widget.offlineMode
                                       ? layer.mOffline
                                       : true) &&
@@ -4101,7 +4125,7 @@ class _OnlineMapMenu extends State<OnlineMapMenu> {
     Map<String, Null> groupesNonVides = {};
     for (String key in gl.dico.mLayerBases.keys) {
       if ((widget.offlineMode ? gl.dico.getLayerBase(key).mOffline : true) &&
-          (!gl.dico.getLayerBase(key).mExpert || gl.Display.modeExpert)) {
+          (!gl.dico.getLayerBase(key).mExpert || gl.Mode.expert)) {
         groupesNonVides[gl.dico.getLayerBase(key).mGroupe] = null;
       }
     }
@@ -4135,7 +4159,7 @@ class _OnlineMapMenu extends State<OnlineMapMenu> {
     int i = 0;
     for (var key in mp.keys) {
       if (category == mp[key]!.mGroupe &&
-          (!mp[key]!.mExpert || gl.Display.modeExpert) &&
+          (!mp[key]!.mExpert || gl.Mode.expert) &&
           mp[key]!.mVisu &&
           mp[key]?.mTypeGeoservice == "" &&
           (widget.offlineMode ? mp[key]!.mOffline : true)) {
@@ -4510,80 +4534,102 @@ Widget stroke(double space, double thickness, Color color) {
   );
 }
 
-Widget popupOnlineMapMenu(
-  BuildContext context,
-  VoidCallback after,
-  bool offlineMode,
-  int selectionMode,
-  String selectedLayer,
-  VoidSetter? stateOfLayerSwitcher,
-) {
-  return OrientationBuilder(
-    builder: (context, orientation) {
-      return AlertDialog(
-        alignment: Alignment.center,
-        titlePadding: EdgeInsets.all(0),
-        actionsPadding: EdgeInsets.all(0),
-        contentPadding: EdgeInsets.all(0),
-        insetPadding: EdgeInsets.all(0),
-        buttonPadding: EdgeInsets.all(0),
-        iconPadding: EdgeInsets.all(0),
-        backgroundColor: gl.backgroundTransparentBlackBox,
-        surfaceTintColor: Colors.transparent,
-        shadowColor: Colors.transparent,
-        title: null,
-        content: Theme(
-          data: Theme.of(context).copyWith(
-            canvasColor: Colors.transparent,
+class PopupOnlineMapMenu {
+  PopupOnlineMapMenu(
+    BuildContext context,
+    VoidCallback after,
+    bool offlineMode,
+    int selectionMode,
+    String selectedLayer,
+    VoidSetter? stateOfLayerSwitcher,
+  ) {
+    popupBarrierWrapper(
+      after: after,
+      dismiss: true,
+      popup: OrientationBuilder(
+        builder: (context, orientation) {
+          return AlertDialog(
+            alignment: Alignment.center,
+            titlePadding: EdgeInsets.all(0),
+            actionsPadding: EdgeInsets.all(0),
+            contentPadding: EdgeInsets.all(0),
+            insetPadding: EdgeInsets.all(0),
+            buttonPadding: EdgeInsets.all(0),
+            iconPadding: EdgeInsets.all(0),
+            backgroundColor: gl.backgroundTransparentBlackBox,
+            surfaceTintColor: Colors.transparent,
             shadowColor: Colors.transparent,
-          ),
-          child: SizedBox(
-            width:
-                gl.display.orientation == Orientation.portrait
-                    ? gl.display.equipixel * gl.popupWindowsPortraitWidth
-                    : gl.display.equipixel * gl.popupWindowsLandscapeWidth,
-            height:
-                gl.display.orientation == Orientation.portrait
-                    ? gl.display.equipixel * gl.popupWindowsPortraitHeight + 1
-                    : gl.display.equipixel * gl.popupWindowsLandscapeHeight,
-            child: OnlineMapMenu(
-              offlineMode: offlineMode,
-              selectionMode: selectionMode,
-              stateOfLayerSwitcher: stateOfLayerSwitcher,
-              after: after,
-              selectedMapCode: selectedLayer,
+            title: null,
+            content: Theme(
+              data: Theme.of(context).copyWith(
+                canvasColor: Colors.transparent,
+                shadowColor: Colors.transparent,
+              ),
+              child: SizedBox(
+                width:
+                    gl.display.orientation == Orientation.portrait
+                        ? gl.display.equipixel * gl.popupWindowsPortraitWidth
+                        : gl.display.equipixel * gl.popupWindowsLandscapeWidth,
+                height:
+                    gl.display.orientation == Orientation.portrait
+                        ? gl.display.equipixel * gl.popupWindowsPortraitHeight +
+                            1
+                        : gl.display.equipixel * gl.popupWindowsLandscapeHeight,
+                child: OnlineMapMenu(
+                  offlineMode: offlineMode,
+                  selectionMode: selectionMode,
+                  stateOfLayerSwitcher: stateOfLayerSwitcher,
+                  after: after,
+                  selectedMapCode: selectedLayer,
+                ),
+              ),
             ),
-          ),
-        ),
-        titleTextStyle: TextStyle(
-          color: Colors.white,
-          fontSize: gl.display.equipixel * gl.fontSizeM,
-        ),
-        actions: [],
-      );
-    },
-  );
+            titleTextStyle: TextStyle(
+              color: Colors.white,
+              fontSize: gl.display.equipixel * gl.fontSizeM,
+            ),
+            actions: [],
+          );
+        },
+      ),
+    );
+  }
 }
 
 class PopupPdfMenu {
-  PopupPdfMenu(BuildContext context, LayerTile layerTile, {String path = ""}) {
+  PopupPdfMenu(
+    String layerKey, {
+    String path = "",
+    String titre = "",
+    int currentPage = -1,
+  }) {
     gl.refreshMainStack(() {
       if (path == "") {
         path =
-            "${gl.pathExternalStorage}/${gl.dico.getLayerBase(layerTile.key).mPdfName}";
+            "${gl.pathExternalStorage}/${gl.dico.getLayerBase(layerKey).mPdfName}";
+      }
+      if (currentPage == -1) {
+        currentPage = int.parse(
+          gl.dico.getLayerBase(layerKey).mPdfPage.toString(),
+        );
+      }
+      if (titre == "") {
+        titre = gl.dico.getLayerBase(layerKey).mNom;
       }
       popupBarrierWrapper(
         dismiss: false,
-        popup: SizedBox(
-          width: gl.display.equipixel * gl.display.equiwidth,
-          height: gl.display.equipixel * gl.display.equiheight,
-          child: PDFScreen(
-            path: path,
-            titre: "documentation", //+ item.mNomCourt,
-            currentPage: int.parse(
-              gl.dico.getLayerBase(layerTile.key).mPdfPage.toString(),
-            ),
-          ),
+        popup: OrientationBuilder(
+          builder: (context, orientation) {
+            return SizedBox(
+              width: gl.display.equipixel * gl.display.equiwidth,
+              height: gl.display.equipixel * gl.display.equiheight,
+              child: PDFScreen(
+                path: path,
+                titre: titre,
+                currentPage: currentPage,
+              ),
+            );
+          },
         ),
       );
     });
@@ -4898,8 +4944,8 @@ class ViewCatalogueControl extends StatefulWidget {
 }
 
 class _ViewCatalogueControl extends State<ViewCatalogueControl> {
-  bool _modeViewOfflineMap = false;
-  bool _modeViewOnlineMap = false;
+  static bool modeViewOfflineMap = false;
+  static bool modeViewOnlineMap = false;
 
   @override
   void initState() {
@@ -4935,34 +4981,32 @@ class _ViewCatalogueControl extends State<ViewCatalogueControl> {
                 height: gl.display.equipixel * gl.iconSizeM * 1.2,
                 child: FloatingActionButton(
                   backgroundColor:
-                      _modeViewOfflineMap ? gl.colorAgroBioTech : Colors.grey,
+                      modeViewOfflineMap ? gl.colorAgroBioTech : Colors.grey,
                   onPressed: () {
-                    if (!_modeViewOnlineMap && !_modeViewOnlineMap) {
-                      gl.mainStack.add(
-                        popupOnlineMapMenu(
-                          gl.notificationContext!,
-                          () {
-                            gl.refreshMainStack(() {
-                              _modeViewOfflineMap = false;
+                    if (!modeViewOnlineMap && !modeViewOnlineMap) {
+                      PopupOnlineMapMenu(
+                        gl.notificationContext!,
+                        () {
+                          gl.refreshMainStack(() {
+                            modeViewOfflineMap = false;
+                          });
+                          if (mounted) {
+                            setState(() {
+                              modeViewOfflineMap = false;
                             });
-                            if (mounted) {
-                              setState(() {
-                                _modeViewOfflineMap = false;
-                              });
-                            }
-                          },
-                          true,
-                          -1,
-                          "",
-                          widget.stateOfLayerSwitcher,
-                        ),
+                          }
+                        },
+                        true,
+                        -1,
+                        "",
+                        widget.stateOfLayerSwitcher,
                       );
                     }
                     setState(() {
-                      _modeViewOfflineMap = true;
+                      modeViewOfflineMap = true;
                     });
                     gl.refreshMainStack(() {
-                      _modeViewOfflineMap = true;
+                      modeViewOfflineMap = true;
                     });
                   },
                   child: Icon(
@@ -4978,34 +5022,32 @@ class _ViewCatalogueControl extends State<ViewCatalogueControl> {
                 height: gl.display.equipixel * gl.iconSizeM * 1.2,
                 child: FloatingActionButton(
                   backgroundColor:
-                      _modeViewOnlineMap ? gl.colorAgroBioTech : Colors.grey,
+                      modeViewOnlineMap ? gl.colorAgroBioTech : Colors.grey,
                   onPressed: () {
-                    if (!_modeViewOnlineMap && !_modeViewOnlineMap) {
-                      gl.mainStack.add(
-                        popupOnlineMapMenu(
-                          gl.notificationContext!,
-                          () {
-                            gl.refreshMainStack(() {
-                              _modeViewOnlineMap = false;
+                    if (!modeViewOnlineMap && !modeViewOnlineMap) {
+                      PopupOnlineMapMenu(
+                        gl.notificationContext!,
+                        () {
+                          gl.refreshMainStack(() {
+                            modeViewOnlineMap = false;
+                          });
+                          if (mounted) {
+                            setState(() {
+                              modeViewOnlineMap = false;
                             });
-                            if (mounted) {
-                              setState(() {
-                                _modeViewOnlineMap = false;
-                              });
-                            }
-                          },
-                          gl.offlineMode,
-                          -1,
-                          "",
-                          null,
-                        ),
+                          }
+                        },
+                        gl.offlineMode,
+                        -1,
+                        "",
+                        null,
                       );
                     }
                     setState(() {
-                      _modeViewOnlineMap = true;
+                      modeViewOnlineMap = true;
                     });
                     gl.refreshMainStack(() {
-                      _modeViewOnlineMap = true;
+                      modeViewOnlineMap = true;
                     });
                   },
                   child: Icon(
@@ -5339,17 +5381,26 @@ class _SwitcherBox extends State<SwitcherBox> {
                             ),
                           ),
                           onPressed: () {
-                            gl.mainStack.add(
-                              popupOnlineMapMenu(
-                                gl.notificationContext!,
-                                () {
-                                  gl.refreshMainStack(() {});
-                                },
-                                gl.offlineMode,
-                                i,
-                                gl.selectedLayerForMap[i].mCode,
-                                null,
-                              ),
+                            PopupOnlineMapMenu(
+                              gl.notificationContext!,
+                              () {
+                                gl.rebuildSwitcherCatalogueButtons(() {
+                                  _ViewCatalogueControl.modeViewOfflineMap =
+                                      false;
+                                  _ViewCatalogueControl.modeViewOnlineMap =
+                                      false;
+                                });
+                                gl.refreshMainStack(() {
+                                  _ViewCatalogueControl.modeViewOfflineMap =
+                                      false;
+                                  _ViewCatalogueControl.modeViewOnlineMap =
+                                      false;
+                                });
+                              },
+                              gl.offlineMode,
+                              i,
+                              gl.selectedLayerForMap[i].mCode,
+                              null,
                             );
                             gl.refreshMainStack(() {});
                           },
@@ -5430,8 +5481,8 @@ class _SwitcherBox extends State<SwitcherBox> {
                         (i == 1 &&
                             !gl.offlineMode &&
                             gl
-                                .Display
-                                .modeExpertTools)) //Pour la transparance de la première tile
+                                .Mode
+                                .expertTools)) //Pour la transparance de la première tile
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -5540,17 +5591,26 @@ class _SwitcherBox extends State<SwitcherBox> {
                             ),
                           ),
                           onPressed: () {
-                            gl.mainStack.add(
-                              popupOnlineMapMenu(
-                                gl.notificationContext!,
-                                () {
-                                  gl.refreshMainStack(() {});
-                                },
-                                gl.offlineMode,
-                                i,
-                                gl.selectedLayerForMap[i].mCode,
-                                null,
-                              ),
+                            PopupOnlineMapMenu(
+                              gl.notificationContext!,
+                              () {
+                                gl.rebuildSwitcherCatalogueButtons(() {
+                                  _ViewCatalogueControl.modeViewOfflineMap =
+                                      false;
+                                  _ViewCatalogueControl.modeViewOnlineMap =
+                                      false;
+                                });
+                                gl.refreshMainStack(() {
+                                  _ViewCatalogueControl.modeViewOfflineMap =
+                                      false;
+                                  _ViewCatalogueControl.modeViewOnlineMap =
+                                      false;
+                                });
+                              },
+                              gl.offlineMode,
+                              i,
+                              gl.selectedLayerForMap[i].mCode,
+                              null,
                             );
                             gl.refreshMainStack(() {});
                           },
@@ -5600,6 +5660,7 @@ class PopupDoYouReally {
   ) {
     gl.refreshMainStack(() {
       popupBarrierWrapper(
+        dismiss: true,
         popup: AlertDialog(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadiusGeometry.circular(12.0),
@@ -5706,45 +5767,52 @@ class PopupDoYouReally {
   }
 }
 
-Widget popupAnaResultsMenu(
-  BuildContext context,
-  List<LayerAnaPt> requestedLayers,
-  VoidCallback after,
-) {
-  return OrientationBuilder(
-    builder: (context, orientation) {
-      return AlertDialog(
-        alignment: Alignment.center,
-        titlePadding: EdgeInsets.all(0),
-        actionsPadding: EdgeInsets.all(0),
-        contentPadding: EdgeInsets.all(0),
-        insetPadding: EdgeInsets.all(0),
-        buttonPadding: EdgeInsets.all(0),
-        iconPadding: EdgeInsets.all(0),
-        backgroundColor: gl.backgroundTransparentBlackBox,
-        surfaceTintColor: Colors.transparent,
-        shadowColor: Colors.transparent,
-        content: Theme(
-          data: Theme.of(context).copyWith(
-            canvasColor: Colors.transparent,
+class PopupAnaResultsMenu {
+  PopupAnaResultsMenu(
+    BuildContext context,
+    List<LayerAnaPt> requestedLayers,
+    VoidCallback after,
+  ) {
+    popupBarrierWrapper(
+      after: after,
+      dismiss: false,
+      popup: OrientationBuilder(
+        builder: (context, orientation) {
+          return AlertDialog(
+            alignment: Alignment.center,
+            titlePadding: EdgeInsets.all(0),
+            actionsPadding: EdgeInsets.all(0),
+            contentPadding: EdgeInsets.all(0),
+            insetPadding: EdgeInsets.all(0),
+            buttonPadding: EdgeInsets.all(0),
+            iconPadding: EdgeInsets.all(0),
+            backgroundColor: gl.backgroundTransparentBlackBox,
+            surfaceTintColor: Colors.transparent,
             shadowColor: Colors.transparent,
-          ),
-          child: SizedBox(
-            width:
-                gl.display.orientation == Orientation.portrait
-                    ? gl.display.equipixel * gl.popupWindowsPortraitWidth
-                    : gl.display.equipixel * gl.popupWindowsLandscapeWidth,
-            height:
-                gl.display.orientation == Orientation.portrait
-                    ? gl.display.equipixel * gl.popupWindowsPortraitHeight + 1
-                    : gl.display.equipixel * gl.popupWindowsLandscapeHeight,
-            child: AnaResultsMenu(after, requestedLayers),
-          ),
-        ),
-        actions: [],
-      );
-    },
-  );
+            content: Theme(
+              data: Theme.of(context).copyWith(
+                canvasColor: Colors.transparent,
+                shadowColor: Colors.transparent,
+              ),
+              child: SizedBox(
+                width:
+                    gl.display.orientation == Orientation.portrait
+                        ? gl.display.equipixel * gl.popupWindowsPortraitWidth
+                        : gl.display.equipixel * gl.popupWindowsLandscapeWidth,
+                height:
+                    gl.display.orientation == Orientation.portrait
+                        ? gl.display.equipixel * gl.popupWindowsPortraitHeight +
+                            1
+                        : gl.display.equipixel * gl.popupWindowsLandscapeHeight,
+                child: AnaResultsMenu(after, requestedLayers),
+              ),
+            ),
+            actions: [],
+          );
+        },
+      ),
+    );
+  }
 }
 
 class AnaResultsMenu extends StatefulWidget {
@@ -6132,36 +6200,34 @@ class _AnaResultsMenu extends State<AnaResultsMenu> {
                   ),
                 ),
                 onPressed: () async {
-                  gl.mainStack.add(
-                    popupPdfSaveDialog((String pdf, String locationName) async {
-                      gl.mainStackPopLast();
-                      gl.refreshMainStack(() {});
-                      if (pdf.isEmpty) {
-                        pdf =
-                            "analyseForestimator${DateTime.now().day}.${DateTime.now().month}.${DateTime.now().year}.pdf";
-                      }
-                      if (pdf.length < 4 ||
-                          pdf.substring(pdf.length - 4) != ".pdf") {
-                        pdf = "$pdf.pdf";
-                      }
-                      if (locationName.isEmpty) {
-                        locationName = "une position";
-                      }
-                      String dir = "/storage/emulated/0/Download";
-                      if (Platform.isIOS) {
-                        dir = (await getApplicationDocumentsDirectory()).path;
-                      }
-                      makePdf(widget.requestedLayers, pdf, dir, locationName);
-                      // confirmation que le pdf a été créé
-                      gl.mainStack.add(
-                        popupPDFSaved(pdf, () {
-                          gl.mainStackPopLast();
-                          gl.refreshMainStack(() {});
-                        }),
-                      );
-                      gl.refreshMainStack(() {});
-                    }),
-                  );
+                  popupPdfSaveDialog((String pdf, String locationName) async {
+                    gl.mainStackPopLast();
+                    gl.refreshMainStack(() {});
+                    if (pdf.isEmpty) {
+                      pdf =
+                          "analyseForestimator${DateTime.now().day}.${DateTime.now().month}.${DateTime.now().year}.pdf";
+                    }
+                    if (pdf.length < 4 ||
+                        pdf.substring(pdf.length - 4) != ".pdf") {
+                      pdf = "$pdf.pdf";
+                    }
+                    if (locationName.isEmpty) {
+                      locationName = "une position";
+                    }
+                    String dir = "/storage/emulated/0/Download";
+                    if (Platform.isIOS) {
+                      dir = (await getApplicationDocumentsDirectory()).path;
+                    }
+                    makePdf(widget.requestedLayers, pdf, dir, locationName);
+                    // confirmation que le pdf a été créé
+                    gl.mainStack.add(
+                      popupPDFSaved(pdf, () {
+                        gl.mainStackPopLast();
+                        gl.refreshMainStack(() {});
+                      }),
+                    );
+                    gl.refreshMainStack(() {});
+                  });
                   gl.refreshMainStack(() {});
                 },
               ),
@@ -6206,12 +6272,16 @@ class _AnaResultsMenu extends State<AnaResultsMenu> {
                     : Colors.transparent,
             () {
               if ((gl.dico.getLayerBase(layer.mCode).hasDoc() &&
-                      layer.mCode != "CS_A") ||
-                  (gl.dico.getLayerBase(layer.mCode).hasDoc() &&
-                      layer.mCode == "CS_A" &&
-                      layer.mRastValue < 99)) {
-                GoRouter.of(context).push(
-                  '/${gl.dico.getLayerBase(layer.mCode).getFicheRoute(us: layer.mRastValue)}/0',
+                  layer.mCode != "CS_A")) {
+                PopupPdfMenu(layer.mCode);
+              }
+              if (gl.dico.getLayerBase(layer.mCode).hasDoc() &&
+                  layer.mCode == "CS_A" &&
+                  layer.mRastValue < 99) {
+                PopupPdfMenu(
+                  "",
+                  path:
+                      '${gl.pathExternalStorage}/${gl.dico.getLayerBase(layer.mCode).getFicheRoute(us: layer.mRastValue)}',
                 );
               }
             },
@@ -6255,11 +6325,16 @@ class _AnaResultsMenu extends State<AnaResultsMenu> {
                 indicatorWeight: gl.display.equipixel * 1,
                 labelColor: Colors.black,
                 unselectedLabelColor: Colors.black45,
-                tabs: [
-                  Tab(text: "Optimum"),
-                  Tab(text: "Tolérance"),
-                  Tab(text: "Tolérance élargie"),
-                ],
+                tabs: List<Tab>.generate(3, (index) {
+                  List<String> tags = [
+                    "Optimum",
+                    "Tolérance",
+                    "Tolérance élargie",
+                  ];
+                  return Tab(
+                    text: "${tags[index]} ${apts.getListEss(index).length}",
+                  );
+                }),
               ),
               Container(
                 constraints: BoxConstraints(
@@ -6276,11 +6351,10 @@ class _AnaResultsMenu extends State<AnaResultsMenu> {
                       1.7,
                 ),
                 child: TabBarView(
-                  children: [
-                    EssencesListView(apts: apts, codeApt: 1),
-                    EssencesListView(apts: apts, codeApt: 2),
-                    EssencesListView(apts: apts, codeApt: 3),
-                  ],
+                  children: List<EssencesListView>.generate(
+                    3,
+                    (index) => EssencesListView(apts: apts, codeApt: index),
+                  ),
                 ),
               ),
             ],
@@ -6311,14 +6385,13 @@ class _AnaResultsMenu extends State<AnaResultsMenu> {
                     WidgetState.selected: gl.colorAgroBioTech.withAlpha(200),
                   },
                 ),
-                tabs: [
-                  Tab(text: gl.dico.vulnerabiliteLabel(1)),
-                  Tab(text: gl.dico.vulnerabiliteLabel(2)),
-                  Tab(text: gl.dico.vulnerabiliteLabel(3)),
-                  Tab(text: gl.dico.vulnerabiliteLabel(4)),
-                  //  Tab(text: "Déconseillé"),
-                  //  Tab(text: "Très fortement déconseillé"),
-                ],
+                tabs: List<Tab>.generate(
+                  4,
+                  (index) => Tab(
+                    text:
+                        "${gl.dico.vulnerabiliteLabel(index + 1)} ${gl.dico.vulnerabiliteLabel(index + 1).length}",
+                  ),
+                ),
               ),
 
               Container(
@@ -6326,24 +6399,26 @@ class _AnaResultsMenu extends State<AnaResultsMenu> {
                   maxHeight:
                       max(
                         max(
-                          apts.getListEss(1).length,
-                          apts.getListEss(2).length,
+                          max(
+                            gl.dico.vulnerabiliteLabel(1).length,
+                            gl.dico.vulnerabiliteLabel(3).length,
+                          ),
+                          gl.dico.vulnerabiliteLabel(2).length,
                         ),
-                        apts.getListEss(3).length,
+                        gl.dico.vulnerabiliteLabel(4).length,
                       ) *
                       gl.display.equipixel *
                       gl.iconSizeS *
                       1.64,
                 ),
                 child: TabBarView(
-                  children: [
-                    EssencesListViewGS(apts: apts, codeApt: 1),
-                    EssencesListViewGS(apts: apts, codeApt: 2),
-                    EssencesListViewGS(apts: apts, codeApt: 3),
-                    EssencesListViewGS(apts: apts, codeApt: 4),
-                    //  EssencesListViewGS(apts: apts, codeApt: 5),
-                    //  EssencesListViewGS(apts: apts, codeApt: 6),
-                  ],
+                  children: List<EssencesListViewGS>.generate(
+                    4,
+                    (index) => EssencesListViewGS(
+                      apts: apts,
+                      codeApt: index,
+                    ), //TODO: apts lists and vulnerabilty labels.length are not compatible!
+                  ),
                 ),
               ),
             ],
@@ -6353,95 +6428,147 @@ class _AnaResultsMenu extends State<AnaResultsMenu> {
     );
   }
 
-  Widget popupPdfSaveDialog(void Function(String, String) after) {
-    return AlertDialog(
-      title: Text(
-        "Nom du pdf et de la localisation",
-        style: TextStyle(
-          color: Colors.black,
-          fontSize: gl.display.equipixel * gl.fontSizeM,
-          fontWeight: FontWeight.w400,
-        ),
-      ),
-      shadowColor: Colors.black,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadiusGeometry.circular(12.0),
-        side: BorderSide(color: Color.fromRGBO(205, 225, 138, 1.0), width: 2.0),
-      ),
-      content: SizedBox(
-        child: SingleChildScrollView(
-          physics: ScrollPhysics(),
-          child: SizedBox(
-            width: gl.display.equipixel * gl.popupWindowsPortraitWidth,
-            child: Column(
-              children: [
-                TextField(
-                  controller: controllerPdfName,
-                  autofocus: true,
-                  decoration: InputDecoration(
-                    hintText:
-                        "forestimatorAnalyse${DateTime.now().day}.${DateTime.now().month}.${DateTime.now().year}.pdf",
+  void popupPdfSaveDialog(void Function(String, String) after) {
+    popupBarrierWrapper(
+      dismiss: false,
+      popup:
+          getStorage()
+              ? AlertDialog(
+                title: Text(
+                  "Nom du pdf et de la localisation",
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: gl.display.equipixel * gl.fontSizeM,
+                    fontWeight: FontWeight.w400,
                   ),
                 ),
-                TextField(
-                  controller: controllerLocationName,
-                  decoration: InputDecoration(hintText: "Point 5"),
+                shadowColor: Colors.black,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadiusGeometry.circular(12.0),
+                  side: BorderSide(
+                    color: Color.fromRGBO(205, 225, 138, 1.0),
+                    width: 2.0,
+                  ),
                 ),
-              ],
-            ),
-          ),
-        ),
-      ),
-      actions: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            _returnButton(
-              context,
-              widget.after,
-              length: gl.display.equipixel * gl.popupReturnButtonWidth * .6,
-            ),
-            TextButton(
-              style: ButtonStyle(
-                backgroundColor: WidgetStateProperty.fromMap(
-                  <WidgetStatesConstraint, Color>{
-                    WidgetState.any: gl.colorAgroBioTech,
-                  },
-                ),
-                shape: WidgetStateProperty<OutlinedBorder>.fromMap(
-                  <WidgetStatesConstraint, OutlinedBorder>{
-                    WidgetState.any: RoundedRectangleBorder(
-                      borderRadius: BorderRadiusGeometry.circular(12.0),
-                      side: BorderSide(
-                        color: Color.fromRGBO(205, 225, 138, 1.0),
-                        width: 2.0,
+                content: SizedBox(
+                  child: SingleChildScrollView(
+                    physics: ScrollPhysics(),
+                    child: SizedBox(
+                      width:
+                          gl.display.equipixel * gl.popupWindowsPortraitWidth,
+                      child: Column(
+                        children: [
+                          TextField(
+                            controller: controllerPdfName,
+                            autofocus: true,
+                            decoration: InputDecoration(
+                              hintText:
+                                  "forestimatorAnalyse${DateTime.now().day}.${DateTime.now().month}.${DateTime.now().year}.pdf",
+                            ),
+                          ),
+                          TextField(
+                            controller: controllerLocationName,
+                            decoration: InputDecoration(hintText: "Point 5"),
+                          ),
+                        ],
                       ),
                     ),
-                  },
+                  ),
                 ),
-                fixedSize:
-                    WidgetStateProperty.fromMap(<WidgetStatesConstraint, Size>{
-                      WidgetState.any: Size(
-                        gl.display.equipixel * gl.popupReturnButtonWidth * .6,
-                        gl.display.equipixel * gl.popupReturnButtonHeight,
+                actions: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      _returnButton(
+                        context,
+                        widget.after,
+                        length:
+                            gl.display.equipixel *
+                            gl.popupReturnButtonWidth *
+                            .6,
                       ),
-                    }),
+                      TextButton(
+                        style: ButtonStyle(
+                          backgroundColor: WidgetStateProperty.fromMap(
+                            <WidgetStatesConstraint, Color>{
+                              WidgetState.any: gl.colorAgroBioTech,
+                            },
+                          ),
+                          shape: WidgetStateProperty<OutlinedBorder>.fromMap(<
+                            WidgetStatesConstraint,
+                            OutlinedBorder
+                          >{
+                            WidgetState.any: RoundedRectangleBorder(
+                              borderRadius: BorderRadiusGeometry.circular(12.0),
+                              side: BorderSide(
+                                color: Color.fromRGBO(205, 225, 138, 1.0),
+                                width: 2.0,
+                              ),
+                            ),
+                          }),
+                          fixedSize: WidgetStateProperty.fromMap(<
+                            WidgetStatesConstraint,
+                            Size
+                          >{
+                            WidgetState.any: Size(
+                              gl.display.equipixel *
+                                  gl.popupReturnButtonWidth *
+                                  .6,
+                              gl.display.equipixel * gl.popupReturnButtonHeight,
+                            ),
+                          }),
+                        ),
+                        onPressed: () {
+                          after(
+                            controllerPdfName!.text,
+                            controllerLocationName!.text,
+                          );
+                        },
+                        child: Text(
+                          "Générer",
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: gl.display.equipixel * gl.fontSizeM,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              )
+              : Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    constraints: BoxConstraints(
+                      minHeight: gl.display.equipixel * 30,
+                      minWidth:
+                          gl.display.equipixel * gl.popupWindowsPortraitWidth,
+                      maxWidth:
+                          gl.display.equipixel * gl.popupWindowsPortraitWidth,
+                    ),
+                    child: Text(
+                      "Vous n'avez pas accordé la permission de stockage des pdf!",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: gl.display.equipixel * gl.fontSizeM,
+                        fontWeight: FontWeight.w400,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                  Container(
+                    alignment: Alignment.center,
+                    child: _returnButton(
+                      context,
+                      widget.after,
+                      length:
+                          gl.display.equipixel * gl.popupReturnButtonWidth * .6,
+                    ),
+                  ),
+                ],
               ),
-              onPressed: () {
-                after(controllerPdfName!.text, controllerLocationName!.text);
-              },
-              child: Text(
-                "Générer",
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: gl.display.equipixel * gl.fontSizeM,
-                  fontWeight: FontWeight.w400,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ],
     );
   }
 
@@ -6630,9 +6757,9 @@ class EssencesListViewGS extends StatelessWidget {
                       : null,
               trailing: SizedBox(width: gl.display.equipixel * gl.iconSizeXS),
               onTap: () {
-                GoRouter.of(context).push(
-                  "/${gl.dico.getEss(code.elementAt(index)).getFicheRoute()}",
-                );
+                String path =
+                    "/${gl.pathExternalStorage}/FEE-${gl.dico.getEss(code.elementAt(index)).mCode}.pdf";
+                PopupPdfMenu("", path: path, currentPage: 0);
               },
             ),
             stroke(
@@ -6749,9 +6876,9 @@ class EssencesListView extends StatelessWidget {
                       )
                       : SizedBox(width: gl.display.equipixel * gl.iconSizeXS),
               onTap: () {
-                GoRouter.of(context).push(
-                  "/${gl.dico.getEss(code.elementAt(index)).getFicheRoute()}",
-                );
+                String path =
+                    "/${gl.pathExternalStorage}/FEE-${gl.dico.getEss(code.elementAt(index)).mCode}.pdf";
+                PopupPdfMenu("", path: path, currentPage: 0);
               },
             ),
             stroke(
@@ -6907,12 +7034,16 @@ class _AnaSurfResultsMenu extends State<AnaSurfResultsMenu> {
                           key: Key('$i'),
                           onPressed: () {
                             if ((gl.dico.getLayerBase(mCode).hasDoc() &&
-                                    mCode != "CS_A") ||
-                                (gl.dico.getLayerBase(mCode).hasDoc() &&
-                                    mCode == "CS_A" &&
-                                    mRastValue < 99)) {
-                              GoRouter.of(context).push(
-                                '/${gl.dico.getLayerBase(mCode).getFicheRoute(us: mRastValue)}/0',
+                                mCode != "CS_A")) {
+                              PopupPdfMenu(mCode);
+                            }
+                            if (gl.dico.getLayerBase(mCode).hasDoc() &&
+                                mCode == "CS_A" &&
+                                mRastValue < 99) {
+                              PopupPdfMenu(
+                                "",
+                                path:
+                                    '${gl.pathExternalStorage}/${gl.dico.getLayerBase(mCode).getFicheRoute(us: mRastValue)}',
                               );
                             }
                           },
@@ -7032,7 +7163,8 @@ class _AnaSurfResultsMenu extends State<AnaSurfResultsMenu> {
     Widget Function(int, Item, String, int) generate,
   ) {
     final List<Item> menuItems = [];
-    if (widget.json['RequestedLayers'].isNotEmpty) {
+    if (widget.json['RequestedLayers'] != null &&
+        widget.json['RequestedLayers'].isNotEmpty) {
       for (var result in widget.json['RequestedLayers']) {
         if (result['mean'] != null) {
           menuItems.add(
