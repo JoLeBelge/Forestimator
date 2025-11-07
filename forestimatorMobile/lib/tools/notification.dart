@@ -113,8 +113,7 @@ void popupBarrierWrapper({
                               "popup wrapper: Voidcall after() was null!",
                             )
                             : after();
-                        gl.mainStackPopLast();
-                        gl.refreshMainStack(() {});
+                        dismissPopup();
                       }
                       : () {
                         barrierHit == null
@@ -134,6 +133,56 @@ void popupBarrierWrapper({
       ],
     ),
   );
+}
+
+/// Present a popup either on the app's mainStack (preferred) or via
+/// `showDialog` as a fallback when no stable notification context is
+/// available (tests may set `gl.notificationContext` manually).
+void presentPopup({
+  required Widget popup,
+  bool dismiss = true,
+  VoidCallback? after,
+  BuildContext? context,
+}) {
+  // If we have the global notification context (set in MyApp) or a
+  // context passed explicitly, prefer the mainStack overlay path so
+  // popups are managed consistently by gl.mainStack.
+  if (gl.notificationContext != null || context != null) {
+    gl.refreshMainStack(() {
+      popupBarrierWrapper(popup: popup, dismiss: dismiss, after: after);
+    });
+    return;
+  }
+
+  // Fallback: try to show a standard dialog if we cannot use mainStack.
+  final ctx = context ?? gl.notificationContext;
+  if (ctx != null) {
+    showDialog(
+      context: ctx,
+      barrierDismissible: dismiss,
+      builder: (BuildContext _) => popup,
+    ).then((_) {
+      if (after != null) after();
+    });
+    return;
+  }
+
+  // Last resort: still push to mainStack so UI can attempt to render it.
+  gl.refreshMainStack(() {
+    popupBarrierWrapper(popup: popup, dismiss: dismiss, after: after);
+  });
+}
+
+/// Centralized dismissal for popups that are presented on the
+/// `gl.mainStack` overlay.
+void dismissPopup({VoidCallback? after}) {
+  try {
+    gl.mainStackPopLast();
+    gl.refreshMainStack(() {});
+  } catch (e) {
+    gl.print('dismissPopup: failed to pop mainStack: $e');
+  }
+  if (after != null) after();
 }
 
 class PopupDownloadRecomendedLayers extends StatelessWidget {
@@ -241,8 +290,7 @@ Widget popupNoInternet() {
         ),
         child: Text("OK", style: dialogTextButtonStyle()),
         onPressed: () {
-          gl.mainStackPopLast();
-          gl.refreshMainStack(() {});
+          dismissPopup();
         },
       ),
     ],
@@ -5658,112 +5706,108 @@ class PopupDoYouReally {
     String title,
     String message,
   ) {
-    gl.refreshMainStack(() {
-      popupBarrierWrapper(
-        dismiss: true,
-        popup: AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadiusGeometry.circular(12.0),
-            side: BorderSide(
-              color: Color.fromRGBO(205, 225, 138, 1.0),
-              width: 2.0,
-            ),
+    presentPopup(
+      context: context,
+      dismiss: true,
+      popup: AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadiusGeometry.circular(12.0),
+          side: BorderSide(
+            color: Color.fromRGBO(205, 225, 138, 1.0),
+            width: 2.0,
           ),
-          titlePadding: EdgeInsets.all(5),
-          actionsPadding: EdgeInsets.all(0),
-          contentPadding: EdgeInsets.all(0),
-          insetPadding: EdgeInsets.all(0),
-          buttonPadding: EdgeInsets.all(0),
-          iconPadding: EdgeInsets.all(0),
-          backgroundColor: gl.backgroundTransparentBlackBox,
-          surfaceTintColor: Colors.transparent,
-          shadowColor: Colors.transparent,
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [Text(title, textAlign: TextAlign.justify)],
-          ),
-          content: Theme(
-            data: Theme.of(context).copyWith(
-              canvasColor: Colors.transparent,
-              shadowColor: Colors.transparent,
-            ),
-            child: SizedBox(
-              width: gl.dyrDialogWidth * gl.display.equipixel,
-              child: Text(
-                message,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: gl.fontSizeM * gl.display.equipixel,
-                ),
-              ),
-            ),
-          ),
-          titleTextStyle: TextStyle(
-            color: Colors.white,
-            fontSize: gl.fontSizeM * gl.display.equipixel,
-          ),
-          actionsAlignment: MainAxisAlignment.spaceAround,
-          actions: [
-            Container(
-              padding: EdgeInsets.symmetric(vertical: gl.display.equipixel * 2),
-              child: FloatingActionButton(
-                onPressed: () {
-                  gl.mainStackPopLast();
-                  gl.refreshMainStack(() {});
-                  after();
-                },
-                backgroundColor: gl.colorBack,
-                child: Container(
-                  alignment: Alignment.center,
-                  constraints: BoxConstraints(
-                    maxHeight: gl.dyrButtonsize * 0.6 * gl.display.equipixel,
-                    minHeight: gl.dyrButtonsize * 0.6 * gl.display.equipixel,
-                    maxWidth: gl.dyrButtonsize * 1.25 * gl.display.equipixel,
-                    minWidth: gl.dyrButtonsize * 1.25 * gl.display.equipixel,
-                  ),
-                  child: Text(
-                    "Oui",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: gl.fontSizeM * gl.display.equipixel,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            Container(
-              padding: EdgeInsets.symmetric(vertical: gl.display.equipixel * 2),
-              child: FloatingActionButton(
-                onPressed: () {
-                  gl.mainStackPopLast();
-                  gl.refreshMainStack(() {});
-                },
-                backgroundColor: gl.colorAgroBioTech,
-                child: Container(
-                  alignment: Alignment.center,
-                  constraints: BoxConstraints(
-                    maxHeight: gl.dyrButtonsize * .6 * gl.display.equipixel,
-                    minHeight: gl.dyrButtonsize * 0.6 * gl.display.equipixel,
-                    maxWidth: gl.dyrButtonsize * 1.25 * gl.display.equipixel,
-                    minWidth: gl.dyrButtonsize * 1.25 * gl.display.equipixel,
-                  ),
-                  child: Text(
-                    "Non",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: gl.fontSizeM * gl.display.equipixel,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
         ),
-      );
-    });
+        titlePadding: EdgeInsets.all(5),
+        actionsPadding: EdgeInsets.all(0),
+        contentPadding: EdgeInsets.all(0),
+        insetPadding: EdgeInsets.all(0),
+        buttonPadding: EdgeInsets.all(0),
+        iconPadding: EdgeInsets.all(0),
+        backgroundColor: gl.backgroundTransparentBlackBox,
+        surfaceTintColor: Colors.transparent,
+        shadowColor: Colors.transparent,
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [Text(title, textAlign: TextAlign.justify)],
+        ),
+        content: Theme(
+          data: Theme.of(context).copyWith(
+            canvasColor: Colors.transparent,
+            shadowColor: Colors.transparent,
+          ),
+          child: SizedBox(
+            width: gl.dyrDialogWidth * gl.display.equipixel,
+            child: Text(
+              message,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: gl.fontSizeM * gl.display.equipixel,
+              ),
+            ),
+          ),
+        ),
+        titleTextStyle: TextStyle(
+          color: Colors.white,
+          fontSize: gl.fontSizeM * gl.display.equipixel,
+        ),
+        actionsAlignment: MainAxisAlignment.spaceAround,
+        actions: [
+          Container(
+            padding: EdgeInsets.symmetric(vertical: gl.display.equipixel * 2),
+            child: FloatingActionButton(
+              onPressed: () {
+                dismissPopup(after: after);
+              },
+              backgroundColor: gl.colorBack,
+              child: Container(
+                alignment: Alignment.center,
+                constraints: BoxConstraints(
+                  maxHeight: gl.dyrButtonsize * 0.6 * gl.display.equipixel,
+                  minHeight: gl.dyrButtonsize * 0.6 * gl.display.equipixel,
+                  maxWidth: gl.dyrButtonsize * 1.25 * gl.display.equipixel,
+                  minWidth: gl.dyrButtonsize * 1.25 * gl.display.equipixel,
+                ),
+                child: Text(
+                  "Oui",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: gl.fontSizeM * gl.display.equipixel,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Container(
+            padding: EdgeInsets.symmetric(vertical: gl.display.equipixel * 2),
+            child: FloatingActionButton(
+              onPressed: () {
+                dismissPopup();
+              },
+              backgroundColor: gl.colorAgroBioTech,
+              child: Container(
+                alignment: Alignment.center,
+                constraints: BoxConstraints(
+                  maxHeight: gl.dyrButtonsize * .6 * gl.display.equipixel,
+                  minHeight: gl.dyrButtonsize * 0.6 * gl.display.equipixel,
+                  maxWidth: gl.dyrButtonsize * 1.25 * gl.display.equipixel,
+                  minWidth: gl.dyrButtonsize * 1.25 * gl.display.equipixel,
+                ),
+                child: Text(
+                  "Non",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: gl.fontSizeM * gl.display.equipixel,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 

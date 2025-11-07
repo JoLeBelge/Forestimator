@@ -1,0 +1,176 @@
+This is a list of instructions to create a manual for the forestimator application
+The output has to be in french.
+A latex compatible document ready to compile. completely formatted with a contents table and later also bibliographie.
+Dont generate graphics. if you find a includegraphics, then consider that there are screenshots in the same folder than the latex document. Latex should include them into the final text. You can set the width to 0.25 for all graphics.
+Icons are also png images. They are located in a separate folder named icons with the latex file. after the  first . is the filename. you can embed them into the text.
+Most sections starts with a description of what can be observed at the screen. After that there are specific procedures to do complete tasks with the application. You should seperate them visually by writing the instructions in a box with title.
+When you encounter "Warning:" you put the following lines of text into a box just like the Procedure instructions.
+
+Titlepage
+ Under the title you can add that the manual has been made by Thierry Thissen and Jonathan Lisein and MistralAi.
+ >includeGraphics LogoUliegeForest.jpg
+ >includeGraphics LogoForestimator.png
+
+Put a Contents table after the Title page
+
+The following is a list of actions and buttons pressed in forestimator.
+
+
+1. Introduction: you can get information here: https://forestimator.gembloux.ulg.ac.be/documentation/forestimator/ .
+ - Explain that there is a Forestimator Web Page and application and that they are different. This manual is dedicated to the application.
+
+2. Installation
+  - Before installing:
+   - Forestimator Mobile is available for Android and iOS
+   - Forestimator can be installed in Belgium, Netherland, France, Germany and Luxemburg.
+  - Install Procedure:
+   - open Googles or Apples App Store
+   - Search for the term forestimator
+   - press install
+   - wait for Installation
+   - press now open to start forestimator for the first time
+
+
+3. First time use
+  - After opening the app you should see the mainscreen with the ign layer in the background.
+  >includeGraphics StartScreen.png
+  - At a certain point the app will ask you permissions. These are never necessary for the app to work, but some specific tasks cannot be done without them. 
+  >includeGraphics Permissions.png
+
+
+4. The Mainscreen
+  >includeGraphics StartScreenDescription.png
+  - On the lower part of the screen you see a menu bar with three elements of which one can be selected.
+   - On the left is a tree symbol.
+    - This open the toolmenu. here are tools to search a location in wallonia or to find your gps location if allowed.
+   - In the middle a hexagon
+    - Opens the Polygon Menu. Here you can create shapes on the map and ask to make a surface analysis with our servers.
+   - On the rigth is an eye symbol
+    - It opens the layer swicher. Here you can change maps, change visibility of polygons and location marker, consult the catalogue or download maps to be used in ofline mode.
+  - On the upper part left is a settings symbol
+    - It allows you to change global settings or view information about forestimator.
+  - On the top in the middle is a button on wich is written Online mode. 
+   - This is a button that switches between on and offline mode. For advanced usage you can download maps to visualize them offroad. We will cover that in a dedicated section.
+ - Attention:
+  - The map shows up to three layers in one screen. The zoom on some layer is restricted so that they disappear if you zoom to far away. This is indicated by a warning sign in the top right of the screen when it happens.   
+
+
+5. Settings
+>includeGraphics Settings.png
+  - Here you can change the permissions you accorded or find information about the application and the people behind. When you open it, you have these 4 submenus:
+   - Permission: You can look wich permission you gave and also change them. 
+   - The about dialog: it indicates the version of forestimator and it tells you about the financement
+   - Contact section: adress of our main web site and mails if you have questions, find bugs
+   - Confidentiality
+
+6. The tools menu
+>includeGraphics ToolMenu2.png
+ - You open it by pressing the tree to the left of the menubar. You will see a new menu poping up on the left with 2 tools:
+  - The gps icon indicates if the mobile knows your position. If it turns from grey to red, it has found your location. In that case if you tap it, it will center the screen on your gps position.
+  - If your position is visible inside the screen, another symbol appears on top of the gps symbol. if you tap it, you get a punctual analysis for your gps position.
+>includeGraphics ToolMenu3.png
+  - the last symbol is a looking glass. It allows you to search for a localization in wallonia. The results come from openstreetmaps nominatim server. 
+
+7. The polygon menu.
+  >includeGraphics PolygonMenu.png
+ - You tap the hexagon symbol on the menubar for opening the polygon menu. the first time you'll see a box that in the upper part of the screen. It tells + Tappez ici pour ajouter un polygone. press it to open the list of all polygones.
+ - PolygonList: 
+   There are two buttons to the down, one with a + on it to add a new polygons, the other is 'Fermer' to get back to the mainscreen.
+ - Procedure to create a new polygon:
+ >includeGraphics PolygonMenu.png
+  - Press on +
+  - A dialog box opens. you can give a short name to the new polygon. and press ok.
+  - A new card appears on top in the list. It contains the new polygons info: The name, its surface in sqaure meters, its cicumference in meters. you can change the color of the tile as well of the polygon on the map with the color symbol on top right of the card. You can delete the polygon by pressing the trashcan to the left of the card. You can ask to analyze the polygon on layers you chosed on ouy servers. This only works if you have a polygon smaller than 250 square meters and it is well defines, the sides dont cut each other.
+  - You can now close the list.
+  - On the top you see now a box with your selected polygon. On the left of this box is a center symbol. You press it to set the view in the center of the polygon if it has one. If you short tap the info box you open the list of polygons again.
+  >includeGraphics NewPoly1.png
+ - Procedure to Add vertexes
+  - On the left is a new menu bar with a Icons.add_circle.png. Press it and you can add vertexes by taping on the map.
+  - If you tap at least 3 points, a triangle will appear. One of the three edges of the triangle is drawn with a big line. This line is divided in 2 with the next vertex you put on the map. If you want to change this line you have to tap on another Vertex.
+  >includeGraphics NewPoly4.png
+ - Procedure to Remove or move a vertex.
+  - Now that you have drawn your polygon You can tap on one Vertex. This changes the menu left, the Icons.add_circle.png disappears and a Icons.remove_circle.png and Icons.open_with.png appear. the Icons.remove_circle.png let you delete the selected vertex. If you press the  Icons.open_with.png you can move the selected vertex. After moving, press the sumbol again to stop move it.
+  - With a well defined polygon you can now open the list and press on the Icons.analytics.png symbol.
+  - The results are presented per layer.  If you see a red small pdf icon with the title of the layer, you can consult the documentation of it.
+  >includeGraphics NewPoly5.png
+
+8. The layer switcher.
+  - Press the eye on the menubar to open the layer switcher. 
+  - In the upper part of the switcher you can control the visibility of Location Markers and Polygons.
+  - In the middle you observe three cards. Each can be a map layer. So you can superpose up to three maps. For the upper one you can set a 50% transparency.
+  - The lower part lets you access the catalogues. The symbol Icons.layers.png let you access the online catalogue on the server.
+   - The map layer in this catalogue are stored on the server. You can browse them, select as one of the three layer, find documentation or references, select them for analysis or download certain layers to use them offline on terrain. 
+  - The symbol Icons.download_for_offline.png lets you access a catalogue with only maps that you already downloaded. If you did not download any, the symbol is not here.
+ 
+ - Procedure to select a layer in a specific slot
+  - press on the text in the switcher tile. If no map is selected you can read Appuyez ici pour ajouter une couche du catalogue.
+  - The catalogue menu opens. If you tap on the Icons.layers.png, you can select that specific layer. A green circle with a number appears instead of the Icons.layers.png
+
+ - Procedure to select 3 layers at once:
+  - open the layer switcher 
+  - press on the Icons.layers.png button to open the catalogue
+  - On the layer tile card you tap on the layers icon to select a layer.
+  - After you tapped, there is a green circle with a number that appears, it indicates in wich layer slot the layer actually is in the switcher.
+  - You can select up to theree layer now. The last one you tapped will always be at the first position in the switcher and the one who exceed number 3 is deselected.
+
+ - Procedure to remove a map in a specific slot
+  - press on the text in the switcher tile to open the catalogue.
+  - You tap now on the green circle with the slot number to deselect the map.
+
+9. Layer Catalogue
+>includeGraphics catalogue.png
+ - In the layer catalogue you can browse all available layers from our servers. 
+ - Our layers are divided by categories: "conditions stationelles, guide des stations, cartes de reference, cartographie des peuplement forestier, etat sanitaire de la pessiere, adequation des essences aux conditions stationels, essences proposes par les guide des stations, couches thematiques(catalogue de stations)"
+ - by tapping on the category you develop the list of layers.
+ - If we look close to a lyer tile we can see at the left of the title multiple small symbols. At the right we see either a circle with a number zhen the layer is selected bw the layer switcher or a Icons.layers.png symbol.
+ - The symbols in the right part are a preview of multiple properties you'll find by developing the layer tile further by tapping on it.
+  - Description of the symbols
+   - Icons.download.png indicates if you can download the layer on you smartphone for offline usage.
+   - Icons.disk.png indicates that the layer has already been downloaded.
+   - Icons.legend_toggle.png tells you if there is a legend to show you the description per color pixel.
+   - Icons.picture_as_pdfBrown.png tells if there is documentaion available.
+   - Icons.pentagram.png tells you if the layer is selected for surface analysis.
+   - Icons.locationPin.png tells you if the layer is selected for puntcual analysis.
+ - By tapping on a layer you see the whole description and you can change the properties by tapping on them.
+   >includeGraphics catalogueLayerTile.png
+
+10. Analysis
+ - Forestimator Mobile gives you differnet possibilities to analyze either positions or surfaces.
+  - Procedure: How make Punctual analysis
+   - you go to the main screen and just tap somewhere on the map.
+    >includeGraphics anaPreview.png
+   - A short preview in one line pops up and tells you the legend and color for this point.
+   - If you tap again on that preview, you'll make an analysis with all selected layer. In online mode the analysis will be carried out on our servers and in offline mode it will be computed on our smartphone. 
+   - Alternatively you can long press the map and skip the short preview and get directly a complete analysis of all selected layer.
+  - Attention:
+   - This does not work with on all selected maps just the 1st map in the switcher will be queried! Also, this will not work with all maps from the catalogue. For instance the IGN map or the orthophotographic layers will not show you a preview.
+  - Procedure: How make Surface analysis
+   - Press on the Hexagon symbol on the main menu.
+   - In the polygon menu you press on the tile in the upper screen to get to the polygon list.
+   - Select the polygon you want to analyze. 
+   - Now tap on Icons.analytics.png to starts the analysis.
+   >includeGraphics anaPt.png
+  - Procedure: Select layer for analysis
+   - Open the layer Switcher.
+   - Press then on the Icons.layers.png to open the catalogue.
+   - Search for the layer you wont to analyze and open it by tapping on the title.
+   - press either Icons.pentagon.png to include it for the surface analysis or Icons.locationPin.png to include it for punctual analwsis.
+   - tap on the close button.
+   - You may now make your analysis.
+
+11. On/Offline mode
+- For people far abroad there is an offline mode you can use to look maps and analyze on the go.
+- Before using the offline mode:
+ - To be able to use the offline mode you have at least one layer downloaded.
+ - You can visualize downloaded layer by tapping on the Icons.download_for_offline.png symbol in the layer switcher.
+ - The layer switcher suppoerts the visualizing of exactly one map right now because of the calculations that are implied for your smartphone.
+ - You can make previews as well as punctual analysis.
+ - You cannot make surface analysis, however you may draw polygones.
+ - You can use the Gps but not search for locations.
+- Procedure: Switch to offline mode
+ - You tap on the Button with text "Forestimator online". You will observe a change in color and a map will be loaded in memory.
+ >includeGraphics offlineMode.png
+- Procedure: Switch to online mode
+  - You tap on the Button with text "Forestimator terrain" to switch back.
+  - Attention:
+   - If you have downloaded layers, you can also mix one downloaded layer with the others from the server. There is a small icon in the switcher that tells if a layer is available online or if it comes from disk.

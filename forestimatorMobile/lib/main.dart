@@ -45,6 +45,7 @@ class MyApp extends StatefulWidget {
 
 class _MyApp extends State<MyApp> {
   bool _initializedPersistentValues = false;
+  GlobalKey<NavigatorState>? _navigatorKey;
 
   _MyApp();
 
@@ -227,16 +228,20 @@ class _MyApp extends State<MyApp> {
     // copier tout les pdf de l'asset bundle vers un fichier utilisable par la librairie flutter_pdfviewer
     _listAndCopyPdfassets();
     _readPreference();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _navigatorKey = GlobalKey<NavigatorState>();
+      gl.notificationContext = _navigatorKey!.currentContext;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     gl.initializeDisplayInfos(context);
-    gl.notificationContext = context;
     if (!_initializedPersistentValues) {
       return const MaterialApp(home: CircularProgressIndicator());
     }
     return MaterialApp(
+      navigatorKey: _navigatorKey,
       title: 'Forestimator',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
