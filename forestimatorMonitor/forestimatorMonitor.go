@@ -7,14 +7,22 @@ import (
 	"net/http"
 	"os/exec"
 	"time"
+
+	"github.com/wneessen/go-mail"
 )
 
 const (
-	serverURL   = "https://forestimator.gembloux.ulg.ac.be/"
-	pingIP      = "139.165.226.56"
-	emailTo     = "tthissen@uliege.be"
-	maxPingTime = 10 * time.Second
+	serverURL          = "https://forestimator.gembloux.ulg.ac.be/"
+	pingIP             = "139.165.226.56"
+	maxPingTime        = 10 * time.Second
+	intervallRequest   = 1 * time.Hour
+	intervallRetry     = 10 * time.Minute
+	hoursNoHarrassment = 24
 )
+
+func emailTo() []string {
+	return []string{"tthissen@uliege.be", "liseinjon@hotmail.com", "p.lejeune@uliege.be"}
+}
 
 type RequestLog struct {
 	Response string
@@ -22,37 +30,46 @@ type RequestLog struct {
 }
 
 func main() {
+	failureTime := 0
 	for {
-		// Attempt the request
 		resp, err := http.Get(serverURL)
 		if err != nil {
 			log.Printf("Request failed: %v\n", err)
-			handleFailure()
+			if failureTime < 1 {
+				failureTime = handleFailure()
+			} else {
+				time.Sleep(intervallRequest)
+				log.Println(failureTime)
+				failureTime--
+			}
 		} else {
 			log.Println("Request succeeded, sleeping for 1 hour...")
-			time.Sleep(1 * time.Hour)
+			if failureTime > 0 {
+				failureTime = 0
+				sendSuccessMailAfterFailure()
+			}
+			time.Sleep(intervallRequest)
 			resp.Body.Close()
 		}
 	}
 }
 
-func handleFailure() {
+func handleFailure() int {
 	var logs [3]RequestLog
 	var pingLog bytes.Buffer
 
 	// Retry loop
 	for i := 0; i < 3; i++ {
-		time.Sleep(15 * time.Minute)
+		time.Sleep(intervallRetry)
 
 		resp, err := http.Get(serverURL)
 		if err != nil {
 			logs[i] = RequestLog{Response: fmt.Sprintf("Attempt %d failed: %v", i+1, err), Time: time.Now()}
 			log.Printf("Attempt %d failed: %v\n", i+1, err)
 		} else {
-			log.Printf("Attempt %d succeeded, resuming normal operation.\n", i+1)
-			time.Sleep(1 * time.Hour)
+			log.Printf("Attempt %d succeeded\n", i+1)
 			resp.Body.Close()
-			return
+			return 0
 		}
 	}
 
@@ -64,30 +81,63 @@ func handleFailure() {
 
 	if pingErr != nil {
 		log.Printf("Ping failed: %v\n", pingErr)
-		sendErrorReport(logs, pingLog.String())
+		sendErrorReport(logs, pingLog.String(), false)
 	} else {
-		log.Println("Ping succeeded, resuming normal operation.")
-		time.Sleep(1 * time.Hour)
+		log.Println("Ping succeeded.")
+		sendErrorReport(logs, pingLog.String(), true)
+	}
+	return hoursNoHarrassment
+}
+
+func sendErrorReport(logs [3]RequestLog, pingLog string, pingSuccess bool) {
+	subject := "Forestimator Offline!"
+	body := "The following requests failed:\n\n"
+	for i, log := range logs {
+		body += fmt.Sprintf("Attempt %d: %s at %s\n", i+1, log.Response, log.Time.Format(time.RFC3339)) + "\n"
+	}
+	if pingSuccess {
+		body += "\nPing to server IP succeeded, indicating a possible server issue.\n"
+	} else {
+		body += "\nPing to server IP failed, indicating a possible network issue.\n"
+	}
+	body += fmt.Sprintf("\nPing log:\n%s\n", pingLog)
+	for _, email := range emailTo() {
+		SendEmail(email, subject, body)
 	}
 }
 
-func sendErrorReport(logs [3]RequestLog, pingLog string) {
-	subject := "Server Monitoring Alert"
-	body := fmt.Sprintf("The following requests failed:\n\n")
-	for i, log := range logs {
-		body += fmt.Sprintf("Attempt %d: %s at %s\n", i+1, log.Response, log.Time.Format(time.RFC3339))
+func sendSuccessMailAfterFailure() {
+	subject := "Forestimator is back online!"
+	body := "The Forestimator server is back online after previous failures.\n"
+	for _, email := range emailTo() {
+		SendEmail(email, subject, body)
 	}
-	body += fmt.Sprintf("\nPing log:\n%s\n", pingLog)
+}
 
-	// In a real-world scenario, you would use an email package to send the email.
-	// For simplicity, we'll just print the report here.
-	log.Printf("Sending error report to %s:\n\n%s\n", emailTo, body)
-	// Uncomment the following lines to actually send an email (requires an SMTP setup)
-		err := smtp.SendMail("smtp.ulg.ac.be:25",
-			smtp.PlainAuth("", "u241781", "ap[Ko)19", "smtp.ulg.ac.be"),
-			"panne@forestimator.gembloux.ulg.ac.be", []string{emailTo}, []byte(body))
-		if err != nil {
-			log.Printf("Failed to send email: %v\n", err)
-		}
+func SendEmail(recipient string, subject string, msg string) {
 
+	// Sender data.
+	m := mail.NewMsg()
+	if err := m.From("tthissen@uliege.be"); err != nil {
+		log.Printf("failed to set From address: %s", err)
+	}
+	if err := m.To(recipient); err != nil {
+		log.Printf("failed to set To address: %s", err)
+	}
+	m.Subject(subject)
+	m.SetBodyString(mail.TypeTextPlain, msg)
+
+	// Secondly the mail client
+	c, err := mail.NewClient("smtp.ulg.ac.be",
+		mail.WithPort(465), mail.WithSMTPAuth(mail.SMTPAuthLogin),
+		mail.WithUsername("tthissen@uliege.be"), mail.WithPassword("ap[Ko)19"),
+		mail.WithSSLPort(false))
+	if err != nil {
+		log.Printf("failed to create mail client: %s", err)
+	}
+
+	// Finally let's send out the mail
+	if err := c.DialAndSend(m); err != nil {
+		log.Printf("failed to send mail: %s", err)
+	}
 }

@@ -353,7 +353,9 @@ func main() {
 	go func() {
 		forestimator.proxy, _ = NewProxy("http://localhost:8500")
 		forestimator.downloader, _ = NewProxy("http://localhost:8501")
+		forestimator.openforis, _ = NewProxy("http://localhost:8080")
 		for {
+			http.Handle("/collect", forestimator.openforis)
 			if forestimator.started {
 				director := forestimator.proxy.Director
 				forestimator.proxy.Director = func(r *http.Request) {
