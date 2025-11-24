@@ -362,13 +362,14 @@ func main() {
 					director(r)
 					recordRequest(&forestimator, r.RequestURI)
 				}
-				forestimator.proxy.OnRequest().DoFunc(func(req *http.Request, ctx *goproxy.ProxyCtx) (*http.Request, *http.Response) {
-					if string.Contains(r.RequestURI, "?signal=") {
+				/*forestimator.proxy.Rewrite = func(r *httputil.ProxyRequest) {
+					if strings.Contains(r.In.RequestURI, "?signal=") {
 						log.Println("Signal detected in request URI")
-						req.Body = io.NopCloser(strings.NewReader("/"))
 					}
-					return req, nil
-				})
+					recordRequest(&forestimator,r.In.RequestURI,)
+					r.Out.URL.RawQuery = "GET /"
+				}*/
+
 				http.Handle("/collect/", forestimator.openforis)
 				http.Handle("/", forestimator.proxy)
 				http.Handle("/results/", forestimator.downloader)
