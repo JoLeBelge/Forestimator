@@ -17,6 +17,7 @@ import (
 type proc struct {
 	proxy            *httputil.ReverseProxy
 	downloader       *httputil.ReverseProxy
+	openforis        *httputil.ReverseProxy
 	listOfProperties string
 	updateintervall  time.Duration
 	started          bool
@@ -61,13 +62,13 @@ type proc struct {
 
 func startForestimatorWebServer() (cmd *exec.Cmd) {
 	cmd = exec.Command("sh", "launch.sh") //, "--deploy-path=/ --docroot \"/home/carto/app/Forestimator/data/;/favicon.ico,/google52ee6b8ebe0b4b19.html,/sitemap.xml,/resources,/style,/tmp,/data,/js,/jslib,/img,/pdf,/video,resources/themes/bootstrap/5\" --http-port 8001 --http-addr 127.0.0.1 -c /home/gef/Documents/Forestimator/data/wt_config.xml --BD \"/home/gef/Documents/Forestimator/carteApt/data/aptitudeEssDB.db\" --colPath \"Dir\" ")
-	cmd.Dir = "/home/gef/Documents/Forestimator/forestimatorWeb"
+	cmd.Dir = "/home/carto/app/Forestimator/forestimatorWeb"
 	return cmd
 }
 
 func startForestimatorDownloadServer() (cmd *exec.Cmd) {
 	cmd = exec.Command("/usr/local/go/bin/go", "run", "downloadServer.go") //, "--deploy-path=/ --docroot \"/home/carto/app/Forestimator/data/;/favicon.ico,/google52ee6b8ebe0b4b19.html,/sitemap.xml,/resources,/style,/tmp,/data,/js,/jslib,/img,/pdf,/video,resources/themes/bootstrap/5\" --http-port 8001 --http-addr 127.0.0.1 -c /home/gef/Documents/Forestimator/data/wt_config.xml --BD \"/home/gef/Documents/Forestimator/carteApt/data/aptitudeEssDB.db\" --colPath \"Dir\" ")
-	cmd.Dir = "/home/gef/Documents/Forestimator/forestimatorDownloadServer"
+	cmd.Dir = "/home/carto/app/Forestimator/forestimatorDownloadServer"
 	return cmd
 }
 
@@ -355,13 +356,20 @@ func main() {
 		forestimator.downloader, _ = NewProxy("http://localhost:8501")
 		forestimator.openforis, _ = NewProxy("http://localhost:8080")
 		for {
-			http.Handle("/collect", forestimator.openforis)
 			if forestimator.started {
 				director := forestimator.proxy.Director
 				forestimator.proxy.Director = func(r *http.Request) {
 					director(r)
 					recordRequest(&forestimator, r.RequestURI)
 				}
+				forestimator.proxy.OnRequest().DoFunc(func(req *http.Request, ctx *goproxy.ProxyCtx) (*http.Request, *http.Response) {
+					if string.Contains(r.RequestURI, "?signal=") {
+						log.Println("Signal detected in request URI")
+						req.Body = io.NopCloser(strings.NewReader("/"))
+					}
+					return req, nil
+				})
+				http.Handle("/collect/", forestimator.openforis)
 				http.Handle("/", forestimator.proxy)
 				http.Handle("/results/", forestimator.downloader)
 				log.Println(http.ListenAndServe(":8085", nil))
