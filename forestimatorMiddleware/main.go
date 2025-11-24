@@ -357,14 +357,18 @@ func main() {
 		forestimator.openforis, _ = NewProxy("http://localhost:8080")
 		for {
 			if forestimator.started {
-
-				forestimator.proxy.Rewrite = func(r *httputil.ProxyRequest) {
+				director := forestimator.proxy.Director
+				forestimator.proxy.Director = func(r *http.Request) {
+					director(r)
+					recordRequest(&forestimator, r.RequestURI)
+				}
+				/*forestimator.proxy.Rewrite = func(r *httputil.ProxyRequest) {
 					if strings.Contains(r.In.RequestURI, "?signal=") {
 						log.Println("Signal detected in request URI")
 					}
-					recordRequest(&forestimator, r.In.RequestURI)
+					recordRequest(&forestimator,r.In.RequestURI,)
 					r.Out.URL.RawQuery = "GET /"
-				}
+				}*/
 
 				http.Handle("/collect/", forestimator.openforis)
 				http.Handle("/", forestimator.proxy)
