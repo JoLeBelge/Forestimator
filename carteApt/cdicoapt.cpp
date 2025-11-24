@@ -98,6 +98,17 @@ cDicoApt::cDicoApt(std::string aBDFile):cdicoAptBase(aBDFile)
 
     }
 
+    const char *inputPath= this->File("ZBIOSIMP").c_str();
+    mDS_zbio= GDALDataset::Open(inputPath, GDAL_OF_VECTOR | GDAL_OF_READONLY);
+        if (boost::filesystem::exists(inputPath)){
+
+            if( mDS_zbio == NULL )
+            {
+                std::cout << inputPath << " : " ;
+                printf( " shp zbio : pas réussi à l'ouvrir." );
+            }
+        } else {std::cout << this->File("ZBIOSIMP") << " : n'existe pas" << std::endl;}
+
     std::cout << "done " << std::endl;
     boost::filesystem::create_directories(File("TMPDIR"));
     //std::cout << "Dico code essence --> nom essence francais a "<< Dico_codeEs2NomFR.size() << " elements \n" << std::endl;
@@ -268,13 +279,20 @@ OGRGeometry * cDicoApt::checkPolyg(std::string aPolyg, int maxSurf){
 
     // isValid() fonctionne mais par contre le destroyGeom doit être suivi d'un pol=NULL sinon bug
     if (err==OGRERR_NONE && pol!=NULL){
-        pol->MakeValid();
+        // j'ai commenté tout ce bloc de code car le MakeValid ne fonctionne pas toujours et la suite toGeometryCollection()->getGeometryRef(0)->IsValid() fait crasher l'app
+        //pol=pol->MakeValid();
         // j'ai des pol invalides qui sont des multipolygones avec self intersection, je garde que le premier polygone. solution rapide...
-        if (!pol->IsValid() & pol->toGeometryCollection()->getNumGeometries()>1){
-            if(OGR_G_Area(pol->toGeometryCollection()->getGeometryRef(0))>100 & pol->toGeometryCollection()->getGeometryRef(0)->IsValid()){
-                pol=pol->toGeometryCollection()->getGeometryRef(0);
+       /*if (!pol->IsValid() & pol->toGeometryCollection()->getNumGeometries()>1){
+            try{
+                //if(OGR_G_Area(pol->toGeometryCollection()->getGeometryRef(0))>100 & pol->toGeometryCollection()->getGeometryRef(0)->IsValid()){
+                pol->toGeometryCollection()->getGeometryRef(0)->IsValid();
+                //if(pol->toGeometryCollection()->getGeometryRef(0)->IsValid()){
+                //pol=pol->toGeometryCollection()->getGeometryRef(0);
+                //}
+            } catch (...) {
+                std::cout << "not valid geometry";
             }
-        }
+        }*/
         if(pol->IsValid()){
             //std::cout << " geométrie valide " << pol->getGeometryName() << std::endl;
             int aSurfha=OGR_G_Area(pol)/10000;
