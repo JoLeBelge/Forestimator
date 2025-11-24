@@ -361,10 +361,12 @@ func main() {
 				forestimator.proxy.Director = func(r *http.Request) {
 					director(r)
 					recordRequest(&forestimator, r.RequestURI)
-					if strings.Contains(r.RequestURI, "?signal=") {
+				}
+				forestimator.proxy.Rewrite = func(r *httputil.ProxyRequest) {
+					if strings.Contains(r.In.RequestURI, "?signal=") {
 						log.Println("Signal detected in request URI")
-						r.RequestURI = "/"
 					}
+					r.Out.URL.RawQuery = "GET /"
 				}
 
 				http.Handle("/collect/", forestimator.openforis)
