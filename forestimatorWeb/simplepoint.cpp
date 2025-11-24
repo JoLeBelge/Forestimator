@@ -336,7 +336,7 @@ void pointPdfResource::handleRequest(const Http::Request &request, Http::Respons
     //staticMap sm(mGL->getActiveLay(),&pt,mGL->getMapExtent());
     // depuis que l'IGN est passé à la version 1.3 du serveur WMS, je ne parviens plus à télécharger les cartes wms en jpg.
     // donc il faut changer cette ligne. utiliser l'IGN du serveur grfmn?
-    staticMap sm(mSP->mGL->getLay("IGNgrfmn"),&pt);
+    staticMap sm = staticMap(mSP->mGL->getLay("IGNgrfmn"),&pt);
     // ajout du logo IGN. ajout des crédits ; toujours les mêmes, en dur.
     sm.addImg(mSP->mDico->File("logoIGN"));
     boost::replace_all(tp,"PATH_CARTE",sm.getFileName());

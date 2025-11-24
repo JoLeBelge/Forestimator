@@ -361,14 +361,12 @@ func main() {
 				forestimator.proxy.Director = func(r *http.Request) {
 					director(r)
 					recordRequest(&forestimator, r.RequestURI)
-				}
-				forestimator.proxy.OnRequest().DoFunc(func(req *http.Request, ctx *goproxy.ProxyCtx) (*http.Request, *http.Response) {
-					if string.Contains(r.RequestURI, "?signal=") {
+					if strings.Contains(r.RequestURI, "?signal=") {
 						log.Println("Signal detected in request URI")
-						req.Body = io.NopCloser(strings.NewReader("/"))
+						r.RequestURI = "/"
 					}
-					return req, nil
-				})
+				}
+
 				http.Handle("/collect/", forestimator.openforis)
 				http.Handle("/", forestimator.proxy)
 				http.Handle("/results/", forestimator.downloader)
