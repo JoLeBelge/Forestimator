@@ -196,7 +196,10 @@ bool parcellaire::computeGlobalGeom(std::string extension, bool limitSize)
     {
         std::cout << "computeGlobalGeom : je n'arrive pas à ouvrir " << mFullPath << "." << extension << std::endl;
     }
-    GDALClose(DS);
+    if (DS != NULL)
+    {
+        GDALClose(DS);
+    }
     return aRes;
 }
 
@@ -562,7 +565,7 @@ void parcellaire::TaskComputing::run()
     std::string input(geoJsonName);
     const char *inputPath = input.c_str();
     cout << input.c_str();
-    GDALDataset *mDS = (GDALDataset *)GDALOpenEx(inputPath, GDAL_OF_VECTOR || GDAL_OF_READONLY, NULL, NULL, NULL);
+    GDALDataset *mDS = (GDALDataset *)GDALOpenEx(inputPath, GDAL_OF_VECTOR | GDAL_OF_READONLY, NULL, NULL, NULL);
     if (mDS != NULL)
     {
         OGRLayer *lay = mDS->GetLayer(0);
