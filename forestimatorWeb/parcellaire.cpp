@@ -61,7 +61,7 @@ parcellaire::parcellaire(groupLayers *aGL, cWebAptitude *app, statWindow *statW)
 
 parcellaire::~parcellaire()
 {
-    cleanShpFile();
+    //cleanShpFile();
     m_app = NULL;
     msg = NULL;
     mGL = NULL;
@@ -244,7 +244,7 @@ void parcellaire::upload()
     // computeStatButton->disable();
     downloadRasterBt->disable();
     // anaOnAllPolygBt->disable();
-    cleanShpFile();
+    //cleanShpFile();
     boost::filesystem::path p(fu->clientFileName().toUTF8()), p2(this->fu->spoolFileName());
     mClientName = p.stem().c_str();
 
