@@ -5,7 +5,7 @@ extern int maxSizePix4Export;
 void rasterClipResource::handleRequest(const Http::Request &request, Http::Response &response)
 {
     std::cout << "rasterClipResource:: handle request" << std::endl;
-
+    char **papszOptions = NULL;
     auto params = request.urlParams();
     std::string lCode("");
     double xmin, ymin, xmax, ymax;
@@ -71,7 +71,6 @@ void rasterClipResource::handleRequest(const Http::Request &request, Http::Respo
         double transform[6], tr1[6];
         pInputRaster->GetGeoTransform(transform);
 
-        char **papszOptions = NULL;
         papszOptions = CSLSetNameValue(papszOptions, "COMPRESS", "DEFLATE");
 
         if (test == 4)
@@ -140,7 +139,7 @@ void rasterClipResource::handleRequest(const Http::Request &request, Http::Respo
             // je met des test pour sécuriser le fait qu'on ne demande pas le téléchargement de couche raster trop lourde; test sur la résolution?
             if (transform[1] >= 10)
             {
-                pCroppedRaster = pDriver->CreateCopy(out.c_str(), pInputRaster, FALSE, papszOptions, NULL, NULL);
+                pCroppedRaster = pDriver->CreateCopy(output.c_str(), pInputRaster, FALSE, papszOptions, NULL, NULL);
                 if (pCroppedRaster != NULL)
                 {
                     GDALClose((GDALDatasetH)pCroppedRaster);

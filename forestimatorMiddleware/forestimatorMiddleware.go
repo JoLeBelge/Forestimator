@@ -62,13 +62,13 @@ type proc struct {
 
 func startForestimatorWebServer() (cmd *exec.Cmd) {
 	cmd = exec.Command("sh", "launch.sh") //, "--deploy-path=/ --docroot \"/home/carto/app/Forestimator/data/;/favicon.ico,/google52ee6b8ebe0b4b19.html,/sitemap.xml,/resources,/style,/tmp,/data,/js,/jslib,/img,/pdf,/video,resources/themes/bootstrap/5\" --http-port 8001 --http-addr 127.0.0.1 -c /home/gef/Documents/Forestimator/data/wt_config.xml --BD \"/home/gef/Documents/Forestimator/carteApt/data/aptitudeEssDB.db\" --colPath \"Dir\" ")
-	cmd.Dir = "/home/carto/app/Forestimator/forestimatorWeb"
+	cmd.Dir = "/home/gef/Documents/Forestimator/forestimatorWeb"
 	return cmd
 }
 
 func startForestimatorDownloadServer() (cmd *exec.Cmd) {
 	cmd = exec.Command("/usr/local/go/bin/go", "run", "downloadServer.go") //, "--deploy-path=/ --docroot \"/home/carto/app/Forestimator/data/;/favicon.ico,/google52ee6b8ebe0b4b19.html,/sitemap.xml,/resources,/style,/tmp,/data,/js,/jslib,/img,/pdf,/video,resources/themes/bootstrap/5\" --http-port 8001 --http-addr 127.0.0.1 -c /home/gef/Documents/Forestimator/data/wt_config.xml --BD \"/home/gef/Documents/Forestimator/carteApt/data/aptitudeEssDB.db\" --colPath \"Dir\" ")
-	cmd.Dir = "/home/carto/app/Forestimator/forestimatorDownloadServer"
+	cmd.Dir = "/home/gef/Documents/Forestimator/forestimatorDownloadServer"
 	return cmd
 }
 
