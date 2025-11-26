@@ -1,4 +1,5 @@
 #include "rasterclipresource.h"
+#include <boost/filesystem.hpp>
 
 extern int maxSizePix4Export;
 
@@ -64,9 +65,9 @@ void rasterClipResource::handleRequest(const Http::Request &request, Http::Respo
             return;
         }
 
-        std::string name01 = std::tmpnam(nullptr);
-        std::string name11 = name01.substr(5, name01.size() - 5);
-        std::string output = mDico->File("TMPDIR") + "/" + name11 + ".tif";
+        // Use boost::filesystem::unique_path to create a safe unique temporary filename
+        boost::filesystem::path tmpPath = boost::filesystem::path(mDico->File("TMPDIR")) / boost::filesystem::unique_path("tmp-%%%%-%%%%-%%%%.tif");
+        std::string output = tmpPath.string();
 
         double transform[6], tr1[6];
         pInputRaster->GetGeoTransform(transform);
