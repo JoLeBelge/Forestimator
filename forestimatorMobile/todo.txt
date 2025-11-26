@@ -11,6 +11,7 @@ AJOUT DE COUCHES
 
 SECURITE ET ROBUSTESSE
 
+-OK  système de vérification automatisé sur l'état de fonctionnement de Forestimator Web. Avec envoi de SMS et/ou de email en cas de coupure de Forestimator Web
 -système de vérification de la disponibilité des couches WMSs?
 
 CONSOLIDATION 
