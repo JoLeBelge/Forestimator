@@ -754,10 +754,10 @@ GDALDataset * rasterFiles::rasterizeGeom(OGRGeometry *poGeom){
             // driver et dataset shp -- creation depuis la géométrie
             GDALDriver *pShpDriver = GetGDALDriverManager()->GetDriverByName("Memory");
             char name[L_tmpnam];
-            std::tmpnam(name);
-            std::string name0 = name;
-            std::string name1 = "/vsimem/"+name0.substr(5,name0.size()-5);
-            std::string name2 = name0.substr(5,name0.size()-5);
+            boost::filesystem::path tmpPath = boost::filesystem::path("/vsimem/") / boost::filesystem::unique_path("tmp-%%%%-%%%%-%%%%");
+
+            std::string name1 = tmpPath.string();
+            std::string name2 = name1.substr(5,name1.size()-5);
             //pShp = pShpDriver->Create("/vsimem/blahblah.shp", 0, 0, 0, GDT_Unknown, NULL );
             pShp = pShpDriver->Create(name1.c_str(), 0, 0, 0, GDT_Unknown, NULL );// avoir des noms unique si je veux fontionner en parrallel computing
             // he bien c'est le comble, sur le serveur j'arrive à avoir le comportement adéquat si JE NE MET PAS de src. j'ai des warnings mais tout vas mieux!!
