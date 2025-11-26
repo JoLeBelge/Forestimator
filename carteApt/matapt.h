@@ -1,6 +1,7 @@
 #ifndef MATAPT_H
 #define MATAPT_H
-#include "cdicoaptbase.h"
+
+#include "cdicoapt.h"
 #include "Wt/WContainerWidget.h"
 #include "Wt/WTable.h"
 #include "Wt/WLayout.h"
@@ -30,12 +31,7 @@ bool commonEss(std::string aCode, std::vector<std::shared_ptr<cEss>> & aV2);
 // inspiré de staticMap, forestimator
 class zbioPainted : public Wt::WPaintedWidget {
 public:
-    zbioPainted(std::string  aShp, cdicoAptBase* aDico);
-    ~zbioPainted(){
-        if (mDS!=NULL){
-            GDALClose(mDS);
-        }
-    }
+    zbioPainted(cDicoApt* aDico);
     double xGeo2Im(double x);
     double yGeo2Im(double y);
 
@@ -65,20 +61,19 @@ private:
     bool displayApt_;
     std::string shpPath, essCoce_;
     //std::shared_ptr<cdicoAptBase> mDico;
-    cdicoAptBase * mDico;
+    cDicoApt * mDico;
     OGRLayer * mlay;
-    GDALDataset * mDS;
 };
 
 class matApt : public Wt::WContainerWidget
 {
 public:
-    matApt(std::shared_ptr<cdicoAptBase> aDicoApt);
+    matApt(std::shared_ptr<cDicoApt> aDicoApt);
     // recevoir les valeurs de prédiction NT ou NH issue de la RF
     void receivePrediction(int aCode,std::vector<double> aVPredNT,std::vector<double> aVPredNH);
 
 private:
-    std::shared_ptr<cdicoAptBase> mDicoApt;
+    std::shared_ptr<cDicoApt> mDicoApt;
 
     // un tableau pour l'écogramme
      Wt::WTable * mEco;

@@ -1,4 +1,4 @@
-/*package alt
+package forestimatorMiddleware
 
 import (
 	"fmt"
@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-func main() {
+func start() {
 	s := NetworkPasstroughSettings{
 		bufferSize:   1024 * 1024 * 10,
 		retryCount:   50,
@@ -191,4 +191,3 @@ func proxyLoop(s NetworkPasstroughSettings) {
 		fmt.Println("Accepted new connection")
 	}
 }
-*/

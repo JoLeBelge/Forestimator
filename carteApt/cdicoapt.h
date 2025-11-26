@@ -28,6 +28,11 @@ class cDicoApt : public cdicoAptBase
 public:
     // charger les dicos depuis BD SQL
     cDicoApt(std::string aBDFile);
+    ~cDicoApt(){
+        if (mDS_zbio!=NULL){
+        GDALClose(mDS_zbio);
+        }
+    }
 
     std::shared_ptr<cnsw> mPedo;
     std::shared_ptr<cadastre> mCadastre;
@@ -245,6 +250,8 @@ public:
    }
     // dans l'ordre que l'on souhaite!
     std::vector<std::string> Dico_groupe;
+
+    GDALDataset * mDS_zbio;
 
 private:
 

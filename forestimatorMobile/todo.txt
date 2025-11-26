@@ -20,21 +20,19 @@ CONSOLIDATION
 
 NOUVELLES OPTIONS
 
+-Acquisitions terrains synchronisées dans une BD sur le serveur
+--> point avec annotation, photo
+--> polygone
+Requiert un module d'authentification et un outils de versionning
+
+-Formulaire d'encodage de placette d'inventaire
+
+-outils de cubage
+
 -gestion de projets et téléchargement de couche offline sur l'extend du projet uniquement. Un projet = un extend. puis des couches offlines sur cet extend.
 
 COMMUNICATION/ DOCUMENTATION
 
 -vidéo d'utilisation
 -tutoriel pdf
-
-Alignement des label "enregistré" qui est érratique pour l'instant. Tester différente "densité" pour l'émulateur et vérifier que ça va bien à chaque fois
-
-retours testeurs:
------------------
-
-GLigot : position sur carte pas clair (quand c'est position grace à internet et non pas GPS, pas de rond bleu pour afficher la position - non c'est quand on donne les droits lors du premier usage? )
-
-Sam : catalogues ; problème de padding, margin, et le top parfois est tronqué, le header de smartphone interfère avec l'affichage.
-Aussi il y a des "<" pour dérouler même si pas d'info derrière, à enlever ?
-
 

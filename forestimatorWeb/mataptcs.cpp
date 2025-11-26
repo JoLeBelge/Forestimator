@@ -23,8 +23,7 @@ matAptCS::matAptCS(cDicoApt *aDicoApt):mDicoApt(aDicoApt),zbio_(1),US_(1),mVar_(
     addNew<Wt::WBreak>();
 
     Wt::WTemplate * tpl = addWidget(cpp14::make_unique<Wt::WTemplate>(tr("template.CS")));
-    std::string  aShp=mDicoApt->File("ZBIOSIMP");
-    graphZbio = tpl->bindWidget("graphZbio", std::make_unique<zbioPainted>(aShp,mDicoApt));
+    graphZbio = tpl->bindWidget("graphZbio", std::make_unique<zbioPainted>(mDicoApt));
     contListeUS = tpl->bindWidget("listeUS", std::make_unique<WContainerWidget>());
     WContainerWidget * contlisteEss = tpl->bindWidget("listeEssence", std::make_unique<WContainerWidget>());
     contlisteEss->setStyleClass("row");

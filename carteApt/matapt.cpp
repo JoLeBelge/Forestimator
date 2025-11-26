@@ -1,7 +1,7 @@
 #include "matapt.h"
 extern bool globTest;
 
-matApt::matApt(std::shared_ptr<cdicoAptBase> aDicoApt):mDicoApt(aDicoApt),zbio_(1),nh_(10),nt_(10),bt_compare4Predicted(NULL)
+matApt::matApt(std::shared_ptr<cDicoApt> aDicoApt):mDicoApt(aDicoApt),zbio_(1),nh_(10),nt_(10),bt_compare4Predicted(NULL)
 {
     setOverflow(Wt::Overflow::Auto);
     setId("matAptCont");
@@ -82,8 +82,7 @@ matApt::matApt(std::shared_ptr<cdicoAptBase> aDicoApt):mDicoApt(aDicoApt),zbio_(
     bt_compare4Predicted->hide();
     bt_compare4Predicted->clicked().connect(std::bind(&matApt::comparison4predicted,this));
 
-    std::string  aShp=mDicoApt->File("ZBIOSIMP");
-    graphZbio = layoutzbio->addWidget(std::make_unique<zbioPainted>(aShp,mDicoApt.get()));
+    graphZbio = layoutzbio->addWidget(std::make_unique<zbioPainted>(mDicoApt.get()));
 
     WContainerWidget * contApt = layoutDroite->addWidget(std::make_unique<WContainerWidget>());
     contApt->setOverflow(Wt::Overflow::Auto);
@@ -460,7 +459,7 @@ void matApt::compareMatApt(){
             }
         }
     } else {
-       resetEco();
+        resetEco();
     }
 }
 
@@ -508,29 +507,19 @@ bool commonEss(std::string aCode, std::vector<std::shared_ptr<cEss>> & aV2){
     return aRes;
 }
 
-zbioPainted::zbioPainted(std::string  aShp, cdicoAptBase *aDico)
-    : WPaintedWidget(),zbio_(1),shpPath(aShp),mSx(400),mSy(200),displayApt_(0),mDico(aDico),mlay(NULL),mDS(NULL)
+zbioPainted::zbioPainted(cDicoApt *aDico)
+    : WPaintedWidget(),zbio_(1),mSx(400),mSy(200),displayApt_(0),mDico(aDico),mlay(NULL)
 {
-    GDALAllRegister();
-    resize(mSx,mSy);   // Provide a default size.
-    const char *inputPath= shpPath.c_str();
-    if (boost::filesystem::exists(inputPath)){
-        mDS= GDALDataset::Open(inputPath, GDAL_OF_VECTOR | GDAL_OF_READONLY);
-        if( mDS == NULL )
-        {
-            std::cout << inputPath << " : " ;
-            printf( " shp zbio : pas réussi à l'ouvrir." );
-        } else{
-            // layer
-            //std::cout << "zbioPainted création " << std::endl;
-            mlay = mDS->GetLayer(0);
-            ext= new OGREnvelope;
-            mlay->GetExtent(ext);
-            // taille de l'emprise de l'image  - mettre tout ça une fois dans le constructeur.
-            mWx=ext->MaxX-ext->MinX;
-            mWy=ext->MaxY-ext->MinY;
-        }
-    } else {std::cout << inputPath << " : n'existe pas (zbioPainted::zbioPainted)" << std::endl;}
+    resize(mSx,mSy);
+
+    if( mDico->mDS_zbio != NULL ){
+        mlay = mDico->mDS_zbio->GetLayer(0);
+        ext= new OGREnvelope;
+        mlay->GetExtent(ext);
+        // taille de l'emprise de l'image
+        mWx=ext->MaxX-ext->MinX;
+        mWy=ext->MaxY-ext->MinY;
+    }
 }
 
 void zbioPainted::paintEvent(Wt::WPaintDevice *paintDevice){
@@ -584,11 +573,11 @@ void zbioPainted::paintEvent(Wt::WPaintDevice *paintDevice){
                 }
                 break;
             }
-               default:
+            default:
 
-                {
-                    std::cout << "poFeature->GetGeometryRef()->getGeometryType() = " << poFeature->GetGeometryRef()->getGeometryType() << "is not handled in switch at line 658" << std::endl;
-                }
+            {
+                std::cout << "poFeature->GetGeometryRef()->getGeometryType() = " << poFeature->GetGeometryRef()->getGeometryType() << "is not handled in switch at line 658" << std::endl;
+            }
             }
         }
     }
@@ -652,7 +641,7 @@ void matApt::selectLevel4comparison(std::tuple<int,int> ntnh){
     if(mVNtnh4Comparison.size()==0){
         std::tuple<int,int> ntnhBase(nt_,nh_);
         if (ntnhBase!=ntnh){
-        mVNtnh4Comparison.push_back(ntnhBase);
+            mVNtnh4Comparison.push_back(ntnhBase);
         }
     }
     // on retire le niveau si il est déjà présent
