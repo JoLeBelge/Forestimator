@@ -17,6 +17,8 @@ CONSOLIDATION
 
 -analyse ponctuelle : quand internet n'est pas disponible, afficher la boite de dialogue "vous n'avez pas accès à internet". Pour l'instant, cela fonctionne mais même quand la data est activée si jamais un autre process utilise toute la bande passante.
 
+-dessin de polygones ; interdire les polygones avec self-intersection
+
 NOUVELLES OPTIONS
 
 -Acquisitions terrains synchronisées dans une BD sur le serveur
@@ -24,7 +26,7 @@ NOUVELLES OPTIONS
 --> polygone
 Requiert un module d'authentification et un outils de versionning
 
--Formulaire d'encodage de placette d'inventaire
+-Formulaire d'encodage de placette d'inventaire -> Pour le moment utilisation de la suite "collect" de open foris
 
 -outils de cubage
 
@@ -33,5 +35,5 @@ Requiert un module d'authentification et un outils de versionning
 COMMUNICATION/ DOCUMENTATION
 
 -vidéo d'utilisation
--tutoriel pdf
+-tutoriel pdf -> Jo prends la main
 
