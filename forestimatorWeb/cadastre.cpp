@@ -26,181 +26,178 @@ void cadastre::loadInfo()
     sqlite3_stmt *stmt;
 
     std::cout << "load info cadastre" << std::endl;
-    const char *query = "SELECT ?,Nom,Code FROM fichiersGIS WHERE Categorie='Cadastre' OR Code='TMPDIR'";
+    std::string SQLstring = "SELECT " + columnPath + ",Nom,Code FROM fichiersGIS WHERE Categorie='Cadastre' OR Code='TMPDIR';";
 
-    if (sqlite3_prepare_v2(db_, query, -1, &stmt, NULL) == SQLITE_OK)
+    sqlite3_prepare_v2(db_, SQLstring.c_str(), -1, &stmt, NULL);
+    while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        sqlite3_bind_text(stmt, 1, columnPath.c_str(), -1, SQLITE_STATIC);
-        while (sqlite3_step(stmt) == SQLITE_ROW)
+        // if (sqlite3_column_type(stmt, 0)!=SQLITE_NULL && sqlite3_column_type(stmt, 1)!=SQLITE_NULL  && sqlite3_column_type(stmt, 2)!=SQLITE_NULL){
+        if (sqlite3_column_type(stmt, 0) != SQLITE_NULL)
         {
-            // if (sqlite3_column_type(stmt, 0)!=SQLITE_NULL && sqlite3_column_type(stmt, 1)!=SQLITE_NULL  && sqlite3_column_type(stmt, 2)!=SQLITE_NULL){
-            if (sqlite3_column_type(stmt, 0) != SQLITE_NULL)
+            std::string code = std::string((char *)sqlite3_column_text(stmt, 2));
+            if (code == "Commune")
             {
-                std::string code = std::string((char *)sqlite3_column_text(stmt, 2));
-                if (code == "Commune")
-                {
-                    mShpCommunePath = fs::path(std::string((char *)sqlite3_column_text(stmt, 0)) + "/" + std::string((char *)sqlite3_column_text(stmt, 1)));
-                }
-                else if (code == "Division")
-                {
-                    mShpDivisionPath = fs::path(std::string((char *)sqlite3_column_text(stmt, 0)) + "/" + std::string((char *)sqlite3_column_text(stmt, 1)));
-                }
-                else if (code == "PaCa")
-                {
-                    mShpParcellePath = fs::path(std::string((char *)sqlite3_column_text(stmt, 0)) + "/" + std::string((char *)sqlite3_column_text(stmt, 1)));
-                }
-                else if (code == "TMPDIR")
-                {
-                    mTmpDir = std::string((char *)sqlite3_column_text(stmt, 0));
-                }
-                else if (code == "CadastreBD")
-                {
-                    mDirBDCadastre = std::string((char *)sqlite3_column_text(stmt, 0)) + "/" + std::string((char *)sqlite3_column_text(stmt, 1));
-                }
+                mShpCommunePath = fs::path(std::string((char *)sqlite3_column_text(stmt, 0)) + "/" + std::string((char *)sqlite3_column_text(stmt, 1)));
             }
-            sqlite3_finalize(stmt);
-        }
-
-        // lecture des communes
-        const char *inputPath = mShpCommunePath.c_str();
-        if (boost::filesystem::exists(inputPath))
-        {
-            if (globTest)
+            else if (code == "Division")
             {
-                std::cout << "open gdaldataset" << std::endl;
+                mShpDivisionPath = fs::path(std::string((char *)sqlite3_column_text(stmt, 0)) + "/" + std::string((char *)sqlite3_column_text(stmt, 1)));
             }
-            GDALDataset *mDS;
-            mDS = GDALDataset::Open(inputPath, GDAL_OF_VECTOR | GDAL_OF_READONLY);
-            if (mDS == NULL)
+            else if (code == "PaCa")
             {
-                std::cout << inputPath << " : ";
-                printf(" cadastre : Open communes failed.");
+                mShpParcellePath = fs::path(std::string((char *)sqlite3_column_text(stmt, 0)) + "/" + std::string((char *)sqlite3_column_text(stmt, 1)));
             }
-            else
+            else if (code == "TMPDIR")
             {
-                // layer
-                OGRLayer *lay = mDS->GetLayer(0);
-                OGRFeature *poFeature;
-                while ((poFeature = lay->GetNextFeature()) != NULL)
-                {
-                    // on garde que la région wallonne
-                    // std::cout << poFeature->GetFieldAsString("NameFRE") << " , " << poFeature->GetFieldAsInteger("AdReKey") << std::endl;
-                    if (poFeature->GetFieldAsInteger("AdReKey") == 3000)
-                    {
-                        mVCom.emplace(std::make_pair(poFeature->GetFieldAsInteger("AdMuKey"), poFeature->GetFieldAsString("NameFRE")));
-                    }
-                }
+                mTmpDir = std::string((char *)sqlite3_column_text(stmt, 0));
             }
-            GDALClose(mDS);
-        }
-        else
-        {
-            std::cout << inputPath << " n'existe pas ";
-        }
-
-        // lecture des divisions
-        inputPath = mShpDivisionPath.c_str();
-        if (boost::filesystem::exists(inputPath))
-        {
-            GDALDataset *mDS;
-            mDS = GDALDataset::Open(inputPath, GDAL_OF_VECTOR | GDAL_OF_READONLY);
-            if (mDS == NULL)
+            else if (code == "CadastreBD")
             {
-                std::cout << inputPath << " : ";
-                printf(" cadastre : Open division failed.");
-            }
-            else
-            {
-                // layer
-                OGRLayer *lay = mDS->GetLayer(0);
-                OGRFeature *poFeature;
-                while ((poFeature = lay->GetNextFeature()) != NULL)
-                {
-                    // garder que ceux qui sont dans une commune de RW
-                    if (mVCom.find(poFeature->GetFieldAsInteger("AdMuKey")) != mVCom.end())
-                    {
-                        mVDiv.emplace(std::make_pair(poFeature->GetFieldAsInteger("CaDiKey"), std::make_tuple(poFeature->GetFieldAsInteger("AdMuKey"), poFeature->GetFieldAsString("NameFRE"))));
-                    }
-                }
-            }
-            GDALClose(mDS);
-        }
-        else
-        {
-            std::cout << inputPath << " n'existe pas ";
-        }
-
-        // lecture des parcelles cadastrales - il y en a 4 000 000 donc je ne vais pas tout lire, sinon c'est un peu lent.
-        // inputPath= mShpParcellePath.c_str();
-        // si j'ouvre uniquement le dbf, est-ce que je ne gagne pas un peu de temps? apparemment pas...
-        /*  std::unique_ptr<dbo::backend::Sqlite3> sqlite3{new dbo::backend::Sqlite3("cadastre.db")};
-        dbo::Session session;
-        session.setConnection(std::move(sqlite3));
-        session.mapClass<capa>("capa");
-        //session.createTables();
-        dbo::Transaction transaction{session}; // une seule transaction pour l'ajout de tout
-        */
-        // ça c'est fait uniquement une fois pour créer la bd sqlite
-        if (0)
-        {
-            std::string tmp = mShpParcellePath.c_str();
-            tmp = tmp.substr(0, mShpParcellePath.size() - 3) + "dbf";
-            inputPath = tmp.c_str();
-            if (boost::filesystem::exists(inputPath))
-            {
-                GDALDataset *mDS;
-                mDS = GDALDataset::Open(inputPath, GDAL_OF_VECTOR | GDAL_OF_READONLY);
-                if (mDS == NULL)
-                {
-                    std::cout << inputPath << " : ";
-                    printf(" cadastre : Open parcelles cadastrales failed.");
-                }
-                else
-                {
-                    // layer
-                    OGRLayer *lay = mDS->GetLayer(0);
-                    OGRFeature *poFeature;
-                    int i(0);
-                    while ((poFeature = lay->GetNextFeature()) != NULL)
-                    {
-                        // création d'une parcelle cadastrale et ajout au vecteur
-                        std::unique_ptr<capa> pt = std::make_unique<capa>(poFeature->GetFieldAsString("CaSeKey"), poFeature->GetFieldAsString("CaPaKey"), poFeature->GetFID(), &mVDiv);
-
-                        /* if (mVCaPa.find(pt->divCode)==mVCaPa.end()){
-                        mVCaPa.emplace(std::make_pair(pt->divCode,std::vector<std::unique_ptr<capa>>()));
-                    }
-
-                    mVCaPa.at(pt->divCode).push_back(std::move(pt));
-                    */
-                        // ajout de la parcelle à la bd sqlite via ORM de wt
-
-                        // dbo::ptr<capa> capaPtr = session.add(std::move(pt));
-
-                        i++;
-                        if (i % 10000 == 0)
-                        {
-                            std::cout << " i " << i << std::endl;
-                        }
-                    }
-                }
-                GDALClose(mDS);
-            }
-            else
-            {
-                std::cout << inputPath << " n'existe pas ";
+                mDirBDCadastre = std::string((char *)sqlite3_column_text(stmt, 0)) + "/" + std::string((char *)sqlite3_column_text(stmt, 1));
             }
         }
-
-        /*
-        std::cout << " j'ai lu " << mVCom.size() << " communes du cadastres (belgique)" << std::endl;
-        std::cout << " j'ai lu " << mVDiv.size() << " divisions du cadastres (belgique)" << std::endl;
-        std::cout << " j'ai rangé les parcelles cadastrales de Wallonie dans " << mVCaPa.size() << " vecteurs " << std::endl;
-        std::vector<std::string> test =getSectionForDiv(61007);
-        for (auto & s : test){std::cout << " section " << s << std::endl;}
-        std::vector<capa *> t=getCaPaPtrVector(std::get<0>(mVDiv.at(61003)),"A");
-        std::cout << " nombre de pointers capa" << t.size() << std::endl;
-        */
     }
+    sqlite3_finalize(stmt);
+
+    // lecture des communes
+    const char *inputPath = mShpCommunePath.c_str();
+    if (boost::filesystem::exists(inputPath))
+    {
+        if (globTest)
+        {
+            std::cout << "open gdaldataset" << std::endl;
+        }
+        GDALDataset *mDS;
+        mDS = GDALDataset::Open(inputPath, GDAL_OF_VECTOR | GDAL_OF_READONLY);
+        if (mDS == NULL)
+        {
+            std::cout << inputPath << " : ";
+            printf(" cadastre : Open communes failed.");
+        }
+        else
+        {
+            // layer
+            OGRLayer *lay = mDS->GetLayer(0);
+            OGRFeature *poFeature;
+            while ((poFeature = lay->GetNextFeature()) != NULL)
+            {
+                // on garde que la région wallonne
+                // std::cout << poFeature->GetFieldAsString("NameFRE") << " , " << poFeature->GetFieldAsInteger("AdReKey") << std::endl;
+                if (poFeature->GetFieldAsInteger("AdReKey") == 3000)
+                {
+                    mVCom.emplace(std::make_pair(poFeature->GetFieldAsInteger("AdMuKey"), poFeature->GetFieldAsString("NameFRE")));
+                }
+            }
+        }
+        GDALClose(mDS);
+    }
+    else
+    {
+        std::cout << inputPath << " n'existe pas ";
+    }
+
+    // lecture des divisions
+    inputPath = mShpDivisionPath.c_str();
+    if (boost::filesystem::exists(inputPath))
+    {
+        GDALDataset *mDS;
+        mDS = GDALDataset::Open(inputPath, GDAL_OF_VECTOR | GDAL_OF_READONLY);
+        if (mDS == NULL)
+        {
+            std::cout << inputPath << " : ";
+            printf(" cadastre : Open division failed.");
+        }
+        else
+        {
+            // layer
+            OGRLayer *lay = mDS->GetLayer(0);
+            OGRFeature *poFeature;
+            while ((poFeature = lay->GetNextFeature()) != NULL)
+            {
+                // garder que ceux qui sont dans une commune de RW
+                if (mVCom.find(poFeature->GetFieldAsInteger("AdMuKey")) != mVCom.end())
+                {
+                    mVDiv.emplace(std::make_pair(poFeature->GetFieldAsInteger("CaDiKey"), std::make_tuple(poFeature->GetFieldAsInteger("AdMuKey"), poFeature->GetFieldAsString("NameFRE"))));
+                }
+            }
+        }
+        GDALClose(mDS);
+    }
+    else
+    {
+        std::cout << inputPath << " n'existe pas ";
+    }
+
+    // lecture des parcelles cadastrales - il y en a 4 000 000 donc je ne vais pas tout lire, sinon c'est un peu lent.
+    // inputPath= mShpParcellePath.c_str();
+    // si j'ouvre uniquement le dbf, est-ce que je ne gagne pas un peu de temps? apparemment pas...
+    /*  std::unique_ptr<dbo::backend::Sqlite3> sqlite3{new dbo::backend::Sqlite3("cadastre.db")};
+    dbo::Session session;
+    session.setConnection(std::move(sqlite3));
+    session.mapClass<capa>("capa");
+    //session.createTables();
+    dbo::Transaction transaction{session}; // une seule transaction pour l'ajout de tout
+    */
+    // ça c'est fait uniquement une fois pour créer la bd sqlite
+    if (0)
+    {
+        std::string tmp = mShpParcellePath.c_str();
+        tmp = tmp.substr(0, mShpParcellePath.size() - 3) + "dbf";
+        inputPath = tmp.c_str();
+        if (boost::filesystem::exists(inputPath))
+        {
+            GDALDataset *mDS;
+            mDS = GDALDataset::Open(inputPath, GDAL_OF_VECTOR | GDAL_OF_READONLY);
+            if (mDS == NULL)
+            {
+                std::cout << inputPath << " : ";
+                printf(" cadastre : Open parcelles cadastrales failed.");
+            }
+            else
+            {
+                // layer
+                OGRLayer *lay = mDS->GetLayer(0);
+                OGRFeature *poFeature;
+                int i(0);
+                while ((poFeature = lay->GetNextFeature()) != NULL)
+                {
+                    // création d'une parcelle cadastrale et ajout au vecteur
+                    std::unique_ptr<capa> pt = std::make_unique<capa>(poFeature->GetFieldAsString("CaSeKey"), poFeature->GetFieldAsString("CaPaKey"), poFeature->GetFID(), &mVDiv);
+
+                    /* if (mVCaPa.find(pt->divCode)==mVCaPa.end()){
+                    mVCaPa.emplace(std::make_pair(pt->divCode,std::vector<std::unique_ptr<capa>>()));
+                }
+
+                mVCaPa.at(pt->divCode).push_back(std::move(pt));
+                */
+                    // ajout de la parcelle à la bd sqlite via ORM de wt
+
+                    // dbo::ptr<capa> capaPtr = session.add(std::move(pt));
+
+                    i++;
+                    if (i % 10000 == 0)
+                    {
+                        std::cout << " i " << i << std::endl;
+                    }
+                }
+            }
+            GDALClose(mDS);
+        }
+        else
+        {
+            std::cout << inputPath << " n'existe pas ";
+        }
+    }
+
+    /*
+    std::cout << " j'ai lu " << mVCom.size() << " communes du cadastres (belgique)" << std::endl;
+    std::cout << " j'ai lu " << mVDiv.size() << " divisions du cadastres (belgique)" << std::endl;
+    std::cout << " j'ai rangé les parcelles cadastrales de Wallonie dans " << mVCaPa.size() << " vecteurs " << std::endl;
+    std::vector<std::string> test =getSectionForDiv(61007);
+    for (auto & s : test){std::cout << " section " << s << std::endl;}
+    std::vector<capa *> t=getCaPaPtrVector(std::get<0>(mVDiv.at(61003)),"A");
+    std::cout << " nombre de pointers capa" << t.size() << std::endl;
+    */
 }
 
 capa::capa(std::string aCaSecKey, std::string aCaPaKey, int aPID, std::map<int, std::tuple<int, std::string>> *aVDiv) : CaSecKey(aCaSecKey), CaPaKey(aCaPaKey), comINS(0), mPID(aPID)

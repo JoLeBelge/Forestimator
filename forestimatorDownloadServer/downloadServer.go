@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	downloadDir = "/home/carto/app/Forestimator/data/tmp"
+	downloadDir = "/home/gef/Documents/Forestimator/data/tmp"
 	retention   = 7 * 24 * time.Hour // 1 week
 )
 
