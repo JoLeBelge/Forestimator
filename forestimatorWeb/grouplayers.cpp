@@ -679,7 +679,7 @@ void groupLayers::exportLayMapView()
         if (cropIm(l->getPathTif(), aCroppedRFile, mMapExtent))
         {
             std::cout << "create archive pour raster croppé " << std::endl;
-            ZipArchive *zf = new ZipArchive(archiveFileName);
+            auto zf = std::make_unique<ZipArchive>(archiveFileName);
             zf->open(ZipArchive::WRITE);
             // pour bien faire; choisir un nom qui soit unique, pour éviter conflict si plusieurs utilisateurs croppent la mm carte en mm temps
             zf->addFile(mClientName + ".tif", aCroppedRFile);
@@ -689,7 +689,6 @@ void groupLayers::exportLayMapView()
             }
             m_app->processEvents();
             zf->close();
-            delete zf;
             // le fileResources sera détruit au moment de la destruction GroupL
             WFileResource *fileResource = new Wt::WFileResource("plain/text", archiveFileName);
             fileResource->suggestFileName(mClientName + ".zip");

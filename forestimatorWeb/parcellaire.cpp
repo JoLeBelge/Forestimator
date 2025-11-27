@@ -407,7 +407,7 @@ void parcellaire::downloadRaster()
         m_app->loadingIndicator()->show();
         // crée l'archive
         std::string suffix = "_ForestimatorRaster.zip";
-        ZipArchive *zf = new ZipArchive(mFullPath + suffix);
+        auto zf = std::make_unique<ZipArchive>(mFullPath + suffix);
         zf->open(ZipArchive::WRITE);
         // crop les raster selectionnés
 
@@ -430,7 +430,6 @@ void parcellaire::downloadRaster()
         }
         // mGL->mPBar->setToolTip("");
         zf->close();
-        delete zf;
         m_app->loadingIndicator()->hide();
         m_app->loadingIndicator()->setMessage(tr("defaultLoadingI"));
 
