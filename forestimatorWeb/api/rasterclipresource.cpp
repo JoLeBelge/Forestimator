@@ -130,7 +130,7 @@ void rasterClipResource::handleRequest(const Http::Request &request, Http::Respo
             {
                 GDALClose((GDALDatasetH)pCroppedRaster);
             }
-            std::ifstream r(output, std::ios::in | std::ios::binary);
+            std::ifstream r(output.c_str(), std::ios::in | std::ios::binary);
             response.addHeader("Content-Type", "image/tiff");
             response.out() << r.rdbuf();
             r.close();
@@ -170,7 +170,6 @@ void rasterClipResource::handleRequest(const Http::Request &request, Http::Respo
     }
     else
     {
-
         response.addHeader("Content-Type", "text/plain; charset=utf-8");
         response.out() << " attention, un des fichiers input n'existe pas : " << l->getPathTif() << std::endl;
     }
