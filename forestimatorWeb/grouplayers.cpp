@@ -867,18 +867,22 @@ bool groupLayers::getExpertModeForUser(std::string id)
     printf("get Expert Mode For User...");
     bool aRes(0);
     sqlite3_stmt *stmt;
-    std::string SQLstring = "SELECT ModeExpert FROM user_expert WHERE id_user=" + id + ";";
-    sqlite3_prepare_v2(db_, SQLstring.c_str(), -1, &stmt, NULL); // preparing the statement
-    while (sqlite3_step(stmt) == SQLITE_ROW)
+    const char *query = "SELECT ModeExpert FROM user_expert WHERE id_user=?;";
+    if (sqlite3_prepare_v2(db_, query, -1, &stmt, NULL) == SQLITE_OK)
     {
-        if (sqlite3_column_type(stmt, 0) != SQLITE_NULL)
+        sqlite3_bind_int(stmt, 1, std::stoi(id));
+        while (sqlite3_step(stmt) == SQLITE_ROW)
         {
-            aRes = sqlite3_column_int(stmt, 0);
+            if (sqlite3_column_type(stmt, 0) != SQLITE_NULL)
+            {
+                aRes = sqlite3_column_int(stmt, 0);
+            }
+            else
+            {
+                std::cout << "je ne parviens pas à lire la table user_expert " << std::endl;
+            }
         }
-        else
-        {
-            std::cout << "je ne parviens pas à lire la table user_expert " << std::endl;
-        }
+        sqlite3_finalize(stmt);
     }
 
     closeConnection();
@@ -897,27 +901,29 @@ void groupLayers::loadExtents(std::string id)
     mExtentDiv->clear();
 
     sqlite3_stmt *stmt;
-    std::string SQLstring = "SELECT centre_x,centre_y,zoom,name,id FROM user_extent WHERE id_user=" + id; // std::to_string(id);
-    sqlite3_prepare_v2(db_, SQLstring.c_str(), -1, &stmt, NULL);                                          // preparing the statement
-    while (sqlite3_step(stmt) == SQLITE_ROW)
+    const char *query = "SELECT centre_x,centre_y,zoom,name,id FROM user_extent WHERE id_user=?";
+    if (sqlite3_prepare_v2(db_, query, -1, &stmt, NULL) == SQLITE_OK)
     {
-        std::string cx = std::string((char *)sqlite3_column_text(stmt, 0));
-        std::string cy = std::string((char *)sqlite3_column_text(stmt, 1));
-        std::string z = std::string((char *)sqlite3_column_text(stmt, 2));
-        std::string n = std::string((char *)sqlite3_column_text(stmt, 3));
-        std::string id_extent = std::string((char *)sqlite3_column_text(stmt, 4));
-        /*std::cout << " value 1 : " << cx << std::endl;
-        std::cout << " value 2 : " << cy << std::endl;
-        std::cout << " value 3 : " << z << std::endl;*/
-        WPushButton *bp = mExtentDiv->addNew<Wt::WPushButton>(n);
-        bp->setInline(1);
-        bp->clicked().connect([=]
-                              {
-            mParent->doJavaScript("map.getView().setCenter(["+cx+","+cy+" ]);");
-            mParent->doJavaScript("map.getView().setZoom("+z+");"); });
-        WAnchor *del = mExtentDiv->addNew<Wt::WAnchor>(WLink(""), "(x)");
-        del->clicked().connect([=]
-                               {
+        sqlite3_bind_int(stmt, 1, std::stoi(id));
+        while (sqlite3_step(stmt) == SQLITE_ROW)
+        {
+            std::string cx = std::string((char *)sqlite3_column_text(stmt, 0));
+            std::string cy = std::string((char *)sqlite3_column_text(stmt, 1));
+            std::string z = std::string((char *)sqlite3_column_text(stmt, 2));
+            std::string n = std::string((char *)sqlite3_column_text(stmt, 3));
+            std::string id_extent = std::string((char *)sqlite3_column_text(stmt, 4));
+            /*std::cout << " value 1 : " << cx << std::endl;
+            std::cout << " value 2 : " << cy << std::endl;
+            std::cout << " value 3 : " << z << std::endl;*/
+            WPushButton *bp = mExtentDiv->addNew<Wt::WPushButton>(n);
+            bp->setInline(1);
+            bp->clicked().connect([=]
+                                  {
+                mParent->doJavaScript("map.getView().setCenter(["+cx+","+cy+" ]);");
+                mParent->doJavaScript("map.getView().setZoom("+z+");"); });
+            WAnchor *del = mExtentDiv->addNew<Wt::WAnchor>(WLink(""), "(x)");
+            del->clicked().connect([=]
+                                   {
             WDialog * dialogPtr =  mParent->addChild(std::make_unique<Wt::WDialog>(tr("extent_del_comfirm")));
             WPushButton *ok = dialogPtr->footer()->addNew<Wt::WPushButton>("Supprimer");
             ok->setDefault(false);
@@ -932,6 +938,7 @@ void groupLayers::loadExtents(std::string id)
             annuler->clicked().connect([=]{dialogPtr->reject();});
 
             dialogPtr->show(); });
+        sqlite3_finalize(stmt);
     }
     closeConnection();
 
@@ -958,12 +965,26 @@ void groupLayers::saveExtent(double c_x, double c_y, double zoom)
     std::string id = m_app->getUser().id();
     std::string n = tb_extent_name->text().toUTF8();
     boost::replace_all(n, "'", "");
-    std::string cx = std::to_string((int)c_x);
-    std::string cy = std::to_string((int)c_y);
-    std::string z = std::to_string((int)zoom);
-    std::string sql = "INSERT INTO user_extent (id_user,centre_x,centre_y,zoom,name) VALUES (" + id + "," + cx + "," + cy + "," + z + ",'" + n + "')";
-    std::cout << sql << std::endl;
-    sqlite3_exec(db_, sql.c_str(), NULL, NULL, NULL);
+    int cx = (int)c_x;
+    int cy = (int)c_y;
+    int z = (int)zoom;
+    
+    const char *query = "INSERT INTO user_extent (id_user,centre_x,centre_y,zoom,name) VALUES (?,?,?,?,?)";
+    sqlite3_stmt *stmt;
+    if (sqlite3_prepare_v2(db_, query, -1, &stmt, NULL) == SQLITE_OK)
+    {
+        sqlite3_bind_int(stmt, 1, std::stoi(id));
+        sqlite3_bind_int(stmt, 2, cx);
+        sqlite3_bind_int(stmt, 3, cy);
+        sqlite3_bind_int(stmt, 4, z);
+        sqlite3_bind_text(stmt, 5, n.c_str(), -1, SQLITE_STATIC);
+        
+        if (sqlite3_step(stmt) != SQLITE_DONE)
+        {
+            std::cout << "Error inserting extent: " << sqlite3_errmsg(db_) << std::endl;
+        }
+        sqlite3_finalize(stmt);
+    }
     closeConnection();
 
     loadExtents(id);
@@ -974,9 +995,18 @@ void groupLayers::deleteExtent(std::string id_extent)
 {
     openConnection();
 
-    std::string sql = "DELETE FROM user_extent WHERE id=" + id_extent;
-    std::cout << sql << std::endl;
-    sqlite3_exec(db_, sql.c_str(), NULL, NULL, NULL);
+    const char *query = "DELETE FROM user_extent WHERE id=?";
+    sqlite3_stmt *stmt;
+    if (sqlite3_prepare_v2(db_, query, -1, &stmt, NULL) == SQLITE_OK)
+    {
+        sqlite3_bind_int(stmt, 1, std::stoi(id_extent));
+        
+        if (sqlite3_step(stmt) != SQLITE_DONE)
+        {
+            std::cout << "Error deleting extent: " << sqlite3_errmsg(db_) << std::endl;
+        }
+        sqlite3_finalize(stmt);
+    }
     closeConnection();
 
     loadExtents(m_app->getUser().id());

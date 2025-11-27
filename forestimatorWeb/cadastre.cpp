@@ -26,11 +26,13 @@ void cadastre::loadInfo()
     sqlite3_stmt *stmt;
 
     std::cout << "load info cadastre" << std::endl;
-    std::string SQLstring = "SELECT " + columnPath + ",Nom,Code FROM fichiersGIS WHERE Categorie='Cadastre' OR Code='TMPDIR';";
+    const char *query = "SELECT ?,Nom,Code FROM fichiersGIS WHERE Categorie='Cadastre' OR Code='TMPDIR'";
 
-    sqlite3_prepare_v2(db_, SQLstring.c_str(), -1, &stmt, NULL);
-    while (sqlite3_step(stmt) == SQLITE_ROW)
+    if (sqlite3_prepare_v2(db_, query, -1, &stmt, NULL) == SQLITE_OK)
     {
+        sqlite3_bind_text(stmt, 1, columnPath.c_str(), -1, SQLITE_STATIC);
+        while (sqlite3_step(stmt) == SQLITE_ROW)
+        {
         // if (sqlite3_column_type(stmt, 0)!=SQLITE_NULL && sqlite3_column_type(stmt, 1)!=SQLITE_NULL  && sqlite3_column_type(stmt, 2)!=SQLITE_NULL){
         if (sqlite3_column_type(stmt, 0) != SQLITE_NULL)
         {
@@ -56,8 +58,8 @@ void cadastre::loadInfo()
                 mDirBDCadastre = std::string((char *)sqlite3_column_text(stmt, 0)) + "/" + std::string((char *)sqlite3_column_text(stmt, 1));
             }
         }
+        sqlite3_finalize(stmt);
     }
-    sqlite3_finalize(stmt);
 
     // lecture des communes
     const char *inputPath = mShpCommunePath.c_str();
