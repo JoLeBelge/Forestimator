@@ -455,7 +455,10 @@ OGREnvelope formOGF::computeGlobalGeom(std::string aFile)
     {
         std::cout << "computeGlobalGeom : je n'arrive pas à ouvrir " << aFile << std::endl;
     }
-    GDALClose(DS);
+    if (DS != NULL)
+    {
+        GDALClose(DS);
+    }
     return env;
 }
 
@@ -489,7 +492,10 @@ void formOGF::validDraw(std::string geojson)
     {
         std::cout << "validDraw : je n'arrive pas à ouvrir " << aOut << std::endl;
     }
-    GDALClose(DS);
+    if (DS != NULL)
+    {
+        GDALClose(DS);
+    }
 }
 
 void formOGF::sendSummaryMail()
@@ -512,14 +518,14 @@ void formOGF::sendSummaryMail()
     mail.addRecipient(Wt::Mail::RecipientType::To, Mail::Mailbox(contactEncoderEdit_->valueText().toUTF8(), nomEncoderEdit_->valueText().toUTF8()));
 
     // création de la figure de localisation - j'enlève
-    //staticMap sm(mDico->getLayerBase("IGN"), geom); // ERROR 1: GDALWMS: Unable to download block 0, 0.... Dbo.Session: Session exiting with 1 dirty objects
-    //std::ifstream in;
-    //in.open(sm.getFileName(), std::ios::in);
-    //mail.addAttachment("image/png", "localisationOGF.png", &in);
+    // staticMap sm(mDico->getLayerBase("IGN"), geom); // ERROR 1: GDALWMS: Unable to download block 0, 0.... Dbo.Session: Session exiting with 1 dirty objects
+    // std::ifstream in;
+    // in.open(sm.getFileName(), std::ios::in);
+    // mail.addAttachment("image/png", "localisationOGF.png", &in);
     Mail::Client client;
     client.connect();
     client.send(mail);
-    //in.close(); // après l'envoi!! car le addAttachement pointe ver le ifstream!
+    // in.close(); // après l'envoi!! car le addAttachement pointe ver le ifstream!
     mail = Wt::Mail::Message();
     mail.addRecipient(Wt::Mail::RecipientType::To, Mail::Mailbox("liseinjon@hotmail.com", "Lisein Jonathan"));
     mail.setFrom(Wt::Mail::Mailbox("JO.Lisein@uliege.be", "Lisein Jonathan"));

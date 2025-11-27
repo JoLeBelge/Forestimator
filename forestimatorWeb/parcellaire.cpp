@@ -61,7 +61,7 @@ parcellaire::parcellaire(groupLayers *aGL, cWebAptitude *app, statWindow *statW)
 
 parcellaire::~parcellaire()
 {
-    //cleanShpFile();
+    // cleanShpFile();
     m_app = NULL;
     msg = NULL;
     mGL = NULL;
@@ -244,7 +244,7 @@ void parcellaire::upload()
     // computeStatButton->disable();
     downloadRasterBt->disable();
     // anaOnAllPolygBt->disable();
-    //cleanShpFile();
+    // cleanShpFile();
     boost::filesystem::path p(fu->clientFileName().toUTF8()), p2(this->fu->spoolFileName());
     mClientName = p.stem().c_str();
 
@@ -727,6 +727,12 @@ void parcellaire::to31370AndGeoJsonGDAL()
     GDALDatasetH hSrcDS = GDALOpenEx(fileName().c_str(), GDAL_OF_VECTOR | GDAL_OF_READONLY, NULL, NULL, NULL);
     char **papszArgv = nullptr;
 
+    if (hSrcDS == NULL)
+    {
+        std::cout << "to31370AndGeoJsonGDAL: failed to open source " << fileName() << std::endl;
+        return;
+    }
+
     /*if (inputEPSG!=-1){
         std::string command ="EPSG:"+std::to_string(inputEPSG);
         papszArgv = CSLAddString(papszArgv, "-s_srs");
@@ -755,10 +761,22 @@ void parcellaire::to31370AndGeoJsonGDAL()
         std::cout << "options shp to geojson pas correctement parsées " << std::endl;
     }
     GDALVectorTranslateOptionsFree(option);
-    GDALClose(hSrcDS);
+    if (papszArgv != nullptr)
+    {
+        CSLDestroy(papszArgv);
+        papszArgv = nullptr;
+    }
+    if (hSrcDS != NULL)
+    {
+        GDALClose(hSrcDS);
+    }
     // la source devient le geojson
-    papszArgv = nullptr;
     hSrcDS = GDALOpenEx(outPath, GDAL_OF_VECTOR | GDAL_OF_READONLY, NULL, NULL, NULL);
+    if (hSrcDS == NULL)
+    {
+        std::cout << "to31370AndGeoJsonGDAL: failed to open intermediate geojson " << outPath << std::endl;
+        return;
+    }
     papszArgv = CSLAddString(papszArgv, "-overwrite");
     GDALVectorTranslateOptions *option2 = GDALVectorTranslateOptionsNew(papszArgv, nullptr);
     if (option2)
@@ -771,7 +789,15 @@ void parcellaire::to31370AndGeoJsonGDAL()
         }
     }
     GDALVectorTranslateOptionsFree(option2);
-    GDALClose(hSrcDS);
+    if (papszArgv != nullptr)
+    {
+        CSLDestroy(papszArgv);
+        papszArgv = nullptr;
+    }
+    if (hSrcDS != NULL)
+    {
+        GDALClose(hSrcDS);
+    }
 
     mGL->m_app->addLog("upload a shp");
     if (computeGlobalGeom())

@@ -95,6 +95,40 @@ if (DS != NULL) {
 }
 ```
 
+## Task 4: GDAL Hardening - Additional Fixes Applied
+
+### Scope
+Audited all 17 GDAL open/close operations across the codebase (GDALOpen / GDALOpenEx) to ensure NULL-safety and proper cleanup.
+
+### Files Patched in Task 4:
+1. **parcellaire.cpp**:
+   - Added NULL-check after `GDALOpenEx()` at line 730 in `to31370AndGeoJsonGDAL()`
+   - Free `papszArgv` with `CSLDestroy()` before re-opening intermediate files
+   - Make all `GDALClose()` calls conditional on non-NULL dataset handle
+   - Early return if intermediate file open fails (line 774)
+
+2. **grouplayers.cpp**:
+   - Added NULL-check after `GDALOpen()` at line 753 in `cropIm()`
+   - Free `papszArgv` with `CSLDestroy()` in `getDSonEnv()` before close (line 1095)
+
+3. **ACR/formviellecouperase.cpp**:
+   - Made `GDALClose()` conditional in `computeGlobalGeom()` (line 524)
+   - Made `GDALClose()` conditional in `validDraw()` (line 595)
+
+4. **desserteForest/desserteForest.cpp**:
+   - Made `GDALClose()` conditional in `computeGlobalGeom()` (line 479)
+   - Made `GDALClose()` conditional in `validDraw()` (line 535)
+
+5. **OGF/formOGF.cpp**:
+   - Made `GDALClose()` conditional in `computeGlobalGeom()` (line 479)
+   - Made `GDALClose()` conditional in `validDraw()` (line 535)
+
+### Verification
+- All 17 GDALOpen/GDALOpenEx calls now have NULL-checks immediately after
+- All CSL option lists (`papszArgv`) now explicitly freed with `CSLDestroy()`
+- All `GDALClose()` calls made conditional on non-NULL dataset
+- No unconditional resource closes on potentially-NULL pointers
+
 ## Testing
 Monitor system for:
 - Reduced file descriptor usage

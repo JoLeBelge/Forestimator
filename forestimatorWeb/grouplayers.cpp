@@ -750,6 +750,12 @@ bool cropIm(std::string inputRaster, std::string aOut, OGREnvelope ext)
         pDriver = GetGDALDriverManager()->GetDriverByName(pszFormat);
         pInputRaster = (GDALDataset *)GDALOpen(inputPath, GA_ReadOnly);
 
+        if (pInputRaster == NULL)
+        {
+            std::cout << "cropIm: cannot open input raster " << inputPath << std::endl;
+            return false;
+        }
+
         double transform[6], tr1[6];
         pInputRaster->GetGeoTransform(transform);
         pInputRaster->GetGeoTransform(tr1);
@@ -987,10 +993,10 @@ int groupLayers::getNumSelect4Download() { return mSelectLayers->numSelectedLaye
 
 std::vector<std::shared_ptr<Layer>> groupLayers::getSelectedLayer4Download() { return mSelectLayers->getSelectedLayer(); }
 
-bool isValidXmlIdentifier(std::string str){
+bool isValidXmlIdentifier(std::string str)
+{
     return str.find("??") == UINTMAX_MAX;
 }
-
 
 bool isValidHtml(std::string text)
 {
@@ -1006,7 +1012,6 @@ bool isValidHtml(std::string text)
     }
     return aRes;
 }
-
 
 std::string getHtml(std::string groupCode)
 {
@@ -1024,7 +1029,7 @@ std::string getHtml(std::string groupCode)
         cout << "Warning: Project name/description not found in FILE: forestimator-documentation.xml for TAG: " << groupCode << ".projet" << std::endl;
     }
 
-    std::string description = "<h4>Description</h4>" + WString::tr(groupCode+ ".description").toUTF8();
+    std::string description = "<h4>Description</h4>" + WString::tr(groupCode + ".description").toUTF8();
     if (!isValidXmlIdentifier(description) || !isValidHtml(description))
     {
         description = "";
@@ -1094,6 +1099,11 @@ GDALDataset *getDSonEnv(std::string inputRaster, OGRGeometry *poGeom)
         }
 
         GDALTranslateOptionsFree(option);
+        if (papszArgv != nullptr)
+        {
+            CSLDestroy(papszArgv);
+            papszArgv = nullptr;
+        }
         GDALClose(DS);
     }
     return aRes;
