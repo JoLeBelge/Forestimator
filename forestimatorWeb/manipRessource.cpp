@@ -219,20 +219,26 @@ std::string traduction(std::string afr, std::string target_lang)
 
         char *urlified = curl_easy_escape(curl, afr.c_str(), 0);
         // Append escaped text if available, then free it with curl_free
-        if (urlified != NULL) {
+        if (urlified != NULL)
+        {
             url += urlified;
             curl_free(urlified);
-        } else {
+        }
+        else
+        {
             std::cerr << "Warning: curl_easy_escape returned NULL, using unescaped text" << std::endl;
             url += afr; // fallback: append raw text (may break request)
         }
-        std::cout << "url: \n" << std::endl;
-        std::cout << url << "\n" << std::endl;
+        std::cout << "url: \n"
+                  << std::endl;
+        std::cout << url << "\n"
+                  << std::endl;
         curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
         res = curl_easy_perform(curl);
-        if (res != CURLE_OK) {
+        if (res != CURLE_OK)
+        {
             std::cerr << "curl_easy_perform() failed: " << curl_easy_strerror(res) << std::endl;
         }
         curl_easy_cleanup(curl);
