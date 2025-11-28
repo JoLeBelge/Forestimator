@@ -387,7 +387,7 @@ OGREnvelope formOGF::computeGlobalGeom(std::string aFile)
     env.MaxY = 167719;
 
     const char *inputPath = aFile.c_str();
-    GDALDataset *DS = (GDALDataset *)GDALOpenEx(inputPath, GDAL_OF_VECTOR | GDAL_OF_READONLY, NULL, NULL, NULL);
+    GDALDataset *DS = reinterpret_cast<GDALDataset *>(GDALOpenEx(inputPath, GDAL_OF_VECTOR | GDAL_OF_READONLY, NULL, NULL, NULL));
     if (DS != NULL)
     {
         OGRLayer *lay = DS->GetLayer(0);
@@ -472,7 +472,7 @@ void formOGF::validDraw(std::string geojson)
     ofs << geojson;
     ofs.close();
     // lecture avec gdal
-    GDALDataset *DS = (GDALDataset *)GDALOpenEx(aOut.c_str(), GDAL_OF_VECTOR | GDAL_OF_READONLY, NULL, NULL, NULL);
+    GDALDataset *DS = reinterpret_cast<GDALDataset *>(GDALOpenEx(aOut.c_str(), GDAL_OF_VECTOR | GDAL_OF_READONLY, NULL, NULL, NULL));
     if (DS != NULL)
     {
         OGRLayer *lay = DS->GetLayer(0);

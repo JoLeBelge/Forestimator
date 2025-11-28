@@ -247,12 +247,31 @@ void formDesserteForest::submit()
             WLocalDateTime d = WLocalDateTime::currentDateTime();
             // std::cout << " sauve la coupe rase " << std::endl;
             sqlite3_stmt *stmt;
-            SQLstring = "INSERT INTO desserte (version,date,nom,prenom,mail,tel,typeContact,contactPrecision,checkRepresentant,typeAM,typeProprio,deposant,typeGeom,descr,acAdmin,geom) VALUES (0,'" + d.toString().toUTF8() + "'," + "'" + format4SQL(nom->valueText().toUTF8()) + "'," + "'" + format4SQL(prenom->valueText().toUTF8()) + "'," + "'" + format4SQL(mail->valueText().toUTF8()) + "'," + "'" + format4SQL(tel->valueText().toUTF8()) + "'," + "'" + format4SQL(typeContact->currentText().toUTF8()) + "'," + "'" + format4SQL(contactPresicion->valueText().toUTF8()) + "'," + std::to_string(checkRepresentant->isChecked()) + "," + "'" + format4SQL(typeAM->currentText().toUTF8()) + "'," + "'" + format4SQL(typeProprio->currentText().toUTF8()) + "'," + "'" + format4SQL(deposant->currentText().toUTF8()) + "'," + std::to_string(choixAM->currentIndex() + 1) + "," + "'" + format4SQL(description->valueText().toUTF8()) + "'," + "'" + format4SQL(acAdmin->valueText().toUTF8()) + "'," + "'" + aGeom + "');";
-            // std::cout << "sql : " << SQLstring << std::endl;
-            sqlite3_prepare_v2(db_, SQLstring.c_str(), -1, &stmt, NULL);
-            // applique l'update
-            sqlite3_step(stmt);
-            sqlite3_finalize(stmt);
+            const char *query = "INSERT INTO desserte (version,date,nom,prenom,mail,tel,typeContact,contactPrecision,checkRepresentant,typeAM,typeProprio,deposant,typeGeom,descr,acAdmin,geom) VALUES (0,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+            if (sqlite3_prepare_v2(db_, query, -1, &stmt, NULL) == SQLITE_OK)
+            {
+                sqlite3_bind_text(stmt, 1, d.toString().toUTF8().c_str(), -1, SQLITE_TRANSIENT);
+                sqlite3_bind_text(stmt, 2, format4SQL(nom->valueText().toUTF8()).c_str(), -1, SQLITE_TRANSIENT);
+                sqlite3_bind_text(stmt, 3, format4SQL(prenom->valueText().toUTF8()).c_str(), -1, SQLITE_TRANSIENT);
+                sqlite3_bind_text(stmt, 4, format4SQL(mail->valueText().toUTF8()).c_str(), -1, SQLITE_TRANSIENT);
+                sqlite3_bind_text(stmt, 5, format4SQL(tel->valueText().toUTF8()).c_str(), -1, SQLITE_TRANSIENT);
+                sqlite3_bind_text(stmt, 6, format4SQL(typeContact->currentText().toUTF8()).c_str(), -1, SQLITE_TRANSIENT);
+                sqlite3_bind_text(stmt, 7, format4SQL(contactPresicion->valueText().toUTF8()).c_str(), -1, SQLITE_TRANSIENT);
+                sqlite3_bind_int(stmt, 8, checkRepresentant->isChecked());
+                sqlite3_bind_text(stmt, 9, format4SQL(typeAM->currentText().toUTF8()).c_str(), -1, SQLITE_TRANSIENT);
+                sqlite3_bind_text(stmt,10, format4SQL(typeProprio->currentText().toUTF8()).c_str(), -1, SQLITE_TRANSIENT);
+                sqlite3_bind_text(stmt,11, format4SQL(deposant->currentText().toUTF8()).c_str(), -1, SQLITE_TRANSIENT);
+                sqlite3_bind_int(stmt, 12, choixAM->currentIndex() + 1);
+                sqlite3_bind_text(stmt,13, format4SQL(description->valueText().toUTF8()).c_str(), -1, SQLITE_TRANSIENT);
+                sqlite3_bind_text(stmt,14, format4SQL(acAdmin->valueText().toUTF8()).c_str(), -1, SQLITE_TRANSIENT);
+                sqlite3_bind_text(stmt,15, aGeom.c_str(), -1, SQLITE_TRANSIENT);
+                // the version is hardcoded as 0
+                if (sqlite3_step(stmt) != SQLITE_DONE)
+                {
+                    std::cerr << "desserteForest: Error inserting desserte: " << sqlite3_errmsg(db_) << std::endl;
+                }
+                sqlite3_finalize(stmt);
+            }
         }
         sqlite3_close(db_);
         sendSummaryMail();
@@ -415,7 +434,7 @@ OGREnvelope formDesserteForest::computeGlobalGeom(std::string aFile)
     env.MaxY = 167719;
 
     const char *inputPath = aFile.c_str();
-    GDALDataset *DS = (GDALDataset *)GDALOpenEx(inputPath, GDAL_OF_VECTOR | GDAL_OF_READONLY, NULL, NULL, NULL);
+    GDALDataset *DS = reinterpret_cast<GDALDataset *>(GDALOpenEx(inputPath, GDAL_OF_VECTOR | GDAL_OF_READONLY, NULL, NULL, NULL));
     if (DS != NULL)
     {
         OGRLayer *lay = DS->GetLayer(0);
@@ -500,7 +519,7 @@ void formDesserteForest::validDraw(std::string geojson)
     ofs << geojson;
     ofs.close();
     // lecture avec gdal
-    GDALDataset *DS = (GDALDataset *)GDALOpenEx(aOut.c_str(), GDAL_OF_VECTOR | GDAL_OF_READONLY, NULL, NULL, NULL);
+    GDALDataset *DS = reinterpret_cast<GDALDataset *>(GDALOpenEx(aOut.c_str(), GDAL_OF_VECTOR | GDAL_OF_READONLY, NULL, NULL, NULL));
     if (DS != NULL)
     {
         OGRLayer *lay = DS->GetLayer(0);

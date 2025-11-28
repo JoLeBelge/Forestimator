@@ -1,5 +1,6 @@
 #include "cadastre.h"
 #include <boost/filesystem.hpp>
+#include <cctype>
 extern bool globTest;
 extern std::string columnPath;
 
@@ -26,34 +27,54 @@ void cadastre::loadInfo()
     sqlite3_stmt *stmt;
 
     std::cout << "load info cadastre" << std::endl;
-    std::string SQLstring = "SELECT " + columnPath + ",Nom,Code FROM fichiersGIS WHERE Categorie='Cadastre' OR Code='TMPDIR';";
-
+    // sanitize columnPath to prevent SQL injection through column name
+    auto isValidColumn = [](const std::string &s) {
+        if (s.empty())
+            return false;
+        for (char c : s)
+        {
+            if (!std::isalnum((unsigned char)c) && c != '_')
+                return false;
+        }
+        return true;
+    };
+    std::string col = "";
+    if (isValidColumn(columnPath))
+    {
+        col = columnPath;
+    }
+    else
+    {
+        // fallback column name; adjust if your DB schema uses a different column
+        col = "path";
+    }
+    std::string SQLstring = "SELECT " + col + ",Nom,Code FROM fichiersGIS WHERE Categorie='Cadastre' OR Code='TMPDIR';";
     sqlite3_prepare_v2(db_, SQLstring.c_str(), -1, &stmt, NULL);
     while (sqlite3_step(stmt) == SQLITE_ROW)
     {
         // if (sqlite3_column_type(stmt, 0)!=SQLITE_NULL && sqlite3_column_type(stmt, 1)!=SQLITE_NULL  && sqlite3_column_type(stmt, 2)!=SQLITE_NULL){
         if (sqlite3_column_type(stmt, 0) != SQLITE_NULL)
         {
-            std::string code = std::string((char *)sqlite3_column_text(stmt, 2));
+            std::string code = std::string(reinterpret_cast<const char *>(sqlite3_column_text(stmt, 2)));
             if (code == "Commune")
             {
-                mShpCommunePath = fs::path(std::string((char *)sqlite3_column_text(stmt, 0)) + "/" + std::string((char *)sqlite3_column_text(stmt, 1)));
+                mShpCommunePath = fs::path(std::string(reinterpret_cast<const char *>(sqlite3_column_text(stmt, 0))) + "/" + std::string(reinterpret_cast<const char *>(sqlite3_column_text(stmt, 1))));
             }
             else if (code == "Division")
             {
-                mShpDivisionPath = fs::path(std::string((char *)sqlite3_column_text(stmt, 0)) + "/" + std::string((char *)sqlite3_column_text(stmt, 1)));
+                mShpDivisionPath = fs::path(std::string(reinterpret_cast<const char *>(sqlite3_column_text(stmt, 0))) + "/" + std::string(reinterpret_cast<const char *>(sqlite3_column_text(stmt, 1))));
             }
             else if (code == "PaCa")
             {
-                mShpParcellePath = fs::path(std::string((char *)sqlite3_column_text(stmt, 0)) + "/" + std::string((char *)sqlite3_column_text(stmt, 1)));
+                mShpParcellePath = fs::path(std::string(reinterpret_cast<const char *>(sqlite3_column_text(stmt, 0))) + "/" + std::string(reinterpret_cast<const char *>(sqlite3_column_text(stmt, 1))));
             }
             else if (code == "TMPDIR")
             {
-                mTmpDir = std::string((char *)sqlite3_column_text(stmt, 0));
+                mTmpDir = std::string(reinterpret_cast<const char *>(sqlite3_column_text(stmt, 0)));
             }
             else if (code == "CadastreBD")
             {
-                mDirBDCadastre = std::string((char *)sqlite3_column_text(stmt, 0)) + "/" + std::string((char *)sqlite3_column_text(stmt, 1));
+                mDirBDCadastre = std::string(reinterpret_cast<const char *>(sqlite3_column_text(stmt, 0))) + "/" + std::string(reinterpret_cast<const char *>(sqlite3_column_text(stmt, 1)));
             }
         }
     }

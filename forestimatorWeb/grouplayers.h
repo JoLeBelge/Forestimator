@@ -59,8 +59,8 @@ double getArea(OGREnvelope *env);
 GDALDataset *getDSonEnv(std::string inputRaster, OGRGeometry *poGeom);
 
 std::string getHtml(std::string);
-bool isValidHtml(std::string);
-bool isValidXmlIdentifier(std::string);
+bool isValidHtml(const std::string &);
+bool isValidXmlIdentifier(const std::string &);
 
 // groupLayers héritera de cette classe , ça me permet d'avoir un meilleur visu des membres dédiés aux clacul des statistiques de surface
 class groupStat

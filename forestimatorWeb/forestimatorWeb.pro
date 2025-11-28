@@ -6,6 +6,9 @@ QT -= gui
 QT += sql
 CONFIG += c++17
 
+# Enable warnings
+QMAKE_CXXFLAGS += -Wall -Wextra -Wpedantic
+
 LIBS = -lcurl -lwthttp -lwt -lboost_system -lboost_iostreams  -lboost_filesystem -lboost_program_options -lcrypt -pthread -lwtdbo -lwtdbosqlite3 -lzip -lhpdf -lsqlite3
 
 DEPENDPATH += /usr/include/gdal/

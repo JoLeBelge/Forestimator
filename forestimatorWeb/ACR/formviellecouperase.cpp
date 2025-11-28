@@ -292,19 +292,35 @@ void formVielleCoupeRase::submit()
             WLocalDateTime d = WLocalDateTime::currentDateTime();
             // std::cout << " sauve la coupe rase " << std::endl;
             sqlite3_stmt *stmt;
-            SQLstring = "INSERT INTO acr (date,vosRef,nom,prenom,contact,gsm,keepInTouch,typeContact,anneeCoupe,regeNat,vegeBloquante,objectif,spCoupe,sanitCoupe,travaux,plantation,gibier,descr,surf,polygon) VALUES ('" + d.toString().toUTF8() + "'," + "'" + format4SQL(vosrefEdit_->valueText().toUTF8()) + "'," + "'" + format4SQL(nomEncoderEdit_->valueText().toUTF8()) + "'," + "'" + format4SQL(prenomEncoderEdit_->valueText().toUTF8()) + "'," + "'" + format4SQL(contactEncoderEdit_->valueText().toUTF8()) + "'," + "'" + format4SQL(contactEncoderGSMEdit_->valueText().toUTF8()) + "'," + std::to_string(keepInTouch->isChecked()) + "," + "'" + format4SQL(typeContactEdit_->currentText().toUTF8()) + "'," + "'" + format4SQL(anneeVCREdit_->currentText().toUTF8()) + "'," + "'" + format4SQL(regeNatEdit_->valueText().toUTF8()) + "'," + "'" + format4SQL(vegeBloquanteEdit_->valueText().toUTF8()) + "'," + "'" + format4SQL(objectifEdit_->currentText().toUTF8()) + "'," + "'" + format4SQL(spEdit_->valueText().toUTF8()) + "'," + "'" + format4SQL(sanitEdit_->valueText().toUTF8()) + "',"
-                        //+"'"+format4SQL(itineraireEdit_->currentText().toUTF8())+"',"
-                        + "'" + format4SQL(travSylviEdit_->valueText().toUTF8()) + "'," + "'" + format4SQL(plantationEdit_->valueText().toUTF8()) + "',"
-                        //+"'"+format4SQL(hauteurEdit_->valueText().toUTF8())+"',"
-                        + "'" + format4SQL(gibierEdit_->valueText().toUTF8()) + "'," + "'" + format4SQL(VCRdescriptionEdit_->valueText().toUTF8()) + "'," + std::to_string(surf) + "," + "'" + polyg + "');";
-            if (globTest)
+            const char *query = "INSERT INTO acr (date,vosRef,nom,prenom,contact,gsm,keepInTouch,typeContact,anneeCoupe,regeNat,vegeBloquante,objectif,spCoupe,sanitCoupe,travaux,plantation,gibier,descr,surf,polygon) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+            if (sqlite3_prepare_v2(db_, query, -1, &stmt, NULL) == SQLITE_OK)
             {
-                std::cout << "sql : " << SQLstring << std::endl;
+                sqlite3_bind_text(stmt, 1, d.toString().toUTF8().c_str(), -1, SQLITE_TRANSIENT);
+                sqlite3_bind_text(stmt, 2, format4SQL(vosrefEdit_->valueText().toUTF8()).c_str(), -1, SQLITE_TRANSIENT);
+                sqlite3_bind_text(stmt, 3, format4SQL(nomEncoderEdit_->valueText().toUTF8()).c_str(), -1, SQLITE_TRANSIENT);
+                sqlite3_bind_text(stmt, 4, format4SQL(prenomEncoderEdit_->valueText().toUTF8()).c_str(), -1, SQLITE_TRANSIENT);
+                sqlite3_bind_text(stmt, 5, format4SQL(contactEncoderEdit_->valueText().toUTF8()).c_str(), -1, SQLITE_TRANSIENT);
+                sqlite3_bind_text(stmt, 6, format4SQL(contactEncoderGSMEdit_->valueText().toUTF8()).c_str(), -1, SQLITE_TRANSIENT);
+                sqlite3_bind_int(stmt, 7, keepInTouch->isChecked());
+                sqlite3_bind_text(stmt, 8, format4SQL(typeContactEdit_->currentText().toUTF8()).c_str(), -1, SQLITE_TRANSIENT);
+                sqlite3_bind_text(stmt, 9, format4SQL(anneeVCREdit_->currentText().toUTF8()).c_str(), -1, SQLITE_TRANSIENT);
+                sqlite3_bind_text(stmt,10, format4SQL(regeNatEdit_->valueText().toUTF8()).c_str(), -1, SQLITE_TRANSIENT);
+                sqlite3_bind_text(stmt,11, format4SQL(vegeBloquanteEdit_->valueText().toUTF8()).c_str(), -1, SQLITE_TRANSIENT);
+                sqlite3_bind_text(stmt,12, format4SQL(objectifEdit_->currentText().toUTF8()).c_str(), -1, SQLITE_TRANSIENT);
+                sqlite3_bind_text(stmt,13, format4SQL(spEdit_->valueText().toUTF8()).c_str(), -1, SQLITE_TRANSIENT);
+                sqlite3_bind_text(stmt,14, format4SQL(sanitEdit_->valueText().toUTF8()).c_str(), -1, SQLITE_TRANSIENT);
+                sqlite3_bind_text(stmt,15, format4SQL(travSylviEdit_->valueText().toUTF8()).c_str(), -1, SQLITE_TRANSIENT);
+                sqlite3_bind_text(stmt,16, format4SQL(plantationEdit_->valueText().toUTF8()).c_str(), -1, SQLITE_TRANSIENT);
+                sqlite3_bind_text(stmt,17, format4SQL(gibierEdit_->valueText().toUTF8()).c_str(), -1, SQLITE_TRANSIENT);
+                sqlite3_bind_text(stmt,18, format4SQL(VCRdescriptionEdit_->valueText().toUTF8()).c_str(), -1, SQLITE_TRANSIENT);
+                sqlite3_bind_double(stmt,19, surf);
+                sqlite3_bind_text(stmt,20, polyg.c_str(), -1, SQLITE_TRANSIENT);
+                if (sqlite3_step(stmt) != SQLITE_DONE)
+                {
+                    std::cerr << "formviellecouperase: Error inserting ACR: " << sqlite3_errmsg(db_) << std::endl;
+                }
+                sqlite3_finalize(stmt);
             }
-            sqlite3_prepare_v2(db_, SQLstring.c_str(), -1, &stmt, NULL);
-            // applique l'update
-            sqlite3_step(stmt);
-            sqlite3_finalize(stmt);
         }
         sqlite3_close(db_);
 
@@ -480,7 +496,7 @@ OGREnvelope formVielleCoupeRase::computeGlobalGeom(std::string aFile)
     env.MaxY = 167719;
 
     const char *inputPath = aFile.c_str();
-    GDALDataset *DS = (GDALDataset *)GDALOpenEx(inputPath, GDAL_OF_VECTOR | GDAL_OF_READONLY, NULL, NULL, NULL);
+    GDALDataset *DS = reinterpret_cast<GDALDataset *>(GDALOpenEx(inputPath, GDAL_OF_VECTOR | GDAL_OF_READONLY, NULL, NULL, NULL));
     if (DS != NULL)
     {
         OGRLayer *lay = DS->GetLayer(0);
@@ -565,7 +581,7 @@ void formVielleCoupeRase::validDraw(std::string geojson)
     ofs << geojson;
     ofs.close();
     // lecture avec gdal
-    GDALDataset *DS = (GDALDataset *)GDALOpenEx(aOut.c_str(), GDAL_OF_VECTOR | GDAL_OF_READONLY, NULL, NULL, NULL);
+    GDALDataset *DS = reinterpret_cast<GDALDataset *>(GDALOpenEx(aOut.c_str(), GDAL_OF_VECTOR | GDAL_OF_READONLY, NULL, NULL, NULL));
     if (DS != NULL)
     {
         OGRLayer *lay = DS->GetLayer(0);

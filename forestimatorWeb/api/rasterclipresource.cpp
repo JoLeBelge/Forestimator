@@ -55,7 +55,7 @@ void rasterClipResource::handleRequest(const Http::Request &request, Http::Respo
 
         const char *pszFormat = "GTiff";
         pDriver = GetGDALDriverManager()->GetDriverByName(pszFormat);
-        pInputRaster = (GDALDataset *)GDALOpen(inputPath.c_str(), GA_ReadOnly);
+        pInputRaster = reinterpret_cast<GDALDataset *>(GDALOpen(inputPath.c_str(), GA_ReadOnly));
 
         // Check if GDALOpen failed
         if (pInputRaster == NULL)
@@ -128,7 +128,7 @@ void rasterClipResource::handleRequest(const Http::Request &request, Http::Respo
             GDALClose(pInputRaster);
             if (pCroppedRaster != NULL)
             {
-                GDALClose((GDALDatasetH)pCroppedRaster);
+                GDALClose(reinterpret_cast<GDALDatasetH>(pCroppedRaster));
             }
             std::ifstream r(output.c_str(), std::ios::in | std::ios::binary);
             response.addHeader("Content-Type", "image/tiff");
@@ -143,17 +143,17 @@ void rasterClipResource::handleRequest(const Http::Request &request, Http::Respo
                 pCroppedRaster = pDriver->CreateCopy(output.c_str(), pInputRaster, FALSE, papszOptions, NULL, NULL);
                 if (pCroppedRaster != NULL)
                 {
-                    GDALClose((GDALDatasetH)pCroppedRaster);
+                    GDALClose(reinterpret_cast<GDALDatasetH>(pCroppedRaster));
                 }
                 // je le referme et réouvre car sinon "Cannot modify tag "PhotometricInterpretation" while writing"
-                pCroppedRaster = (GDALDataset *)GDALOpen(output.c_str(), GA_Update);
+                pCroppedRaster = reinterpret_cast<GDALDataset *>(GDALOpen(output.c_str(), GA_Update));
 
                 // on définit la palette de couleur associé à ce raster croppé
                 l->createRasterColorInterpPalette(pCroppedRaster->GetRasterBand(1));
                 GDALClose(pInputRaster);
                 if (pCroppedRaster != NULL)
                 {
-                    GDALClose((GDALDatasetH)pCroppedRaster);
+                    GDALClose(reinterpret_cast<GDALDatasetH>(pCroppedRaster));
                 }
                 std::ifstream r(output.c_str(), std::ios::in | std::ios::binary);
                 response.addHeader("Content-Type", "image/tiff");

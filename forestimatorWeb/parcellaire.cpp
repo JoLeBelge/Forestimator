@@ -100,7 +100,7 @@ bool parcellaire::computeGlobalGeom(std::string extension, bool limitSize)
     }
     std::string input(mFullPath + "." + extension);
     const char *inputPath = input.c_str();
-    GDALDataset *DS = (GDALDataset *)GDALOpenEx(inputPath, GDAL_OF_VECTOR | GDAL_OF_READONLY, NULL, NULL, NULL);
+    GDALDataset *DS = reinterpret_cast<GDALDataset *>(GDALOpenEx(inputPath, GDAL_OF_VECTOR | GDAL_OF_READONLY, NULL, NULL, NULL));
     if (DS != NULL)
     {
         OGRLayer *lay = DS->GetLayer(0);
@@ -359,7 +359,7 @@ void parcellaire::computeStatAndVisuSelectedPol(int aId)
     m_app->loadingIndicator()->show();
     std::string input(geoJsonName());
     const char *inputPath = input.c_str();
-    GDALDataset *mDS = (GDALDataset *)GDALOpenEx(inputPath, GDAL_OF_VECTOR | GDAL_OF_READONLY, NULL, NULL, NULL);
+    GDALDataset *mDS = reinterpret_cast<GDALDataset *>(GDALOpenEx(inputPath, GDAL_OF_VECTOR | GDAL_OF_READONLY, NULL, NULL, NULL));
     if (mDS != NULL)
     {
         // layer
@@ -471,7 +471,7 @@ void parcellaire::selectPolygon(double x, double y)
         std::cout << "parcellaire::selectPolygon " << std::endl;
         std::string input(geoJsonName()); // lecture du geojson et pas du shp, comme cela compatible avec polygone du cadastre.
         const char *inputPath = input.c_str();
-        GDALDataset *mDS = (GDALDataset *)GDALOpenEx(inputPath, GDAL_OF_VECTOR | GDAL_OF_READONLY, NULL, NULL, NULL);
+        GDALDataset *mDS = reinterpret_cast<GDALDataset *>(GDALOpenEx(inputPath, GDAL_OF_VECTOR | GDAL_OF_READONLY, NULL, NULL, NULL));
         if (mDS != NULL)
         {
             // layer
@@ -564,7 +564,7 @@ void parcellaire::TaskComputing::run()
     std::string input(geoJsonName);
     const char *inputPath = input.c_str();
     cout << input.c_str();
-    GDALDataset *mDS = (GDALDataset *)GDALOpenEx(inputPath, GDAL_OF_VECTOR | GDAL_OF_READONLY, NULL, NULL, NULL);
+    GDALDataset *mDS = reinterpret_cast<GDALDataset *>(GDALOpenEx(inputPath, GDAL_OF_VECTOR | GDAL_OF_READONLY, NULL, NULL, NULL));
     if (mDS != NULL)
     {
         OGRLayer *lay = mDS->GetLayer(0);
@@ -623,7 +623,7 @@ bool parcellaire::to31370AndGeoJson()
     std::cout << " parcellaire::toGeoJson() ... ";
     // 0) suppression des polygones foireux - radical mais c'est l'utilisateur qui doit gérer ses propres merdes
     bool testEPSG(1);
-    GDALDataset *DS = (GDALDataset *)GDALOpenEx(fileName().c_str(), GDAL_OF_VECTOR | GDAL_OF_UPDATE, NULL, NULL, NULL);
+    GDALDataset *DS = reinterpret_cast<GDALDataset *>(GDALOpenEx(fileName().c_str(), GDAL_OF_VECTOR | GDAL_OF_UPDATE, NULL, NULL, NULL));
     if (DS != NULL)
     {
         OGRLayer *lay = DS->GetLayer(0);

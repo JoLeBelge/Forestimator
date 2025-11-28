@@ -17,7 +17,7 @@ void Pool::add(Task *task)
 
 void Pool::waitForThreadsToFinish()
 {
-    for (size_t i = 1; i < nThreads; i++)
+        for (int i = 1; i < nThreads; i++)
     {
         cThreads[i]->finish.wait();
     }
@@ -31,14 +31,14 @@ void Pool::waitForMainThreadToFinish()
 
 void Pool::start()
 {
-    for (size_t i = 0; i < nThreads; i++)
+        for (int i = 0; i < nThreads; i++)
     {
         CoreThread *that = new CoreThread(&cThreads, &nThreads, &valid);
         cThreads.push_back(that);
         that->finish = that->promise.get_future();
         std::thread(launchWorker, that).detach();
     }
-    for (size_t i = 0; i < nThreads; i++)
+        for (int i = 0; i < nThreads; i++)
     {
         cThreads[i]->startWork();
     }
@@ -59,7 +59,7 @@ void Pool::waitOnWorkerToFinished()
 
 int Pool::workerFinished()
 {
-    for (size_t i = 1; i < nThreads; i++)
+        for (int i = 1; i < nThreads; i++)
     {
         CoreThread *cT = cThreads[i];
         if (!cT->empty())
@@ -70,7 +70,7 @@ int Pool::workerFinished()
 
 void Pool::end()
 {
-    for (size_t i = 0; i < nThreads; i++)
+    for (int i = 0; i < nThreads; i++)
     {
         cThreads[i]->suspendWork();
     }
@@ -79,7 +79,7 @@ void Pool::end()
 
 void Pool::suspendWork()
 {
-    for (size_t i = 1; i < nThreads; i++)
+        for (int i = 1; i < nThreads; i++)
     {
         cThreads[i]->suspendWork();
     }
@@ -87,7 +87,7 @@ void Pool::suspendWork()
 
 void Pool::continueWork()
 {
-    for (size_t i = 1; i < nThreads; i++)
+        for (int i = 1; i < nThreads; i++)
     {
         cThreads[i]->startWork();
     }
@@ -95,11 +95,11 @@ void Pool::continueWork()
 
 void Pool::clean()
 {
-    for (size_t i = 0; i < nThreads; i++)
+        for (int i = 0; i < nThreads; i++)
     {
         cThreads[i]->clean();
     }
-    for (size_t i = 0; i < nThreads; i++)
+    for (int i = 0; i < nThreads; i++)
     {
         delete (cThreads[i]);
         cThreads[i] = nullptr;
@@ -108,7 +108,7 @@ void Pool::clean()
 
 void Pool::getUnfinishdTasks(int *ls)
 {
-    for (size_t i = 0; i < nThreads; i++)
+        for (int i = 0; i < nThreads; i++)
     {
         ls[i] = cThreads[i]->getUnfinishdTasks();
     }

@@ -234,6 +234,10 @@ std::string traduction(std::string afr, std::string target_lang)
         std::cout << url << "\n"
                   << std::endl;
         curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+        // Avoid blocking forever on slow or unresponsive endpoints
+        curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, 5L); // seconds to wait for connection
+        curl_easy_setopt(curl, CURLOPT_TIMEOUT, 15L);       // seconds max for the whole transfer
+        curl_easy_setopt(curl, CURLOPT_NOSIGNAL, 1L);
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
         res = curl_easy_perform(curl);
@@ -287,28 +291,32 @@ void processNCBI(std::shared_ptr<cDicoPhyto> dico)
             c++;
             std::string codeEs = kv.first;
             std::string scientificName = kv.second;
-            std::string SQLstring = "SELECT id FROM names WHERE name='" + scientificName + "';";
-            sqlite3_prepare(db_, SQLstring.c_str(), -1, &stmt, NULL);
-            while (sqlite3_step(stmt) == SQLITE_ROW)
+            const char *q1 = "SELECT id FROM names WHERE name=?;";
+            if (sqlite3_prepare_v2(db_, q1, -1, &stmt, NULL) == SQLITE_OK)
+            {
+                sqlite3_bind_text(stmt, 1, scientificName.c_str(), -1, SQLITE_TRANSIENT);
+                while (sqlite3_step(stmt) == SQLITE_ROW)
             {
                 if (sqlite3_column_type(stmt, 0) != SQLITE_NULL)
                 {
                     int id = sqlite3_column_int(stmt, 0);
                     // std::cout << "id of " << codeEs <<" is " << id << std::endl;
-                    SQLstring = "SELECT name FROM names WHERE id=" + std::to_string(id) + " AND type='common name';";
-                    sqlite3_prepare(db_, SQLstring.c_str(), -1, &stmt2, NULL);
-                    while (sqlite3_step(stmt2) == SQLITE_ROW)
+                    const char *q2 = "SELECT name FROM names WHERE id=? AND type='common name';";
+                    if (sqlite3_prepare_v2(db_, q2, -1, &stmt2, NULL) == SQLITE_OK)
+                    {
+                        sqlite3_bind_int(stmt2, 1, id);
+                        while (sqlite3_step(stmt2) == SQLITE_ROW)
                     {
                         if (sqlite3_column_type(stmt2, 0) != SQLITE_NULL)
                         {
-                            std::string commonName = std::string((char *)sqlite3_column_text(stmt2, 0));
+                            std::string commonName = std::string(reinterpret_cast<const char *>(sqlite3_column_text(stmt2, 0)));
                             std::cout << scientificName << " is " << commonName << std::endl;
                             // sauver le résultat dans la table
-                            SQLstring = "UPDATE dico_espece_all SET nom_en=TOTO" + commonName + "TOTO WHERE code_espece=TOTO" + codeEs + "TOTO;";
-                            boost::replace_all(SQLstring, "TOTO", "\"");
-                            // std::cout << "SQLstring " << SQLstring << std::endl;
-                            if (sqlite3_prepare_v2(dbOUT_, SQLstring.c_str(), -1, &stmt3, NULL) == SQLITE_OK)
+                            const char *q3 = "UPDATE dico_espece_all SET nom_en=? WHERE code_espece=?";
+                            if (sqlite3_prepare_v2(dbOUT_, q3, -1, &stmt3, NULL) == SQLITE_OK)
                             {
+                                sqlite3_bind_text(stmt3, 1, commonName.c_str(), -1, SQLITE_TRANSIENT);
+                                sqlite3_bind_text(stmt3, 2, codeEs.c_str(), -1, SQLITE_TRANSIENT);
                                 // applique l'update
                                 sqlite3_step(stmt3);
                                 sqlite3_finalize(stmt3);
@@ -324,8 +332,9 @@ void processNCBI(std::shared_ptr<cDicoPhyto> dico)
                     sqlite3_finalize(stmt2);
                 }
                 break;
-            }
-            if (c % 500 == 0)
+                }
+                sqlite3_finalize(stmt);
+                if (c % 500 == 0)
             {
                 std::cout << c << "plantes effectués" << std::endl;
             }
