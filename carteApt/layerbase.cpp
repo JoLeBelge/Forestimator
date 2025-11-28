@@ -1105,7 +1105,7 @@ bool layerBase::wms2jpg(OGREnvelope  * extent, int aSx, int aSy, std::string aOu
                                      "</DataWindow>"
                                      "<Projection>EPSG:31370</Projection>"
                                      "<BandsCount>3</BandsCount>"
-                                     "<ZeroBlockHttpCodes>204,404,500</ZeroBlockHttpCodes>" // la couche topo de l'ign retourne le code 500 depuis leurs mise à jour de avril 2021,vers WMS version 1.3 qui n'utilise pas les même balises xml (ajout crs entre autre, mais ne fonctionne pas)
+                                     "<ZeroBlockHttpCodes>0,204,404,500</ZeroBlockHttpCodes>" // la couche topo de l'ign retourne le code 500 depuis leurs mise à jour de avril 2021,vers WMS version 1.3 qui n'utilise pas les même balises xml (ajout crs entre autre, mais ne fonctionne pas)
                                      "<ZeroBlockOnServerException>true</ZeroBlockOnServerException>"
                                      "</GDAL_WMS>",
                                      mUrl.c_str(),

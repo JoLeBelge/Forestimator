@@ -498,7 +498,7 @@ void formOGF::sendSummaryMail()
 
     mail.setFrom(Wt::Mail::Mailbox("JO.Lisein@uliege.be", "Lisein Jonathan"));
     mail.setBody(
-        "\nVos données ont été encodée.\n" +
+        "\nVos données ont été encodées.\n" +
         Wt::WString::tr("mail.contact").toUTF8() + "\n--------------------------\n" +
         vosrefEdit_->valueText().toUTF8() + "\n" +
         nomEncoderEdit_->valueText().toUTF8() + "\n" +
