@@ -21,6 +21,7 @@ const (
 	bufferSize                 = 1 << 20
 	updateIntervall            = 100 * time.Millisecond
 	listOfProperties           = "Name: State: VmPeak: VmSize: VmLck: VmPin: VmHWM: VmRSS: VmData: VmStk: VmExe: VmLib: VmPTE: VmSwap: HugetlbPages: CoreDumping: ThpEnabled: Threads: SigQ: SigPnd: ShdPnd: SigBlk: SigIgn: SigCgt: CapInh: CapPrm: CapEff: CapBnd: CapAmb: Cpus_allowed_list:"
+	workingDirectory           = "/home/gef/Documents/"
 )
 
 type proc struct {
@@ -310,7 +311,6 @@ func getProcessInfo(p *proc) string {
 }
 
 func main() {
-	workingDirectory := "/home/gef/Documents/"
 	forestimator := proc{
 		started:               false,
 		cmd:                   nil,
