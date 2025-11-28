@@ -28,7 +28,8 @@ void cadastre::loadInfo()
 
     std::cout << "load info cadastre" << std::endl;
     // sanitize columnPath to prevent SQL injection through column name
-    auto isValidColumn = [](const std::string &s) {
+    auto isValidColumn = [](const std::string &s)
+    {
         if (s.empty())
             return false;
         for (char c : s)

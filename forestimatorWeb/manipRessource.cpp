@@ -296,51 +296,51 @@ void processNCBI(std::shared_ptr<cDicoPhyto> dico)
             {
                 sqlite3_bind_text(stmt, 1, scientificName.c_str(), -1, SQLITE_TRANSIENT);
                 while (sqlite3_step(stmt) == SQLITE_ROW)
-            {
-                if (sqlite3_column_type(stmt, 0) != SQLITE_NULL)
                 {
-                    int id = sqlite3_column_int(stmt, 0);
-                    // std::cout << "id of " << codeEs <<" is " << id << std::endl;
-                    const char *q2 = "SELECT name FROM names WHERE id=? AND type='common name';";
-                    if (sqlite3_prepare_v2(db_, q2, -1, &stmt2, NULL) == SQLITE_OK)
+                    if (sqlite3_column_type(stmt, 0) != SQLITE_NULL)
                     {
-                        sqlite3_bind_int(stmt2, 1, id);
-                        while (sqlite3_step(stmt2) == SQLITE_ROW)
-                    {
-                        if (sqlite3_column_type(stmt2, 0) != SQLITE_NULL)
+                        int id = sqlite3_column_int(stmt, 0);
+                        // std::cout << "id of " << codeEs <<" is " << id << std::endl;
+                        const char *q2 = "SELECT name FROM names WHERE id=? AND type='common name';";
+                        if (sqlite3_prepare_v2(db_, q2, -1, &stmt2, NULL) == SQLITE_OK)
                         {
-                            std::string commonName = std::string(reinterpret_cast<const char *>(sqlite3_column_text(stmt2, 0)));
-                            std::cout << scientificName << " is " << commonName << std::endl;
-                            // sauver le résultat dans la table
-                            const char *q3 = "UPDATE dico_espece_all SET nom_en=? WHERE code_espece=?";
-                            if (sqlite3_prepare_v2(dbOUT_, q3, -1, &stmt3, NULL) == SQLITE_OK)
+                            sqlite3_bind_int(stmt2, 1, id);
+                            while (sqlite3_step(stmt2) == SQLITE_ROW)
                             {
-                                sqlite3_bind_text(stmt3, 1, commonName.c_str(), -1, SQLITE_TRANSIENT);
-                                sqlite3_bind_text(stmt3, 2, codeEs.c_str(), -1, SQLITE_TRANSIENT);
-                                // applique l'update
-                                sqlite3_step(stmt3);
-                                sqlite3_finalize(stmt3);
+                                if (sqlite3_column_type(stmt2, 0) != SQLITE_NULL)
+                                {
+                                    std::string commonName = std::string(reinterpret_cast<const char *>(sqlite3_column_text(stmt2, 0)));
+                                    std::cout << scientificName << " is " << commonName << std::endl;
+                                    // sauver le résultat dans la table
+                                    const char *q3 = "UPDATE dico_espece_all SET nom_en=? WHERE code_espece=?";
+                                    if (sqlite3_prepare_v2(dbOUT_, q3, -1, &stmt3, NULL) == SQLITE_OK)
+                                    {
+                                        sqlite3_bind_text(stmt3, 1, commonName.c_str(), -1, SQLITE_TRANSIENT);
+                                        sqlite3_bind_text(stmt3, 2, codeEs.c_str(), -1, SQLITE_TRANSIENT);
+                                        // applique l'update
+                                        sqlite3_step(stmt3);
+                                        sqlite3_finalize(stmt3);
+                                    }
+                                    else
+                                    {
+                                        int ecode = sqlite3_errcode(dbOUT_);
+                                        std::cout << "\n error code is " << ecode;
+                                    }
+                                    break;
+                                }
                             }
-                            else
-                            {
-                                int ecode = sqlite3_errcode(dbOUT_);
-                                std::cout << "\n error code is " << ecode;
-                            }
-                            break;
+                            sqlite3_finalize(stmt2);
                         }
+                        break;
                     }
-                    sqlite3_finalize(stmt2);
-                }
-                break;
+                    sqlite3_finalize(stmt);
+                    if (c % 500 == 0)
+                    {
+                        std::cout << c << "plantes effectués" << std::endl;
+                    }
                 }
                 sqlite3_finalize(stmt);
-                if (c % 500 == 0)
-            {
-                std::cout << c << "plantes effectués" << std::endl;
+                sqlite3_close(db_);
+                sqlite3_close(dbOUT_);
             }
         }
-        sqlite3_finalize(stmt);
-        sqlite3_close(db_);
-        sqlite3_close(dbOUT_);
-    }
-}

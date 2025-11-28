@@ -259,12 +259,12 @@ void formDesserteForest::submit()
                 sqlite3_bind_text(stmt, 7, format4SQL(contactPresicion->valueText().toUTF8()).c_str(), -1, SQLITE_TRANSIENT);
                 sqlite3_bind_int(stmt, 8, checkRepresentant->isChecked());
                 sqlite3_bind_text(stmt, 9, format4SQL(typeAM->currentText().toUTF8()).c_str(), -1, SQLITE_TRANSIENT);
-                sqlite3_bind_text(stmt,10, format4SQL(typeProprio->currentText().toUTF8()).c_str(), -1, SQLITE_TRANSIENT);
-                sqlite3_bind_text(stmt,11, format4SQL(deposant->currentText().toUTF8()).c_str(), -1, SQLITE_TRANSIENT);
+                sqlite3_bind_text(stmt, 10, format4SQL(typeProprio->currentText().toUTF8()).c_str(), -1, SQLITE_TRANSIENT);
+                sqlite3_bind_text(stmt, 11, format4SQL(deposant->currentText().toUTF8()).c_str(), -1, SQLITE_TRANSIENT);
                 sqlite3_bind_int(stmt, 12, choixAM->currentIndex() + 1);
-                sqlite3_bind_text(stmt,13, format4SQL(description->valueText().toUTF8()).c_str(), -1, SQLITE_TRANSIENT);
-                sqlite3_bind_text(stmt,14, format4SQL(acAdmin->valueText().toUTF8()).c_str(), -1, SQLITE_TRANSIENT);
-                sqlite3_bind_text(stmt,15, aGeom.c_str(), -1, SQLITE_TRANSIENT);
+                sqlite3_bind_text(stmt, 13, format4SQL(description->valueText().toUTF8()).c_str(), -1, SQLITE_TRANSIENT);
+                sqlite3_bind_text(stmt, 14, format4SQL(acAdmin->valueText().toUTF8()).c_str(), -1, SQLITE_TRANSIENT);
+                sqlite3_bind_text(stmt, 15, aGeom.c_str(), -1, SQLITE_TRANSIENT);
                 // the version is hardcoded as 0
                 if (sqlite3_step(stmt) != SQLITE_DONE)
                 {

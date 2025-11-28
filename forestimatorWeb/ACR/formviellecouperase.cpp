@@ -304,17 +304,17 @@ void formVielleCoupeRase::submit()
                 sqlite3_bind_int(stmt, 7, keepInTouch->isChecked());
                 sqlite3_bind_text(stmt, 8, format4SQL(typeContactEdit_->currentText().toUTF8()).c_str(), -1, SQLITE_TRANSIENT);
                 sqlite3_bind_text(stmt, 9, format4SQL(anneeVCREdit_->currentText().toUTF8()).c_str(), -1, SQLITE_TRANSIENT);
-                sqlite3_bind_text(stmt,10, format4SQL(regeNatEdit_->valueText().toUTF8()).c_str(), -1, SQLITE_TRANSIENT);
-                sqlite3_bind_text(stmt,11, format4SQL(vegeBloquanteEdit_->valueText().toUTF8()).c_str(), -1, SQLITE_TRANSIENT);
-                sqlite3_bind_text(stmt,12, format4SQL(objectifEdit_->currentText().toUTF8()).c_str(), -1, SQLITE_TRANSIENT);
-                sqlite3_bind_text(stmt,13, format4SQL(spEdit_->valueText().toUTF8()).c_str(), -1, SQLITE_TRANSIENT);
-                sqlite3_bind_text(stmt,14, format4SQL(sanitEdit_->valueText().toUTF8()).c_str(), -1, SQLITE_TRANSIENT);
-                sqlite3_bind_text(stmt,15, format4SQL(travSylviEdit_->valueText().toUTF8()).c_str(), -1, SQLITE_TRANSIENT);
-                sqlite3_bind_text(stmt,16, format4SQL(plantationEdit_->valueText().toUTF8()).c_str(), -1, SQLITE_TRANSIENT);
-                sqlite3_bind_text(stmt,17, format4SQL(gibierEdit_->valueText().toUTF8()).c_str(), -1, SQLITE_TRANSIENT);
-                sqlite3_bind_text(stmt,18, format4SQL(VCRdescriptionEdit_->valueText().toUTF8()).c_str(), -1, SQLITE_TRANSIENT);
-                sqlite3_bind_double(stmt,19, surf);
-                sqlite3_bind_text(stmt,20, polyg.c_str(), -1, SQLITE_TRANSIENT);
+                sqlite3_bind_text(stmt, 10, format4SQL(regeNatEdit_->valueText().toUTF8()).c_str(), -1, SQLITE_TRANSIENT);
+                sqlite3_bind_text(stmt, 11, format4SQL(vegeBloquanteEdit_->valueText().toUTF8()).c_str(), -1, SQLITE_TRANSIENT);
+                sqlite3_bind_text(stmt, 12, format4SQL(objectifEdit_->currentText().toUTF8()).c_str(), -1, SQLITE_TRANSIENT);
+                sqlite3_bind_text(stmt, 13, format4SQL(spEdit_->valueText().toUTF8()).c_str(), -1, SQLITE_TRANSIENT);
+                sqlite3_bind_text(stmt, 14, format4SQL(sanitEdit_->valueText().toUTF8()).c_str(), -1, SQLITE_TRANSIENT);
+                sqlite3_bind_text(stmt, 15, format4SQL(travSylviEdit_->valueText().toUTF8()).c_str(), -1, SQLITE_TRANSIENT);
+                sqlite3_bind_text(stmt, 16, format4SQL(plantationEdit_->valueText().toUTF8()).c_str(), -1, SQLITE_TRANSIENT);
+                sqlite3_bind_text(stmt, 17, format4SQL(gibierEdit_->valueText().toUTF8()).c_str(), -1, SQLITE_TRANSIENT);
+                sqlite3_bind_text(stmt, 18, format4SQL(VCRdescriptionEdit_->valueText().toUTF8()).c_str(), -1, SQLITE_TRANSIENT);
+                sqlite3_bind_double(stmt, 19, surf);
+                sqlite3_bind_text(stmt, 20, polyg.c_str(), -1, SQLITE_TRANSIENT);
                 if (sqlite3_step(stmt) != SQLITE_DONE)
                 {
                     std::cerr << "formviellecouperase: Error inserting ACR: " << sqlite3_errmsg(db_) << std::endl;
