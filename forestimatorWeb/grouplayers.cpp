@@ -679,7 +679,7 @@ void groupLayers::exportLayMapView()
         if (cropIm(l->getPathTif(), aCroppedRFile, mMapExtent))
         {
             std::cout << "create archive pour raster croppé " << std::endl;
-            ZipArchive *zf = new ZipArchive(archiveFileName);
+            auto zf = std::make_unique<ZipArchive>(archiveFileName);
             zf->open(ZipArchive::WRITE);
             // pour bien faire; choisir un nom qui soit unique, pour éviter conflict si plusieurs utilisateurs croppent la mm carte en mm temps
             zf->addFile(mClientName + ".tif", aCroppedRFile);
@@ -689,7 +689,6 @@ void groupLayers::exportLayMapView()
             }
             m_app->processEvents();
             zf->close();
-            delete zf;
             // le fileResources sera détruit au moment de la destruction GroupL
             WFileResource *fileResource = new Wt::WFileResource("plain/text", archiveFileName);
             fileResource->suggestFileName(mClientName + ".zip");
@@ -749,6 +748,12 @@ bool cropIm(std::string inputRaster, std::string aOut, OGREnvelope ext)
         const char *pszFormat = "GTiff";
         pDriver = GetGDALDriverManager()->GetDriverByName(pszFormat);
         pInputRaster = (GDALDataset *)GDALOpen(inputPath, GA_ReadOnly);
+
+        if (pInputRaster == NULL)
+        {
+            std::cout << "cropIm: cannot open input raster " << inputPath << std::endl;
+            return false;
+        }
 
         double transform[6], tr1[6];
         pInputRaster->GetGeoTransform(transform);
@@ -987,10 +992,10 @@ int groupLayers::getNumSelect4Download() { return mSelectLayers->numSelectedLaye
 
 std::vector<std::shared_ptr<Layer>> groupLayers::getSelectedLayer4Download() { return mSelectLayers->getSelectedLayer(); }
 
-bool isValidXmlIdentifier(std::string str){
+bool isValidXmlIdentifier(std::string str)
+{
     return str.find("??") == UINTMAX_MAX;
 }
-
 
 bool isValidHtml(std::string text)
 {
@@ -1006,7 +1011,6 @@ bool isValidHtml(std::string text)
     }
     return aRes;
 }
-
 
 std::string getHtml(std::string groupCode)
 {
@@ -1024,7 +1028,7 @@ std::string getHtml(std::string groupCode)
         cout << "Warning: Project name/description not found in FILE: forestimator-documentation.xml for TAG: " << groupCode << ".projet" << std::endl;
     }
 
-    std::string description = "<h4>Description</h4>" + WString::tr(groupCode+ ".description").toUTF8();
+    std::string description = "<h4>Description</h4>" + WString::tr(groupCode + ".description").toUTF8();
     if (!isValidXmlIdentifier(description) || !isValidHtml(description))
     {
         description = "";
@@ -1094,6 +1098,11 @@ GDALDataset *getDSonEnv(std::string inputRaster, OGRGeometry *poGeom)
         }
 
         GDALTranslateOptionsFree(option);
+        if (papszArgv != nullptr)
+        {
+            CSLDestroy(papszArgv);
+            papszArgv = nullptr;
+        }
         GDALClose(DS);
     }
     return aRes;

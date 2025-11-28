@@ -15,18 +15,19 @@ import (
 )
 
 type proc struct {
-	proxy            *httputil.ReverseProxy
-	downloader       *httputil.ReverseProxy
-	openforis        *httputil.ReverseProxy
-	listOfProperties string
-	updateintervall  time.Duration
-	started          bool
-	cmd              *exec.Cmd
-	outPipe          io.ReadCloser
-	errPipe          io.ReadCloser
-	starttime        time.Time
-	infoDirName      string
-	bufferSize       int
+	proxy                 *httputil.ReverseProxy
+	downloader            *httputil.ReverseProxy
+	openforis             *httputil.ReverseProxy
+	listOfProperties      string
+	updateintervall       time.Duration
+	started               bool
+	cmd                   *exec.Cmd
+	outPipe               io.ReadCloser
+	errPipe               io.ReadCloser
+	starttime             time.Time
+	infoDirName           string
+	bufferSize            int
+	totalRequestsReceived int
 
 	pid             int
 	state           string
@@ -158,6 +159,7 @@ func recordData(p *proc, data map[string]string) {
 }
 
 func recordRequest(p *proc, request string) {
+	p.totalRequestsReceived++
 	path := p.infoDirName + "/" + "requestRecord.csv"
 	newfile := false
 	if _, err := os.Stat(path); errors.Is(err, os.ErrNotExist) {
@@ -165,12 +167,16 @@ func recordRequest(p *proc, request string) {
 	}
 	openFile, _ := os.OpenFile(path, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if newfile {
-		openFile.Write([]byte("date, request"))
+		openFile.Write([]byte("date, request, meanTimeBetweenRequests(ms)"))
 		openFile.Write([]byte("\n"))
 	}
 	openFile.Write([]byte(strings.Split(time.Now().String(), "+")[0]))
-	openFile.Write([]byte(","))
+	openFile.Write([]byte(", "))
 	openFile.Write([]byte(request))
+	openFile.Write([]byte(", "))
+	elapsed := time.Since(p.starttime)
+	meanTime := float64(elapsed.Milliseconds()) / float64(p.totalRequestsReceived)
+	openFile.Write([]byte(strconv.FormatFloat(meanTime, 'f', 2, 64)))
 	openFile.Write([]byte("\n"))
 	openFile.Close()
 }
@@ -299,13 +305,14 @@ func getProcessInfo(p *proc) string {
 
 func main() {
 	forestimator := proc{
-		listOfProperties: "Name: State: VmPeak: VmSize: VmLck: VmPin: VmHWM: VmRSS: VmData: VmStk: VmExe: VmLib: VmPTE: VmSwap: HugetlbPages: CoreDumping: ThpEnabled: Threads: SigQ: SigPnd: ShdPnd: SigBlk: SigIgn: SigCgt: CapInh: CapPrm: CapEff: CapBnd: CapAmb: Cpus_allowed_list:",
-		updateintervall:  500 * time.Millisecond,
-		started:          false,
-		cmd:              nil,
-		outPipe:          nil,
-		pid:              -1,
-		bufferSize:       1 << 20,
+		listOfProperties:      "Name: State: VmPeak: VmSize: VmLck: VmPin: VmHWM: VmRSS: VmData: VmStk: VmExe: VmLib: VmPTE: VmSwap: HugetlbPages: CoreDumping: ThpEnabled: Threads: SigQ: SigPnd: ShdPnd: SigBlk: SigIgn: SigCgt: CapInh: CapPrm: CapEff: CapBnd: CapAmb: Cpus_allowed_list:",
+		updateintervall:       500 * time.Millisecond,
+		started:               false,
+		cmd:                   nil,
+		outPipe:               nil,
+		pid:                   -1,
+		bufferSize:            1 << 20,
+		totalRequestsReceived: 0,
 	}
 
 	go func() {

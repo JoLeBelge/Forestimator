@@ -90,6 +90,7 @@
         "syncstream": "cpp",
         "valarray": "cpp",
         "__locale": "cpp",
-        "ios": "cpp"
+        "ios": "cpp",
+        "locale": "cpp"
     }
 }

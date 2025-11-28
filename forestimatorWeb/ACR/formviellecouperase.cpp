@@ -548,7 +548,10 @@ OGREnvelope formVielleCoupeRase::computeGlobalGeom(std::string aFile)
     {
         std::cout << "computeGlobalGeom : je n'arrive pas à ouvrir " << aFile << std::endl;
     }
-    GDALClose(DS);
+    if (DS != NULL)
+    {
+        GDALClose(DS);
+    }
     return env;
 }
 
@@ -582,7 +585,10 @@ void formVielleCoupeRase::validDraw(std::string geojson)
     {
         std::cout << "validDraw : je n'arrive pas à ouvrir " << aOut << std::endl;
     }
-    GDALClose(DS);
+    if (DS != NULL)
+    {
+        GDALClose(DS);
+    }
 }
 
 void formVielleCoupeRase::sendSummaryMail()

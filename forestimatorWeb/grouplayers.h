@@ -26,6 +26,7 @@
 #include "./libzippp/src/libzippp.h"
 #include <string.h>
 #include "selectlayers.h"
+#include <memory>
 
 class WOpenLayers;
 class Layer;
@@ -124,7 +125,6 @@ public:
 
     // avec un retour qui est un fichier texte à télécharger
     void computeStatAllPol(OGRLayer *lay, std::string path);
-    
 
     ST *mStation;
     std::vector<std::shared_ptr<Layer>> Layers() { return mVLs; }

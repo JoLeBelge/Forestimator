@@ -218,8 +218,17 @@ std::string traduction(std::string afr, std::string target_lang)
         // boost::replace_all(aMessage,"&nbsp;","\n");// pas géré par easy_escape
 
         char *urlified = curl_easy_escape(curl, afr.c_str(), 0);
-        // std::cout << "urlified " << urlified << std::endl;
-        url += urlified;
+        // Append escaped text if available, then free it with curl_free
+        if (urlified != NULL)
+        {
+            url += urlified;
+            curl_free(urlified);
+        }
+        else
+        {
+            std::cerr << "Warning: curl_easy_escape returned NULL, using unescaped text" << std::endl;
+            url += afr; // fallback: append raw text (may break request)
+        }
         std::cout << "url: \n"
                   << std::endl;
         std::cout << url << "\n"
@@ -228,6 +237,10 @@ std::string traduction(std::string afr, std::string target_lang)
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
         res = curl_easy_perform(curl);
+        if (res != CURLE_OK)
+        {
+            std::cerr << "curl_easy_perform() failed: " << curl_easy_strerror(res) << std::endl;
+        }
         curl_easy_cleanup(curl);
         // std::cout << "result has size " << readBuffer.size() << ", " << readBuffer << std::endl;
         // std::cout << "CURLcode res : " << res << std::endl; // 0 means OK
