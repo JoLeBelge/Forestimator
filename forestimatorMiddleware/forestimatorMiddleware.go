@@ -14,19 +14,25 @@ import (
 	"time"
 )
 
+const (
+	portForestimatorWeb        = 8500
+	portForestimatorDownloader = 8001
+	portOpenForis              = 8380
+	bufferSize                 = 1 << 20
+	updateIntervall            = 100 * time.Millisecond
+	listOfProperties           = "Name: State: VmPeak: VmSize: VmLck: VmPin: VmHWM: VmRSS: VmData: VmStk: VmExe: VmLib: VmPTE: VmSwap: HugetlbPages: CoreDumping: ThpEnabled: Threads: SigQ: SigPnd: ShdPnd: SigBlk: SigIgn: SigCgt: CapInh: CapPrm: CapEff: CapBnd: CapAmb: Cpus_allowed_list:"
+)
+
 type proc struct {
 	proxy                 *httputil.ReverseProxy
 	downloader            *httputil.ReverseProxy
 	openforis             *httputil.ReverseProxy
-	listOfProperties      string
-	updateintervall       time.Duration
 	started               bool
 	cmd                   *exec.Cmd
 	outPipe               io.ReadCloser
 	errPipe               io.ReadCloser
 	starttime             time.Time
 	infoDirName           string
-	bufferSize            int
 	totalRequestsReceived int
 
 	pid             int
@@ -61,15 +67,15 @@ type proc struct {
 	cpusAllowedList string
 }
 
-func startForestimatorWebServer() (cmd *exec.Cmd) {
+func startForestimatorWebServer(wd string) (cmd *exec.Cmd) {
 	cmd = exec.Command("sh", "launch.sh") //, "--deploy-path=/ --docroot \"/home/carto/app/Forestimator/data/;/favicon.ico,/google52ee6b8ebe0b4b19.html,/sitemap.xml,/resources,/style,/tmp,/data,/js,/jslib,/img,/pdf,/video,resources/themes/bootstrap/5\" --http-port 8001 --http-addr 127.0.0.1 -c /home/gef/Documents/Forestimator/data/wt_config.xml --BD \"/home/gef/Documents/Forestimator/carteApt/data/aptitudeEssDB.db\" --colPath \"Dir\" ")
-	cmd.Dir = "/home/carto/app/Forestimator/forestimatorWeb"
+	cmd.Dir = wd + "Forestimator/forestimatorWeb"
 	return cmd
 }
 
-func startForestimatorDownloadServer() (cmd *exec.Cmd) {
+func startForestimatorDownloadServer(wd string) (cmd *exec.Cmd) {
 	cmd = exec.Command("/usr/local/go/bin/go", "run", "downloadServer.go") //, "--deploy-path=/ --docroot \"/home/carto/app/Forestimator/data/;/favicon.ico,/google52ee6b8ebe0b4b19.html,/sitemap.xml,/resources,/style,/tmp,/data,/js,/jslib,/img,/pdf,/video,resources/themes/bootstrap/5\" --http-port 8001 --http-addr 127.0.0.1 -c /home/gef/Documents/Forestimator/data/wt_config.xml --BD \"/home/gef/Documents/Forestimator/carteApt/data/aptitudeEssDB.db\" --colPath \"Dir\" ")
-	cmd.Dir = "/home/carto/app/Forestimator/forestimatorDownloadServer"
+	cmd.Dir = wd + "Forestimator/forestimatorDownloadServer"
 	return cmd
 }
 
@@ -111,7 +117,7 @@ func parseProc(p *proc, keylist string) (map[string]string, error) {
 }
 
 func refreshProcInfo(p *proc) (info map[string]string, err error) {
-	info, err = parseProc(p, p.listOfProperties)
+	info, err = parseProc(p, listOfProperties)
 	if err != nil {
 		log.Printf("Error getting status: %v", err)
 		return nil, err
@@ -145,12 +151,12 @@ func recordData(p *proc, data map[string]string) {
 	}
 	openFile, _ := os.OpenFile(path, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if newfile {
-		openFile.Write([]byte(strings.ReplaceAll(p.listOfProperties, ": ", ",")))
+		openFile.Write([]byte(strings.ReplaceAll(listOfProperties, ": ", ",")))
 		openFile.Write([]byte("\n"))
 	}
 	openFile.Write([]byte(strings.Split(time.Now().String(), "+")[0]))
 	openFile.Write([]byte(","))
-	for _, property := range strings.Split(p.listOfProperties, ": ") {
+	for _, property := range strings.Split(listOfProperties, ": ") {
 		openFile.Write([]byte(data[property]))
 		openFile.Write([]byte(","))
 	}
@@ -192,7 +198,7 @@ func recordTerminalLogs(p *proc) {
 		openFile.Write([]byte("date, log"))
 		openFile.Write([]byte("\n"))
 	}
-	text := make([]byte, p.bufferSize)
+	text := make([]byte, bufferSize)
 	t, _ := p.outPipe.Read(text)
 	openFile.Write([]byte(strings.Split(time.Now().String(), "+")[0]))
 	openFile.Write([]byte(",\"\"\""))
@@ -211,7 +217,7 @@ func recordErrorLogs(p *proc) {
 		openFile.Write([]byte("date, log"))
 		openFile.Write([]byte("\n"))
 	}
-	text := make([]byte, p.bufferSize)
+	text := make([]byte, bufferSize)
 	t, _ := p.errPipe.Read(text)
 	openFile.Write([]byte(strings.Split(time.Now().String(), "+")[0]))
 	openFile.Write([]byte(",\"\"\""))
@@ -304,20 +310,18 @@ func getProcessInfo(p *proc) string {
 }
 
 func main() {
+	workingDirectory := "/home/gef/Documents/"
 	forestimator := proc{
-		listOfProperties:      "Name: State: VmPeak: VmSize: VmLck: VmPin: VmHWM: VmRSS: VmData: VmStk: VmExe: VmLib: VmPTE: VmSwap: HugetlbPages: CoreDumping: ThpEnabled: Threads: SigQ: SigPnd: ShdPnd: SigBlk: SigIgn: SigCgt: CapInh: CapPrm: CapEff: CapBnd: CapAmb: Cpus_allowed_list:",
-		updateintervall:       500 * time.Millisecond,
 		started:               false,
 		cmd:                   nil,
 		outPipe:               nil,
 		pid:                   -1,
-		bufferSize:            1 << 20,
 		totalRequestsReceived: 0,
 	}
 
 	go func() {
 		for {
-			forestimator.cmd = startForestimatorWebServer()
+			forestimator.cmd = startForestimatorWebServer(workingDirectory)
 			log.Println(forestimator.cmd.Args)
 			forestimator.outPipe, _ = forestimator.cmd.StdoutPipe()
 			forestimator.errPipe, _ = forestimator.cmd.StderrPipe()
@@ -350,7 +354,7 @@ func main() {
 	}()
 	go func() {
 		for {
-			cmd := startForestimatorDownloadServer()
+			cmd := startForestimatorDownloadServer(workingDirectory)
 			cmd.Start()
 			cmd.Wait()
 			log.Println("Forestimator download server has stopped")
@@ -359,9 +363,9 @@ func main() {
 
 	}()
 	go func() {
-		forestimator.proxy, _ = NewProxy("http://localhost:8500")
-		forestimator.downloader, _ = NewProxy("http://localhost:8501")
-		forestimator.openforis, _ = NewProxy("http://localhost:8380")
+		forestimator.proxy, _ = NewProxy("http://localhost:" + strconv.Itoa(portForestimatorWeb))
+		forestimator.downloader, _ = NewProxy("http://localhost:" + strconv.Itoa(portForestimatorDownloader))
+		forestimator.openforis, _ = NewProxy("http://localhost:" + strconv.Itoa(portOpenForis))
 		for {
 			if forestimator.started {
 				director := forestimator.proxy.Director
@@ -392,7 +396,7 @@ func main() {
 				recordData(&forestimator, record)
 				timeup = true
 			} else {
-				time.Sleep(forestimator.updateintervall)
+				time.Sleep(updateIntervall)
 				timeup = false
 			}
 		}

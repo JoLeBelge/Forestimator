@@ -7,12 +7,8 @@ import (
 	"net/http"
 	"os/exec"
 	"time"
-<<<<<<< HEAD
-	"net/smtp"
-=======
 
 	"github.com/wneessen/go-mail"
->>>>>>> d8928417cc9adf1f3d86479cf85b2f6313518d28
 )
 
 const (
@@ -37,7 +33,7 @@ func main() {
 	failureTime := 0
 	for {
 		resp, err := http.Get(serverURL)
-		if err != nil {
+		if err != nil && resp.StatusCode != 200 {
 			log.Printf("Request failed: %v\n", err)
 			if failureTime < 1 {
 				failureTime = handleFailure()

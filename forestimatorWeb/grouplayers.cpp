@@ -956,179 +956,180 @@ void groupLayers::loadExtents(std::string id)
 
         std::cout << "done" << std::endl;
     }
+}
 
-    void groupLayers::saveExtent(double c_x, double c_y, double zoom)
+void groupLayers::saveExtent(double c_x, double c_y, double zoom)
+{
+    openConnection();
+
+    std::string id = m_app->getUser().id();
+    std::string n = tb_extent_name->text().toUTF8();
+    boost::replace_all(n, "'", "");
+    std::string cx = std::to_string((int)c_x);
+    std::string cy = std::to_string((int)c_y);
+    std::string z = std::to_string((int)zoom);
+    const char *query = "INSERT INTO user_extent (id_user,centre_x,centre_y,zoom,name) VALUES (?,?,?,?,?)";
+    sqlite3_stmt *stmt;
+    if (sqlite3_prepare_v2(db_, query, -1, &stmt, NULL) == SQLITE_OK)
     {
-        openConnection();
-
-        std::string id = m_app->getUser().id();
-        std::string n = tb_extent_name->text().toUTF8();
-        boost::replace_all(n, "'", "");
-        std::string cx = std::to_string((int)c_x);
-        std::string cy = std::to_string((int)c_y);
-        std::string z = std::to_string((int)zoom);
-        const char *query = "INSERT INTO user_extent (id_user,centre_x,centre_y,zoom,name) VALUES (?,?,?,?,?)";
-        sqlite3_stmt *stmt;
-        if (sqlite3_prepare_v2(db_, query, -1, &stmt, NULL) == SQLITE_OK)
+        sqlite3_bind_int(stmt, 1, std::stoi(id));
+        sqlite3_bind_int(stmt, 2, (int)c_x);
+        sqlite3_bind_int(stmt, 3, (int)c_y);
+        sqlite3_bind_int(stmt, 4, (int)zoom);
+        sqlite3_bind_text(stmt, 5, n.c_str(), -1, SQLITE_TRANSIENT);
+        if (sqlite3_step(stmt) != SQLITE_DONE)
         {
-            sqlite3_bind_int(stmt, 1, std::stoi(id));
-            sqlite3_bind_int(stmt, 2, (int)c_x);
-            sqlite3_bind_int(stmt, 3, (int)c_y);
-            sqlite3_bind_int(stmt, 4, (int)zoom);
-            sqlite3_bind_text(stmt, 5, n.c_str(), -1, SQLITE_TRANSIENT);
-            if (sqlite3_step(stmt) != SQLITE_DONE)
+            std::cerr << "saveExtent: Error inserting extent: " << sqlite3_errmsg(db_) << std::endl;
+        }
+        sqlite3_finalize(stmt);
+    }
+    closeConnection();
+
+    loadExtents(id);
+    m_app->addLog("save an extent", typeLog::extend); // add some web stats
+}
+
+void groupLayers::deleteExtent(std::string id_extent)
+{
+    openConnection();
+    const char *query = "DELETE FROM user_extent WHERE id=?";
+    sqlite3_stmt *stmt;
+    if (sqlite3_prepare_v2(db_, query, -1, &stmt, NULL) == SQLITE_OK)
+    {
+        sqlite3_bind_int(stmt, 1, std::stoi(id_extent));
+        if (sqlite3_step(stmt) != SQLITE_DONE)
+        {
+            std::cerr << "deleteExtent: Error deleting extent: " << sqlite3_errmsg(db_) << std::endl;
+        }
+        sqlite3_finalize(stmt);
+    }
+    closeConnection();
+
+    loadExtents(m_app->getUser().id());
+    m_app->addLog("delete an extent", typeLog::extend); // add some web stats
+}
+/** FIN extents **/
+
+std::vector<rasterFiles> groupLayers::getSelect4Download() { return mSelectLayers->getSelectedRaster(); }
+// std::vector<rasterFiles> groupLayers::getSelect4Stat(){return mSelect4Stat->getSelectedRaster();}
+
+// int groupLayers::getNumSelect4Stat(){return mSelect4Stat->numSelectedLayer();}
+int groupLayers::getNumSelect4Download() { return mSelectLayers->numSelectedLayer(); }
+
+std::vector<std::shared_ptr<Layer>> groupLayers::getSelectedLayer4Download() { return mSelectLayers->getSelectedLayer(); }
+
+bool isValidXmlIdentifier(const std::string &str)
+{
+    return str.find("??") == std::string::npos;
+}
+
+bool isValidHtml(const std::string &text)
+{
+    bool aRes(0);
+    Wt::WText t(text);
+    if (t.textFormat() == Wt::TextFormat::XHTML)
+    {
+        aRes = 1;
+    }
+    else
+    {
+        // std::cout << " attention, le texte " << text << " n'est pas un code html valide " << std::endl;
+    }
+    return aRes;
+}
+
+std::string getHtml(std::string groupCode)
+{
+    std::string title = WString::tr(groupCode + ".title").toUTF8();
+    if (!isValidXmlIdentifier(title) || !isValidHtml(title))
+    {
+        title = "";
+        cout << "Warning: Title not found in FILE: forestimator-documentation.xml for TAG: " << groupCode << ".title" << endl;
+    }
+
+    std::string project = "<h4>Projet</h4>" + WString::tr(groupCode + ".projet").toUTF8();
+    if (!isValidXmlIdentifier(project) || !isValidHtml(project))
+    {
+        project = "";
+        cout << "Warning: Project name/description not found in FILE: forestimator-documentation.xml for TAG: " << groupCode << ".projet" << std::endl;
+    }
+
+    std::string description = "<h4>Description</h4>" + WString::tr(groupCode + ".description").toUTF8();
+    if (!isValidXmlIdentifier(description) || !isValidHtml(description))
+    {
+        description = "";
+        cout << "Warning: No description found in FILE: forestimator-documentation.xml for TAG: " << groupCode + ".description" << std::endl;
+    }
+
+    std::string version = "<h4>Version</h4>" + WString::tr(groupCode + ".version").toUTF8();
+    if (!isValidXmlIdentifier(version) || !isValidHtml(version))
+    {
+        version = "";
+        cout << "Warning: No version found in FILE: forestimator-documentation.xml for TAG: " << groupCode + ".version" << std::endl;
+    }
+
+    std::string logs = "<h4>Informations de modification</h4>" + WString::tr(groupCode + ".logs").toUTF8();
+    if (!isValidXmlIdentifier(logs) || !isValidHtml(logs))
+    {
+        logs = "";
+        cout << "Warning: Logs not found in FILE: forestimator-documentation.xml for TAG: " << groupCode << ".logs" << endl;
+    }
+
+    std::string copyright = "<h4>Copyright</h4>" + WString::tr(groupCode + ".copyright").toUTF8();
+    if (!isValidXmlIdentifier(copyright) || !isValidHtml(copyright))
+    {
+        copyright = "";
+        cout << "Warning: copyright not found in FILE: forestimator-documentation.xml for TAG: " << groupCode << ".copyright" << endl;
+    }
+
+    std::string references = "<h4>Références</h4>" + WString::tr(groupCode + ".ref").toUTF8();
+    if (!isValidXmlIdentifier(references) || !isValidHtml(references))
+    {
+        references = "";
+        cout << "Warning: References not found in FILE: forestimator-documentation.xml for TAG: " << groupCode << ".ref" << endl;
+    }
+    return title + project + description + version + logs + copyright + references;
+}
+
+GDALDataset *getDSonEnv(std::string inputRaster, OGRGeometry *poGeom)
+{
+    OGREnvelope ext;
+    poGeom->getEnvelope(&ext);
+    GDALDataset *aRes = NULL;
+    GDALDataset *DS = reinterpret_cast<GDALDataset *>(GDALOpen(inputRaster.c_str(), GA_ReadOnly));
+    if (DS == NULL)
+    {
+        std::cout << "je n'ai pas lu l'image " << inputRaster << std::endl;
+    }
+    else
+    {
+        char **papszArgv = nullptr;
+        papszArgv = CSLAddString(papszArgv, "-projwin"); // Selects a subwindow from the source image for copying but with the corners given in georeferenced coordinate
+        papszArgv = CSLAddString(papszArgv, std::to_string(ext.MinX).c_str());
+        papszArgv = CSLAddString(papszArgv, std::to_string(ext.MaxY).c_str());
+        papszArgv = CSLAddString(papszArgv, std::to_string(ext.MaxX).c_str());
+        papszArgv = CSLAddString(papszArgv, std::to_string(ext.MinY).c_str());
+
+        GDALTranslateOptions *option = GDALTranslateOptionsNew(papszArgv, nullptr);
+        if (option)
+        {
+            // std::cout <<" options parsées " << std::endl;
+            GDALDatasetH DScrop = GDALTranslate("/vsimem/out", DS, option, nullptr);
+
+            if (DScrop)
             {
-                std::cerr << "saveExtent: Error inserting extent: " << sqlite3_errmsg(db_) << std::endl;
+                // j'ai toujours 2 raster a ouvrir conjointement
+                aRes = GDALDataset::FromHandle(DScrop);
             }
-            sqlite3_finalize(stmt);
         }
-        closeConnection();
 
-        loadExtents(id);
-        m_app->addLog("save an extent", typeLog::extend); // add some web stats
+        GDALTranslateOptionsFree(option);
+        if (papszArgv != nullptr)
+        {
+            CSLDestroy(papszArgv);
+            papszArgv = nullptr;
+        }
+        GDALClose(DS);
     }
-
-    void groupLayers::deleteExtent(std::string id_extent)
-    {
-        openConnection();
-        const char *query = "DELETE FROM user_extent WHERE id=?";
-        sqlite3_stmt *stmt;
-        if (sqlite3_prepare_v2(db_, query, -1, &stmt, NULL) == SQLITE_OK)
-        {
-            sqlite3_bind_int(stmt, 1, std::stoi(id_extent));
-            if (sqlite3_step(stmt) != SQLITE_DONE)
-            {
-                std::cerr << "deleteExtent: Error deleting extent: " << sqlite3_errmsg(db_) << std::endl;
-            }
-            sqlite3_finalize(stmt);
-        }
-        closeConnection();
-
-        loadExtents(m_app->getUser().id());
-        m_app->addLog("delete an extent", typeLog::extend); // add some web stats
-    }
-    /** FIN extents **/
-
-    std::vector<rasterFiles> groupLayers::getSelect4Download() { return mSelectLayers->getSelectedRaster(); }
-    // std::vector<rasterFiles> groupLayers::getSelect4Stat(){return mSelect4Stat->getSelectedRaster();}
-
-    // int groupLayers::getNumSelect4Stat(){return mSelect4Stat->numSelectedLayer();}
-    int groupLayers::getNumSelect4Download() { return mSelectLayers->numSelectedLayer(); }
-
-    std::vector<std::shared_ptr<Layer>> groupLayers::getSelectedLayer4Download() { return mSelectLayers->getSelectedLayer(); }
-
-    bool isValidXmlIdentifier(const std::string &str)
-    {
-        return str.find("??") == std::string::npos;
-    }
-
-    bool isValidHtml(const std::string &text)
-    {
-        bool aRes(0);
-        Wt::WText t(text);
-        if (t.textFormat() == Wt::TextFormat::XHTML)
-        {
-            aRes = 1;
-        }
-        else
-        {
-            // std::cout << " attention, le texte " << text << " n'est pas un code html valide " << std::endl;
-        }
-        return aRes;
-    }
-
-    std::string getHtml(std::string groupCode)
-    {
-        std::string title = WString::tr(groupCode + ".title").toUTF8();
-        if (!isValidXmlIdentifier(title) || !isValidHtml(title))
-        {
-            title = "";
-            cout << "Warning: Title not found in FILE: forestimator-documentation.xml for TAG: " << groupCode << ".title" << endl;
-        }
-
-        std::string project = "<h4>Projet</h4>" + WString::tr(groupCode + ".projet").toUTF8();
-        if (!isValidXmlIdentifier(project) || !isValidHtml(project))
-        {
-            project = "";
-            cout << "Warning: Project name/description not found in FILE: forestimator-documentation.xml for TAG: " << groupCode << ".projet" << std::endl;
-        }
-
-        std::string description = "<h4>Description</h4>" + WString::tr(groupCode + ".description").toUTF8();
-        if (!isValidXmlIdentifier(description) || !isValidHtml(description))
-        {
-            description = "";
-            cout << "Warning: No description found in FILE: forestimator-documentation.xml for TAG: " << groupCode + ".description" << std::endl;
-        }
-
-        std::string version = "<h4>Version</h4>" + WString::tr(groupCode + ".version").toUTF8();
-        if (!isValidXmlIdentifier(version) || !isValidHtml(version))
-        {
-            version = "";
-            cout << "Warning: No version found in FILE: forestimator-documentation.xml for TAG: " << groupCode + ".version" << std::endl;
-        }
-
-        std::string logs = "<h4>Informations de modification</h4>" + WString::tr(groupCode + ".logs").toUTF8();
-        if (!isValidXmlIdentifier(logs) || !isValidHtml(logs))
-        {
-            logs = "";
-            cout << "Warning: Logs not found in FILE: forestimator-documentation.xml for TAG: " << groupCode << ".logs" << endl;
-        }
-
-        std::string copyright = "<h4>Copyright</h4>" + WString::tr(groupCode + ".copyright").toUTF8();
-        if (!isValidXmlIdentifier(copyright) || !isValidHtml(copyright))
-        {
-            copyright = "";
-            cout << "Warning: copyright not found in FILE: forestimator-documentation.xml for TAG: " << groupCode << ".copyright" << endl;
-        }
-
-        std::string references = "<h4>Références</h4>" + WString::tr(groupCode + ".ref").toUTF8();
-        if (!isValidXmlIdentifier(references) || !isValidHtml(references))
-        {
-            references = "";
-            cout << "Warning: References not found in FILE: forestimator-documentation.xml for TAG: " << groupCode << ".ref" << endl;
-        }
-        return title + project + description + version + logs + copyright + references;
-    }
-
-    GDALDataset *getDSonEnv(std::string inputRaster, OGRGeometry * poGeom)
-    {
-        OGREnvelope ext;
-        poGeom->getEnvelope(&ext);
-        GDALDataset *aRes = NULL;
-        GDALDataset *DS = reinterpret_cast<GDALDataset *>(GDALOpen(inputRaster.c_str(), GA_ReadOnly));
-        if (DS == NULL)
-        {
-            std::cout << "je n'ai pas lu l'image " << inputRaster << std::endl;
-        }
-        else
-        {
-            char **papszArgv = nullptr;
-            papszArgv = CSLAddString(papszArgv, "-projwin"); // Selects a subwindow from the source image for copying but with the corners given in georeferenced coordinate
-            papszArgv = CSLAddString(papszArgv, std::to_string(ext.MinX).c_str());
-            papszArgv = CSLAddString(papszArgv, std::to_string(ext.MaxY).c_str());
-            papszArgv = CSLAddString(papszArgv, std::to_string(ext.MaxX).c_str());
-            papszArgv = CSLAddString(papszArgv, std::to_string(ext.MinY).c_str());
-
-            GDALTranslateOptions *option = GDALTranslateOptionsNew(papszArgv, nullptr);
-            if (option)
-            {
-                // std::cout <<" options parsées " << std::endl;
-                GDALDatasetH DScrop = GDALTranslate("/vsimem/out", DS, option, nullptr);
-
-                if (DScrop)
-                {
-                    // j'ai toujours 2 raster a ouvrir conjointement
-                    aRes = GDALDataset::FromHandle(DScrop);
-                }
-            }
-
-            GDALTranslateOptionsFree(option);
-            if (papszArgv != nullptr)
-            {
-                CSLDestroy(papszArgv);
-                papszArgv = nullptr;
-            }
-            GDALClose(DS);
-        }
-        return aRes;
-    }
+    return aRes;
+}
