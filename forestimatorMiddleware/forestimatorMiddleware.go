@@ -336,7 +336,7 @@ func main() {
 						time.Now().Month().String() + "." +
 						strconv.Itoa(time.Now().Day()) + "." +
 						strconv.Itoa(time.Now().Hour()) + "." + strconv.Itoa(time.Now().Minute()) + "." + strconv.Itoa(time.Now().Second()) + "."
-					forestimator.infoDirName = "logs/" + t + strconv.Itoa(forestimator.pid)
+					forestimator.infoDirName = "/home/app/Forestimator/forestimatorMiddleware/logs/" + t + strconv.Itoa(forestimator.pid)
 					os.Mkdir(forestimator.infoDirName, os.ModePerm)
 					forestimator.started = true
 					log.Println("Started Forestimator web server. pid: " + strconv.Itoa(forestimator.pid))
