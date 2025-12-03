@@ -144,21 +144,21 @@ void presentPopup({
   VoidCallback? after,
   BuildContext? context,
 }) {
-  // If we have the global notification context (set in MyApp) or a
-  // context passed explicitly, prefer the mainStack overlay path so
-  // popups are managed consistently by gl.mainStack.
-  if (gl.notificationContext != null || context != null) {
+  // Prefer mainStack overlay when the global notification context has been
+  // initialized by the app. If it's not available then prefer the standard
+  // `showDialog` fallback when a concrete BuildContext has been provided by
+  // the caller (tests often pass a context and expect dialogs to be visible
+  // in the widget tree via a standard showDialog call).
+  if (gl.notificationContext != null) {
     gl.refreshMainStack(() {
       popupBarrierWrapper(popup: popup, dismiss: dismiss, after: after);
     });
     return;
   }
 
-  // Fallback: try to show a standard dialog if we cannot use mainStack.
-  final ctx = context ?? gl.notificationContext;
-  if (ctx != null) {
+  if (context != null) {
     showDialog(
-      context: ctx,
+      context: context,
       barrierDismissible: dismiss,
       builder: (BuildContext _) => popup,
     ).then((_) {
@@ -470,47 +470,111 @@ class PopupDownloadFailed {
   }
 }
 
-Widget popupPDFSaved(String pdfName, VoidCallback after) {
-  return AlertDialog(
-    shadowColor: Colors.black,
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadiusGeometry.circular(12.0),
-      side: BorderSide(color: Color.fromRGBO(205, 225, 138, 1.0), width: 2.0),
-    ),
-    backgroundColor: Colors.white,
-    title: Row(
-      children: [
-        forestimatorIcon(),
-        Text(
-          "Message",
-          style: TextStyle(
-            color: Colors.black,
-            fontWeight: FontWeight.w400,
-            fontSize: gl.display.equipixel * gl.fontSizeM,
+class PopupPolygonNotWellDefined {
+  PopupPolygonNotWellDefined(BuildContext context) {
+    gl.refreshMainStack(() {
+      popupBarrierWrapper(
+        dismiss: true,
+        popup: AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadiusGeometry.circular(12.0),
+            side: BorderSide(color: gl.colorAgroBioTech, width: 2.0),
           ),
+          backgroundColor: Colors.white,
+          title: Row(
+            children: [
+              forestimatorIcon(),
+              Text(
+                "Attention",
+                style: TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.w400,
+                  fontSize: gl.display.equipixel * gl.fontSizeM,
+                ),
+              ),
+            ],
+          ),
+          content: Text(
+            "Avec ce point, le polygone n'est pas bien défini, c'est-à-dire on ne peut pas croiser des segments.",
+            style: TextStyle(
+              color: Colors.black,
+              fontWeight: FontWeight.w400,
+              fontSize: gl.display.equipixel * gl.fontSizeM,
+            ),
+          ),
+          actions: [
+            TextButton(
+              style: dialogButtonStyle(
+                height: gl.display.equipixel * 12,
+                width: gl.display.equipixel * 20,
+              ),
+              child: Text("OK", style: dialogTextButtonStyle()),
+              onPressed: () {
+                gl.mainStackPopLast();
+                gl.refreshMainStack(() {});
+              },
+            ),
+          ],
         ),
-      ],
-    ),
-    content: Text(
-      "$pdfName à été enregistré!",
-      style: TextStyle(
-        color: Colors.black,
-        fontWeight: FontWeight.w400,
-        fontSize: gl.display.equipixel * gl.fontSizeM,
-      ),
-    ),
-    actions: [
-      TextButton(
-        style: dialogButtonStyle(
-          height: gl.display.equipixel * 12,
-          width: gl.display.equipixel * 20,
+      );
+    });
+  }
+}
+
+Widget popupPDFSaved(String pdfName, VoidCallback after) {
+  return Builder(
+    builder:
+        (dialogContext) => AlertDialog(
+          shadowColor: Colors.black,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadiusGeometry.circular(12.0),
+            side: BorderSide(
+              color: Color.fromRGBO(205, 225, 138, 1.0),
+              width: 2.0,
+            ),
+          ),
+          backgroundColor: Colors.white,
+          title: Row(
+            children: [
+              forestimatorIcon(),
+              Text(
+                "Export du pdf: $pdfName",
+                style: TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.w400,
+                  fontSize: gl.display.equipixel * gl.fontSizeM,
+                ),
+              ),
+            ],
+          ),
+          content: Text(
+            "Le document a été enregistré!",
+            style: TextStyle(
+              color: Colors.black,
+              fontWeight: FontWeight.w400,
+              fontSize: gl.display.equipixel * gl.fontSizeM,
+            ),
+          ),
+          actions: [
+            TextButton(
+              style: dialogButtonStyle(
+                height: gl.display.equipixel * 12,
+                width: gl.display.equipixel * 20,
+              ),
+              child: Text("OK", style: dialogTextButtonStyle()),
+              onPressed: () {
+                if (gl.notificationContext == null) {
+                  try {
+                    Navigator.of(dialogContext, rootNavigator: true).pop();
+                  } catch (_) {}
+                } else {
+                  dismissPopup();
+                }
+                after();
+              },
+            ),
+          ],
         ),
-        child: Text("OK", style: dialogTextButtonStyle()),
-        onPressed: () {
-          after();
-        },
-      ),
-    ],
   );
 }
 
@@ -2264,6 +2328,17 @@ class _ForestimatorVariables extends State<ForestimatorVariables> {
           });
           gl.refreshMainStack(() {});
         }, true),
+        variableBooleanSlider(
+          "Deactivate Polygon Well Defined Check",
+          gl.Mode.overrideWellDefinedCheck,
+          (bool it) {
+            setState(() {
+              gl.Mode.overrideWellDefinedCheck = it;
+            });
+            gl.refreshMainStack(() {});
+          },
+          true,
+        ),
         variableBooleanSlider("Tablet Mode", gl.Mode.overrideModeTablet, (
           bool it,
         ) {
@@ -2295,7 +2370,7 @@ Widget variableBooleanSlider(
     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
     children: [
       Container(
-        width: gl.display.equipixel * 50,
+        width: gl.display.equipixel * 55,
         alignment: AlignmentGeometry.centerLeft,
         child: Row(
           children: [
@@ -2307,7 +2382,10 @@ Widget variableBooleanSlider(
                 )
                 : SizedBox(width: gl.display.equipixel * 6),
             SizedBox(width: gl.display.equipixel * 4),
-            Text(description),
+            SizedBox(
+              width: gl.display.equipixel * 45,
+              child: Text(description),
+            ),
           ],
         ),
       ),
@@ -2462,7 +2540,7 @@ class _ForestimatorLog extends State<ForestimatorLog> {
 TextStyle styleSettingMenu() {
   return TextStyle(
     color: Colors.black,
-    fontSize: gl.display.equipixel * gl.fontSizeS,
+    fontSize: gl.display.equipixel * gl.fontSizeM,
   );
 }
 

@@ -16,6 +16,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:memory_info/memory_info.dart';
 
 void main() async {
+  // Ensure Flutter binding initialized before running app or any plugins
+  WidgetsFlutterBinding.ensureInitialized();
+
   if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
     sqfliteFfiInit();
     databaseFactory = databaseFactoryFfi;
@@ -24,16 +27,19 @@ void main() async {
   }
 
   gl.dico = DicoAptProvider();
-  await gl.dico.init();
 
-  while (!gl.dico.finishedLoading) {
-    sleep(const Duration(seconds: 1));
-  }
+  // Start app immediately so integration tests can locate MaterialApp and
+  // so the UI is responsive while longer-running initialization runs in
+  // the background.
   try {
     runApp(const MyApp());
   } catch (e) {
     gl.print("$e");
   }
+
+  // Initialize dictionaries and other long running tasks in background to
+  // avoid blocking the main isolate (avoid synchronous sleep loops).
+  gl.dico.init().then((_) {});
 }
 
 class MyApp extends StatefulWidget {

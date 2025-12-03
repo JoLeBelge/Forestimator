@@ -34,26 +34,29 @@ void main() {
       // Try a real tap first; if the widget is off-screen or obscured the tap
       // may miss. In that case fallback to calling the onPressed handler
       // directly.
-        // Narrow the target to the most recently shown AlertDialog, then find
-        // the matching button inside it. This avoids tapping buttons belonging
-        // to previous dialogs that may still be in the widget tree.
-        final List<Element> dialogs = tester.elementList(find.byType(AlertDialog)).toList();
-        expect(dialogs, isNotEmpty);
-        final Element lastDialog = dialogs.last;
-        final Finder dialogFinder = find.byElementPredicate((e) => e == lastDialog);
-        final Finder f = find.descendant(
-          of: dialogFinder,
-          matching: find.widgetWithText(TextButton, text),
-        );
-        expect(f, findsWidgets);
-        try {
-          await tester.tap(f.first, warnIfMissed: false);
-          await tester.pumpAndSettle();
-        } catch (_) {
-          final TextButton btn = tester.widget<TextButton>(f.first);
-          btn.onPressed?.call();
-          await tester.pumpAndSettle();
-        }
+      // Narrow the target to the most recently shown AlertDialog, then find
+      // the matching button inside it. This avoids tapping buttons belonging
+      // to previous dialogs that may still be in the widget tree.
+      final List<Element> dialogs =
+          tester.elementList(find.byType(AlertDialog)).toList();
+      expect(dialogs, isNotEmpty);
+      final Element lastDialog = dialogs.last;
+      final Finder dialogFinder = find.byElementPredicate(
+        (e) => e == lastDialog,
+      );
+      final Finder f = find.descendant(
+        of: dialogFinder,
+        matching: find.widgetWithText(TextButton, text),
+      );
+      expect(f, findsWidgets);
+      try {
+        await tester.tap(f.first, warnIfMissed: false);
+        await tester.pumpAndSettle();
+      } catch (_) {
+        final TextButton btn = tester.widget<TextButton>(f.first);
+        btn.onPressed?.call();
+        await tester.pumpAndSettle();
+      }
     }
 
     testWidgets('popupNoInternet and popupPDFSaved', (tester) async {
@@ -79,16 +82,16 @@ void main() {
           ),
         ),
       );
-  // Ensure tests use the showDialog fallback so AlertDialog widgets appear
-  // in the widget tree where the test can find them.
-  gl.notificationContext = null;
+      // Ensure tests use the showDialog fallback so AlertDialog widgets appear
+      // in the widget tree where the test can find them.
+      gl.notificationContext = null;
 
-  // Open popupNoInternet directly
-  gl.mainStack.add(Container());
-  presentPopup(popup: popupNoInternet(), context: rootContext);
+      // Open popupNoInternet directly
+      gl.mainStack.add(Container());
+      presentPopup(popup: popupNoInternet(), context: rootContext);
       await tester.pumpAndSettle();
-  expect(alertText('Message'), findsOneWidget);
-  expect(alertText("Vous n'avez pas accès à internet."), findsOneWidget);
+      expect(alertText('Message'), findsOneWidget);
+      expect(alertText("Vous n'avez pas accès à internet."), findsOneWidget);
       expect(alertButton('OK'), findsOneWidget);
       await pressAlertButton(tester, 'OK');
 
@@ -101,7 +104,7 @@ void main() {
         context: rootContext,
       );
       await tester.pumpAndSettle();
-  expect(alertText('Export du pdf: a.pdf'), findsOneWidget);
+      expect(alertText('Export du pdf: a.pdf'), findsOneWidget);
       await pressAlertButton(tester, 'OK');
       expect(pdfAfter, isTrue);
     });
@@ -146,7 +149,7 @@ void main() {
         context: rootContext,
       );
       await tester.pumpAndSettle();
-  expect(alertText('T'), findsOneWidget);
+      expect(alertText('T'), findsOneWidget);
       await pressAlertButton(tester, 'Yes');
       expect(accept, isTrue);
 
@@ -166,7 +169,7 @@ void main() {
         context: rootContext,
       );
       await tester.pumpAndSettle();
-  expect(alertText('PT'), findsOneWidget);
+      expect(alertText('PT'), findsOneWidget);
       await pressAlertButton(tester, 'A');
       expect(accept, isTrue);
 
@@ -186,25 +189,25 @@ void main() {
         context: rootContext,
       );
       await tester.pumpAndSettle();
-  await pressAlertButton(tester, 'D');
+      await pressAlertButton(tester, 'D');
       expect(decline, isTrue);
 
       // PopupDownloadSuccess
-  gl.mainStack.add(Container());
-  // Force showDialog fallback in tests
-  gl.notificationContext = null;
-  PopupDownloadSuccess(rootContext!, 'L1');
+      gl.mainStack.add(Container());
+      // Force showDialog fallback in tests
+      gl.notificationContext = null;
+      PopupDownloadSuccess(rootContext!, 'L1');
       await tester.pumpAndSettle();
-  expect(alertText('L1 a été téléchargée avec succès.'), findsOneWidget);
+      expect(alertText('L1 a été téléchargée avec succès.'), findsOneWidget);
       await pressAlertButton(tester, 'OK');
 
       // PopupDownloadFailed
-  gl.mainStack.add(Container());
-  // Force showDialog fallback in tests
-  gl.notificationContext = null;
-  PopupDownloadFailed(rootContext!, 'L2');
+      gl.mainStack.add(Container());
+      // Force showDialog fallback in tests
+      gl.notificationContext = null;
+      PopupDownloadFailed(rootContext!, 'L2');
       await tester.pumpAndSettle();
-  expect(alertText("L2 n'a pas été téléchargé."), findsOneWidget);
+      expect(alertText("L2 n'a pas été téléchargé."), findsOneWidget);
       await pressAlertButton(tester, 'OK');
     });
 
@@ -235,29 +238,29 @@ void main() {
         ),
       );
 
-  // Color chooser
-  gl.mainStack.add(Container());
-  // Force showDialog fallback in tests
-  gl.notificationContext = null;
-  PopupColorChooser(Colors.blue, rootContext!, (c) {}, () {
+      // Color chooser
+      gl.mainStack.add(Container());
+      // Force showDialog fallback in tests
+      gl.notificationContext = null;
+      PopupColorChooser(Colors.blue, rootContext!, (c) {}, () {
         colorAfter = true;
       });
       await tester.pumpAndSettle();
-  expect(alertText('Choisissez une couleur!'), findsOneWidget);
-  await pressAlertButton(tester, 'OK');
+      expect(alertText('Choisissez une couleur!'), findsOneWidget);
+      await pressAlertButton(tester, 'OK');
       expect(colorAfter, isTrue);
 
-  // Name introducer
-  gl.mainStack.add(Container());
-  // Force showDialog fallback in tests
-  gl.notificationContext = null;
-  PopupNameIntroducer(rootContext!, 'abc', (s) {}, () {
+      // Name introducer
+      gl.mainStack.add(Container());
+      // Force showDialog fallback in tests
+      gl.notificationContext = null;
+      PopupNameIntroducer(rootContext!, 'abc', (s) {}, () {
         nameAfter = true;
       }, () {});
       await tester.pumpAndSettle();
-  // The name introducer uses an 'Ok' button in the dialog
-  expect(alertButton('Ok'), findsWidgets);
-  await pressAlertButton(tester, 'Ok');
+      // The name introducer uses an 'Ok' button in the dialog
+      expect(alertButton('Ok'), findsWidgets);
+      await pressAlertButton(tester, 'Ok');
       expect(nameAfter, isTrue);
 
       // Do you really

@@ -35,6 +35,7 @@ class Mode {
   static bool tablet = false;
   static bool overrideModeTablet = false;
   static bool overrideModeSquare = false;
+  static bool overrideWellDefinedCheck = false;
   static bool _expert = false;
   static bool _expertTools = false;
 
