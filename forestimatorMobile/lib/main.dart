@@ -213,18 +213,37 @@ class _MyApp extends State<MyApp> {
   }
 
   Future _listAndCopyPdfassets() async {
-    // load as string
-    final manifestcontent =
-    //await defaultassetbundle.of(context).loadstring('assetmanifest.json');
-    await rootBundle.loadString('AssetManifest.json');
-    // decode to map
-    final Map<String, dynamic> manifestmap = json.decode(manifestcontent);
+    // First try the JSON manifest (older Flutter versions / some toolchains)
+    try {
+      final manifestcontent = await rootBundle.loadString('AssetManifest.json');
+      final Map<String, dynamic> manifestmap = json.decode(manifestcontent);
+      final List<String> list =
+          manifestmap.keys.where((path) => path.endsWith('.pdf')).toList();
+      for (String f in list) {
+        await fromAsset(f, path.basename(f));
+      }
+      return;
+    } catch (_) {
+      // fall through to try binary manifest
+    }
 
-    // filter by extension
-    List<String> list =
-        manifestmap.keys.where((path) => path.endsWith('.pdf')).toList();
-    for (String f in list) {
-      fromAsset(f, path.basename(f));
+    // Newer Flutter toolchains may produce a binary asset manifest
+    // (`AssetManifest.bin`). Try loading that and extract PDF paths.
+    try {
+      final data = await rootBundle.load('AssetManifest.bin');
+      final bytes = data.buffer.asUint8List();
+      // Decode as UTF-8 allowing malformed sequences so we can extract
+      // embedded paths even if the file isn't plain JSON.
+      final decoded = utf8.decode(bytes, allowMalformed: true);
+      final reg = RegExp(r"assets/[^\s\x00-\x1F]*?\.pdf", caseSensitive: false);
+      final matches = reg.allMatches(decoded).map((m) => m.group(0)!).toSet();
+      for (final f in matches) {
+        await fromAsset(f, path.basename(f));
+      }
+      return;
+    } catch (e) {
+      gl.print('Could not load any AssetManifest (json or bin): $e');
+      return;
     }
   }
 

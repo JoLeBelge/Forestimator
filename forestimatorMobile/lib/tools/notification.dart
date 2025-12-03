@@ -9,6 +9,7 @@ import 'package:fforestimator/pages/catalogueView/layer_tile.dart';
 import 'package:fforestimator/pages/catalogueView/legend_view.dart';
 import 'package:fforestimator/pages/pdf_screen.dart';
 import 'package:fforestimator/tools/color_tools.dart';
+import 'package:fforestimator/tools/customLayer/path_layer.dart';
 import 'package:fforestimator/tools/customLayer/polygon_layer.dart';
 import 'package:fforestimator/tools/handle_permissions.dart';
 import 'package:fforestimator/tools/handle_permissions.dart' as permissions;
@@ -1613,6 +1614,791 @@ class _PolygonListMenu extends State<PolygonListMenu> {
   }
 }
 
+class PathListMenu extends StatefulWidget {
+  final ValueChanged<LatLng> state;
+  final VoidCallback after;
+
+  const PathListMenu({super.key, required this.state, required this.after});
+
+  @override
+  State<StatefulWidget> createState() => _PathListMenu();
+}
+
+class _PathListMenu extends State<PathListMenu> {
+  final Color active = Colors.black;
+  final Color inactive = const Color.fromARGB(255, 92, 92, 92);
+  final ScrollController _controller = ScrollController();
+  bool _keyboard = false;
+
+  void _scrollDown() {
+    _controller.animateTo(
+      _controller.position.maxScrollExtent +
+          (gl.display.orientation == Orientation.portrait
+              ? gl.display.equipixel * gl.polyListSelectedCardHeight
+              : gl.display.equipixel * gl.polyListCardHeight),
+      duration: Duration(seconds: 1),
+      curve: Curves.fastOutSlowIn,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      resizeToAvoidBottomInset: false,
+      backgroundColor: Colors.transparent,
+      body: switchRowColWithOrientation([
+        Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SizedBox(
+              height: gl.display.equipixel * gl.fontSizeL * 1.2,
+              child: Text(
+                "Liste des chemins",
+                textAlign: TextAlign.justify,
+                style: TextStyle(
+                  fontSize: gl.display.equipixel * gl.fontSizeL,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+            Container(
+              constraints:
+                  gl.display.orientation == Orientation.portrait
+                      ? BoxConstraints(
+                        maxHeight:
+                            gl.display.equipixel *
+                            (gl.popupWindowsPortraitHeight -
+                                gl.fontSizeL * 1.2 -
+                                gl.popupReturnButtonHeight -
+                                gl.polyNewPolygonButtonHeight),
+                        maxWidth:
+                            gl.display.equipixel * gl.popupWindowsPortraitWidth,
+                      )
+                      : BoxConstraints(
+                        maxHeight:
+                            gl.display.equipixel *
+                            (gl.popupWindowsLandscapeHeight -
+                                gl.fontSizeL * 1.2),
+                        maxWidth:
+                            gl.popupWindowsPortraitWidth * gl.display.equipixel,
+                      ),
+              child: ReorderableListView(
+                scrollController: _controller,
+                buildDefaultDragHandles: false,
+                onReorder: (int oldIndex, int newIndex) {
+                  setState(() {
+                    if (oldIndex < newIndex) {
+                      newIndex -= 1;
+                    }
+                    if (gl.pathLayers.length < newIndex + 1 ||
+                        gl.pathLayers.length < oldIndex + 1) {
+                      return;
+                    }
+                    gl.refreshMainStack(() {
+                      final PathLayer item = gl.pathLayers.removeAt(oldIndex);
+                      gl.pathLayers.insert(newIndex, item);
+                    });
+                    if (oldIndex == gl.selectedpathLayer) {
+                      gl.selectedpathLayer = newIndex;
+                    } else if (newIndex == gl.selectedpathLayer) {
+                      if (oldIndex > newIndex) {
+                        gl.selectedpathLayer++;
+                      } else {
+                        gl.selectedpathLayer--;
+                      }
+                    } else if (oldIndex < gl.selectedpathLayer &&
+                        gl.selectedpathLayer < newIndex) {
+                      gl.selectedpathLayer--;
+                    } else if (oldIndex > gl.selectedpathLayer &&
+                        gl.selectedpathLayer > newIndex) {
+                      gl.selectedpathLayer++;
+                    }
+                  });
+                },
+                children: List<
+                  TextButton
+                >.generate(gl.pathLayers.isEmpty ? 0 : gl.pathLayers.length, (
+                  int i,
+                ) {
+                  Color activeTextColor =
+                      i == gl.selectedpathLayer
+                          ? getColorTextFromBackground(
+                            i == gl.selectedpathLayer
+                                ? gl.pathLayers[i].colorInside.withAlpha(255)
+                                : Colors.grey.withAlpha(100),
+                          )
+                          : getColorTextFromBackground(
+                            i == gl.selectedpathLayer
+                                ? gl.pathLayers[i].colorInside.withAlpha(255)
+                                : Colors.grey.withAlpha(100),
+                          ).withAlpha(128);
+                  return TextButton(
+                    style: ButtonStyle(
+                      fixedSize:
+                          i == gl.selectedpathLayer &&
+                                  gl.display.orientation == Orientation.portrait
+                              ? WidgetStateProperty<Size>.fromMap(
+                                <WidgetStatesConstraint, Size>{
+                                  WidgetState.any: Size(
+                                    gl.display.equipixel *
+                                        gl.polyListSelectedCardWidth,
+                                    gl.display.equipixel *
+                                        gl.polyListSelectedCardHeight,
+                                  ),
+                                },
+                              )
+                              : WidgetStateProperty<Size>.fromMap(<
+                                WidgetStatesConstraint,
+                                Size
+                              >{
+                                WidgetState.any: Size(
+                                  gl.display.equipixel * gl.polyListCardWidth,
+                                  gl.display.equipixel * gl.polyListCardHeight,
+                                ),
+                              }),
+                    ),
+                    key: Key('$i'),
+                    onPressed:
+                        i == gl.selectedpathLayer
+                            ? () {
+                              setState(() {
+                                widget.state(gl.pathLayers[i].center);
+                              });
+                              gl.refreshMainStack(() {
+                                gl.modeMapShowPolygons = true;
+                              });
+                            }
+                            : () {
+                              setState(() {
+                                gl.selectedpathLayer = i;
+                                widget.state(gl.pathLayers[i].center);
+                              });
+                              gl.refreshMainStack(() {
+                                gl.modeMapShowPolygons = true;
+                              });
+                            },
+                    child: ReorderableDragStartListener(
+                      index: i,
+                      child: SizedBox(
+                        height:
+                            gl.polyListSelectedCardHeight *
+                            gl.display.equipixel,
+                        width:
+                            gl.polyListSelectedCardWidth * gl.display.equipixel,
+                        child: Card(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadiusGeometry.circular(12.0),
+                            side:
+                                i == gl.selectedpathLayer &&
+                                        gl.display.orientation ==
+                                            Orientation.portrait
+                                    ? BorderSide(
+                                      color: Colors.transparent,
+                                      width: 0.0,
+                                    )
+                                    : i == gl.selectedpathLayer
+                                    ? BorderSide(
+                                      color: gl.pathLayers[i].colorInside
+                                          .withAlpha(100),
+                                      width: 2.0,
+                                    )
+                                    : BorderSide(
+                                      color: gl.pathLayers[i].colorInside
+                                          .withAlpha(150),
+                                      width: 4.0,
+                                    ),
+                          ),
+                          surfaceTintColor: Colors.transparent,
+                          shadowColor: Colors.transparent,
+                          color:
+                              i == gl.selectedpathLayer
+                                  ? gl.pathLayers[i].colorInside.withAlpha(255)
+                                  : Colors.grey.withAlpha(150),
+                          child:
+                              i != gl.selectedpathLayer ||
+                                      gl.display.orientation ==
+                                          Orientation.landscape
+                                  ? Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Container(
+                                        alignment: Alignment.center,
+                                        constraints: BoxConstraints(
+                                          maxWidth:
+                                              gl.display.orientation.index == 1
+                                                  ? gl.display.equipixel *
+                                                      gl.polyListCardWidth *
+                                                      .5
+                                                  : gl.display.equipixel *
+                                                      gl.polyListSelectedCardWidth *
+                                                      .5,
+                                        ),
+                                        child: Text(
+                                          gl.pathLayers[i].name,
+                                          style: TextStyle(
+                                            color: Colors.black,
+                                            fontSize:
+                                                gl.display.equipixel *
+                                                gl.fontSizeM,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  )
+                                  : Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      if (i == gl.selectedpathLayer)
+                                        Container(
+                                          alignment: Alignment.center,
+                                          width:
+                                              gl.display.equipixel *
+                                              gl.iconSizeM *
+                                              1.1,
+                                          height:
+                                              gl.display.equipixel *
+                                              gl.iconSizeM *
+                                              1.1,
+                                          child: IconButton(
+                                            onPressed: () {
+                                              PopupDoYouReally(
+                                                gl.notificationContext!,
+                                                () {
+                                                  setState(() {
+                                                    //remove polygon
+                                                    if (i > 0) {
+                                                      gl.pathLayers.removeAt(i);
+                                                      gl.selectedpathLayer--;
+                                                    } else if (i == 0 &&
+                                                        gl
+                                                            .pathLayers
+                                                            .isNotEmpty) {
+                                                      gl.pathLayers.removeAt(i);
+                                                    }
+                                                  });
+                                                  gl.saveChangesToPolygoneToPrefs =
+                                                      true;
+                                                },
+                                                "Message",
+                                                "\nVoulez vous vraiment supprimer ${gl.pathLayers[i].name}?\n",
+                                              );
+                                            },
+                                            icon: Icon(
+                                              Icons.delete_forever,
+                                              color: activeTextColor,
+                                              size:
+                                                  gl.display.equipixel *
+                                                  gl.iconSizeM *
+                                                  .75,
+                                            ),
+                                          ),
+                                        ),
+                                      SizedBox(
+                                        width:
+                                            gl.display.equipixel *
+                                            gl.polyListSelectedCardWidth *
+                                            .5,
+                                        height:
+                                            gl.display.equipixel *
+                                            gl.polyListSelectedCardHeight,
+
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceEvenly,
+                                          children: [
+                                            TextButton(
+                                              child: Container(
+                                                constraints: BoxConstraints(
+                                                  maxHeight:
+                                                      gl.display.equipixel *
+                                                      gl.polyListSelectedCardHeight *
+                                                      .4,
+                                                  maxWidth:
+                                                      gl
+                                                                  .display
+                                                                  .orientation
+                                                                  .index ==
+                                                              1
+                                                          ? gl
+                                                                  .display
+                                                                  .equipixel *
+                                                              gl.polyListSelectedCardWidth *
+                                                              .5
+                                                          : gl
+                                                                  .display
+                                                                  .equipixel *
+                                                              gl.polyListCardWidth *
+                                                              .5,
+                                                ),
+                                                child: Text(
+                                                  gl.pathLayers[i].name,
+                                                  style: TextStyle(
+                                                    color: activeTextColor,
+                                                    fontSize:
+                                                        gl.display.equipixel *
+                                                        gl.fontSizeM,
+                                                  ),
+                                                ),
+                                              ),
+                                              onPressed: () {
+                                                PopupNameIntroducer(
+                                                  context,
+                                                  gl.pathLayers[i].name,
+                                                  (String nameIt) {
+                                                    setState(() {
+                                                      gl.pathLayers[i].name =
+                                                          nameIt;
+                                                      gl.saveChangesToPolygoneToPrefs =
+                                                          true;
+                                                    });
+                                                  },
+                                                  () {
+                                                    setState(() {
+                                                      _keyboard = false;
+                                                    });
+                                                  },
+                                                  () {
+                                                    setState(() {
+                                                      _keyboard = true;
+                                                    });
+                                                  },
+                                                );
+                                              },
+                                            ),
+
+                                            if (i == gl.selectedpathLayer)
+                                              Text(
+                                                "${(gl.pathLayers[i].length).round() / 1000} km",
+                                                style: TextStyle(
+                                                  color: activeTextColor,
+                                                  fontSize:
+                                                      gl.display.equipixel *
+                                                      gl.fontSizeS *
+                                                      1.2,
+                                                ),
+                                              ),
+                                          ],
+                                        ),
+                                      ),
+                                      if (i == gl.selectedpathLayer)
+                                        Container(
+                                          alignment: Alignment.center,
+                                          width:
+                                              gl.display.orientation.index ==
+                                                          1 &&
+                                                      i != gl.selectedpathLayer
+                                                  ? 0.0
+                                                  : gl.display.equipixel *
+                                                      gl.iconSizeM *
+                                                      1.2,
+
+                                          child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceEvenly,
+                                            children: [
+                                              IconButton(
+                                                onPressed: () {
+                                                  PopupColorChooser(
+                                                    gl
+                                                        .pathLayers[i]
+                                                        .colorInside,
+                                                    gl.notificationContext!,
+                                                    //change color
+                                                    (Color col) {
+                                                      setState(() {
+                                                        gl.pathLayers[i]
+                                                            .setColorInside(
+                                                              col,
+                                                            );
+                                                        gl.pathLayers[i]
+                                                            .setColorLine(
+                                                              Color.fromRGBO(
+                                                                (col.r * 255)
+                                                                    .round(),
+                                                                (col.g * 255)
+                                                                    .round(),
+                                                                (col.b * 255)
+                                                                    .round(),
+                                                                1.0,
+                                                              ),
+                                                            );
+                                                      });
+                                                      gl.saveChangesToPolygoneToPrefs =
+                                                          true;
+                                                    },
+                                                    () {},
+                                                  );
+                                                },
+                                                icon: Icon(
+                                                  Icons.color_lens,
+                                                  color: activeTextColor,
+                                                  size:
+                                                      gl.display.equipixel *
+                                                      gl.iconSizeM *
+                                                      .75,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                    ],
+                                  ),
+                        ),
+                      ),
+                    ),
+                  );
+                }),
+              ),
+            ),
+            if (gl.display.orientation == Orientation.portrait && !_keyboard)
+              TextButton(
+                style: ButtonStyle(
+                  backgroundColor: WidgetStateProperty.fromMap(
+                    <WidgetStatesConstraint, Color>{
+                      WidgetState.any: Colors.white,
+                    },
+                  ),
+                  shape: WidgetStateProperty<OutlinedBorder>.fromMap(
+                    <WidgetStatesConstraint, OutlinedBorder>{
+                      WidgetState.any: RoundedRectangleBorder(
+                        borderRadius: BorderRadiusGeometry.circular(12.0),
+                      ),
+                    },
+                  ),
+                  fixedSize: WidgetStateProperty.fromMap(<
+                    WidgetStatesConstraint,
+                    Size
+                  >{
+                    WidgetState.any: Size(
+                      gl.display.equipixel * gl.polyListCardWidth * .97,
+                      gl.display.equipixel * gl.polyNewPolygonButtonHeight * .9,
+                    ),
+                  }),
+                ),
+                key: Key('autsch-5-addPoly'),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.add,
+                      size:
+                          (gl.polyNewPolygonButtonHeight - 4) *
+                          gl.display.equipixel,
+                      color: Colors.black,
+                    ),
+                  ],
+                ),
+                onPressed: () {
+                  setState(() {
+                    gl.pathLayers.add(PathLayer(pathName: "Nouveau"));
+                    PopupNameIntroducer(
+                      context,
+                      "",
+                      (String nameIt) {
+                        if (mounted) {
+                          setState(() {
+                            _keyboard = true;
+                          });
+                        } else {
+                          gl.pathLayers[gl.pathLayers.length - 1].name = nameIt;
+                          gl.saveChangesToPolygoneToPrefs = true;
+                        }
+                      },
+                      () {
+                        if (mounted) {
+                          setState(() {
+                            _keyboard = false;
+                          });
+                        } else {
+                          _keyboard = false;
+                        }
+                      },
+                      () {
+                        if (mounted) {
+                          setState(() {
+                            _keyboard = true;
+                          });
+                        } else {
+                          _keyboard = true;
+                        }
+                      },
+                    );
+                    gl.selectedpathLayer = gl.pathLayers.length - 1;
+                  });
+
+                  gl.refreshMainStack(() {
+                    gl.selectedpathLayer = gl.pathLayers.length - 1;
+                    gl.saveChangesToPolygoneToPrefs = true;
+                  });
+                  _scrollDown();
+                },
+              ),
+            if (gl.display.orientation == Orientation.portrait && !_keyboard)
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [_returnButton(context, widget.after)],
+              ),
+          ],
+        ),
+        if (gl.display.orientation == Orientation.landscape && !_keyboard)
+          Column(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              if (gl.pathLayers.isNotEmpty)
+                SizedBox(
+                  width: gl.polyListSelectedCardWidth * gl.display.equipixel,
+                  child: Card(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadiusGeometry.circular(12.0),
+                    ),
+
+                    surfaceTintColor: Colors.transparent,
+                    shadowColor: Colors.transparent,
+                    color: gl.pathLayers[gl.selectedpathLayer].colorInside
+                        .withAlpha(255),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        SizedBox(
+                          width: gl.display.equipixel * gl.iconSizeM * 1.1,
+                          child: IconButton(
+                            onPressed: () {
+                              PopupDoYouReally(
+                                gl.notificationContext!,
+                                () {
+                                  setState(() {
+                                    //remove polygon
+                                    if (gl.selectedpathLayer > 0) {
+                                      gl.pathLayers.removeAt(
+                                        gl.selectedpathLayer,
+                                      );
+                                      gl.selectedpathLayer--;
+                                    } else if (gl.selectedpathLayer == 0 &&
+                                        gl.pathLayers.isNotEmpty) {
+                                      gl.pathLayers.removeAt(
+                                        gl.selectedpathLayer,
+                                      );
+                                    }
+                                  });
+                                  gl.saveChangesToPolygoneToPrefs = true;
+                                },
+                                "Message",
+                                "\nVoulez vous vraiment supprimer ${gl.pathLayers[gl.selectedpathLayer].name}?\n",
+                              );
+                            },
+                            icon: Icon(
+                              Icons.delete_forever,
+                              color: Colors.black,
+                              size: gl.display.equipixel * gl.iconSizeM * .75,
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              TextButton(
+                                child: Container(
+                                  alignment: Alignment.center,
+                                  constraints: BoxConstraints(
+                                    maxWidth:
+                                        gl.display.equipixel *
+                                        gl.polyListSelectedCardWidth *
+                                        .5,
+                                  ),
+                                  child: Text(
+                                    gl.pathLayers[gl.selectedpathLayer].name,
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize:
+                                          gl.display.equipixel * gl.fontSizeM,
+                                    ),
+                                  ),
+                                ),
+                                onPressed: () {
+                                  PopupNameIntroducer(
+                                    context,
+                                    gl.pathLayers[gl.selectedpathLayer].name,
+                                    (String nameIt) {
+                                      setState(() {
+                                        gl
+                                            .pathLayers[gl.selectedpathLayer]
+                                            .name = nameIt;
+                                        gl.saveChangesToPolygoneToPrefs = true;
+                                      });
+                                    },
+                                    () {
+                                      setState(() {
+                                        _keyboard = false;
+                                      });
+                                    },
+                                    () {
+                                      setState(() {
+                                        _keyboard = true;
+                                      });
+                                    },
+                                  );
+                                },
+                              ),
+
+                              Text(
+                                "${(gl.pathLayers[gl.selectedpathLayer].length).round() / 1000} km",
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: gl.display.equipixel * gl.fontSizeM,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(
+                          width: gl.display.equipixel * gl.iconSizeM * 1.1,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Column(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  IconButton(
+                                    onPressed: () {
+                                      PopupColorChooser(
+                                        gl
+                                            .pathLayers[gl.selectedpathLayer]
+                                            .colorInside,
+                                        gl.notificationContext!,
+                                        //change color
+                                        (Color col) {
+                                          setState(() {
+                                            gl.pathLayers[gl.selectedpathLayer]
+                                                .setColorInside(col);
+                                            gl.pathLayers[gl.selectedpathLayer]
+                                                .setColorLine(
+                                                  Color.fromRGBO(
+                                                    (col.r * 255).round(),
+                                                    (col.g * 255).round(),
+                                                    (col.b * 255).round(),
+                                                    1.0,
+                                                  ),
+                                                );
+                                          });
+                                          gl.saveChangesToPolygoneToPrefs =
+                                              true;
+                                        },
+                                        () {},
+                                      );
+                                    },
+                                    icon: Icon(
+                                      Icons.color_lens,
+                                      color: Colors.black,
+                                      size:
+                                          gl.display.equipixel *
+                                          gl.iconSizeM *
+                                          .75,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+
+              SizedBox(
+                width: gl.polyListSelectedCardWidth * gl.display.equipixel,
+                child: TextButton(
+                  style: ButtonStyle(
+                    backgroundColor: WidgetStateProperty.fromMap(
+                      <WidgetStatesConstraint, Color>{
+                        WidgetState.any: Colors.white,
+                      },
+                    ),
+                    shape: WidgetStateProperty<OutlinedBorder>.fromMap(
+                      <WidgetStatesConstraint, OutlinedBorder>{
+                        WidgetState.any: RoundedRectangleBorder(
+                          borderRadius: BorderRadiusGeometry.circular(12.0),
+                        ),
+                      },
+                    ),
+                    fixedSize: WidgetStateProperty.fromMap(
+                      <WidgetStatesConstraint, Size>{
+                        WidgetState.any: Size(
+                          gl.display.equipixel * gl.polyListCardWidth * .97,
+                          gl.display.equipixel *
+                              gl.polyNewPolygonButtonHeight *
+                              .9,
+                        ),
+                      },
+                    ),
+                  ),
+                  key: Key('autsch-5-addPoly'),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.add,
+                        color: Colors.black,
+                        size:
+                            gl.display.equipixel *
+                            gl.polyNewPolygonButtonHeight *
+                            .7,
+                      ),
+                    ],
+                  ),
+                  onPressed: () async {
+                    setState(() {
+                      gl.pathLayers.add(PathLayer(pathName: "Nouveau"));
+                      PopupNameIntroducer(
+                        context,
+                        "",
+                        (String nameIt) {
+                          setState(() {
+                            gl.pathLayers[gl.pathLayers.length - 1].name =
+                                nameIt;
+                            gl.saveChangesToPolygoneToPrefs = true;
+                          });
+                        },
+                        () {
+                          setState(() {
+                            _keyboard = false;
+                          });
+                        },
+                        () {
+                          setState(() {
+                            _keyboard = true;
+                          });
+                        },
+                      );
+                      gl.selectedpathLayer = gl.pathLayers.length - 1;
+                    });
+
+                    gl.refreshMainStack(() {
+                      gl.selectedpathLayer = gl.pathLayers.length - 1;
+                      gl.saveChangesToPolygoneToPrefs = true;
+                    });
+                    _scrollDown();
+                  },
+                ),
+              ),
+              if (!_keyboard)
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SizedBox(width: gl.display.equipixel * gl.iconSizeM * .25),
+                    _returnButton(context, widget.after),
+                  ],
+                ),
+            ],
+          ),
+      ]),
+    );
+  }
+}
+
 Widget switchRowColWithOrientation(List<Widget> tree) {
   return gl.display.orientation == Orientation.portrait
       ? Column(mainAxisAlignment: MainAxisAlignment.spaceAround, children: tree)
@@ -3008,6 +3794,50 @@ Widget popupPolygonListMenu(
                           (gl.popupWindowsPortraitHeight + 1)
                       : gl.display.equipixel * gl.popupWindowsLandscapeHeight,
               child: PolygonListMenu(state: state, after: after),
+            ),
+          ),
+          actions: [],
+        );
+      },
+    ),
+  );
+}
+
+Widget popupPathListMenu(
+  BuildContext context,
+  String currentName,
+  ValueChanged<LatLng> state,
+  VoidCallback after,
+) {
+  return MaterialApp(
+    home: OrientationBuilder(
+      builder: (context, orientation) {
+        return AlertDialog(
+          titlePadding: EdgeInsets.all(5),
+          actionsPadding: EdgeInsets.all(0),
+          contentPadding: EdgeInsets.all(0),
+          insetPadding: EdgeInsets.all(0),
+          buttonPadding: EdgeInsets.all(0),
+          iconPadding: EdgeInsets.all(0),
+          backgroundColor: gl.backgroundTransparentBlackBox,
+          surfaceTintColor: Colors.transparent,
+          shadowColor: Colors.transparent,
+          content: Theme(
+            data: Theme.of(context).copyWith(
+              canvasColor: Colors.transparent,
+              shadowColor: Colors.transparent,
+            ),
+            child: SizedBox(
+              width:
+                  gl.display.orientation == Orientation.portrait
+                      ? gl.display.equipixel * gl.popupWindowsPortraitWidth
+                      : gl.display.equipixel * gl.popupWindowsLandscapeWidth,
+              height:
+                  gl.display.orientation == Orientation.portrait
+                      ? gl.display.equipixel *
+                          (gl.popupWindowsPortraitHeight + 1)
+                      : gl.display.equipixel * gl.popupWindowsLandscapeHeight,
+              child: PathListMenu(state: state, after: after),
             ),
           ),
           actions: [],

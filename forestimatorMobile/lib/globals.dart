@@ -1,4 +1,5 @@
 import 'package:fforestimator/dico/dico_apt.dart';
+import 'package:fforestimator/tools/customLayer/path_layer.dart';
 import 'package:fforestimator/tools/customLayer/polygon_layer.dart' as pol;
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
@@ -30,6 +31,7 @@ bool modeSettings = false;
 bool modeMenuResults = false;
 
 class Mode {
+  static bool recordPath = false;
   static bool keyboardExpanded = false;
   static bool square = false;
   static bool tablet = false;
@@ -279,6 +281,9 @@ class PoiMarker {
 
 List<pol.PolygonLayer> polygonLayers = [];
 int selectedPolygonLayer = 0;
+
+List<PathLayer> pathLayers = [];
+int selectedpathLayer = -1;
 
 // ajouter le code le la couche à la fin de cette requete. fonctionne que pour layerbase avec mRes <= 10m sinon je considère que c'est trop volumineux
 String queryApiRastDownload =

@@ -432,6 +432,15 @@ class _MapPageState extends State<MapPage> {
                             if (!e) return;
                             _mapControllerInit = true;
                             updateLocation();
+                            if (gl.selectedpathLayer > -1 &&
+                                !gl.pathLayers[gl.selectedpathLayer].finished) {
+                              gl.pathLayers[gl.selectedpathLayer].addPosition(
+                                LatLng(
+                                  position.center.latitude,
+                                  position.center.longitude,
+                                ),
+                              );
+                            }
                             if (_modeMoveMeasurePath) {
                               _measurePath.removeAt(selectedMeasurePointToMove);
                               _measurePath.insert(
@@ -1883,6 +1892,54 @@ class _MapPageState extends State<MapPage> {
                             });
                           },
                           icon: Icon(Icons.more_horiz_outlined),
+                        ),
+                      ),
+                    if (gl.Mode.expertTools && gl.modeDevelopper)
+                      Container(
+                        color:
+                            !gl.Mode.recordPath
+                                ? Colors.transparent
+                                : Colors.yellow.withAlpha(128),
+                        child: IconButton(
+                          color:
+                              gl.Mode.recordPath
+                                  ? Colors.white
+                                  : Colors.yellow.withAlpha(128),
+                          iconSize: gl.display.equipixel * gl.iconSizeM,
+                          isSelected: gl.Mode.recordPath,
+                          onPressed: () {
+                            setState(() {
+                              gl.Mode.recordPath = !gl.Mode.recordPath;
+                              _modeAnaPtPreview = !gl.Mode.recordPath;
+                              if (gl.Mode.recordPath) {
+                                gl.mainStack.add(
+                                  popupPathListMenu(
+                                    gl.notificationContext!,
+                                    gl
+                                        .polygonLayers[gl.selectedPolygonLayer]
+                                        .name,
+                                    (LatLng pos) {
+                                      if (pos.longitude != 0.0 &&
+                                          pos.latitude != 0.0) {
+                                        _mapController.move(
+                                          pos,
+                                          _mapController.camera.zoom,
+                                        );
+                                      }
+                                    },
+                                    () {
+                                      refreshView(() {
+                                        gl.Mode.recordPath =
+                                            !gl.Mode.recordPath;
+                                      });
+                                    },
+                                  ),
+                                );
+                                refreshView(() {});
+                              }
+                            });
+                          },
+                          icon: Icon(Icons.nordic_walking),
                         ),
                       ),
                     Container(
