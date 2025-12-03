@@ -1,12 +1,13 @@
 package main
 
 import (
-        "bytes"
-        "fmt"
-        "log"
-        "net/http"
-        "os/exec"
-        "time"
+	"bytes"
+	"fmt"
+	"log"
+	"net/http"
+	"os"
+	"os/exec"
+	"time"
 
         "github.com/wneessen/go-mail"
 )
@@ -127,14 +128,33 @@ func SendEmail(recipient string, subject string, msg string) {
         m.Subject(subject)
         m.SetBodyString(mail.TypeTextPlain, msg)
 
-        // Secondly the mail client
-        c, err := mail.NewClient("smtp.ulg.ac.be",
-                mail.WithPort(465), mail.WithSMTPAuth(mail.SMTPAuthLogin),
-                mail.WithUsername("tthissen@uliege.be"), mail.WithPassword("ap[Ko)19"),
-                mail.WithSSLPort(false))
-        if err != nil {
-                log.Printf("failed to create mail client: %s", err)
-        }
+	file, err := os.Open("./.credentials")
+	if err != nil {
+		log.Printf("failed to open credentials file: %s", err)
+	}
+	defer file.Close()
+
+	var user string
+	_, err = fmt.Fscanf(file, "%s", &user)
+	if err != nil {
+		log.Printf("failed to read user from credentials file: %s", err)
+		user = "******"
+	}
+
+	var password string
+	_, err = fmt.Fscanf(file, "%s", &password)
+	if err != nil {
+		log.Printf("failed to read password from credentials file: %s", err)
+		password = "******"
+	}
+
+	c, err := mail.NewClient("smtp.ulg.ac.be",
+		mail.WithPort(465), mail.WithSMTPAuth(mail.SMTPAuthLogin),
+		mail.WithUsername(user), mail.WithPassword(password),
+		mail.WithSSLPort(false))
+	if err != nil {
+		log.Printf("failed to create mail client: %s", err)
+	}
 
         // Finally let's send out the mail
         if err := c.DialAndSend(m); err != nil {
