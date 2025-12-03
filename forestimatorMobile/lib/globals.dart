@@ -12,7 +12,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 // A helper typedef used across the app for setters that accept a function to run
 typedef VoidSetter = void Function(void Function());
 
-const String forestimatorMobileVersion = "2.1.0 - build 22";
+const String forestimatorMobileVersion = "2.1.1 - build 24";
 const double globalMinZoom = 4.0;
 const double globalMaxZoom = 13.0;
 const double globalMinOfflineZoom = 8.0;
