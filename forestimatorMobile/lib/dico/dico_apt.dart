@@ -137,10 +137,10 @@ class LayerBase {
               : map['gain'],
       mPdfPage =
           map['pdfPage'] == null
-              ? 0
+              ? 1
               : map['pdfPage'] is String
               ? map['pdfPage'] == ""
-                  ? 0
+                  ? 1
                   : int.parse(map['pdfPage']) - 1
               : map['pdfPage'] - 1,
       mPdfName = map['pdfName'] ?? "",
@@ -178,9 +178,14 @@ class LayerBase {
       case "Gembloux Agro-Bio Tech":
         aRes = 'assets/images/uLIEGE_Gembloux_AgroBioTech_Logo_CMJN_pos.png';
         break;
+      case "init":
+        aRes = "assets/images/LogoForestimator.png";
+        break;
       default:
         aRes = "assets/images/LogoForestimator.png";
-        gl.print("Error: can't find assets path for: $mWMSattribution");
+        gl.print(
+          "Error: can't find assets path for image logo: $mWMSattribution",
+        );
     }
     return aRes;
   }
@@ -209,7 +214,7 @@ class LayerBase {
       mRes = 0.0,
       mUsedForAnalysis = false,
       mBits = 8,
-      mLogoAttributionFile = logoAttributionFile(''),
+      mLogoAttributionFile = logoAttributionFile('init'),
       mIsDownloadableRW = false,
       mInDownload = false;
 
@@ -484,7 +489,6 @@ class DicoAptProvider {
     } else {
       gl.print("oops no layerBase $aCode");
       return LayerBase();
-      //throw "oops no layerBase " + aCode;
     }
   }
 
