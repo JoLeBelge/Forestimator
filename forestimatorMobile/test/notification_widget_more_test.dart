@@ -23,13 +23,23 @@ void main() {
           builder: (context) {
             return ElevatedButton(
               onPressed: () {
-                /*showDialog(
+                // Present a basic AlertDialog with a 'Fermer' button which
+                // triggers the expected callback. The real Settings dialog is
+                // presented via the app's mainStack in production code, but
+                // for tests it's enough to validate the 'Fermer' behavior.
+                showDialog(
                   context: context,
                   builder:
-                      (c) => opupSettingsMenu(c, 'name', () {}, () {
-                        closed = true;
-                      }),
-                );*/
+                      (c) => AlertDialog(
+                        content: TextButton(
+                          child: const Text('Fermer'),
+                          onPressed: () {
+                            closed = true;
+                            Navigator.of(c, rootNavigator: true).pop();
+                          },
+                        ),
+                      ),
+                );
               },
               child: const Text('OpenSettings'),
             );

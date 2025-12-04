@@ -9,6 +9,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:proj4dart/proj4dart.dart' as proj4;
 import 'package:flutter/material.dart';
 import 'dart:math';
+import 'package:fforestimator/tools/geometry/polygon_utils.dart' as polygon;
 import 'dart:io';
 import 'package:geolocator/geolocator.dart';
 import 'package:fforestimator/globals.dart' as gl;
@@ -41,8 +42,6 @@ class _MapPageState extends State<MapPage> {
   bool _polygonToolbarExtended = false;
 
   bool _modeDrawPolygon = false;
-  bool _modePolygonList = false;
-  bool _modeMenuResults = false;
 
   bool _modeDrawPolygonAddVertexes = false;
   bool _modeDrawPolygonRemoveVertexes = false;
@@ -346,7 +345,6 @@ class _MapPageState extends State<MapPage> {
                               _pt = point;
                               refreshView(() {
                                 _doingAnaPt = false;
-                                _modeMenuResults = true;
                               });
                               PopupAnaResultsMenu(
                                 gl.notificationContext!,
@@ -375,12 +373,26 @@ class _MapPageState extends State<MapPage> {
                                   ? (tapPosition, point) async => {
                                     if (gl.polygonLayers.isNotEmpty)
                                       {
-                                        refreshView(() {
+                                        if (_isPolygonWellDefined(
                                           gl
                                               .polygonLayers[gl
                                                   .selectedPolygonLayer]
-                                              .addPoint(point);
-                                        }),
+                                              .getPolyPlusOneVertex(point),
+                                        ))
+                                          {
+                                            refreshView(() {
+                                              gl
+                                                  .polygonLayers[gl
+                                                      .selectedPolygonLayer]
+                                                  .addPoint(point);
+                                            }),
+                                          }
+                                        else
+                                          {
+                                            PopupPolygonNotWellDefined(
+                                              gl.notificationContext!,
+                                            ),
+                                          },
                                       },
                                   }
                                   : _modeDrawPolygonMoveVertexes
@@ -420,6 +432,15 @@ class _MapPageState extends State<MapPage> {
                             if (!e) return;
                             _mapControllerInit = true;
                             updateLocation();
+                            if (gl.selectedpathLayer > -1 &&
+                                !gl.pathLayers[gl.selectedpathLayer].finished) {
+                              gl.pathLayers[gl.selectedpathLayer].addPosition(
+                                LatLng(
+                                  position.center.latitude,
+                                  position.center.longitude,
+                                ),
+                              );
+                            }
                             if (_modeMoveMeasurePath) {
                               _measurePath.removeAt(selectedMeasurePointToMove);
                               _measurePath.insert(
@@ -431,21 +452,31 @@ class _MapPageState extends State<MapPage> {
                               );
                             }
                             if (_selectedPointToMove != null) {
-                              gl.polygonLayers[gl.selectedPolygonLayer]
-                                  .replacePoint(
-                                    _selectedPointToMove!,
-                                    LatLng(
-                                      position.center.latitude,
-                                      position.center.longitude,
+                              if (_isPolygonWellDefined(
+                                gl.polygonLayers[gl.selectedPolygonLayer]
+                                    .getPolyMoveOneVertex(
+                                      _selectedPointToMove!,
+                                      LatLng(
+                                        position.center.latitude,
+                                        position.center.longitude,
+                                      ),
                                     ),
+                              )) {
+                                gl.polygonLayers[gl.selectedPolygonLayer]
+                                    .replacePoint(
+                                      _selectedPointToMove!,
+                                      LatLng(
+                                        position.center.latitude,
+                                        position.center.longitude,
+                                      ),
+                                    );
+                                refreshView(() {
+                                  _selectedPointToMove = LatLng(
+                                    position.center.latitude,
+                                    position.center.longitude,
                                   );
-
-                              refreshView(() {
-                                _selectedPointToMove = LatLng(
-                                  position.center.latitude,
-                                  position.center.longitude,
-                                );
-                              });
+                                });
+                              }
                             } else {
                               refreshView(() {});
                             }
@@ -778,7 +809,6 @@ class _MapPageState extends State<MapPage> {
                                             },
                                             () {
                                               refreshView(() {
-                                                _modePolygonList = false;
                                                 if (gl
                                                     .polygonLayers
                                                     .isNotEmpty) {
@@ -793,9 +823,7 @@ class _MapPageState extends State<MapPage> {
                                             },
                                           ),
                                         );
-                                        refreshView(() {
-                                          _modePolygonList = true;
-                                        });
+                                        refreshView(() {});
                                       },
                                       onLongPress: () {
                                         setState(() {
@@ -974,7 +1002,6 @@ class _MapPageState extends State<MapPage> {
                                             },
                                             () {
                                               refreshView(() {
-                                                _modePolygonList = false;
                                                 if (gl
                                                     .polygonLayers
                                                     .isNotEmpty) {
@@ -1416,6 +1443,13 @@ class _MapPageState extends State<MapPage> {
       currentPoint = point;
     }
     return length;
+  }
+
+  // Geometry helpers are in polygon_utils.dart
+
+  bool _isPolygonWellDefined(List<Point> poly) {
+    if (poly.isEmpty || gl.Mode.overrideWellDefinedCheck) return true;
+    return polygon.isPolygonWellDefined(poly);
   }
 
   List<Marker> _getPathMeasureMarkers() {
@@ -1860,6 +1894,54 @@ class _MapPageState extends State<MapPage> {
                           icon: Icon(Icons.more_horiz_outlined),
                         ),
                       ),
+                    if (gl.Mode.expertTools && gl.modeDevelopper)
+                      Container(
+                        color:
+                            !gl.Mode.recordPath
+                                ? Colors.transparent
+                                : Colors.yellow.withAlpha(128),
+                        child: IconButton(
+                          color:
+                              gl.Mode.recordPath
+                                  ? Colors.white
+                                  : Colors.yellow.withAlpha(128),
+                          iconSize: gl.display.equipixel * gl.iconSizeM,
+                          isSelected: gl.Mode.recordPath,
+                          onPressed: () {
+                            setState(() {
+                              gl.Mode.recordPath = !gl.Mode.recordPath;
+                              _modeAnaPtPreview = !gl.Mode.recordPath;
+                              if (gl.Mode.recordPath) {
+                                gl.mainStack.add(
+                                  popupPathListMenu(
+                                    gl.notificationContext!,
+                                    gl
+                                        .polygonLayers[gl.selectedPolygonLayer]
+                                        .name,
+                                    (LatLng pos) {
+                                      if (pos.longitude != 0.0 &&
+                                          pos.latitude != 0.0) {
+                                        _mapController.move(
+                                          pos,
+                                          _mapController.camera.zoom,
+                                        );
+                                      }
+                                    },
+                                    () {
+                                      refreshView(() {
+                                        gl.Mode.recordPath =
+                                            !gl.Mode.recordPath;
+                                      });
+                                    },
+                                  ),
+                                );
+                                refreshView(() {});
+                              }
+                            });
+                          },
+                          icon: Icon(Icons.nordic_walking),
+                        ),
+                      ),
                     Container(
                       color:
                           !_modeSearch
@@ -2017,16 +2099,29 @@ class _MapPageState extends State<MapPage> {
                             });
                             if (_modeDrawPolygonRemoveVertexes == true) {
                               refreshView(() {
-                                gl.polygonLayers[gl.selectedPolygonLayer]
-                                    .removePoint(
-                                      gl
-                                          .polygonLayers[gl
-                                              .selectedPolygonLayer]
-                                          .polygonPoints[gl
-                                          .polygonLayers[gl
-                                              .selectedPolygonLayer]
-                                          .selectedPolyLinePoints[0]],
-                                    );
+                                if (_isPolygonWellDefined(
+                                  gl.polygonLayers[gl.selectedPolygonLayer]
+                                      .getPolyRemoveOneVertex(
+                                        gl
+                                            .polygonLayers[gl
+                                                .selectedPolygonLayer]
+                                            .polygonPoints[gl
+                                            .polygonLayers[gl
+                                                .selectedPolygonLayer]
+                                            .selectedPolyLinePoints[0]],
+                                      ),
+                                )) {
+                                  gl.polygonLayers[gl.selectedPolygonLayer]
+                                      .removePoint(
+                                        gl
+                                            .polygonLayers[gl
+                                                .selectedPolygonLayer]
+                                            .polygonPoints[gl
+                                            .polygonLayers[gl
+                                                .selectedPolygonLayer]
+                                            .selectedPolyLinePoints[0]],
+                                      );
+                                }
                               });
                               _modeDrawPolygonMoveVertexes = false;
                               _modeDrawPolygonAddVertexes = false;

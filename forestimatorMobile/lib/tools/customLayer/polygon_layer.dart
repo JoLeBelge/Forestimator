@@ -99,6 +99,59 @@ class PolygonLayer {
     gl.saveChangesToPolygoneToPrefs = true;
   }
 
+  List<Point> getPolyPlusOneVertex(LatLng vertex) {
+    List<Point> copyOfPoly = [];
+
+    for (LatLng p in polygonPoints) {
+      copyOfPoly.add(Point(p.latitude, p.longitude));
+    }
+
+    copyOfPoly.insert(
+      selectedPolyLinePoints[1],
+      Point(vertex.latitude, vertex.longitude),
+    );
+    return copyOfPoly;
+  }
+
+  List<Point> getPolyMoveOneVertex(LatLng old, LatLng index) {
+    List<Point> copyOfPoly = [];
+
+    for (LatLng p in polygonPoints) {
+      copyOfPoly.add(Point(p.latitude, p.longitude));
+    }
+    int i = 0;
+    for (LatLng point in polygonPoints) {
+      if (old.latitude == point.latitude && old.longitude == point.longitude) {
+        break;
+      }
+      i++;
+    }
+
+    copyOfPoly.removeAt(i);
+    copyOfPoly.insert(i, Point(index.latitude, index.longitude));
+
+    return copyOfPoly;
+  }
+
+  List<Point> getPolyRemoveOneVertex(LatLng index) {
+    List<Point> copyOfPoly = [];
+
+    for (LatLng p in polygonPoints) {
+      copyOfPoly.add(Point(p.latitude, p.longitude));
+    }
+    int i = 0;
+    for (var point in polygonPoints) {
+      if (index.latitude == point.latitude &&
+          index.longitude == point.longitude) {
+        break;
+      }
+      i++;
+    }
+    copyOfPoly.removeAt(i);
+
+    return copyOfPoly;
+  }
+
   void removePoint(LatLng index) {
     int i = 0;
     for (var point in polygonPoints) {

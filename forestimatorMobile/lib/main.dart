@@ -16,6 +16,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:memory_info/memory_info.dart';
 
 void main() async {
+  // Ensure Flutter binding initialized before running app or any plugins
+  WidgetsFlutterBinding.ensureInitialized();
+
   if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
     sqfliteFfiInit();
     databaseFactory = databaseFactoryFfi;
@@ -24,16 +27,19 @@ void main() async {
   }
 
   gl.dico = DicoAptProvider();
-  await gl.dico.init();
 
-  while (!gl.dico.finishedLoading) {
-    sleep(const Duration(seconds: 1));
-  }
+  // Start app immediately so integration tests can locate MaterialApp and
+  // so the UI is responsive while longer-running initialization runs in
+  // the background.
   try {
     runApp(const MyApp());
   } catch (e) {
     gl.print("$e");
   }
+
+  // Initialize dictionaries and other long running tasks in background to
+  // avoid blocking the main isolate (avoid synchronous sleep loops).
+  gl.dico.init().then((_) {});
 }
 
 class MyApp extends StatefulWidget {
@@ -207,18 +213,37 @@ class _MyApp extends State<MyApp> {
   }
 
   Future _listAndCopyPdfassets() async {
-    // load as string
-    final manifestcontent =
-    //await defaultassetbundle.of(context).loadstring('assetmanifest.json');
-    await rootBundle.loadString('AssetManifest.json');
-    // decode to map
-    final Map<String, dynamic> manifestmap = json.decode(manifestcontent);
+    // First try the JSON manifest (older Flutter versions / some toolchains)
+    try {
+      final manifestcontent = await rootBundle.loadString('AssetManifest.json');
+      final Map<String, dynamic> manifestmap = json.decode(manifestcontent);
+      final List<String> list =
+          manifestmap.keys.where((path) => path.endsWith('.pdf')).toList();
+      for (String f in list) {
+        await fromAsset(f, path.basename(f));
+      }
+      return;
+    } catch (_) {
+      // fall through to try binary manifest
+    }
 
-    // filter by extension
-    List<String> list =
-        manifestmap.keys.where((path) => path.endsWith('.pdf')).toList();
-    for (String f in list) {
-      fromAsset(f, path.basename(f));
+    // Newer Flutter toolchains may produce a binary asset manifest
+    // (`AssetManifest.bin`). Try loading that and extract PDF paths.
+    try {
+      final data = await rootBundle.load('AssetManifest.bin');
+      final bytes = data.buffer.asUint8List();
+      // Decode as UTF-8 allowing malformed sequences so we can extract
+      // embedded paths even if the file isn't plain JSON.
+      final decoded = utf8.decode(bytes, allowMalformed: true);
+      final reg = RegExp(r"assets/[^\s\x00-\x1F]*?\.pdf", caseSensitive: false);
+      final matches = reg.allMatches(decoded).map((m) => m.group(0)!).toSet();
+      for (final f in matches) {
+        await fromAsset(f, path.basename(f));
+      }
+      return;
+    } catch (e) {
+      gl.print('Could not load any AssetManifest (json or bin): $e');
+      return;
     }
   }
 
