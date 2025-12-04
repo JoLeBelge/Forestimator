@@ -222,8 +222,8 @@ Version 2025 12
 </message>
 
 <message id="COMPO.logs">
-Décembre 2025 ; mise à jour majeure utilisant de concert les acquisitions LiDAR de 2021 et des prises de vue satellite. distinction de "autres résineux" et "autres feuillus". Convolution avec PrototypeLoss.
-Octobre 2021 ; passage à une résolution de 2,5 m (auparavant 10 m). Les cartes renseignent dorénavant la proportion de l'essence en pourcentage de gha (précédemment "probabilité de présence").
+<p>Décembre 2025 ; mise à jour majeure utilisant de concert les acquisitions LiDAR de 2021 et des prises de vue satellite. distinction de "autres résineux" et "autres feuillus". Version non finale - mise à jour à venir durant l'année 2026.</p>
+<p>Octobre 2021 ; passage à une résolution de 2,5 m (auparavant 10 m). Les cartes renseignent dorénavant la proportion de l'essence en pourcentage de gha (précédemment "probabilité de présence").</p>
 </message>
 
 <message id="ES_EP.logs">
