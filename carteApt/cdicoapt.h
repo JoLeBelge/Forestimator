@@ -47,7 +47,6 @@ public:
     std::vector<std::string> parseAptArg(std::string aArgs);
     std::map<int,double> simplifieAptStat(std::map<int,double> aStat);
     std::vector<std::string> parseHdomArg(std::string aArgs);
-    std::vector<std::string> parseCompoArg(std::string aArgs);
     std::string parsePointArg(std::string aArgs);
     /*************************/
     std::map<int,std::string> getDicoRaster(std::string aCode);

@@ -26,9 +26,6 @@ enum class FeRe {Feuillus,
                  Autre
                 };
 
-// ça c'était utilisé pour le calcul des carte apt, des tuiles et du code mapserveur. Encore utilisé par l'API forestimator
-enum TypeCarte {Apt, Potentiel, Station1, Habitats,NH,NT,Topo,AE,SS,ZBIO,CSArdenne,CSLorraine,MNH,Composition,MNT16b};
-
 enum class TypeWMS {WMS,
                     ArcGisRest
                    };
@@ -566,11 +563,8 @@ public:
     cdicoAptBase * Dico(){return mDico;}
     std::string printRisque();
 
-    //TypeCarte Type(){return mType;}
-
 private:
     FeRe mFeRe;
-    //TypeCarte mType;
     cdicoAptBase *mDico;
     std::string mCode, mNomFR, mF_R, mPrefix;
 };

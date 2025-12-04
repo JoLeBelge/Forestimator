@@ -59,7 +59,6 @@ inline bool exists (const std::string& name){
     return (stat (name.c_str(), &buffer) == 0);
 }
 
-TypeCarte str2TypeCarte(const std::string& str);
 TypeVar str2TypeVar(const std::string& str);
 TypeLayer str2TypeLayer(const std::string& str);
 
@@ -175,7 +174,6 @@ public:
     std::string getLegendLabel(bool escapeChar=true) const;
     std::string getShortLabel() const {return mNomCourt;}
 
-    TypeCarte TypeCart(){return mTypeCarte;}
     std::map<int, std::string> getDicoVal(){return mDicoVal;}
     std::map<int, std::shared_ptr<color>>  getDicoCol(){return mDicoCol;}
 
@@ -233,10 +231,10 @@ public:
         return aRes;
     }
 
+    void edit_ColorInterpPalette();
     void createRasterColorInterpPalette(GDALRasterBand * aBand);
 
 protected:
-    TypeCarte mTypeCarte;
     TypeVar mTypeVar; // var continue ou discontinue, pour le calcul de statistique
     TypeLayer mType;
     cDicoApt * mDico;

@@ -26,29 +26,19 @@ namespace bf =boost::filesystem;
 bool climat(0);
 std::vector<int> vYears={2016,2017,2018,2019,2020};
 std::vector<int> vMonths={3,4,5,6,7,8,9};
-//std::vector<std::string> vVAR={"Tmean","Tmax","Tmin","ETP","P","R","DJ"};
 std::vector<std::string> vVAR={"Tmean","Tmax","Tmin","ETP","P","R"};
 int globSeuilPres(70);
 
 void statDendro(std::string aShp);
 
-/* jo 2020
-Projet RégioWood 2 et thèse de Arthur G.
+/* jo 2020 - Projet RégioWood 2 et thèse de Arthur G.
 J'aimerai avoir un code c++ avec gdal qui effectue une description stationnelle au départ d'un shapefile.
-En gros la même chose que je faisais déjà avec la librairie micmac mais en plus propre et avec gdal, meilleure portabilité
-Je vais integrer mon dictionnaire Apt comme cela j'aurais accès au dictionnaire des cartes raster, au aptitude, au dictionnaire cnsw
-
-j'ai besoin de calculer le NH maj, NT majoritaire, aptitude, hdom, Zbio, SS, AE, Topo, cnsw : drainage, prof sol, texture
-
-2) thèse MP et démarche similaire mais avec Catalogues Station en premier plan, MNH2014 + MNH2019, probabilité HE
-le masque de forêt Hetraie mature sert pour la selection de nos tuile
-
-
 ./stationDesc --shp "/home/jo/Documents/Alice/pt/dispoEnEx.shp" --outil 1 --dirIRMMap "/home/jo/Documents/Scolyte/Data/climat/IRM/irmCarte/" --meteo 1 --dirBDForestimator "/home/jo/app/Forestimator/carteApt/data/aptitudeEssDB.db"
-
+./stationDesc --outil 200 --dirBDForestimator "/home/jo/app/Forestimator/carteApt/data/aptitudeEssDB.db"
 */
 
 bool test(0);
+extern bool globTest;
 void descriptionStation(std::string aShp);
 
 OGRPoint * getCentroid(OGRPolygon * hex);
@@ -71,8 +61,6 @@ void anaScolyteOnShp(rasterFiles * raster, std::string aShp);
 
 int main(int argc, char *argv[])
 {
-
-    // Declare the supported options.
     po::options_description desc("Allowed options");
     desc.add_options()
             ("help", "produce help message")
@@ -92,6 +80,8 @@ int main(int argc, char *argv[])
     po::store(po::parse_command_line(argc, argv, desc), vm);
     po::notify(vm);
 
+    globTest=1;
+
     if (vm.count("help")) {
         cout << desc << "\n";
         return 1;
@@ -99,6 +89,8 @@ int main(int argc, char *argv[])
 
     columnPath="Dir3";
     if (vm.count("colPath")) {columnPath=vm["colPath"].as<std::string>();std::cout << " colPath =" << columnPath << std::endl;}
+
+    if (vm.count("dirBDForestimator")){dirBD =vm["dirBDForestimator"].as<std::string>();}
 
     if (vm.count("outil")) {
         GDALAllRegister();
@@ -111,13 +103,9 @@ int main(int argc, char *argv[])
             if (vm.count("shp")) {
                 std::string file(vm["shp"].as<std::string>());
                 if (vm.count("meteo")){climat =vm["meteo"].as<bool>();}
-
                 if (vm.count("dirIRMMap")){dirIRMMap =vm["dirIRMMap"].as<std::string>();}
-                if (vm.count("dirBDForestimator")){dirBD =vm["dirBDForestimator"].as<std::string>();}
                 if (vm.count("dirMapDescr")){dirMapDescr =vm["dirMapDescr"].as<std::string>();}
-
                 descriptionStation(file);
-
 
             } else {
                 std::cout << "vous devez obligatoirement renseigner le shapefile en entrée avec l'argument shp" << std::endl;
@@ -131,7 +119,7 @@ int main(int argc, char *argv[])
                 if (vm.count("meteo")){climat =vm["meteo"].as<bool>();}
 
                 if (vm.count("dirIRMMap")){dirIRMMap =vm["dirIRMMap"].as<std::string>();}
-                if (vm.count("dirBDForestimator")){dirBD =vm["dirBDForestimator"].as<std::string>();}
+
                 if (vm.count("dirMapDescr")){dirMapDescr =vm["dirMapDescr"].as<std::string>();}
 
                 statDendro(file);
@@ -266,51 +254,24 @@ int main(int argc, char *argv[])
             break;
         }
 
-            // Marie pierre; je veux créer des tuiles à partir d'un masque de hetraie mature
         case 200:{
-
-            // test html2text
-            /*int mode = HTMLDriver::PRINT_AS_ASCII;
-            iconvstream is;
-            bool toto(false);
-            int width(79);
-            const char *input_file = "/home/jo/app/html2text/tests/montest.html";
-            HTMLControl control(is, mode, false, input_file);
-            HTMLDriver driver(control, is, toto, width, mode, toto);
-
-            if (driver.parse() != 0)*/
-            // ouverture du fichier xml et on retire les balises xml (pas celle html)
-
-
-            //std::string aCommand="./html2text -from_encoding UTF8 "+std::to_string(mVProduts.at(0)->mXmin)+" "+std::to_string(mVProduts.at(0)->mYmin)+" "+std::to_string(mVProduts.at(0)->mXmax)+" "+std::to_string(mVProduts.at(0)->mYmax)+ " -t_srs EPSG:"+std::to_string(epsg)+" -ot Byte -overwrite -tr 10 10 "+ masqueRW+ " "+ out;
-            //std::cout << aCommand << std::endl;
-            //system(aCommand.c_str());
-            /*std::string file(vm["shp"].as<std::string>());
-            xml_document<> doc;
-            xml_node<> * root_node;
-            std::ifstream theFile (file);
-            std::vector<char> buffer((std::istreambuf_iterator<char>(theFile)), std::istreambuf_iterator<char>());
-            buffer.push_back('\0');
-            // Parse the buffer using the xml file parsing library into doc
-            doc.parse<0>(&buffer[0]);
-            // Find our root node
-            root_node = doc.first_node("messages");
-            for (xml_node<> * node = root_node->first_node("message"); node; node = node->next_sibling())
+            cDicoApt dico(dirBD);
+            dico.getLayerBase("COMPOALL")->edit_ColorInterpPalette();
+            std::shared_ptr<layerBase> l =dico.getLayerBase("COMPOALL");
+            GDALDataset  * mGDALDat = (GDALDataset *) GDALOpen( l->getPathTif().c_str(), GA_Update );
+            if( mGDALDat == NULL )
             {
-                std::cout << node->first_attribute("id")->value() << std::endl;
-                std::cout << "n = " << node-><< std::endl;
-
+                std::cout << "je n'ai pas lu l'image " << getPathTif() << std::endl;
+            } else {
+                mGDALDat->SetMetadataItem("Version","2025-12");
+                mGDALDat->SetMetadataItem("Crédit","Gembloux Agro-Bio Tech");
+                GDALClose( mGDALDat );
             }
-            */
-
             break;
         }
         default:
             break;
         }
-
-
-
     } else {
         cout << "pas d'outil choisi.\n";
     }
@@ -322,7 +283,6 @@ int main(int argc, char *argv[])
 void descriptionStation(std::string aShp){
     std::cout << "description du mileu pour les polygones d'un shp " << std::endl;
     cDicoApt dico(dirBD);
-    //dico.summaryRasterFile();
     std::string header("");// pour TA du shp input
     std::string headerProcessing;// il y a le header qui concernent la table d'attribut du shp puis ceux-ci qui concernent les statistiques calculées
 
@@ -439,26 +399,10 @@ void descriptionStation(std::string aShp){
              *
              */
 
-
             // selectionne les couches raster que je vais utiliser
             std::vector<std::string> aVCodes{"MNT","ZBIO","NT","NH","AE","SS","Topo","SWC","slope"};
 
-
-
-            // ajout kk sol ; prof drainage texture + sigle
-
-            //std::vector<std::string> aVCodes{"MNT","ZBIO","NT","NH","AE","SS","Topo","EP_FEE","slope","MNH2019","MNH2014"};// ,"EP_CS","CS_A"
-
-            /*
-            std::vector<std::string> aVCodes{"ZBIO","NT","NH","Topo"};// plus toutes les essences pour avoir les Aptitude pour l'IPRFW
-            for (std::string es : dico.getAllAcroEss()){
-                aVCodes.push_back(es+"_FEE");
-            }*/
-
-            //std::vector<std::string> aVCodes{"MNT","ZBIO","NT","NH","AE","SS","Topo","BV_FEE","BP_FEE","slope"};
-            //std::vector<std::string> aVCodes{"MNT","ZBIO","NT","NH","AE","SS","Topo"};
-            //std::vector<std::string> aVCodes{"COMPO6","MNH2019","MNH2014","slope", "CS_A","CS3","CS8","HE_FEE","HE_CS"};
-            std::vector<std::shared_ptr<layerBase>> aVLs;
+             std::vector<std::shared_ptr<layerBase>> aVLs;
 
             for (std::string aCode : aVCodes){
                 if (dico.hasLayerBase(aCode)){
@@ -613,9 +557,7 @@ void descriptionStation(std::string aShp){
                     std::cout << "Geometrie " << poGeom->getGeometryName() << " non pris en charge " << std::endl;
                     break;
                 }
-                //poGeom->closeRings();
-                //poGeom->flattenTo2D();
-                //poGeom->MakeValid();
+
                 std::map<int,std::string> aStatOnPol;
 
                 // je commence par écrire dans le vecteur de résultat la valeur des champs de la table d'attribu, comme cela j'aurai mes identifiant
@@ -1031,9 +973,6 @@ void echantillonTuiles(std::string aShp){
         std::shuffle(indices.begin(), indices.end(),e);
         std::cout << " indice size  " << indices.size() << " and nb non scolyté " << nbSamp << std::endl;
         for (int i(0);i<indices.size()-nbSamp;i++){
-            //std::cout << " suppression de tuile non scolytée " << i << std::endl;
-            //poFeature = lay->GetFeature();
-            //OGRFeature::DestroyFeature(poFeature);
             lay->DeleteFeature(indices.at(i));
         }
 
@@ -1130,10 +1069,6 @@ void anaScolyteOnShp(rasterFiles * raster, std::string aShp){
 
 }
 
-
-
-
-
 void statDendro(std::string aShp){
     std::cout << "description du peuplement pour les polygones d'un shp " << std::endl;
     cDicoApt dico(dirBD);
@@ -1179,13 +1114,14 @@ void statDendro(std::string aShp){
                 aStatOnPol.push_back(poFeature->GetFieldAsString(i));
             }
 
+            /* old old, à adapter si je veux réutiliser un jour
             statDendroBase stat(l,poGeom,1);
             aStatOnPol.push_back(stat.getHdom());
             aStatOnPol.push_back(stat.getVha());
             aStatOnPol.push_back(stat.getGha());
             aStatOnPol.push_back(stat.getNha());
             aStatOnPol.push_back(stat.getCmoy());
-            aStatOnPol.push_back(stat.getSdCmoy());
+            aStatOnPol.push_back(stat.getSdCmoy());*/
 
             //maintenant on converti la map en vecteur de string
             std::vector<std::string> vResOnPol;

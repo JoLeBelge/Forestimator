@@ -206,23 +206,6 @@ WMSinfo * cDicoApt::getWMSinfo(std::string aCode){
     return aRes;
 }
 
-
-TypeCarte str2TypeCarte(const std::string& str)
-{
-    TypeCarte aRes=SS;
-    if(str == "NH") aRes=NH;
-    else if(str == "NT") aRes=NT;
-    else if(str == "Topo") aRes=Topo;
-    else if(str == "AE") aRes=AE;
-    else if(str == "SS") aRes=SS;
-    else if(str == "ZBIO") aRes=ZBIO;
-    else if(str == "CSArdenne") aRes=CSArdenne;
-    else if(str == "CSLorraine") aRes=CSLorraine;
-    else if(str == "Composition") aRes=Composition;
-    else if(str == "MNH") aRes=MNH;
-    return aRes;
-}
-
 TypeVar str2TypeVar(const std::string& str){
     TypeVar aRes=TypeVar::Classe;
     if(str == "Continu") {
@@ -517,9 +500,9 @@ std::vector<std::string> cDicoApt::parseHdomArg(std::string aArgs){
         std::vector<std::string> aV;
         boost::split( aV,aArgs,boost::is_any_of(","),boost::token_compress_on);
         for (std::string code: aV){
-            if (hasLayerBase(code) & (getLayerBase(code)->TypeCart()==TypeCarte::MNH)){
+            //if (hasLayerBase(code) & (getLayerBase(code)->TypeCart()==TypeCarte::MNH)){
                 aRes.push_back(code);
-            }
+            //}
         }
     }
     return aRes;
@@ -531,19 +514,6 @@ std::string cDicoApt::parsePointArg(std::string aArgs){
     return aRes;
 }
 
-std::vector<std::string> cDicoApt::parseCompoArg(std::string aArgs){
-    std::vector<std::string> aRes;
-    if (aArgs==""){ aRes={"COMPO1","COMPO2","COMPO3","COMPO4","COMPO5","COMPO6","COMPO7","COMPO8","COMPO9"};} else{
-        std::vector<std::string> aV;
-        boost::split( aV,aArgs,boost::is_any_of(","),boost::token_compress_on);
-        for (std::string code: aV){
-            if (hasLayerBase(code) & (getLayerBase(code)->TypeCart()==TypeCarte::Composition)){
-                aRes.push_back(code);
-            }
-        }
-    }
-    return aRes;
-}
 
 std::map<int,double> cDicoApt::simplifieAptStat(std::map<int,double> aStat){
     std::map<int,double> aRes;
@@ -556,3 +526,10 @@ std::map<int,double> cDicoApt::simplifieAptStat(std::map<int,double> aStat){
     // avec clé 1, 2, 3, 4, 11
     return aRes;
 }
+
+std::string putInBalise(std::string aCont,std::string aBalise){
+
+    return "<"+aBalise+">"+aCont+"</"+aBalise+">\n";
+
+}
+

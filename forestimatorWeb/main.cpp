@@ -100,9 +100,6 @@ int launchForestimator(int argc, char **argv)
         Wt::WFileResource *fileResource = new Wt::WFileResource("application/x-sqlite3", dico->File("docroot") + "ACR.db");
         fileResource->suggestFileName("ACR.db");
         server.addResource(fileResource, "/telechargement/ACR");
-        Wt::WFileResource *fileResource2 = new Wt::WFileResource("application/x-sqlite3", dico->File("docroot") + "desserteForest.db");
-        fileResource2->suggestFileName("desserteForest.db");
-        server.addResource(fileResource2, "/telechargement/desserteForest");
 
         Wt::WFileResource *fileResource4 = new Wt::WFileResource("application/pdf", dico->File("docroot") + "pdf/invitationCarrefourForestier2025.pdf");
         fileResource4->suggestFileName("invitationCarrefourForestier2025.pdf");
@@ -132,12 +129,6 @@ int launchForestimator(int argc, char **argv)
 
 std::unique_ptr<Wt::WApplication> createWebAptitudeApplication(const Wt::WEnvironment &env, cDicoApt *dico)
 {
-    // std::cout << env.internalPath() << " " << env.deploymentPath() << std::endl;
-    // std::cout << env.getParameter("a0") << std::endl;
-    /*std::cout << "ffor: " << env.headerValue("X-Forwarded-For") << std::endl;
-    std::cout << "fpro: " << env.headerValue("X-Forwarded-Prot") << std::endl;
-    std::cout << "ip: " << env.headerValue("Client-IP") << std::endl;
-    std::cout << "ua: " << env.headerValue("User-Agent") << std::endl;*/
 
     if (env.internalPath() == "/documentation" || env.internalPath().substr(0, 14) == "/documentation")
     {
@@ -172,18 +163,12 @@ std::unique_ptr<Wt::WApplication> createWebAptitudeApplication(const Wt::WEnviro
     {
         auto app = std::make_unique<formOGF>(env, dico, dico->File("docroot") + "OGF.db");
         return app;
-        /*   }else if (env.internalPath() == "/encodage.coupe.rase"){
-               auto app = std::make_unique<formVielleCoupeRase>(env,dico, dico->File("docroot")+"ACR.db");
-               return app;
-           }else if (env.internalPath() == "/encodage.desserteForest"){
-                   auto app = std::make_unique<formDesserteForest>(env,dico, dico->File("docroot")+"desserteForest.db");
-                   return app;*/
     }
-    else if (env.internalPath() == "/encodage.terrain")
+   /* else if (env.internalPath() == "/encodage.terrain")
     {
         auto app = std::make_unique<encodageRelTerrain>(env, dico->File("docroot") + "ACR.db");
         return app;
-    }
+    }*/
     else
     {
         std::cout << "internal path pas geré : " << env.internalPath() << std::endl;

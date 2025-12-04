@@ -359,7 +359,6 @@ layerBase::layerBase(std::string aCode,cDicoApt * aDico):rasterFiles(aDico->File
     mNomCourt=mDico->RasterNomCourt(mCode);
     mExpert=mDico->RasterExpert(mCode);
     mGain=mDico->RasterGain(mCode);
-    mTypeCarte =str2TypeCarte(mDico->RasterType(mCode));
     mTypeVar =str2TypeVar(mDico->RasterVar(mCode));
     mType =str2TypeLayer(mDico->RasterCategorie(mCode));
     mDicoVal=mDico->getDicoRaster(mCode);
@@ -384,7 +383,6 @@ layerBase::layerBase(std::shared_ptr<layerBase> aLB):rasterFiles(aLB->Dico()->Fi
     mGain=aLB->Gain();
     mNom=aLB->Nom();
     mNomCourt=aLB->NomCourt();
-    mTypeCarte =aLB->TypeCart();
     mTypeVar =aLB->getTypeVar();
     mType=aLB->getCatLayer();
     mDicoVal=aLB->getDicoVal();
@@ -459,7 +457,23 @@ void layerBase::createRasterColorInterpPalette(GDALRasterBand * aBand){
     e.c3=col->mB;
     colors.SetColorEntry(kv.first,&e);
     }
+    if (globTest){
+        std::cout << " colorTable have " << colors.GetColorEntryCount() << " entries" << std::endl;
+    }
+
     aBand->SetColorTable(&colors);
+}
+
+void layerBase::edit_ColorInterpPalette(){
+    GDALDataset  * mGDALDat = (GDALDataset *) GDALOpen( getPathTif().c_str(), GA_Update );
+    if( mGDALDat == NULL )
+    {
+        std::cout << "je n'ai pas lu l'image " << getPathTif() << std::endl;
+    } else {
+        GDALRasterBand * mBand = mGDALDat->GetRasterBand( 1 );
+        createRasterColorInterpPalette(mBand);
+        GDALClose( mGDALDat );
+    }
 }
 
 

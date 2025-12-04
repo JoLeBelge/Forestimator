@@ -27,8 +27,6 @@ NOUVELLES OPTIONS
 --> polygone
 Requiert un module d'authentification et un outils de versionning
 
--Formulaire d'encodage de placette d'inventaire -> Pour le moment utilisation de la suite "collect" de open foris
-
 -outils de cubage
 
 -gestion de projets et téléchargement de couche offline sur l'extend du projet uniquement. Un projet = un extend. puis des couches offlines sur cet extend.

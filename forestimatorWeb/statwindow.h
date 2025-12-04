@@ -10,7 +10,6 @@
 #include <Wt/Render/WPdfRenderer.h>
 #include <Wt/WApplication.h>
 //#include "iostream"
-//#include "wkhtml/wkhtmlutil.h"
 
 class statWindow;
 class cWebAptitude;

@@ -1,5 +1,0 @@
-note pour les services;
-quand on a changé le bash, il faut le copier dans etc/systemd/system
-
-cp webaptitude.service /etc/systemd/system/webaptitude.service
-ensuite systemctl daemon-reload

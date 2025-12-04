@@ -3,13 +3,6 @@
 
 extern bool globTest;
 
-
-std::string putInBalise(std::string aCont,std::string aBalise){
-
-    return "<"+aBalise+">"+aCont+"</"+aBalise+">\n";
-
-}
-
 void stationDescResource::handleRequest(const Http::Request &request,Http::Response &response){
 
     if (request.path().substr(request.path().size()-4,4)=="help"){
