@@ -52,7 +52,7 @@ public:
     std::map<int,std::string> getDicoRaster(std::string aCode);
     std::map<std::string,std::string>  * Files(){return  &Dico_GISfile;}
     // code carte vers type carte code : NH.tif
-    std::map<std::string,std::string>  * RasterType(){return  &Dico_RasterType;}
+    //std::map<std::string,std::string>  * RasterType(){return  &Dico_RasterType;}
     std::map<std::string,std::string>  * RasterVar(){return  &Dico_RasterVar;}
     std::map<std::string,std::string>  * RasterCategorie(){return  &Dico_RasterCategorie;}
     std::map<std::string,std::string>  * RasterNom(){return  &Dico_RasterNomComplet;}
@@ -76,11 +76,7 @@ public:
         if (Dico_RasterExpert.find(aCode)!=Dico_RasterExpert.end()){aRes=Dico_RasterExpert.at(aCode);}
         return aRes;
     }
-    std::string RasterType(std::string aCode){
-        std::string aRes("not found");
-        if (Dico_RasterType.find(aCode)!=Dico_RasterType.end()){aRes=Dico_RasterType.at(aCode);}
-        return aRes;
-    }
+
     std::string RasterTable(std::string aCode){
         std::string aRes("not found");
         if (Dico_RasterTable.find(aCode)!=Dico_RasterTable.end()){aRes=Dico_RasterTable.at(aCode);}

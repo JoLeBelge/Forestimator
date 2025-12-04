@@ -85,7 +85,7 @@ cDicoApt::cDicoApt(std::string aBDFile):cdicoAptBase(aBDFile)
 
         // toutes les layerbase
         if (globTest){   std::cout << "crée toute les layerbase " << std::endl;}
-        for (auto & pair : Dico_RasterType){
+        for (auto & pair : Dico_RasterNomCourt){
             std::shared_ptr<layerBase> l=std::make_shared<layerBase>(pair.first,this);
             if (l->getCatLayer()!=TypeLayer::Externe & !l->rasterExist()){
                 std::cout << "Attention layerBase " << l->Code() << ", fichier " << l->getPathTif() << " inexistant" << std::endl;

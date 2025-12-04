@@ -261,10 +261,12 @@ int main(int argc, char *argv[])
             GDALDataset  * mGDALDat = (GDALDataset *) GDALOpen( l->getPathTif().c_str(), GA_Update );
             if( mGDALDat == NULL )
             {
-                std::cout << "je n'ai pas lu l'image " << getPathTif() << std::endl;
+                std::cout << "je n'ai pas lu l'image " << l->getPathTif() << std::endl;
             } else {
                 mGDALDat->SetMetadataItem("Version","2025-12");
                 mGDALDat->SetMetadataItem("Crédit","Gembloux Agro-Bio Tech");
+                mGDALDat->GetRasterBand(1)->SetNoDataValue(255);
+                mGDALDat->GetRasterBand(1)->SetDescription("COMPO");
                 GDALClose( mGDALDat );
             }
             break;

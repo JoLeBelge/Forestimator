@@ -6548,15 +6548,9 @@ LAYER
    DATA "compo_all_sp.tif" 
    PROCESSING "BANDS=1" 
    CLASSITEM "[pixel]" 
-      CLASS 
-      NAME "NL - Non_Ligneous"
-      EXPRESSION "0"
-      STYLE 
-          COLOR 255 255 255
-       END
-   END
+     
    CLASS 
-      NAME "AU - Others"
+      NAME "AUb - Others broadleaves"
       EXPRESSION "1"
       STYLE 
           COLOR 166 206 227
@@ -6616,6 +6610,13 @@ LAYER
       EXPRESSION "9"
       STYLE 
           COLOR 202 178 214
+       END
+   END
+    CLASS 
+      NAME "AUc -  Others coniferous"
+      EXPRESSION "10"
+      STYLE 
+          COLOR 76 39 114
        END
    END
  METADATA
