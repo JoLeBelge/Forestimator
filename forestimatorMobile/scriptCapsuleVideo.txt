@@ -1,0 +1,42 @@
+COMMUNICATION/ DOCUMENTATION
+
+ressources actuelles : 
+reportage tvlux (Forestimator Mobile)
+https://www.tvlux.be/video/info/forestimator-l-application-qui-cartographie-les-forets-wallonnes_48278.html
+
+article Forêt.Nature (Forestimator Web)
+https://orbi.uliege.be/handle/2268/291563
+
+-vidéo d'utilisation
+
+l'idée est d'avoir une série de 2-4 capsules vidéos courtes (moins de 5 minutes) qui permettent d'illustrer l'utilisation de forestimator mobile. On aurai un intervenant différent pour chaque vidéo, qui commence par se présenter en une phrase, et qui introduit le contenu de la vidéo en une autre phrase. La présentation pourrait être dans le bureau du présentateur, alors que la suite de la vidéo se déroulerai en forêt. On aurait des scènes ou le présentateur est filmé en forêt avec en alternance des prises de vue de l'application (depuis un émulateur sur ordi, ou grace à l'enregistrement capture d'écran depuis android) avec la voie du présentateur pour expliquer ce qu'il fait.
+
+Supervision de loin : Jo Lisein - liseinjon@hotmail.com 0475221309
+Supervision de près : Thierry Thissen - tthissen@uliege.be 0497366991
+
+Prise de vue : Jonathan Demontis jdemontis@uliege.be (service communication)
+Montage : Jonathan Demontis et/ou Thierry Thissen
+
+-vidéo 1 INTRODUCTION - VISUALISATION DES CARTES ET DE LEUR LEGENDE : Florentin Reginster - Florentin.Reginster@uliege.be 0484813359
+
+Illustration de la position GPS de l'utilisateur sur la carte
+Si assez de temps : illustration de la geolocation - recherche d'un lieu
+Illustration de la sélection d'une couche carto dans le catalogue pour visulalisation. (aptitude FEE du chêne pédonculé par exemple)
+Illustration de la légende d'une couche pour une position donnée
+Illustration de la mise en transparence d'une couche carto (pour la CNSW par exemple) et du changement d'ordre de couche carto dans le "panier" (=sélection des couches de l'utilisateur)
+Consultation de la documentation relatif à une couche (le pdf - pour le guide des stations d'ardenne par exemple, ou pour les niveaux hydriques )
+
+-vidéo 2 ANALYSE PONCTUELLE - ANALYSE SURFACIQUE : Charlotte Longrée - C.Longree@uliege.be 0498814583
+
+Illustration de l'analyse ponctuelle (pour un point) - lecture des résultats de l'analyse ponctuelle
+Illustration de la digitalisation d'un polygone et de l'édition d'un polygone (ajout de vertex, retirer un vertex, déplacer un vertex). Eventuellement avec le cadastre en fond de carte pour digitaliser une parcelle cadastrale donnée
+Changer le nom d'un polygone
+Illustration de l'analyse surfacique pour un polygone et lecture des résultats
+
+-------------- ON Commence par faire les vidéos 1 et 2 et on verra par après pour les suivantes
+
+-vidéo 3 : MODE OFFLINE : Cédric Geertz? Thierry ? Ou Boris?
+Explication du mode offline, distinction des catalogues online et offline
+-vidéo 4 : Forestimator Web INTRODUCTION
+
+
