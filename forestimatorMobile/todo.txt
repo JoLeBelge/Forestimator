@@ -9,6 +9,10 @@ AJOUT DE COUCHES
 -ajouter couche plan de secteur
 -ajouter couche nouveau masque forestier
 
+RETIRER DES COUCHES
+
+on va ajouter une colonne boolean "Mobile" aux tables des layers pour renseigner si on les utilise dans Forestimator mobile ou uniquement dans Forestimator Web.
+
 SECURITE ET ROBUSTESSE
 
 -système de vérification de la disponibilité des couches WMSs?

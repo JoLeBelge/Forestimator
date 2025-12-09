@@ -821,9 +821,7 @@ GDALDataset * rasterFiles::rasterizeGeom(OGRGeometry *poGeom){
 
 // pour les couches des variables continues
 basicStat layerBase::computeBasicStatOnPolyg(OGRGeometry * poGeom){
-    if (globTest){std::cout << "compute BasicStat On Polyg" << std::endl;
-    std::cout << getDicoValStr() << std::endl;
-    }
+
     std::map<double,int> aMapValandFrequ;
     int nbNA(0);
 
@@ -838,13 +836,13 @@ basicStat layerBase::computeBasicStatOnPolyg(OGRGeometry * poGeom){
             }
         }
 
-        // c'est mon masque au format raster
-        GDALDataset * mask = rasterizeGeom(poGeom);
-
         OGREnvelope ext;
         poGeom->getEnvelope(&ext);
         double width((ext.MaxX-ext.MinX)), height((ext.MaxY-ext.MinY));
-        // std::cout << " x " << width<< " y " << height << std::endl;
+        if (width>0){
+
+        // c'est mon masque au format raster
+        GDALDataset * mask = rasterizeGeom(poGeom);
 
         GDALDataset  * mGDALDat = (GDALDataset *) GDALOpen( getPathTif().c_str(), GA_ReadOnly );
         if( mGDALDat == NULL )
@@ -905,6 +903,9 @@ basicStat layerBase::computeBasicStatOnPolyg(OGRGeometry * poGeom){
         }
         GDALClose(mask);
         GDALClose(mGDALDat);
+    }
+    } else {
+        std::cout << "layerBase::computeBasicStatOnPolyg : polygone de taille nulle" << std::endl;
     }
 
     if (aMapValandFrequ.size()>0) {

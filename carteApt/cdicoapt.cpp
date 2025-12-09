@@ -1,6 +1,6 @@
 #include "cdicoapt.h"
 
-std::string dirBD("/home/jo/Documents/carteApt/Forestimator/carteApt/data/aptitudeEssDB.db");
+std::string dirBD("/home/jo/app/Forestimator/carteApt/data/aptitudeEssDB.db");
 bool globTest(0);
 int globMaxSurf(200);
 

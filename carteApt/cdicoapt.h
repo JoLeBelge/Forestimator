@@ -8,8 +8,6 @@
 std::string removeAccents(std::string aStr);
 std::string putInBalise(std::string aCont,std::string aBalise);
 
-//extern std::string dirBD;
-
 class cdicoAptBase;
 class color;
 class cDicoApt;

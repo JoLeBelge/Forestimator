@@ -43,7 +43,7 @@
 using namespace std;
 using namespace Wt;
 
-#include "../stationDescriptor/rapidxml/rapidxml.hpp"
+#include "rapidxml/rapidxml.hpp"
 using namespace rapidxml;
 
 extern bool globTest;

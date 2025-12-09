@@ -22,8 +22,8 @@ INCLUDEPATH += $$PWD/libzipp/src/
 DEPENDPATH += $$PWD/libzipp/src/
 
 
-INCLUDEPATH += $$PWD../stationDescriptor/rapidxml/
-DEPENDPATH += $$PWD../stationDescriptor/rapidxml/
+INCLUDEPATH += $$PWD./rapidxml/
+DEPENDPATH += $$PWD./rapidxml/
 
 SOURCES += main.cpp \
     ../carteApt/cdicoaptbase.cpp \

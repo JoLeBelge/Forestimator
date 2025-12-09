@@ -19,12 +19,8 @@ std::vector<OGRPolygon*> hexGeombin(GDALDataset *mask);
 // renvoie une grille de point, centre d'hexagone
 std::vector<OGRPoint> hexbin(GDALDataset * mask);
 
-
 double predHdom(std::vector<double> aVHs);
 double getQ95(std::vector<double> aVHs);
-// dans Forestimator, un gros problème, c'est le fait que j'ai ma classe layer qui soiet strictement liée à Wt et à Forestimator (via grouplayer)
-// J'aurai du avoir une classe mère qui soie indépendante de Wt et me permette de faire des stats sur des cartes, exactement comme j'en ai besoin maintenant pour stationDescriptor
-// Du coup toute mes classe qui terminent par Base sont des classes SANS Wt qui sont intégrée dans le dictionnaire et qui sont donc utilisée pour les traitements API et autre du genre
 
 class basicStat;
 class cEss; // avec les aptitudes de l'essence
@@ -51,8 +47,6 @@ enum class TypeLayer {
 
 // forward dec
 class cDicoApt;
-
-
 
 inline bool exists (const std::string& name){
     struct stat buffer;

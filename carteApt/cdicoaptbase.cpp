@@ -1,6 +1,6 @@
 #include "cdicoaptbase.h"
 
-std::string columnPath("Dir2");
+std::string columnPath("Dir3");
 extern bool globTest;
 
 cdicoAptBase::cdicoAptBase(std::string aBDFile):mBDpath(aBDFile),ptDb_(NULL)
