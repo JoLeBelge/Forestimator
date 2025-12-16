@@ -160,7 +160,7 @@ void simplepoint::afficheAptAllEss()
                     break;
 
                 default:
-                    std::cout << "aptitude code non pris en compte" << std::endl;
+                    if (globTest){std::cout << "aptitude code non pris en compte" << std::endl;}
                     break;
                 }
             }

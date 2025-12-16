@@ -10,6 +10,8 @@
 
 using namespace Wt;
 
+extern bool globTest;
+
 namespace {
 
 Auth::AuthService myAuthService;
@@ -54,7 +56,7 @@ void Session::configureAuth()
 
 Session::Session(const std::string& sqliteDb)
 {
-    std::cout << "new Session()" << std::endl;
+    if (globTest){std::cout << "new Session()" << std::endl;}
     auto connection = std::make_unique<Dbo::backend::Sqlite3>(sqliteDb);
 
     connection->setProperty("show-queries", "false");
@@ -76,7 +78,7 @@ Session::Session(const std::string& sqliteDb)
     }
 
     users_ = std::make_unique<UserDatabase>(*this);
-    //std::cout << "done\n" << std::endl;
+
 }
 
 Auth::AbstractUserDatabase& Session::users()

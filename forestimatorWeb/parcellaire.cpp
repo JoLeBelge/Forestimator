@@ -167,7 +167,6 @@ bool parcellaire::computeGlobalGeom(std::string extension, bool limitSize)
             poGeom2 = poGeom2->Buffer(1.0); // ça marche bien on dirait! je sais pas si c'est le buffer 1 ou le simplify 1 qui enlève les inner ring (hole) qui restent.
             poGeomGlobale = poGeom2->Simplify(1.0);
             int aSurfha = OGR_G_Area(poGeomGlobale) / 10000;
-            printf("aSurfha=%d", aSurfha);
             if (!limitSize || aSurfha < globSurfMax)
             {
                 poGeomGlobale->getEnvelope(&mParcellaireExtent);

@@ -142,7 +142,7 @@ groupLayers::groupLayers(cWebAptitude *cWebApt) : mDico(cWebApt->mDico), m_app(c
     // updateGL pour cacher les couches expert
     // updateGL(); // -> bougé dans classe parent cwebapt car segfault not init refs !
 
-    std::cout << "done " << std::endl;
+    if (globTest){std::cout << "done " << std::endl;}
 }
 
 groupLayers::~groupLayers()
@@ -1044,49 +1044,44 @@ std::string getHtml(std::string groupCode)
     if (!isValidXmlIdentifier(title) || !isValidHtml(title))
     {
         title = "";
-        cout << "Warning: Title not found in FILE: forestimator-documentation.xml for TAG: " << groupCode << ".title" << endl;
+        if (globTest){cout << "Warning: Title not found in FILE: forestimator-documentation.xml for TAG: " << groupCode << ".title" << endl;}
     }
 
     std::string project = "<h4>Projet</h4>" + WString::tr(groupCode + ".projet").toUTF8();
     if (!isValidXmlIdentifier(project) || !isValidHtml(project))
     {
         project = "";
-        cout << "Warning: Project name/description not found in FILE: forestimator-documentation.xml for TAG: " << groupCode << ".projet" << std::endl;
     }
 
     std::string description = "<h4>Description</h4>" + WString::tr(groupCode + ".description").toUTF8();
     if (!isValidXmlIdentifier(description) || !isValidHtml(description))
     {
         description = "";
-        cout << "Warning: No description found in FILE: forestimator-documentation.xml for TAG: " << groupCode + ".description" << std::endl;
+        if (globTest){cout << "Warning: No description found in FILE: forestimator-documentation.xml for TAG: " << groupCode + ".description" << std::endl;}
     }
 
     std::string version = "<h4>Version</h4>" + WString::tr(groupCode + ".version").toUTF8();
     if (!isValidXmlIdentifier(version) || !isValidHtml(version))
     {
         version = "";
-        cout << "Warning: No version found in FILE: forestimator-documentation.xml for TAG: " << groupCode + ".version" << std::endl;
     }
 
     std::string logs = "<h4>Informations de modification</h4>" + WString::tr(groupCode + ".logs").toUTF8();
     if (!isValidXmlIdentifier(logs) || !isValidHtml(logs))
     {
         logs = "";
-        cout << "Warning: Logs not found in FILE: forestimator-documentation.xml for TAG: " << groupCode << ".logs" << endl;
     }
 
     std::string copyright = "<h4>Copyright</h4>" + WString::tr(groupCode + ".copyright").toUTF8();
     if (!isValidXmlIdentifier(copyright) || !isValidHtml(copyright))
     {
         copyright = "";
-        cout << "Warning: copyright not found in FILE: forestimator-documentation.xml for TAG: " << groupCode << ".copyright" << endl;
     }
 
     std::string references = "<h4>Références</h4>" + WString::tr(groupCode + ".ref").toUTF8();
     if (!isValidXmlIdentifier(references) || !isValidHtml(references))
     {
         references = "";
-        cout << "Warning: References not found in FILE: forestimator-documentation.xml for TAG: " << groupCode << ".ref" << endl;
     }
     return title + project + description + version + logs + copyright + references;
 }

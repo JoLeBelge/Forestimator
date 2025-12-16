@@ -202,7 +202,6 @@ cWebAptitude::cWebAptitude(const Wt::WEnvironment& env, cDicoApt *dico)
     dialog_auth->contents()->addWidget(std::move(loadAuthWidget()));
 
     Wt::WContainerWidget* contPrincipal = layout->addWidget(Wt::cpp14::make_unique<Wt::WContainerWidget>());
-    std::cout << "cWebApt\n" << std::endl;
     contPrincipal->setContentAlignment(Wt::AlignmentFlag::Top);// j'ai mis ça sur deux ou trois conteneur car sinon j'ai un bug avec la taille de la page "catalogue station" qui augmente sa taille à l'infini (voir post sur e layout manager for a container which does not have a height that is constrained somehow, you need to specify AlignTop in the alignment flags of WContainerWidget::setLayout().
     GDALAllRegister();
 

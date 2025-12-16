@@ -93,7 +93,7 @@ cDicoApt::cDicoApt(std::string aBDFile):cdicoAptBase(aBDFile)
 
             mVlayerBase.emplace(std::make_pair(pair.first,l));
         }
-        //std::cout << "close connection (dicoApt)" << std::endl;
+
         closeConnection();
 
     }
@@ -109,10 +109,9 @@ cDicoApt::cDicoApt(std::string aBDFile):cdicoAptBase(aBDFile)
             }
         } else {std::cout << this->File("ZBIOSIMP") << " : n'existe pas" << std::endl;}
 
-    std::cout << "done " << std::endl;
+    if (globTest){std::cout << "done " << std::endl;}
     boost::filesystem::create_directories(File("TMPDIR"));
-    //std::cout << "Dico code essence --> nom essence francais a "<< Dico_codeEs2NomFR.size() << " elements \n" << std::endl;
-    //std::cout << "Dico gis file a "<< Dico_GISfile.size() << " elements \n" << std::endl;
+
 }
 
 

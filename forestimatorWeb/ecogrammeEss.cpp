@@ -22,7 +22,6 @@ void EcogrammeEss::paintEvent(Wt::WPaintDevice *paintDevice){
 
     draw(&painter);
     update();          // Trigger a repaint.
-    //std::cout << "done \n" << std::endl;
 }
 
 void EcogrammeEss::draw(Wt::WPainter *painter){

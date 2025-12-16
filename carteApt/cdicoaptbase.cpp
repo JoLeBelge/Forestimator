@@ -378,7 +378,6 @@ cdicoAptBase::cdicoAptBase(std::string aBDFile):mBDpath(aBDFile),ptDb_(NULL)
             mVEss.emplace(std::make_pair(pair.first,std::make_shared<cEss>(pair.first,this)));
         }
 
-        std::cout << "close connection (dicoAptBase)" << std::endl;
         closeConnection();
 
         // lecture de table avec dbo
@@ -400,7 +399,6 @@ cdicoAptBase::cdicoAptBase(std::string aBDFile):mBDpath(aBDFile),ptDb_(NULL)
         for (int us(1);us <18;us++){
            dbo::ptr<caracteristiqueCS>  pt = session.find<caracteristiqueCS>().where("zbio = ?").bind(1).where("station_id = ?").bind(us);
            caracteristiqueCS  kkCSCopy(pt.get());
-         //  if (globTest){std::cout <<"encore une caracteristiqueCS " << kkCSCopy.station_id << " , " << kkCSCopy.zbio <<  std::endl;}
            Dico_US2KK.emplace(std::make_pair(std::make_pair(kkCSCopy.zbio,kkCSCopy.station_id),kkCSCopy));
         }
 
@@ -411,7 +409,6 @@ cdicoAptBase::cdicoAptBase(std::string aBDFile):mBDpath(aBDFile),ptDb_(NULL)
 
 void cdicoAptBase::closeConnection(){
 
-    //int rc = sqlite3_close_v2(*db_);
     int rc = sqlite3_close(*db_);
     if( rc ) {
         fprintf(stderr, "Can't close database: %s\n\n\n", sqlite3_errmsg(*db_));
@@ -421,7 +418,7 @@ void cdicoAptBase::closeConnection(){
 int cdicoAptBase::openConnection(){
     int rc;
 
-    std::cout << "ouvre connexion avec BD dictionnaire ... avec colonne " << columnPath << " pour chemin access aux fichiers" << std::endl;
+    if (globTest){std::cout << "ouvre connexion avec BD dictionnaire ... avec colonne " << columnPath << " pour chemin access aux fichiers" << std::endl;}
     rc = sqlite3_open(mBDpath.c_str(), db_);
     // The 31 result codes are defined in sqlite3.h
 
@@ -455,8 +452,6 @@ std::map<int,std::map<std::string,int>> cdicoAptBase::getFEEApt(std::string aCod
                 // i == zone bioclim
                 std::string codeNTNH=code2NTNH(code);
                 int codeApt=Apt(apt);
-                // fuite de mémoire possible avec cette commande
-                //aRes[i].emplace(std::make_pair(codeNTNH,codeApt));
                 aRes.at(i).insert(std::make_pair(codeNTNH,codeApt));
             }
         }

@@ -21,12 +21,12 @@ int launchForestimator(int argc, char **argv)
     if (vm.count("BD"))
     {
         aBD = vm["BD"].as<std::string>();
-        std::cout << " chemin bd =" << aBD << std::endl;
+        if (globTest){std::cout << " chemin bd =" << aBD << std::endl;}
     }
     if (vm.count("colPath"))
     {
         columnPath = vm["colPath"].as<std::string>();
-        std::cout << " colPath =" << columnPath << std::endl;
+        if (globTest){std::cout << " colPath =" << columnPath << std::endl;}
     }
     cDicoApt *dico = new cDicoApt(aBD);
 
