@@ -38,6 +38,7 @@ int main(int argc, char *argv[])
     desc.add_options()
             ("help", "produce help message")
             ("outils", po::value<int>(), "choix de l'outil à utiliser. 1 : station Descriptor (1 layer, 1 shp polygone), 2 : ajout méta , 3 : aptCS, 4 aptFEE, 5 : carteNH, 6 carteProf")
+            ("test", po::value<bool>(), "debug")
             ("carteNT", po::value<bool>(), "calcul de la carte des NT")
             ("cartepH", po::value<bool>(), "calcul de la carte des pH")
             ("MNH_TS", po::value<bool>(), "preparation de la série temporelle de MNH pour Forestimator")
@@ -52,7 +53,8 @@ int main(int argc, char *argv[])
     po::store(po::parse_command_line(argc, argv, desc), vm);
     po::notify(vm);
 
-    globTest=1;
+    globTest=0;
+    if (vm.count("test")) { globTest=vm["test"].as<bool>();}
 
     std::vector<std::string> codeEss;
 

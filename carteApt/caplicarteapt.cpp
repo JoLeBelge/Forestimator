@@ -219,7 +219,7 @@ void cApliCarteApt::carteAptCS(std::shared_ptr<cEss> aEss, std::string aOut, boo
                     int US=dico->getStationIDFromStatNum(zbio,st);
                     //if (zbio== 4) { std::cout << "stat num pour " << st << " est " << US << std::endl;}
                     apt = aEss->getApt(zbio,US);
-
+                    if (globTest){std::cout << " aptitude de " << apt << " pour station " << st << " dans zbio " << zbio << std::endl;}
                     // version "aptitude CS sans le risque climatique, pour illu dans lettre OWSF
                     //apt = aEss->getApt(zbio,st,"",0);
                 }
