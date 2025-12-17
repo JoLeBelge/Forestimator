@@ -1,6 +1,7 @@
 #include "caplicarteapt.h"
 #include "capplicarteph.h"
 #include "boost/program_options.hpp"
+#include "algorithm"
 namespace po = boost::program_options;
 using namespace std;
 
@@ -24,28 +25,27 @@ using namespace std;
 extern std::string dirBD;
 extern string columnPath;
 
-//./carteApt --aptFEE 1 --pathBD "/home/jo/app/Forestimator/carteApt/data/aptitudeEssDB.db" --colPath Dir3
+// carte aptitude CS pour toutes les essences
+//./carteApt --outils 3 --pathBD "/home/jo/app/Forestimator/carteApt/data/aptitudeEssDB.db" --colPath Dir3
+// carte aptitude CS pour certaine essence uniquement
+//./carteApt --outils 3 --pathBD "/home/jo/app/Forestimator/carteApt/data/aptitudeEssDB.db" --colPath Dir3 --layerCode CP CS
 
-//./carteApt --carteProf 1 --pathBD "/home/jo/app/Forestimator/carteApt/data/carteFEE_NTpH.db"
+//./carteApt --outils 6 --pathBD "/home/jo/app/Forestimator/carteApt/data/carteFEE_NTpH.db"
 
 int main(int argc, char *argv[])
 {
     po::options_description desc("options pour l'outil de calcul des cartes ");
     desc.add_options()
             ("help", "produce help message")
-            ("outils", po::value<int>(), "choix de l'outil à utiliser. 1 : station Descriptor (1 layer, 1 shp polygone)")
+            ("outils", po::value<int>(), "choix de l'outil à utiliser. 1 : station Descriptor (1 layer, 1 shp polygone), 2 : ajout méta , 3 : aptCS, 4 aptFEE, 5 : carteNH, 6 carteProf")
             ("carteNT", po::value<bool>(), "calcul de la carte des NT")
             ("cartepH", po::value<bool>(), "calcul de la carte des pH")
-            ("carteNH", po::value<bool>(), "calcul de la carte des NH")
-            ("carteProf", po::value<bool>(), "calcul de la carte des Profondeurs")
-            ("aptFEE", po::value<bool>(), "calcul des cartes d'aptitude du FEE")
-            ("aptCS", po::value<bool>(), "calcul des cartes d'aptitude du CS")
             ("MNH_TS", po::value<bool>(), "preparation de la série temporelle de MNH pour Forestimator")
             ("pathBD", po::value<std::string>(), "chemin d'accès à la BD carteFEE_NTpH.db ou à aptitudeEssDB.db")
             ("colPath", po::value<std::string>(), "nom de la colonne de fichierGIS et layerApt propre à la machine (chemin d'accès couche en local)")
             ("gpkg", po::value<std::string>(), "gpkg in")
             ("gpkg_layer", po::value<std::string>(), "name of layer")
-            ("layerCode", po::value<std::vector<std::string>>()->multitoken(), "layer Code list, ex: --layerCode dendro_gha dendro_vha dendro_cdom dendro_hdom")
+            ("layerCode", po::value<std::vector<std::string>>()->multitoken(), "layer Code (or ess code) list, ex: --layerCode dendro_gha dendro_vha dendro_cdom dendro_hdom")
             ;
 
     po::variables_map vm;
@@ -54,17 +54,16 @@ int main(int argc, char *argv[])
 
     globTest=1;
 
+    std::vector<std::string> codeEss;
+
     if (vm.count("help")) {
         cout << desc << "\n";
         return 1;
     }
-    bool carteNT(0),cartepH(0),carteFEE(0),carteCS(0),matApt(0),carteNH(0), carteProf(0);
+    bool carteNT(0),cartepH(0),matApt(0);
     if (vm.count("carteNT")) {carteNT=vm["carteNT"].as<bool>();}
     if (vm.count("cartepH")) {cartepH=vm["cartepH"].as<bool>();}
-    if (vm.count("carteNH")) {carteNH=vm["carteNH"].as<bool>();}
-    if (vm.count("carteProf")) {carteProf=vm["carteProf"].as<bool>();}
-    if (vm.count("aptFEE")) {carteFEE=vm["aptFEE"].as<bool>();}
-    if (vm.count("aptCS")) {carteCS=vm["aptCS"].as<bool>();}
+
     if (vm.count("matApt")) {matApt=vm["matApt"].as<bool>();}
     if (vm.count("pathBD")) {dirBD=vm["pathBD"].as<std::string>();}
     if (vm.count("colPath")) {columnPath=vm["colPath"].as<std::string>();}
@@ -79,7 +78,7 @@ int main(int argc, char *argv[])
             cDicoApt dico(dirBD);
             if (vm.count("gpkg") & vm.count("layerCode")) {
                 std::string file(vm["gpkg"].as<std::string>());
-                //std::string code(vm["layerCode"].as<std::string>());
+
                 std::vector<std::string> codeList(vm["layerCode"].as<std::vector<std::string>>());
 
 
@@ -162,6 +161,68 @@ int main(int argc, char *argv[])
             break;
         }
 
+        case 3:{
+            std::cout << "calcul des cartes d'aptitude pour le guide des stations" << std::endl;
+            cDicoApt dico(dirBD);
+            cApliCarteApt aACA(&dico);
+
+            if (vm.count("layerCode")) {
+                codeEss=vm["layerCode"].as<std::vector<std::string>>();
+            }
+
+            // je boucle les layersbase et non les essences car j'ai besoin du chemin d'accès au raster
+            for (std::pair<std::string,std::shared_ptr<layerBase>>  kv : dico.VlayerBase()){
+
+                std::string essCode(kv.second->EssCode());
+
+                if (kv.second->getCatLayer()==TypeLayer::CS){
+                    std::shared_ptr<cEss> ess = dico.getEss(essCode);
+
+                    if (codeEss.size()==0){
+                        aACA.carteAptCS(ess,kv.second->getPathTif(),true);
+                    } else if (std::find(codeEss.begin(), codeEss.end(), essCode)!= codeEss.end()){
+                        aACA.carteAptCS(ess,kv.second->getPathTif(),true);
+                    }
+                }
+            }
+
+            // les cartes dérivées des CS
+            //aACA.carteDeriveCS();
+            break;
+        }
+        case 4:{
+            std::cout << "calcul des cartes d'aptitude pour le FEE" << std::endl;
+            cDicoApt dico(dirBD);
+            cApliCarteApt aACA(&dico);
+            if (vm.count("layerCode")) {
+                codeEss=vm["layerCode"].as<std::vector<std::string>>();
+            }
+            std::vector<std::string> codeEss(vm["layerCode"].as<std::vector<std::string>>());
+            // je boucle les layersbase et non les essences car j'ai besoin du chemin d'accès au raster
+            for (std::pair<std::string,std::shared_ptr<layerBase>>  kv : dico.VlayerBase()){
+                std::string essCode(kv.second->EssCode());
+                if (kv.second->getCatLayer()==TypeLayer::FEE){
+                    std::shared_ptr<cEss> ess = dico.getEss(essCode);
+
+                if (codeEss.size()==0){
+                    aACA.carteAptFEE(ess,kv.second->getPathTif(),true);
+                 } else if (std::find(codeEss.begin(), codeEss.end(), essCode)!= codeEss.end()){
+                    aACA.carteAptFEE(ess,kv.second->getPathTif(),true);
+                }
+            }
+            }
+            break;
+        }
+        case 5:{
+            calculNH(dirBD);
+            break;
+        }
+        case 6:{
+            calculProf(dirBD);
+            break;
+        }
+
+
         default:{
 
         }
@@ -173,39 +234,7 @@ int main(int argc, char *argv[])
         cAppliCartepH aAPH(dirBD,carteNT,cartepH);
     }
 
-    if (carteNH) {
-        calculNH(dirBD);
-    }
-    if (carteProf) {
-        calculProf(dirBD);
-    }
 
-    if (carteFEE | carteCS) {
-
-        cDicoApt dico(dirBD);
-        cApliCarteApt aACA(&dico);
-
-        if(1){
-            // je boucle les layersbase et non les essences car j'ai besoin du chemin d'accès au raster
-            for (std::pair<std::string,std::shared_ptr<layerBase>>  kv : dico.VlayerBase()){
-
-                std::string essCode(kv.second->EssCode()); //essCode =="AG"  | essCode =="AP" |essCode =="EK") |essCode =="PG" essCode =="PY" |essCode =="PZ"
-
-                if (carteFEE &&(kv.second->getCatLayer()==TypeLayer::FEE)){
-                    aACA.carteAptFEE(dico.getEss(essCode),kv.second->getPathTif(),true);
-                }
-                //|essCode =="JR" |essCode =="JH" |essCode =="NO" |essCode =="PN"|essCode =="PK"|essCode =="PC"|essCode =="PS" |essCode =="CR"  |
-                if (carteCS &&(kv.second->getCatLayer()==TypeLayer::CS) && (essCode =="AB"  | essCode =="CB" | essCode =="CO" |essCode =="PN")){
-                    std::shared_ptr<cEss> ess = dico.getEss(essCode);
-                    aACA.carteAptCS(ess,kv.second->getPathTif(),true);
-                }
-            }
-
-        }
-        // les cartes dérivées des CS
-        //aACA.carteDeriveCS();
-
-    }
     if (matApt){
         cDicoApt dico(dirBD);
         std::string aFileScribusTemp("/home/lisein/matAptRW2021/MatApt_Eco_RW.sla");
