@@ -371,103 +371,99 @@ class PopupPermissions extends StatelessWidget {
 
 class PopupDownloadSuccess {
   PopupDownloadSuccess(BuildContext context, String layerName) {
-    gl.refreshMainStack(() {
-      popupBarrierWrapper(
-        dismiss: false,
-        popup: AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadiusGeometry.circular(12.0),
-            side: BorderSide(color: gl.colorAgroBioTech, width: 2.0),
-          ),
-          backgroundColor: Colors.white,
-          title: Row(
-            children: [
-              forestimatorIcon(),
-              Text(
-                "Message",
-                style: TextStyle(
-                  color: Colors.black,
-                  fontWeight: FontWeight.w400,
-                  fontSize: gl.display.equipixel * gl.fontSizeM,
-                ),
+    presentPopup(
+      context: context,
+      dismiss: false,
+      popup: AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadiusGeometry.circular(12.0),
+          side: BorderSide(color: gl.colorAgroBioTech, width: 2.0),
+        ),
+        backgroundColor: Colors.white,
+        title: Row(
+          children: [
+            forestimatorIcon(),
+            Text(
+              "Message",
+              style: TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.w400,
+                fontSize: gl.display.equipixel * gl.fontSizeM,
               ),
-            ],
-          ),
-          content: Text(
-            "$layerName a été téléchargée avec succès.",
-            style: TextStyle(
-              color: Colors.black,
-              fontWeight: FontWeight.w400,
-              fontSize: gl.display.equipixel * gl.fontSizeM,
-            ),
-          ),
-          actions: [
-            TextButton(
-              style: dialogButtonStyle(
-                height: gl.display.equipixel * 12,
-                width: gl.display.equipixel * 20,
-              ),
-              child: Text("OK", style: dialogTextButtonStyle()),
-              onPressed: () {
-                gl.mainStackPopLast();
-                gl.refreshMainStack(() {});
-              },
             ),
           ],
         ),
-      );
-    });
+        content: Text(
+          "$layerName a été téléchargée avec succès.",
+          style: TextStyle(
+            color: Colors.black,
+            fontWeight: FontWeight.w400,
+            fontSize: gl.display.equipixel * gl.fontSizeM,
+          ),
+        ),
+        actions: [
+          TextButton(
+            style: dialogButtonStyle(
+              height: gl.display.equipixel * 12,
+              width: gl.display.equipixel * 20,
+            ),
+            child: Text("OK", style: dialogTextButtonStyle()),
+            onPressed: () {
+              dismissPopup();
+            },
+          ),
+        ],
+      ),
+    );
   }
 }
 
 class PopupDownloadFailed {
   PopupDownloadFailed(BuildContext context, String layerName) {
-    gl.refreshMainStack(() {
-      popupBarrierWrapper(
-        dismiss: false,
-        popup: AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadiusGeometry.circular(12.0),
-            side: BorderSide(color: gl.colorAgroBioTech, width: 2.0),
-          ),
-          backgroundColor: Colors.white,
-          title: Row(
-            children: [
-              forestimatorIcon(),
-              Text(
-                "Message",
-                style: TextStyle(
-                  color: Colors.black,
-                  fontWeight: FontWeight.w400,
-                  fontSize: gl.display.equipixel * gl.fontSizeM,
-                ),
+    presentPopup(
+      context: context,
+      dismiss: false,
+      popup: AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadiusGeometry.circular(12.0),
+          side: BorderSide(color: gl.colorAgroBioTech, width: 2.0),
+        ),
+        backgroundColor: Colors.white,
+        title: Row(
+          children: [
+            forestimatorIcon(),
+            Text(
+              "Message",
+              style: TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.w400,
+                fontSize: gl.display.equipixel * gl.fontSizeM,
               ),
-            ],
-          ),
-          content: Text(
-            "$layerName n'a pas été téléchargé.",
-            style: TextStyle(
-              color: Colors.black,
-              fontWeight: FontWeight.w400,
-              fontSize: gl.display.equipixel * gl.fontSizeM,
-            ),
-          ),
-          actions: [
-            TextButton(
-              style: dialogButtonStyle(
-                height: gl.display.equipixel * 12,
-                width: gl.display.equipixel * 20,
-              ),
-              child: Text("OK", style: dialogTextButtonStyle()),
-              onPressed: () {
-                gl.mainStackPopLast();
-                gl.refreshMainStack(() {});
-              },
             ),
           ],
         ),
-      );
-    });
+        content: Text(
+          "$layerName n'a pas été téléchargé.",
+          style: TextStyle(
+            color: Colors.black,
+            fontWeight: FontWeight.w400,
+            fontSize: gl.display.equipixel * gl.fontSizeM,
+          ),
+        ),
+        actions: [
+          TextButton(
+            style: dialogButtonStyle(
+              height: gl.display.equipixel * 12,
+              width: gl.display.equipixel * 20,
+            ),
+            child: Text("OK", style: dialogTextButtonStyle()),
+            onPressed: () {
+              dismissPopup();
+            },
+          ),
+        ],
+      ),
+    );
   }
 }
 
@@ -511,8 +507,7 @@ class PopupPolygonNotWellDefined {
               ),
               child: Text("OK", style: dialogTextButtonStyle()),
               onPressed: () {
-                gl.mainStackPopLast();
-                gl.refreshMainStack(() {});
+                dismissPopup();
               },
             ),
           ],
@@ -589,48 +584,46 @@ class PopupColorChooser {
     VoidCallback after,
   ) {
     pickerColor = currentColor;
-    gl.refreshMainStack(() {
-      popupBarrierWrapper(
-        dismiss: true,
-        popup: AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadiusGeometry.circular(12.0),
-            side: BorderSide(color: gl.colorAgroBioTech, width: 2.0),
-          ),
-          backgroundColor: Colors.white,
-          title: Text(
-            "Choisissez une couleur!",
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: Colors.black,
-              fontWeight: FontWeight.w500,
-              fontSize: gl.display.equipixel * gl.fontSizeM,
-            ),
-          ),
-          content: SingleChildScrollView(
-            child: ColorPicker(
-              pickerColor: pickerColor,
-              onColorChanged: colorChange,
-            ),
-          ),
-          actions: [
-            TextButton(
-              style: dialogButtonStyle(
-                height: gl.display.equipixel * 12,
-                width: gl.display.equipixel * 20,
-              ),
-              child: Text("OK", style: dialogTextButtonStyle()),
-              onPressed: () {
-                currentColor = pickerColor;
-                gl.mainStackPopLast();
-                gl.refreshMainStack(() {});
-                after();
-              },
-            ),
-          ],
+    presentPopup(
+      context: context,
+      dismiss: true,
+      popup: AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadiusGeometry.circular(12.0),
+          side: BorderSide(color: gl.colorAgroBioTech, width: 2.0),
         ),
-      );
-    });
+        backgroundColor: Colors.white,
+        title: Text(
+          "Choisissez une couleur!",
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: Colors.black,
+            fontWeight: FontWeight.w500,
+            fontSize: gl.display.equipixel * gl.fontSizeM,
+          ),
+        ),
+        content: SingleChildScrollView(
+          child: ColorPicker(
+            pickerColor: pickerColor,
+            onColorChanged: colorChange,
+          ),
+        ),
+        actions: [
+          TextButton(
+            style: dialogButtonStyle(
+              height: gl.display.equipixel * 12,
+              width: gl.display.equipixel * 20,
+            ),
+            child: Text("OK", style: dialogTextButtonStyle()),
+            onPressed: () {
+              currentColor = pickerColor;
+              dismissPopup();
+              after();
+            },
+          ),
+        ],
+      ),
+    );
   }
 }
 
@@ -642,65 +635,59 @@ class PopupNameIntroducer {
     VoidCallback after,
     VoidCallback callbackOnStartTyping,
   ) {
-    gl.refreshMainStack(() {
-      popupBarrierWrapper(
-        dismiss: true,
-        popup: AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadiusGeometry.circular(12.0),
-            side: BorderSide(color: gl.colorAgroBioTech, width: 2.0),
-          ),
-          backgroundColor: Colors.white,
-          content: SizedBox(
-            width:
-                gl.display.orientation == Orientation.portrait
-                    ? gl.menuBarLength * gl.display.equipixel
-                    : gl.menuBarLength * gl.display.equipixel * 1.75,
-            height:
-                gl.display.orientation == Orientation.portrait
-                    ? gl.menuBarThickness * gl.display.equipixel * 1.75
-                    : gl.menuBarThickness * gl.display.equipixel * .9,
-            child: SingleChildScrollView(
-              child: switchRowColWithOrientation([
-                SizedBox(
-                  width: gl.menuBarLength * gl.display.equipixel,
-                  child: TextFormField(
-                    maxLength: 22,
-                    maxLengthEnforcement: MaxLengthEnforcement.enforced,
-                    onChanged: (String str) {
-                      state(str);
-                    },
-                    onTap: () => callbackOnStartTyping(),
-                    onTapOutside: (pointer) {
-                      gl.mainStackPopLast();
-                      gl.refreshMainStack(() {});
-                      after();
-                    },
-                    controller: TextEditingController(text: currentName),
-                  ),
-                ),
-                SizedBox(
-                  width: gl.menuBarLength * .5 * gl.display.equipixel,
-                  child: TextButton(
-                    style: dialogButtonStyle(
-                      height: gl.display.equipixel * 12,
-                      width: gl.display.equipixel * 10 * "Ok".length,
-                    ),
-                    child: Text("Ok", style: dialogTextButtonStyle()),
-                    onPressed: () {
-                      gl.mainStackPopLast();
-                      gl.refreshMainStack(() {});
-                      after();
-                    },
-                  ),
-                ),
-              ]),
-            ),
-          ),
-          actions: [],
+    presentPopup(
+      context: context,
+      dismiss: true,
+      popup: AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadiusGeometry.circular(12.0),
+          side: BorderSide(color: gl.colorAgroBioTech, width: 2.0),
         ),
-      );
-    });
+        backgroundColor: Colors.white,
+        content: SizedBox(
+          width: gl.display.orientation == Orientation.portrait
+              ? gl.menuBarLength * gl.display.equipixel
+              : gl.menuBarLength * gl.display.equipixel * 1.75,
+          height: gl.display.orientation == Orientation.portrait
+              ? gl.menuBarThickness * gl.display.equipixel * 1.75
+              : gl.menuBarThickness * gl.display.equipixel * .9,
+          child: SingleChildScrollView(
+            child: switchRowColWithOrientation([
+              SizedBox(
+                width: gl.menuBarLength * gl.display.equipixel,
+                child: TextFormField(
+                  maxLength: 22,
+                  maxLengthEnforcement: MaxLengthEnforcement.enforced,
+                  onChanged: (String str) {
+                    state(str);
+                  },
+                  onTap: () => callbackOnStartTyping(),
+                  onTapOutside: (pointer) {
+                    dismissPopup();
+                    after();
+                  },
+                  controller: TextEditingController(text: currentName),
+                ),
+              ),
+              SizedBox(
+                width: gl.menuBarLength * .5 * gl.display.equipixel,
+                child: TextButton(
+                  style: dialogButtonStyle(
+                    height: gl.display.equipixel * 12,
+                    width: gl.display.equipixel * 10 * "Ok".length,
+                  ),
+                  child: Text("Ok", style: dialogTextButtonStyle()),
+                  onPressed: () {
+                    dismissPopup();
+                    after();
+                  },
+                ),
+              ),
+            ]),
+          ),
+        ),
+      ),
+    );
   }
 }
 
@@ -3333,85 +3320,115 @@ TextStyle styleSettingMenu() {
 Widget forestimatorSettingsPermissions(VoidSetter state) {
   return Container(
     padding: EdgeInsets.all(7.5),
+    constraints: BoxConstraints(
+      maxWidth: gl.display.equipixel * gl.popupWindowsPortraitWidth * 0.95,
+    ),
     child: Column(
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Text(
-              "Gestion des permissions",
-              overflow: TextOverflow.clip,
-              textAlign: TextAlign.left,
-              style: styleSettingMenu(),
-            ),
-          ],
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Text(
-              "GPS: ",
-              overflow: TextOverflow.clip,
-              textAlign: TextAlign.left,
-              style: styleSettingMenu(),
-            ),
-            TextButton(
-              onPressed: () {
-                openPhoneForestimatorSettings();
-              },
-              child: Row(
-                children: [
-                  Icon(
-                    getLocation()
-                        ? Icons.check_circle
-                        : Icons.circle_notifications,
-                    color: getLocation() ? Colors.green : Colors.red,
-                    size: gl.display.equipixel * gl.iconSizeM * .6,
-                  ),
-                  Text(
-                    getLocation() ? "Accordé." : "Pas accordé.",
-                    overflow: TextOverflow.clip,
-                    textAlign: TextAlign.left,
-                    style: styleSettingMenu(),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-        if (permissions.sdkInt < 33)
-          Row(
+        Container(
+          constraints: BoxConstraints(
+            maxWidth: gl.display.equipixel * gl.popupWindowsPortraitWidth * 0.95,
+          ),
+          child: Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               Text(
-                "Stockage des pdf: ",
+                "Gestion des permissions",
                 overflow: TextOverflow.clip,
                 textAlign: TextAlign.left,
                 style: styleSettingMenu(),
+              ),
+            ],
+          ),
+        ),
+        Container(
+          constraints: BoxConstraints(
+            maxWidth: gl.display.equipixel * gl.popupWindowsPortraitWidth * 0.95,
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Flexible(
+                child: Text(
+                  "GPS: ",
+                  overflow: TextOverflow.clip,
+                  textAlign: TextAlign.left,
+                  style: styleSettingMenu(),
+                ),
               ),
               TextButton(
                 onPressed: () {
                   openPhoneForestimatorSettings();
                 },
-                child: Row(
-                  children: [
-                    Icon(
-                      getStorage()
-                          ? Icons.check_circle
-                          : Icons.circle_notifications,
-                      color: getStorage() ? Colors.green : Colors.red,
-                      size: gl.display.equipixel * gl.iconSizeM * .6,
-                    ),
-                    Text(
-                      getStorage() ? "Accordé." : "Pas accordé.",
-                      overflow: TextOverflow.clip,
-                      textAlign: TextAlign.left,
-                      style: styleSettingMenu(),
-                    ),
-                  ],
+                child: Flexible(
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        getLocation()
+                            ? Icons.check_circle
+                            : Icons.circle_notifications,
+                        color: getLocation() ? Colors.green : Colors.red,
+                        size: gl.display.equipixel * gl.iconSizeM * .6,
+                      ),
+                      Flexible(
+                        child: Text(
+                          getLocation() ? "Accordé." : "Pas accordé.",
+                          overflow: TextOverflow.clip,
+                          textAlign: TextAlign.left,
+                          style: styleSettingMenu(),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],
+          ),
+        ),
+        if (permissions.sdkInt < 33)
+          Container(
+            constraints: BoxConstraints(
+              maxWidth: gl.display.equipixel * gl.popupWindowsPortraitWidth * 0.95,
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Text(
+                  "Stockage des pdf: ",
+                  overflow: TextOverflow.clip,
+                  textAlign: TextAlign.left,
+                  style: styleSettingMenu(),
+                ),
+                TextButton(
+                  onPressed: () {
+                    openPhoneForestimatorSettings();
+                  },
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        getStorage()
+                            ? Icons.check_circle
+                            : Icons.circle_notifications,
+                        color: getStorage() ? Colors.green : Colors.red,
+                        size: gl.display.equipixel * gl.iconSizeM * .6,
+                      ),
+                      Flexible(
+                        child: Text(
+                          getStorage() ? "Accordé." : "Pas accordé.",
+                          overflow: TextOverflow.clip,
+                          textAlign: TextAlign.left,
+                          style: styleSettingMenu(),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
       ],
     ),
@@ -3803,6 +3820,50 @@ Widget popupPolygonListMenu(
   );
 }
 
+Widget popupSettingsMenu(
+  BuildContext context,
+  String currentName,
+  VoidCallback state,
+  VoidCallback after,
+) {
+  return MaterialApp(
+    home: OrientationBuilder(
+      builder: (context, orientation) {
+        return AlertDialog(
+          alignment: Alignment.center,
+          titlePadding: EdgeInsets.all(0),
+          actionsPadding: EdgeInsets.all(0),
+          contentPadding: EdgeInsets.all(0),
+          insetPadding: EdgeInsets.all(0),
+          buttonPadding: EdgeInsets.all(0),
+          iconPadding: EdgeInsets.all(0),
+          backgroundColor: gl.backgroundTransparentBlackBox,
+          surfaceTintColor: Colors.transparent,
+          shadowColor: Colors.transparent,
+          content: Theme(
+            data: Theme.of(context).copyWith(
+              canvasColor: Colors.transparent,
+              shadowColor: Colors.transparent,
+            ),
+            child: SizedBox(
+              width:
+                  gl.display.orientation == Orientation.portrait
+                      ? gl.display.equipixel * gl.popupWindowsPortraitWidth
+                      : gl.display.equipixel * gl.popupWindowsLandscapeWidth,
+              height:
+                  gl.display.orientation == Orientation.portrait
+                      ? gl.display.equipixel * gl.popupWindowsPortraitHeight + 1
+                      : gl.display.equipixel * gl.popupWindowsLandscapeHeight,
+              child: SettingsMenu(state: state, after: after),
+            ),
+          ),
+          actions: [],
+        );
+      },
+    ),
+  );
+}
+
 Widget popupPathListMenu(
   BuildContext context,
   String currentName,
@@ -3892,7 +3953,7 @@ Widget _returnButton(
     ),
     onPressed: () {
       after();
-      gl.mainStackPopLast();
+      dismissPopup();
     },
   );
 }
@@ -5634,7 +5695,7 @@ Widget popupLayerSwitcher(
             child: Container(
               alignment: Alignment.bottomCenter,
               child: mainMenuBarDummy(() {
-                gl.mainStackPopLast();
+                dismissPopup();
               }),
             ),
           ),
@@ -6663,26 +6724,21 @@ class PopupDoYouReally {
         actions: [
           Container(
             padding: EdgeInsets.symmetric(vertical: gl.display.equipixel * 2),
-            child: FloatingActionButton(
+            child: TextButton(
+              style: dialogButtonStyle(
+                height: gl.dyrButtonsize * 0.6 * gl.display.equipixel,
+                width: gl.dyrButtonsize * 1.25 * gl.display.equipixel,
+                color: gl.colorBack,
+              ),
               onPressed: () {
                 dismissPopup(after: after);
               },
-              backgroundColor: gl.colorBack,
-              child: Container(
-                alignment: Alignment.center,
-                constraints: BoxConstraints(
-                  maxHeight: gl.dyrButtonsize * 0.6 * gl.display.equipixel,
-                  minHeight: gl.dyrButtonsize * 0.6 * gl.display.equipixel,
-                  maxWidth: gl.dyrButtonsize * 1.25 * gl.display.equipixel,
-                  minWidth: gl.dyrButtonsize * 1.25 * gl.display.equipixel,
-                ),
-                child: Text(
-                  "Oui",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: gl.fontSizeM * gl.display.equipixel,
-                  ),
+              child: Text(
+                "Oui",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: gl.fontSizeM * gl.display.equipixel,
                 ),
               ),
             ),
@@ -7153,8 +7209,7 @@ class _AnaResultsMenu extends State<AnaResultsMenu> {
                 ),
                 onPressed: () async {
                   popupPdfSaveDialog((String pdf, String locationName) async {
-                    gl.mainStackPopLast();
-                    gl.refreshMainStack(() {});
+                    dismissPopup();
                     if (pdf.isEmpty) {
                       pdf =
                           "analyseForestimator${DateTime.now().day}.${DateTime.now().month}.${DateTime.now().year}.pdf";
@@ -7174,8 +7229,7 @@ class _AnaResultsMenu extends State<AnaResultsMenu> {
                     // confirmation que le pdf a été créé
                     gl.mainStack.add(
                       popupPDFSaved(pdf, () {
-                        gl.mainStackPopLast();
-                        gl.refreshMainStack(() {});
+                        dismissPopup();
                       }),
                     );
                     gl.refreshMainStack(() {});
