@@ -1,0 +1,9 @@
+manuelForestimatorV0.pdf
+*.out
+*.log
+*.toc
+*.synctex.gz
+*.out
+*.gl*
+*.ist
+*.aux
