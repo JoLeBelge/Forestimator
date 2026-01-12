@@ -61,7 +61,7 @@ presentationPage::presentationPage(cDicoApt *aDico, cWebAptitude *app) : mDico(a
     if (!isValidXmlIdentifier(label) || !isValidHtml(label))
     {
         label = "";
-        cout << "Warning: Label not found in FILE: forestimator-documentation.xml for TAG: " << c << ".label" << endl;
+        if (globTest){cout << "Warning: Label not found in FILE: forestimator-documentation.xml for TAG: " << c << ".label" << endl;}
     }
     std::unique_ptr<Wt::WMenuItem> item2 = std::make_unique<Wt::WMenuItem>(label, cpp14::make_unique<Wt::WText>(getHtml(c)));
     if (i == 0)
@@ -86,7 +86,7 @@ presentationPage::presentationPage(cDicoApt *aDico, cWebAptitude *app) : mDico(a
     if (!isValidXmlIdentifier(label) || !isValidHtml(label))
     {
         label = "";
-        cout << "Warning: Label not found in FILE: forestimator-documentation.xml for TAG: " << c << ".label" << endl;
+        if (globTest){cout << "Warning: Label not found in FILE: forestimator-documentation.xml for TAG: " << c << ".label" << endl;}
     }
     std::unique_ptr<Wt::WMenuItem> item2 = std::make_unique<Wt::WMenuItem>(label, cpp14::make_unique<Wt::WText>(getHtml(c)));
     if (i == 0)
@@ -105,7 +105,6 @@ presentationPage::presentationPage(cDicoApt *aDico, cWebAptitude *app) : mDico(a
   item_ = menu->addItem(std::move(item));
   subMenu->addStyleClass("nav-stacked submenu");
   subMenu->setInternalPathEnabled("/documentation/" + item_->pathComponent());
-  // item_->setContents(std::make_unique<WText>(tr("CS.intro")));
 
   std::unique_ptr<Wt::WMenuItem> item2 = std::make_unique<Wt::WMenuItem>("Présentation");
   item2->setContents(std::make_unique<WText>(tr("CS.intro")));
@@ -121,7 +120,7 @@ presentationPage::presentationPage(cDicoApt *aDico, cWebAptitude *app) : mDico(a
     if (!isValidXmlIdentifier(label) || !isValidHtml(label))
     {
         label = "";
-        cout << "Warning: Label not found in FILE: forestimator-documentation.xml for TAG: " << c << ".label" << endl;
+        if (globTest){cout << "Warning: Label not found in FILE: forestimator-documentation.xml for TAG: " << c << ".label" << endl;}
     }
     std::unique_ptr<Wt::WMenuItem> item2 = std::make_unique<Wt::WMenuItem>(label, cpp14::make_unique<Wt::WText>(getHtml(c)));
     menu->addItem(std::move(item2));

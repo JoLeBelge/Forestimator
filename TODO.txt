@@ -1,8 +1,0 @@
-TO DO forestimator WEB
-----------------------
-
-
--integrer symbologie dans les métadonnées des raster (comme pour forestimator mobile)
-
--bug si je retire trop vite les cartes sélectionnées du panier (avec enter du clavier pour valider messagebox)
-

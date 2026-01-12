@@ -9,16 +9,19 @@ AJOUT DE COUCHES
 -ajouter couche plan de secteur
 -ajouter couche nouveau masque forestier
 
+RETIRER DES COUCHES
+
+on va ajouter une colonne boolean "Mobile" aux tables des layers pour renseigner si on les utilise dans Forestimator mobile ou uniquement dans Forestimator Web.
+
 SECURITE ET ROBUSTESSE
 
--OK  système de vérification automatisé sur l'état de fonctionnement de Forestimator Web. Avec envoi de SMS et/ou de email en cas de coupure de Forestimator Web
 -système de vérification de la disponibilité des couches WMSs?
 
 CONSOLIDATION 
 
 -analyse ponctuelle : quand internet n'est pas disponible, afficher la boite de dialogue "vous n'avez pas accès à internet". Pour l'instant, cela fonctionne mais même quand la data est activée si jamais un autre process utilise toute la bande passante.
 
--dessin de polygones ; interdire les polygones avec self-intersection
+-dessin de polygones ; ajouter un mode edition qui permet d'ajouter des vertex et/ou d'en supprimer. car pour l'instant le mode édition est actif tout le temps et c'est trompeur. Ajouter donc un logo de cadenas qui permette d'empecher les modifs
 
 NOUVELLES OPTIONS
 
@@ -27,9 +30,9 @@ NOUVELLES OPTIONS
 --> polygone
 Requiert un module d'authentification et un outils de versionning
 
--Formulaire d'encodage de placette d'inventaire -> Pour le moment utilisation de la suite "collect" de open foris
+-polygones : laisser l'utilisateur ajouter des attributs lié au polygone-> l'utilisateur choisi le nom de l'attribut (nom sans espace ni caractère spéciaux), le label et le type de donnée. Une liste d'attribut prédéfini est disponible à l'utilisateur
 
--outils de cubage
+-polygone : permettre à l'utilisateur de sauver des géométries qui sont des points plutôt que des polygone.
 
 -gestion de projets et téléchargement de couche offline sur l'extend du projet uniquement. Un projet = un extend. puis des couches offlines sur cet extend.
 

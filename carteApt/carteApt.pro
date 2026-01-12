@@ -13,7 +13,9 @@ SOURCES += main.cpp \
     capplicarteph.cpp \
     cnsw.cpp \
     layerbase.cpp\
+    stationDescriptor.cpp \
     ../forestimatorWeb/cadastre.cpp
+
 
 LIBS += -lgdal -lsqlite3 -lboost_system -lboost_filesystem -lwt -lwtdbo -lwtdbosqlite3 -lboost_program_options -fopenmp
 
@@ -34,5 +36,6 @@ HEADERS += \
     cdicocarteph.h \
     capplicarteph.h \
     cnsw.h \
+    stationDescriptor.h \
     layerbase.h
     ../forestimatorWeb/cadastre.h

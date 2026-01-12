@@ -31,18 +31,9 @@ public:
 
     void carteDeriveCS();
 
-    // gdal_translate pour compresser les résultats (à postériori, maintenant je le compresse au moment de la création des cartes.)
-    //void compressTif(std::string input);
-
     // creation du code de rendu de mapserver pour une couche donnée
     void codeMapServer(std::string inputData, string layerName, string layerFullName, std::string output, std::map<int, string> *DicoVal, std::map<int, color> DicoCol);
-
-    //void cropIm(std::string input, std::string output, double topLeftX, double topLeftY,double width, double height);
-    //clip avec l'extent d'un polygone
-    //void cropImWithPol(std::string inputRaster, std::string inputVector, std::string aOut);
     void toPol(std::string input, std::string output);
-
-
 private:
     cDicoApt * dico;
     // toute les couches ont la même résolution et le même extend.

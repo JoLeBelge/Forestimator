@@ -1,0 +1,56 @@
+  CLASS 
+      NAME "BO - Birchs"
+      EXPRESSION "2"
+      STYLE 
+          COLOR 31 120 180
+       END
+   END
+   CLASS 
+      NAME "CH - Oaks"
+      EXPRESSION "3"
+      STYLE 
+          COLOR 178 223 138
+       END
+   END
+   CLASS 
+      NAME "DO - Douglas_fir"
+      EXPRESSION "4"
+      STYLE 
+          COLOR 51 160 44
+       END
+   END
+   CLASS 
+      NAME "EP - Spruces"
+      EXPRESSION "5"
+      STYLE 
+      	COLOR 251 154 153
+       END
+   END
+   CLASS 
+      NAME "HE - Beech"
+      EXPRESSION "6"
+      STYLE 
+          COLOR 227 26 28
+       END
+   END
+   CLASS 
+      NAME "MZ - Larchs"
+      EXPRESSION "7"
+      STYLE 
+          COLOR 253 191 111
+       END
+   END
+   CLASS 
+      NAME "PE - Poplars"
+      EXPRESSION "8"
+      STYLE 
+          COLOR 255 127 0
+       END
+   END
+      CLASS 
+      NAME "PI - Pines"
+      EXPRESSION "9"
+      STYLE 
+          COLOR 202 178 214
+       END
+   END

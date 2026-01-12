@@ -207,29 +207,23 @@ Juin 2025 : deuxième version, développée dans le cadre du projet WAVE.
 
 
 <message id="COMPO.projet">
-Cette cartographie des essences forestières est le résultat de recherches menées à ULiège Gembloux Agro-Bio Tech au travers de deux projets Interreg, Forêt Pro Bos et RegioWood 2, et du projet CARTOFOR appuyé par le DNF.
+Cette cartographie des essences forestières est le résultat de recherches menées à ULiège Gembloux Agro-Bio Tech au travers de multiples projets : W.A.V.E, Interreg, Forêt Pro Bos et RegioWood 2, et du projet CARTOFOR appuyé par le DNF.
 <br></br>
 </message>
 
 <message id="COMPO.description">
-<p>La cartographie des essences forestières a été réalisée à partir d’imagerie satellitaire Sentinel-2. Elle fournit le pourcentage de présence en terme de GHA de 9 groupes d’essences retenus : épicéas, chênes, hêtres, douglas, pins, peupliers, mélèzes, bouleaux et autres. La somme des pourcentages de ces 9 groupes faisant 100 %.
-Exemple : 0 % épicéas, 60 % chênes, 20 % hêtres, 0 % douglas, 0 % pins, 0 % peupliers, 0 % mélèzes, 
-0 % bouleaux, 20 % autres. 
-</p>
-<p>
-La cartographie se présente sous la forme d’une collection de couches cartographiques au format raster. 
-Pour chaque essence, une carte renseigne le pourcentage en GHA (valeur variant de 0 à 100%). 
-En plus de ces 9 rasters, une couche synthétique nommée "Essence majoritaire" renseigne l'essence majoritaire du peuplement. 
+<p>La cartographie des essences forestières a été réalisée à partir d’imagerie satellitaire Sentinel-2. Elle fournit l'essence majoritaire parmi les 10 groupes d’essences retenus : épicéas, chênes, hêtres, douglas, pins, peupliers, mélèzes, bouleaux, autres feuillus et autres résineux.
 </p>
 
 </message>
 
 <message id="COMPO.version">
-Version d'octobre 2021 utilisant les prises de vue satellite de la période de végétation de 2018 (mai/juin/juillet).
+Version 2025 12
 </message>
 
 <message id="COMPO.logs">
-Octobre 2021 ; passage à une résolution de 2,5 m (auparavant 10 m). Les cartes renseignent dorénavant la proportion de l'essence en pourcentage de gha (précédemment "probabilité de présence").
+<p>Décembre 2025 ; mise à jour majeure utilisant de concert les acquisitions LiDAR de 2021 et des prises de vue satellite. distinction de "autres résineux" et "autres feuillus". Version non finale - mise à jour à venir durant l'année 2026.</p>
+<p>Octobre 2021 ; passage à une résolution de 2,5 m (auparavant 10 m). Les cartes renseignent dorénavant la proportion de l'essence en pourcentage de gha (précédemment "probabilité de présence").</p>
 </message>
 
 <message id="ES_EP.logs">

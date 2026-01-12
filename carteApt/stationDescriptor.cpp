@@ -1,19 +1,5 @@
-#include <iostream>
+#include "stationDescriptor.h"
 
-using namespace std;
-
-#include "cdicoaptbase.h"
-#include "cnsw.h"
-#include "cdicoapt.h"
-
-#include "boost/program_options.hpp"
-#include "plaiprfw.h"
-#include "layerbase.h"
-#include <string>
-#include <random>
-#include <omp.h>
-#include <iomanip>
-namespace po = boost::program_options;
 extern string dirBD;
 std::string datDir("/home/lisein/Documents/Scolyte/projetRegioWood/Data/");
 std::string dirIRMMap="/home/jo/Documents/Scolyte/Data/climat/IRM/irmCarte/";
@@ -21,308 +7,16 @@ std::string dirMapDescr="toto";
 
 extern std::string columnPath;
 
-namespace bf =boost::filesystem;
-
 bool climat(0);
 std::vector<int> vYears={2016,2017,2018,2019,2020};
 std::vector<int> vMonths={3,4,5,6,7,8,9};
-//std::vector<std::string> vVAR={"Tmean","Tmax","Tmin","ETP","P","R","DJ"};
 std::vector<std::string> vVAR={"Tmean","Tmax","Tmin","ETP","P","R"};
 int globSeuilPres(70);
 
-void statDendro(std::string aShp);
-
-/* jo 2020
-Projet RégioWood 2 et thèse de Arthur G.
-J'aimerai avoir un code c++ avec gdal qui effectue une description stationnelle au départ d'un shapefile.
-En gros la même chose que je faisais déjà avec la librairie micmac mais en plus propre et avec gdal, meilleure portabilité
-Je vais integrer mon dictionnaire Apt comme cela j'aurais accès au dictionnaire des cartes raster, au aptitude, au dictionnaire cnsw
-
-j'ai besoin de calculer le NH maj, NT majoritaire, aptitude, hdom, Zbio, SS, AE, Topo, cnsw : drainage, prof sol, texture
-
-2) thèse MP et démarche similaire mais avec Catalogues Station en premier plan, MNH2014 + MNH2019, probabilité HE
-le masque de forêt Hetraie mature sert pour la selection de nos tuile
-
-
-./stationDesc --shp "/home/jo/Documents/Alice/pt/dispoEnEx.shp" --outil 1 --dirIRMMap "/home/jo/Documents/Scolyte/Data/climat/IRM/irmCarte/" --meteo 1 --dirBDForestimator "/home/jo/app/Forestimator/carteApt/data/aptitudeEssDB.db"
-
-*/
-
-bool test(0);
-void descriptionStation(std::string aShp);
-
-OGRPoint * getCentroid(OGRPolygon * hex);
-
-void echantillonTuiles(std::string aShp);
-
-// découpe de polygone en tuile
-void tuilage(std::string aShp);
-
-// renvoie une grille de point, centre de tuile
-std::vector<OGRPoint> squarebin(OGRLayer * lay, int rectSize);
-// renvoie les tuiles carrées
-std::vector<OGRGeometry*> squarebinPol(OGRLayer * lay, int rectSize);
-
-// générer une grille depuis un raster masque, on garde les tuiles qui ont plus de x pct d'occurence de 1 dans le masque
-void tuilageFromRaster(rasterFiles * rasterMask, int rectSize, double prop, double seuilRasterIn);
-
-// stat sur un raster scolyte et ajout d'un champ dans shp tuile
-void anaScolyteOnShp(rasterFiles * raster, std::string aShp);
-
-int main(int argc, char *argv[])
-{
-
-    // Declare the supported options.
-    po::options_description desc("Allowed options");
-    desc.add_options()
-            ("help", "produce help message")
-            ("outil", po::value<int>(), "choix de l'outil à utiliser (1 : description stationnelle sur un shapefile de polygone, 101 : ajoute un champ aux shapefile avec la valeur extraite d'un raster donné en entrée), 102 : création d'un shp tuile à partir d'un raster (RasterMasq) , 1010 : statDendro2018")
-            ("shp", po::value< std::string>(), "shapefile des polgones sur lesquels effectuer l'analyse surfacique")
-            ("meteo", po::value<bool>(), "description de la station avec des indices météo en plus (précision chemin d'accès au cartes avec dirIRMMap)")
-            ("dirIRMMap", po::value<std::string>(), "chemin d'accès aux cartes de l'IRM")
-            ("dirBDForestimator", po::value<std::string>(), "chemin d'accès à la BD de forestimator, dont une table sert à avoir tout les chemins d'accès aux raster + cnsw qui nous sont nécessaire.")
-            ("dirMapDescr", po::value<std::string>(), "pour outil 1. Dossier contenant des cartes de variables continues pour lesquelles on souhaite calculer la valeur moyenne sur la tuile.")
-            ("raster", po::value< std::string>(), "raster de description du mileu pour ajout d'un champs dans shp (outil 101")
-            ("rasterMask", po::value< std::string>(), "raster masque à partir duquel on va générer des tuiles (outil 102) , pour tuilages scolytes ou hetraie mature")
-            ("seuilPP", po::value<int>(), "seuil de probabilité de présence, utilisé pour masquer le raster pour création de tuile (102), défaut 70")
-            ("colPath", po::value<std::string>(), "nom de la colonne de fichierGIS et layerApt propre à la machine (chemin d'accès couche en local)")
-            ;
-
-    po::variables_map vm;
-    po::store(po::parse_command_line(argc, argv, desc), vm);
-    po::notify(vm);
-
-    if (vm.count("help")) {
-        cout << desc << "\n";
-        return 1;
-    }
-
-    columnPath="Dir3";
-    if (vm.count("colPath")) {columnPath=vm["colPath"].as<std::string>();std::cout << " colPath =" << columnPath << std::endl;}
-
-    if (vm.count("outil")) {
-        GDALAllRegister();
-
-
-        int mode(vm["outil"].as<int>());
-        switch (mode) {
-        case 1:{
-            std::cout << " description station sur base d'un shp de polygone" << std::endl;
-            if (vm.count("shp")) {
-                std::string file(vm["shp"].as<std::string>());
-                if (vm.count("meteo")){climat =vm["meteo"].as<bool>();}
-
-                if (vm.count("dirIRMMap")){dirIRMMap =vm["dirIRMMap"].as<std::string>();}
-                if (vm.count("dirBDForestimator")){dirBD =vm["dirBDForestimator"].as<std::string>();}
-                if (vm.count("dirMapDescr")){dirMapDescr =vm["dirMapDescr"].as<std::string>();}
-
-                descriptionStation(file);
-
-
-            } else {
-                std::cout << "vous devez obligatoirement renseigner le shapefile en entrée avec l'argument shp" << std::endl;
-            }
-            break;
-        }
-        case 1010:{
-            std::cout << " description station sur base d'un shp de polygone" << std::endl;
-            if (vm.count("shp")) {
-                std::string file(vm["shp"].as<std::string>());
-                if (vm.count("meteo")){climat =vm["meteo"].as<bool>();}
-
-                if (vm.count("dirIRMMap")){dirIRMMap =vm["dirIRMMap"].as<std::string>();}
-                if (vm.count("dirBDForestimator")){dirBD =vm["dirBDForestimator"].as<std::string>();}
-                if (vm.count("dirMapDescr")){dirMapDescr =vm["dirMapDescr"].as<std::string>();}
-
-                statDendro(file);
-
-            } else {
-                std::cout << "vous devez obligatoirement renseigner le shapefile en entrée avec l'argument shp" << std::endl;
-            }
-            break;
-        }
-
-
-        case 10:{
-            std::cout << "choix placettes IPRFW et création d'un shp avec limite des placettes " << std::endl;
-            // ouverture de la bd sqlite , requete convertie de xls en sqlite
-            std::string requete("/home/lisein/Documents/Scolyte/projetRegioWood/Data/iprfw.db");
-            int rc;
-            sqlite3 * db_;
-            rc = sqlite3_open(requete.c_str(), &db_);
-            if( rc!=0) {
-                fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db_));
-                std::cout << requete << std::endl;
-                std::cout << "result code : " << rc << std::endl;
-            } else {
-
-                std::ofstream aOut(datDir+"placetteEP.csv");
-                aOut.precision(3);
-                aOut << "IGN;NPL;X;Y;GHA_tot;PCT_EP;Age2020;SI\n";
-
-                sqlite3_stmt * stmt;
-                std::string SQLstring="SELECT IGN, NPL FROM plot;";
-                sqlite3_prepare( db_, SQLstring.c_str(), -1, &stmt, NULL );//preparing the statement
-                while(sqlite3_step(stmt) == SQLITE_ROW)
-                {
-                    if (sqlite3_column_type(stmt, 0)!=SQLITE_NULL && sqlite3_column_type(stmt, 1)!=SQLITE_NULL){
-                        int ign=sqlite3_column_int( stmt, 0 );
-                        int npl=sqlite3_column_int( stmt, 1 );
-                        // instantie la classe pla
-                        plaIPRFW p(ign,npl,db_);
-                        if (p.isPessiere()){
-                            // ajout de la placette au fichier txt
-
-                            aOut << p.summary() << "\n";
-                        }
-                    }
-                }
-                sqlite3_finalize(stmt);
-
-                aOut.close();
-            }
-            sqlite3_close(db_);
-
-            break;
-        }
-            // fee lu ; je veux découper des polygones en tuile
-        case 100:{
-            if (vm.count("shp")) {
-                std::string file(vm["shp"].as<std::string>());
-                tuilage(file);
-            }
-            break;
-        }
-        case 104:{
-            if (vm.count("shp")) {
-                std::string fileShp(vm["shp"].as<std::string>());
-                echantillonTuiles(fileShp);
-            }
-            break;
-        }
-        case 103:{
-            if (vm.count("rasterMask") && vm.count("shp")) {
-                std::string fileShp(vm["shp"].as<std::string>());
-                std::string file(vm["rasterMask"].as<std::string>());
-                // raster présence de scolyte
-                rasterFiles r(file,"toto");
-                anaScolyteOnShp(&r,fileShp);
-            }
-            break;
-        }
-            // Marie pierre; je veux créer des tuiles à partir d'un masque de hetraie mature
-        case 102:{
-            if (vm.count("seuilPP")) {globSeuilPres=vm["seuilPP"].as<int>();}
-            if (vm.count("rasterMask")) {
-                std::string file(vm["rasterMask"].as<std::string>());
-                rasterFiles r(file,"toto");
-                //tuilageFromRaster(&r,30,65.0); // 65 pct ça fait 6 pixel sur 9 Marie pierre
-                // scolyte
-                tuilageFromRaster(&r,50,65.0,globSeuilPres);
-            }
-            break;
-        }
-        case 101:{
-            // ajoute un champ aux shapefile avec la valeur extraite de raster donné en entrée
-
-            if (vm.count("shp")) {
-                std::string file(vm["shp"].as<std::string>());
-                // extraction des valeurs de pentes
-                if (vm.count("raster")) {
-                    std::string fileRaster(vm["raster"].as<std::string>());
-                    GDALAllRegister();
-                    //ouverture du shp input
-                    const char *inputPath=file.c_str();
-                    GDALDataset * mDS =  (GDALDataset*) GDALOpenEx( inputPath, GDAL_OF_VECTOR | GDAL_OF_UPDATE, NULL, NULL, NULL );
-                    if( mDS != NULL )
-                    {
-                        std::cout << "shp chargé " << std::endl;
-
-                        rasterFiles r(fileRaster,"toto");
-
-                        OGRLayer * lay = mDS->GetLayer(0);
-                        if (lay->FindFieldIndex("slope",0)==-1){
-
-                            OGRFieldDefn * oFLD(NULL);
-                            oFLD= new OGRFieldDefn("slope",  OFTReal);
-                            oFLD->SetJustify(OGRJustification::OJLeft);
-                            lay->CreateField(oFLD);
-                        }
-                        std::cout << "champ créé " << std::endl;
-                        OGRFeature *poFeature;
-                        while( (poFeature = lay->GetNextFeature()) != NULL )
-                        {
-                            //std::cout << "calcul stat " << std::endl;
-                            basicStat stat =r.computeBasicStatOnPolyg(poFeature->GetGeometryRef());
-                            poFeature->SetField("slope",stat.getMeanDbl());// in mem object
-                            lay->SetFeature(poFeature);
-                        }
-                        GDALClose(mDS);
-                    }
-
-                }
-
-            }
-            break;
-        }
-
-            // Marie pierre; je veux créer des tuiles à partir d'un masque de hetraie mature
-        case 200:{
-
-            // test html2text
-            /*int mode = HTMLDriver::PRINT_AS_ASCII;
-            iconvstream is;
-            bool toto(false);
-            int width(79);
-            const char *input_file = "/home/jo/app/html2text/tests/montest.html";
-            HTMLControl control(is, mode, false, input_file);
-            HTMLDriver driver(control, is, toto, width, mode, toto);
-
-            if (driver.parse() != 0)*/
-            // ouverture du fichier xml et on retire les balises xml (pas celle html)
-
-
-            //std::string aCommand="./html2text -from_encoding UTF8 "+std::to_string(mVProduts.at(0)->mXmin)+" "+std::to_string(mVProduts.at(0)->mYmin)+" "+std::to_string(mVProduts.at(0)->mXmax)+" "+std::to_string(mVProduts.at(0)->mYmax)+ " -t_srs EPSG:"+std::to_string(epsg)+" -ot Byte -overwrite -tr 10 10 "+ masqueRW+ " "+ out;
-            //std::cout << aCommand << std::endl;
-            //system(aCommand.c_str());
-            /*std::string file(vm["shp"].as<std::string>());
-            xml_document<> doc;
-            xml_node<> * root_node;
-            std::ifstream theFile (file);
-            std::vector<char> buffer((std::istreambuf_iterator<char>(theFile)), std::istreambuf_iterator<char>());
-            buffer.push_back('\0');
-            // Parse the buffer using the xml file parsing library into doc
-            doc.parse<0>(&buffer[0]);
-            // Find our root node
-            root_node = doc.first_node("messages");
-            for (xml_node<> * node = root_node->first_node("message"); node; node = node->next_sibling())
-            {
-                std::cout << node->first_attribute("id")->value() << std::endl;
-                std::cout << "n = " << node-><< std::endl;
-
-            }
-            */
-
-            break;
-        }
-        default:
-            break;
-        }
-
-
-
-    } else {
-        cout << "pas d'outil choisi.\n";
-    }
-
-
-    return 0;
-}
 
 void descriptionStation(std::string aShp){
     std::cout << "description du mileu pour les polygones d'un shp " << std::endl;
     cDicoApt dico(dirBD);
-    //dico.summaryRasterFile();
     std::string header("");// pour TA du shp input
     std::string headerProcessing;// il y a le header qui concernent la table d'attribut du shp puis ceux-ci qui concernent les statistiques calculées
 
@@ -439,26 +133,10 @@ void descriptionStation(std::string aShp){
              *
              */
 
-
             // selectionne les couches raster que je vais utiliser
             std::vector<std::string> aVCodes{"MNT","ZBIO","NT","NH","AE","SS","Topo","SWC","slope"};
 
-
-
-            // ajout kk sol ; prof drainage texture + sigle
-
-            //std::vector<std::string> aVCodes{"MNT","ZBIO","NT","NH","AE","SS","Topo","EP_FEE","slope","MNH2019","MNH2014"};// ,"EP_CS","CS_A"
-
-            /*
-            std::vector<std::string> aVCodes{"ZBIO","NT","NH","Topo"};// plus toutes les essences pour avoir les Aptitude pour l'IPRFW
-            for (std::string es : dico.getAllAcroEss()){
-                aVCodes.push_back(es+"_FEE");
-            }*/
-
-            //std::vector<std::string> aVCodes{"MNT","ZBIO","NT","NH","AE","SS","Topo","BV_FEE","BP_FEE","slope"};
-            //std::vector<std::string> aVCodes{"MNT","ZBIO","NT","NH","AE","SS","Topo"};
-            //std::vector<std::string> aVCodes{"COMPO6","MNH2019","MNH2014","slope", "CS_A","CS3","CS8","HE_FEE","HE_CS"};
-            std::vector<std::shared_ptr<layerBase>> aVLs;
+             std::vector<std::shared_ptr<layerBase>> aVLs;
 
             for (std::string aCode : aVCodes){
                 if (dico.hasLayerBase(aCode)){
@@ -605,7 +283,7 @@ void descriptionStation(std::string aShp){
                         poGeom = poGeom->Buffer(25);
                     }
 
-                    if (test){std::cout << " point " << std::endl;}
+                    if (globTest){std::cout << " point " << std::endl;}
 
                     break;
                 }
@@ -613,9 +291,7 @@ void descriptionStation(std::string aShp){
                     std::cout << "Geometrie " << poGeom->getGeometryName() << " non pris en charge " << std::endl;
                     break;
                 }
-                //poGeom->closeRings();
-                //poGeom->flattenTo2D();
-                //poGeom->MakeValid();
+
                 std::map<int,std::string> aStatOnPol;
 
                 // je commence par écrire dans le vecteur de résultat la valeur des champs de la table d'attribu, comme cela j'aurai mes identifiant
@@ -705,7 +381,7 @@ void descriptionStation(std::string aShp){
 
                     // analyse ponctuelle, plus rapide.
                 } else {
-                    if (test){std::cout << " analyse ponctuelle" << std::endl;}
+                    if (globTest){std::cout << " analyse ponctuelle" << std::endl;}
 
                     //OGRPoint * pt= poGeom->toPoint();
 
@@ -733,7 +409,7 @@ void descriptionStation(std::string aShp){
 
 
                 }
-                if (test){std::cout << "done " << std::endl;}
+                if (globTest){std::cout << "done " << std::endl;}
 
 
                 /*
@@ -741,7 +417,7 @@ void descriptionStation(std::string aShp){
                  *
                  */
                 if (climat){
-                    if (test){std::cout << "climat " << std::endl;}
+                    if (globTest){std::cout << "climat " << std::endl;}
                     OGRPoint * pt;
                     pt= getCentroid(poGeom->toPolygon());
                     //if (isPt){OGRPoint * pt= poGeom->toPoint();} else { pt= getCentroid(poGeom->toPolygon());}
@@ -1031,9 +707,6 @@ void echantillonTuiles(std::string aShp){
         std::shuffle(indices.begin(), indices.end(),e);
         std::cout << " indice size  " << indices.size() << " and nb non scolyté " << nbSamp << std::endl;
         for (int i(0);i<indices.size()-nbSamp;i++){
-            //std::cout << " suppression de tuile non scolytée " << i << std::endl;
-            //poFeature = lay->GetFeature();
-            //OGRFeature::DestroyFeature(poFeature);
             lay->DeleteFeature(indices.at(i));
         }
 
@@ -1130,10 +803,6 @@ void anaScolyteOnShp(rasterFiles * raster, std::string aShp){
 
 }
 
-
-
-
-
 void statDendro(std::string aShp){
     std::cout << "description du peuplement pour les polygones d'un shp " << std::endl;
     cDicoApt dico(dirBD);
@@ -1179,13 +848,14 @@ void statDendro(std::string aShp){
                 aStatOnPol.push_back(poFeature->GetFieldAsString(i));
             }
 
+            /* old old, à adapter si je veux réutiliser un jour
             statDendroBase stat(l,poGeom,1);
             aStatOnPol.push_back(stat.getHdom());
             aStatOnPol.push_back(stat.getVha());
             aStatOnPol.push_back(stat.getGha());
             aStatOnPol.push_back(stat.getNha());
             aStatOnPol.push_back(stat.getCmoy());
-            aStatOnPol.push_back(stat.getSdCmoy());
+            aStatOnPol.push_back(stat.getSdCmoy());*/
 
             //maintenant on converti la map en vecteur de string
             std::vector<std::string> vResOnPol;

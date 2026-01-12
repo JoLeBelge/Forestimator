@@ -8,8 +8,6 @@
 std::string removeAccents(std::string aStr);
 std::string putInBalise(std::string aCont,std::string aBalise);
 
-//extern std::string dirBD;
-
 class cdicoAptBase;
 class color;
 class cDicoApt;
@@ -47,13 +45,12 @@ public:
     std::vector<std::string> parseAptArg(std::string aArgs);
     std::map<int,double> simplifieAptStat(std::map<int,double> aStat);
     std::vector<std::string> parseHdomArg(std::string aArgs);
-    std::vector<std::string> parseCompoArg(std::string aArgs);
     std::string parsePointArg(std::string aArgs);
     /*************************/
     std::map<int,std::string> getDicoRaster(std::string aCode);
     std::map<std::string,std::string>  * Files(){return  &Dico_GISfile;}
     // code carte vers type carte code : NH.tif
-    std::map<std::string,std::string>  * RasterType(){return  &Dico_RasterType;}
+    //std::map<std::string,std::string>  * RasterType(){return  &Dico_RasterType;}
     std::map<std::string,std::string>  * RasterVar(){return  &Dico_RasterVar;}
     std::map<std::string,std::string>  * RasterCategorie(){return  &Dico_RasterCategorie;}
     std::map<std::string,std::string>  * RasterNom(){return  &Dico_RasterNomComplet;}
@@ -77,11 +74,7 @@ public:
         if (Dico_RasterExpert.find(aCode)!=Dico_RasterExpert.end()){aRes=Dico_RasterExpert.at(aCode);}
         return aRes;
     }
-    std::string RasterType(std::string aCode){
-        std::string aRes("not found");
-        if (Dico_RasterType.find(aCode)!=Dico_RasterType.end()){aRes=Dico_RasterType.at(aCode);}
-        return aRes;
-    }
+
     std::string RasterTable(std::string aCode){
         std::string aRes("not found");
         if (Dico_RasterTable.find(aCode)!=Dico_RasterTable.end()){aRes=Dico_RasterTable.at(aCode);}

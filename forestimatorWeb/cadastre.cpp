@@ -26,7 +26,7 @@ void cadastre::loadInfo()
 {
     sqlite3_stmt *stmt;
 
-    std::cout << "load info cadastre" << std::endl;
+    if (globTest){std::cout << "load info cadastre" << std::endl;}
     // sanitize columnPath to prevent SQL injection through column name
     auto isValidColumn = [](const std::string &s)
     {
@@ -554,36 +554,3 @@ void ptCadastre::usePolyg4Stat()
     std::cout << "ptCadastre::usePolyg4Stat" << std::endl;
     geoJson_.emit(mCad->createPolygonPaCa(mFID), displayAllInfoInOverlay());
 }
-
-/*
-void cadastre::writeArchive(std::string aArchive){
-    std::cout << "Ecriture de l'archive des parcelles cadastrales dans " << aArchive << std::endl;
-    std::ofstream ofs(aArchive);
-    //boost::archive::xml_oarchive oa(ofs);
-    //oa << boost::serialization::make_nvp("cadastre",*this);
-    boost::archive::binary_oarchive oa(ofs);
-    oa <<   boost::serialization::make_binary_object(&mVCaPa, sizeof(mVCaPa));
-    ofs.close();
-}
-
-
-
-void capa::writeArchive(std::string aArchive){
-    std::cout << "Ecriture de l'archive de la parcelle cadastrale dans " << aArchive << std::endl;
-    std::ofstream ofs(aArchive);
-    boost::archive::binary_oarchive oa(ofs);
-    oa <<   boost::serialization::make_binary_object(this, sizeof(*this));
-    ofs.close();
-}
-
-
-
-cadastre::cadastre(std::string xmlCadastre){
-std::cout << "Lecture de l'archive du cadastre "<< std::endl;
- std::ifstream ifs(xmlCadastre);
- boost::archive::binary_iarchive archive(ifs);
-//archive & boost::serialization::make_nvp("cadastre",*this);
- ifs.close();
- std::cout << "Done "<< std::endl;
-}
-*/

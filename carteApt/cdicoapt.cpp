@@ -1,6 +1,6 @@
 #include "cdicoapt.h"
 
-std::string dirBD("/home/jo/Documents/carteApt/Forestimator/carteApt/data/aptitudeEssDB.db");
+std::string dirBD("/home/jo/app/Forestimator/carteApt/data/aptitudeEssDB.db");
 bool globTest(0);
 int globMaxSurf(200);
 
@@ -85,7 +85,7 @@ cDicoApt::cDicoApt(std::string aBDFile):cdicoAptBase(aBDFile)
 
         // toutes les layerbase
         if (globTest){   std::cout << "crée toute les layerbase " << std::endl;}
-        for (auto & pair : Dico_RasterType){
+        for (auto & pair : Dico_RasterNomCourt){
             std::shared_ptr<layerBase> l=std::make_shared<layerBase>(pair.first,this);
             if (l->getCatLayer()!=TypeLayer::Externe & !l->rasterExist()){
                 std::cout << "Attention layerBase " << l->Code() << ", fichier " << l->getPathTif() << " inexistant" << std::endl;
@@ -93,7 +93,7 @@ cDicoApt::cDicoApt(std::string aBDFile):cdicoAptBase(aBDFile)
 
             mVlayerBase.emplace(std::make_pair(pair.first,l));
         }
-        //std::cout << "close connection (dicoApt)" << std::endl;
+
         closeConnection();
 
     }
@@ -109,10 +109,9 @@ cDicoApt::cDicoApt(std::string aBDFile):cdicoAptBase(aBDFile)
             }
         } else {std::cout << this->File("ZBIOSIMP") << " : n'existe pas" << std::endl;}
 
-    std::cout << "done " << std::endl;
+    if (globTest){std::cout << "done " << std::endl;}
     boost::filesystem::create_directories(File("TMPDIR"));
-    //std::cout << "Dico code essence --> nom essence francais a "<< Dico_codeEs2NomFR.size() << " elements \n" << std::endl;
-    //std::cout << "Dico gis file a "<< Dico_GISfile.size() << " elements \n" << std::endl;
+
 }
 
 
@@ -203,23 +202,6 @@ WMSinfo * cDicoApt::getWMSinfo(std::string aCode){
     if (Dico_WMS.find(aCode)!=Dico_WMS.end()){
         aRes=&Dico_WMS.at(aCode);
     };
-    return aRes;
-}
-
-
-TypeCarte str2TypeCarte(const std::string& str)
-{
-    TypeCarte aRes=SS;
-    if(str == "NH") aRes=NH;
-    else if(str == "NT") aRes=NT;
-    else if(str == "Topo") aRes=Topo;
-    else if(str == "AE") aRes=AE;
-    else if(str == "SS") aRes=SS;
-    else if(str == "ZBIO") aRes=ZBIO;
-    else if(str == "CSArdenne") aRes=CSArdenne;
-    else if(str == "CSLorraine") aRes=CSLorraine;
-    else if(str == "Composition") aRes=Composition;
-    else if(str == "MNH") aRes=MNH;
     return aRes;
 }
 
@@ -517,9 +499,9 @@ std::vector<std::string> cDicoApt::parseHdomArg(std::string aArgs){
         std::vector<std::string> aV;
         boost::split( aV,aArgs,boost::is_any_of(","),boost::token_compress_on);
         for (std::string code: aV){
-            if (hasLayerBase(code) & (getLayerBase(code)->TypeCart()==TypeCarte::MNH)){
+            //if (hasLayerBase(code) & (getLayerBase(code)->TypeCart()==TypeCarte::MNH)){
                 aRes.push_back(code);
-            }
+            //}
         }
     }
     return aRes;
@@ -531,19 +513,6 @@ std::string cDicoApt::parsePointArg(std::string aArgs){
     return aRes;
 }
 
-std::vector<std::string> cDicoApt::parseCompoArg(std::string aArgs){
-    std::vector<std::string> aRes;
-    if (aArgs==""){ aRes={"COMPO1","COMPO2","COMPO3","COMPO4","COMPO5","COMPO6","COMPO7","COMPO8","COMPO9"};} else{
-        std::vector<std::string> aV;
-        boost::split( aV,aArgs,boost::is_any_of(","),boost::token_compress_on);
-        for (std::string code: aV){
-            if (hasLayerBase(code) & (getLayerBase(code)->TypeCart()==TypeCarte::Composition)){
-                aRes.push_back(code);
-            }
-        }
-    }
-    return aRes;
-}
 
 std::map<int,double> cDicoApt::simplifieAptStat(std::map<int,double> aStat){
     std::map<int,double> aRes;
@@ -556,3 +525,10 @@ std::map<int,double> cDicoApt::simplifieAptStat(std::map<int,double> aStat){
     // avec clé 1, 2, 3, 4, 11
     return aRes;
 }
+
+std::string putInBalise(std::string aCont,std::string aBalise){
+
+    return "<"+aBalise+">"+aCont+"</"+aBalise+">\n";
+
+}
+

@@ -359,7 +359,6 @@ layerBase::layerBase(std::string aCode,cDicoApt * aDico):rasterFiles(aDico->File
     mNomCourt=mDico->RasterNomCourt(mCode);
     mExpert=mDico->RasterExpert(mCode);
     mGain=mDico->RasterGain(mCode);
-    mTypeCarte =str2TypeCarte(mDico->RasterType(mCode));
     mTypeVar =str2TypeVar(mDico->RasterVar(mCode));
     mType =str2TypeLayer(mDico->RasterCategorie(mCode));
     mDicoVal=mDico->getDicoRaster(mCode);
@@ -384,7 +383,6 @@ layerBase::layerBase(std::shared_ptr<layerBase> aLB):rasterFiles(aLB->Dico()->Fi
     mGain=aLB->Gain();
     mNom=aLB->Nom();
     mNomCourt=aLB->NomCourt();
-    mTypeCarte =aLB->TypeCart();
     mTypeVar =aLB->getTypeVar();
     mType=aLB->getCatLayer();
     mDicoVal=aLB->getDicoVal();
@@ -459,7 +457,23 @@ void layerBase::createRasterColorInterpPalette(GDALRasterBand * aBand){
     e.c3=col->mB;
     colors.SetColorEntry(kv.first,&e);
     }
+    if (globTest){
+        std::cout << " colorTable have " << colors.GetColorEntryCount() << " entries" << std::endl;
+    }
+
     aBand->SetColorTable(&colors);
+}
+
+void layerBase::edit_ColorInterpPalette(){
+    GDALDataset  * mGDALDat = (GDALDataset *) GDALOpen( getPathTif().c_str(), GA_Update );
+    if( mGDALDat == NULL )
+    {
+        std::cout << "je n'ai pas lu l'image " << getPathTif() << std::endl;
+    } else {
+        GDALRasterBand * mBand = mGDALDat->GetRasterBand( 1 );
+        createRasterColorInterpPalette(mBand);
+        GDALClose( mGDALDat );
+    }
 }
 
 
@@ -807,9 +821,7 @@ GDALDataset * rasterFiles::rasterizeGeom(OGRGeometry *poGeom){
 
 // pour les couches des variables continues
 basicStat layerBase::computeBasicStatOnPolyg(OGRGeometry * poGeom){
-    if (globTest){std::cout << "compute BasicStat On Polyg" << std::endl;
-    std::cout << getDicoValStr() << std::endl;
-    }
+
     std::map<double,int> aMapValandFrequ;
     int nbNA(0);
 
@@ -824,13 +836,13 @@ basicStat layerBase::computeBasicStatOnPolyg(OGRGeometry * poGeom){
             }
         }
 
-        // c'est mon masque au format raster
-        GDALDataset * mask = rasterizeGeom(poGeom);
-
         OGREnvelope ext;
         poGeom->getEnvelope(&ext);
         double width((ext.MaxX-ext.MinX)), height((ext.MaxY-ext.MinY));
-        // std::cout << " x " << width<< " y " << height << std::endl;
+        if (width>0){
+
+        // c'est mon masque au format raster
+        GDALDataset * mask = rasterizeGeom(poGeom);
 
         GDALDataset  * mGDALDat = (GDALDataset *) GDALOpen( getPathTif().c_str(), GA_ReadOnly );
         if( mGDALDat == NULL )
@@ -891,6 +903,9 @@ basicStat layerBase::computeBasicStatOnPolyg(OGRGeometry * poGeom){
         }
         GDALClose(mask);
         GDALClose(mGDALDat);
+    }
+    } else {
+        std::cout << "layerBase::computeBasicStatOnPolyg : polygone de taille nulle" << std::endl;
     }
 
     if (aMapValandFrequ.size()>0) {

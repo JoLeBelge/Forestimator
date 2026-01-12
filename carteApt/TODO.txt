@@ -1,9 +1,0 @@
-2023 06 27
-
--création d'un style pour le Catalogues de station (pas mm couleur, pas mm symbologie)
--lien entre US et variante ; choix de la variante majoritaire (qui n'est pas la variante "a" dans tout les cas) --> ajout d'une colonne
-
-./carteApt --aptCS 1 --pathBD "/home/jo/app/Forestimator/carteApt/data/aptitudeEssDB.db" --colPath "Dir3"
-
-
-

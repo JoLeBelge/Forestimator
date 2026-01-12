@@ -26,9 +26,6 @@ enum class FeRe {Feuillus,
                  Autre
                 };
 
-// ça c'était utilisé pour le calcul des carte apt, des tuiles et du code mapserveur. Encore utilisé par l'API forestimator
-enum TypeCarte {Apt, Potentiel, Station1, Habitats,NH,NT,Topo,AE,SS,ZBIO,CSArdenne,CSLorraine,MNH,Composition,MNT16b};
-
 enum class TypeWMS {WMS,
                     ArcGisRest
                    };
@@ -397,7 +394,7 @@ protected:
     // booléen expert assigné au groupe de couche
     std::map<std::string,bool> Dico_groupeExpert;
     std::map<std::string,std::string>  Dico_GISfile;
-    std::map<std::string,std::string>  Dico_RasterType;
+    //std::map<std::string,std::string>  Dico_RasterType;
     // continu vs classe
     std::map<std::string,std::string>  Dico_RasterVar;
     std::map<std::string,bool>  Dico_RasterVisu;// les couches que l'on peux visualiser dans la partie carto
@@ -566,11 +563,8 @@ public:
     cdicoAptBase * Dico(){return mDico;}
     std::string printRisque();
 
-    //TypeCarte Type(){return mType;}
-
 private:
     FeRe mFeRe;
-    //TypeCarte mType;
     cdicoAptBase *mDico;
     std::string mCode, mNomFR, mF_R, mPrefix;
 };
