@@ -7,7 +7,7 @@ FTEX=$(NAME).tex\
 $(NAME).pdf : $(FTEX)
 	pdflatex $(NAME)
 	makeglossaries $(NAME)
-	#bibtex $(NAME)
+	bibtex $(NAME)
 	pdflatex $(NAME)
 	pdflatex $(NAME)
 

@@ -5,8 +5,6 @@ To do list forestimator Mobile
 
 AJOUT DE COUCHES
 
--ajouter couche Natura 2000 (N2K)
--ajouter couche plan de secteur
 -ajouter couche nouveau masque forestier
 
 RETIRER DES COUCHES
@@ -15,7 +13,9 @@ on va ajouter une colonne boolean "Mobile" aux tables des layers pour renseigner
 
 SECURITE ET ROBUSTESSE
 
--système de vérification de la disponibilité des couches WMSs?
+-système de vérification de la disponibilité des couches WMSs
+-système de vérification de la dispo de nominatim
+-système de vérification de la dispo du serveur collect
 
 CONSOLIDATION 
 
@@ -23,21 +23,28 @@ CONSOLIDATION
 
 -dessin de polygones ; ajouter un mode edition qui permet d'ajouter des vertex et/ou d'en supprimer. car pour l'instant le mode édition est actif tout le temps et c'est trompeur. Ajouter donc un logo de cadenas qui permette d'empecher les modifs
 
+-regrouper dans un fichier unique (dart) l'ensemble des labels affichés dans forestimator Mobile et écrit "en dur" dans le code : exemple "Appuyez ici pour ajouter une couche du catalogue" . Le fait de centraliser tout permettra une modification plus aisée (et par une tierce personne si nécessaire). Comme les messages bundle de Wt c++
+
 NOUVELLES OPTIONS
+
+-polygone : permettre à l'utilisateur de sauver des géométries qui sont des points plutôt que des polygone.
+
+-polygones : laisser l'utilisateur ajouter des attributs lié au polygone-> l'utilisateur choisi le nom de l'attribut (nom sans espace ni caractère spéciaux), le label et le type de donnée. Une liste d'attribut prédéfini est disponible à l'utilisateur
+
+-polygones : un polygone qui contient une valeur pour les attributs (prédéfini) "essences" et "user" pourra être envoyé sur forestimator Web pour collecter un feedback à propos de la nouvelle carte de composition de Nicolas (2025) 
+
+COMMUNICATION/ DOCUMENTATION
+
+-tutoriel pdf -> Jo prends la main. Demander un feedback à quelqu'un d'extérieur, Nicolas Dassonville? Les copains de la cellule d'appui? Une personne de la génération de Hugues Claessens?
+
+-vidéo d'utilisation : après la rédaction du manuel, pour que chacun puisse utiliser un vocable commun
+
+NOUVELLES OPTIONS - LONG TERME
+
+-gestion de projets et téléchargement de couche offline sur l'extend du projet uniquement. Un projet = un extend. puis des couches offlines sur cet extend.
 
 -Acquisitions terrains synchronisées dans une BD sur le serveur
 --> point avec annotation, photo
 --> polygone
 Requiert un module d'authentification et un outils de versionning
-
--polygones : laisser l'utilisateur ajouter des attributs lié au polygone-> l'utilisateur choisi le nom de l'attribut (nom sans espace ni caractère spéciaux), le label et le type de donnée. Une liste d'attribut prédéfini est disponible à l'utilisateur
-
--polygone : permettre à l'utilisateur de sauver des géométries qui sont des points plutôt que des polygone.
-
--gestion de projets et téléchargement de couche offline sur l'extend du projet uniquement. Un projet = un extend. puis des couches offlines sur cet extend.
-
-COMMUNICATION/ DOCUMENTATION
-
--vidéo d'utilisation
--tutoriel pdf -> Jo prends la main
 
