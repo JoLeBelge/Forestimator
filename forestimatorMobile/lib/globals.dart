@@ -41,6 +41,15 @@ class Mode {
   static bool _expert = false;
   static bool _expertTools = false;
 
+  static bool polygon = false;
+  static bool editPolygon = false;
+  static bool addVertexesPolygon = false;
+  static bool moveVertexesPolygon = false;
+  static bool removeVertexesPolygon = false;
+  static bool showButtonAddVertexesPolygon = false;
+  static bool showButtonMoveVertexesPolygon = false;
+  static bool showButtonRemoveVertexesPolygon = false;
+
   static bool get expert => _expert;
   static bool get expertTools => _expertTools;
 
@@ -280,7 +289,7 @@ class PoiMarker {
 }
 
 List<pol.PolygonLayer> polygonLayers = [];
-int selectedPolygonLayer = 0;
+int selectedPolygonLayer = -1;
 
 List<PathLayer> pathLayers = [];
 int selectedpathLayer = -1;

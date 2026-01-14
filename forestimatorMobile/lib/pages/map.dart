@@ -9,7 +9,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:proj4dart/proj4dart.dart' as proj4;
 import 'package:flutter/material.dart';
 import 'dart:math';
-import 'package:fforestimator/tools/geometry/polygon_utils.dart' as polygon;
+import 'package:fforestimator/tools/geometry/polygon_utils.dart' as poly;
 import 'dart:io';
 import 'package:geolocator/geolocator.dart';
 import 'package:fforestimator/globals.dart' as gl;
@@ -39,16 +39,6 @@ class _MapPageState extends State<MapPage> {
   bool _mapControllerInit = false;
 
   bool _toolbarExtended = false;
-  bool _polygonToolbarExtended = false;
-
-  bool _modeDrawPolygon = false;
-
-  bool _modeDrawPolygonAddVertexes = false;
-  bool _modeDrawPolygonRemoveVertexes = false;
-  bool _modeDrawPolygonMoveVertexes = false;
-  bool _modeShowButtonDrawPolygonMoveVertexes = false;
-  bool _modeShowButtonDrawPolygonRemoveVertexes = false;
-  bool _modeShowButtonDrawPolygonAddVertexes = false;
 
   bool _modeLayerSwitches = false;
 
@@ -369,7 +359,7 @@ class _MapPageState extends State<MapPage> {
                                       _measurePath.add(point);
                                     }),
                                   }
-                                  : _modeDrawPolygonAddVertexes
+                                  : gl.Mode.addVertexesPolygon
                                   ? (tapPosition, point) async => {
                                     if (gl.polygonLayers.isNotEmpty)
                                       {
@@ -395,33 +385,47 @@ class _MapPageState extends State<MapPage> {
                                           },
                                       },
                                   }
-                                  : _modeDrawPolygonMoveVertexes
+                                  : gl.Mode.moveVertexesPolygon
                                   ? (tapPosition, point) async => {
                                     refreshView(() {
                                       _stopMovingSelectedPoint();
-                                      _modeShowButtonDrawPolygonAddVertexes =
+                                      gl.Mode.showButtonAddVertexesPolygon =
                                           false;
-                                      _modeShowButtonDrawPolygonMoveVertexes =
+                                      gl.Mode.showButtonMoveVertexesPolygon =
                                           true;
-                                      _modeShowButtonDrawPolygonRemoveVertexes =
+                                      gl.Mode.showButtonRemoveVertexesPolygon =
                                           true;
-                                      _modeDrawPolygonAddVertexes = false;
-                                      _modeDrawPolygonMoveVertexes = false;
-                                      _modeDrawPolygonRemoveVertexes = false;
+                                      gl.Mode.addVertexesPolygon = false;
+                                      gl.Mode.moveVertexesPolygon = false;
+                                      gl.Mode.removeVertexesPolygon = false;
                                     }),
                                   }
-                                  : _modeDrawPolygon
+                                  : gl.Mode.editPolygon && gl.Mode.editPolygon
                                   ? (tapPosition, point) async => {
                                     refreshView(() {
-                                      _modeShowButtonDrawPolygonAddVertexes =
+                                      gl.Mode.showButtonAddVertexesPolygon =
                                           true;
-                                      _modeShowButtonDrawPolygonMoveVertexes =
+                                      gl.Mode.showButtonMoveVertexesPolygon =
                                           false;
-                                      _modeShowButtonDrawPolygonRemoveVertexes =
+                                      gl.Mode.showButtonRemoveVertexesPolygon =
                                           false;
-                                      _modeDrawPolygonAddVertexes = false;
-                                      _modeDrawPolygonMoveVertexes = false;
-                                      _modeDrawPolygonRemoveVertexes = false;
+                                      gl.Mode.addVertexesPolygon = false;
+                                      gl.Mode.moveVertexesPolygon = false;
+                                      gl.Mode.removeVertexesPolygon = false;
+                                    }),
+                                  }
+                                  : gl.Mode.editPolygon && !gl.Mode.editPolygon
+                                  ? (tapPosition, point) async => {
+                                    refreshView(() {
+                                      gl.Mode.showButtonAddVertexesPolygon =
+                                          false;
+                                      gl.Mode.showButtonMoveVertexesPolygon =
+                                          false;
+                                      gl.Mode.showButtonRemoveVertexesPolygon =
+                                          false;
+                                      gl.Mode.addVertexesPolygon = false;
+                                      gl.Mode.moveVertexesPolygon = false;
+                                      gl.Mode.removeVertexesPolygon = false;
                                     }),
                                   }
                                   : (tapPosition, point) async => {
@@ -662,7 +666,7 @@ class _MapPageState extends State<MapPage> {
                                 ),
                               ),
                             ] +
-                            (_modeDrawPolygon
+                            (gl.Mode.editPolygon
                                 ? <Widget>[
                                   if (gl.polygonLayers.isNotEmpty &&
                                       gl
@@ -671,8 +675,8 @@ class _MapPageState extends State<MapPage> {
                                               .vertexes
                                               .length >
                                           1 &&
-                                      !_modeShowButtonDrawPolygonMoveVertexes &&
-                                      _modeDrawPolygonAddVertexes)
+                                      !gl.Mode.showButtonMoveVertexesPolygon &&
+                                      gl.Mode.addVertexesPolygon)
                                     PolylineLayer(
                                       polylines: [
                                         Polyline(
@@ -715,7 +719,7 @@ class _MapPageState extends State<MapPage> {
                                               .selectedPolygonLayer]
                                           .vertexes
                                           .isNotEmpty &&
-                                      !_modeShowButtonDrawPolygonAddVertexes)
+                                      !gl.Mode.showButtonAddVertexesPolygon)
                                     CircleLayer(
                                       circles: [
                                         CircleMarker(
@@ -766,7 +770,9 @@ class _MapPageState extends State<MapPage> {
                             ],
                       ),
                       //TODO: polygon moves always if you close the polygonmenu by the menubar
-                      (_modeDrawPolygon && gl.polygonLayers.isNotEmpty)
+                      (gl.Mode.polygon &&
+                              gl.polygonLayers.isNotEmpty &&
+                              gl.selectedPolygonLayer > -1)
                           ? Column(
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
@@ -810,13 +816,14 @@ class _MapPageState extends State<MapPage> {
                                             () {
                                               refreshView(() {
                                                 if (gl
-                                                    .polygonLayers
-                                                    .isNotEmpty) {
-                                                  _modeShowButtonDrawPolygonAddVertexes =
+                                                        .polygonLayers
+                                                        .isNotEmpty &&
+                                                    gl.Mode.editPolygon) {
+                                                  gl.Mode.showButtonAddVertexesPolygon =
                                                       true;
-                                                  _modeShowButtonDrawPolygonMoveVertexes =
+                                                  gl.Mode.showButtonMoveVertexesPolygon =
                                                       false;
-                                                  _modeShowButtonDrawPolygonRemoveVertexes =
+                                                  gl.Mode.showButtonRemoveVertexesPolygon =
                                                       false;
                                                 }
                                               });
@@ -916,12 +923,38 @@ class _MapPageState extends State<MapPage> {
                                                 ),
                                               ),
                                             ),
+                                            IconButton(
+                                              onPressed: () {
+                                                gl.refreshMainStack(() {
+                                                  gl.modeMapShowPolygons = true;
+                                                  gl.Mode.editPolygon =
+                                                      !gl.Mode.editPolygon;
+                                                  gl.Mode.showButtonAddVertexesPolygon =
+                                                      gl.Mode.editPolygon;
+                                                });
+                                              },
+                                              icon: Icon(
+                                                gl.Mode.editPolygon
+                                                    ? Icons.lock_open
+                                                    : Icons.lock_outline,
+                                                size:
+                                                    gl.display.equipixel *
+                                                    gl.iconSizeM,
+                                                color: getColorTextFromBackground(
+                                                  gl
+                                                      .polygonLayers[gl
+                                                          .selectedPolygonLayer]
+                                                      .colorInside
+                                                      .withAlpha(255),
+                                                ),
+                                              ),
+                                            ),
 
                                             SizedBox(
                                               width:
                                                   gl.display.equipixel *
                                                   gl.chosenPolyBarWidth *
-                                                  .4,
+                                                  .3,
                                               child: Text(
                                                 gl
                                                     .polygonLayers[gl
@@ -967,7 +1000,7 @@ class _MapPageState extends State<MapPage> {
                               ),
                             ],
                           )
-                          : _modeDrawPolygon
+                          : gl.Mode.editPolygon
                           ? Column(
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
@@ -1005,11 +1038,11 @@ class _MapPageState extends State<MapPage> {
                                                 if (gl
                                                     .polygonLayers
                                                     .isNotEmpty) {
-                                                  _modeShowButtonDrawPolygonAddVertexes =
+                                                  gl.Mode.showButtonAddVertexesPolygon =
                                                       true;
-                                                  _modeShowButtonDrawPolygonMoveVertexes =
+                                                  gl.Mode.showButtonMoveVertexesPolygon =
                                                       false;
-                                                  _modeShowButtonDrawPolygonRemoveVertexes =
+                                                  gl.Mode.showButtonRemoveVertexesPolygon =
                                                       false;
                                                 }
                                               });
@@ -1067,8 +1100,7 @@ class _MapPageState extends State<MapPage> {
 
                       _mainMenuBar(),
                       if (_toolbarExtended) _toolBar(),
-                      if (_polygonToolbarExtended &&
-                          gl.polygonLayers.isNotEmpty)
+                      if (gl.Mode.editPolygon && gl.polygonLayers.isNotEmpty)
                         _polygonToolbar(),
                     ] +
                     gl.mainStack,
@@ -1106,14 +1138,14 @@ class _MapPageState extends State<MapPage> {
           point: point,
           radius:
               gl.polygonLayers[gl.selectedPolygonLayer].isSelectedLine(i) &&
-                      !_modeShowButtonDrawPolygonMoveVertexes &&
-                      _modeDrawPolygonAddVertexes
+                      !gl.Mode.showButtonMoveVertexesPolygon &&
+                      gl.Mode.addVertexesPolygon
                   ? iconSize / 2.7
                   : iconSize / 3,
           color:
               gl.polygonLayers[gl.selectedPolygonLayer].isSelectedLine(i) &&
-                      !_modeShowButtonDrawPolygonMoveVertexes &&
-                      _modeDrawPolygonAddVertexes
+                      !gl.Mode.showButtonMoveVertexesPolygon &&
+                      gl.Mode.addVertexesPolygon
                   ? gl.polygonLayers[gl.selectedPolygonLayer].colorLine
                   : gl.polygonLayers[gl.selectedPolygonLayer].colorInside,
         ),
@@ -1367,7 +1399,7 @@ class _MapPageState extends State<MapPage> {
 
   List<Marker> _placeVertexMovePointer() {
     List<Marker> ret = [];
-    if ((_modeDrawPolygonMoveVertexes && _selectedPointToMove != null) ||
+    if ((gl.Mode.moveVertexesPolygon && _selectedPointToMove != null) ||
         (_modeMeasurePath && _modeMoveMeasurePath)) {
       ret.add(
         Marker(
@@ -1378,7 +1410,7 @@ class _MapPageState extends State<MapPage> {
           child: const Icon(Icons.donut_large, color: Colors.red),
         ),
       );
-    } else if (_modeDrawPolygonMoveVertexes || _modeMeasurePath) {
+    } else if (gl.Mode.moveVertexesPolygon || _modeMeasurePath) {
       ret.add(
         Marker(
           alignment: Alignment.center,
@@ -1447,9 +1479,9 @@ class _MapPageState extends State<MapPage> {
 
   // Geometry helpers are in polygon_utils.dart
 
-  bool _isPolygonWellDefined(List<Point> poly) {
-    if (poly.isEmpty || gl.Mode.overrideWellDefinedCheck) return true;
-    return polygon.isPolygonWellDefined(poly);
+  bool _isPolygonWellDefined(List<Point> polygones) {
+    if (polygones.isEmpty || gl.Mode.overrideWellDefinedCheck) return true;
+    return poly.isPolygonWellDefined(polygones);
   }
 
   List<Marker> _getPathMeasureMarkers() {
@@ -1512,13 +1544,13 @@ class _MapPageState extends State<MapPage> {
           point: point,
           child: TextButton(
             onPressed: () {
-              if (_modeDrawPolygonAddVertexes) {
+              if (gl.Mode.addVertexesPolygon) {
                 //select line between points to place next point
                 refreshView(() {
                   gl.polygonLayers[gl.selectedPolygonLayer]
                       .refreshSelectedLinePoints(point);
                 });
-              } else if (_modeDrawPolygonMoveVertexes) {
+              } else if (gl.Mode.moveVertexesPolygon) {
                 refreshView(() {
                   if (gl
                           .polygonLayers[gl.selectedPolygonLayer]
@@ -1535,15 +1567,15 @@ class _MapPageState extends State<MapPage> {
                 refreshView(() {
                   gl.polygonLayers[gl.selectedPolygonLayer]
                       .refreshSelectedLinePoints(point);
-                  _modeShowButtonDrawPolygonAddVertexes = false;
-                  _modeShowButtonDrawPolygonMoveVertexes = true;
-                  _modeShowButtonDrawPolygonRemoveVertexes = true;
-                  _modeDrawPolygonAddVertexes = false;
-                  _modeDrawPolygonMoveVertexes = false;
-                  _modeDrawPolygonRemoveVertexes = false;
+                  gl.Mode.showButtonAddVertexesPolygon = false;
+                  gl.Mode.showButtonMoveVertexesPolygon = true;
+                  gl.Mode.showButtonRemoveVertexesPolygon = true;
+                  gl.Mode.addVertexesPolygon = false;
+                  gl.Mode.moveVertexesPolygon = false;
+                  gl.Mode.removeVertexesPolygon = false;
                 });
               }
-              /*if (_modeDrawPolygonRemoveVertexes) {
+              /*if (gl.Mode.removeVertexesPolygon) {
                 refreshView(() {
                   gl.polygonLayers[gl.selectedPolygonLayer].removePoint(point);
                 });
@@ -1564,15 +1596,15 @@ class _MapPageState extends State<MapPage> {
   }
 
   void _closePolygonMenu() {
-    _polygonToolbarExtended = false;
-    _modeDrawPolygon = false;
+    gl.Mode.polygon = false;
+    gl.Mode.editPolygon = false;
     _modeSearch = false;
-    _modeDrawPolygonRemoveVertexes = false;
-    _modeDrawPolygonMoveVertexes = false;
+    gl.Mode.removeVertexesPolygon = false;
+    gl.Mode.moveVertexesPolygon = false;
     _modeAnaPtPreview = true;
-    _modeShowButtonDrawPolygonAddVertexes = false;
-    _modeShowButtonDrawPolygonMoveVertexes = false;
-    _modeShowButtonDrawPolygonRemoveVertexes = false;
+    gl.Mode.showButtonAddVertexesPolygon = false;
+    gl.Mode.showButtonMoveVertexesPolygon = false;
+    gl.Mode.showButtonRemoveVertexesPolygon = false;
   }
 
   void _closeToolbarMenu() {
@@ -1648,28 +1680,58 @@ class _MapPageState extends State<MapPage> {
                       color:
                           dummy
                               ? Colors.transparent
-                              : !_polygonToolbarExtended
+                              : !gl.Mode.polygon
                               ? Colors.transparent
                               : Colors.yellow.withAlpha(128),
                       child: IconButton(
                         color:
                             dummy
                                 ? Colors.transparent
-                                : _polygonToolbarExtended
+                                : gl.Mode.polygon
                                 ? Colors.white
                                 : Colors.yellow,
                         iconSize: gl.display.equipixel * gl.iconSizeM,
-                        isSelected: _polygonToolbarExtended,
+                        isSelected: gl.Mode.polygon,
                         onPressed: () {
                           setState(() {
-                            _polygonToolbarExtended = !_polygonToolbarExtended;
-                            _modeDrawPolygon = _polygonToolbarExtended;
-                            if (_modeDrawPolygon) {
-                              if (gl.polygonLayers.isNotEmpty) {
-                                _modeShowButtonDrawPolygonAddVertexes = true;
+                            gl.Mode.polygon = !gl.Mode.polygon;
+                            if (gl.Mode.polygon) {
+                              if (gl.polygonLayers.isNotEmpty &&
+                                  gl.Mode.polygon &&
+                                  gl.Mode.editPolygon &&
+                                  gl.selectedPolygonLayer > -1) {
+                                gl.Mode.showButtonAddVertexesPolygon = true;
                               }
                               _closeSwitchesMenu();
                               _closeToolbarMenu();
+                              gl.mainStack.add(
+                                popupPolygonListMenu(
+                                  gl.notificationContext!,
+                                  "",
+                                  (LatLng pos) {
+                                    if (pos.longitude != 0.0 &&
+                                        pos.latitude != 0.0) {
+                                      _mapController.move(
+                                        pos,
+                                        _mapController.camera.zoom,
+                                      );
+                                    }
+                                  },
+                                  () {
+                                    refreshView(() {
+                                      if (gl.polygonLayers.isNotEmpty &&
+                                          gl.Mode.editPolygon) {
+                                        gl.Mode.showButtonAddVertexesPolygon =
+                                            true;
+                                        gl.Mode.showButtonMoveVertexesPolygon =
+                                            false;
+                                        gl.Mode.showButtonRemoveVertexesPolygon =
+                                            false;
+                                      }
+                                    });
+                                  },
+                                ),
+                              );
                               if (dummy) {
                                 close!();
                               }
@@ -1998,13 +2060,13 @@ class _MapPageState extends State<MapPage> {
 
   Widget _polygonToolbar() {
     double toolbarHeight = gl.iconSpaceBetween;
-    if (_modeShowButtonDrawPolygonMoveVertexes) {
+    if (gl.Mode.showButtonMoveVertexesPolygon) {
       toolbarHeight += gl.iconSizeM + gl.iconSpaceBetween;
     }
-    if (_modeShowButtonDrawPolygonRemoveVertexes) {
+    if (gl.Mode.showButtonRemoveVertexesPolygon) {
       toolbarHeight += gl.iconSizeM + gl.iconSpaceBetween;
     }
-    if (_modeShowButtonDrawPolygonAddVertexes) {
+    if (gl.Mode.showButtonAddVertexesPolygon) {
       toolbarHeight += gl.iconSizeM + gl.iconSpaceBetween;
     }
     return Column(
@@ -2025,23 +2087,23 @@ class _MapPageState extends State<MapPage> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    if (_modeShowButtonDrawPolygonMoveVertexes)
+                    if (gl.Mode.showButtonMoveVertexesPolygon)
                       Container(
                         color: _polygonMenuColorTools(
-                          _modeDrawPolygonMoveVertexes,
+                          gl.Mode.moveVertexesPolygon,
                         ),
                         child: IconButton(
                           color:
-                              _modeDrawPolygonMoveVertexes
+                              gl.Mode.moveVertexesPolygon
                                   ? Colors.white
                                   : Colors.lightGreenAccent,
                           iconSize: gl.display.equipixel * gl.iconSizeM,
                           onPressed: () async {
                             refreshView(() {
-                              _modeDrawPolygonMoveVertexes =
-                                  !_modeDrawPolygonMoveVertexes;
+                              gl.Mode.moveVertexesPolygon =
+                                  !gl.Mode.moveVertexesPolygon;
                             });
-                            if (_modeDrawPolygonMoveVertexes == true) {
+                            if (gl.Mode.moveVertexesPolygon == true) {
                               refreshView(() {
                                 LatLng point =
                                     gl
@@ -2070,8 +2132,8 @@ class _MapPageState extends State<MapPage> {
                                   }
                                 }
                               });
-                              _modeDrawPolygonAddVertexes = false;
-                              _modeDrawPolygonRemoveVertexes = false;
+                              gl.Mode.addVertexesPolygon = false;
+                              gl.Mode.removeVertexesPolygon = false;
                             } else {
                               refreshView(() {
                                 _stopMovingSelectedPoint();
@@ -2081,23 +2143,23 @@ class _MapPageState extends State<MapPage> {
                           icon: const Icon(Icons.open_with_rounded),
                         ),
                       ),
-                    if (_modeShowButtonDrawPolygonRemoveVertexes)
+                    if (gl.Mode.showButtonRemoveVertexesPolygon)
                       Container(
                         color: _polygonMenuColorTools(
-                          _modeDrawPolygonRemoveVertexes,
+                          gl.Mode.removeVertexesPolygon,
                         ),
                         child: IconButton(
                           iconSize: gl.display.equipixel * gl.iconSizeM,
                           color:
-                              _modeDrawPolygonRemoveVertexes
+                              gl.Mode.removeVertexesPolygon
                                   ? Colors.white
                                   : Colors.lightGreenAccent,
                           onPressed: () async {
                             refreshView(() {
-                              _modeDrawPolygonRemoveVertexes =
-                                  !_modeDrawPolygonRemoveVertexes;
+                              gl.Mode.removeVertexesPolygon =
+                                  !gl.Mode.removeVertexesPolygon;
                             });
-                            if (_modeDrawPolygonRemoveVertexes == true) {
+                            if (gl.Mode.removeVertexesPolygon == true) {
                               refreshView(() {
                                 if (_isPolygonWellDefined(
                                   gl.polygonLayers[gl.selectedPolygonLayer]
@@ -2123,30 +2185,29 @@ class _MapPageState extends State<MapPage> {
                                       );
                                 }
                               });
-                              _modeDrawPolygonMoveVertexes = false;
-                              _modeDrawPolygonAddVertexes = false;
+                              gl.Mode.moveVertexesPolygon = false;
+                              gl.Mode.addVertexesPolygon = false;
                               _stopMovingSelectedPoint();
                               refreshView(() {
                                 if (gl
                                     .polygonLayers[gl.selectedPolygonLayer]
                                     .polygonPoints
                                     .isEmpty) {
-                                  _modeShowButtonDrawPolygonAddVertexes = true;
-                                  _modeShowButtonDrawPolygonMoveVertexes =
+                                  gl.Mode.showButtonAddVertexesPolygon = true;
+                                  gl.Mode.showButtonMoveVertexesPolygon = false;
+                                  gl.Mode.showButtonRemoveVertexesPolygon =
                                       false;
-                                  _modeShowButtonDrawPolygonRemoveVertexes =
-                                      false;
-                                  _modeDrawPolygonAddVertexes = false;
-                                  _modeDrawPolygonMoveVertexes = false;
-                                  _modeDrawPolygonRemoveVertexes = false;
+                                  gl.Mode.addVertexesPolygon = false;
+                                  gl.Mode.moveVertexesPolygon = false;
+                                  gl.Mode.removeVertexesPolygon = false;
                                 } else {
-                                  _modeShowButtonDrawPolygonAddVertexes = false;
-                                  _modeShowButtonDrawPolygonMoveVertexes = true;
-                                  _modeShowButtonDrawPolygonRemoveVertexes =
+                                  gl.Mode.showButtonAddVertexesPolygon = false;
+                                  gl.Mode.showButtonMoveVertexesPolygon = true;
+                                  gl.Mode.showButtonRemoveVertexesPolygon =
                                       true;
-                                  _modeDrawPolygonAddVertexes = false;
-                                  _modeDrawPolygonMoveVertexes = false;
-                                  _modeDrawPolygonRemoveVertexes = false;
+                                  gl.Mode.addVertexesPolygon = false;
+                                  gl.Mode.moveVertexesPolygon = false;
+                                  gl.Mode.removeVertexesPolygon = false;
                                 }
                               });
                             }
@@ -2154,25 +2215,25 @@ class _MapPageState extends State<MapPage> {
                           icon: const Icon(Icons.remove_circle),
                         ),
                       ),
-                    if (_modeShowButtonDrawPolygonAddVertexes)
+                    if (gl.Mode.showButtonAddVertexesPolygon)
                       Container(
                         color: _polygonMenuColorTools(
-                          _modeDrawPolygonAddVertexes,
+                          gl.Mode.addVertexesPolygon,
                         ),
                         child: IconButton(
                           iconSize: gl.display.equipixel * gl.iconSizeM,
                           color:
-                              _modeDrawPolygonAddVertexes
+                              gl.Mode.addVertexesPolygon
                                   ? Colors.white
                                   : Colors.lightGreenAccent,
                           onPressed: () async {
                             refreshView(() {
-                              _modeDrawPolygonAddVertexes =
-                                  !_modeDrawPolygonAddVertexes;
+                              gl.Mode.addVertexesPolygon =
+                                  !gl.Mode.addVertexesPolygon;
                             });
-                            if (_modeDrawPolygonAddVertexes == true) {
-                              _modeDrawPolygonRemoveVertexes = false;
-                              _modeDrawPolygonMoveVertexes = false;
+                            if (gl.Mode.addVertexesPolygon == true) {
+                              gl.Mode.removeVertexesPolygon = false;
+                              gl.Mode.moveVertexesPolygon = false;
                               refreshView(() {
                                 _stopMovingSelectedPoint();
                               });

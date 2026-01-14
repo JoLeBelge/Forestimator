@@ -645,12 +645,14 @@ class PopupNameIntroducer {
         ),
         backgroundColor: Colors.white,
         content: SizedBox(
-          width: gl.display.orientation == Orientation.portrait
-              ? gl.menuBarLength * gl.display.equipixel
-              : gl.menuBarLength * gl.display.equipixel * 1.75,
-          height: gl.display.orientation == Orientation.portrait
-              ? gl.menuBarThickness * gl.display.equipixel * 1.75
-              : gl.menuBarThickness * gl.display.equipixel * .9,
+          width:
+              gl.display.orientation == Orientation.portrait
+                  ? gl.menuBarLength * gl.display.equipixel
+                  : gl.menuBarLength * gl.display.equipixel * 1.75,
+          height:
+              gl.display.orientation == Orientation.portrait
+                  ? gl.menuBarThickness * gl.display.equipixel * 1.75
+                  : gl.menuBarThickness * gl.display.equipixel * .9,
           child: SingleChildScrollView(
             child: switchRowColWithOrientation([
               SizedBox(
@@ -3327,7 +3329,8 @@ Widget forestimatorSettingsPermissions(VoidSetter state) {
       children: [
         Container(
           constraints: BoxConstraints(
-            maxWidth: gl.display.equipixel * gl.popupWindowsPortraitWidth * 0.95,
+            maxWidth:
+                gl.display.equipixel * gl.popupWindowsPortraitWidth * 0.95,
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.start,
@@ -3343,7 +3346,8 @@ Widget forestimatorSettingsPermissions(VoidSetter state) {
         ),
         Container(
           constraints: BoxConstraints(
-            maxWidth: gl.display.equipixel * gl.popupWindowsPortraitWidth * 0.95,
+            maxWidth:
+                gl.display.equipixel * gl.popupWindowsPortraitWidth * 0.95,
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
@@ -3390,7 +3394,8 @@ Widget forestimatorSettingsPermissions(VoidSetter state) {
         if (permissions.sdkInt < 33)
           Container(
             constraints: BoxConstraints(
-              maxWidth: gl.display.equipixel * gl.popupWindowsPortraitWidth * 0.95,
+              maxWidth:
+                  gl.display.equipixel * gl.popupWindowsPortraitWidth * 0.95,
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
