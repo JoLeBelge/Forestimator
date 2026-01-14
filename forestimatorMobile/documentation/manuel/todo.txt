@@ -1,10 +1,10 @@
--refaire un printscreen du sélecteur après avoir modifié les labels des sections (avec un catalogue offline et un lieu)
+-changer les tables des layers, ajouter un code pour savoir si on les utilisent dans forestimator Mobile
 
--ajout image pour les références vers des vidéos
+-refaire un printscreen du sélecteur après avoir modifié les labels des sections (avec un catalogue offline et un lieu)
+-> enlever d'abor la bannière débug.
 
 -analyse ponctuelle : présentation de la matrice d'aptitude
+-orthographe
 
--introduire le glossaire dans l'intro
-
+-début des exercices (le premier en tout cas. -> fresh install)
 -Demander un feedback à quelqu'un d'extérieur: commencer par Florentin (il a le temps et est payé pour ça !)
-

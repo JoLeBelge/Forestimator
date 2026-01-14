@@ -394,7 +394,6 @@ protected:
     // booléen expert assigné au groupe de couche
     std::map<std::string,bool> Dico_groupeExpert;
     std::map<std::string,std::string>  Dico_GISfile;
-    //std::map<std::string,std::string>  Dico_RasterType;
     // continu vs classe
     std::map<std::string,std::string>  Dico_RasterVar;
     std::map<std::string,bool>  Dico_RasterVisu;// les couches que l'on peux visualiser dans la partie carto

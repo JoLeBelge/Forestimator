@@ -107,17 +107,14 @@ class LayerBase {
   Map<int, Color> mDicoCol; // valeur raster vers couleur
   late bool mUsedForAnalysis;
   late int mBits;
-  //String mNomFile,mDir; mPathQml mPathRaster,
 
   // frommap avec liste d'instanciation, inspiré de https://medium.com/@lumeilin/using-sqlite-in-flutter-59b27b099123
-  // named constructor
   LayerBase.fromMap(final Map<String, dynamic> map)
     : mNom = map['NomComplet'],
       mCode = map['Code'],
       mNomCourt = map['NomCourt'],
-      //mPathRaster = map['Dir3'], //+ '/' + map['Nom'], // pas si simple, chemin d'accès sur le mobile. Utile que si bulk download des raster
       mExpert = map['expert'] == 0 ? false : true,
-      mVisu = map['visu'] == 0 ? false : true,
+      mVisu = map['forestimatorMobile'] == 0 ? false : true,
       mGroupe = map['groupe'],
       mUrl = map['WMSurl'] ?? "",
       mWMSLayerName = map['WMSlayer'] ?? "",

@@ -129,7 +129,7 @@ cdicoAptBase::cdicoAptBase(std::string aBDFile):mBDpath(aBDFile),ptDb_(NULL)
         for (std::string table : std::vector<std::string>{"layerApt","fichiersGIS"})
         {
 
-            SQLstring="SELECT Code,"+columnPath+",Nom,Type,NomComplet,Categorie,TypeVar, expert, visu, stat,NomCourt,groupe,statPonct, res FROM "+table+";";
+            SQLstring="SELECT Code,"+columnPath+",Nom,res,NomComplet,Categorie,TypeVar, expert, visu, stat,NomCourt,groupe,statPonct FROM "+table+";";
             sqlite3_prepare_v2( *db_, SQLstring.c_str(), -1, &stmt, NULL );
             while(sqlite3_step(stmt) == SQLITE_ROW)
             {
@@ -147,13 +147,11 @@ cdicoAptBase::cdicoAptBase(std::string aBDFile):mBDpath(aBDFile),ptDb_(NULL)
                     if (sqlite3_column_type(stmt, 11)!=SQLITE_NULL) {groupe=std::string( (char *)sqlite3_column_text( stmt, 11 ) );}
                     Dico_lay2groupe.emplace(std::make_pair(aA,groupe));
 
-                    if ( sqlite3_column_type(stmt, 3)!=SQLITE_NULL && sqlite3_column_type(stmt, 4)!=SQLITE_NULL && sqlite3_column_type(stmt, 5)!=SQLITE_NULL && sqlite3_column_type(stmt, 6)!=SQLITE_NULL&& sqlite3_column_type(stmt, 10)!=SQLITE_NULL){
-                        //std::string aD=std::string( (char *)sqlite3_column_text( stmt, 3 ) );
+                    if ( sqlite3_column_type(stmt, 4)!=SQLITE_NULL && sqlite3_column_type(stmt, 5)!=SQLITE_NULL && sqlite3_column_type(stmt, 6)!=SQLITE_NULL&& sqlite3_column_type(stmt, 10)!=SQLITE_NULL){
                         std::string aE=std::string( (char *)sqlite3_column_text( stmt, 4 ) );
                         std::string aF=std::string( (char *)sqlite3_column_text( stmt, 5 ) );
                         std::string aG=std::string( (char *)sqlite3_column_text( stmt, 6 ) );
                         std::string aH=std::string( (char *)sqlite3_column_text( stmt, 10 ) );
-                        //Dico_RasterType.emplace(std::make_pair(aA,aD));
                         Dico_RasterNomComplet.emplace(std::make_pair(aA,aE));
                         Dico_RasterNomCourt.emplace(std::make_pair(aA,aH));
                         Dico_RasterCategorie.emplace(std::make_pair(aA,aF));
@@ -165,7 +163,7 @@ cdicoAptBase::cdicoAptBase(std::string aBDFile):mBDpath(aBDFile),ptDb_(NULL)
                         if (sqlite3_column_type(stmt, 9)!=SQLITE_NULL) { Dico_RasterStat.emplace(std::make_pair(aA,sqlite3_column_int( stmt, 9 )));}
 
                         if (sqlite3_column_type(stmt, 12)!=SQLITE_NULL) { Dico_RasterStatP.emplace(std::make_pair(aA,sqlite3_column_int( stmt, 12 )));}
-                        if (sqlite3_column_type(stmt, 13)!=SQLITE_NULL) { Dico_RasterResolution.emplace(std::make_pair(aA,sqlite3_column_double( stmt, 13 )));}
+                        if (sqlite3_column_type(stmt, 3)!=SQLITE_NULL) { Dico_RasterResolution.emplace(std::make_pair(aA,sqlite3_column_double( stmt, 3 )));}
                     }
                 }
             }

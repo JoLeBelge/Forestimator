@@ -645,12 +645,14 @@ class PopupNameIntroducer {
         ),
         backgroundColor: Colors.white,
         content: SizedBox(
-          width: gl.display.orientation == Orientation.portrait
-              ? gl.menuBarLength * gl.display.equipixel
-              : gl.menuBarLength * gl.display.equipixel * 1.75,
-          height: gl.display.orientation == Orientation.portrait
-              ? gl.menuBarThickness * gl.display.equipixel * 1.75
-              : gl.menuBarThickness * gl.display.equipixel * .9,
+          width:
+              gl.display.orientation == Orientation.portrait
+                  ? gl.menuBarLength * gl.display.equipixel
+                  : gl.menuBarLength * gl.display.equipixel * 1.75,
+          height:
+              gl.display.orientation == Orientation.portrait
+                  ? gl.menuBarThickness * gl.display.equipixel * 1.75
+                  : gl.menuBarThickness * gl.display.equipixel * .9,
           child: SingleChildScrollView(
             child: switchRowColWithOrientation([
               SizedBox(
@@ -2616,7 +2618,7 @@ class _SearchMenu extends State<SearchMenu> {
                     child: TextFormField(
                       decoration: InputDecoration(
                         border: InputBorder.none,
-                        hintText: "Tappez le nom d'un lieu",
+                        hintText: "Entrez le nom d'un lieu",
                         prefixIcon: Icon(Icons.search, color: Colors.black),
                       ),
                       autocorrect: false,
@@ -3327,7 +3329,8 @@ Widget forestimatorSettingsPermissions(VoidSetter state) {
       children: [
         Container(
           constraints: BoxConstraints(
-            maxWidth: gl.display.equipixel * gl.popupWindowsPortraitWidth * 0.95,
+            maxWidth:
+                gl.display.equipixel * gl.popupWindowsPortraitWidth * 0.95,
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.start,
@@ -3343,7 +3346,8 @@ Widget forestimatorSettingsPermissions(VoidSetter state) {
         ),
         Container(
           constraints: BoxConstraints(
-            maxWidth: gl.display.equipixel * gl.popupWindowsPortraitWidth * 0.95,
+            maxWidth:
+                gl.display.equipixel * gl.popupWindowsPortraitWidth * 0.95,
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
@@ -3390,7 +3394,8 @@ Widget forestimatorSettingsPermissions(VoidSetter state) {
         if (permissions.sdkInt < 33)
           Container(
             constraints: BoxConstraints(
-              maxWidth: gl.display.equipixel * gl.popupWindowsPortraitWidth * 0.95,
+              maxWidth:
+                  gl.display.equipixel * gl.popupWindowsPortraitWidth * 0.95,
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
@@ -4814,7 +4819,7 @@ class _OnlineMapMenu extends State<OnlineMapMenu> {
                   child: TextFormField(
                     decoration: InputDecoration(
                       border: InputBorder.none,
-                      hintText: "Tappez le nom d'une couche",
+                      hintText: "Entrez le nom d'une couche",
                       contentPadding: EdgeInsets.all(10),
                       prefixIcon: Icon(Icons.search, color: Colors.black),
                     ),
@@ -5778,7 +5783,7 @@ class _LayerSwitcher extends State<LayerSwitcher> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        "Controlez les couches visibles",
+                        "Couches points/polygones",
                         textAlign: TextAlign.justify,
                         style: TextStyle(
                           color: Colors.white,
@@ -5811,7 +5816,7 @@ class _LayerSwitcher extends State<LayerSwitcher> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      "Changez les cartes affichées",
+                      "Couches thématiques",
                       textAlign: TextAlign.justify,
                       style: TextStyle(
                         color: Colors.white,
@@ -7338,7 +7343,7 @@ class _AnaResultsMenu extends State<AnaResultsMenu> {
                     "Tolérance élargie",
                   ];
                   return Tab(
-                    text: "${tags[index]} ${apts.getListEss(index).length}",
+                    text: "${tags[index]} ${apts.getListEss(index + 1).length}",
                   );
                 }),
               ),
@@ -7359,7 +7364,7 @@ class _AnaResultsMenu extends State<AnaResultsMenu> {
                 child: TabBarView(
                   children: List<EssencesListView>.generate(
                     3,
-                    (index) => EssencesListView(apts: apts, codeApt: index),
+                    (index) => EssencesListView(apts: apts, codeApt: index + 1),
                   ),
                 ),
               ),
@@ -7395,7 +7400,7 @@ class _AnaResultsMenu extends State<AnaResultsMenu> {
                   4,
                   (index) => Tab(
                     text:
-                        "${gl.dico.vulnerabiliteLabel(index + 1)} ${gl.dico.vulnerabiliteLabel(index + 1).length}",
+                        "${gl.dico.vulnerabiliteLabel(index + 1)} ${apts.getListEss(index + 1).length}",
                   ),
                 ),
               ),
@@ -7406,12 +7411,12 @@ class _AnaResultsMenu extends State<AnaResultsMenu> {
                       max(
                         max(
                           max(
-                            gl.dico.vulnerabiliteLabel(1).length,
-                            gl.dico.vulnerabiliteLabel(3).length,
+                            apts.getListEss(1).length,
+                            apts.getListEss(3).length,
                           ),
-                          gl.dico.vulnerabiliteLabel(2).length,
+                          apts.getListEss(2).length,
                         ),
-                        gl.dico.vulnerabiliteLabel(4).length,
+                        apts.getListEss(4).length,
                       ) *
                       gl.display.equipixel *
                       gl.iconSizeS *
@@ -7422,7 +7427,7 @@ class _AnaResultsMenu extends State<AnaResultsMenu> {
                     4,
                     (index) => EssencesListViewGS(
                       apts: apts,
-                      codeApt: index,
+                      codeApt: index + 1,
                     ), //TODO: apts lists and vulnerabilty labels.length are not compatible!
                   ),
                 ),

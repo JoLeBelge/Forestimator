@@ -49,8 +49,6 @@ public:
     /*************************/
     std::map<int,std::string> getDicoRaster(std::string aCode);
     std::map<std::string,std::string>  * Files(){return  &Dico_GISfile;}
-    // code carte vers type carte code : NH.tif
-    //std::map<std::string,std::string>  * RasterType(){return  &Dico_RasterType;}
     std::map<std::string,std::string>  * RasterVar(){return  &Dico_RasterVar;}
     std::map<std::string,std::string>  * RasterCategorie(){return  &Dico_RasterCategorie;}
     std::map<std::string,std::string>  * RasterNom(){return  &Dico_RasterNomComplet;}
