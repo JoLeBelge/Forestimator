@@ -24,6 +24,7 @@ using namespace libzippp;
 //#include "desserteForest/desserteForest.h"
 #include "api/staticmapresource.h"
 #include "OGF/formOGF.h"
+#include "api/polygfrommobile.h"
 
 std::unique_ptr<Wt::WApplication> createWebAptitudeApplication(const Wt::WEnvironment &env, cDicoApt * dico);
 
