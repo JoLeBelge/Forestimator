@@ -1494,15 +1494,41 @@ class _MapPageState extends State<MapPage> {
                                                                               width:
                                                                                   gl.display.equipixel *
                                                                                   40,
-                                                                              child: Text(
-                                                                                gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].name,
-                                                                                style: TextStyle(
-                                                                                  color:
-                                                                                      Colors.white,
-                                                                                  fontSize:
-                                                                                      gl.display.equipixel *
-                                                                                      gl.fontSizeM *
-                                                                                      .75,
+                                                                              height:
+                                                                                  gl.display.equipixel *
+                                                                                  gl.iconSizeS,
+                                                                              child: TextButton(
+                                                                                onPressed:
+                                                                                    () {},
+                                                                                onLongPress: () {
+                                                                                  PopupValueChange(
+                                                                                    context,
+                                                                                    "prop",
+                                                                                    gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].name,
+                                                                                    (
+                                                                                      value,
+                                                                                    ) {
+                                                                                      gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].name = value;
+                                                                                    },
+                                                                                    () {},
+                                                                                  );
+                                                                                },
+                                                                                child: Container(
+                                                                                  alignment:
+                                                                                      Alignment.centerLeft,
+                                                                                  child: Text(
+                                                                                    gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].name,
+                                                                                    textAlign:
+                                                                                        TextAlign.start,
+                                                                                    style: TextStyle(
+                                                                                      color:
+                                                                                          Colors.white,
+                                                                                      fontSize:
+                                                                                          gl.display.equipixel *
+                                                                                          gl.fontSizeM *
+                                                                                          .75,
+                                                                                    ),
+                                                                                  ),
                                                                                 ),
                                                                               ),
                                                                             ),
@@ -1518,70 +1544,100 @@ class _MapPageState extends State<MapPage> {
                                                                               width:
                                                                                   gl.display.equipixel *
                                                                                   40,
-                                                                              child:
-                                                                                  gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].type ==
-                                                                                          "string"
-                                                                                      ? Text(
-                                                                                        gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].value,
-                                                                                        style: TextStyle(
-                                                                                          color:
-                                                                                              Colors.white,
-                                                                                          fontSize:
-                                                                                              gl.display.equipixel *
-                                                                                              gl.fontSizeM *
-                                                                                              .75,
-                                                                                        ),
-                                                                                      )
-                                                                                      : gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].type ==
-                                                                                          "int"
-                                                                                      ? Text(
-                                                                                        gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].value.toString(),
-                                                                                        style: TextStyle(
-                                                                                          color:
-                                                                                              Colors.white,
-                                                                                          fontSize:
-                                                                                              gl.display.equipixel *
-                                                                                              gl.fontSizeM *
-                                                                                              .75,
-                                                                                        ),
-                                                                                      )
-                                                                                      : gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].type ==
-                                                                                          "double"
-                                                                                      ? Text(
-                                                                                        gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].value.toString(),
-                                                                                        style: TextStyle(
-                                                                                          color:
-                                                                                              Colors.white,
-                                                                                          fontSize:
-                                                                                              gl.display.equipixel *
-                                                                                              gl.fontSizeM *
-                                                                                              .75,
-                                                                                        ),
-                                                                                      )
-                                                                                      : gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].type ==
-                                                                                          "special"
-                                                                                      ? Text(
-                                                                                        "special value",
-                                                                                        style: TextStyle(
-                                                                                          color:
-                                                                                              Colors.white,
-                                                                                          fontSize:
-                                                                                              gl.display.equipixel *
-                                                                                              gl.fontSizeM *
-                                                                                              .75,
-                                                                                        ),
-                                                                                      )
-                                                                                      : Text(
-                                                                                        "ERROR TYPE ${gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].type}",
-                                                                                        style: TextStyle(
-                                                                                          color:
-                                                                                              Colors.white,
-                                                                                          fontSize:
-                                                                                              gl.display.equipixel *
-                                                                                              gl.fontSizeM *
-                                                                                              .75,
-                                                                                        ),
-                                                                                      ),
+                                                                              height:
+                                                                                  gl.display.equipixel *
+                                                                                  gl.iconSizeS,
+                                                                              child: TextButton(
+                                                                                onPressed:
+                                                                                    () {},
+                                                                                onLongPress: () {
+                                                                                  PopupValueChange(
+                                                                                    context,
+                                                                                    gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].type,
+                                                                                    gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].value,
+                                                                                    (
+                                                                                      value,
+                                                                                    ) {
+                                                                                      gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].value = value;
+                                                                                    },
+                                                                                    () {},
+                                                                                  );
+                                                                                },
+                                                                                child: Container(
+                                                                                  alignment:
+                                                                                      Alignment.centerLeft,
+                                                                                  child:
+                                                                                      gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].type ==
+                                                                                              "string"
+                                                                                          ? Text(
+                                                                                            gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].value,
+                                                                                            textAlign:
+                                                                                                TextAlign.start,
+                                                                                            style: TextStyle(
+                                                                                              color:
+                                                                                                  Colors.white,
+                                                                                              fontSize:
+                                                                                                  gl.display.equipixel *
+                                                                                                  gl.fontSizeM *
+                                                                                                  .75,
+                                                                                            ),
+                                                                                          )
+                                                                                          : gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].type ==
+                                                                                              "int"
+                                                                                          ? Text(
+                                                                                            gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].value.toString(),
+                                                                                            textAlign:
+                                                                                                TextAlign.start,
+                                                                                            style: TextStyle(
+                                                                                              color:
+                                                                                                  Colors.white,
+                                                                                              fontSize:
+                                                                                                  gl.display.equipixel *
+                                                                                                  gl.fontSizeM *
+                                                                                                  .75,
+                                                                                            ),
+                                                                                          )
+                                                                                          : gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].type ==
+                                                                                              "double"
+                                                                                          ? Text(
+                                                                                            gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].value.toString(),
+                                                                                            textAlign:
+                                                                                                TextAlign.start,
+                                                                                            style: TextStyle(
+                                                                                              color:
+                                                                                                  Colors.white,
+                                                                                              fontSize:
+                                                                                                  gl.display.equipixel *
+                                                                                                  gl.fontSizeM *
+                                                                                                  .75,
+                                                                                            ),
+                                                                                          )
+                                                                                          : gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].type ==
+                                                                                              "special"
+                                                                                          ? Text(
+                                                                                            "special value",
+                                                                                            style: TextStyle(
+                                                                                              color:
+                                                                                                  Colors.white,
+                                                                                              fontSize:
+                                                                                                  gl.display.equipixel *
+                                                                                                  gl.fontSizeM *
+                                                                                                  .75,
+                                                                                            ),
+                                                                                          )
+                                                                                          : Text(
+                                                                                            "ERROR TYPE ${gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].type}",
+                                                                                            style: TextStyle(
+                                                                                              color:
+                                                                                                  Colors.white,
+                                                                                              fontSize:
+                                                                                                  gl.display.equipixel *
+                                                                                                  gl.fontSizeM *
+                                                                                                  .75,
+                                                                                            ),
+                                                                                          ),
+                                                                                ),
+                                                                              ),
                                                                             ),
                                                                           ],
                                                                         ),
@@ -1656,7 +1712,13 @@ class _MapPageState extends State<MapPage> {
                                                                   .last
                                                                   .value = it;
                                                             },
-                                                            () {},
+                                                            () {
+                                                              gl
+                                                                  .polygonLayers[gl
+                                                                      .selectedPolygonLayer]
+                                                                  .attributes
+                                                                  .removeLast();
+                                                            },
                                                             () {},
                                                           );
                                                         },
@@ -3034,6 +3096,26 @@ class _MapPageState extends State<MapPage> {
     await gl.shared!.setInt('$name.nPolyPoints', i);
   }
 
+  void _writePropertiesToMemory(
+    String name,
+    List<pl.Attribute> attributes,
+  ) async {
+    int i = 0;
+    for (var attribute in attributes) {
+      await gl.shared!.setString('$name.$i.name', attribute.name);
+      await gl.shared!.setString('$name.$i.type', attribute.type);
+      if (attribute.type == "string") {
+        await gl.shared!.setString('$name.$i.val', attribute.value);
+      } else if (attribute.type == "int") {
+        await gl.shared!.setInt('$name.$i.val', attribute.value);
+      } else if (attribute.type == "double") {
+        await gl.shared!.setDouble('$name.$i.val', attribute.value);
+      }
+      i++;
+    }
+    await gl.shared!.setInt('$name.nAttributes', i);
+  }
+
   void _writePositionDataToSharedPreferences(
     double lon,
     double lat,
@@ -3069,6 +3151,7 @@ class _MapPageState extends State<MapPage> {
         _writeColorToMemory('poly$i.colorInside', polygon.colorInside);
         _writeColorToMemory('poly$i.colorLine', polygon.colorLine);
         _writePolygonPointsToMemory('poly$i.poly', polygon.polygonPoints);
+        _writePropertiesToMemory('poly$i.prop', polygon.attributes);
         i++;
       }
       await gl.shared!.setInt('nPolys', i);

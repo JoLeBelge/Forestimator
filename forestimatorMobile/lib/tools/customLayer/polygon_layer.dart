@@ -363,7 +363,7 @@ class PolygonLayer {
   Future<bool> sendGeometryToServer() async {
     if (sentToServer) {
       gl.print("Geometry $name already sent once!");
-      gl.mainStack.add(popupAlreadySent());
+      gl.mainStack.add(popupGeometryAlreadySent());
       return false;
     }
     bool internet = await InternetConnection().hasInternetAccess;
@@ -386,7 +386,9 @@ class PolygonLayer {
         );
         coordinates = "[[$coordinates[${tLb72.x}, ${tLb72.y}]]]";
       } else {
-        coordinates = coordinates.substring(0, coordinates.length - 1);
+        if (coordinates.length > 1) {
+          coordinates = coordinates.substring(0, coordinates.length - 1);
+        }
       }
       String properties = "";
       for (Attribute attribute in attributes) {

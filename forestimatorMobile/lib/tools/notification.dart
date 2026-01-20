@@ -256,7 +256,7 @@ class PopupDownloadRecomendedLayers extends StatelessWidget {
   }
 }
 
-Widget popupAlreadySent() {
+Widget popupGeometryAlreadySent() {
   return AlertDialog(
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadiusGeometry.circular(12.0),
@@ -961,12 +961,16 @@ class PopupNewAttribute {
     ValueChanged<String> typeChanged,
     ValueChanged<String> attributeNameChanged,
     ValueChanged<dynamic> valueChanged,
-    VoidCallback after,
+    VoidCallback onTapOutside,
     VoidCallback callbackOnStartTyping,
   ) {
+    TextEditingController textEditor = TextEditingController();
+    TextEditingController textEditorVal = TextEditingController();
+    String type = "string";
     presentPopup(
       context: context,
       dismiss: true,
+      after: onTapOutside,
       popup: AlertDialog(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadiusGeometry.circular(12.0),
@@ -987,13 +991,19 @@ class PopupNewAttribute {
               Column(
                 children: [
                   Text(
-                    "Choisissez le type de la variable",
+                    "Type de la variable",
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: gl.display.equipixel * gl.fontSizeM,
                     ),
                   ),
-                  SelectAttributeType(typeChanged: typeChanged),
+                  SelectAttributeType(
+                    typeChanged: (String newType) {
+                      type = newType;
+                      typeChanged(type);
+                      textEditorVal.text = "";
+                    },
+                  ),
                   stroke(
                     gl.display.equipixel,
                     gl.display.equipixel * .5,
@@ -1012,14 +1022,13 @@ class PopupNewAttribute {
                       maxLength: 22,
                       maxLengthEnforcement: MaxLengthEnforcement.enforced,
                       onChanged: (String str) {
-                        attributeNameChanged(str);
+                        textEditor.text = cleanAttributeName(str.toString());
+                        attributeNameChanged(textEditor.text);
                       },
                       onTap: () => callbackOnStartTyping(),
-                      onTapOutside: (pointer) {
-                        after();
-                      },
-                      controller: TextEditingController(text: ""),
+                      onTapOutside: (pointer) {},
                       style: TextStyle(color: Colors.white),
+                      controller: textEditor,
                     ),
                   ),
                   Text(
@@ -1035,13 +1044,48 @@ class PopupNewAttribute {
                       maxLength: 22,
                       maxLengthEnforcement: MaxLengthEnforcement.enforced,
                       onChanged: (String str) {
-                        valueChanged(str);
+                        switch (type) {
+                          case "string":
+                            valueChanged(str);
+                          case "int":
+                            try {
+                              valueChanged(int.parse(str));
+                            } catch (e) {
+                              if (textEditorVal.text.isNotEmpty) {
+                                textEditorVal.text = textEditorVal.text
+                                    .substring(
+                                      0,
+                                      textEditorVal.text.length - 1,
+                                    );
+                              }
+                              if (textEditorVal.text.isEmpty) {
+                                valueChanged(0);
+                              } else {
+                                valueChanged(int.parse(textEditorVal.text));
+                              }
+                            }
+                          case "double":
+                            try {
+                              valueChanged(double.parse(str));
+                            } catch (e) {
+                              if (textEditorVal.text.isNotEmpty) {
+                                textEditorVal.text = textEditorVal.text
+                                    .substring(
+                                      0,
+                                      textEditorVal.text.length - 1,
+                                    );
+                              }
+                              if (textEditorVal.text.isEmpty) {
+                                valueChanged(0.0);
+                              } else {
+                                valueChanged(double.parse(textEditorVal.text));
+                              }
+                            }
+                        }
                       },
                       onTap: () => callbackOnStartTyping(),
-                      onTapOutside: (pointer) {
-                        after();
-                      },
-                      controller: TextEditingController(text: ""),
+                      onTapOutside: (pointer) {},
+                      controller: textEditorVal,
                       style: TextStyle(color: Colors.white),
                     ),
                   ),
@@ -1056,8 +1100,10 @@ class PopupNewAttribute {
                   ),
                   child: Text("Ajouter", style: dialogTextButtonStyle()),
                   onPressed: () {
+                    if (controlDuplicateAttributeName(textEditor.text)) {
+                      return;
+                    }
                     dismissPopup();
-                    after();
                   },
                 ),
               ),
@@ -1067,6 +1113,149 @@ class PopupNewAttribute {
       ),
     );
   }
+}
+
+class PopupValueChange {
+  PopupValueChange(
+    BuildContext context,
+    String type,
+    dynamic oldValue,
+    ValueChanged<dynamic> valueChanged,
+    VoidCallback onTapOutside,
+  ) {
+    TextEditingController textEditor = TextEditingController(text: "");
+    presentPopup(
+      context: context,
+      dismiss: true,
+      after: () {
+        valueChanged(oldValue);
+        onTapOutside;
+      },
+      popup: AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadiusGeometry.circular(12.0),
+          side: BorderSide(color: gl.colorAgroBioTech, width: 2.0),
+        ),
+        backgroundColor: gl.backgroundTransparentBlackBox,
+        content: SizedBox(
+          width:
+              gl.display.orientation == Orientation.portrait
+                  ? gl.popupWindowsPortraitWidth * gl.display.equipixel
+                  : gl.popupWindowsLandscapeWidth * gl.display.equipixel,
+          height:
+              gl.display.orientation == Orientation.portrait
+                  ? gl.popupWindowsPortraitHeight * gl.display.equipixel / 2
+                  : gl.popupWindowsLandscapeHeight * gl.display.equipixel,
+          child: Column(
+            children: [
+              Text(
+                "Introduisez une nouvelle valeur",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: gl.display.equipixel * gl.fontSizeS,
+                ),
+              ),
+              SizedBox(
+                width: gl.menuBarLength * gl.display.equipixel,
+                child: TextFormField(
+                  maxLength: 22,
+                  maxLengthEnforcement: MaxLengthEnforcement.enforced,
+                  onChanged: (String str) {
+                    switch (type) {
+                      case "prop":
+                        textEditor.text = cleanAttributeName(str.toString());
+                        valueChanged(textEditor.text);
+                      case "string":
+                        valueChanged(str.toString());
+                      case "int":
+                        try {
+                          valueChanged(int.parse(str));
+                        } catch (e) {
+                          if (textEditor.text.isNotEmpty) {
+                            textEditor.text = textEditor.text.substring(
+                              0,
+                              textEditor.text.length - 1,
+                            );
+                          }
+                          if (textEditor.text.isEmpty) {
+                            valueChanged(0);
+                          } else {
+                            valueChanged(textEditor.text);
+                          }
+                        }
+                      case "double":
+                        try {
+                          valueChanged(double.parse(str));
+                        } catch (e) {
+                          if (textEditor.text.isNotEmpty) {
+                            textEditor.text = textEditor.text.substring(
+                              0,
+                              textEditor.text.length - 1,
+                            );
+                          }
+                          if (textEditor.text.isEmpty) {
+                            valueChanged(0.0);
+                          } else {
+                            valueChanged(textEditor.text);
+                          }
+                        }
+                    }
+                  },
+                  onTapOutside: (pointer) {},
+                  controller: textEditor,
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+              SizedBox(
+                width: gl.menuBarLength * .5 * gl.display.equipixel,
+                child: TextButton(
+                  style: dialogButtonStyle(
+                    height: gl.display.equipixel * 12,
+                    width: gl.display.equipixel * 10 * "Ok".length,
+                  ),
+                  child: Text("Changer", style: dialogTextButtonStyle()),
+                  onPressed: () {
+                    if (controlDuplicateAttributeName(textEditor.text)) {
+                      return;
+                    }
+                    dismissPopup();
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+String cleanAttributeName(String attribute) {
+  String controlled = "";
+  String wantedCharacters = "_";
+  for (int i = 0; i < attribute.length; i++) {
+    if (attribute[i].contains(wantedCharacters) ||
+        attribute[i].contains(RegExp(r'[A-Z]')) ||
+        attribute[i].contains(RegExp(r'[a-z]'))) {
+      controlled = controlled + attribute[i];
+    }
+  }
+  return controlled;
+}
+
+bool controlDuplicateAttributeName(String attribute) {
+  int count = 0;
+  for (
+    int i = 0;
+    i < gl.polygonLayers[gl.selectedPolygonLayer].attributes.length;
+    i++
+  ) {
+    if (attribute ==
+        gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].name) {
+      count++;
+    }
+  }
+  return count > 1 ? true : false;
 }
 
 class SelectAttributeType extends StatefulWidget {
@@ -1086,7 +1275,7 @@ class _SelectAttributeType extends State<SelectAttributeType> {
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
         Container(
-          width: gl.display.equipixel * gl.iconSizeM * 2,
+          width: gl.display.equipixel * gl.iconSizeM * 1.9,
           height: gl.display.equipixel * gl.iconSizeM * 1.35,
           color: _selectedType == 0 ? gl.colorAgroBioTech : Colors.transparent,
           child: TextButton(
@@ -1111,7 +1300,7 @@ class _SelectAttributeType extends State<SelectAttributeType> {
           ),
         ),
         Container(
-          width: gl.display.equipixel * gl.iconSizeM * 2,
+          width: gl.display.equipixel * gl.iconSizeM * 1.7,
           height: gl.display.equipixel * gl.iconSizeM * 1.35,
           color: _selectedType == 1 ? gl.colorAgroBioTech : Colors.transparent,
           child: TextButton(
@@ -1136,7 +1325,7 @@ class _SelectAttributeType extends State<SelectAttributeType> {
           ),
         ),
         Container(
-          width: gl.display.equipixel * gl.iconSizeM * 2,
+          width: gl.display.equipixel * gl.iconSizeM * 1.9,
           height: gl.display.equipixel * gl.iconSizeM * 1.35,
           color: _selectedType == 2 ? gl.colorAgroBioTech : Colors.transparent,
           child: TextButton(
