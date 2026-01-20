@@ -1,10 +1,5 @@
--changer les tables des layers, ajouter un code pour savoir si on les utilisent dans forestimator Mobile
+-attendre les modifications du logiciels (géométrie points et attributs)
 
--refaire un printscreen du sélecteur après avoir modifié les labels des sections (avec un catalogue offline et un lieu)
--> enlever d'abor la bannière débug.
+-début des exercices (le premier en tout cas.)
 
--analyse ponctuelle : présentation de la matrice d'aptitude
--orthographe
-
--début des exercices (le premier en tout cas. -> fresh install)
--Demander un feedback à quelqu'un d'extérieur: commencer par Florentin (il a le temps et est payé pour ça !)
+-Demander un deuxième feedback à quelqu'un d'extérieur: Charlotte? Nicolas D.? 

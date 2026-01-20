@@ -36,6 +36,8 @@ int launchForestimator(int argc, char **argv)
     anaSurfResource anaSurfResource(dico);
     staticMapResource smResource(dico);
 
+    polygFromMobile fromMobile(dico->File("docroot") + "validCarteEss.db");
+
     try
     {
         Wt::WServer server = Wt::WServer(argc, argv, WTHTTP_CONFIGURATION);
@@ -66,6 +68,8 @@ int launchForestimator(int argc, char **argv)
         server.addResource(&anaPonctResource, "/api/anaPt/layers/${listLayerCode}/x/${x}/y/${y}");
 
         server.addResource(&anaSurfResource, "/api/anaSurf/layers/${listLayerCode}/polygon/${pol}");
+
+        server.addResource(&fromMobile, "/api/polygFromMobile/${feature}");
 
         // fileResource pour les cartes à l'échelle de toute la RW
         for (auto kv : dico->VlayerBase())

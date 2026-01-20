@@ -32,6 +32,7 @@ SOURCES += main.cpp \
     api/anasurfresource.cpp \
     analytics.cpp \
     api/anaponctuelleresource.cpp \
+    api/polygfrommobile.cpp \
     api/rasterclipresource.cpp \
     api/staticmapresource.cpp \
     auth/Session.cpp \
@@ -72,6 +73,7 @@ HEADERS += \
     #desserteForest/desserteForest.h \
     analytics.h \
     api/anaponctuelleresource.h \
+    api/polygfrommobile.h \
     api/rasterclipresource.h \
     api/staticmapresource.h \
     auth/Session.h \

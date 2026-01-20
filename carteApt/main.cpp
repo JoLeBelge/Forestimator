@@ -44,7 +44,7 @@ int main(int argc, char *argv[])
             ("MNH_TS", po::value<bool>(), "preparation de la série temporelle de MNH pour Forestimator")
             ("pathBD", po::value<std::string>(), "chemin d'accès à la BD carteFEE_NTpH.db ou à aptitudeEssDB.db")
             ("colPath", po::value<std::string>(), "nom de la colonne de fichierGIS et layerApt propre à la machine (chemin d'accès couche en local)")
-            ("gpkg", po::value<std::string>(), "gpkg in")
+            ("gpkg", po::value<std::string>(), "gpkg in. Only BL72")
             ("gpkg_layer", po::value<std::string>(), "name of layer")
             ("layerCode", po::value<std::vector<std::string>>()->multitoken(), "layer Code (or ess code) list, ex: --layerCode dendro_gha dendro_vha dendro_cdom dendro_hdom")
             ;
