@@ -164,6 +164,12 @@ class _MyApp extends State<MyApp> {
         gl.polygonLayers.add(
           PolygonLayer(polygonName: gl.shared!.getString('poly$i.name')!),
         );
+        gl.polygonLayers[i].type =
+            gl.shared!.getString('poly$i.type') ?? "Polygon";
+        gl.polygonLayers[i].sentToServer =
+            gl.shared!.getBool('poly$i.sent') ?? false;
+        gl.polygonLayers[i].visibleOnMap =
+            gl.shared!.getBool('poly$i.visibleOnMap') ?? true;
         gl.polygonLayers[i].area = gl.shared!.getDouble('poly$i.area')!;
         gl.polygonLayers[i].perimeter =
             gl.shared!.getDouble('poly$i.perimeter')!;

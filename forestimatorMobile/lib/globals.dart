@@ -42,6 +42,8 @@ class Mode {
   static bool _expertTools = false;
 
   static bool polygon = false;
+  static bool openToolbox = false;
+  static bool editAttributes = false;
   static bool editPolygon = false;
   static bool addVertexesPolygon = false;
   static bool moveVertexesPolygon = false;
@@ -199,7 +201,7 @@ double fontSizeL = 6;
 double fontSizeXL = 7;
 // Polygons
 double chosenPolyBarWidth = 95;
-double chosenPolyBarHeight = 25;
+double chosenPolyBarHeight = 20;
 double infoBoxPolygon = 30;
 // AnaPtPreview
 double anaPtBoxSize = 12;
@@ -234,6 +236,8 @@ double onCatalogueIconSize = 7;
 double onCatalogueLayerSelectionButton = 10;
 // Legend view
 double legendHeightColorTile = 0.01;
+// AttributeTable
+double attributeTableHeight = 75;
 
 proj4.Projection epsg4326 = proj4.Projection.get('EPSG:4326')!;
 proj4.Projection epsg31370 =
