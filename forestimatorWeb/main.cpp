@@ -113,6 +113,10 @@ int launchForestimator(int argc, char **argv)
         fileResource5->suggestFileName("OGF.db");
         server.addResource(fileResource5, "/telechargement/OGF");
 
+        Wt::WFileResource *fileResource6 = new Wt::WFileResource("application/x-sqlite3", dico->File("docroot") + "compo.db");
+        fileResource6->suggestFileName("validCarteEss.db");
+        server.addResource(fileResource6, "/telechargement/validCarteEss");
+
         server.addEntryPoint(Wt::EntryPointType::Application, std::bind(&createWebAptitudeApplication, std::placeholders::_1, dico));
         Session::configureAuth();
         server.run();

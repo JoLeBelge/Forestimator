@@ -47,6 +47,8 @@ int main(int argc, char *argv[])
             ("gpkg", po::value<std::string>(), "gpkg in. Only BL72")
             ("gpkg_layer", po::value<std::string>(), "name of layer")
             ("layerCode", po::value<std::vector<std::string>>()->multitoken(), "layer Code (or ess code) list, ex: --layerCode dendro_gha dendro_vha dendro_cdom dendro_hdom")
+            ("buffer", po::value<int>(), "buffer to apply to point geometry, def 30")
+
             ;
 
     po::variables_map vm;
@@ -83,6 +85,9 @@ int main(int argc, char *argv[])
 
                 std::vector<std::string> codeList(vm["layerCode"].as<std::vector<std::string>>());
 
+                int buffer = 30;
+
+                if (vm.count("buffer")){buffer=vm["buffer"].as<int>();}
 
                 //ouverture du gpkg
                 const char *inputPath=file.c_str();
@@ -100,9 +105,9 @@ int main(int argc, char *argv[])
                     std::cout << "layer chargée " << std::endl;
 
                     OGRSpatialReference *oSRS = lay->GetSpatialRef();
-                    if (oSRS == NULL || oSRS->GetEPSGGeogCS()!=31370)
+                    if (oSRS == NULL || oSRS->AutoIdentifyEPSG()!=31370)
                     {
-                        std::cout << "la couche doit être en BL72. epsg est de  " << oSRS->GetEPSGGeogCS()  << std::endl;
+                        std::cout << "la couche doit être en BL72. epsg est de  " << oSRS->AutoIdentifyEPSG()  << std::endl;
                     }
 
 
@@ -121,10 +126,10 @@ int main(int argc, char *argv[])
                     {
 
                         OGRGeometry * poGeom = poFeature->GetGeometryRef();
-                        if (poFeature->GetGeometryRef()->getIsoGeometryType()==1001)
+                        if (poFeature->GetGeometryRef()->getIsoGeometryType()==1001 || poFeature->GetGeometryRef()->getIsoGeometryType()==1)
                         {
-                            std::cout << " buffer on point" << std::endl;
-                            poGeom = poFeature->GetGeometryRef()->Buffer(30);
+                            std::cout << " buffer on point, " << buffer << " meters" << std::endl;
+                            poGeom = poFeature->GetGeometryRef()->Buffer(buffer);
 
                         } else {
                             std::cout << "geometry type is " << poFeature->GetGeometryRef()->getGeometryName() << ", iso geom type " << poFeature->GetGeometryRef()->getIsoGeometryType() <<std::endl;
