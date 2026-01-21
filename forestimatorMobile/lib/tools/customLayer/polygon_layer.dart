@@ -10,9 +10,20 @@ import 'package:internet_connection_checker_plus/internet_connection_checker_plu
 import 'package:proj4dart/proj4dart.dart' as proj4;
 import 'package:latlong2/latlong.dart';
 
+class Attribute {
+  String type;
+  String name;
+  dynamic value;
+
+  Attribute({required this.name, required this.type, required this.value});
+}
+
 class PolygonLayer {
   UniqueKey identifier = UniqueKey();
+  bool sentToServer = false;
+  String type = "";
   String name = "";
+  bool visibleOnMap = true;
   List<LatLng> polygonPoints = [];
   List<int> selectedPolyLinePoints = [0, 0];
   Color colorInside = Color.fromRGBO(255, 128, 164, 80);
@@ -23,6 +34,7 @@ class PolygonLayer {
   double area = 0.0;
   double perimeter = 0.0;
   Map<String, dynamic> decodedJson = {};
+  List<Attribute> attributes = [];
 
   PolygonLayer({required String polygonName}) {
     name = polygonName;
@@ -345,6 +357,77 @@ class PolygonLayer {
       gl.mainStack.add(popupNoInternet());
       return false;
     }
+    return true;
+  }
+
+  Future<bool> sendGeometryToServer() async {
+    if (sentToServer) {
+      gl.print("Geometry $name already sent once!");
+      gl.mainStack.add(popupGeometryAlreadySent());
+      return false;
+    }
+    bool internet = await InternetConnection().hasInternetAccess;
+    if (internet) {
+      String coordinates = "";
+      for (LatLng point in polygonPoints) {
+        proj4.Point tLb72 = gl.epsg4326.transform(
+          gl.epsg31370,
+          proj4.Point(x: point.longitude, y: point.latitude),
+        );
+        coordinates = "$coordinates[${tLb72.x}, ${tLb72.y}],";
+      }
+      if (type == "Polygon") {
+        proj4.Point tLb72 = gl.epsg4326.transform(
+          gl.epsg31370,
+          proj4.Point(
+            x: polygonPoints.first.longitude,
+            y: polygonPoints.first.latitude,
+          ),
+        );
+        coordinates = "[[$coordinates[${tLb72.x}, ${tLb72.y}]]]";
+      } else {
+        if (coordinates.length > 1) {
+          coordinates = coordinates.substring(0, coordinates.length - 1);
+        }
+      }
+      String properties = "";
+      for (Attribute attribute in attributes) {
+        properties =
+            "$properties\"${attribute.name}\":\"${attribute.value.toString()}\",";
+      }
+      properties = properties.substring(0, properties.length - 1);
+      String geometry =
+          "{\"type\":\"FeatureCollection\",\"features\":[{\"type\":\"Feature\",\"geometry\":{\"type\":\"$type\",\"coordinates\":$coordinates},\"properties\":{$properties}}]}";
+
+      String request =
+          "https://forestimator.gembloux.ulg.ac.be/api/polygFromMobile/$geometry";
+      http.Response? response;
+      try {
+        response = await http.get(Uri.parse(request));
+        if (response.statusCode != 200) {
+          throw HttpException('${response.statusCode}');
+        }
+      } catch (e) {
+        gl.print("Server error sending geometry to server");
+        gl.print("$e");
+        return false;
+      }
+      try {
+        if (!(response.bodyBytes[0] == 79 && response.bodyBytes[1] == 75)) {
+          throw Exception("server said not OK to geometry");
+        }
+      } catch (e) {
+        gl.print("Error with answer after sending geometry to server");
+        gl.print("$e");
+        return false;
+      }
+    } else {
+      gl.print("Could not send Poly to Server, no internet!");
+      gl.mainStack.add(popupNoInternet());
+      return false;
+    }
+    gl.print("Success sending Geometry $name");
+    sentToServer = true;
     return true;
   }
 }

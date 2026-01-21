@@ -1,3 +1,4 @@
+import 'package:fforestimator/globals.dart' as gl;
 import 'package:flutter/material.dart';
 
 Color getColorFromName(String name) {
@@ -38,4 +39,31 @@ Color getColorTextFromBackground(Color background) {
   } else {
     return Colors.black;
   }
+}
+
+Widget stroke(
+  double space,
+  double thickness,
+  Color color, {
+  bool vertical = false,
+}) {
+  return vertical
+      ? Row(
+        children: [
+          SizedBox(width: space),
+          Container(
+            height: gl.display.equipixel * gl.iconSizeXS,
+            width: thickness,
+            color: color,
+          ),
+          SizedBox(width: space),
+        ],
+      )
+      : Column(
+        children: [
+          SizedBox(height: space),
+          Container(height: thickness, color: color),
+          SizedBox(height: space),
+        ],
+      );
 }

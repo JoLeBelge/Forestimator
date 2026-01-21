@@ -8,7 +8,7 @@ import 'package:fforestimator/pages/anaPt/requested_layer.dart';
 import 'package:fforestimator/pages/catalogueView/layer_tile.dart';
 import 'package:fforestimator/pages/catalogueView/legend_view.dart';
 import 'package:fforestimator/pages/pdf_screen.dart';
-import 'package:fforestimator/tools/color_tools.dart';
+import 'package:fforestimator/tools/layout_tools.dart';
 import 'package:fforestimator/tools/customLayer/path_layer.dart';
 import 'package:fforestimator/tools/customLayer/polygon_layer.dart';
 import 'package:fforestimator/tools/handle_permissions.dart';
@@ -18,6 +18,7 @@ import 'package:fforestimator/tools/pretty_print_nominatim_results.dart';
 import 'package:fforestimator/tools/pretty_print_polygon_results.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
@@ -253,6 +254,49 @@ class PopupDownloadRecomendedLayers extends StatelessWidget {
       ],
     );
   }
+}
+
+Widget popupGeometryAlreadySent() {
+  return AlertDialog(
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadiusGeometry.circular(12.0),
+      side: BorderSide(color: gl.colorAgroBioTech, width: 2.0),
+    ),
+    backgroundColor: Colors.white,
+    title: Row(
+      children: [
+        forestimatorIcon(),
+        Text(
+          "Message",
+          style: TextStyle(
+            color: Colors.black,
+            fontWeight: FontWeight.w400,
+            fontSize: gl.display.equipixel * gl.fontSizeM,
+          ),
+        ),
+      ],
+    ),
+    content: Text(
+      "Vous avez déja envoyé cette Géométrie.",
+      style: TextStyle(
+        color: Colors.black,
+        fontWeight: FontWeight.w400,
+        fontSize: gl.display.equipixel * gl.fontSizeM,
+      ),
+    ),
+    actions: <Widget>[
+      TextButton(
+        style: dialogButtonStyle(
+          height: gl.display.equipixel * 12,
+          width: gl.display.equipixel * 20,
+        ),
+        child: Text("OK", style: dialogTextButtonStyle()),
+        onPressed: () {
+          dismissPopup();
+        },
+      ),
+    ],
+  );
 }
 
 Widget popupNoInternet() {
@@ -689,6 +733,623 @@ class PopupNameIntroducer {
           ),
         ),
       ),
+    );
+  }
+}
+
+class PopupNewPolygon {
+  PopupNewPolygon(
+    BuildContext context,
+    String currentName,
+    Color currentColor,
+    ValueChanged<String> typeChanged,
+    ValueChanged<String> nameChanged,
+    ValueChanged<Color> colorChanged,
+    VoidCallback after,
+    VoidCallback callbackOnStartTyping,
+  ) {
+    presentPopup(
+      context: context,
+      dismiss: true,
+      popup: AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadiusGeometry.circular(12.0),
+          side: BorderSide(color: gl.colorAgroBioTech, width: 2.0),
+        ),
+        backgroundColor: gl.backgroundTransparentBlackBox,
+        content: SizedBox(
+          width:
+              gl.display.orientation == Orientation.portrait
+                  ? gl.popupWindowsPortraitWidth * gl.display.equipixel
+                  : gl.popupWindowsLandscapeWidth * gl.display.equipixel,
+          height:
+              gl.display.orientation == Orientation.portrait
+                  ? gl.popupWindowsPortraitHeight * gl.display.equipixel / 2
+                  : gl.popupWindowsLandscapeHeight * gl.display.equipixel,
+          child: SingleChildScrollView(
+            child: switchRowColWithOrientation([
+              Column(
+                children: [
+                  Text(
+                    "Choisissez le type",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: gl.display.equipixel * gl.fontSizeM,
+                    ),
+                  ),
+                  SelectPolyType(state: (String s) {}),
+                  stroke(
+                    gl.display.equipixel,
+                    gl.display.equipixel * .5,
+                    gl.colorAgroBioTech,
+                  ),
+                  Text(
+                    "Introduisez un nom",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: gl.display.equipixel * gl.fontSizeM,
+                    ),
+                  ),
+                  SizedBox(
+                    width: gl.menuBarLength * gl.display.equipixel,
+                    child: TextFormField(
+                      maxLength: 22,
+                      maxLengthEnforcement: MaxLengthEnforcement.enforced,
+                      onChanged: (String str) {
+                        nameChanged(str);
+                      },
+                      onTap: () => callbackOnStartTyping(),
+                      onTapOutside: (pointer) {
+                        after();
+                      },
+                      controller: TextEditingController(text: ""),
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                  Text(
+                    "Choisissez une couleur",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: gl.display.equipixel * gl.fontSizeM,
+                    ),
+                  ),
+                  SelectPolyColor(
+                    colorChanged: colorChanged,
+                    currentColor: currentColor,
+                  ),
+                ],
+              ),
+              SizedBox(
+                width: gl.menuBarLength * .5 * gl.display.equipixel,
+                child: TextButton(
+                  style: dialogButtonStyle(
+                    height: gl.display.equipixel * 12,
+                    width: gl.display.equipixel * 10 * "Ok".length,
+                  ),
+                  child: Text("Créer", style: dialogTextButtonStyle()),
+                  onPressed: () {
+                    dismissPopup();
+                    after();
+                  },
+                ),
+              ),
+            ]),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class SelectPolyColor extends StatefulWidget {
+  final ValueChanged<Color> colorChanged;
+  final Color currentColor;
+
+  const SelectPolyColor({
+    super.key,
+    required this.colorChanged,
+    required this.currentColor,
+  });
+
+  @override
+  State<StatefulWidget> createState() => _SelectPolyColor();
+}
+
+class _SelectPolyColor extends State<SelectPolyColor> {
+  Color currentColor = Colors.black;
+  @override
+  Widget build(BuildContext context) {
+    if (currentColor == Colors.black) currentColor = widget.currentColor;
+    return TextButton(
+      onPressed: () {
+        PopupColorChooser(
+          currentColor,
+          gl.notificationContext!,
+          (Color color) {
+            setState(() {
+              widget.colorChanged(color);
+              currentColor = color;
+            });
+          },
+          () {
+            setState(() {});
+          },
+        );
+      },
+      child: CircleAvatar(backgroundColor: currentColor),
+    );
+  }
+}
+
+class SelectPolyType extends StatefulWidget {
+  final ValueChanged<String> state;
+
+  const SelectPolyType({super.key, required this.state});
+
+  @override
+  State<StatefulWidget> createState() => _SelectPolyType();
+}
+
+class _SelectPolyType extends State<SelectPolyType> {
+  final Color active = Colors.black;
+  int _selectedType = 0;
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: [
+        Container(
+          width: gl.display.equipixel * gl.iconSizeM * 1.65,
+          height: gl.display.equipixel * gl.iconSizeM * 1.35,
+          color: _selectedType == 0 ? gl.colorAgroBioTech : Colors.transparent,
+          child: TextButton(
+            onPressed: () {
+              setState(() {
+                _selectedType = 0;
+              });
+              widget.state("Point");
+            },
+            child: Column(
+              children: [
+                FaIcon(FontAwesomeIcons.circleDot, color: Colors.white),
+                Text(
+                  "Point",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: gl.display.equipixel * gl.fontSizeXS,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        Container(
+          width: gl.display.equipixel * gl.iconSizeM * 1.65,
+          height: gl.display.equipixel * gl.iconSizeM * 1.35,
+          color: _selectedType == 1 ? gl.colorAgroBioTech : Colors.transparent,
+          child: TextButton(
+            onPressed: () {
+              setState(() {
+                _selectedType = 1;
+              });
+              widget.state("Polygon");
+            },
+            child: Column(
+              children: [
+                FaIcon(FontAwesomeIcons.pentagon, color: Colors.white),
+                Text(
+                  "Polygon",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: gl.display.equipixel * gl.fontSizeXS,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class PopupNewAttribute {
+  PopupNewAttribute(
+    BuildContext context,
+    String currentName,
+    Color currentColor,
+    ValueChanged<String> typeChanged,
+    ValueChanged<String> attributeNameChanged,
+    ValueChanged<dynamic> valueChanged,
+    VoidCallback onTapOutside,
+    VoidCallback callbackOnStartTyping,
+  ) {
+    TextEditingController textEditor = TextEditingController();
+    TextEditingController textEditorVal = TextEditingController();
+    String type = "string";
+    presentPopup(
+      context: context,
+      dismiss: true,
+      after: onTapOutside,
+      popup: AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadiusGeometry.circular(12.0),
+          side: BorderSide(color: gl.colorAgroBioTech, width: 2.0),
+        ),
+        backgroundColor: gl.backgroundTransparentBlackBox,
+        content: SizedBox(
+          width:
+              gl.display.orientation == Orientation.portrait
+                  ? gl.popupWindowsPortraitWidth * gl.display.equipixel
+                  : gl.popupWindowsLandscapeWidth * gl.display.equipixel,
+          height:
+              gl.display.orientation == Orientation.portrait
+                  ? gl.popupWindowsPortraitHeight * gl.display.equipixel / 2
+                  : gl.popupWindowsLandscapeHeight * gl.display.equipixel,
+          child: SingleChildScrollView(
+            child: switchRowColWithOrientation([
+              Column(
+                children: [
+                  Text(
+                    "Type de la variable",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: gl.display.equipixel * gl.fontSizeM,
+                    ),
+                  ),
+                  SelectAttributeType(
+                    typeChanged: (String newType) {
+                      type = newType;
+                      typeChanged(type);
+                      textEditorVal.text = "";
+                    },
+                  ),
+                  stroke(
+                    gl.display.equipixel,
+                    gl.display.equipixel * .5,
+                    gl.colorAgroBioTech,
+                  ),
+                  Text(
+                    "Introduisez un nom",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: gl.display.equipixel * gl.fontSizeM,
+                    ),
+                  ),
+                  SizedBox(
+                    width: gl.menuBarLength * gl.display.equipixel,
+                    child: TextFormField(
+                      maxLength: 22,
+                      maxLengthEnforcement: MaxLengthEnforcement.enforced,
+                      onChanged: (String str) {
+                        textEditor.text = cleanAttributeName(str.toString());
+                        attributeNameChanged(textEditor.text);
+                      },
+                      onTap: () => callbackOnStartTyping(),
+                      onTapOutside: (pointer) {},
+                      style: TextStyle(color: Colors.white),
+                      controller: textEditor,
+                    ),
+                  ),
+                  Text(
+                    "Introduisez une valeur",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: gl.display.equipixel * gl.fontSizeM,
+                    ),
+                  ),
+                  SizedBox(
+                    width: gl.menuBarLength * gl.display.equipixel,
+                    child: TextFormField(
+                      maxLength: 22,
+                      maxLengthEnforcement: MaxLengthEnforcement.enforced,
+                      onChanged: (String str) {
+                        switch (type) {
+                          case "string":
+                            valueChanged(str);
+                          case "int":
+                            try {
+                              valueChanged(int.parse(str));
+                            } catch (e) {
+                              if (textEditorVal.text.isNotEmpty) {
+                                textEditorVal.text = textEditorVal.text
+                                    .substring(
+                                      0,
+                                      textEditorVal.text.length - 1,
+                                    );
+                              }
+                              if (textEditorVal.text.isEmpty) {
+                                valueChanged(0);
+                              } else {
+                                valueChanged(int.parse(textEditorVal.text));
+                              }
+                            }
+                          case "double":
+                            try {
+                              valueChanged(double.parse(str));
+                            } catch (e) {
+                              if (textEditorVal.text.isNotEmpty) {
+                                textEditorVal.text = textEditorVal.text
+                                    .substring(
+                                      0,
+                                      textEditorVal.text.length - 1,
+                                    );
+                              }
+                              if (textEditorVal.text.isEmpty) {
+                                valueChanged(0.0);
+                              } else {
+                                valueChanged(double.parse(textEditorVal.text));
+                              }
+                            }
+                        }
+                      },
+                      onTap: () => callbackOnStartTyping(),
+                      onTapOutside: (pointer) {},
+                      controller: textEditorVal,
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(
+                width: gl.menuBarLength * .5 * gl.display.equipixel,
+                child: TextButton(
+                  style: dialogButtonStyle(
+                    height: gl.display.equipixel * 12,
+                    width: gl.display.equipixel * 10 * "Ok".length,
+                  ),
+                  child: Text("Ajouter", style: dialogTextButtonStyle()),
+                  onPressed: () {
+                    if (controlDuplicateAttributeName(textEditor.text)) {
+                      return;
+                    }
+                    dismissPopup();
+                  },
+                ),
+              ),
+            ]),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class PopupValueChange {
+  PopupValueChange(
+    BuildContext context,
+    String type,
+    dynamic oldValue,
+    ValueChanged<dynamic> valueChanged,
+    VoidCallback onTapOutside,
+  ) {
+    TextEditingController textEditor = TextEditingController(text: "");
+    presentPopup(
+      context: context,
+      dismiss: true,
+      after: () {
+        valueChanged(oldValue);
+        onTapOutside;
+      },
+      popup: AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadiusGeometry.circular(12.0),
+          side: BorderSide(color: gl.colorAgroBioTech, width: 2.0),
+        ),
+        backgroundColor: gl.backgroundTransparentBlackBox,
+        content: SizedBox(
+          width:
+              gl.display.orientation == Orientation.portrait
+                  ? gl.popupWindowsPortraitWidth * gl.display.equipixel
+                  : gl.popupWindowsLandscapeWidth * gl.display.equipixel,
+          height:
+              gl.display.orientation == Orientation.portrait
+                  ? gl.popupWindowsPortraitHeight * gl.display.equipixel / 2
+                  : gl.popupWindowsLandscapeHeight * gl.display.equipixel,
+          child: Column(
+            children: [
+              Text(
+                "Introduisez une nouvelle valeur",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: gl.display.equipixel * gl.fontSizeS,
+                ),
+              ),
+              SizedBox(
+                width: gl.menuBarLength * gl.display.equipixel,
+                child: TextFormField(
+                  maxLength: 22,
+                  maxLengthEnforcement: MaxLengthEnforcement.enforced,
+                  onChanged: (String str) {
+                    switch (type) {
+                      case "prop":
+                        textEditor.text = cleanAttributeName(str.toString());
+                        valueChanged(textEditor.text);
+                      case "string":
+                        valueChanged(str.toString());
+                      case "int":
+                        try {
+                          valueChanged(int.parse(str));
+                        } catch (e) {
+                          if (textEditor.text.isNotEmpty) {
+                            textEditor.text = textEditor.text.substring(
+                              0,
+                              textEditor.text.length - 1,
+                            );
+                          }
+                          if (textEditor.text.isEmpty) {
+                            valueChanged(0);
+                          } else {
+                            valueChanged(textEditor.text);
+                          }
+                        }
+                      case "double":
+                        try {
+                          valueChanged(double.parse(str));
+                        } catch (e) {
+                          if (textEditor.text.isNotEmpty) {
+                            textEditor.text = textEditor.text.substring(
+                              0,
+                              textEditor.text.length - 1,
+                            );
+                          }
+                          if (textEditor.text.isEmpty) {
+                            valueChanged(0.0);
+                          } else {
+                            valueChanged(textEditor.text);
+                          }
+                        }
+                    }
+                  },
+                  onTapOutside: (pointer) {},
+                  controller: textEditor,
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+              SizedBox(
+                width: gl.menuBarLength * .5 * gl.display.equipixel,
+                child: TextButton(
+                  style: dialogButtonStyle(
+                    height: gl.display.equipixel * 12,
+                    width: gl.display.equipixel * 10 * "Ok".length,
+                  ),
+                  child: Text("Changer", style: dialogTextButtonStyle()),
+                  onPressed: () {
+                    if (controlDuplicateAttributeName(textEditor.text)) {
+                      return;
+                    }
+                    dismissPopup();
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+String cleanAttributeName(String attribute) {
+  String controlled = "";
+  String wantedCharacters = "_";
+  for (int i = 0; i < attribute.length; i++) {
+    if (attribute[i].contains(wantedCharacters) ||
+        attribute[i].contains(RegExp(r'[A-Z]')) ||
+        attribute[i].contains(RegExp(r'[a-z]'))) {
+      controlled = controlled + attribute[i];
+    }
+  }
+  return controlled;
+}
+
+bool controlDuplicateAttributeName(String attribute) {
+  int count = 0;
+  for (
+    int i = 0;
+    i < gl.polygonLayers[gl.selectedPolygonLayer].attributes.length;
+    i++
+  ) {
+    if (attribute ==
+        gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].name) {
+      count++;
+    }
+  }
+  return count > 1 ? true : false;
+}
+
+class SelectAttributeType extends StatefulWidget {
+  final ValueChanged<String> typeChanged;
+  const SelectAttributeType({super.key, required this.typeChanged});
+
+  @override
+  State<StatefulWidget> createState() => _SelectAttributeType();
+}
+
+class _SelectAttributeType extends State<SelectAttributeType> {
+  final Color active = Colors.black;
+  int _selectedType = 0;
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: [
+        Container(
+          width: gl.display.equipixel * gl.iconSizeM * 1.9,
+          height: gl.display.equipixel * gl.iconSizeM * 1.35,
+          color: _selectedType == 0 ? gl.colorAgroBioTech : Colors.transparent,
+          child: TextButton(
+            onPressed: () {
+              setState(() {
+                _selectedType = 0;
+              });
+              widget.typeChanged("string");
+            },
+            child: Column(
+              children: [
+                Icon(Icons.abc, color: Colors.white),
+                Text(
+                  "Charactères",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: gl.display.equipixel * gl.fontSizeXS,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        Container(
+          width: gl.display.equipixel * gl.iconSizeM * 1.7,
+          height: gl.display.equipixel * gl.iconSizeM * 1.35,
+          color: _selectedType == 1 ? gl.colorAgroBioTech : Colors.transparent,
+          child: TextButton(
+            onPressed: () {
+              setState(() {
+                _selectedType = 1;
+              });
+              widget.typeChanged("int");
+            },
+            child: Column(
+              children: [
+                Icon(Icons.numbers, color: Colors.white),
+                Text(
+                  "Entièr",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: gl.display.equipixel * gl.fontSizeXS,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        Container(
+          width: gl.display.equipixel * gl.iconSizeM * 1.9,
+          height: gl.display.equipixel * gl.iconSizeM * 1.35,
+          color: _selectedType == 2 ? gl.colorAgroBioTech : Colors.transparent,
+          child: TextButton(
+            onPressed: () {
+              setState(() {
+                _selectedType = 2;
+              });
+              widget.typeChanged("double");
+            },
+            child: Column(
+              children: [
+                Icon(Icons.numbers, color: Colors.white),
+                Text(
+                  "Décimale",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: gl.display.equipixel * gl.fontSizeXS,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
@@ -1242,19 +1903,60 @@ class _PolygonListMenu extends State<PolygonListMenu> {
                 ),
                 onPressed: () {
                   setState(() {
-                    gl.polygonLayers.add(PolygonLayer(polygonName: "Nouveau"));
-                    PopupNameIntroducer(
+                    gl.polygonLayers.add(
+                      PolygonLayer(
+                        polygonName: "Nouveau${gl.polygonLayers.length - 1}",
+                      ),
+                    );
+                    PopupNewPolygon(
                       context,
                       "",
+                      gl.polygonLayers[gl.polygonLayers.length - 1].colorInside,
+                      (String typeIt) {
+                        if (mounted) {
+                          setState(() {
+                            gl.polygonLayers[gl.polygonLayers.length - 1].type =
+                                typeIt;
+                            gl.saveChangesToPolygoneToPrefs = true;
+                            _keyboard = true;
+                          });
+                        } else {
+                          gl.polygonLayers[gl.polygonLayers.length - 1].type =
+                              typeIt;
+                          gl.saveChangesToPolygoneToPrefs = true;
+                          _keyboard = true;
+                        }
+                      },
                       (String nameIt) {
                         if (mounted) {
                           setState(() {
+                            gl.polygonLayers[gl.polygonLayers.length - 1].name =
+                                nameIt;
+                            gl.saveChangesToPolygoneToPrefs = true;
                             _keyboard = true;
                           });
                         } else {
                           gl.polygonLayers[gl.polygonLayers.length - 1].name =
                               nameIt;
                           gl.saveChangesToPolygoneToPrefs = true;
+                          _keyboard = true;
+                        }
+                      },
+                      (Color colorIt) {
+                        if (mounted) {
+                          setState(() {
+                            gl
+                                .polygonLayers[gl.polygonLayers.length - 1]
+                                .colorInside = colorIt;
+                            gl.saveChangesToPolygoneToPrefs = true;
+                            _keyboard = true;
+                          });
+                        } else {
+                          gl
+                              .polygonLayers[gl.polygonLayers.length - 1]
+                              .colorInside = colorIt;
+                          gl.saveChangesToPolygoneToPrefs = true;
+                          _keyboard = true;
                         }
                       },
                       () {
@@ -5544,16 +6246,6 @@ Card layerTileCard(
           ],
         ),
       );
-}
-
-Widget stroke(double space, double thickness, Color color) {
-  return Column(
-    children: [
-      SizedBox(height: space),
-      Container(height: thickness, color: color),
-      SizedBox(height: space),
-    ],
-  );
 }
 
 class PopupOnlineMapMenu {

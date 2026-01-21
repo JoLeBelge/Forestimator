@@ -93,6 +93,32 @@ class _MyApp extends State<MyApp> {
     return polygon;
   }
 
+  List<Attribute> _getAttributesFromMemory(
+    String name,
+    SharedPreferences shared,
+  ) {
+    List<Attribute> attributes = [];
+    int nAttributes = gl.shared!.getInt('$name.nAttributes') ?? 0;
+    for (int i = 0; i < nAttributes; i++) {
+      String type = gl.shared!.getString('$name.$i.type')!;
+      attributes.add(
+        Attribute(
+          name: gl.shared!.getString('$name.$i.name')!,
+          type: type,
+          value:
+              type == "string"
+                  ? gl.shared!.getString('$name.$i.val')!
+                  : type == "int"
+                  ? gl.shared!.getInt('$name.$i.val')!
+                  : type == "double"
+                  ? gl.shared!.getDouble('$name.$i.val')!
+                  : "unknown",
+        ),
+      );
+    }
+    return attributes;
+  }
+
   Future _readPreference() async {
     gl.shared = await SharedPreferences.getInstance();
 
@@ -164,6 +190,12 @@ class _MyApp extends State<MyApp> {
         gl.polygonLayers.add(
           PolygonLayer(polygonName: gl.shared!.getString('poly$i.name')!),
         );
+        gl.polygonLayers[i].type =
+            gl.shared!.getString('poly$i.type') ?? "Polygon";
+        gl.polygonLayers[i].sentToServer =
+            gl.shared!.getBool('poly$i.sent') ?? false;
+        gl.polygonLayers[i].visibleOnMap =
+            gl.shared!.getBool('poly$i.visibleOnMap') ?? true;
         gl.polygonLayers[i].area = gl.shared!.getDouble('poly$i.area')!;
         gl.polygonLayers[i].perimeter =
             gl.shared!.getDouble('poly$i.perimeter')!;
@@ -181,6 +213,10 @@ class _MyApp extends State<MyApp> {
         );
         gl.polygonLayers[i].polygonPoints = _getPolygonFromMemory(
           'poly$i.poly',
+          gl.shared!,
+        );
+        gl.polygonLayers[i].attributes = _getAttributesFromMemory(
+          'poly$i.prop',
           gl.shared!,
         );
       }
