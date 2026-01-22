@@ -363,7 +363,18 @@ class _MapPageState extends State<MapPage> {
                                   }
                                   : gl.Mode.addVertexesPolygon
                                   ? (tapPosition, point) async => {
-                                    if (gl.polygonLayers.isNotEmpty)
+                                    if (gl
+                                                .polygonLayers[gl
+                                                    .selectedPolygonLayer]
+                                                .type ==
+                                            "Point" &&
+                                        gl
+                                                .polygonLayers[gl
+                                                    .selectedPolygonLayer]
+                                                .numPoints ==
+                                            1)
+                                      {gl.Mode.addVertexesPolygon = false}
+                                    else if (gl.polygonLayers.isNotEmpty)
                                       {
                                         if (_isPolygonWellDefined(
                                           gl
@@ -697,6 +708,7 @@ class _MapPageState extends State<MapPage> {
                                   CircleLayer(
                                     circles: _drawnLayerPointsCircleMarker(),
                                   ),
+                                  CircleLayer(circles: _getPointsToDraw()),
                                   PolygonLayer(polygons: _getPolygonesToDraw()),
                                   MarkerLayer(
                                     markers: _drawnLayerPointsMarker(),
@@ -730,6 +742,8 @@ class _MapPageState extends State<MapPage> {
                                     PolygonLayer(
                                       polygons: _getPolygonesToDraw(),
                                     ),
+                                  if (gl.modeMapShowPolygons)
+                                    CircleLayer(circles: _getPointsToDraw()),
                                 ]) +
                             <Widget>[
                               MarkerLayer(
@@ -738,7 +752,7 @@ class _MapPageState extends State<MapPage> {
                                     _placeAnaPtMarker(),
                               ),
                               if (gl.modeMapShowPolygons)
-                                MarkerLayer(markers: _getPolygonesInfos()),
+                                MarkerLayer(markers: _getPolygonesLabels()),
                               if (gl.modeMapShowCustomMarker)
                                 MarkerLayer(markers: []),
                               if (gl.modeMapShowSearchMarker)
@@ -757,7 +771,6 @@ class _MapPageState extends State<MapPage> {
                                 MarkerLayer(markers: _getPathMeasureMarkers()),
                             ],
                       ),
-                      //TODO: polygon moves always if you close the polygonmenu by the menubar
                       (gl.Mode.polygon &&
                               gl.polygonLayers.isNotEmpty &&
                               gl.selectedPolygonLayer > -1)
@@ -828,11 +841,7 @@ class _MapPageState extends State<MapPage> {
                                                                   .equipixel *
                                                               gl.iconSizeS *
                                                               .9,
-                                                          color:
-                                                              gl
-                                                                  .polygonLayers[gl
-                                                                      .selectedPolygonLayer]
-                                                                  .colorLine,
+                                                          color: Colors.white,
                                                         )
                                                         : FaIcon(
                                                           FontAwesomeIcons
@@ -846,25 +855,110 @@ class _MapPageState extends State<MapPage> {
                                                           color: Colors.white30,
                                                         ),
                                               ),
-                                              Container(
-                                                alignment: Alignment.topCenter,
+                                              SizedBox(
                                                 width:
                                                     gl.display.equipixel *
                                                     gl.chosenPolyBarWidth *
                                                     .5,
-                                                child: Text(
-                                                  gl
-                                                      .polygonLayers[gl
-                                                          .selectedPolygonLayer]
-                                                      .name,
-                                                  textAlign: TextAlign.end,
-                                                  style: TextStyle(
-                                                    color: Colors.white,
-                                                    fontSize:
-                                                        gl.display.equipixel *
-                                                        gl.fontSizeM *
-                                                        .75,
-                                                  ),
+                                                child: Stack(
+                                                  children: [
+                                                    Column(
+                                                      children: [
+                                                        Container(
+                                                          alignment:
+                                                              Alignment.topLeft,
+                                                          child:
+                                                              gl.polygonLayers[gl.selectedPolygonLayer].type ==
+                                                                      "Point"
+                                                                  ? Text(
+                                                                    "POINT",
+                                                                    style: TextStyle(
+                                                                      color:
+                                                                          Colors
+                                                                              .yellow,
+                                                                      fontSize:
+                                                                          gl.display.equipixel *
+                                                                          gl.fontSizeXS *
+                                                                          .9,
+                                                                    ),
+                                                                  )
+                                                                  : gl
+                                                                          .polygonLayers[gl
+                                                                              .selectedPolygonLayer]
+                                                                          .type ==
+                                                                      "Polygon"
+                                                                  ? Text(
+                                                                    "POLY",
+                                                                    style: TextStyle(
+                                                                      color:
+                                                                          Colors
+                                                                              .green,
+                                                                      fontSize:
+                                                                          gl.display.equipixel *
+                                                                          gl.fontSizeXS *
+                                                                          .9,
+                                                                    ),
+                                                                  )
+                                                                  : Text(
+                                                                    "OHA?",
+                                                                    style: TextStyle(
+                                                                      color:
+                                                                          Colors
+                                                                              .red,
+                                                                      fontSize:
+                                                                          gl.display.equipixel *
+                                                                          gl.fontSizeXS *
+                                                                          .9,
+                                                                    ),
+                                                                  ),
+                                                        ),
+                                                        if (gl
+                                                            .polygonLayers[gl
+                                                                .selectedPolygonLayer]
+                                                            .sentToServer)
+                                                          Container(
+                                                            alignment:
+                                                                Alignment
+                                                                    .bottomLeft,
+                                                            child: Text(
+                                                              "SENT",
+                                                              style: TextStyle(
+                                                                color:
+                                                                    Colors.red,
+                                                                fontSize:
+                                                                    gl
+                                                                        .display
+                                                                        .equipixel *
+                                                                    gl.fontSizeXS *
+                                                                    .9,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                      ],
+                                                    ),
+
+                                                    Container(
+                                                      alignment:
+                                                          Alignment.center,
+                                                      child: Text(
+                                                        gl
+                                                            .polygonLayers[gl
+                                                                .selectedPolygonLayer]
+                                                            .name,
+                                                        textAlign:
+                                                            TextAlign.center,
+                                                        style: TextStyle(
+                                                          color: Colors.white,
+                                                          fontSize:
+                                                              gl
+                                                                  .display
+                                                                  .equipixel *
+                                                              gl.fontSizeM *
+                                                              .9,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
                                                 ),
                                               ),
                                               IconButton(
@@ -953,6 +1047,7 @@ class _MapPageState extends State<MapPage> {
                                                                 .lightGreenAccent,
                                                         onPressed: () {
                                                           refreshView(() {
+                                                            _stopMovingSelectedPoint();
                                                             gl.Mode.editPolygon =
                                                                 false;
                                                             gl.Mode.showButtonAddVertexesPolygon =
@@ -988,20 +1083,68 @@ class _MapPageState extends State<MapPage> {
                                                                 .equipixel *
                                                             gl.chosenPolyBarWidth *
                                                             .5,
-                                                        child: Text(
-                                                          "Modifiez le polygone",
-                                                          textAlign:
-                                                              TextAlign.center,
-                                                          style: TextStyle(
-                                                            color: Colors.white,
-                                                            fontSize:
-                                                                gl
-                                                                    .display
-                                                                    .equipixel *
-                                                                gl.fontSizeM *
-                                                                .75,
-                                                          ),
-                                                        ),
+                                                        child:
+                                                            gl
+                                                                        .polygonLayers[gl
+                                                                            .selectedPolygonLayer]
+                                                                        .type ==
+                                                                    "Polygon"
+                                                                ? Text(
+                                                                  "Modifiez le polygone",
+                                                                  textAlign:
+                                                                      TextAlign
+                                                                          .center,
+                                                                  style: TextStyle(
+                                                                    color:
+                                                                        Colors
+                                                                            .white,
+                                                                    fontSize:
+                                                                        gl
+                                                                            .display
+                                                                            .equipixel *
+                                                                        gl.fontSizeM *
+                                                                        .75,
+                                                                  ),
+                                                                )
+                                                                : gl
+                                                                        .polygonLayers[gl
+                                                                            .selectedPolygonLayer]
+                                                                        .type ==
+                                                                    "Point"
+                                                                ? Text(
+                                                                  "Modifiez le point",
+                                                                  textAlign:
+                                                                      TextAlign
+                                                                          .center,
+                                                                  style: TextStyle(
+                                                                    color:
+                                                                        Colors
+                                                                            .white,
+                                                                    fontSize:
+                                                                        gl
+                                                                            .display
+                                                                            .equipixel *
+                                                                        gl.fontSizeM *
+                                                                        .75,
+                                                                  ),
+                                                                )
+                                                                : Text(
+                                                                  "Modifiez ceci?",
+                                                                  textAlign:
+                                                                      TextAlign
+                                                                          .center,
+                                                                  style: TextStyle(
+                                                                    color:
+                                                                        Colors
+                                                                            .orange,
+                                                                    fontSize:
+                                                                        gl
+                                                                            .display
+                                                                            .equipixel *
+                                                                        gl.fontSizeM *
+                                                                        .75,
+                                                                  ),
+                                                                ),
                                                       ),
                                                     ],
                                                   ),
@@ -1124,7 +1267,15 @@ class _MapPageState extends State<MapPage> {
                                                                   .remove_circle,
                                                             ),
                                                           ),
-                                                      gl.Mode.showButtonAddVertexesPolygon
+                                                      (gl.polygonLayers[gl.selectedPolygonLayer].type ==
+                                                                      "Polygon" ||
+                                                                  gl.polygonLayers[gl.selectedPolygonLayer].type ==
+                                                                          "Point" &&
+                                                                      gl.polygonLayers[gl.selectedPolygonLayer].numPoints <
+                                                                          1) &&
+                                                              gl
+                                                                  .Mode
+                                                                  .showButtonAddVertexesPolygon
                                                           ? Container(
                                                             color: _polygonMenuColorTools(
                                                               gl
@@ -1378,7 +1529,75 @@ class _MapPageState extends State<MapPage> {
                                                                     gl
                                                                         .display
                                                                         .equipixel *
-                                                                    40,
+                                                                    11,
+                                                                child: Text(
+                                                                  "type",
+                                                                  textAlign:
+                                                                      TextAlign
+                                                                          .center,
+                                                                  style: TextStyle(
+                                                                    color:
+                                                                        Colors
+                                                                            .white,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold,
+                                                                    fontSize:
+                                                                        gl
+                                                                            .display
+                                                                            .equipixel *
+                                                                        gl.fontSizeM *
+                                                                        .75,
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                              stroke(
+                                                                vertical: true,
+                                                                gl
+                                                                    .display
+                                                                    .equipixel,
+                                                                gl
+                                                                        .display
+                                                                        .equipixel *
+                                                                    0.5,
+                                                                gl.colorAgroBioTech,
+                                                              ),
+                                                              SizedBox(
+                                                                width:
+                                                                    gl
+                                                                        .display
+                                                                        .equipixel *
+                                                                    7,
+                                                                child: Icon(
+                                                                  Icons
+                                                                      .remove_red_eye,
+                                                                  color:
+                                                                      Colors
+                                                                          .white,
+                                                                  size:
+                                                                      gl
+                                                                          .display
+                                                                          .equipixel *
+                                                                      gl.iconSizeXS,
+                                                                ),
+                                                              ),
+                                                              stroke(
+                                                                vertical: true,
+                                                                gl
+                                                                    .display
+                                                                    .equipixel,
+                                                                gl
+                                                                        .display
+                                                                        .equipixel *
+                                                                    0.5,
+                                                                gl.colorAgroBioTech,
+                                                              ),
+                                                              SizedBox(
+                                                                width:
+                                                                    gl
+                                                                        .display
+                                                                        .equipixel *
+                                                                    33,
                                                                 child: Text(
                                                                   "Attribut",
                                                                   textAlign:
@@ -1416,7 +1635,7 @@ class _MapPageState extends State<MapPage> {
                                                                     gl
                                                                         .display
                                                                         .equipixel *
-                                                                    40,
+                                                                    33,
                                                                 child: Text(
                                                                   "Valeur",
                                                                   textAlign:
@@ -1475,182 +1694,447 @@ class _MapPageState extends State<MapPage> {
                                                               child: ListView(
                                                                 controller:
                                                                     propertiesTableScrollController,
-                                                                children: List<
-                                                                  Widget
-                                                                >.generate(
-                                                                  gl
-                                                                      .polygonLayers[gl
-                                                                          .selectedPolygonLayer]
-                                                                      .attributes
-                                                                      .length,
-                                                                  (i) {
-                                                                    return Column(
-                                                                      children: [
-                                                                        Row(
-                                                                          mainAxisAlignment:
-                                                                              MainAxisAlignment.spaceEvenly,
+                                                                children:
+                                                                    <Widget>[
+                                                                      _getFixedAttribute(
+                                                                        "type",
+                                                                        gl
+                                                                            .polygonLayers[gl.selectedPolygonLayer]
+                                                                            .type,
+                                                                      ),
+                                                                      _getFixedAttribute(
+                                                                        "nom",
+                                                                        gl
+                                                                            .polygonLayers[gl.selectedPolygonLayer]
+                                                                            .name,
+                                                                        checked:
+                                                                            true,
+                                                                      ),
+                                                                      if (gl.polygonLayers[gl.selectedPolygonLayer].type ==
+                                                                          "Polygon")
+                                                                        _getFixedAttribute(
+                                                                          "surface",
+                                                                          "${(gl.polygonLayers[gl.selectedPolygonLayer].area / 100).round() / 100}",
+                                                                        ),
+                                                                      if (gl.polygonLayers[gl.selectedPolygonLayer].type ==
+                                                                          "Polygon")
+                                                                        _getFixedAttribute(
+                                                                          "circonference",
+                                                                          "${(gl.polygonLayers[gl.selectedPolygonLayer].perimeter).round() / 1000}",
+                                                                        ),
+
+                                                                      _getFixedAttribute(
+                                                                        "coordinates",
+                                                                        gl.polygonLayers[gl.selectedPolygonLayer]
+                                                                            .getPolyPointsString(),
+                                                                      ),
+                                                                    ] +
+                                                                    List<
+                                                                      Widget
+                                                                    >.generate(
+                                                                      gl
+                                                                          .polygonLayers[gl
+                                                                              .selectedPolygonLayer]
+                                                                          .attributes
+                                                                          .length,
+                                                                      (i) {
+                                                                        return Column(
                                                                           children: [
-                                                                            SizedBox(
-                                                                              width:
-                                                                                  gl.display.equipixel *
-                                                                                  40,
-                                                                              height:
-                                                                                  gl.display.equipixel *
-                                                                                  gl.iconSizeS,
-                                                                              child: TextButton(
-                                                                                onPressed:
-                                                                                    () {},
-                                                                                onLongPress: () {
-                                                                                  PopupValueChange(
-                                                                                    context,
-                                                                                    "prop",
-                                                                                    gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].name,
-                                                                                    (
-                                                                                      value,
-                                                                                    ) {
-                                                                                      gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].name = value;
-                                                                                    },
-                                                                                    () {},
-                                                                                  );
-                                                                                },
-                                                                                child: Container(
-                                                                                  alignment:
-                                                                                      Alignment.centerLeft,
-                                                                                  child: Text(
-                                                                                    gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].name,
-                                                                                    textAlign:
-                                                                                        TextAlign.start,
-                                                                                    style: TextStyle(
-                                                                                      color:
-                                                                                          Colors.white,
-                                                                                      fontSize:
-                                                                                          gl.display.equipixel *
-                                                                                          gl.fontSizeM *
-                                                                                          .75,
+                                                                            Row(
+                                                                              mainAxisAlignment:
+                                                                                  MainAxisAlignment.spaceEvenly,
+                                                                              children: [
+                                                                                SizedBox(
+                                                                                  width:
+                                                                                      gl.display.equipixel *
+                                                                                      11,
+                                                                                  height:
+                                                                                      gl.display.equipixel *
+                                                                                      gl.iconSizeS,
+                                                                                  child: TextButton(
+                                                                                    style: ButtonStyle(
+                                                                                      animationDuration: Duration(
+                                                                                        seconds:
+                                                                                            1,
+                                                                                      ),
+                                                                                      backgroundColor: WidgetStateProperty<
+                                                                                        Color
+                                                                                      >.fromMap(
+                                                                                        <
+                                                                                          WidgetStatesConstraint,
+                                                                                          Color
+                                                                                        >{
+                                                                                          WidgetState.any: Colors.transparent,
+                                                                                        },
+                                                                                      ),
+                                                                                      padding: WidgetStateProperty<
+                                                                                        EdgeInsetsGeometry
+                                                                                      >.fromMap(
+                                                                                        <
+                                                                                          WidgetStatesConstraint,
+                                                                                          EdgeInsetsGeometry
+                                                                                        >{
+                                                                                          WidgetState.any: EdgeInsetsGeometry.zero,
+                                                                                        },
+                                                                                      ),
+                                                                                    ),
+                                                                                    onPressed:
+                                                                                        () {},
+                                                                                    onLongPress:
+                                                                                        () {},
+                                                                                    child: Container(
+                                                                                      alignment:
+                                                                                          Alignment.center,
+                                                                                      child:
+                                                                                          gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].type ==
+                                                                                                  "int"
+                                                                                              ? Text(
+                                                                                                "INT",
+                                                                                                style: TextStyle(
+                                                                                                  color:
+                                                                                                      Colors.yellow,
+                                                                                                  fontSize:
+                                                                                                      gl.fontSizeXS *
+                                                                                                      gl.display.equipixel,
+                                                                                                ),
+                                                                                              )
+                                                                                              : gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].type ==
+                                                                                                  "string"
+                                                                                              ? Text(
+                                                                                                "STRING",
+                                                                                                style: TextStyle(
+                                                                                                  color:
+                                                                                                      Colors.lightBlue,
+                                                                                                  fontSize:
+                                                                                                      gl.fontSizeXS *
+                                                                                                      gl.display.equipixel,
+                                                                                                ),
+                                                                                              )
+                                                                                              : gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].type ==
+                                                                                                  "double"
+                                                                                              ? Text(
+                                                                                                "DOUBLE",
+                                                                                                style: TextStyle(
+                                                                                                  color:
+                                                                                                      Colors.red,
+                                                                                                  fontSize:
+                                                                                                      gl.fontSizeXS *
+                                                                                                      gl.display.equipixel,
+                                                                                                ),
+                                                                                              )
+                                                                                              : Text(
+                                                                                                "UFO",
+                                                                                                style: TextStyle(
+                                                                                                  color:
+                                                                                                      Colors.green,
+                                                                                                  fontSize:
+                                                                                                      gl.fontSizeXS *
+                                                                                                      gl.display.equipixel,
+                                                                                                ),
+                                                                                              ),
                                                                                     ),
                                                                                   ),
                                                                                 ),
-                                                                              ),
+                                                                                stroke(
+                                                                                  vertical:
+                                                                                      true,
+                                                                                  gl.display.equipixel,
+                                                                                  gl.display.equipixel *
+                                                                                      0.5,
+                                                                                  gl.colorAgroBioTech,
+                                                                                ),
+                                                                                SizedBox(
+                                                                                  width:
+                                                                                      gl.display.equipixel *
+                                                                                      7,
+                                                                                  height:
+                                                                                      gl.display.equipixel *
+                                                                                      gl.iconSizeS,
+                                                                                  child: IconButton(
+                                                                                    style: ButtonStyle(
+                                                                                      animationDuration: Duration(
+                                                                                        seconds:
+                                                                                            1,
+                                                                                      ),
+                                                                                      backgroundColor: WidgetStateProperty<
+                                                                                        Color
+                                                                                      >.fromMap(
+                                                                                        <
+                                                                                          WidgetStatesConstraint,
+                                                                                          Color
+                                                                                        >{
+                                                                                          WidgetState.any: Colors.transparent,
+                                                                                        },
+                                                                                      ),
+                                                                                      padding: WidgetStateProperty<
+                                                                                        EdgeInsetsGeometry
+                                                                                      >.fromMap(
+                                                                                        <
+                                                                                          WidgetStatesConstraint,
+                                                                                          EdgeInsetsGeometry
+                                                                                        >{
+                                                                                          WidgetState.any: EdgeInsetsGeometry.zero,
+                                                                                        },
+                                                                                      ),
+                                                                                    ),
+                                                                                    onPressed:
+                                                                                        () {},
+                                                                                    onLongPress: () {
+                                                                                      refreshView(
+                                                                                        () {
+                                                                                          gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].visibleOnMapLabel = !gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].visibleOnMapLabel;
+                                                                                        },
+                                                                                      );
+                                                                                    },
+                                                                                    icon:
+                                                                                        gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].visibleOnMapLabel
+                                                                                            ? Icon(
+                                                                                              Icons.check_box_outlined,
+                                                                                              color:
+                                                                                                  Colors.white,
+                                                                                              size:
+                                                                                                  gl.display.equipixel *
+                                                                                                  gl.iconSizeXS,
+                                                                                            )
+                                                                                            : Icon(
+                                                                                              Icons.check_box_outline_blank,
+                                                                                              color:
+                                                                                                  Colors.white,
+                                                                                              size:
+                                                                                                  gl.display.equipixel *
+                                                                                                  gl.iconSizeXS,
+                                                                                            ),
+                                                                                  ),
+                                                                                ),
+                                                                                stroke(
+                                                                                  vertical:
+                                                                                      true,
+                                                                                  gl.display.equipixel,
+                                                                                  gl.display.equipixel *
+                                                                                      0.5,
+                                                                                  gl.colorAgroBioTech,
+                                                                                ),
+                                                                                SizedBox(
+                                                                                  width:
+                                                                                      gl.display.equipixel *
+                                                                                      33,
+                                                                                  height:
+                                                                                      gl.display.equipixel *
+                                                                                      gl.iconSizeS,
+                                                                                  child: TextButton(
+                                                                                    style: ButtonStyle(
+                                                                                      animationDuration: Duration(
+                                                                                        seconds:
+                                                                                            1,
+                                                                                      ),
+                                                                                      backgroundColor: WidgetStateProperty<
+                                                                                        Color
+                                                                                      >.fromMap(
+                                                                                        <
+                                                                                          WidgetStatesConstraint,
+                                                                                          Color
+                                                                                        >{
+                                                                                          WidgetState.any: Colors.transparent,
+                                                                                        },
+                                                                                      ),
+                                                                                      padding: WidgetStateProperty<
+                                                                                        EdgeInsetsGeometry
+                                                                                      >.fromMap(
+                                                                                        <
+                                                                                          WidgetStatesConstraint,
+                                                                                          EdgeInsetsGeometry
+                                                                                        >{
+                                                                                          WidgetState.any: EdgeInsetsGeometry.zero,
+                                                                                        },
+                                                                                      ),
+                                                                                    ),
+                                                                                    onPressed:
+                                                                                        () {},
+                                                                                    onLongPress: () {
+                                                                                      PopupValueChange(
+                                                                                        context,
+                                                                                        "prop",
+                                                                                        gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].name,
+                                                                                        (
+                                                                                          value,
+                                                                                        ) {
+                                                                                          gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].name = value;
+                                                                                        },
+                                                                                        () {},
+                                                                                      );
+                                                                                    },
+                                                                                    child: Container(
+                                                                                      alignment:
+                                                                                          Alignment.centerLeft,
+                                                                                      child: SingleChildScrollView(
+                                                                                        scrollDirection:
+                                                                                            Axis.horizontal,
+                                                                                        child: Text(
+                                                                                          gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].name,
+                                                                                          textAlign:
+                                                                                              TextAlign.start,
+                                                                                          style: TextStyle(
+                                                                                            color:
+                                                                                                Colors.white,
+                                                                                            fontSize:
+                                                                                                gl.display.equipixel *
+                                                                                                gl.fontSizeM *
+                                                                                                .75,
+                                                                                          ),
+                                                                                        ),
+                                                                                      ),
+                                                                                    ),
+                                                                                  ),
+                                                                                ),
+                                                                                stroke(
+                                                                                  vertical:
+                                                                                      true,
+                                                                                  gl.display.equipixel,
+                                                                                  gl.display.equipixel *
+                                                                                      0.5,
+                                                                                  gl.colorAgroBioTech,
+                                                                                ),
+                                                                                SizedBox(
+                                                                                  width:
+                                                                                      gl.display.equipixel *
+                                                                                      33,
+                                                                                  height:
+                                                                                      gl.display.equipixel *
+                                                                                      gl.iconSizeS,
+                                                                                  child: TextButton(
+                                                                                    style: ButtonStyle(
+                                                                                      animationDuration: Duration(
+                                                                                        seconds:
+                                                                                            1,
+                                                                                      ),
+                                                                                      backgroundColor: WidgetStateProperty<
+                                                                                        Color
+                                                                                      >.fromMap(
+                                                                                        <
+                                                                                          WidgetStatesConstraint,
+                                                                                          Color
+                                                                                        >{
+                                                                                          WidgetState.any: Colors.transparent,
+                                                                                        },
+                                                                                      ),
+                                                                                      padding: WidgetStateProperty<
+                                                                                        EdgeInsetsGeometry
+                                                                                      >.fromMap(
+                                                                                        <
+                                                                                          WidgetStatesConstraint,
+                                                                                          EdgeInsetsGeometry
+                                                                                        >{
+                                                                                          WidgetState.any: EdgeInsetsGeometry.zero,
+                                                                                        },
+                                                                                      ),
+                                                                                    ),
+                                                                                    onPressed:
+                                                                                        () {},
+                                                                                    onLongPress: () {
+                                                                                      PopupValueChange(
+                                                                                        context,
+                                                                                        gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].type,
+                                                                                        gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].value,
+                                                                                        (
+                                                                                          value,
+                                                                                        ) {
+                                                                                          gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].value = value;
+                                                                                        },
+                                                                                        () {},
+                                                                                      );
+                                                                                    },
+                                                                                    child: Container(
+                                                                                      alignment:
+                                                                                          Alignment.centerLeft,
+                                                                                      child: SingleChildScrollView(
+                                                                                        scrollDirection:
+                                                                                            Axis.horizontal,
+                                                                                        child:
+                                                                                            gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].type ==
+                                                                                                    "string"
+                                                                                                ? Text(
+                                                                                                  gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].value,
+                                                                                                  textAlign:
+                                                                                                      TextAlign.start,
+                                                                                                  style: TextStyle(
+                                                                                                    color:
+                                                                                                        Colors.white,
+                                                                                                    fontSize:
+                                                                                                        gl.display.equipixel *
+                                                                                                        gl.fontSizeM *
+                                                                                                        .75,
+                                                                                                  ),
+                                                                                                )
+                                                                                                : gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].type ==
+                                                                                                    "int"
+                                                                                                ? Text(
+                                                                                                  gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].value.toString(),
+                                                                                                  textAlign:
+                                                                                                      TextAlign.start,
+                                                                                                  style: TextStyle(
+                                                                                                    color:
+                                                                                                        Colors.white,
+                                                                                                    fontSize:
+                                                                                                        gl.display.equipixel *
+                                                                                                        gl.fontSizeM *
+                                                                                                        .75,
+                                                                                                  ),
+                                                                                                )
+                                                                                                : gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].type ==
+                                                                                                    "double"
+                                                                                                ? Text(
+                                                                                                  gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].value.toString(),
+                                                                                                  textAlign:
+                                                                                                      TextAlign.start,
+                                                                                                  style: TextStyle(
+                                                                                                    color:
+                                                                                                        Colors.white,
+                                                                                                    fontSize:
+                                                                                                        gl.display.equipixel *
+                                                                                                        gl.fontSizeM *
+                                                                                                        .75,
+                                                                                                  ),
+                                                                                                )
+                                                                                                : gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].type ==
+                                                                                                    "special"
+                                                                                                ? Text(
+                                                                                                  "special value",
+                                                                                                  style: TextStyle(
+                                                                                                    color:
+                                                                                                        Colors.white,
+                                                                                                    fontSize:
+                                                                                                        gl.display.equipixel *
+                                                                                                        gl.fontSizeM *
+                                                                                                        .75,
+                                                                                                  ),
+                                                                                                )
+                                                                                                : Text(
+                                                                                                  "ERROR TYPE ${gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].type}",
+                                                                                                  style: TextStyle(
+                                                                                                    color:
+                                                                                                        Colors.white,
+                                                                                                    fontSize:
+                                                                                                        gl.display.equipixel *
+                                                                                                        gl.fontSizeM *
+                                                                                                        .75,
+                                                                                                  ),
+                                                                                                ),
+                                                                                      ),
+                                                                                    ),
+                                                                                  ),
+                                                                                ),
+                                                                              ],
                                                                             ),
                                                                             stroke(
-                                                                              vertical:
-                                                                                  true,
                                                                               gl.display.equipixel,
                                                                               gl.display.equipixel *
-                                                                                  0.5,
+                                                                                  .5,
                                                                               gl.colorAgroBioTech,
                                                                             ),
-                                                                            SizedBox(
-                                                                              width:
-                                                                                  gl.display.equipixel *
-                                                                                  40,
-                                                                              height:
-                                                                                  gl.display.equipixel *
-                                                                                  gl.iconSizeS,
-                                                                              child: TextButton(
-                                                                                onPressed:
-                                                                                    () {},
-                                                                                onLongPress: () {
-                                                                                  PopupValueChange(
-                                                                                    context,
-                                                                                    gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].type,
-                                                                                    gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].value,
-                                                                                    (
-                                                                                      value,
-                                                                                    ) {
-                                                                                      gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].value = value;
-                                                                                    },
-                                                                                    () {},
-                                                                                  );
-                                                                                },
-                                                                                child: Container(
-                                                                                  alignment:
-                                                                                      Alignment.centerLeft,
-                                                                                  child:
-                                                                                      gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].type ==
-                                                                                              "string"
-                                                                                          ? Text(
-                                                                                            gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].value,
-                                                                                            textAlign:
-                                                                                                TextAlign.start,
-                                                                                            style: TextStyle(
-                                                                                              color:
-                                                                                                  Colors.white,
-                                                                                              fontSize:
-                                                                                                  gl.display.equipixel *
-                                                                                                  gl.fontSizeM *
-                                                                                                  .75,
-                                                                                            ),
-                                                                                          )
-                                                                                          : gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].type ==
-                                                                                              "int"
-                                                                                          ? Text(
-                                                                                            gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].value.toString(),
-                                                                                            textAlign:
-                                                                                                TextAlign.start,
-                                                                                            style: TextStyle(
-                                                                                              color:
-                                                                                                  Colors.white,
-                                                                                              fontSize:
-                                                                                                  gl.display.equipixel *
-                                                                                                  gl.fontSizeM *
-                                                                                                  .75,
-                                                                                            ),
-                                                                                          )
-                                                                                          : gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].type ==
-                                                                                              "double"
-                                                                                          ? Text(
-                                                                                            gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].value.toString(),
-                                                                                            textAlign:
-                                                                                                TextAlign.start,
-                                                                                            style: TextStyle(
-                                                                                              color:
-                                                                                                  Colors.white,
-                                                                                              fontSize:
-                                                                                                  gl.display.equipixel *
-                                                                                                  gl.fontSizeM *
-                                                                                                  .75,
-                                                                                            ),
-                                                                                          )
-                                                                                          : gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].type ==
-                                                                                              "special"
-                                                                                          ? Text(
-                                                                                            "special value",
-                                                                                            style: TextStyle(
-                                                                                              color:
-                                                                                                  Colors.white,
-                                                                                              fontSize:
-                                                                                                  gl.display.equipixel *
-                                                                                                  gl.fontSizeM *
-                                                                                                  .75,
-                                                                                            ),
-                                                                                          )
-                                                                                          : Text(
-                                                                                            "ERROR TYPE ${gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].type}",
-                                                                                            style: TextStyle(
-                                                                                              color:
-                                                                                                  Colors.white,
-                                                                                              fontSize:
-                                                                                                  gl.display.equipixel *
-                                                                                                  gl.fontSizeM *
-                                                                                                  .75,
-                                                                                            ),
-                                                                                          ),
-                                                                                ),
-                                                                              ),
-                                                                            ),
                                                                           ],
-                                                                        ),
-                                                                        stroke(
-                                                                          gl.display.equipixel,
-                                                                          gl.display.equipixel *
-                                                                              .5,
-                                                                          gl.colorAgroBioTech,
-                                                                        ),
-                                                                      ],
-                                                                    );
-                                                                  },
-                                                                ),
+                                                                        );
+                                                                      },
+                                                                    ),
                                                               ),
                                                             ),
                                                           ),
@@ -1670,7 +2154,7 @@ class _MapPageState extends State<MapPage> {
                                                         MainAxisAlignment
                                                             .spaceAround,
                                                     children: [
-                                                      IconButton(
+                                                      TextButton(
                                                         onPressed: () {
                                                           gl
                                                               .polygonLayers[gl
@@ -1722,41 +2206,65 @@ class _MapPageState extends State<MapPage> {
                                                             () {},
                                                           );
                                                         },
-                                                        icon: Icon(
-                                                          Icons.add_circle,
-                                                          color:
-                                                              gl.colorAgroBioTech,
-                                                          size:
-                                                              gl.iconSizeS *
-                                                              gl
-                                                                  .display
-                                                                  .equipixel,
+                                                        child: Column(
+                                                          children: [
+                                                            Icon(
+                                                              Icons.add_circle,
+                                                              color:
+                                                                  gl.colorAgroBioTech,
+                                                              size:
+                                                                  gl.iconSizeS *
+                                                                  gl
+                                                                      .display
+                                                                      .equipixel,
+                                                            ),
+                                                            Text(
+                                                              "Une seule variable",
+                                                              style: TextStyle(
+                                                                color:
+                                                                    gl.colorAgroBioTech,
+                                                                fontSize:
+                                                                    gl
+                                                                        .display
+                                                                        .equipixel *
+                                                                    gl.fontSizeXS,
+                                                              ),
+                                                            ),
+                                                          ],
                                                         ),
                                                       ),
-                                                      IconButton(
+                                                      TextButton(
                                                         onPressed: () {
-                                                          PopupDoYouReally(
+                                                          PopupSelectAttributeSet(
                                                             context,
-                                                            () {
-                                                              gl
-                                                                  .polygonLayers[gl
-                                                                      .selectedPolygonLayer]
-                                                                  .sendGeometryToServer();
-                                                            },
-                                                            "Attention !",
-                                                            "Vous pouvez envoyer un polygone seulement une fois! Meme si vous le modifiez par après.",
                                                           );
                                                         },
-                                                        icon: Icon(
-                                                          Icons
-                                                              .send_and_archive,
-                                                          color:
-                                                              gl.colorAgroBioTech,
-                                                          size:
-                                                              gl.iconSizeS *
-                                                              gl
-                                                                  .display
-                                                                  .equipixel,
+                                                        child: Column(
+                                                          children: [
+                                                            Icon(
+                                                              Icons
+                                                                  .add_circle_outline_outlined,
+                                                              color:
+                                                                  gl.colorAgroBioTech,
+                                                              size:
+                                                                  gl.iconSizeS *
+                                                                  gl
+                                                                      .display
+                                                                      .equipixel,
+                                                            ),
+                                                            Text(
+                                                              "Un set de variables",
+                                                              style: TextStyle(
+                                                                color:
+                                                                    gl.colorAgroBioTech,
+                                                                fontSize:
+                                                                    gl
+                                                                        .display
+                                                                        .equipixel *
+                                                                    gl.fontSizeXS,
+                                                              ),
+                                                            ),
+                                                          ],
                                                         ),
                                                       ),
                                                     ],
@@ -2073,8 +2581,29 @@ class _MapPageState extends State<MapPage> {
   List<Polygon> _getPolygonesToDraw() {
     List<Polygon> that = [];
     for (var layer in gl.polygonLayers) {
-      if (layer.numPoints > 2 && layer.visibleOnMap) {
+      if (layer.numPoints > 2 &&
+          layer.visibleOnMap &&
+          layer.type == "Polygon") {
         that.add(Polygon(points: layer.vertexes, color: layer.colorInside));
+      }
+    }
+    return that;
+  }
+
+  List<CircleMarker> _getPointsToDraw() {
+    List<CircleMarker> that = [];
+    for (var layer in gl.polygonLayers) {
+      if (layer.visibleOnMap && layer.numPoints > 0 && layer.type == "Point") {
+        that.add(
+          CircleMarker(
+            point: LatLng(
+              layer.vertexes.first.latitude,
+              layer.vertexes.first.longitude,
+            ),
+            radius: gl.display.equipixel * 2.5,
+            color: layer.colorLine,
+          ),
+        );
       }
     }
     return that;
@@ -2550,6 +3079,7 @@ class _MapPageState extends State<MapPage> {
   }
 
   void _closePolygonMenu() {
+    _stopMovingSelectedPoint();
     gl.Mode.polygon = false;
     gl.Mode.editPolygon = false;
     _modeSearch = false;
@@ -3012,59 +3542,198 @@ class _MapPageState extends State<MapPage> {
     );
   }
 
-  List<Marker> _getPolygonesInfos() {
+  List<Marker> _getPolygonesLabels() {
     return List.generate(gl.polygonLayers.length, (i) {
       String textArea = "${(gl.polygonLayers[i].area / 100).round() / 100} Ha";
       return gl.polygonLayers[i].visibleOnMap
-          ? Marker(
-            alignment: Alignment.center,
+          ? gl.polygonLayers[i].type == "Polygon"
+              ? Marker(
+                alignment: Alignment.center,
 
-            width:
-                textArea.length > gl.polygonLayers[i].name.length
-                    ? gl.display.equipixel * gl.infoBoxPolygon * 2.5 +
-                        textArea.length * gl.fontSizeS
-                    : gl.display.equipixel * gl.infoBoxPolygon * 1.5 +
-                        gl.polygonLayers[i].name.length * gl.fontSizeS,
-            height: gl.display.equipixel * gl.infoBoxPolygon * 1.5,
-            point: gl.polygonLayers[i].center,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Row(
+                width:
+                    textArea.length > gl.polygonLayers[i].name.length
+                        ? gl.display.equipixel * gl.infoBoxPolygon * 2.5 +
+                            textArea.length * gl.fontSizeS
+                        : gl.display.equipixel * gl.infoBoxPolygon * 1.5 +
+                            gl.polygonLayers[i].name.length * gl.fontSizeS,
+                height: gl.display.equipixel * gl.infoBoxPolygon * 1.5,
+                point: gl.polygonLayers[i].center,
+                child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Column(
+                  children: <Widget>[
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
+                        Column(
                           children: [
-                            Icon(
-                              Icons.layers,
-                              color: gl.polygonLayers[i].colorLine,
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Icon(
+                                  Icons.layers,
+                                  color: gl.polygonLayers[i].colorLine,
+                                ),
+                                Text(
+                                  gl.polygonLayers[i].name,
+                                  overflow: TextOverflow.clip,
+                                ),
+                              ],
                             ),
-                            Text(
-                              gl.polygonLayers[i].name,
-                              overflow: TextOverflow.clip,
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Icon(
+                                  Icons.square_foot,
+                                  color: gl.polygonLayers[i].colorLine,
+                                ),
+                                Text(textArea),
+                              ],
                             ),
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Icon(
-                              Icons.square_foot,
-                              color: gl.polygonLayers[i].colorLine,
-                            ),
-                            Text(textArea),
                           ],
                         ),
                       ],
                     ),
                   ],
                 ),
-              ],
-            ),
-          )
+              )
+              : gl.polygonLayers[i].type == "Point"
+              ? Marker(
+                alignment: Alignment.bottomLeft,
+                width: gl.display.equipixel * gl.infoBoxPolygon,
+                height:
+                    gl.display.equipixel *
+                    (gl.polygonLayers[i].getNCheckedAttributes() + 1) *
+                    gl.iconSizeS *
+                    .8,
+                point: gl.polygonLayers[i].center,
+                child: Card(
+                  color: Colors.black.withAlpha(200),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children:
+                        <Widget>[
+                          Container(
+                            padding: EdgeInsets.all(2),
+                            color: Colors.transparent,
+                            height: gl.display.equipixel * gl.iconSizeXS,
+
+                            child: SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: Text(
+                                gl.polygonLayers[i].name,
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize:
+                                      gl.display.equipixel * gl.fontSizeXS,
+                                ),
+                              ),
+                            ),
+                          ),
+                          stroke(
+                            gl.display.equipixel * 0.5,
+                            gl.display.equipixel * 0.25,
+                            gl.colorAgroBioTech,
+                          ),
+                        ] +
+                        List<Widget>.generate(
+                          gl.polygonLayers[i].getNCheckedAttributes(),
+                          (j) {
+                            return Container(
+                              padding: EdgeInsetsDirectional.symmetric(
+                                horizontal: gl.display.equipixel * 2,
+                              ),
+                              color: Colors.transparent,
+                              height: gl.display.equipixel * gl.iconSizeXS,
+                              child: Row(
+                                children: [
+                                  Container(
+                                    alignment: Alignment.centerLeft,
+                                    width: gl.display.equipixel * 15,
+                                    child: SingleChildScrollView(
+                                      scrollDirection: Axis.horizontal,
+                                      child: Text(
+                                        gl.polygonLayers[i].attributes[j].name,
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize:
+                                              gl.display.equipixel *
+                                              gl.fontSizeXS,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  stroke(
+                                    vertical: true,
+                                    gl.display.equipixel * 0.5,
+                                    gl.display.equipixel * 0.25,
+                                    gl.colorAgroBioTech,
+                                  ),
+                                  Container(
+                                    alignment: Alignment.centerLeft,
+                                    width: gl.display.equipixel * 15,
+                                    child: SingleChildScrollView(
+                                      scrollDirection: Axis.horizontal,
+                                      child: Text(
+                                        gl.polygonLayers[i].attributes[j].value
+                                            .toString(),
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize:
+                                              gl.display.equipixel *
+                                              gl.fontSizeXS,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
+                  ),
+                ),
+              )
+              : Marker(
+                alignment: Alignment.center,
+                width:
+                    textArea.length > gl.polygonLayers[i].name.length
+                        ? gl.display.equipixel * gl.infoBoxPolygon * 2.5 +
+                            textArea.length * gl.fontSizeS
+                        : gl.display.equipixel * gl.infoBoxPolygon * 1.5 +
+                            gl.polygonLayers[i].name.length * gl.fontSizeS,
+                height: gl.display.equipixel * gl.infoBoxPolygon * 1.5,
+                point: gl.polygonLayers[i].center,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Column(
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Icon(
+                                  Icons.layers,
+                                  color: gl.polygonLayers[i].colorLine,
+                                ),
+                                Text(
+                                  "Unknown Geometry",
+                                  overflow: TextOverflow.clip,
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              )
           : Marker(
             alignment: Alignment.center,
             width: 1,
@@ -3186,6 +3855,97 @@ class _MapPageState extends State<MapPage> {
       gl.print("$e");
       _refreshLocation = false;
     }
+  }
+
+  Column _getFixedAttribute(
+    String name,
+    String values, {
+    bool checked = false,
+  }) {
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            Container(
+              alignment: Alignment.center,
+              width: gl.display.equipixel * 11,
+              child: Text(
+                "FIXED",
+                style: TextStyle(
+                  color: Colors.grey,
+                  fontSize: gl.fontSizeXS * gl.display.equipixel,
+                ),
+              ),
+            ),
+            stroke(
+              vertical: true,
+              gl.display.equipixel,
+              gl.display.equipixel * 0.5,
+              gl.colorAgroBioTech,
+            ),
+            SizedBox(
+              width: gl.display.equipixel * 7,
+              child:
+                  checked
+                      ? Icon(
+                        Icons.check_box,
+                        color: Colors.white12,
+                        size: gl.display.equipixel * gl.iconSizeXS,
+                      )
+                      : Icon(
+                        Icons.check_box_outline_blank,
+                        color: Colors.white12,
+                        size: gl.display.equipixel * gl.iconSizeXS,
+                      ),
+            ),
+            stroke(
+              vertical: true,
+              gl.display.equipixel,
+              gl.display.equipixel * 0.5,
+              gl.colorAgroBioTech,
+            ),
+            Container(
+              alignment: Alignment.centerLeft,
+              width: gl.display.equipixel * 33,
+              child: Text(
+                name,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: gl.display.equipixel * gl.fontSizeM * .75,
+                ),
+              ),
+            ),
+            stroke(
+              vertical: true,
+              gl.display.equipixel,
+              gl.display.equipixel * 0.5,
+              gl.colorAgroBioTech,
+            ),
+            Container(
+              alignment: Alignment.centerLeft,
+              width: gl.display.equipixel * 33,
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Text(
+                  values,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: gl.display.equipixel * gl.fontSizeM * .75,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+        stroke(
+          gl.display.equipixel,
+          gl.display.equipixel * 0.5,
+          gl.colorAgroBioTech,
+        ),
+      ],
+    );
   }
 }
 

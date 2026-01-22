@@ -122,6 +122,8 @@ class _MyApp extends State<MyApp> {
   Future _readPreference() async {
     gl.shared = await SharedPreferences.getInstance();
 
+    gl.UserData.loadFromPrefs();
+
     final bool? modeDevelopper = gl.shared!.getBool('modeDevelopper');
     if (modeDevelopper != null) {
       gl.modeDevelopper = modeDevelopper;

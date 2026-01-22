@@ -30,6 +30,23 @@ bool modeDevelopper = false;
 bool modeSettings = false;
 bool modeMenuResults = false;
 
+class UserData {
+  static String name = "";
+  static String forename = "";
+  static String mail = "";
+
+  static void saveToPrefs() async {
+    await shared!.setStringList('UserDATA', <String>[name, forename, mail]);
+  }
+
+  static void loadFromPrefs() {
+    List<String> data = shared!.getStringList('UserDATA') ?? ["", "", ""];
+    name = data[0];
+    forename = data[1];
+    mail = data[2];
+  }
+}
+
 class Mode {
   static bool recordPath = false;
   static bool keyboardExpanded = false;
@@ -202,7 +219,7 @@ double fontSizeXL = 7;
 // Polygons
 double chosenPolyBarWidth = 95;
 double chosenPolyBarHeight = 20;
-double infoBoxPolygon = 30;
+double infoBoxPolygon = 40;
 // AnaPtPreview
 double anaPtBoxSize = 12;
 // Popup Poly List

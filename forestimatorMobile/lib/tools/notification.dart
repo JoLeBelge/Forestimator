@@ -777,7 +777,7 @@ class PopupNewPolygon {
                       fontSize: gl.display.equipixel * gl.fontSizeM,
                     ),
                   ),
-                  SelectPolyType(state: (String s) {}),
+                  SelectPolyType(state: typeChanged),
                   stroke(
                     gl.display.equipixel,
                     gl.display.equipixel * .5,
@@ -953,6 +953,169 @@ class _SelectPolyType extends State<SelectPolyType> {
   }
 }
 
+class PopupUserData {
+  PopupUserData(
+    BuildContext context,
+    VoidCallback callbackOnStartTyping,
+    VoidCallback afterCompleting, {
+    String oldName = "",
+    String oldForename = "",
+    String oldMail = "",
+  }) {
+    presentPopup(
+      context: context,
+      dismiss: true,
+      after: () {
+        gl.UserData.forename = oldForename;
+        gl.UserData.name = oldName;
+        gl.UserData.mail = oldMail;
+      },
+      popup: AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadiusGeometry.circular(12.0),
+          side: BorderSide(color: gl.colorAgroBioTech, width: 2.0),
+        ),
+        backgroundColor: gl.backgroundTransparentBlackBox,
+        content: SizedBox(
+          width:
+              gl.display.orientation == Orientation.portrait
+                  ? gl.popupWindowsPortraitWidth * gl.display.equipixel
+                  : gl.popupWindowsLandscapeWidth * gl.display.equipixel,
+          height:
+              gl.display.orientation == Orientation.portrait
+                  ? gl.popupWindowsPortraitHeight * gl.display.equipixel / 2
+                  : gl.popupWindowsLandscapeHeight * gl.display.equipixel,
+          child: SingleChildScrollView(
+            child: switchRowColWithOrientation([
+              Column(
+                children: [
+                  Text(
+                    "Renseignements personnels",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: gl.display.equipixel * gl.fontSizeM,
+                    ),
+                  ),
+                  stroke(
+                    gl.display.equipixel,
+                    gl.display.equipixel * .5,
+                    gl.colorAgroBioTech,
+                  ),
+                  Text(
+                    "Votre nom",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: gl.display.equipixel * gl.fontSizeM,
+                    ),
+                  ),
+                  SizedBox(
+                    width: gl.menuBarLength * gl.display.equipixel,
+                    child: TextFormField(
+                      maxLength: 22,
+                      maxLengthEnforcement: MaxLengthEnforcement.enforced,
+                      onChanged: (String str) {
+                        gl.UserData.name = str;
+                      },
+                      onTap: () => callbackOnStartTyping(),
+                      onTapOutside: (pointer) {},
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                  Text(
+                    "Votre prénom",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: gl.display.equipixel * gl.fontSizeM,
+                    ),
+                  ),
+                  SizedBox(
+                    width: gl.menuBarLength * gl.display.equipixel,
+                    child: TextFormField(
+                      maxLength: 22,
+                      maxLengthEnforcement: MaxLengthEnforcement.enforced,
+                      onChanged: (String str) {
+                        gl.UserData.forename = str;
+                      },
+                      onTap: () => callbackOnStartTyping(),
+                      onTapOutside: (pointer) {},
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                  Text(
+                    "Mail de contact",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: gl.display.equipixel * gl.fontSizeM,
+                    ),
+                  ),
+                  SizedBox(
+                    width: gl.menuBarLength * gl.display.equipixel,
+                    child: TextFormField(
+                      maxLength: 22,
+                      maxLengthEnforcement: MaxLengthEnforcement.enforced,
+                      onChanged: (String str) {
+                        gl.UserData.mail = str;
+                      },
+                      onTap: () => callbackOnStartTyping(),
+                      onTapOutside: (pointer) {},
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  SizedBox(
+                    width: gl.menuBarLength * .5 * gl.display.equipixel,
+                    child: TextButton(
+                      style: dialogButtonStyle(
+                        height: gl.display.equipixel * 12,
+                        width: gl.display.equipixel * 10 * "Ok".length,
+                      ),
+                      child: Text("Appliquer", style: dialogTextButtonStyle()),
+                      onPressed: () {
+                        if (gl.UserData.forename.isNotEmpty &&
+                            gl.UserData.name.isNotEmpty &&
+                            gl.UserData.mail.isNotEmpty) {
+                          dismissPopup();
+                          afterCompleting();
+                          gl.UserData.saveToPrefs();
+                        }
+                      },
+                    ),
+                  ),
+                  stroke(
+                    vertical: true,
+                    gl.display.equipixel,
+                    gl.display.equipixel * .5,
+                    Colors.transparent,
+                  ),
+                  SizedBox(
+                    width: gl.menuBarLength * .5 * gl.display.equipixel,
+                    child: TextButton(
+                      style: dialogButtonStyle(
+                        height: gl.display.equipixel * 12,
+                        width: gl.display.equipixel * 10 * "Retour".length,
+                      ),
+                      child: Text("Retour", style: dialogTextButtonStyle()),
+                      onPressed: () {
+                        gl.UserData.forename = oldForename;
+                        gl.UserData.name = oldName;
+                        gl.UserData.mail = oldMail;
+                        dismissPopup();
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ]),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class PopupNewAttribute {
   PopupNewAttribute(
     BuildContext context,
@@ -1091,21 +1254,45 @@ class PopupNewAttribute {
                   ),
                 ],
               ),
-              SizedBox(
-                width: gl.menuBarLength * .5 * gl.display.equipixel,
-                child: TextButton(
-                  style: dialogButtonStyle(
-                    height: gl.display.equipixel * 12,
-                    width: gl.display.equipixel * 10 * "Ok".length,
+              Row(
+                children: [
+                  SizedBox(
+                    width: gl.menuBarLength * .5 * gl.display.equipixel,
+                    child: TextButton(
+                      style: dialogButtonStyle(
+                        height: gl.display.equipixel * 12,
+                        width: gl.display.equipixel * 10 * "Ok".length,
+                      ),
+                      child: Text("Ajouter", style: dialogTextButtonStyle()),
+                      onPressed: () {
+                        if (controlDuplicateAttributeName(textEditor.text)) {
+                          return;
+                        }
+                        dismissPopup();
+                      },
+                    ),
                   ),
-                  child: Text("Ajouter", style: dialogTextButtonStyle()),
-                  onPressed: () {
-                    if (controlDuplicateAttributeName(textEditor.text)) {
-                      return;
-                    }
-                    dismissPopup();
-                  },
-                ),
+                  stroke(
+                    vertical: true,
+                    gl.display.equipixel,
+                    gl.display.equipixel * .5,
+                    Colors.transparent,
+                  ),
+                  SizedBox(
+                    width: gl.menuBarLength * .5 * gl.display.equipixel,
+                    child: TextButton(
+                      style: dialogButtonStyle(
+                        height: gl.display.equipixel * 12,
+                        width: gl.display.equipixel * 10 * "Retour".length,
+                      ),
+                      child: Text("Retour", style: dialogTextButtonStyle()),
+                      onPressed: () {
+                        onTapOutside();
+                        dismissPopup();
+                      },
+                    ),
+                  ),
+                ],
               ),
             ]),
           ),
@@ -1123,7 +1310,7 @@ class PopupValueChange {
     ValueChanged<dynamic> valueChanged,
     VoidCallback onTapOutside,
   ) {
-    TextEditingController textEditor = TextEditingController(text: "");
+    TextEditingController textEditor = TextEditingController(text: oldValue);
     presentPopup(
       context: context,
       dismiss: true,
@@ -1158,7 +1345,7 @@ class PopupValueChange {
               SizedBox(
                 width: gl.menuBarLength * gl.display.equipixel,
                 child: TextFormField(
-                  maxLength: 22,
+                  maxLength: 255,
                   maxLengthEnforcement: MaxLengthEnforcement.enforced,
                   onChanged: (String str) {
                     switch (type) {
@@ -1206,21 +1393,45 @@ class PopupValueChange {
                   style: TextStyle(color: Colors.white),
                 ),
               ),
-              SizedBox(
-                width: gl.menuBarLength * .5 * gl.display.equipixel,
-                child: TextButton(
-                  style: dialogButtonStyle(
-                    height: gl.display.equipixel * 12,
-                    width: gl.display.equipixel * 10 * "Ok".length,
+              Row(
+                children: [
+                  SizedBox(
+                    width: gl.menuBarLength * .5 * gl.display.equipixel,
+                    child: TextButton(
+                      style: dialogButtonStyle(
+                        height: gl.display.equipixel * 12,
+                        width: gl.display.equipixel * 10 * "Ok".length,
+                      ),
+                      child: Text("Changer", style: dialogTextButtonStyle()),
+                      onPressed: () {
+                        if (controlDuplicateAttributeName(textEditor.text)) {
+                          return;
+                        }
+                        dismissPopup();
+                      },
+                    ),
                   ),
-                  child: Text("Changer", style: dialogTextButtonStyle()),
-                  onPressed: () {
-                    if (controlDuplicateAttributeName(textEditor.text)) {
-                      return;
-                    }
-                    dismissPopup();
-                  },
-                ),
+                  stroke(
+                    vertical: true,
+                    gl.display.equipixel,
+                    gl.display.equipixel * .5,
+                    Colors.transparent,
+                  ),
+                  SizedBox(
+                    width: gl.menuBarLength * .5 * gl.display.equipixel,
+                    child: TextButton(
+                      style: dialogButtonStyle(
+                        height: gl.display.equipixel * 12,
+                        width: gl.display.equipixel * 10 * "Retour".length,
+                      ),
+                      child: Text("Retour", style: dialogTextButtonStyle()),
+                      onPressed: () {
+                        valueChanged(oldValue);
+                        dismissPopup();
+                      },
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -1236,7 +1447,8 @@ String cleanAttributeName(String attribute) {
   for (int i = 0; i < attribute.length; i++) {
     if (attribute[i].contains(wantedCharacters) ||
         attribute[i].contains(RegExp(r'[A-Z]')) ||
-        attribute[i].contains(RegExp(r'[a-z]'))) {
+        attribute[i].contains(RegExp(r'[a-z]')) ||
+        attribute[i].contains(RegExp(r'[0-9]'))) {
       controlled = controlled + attribute[i];
     }
   }
@@ -1353,6 +1565,270 @@ class _SelectAttributeType extends State<SelectAttributeType> {
     );
   }
 }
+
+class PopupSelectAttributeSet {
+  PopupSelectAttributeSet(BuildContext context) {
+    String wantedSet = "Observation Composition";
+    presentPopup(
+      context: context,
+      dismiss: true,
+      after: () {},
+      popup: AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadiusGeometry.circular(12.0),
+          side: BorderSide(color: gl.colorAgroBioTech, width: 2.0),
+        ),
+        backgroundColor: gl.backgroundTransparentBlackBox,
+        content: SizedBox(
+          width:
+              gl.display.orientation == Orientation.portrait
+                  ? gl.popupWindowsPortraitWidth * gl.display.equipixel
+                  : gl.popupWindowsLandscapeWidth * gl.display.equipixel,
+          height:
+              gl.display.orientation == Orientation.portrait
+                  ? gl.popupWindowsPortraitHeight * gl.display.equipixel / 4
+                  : gl.popupWindowsLandscapeHeight * gl.display.equipixel,
+          child: Column(
+            children: [
+              Text(
+                "Choisissez un ensemble",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: gl.display.equipixel * gl.fontSizeM,
+                ),
+              ),
+              SizedBox(
+                width: gl.menuBarLength * gl.display.equipixel,
+                child: SelectAttributeSet(
+                  setChanged: (String it) {
+                    wantedSet = it;
+                  },
+                ),
+              ),
+              stroke(
+                gl.display.equipixel,
+                gl.display.equipixel * .5,
+                gl.colorAgroBioTech,
+              ),
+              Row(
+                children: [
+                  SizedBox(
+                    width: gl.menuBarLength * .5 * gl.display.equipixel,
+                    child: TextButton(
+                      style: dialogButtonStyle(
+                        height: gl.display.equipixel * 12,
+                        width: gl.display.equipixel * 10 * "Appliquer".length,
+                      ),
+                      child: Text("Appliquer", style: dialogTextButtonStyle()),
+                      onPressed: () {
+                        List<String> attributeNames = List<String>.generate(
+                          gl
+                              .polygonLayers[gl.selectedPolygonLayer]
+                              .attributes
+                              .length,
+                          (i) {
+                            return gl
+                                .polygonLayers[gl.selectedPolygonLayer]
+                                .attributes[i]
+                                .name;
+                          },
+                        );
+
+                        switch (wantedSet) {
+                          case "Observation Composition":
+                            if (!(attributeNames.contains("essence") &&
+                                attributeNames.contains("rmq"))) {
+                              gl
+                                  .polygonLayers[gl.selectedPolygonLayer]
+                                  .attributes
+                                  .addAll([
+                                    Attribute(
+                                      name: "essence",
+                                      type: "string",
+                                      value: "",
+                                    ),
+                                    Attribute(
+                                      name: "rmq",
+                                      type: "string",
+                                      value: "",
+                                    ),
+                                  ]);
+                            }
+                            break;
+                          default:
+                        }
+                        dismissPopup();
+                      },
+                    ),
+                  ),
+                  stroke(
+                    vertical: true,
+                    gl.display.equipixel,
+                    gl.display.equipixel * .5,
+                    Colors.transparent,
+                  ),
+                  SizedBox(
+                    width: gl.menuBarLength * .5 * gl.display.equipixel,
+                    child: TextButton(
+                      style: dialogButtonStyle(
+                        height: gl.display.equipixel * 12,
+                        width: gl.display.equipixel * 10 * "Retour".length,
+                      ),
+                      child: Text("Retour", style: dialogTextButtonStyle()),
+                      onPressed: () {
+                        dismissPopup();
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class SelectAttributeSet extends StatefulWidget {
+  final ValueChanged<String> setChanged;
+  const SelectAttributeSet({super.key, required this.setChanged});
+
+  @override
+  State<StatefulWidget> createState() => _SelectAttributeSet();
+}
+
+class _SelectAttributeSet extends State<SelectAttributeSet> {
+  final Color active = Colors.black;
+  int _selectedSet = 0;
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: [
+        Container(
+          width: gl.display.equipixel * gl.iconSizeM * 2.1,
+          height: gl.display.equipixel * gl.iconSizeM * 1.5,
+          color: _selectedSet == 0 ? gl.colorAgroBioTech : Colors.transparent,
+          child: TextButton(
+            onPressed: () {
+              setState(() {
+                _selectedSet = 0;
+                widget.setChanged("Observation Composition");
+              });
+            },
+            child: Column(
+              children: [
+                FaIcon(FontAwesomeIcons.chartLine, color: Colors.black),
+                SizedBox(
+                  width: gl.display.equipixel * gl.iconSizeM * 1.9,
+                  child: Text(
+                    "Observation Composition",
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: gl.display.equipixel * gl.fontSizeXS,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/*class PopupDeleteAttribute {
+  PopupDeleteAttribute(
+    BuildContext context,
+    List<String> entries,
+    ValueChanged<List<int>> deleteEntries,
+    VoidCallback onTapOutside,
+  ) {
+    TextEditingController textEditor = TextEditingController(text: "");
+    presentPopup(
+      context: context,
+      dismiss: true,
+      after: () {
+        onTapOutside;
+      },
+      popup: AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadiusGeometry.circular(12.0),
+          side: BorderSide(color: gl.colorAgroBioTech, width: 2.0),
+        ),
+        backgroundColor: gl.backgroundTransparentBlackBox,
+        content: SizedBox(
+          width:
+              gl.display.orientation == Orientation.portrait
+                  ? gl.popupWindowsPortraitWidth * gl.display.equipixel
+                  : gl.popupWindowsLandscapeWidth * gl.display.equipixel,
+          height:
+              gl.display.orientation == Orientation.portrait
+                  ? gl.popupWindowsPortraitHeight * gl.display.equipixel / 2
+                  : gl.popupWindowsLandscapeHeight * gl.display.equipixel,
+          child: Column(
+            children: [
+              Text(
+                "Choisissez les lignes à enlever.",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: gl.display.equipixel * gl.fontSizeS,
+                ),
+              ),
+              SizedBox(
+                height: 100 * gl.display.equipixel,
+                child: DeleteAttribute(
+                  deleteEntries: deleteEntries,
+                  entries: entries,
+                ),
+              ),
+              SizedBox(
+                width: gl.menuBarLength * .5 * gl.display.equipixel,
+                child: TextButton(
+                  style: dialogButtonStyle(
+                    height: gl.display.equipixel * 12,
+                    width: gl.display.equipixel * 10 * "Ok".length,
+                  ),
+                  child: Text("Enlever", style: dialogTextButtonStyle()),
+                  onPressed: () {
+                    if (controlDuplicateAttributeName(textEditor.text)) {
+                      return;
+                    }
+                    dismissPopup();
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class DeleteAttribute extends StatefulWidget {
+  final List<String> entries;
+  final ValueChanged<List<int>> deleteEntries;
+  const DeleteAttribute({
+    super.key,
+    required this.deleteEntries,
+    required this.entries,
+  });
+
+  @override
+  State<StatefulWidget> createState() => _DeleteAttribute();
+}
+
+class _DeleteAttribute extends State<DeleteAttribute> {
+  List<int> selected = [];
+
+  @override
+  Widget build(BuildContext context) {
+    return Container();
+  }
+}*/
 
 class PolygonListMenu extends StatefulWidget {
   final ValueChanged<LatLng> state;
@@ -1714,7 +2190,6 @@ class _PolygonListMenu extends State<PolygonListMenu> {
                                                 );
                                               },
                                             ),
-
                                             if (i == gl.selectedPolygonLayer)
                                               Text(
                                                 "${(gl.polygonLayers[i].area / 100).round() / 100} Ha",
@@ -1752,11 +2227,67 @@ class _PolygonListMenu extends State<PolygonListMenu> {
                                                   : gl.display.equipixel *
                                                       gl.iconSizeM *
                                                       1.2,
-
                                           child: Column(
                                             mainAxisAlignment:
                                                 MainAxisAlignment.spaceEvenly,
                                             children: [
+                                              IconButton(
+                                                onPressed: () {
+                                                  if (gl
+                                                          .UserData
+                                                          .forename
+                                                          .isEmpty ||
+                                                      gl
+                                                          .UserData
+                                                          .name
+                                                          .isEmpty ||
+                                                      gl
+                                                          .UserData
+                                                          .mail
+                                                          .isEmpty) {
+                                                    PopupUserData(
+                                                      context,
+                                                      () {},
+                                                      () {
+                                                        PopupDoYouReally(
+                                                          context,
+                                                          () {
+                                                            gl
+                                                                .polygonLayers[gl
+                                                                    .selectedPolygonLayer]
+                                                                .sendGeometryToServer();
+                                                          },
+                                                          "Attention !",
+                                                          "Vous pouvez envoyer un polygone seulement une fois! Même si vous le modifiez par après.",
+                                                        );
+                                                      },
+                                                      oldForename:
+                                                          gl.UserData.forename,
+                                                      oldName: gl.UserData.name,
+                                                      oldMail: gl.UserData.mail,
+                                                    );
+                                                  } else {
+                                                    PopupDoYouReally(
+                                                      context,
+                                                      () {
+                                                        gl
+                                                            .polygonLayers[gl
+                                                                .selectedPolygonLayer]
+                                                            .sendGeometryToServer();
+                                                      },
+                                                      "Attention !",
+                                                      "Vous pouvez envoyer un polygone seulement une fois! Même si vous le modifiez par après.",
+                                                    );
+                                                  }
+                                                },
+                                                icon: Icon(
+                                                  Icons.send_and_archive,
+                                                  color: gl.colorAgroBioTech,
+                                                  size:
+                                                      gl.iconSizeS *
+                                                      gl.display.equipixel,
+                                                ),
+                                              ),
                                               IconButton(
                                                 onPressed: () {
                                                   PopupColorChooser(
@@ -3693,6 +4224,237 @@ void launchURL(String url) async {
   }
 }
 
+Widget forestimatorSettingsUserData() {
+  return OrientationBuilder(
+    builder: (context, orientation) {
+      return Container(
+        padding: EdgeInsets.all(7.5),
+        child: Column(
+          children: [
+            stroke(
+              vertical: false,
+              gl.display.equipixel,
+              gl.display.equipixel * .5,
+              gl.colorAgroBioTech,
+            ),
+            Row(
+              children: [
+                SizedBox(
+                  width: gl.display.equipixel * 40,
+                  child: Text(
+                    "Prénom",
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: gl.display.equipixel * gl.fontSizeS,
+                    ),
+                  ),
+                ),
+                stroke(
+                  vertical: true,
+                  gl.display.equipixel,
+                  gl.display.equipixel * .5,
+                  gl.colorAgroBioTech,
+                ),
+                Container(
+                  alignment: Alignment.center,
+                  width: gl.display.equipixel * 40,
+                  height: gl.display.equipixel * gl.iconSizeXS,
+                  child: TextButton(
+                    style: ButtonStyle(
+                      animationDuration: Duration(seconds: 1),
+                      backgroundColor: WidgetStateProperty<Color>.fromMap(
+                        <WidgetStatesConstraint, Color>{
+                          WidgetState.any: Colors.transparent,
+                        },
+                      ),
+                      padding: WidgetStateProperty<EdgeInsetsGeometry>.fromMap(
+                        <WidgetStatesConstraint, EdgeInsetsGeometry>{
+                          WidgetState.any: EdgeInsetsGeometry.zero,
+                        },
+                      ),
+                    ),
+                    onPressed: () {},
+                    onLongPress: () {
+                      PopupValueChange(
+                        context,
+                        "string",
+                        gl.UserData.forename,
+                        (value) {
+                          gl.UserData.forename = value;
+                          gl.UserData.saveToPrefs();
+                        },
+                        () {},
+                      );
+                    },
+                    child: Container(
+                      alignment: Alignment.centerLeft,
+                      width: gl.display.equipixel * 40,
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Text(
+                          gl.UserData.forename,
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: gl.display.equipixel * gl.fontSizeS,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            stroke(
+              vertical: false,
+              gl.display.equipixel,
+              gl.display.equipixel * .5,
+              gl.colorAgroBioTech,
+            ),
+            Row(
+              children: [
+                SizedBox(
+                  width: gl.display.equipixel * 40,
+                  child: Text(
+                    "Nom",
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: gl.display.equipixel * gl.fontSizeS,
+                    ),
+                  ),
+                ),
+                stroke(
+                  vertical: true,
+                  gl.display.equipixel,
+                  gl.display.equipixel * .5,
+                  gl.colorAgroBioTech,
+                ),
+                Container(
+                  alignment: Alignment.center,
+                  width: gl.display.equipixel * 40,
+                  height: gl.display.equipixel * gl.iconSizeXS,
+                  child: TextButton(
+                    style: ButtonStyle(
+                      animationDuration: Duration(seconds: 1),
+                      backgroundColor: WidgetStateProperty<Color>.fromMap(
+                        <WidgetStatesConstraint, Color>{
+                          WidgetState.any: Colors.transparent,
+                        },
+                      ),
+                      padding: WidgetStateProperty<EdgeInsetsGeometry>.fromMap(
+                        <WidgetStatesConstraint, EdgeInsetsGeometry>{
+                          WidgetState.any: EdgeInsetsGeometry.zero,
+                        },
+                      ),
+                    ),
+                    onPressed: () {},
+                    onLongPress: () {
+                      PopupValueChange(context, "string", gl.UserData.name, (
+                        value,
+                      ) {
+                        gl.UserData.name = value;
+                        gl.UserData.saveToPrefs();
+                      }, () {});
+                    },
+                    child: Container(
+                      alignment: Alignment.centerLeft,
+                      width: gl.display.equipixel * 40,
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Text(
+                          gl.UserData.name,
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: gl.display.equipixel * gl.fontSizeS,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            stroke(
+              vertical: false,
+              gl.display.equipixel,
+              gl.display.equipixel * .5,
+              gl.colorAgroBioTech,
+            ),
+            Row(
+              children: [
+                SizedBox(
+                  width: gl.display.equipixel * 40,
+                  child: Text(
+                    "Mail",
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: gl.display.equipixel * gl.fontSizeS,
+                    ),
+                  ),
+                ),
+                stroke(
+                  vertical: true,
+                  gl.display.equipixel,
+                  gl.display.equipixel * .5,
+                  gl.colorAgroBioTech,
+                ),
+                Container(
+                  alignment: Alignment.center,
+                  width: gl.display.equipixel * 40,
+                  height: gl.display.equipixel * gl.iconSizeXS,
+                  child: TextButton(
+                    style: ButtonStyle(
+                      animationDuration: Duration(seconds: 1),
+                      backgroundColor: WidgetStateProperty<Color>.fromMap(
+                        <WidgetStatesConstraint, Color>{
+                          WidgetState.any: Colors.transparent,
+                        },
+                      ),
+                      padding: WidgetStateProperty<EdgeInsetsGeometry>.fromMap(
+                        <WidgetStatesConstraint, EdgeInsetsGeometry>{
+                          WidgetState.any: EdgeInsetsGeometry.zero,
+                        },
+                      ),
+                    ),
+                    onPressed: () {},
+                    onLongPress: () {
+                      PopupValueChange(context, "string", gl.UserData.mail, (
+                        value,
+                      ) {
+                        gl.UserData.mail = value;
+                        gl.UserData.saveToPrefs();
+                      }, () {});
+                    },
+                    child: Container(
+                      alignment: Alignment.centerLeft,
+                      width: gl.display.equipixel * 40,
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Text(
+                          gl.UserData.mail,
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: gl.display.equipixel * gl.fontSizeS,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            stroke(
+              vertical: false,
+              gl.display.equipixel,
+              gl.display.equipixel * .5,
+              gl.colorAgroBioTech,
+            ),
+          ],
+        ),
+      );
+    },
+  );
+}
+
 Widget forestimatorSettingsContacts() {
   return OrientationBuilder(
     builder: (context, orientation) {
@@ -4440,6 +5202,10 @@ class _SettingsMenu extends State<SettingsMenu> {
             f();
           });
         }),
+      ),
+      ItemSettings(
+        name: "Données Utilisateur",
+        entry: forestimatorSettingsUserData(),
       ),
       ItemSettings(
         name: "À propos de Forestimator",
@@ -8117,10 +8883,8 @@ class _AnaResultsMenu extends State<AnaResultsMenu> {
                 child: TabBarView(
                   children: List<EssencesListViewGS>.generate(
                     4,
-                    (index) => EssencesListViewGS(
-                      apts: apts,
-                      codeApt: index + 1,
-                    ), //TODO: apts lists and vulnerabilty labels.length are not compatible!
+                    (index) =>
+                        EssencesListViewGS(apts: apts, codeApt: index + 1),
                   ),
                 ),
               ),

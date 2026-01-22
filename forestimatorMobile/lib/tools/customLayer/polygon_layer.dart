@@ -14,14 +14,20 @@ class Attribute {
   String type;
   String name;
   dynamic value;
+  bool visibleOnMapLabel;
 
-  Attribute({required this.name, required this.type, required this.value});
+  Attribute({
+    required this.name,
+    this.type = "string",
+    this.value = "",
+    this.visibleOnMapLabel = false,
+  });
 }
 
 class PolygonLayer {
   UniqueKey identifier = UniqueKey();
   bool sentToServer = false;
-  String type = "";
+  String type = "Point";
   String name = "";
   bool visibleOnMap = true;
   List<LatLng> polygonPoints = [];
@@ -293,6 +299,36 @@ class PolygonLayer {
     }
   }
 
+  String getPolyPointsString() {
+    String coordinates = "";
+    for (LatLng point in polygonPoints) {
+      proj4.Point tLb72 = gl.epsg4326.transform(
+        gl.epsg31370,
+        proj4.Point(x: point.longitude, y: point.latitude),
+      );
+      coordinates = "$coordinates[${tLb72.x}, ${tLb72.y}],";
+    }
+    if (type == "Polygon" && polygonPoints.isNotEmpty) {
+      proj4.Point tLb72 = gl.epsg4326.transform(
+        gl.epsg31370,
+        proj4.Point(
+          x: polygonPoints.first.longitude,
+          y: polygonPoints.first.latitude,
+        ),
+      );
+      coordinates = "$coordinates[${tLb72.x}, ${tLb72.y}]";
+    } else {
+      if (coordinates.length > 1) {
+        coordinates = coordinates.substring(0, coordinates.length - 1);
+      }
+    }
+    if (coordinates.isEmpty) {
+      return "[]";
+    } else {
+      return coordinates;
+    }
+  }
+
   Future<bool> onlineSurfaceAnalysis() async {
     if (polygonPoints.length < 2) return false;
     bool internet = await InternetConnection().hasInternetAccess;
@@ -401,6 +437,7 @@ class PolygonLayer {
 
       String request =
           "https://forestimator.gembloux.ulg.ac.be/api/polygFromMobile/$geometry";
+      gl.print(request);
       http.Response? response;
       try {
         response = await http.get(Uri.parse(request));
@@ -429,5 +466,13 @@ class PolygonLayer {
     gl.print("Success sending Geometry $name");
     sentToServer = true;
     return true;
+  }
+
+  int getNCheckedAttributes() {
+    int nChecked = 0;
+    for (Attribute a in attributes) {
+      if (a.visibleOnMapLabel) nChecked++;
+    }
+    return nChecked;
   }
 }
