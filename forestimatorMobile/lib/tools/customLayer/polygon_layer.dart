@@ -31,6 +31,7 @@ class PolygonLayer {
   String name = "";
   bool visibleOnMap = true;
   bool labelsVisibleOnMap = true;
+  int selectedPointIcon = 0;
   List<LatLng> polygonPoints = [];
   List<int> selectedPolyLinePoints = [0, 0];
   Color colorInside = Color.fromRGBO(255, 128, 164, 80);
@@ -486,6 +487,7 @@ class PolygonLayer {
       '$identifier.labelsVisibleOnMap',
       labelsVisibleOnMap,
     );
+    await gl.shared!.setInt('$identifier.selectedPointIcon', selectedPointIcon);
     await gl.shared!.setDouble('$identifier.area', area);
     await gl.shared!.setDouble('$identifier.perimeter', perimeter);
     await gl.shared!.setDouble(
@@ -555,6 +557,7 @@ class PolygonLayer {
     sentToServer = gl.shared!.getBool('$id.sent') ?? false;
     visibleOnMap = gl.shared!.getBool('$id.visibleOnMap') ?? true;
     labelsVisibleOnMap = gl.shared!.getBool('$id.labelsVisibleOnMap') ?? true;
+    selectedPointIcon = gl.shared!.getInt('$id.selectedPointIcon') ?? 0;
     area = gl.shared!.getDouble('$id.area')!;
     perimeter = gl.shared!.getDouble('$id.perimeter')!;
     transparencyInside = gl.shared!.getDouble('$id.transparencyInside')!;

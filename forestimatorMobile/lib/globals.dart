@@ -1,7 +1,9 @@
 import 'package:fforestimator/dico/dico_apt.dart';
+import 'package:fforestimator/myicons.dart';
 import 'package:fforestimator/tools/customLayer/path_layer.dart';
 import 'package:fforestimator/tools/customLayer/polygon_layer.dart' as pol;
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:fforestimator/pages/anaPt/requested_layer.dart';
 import 'package:memory_info/memory_info.dart';
@@ -48,6 +50,7 @@ class UserData {
 }
 
 class Mode {
+  static bool debugScanlines = false;
   static bool recordPath = false;
   static bool keyboardExpanded = false;
   static bool square = false;
@@ -62,6 +65,7 @@ class Mode {
   static bool openToolbox = false;
   static bool editAttributes = false;
   static bool editPolygon = false;
+  static bool editPointMarker = false;
   static bool addVertexesPolygon = false;
   static bool moveVertexesPolygon = false;
   static bool removeVertexesPolygon = false;
@@ -741,3 +745,17 @@ void mainStackPopLast() {
     print("Error: Stack is empty, cannot pop last element!");
   }
 }
+
+List<IconData> selectableIcons = [
+  Icons.forest,
+  CustomIcons.mountain,
+  CustomIcons.tree,
+  CustomIcons.soil,
+  CustomIcons.forest,
+  Icons.circle,
+  FontAwesomeIcons.tree,
+  FontAwesomeIcons.mountain,
+  FontAwesomeIcons.locationPin,
+  FontAwesomeIcons.mapLocation,
+  FontAwesomeIcons.locationArrow,
+];

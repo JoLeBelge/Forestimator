@@ -707,7 +707,7 @@ class _MapPageState extends State<MapPage> {
                                   CircleLayer(
                                     circles: _drawnLayerPointsCircleMarker(),
                                   ),
-                                  CircleLayer(circles: _getPointsToDraw()),
+                                  MarkerLayer(markers: _getPointsToDraw()),
                                   PolygonLayer(polygons: _getPolygonesToDraw()),
                                   MarkerLayer(
                                     markers: _drawnLayerPointsMarker(),
@@ -742,7 +742,7 @@ class _MapPageState extends State<MapPage> {
                                       polygons: _getPolygonesToDraw(),
                                     ),
                                   if (gl.modeMapShowPolygons)
-                                    CircleLayer(circles: _getPointsToDraw()),
+                                    MarkerLayer(markers: _getPointsToDraw()),
                                 ]) +
                             <Widget>[
                               MarkerLayer(
@@ -1432,8 +1432,7 @@ class _MapPageState extends State<MapPage> {
                                                   ),
                                                 ],
                                               )
-                                              : (gl.Mode.editAttributes &&
-                                                  gl.polygonLayers.isNotEmpty)
+                                              : gl.Mode.editAttributes
                                               ? Column(
                                                 mainAxisAlignment:
                                                     MainAxisAlignment
@@ -2283,6 +2282,151 @@ class _MapPageState extends State<MapPage> {
                                                   ),
                                                 ],
                                               )
+                                              : gl.Mode.editPointMarker
+                                              ? Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  Column(
+                                                    children: [
+                                                      stroke(
+                                                        gl.display.equipixel,
+                                                        gl.display.equipixel *
+                                                            .5,
+                                                        gl.colorAgroBioTech,
+                                                      ),
+                                                      Row(
+                                                        children: [
+                                                          Container(
+                                                            alignment:
+                                                                Alignment
+                                                                    .topLeft,
+                                                            child: IconButton(
+                                                              iconSize:
+                                                                  gl
+                                                                      .display
+                                                                      .equipixel *
+                                                                  gl.iconSizeS,
+                                                              color:
+                                                                  Colors
+                                                                      .lightGreenAccent,
+                                                              onPressed: () {
+                                                                refreshView(() {
+                                                                  gl.Mode.editPointMarker =
+                                                                      false;
+                                                                });
+                                                              },
+                                                              icon: Icon(
+                                                                Icons
+                                                                    .arrow_back,
+                                                                size:
+                                                                    gl
+                                                                        .display
+                                                                        .equipixel *
+                                                                    gl.iconSizeS *
+                                                                    .9,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          Container(
+                                                            alignment:
+                                                                Alignment
+                                                                    .topLeft,
+                                                            width:
+                                                                gl
+                                                                    .display
+                                                                    .equipixel *
+                                                                gl.chosenPolyBarWidth *
+                                                                .75,
+                                                            child: Text(
+                                                              "Changez le symbole du point.",
+                                                              textAlign:
+                                                                  TextAlign
+                                                                      .center,
+                                                              style: TextStyle(
+                                                                color:
+                                                                    Colors
+                                                                        .white,
+                                                                fontSize:
+                                                                    gl
+                                                                        .display
+                                                                        .equipixel *
+                                                                    gl.fontSizeM *
+                                                                    .75,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      stroke(
+                                                        gl.display.equipixel,
+                                                        gl.display.equipixel *
+                                                            .5,
+                                                        gl.colorAgroBioTech,
+                                                      ),
+                                                      SizedBox(
+                                                        width:
+                                                            gl
+                                                                .display
+                                                                .equipixel *
+                                                            gl.chosenPolyBarWidth,
+
+                                                        child: SingleChildScrollView(
+                                                          scrollDirection:
+                                                              Axis.horizontal,
+                                                          child: Row(
+                                                            children: List<
+                                                              Widget
+                                                            >.generate(
+                                                              gl
+                                                                  .selectableIcons
+                                                                  .length,
+                                                              (k) {
+                                                                return Container(
+                                                                  color:
+                                                                      gl.polygonLayers[gl.selectedPolygonLayer].selectedPointIcon ==
+                                                                              k
+                                                                          ? gl.colorAgroBioTech
+                                                                          : Colors
+                                                                              .transparent,
+                                                                  child: IconButton(
+                                                                    onPressed: () {
+                                                                      refreshView(
+                                                                        () {
+                                                                          gl.polygonLayers[gl.selectedPolygonLayer].selectedPointIcon =
+                                                                              k;
+                                                                        },
+                                                                      );
+                                                                    },
+                                                                    icon: Icon(
+                                                                      gl.selectableIcons[k],
+                                                                      size:
+                                                                          gl.iconSizeM *
+                                                                          gl.display.equipixel,
+                                                                      color:
+                                                                          Colors
+                                                                              .white,
+                                                                    ),
+                                                                    color:
+                                                                        Colors
+                                                                            .white,
+                                                                    iconSize:
+                                                                        gl
+                                                                            .display
+                                                                            .equipixel *
+                                                                        gl.iconSizeM,
+                                                                  ),
+                                                                );
+                                                              },
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ],
+                                              )
                                               : Column(
                                                 children: [
                                                   stroke(
@@ -2382,7 +2526,8 @@ class _MapPageState extends State<MapPage> {
                                                                 gl
                                                                     .display
                                                                     .equipixel *
-                                                                gl.iconSizeS,
+                                                                gl.iconSizeS *
+                                                                .9,
                                                             color: Colors.white,
                                                           ),
                                                         ),
@@ -2428,6 +2573,12 @@ class _MapPageState extends State<MapPage> {
                                                             Icons
                                                                 .center_focus_strong_outlined,
                                                             size:
+                                                                gl
+                                                                    .display
+                                                                    .equipixel *
+                                                                gl.iconSizeS *
+                                                                .9,
+                                                            opticalSize:
                                                                 gl
                                                                     .display
                                                                     .equipixel *
@@ -2488,6 +2639,32 @@ class _MapPageState extends State<MapPage> {
                                                           color: Colors.white,
                                                         ),
                                                       ),
+                                                      if (gl
+                                                              .polygonLayers[gl
+                                                                  .selectedPolygonLayer]
+                                                              .type ==
+                                                          "Point")
+                                                        IconButton(
+                                                          onPressed: () {
+                                                            setState(() {
+                                                              gl.Mode.editPointMarker =
+                                                                  !gl
+                                                                      .Mode
+                                                                      .editPointMarker;
+                                                            });
+                                                          },
+                                                          icon: Icon(
+                                                            FontAwesomeIcons
+                                                                .locationPin,
+                                                            size:
+                                                                gl
+                                                                    .display
+                                                                    .equipixel *
+                                                                gl.iconSizeS *
+                                                                .9,
+                                                            color: Colors.white,
+                                                          ),
+                                                        ),
                                                     ],
                                                   ),
                                                 ],
@@ -2601,7 +2778,11 @@ class _MapPageState extends State<MapPage> {
                       _mainMenuBar(),
                       if (_toolbarExtended) _toolBar(),
                     ] +
-                    gl.mainStack,
+                    gl.mainStack +
+                    [
+                      if (gl.modeDevelopper && gl.Mode.debugScanlines)
+                        scanlines(),
+                    ],
               );
             },
           ),
@@ -2614,7 +2795,11 @@ class _MapPageState extends State<MapPage> {
     double result = gl.iconSizeM * 1.25;
     if (gl.Mode.openToolbox) {
       result += gl.chosenPolyBarHeight + 10;
-      if (gl.Mode.editAttributes) result += gl.attributeTableHeight + 20;
+      if (gl.Mode.editAttributes) {
+        result += gl.attributeTableHeight + 20;
+      } else if (gl.Mode.editPointMarker) {
+        result += 50;
+      }
     }
     return result;
   }
@@ -2635,18 +2820,22 @@ class _MapPageState extends State<MapPage> {
     return that;
   }
 
-  List<CircleMarker> _getPointsToDraw() {
-    List<CircleMarker> that = [];
+  List<Marker> _getPointsToDraw() {
+    List<Marker> that = [];
     for (var layer in gl.polygonLayers) {
+      gl.selectableIcons[layer.selectedPointIcon];
       if (layer.visibleOnMap && layer.numPoints > 0 && layer.type == "Point") {
         that.add(
-          CircleMarker(
+          Marker(
             point: LatLng(
               layer.vertexes.first.latitude,
               layer.vertexes.first.longitude,
             ),
-            radius: gl.display.equipixel * 2.5,
-            color: layer.colorLine,
+            child: Icon(
+              gl.selectableIcons[layer.selectedPointIcon],
+              size: gl.iconSizeXS * gl.display.equipixel,
+              color: layer.colorLine,
+            ),
           ),
         );
       }

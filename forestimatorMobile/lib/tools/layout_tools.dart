@@ -46,13 +46,14 @@ Widget stroke(
   double thickness,
   Color color, {
   bool vertical = false,
+  double height = 10,
 }) {
   return vertical
       ? Row(
         children: [
           SizedBox(width: space),
           Container(
-            height: gl.display.equipixel * gl.iconSizeXS,
+            height: gl.display.equipixel * height,
             width: thickness,
             color: color,
           ),
@@ -66,4 +67,42 @@ Widget stroke(
           SizedBox(height: space),
         ],
       );
+}
+
+Widget scanlines() {
+  double equiPixelPerLine = gl.display.equipixel * 4;
+  return Stack(
+    children:
+        List<Widget>.generate((gl.display.width / equiPixelPerLine).round(), (
+          i,
+        ) {
+          return Container(
+            alignment: AlignmentGeometry.xy(
+              (1.0 - (2.0 / (gl.display.width / equiPixelPerLine).round() * i)),
+              0,
+            ),
+            child: Container(
+              height: gl.display.height,
+              width: 1,
+              color: Colors.black,
+            ),
+          );
+        }) +
+        List<Widget>.generate((gl.display.height / equiPixelPerLine).round(), (
+          i,
+        ) {
+          return Container(
+            alignment: AlignmentGeometry.xy(
+              0,
+              (1.0 -
+                  (2.0 / (gl.display.height / equiPixelPerLine).round() * i)),
+            ),
+            child: Container(
+              height: 1,
+              width: gl.display.width,
+              color: Colors.black,
+            ),
+          );
+        }),
+  );
 }

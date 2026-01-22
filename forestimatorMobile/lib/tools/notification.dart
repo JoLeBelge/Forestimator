@@ -2806,24 +2806,72 @@ class _PolygonListMenu extends State<PolygonListMenu> {
                       gl.polygonLayers.add(
                         PolygonLayer(polygonName: "Nouveau"),
                       );
-                      PopupNameIntroducer(
+                      PopupNewPolygon(
                         context,
                         "",
+                        gl
+                            .polygonLayers[gl.polygonLayers.length - 1]
+                            .colorInside,
+                        (String typeIt) {
+                          if (mounted) {
+                            setState(() {
+                              gl
+                                  .polygonLayers[gl.polygonLayers.length - 1]
+                                  .type = typeIt;
+                              _keyboard = true;
+                            });
+                          } else {
+                            gl.polygonLayers[gl.polygonLayers.length - 1].type =
+                                typeIt;
+                            _keyboard = true;
+                          }
+                        },
                         (String nameIt) {
-                          setState(() {
+                          if (mounted) {
+                            setState(() {
+                              gl
+                                  .polygonLayers[gl.polygonLayers.length - 1]
+                                  .name = nameIt;
+                              _keyboard = true;
+                            });
+                          } else {
                             gl.polygonLayers[gl.polygonLayers.length - 1].name =
                                 nameIt;
-                          });
-                        },
-                        () {
-                          setState(() {
-                            _keyboard = false;
-                          });
-                        },
-                        () {
-                          setState(() {
                             _keyboard = true;
-                          });
+                          }
+                        },
+                        (Color colorIt) {
+                          if (mounted) {
+                            setState(() {
+                              gl
+                                  .polygonLayers[gl.polygonLayers.length - 1]
+                                  .colorInside = colorIt;
+                              _keyboard = true;
+                            });
+                          } else {
+                            gl
+                                .polygonLayers[gl.polygonLayers.length - 1]
+                                .colorInside = colorIt;
+                            _keyboard = true;
+                          }
+                        },
+                        () {
+                          if (mounted) {
+                            setState(() {
+                              _keyboard = false;
+                            });
+                          } else {
+                            _keyboard = false;
+                          }
+                        },
+                        () {
+                          if (mounted) {
+                            setState(() {
+                              _keyboard = true;
+                            });
+                          } else {
+                            _keyboard = true;
+                          }
                         },
                         () {
                           gl.polygonLayers[gl.polygonLayers.length - 1]
@@ -4603,6 +4651,12 @@ class _ForestimatorVariables extends State<ForestimatorVariables> {
         variableBooleanSlider("Expert Mode", gl.Mode.expert, (bool it) {
           setState(() {
             gl.Mode.expert = it;
+          });
+          gl.refreshMainStack(() {});
+        }, false),
+        variableBooleanSlider("Scanlines", gl.Mode.debugScanlines, (bool it) {
+          setState(() {
+            gl.Mode.debugScanlines = it;
           });
           gl.refreshMainStack(() {});
         }, false),
