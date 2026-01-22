@@ -115,7 +115,7 @@ class PolygonLayer {
     refreshSelectedLinePoints(point);
     _computeArea();
     _computePerimeter();
-    gl.saveChangesToPolygoneToPrefs = true;
+    serialize();
   }
 
   List<Point> getPolyPlusOneVertex(LatLng vertex) {
@@ -209,7 +209,7 @@ class PolygonLayer {
 
     _computeArea();
     _computePerimeter();
-    gl.saveChangesToPolygoneToPrefs = true;
+    serialize();
   }
 
   void replacePoint(LatLng old, LatLng index) {
@@ -224,7 +224,7 @@ class PolygonLayer {
     polygonPoints.insert(i, index);
     _computeArea();
     _computePerimeter();
-    gl.saveChangesToPolygoneToPrefs = true;
+    serialize();
   }
 
   Color get colorSurface => colorInside;
@@ -549,7 +549,7 @@ class PolygonLayer {
   }
 
   void deserialze(String id) async {
-    name = gl.shared!.getString('$id.name')! ?? "Noname";
+    name = gl.shared!.getString('$id.name')!;
     identifier = id;
     type = gl.shared!.getString('$id.type') ?? "Polygon";
     sentToServer = gl.shared!.getBool('$id.sent') ?? false;
@@ -606,7 +606,7 @@ class PolygonLayer {
                   ? gl.shared!.getDouble('$name.$i.val')!
                   : "unknown",
           visibleOnMapLabel:
-              gl.shared!.getBool('poly$i.visibleOnMapLabel') ?? false,
+              gl.shared!.getBool('$name.$i.visibleOnMapLabel') ?? false,
         ),
       );
     }
@@ -618,6 +618,14 @@ class PolygonLayer {
     for (String key in polykeys) {
       gl.polygonLayers.add(PolygonLayer());
       gl.polygonLayers.last.deserialze(key);
+    }
+  }
+
+  static void deleteLayerFromShared(String id) async {
+    List<String> polykeys = gl.shared!.getStringList('polyKeys') ?? <String>[];
+    if (!polykeys.contains(id)) {
+      polykeys.remove(id);
+      await gl.shared!.setStringList('polyKeys', polykeys);
     }
   }
 }

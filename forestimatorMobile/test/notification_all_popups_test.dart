@@ -244,7 +244,7 @@ void main() {
       gl.notificationContext = null;
       PopupColorChooser(Colors.blue, rootContext!, (c) {}, () {
         colorAfter = true;
-      });
+      }, () {});
       await tester.pumpAndSettle();
       expect(alertText('Choisissez une couleur!'), findsOneWidget);
       await pressAlertButton(tester, 'OK');
@@ -254,9 +254,16 @@ void main() {
       gl.mainStack.add(Container());
       // Force showDialog fallback in tests
       gl.notificationContext = null;
-      PopupNameIntroducer(rootContext!, 'abc', (s) {}, () {
-        nameAfter = true;
-      }, () {});
+      PopupNameIntroducer(
+        rootContext!,
+        'abc',
+        (s) {},
+        () {
+          nameAfter = true;
+        },
+        () {},
+        () {},
+      );
       await tester.pumpAndSettle();
       // The name introducer uses an 'Ok' button in the dialog
       expect(alertButton('Ok'), findsWidgets);

@@ -35,7 +35,7 @@ class UserData {
   static String forename = "";
   static String mail = "";
 
-  static void saveToPrefs() async {
+  static void serialize() async {
     await shared!.setStringList('UserDATA', <String>[name, forename, mail]);
   }
 
@@ -289,8 +289,6 @@ void print(dynamic it) {
 int selectedSearchMarker = -1;
 
 List<PoiMarker> poiMarkerList = [];
-
-bool saveChangesToPolygoneToPrefs = false;
 
 class PoiMarker {
   final int index;

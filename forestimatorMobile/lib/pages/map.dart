@@ -488,7 +488,6 @@ class _MapPageState extends State<MapPage> {
                               position.center.latitude,
                               position.zoom,
                             );
-                            _writeDataToSharedPreferences();
                           },
                           crs: epsg31370CRS,
                           initialZoom:
@@ -1879,12 +1878,13 @@ class _MapPageState extends State<MapPage> {
                                                                                     ),
                                                                                     onPressed:
                                                                                         () {},
-                                                                                    onLongPress: () {
+                                                                                    onLongPress: () async {
                                                                                       refreshView(
                                                                                         () {
                                                                                           gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].visibleOnMapLabel = !gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].visibleOnMapLabel;
                                                                                         },
                                                                                       );
+                                                                                      gl.polygonLayers[gl.selectedPolygonLayer].serialize();
                                                                                     },
                                                                                     icon:
                                                                                         gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].visibleOnMapLabel
@@ -1961,6 +1961,15 @@ class _MapPageState extends State<MapPage> {
                                                                                           gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].name = value;
                                                                                         },
                                                                                         () {},
+                                                                                        () {
+                                                                                          if (controlDuplicateAttributeName(
+                                                                                            gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].name,
+                                                                                          )) {
+                                                                                            return;
+                                                                                          } else {
+                                                                                            gl.polygonLayers[gl.selectedPolygonLayer].serialize();
+                                                                                          }
+                                                                                        },
                                                                                       );
                                                                                     },
                                                                                     child: Container(
@@ -2041,6 +2050,9 @@ class _MapPageState extends State<MapPage> {
                                                                                           gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].value = value;
                                                                                         },
                                                                                         () {},
+                                                                                        () {
+                                                                                          gl.polygonLayers[gl.selectedPolygonLayer].serialize();
+                                                                                        },
                                                                                       );
                                                                                     },
                                                                                     child: Container(
@@ -2353,6 +2365,10 @@ class _MapPageState extends State<MapPage> {
                                                                       .selectedPolygonLayer]
                                                                   .labelsVisibleOnMap = true;
                                                             });
+                                                            gl
+                                                                .polygonLayers[gl
+                                                                    .selectedPolygonLayer]
+                                                                .serialize();
                                                             gl.refreshMainStack(
                                                               () {
                                                                 gl.modeMapShowPolygons =
@@ -3681,6 +3697,7 @@ class _MapPageState extends State<MapPage> {
                                       gl.polygonLayers[i].labelsVisibleOnMap =
                                           false;
                                     });
+                                    gl.polygonLayers[i].serialize();
                                   },
                                   icon: FaIcon(
                                     Icons.close,
@@ -3865,6 +3882,7 @@ class _MapPageState extends State<MapPage> {
                                       gl.polygonLayers[i].labelsVisibleOnMap =
                                           false;
                                     });
+                                    gl.polygonLayers[i].serialize();
                                   },
                                   icon: FaIcon(
                                     Icons.close,
@@ -3997,47 +4015,6 @@ class _MapPageState extends State<MapPage> {
     return Container(constraints: constraints, alignment: alignement);
   }
 
-  void _writeColorToMemory(String name, Color color) async {
-    await gl.shared!.setInt('$name.r', (color.r * 255).round());
-    await gl.shared!.setInt('$name.g', (color.g * 255).round());
-    await gl.shared!.setInt('$name.b', (color.b * 255).round());
-    await gl.shared!.setDouble('$name.a', color.a);
-  }
-
-  void _writePolygonPointsToMemory(String name, List<LatLng> polygon) async {
-    int i = 0;
-    for (var point in polygon) {
-      await gl.shared!.setDouble('$name.$i-lat', point.latitude);
-      await gl.shared!.setDouble('$name.$i-lng', point.longitude);
-      i++;
-    }
-    await gl.shared!.setInt('$name.nPolyPoints', i);
-  }
-
-  void _writePropertiesToMemory(
-    String name,
-    List<pl.Attribute> attributes,
-  ) async {
-    int i = 0;
-    for (var attribute in attributes) {
-      await gl.shared!.setString('$name.$i.name', attribute.name);
-      await gl.shared!.setString('$name.$i.type', attribute.type);
-      await gl.shared!.setBool(
-        '$name.$i.visibleOnMapLabel',
-        attribute.visibleOnMapLabel,
-      );
-      if (attribute.type == "string") {
-        await gl.shared!.setString('$name.$i.val', attribute.value);
-      } else if (attribute.type == "int") {
-        await gl.shared!.setInt('$name.$i.val', attribute.value);
-      } else if (attribute.type == "double") {
-        await gl.shared!.setDouble('$name.$i.val', attribute.value);
-      }
-      i++;
-    }
-    await gl.shared!.setInt('$name.nAttributes', i);
-  }
-
   void _writePositionDataToSharedPreferences(
     double lon,
     double lat,
@@ -4048,40 +4025,6 @@ class _MapPageState extends State<MapPage> {
       await gl.shared!.setDouble('mapCenterLon', lon);
       await gl.shared!.setDouble('mapZoom', zoom);
       gl.print("position saved to prefs: $lon $lat $zoom");
-    }
-  }
-
-  void _writeDataToSharedPreferences() async {
-    if (gl.saveChangesToPolygoneToPrefs) {
-      gl.saveChangesToPolygoneToPrefs = false;
-      int i = 0;
-      for (var polygon in gl.polygonLayers) {
-        await gl.shared!.setBool('poly$i.sent', polygon.sentToServer);
-        await gl.shared!.setString('poly$i.name', polygon.name);
-        await gl.shared!.setString('poly$i.type', polygon.type);
-        await gl.shared!.setBool('poly$i.visibleOnMap', polygon.visibleOnMap);
-        await gl.shared!.setBool(
-          'poly$i.labelsVisibleOnMap',
-          polygon.labelsVisibleOnMap,
-        );
-        await gl.shared!.setDouble('poly$i.area', polygon.area);
-        await gl.shared!.setDouble('poly$i.perimeter', polygon.perimeter);
-        await gl.shared!.setDouble(
-          'poly$i.transparencyInside',
-          polygon.transparencyInside,
-        );
-        await gl.shared!.setDouble(
-          'poly$i.transparencyLine',
-          polygon.transparencyLine,
-        );
-        _writeColorToMemory('poly$i.colorInside', polygon.colorInside);
-        _writeColorToMemory('poly$i.colorLine', polygon.colorLine);
-        _writePolygonPointsToMemory('poly$i.poly', polygon.polygonPoints);
-        _writePropertiesToMemory('poly$i.prop', polygon.attributes);
-        i++;
-      }
-      await gl.shared!.setInt('nPolys', i);
-      gl.print("polygones saved to prefs");
     }
   }
 

@@ -6,7 +6,7 @@ import 'package:latlong2/latlong.dart';
 
 // Layer to record the path you made on the map with gps.
 class PathLayer {
-  UniqueKey identifier = UniqueKey();
+  String identifier = UniqueKey().toString();
   String name = "";
   List<LatLng> pathPoints = [];
   Color colorInside = Color.fromRGBO(255, 128, 164, 80);
@@ -61,12 +61,12 @@ class PathLayer {
   void addPosition(LatLng point) {
     pathPoints.add(point);
     _computeLength();
-    gl.saveChangesToPolygoneToPrefs = true;
+    serialize();
   }
 
   Color get colorSurface => colorInside;
   Color get colorPolygon => colorLine;
-  UniqueKey get id => identifier;
+  String get id => identifier;
   List<LatLng> get vertexes => pathPoints;
   int get numPoints => pathPoints.length;
   LatLng get center {
@@ -115,4 +115,8 @@ class PathLayer {
       currentPoint = point;
     }
   }
+
+  void serialize() {}
+  void deserialze(String id) {}
+  static void delete(String id) {}
 }

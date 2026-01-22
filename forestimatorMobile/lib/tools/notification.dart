@@ -626,6 +626,7 @@ class PopupColorChooser {
     BuildContext context,
     ValueChanged<Color> colorChange,
     VoidCallback after,
+    VoidCallback onAccept,
   ) {
     pickerColor = currentColor;
     presentPopup(
@@ -661,6 +662,7 @@ class PopupColorChooser {
             child: Text("OK", style: dialogTextButtonStyle()),
             onPressed: () {
               currentColor = pickerColor;
+              onAccept();
               dismissPopup();
               after();
             },
@@ -678,6 +680,7 @@ class PopupNameIntroducer {
     ValueChanged<String> state,
     VoidCallback after,
     VoidCallback callbackOnStartTyping,
+    VoidCallback onAccept,
   ) {
     presentPopup(
       context: context,
@@ -724,6 +727,7 @@ class PopupNameIntroducer {
                   ),
                   child: Text("Ok", style: dialogTextButtonStyle()),
                   onPressed: () {
+                    onAccept();
                     dismissPopup();
                     after();
                   },
@@ -747,6 +751,7 @@ class PopupNewPolygon {
     ValueChanged<Color> colorChanged,
     VoidCallback after,
     VoidCallback callbackOnStartTyping,
+    VoidCallback onAccept,
   ) {
     presentPopup(
       context: context,
@@ -829,7 +834,7 @@ class PopupNewPolygon {
                   child: Text("Créer", style: dialogTextButtonStyle()),
                   onPressed: () {
                     dismissPopup();
-                    after();
+                    onAccept();
                   },
                 ),
               ),
@@ -874,6 +879,7 @@ class _SelectPolyColor extends State<SelectPolyColor> {
           () {
             setState(() {});
           },
+          () {},
         );
       },
       child: CircleAvatar(backgroundColor: currentColor),
@@ -1079,7 +1085,7 @@ class PopupUserData {
                             gl.UserData.mail.isNotEmpty) {
                           dismissPopup();
                           afterCompleting();
-                          gl.UserData.saveToPrefs();
+                          gl.UserData.serialize();
                         }
                       },
                     ),
@@ -1309,6 +1315,7 @@ class PopupValueChange {
     dynamic oldValue,
     ValueChanged<dynamic> valueChanged,
     VoidCallback onTapOutside,
+    VoidCallback onAccept,
   ) {
     TextEditingController textEditor = TextEditingController(text: oldValue);
     presentPopup(
@@ -1404,9 +1411,7 @@ class PopupValueChange {
                       ),
                       child: Text("Changer", style: dialogTextButtonStyle()),
                       onPressed: () {
-                        if (controlDuplicateAttributeName(textEditor.text)) {
-                          return;
-                        }
+                        onAccept();
                         dismissPopup();
                       },
                     ),
@@ -2086,7 +2091,9 @@ class _PolygonListMenu extends State<PolygonListMenu> {
                                                 gl.notificationContext!,
                                                 () {
                                                   setState(() {
-                                                    //remove polygon
+                                                    PolygonLayer.deleteLayerFromShared(
+                                                      gl.polygonLayers[i].id,
+                                                    );
                                                     if (i > 0) {
                                                       gl.polygonLayers.removeAt(
                                                         i,
@@ -2101,8 +2108,6 @@ class _PolygonListMenu extends State<PolygonListMenu> {
                                                       );
                                                     }
                                                   });
-                                                  gl.saveChangesToPolygoneToPrefs =
-                                                      true;
                                                 },
                                                 "Message",
                                                 "\nVoulez vous vraiment supprimer ${gl.polygonLayers[i].name}?\n",
@@ -2173,8 +2178,6 @@ class _PolygonListMenu extends State<PolygonListMenu> {
                                                     setState(() {
                                                       gl.polygonLayers[i].name =
                                                           nameIt;
-                                                      gl.saveChangesToPolygoneToPrefs =
-                                                          true;
                                                     });
                                                   },
                                                   () {
@@ -2186,6 +2189,10 @@ class _PolygonListMenu extends State<PolygonListMenu> {
                                                     setState(() {
                                                       _keyboard = true;
                                                     });
+                                                  },
+                                                  () {
+                                                    gl.polygonLayers[i]
+                                                        .serialize();
                                                   },
                                                 );
                                               },
@@ -2315,10 +2322,12 @@ class _PolygonListMenu extends State<PolygonListMenu> {
                                                               ),
                                                             );
                                                       });
-                                                      gl.saveChangesToPolygoneToPrefs =
-                                                          true;
                                                     },
                                                     () {},
+                                                    () {
+                                                      gl.polygonLayers[i]
+                                                          .serialize();
+                                                    },
                                                   );
                                                 },
                                                 icon: Icon(
@@ -2448,13 +2457,11 @@ class _PolygonListMenu extends State<PolygonListMenu> {
                           setState(() {
                             gl.polygonLayers[gl.polygonLayers.length - 1].type =
                                 typeIt;
-                            gl.saveChangesToPolygoneToPrefs = true;
                             _keyboard = true;
                           });
                         } else {
                           gl.polygonLayers[gl.polygonLayers.length - 1].type =
                               typeIt;
-                          gl.saveChangesToPolygoneToPrefs = true;
                           _keyboard = true;
                         }
                       },
@@ -2463,13 +2470,11 @@ class _PolygonListMenu extends State<PolygonListMenu> {
                           setState(() {
                             gl.polygonLayers[gl.polygonLayers.length - 1].name =
                                 nameIt;
-                            gl.saveChangesToPolygoneToPrefs = true;
                             _keyboard = true;
                           });
                         } else {
                           gl.polygonLayers[gl.polygonLayers.length - 1].name =
                               nameIt;
-                          gl.saveChangesToPolygoneToPrefs = true;
                           _keyboard = true;
                         }
                       },
@@ -2479,14 +2484,12 @@ class _PolygonListMenu extends State<PolygonListMenu> {
                             gl
                                 .polygonLayers[gl.polygonLayers.length - 1]
                                 .colorInside = colorIt;
-                            gl.saveChangesToPolygoneToPrefs = true;
                             _keyboard = true;
                           });
                         } else {
                           gl
                               .polygonLayers[gl.polygonLayers.length - 1]
                               .colorInside = colorIt;
-                          gl.saveChangesToPolygoneToPrefs = true;
                           _keyboard = true;
                         }
                       },
@@ -2508,13 +2511,16 @@ class _PolygonListMenu extends State<PolygonListMenu> {
                           _keyboard = true;
                         }
                       },
+                      () {
+                        gl.polygonLayers[gl.polygonLayers.length - 1]
+                            .serialize();
+                      },
                     );
                     gl.selectedPolygonLayer = gl.polygonLayers.length - 1;
                   });
 
                   gl.refreshMainStack(() {
                     gl.selectedPolygonLayer = gl.polygonLayers.length - 1;
-                    gl.saveChangesToPolygoneToPrefs = true;
                   });
                   _scrollDown();
                 },
@@ -2552,6 +2558,11 @@ class _PolygonListMenu extends State<PolygonListMenu> {
                               PopupDoYouReally(
                                 gl.notificationContext!,
                                 () {
+                                  PolygonLayer.deleteLayerFromShared(
+                                    gl
+                                        .polygonLayers[gl.selectedPolygonLayer]
+                                        .id,
+                                  );
                                   setState(() {
                                     //remove polygon
                                     if (gl.selectedPolygonLayer > 0) {
@@ -2566,7 +2577,6 @@ class _PolygonListMenu extends State<PolygonListMenu> {
                                       );
                                     }
                                   });
-                                  gl.saveChangesToPolygoneToPrefs = true;
                                 },
                                 "Message",
                                 "\nVoulez vous vraiment supprimer ${gl.polygonLayers[gl.selectedPolygonLayer].name}?\n",
@@ -2615,7 +2625,6 @@ class _PolygonListMenu extends State<PolygonListMenu> {
                                             .polygonLayers[gl
                                                 .selectedPolygonLayer]
                                             .name = nameIt;
-                                        gl.saveChangesToPolygoneToPrefs = true;
                                       });
                                     },
                                     () {
@@ -2627,6 +2636,10 @@ class _PolygonListMenu extends State<PolygonListMenu> {
                                       setState(() {
                                         _keyboard = true;
                                       });
+                                    },
+                                    () {
+                                      gl.polygonLayers[gl.selectedPolygonLayer]
+                                          .serialize();
                                     },
                                   );
                                 },
@@ -2685,10 +2698,14 @@ class _PolygonListMenu extends State<PolygonListMenu> {
                                                   ),
                                                 );
                                           });
-                                          gl.saveChangesToPolygoneToPrefs =
-                                              true;
                                         },
                                         () {},
+                                        () {
+                                          gl
+                                              .polygonLayers[gl
+                                                  .selectedPolygonLayer]
+                                              .serialize();
+                                        },
                                       );
                                     },
                                     icon: Icon(
@@ -2796,7 +2813,6 @@ class _PolygonListMenu extends State<PolygonListMenu> {
                           setState(() {
                             gl.polygonLayers[gl.polygonLayers.length - 1].name =
                                 nameIt;
-                            gl.saveChangesToPolygoneToPrefs = true;
                           });
                         },
                         () {
@@ -2809,13 +2825,16 @@ class _PolygonListMenu extends State<PolygonListMenu> {
                             _keyboard = true;
                           });
                         },
+                        () {
+                          gl.polygonLayers[gl.polygonLayers.length - 1]
+                              .serialize();
+                        },
                       );
                       gl.selectedPolygonLayer = gl.polygonLayers.length - 1;
                     });
 
                     gl.refreshMainStack(() {
                       gl.selectedPolygonLayer = gl.polygonLayers.length - 1;
-                      gl.saveChangesToPolygoneToPrefs = true;
                     });
                     _scrollDown();
                   },
@@ -3089,6 +3108,9 @@ class _PathListMenu extends State<PathListMenu> {
                                                 () {
                                                   setState(() {
                                                     //remove polygon
+                                                    PolygonLayer.deleteLayerFromShared(
+                                                      gl.pathLayers[i].id,
+                                                    );
                                                     if (i > 0) {
                                                       gl.pathLayers.removeAt(i);
                                                       gl.selectedpathLayer--;
@@ -3099,8 +3121,6 @@ class _PathListMenu extends State<PathListMenu> {
                                                       gl.pathLayers.removeAt(i);
                                                     }
                                                   });
-                                                  gl.saveChangesToPolygoneToPrefs =
-                                                      true;
                                                 },
                                                 "Message",
                                                 "\nVoulez vous vraiment supprimer ${gl.pathLayers[i].name}?\n",
@@ -3171,8 +3191,6 @@ class _PathListMenu extends State<PathListMenu> {
                                                     setState(() {
                                                       gl.pathLayers[i].name =
                                                           nameIt;
-                                                      gl.saveChangesToPolygoneToPrefs =
-                                                          true;
                                                     });
                                                   },
                                                   () {
@@ -3184,6 +3202,10 @@ class _PathListMenu extends State<PathListMenu> {
                                                     setState(() {
                                                       _keyboard = true;
                                                     });
+                                                  },
+                                                  () {
+                                                    gl.pathLayers[i]
+                                                        .serialize();
                                                   },
                                                 );
                                               },
@@ -3246,10 +3268,12 @@ class _PathListMenu extends State<PathListMenu> {
                                                               ),
                                                             );
                                                       });
-                                                      gl.saveChangesToPolygoneToPrefs =
-                                                          true;
                                                     },
                                                     () {},
+                                                    () {
+                                                      gl.pathLayers[i]
+                                                          .serialize();
+                                                    },
                                                   );
                                                 },
                                                 icon: Icon(
@@ -3324,7 +3348,6 @@ class _PathListMenu extends State<PathListMenu> {
                           });
                         } else {
                           gl.pathLayers[gl.pathLayers.length - 1].name = nameIt;
-                          gl.saveChangesToPolygoneToPrefs = true;
                         }
                       },
                       () {
@@ -3345,13 +3368,15 @@ class _PathListMenu extends State<PathListMenu> {
                           _keyboard = true;
                         }
                       },
+                      () {
+                        gl.pathLayers[gl.pathLayers.length - 1].serialize();
+                      },
                     );
                     gl.selectedpathLayer = gl.pathLayers.length - 1;
                   });
 
                   gl.refreshMainStack(() {
                     gl.selectedpathLayer = gl.pathLayers.length - 1;
-                    gl.saveChangesToPolygoneToPrefs = true;
                   });
                   _scrollDown();
                 },
@@ -3391,6 +3416,9 @@ class _PathListMenu extends State<PathListMenu> {
                                 () {
                                   setState(() {
                                     //remove polygon
+                                    PathLayer.delete(
+                                      gl.pathLayers[gl.selectedpathLayer].id,
+                                    );
                                     if (gl.selectedpathLayer > 0) {
                                       gl.pathLayers.removeAt(
                                         gl.selectedpathLayer,
@@ -3403,7 +3431,6 @@ class _PathListMenu extends State<PathListMenu> {
                                       );
                                     }
                                   });
-                                  gl.saveChangesToPolygoneToPrefs = true;
                                 },
                                 "Message",
                                 "\nVoulez vous vraiment supprimer ${gl.pathLayers[gl.selectedpathLayer].name}?\n",
@@ -3447,7 +3474,6 @@ class _PathListMenu extends State<PathListMenu> {
                                         gl
                                             .pathLayers[gl.selectedpathLayer]
                                             .name = nameIt;
-                                        gl.saveChangesToPolygoneToPrefs = true;
                                       });
                                     },
                                     () {
@@ -3459,6 +3485,10 @@ class _PathListMenu extends State<PathListMenu> {
                                       setState(() {
                                         _keyboard = true;
                                       });
+                                    },
+                                    () {
+                                      gl.pathLayers[gl.selectedpathLayer]
+                                          .serialize();
                                     },
                                   );
                                 },
@@ -3505,10 +3535,12 @@ class _PathListMenu extends State<PathListMenu> {
                                                   ),
                                                 );
                                           });
-                                          gl.saveChangesToPolygoneToPrefs =
-                                              true;
                                         },
                                         () {},
+                                        () {
+                                          gl.pathLayers[gl.selectedpathLayer]
+                                              .serialize();
+                                        },
                                       );
                                     },
                                     icon: Icon(
@@ -3581,7 +3613,6 @@ class _PathListMenu extends State<PathListMenu> {
                           setState(() {
                             gl.pathLayers[gl.pathLayers.length - 1].name =
                                 nameIt;
-                            gl.saveChangesToPolygoneToPrefs = true;
                           });
                         },
                         () {
@@ -3594,13 +3625,15 @@ class _PathListMenu extends State<PathListMenu> {
                             _keyboard = true;
                           });
                         },
+                        () {
+                          gl.pathLayers[gl.pathLayers.length - 1].serialize();
+                        },
                       );
                       gl.selectedpathLayer = gl.pathLayers.length - 1;
                     });
 
                     gl.refreshMainStack(() {
                       gl.selectedpathLayer = gl.pathLayers.length - 1;
-                      gl.saveChangesToPolygoneToPrefs = true;
                     });
                     _scrollDown();
                   },
@@ -4281,9 +4314,11 @@ Widget forestimatorSettingsUserData() {
                         gl.UserData.forename,
                         (value) {
                           gl.UserData.forename = value;
-                          gl.UserData.saveToPrefs();
                         },
                         () {},
+                        () {
+                          gl.UserData.serialize();
+                        },
                       );
                     },
                     child: Container(
@@ -4348,12 +4383,18 @@ Widget forestimatorSettingsUserData() {
                     ),
                     onPressed: () {},
                     onLongPress: () {
-                      PopupValueChange(context, "string", gl.UserData.name, (
-                        value,
-                      ) {
-                        gl.UserData.name = value;
-                        gl.UserData.saveToPrefs();
-                      }, () {});
+                      PopupValueChange(
+                        context,
+                        "string",
+                        gl.UserData.name,
+                        (value) {
+                          gl.UserData.name = value;
+                        },
+                        () {},
+                        () {
+                          gl.UserData.serialize();
+                        },
+                      );
                     },
                     child: Container(
                       alignment: Alignment.centerLeft,
@@ -4417,12 +4458,18 @@ Widget forestimatorSettingsUserData() {
                     ),
                     onPressed: () {},
                     onLongPress: () {
-                      PopupValueChange(context, "string", gl.UserData.mail, (
-                        value,
-                      ) {
-                        gl.UserData.mail = value;
-                        gl.UserData.saveToPrefs();
-                      }, () {});
+                      PopupValueChange(
+                        context,
+                        "string",
+                        gl.UserData.mail,
+                        (value) {
+                          gl.UserData.mail = value;
+                        },
+                        () {},
+                        () {
+                          gl.UserData.serialize();
+                        },
+                      );
                     },
                     child: Container(
                       alignment: Alignment.centerLeft,

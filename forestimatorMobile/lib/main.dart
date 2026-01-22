@@ -70,57 +70,6 @@ class _MyApp extends State<MyApp> {
     }
   }
 
-  Color _getColorFromMemory(String name, SharedPreferences shared) {
-    return Color.fromRGBO(
-      gl.shared!.getInt('$name.r')!,
-      gl.shared!.getInt('$name.g')!,
-      gl.shared!.getInt('$name.b')!,
-      gl.shared!.getDouble('$name.a')!,
-    );
-  }
-
-  List<LatLng> _getPolygonFromMemory(String name, SharedPreferences shared) {
-    List<LatLng> polygon = [];
-    int nPoints = gl.shared!.getInt('$name.nPolyPoints')!;
-    for (int i = 0; i < nPoints; i++) {
-      polygon.add(
-        LatLng(
-          gl.shared!.getDouble('$name.$i-lat')!,
-          gl.shared!.getDouble('$name.$i-lng')!,
-        ),
-      );
-    }
-    return polygon;
-  }
-
-  List<Attribute> _getAttributesFromMemory(
-    String name,
-    SharedPreferences shared,
-  ) {
-    List<Attribute> attributes = [];
-    int nAttributes = gl.shared!.getInt('$name.nAttributes') ?? 0;
-    for (int i = 0; i < nAttributes; i++) {
-      String type = gl.shared!.getString('$name.$i.type')!;
-      attributes.add(
-        Attribute(
-          name: gl.shared!.getString('$name.$i.name')!,
-          type: type,
-          value:
-              type == "string"
-                  ? gl.shared!.getString('$name.$i.val')!
-                  : type == "int"
-                  ? gl.shared!.getInt('$name.$i.val')!
-                  : type == "double"
-                  ? gl.shared!.getDouble('$name.$i.val')!
-                  : "unknown",
-          visibleOnMapLabel:
-              gl.shared!.getBool('poly$i.visibleOnMapLabel') ?? false,
-        ),
-      );
-    }
-    return attributes;
-  }
-
   Future _readPreference() async {
     gl.shared = await SharedPreferences.getInstance();
 
@@ -187,46 +136,7 @@ class _MyApp extends State<MyApp> {
       gl.mapZoom = aZoom;
     }
 
-    int? nPolys = gl.shared!.getInt('nPolys');
-    if (nPolys != null && nPolys != 0) {
-      gl.polygonLayers.clear();
-      for (int i = 0; i < nPolys; i++) {
-        gl.polygonLayers.add(
-          PolygonLayer(polygonName: gl.shared!.getString('poly$i.name')!),
-        );
-        gl.polygonLayers[i].type =
-            gl.shared!.getString('poly$i.type') ?? "Polygon";
-        gl.polygonLayers[i].sentToServer =
-            gl.shared!.getBool('poly$i.sent') ?? false;
-        gl.polygonLayers[i].visibleOnMap =
-            gl.shared!.getBool('poly$i.visibleOnMap') ?? true;
-        gl.polygonLayers[i].labelsVisibleOnMap =
-            gl.shared!.getBool('poly$i.labelsVisibleOnMap') ?? true;
-        gl.polygonLayers[i].area = gl.shared!.getDouble('poly$i.area')!;
-        gl.polygonLayers[i].perimeter =
-            gl.shared!.getDouble('poly$i.perimeter')!;
-        gl.polygonLayers[i].transparencyInside =
-            gl.shared!.getDouble('poly$i.transparencyInside')!;
-        gl.polygonLayers[i].transparencyLine =
-            gl.shared!.getDouble('poly$i.transparencyLine')!;
-        gl.polygonLayers[i].colorInside = _getColorFromMemory(
-          'poly$i.colorInside',
-          gl.shared!,
-        );
-        gl.polygonLayers[i].colorLine = _getColorFromMemory(
-          'poly$i.colorLine',
-          gl.shared!,
-        );
-        gl.polygonLayers[i].polygonPoints = _getPolygonFromMemory(
-          'poly$i.poly',
-          gl.shared!,
-        );
-        gl.polygonLayers[i].attributes = _getAttributesFromMemory(
-          'poly$i.prop',
-          gl.shared!,
-        );
-      }
-    }
+    PolygonLayer.loadPolyData();
 
     setState(() {
       _initializedPersistentValues = true;
