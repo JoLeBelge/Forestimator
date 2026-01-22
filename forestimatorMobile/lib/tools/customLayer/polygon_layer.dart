@@ -25,11 +25,12 @@ class Attribute {
 }
 
 class PolygonLayer {
-  UniqueKey identifier = UniqueKey();
+  String identifier = UniqueKey().toString();
   bool sentToServer = false;
   String type = "Point";
   String name = "";
   bool visibleOnMap = true;
+  bool labelsVisibleOnMap = true;
   List<LatLng> polygonPoints = [];
   List<int> selectedPolyLinePoints = [0, 0];
   Color colorInside = Color.fromRGBO(255, 128, 164, 80);
@@ -42,7 +43,7 @@ class PolygonLayer {
   Map<String, dynamic> decodedJson = {};
   List<Attribute> attributes = [];
 
-  PolygonLayer({required String polygonName}) {
+  PolygonLayer({String polygonName = ""}) {
     name = polygonName;
     Random randomColor = Random();
     setColorInside(
@@ -228,7 +229,7 @@ class PolygonLayer {
 
   Color get colorSurface => colorInside;
   Color get colorPolygon => colorLine;
-  UniqueKey get id => identifier;
+  String get id => identifier;
   List<LatLng> get vertexes => polygonPoints;
   int get numPoints => polygonPoints.length;
   LatLng get center {
@@ -474,5 +475,149 @@ class PolygonLayer {
       if (a.visibleOnMapLabel) nChecked++;
     }
     return nChecked;
+  }
+
+  void serialize() async {
+    await gl.shared!.setBool('$identifier.sent', sentToServer);
+    await gl.shared!.setString('$identifier.name', name);
+    await gl.shared!.setString('$identifier.type', type);
+    await gl.shared!.setBool('$identifier.visibleOnMap', visibleOnMap);
+    await gl.shared!.setBool(
+      '$identifier.labelsVisibleOnMap',
+      labelsVisibleOnMap,
+    );
+    await gl.shared!.setDouble('$identifier.area', area);
+    await gl.shared!.setDouble('$identifier.perimeter', perimeter);
+    await gl.shared!.setDouble(
+      '$identifier.transparencyInside',
+      transparencyInside,
+    );
+    await gl.shared!.setDouble(
+      '$identifier.transparencyLine',
+      transparencyLine,
+    );
+    _writeColorToMemory('$identifier.colorInside', colorInside);
+    _writeColorToMemory('$identifier.colorLine', colorLine);
+    _writePolygonPointsToMemory('$identifier.poly', polygonPoints);
+    _writePropertiesToMemory('$identifier.prop', attributes);
+
+    List<String> polykeys = gl.shared!.getStringList('polyKeys') ?? <String>[];
+    if (!polykeys.contains(identifier)) {
+      polykeys.add(identifier);
+      await gl.shared!.setStringList('polyKeys', polykeys);
+    }
+
+    gl.print("polygone $name saved to prefs");
+  }
+
+  void _writeColorToMemory(String name, Color color) async {
+    await gl.shared!.setInt('$name.r', (color.r * 255).round());
+    await gl.shared!.setInt('$name.g', (color.g * 255).round());
+    await gl.shared!.setInt('$name.b', (color.b * 255).round());
+    await gl.shared!.setDouble('$name.a', color.a);
+  }
+
+  void _writePolygonPointsToMemory(String name, List<LatLng> polygon) async {
+    int i = 0;
+    for (var point in polygon) {
+      await gl.shared!.setDouble('$name.$i-lat', point.latitude);
+      await gl.shared!.setDouble('$name.$i-lng', point.longitude);
+      i++;
+    }
+    await gl.shared!.setInt('$name.nPolyPoints', i);
+  }
+
+  void _writePropertiesToMemory(String name, List<Attribute> attributes) async {
+    int i = 0;
+    for (var attribute in attributes) {
+      await gl.shared!.setString('$name.$i.name', attribute.name);
+      await gl.shared!.setString('$name.$i.type', attribute.type);
+      await gl.shared!.setBool(
+        '$name.$i.visibleOnMapLabel',
+        attribute.visibleOnMapLabel,
+      );
+      if (attribute.type == "string") {
+        await gl.shared!.setString('$name.$i.val', attribute.value);
+      } else if (attribute.type == "int") {
+        await gl.shared!.setInt('$name.$i.val', attribute.value);
+      } else if (attribute.type == "double") {
+        await gl.shared!.setDouble('$name.$i.val', attribute.value);
+      }
+      i++;
+    }
+    await gl.shared!.setInt('$name.nAttributes', i);
+  }
+
+  void deserialze(String id) async {
+    name = gl.shared!.getString('$id.name')! ?? "Noname";
+    identifier = id;
+    type = gl.shared!.getString('$id.type') ?? "Polygon";
+    sentToServer = gl.shared!.getBool('$id.sent') ?? false;
+    visibleOnMap = gl.shared!.getBool('$id.visibleOnMap') ?? true;
+    labelsVisibleOnMap = gl.shared!.getBool('$id.labelsVisibleOnMap') ?? true;
+    area = gl.shared!.getDouble('$id.area')!;
+    perimeter = gl.shared!.getDouble('$id.perimeter')!;
+    transparencyInside = gl.shared!.getDouble('$id.transparencyInside')!;
+    transparencyLine = gl.shared!.getDouble('$id.transparencyLine')!;
+    colorInside = _getColorFromMemory('$id.colorInside');
+    colorLine = _getColorFromMemory('$id.colorLine');
+    polygonPoints = _getPolygonFromMemory('$id.poly');
+    attributes = _getAttributesFromMemory('$id.prop');
+  }
+
+  Color _getColorFromMemory(String name) {
+    return Color.fromRGBO(
+      gl.shared!.getInt('$name.r')!,
+      gl.shared!.getInt('$name.g')!,
+      gl.shared!.getInt('$name.b')!,
+      gl.shared!.getDouble('$name.a')!,
+    );
+  }
+
+  List<LatLng> _getPolygonFromMemory(String name) {
+    List<LatLng> polygon = [];
+    int nPoints = gl.shared!.getInt('$name.nPolyPoints')!;
+    for (int i = 0; i < nPoints; i++) {
+      polygon.add(
+        LatLng(
+          gl.shared!.getDouble('$name.$i-lat')!,
+          gl.shared!.getDouble('$name.$i-lng')!,
+        ),
+      );
+    }
+    return polygon;
+  }
+
+  List<Attribute> _getAttributesFromMemory(String name) {
+    List<Attribute> attributes = [];
+    int nAttributes = gl.shared!.getInt('$name.nAttributes') ?? 0;
+    for (int i = 0; i < nAttributes; i++) {
+      String type = gl.shared!.getString('$name.$i.type')!;
+      attributes.add(
+        Attribute(
+          name: gl.shared!.getString('$name.$i.name')!,
+          type: type,
+          value:
+              type == "string"
+                  ? gl.shared!.getString('$name.$i.val')!
+                  : type == "int"
+                  ? gl.shared!.getInt('$name.$i.val')!
+                  : type == "double"
+                  ? gl.shared!.getDouble('$name.$i.val')!
+                  : "unknown",
+          visibleOnMapLabel:
+              gl.shared!.getBool('poly$i.visibleOnMapLabel') ?? false,
+        ),
+      );
+    }
+    return attributes;
+  }
+
+  static void loadPolyData() {
+    List<String> polykeys = gl.shared!.getStringList('polyKeys') ?? <String>[];
+    for (String key in polykeys) {
+      gl.polygonLayers.add(PolygonLayer());
+      gl.polygonLayers.last.deserialze(key);
+    }
   }
 }

@@ -2341,6 +2341,35 @@ class _MapPageState extends State<MapPage> {
                                                         MainAxisAlignment
                                                             .spaceEvenly,
                                                     children: [
+                                                      if (!gl
+                                                          .polygonLayers[gl
+                                                              .selectedPolygonLayer]
+                                                          .labelsVisibleOnMap)
+                                                        IconButton(
+                                                          onPressed: () {
+                                                            setState(() {
+                                                              gl
+                                                                  .polygonLayers[gl
+                                                                      .selectedPolygonLayer]
+                                                                  .labelsVisibleOnMap = true;
+                                                            });
+                                                            gl.refreshMainStack(
+                                                              () {
+                                                                gl.modeMapShowPolygons =
+                                                                    true;
+                                                              },
+                                                            );
+                                                          },
+                                                          icon: Icon(
+                                                            Icons.label,
+                                                            size:
+                                                                gl
+                                                                    .display
+                                                                    .equipixel *
+                                                                gl.iconSizeS,
+                                                            color: Colors.white,
+                                                          ),
+                                                        ),
                                                       if (gl
                                                           .polygonLayers[gl
                                                               .selectedPolygonLayer]
@@ -3545,55 +3574,191 @@ class _MapPageState extends State<MapPage> {
   List<Marker> _getPolygonesLabels() {
     return List.generate(gl.polygonLayers.length, (i) {
       String textArea = "${(gl.polygonLayers[i].area / 100).round() / 100} Ha";
-      return gl.polygonLayers[i].visibleOnMap
+      return gl.polygonLayers[i].visibleOnMap &&
+              gl.polygonLayers[i].labelsVisibleOnMap
           ? gl.polygonLayers[i].type == "Polygon"
               ? Marker(
                 alignment: Alignment.center,
-
-                width:
-                    textArea.length > gl.polygonLayers[i].name.length
-                        ? gl.display.equipixel * gl.infoBoxPolygon * 2.5 +
-                            textArea.length * gl.fontSizeS
-                        : gl.display.equipixel * gl.infoBoxPolygon * 1.5 +
-                            gl.polygonLayers[i].name.length * gl.fontSizeS,
-                height: gl.display.equipixel * gl.infoBoxPolygon * 1.5,
+                width: gl.display.equipixel * gl.infoBoxPolygon,
+                height:
+                    gl.display.equipixel *
+                        (gl.polygonLayers[i].getNCheckedAttributes() + 1) *
+                        gl.iconSizeS *
+                        .8 +
+                    5,
                 point: gl.polygonLayers[i].center,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Column(
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                Icon(
-                                  Icons.layers,
-                                  color: gl.polygonLayers[i].colorLine,
+                child: Card(
+                  color: Colors.black.withAlpha(200),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children:
+                        <Widget>[
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Container(
+                                padding: EdgeInsets.all(2),
+                                color: Colors.transparent,
+                                height: gl.display.equipixel * gl.iconSizeXS,
+                                width: gl.display.equipixel * gl.iconSizeXS,
+                                child: IconButton(
+                                  style: ButtonStyle(
+                                    animationDuration: Duration(seconds: 1),
+                                    backgroundColor:
+                                        WidgetStateProperty<Color>.fromMap(
+                                          <WidgetStatesConstraint, Color>{
+                                            WidgetState.any: Colors.transparent,
+                                          },
+                                        ),
+                                    padding: WidgetStateProperty<
+                                      EdgeInsetsGeometry
+                                    >.fromMap(<
+                                      WidgetStatesConstraint,
+                                      EdgeInsetsGeometry
+                                    >{
+                                      WidgetState.any: EdgeInsetsGeometry.zero,
+                                    }),
+                                  ),
+                                  onPressed: () {},
+                                  icon: FaIcon(
+                                    FontAwesomeIcons.list,
+                                    size:
+                                        gl.display.equipixel *
+                                        gl.iconSizeXS *
+                                        .5,
+                                    color: Colors.transparent,
+                                  ),
                                 ),
-                                Text(
-                                  gl.polygonLayers[i].name,
-                                  overflow: TextOverflow.clip,
+                              ),
+                              Container(
+                                padding: EdgeInsets.all(2),
+                                alignment: Alignment.center,
+                                color: Colors.transparent,
+                                height: gl.display.equipixel * gl.iconSizeXS,
+                                width:
+                                    gl.display.equipixel *
+                                    gl.infoBoxPolygon /
+                                    2,
+
+                                child: SingleChildScrollView(
+                                  scrollDirection: Axis.horizontal,
+                                  child: Text(
+                                    gl.polygonLayers[i].name,
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize:
+                                          gl.display.equipixel * gl.fontSizeXS,
+                                    ),
+                                  ),
                                 ),
-                              ],
+                              ),
+                              Container(
+                                padding: EdgeInsets.all(0),
+                                color: Colors.transparent,
+                                height: gl.display.equipixel * gl.iconSizeXS,
+                                width: gl.display.equipixel * gl.iconSizeXS,
+                                child: IconButton(
+                                  style: ButtonStyle(
+                                    animationDuration: Duration(seconds: 1),
+                                    backgroundColor:
+                                        WidgetStateProperty<Color>.fromMap(
+                                          <WidgetStatesConstraint, Color>{
+                                            WidgetState.any: Colors.transparent,
+                                          },
+                                        ),
+                                    padding: WidgetStateProperty<
+                                      EdgeInsetsGeometry
+                                    >.fromMap(<
+                                      WidgetStatesConstraint,
+                                      EdgeInsetsGeometry
+                                    >{
+                                      WidgetState.any: EdgeInsetsGeometry.zero,
+                                    }),
+                                  ),
+                                  onPressed: () {
+                                    refreshView(() {
+                                      gl.polygonLayers[i].labelsVisibleOnMap =
+                                          false;
+                                    });
+                                  },
+                                  icon: FaIcon(
+                                    Icons.close,
+                                    size:
+                                        gl.display.equipixel *
+                                        gl.iconSizeXS *
+                                        .8,
+                                    color: Colors.red,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          if (gl.polygonLayers[i].getNCheckedAttributes() > 1)
+                            stroke(
+                              gl.display.equipixel * 0.5,
+                              gl.display.equipixel * 0.25,
+                              gl.colorAgroBioTech,
                             ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                Icon(
-                                  Icons.square_foot,
-                                  color: gl.polygonLayers[i].colorLine,
-                                ),
-                                Text(textArea),
-                              ],
-                            ),
-                          ],
+                        ] +
+                        List<Widget>.generate(
+                          gl.polygonLayers[i].getNCheckedAttributes(),
+                          (j) {
+                            return Container(
+                              padding: EdgeInsetsDirectional.symmetric(
+                                horizontal: gl.display.equipixel * 2,
+                              ),
+                              color: Colors.transparent,
+                              height: gl.display.equipixel * gl.iconSizeXS,
+                              child: Row(
+                                children: [
+                                  Container(
+                                    alignment: Alignment.centerLeft,
+                                    width: gl.display.equipixel * 15,
+                                    child: SingleChildScrollView(
+                                      scrollDirection: Axis.horizontal,
+                                      child: Text(
+                                        gl.polygonLayers[i].attributes[j].name,
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize:
+                                              gl.display.equipixel *
+                                              gl.fontSizeXS,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  stroke(
+                                    vertical: true,
+                                    gl.display.equipixel * 0.5,
+                                    gl.display.equipixel * 0.25,
+                                    gl.colorAgroBioTech,
+                                  ),
+                                  Container(
+                                    alignment: Alignment.centerLeft,
+                                    width: gl.display.equipixel * 15,
+                                    child: SingleChildScrollView(
+                                      scrollDirection: Axis.horizontal,
+                                      child: Text(
+                                        gl.polygonLayers[i].attributes[j].value
+                                            .toString(),
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize:
+                                              gl.display.equipixel *
+                                              gl.fontSizeXS,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
                         ),
-                      ],
-                    ),
-                  ],
+                  ),
                 ),
               )
               : gl.polygonLayers[i].type == "Point"
@@ -3602,9 +3767,10 @@ class _MapPageState extends State<MapPage> {
                 width: gl.display.equipixel * gl.infoBoxPolygon,
                 height:
                     gl.display.equipixel *
-                    (gl.polygonLayers[i].getNCheckedAttributes() + 1) *
-                    gl.iconSizeS *
-                    .8,
+                        (gl.polygonLayers[i].getNCheckedAttributes() + 1) *
+                        gl.iconSizeS *
+                        .8 +
+                    5,
                 point: gl.polygonLayers[i].center,
                 child: Card(
                   color: Colors.black.withAlpha(200),
@@ -3612,29 +3778,112 @@ class _MapPageState extends State<MapPage> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children:
                         <Widget>[
-                          Container(
-                            padding: EdgeInsets.all(2),
-                            color: Colors.transparent,
-                            height: gl.display.equipixel * gl.iconSizeXS,
-
-                            child: SingleChildScrollView(
-                              scrollDirection: Axis.horizontal,
-                              child: Text(
-                                gl.polygonLayers[i].name,
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize:
-                                      gl.display.equipixel * gl.fontSizeXS,
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Container(
+                                padding: EdgeInsets.all(2),
+                                color: Colors.transparent,
+                                height: gl.display.equipixel * gl.iconSizeXS,
+                                width: gl.display.equipixel * gl.iconSizeXS,
+                                child: IconButton(
+                                  style: ButtonStyle(
+                                    animationDuration: Duration(seconds: 1),
+                                    backgroundColor:
+                                        WidgetStateProperty<Color>.fromMap(
+                                          <WidgetStatesConstraint, Color>{
+                                            WidgetState.any: Colors.transparent,
+                                          },
+                                        ),
+                                    padding: WidgetStateProperty<
+                                      EdgeInsetsGeometry
+                                    >.fromMap(<
+                                      WidgetStatesConstraint,
+                                      EdgeInsetsGeometry
+                                    >{
+                                      WidgetState.any: EdgeInsetsGeometry.zero,
+                                    }),
+                                  ),
+                                  onPressed: () {},
+                                  icon: FaIcon(
+                                    FontAwesomeIcons.list,
+                                    size:
+                                        gl.display.equipixel *
+                                        gl.iconSizeXS *
+                                        .5,
+                                    color: Colors.transparent,
+                                  ),
                                 ),
                               ),
+                              Container(
+                                padding: EdgeInsets.all(2),
+                                alignment: Alignment.center,
+                                color: Colors.transparent,
+                                height: gl.display.equipixel * gl.iconSizeXS,
+                                width:
+                                    gl.display.equipixel *
+                                    gl.infoBoxPolygon /
+                                    2,
+                                child: SingleChildScrollView(
+                                  scrollDirection: Axis.horizontal,
+                                  child: Text(
+                                    gl.polygonLayers[i].name,
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize:
+                                          gl.display.equipixel * gl.fontSizeXS,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                padding: EdgeInsets.all(0),
+                                color: Colors.transparent,
+                                height: gl.display.equipixel * gl.iconSizeXS,
+                                width: gl.display.equipixel * gl.iconSizeXS,
+                                child: IconButton(
+                                  style: ButtonStyle(
+                                    animationDuration: Duration(seconds: 1),
+                                    backgroundColor:
+                                        WidgetStateProperty<Color>.fromMap(
+                                          <WidgetStatesConstraint, Color>{
+                                            WidgetState.any: Colors.transparent,
+                                          },
+                                        ),
+                                    padding: WidgetStateProperty<
+                                      EdgeInsetsGeometry
+                                    >.fromMap(<
+                                      WidgetStatesConstraint,
+                                      EdgeInsetsGeometry
+                                    >{
+                                      WidgetState.any: EdgeInsetsGeometry.zero,
+                                    }),
+                                  ),
+                                  onPressed: () {
+                                    refreshView(() {
+                                      gl.polygonLayers[i].labelsVisibleOnMap =
+                                          false;
+                                    });
+                                  },
+                                  icon: FaIcon(
+                                    Icons.close,
+                                    size:
+                                        gl.display.equipixel *
+                                        gl.iconSizeXS *
+                                        .8,
+                                    color: Colors.red,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          if (gl.polygonLayers[i].getNCheckedAttributes() > 1)
+                            stroke(
+                              gl.display.equipixel * 0.5,
+                              gl.display.equipixel * 0.25,
+                              gl.colorAgroBioTech,
                             ),
-                          ),
-                          stroke(
-                            gl.display.equipixel * 0.5,
-                            gl.display.equipixel * 0.25,
-                            gl.colorAgroBioTech,
-                          ),
                         ] +
                         List<Widget>.generate(
                           gl.polygonLayers[i].getNCheckedAttributes(),
@@ -3773,6 +4022,10 @@ class _MapPageState extends State<MapPage> {
     for (var attribute in attributes) {
       await gl.shared!.setString('$name.$i.name', attribute.name);
       await gl.shared!.setString('$name.$i.type', attribute.type);
+      await gl.shared!.setBool(
+        '$name.$i.visibleOnMapLabel',
+        attribute.visibleOnMapLabel,
+      );
       if (attribute.type == "string") {
         await gl.shared!.setString('$name.$i.val', attribute.value);
       } else if (attribute.type == "int") {
@@ -3807,6 +4060,10 @@ class _MapPageState extends State<MapPage> {
         await gl.shared!.setString('poly$i.name', polygon.name);
         await gl.shared!.setString('poly$i.type', polygon.type);
         await gl.shared!.setBool('poly$i.visibleOnMap', polygon.visibleOnMap);
+        await gl.shared!.setBool(
+          'poly$i.labelsVisibleOnMap',
+          polygon.labelsVisibleOnMap,
+        );
         await gl.shared!.setDouble('poly$i.area', polygon.area);
         await gl.shared!.setDouble('poly$i.perimeter', polygon.perimeter);
         await gl.shared!.setDouble(

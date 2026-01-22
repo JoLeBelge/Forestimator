@@ -113,6 +113,8 @@ class _MyApp extends State<MyApp> {
                   : type == "double"
                   ? gl.shared!.getDouble('$name.$i.val')!
                   : "unknown",
+          visibleOnMapLabel:
+              gl.shared!.getBool('poly$i.visibleOnMapLabel') ?? false,
         ),
       );
     }
@@ -198,6 +200,8 @@ class _MyApp extends State<MyApp> {
             gl.shared!.getBool('poly$i.sent') ?? false;
         gl.polygonLayers[i].visibleOnMap =
             gl.shared!.getBool('poly$i.visibleOnMap') ?? true;
+        gl.polygonLayers[i].labelsVisibleOnMap =
+            gl.shared!.getBool('poly$i.labelsVisibleOnMap') ?? true;
         gl.polygonLayers[i].area = gl.shared!.getDouble('poly$i.area')!;
         gl.polygonLayers[i].perimeter =
             gl.shared!.getDouble('poly$i.perimeter')!;
