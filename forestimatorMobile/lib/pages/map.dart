@@ -364,29 +364,23 @@ class _MapPageState extends State<MapPage> {
                                   : gl.Mode.addVertexesPolygon
                                   ? (tapPosition, point) async => {
                                     if (gl
-                                                .polygonLayers[gl
-                                                    .selectedPolygonLayer]
+                                                .geometries[gl.selectedGeometry]
                                                 .type ==
                                             "Point" &&
                                         gl
-                                                .polygonLayers[gl
-                                                    .selectedPolygonLayer]
+                                                .geometries[gl.selectedGeometry]
                                                 .numPoints ==
                                             1)
                                       {gl.Mode.addVertexesPolygon = false}
-                                    else if (gl.polygonLayers.isNotEmpty)
+                                    else if (gl.geometries.isNotEmpty)
                                       {
                                         if (_isPolygonWellDefined(
-                                          gl
-                                              .polygonLayers[gl
-                                                  .selectedPolygonLayer]
+                                          gl.geometries[gl.selectedGeometry]
                                               .getPolyPlusOneVertex(point),
                                         ))
                                           {
                                             refreshView(() {
-                                              gl
-                                                  .polygonLayers[gl
-                                                      .selectedPolygonLayer]
+                                              gl.geometries[gl.selectedGeometry]
                                                   .addPoint(point);
                                             }),
                                           }
@@ -456,7 +450,7 @@ class _MapPageState extends State<MapPage> {
                             }
                             if (_selectedPointToMove != null) {
                               if (_isPolygonWellDefined(
-                                gl.polygonLayers[gl.selectedPolygonLayer]
+                                gl.geometries[gl.selectedGeometry]
                                     .getPolyMoveOneVertex(
                                       _selectedPointToMove!,
                                       LatLng(
@@ -465,14 +459,13 @@ class _MapPageState extends State<MapPage> {
                                       ),
                                     ),
                               )) {
-                                gl.polygonLayers[gl.selectedPolygonLayer]
-                                    .replacePoint(
-                                      _selectedPointToMove!,
-                                      LatLng(
-                                        position.center.latitude,
-                                        position.center.longitude,
-                                      ),
-                                    );
+                                gl.geometries[gl.selectedGeometry].replacePoint(
+                                  _selectedPointToMove!,
+                                  LatLng(
+                                    position.center.latitude,
+                                    position.center.longitude,
+                                  ),
+                                );
                                 refreshView(() {
                                   _selectedPointToMove = LatLng(
                                     position.center.latitude,
@@ -666,11 +659,10 @@ class _MapPageState extends State<MapPage> {
                             ] +
                             (gl.Mode.editPolygon
                                 ? <Widget>[
-                                  if (gl.polygonLayers.isNotEmpty &&
+                                  if (gl.geometries.isNotEmpty &&
                                       gl
-                                              .polygonLayers[gl
-                                                  .selectedPolygonLayer]
-                                              .vertexes
+                                              .geometries[gl.selectedGeometry]
+                                              .points
                                               .length >
                                           1 &&
                                       !gl.Mode.showButtonMoveVertexesPolygon &&
@@ -680,24 +672,20 @@ class _MapPageState extends State<MapPage> {
                                         Polyline(
                                           points: [
                                             gl
-                                                .polygonLayers[gl
-                                                    .selectedPolygonLayer]
-                                                .vertexes[gl
-                                                .polygonLayers[gl
-                                                    .selectedPolygonLayer]
+                                                .geometries[gl.selectedGeometry]
+                                                .points[gl
+                                                .geometries[gl.selectedGeometry]
                                                 .selectedPolyLinePoints[0]],
                                             gl
-                                                .polygonLayers[gl
-                                                    .selectedPolygonLayer]
-                                                .vertexes[gl
-                                                .polygonLayers[gl
-                                                    .selectedPolygonLayer]
+                                                .geometries[gl.selectedGeometry]
+                                                .points[gl
+                                                .geometries[gl.selectedGeometry]
                                                 .selectedPolyLinePoints[1]],
                                           ],
                                           color:
                                               gl
-                                                  .polygonLayers[gl
-                                                      .selectedPolygonLayer]
+                                                  .geometries[gl
+                                                      .selectedGeometry]
                                                   .colorLine,
                                           strokeWidth: 5.0,
                                         ),
@@ -712,11 +700,10 @@ class _MapPageState extends State<MapPage> {
                                   MarkerLayer(
                                     markers: _drawnLayerPointsMarker(),
                                   ),
-                                  if (gl.polygonLayers.isNotEmpty &&
+                                  if (gl.geometries.isNotEmpty &&
                                       gl
-                                          .polygonLayers[gl
-                                              .selectedPolygonLayer]
-                                          .vertexes
+                                          .geometries[gl.selectedGeometry]
+                                          .points
                                           .isNotEmpty &&
                                       !gl.Mode.showButtonAddVertexesPolygon)
                                     CircleLayer(
@@ -724,11 +711,11 @@ class _MapPageState extends State<MapPage> {
                                         CircleMarker(
                                           point:
                                               gl
-                                                  .polygonLayers[gl
-                                                      .selectedPolygonLayer]
-                                                  .vertexes[gl
-                                                  .polygonLayers[gl
-                                                      .selectedPolygonLayer]
+                                                  .geometries[gl
+                                                      .selectedGeometry]
+                                                  .points[gl
+                                                  .geometries[gl
+                                                      .selectedGeometry]
                                                   .selectedPolyLinePoints[0]],
                                           radius: 15,
                                           color: Colors.red,
@@ -771,8 +758,8 @@ class _MapPageState extends State<MapPage> {
                             ],
                       ),
                       (gl.Mode.polygon &&
-                              gl.polygonLayers.isNotEmpty &&
-                              gl.selectedPolygonLayer > -1)
+                              gl.geometries.isNotEmpty &&
+                              gl.selectedGeometry > -1)
                           ? Column(
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
@@ -818,19 +805,19 @@ class _MapPageState extends State<MapPage> {
                                                   refreshView(() {
                                                     if (!gl.Mode.editPolygon) {
                                                       gl
-                                                          .polygonLayers[gl
-                                                              .selectedPolygonLayer]
+                                                          .geometries[gl
+                                                              .selectedGeometry]
                                                           .visibleOnMap = !gl
-                                                              .polygonLayers[gl
-                                                                  .selectedPolygonLayer]
+                                                              .geometries[gl
+                                                                  .selectedGeometry]
                                                               .visibleOnMap;
                                                     }
                                                   });
                                                 },
                                                 icon:
                                                     gl
-                                                            .polygonLayers[gl
-                                                                .selectedPolygonLayer]
+                                                            .geometries[gl
+                                                                .selectedGeometry]
                                                             .visibleOnMap
                                                         ? FaIcon(
                                                           FontAwesomeIcons.eye,
@@ -867,7 +854,7 @@ class _MapPageState extends State<MapPage> {
                                                           alignment:
                                                               Alignment.topLeft,
                                                           child:
-                                                              gl.polygonLayers[gl.selectedPolygonLayer].type ==
+                                                              gl.geometries[gl.selectedGeometry].type ==
                                                                       "Point"
                                                                   ? Text(
                                                                     "POINT",
@@ -882,8 +869,8 @@ class _MapPageState extends State<MapPage> {
                                                                     ),
                                                                   )
                                                                   : gl
-                                                                          .polygonLayers[gl
-                                                                              .selectedPolygonLayer]
+                                                                          .geometries[gl
+                                                                              .selectedGeometry]
                                                                           .type ==
                                                                       "Polygon"
                                                                   ? Text(
@@ -912,8 +899,8 @@ class _MapPageState extends State<MapPage> {
                                                                   ),
                                                         ),
                                                         if (gl
-                                                            .polygonLayers[gl
-                                                                .selectedPolygonLayer]
+                                                            .geometries[gl
+                                                                .selectedGeometry]
                                                             .sentToServer)
                                                           Container(
                                                             alignment:
@@ -943,8 +930,8 @@ class _MapPageState extends State<MapPage> {
                                                             Axis.horizontal,
                                                         child: Text(
                                                           gl
-                                                              .polygonLayers[gl
-                                                                  .selectedPolygonLayer]
+                                                              .geometries[gl
+                                                                  .selectedGeometry]
                                                               .name,
                                                           textAlign:
                                                               TextAlign.center,
@@ -983,7 +970,7 @@ class _MapPageState extends State<MapPage> {
                                           !gl.Mode.openToolbox
                                               ? Row()
                                               : (gl.Mode.editPolygon &&
-                                                  gl.polygonLayers.isNotEmpty)
+                                                  gl.geometries.isNotEmpty)
                                               ? Column(
                                                 children: [
                                                   stroke(
@@ -1042,8 +1029,8 @@ class _MapPageState extends State<MapPage> {
                                                             .5,
                                                         child:
                                                             gl
-                                                                        .polygonLayers[gl
-                                                                            .selectedPolygonLayer]
+                                                                        .geometries[gl
+                                                                            .selectedGeometry]
                                                                         .type ==
                                                                     "Polygon"
                                                                 ? Text(
@@ -1064,8 +1051,8 @@ class _MapPageState extends State<MapPage> {
                                                                   ),
                                                                 )
                                                                 : gl
-                                                                        .polygonLayers[gl
-                                                                            .selectedPolygonLayer]
+                                                                        .geometries[gl
+                                                                            .selectedGeometry]
                                                                         .type ==
                                                                     "Point"
                                                                 ? Text(
@@ -1147,19 +1134,19 @@ class _MapPageState extends State<MapPage> {
                                                                     true) {
                                                                   refreshView(() {
                                                                     if (_isPolygonWellDefined(
-                                                                      gl.polygonLayers[gl.selectedPolygonLayer].getPolyRemoveOneVertex(
+                                                                      gl.geometries[gl.selectedGeometry].getPolyRemoveOneVertex(
                                                                         gl
-                                                                            .polygonLayers[gl.selectedPolygonLayer]
-                                                                            .polygonPoints[gl
-                                                                            .polygonLayers[gl.selectedPolygonLayer]
+                                                                            .geometries[gl.selectedGeometry]
+                                                                            .points[gl
+                                                                            .geometries[gl.selectedGeometry]
                                                                             .selectedPolyLinePoints[0]],
                                                                       ),
                                                                     )) {
-                                                                      gl.polygonLayers[gl.selectedPolygonLayer].removePoint(
+                                                                      gl.geometries[gl.selectedGeometry].removePoint(
                                                                         gl
-                                                                            .polygonLayers[gl.selectedPolygonLayer]
-                                                                            .polygonPoints[gl
-                                                                            .polygonLayers[gl.selectedPolygonLayer]
+                                                                            .geometries[gl.selectedGeometry]
+                                                                            .points[gl
+                                                                            .geometries[gl.selectedGeometry]
                                                                             .selectedPolyLinePoints[0]],
                                                                       );
                                                                     }
@@ -1205,11 +1192,11 @@ class _MapPageState extends State<MapPage> {
                                                                   .remove_circle,
                                                             ),
                                                           ),
-                                                      (gl.polygonLayers[gl.selectedPolygonLayer].type ==
+                                                      (gl.geometries[gl.selectedGeometry].type ==
                                                                       "Polygon" ||
-                                                                  gl.polygonLayers[gl.selectedPolygonLayer].type ==
+                                                                  gl.geometries[gl.selectedGeometry].type ==
                                                                           "Point" &&
-                                                                      gl.polygonLayers[gl.selectedPolygonLayer].numPoints <
+                                                                      gl.geometries[gl.selectedGeometry].numPoints <
                                                                           1) &&
                                                               gl
                                                                   .Mode
@@ -1305,9 +1292,9 @@ class _MapPageState extends State<MapPage> {
                                                                     LatLng
                                                                     point =
                                                                         gl
-                                                                            .polygonLayers[gl.selectedPolygonLayer]
-                                                                            .polygonPoints[gl
-                                                                            .polygonLayers[gl.selectedPolygonLayer]
+                                                                            .geometries[gl.selectedGeometry]
+                                                                            .points[gl
+                                                                            .geometries[gl.selectedGeometry]
                                                                             .selectedPolyLinePoints[0]];
                                                                     if (_selectedPointToMove ==
                                                                         null) {
@@ -1648,33 +1635,33 @@ class _MapPageState extends State<MapPage> {
                                                                       _getFixedAttribute(
                                                                         "type",
                                                                         gl
-                                                                            .polygonLayers[gl.selectedPolygonLayer]
+                                                                            .geometries[gl.selectedGeometry]
                                                                             .type,
                                                                       ),
                                                                       _getFixedAttribute(
                                                                         "nom",
                                                                         gl
-                                                                            .polygonLayers[gl.selectedPolygonLayer]
+                                                                            .geometries[gl.selectedGeometry]
                                                                             .name,
                                                                         checked:
                                                                             true,
                                                                       ),
-                                                                      if (gl.polygonLayers[gl.selectedPolygonLayer].type ==
+                                                                      if (gl.geometries[gl.selectedGeometry].type ==
                                                                           "Polygon")
                                                                         _getFixedAttribute(
                                                                           "surface",
-                                                                          "${(gl.polygonLayers[gl.selectedPolygonLayer].area / 100).round() / 100}",
+                                                                          "${(gl.geometries[gl.selectedGeometry].area / 100).round() / 100}",
                                                                         ),
-                                                                      if (gl.polygonLayers[gl.selectedPolygonLayer].type ==
+                                                                      if (gl.geometries[gl.selectedGeometry].type ==
                                                                           "Polygon")
                                                                         _getFixedAttribute(
                                                                           "circonference",
-                                                                          "${(gl.polygonLayers[gl.selectedPolygonLayer].perimeter).round() / 1000}",
+                                                                          "${(gl.geometries[gl.selectedGeometry].perimeter).round() / 1000}",
                                                                         ),
 
                                                                       _getFixedAttribute(
                                                                         "coordinates",
-                                                                        gl.polygonLayers[gl.selectedPolygonLayer]
+                                                                        gl.geometries[gl.selectedGeometry]
                                                                             .getPolyPointsString(),
                                                                       ),
                                                                     ] +
@@ -1682,8 +1669,8 @@ class _MapPageState extends State<MapPage> {
                                                                       Widget
                                                                     >.generate(
                                                                       gl
-                                                                          .polygonLayers[gl
-                                                                              .selectedPolygonLayer]
+                                                                          .geometries[gl
+                                                                              .selectedGeometry]
                                                                           .attributes
                                                                           .length,
                                                                       (i) {
@@ -1735,7 +1722,7 @@ class _MapPageState extends State<MapPage> {
                                                                                       alignment:
                                                                                           Alignment.center,
                                                                                       child:
-                                                                                          gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].type ==
+                                                                                          gl.geometries[gl.selectedGeometry].attributes[i].type ==
                                                                                                   "int"
                                                                                               ? Text(
                                                                                                 "INT",
@@ -1747,7 +1734,7 @@ class _MapPageState extends State<MapPage> {
                                                                                                       gl.display.equipixel,
                                                                                                 ),
                                                                                               )
-                                                                                              : gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].type ==
+                                                                                              : gl.geometries[gl.selectedGeometry].attributes[i].type ==
                                                                                                   "string"
                                                                                               ? Text(
                                                                                                 "STRING",
@@ -1759,7 +1746,7 @@ class _MapPageState extends State<MapPage> {
                                                                                                       gl.display.equipixel,
                                                                                                 ),
                                                                                               )
-                                                                                              : gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].type ==
+                                                                                              : gl.geometries[gl.selectedGeometry].attributes[i].type ==
                                                                                                   "double"
                                                                                               ? Text(
                                                                                                 "DOUBLE",
@@ -1831,13 +1818,13 @@ class _MapPageState extends State<MapPage> {
                                                                                     onLongPress: () async {
                                                                                       refreshView(
                                                                                         () {
-                                                                                          gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].visibleOnMapLabel = !gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].visibleOnMapLabel;
+                                                                                          gl.geometries[gl.selectedGeometry].attributes[i].visibleOnMapLabel = !gl.geometries[gl.selectedGeometry].attributes[i].visibleOnMapLabel;
                                                                                         },
                                                                                       );
-                                                                                      gl.polygonLayers[gl.selectedPolygonLayer].serialize();
+                                                                                      gl.geometries[gl.selectedGeometry].serialize();
                                                                                     },
                                                                                     icon:
-                                                                                        gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].visibleOnMapLabel
+                                                                                        gl.geometries[gl.selectedGeometry].attributes[i].visibleOnMapLabel
                                                                                             ? Icon(
                                                                                               Icons.check_box_outlined,
                                                                                               color:
@@ -1903,20 +1890,20 @@ class _MapPageState extends State<MapPage> {
                                                                                     onLongPress: () {
                                                                                       PopupValueChange(
                                                                                         "prop",
-                                                                                        gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].name,
+                                                                                        gl.geometries[gl.selectedGeometry].attributes[i].name,
                                                                                         (
                                                                                           value,
                                                                                         ) {
-                                                                                          gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].name = cleanAttributeName(
+                                                                                          gl.geometries[gl.selectedGeometry].attributes[i].name = cleanAttributeName(
                                                                                             value.toString(),
                                                                                           );
                                                                                         },
                                                                                         () {},
                                                                                         () {
                                                                                           String nom =
-                                                                                              gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].name;
+                                                                                              gl.geometries[gl.selectedGeometry].attributes[i].name;
                                                                                           if (controlDuplicateAttributeName(
-                                                                                            gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].name,
+                                                                                            gl.geometries[gl.selectedGeometry].attributes[i].name,
                                                                                           )) {
                                                                                             PopupMessage(
                                                                                               "Erreur",
@@ -1924,7 +1911,7 @@ class _MapPageState extends State<MapPage> {
                                                                                             );
                                                                                             return;
                                                                                           } else {
-                                                                                            gl.polygonLayers[gl.selectedPolygonLayer].serialize();
+                                                                                            gl.geometries[gl.selectedGeometry].serialize();
                                                                                           }
                                                                                         },
                                                                                       );
@@ -1936,7 +1923,7 @@ class _MapPageState extends State<MapPage> {
                                                                                         scrollDirection:
                                                                                             Axis.horizontal,
                                                                                         child: Text(
-                                                                                          gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].name,
+                                                                                          gl.geometries[gl.selectedGeometry].attributes[i].name,
                                                                                           textAlign:
                                                                                               TextAlign.start,
                                                                                           style: TextStyle(
@@ -1998,16 +1985,16 @@ class _MapPageState extends State<MapPage> {
                                                                                         () {},
                                                                                     onLongPress: () {
                                                                                       PopupValueChange(
-                                                                                        gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].type,
-                                                                                        gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].value,
+                                                                                        gl.geometries[gl.selectedGeometry].attributes[i].type,
+                                                                                        gl.geometries[gl.selectedGeometry].attributes[i].value,
                                                                                         (
                                                                                           value,
                                                                                         ) {
-                                                                                          gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].value = value;
+                                                                                          gl.geometries[gl.selectedGeometry].attributes[i].value = value;
                                                                                         },
                                                                                         () {},
                                                                                         () {
-                                                                                          gl.polygonLayers[gl.selectedPolygonLayer].serialize();
+                                                                                          gl.geometries[gl.selectedGeometry].serialize();
                                                                                         },
                                                                                       );
                                                                                     },
@@ -2018,10 +2005,10 @@ class _MapPageState extends State<MapPage> {
                                                                                         scrollDirection:
                                                                                             Axis.horizontal,
                                                                                         child:
-                                                                                            gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].type ==
+                                                                                            gl.geometries[gl.selectedGeometry].attributes[i].type ==
                                                                                                     "string"
                                                                                                 ? Text(
-                                                                                                  gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].value,
+                                                                                                  gl.geometries[gl.selectedGeometry].attributes[i].value,
                                                                                                   textAlign:
                                                                                                       TextAlign.start,
                                                                                                   style: TextStyle(
@@ -2033,10 +2020,10 @@ class _MapPageState extends State<MapPage> {
                                                                                                         .75,
                                                                                                   ),
                                                                                                 )
-                                                                                                : gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].type ==
+                                                                                                : gl.geometries[gl.selectedGeometry].attributes[i].type ==
                                                                                                     "int"
                                                                                                 ? Text(
-                                                                                                  gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].value.toString(),
+                                                                                                  gl.geometries[gl.selectedGeometry].attributes[i].value.toString(),
                                                                                                   textAlign:
                                                                                                       TextAlign.start,
                                                                                                   style: TextStyle(
@@ -2048,10 +2035,10 @@ class _MapPageState extends State<MapPage> {
                                                                                                         .75,
                                                                                                   ),
                                                                                                 )
-                                                                                                : gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].type ==
+                                                                                                : gl.geometries[gl.selectedGeometry].attributes[i].type ==
                                                                                                     "double"
                                                                                                 ? Text(
-                                                                                                  gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].value.toString(),
+                                                                                                  gl.geometries[gl.selectedGeometry].attributes[i].value.toString(),
                                                                                                   textAlign:
                                                                                                       TextAlign.start,
                                                                                                   style: TextStyle(
@@ -2063,7 +2050,7 @@ class _MapPageState extends State<MapPage> {
                                                                                                         .75,
                                                                                                   ),
                                                                                                 )
-                                                                                                : gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].type ==
+                                                                                                : gl.geometries[gl.selectedGeometry].attributes[i].type ==
                                                                                                     "special"
                                                                                                 ? Text(
                                                                                                   "special value",
@@ -2077,7 +2064,7 @@ class _MapPageState extends State<MapPage> {
                                                                                                   ),
                                                                                                 )
                                                                                                 : Text(
-                                                                                                  "ERROR TYPE ${gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].type}",
+                                                                                                  "ERROR TYPE ${gl.geometries[gl.selectedGeometry].attributes[i].type}",
                                                                                                   style: TextStyle(
                                                                                                     color:
                                                                                                         Colors.white,
@@ -2125,8 +2112,8 @@ class _MapPageState extends State<MapPage> {
                                                       TextButton(
                                                         onPressed: () {
                                                           gl
-                                                              .polygonLayers[gl
-                                                                  .selectedPolygonLayer]
+                                                              .geometries[gl
+                                                                  .selectedGeometry]
                                                               .attributes
                                                               .add(
                                                                 pl.Attribute(
@@ -2142,32 +2129,32 @@ class _MapPageState extends State<MapPage> {
                                                             gl.colorAgroBioTech,
                                                             (String s) {
                                                               gl
-                                                                  .polygonLayers[gl
-                                                                      .selectedPolygonLayer]
+                                                                  .geometries[gl
+                                                                      .selectedGeometry]
                                                                   .attributes
                                                                   .last
                                                                   .type = s;
                                                             },
                                                             (String s) {
                                                               gl
-                                                                  .polygonLayers[gl
-                                                                      .selectedPolygonLayer]
+                                                                  .geometries[gl
+                                                                      .selectedGeometry]
                                                                   .attributes
                                                                   .last
                                                                   .name = s;
                                                             },
                                                             (dynamic it) {
                                                               gl
-                                                                  .polygonLayers[gl
-                                                                      .selectedPolygonLayer]
+                                                                  .geometries[gl
+                                                                      .selectedGeometry]
                                                                   .attributes
                                                                   .last
                                                                   .value = it;
                                                             },
                                                             () {
                                                               gl
-                                                                  .polygonLayers[gl
-                                                                      .selectedPolygonLayer]
+                                                                  .geometries[gl
+                                                                      .selectedGeometry]
                                                                   .attributes
                                                                   .removeLast();
                                                             },
@@ -2342,7 +2329,7 @@ class _MapPageState extends State<MapPage> {
                                                               (k) {
                                                                 return Container(
                                                                   color:
-                                                                      gl.polygonLayers[gl.selectedPolygonLayer].selectedPointIcon ==
+                                                                      gl.geometries[gl.selectedGeometry].selectedPointIcon ==
                                                                               k
                                                                           ? gl.colorAgroBioTech
                                                                           : Colors
@@ -2351,7 +2338,7 @@ class _MapPageState extends State<MapPage> {
                                                                     onPressed: () {
                                                                       refreshView(
                                                                         () {
-                                                                          gl.polygonLayers[gl.selectedPolygonLayer].selectedPointIcon =
+                                                                          gl.geometries[gl.selectedGeometry].selectedPointIcon =
                                                                               k;
                                                                         },
                                                                       );
@@ -2378,6 +2365,120 @@ class _MapPageState extends State<MapPage> {
                                                               },
                                                             ),
                                                           ),
+                                                        ),
+                                                      ),
+                                                      stroke(
+                                                        gl.display.equipixel,
+                                                        gl.display.equipixel *
+                                                            .5,
+                                                        gl.colorAgroBioTech,
+                                                      ),
+                                                      SizedBox(
+                                                        width:
+                                                            gl
+                                                                .display
+                                                                .equipixel *
+                                                            gl.chosenPolyBarWidth,
+
+                                                        child: SingleChildScrollView(
+                                                          scrollDirection:
+                                                              Axis.horizontal,
+                                                          child: Row(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .spaceAround,
+                                                            children: List<
+                                                              TextButton
+                                                            >.generate(
+                                                              gl
+                                                                  .predefinedPointPalette
+                                                                  .length,
+                                                              (int k) {
+                                                                return TextButton(
+                                                                  onPressed: () {
+                                                                    refreshView(() {
+                                                                      gl.geometries[gl.selectedGeometry].setColorInside(
+                                                                        gl.predefinedPointPalette[k]
+                                                                            .withAlpha(
+                                                                              150,
+                                                                            ),
+                                                                      );
+                                                                      gl.geometries[gl.selectedGeometry]
+                                                                          .setColorLine(
+                                                                            gl.predefinedPointPalette[k],
+                                                                          );
+                                                                    });
+                                                                  },
+                                                                  child: CircleAvatar(
+                                                                    backgroundColor:
+                                                                        gl.geometries[gl.selectedGeometry].colorPolygon ==
+                                                                                gl.predefinedPointPalette[k]
+                                                                            ? Colors.white
+                                                                            : Colors.transparent,
+                                                                    radius:
+                                                                        gl
+                                                                            .display
+                                                                            .equipixel *
+                                                                        gl.iconSizeXS *
+                                                                        .9,
+                                                                    child: CircleAvatar(
+                                                                      radius:
+                                                                          gl.display.equipixel *
+                                                                          gl.iconSizeXS *
+                                                                          .85,
+                                                                      backgroundColor:
+                                                                          gl.predefinedPointPalette[k],
+                                                                    ),
+                                                                  ),
+                                                                );
+                                                              },
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      stroke(
+                                                        gl.display.equipixel,
+                                                        gl.display.equipixel *
+                                                            .5,
+                                                        gl.colorAgroBioTech,
+                                                      ),
+                                                      SizedBox(
+                                                        width:
+                                                            gl
+                                                                .display
+                                                                .equipixel *
+                                                            gl.chosenPolyBarWidth,
+                                                        height:
+                                                            gl
+                                                                .display
+                                                                .equipixel *
+                                                            gl.chosenPolyBarHeight,
+                                                        child: Slider(
+                                                          min: gl.iconSizeXXS,
+                                                          max: gl.iconSizeL,
+                                                          value:
+                                                              gl.geometries[gl.selectedGeometry].iconSize >
+                                                                          gl.iconSizeXXS &&
+                                                                      gl.geometries[gl.selectedGeometry].iconSize <
+                                                                          gl.iconSizeL
+                                                                  ? gl
+                                                                      .geometries[gl
+                                                                          .selectedGeometry]
+                                                                      .iconSize
+                                                                  : 10.0,
+                                                          divisions: 20,
+                                                          activeColor:
+                                                              gl.colorAgroBioTech,
+                                                          onChanged: (
+                                                            double value,
+                                                          ) {
+                                                            refreshView(() {
+                                                              gl
+                                                                  .geometries[gl
+                                                                      .selectedGeometry]
+                                                                  .iconSize = value;
+                                                            });
+                                                          },
                                                         ),
                                                       ),
                                                     ],
@@ -2455,20 +2556,20 @@ class _MapPageState extends State<MapPage> {
                                                             .spaceEvenly,
                                                     children: [
                                                       if (!gl
-                                                          .polygonLayers[gl
-                                                              .selectedPolygonLayer]
+                                                          .geometries[gl
+                                                              .selectedGeometry]
                                                           .labelsVisibleOnMap)
                                                         IconButton(
                                                           onPressed: () {
                                                             setState(() {
                                                               gl
-                                                                  .polygonLayers[gl
-                                                                      .selectedPolygonLayer]
+                                                                  .geometries[gl
+                                                                      .selectedGeometry]
                                                                   .labelsVisibleOnMap = true;
                                                             });
                                                             gl
-                                                                .polygonLayers[gl
-                                                                    .selectedPolygonLayer]
+                                                                .geometries[gl
+                                                                    .selectedGeometry]
                                                                 .serialize();
                                                             gl.refreshMainStack(
                                                               () {
@@ -2489,29 +2590,29 @@ class _MapPageState extends State<MapPage> {
                                                           ),
                                                         ),
                                                       if (gl
-                                                          .polygonLayers[gl
-                                                              .selectedPolygonLayer]
-                                                          .polygonPoints
+                                                          .geometries[gl
+                                                              .selectedGeometry]
+                                                          .points
                                                           .isNotEmpty)
                                                         IconButton(
                                                           onPressed: () {
                                                             setState(() {
                                                               if (gl
-                                                                          .polygonLayers[gl
-                                                                              .selectedPolygonLayer]
+                                                                          .geometries[gl
+                                                                              .selectedGeometry]
                                                                           .center
                                                                           .longitude !=
                                                                       0.0 &&
                                                                   gl
-                                                                          .polygonLayers[gl
-                                                                              .selectedPolygonLayer]
+                                                                          .geometries[gl
+                                                                              .selectedGeometry]
                                                                           .center
                                                                           .latitude !=
                                                                       0.0) {
                                                                 _mapController.move(
                                                                   gl
-                                                                      .polygonLayers[gl
-                                                                          .selectedPolygonLayer]
+                                                                      .geometries[gl
+                                                                          .selectedGeometry]
                                                                       .center,
                                                                   _mapController
                                                                       .camera
@@ -2543,14 +2644,40 @@ class _MapPageState extends State<MapPage> {
                                                             color: Colors.white,
                                                           ),
                                                         ),
+                                                      if (gl
+                                                              .geometries[gl
+                                                                  .selectedGeometry]
+                                                              .type ==
+                                                          "Point")
+                                                        IconButton(
+                                                          onPressed: () {
+                                                            setState(() {
+                                                              gl.Mode.editPointMarker =
+                                                                  !gl
+                                                                      .Mode
+                                                                      .editPointMarker;
+                                                            });
+                                                          },
+                                                          icon: Icon(
+                                                            FontAwesomeIcons
+                                                                .locationPin,
+                                                            size:
+                                                                gl
+                                                                    .display
+                                                                    .equipixel *
+                                                                gl.iconSizeS *
+                                                                .9,
+                                                            color: Colors.white,
+                                                          ),
+                                                        ),
                                                       IconButton(
                                                         onPressed: () {
                                                           gl.refreshMainStack(() {
                                                             gl.modeMapShowPolygons =
                                                                 true;
                                                             gl
-                                                                .polygonLayers[gl
-                                                                    .selectedPolygonLayer]
+                                                                .geometries[gl
+                                                                    .selectedGeometry]
                                                                 .visibleOnMap = true;
                                                             gl.Mode.editPolygon =
                                                                 !gl
@@ -2596,32 +2723,6 @@ class _MapPageState extends State<MapPage> {
                                                           color: Colors.white,
                                                         ),
                                                       ),
-                                                      if (gl
-                                                              .polygonLayers[gl
-                                                                  .selectedPolygonLayer]
-                                                              .type ==
-                                                          "Point")
-                                                        IconButton(
-                                                          onPressed: () {
-                                                            setState(() {
-                                                              gl.Mode.editPointMarker =
-                                                                  !gl
-                                                                      .Mode
-                                                                      .editPointMarker;
-                                                            });
-                                                          },
-                                                          icon: Icon(
-                                                            FontAwesomeIcons
-                                                                .locationPin,
-                                                            size:
-                                                                gl
-                                                                    .display
-                                                                    .equipixel *
-                                                                gl.iconSizeS *
-                                                                .9,
-                                                            color: Colors.white,
-                                                          ),
-                                                        ),
                                                     ],
                                                   ),
                                                 ],
@@ -2669,9 +2770,7 @@ class _MapPageState extends State<MapPage> {
                                             },
                                             () {
                                               refreshView(() {
-                                                if (gl
-                                                    .polygonLayers
-                                                    .isNotEmpty) {
+                                                if (gl.geometries.isNotEmpty) {
                                                   gl.Mode.showButtonAddVertexesPolygon =
                                                       true;
                                                   gl.Mode.showButtonMoveVertexesPolygon =
@@ -2755,7 +2854,7 @@ class _MapPageState extends State<MapPage> {
       if (gl.Mode.editAttributes) {
         result += gl.attributeTableHeight + 20;
       } else if (gl.Mode.editPointMarker) {
-        result += 50;
+        result += 45;
       }
     }
     return result;
@@ -2767,11 +2866,11 @@ class _MapPageState extends State<MapPage> {
 
   List<Polygon> _getPolygonesToDraw() {
     List<Polygon> that = [];
-    for (var layer in gl.polygonLayers) {
+    for (var layer in gl.geometries) {
       if (layer.numPoints > 2 &&
           layer.visibleOnMap &&
           layer.type == "Polygon") {
-        that.add(Polygon(points: layer.vertexes, color: layer.colorInside));
+        that.add(Polygon(points: layer.points, color: layer.colorInside));
       }
     }
     return that;
@@ -2779,18 +2878,18 @@ class _MapPageState extends State<MapPage> {
 
   List<Marker> _getPointsToDraw() {
     List<Marker> that = [];
-    for (var layer in gl.polygonLayers) {
+    for (var layer in gl.geometries) {
       gl.selectableIcons[layer.selectedPointIcon];
       if (layer.visibleOnMap && layer.numPoints > 0 && layer.type == "Point") {
         that.add(
           Marker(
             point: LatLng(
-              layer.vertexes.first.latitude,
-              layer.vertexes.first.longitude,
+              layer.points.first.latitude,
+              layer.points.first.longitude,
             ),
             child: Icon(
               gl.selectableIcons[layer.selectedPointIcon],
-              size: gl.iconSizeXS * gl.display.equipixel,
+              size: layer.iconSize * gl.display.equipixel,
               color: layer.colorLine,
             ),
           ),
@@ -2801,27 +2900,27 @@ class _MapPageState extends State<MapPage> {
   }
 
   List<CircleMarker> _drawnLayerPointsCircleMarker() {
-    if (gl.polygonLayers.isEmpty) {
+    if (gl.geometries.isEmpty) {
       return [];
     }
     List<CircleMarker> all = [];
     int i = 0;
-    for (var point in gl.polygonLayers[gl.selectedPolygonLayer].vertexes) {
+    for (var point in gl.geometries[gl.selectedGeometry].points) {
       all.add(
         CircleMarker(
           point: point,
           radius:
-              gl.polygonLayers[gl.selectedPolygonLayer].isSelectedLine(i) &&
+              gl.geometries[gl.selectedGeometry].isSelectedLine(i) &&
                       !gl.Mode.showButtonMoveVertexesPolygon &&
                       gl.Mode.addVertexesPolygon
                   ? iconSize / 2.7
                   : iconSize / 3,
           color:
-              gl.polygonLayers[gl.selectedPolygonLayer].isSelectedLine(i) &&
+              gl.geometries[gl.selectedGeometry].isSelectedLine(i) &&
                       !gl.Mode.showButtonMoveVertexesPolygon &&
                       gl.Mode.addVertexesPolygon
-                  ? gl.polygonLayers[gl.selectedPolygonLayer].colorLine
-                  : gl.polygonLayers[gl.selectedPolygonLayer].colorInside,
+                  ? gl.geometries[gl.selectedGeometry].colorLine
+                  : gl.geometries[gl.selectedGeometry].colorInside,
         ),
       );
       i++;
@@ -3204,12 +3303,12 @@ class _MapPageState extends State<MapPage> {
   }
 
   List<Marker> _drawnLayerPointsMarker() {
-    if (gl.polygonLayers.isEmpty) {
+    if (gl.geometries.isEmpty) {
       return [];
     }
     List<Marker> all = [];
     int count = 0;
-    for (var point in gl.polygonLayers[gl.selectedPolygonLayer].vertexes) {
+    for (var point in gl.geometries[gl.selectedGeometry].points) {
       all.add(
         Marker(
           alignment: Alignment.center,
@@ -3221,26 +3320,24 @@ class _MapPageState extends State<MapPage> {
               if (gl.Mode.addVertexesPolygon) {
                 //select line between points to place next point
                 refreshView(() {
-                  gl.polygonLayers[gl.selectedPolygonLayer]
-                      .refreshSelectedLinePoints(point);
+                  gl.geometries[gl.selectedGeometry].refreshSelectedLinePoints(
+                    point,
+                  );
                 });
               } else if (gl.Mode.moveVertexesPolygon) {
                 refreshView(() {
-                  if (gl
-                          .polygonLayers[gl.selectedPolygonLayer]
-                          .selectedVertex !=
+                  if (gl.geometries[gl.selectedGeometry].selectedVertex !=
                       1 + count) {
-                    gl.polygonLayers[gl.selectedPolygonLayer].selectedVertex =
-                        count;
+                    gl.geometries[gl.selectedGeometry].selectedVertex = count;
                   } else {
-                    gl.polygonLayers[gl.selectedPolygonLayer].selectedVertex =
-                        -1;
+                    gl.geometries[gl.selectedGeometry].selectedVertex = -1;
                   }
                 });
               } else {
                 refreshView(() {
-                  gl.polygonLayers[gl.selectedPolygonLayer]
-                      .refreshSelectedLinePoints(point);
+                  gl.geometries[gl.selectedGeometry].refreshSelectedLinePoints(
+                    point,
+                  );
                   gl.Mode.showButtonAddVertexesPolygon = false;
                   gl.Mode.showButtonMoveVertexesPolygon = true;
                   gl.Mode.showButtonRemoveVertexesPolygon = true;
@@ -3390,7 +3487,7 @@ class _MapPageState extends State<MapPage> {
                                 },
                                 () {
                                   refreshView(() {
-                                    if (gl.polygonLayers.isNotEmpty &&
+                                    if (gl.geometries.isNotEmpty &&
                                         gl.Mode.editPolygon) {
                                       gl.Mode.showButtonAddVertexesPolygon =
                                           true;
@@ -3647,9 +3744,7 @@ class _MapPageState extends State<MapPage> {
                                 gl.mainStack.add(
                                   popupPathListMenu(
                                     gl.notificationContext!,
-                                    gl
-                                        .polygonLayers[gl.selectedPolygonLayer]
-                                        .name,
+                                    gl.geometries[gl.selectedGeometry].name,
                                     (LatLng pos) {
                                       if (pos.longitude != 0.0 &&
                                           pos.latitude != 0.0) {
@@ -3729,21 +3824,21 @@ class _MapPageState extends State<MapPage> {
   }
 
   List<Marker> _getPolygonesLabels() {
-    return List.generate(gl.polygonLayers.length, (i) {
-      String textArea = "${(gl.polygonLayers[i].area / 100).round() / 100} Ha";
-      return gl.polygonLayers[i].visibleOnMap &&
-              gl.polygonLayers[i].labelsVisibleOnMap
-          ? gl.polygonLayers[i].type == "Polygon"
+    return List.generate(gl.geometries.length, (i) {
+      String textArea = "${(gl.geometries[i].area / 100).round() / 100} Ha";
+      return gl.geometries[i].visibleOnMap &&
+              gl.geometries[i].labelsVisibleOnMap
+          ? gl.geometries[i].type == "Polygon"
               ? Marker(
                 alignment: Alignment.center,
                 width: gl.display.equipixel * gl.infoBoxPolygon,
                 height:
                     gl.display.equipixel *
-                        (gl.polygonLayers[i].getNCheckedAttributes() + 1) *
+                        (gl.geometries[i].getNCheckedAttributes() + 1) *
                         gl.iconSizeS *
                         .8 +
                     5,
-                point: gl.polygonLayers[i].center,
+                point: gl.geometries[i].center,
                 child: Card(
                   color: Colors.black.withAlpha(200),
                   child: Column(
@@ -3800,7 +3895,7 @@ class _MapPageState extends State<MapPage> {
                                 child: SingleChildScrollView(
                                   scrollDirection: Axis.horizontal,
                                   child: Text(
-                                    gl.polygonLayers[i].name,
+                                    gl.geometries[i].name,
                                     textAlign: TextAlign.center,
                                     style: TextStyle(
                                       color: Colors.white,
@@ -3835,10 +3930,10 @@ class _MapPageState extends State<MapPage> {
                                   ),
                                   onPressed: () {
                                     refreshView(() {
-                                      gl.polygonLayers[i].labelsVisibleOnMap =
+                                      gl.geometries[i].labelsVisibleOnMap =
                                           false;
                                     });
-                                    gl.polygonLayers[i].serialize();
+                                    gl.geometries[i].serialize();
                                   },
                                   icon: FaIcon(
                                     Icons.close,
@@ -3852,7 +3947,7 @@ class _MapPageState extends State<MapPage> {
                               ),
                             ],
                           ),
-                          if (gl.polygonLayers[i].getNCheckedAttributes() > 1)
+                          if (gl.geometries[i].getNCheckedAttributes() > 1)
                             stroke(
                               gl.display.equipixel * 0.5,
                               gl.display.equipixel * 0.25,
@@ -3860,7 +3955,7 @@ class _MapPageState extends State<MapPage> {
                             ),
                         ] +
                         List<Widget>.generate(
-                          gl.polygonLayers[i].getNCheckedAttributes(),
+                          gl.geometries[i].getNCheckedAttributes(),
                           (j) {
                             return Container(
                               padding: EdgeInsetsDirectional.symmetric(
@@ -3876,7 +3971,7 @@ class _MapPageState extends State<MapPage> {
                                     child: SingleChildScrollView(
                                       scrollDirection: Axis.horizontal,
                                       child: Text(
-                                        gl.polygonLayers[i].attributes[j].name,
+                                        gl.geometries[i].attributes[j].name,
                                         textAlign: TextAlign.center,
                                         style: TextStyle(
                                           color: Colors.white,
@@ -3899,7 +3994,7 @@ class _MapPageState extends State<MapPage> {
                                     child: SingleChildScrollView(
                                       scrollDirection: Axis.horizontal,
                                       child: Text(
-                                        gl.polygonLayers[i].attributes[j].value
+                                        gl.geometries[i].attributes[j].value
                                             .toString(),
                                         textAlign: TextAlign.center,
                                         style: TextStyle(
@@ -3919,17 +4014,17 @@ class _MapPageState extends State<MapPage> {
                   ),
                 ),
               )
-              : gl.polygonLayers[i].type == "Point"
+              : gl.geometries[i].type == "Point"
               ? Marker(
                 alignment: Alignment.bottomLeft,
                 width: gl.display.equipixel * gl.infoBoxPolygon,
                 height:
                     gl.display.equipixel *
-                        (gl.polygonLayers[i].getNCheckedAttributes() + 1) *
+                        (gl.geometries[i].getNCheckedAttributes() + 1) *
                         gl.iconSizeS *
                         .8 +
                     5,
-                point: gl.polygonLayers[i].center,
+                point: gl.geometries[i].center,
                 child: Card(
                   color: Colors.black.withAlpha(200),
                   child: Column(
@@ -3985,7 +4080,7 @@ class _MapPageState extends State<MapPage> {
                                 child: SingleChildScrollView(
                                   scrollDirection: Axis.horizontal,
                                   child: Text(
-                                    gl.polygonLayers[i].name,
+                                    gl.geometries[i].name,
                                     textAlign: TextAlign.center,
                                     style: TextStyle(
                                       color: Colors.white,
@@ -4020,10 +4115,10 @@ class _MapPageState extends State<MapPage> {
                                   ),
                                   onPressed: () {
                                     refreshView(() {
-                                      gl.polygonLayers[i].labelsVisibleOnMap =
+                                      gl.geometries[i].labelsVisibleOnMap =
                                           false;
                                     });
-                                    gl.polygonLayers[i].serialize();
+                                    gl.geometries[i].serialize();
                                   },
                                   icon: FaIcon(
                                     Icons.close,
@@ -4037,7 +4132,7 @@ class _MapPageState extends State<MapPage> {
                               ),
                             ],
                           ),
-                          if (gl.polygonLayers[i].getNCheckedAttributes() > 1)
+                          if (gl.geometries[i].getNCheckedAttributes() > 1)
                             stroke(
                               gl.display.equipixel * 0.5,
                               gl.display.equipixel * 0.25,
@@ -4045,7 +4140,7 @@ class _MapPageState extends State<MapPage> {
                             ),
                         ] +
                         List<Widget>.generate(
-                          gl.polygonLayers[i].getNCheckedAttributes(),
+                          gl.geometries[i].getNCheckedAttributes(),
                           (j) {
                             return Container(
                               padding: EdgeInsetsDirectional.symmetric(
@@ -4061,7 +4156,7 @@ class _MapPageState extends State<MapPage> {
                                     child: SingleChildScrollView(
                                       scrollDirection: Axis.horizontal,
                                       child: Text(
-                                        gl.polygonLayers[i].attributes[j].name,
+                                        gl.geometries[i].attributes[j].name,
                                         textAlign: TextAlign.center,
                                         style: TextStyle(
                                           color: Colors.white,
@@ -4084,7 +4179,7 @@ class _MapPageState extends State<MapPage> {
                                     child: SingleChildScrollView(
                                       scrollDirection: Axis.horizontal,
                                       child: Text(
-                                        gl.polygonLayers[i].attributes[j].value
+                                        gl.geometries[i].attributes[j].value
                                             .toString(),
                                         textAlign: TextAlign.center,
                                         style: TextStyle(
@@ -4107,13 +4202,13 @@ class _MapPageState extends State<MapPage> {
               : Marker(
                 alignment: Alignment.center,
                 width:
-                    textArea.length > gl.polygonLayers[i].name.length
+                    textArea.length > gl.geometries[i].name.length
                         ? gl.display.equipixel * gl.infoBoxPolygon * 2.5 +
                             textArea.length * gl.fontSizeS
                         : gl.display.equipixel * gl.infoBoxPolygon * 1.5 +
-                            gl.polygonLayers[i].name.length * gl.fontSizeS,
+                            gl.geometries[i].name.length * gl.fontSizeS,
                 height: gl.display.equipixel * gl.infoBoxPolygon * 1.5,
-                point: gl.polygonLayers[i].center,
+                point: gl.geometries[i].center,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
@@ -4127,7 +4222,7 @@ class _MapPageState extends State<MapPage> {
                               children: [
                                 Icon(
                                   Icons.layers,
-                                  color: gl.polygonLayers[i].colorLine,
+                                  color: gl.geometries[i].colorLine,
                                 ),
                                 Text(
                                   "Unknown Geometry",
@@ -4146,7 +4241,7 @@ class _MapPageState extends State<MapPage> {
             alignment: Alignment.center,
             width: 1,
             height: 1,
-            point: gl.polygonLayers[i].center,
+            point: gl.geometries[i].center,
             child: SizedBox(),
           );
     });

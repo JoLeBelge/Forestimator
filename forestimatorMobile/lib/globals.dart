@@ -15,13 +15,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 // TODO: select poly and points by clicking on the map
 // TODO: Change explanation text in toolbox when: add vertex is selected etc...
 // TODO: When a point exists, automatically activate remove or move when editing
-// TODO: add color dots with symbols for points
 // TODO: Debug color bug when creating a new poly and selecting a color.
 // TODO: Bug in Permission menu occurs only on real device?
 // TODO: Florentin BUG
 // TODO: Many Keyboard switch Bugs...
 // TODO: Some Widgets still dont adapt properly with rotation etc... Add missing constraints to size with equipixels.
-// TODO: rearrange poly menu
+// TODO 2sec: rearrange poly menu
 typedef VoidSetter = void Function(void Function());
 
 const String forestimatorMobileVersion = "2.1.1 - build 24";
@@ -324,8 +323,8 @@ class PoiMarker {
   });
 }
 
-List<pol.PolygonLayer> polygonLayers = [];
-int selectedPolygonLayer = -1;
+List<pol.Geometry> geometries = [];
+int selectedGeometry = -1;
 
 List<PathLayer> pathLayers = [];
 int selectedpathLayer = -1;
@@ -771,4 +770,17 @@ List<IconData> selectableIcons = [
   FontAwesomeIcons.locationPin,
   FontAwesomeIcons.mapLocation,
   FontAwesomeIcons.locationArrow,
+];
+
+List<Color> predefinedPointPalette = [
+  Colors.black,
+  Colors.green,
+  Colors.yellow,
+  Colors.blueAccent,
+  Colors.red,
+  Colors.deepPurpleAccent,
+  Colors.orange,
+  Colors.cyanAccent,
+  Colors.pinkAccent,
+  Colors.white,
 ];

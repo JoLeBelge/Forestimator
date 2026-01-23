@@ -136,7 +136,7 @@ class _MyApp extends State<MyApp> {
       gl.mapZoom = aZoom;
     }
 
-    PolygonLayer.loadPolyData();
+    Geometry.loadPolyData();
 
     setState(() {
       _initializedPersistentValues = true;

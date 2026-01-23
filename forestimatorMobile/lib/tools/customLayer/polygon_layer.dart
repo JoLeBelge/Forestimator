@@ -24,7 +24,7 @@ class Attribute {
   });
 }
 
-class PolygonLayer {
+class Geometry {
   String identifier = UniqueKey().toString();
   bool sentToServer = false;
   String type = "Point";
@@ -32,7 +32,8 @@ class PolygonLayer {
   bool visibleOnMap = true;
   bool labelsVisibleOnMap = true;
   int selectedPointIcon = 0;
-  List<LatLng> polygonPoints = [];
+  double iconSize = 10;
+  List<LatLng> points = [];
   List<int> selectedPolyLinePoints = [0, 0];
   Color colorInside = Color.fromRGBO(255, 128, 164, 80);
   double transparencyInside = 0.0;
@@ -44,7 +45,7 @@ class PolygonLayer {
   Map<String, dynamic> decodedJson = {};
   List<Attribute> attributes = [];
 
-  PolygonLayer({String polygonName = ""}) {
+  Geometry({String polygonName = ""}) {
     name = polygonName;
     Random randomColor = Random();
     setColorInside(
@@ -93,11 +94,11 @@ class PolygonLayer {
     int index = pointIndex(point);
     gl.print(selectedPolyLinePoints);
     selectedPolyLinePoints[0] = index;
-    if (polygonPoints.length == 1) {
+    if (points.length == 1) {
       selectedPolyLinePoints[1] = index;
-    } else if (polygonPoints.length - 1 == index) {
+    } else if (points.length - 1 == index) {
       selectedPolyLinePoints[1] = 0;
-    } else if (polygonPoints.length - 1 > index) {
+    } else if (points.length - 1 > index) {
       selectedPolyLinePoints[1] = index + 1;
     } else {
       gl.print("error 1st index polygon line: $index");
@@ -112,7 +113,7 @@ class PolygonLayer {
   }
 
   void addPoint(LatLng point) {
-    polygonPoints.insert(selectedPolyLinePoints[1], point);
+    points.insert(selectedPolyLinePoints[1], point);
     refreshSelectedLinePoints(point);
     _computeArea();
     _computePerimeter();
@@ -122,7 +123,7 @@ class PolygonLayer {
   List<Point> getPolyPlusOneVertex(LatLng vertex) {
     List<Point> copyOfPoly = [];
 
-    for (LatLng p in polygonPoints) {
+    for (LatLng p in points) {
       copyOfPoly.add(Point(p.latitude, p.longitude));
     }
 
@@ -136,11 +137,11 @@ class PolygonLayer {
   List<Point> getPolyMoveOneVertex(LatLng old, LatLng index) {
     List<Point> copyOfPoly = [];
 
-    for (LatLng p in polygonPoints) {
+    for (LatLng p in points) {
       copyOfPoly.add(Point(p.latitude, p.longitude));
     }
     int i = 0;
-    for (LatLng point in polygonPoints) {
+    for (LatLng point in points) {
       if (old.latitude == point.latitude && old.longitude == point.longitude) {
         break;
       }
@@ -156,11 +157,11 @@ class PolygonLayer {
   List<Point> getPolyRemoveOneVertex(LatLng index) {
     List<Point> copyOfPoly = [];
 
-    for (LatLng p in polygonPoints) {
+    for (LatLng p in points) {
       copyOfPoly.add(Point(p.latitude, p.longitude));
     }
     int i = 0;
-    for (var point in polygonPoints) {
+    for (var point in points) {
       if (index.latitude == point.latitude &&
           index.longitude == point.longitude) {
         break;
@@ -174,7 +175,7 @@ class PolygonLayer {
 
   void removePoint(LatLng index) {
     int i = 0;
-    for (var point in polygonPoints) {
+    for (var point in points) {
       if (index.latitude == point.latitude &&
           index.longitude == point.longitude) {
         break;
@@ -182,18 +183,18 @@ class PolygonLayer {
       i++;
     }
     int pointIsSelected = -1;
-    if (i == selectedPolyLinePoints[0] && polygonPoints.length > 2) {
+    if (i == selectedPolyLinePoints[0] && points.length > 2) {
       pointIsSelected = selectedPolyLinePoints[1];
-    } else if (i == selectedPolyLinePoints[1] && polygonPoints.length > 2) {
+    } else if (i == selectedPolyLinePoints[1] && points.length > 2) {
       pointIsSelected = selectedPolyLinePoints[0];
     }
-    polygonPoints.removeAt(i);
-    if (pointIsSelected > -1 && pointIsSelected < polygonPoints.length) {
-      refreshSelectedLinePoints(polygonPoints[pointIsSelected]);
+    points.removeAt(i);
+    if (pointIsSelected > -1 && pointIsSelected < points.length) {
+      refreshSelectedLinePoints(points[pointIsSelected]);
     } else {
-      if (polygonPoints.length == 1) {
-        refreshSelectedLinePoints(polygonPoints[0]);
-      } else if (polygonPoints.isEmpty) {
+      if (points.length == 1) {
+        refreshSelectedLinePoints(points[0]);
+      } else if (points.isEmpty) {
         refreshSelectedLinePoints(null);
       } else {
         int selection =
@@ -201,9 +202,7 @@ class PolygonLayer {
                 ? selectedPolyLinePoints[1]
                 : selectedPolyLinePoints[0];
         refreshSelectedLinePoints(
-          polygonPoints[selection > polygonPoints.length - 1
-              ? polygonPoints.length - 1
-              : selection],
+          points[selection > points.length - 1 ? points.length - 1 : selection],
         );
       }
     }
@@ -215,14 +214,14 @@ class PolygonLayer {
 
   void replacePoint(LatLng old, LatLng index) {
     int i = 0;
-    for (var point in polygonPoints) {
+    for (var point in points) {
       if (old.latitude == point.latitude && old.longitude == point.longitude) {
         break;
       }
       i++;
     }
-    polygonPoints.removeAt(i);
-    polygonPoints.insert(i, index);
+    points.removeAt(i);
+    points.insert(i, index);
     _computeArea();
     _computePerimeter();
     serialize();
@@ -231,12 +230,11 @@ class PolygonLayer {
   Color get colorSurface => colorInside;
   Color get colorPolygon => colorLine;
   String get id => identifier;
-  List<LatLng> get vertexes => polygonPoints;
-  int get numPoints => polygonPoints.length;
+  int get numPoints => points.length;
   LatLng get center {
     double x = 0.0, y = 0.0;
     int i = 0;
-    for (var point in polygonPoints) {
+    for (var point in points) {
       y += point.longitude;
       x += point.latitude;
       i++;
@@ -246,7 +244,7 @@ class PolygonLayer {
 
   int pointIndex(LatLng searchedPoint) {
     int i = 0;
-    for (var point in polygonPoints) {
+    for (var point in points) {
       if (searchedPoint.latitude == point.latitude &&
           searchedPoint.longitude == point.longitude) {
         break;
@@ -264,13 +262,13 @@ class PolygonLayer {
   }
 
   void _computeArea() {
-    if (polygonPoints.length < 2) {
+    if (points.length < 2) {
       area = 0.0;
       return;
     }
 
     List<Offset> poly = [];
-    for (LatLng point in polygonPoints) {
+    for (LatLng point in points) {
       poly.add(
         _epsg4326ToEpsg31370(
           proj4.Point(y: point.latitude, x: point.longitude),
@@ -281,12 +279,12 @@ class PolygonLayer {
   }
 
   void _computePerimeter() {
-    if (polygonPoints.length < 2) {
+    if (points.length < 2) {
       area = 0.0;
       return;
     }
     List<Offset> poly = [];
-    for (LatLng point in polygonPoints) {
+    for (LatLng point in points) {
       poly.add(
         _epsg4326ToEpsg31370(
           proj4.Point(y: point.latitude, x: point.longitude),
@@ -303,20 +301,17 @@ class PolygonLayer {
 
   String getPolyPointsString() {
     String coordinates = "";
-    for (LatLng point in polygonPoints) {
+    for (LatLng point in points) {
       proj4.Point tLb72 = gl.epsg4326.transform(
         gl.epsg31370,
         proj4.Point(x: point.longitude, y: point.latitude),
       );
       coordinates = "$coordinates[${tLb72.x}, ${tLb72.y}],";
     }
-    if (type == "Polygon" && polygonPoints.isNotEmpty) {
+    if (type == "Polygon" && points.isNotEmpty) {
       proj4.Point tLb72 = gl.epsg4326.transform(
         gl.epsg31370,
-        proj4.Point(
-          x: polygonPoints.first.longitude,
-          y: polygonPoints.first.latitude,
-        ),
+        proj4.Point(x: points.first.longitude, y: points.first.latitude),
       );
       coordinates = "$coordinates[${tLb72.x}, ${tLb72.y}]";
     } else {
@@ -332,7 +327,7 @@ class PolygonLayer {
   }
 
   Future<bool> onlineSurfaceAnalysis() async {
-    if (polygonPoints.length < 2) return false;
+    if (points.length < 2) return false;
     bool internet = await InternetConnection().hasInternetAccess;
     if (internet) {
       String layersAnaSurf = "";
@@ -344,7 +339,7 @@ class PolygonLayer {
       layersAnaSurf = layersAnaSurf.substring(0, layersAnaSurf.length - 1);
 
       String polygon = "POLYGON ((";
-      for (LatLng point in polygonPoints) {
+      for (LatLng point in points) {
         proj4.Point tLb72 = gl.epsg4326.transform(
           gl.epsg31370,
           proj4.Point(x: point.longitude, y: point.latitude),
@@ -353,10 +348,7 @@ class PolygonLayer {
       }
       proj4.Point tLb72 = gl.epsg4326.transform(
         gl.epsg31370,
-        proj4.Point(
-          x: polygonPoints.first.longitude,
-          y: polygonPoints.first.latitude,
-        ),
+        proj4.Point(x: points.first.longitude, y: points.first.latitude),
       );
       polygon = "$polygon${tLb72.x} ${tLb72.y},";
       polygon = "${polygon.substring(0, polygon.length - 1)}))";
@@ -407,7 +399,7 @@ class PolygonLayer {
     bool internet = await InternetConnection().hasInternetAccess;
     if (internet) {
       String coordinates = "";
-      for (LatLng point in polygonPoints) {
+      for (LatLng point in points) {
         proj4.Point tLb72 = gl.epsg4326.transform(
           gl.epsg31370,
           proj4.Point(x: point.longitude, y: point.latitude),
@@ -417,10 +409,7 @@ class PolygonLayer {
       if (type == "Polygon") {
         proj4.Point tLb72 = gl.epsg4326.transform(
           gl.epsg31370,
-          proj4.Point(
-            x: polygonPoints.first.longitude,
-            y: polygonPoints.first.latitude,
-          ),
+          proj4.Point(x: points.first.longitude, y: points.first.latitude),
         );
         coordinates = "[[$coordinates[${tLb72.x}, ${tLb72.y}]]]";
       } else {
@@ -429,6 +418,12 @@ class PolygonLayer {
         }
       }
       String properties = "";
+      properties = "$properties\"name\":\"$name\",";
+      properties = "$properties\"area\":\"$area\",";
+      properties = "$properties\"perimeter\":\"$perimeter\",";
+      properties =
+          "$properties\"nom_contact\":\"${gl.UserData.name} ${gl.UserData.forename}\",";
+      properties = "$properties\"contact\":\"${gl.UserData.mail}\",";
       for (Attribute attribute in attributes) {
         properties =
             "$properties\"${attribute.name}\":\"${attribute.value.toString()}\",";
@@ -488,6 +483,7 @@ class PolygonLayer {
       labelsVisibleOnMap,
     );
     await gl.shared!.setInt('$identifier.selectedPointIcon', selectedPointIcon);
+    await gl.shared!.setDouble('$identifier.iconSize', iconSize);
     await gl.shared!.setDouble('$identifier.area', area);
     await gl.shared!.setDouble('$identifier.perimeter', perimeter);
     await gl.shared!.setDouble(
@@ -500,7 +496,7 @@ class PolygonLayer {
     );
     _writeColorToMemory('$identifier.colorInside', colorInside);
     _writeColorToMemory('$identifier.colorLine', colorLine);
-    _writePolygonPointsToMemory('$identifier.poly', polygonPoints);
+    _writePolygonPointsToMemory('$identifier.poly', points);
     _writePropertiesToMemory('$identifier.prop', attributes);
 
     List<String> polykeys = gl.shared!.getStringList('polyKeys') ?? <String>[];
@@ -558,13 +554,14 @@ class PolygonLayer {
     visibleOnMap = gl.shared!.getBool('$id.visibleOnMap') ?? true;
     labelsVisibleOnMap = gl.shared!.getBool('$id.labelsVisibleOnMap') ?? true;
     selectedPointIcon = gl.shared!.getInt('$id.selectedPointIcon') ?? 0;
+    iconSize = gl.shared!.getDouble('$id.iconSize') ?? 10.0;
     area = gl.shared!.getDouble('$id.area')!;
     perimeter = gl.shared!.getDouble('$id.perimeter')!;
     transparencyInside = gl.shared!.getDouble('$id.transparencyInside')!;
     transparencyLine = gl.shared!.getDouble('$id.transparencyLine')!;
     colorInside = _getColorFromMemory('$id.colorInside');
     colorLine = _getColorFromMemory('$id.colorLine');
-    polygonPoints = _getPolygonFromMemory('$id.poly');
+    points = _getPolygonFromMemory('$id.poly');
     attributes = _getAttributesFromMemory('$id.prop');
   }
 
@@ -619,8 +616,8 @@ class PolygonLayer {
   static void loadPolyData() {
     List<String> polykeys = gl.shared!.getStringList('polyKeys') ?? <String>[];
     for (String key in polykeys) {
-      gl.polygonLayers.add(PolygonLayer());
-      gl.polygonLayers.last.deserialze(key);
+      gl.geometries.add(Geometry());
+      gl.geometries.last.deserialze(key);
     }
   }
 

@@ -1511,11 +1511,10 @@ bool controlDuplicateAttributeName(String attribute) {
   int count = 0;
   for (
     int i = 0;
-    i < gl.polygonLayers[gl.selectedPolygonLayer].attributes.length;
+    i < gl.geometries[gl.selectedGeometry].attributes.length;
     i++
   ) {
-    if (attribute ==
-        gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].name) {
+    if (attribute == gl.geometries[gl.selectedGeometry].attributes[i].name) {
       count++;
     }
   }
@@ -1680,13 +1679,10 @@ class PopupSelectAttributeSet {
                       child: Text("Appliquer", style: dialogTextButtonStyle()),
                       onPressed: () {
                         List<String> attributeNames = List<String>.generate(
-                          gl
-                              .polygonLayers[gl.selectedPolygonLayer]
-                              .attributes
-                              .length,
+                          gl.geometries[gl.selectedGeometry].attributes.length,
                           (i) {
                             return gl
-                                .polygonLayers[gl.selectedPolygonLayer]
+                                .geometries[gl.selectedGeometry]
                                 .attributes[i]
                                 .name;
                           },
@@ -1696,9 +1692,7 @@ class PopupSelectAttributeSet {
                           case "Observation Composition":
                             if (!(attributeNames.contains("essence") &&
                                 attributeNames.contains("rmq"))) {
-                              gl
-                                  .polygonLayers[gl.selectedPolygonLayer]
-                                  .attributes
+                              gl.geometries[gl.selectedGeometry].attributes
                                   .addAll([
                                     Attribute(
                                       name: "essence",
@@ -1964,54 +1958,52 @@ class _PolygonListMenu extends State<PolygonListMenu> {
                     if (oldIndex < newIndex) {
                       newIndex -= 1;
                     }
-                    if (gl.polygonLayers.length < newIndex + 1 ||
-                        gl.polygonLayers.length < oldIndex + 1) {
+                    if (gl.geometries.length < newIndex + 1 ||
+                        gl.geometries.length < oldIndex + 1) {
                       return;
                     }
                     gl.refreshMainStack(() {
-                      final PolygonLayer item = gl.polygonLayers.removeAt(
-                        oldIndex,
-                      );
-                      gl.polygonLayers.insert(newIndex, item);
+                      final Geometry item = gl.geometries.removeAt(oldIndex);
+                      gl.geometries.insert(newIndex, item);
                     });
-                    if (oldIndex == gl.selectedPolygonLayer) {
-                      gl.selectedPolygonLayer = newIndex;
-                    } else if (newIndex == gl.selectedPolygonLayer) {
+                    if (oldIndex == gl.selectedGeometry) {
+                      gl.selectedGeometry = newIndex;
+                    } else if (newIndex == gl.selectedGeometry) {
                       if (oldIndex > newIndex) {
-                        gl.selectedPolygonLayer++;
+                        gl.selectedGeometry++;
                       } else {
-                        gl.selectedPolygonLayer--;
+                        gl.selectedGeometry--;
                       }
-                    } else if (oldIndex < gl.selectedPolygonLayer &&
-                        gl.selectedPolygonLayer < newIndex) {
-                      gl.selectedPolygonLayer--;
-                    } else if (oldIndex > gl.selectedPolygonLayer &&
-                        gl.selectedPolygonLayer > newIndex) {
-                      gl.selectedPolygonLayer++;
+                    } else if (oldIndex < gl.selectedGeometry &&
+                        gl.selectedGeometry < newIndex) {
+                      gl.selectedGeometry--;
+                    } else if (oldIndex > gl.selectedGeometry &&
+                        gl.selectedGeometry > newIndex) {
+                      gl.selectedGeometry++;
                     }
                   });
                 },
                 children: List<
                   TextButton
-                >.generate(gl.polygonLayers.isEmpty ? 0 : gl.polygonLayers.length, (
+                >.generate(gl.geometries.isEmpty ? 0 : gl.geometries.length, (
                   int i,
                 ) {
                   Color activeTextColor =
-                      i == gl.selectedPolygonLayer
+                      i == gl.selectedGeometry
                           ? getColorTextFromBackground(
-                            i == gl.selectedPolygonLayer
-                                ? gl.polygonLayers[i].colorInside.withAlpha(255)
+                            i == gl.selectedGeometry
+                                ? gl.geometries[i].colorInside.withAlpha(255)
                                 : Colors.grey.withAlpha(100),
                           )
                           : getColorTextFromBackground(
-                            i == gl.selectedPolygonLayer
-                                ? gl.polygonLayers[i].colorInside.withAlpha(255)
+                            i == gl.selectedGeometry
+                                ? gl.geometries[i].colorInside.withAlpha(255)
                                 : Colors.grey.withAlpha(100),
                           ).withAlpha(128);
                   return TextButton(
                     style: ButtonStyle(
                       fixedSize:
-                          i == gl.selectedPolygonLayer &&
+                          i == gl.selectedGeometry &&
                                   gl.display.orientation == Orientation.portrait
                               ? WidgetStateProperty<Size>.fromMap(
                                 <WidgetStatesConstraint, Size>{
@@ -2035,10 +2027,10 @@ class _PolygonListMenu extends State<PolygonListMenu> {
                     ),
                     key: Key('$i'),
                     onPressed:
-                        i == gl.selectedPolygonLayer
+                        i == gl.selectedGeometry
                             ? () {
                               setState(() {
-                                widget.state(gl.polygonLayers[i].center);
+                                widget.state(gl.geometries[i].center);
                               });
                               gl.refreshMainStack(() {
                                 gl.modeMapShowPolygons = true;
@@ -2046,8 +2038,8 @@ class _PolygonListMenu extends State<PolygonListMenu> {
                             }
                             : () {
                               setState(() {
-                                gl.selectedPolygonLayer = i;
-                                widget.state(gl.polygonLayers[i].center);
+                                gl.selectedGeometry = i;
+                                widget.state(gl.geometries[i].center);
                               });
                               gl.refreshMainStack(() {
                                 gl.modeMapShowPolygons = true;
@@ -2065,21 +2057,21 @@ class _PolygonListMenu extends State<PolygonListMenu> {
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadiusGeometry.circular(12.0),
                             side:
-                                i == gl.selectedPolygonLayer &&
+                                i == gl.selectedGeometry &&
                                         gl.display.orientation ==
                                             Orientation.portrait
                                     ? BorderSide(
                                       color: Colors.transparent,
                                       width: 0.0,
                                     )
-                                    : i == gl.selectedPolygonLayer
+                                    : i == gl.selectedGeometry
                                     ? BorderSide(
-                                      color: gl.polygonLayers[i].colorInside
+                                      color: gl.geometries[i].colorInside
                                           .withAlpha(100),
                                       width: 2.0,
                                     )
                                     : BorderSide(
-                                      color: gl.polygonLayers[i].colorInside
+                                      color: gl.geometries[i].colorInside
                                           .withAlpha(150),
                                       width: 4.0,
                                     ),
@@ -2087,13 +2079,11 @@ class _PolygonListMenu extends State<PolygonListMenu> {
                           surfaceTintColor: Colors.transparent,
                           shadowColor: Colors.transparent,
                           color:
-                              i == gl.selectedPolygonLayer
-                                  ? gl.polygonLayers[i].colorInside.withAlpha(
-                                    255,
-                                  )
+                              i == gl.selectedGeometry
+                                  ? gl.geometries[i].colorInside.withAlpha(255)
                                   : Colors.grey.withAlpha(150),
                           child:
-                              i != gl.selectedPolygonLayer ||
+                              i != gl.selectedGeometry ||
                                       gl.display.orientation ==
                                           Orientation.landscape
                                   ? Row(
@@ -2112,7 +2102,7 @@ class _PolygonListMenu extends State<PolygonListMenu> {
                                                       .5,
                                         ),
                                         child: Text(
-                                          gl.polygonLayers[i].name,
+                                          gl.geometries[i].name,
                                           style: TextStyle(
                                             color: Colors.black,
                                             fontSize:
@@ -2127,7 +2117,7 @@ class _PolygonListMenu extends State<PolygonListMenu> {
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
                                     children: [
-                                      if (i == gl.selectedPolygonLayer)
+                                      if (i == gl.selectedGeometry)
                                         Container(
                                           alignment: Alignment.center,
                                           width:
@@ -2144,26 +2134,22 @@ class _PolygonListMenu extends State<PolygonListMenu> {
                                                 gl.notificationContext!,
                                                 () {
                                                   setState(() {
-                                                    PolygonLayer.deleteLayerFromShared(
-                                                      gl.polygonLayers[i].id,
+                                                    Geometry.deleteLayerFromShared(
+                                                      gl.geometries[i].id,
                                                     );
                                                     if (i > 0) {
-                                                      gl.polygonLayers.removeAt(
-                                                        i,
-                                                      );
-                                                      gl.selectedPolygonLayer--;
+                                                      gl.geometries.removeAt(i);
+                                                      gl.selectedGeometry--;
                                                     } else if (i == 0 &&
                                                         gl
-                                                            .polygonLayers
+                                                            .geometries
                                                             .isNotEmpty) {
-                                                      gl.polygonLayers.removeAt(
-                                                        i,
-                                                      );
+                                                      gl.geometries.removeAt(i);
                                                     }
                                                   });
                                                 },
                                                 "Message",
-                                                "\nVoulez vous vraiment supprimer ${gl.polygonLayers[i].name}?\n",
+                                                "\nVoulez vous vraiment supprimer ${gl.geometries[i].name}?\n",
                                               );
                                             },
                                             icon: Icon(
@@ -2214,7 +2200,7 @@ class _PolygonListMenu extends State<PolygonListMenu> {
                                                               .5,
                                                 ),
                                                 child: Text(
-                                                  gl.polygonLayers[i].name,
+                                                  gl.geometries[i].name,
                                                   style: TextStyle(
                                                     color: activeTextColor,
                                                     fontSize:
@@ -2226,10 +2212,10 @@ class _PolygonListMenu extends State<PolygonListMenu> {
                                               onPressed: () {
                                                 PopupNameIntroducer(
                                                   context,
-                                                  gl.polygonLayers[i].name,
+                                                  gl.geometries[i].name,
                                                   (String nameIt) {
                                                     setState(() {
-                                                      gl.polygonLayers[i].name =
+                                                      gl.geometries[i].name =
                                                           nameIt;
                                                     });
                                                   },
@@ -2244,15 +2230,15 @@ class _PolygonListMenu extends State<PolygonListMenu> {
                                                     });
                                                   },
                                                   () {
-                                                    gl.polygonLayers[i]
+                                                    gl.geometries[i]
                                                         .serialize();
                                                   },
                                                 );
                                               },
                                             ),
-                                            if (i == gl.selectedPolygonLayer)
+                                            if (i == gl.selectedGeometry)
                                               Text(
-                                                "${(gl.polygonLayers[i].area / 100).round() / 100} Ha",
+                                                "${(gl.geometries[i].area / 100).round() / 100} Ha",
                                                 style: TextStyle(
                                                   color: activeTextColor,
                                                   fontSize:
@@ -2261,9 +2247,9 @@ class _PolygonListMenu extends State<PolygonListMenu> {
                                                       1.2,
                                                 ),
                                               ),
-                                            if (i == gl.selectedPolygonLayer)
+                                            if (i == gl.selectedGeometry)
                                               Text(
-                                                "${(gl.polygonLayers[i].perimeter).round() / 1000} km",
+                                                "${(gl.geometries[i].perimeter).round() / 1000} km",
                                                 style: TextStyle(
                                                   color: activeTextColor,
                                                   fontSize:
@@ -2275,14 +2261,13 @@ class _PolygonListMenu extends State<PolygonListMenu> {
                                           ],
                                         ),
                                       ),
-                                      if (i == gl.selectedPolygonLayer)
+                                      if (i == gl.selectedGeometry)
                                         Container(
                                           alignment: Alignment.center,
                                           width:
                                               gl.display.orientation.index ==
                                                           1 &&
-                                                      i !=
-                                                          gl.selectedPolygonLayer
+                                                      i != gl.selectedGeometry
                                                   ? 0.0
                                                   : gl.display.equipixel *
                                                       gl.iconSizeM *
@@ -2313,8 +2298,8 @@ class _PolygonListMenu extends State<PolygonListMenu> {
                                                           context,
                                                           () {
                                                             gl
-                                                                .polygonLayers[gl
-                                                                    .selectedPolygonLayer]
+                                                                .geometries[gl
+                                                                    .selectedGeometry]
                                                                 .sendGeometryToServer();
                                                           },
                                                           "Attention !",
@@ -2331,8 +2316,8 @@ class _PolygonListMenu extends State<PolygonListMenu> {
                                                       context,
                                                       () {
                                                         gl
-                                                            .polygonLayers[gl
-                                                                .selectedPolygonLayer]
+                                                            .geometries[gl
+                                                                .selectedGeometry]
                                                             .sendGeometryToServer();
                                                       },
                                                       "Attention !",
@@ -2352,17 +2337,17 @@ class _PolygonListMenu extends State<PolygonListMenu> {
                                                 onPressed: () {
                                                   PopupColorChooser(
                                                     gl
-                                                        .polygonLayers[i]
+                                                        .geometries[i]
                                                         .colorInside,
                                                     gl.notificationContext!,
                                                     //change color
                                                     (Color col) {
                                                       setState(() {
-                                                        gl.polygonLayers[i]
+                                                        gl.geometries[i]
                                                             .setColorInside(
                                                               col,
                                                             );
-                                                        gl.polygonLayers[i]
+                                                        gl.geometries[i]
                                                             .setColorLine(
                                                               Color.fromRGBO(
                                                                 (col.r * 255)
@@ -2378,7 +2363,7 @@ class _PolygonListMenu extends State<PolygonListMenu> {
                                                     },
                                                     () {},
                                                     () {
-                                                      gl.polygonLayers[i]
+                                                      gl.geometries[i]
                                                           .serialize();
                                                     },
                                                   );
@@ -2400,22 +2385,21 @@ class _PolygonListMenu extends State<PolygonListMenu> {
                                                                     .index ==
                                                                 1 &&
                                                             i !=
-                                                                gl.selectedPolygonLayer
+                                                                gl.selectedGeometry
                                                         ? 0.0
                                                         : gl.display.equipixel *
                                                             gl.iconSizeM *
                                                             1.2,
                                                 child: IconButton(
                                                   onPressed: () async {
-                                                    if (await gl
-                                                        .polygonLayers[i]
+                                                    if (await gl.geometries[i]
                                                         .onlineSurfaceAnalysis()) {
                                                       gl.mainStack.add(
                                                         popupAnaSurfResultsMenu(
                                                           gl.notificationContext!,
                                                           gl
-                                                              .polygonLayers[gl
-                                                                  .selectedPolygonLayer]
+                                                              .geometries[gl
+                                                                  .selectedGeometry]
                                                               .decodedJson,
                                                           () {
                                                             gl.refreshMainStack(
@@ -2496,38 +2480,36 @@ class _PolygonListMenu extends State<PolygonListMenu> {
                 ),
                 onPressed: () {
                   setState(() {
-                    gl.polygonLayers.add(
-                      PolygonLayer(
-                        polygonName: "Nouveau${gl.polygonLayers.length - 1}",
+                    gl.geometries.add(
+                      Geometry(
+                        polygonName: "Nouveau${gl.geometries.length - 1}",
                       ),
                     );
                     PopupNewPolygon(
                       context,
                       "",
-                      gl.polygonLayers[gl.polygonLayers.length - 1].colorInside,
+                      gl.geometries[gl.geometries.length - 1].colorInside,
                       (String typeIt) {
                         if (mounted) {
                           setState(() {
-                            gl.polygonLayers[gl.polygonLayers.length - 1].type =
+                            gl.geometries[gl.geometries.length - 1].type =
                                 typeIt;
                             _keyboard = true;
                           });
                         } else {
-                          gl.polygonLayers[gl.polygonLayers.length - 1].type =
-                              typeIt;
+                          gl.geometries[gl.geometries.length - 1].type = typeIt;
                           _keyboard = true;
                         }
                       },
                       (String nameIt) {
                         if (mounted) {
                           setState(() {
-                            gl.polygonLayers[gl.polygonLayers.length - 1].name =
+                            gl.geometries[gl.geometries.length - 1].name =
                                 nameIt;
                             _keyboard = true;
                           });
                         } else {
-                          gl.polygonLayers[gl.polygonLayers.length - 1].name =
-                              nameIt;
+                          gl.geometries[gl.geometries.length - 1].name = nameIt;
                           _keyboard = true;
                         }
                       },
@@ -2535,14 +2517,13 @@ class _PolygonListMenu extends State<PolygonListMenu> {
                         if (mounted) {
                           setState(() {
                             gl
-                                .polygonLayers[gl.polygonLayers.length - 1]
+                                .geometries[gl.geometries.length - 1]
                                 .colorInside = colorIt;
                             _keyboard = true;
                           });
                         } else {
-                          gl
-                              .polygonLayers[gl.polygonLayers.length - 1]
-                              .colorInside = colorIt;
+                          gl.geometries[gl.geometries.length - 1].colorInside =
+                              colorIt;
                           _keyboard = true;
                         }
                       },
@@ -2565,15 +2546,14 @@ class _PolygonListMenu extends State<PolygonListMenu> {
                         }
                       },
                       () {
-                        gl.polygonLayers[gl.polygonLayers.length - 1]
-                            .serialize();
+                        gl.geometries[gl.geometries.length - 1].serialize();
                       },
                     );
-                    gl.selectedPolygonLayer = gl.polygonLayers.length - 1;
+                    gl.selectedGeometry = gl.geometries.length - 1;
                   });
 
                   gl.refreshMainStack(() {
-                    gl.selectedPolygonLayer = gl.polygonLayers.length - 1;
+                    gl.selectedGeometry = gl.geometries.length - 1;
                   });
                   _scrollDown();
                 },
@@ -2589,7 +2569,7 @@ class _PolygonListMenu extends State<PolygonListMenu> {
           Column(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              if (gl.polygonLayers.isNotEmpty)
+              if (gl.geometries.isNotEmpty)
                 SizedBox(
                   width: gl.polyListSelectedCardWidth * gl.display.equipixel,
                   child: Card(
@@ -2599,7 +2579,7 @@ class _PolygonListMenu extends State<PolygonListMenu> {
 
                     surfaceTintColor: Colors.transparent,
                     shadowColor: Colors.transparent,
-                    color: gl.polygonLayers[gl.selectedPolygonLayer].colorInside
+                    color: gl.geometries[gl.selectedGeometry].colorInside
                         .withAlpha(255),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -2611,28 +2591,26 @@ class _PolygonListMenu extends State<PolygonListMenu> {
                               PopupDoYouReally(
                                 gl.notificationContext!,
                                 () {
-                                  PolygonLayer.deleteLayerFromShared(
-                                    gl
-                                        .polygonLayers[gl.selectedPolygonLayer]
-                                        .id,
+                                  Geometry.deleteLayerFromShared(
+                                    gl.geometries[gl.selectedGeometry].id,
                                   );
                                   setState(() {
                                     //remove polygon
-                                    if (gl.selectedPolygonLayer > 0) {
-                                      gl.polygonLayers.removeAt(
-                                        gl.selectedPolygonLayer,
+                                    if (gl.selectedGeometry > 0) {
+                                      gl.geometries.removeAt(
+                                        gl.selectedGeometry,
                                       );
-                                      gl.selectedPolygonLayer--;
-                                    } else if (gl.selectedPolygonLayer == 0 &&
-                                        gl.polygonLayers.isNotEmpty) {
-                                      gl.polygonLayers.removeAt(
-                                        gl.selectedPolygonLayer,
+                                      gl.selectedGeometry--;
+                                    } else if (gl.selectedGeometry == 0 &&
+                                        gl.geometries.isNotEmpty) {
+                                      gl.geometries.removeAt(
+                                        gl.selectedGeometry,
                                       );
                                     }
                                   });
                                 },
                                 "Message",
-                                "\nVoulez vous vraiment supprimer ${gl.polygonLayers[gl.selectedPolygonLayer].name}?\n",
+                                "\nVoulez vous vraiment supprimer ${gl.geometries[gl.selectedGeometry].name}?\n",
                               );
                             },
                             icon: Icon(
@@ -2656,9 +2634,7 @@ class _PolygonListMenu extends State<PolygonListMenu> {
                                         .5,
                                   ),
                                   child: Text(
-                                    gl
-                                        .polygonLayers[gl.selectedPolygonLayer]
-                                        .name,
+                                    gl.geometries[gl.selectedGeometry].name,
                                     style: TextStyle(
                                       color: Colors.black,
                                       fontSize:
@@ -2669,14 +2645,11 @@ class _PolygonListMenu extends State<PolygonListMenu> {
                                 onPressed: () {
                                   PopupNameIntroducer(
                                     context,
-                                    gl
-                                        .polygonLayers[gl.selectedPolygonLayer]
-                                        .name,
+                                    gl.geometries[gl.selectedGeometry].name,
                                     (String nameIt) {
                                       setState(() {
                                         gl
-                                            .polygonLayers[gl
-                                                .selectedPolygonLayer]
+                                            .geometries[gl.selectedGeometry]
                                             .name = nameIt;
                                       });
                                     },
@@ -2691,7 +2664,7 @@ class _PolygonListMenu extends State<PolygonListMenu> {
                                       });
                                     },
                                     () {
-                                      gl.polygonLayers[gl.selectedPolygonLayer]
+                                      gl.geometries[gl.selectedGeometry]
                                           .serialize();
                                     },
                                   );
@@ -2699,14 +2672,14 @@ class _PolygonListMenu extends State<PolygonListMenu> {
                               ),
 
                               Text(
-                                "${(gl.polygonLayers[gl.selectedPolygonLayer].area / 100).round() / 100} Ha",
+                                "${(gl.geometries[gl.selectedGeometry].area / 100).round() / 100} Ha",
                                 style: TextStyle(
                                   color: Colors.black,
                                   fontSize: gl.display.equipixel * gl.fontSizeM,
                                 ),
                               ),
                               Text(
-                                "${(gl.polygonLayers[gl.selectedPolygonLayer].perimeter).round() / 1000} km",
+                                "${(gl.geometries[gl.selectedGeometry].perimeter).round() / 1000} km",
                                 style: TextStyle(
                                   color: Colors.black,
                                   fontSize: gl.display.equipixel * gl.fontSizeM,
@@ -2728,20 +2701,15 @@ class _PolygonListMenu extends State<PolygonListMenu> {
                                     onPressed: () {
                                       PopupColorChooser(
                                         gl
-                                            .polygonLayers[gl
-                                                .selectedPolygonLayer]
+                                            .geometries[gl.selectedGeometry]
                                             .colorInside,
                                         gl.notificationContext!,
                                         //change color
                                         (Color col) {
                                           setState(() {
-                                            gl
-                                                .polygonLayers[gl
-                                                    .selectedPolygonLayer]
+                                            gl.geometries[gl.selectedGeometry]
                                                 .setColorInside(col);
-                                            gl
-                                                .polygonLayers[gl
-                                                    .selectedPolygonLayer]
+                                            gl.geometries[gl.selectedGeometry]
                                                 .setColorLine(
                                                   Color.fromRGBO(
                                                     (col.r * 255).round(),
@@ -2754,9 +2722,7 @@ class _PolygonListMenu extends State<PolygonListMenu> {
                                         },
                                         () {},
                                         () {
-                                          gl
-                                              .polygonLayers[gl
-                                                  .selectedPolygonLayer]
+                                          gl.geometries[gl.selectedGeometry]
                                               .serialize();
                                         },
                                       );
@@ -2773,15 +2739,13 @@ class _PolygonListMenu extends State<PolygonListMenu> {
                                   IconButton(
                                     onPressed: () async {
                                       if (await gl
-                                          .polygonLayers[gl
-                                              .selectedPolygonLayer]
+                                          .geometries[gl.selectedGeometry]
                                           .onlineSurfaceAnalysis()) {
                                         gl.mainStack.add(
                                           popupAnaSurfResultsMenu(
                                             gl.notificationContext!,
                                             gl
-                                                .polygonLayers[gl
-                                                    .selectedPolygonLayer]
+                                                .geometries[gl.selectedGeometry]
                                                 .decodedJson,
                                             () {
                                               gl.refreshMainStack(() {});
@@ -2856,25 +2820,20 @@ class _PolygonListMenu extends State<PolygonListMenu> {
                   ),
                   onPressed: () async {
                     setState(() {
-                      gl.polygonLayers.add(
-                        PolygonLayer(polygonName: "Nouveau"),
-                      );
+                      gl.geometries.add(Geometry(polygonName: "Nouveau"));
                       PopupNewPolygon(
                         context,
                         "",
-                        gl
-                            .polygonLayers[gl.polygonLayers.length - 1]
-                            .colorInside,
+                        gl.geometries[gl.geometries.length - 1].colorInside,
                         (String typeIt) {
                           if (mounted) {
                             setState(() {
-                              gl
-                                  .polygonLayers[gl.polygonLayers.length - 1]
-                                  .type = typeIt;
+                              gl.geometries[gl.geometries.length - 1].type =
+                                  typeIt;
                               _keyboard = true;
                             });
                           } else {
-                            gl.polygonLayers[gl.polygonLayers.length - 1].type =
+                            gl.geometries[gl.geometries.length - 1].type =
                                 typeIt;
                             _keyboard = true;
                           }
@@ -2882,13 +2841,12 @@ class _PolygonListMenu extends State<PolygonListMenu> {
                         (String nameIt) {
                           if (mounted) {
                             setState(() {
-                              gl
-                                  .polygonLayers[gl.polygonLayers.length - 1]
-                                  .name = nameIt;
+                              gl.geometries[gl.geometries.length - 1].name =
+                                  nameIt;
                               _keyboard = true;
                             });
                           } else {
-                            gl.polygonLayers[gl.polygonLayers.length - 1].name =
+                            gl.geometries[gl.geometries.length - 1].name =
                                 nameIt;
                             _keyboard = true;
                           }
@@ -2897,13 +2855,13 @@ class _PolygonListMenu extends State<PolygonListMenu> {
                           if (mounted) {
                             setState(() {
                               gl
-                                  .polygonLayers[gl.polygonLayers.length - 1]
+                                  .geometries[gl.geometries.length - 1]
                                   .colorInside = colorIt;
                               _keyboard = true;
                             });
                           } else {
                             gl
-                                .polygonLayers[gl.polygonLayers.length - 1]
+                                .geometries[gl.geometries.length - 1]
                                 .colorInside = colorIt;
                             _keyboard = true;
                           }
@@ -2927,15 +2885,14 @@ class _PolygonListMenu extends State<PolygonListMenu> {
                           }
                         },
                         () {
-                          gl.polygonLayers[gl.polygonLayers.length - 1]
-                              .serialize();
+                          gl.geometries[gl.geometries.length - 1].serialize();
                         },
                       );
-                      gl.selectedPolygonLayer = gl.polygonLayers.length - 1;
+                      gl.selectedGeometry = gl.geometries.length - 1;
                     });
 
                     gl.refreshMainStack(() {
-                      gl.selectedPolygonLayer = gl.polygonLayers.length - 1;
+                      gl.selectedGeometry = gl.geometries.length - 1;
                     });
                     _scrollDown();
                   },
@@ -3209,7 +3166,7 @@ class _PathListMenu extends State<PathListMenu> {
                                                 () {
                                                   setState(() {
                                                     //remove polygon
-                                                    PolygonLayer.deleteLayerFromShared(
+                                                    Geometry.deleteLayerFromShared(
                                                       gl.pathLayers[i].id,
                                                     );
                                                     if (i > 0) {
@@ -7349,37 +7306,36 @@ class _LayerSwitcher extends State<LayerSwitcher> {
                   ? (gl.layerSwitcherBoxHeightPortraitOffline +
                           gl.layerswitcherButtonsBoxHeight +
                           (gl.poiMarkerList.isNotEmpty &&
-                                  gl.polygonLayers.isNotEmpty
+                                  gl.geometries.isNotEmpty
                               ? gl.layerSwitcherTileHeight +
                                   gl.layerswitcherControlBoxHeight
                               : (gl.poiMarkerList.isNotEmpty ||
-                                      gl.polygonLayers.isNotEmpty
+                                      gl.geometries.isNotEmpty
                                   ? gl.layerswitcherControlBoxHeight
                                   : 0.0))) *
                       gl.display.equipixel
                   : (gl.layerSwitcherBoxHeightPortrait +
                           gl.layerswitcherButtonsBoxHeight +
                           (gl.poiMarkerList.isNotEmpty &&
-                                  gl.polygonLayers.isNotEmpty
+                                  gl.geometries.isNotEmpty
                               ? gl.layerSwitcherTileHeight +
                                   gl.layerswitcherControlBoxHeight
                               : (gl.poiMarkerList.isNotEmpty ||
-                                      gl.polygonLayers.isNotEmpty
+                                      gl.geometries.isNotEmpty
                                   ? gl.layerswitcherControlBoxHeight
                                   : 0.0))) *
                       gl.display.equipixel
               : gl.layerSwitcherBoxHeightLandscape * gl.display.equipixel,
       child: switchRowColWithOrientation([
-        if ((gl.polygonLayers.isNotEmpty || gl.poiMarkerList.isNotEmpty) &&
+        if ((gl.geometries.isNotEmpty || gl.poiMarkerList.isNotEmpty) &&
             gl.display.orientation == Orientation.portrait)
           SizedBox(
             width: gl.display.equipixel * gl.layerswitcherBoxWidth,
             height:
-                (gl.poiMarkerList.isNotEmpty && gl.polygonLayers.isNotEmpty
+                (gl.poiMarkerList.isNotEmpty && gl.geometries.isNotEmpty
                     ? gl.layerSwitcherTileHeight +
                         gl.layerswitcherControlBoxHeight
-                    : (gl.poiMarkerList.isNotEmpty ||
-                            gl.polygonLayers.isNotEmpty
+                    : (gl.poiMarkerList.isNotEmpty || gl.geometries.isNotEmpty
                         ? gl.layerswitcherControlBoxHeight
                         : 0.0)) *
                 gl.display.equipixel,
@@ -7485,16 +7441,15 @@ class _LayerSwitcher extends State<LayerSwitcher> {
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              if (gl.polygonLayers.isNotEmpty || gl.poiMarkerList.isNotEmpty)
+              if (gl.geometries.isNotEmpty || gl.poiMarkerList.isNotEmpty)
                 SizedBox(
                   width: gl.display.equipixel * gl.layerswitcherBoxWidth,
                   height:
-                      (gl.poiMarkerList.isNotEmpty &&
-                              gl.polygonLayers.isNotEmpty
+                      (gl.poiMarkerList.isNotEmpty && gl.geometries.isNotEmpty
                           ? gl.layerSwitcherTileHeight +
                               gl.layerswitcherControlBoxHeight
                           : (gl.poiMarkerList.isNotEmpty ||
-                                  gl.polygonLayers.isNotEmpty
+                                  gl.geometries.isNotEmpty
                               ? gl.layerswitcherControlBoxHeight
                               : 0.0)) *
                       gl.display.equipixel,
@@ -7816,7 +7771,7 @@ class _UpperLayerControl extends State<UpperLayerControl> {
               ),
             ),
           ),
-        if (gl.polygonLayers.isNotEmpty)
+        if (gl.geometries.isNotEmpty)
           SizedBox(
             height: gl.display.equipixel * gl.layerSwitcherTileHeight,
             child: Card(
@@ -7845,7 +7800,7 @@ class _UpperLayerControl extends State<UpperLayerControl> {
                       gl.mainStack.add(
                         popupPolygonListMenu(
                           gl.notificationContext!,
-                          gl.polygonLayers[gl.selectedPolygonLayer].name,
+                          gl.geometries[gl.selectedGeometry].name,
                           widget.switchToLocationInSearchMenu,
                           () {
                             gl.refreshMainStack(() {});
