@@ -20,6 +20,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 // TODO: Florentin BUG
 // TODO: Many Keyboard switch Bugs...
 // TODO: Some Widgets still dont adapt properly with rotation etc... Add missing constraints to size with equipixels.
+// TODO: Add bounding box
 typedef VoidSetter = void Function(void Function());
 
 const String forestimatorMobileVersion = "2.1.1 - build 24";
@@ -428,7 +429,31 @@ List<String> downloadableLayerKeys = [
   "CNSWrast",
 ];
 
-Position? position;
+Position _position = Position(
+  longitude: 0,
+  latitude: 0,
+  timestamp: DateTime.now(),
+  accuracy: 0,
+  altitude: 0,
+  altitudeAccuracy: 0,
+  heading: 0,
+  headingAccuracy: 0,
+  speed: 0,
+  speedAccuracy: 0,
+);
+bool _positionInit = false;
+
+Position get position {
+  return _position;
+}
+
+set position(Position p) {
+  _position = p;
+  _positionInit = true;
+}
+
+bool get positionInit => _positionInit;
+
 late proj4.Point pt;
 
 const Color colorAgroBioTech = Color.fromRGBO(185, 205, 118, 1.0);

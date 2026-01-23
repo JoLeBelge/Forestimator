@@ -496,12 +496,12 @@ class _MapPageState extends State<MapPage> {
                           ),
                           onMapReady: () async {
                             updateLocation();
-                            if (gl.position != null) {
+                            if (gl.positionInit) {
                               refreshView(() {
                                 _mapController.move(
                                   LatLng(
-                                    gl.position?.latitude ?? 0.0,
-                                    gl.position?.longitude ?? 0.0,
+                                    gl.position.latitude,
+                                    gl.position.longitude,
                                   ),
                                   _mapController.camera.zoom,
                                 );
@@ -651,8 +651,8 @@ class _MapPageState extends State<MapPage> {
                             <Widget>[
                               AnimatedLocationMarkerLayer(
                                 position: LocationMarkerPosition(
-                                  latitude: gl.position?.latitude ?? 0.0,
-                                  longitude: gl.position?.longitude ?? 0.0,
+                                  latitude: gl.position.latitude,
+                                  longitude: gl.position.longitude,
                                   accuracy: 10.0,
                                 ),
                               ),
@@ -811,6 +811,10 @@ class _MapPageState extends State<MapPage> {
                                                               .geometries[gl
                                                                   .selectedGeometry]
                                                               .visibleOnMap;
+                                                      gl
+                                                          .geometries[gl
+                                                              .selectedGeometry]
+                                                          .serialize();
                                                     }
                                                   });
                                                 },
@@ -2267,6 +2271,10 @@ class _MapPageState extends State<MapPage> {
                                                                   gl.Mode.editPointMarker =
                                                                       false;
                                                                 });
+                                                                gl
+                                                                    .geometries[gl
+                                                                        .selectedGeometry]
+                                                                    .serialize();
                                                               },
                                                               icon: Icon(
                                                                 Icons
@@ -2574,6 +2582,8 @@ class _MapPageState extends State<MapPage> {
                                                                       .selectedGeometry]
                                                                   .labelsVisibleOnMap = true;
                                                             });
+                                                            gl.geometries[i]
+                                                                .serialize();
                                                             gl
                                                                 .geometries[gl
                                                                     .selectedGeometry]
@@ -2597,12 +2607,50 @@ class _MapPageState extends State<MapPage> {
                                                           ),
                                                         ),
                                                       if (gl
-                                                          .geometries[gl
-                                                              .selectedGeometry]
-                                                          .points
-                                                          .isNotEmpty)
+                                                              .geometries[gl
+                                                                  .selectedGeometry]
+                                                              .points
+                                                              .isNotEmpty &&
+                                                          (!positionInsideViewRectangle(
+                                                                Position(
+                                                                  longitude:
+                                                                      gl
+                                                                          .geometries[gl
+                                                                              .selectedGeometry]
+                                                                          .center
+                                                                          .longitude,
+                                                                  latitude:
+                                                                      gl
+                                                                          .geometries[gl
+                                                                              .selectedGeometry]
+                                                                          .center
+                                                                          .latitude,
+                                                                  timestamp:
+                                                                      DateTime.now(),
+                                                                  accuracy: 0,
+                                                                  altitude: 0,
+                                                                  altitudeAccuracy:
+                                                                      0,
+                                                                  heading: 0,
+                                                                  headingAccuracy:
+                                                                      0,
+                                                                  speed: 0,
+                                                                  speedAccuracy:
+                                                                      0,
+                                                                ),
+                                                              ) ||
+                                                              !gl
+                                                                  .geometries[gl
+                                                                      .selectedGeometry]
+                                                                  .visibleOnMap))
                                                         IconButton(
                                                           onPressed: () {
+                                                            gl
+                                                                .geometries[gl
+                                                                    .selectedGeometry]
+                                                                .visibleOnMap = true;
+                                                            gl.geometries[i]
+                                                                .serialize();
                                                             setState(() {
                                                               if (gl
                                                                           .geometries[gl
@@ -2635,8 +2683,7 @@ class _MapPageState extends State<MapPage> {
                                                             );
                                                           },
                                                           icon: Icon(
-                                                            Icons
-                                                                .center_focus_strong_outlined,
+                                                            Icons.gps_fixed,
                                                             size:
                                                                 gl
                                                                     .display
@@ -2686,6 +2733,8 @@ class _MapPageState extends State<MapPage> {
                                                                 .geometries[gl
                                                                     .selectedGeometry]
                                                                 .visibleOnMap = true;
+                                                            gl.geometries[i]
+                                                                .serialize();
                                                             gl.Mode.editPolygon =
                                                                 !gl
                                                                     .Mode
@@ -3595,19 +3644,17 @@ class _MapPageState extends State<MapPage> {
     );
   }
 
-  bool positionMarkerInsideViewRectangle() =>
-      gl.position != null
-          ? _mapController.camera.visibleBounds.contains(
-            LatLng(gl.position!.latitude, gl.position!.longitude),
-          )
-          : false;
+  bool positionInsideViewRectangle(Position p) => _mapController
+      .camera
+      .visibleBounds
+      .contains(LatLng(p.latitude, p.longitude));
 
   Widget _toolBar() {
     double toolbarHeight = gl.iconSizeM * 2 + gl.iconSpaceBetween * 2;
     if (gl.modeDevelopper) {
       toolbarHeight += gl.iconSizeM + gl.iconSpaceBetween;
     }
-    if (positionMarkerInsideViewRectangle()) {
+    if (positionInsideViewRectangle(gl.position)) {
       toolbarHeight += gl.iconSizeM + gl.iconSpaceBetween;
     }
     return Column(
@@ -3627,13 +3674,13 @@ class _MapPageState extends State<MapPage> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    gl.position != null
+                    gl.positionInit
                         ? Card(
                           color: Colors.orange.withAlpha(128),
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [
-                              if (positionMarkerInsideViewRectangle())
+                              if (positionInsideViewRectangle(gl.position))
                                 IconButton(
                                   iconSize: gl.display.equipixel * gl.iconSizeM,
                                   color: gl.colorAgroBioTech,
@@ -3646,15 +3693,15 @@ class _MapPageState extends State<MapPage> {
                                         epsg4326.transform(
                                           epsg31370,
                                           proj4.Point(
-                                            x: gl.position?.longitude ?? 0.0,
-                                            y: gl.position?.latitude ?? 0.0,
+                                            x: gl.position.longitude,
+                                            y: gl.position.latitude,
                                           ),
                                         ),
                                       );
                                       _updatePtMarker(
                                         LatLng(
-                                          gl.position?.latitude ?? 0.0,
-                                          gl.position?.longitude ?? 0.0,
+                                          gl.position.latitude,
+                                          gl.position.longitude,
                                         ),
                                       );
                                       PopupAnaResultsMenu(
@@ -3675,12 +3722,12 @@ class _MapPageState extends State<MapPage> {
                                 iconSize: gl.display.equipixel * gl.iconSizeM,
                                 color: Colors.red,
                                 onPressed: () async {
-                                  if (gl.position != null) {
+                                  if (gl.positionInit) {
                                     refreshView(() {
                                       _mapController.move(
                                         LatLng(
-                                          gl.position?.latitude ?? 0.0,
-                                          gl.position?.longitude ?? 0.0,
+                                          gl.position.latitude,
+                                          gl.position.longitude,
                                         ),
                                         8,
                                       );
@@ -3699,7 +3746,7 @@ class _MapPageState extends State<MapPage> {
                               iconSize: gl.display.equipixel * gl.iconSizeM,
                               color: Colors.black,
                               onPressed: () async {
-                                if (gl.position != null) {
+                                if (gl.positionInit) {
                                   refreshView(() {});
                                 }
                               },
@@ -4284,7 +4331,7 @@ class _MapPageState extends State<MapPage> {
         Duration(seconds: 5),
         onTimeout: () {
           gl.print("Geolocator timeout reached!");
-          return gl.position!;
+          return gl.position;
         },
       );
 
