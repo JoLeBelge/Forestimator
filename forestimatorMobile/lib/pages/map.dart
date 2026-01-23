@@ -820,7 +820,8 @@ class _MapPageState extends State<MapPage> {
                                                                 .selectedGeometry]
                                                             .visibleOnMap
                                                         ? FaIcon(
-                                                          FontAwesomeIcons.eye,
+                                                          FontAwesomeIcons
+                                                              .eyeSlash,
                                                           size:
                                                               gl
                                                                   .display
@@ -830,8 +831,7 @@ class _MapPageState extends State<MapPage> {
                                                           color: Colors.white,
                                                         )
                                                         : FaIcon(
-                                                          FontAwesomeIcons
-                                                              .eyeSlash,
+                                                          FontAwesomeIcons.eye,
                                                           size:
                                                               gl
                                                                   .display
@@ -848,7 +848,7 @@ class _MapPageState extends State<MapPage> {
                                                     .5,
                                                 child: Stack(
                                                   children: [
-                                                    Column(
+                                                    Row(
                                                       children: [
                                                         Container(
                                                           alignment:
@@ -897,6 +897,13 @@ class _MapPageState extends State<MapPage> {
                                                                           .9,
                                                                     ),
                                                                   ),
+                                                        ),
+                                                        SizedBox(
+                                                          width:
+                                                              gl
+                                                                  .display
+                                                                  .equipixel *
+                                                              2,
                                                         ),
                                                         if (gl
                                                             .geometries[gl

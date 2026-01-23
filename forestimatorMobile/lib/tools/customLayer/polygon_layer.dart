@@ -2,7 +2,9 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 import 'package:area_polygon/area_polygon.dart';
+import 'package:fforestimator/dico/dico_apt.dart';
 import 'package:fforestimator/globals.dart' as gl;
+import 'package:fforestimator/pages/anaPt/requested_layer.dart';
 import 'package:fforestimator/tools/notification.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -473,6 +475,13 @@ class Geometry {
     return nChecked;
   }
 
+  bool containsAttribute(String name) {
+    for (Attribute a in attributes) {
+      if (a.name == name) return true;
+    }
+    return false;
+  }
+
   void serialize() async {
     await gl.shared!.setBool('$identifier.sent', sentToServer);
     await gl.shared!.setString('$identifier.name', name);
@@ -627,5 +636,68 @@ class Geometry {
       polykeys.remove(id);
       await gl.shared!.setStringList('polyKeys', polykeys);
     }
+  }
+
+  Future runAnaPt() async {
+    proj4.Point ptBL72 = epsg4326.transform(
+      epsg31370,
+      proj4.Point(x: points.first.longitude, y: points.first.latitude),
+    );
+    gl.requestedLayers.clear();
+    Map data;
+
+    gl.pt = ptBL72;
+
+    bool internet = await InternetConnection().hasInternetAccess;
+    if (!gl.offlineMode) {
+      if (internet) {
+        String layersAnaPt = "";
+        for (String lCode in gl.anaPtSelectedLayerKeys) {
+          if (gl.dico.getLayerBase(lCode).mCategorie != "Externe") {
+            layersAnaPt += "+$lCode";
+          }
+        }
+
+        String request =
+            "https://forestimator.gembloux.ulg.ac.be/api/anaPt/layers/$layersAnaPt/x/${ptBL72.x}/y/${ptBL72.y}";
+        try {
+          var res = await http.get(Uri.parse(request));
+          if (res.statusCode != 200) throw HttpException('${res.statusCode}');
+          data = jsonDecode(res.body);
+
+          // si pas de connexion internet, va tenter de lire data comme une map alors que c'est vide, erreur. donc dans le bloc try catch aussi
+          for (var r in data["RequestedLayers"]) {
+            gl.requestedLayers.add(LayerAnaPt.fromMap(r));
+          }
+        } catch (e) {
+          gl.print(request);
+          gl.print("$e");
+        }
+        gl.requestedLayers.removeWhere(
+          (element) => element.mFoundLayer == false,
+        );
+      } else {
+        gl.mainStack.add(popupNoInternet());
+      }
+    } else {
+      if (gl.dico.getLayersOffline().isEmpty) {
+        return;
+      }
+      for (LayerBase l in gl.dico.getLayersOffline()) {
+        int val = await l.getValXY(ptBL72);
+        gl.requestedLayers.add(LayerAnaPt(mCode: l.mCode, mRastValue: val));
+      }
+    }
+
+    // un peu radical mais me fait bugger mon affichage par la suite donc je retire
+    gl.requestedLayers.removeWhere((element) => element.mRastValue == 0);
+
+    // on les trie sur base des catégories de couches
+    gl.requestedLayers.sort(
+      (a, b) => gl.dico
+          .getLayerBase(a.mCode)
+          .mGroupe
+          .compareTo(gl.dico.getLayerBase(b.mCode).mGroupe),
+    );
   }
 }

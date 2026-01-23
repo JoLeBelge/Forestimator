@@ -18,6 +18,7 @@ import 'package:fforestimator/tools/pretty_print_nominatim_results.dart';
 import 'package:fforestimator/tools/pretty_print_polygon_results.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
@@ -25,11 +26,42 @@ import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:proj4dart/proj4dart.dart' as proj4;
 import 'package:url_launcher/url_launcher.dart';
 import 'package:intl/intl.dart';
 
 // A helper typedef: accepts a function to run inside a setter (used by global rebuild callbacks)
 typedef VoidSetter = void Function(void Function());
+
+//https://github.com/fleaflet/flutter_map/blob/master/example/lib/pages/custom_crs/custom_crs.dart
+proj4.Projection epsg4326 = proj4.Projection.get('EPSG:4326')!;
+// si epsg31370 est dans la db proj 4, on prend, sinon on définit
+proj4.Projection epsg31370 =
+    proj4.Projection.get('EPSG:31370') ??
+    proj4.Projection.add(
+      'EPSG:31370',
+      '+proj=lcc +lat_1=51.16666723333333 +lat_2=49.8333339 +lat_0=90 +lon_0=4.367486666666666 +x_0=150000.013 +y_0=5400088.438 +ellps=intl +towgs84=-106.8686,52.2978,-103.7239,0.3366,-0.457,1.8422,-1.2747 +units=m +no_defs +type=crs',
+    );
+// map extend in BL72.
+final epsg31370Bounds = Rect.fromPoints(
+  Offset(42250.0, 21170.0), // lower left
+  Offset(295170.0, 167700.0), // upper right
+);
+
+double tileSize = 256.0;
+
+List<double> getResolutions2(int nbZoom) {
+  // résolution numéro 1: une tile pour tout l'extend de la Wallonie
+  int maxResolution = 1280;
+  return List.generate(nbZoom, (z) => maxResolution / pow(2, z));
+}
+
+Proj4Crs epsg31370CRS = Proj4Crs.fromFactory(
+  code: 'EPSG:31370',
+  proj4Projection: epsg31370,
+  bounds: epsg31370Bounds,
+  resolutions: getResolutions2(15),
+);
 
 ButtonStyle dialogButtonStyle({
   double width = 0,
@@ -1897,6 +1929,7 @@ class _PolygonListMenu extends State<PolygonListMenu> {
   final Color inactive = const Color.fromARGB(255, 92, 92, 92);
   final ScrollController _controller = ScrollController();
   bool _keyboard = false;
+  bool _doingAnaPt = false;
 
   void _scrollDown() {
     _controller.animateTo(
@@ -1988,18 +2021,6 @@ class _PolygonListMenu extends State<PolygonListMenu> {
                 >.generate(gl.geometries.isEmpty ? 0 : gl.geometries.length, (
                   int i,
                 ) {
-                  Color activeTextColor =
-                      i == gl.selectedGeometry
-                          ? getColorTextFromBackground(
-                            i == gl.selectedGeometry
-                                ? gl.geometries[i].colorInside.withAlpha(255)
-                                : Colors.grey.withAlpha(100),
-                          )
-                          : getColorTextFromBackground(
-                            i == gl.selectedGeometry
-                                ? gl.geometries[i].colorInside.withAlpha(255)
-                                : Colors.grey.withAlpha(100),
-                          ).withAlpha(128);
                   return TextButton(
                     style: ButtonStyle(
                       fixedSize:
@@ -2057,340 +2078,520 @@ class _PolygonListMenu extends State<PolygonListMenu> {
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadiusGeometry.circular(12.0),
                             side:
-                                i == gl.selectedGeometry &&
-                                        gl.display.orientation ==
-                                            Orientation.portrait
-                                    ? BorderSide(
-                                      color: Colors.transparent,
-                                      width: 0.0,
-                                    )
-                                    : i == gl.selectedGeometry
+                                i == gl.selectedGeometry
                                     ? BorderSide(
                                       color: gl.geometries[i].colorInside
-                                          .withAlpha(100),
-                                      width: 2.0,
+                                          .withAlpha(255),
+                                      width: gl.display.equipixel * .75,
                                     )
                                     : BorderSide(
                                       color: gl.geometries[i].colorInside
-                                          .withAlpha(150),
-                                      width: 4.0,
+                                          .withAlpha(120),
+                                      width: gl.display.equipixel * .25,
                                     ),
                           ),
                           surfaceTintColor: Colors.transparent,
                           shadowColor: Colors.transparent,
-                          color:
-                              i == gl.selectedGeometry
-                                  ? gl.geometries[i].colorInside.withAlpha(255)
-                                  : Colors.grey.withAlpha(150),
+                          color: Colors.black.withAlpha(100),
                           child:
                               i != gl.selectedGeometry ||
                                       gl.display.orientation ==
                                           Orientation.landscape
                                   ? Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Container(
-                                        alignment: Alignment.center,
-                                        constraints: BoxConstraints(
-                                          maxWidth:
-                                              gl.display.orientation.index == 1
-                                                  ? gl.display.equipixel *
-                                                      gl.polyListCardWidth *
-                                                      .5
-                                                  : gl.display.equipixel *
-                                                      gl.polyListSelectedCardWidth *
-                                                      .5,
+                                      IconButton(
+                                        onPressed: () {
+                                          gl.refreshMainStack(() {
+                                            if (!gl.Mode.editPolygon) {
+                                              gl.geometries[i].visibleOnMap =
+                                                  !gl
+                                                      .geometries[i]
+                                                      .visibleOnMap;
+                                            }
+                                          });
+                                          setState(() {});
+                                        },
+                                        icon:
+                                            gl.geometries[i].visibleOnMap
+                                                ? FaIcon(
+                                                  FontAwesomeIcons.eyeSlash,
+                                                  size:
+                                                      gl.display.equipixel *
+                                                      gl.iconSizeS *
+                                                      .9,
+                                                  color: Colors.white,
+                                                )
+                                                : FaIcon(
+                                                  FontAwesomeIcons.eye,
+                                                  size:
+                                                      gl.display.equipixel *
+                                                      gl.iconSizeS *
+                                                      .9,
+                                                  color: Colors.white,
+                                                ),
+                                      ),
+                                      SizedBox(
+                                        width:
+                                            gl.display.equipixel *
+                                            gl.chosenPolyBarWidth *
+                                            .5,
+                                        child: Stack(
+                                          children: [
+                                            Row(
+                                              children: [
+                                                Container(
+                                                  alignment: Alignment.topLeft,
+                                                  child:
+                                                      gl.geometries[i].type ==
+                                                              "Point"
+                                                          ? Text(
+                                                            "POINT",
+                                                            style: TextStyle(
+                                                              color:
+                                                                  Colors.yellow,
+                                                              fontSize:
+                                                                  gl
+                                                                      .display
+                                                                      .equipixel *
+                                                                  gl.fontSizeXS *
+                                                                  .9,
+                                                            ),
+                                                          )
+                                                          : gl
+                                                                  .geometries[i]
+                                                                  .type ==
+                                                              "Polygon"
+                                                          ? Text(
+                                                            "POLY",
+                                                            style: TextStyle(
+                                                              color:
+                                                                  Colors.green,
+                                                              fontSize:
+                                                                  gl
+                                                                      .display
+                                                                      .equipixel *
+                                                                  gl.fontSizeXS *
+                                                                  .9,
+                                                            ),
+                                                          )
+                                                          : Text(
+                                                            "OHA?",
+                                                            style: TextStyle(
+                                                              color: Colors.red,
+                                                              fontSize:
+                                                                  gl
+                                                                      .display
+                                                                      .equipixel *
+                                                                  gl.fontSizeXS *
+                                                                  .9,
+                                                            ),
+                                                          ),
+                                                ),
+                                                SizedBox(
+                                                  width:
+                                                      gl.display.equipixel * 2,
+                                                ),
+                                                if (gl
+                                                    .geometries[i]
+                                                    .sentToServer)
+                                                  Container(
+                                                    alignment:
+                                                        Alignment.topLeft,
+                                                    child: Text(
+                                                      "SENT",
+                                                      style: TextStyle(
+                                                        color: Colors.red,
+                                                        fontSize:
+                                                            gl
+                                                                .display
+                                                                .equipixel *
+                                                            gl.fontSizeXS *
+                                                            .9,
+                                                      ),
+                                                    ),
+                                                  ),
+                                              ],
+                                            ),
+                                            Container(
+                                              alignment: Alignment.center,
+                                              child: SingleChildScrollView(
+                                                scrollDirection:
+                                                    Axis.horizontal,
+                                                child: Text(
+                                                  gl.geometries[i].name,
+                                                  textAlign: TextAlign.center,
+                                                  style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize:
+                                                        gl.display.equipixel *
+                                                        gl.fontSizeL,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
                                         ),
-                                        child: Text(
-                                          gl.geometries[i].name,
-                                          style: TextStyle(
-                                            color: Colors.black,
-                                            fontSize:
-                                                gl.display.equipixel *
-                                                gl.fontSizeM,
-                                          ),
+                                      ),
+                                      IconButton(
+                                        onPressed: () {
+                                          PopupColorChooser(
+                                            gl.geometries[i].colorInside,
+                                            gl.notificationContext!,
+                                            //change color
+                                            (Color col) {
+                                              setState(() {
+                                                gl.geometries[i].setColorInside(
+                                                  col,
+                                                );
+                                                gl.geometries[i].setColorLine(
+                                                  Color.fromRGBO(
+                                                    (col.r * 255).round(),
+                                                    (col.g * 255).round(),
+                                                    (col.b * 255).round(),
+                                                    1.0,
+                                                  ),
+                                                );
+                                              });
+                                            },
+                                            () {},
+                                            () {
+                                              gl.geometries[i].serialize();
+                                            },
+                                          );
+                                        },
+                                        icon: Icon(
+                                          Icons.color_lens,
+                                          color: gl.geometries[i].colorInside,
+                                          size:
+                                              gl.display.equipixel *
+                                              gl.iconSizeM *
+                                              .75,
                                         ),
                                       ),
                                     ],
                                   )
-                                  : Row(
+                                  : Column(
                                     mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
+                                        MainAxisAlignment.spaceAround,
                                     children: [
-                                      if (i == gl.selectedGeometry)
-                                        Container(
-                                          alignment: Alignment.center,
-                                          width:
-                                              gl.display.equipixel *
-                                              gl.iconSizeM *
-                                              1.1,
-                                          height:
-                                              gl.display.equipixel *
-                                              gl.iconSizeM *
-                                              1.1,
-                                          child: IconButton(
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          IconButton(
                                             onPressed: () {
-                                              PopupDoYouReally(
+                                              gl.refreshMainStack(() {
+                                                if (!gl.Mode.editPolygon) {
+                                                  gl
+                                                      .geometries[i]
+                                                      .visibleOnMap = !gl
+                                                          .geometries[i]
+                                                          .visibleOnMap;
+                                                }
+                                              });
+                                              setState(() {});
+                                            },
+                                            icon:
+                                                gl.geometries[i].visibleOnMap
+                                                    ? FaIcon(
+                                                      FontAwesomeIcons.eyeSlash,
+                                                      size:
+                                                          gl.display.equipixel *
+                                                          gl.iconSizeS *
+                                                          .9,
+                                                      color: Colors.white,
+                                                    )
+                                                    : FaIcon(
+                                                      FontAwesomeIcons.eye,
+                                                      size:
+                                                          gl.display.equipixel *
+                                                          gl.iconSizeS *
+                                                          .9,
+                                                      color: Colors.white,
+                                                    ),
+                                          ),
+                                          SizedBox(
+                                            width:
+                                                gl.display.equipixel *
+                                                gl.chosenPolyBarWidth *
+                                                .5,
+                                            child: Stack(
+                                              children: [
+                                                Row(
+                                                  children: [
+                                                    Container(
+                                                      alignment:
+                                                          Alignment.topLeft,
+                                                      child:
+                                                          gl.geometries[i].type ==
+                                                                  "Point"
+                                                              ? Text(
+                                                                "POINT",
+                                                                style: TextStyle(
+                                                                  color:
+                                                                      Colors
+                                                                          .yellow,
+                                                                  fontSize:
+                                                                      gl
+                                                                          .display
+                                                                          .equipixel *
+                                                                      gl.fontSizeXS *
+                                                                      .9,
+                                                                ),
+                                                              )
+                                                              : gl
+                                                                      .geometries[i]
+                                                                      .type ==
+                                                                  "Polygon"
+                                                              ? Text(
+                                                                "POLY",
+                                                                style: TextStyle(
+                                                                  color:
+                                                                      Colors
+                                                                          .green,
+                                                                  fontSize:
+                                                                      gl
+                                                                          .display
+                                                                          .equipixel *
+                                                                      gl.fontSizeXS *
+                                                                      .9,
+                                                                ),
+                                                              )
+                                                              : Text(
+                                                                "OHA?",
+                                                                style: TextStyle(
+                                                                  color:
+                                                                      Colors
+                                                                          .red,
+                                                                  fontSize:
+                                                                      gl
+                                                                          .display
+                                                                          .equipixel *
+                                                                      gl.fontSizeXS *
+                                                                      .9,
+                                                                ),
+                                                              ),
+                                                    ),
+                                                    SizedBox(
+                                                      width:
+                                                          gl.display.equipixel *
+                                                          2,
+                                                    ),
+                                                    if (gl
+                                                        .geometries[i]
+                                                        .sentToServer)
+                                                      Container(
+                                                        alignment:
+                                                            Alignment
+                                                                .bottomLeft,
+                                                        child: Text(
+                                                          "SENT",
+                                                          style: TextStyle(
+                                                            color: Colors.red,
+                                                            fontSize:
+                                                                gl
+                                                                    .display
+                                                                    .equipixel *
+                                                                gl.fontSizeXS *
+                                                                .9,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                  ],
+                                                ),
+                                                TextButton(
+                                                  style: ButtonStyle(
+                                                    animationDuration: Duration(
+                                                      seconds: 1,
+                                                    ),
+                                                    backgroundColor:
+                                                        WidgetStateProperty<
+                                                          Color
+                                                        >.fromMap(<
+                                                          WidgetStatesConstraint,
+                                                          Color
+                                                        >{
+                                                          WidgetState.any:
+                                                              Colors
+                                                                  .transparent,
+                                                        }),
+                                                    padding: WidgetStateProperty<
+                                                      EdgeInsetsGeometry
+                                                    >.fromMap(<
+                                                      WidgetStatesConstraint,
+                                                      EdgeInsetsGeometry
+                                                    >{
+                                                      WidgetState.any:
+                                                          EdgeInsetsGeometry
+                                                              .zero,
+                                                    }),
+                                                  ),
+                                                  onPressed: () {
+                                                    setState(() {
+                                                      PopupValueChange(
+                                                        "string",
+                                                        gl.geometries[i].name,
+                                                        (value) {
+                                                          gl
+                                                                  .geometries[i]
+                                                                  .name =
+                                                              value.toString();
+                                                        },
+                                                        () {},
+                                                        () {
+                                                          gl
+                                                              .geometries[gl
+                                                                  .selectedGeometry]
+                                                              .serialize();
+                                                        },
+                                                      );
+                                                    });
+                                                  },
+                                                  child: Container(
+                                                    alignment: Alignment.center,
+                                                    child: SingleChildScrollView(
+                                                      scrollDirection:
+                                                          Axis.horizontal,
+                                                      child: Text(
+                                                        gl.geometries[i].name,
+                                                        textAlign:
+                                                            TextAlign.center,
+                                                        style: TextStyle(
+                                                          color: Colors.white,
+                                                          fontSize:
+                                                              gl
+                                                                  .display
+                                                                  .equipixel *
+                                                              gl.fontSizeL,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          IconButton(
+                                            onPressed: () {
+                                              PopupColorChooser(
+                                                gl.geometries[i].colorInside,
                                                 gl.notificationContext!,
-                                                () {
+                                                //change color
+                                                (Color col) {
                                                   setState(() {
-                                                    Geometry.deleteLayerFromShared(
-                                                      gl.geometries[i].id,
-                                                    );
-                                                    if (i > 0) {
-                                                      gl.geometries.removeAt(i);
-                                                      gl.selectedGeometry--;
-                                                    } else if (i == 0 &&
-                                                        gl
-                                                            .geometries
-                                                            .isNotEmpty) {
-                                                      gl.geometries.removeAt(i);
-                                                    }
+                                                    gl.geometries[i]
+                                                        .setColorInside(col);
+                                                    gl.geometries[i]
+                                                        .setColorLine(
+                                                          Color.fromRGBO(
+                                                            (col.r * 255)
+                                                                .round(),
+                                                            (col.g * 255)
+                                                                .round(),
+                                                            (col.b * 255)
+                                                                .round(),
+                                                            1.0,
+                                                          ),
+                                                        );
                                                   });
                                                 },
-                                                "Message",
-                                                "\nVoulez vous vraiment supprimer ${gl.geometries[i].name}?\n",
+                                                () {},
+                                                () {
+                                                  gl.geometries[i].serialize();
+                                                },
                                               );
                                             },
                                             icon: Icon(
-                                              Icons.delete_forever,
-                                              color: activeTextColor,
+                                              Icons.color_lens,
+                                              color:
+                                                  gl.geometries[i].colorInside,
                                               size:
                                                   gl.display.equipixel *
                                                   gl.iconSizeM *
                                                   .75,
                                             ),
                                           ),
-                                        ),
-                                      SizedBox(
-                                        width:
-                                            gl.display.equipixel *
-                                            gl.polyListSelectedCardWidth *
-                                            .5,
-                                        height:
-                                            gl.display.equipixel *
-                                            gl.polyListSelectedCardHeight,
-
-                                        child: Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceEvenly,
-                                          children: [
-                                            TextButton(
-                                              child: Container(
-                                                constraints: BoxConstraints(
-                                                  maxHeight:
-                                                      gl.display.equipixel *
-                                                      gl.polyListSelectedCardHeight *
-                                                      .4,
-                                                  maxWidth:
-                                                      gl
-                                                                  .display
-                                                                  .orientation
-                                                                  .index ==
-                                                              1
-                                                          ? gl
-                                                                  .display
-                                                                  .equipixel *
-                                                              gl.polyListSelectedCardWidth *
-                                                              .5
-                                                          : gl
-                                                                  .display
-                                                                  .equipixel *
-                                                              gl.polyListCardWidth *
-                                                              .5,
-                                                ),
-                                                child: Text(
-                                                  gl.geometries[i].name,
-                                                  style: TextStyle(
-                                                    color: activeTextColor,
-                                                    fontSize:
-                                                        gl.display.equipixel *
-                                                        gl.fontSizeM,
+                                        ],
+                                      ),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Row(
+                                            children: [
+                                              if (gl.geometries[i]
+                                                      .containsAttribute(
+                                                        "essence",
+                                                      ) &&
+                                                  gl.geometries[i]
+                                                      .containsAttribute("rmq"))
+                                                IconButton(
+                                                  onPressed: () {
+                                                    if (gl
+                                                            .UserData
+                                                            .forename
+                                                            .isEmpty ||
+                                                        gl
+                                                            .UserData
+                                                            .name
+                                                            .isEmpty ||
+                                                        gl
+                                                            .UserData
+                                                            .mail
+                                                            .isEmpty) {
+                                                      PopupUserData(
+                                                        context,
+                                                        () {},
+                                                        () {
+                                                          PopupDoYouReally(
+                                                            context,
+                                                            () {
+                                                              gl.geometries[i]
+                                                                  .sendGeometryToServer();
+                                                            },
+                                                            "Attention !",
+                                                            "Vous pouvez envoyer un polygone seulement une fois! Même si vous le modifiez par après.",
+                                                          );
+                                                        },
+                                                        oldForename:
+                                                            gl
+                                                                .UserData
+                                                                .forename,
+                                                        oldName:
+                                                            gl.UserData.name,
+                                                        oldMail:
+                                                            gl.UserData.mail,
+                                                      );
+                                                    } else {
+                                                      PopupDoYouReally(
+                                                        context,
+                                                        () {
+                                                          gl.geometries[i]
+                                                              .sendGeometryToServer();
+                                                        },
+                                                        "Attention !",
+                                                        "Vous pouvez envoyer un polygone seulement une fois! Même si vous le modifiez par après.",
+                                                      );
+                                                    }
+                                                  },
+                                                  icon: Icon(
+                                                    Icons.send_and_archive,
+                                                    color: Colors.white,
+                                                    size:
+                                                        gl.iconSizeS *
+                                                        gl.display.equipixel,
                                                   ),
                                                 ),
-                                              ),
-                                              onPressed: () {
-                                                PopupNameIntroducer(
-                                                  context,
-                                                  gl.geometries[i].name,
-                                                  (String nameIt) {
-                                                    setState(() {
-                                                      gl.geometries[i].name =
-                                                          nameIt;
-                                                    });
-                                                  },
-                                                  () {
-                                                    setState(() {
-                                                      _keyboard = false;
-                                                    });
-                                                  },
-                                                  () {
-                                                    setState(() {
-                                                      _keyboard = true;
-                                                    });
-                                                  },
-                                                  () {
-                                                    gl.geometries[i]
-                                                        .serialize();
-                                                  },
-                                                );
-                                              },
-                                            ),
-                                            if (i == gl.selectedGeometry)
-                                              Text(
-                                                "${(gl.geometries[i].area / 100).round() / 100} Ha",
-                                                style: TextStyle(
-                                                  color: activeTextColor,
-                                                  fontSize:
-                                                      gl.display.equipixel *
-                                                      gl.fontSizeS *
-                                                      1.2,
-                                                ),
-                                              ),
-                                            if (i == gl.selectedGeometry)
-                                              Text(
-                                                "${(gl.geometries[i].perimeter).round() / 1000} km",
-                                                style: TextStyle(
-                                                  color: activeTextColor,
-                                                  fontSize:
-                                                      gl.display.equipixel *
-                                                      gl.fontSizeS *
-                                                      1.2,
-                                                ),
-                                              ),
-                                          ],
-                                        ),
-                                      ),
-                                      if (i == gl.selectedGeometry)
-                                        Container(
-                                          alignment: Alignment.center,
-                                          width:
-                                              gl.display.orientation.index ==
-                                                          1 &&
-                                                      i != gl.selectedGeometry
-                                                  ? 0.0
-                                                  : gl.display.equipixel *
-                                                      gl.iconSizeM *
-                                                      1.2,
-                                          child: Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceEvenly,
-                                            children: [
-                                              IconButton(
-                                                onPressed: () {
-                                                  if (gl
-                                                          .UserData
-                                                          .forename
-                                                          .isEmpty ||
-                                                      gl
-                                                          .UserData
-                                                          .name
-                                                          .isEmpty ||
-                                                      gl
-                                                          .UserData
-                                                          .mail
-                                                          .isEmpty) {
-                                                    PopupUserData(
-                                                      context,
-                                                      () {},
-                                                      () {
-                                                        PopupDoYouReally(
-                                                          context,
-                                                          () {
-                                                            gl
-                                                                .geometries[gl
-                                                                    .selectedGeometry]
-                                                                .sendGeometryToServer();
-                                                          },
-                                                          "Attention !",
-                                                          "Vous pouvez envoyer un polygone seulement une fois! Même si vous le modifiez par après.",
-                                                        );
-                                                      },
-                                                      oldForename:
-                                                          gl.UserData.forename,
-                                                      oldName: gl.UserData.name,
-                                                      oldMail: gl.UserData.mail,
-                                                    );
-                                                  } else {
-                                                    PopupDoYouReally(
-                                                      context,
-                                                      () {
-                                                        gl
-                                                            .geometries[gl
-                                                                .selectedGeometry]
-                                                            .sendGeometryToServer();
-                                                      },
-                                                      "Attention !",
-                                                      "Vous pouvez envoyer un polygone seulement une fois! Même si vous le modifiez par après.",
-                                                    );
-                                                  }
-                                                },
-                                                icon: Icon(
-                                                  Icons.send_and_archive,
-                                                  color: gl.colorAgroBioTech,
-                                                  size:
-                                                      gl.iconSizeS *
-                                                      gl.display.equipixel,
-                                                ),
-                                              ),
-                                              IconButton(
-                                                onPressed: () {
-                                                  PopupColorChooser(
-                                                    gl
-                                                        .geometries[i]
-                                                        .colorInside,
-                                                    gl.notificationContext!,
-                                                    //change color
-                                                    (Color col) {
-                                                      setState(() {
-                                                        gl.geometries[i]
-                                                            .setColorInside(
-                                                              col,
-                                                            );
-                                                        gl.geometries[i]
-                                                            .setColorLine(
-                                                              Color.fromRGBO(
-                                                                (col.r * 255)
-                                                                    .round(),
-                                                                (col.g * 255)
-                                                                    .round(),
-                                                                (col.b * 255)
-                                                                    .round(),
-                                                                1.0,
-                                                              ),
-                                                            );
-                                                      });
-                                                    },
-                                                    () {},
-                                                    () {
-                                                      gl.geometries[i]
-                                                          .serialize();
-                                                    },
-                                                  );
-                                                },
-                                                icon: Icon(
-                                                  Icons.color_lens,
-                                                  color: activeTextColor,
-                                                  size:
-                                                      gl.display.equipixel *
-                                                      gl.iconSizeM *
-                                                      .75,
-                                                ),
-                                              ),
-                                              SizedBox(
-                                                width:
-                                                    gl
-                                                                    .display
-                                                                    .orientation
-                                                                    .index ==
-                                                                1 &&
-                                                            i !=
-                                                                gl.selectedGeometry
-                                                        ? 0.0
-                                                        : gl.display.equipixel *
-                                                            gl.iconSizeM *
-                                                            1.2,
-                                                child: IconButton(
+                                              if (gl.geometries[i].type ==
+                                                      "Polygon" &&
+                                                  gl
+                                                          .geometries[i]
+                                                          .points
+                                                          .length >
+                                                      2)
+                                                IconButton(
                                                   onPressed: () async {
                                                     if (await gl.geometries[i]
                                                         .onlineSurfaceAnalysis()) {
@@ -2420,17 +2621,99 @@ class _PolygonListMenu extends State<PolygonListMenu> {
                                                   },
                                                   icon: Icon(
                                                     Icons.analytics,
-                                                    color: activeTextColor,
+                                                    color: Colors.white,
                                                     size:
                                                         gl.display.equipixel *
                                                         gl.iconSizeM *
                                                         .75,
                                                   ),
                                                 ),
-                                              ),
+                                              if (gl.geometries[i].type ==
+                                                      "Point" &&
+                                                  gl
+                                                      .geometries[i]
+                                                      .points
+                                                      .isNotEmpty)
+                                                IconButton(
+                                                  onPressed: () async {
+                                                    if (!_doingAnaPt) {
+                                                      _doingAnaPt = true;
+                                                      await gl.geometries[i]
+                                                          .runAnaPt();
+                                                      gl.refreshMainStack(() {
+                                                        PopupAnaResultsMenu(
+                                                          gl.notificationContext!,
+                                                          gl.requestedLayers,
+                                                          () {
+                                                            setState(() {});
+                                                          },
+                                                        );
+                                                      });
+
+                                                      _doingAnaPt = false;
+                                                    }
+                                                  },
+                                                  icon: Icon(
+                                                    Icons.location_pin,
+                                                    color: Colors.white,
+                                                    size:
+                                                        gl.display.equipixel *
+                                                        gl.iconSizeM *
+                                                        .75,
+                                                  ),
+                                                ),
                                             ],
                                           ),
-                                        ),
+                                          Container(
+                                            alignment: Alignment.center,
+                                            width:
+                                                gl.display.equipixel *
+                                                gl.iconSizeM *
+                                                1.1,
+                                            height:
+                                                gl.display.equipixel *
+                                                gl.iconSizeM *
+                                                1.1,
+                                            child: IconButton(
+                                              onPressed: () {
+                                                PopupDoYouReally(
+                                                  gl.notificationContext!,
+                                                  () {
+                                                    setState(() {
+                                                      Geometry.deleteLayerFromShared(
+                                                        gl.geometries[i].id,
+                                                      );
+                                                      if (i > 0) {
+                                                        gl.geometries.removeAt(
+                                                          i,
+                                                        );
+                                                        gl.selectedGeometry--;
+                                                      } else if (i == 0 &&
+                                                          gl
+                                                              .geometries
+                                                              .isNotEmpty) {
+                                                        gl.geometries.removeAt(
+                                                          i,
+                                                        );
+                                                      }
+                                                    });
+                                                  },
+                                                  "Message",
+                                                  "\nVoulez vous vraiment supprimer ${gl.geometries[i].name}?\n",
+                                                );
+                                              },
+                                              icon: Icon(
+                                                Icons.delete_forever,
+                                                color: Colors.white,
+                                                size:
+                                                    gl.display.equipixel *
+                                                    gl.iconSizeM *
+                                                    .75,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
                                     ],
                                   ),
                         ),

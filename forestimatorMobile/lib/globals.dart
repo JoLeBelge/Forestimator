@@ -20,7 +20,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 // TODO: Florentin BUG
 // TODO: Many Keyboard switch Bugs...
 // TODO: Some Widgets still dont adapt properly with rotation etc... Add missing constraints to size with equipixels.
-// TODO 2sec: rearrange poly menu
 typedef VoidSetter = void Function(void Function());
 
 const String forestimatorMobileVersion = "2.1.1 - build 24";
