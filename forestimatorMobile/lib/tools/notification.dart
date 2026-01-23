@@ -187,6 +187,54 @@ void dismissPopup({VoidCallback? after}) {
   if (after != null) after();
 }
 
+class PopupMessage {
+  PopupMessage(String title, String message) {
+    presentPopup(
+      dismiss: false,
+      popup: AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadiusGeometry.circular(12.0),
+          side: BorderSide(color: gl.colorAgroBioTech, width: 2.0),
+        ),
+        backgroundColor: Colors.white,
+        title: Row(
+          children: [
+            forestimatorIcon(),
+            Text(
+              title,
+              style: TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.w400,
+                fontSize: gl.display.equipixel * gl.fontSizeM,
+              ),
+            ),
+          ],
+        ),
+        content: Text(
+          message,
+          style: TextStyle(
+            color: Colors.black,
+            fontWeight: FontWeight.w400,
+            fontSize: gl.display.equipixel * gl.fontSizeS,
+          ),
+        ),
+        actions: [
+          TextButton(
+            style: dialogButtonStyle(
+              height: gl.display.equipixel * 12,
+              width: gl.display.equipixel * 20,
+            ),
+            child: Text("OK", style: dialogTextButtonStyle()),
+            onPressed: () {
+              dismissPopup();
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class PopupDownloadRecomendedLayers extends StatelessWidget {
   final String? title;
   final String? dialog;
@@ -1271,7 +1319,9 @@ class PopupNewAttribute {
                       ),
                       child: Text("Ajouter", style: dialogTextButtonStyle()),
                       onPressed: () {
+                        String nom = textEditor.text;
                         if (controlDuplicateAttributeName(textEditor.text)) {
+                          PopupMessage("Erreur", "Le nom $nom existe déja!");
                           return;
                         }
                         dismissPopup();
@@ -1310,7 +1360,6 @@ class PopupNewAttribute {
 
 class PopupValueChange {
   PopupValueChange(
-    BuildContext context,
     String type,
     dynamic oldValue,
     ValueChanged<dynamic> valueChanged,
@@ -1319,7 +1368,6 @@ class PopupValueChange {
   ) {
     TextEditingController textEditor = TextEditingController(text: oldValue);
     presentPopup(
-      context: context,
       dismiss: true,
       after: () {
         valueChanged(oldValue);
@@ -1357,7 +1405,6 @@ class PopupValueChange {
                   onChanged: (String str) {
                     switch (type) {
                       case "prop":
-                        textEditor.text = cleanAttributeName(str.toString());
                         valueChanged(textEditor.text);
                       case "string":
                         valueChanged(str.toString());
@@ -1488,85 +1535,91 @@ class _SelectAttributeType extends State<SelectAttributeType> {
   int _selectedType = 0;
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: [
-        Container(
-          width: gl.display.equipixel * gl.iconSizeM * 1.9,
-          height: gl.display.equipixel * gl.iconSizeM * 1.35,
-          color: _selectedType == 0 ? gl.colorAgroBioTech : Colors.transparent,
-          child: TextButton(
-            onPressed: () {
-              setState(() {
-                _selectedType = 0;
-              });
-              widget.typeChanged("string");
-            },
-            child: Column(
-              children: [
-                Icon(Icons.abc, color: Colors.white),
-                Text(
-                  "Charactères",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: gl.display.equipixel * gl.fontSizeXS,
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          Container(
+            width: gl.display.equipixel * gl.iconSizeM * 2.1,
+            height: gl.display.equipixel * gl.iconSizeM * 1.35,
+            color:
+                _selectedType == 0 ? gl.colorAgroBioTech : Colors.transparent,
+            child: TextButton(
+              onPressed: () {
+                setState(() {
+                  _selectedType = 0;
+                });
+                widget.typeChanged("string");
+              },
+              child: Column(
+                children: [
+                  Icon(Icons.abc, color: Colors.white),
+                  Text(
+                    "Charactères",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: gl.display.equipixel * gl.fontSizeXS,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
-        ),
-        Container(
-          width: gl.display.equipixel * gl.iconSizeM * 1.7,
-          height: gl.display.equipixel * gl.iconSizeM * 1.35,
-          color: _selectedType == 1 ? gl.colorAgroBioTech : Colors.transparent,
-          child: TextButton(
-            onPressed: () {
-              setState(() {
-                _selectedType = 1;
-              });
-              widget.typeChanged("int");
-            },
-            child: Column(
-              children: [
-                Icon(Icons.numbers, color: Colors.white),
-                Text(
-                  "Entièr",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: gl.display.equipixel * gl.fontSizeXS,
+          Container(
+            width: gl.display.equipixel * gl.iconSizeM * 1.5,
+            height: gl.display.equipixel * gl.iconSizeM * 1.35,
+            color:
+                _selectedType == 1 ? gl.colorAgroBioTech : Colors.transparent,
+            child: TextButton(
+              onPressed: () {
+                setState(() {
+                  _selectedType = 1;
+                });
+                widget.typeChanged("int");
+              },
+              child: Column(
+                children: [
+                  Icon(Icons.numbers, color: Colors.white),
+                  Text(
+                    "Entièr",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: gl.display.equipixel * gl.fontSizeXS,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
-        ),
-        Container(
-          width: gl.display.equipixel * gl.iconSizeM * 1.9,
-          height: gl.display.equipixel * gl.iconSizeM * 1.35,
-          color: _selectedType == 2 ? gl.colorAgroBioTech : Colors.transparent,
-          child: TextButton(
-            onPressed: () {
-              setState(() {
-                _selectedType = 2;
-              });
-              widget.typeChanged("double");
-            },
-            child: Column(
-              children: [
-                Icon(Icons.numbers, color: Colors.white),
-                Text(
-                  "Décimale",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: gl.display.equipixel * gl.fontSizeXS,
+          Container(
+            width: gl.display.equipixel * gl.iconSizeM * 1.7,
+            height: gl.display.equipixel * gl.iconSizeM * 1.35,
+            color:
+                _selectedType == 2 ? gl.colorAgroBioTech : Colors.transparent,
+            child: TextButton(
+              onPressed: () {
+                setState(() {
+                  _selectedType = 2;
+                });
+                widget.typeChanged("double");
+              },
+              child: Column(
+                children: [
+                  Icon(Icons.numbers, color: Colors.white),
+                  Text(
+                    "Décimale",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: gl.display.equipixel * gl.fontSizeXS,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
@@ -4357,7 +4410,6 @@ Widget forestimatorSettingsUserData() {
                     onPressed: () {},
                     onLongPress: () {
                       PopupValueChange(
-                        context,
                         "string",
                         gl.UserData.forename,
                         (value) {
@@ -4432,7 +4484,6 @@ Widget forestimatorSettingsUserData() {
                     onPressed: () {},
                     onLongPress: () {
                       PopupValueChange(
-                        context,
                         "string",
                         gl.UserData.name,
                         (value) {
@@ -4507,7 +4558,6 @@ Widget forestimatorSettingsUserData() {
                     onPressed: () {},
                     onLongPress: () {
                       PopupValueChange(
-                        context,
                         "string",
                         gl.UserData.mail,
                         (value) {

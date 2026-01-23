@@ -403,11 +403,11 @@ class _MapPageState extends State<MapPage> {
                                     refreshView(() {
                                       _stopMovingSelectedPoint();
                                       gl.Mode.showButtonAddVertexesPolygon =
-                                          false;
+                                          true;
                                       gl.Mode.showButtonMoveVertexesPolygon =
-                                          true;
+                                          false;
                                       gl.Mode.showButtonRemoveVertexesPolygon =
-                                          true;
+                                          false;
                                       gl.Mode.addVertexesPolygon = false;
                                       gl.Mode.moveVertexesPolygon = false;
                                       gl.Mode.removeVertexesPolygon = false;
@@ -851,7 +851,7 @@ class _MapPageState extends State<MapPage> {
                                                                   .equipixel *
                                                               gl.iconSizeS *
                                                               .9,
-                                                          color: Colors.white30,
+                                                          color: Colors.white,
                                                         ),
                                               ),
                                               SizedBox(
@@ -935,25 +935,27 @@ class _MapPageState extends State<MapPage> {
                                                           ),
                                                       ],
                                                     ),
-
                                                     Container(
                                                       alignment:
                                                           Alignment.center,
-                                                      child: Text(
-                                                        gl
-                                                            .polygonLayers[gl
-                                                                .selectedPolygonLayer]
-                                                            .name,
-                                                        textAlign:
-                                                            TextAlign.center,
-                                                        style: TextStyle(
-                                                          color: Colors.white,
-                                                          fontSize:
-                                                              gl
-                                                                  .display
-                                                                  .equipixel *
-                                                              gl.fontSizeM *
-                                                              .9,
+                                                      child: SingleChildScrollView(
+                                                        scrollDirection:
+                                                            Axis.horizontal,
+                                                        child: Text(
+                                                          gl
+                                                              .polygonLayers[gl
+                                                                  .selectedPolygonLayer]
+                                                              .name,
+                                                          textAlign:
+                                                              TextAlign.center,
+                                                          style: TextStyle(
+                                                            color: Colors.white,
+                                                            fontSize:
+                                                                gl
+                                                                    .display
+                                                                    .equipixel *
+                                                                gl.fontSizeL,
+                                                          ),
                                                         ),
                                                       ),
                                                     ),
@@ -971,52 +973,8 @@ class _MapPageState extends State<MapPage> {
                                                   FontAwesomeIcons.toolbox,
                                                   size:
                                                       gl.display.equipixel *
-                                                      gl.iconSizeS,
-                                                  color: Colors.white,
-                                                ),
-                                              ),
-                                              IconButton(
-                                                onPressed: () {
-                                                  gl.mainStack.add(
-                                                    popupPolygonListMenu(
-                                                      gl.notificationContext!,
-                                                      "",
-                                                      (LatLng pos) {
-                                                        if (pos.longitude !=
-                                                                0.0 &&
-                                                            pos.latitude !=
-                                                                0.0) {
-                                                          _mapController.move(
-                                                            pos,
-                                                            _mapController
-                                                                .camera
-                                                                .zoom,
-                                                          );
-                                                        }
-                                                      },
-                                                      () {
-                                                        refreshView(() {
-                                                          if (gl
-                                                              .polygonLayers
-                                                              .isNotEmpty) {
-                                                            gl.Mode.showButtonAddVertexesPolygon =
-                                                                true;
-                                                            gl.Mode.showButtonMoveVertexesPolygon =
-                                                                false;
-                                                            gl.Mode.showButtonRemoveVertexesPolygon =
-                                                                false;
-                                                          }
-                                                        });
-                                                      },
-                                                    ),
-                                                  );
-                                                  refreshView(() {});
-                                                },
-                                                icon: FaIcon(
-                                                  FontAwesomeIcons.list,
-                                                  size:
-                                                      gl.display.equipixel *
-                                                      gl.iconSizeS,
+                                                      gl.iconSizeS *
+                                                      .9,
                                                   color: Colors.white,
                                                 ),
                                               ),
@@ -1212,37 +1170,18 @@ class _MapPageState extends State<MapPage> {
                                                                       false;
                                                                   _stopMovingSelectedPoint();
                                                                   refreshView(() {
-                                                                    if (gl
-                                                                        .polygonLayers[gl
-                                                                            .selectedPolygonLayer]
-                                                                        .polygonPoints
-                                                                        .isEmpty) {
-                                                                      gl.Mode.showButtonAddVertexesPolygon =
-                                                                          true;
-                                                                      gl.Mode.showButtonMoveVertexesPolygon =
-                                                                          false;
-                                                                      gl.Mode.showButtonRemoveVertexesPolygon =
-                                                                          false;
-                                                                      gl.Mode.addVertexesPolygon =
-                                                                          false;
-                                                                      gl.Mode.moveVertexesPolygon =
-                                                                          false;
-                                                                      gl.Mode.removeVertexesPolygon =
-                                                                          false;
-                                                                    } else {
-                                                                      gl.Mode.showButtonAddVertexesPolygon =
-                                                                          false;
-                                                                      gl.Mode.showButtonMoveVertexesPolygon =
-                                                                          true;
-                                                                      gl.Mode.showButtonRemoveVertexesPolygon =
-                                                                          true;
-                                                                      gl.Mode.addVertexesPolygon =
-                                                                          false;
-                                                                      gl.Mode.moveVertexesPolygon =
-                                                                          false;
-                                                                      gl.Mode.removeVertexesPolygon =
-                                                                          false;
-                                                                    }
+                                                                    gl.Mode.showButtonAddVertexesPolygon =
+                                                                        true;
+                                                                    gl.Mode.showButtonMoveVertexesPolygon =
+                                                                        false;
+                                                                    gl.Mode.showButtonRemoveVertexesPolygon =
+                                                                        false;
+                                                                    gl.Mode.addVertexesPolygon =
+                                                                        false;
+                                                                    gl.Mode.moveVertexesPolygon =
+                                                                        false;
+                                                                    gl.Mode.removeVertexesPolygon =
+                                                                        false;
                                                                   });
                                                                 }
                                                               },
@@ -1405,6 +1344,18 @@ class _MapPageState extends State<MapPage> {
                                                                 } else {
                                                                   refreshView(() {
                                                                     _stopMovingSelectedPoint();
+                                                                    gl.Mode.showButtonAddVertexesPolygon =
+                                                                        true;
+                                                                    gl.Mode.showButtonMoveVertexesPolygon =
+                                                                        false;
+                                                                    gl.Mode.showButtonRemoveVertexesPolygon =
+                                                                        false;
+                                                                    gl.Mode.addVertexesPolygon =
+                                                                        false;
+                                                                    gl.Mode.moveVertexesPolygon =
+                                                                        false;
+                                                                    gl.Mode.removeVertexesPolygon =
+                                                                        false;
                                                                   });
                                                                 }
                                                               },
@@ -1792,7 +1743,7 @@ class _MapPageState extends State<MapPage> {
                                                                                                   color:
                                                                                                       Colors.yellow,
                                                                                                   fontSize:
-                                                                                                      gl.fontSizeXS *
+                                                                                                      gl.fontSizeXXS *
                                                                                                       gl.display.equipixel,
                                                                                                 ),
                                                                                               )
@@ -1804,7 +1755,7 @@ class _MapPageState extends State<MapPage> {
                                                                                                   color:
                                                                                                       Colors.lightBlue,
                                                                                                   fontSize:
-                                                                                                      gl.fontSizeXS *
+                                                                                                      gl.fontSizeXXS *
                                                                                                       gl.display.equipixel,
                                                                                                 ),
                                                                                               )
@@ -1816,7 +1767,7 @@ class _MapPageState extends State<MapPage> {
                                                                                                   color:
                                                                                                       Colors.red,
                                                                                                   fontSize:
-                                                                                                      gl.fontSizeXS *
+                                                                                                      gl.fontSizeXXS *
                                                                                                       gl.display.equipixel,
                                                                                                 ),
                                                                                               )
@@ -1826,7 +1777,7 @@ class _MapPageState extends State<MapPage> {
                                                                                                   color:
                                                                                                       Colors.green,
                                                                                                   fontSize:
-                                                                                                      gl.fontSizeXS *
+                                                                                                      gl.fontSizeXXS *
                                                                                                       gl.display.equipixel,
                                                                                                 ),
                                                                                               ),
@@ -1951,19 +1902,26 @@ class _MapPageState extends State<MapPage> {
                                                                                         () {},
                                                                                     onLongPress: () {
                                                                                       PopupValueChange(
-                                                                                        context,
                                                                                         "prop",
                                                                                         gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].name,
                                                                                         (
                                                                                           value,
                                                                                         ) {
-                                                                                          gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].name = value;
+                                                                                          gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].name = cleanAttributeName(
+                                                                                            value.toString(),
+                                                                                          );
                                                                                         },
                                                                                         () {},
                                                                                         () {
+                                                                                          String nom =
+                                                                                              gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].name;
                                                                                           if (controlDuplicateAttributeName(
                                                                                             gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].name,
                                                                                           )) {
+                                                                                            PopupMessage(
+                                                                                              "Erreur",
+                                                                                              "Le nom $nom existe déja!",
+                                                                                            );
                                                                                             return;
                                                                                           } else {
                                                                                             gl.polygonLayers[gl.selectedPolygonLayer].serialize();
@@ -2040,7 +1998,6 @@ class _MapPageState extends State<MapPage> {
                                                                                         () {},
                                                                                     onLongPress: () {
                                                                                       PopupValueChange(
-                                                                                        context,
                                                                                         gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].type,
                                                                                         gl.polygonLayers[gl.selectedPolygonLayer].attributes[i].value,
                                                                                         (
@@ -3412,50 +3369,45 @@ class _MapPageState extends State<MapPage> {
                         isSelected: gl.Mode.polygon,
                         onPressed: () {
                           setState(() {
-                            gl.Mode.polygon = !gl.Mode.polygon;
-                            if (gl.Mode.polygon) {
-                              if (gl.polygonLayers.isNotEmpty &&
-                                  gl.Mode.polygon &&
-                                  gl.Mode.editPolygon &&
-                                  gl.selectedPolygonLayer > -1) {
-                                gl.Mode.showButtonAddVertexesPolygon = true;
-                              }
-                              _closeSwitchesMenu();
-                              _closeToolbarMenu();
-                              gl.mainStack.add(
-                                popupPolygonListMenu(
-                                  gl.notificationContext!,
-                                  "",
-                                  (LatLng pos) {
-                                    if (pos.longitude != 0.0 &&
-                                        pos.latitude != 0.0) {
-                                      _mapController.move(
-                                        pos,
-                                        _mapController.camera.zoom,
-                                      );
-                                    }
-                                  },
-                                  () {
-                                    refreshView(() {
-                                      if (gl.polygonLayers.isNotEmpty &&
-                                          gl.Mode.editPolygon) {
-                                        gl.Mode.showButtonAddVertexesPolygon =
-                                            true;
-                                        gl.Mode.showButtonMoveVertexesPolygon =
-                                            false;
-                                        gl.Mode.showButtonRemoveVertexesPolygon =
-                                            false;
-                                      }
-                                    });
-                                  },
-                                ),
-                              );
-                              if (dummy) {
-                                close!();
-                              }
-                            } else {
-                              _closePolygonMenu();
+                            gl.Mode.polygon = true;
+                            _closeSwitchesMenu();
+                            _closeToolbarMenu();
+                            if (dummy) {
+                              close!();
                             }
+                            gl.mainStack.add(
+                              popupPolygonListMenu(
+                                gl.notificationContext!,
+                                "",
+                                (LatLng pos) {
+                                  if (pos.longitude != 0.0 &&
+                                      pos.latitude != 0.0) {
+                                    _mapController.move(
+                                      pos,
+                                      _mapController.camera.zoom,
+                                    );
+                                  }
+                                },
+                                () {
+                                  refreshView(() {
+                                    if (gl.polygonLayers.isNotEmpty &&
+                                        gl.Mode.editPolygon) {
+                                      gl.Mode.showButtonAddVertexesPolygon =
+                                          true;
+                                      gl.Mode.showButtonMoveVertexesPolygon =
+                                          false;
+                                      gl.Mode.showButtonRemoveVertexesPolygon =
+                                          false;
+                                    }
+                                  });
+                                },
+                              ),
+                            );
+                          });
+                        },
+                        onLongPress: () {
+                          refreshView(() {
+                            _closePolygonMenu();
                           });
                         },
                         icon: Icon(Icons.hexagon_outlined),
@@ -4217,7 +4169,6 @@ class _MapPageState extends State<MapPage> {
     }
   }
 
-  //TODO: dummy does not open poly menu when switcher opened
   static bool _refreshLocation = false;
 
   void updateLocation() async {
@@ -4263,7 +4214,7 @@ class _MapPageState extends State<MapPage> {
                 "FIXED",
                 style: TextStyle(
                   color: Colors.grey,
-                  fontSize: gl.fontSizeXS * gl.display.equipixel,
+                  fontSize: gl.fontSizeXXS * gl.display.equipixel,
                 ),
               ),
             ),

@@ -11,7 +11,17 @@ import 'package:proj4dart/proj4dart.dart' as proj4;
 import 'package:latlong2/latlong.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-// A helper typedef used across the app for setters that accept a function to run
+// TODO optional: remove global variable notificationContext for clarity and proper stack usage
+// TODO: select poly and points by clicking on the map
+// TODO: Change explanation text in toolbox when: add vertex is selected etc...
+// TODO: When a point exists, automatically activate remove or move when editing
+// TODO: add color dots with symbols for points
+// TODO: Debug color bug when creating a new poly and selecting a color.
+// TODO: Bug in Permission menu occurs only on real device?
+// TODO: Florentin BUG
+// TODO: Many Keyboard switch Bugs...
+// TODO: Some Widgets still dont adapt properly with rotation etc... Add missing constraints to size with equipixels.
+// TODO: rearrange poly menu
 typedef VoidSetter = void Function(void Function());
 
 const String forestimatorMobileVersion = "2.1.1 - build 24";
@@ -197,24 +207,27 @@ double topAppForestimatorFontWidth = 60;
 // PopupWindows
 double popupWindowsPortraitWidth = minEquiPixelsDisplayPortraitWidth - 5;
 double popupWindowsPortraitHeight =
-    minEquiPixelsDisplayPortraitHeight - topAppInfoBarThickness - 20;
+    minEquiPixelsDisplayPortraitHeight - topAppInfoBarThickness - 5;
 double popupWindowsLandscapeWidth = minEquiPixelsDisplayLandscapeWidth - 5;
 double popupWindowsLandscapeHeight =
-    minEquiPixelsDisplayLandscapeHeight - topAppInfoBarThickness - 10;
+    minEquiPixelsDisplayLandscapeHeight - topAppInfoBarThickness - 5;
 double popupReturnButtonHeight = 16;
 double popupReturnButtonWidth = 52;
 // Menus
 double menuBarThickness = 20;
 double menuBarLength = 65;
+double iconSizeXXS = 4;
 double iconSizeXS = 6;
 double iconSizeS = 9;
 double iconSizeM = 12;
+double iconSizeL = 15;
 double iconSizeSettings = 8;
 double iconSpaceBetween = 8;
 // Offline loading box
 double loadingMapBoxWidth = 70;
 double loadingMapBoxHeight = 15;
 // General Fonts
+double fontSizeXXS = 2.5;
 double fontSizeXS = 3;
 double fontSizeS = 4;
 double fontSizeM = 5;
