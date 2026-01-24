@@ -30,6 +30,7 @@ class MapPage extends StatefulWidget {
 
 class _MapPageState extends State<MapPage> {
   final _mapController = MapController();
+  final LayerHitNotifier<String> hitNotifier = ValueNotifier(null);
   LatLng? _pt;
   bool _doingAnaPt = false;
 
@@ -303,6 +304,7 @@ class _MapPageState extends State<MapPage> {
           body: OrientationBuilder(
             builder: (context, orientation) {
               return Stack(
+                alignment: AlignmentGeometry.bottomCenter,
                 children:
                     [
                       FlutterMap(
@@ -691,7 +693,6 @@ class _MapPageState extends State<MapPage> {
                                         ),
                                       ],
                                     ),
-
                                   CircleLayer(
                                     circles: _drawnLayerPointsCircleMarker(),
                                   ),
@@ -725,11 +726,40 @@ class _MapPageState extends State<MapPage> {
                                 ]
                                 : <Widget>[
                                   if (gl.modeMapShowPolygons)
-                                    PolygonLayer(
-                                      polygons: _getPolygonesToDraw(),
+                                    MouseRegion(
+                                      hitTestBehavior:
+                                          HitTestBehavior.deferToChild,
+                                      cursor: SystemMouseCursors.click,
+                                      child: GestureDetector(
+                                        onTap: () {
+                                          final LayerHitResult<String>? result =
+                                              hitNotifier.value;
+                                          if (result == null) return;
+                                          int index = 0;
+                                          if (gl.Mode.openToolbox) {
+                                            for (var it in gl.geometries) {
+                                              if (result.hitValues.first ==
+                                                  it.identifier) {
+                                                setState(() {
+                                                  gl.selectedGeometry = index;
+                                                });
+                                              }
+                                              index++;
+                                            }
+                                          }
+                                        },
+                                        child: PolygonLayer<String>(
+                                          hitNotifier: hitNotifier,
+                                          polygons: _getPolygonesToDraw(),
+                                        ),
+                                      ),
                                     ),
                                   if (gl.modeMapShowPolygons)
-                                    MarkerLayer(markers: _getPointsToDraw()),
+                                    MarkerLayer(
+                                      markers: _getPointsToDraw(
+                                        hitButton: true,
+                                      ),
+                                    ),
                                 ]) +
                             <Widget>[
                               MarkerLayer(
@@ -2406,28 +2436,28 @@ class _MapPageState extends State<MapPage> {
                                                               TextButton
                                                             >.generate(
                                                               gl
-                                                                  .predefinedPointPalette
+                                                                  .predefinedPointSymbPalette
                                                                   .length,
                                                               (int k) {
                                                                 return TextButton(
                                                                   onPressed: () {
                                                                     refreshView(() {
                                                                       gl.geometries[gl.selectedGeometry].setColorInside(
-                                                                        gl.predefinedPointPalette[k]
+                                                                        gl.predefinedPointSymbPalette[k]
                                                                             .withAlpha(
                                                                               150,
                                                                             ),
                                                                       );
                                                                       gl.geometries[gl.selectedGeometry]
                                                                           .setColorLine(
-                                                                            gl.predefinedPointPalette[k],
+                                                                            gl.predefinedPointSymbPalette[k],
                                                                           );
                                                                     });
                                                                   },
                                                                   child: CircleAvatar(
                                                                     backgroundColor:
                                                                         gl.geometries[gl.selectedGeometry].colorPolygon ==
-                                                                                gl.predefinedPointPalette[k]
+                                                                                gl.predefinedPointSymbPalette[k]
                                                                             ? Colors.white
                                                                             : Colors.transparent,
                                                                     radius:
@@ -2442,7 +2472,7 @@ class _MapPageState extends State<MapPage> {
                                                                           gl.iconSizeXS *
                                                                           .85,
                                                                       backgroundColor:
-                                                                          gl.predefinedPointPalette[k],
+                                                                          gl.predefinedPointSymbPalette[k],
                                                                     ),
                                                                   ),
                                                                 );
@@ -2611,7 +2641,7 @@ class _MapPageState extends State<MapPage> {
                                                                   .selectedGeometry]
                                                               .points
                                                               .isNotEmpty &&
-                                                          (!positionInsideViewRectangle(
+                                                          (!_positionInsideViewRectangle(
                                                                 Position(
                                                                   longitude:
                                                                       gl
@@ -2886,14 +2916,13 @@ class _MapPageState extends State<MapPage> {
                             ],
                           )
                           : Column(),
-
                       _mainMenuBar(),
                       if (_toolbarExtended) _toolBar(),
                     ] +
                     gl.mainStack +
                     [
                       if (gl.modeDevelopper && gl.Mode.debugScanlines)
-                        scanlines(),
+                        gridlines(),
                     ],
               );
             },
@@ -2920,20 +2949,27 @@ class _MapPageState extends State<MapPage> {
     _selectedPointToMove = null;
   }
 
-  List<Polygon> _getPolygonesToDraw() {
-    List<Polygon> that = [];
+  List<Polygon<String>> _getPolygonesToDraw() {
+    List<Polygon<String>> that = [];
     for (var layer in gl.geometries) {
       if (layer.numPoints > 2 &&
           layer.visibleOnMap &&
           layer.type == "Polygon") {
-        that.add(Polygon(points: layer.points, color: layer.colorInside));
+        that.add(
+          Polygon<String>(
+            points: layer.points,
+            color: layer.colorInside,
+            hitValue: layer.identifier,
+          ),
+        );
       }
     }
     return that;
   }
 
-  List<Marker> _getPointsToDraw() {
+  List<Marker> _getPointsToDraw({bool hitButton = false}) {
     List<Marker> that = [];
+
     for (var layer in gl.geometries) {
       gl.selectableIcons[layer.selectedPointIcon];
       if (layer.visibleOnMap && layer.numPoints > 0 && layer.type == "Point") {
@@ -2943,11 +2979,35 @@ class _MapPageState extends State<MapPage> {
               layer.points.first.latitude,
               layer.points.first.longitude,
             ),
-            child: Icon(
-              gl.selectableIcons[layer.selectedPointIcon],
-              size: layer.iconSize * gl.display.equipixel,
-              color: layer.colorLine,
-            ),
+            child:
+                hitButton
+                    ? IconButton(
+                      onPressed: () {
+                        if (gl.Mode.openToolbox) {
+                          setState(() {
+                            int index = 0;
+                            for (var it in gl.geometries) {
+                              if (layer.identifier == it.identifier) {
+                                setState(() {
+                                  gl.selectedGeometry = index;
+                                });
+                              }
+                              index++;
+                            }
+                          });
+                        }
+                      },
+                      icon: Icon(
+                        gl.selectableIcons[layer.selectedPointIcon],
+                        size: layer.iconSize * gl.display.equipixel,
+                        color: layer.colorLine,
+                      ),
+                    )
+                    : Icon(
+                      gl.selectableIcons[layer.selectedPointIcon],
+                      size: layer.iconSize * gl.display.equipixel,
+                      color: layer.colorLine,
+                    ),
           ),
         );
       }
@@ -3446,215 +3506,204 @@ class _MapPageState extends State<MapPage> {
   }
 
   Widget _mainMenuBar({bool dummy = false, VoidCallback? close}) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-        Row(
-          mainAxisAlignment:
-              gl.display.orientation == Orientation.portrait
-                  ? MainAxisAlignment.center
-                  : MainAxisAlignment.end,
+    return Container(
+      alignment: Alignment.center,
+      width: gl.display.equipixel * gl.menuBarLength,
+      height: gl.display.equipixel * gl.menuBarThickness,
+      child: Card(
+        shadowColor: Colors.transparent,
+        color: dummy ? Colors.transparent : gl.backgroundTransparentBlackBox,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            Container(
-              alignment: Alignment.center,
-              constraints: BoxConstraints(
-                maxHeight: gl.display.equipixel * gl.menuBarThickness,
-                minHeight: gl.display.equipixel * gl.menuBarThickness,
-                maxWidth: gl.display.equipixel * gl.menuBarLength,
+            _menuButton(
+              gl.display.equipixel * gl.menuBarLength / 4,
+              gl.display.equipixel * gl.menuBarThickness,
+              dummy
+                  ? Colors.transparent
+                  : !_toolbarExtended
+                  ? Colors.transparent
+                  : Colors.green.withAlpha(128),
+              dummy
+                  ? Colors.transparent
+                  : _toolbarExtended
+                  ? Colors.white
+                  : Colors.green,
+              _toolbarExtended,
+              () {},
+              () {
+                setState(() {
+                  _toolbarExtended = !_toolbarExtended;
+                  if (_toolbarExtended) {
+                    _closePolygonMenu();
+                    _closeSwitchesMenu();
+                    if (dummy) {
+                      close!();
+                    }
+                  } else {
+                    _closeToolbarMenu();
+                  }
+                });
+              },
+              Icon(
+                Icons.forest,
+                size: gl.display.equipixel * gl.menuBarLength / 5,
               ),
-              child: Card(
-                shadowColor: Colors.transparent,
-                color:
-                    dummy
-                        ? Colors.transparent
-                        : gl.backgroundTransparentBlackBox,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    Container(
-                      color:
-                          dummy
-                              ? Colors.transparent
-                              : !_toolbarExtended
-                              ? Colors.transparent
-                              : Colors.green.withAlpha(128),
-                      child: IconButton(
-                        color:
-                            dummy
-                                ? Colors.transparent
-                                : _toolbarExtended
-                                ? Colors.white
-                                : Colors.green,
-                        iconSize: gl.display.equipixel * gl.iconSizeM,
-                        isSelected: _toolbarExtended,
-                        onPressed: () {
-                          setState(() {
-                            _toolbarExtended = !_toolbarExtended;
-                            if (_toolbarExtended) {
-                              _closePolygonMenu();
-                              _closeSwitchesMenu();
-                              if (dummy) {
-                                close!();
-                              }
-                            } else {
-                              _closeToolbarMenu();
-                            }
-                          });
-                        },
-                        icon: Icon(Icons.forest),
-                      ),
+            ),
+            _menuButton(
+              gl.display.equipixel * gl.menuBarLength / 4,
+              gl.display.equipixel * gl.menuBarThickness,
+              dummy
+                  ? Colors.transparent
+                  : !gl.Mode.polygon
+                  ? Colors.transparent
+                  : Colors.yellow.withAlpha(128),
+              dummy
+                  ? Colors.transparent
+                  : gl.Mode.polygon
+                  ? Colors.white
+                  : Colors.yellow,
+              gl.Mode.polygon,
+              () {},
+              () {
+                setState(() {
+                  gl.Mode.polygon = true;
+                  _closeSwitchesMenu();
+                  _closeToolbarMenu();
+                  if (dummy) {
+                    close!();
+                  }
+                  gl.mainStack.add(
+                    popupPolygonListMenu(
+                      gl.notificationContext!,
+                      "",
+                      (LatLng pos) {
+                        if (pos.longitude != 0.0 && pos.latitude != 0.0) {
+                          _mapController.move(pos, _mapController.camera.zoom);
+                        }
+                      },
+                      () {
+                        refreshView(() {
+                          if (gl.geometries.isNotEmpty && gl.Mode.editPolygon) {
+                            gl.Mode.showButtonAddVertexesPolygon = true;
+                            gl.Mode.showButtonMoveVertexesPolygon = false;
+                            gl.Mode.showButtonRemoveVertexesPolygon = false;
+                          }
+                        });
+                      },
                     ),
-                    Container(
-                      color:
-                          dummy
-                              ? Colors.transparent
-                              : !gl.Mode.polygon
-                              ? Colors.transparent
-                              : Colors.yellow.withAlpha(128),
-                      child: IconButton(
-                        color:
-                            dummy
-                                ? Colors.transparent
-                                : gl.Mode.polygon
-                                ? Colors.white
-                                : Colors.yellow,
-                        iconSize: gl.display.equipixel * gl.iconSizeM,
-                        isSelected: gl.Mode.polygon,
-                        onPressed: () {
-                          setState(() {
-                            gl.Mode.polygon = true;
-                            _closeSwitchesMenu();
-                            _closeToolbarMenu();
-                            if (dummy) {
-                              close!();
-                            }
-                            gl.mainStack.add(
-                              popupPolygonListMenu(
-                                gl.notificationContext!,
-                                "",
-                                (LatLng pos) {
-                                  if (pos.longitude != 0.0 &&
-                                      pos.latitude != 0.0) {
-                                    _mapController.move(
-                                      pos,
-                                      _mapController.camera.zoom,
-                                    );
-                                  }
-                                },
-                                () {
-                                  refreshView(() {
-                                    if (gl.geometries.isNotEmpty &&
-                                        gl.Mode.editPolygon) {
-                                      gl.Mode.showButtonAddVertexesPolygon =
-                                          true;
-                                      gl.Mode.showButtonMoveVertexesPolygon =
-                                          false;
-                                      gl.Mode.showButtonRemoveVertexesPolygon =
-                                          false;
-                                    }
-                                  });
-                                },
-                              ),
-                            );
-                          });
-                        },
-                        onLongPress: () {
-                          refreshView(() {
-                            _closePolygonMenu();
-                          });
-                        },
-                        icon: Icon(Icons.hexagon_outlined),
-                      ),
+                  );
+                });
+              },
+              Icon(
+                Icons.hexagon_outlined,
+                size: gl.display.equipixel * gl.menuBarLength / 5,
+              ),
+            ),
+            _menuButton(
+              dummy: dummy,
+              gl.display.equipixel * gl.menuBarLength / 4,
+              gl.display.equipixel * gl.menuBarThickness,
+              !_modeLayerSwitches
+                  ? Colors.transparent
+                  : Colors.brown.withAlpha(128),
+              _modeLayerSwitches ? Colors.white : Colors.brown,
+              _modeLayerSwitches,
+              () {
+                setState(() {
+                  _modeLayerSwitches = false;
+                  _closeSwitchesMenu();
+                  if (dummy) {
+                    close!();
+                  }
+                });
+              },
+              () {
+                setState(() {
+                  _modeLayerSwitches = true;
+                  _closePolygonMenu();
+                  _closeToolbarMenu();
+                  gl.mainStack.add(
+                    popupLayerSwitcher(
+                      gl.notificationContext!,
+                      () {
+                        setState(() {
+                          _closeSwitchesMenu();
+                        });
+                      },
+                      (close) {
+                        return _mainMenuBar(dummy: true, close: close);
+                      },
+                      (LatLng pos) {
+                        if (pos.longitude != 0.0 && pos.latitude != 0.0) {
+                          _mapController.move(pos, _mapController.camera.zoom);
+                        }
+                      },
                     ),
-                    dummy
-                        ? Container(
-                          color: Colors.transparent,
-                          width: gl.display.equipixel * gl.menuBarThickness,
-                          height: gl.display.equipixel * gl.menuBarThickness,
-                          child: IconButton(
-                            color: Colors.transparent,
-                            iconSize: gl.display.equipixel * gl.iconSizeM,
-                            isSelected: _modeLayerSwitches,
-                            onPressed: () {
-                              setState(() {
-                                _modeLayerSwitches = false;
-                                _closeSwitchesMenu();
-                                if (dummy) {
-                                  close!();
-                                }
-                              });
-                            },
-                            icon: Icon(Icons.remove_red_eye),
-                          ),
-                        )
-                        : Container(
-                          color:
-                              !_modeLayerSwitches
-                                  ? Colors.transparent
-                                  : Colors.brown.withAlpha(128),
-                          child: IconButton(
-                            color:
-                                _modeLayerSwitches
-                                    ? Colors.white
-                                    : Colors.brown,
-                            iconSize: gl.display.equipixel * gl.iconSizeM,
-                            isSelected: _modeLayerSwitches,
-                            onPressed: () {
-                              setState(() {
-                                _modeLayerSwitches = true;
-                                _closePolygonMenu();
-                                _closeToolbarMenu();
-                                gl.mainStack.add(
-                                  popupLayerSwitcher(
-                                    gl.notificationContext!,
-                                    () {
-                                      setState(() {
-                                        _closeSwitchesMenu();
-                                      });
-                                    },
-                                    (close) {
-                                      return _mainMenuBar(
-                                        dummy: true,
-                                        close: close,
-                                      );
-                                    },
-                                    (LatLng pos) {
-                                      if (pos.longitude != 0.0 &&
-                                          pos.latitude != 0.0) {
-                                        _mapController.move(
-                                          pos,
-                                          _mapController.camera.zoom,
-                                        );
-                                      }
-                                    },
-                                  ),
-                                );
-                              });
-                            },
-                            icon: Icon(Icons.remove_red_eye),
-                          ),
-                        ),
-                  ],
-                ),
+                  );
+                });
+              },
+              Icon(
+                Icons.remove_red_eye,
+                size: gl.display.equipixel * gl.menuBarLength / 5,
               ),
             ),
           ],
         ),
-      ],
+      ),
     );
   }
 
-  bool positionInsideViewRectangle(Position p) => _mapController
-      .camera
-      .visibleBounds
-      .contains(LatLng(p.latitude, p.longitude));
+  Widget _menuButton(
+    double width,
+    double height,
+    Color borderColor,
+    Color color,
+    bool isSelected,
+    VoidCallback dummyClose,
+    VoidCallback onPressed,
+    Icon icon, {
+    bool dummy = false,
+  }) {
+    return Container(
+      width: width,
+      height: height,
+      color: borderColor,
+      child: IconButton(
+        style: ButtonStyle(
+          shape: WidgetStateProperty.fromMap(
+            <WidgetStatesConstraint, ContinuousRectangleBorder>{
+              WidgetState.any: ContinuousRectangleBorder(),
+            },
+          ),
+          alignment: AlignmentGeometry.center,
+          padding: WidgetStateProperty.fromMap(
+            <WidgetStatesConstraint, EdgeInsetsGeometry>{
+              WidgetState.any: EdgeInsetsGeometry.zero,
+            },
+          ),
+        ),
+        color: color,
+        isSelected: isSelected,
+        onPressed: () {
+          dummy ? dummyClose() : onPressed();
+        },
+        onLongPress: () {
+          refreshView(() {
+            _closePolygonMenu();
+          });
+        },
+        icon: icon,
+      ),
+    );
+  }
 
   Widget _toolBar() {
     double toolbarHeight = gl.iconSizeM * 2 + gl.iconSpaceBetween * 2;
     if (gl.modeDevelopper) {
       toolbarHeight += gl.iconSizeM + gl.iconSpaceBetween;
     }
-    if (positionInsideViewRectangle(gl.position)) {
+    if (_positionInsideViewRectangle(gl.position)) {
       toolbarHeight += gl.iconSizeM + gl.iconSpaceBetween;
     }
     return Column(
@@ -3680,7 +3729,7 @@ class _MapPageState extends State<MapPage> {
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [
-                              if (positionInsideViewRectangle(gl.position))
+                              if (_positionInsideViewRectangle(gl.position))
                                 IconButton(
                                   iconSize: gl.display.equipixel * gl.iconSizeM,
                                   color: gl.colorAgroBioTech,
@@ -4436,6 +4485,11 @@ class _MapPageState extends State<MapPage> {
       ],
     );
   }
+
+  bool _positionInsideViewRectangle(Position p) => _mapController
+      .camera
+      .visibleBounds
+      .contains(LatLng(p.latitude, p.longitude));
 }
 
 Future<Position?> acquireUserLocation() async {

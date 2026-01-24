@@ -69,7 +69,7 @@ Widget stroke(
       );
 }
 
-Widget scanlines() {
+Widget gridlines() {
   double equiPixelPerLine = gl.display.equipixel * 4;
   return Stack(
     children:

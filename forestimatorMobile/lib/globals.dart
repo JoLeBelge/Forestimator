@@ -12,18 +12,16 @@ import 'package:latlong2/latlong.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 // TODO optional: remove global variable notificationContext for clarity and proper stack usage
-// TODO: select poly and points by clicking on the map
 // TODO: Change explanation text in toolbox when: add vertex is selected etc...
 // TODO: When a point exists, automatically activate remove or move when editing
 // TODO: Debug color bug when creating a new poly and selecting a color.
-// TODO: Bug in Permission menu occurs only on real device?
 // TODO: Florentin BUG
 // TODO: Many Keyboard switch Bugs...
 // TODO: Some Widgets still dont adapt properly with rotation etc... Add missing constraints to size with equipixels.
 // TODO: Add bounding box
 typedef VoidSetter = void Function(void Function());
 
-const String forestimatorMobileVersion = "2.1.1 - build 24";
+const String forestimatorMobileVersion = "2.2.0 - build 25";
 const double globalMinZoom = 4.0;
 const double globalMaxZoom = 13.0;
 const double globalMinOfflineZoom = 8.0;
@@ -50,7 +48,7 @@ class UserData {
     await shared!.setStringList('UserDATA', <String>[name, forename, mail]);
   }
 
-  static void loadFromPrefs() {
+  static void deserialize() {
     List<String> data = shared!.getStringList('UserDATA') ?? ["", "", ""];
     name = data[0];
     forename = data[1];
@@ -115,8 +113,8 @@ class Display {
     dpi = MediaQuery.of(context).devicePixelRatio;
     orientation = MediaQuery.of(context).orientation;
 
-    _tabletMode();
-    _squareMode();
+    //_tabletMode();
+    //_squareMode();
     _enforceEquiWidthHeight();
     if (Mode.square || Mode.overrideModeSquare) {
       minEquiPixelsDisplayLandscapeHeight =
@@ -132,10 +130,10 @@ class Display {
         dpi < 1.55 && dpi * (width < height ? width : height) > 1000 ||
         Mode.overrideModeTablet) {
       if (!Mode.tablet) {
-        minEquiPixelsDisplayPortraitWidth = 150;
-        minEquiPixelsDisplayPortraitHeight = 300;
-        minEquiPixelsDisplayLandscapeWidth = 300;
-        minEquiPixelsDisplayLandscapeHeight = 150;
+        minEquiPixelsDisplayPortraitWidth = 125;
+        minEquiPixelsDisplayPortraitHeight = 250;
+        minEquiPixelsDisplayLandscapeWidth = 250;
+        minEquiPixelsDisplayLandscapeHeight = 125;
         Mode.tablet = true;
       }
     } else {
@@ -783,20 +781,34 @@ void mainStackPopLast() {
 }
 
 List<IconData> selectableIcons = [
+  Icons.square_outlined,
+  Icons.circle,
+  Icons.gps_fixed,
+  Icons.location_pin,
+  Icons.park,
   Icons.forest,
   CustomIcons.mountain,
   CustomIcons.tree,
   CustomIcons.soil,
   CustomIcons.forest,
-  Icons.circle,
   FontAwesomeIcons.tree,
   FontAwesomeIcons.mountain,
   FontAwesomeIcons.locationPin,
   FontAwesomeIcons.mapLocation,
   FontAwesomeIcons.locationArrow,
+  FontAwesomeIcons.cross,
+  FontAwesomeIcons.bolt,
+  FontAwesomeIcons.flutter,
+  FontAwesomeIcons.dog,
+  FontAwesomeIcons.trash,
+  FontAwesomeIcons.faceLaugh,
+  FontAwesomeIcons.fire,
+  FontAwesomeIcons.solidFlag,
+  FontAwesomeIcons.spaghettiMonsterFlying,
+  FontAwesomeIcons.crop,
 ];
 
-List<Color> predefinedPointPalette = [
+List<Color> predefinedPointSymbPalette = [
   Colors.black,
   Colors.green,
   Colors.yellow,

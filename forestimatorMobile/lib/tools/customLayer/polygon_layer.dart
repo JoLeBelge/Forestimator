@@ -29,6 +29,7 @@ class Attribute {
 class Geometry {
   String identifier = UniqueKey().toString();
   bool sentToServer = false;
+  String hitValue = UniqueKey().toString();
   String type = "Point";
   String name = "";
   bool visibleOnMap = true;

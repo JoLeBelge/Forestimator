@@ -2848,7 +2848,9 @@ class _PolygonListMenu extends State<PolygonListMenu> {
               ),
           ],
         ),
-        if (gl.display.orientation == Orientation.landscape && !_keyboard)
+        if (gl.display.orientation == Orientation.landscape &&
+            !_keyboard &&
+            gl.selectedGeometry > -1)
           Column(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
@@ -5183,68 +5185,53 @@ Widget forestimatorSettingsPermissions(VoidSetter state) {
     child: Column(
       children: [
         Container(
-          constraints: BoxConstraints(
-            maxWidth:
-                gl.display.equipixel * gl.popupWindowsPortraitWidth * 0.95,
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Text(
-                "Gestion des permissions",
-                overflow: TextOverflow.clip,
-                textAlign: TextAlign.left,
-                style: styleSettingMenu(),
-              ),
-            ],
+          alignment: Alignment.center,
+          child: Text(
+            "Gestion des permissions",
+            overflow: TextOverflow.clip,
+            textAlign: TextAlign.left,
+            style: styleSettingMenu(),
           ),
         ),
-        Container(
-          constraints: BoxConstraints(
-            maxWidth:
-                gl.display.equipixel * gl.popupWindowsPortraitWidth * 0.95,
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Flexible(
-                child: Text(
-                  "GPS: ",
-                  overflow: TextOverflow.clip,
-                  textAlign: TextAlign.left,
-                  style: styleSettingMenu(),
-                ),
-              ),
-              TextButton(
-                onPressed: () {
-                  openPhoneForestimatorSettings();
-                },
-                child: Flexible(
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        getLocation()
-                            ? Icons.check_circle
-                            : Icons.circle_notifications,
-                        color: getLocation() ? Colors.green : Colors.red,
-                        size: gl.display.equipixel * gl.iconSizeM * .6,
-                      ),
-                      Flexible(
-                        child: Text(
-                          getLocation() ? "Accordé." : "Pas accordé.",
-                          overflow: TextOverflow.clip,
-                          textAlign: TextAlign.left,
-                          style: styleSettingMenu(),
-                        ),
-                      ),
-                    ],
+        stroke(
+          gl.display.equipixel,
+          gl.display.equipixel * .5,
+          gl.colorAgroBioTech,
+        ),
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Text(
+              "GPS: ",
+              overflow: TextOverflow.clip,
+              textAlign: TextAlign.left,
+              style: styleSettingMenu(),
+            ),
+            TextButton(
+              onPressed: () {
+                openPhoneForestimatorSettings();
+              },
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    getLocation()
+                        ? Icons.check_circle
+                        : Icons.circle_notifications,
+                    color: getLocation() ? Colors.green : Colors.red,
+                    size: gl.display.equipixel * gl.iconSizeM * .6,
                   ),
-                ),
+                  Text(
+                    getLocation() ? "Accordé." : "Pas accordé.",
+                    overflow: TextOverflow.clip,
+                    textAlign: TextAlign.left,
+                    style: styleSettingMenu(),
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
         if (permissions.sdkInt < 33)
           Container(
@@ -5276,13 +5263,11 @@ Widget forestimatorSettingsPermissions(VoidSetter state) {
                         color: getStorage() ? Colors.green : Colors.red,
                         size: gl.display.equipixel * gl.iconSizeM * .6,
                       ),
-                      Flexible(
-                        child: Text(
-                          getStorage() ? "Accordé." : "Pas accordé.",
-                          overflow: TextOverflow.clip,
-                          textAlign: TextAlign.left,
-                          style: styleSettingMenu(),
-                        ),
+                      Text(
+                        getStorage() ? "Accordé." : "Pas accordé.",
+                        overflow: TextOverflow.clip,
+                        textAlign: TextAlign.left,
+                        style: styleSettingMenu(),
                       ),
                     ],
                   ),
