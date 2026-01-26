@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
+import 'package:dart_jts/dart_jts.dart' hide Orientation, Geometry, Key;
 import 'package:fforestimator/dico/dico_apt.dart';
 import 'package:fforestimator/globals.dart' as gl;
 import 'package:fforestimator/myicons.dart';
@@ -357,7 +358,7 @@ Widget popupGeometryAlreadySent() {
       ],
     ),
     content: Text(
-      "Vous avez déja envoyé cette Géométrie.",
+      "Vous nous avez déja envoyé cette entité.",
       style: TextStyle(
         color: Colors.black,
         fontWeight: FontWeight.w400,
@@ -2552,7 +2553,9 @@ class _PolygonListMenu extends State<PolygonListMenu> {
                                                                   .sendGeometryToServer();
                                                             },
                                                             "Attention !",
-                                                            "Vous pouvez envoyer un polygone seulement une fois! Même si vous le modifiez par après.",
+                                                            gl.labelSendCompoFeature,
+                                                            "Envoyer",
+                                                            "Ne pas envoyer",
                                                           );
                                                         },
                                                         oldForename:
@@ -2572,7 +2575,9 @@ class _PolygonListMenu extends State<PolygonListMenu> {
                                                               .sendGeometryToServer();
                                                         },
                                                         "Attention !",
-                                                        "Vous pouvez envoyer un polygone seulement une fois! Même si vous le modifiez par après.",
+                                                        gl.labelSendCompoFeature,
+                                                        "Envoyer",
+                                                        "Ne pas envoyer",
                                                       );
                                                     }
                                                   },
@@ -8518,12 +8523,16 @@ class _SwitcherBox extends State<SwitcherBox> {
 }
 
 class PopupDoYouReally {
+  String labelYes;
+  String labelNo;
   PopupDoYouReally(
     BuildContext context,
     VoidCallback after,
     String title,
-    String message,
-  ) {
+    String message, [
+    this.labelYes = "Oui",
+    this.labelNo = "Non",
+  ]) {
     presentPopup(
       context: context,
       dismiss: true,
@@ -8583,7 +8592,7 @@ class PopupDoYouReally {
                 dismissPopup(after: after);
               },
               child: Text(
-                "Oui",
+                labelYes,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: Colors.black,
@@ -8608,7 +8617,7 @@ class PopupDoYouReally {
                   minWidth: gl.dyrButtonsize * 1.25 * gl.display.equipixel,
                 ),
                 child: Text(
-                  "Non",
+                  labelNo,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Colors.black,

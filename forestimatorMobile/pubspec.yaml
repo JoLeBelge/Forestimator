@@ -21,7 +21,7 @@ dependencies:
   connectivity_plus: ^7.0.0 # te dis si tu es connecté au wifi ou à la data, mais pas si tu as accès à internet. pas suffisant donc
   internet_connection_checker_plus: ^2.3.0
   latlong2: ^0.9.0
-  go_router: ^16.2.1
+  go_router: ^17.0.1
   flutter_pdfview: ^1.2.7
   flutter_map_location_marker: ^10.1.0
   image: ^4.5.4
