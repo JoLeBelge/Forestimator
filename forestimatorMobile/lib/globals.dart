@@ -13,12 +13,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 // TODO optional: remove global variable notificationContext for clarity and proper stack usage
 // TODO: Change explanation text in toolbox when: add vertex is selected etc...
-// TODO: When a point exists, automatically activate remove or move when editing
-// TODO: Debug color bug when creating a new poly and selecting a color.
 // TODO: Florentin BUG
 // TODO: Many Keyboard switch Bugs...
 // TODO: Some Widgets still dont adapt properly with rotation etc... Add missing constraints to size with equipixels.
-// TODO: Add bounding box
+// TODO: Add bounding box as properties & map view
 typedef VoidSetter = void Function(void Function());
 
 const String forestimatorMobileVersion = "2.2.0 - build 25";
@@ -72,6 +70,7 @@ class Mode {
   static bool openToolbox = false;
   static bool editAttributes = false;
   static bool editPolygon = false;
+  static bool editPoint = false;
   static bool editPointMarker = false;
   static bool addVertexesPolygon = false;
   static bool moveVertexesPolygon = false;

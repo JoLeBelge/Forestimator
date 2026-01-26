@@ -365,16 +365,7 @@ class _MapPageState extends State<MapPage> {
                                   }
                                   : gl.Mode.addVertexesPolygon
                                   ? (tapPosition, point) async => {
-                                    if (gl
-                                                .geometries[gl.selectedGeometry]
-                                                .type ==
-                                            "Point" &&
-                                        gl
-                                                .geometries[gl.selectedGeometry]
-                                                .numPoints ==
-                                            1)
-                                      {gl.Mode.addVertexesPolygon = false}
-                                    else if (gl.geometries.isNotEmpty)
+                                    if (gl.geometries.isNotEmpty)
                                       {
                                         if (_isPolygonWellDefined(
                                           gl.geometries[gl.selectedGeometry]
@@ -385,6 +376,36 @@ class _MapPageState extends State<MapPage> {
                                               gl.geometries[gl.selectedGeometry]
                                                   .addPoint(point);
                                             }),
+                                            if (gl
+                                                        .geometries[gl
+                                                            .selectedGeometry]
+                                                        .type ==
+                                                    "Point" &&
+                                                gl
+                                                        .geometries[gl
+                                                            .selectedGeometry]
+                                                        .numPoints ==
+                                                    1)
+                                              {
+                                                refreshView(() {
+                                                  gl
+                                                      .geometries[gl
+                                                          .selectedGeometry]
+                                                      .selectedVertex = 0;
+                                                  gl.Mode.showButtonAddVertexesPolygon =
+                                                      false;
+                                                  gl.Mode.showButtonMoveVertexesPolygon =
+                                                      true;
+                                                  gl.Mode.showButtonRemoveVertexesPolygon =
+                                                      true;
+                                                  gl.Mode.addVertexesPolygon =
+                                                      false;
+                                                  gl.Mode.moveVertexesPolygon =
+                                                      false;
+                                                  gl.Mode.removeVertexesPolygon =
+                                                      false;
+                                                }),
+                                              },
                                           }
                                         else
                                           {
@@ -398,31 +419,45 @@ class _MapPageState extends State<MapPage> {
                                   ? (tapPosition, point) async => {
                                     refreshView(() {
                                       _stopMovingSelectedPoint();
-                                      gl.Mode.showButtonAddVertexesPolygon =
-                                          true;
-                                      gl.Mode.showButtonMoveVertexesPolygon =
-                                          false;
-                                      gl.Mode.showButtonRemoveVertexesPolygon =
-                                          false;
-                                      gl.Mode.addVertexesPolygon = false;
-                                      gl.Mode.moveVertexesPolygon = false;
-                                      gl.Mode.removeVertexesPolygon = false;
+                                      if (gl
+                                                  .geometries[gl
+                                                      .selectedGeometry]
+                                                  .type ==
+                                              "Point" &&
+                                          gl
+                                                  .geometries[gl
+                                                      .selectedGeometry]
+                                                  .numPoints ==
+                                              1) {
+                                        refreshView(() {
+                                          gl
+                                              .geometries[gl.selectedGeometry]
+                                              .selectedVertex = 0;
+                                          gl.Mode.showButtonAddVertexesPolygon =
+                                              false;
+                                          gl.Mode.showButtonMoveVertexesPolygon =
+                                              true;
+                                          gl.Mode.showButtonRemoveVertexesPolygon =
+                                              true;
+                                          gl.Mode.addVertexesPolygon = false;
+                                          gl.Mode.moveVertexesPolygon = false;
+                                          gl.Mode.removeVertexesPolygon = false;
+                                        });
+                                      } else {
+                                        gl.Mode.showButtonAddVertexesPolygon =
+                                            true;
+                                        gl.Mode.showButtonMoveVertexesPolygon =
+                                            false;
+                                        gl.Mode.showButtonRemoveVertexesPolygon =
+                                            false;
+                                        gl.Mode.addVertexesPolygon = false;
+                                        gl.Mode.moveVertexesPolygon = false;
+                                        gl.Mode.removeVertexesPolygon = false;
+                                      }
                                     }),
                                   }
                                   : gl.Mode.editPolygon
-                                  ? (tapPosition, point) async => {
-                                    refreshView(() {
-                                      gl.Mode.showButtonAddVertexesPolygon =
-                                          true;
-                                      gl.Mode.showButtonMoveVertexesPolygon =
-                                          false;
-                                      gl.Mode.showButtonRemoveVertexesPolygon =
-                                          false;
-                                      gl.Mode.addVertexesPolygon = false;
-                                      gl.Mode.moveVertexesPolygon = false;
-                                      gl.Mode.removeVertexesPolygon = false;
-                                    }),
-                                  }
+                                  ? (tapPosition, point) async => {}
                                   : (tapPosition, point) async => {
                                     _lastPressWasShort = true,
                                     _updatePtMarker(point),
@@ -724,42 +759,47 @@ class _MapPageState extends State<MapPage> {
                                       ],
                                     ),
                                 ]
-                                : <Widget>[
-                                  if (gl.modeMapShowPolygons)
-                                    MouseRegion(
-                                      hitTestBehavior:
-                                          HitTestBehavior.deferToChild,
-                                      cursor: SystemMouseCursors.click,
-                                      child: GestureDetector(
-                                        onTap: () {
-                                          final LayerHitResult<String>? result =
-                                              hitNotifier.value;
-                                          if (result == null) return;
-                                          int index = 0;
-                                          if (gl.Mode.openToolbox) {
-                                            for (var it in gl.geometries) {
-                                              if (result.hitValues.first ==
-                                                  it.identifier) {
-                                                setState(() {
-                                                  gl.selectedGeometry = index;
-                                                });
-                                              }
-                                              index++;
+                                : (gl.modeMapShowPolygons && gl.Mode.polygon)
+                                ? <Widget>[
+                                  MouseRegion(
+                                    hitTestBehavior:
+                                        HitTestBehavior.deferToChild,
+                                    cursor: SystemMouseCursors.click,
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        final LayerHitResult<String>? result =
+                                            hitNotifier.value;
+                                        if (result == null) return;
+                                        int index = 0;
+                                        if (gl.Mode.openToolbox) {
+                                          for (var it in gl.geometries) {
+                                            if (result.hitValues.first ==
+                                                it.identifier) {
+                                              setState(() {
+                                                gl.selectedGeometry = index;
+                                              });
                                             }
+                                            index++;
                                           }
-                                        },
-                                        child: PolygonLayer<String>(
-                                          hitNotifier: hitNotifier,
-                                          polygons: _getPolygonesToDraw(),
-                                        ),
+                                        }
+                                      },
+                                      child: PolygonLayer<String>(
+                                        hitNotifier: hitNotifier,
+                                        polygons: _getPolygonesToDraw(),
                                       ),
                                     ),
-                                  if (gl.modeMapShowPolygons)
-                                    MarkerLayer(
-                                      markers: _getPointsToDraw(
-                                        hitButton: true,
-                                      ),
-                                    ),
+                                  ),
+                                  MarkerLayer(
+                                    markers: _getPointsToDraw(hitButton: true),
+                                  ),
+                                ]
+                                : <Widget>[
+                                  PolygonLayer<String>(
+                                    polygons: _getPolygonesToDraw(),
+                                  ),
+                                  MarkerLayer(
+                                    markers: _getPointsToDraw(hitButton: false),
+                                  ),
                                 ]) +
                             <Widget>[
                               MarkerLayer(
@@ -800,18 +840,13 @@ class _MapPageState extends State<MapPage> {
                                         ? MainAxisAlignment.center
                                         : MainAxisAlignment.start,
                                 children: [
-                                  Container(
+                                  SizedBox(
                                     width:
                                         gl.display.equipixel *
                                         gl.chosenPolyBarWidth,
-                                    constraints: BoxConstraints(
-                                      minHeight:
-                                          gl.display.equipixel *
-                                          computePolygonTitleHeight(),
-                                      maxHeight:
-                                          gl.display.equipixel *
-                                          computePolygonTitleHeight(),
-                                    ),
+                                    height:
+                                        gl.display.equipixel *
+                                        computePolygonTitleHeight(),
                                     child: Card(
                                       shape: RoundedRectangleBorder(
                                         borderRadius:
@@ -830,50 +865,60 @@ class _MapPageState extends State<MapPage> {
                                             mainAxisAlignment:
                                                 MainAxisAlignment.spaceAround,
                                             children: [
-                                              IconButton(
-                                                onPressed: () {
-                                                  refreshView(() {
-                                                    if (!gl.Mode.editPolygon) {
-                                                      gl
-                                                          .geometries[gl
-                                                              .selectedGeometry]
-                                                          .visibleOnMap = !gl
-                                                              .geometries[gl
-                                                                  .selectedGeometry]
-                                                              .visibleOnMap;
-                                                      gl
-                                                          .geometries[gl
-                                                              .selectedGeometry]
-                                                          .serialize();
-                                                    }
-                                                  });
-                                                },
-                                                icon:
-                                                    gl
+                                              SizedBox(
+                                                height:
+                                                    gl.display.equipixel *
+                                                    gl.iconSizeM *
+                                                    .9,
+                                                child: IconButton(
+                                                  style: borderlessStyle,
+                                                  onPressed: () {
+                                                    refreshView(() {
+                                                      if (!gl
+                                                          .Mode
+                                                          .editPolygon) {
+                                                        gl
                                                             .geometries[gl
                                                                 .selectedGeometry]
-                                                            .visibleOnMap
-                                                        ? FaIcon(
-                                                          FontAwesomeIcons
-                                                              .eyeSlash,
-                                                          size:
-                                                              gl
-                                                                  .display
-                                                                  .equipixel *
-                                                              gl.iconSizeS *
-                                                              .9,
-                                                          color: Colors.white,
-                                                        )
-                                                        : FaIcon(
-                                                          FontAwesomeIcons.eye,
-                                                          size:
-                                                              gl
-                                                                  .display
-                                                                  .equipixel *
-                                                              gl.iconSizeS *
-                                                              .9,
-                                                          color: Colors.white,
-                                                        ),
+                                                            .visibleOnMap = !gl
+                                                                .geometries[gl
+                                                                    .selectedGeometry]
+                                                                .visibleOnMap;
+                                                        gl
+                                                            .geometries[gl
+                                                                .selectedGeometry]
+                                                            .serialize();
+                                                      }
+                                                    });
+                                                  },
+                                                  icon:
+                                                      gl
+                                                              .geometries[gl
+                                                                  .selectedGeometry]
+                                                              .visibleOnMap
+                                                          ? FaIcon(
+                                                            FontAwesomeIcons
+                                                                .eyeSlash,
+                                                            size:
+                                                                gl
+                                                                    .display
+                                                                    .equipixel *
+                                                                gl.iconSizeS *
+                                                                .9,
+                                                            color: Colors.white,
+                                                          )
+                                                          : FaIcon(
+                                                            FontAwesomeIcons
+                                                                .eye,
+                                                            size:
+                                                                gl
+                                                                    .display
+                                                                    .equipixel *
+                                                                gl.iconSizeS *
+                                                                .9,
+                                                            color: Colors.white,
+                                                          ),
+                                                ),
                                               ),
                                               SizedBox(
                                                 width:
@@ -884,53 +929,84 @@ class _MapPageState extends State<MapPage> {
                                                   children: [
                                                     Row(
                                                       children: [
-                                                        Container(
-                                                          alignment:
-                                                              Alignment.topLeft,
-                                                          child:
-                                                              gl.geometries[gl.selectedGeometry].type ==
-                                                                      "Point"
-                                                                  ? Text(
-                                                                    "POINT",
-                                                                    style: TextStyle(
-                                                                      color:
-                                                                          Colors
-                                                                              .yellow,
-                                                                      fontSize:
-                                                                          gl.display.equipixel *
-                                                                          gl.fontSizeXS *
-                                                                          .9,
-                                                                    ),
-                                                                  )
-                                                                  : gl
-                                                                          .geometries[gl
-                                                                              .selectedGeometry]
-                                                                          .type ==
-                                                                      "Polygon"
-                                                                  ? Text(
-                                                                    "POLY",
-                                                                    style: TextStyle(
-                                                                      color:
-                                                                          Colors
-                                                                              .green,
-                                                                      fontSize:
-                                                                          gl.display.equipixel *
-                                                                          gl.fontSizeXS *
-                                                                          .9,
-                                                                    ),
-                                                                  )
-                                                                  : Text(
-                                                                    "OHA?",
-                                                                    style: TextStyle(
-                                                                      color:
-                                                                          Colors
-                                                                              .red,
-                                                                      fontSize:
-                                                                          gl.display.equipixel *
-                                                                          gl.fontSizeXS *
-                                                                          .9,
-                                                                    ),
+                                                        Column(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .spaceBetween,
+                                                          children: [
+                                                            gl
+                                                                        .geometries[gl
+                                                                            .selectedGeometry]
+                                                                        .type ==
+                                                                    "Point"
+                                                                ? Text(
+                                                                  "POINT",
+                                                                  style: TextStyle(
+                                                                    color:
+                                                                        Colors
+                                                                            .yellow,
+                                                                    fontSize:
+                                                                        gl
+                                                                            .display
+                                                                            .equipixel *
+                                                                        gl.fontSizeXS *
+                                                                        .9,
                                                                   ),
+                                                                )
+                                                                : gl
+                                                                        .geometries[gl
+                                                                            .selectedGeometry]
+                                                                        .type ==
+                                                                    "Polygon"
+                                                                ? Text(
+                                                                  "POLY",
+                                                                  style: TextStyle(
+                                                                    color:
+                                                                        Colors
+                                                                            .green,
+                                                                    fontSize:
+                                                                        gl
+                                                                            .display
+                                                                            .equipixel *
+                                                                        gl.fontSizeXS *
+                                                                        .9,
+                                                                  ),
+                                                                )
+                                                                : Text(
+                                                                  "OHA?",
+                                                                  style: TextStyle(
+                                                                    color:
+                                                                        Colors
+                                                                            .red,
+                                                                    fontSize:
+                                                                        gl
+                                                                            .display
+                                                                            .equipixel *
+                                                                        gl.fontSizeXS *
+                                                                        .9,
+                                                                  ),
+                                                                ),
+                                                            Icon(
+                                                              (gl.geometries[gl.selectedGeometry].type ==
+                                                                      "Point"
+                                                                  ? gl.selectableIcons[gl
+                                                                      .geometries[gl
+                                                                          .selectedGeometry]
+                                                                      .selectedPointIcon]
+                                                                  : Icons
+                                                                      .hexagon_outlined),
+                                                              size:
+                                                                  gl.iconSizeXS *
+                                                                  gl
+                                                                      .display
+                                                                      .equipixel,
+                                                              color:
+                                                                  gl
+                                                                      .geometries[gl
+                                                                          .selectedGeometry]
+                                                                      .colorLine,
+                                                            ),
+                                                          ],
                                                         ),
                                                         SizedBox(
                                                           width:
@@ -946,7 +1022,7 @@ class _MapPageState extends State<MapPage> {
                                                           Container(
                                                             alignment:
                                                                 Alignment
-                                                                    .bottomLeft,
+                                                                    .topRight,
                                                             child: Text(
                                                               "SENT",
                                                               style: TextStyle(
@@ -990,20 +1066,27 @@ class _MapPageState extends State<MapPage> {
                                                   ],
                                                 ),
                                               ),
-                                              IconButton(
-                                                onPressed: () {
-                                                  refreshView(() {
-                                                    gl.Mode.openToolbox =
-                                                        !gl.Mode.openToolbox;
-                                                  });
-                                                },
-                                                icon: FaIcon(
-                                                  FontAwesomeIcons.toolbox,
-                                                  size:
-                                                      gl.display.equipixel *
-                                                      gl.iconSizeS *
-                                                      .9,
-                                                  color: Colors.white,
+                                              SizedBox(
+                                                height:
+                                                    gl.display.equipixel *
+                                                    gl.iconSizeM *
+                                                    .9,
+                                                child: IconButton(
+                                                  style: borderlessStyle,
+                                                  onPressed: () {
+                                                    refreshView(() {
+                                                      gl.Mode.openToolbox =
+                                                          !gl.Mode.openToolbox;
+                                                    });
+                                                  },
+                                                  icon: FaIcon(
+                                                    FontAwesomeIcons.toolbox,
+                                                    size:
+                                                        gl.display.equipixel *
+                                                        gl.iconSizeS *
+                                                        .9,
+                                                    color: Colors.white,
+                                                  ),
                                                 ),
                                               ),
                                             ],
@@ -1021,47 +1104,58 @@ class _MapPageState extends State<MapPage> {
                                                   ),
                                                   Row(
                                                     children: [
-                                                      IconButton(
-                                                        iconSize:
+                                                      SizedBox(
+                                                        height:
                                                             gl
                                                                 .display
                                                                 .equipixel *
-                                                            gl.iconSizeS,
-                                                        color:
-                                                            Colors
-                                                                .lightGreenAccent,
-                                                        onPressed: () {
-                                                          refreshView(() {
-                                                            _stopMovingSelectedPoint();
-                                                            gl.Mode.editPolygon =
-                                                                false;
-                                                            gl.Mode.showButtonAddVertexesPolygon =
-                                                                true;
-                                                            gl.Mode.showButtonMoveVertexesPolygon =
-                                                                false;
-                                                            gl.Mode.showButtonRemoveVertexesPolygon =
-                                                                false;
-                                                            gl.Mode.addVertexesPolygon =
-                                                                false;
-                                                            gl.Mode.moveVertexesPolygon =
-                                                                false;
-                                                            gl.Mode.removeVertexesPolygon =
-                                                                false;
-                                                          });
-                                                        },
-                                                        icon: Icon(
-                                                          Icons.arrow_back,
-                                                          size:
+                                                            gl.iconSizeM *
+                                                            .9,
+                                                        child: IconButton(
+                                                          style:
+                                                              borderlessStyle,
+                                                          iconSize:
                                                               gl
                                                                   .display
                                                                   .equipixel *
-                                                              gl.iconSizeS *
-                                                              .9,
+                                                              gl.iconSizeS,
+                                                          color:
+                                                              Colors
+                                                                  .lightGreenAccent,
+                                                          onPressed: () {
+                                                            refreshView(() {
+                                                              _stopMovingSelectedPoint();
+                                                              gl.Mode.editPolygon =
+                                                                  false;
+                                                              gl.Mode.showButtonAddVertexesPolygon =
+                                                                  true;
+                                                              gl.Mode.showButtonMoveVertexesPolygon =
+                                                                  false;
+                                                              gl.Mode.showButtonRemoveVertexesPolygon =
+                                                                  false;
+                                                              gl.Mode.addVertexesPolygon =
+                                                                  false;
+                                                              gl.Mode.moveVertexesPolygon =
+                                                                  false;
+                                                              gl.Mode.removeVertexesPolygon =
+                                                                  false;
+                                                            });
+                                                          },
+                                                          icon: Icon(
+                                                            Icons.arrow_back,
+                                                            size:
+                                                                gl
+                                                                    .display
+                                                                    .equipixel *
+                                                                gl.iconSizeS *
+                                                                .9,
+                                                          ),
                                                         ),
                                                       ),
                                                       Container(
                                                         alignment:
-                                                            Alignment.topLeft,
+                                                            Alignment
+                                                                .centerLeft,
                                                         width:
                                                             gl
                                                                 .display
@@ -1150,87 +1244,106 @@ class _MapPageState extends State<MapPage> {
                                                                   .Mode
                                                                   .removeVertexesPolygon,
                                                             ),
+                                                            child: SizedBox(
+                                                              height:
+                                                                  gl
+                                                                      .display
+                                                                      .equipixel *
+                                                                  gl.iconSizeM *
+                                                                  .9,
+                                                              child: IconButton(
+                                                                style:
+                                                                    borderlessStyle,
+                                                                iconSize:
+                                                                    gl
+                                                                        .display
+                                                                        .equipixel *
+                                                                    gl.iconSizeS,
+                                                                color:
+                                                                    gl.Mode.removeVertexesPolygon
+                                                                        ? Colors
+                                                                            .white
+                                                                        : Colors
+                                                                            .lightGreenAccent,
+                                                                onPressed: () async {
+                                                                  refreshView(() {
+                                                                    gl.Mode.removeVertexesPolygon =
+                                                                        !gl
+                                                                            .Mode
+                                                                            .removeVertexesPolygon;
+                                                                  });
+                                                                  if (gl
+                                                                          .Mode
+                                                                          .removeVertexesPolygon ==
+                                                                      true) {
+                                                                    refreshView(() {
+                                                                      if (gl
+                                                                              .geometries[gl.selectedGeometry]
+                                                                              .points
+                                                                              .isNotEmpty &&
+                                                                          _isPolygonWellDefined(
+                                                                            gl.geometries[gl.selectedGeometry].getPolyRemoveOneVertex(
+                                                                              gl.geometries[gl.selectedGeometry].points[gl.geometries[gl.selectedGeometry].selectedPolyLinePoints[0]],
+                                                                            ),
+                                                                          )) {
+                                                                        gl.geometries[gl.selectedGeometry].removePoint(
+                                                                          gl.geometries[gl.selectedGeometry].points[gl
+                                                                              .geometries[gl.selectedGeometry]
+                                                                              .selectedPolyLinePoints[0]],
+                                                                        );
+                                                                      }
+                                                                    });
+                                                                    gl.Mode.moveVertexesPolygon =
+                                                                        false;
+                                                                    gl.Mode.addVertexesPolygon =
+                                                                        false;
+                                                                    _stopMovingSelectedPoint();
+                                                                    refreshView(() {
+                                                                      gl.Mode.showButtonAddVertexesPolygon =
+                                                                          true;
+                                                                      gl.Mode.showButtonMoveVertexesPolygon =
+                                                                          false;
+                                                                      gl.Mode.showButtonRemoveVertexesPolygon =
+                                                                          false;
+                                                                      gl.Mode.addVertexesPolygon =
+                                                                          false;
+                                                                      gl.Mode.moveVertexesPolygon =
+                                                                          false;
+                                                                      gl.Mode.removeVertexesPolygon =
+                                                                          false;
+                                                                    });
+                                                                  }
+                                                                },
+                                                                icon: const Icon(
+                                                                  Icons
+                                                                      .remove_circle,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          )
+                                                          : SizedBox(
+                                                            height:
+                                                                gl
+                                                                    .display
+                                                                    .equipixel *
+                                                                gl.iconSizeM *
+                                                                .9,
                                                             child: IconButton(
+                                                              style:
+                                                                  borderlessStyle,
                                                               iconSize:
                                                                   gl
                                                                       .display
                                                                       .equipixel *
                                                                   gl.iconSizeS,
                                                               color:
-                                                                  gl.Mode.removeVertexesPolygon
-                                                                      ? Colors
-                                                                          .white
-                                                                      : Colors
-                                                                          .lightGreenAccent,
-                                                              onPressed: () async {
-                                                                refreshView(() {
-                                                                  gl.Mode.removeVertexesPolygon =
-                                                                      !gl
-                                                                          .Mode
-                                                                          .removeVertexesPolygon;
-                                                                });
-                                                                if (gl
-                                                                        .Mode
-                                                                        .removeVertexesPolygon ==
-                                                                    true) {
-                                                                  refreshView(() {
-                                                                    if (_isPolygonWellDefined(
-                                                                      gl.geometries[gl.selectedGeometry].getPolyRemoveOneVertex(
-                                                                        gl
-                                                                            .geometries[gl.selectedGeometry]
-                                                                            .points[gl
-                                                                            .geometries[gl.selectedGeometry]
-                                                                            .selectedPolyLinePoints[0]],
-                                                                      ),
-                                                                    )) {
-                                                                      gl.geometries[gl.selectedGeometry].removePoint(
-                                                                        gl
-                                                                            .geometries[gl.selectedGeometry]
-                                                                            .points[gl
-                                                                            .geometries[gl.selectedGeometry]
-                                                                            .selectedPolyLinePoints[0]],
-                                                                      );
-                                                                    }
-                                                                  });
-                                                                  gl.Mode.moveVertexesPolygon =
-                                                                      false;
-                                                                  gl.Mode.addVertexesPolygon =
-                                                                      false;
-                                                                  _stopMovingSelectedPoint();
-                                                                  refreshView(() {
-                                                                    gl.Mode.showButtonAddVertexesPolygon =
-                                                                        true;
-                                                                    gl.Mode.showButtonMoveVertexesPolygon =
-                                                                        false;
-                                                                    gl.Mode.showButtonRemoveVertexesPolygon =
-                                                                        false;
-                                                                    gl.Mode.addVertexesPolygon =
-                                                                        false;
-                                                                    gl.Mode.moveVertexesPolygon =
-                                                                        false;
-                                                                    gl.Mode.removeVertexesPolygon =
-                                                                        false;
-                                                                  });
-                                                                }
-                                                              },
+                                                                  Colors
+                                                                      .white24,
+                                                              onPressed: () {},
                                                               icon: const Icon(
                                                                 Icons
                                                                     .remove_circle,
                                                               ),
-                                                            ),
-                                                          )
-                                                          : IconButton(
-                                                            iconSize:
-                                                                gl
-                                                                    .display
-                                                                    .equipixel *
-                                                                gl.iconSizeS,
-                                                            color:
-                                                                Colors.white24,
-                                                            onPressed: () {},
-                                                            icon: const Icon(
-                                                              Icons
-                                                                  .remove_circle,
                                                             ),
                                                           ),
                                                       (gl.geometries[gl.selectedGeometry].type ==
@@ -1248,55 +1361,79 @@ class _MapPageState extends State<MapPage> {
                                                                   .Mode
                                                                   .addVertexesPolygon,
                                                             ),
+                                                            child: SizedBox(
+                                                              height:
+                                                                  gl
+                                                                      .display
+                                                                      .equipixel *
+                                                                  gl.iconSizeM *
+                                                                  .9,
+                                                              child: IconButton(
+                                                                style:
+                                                                    borderlessStyle,
+                                                                iconSize:
+                                                                    gl
+                                                                        .display
+                                                                        .equipixel *
+                                                                    gl.iconSizeS,
+                                                                color:
+                                                                    gl.Mode.addVertexesPolygon
+                                                                        ? Colors
+                                                                            .white
+                                                                        : Colors
+                                                                            .lightGreenAccent,
+                                                                onPressed: () async {
+                                                                  refreshView(() {
+                                                                    gl.Mode.addVertexesPolygon =
+                                                                        !gl
+                                                                            .Mode
+                                                                            .addVertexesPolygon;
+                                                                  });
+                                                                  if (gl
+                                                                          .Mode
+                                                                          .addVertexesPolygon ==
+                                                                      true) {
+                                                                    gl.Mode.removeVertexesPolygon =
+                                                                        false;
+                                                                    gl.Mode.moveVertexesPolygon =
+                                                                        false;
+                                                                    refreshView(
+                                                                      () {
+                                                                        _stopMovingSelectedPoint();
+                                                                      },
+                                                                    );
+                                                                  }
+                                                                },
+                                                                icon: const Icon(
+                                                                  Icons
+                                                                      .add_circle,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          )
+                                                          : SizedBox(
+                                                            height:
+                                                                gl
+                                                                    .display
+                                                                    .equipixel *
+                                                                gl.iconSizeM *
+                                                                .9,
                                                             child: IconButton(
+                                                              style:
+                                                                  borderlessStyle,
                                                               iconSize:
                                                                   gl
                                                                       .display
                                                                       .equipixel *
                                                                   gl.iconSizeS,
                                                               color:
-                                                                  gl.Mode.addVertexesPolygon
-                                                                      ? Colors
-                                                                          .white
-                                                                      : Colors
-                                                                          .lightGreenAccent,
-                                                              onPressed: () async {
-                                                                refreshView(() {
-                                                                  gl.Mode.addVertexesPolygon =
-                                                                      !gl
-                                                                          .Mode
-                                                                          .addVertexesPolygon;
-                                                                });
-                                                                if (gl
-                                                                        .Mode
-                                                                        .addVertexesPolygon ==
-                                                                    true) {
-                                                                  gl.Mode.removeVertexesPolygon =
-                                                                      false;
-                                                                  gl.Mode.moveVertexesPolygon =
-                                                                      false;
-                                                                  refreshView(() {
-                                                                    _stopMovingSelectedPoint();
-                                                                  });
-                                                                }
-                                                              },
+                                                                  Colors
+                                                                      .white24,
+                                                              onPressed: () {},
                                                               icon: const Icon(
                                                                 Icons
                                                                     .add_circle,
                                                               ),
-                                                            ),
-                                                          )
-                                                          : IconButton(
-                                                            iconSize:
-                                                                gl
-                                                                    .display
-                                                                    .equipixel *
-                                                                gl.iconSizeS,
-                                                            color:
-                                                                Colors.white24,
-                                                            onPressed: () {},
-                                                            icon: const Icon(
-                                                              Icons.add_circle,
                                                             ),
                                                           ),
                                                       gl.Mode.showButtonMoveVertexesPolygon
@@ -1306,54 +1443,46 @@ class _MapPageState extends State<MapPage> {
                                                                   .Mode
                                                                   .moveVertexesPolygon,
                                                             ),
-                                                            child: IconButton(
-                                                              color:
-                                                                  gl.Mode.moveVertexesPolygon
-                                                                      ? Colors
-                                                                          .white
-                                                                      : Colors
-                                                                          .lightGreenAccent,
-                                                              iconSize:
+                                                            child: SizedBox(
+                                                              height:
                                                                   gl
                                                                       .display
                                                                       .equipixel *
-                                                                  gl.iconSizeS,
-                                                              onPressed: () async {
-                                                                refreshView(() {
-                                                                  gl.Mode.moveVertexesPolygon =
-                                                                      !gl
-                                                                          .Mode
-                                                                          .moveVertexesPolygon;
-                                                                });
-                                                                if (gl
-                                                                        .Mode
-                                                                        .moveVertexesPolygon ==
-                                                                    true) {
+                                                                  gl.iconSizeM *
+                                                                  .9,
+                                                              child: IconButton(
+                                                                style:
+                                                                    borderlessStyle,
+                                                                color:
+                                                                    gl.Mode.moveVertexesPolygon
+                                                                        ? Colors
+                                                                            .white
+                                                                        : Colors
+                                                                            .lightGreenAccent,
+                                                                iconSize:
+                                                                    gl
+                                                                        .display
+                                                                        .equipixel *
+                                                                    gl.iconSizeS,
+                                                                onPressed: () async {
                                                                   refreshView(() {
-                                                                    LatLng
-                                                                    point =
-                                                                        gl
-                                                                            .geometries[gl.selectedGeometry]
-                                                                            .points[gl
-                                                                            .geometries[gl.selectedGeometry]
-                                                                            .selectedPolyLinePoints[0]];
-                                                                    if (_selectedPointToMove ==
-                                                                        null) {
-                                                                      _selectedPointToMove =
-                                                                          point;
-                                                                      _mapController.move(
-                                                                        point,
-                                                                        _mapController
-                                                                            .camera
-                                                                            .zoom,
-                                                                      );
-                                                                    } else {
-                                                                      if (point.latitude ==
-                                                                              _selectedPointToMove!.latitude &&
-                                                                          point.longitude ==
-                                                                              _selectedPointToMove!.longitude) {
-                                                                        _stopMovingSelectedPoint();
-                                                                      } else {
+                                                                    gl.Mode.moveVertexesPolygon =
+                                                                        !gl
+                                                                            .Mode
+                                                                            .moveVertexesPolygon;
+                                                                  });
+                                                                  if (gl
+                                                                          .Mode
+                                                                          .moveVertexesPolygon ==
+                                                                      true) {
+                                                                    refreshView(() {
+                                                                      LatLng
+                                                                      point =
+                                                                          gl.geometries[gl.selectedGeometry].points[gl
+                                                                              .geometries[gl.selectedGeometry]
+                                                                              .selectedPolyLinePoints[0]];
+                                                                      if (_selectedPointToMove ==
+                                                                          null) {
                                                                         _selectedPointToMove =
                                                                             point;
                                                                         _mapController.move(
@@ -1362,49 +1491,94 @@ class _MapPageState extends State<MapPage> {
                                                                               .camera
                                                                               .zoom,
                                                                         );
+                                                                      } else {
+                                                                        if (point.latitude ==
+                                                                                _selectedPointToMove!.latitude &&
+                                                                            point.longitude ==
+                                                                                _selectedPointToMove!.longitude) {
+                                                                          _stopMovingSelectedPoint();
+                                                                        } else {
+                                                                          _selectedPointToMove =
+                                                                              point;
+                                                                          _mapController.move(
+                                                                            point,
+                                                                            _mapController.camera.zoom,
+                                                                          );
+                                                                        }
                                                                       }
-                                                                    }
-                                                                  });
-                                                                  gl.Mode.addVertexesPolygon =
-                                                                      false;
-                                                                  gl.Mode.removeVertexesPolygon =
-                                                                      false;
-                                                                } else {
-                                                                  refreshView(() {
-                                                                    _stopMovingSelectedPoint();
-                                                                    gl.Mode.showButtonAddVertexesPolygon =
-                                                                        true;
-                                                                    gl.Mode.showButtonMoveVertexesPolygon =
-                                                                        false;
-                                                                    gl.Mode.showButtonRemoveVertexesPolygon =
-                                                                        false;
+                                                                    });
                                                                     gl.Mode.addVertexesPolygon =
-                                                                        false;
-                                                                    gl.Mode.moveVertexesPolygon =
                                                                         false;
                                                                     gl.Mode.removeVertexesPolygon =
                                                                         false;
-                                                                  });
-                                                                }
-                                                              },
+                                                                  } else if (gl
+                                                                          .Mode
+                                                                          .editPolygon &&
+                                                                      gl.geometries[gl.selectedGeometry].type ==
+                                                                          "Point") {
+                                                                    refreshView(() {
+                                                                      _stopMovingSelectedPoint();
+                                                                      gl.Mode.showButtonAddVertexesPolygon =
+                                                                          false;
+                                                                      gl.Mode.showButtonMoveVertexesPolygon =
+                                                                          true;
+                                                                      gl.Mode.showButtonRemoveVertexesPolygon =
+                                                                          true;
+                                                                      gl.Mode.addVertexesPolygon =
+                                                                          false;
+                                                                      gl.Mode.moveVertexesPolygon =
+                                                                          false;
+                                                                      gl.Mode.removeVertexesPolygon =
+                                                                          false;
+                                                                    });
+                                                                  } else {
+                                                                    refreshView(() {
+                                                                      _stopMovingSelectedPoint();
+                                                                      gl.Mode.showButtonAddVertexesPolygon =
+                                                                          true;
+                                                                      gl.Mode.showButtonMoveVertexesPolygon =
+                                                                          false;
+                                                                      gl.Mode.showButtonRemoveVertexesPolygon =
+                                                                          false;
+                                                                      gl.Mode.addVertexesPolygon =
+                                                                          false;
+                                                                      gl.Mode.moveVertexesPolygon =
+                                                                          false;
+                                                                      gl.Mode.removeVertexesPolygon =
+                                                                          false;
+                                                                    });
+                                                                  }
+                                                                },
+                                                                icon: const Icon(
+                                                                  Icons
+                                                                      .open_with_rounded,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          )
+                                                          : SizedBox(
+                                                            height:
+                                                                gl
+                                                                    .display
+                                                                    .equipixel *
+                                                                gl.iconSizeM *
+                                                                .9,
+                                                            child: IconButton(
+                                                              style:
+                                                                  borderlessStyle,
+                                                              iconSize:
+                                                                  gl
+                                                                      .display
+                                                                      .equipixel *
+                                                                  gl.iconSizeS,
+                                                              color:
+                                                                  Colors
+                                                                      .white24,
+                                                              onPressed: () {},
                                                               icon: const Icon(
                                                                 Icons
                                                                     .open_with_rounded,
                                                               ),
-                                                            ),
-                                                          )
-                                                          : IconButton(
-                                                            iconSize:
-                                                                gl
-                                                                    .display
-                                                                    .equipixel *
-                                                                gl.iconSizeS,
-                                                            color:
-                                                                Colors.white24,
-                                                            onPressed: () {},
-                                                            icon: const Icon(
-                                                              Icons
-                                                                  .open_with_rounded,
                                                             ),
                                                           ),
                                                     ],
@@ -1431,37 +1605,47 @@ class _MapPageState extends State<MapPage> {
                                                             alignment:
                                                                 Alignment
                                                                     .topLeft,
-                                                            child: IconButton(
-                                                              iconSize:
+                                                            child: SizedBox(
+                                                              height:
                                                                   gl
                                                                       .display
                                                                       .equipixel *
-                                                                  gl.iconSizeS,
-                                                              color:
-                                                                  Colors
-                                                                      .lightGreenAccent,
-                                                              onPressed: () {
-                                                                refreshView(() {
-                                                                  gl.Mode.editAttributes =
-                                                                      false;
-                                                                });
-                                                              },
-                                                              icon: Icon(
-                                                                Icons
-                                                                    .arrow_back,
-                                                                size:
+                                                                  gl.iconSizeM *
+                                                                  .9,
+                                                              child: IconButton(
+                                                                style:
+                                                                    borderlessStyle,
+                                                                iconSize:
                                                                     gl
                                                                         .display
                                                                         .equipixel *
-                                                                    gl.iconSizeS *
-                                                                    .9,
+                                                                    gl.iconSizeS,
+                                                                color:
+                                                                    Colors
+                                                                        .lightGreenAccent,
+                                                                onPressed: () {
+                                                                  refreshView(() {
+                                                                    gl.Mode.editAttributes =
+                                                                        false;
+                                                                  });
+                                                                },
+                                                                icon: Icon(
+                                                                  Icons
+                                                                      .arrow_back,
+                                                                  size:
+                                                                      gl
+                                                                          .display
+                                                                          .equipixel *
+                                                                      gl.iconSizeS *
+                                                                      .9,
+                                                                ),
                                                               ),
                                                             ),
                                                           ),
                                                           Container(
                                                             alignment:
                                                                 Alignment
-                                                                    .topLeft,
+                                                                    .centerLeft,
                                                             width:
                                                                 gl
                                                                     .display
@@ -1826,7 +2010,7 @@ class _MapPageState extends State<MapPage> {
                                                                                       7,
                                                                                   height:
                                                                                       gl.display.equipixel *
-                                                                                      gl.iconSizeS,
+                                                                                      gl.iconSizeM,
                                                                                   child: IconButton(
                                                                                     style: ButtonStyle(
                                                                                       animationDuration: Duration(
@@ -2287,34 +2471,42 @@ class _MapPageState extends State<MapPage> {
                                                             alignment:
                                                                 Alignment
                                                                     .topLeft,
-                                                            child: IconButton(
-                                                              iconSize:
+                                                            child: SizedBox(
+                                                              height:
                                                                   gl
                                                                       .display
                                                                       .equipixel *
-                                                                  gl.iconSizeS,
-                                                              color:
-                                                                  Colors
-                                                                      .lightGreenAccent,
-                                                              onPressed: () {
-                                                                refreshView(() {
-                                                                  gl.Mode.editPointMarker =
-                                                                      false;
-                                                                });
-                                                                gl
-                                                                    .geometries[gl
-                                                                        .selectedGeometry]
-                                                                    .serialize();
-                                                              },
-                                                              icon: Icon(
-                                                                Icons
-                                                                    .arrow_back,
-                                                                size:
+                                                                  gl.iconSizeM *
+                                                                  .9,
+                                                              child: IconButton(
+                                                                iconSize:
                                                                     gl
                                                                         .display
                                                                         .equipixel *
-                                                                    gl.iconSizeS *
-                                                                    .9,
+                                                                    gl.iconSizeS,
+                                                                color:
+                                                                    Colors
+                                                                        .lightGreenAccent,
+                                                                onPressed: () {
+                                                                  refreshView(() {
+                                                                    gl.Mode.editPointMarker =
+                                                                        false;
+                                                                  });
+                                                                  gl
+                                                                      .geometries[gl
+                                                                          .selectedGeometry]
+                                                                      .serialize();
+                                                                },
+                                                                icon: Icon(
+                                                                  Icons
+                                                                      .arrow_back,
+                                                                  size:
+                                                                      gl
+                                                                          .display
+                                                                          .equipixel *
+                                                                      gl.iconSizeS *
+                                                                      .9,
+                                                                ),
                                                               ),
                                                             ),
                                                           ),
@@ -2379,32 +2571,35 @@ class _MapPageState extends State<MapPage> {
                                                                           ? gl.colorAgroBioTech
                                                                           : Colors
                                                                               .transparent,
-                                                                  child: IconButton(
-                                                                    onPressed: () {
-                                                                      refreshView(
-                                                                        () {
-                                                                          gl.geometries[gl.selectedGeometry].selectedPointIcon =
-                                                                              k;
-                                                                        },
-                                                                      );
-                                                                    },
-                                                                    icon: Icon(
-                                                                      gl.selectableIcons[k],
-                                                                      size:
-                                                                          gl.iconSizeM *
-                                                                          gl.display.equipixel,
-                                                                      color:
-                                                                          Colors
-                                                                              .white,
-                                                                    ),
-                                                                    color:
-                                                                        Colors
-                                                                            .white,
-                                                                    iconSize:
+                                                                  child: SizedBox(
+                                                                    height:
                                                                         gl
                                                                             .display
                                                                             .equipixel *
-                                                                        gl.iconSizeM,
+                                                                        gl.iconSizeM *
+                                                                        .9,
+                                                                    child: IconButton(
+                                                                      onPressed: () {
+                                                                        refreshView(() {
+                                                                          gl.geometries[gl.selectedGeometry].selectedPointIcon =
+                                                                              k;
+                                                                        });
+                                                                      },
+                                                                      icon: Icon(
+                                                                        gl.selectableIcons[k],
+                                                                        size:
+                                                                            gl.iconSizeM *
+                                                                            gl.display.equipixel,
+                                                                        color:
+                                                                            Colors.white,
+                                                                      ),
+                                                                      color:
+                                                                          Colors
+                                                                              .white,
+                                                                      iconSize:
+                                                                          gl.display.equipixel *
+                                                                          gl.iconSizeM,
+                                                                    ),
                                                                   ),
                                                                 );
                                                               },
@@ -2539,52 +2734,71 @@ class _MapPageState extends State<MapPage> {
                                                   ),
                                                   Row(
                                                     children: [
-                                                      IconButton(
-                                                        iconSize:
+                                                      SizedBox(
+                                                        height:
                                                             gl
                                                                 .display
                                                                 .equipixel *
-                                                            gl.iconSizeS,
-                                                        color:
-                                                            Colors
-                                                                .lightGreenAccent,
-                                                        onPressed: () {
-                                                          refreshView(() {
-                                                            gl.Mode.openToolbox =
-                                                                false;
-                                                          });
-                                                        },
-                                                        icon: Icon(
-                                                          Icons.arrow_back,
-                                                          size:
+                                                            gl.iconSizeM *
+                                                            .9,
+                                                        child: IconButton(
+                                                          iconSize:
                                                               gl
                                                                   .display
                                                                   .equipixel *
-                                                              gl.iconSizeS *
-                                                              .9,
-                                                        ),
-                                                      ),
-                                                      Container(
-                                                        alignment:
-                                                            Alignment.topLeft,
-                                                        width:
-                                                            gl
-                                                                .display
-                                                                .equipixel *
-                                                            gl.chosenPolyBarWidth *
-                                                            .5,
-                                                        child: Text(
-                                                          "Boite à outils",
-                                                          textAlign:
-                                                              TextAlign.center,
-                                                          style: TextStyle(
-                                                            color: Colors.white,
-                                                            fontSize:
+                                                              gl.iconSizeS,
+                                                          color:
+                                                              Colors
+                                                                  .lightGreenAccent,
+                                                          onPressed: () {
+                                                            refreshView(() {
+                                                              gl.Mode.openToolbox =
+                                                                  false;
+                                                            });
+                                                          },
+                                                          icon: Icon(
+                                                            Icons.arrow_back,
+                                                            size:
                                                                 gl
                                                                     .display
                                                                     .equipixel *
-                                                                gl.fontSizeM *
-                                                                .75,
+                                                                gl.iconSizeS *
+                                                                .9,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      SizedBox(
+                                                        height:
+                                                            gl
+                                                                .display
+                                                                .equipixel *
+                                                            gl.iconSizeS *
+                                                            .9,
+                                                        child: Container(
+                                                          alignment:
+                                                              Alignment
+                                                                  .centerLeft,
+                                                          width:
+                                                              gl
+                                                                  .display
+                                                                  .equipixel *
+                                                              gl.chosenPolyBarWidth *
+                                                              .5,
+                                                          child: Text(
+                                                            "Boite à outils",
+                                                            textAlign:
+                                                                TextAlign
+                                                                    .center,
+                                                            style: TextStyle(
+                                                              color:
+                                                                  Colors.white,
+                                                              fontSize:
+                                                                  gl
+                                                                      .display
+                                                                      .equipixel *
+                                                                  gl.fontSizeM *
+                                                                  .75,
+                                                            ),
                                                           ),
                                                         ),
                                                       ),
@@ -2604,36 +2818,47 @@ class _MapPageState extends State<MapPage> {
                                                           .geometries[gl
                                                               .selectedGeometry]
                                                           .labelsVisibleOnMap)
-                                                        IconButton(
-                                                          onPressed: () {
-                                                            setState(() {
+                                                        SizedBox(
+                                                          height:
+                                                              gl
+                                                                  .display
+                                                                  .equipixel *
+                                                              gl.iconSizeM *
+                                                              .9,
+                                                          child: IconButton(
+                                                            onPressed: () {
+                                                              setState(() {
+                                                                gl
+                                                                    .geometries[gl
+                                                                        .selectedGeometry]
+                                                                    .labelsVisibleOnMap = true;
+                                                              });
                                                               gl
                                                                   .geometries[gl
                                                                       .selectedGeometry]
-                                                                  .labelsVisibleOnMap = true;
-                                                            });
-                                                            gl.geometries[i]
-                                                                .serialize();
-                                                            gl
-                                                                .geometries[gl
-                                                                    .selectedGeometry]
-                                                                .serialize();
-                                                            gl.refreshMainStack(
-                                                              () {
-                                                                gl.modeMapShowPolygons =
-                                                                    true;
-                                                              },
-                                                            );
-                                                          },
-                                                          icon: Icon(
-                                                            Icons.label,
-                                                            size:
-                                                                gl
-                                                                    .display
-                                                                    .equipixel *
-                                                                gl.iconSizeS *
-                                                                .9,
-                                                            color: Colors.white,
+                                                                  .serialize();
+                                                              gl
+                                                                  .geometries[gl
+                                                                      .selectedGeometry]
+                                                                  .serialize();
+                                                              gl.refreshMainStack(
+                                                                () {
+                                                                  gl.modeMapShowPolygons =
+                                                                      true;
+                                                                },
+                                                              );
+                                                            },
+                                                            icon: Icon(
+                                                              Icons.label,
+                                                              size:
+                                                                  gl
+                                                                      .display
+                                                                      .equipixel *
+                                                                  gl.iconSizeS *
+                                                                  .9,
+                                                              color:
+                                                                  Colors.white,
+                                                            ),
                                                           ),
                                                         ),
                                                       if (gl
@@ -2673,59 +2898,68 @@ class _MapPageState extends State<MapPage> {
                                                                   .geometries[gl
                                                                       .selectedGeometry]
                                                                   .visibleOnMap))
-                                                        IconButton(
-                                                          onPressed: () {
-                                                            gl
-                                                                .geometries[gl
-                                                                    .selectedGeometry]
-                                                                .visibleOnMap = true;
-                                                            gl.geometries[i]
-                                                                .serialize();
-                                                            setState(() {
-                                                              if (gl
-                                                                          .geometries[gl
-                                                                              .selectedGeometry]
-                                                                          .center
-                                                                          .longitude !=
-                                                                      0.0 &&
+                                                        SizedBox(
+                                                          height:
+                                                              gl
+                                                                  .display
+                                                                  .equipixel *
+                                                              gl.iconSizeM *
+                                                              .9,
+                                                          child: IconButton(
+                                                            onPressed: () {
+                                                              gl
+                                                                  .geometries[gl
+                                                                      .selectedGeometry]
+                                                                  .visibleOnMap = true;
+                                                              gl
+                                                                  .geometries[gl
+                                                                      .selectedGeometry]
+                                                                  .serialize();
+                                                              setState(() {
+                                                                if (gl
+                                                                            .geometries[gl.selectedGeometry]
+                                                                            .center
+                                                                            .longitude !=
+                                                                        0.0 &&
+                                                                    gl
+                                                                            .geometries[gl.selectedGeometry]
+                                                                            .center
+                                                                            .latitude !=
+                                                                        0.0) {
+                                                                  _mapController.move(
+                                                                    gl
+                                                                        .geometries[gl
+                                                                            .selectedGeometry]
+                                                                        .center,
+                                                                    _mapController
+                                                                        .camera
+                                                                        .zoom,
+                                                                  );
+                                                                }
+                                                              });
+                                                              gl.refreshMainStack(
+                                                                () {
+                                                                  gl.modeMapShowPolygons =
+                                                                      true;
+                                                                },
+                                                              );
+                                                            },
+                                                            icon: Icon(
+                                                              Icons.gps_fixed,
+                                                              size:
                                                                   gl
-                                                                          .geometries[gl
-                                                                              .selectedGeometry]
-                                                                          .center
-                                                                          .latitude !=
-                                                                      0.0) {
-                                                                _mapController.move(
+                                                                      .display
+                                                                      .equipixel *
+                                                                  gl.iconSizeS *
+                                                                  .9,
+                                                              opticalSize:
                                                                   gl
-                                                                      .geometries[gl
-                                                                          .selectedGeometry]
-                                                                      .center,
-                                                                  _mapController
-                                                                      .camera
-                                                                      .zoom,
-                                                                );
-                                                              }
-                                                            });
-                                                            gl.refreshMainStack(
-                                                              () {
-                                                                gl.modeMapShowPolygons =
-                                                                    true;
-                                                              },
-                                                            );
-                                                          },
-                                                          icon: Icon(
-                                                            Icons.gps_fixed,
-                                                            size:
-                                                                gl
-                                                                    .display
-                                                                    .equipixel *
-                                                                gl.iconSizeS *
-                                                                .9,
-                                                            opticalSize:
-                                                                gl
-                                                                    .display
-                                                                    .equipixel *
-                                                                gl.iconSizeS,
-                                                            color: Colors.white,
+                                                                      .display
+                                                                      .equipixel *
+                                                                  gl.iconSizeS,
+                                                              color:
+                                                                  Colors.white,
+                                                            ),
                                                           ),
                                                         ),
                                                       if (gl
@@ -2733,18 +2967,103 @@ class _MapPageState extends State<MapPage> {
                                                                   .selectedGeometry]
                                                               .type ==
                                                           "Point")
-                                                        IconButton(
+                                                        SizedBox(
+                                                          height:
+                                                              gl
+                                                                  .display
+                                                                  .equipixel *
+                                                              gl.iconSizeM *
+                                                              .9,
+                                                          child: IconButton(
+                                                            onPressed: () {
+                                                              setState(() {
+                                                                gl.Mode.editPointMarker =
+                                                                    !gl
+                                                                        .Mode
+                                                                        .editPointMarker;
+                                                              });
+                                                            },
+                                                            icon: Icon(
+                                                              FontAwesomeIcons
+                                                                  .locationPin,
+                                                              size:
+                                                                  gl
+                                                                      .display
+                                                                      .equipixel *
+                                                                  gl.iconSizeS *
+                                                                  .9,
+                                                              color:
+                                                                  Colors.white,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      SizedBox(
+                                                        height:
+                                                            gl
+                                                                .display
+                                                                .equipixel *
+                                                            gl.iconSizeM *
+                                                            .9,
+                                                        child: IconButton(
                                                           onPressed: () {
-                                                            setState(() {
-                                                              gl.Mode.editPointMarker =
+                                                            gl.refreshMainStack(() {
+                                                              gl.modeMapShowPolygons =
+                                                                  true;
+                                                              gl
+                                                                  .geometries[gl
+                                                                      .selectedGeometry]
+                                                                  .visibleOnMap = true;
+                                                              gl.Mode.editPolygon =
                                                                   !gl
                                                                       .Mode
-                                                                      .editPointMarker;
+                                                                      .editPolygon;
+                                                              if (gl
+                                                                      .Mode
+                                                                      .editPolygon &&
+                                                                  gl
+                                                                          .geometries[gl
+                                                                              .selectedGeometry]
+                                                                          .type ==
+                                                                      "Point") {
+                                                                refreshView(() {
+                                                                  gl.Mode.editPolygon =
+                                                                      true;
+                                                                  gl.Mode.showButtonAddVertexesPolygon =
+                                                                      false;
+                                                                  gl.Mode.showButtonMoveVertexesPolygon =
+                                                                      true;
+                                                                  gl.Mode.showButtonRemoveVertexesPolygon =
+                                                                      true;
+                                                                  gl.Mode.addVertexesPolygon =
+                                                                      false;
+                                                                  gl.Mode.moveVertexesPolygon =
+                                                                      false;
+                                                                  gl.Mode.removeVertexesPolygon =
+                                                                      false;
+                                                                });
+                                                              } else {
+                                                                refreshView(() {
+                                                                  gl.Mode.editPolygon =
+                                                                      true;
+                                                                  gl.Mode.showButtonAddVertexesPolygon =
+                                                                      true;
+                                                                  gl.Mode.showButtonMoveVertexesPolygon =
+                                                                      false;
+                                                                  gl.Mode.showButtonRemoveVertexesPolygon =
+                                                                      false;
+                                                                  gl.Mode.addVertexesPolygon =
+                                                                      false;
+                                                                  gl.Mode.moveVertexesPolygon =
+                                                                      false;
+                                                                  gl.Mode.removeVertexesPolygon =
+                                                                      false;
+                                                                });
+                                                              }
                                                             });
                                                           },
-                                                          icon: Icon(
+                                                          icon: FaIcon(
                                                             FontAwesomeIcons
-                                                                .locationPin,
+                                                                .drawPolygon,
                                                             size:
                                                                 gl
                                                                     .display
@@ -2754,59 +3073,34 @@ class _MapPageState extends State<MapPage> {
                                                             color: Colors.white,
                                                           ),
                                                         ),
-                                                      IconButton(
-                                                        onPressed: () {
-                                                          gl.refreshMainStack(() {
-                                                            gl.modeMapShowPolygons =
-                                                                true;
-                                                            gl
-                                                                .geometries[gl
-                                                                    .selectedGeometry]
-                                                                .visibleOnMap = true;
-                                                            gl.geometries[i]
-                                                                .serialize();
-                                                            gl.Mode.editPolygon =
-                                                                !gl
-                                                                    .Mode
-                                                                    .editPolygon;
-                                                            gl
-                                                                .Mode
-                                                                .showButtonAddVertexesPolygon = gl
-                                                                    .Mode
-                                                                    .editPolygon;
-                                                          });
-                                                        },
-                                                        icon: FaIcon(
-                                                          FontAwesomeIcons
-                                                              .drawPolygon,
-                                                          size:
-                                                              gl
-                                                                  .display
-                                                                  .equipixel *
-                                                              gl.iconSizeS *
-                                                              .9,
-                                                          color: Colors.white,
-                                                        ),
                                                       ),
-                                                      IconButton(
-                                                        onPressed: () {
-                                                          setState(() {
-                                                            gl.Mode.editAttributes =
-                                                                !gl
-                                                                    .Mode
-                                                                    .editAttributes;
-                                                          });
-                                                        },
-                                                        icon: FaIcon(
-                                                          FontAwesomeIcons
-                                                              .tableColumns,
-                                                          size:
-                                                              gl
-                                                                  .display
-                                                                  .equipixel *
-                                                              gl.iconSizeS *
-                                                              .9,
-                                                          color: Colors.white,
+                                                      SizedBox(
+                                                        height:
+                                                            gl
+                                                                .display
+                                                                .equipixel *
+                                                            gl.iconSizeM *
+                                                            .9,
+                                                        child: IconButton(
+                                                          onPressed: () {
+                                                            setState(() {
+                                                              gl.Mode.editAttributes =
+                                                                  !gl
+                                                                      .Mode
+                                                                      .editAttributes;
+                                                            });
+                                                          },
+                                                          icon: FaIcon(
+                                                            FontAwesomeIcons
+                                                                .tableColumns,
+                                                            size:
+                                                                gl
+                                                                    .display
+                                                                    .equipixel *
+                                                                gl.iconSizeS *
+                                                                .9,
+                                                            color: Colors.white,
+                                                          ),
                                                         ),
                                                       ),
                                                     ],
@@ -2933,11 +3227,11 @@ class _MapPageState extends State<MapPage> {
   }
 
   double computePolygonTitleHeight() {
-    double result = gl.iconSizeM * 1.25;
+    double result = gl.chosenPolyBarHeight * .8;
     if (gl.Mode.openToolbox) {
-      result += gl.chosenPolyBarHeight + 10;
+      result += gl.chosenPolyBarHeight * 1.25;
       if (gl.Mode.editAttributes) {
-        result += gl.attributeTableHeight + 20;
+        result += gl.attributeTableHeight * 1.25;
       } else if (gl.Mode.editPointMarker) {
         result += 45;
       }
@@ -2975,6 +3269,8 @@ class _MapPageState extends State<MapPage> {
       if (layer.visibleOnMap && layer.numPoints > 0 && layer.type == "Point") {
         that.add(
           Marker(
+            width: layer.iconSize * gl.display.equipixel,
+            height: layer.iconSize * gl.display.equipixel,
             point: LatLng(
               layer.points.first.latitude,
               layer.points.first.longitude,
@@ -2982,6 +3278,21 @@ class _MapPageState extends State<MapPage> {
             child:
                 hitButton
                     ? IconButton(
+                      highlightColor: Colors.transparent,
+                      alignment: Alignment.center,
+                      style: ButtonStyle(
+                        shape: WidgetStateProperty.fromMap(
+                          <WidgetStatesConstraint, ContinuousRectangleBorder>{
+                            WidgetState.any: ContinuousRectangleBorder(),
+                          },
+                        ),
+                        alignment: AlignmentGeometry.center,
+                        padding: WidgetStateProperty.fromMap(
+                          <WidgetStatesConstraint, EdgeInsetsGeometry>{
+                            WidgetState.any: EdgeInsetsGeometry.zero,
+                          },
+                        ),
+                      ),
                       onPressed: () {
                         if (gl.Mode.openToolbox) {
                           setState(() {
@@ -3503,6 +3814,7 @@ class _MapPageState extends State<MapPage> {
 
   void _closeSwitchesMenu() {
     _modeLayerSwitches = false;
+    gl.mainStackPopLast();
   }
 
   Widget _mainMenuBar({bool dummy = false, VoidCallback? close}) {
@@ -3519,18 +3831,8 @@ class _MapPageState extends State<MapPage> {
             _menuButton(
               gl.display.equipixel * gl.menuBarLength / 4,
               gl.display.equipixel * gl.menuBarThickness,
-              dummy
-                  ? Colors.transparent
-                  : !_toolbarExtended
-                  ? Colors.transparent
-                  : Colors.green.withAlpha(128),
-              dummy
-                  ? Colors.transparent
-                  : _toolbarExtended
-                  ? Colors.white
-                  : Colors.green,
               _toolbarExtended,
-              () {},
+              Colors.green,
               () {
                 setState(() {
                   _toolbarExtended = !_toolbarExtended;
@@ -3545,6 +3847,11 @@ class _MapPageState extends State<MapPage> {
                   }
                 });
               },
+              () {
+                refreshView(() {
+                  _closePolygonMenu();
+                });
+              },
               Icon(
                 Icons.forest,
                 size: gl.display.equipixel * gl.menuBarLength / 5,
@@ -3553,18 +3860,8 @@ class _MapPageState extends State<MapPage> {
             _menuButton(
               gl.display.equipixel * gl.menuBarLength / 4,
               gl.display.equipixel * gl.menuBarThickness,
-              dummy
-                  ? Colors.transparent
-                  : !gl.Mode.polygon
-                  ? Colors.transparent
-                  : Colors.yellow.withAlpha(128),
-              dummy
-                  ? Colors.transparent
-                  : gl.Mode.polygon
-                  ? Colors.white
-                  : Colors.yellow,
               gl.Mode.polygon,
-              () {},
+              Colors.yellow,
               () {
                 setState(() {
                   gl.Mode.polygon = true;
@@ -3585,14 +3882,32 @@ class _MapPageState extends State<MapPage> {
                       () {
                         refreshView(() {
                           if (gl.geometries.isNotEmpty && gl.Mode.editPolygon) {
-                            gl.Mode.showButtonAddVertexesPolygon = true;
-                            gl.Mode.showButtonMoveVertexesPolygon = false;
-                            gl.Mode.showButtonRemoveVertexesPolygon = false;
+                            if (gl.geometries[gl.selectedGeometry].type ==
+                                "Polygon") {
+                              gl.Mode.showButtonAddVertexesPolygon = true;
+                              gl.Mode.showButtonMoveVertexesPolygon = false;
+                              gl.Mode.showButtonRemoveVertexesPolygon = false;
+                            } else if (gl
+                                    .geometries[gl.selectedGeometry]
+                                    .type ==
+                                "Point") {
+                              gl
+                                  .geometries[gl.selectedGeometry]
+                                  .selectedVertex = 0;
+                              gl.Mode.showButtonAddVertexesPolygon = false;
+                              gl.Mode.showButtonMoveVertexesPolygon = true;
+                              gl.Mode.showButtonRemoveVertexesPolygon = true;
+                            }
                           }
                         });
                       },
                     ),
                   );
+                });
+              },
+              () {
+                refreshView(() {
+                  _closePolygonMenu();
                 });
               },
               Icon(
@@ -3601,46 +3916,48 @@ class _MapPageState extends State<MapPage> {
               ),
             ),
             _menuButton(
-              dummy: dummy,
               gl.display.equipixel * gl.menuBarLength / 4,
               gl.display.equipixel * gl.menuBarThickness,
-              !_modeLayerSwitches
-                  ? Colors.transparent
-                  : Colors.brown.withAlpha(128),
-              _modeLayerSwitches ? Colors.white : Colors.brown,
               _modeLayerSwitches,
+              Colors.brown,
               () {
                 setState(() {
-                  _modeLayerSwitches = false;
-                  _closeSwitchesMenu();
-                  if (dummy) {
-                    close!();
+                  if (!_modeLayerSwitches) {
+                    _modeLayerSwitches = true;
+                    _closePolygonMenu();
+                    _closeToolbarMenu();
+                    gl.mainStack.add(
+                      popupLayerSwitcher(
+                        gl.notificationContext!,
+                        () {
+                          setState(() {
+                            _closeSwitchesMenu();
+                          });
+                        },
+                        (close) {
+                          return _mainMenuBar(dummy: true, close: close);
+                        },
+                        (LatLng pos) {
+                          if (pos.longitude != 0.0 && pos.latitude != 0.0) {
+                            _mapController.move(
+                              pos,
+                              _mapController.camera.zoom,
+                            );
+                          }
+                        },
+                      ),
+                    );
+                  } else {
+                    setState(() {
+                      _modeLayerSwitches = false;
+                      _closeSwitchesMenu();
+                    });
                   }
                 });
               },
               () {
-                setState(() {
-                  _modeLayerSwitches = true;
-                  _closePolygonMenu();
-                  _closeToolbarMenu();
-                  gl.mainStack.add(
-                    popupLayerSwitcher(
-                      gl.notificationContext!,
-                      () {
-                        setState(() {
-                          _closeSwitchesMenu();
-                        });
-                      },
-                      (close) {
-                        return _mainMenuBar(dummy: true, close: close);
-                      },
-                      (LatLng pos) {
-                        if (pos.longitude != 0.0 && pos.latitude != 0.0) {
-                          _mapController.move(pos, _mapController.camera.zoom);
-                        }
-                      },
-                    ),
-                  );
+                refreshView(() {
+                  _closeSwitchesMenu();
                 });
               },
               Icon(
@@ -3657,18 +3974,16 @@ class _MapPageState extends State<MapPage> {
   Widget _menuButton(
     double width,
     double height,
-    Color borderColor,
-    Color color,
     bool isSelected,
-    VoidCallback dummyClose,
+    Color color,
     VoidCallback onPressed,
-    Icon icon, {
-    bool dummy = false,
-  }) {
+    VoidCallback onLongPress,
+    Icon icon,
+  ) {
     return Container(
       width: width,
       height: height,
-      color: borderColor,
+      color: !isSelected ? Colors.transparent : color.withAlpha(128),
       child: IconButton(
         style: ButtonStyle(
           shape: WidgetStateProperty.fromMap(
@@ -3683,16 +3998,9 @@ class _MapPageState extends State<MapPage> {
             },
           ),
         ),
-        color: color,
-        isSelected: isSelected,
-        onPressed: () {
-          dummy ? dummyClose() : onPressed();
-        },
-        onLongPress: () {
-          refreshView(() {
-            _closePolygonMenu();
-          });
-        },
+        color: isSelected ? Colors.white : color,
+        onPressed: onPressed,
+        onLongPress: onLongPress,
         icon: icon,
       ),
     );

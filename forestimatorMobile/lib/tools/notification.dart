@@ -2802,11 +2802,17 @@ class _PolygonListMenu extends State<PolygonListMenu> {
                             gl
                                 .geometries[gl.geometries.length - 1]
                                 .colorInside = colorIt;
+                            gl
+                                .geometries[gl.geometries.length - 1]
+                                .colorLine = colorIt.withAlpha(255);
                             _keyboard = true;
                           });
                         } else {
                           gl.geometries[gl.geometries.length - 1].colorInside =
                               colorIt;
+                          gl
+                              .geometries[gl.geometries.length - 1]
+                              .colorLine = colorIt.withAlpha(255);
                           _keyboard = true;
                         }
                       },
@@ -3142,12 +3148,18 @@ class _PolygonListMenu extends State<PolygonListMenu> {
                               gl
                                   .geometries[gl.geometries.length - 1]
                                   .colorInside = colorIt;
+                              gl
+                                  .geometries[gl.geometries.length - 1]
+                                  .colorLine = colorIt.withAlpha(255);
                               _keyboard = true;
                             });
                           } else {
                             gl
                                 .geometries[gl.geometries.length - 1]
                                 .colorInside = colorIt;
+                            gl
+                                .geometries[gl.geometries.length - 1]
+                                .colorLine = colorIt.withAlpha(255);
                             _keyboard = true;
                           }
                         },

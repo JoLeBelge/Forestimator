@@ -106,3 +106,15 @@ Widget gridlines() {
         }),
   );
 }
+
+ButtonStyle borderlessStyle = ButtonStyle(
+  animationDuration: Duration(seconds: 1),
+  backgroundColor: WidgetStateProperty<Color>.fromMap(
+    <WidgetStatesConstraint, Color>{WidgetState.any: Colors.transparent},
+  ),
+  padding: WidgetStateProperty<EdgeInsetsGeometry>.fromMap(
+    <WidgetStatesConstraint, EdgeInsetsGeometry>{
+      WidgetState.any: EdgeInsetsGeometry.zero,
+    },
+  ),
+);
