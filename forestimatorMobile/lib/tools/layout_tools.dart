@@ -1,5 +1,6 @@
 import 'package:fforestimator/globals.dart' as gl;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 Color getColorFromName(String name) {
   List<int> numbers = name.codeUnits;
@@ -118,3 +119,62 @@ ButtonStyle borderlessStyle = ButtonStyle(
     },
   ),
 );
+
+class ValidTextField extends StatefulWidget {
+  final VoidCallback onTap;
+  final VoidCallback onEditingComplete;
+  final bool Function(String) validate;
+  final ValueChanged<String> onValid;
+  final ValueChanged<String> onInvalid;
+  final Color validColor;
+  final Color invalidColor;
+  final double width;
+  final double height;
+  final int maxLength;
+  final String initialValue;
+
+  const ValidTextField({
+    super.key,
+    required this.width,
+    required this.height,
+    required this.validate,
+    required this.onValid,
+    required this.onInvalid,
+    required this.onTap,
+    required this.onEditingComplete,
+    this.validColor = Colors.white,
+    this.invalidColor = Colors.red,
+    this.maxLength = 255,
+    this.initialValue = "",
+  });
+
+  @override
+  State<StatefulWidget> createState() => _ValidTextField();
+}
+
+class _ValidTextField extends State<ValidTextField> {
+  bool _valid = true;
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: widget.width,
+      height: widget.height,
+      child: TextFormField(
+        initialValue: widget.initialValue,
+        maxLength: widget.maxLength,
+        maxLengthEnforcement: MaxLengthEnforcement.enforced,
+        onChanged: (String value) {
+          setState(() {
+            _valid = widget.validate(value);
+          });
+          _valid ? widget.onValid(value) : widget.onInvalid(value);
+        },
+        onEditingComplete: widget.onEditingComplete,
+        onTap: () => widget.onTap,
+        style: TextStyle(
+          color: _valid ? widget.validColor : widget.invalidColor,
+        ),
+      ),
+    );
+  }
+}

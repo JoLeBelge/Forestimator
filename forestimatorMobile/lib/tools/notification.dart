@@ -1134,18 +1134,17 @@ class PopupUserData {
                       fontSize: gl.display.equipixel * gl.fontSizeM,
                     ),
                   ),
-                  SizedBox(
+                  ValidTextField(
                     width: gl.menuBarLength * gl.display.equipixel,
-                    child: TextFormField(
-                      maxLength: 22,
-                      maxLengthEnforcement: MaxLengthEnforcement.enforced,
-                      onChanged: (String str) {
-                        gl.UserData.mail = str;
-                      },
-                      onTap: () => callbackOnStartTyping(),
-                      onTapOutside: (pointer) {},
-                      style: TextStyle(color: Colors.white),
-                    ),
+                    height: gl.menuBarThickness * gl.display.equipixel,
+                    validate: validMail,
+                    onValid: (String str) {
+                      gl.UserData.mail = str;
+                      gl.UserData.serialize();
+                    },
+                    onInvalid: (String str) {},
+                    onTap: () => callbackOnStartTyping(),
+                    onEditingComplete: () {},
                   ),
                 ],
               ),
@@ -1160,12 +1159,14 @@ class PopupUserData {
                       ),
                       child: Text("Appliquer", style: dialogTextButtonStyle()),
                       onPressed: () {
-                        if (gl.UserData.forename.isNotEmpty &&
-                            gl.UserData.name.isNotEmpty &&
-                            gl.UserData.mail.isNotEmpty) {
+                        if (validUserData()) {
+                          gl.Mode.userDataFilled = true;
+                          gl.Mode.serialize();
                           dismissPopup();
                           afterCompleting();
-                          gl.UserData.serialize();
+                        } else {
+                          gl.Mode.userDataFilled = false;
+                          gl.Mode.serialize();
                         }
                       },
                     ),
@@ -1200,6 +1201,49 @@ class PopupUserData {
       ),
     );
   }
+}
+
+bool validUserData() {
+  return gl.UserData.forename.isNotEmpty &&
+      gl.UserData.name.isNotEmpty &&
+      validMail(gl.UserData.mail);
+}
+
+bool validMail(String str) {
+  List<String> first = str.split("@");
+  if (first.length != 2) return false;
+  if (!first[1].contains(".")) return false;
+  List<String> second = first[1].split(".");
+  if (second.length != 2) return false;
+  if (second[1].isEmpty) return false;
+
+  for (int i = 0; i < first[0].length; i++) {
+    if (!containsAllowedCharacters(first[0][i], ".!#\$&%'*+-/=?^_`{}|~") &&
+        !first[0][i].contains(RegExp(r'[A-Z]')) &&
+        !first[0][i].contains(RegExp(r'[a-z]')) &&
+        !first[0][i].contains(RegExp(r'[0-9]'))) {
+      return false;
+    }
+  }
+  for (int i = 0; i < first[1].length; i++) {
+    if (!containsAllowedCharacters(first[1][i], ".-") &&
+        !first[1][i].contains(RegExp(r'[A-Z]')) &&
+        !first[1][i].contains(RegExp(r'[a-z]')) &&
+        !first[1][i].contains(RegExp(r'[0-9]'))) {
+      return false;
+    }
+  }
+  return true;
+}
+
+bool containsAllowedCharacters(String that, String allowed) {
+  String allowedCharacters = ".!#\$&%'*+-/=?^_`{}|~";
+  for (int j = 0; j < allowedCharacters.length; j++) {
+    if (that.contains(allowedCharacters[j])) {
+      return true;
+    }
+  }
+  return false;
 }
 
 class PopupNewAttribute {
@@ -1390,6 +1434,189 @@ class PopupNewAttribute {
   }
 }
 
+class PopupNewEssenceObservationPoint {
+  VoidCallback? callbackOnStartTyping;
+  VoidCallback? onTapOutside;
+
+  PopupNewEssenceObservationPoint(
+    BuildContext context,
+    LatLng coordinates, {
+    this.onTapOutside,
+    this.callbackOnStartTyping,
+  }) {
+    gl.geometries.add(
+      Geometry.essencePoint(
+        polygonName: "Essence-${Geometry.countEssenceObservations()}",
+      ),
+    );
+    gl.geometries.last.addPoint(coordinates);
+    presentPopup(
+      context: context,
+      dismiss: true,
+      after: onTapOutside ?? () {},
+      popup: AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadiusGeometry.circular(12.0),
+          side: BorderSide(color: gl.colorAgroBioTech, width: 2.0),
+        ),
+        backgroundColor: gl.backgroundTransparentBlackBox,
+        content: SizedBox(
+          width:
+              gl.display.orientation == Orientation.portrait
+                  ? gl.popupWindowsPortraitWidth * gl.display.equipixel
+                  : gl.popupWindowsLandscapeWidth * gl.display.equipixel,
+          height:
+              gl.display.orientation == Orientation.portrait
+                  ? gl.popupWindowsPortraitHeight * gl.display.equipixel / 2
+                  : gl.popupWindowsLandscapeHeight * gl.display.equipixel,
+          child: SingleChildScrollView(
+            child: switchRowColWithOrientation([
+              Column(
+                children: [
+                  Text(
+                    "Observation essence",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: gl.display.equipixel * gl.fontSizeM,
+                    ),
+                  ),
+                  stroke(
+                    gl.display.equipixel,
+                    gl.display.equipixel * .5,
+                    gl.colorAgroBioTech,
+                  ),
+                  SelectEssence(),
+                  stroke(
+                    gl.display.equipixel,
+                    gl.display.equipixel * .5,
+                    gl.colorAgroBioTech,
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  SizedBox(
+                    width: gl.menuBarLength * .5 * gl.display.equipixel,
+                    child: TextButton(
+                      style: dialogButtonStyle(
+                        height: gl.display.equipixel * 12,
+                        width: gl.display.equipixel * 10 * "Ok".length,
+                      ),
+                      child: Text("Ajouter", style: dialogTextButtonStyle()),
+                      onPressed: () {
+                        gl.Mode.essencePointsToSync = true;
+                        Geometry.startSendDeamon();
+                        gl.Mode.serialize();
+                        dismissPopup();
+                      },
+                    ),
+                  ),
+                  stroke(
+                    vertical: true,
+                    gl.display.equipixel,
+                    gl.display.equipixel * .5,
+                    Colors.transparent,
+                  ),
+                  SizedBox(
+                    width: gl.menuBarLength * .5 * gl.display.equipixel,
+                    child: TextButton(
+                      style: dialogButtonStyle(
+                        height: gl.display.equipixel * 12,
+                        width: gl.display.equipixel * 10 * "Retour".length,
+                      ),
+                      child: Text("Retour", style: dialogTextButtonStyle()),
+                      onPressed: () {
+                        gl.geometries.removeLast();
+                        dismissPopup();
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ]),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class SelectEssence extends StatefulWidget {
+  final VoidCallback? callbackOnStartTyping;
+  const SelectEssence({super.key, this.callbackOnStartTyping});
+
+  @override
+  State<StatefulWidget> createState() => _SelectEssence();
+}
+
+class _SelectEssence extends State<SelectEssence> {
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        SizedBox(
+          width: gl.menuBarLength * gl.display.equipixel,
+          child: DropdownMenuFormField<String>(
+            textStyle: TextStyle(
+              color: Colors.white,
+              fontSize: gl.fontSizeM * gl.display.equipixel,
+            ),
+            menuStyle: MenuStyle(
+              backgroundColor: WidgetStateProperty<Color>.fromMap(
+                <WidgetStatesConstraint, Color>{
+                  WidgetState.any: gl.backgroundTransparentBlackBox,
+                },
+              ),
+            ),
+            initialSelection: gl.essenceChoice[0],
+            dropdownMenuEntries: List<DropdownMenuEntry<String>>.generate(
+              gl.essenceChoice.length,
+              (index) {
+                return DropdownMenuEntry<String>(
+                  value: gl.essenceChoice[index],
+                  label: gl.essenceChoice[index],
+                  labelWidget: Text(
+                    gl.essenceChoice[index],
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: gl.fontSizeM * gl.display.equipixel,
+                    ),
+                  ),
+                );
+              },
+            ),
+            onSelected: (value) {
+              setState(() {
+                gl.geometries.last.attributes[0].value = value;
+                gl.geometries.last.colorInside =
+                    gl.dico.mLayerBases["COMPOALL"]!.mDicoCol[gl.essenceChoice
+                        .indexOf(value!)] ??
+                    Colors.black;
+                gl.geometries.last.colorLine = gl.geometries.last.colorInside
+                    .withAlpha(255);
+              });
+            },
+          ),
+        ),
+        if (gl.geometries.last.attributes[0].value == "Entrer du texte")
+          SizedBox(
+            width: gl.menuBarLength * gl.display.equipixel,
+            child: TextFormField(
+              maxLength: 255,
+              maxLengthEnforcement: MaxLengthEnforcement.enforced,
+              onChanged: (value) {
+                gl.geometries.last.attributes[0].value = value;
+              },
+              onTap: () => widget.callbackOnStartTyping ?? () {},
+              onTapOutside: (pointer) {},
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+      ],
+    );
+  }
+}
+
 class PopupValueChange {
   PopupValueChange(
     String type,
@@ -1431,53 +1658,67 @@ class PopupValueChange {
               ),
               SizedBox(
                 width: gl.menuBarLength * gl.display.equipixel,
-                child: TextFormField(
-                  maxLength: 255,
-                  maxLengthEnforcement: MaxLengthEnforcement.enforced,
-                  onChanged: (String str) {
-                    switch (type) {
-                      case "prop":
-                        valueChanged(textEditor.text);
-                      case "string":
-                        valueChanged(str.toString());
-                      case "int":
-                        try {
-                          valueChanged(int.parse(str));
-                        } catch (e) {
-                          if (textEditor.text.isNotEmpty) {
-                            textEditor.text = textEditor.text.substring(
-                              0,
-                              textEditor.text.length - 1,
-                            );
-                          }
-                          if (textEditor.text.isEmpty) {
-                            valueChanged(0);
-                          } else {
-                            valueChanged(textEditor.text);
-                          }
-                        }
-                      case "double":
-                        try {
-                          valueChanged(double.parse(str));
-                        } catch (e) {
-                          if (textEditor.text.isNotEmpty) {
-                            textEditor.text = textEditor.text.substring(
-                              0,
-                              textEditor.text.length - 1,
-                            );
-                          }
-                          if (textEditor.text.isEmpty) {
-                            valueChanged(0.0);
-                          } else {
-                            valueChanged(textEditor.text);
-                          }
-                        }
-                    }
-                  },
-                  onTapOutside: (pointer) {},
-                  controller: textEditor,
-                  style: TextStyle(color: Colors.white),
-                ),
+                child:
+                    type != "mail"
+                        ? TextFormField(
+                          maxLength: 255,
+                          maxLengthEnforcement: MaxLengthEnforcement.enforced,
+                          onChanged: (String str) {
+                            switch (type) {
+                              case "prop":
+                                valueChanged(textEditor.text);
+                              case "string":
+                                valueChanged(str.toString());
+                              case "int":
+                                try {
+                                  valueChanged(int.parse(str));
+                                } catch (e) {
+                                  if (textEditor.text.isNotEmpty) {
+                                    textEditor.text = textEditor.text.substring(
+                                      0,
+                                      textEditor.text.length - 1,
+                                    );
+                                  }
+                                  if (textEditor.text.isEmpty) {
+                                    valueChanged(0);
+                                  } else {
+                                    valueChanged(textEditor.text);
+                                  }
+                                }
+                              case "double":
+                                try {
+                                  valueChanged(double.parse(str));
+                                } catch (e) {
+                                  if (textEditor.text.isNotEmpty) {
+                                    textEditor.text = textEditor.text.substring(
+                                      0,
+                                      textEditor.text.length - 1,
+                                    );
+                                  }
+                                  if (textEditor.text.isEmpty) {
+                                    valueChanged(0.0);
+                                  } else {
+                                    valueChanged(textEditor.text);
+                                  }
+                                }
+                            }
+                          },
+                          onTapOutside: (pointer) {},
+                          controller: textEditor,
+                          style: TextStyle(color: Colors.white),
+                        )
+                        : ValidTextField(
+                          initialValue: gl.UserData.mail,
+                          width: gl.menuBarLength * gl.display.equipixel,
+                          height: gl.menuBarThickness * gl.display.equipixel,
+                          validate: validMail,
+                          onValid: (String str) {
+                            valueChanged(str);
+                          },
+                          onInvalid: (String str) {},
+                          onTap: () => () {},
+                          onEditingComplete: () {},
+                        ),
               ),
               Row(
                 children: [
@@ -2144,8 +2385,8 @@ class _PolygonListMenu extends State<PolygonListMenu> {
                                                 Container(
                                                   alignment: Alignment.topLeft,
                                                   child:
-                                                      gl.geometries[i].type ==
-                                                              "Point"
+                                                      gl.geometries[i].type
+                                                              .contains("Point")
                                                           ? Text(
                                                             "POINT",
                                                             style: TextStyle(
@@ -2325,8 +2566,10 @@ class _PolygonListMenu extends State<PolygonListMenu> {
                                                       alignment:
                                                           Alignment.topLeft,
                                                       child:
-                                                          gl.geometries[i].type ==
-                                                                  "Point"
+                                                          gl.geometries[i].type
+                                                                  .contains(
+                                                                    "Point",
+                                                                  )
                                                               ? Text(
                                                                 "POINT",
                                                                 style: TextStyle(
@@ -2628,8 +2871,8 @@ class _PolygonListMenu extends State<PolygonListMenu> {
                                                         .75,
                                                   ),
                                                 ),
-                                              if (gl.geometries[i].type ==
-                                                      "Point" &&
+                                              if (gl.geometries[i].type
+                                                      .contains("Point") &&
                                                   gl
                                                       .geometries[i]
                                                       .points
@@ -4612,246 +4855,277 @@ void launchURL(String url) async {
   }
 }
 
-Widget forestimatorSettingsUserData() {
-  return OrientationBuilder(
-    builder: (context, orientation) {
-      return Container(
-        padding: EdgeInsets.all(7.5),
-        child: Column(
-          children: [
-            stroke(
-              vertical: false,
-              gl.display.equipixel,
-              gl.display.equipixel * .5,
-              gl.colorAgroBioTech,
-            ),
-            Row(
-              children: [
-                SizedBox(
-                  width: gl.display.equipixel * 40,
-                  child: Text(
-                    "Prénom",
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: gl.display.equipixel * gl.fontSizeS,
+class ForestimatorSettingsUserData extends StatefulWidget {
+  final VoidCallback onChanged;
+  const ForestimatorSettingsUserData({super.key, required this.onChanged});
+
+  @override
+  State<StatefulWidget> createState() => _ForestimatorSettingsUserData();
+}
+
+class _ForestimatorSettingsUserData
+    extends State<ForestimatorSettingsUserData> {
+  _ForestimatorSettingsUserData();
+  @override
+  Widget build(BuildContext context) {
+    return OrientationBuilder(
+      builder: (context, orientation) {
+        return Container(
+          padding: EdgeInsets.all(7.5),
+          child: Column(
+            children: [
+              stroke(
+                vertical: false,
+                gl.display.equipixel,
+                gl.display.equipixel * .5,
+                gl.colorAgroBioTech,
+              ),
+              Row(
+                children: [
+                  SizedBox(
+                    width: gl.display.equipixel * 40,
+                    child: Text(
+                      "Prénom",
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: gl.display.equipixel * gl.fontSizeS,
+                      ),
                     ),
                   ),
-                ),
-                stroke(
-                  vertical: true,
-                  gl.display.equipixel,
-                  gl.display.equipixel * .5,
-                  gl.colorAgroBioTech,
-                ),
-                Container(
-                  alignment: Alignment.center,
-                  width: gl.display.equipixel * 40,
-                  height: gl.display.equipixel * gl.iconSizeXS,
-                  child: TextButton(
-                    style: ButtonStyle(
-                      animationDuration: Duration(seconds: 1),
-                      backgroundColor: WidgetStateProperty<Color>.fromMap(
-                        <WidgetStatesConstraint, Color>{
-                          WidgetState.any: Colors.transparent,
-                        },
+                  stroke(
+                    vertical: true,
+                    gl.display.equipixel,
+                    gl.display.equipixel * .5,
+                    gl.colorAgroBioTech,
+                  ),
+                  Container(
+                    alignment: Alignment.center,
+                    width: gl.display.equipixel * 40,
+                    height: gl.display.equipixel * gl.iconSizeXS,
+                    child: TextButton(
+                      style: ButtonStyle(
+                        animationDuration: Duration(seconds: 1),
+                        backgroundColor: WidgetStateProperty<Color>.fromMap(
+                          <WidgetStatesConstraint, Color>{
+                            WidgetState.any: Colors.transparent,
+                          },
+                        ),
+                        padding:
+                            WidgetStateProperty<EdgeInsetsGeometry>.fromMap(
+                              <WidgetStatesConstraint, EdgeInsetsGeometry>{
+                                WidgetState.any: EdgeInsetsGeometry.zero,
+                              },
+                            ),
                       ),
-                      padding: WidgetStateProperty<EdgeInsetsGeometry>.fromMap(
-                        <WidgetStatesConstraint, EdgeInsetsGeometry>{
-                          WidgetState.any: EdgeInsetsGeometry.zero,
-                        },
-                      ),
-                    ),
-                    onPressed: () {},
-                    onLongPress: () {
-                      PopupValueChange(
-                        "string",
-                        gl.UserData.forename,
-                        (value) {
-                          gl.UserData.forename = value;
-                        },
-                        () {},
-                        () {
-                          gl.UserData.serialize();
-                        },
-                      );
-                    },
-                    child: Container(
-                      alignment: Alignment.centerLeft,
-                      width: gl.display.equipixel * 40,
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Text(
+                      onPressed: () {},
+                      onLongPress: () {
+                        PopupValueChange(
+                          "string",
                           gl.UserData.forename,
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontSize: gl.display.equipixel * gl.fontSizeS,
+                          (value) {
+                            setState(() {
+                              gl.UserData.forename = value;
+                              gl.Mode.userDataFilled = validUserData();
+                              gl.Mode.serialize();
+                            });
+                            widget.onChanged();
+                          },
+                          () {},
+                          () {
+                            gl.UserData.serialize();
+                          },
+                        );
+                      },
+                      child: Container(
+                        alignment: Alignment.centerLeft,
+                        width: gl.display.equipixel * 40,
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Text(
+                            gl.UserData.forename,
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: gl.display.equipixel * gl.fontSizeS,
+                            ),
                           ),
                         ),
                       ),
                     ),
                   ),
-                ),
-              ],
-            ),
-            stroke(
-              vertical: false,
-              gl.display.equipixel,
-              gl.display.equipixel * .5,
-              gl.colorAgroBioTech,
-            ),
-            Row(
-              children: [
-                SizedBox(
-                  width: gl.display.equipixel * 40,
-                  child: Text(
-                    "Nom",
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: gl.display.equipixel * gl.fontSizeS,
+                ],
+              ),
+              stroke(
+                vertical: false,
+                gl.display.equipixel,
+                gl.display.equipixel * .5,
+                gl.colorAgroBioTech,
+              ),
+              Row(
+                children: [
+                  SizedBox(
+                    width: gl.display.equipixel * 40,
+                    child: Text(
+                      "Nom",
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: gl.display.equipixel * gl.fontSizeS,
+                      ),
                     ),
                   ),
-                ),
-                stroke(
-                  vertical: true,
-                  gl.display.equipixel,
-                  gl.display.equipixel * .5,
-                  gl.colorAgroBioTech,
-                ),
-                Container(
-                  alignment: Alignment.center,
-                  width: gl.display.equipixel * 40,
-                  height: gl.display.equipixel * gl.iconSizeXS,
-                  child: TextButton(
-                    style: ButtonStyle(
-                      animationDuration: Duration(seconds: 1),
-                      backgroundColor: WidgetStateProperty<Color>.fromMap(
-                        <WidgetStatesConstraint, Color>{
-                          WidgetState.any: Colors.transparent,
-                        },
+                  stroke(
+                    vertical: true,
+                    gl.display.equipixel,
+                    gl.display.equipixel * .5,
+                    gl.colorAgroBioTech,
+                  ),
+                  Container(
+                    alignment: Alignment.center,
+                    width: gl.display.equipixel * 40,
+                    height: gl.display.equipixel * gl.iconSizeXS,
+                    child: TextButton(
+                      style: ButtonStyle(
+                        animationDuration: Duration(seconds: 1),
+                        backgroundColor: WidgetStateProperty<Color>.fromMap(
+                          <WidgetStatesConstraint, Color>{
+                            WidgetState.any: Colors.transparent,
+                          },
+                        ),
+                        padding:
+                            WidgetStateProperty<EdgeInsetsGeometry>.fromMap(
+                              <WidgetStatesConstraint, EdgeInsetsGeometry>{
+                                WidgetState.any: EdgeInsetsGeometry.zero,
+                              },
+                            ),
                       ),
-                      padding: WidgetStateProperty<EdgeInsetsGeometry>.fromMap(
-                        <WidgetStatesConstraint, EdgeInsetsGeometry>{
-                          WidgetState.any: EdgeInsetsGeometry.zero,
-                        },
-                      ),
-                    ),
-                    onPressed: () {},
-                    onLongPress: () {
-                      PopupValueChange(
-                        "string",
-                        gl.UserData.name,
-                        (value) {
-                          gl.UserData.name = value;
-                        },
-                        () {},
-                        () {
-                          gl.UserData.serialize();
-                        },
-                      );
-                    },
-                    child: Container(
-                      alignment: Alignment.centerLeft,
-                      width: gl.display.equipixel * 40,
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Text(
+                      onPressed: () {},
+                      onLongPress: () {
+                        PopupValueChange(
+                          "string",
                           gl.UserData.name,
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontSize: gl.display.equipixel * gl.fontSizeS,
+                          (value) {
+                            setState(() {
+                              gl.UserData.name = value;
+                              gl.Mode.userDataFilled = validUserData();
+                              gl.Mode.serialize();
+                            });
+                            widget.onChanged();
+                          },
+                          () {},
+                          () {
+                            gl.UserData.serialize();
+                          },
+                        );
+                      },
+                      child: Container(
+                        alignment: Alignment.centerLeft,
+                        width: gl.display.equipixel * 40,
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Text(
+                            gl.UserData.name,
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: gl.display.equipixel * gl.fontSizeS,
+                            ),
                           ),
                         ),
                       ),
                     ),
                   ),
-                ),
-              ],
-            ),
-            stroke(
-              vertical: false,
-              gl.display.equipixel,
-              gl.display.equipixel * .5,
-              gl.colorAgroBioTech,
-            ),
-            Row(
-              children: [
-                SizedBox(
-                  width: gl.display.equipixel * 40,
-                  child: Text(
-                    "Mail",
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: gl.display.equipixel * gl.fontSizeS,
+                ],
+              ),
+              stroke(
+                vertical: false,
+                gl.display.equipixel,
+                gl.display.equipixel * .5,
+                gl.colorAgroBioTech,
+              ),
+              Row(
+                children: [
+                  SizedBox(
+                    width: gl.display.equipixel * 40,
+                    child: Text(
+                      "Mail",
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: gl.display.equipixel * gl.fontSizeS,
+                      ),
                     ),
                   ),
-                ),
-                stroke(
-                  vertical: true,
-                  gl.display.equipixel,
-                  gl.display.equipixel * .5,
-                  gl.colorAgroBioTech,
-                ),
-                Container(
-                  alignment: Alignment.center,
-                  width: gl.display.equipixel * 40,
-                  height: gl.display.equipixel * gl.iconSizeXS,
-                  child: TextButton(
-                    style: ButtonStyle(
-                      animationDuration: Duration(seconds: 1),
-                      backgroundColor: WidgetStateProperty<Color>.fromMap(
-                        <WidgetStatesConstraint, Color>{
-                          WidgetState.any: Colors.transparent,
-                        },
+                  stroke(
+                    vertical: true,
+                    gl.display.equipixel,
+                    gl.display.equipixel * .5,
+                    gl.colorAgroBioTech,
+                  ),
+                  Container(
+                    alignment: Alignment.center,
+                    width: gl.display.equipixel * 40,
+                    height: gl.display.equipixel * gl.iconSizeXS,
+                    child: TextButton(
+                      style: ButtonStyle(
+                        animationDuration: Duration(seconds: 1),
+                        backgroundColor: WidgetStateProperty<Color>.fromMap(
+                          <WidgetStatesConstraint, Color>{
+                            WidgetState.any: Colors.transparent,
+                          },
+                        ),
+                        padding:
+                            WidgetStateProperty<EdgeInsetsGeometry>.fromMap(
+                              <WidgetStatesConstraint, EdgeInsetsGeometry>{
+                                WidgetState.any: EdgeInsetsGeometry.zero,
+                              },
+                            ),
                       ),
-                      padding: WidgetStateProperty<EdgeInsetsGeometry>.fromMap(
-                        <WidgetStatesConstraint, EdgeInsetsGeometry>{
-                          WidgetState.any: EdgeInsetsGeometry.zero,
-                        },
-                      ),
-                    ),
-                    onPressed: () {},
-                    onLongPress: () {
-                      PopupValueChange(
-                        "string",
-                        gl.UserData.mail,
-                        (value) {
-                          gl.UserData.mail = value;
-                        },
-                        () {},
-                        () {
-                          gl.UserData.serialize();
-                        },
-                      );
-                    },
-                    child: Container(
-                      alignment: Alignment.centerLeft,
-                      width: gl.display.equipixel * 40,
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Text(
+                      onPressed: () {},
+                      onLongPress: () {
+                        PopupValueChange(
+                          "mail",
                           gl.UserData.mail,
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontSize: gl.display.equipixel * gl.fontSizeS,
+                          (value) {
+                            setState(() {
+                              gl.UserData.mail = value;
+                              gl.Mode.userDataFilled = validUserData();
+                              gl.Mode.serialize();
+                            });
+                            widget.onChanged();
+                          },
+                          () {},
+                          () {
+                            gl.UserData.serialize();
+                          },
+                        );
+                      },
+                      child: Container(
+                        alignment: Alignment.centerLeft,
+                        width: gl.display.equipixel * 40,
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Text(
+                            gl.UserData.mail,
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: gl.display.equipixel * gl.fontSizeS,
+                            ),
                           ),
                         ),
                       ),
                     ),
                   ),
-                ),
-              ],
-            ),
-            stroke(
-              vertical: false,
-              gl.display.equipixel,
-              gl.display.equipixel * .5,
-              gl.colorAgroBioTech,
-            ),
-          ],
-        ),
-      );
-    },
-  );
+                ],
+              ),
+              stroke(
+                vertical: false,
+                gl.display.equipixel,
+                gl.display.equipixel * .5,
+                gl.colorAgroBioTech,
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
 }
 
 Widget forestimatorSettingsContacts() {
@@ -4958,7 +5232,7 @@ class _ForestimatorVariables extends State<ForestimatorVariables> {
           });
           gl.refreshMainStack(() {});
         }, false),
-        variableBooleanSlider("Scanlines", gl.Mode.debugScanlines, (bool it) {
+        variableBooleanSlider("Gridlines", gl.Mode.debugScanlines, (bool it) {
           setState(() {
             gl.Mode.debugScanlines = it;
           });
@@ -4999,6 +5273,37 @@ class _ForestimatorVariables extends State<ForestimatorVariables> {
           });
           gl.refreshMainStack(() {});
         }, true),
+      ],
+    );
+  }
+}
+
+class ForestimatorAdvancedSettings extends StatefulWidget {
+  const ForestimatorAdvancedSettings({super.key});
+
+  @override
+  State<StatefulWidget> createState() => _ForestimatorAdvancedSettings();
+}
+
+class _ForestimatorAdvancedSettings
+    extends State<ForestimatorAdvancedSettings> {
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        variableBooleanSlider("Mode Essence", gl.Mode.essence, (bool it) {
+          setState(() {
+            gl.Mode.essence = it;
+          });
+          gl.refreshMainStack(() {});
+        }, false),
+        variableBooleanSlider("Petit Label", gl.Mode.smallLabel, (bool it) {
+          setState(() {
+            gl.Mode.smallLabel = it;
+            gl.Mode.labelCross = !it;
+          });
+          gl.refreshMainStack(() {});
+        }, false),
       ],
     );
   }
@@ -5446,7 +5751,7 @@ class _SettingsMenu extends State<SettingsMenu> {
                 width: gl.popupWindowsPortraitWidth * gl.display.equipixel,
                 child: ListView(
                   padding: const EdgeInsets.symmetric(horizontal: 0),
-                  children: _injectLayerResults((int i, ItemSettings item) {
+                  children: _injectMenuEntries((int i, ItemSettings item) {
                     return Container(
                       alignment: Alignment.center,
                       child:
@@ -5578,9 +5883,7 @@ class _SettingsMenu extends State<SettingsMenu> {
     );
   }
 
-  List<Widget> _injectLayerResults(
-    Widget Function(int, ItemSettings) generate,
-  ) {
+  List<Widget> _injectMenuEntries(Widget Function(int, ItemSettings) generate) {
     final List<ItemSettings> menuItems = [];
     menuItems.addAll([
       ItemSettings(
@@ -5593,8 +5896,17 @@ class _SettingsMenu extends State<SettingsMenu> {
       ),
       ItemSettings(
         name: "Données Utilisateur",
-        entry: forestimatorSettingsUserData(),
+        entry: ForestimatorSettingsUserData(
+          onChanged: () {
+            setState(() {});
+          },
+        ),
       ),
+      if (gl.Mode.userDataFilled)
+        ItemSettings(
+          name: "Paramètres avancés",
+          entry: ForestimatorAdvancedSettings(),
+        ),
       ItemSettings(
         name: "À propos de Forestimator",
         entry: forestimatorSettingsVersion((void Function() f) {

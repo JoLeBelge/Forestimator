@@ -377,10 +377,10 @@ class _MapPageState extends State<MapPage> {
                                                   .addPoint(point);
                                             }),
                                             if (gl
-                                                        .geometries[gl
-                                                            .selectedGeometry]
-                                                        .type ==
-                                                    "Point" &&
+                                                    .geometries[gl
+                                                        .selectedGeometry]
+                                                    .type
+                                                    .contains("Point") &&
                                                 gl
                                                         .geometries[gl
                                                             .selectedGeometry]
@@ -420,10 +420,9 @@ class _MapPageState extends State<MapPage> {
                                     refreshView(() {
                                       _stopMovingSelectedPoint();
                                       if (gl
-                                                  .geometries[gl
-                                                      .selectedGeometry]
-                                                  .type ==
-                                              "Point" &&
+                                              .geometries[gl.selectedGeometry]
+                                              .type
+                                              .contains("Point") &&
                                           gl
                                                   .geometries[gl
                                                       .selectedGeometry]
@@ -455,6 +454,13 @@ class _MapPageState extends State<MapPage> {
                                         gl.Mode.removeVertexesPolygon = false;
                                       }
                                     }),
+                                  }
+                                  : gl.Mode.essence
+                                  ? (tapPosition, point) async => {
+                                    PopupNewEssenceObservationPoint(
+                                      context,
+                                      point,
+                                    ),
                                   }
                                   : gl.Mode.editPolygon
                                   ? (tapPosition, point) async => {}
@@ -935,10 +941,12 @@ class _MapPageState extends State<MapPage> {
                                                                   .spaceBetween,
                                                           children: [
                                                             gl
-                                                                        .geometries[gl
-                                                                            .selectedGeometry]
-                                                                        .type ==
-                                                                    "Point"
+                                                                    .geometries[gl
+                                                                        .selectedGeometry]
+                                                                    .type
+                                                                    .contains(
+                                                                      "Point",
+                                                                    )
                                                                 ? Text(
                                                                   "POINT",
                                                                   style: TextStyle(
@@ -987,8 +995,13 @@ class _MapPageState extends State<MapPage> {
                                                                   ),
                                                                 ),
                                                             Icon(
-                                                              (gl.geometries[gl.selectedGeometry].type ==
-                                                                      "Point"
+                                                              (gl
+                                                                      .geometries[gl
+                                                                          .selectedGeometry]
+                                                                      .type
+                                                                      .contains(
+                                                                        "Point",
+                                                                      )
                                                                   ? gl.selectableIcons[gl
                                                                       .geometries[gl
                                                                           .selectedGeometry]
@@ -1186,10 +1199,12 @@ class _MapPageState extends State<MapPage> {
                                                                   ),
                                                                 )
                                                                 : gl
-                                                                        .geometries[gl
-                                                                            .selectedGeometry]
-                                                                        .type ==
-                                                                    "Point"
+                                                                    .geometries[gl
+                                                                        .selectedGeometry]
+                                                                    .type
+                                                                    .contains(
+                                                                      "Point",
+                                                                    )
                                                                 ? Text(
                                                                   "Modifiez le point",
                                                                   textAlign:
@@ -1348,8 +1363,13 @@ class _MapPageState extends State<MapPage> {
                                                           ),
                                                       (gl.geometries[gl.selectedGeometry].type ==
                                                                       "Polygon" ||
-                                                                  gl.geometries[gl.selectedGeometry].type ==
-                                                                          "Point" &&
+                                                                  gl
+                                                                          .geometries[gl
+                                                                              .selectedGeometry]
+                                                                          .type
+                                                                          .contains(
+                                                                            "Point",
+                                                                          ) &&
                                                                       gl.geometries[gl.selectedGeometry].numPoints <
                                                                           1) &&
                                                               gl
@@ -1514,8 +1534,13 @@ class _MapPageState extends State<MapPage> {
                                                                   } else if (gl
                                                                           .Mode
                                                                           .editPolygon &&
-                                                                      gl.geometries[gl.selectedGeometry].type ==
-                                                                          "Point") {
+                                                                      gl
+                                                                          .geometries[gl
+                                                                              .selectedGeometry]
+                                                                          .type
+                                                                          .contains(
+                                                                            "Point",
+                                                                          )) {
                                                                     refreshView(() {
                                                                       _stopMovingSelectedPoint();
                                                                       gl.Mode.showButtonAddVertexesPolygon =
@@ -2479,6 +2504,8 @@ class _MapPageState extends State<MapPage> {
                                                                   gl.iconSizeM *
                                                                   .9,
                                                               child: IconButton(
+                                                                style:
+                                                                    borderlessStyle,
                                                                 iconSize:
                                                                     gl
                                                                         .display
@@ -2533,8 +2560,7 @@ class _MapPageState extends State<MapPage> {
                                                                     gl
                                                                         .display
                                                                         .equipixel *
-                                                                    gl.fontSizeM *
-                                                                    .75,
+                                                                    gl.fontSizeS,
                                                               ),
                                                             ),
                                                           ),
@@ -2576,8 +2602,7 @@ class _MapPageState extends State<MapPage> {
                                                                         gl
                                                                             .display
                                                                             .equipixel *
-                                                                        gl.iconSizeM *
-                                                                        .9,
+                                                                        gl.iconSizeL,
                                                                     child: IconButton(
                                                                       onPressed: () {
                                                                         refreshView(() {
@@ -2692,7 +2717,8 @@ class _MapPageState extends State<MapPage> {
                                                             gl
                                                                 .display
                                                                 .equipixel *
-                                                            gl.chosenPolyBarHeight,
+                                                            gl.chosenPolyBarHeight *
+                                                            .8,
                                                         child: Slider(
                                                           min: gl.iconSizeXXS,
                                                           max: gl.iconSizeL,
@@ -2742,6 +2768,8 @@ class _MapPageState extends State<MapPage> {
                                                             gl.iconSizeM *
                                                             .9,
                                                         child: IconButton(
+                                                          style:
+                                                              borderlessStyle,
                                                           iconSize:
                                                               gl
                                                                   .display
@@ -2814,53 +2842,88 @@ class _MapPageState extends State<MapPage> {
                                                         MainAxisAlignment
                                                             .spaceEvenly,
                                                     children: [
-                                                      if (!gl
-                                                          .geometries[gl
-                                                              .selectedGeometry]
-                                                          .labelsVisibleOnMap)
-                                                        SizedBox(
-                                                          height:
-                                                              gl
-                                                                  .display
-                                                                  .equipixel *
-                                                              gl.iconSizeM *
-                                                              .9,
-                                                          child: IconButton(
-                                                            onPressed: () {
-                                                              setState(() {
+                                                      !gl
+                                                              .geometries[gl
+                                                                  .selectedGeometry]
+                                                              .labelsVisibleOnMap
+                                                          ? SizedBox(
+                                                            height:
+                                                                gl
+                                                                    .display
+                                                                    .equipixel *
+                                                                gl.iconSizeM *
+                                                                .9,
+                                                            child: IconButton(
+                                                              onPressed: () {
+                                                                setState(() {
+                                                                  gl
+                                                                      .geometries[gl
+                                                                          .selectedGeometry]
+                                                                      .labelsVisibleOnMap = true;
+                                                                });
                                                                 gl
                                                                     .geometries[gl
                                                                         .selectedGeometry]
-                                                                    .labelsVisibleOnMap = true;
-                                                              });
-                                                              gl
-                                                                  .geometries[gl
-                                                                      .selectedGeometry]
-                                                                  .serialize();
-                                                              gl
-                                                                  .geometries[gl
-                                                                      .selectedGeometry]
-                                                                  .serialize();
-                                                              gl.refreshMainStack(
-                                                                () {
-                                                                  gl.modeMapShowPolygons =
-                                                                      true;
-                                                                },
-                                                              );
-                                                            },
-                                                            icon: Icon(
-                                                              Icons.label,
-                                                              size:
+                                                                    .serialize();
+                                                                gl
+                                                                    .geometries[gl
+                                                                        .selectedGeometry]
+                                                                    .serialize();
+                                                                gl.refreshMainStack(
+                                                                  () {
+                                                                    gl.modeMapShowPolygons =
+                                                                        true;
+                                                                  },
+                                                                );
+                                                              },
+                                                              icon: Icon(
+                                                                Icons.label,
+                                                                size:
+                                                                    gl
+                                                                        .display
+                                                                        .equipixel *
+                                                                    gl.iconSizeS *
+                                                                    .9,
+                                                                color:
+                                                                    Colors
+                                                                        .white,
+                                                              ),
+                                                            ),
+                                                          )
+                                                          : SizedBox(
+                                                            height:
+                                                                gl
+                                                                    .display
+                                                                    .equipixel *
+                                                                gl.iconSizeM *
+                                                                .9,
+                                                            child: IconButton(
+                                                              onPressed: () {
+                                                                setState(() {
                                                                   gl
-                                                                      .display
-                                                                      .equipixel *
-                                                                  gl.iconSizeS *
-                                                                  .9,
-                                                              color:
-                                                                  Colors.white,
+                                                                      .geometries[gl
+                                                                          .selectedGeometry]
+                                                                      .labelsVisibleOnMap = false;
+                                                                });
+                                                                gl
+                                                                    .geometries[gl
+                                                                        .selectedGeometry]
+                                                                    .serialize();
+                                                              },
+                                                              icon: Icon(
+                                                                Icons.label_off,
+                                                                size:
+                                                                    gl
+                                                                        .display
+                                                                        .equipixel *
+                                                                    gl.iconSizeS *
+                                                                    .9,
+                                                                color:
+                                                                    Colors
+                                                                        .white,
+                                                              ),
                                                             ),
                                                           ),
-                                                        ),
                                                       if (gl
                                                               .geometries[gl
                                                                   .selectedGeometry]
@@ -2963,10 +3026,10 @@ class _MapPageState extends State<MapPage> {
                                                           ),
                                                         ),
                                                       if (gl
-                                                              .geometries[gl
-                                                                  .selectedGeometry]
-                                                              .type ==
-                                                          "Point")
+                                                          .geometries[gl
+                                                              .selectedGeometry]
+                                                          .type
+                                                          .contains("Point"))
                                                         SizedBox(
                                                           height:
                                                               gl
@@ -3021,10 +3084,12 @@ class _MapPageState extends State<MapPage> {
                                                                       .Mode
                                                                       .editPolygon &&
                                                                   gl
-                                                                          .geometries[gl
-                                                                              .selectedGeometry]
-                                                                          .type ==
-                                                                      "Point") {
+                                                                      .geometries[gl
+                                                                          .selectedGeometry]
+                                                                      .type
+                                                                      .contains(
+                                                                        "Point",
+                                                                      )) {
                                                                 refreshView(() {
                                                                   gl.Mode.editPolygon =
                                                                       true;
@@ -3231,9 +3296,9 @@ class _MapPageState extends State<MapPage> {
     if (gl.Mode.openToolbox) {
       result += gl.chosenPolyBarHeight * 1.25;
       if (gl.Mode.editAttributes) {
-        result += gl.attributeTableHeight * 1.25;
+        result += gl.attributeTableHeight * 1.3;
       } else if (gl.Mode.editPointMarker) {
-        result += 45;
+        result += gl.chosenPolyBarHeight * 2;
       }
     }
     return result;
@@ -3266,7 +3331,9 @@ class _MapPageState extends State<MapPage> {
 
     for (var layer in gl.geometries) {
       gl.selectableIcons[layer.selectedPointIcon];
-      if (layer.visibleOnMap && layer.numPoints > 0 && layer.type == "Point") {
+      if (layer.visibleOnMap &&
+          layer.numPoints > 0 &&
+          layer.type.contains("Point")) {
         that.add(
           Marker(
             width: layer.iconSize * gl.display.equipixel,
@@ -3887,10 +3954,8 @@ class _MapPageState extends State<MapPage> {
                               gl.Mode.showButtonAddVertexesPolygon = true;
                               gl.Mode.showButtonMoveVertexesPolygon = false;
                               gl.Mode.showButtonRemoveVertexesPolygon = false;
-                            } else if (gl
-                                    .geometries[gl.selectedGeometry]
-                                    .type ==
-                                "Point") {
+                            } else if (gl.geometries[gl.selectedGeometry].type
+                                .contains("Point")) {
                               gl
                                   .geometries[gl.selectedGeometry]
                                   .selectedVertex = 0;
@@ -4242,7 +4307,11 @@ class _MapPageState extends State<MapPage> {
           ? gl.geometries[i].type == "Polygon"
               ? Marker(
                 alignment: Alignment.center,
-                width: gl.display.equipixel * gl.infoBoxPolygon,
+                width:
+                    gl.display.equipixel *
+                    (gl.Mode.smallLabel
+                        ? gl.infoBoxPolygon * .6
+                        : gl.infoBoxPolygon),
                 height:
                     gl.display.equipixel *
                         (gl.geometries[i].getNCheckedAttributes() + 1) *
@@ -4251,48 +4320,52 @@ class _MapPageState extends State<MapPage> {
                     5,
                 point: gl.geometries[i].center,
                 child: Card(
-                  color: Colors.black.withAlpha(200),
+                  color:
+                      gl.Mode.smallLabel
+                          ? Colors.white.withAlpha(100)
+                          : Colors.black.withAlpha(200),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children:
                         <Widget>[
                           Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
-                              Container(
-                                padding: EdgeInsets.all(2),
-                                color: Colors.transparent,
-                                height: gl.display.equipixel * gl.iconSizeXS,
-                                width: gl.display.equipixel * gl.iconSizeXS,
-                                child: IconButton(
-                                  style: ButtonStyle(
-                                    animationDuration: Duration(seconds: 1),
-                                    backgroundColor:
-                                        WidgetStateProperty<Color>.fromMap(
-                                          <WidgetStatesConstraint, Color>{
-                                            WidgetState.any: Colors.transparent,
-                                          },
-                                        ),
-                                    padding: WidgetStateProperty<
-                                      EdgeInsetsGeometry
-                                    >.fromMap(<
-                                      WidgetStatesConstraint,
-                                      EdgeInsetsGeometry
-                                    >{
-                                      WidgetState.any: EdgeInsetsGeometry.zero,
-                                    }),
-                                  ),
-                                  onPressed: () {},
-                                  icon: FaIcon(
-                                    FontAwesomeIcons.list,
-                                    size:
-                                        gl.display.equipixel *
-                                        gl.iconSizeXS *
-                                        .5,
-                                    color: Colors.transparent,
+                              if (gl.Mode.labelCross)
+                                Container(
+                                  padding: EdgeInsets.all(2),
+                                  color: Colors.transparent,
+                                  height: gl.display.equipixel * gl.iconSizeXS,
+                                  width: gl.display.equipixel * gl.iconSizeXS,
+                                  child: IconButton(
+                                    style: ButtonStyle(
+                                      animationDuration: Duration(seconds: 1),
+                                      backgroundColor: WidgetStateProperty<
+                                        Color
+                                      >.fromMap(<WidgetStatesConstraint, Color>{
+                                        WidgetState.any: Colors.transparent,
+                                      }),
+                                      padding: WidgetStateProperty<
+                                        EdgeInsetsGeometry
+                                      >.fromMap(<
+                                        WidgetStatesConstraint,
+                                        EdgeInsetsGeometry
+                                      >{
+                                        WidgetState.any:
+                                            EdgeInsetsGeometry.zero,
+                                      }),
+                                    ),
+                                    onPressed: () {},
+                                    icon: FaIcon(
+                                      FontAwesomeIcons.list,
+                                      size:
+                                          gl.display.equipixel *
+                                          gl.iconSizeXS *
+                                          .5,
+                                      color: Colors.transparent,
+                                    ),
                                   ),
                                 ),
-                              ),
                               Container(
                                 padding: EdgeInsets.all(2),
                                 alignment: Alignment.center,
@@ -4309,56 +4382,61 @@ class _MapPageState extends State<MapPage> {
                                     gl.geometries[i].name,
                                     textAlign: TextAlign.center,
                                     style: TextStyle(
-                                      color: Colors.white,
+                                      color:
+                                          gl.Mode.smallLabel
+                                              ? Colors.black
+                                              : Colors.white,
                                       fontSize:
                                           gl.display.equipixel * gl.fontSizeXS,
                                     ),
                                   ),
                                 ),
                               ),
-                              Container(
-                                padding: EdgeInsets.all(0),
-                                color: Colors.transparent,
-                                height: gl.display.equipixel * gl.iconSizeXS,
-                                width: gl.display.equipixel * gl.iconSizeXS,
-                                child: IconButton(
-                                  style: ButtonStyle(
-                                    animationDuration: Duration(seconds: 1),
-                                    backgroundColor:
-                                        WidgetStateProperty<Color>.fromMap(
-                                          <WidgetStatesConstraint, Color>{
-                                            WidgetState.any: Colors.transparent,
-                                          },
-                                        ),
-                                    padding: WidgetStateProperty<
-                                      EdgeInsetsGeometry
-                                    >.fromMap(<
-                                      WidgetStatesConstraint,
-                                      EdgeInsetsGeometry
-                                    >{
-                                      WidgetState.any: EdgeInsetsGeometry.zero,
-                                    }),
-                                  ),
-                                  onPressed: () {
-                                    refreshView(() {
-                                      gl.geometries[i].labelsVisibleOnMap =
-                                          false;
-                                    });
-                                    gl.geometries[i].serialize();
-                                  },
-                                  icon: FaIcon(
-                                    Icons.close,
-                                    size:
-                                        gl.display.equipixel *
-                                        gl.iconSizeXS *
-                                        .8,
-                                    color: Colors.red,
+                              if (gl.Mode.labelCross)
+                                Container(
+                                  padding: EdgeInsets.all(0),
+                                  color: Colors.transparent,
+                                  height: gl.display.equipixel * gl.iconSizeXS,
+                                  width: gl.display.equipixel * gl.iconSizeXS,
+                                  child: IconButton(
+                                    style: ButtonStyle(
+                                      animationDuration: Duration(seconds: 1),
+                                      backgroundColor: WidgetStateProperty<
+                                        Color
+                                      >.fromMap(<WidgetStatesConstraint, Color>{
+                                        WidgetState.any: Colors.transparent,
+                                      }),
+                                      padding: WidgetStateProperty<
+                                        EdgeInsetsGeometry
+                                      >.fromMap(<
+                                        WidgetStatesConstraint,
+                                        EdgeInsetsGeometry
+                                      >{
+                                        WidgetState.any:
+                                            EdgeInsetsGeometry.zero,
+                                      }),
+                                    ),
+                                    onPressed: () {
+                                      refreshView(() {
+                                        gl.geometries[i].labelsVisibleOnMap =
+                                            false;
+                                      });
+                                      gl.geometries[i].serialize();
+                                    },
+                                    icon: FaIcon(
+                                      Icons.close,
+                                      size:
+                                          gl.display.equipixel *
+                                          gl.iconSizeXS *
+                                          .8,
+                                      color: Colors.red,
+                                    ),
                                   ),
                                 ),
-                              ),
                             ],
                           ),
-                          if (gl.geometries[i].getNCheckedAttributes() > 1)
+                          if (!gl.Mode.smallLabel &&
+                              gl.geometries[i].getNCheckedAttributes() > 1)
                             stroke(
                               gl.display.equipixel * 0.5,
                               gl.display.equipixel * 0.25,
@@ -4375,30 +4453,37 @@ class _MapPageState extends State<MapPage> {
                               color: Colors.transparent,
                               height: gl.display.equipixel * gl.iconSizeXS,
                               child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
                                 children: [
-                                  Container(
-                                    alignment: Alignment.centerLeft,
-                                    width: gl.display.equipixel * 15,
-                                    child: SingleChildScrollView(
-                                      scrollDirection: Axis.horizontal,
-                                      child: Text(
-                                        gl.geometries[i].attributes[j].name,
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize:
-                                              gl.display.equipixel *
-                                              gl.fontSizeXS,
+                                  if (!gl.Mode.smallLabel)
+                                    Container(
+                                      alignment: Alignment.centerLeft,
+                                      width: gl.display.equipixel * 15,
+                                      child: SingleChildScrollView(
+                                        scrollDirection: Axis.horizontal,
+                                        child: Text(
+                                          gl.geometries[i].attributes[j].name,
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                            color:
+                                                gl.Mode.smallLabel
+                                                    ? Colors.black
+                                                    : Colors.white,
+                                            fontSize:
+                                                gl.display.equipixel *
+                                                gl.fontSizeXS,
+                                          ),
                                         ),
                                       ),
                                     ),
-                                  ),
-                                  stroke(
-                                    vertical: true,
-                                    gl.display.equipixel * 0.5,
-                                    gl.display.equipixel * 0.25,
-                                    gl.colorAgroBioTech,
-                                  ),
+                                  if (!gl.Mode.smallLabel)
+                                    stroke(
+                                      vertical: true,
+                                      gl.display.equipixel * 0.5,
+                                      gl.display.equipixel * 0.25,
+                                      gl.colorAgroBioTech,
+                                    ),
                                   Container(
                                     alignment: Alignment.centerLeft,
                                     width: gl.display.equipixel * 15,
@@ -4409,7 +4494,10 @@ class _MapPageState extends State<MapPage> {
                                             .toString(),
                                         textAlign: TextAlign.center,
                                         style: TextStyle(
-                                          color: Colors.white,
+                                          color:
+                                              gl.Mode.smallLabel
+                                                  ? Colors.black
+                                                  : Colors.white,
                                           fontSize:
                                               gl.display.equipixel *
                                               gl.fontSizeXS,
@@ -4425,10 +4513,14 @@ class _MapPageState extends State<MapPage> {
                   ),
                 ),
               )
-              : gl.geometries[i].type == "Point"
+              : gl.geometries[i].type.contains("Point")
               ? Marker(
                 alignment: Alignment.bottomLeft,
-                width: gl.display.equipixel * gl.infoBoxPolygon,
+                width:
+                    gl.display.equipixel *
+                    (gl.Mode.smallLabel
+                        ? gl.infoBoxPolygon * .6
+                        : gl.infoBoxPolygon),
                 height:
                     gl.display.equipixel *
                         (gl.geometries[i].getNCheckedAttributes() + 1) *
@@ -4437,48 +4529,52 @@ class _MapPageState extends State<MapPage> {
                     5,
                 point: gl.geometries[i].center,
                 child: Card(
-                  color: Colors.black.withAlpha(200),
+                  color:
+                      gl.Mode.smallLabel
+                          ? Colors.white.withAlpha(100)
+                          : Colors.black.withAlpha(200),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children:
                         <Widget>[
                           Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
-                              Container(
-                                padding: EdgeInsets.all(2),
-                                color: Colors.transparent,
-                                height: gl.display.equipixel * gl.iconSizeXS,
-                                width: gl.display.equipixel * gl.iconSizeXS,
-                                child: IconButton(
-                                  style: ButtonStyle(
-                                    animationDuration: Duration(seconds: 1),
-                                    backgroundColor:
-                                        WidgetStateProperty<Color>.fromMap(
-                                          <WidgetStatesConstraint, Color>{
-                                            WidgetState.any: Colors.transparent,
-                                          },
-                                        ),
-                                    padding: WidgetStateProperty<
-                                      EdgeInsetsGeometry
-                                    >.fromMap(<
-                                      WidgetStatesConstraint,
-                                      EdgeInsetsGeometry
-                                    >{
-                                      WidgetState.any: EdgeInsetsGeometry.zero,
-                                    }),
-                                  ),
-                                  onPressed: () {},
-                                  icon: FaIcon(
-                                    FontAwesomeIcons.list,
-                                    size:
-                                        gl.display.equipixel *
-                                        gl.iconSizeXS *
-                                        .5,
-                                    color: Colors.transparent,
+                              if (gl.Mode.labelCross)
+                                Container(
+                                  padding: EdgeInsets.all(2),
+                                  color: Colors.transparent,
+                                  height: gl.display.equipixel * gl.iconSizeXS,
+                                  width: gl.display.equipixel * gl.iconSizeXS,
+                                  child: IconButton(
+                                    style: ButtonStyle(
+                                      animationDuration: Duration(seconds: 1),
+                                      backgroundColor: WidgetStateProperty<
+                                        Color
+                                      >.fromMap(<WidgetStatesConstraint, Color>{
+                                        WidgetState.any: Colors.transparent,
+                                      }),
+                                      padding: WidgetStateProperty<
+                                        EdgeInsetsGeometry
+                                      >.fromMap(<
+                                        WidgetStatesConstraint,
+                                        EdgeInsetsGeometry
+                                      >{
+                                        WidgetState.any:
+                                            EdgeInsetsGeometry.zero,
+                                      }),
+                                    ),
+                                    onPressed: () {},
+                                    icon: FaIcon(
+                                      FontAwesomeIcons.list,
+                                      size:
+                                          gl.display.equipixel *
+                                          gl.iconSizeXS *
+                                          .5,
+                                      color: Colors.transparent,
+                                    ),
                                   ),
                                 ),
-                              ),
                               Container(
                                 padding: EdgeInsets.all(2),
                                 alignment: Alignment.center,
@@ -4494,53 +4590,57 @@ class _MapPageState extends State<MapPage> {
                                     gl.geometries[i].name,
                                     textAlign: TextAlign.center,
                                     style: TextStyle(
-                                      color: Colors.white,
+                                      color:
+                                          gl.Mode.smallLabel
+                                              ? Colors.black
+                                              : Colors.white,
                                       fontSize:
                                           gl.display.equipixel * gl.fontSizeXS,
                                     ),
                                   ),
                                 ),
                               ),
-                              Container(
-                                padding: EdgeInsets.all(0),
-                                color: Colors.transparent,
-                                height: gl.display.equipixel * gl.iconSizeXS,
-                                width: gl.display.equipixel * gl.iconSizeXS,
-                                child: IconButton(
-                                  style: ButtonStyle(
-                                    animationDuration: Duration(seconds: 1),
-                                    backgroundColor:
-                                        WidgetStateProperty<Color>.fromMap(
-                                          <WidgetStatesConstraint, Color>{
-                                            WidgetState.any: Colors.transparent,
-                                          },
-                                        ),
-                                    padding: WidgetStateProperty<
-                                      EdgeInsetsGeometry
-                                    >.fromMap(<
-                                      WidgetStatesConstraint,
-                                      EdgeInsetsGeometry
-                                    >{
-                                      WidgetState.any: EdgeInsetsGeometry.zero,
-                                    }),
-                                  ),
-                                  onPressed: () {
-                                    refreshView(() {
-                                      gl.geometries[i].labelsVisibleOnMap =
-                                          false;
-                                    });
-                                    gl.geometries[i].serialize();
-                                  },
-                                  icon: FaIcon(
-                                    Icons.close,
-                                    size:
-                                        gl.display.equipixel *
-                                        gl.iconSizeXS *
-                                        .8,
-                                    color: Colors.red,
+                              if (gl.Mode.labelCross)
+                                Container(
+                                  padding: EdgeInsets.all(0),
+                                  color: Colors.transparent,
+                                  height: gl.display.equipixel * gl.iconSizeXS,
+                                  width: gl.display.equipixel * gl.iconSizeXS,
+                                  child: IconButton(
+                                    style: ButtonStyle(
+                                      animationDuration: Duration(seconds: 1),
+                                      backgroundColor: WidgetStateProperty<
+                                        Color
+                                      >.fromMap(<WidgetStatesConstraint, Color>{
+                                        WidgetState.any: Colors.transparent,
+                                      }),
+                                      padding: WidgetStateProperty<
+                                        EdgeInsetsGeometry
+                                      >.fromMap(<
+                                        WidgetStatesConstraint,
+                                        EdgeInsetsGeometry
+                                      >{
+                                        WidgetState.any:
+                                            EdgeInsetsGeometry.zero,
+                                      }),
+                                    ),
+                                    onPressed: () {
+                                      refreshView(() {
+                                        gl.geometries[i].labelsVisibleOnMap =
+                                            false;
+                                      });
+                                      gl.geometries[i].serialize();
+                                    },
+                                    icon: FaIcon(
+                                      Icons.close,
+                                      size:
+                                          gl.display.equipixel *
+                                          gl.iconSizeXS *
+                                          .8,
+                                      color: Colors.red,
+                                    ),
                                   ),
                                 ),
-                              ),
                             ],
                           ),
                           if (gl.geometries[i].getNCheckedAttributes() > 1)
@@ -4560,30 +4660,34 @@ class _MapPageState extends State<MapPage> {
                               color: Colors.transparent,
                               height: gl.display.equipixel * gl.iconSizeXS,
                               child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
                                 children: [
-                                  Container(
-                                    alignment: Alignment.centerLeft,
-                                    width: gl.display.equipixel * 15,
-                                    child: SingleChildScrollView(
-                                      scrollDirection: Axis.horizontal,
-                                      child: Text(
-                                        gl.geometries[i].attributes[j].name,
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize:
-                                              gl.display.equipixel *
-                                              gl.fontSizeXS,
+                                  if (!gl.Mode.smallLabel)
+                                    Container(
+                                      alignment: Alignment.centerLeft,
+                                      width: gl.display.equipixel * 15,
+                                      child: SingleChildScrollView(
+                                        scrollDirection: Axis.horizontal,
+                                        child: Text(
+                                          gl.geometries[i].attributes[j].name,
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize:
+                                                gl.display.equipixel *
+                                                gl.fontSizeXS,
+                                          ),
                                         ),
                                       ),
                                     ),
-                                  ),
-                                  stroke(
-                                    vertical: true,
-                                    gl.display.equipixel * 0.5,
-                                    gl.display.equipixel * 0.25,
-                                    gl.colorAgroBioTech,
-                                  ),
+                                  if (!gl.Mode.smallLabel)
+                                    stroke(
+                                      vertical: true,
+                                      gl.display.equipixel * 0.5,
+                                      gl.display.equipixel * 0.25,
+                                      gl.colorAgroBioTech,
+                                    ),
                                   Container(
                                     alignment: Alignment.centerLeft,
                                     width: gl.display.equipixel * 15,
@@ -4594,7 +4698,10 @@ class _MapPageState extends State<MapPage> {
                                             .toString(),
                                         textAlign: TextAlign.center,
                                         style: TextStyle(
-                                          color: Colors.white,
+                                          color:
+                                              gl.Mode.smallLabel
+                                                  ? Colors.black
+                                                  : Colors.white,
                                           fontSize:
                                               gl.display.equipixel *
                                               gl.fontSizeXS,

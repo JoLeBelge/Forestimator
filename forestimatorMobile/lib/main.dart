@@ -74,6 +74,7 @@ class _MyApp extends State<MyApp> {
     gl.shared = await SharedPreferences.getInstance();
 
     gl.UserData.deserialize();
+    gl.Mode.deserialize();
 
     final bool? modeDevelopper = gl.shared!.getBool('modeDevelopper');
     if (modeDevelopper != null) {

@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:isolate';
 import 'dart:math';
 import 'package:area_polygon/area_polygon.dart';
 import 'package:fforestimator/dico/dico_apt.dart';
@@ -50,6 +51,78 @@ class Geometry {
 
   Geometry({String polygonName = ""}) {
     name = polygonName;
+    Random randomColor = Random();
+    setColorInside(
+      Color.fromRGBO(
+        randomColor.nextInt(256),
+        randomColor.nextInt(256),
+        randomColor.nextInt(256),
+        0.4,
+      ),
+    );
+    setColorLine(
+      Color.fromRGBO(
+        (colorInside.r * 255).round(),
+        (colorInside.g * 255).round(),
+        (colorInside.b * 255).round(),
+        1.0,
+      ),
+    );
+  }
+
+  Geometry.point({String polygonName = ""}) {
+    name = polygonName;
+    Random randomColor = Random();
+    setColorInside(
+      Color.fromRGBO(
+        randomColor.nextInt(256),
+        randomColor.nextInt(256),
+        randomColor.nextInt(256),
+        0.4,
+      ),
+    );
+    setColorLine(
+      Color.fromRGBO(
+        (colorInside.r * 255).round(),
+        (colorInside.g * 255).round(),
+        (colorInside.b * 255).round(),
+        1.0,
+      ),
+    );
+  }
+
+  Geometry.polygon({String polygonName = ""}) {
+    type = "Polygon";
+    name = polygonName;
+    Random randomColor = Random();
+    setColorInside(
+      Color.fromRGBO(
+        randomColor.nextInt(256),
+        randomColor.nextInt(256),
+        randomColor.nextInt(256),
+        0.4,
+      ),
+    );
+    setColorLine(
+      Color.fromRGBO(
+        (colorInside.r * 255).round(),
+        (colorInside.g * 255).round(),
+        (colorInside.b * 255).round(),
+        1.0,
+      ),
+    );
+  }
+
+  Geometry.essencePoint({String polygonName = ""}) {
+    type = "Point-essence";
+    attributes.addAll([
+      Attribute(name: "essence", type: "string", value: gl.essenceChoice[0]),
+      Attribute(name: "rmq", type: "string", value: ""),
+    ]);
+    attributes[1].visibleOnMapLabel = true;
+    visibleOnMap = true;
+    name = polygonName;
+    selectedPointIcon = 4;
     Random randomColor = Random();
     setColorInside(
       Color.fromRGBO(
@@ -393,6 +466,25 @@ class Geometry {
     return true;
   }
 
+  static void startSendDeamon() async {
+    bool finished = await sendDeamon(gl.geometries);
+
+    if (finished) {
+      gl.Mode.essencePointsToSync = false;
+    }
+  }
+
+  static Future<bool> sendDeamon(List<Geometry> geometries) async {
+    bool allFinished = true;
+    for (int i = 0; i < geometries.length; i++) {
+      if (geometries[i].type == "Point-essence" &&
+          !geometries[i].sentToServer) {
+        if (await geometries[i].sendGeometryToServer()) allFinished = false;
+      }
+    }
+    return allFinished;
+  }
+
   Future<bool> sendGeometryToServer() async {
     if (sentToServer) {
       gl.print("Geometry $name already sent once!");
@@ -433,7 +525,7 @@ class Geometry {
       }
       properties = properties.substring(0, properties.length - 1);
       String geometry =
-          "{\"type\":\"FeatureCollection\",\"features\":[{\"type\":\"Feature\",\"geometry\":{\"type\":\"$type\",\"coordinates\":$coordinates},\"properties\":{$properties}}]}";
+          "{\"type\":\"FeatureCollection\",\"features\":[{\"type\":\"Feature\",\"geometry\":{\"type\":\"${getProperTypeForCarto(type)}\",\"coordinates\":$coordinates},\"properties\":{$properties}}]}";
 
       String request =
           "https://forestimator.gembloux.ulg.ac.be/api/polygFromMobile/$geometry";
@@ -466,6 +558,11 @@ class Geometry {
     gl.print("Success sending Geometry $name");
     sentToServer = true;
     return true;
+  }
+
+  String getProperTypeForCarto(String s) {
+    if (s == "Point-essence") return "Point";
+    return s;
   }
 
   int getNCheckedAttributes() {
@@ -637,6 +734,14 @@ class Geometry {
       polykeys.remove(id);
       await gl.shared!.setStringList('polyKeys', polykeys);
     }
+  }
+
+  static int countEssenceObservations() {
+    int count = 0;
+    for (Geometry form in gl.geometries) {
+      if (form.type.contains("essence")) count++;
+    }
+    return count;
   }
 
   Future runAnaPt() async {

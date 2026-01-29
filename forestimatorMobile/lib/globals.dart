@@ -55,6 +55,12 @@ class UserData {
 }
 
 class Mode {
+  static bool userDataFilled = false;
+  static bool essence = false;
+  static bool labelCross = false;
+  static bool smallLabel = true;
+  static bool essencePointsToSync = false;
+
   static bool debugScanlines = false;
   static bool recordPath = false;
   static bool keyboardExpanded = false;
@@ -90,6 +96,20 @@ class Mode {
   static set expertTools(bool b) {
     _expertTools = b;
     shared!.setBool('modeExpertTools', _expertTools);
+  }
+
+  static void serialize() async {
+    await shared!.setBool('Modes.essence', essence);
+    await shared!.setBool('Modes.userDataFilled', userDataFilled);
+    await shared!.setBool('Modes.userDataFilled', userDataFilled);
+    await shared!.setBool('Modes.smallLabel', smallLabel);
+  }
+
+  static void deserialize() {
+    essence = shared!.getBool('Modes.essence') ?? false;
+    essence = shared!.getBool('Modes.userDataFilled') ?? false;
+    labelCross = shared!.getBool('Modes.labelCross') ?? false;
+    smallLabel = shared!.getBool('Modes.smallLabel') ?? true;
   }
 }
 
@@ -818,4 +838,17 @@ List<Color> predefinedPointSymbPalette = [
   Colors.cyanAccent,
   Colors.pinkAccent,
   Colors.white,
+];
+
+List<String> essenceChoice = [
+  "Bouleaux",
+  "Chênes",
+  "Douglas",
+  "Epicéa",
+  "Hêtre",
+  "Mélèzes",
+  "Peupliers",
+  "Pins",
+  "Autres conifères",
+  "Entrer du texte",
 ];
