@@ -852,3 +852,5 @@ List<String> essenceChoice = [
   "Autres conifères",
   "Entrer du texte",
 ];
+const String labelSendCompoFeature =
+    "Vous pouvez nous communiquer des observations relatives à la composition dans le but d'améliorer la carte de composition. Veillez à complêter l'attribut 'essence' avec l'espèce observée. Nous attirons votre attention qu'une entitée (polygone ou point) ne peux être envoyée qu'une seule fois. Merci pour votre contribution !";
