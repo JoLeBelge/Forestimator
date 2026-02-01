@@ -27,36 +27,21 @@ class GeometricLayer {
     type = "";
     subtype = "";
     Random rand = Random();
-    defaultColor = Color.fromRGBO(
-      rand.nextInt(256),
-      rand.nextInt(256),
-      rand.nextInt(256),
-      1.0,
-    );
+    defaultColor = Color.fromRGBO(rand.nextInt(256), rand.nextInt(256), rand.nextInt(256), 1.0);
   }
 
   GeometricLayer.point() {
     type = "Point";
     subtype = "";
     Random rand = Random();
-    defaultColor = Color.fromRGBO(
-      rand.nextInt(256),
-      rand.nextInt(256),
-      rand.nextInt(256),
-      1.0,
-    );
+    defaultColor = Color.fromRGBO(rand.nextInt(256), rand.nextInt(256), rand.nextInt(256), 1.0);
   }
 
   GeometricLayer.essence() {
     type = "Point";
     subtype = "Essence";
     Random rand = Random();
-    defaultColor = Color.fromRGBO(
-      rand.nextInt(256),
-      rand.nextInt(256),
-      rand.nextInt(256),
-      1.0,
-    );
+    defaultColor = Color.fromRGBO(rand.nextInt(256), rand.nextInt(256), rand.nextInt(256), 1.0);
     defaultAttributes.addAll([
       Attribute(name: "essence", type: "string", value: gl.essenceChoice[0]),
       Attribute(name: "rmq", type: "string", value: ""),
@@ -66,28 +51,19 @@ class GeometricLayer {
   GeometricLayer.polygon() {
     type = "Polygon";
     Random rand = Random();
-    defaultColor = Color.fromRGBO(
-      rand.nextInt(256),
-      rand.nextInt(256),
-      rand.nextInt(256),
-      1.0,
-    );
+    defaultColor = Color.fromRGBO(rand.nextInt(256), rand.nextInt(256), rand.nextInt(256), 1.0);
   }
 
   void addGeometry() {
     switch (type) {
       case 'Point':
-        subtype == 'Essence'
-            ? geometries.add(Geometry.essencePoint())
-            : geometries.add(Geometry.point());
+        subtype == 'Essence' ? geometries.add(Geometry.essencePoint()) : geometries.add(Geometry.point());
         break;
       case 'Polygon':
         geometries.add(Geometry.polygon());
         break;
       default:
-        gl.print(
-          "error: unknown type $type to create new geometry on layer $name",
-        );
+        gl.print("error: unknown type $type to create new geometry on layer $name");
         return;
     }
     geometries.last.setColorInside(defaultColor);
@@ -141,8 +117,7 @@ class GeometricLayer {
       g.serialize();
     }
 
-    List<String> layerKeys =
-        gl.shared!.getStringList('layerKeys') ?? <String>[];
+    List<String> layerKeys = gl.shared!.getStringList('layerKeys') ?? <String>[];
     if (!layerKeys.contains(id)) {
       layerKeys.add(id);
       await gl.shared!.setStringList('layerKeys', layerKeys);
@@ -170,18 +145,12 @@ class GeometricLayer {
     gl.print("layer $name loaded from prefs");
   }
 
-  void _writeAttributesToMemory(
-    String prefix,
-    List<Attribute> attributes,
-  ) async {
+  void _writeAttributesToMemory(String prefix, List<Attribute> attributes) async {
     int i = 0;
     for (var attribute in attributes) {
       await gl.shared!.setString('$prefix.$i.name', attribute.name);
       await gl.shared!.setString('$prefix.$i.type', attribute.type);
-      await gl.shared!.setBool(
-        '$prefix.$i.visibleOnMapLabel',
-        attribute.visibleOnMapLabel,
-      );
+      await gl.shared!.setBool('$prefix.$i.visibleOnMapLabel', attribute.visibleOnMapLabel);
       if (attribute.type == "string") {
         await gl.shared!.setString('$prefix.$i.val', attribute.value);
       } else if (attribute.type == "int") {
@@ -211,8 +180,7 @@ class GeometricLayer {
                   : type == "double"
                   ? gl.shared!.getDouble('$prefix.$i.val')!
                   : "unknown",
-          visibleOnMapLabel:
-              gl.shared!.getBool('$prefix.$i.visibleOnMapLabel') ?? false,
+          visibleOnMapLabel: gl.shared!.getBool('$prefix.$i.visibleOnMapLabel') ?? false,
         ),
       );
     }
@@ -236,8 +204,7 @@ class GeometricLayer {
   }
 
   void _deserializAllPolys() {
-    List<String> polykeys =
-        gl.shared!.getStringList('$id.polyKeys') ?? <String>[];
+    List<String> polykeys = gl.shared!.getStringList('$id.polyKeys') ?? <String>[];
     for (String key in polykeys) {
       geometries.add(Geometry());
       geometries.last.deserialze(key);
@@ -245,8 +212,7 @@ class GeometricLayer {
   }
 
   static void deserializeLayers() {
-    List<String> layerKeys =
-        gl.shared!.getStringList('layerKeys') ?? <String>[];
+    List<String> layerKeys = gl.shared!.getStringList('layerKeys') ?? <String>[];
     for (String key in layerKeys) {
       gl.geoLayers.add(GeometricLayer());
       gl.geoLayers.last.deserialize(key);
@@ -254,11 +220,9 @@ class GeometricLayer {
   }
 
   static void removeLayerFromShared(String it) async {
-    List<String> layerKeys =
-        gl.shared!.getStringList('layerKeys') ?? <String>[];
+    List<String> layerKeys = gl.shared!.getStringList('layerKeys') ?? <String>[];
     if (!layerKeys.contains(it)) {
-      List<String> polykeys =
-          gl.shared!.getStringList('$it.polyKeys') ?? <String>[];
+      List<String> polykeys = gl.shared!.getStringList('$it.polyKeys') ?? <String>[];
       for (String key in polykeys) {
         Geometry.removePolyFromShared(key);
       }
@@ -284,15 +248,5 @@ class GeometricLayer {
 
   void sendLayerPolys() async {
     //TODO: sendLayer
-  }
-
-  static List<Geometry> getSelectedGeometries() {
-    return gl.geoLayers[gl.selectedGeoLayer].geometries;
-  }
-
-  static Geometry getSelectedGeometry() {
-    return gl.geoLayers[gl.selectedGeoLayer].geometries[gl
-        .geoLayers[gl.selectedGeoLayer]
-        .selectedGeometry];
   }
 }

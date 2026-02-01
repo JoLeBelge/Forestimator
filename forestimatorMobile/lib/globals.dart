@@ -56,9 +56,7 @@ class UserData {
   }
 
   static bool validUserData() {
-    return UserData.forename.isNotEmpty &&
-        UserData.name.isNotEmpty &&
-        validMail(UserData.mail);
+    return UserData.forename.isNotEmpty && UserData.name.isNotEmpty && validMail(UserData.mail);
   }
 
   static bool validMail(String str) {
@@ -181,10 +179,8 @@ class Display {
     //_squareMode();
     _enforceEquiWidthHeight();
     if (Mode.square || Mode.overrideModeSquare) {
-      minEquiPixelsDisplayLandscapeHeight =
-          minEquiPixelsDisplayLandscapeWidth * .8;
-      minEquiPixelsDisplayPortraitHeight =
-          minEquiPixelsDisplayPortraitWidth * .8;
+      minEquiPixelsDisplayLandscapeHeight = minEquiPixelsDisplayLandscapeWidth * .8;
+      minEquiPixelsDisplayPortraitHeight = minEquiPixelsDisplayPortraitWidth * .8;
     }
   }
 
@@ -212,9 +208,7 @@ class Display {
   }
 
   void _squareMode() {
-    if ((aspect > .8 && aspect < 1 / .8) ||
-        Mode.tablet ||
-        Mode.overrideModeSquare) {
+    if ((aspect > .8 && aspect < 1 / .8) || Mode.tablet || Mode.overrideModeSquare) {
       Mode.square = true;
       orientation = Orientation.landscape;
     } else {
@@ -267,11 +261,9 @@ double topAppForestimatorFontHeight = 5;
 double topAppForestimatorFontWidth = 60;
 // PopupWindows
 double popupWindowsPortraitWidth = minEquiPixelsDisplayPortraitWidth - 5;
-double popupWindowsPortraitHeight =
-    minEquiPixelsDisplayPortraitHeight - topAppInfoBarThickness - 5;
+double popupWindowsPortraitHeight = minEquiPixelsDisplayPortraitHeight - topAppInfoBarThickness - 5;
 double popupWindowsLandscapeWidth = minEquiPixelsDisplayLandscapeWidth - 5;
-double popupWindowsLandscapeHeight =
-    minEquiPixelsDisplayLandscapeHeight - topAppInfoBarThickness - 5;
+double popupWindowsLandscapeHeight = minEquiPixelsDisplayLandscapeHeight - topAppInfoBarThickness - 5;
 double popupReturnButtonHeight = 16;
 double popupReturnButtonWidth = 52;
 // Menus
@@ -316,8 +308,7 @@ double layerSwitcherBoxHeightPortrait = 5.5 * layerSwitcherTileHeight;
 double layerSwitcherBoxHeightPortraitOffline = 2.5 * layerSwitcherTileHeight;
 double layerSwitcherBoxHeightLandscape = 66;
 double layerswitcherButtonsBoxHeight = 30;
-double layerswitcherControlBoxHeight =
-    layerSwitcherTileHeight + fontSizeM * 1.2;
+double layerswitcherControlBoxHeight = layerSwitcherTileHeight + fontSizeM * 1.2;
 // Do you really dialogue
 double dyrDialogWidth = 60;
 double dyrDialogHeight = 60;
@@ -375,18 +366,13 @@ class PoiMarker {
   final String address;
   final String city;
   final String postcode;
-  PoiMarker({
-    required this.index,
-    required this.position,
-    required this.name,
-    required this.address,
-    required this.city,
-    required this.postcode,
-  });
+  PoiMarker({required this.index, required this.position, required this.name, required this.address, required this.city, required this.postcode});
 }
 
-List<pol.Geometry> geometries = [];
-int selectedGeometry = -1;
+//List<pol.Geometry> geometries = [];
+GeometricLayer get selLay => geoLayers[selectedGeoLayer];
+
+pol.Geometry get selGeo => selLay.geometries[selLay.selectedGeometry];
 
 List<GeometricLayer> geoLayers = [];
 int selectedGeoLayer = -1;
@@ -395,8 +381,7 @@ List<PathLayer> pathLayers = [];
 int selectedpathLayer = -1;
 
 // ajouter le code le la couche à la fin de cette requete. fonctionne que pour layerbase avec mRes <= 10m sinon je considère que c'est trop volumineux
-String queryApiRastDownload =
-    "https://forestimator.gembloux.ulg.ac.be/api/rastPColor/layerCode";
+String queryApiRastDownload = "https://forestimator.gembloux.ulg.ac.be/api/rastPColor/layerCode";
 
 String defaultLayer = "IGN";
 List<String> interfaceSelectedLCode = ["IGN"];
@@ -408,11 +393,7 @@ class SelectedLayer {
   String mCode;
   bool offline;
   String sourceImagePath;
-  SelectedLayer({
-    required this.mCode,
-    this.offline = false,
-    this.sourceImagePath = "",
-  });
+  SelectedLayer({required this.mCode, this.offline = false, this.sourceImagePath = ""});
 }
 
 List<SelectedLayer> selectedLayerForMap = [
@@ -429,11 +410,7 @@ String getFirstSelLayOffline() {
 void initializeSelectedLayerForFlutterMap() {
   if (!firstTimeUse) {
     for (int i = 0; i < interfaceSelectedLCode.length; i++) {
-      replaceLayerFromList(
-        interfaceSelectedLCode.elementAt(i),
-        index: i,
-        offline: false,
-      );
+      replaceLayerFromList(interfaceSelectedLCode.elementAt(i), index: i, offline: false);
     }
   } else {
     replaceLayerFromList(defaultLayer, index: 0, offline: false);
@@ -461,38 +438,11 @@ List<String> getInterfaceSelectedLOffline() {
 LayerAnaPt? anaPtPreview;
 List<LayerAnaPt> requestedLayers = [];
 
-List<String> anaPtSelectedLayerKeys = [
-  "ZBIO",
-  "CNSWrast",
-  "CS_A",
-  "MNT",
-  "slope",
-  "NT",
-  "NH",
-  "Topo",
-  "AE",
-  "COMPOALL",
-  "MNH2021",
-];
+List<String> anaPtSelectedLayerKeys = ["ZBIO", "CNSWrast", "CS_A", "MNT", "slope", "NT", "NH", "Topo", "AE", "COMPOALL", "MNH2021"];
 
-List<String> anaSurfSelectedLayerKeys = [
-  "dendro_nha",
-  "dendro_gha",
-  "dendro_cdom",
-  "dendro_hdom",
-  "dendro_vha",
-  "HE_FEE",
-  "COMPOALL",
-];
+List<String> anaSurfSelectedLayerKeys = ["dendro_nha", "dendro_gha", "dendro_cdom", "dendro_hdom", "dendro_vha", "HE_FEE", "COMPOALL"];
 
-List<String> downloadableLayerKeys = [
-  "ZBIO",
-  "NT",
-  "NH",
-  "Topo",
-  "CS_A",
-  "CNSWrast",
-];
+List<String> downloadableLayerKeys = ["ZBIO", "NT", "NH", "Topo", "CS_A", "CNSWrast"];
 
 Position _position = Position(
   longitude: 0,
@@ -551,11 +501,7 @@ bool firstTimeUse = true;
 LatLng latlonCenter = const LatLng(49.76, 5.32);
 double mapZoom = 7.0;
 
-void removeLayerFromList({
-  bool offline = false,
-  int index = -1,
-  String key = "",
-}) {
+void removeLayerFromList({bool offline = false, int index = -1, String key = ""}) {
   if (key != "" && index > -1) {
     print("Error in removeLayerFromList(): key != '' && index > -1");
     return;
@@ -570,27 +516,16 @@ void removeLayerFromList({
     if (sL != null) {
       int index = selectedLayerForMap.indexOf(sL);
       selectedLayerForMap.removeAt(index);
-      selectedLayerForMap.insert(
-        index,
-        SelectedLayer(mCode: '${index + 1}', offline: offline),
-      );
+      selectedLayerForMap.insert(index, SelectedLayer(mCode: '${index + 1}', offline: offline));
     }
   }
   if (index > -1) {
     selectedLayerForMap.removeAt(index);
-    selectedLayerForMap.insert(
-      index,
-      SelectedLayer(mCode: '${index + 1}', offline: offline),
-    );
+    selectedLayerForMap.insert(index, SelectedLayer(mCode: '${index + 1}', offline: offline));
   }
 }
 
-void replaceLayerFromList(
-  String replacement, {
-  String key = "",
-  int index = -1,
-  bool offline = false,
-}) {
+void replaceLayerFromList(String replacement, {String key = "", int index = -1, bool offline = false}) {
   if (key != "") {
     SelectedLayer? sL;
     for (var layer in selectedLayerForMap) {
@@ -601,35 +536,20 @@ void replaceLayerFromList(
     if (sL != null) {
       int index = selectedLayerForMap.indexOf(sL);
       selectedLayerForMap.removeAt(index);
-      selectedLayerForMap.insert(
-        index,
-        SelectedLayer(mCode: replacement, offline: offline),
-      );
+      selectedLayerForMap.insert(index, SelectedLayer(mCode: replacement, offline: offline));
     }
   } else if (index > -1) {
     selectedLayerForMap.removeAt(index);
-    selectedLayerForMap.insert(
-      index,
-      SelectedLayer(mCode: replacement, offline: offline),
-    );
+    selectedLayerForMap.insert(index, SelectedLayer(mCode: replacement, offline: offline));
   } else if (getCountOfSelectedLayersForMap() == 3) {
     selectedLayerForMap.removeAt(2);
-    selectedLayerForMap.insert(
-      0,
-      SelectedLayer(mCode: replacement, offline: offline),
-    );
+    selectedLayerForMap.insert(0, SelectedLayer(mCode: replacement, offline: offline));
   } else if (getCountOfSelectedLayersForMap() == 0) {
     selectedLayerForMap.removeAt(0);
-    selectedLayerForMap.insert(
-      0,
-      SelectedLayer(mCode: replacement, offline: offline),
-    );
+    selectedLayerForMap.insert(0, SelectedLayer(mCode: replacement, offline: offline));
   } else {
     selectedLayerForMap.removeAt(getIndexForEmptySlot());
-    selectedLayerForMap.insert(
-      0,
-      SelectedLayer(mCode: replacement, offline: offline),
-    );
+    selectedLayerForMap.insert(0, SelectedLayer(mCode: replacement, offline: offline));
   }
 }
 
@@ -709,10 +629,7 @@ void savePrefSelLayOnline() async {
     offlineLayer.add(dico.getLayerBase(sL.mCode).mOffline ? "t" : "n");
   }
   await shared!.setStringList('interfaceSelectedLCode', interfaceSelectedLCode);
-  await shared!.setStringList(
-    'interfaceSelectedLCodeOfflineFlag',
-    offlineLayer,
-  );
+  await shared!.setStringList('interfaceSelectedLCodeOfflineFlag', offlineLayer);
 }
 
 void savePrefSelLayOffline() async {
@@ -720,25 +637,16 @@ void savePrefSelLayOffline() async {
   for (SelectedLayer sL in selectedLayerForMap) {
     interfaceSelectedLCode.add(sL.mCode);
   }
-  await shared!.setStringList(
-    'interfaceSelectedOffCode',
-    interfaceSelectedLCode,
-  );
+  await shared!.setStringList('interfaceSelectedOffCode', interfaceSelectedLCode);
 }
 
 void loadPrefSelLayOnline() async {
   interfaceSelectedLCode = shared!.getStringList('interfaceSelectedLCode')!;
-  List<String> offlineLayer =
-      shared!.getStringList('interfaceSelectedLCodeOfflineFlag')!;
+  List<String> offlineLayer = shared!.getStringList('interfaceSelectedLCodeOfflineFlag')!;
   selectedLayerForMap.clear();
   int index = 0;
   for (String key in interfaceSelectedLCode) {
-    selectedLayerForMap.add(
-      SelectedLayer(
-        mCode: key,
-        offline: offlineLayer[index] == "t" ? true : false,
-      ),
-    );
+    selectedLayerForMap.add(SelectedLayer(mCode: key, offline: offlineLayer[index] == "t" ? true : false));
     index++;
   }
 }
@@ -761,21 +669,8 @@ void changeSelectedLayerModeOffline() {
   savePrefSelLayOnline();
   loadPrefSelLayOffline();
   selectedLayerForMap.removeWhere((element) => element.offline == false);
-  if (dico.getLayersOffline().where((i) => i.mBits == 8).toList().isNotEmpty &&
-      selectedLayerForMap.isEmpty) {
-    selectedLayerForMap.insert(
-      0,
-      SelectedLayer(
-        mCode:
-            dico
-                .getLayersOffline()
-                .where((i) => i.mBits == 8)
-                .toList()
-                .first
-                .mCode,
-        offline: true,
-      ),
-    );
+  if (dico.getLayersOffline().where((i) => i.mBits == 8).toList().isNotEmpty && selectedLayerForMap.isEmpty) {
+    selectedLayerForMap.insert(0, SelectedLayer(mCode: dico.getLayersOffline().where((i) => i.mBits == 8).toList().first.mCode, offline: true));
   } else {
     while (selectedLayerForMap.length > 1) {
       selectedLayerForMap.removeLast();
@@ -801,41 +696,18 @@ bool isSelectedLayer(String key, {offline = false}) {
 }
 
 bool slotContainsLayer(int index, String key) {
-  return offlineMode
-      ? selectedLayerForMap.first.mCode == key
-      : selectedLayerForMap[index].mCode == key;
+  return offlineMode ? selectedLayerForMap.first.mCode == key : selectedLayerForMap[index].mCode == key;
 }
 
 List<SelectedLayer> getLayersForFlutterMap() {
   return selectedLayerForMap
-      .where(
-        (val) =>
-            !(val.mCode.length < 3 &&
-                (val.mCode.contains('1') ||
-                    val.mCode.contains('2') ||
-                    val.mCode.contains('3'))),
-      )
+      .where((val) => !(val.mCode.length < 3 && (val.mCode.contains('1') || val.mCode.contains('2') || val.mCode.contains('3'))))
       .toList()
       .reversed
       .toList();
 }
 
-Map<int, int> lutVulnerabiliteCS = {
-  0: 0,
-  1: 1,
-  2: 1,
-  3: 3,
-  4: 5,
-  5: 2,
-  6: 2,
-  7: 3,
-  8: 6,
-  9: 2,
-  10: 4,
-  11: 4,
-  12: 4,
-  13: 7,
-};
+Map<int, int> lutVulnerabiliteCS = {0: 0, 1: 1, 2: 1, 3: 3, 4: 5, 5: 2, 6: 2, 7: 3, 8: 6, 9: 2, 10: 4, 11: 4, 12: 4, 13: 7};
 
 List<Widget> mainStack = [];
 
@@ -904,23 +776,14 @@ List<String> essenceChoice = [
 const String labelSendCompoFeature =
     "Vous pouvez nous communiquer des observations relatives à la composition dans le but d'améliorer la carte de composition. Veillez à complêter l'attribut 'essence' avec l'espèce observée. Nous attirons votre attention qu'une entitée (polygone ou point) ne peux être envoyée qu'une seule fois. Merci pour votre contribution !";
 
-void startTimer(
-  Future<bool> Function() timeupCall,
-  bool Function() stop,
-  int start,
-  int repeat,
-) {
+void startTimer(Future<bool> Function() timeupCall, bool Function() stop, int start, int repeat) {
   Timer(Duration(seconds: start), () {
     repeatTimer(timeupCall, stop, repeat);
     timeupCall();
   });
 }
 
-void repeatTimer(
-  Future<bool> Function() timeupCall,
-  bool Function() stop,
-  int repeat,
-) {
+void repeatTimer(Future<bool> Function() timeupCall, bool Function() stop, int repeat) {
   print("Stop repeating task ${stop()}");
   if (!stop()) {
     Timer(Duration(seconds: repeat), () {

@@ -20,12 +20,7 @@ class Attribute {
   dynamic value;
   bool visibleOnMapLabel;
 
-  Attribute({
-    required this.name,
-    this.type = "string",
-    this.value = "",
-    this.visibleOnMapLabel = false,
-  });
+  Attribute({required this.name, this.type = "string", this.value = "", this.visibleOnMapLabel = false});
 }
 
 class Geometry {
@@ -53,83 +48,33 @@ class Geometry {
   Geometry({String polygonName = ""}) {
     name = polygonName;
     Random randomColor = Random();
-    setColorInside(
-      Color.fromRGBO(
-        randomColor.nextInt(256),
-        randomColor.nextInt(256),
-        randomColor.nextInt(256),
-        0.4,
-      ),
-    );
-    setColorLine(
-      Color.fromRGBO(
-        (colorInside.r * 255).round(),
-        (colorInside.g * 255).round(),
-        (colorInside.b * 255).round(),
-        1.0,
-      ),
-    );
+    setColorInside(Color.fromRGBO(randomColor.nextInt(256), randomColor.nextInt(256), randomColor.nextInt(256), 0.4));
+    setColorLine(Color.fromRGBO((colorInside.r * 255).round(), (colorInside.g * 255).round(), (colorInside.b * 255).round(), 1.0));
   }
 
   Geometry.point({String polygonName = ""}) {
     name = polygonName;
     Random randomColor = Random();
-    setColorInside(
-      Color.fromRGBO(
-        randomColor.nextInt(256),
-        randomColor.nextInt(256),
-        randomColor.nextInt(256),
-        0.4,
-      ),
-    );
-    setColorLine(
-      Color.fromRGBO(
-        (colorInside.r * 255).round(),
-        (colorInside.g * 255).round(),
-        (colorInside.b * 255).round(),
-        1.0,
-      ),
-    );
+    setColorInside(Color.fromRGBO(randomColor.nextInt(256), randomColor.nextInt(256), randomColor.nextInt(256), 0.4));
+    setColorLine(Color.fromRGBO((colorInside.r * 255).round(), (colorInside.g * 255).round(), (colorInside.b * 255).round(), 1.0));
   }
 
   Geometry.polygon({String polygonName = ""}) {
     type = "Polygon";
     name = polygonName;
     Random randomColor = Random();
-    setColorInside(
-      Color.fromRGBO(
-        randomColor.nextInt(256),
-        randomColor.nextInt(256),
-        randomColor.nextInt(256),
-        0.4,
-      ),
-    );
-    setColorLine(
-      Color.fromRGBO(
-        (colorInside.r * 255).round(),
-        (colorInside.g * 255).round(),
-        (colorInside.b * 255).round(),
-        1.0,
-      ),
-    );
+    setColorInside(Color.fromRGBO(randomColor.nextInt(256), randomColor.nextInt(256), randomColor.nextInt(256), 0.4));
+    setColorLine(Color.fromRGBO((colorInside.r * 255).round(), (colorInside.g * 255).round(), (colorInside.b * 255).round(), 1.0));
   }
 
   Geometry.essencePoint({String polygonName = ""}) {
     type = "Point-essence";
-    attributes.addAll([
-      Attribute(name: "essence", type: "string", value: gl.essenceChoice[0]),
-      Attribute(name: "rmq", type: "string", value: ""),
-    ]);
+    attributes.addAll([Attribute(name: "essence", type: "string", value: gl.essenceChoice[0]), Attribute(name: "rmq", type: "string", value: "")]);
     attributes[1].visibleOnMapLabel = true;
     visibleOnMap = true;
     name = polygonName;
     selectedPointIcon = 4;
-    setColorInside(
-      gl.dico.mLayerBases["COMPOALL"]!.mDicoCol[gl.essenceChoice.indexOf(
-            gl.essenceChoice[0],
-          )] ??
-          Colors.black,
-    );
+    setColorInside(gl.dico.mLayerBases["COMPOALL"]!.mDicoCol[gl.essenceChoice.indexOf(gl.essenceChoice[0])] ?? Colors.black);
     setColorLine(colorInside.withAlpha(255));
   }
 
@@ -174,9 +119,7 @@ class Geometry {
   }
 
   bool isSelectedLine(int i) {
-    return (i == selectedPolyLinePoints[0] || i == selectedPolyLinePoints[1])
-        ? true
-        : false;
+    return (i == selectedPolyLinePoints[0] || i == selectedPolyLinePoints[1]) ? true : false;
   }
 
   void addPoint(LatLng point) {
@@ -194,10 +137,7 @@ class Geometry {
       copyOfPoly.add(Point(p.latitude, p.longitude));
     }
 
-    copyOfPoly.insert(
-      selectedPolyLinePoints[1],
-      Point(vertex.latitude, vertex.longitude),
-    );
+    copyOfPoly.insert(selectedPolyLinePoints[1], Point(vertex.latitude, vertex.longitude));
     return copyOfPoly;
   }
 
@@ -229,8 +169,7 @@ class Geometry {
     }
     int i = 0;
     for (var point in points) {
-      if (index.latitude == point.latitude &&
-          index.longitude == point.longitude) {
+      if (index.latitude == point.latitude && index.longitude == point.longitude) {
         break;
       }
       i++;
@@ -243,8 +182,7 @@ class Geometry {
   void removePoint(LatLng index) {
     int i = 0;
     for (var point in points) {
-      if (index.latitude == point.latitude &&
-          index.longitude == point.longitude) {
+      if (index.latitude == point.latitude && index.longitude == point.longitude) {
         break;
       }
       i++;
@@ -264,13 +202,8 @@ class Geometry {
       } else if (points.isEmpty) {
         refreshSelectedLinePoints(null);
       } else {
-        int selection =
-            (selectedPolyLinePoints[0] > selectedPolyLinePoints[1])
-                ? selectedPolyLinePoints[1]
-                : selectedPolyLinePoints[0];
-        refreshSelectedLinePoints(
-          points[selection > points.length - 1 ? points.length - 1 : selection],
-        );
+        int selection = (selectedPolyLinePoints[0] > selectedPolyLinePoints[1]) ? selectedPolyLinePoints[1] : selectedPolyLinePoints[0];
+        refreshSelectedLinePoints(points[selection > points.length - 1 ? points.length - 1 : selection]);
       }
     }
 
@@ -312,8 +245,7 @@ class Geometry {
   int pointIndex(LatLng searchedPoint) {
     int i = 0;
     for (var point in points) {
-      if (searchedPoint.latitude == point.latitude &&
-          searchedPoint.longitude == point.longitude) {
+      if (searchedPoint.latitude == point.latitude && searchedPoint.longitude == point.longitude) {
         break;
       }
       i++;
@@ -322,10 +254,7 @@ class Geometry {
   }
 
   Offset _epsg4326ToEpsg31370(proj4.Point spPoint) {
-    return Offset(
-      gl.epsg4326.transform(gl.epsg31370, spPoint).x,
-      gl.epsg4326.transform(gl.epsg31370, spPoint).y,
-    );
+    return Offset(gl.epsg4326.transform(gl.epsg31370, spPoint).x, gl.epsg4326.transform(gl.epsg31370, spPoint).y);
   }
 
   void _computeArea() {
@@ -336,11 +265,7 @@ class Geometry {
 
     List<Offset> poly = [];
     for (LatLng point in points) {
-      poly.add(
-        _epsg4326ToEpsg31370(
-          proj4.Point(y: point.latitude, x: point.longitude),
-        ),
-      );
+      poly.add(_epsg4326ToEpsg31370(proj4.Point(y: point.latitude, x: point.longitude)));
     }
     area = calculateArea(poly);
   }
@@ -352,11 +277,7 @@ class Geometry {
     }
     List<Offset> poly = [];
     for (LatLng point in points) {
-      poly.add(
-        _epsg4326ToEpsg31370(
-          proj4.Point(y: point.latitude, x: point.longitude),
-        ),
-      );
+      poly.add(_epsg4326ToEpsg31370(proj4.Point(y: point.latitude, x: point.longitude)));
     }
     perimeter = 0.0;
     Offset currentPoint = poly.last;
@@ -369,17 +290,11 @@ class Geometry {
   String getPolyPointsString() {
     String coordinates = "";
     for (LatLng point in points) {
-      proj4.Point tLb72 = gl.epsg4326.transform(
-        gl.epsg31370,
-        proj4.Point(x: point.longitude, y: point.latitude),
-      );
+      proj4.Point tLb72 = gl.epsg4326.transform(gl.epsg31370, proj4.Point(x: point.longitude, y: point.latitude));
       coordinates = "$coordinates[${tLb72.x}, ${tLb72.y}],";
     }
     if (type == "Polygon" && points.isNotEmpty) {
-      proj4.Point tLb72 = gl.epsg4326.transform(
-        gl.epsg31370,
-        proj4.Point(x: points.first.longitude, y: points.first.latitude),
-      );
+      proj4.Point tLb72 = gl.epsg4326.transform(gl.epsg31370, proj4.Point(x: points.first.longitude, y: points.first.latitude));
       coordinates = "$coordinates[${tLb72.x}, ${tLb72.y}]";
     } else {
       if (coordinates.length > 1) {
@@ -407,21 +322,14 @@ class Geometry {
 
       String polygon = "POLYGON ((";
       for (LatLng point in points) {
-        proj4.Point tLb72 = gl.epsg4326.transform(
-          gl.epsg31370,
-          proj4.Point(x: point.longitude, y: point.latitude),
-        );
+        proj4.Point tLb72 = gl.epsg4326.transform(gl.epsg31370, proj4.Point(x: point.longitude, y: point.latitude));
         polygon = "$polygon${tLb72.x} ${tLb72.y},";
       }
-      proj4.Point tLb72 = gl.epsg4326.transform(
-        gl.epsg31370,
-        proj4.Point(x: points.first.longitude, y: points.first.latitude),
-      );
+      proj4.Point tLb72 = gl.epsg4326.transform(gl.epsg31370, proj4.Point(x: points.first.longitude, y: points.first.latitude));
       polygon = "$polygon${tLb72.x} ${tLb72.y},";
       polygon = "${polygon.substring(0, polygon.length - 1)}))";
 
-      String request =
-          "https://forestimator.gembloux.ulg.ac.be/api/anaSurf/layers/$layersAnaSurf/polygon/$polygon";
+      String request = "https://forestimator.gembloux.ulg.ac.be/api/anaSurf/layers/$layersAnaSurf/polygon/$polygon";
       http.Response? res;
       try {
         res = await http.get(Uri.parse(request));
@@ -460,21 +368,16 @@ class Geometry {
   static void sendEssencePointsInBackground() async {
     if (!gl.Mode.essencePointsToSync) {
       gl.Mode.essencePointsToSync = true;
-      gl.startTimer(
-        sendInBackground,
-        () => !gl.Mode.essencePointsToSync,
-        1,
-        300,
-      );
+      gl.startTimer(sendInBackground, () => !gl.Mode.essencePointsToSync, 1, 300);
     }
   }
 
   static Future<bool> sendInBackground() async {
     bool allFinished = true;
-    for (int i = 0; i < gl.geometries.length; i++) {
-      if (gl.geometries[i].type == "Point-essence" &&
-          !gl.geometries[i].sentToServer) {
-        if (!await gl.geometries[i].sendGeometryToServer()) allFinished = false;
+    if (gl.selectedGeoLayer < 0) return true;
+    for (int i = 0; i < gl.selLay.geometries.length; i++) {
+      if (gl.selLay.geometries[i].type == "Point-essence" && !gl.selLay.geometries[i].sentToServer) {
+        if (!await gl.selLay.geometries[i].sendGeometryToServer()) allFinished = false;
       }
     }
     gl.Mode.essencePointsToSync = !allFinished;
@@ -491,17 +394,11 @@ class Geometry {
     if (internet) {
       String coordinates = "";
       for (LatLng point in points) {
-        proj4.Point tLb72 = gl.epsg4326.transform(
-          gl.epsg31370,
-          proj4.Point(x: point.longitude, y: point.latitude),
-        );
+        proj4.Point tLb72 = gl.epsg4326.transform(gl.epsg31370, proj4.Point(x: point.longitude, y: point.latitude));
         coordinates = "$coordinates[${tLb72.x}, ${tLb72.y}],";
       }
       if (type == "Polygon") {
-        proj4.Point tLb72 = gl.epsg4326.transform(
-          gl.epsg31370,
-          proj4.Point(x: points.first.longitude, y: points.first.latitude),
-        );
+        proj4.Point tLb72 = gl.epsg4326.transform(gl.epsg31370, proj4.Point(x: points.first.longitude, y: points.first.latitude));
         coordinates = "[[$coordinates[${tLb72.x}, ${tLb72.y}]]]";
       } else {
         if (coordinates.length > 1) {
@@ -512,19 +409,16 @@ class Geometry {
       properties = "$properties\"name\":\"$name\",";
       properties = "$properties\"area\":\"$area\",";
       properties = "$properties\"perimeter\":\"$perimeter\",";
-      properties =
-          "$properties\"nom_contact\":\"${gl.UserData.name} ${gl.UserData.forename}\",";
+      properties = "$properties\"nom_contact\":\"${gl.UserData.name} ${gl.UserData.forename}\",";
       properties = "$properties\"contact\":\"${gl.UserData.mail}\",";
       for (Attribute attribute in attributes) {
-        properties =
-            "$properties\"${attribute.name}\":\"${attribute.value.toString()}\",";
+        properties = "$properties\"${attribute.name}\":\"${attribute.value.toString()}\",";
       }
       properties = properties.substring(0, properties.length - 1);
       String geometry =
           "{\"type\":\"FeatureCollection\",\"features\":[{\"type\":\"Feature\",\"geometry\":{\"type\":\"${getProperTypeForCarto(type)}\",\"coordinates\":$coordinates},\"properties\":{$properties}}]}";
 
-      String request =
-          "https://forestimator.gembloux.ulg.ac.be/api/polygFromMobile/$geometry";
+      String request = "https://forestimator.gembloux.ulg.ac.be/api/polygFromMobile/$geometry";
       gl.print(request);
       http.Response? response;
       try {
@@ -587,18 +481,14 @@ class Geometry {
     await gl.shared!.setDouble('$prefix.iconSize', iconSize);
     await gl.shared!.setDouble('$prefix.area', area);
     await gl.shared!.setDouble('$prefix.perimeter', perimeter);
-    await gl.shared!.setDouble(
-      '$prefix.transparencyInside',
-      transparencyInside,
-    );
+    await gl.shared!.setDouble('$prefix.transparencyInside', transparencyInside);
     await gl.shared!.setDouble('$prefix.transparencyLine', transparencyLine);
     _writeColorToMemory('$prefix.colorInside', colorInside);
     _writeColorToMemory('$prefix.colorLine', colorLine);
     _writePolygonPointsToMemory('$prefix.poly', points);
     _writePropertiesToMemory('$prefix.prop', attributes);
 
-    List<String> polykeys =
-        gl.shared!.getStringList('$layerId.polyKeys') ?? <String>[];
+    List<String> polykeys = gl.shared!.getStringList('$layerId.polyKeys') ?? <String>[];
     if (!polykeys.contains(prefix)) {
       polykeys.add(prefix);
       await gl.shared!.setStringList('$layerId.polyKeys', polykeys);
@@ -629,10 +519,7 @@ class Geometry {
     for (var attribute in attributes) {
       await gl.shared!.setString('$name.$i.name', attribute.name);
       await gl.shared!.setString('$name.$i.type', attribute.type);
-      await gl.shared!.setBool(
-        '$name.$i.visibleOnMapLabel',
-        attribute.visibleOnMapLabel,
-      );
+      await gl.shared!.setBool('$name.$i.visibleOnMapLabel', attribute.visibleOnMapLabel);
       if (attribute.type == "string") {
         await gl.shared!.setString('$name.$i.val', attribute.value);
       } else if (attribute.type == "int") {
@@ -677,12 +564,7 @@ class Geometry {
     List<LatLng> polygon = [];
     int nPoints = gl.shared!.getInt('$name.nPolyPoints')!;
     for (int i = 0; i < nPoints; i++) {
-      polygon.add(
-        LatLng(
-          gl.shared!.getDouble('$name.$i-lat')!,
-          gl.shared!.getDouble('$name.$i-lng')!,
-        ),
-      );
+      polygon.add(LatLng(gl.shared!.getDouble('$name.$i-lat')!, gl.shared!.getDouble('$name.$i-lng')!));
     }
     return polygon;
   }
@@ -704,8 +586,7 @@ class Geometry {
                   : type == "double"
                   ? gl.shared!.getDouble('$name.$i.val')!
                   : "unknown",
-          visibleOnMapLabel:
-              gl.shared!.getBool('$name.$i.visibleOnMapLabel') ?? false,
+          visibleOnMapLabel: gl.shared!.getBool('$name.$i.visibleOnMapLabel') ?? false,
         ),
       );
     }
@@ -713,17 +594,15 @@ class Geometry {
   }
 
   static void deserializAllPolys({String layerId = ""}) {
-    List<String> polykeys =
-        gl.shared!.getStringList('$layerId.polyKeys') ?? <String>[];
+    List<String> polykeys = gl.shared!.getStringList('$layerId.polyKeys') ?? <String>[];
     for (String key in polykeys) {
-      gl.geometries.add(Geometry());
-      gl.geometries.last.deserialze(key);
+      gl.selLay.geometries.add(Geometry());
+      gl.selLay.geometries.last.deserialze(key);
     }
   }
 
   static void removePolyFromShared(String id, {String layerId = ""}) async {
-    List<String> polykeys =
-        gl.shared!.getStringList('$layerId.polyKeys') ?? <String>[];
+    List<String> polykeys = gl.shared!.getStringList('$layerId.polyKeys') ?? <String>[];
     if (!polykeys.contains(id)) {
       polykeys.remove(id);
       await gl.shared!.setStringList('$layerId.polyKeys', polykeys);
@@ -732,17 +611,14 @@ class Geometry {
 
   static int countEssenceObservations() {
     int count = 0;
-    for (Geometry form in gl.geometries) {
+    for (Geometry form in gl.selLay.geometries) {
       if (form.type.contains("essence")) count++;
     }
     return count;
   }
 
   Future runAnaPt() async {
-    proj4.Point ptBL72 = epsg4326.transform(
-      epsg31370,
-      proj4.Point(x: points.first.longitude, y: points.first.latitude),
-    );
+    proj4.Point ptBL72 = epsg4326.transform(epsg31370, proj4.Point(x: points.first.longitude, y: points.first.latitude));
     gl.requestedLayers.clear();
     Map data;
 
@@ -758,8 +634,7 @@ class Geometry {
           }
         }
 
-        String request =
-            "https://forestimator.gembloux.ulg.ac.be/api/anaPt/layers/$layersAnaPt/x/${ptBL72.x}/y/${ptBL72.y}";
+        String request = "https://forestimator.gembloux.ulg.ac.be/api/anaPt/layers/$layersAnaPt/x/${ptBL72.x}/y/${ptBL72.y}";
         try {
           var res = await http.get(Uri.parse(request));
           if (res.statusCode != 200) throw HttpException('${res.statusCode}');
@@ -773,9 +648,7 @@ class Geometry {
           gl.print(request);
           gl.print("$e");
         }
-        gl.requestedLayers.removeWhere(
-          (element) => element.mFoundLayer == false,
-        );
+        gl.requestedLayers.removeWhere((element) => element.mFoundLayer == false);
       } else {
         gl.mainStack.add(popupNoInternet());
       }
@@ -793,11 +666,6 @@ class Geometry {
     gl.requestedLayers.removeWhere((element) => element.mRastValue == 0);
 
     // on les trie sur base des catégories de couches
-    gl.requestedLayers.sort(
-      (a, b) => gl.dico
-          .getLayerBase(a.mCode)
-          .mGroupe
-          .compareTo(gl.dico.getLayerBase(b.mCode).mGroupe),
-    );
+    gl.requestedLayers.sort((a, b) => gl.dico.getLayerBase(a.mCode).mGroupe.compareTo(gl.dico.getLayerBase(b.mCode).mGroupe));
   }
 }
