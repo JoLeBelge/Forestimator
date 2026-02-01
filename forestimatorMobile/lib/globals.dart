@@ -1,7 +1,9 @@
+import 'dart:async';
+
 import 'package:fforestimator/dico/dico_apt.dart';
 import 'package:fforestimator/myicons.dart';
 import 'package:fforestimator/tools/customLayer/path_layer.dart';
-import 'package:fforestimator/tools/customLayer/polygon_layer.dart' as pol;
+import 'package:fforestimator/tools/geometry/geometry.dart' as pol;
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geolocator/geolocator.dart';
@@ -51,6 +53,49 @@ class UserData {
     name = data[0];
     forename = data[1];
     mail = data[2];
+  }
+
+  static bool validUserData() {
+    return UserData.forename.isNotEmpty &&
+        UserData.name.isNotEmpty &&
+        validMail(UserData.mail);
+  }
+
+  static bool validMail(String str) {
+    List<String> first = str.split("@");
+    if (first.length != 2) return false;
+    if (!first[1].contains(".")) return false;
+    List<String> second = first[1].split(".");
+    if (second.length != 2) return false;
+    if (second[1].isEmpty) return false;
+
+    for (int i = 0; i < first[0].length; i++) {
+      if (!_containsAllowedCharacters(first[0][i], ".!#\$&%'*+-/=?^_`{}|~") &&
+          !first[0][i].contains(RegExp(r'[A-Z]')) &&
+          !first[0][i].contains(RegExp(r'[a-z]')) &&
+          !first[0][i].contains(RegExp(r'[0-9]'))) {
+        return false;
+      }
+    }
+    for (int i = 0; i < first[1].length; i++) {
+      if (!_containsAllowedCharacters(first[1][i], ".-") &&
+          !first[1][i].contains(RegExp(r'[A-Z]')) &&
+          !first[1][i].contains(RegExp(r'[a-z]')) &&
+          !first[1][i].contains(RegExp(r'[0-9]'))) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  static bool _containsAllowedCharacters(String that, String allowed) {
+    String allowedCharacters = ".!#\$&%'*+-/=?^_`{}|~";
+    for (int j = 0; j < allowedCharacters.length; j++) {
+      if (that.contains(allowedCharacters[j])) {
+        return true;
+      }
+    }
+    return false;
   }
 }
 
@@ -852,5 +897,32 @@ List<String> essenceChoice = [
   "Autres conifères",
   "Entrer du texte",
 ];
+
 const String labelSendCompoFeature =
     "Vous pouvez nous communiquer des observations relatives à la composition dans le but d'améliorer la carte de composition. Veillez à complêter l'attribut 'essence' avec l'espèce observée. Nous attirons votre attention qu'une entitée (polygone ou point) ne peux être envoyée qu'une seule fois. Merci pour votre contribution !";
+
+void startTimer(
+  Future<bool> Function() timeupCall,
+  bool Function() stop,
+  int start,
+  int repeat,
+) {
+  Timer(Duration(seconds: start), () {
+    repeatTimer(timeupCall, stop, repeat);
+    timeupCall();
+  });
+}
+
+void repeatTimer(
+  Future<bool> Function() timeupCall,
+  bool Function() stop,
+  int repeat,
+) {
+  print("Stop repeating task ${stop()}");
+  if (!stop()) {
+    Timer(Duration(seconds: repeat), () {
+      repeatTimer(timeupCall, stop, repeat);
+      timeupCall();
+    });
+  }
+}

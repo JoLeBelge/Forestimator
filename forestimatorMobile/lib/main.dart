@@ -1,6 +1,6 @@
 import 'package:downloadsfolder/downloadsfolder.dart' as path;
 import 'package:fforestimator/dico/dico_apt.dart';
-import 'package:fforestimator/tools/customLayer/polygon_layer.dart';
+import 'package:fforestimator/tools/geometry/geometry.dart';
 import 'package:fforestimator/tools/layer_downloader.dart';
 import 'package:flutter/material.dart';
 import 'package:fforestimator/globals.dart' as gl;
@@ -27,7 +27,6 @@ void main() async {
   }
 
   gl.dico = DicoAptProvider();
-
   // Start app immediately so integration tests can locate MaterialApp and
   // so the UI is responsive while longer-running initialization runs in
   // the background.
@@ -72,9 +71,9 @@ class _MyApp extends State<MyApp> {
 
   Future _readPreference() async {
     gl.shared = await SharedPreferences.getInstance();
-
-    gl.UserData.deserialize();
     gl.Mode.deserialize();
+    gl.UserData.deserialize();
+    gl.Mode.userDataFilled = gl.UserData.validUserData();
 
     final bool? modeDevelopper = gl.shared!.getBool('modeDevelopper');
     if (modeDevelopper != null) {
@@ -210,6 +209,7 @@ class _MyApp extends State<MyApp> {
       _navigatorKey = GlobalKey<NavigatorState>();
       gl.notificationContext = _navigatorKey!.currentContext;
     });
+    Geometry.sendEssencePointsInBackground();
   }
 
   @override

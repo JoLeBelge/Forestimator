@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
-import 'package:dart_jts/dart_jts.dart' hide Orientation, Geometry, Key;
 import 'package:fforestimator/dico/dico_apt.dart';
 import 'package:fforestimator/globals.dart' as gl;
 import 'package:fforestimator/myicons.dart';
@@ -11,7 +10,7 @@ import 'package:fforestimator/pages/catalogueView/legend_view.dart';
 import 'package:fforestimator/pages/pdf_screen.dart';
 import 'package:fforestimator/tools/layout_tools.dart';
 import 'package:fforestimator/tools/customLayer/path_layer.dart';
-import 'package:fforestimator/tools/customLayer/polygon_layer.dart';
+import 'package:fforestimator/tools/geometry/geometry.dart';
 import 'package:fforestimator/tools/handle_permissions.dart';
 import 'package:fforestimator/tools/handle_permissions.dart' as permissions;
 import 'package:fforestimator/tools/layer_downloader.dart';
@@ -1138,7 +1137,7 @@ class PopupUserData {
                   ValidTextField(
                     width: gl.menuBarLength * gl.display.equipixel,
                     height: gl.menuBarThickness * gl.display.equipixel,
-                    validate: validMail,
+                    validate: gl.UserData.validMail,
                     onValid: (String str) {
                       gl.UserData.mail = str;
                       gl.UserData.serialize();
@@ -1160,7 +1159,7 @@ class PopupUserData {
                       ),
                       child: Text("Appliquer", style: dialogTextButtonStyle()),
                       onPressed: () {
-                        if (validUserData()) {
+                        if (gl.UserData.validUserData()) {
                           gl.Mode.userDataFilled = true;
                           gl.Mode.serialize();
                           dismissPopup();
@@ -1202,49 +1201,6 @@ class PopupUserData {
       ),
     );
   }
-}
-
-bool validUserData() {
-  return gl.UserData.forename.isNotEmpty &&
-      gl.UserData.name.isNotEmpty &&
-      validMail(gl.UserData.mail);
-}
-
-bool validMail(String str) {
-  List<String> first = str.split("@");
-  if (first.length != 2) return false;
-  if (!first[1].contains(".")) return false;
-  List<String> second = first[1].split(".");
-  if (second.length != 2) return false;
-  if (second[1].isEmpty) return false;
-
-  for (int i = 0; i < first[0].length; i++) {
-    if (!containsAllowedCharacters(first[0][i], ".!#\$&%'*+-/=?^_`{}|~") &&
-        !first[0][i].contains(RegExp(r'[A-Z]')) &&
-        !first[0][i].contains(RegExp(r'[a-z]')) &&
-        !first[0][i].contains(RegExp(r'[0-9]'))) {
-      return false;
-    }
-  }
-  for (int i = 0; i < first[1].length; i++) {
-    if (!containsAllowedCharacters(first[1][i], ".-") &&
-        !first[1][i].contains(RegExp(r'[A-Z]')) &&
-        !first[1][i].contains(RegExp(r'[a-z]')) &&
-        !first[1][i].contains(RegExp(r'[0-9]'))) {
-      return false;
-    }
-  }
-  return true;
-}
-
-bool containsAllowedCharacters(String that, String allowed) {
-  String allowedCharacters = ".!#\$&%'*+-/=?^_`{}|~";
-  for (int j = 0; j < allowedCharacters.length; j++) {
-    if (that.contains(allowedCharacters[j])) {
-      return true;
-    }
-  }
-  return false;
 }
 
 class PopupNewAttribute {
@@ -1505,8 +1461,8 @@ class PopupNewEssenceObservationPoint {
                       ),
                       child: Text("Ajouter", style: dialogTextButtonStyle()),
                       onPressed: () {
-                        gl.Mode.essencePointsToSync = true;
-                        Geometry.startSendDeamon();
+                        gl.geometries.last.serialize();
+                        Geometry.sendEssencePointsInBackground();
                         gl.Mode.serialize();
                         dismissPopup();
                       },
@@ -1562,6 +1518,7 @@ class _SelectEssence extends State<SelectEssence> {
               color: Colors.white,
               fontSize: gl.fontSizeM * gl.display.equipixel,
             ),
+            trailingIcon: Icon(Icons.arrow_drop_down),
             menuStyle: MenuStyle(
               backgroundColor: WidgetStateProperty<Color>.fromMap(
                 <WidgetStatesConstraint, Color>{
@@ -1583,6 +1540,12 @@ class _SelectEssence extends State<SelectEssence> {
                       fontSize: gl.fontSizeM * gl.display.equipixel,
                     ),
                   ),
+                  trailingIcon: CircleAvatar(
+                    backgroundColor:
+                        gl.dico.mLayerBases['COMPOALL']!.mDicoCol[index] ??
+                        Colors.black,
+                    radius: gl.iconSizeXS * gl.display.equipixel * .75,
+                  ),
                 );
               },
             ),
@@ -1603,6 +1566,7 @@ class _SelectEssence extends State<SelectEssence> {
           SizedBox(
             width: gl.menuBarLength * gl.display.equipixel,
             child: TextFormField(
+              cursorColor: Colors.white,
               maxLength: 255,
               maxLengthEnforcement: MaxLengthEnforcement.enforced,
               onChanged: (value) {
@@ -1712,7 +1676,7 @@ class PopupValueChange {
                           initialValue: gl.UserData.mail,
                           width: gl.menuBarLength * gl.display.equipixel,
                           height: gl.menuBarThickness * gl.display.equipixel,
-                          validate: validMail,
+                          validate: gl.UserData.validMail,
                           onValid: (String str) {
                             valueChanged(str);
                           },
@@ -4930,7 +4894,8 @@ class _ForestimatorSettingsUserData
                           (value) {
                             setState(() {
                               gl.UserData.forename = value;
-                              gl.Mode.userDataFilled = validUserData();
+                              gl.Mode.userDataFilled =
+                                  gl.UserData.validUserData();
                               gl.Mode.serialize();
                             });
                             widget.onChanged();
@@ -5010,7 +4975,8 @@ class _ForestimatorSettingsUserData
                           (value) {
                             setState(() {
                               gl.UserData.name = value;
-                              gl.Mode.userDataFilled = validUserData();
+                              gl.Mode.userDataFilled =
+                                  gl.UserData.validUserData();
                               gl.Mode.serialize();
                             });
                             widget.onChanged();
@@ -5090,7 +5056,8 @@ class _ForestimatorSettingsUserData
                           (value) {
                             setState(() {
                               gl.UserData.mail = value;
-                              gl.Mode.userDataFilled = validUserData();
+                              gl.Mode.userDataFilled =
+                                  gl.UserData.validUserData();
                               gl.Mode.serialize();
                             });
                             widget.onChanged();

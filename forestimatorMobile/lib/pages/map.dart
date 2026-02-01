@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:fforestimator/dico/dico_apt.dart';
 import 'package:fforestimator/tileProvider/tif_tile_provider.dart';
-import 'package:fforestimator/tools/customLayer/polygon_layer.dart' as pl;
+import 'package:fforestimator/tools/geometry/geometry.dart' as pl;
 import 'package:fforestimator/tools/layout_tools.dart';
 import 'package:fforestimator/tools/handle_permissions.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -4523,7 +4523,10 @@ class _MapPageState extends State<MapPage> {
                         : gl.infoBoxPolygon),
                 height:
                     gl.display.equipixel *
-                        (gl.geometries[i].getNCheckedAttributes() + 1) *
+                        (gl.geometries[i].getNCheckedAttributes() +
+                            ((!gl.geometries[i].type.contains("essence"))
+                                ? 1
+                                : 0)) *
                         gl.iconSizeS *
                         .8 +
                     5,
@@ -4575,31 +4578,33 @@ class _MapPageState extends State<MapPage> {
                                     ),
                                   ),
                                 ),
-                              Container(
-                                padding: EdgeInsets.all(2),
-                                alignment: Alignment.center,
-                                color: Colors.transparent,
-                                height: gl.display.equipixel * gl.iconSizeXS,
-                                width:
-                                    gl.display.equipixel *
-                                    gl.infoBoxPolygon /
-                                    2,
-                                child: SingleChildScrollView(
-                                  scrollDirection: Axis.horizontal,
-                                  child: Text(
-                                    gl.geometries[i].name,
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      color:
-                                          gl.Mode.smallLabel
-                                              ? Colors.black
-                                              : Colors.white,
-                                      fontSize:
-                                          gl.display.equipixel * gl.fontSizeXS,
+                              if (!gl.geometries[i].type.contains("essence"))
+                                Container(
+                                  padding: EdgeInsets.all(2),
+                                  alignment: Alignment.center,
+                                  color: Colors.transparent,
+                                  height: gl.display.equipixel * gl.iconSizeXS,
+                                  width:
+                                      gl.display.equipixel *
+                                      gl.infoBoxPolygon /
+                                      2,
+                                  child: SingleChildScrollView(
+                                    scrollDirection: Axis.horizontal,
+                                    child: Text(
+                                      gl.geometries[i].name,
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        color:
+                                            gl.Mode.smallLabel
+                                                ? Colors.black
+                                                : Colors.white,
+                                        fontSize:
+                                            gl.display.equipixel *
+                                            gl.fontSizeXS,
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
                               if (gl.Mode.labelCross)
                                 Container(
                                   padding: EdgeInsets.all(0),
