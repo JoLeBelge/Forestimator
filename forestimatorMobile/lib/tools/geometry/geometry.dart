@@ -12,6 +12,7 @@ import 'package:http/http.dart' as http;
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 import 'package:proj4dart/proj4dart.dart' as proj4;
 import 'package:latlong2/latlong.dart';
+import 'package:uuid/uuid.dart';
 
 class Attribute {
   String type;
@@ -28,9 +29,9 @@ class Attribute {
 }
 
 class Geometry {
-  String identifier = UniqueKey().toString();
+  String identifier = Uuid().v4();
   bool sentToServer = false;
-  String hitValue = UniqueKey().toString();
+  String hitValue = Uuid().v4();
   String type = "Point";
   String name = "";
   bool visibleOnMap = true;
@@ -575,56 +576,52 @@ class Geometry {
     return false;
   }
 
-  void serialize() async {
-    await gl.shared!.setBool('$identifier.sent', sentToServer);
-    await gl.shared!.setString('$identifier.name', name);
-    await gl.shared!.setString('$identifier.type', type);
-    await gl.shared!.setBool('$identifier.visibleOnMap', visibleOnMap);
-    await gl.shared!.setBool(
-      '$identifier.labelsVisibleOnMap',
-      labelsVisibleOnMap,
-    );
-    await gl.shared!.setInt('$identifier.selectedPointIcon', selectedPointIcon);
-    await gl.shared!.setDouble('$identifier.iconSize', iconSize);
-    await gl.shared!.setDouble('$identifier.area', area);
-    await gl.shared!.setDouble('$identifier.perimeter', perimeter);
+  void serialize({String layerId = ""}) async {
+    String prefix = identifier;
+    await gl.shared!.setBool('$prefix.sent', sentToServer);
+    await gl.shared!.setString('$prefix.name', name);
+    await gl.shared!.setString('$prefix.type', type);
+    await gl.shared!.setBool('$prefix.visibleOnMap', visibleOnMap);
+    await gl.shared!.setBool('$prefix.labelsVisibleOnMap', labelsVisibleOnMap);
+    await gl.shared!.setInt('$prefix.selectedPointIcon', selectedPointIcon);
+    await gl.shared!.setDouble('$prefix.iconSize', iconSize);
+    await gl.shared!.setDouble('$prefix.area', area);
+    await gl.shared!.setDouble('$prefix.perimeter', perimeter);
     await gl.shared!.setDouble(
-      '$identifier.transparencyInside',
+      '$prefix.transparencyInside',
       transparencyInside,
     );
-    await gl.shared!.setDouble(
-      '$identifier.transparencyLine',
-      transparencyLine,
-    );
-    _writeColorToMemory('$identifier.colorInside', colorInside);
-    _writeColorToMemory('$identifier.colorLine', colorLine);
-    _writePolygonPointsToMemory('$identifier.poly', points);
-    _writePropertiesToMemory('$identifier.prop', attributes);
+    await gl.shared!.setDouble('$prefix.transparencyLine', transparencyLine);
+    _writeColorToMemory('$prefix.colorInside', colorInside);
+    _writeColorToMemory('$prefix.colorLine', colorLine);
+    _writePolygonPointsToMemory('$prefix.poly', points);
+    _writePropertiesToMemory('$prefix.prop', attributes);
 
-    List<String> polykeys = gl.shared!.getStringList('polyKeys') ?? <String>[];
-    if (!polykeys.contains(identifier)) {
-      polykeys.add(identifier);
-      await gl.shared!.setStringList('polyKeys', polykeys);
+    List<String> polykeys =
+        gl.shared!.getStringList('$layerId.polyKeys') ?? <String>[];
+    if (!polykeys.contains(prefix)) {
+      polykeys.add(prefix);
+      await gl.shared!.setStringList('$layerId.polyKeys', polykeys);
     }
 
     gl.print("polygone $name saved to prefs");
   }
 
-  void _writeColorToMemory(String name, Color color) async {
-    await gl.shared!.setInt('$name.r', (color.r * 255).round());
-    await gl.shared!.setInt('$name.g', (color.g * 255).round());
-    await gl.shared!.setInt('$name.b', (color.b * 255).round());
-    await gl.shared!.setDouble('$name.a', color.a);
+  void _writeColorToMemory(String prefix, Color color) async {
+    await gl.shared!.setInt('$prefix.r', (color.r * 255).round());
+    await gl.shared!.setInt('$prefix.g', (color.g * 255).round());
+    await gl.shared!.setInt('$prefix.b', (color.b * 255).round());
+    await gl.shared!.setDouble('$prefix.a', color.a);
   }
 
-  void _writePolygonPointsToMemory(String name, List<LatLng> polygon) async {
+  void _writePolygonPointsToMemory(String prefix, List<LatLng> polygon) async {
     int i = 0;
     for (var point in polygon) {
-      await gl.shared!.setDouble('$name.$i-lat', point.latitude);
-      await gl.shared!.setDouble('$name.$i-lng', point.longitude);
+      await gl.shared!.setDouble('$prefix.$i-lat', point.latitude);
+      await gl.shared!.setDouble('$prefix.$i-lng', point.longitude);
       i++;
     }
-    await gl.shared!.setInt('$name.nPolyPoints', i);
+    await gl.shared!.setInt('$prefix.nPolyPoints', i);
   }
 
   void _writePropertiesToMemory(String name, List<Attribute> attributes) async {
@@ -715,19 +712,21 @@ class Geometry {
     return attributes;
   }
 
-  static void loadPolyData() {
-    List<String> polykeys = gl.shared!.getStringList('polyKeys') ?? <String>[];
+  static void deserializAllPolys({String layerId = ""}) {
+    List<String> polykeys =
+        gl.shared!.getStringList('$layerId.polyKeys') ?? <String>[];
     for (String key in polykeys) {
       gl.geometries.add(Geometry());
       gl.geometries.last.deserialze(key);
     }
   }
 
-  static void deleteLayerFromShared(String id) async {
-    List<String> polykeys = gl.shared!.getStringList('polyKeys') ?? <String>[];
+  static void removePolyFromShared(String id, {String layerId = ""}) async {
+    List<String> polykeys =
+        gl.shared!.getStringList('$layerId.polyKeys') ?? <String>[];
     if (!polykeys.contains(id)) {
       polykeys.remove(id);
-      await gl.shared!.setStringList('polyKeys', polykeys);
+      await gl.shared!.setStringList('$layerId.polyKeys', polykeys);
     }
   }
 

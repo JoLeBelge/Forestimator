@@ -2892,7 +2892,7 @@ class _PolygonListMenu extends State<PolygonListMenu> {
                                                   gl.notificationContext!,
                                                   () {
                                                     setState(() {
-                                                      Geometry.deleteLayerFromShared(
+                                                      Geometry.removePolyFromShared(
                                                         gl.geometries[i].id,
                                                       );
                                                       if (i > 0) {
@@ -3094,7 +3094,7 @@ class _PolygonListMenu extends State<PolygonListMenu> {
                               PopupDoYouReally(
                                 gl.notificationContext!,
                                 () {
-                                  Geometry.deleteLayerFromShared(
+                                  Geometry.removePolyFromShared(
                                     gl.geometries[gl.selectedGeometry].id,
                                   );
                                   setState(() {
@@ -3675,7 +3675,7 @@ class _PathListMenu extends State<PathListMenu> {
                                                 () {
                                                   setState(() {
                                                     //remove polygon
-                                                    Geometry.deleteLayerFromShared(
+                                                    Geometry.removePolyFromShared(
                                                       gl.pathLayers[i].id,
                                                     );
                                                     if (i > 0) {
