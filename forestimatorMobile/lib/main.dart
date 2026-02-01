@@ -1,6 +1,7 @@
 import 'package:downloadsfolder/downloadsfolder.dart' as path;
 import 'package:fforestimator/dico/dico_apt.dart';
 import 'package:fforestimator/tools/geometry/geometry.dart';
+import 'package:fforestimator/tools/geometry_layer.dart';
 import 'package:fforestimator/tools/layer_downloader.dart';
 import 'package:flutter/material.dart';
 import 'package:fforestimator/globals.dart' as gl;
@@ -136,7 +137,7 @@ class _MyApp extends State<MyApp> {
       gl.mapZoom = aZoom;
     }
 
-    Geometry.deserializAllPolys();
+    GeometricLayer.deserializeLayers();
 
     setState(() {
       _initializedPersistentValues = true;

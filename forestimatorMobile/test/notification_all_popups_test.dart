@@ -312,7 +312,7 @@ void main() {
 
       gl.mainStack.add(Container());
       presentPopup(
-        popup: popupPolygonListMenu(rootContext!, 'n', (l) {}, () {
+        popup: popupLayerListMenu(rootContext!, 'n', (l) {}, () {
           after = true;
         }),
         context: rootContext,

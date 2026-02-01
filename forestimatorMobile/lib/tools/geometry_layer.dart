@@ -1,12 +1,11 @@
 import 'dart:math';
-import 'dart:ui';
 
 import 'package:fforestimator/globals.dart' as gl;
 import 'package:fforestimator/tools/geometry/geometry.dart';
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 
-class GeometryLayer {
+class GeometricLayer {
   String id = Uuid().v4();
   String type = "";
   String subtype = "";
@@ -23,7 +22,20 @@ class GeometryLayer {
 
   List<Geometry> geometries = [];
 
-  GeometryLayer.point() {
+  GeometricLayer({String name = ""}) {
+    name = "";
+    type = "";
+    subtype = "";
+    Random rand = Random();
+    defaultColor = Color.fromRGBO(
+      rand.nextInt(256),
+      rand.nextInt(256),
+      rand.nextInt(256),
+      1.0,
+    );
+  }
+
+  GeometricLayer.point() {
     type = "Point";
     subtype = "";
     Random rand = Random();
@@ -35,7 +47,7 @@ class GeometryLayer {
     );
   }
 
-  GeometryLayer.essence() {
+  GeometricLayer.essence() {
     type = "Point";
     subtype = "Essence";
     Random rand = Random();
@@ -51,7 +63,7 @@ class GeometryLayer {
     ]);
   }
 
-  GeometryLayer.polygon() {
+  GeometricLayer.polygon() {
     type = "Polygon";
     Random rand = Random();
     defaultColor = Color.fromRGBO(
@@ -78,8 +90,8 @@ class GeometryLayer {
         );
         return;
     }
-    geometries.last.setColorInside(defaultColor!);
-    geometries.last.setColorLine(defaultColor!);
+    geometries.last.setColorInside(defaultColor);
+    geometries.last.setColorLine(defaultColor);
     geometries.last.selectedPointIcon = defaultPointIcon;
     geometries.last.iconSize = defaultIconSize;
     geometries.last.attributes.addAll(defaultAttributes);
@@ -113,31 +125,36 @@ class GeometryLayer {
   }
 
   void serialize() async {
-    await gl.shared!.setString('layer.$id.name', name);
-    await gl.shared!.setString('layer.$id.type', type);
-    await gl.shared!.setString('layer.$id.subtype', subtype);
+    await gl.shared!.setString('$id.name', name);
+    await gl.shared!.setString('$id.type', type);
+    await gl.shared!.setString('$id.subtype', subtype);
 
-    await gl.shared!.setBool('layer.$id.visibleOnMap', visibleOnMap);
-    await gl.shared!.setBool(
-      'layer.$id.labelsVisibleOnMap',
-      labelsVisibleOnMap,
-    );
-    await gl.shared!.setInt('layer.$id.defaultPointIcon', defaultPointIcon);
-    await gl.shared!.setDouble('layer.$id.defaultIconSize', defaultIconSize);
+    await gl.shared!.setBool('$id.visibleOnMap', visibleOnMap);
+    await gl.shared!.setBool('$id.labelsVisibleOnMap', labelsVisibleOnMap);
+    await gl.shared!.setInt('$id.defaultPointIcon', defaultPointIcon);
+    await gl.shared!.setDouble('$id.defaultIconSize', defaultIconSize);
 
-    _writeColorToMemory("layer.$id.col", defaultColor);
-    _writeAttributesToMemory("layer.$id.defAttr", defaultAttributes);
+    _writeColorToMemory("$id.col", defaultColor);
+    _writeAttributesToMemory("$id.defAttr", defaultAttributes);
 
     for (Geometry g in geometries) {
       g.serialize();
     }
+
+    List<String> layerKeys =
+        gl.shared!.getStringList('layerKeys') ?? <String>[];
+    if (!layerKeys.contains(id)) {
+      layerKeys.add(id);
+      await gl.shared!.setStringList('layerKeys', layerKeys);
+    }
+
     gl.print("layer $name saved to prefs");
   }
 
   void deserialize(String id) async {
-    name = gl.shared!.getString('layer.$id.name')!;
-    type = gl.shared!.getString('layer.$id.type')!;
-    subtype = gl.shared!.getString('layer.$id.subtype')!;
+    name = gl.shared!.getString('$id.name')!;
+    type = gl.shared!.getString('$id.type')!;
+    subtype = gl.shared!.getString('$id.subtype')!;
 
     visibleOnMap = gl.shared!.getBool('$id.labelsVisibleOnMap')!;
     labelsVisibleOnMap = gl.shared!.getBool('$id.labelsVisibleOnMap')!;
@@ -145,8 +162,8 @@ class GeometryLayer {
     defaultPointIcon = gl.shared!.getInt('$id.defaultPointIcon')!;
     defaultIconSize = gl.shared!.getDouble('$id.defaultIconSize')!;
 
-    defaultColor = _getColorFromMemory("layer.$id.col");
-    defaultAttributes = _getAttributesFromMemory("layer.$id.defAttr");
+    defaultColor = _getColorFromMemory("$id.col");
+    defaultAttributes = _getAttributesFromMemory("$id.defAttr");
 
     _deserializAllPolys();
 
@@ -227,12 +244,55 @@ class GeometryLayer {
     }
   }
 
-  void removePolyFromShared(String polyId) async {
-    List<String> polykeys =
-        gl.shared!.getStringList('$id.polyKeys') ?? <String>[];
-    if (!polykeys.contains(polyId)) {
-      polykeys.remove(polyId);
-      await gl.shared!.setStringList('$id.polyKeys', polykeys);
+  static void deserializeLayers() {
+    List<String> layerKeys =
+        gl.shared!.getStringList('layerKeys') ?? <String>[];
+    for (String key in layerKeys) {
+      gl.geoLayers.add(GeometricLayer());
+      gl.geoLayers.last.deserialize(key);
     }
+  }
+
+  static void removeLayerFromShared(String it) async {
+    List<String> layerKeys =
+        gl.shared!.getStringList('layerKeys') ?? <String>[];
+    if (!layerKeys.contains(it)) {
+      List<String> polykeys =
+          gl.shared!.getStringList('$it.polyKeys') ?? <String>[];
+      for (String key in polykeys) {
+        Geometry.removePolyFromShared(key);
+      }
+      layerKeys.remove(it);
+      await gl.shared!.setStringList('layerKeys', layerKeys);
+    }
+  }
+
+  bool allSent() {
+    if (geometries.isEmpty) return false;
+    for (Geometry g in geometries) {
+      if (!g.sentToServer) return false;
+    }
+    return true;
+  }
+
+  bool containsAttribute(String name) {
+    for (Attribute a in defaultAttributes) {
+      if (a.name == name) return true;
+    }
+    return false;
+  }
+
+  void sendLayerPolys() async {
+    //TODO: sendLayer
+  }
+
+  static List<Geometry> getSelectedGeometries() {
+    return gl.geoLayers[gl.selectedGeoLayer].geometries;
+  }
+
+  static Geometry getSelectedGeometry() {
+    return gl.geoLayers[gl.selectedGeoLayer].geometries[gl
+        .geoLayers[gl.selectedGeoLayer]
+        .selectedGeometry];
   }
 }

@@ -3201,7 +3201,7 @@ class _MapPageState extends State<MapPage> {
                                     child: TextButton(
                                       onPressed: () {
                                         gl.mainStack.add(
-                                          popupPolygonListMenu(
+                                          popupLayerListMenu(
                                             gl.notificationContext!,
                                             "",
                                             (LatLng pos) {
@@ -3938,7 +3938,7 @@ class _MapPageState extends State<MapPage> {
                     close!();
                   }
                   gl.mainStack.add(
-                    popupPolygonListMenu(
+                    popupLayerListMenu(
                       gl.notificationContext!,
                       "",
                       (LatLng pos) {

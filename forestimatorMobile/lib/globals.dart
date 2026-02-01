@@ -1,9 +1,9 @@
 import 'dart:async';
-
 import 'package:fforestimator/dico/dico_apt.dart';
 import 'package:fforestimator/myicons.dart';
 import 'package:fforestimator/tools/customLayer/path_layer.dart';
 import 'package:fforestimator/tools/geometry/geometry.dart' as pol;
+import 'package:fforestimator/tools/geometry_layer.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geolocator/geolocator.dart';
@@ -387,6 +387,9 @@ class PoiMarker {
 
 List<pol.Geometry> geometries = [];
 int selectedGeometry = -1;
+
+List<GeometricLayer> geoLayers = [];
+int selectedGeoLayer = -1;
 
 List<PathLayer> pathLayers = [];
 int selectedpathLayer = -1;
