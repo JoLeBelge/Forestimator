@@ -73,7 +73,7 @@ public:
     // télécharger plusieurs carte à la fois
     void downloadRaster();
     void anaAllPol();
-    bool cropImWithShp(std::string inputRaster, std::string aOut);
+    bool cropImWithShp(std::shared_ptr<layerBase> l, std::string aOut);
 
     // une méthode pour utiliser le polygone issu d'une recherche sur le cadastre. Un seul polygone, format geojson - et les signaux qui vont avec pour la communicaiton avec widgetCadastre.
     void polygoneCadastre(std::string aFileGeoJson, std::string aLabelName = "");

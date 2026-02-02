@@ -10,6 +10,12 @@
 #include <numeric>
 #include "color.h"
 
+
+
+// pour la comparaison de deux enveloppes lors du crop d'une image
+double getArea(OGREnvelope *env);
+
+
 std::string getAbbreviation(std::string str);
 
 GDALDataset * rasterizeGeom(OGRGeometry *poGeom, GDALDataset * aGDALDat);
@@ -227,6 +233,8 @@ public:
 
     void edit_ColorInterpPalette();
     void createRasterColorInterpPalette(GDALRasterBand * aBand);
+
+    bool cropIm(std::string aOut, OGREnvelope ext);
 
 protected:
     TypeVar mTypeVar; // var continue ou discontinue, pour le calcul de statistique

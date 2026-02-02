@@ -10,7 +10,7 @@ class rasterFiles;
 class baseSelectLayers : public WContainerWidget{
 public:
     baseSelectLayers();
-    std::vector<rasterFiles> getSelectedRaster();
+    //std::vector<std::shared_ptr<layerBase>> getSelectedLayerBase();
     std::vector<std::shared_ptr<Layer>> getSelectedLayer();
 
     int numSelectedLayer(){
@@ -48,14 +48,6 @@ protected: // les classes qui héritent en mode public peuvent avoir accès
     groupLayers * mGL;
 
 };
-
-/*
-class selectLayers4Stat : public baseSelectLayers{
-public:
-    selectLayers4Stat(groupLayers * aGL);
-private:
-};
-*/
 
 class selectLayers : public baseSelectLayers{
 public:

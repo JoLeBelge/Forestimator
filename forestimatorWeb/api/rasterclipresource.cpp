@@ -3,7 +3,7 @@
 #include <cmath>
 #include <vector>
 
-extern int maxSizePix4Export;
+//extern int maxSizePix4Export;
 
 void rasterClipResource::handleRequest(const Http::Request &request, Http::Response &response)
 {
