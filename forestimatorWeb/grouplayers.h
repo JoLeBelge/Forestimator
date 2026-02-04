@@ -51,9 +51,7 @@ enum TypeClassifST
 using namespace Wt;
 using namespace libzippp;
 
-bool cropIm(std::string inputRaster, std::string aOut, OGREnvelope ext);
-// pour la comparaison de deux enveloppes lors du crop d'une image
-double getArea(OGREnvelope *env);
+//bool cropIm(std::string inputRaster, std::string aOut, OGREnvelope ext);
 
 // retourne le dataset sur l'enveloppe d'un polygone
 GDALDataset *getDSonEnv(std::string inputRaster, OGRGeometry *poGeom);
@@ -139,11 +137,10 @@ public:
     //  pour faire un processEvent, seul moyen de refresh de la progressbar.
     cWebAptitude *m_app;
 
-    std::vector<rasterFiles> getSelect4Download();
+    std::vector<std::shared_ptr<Layer> > getSelect4Download();
     // std::vector<rasterFiles> getSelect4Stat();
 
-    // 28 septembre 2020 , Philippe lache l'affaire et on retire les analyses simples qui portent sur l'ajout d'une colonne du shp
-    // WContainerWidget * afficheSelect4Stat();
+
     WContainerWidget *afficheSelect4Download();
     // int getNumSelect4Stat();
     int getNumSelect4Download();

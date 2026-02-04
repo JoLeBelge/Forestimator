@@ -1,5 +1,6 @@
 #include "layerbase.h"
 
+int maxSizePix4Export(130000);
 int seuilClasseMinoritaire(2); // en dessous de ce seuil, les classes sont regroupées dans la catégorie "Autre"
 extern bool globTest;
 // hexagone ; apotheme et x qui sert pour les longeurs de d
@@ -1257,3 +1258,116 @@ GDALDataset * rasterizeGeom(OGRGeometry *poGeom, GDALDataset * aGDALDat){
 
     return pRaster;
 }
+
+/**
+ * @brief cropIm
+ * @param inputRaster
+ * @param aOut
+ * @param ext
+ * @return
+ */
+
+bool layerBase::cropIm(std::string aOut, OGREnvelope ext)
+{
+    bool aRes(0);
+    //std::cout << " cropIm" << std::endl;
+    GDALAllRegister();
+    if (exists(mPathRaster))
+    {
+        const char *inputPath = mPathRaster.c_str();
+        const char *cropPath = aOut.c_str();
+        GDALDataset *pInputRaster, *pCroppedRaster;
+        GDALDriver *pDriver;
+        const char *pszFormat = "GTiff";
+        pDriver = GetGDALDriverManager()->GetDriverByName(pszFormat);
+        pInputRaster = reinterpret_cast<GDALDataset *>(GDALOpen(inputPath, GA_ReadOnly));
+
+        if (pInputRaster == NULL)
+        {
+            std::cout << "cropIm: cannot open input raster " << inputPath << std::endl;
+            return false;
+        }
+
+        double transform[6], tr1[6];
+        pInputRaster->GetGeoTransform(transform);
+        pInputRaster->GetGeoTransform(tr1);
+
+        OGREnvelope extGlob = OGREnvelope();
+        extGlob.MaxY = transform[3];
+        extGlob.MinX = transform[0];
+        extGlob.MinY = transform[3] + transform[5] * pInputRaster->GetRasterBand(1)->GetYSize();
+        extGlob.MaxX = transform[0] + transform[1] * pInputRaster->GetRasterBand(1)->GetXSize();
+        // garder l'intersect des 2 extend
+        ext.Intersect(extGlob);
+        // std::cout << ext.MinX << " , " << ext.MaxX << " , " << ext.MinY << " , " << ext.MaxY << " après intersect " << std::endl;
+
+        double width((ext.MaxX - ext.MinX)), height((ext.MaxY - ext.MinY));
+
+        // adjust top left coordinates
+        transform[0] = ext.MinX;
+        transform[3] = ext.MaxY;
+        // determine dimensions of the new (cropped) raster in cells
+        int xSize = round(width / transform[1]);
+        int ySize = round(height / transform[1]);
+        // std::cout << "xSize " << xSize << ", ySize " << ySize << std::endl;
+
+        // test si la différence entre le raster en entier et le raster croppé est significative, si non on va copier tout au lieu de cropper
+        // si 65% ou plus, on garde toute l'image
+        if (xSize > 0 && ySize > 0 && xSize < maxSizePix4Export && ySize < maxSizePix4Export)
+        {
+            if (getArea(&ext) / getArea(&extGlob) > 0.65)
+            {
+                std::cout << "copie de toute l'image" << std::endl;
+                pDriver->CopyFiles(cropPath, inputPath);
+                aRes = 1;
+            }
+            else
+            {
+                // create the new (cropped) dataset
+                pCroppedRaster = pDriver->Create(cropPath, xSize, ySize, 1, pInputRaster->GetRasterBand(1)->GetRasterDataType(), NULL); // or something similar
+                pCroppedRaster->SetProjection(pInputRaster->GetProjectionRef());
+                // pCroppedRaster->SetSpatialRef(pInputRaster->GetSpatialRef());
+                pCroppedRaster->SetGeoTransform(transform);
+
+                int xOffset = round((transform[0] - tr1[0]) / tr1[1]);
+                int yOffset = round((transform[3] - tr1[3]) / tr1[5]);
+                float *scanline;
+                scanline = (float *)CPLMalloc(sizeof(float) * xSize);
+                // boucle sur chaque ligne
+                for (int row = 0; row < ySize; row++)
+                {
+                    // lecture
+                    pInputRaster->GetRasterBand(1)->RasterIO(GF_Read, xOffset, row + yOffset, xSize, 1, scanline, xSize, 1, GDT_Float32, 0, 0);
+                    // écriture
+                    pCroppedRaster->GetRasterBand(1)->RasterIO(GF_Write, 0, row, xSize, 1, scanline, xSize, 1, GDT_Float32, 0, 0);
+                }
+                CPLFree(scanline);
+                // define color palette for the cropped raster
+                createRasterColorInterpPalette(pCroppedRaster->GetRasterBand(1));
+
+                aRes = 1;
+                if (pCroppedRaster != NULL)
+                {
+                    GDALClose(reinterpret_cast<GDALDatasetH>(pCroppedRaster));
+                }
+            }
+        }
+        else
+        {
+            std::cout << " crop du raster a échoué: taille pas correcte " << std::endl;
+        }
+
+        GDALClose(pInputRaster);
+    }
+    else
+    {
+        std::cout << " attention, un des fichiers input n'existe pas : " << mPathRaster << std::endl;
+    }
+    return aRes;
+}
+
+double getArea(OGREnvelope *env)
+{
+    return (double)(env->MaxX - env->MinX) * (env->MaxY - env->MinY);
+}
+

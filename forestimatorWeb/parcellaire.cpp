@@ -398,10 +398,10 @@ std::string parcellaire::fileName() { return mFullPath + "." + mExtention; }
 void parcellaire::downloadRaster()
 {
 
-    std::vector<rasterFiles> vRs = mGL->getSelect4Download();
-    if (vRs.size() > 0)
+    //std::vector<rasterFiles> vRs = mGL->getSelect4Download();
+    if (mGL->getSelect4Download().size() > 0)
     {
-        m_app->addLog("download " + vRs.size(), typeLog::dmulti);
+        m_app->addLog("download " + mGL->getSelect4Download().size(), typeLog::dmulti);
         m_app->loadingIndicator()->setMessage(tr("LoadingI4"));
         m_app->loadingIndicator()->show();
         // crée l'archive
@@ -409,25 +409,19 @@ void parcellaire::downloadRaster()
         auto zf = std::make_unique<ZipArchive>(mFullPath + suffix);
         zf->open(ZipArchive::WRITE);
         // crop les raster selectionnés
-
-        // mGL->mPBar->setValue(0);
-        // mGL->mPBar->setMaximum(vRs.size());
-        for (const rasterFiles &r : vRs)
+        for (std::shared_ptr<Layer> &l : mGL->getSelect4Download())
         {
-            std::string aCroppedRFile = mFullPath + "_" + r.Code() + ".tif";
+            std::string aCroppedRFile = mFullPath + "_" + l->Code() + ".tif";
             // mGL->mPBar->setToolTip("découpe de la carte " + r.code() + "...");
-            if (cropImWithShp(r.getPathTif(), aCroppedRFile))
+            if (cropImWithShp(l, aCroppedRFile))
             {
-                zf->addFile(mClientName + "_" + r.Code() + ".tif", aCroppedRFile);
-                if (r.hasSymbology())
+                zf->addFile(mClientName + "_" + l->Code() + ".tif", aCroppedRFile);
+                if (l->hasSymbology())
                 {
-                    zf->addFile(mClientName + "_" + r.Code() + ".qml", r.symbology());
+                    zf->addFile(mClientName + "_" + l->Code() + ".qml", l->symbology());
                 }
             }
-            // mGL->mPBar->setValue(mGL->mPBar->value()+1);
-            // m_app->processEvents();
         }
-        // mGL->mPBar->setToolTip("");
         zf->close();
         m_app->loadingIndicator()->hide();
         m_app->loadingIndicator()->setMessage(tr("defaultLoadingI"));
@@ -452,14 +446,14 @@ void parcellaire::downloadRaster()
     }
 }
 
-bool parcellaire::cropImWithShp(std::string inputRaster, std::string aOut)
+bool parcellaire::cropImWithShp(std::shared_ptr<layerBase> l, std::string aOut)
 {
     bool aRes(0);
     std::cout << " cropImWithShp" << std::endl;
     // enveloppe de la géométrie globale
     OGREnvelope ext;
     poGeomGlobale->getEnvelope(&ext);
-    aRes = cropIm(inputRaster, aOut, ext);
+    aRes = l->cropIm(aOut, ext);
     return aRes;
 }
 

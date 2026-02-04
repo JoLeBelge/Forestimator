@@ -101,14 +101,13 @@ void baseSelectLayers::SelectLayerGroup(bool select,TypeLayer aType){
 
 
 // pour envoyer la liste des raster à uploadcarte
-std::vector<rasterFiles> baseSelectLayers::getSelectedRaster(){
-    std::vector<rasterFiles> aRes;
+/*std::vector<std::shared_ptr<layerBase>> baseSelectLayers::getSelectedLayerBase(){
+    std::vector<layerBase> aRes;
     for (std::shared_ptr<Layer> l : getSelectedLayer()){
         aRes.push_back(l->getRasterfile());
     }
-    return aRes;
-}
-
+    return getSelectedLayer();
+}*/
 baseSelectLayers::baseSelectLayers(){
 
     setOverflow(Wt::Overflow::Auto);
