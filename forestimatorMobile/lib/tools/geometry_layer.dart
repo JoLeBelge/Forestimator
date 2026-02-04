@@ -54,13 +54,15 @@ class GeometricLayer {
     defaultColor = Color.fromRGBO(rand.nextInt(256), rand.nextInt(256), rand.nextInt(256), 1.0);
   }
 
-  void addGeometry() {
+  void addGeometry({String name = ""}) {
     switch (type) {
       case 'Point':
-        subtype == 'Essence' ? geometries.add(Geometry.essencePoint()) : geometries.add(Geometry.point());
+        subtype == 'Essence'
+            ? geometries.add(Geometry.essencePoint(polygonName: name))
+            : geometries.add(Geometry.point(polygonName: name));
         break;
       case 'Polygon':
-        geometries.add(Geometry.polygon());
+        geometries.add(Geometry.polygon(polygonName: name));
         break;
       default:
         gl.print("error: unknown type $type to create new geometry on layer $name");
@@ -71,6 +73,7 @@ class GeometricLayer {
     geometries.last.selectedPointIcon = defaultPointIcon;
     geometries.last.iconSize = defaultIconSize;
     geometries.last.attributes.addAll(defaultAttributes);
+    geometries.last.serialize(layerId: id);
   }
 
   void removeGeometry({int? index, String? name, bool? last}) {
@@ -78,13 +81,16 @@ class GeometricLayer {
       gl.print("error: nothing to remove in geometry list:");
       return;
     } else if (index != null) {
-      geometries.removeAt(index);
+      Geometry.removePolyFromShared(geometries.removeAt(index).id, layerId: id);
     } else if (name != null) {
+      String identifier = "";
       geometries.removeWhere((Geometry g) {
+        identifier = g.id;
         return g.name == name;
       });
+      Geometry.removePolyFromShared(identifier, layerId: id);
     } else if (last != null && last) {
-      geometries.removeLast();
+      Geometry.removePolyFromShared(geometries.removeLast().id, layerId: id);
     }
   }
 

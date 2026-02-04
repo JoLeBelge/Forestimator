@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:fforestimator/dico/dico_apt.dart';
 import 'package:fforestimator/tileProvider/tif_tile_provider.dart';
 import 'package:fforestimator/tools/geometry/geometry.dart' as pl;
+import 'package:fforestimator/tools/geometry_layer.dart';
 import 'package:fforestimator/tools/layout_tools.dart';
 import 'package:fforestimator/tools/handle_permissions.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -110,7 +111,8 @@ class _MapPageState extends State<MapPage> {
           }
         }
 
-        String request = "https://forestimator.gembloux.ulg.ac.be/api/anaPt/layers/$layersAnaPt/x/${ptBL72.x}/y/${ptBL72.y}";
+        String request =
+            "https://forestimator.gembloux.ulg.ac.be/api/anaPt/layers/$layersAnaPt/x/${ptBL72.x}/y/${ptBL72.y}";
         try {
           var res = await http.get(Uri.parse(request));
           if (res.statusCode != 200) throw HttpException('${res.statusCode}');
@@ -142,7 +144,9 @@ class _MapPageState extends State<MapPage> {
     gl.requestedLayers.removeWhere((element) => element.mRastValue == 0);
 
     // on les trie sur base des catégories de couches
-    gl.requestedLayers.sort((a, b) => gl.dico.getLayerBase(a.mCode).mGroupe.compareTo(gl.dico.getLayerBase(b.mCode).mGroupe));
+    gl.requestedLayers.sort(
+      (a, b) => gl.dico.getLayerBase(a.mCode).mGroupe.compareTo(gl.dico.getLayerBase(b.mCode).mGroupe),
+    );
   }
 
   TifFileTileProvider? _provider;
@@ -169,8 +173,14 @@ class _MapPageState extends State<MapPage> {
 
     // contraindre la vue de la map sur la zone de la Wallonie. ajout d'un peu de marge
     double margeInDegree = 0.1;
-    latlonBL = LatLng(epsg31370.transform(epsg4326, ptBotLeft).y + margeInDegree, epsg31370.transform(epsg4326, ptBotLeft).x - margeInDegree);
-    latlonTR = LatLng(epsg31370.transform(epsg4326, ptTopR).y - margeInDegree, epsg31370.transform(epsg4326, ptTopR).x + margeInDegree);
+    latlonBL = LatLng(
+      epsg31370.transform(epsg4326, ptBotLeft).y + margeInDegree,
+      epsg31370.transform(epsg4326, ptBotLeft).x - margeInDegree,
+    );
+    latlonTR = LatLng(
+      epsg31370.transform(epsg4326, ptTopR).y - margeInDegree,
+      epsg31370.transform(epsg4326, ptTopR).x + margeInDegree,
+    );
   }
 
   @override
@@ -236,20 +246,28 @@ class _MapPageState extends State<MapPage> {
                         gl.offlineMode
                             ? Text(
                               "Forestimator terrain",
-                              style: TextStyle(color: Colors.black, fontSize: gl.display.equipixel * gl.topAppForestimatorFontHeight),
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: gl.display.equipixel * gl.topAppForestimatorFontHeight,
+                              ),
                             )
                             : Text(
                               "Forestimator online",
-                              style: TextStyle(color: Colors.white, fontSize: gl.display.equipixel * gl.topAppForestimatorFontHeight),
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: gl.display.equipixel * gl.topAppForestimatorFontHeight,
+                              ),
                             ),
                   ),
                 ),
                 _mapControllerInit
-                    ? _mapController.camera.zoom.round() < gl.globalMinOfflineZoom.round() && gl.getIndexForNextLayerOffline() > -1
+                    ? _mapController.camera.zoom.round() < gl.globalMinOfflineZoom.round() &&
+                            gl.getIndexForNextLayerOffline() > -1
                         ? IconButton(
                           iconSize: gl.display.equipixel * gl.iconSizeSettings,
                           color: Colors.red,
-                          tooltip: "Si vous n'arrivez plus à visualiser les cartes hors ligne c'est que votre zoom est trop large.",
+                          tooltip:
+                              "Si vous n'arrivez plus à visualiser les cartes hors ligne c'est que votre zoom est trop large.",
                           onPressed: () {},
                           icon: Icon(Icons.info_rounded),
                         )
@@ -284,7 +302,9 @@ class _MapPageState extends State<MapPage> {
                               refreshView(() {
                                 _doingAnaPt = true;
                               });
-                              await _runAnaPt(epsg4326.transform(epsg31370, proj4.Point(x: point.longitude, y: point.latitude)));
+                              await _runAnaPt(
+                                epsg4326.transform(epsg31370, proj4.Point(x: point.longitude, y: point.latitude)),
+                              );
                               _pt = point;
                               refreshView(() {
                                 _doingAnaPt = false;
@@ -368,17 +388,28 @@ class _MapPageState extends State<MapPage> {
                             _mapControllerInit = true;
                             updateLocation();
                             if (gl.selectedpathLayer > -1 && !gl.pathLayers[gl.selectedpathLayer].finished) {
-                              gl.pathLayers[gl.selectedpathLayer].addPosition(LatLng(position.center.latitude, position.center.longitude));
+                              gl.pathLayers[gl.selectedpathLayer].addPosition(
+                                LatLng(position.center.latitude, position.center.longitude),
+                              );
                             }
                             if (_modeMoveMeasurePath) {
                               _measurePath.removeAt(selectedMeasurePointToMove);
-                              _measurePath.insert(selectedMeasurePointToMove, LatLng(position.center.latitude, position.center.longitude));
+                              _measurePath.insert(
+                                selectedMeasurePointToMove,
+                                LatLng(position.center.latitude, position.center.longitude),
+                              );
                             }
                             if (_selectedPointToMove != null) {
                               if (_isPolygonWellDefined(
-                                gl.selGeo.getPolyMoveOneVertex(_selectedPointToMove!, LatLng(position.center.latitude, position.center.longitude)),
+                                gl.selGeo.getPolyMoveOneVertex(
+                                  _selectedPointToMove!,
+                                  LatLng(position.center.latitude, position.center.longitude),
+                                ),
                               )) {
-                                gl.selGeo.replacePoint(_selectedPointToMove!, LatLng(position.center.latitude, position.center.longitude));
+                                gl.selGeo.replacePoint(
+                                  _selectedPointToMove!,
+                                  LatLng(position.center.latitude, position.center.longitude),
+                                );
                                 refreshView(() {
                                   _selectedPointToMove = LatLng(position.center.latitude, position.center.longitude);
                                 });
@@ -386,19 +417,28 @@ class _MapPageState extends State<MapPage> {
                             } else {
                               refreshView(() {});
                             }
-                            _writePositionDataToSharedPreferences(position.center.longitude, position.center.latitude, position.zoom);
+                            _writePositionDataToSharedPreferences(
+                              position.center.longitude,
+                              position.center.latitude,
+                              position.zoom,
+                            );
                           },
                           crs: epsg31370CRS,
                           initialZoom: (gl.globalMinZoom + gl.globalMaxZoom) / 2.0,
                           maxZoom: gl.globalMaxZoom,
                           minZoom: gl.globalMinZoom,
                           initialCenter: gl.latlonCenter,
-                          cameraConstraint: CameraConstraint.containCenter(bounds: LatLngBounds.fromPoints([latlonBL, latlonTR])),
+                          cameraConstraint: CameraConstraint.containCenter(
+                            bounds: LatLngBounds.fromPoints([latlonBL, latlonTR]),
+                          ),
                           onMapReady: () async {
                             updateLocation();
                             if (gl.positionInit) {
                               refreshView(() {
-                                _mapController.move(LatLng(gl.position.latitude, gl.position.longitude), _mapController.camera.zoom);
+                                _mapController.move(
+                                  LatLng(gl.position.latitude, gl.position.longitude),
+                                  _mapController.camera.zoom,
+                                );
                               });
                               // si on refusait d'allumer le GPS, alors la carte ne s'affichait jamais, c'est pourquoi il y a le else et le code ci-dessous
                             } else {
@@ -452,7 +492,10 @@ class _MapPageState extends State<MapPage> {
                                                 child: Text(
                                                   "La carte choisie est en préparation dans la mémoire.",
                                                   textAlign: TextAlign.center,
-                                                  style: TextStyle(color: Colors.white, fontSize: gl.display.equipixel * gl.fontSizeS),
+                                                  style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize: gl.display.equipixel * gl.fontSizeS,
+                                                  ),
                                                 ),
                                               ),
                                               SizedBox(width: gl.display.equipixel * gl.fontSizeS),
@@ -475,7 +518,9 @@ class _MapPageState extends State<MapPage> {
                                 return TileLayer(
                                   userAgentPackageName: "com.forestimator",
                                   tileDisplay:
-                                      gl.modeMapFirstTileLayerTransparancy && i > 1 && gl.getLayersForFlutterMap().length == i
+                                      gl.modeMapFirstTileLayerTransparancy &&
+                                              i > 1 &&
+                                              gl.getLayersForFlutterMap().length == i
                                           ? TileDisplay.instantaneous(opacity: 0.5)
                                           : TileDisplay.instantaneous(opacity: 1.0),
                                   wmsOptions: WMSTileLayerOptions(
@@ -491,7 +536,11 @@ class _MapPageState extends State<MapPage> {
                             }).toList() +
                             <Widget>[
                               AnimatedLocationMarkerLayer(
-                                position: LocationMarkerPosition(latitude: gl.position.latitude, longitude: gl.position.longitude, accuracy: 10.0),
+                                position: LocationMarkerPosition(
+                                  latitude: gl.position.latitude,
+                                  longitude: gl.position.longitude,
+                                  accuracy: 10.0,
+                                ),
                               ),
                             ] +
                             (gl.Mode.editPolygon
@@ -516,10 +565,16 @@ class _MapPageState extends State<MapPage> {
                                   MarkerLayer(markers: _getPointsToDraw()),
                                   PolygonLayer(polygons: _getPolygonesToDraw()),
                                   MarkerLayer(markers: _drawnLayerPointsMarker()),
-                                  if (gl.selLay.geometries.isNotEmpty && gl.selGeo.points.isNotEmpty && !gl.Mode.showButtonAddVertexesPolygon)
+                                  if (gl.selLay.geometries.isNotEmpty &&
+                                      gl.selGeo.points.isNotEmpty &&
+                                      !gl.Mode.showButtonAddVertexesPolygon)
                                     CircleLayer(
                                       circles: [
-                                        CircleMarker(point: gl.selGeo.points[gl.selGeo.selectedPolyLinePoints[0]], radius: 15, color: Colors.red),
+                                        CircleMarker(
+                                          point: gl.selGeo.points[gl.selGeo.selectedPolyLinePoints[0]],
+                                          radius: 15,
+                                          color: Colors.red,
+                                        ),
                                       ],
                                     ),
                                 ]
@@ -544,7 +599,10 @@ class _MapPageState extends State<MapPage> {
                                           }
                                         }
                                       },
-                                      child: PolygonLayer<String>(hitNotifier: hitNotifier, polygons: _getPolygonesToDraw()),
+                                      child: PolygonLayer<String>(
+                                        hitNotifier: hitNotifier,
+                                        polygons: _getPolygonesToDraw(),
+                                      ),
                                     ),
                                   ),
                                   MarkerLayer(markers: _getPointsToDraw(hitButton: true)),
@@ -559,17 +617,30 @@ class _MapPageState extends State<MapPage> {
                               if (gl.modeMapShowCustomMarker) MarkerLayer(markers: []),
                               if (gl.modeMapShowSearchMarker) MarkerLayer(markers: _placeSearchMarker()),
                               if (_modeMeasurePath && _measurePath.length > 1)
-                                PolylineLayer(polylines: [Polyline(points: _measurePath, color: Colors.blueGrey.withAlpha(200), strokeWidth: 5.0)]),
+                                PolylineLayer(
+                                  polylines: [
+                                    Polyline(
+                                      points: _measurePath,
+                                      color: Colors.blueGrey.withAlpha(200),
+                                      strokeWidth: 5.0,
+                                    ),
+                                  ],
+                                ),
                               if (_modeMeasurePath) MarkerLayer(markers: _getPathMeasureMarkers()),
                             ],
                       ),
-                      (gl.selectedGeoLayer > -1 && gl.Mode.polygon && gl.selLay.geometries.isNotEmpty && gl.selLay.selectedGeometry > -1)
+                      (gl.layerReady &&
+                              gl.Mode.polygon &&
+                              gl.selLay.geometries.isNotEmpty &&
+                              gl.selLay.selectedGeometry > -1)
                           ? Column(
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
                               Row(
                                 mainAxisAlignment:
-                                    gl.display.orientation == Orientation.portrait ? MainAxisAlignment.center : MainAxisAlignment.start,
+                                    gl.display.orientation == Orientation.portrait
+                                        ? MainAxisAlignment.center
+                                        : MainAxisAlignment.start,
                                 children: [
                                   SizedBox(
                                     width: gl.display.equipixel * gl.chosenPolyBarWidth,
@@ -675,7 +746,10 @@ class _MapPageState extends State<MapPage> {
                                                         child: Text(
                                                           gl.selGeo.name,
                                                           textAlign: TextAlign.center,
-                                                          style: TextStyle(color: Colors.white, fontSize: gl.display.equipixel * gl.fontSizeL),
+                                                          style: TextStyle(
+                                                            color: Colors.white,
+                                                            fontSize: gl.display.equipixel * gl.fontSizeL,
+                                                          ),
                                                         ),
                                                       ),
                                                     ),
@@ -705,7 +779,11 @@ class _MapPageState extends State<MapPage> {
                                               : (gl.Mode.editPolygon && gl.selLay.geometries.isNotEmpty)
                                               ? Column(
                                                 children: [
-                                                  stroke(gl.display.equipixel, gl.display.equipixel * .5, gl.colorAgroBioTech),
+                                                  stroke(
+                                                    gl.display.equipixel,
+                                                    gl.display.equipixel * .5,
+                                                    gl.colorAgroBioTech,
+                                                  ),
                                                   Row(
                                                     children: [
                                                       SizedBox(
@@ -726,7 +804,10 @@ class _MapPageState extends State<MapPage> {
                                                               gl.Mode.removeVertexesPolygon = false;
                                                             });
                                                           },
-                                                          icon: Icon(Icons.arrow_back, size: gl.display.equipixel * gl.iconSizeS * .9),
+                                                          icon: Icon(
+                                                            Icons.arrow_back,
+                                                            size: gl.display.equipixel * gl.iconSizeS * .9,
+                                                          ),
                                                         ),
                                                       ),
                                                       Container(
@@ -762,22 +843,32 @@ class _MapPageState extends State<MapPage> {
                                                       ),
                                                     ],
                                                   ),
-                                                  stroke(gl.display.equipixel, gl.display.equipixel * .5, gl.colorAgroBioTech),
+                                                  stroke(
+                                                    gl.display.equipixel,
+                                                    gl.display.equipixel * .5,
+                                                    gl.colorAgroBioTech,
+                                                  ),
                                                   Row(
                                                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                                                     children: [
                                                       gl.Mode.showButtonRemoveVertexesPolygon
                                                           ? Container(
-                                                            color: _polygonMenuColorTools(gl.Mode.removeVertexesPolygon),
+                                                            color: _polygonMenuColorTools(
+                                                              gl.Mode.removeVertexesPolygon,
+                                                            ),
                                                             child: SizedBox(
                                                               height: gl.display.equipixel * gl.iconSizeM * .9,
                                                               child: IconButton(
                                                                 style: borderlessStyle,
                                                                 iconSize: gl.display.equipixel * gl.iconSizeS,
-                                                                color: gl.Mode.removeVertexesPolygon ? Colors.white : Colors.lightGreenAccent,
+                                                                color:
+                                                                    gl.Mode.removeVertexesPolygon
+                                                                        ? Colors.white
+                                                                        : Colors.lightGreenAccent,
                                                                 onPressed: () async {
                                                                   refreshView(() {
-                                                                    gl.Mode.removeVertexesPolygon = !gl.Mode.removeVertexesPolygon;
+                                                                    gl.Mode.removeVertexesPolygon =
+                                                                        !gl.Mode.removeVertexesPolygon;
                                                                   });
                                                                   if (gl.Mode.removeVertexesPolygon == true) {
                                                                     refreshView(() {
@@ -786,7 +877,9 @@ class _MapPageState extends State<MapPage> {
                                                                             gl.selGeo.getPolyRemoveOneVertex(
                                                                               gl.selGeo.points[gl
                                                                                   .selLay
-                                                                                  .geometries[gl.selLay.selectedGeometry]
+                                                                                  .geometries[gl
+                                                                                      .selLay
+                                                                                      .selectedGeometry]
                                                                                   .selectedPolyLinePoints[0]],
                                                                             ),
                                                                           )) {
@@ -825,7 +918,9 @@ class _MapPageState extends State<MapPage> {
                                                               icon: const Icon(Icons.remove_circle),
                                                             ),
                                                           ),
-                                                      (gl.selGeo.type == "Polygon" || gl.selGeo.type.contains("Point") && gl.selGeo.numPoints < 1) &&
+                                                      (gl.selGeo.type == "Polygon" ||
+                                                                  gl.selGeo.type.contains("Point") &&
+                                                                      gl.selGeo.numPoints < 1) &&
                                                               gl.Mode.showButtonAddVertexesPolygon
                                                           ? Container(
                                                             color: _polygonMenuColorTools(gl.Mode.addVertexesPolygon),
@@ -834,10 +929,14 @@ class _MapPageState extends State<MapPage> {
                                                               child: IconButton(
                                                                 style: borderlessStyle,
                                                                 iconSize: gl.display.equipixel * gl.iconSizeS,
-                                                                color: gl.Mode.addVertexesPolygon ? Colors.white : Colors.lightGreenAccent,
+                                                                color:
+                                                                    gl.Mode.addVertexesPolygon
+                                                                        ? Colors.white
+                                                                        : Colors.lightGreenAccent,
                                                                 onPressed: () async {
                                                                   refreshView(() {
-                                                                    gl.Mode.addVertexesPolygon = !gl.Mode.addVertexesPolygon;
+                                                                    gl.Mode.addVertexesPolygon =
+                                                                        !gl.Mode.addVertexesPolygon;
                                                                   });
                                                                   if (gl.Mode.addVertexesPolygon == true) {
                                                                     gl.Mode.removeVertexesPolygon = false;
@@ -868,11 +967,15 @@ class _MapPageState extends State<MapPage> {
                                                               height: gl.display.equipixel * gl.iconSizeM * .9,
                                                               child: IconButton(
                                                                 style: borderlessStyle,
-                                                                color: gl.Mode.moveVertexesPolygon ? Colors.white : Colors.lightGreenAccent,
+                                                                color:
+                                                                    gl.Mode.moveVertexesPolygon
+                                                                        ? Colors.white
+                                                                        : Colors.lightGreenAccent,
                                                                 iconSize: gl.display.equipixel * gl.iconSizeS,
                                                                 onPressed: () async {
                                                                   refreshView(() {
-                                                                    gl.Mode.moveVertexesPolygon = !gl.Mode.moveVertexesPolygon;
+                                                                    gl.Mode.moveVertexesPolygon =
+                                                                        !gl.Mode.moveVertexesPolygon;
                                                                   });
                                                                   if (gl.Mode.moveVertexesPolygon == true) {
                                                                     refreshView(() {
@@ -883,20 +986,29 @@ class _MapPageState extends State<MapPage> {
                                                                               .selectedPolyLinePoints[0]];
                                                                       if (_selectedPointToMove == null) {
                                                                         _selectedPointToMove = point;
-                                                                        _mapController.move(point, _mapController.camera.zoom);
+                                                                        _mapController.move(
+                                                                          point,
+                                                                          _mapController.camera.zoom,
+                                                                        );
                                                                       } else {
-                                                                        if (point.latitude == _selectedPointToMove!.latitude &&
-                                                                            point.longitude == _selectedPointToMove!.longitude) {
+                                                                        if (point.latitude ==
+                                                                                _selectedPointToMove!.latitude &&
+                                                                            point.longitude ==
+                                                                                _selectedPointToMove!.longitude) {
                                                                           _stopMovingSelectedPoint();
                                                                         } else {
                                                                           _selectedPointToMove = point;
-                                                                          _mapController.move(point, _mapController.camera.zoom);
+                                                                          _mapController.move(
+                                                                            point,
+                                                                            _mapController.camera.zoom,
+                                                                          );
                                                                         }
                                                                       }
                                                                     });
                                                                     gl.Mode.addVertexesPolygon = false;
                                                                     gl.Mode.removeVertexesPolygon = false;
-                                                                  } else if (gl.Mode.editPolygon && gl.selGeo.type.contains("Point")) {
+                                                                  } else if (gl.Mode.editPolygon &&
+                                                                      gl.selGeo.type.contains("Point")) {
                                                                     refreshView(() {
                                                                       _stopMovingSelectedPoint();
                                                                       gl.Mode.showButtonAddVertexesPolygon = false;
@@ -942,7 +1054,11 @@ class _MapPageState extends State<MapPage> {
                                                 children: [
                                                   Column(
                                                     children: [
-                                                      stroke(gl.display.equipixel, gl.display.equipixel * .5, gl.colorAgroBioTech),
+                                                      stroke(
+                                                        gl.display.equipixel,
+                                                        gl.display.equipixel * .5,
+                                                        gl.colorAgroBioTech,
+                                                      ),
                                                       Row(
                                                         children: [
                                                           Container(
@@ -958,7 +1074,10 @@ class _MapPageState extends State<MapPage> {
                                                                     gl.Mode.editAttributes = false;
                                                                   });
                                                                 },
-                                                                icon: Icon(Icons.arrow_back, size: gl.display.equipixel * gl.iconSizeS * .9),
+                                                                icon: Icon(
+                                                                  Icons.arrow_back,
+                                                                  size: gl.display.equipixel * gl.iconSizeS * .9,
+                                                                ),
                                                               ),
                                                             ),
                                                           ),
@@ -976,7 +1095,11 @@ class _MapPageState extends State<MapPage> {
                                                           ),
                                                         ],
                                                       ),
-                                                      stroke(gl.display.equipixel, gl.display.equipixel * .5, gl.colorAgroBioTech),
+                                                      stroke(
+                                                        gl.display.equipixel,
+                                                        gl.display.equipixel * .5,
+                                                        gl.colorAgroBioTech,
+                                                      ),
                                                       Column(
                                                         children: [
                                                           Row(
@@ -1046,7 +1169,11 @@ class _MapPageState extends State<MapPage> {
                                                               ),
                                                             ],
                                                           ),
-                                                          stroke(gl.display.equipixel, gl.display.equipixel * 0.5, gl.colorAgroBioTech),
+                                                          stroke(
+                                                            gl.display.equipixel,
+                                                            gl.display.equipixel * 0.5,
+                                                            gl.colorAgroBioTech,
+                                                          ),
                                                           Scrollbar(
                                                             scrollbarOrientation: ScrollbarOrientation.right,
                                                             thickness: gl.display.equipixel * 3,
@@ -1059,74 +1186,124 @@ class _MapPageState extends State<MapPage> {
                                                                 children:
                                                                     <Widget>[
                                                                       _getFixedAttribute("type", gl.selGeo.type),
-                                                                      _getFixedAttribute("nom", gl.selGeo.name, checked: true),
+                                                                      _getFixedAttribute(
+                                                                        "nom",
+                                                                        gl.selGeo.name,
+                                                                        checked: true,
+                                                                      ),
                                                                       if (gl.selGeo.type == "Polygon")
-                                                                        _getFixedAttribute("surface", "${(gl.selGeo.area / 100).round() / 100}"),
+                                                                        _getFixedAttribute(
+                                                                          "surface",
+                                                                          "${(gl.selGeo.area / 100).round() / 100}",
+                                                                        ),
                                                                       if (gl.selGeo.type == "Polygon")
                                                                         _getFixedAttribute(
                                                                           "circonference",
                                                                           "${(gl.selGeo.perimeter).round() / 1000}",
                                                                         ),
 
-                                                                      _getFixedAttribute("coordinates", gl.selGeo.getPolyPointsString()),
+                                                                      _getFixedAttribute(
+                                                                        "coordinates",
+                                                                        gl.selGeo.getPolyPointsString(),
+                                                                      ),
                                                                     ] +
-                                                                    List<Widget>.generate(gl.selGeo.attributes.length, (i) {
+                                                                    List<Widget>.generate(gl.selGeo.attributes.length, (
+                                                                      i,
+                                                                    ) {
                                                                       return Column(
                                                                         children: [
                                                                           Row(
-                                                                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                                                            mainAxisAlignment:
+                                                                                MainAxisAlignment.spaceEvenly,
                                                                             children: [
                                                                               SizedBox(
                                                                                 width: gl.display.equipixel * 11,
-                                                                                height: gl.display.equipixel * gl.iconSizeS,
+                                                                                height:
+                                                                                    gl.display.equipixel * gl.iconSizeS,
                                                                                 child: TextButton(
                                                                                   style: ButtonStyle(
-                                                                                    animationDuration: Duration(seconds: 1),
-                                                                                    backgroundColor: WidgetStateProperty<Color>.fromMap(
-                                                                                      <WidgetStatesConstraint, Color>{
-                                                                                        WidgetState.any: Colors.transparent,
-                                                                                      },
+                                                                                    animationDuration: Duration(
+                                                                                      seconds: 1,
                                                                                     ),
-                                                                                    padding: WidgetStateProperty<EdgeInsetsGeometry>.fromMap(
-                                                                                      <WidgetStatesConstraint, EdgeInsetsGeometry>{
-                                                                                        WidgetState.any: EdgeInsetsGeometry.zero,
-                                                                                      },
-                                                                                    ),
+                                                                                    backgroundColor:
+                                                                                        WidgetStateProperty<
+                                                                                          Color
+                                                                                        >.fromMap(<
+                                                                                          WidgetStatesConstraint,
+                                                                                          Color
+                                                                                        >{
+                                                                                          WidgetState.any:
+                                                                                              Colors.transparent,
+                                                                                        }),
+                                                                                    padding: WidgetStateProperty<
+                                                                                      EdgeInsetsGeometry
+                                                                                    >.fromMap(<
+                                                                                      WidgetStatesConstraint,
+                                                                                      EdgeInsetsGeometry
+                                                                                    >{
+                                                                                      WidgetState.any:
+                                                                                          EdgeInsetsGeometry.zero,
+                                                                                    }),
                                                                                   ),
                                                                                   onPressed: () {},
                                                                                   onLongPress: () {},
                                                                                   child: Container(
                                                                                     alignment: Alignment.center,
                                                                                     child:
-                                                                                        gl.selGeo.attributes[i].type == "int"
+                                                                                        gl.selGeo.attributes[i].type ==
+                                                                                                "int"
                                                                                             ? Text(
                                                                                               "INT",
                                                                                               style: TextStyle(
                                                                                                 color: Colors.yellow,
-                                                                                                fontSize: gl.fontSizeXXS * gl.display.equipixel,
+                                                                                                fontSize:
+                                                                                                    gl.fontSizeXXS *
+                                                                                                    gl
+                                                                                                        .display
+                                                                                                        .equipixel,
                                                                                               ),
                                                                                             )
-                                                                                            : gl.selGeo.attributes[i].type == "string"
+                                                                                            : gl
+                                                                                                    .selGeo
+                                                                                                    .attributes[i]
+                                                                                                    .type ==
+                                                                                                "string"
                                                                                             ? Text(
                                                                                               "STRING",
                                                                                               style: TextStyle(
                                                                                                 color: Colors.lightBlue,
-                                                                                                fontSize: gl.fontSizeXXS * gl.display.equipixel,
+                                                                                                fontSize:
+                                                                                                    gl.fontSizeXXS *
+                                                                                                    gl
+                                                                                                        .display
+                                                                                                        .equipixel,
                                                                                               ),
                                                                                             )
-                                                                                            : gl.selGeo.attributes[i].type == "double"
+                                                                                            : gl
+                                                                                                    .selGeo
+                                                                                                    .attributes[i]
+                                                                                                    .type ==
+                                                                                                "double"
                                                                                             ? Text(
                                                                                               "DOUBLE",
                                                                                               style: TextStyle(
                                                                                                 color: Colors.red,
-                                                                                                fontSize: gl.fontSizeXXS * gl.display.equipixel,
+                                                                                                fontSize:
+                                                                                                    gl.fontSizeXXS *
+                                                                                                    gl
+                                                                                                        .display
+                                                                                                        .equipixel,
                                                                                               ),
                                                                                             )
                                                                                             : Text(
                                                                                               "UFO",
                                                                                               style: TextStyle(
                                                                                                 color: Colors.green,
-                                                                                                fontSize: gl.fontSizeXXS * gl.display.equipixel,
+                                                                                                fontSize:
+                                                                                                    gl.fontSizeXXS *
+                                                                                                    gl
+                                                                                                        .display
+                                                                                                        .equipixel,
                                                                                               ),
                                                                                             ),
                                                                                   ),
@@ -1140,31 +1317,47 @@ class _MapPageState extends State<MapPage> {
                                                                               ),
                                                                               SizedBox(
                                                                                 width: gl.display.equipixel * 7,
-                                                                                height: gl.display.equipixel * gl.iconSizeM,
+                                                                                height:
+                                                                                    gl.display.equipixel * gl.iconSizeM,
                                                                                 child: IconButton(
                                                                                   style: ButtonStyle(
-                                                                                    animationDuration: Duration(seconds: 1),
-                                                                                    backgroundColor: WidgetStateProperty<Color>.fromMap(
-                                                                                      <WidgetStatesConstraint, Color>{
-                                                                                        WidgetState.any: Colors.transparent,
-                                                                                      },
+                                                                                    animationDuration: Duration(
+                                                                                      seconds: 1,
                                                                                     ),
-                                                                                    padding: WidgetStateProperty<EdgeInsetsGeometry>.fromMap(
-                                                                                      <WidgetStatesConstraint, EdgeInsetsGeometry>{
-                                                                                        WidgetState.any: EdgeInsetsGeometry.zero,
-                                                                                      },
-                                                                                    ),
+                                                                                    backgroundColor:
+                                                                                        WidgetStateProperty<
+                                                                                          Color
+                                                                                        >.fromMap(<
+                                                                                          WidgetStatesConstraint,
+                                                                                          Color
+                                                                                        >{
+                                                                                          WidgetState.any:
+                                                                                              Colors.transparent,
+                                                                                        }),
+                                                                                    padding: WidgetStateProperty<
+                                                                                      EdgeInsetsGeometry
+                                                                                    >.fromMap(<
+                                                                                      WidgetStatesConstraint,
+                                                                                      EdgeInsetsGeometry
+                                                                                    >{
+                                                                                      WidgetState.any:
+                                                                                          EdgeInsetsGeometry.zero,
+                                                                                    }),
                                                                                   ),
                                                                                   onPressed: () {},
                                                                                   onLongPress: () async {
                                                                                     refreshView(() {
                                                                                       gl
                                                                                           .selLay
-                                                                                          .geometries[gl.selLay.selectedGeometry]
+                                                                                          .geometries[gl
+                                                                                              .selLay
+                                                                                              .selectedGeometry]
                                                                                           .attributes[i]
                                                                                           .visibleOnMapLabel = !gl
                                                                                               .selLay
-                                                                                              .geometries[gl.selLay.selectedGeometry]
+                                                                                              .geometries[gl
+                                                                                                  .selLay
+                                                                                                  .selectedGeometry]
                                                                                               .attributes[i]
                                                                                               .visibleOnMapLabel;
                                                                                     });
@@ -1173,18 +1366,25 @@ class _MapPageState extends State<MapPage> {
                                                                                   icon:
                                                                                       gl
                                                                                               .selLay
-                                                                                              .geometries[gl.selLay.selectedGeometry]
+                                                                                              .geometries[gl
+                                                                                                  .selLay
+                                                                                                  .selectedGeometry]
                                                                                               .attributes[i]
                                                                                               .visibleOnMapLabel
                                                                                           ? Icon(
                                                                                             Icons.check_box_outlined,
                                                                                             color: Colors.white,
-                                                                                            size: gl.display.equipixel * gl.iconSizeXS,
+                                                                                            size:
+                                                                                                gl.display.equipixel *
+                                                                                                gl.iconSizeXS,
                                                                                           )
                                                                                           : Icon(
-                                                                                            Icons.check_box_outline_blank,
+                                                                                            Icons
+                                                                                                .check_box_outline_blank,
                                                                                             color: Colors.white,
-                                                                                            size: gl.display.equipixel * gl.iconSizeXS,
+                                                                                            size:
+                                                                                                gl.display.equipixel *
+                                                                                                gl.iconSizeXS,
                                                                                           ),
                                                                                 ),
                                                                               ),
@@ -1196,20 +1396,32 @@ class _MapPageState extends State<MapPage> {
                                                                               ),
                                                                               SizedBox(
                                                                                 width: gl.display.equipixel * 33,
-                                                                                height: gl.display.equipixel * gl.iconSizeS,
+                                                                                height:
+                                                                                    gl.display.equipixel * gl.iconSizeS,
                                                                                 child: TextButton(
                                                                                   style: ButtonStyle(
-                                                                                    animationDuration: Duration(seconds: 1),
-                                                                                    backgroundColor: WidgetStateProperty<Color>.fromMap(
-                                                                                      <WidgetStatesConstraint, Color>{
-                                                                                        WidgetState.any: Colors.transparent,
-                                                                                      },
+                                                                                    animationDuration: Duration(
+                                                                                      seconds: 1,
                                                                                     ),
-                                                                                    padding: WidgetStateProperty<EdgeInsetsGeometry>.fromMap(
-                                                                                      <WidgetStatesConstraint, EdgeInsetsGeometry>{
-                                                                                        WidgetState.any: EdgeInsetsGeometry.zero,
-                                                                                      },
-                                                                                    ),
+                                                                                    backgroundColor:
+                                                                                        WidgetStateProperty<
+                                                                                          Color
+                                                                                        >.fromMap(<
+                                                                                          WidgetStatesConstraint,
+                                                                                          Color
+                                                                                        >{
+                                                                                          WidgetState.any:
+                                                                                              Colors.transparent,
+                                                                                        }),
+                                                                                    padding: WidgetStateProperty<
+                                                                                      EdgeInsetsGeometry
+                                                                                    >.fromMap(<
+                                                                                      WidgetStatesConstraint,
+                                                                                      EdgeInsetsGeometry
+                                                                                    >{
+                                                                                      WidgetState.any:
+                                                                                          EdgeInsetsGeometry.zero,
+                                                                                    }),
                                                                                   ),
                                                                                   onPressed: () {},
                                                                                   onLongPress: () {
@@ -1219,17 +1431,28 @@ class _MapPageState extends State<MapPage> {
                                                                                       (value) {
                                                                                         gl
                                                                                             .selLay
-                                                                                            .geometries[gl.selLay.selectedGeometry]
+                                                                                            .geometries[gl
+                                                                                                .selLay
+                                                                                                .selectedGeometry]
                                                                                             .attributes[i]
-                                                                                            .name = cleanAttributeName(value.toString());
+                                                                                            .name = cleanAttributeName(
+                                                                                          value.toString(),
+                                                                                        );
                                                                                       },
                                                                                       () {},
                                                                                       () {
-                                                                                        String nom = gl.selGeo.attributes[i].name;
+                                                                                        String nom =
+                                                                                            gl
+                                                                                                .selGeo
+                                                                                                .attributes[i]
+                                                                                                .name;
                                                                                         if (controlDuplicateAttributeName(
                                                                                           gl.selGeo.attributes[i].name,
                                                                                         )) {
-                                                                                          PopupMessage("Erreur", "Le nom $nom existe déja!");
+                                                                                          PopupMessage(
+                                                                                            "Erreur",
+                                                                                            "Le nom $nom existe déja!",
+                                                                                          );
                                                                                           return;
                                                                                         } else {
                                                                                           gl.selGeo.serialize();
@@ -1246,7 +1469,10 @@ class _MapPageState extends State<MapPage> {
                                                                                         textAlign: TextAlign.start,
                                                                                         style: TextStyle(
                                                                                           color: Colors.white,
-                                                                                          fontSize: gl.display.equipixel * gl.fontSizeM * .75,
+                                                                                          fontSize:
+                                                                                              gl.display.equipixel *
+                                                                                              gl.fontSizeM *
+                                                                                              .75,
                                                                                         ),
                                                                                       ),
                                                                                     ),
@@ -1261,20 +1487,32 @@ class _MapPageState extends State<MapPage> {
                                                                               ),
                                                                               SizedBox(
                                                                                 width: gl.display.equipixel * 33,
-                                                                                height: gl.display.equipixel * gl.iconSizeS,
+                                                                                height:
+                                                                                    gl.display.equipixel * gl.iconSizeS,
                                                                                 child: TextButton(
                                                                                   style: ButtonStyle(
-                                                                                    animationDuration: Duration(seconds: 1),
-                                                                                    backgroundColor: WidgetStateProperty<Color>.fromMap(
-                                                                                      <WidgetStatesConstraint, Color>{
-                                                                                        WidgetState.any: Colors.transparent,
-                                                                                      },
+                                                                                    animationDuration: Duration(
+                                                                                      seconds: 1,
                                                                                     ),
-                                                                                    padding: WidgetStateProperty<EdgeInsetsGeometry>.fromMap(
-                                                                                      <WidgetStatesConstraint, EdgeInsetsGeometry>{
-                                                                                        WidgetState.any: EdgeInsetsGeometry.zero,
-                                                                                      },
-                                                                                    ),
+                                                                                    backgroundColor:
+                                                                                        WidgetStateProperty<
+                                                                                          Color
+                                                                                        >.fromMap(<
+                                                                                          WidgetStatesConstraint,
+                                                                                          Color
+                                                                                        >{
+                                                                                          WidgetState.any:
+                                                                                              Colors.transparent,
+                                                                                        }),
+                                                                                    padding: WidgetStateProperty<
+                                                                                      EdgeInsetsGeometry
+                                                                                    >.fromMap(<
+                                                                                      WidgetStatesConstraint,
+                                                                                      EdgeInsetsGeometry
+                                                                                    >{
+                                                                                      WidgetState.any:
+                                                                                          EdgeInsetsGeometry.zero,
+                                                                                    }),
                                                                                   ),
                                                                                   onPressed: () {},
                                                                                   onLongPress: () {
@@ -1282,7 +1520,8 @@ class _MapPageState extends State<MapPage> {
                                                                                       gl.selGeo.attributes[i].type,
                                                                                       gl.selGeo.attributes[i].value,
                                                                                       (value) {
-                                                                                        gl.selGeo.attributes[i].value = value;
+                                                                                        gl.selGeo.attributes[i].value =
+                                                                                            value;
                                                                                       },
                                                                                       () {},
                                                                                       () {
@@ -1295,50 +1534,88 @@ class _MapPageState extends State<MapPage> {
                                                                                     child: SingleChildScrollView(
                                                                                       scrollDirection: Axis.horizontal,
                                                                                       child:
-                                                                                          gl.selGeo.attributes[i].type == "string"
+                                                                                          gl
+                                                                                                      .selGeo
+                                                                                                      .attributes[i]
+                                                                                                      .type ==
+                                                                                                  "string"
                                                                                               ? Text(
                                                                                                 gl
                                                                                                     .selLay
-                                                                                                    .geometries[gl.selLay.selectedGeometry]
+                                                                                                    .geometries[gl
+                                                                                                        .selLay
+                                                                                                        .selectedGeometry]
                                                                                                     .attributes[i]
                                                                                                     .value,
-                                                                                                textAlign: TextAlign.start,
+                                                                                                textAlign:
+                                                                                                    TextAlign.start,
                                                                                                 style: TextStyle(
                                                                                                   color: Colors.white,
-                                                                                                  fontSize: gl.display.equipixel * gl.fontSizeM * .75,
+                                                                                                  fontSize:
+                                                                                                      gl
+                                                                                                          .display
+                                                                                                          .equipixel *
+                                                                                                      gl.fontSizeM *
+                                                                                                      .75,
                                                                                                 ),
                                                                                               )
                                                                                               : gl
                                                                                                       .selLay
-                                                                                                      .geometries[gl.selLay.selectedGeometry]
+                                                                                                      .geometries[gl
+                                                                                                          .selLay
+                                                                                                          .selectedGeometry]
                                                                                                       .attributes[i]
                                                                                                       .type ==
                                                                                                   "int"
                                                                                               ? Text(
-                                                                                                gl.selGeo.attributes[i].value.toString(),
-                                                                                                textAlign: TextAlign.start,
+                                                                                                gl
+                                                                                                    .selGeo
+                                                                                                    .attributes[i]
+                                                                                                    .value
+                                                                                                    .toString(),
+                                                                                                textAlign:
+                                                                                                    TextAlign.start,
                                                                                                 style: TextStyle(
                                                                                                   color: Colors.white,
-                                                                                                  fontSize: gl.display.equipixel * gl.fontSizeM * .75,
+                                                                                                  fontSize:
+                                                                                                      gl
+                                                                                                          .display
+                                                                                                          .equipixel *
+                                                                                                      gl.fontSizeM *
+                                                                                                      .75,
                                                                                                 ),
                                                                                               )
                                                                                               : gl
                                                                                                       .selLay
-                                                                                                      .geometries[gl.selLay.selectedGeometry]
+                                                                                                      .geometries[gl
+                                                                                                          .selLay
+                                                                                                          .selectedGeometry]
                                                                                                       .attributes[i]
                                                                                                       .type ==
                                                                                                   "double"
                                                                                               ? Text(
-                                                                                                gl.selGeo.attributes[i].value.toString(),
-                                                                                                textAlign: TextAlign.start,
+                                                                                                gl
+                                                                                                    .selGeo
+                                                                                                    .attributes[i]
+                                                                                                    .value
+                                                                                                    .toString(),
+                                                                                                textAlign:
+                                                                                                    TextAlign.start,
                                                                                                 style: TextStyle(
                                                                                                   color: Colors.white,
-                                                                                                  fontSize: gl.display.equipixel * gl.fontSizeM * .75,
+                                                                                                  fontSize:
+                                                                                                      gl
+                                                                                                          .display
+                                                                                                          .equipixel *
+                                                                                                      gl.fontSizeM *
+                                                                                                      .75,
                                                                                                 ),
                                                                                               )
                                                                                               : gl
                                                                                                       .selLay
-                                                                                                      .geometries[gl.selLay.selectedGeometry]
+                                                                                                      .geometries[gl
+                                                                                                          .selLay
+                                                                                                          .selectedGeometry]
                                                                                                       .attributes[i]
                                                                                                       .type ==
                                                                                                   "special"
@@ -1346,14 +1623,24 @@ class _MapPageState extends State<MapPage> {
                                                                                                 "special value",
                                                                                                 style: TextStyle(
                                                                                                   color: Colors.white,
-                                                                                                  fontSize: gl.display.equipixel * gl.fontSizeM * .75,
+                                                                                                  fontSize:
+                                                                                                      gl
+                                                                                                          .display
+                                                                                                          .equipixel *
+                                                                                                      gl.fontSizeM *
+                                                                                                      .75,
                                                                                                 ),
                                                                                               )
                                                                                               : Text(
                                                                                                 "ERROR TYPE ${gl.selGeo.attributes[i].type}",
                                                                                                 style: TextStyle(
                                                                                                   color: Colors.white,
-                                                                                                  fontSize: gl.display.equipixel * gl.fontSizeM * .75,
+                                                                                                  fontSize:
+                                                                                                      gl
+                                                                                                          .display
+                                                                                                          .equipixel *
+                                                                                                      gl.fontSizeM *
+                                                                                                      .75,
                                                                                                 ),
                                                                                               ),
                                                                                     ),
@@ -1376,7 +1663,11 @@ class _MapPageState extends State<MapPage> {
                                                         ],
                                                       ),
 
-                                                      stroke(gl.display.equipixel, gl.display.equipixel * .5, gl.colorAgroBioTech),
+                                                      stroke(
+                                                        gl.display.equipixel,
+                                                        gl.display.equipixel * .5,
+                                                        gl.colorAgroBioTech,
+                                                      ),
                                                     ],
                                                   ),
                                                   Row(
@@ -1384,7 +1675,9 @@ class _MapPageState extends State<MapPage> {
                                                     children: [
                                                       TextButton(
                                                         onPressed: () {
-                                                          gl.selGeo.attributes.add(pl.Attribute(name: "", type: "string", value: ""));
+                                                          gl.selGeo.attributes.add(
+                                                            pl.Attribute(name: "", type: "string", value: ""),
+                                                          );
                                                           PopupNewAttribute(
                                                             context,
                                                             "",
@@ -1452,7 +1745,11 @@ class _MapPageState extends State<MapPage> {
                                                 children: [
                                                   Column(
                                                     children: [
-                                                      stroke(gl.display.equipixel, gl.display.equipixel * .5, gl.colorAgroBioTech),
+                                                      stroke(
+                                                        gl.display.equipixel,
+                                                        gl.display.equipixel * .5,
+                                                        gl.colorAgroBioTech,
+                                                      ),
                                                       Row(
                                                         children: [
                                                           Container(
@@ -1469,7 +1766,10 @@ class _MapPageState extends State<MapPage> {
                                                                   });
                                                                   gl.selGeo.serialize();
                                                                 },
-                                                                icon: Icon(Icons.arrow_back, size: gl.display.equipixel * gl.iconSizeS * .9),
+                                                                icon: Icon(
+                                                                  Icons.arrow_back,
+                                                                  size: gl.display.equipixel * gl.iconSizeS * .9,
+                                                                ),
                                                               ),
                                                             ),
                                                           ),
@@ -1479,21 +1779,33 @@ class _MapPageState extends State<MapPage> {
                                                             child: Text(
                                                               "Changez le symbole du point.",
                                                               textAlign: TextAlign.center,
-                                                              style: TextStyle(color: Colors.white, fontSize: gl.display.equipixel * gl.fontSizeS),
+                                                              style: TextStyle(
+                                                                color: Colors.white,
+                                                                fontSize: gl.display.equipixel * gl.fontSizeS,
+                                                              ),
                                                             ),
                                                           ),
                                                         ],
                                                       ),
-                                                      stroke(gl.display.equipixel, gl.display.equipixel * .5, gl.colorAgroBioTech),
+                                                      stroke(
+                                                        gl.display.equipixel,
+                                                        gl.display.equipixel * .5,
+                                                        gl.colorAgroBioTech,
+                                                      ),
                                                       SizedBox(
                                                         width: gl.display.equipixel * gl.chosenPolyBarWidth,
 
                                                         child: SingleChildScrollView(
                                                           scrollDirection: Axis.horizontal,
                                                           child: Row(
-                                                            children: List<Widget>.generate(gl.selectableIcons.length, (k) {
+                                                            children: List<Widget>.generate(gl.selectableIcons.length, (
+                                                              k,
+                                                            ) {
                                                               return Container(
-                                                                color: gl.selGeo.selectedPointIcon == k ? gl.colorAgroBioTech : Colors.transparent,
+                                                                color:
+                                                                    gl.selGeo.selectedPointIcon == k
+                                                                        ? gl.colorAgroBioTech
+                                                                        : Colors.transparent,
                                                                 child: SizedBox(
                                                                   height: gl.display.equipixel * gl.iconSizeL,
                                                                   child: IconButton(
@@ -1516,7 +1828,11 @@ class _MapPageState extends State<MapPage> {
                                                           ),
                                                         ),
                                                       ),
-                                                      stroke(gl.display.equipixel, gl.display.equipixel * .5, gl.colorAgroBioTech),
+                                                      stroke(
+                                                        gl.display.equipixel,
+                                                        gl.display.equipixel * .5,
+                                                        gl.colorAgroBioTech,
+                                                      ),
                                                       SizedBox(
                                                         width: gl.display.equipixel * gl.chosenPolyBarWidth,
 
@@ -1524,31 +1840,44 @@ class _MapPageState extends State<MapPage> {
                                                           scrollDirection: Axis.horizontal,
                                                           child: Row(
                                                             mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                                            children: List<TextButton>.generate(gl.predefinedPointSymbPalette.length, (int k) {
-                                                              return TextButton(
-                                                                onPressed: () {
-                                                                  refreshView(() {
-                                                                    gl.selGeo.setColorInside(gl.predefinedPointSymbPalette[k].withAlpha(150));
-                                                                    gl.selGeo.setColorLine(gl.predefinedPointSymbPalette[k]);
-                                                                  });
-                                                                },
-                                                                child: CircleAvatar(
-                                                                  backgroundColor:
-                                                                      gl.selGeo.colorPolygon == gl.predefinedPointSymbPalette[k]
-                                                                          ? Colors.white
-                                                                          : Colors.transparent,
-                                                                  radius: gl.display.equipixel * gl.iconSizeXS * .9,
+                                                            children: List<TextButton>.generate(
+                                                              gl.predefinedPointSymbPalette.length,
+                                                              (int k) {
+                                                                return TextButton(
+                                                                  onPressed: () {
+                                                                    refreshView(() {
+                                                                      gl.selGeo.setColorInside(
+                                                                        gl.predefinedPointSymbPalette[k].withAlpha(150),
+                                                                      );
+                                                                      gl.selGeo.setColorLine(
+                                                                        gl.predefinedPointSymbPalette[k],
+                                                                      );
+                                                                    });
+                                                                  },
                                                                   child: CircleAvatar(
-                                                                    radius: gl.display.equipixel * gl.iconSizeXS * .85,
-                                                                    backgroundColor: gl.predefinedPointSymbPalette[k],
+                                                                    backgroundColor:
+                                                                        gl.selGeo.colorPolygon ==
+                                                                                gl.predefinedPointSymbPalette[k]
+                                                                            ? Colors.white
+                                                                            : Colors.transparent,
+                                                                    radius: gl.display.equipixel * gl.iconSizeXS * .9,
+                                                                    child: CircleAvatar(
+                                                                      radius:
+                                                                          gl.display.equipixel * gl.iconSizeXS * .85,
+                                                                      backgroundColor: gl.predefinedPointSymbPalette[k],
+                                                                    ),
                                                                   ),
-                                                                ),
-                                                              );
-                                                            }),
+                                                                );
+                                                              },
+                                                            ),
                                                           ),
                                                         ),
                                                       ),
-                                                      stroke(gl.display.equipixel, gl.display.equipixel * .5, gl.colorAgroBioTech),
+                                                      stroke(
+                                                        gl.display.equipixel,
+                                                        gl.display.equipixel * .5,
+                                                        gl.colorAgroBioTech,
+                                                      ),
                                                       SizedBox(
                                                         width: gl.display.equipixel * gl.chosenPolyBarWidth,
                                                         height: gl.display.equipixel * gl.chosenPolyBarHeight * .8,
@@ -1556,7 +1885,8 @@ class _MapPageState extends State<MapPage> {
                                                           min: gl.iconSizeXXS,
                                                           max: gl.iconSizeL,
                                                           value:
-                                                              gl.selGeo.iconSize > gl.iconSizeXXS && gl.selGeo.iconSize < gl.iconSizeL
+                                                              gl.selGeo.iconSize > gl.iconSizeXXS &&
+                                                                      gl.selGeo.iconSize < gl.iconSizeL
                                                                   ? gl.selGeo.iconSize
                                                                   : 10.0,
                                                           divisions: 20,
@@ -1574,7 +1904,11 @@ class _MapPageState extends State<MapPage> {
                                               )
                                               : Column(
                                                 children: [
-                                                  stroke(gl.display.equipixel, gl.display.equipixel * .5, gl.colorAgroBioTech),
+                                                  stroke(
+                                                    gl.display.equipixel,
+                                                    gl.display.equipixel * .5,
+                                                    gl.colorAgroBioTech,
+                                                  ),
                                                   Row(
                                                     children: [
                                                       SizedBox(
@@ -1588,7 +1922,10 @@ class _MapPageState extends State<MapPage> {
                                                               gl.Mode.openToolbox = false;
                                                             });
                                                           },
-                                                          icon: Icon(Icons.arrow_back, size: gl.display.equipixel * gl.iconSizeS * .9),
+                                                          icon: Icon(
+                                                            Icons.arrow_back,
+                                                            size: gl.display.equipixel * gl.iconSizeS * .9,
+                                                          ),
                                                         ),
                                                       ),
                                                       SizedBox(
@@ -1608,7 +1945,11 @@ class _MapPageState extends State<MapPage> {
                                                       ),
                                                     ],
                                                   ),
-                                                  stroke(gl.display.equipixel, gl.display.equipixel * .5, gl.colorAgroBioTech),
+                                                  stroke(
+                                                    gl.display.equipixel,
+                                                    gl.display.equipixel * .5,
+                                                    gl.colorAgroBioTech,
+                                                  ),
                                                   Row(
                                                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                                     children: [
@@ -1672,8 +2013,12 @@ class _MapPageState extends State<MapPage> {
                                                               gl.selGeo.visibleOnMap = true;
                                                               gl.selGeo.serialize();
                                                               setState(() {
-                                                                if (gl.selGeo.center.longitude != 0.0 && gl.selGeo.center.latitude != 0.0) {
-                                                                  _mapController.move(gl.selGeo.center, _mapController.camera.zoom);
+                                                                if (gl.selGeo.center.longitude != 0.0 &&
+                                                                    gl.selGeo.center.latitude != 0.0) {
+                                                                  _mapController.move(
+                                                                    gl.selGeo.center,
+                                                                    _mapController.camera.zoom,
+                                                                  );
                                                                 }
                                                               });
                                                               gl.refreshMainStack(() {
@@ -1712,7 +2057,8 @@ class _MapPageState extends State<MapPage> {
                                                               gl.modeMapShowPolygons = true;
                                                               gl.selGeo.visibleOnMap = true;
                                                               gl.Mode.editPolygon = !gl.Mode.editPolygon;
-                                                              if (gl.Mode.editPolygon && gl.selGeo.type.contains("Point")) {
+                                                              if (gl.Mode.editPolygon &&
+                                                                  gl.selGeo.type.contains("Point")) {
                                                                 refreshView(() {
                                                                   gl.Mode.editPolygon = true;
                                                                   gl.Mode.showButtonAddVertexesPolygon = false;
@@ -1775,7 +2121,9 @@ class _MapPageState extends State<MapPage> {
                             children: [
                               Row(
                                 mainAxisAlignment:
-                                    gl.display.orientation == Orientation.portrait ? MainAxisAlignment.center : MainAxisAlignment.start,
+                                    gl.display.orientation == Orientation.portrait
+                                        ? MainAxisAlignment.center
+                                        : MainAxisAlignment.start,
                                 children: [
                                   SizedBox(
                                     height: gl.display.equipixel * gl.chosenPolyBarHeight,
@@ -1812,13 +2160,20 @@ class _MapPageState extends State<MapPage> {
                                         child: Row(
                                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                           children: [
-                                            Icon(Icons.add, size: gl.display.equipixel * gl.iconSizeM, color: Colors.white),
+                                            Icon(
+                                              Icons.add,
+                                              size: gl.display.equipixel * gl.iconSizeM,
+                                              color: Colors.white,
+                                            ),
                                             SizedBox(width: gl.display.equipixel * gl.fontSizeS),
                                             SizedBox(
                                               width: gl.display.equipixel * gl.chosenPolyBarWidth * .7,
                                               child: Text(
                                                 "Tappez ici pour ajouter un Polygone",
-                                                style: TextStyle(color: Colors.white, fontSize: gl.display.equipixel * gl.fontSizeM),
+                                                style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: gl.display.equipixel * gl.fontSizeM,
+                                                ),
                                               ),
                                             ),
                                           ],
@@ -1863,10 +2218,12 @@ class _MapPageState extends State<MapPage> {
 
   List<Polygon<String>> _getPolygonesToDraw() {
     List<Polygon<String>> that = [];
-    if (gl.selectedGeoLayer > -1) {
-      for (var layer in gl.selLay.geometries) {
-        if (layer.numPoints > 2 && layer.visibleOnMap && layer.type == "Polygon") {
-          that.add(Polygon<String>(points: layer.points, color: layer.colorInside, hitValue: layer.identifier));
+    if (gl.layerReady) {
+      for (GeometricLayer layer in gl.geoLayers) {
+        for (var g in layer.geometries) {
+          if (g.numPoints > 2 && layer.visibleOnMap && layer.type == "Polygon") {
+            that.add(Polygon<String>(points: g.points, color: g.colorInside, hitValue: g.identifier));
+          }
         }
       }
     }
@@ -1875,7 +2232,7 @@ class _MapPageState extends State<MapPage> {
 
   List<Marker> _getPointsToDraw({bool hitButton = false}) {
     List<Marker> that = [];
-    if (gl.selectedGeoLayer > -1) {
+    if (gl.layerReady) {
       for (var layer in gl.selLay.geometries) {
         gl.selectableIcons[layer.selectedPointIcon];
         if (layer.visibleOnMap && layer.numPoints > 0 && layer.type.contains("Point")) {
@@ -1913,9 +2270,17 @@ class _MapPageState extends State<MapPage> {
                             });
                           }
                         },
-                        icon: Icon(gl.selectableIcons[layer.selectedPointIcon], size: layer.iconSize * gl.display.equipixel, color: layer.colorLine),
+                        icon: Icon(
+                          gl.selectableIcons[layer.selectedPointIcon],
+                          size: layer.iconSize * gl.display.equipixel,
+                          color: layer.colorLine,
+                        ),
                       )
-                      : Icon(gl.selectableIcons[layer.selectedPointIcon], size: layer.iconSize * gl.display.equipixel, color: layer.colorLine),
+                      : Icon(
+                        gl.selectableIcons[layer.selectedPointIcon],
+                        size: layer.iconSize * gl.display.equipixel,
+                        color: layer.colorLine,
+                      ),
             ),
           );
         }
@@ -1934,7 +2299,10 @@ class _MapPageState extends State<MapPage> {
       all.add(
         CircleMarker(
           point: point,
-          radius: gl.selGeo.isSelectedLine(i) && !gl.Mode.showButtonMoveVertexesPolygon && gl.Mode.addVertexesPolygon ? iconSize / 2.7 : iconSize / 3,
+          radius:
+              gl.selGeo.isSelectedLine(i) && !gl.Mode.showButtonMoveVertexesPolygon && gl.Mode.addVertexesPolygon
+                  ? iconSize / 2.7
+                  : iconSize / 3,
           color:
               gl.selGeo.isSelectedLine(i) && !gl.Mode.showButtonMoveVertexesPolygon && gl.Mode.addVertexesPolygon
                   ? gl.selGeo.colorLine
@@ -1965,8 +2333,12 @@ class _MapPageState extends State<MapPage> {
                   animationDuration: Duration(seconds: 1),
                   backgroundColor:
                       gl.selectedSearchMarker == i
-                          ? WidgetStateProperty<Color>.fromMap(<WidgetStatesConstraint, Color>{WidgetState.any: getColorFromName(poi.name)})
-                          : WidgetStateProperty<Color>.fromMap(<WidgetStatesConstraint, Color>{WidgetState.any: getColorFromName(poi.name)}),
+                          ? WidgetStateProperty<Color>.fromMap(<WidgetStatesConstraint, Color>{
+                            WidgetState.any: getColorFromName(poi.name),
+                          })
+                          : WidgetStateProperty<Color>.fromMap(<WidgetStatesConstraint, Color>{
+                            WidgetState.any: getColorFromName(poi.name),
+                          }),
                   foregroundColor:
                       gl.selectedSearchMarker == i
                           ? WidgetStateProperty<Color>.fromMap(<WidgetStatesConstraint, Color>{
@@ -2015,7 +2387,9 @@ class _MapPageState extends State<MapPage> {
           child: IconButton(
             style: ButtonStyle(
               animationDuration: Duration(seconds: 1),
-              backgroundColor: WidgetStateProperty<Color>.fromMap(<WidgetStatesConstraint, Color>{WidgetState.any: Colors.transparent}),
+              backgroundColor: WidgetStateProperty<Color>.fromMap(<WidgetStatesConstraint, Color>{
+                WidgetState.any: Colors.transparent,
+              }),
             ),
             onPressed: () {
               refreshView(() {
@@ -2050,7 +2424,12 @@ class _MapPageState extends State<MapPage> {
             children: [
               Container(
                 constraints: BoxConstraints(maxWidth: 200),
-                child: Text(poi.address, textScaler: TextScaler.linear(scale), textAlign: TextAlign.center, maxLines: 10),
+                child: Text(
+                  poi.address,
+                  textScaler: TextScaler.linear(scale),
+                  textAlign: TextAlign.center,
+                  maxLines: 10,
+                ),
               ),
             ],
           ),
@@ -2293,7 +2672,12 @@ class _MapPageState extends State<MapPage> {
                 });
               }*/
             },
-            child: Text(overflow: TextOverflow.visible, "$count", maxLines: 1, style: TextStyle(color: Colors.black, fontSize: iconSize / 3)),
+            child: Text(
+              overflow: TextOverflow.visible,
+              "$count",
+              maxLines: 1,
+              style: TextStyle(color: Colors.black, fontSize: iconSize / 3),
+            ),
           ),
         ),
       );
@@ -2387,7 +2771,7 @@ class _MapPageState extends State<MapPage> {
                       },
                       () {
                         refreshView(() {
-                          if (gl.selLay.geometries.isNotEmpty && gl.Mode.editPolygon) {
+                          if (gl.layerReady && gl.selLay.geometries.isNotEmpty && gl.Mode.editPolygon) {
                             if (gl.selGeo.type == "Polygon") {
                               gl.Mode.showButtonAddVertexesPolygon = true;
                               gl.Mode.showButtonMoveVertexesPolygon = false;
@@ -2462,16 +2846,28 @@ class _MapPageState extends State<MapPage> {
     );
   }
 
-  Widget _menuButton(double width, double height, bool isSelected, Color color, VoidCallback onPressed, VoidCallback onLongPress, Icon icon) {
+  Widget _menuButton(
+    double width,
+    double height,
+    bool isSelected,
+    Color color,
+    VoidCallback onPressed,
+    VoidCallback onLongPress,
+    Icon icon,
+  ) {
     return Container(
       width: width,
       height: height,
       color: !isSelected ? Colors.transparent : color.withAlpha(128),
       child: IconButton(
         style: ButtonStyle(
-          shape: WidgetStateProperty.fromMap(<WidgetStatesConstraint, ContinuousRectangleBorder>{WidgetState.any: ContinuousRectangleBorder()}),
+          shape: WidgetStateProperty.fromMap(<WidgetStatesConstraint, ContinuousRectangleBorder>{
+            WidgetState.any: ContinuousRectangleBorder(),
+          }),
           alignment: AlignmentGeometry.center,
-          padding: WidgetStateProperty.fromMap(<WidgetStatesConstraint, EdgeInsetsGeometry>{WidgetState.any: EdgeInsetsGeometry.zero}),
+          padding: WidgetStateProperty.fromMap(<WidgetStatesConstraint, EdgeInsetsGeometry>{
+            WidgetState.any: EdgeInsetsGeometry.zero,
+          }),
         ),
         color: isSelected ? Colors.white : color,
         onPressed: onPressed,
@@ -2497,7 +2893,10 @@ class _MapPageState extends State<MapPage> {
           children: [
             Container(
               alignment: Alignment.center,
-              constraints: BoxConstraints(maxHeight: gl.display.equipixel * toolbarHeight, maxWidth: gl.display.equipixel * gl.menuBarThickness),
+              constraints: BoxConstraints(
+                maxHeight: gl.display.equipixel * toolbarHeight,
+                maxWidth: gl.display.equipixel * gl.menuBarThickness,
+              ),
               child: Card(
                 color: gl.backgroundTransparentBlackBox,
                 child: Column(
@@ -2518,7 +2917,12 @@ class _MapPageState extends State<MapPage> {
                                       refreshView(() {
                                         _doingAnaPt = true;
                                       });
-                                      await _runAnaPt(epsg4326.transform(epsg31370, proj4.Point(x: gl.position.longitude, y: gl.position.latitude)));
+                                      await _runAnaPt(
+                                        epsg4326.transform(
+                                          epsg31370,
+                                          proj4.Point(x: gl.position.longitude, y: gl.position.latitude),
+                                        ),
+                                      );
                                       _updatePtMarker(LatLng(gl.position.latitude, gl.position.longitude));
                                       PopupAnaResultsMenu(gl.notificationContext!, gl.requestedLayers, () {
                                         refreshView(() {});
@@ -2668,7 +3072,9 @@ class _MapPageState extends State<MapPage> {
               ? Marker(
                 alignment: Alignment.center,
                 width: gl.display.equipixel * (gl.Mode.smallLabel ? gl.infoBoxPolygon * .6 : gl.infoBoxPolygon),
-                height: gl.display.equipixel * (gl.selLay.geometries[i].getNCheckedAttributes() + 1) * gl.iconSizeS * .8 + 5,
+                height:
+                    gl.display.equipixel * (gl.selLay.geometries[i].getNCheckedAttributes() + 1) * gl.iconSizeS * .8 +
+                    5,
                 point: gl.selLay.geometries[i].center,
                 child: Card(
                   color: gl.Mode.smallLabel ? Colors.white.withAlpha(100) : Colors.black.withAlpha(200),
@@ -2688,15 +3094,21 @@ class _MapPageState extends State<MapPage> {
                                   child: IconButton(
                                     style: ButtonStyle(
                                       animationDuration: Duration(seconds: 1),
-                                      backgroundColor: WidgetStateProperty<Color>.fromMap(<WidgetStatesConstraint, Color>{
-                                        WidgetState.any: Colors.transparent,
-                                      }),
-                                      padding: WidgetStateProperty<EdgeInsetsGeometry>.fromMap(<WidgetStatesConstraint, EdgeInsetsGeometry>{
-                                        WidgetState.any: EdgeInsetsGeometry.zero,
-                                      }),
+                                      backgroundColor: WidgetStateProperty<Color>.fromMap(
+                                        <WidgetStatesConstraint, Color>{WidgetState.any: Colors.transparent},
+                                      ),
+                                      padding: WidgetStateProperty<EdgeInsetsGeometry>.fromMap(
+                                        <WidgetStatesConstraint, EdgeInsetsGeometry>{
+                                          WidgetState.any: EdgeInsetsGeometry.zero,
+                                        },
+                                      ),
                                     ),
                                     onPressed: () {},
-                                    icon: FaIcon(FontAwesomeIcons.list, size: gl.display.equipixel * gl.iconSizeXS * .5, color: Colors.transparent),
+                                    icon: FaIcon(
+                                      FontAwesomeIcons.list,
+                                      size: gl.display.equipixel * gl.iconSizeXS * .5,
+                                      color: Colors.transparent,
+                                    ),
                                   ),
                                 ),
                               Container(
@@ -2727,12 +3139,14 @@ class _MapPageState extends State<MapPage> {
                                   child: IconButton(
                                     style: ButtonStyle(
                                       animationDuration: Duration(seconds: 1),
-                                      backgroundColor: WidgetStateProperty<Color>.fromMap(<WidgetStatesConstraint, Color>{
-                                        WidgetState.any: Colors.transparent,
-                                      }),
-                                      padding: WidgetStateProperty<EdgeInsetsGeometry>.fromMap(<WidgetStatesConstraint, EdgeInsetsGeometry>{
-                                        WidgetState.any: EdgeInsetsGeometry.zero,
-                                      }),
+                                      backgroundColor: WidgetStateProperty<Color>.fromMap(
+                                        <WidgetStatesConstraint, Color>{WidgetState.any: Colors.transparent},
+                                      ),
+                                      padding: WidgetStateProperty<EdgeInsetsGeometry>.fromMap(
+                                        <WidgetStatesConstraint, EdgeInsetsGeometry>{
+                                          WidgetState.any: EdgeInsetsGeometry.zero,
+                                        },
+                                      ),
                                     ),
                                     onPressed: () {
                                       refreshView(() {
@@ -2740,7 +3154,11 @@ class _MapPageState extends State<MapPage> {
                                       });
                                       gl.selLay.geometries[i].serialize();
                                     },
-                                    icon: FaIcon(Icons.close, size: gl.display.equipixel * gl.iconSizeXS * .8, color: Colors.red),
+                                    icon: FaIcon(
+                                      Icons.close,
+                                      size: gl.display.equipixel * gl.iconSizeXS * .8,
+                                      color: Colors.red,
+                                    ),
                                   ),
                                 ),
                             ],
@@ -2773,7 +3191,12 @@ class _MapPageState extends State<MapPage> {
                                     ),
                                   ),
                                 if (!gl.Mode.smallLabel)
-                                  stroke(vertical: true, gl.display.equipixel * 0.5, gl.display.equipixel * 0.25, gl.colorAgroBioTech),
+                                  stroke(
+                                    vertical: true,
+                                    gl.display.equipixel * 0.5,
+                                    gl.display.equipixel * 0.25,
+                                    gl.colorAgroBioTech,
+                                  ),
                                 Container(
                                   alignment: Alignment.centerLeft,
                                   width: gl.display.equipixel * 15,
@@ -2802,7 +3225,8 @@ class _MapPageState extends State<MapPage> {
                 width: gl.display.equipixel * (gl.Mode.smallLabel ? gl.infoBoxPolygon * .6 : gl.infoBoxPolygon),
                 height:
                     gl.display.equipixel *
-                        (gl.selLay.geometries[i].getNCheckedAttributes() + ((!gl.selLay.geometries[i].type.contains("essence")) ? 1 : 0)) *
+                        (gl.selLay.geometries[i].getNCheckedAttributes() +
+                            ((!gl.selLay.geometries[i].type.contains("essence")) ? 1 : 0)) *
                         gl.iconSizeS *
                         .8 +
                     5,
@@ -2825,15 +3249,21 @@ class _MapPageState extends State<MapPage> {
                                   child: IconButton(
                                     style: ButtonStyle(
                                       animationDuration: Duration(seconds: 1),
-                                      backgroundColor: WidgetStateProperty<Color>.fromMap(<WidgetStatesConstraint, Color>{
-                                        WidgetState.any: Colors.transparent,
-                                      }),
-                                      padding: WidgetStateProperty<EdgeInsetsGeometry>.fromMap(<WidgetStatesConstraint, EdgeInsetsGeometry>{
-                                        WidgetState.any: EdgeInsetsGeometry.zero,
-                                      }),
+                                      backgroundColor: WidgetStateProperty<Color>.fromMap(
+                                        <WidgetStatesConstraint, Color>{WidgetState.any: Colors.transparent},
+                                      ),
+                                      padding: WidgetStateProperty<EdgeInsetsGeometry>.fromMap(
+                                        <WidgetStatesConstraint, EdgeInsetsGeometry>{
+                                          WidgetState.any: EdgeInsetsGeometry.zero,
+                                        },
+                                      ),
                                     ),
                                     onPressed: () {},
-                                    icon: FaIcon(FontAwesomeIcons.list, size: gl.display.equipixel * gl.iconSizeXS * .5, color: Colors.transparent),
+                                    icon: FaIcon(
+                                      FontAwesomeIcons.list,
+                                      size: gl.display.equipixel * gl.iconSizeXS * .5,
+                                      color: Colors.transparent,
+                                    ),
                                   ),
                                 ),
                               if (!gl.selLay.geometries[i].type.contains("essence"))
@@ -2864,12 +3294,14 @@ class _MapPageState extends State<MapPage> {
                                   child: IconButton(
                                     style: ButtonStyle(
                                       animationDuration: Duration(seconds: 1),
-                                      backgroundColor: WidgetStateProperty<Color>.fromMap(<WidgetStatesConstraint, Color>{
-                                        WidgetState.any: Colors.transparent,
-                                      }),
-                                      padding: WidgetStateProperty<EdgeInsetsGeometry>.fromMap(<WidgetStatesConstraint, EdgeInsetsGeometry>{
-                                        WidgetState.any: EdgeInsetsGeometry.zero,
-                                      }),
+                                      backgroundColor: WidgetStateProperty<Color>.fromMap(
+                                        <WidgetStatesConstraint, Color>{WidgetState.any: Colors.transparent},
+                                      ),
+                                      padding: WidgetStateProperty<EdgeInsetsGeometry>.fromMap(
+                                        <WidgetStatesConstraint, EdgeInsetsGeometry>{
+                                          WidgetState.any: EdgeInsetsGeometry.zero,
+                                        },
+                                      ),
                                     ),
                                     onPressed: () {
                                       refreshView(() {
@@ -2877,7 +3309,11 @@ class _MapPageState extends State<MapPage> {
                                       });
                                       gl.selLay.geometries[i].serialize();
                                     },
-                                    icon: FaIcon(Icons.close, size: gl.display.equipixel * gl.iconSizeXS * .8, color: Colors.red),
+                                    icon: FaIcon(
+                                      Icons.close,
+                                      size: gl.display.equipixel * gl.iconSizeXS * .8,
+                                      color: Colors.red,
+                                    ),
                                   ),
                                 ),
                             ],
@@ -2902,12 +3338,20 @@ class _MapPageState extends State<MapPage> {
                                       child: Text(
                                         gl.selLay.geometries[i].attributes[j].name,
                                         textAlign: TextAlign.center,
-                                        style: TextStyle(color: Colors.white, fontSize: gl.display.equipixel * gl.fontSizeXS),
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: gl.display.equipixel * gl.fontSizeXS,
+                                        ),
                                       ),
                                     ),
                                   ),
                                 if (!gl.Mode.smallLabel)
-                                  stroke(vertical: true, gl.display.equipixel * 0.5, gl.display.equipixel * 0.25, gl.colorAgroBioTech),
+                                  stroke(
+                                    vertical: true,
+                                    gl.display.equipixel * 0.5,
+                                    gl.display.equipixel * 0.25,
+                                    gl.colorAgroBioTech,
+                                  ),
                                 Container(
                                   alignment: Alignment.centerLeft,
                                   width: gl.display.equipixel * 15,
@@ -2935,7 +3379,8 @@ class _MapPageState extends State<MapPage> {
                 width:
                     textArea.length > gl.selLay.geometries[i].name.length
                         ? gl.display.equipixel * gl.infoBoxPolygon * 2.5 + textArea.length * gl.fontSizeS
-                        : gl.display.equipixel * gl.infoBoxPolygon * 1.5 + gl.selLay.geometries[i].name.length * gl.fontSizeS,
+                        : gl.display.equipixel * gl.infoBoxPolygon * 1.5 +
+                            gl.selLay.geometries[i].name.length * gl.fontSizeS,
                 height: gl.display.equipixel * gl.infoBoxPolygon * 1.5,
                 point: gl.selLay.geometries[i].center,
                 child: Column(
@@ -2960,7 +3405,13 @@ class _MapPageState extends State<MapPage> {
                   ],
                 ),
               )
-          : Marker(alignment: Alignment.center, width: 1, height: 1, point: gl.selLay.geometries[i].center, child: SizedBox());
+          : Marker(
+            alignment: Alignment.center,
+            width: 1,
+            height: 1,
+            point: gl.selLay.geometries[i].center,
+            child: SizedBox(),
+          );
     });
   }
 
@@ -3014,7 +3465,10 @@ class _MapPageState extends State<MapPage> {
             Container(
               alignment: Alignment.center,
               width: gl.display.equipixel * 11,
-              child: Text("FIXED", style: TextStyle(color: Colors.grey, fontSize: gl.fontSizeXXS * gl.display.equipixel)),
+              child: Text(
+                "FIXED",
+                style: TextStyle(color: Colors.grey, fontSize: gl.fontSizeXXS * gl.display.equipixel),
+              ),
             ),
             stroke(vertical: true, gl.display.equipixel, gl.display.equipixel * 0.5, gl.colorAgroBioTech),
             SizedBox(
@@ -3022,13 +3476,20 @@ class _MapPageState extends State<MapPage> {
               child:
                   checked
                       ? Icon(Icons.check_box, color: Colors.white12, size: gl.display.equipixel * gl.iconSizeXS)
-                      : Icon(Icons.check_box_outline_blank, color: Colors.white12, size: gl.display.equipixel * gl.iconSizeXS),
+                      : Icon(
+                        Icons.check_box_outline_blank,
+                        color: Colors.white12,
+                        size: gl.display.equipixel * gl.iconSizeXS,
+                      ),
             ),
             stroke(vertical: true, gl.display.equipixel, gl.display.equipixel * 0.5, gl.colorAgroBioTech),
             Container(
               alignment: Alignment.centerLeft,
               width: gl.display.equipixel * 33,
-              child: Text(name, style: TextStyle(color: Colors.white, fontSize: gl.display.equipixel * gl.fontSizeM * .75)),
+              child: Text(
+                name,
+                style: TextStyle(color: Colors.white, fontSize: gl.display.equipixel * gl.fontSizeM * .75),
+              ),
             ),
             stroke(vertical: true, gl.display.equipixel, gl.display.equipixel * 0.5, gl.colorAgroBioTech),
             Container(
@@ -3050,7 +3511,8 @@ class _MapPageState extends State<MapPage> {
     );
   }
 
-  bool _positionInsideViewRectangle(Position p) => _mapController.camera.visibleBounds.contains(LatLng(p.latitude, p.longitude));
+  bool _positionInsideViewRectangle(Position p) =>
+      _mapController.camera.visibleBounds.contains(LatLng(p.latitude, p.longitude));
 }
 
 Future<Position?> acquireUserLocation() async {
@@ -3084,7 +3546,10 @@ class _AnaPtPreview extends State<AnaPtPreview> {
   Widget build(BuildContext context) {
     if (lastRequested == null || lastRequested != widget.position) {
       lastRequested = widget.position;
-      _runAnaPtPreview(gl.epsg4326ToEpsg31370(proj4.Point(x: widget.position.longitude, y: widget.position.latitude)), widget.after);
+      _runAnaPtPreview(
+        gl.epsg4326ToEpsg31370(proj4.Point(x: widget.position.longitude, y: widget.position.latitude)),
+        widget.after,
+      );
     }
     if (gl.anaPtPreview != null) {
       Color color = gl.dico.getLayerBase(gl.anaPtPreview!.mCode).getValColor(gl.anaPtPreview!.mRastValue);
@@ -3097,7 +3562,10 @@ class _AnaPtPreview extends State<AnaPtPreview> {
           children: [
             Container(
               alignment: Alignment.center,
-              constraints: BoxConstraints(minHeight: gl.fontSizeM * gl.display.equipixel, minWidth: gl.fontSizeM * gl.display.equipixel),
+              constraints: BoxConstraints(
+                minHeight: gl.fontSizeM * gl.display.equipixel,
+                minWidth: gl.fontSizeM * gl.display.equipixel,
+              ),
               color: Colors.white,
               child: Container(
                 alignment: Alignment.center,
@@ -3107,10 +3575,17 @@ class _AnaPtPreview extends State<AnaPtPreview> {
               ),
             ),
             Container(
-              constraints: BoxConstraints(minHeight: gl.fontSizeM * gl.display.equipixel, minWidth: gl.fontSizeM * gl.display.equipixel),
+              constraints: BoxConstraints(
+                minHeight: gl.fontSizeM * gl.display.equipixel,
+                minWidth: gl.fontSizeM * gl.display.equipixel,
+              ),
               child: Text(":", textAlign: TextAlign.center),
             ),
-            Text(textAlign: TextAlign.center, text == "" ? "No data" : text, style: TextStyle(fontSize: gl.fontSizeS * gl.display.equipixel)),
+            Text(
+              textAlign: TextAlign.center,
+              text == "" ? "No data" : text,
+              style: TextStyle(fontSize: gl.fontSizeS * gl.display.equipixel),
+            ),
           ],
         ),
       );

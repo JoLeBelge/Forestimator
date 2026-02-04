@@ -49,14 +49,18 @@ class Geometry {
     name = polygonName;
     Random randomColor = Random();
     setColorInside(Color.fromRGBO(randomColor.nextInt(256), randomColor.nextInt(256), randomColor.nextInt(256), 0.4));
-    setColorLine(Color.fromRGBO((colorInside.r * 255).round(), (colorInside.g * 255).round(), (colorInside.b * 255).round(), 1.0));
+    setColorLine(
+      Color.fromRGBO((colorInside.r * 255).round(), (colorInside.g * 255).round(), (colorInside.b * 255).round(), 1.0),
+    );
   }
 
   Geometry.point({String polygonName = ""}) {
     name = polygonName;
     Random randomColor = Random();
     setColorInside(Color.fromRGBO(randomColor.nextInt(256), randomColor.nextInt(256), randomColor.nextInt(256), 0.4));
-    setColorLine(Color.fromRGBO((colorInside.r * 255).round(), (colorInside.g * 255).round(), (colorInside.b * 255).round(), 1.0));
+    setColorLine(
+      Color.fromRGBO((colorInside.r * 255).round(), (colorInside.g * 255).round(), (colorInside.b * 255).round(), 1.0),
+    );
   }
 
   Geometry.polygon({String polygonName = ""}) {
@@ -64,17 +68,24 @@ class Geometry {
     name = polygonName;
     Random randomColor = Random();
     setColorInside(Color.fromRGBO(randomColor.nextInt(256), randomColor.nextInt(256), randomColor.nextInt(256), 0.4));
-    setColorLine(Color.fromRGBO((colorInside.r * 255).round(), (colorInside.g * 255).round(), (colorInside.b * 255).round(), 1.0));
+    setColorLine(
+      Color.fromRGBO((colorInside.r * 255).round(), (colorInside.g * 255).round(), (colorInside.b * 255).round(), 1.0),
+    );
   }
 
   Geometry.essencePoint({String polygonName = ""}) {
     type = "Point-essence";
-    attributes.addAll([Attribute(name: "essence", type: "string", value: gl.essenceChoice[0]), Attribute(name: "rmq", type: "string", value: "")]);
+    attributes.addAll([
+      Attribute(name: "essence", type: "string", value: gl.essenceChoice[0]),
+      Attribute(name: "rmq", type: "string", value: ""),
+    ]);
     attributes[1].visibleOnMapLabel = true;
     visibleOnMap = true;
     name = polygonName;
     selectedPointIcon = 4;
-    setColorInside(gl.dico.mLayerBases["COMPOALL"]!.mDicoCol[gl.essenceChoice.indexOf(gl.essenceChoice[0])] ?? Colors.black);
+    setColorInside(
+      gl.dico.mLayerBases["COMPOALL"]!.mDicoCol[gl.essenceChoice.indexOf(gl.essenceChoice[0])] ?? Colors.black,
+    );
     setColorLine(colorInside.withAlpha(255));
   }
 
@@ -202,7 +213,10 @@ class Geometry {
       } else if (points.isEmpty) {
         refreshSelectedLinePoints(null);
       } else {
-        int selection = (selectedPolyLinePoints[0] > selectedPolyLinePoints[1]) ? selectedPolyLinePoints[1] : selectedPolyLinePoints[0];
+        int selection =
+            (selectedPolyLinePoints[0] > selectedPolyLinePoints[1])
+                ? selectedPolyLinePoints[1]
+                : selectedPolyLinePoints[0];
         refreshSelectedLinePoints(points[selection > points.length - 1 ? points.length - 1 : selection]);
       }
     }
@@ -294,7 +308,10 @@ class Geometry {
       coordinates = "$coordinates[${tLb72.x}, ${tLb72.y}],";
     }
     if (type == "Polygon" && points.isNotEmpty) {
-      proj4.Point tLb72 = gl.epsg4326.transform(gl.epsg31370, proj4.Point(x: points.first.longitude, y: points.first.latitude));
+      proj4.Point tLb72 = gl.epsg4326.transform(
+        gl.epsg31370,
+        proj4.Point(x: points.first.longitude, y: points.first.latitude),
+      );
       coordinates = "$coordinates[${tLb72.x}, ${tLb72.y}]";
     } else {
       if (coordinates.length > 1) {
@@ -325,7 +342,10 @@ class Geometry {
         proj4.Point tLb72 = gl.epsg4326.transform(gl.epsg31370, proj4.Point(x: point.longitude, y: point.latitude));
         polygon = "$polygon${tLb72.x} ${tLb72.y},";
       }
-      proj4.Point tLb72 = gl.epsg4326.transform(gl.epsg31370, proj4.Point(x: points.first.longitude, y: points.first.latitude));
+      proj4.Point tLb72 = gl.epsg4326.transform(
+        gl.epsg31370,
+        proj4.Point(x: points.first.longitude, y: points.first.latitude),
+      );
       polygon = "$polygon${tLb72.x} ${tLb72.y},";
       polygon = "${polygon.substring(0, polygon.length - 1)}))";
 
@@ -398,7 +418,10 @@ class Geometry {
         coordinates = "$coordinates[${tLb72.x}, ${tLb72.y}],";
       }
       if (type == "Polygon") {
-        proj4.Point tLb72 = gl.epsg4326.transform(gl.epsg31370, proj4.Point(x: points.first.longitude, y: points.first.latitude));
+        proj4.Point tLb72 = gl.epsg4326.transform(
+          gl.epsg31370,
+          proj4.Point(x: points.first.longitude, y: points.first.latitude),
+        );
         coordinates = "[[$coordinates[${tLb72.x}, ${tLb72.y}]]]";
       } else {
         if (coordinates.length > 1) {
@@ -618,7 +641,10 @@ class Geometry {
   }
 
   Future runAnaPt() async {
-    proj4.Point ptBL72 = epsg4326.transform(epsg31370, proj4.Point(x: points.first.longitude, y: points.first.latitude));
+    proj4.Point ptBL72 = epsg4326.transform(
+      epsg31370,
+      proj4.Point(x: points.first.longitude, y: points.first.latitude),
+    );
     gl.requestedLayers.clear();
     Map data;
 
@@ -634,7 +660,8 @@ class Geometry {
           }
         }
 
-        String request = "https://forestimator.gembloux.ulg.ac.be/api/anaPt/layers/$layersAnaPt/x/${ptBL72.x}/y/${ptBL72.y}";
+        String request =
+            "https://forestimator.gembloux.ulg.ac.be/api/anaPt/layers/$layersAnaPt/x/${ptBL72.x}/y/${ptBL72.y}";
         try {
           var res = await http.get(Uri.parse(request));
           if (res.statusCode != 200) throw HttpException('${res.statusCode}');
@@ -666,6 +693,8 @@ class Geometry {
     gl.requestedLayers.removeWhere((element) => element.mRastValue == 0);
 
     // on les trie sur base des catégories de couches
-    gl.requestedLayers.sort((a, b) => gl.dico.getLayerBase(a.mCode).mGroupe.compareTo(gl.dico.getLayerBase(b.mCode).mGroupe));
+    gl.requestedLayers.sort(
+      (a, b) => gl.dico.getLayerBase(a.mCode).mGroupe.compareTo(gl.dico.getLayerBase(b.mCode).mGroupe),
+    );
   }
 }
