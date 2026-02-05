@@ -1853,8 +1853,9 @@ class _DeleteAttribute extends State<DeleteAttribute> {
 class PolygonListMenu extends StatefulWidget {
   final ValueChanged<LatLng> state;
   final VoidCallback after;
+  final double height;
 
-  const PolygonListMenu({super.key, required this.state, required this.after});
+  const PolygonListMenu({super.key, required this.state, required this.after, required this.height});
 
   @override
   State<StatefulWidget> createState() => _PolygonListMenu();
@@ -1883,7 +1884,7 @@ class _PolygonListMenu extends State<PolygonListMenu> {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: Colors.transparent,
-      body: switchRowColWithOrientation([
+      body: switchRowColWithOrientation(alignment: MainAxisAlignment.spaceEvenly, [
         Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -1897,7 +1898,7 @@ class _PolygonListMenu extends State<PolygonListMenu> {
             ),
             SizedBox(
               width: gl.display.equipixel * gl.popupWindowsPortraitWidth,
-              height: gl.display.equipixel * gl.popupWindowsPortraitHeight / 2,
+              height: gl.display.equipixel * gl.popupWindowsPortraitHeight / 3,
               child: ReorderableListView(
                 scrollController: _controller,
                 buildDefaultDragHandles: false,
@@ -1945,6 +1946,9 @@ class _PolygonListMenu extends State<PolygonListMenu> {
                                   gl.display.equipixel * gl.polyListCardHeight,
                                 ),
                               }),
+                      padding: WidgetStateProperty.fromMap(<WidgetStatesConstraint, EdgeInsetsGeometry>{
+                        WidgetState.any: EdgeInsetsGeometry.zero,
+                      }),
                     ),
                     key: Key('$i'),
                     onPressed:
@@ -2428,6 +2432,9 @@ class _PolygonListMenu extends State<PolygonListMenu> {
                     gl.display.equipixel * gl.polyNewPolygonButtonHeight * .9,
                   ),
                 }),
+                padding: WidgetStateProperty.fromMap(<WidgetStatesConstraint, EdgeInsetsGeometry>{
+                  WidgetState.any: EdgeInsetsGeometry.zero,
+                }),
               ),
               key: Key('autsch-5-addPoly'),
               child: Row(
@@ -2452,6 +2459,7 @@ class _PolygonListMenu extends State<PolygonListMenu> {
                 _scrollDown();
               },
             ),
+            Row(mainAxisAlignment: MainAxisAlignment.center, children: [_returnButton(context, widget.after)]),
           ],
         ),
       ]),
@@ -2462,8 +2470,9 @@ class _PolygonListMenu extends State<PolygonListMenu> {
 class GeoLayerListMenu extends StatefulWidget {
   final ValueChanged<LatLng> state;
   final VoidCallback after;
+  final double windowHeight;
 
-  const GeoLayerListMenu({super.key, required this.state, required this.after});
+  const GeoLayerListMenu({super.key, required this.state, required this.after, required this.windowHeight});
 
   @override
   State<StatefulWidget> createState() => _GeoLayerListMenu();
@@ -2492,13 +2501,29 @@ class _GeoLayerListMenu extends State<GeoLayerListMenu> {
 
   @override
   void dispose() {
-    // Dispose the PageController when the widget is disposed
     _pageController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    double titleHeight = gl.display.equipixel * gl.fontSizeXL * 1.2;
+    double listPartHeight =
+        gl.display.equipixel *
+        (widget.windowHeight -
+            (gl.fontSizeXL * 1.2) -
+            gl.popupReturnButtonHeight -
+            (gl.polyNewPolygonButtonHeight * .9) -
+            2.5 - //stroke
+            10);
+    if (!_titleLayer) {
+      listPartHeight =
+          gl.display.equipixel *
+          (widget.windowHeight -
+              (gl.fontSizeXL * 1.2) -
+              2.5 - //stroke
+              10);
+    }
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: Colors.transparent,
@@ -2506,7 +2531,7 @@ class _GeoLayerListMenu extends State<GeoLayerListMenu> {
         Column(
           children: [
             SizedBox(
-              height: gl.display.equipixel * gl.fontSizeL * 1.2,
+              height: titleHeight,
               child: Text(
                 _titleLayer ? "Liste des layer" : "Layer",
                 textAlign: TextAlign.justify,
@@ -2516,7 +2541,7 @@ class _GeoLayerListMenu extends State<GeoLayerListMenu> {
             stroke(vertical: false, gl.display.equipixel, gl.display.equipixel * .5, gl.colorAgroBioTech),
             SizedBox(
               width: gl.display.equipixel * gl.popupWindowsPortraitWidth,
-              height: gl.display.equipixel * gl.popupWindowsPortraitHeight * .75,
+              height: listPartHeight,
               child: PageView(
                 controller: _pageController,
                 physics: NeverScrollableScrollPhysics(),
@@ -2555,20 +2580,15 @@ class _GeoLayerListMenu extends State<GeoLayerListMenu> {
                     itemBuilder:
                         (context, i) => TextButton(
                           style: ButtonStyle(
-                            fixedSize:
-                                i == gl.selectedGeoLayer && gl.display.orientation == Orientation.portrait
-                                    ? WidgetStateProperty<Size>.fromMap(<WidgetStatesConstraint, Size>{
-                                      WidgetState.any: Size(
-                                        gl.display.equipixel * gl.polyListSelectedCardWidth,
-                                        gl.display.equipixel * gl.polyListSelectedCardHeight,
-                                      ),
-                                    })
-                                    : WidgetStateProperty<Size>.fromMap(<WidgetStatesConstraint, Size>{
-                                      WidgetState.any: Size(
-                                        gl.display.equipixel * gl.polyListCardWidth,
-                                        gl.display.equipixel * gl.polyListCardHeight,
-                                      ),
-                                    }),
+                            fixedSize: WidgetStateProperty<Size>.fromMap(<WidgetStatesConstraint, Size>{
+                              WidgetState.any: Size(
+                                gl.display.equipixel * gl.polyListCardWidth,
+                                gl.display.equipixel * gl.polyListCardHeight,
+                              ),
+                            }),
+                            padding: WidgetStateProperty.fromMap(<WidgetStatesConstraint, EdgeInsetsGeometry>{
+                              WidgetState.any: EdgeInsetsGeometry.zero,
+                            }),
                           ),
                           key: Key('$i'),
                           onPressed:
@@ -2746,6 +2766,7 @@ class _GeoLayerListMenu extends State<GeoLayerListMenu> {
                                                 color: Colors.white,
                                                 size: gl.display.equipixel * gl.iconSizeM * .75,
                                               ),
+                                              padding: EdgeInsets.zero,
                                             ),
                                           ],
                                         )
@@ -2924,6 +2945,7 @@ class _GeoLayerListMenu extends State<GeoLayerListMenu> {
                                                     color: Colors.white,
                                                     size: gl.display.equipixel * gl.iconSizeM * .75,
                                                   ),
+                                                  padding: EdgeInsets.zero,
                                                 ),
                                               ],
                                             ),
@@ -3060,14 +3082,19 @@ class _GeoLayerListMenu extends State<GeoLayerListMenu> {
                                       curve: Curves.easeInOut,
                                     );
                                   },
+                                  padding: EdgeInsets.zero,
                                 ),
                                 Text('Details for Tile ${_selectedIndex! + 1}'),
                               ],
                             ),
                             SizedBox(
                               width: gl.display.equipixel * gl.popupWindowsPortraitWidth,
-                              height: gl.display.equipixel * gl.popupWindowsPortraitHeight * .75,
-                              child: PolygonListMenu(state: widget.state, after: widget.after),
+                              height: gl.display.equipixel * widget.windowHeight * .75,
+                              child: PolygonListMenu(
+                                state: widget.state,
+                                after: widget.after,
+                                height: widget.windowHeight,
+                              ),
                             ),
                           ],
                         ),
@@ -3090,6 +3117,9 @@ class _GeoLayerListMenu extends State<GeoLayerListMenu> {
                       gl.display.equipixel * gl.polyListCardWidth * .97,
                       gl.display.equipixel * gl.polyNewPolygonButtonHeight * .9,
                     ),
+                  }),
+                  padding: WidgetStateProperty.fromMap(<WidgetStatesConstraint, EdgeInsetsGeometry>{
+                    WidgetState.any: EdgeInsetsGeometry.zero,
                   }),
                 ),
                 key: Key('autsch-5-addPoly'),
@@ -3126,7 +3156,7 @@ class _GeoLayerListMenu extends State<GeoLayerListMenu> {
                   });
                 },
               ),
-            if (gl.display.orientation == Orientation.portrait && !_keyboard)
+            if (gl.display.orientation == Orientation.portrait && !_keyboard && _titleLayer)
               Row(mainAxisAlignment: MainAxisAlignment.center, children: [_returnButton(context, widget.after)]),
           ],
         ),
@@ -5172,7 +5202,14 @@ Widget popupLayerListMenu(BuildContext context, String currentName, ValueChanged
                   gl.display.orientation == Orientation.portrait
                       ? gl.display.equipixel * (gl.display.equiheight - 25)
                       : gl.display.equipixel * gl.popupWindowsLandscapeHeight,
-              child: GeoLayerListMenu(state: state, after: after),
+              child: GeoLayerListMenu(
+                state: state,
+                after: after,
+                windowHeight:
+                    gl.display.orientation == Orientation.portrait
+                        ? (gl.display.equiheight - 25)
+                        : gl.popupWindowsLandscapeHeight,
+              ),
             ),
           ),
           actions: [],
@@ -5314,6 +5351,9 @@ Widget _returnButton(BuildContext context, VoidCallback after, {double length = 
       }),
       fixedSize: WidgetStateProperty.fromMap(<WidgetStatesConstraint, Size>{
         WidgetState.any: Size(length, gl.display.equipixel * gl.popupReturnButtonHeight),
+      }),
+      padding: WidgetStateProperty.fromMap(<WidgetStatesConstraint, EdgeInsetsGeometry>{
+        WidgetState.any: EdgeInsetsGeometry.zero,
       }),
     ),
 

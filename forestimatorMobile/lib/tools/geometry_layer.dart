@@ -68,7 +68,7 @@ class GeometricLayer {
         gl.print("error: unknown type $type to create new geometry on layer $name");
         return;
     }
-    geometries.last.setColorInside(defaultColor);
+    geometries.last.setColorInside(defaultColor.withAlpha(100));
     geometries.last.setColorLine(defaultColor);
     geometries.last.selectedPointIcon = defaultPointIcon;
     geometries.last.iconSize = defaultIconSize;
@@ -120,7 +120,7 @@ class GeometricLayer {
     _writeAttributesToMemory("$id.defAttr", defaultAttributes);
 
     for (Geometry g in geometries) {
-      g.serialize();
+      g.serialize(layerId: id);
     }
 
     List<String> layerKeys = gl.shared!.getStringList('layerKeys') ?? <String>[];
@@ -133,6 +133,7 @@ class GeometricLayer {
   }
 
   void deserialize(String id) async {
+    this.id = id;
     name = gl.shared!.getString('$id.name')!;
     type = gl.shared!.getString('$id.type')!;
     subtype = gl.shared!.getString('$id.subtype')!;
@@ -210,7 +211,9 @@ class GeometricLayer {
   }
 
   void _deserializAllPolys() {
+    print(id);
     List<String> polykeys = gl.shared!.getStringList('$id.polyKeys') ?? <String>[];
+    print(polykeys);
     for (String key in polykeys) {
       geometries.add(Geometry());
       geometries.last.deserialze(key);
