@@ -1448,6 +1448,7 @@ class _MapPageState extends State<MapPage> {
                                                                                                 .name;
                                                                                         if (controlDuplicateAttributeName(
                                                                                           gl.selGeo.attributes[i].name,
+                                                                                          gl.selGeo.attributes,
                                                                                         )) {
                                                                                           PopupMessage(
                                                                                             "Erreur",
@@ -1716,7 +1717,7 @@ class _MapPageState extends State<MapPage> {
                                                       ),
                                                       TextButton(
                                                         onPressed: () {
-                                                          PopupSelectAttributeSet(context);
+                                                          PopupSelectAttributeSet(context, gl.selGeo.attributes);
                                                         },
                                                         child: Column(
                                                           children: [
@@ -2233,56 +2234,60 @@ class _MapPageState extends State<MapPage> {
   List<Marker> _getPointsToDraw({bool hitButton = false}) {
     List<Marker> that = [];
     if (gl.layerReady) {
-      for (var layer in gl.selLay.geometries) {
-        gl.selectableIcons[layer.selectedPointIcon];
-        if (layer.visibleOnMap && layer.numPoints > 0 && layer.type.contains("Point")) {
-          that.add(
-            Marker(
-              width: layer.iconSize * gl.display.equipixel,
-              height: layer.iconSize * gl.display.equipixel,
-              point: LatLng(layer.points.first.latitude, layer.points.first.longitude),
-              child:
-                  hitButton
-                      ? IconButton(
-                        highlightColor: Colors.transparent,
-                        alignment: Alignment.center,
-                        style: ButtonStyle(
-                          shape: WidgetStateProperty.fromMap(<WidgetStatesConstraint, ContinuousRectangleBorder>{
-                            WidgetState.any: ContinuousRectangleBorder(),
-                          }),
-                          alignment: AlignmentGeometry.center,
-                          padding: WidgetStateProperty.fromMap(<WidgetStatesConstraint, EdgeInsetsGeometry>{
-                            WidgetState.any: EdgeInsetsGeometry.zero,
-                          }),
-                        ),
-                        onPressed: () {
-                          if (gl.Mode.openToolbox) {
-                            setState(() {
-                              int index = 0;
-                              for (var it in gl.selLay.geometries) {
-                                if (layer.identifier == it.identifier) {
-                                  setState(() {
-                                    gl.selLay.selectedGeometry = index;
-                                  });
+      int index = 0;
+      for (GeometricLayer layer in gl.geoLayers) {
+        for (pl.Geometry geometry in layer.geometries) {
+          gl.selectableIcons[geometry.selectedPointIcon];
+          if (geometry.visibleOnMap && geometry.numPoints > 0 && geometry.type.contains("Point")) {
+            that.add(
+              Marker(
+                width: geometry.iconSize * gl.display.equipixel,
+                height: geometry.iconSize * gl.display.equipixel,
+                point: LatLng(geometry.points.first.latitude, geometry.points.first.longitude),
+                child:
+                    hitButton && gl.selectedGeoLayer != index
+                        ? IconButton(
+                          highlightColor: Colors.transparent,
+                          alignment: Alignment.center,
+                          style: ButtonStyle(
+                            shape: WidgetStateProperty.fromMap(<WidgetStatesConstraint, ContinuousRectangleBorder>{
+                              WidgetState.any: ContinuousRectangleBorder(),
+                            }),
+                            alignment: AlignmentGeometry.center,
+                            padding: WidgetStateProperty.fromMap(<WidgetStatesConstraint, EdgeInsetsGeometry>{
+                              WidgetState.any: EdgeInsetsGeometry.zero,
+                            }),
+                          ),
+                          onPressed: () {
+                            if (gl.Mode.openToolbox) {
+                              setState(() {
+                                int index = 0;
+                                for (pl.Geometry it in gl.selLay.geometries) {
+                                  if (geometry.identifier == it.identifier) {
+                                    setState(() {
+                                      gl.selLay.selectedGeometry = index;
+                                    });
+                                  }
+                                  index++;
                                 }
-                                index++;
-                              }
-                            });
-                          }
-                        },
-                        icon: Icon(
-                          gl.selectableIcons[layer.selectedPointIcon],
-                          size: layer.iconSize * gl.display.equipixel,
-                          color: layer.colorLine,
+                              });
+                            }
+                          },
+                          icon: Icon(
+                            gl.selectableIcons[geometry.selectedPointIcon],
+                            size: geometry.iconSize * gl.display.equipixel,
+                            color: geometry.colorLine,
+                          ),
+                        )
+                        : Icon(
+                          gl.selectableIcons[geometry.selectedPointIcon],
+                          size: geometry.iconSize * gl.display.equipixel,
+                          color: geometry.colorLine,
                         ),
-                      )
-                      : Icon(
-                        gl.selectableIcons[layer.selectedPointIcon],
-                        size: layer.iconSize * gl.display.equipixel,
-                        color: layer.colorLine,
-                      ),
-            ),
-          );
+              ),
+            );
+          }
+          index++;
         }
       }
     }

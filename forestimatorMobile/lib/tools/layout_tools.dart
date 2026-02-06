@@ -23,11 +23,7 @@ Color getColorFromName(String name) {
 }
 
 Color getColorTextFromBackground(Color background) {
-  List<int> values = [
-    (background.r * 255).round(),
-    (background.g * 255).round(),
-    (background.b * 255).round(),
-  ];
+  List<int> values = [(background.r * 255).round(), (background.g * 255).round(), (background.b * 255).round()];
   int valueAbove128 = 0;
   for (var value in values) {
     if (value > 127) {
@@ -42,31 +38,17 @@ Color getColorTextFromBackground(Color background) {
   }
 }
 
-Widget stroke(
-  double space,
-  double thickness,
-  Color color, {
-  bool vertical = false,
-  double height = 10,
-}) {
+Widget stroke(double space, double thickness, Color color, {bool vertical = false, double height = 10}) {
   return vertical
       ? Row(
         children: [
           SizedBox(width: space),
-          Container(
-            height: gl.display.equipixel * height,
-            width: thickness,
-            color: color,
-          ),
+          Container(height: gl.display.equipixel * height, width: thickness, color: color),
           SizedBox(width: space),
         ],
       )
       : Column(
-        children: [
-          SizedBox(height: space),
-          Container(height: thickness, color: color),
-          SizedBox(height: space),
-        ],
+        children: [SizedBox(height: space), Container(height: thickness, color: color), SizedBox(height: space)],
       );
 }
 
@@ -74,35 +56,16 @@ Widget gridlines() {
   double equiPixelPerLine = gl.display.equipixel * 4;
   return Stack(
     children:
-        List<Widget>.generate((gl.display.width / equiPixelPerLine).round(), (
-          i,
-        ) {
+        List<Widget>.generate((gl.display.width / equiPixelPerLine).round(), (i) {
           return Container(
-            alignment: AlignmentGeometry.xy(
-              (1.0 - (2.0 / (gl.display.width / equiPixelPerLine).round() * i)),
-              0,
-            ),
-            child: Container(
-              height: gl.display.height,
-              width: 1,
-              color: Colors.black,
-            ),
+            alignment: AlignmentGeometry.xy((1.0 - (2.0 / (gl.display.width / equiPixelPerLine).round() * i)), 0),
+            child: Container(height: gl.display.height, width: 1, color: Colors.black),
           );
         }) +
-        List<Widget>.generate((gl.display.height / equiPixelPerLine).round(), (
-          i,
-        ) {
+        List<Widget>.generate((gl.display.height / equiPixelPerLine).round(), (i) {
           return Container(
-            alignment: AlignmentGeometry.xy(
-              0,
-              (1.0 -
-                  (2.0 / (gl.display.height / equiPixelPerLine).round() * i)),
-            ),
-            child: Container(
-              height: 1,
-              width: gl.display.width,
-              color: Colors.black,
-            ),
+            alignment: AlignmentGeometry.xy(0, (1.0 - (2.0 / (gl.display.height / equiPixelPerLine).round() * i))),
+            child: Container(height: 1, width: gl.display.width, color: Colors.black),
           );
         }),
   );
@@ -110,14 +73,12 @@ Widget gridlines() {
 
 ButtonStyle borderlessStyle = ButtonStyle(
   animationDuration: Duration(seconds: 1),
-  backgroundColor: WidgetStateProperty<Color>.fromMap(
-    <WidgetStatesConstraint, Color>{WidgetState.any: Colors.transparent},
-  ),
-  padding: WidgetStateProperty<EdgeInsetsGeometry>.fromMap(
-    <WidgetStatesConstraint, EdgeInsetsGeometry>{
-      WidgetState.any: EdgeInsetsGeometry.zero,
-    },
-  ),
+  backgroundColor: WidgetStateProperty<Color>.fromMap(<WidgetStatesConstraint, Color>{
+    WidgetState.any: Colors.transparent,
+  }),
+  padding: WidgetStateProperty<EdgeInsetsGeometry>.fromMap(<WidgetStatesConstraint, EdgeInsetsGeometry>{
+    WidgetState.any: EdgeInsetsGeometry.zero,
+  }),
 );
 
 class ValidTextField extends StatefulWidget {
@@ -171,9 +132,7 @@ class _ValidTextField extends State<ValidTextField> {
         },
         onEditingComplete: widget.onEditingComplete,
         onTap: () => widget.onTap,
-        style: TextStyle(
-          color: _valid ? widget.validColor : widget.invalidColor,
-        ),
+        style: TextStyle(color: _valid ? widget.validColor : widget.invalidColor),
       ),
     );
   }

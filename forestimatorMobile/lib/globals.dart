@@ -385,6 +385,10 @@ bool get geoReady =>
     geoLayers[selectedGeoLayer].selectedGeometry > -1 &&
     geoLayers[selectedGeoLayer].geometries.isNotEmpty;
 
+double get equiPxl => display.equipixel;
+double get equiPxlH => display.equiheight;
+double get equiPxlW => display.equiwidth;
+
 List<GeometricLayer> geoLayers = [];
 int selectedGeoLayer = -1;
 

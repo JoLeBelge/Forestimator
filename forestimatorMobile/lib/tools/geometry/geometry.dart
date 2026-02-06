@@ -21,6 +21,8 @@ class Attribute {
   bool visibleOnMapLabel;
 
   Attribute({required this.name, this.type = "string", this.value = "", this.visibleOnMapLabel = false});
+
+  Attribute get clone => Attribute(name: name, type: type, value: value, visibleOnMapLabel: visibleOnMapLabel);
 }
 
 class Geometry {
@@ -75,11 +77,6 @@ class Geometry {
 
   Geometry.essencePoint({String polygonName = ""}) {
     type = "Point-essence";
-    attributes.addAll([
-      Attribute(name: "essence", type: "string", value: gl.essenceChoice[0]),
-      Attribute(name: "rmq", type: "string", value: ""),
-    ]);
-    attributes[1].visibleOnMapLabel = true;
     visibleOnMap = true;
     name = polygonName;
     selectedPointIcon = 4;

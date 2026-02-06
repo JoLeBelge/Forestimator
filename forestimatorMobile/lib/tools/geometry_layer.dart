@@ -22,8 +22,7 @@ class GeometricLayer {
 
   List<Geometry> geometries = [];
 
-  GeometricLayer({String name = ""}) {
-    name = "";
+  GeometricLayer({this.name = ""}) {
     type = "";
     subtype = "";
     Random rand = Random();
@@ -40,12 +39,15 @@ class GeometricLayer {
   GeometricLayer.essence() {
     type = "Point";
     subtype = "Essence";
-    Random rand = Random();
-    defaultColor = Color.fromRGBO(rand.nextInt(256), rand.nextInt(256), rand.nextInt(256), 1.0);
+    defaultColor = Colors.black;
+    defaultPointIcon = 4;
     defaultAttributes.addAll([
       Attribute(name: "essence", type: "string", value: gl.essenceChoice[0]),
       Attribute(name: "rmq", type: "string", value: ""),
     ]);
+    defaultAttributes[0].visibleOnMapLabel = true;
+    name = "Observations Essences";
+    serialize();
   }
 
   GeometricLayer.polygon() {
@@ -72,7 +74,9 @@ class GeometricLayer {
     geometries.last.setColorLine(defaultColor);
     geometries.last.selectedPointIcon = defaultPointIcon;
     geometries.last.iconSize = defaultIconSize;
-    geometries.last.attributes.addAll(defaultAttributes);
+    for (Attribute a in defaultAttributes) {
+      geometries.last.attributes.add(a.clone);
+    }
     geometries.last.serialize(layerId: id);
   }
 
@@ -211,9 +215,7 @@ class GeometricLayer {
   }
 
   void _deserializAllPolys() {
-    print(id);
     List<String> polykeys = gl.shared!.getStringList('$id.polyKeys') ?? <String>[];
-    print(polykeys);
     for (String key in polykeys) {
       geometries.add(Geometry());
       geometries.last.deserialze(key);
@@ -257,5 +259,19 @@ class GeometricLayer {
 
   void sendLayerPolys() async {
     //TODO: sendLayer
+  }
+
+  static GeometricLayer getEssenceLayer() {
+    int index = 0;
+    for (GeometricLayer g in gl.geoLayers) {
+      if (g.type == "Point" && g.subtype == "Essence") {
+        gl.selectedGeoLayer = index;
+        return g;
+      }
+      index++;
+    }
+    gl.geoLayers.add(GeometricLayer.essence());
+    gl.selectedGeoLayer = gl.geoLayers.length - 1;
+    return gl.geoLayers.last;
   }
 }
