@@ -9,7 +9,7 @@ import 'package:fforestimator/pages/catalogueView/layer_tile.dart';
 import 'package:fforestimator/pages/catalogueView/legend_view.dart';
 import 'package:fforestimator/pages/pdf_screen.dart';
 import 'package:fforestimator/tools/geometry_layer.dart';
-import 'package:fforestimator/tools/layout_tools.dart';
+import 'package:fforestimator/tools/layout_tools.dart' as lt;
 import 'package:fforestimator/tools/customLayer/path_layer.dart';
 import 'package:fforestimator/tools/geometry/geometry.dart';
 import 'package:fforestimator/tools/handle_permissions.dart';
@@ -695,7 +695,7 @@ class PopupNewGeometricLayer {
                       type = it;
                     },
                   ),
-                  stroke(gl.equiPxl, gl.equiPxl * .5, gl.colorAgroBioTech),
+                  lt.stroke(gl.equiPxl, gl.equiPxl * .5, gl.colorAgroBioTech),
                   Text(
                     "Introduisez un nom",
                     style: TextStyle(color: Colors.white, fontSize: gl.equiPxl * gl.fontSizeM),
@@ -880,7 +880,7 @@ class PopupUserData {
                     "Renseignements personnels",
                     style: TextStyle(color: Colors.white, fontSize: gl.equiPxl * gl.fontSizeM),
                   ),
-                  stroke(gl.equiPxl, gl.equiPxl * .5, gl.colorAgroBioTech),
+                  lt.stroke(gl.equiPxl, gl.equiPxl * .5, gl.colorAgroBioTech),
                   Text("Votre nom", style: TextStyle(color: Colors.white, fontSize: gl.equiPxl * gl.fontSizeM)),
                   SizedBox(
                     width: gl.menuBarLength * gl.equiPxl,
@@ -910,7 +910,7 @@ class PopupUserData {
                     ),
                   ),
                   Text("Mail de contact", style: TextStyle(color: Colors.white, fontSize: gl.equiPxl * gl.fontSizeM)),
-                  ValidTextField(
+                  lt.ValidTextField(
                     width: gl.menuBarLength * gl.equiPxl,
                     height: gl.menuBarThickness * gl.equiPxl,
                     validate: gl.UserData.validMail,
@@ -944,7 +944,7 @@ class PopupUserData {
                       },
                     ),
                   ),
-                  stroke(vertical: true, gl.equiPxl, gl.equiPxl * .5, Colors.transparent),
+                  lt.stroke(vertical: true, gl.equiPxl, gl.equiPxl * .5, Colors.transparent),
                   SizedBox(
                     width: gl.menuBarLength * .5 * gl.equiPxl,
                     child: TextButton(
@@ -1017,7 +1017,7 @@ class PopupNewAttribute {
                       textEditorVal.text = "";
                     },
                   ),
-                  stroke(gl.equiPxl, gl.equiPxl * .5, gl.colorAgroBioTech),
+                  lt.stroke(gl.equiPxl, gl.equiPxl * .5, gl.colorAgroBioTech),
                   Text(
                     "Introduisez un nom",
                     style: TextStyle(color: Colors.white, fontSize: gl.equiPxl * gl.fontSizeM),
@@ -1105,7 +1105,7 @@ class PopupNewAttribute {
                       },
                     ),
                   ),
-                  stroke(vertical: true, gl.equiPxl, gl.equiPxl * .5, Colors.transparent),
+                  lt.stroke(vertical: true, gl.equiPxl, gl.equiPxl * .5, Colors.transparent),
                   SizedBox(
                     width: gl.menuBarLength * .5 * gl.equiPxl,
                     child: TextButton(
@@ -1169,9 +1169,9 @@ class PopupNewEssenceObservationPoint {
                     "Observation essence",
                     style: TextStyle(color: Colors.white, fontSize: gl.equiPxl * gl.fontSizeM),
                   ),
-                  stroke(gl.equiPxl, gl.equiPxl * .5, gl.colorAgroBioTech),
+                  lt.stroke(gl.equiPxl, gl.equiPxl * .5, gl.colorAgroBioTech),
                   SelectEssence(),
-                  stroke(gl.equiPxl, gl.equiPxl * .5, gl.colorAgroBioTech),
+                  lt.stroke(gl.equiPxl, gl.equiPxl * .5, gl.colorAgroBioTech),
                 ],
               ),
               Row(
@@ -1189,7 +1189,7 @@ class PopupNewEssenceObservationPoint {
                       },
                     ),
                   ),
-                  stroke(vertical: true, gl.equiPxl, gl.equiPxl * .5, Colors.transparent),
+                  lt.stroke(vertical: true, gl.equiPxl, gl.equiPxl * .5, Colors.transparent),
                   SizedBox(
                     width: gl.menuBarLength * .5 * gl.equiPxl,
                     child: TextButton(
@@ -1364,7 +1364,7 @@ class PopupValueChange {
                           controller: textEditor,
                           style: TextStyle(color: Colors.white),
                         )
-                        : ValidTextField(
+                        : lt.ValidTextField(
                           initialValue: gl.UserData.mail,
                           width: gl.menuBarLength * gl.equiPxl,
                           height: gl.menuBarThickness * gl.equiPxl,
@@ -1390,7 +1390,7 @@ class PopupValueChange {
                       },
                     ),
                   ),
-                  stroke(vertical: true, gl.equiPxl, gl.equiPxl * .5, Colors.transparent),
+                  lt.stroke(vertical: true, gl.equiPxl, gl.equiPxl * .5, Colors.transparent),
                   SizedBox(
                     width: gl.menuBarLength * .5 * gl.equiPxl,
                     child: TextButton(
@@ -1553,7 +1553,7 @@ class PopupSelectAttributeSet {
                   },
                 ),
               ),
-              stroke(gl.equiPxl, gl.equiPxl * .5, gl.colorAgroBioTech),
+              lt.stroke(gl.equiPxl, gl.equiPxl * .5, gl.colorAgroBioTech),
               Row(
                 children: [
                   SizedBox(
@@ -1587,7 +1587,7 @@ class PopupSelectAttributeSet {
                       },
                     ),
                   ),
-                  stroke(vertical: true, gl.equiPxl, gl.equiPxl * .5, Colors.transparent),
+                  lt.stroke(vertical: true, gl.equiPxl, gl.equiPxl * .5, Colors.transparent),
                   SizedBox(
                     width: gl.menuBarLength * .5 * gl.equiPxl,
                     child: TextButton(
@@ -2359,11 +2359,11 @@ class _PolygonListMenu extends State<PolygonListMenu> {
 }
 
 class GeoLayerListMenu extends StatefulWidget {
-  final ValueChanged<LatLng> state;
+  final ValueChanged<LatLng> mapmove;
   final VoidCallback after;
   final double windowHeight;
 
-  const GeoLayerListMenu({super.key, required this.state, required this.after, required this.windowHeight});
+  const GeoLayerListMenu({super.key, required this.mapmove, required this.after, required this.windowHeight});
 
   @override
   State<StatefulWidget> createState() => _GeoLayerListMenu();
@@ -2405,14 +2405,14 @@ class _GeoLayerListMenu extends State<GeoLayerListMenu> {
             (gl.fontSizeXL * 1.2) -
             gl.popupReturnButtonHeight -
             (gl.polyNewPolygonButtonHeight * .9) -
-            2.5 - //stroke
+            2.5 - //lt.stroke
             10);
     if (!_titleLayer) {
       listPartHeight =
           gl.equiPxl *
           (widget.windowHeight -
               (gl.fontSizeXL * 1.2) -
-              2.5 - //stroke
+              2.5 - //lt.stroke
               10);
     }
     return Scaffold(
@@ -2451,7 +2451,7 @@ class _GeoLayerListMenu extends State<GeoLayerListMenu> {
                 ],
               ),
             ),
-            stroke(vertical: false, gl.equiPxl, gl.equiPxl * .5, gl.colorAgroBioTech),
+            lt.stroke(vertical: false, gl.equiPxl, gl.equiPxl * .5, gl.colorAgroBioTech),
             SizedBox(
               width: gl.equiPxl * gl.popupWindowsPortraitWidth,
               height: listPartHeight,
@@ -2917,7 +2917,7 @@ class _GeoLayerListMenu extends State<GeoLayerListMenu> {
                         _titleLayer = true;
                       });
                       _pageController.animateToPage(0, duration: Duration(milliseconds: 300), curve: Curves.easeInOut);
-                    }),
+                    }, widget.mapmove),
                 ],
               ),
             ),
@@ -2977,61 +2977,19 @@ class _GeoLayerListMenu extends State<GeoLayerListMenu> {
       ]),
     );
   }
-
-  List<Widget> _getLayerPropertiesPage() {
-    return [
-      Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              IconButton(
-                onPressed: () {
-                  PopupColorChooser(
-                    gl.layerReady ? gl.selLay.defaultColor : Colors.transparent,
-                    gl.notificationContext!,
-                    (Color col) {
-                      setState(() {
-                        if (gl.layerReady) gl.selLay.defaultColor = col;
-                      });
-                    },
-                    () {},
-                    () {
-                      gl.selLay.serialize();
-                    },
-                  );
-                },
-                icon: Icon(
-                  Icons.color_lens,
-                  color: gl.layerReady ? gl.selLay.defaultColor : Colors.transparent,
-                  size: gl.equiPxl * gl.iconSizeM * .75,
-                ),
-              ),
-            ],
-          ),
-          stroke(vertical: false, gl.equiPxl, gl.equiPxl * .5, gl.colorAgroBioTech),
-
-          stroke(vertical: false, gl.equiPxl, gl.equiPxl * .5, gl.colorAgroBioTech),
-          SizedBox(
-            width: gl.equiPxl * gl.popupWindowsPortraitWidth,
-            height: gl.equiPxl * widget.windowHeight * .75,
-            child: PolygonListMenu(state: widget.state, after: widget.after, height: widget.windowHeight * .6),
-          ),
-        ],
-      ),
-    ];
-  }
 }
 
 class LayerPropertiesPage extends StatefulWidget {
   final VoidCallback closePage;
-  const LayerPropertiesPage(this.closePage, {super.key});
+  final void Function(LatLng) mapmove;
+  const LayerPropertiesPage(this.closePage, this.mapmove, {super.key});
 
   @override
   State<StatefulWidget> createState() => _LayerPropertiesPage();
 }
 
 class _LayerPropertiesPage extends State<LayerPropertiesPage> {
+  bool _doingAnaPt = false;
   TextEditingController? controllerPdfName;
   TextEditingController? controllerLocationName;
 
@@ -3091,23 +3049,13 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
                                 style: TextStyle(color: Colors.black, fontSize: gl.equiPxl * gl.fontSizeXS),
                               ),
                             ),
-                            stroke(gl.equiPxl, gl.equiPxl * .5, gl.colorAgroBioTech),
+                            lt.stroke(gl.equiPxl, gl.equiPxl * .5, gl.colorAgroBioTech),
                             Container(
                               padding: EdgeInsets.all(0),
                               width: gl.equiPxl * gl.onCatalogueWidth * .9,
                               height: gl.equiPxl * gl.onCatalogueMapHeight * .4,
                               child: TextButton(
-                                style: ButtonStyle(
-                                  animationDuration: Duration(seconds: 1),
-                                  backgroundColor: WidgetStateProperty<Color>.fromMap(<WidgetStatesConstraint, Color>{
-                                    WidgetState.any: Colors.transparent,
-                                  }),
-                                  padding: WidgetStateProperty<EdgeInsetsGeometry>.fromMap(
-                                    <WidgetStatesConstraint, EdgeInsetsGeometry>{
-                                      WidgetState.any: EdgeInsetsGeometry.zero,
-                                    },
-                                  ),
-                                ),
+                                style: lt.transparentNoPadding,
                                 onPressed: () {
                                   setState(() {
                                     PopupValueChange(
@@ -3146,7 +3094,7 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
                                 ),
                               ),
                             ),
-                            stroke(gl.equiPxl, gl.equiPxl * .5, gl.colorAgroBioTech),
+                            lt.stroke(gl.equiPxl, gl.equiPxl * .5, gl.colorAgroBioTech),
                             Container(
                               padding: EdgeInsets.all(0),
                               width: gl.equiPxl * gl.onCatalogueWidth * .9,
@@ -3157,7 +3105,7 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
                                 style: TextStyle(color: Colors.black, fontSize: gl.equiPxl * gl.fontSizeXS),
                               ),
                             ),
-                            stroke(gl.equiPxl, gl.equiPxl * .5, gl.colorAgroBioTech),
+                            lt.stroke(gl.equiPxl, gl.equiPxl * .5, gl.colorAgroBioTech),
                             Container(
                               padding: EdgeInsets.all(0),
                               width: gl.equiPxl * gl.onCatalogueWidth * .9,
@@ -3168,7 +3116,7 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
                                 style: TextStyle(color: Colors.black, fontSize: gl.equiPxl * gl.fontSizeM),
                               ),
                             ),
-                            stroke(gl.equiPxl, gl.equiPxl * .5, gl.colorAgroBioTech),
+                            lt.stroke(gl.equiPxl, gl.equiPxl * .5, gl.colorAgroBioTech),
                             Container(
                               padding: EdgeInsets.all(0),
                               width: gl.equiPxl * gl.onCatalogueWidth * .9,
@@ -3179,7 +3127,7 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
                                 style: TextStyle(color: Colors.black, fontSize: gl.equiPxl * gl.fontSizeXS),
                               ),
                             ),
-                            stroke(gl.equiPxl, gl.equiPxl * .5, gl.colorAgroBioTech),
+                            lt.stroke(gl.equiPxl, gl.equiPxl * .5, gl.colorAgroBioTech),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
@@ -3194,6 +3142,32 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
                                 ),
                                 SizedBox(width: gl.equiPxl * gl.iconSizeXS),
                               ],
+                            ),
+                            lt.stroke(gl.equiPxl, gl.equiPxl * .5, gl.colorAgroBioTech),
+                            Container(
+                              alignment: Alignment.center,
+                              width: gl.equiPxl * gl.iconSizeS,
+                              height: gl.equiPxl * gl.iconSizeS,
+                              child: IconButton(
+                                style: lt.transparentNoPadding,
+                                onPressed: () {
+                                  PopupDoYouReally(
+                                    gl.notificationContext!,
+                                    () {
+                                      setState(() {
+                                        GeometricLayer.deleteLayer(gl.selectedGeoLayer);
+                                        if (gl.selectedGeoLayer > -1) {
+                                          gl.selectedGeoLayer--;
+                                        }
+                                      });
+                                      widget.closePage();
+                                    },
+                                    "Message",
+                                    "\nVoulez vous vraiment supprimer ${gl.selLay.name}?\n",
+                                  );
+                                },
+                                icon: Icon(Icons.delete_forever, color: Colors.black, size: gl.equiPxl * gl.iconSizeS),
+                              ),
                             ),
                           ],
                         ),
@@ -3223,7 +3197,7 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
                     color: Colors.white.withAlpha(200),
                     child: ListBody(
                       children: [
-                        stroke(gl.display.equipixel, gl.display.equipixel * .5, gl.colorAgroBioTech),
+                        lt.stroke(gl.display.equipixel, gl.display.equipixel * .5, gl.colorAgroBioTech),
                         Column(
                           children: [
                             Row(
@@ -3241,7 +3215,7 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
                                     ),
                                   ),
                                 ),
-                                stroke(
+                                lt.stroke(
                                   vertical: true,
                                   gl.display.equipixel,
                                   gl.display.equipixel * 0.5,
@@ -3255,7 +3229,7 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
                                     size: gl.display.equipixel * gl.iconSizeXS,
                                   ),
                                 ),
-                                stroke(
+                                lt.stroke(
                                   vertical: true,
                                   gl.display.equipixel,
                                   gl.display.equipixel * 0.5,
@@ -3275,7 +3249,7 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
                                 ),
                               ],
                             ),
-                            stroke(gl.display.equipixel, gl.display.equipixel * 0.5, gl.colorAgroBioTech),
+                            lt.stroke(gl.display.equipixel, gl.display.equipixel * 0.5, gl.colorAgroBioTech),
                             Scrollbar(
                               scrollbarOrientation: ScrollbarOrientation.right,
                               thickness: gl.display.equipixel * 3,
@@ -3354,7 +3328,7 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
                                                     ),
                                                   ),
                                                 ),
-                                                stroke(
+                                                lt.stroke(
                                                   vertical: true,
                                                   gl.display.equipixel,
                                                   gl.display.equipixel * 0.5,
@@ -3399,7 +3373,7 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
                                                             ),
                                                   ),
                                                 ),
-                                                stroke(
+                                                lt.stroke(
                                                   vertical: true,
                                                   gl.display.equipixel,
                                                   gl.display.equipixel * 0.5,
@@ -3465,7 +3439,7 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
                                                 ),
                                               ],
                                             ),
-                                            stroke(
+                                            lt.stroke(
                                               gl.display.equipixel,
                                               gl.display.equipixel * .5,
                                               gl.colorAgroBioTech,
@@ -3588,8 +3562,250 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
                       children: List<Widget>.generate(gl.layerReady ? gl.selLay.geometries.length : 0, (int index) {
                         return Column(
                           children: [
-                            Text(gl.selLay.geometries[index].name),
-                            stroke(gl.display.equipixel, gl.display.equipixel * .5, gl.colorAgroBioTech),
+                            Container(
+                              padding: EdgeInsets.all(0),
+                              width: gl.equiPxl * gl.onCatalogueWidth * .9,
+                              height: gl.equiPxl * gl.onCatalogueMapHeight * .17,
+                              child: TextButton(
+                                style: lt.transparentNoPadding,
+                                onPressed: () {
+                                  setState(() {
+                                    PopupValueChange(
+                                      "string",
+                                      gl.layerReady ? gl.selLay.geometries[index].name : "",
+                                      (value) {
+                                        setState(() {
+                                          gl.selLay.geometries[index].name = value.toString();
+                                        });
+                                      },
+                                      () {},
+                                      () {
+                                        gl.selLay.geometries[index].serialize();
+                                      },
+                                    );
+                                  });
+                                },
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Icon(Icons.edit, size: gl.equiPxl * gl.iconSizeXXS, color: Colors.black),
+                                    Container(
+                                      alignment: Alignment.center,
+                                      width: gl.equiPxl * 65,
+                                      child: SingleChildScrollView(
+                                        scrollDirection: Axis.horizontal,
+                                        child: Text(
+                                          gl.layerReady ? gl.selLay.geometries[index].name : "",
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(color: Colors.black, fontSize: gl.equiPxl * gl.fontSizeXS),
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(width: gl.equiPxl * gl.iconSizeXXS),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                Row(
+                                  children: [
+                                    gl.selLay.geometries[index].containsAttribute("essence") &&
+                                            gl.selLay.geometries[index].containsAttribute("rmq")
+                                        ? Container(
+                                          alignment: Alignment.center,
+                                          width: gl.equiPxl * gl.iconSizeS,
+                                          height: gl.equiPxl * gl.iconSizeS,
+                                          child: IconButton(
+                                            style: lt.transparentNoPadding,
+                                            onPressed: () {
+                                              if (gl.UserData.forename.isEmpty ||
+                                                  gl.UserData.name.isEmpty ||
+                                                  gl.UserData.mail.isEmpty) {
+                                                PopupUserData(
+                                                  context,
+                                                  () {},
+                                                  () {
+                                                    PopupDoYouReally(
+                                                      context,
+                                                      () {
+                                                        gl.selLay.geometries[index].sendGeometryToServer();
+                                                      },
+                                                      "Attention !",
+                                                      gl.labelSendCompoFeature,
+                                                      "Envoyer",
+                                                      "Ne pas envoyer",
+                                                    );
+                                                  },
+                                                  oldForename: gl.UserData.forename,
+                                                  oldName: gl.UserData.name,
+                                                  oldMail: gl.UserData.mail,
+                                                );
+                                              } else {
+                                                PopupDoYouReally(
+                                                  context,
+                                                  () {
+                                                    gl.selLay.geometries[index].sendGeometryToServer();
+                                                  },
+                                                  "Attention !",
+                                                  gl.labelSendCompoFeature,
+                                                  "Envoyer",
+                                                  "Ne pas envoyer",
+                                                );
+                                              }
+                                            },
+                                            icon: Icon(
+                                              Icons.send_and_archive,
+                                              color: Colors.black,
+                                              size: gl.iconSizeXS * gl.equiPxl,
+                                            ),
+                                          ),
+                                        )
+                                        : SizedBox(width: gl.equiPxl * gl.iconSizeS, height: gl.equiPxl * gl.iconSizeS),
+                                    (gl.selLay.geometries[index].type == "Polygon" &&
+                                            gl.selLay.geometries[index].points.length > 2)
+                                        ? Container(
+                                          alignment: Alignment.center,
+                                          width: gl.equiPxl * gl.iconSizeS,
+                                          height: gl.equiPxl * gl.iconSizeS,
+                                          child: IconButton(
+                                            style: lt.transparentNoPadding,
+                                            onPressed: () async {
+                                              if (await gl.selLay.geometries[index].onlineSurfaceAnalysis()) {
+                                                gl.mainStack.add(
+                                                  popupAnaSurfResultsMenu(
+                                                    gl.notificationContext!,
+                                                    gl.selLay.geometries[index].decodedJson,
+                                                    () {
+                                                      gl.refreshMainStack(() {});
+                                                    },
+                                                    () {
+                                                      gl.refreshMainStack(() {});
+                                                    },
+                                                  ),
+                                                );
+                                                gl.refreshMainStack(() {});
+                                              }
+                                            },
+                                            icon: Icon(
+                                              Icons.analytics,
+                                              color: Colors.black,
+                                              size: gl.equiPxl * gl.iconSizeXS,
+                                            ),
+                                          ),
+                                        )
+                                        : SizedBox(width: gl.equiPxl * gl.iconSizeS, height: gl.equiPxl * gl.iconSizeS),
+                                    (gl.selLay.geometries[index].type.contains("Point") &&
+                                            gl.selLay.geometries[index].points.isNotEmpty)
+                                        ? Container(
+                                          alignment: Alignment.center,
+                                          width: gl.equiPxl * gl.iconSizeS,
+                                          height: gl.equiPxl * gl.iconSizeS,
+                                          child: IconButton(
+                                            style: lt.transparentNoPadding,
+                                            onPressed: () async {
+                                              if (!_doingAnaPt) {
+                                                _doingAnaPt = true;
+                                                await gl.selLay.geometries[index].runAnaPt();
+                                                gl.refreshMainStack(() {
+                                                  PopupAnaResultsMenu(gl.notificationContext!, gl.requestedLayers, () {
+                                                    setState(() {});
+                                                  });
+                                                });
+
+                                                _doingAnaPt = false;
+                                              }
+                                            },
+                                            icon: Icon(
+                                              Icons.location_pin,
+                                              color: Colors.black,
+                                              size: gl.equiPxl * gl.iconSizeXS,
+                                            ),
+                                          ),
+                                        )
+                                        : SizedBox(width: gl.equiPxl * gl.iconSizeS, height: gl.equiPxl * gl.iconSizeS),
+                                  ],
+                                ),
+                                gl.selLay.geometries[index].sentToServer
+                                    ? Container(
+                                      alignment: Alignment.center,
+                                      width: gl.equiPxl * gl.iconSizeS,
+                                      height: gl.equiPxl * gl.iconSizeS,
+                                      child: Text(
+                                        "SENT",
+                                        style: TextStyle(
+                                          color: Colors.red,
+                                          fontSize: gl.display.equipixel * gl.fontSizeXXS,
+                                        ),
+                                      ),
+                                    )
+                                    : SizedBox(width: gl.equiPxl * gl.iconSizeS, height: gl.equiPxl * gl.iconSizeS),
+                                (gl.selLay.geometries[index].center.longitude != 0.0 &&
+                                        gl.selLay.geometries[index].center.latitude != 0.0)
+                                    ? Container(
+                                      alignment: Alignment.center,
+                                      width: gl.display.equipixel * gl.iconSizeS,
+                                      height: gl.equiPxl * gl.iconSizeS,
+                                      child: IconButton(
+                                        style: lt.borderlessStyle,
+                                        onPressed: () {
+                                          gl.selLay.geometries[index].visibleOnMap = true;
+                                          gl.selLay.geometries[index].serialize();
+                                          setState(() {
+                                            widget.mapmove(gl.selLay.geometries[index].center);
+                                          });
+                                          gl.refreshMainStack(() {
+                                            gl.modeMapShowPolygons = true;
+                                          });
+                                        },
+                                        icon: Icon(
+                                          Icons.gps_fixed,
+                                          size: gl.display.equipixel * gl.iconSizeXS,
+                                          opticalSize: gl.display.equipixel * gl.iconSizeS,
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                    )
+                                    : SizedBox(
+                                      width: gl.display.equipixel * gl.iconSizeS,
+                                      height: gl.equiPxl * gl.iconSizeS,
+                                    ),
+                                Container(
+                                  alignment: Alignment.center,
+                                  width: gl.equiPxl * gl.iconSizeS,
+                                  height: gl.equiPxl * gl.iconSizeS,
+                                  child: IconButton(
+                                    style: lt.transparentNoPadding,
+                                    onPressed: () {
+                                      PopupDoYouReally(
+                                        gl.notificationContext!,
+                                        () {
+                                          setState(() {
+                                            Geometry.removePolyFromShared(gl.selLay.geometries[index].id);
+                                            if (index > 0) {
+                                              gl.selLay.geometries.removeAt(index);
+                                              gl.selLay.selectedGeometry--;
+                                            } else if (index == 0 && gl.selLay.geometries.isNotEmpty) {
+                                              gl.selLay.geometries.removeAt(index);
+                                            }
+                                          });
+                                        },
+                                        "Message",
+                                        "\nVoulez vous vraiment supprimer ${gl.selLay.geometries[index].name}?\n",
+                                      );
+                                    },
+                                    icon: Icon(
+                                      Icons.delete_forever,
+                                      color: Colors.black,
+                                      size: gl.equiPxl * gl.iconSizeXS,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            if (index < gl.selLay.geometries.length - 1)
+                              lt.stroke(gl.display.equipixel, gl.display.equipixel * .5, gl.colorAgroBioTech),
                           ],
                         );
                       }),
@@ -3624,7 +3840,7 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
                 style: TextStyle(color: Colors.black, fontSize: gl.fontSizeXXS * gl.display.equipixel),
               ),
             ),
-            stroke(vertical: true, gl.display.equipixel, gl.display.equipixel * 0.5, gl.colorAgroBioTech),
+            lt.stroke(vertical: true, gl.display.equipixel, gl.display.equipixel * 0.5, gl.colorAgroBioTech),
             SizedBox(
               width: gl.display.equipixel * 7,
               child:
@@ -3636,7 +3852,7 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
                         size: gl.display.equipixel * gl.iconSizeXS,
                       ),
             ),
-            stroke(vertical: true, gl.display.equipixel, gl.display.equipixel * 0.5, gl.colorAgroBioTech),
+            lt.stroke(vertical: true, gl.display.equipixel, gl.display.equipixel * 0.5, gl.colorAgroBioTech),
             Container(
               alignment: Alignment.centerLeft,
               width: gl.display.equipixel * (!noValues ? 32 : 64),
@@ -3646,7 +3862,7 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
               ),
             ),
             if (!noValues)
-              stroke(vertical: true, gl.display.equipixel, gl.display.equipixel * 0.5, gl.colorAgroBioTech),
+              lt.stroke(vertical: true, gl.display.equipixel, gl.display.equipixel * 0.5, gl.colorAgroBioTech),
             if (!noValues)
               Container(
                 alignment: Alignment.centerLeft,
@@ -3662,7 +3878,7 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
               ),
           ],
         ),
-        stroke(gl.display.equipixel, gl.display.equipixel * 0.5, gl.colorAgroBioTech),
+        lt.stroke(gl.display.equipixel, gl.display.equipixel * 0.5, gl.colorAgroBioTech),
       ],
     );
   }
@@ -3761,16 +3977,18 @@ class _PathListMenu extends State<PathListMenu> {
                 children: List<TextButton>.generate(gl.pathLayers.isEmpty ? 0 : gl.pathLayers.length, (int i) {
                   Color activeTextColor =
                       i == gl.selectedpathLayer
-                          ? getColorTextFromBackground(
+                          ? lt.getColorTextFromBackground(
                             i == gl.selectedpathLayer
                                 ? gl.pathLayers[i].colorInside.withAlpha(255)
                                 : Colors.grey.withAlpha(100),
                           )
-                          : getColorTextFromBackground(
-                            i == gl.selectedpathLayer
-                                ? gl.pathLayers[i].colorInside.withAlpha(255)
-                                : Colors.grey.withAlpha(100),
-                          ).withAlpha(128);
+                          : lt
+                              .getColorTextFromBackground(
+                                i == gl.selectedpathLayer
+                                    ? gl.pathLayers[i].colorInside.withAlpha(255)
+                                    : Colors.grey.withAlpha(100),
+                              )
+                              .withAlpha(128);
                   return TextButton(
                     style: ButtonStyle(
                       fixedSize:
@@ -4400,7 +4618,7 @@ class _SearchResultCard extends State<SearchResultCard> {
                   child: Text(
                     widget.typeDeResultat,
                     style: TextStyle(
-                      color: getColorTextFromBackground(widget.boxColor),
+                      color: lt.getColorTextFromBackground(widget.boxColor),
                       fontSize: gl.equiPxl * gl.fontSizeS,
                     ),
                   ),
@@ -4417,7 +4635,7 @@ class _SearchResultCard extends State<SearchResultCard> {
                         widget.descriptionDeResultat,
                         textAlign: TextAlign.justify,
                         style: TextStyle(
-                          color: getColorTextFromBackground(widget.boxColor),
+                          color: lt.getColorTextFromBackground(widget.boxColor),
                           fontSize: gl.equiPxl * gl.fontSizeS,
                         ),
                       ),
@@ -4558,7 +4776,7 @@ class _SearchMenu extends State<SearchMenu> {
                                 );
                                 searchResults.add(
                                   SearchResultCard(
-                                    boxColor: getColorFromName(typeDeResultat),
+                                    boxColor: lt.getColorFromName(typeDeResultat),
                                     state: widget.state,
                                     typeDeResultat: typeDeResultat,
                                     entry: LatLng(double.parse(entry['lat']), double.parse(entry['lon'])),
@@ -4588,7 +4806,7 @@ class _SearchMenu extends State<SearchMenu> {
                                     descriptionDeResultat = descriptionDeResultat.replaceAll("Wallonie, ", "");
                                     descriptionDeResultat = descriptionDeResultat.replaceAll("Belgique", "");
                                   }
-                                  Color boxColor = getColorFromName(typeDeResultat!);
+                                  Color boxColor = lt.getColorFromName(typeDeResultat!);
                                   gl.poiMarkerList.add(
                                     gl.PoiMarker(
                                       index: i++,
@@ -4794,14 +5012,14 @@ class _ForestimatorSettingsUserData extends State<ForestimatorSettingsUserData> 
           padding: EdgeInsets.all(7.5),
           child: Column(
             children: [
-              stroke(vertical: false, gl.equiPxl, gl.equiPxl * .5, gl.colorAgroBioTech),
+              lt.stroke(vertical: false, gl.equiPxl, gl.equiPxl * .5, gl.colorAgroBioTech),
               Row(
                 children: [
                   SizedBox(
                     width: gl.equiPxl * 40,
                     child: Text("Prénom", style: TextStyle(color: Colors.black, fontSize: gl.equiPxl * gl.fontSizeS)),
                   ),
-                  stroke(vertical: true, gl.equiPxl, gl.equiPxl * .5, gl.colorAgroBioTech),
+                  lt.stroke(vertical: true, gl.equiPxl, gl.equiPxl * .5, gl.colorAgroBioTech),
                   Container(
                     alignment: Alignment.center,
                     width: gl.equiPxl * 40,
@@ -4850,14 +5068,14 @@ class _ForestimatorSettingsUserData extends State<ForestimatorSettingsUserData> 
                   ),
                 ],
               ),
-              stroke(vertical: false, gl.equiPxl, gl.equiPxl * .5, gl.colorAgroBioTech),
+              lt.stroke(vertical: false, gl.equiPxl, gl.equiPxl * .5, gl.colorAgroBioTech),
               Row(
                 children: [
                   SizedBox(
                     width: gl.equiPxl * 40,
                     child: Text("Nom", style: TextStyle(color: Colors.black, fontSize: gl.equiPxl * gl.fontSizeS)),
                   ),
-                  stroke(vertical: true, gl.equiPxl, gl.equiPxl * .5, gl.colorAgroBioTech),
+                  lt.stroke(vertical: true, gl.equiPxl, gl.equiPxl * .5, gl.colorAgroBioTech),
                   Container(
                     alignment: Alignment.center,
                     width: gl.equiPxl * 40,
@@ -4906,14 +5124,14 @@ class _ForestimatorSettingsUserData extends State<ForestimatorSettingsUserData> 
                   ),
                 ],
               ),
-              stroke(vertical: false, gl.equiPxl, gl.equiPxl * .5, gl.colorAgroBioTech),
+              lt.stroke(vertical: false, gl.equiPxl, gl.equiPxl * .5, gl.colorAgroBioTech),
               Row(
                 children: [
                   SizedBox(
                     width: gl.equiPxl * 40,
                     child: Text("Mail", style: TextStyle(color: Colors.black, fontSize: gl.equiPxl * gl.fontSizeS)),
                   ),
-                  stroke(vertical: true, gl.equiPxl, gl.equiPxl * .5, gl.colorAgroBioTech),
+                  lt.stroke(vertical: true, gl.equiPxl, gl.equiPxl * .5, gl.colorAgroBioTech),
                   Container(
                     alignment: Alignment.center,
                     width: gl.equiPxl * 40,
@@ -4962,7 +5180,7 @@ class _ForestimatorSettingsUserData extends State<ForestimatorSettingsUserData> 
                   ),
                 ],
               ),
-              stroke(vertical: false, gl.equiPxl, gl.equiPxl * .5, gl.colorAgroBioTech),
+              lt.stroke(vertical: false, gl.equiPxl, gl.equiPxl * .5, gl.colorAgroBioTech),
             ],
           ),
         );
@@ -5235,7 +5453,7 @@ class _ForestimatorLog extends State<ForestimatorLog> {
                             ),
                           ],
                         ),
-                        if (lengthLog != i + 1) stroke(gl.equiPxl, gl.equiPxl * .5, gl.colorAgroBioTech),
+                        if (lengthLog != i + 1) lt.stroke(gl.equiPxl, gl.equiPxl * .5, gl.colorAgroBioTech),
                       ],
                     )
                     : gl.onboardLog.length - i > 0
@@ -5289,7 +5507,7 @@ Widget forestimatorSettingsPermissions(VoidSetter state) {
             style: styleSettingMenu(),
           ),
         ),
-        stroke(gl.equiPxl, gl.equiPxl * .5, gl.colorAgroBioTech),
+        lt.stroke(gl.equiPxl, gl.equiPxl * .5, gl.colorAgroBioTech),
         Row(
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.start,
@@ -5539,7 +5757,7 @@ class _SettingsMenu extends State<SettingsMenu> {
                                               ),
                                             ),
                                           ),
-                                          stroke(gl.equiPxl, gl.equiPxl * .5, gl.colorAgroBioTech),
+                                          lt.stroke(gl.equiPxl, gl.equiPxl * .5, gl.colorAgroBioTech),
                                           item.entry,
                                         ],
                                       ),
@@ -5646,7 +5864,7 @@ class _SettingsMenu extends State<SettingsMenu> {
   }
 }
 
-Widget popupLayerListMenu(BuildContext context, String currentName, ValueChanged<LatLng> state, VoidCallback after) {
+Widget popupLayerListMenu(BuildContext context, String currentName, ValueChanged<LatLng> mapmove, VoidCallback after) {
   return MaterialApp(
     home: OrientationBuilder(
       builder: (context, orientation) {
@@ -5672,7 +5890,7 @@ Widget popupLayerListMenu(BuildContext context, String currentName, ValueChanged
                       ? gl.equiPxl * (gl.equiPxlH - 25)
                       : gl.equiPxl * gl.popupWindowsLandscapeHeight,
               child: GeoLayerListMenu(
-                state: state,
+                mapmove: mapmove,
                 after: after,
                 windowHeight:
                     gl.display.orientation == Orientation.portrait
@@ -5687,50 +5905,6 @@ Widget popupLayerListMenu(BuildContext context, String currentName, ValueChanged
     ),
   );
 }
-
-/*Widget popupPolygonListMenu(
-  BuildContext context,
-  String currentName,
-  ValueChanged<LatLng> state,
-  VoidCallback after,
-) {
-  return MaterialApp(
-    home: OrientationBuilder(
-      builder: (context, orientation) {
-        return AlertDialog(
-          titlePadding: EdgeInsets.all(5),
-          actionsPadding: EdgeInsets.all(0),
-          contentPadding: EdgeInsets.all(0),
-          insetPadding: EdgeInsets.all(0),
-          buttonPadding: EdgeInsets.all(0),
-          iconPadding: EdgeInsets.all(0),
-          backgroundColor: gl.backgroundTransparentBlackBox,
-          surfaceTintColor: Colors.transparent,
-          shadowColor: Colors.transparent,
-          content: Theme(
-            data: Theme.of(context).copyWith(
-              canvasColor: Colors.transparent,
-              shadowColor: Colors.transparent,
-            ),
-            child: SizedBox(
-              width:
-                  gl.display.orientation == Orientation.portrait
-                      ? gl.equiPxl * gl.popupWindowsPortraitWidth
-                      : gl.equiPxl * gl.popupWindowsLandscapeWidth,
-              height:
-                  gl.display.orientation == Orientation.portrait
-                      ? gl.equiPxl *
-                          (gl.popupWindowsPortraitHeight + 1)
-                      : gl.equiPxl * gl.popupWindowsLandscapeHeight,
-              child: PolygonListMenu(state: state, after: after),
-            ),
-          ),
-          actions: [],
-        );
-      },
-    ),
-  );
-}*/
 
 Widget popupSettingsMenu(BuildContext context, String currentName, VoidCallback state, VoidCallback after) {
   return MaterialApp(
@@ -6027,7 +6201,7 @@ class _OnlineMapStatusTool extends State<OnlineMapStatusTool> {
     return Column(
       children: [
         if (widget.layerTile.downloadable) LayerDownloader(widget.layerTile),
-        if (widget.layerTile.downloadable) stroke(gl.equiPxl, gl.equiPxl * .5, gl.colorAgroBioTech),
+        if (widget.layerTile.downloadable) lt.stroke(gl.equiPxl, gl.equiPxl * .5, gl.colorAgroBioTech),
         gl.anaSurfSelectedLayerKeys.contains(widget.layerTile.key)
             ? TextButton(
               style: ButtonStyle(
@@ -6091,7 +6265,7 @@ class _OnlineMapStatusTool extends State<OnlineMapStatusTool> {
                 gl.shared!.setStringList('anaSurfSelectedLayerKeys', gl.anaSurfSelectedLayerKeys);
               },
             ),
-        stroke(gl.equiPxl, gl.equiPxl * .5, gl.colorAgroBioTech),
+        lt.stroke(gl.equiPxl, gl.equiPxl * .5, gl.colorAgroBioTech),
         gl.anaPtSelectedLayerKeys.contains(widget.layerTile.key)
             ? TextButton(
               style: ButtonStyle(
@@ -6156,7 +6330,7 @@ class _OnlineMapStatusTool extends State<OnlineMapStatusTool> {
               },
             ),
         if (gl.dico.getLayerBase(widget.layerTile.key).hasDoc())
-          stroke(gl.equiPxl, gl.equiPxl * .5, gl.colorAgroBioTech),
+          lt.stroke(gl.equiPxl, gl.equiPxl * .5, gl.colorAgroBioTech),
         if (gl.dico.getLayerBase(widget.layerTile.key).hasDoc())
           TextButton(
             style: ButtonStyle(
@@ -6973,9 +7147,9 @@ Card layerTileCard(
                           ),
                         ],
                       ),
-                    stroke(gl.equiPxl, gl.equiPxl * .5, gl.colorAgroBioTech),
+                    lt.stroke(gl.equiPxl, gl.equiPxl * .5, gl.colorAgroBioTech),
                     OnlineMapStatusTool(layerTile: layerTile),
-                    stroke(gl.equiPxl, gl.equiPxl * .5, gl.colorAgroBioTech),
+                    lt.stroke(gl.equiPxl, gl.equiPxl * .5, gl.colorAgroBioTech),
                     LegendView(
                       layerKey: layerTile.key,
                       color: gl.colorBackgroundSecondary,
@@ -6993,7 +7167,7 @@ Card layerTileCard(
                       ),
                     ),
                     if (gl.dico.mLayerBases[layerTile.key]!.getDicoValForLegend().isNotEmpty)
-                      stroke(gl.equiPxl, gl.equiPxl * .5, gl.colorAgroBioTech),
+                      lt.stroke(gl.equiPxl, gl.equiPxl * .5, gl.colorAgroBioTech),
                     layerTile.proprietaire(),
                   ],
                 ),
@@ -8174,7 +8348,7 @@ class _AnaResultsMenu extends State<AnaResultsMenu> {
                                     ),
                                   ],
                                 ),
-                                stroke(gl.equiPxl, gl.equiPxl * .5, Colors.black.withAlpha(50)),
+                                lt.stroke(gl.equiPxl, gl.equiPxl * .5, Colors.black.withAlpha(50)),
                                 Row(
                                   children: [
                                     Container(
@@ -8410,7 +8584,7 @@ class _AnaResultsMenu extends State<AnaResultsMenu> {
     });
     //return resultWidgets;
     for (int i = 0; i < results.length - 1; i++) {
-      resultWidgets.insert(i * 2 + 1, stroke(gl.equiPxl, gl.equiPxl * .5, gl.colorAgroBioTech));
+      resultWidgets.insert(i * 2 + 1, lt.stroke(gl.equiPxl, gl.equiPxl * .5, gl.colorAgroBioTech));
     }
     return resultWidgets;
   }
@@ -8755,7 +8929,7 @@ class EssencesListViewGS extends StatelessWidget {
                 PopupPdfMenu("", path: path, currentPage: 0);
               },
             ),
-            stroke(gl.equiPxl, gl.equiPxl * .5, gl.colorAgroBioTech),
+            lt.stroke(gl.equiPxl, gl.equiPxl * .5, gl.colorAgroBioTech),
           ],
         );
       },
@@ -8834,7 +9008,7 @@ class EssencesListView extends StatelessWidget {
                 PopupPdfMenu("", path: path, currentPage: 0);
               },
             ),
-            stroke(gl.equiPxl, gl.equiPxl * .5, gl.colorAgroBioTech),
+            lt.stroke(gl.equiPxl, gl.equiPxl * .5, gl.colorAgroBioTech),
           ],
         );
       },
@@ -9020,7 +9194,7 @@ class _AnaSurfResultsMenu extends State<AnaSurfResultsMenu> {
                                     ),
                                   ],
                                 ),
-                                stroke(gl.equiPxl, gl.equiPxl * .5, Colors.black.withAlpha(50)),
+                                lt.stroke(gl.equiPxl, gl.equiPxl * .5, Colors.black.withAlpha(50)),
                                 item.entry,
                               ],
                             ),
@@ -9075,7 +9249,7 @@ class _AnaSurfResultsMenu extends State<AnaSurfResultsMenu> {
     });
     //return resultWidgets;
     for (int i = 0; i < menuItems.length - 1; i++) {
-      resultWidgets.insert(i * 2 + 1, stroke(gl.equiPxl, gl.equiPxl * .5, gl.colorAgroBioTech));
+      resultWidgets.insert(i * 2 + 1, lt.stroke(gl.equiPxl, gl.equiPxl * .5, gl.colorAgroBioTech));
     }
     return resultWidgets;
   }

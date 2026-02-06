@@ -56,6 +56,15 @@ class GeometricLayer {
     defaultColor = Color.fromRGBO(rand.nextInt(256), rand.nextInt(256), rand.nextInt(256), 1.0);
   }
 
+  static void deleteLayer(int index) {
+    if (gl.layerReady && gl.geoLayers.length <= index) return;
+    for (int i = 0; i < gl.geoLayers[index].geometries.length; i++) {
+      gl.geoLayers[index].removeGeometry(index: i);
+    }
+    removeLayerFromShared(gl.geoLayers[index].id);
+    gl.geoLayers.removeAt(index);
+  }
+
   void addGeometry({String name = ""}) {
     switch (type) {
       case 'Point':
@@ -230,14 +239,14 @@ class GeometricLayer {
     }
   }
 
-  static void removeLayerFromShared(String it) async {
+  static void removeLayerFromShared(String id) async {
     List<String> layerKeys = gl.shared!.getStringList('layerKeys') ?? <String>[];
-    if (!layerKeys.contains(it)) {
-      List<String> polykeys = gl.shared!.getStringList('$it.polyKeys') ?? <String>[];
+    if (!layerKeys.contains(id)) {
+      List<String> polykeys = gl.shared!.getStringList('$id.polyKeys') ?? <String>[];
       for (String key in polykeys) {
         Geometry.removePolyFromShared(key);
       }
-      layerKeys.remove(it);
+      layerKeys.remove(id);
       await gl.shared!.setStringList('layerKeys', layerKeys);
     }
   }

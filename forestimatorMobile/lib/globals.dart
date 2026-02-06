@@ -13,8 +13,9 @@ import 'package:proj4dart/proj4dart.dart' as proj4;
 import 'package:latlong2/latlong.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+// TODO: Add state to SENT status with callback in timer.
+// TODO: ajout de variables au layer -> appliquer a tous les geos ou seulement nouveaux? Avec ou sans valeur predefini?
 // TODO optional: remove global variable notificationContext for clarity and proper stack usage
-// TODO: Change explanation text in toolbox when: add vertex is selected etc...
 // TODO: Florentin BUG
 // TODO: Many Keyboard switch Bugs...
 // TODO: Some Widgets still dont adapt properly with rotation etc... Add missing constraints to size with equipixels.
