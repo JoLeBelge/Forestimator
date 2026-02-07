@@ -108,6 +108,7 @@ class GeometricLayer {
   }
 
   void visible(bool visibility) {
+    visibleOnMap = visibility;
     for (Geometry g in geometries) {
       g.visibleOnMap = visibility;
     }
@@ -119,7 +120,7 @@ class GeometricLayer {
     }
   }
 
-  void serialize() async {
+  void serialize({bool withPolys = false}) async {
     await gl.shared!.setString('$id.name', name);
     await gl.shared!.setString('$id.type', type);
     await gl.shared!.setString('$id.subtype', subtype);
@@ -132,8 +133,10 @@ class GeometricLayer {
     _writeColorToMemory("$id.col", defaultColor);
     _writeAttributesToMemory("$id.defAttr", defaultAttributes);
 
-    for (Geometry g in geometries) {
-      g.serialize(layerId: id);
+    if (withPolys) {
+      for (Geometry g in geometries) {
+        g.serialize(layerId: id);
+      }
     }
 
     List<String> layerKeys = gl.shared!.getStringList('layerKeys') ?? <String>[];
@@ -151,7 +154,7 @@ class GeometricLayer {
     type = gl.shared!.getString('$id.type')!;
     subtype = gl.shared!.getString('$id.subtype')!;
 
-    visibleOnMap = gl.shared!.getBool('$id.labelsVisibleOnMap')!;
+    visibleOnMap = gl.shared!.getBool('$id.visibleOnMap')!;
     labelsVisibleOnMap = gl.shared!.getBool('$id.labelsVisibleOnMap')!;
 
     defaultPointIcon = gl.shared!.getInt('$id.defaultPointIcon')!;
@@ -171,11 +174,11 @@ class GeometricLayer {
       await gl.shared!.setString('$prefix.$i.name', attribute.name);
       await gl.shared!.setString('$prefix.$i.type', attribute.type);
       await gl.shared!.setBool('$prefix.$i.visibleOnMapLabel', attribute.visibleOnMapLabel);
-      if (attribute.type == "string") {
+      if (attribute.type == "string" && attribute.value is String) {
         await gl.shared!.setString('$prefix.$i.val', attribute.value);
-      } else if (attribute.type == "int") {
+      } else if (attribute.type == "int" && attribute.value is int) {
         await gl.shared!.setInt('$prefix.$i.val', attribute.value);
-      } else if (attribute.type == "double") {
+      } else if (attribute.type == "double" && attribute.value is double) {
         await gl.shared!.setDouble('$prefix.$i.val', attribute.value);
       }
       i++;
@@ -194,11 +197,11 @@ class GeometricLayer {
           type: type,
           value:
               type == "string"
-                  ? gl.shared!.getString('$prefix.$i.val')!
+                  ? gl.shared!.getString('$prefix.$i.val') ?? ""
                   : type == "int"
-                  ? gl.shared!.getInt('$prefix.$i.val')!
+                  ? gl.shared!.getInt('$prefix.$i.val') ?? ""
                   : type == "double"
-                  ? gl.shared!.getDouble('$prefix.$i.val')!
+                  ? gl.shared!.getDouble('$prefix.$i.val') ?? ""
                   : "unknown",
           visibleOnMapLabel: gl.shared!.getBool('$prefix.$i.visibleOnMapLabel') ?? false,
         ),

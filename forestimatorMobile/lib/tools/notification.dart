@@ -1355,7 +1355,7 @@ class PopupValueChange {
                                   if (textEditor.text.isEmpty) {
                                     valueChanged(0.0);
                                   } else {
-                                    valueChanged(textEditor.text);
+                                    valueChanged(double.parse(textEditor.text));
                                   }
                                 }
                             }
@@ -2635,56 +2635,31 @@ class _GeoLayerListMenu extends State<GeoLayerListMenu> {
                                                   ],
                                                 ),
                                               ),
-                                              /*IconButton(
-                                              onPressed: () {
-                                                PopupColorChooser(
-                                                  gl.geoLayers[i].defaultColor,
-                                                  gl.notificationContext!,
-                                                  //change color
-                                                  (Color col) {
+                                              Container(
+                                                alignment: Alignment.center,
+                                                height: gl.equiPxl * gl.iconSizeM,
+                                                width: gl.equiPxl * gl.iconSizeM,
+                                                child: IconButton(
+                                                  style: lt.transparentNoPadding,
+                                                  onPressed: () {
                                                     setState(() {
-                                                      gl
-                                                          .geoLayers[i]
-                                                          .defaultColor = col;
+                                                      gl.selectedGeoLayer = i;
+                                                      _selectedIndex = i;
+                                                      _titleLayer = false;
                                                     });
+                                                    _pageController.animateToPage(
+                                                      1,
+                                                      duration: Duration(milliseconds: 300),
+                                                      curve: Curves.easeInOut,
+                                                    );
                                                   },
-                                                  () {},
-                                                  () {
-                                                    gl.geoLayers[i].serialize();
-                                                  },
-                                                );
-                                              },
-                                              icon: Icon(
-                                                Icons.color_lens,
-                                                color:
-                                                    gl
-                                                        .geoLayers[i]
-                                                        .defaultColor,
-                                                size:
-                                                    gl.equiPxl *
-                                                    gl.iconSizeM *
-                                                    .75,
-                                              ),
-                                            ),*/
-                                              IconButton(
-                                                onPressed: () {
-                                                  setState(() {
-                                                    gl.selectedGeoLayer = i;
-                                                    _selectedIndex = i;
-                                                    _titleLayer = false;
-                                                  });
-                                                  _pageController.animateToPage(
-                                                    1,
-                                                    duration: Duration(milliseconds: 300),
-                                                    curve: Curves.easeInOut,
-                                                  );
-                                                },
-                                                icon: Icon(
-                                                  Icons.arrow_forward,
-                                                  color: Colors.white,
-                                                  size: gl.equiPxl * gl.iconSizeM * .75,
+                                                  icon: Icon(
+                                                    Icons.arrow_forward,
+                                                    color: Colors.white,
+                                                    size: gl.equiPxl * gl.iconSizeM,
+                                                  ),
+                                                  padding: EdgeInsets.zero,
                                                 ),
-                                                padding: EdgeInsets.zero,
                                               ),
                                             ],
                                           ),
@@ -2698,8 +2673,7 @@ class _GeoLayerListMenu extends State<GeoLayerListMenu> {
                                                 onPressed: () {
                                                   gl.refreshMainStack(() {
                                                     if (!gl.Mode.editPolygon) {
-                                                      gl.geoLayers[i].visibleOnMap = !gl.geoLayers[i].visibleOnMap;
-                                                      gl.geoLayers[i].visible(gl.geoLayers[i].visibleOnMap);
+                                                      gl.geoLayers[i].visible(!gl.geoLayers[i].visibleOnMap);
                                                     }
                                                   });
                                                   setState(() {});
@@ -2755,7 +2729,7 @@ class _GeoLayerListMenu extends State<GeoLayerListMenu> {
                                                           Container(
                                                             alignment: Alignment.topLeft,
                                                             child: Text(
-                                                              "All sent",
+                                                              "ALL SENT",
                                                               style: TextStyle(
                                                                 color: Colors.red,
                                                                 fontSize: gl.equiPxl * gl.fontSizeXS * .9,
@@ -3338,19 +3312,7 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
                                                   width: gl.display.equipixel * 7,
                                                   height: gl.display.equipixel * gl.iconSizeM,
                                                   child: IconButton(
-                                                    style: ButtonStyle(
-                                                      animationDuration: Duration(seconds: 1),
-                                                      backgroundColor: WidgetStateProperty<Color>.fromMap(
-                                                        <WidgetStatesConstraint, Color>{
-                                                          WidgetState.any: Colors.transparent,
-                                                        },
-                                                      ),
-                                                      padding: WidgetStateProperty<EdgeInsetsGeometry>.fromMap(
-                                                        <WidgetStatesConstraint, EdgeInsetsGeometry>{
-                                                          WidgetState.any: EdgeInsetsGeometry.zero,
-                                                        },
-                                                      ),
-                                                    ),
+                                                    style: lt.transparentNoPadding,
                                                     onPressed: () {},
                                                     onLongPress: () async {
                                                       setState(() {
@@ -3383,28 +3345,18 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
                                                   width: gl.display.equipixel * 64,
                                                   height: gl.display.equipixel * gl.iconSizeS,
                                                   child: TextButton(
-                                                    style: ButtonStyle(
-                                                      animationDuration: Duration(seconds: 1),
-                                                      backgroundColor: WidgetStateProperty<Color>.fromMap(
-                                                        <WidgetStatesConstraint, Color>{
-                                                          WidgetState.any: Colors.transparent,
-                                                        },
-                                                      ),
-                                                      padding: WidgetStateProperty<EdgeInsetsGeometry>.fromMap(
-                                                        <WidgetStatesConstraint, EdgeInsetsGeometry>{
-                                                          WidgetState.any: EdgeInsetsGeometry.zero,
-                                                        },
-                                                      ),
-                                                    ),
+                                                    style: lt.transparentNoPadding,
                                                     onPressed: () {},
                                                     onLongPress: () {
                                                       PopupValueChange(
                                                         "prop",
                                                         gl.selLay.defaultAttributes[i].name,
                                                         (value) {
-                                                          gl.selLay.defaultAttributes[i].name = cleanAttributeName(
-                                                            value.toString(),
-                                                          );
+                                                          setState(() {
+                                                            gl.selLay.defaultAttributes[i].name = cleanAttributeName(
+                                                              value.toString(),
+                                                            );
+                                                          });
                                                         },
                                                         () {},
                                                         () {
@@ -3601,7 +3553,43 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
                                         ),
                                       ),
                                     ),
-                                    SizedBox(width: gl.equiPxl * gl.iconSizeXXS),
+                                    Container(
+                                      alignment: Alignment.center,
+                                      height: gl.equiPxl * gl.iconSizeXXS,
+                                      width: gl.equiPxl * gl.iconSizeXXS,
+                                      child: IconButton(
+                                        style: lt.transparentNoPadding,
+                                        onPressed: () {
+                                          PopupColorChooser(
+                                            gl.selLay.geometries[index].colorInside,
+                                            gl.notificationContext!,
+                                            //change color
+                                            (Color col) {
+                                              setState(() {
+                                                gl.selLay.geometries[index].setColorInside(col);
+                                                gl.selLay.geometries[index].setColorLine(
+                                                  Color.fromRGBO(
+                                                    (col.r * 255).round(),
+                                                    (col.g * 255).round(),
+                                                    (col.b * 255).round(),
+                                                    1.0,
+                                                  ),
+                                                );
+                                              });
+                                            },
+                                            () {},
+                                            () {
+                                              gl.selLay.geometries[index].serialize();
+                                            },
+                                          );
+                                        },
+                                        icon: Icon(
+                                          gl.selectableIcons[gl.selLay.geometries[index].selectedPointIcon],
+                                          size: gl.equiPxl * gl.iconSizeXXS,
+                                          color: gl.selLay.geometries[index].colorLine,
+                                        ),
+                                      ),
+                                    ),
                                   ],
                                 ),
                               ),
@@ -3754,6 +3742,7 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
                                           gl.selLay.geometries[index].serialize();
                                           setState(() {
                                             widget.mapmove(gl.selLay.geometries[index].center);
+                                            gl.selLay.selectedGeometry = index;
                                           });
                                           gl.refreshMainStack(() {
                                             gl.modeMapShowPolygons = true;
@@ -3763,7 +3752,7 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
                                           Icons.gps_fixed,
                                           size: gl.display.equipixel * gl.iconSizeXS,
                                           opticalSize: gl.display.equipixel * gl.iconSizeS,
-                                          color: Colors.black,
+                                          color: gl.selLay.selectedGeometry == index ? Colors.red : Colors.black,
                                         ),
                                       ),
                                     )

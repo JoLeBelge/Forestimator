@@ -147,3 +147,102 @@ ButtonStyle get transparentNoPadding => ButtonStyle(
     WidgetState.any: EdgeInsetsGeometry.zero,
   }),
 );
+
+class ForestimatorScrollView extends StatefulWidget {
+  const ForestimatorScrollView({
+    super.key,
+    this.height,
+    this.width,
+    required this.child,
+    this.reverse = false,
+    this.horizontal = false,
+    this.arrowColor,
+    this.sizeArrows,
+  });
+  final double? height;
+  final double? width;
+  final Widget child;
+  final bool reverse;
+  final bool horizontal;
+  final Color? arrowColor;
+  final double? sizeArrows;
+
+  @override
+  State<StatefulWidget> createState() => _ForestimatorScrollView();
+}
+
+class _ForestimatorScrollView extends State<ForestimatorScrollView> {
+  final ScrollController _controller = ScrollController();
+
+  bool _atTop = true;
+  bool _atBottom = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller.addListener(() {
+      setState(() {
+        _atBottom = _atTop = false;
+        if (_controller.offset < 10) {
+          _atTop = true;
+        }
+        if (_controller.position.maxScrollExtent - _controller.offset < 10) {
+          _atBottom = true;
+        }
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    double width = widget.width ?? gl.equiPxl * 65;
+    double height = widget.height ?? gl.equiPxl * 20;
+    double sizeArrows = widget.sizeArrows ?? width * .1;
+    return Container(
+      padding: EdgeInsets.zero,
+      alignment: Alignment.center,
+      width: width,
+      height: height,
+      child: Stack(
+        children: [
+          SingleChildScrollView(
+            controller: _controller,
+            padding: EdgeInsets.zero,
+            reverse: widget.reverse,
+            scrollDirection: widget.horizontal ? Axis.horizontal : Axis.vertical,
+            child: widget.child,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                alignment: Alignment.centerLeft,
+                height: height,
+                width: sizeArrows,
+                child:
+                    !_atTop
+                        ? Icon(Icons.arrow_left_outlined, color: widget.arrowColor ?? Colors.white, size: sizeArrows)
+                        : Container(),
+              ),
+              Container(
+                alignment: Alignment.centerRight,
+                height: height,
+                width: sizeArrows,
+                child:
+                    !_atBottom
+                        ? Icon(Icons.arrow_right_outlined, color: widget.arrowColor ?? Colors.white, size: sizeArrows)
+                        : Container(),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}

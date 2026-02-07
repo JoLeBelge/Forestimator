@@ -540,11 +540,11 @@ class Geometry {
       await gl.shared!.setString('$name.$i.name', attribute.name);
       await gl.shared!.setString('$name.$i.type', attribute.type);
       await gl.shared!.setBool('$name.$i.visibleOnMapLabel', attribute.visibleOnMapLabel);
-      if (attribute.type == "string") {
+      if (attribute.type == "string" && attribute.value is String) {
         await gl.shared!.setString('$name.$i.val', attribute.value);
-      } else if (attribute.type == "int") {
+      } else if (attribute.type == "int" && attribute.value is int) {
         await gl.shared!.setInt('$name.$i.val', attribute.value);
-      } else if (attribute.type == "double") {
+      } else if (attribute.type == "double" && attribute.value is double) {
         await gl.shared!.setDouble('$name.$i.val', attribute.value);
       }
       i++;
@@ -600,11 +600,11 @@ class Geometry {
           type: type,
           value:
               type == "string"
-                  ? gl.shared!.getString('$name.$i.val')!
+                  ? gl.shared!.getString('$name.$i.val') ?? ""
                   : type == "int"
-                  ? gl.shared!.getInt('$name.$i.val')!
+                  ? gl.shared!.getInt('$name.$i.val') ?? ""
                   : type == "double"
-                  ? gl.shared!.getDouble('$name.$i.val')!
+                  ? gl.shared!.getDouble('$name.$i.val') ?? ""
                   : "unknown",
           visibleOnMapLabel: gl.shared!.getBool('$name.$i.visibleOnMapLabel') ?? false,
         ),
