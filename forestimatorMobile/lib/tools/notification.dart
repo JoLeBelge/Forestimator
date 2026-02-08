@@ -763,7 +763,7 @@ class _SelectLayerSymbol extends State<SelectLayerSymbol> {
     _current ?? (_current = widget.current);
     return !_mode
         ? IconButton(
-          style: lt.transparentNoPadding,
+          style: lt.trNoPadButtonstyle,
           onPressed: () {
             setState(() {
               _mode = !_mode;
@@ -790,7 +790,7 @@ class _SelectLayerSymbol extends State<SelectLayerSymbol> {
                   color: gl.selLay.defaultPointIcon == k ? gl.colorAgroBioTech : Colors.transparent,
                   height: gl.display.equipixel * gl.iconSizeM,
                   child: IconButton(
-                    style: lt.transparentNoPadding,
+                    style: lt.trNoPadButtonstyle,
                     onPressed: () {
                       setState(() {
                         _mode = !_mode;
@@ -830,7 +830,7 @@ class _SelectPolyColor extends State<SelectPolyColor> {
   Widget build(BuildContext context) {
     if (currentColor == Colors.black) currentColor = widget.currentColor;
     return TextButton(
-      style: lt.transparentNoPadding,
+      style: lt.trNoPadButtonstyle,
       onPressed: () {
         PopupColorChooser(
           currentColor,
@@ -2714,7 +2714,7 @@ class _GeoLayerListMenu extends State<GeoLayerListMenu> {
                                         height: gl.equiPxl * gl.iconSizeM,
                                         width: gl.equiPxl * gl.iconSizeM,
                                         child: IconButton(
-                                          style: lt.transparentNoPadding,
+                                          style: lt.trNoPadButtonstyle,
                                           onPressed: () {
                                             setState(() {
                                               gl.selectedGeoLayer = i;
@@ -2890,7 +2890,7 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
                   width: gl.equiPxl * gl.onCatalogueWidth * .9,
                   height: gl.equiPxl * gl.onCatalogueMapHeight * .17,
                   child: TextButton(
-                    style: lt.transparentNoPadding,
+                    style: lt.trNoPadButtonstyle,
                     onPressed: () {
                       setState(() {
                         PopupValueChange(
@@ -2929,7 +2929,7 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
                           height: gl.equiPxl * gl.iconSizeXXS,
                           width: gl.equiPxl * gl.iconSizeXXS,
                           child: IconButton(
-                            style: lt.transparentNoPadding,
+                            style: lt.trNoPadButtonstyle,
                             onPressed: () {
                               PopupColorChooser(
                                 gl.selLay.geometries[index].colorInside,
@@ -2979,7 +2979,7 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
                               width: gl.equiPxl * gl.iconSizeS,
                               height: gl.equiPxl * gl.iconSizeS,
                               child: IconButton(
-                                style: lt.transparentNoPadding,
+                                style: lt.trNoPadButtonstyle,
                                 onPressed: () {
                                   if (gl.UserData.forename.isEmpty ||
                                       gl.UserData.name.isEmpty ||
@@ -3030,7 +3030,7 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
                               width: gl.equiPxl * gl.iconSizeS,
                               height: gl.equiPxl * gl.iconSizeS,
                               child: IconButton(
-                                style: lt.transparentNoPadding,
+                                style: lt.trNoPadButtonstyle,
                                 onPressed: () async {
                                   if (await gl.selLay.geometries[index].onlineSurfaceAnalysis()) {
                                     gl.mainStack.add(
@@ -3059,7 +3059,7 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
                               width: gl.equiPxl * gl.iconSizeS,
                               height: gl.equiPxl * gl.iconSizeS,
                               child: IconButton(
-                                style: lt.transparentNoPadding,
+                                style: lt.trNoPadButtonstyle,
                                 onPressed: () async {
                                   if (!_doingAnaPt) {
                                     _doingAnaPt = true;
@@ -3123,7 +3123,7 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
                       width: gl.equiPxl * gl.iconSizeS,
                       height: gl.equiPxl * gl.iconSizeS,
                       child: IconButton(
-                        style: lt.transparentNoPadding,
+                        style: lt.trNoPadButtonstyle,
                         onPressed: () {
                           PopupDoYouReally(
                             gl.notificationContext!,
@@ -3309,7 +3309,7 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
                                       width: gl.display.equipixel * 7,
                                       height: gl.display.equipixel * gl.iconSizeM,
                                       child: IconButton(
-                                        style: lt.transparentNoPadding,
+                                        style: lt.trNoPadButtonstyle,
                                         onPressed: () {},
                                         onLongPress: () async {
                                           setState(() {
@@ -3342,7 +3342,7 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
                                       width: gl.display.equipixel * 64,
                                       height: gl.display.equipixel * gl.iconSizeS,
                                       child: TextButton(
-                                        style: lt.transparentNoPadding,
+                                        style: lt.trNoPadButtonstyle,
                                         onPressed: () {},
                                         onLongPress: () {
                                           PopupValueChange(
@@ -3518,7 +3518,7 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
                   width: gl.equiPxl * gl.onCatalogueWidth * .9,
                   height: gl.equiPxl * gl.onCatalogueMapHeight * .4,
                   child: TextButton(
-                    style: lt.transparentNoPadding,
+                    style: lt.trNoPadButtonstyle,
                     onPressed: () {
                       setState(() {
                         PopupValueChange(
@@ -3640,7 +3640,7 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
                   width: gl.equiPxl * gl.iconSizeS,
                   height: gl.equiPxl * gl.iconSizeS,
                   child: IconButton(
-                    style: lt.transparentNoPadding,
+                    style: lt.trNoPadButtonstyle,
                     onPressed: () {
                       PopupDoYouReally(
                         gl.notificationContext!,
@@ -5182,9 +5182,10 @@ class _ForestimatorAdvancedSettings extends State<ForestimatorAdvancedSettings> 
   Widget build(BuildContext context) {
     return Column(
       children: [
-        variableBooleanSlider("Mode Essence", gl.Mode.essence, (bool it) {
+        variableBooleanSlider("Mode Essence", gl.Mode.essenceButton, (bool it) {
           setState(() {
-            gl.Mode.essence = it;
+            gl.Mode.essenceButton = it;
+            if (!it) gl.Mode.essence = false;
           });
           gl.refreshMainStack(() {});
         }, false),

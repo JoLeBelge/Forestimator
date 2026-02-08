@@ -138,10 +138,36 @@ class _ValidTextField extends State<ValidTextField> {
   }
 }
 
-ButtonStyle get transparentNoPadding => ButtonStyle(
+ButtonStyle get trNoPadButtonstyle => ButtonStyle(
   animationDuration: Duration(seconds: 1),
   backgroundColor: WidgetStateProperty<Color>.fromMap(<WidgetStatesConstraint, Color>{
     WidgetState.any: Colors.transparent,
+  }),
+  padding: WidgetStateProperty<EdgeInsetsGeometry>.fromMap(<WidgetStatesConstraint, EdgeInsetsGeometry>{
+    WidgetState.any: EdgeInsetsGeometry.zero,
+  }),
+);
+
+ButtonStyle get onOflineButtonstyle => ButtonStyle(
+  animationDuration: Duration(seconds: 1),
+  backgroundColor: WidgetStateProperty<Color>.fromMap(<WidgetStatesConstraint, Color>{
+    WidgetState.any: gl.offlineMode ? gl.colorAgroBioTech : gl.colorUliege,
+  }),
+  fixedSize: WidgetStateProperty<Size>.fromMap(<WidgetStatesConstraint, Size>{
+    WidgetState.any: Size(gl.equiPxl * 40, gl.equiPxl * 10),
+  }),
+  padding: WidgetStateProperty<EdgeInsetsGeometry>.fromMap(<WidgetStatesConstraint, EdgeInsetsGeometry>{
+    WidgetState.any: EdgeInsetsGeometry.zero,
+  }),
+);
+
+ButtonStyle get essenceButtonstyle => ButtonStyle(
+  animationDuration: Duration(seconds: 1),
+  backgroundColor: WidgetStateProperty<Color>.fromMap(<WidgetStatesConstraint, Color>{
+    WidgetState.any: gl.Mode.essence ? gl.colorAgroBioTech : gl.colorUliege,
+  }),
+  fixedSize: WidgetStateProperty<Size>.fromMap(<WidgetStatesConstraint, Size>{
+    WidgetState.any: Size(gl.equiPxl * 40, gl.equiPxl * 10),
   }),
   padding: WidgetStateProperty<EdgeInsetsGeometry>.fromMap(<WidgetStatesConstraint, EdgeInsetsGeometry>{
     WidgetState.any: EdgeInsetsGeometry.zero,

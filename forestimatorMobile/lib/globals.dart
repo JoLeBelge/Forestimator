@@ -101,6 +101,7 @@ class UserData {
 class Mode {
   static bool userDataFilled = false;
   static bool essence = false;
+  static bool essenceButton = false;
   static bool labelCross = false;
   static bool smallLabel = true;
   static bool essencePointsToSync = false;
