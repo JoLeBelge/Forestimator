@@ -195,88 +195,6 @@ class _MapPageState extends State<MapPage> {
         child: Scaffold(
           resizeToAvoidBottomInset: true,
           extendBody: true,
-          appBar: AppBar(
-            toolbarHeight: gl.display.equipixel * gl.topAppInfoBarThickness,
-            backgroundColor: gl.offlineMode ? gl.colorAgroBioTech : gl.colorUliege,
-            title: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                IconButton(
-                  iconSize: gl.display.equipixel * gl.iconSizeSettings,
-                  color: gl.offlineMode ? Colors.black : Colors.white,
-                  onPressed: () {
-                    if (!gl.modeSettings) {
-                      PopupSettingsMenu(
-                        gl.notificationContext!,
-                        "",
-                        () {
-                          refreshView(() {});
-                        },
-                        () {
-                          refreshView(() {});
-                        },
-                      );
-                    } else {
-                      gl.mainStackPopLast();
-                      gl.modeSettings = false;
-                    }
-                    gl.refreshMainStack(() {});
-                  },
-                  icon: Icon(Icons.settings),
-                ),
-                SizedBox(width: 1),
-                Container(
-                  constraints: BoxConstraints(maxWidth: gl.display.equipixel * gl.topAppForestimatorFontWidth),
-                  alignment: Alignment.center,
-                  child: TextButton(
-                    onPressed: () {
-                      setState(() {
-                        gl.offlineMode = !gl.offlineMode;
-                        if (gl.offlineMode) {
-                          gl.changeSelectedLayerModeOffline();
-                        } else {
-                          gl.changeSelectedLayerModeOnline();
-                        }
-                      });
-                      gl.rebuildSwitcherCatalogueButtons(() {});
-                      gl.rebuildOfflineCatalogue(() {});
-                      gl.rebuildSwitcherBox(() {});
-                      gl.rebuildLayerSwitcher(() {});
-                    },
-                    child:
-                        gl.offlineMode
-                            ? Text(
-                              "Forestimator terrain",
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: gl.display.equipixel * gl.topAppForestimatorFontHeight,
-                              ),
-                            )
-                            : Text(
-                              "Forestimator online",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: gl.display.equipixel * gl.topAppForestimatorFontHeight,
-                              ),
-                            ),
-                  ),
-                ),
-                _mapControllerInit
-                    ? _mapController.camera.zoom.round() < gl.globalMinOfflineZoom.round() &&
-                            gl.getIndexForNextLayerOffline() > -1
-                        ? IconButton(
-                          iconSize: gl.display.equipixel * gl.iconSizeSettings,
-                          color: Colors.red,
-                          tooltip:
-                              "Si vous n'arrivez plus à visualiser les cartes hors ligne c'est que votre zoom est trop large.",
-                          onPressed: () {},
-                          icon: Icon(Icons.info_rounded),
-                        )
-                        : SizedBox(width: gl.display.equipixel * gl.iconSizeSettings * 1.5)
-                    : SizedBox(width: gl.display.equipixel * gl.iconSizeSettings * 1.5),
-              ],
-            ),
-          ),
           body: OrientationBuilder(
             builder: (context, orientation) {
               return Stack(
@@ -630,6 +548,7 @@ class _MapPageState extends State<MapPage> {
                               if (_modeMeasurePath) MarkerLayer(markers: _getPathMeasureMarkers()),
                             ],
                       ),
+                      _getAppBar(),
                       (gl.layerReady && gl.Mode.polygon)
                           ? Column(
                             mainAxisAlignment: MainAxisAlignment.start,
@@ -772,9 +691,7 @@ class _MapPageState extends State<MapPage> {
                                               ),
                                             ],
                                           ),
-                                          !gl
-                                                  .Mode
-                                                  .openToolbox // TODO:
+                                          !gl.Mode.openToolbox
                                               ? SizedBox()
                                               : (gl.Mode.editPolygon && gl.geoReady)
                                               ? Column(
@@ -1869,6 +1786,179 @@ class _MapPageState extends State<MapPage> {
                                                   ),
                                                 ],
                                               )
+                                              : gl.Mode.editPolyMarker
+                                              ? Column(
+                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                children: [
+                                                  Column(
+                                                    children: [
+                                                      lt.stroke(
+                                                        gl.display.equipixel,
+                                                        gl.display.equipixel * .5,
+                                                        gl.colorAgroBioTech,
+                                                      ),
+                                                      Row(
+                                                        children: [
+                                                          Container(
+                                                            alignment: Alignment.topLeft,
+                                                            child: SizedBox(
+                                                              height: gl.display.equipixel * gl.iconSizeM * .9,
+                                                              child: IconButton(
+                                                                style: lt.borderlessStyle,
+                                                                iconSize: gl.display.equipixel * gl.iconSizeS,
+                                                                color: Colors.lightGreenAccent,
+                                                                onPressed: () {
+                                                                  refreshView(() {
+                                                                    gl.Mode.editPolyMarker = false;
+                                                                  });
+                                                                  gl.selGeo.serialize();
+                                                                },
+                                                                icon: Icon(
+                                                                  Icons.arrow_back,
+                                                                  size: gl.display.equipixel * gl.iconSizeS * .9,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          Container(
+                                                            alignment: Alignment.topLeft,
+                                                            width: gl.display.equipixel * gl.chosenPolyBarWidth * .75,
+                                                            child: Text(
+                                                              "Changez le symbole du polygone.",
+                                                              textAlign: TextAlign.center,
+                                                              style: TextStyle(
+                                                                color: Colors.white,
+                                                                fontSize: gl.display.equipixel * gl.fontSizeS,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      lt.stroke(
+                                                        gl.display.equipixel,
+                                                        gl.display.equipixel * .5,
+                                                        gl.colorAgroBioTech,
+                                                      ),
+                                                      if (gl.geoReady)
+                                                        lt.ForestimatorScrollView(
+                                                          width: gl.display.equipixel * gl.chosenPolyBarWidth,
+                                                          height: gl.display.equipixel * gl.iconSizeXS * 2.5,
+                                                          sizeArrows: gl.display.equipixel * gl.iconSizeM,
+                                                          horizontal: true,
+                                                          arrowColor: Colors.black,
+                                                          child: Row(
+                                                            children: List<Widget>.generate(
+                                                              gl.selectableIconGeo.length,
+                                                              (k) {
+                                                                return Container(
+                                                                  color:
+                                                                      gl.selGeo.selectedPointIcon == k
+                                                                          ? gl.colorAgroBioTech
+                                                                          : Colors.transparent,
+                                                                  child: SizedBox(
+                                                                    height: gl.display.equipixel * gl.iconSizeL,
+                                                                    child: IconButton(
+                                                                      onPressed: () {
+                                                                        refreshView(() {
+                                                                          gl.selGeo.selectedPointIcon = k;
+                                                                        });
+                                                                      },
+                                                                      icon: Icon(
+                                                                        gl.selectableIconGeo[k],
+                                                                        size: gl.iconSizeM * gl.display.equipixel,
+                                                                        color: Colors.white,
+                                                                      ),
+                                                                      color: Colors.white,
+                                                                      iconSize: gl.display.equipixel * gl.iconSizeM,
+                                                                    ),
+                                                                  ),
+                                                                );
+                                                              },
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      lt.stroke(
+                                                        gl.display.equipixel,
+                                                        gl.display.equipixel * .5,
+                                                        gl.colorAgroBioTech,
+                                                      ),
+                                                      if (gl.geoReady)
+                                                        lt.ForestimatorScrollView(
+                                                          width: gl.display.equipixel * gl.chosenPolyBarWidth,
+                                                          height: gl.display.equipixel * gl.iconSizeXS * 2.5,
+                                                          sizeArrows: gl.display.equipixel * gl.iconSizeM,
+                                                          horizontal: true,
+                                                          child: Row(
+                                                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                                            children:
+                                                                [
+                                                                  TextButton(
+                                                                    onPressed: () {
+                                                                      refreshView(() {
+                                                                        gl.selGeo.setColorInside(
+                                                                          gl.selLay.defaultColor.withAlpha(120),
+                                                                        );
+                                                                        gl.selGeo.setColorLine(gl.selLay.defaultColor);
+                                                                      });
+                                                                    },
+                                                                    child: CircleAvatar(
+                                                                      backgroundColor:
+                                                                          gl.selGeo.colorPolygon ==
+                                                                                  gl.selLay.defaultColor
+                                                                              ? Colors.white
+                                                                              : Colors.transparent,
+                                                                      radius: gl.display.equipixel * gl.iconSizeXS * .9,
+                                                                      child: CircleAvatar(
+                                                                        radius:
+                                                                            gl.display.equipixel * gl.iconSizeXS * .85,
+                                                                        backgroundColor: gl.selLay.defaultColor
+                                                                            .withAlpha(255),
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                ] +
+                                                                List<TextButton>.generate(
+                                                                  gl.predefinedPointSymbPalette.length,
+                                                                  (int k) {
+                                                                    return TextButton(
+                                                                      onPressed: () {
+                                                                        refreshView(() {
+                                                                          gl.selGeo.setColorInside(
+                                                                            gl.predefinedPointSymbPalette[k].withAlpha(
+                                                                              120,
+                                                                            ),
+                                                                          );
+                                                                          gl.selGeo.setColorLine(
+                                                                            gl.predefinedPointSymbPalette[k],
+                                                                          );
+                                                                        });
+                                                                      },
+                                                                      child: CircleAvatar(
+                                                                        backgroundColor:
+                                                                            gl.selGeo.colorPolygon ==
+                                                                                    gl.predefinedPointSymbPalette[k]
+                                                                                ? Colors.white
+                                                                                : Colors.transparent,
+                                                                        radius:
+                                                                            gl.display.equipixel * gl.iconSizeXS * .9,
+                                                                        child: CircleAvatar(
+                                                                          radius:
+                                                                              gl.display.equipixel *
+                                                                              gl.iconSizeXS *
+                                                                              .85,
+                                                                          backgroundColor:
+                                                                              gl.predefinedPointSymbPalette[k],
+                                                                        ),
+                                                                      ),
+                                                                    );
+                                                                  },
+                                                                ),
+                                                          ),
+                                                        ),
+                                                    ],
+                                                  ),
+                                                ],
+                                              )
                                               : gl.geoReady
                                               ? Column(
                                                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -1915,7 +2005,10 @@ class _MapPageState extends State<MapPage> {
                                                                           .selLay
                                                                           .geometries[index]
                                                                           .selectedPointIcon]
-                                                                      : Icons.hexagon_outlined,
+                                                                      : gl.selectableIconGeo[gl
+                                                                          .selLay
+                                                                          .geometries[index]
+                                                                          .selectedPointIcon],
                                                                   color:
                                                                       gl.selLay.selectedGeometry == index
                                                                           ? Colors.white
@@ -1932,20 +2025,26 @@ class _MapPageState extends State<MapPage> {
                                                         height: gl.display.equipixel * gl.iconSizeM,
                                                         width: gl.display.equipixel * gl.iconSizeM,
                                                         child: IconButton(
-                                                          style: lt.transparentNoPadding,
-                                                          onPressed: () {
-                                                            setState(() {
-                                                              gl.selLay.addGeometry(
-                                                                name:
-                                                                    gl.selLay.type == "Point"
-                                                                        ? "Point${gl.selLay.geometries.length + 1}"
-                                                                        : "Polygon${gl.selLay.geometries.length + 1}",
-                                                              );
-                                                            });
-                                                          },
+                                                          style: lt.borderlessStyle,
+                                                          onPressed:
+                                                              gl.selLay.subtype != "Essence"
+                                                                  ? () {
+                                                                    setState(() {
+                                                                      gl.selLay.addGeometry(
+                                                                        name:
+                                                                            gl.selLay.type == "Point"
+                                                                                ? "Point${gl.selLay.geometries.length + 1}"
+                                                                                : "Polygon${gl.selLay.geometries.length + 1}",
+                                                                      );
+                                                                    });
+                                                                  }
+                                                                  : () {},
                                                           icon: Icon(
                                                             Icons.add_circle,
-                                                            color: gl.colorAgroBioTech,
+                                                            color:
+                                                                gl.selLay.subtype != "Essence"
+                                                                    ? gl.colorAgroBioTech
+                                                                    : Colors.grey,
                                                             size: gl.display.equipixel * gl.iconSizeS,
                                                           ),
                                                         ),
@@ -1984,7 +2083,7 @@ class _MapPageState extends State<MapPage> {
                                                             height: gl.display.equipixel * gl.iconSizeM * .9,
                                                             child: IconButton(
                                                               onPressed: () {
-                                                                setState(() {
+                                                                gl.refreshMainStack(() {
                                                                   gl.selGeo.labelsVisibleOnMap = false;
                                                                 });
                                                                 gl.selGeo.serialize();
@@ -1996,6 +2095,23 @@ class _MapPageState extends State<MapPage> {
                                                               ),
                                                             ),
                                                           ),
+                                                      if (gl.selGeo.visibleOnMap)
+                                                        SizedBox(
+                                                          height: gl.display.equipixel * gl.iconSizeM * .9,
+                                                          child: IconButton(
+                                                            onPressed: () {
+                                                              setState(() {
+                                                                gl.selGeo.visibleOnMap = false;
+                                                              });
+                                                              gl.selGeo.serialize();
+                                                            },
+                                                            icon: Icon(
+                                                              FontAwesomeIcons.eyeSlash,
+                                                              size: gl.display.equipixel * gl.iconSizeS * .9,
+                                                              color: Colors.white,
+                                                            ),
+                                                          ),
+                                                        ),
                                                       if (gl.selGeo.points.isNotEmpty &&
                                                           (!_positionInsideViewRectangle(
                                                                 Position(
@@ -2039,22 +2155,37 @@ class _MapPageState extends State<MapPage> {
                                                             ),
                                                           ),
                                                         ),
-                                                      if (gl.selGeo.type.contains("Point"))
-                                                        SizedBox(
-                                                          height: gl.display.equipixel * gl.iconSizeM * .9,
-                                                          child: IconButton(
-                                                            onPressed: () {
-                                                              setState(() {
-                                                                gl.Mode.editPointMarker = !gl.Mode.editPointMarker;
-                                                              });
-                                                            },
-                                                            icon: Icon(
-                                                              FontAwesomeIcons.locationPin,
-                                                              size: gl.display.equipixel * gl.iconSizeS * .9,
-                                                              color: Colors.white,
+                                                      gl.selGeo.type.contains("Point")
+                                                          ? SizedBox(
+                                                            height: gl.display.equipixel * gl.iconSizeM * .9,
+                                                            child: IconButton(
+                                                              onPressed: () {
+                                                                setState(() {
+                                                                  gl.Mode.editPointMarker = !gl.Mode.editPointMarker;
+                                                                });
+                                                              },
+                                                              icon: Icon(
+                                                                FontAwesomeIcons.locationPin,
+                                                                size: gl.display.equipixel * gl.iconSizeS * .9,
+                                                                color: Colors.white,
+                                                              ),
+                                                            ),
+                                                          )
+                                                          : SizedBox(
+                                                            height: gl.display.equipixel * gl.iconSizeM * .9,
+                                                            child: IconButton(
+                                                              onPressed: () {
+                                                                setState(() {
+                                                                  gl.Mode.editPolyMarker = !gl.Mode.editPolyMarker;
+                                                                });
+                                                              },
+                                                              icon: Icon(
+                                                                Icons.square_outlined,
+                                                                size: gl.display.equipixel * gl.iconSizeS * .9,
+                                                                color: Colors.white,
+                                                              ),
                                                             ),
                                                           ),
-                                                        ),
                                                       SizedBox(
                                                         height: gl.display.equipixel * gl.iconSizeM * .9,
                                                         child: IconButton(
@@ -2064,7 +2195,8 @@ class _MapPageState extends State<MapPage> {
                                                               gl.selGeo.visibleOnMap = true;
                                                               gl.Mode.editPolygon = !gl.Mode.editPolygon;
                                                               if (gl.Mode.editPolygon &&
-                                                                  gl.selGeo.type.contains("Point")) {
+                                                                  gl.selGeo.type.contains("Point") &&
+                                                                  gl.selGeo.points.isNotEmpty) {
                                                                 refreshView(() {
                                                                   gl.Mode.editPolygon = true;
                                                                   gl.Mode.showButtonAddVertexesPolygon = false;
@@ -2171,19 +2303,25 @@ class _MapPageState extends State<MapPage> {
                                                         width: gl.display.equipixel * gl.iconSizeM,
                                                         child: IconButton(
                                                           style: lt.borderlessStyle,
-                                                          onPressed: () {
-                                                            setState(() {
-                                                              gl.selLay.addGeometry(
-                                                                name:
-                                                                    gl.selLay.type == "Point"
-                                                                        ? "Point${gl.selLay.geometries.length + 1}"
-                                                                        : "Polygon${gl.selLay.geometries.length + 1}",
-                                                              );
-                                                            });
-                                                          },
+                                                          onPressed:
+                                                              gl.selLay.subtype != "Essence"
+                                                                  ? () {
+                                                                    setState(() {
+                                                                      gl.selLay.addGeometry(
+                                                                        name:
+                                                                            gl.selLay.type == "Point"
+                                                                                ? "Point${gl.selLay.geometries.length + 1}"
+                                                                                : "Polygon${gl.selLay.geometries.length + 1}",
+                                                                      );
+                                                                    });
+                                                                  }
+                                                                  : () {},
                                                           icon: Icon(
                                                             Icons.add_circle,
-                                                            color: gl.colorAgroBioTech,
+                                                            color:
+                                                                gl.selLay.subtype != "Essence"
+                                                                    ? gl.colorAgroBioTech
+                                                                    : Colors.grey,
                                                             size: gl.display.equipixel * gl.iconSizeS,
                                                           ),
                                                         ),
@@ -2284,6 +2422,91 @@ class _MapPageState extends State<MapPage> {
     );
   }
 
+  Widget _getAppBar() {
+    return Column(
+      children: [
+        Container(
+          alignment: Alignment.topCenter,
+          width: gl.equiPxl * 100,
+          height: gl.equiPxl * 12,
+          color: gl.offlineMode ? gl.colorAgroBioTech : gl.colorUliege,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              IconButton(
+                iconSize: gl.display.equipixel * gl.iconSizeSettings,
+                color: gl.offlineMode ? Colors.black : Colors.white,
+                onPressed: () {
+                  if (!gl.modeSettings) {
+                    PopupSettingsMenu(
+                      gl.notificationContext!,
+                      "",
+                      () {
+                        refreshView(() {});
+                      },
+                      () {
+                        refreshView(() {});
+                      },
+                    );
+                  } else {
+                    gl.mainStackPopLast();
+                    gl.modeSettings = false;
+                  }
+                  gl.refreshMainStack(() {});
+                },
+                icon: Icon(Icons.settings),
+              ),
+              SizedBox(width: 1),
+              Container(
+                constraints: BoxConstraints(maxWidth: gl.display.equipixel * gl.topAppForestimatorFontWidth),
+                alignment: Alignment.center,
+                child: TextButton(
+                  onPressed: () {
+                    setState(() {
+                      gl.offlineMode = !gl.offlineMode;
+                      if (gl.offlineMode) {
+                        gl.changeSelectedLayerModeOffline();
+                      } else {
+                        gl.changeSelectedLayerModeOnline();
+                      }
+                    });
+                    gl.rebuildSwitcherCatalogueButtons(() {});
+                    gl.rebuildOfflineCatalogue(() {});
+                    gl.rebuildSwitcherBox(() {});
+                    gl.rebuildLayerSwitcher(() {});
+                  },
+                  child:
+                      gl.offlineMode
+                          ? Text(
+                            "Forestimator terrain",
+                            style: TextStyle(color: Colors.black, fontSize: gl.display.equipixel * gl.fontSizeXS),
+                          )
+                          : Text(
+                            "Forestimator online",
+                            style: TextStyle(color: Colors.white, fontSize: gl.display.equipixel * gl.fontSizeXS),
+                          ),
+                ),
+              ),
+              _mapControllerInit
+                  ? _mapController.camera.zoom.round() < gl.globalMinOfflineZoom.round() &&
+                          gl.getIndexForNextLayerOffline() > -1
+                      ? IconButton(
+                        iconSize: gl.display.equipixel * gl.iconSizeSettings,
+                        color: Colors.red,
+                        tooltip:
+                            "Si vous n'arrivez plus à visualiser les cartes hors ligne c'est que votre zoom est trop large.",
+                        onPressed: () {},
+                        icon: Icon(Icons.info_rounded),
+                      )
+                      : SizedBox(width: gl.display.equipixel * gl.iconSizeSettings * 1.5)
+                  : SizedBox(width: gl.display.equipixel * gl.iconSizeSettings * 1.5),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
   double computePolygonTitleHeight() {
     double result = gl.chosenPolyBarHeight * .8;
     if (gl.Mode.openToolbox) {
@@ -2293,6 +2516,8 @@ class _MapPageState extends State<MapPage> {
         result += gl.attributeTableHeight * 1.3;
       } else if (gl.Mode.editPointMarker) {
         result += gl.chosenPolyBarHeight * 2;
+      } else if (gl.Mode.editPolyMarker) {
+        result += gl.chosenPolyBarHeight * 1.0;
       }
     }
     return result;
@@ -2306,9 +2531,11 @@ class _MapPageState extends State<MapPage> {
     List<Polygon<String>> that = [];
     if (gl.layerReady) {
       for (GeometricLayer layer in gl.geoLayers) {
-        for (var g in layer.geometries) {
-          if (g.numPoints > 2 && layer.visibleOnMap && layer.type == "Polygon") {
-            that.add(Polygon<String>(points: g.points, color: g.colorInside, hitValue: g.identifier));
+        if (layer.visibleOnMap && layer.type == "Polygon") {
+          for (var g in layer.geometries) {
+            if (g.numPoints > 2 && g.visibleOnMap) {
+              that.add(Polygon<String>(points: g.points, color: g.colorInside, hitValue: g.identifier));
+            }
           }
         }
       }
@@ -2862,11 +3089,10 @@ class _MapPageState extends State<MapPage> {
                       () {
                         refreshView(() {
                           if (gl.layerReady && gl.selLay.geometries.isNotEmpty && gl.Mode.editPolygon) {
-                            if (gl.selGeo.type == "Polygon") {
-                              gl.Mode.showButtonAddVertexesPolygon = true;
-                              gl.Mode.showButtonMoveVertexesPolygon = false;
-                              gl.Mode.showButtonRemoveVertexesPolygon = false;
-                            } else if (gl.selGeo.type.contains("Point")) {
+                            gl.Mode.showButtonAddVertexesPolygon = true;
+                            gl.Mode.showButtonMoveVertexesPolygon = false;
+                            gl.Mode.showButtonRemoveVertexesPolygon = false;
+                            if (gl.selGeo.type.contains("Point") && gl.selGeo.points.isNotEmpty) {
                               gl.selGeo.selectedVertex = 0;
                               gl.Mode.showButtonAddVertexesPolygon = false;
                               gl.Mode.showButtonMoveVertexesPolygon = true;

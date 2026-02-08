@@ -16,7 +16,7 @@ class GeometricLayer {
   int selectedGeometry = -1;
 
   Color defaultColor = Colors.black;
-  int defaultPointIcon = 0;
+  int defaultPointIcon = 3;
   double defaultIconSize = 10;
   List<Attribute> defaultAttributes = [];
 
@@ -59,7 +59,7 @@ class GeometricLayer {
   static void deleteLayer(int index) {
     if (gl.layerReady && gl.geoLayers.length <= index) return;
     for (int i = 0; i < gl.geoLayers[index].geometries.length; i++) {
-      gl.geoLayers[index].removeGeometry(index: i);
+      gl.geoLayers[index].removeGeometry(last: true);
     }
     removeLayerFromShared(gl.geoLayers[index].id);
     gl.geoLayers.removeAt(index);
@@ -89,21 +89,26 @@ class GeometricLayer {
     geometries.last.serialize(layerId: id);
   }
 
-  void removeGeometry({int? index, String? name, bool? last}) {
+  void removeGeometry({int? index, String? name, bool? last, String? id}) {
     if (geometries.isEmpty) {
       gl.print("error: nothing to remove in geometry list:");
       return;
     } else if (index != null) {
-      Geometry.removePolyFromShared(geometries.removeAt(index).id, layerId: id);
+      Geometry.removePolyFromShared(geometries.removeAt(index).id, layerId: this.id);
     } else if (name != null) {
       String identifier = "";
       geometries.removeWhere((Geometry g) {
         identifier = g.id;
         return g.name == name;
       });
-      Geometry.removePolyFromShared(identifier, layerId: id);
+      Geometry.removePolyFromShared(identifier, layerId: this.id);
     } else if (last != null && last) {
-      Geometry.removePolyFromShared(geometries.removeLast().id, layerId: id);
+      Geometry.removePolyFromShared(geometries.removeLast().id, layerId: this.id);
+    } else if (id != null) {
+      geometries.removeWhere((Geometry g) {
+        return g.id == id;
+      });
+      Geometry.removePolyFromShared(id, layerId: this.id);
     }
   }
 
@@ -244,11 +249,7 @@ class GeometricLayer {
 
   static void removeLayerFromShared(String id) async {
     List<String> layerKeys = gl.shared!.getStringList('layerKeys') ?? <String>[];
-    if (!layerKeys.contains(id)) {
-      List<String> polykeys = gl.shared!.getStringList('$id.polyKeys') ?? <String>[];
-      for (String key in polykeys) {
-        Geometry.removePolyFromShared(key);
-      }
+    if (layerKeys.contains(id)) {
       layerKeys.remove(id);
       await gl.shared!.setStringList('layerKeys', layerKeys);
     }

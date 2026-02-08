@@ -122,6 +122,7 @@ class Mode {
   static bool editPolygon = false;
   static bool editPoint = false;
   static bool editPointMarker = false;
+  static bool editPolyMarker = false;
   static bool addVertexesPolygon = false;
   static bool moveVertexesPolygon = false;
   static bool removeVertexesPolygon = false;
@@ -801,6 +802,16 @@ List<IconData> selectableIcons = [
   FontAwesomeIcons.fire,
   FontAwesomeIcons.solidFlag,
   FontAwesomeIcons.spaghettiMonsterFlying,
+  FontAwesomeIcons.crop,
+];
+
+List<IconData> selectableIconGeo = [
+  Icons.square_outlined,
+  Icons.circle_outlined,
+  Icons.pentagon_outlined,
+  Icons.hexagon_outlined,
+  FontAwesomeIcons.triangleExclamation,
+  FontAwesomeIcons.drawPolygon,
   FontAwesomeIcons.crop,
 ];
 

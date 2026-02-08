@@ -623,7 +623,7 @@ class Geometry {
 
   static void removePolyFromShared(String id, {String layerId = ""}) async {
     List<String> polykeys = gl.shared!.getStringList('$layerId.polyKeys') ?? <String>[];
-    if (!polykeys.contains(id)) {
+    if (polykeys.contains(id)) {
       polykeys.remove(id);
       await gl.shared!.setStringList('$layerId.polyKeys', polykeys);
     }

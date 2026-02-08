@@ -175,7 +175,7 @@ class _ForestimatorScrollView extends State<ForestimatorScrollView> {
   final ScrollController _controller = ScrollController();
 
   bool _atTop = true;
-  bool _atBottom = false;
+  bool _atBottom = true;
 
   @override
   void initState() {
@@ -183,6 +183,9 @@ class _ForestimatorScrollView extends State<ForestimatorScrollView> {
     _controller.addListener(() {
       setState(() {
         _atBottom = _atTop = false;
+        if (_controller.position.maxScrollExtent < 0) {
+          return;
+        }
         if (_controller.offset < 10) {
           _atTop = true;
         }
@@ -190,6 +193,9 @@ class _ForestimatorScrollView extends State<ForestimatorScrollView> {
           _atBottom = true;
         }
       });
+    });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _controller.jumpTo(1);
     });
   }
 
