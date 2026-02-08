@@ -42,7 +42,7 @@ class GeometricLayer {
     defaultColor = Colors.black;
     defaultPointIcon = 4;
     defaultAttributes.addAll([
-      Attribute(name: "essence", type: "string", value: gl.essenceChoice[0]),
+      Attribute(name: "essence", type: "string", value: "Choisissez"),
       Attribute(name: "rmq", type: "string", value: ""),
     ]);
     defaultAttributes[0].visibleOnMapLabel = true;
@@ -85,6 +85,7 @@ class GeometricLayer {
     geometries.last.iconSize = defaultIconSize;
     for (Attribute a in defaultAttributes) {
       geometries.last.attributes.add(a.clone);
+      print(geometries.last.attributes.last.value);
     }
     geometries.last.serialize(layerId: id);
   }

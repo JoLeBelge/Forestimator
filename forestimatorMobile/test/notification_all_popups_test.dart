@@ -8,27 +8,21 @@ void main() {
 
   setUp(() async {
     // Ensure consistent display globals for popup layout
-    gl.display = gl.Display.empty();
-    gl.display.width = 1200;
-    gl.display.height = 1600;
-    gl.display.dpi = 1.0;
-    gl.display.orientation = Orientation.portrait;
-    gl.display.equipixel =
-        gl.display.height / gl.minEquiPixelsDisplayPortraitHeight;
+    gl.dsp = gl.Display.empty();
+    gl.dsp.width = 1200;
+    gl.dsp.height = 1600;
+    gl.dsp.dpi = 1.0;
+    gl.dsp.orientation = Orientation.portrait;
+    gl.dsp.equipixel = gl.dsp.height / gl.minEquiPixelsDisplayPortraitHeight;
   });
 
   group('notification popups smoke tests', () {
     // Helper to find buttons inside the currently shown AlertDialog(s)
-    Finder alertButton(String text) => find.descendant(
-      of: find.byType(AlertDialog),
-      matching: find.widgetWithText(TextButton, text),
-    );
+    Finder alertButton(String text) =>
+        find.descendant(of: find.byType(AlertDialog), matching: find.widgetWithText(TextButton, text));
 
     // Helper to find text inside the currently shown AlertDialog(s)
-    Finder alertText(String text) => find.descendant(
-      of: find.byType(AlertDialog),
-      matching: find.text(text),
-    );
+    Finder alertText(String text) => find.descendant(of: find.byType(AlertDialog), matching: find.text(text));
 
     Future<void> pressAlertButton(WidgetTester tester, String text) async {
       // Try a real tap first; if the widget is off-screen or obscured the tap
@@ -37,17 +31,11 @@ void main() {
       // Narrow the target to the most recently shown AlertDialog, then find
       // the matching button inside it. This avoids tapping buttons belonging
       // to previous dialogs that may still be in the widget tree.
-      final List<Element> dialogs =
-          tester.elementList(find.byType(AlertDialog)).toList();
+      final List<Element> dialogs = tester.elementList(find.byType(AlertDialog)).toList();
       expect(dialogs, isNotEmpty);
       final Element lastDialog = dialogs.last;
-      final Finder dialogFinder = find.byElementPredicate(
-        (e) => e == lastDialog,
-      );
-      final Finder f = find.descendant(
-        of: dialogFinder,
-        matching: find.widgetWithText(TextButton, text),
-      );
+      final Finder dialogFinder = find.byElementPredicate((e) => e == lastDialog);
+      final Finder f = find.descendant(of: dialogFinder, matching: find.widgetWithText(TextButton, text));
       expect(f, findsWidgets);
       try {
         await tester.tap(f.first, warnIfMissed: false);
@@ -62,13 +50,12 @@ void main() {
     testWidgets('popupNoInternet and popupPDFSaved', (tester) async {
       // enlarge test surface so popups layout without overflow
       await tester.binding.setSurfaceSize(const Size(1200, 1600));
-      gl.display = gl.Display.empty();
-      gl.display.width = 1200;
-      gl.display.height = 1600;
-      gl.display.dpi = 1.0;
-      gl.display.orientation = Orientation.portrait;
-      gl.display.equipixel =
-          gl.display.height / gl.minEquiPixelsDisplayPortraitHeight;
+      gl.dsp = gl.Display.empty();
+      gl.dsp.width = 1200;
+      gl.dsp.height = 1600;
+      gl.dsp.dpi = 1.0;
+      gl.dsp.orientation = Orientation.portrait;
+      gl.dsp.equipixel = gl.dsp.height / gl.minEquiPixelsDisplayPortraitHeight;
       bool pdfAfter = false;
 
       BuildContext? rootContext;
@@ -109,17 +96,14 @@ void main() {
       expect(pdfAfter, isTrue);
     });
 
-    testWidgets('download recommended / permissions / download success/fail', (
-      tester,
-    ) async {
+    testWidgets('download recommended / permissions / download success/fail', (tester) async {
       await tester.binding.setSurfaceSize(const Size(1200, 1600));
-      gl.display = gl.Display.empty();
-      gl.display.width = 1200;
-      gl.display.height = 1600;
-      gl.display.dpi = 1.0;
-      gl.display.orientation = Orientation.portrait;
-      gl.display.equipixel =
-          gl.display.height / gl.minEquiPixelsDisplayPortraitHeight;
+      gl.dsp = gl.Display.empty();
+      gl.dsp.width = 1200;
+      gl.dsp.height = 1600;
+      gl.dsp.dpi = 1.0;
+      gl.dsp.orientation = Orientation.portrait;
+      gl.dsp.equipixel = gl.dsp.height / gl.minEquiPixelsDisplayPortraitHeight;
       bool accept = false;
       bool decline = false;
 
@@ -211,17 +195,14 @@ void main() {
       await pressAlertButton(tester, 'OK');
     });
 
-    testWidgets('color chooser and name introducer and do you really', (
-      tester,
-    ) async {
+    testWidgets('color chooser and name introducer and do you really', (tester) async {
       await tester.binding.setSurfaceSize(const Size(1200, 1600));
-      gl.display = gl.Display.empty();
-      gl.display.width = 1200;
-      gl.display.height = 1600;
-      gl.display.dpi = 1.0;
-      gl.display.orientation = Orientation.portrait;
-      gl.display.equipixel =
-          gl.display.height / gl.minEquiPixelsDisplayPortraitHeight;
+      gl.dsp = gl.Display.empty();
+      gl.dsp.width = 1200;
+      gl.dsp.height = 1600;
+      gl.dsp.dpi = 1.0;
+      gl.dsp.orientation = Orientation.portrait;
+      gl.dsp.equipixel = gl.dsp.height / gl.minEquiPixelsDisplayPortraitHeight;
       bool colorAfter = false;
       bool nameAfter = false;
       bool dydAfter = false;
@@ -290,13 +271,12 @@ void main() {
 
     testWidgets('polygon list and settings menu popups', (tester) async {
       await tester.binding.setSurfaceSize(const Size(1200, 1600));
-      gl.display = gl.Display.empty();
-      gl.display.width = 1200;
-      gl.display.height = 1600;
-      gl.display.dpi = 1.0;
-      gl.display.orientation = Orientation.portrait;
-      gl.display.equipixel =
-          gl.display.height / gl.minEquiPixelsDisplayPortraitHeight;
+      gl.dsp = gl.Display.empty();
+      gl.dsp.width = 1200;
+      gl.dsp.height = 1600;
+      gl.dsp.dpi = 1.0;
+      gl.dsp.orientation = Orientation.portrait;
+      gl.dsp.equipixel = gl.dsp.height / gl.minEquiPixelsDisplayPortraitHeight;
       bool after = false; // used to ensure popup can call after
       BuildContext? rootContext;
       await tester.pumpWidget(

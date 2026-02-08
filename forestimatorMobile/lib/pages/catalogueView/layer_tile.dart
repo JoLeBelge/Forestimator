@@ -28,13 +28,10 @@ class LayerTile {
       title: Text(gl.dico.getLayerBase(key).mWMSattribution),
       leading: Container(
         constraints: BoxConstraints(
-          maxWidth: gl.display.equipixel * gl.onCatalogueWidth * .75,
-          maxHeight: gl.display.equipixel * gl.onCatalogueWidth * .75,
+          maxWidth: gl.dsp.equipixel * gl.onCatalogueWidth * .75,
+          maxHeight: gl.dsp.equipixel * gl.onCatalogueWidth * .75,
         ),
-        child: Image.asset(
-          gl.dico.getLayerBase(key).mLogoAttributionFile,
-          fit: BoxFit.cover,
-        ),
+        child: Image.asset(gl.dico.getLayerBase(key).mLogoAttributionFile, fit: BoxFit.cover),
       ),
       trailing: const Icon(Icons.copyright),
     );
@@ -48,37 +45,24 @@ class LayerTile {
         children: [
           Container(
             alignment: Alignment.center,
-            constraints: BoxConstraints(
-              maxWidth: gl.display.equipixel * gl.onCatalogueWidth * .8,
-            ),
+            constraints: BoxConstraints(maxWidth: gl.dsp.equipixel * gl.onCatalogueWidth * .8),
             child: Text(
               "Propriétaire de la couche cartographique",
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: gl.display.equipixel * gl.fontSizeS),
+              style: TextStyle(fontSize: gl.dsp.equipixel * gl.fontSizeS),
             ),
           ),
           Container(
             alignment: Alignment.center,
-            constraints: BoxConstraints(
-              maxWidth: gl.display.equipixel * gl.onCatalogueWidth * .75,
-            ),
-            child: Image.asset(
-              gl.dico.getLayerBase(key).mLogoAttributionFile,
-              fit: BoxFit.cover,
-            ),
+            constraints: BoxConstraints(maxWidth: gl.dsp.equipixel * gl.onCatalogueWidth * .75),
+            child: Image.asset(gl.dico.getLayerBase(key).mLogoAttributionFile, fit: BoxFit.cover),
           ),
           Container(
             alignment: Alignment.center,
-            constraints: BoxConstraints(
-              maxWidth: gl.display.equipixel * gl.onCatalogueWidth * .75,
-            ),
+            constraints: BoxConstraints(maxWidth: gl.dsp.equipixel * gl.onCatalogueWidth * .75),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.copyright),
-                Text("  "),
-                Text(gl.dico.getLayerBase(key).mWMSattribution),
-              ],
+              children: [Icon(Icons.copyright), Text("  "), Text(gl.dico.getLayerBase(key).mWMSattribution)],
             ),
           ),
         ],
@@ -88,27 +72,14 @@ class LayerTile {
 
   Widget downloadedControlBar() {
     return Container(
-      constraints: const BoxConstraints(
-        maxWidth: 150,
-        minHeight: 32,
-        maxHeight: 32,
-      ),
+      constraints: const BoxConstraints(maxWidth: 150, minHeight: 32, maxHeight: 32),
       child:
           gl.dico.getLayerBase(key).mInDownload
-              ? const Text(
-                "en attente",
-                style: TextStyle(color: Color.fromARGB(255, 155, 124, 38)),
-              )
+              ? const Text("en attente", style: TextStyle(color: Color.fromARGB(255, 155, 124, 38)))
               : gl.dico.getLayerBase(key).mOffline
-              ? const Text(
-                "Enregistré",
-                style: TextStyle(color: gl.colorAgroBioTech),
-              )
+              ? const Text("Enregistré", style: TextStyle(color: gl.colorAgroBioTech))
               : gl.dico.getLayerBase(key).mIsDownloadableRW
-              ? const Text(
-                "Téléchargeable",
-                style: TextStyle(color: gl.colorUliege),
-              )
+              ? const Text("Téléchargeable", style: TextStyle(color: gl.colorUliege))
               : const Text(""),
     );
   }

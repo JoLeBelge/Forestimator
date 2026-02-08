@@ -146,6 +146,7 @@ class Mode {
 
   static void serialize() async {
     await shared!.setBool('Modes.essence', essence);
+    await shared!.setBool('Modes.essenceButton', essenceButton);
     await shared!.setBool('Modes.userDataFilled', userDataFilled);
     await shared!.setBool('Modes.userDataFilled', userDataFilled);
     await shared!.setBool('Modes.smallLabel', smallLabel);
@@ -153,6 +154,7 @@ class Mode {
 
   static void deserialize() {
     essence = shared!.getBool('Modes.essence') ?? false;
+    essenceButton = shared!.getBool('Modes.essenceButton') ?? false;
     essence = shared!.getBool('Modes.userDataFilled') ?? false;
     labelCross = shared!.getBool('Modes.labelCross') ?? false;
     smallLabel = shared!.getBool('Modes.smallLabel') ?? true;
@@ -160,6 +162,7 @@ class Mode {
 }
 
 class Display {
+  double paddingTop = -1;
   double width = -1;
   double height = -1;
   double dpi = -1;
@@ -171,13 +174,17 @@ class Display {
 
   Display.empty();
 
+  double alignX(double px) => (2.0 / width) * (equipixel * px);
+  double alignY(double px) => (2.0 / (height + paddingTop * 2)) * (equipixel * px);
+
   Display(BuildContext context) {
+    paddingTop = MediaQuery.of(context).padding.top;
     width = MediaQuery.of(context).size.width;
     height = MediaQuery.of(context).size.height;
     aspect = MediaQuery.of(context).size.aspectRatio;
     dpi = MediaQuery.of(context).devicePixelRatio;
     orientation = MediaQuery.of(context).orientation;
-
+    print(paddingTop);
     //_tabletMode();
     //_squareMode();
     _enforceEquiWidthHeight();
@@ -245,11 +252,11 @@ class Display {
   }
 }
 
-Display display = Display.empty();
+Display dsp = Display.empty();
 
 void initializeDisplayInfos(BuildContext context) {
-  display = Display(context);
-  print(display.toString());
+  dsp = Display(context);
+  print(dsp.toString());
 }
 
 // This has to be guaranteed on all displays to ensure correct visibility
@@ -388,9 +395,9 @@ bool get geoReady =>
     geoLayers[selectedGeoLayer].selectedGeometry > -1 &&
     geoLayers[selectedGeoLayer].geometries.isNotEmpty;
 
-double get equiPxl => display.equipixel;
-double get equiPxlH => display.equiheight;
-double get equiPxlW => display.equiwidth;
+double get eqPx => dsp.equipixel;
+double get eqPxH => dsp.equiheight;
+double get eqPxW => dsp.equiwidth;
 
 List<GeometricLayer> geoLayers = [];
 int selectedGeoLayer = -1;
@@ -830,6 +837,7 @@ List<Color> predefinedPointSymbPalette = [
 ];
 
 List<String> essenceChoice = [
+  "Choisissez",
   "Bouleaux",
   "Chênes",
   "Douglas",

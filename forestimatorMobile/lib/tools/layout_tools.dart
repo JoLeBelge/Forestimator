@@ -43,7 +43,7 @@ Widget stroke(double space, double thickness, Color color, {bool vertical = fals
       ? Row(
         children: [
           SizedBox(width: space),
-          Container(height: gl.display.equipixel * height, width: thickness, color: color),
+          Container(height: gl.dsp.equipixel * height, width: thickness, color: color),
           SizedBox(width: space),
         ],
       )
@@ -53,19 +53,19 @@ Widget stroke(double space, double thickness, Color color, {bool vertical = fals
 }
 
 Widget gridlines() {
-  double equiPixelPerLine = gl.display.equipixel * 4;
+  double equiPixelPerLine = gl.dsp.equipixel * 4;
   return Stack(
     children:
-        List<Widget>.generate((gl.display.width / equiPixelPerLine).round(), (i) {
+        List<Widget>.generate((gl.dsp.width / equiPixelPerLine).round(), (i) {
           return Container(
-            alignment: AlignmentGeometry.xy((1.0 - (2.0 / (gl.display.width / equiPixelPerLine).round() * i)), 0),
-            child: Container(height: gl.display.height, width: 1, color: Colors.black),
+            alignment: AlignmentGeometry.xy((1.0 - (2.0 / (gl.dsp.width / equiPixelPerLine).round() * i)), 0),
+            child: Container(height: gl.dsp.height, width: 1, color: Colors.black),
           );
         }) +
-        List<Widget>.generate((gl.display.height / equiPixelPerLine).round(), (i) {
+        List<Widget>.generate((gl.dsp.height / equiPixelPerLine).round(), (i) {
           return Container(
-            alignment: AlignmentGeometry.xy(0, (1.0 - (2.0 / (gl.display.height / equiPixelPerLine).round() * i))),
-            child: Container(height: 1, width: gl.display.width, color: Colors.black),
+            alignment: AlignmentGeometry.xy(0, (1.0 - (2.0 / (gl.dsp.height / equiPixelPerLine).round() * i))),
+            child: Container(height: 1, width: gl.dsp.width, color: Colors.black),
           );
         }),
   );
@@ -154,7 +154,7 @@ ButtonStyle get onOflineButtonstyle => ButtonStyle(
     WidgetState.any: gl.offlineMode ? gl.colorAgroBioTech : gl.colorUliege,
   }),
   fixedSize: WidgetStateProperty<Size>.fromMap(<WidgetStatesConstraint, Size>{
-    WidgetState.any: Size(gl.equiPxl * 40, gl.equiPxl * 10),
+    WidgetState.any: Size(gl.eqPx * 40, gl.eqPx * 10),
   }),
   padding: WidgetStateProperty<EdgeInsetsGeometry>.fromMap(<WidgetStatesConstraint, EdgeInsetsGeometry>{
     WidgetState.any: EdgeInsetsGeometry.zero,
@@ -167,7 +167,7 @@ ButtonStyle get essenceButtonstyle => ButtonStyle(
     WidgetState.any: gl.Mode.essence ? gl.colorAgroBioTech : gl.colorUliege,
   }),
   fixedSize: WidgetStateProperty<Size>.fromMap(<WidgetStatesConstraint, Size>{
-    WidgetState.any: Size(gl.equiPxl * 40, gl.equiPxl * 10),
+    WidgetState.any: Size(gl.eqPx * 40, gl.eqPx * 10),
   }),
   padding: WidgetStateProperty<EdgeInsetsGeometry>.fromMap(<WidgetStatesConstraint, EdgeInsetsGeometry>{
     WidgetState.any: EdgeInsetsGeometry.zero,
@@ -233,8 +233,8 @@ class _ForestimatorScrollView extends State<ForestimatorScrollView> {
 
   @override
   Widget build(BuildContext context) {
-    double width = widget.width ?? gl.equiPxl * 65;
-    double height = widget.height ?? gl.equiPxl * 20;
+    double width = widget.width ?? gl.eqPx * 65;
+    double height = widget.height ?? gl.eqPx * 20;
     double sizeArrows = widget.sizeArrows ?? width * .1;
     return Container(
       padding: EdgeInsets.zero,

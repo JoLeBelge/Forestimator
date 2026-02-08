@@ -8,33 +8,23 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   group('switchRowColWithOrientation', () {
-    testWidgets('returns Column for portrait orientation', (
-      WidgetTester tester,
-    ) async {
+    testWidgets('returns Column for portrait orientation', (WidgetTester tester) async {
       // Arrange
-      gl.display.orientation = Orientation.portrait;
+      gl.dsp.orientation = Orientation.portrait;
 
       // Act
-      final widget = switchRowColWithOrientation([
-        const Text('A'),
-        const Text('B'),
-      ]);
+      final widget = switchRowColWithOrientation([const Text('A'), const Text('B')]);
 
       // Assert
       expect(widget, isA<Column>());
     });
 
-    testWidgets('returns Row for landscape orientation', (
-      WidgetTester tester,
-    ) async {
+    testWidgets('returns Row for landscape orientation', (WidgetTester tester) async {
       // Arrange
-      gl.display.orientation = Orientation.landscape;
+      gl.dsp.orientation = Orientation.landscape;
 
       // Act
-      final widget = switchRowColWithOrientation([
-        const Text('A'),
-        const Text('B'),
-      ]);
+      final widget = switchRowColWithOrientation([const Text('A'), const Text('B')]);
 
       // Assert
       expect(widget, isA<Row>());
@@ -42,7 +32,7 @@ void main() {
 
     test('styleSettingMenu returns expected font size', () {
       // Arrange
-      final expected = gl.display.equipixel * gl.fontSizeM;
+      final expected = gl.dsp.equipixel * gl.fontSizeM;
 
       // Act
       final style = styleSettingMenu();

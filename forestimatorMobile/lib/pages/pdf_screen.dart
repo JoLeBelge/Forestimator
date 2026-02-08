@@ -8,19 +8,13 @@ class PDFScreen extends StatefulWidget {
   final String titre;
   final int currentPage;
 
-  const PDFScreen({
-    super.key,
-    required this.path,
-    required this.titre,
-    this.currentPage = 0,
-  });
+  const PDFScreen({super.key, required this.path, required this.titre, this.currentPage = 0});
   @override
   State<StatefulWidget> createState() => _PDFScreenState();
 }
 
 class _PDFScreenState extends State<PDFScreen> with WidgetsBindingObserver {
-  final Completer<PDFViewController> _controller =
-      Completer<PDFViewController>();
+  final Completer<PDFViewController> _controller = Completer<PDFViewController>();
   int? pages = 0;
   bool isReady = false;
   String errorMessage = '';
@@ -37,11 +31,9 @@ class _PDFScreenState extends State<PDFScreen> with WidgetsBindingObserver {
             autoSpacing: false,
             pageFling: true,
             pageSnap: true,
-            defaultPage:
-                widget.currentPage > 0 ? widget.currentPage : gl.currentPage,
+            defaultPage: widget.currentPage > 0 ? widget.currentPage : gl.currentPage,
             fitPolicy: FitPolicy.BOTH,
-            preventLinkNavigation:
-                false, // if set to true the link is handled in flutter
+            preventLinkNavigation: false, // if set to true the link is handled in flutter
             onRender: (xpages) {
               setState(() {
                 pages = xpages;
@@ -74,16 +66,8 @@ class _PDFScreenState extends State<PDFScreen> with WidgetsBindingObserver {
               TextButton(
                 child: Stack(
                   children: [
-                    Icon(
-                      Icons.arrow_back,
-                      color: Colors.black,
-                      size: gl.iconSizeM * gl.display.equipixel,
-                    ),
-                    Icon(
-                      Icons.arrow_back,
-                      color: Colors.white,
-                      size: gl.iconSizeM * (gl.display.equipixel - .2),
-                    ),
+                    Icon(Icons.arrow_back, color: Colors.black, size: gl.iconSizeM * gl.dsp.equipixel),
+                    Icon(Icons.arrow_back, color: Colors.white, size: gl.iconSizeM * (gl.dsp.equipixel - .2)),
                   ],
                 ),
                 onPressed: () {
