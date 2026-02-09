@@ -821,6 +821,7 @@ List<IconData> selectableIconGeo = [
   FontAwesomeIcons.triangleExclamation,
   FontAwesomeIcons.drawPolygon,
   FontAwesomeIcons.crop,
+  FontAwesomeIcons.noteSticky,
 ];
 
 List<Color> predefinedPointSymbPalette = [

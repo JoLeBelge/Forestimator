@@ -259,7 +259,7 @@ class _ForestimatorScrollView extends State<ForestimatorScrollView> {
                 width: sizeArrows,
                 child:
                     !_atTop
-                        ? Icon(Icons.arrow_left_outlined, color: widget.arrowColor ?? Colors.white, size: sizeArrows)
+                        ? Icon(Icons.arrow_left_outlined, color: widget.arrowColor ?? Colors.red, size: sizeArrows)
                         : Container(),
               ),
               Container(
@@ -268,7 +268,7 @@ class _ForestimatorScrollView extends State<ForestimatorScrollView> {
                 width: sizeArrows,
                 child:
                     !_atBottom
-                        ? Icon(Icons.arrow_right_outlined, color: widget.arrowColor ?? Colors.white, size: sizeArrows)
+                        ? Icon(Icons.arrow_right_outlined, color: widget.arrowColor ?? Colors.red, size: sizeArrows)
                         : Container(),
               ),
             ],

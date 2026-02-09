@@ -1666,7 +1666,6 @@ class _MapPageState extends State<MapPage> {
                                           height: gl.dsp.equipixel * gl.iconSizeXS * 2.5,
                                           sizeArrows: gl.dsp.equipixel * gl.iconSizeM,
                                           horizontal: true,
-                                          arrowColor: Colors.black,
                                           child: Row(
                                             children: List<Widget>.generate(gl.selectableIconGeo.length, (k) {
                                               return Container(
@@ -1780,33 +1779,47 @@ class _MapPageState extends State<MapPage> {
                                                   gl.selLay.selectedGeometry == index
                                                       ? gl.selGeo.colorInside
                                                       : Colors.transparent,
-                                              child: IconButton(
-                                                style: lt.trNoPadButtonstyle,
-                                                onPressed: () {
-                                                  setState(() {
-                                                    if (gl.selLay.selectedGeometry == index) {
-                                                      gl.selLay.selectedGeometry = -1;
-                                                    } else {
-                                                      gl.selLay.selectedGeometry = index;
-                                                    }
-                                                  });
-                                                },
-                                                icon: Icon(
-                                                  gl.selLay.type == "Point"
-                                                      ? gl.selectableIcons[gl
-                                                          .selLay
-                                                          .geometries[index]
-                                                          .selectedPointIcon]
-                                                      : gl.selectableIconGeo[gl
-                                                          .selLay
-                                                          .geometries[index]
-                                                          .selectedPointIcon],
-                                                  color:
-                                                      gl.selLay.selectedGeometry == index
-                                                          ? Colors.white
-                                                          : gl.selLay.geometries[index].colorLine,
-                                                  size: gl.dsp.equipixel * gl.iconSizeS,
-                                                ),
+                                              child: Stack(
+                                                children: [
+                                                  IconButton(
+                                                    style: lt.trNoPadButtonstyle,
+                                                    onPressed: () {
+                                                      setState(() {
+                                                        if (gl.selLay.selectedGeometry == index) {
+                                                          gl.selLay.selectedGeometry = -1;
+                                                        } else {
+                                                          gl.selLay.selectedGeometry = index;
+                                                        }
+                                                      });
+                                                    },
+                                                    icon: Icon(
+                                                      gl.selLay.type == "Point"
+                                                          ? gl.selectableIcons[gl
+                                                              .selLay
+                                                              .geometries[index]
+                                                              .selectedPointIcon]
+                                                          : gl.selectableIconGeo[gl
+                                                              .selLay
+                                                              .geometries[index]
+                                                              .selectedPointIcon],
+                                                      color:
+                                                          gl.selLay.selectedGeometry == index
+                                                              ? Colors.white
+                                                              : gl.selLay.geometries[index].colorLine,
+                                                      size: gl.dsp.equipixel * gl.iconSizeS,
+                                                    ),
+                                                  ),
+                                                  Container(
+                                                    alignment: AlignmentGeometry.topLeft,
+                                                    child: Text(
+                                                      "$index",
+                                                      style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: gl.eqPx * gl.fontSizeXXS,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
                                               ),
                                             );
                                           }),
@@ -2048,26 +2061,43 @@ class _MapPageState extends State<MapPage> {
                                                   gl.selLay.selectedGeometry == index
                                                       ? gl.selGeo.colorLine
                                                       : Colors.transparent,
-                                              child: IconButton(
-                                                style: lt.trNoPadButtonstyle,
-                                                onPressed: () {
-                                                  setState(() {
-                                                    gl.selLay.selectedGeometry = index;
-                                                  });
-                                                },
-                                                icon: Icon(
-                                                  gl.selLay.type == "Point"
-                                                      ? gl.selectableIcons[gl
-                                                          .selLay
-                                                          .geometries[index]
-                                                          .selectedPointIcon]
-                                                      : Icons.hexagon_outlined,
-                                                  color:
-                                                      gl.selLay.selectedGeometry == index
-                                                          ? Colors.white
-                                                          : gl.selLay.geometries[index].colorLine,
-                                                  size: gl.dsp.equipixel * gl.iconSizeS,
-                                                ),
+                                              child: Stack(
+                                                children: [
+                                                  IconButton(
+                                                    style: lt.trNoPadButtonstyle,
+                                                    onPressed: () {
+                                                      setState(() {
+                                                        gl.selLay.selectedGeometry = index;
+                                                      });
+                                                    },
+                                                    icon: Icon(
+                                                      gl.selLay.type == "Point"
+                                                          ? gl.selectableIcons[gl
+                                                              .selLay
+                                                              .geometries[index]
+                                                              .selectedPointIcon]
+                                                          : gl.selectableIconGeo[gl
+                                                              .selLay
+                                                              .geometries[index]
+                                                              .selectedPointIcon],
+                                                      color:
+                                                          gl.selLay.selectedGeometry == index
+                                                              ? Colors.white
+                                                              : gl.selLay.geometries[index].colorLine,
+                                                      size: gl.dsp.equipixel * gl.iconSizeS,
+                                                    ),
+                                                  ),
+                                                  Container(
+                                                    alignment: AlignmentGeometry.topLeft,
+                                                    child: Text(
+                                                      "$index",
+                                                      style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: gl.eqPx * gl.fontSizeXXS,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
                                               ),
                                             );
                                           }),
