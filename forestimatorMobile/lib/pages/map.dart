@@ -60,6 +60,14 @@ class _MapPageState extends State<MapPage> {
   double iconSize = 50.0;
   ScrollController propertiesTableScrollController = ScrollController();
 
+  Point<double> _layToolBoxPos = Point<double>(
+    gl.dsp.alignX(0),
+    gl.dsp.alignY(-gl.eqPxH / 2.0 + gl.dsp.paddingTop / gl.eqPx / 2.0),
+  );
+  Point<double> get _layToolBoxAnimOnScreenPos =>
+      Point<double>(gl.dsp.alignX(0), gl.dsp.alignY(-gl.eqPxH / 2.0 + gl.dsp.paddingTop / gl.eqPx / 2.0));
+  Point<double> get _layToolBoxAnimOffScreenPos => Point<double>(gl.dsp.alignX(0), gl.dsp.alignY(-250));
+
   //https://github.com/fleaflet/flutter_map/blob/master/example/lib/pages/custom_crs/custom_crs.dart
   late proj4.Projection epsg4326 = proj4.Projection.get('EPSG:4326')!;
   // si epsg31370 est dans la db proj 4, on prend, sinon on définit
@@ -400,32 +408,32 @@ class _MapPageState extends State<MapPage> {
                                         color: gl.backgroundTransparentBlackBox,
                                         child: Container(
                                           constraints: BoxConstraints(
-                                            minHeight: gl.dsp.equipixel * gl.loadingMapBoxHeight,
-                                            minWidth: gl.dsp.equipixel * gl.loadingMapBoxWidth,
-                                            maxWidth: gl.dsp.equipixel * gl.loadingMapBoxWidth,
+                                            minHeight: gl.eqPx * gl.loadingMapBoxHeight,
+                                            minWidth: gl.eqPx * gl.loadingMapBoxWidth,
+                                            maxWidth: gl.eqPx * gl.loadingMapBoxWidth,
                                           ),
                                           child: Row(
                                             mainAxisAlignment: MainAxisAlignment.center,
                                             children: [
                                               SizedBox(
-                                                width: gl.dsp.equipixel * gl.loadingMapBoxWidth * .7,
+                                                width: gl.eqPx * gl.loadingMapBoxWidth * .7,
                                                 child: Text(
                                                   "La carte choisie est en préparation dans la mémoire.",
                                                   textAlign: TextAlign.center,
                                                   style: TextStyle(
                                                     color: Colors.white,
-                                                    fontSize: gl.dsp.equipixel * gl.fontSizeS,
+                                                    fontSize: gl.eqPx * gl.fontSizeS,
                                                   ),
                                                 ),
                                               ),
-                                              SizedBox(width: gl.dsp.equipixel * gl.fontSizeS),
+                                              SizedBox(width: gl.eqPx * gl.fontSizeS),
                                               CircularProgressIndicator(
                                                 constraints: BoxConstraints(
-                                                  minHeight: gl.dsp.equipixel * gl.fontSizeXL,
-                                                  minWidth: gl.dsp.equipixel * gl.fontSizeXL,
+                                                  minHeight: gl.eqPx * gl.fontSizeXL,
+                                                  minWidth: gl.eqPx * gl.fontSizeXL,
                                                 ),
                                                 color: gl.colorAgroBioTech,
-                                                strokeWidth: gl.dsp.equipixel * gl.fontSizeS * .5,
+                                                strokeWidth: gl.eqPx * gl.fontSizeS * .5,
                                               ),
                                             ],
                                           ),
@@ -508,7 +516,7 @@ class _MapPageState extends State<MapPage> {
                                         final LayerHitResult<String>? result = hitNotifier.value;
                                         if (result == null) return;
                                         int index = 0;
-                                        if (gl.Mode.openToolbox) {
+                                        if (gl.Mode.polygon) {
                                           for (var it in gl.selLay.geometries) {
                                             if (result.hitValues.first == it.identifier) {
                                               setState(() {
@@ -564,19 +572,22 @@ class _MapPageState extends State<MapPage> {
     );
   }
 
-  Widget get forestimatorGeoMenu =>
-      (gl.layerReady && gl.Mode.polygon)
-          ? Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              SizedBox(height: gl.dsp.paddingTop),
-              Row(
+  Widget get forestimatorGeoMenu => SizedBox(
+    width: gl.eqPx * gl.eqPxW,
+    height: gl.eqPx * gl.eqPxH,
+    child: AnimatedContainer(
+      alignment: Alignment(_layToolBoxPos.x, _layToolBoxPos.y),
+      curve: Curves.easeInOutBack,
+      duration: Duration(milliseconds: 750),
+      child:
+          (gl.layerReady)
+              ? Row(
                 mainAxisAlignment:
                     gl.dsp.orientation == Orientation.portrait ? MainAxisAlignment.center : MainAxisAlignment.start,
                 children: [
                   SizedBox(
-                    width: gl.dsp.equipixel * gl.chosenPolyBarWidth,
-                    height: gl.dsp.equipixel * computePolygonTitleHeight(),
+                    width: gl.eqPx * gl.chosenPolyBarWidth,
+                    height: gl.eqPx * computePolygonTitleHeight(),
                     child: Card(
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadiusGeometry.circular(12.0),
@@ -591,7 +602,7 @@ class _MapPageState extends State<MapPage> {
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: [
                               SizedBox(
-                                height: gl.dsp.equipixel * gl.iconSizeM * .9,
+                                height: gl.eqPx * gl.iconSizeM * .9,
                                 child: IconButton(
                                   style: lt.borderlessStyle,
                                   onPressed: () {
@@ -606,119 +617,122 @@ class _MapPageState extends State<MapPage> {
                                       gl.selLay.visibleOnMap
                                           ? FaIcon(
                                             FontAwesomeIcons.eyeSlash,
-                                            size: gl.dsp.equipixel * gl.iconSizeS * .9,
+                                            size: gl.eqPx * gl.iconSizeS * .9,
                                             color: Colors.white,
                                           )
                                           : FaIcon(
                                             FontAwesomeIcons.eye,
-                                            size: gl.dsp.equipixel * gl.iconSizeS * .9,
+                                            size: gl.eqPx * gl.iconSizeS * .9,
                                             color: Colors.white,
                                           ),
                                 ),
                               ),
                               SizedBox(
-                                width: gl.dsp.equipixel * gl.chosenPolyBarWidth * .5,
-                                child: Stack(
-                                  children: [
-                                    Row(
-                                      children: [
-                                        Column(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            gl.selLay.type.contains("Point")
-                                                ? Text(
-                                                  "POINT",
-                                                  style: TextStyle(
-                                                    color: Colors.yellow,
-                                                    fontSize: gl.dsp.equipixel * gl.fontSizeXS * .9,
-                                                  ),
-                                                )
-                                                : gl.selLay.type == "Polygon"
-                                                ? Text(
-                                                  "POLY",
-                                                  style: TextStyle(
-                                                    color: Colors.green,
-                                                    fontSize: gl.dsp.equipixel * gl.fontSizeXS * .9,
-                                                  ),
-                                                )
-                                                : Text(
-                                                  "OHA?",
-                                                  style: TextStyle(
-                                                    color: Colors.red,
-                                                    fontSize: gl.dsp.equipixel * gl.fontSizeXS * .9,
-                                                  ),
-                                                ),
-                                            Icon(
-                                              (gl.selLay.type.contains("Point")
-                                                  ? gl.selectableIcons[gl.selLay.defaultPointIcon]
-                                                  : Icons.hexagon_outlined),
-                                              size: gl.iconSizeXS * gl.dsp.equipixel,
-                                              color: gl.selLay.defaultColor,
-                                            ),
-                                          ],
-                                        ),
-                                        SizedBox(width: gl.dsp.equipixel * 2),
-                                        if (gl.selLay.allSent())
-                                          Container(
-                                            alignment: Alignment.topRight,
-                                            child: Text(
-                                              "ALL SENT",
-                                              style: TextStyle(
-                                                color: Colors.red,
-                                                fontSize: gl.dsp.equipixel * gl.fontSizeXS * .9,
-                                              ),
-                                            ),
-                                          ),
-                                      ],
+                                width: gl.eqPx * 60,
+                                height: gl.eqPx * 8,
+                                child: DropdownMenuFormField<int>(
+                                  label: lt.ForestimatorScrollView(
+                                    width: gl.eqPx * 50,
+                                    height: gl.eqPx * 8,
+                                    horizontal: true,
+                                    child: Text(
+                                      gl.selLay.name,
+                                      style: TextStyle(color: Colors.white, fontSize: gl.eqPx * gl.fontSizeL),
                                     ),
-                                    Container(
-                                      alignment: Alignment.center,
-                                      child: SingleChildScrollView(
-                                        scrollDirection: Axis.horizontal,
-                                        child: Text(
-                                          gl.selLay.name,
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: gl.dsp.equipixel * gl.fontSizeL,
+                                  ),
+                                  trailingIcon: Icon(
+                                    Icons.arrow_drop_down_outlined,
+                                    size: gl.eqPx * gl.iconSizeXS,
+                                    color: Colors.white,
+                                  ),
+                                  selectedTrailingIcon: Icon(
+                                    Icons.arrow_drop_up_outlined,
+                                    size: gl.eqPx * gl.iconSizeXS,
+                                    color: Colors.white,
+                                  ),
+                                  expandedInsets: EdgeInsets.zero,
+                                  textStyle: TextStyle(color: Colors.transparent, fontSize: 0),
+                                  menuStyle: MenuStyle(
+                                    backgroundColor: WidgetStateProperty<Color>.fromMap(<WidgetStatesConstraint, Color>{
+                                      WidgetState.any: gl.backgroundTransparentBlackBox,
+                                    }),
+                                    shape: WidgetStateProperty<RoundedRectangleBorder>.fromMap(
+                                      <WidgetStatesConstraint, RoundedRectangleBorder>{
+                                        WidgetState.any: RoundedRectangleBorder(
+                                          borderRadius: BorderRadiusGeometry.circular(12.0),
+                                          side: BorderSide(color: gl.colorAgroBioTech, width: 2.0),
+                                        ),
+                                      },
+                                    ),
+                                    side: WidgetStateProperty<BorderSide>.fromMap(<WidgetStatesConstraint, BorderSide>{
+                                      WidgetState.any: BorderSide(color: gl.colorAgroBioTech, width: 2.0),
+                                    }),
+                                  ),
+                                  initialSelection: gl.selectedGeoLayer,
+                                  onSelected:
+                                      (int? value) => setState(() {
+                                        gl.selectedGeoLayer = value!;
+                                      }),
+                                  dropdownMenuEntries: List<DropdownMenuEntry<int>>.generate(gl.geoLayers.length, (
+                                    int index,
+                                  ) {
+                                    return DropdownMenuEntry<int>(
+                                      label: "",
+                                      value: index,
+                                      labelWidget: Container(
+                                        alignment: Alignment.center,
+                                        child: SingleChildScrollView(
+                                          scrollDirection: Axis.horizontal,
+                                          child: Text(
+                                            gl.geoLayers[index].name,
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(color: Colors.white, fontSize: gl.eqPx * gl.fontSizeL),
                                           ),
                                         ),
                                       ),
-                                    ),
-                                  ],
+                                    );
+                                  }),
                                 ),
                               ),
-                              SizedBox(
-                                height: gl.dsp.equipixel * gl.iconSizeM * .9,
-                                child: IconButton(
-                                  style: lt.borderlessStyle,
-                                  onPressed: () {
-                                    refreshView(() {
-                                      gl.Mode.openToolbox = !gl.Mode.openToolbox;
-                                    });
-                                  },
-                                  icon: FaIcon(
-                                    FontAwesomeIcons.toolbox,
-                                    size: gl.dsp.equipixel * gl.iconSizeS * .9,
-                                    color: Colors.white,
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  gl.selLay.type.contains("Point")
+                                      ? Text(
+                                        "POINT",
+                                        style: TextStyle(color: Colors.yellow, fontSize: gl.eqPx * gl.fontSizeXS * .9),
+                                      )
+                                      : gl.selLay.type == "Polygon"
+                                      ? Text(
+                                        "POLY",
+                                        style: TextStyle(color: Colors.green, fontSize: gl.eqPx * gl.fontSizeXS * .9),
+                                      )
+                                      : Text(
+                                        "OHA?",
+                                        style: TextStyle(color: Colors.red, fontSize: gl.eqPx * gl.fontSizeXS * .9),
+                                      ),
+                                  Icon(
+                                    (gl.selLay.type.contains("Point")
+                                        ? gl.selectableIcons[gl.selLay.defaultPointIcon]
+                                        : Icons.hexagon_outlined),
+                                    size: gl.iconSizeXS * gl.eqPx,
+                                    color: gl.selLay.defaultColor,
                                   ),
-                                ),
+                                ],
                               ),
                             ],
                           ),
-                          !gl.Mode.openToolbox
-                              ? SizedBox()
-                              : (gl.Mode.editPolygon && gl.geoReady)
+                          (gl.Mode.editPolygon && gl.geoReady)
                               ? Column(
                                 children: [
-                                  lt.stroke(gl.dsp.equipixel, gl.dsp.equipixel * .5, gl.colorAgroBioTech),
+                                  lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
                                   Row(
                                     children: [
                                       SizedBox(
-                                        height: gl.dsp.equipixel * gl.iconSizeM * .9,
+                                        height: gl.eqPx * gl.iconSizeM * .9,
                                         child: IconButton(
                                           style: lt.borderlessStyle,
-                                          iconSize: gl.dsp.equipixel * gl.iconSizeS,
+                                          iconSize: gl.eqPx * gl.iconSizeS,
                                           color: Colors.lightGreenAccent,
                                           onPressed: () {
                                             refreshView(() {
@@ -732,12 +746,12 @@ class _MapPageState extends State<MapPage> {
                                               gl.Mode.removeVertexesPolygon = false;
                                             });
                                           },
-                                          icon: Icon(Icons.arrow_back, size: gl.dsp.equipixel * gl.iconSizeS * .9),
+                                          icon: Icon(Icons.arrow_back, size: gl.eqPx * gl.iconSizeS * .9),
                                         ),
                                       ),
                                     ],
                                   ),
-                                  lt.stroke(gl.dsp.equipixel, gl.dsp.equipixel * .5, gl.colorAgroBioTech),
+                                  lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                                     children: [
@@ -745,10 +759,10 @@ class _MapPageState extends State<MapPage> {
                                           ? Container(
                                             color: _polygonMenuColorTools(gl.Mode.removeVertexesPolygon),
                                             child: SizedBox(
-                                              height: gl.dsp.equipixel * gl.iconSizeM * .9,
+                                              height: gl.eqPx * gl.iconSizeM * .9,
                                               child: IconButton(
                                                 style: lt.borderlessStyle,
-                                                iconSize: gl.dsp.equipixel * gl.iconSizeS,
+                                                iconSize: gl.eqPx * gl.iconSizeS,
                                                 color:
                                                     gl.Mode.removeVertexesPolygon
                                                         ? Colors.white
@@ -794,10 +808,10 @@ class _MapPageState extends State<MapPage> {
                                             ),
                                           )
                                           : SizedBox(
-                                            height: gl.dsp.equipixel * gl.iconSizeM * .9,
+                                            height: gl.eqPx * gl.iconSizeM * .9,
                                             child: IconButton(
                                               style: lt.borderlessStyle,
-                                              iconSize: gl.dsp.equipixel * gl.iconSizeS,
+                                              iconSize: gl.eqPx * gl.iconSizeS,
                                               color: Colors.white24,
                                               onPressed: () {},
                                               icon: const Icon(Icons.remove_circle),
@@ -809,10 +823,10 @@ class _MapPageState extends State<MapPage> {
                                           ? Container(
                                             color: _polygonMenuColorTools(gl.Mode.addVertexesPolygon),
                                             child: SizedBox(
-                                              height: gl.dsp.equipixel * gl.iconSizeM * .9,
+                                              height: gl.eqPx * gl.iconSizeM * .9,
                                               child: IconButton(
                                                 style: lt.borderlessStyle,
-                                                iconSize: gl.dsp.equipixel * gl.iconSizeS,
+                                                iconSize: gl.eqPx * gl.iconSizeS,
                                                 color:
                                                     gl.Mode.addVertexesPolygon ? Colors.white : Colors.lightGreenAccent,
                                                 onPressed: () async {
@@ -832,10 +846,10 @@ class _MapPageState extends State<MapPage> {
                                             ),
                                           )
                                           : SizedBox(
-                                            height: gl.dsp.equipixel * gl.iconSizeM * .9,
+                                            height: gl.eqPx * gl.iconSizeM * .9,
                                             child: IconButton(
                                               style: lt.borderlessStyle,
-                                              iconSize: gl.dsp.equipixel * gl.iconSizeS,
+                                              iconSize: gl.eqPx * gl.iconSizeS,
                                               color: Colors.white24,
                                               onPressed: () {},
                                               icon: const Icon(Icons.add_circle),
@@ -845,14 +859,14 @@ class _MapPageState extends State<MapPage> {
                                           ? Container(
                                             color: _polygonMenuColorTools(gl.Mode.moveVertexesPolygon),
                                             child: SizedBox(
-                                              height: gl.dsp.equipixel * gl.iconSizeM * .9,
+                                              height: gl.eqPx * gl.iconSizeM * .9,
                                               child: IconButton(
                                                 style: lt.borderlessStyle,
                                                 color:
                                                     gl.Mode.moveVertexesPolygon
                                                         ? Colors.white
                                                         : Colors.lightGreenAccent,
-                                                iconSize: gl.dsp.equipixel * gl.iconSizeS,
+                                                iconSize: gl.eqPx * gl.iconSizeS,
                                                 onPressed: () async {
                                                   refreshView(() {
                                                     gl.Mode.moveVertexesPolygon = !gl.Mode.moveVertexesPolygon;
@@ -906,10 +920,10 @@ class _MapPageState extends State<MapPage> {
                                             ),
                                           )
                                           : SizedBox(
-                                            height: gl.dsp.equipixel * gl.iconSizeM * .9,
+                                            height: gl.eqPx * gl.iconSizeM * .9,
                                             child: IconButton(
                                               style: lt.borderlessStyle,
-                                              iconSize: gl.dsp.equipixel * gl.iconSizeS,
+                                              iconSize: gl.eqPx * gl.iconSizeS,
                                               color: Colors.white24,
                                               onPressed: () {},
                                               icon: const Icon(Icons.open_with_rounded),
@@ -925,121 +939,103 @@ class _MapPageState extends State<MapPage> {
                                 children: [
                                   Column(
                                     children: [
-                                      lt.stroke(gl.dsp.equipixel, gl.dsp.equipixel * .5, gl.colorAgroBioTech),
+                                      lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
                                       Row(
                                         children: [
                                           Container(
                                             alignment: Alignment.topLeft,
                                             child: SizedBox(
-                                              height: gl.dsp.equipixel * gl.iconSizeM * .9,
+                                              height: gl.eqPx * gl.iconSizeM * .9,
                                               child: IconButton(
                                                 style: lt.borderlessStyle,
-                                                iconSize: gl.dsp.equipixel * gl.iconSizeS,
+                                                iconSize: gl.eqPx * gl.iconSizeS,
                                                 color: Colors.lightGreenAccent,
                                                 onPressed: () {
                                                   refreshView(() {
                                                     gl.Mode.editAttributes = false;
                                                   });
                                                 },
-                                                icon: Icon(
-                                                  Icons.arrow_back,
-                                                  size: gl.dsp.equipixel * gl.iconSizeS * .9,
-                                                ),
+                                                icon: Icon(Icons.arrow_back, size: gl.eqPx * gl.iconSizeS * .9),
                                               ),
                                             ),
                                           ),
                                           Container(
                                             alignment: Alignment.centerLeft,
-                                            width: gl.dsp.equipixel * gl.chosenPolyBarWidth * .75,
+                                            width: gl.eqPx * gl.chosenPolyBarWidth * .75,
                                             child: Text(
                                               "Table des attributs",
                                               textAlign: TextAlign.center,
                                               style: TextStyle(
                                                 color: Colors.white,
-                                                fontSize: gl.dsp.equipixel * gl.fontSizeM * .75,
+                                                fontSize: gl.eqPx * gl.fontSizeM * .75,
                                               ),
                                             ),
                                           ),
                                         ],
                                       ),
-                                      lt.stroke(gl.dsp.equipixel, gl.dsp.equipixel * .5, gl.colorAgroBioTech),
+                                      lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
                                       Column(
                                         children: [
                                           Row(
                                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                             children: [
                                               SizedBox(
-                                                width: gl.dsp.equipixel * 11,
+                                                width: gl.eqPx * 11,
                                                 child: Text(
                                                   "type",
                                                   textAlign: TextAlign.center,
                                                   style: TextStyle(
                                                     color: Colors.white,
                                                     fontWeight: FontWeight.bold,
-                                                    fontSize: gl.dsp.equipixel * gl.fontSizeM * .75,
+                                                    fontSize: gl.eqPx * gl.fontSizeM * .75,
                                                   ),
                                                 ),
                                               ),
-                                              lt.stroke(
-                                                vertical: true,
-                                                gl.dsp.equipixel,
-                                                gl.dsp.equipixel * 0.5,
-                                                gl.colorAgroBioTech,
-                                              ),
+                                              lt.stroke(vertical: true, gl.eqPx, gl.eqPx * 0.5, gl.colorAgroBioTech),
                                               SizedBox(
-                                                width: gl.dsp.equipixel * 7,
+                                                width: gl.eqPx * 7,
                                                 child: Icon(
                                                   Icons.remove_red_eye,
                                                   color: Colors.white,
-                                                  size: gl.dsp.equipixel * gl.iconSizeXS,
+                                                  size: gl.eqPx * gl.iconSizeXS,
                                                 ),
                                               ),
-                                              lt.stroke(
-                                                vertical: true,
-                                                gl.dsp.equipixel,
-                                                gl.dsp.equipixel * 0.5,
-                                                gl.colorAgroBioTech,
-                                              ),
+                                              lt.stroke(vertical: true, gl.eqPx, gl.eqPx * 0.5, gl.colorAgroBioTech),
                                               SizedBox(
-                                                width: gl.dsp.equipixel * 33,
+                                                width: gl.eqPx * 33,
                                                 child: Text(
                                                   "Attribut",
                                                   textAlign: TextAlign.center,
                                                   style: TextStyle(
                                                     color: Colors.white,
                                                     fontWeight: FontWeight.bold,
-                                                    fontSize: gl.dsp.equipixel * gl.fontSizeM * .75,
+                                                    fontSize: gl.eqPx * gl.fontSizeM * .75,
                                                   ),
                                                 ),
                                               ),
-                                              lt.stroke(
-                                                vertical: true,
-                                                gl.dsp.equipixel,
-                                                gl.dsp.equipixel * 0.5,
-                                                gl.colorAgroBioTech,
-                                              ),
+                                              lt.stroke(vertical: true, gl.eqPx, gl.eqPx * 0.5, gl.colorAgroBioTech),
                                               SizedBox(
-                                                width: gl.dsp.equipixel * 33,
+                                                width: gl.eqPx * 33,
                                                 child: Text(
                                                   "Valeur",
                                                   textAlign: TextAlign.center,
                                                   style: TextStyle(
                                                     color: Colors.white,
                                                     fontWeight: FontWeight.bold,
-                                                    fontSize: gl.dsp.equipixel * gl.fontSizeM * .75,
+                                                    fontSize: gl.eqPx * gl.fontSizeM * .75,
                                                   ),
                                                 ),
                                               ),
                                             ],
                                           ),
-                                          lt.stroke(gl.dsp.equipixel, gl.dsp.equipixel * 0.5, gl.colorAgroBioTech),
+                                          lt.stroke(gl.eqPx, gl.eqPx * 0.5, gl.colorAgroBioTech),
                                           Scrollbar(
                                             scrollbarOrientation: ScrollbarOrientation.right,
-                                            thickness: gl.dsp.equipixel * 3,
+                                            thickness: gl.eqPx * 3,
                                             controller: propertiesTableScrollController,
                                             child: Container(
                                               color: gl.backgroundTransparentBlackBox.withAlpha(100),
-                                              height: gl.dsp.equipixel * gl.attributeTableHeight,
+                                              height: gl.eqPx * gl.attributeTableHeight,
                                               child: ListView(
                                                 controller: propertiesTableScrollController,
                                                 children:
@@ -1069,8 +1065,8 @@ class _MapPageState extends State<MapPage> {
                                                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                                             children: [
                                                               SizedBox(
-                                                                width: gl.dsp.equipixel * 11,
-                                                                height: gl.dsp.equipixel * gl.iconSizeS,
+                                                                width: gl.eqPx * 11,
+                                                                height: gl.eqPx * gl.iconSizeS,
                                                                 child: TextButton(
                                                                   style: ButtonStyle(
                                                                     animationDuration: Duration(seconds: 1),
@@ -1096,8 +1092,7 @@ class _MapPageState extends State<MapPage> {
                                                                               "INT",
                                                                               style: TextStyle(
                                                                                 color: Colors.yellow,
-                                                                                fontSize:
-                                                                                    gl.fontSizeXXS * gl.dsp.equipixel,
+                                                                                fontSize: gl.fontSizeXXS * gl.eqPx,
                                                                               ),
                                                                             )
                                                                             : gl.selGeo.attributes[i].type == "string"
@@ -1105,8 +1100,7 @@ class _MapPageState extends State<MapPage> {
                                                                               "STRING",
                                                                               style: TextStyle(
                                                                                 color: Colors.lightBlue,
-                                                                                fontSize:
-                                                                                    gl.fontSizeXXS * gl.dsp.equipixel,
+                                                                                fontSize: gl.fontSizeXXS * gl.eqPx,
                                                                               ),
                                                                             )
                                                                             : gl.selGeo.attributes[i].type == "double"
@@ -1114,16 +1108,14 @@ class _MapPageState extends State<MapPage> {
                                                                               "DOUBLE",
                                                                               style: TextStyle(
                                                                                 color: Colors.red,
-                                                                                fontSize:
-                                                                                    gl.fontSizeXXS * gl.dsp.equipixel,
+                                                                                fontSize: gl.fontSizeXXS * gl.eqPx,
                                                                               ),
                                                                             )
                                                                             : Text(
                                                                               "UFO",
                                                                               style: TextStyle(
                                                                                 color: Colors.green,
-                                                                                fontSize:
-                                                                                    gl.fontSizeXXS * gl.dsp.equipixel,
+                                                                                fontSize: gl.fontSizeXXS * gl.eqPx,
                                                                               ),
                                                                             ),
                                                                   ),
@@ -1131,13 +1123,13 @@ class _MapPageState extends State<MapPage> {
                                                               ),
                                                               lt.stroke(
                                                                 vertical: true,
-                                                                gl.dsp.equipixel,
-                                                                gl.dsp.equipixel * 0.5,
+                                                                gl.eqPx,
+                                                                gl.eqPx * 0.5,
                                                                 gl.colorAgroBioTech,
                                                               ),
                                                               SizedBox(
-                                                                width: gl.dsp.equipixel * 7,
-                                                                height: gl.dsp.equipixel * gl.iconSizeM,
+                                                                width: gl.eqPx * 7,
+                                                                height: gl.eqPx * gl.iconSizeM,
                                                                 child: IconButton(
                                                                   style: ButtonStyle(
                                                                     animationDuration: Duration(seconds: 1),
@@ -1177,24 +1169,24 @@ class _MapPageState extends State<MapPage> {
                                                                           ? Icon(
                                                                             Icons.check_box_outlined,
                                                                             color: Colors.white,
-                                                                            size: gl.dsp.equipixel * gl.iconSizeXS,
+                                                                            size: gl.eqPx * gl.iconSizeXS,
                                                                           )
                                                                           : Icon(
                                                                             Icons.check_box_outline_blank,
                                                                             color: Colors.white,
-                                                                            size: gl.dsp.equipixel * gl.iconSizeXS,
+                                                                            size: gl.eqPx * gl.iconSizeXS,
                                                                           ),
                                                                 ),
                                                               ),
                                                               lt.stroke(
                                                                 vertical: true,
-                                                                gl.dsp.equipixel,
-                                                                gl.dsp.equipixel * 0.5,
+                                                                gl.eqPx,
+                                                                gl.eqPx * 0.5,
                                                                 gl.colorAgroBioTech,
                                                               ),
                                                               SizedBox(
-                                                                width: gl.dsp.equipixel * 33,
-                                                                height: gl.dsp.equipixel * gl.iconSizeS,
+                                                                width: gl.eqPx * 33,
+                                                                height: gl.eqPx * gl.iconSizeS,
                                                                 child: TextButton(
                                                                   style: ButtonStyle(
                                                                     animationDuration: Duration(seconds: 1),
@@ -1251,8 +1243,7 @@ class _MapPageState extends State<MapPage> {
                                                                         textAlign: TextAlign.start,
                                                                         style: TextStyle(
                                                                           color: Colors.white,
-                                                                          fontSize:
-                                                                              gl.dsp.equipixel * gl.fontSizeM * .75,
+                                                                          fontSize: gl.eqPx * gl.fontSizeM * .75,
                                                                         ),
                                                                       ),
                                                                     ),
@@ -1261,13 +1252,13 @@ class _MapPageState extends State<MapPage> {
                                                               ),
                                                               lt.stroke(
                                                                 vertical: true,
-                                                                gl.dsp.equipixel,
-                                                                gl.dsp.equipixel * 0.5,
+                                                                gl.eqPx,
+                                                                gl.eqPx * 0.5,
                                                                 gl.colorAgroBioTech,
                                                               ),
                                                               SizedBox(
-                                                                width: gl.dsp.equipixel * 33,
-                                                                height: gl.dsp.equipixel * gl.iconSizeS,
+                                                                width: gl.eqPx * 33,
+                                                                height: gl.eqPx * gl.iconSizeS,
                                                                 child: TextButton(
                                                                   style: ButtonStyle(
                                                                     animationDuration: Duration(seconds: 1),
@@ -1315,9 +1306,7 @@ class _MapPageState extends State<MapPage> {
                                                                                 style: TextStyle(
                                                                                   color: Colors.white,
                                                                                   fontSize:
-                                                                                      gl.dsp.equipixel *
-                                                                                      gl.fontSizeM *
-                                                                                      .75,
+                                                                                      gl.eqPx * gl.fontSizeM * .75,
                                                                                 ),
                                                                               )
                                                                               : gl
@@ -1335,9 +1324,7 @@ class _MapPageState extends State<MapPage> {
                                                                                 style: TextStyle(
                                                                                   color: Colors.white,
                                                                                   fontSize:
-                                                                                      gl.dsp.equipixel *
-                                                                                      gl.fontSizeM *
-                                                                                      .75,
+                                                                                      gl.eqPx * gl.fontSizeM * .75,
                                                                                 ),
                                                                               )
                                                                               : gl
@@ -1355,9 +1342,7 @@ class _MapPageState extends State<MapPage> {
                                                                                 style: TextStyle(
                                                                                   color: Colors.white,
                                                                                   fontSize:
-                                                                                      gl.dsp.equipixel *
-                                                                                      gl.fontSizeM *
-                                                                                      .75,
+                                                                                      gl.eqPx * gl.fontSizeM * .75,
                                                                                 ),
                                                                               )
                                                                               : gl
@@ -1373,9 +1358,7 @@ class _MapPageState extends State<MapPage> {
                                                                                 style: TextStyle(
                                                                                   color: Colors.white,
                                                                                   fontSize:
-                                                                                      gl.dsp.equipixel *
-                                                                                      gl.fontSizeM *
-                                                                                      .75,
+                                                                                      gl.eqPx * gl.fontSizeM * .75,
                                                                                 ),
                                                                               )
                                                                               : Text(
@@ -1383,9 +1366,7 @@ class _MapPageState extends State<MapPage> {
                                                                                 style: TextStyle(
                                                                                   color: Colors.white,
                                                                                   fontSize:
-                                                                                      gl.dsp.equipixel *
-                                                                                      gl.fontSizeM *
-                                                                                      .75,
+                                                                                      gl.eqPx * gl.fontSizeM * .75,
                                                                                 ),
                                                                               ),
                                                                     ),
@@ -1394,11 +1375,7 @@ class _MapPageState extends State<MapPage> {
                                                               ),
                                                             ],
                                                           ),
-                                                          lt.stroke(
-                                                            gl.dsp.equipixel,
-                                                            gl.dsp.equipixel * .5,
-                                                            gl.colorAgroBioTech,
-                                                          ),
+                                                          lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
                                                         ],
                                                       );
                                                     }),
@@ -1407,72 +1384,7 @@ class _MapPageState extends State<MapPage> {
                                           ),
                                         ],
                                       ),
-                                      lt.stroke(gl.dsp.equipixel, gl.dsp.equipixel * .5, gl.colorAgroBioTech),
-                                    ],
-                                  ),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                    children: [
-                                      TextButton(
-                                        onPressed: () {
-                                          gl.selGeo.attributes.add(pl.Attribute(name: "", type: "string", value: ""));
-                                          PopupNewAttribute(
-                                            context,
-                                            "",
-                                            gl.colorAgroBioTech,
-                                            (String s) {
-                                              gl.selGeo.attributes.last.type = s;
-                                            },
-                                            (String s) {
-                                              gl.selGeo.attributes.last.name = s;
-                                            },
-                                            (dynamic it) {
-                                              gl.selGeo.attributes.last.value = it;
-                                            },
-                                            () {
-                                              gl.selGeo.attributes.removeLast();
-                                            },
-                                            () {},
-                                          );
-                                        },
-                                        child: Column(
-                                          children: [
-                                            Icon(
-                                              Icons.add_circle,
-                                              color: gl.colorAgroBioTech,
-                                              size: gl.iconSizeS * gl.dsp.equipixel,
-                                            ),
-                                            Text(
-                                              "Une seule variable",
-                                              style: TextStyle(
-                                                color: gl.colorAgroBioTech,
-                                                fontSize: gl.dsp.equipixel * gl.fontSizeXS,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      TextButton(
-                                        onPressed: () {
-                                          PopupSelectAttributeSet(context, gl.selGeo.attributes);
-                                        },
-                                        child: Column(
-                                          children: [
-                                            Icon(
-                                              Icons.add_circle_outline_outlined,
-                                              color: gl.colorAgroBioTech,
-                                              size: gl.iconSizeS * gl.dsp.equipixel,
-                                            ),
-                                            Text(
-                                              "Un set de variables",
-                                              style: TextStyle(
-                                                color: gl.colorAgroBioTech,
-                                                fontSize: gl.dsp.equipixel * gl.fontSizeXS,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
+                                      lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
                                     ],
                                   ),
                                 ],
@@ -1483,16 +1395,16 @@ class _MapPageState extends State<MapPage> {
                                 children: [
                                   Column(
                                     children: [
-                                      lt.stroke(gl.dsp.equipixel, gl.dsp.equipixel * .5, gl.colorAgroBioTech),
+                                      lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
                                       Row(
                                         children: [
                                           Container(
                                             alignment: Alignment.topLeft,
                                             child: SizedBox(
-                                              height: gl.dsp.equipixel * gl.iconSizeM * .9,
+                                              height: gl.eqPx * gl.iconSizeM * .9,
                                               child: IconButton(
                                                 style: lt.borderlessStyle,
-                                                iconSize: gl.dsp.equipixel * gl.iconSizeS,
+                                                iconSize: gl.eqPx * gl.iconSizeS,
                                                 color: Colors.lightGreenAccent,
                                                 onPressed: () {
                                                   refreshView(() {
@@ -1500,32 +1412,26 @@ class _MapPageState extends State<MapPage> {
                                                   });
                                                   gl.selGeo.serialize();
                                                 },
-                                                icon: Icon(
-                                                  Icons.arrow_back,
-                                                  size: gl.dsp.equipixel * gl.iconSizeS * .9,
-                                                ),
+                                                icon: Icon(Icons.arrow_back, size: gl.eqPx * gl.iconSizeS * .9),
                                               ),
                                             ),
                                           ),
                                           Container(
                                             alignment: Alignment.topLeft,
-                                            width: gl.dsp.equipixel * gl.chosenPolyBarWidth * .75,
+                                            width: gl.eqPx * gl.chosenPolyBarWidth * .75,
                                             child: Text(
                                               "Changez le symbole du point.",
                                               textAlign: TextAlign.center,
-                                              style: TextStyle(
-                                                color: Colors.white,
-                                                fontSize: gl.dsp.equipixel * gl.fontSizeS,
-                                              ),
+                                              style: TextStyle(color: Colors.white, fontSize: gl.eqPx * gl.fontSizeS),
                                             ),
                                           ),
                                         ],
                                       ),
-                                      lt.stroke(gl.dsp.equipixel, gl.dsp.equipixel * .5, gl.colorAgroBioTech),
+                                      lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
                                       lt.ForestimatorScrollView(
-                                        width: gl.dsp.equipixel * gl.chosenPolyBarWidth,
-                                        height: gl.dsp.equipixel * gl.iconSizeXS * 2.5,
-                                        sizeArrows: gl.dsp.equipixel * gl.iconSizeM,
+                                        width: gl.eqPx * gl.chosenPolyBarWidth,
+                                        height: gl.eqPx * gl.iconSizeXS * 2.5,
+                                        sizeArrows: gl.eqPx * gl.iconSizeM,
                                         horizontal: true,
                                         arrowColor: Colors.black,
                                         child: Row(
@@ -1536,7 +1442,7 @@ class _MapPageState extends State<MapPage> {
                                                       ? gl.colorAgroBioTech
                                                       : Colors.transparent,
                                               child: SizedBox(
-                                                height: gl.dsp.equipixel * gl.iconSizeL,
+                                                height: gl.eqPx * gl.iconSizeL,
                                                 child: IconButton(
                                                   onPressed: () {
                                                     refreshView(() {
@@ -1545,22 +1451,22 @@ class _MapPageState extends State<MapPage> {
                                                   },
                                                   icon: Icon(
                                                     gl.selectableIcons[k],
-                                                    size: gl.iconSizeM * gl.dsp.equipixel,
+                                                    size: gl.iconSizeM * gl.eqPx,
                                                     color: Colors.white,
                                                   ),
                                                   color: Colors.white,
-                                                  iconSize: gl.dsp.equipixel * gl.iconSizeM,
+                                                  iconSize: gl.eqPx * gl.iconSizeM,
                                                 ),
                                               ),
                                             );
                                           }),
                                         ),
                                       ),
-                                      lt.stroke(gl.dsp.equipixel, gl.dsp.equipixel * .5, gl.colorAgroBioTech),
+                                      lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
                                       lt.ForestimatorScrollView(
-                                        width: gl.dsp.equipixel * gl.chosenPolyBarWidth,
-                                        height: gl.dsp.equipixel * gl.iconSizeXS * 2.5,
-                                        sizeArrows: gl.dsp.equipixel * gl.iconSizeM,
+                                        width: gl.eqPx * gl.chosenPolyBarWidth,
+                                        height: gl.eqPx * gl.iconSizeXS * 2.5,
+                                        sizeArrows: gl.eqPx * gl.iconSizeM,
                                         horizontal: true,
                                         child: Row(
                                           mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -1581,9 +1487,9 @@ class _MapPageState extends State<MapPage> {
                                                     gl.selGeo.colorPolygon == gl.predefinedPointSymbPalette[k]
                                                         ? Colors.white
                                                         : Colors.transparent,
-                                                radius: gl.dsp.equipixel * gl.iconSizeXS * .9,
+                                                radius: gl.eqPx * gl.iconSizeXS * .9,
                                                 child: CircleAvatar(
-                                                  radius: gl.dsp.equipixel * gl.iconSizeXS * .85,
+                                                  radius: gl.eqPx * gl.iconSizeXS * .85,
                                                   backgroundColor: gl.predefinedPointSymbPalette[k],
                                                 ),
                                               ),
@@ -1591,10 +1497,10 @@ class _MapPageState extends State<MapPage> {
                                           }),
                                         ),
                                       ),
-                                      lt.stroke(gl.dsp.equipixel, gl.dsp.equipixel * .5, gl.colorAgroBioTech),
+                                      lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
                                       SizedBox(
-                                        width: gl.dsp.equipixel * gl.chosenPolyBarWidth,
-                                        height: gl.dsp.equipixel * gl.chosenPolyBarHeight * .8,
+                                        width: gl.eqPx * gl.chosenPolyBarWidth,
+                                        height: gl.eqPx * gl.chosenPolyBarHeight * .8,
                                         child: Slider(
                                           min: gl.iconSizeXXS,
                                           max: gl.iconSizeL,
@@ -1621,16 +1527,16 @@ class _MapPageState extends State<MapPage> {
                                 children: [
                                   Column(
                                     children: [
-                                      lt.stroke(gl.dsp.equipixel, gl.dsp.equipixel * .5, gl.colorAgroBioTech),
+                                      lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
                                       Row(
                                         children: [
                                           Container(
                                             alignment: Alignment.topLeft,
                                             child: SizedBox(
-                                              height: gl.dsp.equipixel * gl.iconSizeM * .9,
+                                              height: gl.eqPx * gl.iconSizeM * .9,
                                               child: IconButton(
                                                 style: lt.borderlessStyle,
-                                                iconSize: gl.dsp.equipixel * gl.iconSizeS,
+                                                iconSize: gl.eqPx * gl.iconSizeS,
                                                 color: Colors.lightGreenAccent,
                                                 onPressed: () {
                                                   refreshView(() {
@@ -1638,33 +1544,27 @@ class _MapPageState extends State<MapPage> {
                                                   });
                                                   gl.selGeo.serialize();
                                                 },
-                                                icon: Icon(
-                                                  Icons.arrow_back,
-                                                  size: gl.dsp.equipixel * gl.iconSizeS * .9,
-                                                ),
+                                                icon: Icon(Icons.arrow_back, size: gl.eqPx * gl.iconSizeS * .9),
                                               ),
                                             ),
                                           ),
                                           Container(
                                             alignment: Alignment.topLeft,
-                                            width: gl.dsp.equipixel * gl.chosenPolyBarWidth * .75,
+                                            width: gl.eqPx * gl.chosenPolyBarWidth * .75,
                                             child: Text(
                                               "Changez le symbole du polygone.",
                                               textAlign: TextAlign.center,
-                                              style: TextStyle(
-                                                color: Colors.white,
-                                                fontSize: gl.dsp.equipixel * gl.fontSizeS,
-                                              ),
+                                              style: TextStyle(color: Colors.white, fontSize: gl.eqPx * gl.fontSizeS),
                                             ),
                                           ),
                                         ],
                                       ),
-                                      lt.stroke(gl.dsp.equipixel, gl.dsp.equipixel * .5, gl.colorAgroBioTech),
+                                      lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
                                       if (gl.geoReady)
                                         lt.ForestimatorScrollView(
-                                          width: gl.dsp.equipixel * gl.chosenPolyBarWidth,
-                                          height: gl.dsp.equipixel * gl.iconSizeXS * 2.5,
-                                          sizeArrows: gl.dsp.equipixel * gl.iconSizeM,
+                                          width: gl.eqPx * gl.chosenPolyBarWidth,
+                                          height: gl.eqPx * gl.iconSizeXS * 2.5,
+                                          sizeArrows: gl.eqPx * gl.iconSizeM,
                                           horizontal: true,
                                           child: Row(
                                             children: List<Widget>.generate(gl.selectableIconGeo.length, (k) {
@@ -1674,7 +1574,7 @@ class _MapPageState extends State<MapPage> {
                                                         ? gl.colorAgroBioTech
                                                         : Colors.transparent,
                                                 child: SizedBox(
-                                                  height: gl.dsp.equipixel * gl.iconSizeL,
+                                                  height: gl.eqPx * gl.iconSizeL,
                                                   child: IconButton(
                                                     onPressed: () {
                                                       refreshView(() {
@@ -1683,23 +1583,23 @@ class _MapPageState extends State<MapPage> {
                                                     },
                                                     icon: Icon(
                                                       gl.selectableIconGeo[k],
-                                                      size: gl.iconSizeM * gl.dsp.equipixel,
+                                                      size: gl.iconSizeM * gl.eqPx,
                                                       color: Colors.white,
                                                     ),
                                                     color: Colors.white,
-                                                    iconSize: gl.dsp.equipixel * gl.iconSizeM,
+                                                    iconSize: gl.eqPx * gl.iconSizeM,
                                                   ),
                                                 ),
                                               );
                                             }),
                                           ),
                                         ),
-                                      lt.stroke(gl.dsp.equipixel, gl.dsp.equipixel * .5, gl.colorAgroBioTech),
+                                      lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
                                       if (gl.geoReady)
                                         lt.ForestimatorScrollView(
-                                          width: gl.dsp.equipixel * gl.chosenPolyBarWidth,
-                                          height: gl.dsp.equipixel * gl.iconSizeXS * 2.5,
-                                          sizeArrows: gl.dsp.equipixel * gl.iconSizeM,
+                                          width: gl.eqPx * gl.chosenPolyBarWidth,
+                                          height: gl.eqPx * gl.iconSizeXS * 2.5,
+                                          sizeArrows: gl.eqPx * gl.iconSizeM,
                                           horizontal: true,
                                           child: Row(
                                             mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -1717,9 +1617,9 @@ class _MapPageState extends State<MapPage> {
                                                           gl.selGeo.colorPolygon == gl.selLay.defaultColor
                                                               ? Colors.white
                                                               : Colors.transparent,
-                                                      radius: gl.dsp.equipixel * gl.iconSizeXS * .9,
+                                                      radius: gl.eqPx * gl.iconSizeXS * .9,
                                                       child: CircleAvatar(
-                                                        radius: gl.dsp.equipixel * gl.iconSizeXS * .85,
+                                                        radius: gl.eqPx * gl.iconSizeXS * .85,
                                                         backgroundColor: gl.selLay.defaultColor.withAlpha(255),
                                                       ),
                                                     ),
@@ -1742,9 +1642,9 @@ class _MapPageState extends State<MapPage> {
                                                           gl.selGeo.colorPolygon == gl.predefinedPointSymbPalette[k]
                                                               ? Colors.white
                                                               : Colors.transparent,
-                                                      radius: gl.dsp.equipixel * gl.iconSizeXS * .9,
+                                                      radius: gl.eqPx * gl.iconSizeXS * .9,
                                                       child: CircleAvatar(
-                                                        radius: gl.dsp.equipixel * gl.iconSizeXS * .85,
+                                                        radius: gl.eqPx * gl.iconSizeXS * .85,
                                                         backgroundColor: gl.predefinedPointSymbPalette[k],
                                                       ),
                                                     ),
@@ -1756,348 +1656,83 @@ class _MapPageState extends State<MapPage> {
                                   ),
                                 ],
                               )
-                              : gl.geoReady
-                              ? Column(
-                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  lt.stroke(gl.dsp.equipixel, gl.dsp.equipixel * .5, gl.colorAgroBioTech),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                    children: [
-                                      lt.ForestimatorScrollView(
-                                        horizontal: true,
-                                        height: gl.dsp.equipixel * gl.iconSizeM,
-                                        width: gl.dsp.equipixel * gl.chosenPolyBarWidth * .75,
-                                        child: Row(
-                                          children: List<Widget>.generate(gl.selLay.geometries.length, (int index) {
-                                            return Container(
-                                              height: gl.dsp.equipixel * gl.iconSizeM,
-                                              width: gl.dsp.equipixel * gl.iconSizeM,
-                                              alignment: Alignment.center,
-                                              padding: EdgeInsets.zero,
-                                              color:
-                                                  gl.selLay.selectedGeometry == index
-                                                      ? gl.selGeo.colorInside
-                                                      : Colors.transparent,
-                                              child: Stack(
-                                                children: [
-                                                  IconButton(
-                                                    style: lt.trNoPadButtonstyle,
-                                                    onPressed: () {
-                                                      setState(() {
-                                                        if (gl.selLay.selectedGeometry == index) {
-                                                          gl.selLay.selectedGeometry = -1;
-                                                        } else {
-                                                          gl.selLay.selectedGeometry = index;
-                                                        }
-                                                      });
-                                                    },
-                                                    icon: Icon(
-                                                      gl.selLay.type == "Point"
-                                                          ? gl.selectableIcons[gl
-                                                              .selLay
-                                                              .geometries[index]
-                                                              .selectedPointIcon]
-                                                          : gl.selectableIconGeo[gl
-                                                              .selLay
-                                                              .geometries[index]
-                                                              .selectedPointIcon],
-                                                      color:
-                                                          gl.selLay.selectedGeometry == index
-                                                              ? Colors.white
-                                                              : gl.selLay.geometries[index].colorLine,
-                                                      size: gl.dsp.equipixel * gl.iconSizeS,
-                                                    ),
-                                                  ),
-                                                  Container(
-                                                    alignment: AlignmentGeometry.topLeft,
-                                                    child: Text(
-                                                      "$index",
-                                                      style: TextStyle(
-                                                        color: Colors.white,
-                                                        fontSize: gl.eqPx * gl.fontSizeXXS,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            );
-                                          }),
-                                        ),
-                                      ),
-                                      Container(
-                                        alignment: Alignment.center,
-                                        height: gl.dsp.equipixel * gl.iconSizeM,
-                                        width: gl.dsp.equipixel * gl.iconSizeM,
-                                        child: IconButton(
-                                          style: lt.borderlessStyle,
-                                          onPressed:
-                                              gl.selLay.subtype != "Essence"
-                                                  ? () {
-                                                    setState(() {
-                                                      gl.selLay.addGeometry(
-                                                        name:
-                                                            gl.selLay.type == "Point"
-                                                                ? "Point${gl.selLay.geometries.length + 1}"
-                                                                : "Polygon${gl.selLay.geometries.length + 1}",
-                                                      );
-                                                    });
-                                                  }
-                                                  : () {},
-                                          icon: Icon(
-                                            Icons.add_circle,
-                                            color: gl.selLay.subtype != "Essence" ? gl.colorAgroBioTech : Colors.grey,
-                                            size: gl.dsp.equipixel * gl.iconSizeS,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  lt.stroke(gl.dsp.equipixel, gl.dsp.equipixel * .5, gl.colorAgroBioTech),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                    children: [
-                                      !gl.selGeo.labelsVisibleOnMap
-                                          ? SizedBox(
-                                            height: gl.dsp.equipixel * gl.iconSizeM * .9,
-                                            child: IconButton(
-                                              onPressed: () {
-                                                setState(() {
-                                                  gl.selGeo.labelsVisibleOnMap = true;
-                                                });
-                                                gl.selGeo.serialize();
-                                                gl.refreshMainStack(() {
-                                                  gl.modeMapShowPolygons = true;
-                                                });
-                                              },
-                                              icon: Icon(
-                                                Icons.label,
-                                                size: gl.dsp.equipixel * gl.iconSizeS * .9,
-                                                color: Colors.white,
-                                              ),
-                                            ),
-                                          )
-                                          : SizedBox(
-                                            height: gl.dsp.equipixel * gl.iconSizeM * .9,
-                                            child: IconButton(
-                                              onPressed: () {
-                                                gl.refreshMainStack(() {
-                                                  gl.selGeo.labelsVisibleOnMap = false;
-                                                });
-                                                gl.selGeo.serialize();
-                                              },
-                                              icon: Icon(
-                                                Icons.label_off,
-                                                size: gl.dsp.equipixel * gl.iconSizeS * .9,
-                                                color: Colors.white,
-                                              ),
-                                            ),
-                                          ),
-                                      if (gl.selGeo.visibleOnMap)
-                                        SizedBox(
-                                          height: gl.dsp.equipixel * gl.iconSizeM * .9,
-                                          child: IconButton(
-                                            onPressed: () {
-                                              setState(() {
-                                                gl.selGeo.visibleOnMap = false;
-                                              });
-                                              gl.selGeo.serialize();
-                                            },
-                                            icon: Icon(
-                                              FontAwesomeIcons.eyeSlash,
-                                              size: gl.dsp.equipixel * gl.iconSizeS * .9,
-                                              color: Colors.white,
-                                            ),
-                                          ),
-                                        ),
-                                      if (gl.selGeo.points.isNotEmpty &&
-                                          (!_positionInsideViewRectangle(
-                                                Position(
-                                                  longitude: gl.selGeo.center.longitude,
-                                                  latitude: gl.selGeo.center.latitude,
-                                                  timestamp: DateTime.now(),
-                                                  accuracy: 0,
-                                                  altitude: 0,
-                                                  altitudeAccuracy: 0,
-                                                  heading: 0,
-                                                  headingAccuracy: 0,
-                                                  speed: 0,
-                                                  speedAccuracy: 0,
-                                                ),
-                                              ) ||
-                                              !gl.selGeo.visibleOnMap))
-                                        SizedBox(
-                                          height: gl.dsp.equipixel * gl.iconSizeM * .9,
-                                          child: IconButton(
-                                            onPressed: () {
-                                              gl.selGeo.visibleOnMap = true;
-                                              gl.selGeo.serialize();
-                                              setState(() {
-                                                if (gl.selGeo.center.longitude != 0.0 &&
-                                                    gl.selGeo.center.latitude != 0.0) {
-                                                  _mapController.move(gl.selGeo.center, _mapController.camera.zoom);
-                                                }
-                                              });
-                                              gl.refreshMainStack(() {
-                                                gl.modeMapShowPolygons = true;
-                                              });
-                                            },
-                                            icon: Icon(
-                                              Icons.gps_fixed,
-                                              size: gl.dsp.equipixel * gl.iconSizeS * .9,
-                                              opticalSize: gl.dsp.equipixel * gl.iconSizeS,
-                                              color: Colors.white,
-                                            ),
-                                          ),
-                                        ),
-                                      gl.selGeo.type.contains("Point")
-                                          ? SizedBox(
-                                            height: gl.dsp.equipixel * gl.iconSizeM * .9,
-                                            child: IconButton(
-                                              onPressed: () {
-                                                setState(() {
-                                                  gl.Mode.editPointMarker = !gl.Mode.editPointMarker;
-                                                });
-                                              },
-                                              icon: Icon(
-                                                FontAwesomeIcons.locationPin,
-                                                size: gl.dsp.equipixel * gl.iconSizeS * .9,
-                                                color: Colors.white,
-                                              ),
-                                            ),
-                                          )
-                                          : SizedBox(
-                                            height: gl.dsp.equipixel * gl.iconSizeM * .9,
-                                            child: IconButton(
-                                              onPressed: () {
-                                                setState(() {
-                                                  gl.Mode.editPolyMarker = !gl.Mode.editPolyMarker;
-                                                });
-                                              },
-                                              icon: Icon(
-                                                Icons.square_outlined,
-                                                size: gl.dsp.equipixel * gl.iconSizeS * .9,
-                                                color: Colors.white,
-                                              ),
-                                            ),
-                                          ),
-                                      SizedBox(
-                                        height: gl.dsp.equipixel * gl.iconSizeM * .9,
-                                        child: IconButton(
-                                          onPressed: () {
-                                            gl.refreshMainStack(() {
-                                              gl.modeMapShowPolygons = true;
-                                              gl.selGeo.visibleOnMap = true;
-                                              gl.Mode.editPolygon = !gl.Mode.editPolygon;
-                                              if (gl.Mode.editPolygon &&
-                                                  gl.selGeo.type.contains("Point") &&
-                                                  gl.selGeo.points.isNotEmpty) {
-                                                refreshView(() {
-                                                  gl.Mode.editPolygon = true;
-                                                  gl.Mode.showButtonAddVertexesPolygon = false;
-                                                  gl.Mode.showButtonMoveVertexesPolygon = true;
-                                                  gl.Mode.showButtonRemoveVertexesPolygon = true;
-                                                  gl.Mode.addVertexesPolygon = false;
-                                                  gl.Mode.moveVertexesPolygon = false;
-                                                  gl.Mode.removeVertexesPolygon = false;
-                                                });
-                                              } else {
-                                                refreshView(() {
-                                                  gl.Mode.editPolygon = true;
-                                                  gl.Mode.showButtonAddVertexesPolygon = true;
-                                                  gl.Mode.showButtonMoveVertexesPolygon = false;
-                                                  gl.Mode.showButtonRemoveVertexesPolygon = false;
-                                                  gl.Mode.addVertexesPolygon = false;
-                                                  gl.Mode.moveVertexesPolygon = false;
-                                                  gl.Mode.removeVertexesPolygon = false;
-                                                });
-                                              }
-                                            });
-                                          },
-                                          icon: FaIcon(
-                                            FontAwesomeIcons.drawPolygon,
-                                            size: gl.dsp.equipixel * gl.iconSizeS * .9,
-                                            color: Colors.white,
-                                          ),
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        height: gl.dsp.equipixel * gl.iconSizeM * .9,
-                                        child: IconButton(
-                                          onPressed: () {
-                                            setState(() {
-                                              gl.Mode.editAttributes = !gl.Mode.editAttributes;
-                                            });
-                                          },
-                                          icon: FaIcon(
-                                            FontAwesomeIcons.tableColumns,
-                                            size: gl.dsp.equipixel * gl.iconSizeS * .9,
-                                            color: Colors.white,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              )
                               : Column(
                                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                 children: [
-                                  lt.stroke(gl.dsp.equipixel, gl.dsp.equipixel * .5, gl.colorAgroBioTech),
+                                  lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                     children: [
                                       lt.ForestimatorScrollView(
-                                        height: gl.dsp.equipixel * gl.iconSizeM,
-                                        width: gl.dsp.equipixel * gl.chosenPolyBarWidth * .75,
                                         horizontal: true,
+                                        height: gl.eqPx * gl.iconSizeM,
+                                        width: gl.eqPx * gl.chosenPolyBarWidth * .75,
                                         child: Row(
                                           children: List<Widget>.generate(gl.selLay.geometries.length, (int index) {
                                             return Container(
-                                              height: gl.dsp.equipixel * gl.iconSizeM,
-                                              width: gl.dsp.equipixel * gl.iconSizeM,
+                                              height: gl.eqPx * gl.iconSizeM,
+                                              width: gl.eqPx * gl.iconSizeM,
                                               alignment: Alignment.center,
-                                              color:
-                                                  gl.selLay.selectedGeometry == index
-                                                      ? gl.selGeo.colorLine
-                                                      : Colors.transparent,
-                                              child: Stack(
-                                                children: [
-                                                  IconButton(
-                                                    style: lt.trNoPadButtonstyle,
-                                                    onPressed: () {
-                                                      setState(() {
-                                                        gl.selLay.selectedGeometry = index;
-                                                      });
-                                                    },
-                                                    icon: Icon(
-                                                      gl.selLay.type == "Point"
-                                                          ? gl.selectableIcons[gl
-                                                              .selLay
-                                                              .geometries[index]
-                                                              .selectedPointIcon]
-                                                          : gl.selectableIconGeo[gl
-                                                              .selLay
-                                                              .geometries[index]
-                                                              .selectedPointIcon],
-                                                      color:
-                                                          gl.selLay.selectedGeometry == index
-                                                              ? Colors.white
-                                                              : gl.selLay.geometries[index].colorLine,
-                                                      size: gl.dsp.equipixel * gl.iconSizeS,
-                                                    ),
+                                              padding: EdgeInsets.zero,
+                                              color: Colors.transparent,
+                                              child: Card(
+                                                margin: EdgeInsetsGeometry.zero,
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius: BorderRadiusGeometry.circular(12.0),
+                                                  side: BorderSide(
+                                                    color:
+                                                        gl.selLay.selectedGeometry == index
+                                                            ? gl.colorAgroBioTech
+                                                            : Colors.transparent,
+                                                    width: gl.eqPx * .75,
                                                   ),
-                                                  Container(
-                                                    alignment: AlignmentGeometry.topLeft,
-                                                    child: Text(
-                                                      "$index",
-                                                      style: TextStyle(
-                                                        color: Colors.white,
-                                                        fontSize: gl.eqPx * gl.fontSizeXXS,
+                                                ),
+                                                surfaceTintColor: Colors.transparent,
+                                                shadowColor: Colors.transparent,
+                                                color: Colors.transparent,
+                                                child: Stack(
+                                                  children: [
+                                                    IconButton(
+                                                      alignment: AlignmentGeometry.center,
+                                                      style: lt.trNoPadButtonstyle,
+                                                      onPressed: () {
+                                                        setState(() {
+                                                          if (gl.selLay.selectedGeometry == index) {
+                                                            gl.selLay.selectedGeometry = -1;
+                                                          } else {
+                                                            gl.selLay.selectedGeometry = index;
+                                                          }
+                                                        });
+                                                      },
+                                                      icon: Icon(
+                                                        gl.selLay.type == "Point"
+                                                            ? gl.selectableIcons[gl
+                                                                .selLay
+                                                                .geometries[index]
+                                                                .selectedPointIcon]
+                                                            : gl.selectableIconGeo[gl
+                                                                .selLay
+                                                                .geometries[index]
+                                                                .selectedPointIcon],
+                                                        color: gl.selLay.geometries[index].colorLine,
+                                                        size: gl.eqPx * gl.iconSizeXS * 1.2,
                                                       ),
                                                     ),
-                                                  ),
-                                                ],
+                                                    Container(
+                                                      alignment: AlignmentGeometry.xy(
+                                                        gl.dsp.alignX(-10 * gl.eqPx),
+                                                        gl.dsp.alignY(-15 * gl.eqPx),
+                                                      ),
+                                                      child: Text(
+                                                        "$index",
+                                                        style: TextStyle(
+                                                          color: Colors.white,
+                                                          fontSize: gl.eqPx * gl.fontSizeXXS,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
                                               ),
                                             );
                                           }),
@@ -2105,8 +1740,8 @@ class _MapPageState extends State<MapPage> {
                                       ),
                                       Container(
                                         alignment: Alignment.center,
-                                        height: gl.dsp.equipixel * gl.iconSizeM,
-                                        width: gl.dsp.equipixel * gl.iconSizeM,
+                                        height: gl.eqPx * gl.iconSizeM,
+                                        width: gl.eqPx * gl.iconSizeM,
                                         child: IconButton(
                                           style: lt.borderlessStyle,
                                           onPressed:
@@ -2125,12 +1760,199 @@ class _MapPageState extends State<MapPage> {
                                           icon: Icon(
                                             Icons.add_circle,
                                             color: gl.selLay.subtype != "Essence" ? gl.colorAgroBioTech : Colors.grey,
-                                            size: gl.dsp.equipixel * gl.iconSizeS,
+                                            size: gl.eqPx * gl.iconSizeS,
                                           ),
                                         ),
                                       ),
                                     ],
                                   ),
+                                  if (gl.geoReady) lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
+                                  gl.geoReady
+                                      ? Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                        children: [
+                                          !gl.selGeo.labelsVisibleOnMap
+                                              ? SizedBox(
+                                                height: gl.eqPx * gl.iconSizeM * .9,
+                                                child: IconButton(
+                                                  onPressed: () {
+                                                    setState(() {
+                                                      gl.selGeo.labelsVisibleOnMap = true;
+                                                    });
+                                                    gl.selGeo.serialize();
+                                                    gl.refreshMainStack(() {
+                                                      gl.modeMapShowPolygons = true;
+                                                    });
+                                                  },
+                                                  icon: Icon(
+                                                    Icons.label,
+                                                    size: gl.eqPx * gl.iconSizeS * .9,
+                                                    color: Colors.white,
+                                                  ),
+                                                ),
+                                              )
+                                              : SizedBox(
+                                                height: gl.eqPx * gl.iconSizeM * .9,
+                                                child: IconButton(
+                                                  onPressed: () {
+                                                    gl.refreshMainStack(() {
+                                                      gl.selGeo.labelsVisibleOnMap = false;
+                                                    });
+                                                    gl.selGeo.serialize();
+                                                  },
+                                                  icon: Icon(
+                                                    Icons.label_off,
+                                                    size: gl.eqPx * gl.iconSizeS * .9,
+                                                    color: Colors.white,
+                                                  ),
+                                                ),
+                                              ),
+                                          if (gl.selGeo.visibleOnMap)
+                                            SizedBox(
+                                              height: gl.eqPx * gl.iconSizeM * .9,
+                                              child: IconButton(
+                                                onPressed: () {
+                                                  setState(() {
+                                                    gl.selGeo.visibleOnMap = false;
+                                                  });
+                                                  gl.selGeo.serialize();
+                                                },
+                                                icon: Icon(
+                                                  FontAwesomeIcons.eyeSlash,
+                                                  size: gl.eqPx * gl.iconSizeS * .9,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            ),
+                                          if (gl.selGeo.points.isNotEmpty &&
+                                              (!_positionInsideViewRectangle(
+                                                    Position(
+                                                      longitude: gl.selGeo.center.longitude,
+                                                      latitude: gl.selGeo.center.latitude,
+                                                      timestamp: DateTime.now(),
+                                                      accuracy: 0,
+                                                      altitude: 0,
+                                                      altitudeAccuracy: 0,
+                                                      heading: 0,
+                                                      headingAccuracy: 0,
+                                                      speed: 0,
+                                                      speedAccuracy: 0,
+                                                    ),
+                                                  ) ||
+                                                  !gl.selGeo.visibleOnMap))
+                                            SizedBox(
+                                              height: gl.eqPx * gl.iconSizeM * .9,
+                                              child: IconButton(
+                                                onPressed: () {
+                                                  gl.selGeo.visibleOnMap = true;
+                                                  gl.selGeo.serialize();
+                                                  setState(() {
+                                                    if (gl.selGeo.center.longitude != 0.0 &&
+                                                        gl.selGeo.center.latitude != 0.0) {
+                                                      _mapController.move(gl.selGeo.center, _mapController.camera.zoom);
+                                                    }
+                                                  });
+                                                  gl.refreshMainStack(() {
+                                                    gl.modeMapShowPolygons = true;
+                                                  });
+                                                },
+                                                icon: Icon(
+                                                  Icons.gps_fixed,
+                                                  size: gl.eqPx * gl.iconSizeS * .9,
+                                                  opticalSize: gl.eqPx * gl.iconSizeS,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            ),
+                                          gl.selGeo.type.contains("Point")
+                                              ? SizedBox(
+                                                height: gl.eqPx * gl.iconSizeM * .9,
+                                                child: IconButton(
+                                                  onPressed: () {
+                                                    setState(() {
+                                                      gl.Mode.editPointMarker = !gl.Mode.editPointMarker;
+                                                    });
+                                                  },
+                                                  icon: Icon(
+                                                    FontAwesomeIcons.locationPin,
+                                                    size: gl.eqPx * gl.iconSizeS * .9,
+                                                    color: Colors.white,
+                                                  ),
+                                                ),
+                                              )
+                                              : SizedBox(
+                                                height: gl.eqPx * gl.iconSizeM * .9,
+                                                child: IconButton(
+                                                  onPressed: () {
+                                                    setState(() {
+                                                      gl.Mode.editPolyMarker = !gl.Mode.editPolyMarker;
+                                                    });
+                                                  },
+                                                  icon: Icon(
+                                                    Icons.square_outlined,
+                                                    size: gl.eqPx * gl.iconSizeS * .9,
+                                                    color: Colors.white,
+                                                  ),
+                                                ),
+                                              ),
+                                          SizedBox(
+                                            height: gl.eqPx * gl.iconSizeM * .9,
+                                            child: IconButton(
+                                              onPressed: () {
+                                                gl.refreshMainStack(() {
+                                                  gl.modeMapShowPolygons = true;
+                                                  gl.selGeo.visibleOnMap = true;
+                                                  gl.Mode.editPolygon = !gl.Mode.editPolygon;
+                                                  if (gl.Mode.editPolygon &&
+                                                      gl.selGeo.type.contains("Point") &&
+                                                      gl.selGeo.points.isNotEmpty) {
+                                                    refreshView(() {
+                                                      gl.Mode.editPolygon = true;
+                                                      gl.Mode.showButtonAddVertexesPolygon = false;
+                                                      gl.Mode.showButtonMoveVertexesPolygon = true;
+                                                      gl.Mode.showButtonRemoveVertexesPolygon = true;
+                                                      gl.Mode.addVertexesPolygon = false;
+                                                      gl.Mode.moveVertexesPolygon = false;
+                                                      gl.Mode.removeVertexesPolygon = false;
+                                                    });
+                                                  } else {
+                                                    refreshView(() {
+                                                      gl.Mode.editPolygon = true;
+                                                      gl.Mode.showButtonAddVertexesPolygon = true;
+                                                      gl.Mode.showButtonMoveVertexesPolygon = false;
+                                                      gl.Mode.showButtonRemoveVertexesPolygon = false;
+                                                      gl.Mode.addVertexesPolygon = false;
+                                                      gl.Mode.moveVertexesPolygon = false;
+                                                      gl.Mode.removeVertexesPolygon = false;
+                                                    });
+                                                  }
+                                                });
+                                              },
+                                              icon: FaIcon(
+                                                FontAwesomeIcons.drawPolygon,
+                                                size: gl.eqPx * gl.iconSizeS * .9,
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                          ),
+                                          SizedBox(
+                                            height: gl.eqPx * gl.iconSizeM * .9,
+                                            child: IconButton(
+                                              onPressed: () {
+                                                setState(() {
+                                                  gl.Mode.editAttributes = !gl.Mode.editAttributes;
+                                                });
+                                              },
+                                              icon: FaIcon(
+                                                FontAwesomeIcons.tableColumns,
+                                                size: gl.eqPx * gl.iconSizeS * .9,
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      )
+                                      : SizedBox(),
                                 ],
                               ),
                         ],
@@ -2138,77 +1960,77 @@ class _MapPageState extends State<MapPage> {
                     ),
                   ),
                 ],
-              ),
-            ],
-          )
-          : gl.Mode.editPolygon
-          ? Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment:
-                    gl.dsp.orientation == Orientation.portrait ? MainAxisAlignment.center : MainAxisAlignment.start,
+              )
+              : gl.Mode.editPolygon
+              ? Column(
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  SizedBox(
-                    height: gl.dsp.equipixel * gl.chosenPolyBarHeight,
-                    width: gl.dsp.equipixel * gl.chosenPolyBarWidth,
-                    child: TextButton(
-                      onPressed: () {
-                        gl.mainStack.add(
-                          popupLayerListMenu(
-                            gl.notificationContext!,
-                            "",
-                            (LatLng pos) {
-                              if (pos.longitude != 0.0 && pos.latitude != 0.0) {
-                                _mapController.move(pos, _mapController.camera.zoom);
-                              }
-                            },
-                            () {
-                              refreshView(() {
-                                if (gl.selLay.geometries.isNotEmpty) {
-                                  gl.Mode.showButtonAddVertexesPolygon = true;
-                                  gl.Mode.showButtonMoveVertexesPolygon = false;
-                                  gl.Mode.showButtonRemoveVertexesPolygon = false;
-                                }
-                              });
-                            },
-                          ),
-                        );
-                        refreshView(() {});
-                      },
-
-                      child: Card(
-                        surfaceTintColor: Colors.transparent,
-                        shadowColor: Colors.transparent,
-                        color: gl.backgroundTransparentBlackBox,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            Icon(Icons.add, size: gl.dsp.equipixel * gl.iconSizeM, color: Colors.white),
-                            SizedBox(width: gl.dsp.equipixel * gl.fontSizeS),
-                            SizedBox(
-                              width: gl.dsp.equipixel * gl.chosenPolyBarWidth * .7,
-                              child: Text(
-                                "Tappez ici pour ajouter un Polygone",
-                                style: TextStyle(color: Colors.white, fontSize: gl.dsp.equipixel * gl.fontSizeM),
+                  Row(
+                    mainAxisAlignment:
+                        gl.dsp.orientation == Orientation.portrait ? MainAxisAlignment.center : MainAxisAlignment.start,
+                    children: [
+                      SizedBox(
+                        height: gl.eqPx * gl.chosenPolyBarHeight,
+                        width: gl.eqPx * gl.chosenPolyBarWidth,
+                        child: TextButton(
+                          onPressed: () {
+                            gl.mainStack.add(
+                              popupLayerListMenu(
+                                gl.notificationContext!,
+                                "",
+                                (LatLng pos) {
+                                  if (pos.longitude != 0.0 && pos.latitude != 0.0) {
+                                    _mapController.move(pos, _mapController.camera.zoom);
+                                  }
+                                },
+                                () {
+                                  refreshView(() {
+                                    if (gl.selLay.geometries.isNotEmpty) {
+                                      gl.Mode.showButtonAddVertexesPolygon = true;
+                                      gl.Mode.showButtonMoveVertexesPolygon = false;
+                                      gl.Mode.showButtonRemoveVertexesPolygon = false;
+                                    }
+                                  });
+                                },
                               ),
+                            );
+                            refreshView(() {});
+                          },
+
+                          child: Card(
+                            surfaceTintColor: Colors.transparent,
+                            shadowColor: Colors.transparent,
+                            color: gl.backgroundTransparentBlackBox,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                Icon(Icons.add, size: gl.eqPx * gl.iconSizeM, color: Colors.white),
+                                SizedBox(width: gl.eqPx * gl.fontSizeS),
+                                SizedBox(
+                                  width: gl.eqPx * gl.chosenPolyBarWidth * .7,
+                                  child: Text(
+                                    "Tappez ici pour ajouter un Polygone",
+                                    style: TextStyle(color: Colors.white, fontSize: gl.eqPx * gl.fontSizeM),
+                                  ),
+                                ),
+                              ],
                             ),
-                          ],
+                          ),
                         ),
                       ),
-                    ),
+                    ],
                   ),
                 ],
-              ),
-            ],
-          )
-          : Column();
+              )
+              : Column(),
+    ),
+  );
 
   Widget get forestimatorTopMenuElements => Stack(
     alignment: AlignmentGeometry.center,
     children: [
       _forestimatorSettingButton,
-      if (gl.Mode.essenceButton) _forestimatorEssenceModeButton,
+      if (gl.Mode.essence) _forestimatorEssenceModeButton,
       _forestimatorWarnings,
       _forestimatorOnOffline,
     ],
@@ -2262,14 +2084,21 @@ class _MapPageState extends State<MapPage> {
     alignment: AlignmentGeometry.xy(gl.dsp.alignX(-33), gl.dsp.alignY(-gl.eqPxH * .5)),
     child: Container(
       alignment: Alignment.center,
-      width: gl.eqPx * 10,
-      height: gl.eqPx * 7,
+      width: gl.eqPx * 15,
+      height: gl.eqPx * 15,
       child: TextButton(
         style: lt.essenceButtonstyle,
         onPressed: () {
-          setState(() {
-            gl.Mode.essence = !gl.Mode.essence;
-          });
+          PopupDoYouReally(
+            context,
+            () {
+              setState(() {
+                gl.Mode.essence = false;
+              });
+            },
+            "Attention",
+            "Voulez vous fermer le mode Essence?",
+          );
         },
         child: Icon(
           CustomIcons.tree,
@@ -2306,11 +2135,11 @@ class _MapPageState extends State<MapPage> {
             gl.offlineMode
                 ? Text(
                   gl.Mode.essence ? "Forestimator [E] terrain" : "Forestimator terrain",
-                  style: TextStyle(color: Colors.black, fontSize: gl.dsp.equipixel * gl.fontSizeXS),
+                  style: TextStyle(color: Colors.black, fontSize: gl.eqPx * gl.fontSizeXS),
                 )
                 : Text(
                   gl.Mode.essence ? "Forestimator [E] en ligne" : "Forestimator en ligne",
-                  style: TextStyle(color: Colors.white, fontSize: gl.dsp.equipixel * gl.fontSizeXS),
+                  style: TextStyle(color: Colors.white, fontSize: gl.eqPx * gl.fontSizeXS),
                 ),
       ),
     ),
@@ -2324,7 +2153,7 @@ class _MapPageState extends State<MapPage> {
                 alignment: AlignmentGeometry.xy(gl.dsp.alignX(gl.eqPxW * .5), gl.dsp.alignY(-gl.eqPxH * .5)),
                 child: IconButton(
                   style: lt.trNoPadButtonstyle,
-                  iconSize: gl.dsp.equipixel * gl.iconSizeSettings,
+                  iconSize: gl.eqPx * gl.iconSizeSettings,
                   color: Colors.red,
                   tooltip:
                       "Si vous n'arrivez plus à visualiser les cartes hors ligne c'est que votre zoom est trop large.",
@@ -2332,21 +2161,18 @@ class _MapPageState extends State<MapPage> {
                   icon: Icon(Icons.info_rounded),
                 ),
               )
-              : Container(width: gl.dsp.equipixel * gl.iconSizeSettings * 1.5)
-          : Container(width: gl.dsp.equipixel * gl.iconSizeSettings * 1.5);
+              : Container(width: gl.eqPx * gl.iconSizeSettings * 1.5)
+          : Container(width: gl.eqPx * gl.iconSizeSettings * 1.5);
 
   double computePolygonTitleHeight() {
-    double result = gl.chosenPolyBarHeight * .8;
-    if (gl.Mode.openToolbox) {
-      result += gl.chosenPolyBarHeight * .7;
-      if (gl.geoReady) result += gl.chosenPolyBarHeight * 0.7;
-      if (gl.Mode.editAttributes) {
-        result += gl.attributeTableHeight * 1.3;
-      } else if (gl.Mode.editPointMarker) {
-        result += gl.chosenPolyBarHeight * 2;
-      } else if (gl.Mode.editPolyMarker) {
-        result += gl.chosenPolyBarHeight * 1.0;
-      }
+    double result = gl.chosenPolyBarHeight * 1.45;
+    if (gl.geoReady) result += gl.chosenPolyBarHeight * 0.7;
+    if (gl.Mode.editAttributes) {
+      result += gl.attributeTableHeight * 1.05;
+    } else if (gl.Mode.editPointMarker) {
+      result += gl.chosenPolyBarHeight * 2;
+    } else if (gl.Mode.editPolyMarker) {
+      result += gl.chosenPolyBarHeight * 1.0;
     }
     return result;
   }
@@ -2381,8 +2207,8 @@ class _MapPageState extends State<MapPage> {
           if (geometry.visibleOnMap && geometry.numPoints > 0 && geometry.type.contains("Point")) {
             that.add(
               Marker(
-                width: geometry.iconSize * gl.dsp.equipixel,
-                height: geometry.iconSize * gl.dsp.equipixel,
+                width: geometry.iconSize * gl.eqPx,
+                height: geometry.iconSize * gl.eqPx,
                 point: LatLng(geometry.points.first.latitude, geometry.points.first.longitude),
                 child:
                     hitButton && gl.selectedGeoLayer != index
@@ -2399,7 +2225,7 @@ class _MapPageState extends State<MapPage> {
                             }),
                           ),
                           onPressed: () {
-                            if (gl.Mode.openToolbox) {
+                            if (gl.Mode.polygon) {
                               setState(() {
                                 int index = 0;
                                 for (pl.Geometry it in gl.selLay.geometries) {
@@ -2415,13 +2241,13 @@ class _MapPageState extends State<MapPage> {
                           },
                           icon: Icon(
                             gl.selectableIcons[geometry.selectedPointIcon],
-                            size: geometry.iconSize * gl.dsp.equipixel,
+                            size: geometry.iconSize * gl.eqPx,
                             color: geometry.colorLine,
                           ),
                         )
                         : Icon(
                           gl.selectableIcons[geometry.selectedPointIcon],
-                          size: geometry.iconSize * gl.dsp.equipixel,
+                          size: geometry.iconSize * gl.eqPx,
                           color: geometry.colorLine,
                         ),
               ),
@@ -2592,14 +2418,14 @@ class _MapPageState extends State<MapPage> {
           alignment: Alignment(0.0, -3.0),
           width:
               gl.anaPtPreview == null
-                  ? gl.dsp.equipixel * gl.anaPtBoxSize
+                  ? gl.eqPx * gl.anaPtBoxSize
                   : gl.dico.getLayerBase(gl.anaPtPreview!.mCode).getValLabel(gl.anaPtPreview!.mRastValue).length > 3
-                  ? gl.dsp.equipixel * gl.anaPtBoxSize * 1.5 +
+                  ? gl.eqPx * gl.anaPtBoxSize * 1.5 +
                       gl.dico.getLayerBase(gl.anaPtPreview!.mCode).getValLabel(gl.anaPtPreview!.mRastValue).length * 8.0
                   : gl.dico.getLayerBase(gl.anaPtPreview!.mCode).mCategorie != "Externe"
-                  ? gl.dsp.equipixel * gl.anaPtBoxSize * 2.5
+                  ? gl.eqPx * gl.anaPtBoxSize * 2.5
                   : 0.0,
-          height: gl.dsp.equipixel * gl.anaPtBoxSize,
+          height: gl.eqPx * gl.anaPtBoxSize,
           point: _pt ?? const LatLng(0.0, 0.0),
           child: FloatingActionButton(
             backgroundColor: Color.fromRGBO(0, 0, 0, 0.8),
@@ -2683,8 +2509,8 @@ class _MapPageState extends State<MapPage> {
       ret.add(
         Marker(
           alignment: Alignment(0, -2),
-          width: gl.dsp.equipixel * gl.anaPtBoxSize * 2,
-          height: gl.dsp.equipixel * gl.anaPtBoxSize,
+          width: gl.eqPx * gl.anaPtBoxSize * 2,
+          height: gl.eqPx * gl.anaPtBoxSize,
           point: _mapController.camera.center,
           child: Card(
             color: Colors.black.withAlpha(164),
@@ -2842,6 +2668,7 @@ class _MapPageState extends State<MapPage> {
     gl.Mode.showButtonAddVertexesPolygon = false;
     gl.Mode.showButtonMoveVertexesPolygon = false;
     gl.Mode.showButtonRemoveVertexesPolygon = false;
+    _layToolBoxPos = _layToolBoxAnimOffScreenPos;
   }
 
   void _closeToolbarMenu() {
@@ -2858,8 +2685,8 @@ class _MapPageState extends State<MapPage> {
   Widget _mainMenuBar({bool dummy = false, VoidCallback? close}) {
     return Container(
       alignment: Alignment.center,
-      width: gl.dsp.equipixel * gl.menuBarLength,
-      height: gl.dsp.equipixel * gl.menuBarThickness,
+      width: gl.eqPx * gl.menuBarLength,
+      height: gl.eqPx * gl.menuBarThickness,
       child: Card(
         shadowColor: Colors.transparent,
         color: dummy ? Colors.transparent : gl.backgroundTransparentBlackBox,
@@ -2867,8 +2694,8 @@ class _MapPageState extends State<MapPage> {
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             _menuButton(
-              gl.dsp.equipixel * gl.menuBarLength / 4,
-              gl.dsp.equipixel * gl.menuBarThickness,
+              gl.eqPx * gl.menuBarLength / 4,
+              gl.eqPx * gl.menuBarThickness,
               _toolbarExtended,
               Colors.green,
               () {
@@ -2890,48 +2717,59 @@ class _MapPageState extends State<MapPage> {
                   _closePolygonMenu();
                 });
               },
-              Icon(Icons.forest, size: gl.dsp.equipixel * gl.menuBarLength / 5),
+              Icon(Icons.forest, size: gl.eqPx * gl.menuBarLength / 5),
             ),
             if (!gl.Mode.essence)
               _menuButton(
-                gl.dsp.equipixel * gl.menuBarLength / 4,
-                gl.dsp.equipixel * gl.menuBarThickness,
+                gl.eqPx * gl.menuBarLength / 4,
+                gl.eqPx * gl.menuBarThickness,
                 gl.Mode.polygon,
                 Colors.yellow,
                 () {
                   setState(() {
-                    gl.Mode.polygon = true;
-                    _closeSwitchesMenu();
-                    _closeToolbarMenu();
-                    if (dummy) {
-                      close!();
-                    }
-                    gl.mainStack.add(
-                      popupLayerListMenu(
-                        gl.notificationContext!,
-                        "",
-                        (LatLng pos) {
-                          if (pos.longitude != 0.0 && pos.latitude != 0.0) {
-                            _mapController.move(pos, _mapController.camera.zoom);
-                          }
-                        },
-                        () {
-                          refreshView(() {
-                            if (gl.layerReady && gl.selLay.geometries.isNotEmpty && gl.Mode.editPolygon) {
-                              gl.Mode.showButtonAddVertexesPolygon = true;
-                              gl.Mode.showButtonMoveVertexesPolygon = false;
-                              gl.Mode.showButtonRemoveVertexesPolygon = false;
-                              if (gl.selGeo.type.contains("Point") && gl.selGeo.points.isNotEmpty) {
-                                gl.selGeo.selectedVertex = 0;
-                                gl.Mode.showButtonAddVertexesPolygon = false;
-                                gl.Mode.showButtonMoveVertexesPolygon = true;
-                                gl.Mode.showButtonRemoveVertexesPolygon = true;
+                    if (!gl.Mode.polygon) {
+                      gl.Mode.polygon = true;
+                      _layToolBoxPos = _layToolBoxAnimOnScreenPos;
+                      _closeSwitchesMenu();
+                      _closeToolbarMenu();
+                      if (dummy) {
+                        close!();
+                      }
+                      if (!gl.layerReady) {
+                        gl.mainStack.add(
+                          popupLayerListMenu(
+                            gl.notificationContext!,
+                            "",
+                            (LatLng pos) {
+                              if (pos.longitude != 0.0 && pos.latitude != 0.0) {
+                                _mapController.move(pos, _mapController.camera.zoom);
                               }
-                            }
-                          });
-                        },
-                      ),
-                    );
+                            },
+                            () {
+                              refreshView(() {
+                                if (gl.layerReady && gl.selLay.geometries.isNotEmpty && gl.Mode.editPolygon) {
+                                  gl.Mode.showButtonAddVertexesPolygon = true;
+                                  gl.Mode.showButtonMoveVertexesPolygon = false;
+                                  gl.Mode.showButtonRemoveVertexesPolygon = false;
+                                  if (gl.selGeo.type.contains("Point") && gl.selGeo.points.isNotEmpty) {
+                                    gl.selGeo.selectedVertex = 0;
+                                    gl.Mode.showButtonAddVertexesPolygon = false;
+                                    gl.Mode.showButtonMoveVertexesPolygon = true;
+                                    gl.Mode.showButtonRemoveVertexesPolygon = true;
+                                  }
+                                }
+                              });
+                            },
+                          ),
+                        );
+                      }
+                    } else {
+                      setState(() {
+                        gl.Mode.polygon = true;
+                        _layToolBoxPos = _layToolBoxAnimOffScreenPos;
+                        _closePolygonMenu();
+                      });
+                    }
                   });
                 },
                 () {
@@ -2939,11 +2777,11 @@ class _MapPageState extends State<MapPage> {
                     _closePolygonMenu();
                   });
                 },
-                Icon(Icons.hexagon_outlined, size: gl.dsp.equipixel * gl.menuBarLength / 5),
+                Icon(Icons.hexagon_outlined, size: gl.eqPx * gl.menuBarLength / 5),
               ),
             _menuButton(
-              gl.dsp.equipixel * gl.menuBarLength / 4,
-              gl.dsp.equipixel * gl.menuBarThickness,
+              gl.eqPx * gl.menuBarLength / 4,
+              gl.eqPx * gl.menuBarThickness,
               _modeLayerSwitches,
               Colors.brown,
               () {
@@ -2983,7 +2821,7 @@ class _MapPageState extends State<MapPage> {
                   _closeSwitchesMenu();
                 });
               },
-              Icon(Icons.remove_red_eye, size: gl.dsp.equipixel * gl.menuBarLength / 5),
+              Icon(Icons.remove_red_eye, size: gl.eqPx * gl.menuBarLength / 5),
             ),
           ],
         ),
@@ -3038,10 +2876,7 @@ class _MapPageState extends State<MapPage> {
           children: [
             Container(
               alignment: Alignment.center,
-              constraints: BoxConstraints(
-                maxHeight: gl.dsp.equipixel * toolbarHeight,
-                maxWidth: gl.dsp.equipixel * gl.menuBarThickness,
-              ),
+              constraints: BoxConstraints(maxHeight: gl.eqPx * toolbarHeight, maxWidth: gl.eqPx * gl.menuBarThickness),
               child: Card(
                 color: gl.backgroundTransparentBlackBox,
                 child: Column(
@@ -3055,7 +2890,7 @@ class _MapPageState extends State<MapPage> {
                             children: [
                               if (_positionInsideViewRectangle(gl.position))
                                 IconButton(
-                                  iconSize: gl.dsp.equipixel * gl.iconSizeM,
+                                  iconSize: gl.eqPx * gl.iconSizeM,
                                   color: gl.colorAgroBioTech,
                                   onPressed: () async {
                                     if (!_doingAnaPt) {
@@ -3080,7 +2915,7 @@ class _MapPageState extends State<MapPage> {
                                   icon: const Icon(Icons.analytics),
                                 ),
                               IconButton(
-                                iconSize: gl.dsp.equipixel * gl.iconSizeM,
+                                iconSize: gl.eqPx * gl.iconSizeM,
                                 color: Colors.red,
                                 onPressed: () async {
                                   if (gl.positionInit) {
@@ -3098,7 +2933,7 @@ class _MapPageState extends State<MapPage> {
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
                             IconButton(
-                              iconSize: gl.dsp.equipixel * gl.iconSizeM,
+                              iconSize: gl.eqPx * gl.iconSizeM,
                               color: Colors.black,
                               onPressed: () async {
                                 if (gl.positionInit) {
@@ -3114,7 +2949,7 @@ class _MapPageState extends State<MapPage> {
                         color: !_modeMeasurePath ? Colors.transparent : Colors.lightBlue.withAlpha(128),
                         child: IconButton(
                           color: _modeMeasurePath ? Colors.white : Colors.lightBlue,
-                          iconSize: gl.dsp.equipixel * gl.iconSizeM,
+                          iconSize: gl.eqPx * gl.iconSizeM,
                           isSelected: _modeMeasurePath,
                           onPressed: () {
                             setState(() {
@@ -3131,7 +2966,7 @@ class _MapPageState extends State<MapPage> {
                         color: !gl.Mode.recordPath ? Colors.transparent : Colors.yellow.withAlpha(128),
                         child: IconButton(
                           color: gl.Mode.recordPath ? Colors.white : Colors.yellow.withAlpha(128),
-                          iconSize: gl.dsp.equipixel * gl.iconSizeM,
+                          iconSize: gl.eqPx * gl.iconSizeM,
                           isSelected: gl.Mode.recordPath,
                           onPressed: () {
                             setState(() {
@@ -3164,7 +2999,7 @@ class _MapPageState extends State<MapPage> {
                     Container(
                       color: !_modeSearch ? Colors.transparent : Colors.blueGrey.withAlpha(128),
                       child: IconButton(
-                        iconSize: gl.dsp.equipixel * gl.iconSizeM,
+                        iconSize: gl.eqPx * gl.iconSizeM,
                         color: _modeSearch ? Colors.white : Colors.blueGrey,
                         onPressed: () {
                           setState(() {
@@ -3199,9 +3034,9 @@ class _MapPageState extends State<MapPage> {
         if (gl.dsp.orientation == Orientation.portrait)
           _placeholder(
             constraints: BoxConstraints(
-              maxHeight: gl.dsp.equipixel * gl.menuBarThickness,
-              minHeight: gl.dsp.equipixel * gl.menuBarThickness,
-              maxWidth: gl.dsp.equipixel * gl.menuBarThickness * .5,
+              maxHeight: gl.eqPx * gl.menuBarThickness,
+              minHeight: gl.eqPx * gl.menuBarThickness,
+              maxWidth: gl.eqPx * gl.menuBarThickness * .5,
             ),
           ),
       ],
@@ -3216,9 +3051,8 @@ class _MapPageState extends State<MapPage> {
           ? gl.selLay.geometries[i].type == "Polygon"
               ? Marker(
                 alignment: Alignment.center,
-                width: gl.dsp.equipixel * (gl.Mode.smallLabel ? gl.infoBoxPolygon * .6 : gl.infoBoxPolygon),
-                height:
-                    gl.dsp.equipixel * (gl.selLay.geometries[i].getNCheckedAttributes() + 1) * gl.iconSizeS * .8 + 5,
+                width: gl.eqPx * (gl.Mode.smallLabel ? gl.infoBoxPolygon * .6 : gl.infoBoxPolygon),
+                height: gl.eqPx * (gl.selLay.geometries[i].getNCheckedAttributes() + 1) * gl.iconSizeS * .8 + 5,
                 point: gl.selLay.geometries[i].center,
                 child: Card(
                   color: gl.Mode.smallLabel ? Colors.white.withAlpha(100) : Colors.black.withAlpha(200),
@@ -3233,8 +3067,8 @@ class _MapPageState extends State<MapPage> {
                                 Container(
                                   padding: EdgeInsets.all(2),
                                   color: Colors.transparent,
-                                  height: gl.dsp.equipixel * gl.iconSizeXS,
-                                  width: gl.dsp.equipixel * gl.iconSizeXS,
+                                  height: gl.eqPx * gl.iconSizeXS,
+                                  width: gl.eqPx * gl.iconSizeXS,
                                   child: IconButton(
                                     style: ButtonStyle(
                                       animationDuration: Duration(seconds: 1),
@@ -3250,7 +3084,7 @@ class _MapPageState extends State<MapPage> {
                                     onPressed: () {},
                                     icon: FaIcon(
                                       FontAwesomeIcons.list,
-                                      size: gl.dsp.equipixel * gl.iconSizeXS * .5,
+                                      size: gl.eqPx * gl.iconSizeXS * .5,
                                       color: Colors.transparent,
                                     ),
                                   ),
@@ -3259,8 +3093,8 @@ class _MapPageState extends State<MapPage> {
                                 padding: EdgeInsets.all(2),
                                 alignment: Alignment.center,
                                 color: Colors.transparent,
-                                height: gl.dsp.equipixel * gl.iconSizeXS,
-                                width: gl.dsp.equipixel * gl.infoBoxPolygon / 2,
+                                height: gl.eqPx * gl.iconSizeXS,
+                                width: gl.eqPx * gl.infoBoxPolygon / 2,
 
                                 child: SingleChildScrollView(
                                   scrollDirection: Axis.horizontal,
@@ -3269,7 +3103,7 @@ class _MapPageState extends State<MapPage> {
                                     textAlign: TextAlign.center,
                                     style: TextStyle(
                                       color: gl.Mode.smallLabel ? Colors.black : Colors.white,
-                                      fontSize: gl.dsp.equipixel * gl.fontSizeXS,
+                                      fontSize: gl.eqPx * gl.fontSizeXS,
                                     ),
                                   ),
                                 ),
@@ -3278,8 +3112,8 @@ class _MapPageState extends State<MapPage> {
                                 Container(
                                   padding: EdgeInsets.all(0),
                                   color: Colors.transparent,
-                                  height: gl.dsp.equipixel * gl.iconSizeXS,
-                                  width: gl.dsp.equipixel * gl.iconSizeXS,
+                                  height: gl.eqPx * gl.iconSizeXS,
+                                  width: gl.eqPx * gl.iconSizeXS,
                                   child: IconButton(
                                     style: ButtonStyle(
                                       animationDuration: Duration(seconds: 1),
@@ -3298,30 +3132,26 @@ class _MapPageState extends State<MapPage> {
                                       });
                                       gl.selLay.geometries[i].serialize();
                                     },
-                                    icon: FaIcon(
-                                      Icons.close,
-                                      size: gl.dsp.equipixel * gl.iconSizeXS * .8,
-                                      color: Colors.red,
-                                    ),
+                                    icon: FaIcon(Icons.close, size: gl.eqPx * gl.iconSizeXS * .8, color: Colors.red),
                                   ),
                                 ),
                             ],
                           ),
                           if (!gl.Mode.smallLabel && gl.selLay.geometries[i].getNCheckedAttributes() > 1)
-                            lt.stroke(gl.dsp.equipixel * 0.5, gl.dsp.equipixel * 0.25, gl.colorAgroBioTech),
+                            lt.stroke(gl.eqPx * 0.5, gl.eqPx * 0.25, gl.colorAgroBioTech),
                         ] +
                         List<Widget>.generate(gl.selLay.geometries[i].getNCheckedAttributes(), (j) {
                           return Container(
-                            padding: EdgeInsetsDirectional.symmetric(horizontal: gl.dsp.equipixel * 2),
+                            padding: EdgeInsetsDirectional.symmetric(horizontal: gl.eqPx * 2),
                             color: Colors.transparent,
-                            height: gl.dsp.equipixel * gl.iconSizeXS,
+                            height: gl.eqPx * gl.iconSizeXS,
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
                                 if (!gl.Mode.smallLabel)
                                   Container(
                                     alignment: Alignment.centerLeft,
-                                    width: gl.dsp.equipixel * 15,
+                                    width: gl.eqPx * 15,
                                     child: SingleChildScrollView(
                                       scrollDirection: Axis.horizontal,
                                       child: Text(
@@ -3329,21 +3159,16 @@ class _MapPageState extends State<MapPage> {
                                         textAlign: TextAlign.center,
                                         style: TextStyle(
                                           color: gl.Mode.smallLabel ? Colors.black : Colors.white,
-                                          fontSize: gl.dsp.equipixel * gl.fontSizeXS,
+                                          fontSize: gl.eqPx * gl.fontSizeXS,
                                         ),
                                       ),
                                     ),
                                   ),
                                 if (!gl.Mode.smallLabel)
-                                  lt.stroke(
-                                    vertical: true,
-                                    gl.dsp.equipixel * 0.5,
-                                    gl.dsp.equipixel * 0.25,
-                                    gl.colorAgroBioTech,
-                                  ),
+                                  lt.stroke(vertical: true, gl.eqPx * 0.5, gl.eqPx * 0.25, gl.colorAgroBioTech),
                                 Container(
                                   alignment: Alignment.centerLeft,
-                                  width: gl.dsp.equipixel * 15,
+                                  width: gl.eqPx * 15,
                                   child: SingleChildScrollView(
                                     scrollDirection: Axis.horizontal,
                                     child: Text(
@@ -3351,7 +3176,7 @@ class _MapPageState extends State<MapPage> {
                                       textAlign: TextAlign.center,
                                       style: TextStyle(
                                         color: gl.Mode.smallLabel ? Colors.black : Colors.white,
-                                        fontSize: gl.dsp.equipixel * gl.fontSizeXS,
+                                        fontSize: gl.eqPx * gl.fontSizeXS,
                                       ),
                                     ),
                                   ),
@@ -3366,9 +3191,9 @@ class _MapPageState extends State<MapPage> {
               : gl.selLay.geometries[i].type.contains("Point")
               ? Marker(
                 alignment: Alignment.bottomLeft,
-                width: gl.dsp.equipixel * (gl.Mode.smallLabel ? gl.infoBoxPolygon * .6 : gl.infoBoxPolygon),
+                width: gl.eqPx * (gl.Mode.smallLabel ? gl.infoBoxPolygon * .6 : gl.infoBoxPolygon),
                 height:
-                    gl.dsp.equipixel *
+                    gl.eqPx *
                         (gl.selLay.geometries[i].getNCheckedAttributes() +
                             ((!gl.selLay.geometries[i].type.contains("essence")) ? 1 : 0)) *
                         gl.iconSizeS *
@@ -3388,8 +3213,8 @@ class _MapPageState extends State<MapPage> {
                                 Container(
                                   padding: EdgeInsets.all(2),
                                   color: Colors.transparent,
-                                  height: gl.dsp.equipixel * gl.iconSizeXS,
-                                  width: gl.dsp.equipixel * gl.iconSizeXS,
+                                  height: gl.eqPx * gl.iconSizeXS,
+                                  width: gl.eqPx * gl.iconSizeXS,
                                   child: IconButton(
                                     style: ButtonStyle(
                                       animationDuration: Duration(seconds: 1),
@@ -3405,7 +3230,7 @@ class _MapPageState extends State<MapPage> {
                                     onPressed: () {},
                                     icon: FaIcon(
                                       FontAwesomeIcons.list,
-                                      size: gl.dsp.equipixel * gl.iconSizeXS * .5,
+                                      size: gl.eqPx * gl.iconSizeXS * .5,
                                       color: Colors.transparent,
                                     ),
                                   ),
@@ -3415,8 +3240,8 @@ class _MapPageState extends State<MapPage> {
                                   padding: EdgeInsets.all(2),
                                   alignment: Alignment.center,
                                   color: Colors.transparent,
-                                  height: gl.dsp.equipixel * gl.iconSizeXS,
-                                  width: gl.dsp.equipixel * gl.infoBoxPolygon / 2,
+                                  height: gl.eqPx * gl.iconSizeXS,
+                                  width: gl.eqPx * gl.infoBoxPolygon / 2,
                                   child: SingleChildScrollView(
                                     scrollDirection: Axis.horizontal,
                                     child: Text(
@@ -3424,7 +3249,7 @@ class _MapPageState extends State<MapPage> {
                                       textAlign: TextAlign.center,
                                       style: TextStyle(
                                         color: gl.Mode.smallLabel ? Colors.black : Colors.white,
-                                        fontSize: gl.dsp.equipixel * gl.fontSizeXS,
+                                        fontSize: gl.eqPx * gl.fontSizeXS,
                                       ),
                                     ),
                                   ),
@@ -3433,8 +3258,8 @@ class _MapPageState extends State<MapPage> {
                                 Container(
                                   padding: EdgeInsets.all(0),
                                   color: Colors.transparent,
-                                  height: gl.dsp.equipixel * gl.iconSizeXS,
-                                  width: gl.dsp.equipixel * gl.iconSizeXS,
+                                  height: gl.eqPx * gl.iconSizeXS,
+                                  width: gl.eqPx * gl.iconSizeXS,
                                   child: IconButton(
                                     style: ButtonStyle(
                                       animationDuration: Duration(seconds: 1),
@@ -3453,52 +3278,40 @@ class _MapPageState extends State<MapPage> {
                                       });
                                       gl.selLay.geometries[i].serialize();
                                     },
-                                    icon: FaIcon(
-                                      Icons.close,
-                                      size: gl.dsp.equipixel * gl.iconSizeXS * .8,
-                                      color: Colors.red,
-                                    ),
+                                    icon: FaIcon(Icons.close, size: gl.eqPx * gl.iconSizeXS * .8, color: Colors.red),
                                   ),
                                 ),
                             ],
                           ),
                           if (gl.selLay.geometries[i].getNCheckedAttributes() > 1)
-                            lt.stroke(gl.dsp.equipixel * 0.5, gl.dsp.equipixel * 0.25, gl.colorAgroBioTech),
+                            lt.stroke(gl.eqPx * 0.5, gl.eqPx * 0.25, gl.colorAgroBioTech),
                         ] +
                         List<Widget>.generate(gl.selLay.geometries[i].getNCheckedAttributes(), (j) {
                           return Container(
-                            padding: EdgeInsetsDirectional.symmetric(horizontal: gl.dsp.equipixel * 2),
+                            padding: EdgeInsetsDirectional.symmetric(horizontal: gl.eqPx * 2),
                             color: Colors.transparent,
-                            height: gl.dsp.equipixel * gl.iconSizeXS,
+                            height: gl.eqPx * gl.iconSizeXS,
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
                                 if (!gl.Mode.smallLabel)
                                   Container(
                                     alignment: Alignment.centerLeft,
-                                    width: gl.dsp.equipixel * 15,
+                                    width: gl.eqPx * 15,
                                     child: SingleChildScrollView(
                                       scrollDirection: Axis.horizontal,
                                       child: Text(
                                         gl.selLay.geometries[i].attributes[j].name,
                                         textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: gl.dsp.equipixel * gl.fontSizeXS,
-                                        ),
+                                        style: TextStyle(color: Colors.white, fontSize: gl.eqPx * gl.fontSizeXS),
                                       ),
                                     ),
                                   ),
                                 if (!gl.Mode.smallLabel)
-                                  lt.stroke(
-                                    vertical: true,
-                                    gl.dsp.equipixel * 0.5,
-                                    gl.dsp.equipixel * 0.25,
-                                    gl.colorAgroBioTech,
-                                  ),
+                                  lt.stroke(vertical: true, gl.eqPx * 0.5, gl.eqPx * 0.25, gl.colorAgroBioTech),
                                 Container(
                                   alignment: Alignment.centerLeft,
-                                  width: gl.dsp.equipixel * 15,
+                                  width: gl.eqPx * 15,
                                   child: SingleChildScrollView(
                                     scrollDirection: Axis.horizontal,
                                     child: Text(
@@ -3506,7 +3319,7 @@ class _MapPageState extends State<MapPage> {
                                       textAlign: TextAlign.center,
                                       style: TextStyle(
                                         color: gl.Mode.smallLabel ? Colors.black : Colors.white,
-                                        fontSize: gl.dsp.equipixel * gl.fontSizeXS,
+                                        fontSize: gl.eqPx * gl.fontSizeXS,
                                       ),
                                     ),
                                   ),
@@ -3522,10 +3335,9 @@ class _MapPageState extends State<MapPage> {
                 alignment: Alignment.center,
                 width:
                     textArea.length > gl.selLay.geometries[i].name.length
-                        ? gl.dsp.equipixel * gl.infoBoxPolygon * 2.5 + textArea.length * gl.fontSizeS
-                        : gl.dsp.equipixel * gl.infoBoxPolygon * 1.5 +
-                            gl.selLay.geometries[i].name.length * gl.fontSizeS,
-                height: gl.dsp.equipixel * gl.infoBoxPolygon * 1.5,
+                        ? gl.eqPx * gl.infoBoxPolygon * 2.5 + textArea.length * gl.fontSizeS
+                        : gl.eqPx * gl.infoBoxPolygon * 1.5 + gl.selLay.geometries[i].name.length * gl.fontSizeS,
+                height: gl.eqPx * gl.infoBoxPolygon * 1.5,
                 point: gl.selLay.geometries[i].center,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -3608,43 +3420,39 @@ class _MapPageState extends State<MapPage> {
           children: [
             Container(
               alignment: Alignment.center,
-              width: gl.dsp.equipixel * 11,
-              child: Text("FIXED", style: TextStyle(color: Colors.grey, fontSize: gl.fontSizeXXS * gl.dsp.equipixel)),
+              width: gl.eqPx * 11,
+              child: Text("FIXED", style: TextStyle(color: Colors.grey, fontSize: gl.fontSizeXXS * gl.eqPx)),
             ),
-            lt.stroke(vertical: true, gl.dsp.equipixel, gl.dsp.equipixel * 0.5, gl.colorAgroBioTech),
+            lt.stroke(vertical: true, gl.eqPx, gl.eqPx * 0.5, gl.colorAgroBioTech),
             SizedBox(
-              width: gl.dsp.equipixel * 7,
+              width: gl.eqPx * 7,
               child:
                   checked
-                      ? Icon(Icons.check_box, color: Colors.white12, size: gl.dsp.equipixel * gl.iconSizeXS)
-                      : Icon(
-                        Icons.check_box_outline_blank,
-                        color: Colors.white12,
-                        size: gl.dsp.equipixel * gl.iconSizeXS,
-                      ),
+                      ? Icon(Icons.check_box, color: Colors.white12, size: gl.eqPx * gl.iconSizeXS)
+                      : Icon(Icons.check_box_outline_blank, color: Colors.white12, size: gl.eqPx * gl.iconSizeXS),
             ),
-            lt.stroke(vertical: true, gl.dsp.equipixel, gl.dsp.equipixel * 0.5, gl.colorAgroBioTech),
+            lt.stroke(vertical: true, gl.eqPx, gl.eqPx * 0.5, gl.colorAgroBioTech),
             Container(
               alignment: Alignment.centerLeft,
-              width: gl.dsp.equipixel * 33,
-              child: Text(name, style: TextStyle(color: Colors.white, fontSize: gl.dsp.equipixel * gl.fontSizeM * .75)),
+              width: gl.eqPx * 33,
+              child: Text(name, style: TextStyle(color: Colors.white, fontSize: gl.eqPx * gl.fontSizeM * .75)),
             ),
-            lt.stroke(vertical: true, gl.dsp.equipixel, gl.dsp.equipixel * 0.5, gl.colorAgroBioTech),
+            lt.stroke(vertical: true, gl.eqPx, gl.eqPx * 0.5, gl.colorAgroBioTech),
             Container(
               alignment: Alignment.centerLeft,
-              width: gl.dsp.equipixel * 33,
+              width: gl.eqPx * 33,
               child: SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: Text(
                   values,
                   textAlign: TextAlign.center,
-                  style: TextStyle(color: Colors.white, fontSize: gl.dsp.equipixel * gl.fontSizeM * .75),
+                  style: TextStyle(color: Colors.white, fontSize: gl.eqPx * gl.fontSizeM * .75),
                 ),
               ),
             ),
           ],
         ),
-        lt.stroke(gl.dsp.equipixel, gl.dsp.equipixel * 0.5, gl.colorAgroBioTech),
+        lt.stroke(gl.eqPx, gl.eqPx * 0.5, gl.colorAgroBioTech),
       ],
     );
   }
@@ -3694,35 +3502,29 @@ class _AnaPtPreview extends State<AnaPtPreview> {
       String text = gl.dico.getLayerBase(gl.anaPtPreview!.mCode).getValLabel(gl.anaPtPreview!.mRastValue);
       return Container(
         alignment: Alignment.centerLeft,
-        height: gl.dsp.equipixel * gl.fontSizeM * 1.1,
+        height: gl.eqPx * gl.fontSizeM * 1.1,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Container(
               alignment: Alignment.center,
-              constraints: BoxConstraints(
-                minHeight: gl.fontSizeM * gl.dsp.equipixel,
-                minWidth: gl.fontSizeM * gl.dsp.equipixel,
-              ),
+              constraints: BoxConstraints(minHeight: gl.fontSizeM * gl.eqPx, minWidth: gl.fontSizeM * gl.eqPx),
               color: Colors.white,
               child: Container(
                 alignment: Alignment.center,
-                height: (gl.fontSizeM - .5) * gl.dsp.equipixel,
-                width: (gl.fontSizeM - .5) * gl.dsp.equipixel,
+                height: (gl.fontSizeM - .5) * gl.eqPx,
+                width: (gl.fontSizeM - .5) * gl.eqPx,
                 color: color == Colors.transparent ? Colors.white : color,
               ),
             ),
             Container(
-              constraints: BoxConstraints(
-                minHeight: gl.fontSizeM * gl.dsp.equipixel,
-                minWidth: gl.fontSizeM * gl.dsp.equipixel,
-              ),
+              constraints: BoxConstraints(minHeight: gl.fontSizeM * gl.eqPx, minWidth: gl.fontSizeM * gl.eqPx),
               child: Text(":", textAlign: TextAlign.center),
             ),
             Text(
               textAlign: TextAlign.center,
               text == "" ? "No data" : text,
-              style: TextStyle(fontSize: gl.fontSizeS * gl.dsp.equipixel),
+              style: TextStyle(fontSize: gl.fontSizeS * gl.eqPx),
             ),
           ],
         ),
@@ -3731,10 +3533,10 @@ class _AnaPtPreview extends State<AnaPtPreview> {
     return CircularProgressIndicator(
       color: gl.colorAgroBioTech,
       constraints: BoxConstraints(
-        maxHeight: gl.dsp.equipixel * gl.anaPtBoxSize * .9,
-        minHeight: gl.dsp.equipixel * gl.anaPtBoxSize * .8,
-        maxWidth: gl.dsp.equipixel * gl.anaPtBoxSize * .9,
-        minWidth: gl.dsp.equipixel * gl.anaPtBoxSize * .8,
+        maxHeight: gl.eqPx * gl.anaPtBoxSize * .9,
+        minHeight: gl.eqPx * gl.anaPtBoxSize * .8,
+        maxWidth: gl.eqPx * gl.anaPtBoxSize * .9,
+        minWidth: gl.eqPx * gl.anaPtBoxSize * .8,
       ),
     );
   }

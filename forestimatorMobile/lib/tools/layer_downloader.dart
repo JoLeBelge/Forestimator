@@ -47,10 +47,10 @@ class _LayerDownloaderState extends State<LayerDownloader> {
       return Container(
         color: gl.colorBackground,
         constraints: BoxConstraints(
-          minWidth: gl.onCatalogueWidth * gl.dsp.equipixel,
-          maxWidth: gl.onCatalogueWidth * gl.dsp.equipixel,
-          minHeight: 10 * gl.dsp.equipixel,
-          maxHeight: 10 * gl.dsp.equipixel,
+          minWidth: gl.onCatalogueWidth * gl.eqPx,
+          maxWidth: gl.onCatalogueWidth * gl.eqPx,
+          minHeight: 10 * gl.eqPx,
+          maxHeight: 10 * gl.eqPx,
         ),
         child: const Text("Downloads are not supported yet."),
       );
@@ -60,7 +60,7 @@ class _LayerDownloaderState extends State<LayerDownloader> {
       return TextButton(
         style: ButtonStyle(
           minimumSize: WidgetStateProperty<Size>.fromMap(<WidgetStatesConstraint, Size>{
-            WidgetState.any: Size(gl.onCatalogueWidth * gl.dsp.equipixel, gl.dsp.equipixel * 10),
+            WidgetState.any: Size(gl.onCatalogueWidth * gl.eqPx, gl.eqPx * 10),
           }),
         ),
         onPressed: () async {
@@ -91,10 +91,10 @@ class _LayerDownloaderState extends State<LayerDownloader> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            Icon(Icons.delete, size: gl.onCatalogueIconSize * gl.dsp.equipixel, color: Colors.black),
-            Container(constraints: BoxConstraints(maxWidth: 5 * gl.dsp.equipixel)),
+            Icon(Icons.delete, size: gl.onCatalogueIconSize * gl.eqPx, color: Colors.black),
+            Container(constraints: BoxConstraints(maxWidth: 5 * gl.eqPx)),
             Container(
-              constraints: BoxConstraints(maxWidth: 60 * gl.dsp.equipixel),
+              constraints: BoxConstraints(maxWidth: 60 * gl.eqPx),
               child: const Text("La couche est enregistrée.", style: TextStyle(color: Colors.black)),
             ),
           ],
@@ -104,7 +104,7 @@ class _LayerDownloaderState extends State<LayerDownloader> {
       return TextButton(
         style: ButtonStyle(
           minimumSize: WidgetStateProperty<Size>.fromMap(<WidgetStatesConstraint, Size>{
-            WidgetState.any: Size(gl.onCatalogueWidth * gl.dsp.equipixel, 10 * gl.dsp.equipixel),
+            WidgetState.any: Size(gl.onCatalogueWidth * gl.eqPx, 10 * gl.eqPx),
           }),
         ),
         onPressed: () async {
@@ -131,10 +131,10 @@ class _LayerDownloaderState extends State<LayerDownloader> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            Icon(Icons.repeat_rounded, size: gl.onCatalogueIconSize * gl.dsp.equipixel, color: Colors.black),
-            Container(constraints: BoxConstraints(maxWidth: 10 * gl.dsp.equipixel)),
+            Icon(Icons.repeat_rounded, size: gl.onCatalogueIconSize * gl.eqPx, color: Colors.black),
+            Container(constraints: BoxConstraints(maxWidth: 10 * gl.eqPx)),
             Container(
-              constraints: BoxConstraints(maxWidth: 60 * gl.dsp.equipixel),
+              constraints: BoxConstraints(maxWidth: 60 * gl.eqPx),
               child: const Text("Relancer.", style: TextStyle(color: Colors.black)),
             ),
           ],
@@ -144,7 +144,7 @@ class _LayerDownloaderState extends State<LayerDownloader> {
       return TextButton(
         style: ButtonStyle(
           minimumSize: WidgetStateProperty<Size>.fromMap(<WidgetStatesConstraint, Size>{
-            WidgetState.any: Size(gl.onCatalogueWidth * gl.dsp.equipixel, 10 * gl.dsp.equipixel),
+            WidgetState.any: Size(gl.onCatalogueWidth * gl.eqPx, 10 * gl.eqPx),
           }),
         ),
         onPressed: () async {
@@ -170,10 +170,10 @@ class _LayerDownloaderState extends State<LayerDownloader> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            Icon(Icons.download, size: gl.onCatalogueIconSize * gl.dsp.equipixel, color: Colors.black),
-            Container(constraints: BoxConstraints(maxWidth: 5 * gl.dsp.equipixel)),
+            Icon(Icons.download, size: gl.onCatalogueIconSize * gl.eqPx, color: Colors.black),
+            Container(constraints: BoxConstraints(maxWidth: 5 * gl.eqPx)),
             Container(
-              constraints: BoxConstraints(maxWidth: 60 * gl.dsp.equipixel),
+              constraints: BoxConstraints(maxWidth: 60 * gl.eqPx),
               child: const Text(
                 "La couche peut être téléchargée pour l'utilisation hors ligne.",
                 style: TextStyle(color: Colors.black),

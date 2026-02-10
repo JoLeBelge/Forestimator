@@ -32,7 +32,7 @@ void main() {
 
     test('styleSettingMenu returns expected font size', () {
       // Arrange
-      final expected = gl.dsp.equipixel * gl.fontSizeM;
+      final expected = gl.eqPx * gl.fontSizeM;
 
       // Act
       final style = styleSettingMenu();

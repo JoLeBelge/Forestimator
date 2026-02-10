@@ -66,8 +66,8 @@ class _PDFScreenState extends State<PDFScreen> with WidgetsBindingObserver {
               TextButton(
                 child: Stack(
                   children: [
-                    Icon(Icons.arrow_back, color: Colors.black, size: gl.iconSizeM * gl.dsp.equipixel),
-                    Icon(Icons.arrow_back, color: Colors.white, size: gl.iconSizeM * (gl.dsp.equipixel - .2)),
+                    Icon(Icons.arrow_back, color: Colors.black, size: gl.iconSizeM * gl.eqPx),
+                    Icon(Icons.arrow_back, color: Colors.white, size: gl.iconSizeM * (gl.eqPx - .2)),
                   ],
                 ),
                 onPressed: () {

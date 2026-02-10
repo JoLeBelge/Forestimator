@@ -28,8 +28,8 @@ class LayerTile {
       title: Text(gl.dico.getLayerBase(key).mWMSattribution),
       leading: Container(
         constraints: BoxConstraints(
-          maxWidth: gl.dsp.equipixel * gl.onCatalogueWidth * .75,
-          maxHeight: gl.dsp.equipixel * gl.onCatalogueWidth * .75,
+          maxWidth: gl.eqPx * gl.onCatalogueWidth * .75,
+          maxHeight: gl.eqPx * gl.onCatalogueWidth * .75,
         ),
         child: Image.asset(gl.dico.getLayerBase(key).mLogoAttributionFile, fit: BoxFit.cover),
       ),
@@ -45,21 +45,21 @@ class LayerTile {
         children: [
           Container(
             alignment: Alignment.center,
-            constraints: BoxConstraints(maxWidth: gl.dsp.equipixel * gl.onCatalogueWidth * .8),
+            constraints: BoxConstraints(maxWidth: gl.eqPx * gl.onCatalogueWidth * .8),
             child: Text(
               "Propriétaire de la couche cartographique",
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: gl.dsp.equipixel * gl.fontSizeS),
+              style: TextStyle(fontSize: gl.eqPx * gl.fontSizeS),
             ),
           ),
           Container(
             alignment: Alignment.center,
-            constraints: BoxConstraints(maxWidth: gl.dsp.equipixel * gl.onCatalogueWidth * .75),
+            constraints: BoxConstraints(maxWidth: gl.eqPx * gl.onCatalogueWidth * .75),
             child: Image.asset(gl.dico.getLayerBase(key).mLogoAttributionFile, fit: BoxFit.cover),
           ),
           Container(
             alignment: Alignment.center,
-            constraints: BoxConstraints(maxWidth: gl.dsp.equipixel * gl.onCatalogueWidth * .75),
+            constraints: BoxConstraints(maxWidth: gl.eqPx * gl.onCatalogueWidth * .75),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [Icon(Icons.copyright), Text("  "), Text(gl.dico.getLayerBase(key).mWMSattribution)],

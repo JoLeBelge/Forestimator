@@ -782,7 +782,7 @@ class _SelectLayerSymbol extends State<SelectLayerSymbol> {
                   alignment: Alignment.center,
                   padding: EdgeInsets.symmetric(horizontal: gl.eqPx),
                   color: gl.selLay.defaultPointIcon == k ? gl.colorAgroBioTech : Colors.transparent,
-                  height: gl.dsp.equipixel * gl.iconSizeM,
+                  height: gl.eqPx * gl.iconSizeM,
                   child: IconButton(
                     style: lt.trNoPadButtonstyle,
                     onPressed: () {
@@ -794,11 +794,11 @@ class _SelectLayerSymbol extends State<SelectLayerSymbol> {
                     },
                     icon: Icon(
                       widget.type == "Polygon" ? gl.selectableIconGeo[k] : gl.selectableIcons[k],
-                      size: gl.iconSizeM * gl.dsp.equipixel,
+                      size: gl.iconSizeM * gl.eqPx,
                       color: Colors.black,
                     ),
                     color: Colors.black,
-                    iconSize: gl.dsp.equipixel * gl.iconSizeM,
+                    iconSize: gl.eqPx * gl.iconSizeM,
                   ),
                 );
               },
@@ -2490,12 +2490,12 @@ class _GeoLayerListMenu extends State<GeoLayerListMenu> {
                       onPressed: () {
                         setState(() {
                           _titleLayer = true;
+                          _pageController.animateToPage(
+                            0,
+                            duration: Duration(milliseconds: 300),
+                            curve: Curves.easeInOut,
+                          );
                         });
-                        _pageController.animateToPage(
-                          0,
-                          duration: Duration(milliseconds: 300),
-                          curve: Curves.easeInOut,
-                        );
                       },
                       padding: EdgeInsets.zero,
                     ),
@@ -2729,8 +2729,13 @@ class _GeoLayerListMenu extends State<GeoLayerListMenu> {
                     LayerPropertiesPage(() {
                       setState(() {
                         _titleLayer = true;
+
+                        _pageController.animateToPage(
+                          0,
+                          duration: Duration(milliseconds: 300),
+                          curve: Curves.easeInOut,
+                        );
                       });
-                      _pageController.animateToPage(0, duration: Duration(milliseconds: 300), curve: Curves.easeInOut);
                     }, widget.mapmove),
                 ],
               ),
@@ -2805,7 +2810,22 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
   TextEditingController? controllerPdfName;
   TextEditingController? controllerLocationName;
 
+  final PageController _pageController = PageController();
+
   ScrollController propertiesTableScrollController = ScrollController();
+  bool propertiesOpen = false;
+  bool attributesOpen = false;
+  bool listOpen = true;
+
+  int? _selectedIndex;
+  bool _titleLayer = true;
+
+  @override
+  void dispose() {
+    print("zez");
+    _pageController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -2824,7 +2844,7 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
               surfaceTintColor: Colors.transparent,
               shadowColor: Colors.transparent,
               color: gl.colorAgroBioTech.withAlpha(75),
-              child: Column(children: _getGeometriesList() + _getDefaultAttributes() + _getPropertiesTab()),
+              child: Column(children: _getPropertiesTab() + _getGeometriesList()),
             ),
           ],
         ),
@@ -2846,602 +2866,1130 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
         child: Container(
           alignment: Alignment.center,
           width: gl.eqPx * gl.onCatalogueWidth * .97,
-          height: gl.eqPx * 20,
-          child: Text(
-            gl.selLay.type == "Polygon" ? "Liste des polygones" : "Liste des points",
-            textAlign: TextAlign.center,
-            style: TextStyle(color: Colors.black, fontSize: gl.eqPx * gl.fontSizeL),
-          ),
-        ),
-      ),
-      Card(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadiusGeometry.circular(12.0),
-          side: BorderSide(color: gl.colorAgroBioTech.withAlpha(255), width: 2.0),
-        ),
-        surfaceTintColor: Colors.transparent,
-        shadowColor: Colors.transparent,
-        color: Colors.white.withAlpha(200),
-        child: ListBody(
-          children: List<Widget>.generate(gl.layerReady ? gl.selLay.geometries.length : 0, (int index) {
-            return Column(
-              children: [
-                Container(
-                  padding: EdgeInsets.all(0),
-                  width: gl.eqPx * gl.onCatalogueWidth * .9,
-                  height: gl.eqPx * gl.onCatalogueMapHeight * .17,
-                  child: TextButton(
-                    style: lt.trNoPadButtonstyle,
-                    onPressed: () {
-                      setState(() {
-                        PopupValueChange(
-                          "string",
-                          gl.layerReady ? gl.selLay.geometries[index].name : "",
-                          (value) {
-                            setState(() {
-                              gl.selLay.geometries[index].name = value.toString();
-                            });
-                          },
-                          () {},
-                          () {
-                            gl.selLay.geometries[index].serialize();
-                          },
-                        );
-                      });
-                    },
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Icon(Icons.edit, size: gl.eqPx * gl.iconSizeXXS, color: Colors.black),
-                        Container(
-                          alignment: Alignment.center,
-                          width: gl.eqPx * 65,
-                          child: SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: Text(
-                              gl.layerReady ? gl.selLay.geometries[index].name : "",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(color: Colors.black, fontSize: gl.eqPx * gl.fontSizeXS),
-                            ),
-                          ),
-                        ),
-                        Container(
-                          alignment: Alignment.center,
-                          height: gl.eqPx * gl.iconSizeXXS,
-                          width: gl.eqPx * gl.iconSizeXXS,
-                          child: IconButton(
-                            style: lt.trNoPadButtonstyle,
-                            onPressed: () {
-                              PopupColorChooser(
-                                gl.selLay.geometries[index].colorInside,
-                                gl.notificationContext!,
-                                //change color
-                                (Color col) {
-                                  setState(() {
-                                    gl.selLay.geometries[index].setColorInside(col);
-                                    gl.selLay.geometries[index].setColorLine(
-                                      Color.fromRGBO(
-                                        (col.r * 255).round(),
-                                        (col.g * 255).round(),
-                                        (col.b * 255).round(),
-                                        1.0,
-                                      ),
-                                    );
-                                  });
-                                },
-                                () {},
-                                () {
-                                  gl.selLay.geometries[index].serialize();
-                                },
-                              );
-                            },
-                            icon: Icon(
-                              gl.selLay.geometries[index].type.contains("Point")
-                                  ? gl.selectableIcons[gl.selLay.geometries[index].selectedPointIcon]
-                                  : gl.selectableIconGeo[gl.selLay.geometries[index].selectedPointIcon],
-                              size: gl.eqPx * gl.iconSizeXXS,
-                              color: gl.selLay.geometries[index].colorLine,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+          height: gl.eqPx * 18,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              SizedBox(width: gl.eqPx * gl.iconSizeL, height: gl.eqPx * gl.iconSizeL),
+              Text(
+                "Entités",
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.black, fontSize: gl.eqPx * gl.fontSizeL),
+              ),
+              SizedBox(
+                width: gl.eqPx * gl.iconSizeL,
+                height: gl.eqPx * gl.iconSizeL,
+                child: IconButton(
+                  style: lt.trNoPadButtonstyle,
+                  onPressed: () {
+                    setState(() {
+                      listOpen = !listOpen;
+                    });
+                  },
+                  icon: Icon(
+                    listOpen ? Icons.arrow_drop_up_outlined : Icons.arrow_drop_down_outlined,
+                    size: gl.eqPx * gl.iconSizeL * .8,
+                    color: Colors.black,
                   ),
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    Row(
-                      children: [
-                        gl.selLay.geometries[index].containsAttribute("essence") &&
-                                gl.selLay.geometries[index].containsAttribute("rmq")
-                            ? Container(
-                              alignment: Alignment.center,
-                              width: gl.eqPx * gl.iconSizeS,
-                              height: gl.eqPx * gl.iconSizeS,
-                              child: IconButton(
-                                style: lt.trNoPadButtonstyle,
-                                onPressed: () {
-                                  if (gl.UserData.forename.isEmpty ||
-                                      gl.UserData.name.isEmpty ||
-                                      gl.UserData.mail.isEmpty) {
-                                    PopupUserData(
-                                      context,
-                                      () {},
-                                      () {
-                                        PopupDoYouReally(
-                                          context,
-                                          () {
-                                            gl.selLay.geometries[index].sendGeometryToServer();
-                                          },
-                                          "Attention !",
-                                          gl.labelSendCompoFeature,
-                                          "Envoyer",
-                                          "Ne pas envoyer",
-                                        );
-                                      },
-                                      oldForename: gl.UserData.forename,
-                                      oldName: gl.UserData.name,
-                                      oldMail: gl.UserData.mail,
-                                    );
-                                  } else {
-                                    PopupDoYouReally(
-                                      context,
-                                      () {
-                                        gl.selLay.geometries[index].sendGeometryToServer();
-                                      },
-                                      "Attention !",
-                                      gl.labelSendCompoFeature,
-                                      "Envoyer",
-                                      "Ne pas envoyer",
-                                    );
-                                  }
-                                },
-                                icon: Icon(Icons.send_and_archive, color: Colors.black, size: gl.iconSizeXS * gl.eqPx),
-                              ),
-                            )
-                            : SizedBox(width: gl.eqPx * gl.iconSizeS, height: gl.eqPx * gl.iconSizeS),
-                        (gl.selLay.geometries[index].type == "Polygon" && gl.selLay.geometries[index].points.length > 2)
-                            ? Container(
-                              alignment: Alignment.center,
-                              width: gl.eqPx * gl.iconSizeS,
-                              height: gl.eqPx * gl.iconSizeS,
-                              child: IconButton(
-                                style: lt.trNoPadButtonstyle,
-                                onPressed: () async {
-                                  if (await gl.selLay.geometries[index].onlineSurfaceAnalysis()) {
-                                    gl.mainStack.add(
-                                      popupAnaSurfResultsMenu(
-                                        gl.notificationContext!,
-                                        gl.selLay.geometries[index].decodedJson,
-                                        () {
-                                          gl.refreshMainStack(() {});
-                                        },
-                                        () {
-                                          gl.refreshMainStack(() {});
-                                        },
-                                      ),
-                                    );
-                                    gl.refreshMainStack(() {});
-                                  }
-                                },
-                                icon: Icon(Icons.analytics, color: Colors.black, size: gl.eqPx * gl.iconSizeXS),
-                              ),
-                            )
-                            : SizedBox(width: gl.eqPx * gl.iconSizeS, height: gl.eqPx * gl.iconSizeS),
-                        (gl.selLay.geometries[index].type.contains("Point") &&
-                                gl.selLay.geometries[index].points.isNotEmpty)
-                            ? Container(
-                              alignment: Alignment.center,
-                              width: gl.eqPx * gl.iconSizeS,
-                              height: gl.eqPx * gl.iconSizeS,
-                              child: IconButton(
-                                style: lt.trNoPadButtonstyle,
-                                onPressed: () async {
-                                  if (!_doingAnaPt) {
-                                    _doingAnaPt = true;
-                                    await gl.selLay.geometries[index].runAnaPt();
-                                    gl.refreshMainStack(() {
-                                      PopupAnaResultsMenu(gl.notificationContext!, gl.requestedLayers, () {
-                                        setState(() {});
-                                      });
-                                    });
-
-                                    _doingAnaPt = false;
-                                  }
-                                },
-                                icon: Icon(Icons.location_pin, color: Colors.black, size: gl.eqPx * gl.iconSizeXS),
-                              ),
-                            )
-                            : SizedBox(width: gl.eqPx * gl.iconSizeS, height: gl.eqPx * gl.iconSizeS),
-                      ],
-                    ),
-                    gl.selLay.geometries[index].sentToServer
-                        ? Container(
-                          alignment: Alignment.center,
-                          width: gl.eqPx * gl.iconSizeS,
-                          height: gl.eqPx * gl.iconSizeS,
-                          child: Text(
-                            "SENT",
-                            style: TextStyle(color: Colors.red, fontSize: gl.dsp.equipixel * gl.fontSizeXXS),
-                          ),
-                        )
-                        : SizedBox(width: gl.eqPx * gl.iconSizeS, height: gl.eqPx * gl.iconSizeS),
-                    (gl.selLay.geometries[index].center.longitude != 0.0 &&
-                            gl.selLay.geometries[index].center.latitude != 0.0)
-                        ? Container(
-                          alignment: Alignment.center,
-                          width: gl.dsp.equipixel * gl.iconSizeS,
-                          height: gl.eqPx * gl.iconSizeS,
-                          child: IconButton(
-                            style: lt.borderlessStyle,
-                            onPressed: () {
-                              gl.selLay.geometries[index].visibleOnMap = true;
-                              gl.selLay.geometries[index].serialize();
-                              setState(() {
-                                widget.mapmove(gl.selLay.geometries[index].center);
-                                gl.selLay.selectedGeometry = index;
-                              });
-                              gl.refreshMainStack(() {
-                                gl.modeMapShowPolygons = true;
-                              });
-                            },
-                            icon: Icon(
-                              Icons.gps_fixed,
-                              size: gl.dsp.equipixel * gl.iconSizeXS,
-                              opticalSize: gl.dsp.equipixel * gl.iconSizeS,
-                              color: gl.selLay.selectedGeometry == index ? Colors.red : Colors.black,
-                            ),
-                          ),
-                        )
-                        : SizedBox(width: gl.dsp.equipixel * gl.iconSizeS, height: gl.eqPx * gl.iconSizeS),
-                    Container(
-                      alignment: Alignment.center,
-                      width: gl.eqPx * gl.iconSizeS,
-                      height: gl.eqPx * gl.iconSizeS,
-                      child: IconButton(
-                        style: lt.trNoPadButtonstyle,
-                        onPressed: () {
-                          PopupDoYouReally(
-                            gl.notificationContext!,
-                            () {
-                              setState(() {
-                                widget.closePage();
-                                gl.selLay.removeGeometry(id: gl.selLay.geometries[index].id);
-                                if (index > 0) {
-                                  gl.selLay.selectedGeometry--;
-                                } else if (gl.selLay.geometries.isEmpty) {
-                                  gl.selLay.selectedGeometry = -1;
-                                }
-                              });
-                            },
-                            "Message",
-                            "\nVoulez vous vraiment supprimer ${gl.selLay.geometries[index].name}?\n",
-                          );
-                        },
-                        icon: Icon(Icons.delete_forever, color: Colors.black, size: gl.eqPx * gl.iconSizeXS),
-                      ),
-                    ),
-                  ],
-                ),
-                if (index < gl.selLay.geometries.length - 1)
-                  lt.stroke(gl.dsp.equipixel, gl.dsp.equipixel * .5, gl.colorAgroBioTech),
-              ],
-            );
-          }),
-        ),
-      ),
-    ];
-  }
-
-  List<Widget> _getDefaultAttributes() {
-    return [
-      Card(
-        color: gl.colorAgroBioTech.withAlpha(200),
-        child: Container(
-          alignment: Alignment.center,
-          width: gl.eqPx * gl.onCatalogueWidth * .97,
-          height: gl.eqPx * 20,
-          child: Text(
-            "Attributs par défaut",
-            textAlign: TextAlign.center,
-            style: TextStyle(color: Colors.black, fontSize: gl.eqPx * gl.fontSizeL),
+              ),
+            ],
           ),
         ),
       ),
-      Card(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadiusGeometry.circular(12.0),
-          side: BorderSide(color: gl.colorAgroBioTech.withAlpha(255), width: 2.0),
-        ),
-        surfaceTintColor: Colors.transparent,
-        shadowColor: Colors.transparent,
-        color: Colors.white.withAlpha(200),
-        child: ListBody(
-          children: [
-            lt.stroke(gl.dsp.equipixel, gl.dsp.equipixel * .5, gl.colorAgroBioTech),
-            Column(
+      if (listOpen)
+        Card(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadiusGeometry.circular(12.0),
+            side: BorderSide(color: gl.colorAgroBioTech.withAlpha(255), width: 2.0),
+          ),
+          surfaceTintColor: Colors.transparent,
+          shadowColor: Colors.transparent,
+          color: Colors.white.withAlpha(200),
+          child: Container(
+            padding: EdgeInsetsGeometry.zero,
+            width: gl.eqPx * gl.onCatalogueWidth,
+            height: _titleLayer ? gl.eqPx * gl.selLay.geometries.length * (16 + 2.5) : gl.eqPx * 110,
+            child: PageView(
+              controller: _pageController,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    SizedBox(
-                      width: gl.dsp.equipixel * 10,
-                      child: Text(
-                        "type",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
-                          fontSize: gl.dsp.equipixel * gl.fontSizeM * .75,
-                        ),
-                      ),
-                    ),
-                    lt.stroke(vertical: true, gl.dsp.equipixel, gl.dsp.equipixel * 0.5, gl.colorAgroBioTech),
-                    SizedBox(
-                      width: gl.dsp.equipixel * 7,
-                      child: Icon(Icons.remove_red_eye, color: Colors.black, size: gl.dsp.equipixel * gl.iconSizeXS),
-                    ),
-                    lt.stroke(vertical: true, gl.dsp.equipixel, gl.dsp.equipixel * 0.5, gl.colorAgroBioTech),
-                    SizedBox(
-                      width: gl.dsp.equipixel * 64,
-                      child: Text(
-                        "Attribut",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
-                          fontSize: gl.dsp.equipixel * gl.fontSizeM * .75,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                lt.stroke(gl.dsp.equipixel, gl.dsp.equipixel * 0.5, gl.colorAgroBioTech),
-                Scrollbar(
-                  scrollbarOrientation: ScrollbarOrientation.right,
-                  thickness: gl.dsp.equipixel * 3,
-                  controller: propertiesTableScrollController,
-                  child: Container(
-                    color: gl.backgroundTransparentBlackBox.withAlpha(50),
-                    height: gl.dsp.equipixel * gl.attributeTableHeight,
-                    child: ListView(
-                      controller: propertiesTableScrollController,
-                      children:
-                          <Widget>[
-                            _getFixedAttribute("type", gl.selLay.type, noValues: true),
-                            _getFixedAttribute("nom", gl.selLay.name, noValues: true),
-                          ] +
-                          List<Widget>.generate(gl.layerReady ? gl.selLay.defaultAttributes.length : 0, (i) {
-                            return Column(
-                              children: [
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                  children: [
-                                    SizedBox(
-                                      width: gl.dsp.equipixel * 10,
-                                      height: gl.dsp.equipixel * gl.iconSizeS,
-                                      child: TextButton(
-                                        style: ButtonStyle(
-                                          animationDuration: Duration(seconds: 1),
-                                          backgroundColor: WidgetStateProperty<Color>.fromMap(
-                                            <WidgetStatesConstraint, Color>{WidgetState.any: Colors.transparent},
-                                          ),
-                                          padding: WidgetStateProperty<EdgeInsetsGeometry>.fromMap(
-                                            <WidgetStatesConstraint, EdgeInsetsGeometry>{
-                                              WidgetState.any: EdgeInsetsGeometry.zero,
-                                            },
-                                          ),
-                                        ),
-                                        onPressed: () {},
-                                        onLongPress: () {},
-                                        child: Container(
-                                          alignment: Alignment.center,
-                                          child:
-                                              gl.selLay.defaultAttributes[i].type == "int"
-                                                  ? Text(
-                                                    "INT",
-                                                    style: TextStyle(
-                                                      color: Colors.yellow,
-                                                      fontSize: gl.fontSizeXXS * gl.dsp.equipixel,
-                                                    ),
-                                                  )
-                                                  : gl.selLay.defaultAttributes[i].type == "string"
-                                                  ? Text(
-                                                    "STRING",
-                                                    style: TextStyle(
-                                                      color: Colors.lightBlue,
-                                                      fontSize: gl.fontSizeXXS * gl.dsp.equipixel,
-                                                    ),
-                                                  )
-                                                  : gl.selLay.defaultAttributes[i].type == "double"
-                                                  ? Text(
-                                                    "DOUBLE",
-                                                    style: TextStyle(
-                                                      color: Colors.red,
-                                                      fontSize: gl.fontSizeXXS * gl.dsp.equipixel,
-                                                    ),
-                                                  )
-                                                  : Text(
-                                                    "UFO",
-                                                    style: TextStyle(
-                                                      color: Colors.green,
-                                                      fontSize: gl.fontSizeXXS * gl.dsp.equipixel,
-                                                    ),
-                                                  ),
-                                        ),
-                                      ),
-                                    ),
-                                    lt.stroke(
-                                      vertical: true,
-                                      gl.dsp.equipixel,
-                                      gl.dsp.equipixel * 0.5,
-                                      gl.colorAgroBioTech,
-                                    ),
-                                    SizedBox(
-                                      width: gl.dsp.equipixel * 7,
-                                      height: gl.dsp.equipixel * gl.iconSizeM,
-                                      child: IconButton(
-                                        style: lt.trNoPadButtonstyle,
-                                        onPressed: () {},
-                                        onLongPress: () async {
-                                          setState(() {
-                                            gl.selLay.defaultAttributes[i].visibleOnMapLabel =
-                                                !gl.selLay.defaultAttributes[i].visibleOnMapLabel;
-                                          });
-                                          gl.selLay.serialize();
-                                        },
-                                        icon:
-                                            gl.selLay.defaultAttributes[i].visibleOnMapLabel
-                                                ? Icon(
-                                                  Icons.check_box_outlined,
-                                                  color: Colors.black,
-                                                  size: gl.dsp.equipixel * gl.iconSizeXS,
-                                                )
-                                                : Icon(
-                                                  Icons.check_box_outline_blank,
-                                                  color: Colors.black,
-                                                  size: gl.dsp.equipixel * gl.iconSizeXS,
-                                                ),
-                                      ),
-                                    ),
-                                    lt.stroke(
-                                      vertical: true,
-                                      gl.dsp.equipixel,
-                                      gl.dsp.equipixel * 0.5,
-                                      gl.colorAgroBioTech,
-                                    ),
-                                    SizedBox(
-                                      width: gl.dsp.equipixel * 64,
-                                      height: gl.dsp.equipixel * gl.iconSizeS,
-                                      child: TextButton(
-                                        style: lt.trNoPadButtonstyle,
-                                        onPressed: () {},
-                                        onLongPress: () {
+                Column(
+                  children: List<Widget>.generate(gl.layerReady ? gl.selLay.geometries.length : 0, (int index) {
+                    return Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Container(
+                              width: gl.eqPx * 75,
+                              height: gl.eqPx * 14,
+                              alignment: Alignment.centerLeft,
+                              padding: EdgeInsetsGeometry.zero,
+                              child: Column(
+                                children: [
+                                  Container(
+                                    padding: EdgeInsets.all(0),
+                                    width: gl.eqPx * gl.onCatalogueWidth,
+                                    height: gl.eqPx * 4,
+                                    child: TextButton(
+                                      style: lt.trNoPadButtonstyle,
+                                      onPressed: () {
+                                        setState(() {
                                           PopupValueChange(
-                                            "prop",
-                                            gl.selLay.defaultAttributes[i].name,
+                                            "string",
+                                            gl.layerReady ? gl.selLay.geometries[index].name : "",
                                             (value) {
                                               setState(() {
-                                                gl.selLay.defaultAttributes[i].name = cleanAttributeName(
-                                                  value.toString(),
-                                                );
+                                                gl.selLay.geometries[index].name = value.toString();
                                               });
                                             },
                                             () {},
                                             () {
-                                              String nom = gl.selLay.defaultAttributes[i].name;
-                                              if (controlDuplicateAttributeName(
-                                                gl.selLay.defaultAttributes[i].name,
-                                                gl.selLay.defaultAttributes,
-                                              )) {
-                                                PopupMessage("Erreur", "Le nom $nom existe déja!");
-                                                return;
-                                              } else {
-                                                gl.selLay.serialize();
-                                              }
+                                              gl.selLay.geometries[index].serialize();
                                             },
                                           );
-                                        },
-                                        child: Container(
-                                          alignment: Alignment.centerLeft,
-                                          child: SingleChildScrollView(
-                                            scrollDirection: Axis.horizontal,
+                                        });
+                                      },
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Row(
+                                            children: [
+                                              Text(
+                                                " $index",
+                                                style: TextStyle(
+                                                  color: Colors.black,
+                                                  fontSize: gl.eqPx * gl.fontSizeXS,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          lt.ForestimatorScrollView(
+                                            height: gl.eqPx * gl.fontSizeXS,
+                                            width: gl.eqPx * 30,
+                                            horizontal: true,
                                             child: Text(
-                                              gl.selLay.defaultAttributes[i].name,
-                                              textAlign: TextAlign.start,
+                                              gl.layerReady ? gl.selLay.geometries[index].name : "",
+                                              textAlign: TextAlign.center,
                                               style: TextStyle(
                                                 color: Colors.black,
-                                                fontSize: gl.dsp.equipixel * gl.fontSizeM * .75,
+                                                fontSize: gl.eqPx * gl.fontSizeXS * .9,
                                               ),
+                                            ),
+                                          ),
+                                          Container(
+                                            alignment: Alignment.center,
+                                            height: gl.eqPx * gl.iconSizeXXS,
+                                            width: gl.eqPx * gl.iconSizeS,
+                                            child: IconButton(
+                                              style: lt.trNoPadButtonstyle,
+                                              onPressed: () {
+                                                PopupColorChooser(
+                                                  gl.selLay.geometries[index].colorInside,
+                                                  gl.notificationContext!,
+                                                  //change color
+                                                  (Color col) {
+                                                    setState(() {
+                                                      gl.selLay.geometries[index].setColorInside(col);
+                                                      gl.selLay.geometries[index].setColorLine(
+                                                        Color.fromRGBO(
+                                                          (col.r * 255).round(),
+                                                          (col.g * 255).round(),
+                                                          (col.b * 255).round(),
+                                                          1.0,
+                                                        ),
+                                                      );
+                                                    });
+                                                  },
+                                                  () {},
+                                                  () {
+                                                    gl.selLay.geometries[index].serialize();
+                                                  },
+                                                );
+                                              },
+                                              icon: Icon(
+                                                gl.selLay.geometries[index].type.contains("Point")
+                                                    ? gl.selectableIcons[gl.selLay.geometries[index].selectedPointIcon]
+                                                    : gl.selectableIconGeo[gl
+                                                        .selLay
+                                                        .geometries[index]
+                                                        .selectedPointIcon],
+                                                size: gl.eqPx * gl.iconSizeXXS,
+                                                color: gl.selLay.geometries[index].colorLine,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          gl.selLay.geometries[index].sentToServer
+                                              ? Container(
+                                                alignment: Alignment.center,
+                                                width: gl.eqPx * gl.iconSizeS,
+                                                height: gl.eqPx * gl.iconSizeS,
+                                                child: Text(
+                                                  "SENT",
+                                                  style: TextStyle(
+                                                    color: Colors.red,
+                                                    fontSize: gl.eqPx * gl.fontSizeXXS,
+                                                  ),
+                                                ),
+                                              )
+                                              : gl.selLay.geometries[index].containsAttribute("essence") &&
+                                                  gl.selLay.geometries[index].containsAttribute("rmq")
+                                              ? Container(
+                                                alignment: Alignment.center,
+                                                width: gl.eqPx * gl.iconSizeS,
+                                                height: gl.eqPx * gl.iconSizeS,
+                                                child: IconButton(
+                                                  style: lt.trNoPadButtonstyle,
+                                                  onPressed: () {
+                                                    if (gl.UserData.forename.isEmpty ||
+                                                        gl.UserData.name.isEmpty ||
+                                                        gl.UserData.mail.isEmpty) {
+                                                      PopupUserData(
+                                                        context,
+                                                        () {},
+                                                        () {
+                                                          PopupDoYouReally(
+                                                            context,
+                                                            () {
+                                                              gl.selLay.geometries[index].sendGeometryToServer();
+                                                            },
+                                                            "Attention !",
+                                                            gl.labelSendCompoFeature,
+                                                            "Envoyer",
+                                                            "Ne pas envoyer",
+                                                          );
+                                                        },
+                                                        oldForename: gl.UserData.forename,
+                                                        oldName: gl.UserData.name,
+                                                        oldMail: gl.UserData.mail,
+                                                      );
+                                                    } else {
+                                                      PopupDoYouReally(
+                                                        context,
+                                                        () {
+                                                          gl.selLay.geometries[index].sendGeometryToServer();
+                                                        },
+                                                        "Attention !",
+                                                        gl.labelSendCompoFeature,
+                                                        "Envoyer",
+                                                        "Ne pas envoyer",
+                                                      );
+                                                    }
+                                                  },
+                                                  icon: Icon(
+                                                    Icons.send_and_archive,
+                                                    color: Colors.black,
+                                                    size: gl.iconSizeXS * gl.eqPx,
+                                                  ),
+                                                ),
+                                              )
+                                              : SizedBox(width: gl.eqPx * gl.iconSizeS, height: gl.eqPx * gl.iconSizeS),
+                                          (gl.selLay.geometries[index].type == "Polygon" &&
+                                                  gl.selLay.geometries[index].points.length > 2)
+                                              ? Container(
+                                                alignment: Alignment.center,
+                                                width: gl.eqPx * gl.iconSizeS,
+                                                height: gl.eqPx * gl.iconSizeS,
+                                                child: IconButton(
+                                                  style: lt.trNoPadButtonstyle,
+                                                  onPressed: () async {
+                                                    if (await gl.selLay.geometries[index].onlineSurfaceAnalysis()) {
+                                                      gl.mainStack.add(
+                                                        popupAnaSurfResultsMenu(
+                                                          gl.notificationContext!,
+                                                          gl.selLay.geometries[index].decodedJson,
+                                                          () {
+                                                            gl.refreshMainStack(() {});
+                                                          },
+                                                          () {
+                                                            gl.refreshMainStack(() {});
+                                                          },
+                                                        ),
+                                                      );
+                                                      gl.refreshMainStack(() {});
+                                                    }
+                                                  },
+                                                  icon: Icon(
+                                                    Icons.analytics,
+                                                    color: Colors.black,
+                                                    size: gl.eqPx * gl.iconSizeXS,
+                                                  ),
+                                                ),
+                                              )
+                                              : SizedBox(width: gl.eqPx * gl.iconSizeS, height: gl.eqPx * gl.iconSizeS),
+                                          (gl.selLay.geometries[index].type.contains("Point") &&
+                                                  gl.selLay.geometries[index].points.isNotEmpty)
+                                              ? Container(
+                                                alignment: Alignment.center,
+                                                width: gl.eqPx * gl.iconSizeS,
+                                                height: gl.eqPx * gl.iconSizeS,
+                                                child: IconButton(
+                                                  style: lt.trNoPadButtonstyle,
+                                                  onPressed: () async {
+                                                    if (!_doingAnaPt) {
+                                                      _doingAnaPt = true;
+                                                      await gl.selLay.geometries[index].runAnaPt();
+                                                      gl.refreshMainStack(() {
+                                                        PopupAnaResultsMenu(
+                                                          gl.notificationContext!,
+                                                          gl.requestedLayers,
+                                                          () {
+                                                            setState(() {});
+                                                          },
+                                                        );
+                                                      });
+                                                      _doingAnaPt = false;
+                                                    }
+                                                  },
+                                                  icon: Icon(
+                                                    Icons.location_pin,
+                                                    color: Colors.black,
+                                                    size: gl.eqPx * gl.iconSizeXS,
+                                                  ),
+                                                ),
+                                              )
+                                              : SizedBox(width: gl.eqPx * gl.iconSizeS, height: gl.eqPx * gl.iconSizeS),
+                                        ],
+                                      ),
+                                      (gl.selLay.geometries[index].center.longitude != 0.0 &&
+                                              gl.selLay.geometries[index].center.latitude != 0.0)
+                                          ? Container(
+                                            alignment: Alignment.center,
+                                            width: gl.eqPx * gl.iconSizeS,
+                                            height: gl.eqPx * gl.iconSizeS,
+                                            child: IconButton(
+                                              style: lt.borderlessStyle,
+                                              onPressed: () {
+                                                gl.selLay.geometries[index].visibleOnMap = true;
+                                                gl.selLay.geometries[index].serialize();
+                                                setState(() {
+                                                  widget.mapmove(gl.selLay.geometries[index].center);
+                                                  gl.selLay.selectedGeometry = index;
+                                                });
+                                                gl.refreshMainStack(() {
+                                                  gl.modeMapShowPolygons = true;
+                                                });
+                                              },
+                                              icon: Icon(
+                                                Icons.gps_fixed,
+                                                size: gl.eqPx * gl.iconSizeXS,
+                                                opticalSize: gl.eqPx * gl.iconSizeS,
+                                                color: gl.selLay.selectedGeometry == index ? Colors.red : Colors.black,
+                                              ),
+                                            ),
+                                          )
+                                          : SizedBox(width: gl.eqPx * gl.iconSizeS, height: gl.eqPx * gl.iconSizeS),
+                                      Container(
+                                        alignment: Alignment.center,
+                                        width: gl.eqPx * gl.iconSizeS,
+                                        height: gl.eqPx * gl.iconSizeS,
+                                        child: IconButton(
+                                          style: lt.trNoPadButtonstyle,
+                                          onPressed: () {
+                                            PopupDoYouReally(
+                                              gl.notificationContext!,
+                                              () {
+                                                setState(() {
+                                                  widget.closePage();
+                                                  gl.selLay.removeGeometry(id: gl.selLay.geometries[index].id);
+                                                  if (index > 0) {
+                                                    gl.selLay.selectedGeometry--;
+                                                  } else if (gl.selLay.geometries.isEmpty) {
+                                                    gl.selLay.selectedGeometry = -1;
+                                                  }
+                                                });
+                                              },
+                                              "Message",
+                                              "\nVoulez vous vraiment supprimer ${gl.selLay.geometries[index].name}?\n",
+                                            );
+                                          },
+                                          icon: Icon(
+                                            Icons.delete_forever,
+                                            color: Colors.black,
+                                            size: gl.eqPx * gl.iconSizeXS,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Container(
+                              width: gl.eqPx * 10,
+                              height: gl.eqPx * 16,
+                              alignment: Alignment.centerRight,
+                              child: IconButton(
+                                style: lt.trNoPadButtonstyle,
+                                onPressed: () {
+                                  setState(() {
+                                    gl.selLay.selectedGeometry = index;
+                                    _selectedIndex = index;
+                                    _titleLayer = false;
+                                  });
+                                  _pageController.animateToPage(
+                                    1,
+                                    duration: Duration(milliseconds: 300),
+                                    curve: Curves.easeInOut,
+                                  );
+                                },
+                                icon: Icon(Icons.arrow_forward, color: Colors.black, size: gl.eqPx * gl.iconSizeS),
+                                padding: EdgeInsets.zero,
+                              ),
+                            ),
+                          ],
+                        ),
+                        if (index < gl.selLay.geometries.length - 1)
+                          lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
+                      ],
+                    );
+                  }),
+                ),
+                if (_selectedIndex != null)
+                  Column(
+                    children: [
+                      Row(
+                        children: [
+                          IconButton(
+                            icon: Icon(Icons.arrow_back, color: Colors.black, size: gl.eqPx * gl.iconSizeM * .75),
+                            onPressed: () {
+                              setState(() {
+                                _titleLayer = true;
+                              });
+                              _pageController.animateToPage(
+                                0,
+                                duration: Duration(milliseconds: 300),
+                                curve: Curves.easeInOut,
+                              );
+                            },
+                            padding: EdgeInsets.zero,
+                          ),
+                          Container(
+                            alignment: Alignment.centerLeft,
+                            width: gl.eqPx * gl.chosenPolyBarWidth * .75,
+                            child: Text(
+                              "Table des attributs",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(color: Colors.black, fontSize: gl.eqPx * gl.fontSizeM * .75),
+                            ),
+                          ),
+                        ],
+                      ),
+                      entitiesAttributes,
+                    ],
+                  ),
+              ],
+            ),
+          ),
+        ),
+    ];
+  }
+
+  Widget get entitiesAttributes => Column(
+    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    children: [
+      Column(
+        children: [
+          lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
+          Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  SizedBox(
+                    width: gl.eqPx * 10,
+                    child: Text(
+                      "type",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold,
+                        fontSize: gl.eqPx * gl.fontSizeM * .75,
+                      ),
+                    ),
+                  ),
+                  lt.stroke(vertical: true, gl.eqPx, gl.eqPx * 0.5, gl.colorAgroBioTech),
+                  SizedBox(
+                    width: gl.eqPx * 7,
+                    child: Icon(Icons.remove_red_eye, color: Colors.black, size: gl.eqPx * gl.iconSizeXS),
+                  ),
+                  lt.stroke(vertical: true, gl.eqPx, gl.eqPx * 0.5, gl.colorAgroBioTech),
+                  SizedBox(
+                    width: gl.eqPx * 32,
+                    child: Text(
+                      "Attribut",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold,
+                        fontSize: gl.eqPx * gl.fontSizeM * .75,
+                      ),
+                    ),
+                  ),
+                  lt.stroke(vertical: true, gl.eqPx, gl.eqPx * 0.5, gl.colorAgroBioTech),
+                  SizedBox(
+                    width: gl.eqPx * 32,
+                    child: Text(
+                      "Valeur",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold,
+                        fontSize: gl.eqPx * gl.fontSizeM * .75,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              lt.stroke(gl.eqPx, gl.eqPx * 0.5, gl.colorAgroBioTech),
+              Scrollbar(
+                scrollbarOrientation: ScrollbarOrientation.right,
+                thickness: gl.eqPx * 3,
+                controller: propertiesTableScrollController,
+                child: Container(
+                  color: gl.backgroundTransparentBlackBox.withAlpha(100),
+                  height: gl.eqPx * gl.attributeTableHeight,
+                  child: ListView(
+                    controller: propertiesTableScrollController,
+                    children:
+                        <Widget>[
+                          _getFixedAttribute("type", gl.selGeo.type),
+                          _getFixedAttribute("nom", gl.selGeo.name, checked: true),
+                          if (gl.selGeo.type == "Polygon")
+                            _getFixedAttribute("surface", "${(gl.selGeo.area / 100).round() / 100}"),
+                          if (gl.selGeo.type == "Polygon")
+                            _getFixedAttribute("circonference", "${(gl.selGeo.perimeter).round() / 1000}"),
+
+                          _getFixedAttribute("coordinates", gl.selGeo.getPolyPointsString()),
+                        ] +
+                        List<Widget>.generate(gl.selGeo.attributes.length, (i) {
+                          return Column(
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  SizedBox(
+                                    width: gl.eqPx * 10,
+                                    height: gl.eqPx * gl.iconSizeS,
+                                    child: TextButton(
+                                      style: ButtonStyle(
+                                        animationDuration: Duration(seconds: 1),
+                                        backgroundColor: WidgetStateProperty<Color>.fromMap(
+                                          <WidgetStatesConstraint, Color>{WidgetState.any: Colors.transparent},
+                                        ),
+                                        padding: WidgetStateProperty<EdgeInsetsGeometry>.fromMap(
+                                          <WidgetStatesConstraint, EdgeInsetsGeometry>{
+                                            WidgetState.any: EdgeInsetsGeometry.zero,
+                                          },
+                                        ),
+                                      ),
+                                      onPressed: () {},
+                                      onLongPress: () {},
+                                      child: Container(
+                                        alignment: Alignment.center,
+                                        child:
+                                            gl.selGeo.attributes[i].type == "int"
+                                                ? Text(
+                                                  "INT",
+                                                  style: TextStyle(
+                                                    color: Colors.yellow,
+                                                    fontSize: gl.fontSizeXXS * gl.eqPx,
+                                                  ),
+                                                )
+                                                : gl.selGeo.attributes[i].type == "string"
+                                                ? Text(
+                                                  "STRING",
+                                                  style: TextStyle(
+                                                    color: Colors.lightBlue,
+                                                    fontSize: gl.fontSizeXXS * gl.eqPx,
+                                                  ),
+                                                )
+                                                : gl.selGeo.attributes[i].type == "double"
+                                                ? Text(
+                                                  "DOUBLE",
+                                                  style: TextStyle(
+                                                    color: Colors.red,
+                                                    fontSize: gl.fontSizeXXS * gl.eqPx,
+                                                  ),
+                                                )
+                                                : Text(
+                                                  "UFO",
+                                                  style: TextStyle(
+                                                    color: Colors.green,
+                                                    fontSize: gl.fontSizeXXS * gl.eqPx,
+                                                  ),
+                                                ),
+                                      ),
+                                    ),
+                                  ),
+                                  lt.stroke(vertical: true, gl.eqPx, gl.eqPx * 0.5, gl.colorAgroBioTech),
+                                  SizedBox(
+                                    width: gl.eqPx * 7,
+                                    height: gl.eqPx * gl.iconSizeM,
+                                    child: IconButton(
+                                      style: ButtonStyle(
+                                        animationDuration: Duration(seconds: 1),
+                                        backgroundColor: WidgetStateProperty<Color>.fromMap(
+                                          <WidgetStatesConstraint, Color>{WidgetState.any: Colors.transparent},
+                                        ),
+                                        padding: WidgetStateProperty<EdgeInsetsGeometry>.fromMap(
+                                          <WidgetStatesConstraint, EdgeInsetsGeometry>{
+                                            WidgetState.any: EdgeInsetsGeometry.zero,
+                                          },
+                                        ),
+                                      ),
+                                      onPressed: () {},
+                                      onLongPress: () async {
+                                        setState(() {
+                                          gl
+                                              .selLay
+                                              .geometries[gl.selLay.selectedGeometry]
+                                              .attributes[i]
+                                              .visibleOnMapLabel = !gl
+                                                  .selLay
+                                                  .geometries[gl.selLay.selectedGeometry]
+                                                  .attributes[i]
+                                                  .visibleOnMapLabel;
+                                        });
+                                        gl.selGeo.serialize();
+                                      },
+                                      icon:
+                                          gl
+                                                  .selLay
+                                                  .geometries[gl.selLay.selectedGeometry]
+                                                  .attributes[i]
+                                                  .visibleOnMapLabel
+                                              ? Icon(
+                                                Icons.check_box_outlined,
+                                                color: Colors.black,
+                                                size: gl.eqPx * gl.iconSizeXS,
+                                              )
+                                              : Icon(
+                                                Icons.check_box_outline_blank,
+                                                color: Colors.black,
+                                                size: gl.eqPx * gl.iconSizeXS,
+                                              ),
+                                    ),
+                                  ),
+                                  lt.stroke(vertical: true, gl.eqPx, gl.eqPx * 0.5, gl.colorAgroBioTech),
+                                  SizedBox(
+                                    width: gl.eqPx * 32,
+                                    height: gl.eqPx * gl.iconSizeS,
+                                    child: TextButton(
+                                      style: ButtonStyle(
+                                        animationDuration: Duration(seconds: 1),
+                                        backgroundColor: WidgetStateProperty<Color>.fromMap(
+                                          <WidgetStatesConstraint, Color>{WidgetState.any: Colors.transparent},
+                                        ),
+                                        padding: WidgetStateProperty<EdgeInsetsGeometry>.fromMap(
+                                          <WidgetStatesConstraint, EdgeInsetsGeometry>{
+                                            WidgetState.any: EdgeInsetsGeometry.zero,
+                                          },
+                                        ),
+                                      ),
+                                      onPressed: () {},
+                                      onLongPress: () {
+                                        PopupValueChange(
+                                          "prop",
+                                          gl.selGeo.attributes[i].name,
+                                          (value) {
+                                            gl
+                                                .selLay
+                                                .geometries[gl.selLay.selectedGeometry]
+                                                .attributes[i]
+                                                .name = cleanAttributeName(value.toString());
+                                          },
+                                          () {},
+                                          () {
+                                            String nom = gl.selGeo.attributes[i].name;
+                                            if (controlDuplicateAttributeName(
+                                              gl.selGeo.attributes[i].name,
+                                              gl.selGeo.attributes,
+                                            )) {
+                                              PopupMessage("Erreur", "Le nom $nom existe déja!");
+                                              return;
+                                            } else {
+                                              gl.selGeo.serialize();
+                                            }
+                                          },
+                                        );
+                                      },
+                                      child: Container(
+                                        alignment: Alignment.centerLeft,
+                                        child: SingleChildScrollView(
+                                          scrollDirection: Axis.horizontal,
+                                          child: Text(
+                                            gl.selGeo.attributes[i].name,
+                                            textAlign: TextAlign.start,
+                                            style: TextStyle(
+                                              color: Colors.black,
+                                              fontSize: gl.eqPx * gl.fontSizeM * .75,
                                             ),
                                           ),
                                         ),
                                       ),
                                     ),
-                                  ],
-                                ),
-                                lt.stroke(gl.dsp.equipixel, gl.dsp.equipixel * .5, gl.colorAgroBioTech),
-                              ],
-                            );
-                          }),
+                                  ),
+                                  lt.stroke(vertical: true, gl.eqPx, gl.eqPx * 0.5, gl.colorAgroBioTech),
+                                  SizedBox(
+                                    width: gl.eqPx * 32,
+                                    height: gl.eqPx * gl.iconSizeS,
+                                    child: TextButton(
+                                      style: ButtonStyle(
+                                        animationDuration: Duration(seconds: 1),
+                                        backgroundColor: WidgetStateProperty<Color>.fromMap(
+                                          <WidgetStatesConstraint, Color>{WidgetState.any: Colors.transparent},
+                                        ),
+                                        padding: WidgetStateProperty<EdgeInsetsGeometry>.fromMap(
+                                          <WidgetStatesConstraint, EdgeInsetsGeometry>{
+                                            WidgetState.any: EdgeInsetsGeometry.zero,
+                                          },
+                                        ),
+                                      ),
+                                      onPressed: () {},
+                                      onLongPress: () {
+                                        PopupValueChange(
+                                          gl.selGeo.attributes[i].type,
+                                          gl.selGeo.attributes[i].value,
+                                          (value) {
+                                            gl.selGeo.attributes[i].value = value;
+                                          },
+                                          () {},
+                                          () {
+                                            gl.selGeo.serialize();
+                                          },
+                                        );
+                                      },
+                                      child: Container(
+                                        alignment: Alignment.centerLeft,
+                                        child: SingleChildScrollView(
+                                          scrollDirection: Axis.horizontal,
+                                          child:
+                                              gl.selGeo.attributes[i].type == "string"
+                                                  ? Text(
+                                                    gl
+                                                        .selLay
+                                                        .geometries[gl.selLay.selectedGeometry]
+                                                        .attributes[i]
+                                                        .value,
+                                                    textAlign: TextAlign.start,
+                                                    style: TextStyle(
+                                                      color: Colors.black,
+                                                      fontSize: gl.eqPx * gl.fontSizeM * .75,
+                                                    ),
+                                                  )
+                                                  : gl
+                                                          .selLay
+                                                          .geometries[gl.selLay.selectedGeometry]
+                                                          .attributes[i]
+                                                          .type ==
+                                                      "int"
+                                                  ? Text(
+                                                    gl.selGeo.attributes[i].value.toString(),
+                                                    textAlign: TextAlign.start,
+                                                    style: TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize: gl.eqPx * gl.fontSizeM * .75,
+                                                    ),
+                                                  )
+                                                  : gl
+                                                          .selLay
+                                                          .geometries[gl.selLay.selectedGeometry]
+                                                          .attributes[i]
+                                                          .type ==
+                                                      "double"
+                                                  ? Text(
+                                                    gl.selGeo.attributes[i].value.toString(),
+                                                    textAlign: TextAlign.start,
+                                                    style: TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize: gl.eqPx * gl.fontSizeM * .75,
+                                                    ),
+                                                  )
+                                                  : gl
+                                                          .selLay
+                                                          .geometries[gl.selLay.selectedGeometry]
+                                                          .attributes[i]
+                                                          .type ==
+                                                      "special"
+                                                  ? Text(
+                                                    "special value",
+                                                    style: TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize: gl.eqPx * gl.fontSizeM * .75,
+                                                    ),
+                                                  )
+                                                  : Text(
+                                                    "ERROR TYPE ${gl.selGeo.attributes[i].type}",
+                                                    style: TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize: gl.eqPx * gl.fontSizeM * .75,
+                                                    ),
+                                                  ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
+                            ],
+                          );
+                        }),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
+        ],
+      ),
+    ],
+  );
+
+  List<Widget> _getDefaultAttributes() {
+    return [
+      Card(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadiusGeometry.circular(12.0)),
+        surfaceTintColor: Colors.transparent,
+        shadowColor: Colors.transparent,
+        color: Colors.transparent,
+        child: Column(
+          children: [
+            Card(
+              color: gl.colorAgroBioTech.withAlpha(255),
+              child: Container(
+                alignment: Alignment.center,
+                width: gl.eqPx * gl.onCatalogueWidth * .97,
+                height: gl.eqPx * 18,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    SizedBox(width: gl.eqPx * gl.iconSizeL, height: gl.eqPx * gl.iconSizeL),
+                    Text(
+                      "Attributs",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: Colors.black, fontSize: gl.eqPx * gl.fontSizeL),
                     ),
-                  ),
+                    SizedBox(
+                      width: gl.eqPx * gl.iconSizeL,
+                      height: gl.eqPx * gl.iconSizeL,
+                      child: IconButton(
+                        style: lt.trNoPadButtonstyle,
+                        onPressed: () {
+                          setState(() {
+                            attributesOpen = !attributesOpen;
+                          });
+                        },
+                        icon: Icon(
+                          attributesOpen ? Icons.arrow_drop_up_outlined : Icons.arrow_drop_down_outlined,
+                          size: gl.eqPx * gl.iconSizeL * .8,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                TextButton(
-                  onPressed: () {
-                    gl.selLay.defaultAttributes.add(Attribute(name: "", type: "string", value: ""));
-                    PopupNewAttribute(
-                      context,
-                      "",
-                      gl.colorAgroBioTech,
-                      (String s) {
-                        setState(() {
-                          gl.selLay.defaultAttributes.last.type = s;
-                        });
-                      },
-                      (String s) {
-                        setState(() {
-                          gl.selLay.defaultAttributes.last.name = s;
-                        });
-                      },
-                      (dynamic it) {
-                        setState(() {
-                          gl.selLay.defaultAttributes.last.value = it;
-                        });
-                      },
-                      () {
-                        setState(() {
-                          gl.selLay.defaultAttributes.removeLast();
-                        });
-                      },
-                      () {},
-                      noValue: true,
-                    );
-                  },
-                  child: Column(
-                    children: [
-                      Icon(Icons.add_circle, color: Colors.black, size: gl.iconSizeS * gl.dsp.equipixel),
-                      Text(
-                        "Une seule variable",
-                        style: TextStyle(color: Colors.black, fontSize: gl.dsp.equipixel * gl.fontSizeXS),
-                      ),
-                    ],
-                  ),
+            if (attributesOpen)
+              Card(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadiusGeometry.circular(12.0),
+                  side: BorderSide(color: gl.colorAgroBioTech.withAlpha(255), width: 2.0),
                 ),
-                TextButton(
-                  onPressed: () {
-                    PopupSelectAttributeSet(
-                      context,
-                      gl.selLay.defaultAttributes,
-                      onPressed: (void Function() it) {
-                        setState(() {
-                          it();
-                        });
-                      },
-                    );
-                  },
-                  child: Column(
-                    children: [
-                      Icon(
-                        Icons.add_circle_outline_outlined,
-                        color: Colors.black,
-                        size: gl.iconSizeS * gl.dsp.equipixel,
-                      ),
-                      Text(
-                        "Un set de variables",
-                        style: TextStyle(color: Colors.black, fontSize: gl.dsp.equipixel * gl.fontSizeXS),
-                      ),
-                    ],
-                  ),
+                surfaceTintColor: Colors.transparent,
+                shadowColor: Colors.transparent,
+                color: Colors.white.withAlpha(200),
+                child: Column(
+                  children: [
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            SizedBox(
+                              width: gl.eqPx * 10,
+                              child: Text(
+                                "type",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: gl.eqPx * gl.fontSizeM * .75,
+                                ),
+                              ),
+                            ),
+                            lt.stroke(vertical: true, gl.eqPx, gl.eqPx * 0.5, gl.colorAgroBioTech),
+                            SizedBox(
+                              width: gl.eqPx * 7,
+                              child: Icon(Icons.remove_red_eye, color: Colors.black, size: gl.eqPx * gl.iconSizeXS),
+                            ),
+                            lt.stroke(vertical: true, gl.eqPx, gl.eqPx * 0.5, gl.colorAgroBioTech),
+                            SizedBox(
+                              width: gl.eqPx * 64,
+                              child: Text(
+                                "Attribut",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: gl.eqPx * gl.fontSizeM * .75,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        lt.stroke(gl.eqPx, gl.eqPx * 0.5, gl.colorAgroBioTech),
+                        Scrollbar(
+                          scrollbarOrientation: ScrollbarOrientation.right,
+                          thickness: gl.eqPx * 3,
+                          controller: propertiesTableScrollController,
+                          child: Container(
+                            color: gl.backgroundTransparentBlackBox.withAlpha(50),
+                            height: gl.eqPx * gl.attributeTableHeight,
+                            child: ListView(
+                              controller: propertiesTableScrollController,
+                              children:
+                                  <Widget>[
+                                    _getFixedAttribute("type", gl.selLay.type, noValues: true),
+                                    _getFixedAttribute("nom", gl.selLay.name, noValues: true),
+                                  ] +
+                                  List<Widget>.generate(gl.layerReady ? gl.selLay.defaultAttributes.length : 0, (i) {
+                                    return Column(
+                                      children: [
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                          children: [
+                                            SizedBox(
+                                              width: gl.eqPx * 10,
+                                              height: gl.eqPx * gl.iconSizeS,
+                                              child: TextButton(
+                                                style: ButtonStyle(
+                                                  animationDuration: Duration(seconds: 1),
+                                                  backgroundColor: WidgetStateProperty<Color>.fromMap(
+                                                    <WidgetStatesConstraint, Color>{
+                                                      WidgetState.any: Colors.transparent,
+                                                    },
+                                                  ),
+                                                  padding: WidgetStateProperty<EdgeInsetsGeometry>.fromMap(
+                                                    <WidgetStatesConstraint, EdgeInsetsGeometry>{
+                                                      WidgetState.any: EdgeInsetsGeometry.zero,
+                                                    },
+                                                  ),
+                                                ),
+                                                onPressed: () {},
+                                                onLongPress: () {},
+                                                child: Container(
+                                                  alignment: Alignment.center,
+                                                  child:
+                                                      gl.selLay.defaultAttributes[i].type == "int"
+                                                          ? Text(
+                                                            "INT",
+                                                            style: TextStyle(
+                                                              color: Colors.yellow,
+                                                              fontSize: gl.fontSizeXXS * gl.eqPx,
+                                                            ),
+                                                          )
+                                                          : gl.selLay.defaultAttributes[i].type == "string"
+                                                          ? Text(
+                                                            "STRING",
+                                                            style: TextStyle(
+                                                              color: Colors.lightBlue,
+                                                              fontSize: gl.fontSizeXXS * gl.eqPx,
+                                                            ),
+                                                          )
+                                                          : gl.selLay.defaultAttributes[i].type == "double"
+                                                          ? Text(
+                                                            "DOUBLE",
+                                                            style: TextStyle(
+                                                              color: Colors.red,
+                                                              fontSize: gl.fontSizeXXS * gl.eqPx,
+                                                            ),
+                                                          )
+                                                          : Text(
+                                                            "UFO",
+                                                            style: TextStyle(
+                                                              color: Colors.green,
+                                                              fontSize: gl.fontSizeXXS * gl.eqPx,
+                                                            ),
+                                                          ),
+                                                ),
+                                              ),
+                                            ),
+                                            lt.stroke(vertical: true, gl.eqPx, gl.eqPx * 0.5, gl.colorAgroBioTech),
+                                            SizedBox(
+                                              width: gl.eqPx * 7,
+                                              height: gl.eqPx * gl.iconSizeM,
+                                              child: IconButton(
+                                                style: lt.trNoPadButtonstyle,
+                                                onPressed: () {},
+                                                onLongPress: () async {
+                                                  setState(() {
+                                                    gl.selLay.defaultAttributes[i].visibleOnMapLabel =
+                                                        !gl.selLay.defaultAttributes[i].visibleOnMapLabel;
+                                                  });
+                                                  gl.selLay.serialize();
+                                                },
+                                                icon:
+                                                    gl.selLay.defaultAttributes[i].visibleOnMapLabel
+                                                        ? Icon(
+                                                          Icons.check_box_outlined,
+                                                          color: Colors.black,
+                                                          size: gl.eqPx * gl.iconSizeXS,
+                                                        )
+                                                        : Icon(
+                                                          Icons.check_box_outline_blank,
+                                                          color: Colors.black,
+                                                          size: gl.eqPx * gl.iconSizeXS,
+                                                        ),
+                                              ),
+                                            ),
+                                            lt.stroke(vertical: true, gl.eqPx, gl.eqPx * 0.5, gl.colorAgroBioTech),
+                                            SizedBox(
+                                              width: gl.eqPx * 64,
+                                              height: gl.eqPx * gl.iconSizeS,
+                                              child: TextButton(
+                                                style: lt.trNoPadButtonstyle,
+                                                onPressed: () {},
+                                                onLongPress: () {
+                                                  PopupValueChange(
+                                                    "prop",
+                                                    gl.selLay.defaultAttributes[i].name,
+                                                    (value) {
+                                                      setState(() {
+                                                        gl.selLay.defaultAttributes[i].name = cleanAttributeName(
+                                                          value.toString(),
+                                                        );
+                                                      });
+                                                    },
+                                                    () {},
+                                                    () {
+                                                      String nom = gl.selLay.defaultAttributes[i].name;
+                                                      if (controlDuplicateAttributeName(
+                                                        gl.selLay.defaultAttributes[i].name,
+                                                        gl.selLay.defaultAttributes,
+                                                      )) {
+                                                        PopupMessage("Erreur", "Le nom $nom existe déja!");
+                                                        return;
+                                                      } else {
+                                                        gl.selLay.serialize();
+                                                      }
+                                                    },
+                                                  );
+                                                },
+                                                child: Container(
+                                                  alignment: Alignment.centerLeft,
+                                                  child: SingleChildScrollView(
+                                                    scrollDirection: Axis.horizontal,
+                                                    child: Text(
+                                                      gl.selLay.defaultAttributes[i].name,
+                                                      textAlign: TextAlign.start,
+                                                      style: TextStyle(
+                                                        color: Colors.black,
+                                                        fontSize: gl.eqPx * gl.fontSizeM * .75,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
+                                      ],
+                                    );
+                                  }),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        TextButton(
+                          onPressed: () {
+                            gl.selLay.defaultAttributes.add(Attribute(name: "", type: "string", value: ""));
+                            PopupNewAttribute(
+                              context,
+                              "",
+                              gl.colorAgroBioTech,
+                              (String s) {
+                                setState(() {
+                                  gl.selLay.defaultAttributes.last.type = s;
+                                });
+                              },
+                              (String s) {
+                                setState(() {
+                                  gl.selLay.defaultAttributes.last.name = s;
+                                });
+                              },
+                              (dynamic it) {
+                                setState(() {
+                                  gl.selLay.defaultAttributes.last.value = it;
+                                });
+                              },
+                              () {
+                                setState(() {
+                                  gl.selLay.defaultAttributes.removeLast();
+                                });
+                              },
+                              () {},
+                              noValue: true,
+                            );
+                          },
+                          child: Column(
+                            children: [
+                              Icon(Icons.add_circle, color: Colors.black, size: gl.iconSizeS * gl.eqPx),
+                              Text(
+                                "Une seule variable",
+                                style: TextStyle(color: Colors.black, fontSize: gl.eqPx * gl.fontSizeXS),
+                              ),
+                            ],
+                          ),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            PopupSelectAttributeSet(
+                              context,
+                              gl.selLay.defaultAttributes,
+                              onPressed: (void Function() it) {
+                                setState(() {
+                                  it();
+                                });
+                              },
+                            );
+                          },
+                          child: Column(
+                            children: [
+                              Icon(
+                                Icons.add_circle_outline_outlined,
+                                color: Colors.black,
+                                size: gl.iconSizeS * gl.eqPx,
+                              ),
+                              Text(
+                                "Un set de variables",
+                                style: TextStyle(color: Colors.black, fontSize: gl.eqPx * gl.fontSizeXS),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
           ],
         ),
       ),
@@ -3451,193 +3999,230 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
   List<Widget> _getPropertiesTab() {
     return [
       Card(
-        color: gl.colorAgroBioTech.withAlpha(200),
-        child: Container(
-          alignment: Alignment.center,
-          width: gl.eqPx * gl.onCatalogueWidth * .97,
-          height: gl.eqPx * 20,
-          child: Text(
-            "Proprietés",
-            textAlign: TextAlign.center,
-            style: TextStyle(color: Colors.black, fontSize: gl.eqPx * gl.fontSizeL),
-          ),
-        ),
-      ),
-      Card(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadiusGeometry.circular(12.0),
           side: BorderSide(color: gl.colorAgroBioTech.withAlpha(255), width: 2.0),
         ),
         surfaceTintColor: Colors.transparent,
         shadowColor: Colors.transparent,
-        color: Colors.white.withAlpha(200),
-        child: ListBody(
+        color: gl.colorAgroBioTech.withAlpha(255),
+        child: Column(
           children: [
-            Column(
-              children: [
-                Container(
-                  padding: EdgeInsets.all(0),
-                  width: gl.eqPx * gl.onCatalogueWidth * .9,
-                  height: gl.eqPx * gl.onCatalogueMapHeight * .2,
-                  child: Text(
-                    "Nom",
+            Card(
+              surfaceTintColor: Colors.transparent,
+              shadowColor: Colors.transparent,
+              color: gl.colorAgroBioTech.withAlpha(255),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  SizedBox(width: gl.eqPx * gl.iconSizeL, height: gl.eqPx * gl.iconSizeL),
+                  Text(
+                    "Proprietés",
                     textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.black, fontSize: gl.eqPx * gl.fontSizeXS),
+                    style: TextStyle(color: Colors.black, fontSize: gl.eqPx * gl.fontSizeL),
                   ),
-                ),
-                lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
-                Container(
-                  padding: EdgeInsets.all(0),
-                  width: gl.eqPx * gl.onCatalogueWidth * .9,
-                  height: gl.eqPx * gl.onCatalogueMapHeight * .4,
-                  child: TextButton(
-                    style: lt.trNoPadButtonstyle,
-                    onPressed: () {
-                      setState(() {
-                        PopupValueChange(
-                          "string",
-                          gl.layerReady ? gl.selLay.name : "",
-                          (value) {
-                            setState(() {
-                              gl.selLay.name = value.toString();
-                            });
-                          },
-                          () {},
-                          () {
-                            gl.geoLayers[gl.selectedGeoLayer].serialize();
-                          },
-                        );
-                      });
-                    },
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Icon(Icons.edit, size: gl.eqPx * gl.iconSizeXS, color: Colors.black),
-                        Container(
-                          alignment: Alignment.center,
-                          width: gl.eqPx * 65,
-                          child: SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: Text(
-                              gl.layerReady ? gl.selLay.name : "",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(color: Colors.black, fontSize: gl.eqPx * gl.fontSizeM),
-                            ),
-                          ),
-                        ),
-                        SizedBox(width: gl.eqPx * gl.iconSizeXS),
-                      ],
-                    ),
-                  ),
-                ),
-                lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
-                Container(
-                  padding: EdgeInsets.all(0),
-                  width: gl.eqPx * gl.onCatalogueWidth * .9,
-                  height: gl.eqPx * gl.onCatalogueMapHeight * .2,
-                  child: Text(
-                    "Type",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.black, fontSize: gl.eqPx * gl.fontSizeXS),
-                  ),
-                ),
-                lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
-                Container(
-                  padding: EdgeInsets.all(0),
-                  width: gl.eqPx * gl.onCatalogueWidth * .9,
-                  height: gl.eqPx * gl.onCatalogueMapHeight * .4,
-                  child: Text(
-                    gl.layerReady ? gl.selLay.type : "oho",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.black, fontSize: gl.eqPx * gl.fontSizeM),
-                  ),
-                ),
-                lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
-                Container(
-                  padding: EdgeInsets.all(0),
-                  width: gl.eqPx * gl.onCatalogueWidth * .9,
-                  height: gl.eqPx * gl.onCatalogueMapHeight * .2,
-                  child: Text(
-                    "Couleur",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.black, fontSize: gl.eqPx * gl.fontSizeXS),
-                  ),
-                ),
-                lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Icon(Icons.edit, size: gl.eqPx * gl.iconSizeXS, color: Colors.black),
-                    SelectPolyColor(
-                      colorChanged: (Color c) {
+                  SizedBox(
+                    width: gl.eqPx * gl.iconSizeL,
+                    height: gl.eqPx * gl.iconSizeL,
+                    child: IconButton(
+                      style: lt.trNoPadButtonstyle,
+                      onPressed: () {
                         setState(() {
-                          gl.selLay.defaultColor = c;
+                          propertiesOpen = !propertiesOpen;
                         });
                       },
-                      currentColor: gl.selLay.defaultColor,
+                      icon: Icon(
+                        propertiesOpen ? Icons.arrow_drop_up_outlined : Icons.arrow_drop_down_outlined,
+                        size: gl.eqPx * gl.iconSizeL * .8,
+                        color: Colors.black,
+                      ),
                     ),
-                    SizedBox(width: gl.eqPx * gl.iconSizeXS),
-                  ],
-                ),
-                lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
-                Container(
-                  padding: EdgeInsets.all(0),
-                  width: gl.eqPx * gl.onCatalogueWidth * .9,
-                  height: gl.eqPx * gl.onCatalogueMapHeight * .2,
-                  child: Text(
-                    "Symbole",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.black, fontSize: gl.eqPx * gl.fontSizeXS),
                   ),
-                ),
-                lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Icon(Icons.edit, size: gl.eqPx * gl.iconSizeXS, color: Colors.black),
-                    SelectLayerSymbol(
-                      type: gl.selLay.type,
-                      iconChanged: (int i) {
-                        setState(() {
-                          gl.selLay.defaultPointIcon = i;
-                        });
-                      },
-                      current: gl.selLay.defaultPointIcon,
-                    ),
-                    SizedBox(width: gl.eqPx * gl.iconSizeXS),
-                  ],
-                ),
-                lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
-                Container(
-                  alignment: Alignment.center,
-                  width: gl.eqPx * gl.iconSizeS,
-                  height: gl.eqPx * gl.iconSizeS,
-                  child: IconButton(
-                    style: lt.trNoPadButtonstyle,
-                    onPressed: () {
-                      PopupDoYouReally(
-                        gl.notificationContext!,
-                        () {
-                          setState(() {
-                            GeometricLayer.deleteLayer(gl.selectedGeoLayer);
-                            if (gl.selectedGeoLayer > -1) {
-                              gl.selectedGeoLayer--;
-                            }
-                          });
-                          widget.closePage();
-                        },
-                        "Message",
-                        "\nVoulez vous vraiment supprimer ${gl.selLay.name}?\n",
-                      );
-                    },
-                    icon: Icon(Icons.delete_forever, color: Colors.black, size: gl.eqPx * gl.iconSizeS),
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
           ],
         ),
       ),
+      if (propertiesOpen)
+        Card(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadiusGeometry.circular(12.0),
+            side: BorderSide(color: gl.colorAgroBioTech.withAlpha(255), width: 2.0),
+          ),
+          surfaceTintColor: Colors.transparent,
+          shadowColor: Colors.transparent,
+          color: Colors.white.withAlpha(200),
+          child: ListBody(
+            children: [
+              Column(
+                children:
+                    [
+                      Container(
+                        padding: EdgeInsets.all(0),
+                        width: gl.eqPx * gl.onCatalogueWidth * .9,
+                        height: gl.eqPx * gl.onCatalogueMapHeight * .2,
+                        child: Text(
+                          "Nom",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.black, fontSize: gl.eqPx * gl.fontSizeXS),
+                        ),
+                      ),
+                      lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
+                      Container(
+                        padding: EdgeInsets.all(0),
+                        width: gl.eqPx * gl.onCatalogueWidth * .9,
+                        height: gl.eqPx * gl.onCatalogueMapHeight * .4,
+                        child: TextButton(
+                          style: lt.trNoPadButtonstyle,
+                          onPressed: () {
+                            setState(() {
+                              PopupValueChange(
+                                "string",
+                                gl.layerReady ? gl.selLay.name : "",
+                                (value) {
+                                  setState(() {
+                                    gl.selLay.name = value.toString();
+                                  });
+                                },
+                                () {},
+                                () {
+                                  gl.geoLayers[gl.selectedGeoLayer].serialize();
+                                },
+                              );
+                            });
+                          },
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Icon(Icons.edit, size: gl.eqPx * gl.iconSizeXS, color: Colors.black),
+                              Container(
+                                alignment: Alignment.center,
+                                width: gl.eqPx * 65,
+                                child: SingleChildScrollView(
+                                  scrollDirection: Axis.horizontal,
+                                  child: Text(
+                                    gl.layerReady ? gl.selLay.name : "",
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(color: Colors.black, fontSize: gl.eqPx * gl.fontSizeM),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(width: gl.eqPx * gl.iconSizeXS),
+                            ],
+                          ),
+                        ),
+                      ),
+                      lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
+                      Container(
+                        padding: EdgeInsets.zero,
+                        width: gl.eqPx * gl.onCatalogueWidth * .9,
+                        height: gl.eqPx * gl.onCatalogueMapHeight * .2,
+                        child: Text(
+                          "Type",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.black, fontSize: gl.eqPx * gl.fontSizeXS),
+                        ),
+                      ),
+                      lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
+                      Container(
+                        padding: EdgeInsets.zero,
+                        width: gl.eqPx * gl.onCatalogueWidth * .9,
+                        height: gl.eqPx * gl.onCatalogueMapHeight * .4,
+                        child: Text(
+                          gl.layerReady ? gl.selLay.type : "oho",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.black, fontSize: gl.eqPx * gl.fontSizeM),
+                        ),
+                      ),
+                      lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
+                      Container(
+                        padding: EdgeInsets.zero,
+                        width: gl.eqPx * gl.onCatalogueWidth * .9,
+                        height: gl.eqPx * gl.onCatalogueMapHeight * .2,
+                        child: Text(
+                          "Couleur",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.black, fontSize: gl.eqPx * gl.fontSizeXS),
+                        ),
+                      ),
+                      lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Icon(Icons.edit, size: gl.eqPx * gl.iconSizeXS, color: Colors.black),
+                          SelectPolyColor(
+                            colorChanged: (Color c) {
+                              setState(() {
+                                gl.selLay.defaultColor = c;
+                              });
+                            },
+                            currentColor: gl.selLay.defaultColor,
+                          ),
+                          SizedBox(width: gl.eqPx * gl.iconSizeXS),
+                        ],
+                      ),
+                      lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
+                      Container(
+                        padding: EdgeInsets.zero,
+                        width: gl.eqPx * gl.onCatalogueWidth * .9,
+                        height: gl.eqPx * gl.onCatalogueMapHeight * .2,
+                        child: Text(
+                          "Symbole",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.black, fontSize: gl.eqPx * gl.fontSizeXS),
+                        ),
+                      ),
+                      lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Icon(Icons.edit, size: gl.eqPx * gl.iconSizeXS, color: Colors.black),
+                          SelectLayerSymbol(
+                            type: gl.selLay.type,
+                            iconChanged: (int i) {
+                              setState(() {
+                                gl.selLay.defaultPointIcon = i;
+                              });
+                            },
+                            current: gl.selLay.defaultPointIcon,
+                          ),
+                          SizedBox(width: gl.eqPx * gl.iconSizeXS),
+                        ],
+                      ),
+                      lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
+                      Container(
+                        alignment: Alignment.center,
+                        width: gl.eqPx * gl.iconSizeM,
+                        height: gl.eqPx * gl.iconSizeM,
+                        child: IconButton(
+                          style: lt.trNoPadButtonstyle,
+                          onPressed: () {
+                            PopupDoYouReally(
+                              gl.notificationContext!,
+                              () {
+                                setState(() {
+                                  GeometricLayer.deleteLayer(gl.selectedGeoLayer);
+                                  if (gl.selectedGeoLayer > -1) {
+                                    gl.selectedGeoLayer--;
+                                  }
+                                });
+                                widget.closePage();
+                              },
+                              "Message",
+                              "\nVoulez vous vraiment supprimer ${gl.selLay.name}?\n",
+                            );
+                          },
+                          icon: Icon(Icons.delete_forever, color: Colors.black, size: gl.eqPx * gl.iconSizeM),
+                        ),
+                      ),
+                      lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
+                    ] +
+                    _getDefaultAttributes(),
+              ),
+            ],
+          ),
+        ),
     ];
   }
 
@@ -3649,44 +4234,40 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
           children: [
             Container(
               alignment: Alignment.center,
-              width: gl.dsp.equipixel * 10,
-              child: Text("FIXED", style: TextStyle(color: Colors.black, fontSize: gl.fontSizeXXS * gl.dsp.equipixel)),
+              width: gl.eqPx * 10,
+              child: Text("FIXED", style: TextStyle(color: Colors.black, fontSize: gl.fontSizeXXS * gl.eqPx)),
             ),
-            lt.stroke(vertical: true, gl.dsp.equipixel, gl.dsp.equipixel * 0.5, gl.colorAgroBioTech),
+            lt.stroke(vertical: true, gl.eqPx, gl.eqPx * 0.5, gl.colorAgroBioTech),
             SizedBox(
-              width: gl.dsp.equipixel * 7,
+              width: gl.eqPx * 7,
               child:
                   checked
-                      ? Icon(Icons.check_box, color: Colors.black, size: gl.dsp.equipixel * gl.iconSizeXS)
-                      : Icon(
-                        Icons.check_box_outline_blank,
-                        color: Colors.black,
-                        size: gl.dsp.equipixel * gl.iconSizeXS,
-                      ),
+                      ? Icon(Icons.check_box, color: Colors.black, size: gl.eqPx * gl.iconSizeXS)
+                      : Icon(Icons.check_box_outline_blank, color: Colors.black, size: gl.eqPx * gl.iconSizeXS),
             ),
-            lt.stroke(vertical: true, gl.dsp.equipixel, gl.dsp.equipixel * 0.5, gl.colorAgroBioTech),
+            lt.stroke(vertical: true, gl.eqPx, gl.eqPx * 0.5, gl.colorAgroBioTech),
             Container(
               alignment: Alignment.centerLeft,
-              width: gl.dsp.equipixel * (!noValues ? 32 : 64),
-              child: Text(name, style: TextStyle(color: Colors.black, fontSize: gl.dsp.equipixel * gl.fontSizeM * .75)),
+              width: gl.eqPx * (!noValues ? 32 : 64),
+              child: Text(name, style: TextStyle(color: Colors.black, fontSize: gl.eqPx * gl.fontSizeM * .75)),
             ),
-            if (!noValues) lt.stroke(vertical: true, gl.dsp.equipixel, gl.dsp.equipixel * 0.5, gl.colorAgroBioTech),
+            if (!noValues) lt.stroke(vertical: true, gl.eqPx, gl.eqPx * 0.5, gl.colorAgroBioTech),
             if (!noValues)
               Container(
                 alignment: Alignment.centerLeft,
-                width: gl.dsp.equipixel * 32,
+                width: gl.eqPx * 32,
                 child: SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: Text(
                     values,
                     textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.black, fontSize: gl.dsp.equipixel * gl.fontSizeM * .75),
+                    style: TextStyle(color: Colors.black, fontSize: gl.eqPx * gl.fontSizeM * .75),
                   ),
                 ),
               ),
           ],
         ),
-        lt.stroke(gl.dsp.equipixel, gl.dsp.equipixel * 0.5, gl.colorAgroBioTech),
+        lt.stroke(gl.eqPx, gl.eqPx * 0.5, gl.colorAgroBioTech),
       ],
     );
   }
@@ -5127,10 +5708,9 @@ class _ForestimatorAdvancedSettings extends State<ForestimatorAdvancedSettings> 
   Widget build(BuildContext context) {
     return Column(
       children: [
-        variableBooleanSlider("Mode Essence", gl.Mode.essenceButton, (bool it) {
+        variableBooleanSlider("Mode Essence", gl.Mode.essence, (bool it) {
           setState(() {
-            gl.Mode.essenceButton = it;
-            if (!it) gl.Mode.essence = false;
+            gl.Mode.essence = it;
           });
           gl.refreshMainStack(() {});
         }, false),

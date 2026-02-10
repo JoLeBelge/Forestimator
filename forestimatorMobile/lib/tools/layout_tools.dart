@@ -43,7 +43,7 @@ Widget stroke(double space, double thickness, Color color, {bool vertical = fals
       ? Row(
         children: [
           SizedBox(width: space),
-          Container(height: gl.dsp.equipixel * height, width: thickness, color: color),
+          Container(height: gl.eqPx * height, width: thickness, color: color),
           SizedBox(width: space),
         ],
       )
@@ -53,7 +53,7 @@ Widget stroke(double space, double thickness, Color color, {bool vertical = fals
 }
 
 Widget gridlines() {
-  double equiPixelPerLine = gl.dsp.equipixel * 4;
+  double equiPixelPerLine = gl.eqPx * 4;
   return Stack(
     children:
         List<Widget>.generate((gl.dsp.width / equiPixelPerLine).round(), (i) {

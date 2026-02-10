@@ -101,7 +101,6 @@ class UserData {
 class Mode {
   static bool userDataFilled = false;
   static bool essence = false;
-  static bool essenceButton = false;
   static bool labelCross = false;
   static bool smallLabel = true;
   static bool essencePointsToSync = false;
@@ -118,7 +117,6 @@ class Mode {
   static bool _expertTools = false;
 
   static bool polygon = false;
-  static bool openToolbox = false;
   static bool editAttributes = false;
   static bool editPolygon = false;
   static bool editPoint = false;
@@ -146,7 +144,6 @@ class Mode {
 
   static void serialize() async {
     await shared!.setBool('Modes.essence', essence);
-    await shared!.setBool('Modes.essenceButton', essenceButton);
     await shared!.setBool('Modes.userDataFilled', userDataFilled);
     await shared!.setBool('Modes.userDataFilled', userDataFilled);
     await shared!.setBool('Modes.smallLabel', smallLabel);
@@ -154,7 +151,6 @@ class Mode {
 
   static void deserialize() {
     essence = shared!.getBool('Modes.essence') ?? false;
-    essenceButton = shared!.getBool('Modes.essenceButton') ?? false;
     essence = shared!.getBool('Modes.userDataFilled') ?? false;
     labelCross = shared!.getBool('Modes.labelCross') ?? false;
     smallLabel = shared!.getBool('Modes.smallLabel') ?? true;

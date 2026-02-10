@@ -34,10 +34,7 @@ class _LegendView extends State<LegendView> {
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           if (gl.dico.getLayerBase(widget.layerKey).mCategorie != "Externe")
-            Container(
-              constraints: BoxConstraints(maxHeight: gl.fontSizeM * gl.dsp.equipixel),
-              child: const Text('Légende'),
-            ),
+            Container(constraints: BoxConstraints(maxHeight: gl.fontSizeM * gl.eqPx), child: const Text('Légende')),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
@@ -53,11 +50,11 @@ class _LegendView extends State<LegendView> {
                           minWidth: 0,
                           maxWidth: _constraintsLeft.maxWidth,
                           minHeight: 0,
-                          maxHeight: gl.fontSizeS * gl.dsp.equipixel,
+                          maxHeight: gl.fontSizeS * gl.eqPx,
                         ),
                         child: Text(
                           gl.dico.mLayerBases[widget.layerKey]!.mDicoVal[key]!,
-                          style: TextStyle(fontSize: gl.dsp.equipixel * gl.fontSizeXS, fontWeight: FontWeight.w300),
+                          style: TextStyle(fontSize: gl.eqPx * gl.fontSizeXS, fontWeight: FontWeight.w300),
                         ),
                       );
                     } else {
@@ -68,7 +65,7 @@ class _LegendView extends State<LegendView> {
                       constraints: _constraintsLeft,
                       child: Text(
                         gl.dico.mLayerBases[widget.layerKey]!.mDicoVal[key]!,
-                        style: TextStyle(fontSize: gl.dsp.equipixel * gl.fontSizeXS, fontWeight: FontWeight.w300),
+                        style: TextStyle(fontSize: gl.eqPx * gl.fontSizeXS, fontWeight: FontWeight.w300),
                       ),
                     );
                   }
@@ -98,8 +95,8 @@ class _LegendView extends State<LegendView> {
 
   void _computeBoxContraintsPerColorTile() {
     if (gl.dico.mLayerBases[widget.layerKey]!.mDicoCol.length > 300) {
-      double heightPerColorTile = gl.dsp.equipixel * 0.06;
-      double graduatedHeight = gl.dsp.equipixel * 2;
+      double heightPerColorTile = gl.eqPx * 0.06;
+      double graduatedHeight = gl.eqPx * 2;
       _magicNumber = 37;
       _graduatedMode = true;
       _constraintsLeft = _initConstraints(
@@ -115,9 +112,9 @@ class _LegendView extends State<LegendView> {
         widget.constraintsColors.maxWidth * 0.85,
       );
     } else if (gl.dico.mLayerBases[widget.layerKey]!.mDicoCol.length > 50) {
-      double heightPerColorTile = gl.dsp.equipixel * 0.5;
+      double heightPerColorTile = gl.eqPx * 0.5;
       double graduatedHeight =
-          gl.dsp.equipixel * gl.dsp.equiheight * gl.dico.mLayerBases[widget.layerKey]!.mDicoCol.length / 11.0 * .005;
+          gl.eqPx * gl.dsp.equiheight * gl.dico.mLayerBases[widget.layerKey]!.mDicoCol.length / 11.0 * .005;
       _magicNumber = (gl.dico.mLayerBases[widget.layerKey]!.mDicoCol.length / 10).toInt();
       _graduatedMode = true;
       _constraintsLeft = _initConstraints(
@@ -133,9 +130,9 @@ class _LegendView extends State<LegendView> {
         widget.constraintsColors.maxWidth,
       );
     } else if (gl.dico.mLayerBases[widget.layerKey]!.mDicoCol.length > 40) {
-      double heightPerColorTile = gl.dsp.equipixel * 1.5;
+      double heightPerColorTile = gl.eqPx * 1.5;
       double graduatedHeight =
-          gl.dsp.equipixel * gl.dsp.equiheight * gl.dico.mLayerBases[widget.layerKey]!.mDicoCol.length / 13.0 * .016;
+          gl.eqPx * gl.dsp.equiheight * gl.dico.mLayerBases[widget.layerKey]!.mDicoCol.length / 13.0 * .016;
       _magicNumber = (gl.dico.mLayerBases[widget.layerKey]!.mDicoCol.length / 10).toInt();
       _graduatedMode = true;
       _constraintsLeft = _initConstraints(
@@ -152,7 +149,7 @@ class _LegendView extends State<LegendView> {
       );
     } else {
       _graduatedMode = false;
-      double heightPerColorTile = gl.dsp.equipixel * 4;
+      double heightPerColorTile = gl.eqPx * 4;
       _constraintsLeft = _initConstraints(
         heightPerColorTile,
         heightPerColorTile,
