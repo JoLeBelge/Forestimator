@@ -2554,7 +2554,7 @@ class _GeoLayerListMenu extends State<GeoLayerListMenu> {
                               WidgetState.any: Size(gl.eqPx * gl.polyListCardWidth, gl.eqPx * gl.polyListCardHeight),
                             }),
                             padding: WidgetStateProperty.fromMap(<WidgetStatesConstraint, EdgeInsetsGeometry>{
-                              WidgetState.any: EdgeInsetsGeometry.zero,
+                              WidgetState.any: EdgeInsetsGeometry.symmetric(vertical: gl.eqPx * 2),
                             }),
                           ),
                           key: Key('$i'),
