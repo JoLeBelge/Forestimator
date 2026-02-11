@@ -676,7 +676,7 @@ void groupLayers::exportLayMapView()
         //rasterFiles r = l->getRasterfile();
         if (l->cropIm(aCroppedRFile, mMapExtent))
         {
-            std::cout << "create archive pour raster croppé " << std::endl;
+            //std::cout << "create archive pour raster croppé " << std::endl;
             auto zf = std::make_unique<ZipArchive>(archiveFileName);
             zf->open(ZipArchive::WRITE);
             // pour bien faire; choisir un nom qui soit unique, pour éviter conflict si plusieurs utilisateurs croppent la mm carte en mm temps
@@ -685,6 +685,21 @@ void groupLayers::exportLayMapView()
             {
                 zf->addFile(mClientName + ".qml", l->symbology());
             }
+            // dictionnaire
+            boost::filesystem::path tmpPath = boost::filesystem::path(mDico->File("TMPDIR")) / boost::filesystem::unique_path("tmp-%%%%-%%%%-%%%%.csv");
+            std::ofstream out(tmpPath, std::ios::app);
+            out << "Valeur Numérique Raster;Signification\n";
+            out << l->getDicoValStr();
+            out.close();
+            zf->addFile(mClientName + "_dico.csv", tmpPath.c_str());
+
+            // readme
+            boost::filesystem::path tmpPath2 = boost::filesystem::path(mDico->File("TMPDIR")) / boost::filesystem::unique_path("tmp-%%%%-%%%%-%%%%.csv");
+            std::ofstream out2(tmpPath2, std::ios::app);
+            out2 << Wt::WString::tr("readme.download.layer").arg("https://forestimator.gembloux.ulg.ac.be/telechargement/" + l->Code()).toUTF8();
+            out2.close();
+            zf->addFile("README.txt", tmpPath2.c_str());
+
             m_app->processEvents();
             zf->close();
             // le fileResources sera détruit au moment de la destruction GroupL

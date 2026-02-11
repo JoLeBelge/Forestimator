@@ -34,17 +34,17 @@ class layerResource : public Wt::WStreamResource
 {
 public:
 
-layerResource(std::shared_ptr<layerBase> al,bool qml=0) : WStreamResource("plain/text"), ml(al),mQml(qml){}
+layerResource(std::shared_ptr<layerBase> al,cDicoApt * aDico,int modeQml_Dico=0) : WStreamResource("plain/text"), ml(al),mQmlDico(modeQml_Dico),mDico(aDico){}
     ~layerResource()
     {
         beingDeleted();
     }
 void handleRequest(const Http::Request &request, Http::Response &response);
 
-
 private:
 std::shared_ptr<layerBase> ml;
-bool mQml;
+int mQmlDico;
+cDicoApt * mDico;
 
 };
 

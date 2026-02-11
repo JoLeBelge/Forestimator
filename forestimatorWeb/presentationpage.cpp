@@ -208,6 +208,11 @@ std::unique_ptr<WMenuItem> presentationPage::downloadPage()
             Wt::WLink loadLink2 = Wt::WLink("/telechargement/" + l->Code() + "qml");
             b2->setLink(loadLink2);
           }
+
+            Wt::WPushButton *b3 = t->elementAt(row, 6)->addWidget(std::make_unique<Wt::WPushButton>("télécharger le dictionnaire"));
+            t->elementAt(row, 6)->setContentAlignment(AlignmentFlag::Center | AlignmentFlag::Middle);
+            Wt::WLink loadLink3 = Wt::WLink("/telechargement/" + l->Code() + "dico");
+            b3->setLink(loadLink3);
         }
       }
     }
