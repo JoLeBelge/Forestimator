@@ -117,6 +117,7 @@ class Mode {
   static bool _expertTools = false;
 
   static bool polygon = false;
+  static bool polygonList = false;
   static bool editAttributes = false;
   static bool editPolygon = false;
   static bool editPoint = false;

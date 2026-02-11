@@ -2431,7 +2431,6 @@ class _GeoLayerListMenu extends State<GeoLayerListMenu> {
   final Color inactive = const Color.fromARGB(255, 92, 92, 92);
   final ScrollController _controller = ScrollController();
   final PageController _pageController = PageController();
-  bool _keyboard = false;
 
   int? _selectedIndex;
   bool _titleLayer = true;
@@ -2445,6 +2444,11 @@ class _GeoLayerListMenu extends State<GeoLayerListMenu> {
       duration: Duration(seconds: 1),
       curve: Curves.fastOutSlowIn,
     );
+  }
+
+  @override
+  void initState() {
+    super.initState();
   }
 
   @override
@@ -2472,39 +2476,55 @@ class _GeoLayerListMenu extends State<GeoLayerListMenu> {
               2.5 - //lt.stroke
               10);
     }
-    return Scaffold(
-      resizeToAvoidBottomInset: false,
-      backgroundColor: Colors.transparent,
-      body: switchRowColWithOrientation(alignment: MainAxisAlignment.spaceBetween, [
-        Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+    return Card(
+      color: gl.backgroundTransparentBlackBox,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadiusGeometry.circular(12.0),
+        side: BorderSide(color: gl.colorAgroBioTech.withAlpha(255), width: 2.0),
+      ),
+      child: SizedBox(
+        height: gl.eqPx * gl.eqPxH * .9,
+        width: gl.eqPx * gl.eqPxW * .95,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            SizedBox(
+            Container(
+              alignment: Alignment.center,
               height: titleHeight,
               child: Row(
-                mainAxisAlignment: _titleLayer ? MainAxisAlignment.spaceAround : MainAxisAlignment.spaceBetween,
+                mainAxisAlignment: _titleLayer ? MainAxisAlignment.spaceBetween : MainAxisAlignment.spaceBetween,
                 children: [
-                  if (!_titleLayer)
-                    IconButton(
-                      icon: Icon(Icons.arrow_back, color: Colors.white, size: gl.eqPx * gl.iconSizeM * .75),
-                      onPressed: () {
-                        setState(() {
-                          _titleLayer = true;
-                          _pageController.animateToPage(
-                            0,
-                            duration: Duration(milliseconds: 300),
-                            curve: Curves.easeInOut,
-                          );
-                        });
-                      },
-                      padding: EdgeInsets.zero,
-                    ),
+                  !_titleLayer
+                      ? IconButton(
+                        style: lt.trNoPadButtonstyle,
+                        icon: Icon(Icons.arrow_back, color: Colors.white, size: gl.eqPx * gl.iconSizeM),
+                        onPressed: () {
+                          setState(() {
+                            _titleLayer = true;
+                            _pageController.animateToPage(
+                              0,
+                              duration: Duration(milliseconds: 300),
+                              curve: Curves.easeInOut,
+                            );
+                          });
+                        },
+                        padding: EdgeInsets.zero,
+                      )
+                      : Container(width: gl.eqPx * gl.iconSizeM),
                   Text(
                     _titleLayer ? "Liste des layer" : "Layer",
                     textAlign: TextAlign.justify,
                     style: TextStyle(fontSize: gl.eqPx * gl.fontSizeL, color: Colors.white),
                   ),
-                  if (!_titleLayer) SizedBox(width: gl.eqPx * gl.iconSizeM * .75),
+                  SizedBox(
+                    width: gl.eqPx * gl.iconSizeL,
+                    child: IconButton(
+                      color: gl.colorAgroBioTech,
+                      style: lt.trNoPadButtonstyle,
+                      onPressed: widget.after,
+                      icon: Icon(Icons.arrow_drop_up_outlined, color: Colors.white, size: gl.eqPx * gl.iconSizeM),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -2729,7 +2749,6 @@ class _GeoLayerListMenu extends State<GeoLayerListMenu> {
                     LayerPropertiesPage(() {
                       setState(() {
                         _titleLayer = true;
-
                         _pageController.animateToPage(
                           0,
                           duration: Duration(milliseconds: 300),
@@ -2740,7 +2759,7 @@ class _GeoLayerListMenu extends State<GeoLayerListMenu> {
                 ],
               ),
             ),
-            if (gl.dsp.orientation == Orientation.portrait && !_keyboard && _titleLayer)
+            if (gl.dsp.orientation == Orientation.portrait && _titleLayer)
               TextButton(
                 style: ButtonStyle(
                   backgroundColor: WidgetStateProperty.fromMap(<WidgetStatesConstraint, Color>{
@@ -2787,11 +2806,9 @@ class _GeoLayerListMenu extends State<GeoLayerListMenu> {
                   });
                 },
               ),
-            if (gl.dsp.orientation == Orientation.portrait && !_keyboard && _titleLayer)
-              Row(mainAxisAlignment: MainAxisAlignment.center, children: [_returnButton(context, widget.after)]),
           ],
         ),
-      ]),
+      ),
     );
   }
 }
@@ -2822,7 +2839,6 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
 
   @override
   void dispose() {
-    print("zez");
     _pageController.dispose();
     super.dispose();
   }
@@ -2848,12 +2864,6 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
             ),
           ],
         ),
-      ),
-      Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [_returnButton(context, widget.closePage)]),
-        ],
       ),
     ]);
   }
@@ -2914,7 +2924,7 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
               controller: _pageController,
               children: [
                 Column(
-                  children: List<Widget>.generate(gl.layerReady ? gl.selLay.geometries.length : 0, (int index) {
+                  children: List<Widget>.generate(gl.layerReady ? gl.selLay.geometries.length : 1, (int index) {
                     return Column(
                       children: [
                         Row(
@@ -2928,7 +2938,7 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
                               child: Column(
                                 children: [
                                   Container(
-                                    padding: EdgeInsets.all(0),
+                                    padding: EdgeInsets.zero,
                                     width: gl.eqPx * gl.onCatalogueWidth,
                                     height: gl.eqPx * 4,
                                     child: TextButton(
@@ -2937,7 +2947,9 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
                                         setState(() {
                                           PopupValueChange(
                                             "string",
-                                            gl.layerReady ? gl.selLay.geometries[index].name : "",
+                                            gl.layerReady
+                                                ? gl.selLay.geometries[index].name
+                                                : "La liste est encore vide!",
                                             (value) {
                                               setState(() {
                                                 gl.selLay.geometries[index].name = value.toString();
@@ -3260,7 +3272,8 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
                       Row(
                         children: [
                           IconButton(
-                            icon: Icon(Icons.arrow_back, color: Colors.black, size: gl.eqPx * gl.iconSizeM * .75),
+                            style: lt.trNoPadButtonstyle,
+                            icon: Icon(Icons.arrow_back, color: Colors.black, size: gl.eqPx * gl.iconSizeM),
                             onPressed: () {
                               setState(() {
                                 _titleLayer = true;
@@ -3271,7 +3284,6 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
                                 curve: Curves.easeInOut,
                               );
                             },
-                            padding: EdgeInsets.zero,
                           ),
                           Container(
                             alignment: Alignment.centerLeft,
@@ -3279,7 +3291,7 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
                             child: Text(
                               "Table des attributs",
                               textAlign: TextAlign.center,
-                              style: TextStyle(color: Colors.black, fontSize: gl.eqPx * gl.fontSizeM * .75),
+                              style: TextStyle(color: Colors.black, fontSize: gl.eqPx * gl.fontSizeM),
                             ),
                           ),
                         ],
@@ -4059,7 +4071,7 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
                 children:
                     [
                       Container(
-                        padding: EdgeInsets.all(0),
+                        padding: EdgeInsets.zero,
                         width: gl.eqPx * gl.onCatalogueWidth * .9,
                         height: gl.eqPx * gl.onCatalogueMapHeight * .2,
                         child: Text(
@@ -4070,7 +4082,7 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
                       ),
                       lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
                       Container(
-                        padding: EdgeInsets.all(0),
+                        padding: EdgeInsets.zero,
                         width: gl.eqPx * gl.onCatalogueWidth * .9,
                         height: gl.eqPx * gl.onCatalogueMapHeight * .4,
                         child: TextButton(
@@ -4894,12 +4906,12 @@ Widget popupSearchMenu(BuildContext context, String currentName, ValueChanged<La
       builder: (context, orientation) {
         return AlertDialog(
           alignment: Alignment.center,
-          titlePadding: EdgeInsets.all(0),
-          actionsPadding: EdgeInsets.all(0),
-          contentPadding: EdgeInsets.all(0),
-          insetPadding: EdgeInsets.all(0),
-          buttonPadding: EdgeInsets.all(0),
-          iconPadding: EdgeInsets.all(0),
+          titlePadding: EdgeInsets.zero,
+          actionsPadding: EdgeInsets.zero,
+          contentPadding: EdgeInsets.zero,
+          insetPadding: EdgeInsets.zero,
+          buttonPadding: EdgeInsets.zero,
+          iconPadding: EdgeInsets.zero,
           backgroundColor: gl.backgroundTransparentBlackBox,
           surfaceTintColor: Colors.transparent,
           shadowColor: Colors.transparent,
@@ -6229,42 +6241,10 @@ class _SettingsMenu extends State<SettingsMenu> {
 }
 
 Widget popupLayerListMenu(BuildContext context, String currentName, ValueChanged<LatLng> mapmove, VoidCallback after) {
-  return MaterialApp(
-    home: OrientationBuilder(
-      builder: (context, orientation) {
-        return AlertDialog(
-          titlePadding: EdgeInsets.all(5),
-          actionsPadding: EdgeInsets.all(0),
-          contentPadding: EdgeInsets.all(0),
-          insetPadding: EdgeInsets.all(0),
-          buttonPadding: EdgeInsets.all(0),
-          iconPadding: EdgeInsets.all(0),
-          backgroundColor: gl.backgroundTransparentBlackBox,
-          surfaceTintColor: Colors.transparent,
-          shadowColor: Colors.transparent,
-          content: Theme(
-            data: Theme.of(context).copyWith(canvasColor: Colors.transparent, shadowColor: Colors.transparent),
-            child: SizedBox(
-              width:
-                  gl.dsp.orientation == Orientation.portrait
-                      ? gl.eqPx * gl.popupWindowsPortraitWidth
-                      : gl.eqPx * gl.popupWindowsLandscapeWidth,
-              height:
-                  gl.dsp.orientation == Orientation.portrait
-                      ? gl.eqPx * (gl.eqPxH - 25)
-                      : gl.eqPx * gl.popupWindowsLandscapeHeight,
-              child: GeoLayerListMenu(
-                mapmove: mapmove,
-                after: after,
-                windowHeight:
-                    gl.dsp.orientation == Orientation.portrait ? (gl.eqPxH - 25) : gl.popupWindowsLandscapeHeight,
-              ),
-            ),
-          ),
-          actions: [],
-        );
-      },
-    ),
+  return GeoLayerListMenu(
+    mapmove: mapmove,
+    after: after,
+    windowHeight: gl.dsp.orientation == Orientation.portrait ? (gl.eqPxH - 25) : gl.popupWindowsLandscapeHeight,
   );
 }
 
@@ -6274,12 +6254,12 @@ Widget popupSettingsMenu(BuildContext context, String currentName, VoidCallback 
       builder: (context, orientation) {
         return AlertDialog(
           alignment: Alignment.center,
-          titlePadding: EdgeInsets.all(0),
-          actionsPadding: EdgeInsets.all(0),
-          contentPadding: EdgeInsets.all(0),
-          insetPadding: EdgeInsets.all(0),
-          buttonPadding: EdgeInsets.all(0),
-          iconPadding: EdgeInsets.all(0),
+          titlePadding: EdgeInsets.zero,
+          actionsPadding: EdgeInsets.zero,
+          contentPadding: EdgeInsets.zero,
+          insetPadding: EdgeInsets.zero,
+          buttonPadding: EdgeInsets.zero,
+          iconPadding: EdgeInsets.zero,
           backgroundColor: gl.backgroundTransparentBlackBox,
           surfaceTintColor: Colors.transparent,
           shadowColor: Colors.transparent,
@@ -6310,11 +6290,11 @@ Widget popupPathListMenu(BuildContext context, String currentName, ValueChanged<
       builder: (context, orientation) {
         return AlertDialog(
           titlePadding: EdgeInsets.all(5),
-          actionsPadding: EdgeInsets.all(0),
-          contentPadding: EdgeInsets.all(0),
-          insetPadding: EdgeInsets.all(0),
-          buttonPadding: EdgeInsets.all(0),
-          iconPadding: EdgeInsets.all(0),
+          actionsPadding: EdgeInsets.zero,
+          contentPadding: EdgeInsets.zero,
+          insetPadding: EdgeInsets.zero,
+          buttonPadding: EdgeInsets.zero,
+          iconPadding: EdgeInsets.zero,
           backgroundColor: gl.backgroundTransparentBlackBox,
           surfaceTintColor: Colors.transparent,
           shadowColor: Colors.transparent,
@@ -6387,12 +6367,12 @@ class PopupSettingsMenu {
         builder: (context, orientation) {
           return AlertDialog(
             alignment: Alignment.center,
-            titlePadding: EdgeInsets.all(0),
-            actionsPadding: EdgeInsets.all(0),
-            contentPadding: EdgeInsets.all(0),
-            insetPadding: EdgeInsets.all(0),
-            buttonPadding: EdgeInsets.all(0),
-            iconPadding: EdgeInsets.all(0),
+            titlePadding: EdgeInsets.zero,
+            actionsPadding: EdgeInsets.zero,
+            contentPadding: EdgeInsets.zero,
+            insetPadding: EdgeInsets.zero,
+            buttonPadding: EdgeInsets.zero,
+            iconPadding: EdgeInsets.zero,
             backgroundColor: gl.backgroundTransparentBlackBox,
             surfaceTintColor: Colors.transparent,
             shadowColor: Colors.transparent,
@@ -7128,7 +7108,7 @@ class _OnlineMapMenu extends State<OnlineMapMenu> {
                                         )
                                         : Container(
                                           alignment: Alignment.center,
-                                          padding: EdgeInsets.all(0),
+                                          padding: EdgeInsets.zero,
                                           constraints: BoxConstraints(maxWidth: gl.eqPx * gl.onCatalogueWidth * .97),
                                           child: ListBody(
                                             children:
@@ -7561,12 +7541,12 @@ class PopupOnlineMapMenu {
         builder: (context, orientation) {
           return AlertDialog(
             alignment: Alignment.center,
-            titlePadding: EdgeInsets.all(0),
-            actionsPadding: EdgeInsets.all(0),
-            contentPadding: EdgeInsets.all(0),
-            insetPadding: EdgeInsets.all(0),
-            buttonPadding: EdgeInsets.all(0),
-            iconPadding: EdgeInsets.all(0),
+            titlePadding: EdgeInsets.zero,
+            actionsPadding: EdgeInsets.zero,
+            contentPadding: EdgeInsets.zero,
+            insetPadding: EdgeInsets.zero,
+            buttonPadding: EdgeInsets.zero,
+            iconPadding: EdgeInsets.zero,
             backgroundColor: gl.backgroundTransparentBlackBox,
             surfaceTintColor: Colors.transparent,
             shadowColor: Colors.transparent,
@@ -7640,12 +7620,12 @@ Widget popupLayerSwitcher(
         children: [
           AlertDialog(
             alignment: gl.dsp.orientation == Orientation.portrait ? Alignment.center : Alignment.topCenter,
-            titlePadding: EdgeInsets.all(0),
-            actionsPadding: EdgeInsets.all(0),
-            contentPadding: EdgeInsets.all(0),
-            insetPadding: EdgeInsets.all(0),
-            buttonPadding: EdgeInsets.all(0),
-            iconPadding: EdgeInsets.all(0),
+            titlePadding: EdgeInsets.zero,
+            actionsPadding: EdgeInsets.zero,
+            contentPadding: EdgeInsets.zero,
+            insetPadding: EdgeInsets.zero,
+            buttonPadding: EdgeInsets.zero,
+            iconPadding: EdgeInsets.zero,
             backgroundColor: gl.backgroundTransparentBlackBox,
             surfaceTintColor: Colors.transparent,
             shadowColor: Colors.transparent,
@@ -8477,11 +8457,11 @@ class PopupDoYouReally {
           side: BorderSide(color: Color.fromRGBO(205, 225, 138, 1.0), width: 2.0),
         ),
         titlePadding: EdgeInsets.all(5),
-        actionsPadding: EdgeInsets.all(0),
-        contentPadding: EdgeInsets.all(0),
-        insetPadding: EdgeInsets.all(0),
-        buttonPadding: EdgeInsets.all(0),
-        iconPadding: EdgeInsets.all(0),
+        actionsPadding: EdgeInsets.zero,
+        contentPadding: EdgeInsets.zero,
+        insetPadding: EdgeInsets.zero,
+        buttonPadding: EdgeInsets.zero,
+        iconPadding: EdgeInsets.zero,
         backgroundColor: gl.backgroundTransparentBlackBox,
         surfaceTintColor: Colors.transparent,
         shadowColor: Colors.transparent,
@@ -8556,12 +8536,12 @@ class PopupAnaResultsMenu {
         builder: (context, orientation) {
           return AlertDialog(
             alignment: Alignment.center,
-            titlePadding: EdgeInsets.all(0),
-            actionsPadding: EdgeInsets.all(0),
-            contentPadding: EdgeInsets.all(0),
-            insetPadding: EdgeInsets.all(0),
-            buttonPadding: EdgeInsets.all(0),
-            iconPadding: EdgeInsets.all(0),
+            titlePadding: EdgeInsets.zero,
+            actionsPadding: EdgeInsets.zero,
+            contentPadding: EdgeInsets.zero,
+            insetPadding: EdgeInsets.zero,
+            buttonPadding: EdgeInsets.zero,
+            iconPadding: EdgeInsets.zero,
             backgroundColor: gl.backgroundTransparentBlackBox,
             surfaceTintColor: Colors.transparent,
             shadowColor: Colors.transparent,
@@ -9378,12 +9358,12 @@ Widget popupAnaSurfResultsMenu(
     builder: (context, orientation) {
       return AlertDialog(
         alignment: Alignment.center,
-        titlePadding: EdgeInsets.all(0),
-        actionsPadding: EdgeInsets.all(0),
-        contentPadding: EdgeInsets.all(0),
-        insetPadding: EdgeInsets.all(0),
-        buttonPadding: EdgeInsets.all(0),
-        iconPadding: EdgeInsets.all(0),
+        titlePadding: EdgeInsets.zero,
+        actionsPadding: EdgeInsets.zero,
+        contentPadding: EdgeInsets.zero,
+        insetPadding: EdgeInsets.zero,
+        buttonPadding: EdgeInsets.zero,
+        iconPadding: EdgeInsets.zero,
         backgroundColor: gl.backgroundTransparentBlackBox,
         surfaceTintColor: Colors.transparent,
         shadowColor: Colors.transparent,
