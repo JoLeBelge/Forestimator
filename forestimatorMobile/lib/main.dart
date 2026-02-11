@@ -215,7 +215,11 @@ class _MyApp extends State<MyApp> {
     return MaterialApp(
       navigatorKey: _navigatorKey,
       title: 'Forestimator',
-      theme: ThemeData(colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple), fontFamily: "Calibri", useMaterial3: true),
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        fontFamily: "Calibri",
+        useMaterial3: true,
+      ),
       home: MapPage(),
     );
   }

@@ -13,15 +13,16 @@ import 'package:proj4dart/proj4dart.dart' as proj4;
 import 'package:latlong2/latlong.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+// TODO: Add state to SENT status with callback in timer.
+// TODO: ajout de variables au layer -> appliquer a tous les geos ou seulement nouveaux? Avec ou sans valeur predefini?
 // TODO optional: remove global variable notificationContext for clarity and proper stack usage
-// TODO: Change explanation text in toolbox when: add vertex is selected etc...
 // TODO: Florentin BUG
 // TODO: Many Keyboard switch Bugs...
 // TODO: Some Widgets still dont adapt properly with rotation etc... Add missing constraints to size with equipixels.
 // TODO: Add bounding box as properties & map view
 typedef VoidSetter = void Function(void Function());
 
-const String forestimatorMobileVersion = "2.2.0 - build 25";
+const String forestimatorMobileVersion = "2.3.0 - build 26"; //02/2026
 const double globalMinZoom = 4.0;
 const double globalMaxZoom = 13.0;
 const double globalMinOfflineZoom = 8.0;
@@ -116,11 +117,12 @@ class Mode {
   static bool _expertTools = false;
 
   static bool polygon = false;
-  static bool openToolbox = false;
+  static bool polygonList = false;
   static bool editAttributes = false;
   static bool editPolygon = false;
   static bool editPoint = false;
   static bool editPointMarker = false;
+  static bool editPolyMarker = false;
   static bool addVertexesPolygon = false;
   static bool moveVertexesPolygon = false;
   static bool removeVertexesPolygon = false;
@@ -157,6 +159,7 @@ class Mode {
 }
 
 class Display {
+  double paddingTop = -1;
   double width = -1;
   double height = -1;
   double dpi = -1;
@@ -168,13 +171,17 @@ class Display {
 
   Display.empty();
 
+  double alignX(double px) => (2.0 / width) * (equipixel * px);
+  double alignY(double px) => (2.0 / (height + paddingTop * 2)) * (equipixel * px);
+
   Display(BuildContext context) {
+    paddingTop = MediaQuery.of(context).padding.top;
     width = MediaQuery.of(context).size.width;
     height = MediaQuery.of(context).size.height;
     aspect = MediaQuery.of(context).size.aspectRatio;
     dpi = MediaQuery.of(context).devicePixelRatio;
     orientation = MediaQuery.of(context).orientation;
-
+    print(paddingTop);
     //_tabletMode();
     //_squareMode();
     _enforceEquiWidthHeight();
@@ -242,11 +249,11 @@ class Display {
   }
 }
 
-Display display = Display.empty();
+Display dsp = Display.empty();
 
 void initializeDisplayInfos(BuildContext context) {
-  display = Display(context);
-  print(display.toString());
+  dsp = Display(context);
+  print(dsp.toString());
 }
 
 // This has to be guaranteed on all displays to ensure correct visibility
@@ -366,13 +373,28 @@ class PoiMarker {
   final String address;
   final String city;
   final String postcode;
-  PoiMarker({required this.index, required this.position, required this.name, required this.address, required this.city, required this.postcode});
+  PoiMarker({
+    required this.index,
+    required this.position,
+    required this.name,
+    required this.address,
+    required this.city,
+    required this.postcode,
+  });
 }
 
-//List<pol.Geometry> geometries = [];
 GeometricLayer get selLay => geoLayers[selectedGeoLayer];
-
 pol.Geometry get selGeo => selLay.geometries[selLay.selectedGeometry];
+
+bool get layerReady => selectedGeoLayer > -1 && geoLayers.isNotEmpty;
+bool get geoReady =>
+    layerReady &&
+    geoLayers[selectedGeoLayer].selectedGeometry > -1 &&
+    geoLayers[selectedGeoLayer].geometries.isNotEmpty;
+
+double get eqPx => dsp.equipixel;
+double get eqPxH => dsp.equiheight;
+double get eqPxW => dsp.equiwidth;
 
 List<GeometricLayer> geoLayers = [];
 int selectedGeoLayer = -1;
@@ -438,15 +460,35 @@ List<String> getInterfaceSelectedLOffline() {
 LayerAnaPt? anaPtPreview;
 List<LayerAnaPt> requestedLayers = [];
 
-List<String> anaPtSelectedLayerKeys = ["ZBIO", "CNSWrast", "CS_A", "MNT", "slope", "NT", "NH", "Topo", "AE", "COMPOALL", "MNH2021"];
+List<String> anaPtSelectedLayerKeys = [
+  "ZBIO",
+  "CNSWrast",
+  "CS_A",
+  "MNT",
+  "slope",
+  "NT",
+  "NH",
+  "Topo",
+  "AE",
+  "COMPOALL",
+  "MNH2021",
+];
 
-List<String> anaSurfSelectedLayerKeys = ["dendro_nha", "dendro_gha", "dendro_cdom", "dendro_hdom", "dendro_vha", "HE_FEE", "COMPOALL"];
+List<String> anaSurfSelectedLayerKeys = [
+  "dendro_nha",
+  "dendro_gha",
+  "dendro_cdom",
+  "dendro_hdom",
+  "dendro_vha",
+  "HE_FEE",
+  "COMPOALL",
+];
 
 List<String> downloadableLayerKeys = ["ZBIO", "NT", "NH", "Topo", "CS_A", "CNSWrast"];
 
 Position _position = Position(
-  longitude: 0,
-  latitude: 0,
+  longitude: latlonCenter.longitude,
+  latitude: latlonCenter.latitude,
   timestamp: DateTime.now(),
   accuracy: 0,
   altitude: 0,
@@ -670,7 +712,10 @@ void changeSelectedLayerModeOffline() {
   loadPrefSelLayOffline();
   selectedLayerForMap.removeWhere((element) => element.offline == false);
   if (dico.getLayersOffline().where((i) => i.mBits == 8).toList().isNotEmpty && selectedLayerForMap.isEmpty) {
-    selectedLayerForMap.insert(0, SelectedLayer(mCode: dico.getLayersOffline().where((i) => i.mBits == 8).toList().first.mCode, offline: true));
+    selectedLayerForMap.insert(
+      0,
+      SelectedLayer(mCode: dico.getLayersOffline().where((i) => i.mBits == 8).toList().first.mCode, offline: true),
+    );
   } else {
     while (selectedLayerForMap.length > 1) {
       selectedLayerForMap.removeLast();
@@ -701,13 +746,31 @@ bool slotContainsLayer(int index, String key) {
 
 List<SelectedLayer> getLayersForFlutterMap() {
   return selectedLayerForMap
-      .where((val) => !(val.mCode.length < 3 && (val.mCode.contains('1') || val.mCode.contains('2') || val.mCode.contains('3'))))
+      .where(
+        (val) =>
+            !(val.mCode.length < 3 && (val.mCode.contains('1') || val.mCode.contains('2') || val.mCode.contains('3'))),
+      )
       .toList()
       .reversed
       .toList();
 }
 
-Map<int, int> lutVulnerabiliteCS = {0: 0, 1: 1, 2: 1, 3: 3, 4: 5, 5: 2, 6: 2, 7: 3, 8: 6, 9: 2, 10: 4, 11: 4, 12: 4, 13: 7};
+Map<int, int> lutVulnerabiliteCS = {
+  0: 0,
+  1: 1,
+  2: 1,
+  3: 3,
+  4: 5,
+  5: 2,
+  6: 2,
+  7: 3,
+  8: 6,
+  9: 2,
+  10: 4,
+  11: 4,
+  12: 4,
+  13: 7,
+};
 
 List<Widget> mainStack = [];
 
@@ -747,6 +810,17 @@ List<IconData> selectableIcons = [
   FontAwesomeIcons.crop,
 ];
 
+List<IconData> selectableIconGeo = [
+  Icons.square_outlined,
+  Icons.circle_outlined,
+  Icons.pentagon_outlined,
+  Icons.hexagon_outlined,
+  FontAwesomeIcons.triangleExclamation,
+  FontAwesomeIcons.drawPolygon,
+  FontAwesomeIcons.crop,
+  FontAwesomeIcons.noteSticky,
+];
+
 List<Color> predefinedPointSymbPalette = [
   Colors.black,
   Colors.green,
@@ -761,6 +835,7 @@ List<Color> predefinedPointSymbPalette = [
 ];
 
 List<String> essenceChoice = [
+  "Choisissez",
   "Bouleaux",
   "Chênes",
   "Douglas",

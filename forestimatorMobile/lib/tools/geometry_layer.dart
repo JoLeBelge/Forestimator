@@ -16,14 +16,13 @@ class GeometricLayer {
   int selectedGeometry = -1;
 
   Color defaultColor = Colors.black;
-  int defaultPointIcon = 0;
+  int defaultPointIcon = 3;
   double defaultIconSize = 10;
   List<Attribute> defaultAttributes = [];
 
   List<Geometry> geometries = [];
 
-  GeometricLayer({String name = ""}) {
-    name = "";
+  GeometricLayer({this.name = ""}) {
     type = "";
     subtype = "";
     Random rand = Random();
@@ -40,12 +39,15 @@ class GeometricLayer {
   GeometricLayer.essence() {
     type = "Point";
     subtype = "Essence";
-    Random rand = Random();
-    defaultColor = Color.fromRGBO(rand.nextInt(256), rand.nextInt(256), rand.nextInt(256), 1.0);
+    defaultColor = Colors.black;
+    defaultPointIcon = 4;
     defaultAttributes.addAll([
-      Attribute(name: "essence", type: "string", value: gl.essenceChoice[0]),
+      Attribute(name: "essence", type: "string", value: "Choisissez"),
       Attribute(name: "rmq", type: "string", value: ""),
     ]);
+    defaultAttributes[0].visibleOnMapLabel = true;
+    name = "Observations Essences";
+    serialize();
   }
 
   GeometricLayer.polygon() {
@@ -54,41 +56,65 @@ class GeometricLayer {
     defaultColor = Color.fromRGBO(rand.nextInt(256), rand.nextInt(256), rand.nextInt(256), 1.0);
   }
 
-  void addGeometry() {
+  static void deleteLayer(int index) {
+    if (gl.layerReady && gl.geoLayers.length <= index) return;
+    for (int i = 0; i < gl.geoLayers[index].geometries.length; i++) {
+      gl.geoLayers[index].removeGeometry(last: true);
+    }
+    removeLayerFromShared(gl.geoLayers[index].id);
+    gl.geoLayers.removeAt(index);
+  }
+
+  void addGeometry({String name = ""}) {
     switch (type) {
       case 'Point':
-        subtype == 'Essence' ? geometries.add(Geometry.essencePoint()) : geometries.add(Geometry.point());
+        subtype == 'Essence'
+            ? geometries.add(Geometry.essencePoint(polygonName: name))
+            : geometries.add(Geometry.point(polygonName: name));
         break;
       case 'Polygon':
-        geometries.add(Geometry.polygon());
+        geometries.add(Geometry.polygon(polygonName: name));
         break;
       default:
         gl.print("error: unknown type $type to create new geometry on layer $name");
         return;
     }
-    geometries.last.setColorInside(defaultColor);
+    geometries.last.setColorInside(defaultColor.withAlpha(100));
     geometries.last.setColorLine(defaultColor);
     geometries.last.selectedPointIcon = defaultPointIcon;
     geometries.last.iconSize = defaultIconSize;
-    geometries.last.attributes.addAll(defaultAttributes);
+    for (Attribute a in defaultAttributes) {
+      geometries.last.attributes.add(a.clone);
+      print(geometries.last.attributes.last.value);
+    }
+    geometries.last.serialize(layerId: id);
   }
 
-  void removeGeometry({int? index, String? name, bool? last}) {
+  void removeGeometry({int? index, String? name, bool? last, String? id}) {
     if (geometries.isEmpty) {
       gl.print("error: nothing to remove in geometry list:");
       return;
     } else if (index != null) {
-      geometries.removeAt(index);
+      Geometry.removePolyFromShared(geometries.removeAt(index).id, layerId: this.id);
     } else if (name != null) {
+      String identifier = "";
       geometries.removeWhere((Geometry g) {
+        identifier = g.id;
         return g.name == name;
       });
+      Geometry.removePolyFromShared(identifier, layerId: this.id);
     } else if (last != null && last) {
-      geometries.removeLast();
+      Geometry.removePolyFromShared(geometries.removeLast().id, layerId: this.id);
+    } else if (id != null) {
+      geometries.removeWhere((Geometry g) {
+        return g.id == id;
+      });
+      Geometry.removePolyFromShared(id, layerId: this.id);
     }
   }
 
   void visible(bool visibility) {
+    visibleOnMap = visibility;
     for (Geometry g in geometries) {
       g.visibleOnMap = visibility;
     }
@@ -100,7 +126,7 @@ class GeometricLayer {
     }
   }
 
-  void serialize() async {
+  void serialize({bool withPolys = false}) async {
     await gl.shared!.setString('$id.name', name);
     await gl.shared!.setString('$id.type', type);
     await gl.shared!.setString('$id.subtype', subtype);
@@ -113,8 +139,10 @@ class GeometricLayer {
     _writeColorToMemory("$id.col", defaultColor);
     _writeAttributesToMemory("$id.defAttr", defaultAttributes);
 
-    for (Geometry g in geometries) {
-      g.serialize();
+    if (withPolys) {
+      for (Geometry g in geometries) {
+        g.serialize(layerId: id);
+      }
     }
 
     List<String> layerKeys = gl.shared!.getStringList('layerKeys') ?? <String>[];
@@ -127,11 +155,12 @@ class GeometricLayer {
   }
 
   void deserialize(String id) async {
+    this.id = id;
     name = gl.shared!.getString('$id.name')!;
     type = gl.shared!.getString('$id.type')!;
     subtype = gl.shared!.getString('$id.subtype')!;
 
-    visibleOnMap = gl.shared!.getBool('$id.labelsVisibleOnMap')!;
+    visibleOnMap = gl.shared!.getBool('$id.visibleOnMap')!;
     labelsVisibleOnMap = gl.shared!.getBool('$id.labelsVisibleOnMap')!;
 
     defaultPointIcon = gl.shared!.getInt('$id.defaultPointIcon')!;
@@ -151,11 +180,11 @@ class GeometricLayer {
       await gl.shared!.setString('$prefix.$i.name', attribute.name);
       await gl.shared!.setString('$prefix.$i.type', attribute.type);
       await gl.shared!.setBool('$prefix.$i.visibleOnMapLabel', attribute.visibleOnMapLabel);
-      if (attribute.type == "string") {
+      if (attribute.type == "string" && attribute.value is String) {
         await gl.shared!.setString('$prefix.$i.val', attribute.value);
-      } else if (attribute.type == "int") {
+      } else if (attribute.type == "int" && attribute.value is int) {
         await gl.shared!.setInt('$prefix.$i.val', attribute.value);
-      } else if (attribute.type == "double") {
+      } else if (attribute.type == "double" && attribute.value is double) {
         await gl.shared!.setDouble('$prefix.$i.val', attribute.value);
       }
       i++;
@@ -174,11 +203,11 @@ class GeometricLayer {
           type: type,
           value:
               type == "string"
-                  ? gl.shared!.getString('$prefix.$i.val')!
+                  ? gl.shared!.getString('$prefix.$i.val') ?? ""
                   : type == "int"
-                  ? gl.shared!.getInt('$prefix.$i.val')!
+                  ? gl.shared!.getInt('$prefix.$i.val') ?? ""
                   : type == "double"
-                  ? gl.shared!.getDouble('$prefix.$i.val')!
+                  ? gl.shared!.getDouble('$prefix.$i.val') ?? ""
                   : "unknown",
           visibleOnMapLabel: gl.shared!.getBool('$prefix.$i.visibleOnMapLabel') ?? false,
         ),
@@ -219,14 +248,10 @@ class GeometricLayer {
     }
   }
 
-  static void removeLayerFromShared(String it) async {
+  static void removeLayerFromShared(String id) async {
     List<String> layerKeys = gl.shared!.getStringList('layerKeys') ?? <String>[];
-    if (!layerKeys.contains(it)) {
-      List<String> polykeys = gl.shared!.getStringList('$it.polyKeys') ?? <String>[];
-      for (String key in polykeys) {
-        Geometry.removePolyFromShared(key);
-      }
-      layerKeys.remove(it);
+    if (layerKeys.contains(id)) {
+      layerKeys.remove(id);
       await gl.shared!.setStringList('layerKeys', layerKeys);
     }
   }
@@ -248,5 +273,19 @@ class GeometricLayer {
 
   void sendLayerPolys() async {
     //TODO: sendLayer
+  }
+
+  static GeometricLayer getEssenceLayer() {
+    int index = 0;
+    for (GeometricLayer g in gl.geoLayers) {
+      if (g.type == "Point" && g.subtype == "Essence") {
+        gl.selectedGeoLayer = index;
+        return g;
+      }
+      index++;
+    }
+    gl.geoLayers.add(GeometricLayer.essence());
+    gl.selectedGeoLayer = gl.geoLayers.length - 1;
+    return gl.geoLayers.last;
   }
 }

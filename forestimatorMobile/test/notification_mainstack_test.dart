@@ -9,18 +9,15 @@ void main() {
   setUp(() async {
     // ensure a clean stack and stable display values
     gl.mainStack.clear();
-    gl.display = gl.Display.empty();
-    gl.display.width = 1200;
-    gl.display.height = 1600;
-    gl.display.dpi = 1.0;
-    gl.display.orientation = Orientation.portrait;
-    gl.display.equipixel =
-        gl.display.height / gl.minEquiPixelsDisplayPortraitHeight;
+    gl.dsp = gl.Display.empty();
+    gl.dsp.width = 1200;
+    gl.dsp.height = 1600;
+    gl.dsp.dpi = 1.0;
+    gl.dsp.orientation = Orientation.portrait;
+    gl.dsp.equipixel = gl.dsp.height / gl.minEquiPixelsDisplayPortraitHeight;
   });
 
-  testWidgets('presentPopup uses mainStack when notificationContext is set', (
-    WidgetTester tester,
-  ) async {
+  testWidgets('presentPopup uses mainStack when notificationContext is set', (WidgetTester tester) async {
     // Prepare a minimal app and capture a BuildContext to use as notificationContext
     BuildContext? rootContext;
     await tester.pumpWidget(

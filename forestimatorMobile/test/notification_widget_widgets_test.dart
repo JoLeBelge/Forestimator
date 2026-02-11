@@ -6,22 +6,19 @@ import 'package:fforestimator/tools/notification.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  testWidgets('PopupDoYouReally shows title and triggers callback', (
-    tester,
-  ) async {
+  testWidgets('PopupDoYouReally shows title and triggers callback', (tester) async {
     bool called = false;
     // Make the test surface larger to avoid dialog overflow in layout
     await tester.binding.setSurfaceSize(const Size(1200, 1600));
 
     // Initialize display globals to match the test binding
-    gl.display = gl.Display.empty();
-    gl.display.width = 1200;
-    gl.display.height = 1600; // match test surface
-    gl.display.dpi = 1.0;
-    gl.display.orientation = Orientation.portrait;
+    gl.dsp = gl.Display.empty();
+    gl.dsp.width = 1200;
+    gl.dsp.height = 1600; // match test surface
+    gl.dsp.dpi = 1.0;
+    gl.dsp.orientation = Orientation.portrait;
     // derive equipixel from globals to keep sizes consistent
-    gl.display.equipixel =
-        gl.display.height / gl.minEquiPixelsDisplayPortraitHeight;
+    gl.dsp.equipixel = gl.dsp.height / gl.minEquiPixelsDisplayPortraitHeight;
 
     await tester.pumpWidget(
       MaterialApp(
@@ -66,13 +63,12 @@ void main() {
     await tester.binding.setSurfaceSize(const Size(1200, 1600));
 
     // Initialize display globals to match the test binding
-    gl.display = gl.Display.empty();
-    gl.display.width = 1200;
-    gl.display.height = 1600;
-    gl.display.dpi = 1.0;
-    gl.display.orientation = Orientation.portrait;
-    gl.display.equipixel =
-        gl.display.height / gl.minEquiPixelsDisplayPortraitHeight;
+    gl.dsp = gl.Display.empty();
+    gl.dsp.width = 1200;
+    gl.dsp.height = 1600;
+    gl.dsp.dpi = 1.0;
+    gl.dsp.orientation = Orientation.portrait;
+    gl.dsp.equipixel = gl.dsp.height / gl.minEquiPixelsDisplayPortraitHeight;
 
     // Build a button that opens a simple dialog with a "Fermer" button which
     // only calls the provided after callback and pops the dialog. This avoids
