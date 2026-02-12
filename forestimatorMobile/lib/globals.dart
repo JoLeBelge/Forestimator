@@ -528,7 +528,7 @@ const Color colorBack = Color.fromRGBO(255, 120, 30, 1);
 const Color colorBackground = Color.fromRGBO(202, 202, 202, 1);
 const Color colorBackgroundSecondary = Color.fromRGBO(243, 243, 243, 1);
 
-VoidSetter refreshMainStack = (void Function() f) {
+VoidSetter refreshStack = (void Function() f) {
   f();
 };
 VoidSetter rebuildSwitcherCatalogueButtons = (void Function() setter) {};

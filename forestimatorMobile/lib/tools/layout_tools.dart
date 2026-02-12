@@ -1,4 +1,5 @@
 import 'package:fforestimator/globals.dart' as gl;
+import 'package:fforestimator/tools/layout_tools.dart' as lt;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -277,4 +278,25 @@ class _ForestimatorScrollView extends State<ForestimatorScrollView> {
       ),
     );
   }
+}
+
+Widget forestimatorBackButton(VoidCallback after, IconData icon) {
+  return Stack(
+    alignment: AlignmentGeometry.center,
+    children: [
+      CircleAvatar(
+        radius: gl.eqPx * (gl.iconSizeXS - 1.5),
+        backgroundColor: Colors.white,
+        child: CircleAvatar(radius: gl.eqPx * (gl.iconSizeXS - 1.75), backgroundColor: gl.colorAgroBioTech),
+      ),
+      IconButton(
+        alignment: Alignment.center,
+        style: lt.trNoPadButtonstyle,
+        onPressed: () {
+          after();
+        },
+        icon: Icon(icon, color: Colors.black, size: gl.eqPx * gl.iconSizeS),
+      ),
+    ],
+  );
 }

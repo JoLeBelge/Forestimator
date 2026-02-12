@@ -72,7 +72,7 @@ class _PDFScreenState extends State<PDFScreen> with WidgetsBindingObserver {
                 ),
                 onPressed: () {
                   gl.mainStackPopLast();
-                  gl.refreshMainStack(() {});
+                  gl.refreshStack(() {});
                 },
               ),
               //IconButton(icon: Icon(Icons.share), onPressed: () {}),

@@ -163,7 +163,19 @@ class _MapPageState extends State<MapPage> {
         }
         gl.requestedLayers.removeWhere((element) => element.mFoundLayer == false);
       } else {
-        gl.mainStack.add(popupNoInternet());
+        gl.stack.add(
+          "NoInternet",
+          popupNoInternet(() {
+            mounted
+                ? setState(() {
+                  gl.stack.pop("NoInternet");
+                })
+                : gl.stack.pop("NoInternet");
+          }),
+          Duration(milliseconds: 400),
+          Offset.zero,
+          Offset(0, -250),
+        );
       }
     } else {
       if (gl.dico.getLayersOffline().isEmpty) {
@@ -190,7 +202,7 @@ class _MapPageState extends State<MapPage> {
   void initState() {
     super.initState();
     initPermissions();
-    gl.refreshMainStack = refreshView;
+    gl.refreshStack = refreshView;
     initOtherValuesOnce();
   }
 
@@ -265,7 +277,7 @@ class _MapPageState extends State<MapPage> {
                               PopupAnaResultsMenu(gl.notificationContext!, gl.requestedLayers, () {
                                 refreshView(() {});
                               });
-                              gl.refreshMainStack(() {});
+                              gl.refreshStack(() {});
                             }
                           },
                           onTap:
@@ -850,30 +862,12 @@ class _MapPageState extends State<MapPage> {
                               color: Colors.transparent,
                               height: gl.eqPx * gl.iconSizeL,
                               width: gl.eqPx * gl.iconSizeL,
-                              child: IconButton(
-                                style: ButtonStyle(
-                                  animationDuration: Duration(seconds: 1),
-                                  backgroundColor: WidgetStateProperty<Color>.fromMap(<WidgetStatesConstraint, Color>{
-                                    WidgetState.any: Colors.transparent,
-                                  }),
-                                  padding: WidgetStateProperty<EdgeInsetsGeometry>.fromMap(
-                                    <WidgetStatesConstraint, EdgeInsetsGeometry>{
-                                      WidgetState.any: EdgeInsetsGeometry.zero,
-                                    },
-                                  ),
-                                ),
-                                onPressed: () {
-                                  setState(() {
-                                    gl.Mode.polygonList = true;
-                                    _polygonMode = true;
-                                  });
-                                },
-                                icon: FaIcon(
-                                  Icons.arrow_drop_down_outlined,
-                                  size: gl.eqPx * gl.iconSizeM,
-                                  color: Colors.white,
-                                ),
-                              ),
+                              child: lt.forestimatorBackButton(() {
+                                setState(() {
+                                  gl.Mode.polygonList = true;
+                                  _polygonMode = true;
+                                });
+                              }, Icons.arrow_drop_down_outlined),
                             ),
                           ],
                         ),
@@ -1384,10 +1378,13 @@ class _MapPageState extends State<MapPage> {
                                                                               gl.selGeo.attributes[i].name,
                                                                               gl.selGeo.attributes,
                                                                             )) {
-                                                                              PopupMessage(
-                                                                                "Erreur",
-                                                                                "Le nom $nom existe déja!",
-                                                                              );
+                                                                              gl.refreshStack(() {
+                                                                                popupForestimatorMessage(
+                                                                                  id: "MSGduplicateName",
+                                                                                  title: "Erreur",
+                                                                                  message: "Le nom $nom existe déja!",
+                                                                                );
+                                                                              });
                                                                               return;
                                                                             } else {
                                                                               gl.selGeo.serialize();
@@ -1940,7 +1937,7 @@ class _MapPageState extends State<MapPage> {
                                                   gl.selGeo.labelsVisibleOnMap = true;
                                                 });
                                                 gl.selGeo.serialize();
-                                                gl.refreshMainStack(() {
+                                                gl.refreshStack(() {
                                                   gl.modeMapShowPolygons = true;
                                                 });
                                               },
@@ -1955,7 +1952,7 @@ class _MapPageState extends State<MapPage> {
                                             height: gl.eqPx * gl.iconSizeM * .9,
                                             child: IconButton(
                                               onPressed: () {
-                                                gl.refreshMainStack(() {
+                                                gl.refreshStack(() {
                                                   gl.selGeo.labelsVisibleOnMap = false;
                                                 });
                                                 gl.selGeo.serialize();
@@ -2012,7 +2009,7 @@ class _MapPageState extends State<MapPage> {
                                                   _mapController.move(gl.selGeo.center, _mapController.camera.zoom);
                                                 }
                                               });
-                                              gl.refreshMainStack(() {
+                                              gl.refreshStack(() {
                                                 gl.modeMapShowPolygons = true;
                                               });
                                             },
@@ -2059,7 +2056,7 @@ class _MapPageState extends State<MapPage> {
                                         height: gl.eqPx * gl.iconSizeM * .9,
                                         child: IconButton(
                                           onPressed: () {
-                                            gl.refreshMainStack(() {
+                                            gl.refreshStack(() {
                                               gl.modeMapShowPolygons = true;
                                               gl.selGeo.visibleOnMap = true;
                                               gl.Mode.editPolygon = !gl.Mode.editPolygon;
@@ -2176,22 +2173,28 @@ class _MapPageState extends State<MapPage> {
         setState(() {
           gl.modeSettings = true;
         });
-
-        PopupSettingsMenu(
-          gl.notificationContext!,
-          "",
-          () {
-            refreshView(() {});
-          },
-          () {
-            refreshView(() {});
-          },
+        gl.stack.add(
+          "SettingsMenu",
+          SettingsMenu(
+            state: () {},
+            after: () {
+              gl.refreshStack(() {
+                gl.stack.pop("SettingsMenu");
+                gl.modeSettings = false;
+              });
+            },
+          ),
+          Duration(milliseconds: 500),
+          gl.Anim.searchAnimOnScreenPos,
+          Offset(0, -2000),
         );
       } else {
-        gl.mainStackPopLast();
-        gl.modeSettings = false;
+        gl.refreshStack(() {
+          gl.stack.pop("SettingsMenu");
+          gl.modeSettings = false;
+        });
       }
-      gl.refreshMainStack(() {});
+      gl.refreshStack(() {});
     },
     child: Stack(
       alignment: AlignmentGeometry.center,
@@ -2796,12 +2799,14 @@ class _MapPageState extends State<MapPage> {
   }
 
   void _closeToolbarMenu() {
+    gl.stack.pop("SearchMenu");
     _toolBarMenu = false;
     _modeSearch = false;
     _modeMeasurePath = false;
   }
 
   void _closeSwitchesMenu() {
+    gl.stack.pop("LayerSwitcher");
     _modeLayerSwitches = false;
     gl.mainStackPopLast();
   }
@@ -2895,23 +2900,23 @@ class _MapPageState extends State<MapPage> {
                     _modeLayerSwitches = true;
                     _closePolygonMenu();
                     _closeToolbarMenu();
-                    gl.mainStack.add(
-                      popupLayerSwitcher(
-                        gl.notificationContext!,
-                        () {
-                          setState(() {
-                            _closeSwitchesMenu();
-                          });
-                        },
-                        (close) {
-                          return _mainMenuBar(dummy: true, close: close);
-                        },
+                    gl.stack.add(
+                      "LayerSwitcher",
+                      LayerSwitcher(
                         (LatLng pos) {
                           if (pos.longitude != 0.0 && pos.latitude != 0.0) {
                             _mapController.move(pos, _mapController.camera.zoom);
                           }
                         },
+                        () {
+                          setState(() {
+                            _closeSwitchesMenu();
+                          });
+                        },
                       ),
+                      Duration(milliseconds: 400),
+                      gl.Anim.searchAnimOnScreenPos,
+                      Offset(0, -500),
                     );
                   } else {
                     setState(() {
@@ -3080,7 +3085,7 @@ class _MapPageState extends State<MapPage> {
                             gl.Mode.recordPath = !gl.Mode.recordPath;
                             _modeAnaPtPreview = !gl.Mode.recordPath;
                             if (gl.Mode.recordPath) {
-                              gl.mainStack.add(
+                              /*gl.mainStack.add(
                                 popupPathListMenu(
                                   gl.notificationContext!,
                                   gl.selGeo.name,
@@ -3096,7 +3101,7 @@ class _MapPageState extends State<MapPage> {
                                   },
                                 ),
                               );
-                              refreshView(() {});
+                              refreshView(() {});*/
                             }
                           });
                         },
@@ -3112,21 +3117,26 @@ class _MapPageState extends State<MapPage> {
                         setState(() {
                           _modeSearch = true;
                         });
-                        gl.mainStack.add(
-                          popupSearchMenu(
-                            gl.notificationContext!,
-                            "",
-                            (LatLng pos) {
+                        gl.stack.add(
+                          "SearchMenu",
+                          SearchMenu(
+                            state: (LatLng pos) {
                               if (pos.longitude != 0.0 && pos.latitude != 0.0) {
                                 _mapController.move(pos, _mapController.camera.zoom);
                               }
                             },
-                            () {
+                            after: () {
+                              gl.refreshStack(() {
+                                gl.stack.pop("SearchMenu");
+                              });
                               refreshView(() {
                                 _modeSearch = false;
                               });
                             },
                           ),
+                          Duration(milliseconds: 500),
+                          gl.Anim.searchAnimOnScreenPos,
+                          Offset(0, -2000),
                         );
                       },
                       icon: FaIcon(FontAwesomeIcons.magnifyingGlassLocation),
@@ -3654,7 +3664,19 @@ class _AnaPtPreview extends State<AnaPtPreview> {
           gl.print("$e");
         }
       } else {
-        gl.mainStack.add(popupNoInternet());
+        gl.stack.add(
+          "NoInternet",
+          popupNoInternet(() {
+            mounted
+                ? setState(() {
+                  gl.stack.pop("NoInternet");
+                })
+                : gl.stack.pop("NoInternet");
+          }),
+          Duration(milliseconds: 400),
+          Offset.zero,
+          Offset(0, -250),
+        );
       }
     } else {
       int val = await gl.dico.getLayerBase(gl.selectedLayerForMap.first.mCode).getValXY(ptBL72);

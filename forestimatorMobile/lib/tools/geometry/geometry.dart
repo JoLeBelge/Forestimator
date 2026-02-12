@@ -376,7 +376,17 @@ class Geometry {
       gl.print(decodedJson);
     } else {
       gl.print("Could not make surface analysis, no internet!");
-      gl.mainStack.add(popupNoInternet());
+      gl.stack.add(
+        "NoInternet",
+        popupNoInternet(() {
+          gl.refreshStack(() {
+            gl.stack.pop("NoInternet");
+          });
+        }),
+        Duration(milliseconds: 400),
+        Offset.zero,
+        Offset(0, -250),
+      );
       return false;
     }
     return true;
@@ -404,7 +414,6 @@ class Geometry {
   Future<bool> sendGeometryToServer() async {
     if (sentToServer) {
       gl.print("Geometry $name already sent once!");
-      gl.mainStack.add(popupGeometryAlreadySent());
       return false;
     }
     bool internet = await InternetConnection().hasInternetAccess;
@@ -674,7 +683,17 @@ class Geometry {
         }
         gl.requestedLayers.removeWhere((element) => element.mFoundLayer == false);
       } else {
-        gl.mainStack.add(popupNoInternet());
+        gl.stack.add(
+          "NoInternet",
+          popupNoInternet(() {
+            gl.refreshStack(() {
+              gl.stack.pop("NoInternet");
+            });
+          }),
+          Duration(milliseconds: 400),
+          Offset.zero,
+          Offset(0, -250),
+        );
       }
     } else {
       if (gl.dico.getLayersOffline().isEmpty) {

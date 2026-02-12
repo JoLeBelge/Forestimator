@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:fforestimator/globals.dart' as gl;
 import 'package:flutter/material.dart';
 
@@ -35,18 +34,11 @@ class ForestimatorStack {
         child: it,
       ),
     );
-    Timer(Duration(milliseconds: 50), () {
-      StackAnimated it = stack.firstWhere((StackAnimated a) {
-        return a.id == id;
-      });
-      animStates[id]!(() {
-        it.positions[0] = it.positions[1];
-      });
-      animStates.remove(id);
-    });
+    _startTimer(id);
   }
 
   void pop(String id) {
+    if (stack.isEmpty || !ids.contains(id)) return;
     StackAnimated it = stack.firstWhere((StackAnimated a) {
       return a.id == id;
     });
@@ -58,6 +50,21 @@ class ForestimatorStack {
         return a.id == id;
       });
       animStates.remove(id);
+    });
+  }
+
+  void _startTimer(String id) {
+    Timer(Duration(milliseconds: 10), () {
+      StackAnimated it = stack.firstWhere((StackAnimated a) {
+        return a.id == id;
+      });
+      if (animStates[id] != null) {
+        animStates[id]!(() {
+          it.positions[0] = it.positions[1];
+        });
+      } else {
+        _startTimer(id);
+      }
     });
   }
 }

@@ -30,7 +30,7 @@ class TifFileTileProvider extends TileProvider {
   });
 
   void init() async {
-    _loadAndDecodeImage().whenComplete(() => gl.refreshMainStack(() {}));
+    _loadAndDecodeImage().whenComplete(() => gl.refreshStack(() {}));
   }
 
   Future _loadAndDecodeImage() async {
@@ -63,10 +63,7 @@ class TifFileTileProvider extends TileProvider {
 
     // final nwPoint = coordinates.scaleBy(tileSizePoint) - daptation for flutter_map 7.0.0 (scaleBy depreciated)
 
-    final Offset nwPoint = Offset(
-      coordinates.x.toDouble() * tileSize,
-      coordinates.y.toDouble() * tileSize,
-    );
+    final Offset nwPoint = Offset(coordinates.x.toDouble() * tileSize, coordinates.y.toDouble() * tileSize);
 
     final nwCoords = mycrs.offsetToLatLng(nwPoint, coordinates.z.toDouble());
     final nw = mycrs.projection.project(nwCoords);
@@ -85,23 +82,11 @@ class TifFileTileProvider extends TileProvider {
     int initImSize = (pow(2, (zFullIm - coordinates.z)) * tileSize).round();
 
     if (_sourceImage != null) {
-      img.Image cropped = img.copyCrop(
-        _sourceImage!,
-        x: xOffset,
-        y: yOffset,
-        width: initImSize,
-        height: initImSize,
-      );
-      img.Image resized = img.copyResize(
-        cropped,
-        width: tileSize,
-        interpolation: img.Interpolation.linear,
-      );
+      img.Image cropped = img.copyCrop(_sourceImage!, x: xOffset, y: yOffset, width: initImSize, height: initImSize);
+      img.Image resized = img.copyResize(cropped, width: tileSize, interpolation: img.Interpolation.linear);
       return MemoryImage(img.encodePng(resized, singleFrame: true));
     } else {
-      Uint8List blankBytes = Base64Codec().decode(
-        "R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7",
-      );
+      Uint8List blankBytes = Base64Codec().decode("R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7");
       return MemoryImage(blankBytes);
     }
   }
