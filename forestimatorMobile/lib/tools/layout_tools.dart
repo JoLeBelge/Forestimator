@@ -221,7 +221,7 @@ class _ForestimatorScrollView extends State<ForestimatorScrollView> {
       });
     });
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _controller.jumpTo(1);
+      _controller.jumpTo(2);
     });
   }
 

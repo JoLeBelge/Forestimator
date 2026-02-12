@@ -60,40 +60,38 @@ class _MapPageState extends State<MapPage> {
   double iconSize = 50.0;
   ScrollController propertiesTableScrollController = ScrollController();
 
-  Point<double> _layToolBoxPos = Point<double>(gl.dsp.alignX(0), gl.dsp.alignY(-gl.eqPxH / 2.0));
-  Point<double> get _layToolBoxAnimOnScreenPos => Point<double>(gl.dsp.alignX(0), gl.dsp.alignY(-gl.eqPxH / 2.0));
-  Point<double> get _layToolBoxAnimOffScreenPos => Point<double>(gl.dsp.alignX(0), gl.dsp.alignY(-250));
-  Point<double> get _layToolBoxAnimUnderListPos =>
-      Point<double>(gl.dsp.alignX(0), gl.dsp.alignY(gl.eqPxH / 2.0 + computePolygonTitleHeight() * 3));
+  Offset _layToolBoxPos = Offset(gl.dsp.alignX(0), gl.dsp.alignY(-gl.eqPxH / 2.0));
+  Offset get _layToolBoxAnimOnScreenPos => Offset(gl.dsp.alignX(0), gl.dsp.alignY(-gl.eqPxH / 2.0));
+  Offset get _layToolBoxAnimOffScreenPos => Offset(gl.dsp.alignX(0), gl.dsp.alignY(-250));
+  Offset get _layToolBoxAnimUnderListPos =>
+      Offset(gl.dsp.alignX(0), gl.dsp.alignY(gl.eqPxH / 2.0 + computePolygonTitleHeight() * 3));
 
-  Point<double> _mainMenuSettingsBoxPos = Point<double>(
-    gl.dsp.alignX(-gl.eqPxW * .5 - 2),
-    gl.dsp.alignY(-gl.eqPxH * .5),
-  );
-  Point<double> get _mainMenuSettingsAnimOnScreenPos =>
-      Point<double>(gl.dsp.alignX(-gl.eqPxW * .5 - 2), gl.dsp.alignY(-gl.eqPxH * .5));
-  Point<double> get _mainMenuSettingsAnimOffScreenPos =>
-      Point<double>(gl.dsp.alignX(-gl.eqPxW), gl.dsp.alignY(-gl.eqPxH * .5));
+  Offset _mainMenuSettingsBoxPos = Offset(gl.dsp.alignX(-gl.eqPxW * .5 - 2), gl.dsp.alignY(-gl.eqPxH * .5));
+  Offset get _mainMenuSettingsAnimOnScreenPos =>
+      Offset(gl.dsp.alignX(-gl.eqPxW * .5 - 2), gl.dsp.alignY(-gl.eqPxH * .5));
+  Offset get _mainMenuSettingsAnimOffScreenPos => Offset(gl.dsp.alignX(-gl.eqPxW), gl.dsp.alignY(-gl.eqPxH * .5));
 
-  Point<double> _mainMenuEssenceBoxPos = Point<double>(gl.dsp.alignX(-33), gl.dsp.alignY(-gl.eqPxH * .5));
-  Point<double> get _mainMenuEssenceAnimOnScreenPos => Point<double>(gl.dsp.alignX(-33), gl.dsp.alignY(-gl.eqPxH * .5));
-  Point<double> get _mainMenuEssenceAnimOffScreenPos =>
-      Point<double>(gl.dsp.alignX(-gl.eqPxW), gl.dsp.alignY(-gl.eqPxH * .5));
+  Offset _mainMenuEssenceBoxPos = Offset(gl.dsp.alignX(-33), gl.dsp.alignY(-gl.eqPxH * .5));
+  Offset get _mainMenuEssenceAnimOnScreenPos => Offset(gl.dsp.alignX(-33), gl.dsp.alignY(-gl.eqPxH * .5));
+  Offset get _mainMenuEssenceAnimOffScreenPos => Offset(gl.dsp.alignX(-gl.eqPxW), gl.dsp.alignY(-gl.eqPxH * .5));
 
-  Point<double> _mainMenuWarningsBoxPos = Point<double>(gl.dsp.alignX(gl.eqPxW * .5), gl.dsp.alignY(-gl.eqPxH * .5));
-  Point<double> get _mainMenuWarningsAnimOnScreenPos =>
-      Point<double>(gl.dsp.alignX(gl.eqPxW * .5), gl.dsp.alignY(-gl.eqPxH * .5));
-  Point<double> get _mainMenuWarningsAnimOffScreenPos =>
-      Point<double>(gl.dsp.alignX(-gl.eqPxW), gl.dsp.alignY(-gl.eqPxH * .5));
+  Offset _mainMenuWarningsBoxPos = Offset(gl.dsp.alignX(gl.eqPxW * .5), gl.dsp.alignY(-gl.eqPxH * .5));
+  Offset get _mainMenuWarningsAnimOnScreenPos => Offset(gl.dsp.alignX(gl.eqPxW * .5), gl.dsp.alignY(-gl.eqPxH * .5));
+  Offset get _mainMenuWarningsAnimOffScreenPos => Offset(gl.dsp.alignX(-gl.eqPxW), gl.dsp.alignY(-gl.eqPxH * .5));
 
-  Point<double> _mainMenuOnOfflineBoxPos = Point<double>(gl.dsp.alignX(0), gl.dsp.alignY(-gl.eqPxH * .5));
-  Point<double> get _mainMenuOnOfflineAnimOnScreenPos => Point<double>(gl.dsp.alignX(0), gl.dsp.alignY(-gl.eqPxH * .5));
-  Point<double> get _mainMenuOnOfflineAnimOffScreenPos =>
-      Point<double>(gl.dsp.alignX(-2 * gl.eqPxW), gl.dsp.alignY(-gl.eqPxH * .5));
+  Offset _mainMenuOnOfflineBoxPos = Offset(gl.dsp.alignX(0), gl.dsp.alignY(-gl.eqPxH * .5));
+  Offset get _mainMenuOnOfflineAnimOnScreenPos => Offset(gl.dsp.alignX(0), gl.dsp.alignY(-gl.eqPxH * .5));
+  Offset get _mainMenuOnOfflineAnimOffScreenPos => Offset(gl.dsp.alignX(-2 * gl.eqPxW), gl.dsp.alignY(-gl.eqPxH * .5));
 
-  Point<double> _boxPos = Point<double>(gl.dsp.alignX(0), gl.dsp.alignY(-6000));
-  Point<double> get _animOnScreenPos => Point<double>(gl.dsp.alignX(0), gl.dsp.alignY(-gl.eqPxH / 2.0));
-  Point<double> get _animOffScreenPos => Point<double>(gl.dsp.alignX(0), gl.dsp.alignY(-6000));
+  Offset _boxPos = Offset(gl.dsp.alignX(0), gl.dsp.alignY(-6000));
+  Offset get _animOnScreenPos => Offset(gl.dsp.alignX(0), gl.dsp.alignY(-gl.eqPxH / 2.0 + gl.dsp.paddingTop * 2));
+  Offset get _animOffScreenPos => Offset(gl.dsp.alignX(0), gl.dsp.alignY(-6000));
+
+  Offset _anaToolbarBoxPos = Offset(gl.dsp.alignX(-gl.eqPxW), gl.dsp.alignY(gl.eqPxH * .5));
+  Offset get _anaToolbarAnimOnScreenPos =>
+      Offset(gl.dsp.alignX(-gl.eqPxW * .5 + 0), gl.dsp.alignY(gl.eqPxH * .5 - gl.menuBarThickness));
+  Offset get _anaToolbarAnimOffScreenPos =>
+      Offset(gl.dsp.alignX(-gl.eqPxW), gl.dsp.alignY(gl.eqPxH * .5 - gl.menuBarThickness));
 
   //https://github.com/fleaflet/flutter_map/blob/master/example/lib/pages/custom_crs/custom_crs.dart
   late proj4.Projection epsg4326 = proj4.Projection.get('EPSG:4326')!;
@@ -586,11 +584,12 @@ class _MapPageState extends State<MapPage> {
                       ),
                       forestimatorTopMenuElements,
                       forestimatorGeoMenu,
+                      forestimatorAnalysisToolbar,
                       _mainMenuBar(),
-                      if (_toolbarExtended) _toolBar(),
                     ] +
                     gl.mainStack +
-                    [if (gl.modeDevelopper && gl.Mode.debugScanlines) lt.gridlines()],
+                    [if (gl.modeDevelopper && gl.Mode.debugScanlines) lt.gridlines()] +
+                    gl.stack.widgets,
               );
             },
           ),
@@ -606,7 +605,7 @@ class _MapPageState extends State<MapPage> {
         width: gl.eqPx * gl.eqPxW,
         height: gl.eqPx * gl.eqPxH,
         child: AnimatedContainer(
-          alignment: Alignment(_layToolBoxPos.x, _layToolBoxPos.y),
+          alignment: Alignment(_layToolBoxPos.dx, _layToolBoxPos.dy),
           curve: Curves.linearToEaseOut,
           duration: Duration(milliseconds: 1500),
           child: forestimatorBuildGeoMenu,
@@ -616,7 +615,7 @@ class _MapPageState extends State<MapPage> {
         height: gl.eqPx * gl.eqPxH,
         width: gl.eqPx * gl.eqPxW,
         child: AnimatedContainer(
-          alignment: AlignmentGeometry.xy(_boxPos.x, _boxPos.y),
+          alignment: AlignmentGeometry.xy(_boxPos.dx, _boxPos.dy),
           curve: Curves.linearToEaseOut,
           duration: Duration(milliseconds: 1500),
           child: GeoLayerListMenu(
@@ -805,7 +804,7 @@ class _MapPageState extends State<MapPage> {
                                                       fontSize: gl.eqPx * gl.fontSizeXS * .9,
                                                     ),
                                                   )
-                                                  : gl.selLay.type == "Polygon"
+                                                  : gl.geoLayers[index].type == "Polygon"
                                                   ? Text(
                                                     "POLY",
                                                     style: TextStyle(
@@ -1184,336 +1183,367 @@ class _MapPageState extends State<MapPage> {
                                         child: Container(
                                           color: gl.backgroundTransparentBlackBox.withAlpha(100),
                                           height: gl.eqPx * gl.attributeTableHeight,
-                                          child: ListView(
-                                            controller: propertiesTableScrollController,
-                                            children:
-                                                <Widget>[
-                                                  _getFixedAttribute("type", gl.selGeo.type),
-                                                  _getFixedAttribute("nom", gl.selGeo.name, checked: true),
-                                                  if (gl.selGeo.type == "Polygon")
-                                                    _getFixedAttribute(
-                                                      "surface",
-                                                      "${(gl.selGeo.area / 100).round() / 100}",
-                                                    ),
-                                                  if (gl.selGeo.type == "Polygon")
-                                                    _getFixedAttribute(
-                                                      "circonference",
-                                                      "${(gl.selGeo.perimeter).round() / 1000}",
-                                                    ),
+                                          child:
+                                              gl.geoReady
+                                                  ? ListView(
+                                                    controller: propertiesTableScrollController,
+                                                    children:
+                                                        <Widget>[
+                                                          _getFixedAttribute("type", gl.selGeo.type),
+                                                          _getFixedAttribute("nom", gl.selGeo.name, checked: true),
+                                                          if (gl.selGeo.type == "Polygon")
+                                                            _getFixedAttribute(
+                                                              "surface",
+                                                              "${(gl.selGeo.area / 100).round() / 100}",
+                                                            ),
+                                                          if (gl.selGeo.type == "Polygon")
+                                                            _getFixedAttribute(
+                                                              "circonference",
+                                                              "${(gl.selGeo.perimeter).round() / 1000}",
+                                                            ),
 
-                                                  _getFixedAttribute("coordinates", gl.selGeo.getPolyPointsString()),
-                                                ] +
-                                                List<Widget>.generate(gl.selGeo.attributes.length, (i) {
-                                                  return Column(
-                                                    children: [
-                                                      Row(
-                                                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                                        children: [
-                                                          SizedBox(
-                                                            width: gl.eqPx * 11,
-                                                            height: gl.eqPx * gl.iconSizeS,
-                                                            child: TextButton(
-                                                              style: ButtonStyle(
-                                                                animationDuration: Duration(seconds: 1),
-                                                                backgroundColor: WidgetStateProperty<Color>.fromMap(
-                                                                  <WidgetStatesConstraint, Color>{
-                                                                    WidgetState.any: Colors.transparent,
-                                                                  },
-                                                                ),
-                                                                padding:
-                                                                    WidgetStateProperty<EdgeInsetsGeometry>.fromMap(
-                                                                      <WidgetStatesConstraint, EdgeInsetsGeometry>{
-                                                                        WidgetState.any: EdgeInsetsGeometry.zero,
-                                                                      },
-                                                                    ),
-                                                              ),
-                                                              onPressed: () {},
-                                                              onLongPress: () {},
-                                                              child: Container(
-                                                                alignment: Alignment.center,
-                                                                child:
-                                                                    gl.selGeo.attributes[i].type == "int"
-                                                                        ? Text(
-                                                                          "INT",
-                                                                          style: TextStyle(
-                                                                            color: Colors.yellow,
-                                                                            fontSize: gl.fontSizeXXS * gl.eqPx,
-                                                                          ),
-                                                                        )
-                                                                        : gl.selGeo.attributes[i].type == "string"
-                                                                        ? Text(
-                                                                          "STRING",
-                                                                          style: TextStyle(
-                                                                            color: Colors.lightBlue,
-                                                                            fontSize: gl.fontSizeXXS * gl.eqPx,
-                                                                          ),
-                                                                        )
-                                                                        : gl.selGeo.attributes[i].type == "double"
-                                                                        ? Text(
-                                                                          "DOUBLE",
-                                                                          style: TextStyle(
-                                                                            color: Colors.red,
-                                                                            fontSize: gl.fontSizeXXS * gl.eqPx,
-                                                                          ),
-                                                                        )
-                                                                        : Text(
-                                                                          "UFO",
-                                                                          style: TextStyle(
-                                                                            color: Colors.green,
-                                                                            fontSize: gl.fontSizeXXS * gl.eqPx,
-                                                                          ),
+                                                          _getFixedAttribute(
+                                                            "coordinates",
+                                                            gl.selGeo.getPolyPointsString(),
+                                                          ),
+                                                        ] +
+                                                        List<Widget>.generate(gl.selGeo.attributes.length, (i) {
+                                                          return Column(
+                                                            children: [
+                                                              Row(
+                                                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                                                children: [
+                                                                  SizedBox(
+                                                                    width: gl.eqPx * 11,
+                                                                    height: gl.eqPx * gl.iconSizeS,
+                                                                    child: TextButton(
+                                                                      style: ButtonStyle(
+                                                                        animationDuration: Duration(seconds: 1),
+                                                                        backgroundColor:
+                                                                            WidgetStateProperty<Color>.fromMap(
+                                                                              <WidgetStatesConstraint, Color>{
+                                                                                WidgetState.any: Colors.transparent,
+                                                                              },
+                                                                            ),
+                                                                        padding: WidgetStateProperty<
+                                                                          EdgeInsetsGeometry
+                                                                        >.fromMap(
+                                                                          <WidgetStatesConstraint, EdgeInsetsGeometry>{
+                                                                            WidgetState.any: EdgeInsetsGeometry.zero,
+                                                                          },
                                                                         ),
-                                                              ),
-                                                            ),
-                                                          ),
-                                                          lt.stroke(
-                                                            vertical: true,
-                                                            gl.eqPx,
-                                                            gl.eqPx * 0.5,
-                                                            gl.colorAgroBioTech,
-                                                          ),
-                                                          SizedBox(
-                                                            width: gl.eqPx * 7,
-                                                            height: gl.eqPx * gl.iconSizeM,
-                                                            child: IconButton(
-                                                              style: ButtonStyle(
-                                                                animationDuration: Duration(seconds: 1),
-                                                                backgroundColor: WidgetStateProperty<Color>.fromMap(
-                                                                  <WidgetStatesConstraint, Color>{
-                                                                    WidgetState.any: Colors.transparent,
-                                                                  },
-                                                                ),
-                                                                padding:
-                                                                    WidgetStateProperty<EdgeInsetsGeometry>.fromMap(
-                                                                      <WidgetStatesConstraint, EdgeInsetsGeometry>{
-                                                                        WidgetState.any: EdgeInsetsGeometry.zero,
-                                                                      },
-                                                                    ),
-                                                              ),
-                                                              onPressed: () {},
-                                                              onLongPress: () async {
-                                                                refreshView(() {
-                                                                  gl
-                                                                      .selLay
-                                                                      .geometries[gl.selLay.selectedGeometry]
-                                                                      .attributes[i]
-                                                                      .visibleOnMapLabel = !gl
-                                                                          .selLay
-                                                                          .geometries[gl.selLay.selectedGeometry]
-                                                                          .attributes[i]
-                                                                          .visibleOnMapLabel;
-                                                                });
-                                                                gl.selGeo.serialize();
-                                                              },
-                                                              icon:
-                                                                  gl
-                                                                          .selLay
-                                                                          .geometries[gl.selLay.selectedGeometry]
-                                                                          .attributes[i]
-                                                                          .visibleOnMapLabel
-                                                                      ? Icon(
-                                                                        Icons.check_box_outlined,
-                                                                        color: Colors.white,
-                                                                        size: gl.eqPx * gl.iconSizeXS,
-                                                                      )
-                                                                      : Icon(
-                                                                        Icons.check_box_outline_blank,
-                                                                        color: Colors.white,
-                                                                        size: gl.eqPx * gl.iconSizeXS,
                                                                       ),
-                                                            ),
-                                                          ),
-                                                          lt.stroke(
-                                                            vertical: true,
-                                                            gl.eqPx,
-                                                            gl.eqPx * 0.5,
-                                                            gl.colorAgroBioTech,
-                                                          ),
-                                                          SizedBox(
-                                                            width: gl.eqPx * 33,
-                                                            height: gl.eqPx * gl.iconSizeS,
-                                                            child: TextButton(
-                                                              style: ButtonStyle(
-                                                                animationDuration: Duration(seconds: 1),
-                                                                backgroundColor: WidgetStateProperty<Color>.fromMap(
-                                                                  <WidgetStatesConstraint, Color>{
-                                                                    WidgetState.any: Colors.transparent,
-                                                                  },
-                                                                ),
-                                                                padding:
-                                                                    WidgetStateProperty<EdgeInsetsGeometry>.fromMap(
-                                                                      <WidgetStatesConstraint, EdgeInsetsGeometry>{
-                                                                        WidgetState.any: EdgeInsetsGeometry.zero,
-                                                                      },
-                                                                    ),
-                                                              ),
-                                                              onPressed: () {},
-                                                              onLongPress: () {
-                                                                PopupValueChange(
-                                                                  "prop",
-                                                                  gl.selGeo.attributes[i].name,
-                                                                  (value) {
-                                                                    gl
-                                                                        .selLay
-                                                                        .geometries[gl.selLay.selectedGeometry]
-                                                                        .attributes[i]
-                                                                        .name = cleanAttributeName(value.toString());
-                                                                  },
-                                                                  () {},
-                                                                  () {
-                                                                    String nom = gl.selGeo.attributes[i].name;
-                                                                    if (controlDuplicateAttributeName(
-                                                                      gl.selGeo.attributes[i].name,
-                                                                      gl.selGeo.attributes,
-                                                                    )) {
-                                                                      PopupMessage(
-                                                                        "Erreur",
-                                                                        "Le nom $nom existe déja!",
-                                                                      );
-                                                                      return;
-                                                                    } else {
-                                                                      gl.selGeo.serialize();
-                                                                    }
-                                                                  },
-                                                                );
-                                                              },
-                                                              child: Container(
-                                                                alignment: Alignment.centerLeft,
-                                                                child: SingleChildScrollView(
-                                                                  scrollDirection: Axis.horizontal,
-                                                                  child: Text(
-                                                                    gl.selGeo.attributes[i].name,
-                                                                    textAlign: TextAlign.start,
-                                                                    style: TextStyle(
-                                                                      color: Colors.white,
-                                                                      fontSize: gl.eqPx * gl.fontSizeM * .75,
+                                                                      onPressed: () {},
+                                                                      onLongPress: () {},
+                                                                      child: Container(
+                                                                        alignment: Alignment.center,
+                                                                        child:
+                                                                            gl.selGeo.attributes[i].type == "int"
+                                                                                ? Text(
+                                                                                  "INT",
+                                                                                  style: TextStyle(
+                                                                                    color: Colors.yellow,
+                                                                                    fontSize: gl.fontSizeXXS * gl.eqPx,
+                                                                                  ),
+                                                                                )
+                                                                                : gl.selGeo.attributes[i].type ==
+                                                                                    "string"
+                                                                                ? Text(
+                                                                                  "STRING",
+                                                                                  style: TextStyle(
+                                                                                    color: Colors.lightBlue,
+                                                                                    fontSize: gl.fontSizeXXS * gl.eqPx,
+                                                                                  ),
+                                                                                )
+                                                                                : gl.selGeo.attributes[i].type ==
+                                                                                    "double"
+                                                                                ? Text(
+                                                                                  "DOUBLE",
+                                                                                  style: TextStyle(
+                                                                                    color: Colors.red,
+                                                                                    fontSize: gl.fontSizeXXS * gl.eqPx,
+                                                                                  ),
+                                                                                )
+                                                                                : Text(
+                                                                                  "UFO",
+                                                                                  style: TextStyle(
+                                                                                    color: Colors.green,
+                                                                                    fontSize: gl.fontSizeXXS * gl.eqPx,
+                                                                                  ),
+                                                                                ),
+                                                                      ),
                                                                     ),
                                                                   ),
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ),
-                                                          lt.stroke(
-                                                            vertical: true,
-                                                            gl.eqPx,
-                                                            gl.eqPx * 0.5,
-                                                            gl.colorAgroBioTech,
-                                                          ),
-                                                          SizedBox(
-                                                            width: gl.eqPx * 33,
-                                                            height: gl.eqPx * gl.iconSizeS,
-                                                            child: TextButton(
-                                                              style: ButtonStyle(
-                                                                animationDuration: Duration(seconds: 1),
-                                                                backgroundColor: WidgetStateProperty<Color>.fromMap(
-                                                                  <WidgetStatesConstraint, Color>{
-                                                                    WidgetState.any: Colors.transparent,
-                                                                  },
-                                                                ),
-                                                                padding:
-                                                                    WidgetStateProperty<EdgeInsetsGeometry>.fromMap(
-                                                                      <WidgetStatesConstraint, EdgeInsetsGeometry>{
-                                                                        WidgetState.any: EdgeInsetsGeometry.zero,
+                                                                  lt.stroke(
+                                                                    vertical: true,
+                                                                    gl.eqPx,
+                                                                    gl.eqPx * 0.5,
+                                                                    gl.colorAgroBioTech,
+                                                                  ),
+                                                                  SizedBox(
+                                                                    width: gl.eqPx * 7,
+                                                                    height: gl.eqPx * gl.iconSizeM,
+                                                                    child: IconButton(
+                                                                      style: ButtonStyle(
+                                                                        animationDuration: Duration(seconds: 1),
+                                                                        backgroundColor:
+                                                                            WidgetStateProperty<Color>.fromMap(
+                                                                              <WidgetStatesConstraint, Color>{
+                                                                                WidgetState.any: Colors.transparent,
+                                                                              },
+                                                                            ),
+                                                                        padding: WidgetStateProperty<
+                                                                          EdgeInsetsGeometry
+                                                                        >.fromMap(
+                                                                          <WidgetStatesConstraint, EdgeInsetsGeometry>{
+                                                                            WidgetState.any: EdgeInsetsGeometry.zero,
+                                                                          },
+                                                                        ),
+                                                                      ),
+                                                                      onPressed: () {},
+                                                                      onLongPress: () async {
+                                                                        refreshView(() {
+                                                                          gl
+                                                                              .selLay
+                                                                              .geometries[gl.selLay.selectedGeometry]
+                                                                              .attributes[i]
+                                                                              .visibleOnMapLabel = !gl
+                                                                                  .selLay
+                                                                                  .geometries[gl
+                                                                                      .selLay
+                                                                                      .selectedGeometry]
+                                                                                  .attributes[i]
+                                                                                  .visibleOnMapLabel;
+                                                                        });
+                                                                        gl.selGeo.serialize();
                                                                       },
+                                                                      icon:
+                                                                          gl
+                                                                                  .selLay
+                                                                                  .geometries[gl
+                                                                                      .selLay
+                                                                                      .selectedGeometry]
+                                                                                  .attributes[i]
+                                                                                  .visibleOnMapLabel
+                                                                              ? Icon(
+                                                                                Icons.check_box_outlined,
+                                                                                color: Colors.white,
+                                                                                size: gl.eqPx * gl.iconSizeXS,
+                                                                              )
+                                                                              : Icon(
+                                                                                Icons.check_box_outline_blank,
+                                                                                color: Colors.white,
+                                                                                size: gl.eqPx * gl.iconSizeXS,
+                                                                              ),
                                                                     ),
-                                                              ),
-                                                              onPressed: () {},
-                                                              onLongPress: () {
-                                                                PopupValueChange(
-                                                                  gl.selGeo.attributes[i].type,
-                                                                  gl.selGeo.attributes[i].value,
-                                                                  (value) {
-                                                                    gl.selGeo.attributes[i].value = value;
-                                                                  },
-                                                                  () {},
-                                                                  () {
-                                                                    gl.selGeo.serialize();
-                                                                  },
-                                                                );
-                                                              },
-                                                              child: Container(
-                                                                alignment: Alignment.centerLeft,
-                                                                child: SingleChildScrollView(
-                                                                  scrollDirection: Axis.horizontal,
-                                                                  child:
-                                                                      gl.selGeo.attributes[i].type == "string"
-                                                                          ? Text(
+                                                                  ),
+                                                                  lt.stroke(
+                                                                    vertical: true,
+                                                                    gl.eqPx,
+                                                                    gl.eqPx * 0.5,
+                                                                    gl.colorAgroBioTech,
+                                                                  ),
+                                                                  SizedBox(
+                                                                    width: gl.eqPx * 33,
+                                                                    height: gl.eqPx * gl.iconSizeS,
+                                                                    child: TextButton(
+                                                                      style: ButtonStyle(
+                                                                        animationDuration: Duration(seconds: 1),
+                                                                        backgroundColor:
+                                                                            WidgetStateProperty<Color>.fromMap(
+                                                                              <WidgetStatesConstraint, Color>{
+                                                                                WidgetState.any: Colors.transparent,
+                                                                              },
+                                                                            ),
+                                                                        padding: WidgetStateProperty<
+                                                                          EdgeInsetsGeometry
+                                                                        >.fromMap(
+                                                                          <WidgetStatesConstraint, EdgeInsetsGeometry>{
+                                                                            WidgetState.any: EdgeInsetsGeometry.zero,
+                                                                          },
+                                                                        ),
+                                                                      ),
+                                                                      onPressed: () {},
+                                                                      onLongPress: () {
+                                                                        PopupValueChange(
+                                                                          "prop",
+                                                                          gl.selGeo.attributes[i].name,
+                                                                          (value) {
                                                                             gl
                                                                                 .selLay
                                                                                 .geometries[gl.selLay.selectedGeometry]
                                                                                 .attributes[i]
-                                                                                .value,
+                                                                                .name = cleanAttributeName(
+                                                                              value.toString(),
+                                                                            );
+                                                                          },
+                                                                          () {},
+                                                                          () {
+                                                                            String nom = gl.selGeo.attributes[i].name;
+                                                                            if (controlDuplicateAttributeName(
+                                                                              gl.selGeo.attributes[i].name,
+                                                                              gl.selGeo.attributes,
+                                                                            )) {
+                                                                              PopupMessage(
+                                                                                "Erreur",
+                                                                                "Le nom $nom existe déja!",
+                                                                              );
+                                                                              return;
+                                                                            } else {
+                                                                              gl.selGeo.serialize();
+                                                                            }
+                                                                          },
+                                                                        );
+                                                                      },
+                                                                      child: Container(
+                                                                        alignment: Alignment.centerLeft,
+                                                                        child: SingleChildScrollView(
+                                                                          scrollDirection: Axis.horizontal,
+                                                                          child: Text(
+                                                                            gl.selGeo.attributes[i].name,
                                                                             textAlign: TextAlign.start,
-                                                                            style: TextStyle(
-                                                                              color: Colors.white,
-                                                                              fontSize: gl.eqPx * gl.fontSizeM * .75,
-                                                                            ),
-                                                                          )
-                                                                          : gl
-                                                                                  .selLay
-                                                                                  .geometries[gl
-                                                                                      .selLay
-                                                                                      .selectedGeometry]
-                                                                                  .attributes[i]
-                                                                                  .type ==
-                                                                              "int"
-                                                                          ? Text(
-                                                                            gl.selGeo.attributes[i].value.toString(),
-                                                                            textAlign: TextAlign.start,
-                                                                            style: TextStyle(
-                                                                              color: Colors.white,
-                                                                              fontSize: gl.eqPx * gl.fontSizeM * .75,
-                                                                            ),
-                                                                          )
-                                                                          : gl
-                                                                                  .selLay
-                                                                                  .geometries[gl
-                                                                                      .selLay
-                                                                                      .selectedGeometry]
-                                                                                  .attributes[i]
-                                                                                  .type ==
-                                                                              "double"
-                                                                          ? Text(
-                                                                            gl.selGeo.attributes[i].value.toString(),
-                                                                            textAlign: TextAlign.start,
-                                                                            style: TextStyle(
-                                                                              color: Colors.white,
-                                                                              fontSize: gl.eqPx * gl.fontSizeM * .75,
-                                                                            ),
-                                                                          )
-                                                                          : gl
-                                                                                  .selLay
-                                                                                  .geometries[gl
-                                                                                      .selLay
-                                                                                      .selectedGeometry]
-                                                                                  .attributes[i]
-                                                                                  .type ==
-                                                                              "special"
-                                                                          ? Text(
-                                                                            "special value",
-                                                                            style: TextStyle(
-                                                                              color: Colors.white,
-                                                                              fontSize: gl.eqPx * gl.fontSizeM * .75,
-                                                                            ),
-                                                                          )
-                                                                          : Text(
-                                                                            "ERROR TYPE ${gl.selGeo.attributes[i].type}",
                                                                             style: TextStyle(
                                                                               color: Colors.white,
                                                                               fontSize: gl.eqPx * gl.fontSizeM * .75,
                                                                             ),
                                                                           ),
-                                                                ),
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                  lt.stroke(
+                                                                    vertical: true,
+                                                                    gl.eqPx,
+                                                                    gl.eqPx * 0.5,
+                                                                    gl.colorAgroBioTech,
+                                                                  ),
+                                                                  SizedBox(
+                                                                    width: gl.eqPx * 33,
+                                                                    height: gl.eqPx * gl.iconSizeS,
+                                                                    child: TextButton(
+                                                                      style: ButtonStyle(
+                                                                        animationDuration: Duration(seconds: 1),
+                                                                        backgroundColor:
+                                                                            WidgetStateProperty<Color>.fromMap(
+                                                                              <WidgetStatesConstraint, Color>{
+                                                                                WidgetState.any: Colors.transparent,
+                                                                              },
+                                                                            ),
+                                                                        padding: WidgetStateProperty<
+                                                                          EdgeInsetsGeometry
+                                                                        >.fromMap(
+                                                                          <WidgetStatesConstraint, EdgeInsetsGeometry>{
+                                                                            WidgetState.any: EdgeInsetsGeometry.zero,
+                                                                          },
+                                                                        ),
+                                                                      ),
+                                                                      onPressed: () {},
+                                                                      onLongPress: () {
+                                                                        PopupValueChange(
+                                                                          gl.selGeo.attributes[i].type,
+                                                                          gl.selGeo.attributes[i].value,
+                                                                          (value) {
+                                                                            gl.selGeo.attributes[i].value = value;
+                                                                          },
+                                                                          () {},
+                                                                          () {
+                                                                            gl.selGeo.serialize();
+                                                                          },
+                                                                        );
+                                                                      },
+                                                                      child: Container(
+                                                                        alignment: Alignment.centerLeft,
+                                                                        child: SingleChildScrollView(
+                                                                          scrollDirection: Axis.horizontal,
+                                                                          child:
+                                                                              gl.selGeo.attributes[i].type == "string"
+                                                                                  ? Text(
+                                                                                    gl
+                                                                                        .selLay
+                                                                                        .geometries[gl
+                                                                                            .selLay
+                                                                                            .selectedGeometry]
+                                                                                        .attributes[i]
+                                                                                        .value,
+                                                                                    textAlign: TextAlign.start,
+                                                                                    style: TextStyle(
+                                                                                      color: Colors.white,
+                                                                                      fontSize:
+                                                                                          gl.eqPx * gl.fontSizeM * .75,
+                                                                                    ),
+                                                                                  )
+                                                                                  : gl
+                                                                                          .selLay
+                                                                                          .geometries[gl
+                                                                                              .selLay
+                                                                                              .selectedGeometry]
+                                                                                          .attributes[i]
+                                                                                          .type ==
+                                                                                      "int"
+                                                                                  ? Text(
+                                                                                    gl.selGeo.attributes[i].value
+                                                                                        .toString(),
+                                                                                    textAlign: TextAlign.start,
+                                                                                    style: TextStyle(
+                                                                                      color: Colors.white,
+                                                                                      fontSize:
+                                                                                          gl.eqPx * gl.fontSizeM * .75,
+                                                                                    ),
+                                                                                  )
+                                                                                  : gl
+                                                                                          .selLay
+                                                                                          .geometries[gl
+                                                                                              .selLay
+                                                                                              .selectedGeometry]
+                                                                                          .attributes[i]
+                                                                                          .type ==
+                                                                                      "double"
+                                                                                  ? Text(
+                                                                                    gl.selGeo.attributes[i].value
+                                                                                        .toString(),
+                                                                                    textAlign: TextAlign.start,
+                                                                                    style: TextStyle(
+                                                                                      color: Colors.white,
+                                                                                      fontSize:
+                                                                                          gl.eqPx * gl.fontSizeM * .75,
+                                                                                    ),
+                                                                                  )
+                                                                                  : gl
+                                                                                          .selLay
+                                                                                          .geometries[gl
+                                                                                              .selLay
+                                                                                              .selectedGeometry]
+                                                                                          .attributes[i]
+                                                                                          .type ==
+                                                                                      "special"
+                                                                                  ? Text(
+                                                                                    "special value",
+                                                                                    style: TextStyle(
+                                                                                      color: Colors.white,
+                                                                                      fontSize:
+                                                                                          gl.eqPx * gl.fontSizeM * .75,
+                                                                                    ),
+                                                                                  )
+                                                                                  : Text(
+                                                                                    "ERROR TYPE ${gl.selGeo.attributes[i].type}",
+                                                                                    style: TextStyle(
+                                                                                      color: Colors.white,
+                                                                                      fontSize:
+                                                                                          gl.eqPx * gl.fontSizeM * .75,
+                                                                                    ),
+                                                                                  ),
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                ],
                                                               ),
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                      lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
-                                                    ],
-                                                  );
-                                                }),
-                                          ),
+                                                              lt.stroke(gl.eqPx, gl.eqPx * .5, gl.colorAgroBioTech),
+                                                            ],
+                                                          );
+                                                        }),
+                                                  )
+                                                  : SizedBox(),
                                         ),
                                       ),
                                     ],
@@ -2095,11 +2125,23 @@ class _MapPageState extends State<MapPage> {
           )
           : Column();
 
+  Widget get forestimatorAnalysisToolbar => Stack(
+    alignment: AlignmentGeometry.center,
+    children: [
+      AnimatedContainer(
+        alignment: AlignmentGeometry.xy(_anaToolbarBoxPos.dx, _anaToolbarBoxPos.dy),
+        curve: Curves.easeInOutBack,
+        duration: Duration(milliseconds: 750),
+        child: toolBar,
+      ),
+    ],
+  );
+
   Widget get forestimatorTopMenuElements => Stack(
     alignment: AlignmentGeometry.center,
     children: [
       AnimatedContainer(
-        alignment: AlignmentGeometry.xy(_mainMenuSettingsBoxPos.x, _mainMenuSettingsBoxPos.y),
+        alignment: AlignmentGeometry.xy(_mainMenuSettingsBoxPos.dx, _mainMenuSettingsBoxPos.dy),
         curve: Curves.easeInOutBack,
         duration: Duration(milliseconds: 750),
         child: _forestimatorSettingButton,
@@ -2107,19 +2149,19 @@ class _MapPageState extends State<MapPage> {
 
       if (gl.Mode.essence)
         AnimatedContainer(
-          alignment: AlignmentGeometry.xy(_mainMenuEssenceBoxPos.x, _mainMenuEssenceBoxPos.y),
+          alignment: AlignmentGeometry.xy(_mainMenuEssenceBoxPos.dx, _mainMenuEssenceBoxPos.dy),
           curve: Curves.easeInOutBack,
           duration: Duration(milliseconds: 750),
           child: _forestimatorEssenceModeButton,
         ),
       AnimatedContainer(
-        alignment: AlignmentGeometry.xy(_mainMenuWarningsBoxPos.x, _mainMenuWarningsBoxPos.y),
+        alignment: AlignmentGeometry.xy(_mainMenuWarningsBoxPos.dx, _mainMenuWarningsBoxPos.dy),
         curve: Curves.easeInOutBack,
         duration: Duration(milliseconds: 750),
         child: _forestimatorWarnings,
       ),
       AnimatedContainer(
-        alignment: AlignmentGeometry.xy(_mainMenuOnOfflineBoxPos.x, _mainMenuOnOfflineBoxPos.y),
+        alignment: AlignmentGeometry.xy(_mainMenuOnOfflineBoxPos.dx, _mainMenuOnOfflineBoxPos.dy),
         curve: Curves.easeInOutBack,
         duration: Duration(milliseconds: 750),
         child: _forestimatorOnOffline,
@@ -2177,6 +2219,7 @@ class _MapPageState extends State<MapPage> {
             setState(() {
               gl.Mode.essence = false;
             });
+            gl.Mode.serialize();
           },
           "Attention",
           "Voulez vous fermer le mode Essence?",
@@ -2211,14 +2254,8 @@ class _MapPageState extends State<MapPage> {
       },
       child:
           gl.offlineMode
-              ? Text(
-                gl.Mode.essence ? "Forestimator [E] terrain" : "Forestimator terrain",
-                style: TextStyle(color: Colors.black, fontSize: gl.eqPx * gl.fontSizeXS),
-              )
-              : Text(
-                gl.Mode.essence ? "Forestimator [E] en ligne" : "Forestimator en ligne",
-                style: TextStyle(color: Colors.white, fontSize: gl.eqPx * gl.fontSizeXS),
-              ),
+              ? Text("Forestimator terrain", style: TextStyle(color: Colors.black, fontSize: gl.eqPx * gl.fontSizeXS))
+              : Text("Forestimator en ligne", style: TextStyle(color: Colors.white, fontSize: gl.eqPx * gl.fontSizeXS)),
     ),
   );
 
@@ -2257,13 +2294,11 @@ class _MapPageState extends State<MapPage> {
 
   List<Polygon<String>> _getPolygonesToDraw() {
     List<Polygon<String>> that = [];
-    if (gl.layerReady) {
-      for (GeometricLayer layer in gl.geoLayers) {
-        if (layer.visibleOnMap && layer.type == "Polygon") {
-          for (var g in layer.geometries) {
-            if (g.numPoints > 2 && g.visibleOnMap) {
-              that.add(Polygon<String>(points: g.points, color: g.colorInside, hitValue: g.identifier));
-            }
+    for (GeometricLayer layer in gl.geoLayers) {
+      if (layer.visibleOnMap && layer.type == "Polygon") {
+        for (var g in layer.geometries) {
+          if (g.numPoints > 2 && g.visibleOnMap) {
+            that.add(Polygon<String>(points: g.points, color: g.colorInside, hitValue: g.identifier));
           }
         }
       }
@@ -2273,69 +2308,67 @@ class _MapPageState extends State<MapPage> {
 
   List<Marker> _getPointsToDraw({bool hitButton = false}) {
     List<Marker> that = [];
-    if (gl.layerReady) {
-      int index = 0;
-      for (GeometricLayer layer in gl.geoLayers) {
-        for (pl.Geometry geometry in layer.geometries) {
-          gl.selectableIcons[geometry.selectedPointIcon];
-          if (geometry.visibleOnMap && geometry.numPoints > 0 && geometry.type.contains("Point")) {
-            that.add(
-              Marker(
-                width: geometry.iconSize * gl.eqPx,
-                height: geometry.iconSize * gl.eqPx,
-                point: LatLng(geometry.points.first.latitude, geometry.points.first.longitude),
-                child:
-                    hitButton && gl.selectedGeoLayer != index
-                        ? IconButton(
-                          highlightColor: Colors.transparent,
-                          alignment: Alignment.center,
-                          style: ButtonStyle(
-                            shape: WidgetStateProperty.fromMap(<WidgetStatesConstraint, ContinuousRectangleBorder>{
-                              WidgetState.any: ContinuousRectangleBorder(),
-                            }),
-                            alignment: AlignmentGeometry.center,
-                            padding: WidgetStateProperty.fromMap(<WidgetStatesConstraint, EdgeInsetsGeometry>{
-                              WidgetState.any: EdgeInsetsGeometry.zero,
-                            }),
-                          ),
-                          onPressed: () {
-                            if (gl.Mode.polygon) {
-                              setState(() {
-                                int index = 0;
-                                for (pl.Geometry it in gl.selLay.geometries) {
-                                  if (geometry.identifier == it.identifier) {
-                                    setState(() {
-                                      gl.selLay.selectedGeometry = index;
-                                    });
-                                  }
-                                  index++;
+    int index = 0;
+    for (GeometricLayer layer in gl.geoLayers) {
+      for (pl.Geometry geometry in layer.geometries) {
+        gl.selectableIcons[geometry.selectedPointIcon];
+        if (geometry.visibleOnMap && geometry.numPoints > 0 && geometry.type.contains("Point")) {
+          that.add(
+            Marker(
+              width: geometry.iconSize * gl.eqPx,
+              height: geometry.iconSize * gl.eqPx,
+              point: LatLng(geometry.points.first.latitude, geometry.points.first.longitude),
+              child:
+                  hitButton && gl.selectedGeoLayer != index
+                      ? IconButton(
+                        highlightColor: Colors.transparent,
+                        alignment: Alignment.center,
+                        style: ButtonStyle(
+                          shape: WidgetStateProperty.fromMap(<WidgetStatesConstraint, ContinuousRectangleBorder>{
+                            WidgetState.any: ContinuousRectangleBorder(),
+                          }),
+                          alignment: AlignmentGeometry.center,
+                          padding: WidgetStateProperty.fromMap(<WidgetStatesConstraint, EdgeInsetsGeometry>{
+                            WidgetState.any: EdgeInsetsGeometry.zero,
+                          }),
+                        ),
+                        onPressed: () {
+                          if (gl.Mode.polygon) {
+                            setState(() {
+                              int index = 0;
+                              for (pl.Geometry it in gl.selLay.geometries) {
+                                if (geometry.identifier == it.identifier) {
+                                  setState(() {
+                                    gl.selLay.selectedGeometry = index;
+                                  });
                                 }
-                              });
-                            }
-                          },
-                          icon: Icon(
-                            gl.selectableIcons[geometry.selectedPointIcon],
-                            size: geometry.iconSize * gl.eqPx,
-                            color: geometry.colorLine,
-                          ),
-                        )
-                        : Icon(
+                                index++;
+                              }
+                            });
+                          }
+                        },
+                        icon: Icon(
                           gl.selectableIcons[geometry.selectedPointIcon],
                           size: geometry.iconSize * gl.eqPx,
                           color: geometry.colorLine,
                         ),
-              ),
-            );
-          }
-          index++;
+                      )
+                      : Icon(
+                        gl.selectableIcons[geometry.selectedPointIcon],
+                        size: geometry.iconSize * gl.eqPx,
+                        color: geometry.colorLine,
+                      ),
+            ),
+          );
         }
+        index++;
       }
     }
     return that;
   }
 
   List<CircleMarker> _drawnLayerPointsCircleMarker() {
-    if (gl.selLay.geometries.isEmpty) {
+    if (!gl.layerReady || gl.selLay.geometries.isEmpty) {
       return [];
     }
     List<CircleMarker> all = [];
@@ -2688,7 +2721,6 @@ class _MapPageState extends State<MapPage> {
           child: TextButton(
             onPressed: () {
               if (gl.Mode.addVertexesPolygon) {
-                //select line between points to place next point
                 refreshView(() {
                   gl.selGeo.refreshSelectedLinePoints(point);
                 });
@@ -2711,11 +2743,6 @@ class _MapPageState extends State<MapPage> {
                   gl.Mode.removeVertexesPolygon = false;
                 });
               }
-              /*if (gl.Mode.removeVertexesPolygon) {
-                refreshView(() {
-                  gl.polygonLayers[gl.selectedPolygonLayer].removePoint(point);
-                });
-              }*/
             },
             child: Text(
               overflow: TextOverflow.visible,
@@ -2761,8 +2788,15 @@ class _MapPageState extends State<MapPage> {
     });
   }
 
+  set _toolBarMenu(bool mode) {
+    setState(() {
+      _toolbarExtended = mode;
+      _anaToolbarBoxPos = mode ? _anaToolbarAnimOnScreenPos : _anaToolbarAnimOffScreenPos;
+    });
+  }
+
   void _closeToolbarMenu() {
-    _toolbarExtended = false;
+    _toolBarMenu = false;
     _modeSearch = false;
     _modeMeasurePath = false;
   }
@@ -2797,6 +2831,7 @@ class _MapPageState extends State<MapPage> {
                     if (dummy) {
                       close!();
                     }
+                    _toolBarMenu = true;
                   } else {
                     _closeToolbarMenu();
                   }
@@ -2930,186 +2965,179 @@ class _MapPageState extends State<MapPage> {
     );
   }
 
-  Widget _toolBar() {
+  Widget get toolBar {
     double toolbarHeight = gl.iconSizeM * 2 + gl.iconSpaceBetween * 2;
     if (gl.modeDevelopper) {
       toolbarHeight += gl.iconSizeM + gl.iconSpaceBetween;
     }
-    if (_positionInsideViewRectangle(gl.position)) {
+    if (gl.positionInit && _positionInsideViewRectangle(gl.position)) {
       toolbarHeight += gl.iconSizeM + gl.iconSpaceBetween;
     }
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Container(
-              alignment: Alignment.center,
-              constraints: BoxConstraints(maxHeight: gl.eqPx * toolbarHeight, maxWidth: gl.eqPx * gl.menuBarThickness),
-              child: Card(
-                color: gl.backgroundTransparentBlackBox,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    gl.positionInit
-                        ? Card(
-                          color: Colors.orange.withAlpha(128),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              if (_positionInsideViewRectangle(gl.position))
-                                IconButton(
-                                  iconSize: gl.eqPx * gl.iconSizeM,
-                                  color: gl.colorAgroBioTech,
-                                  onPressed: () async {
-                                    if (!_doingAnaPt) {
-                                      refreshView(() {
-                                        _doingAnaPt = true;
-                                      });
-                                      await _runAnaPt(
-                                        epsg4326.transform(
-                                          epsg31370,
-                                          proj4.Point(x: gl.position.longitude, y: gl.position.latitude),
-                                        ),
-                                      );
-                                      _updatePtMarker(LatLng(gl.position.latitude, gl.position.longitude));
-                                      PopupAnaResultsMenu(gl.notificationContext!, gl.requestedLayers, () {
-                                        refreshView(() {});
-                                      });
-                                      refreshView(() {
-                                        _doingAnaPt = false;
-                                      });
-                                    }
-                                  },
-                                  icon: const Icon(Icons.analytics),
-                                ),
+    return Container(
+      alignment: Alignment.center,
+      height: gl.eqPx * toolbarHeight,
+      width: gl.eqPx * gl.menuBarThickness,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          SizedBox(
+            height: gl.eqPx * toolbarHeight,
+            width: gl.eqPx * gl.menuBarThickness,
+            child: Card(
+              color: gl.backgroundTransparentBlackBox,
+
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  gl.positionInit
+                      ? Card(
+                        color: Colors.orange.withAlpha(128),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            if (_positionInsideViewRectangle(gl.position))
                               IconButton(
                                 iconSize: gl.eqPx * gl.iconSizeM,
-                                color: Colors.red,
+                                color: gl.colorAgroBioTech,
                                 onPressed: () async {
-                                  if (gl.positionInit) {
+                                  if (!_doingAnaPt) {
                                     refreshView(() {
-                                      _mapController.move(LatLng(gl.position.latitude, gl.position.longitude), 8);
+                                      _doingAnaPt = true;
+                                    });
+                                    await _runAnaPt(
+                                      epsg4326.transform(
+                                        epsg31370,
+                                        proj4.Point(x: gl.position.longitude, y: gl.position.latitude),
+                                      ),
+                                    );
+                                    _updatePtMarker(LatLng(gl.position.latitude, gl.position.longitude));
+                                    PopupAnaResultsMenu(gl.notificationContext!, gl.requestedLayers, () {
+                                      refreshView(() {});
+                                    });
+                                    refreshView(() {
+                                      _doingAnaPt = false;
                                     });
                                   }
                                 },
-                                icon: Icon(Icons.gps_fixed),
+                                icon: const Icon(Icons.analytics),
                               ),
-                            ],
-                          ),
-                        )
-                        : Column(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
                             IconButton(
                               iconSize: gl.eqPx * gl.iconSizeM,
-                              color: Colors.black,
+                              color: Colors.red,
                               onPressed: () async {
                                 if (gl.positionInit) {
-                                  refreshView(() {});
+                                  refreshView(() {
+                                    _mapController.move(LatLng(gl.position.latitude, gl.position.longitude), 8);
+                                  });
                                 }
                               },
                               icon: Icon(Icons.gps_fixed),
                             ),
                           ],
                         ),
-                    if (gl.Mode.expertTools && gl.modeDevelopper)
-                      Container(
-                        color: !_modeMeasurePath ? Colors.transparent : Colors.lightBlue.withAlpha(128),
-                        child: IconButton(
-                          color: _modeMeasurePath ? Colors.white : Colors.lightBlue,
-                          iconSize: gl.eqPx * gl.iconSizeM,
-                          isSelected: _modeMeasurePath,
-                          onPressed: () {
-                            setState(() {
-                              _modeMeasurePath = !_modeMeasurePath;
-                              _modeAnaPtPreview = !_modeMeasurePath;
-                              _measurePath.clear();
-                            });
-                          },
-                          icon: Icon(Icons.more_horiz_outlined),
-                        ),
-                      ),
-                    if (gl.Mode.expertTools && gl.modeDevelopper)
-                      Container(
-                        color: !gl.Mode.recordPath ? Colors.transparent : Colors.yellow.withAlpha(128),
-                        child: IconButton(
-                          color: gl.Mode.recordPath ? Colors.white : Colors.yellow.withAlpha(128),
-                          iconSize: gl.eqPx * gl.iconSizeM,
-                          isSelected: gl.Mode.recordPath,
-                          onPressed: () {
-                            setState(() {
-                              gl.Mode.recordPath = !gl.Mode.recordPath;
-                              _modeAnaPtPreview = !gl.Mode.recordPath;
-                              if (gl.Mode.recordPath) {
-                                gl.mainStack.add(
-                                  popupPathListMenu(
-                                    gl.notificationContext!,
-                                    gl.selGeo.name,
-                                    (LatLng pos) {
-                                      if (pos.longitude != 0.0 && pos.latitude != 0.0) {
-                                        _mapController.move(pos, _mapController.camera.zoom);
-                                      }
-                                    },
-                                    () {
-                                      refreshView(() {
-                                        gl.Mode.recordPath = !gl.Mode.recordPath;
-                                      });
-                                    },
-                                  ),
-                                );
+                      )
+                      : Column(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          IconButton(
+                            iconSize: gl.eqPx * gl.iconSizeM,
+                            color: Colors.black,
+                            onPressed: () async {
+                              if (gl.positionInit) {
                                 refreshView(() {});
                               }
-                            });
-                          },
-                          icon: Icon(Icons.nordic_walking),
-                        ),
+                            },
+                            icon: Icon(Icons.gps_fixed),
+                          ),
+                        ],
                       ),
+                  if (gl.Mode.expertTools && gl.modeDevelopper)
                     Container(
-                      color: !_modeSearch ? Colors.transparent : Colors.blueGrey.withAlpha(128),
+                      color: !_modeMeasurePath ? Colors.transparent : Colors.lightBlue.withAlpha(128),
                       child: IconButton(
+                        color: _modeMeasurePath ? Colors.white : Colors.lightBlue,
                         iconSize: gl.eqPx * gl.iconSizeM,
-                        color: _modeSearch ? Colors.white : Colors.blueGrey,
+                        isSelected: _modeMeasurePath,
                         onPressed: () {
                           setState(() {
-                            _modeSearch = true;
+                            _modeMeasurePath = !_modeMeasurePath;
+                            _modeAnaPtPreview = !_modeMeasurePath;
+                            _measurePath.clear();
                           });
-                          gl.mainStack.add(
-                            popupSearchMenu(
-                              gl.notificationContext!,
-                              "",
-                              (LatLng pos) {
-                                if (pos.longitude != 0.0 && pos.latitude != 0.0) {
-                                  _mapController.move(pos, _mapController.camera.zoom);
-                                }
-                              },
-                              () {
-                                refreshView(() {
-                                  _modeSearch = false;
-                                });
-                              },
-                            ),
-                          );
                         },
-                        icon: FaIcon(FontAwesomeIcons.magnifyingGlassLocation),
+                        icon: Icon(Icons.more_horiz_outlined),
                       ),
                     ),
-                  ],
-                ),
+                  if (gl.Mode.expertTools && gl.modeDevelopper)
+                    Container(
+                      color: !gl.Mode.recordPath ? Colors.transparent : Colors.yellow.withAlpha(128),
+                      child: IconButton(
+                        color: gl.Mode.recordPath ? Colors.white : Colors.yellow.withAlpha(128),
+                        iconSize: gl.eqPx * gl.iconSizeM,
+                        isSelected: gl.Mode.recordPath,
+                        onPressed: () {
+                          setState(() {
+                            gl.Mode.recordPath = !gl.Mode.recordPath;
+                            _modeAnaPtPreview = !gl.Mode.recordPath;
+                            if (gl.Mode.recordPath) {
+                              gl.mainStack.add(
+                                popupPathListMenu(
+                                  gl.notificationContext!,
+                                  gl.selGeo.name,
+                                  (LatLng pos) {
+                                    if (pos.longitude != 0.0 && pos.latitude != 0.0) {
+                                      _mapController.move(pos, _mapController.camera.zoom);
+                                    }
+                                  },
+                                  () {
+                                    refreshView(() {
+                                      gl.Mode.recordPath = !gl.Mode.recordPath;
+                                    });
+                                  },
+                                ),
+                              );
+                              refreshView(() {});
+                            }
+                          });
+                        },
+                        icon: Icon(Icons.nordic_walking),
+                      ),
+                    ),
+                  Container(
+                    color: !_modeSearch ? Colors.transparent : Colors.blueGrey.withAlpha(128),
+                    child: IconButton(
+                      iconSize: gl.eqPx * gl.iconSizeM,
+                      color: _modeSearch ? Colors.white : Colors.blueGrey,
+                      onPressed: () {
+                        setState(() {
+                          _modeSearch = true;
+                        });
+                        gl.mainStack.add(
+                          popupSearchMenu(
+                            gl.notificationContext!,
+                            "",
+                            (LatLng pos) {
+                              if (pos.longitude != 0.0 && pos.latitude != 0.0) {
+                                _mapController.move(pos, _mapController.camera.zoom);
+                              }
+                            },
+                            () {
+                              refreshView(() {
+                                _modeSearch = false;
+                              });
+                            },
+                          ),
+                        );
+                      },
+                      icon: FaIcon(FontAwesomeIcons.magnifyingGlassLocation),
+                    ),
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
-        if (gl.dsp.orientation == Orientation.portrait)
-          _placeholder(
-            constraints: BoxConstraints(
-              maxHeight: gl.eqPx * gl.menuBarThickness,
-              minHeight: gl.eqPx * gl.menuBarThickness,
-              maxWidth: gl.eqPx * gl.menuBarThickness * .5,
-            ),
           ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -3439,10 +3467,6 @@ class _MapPageState extends State<MapPage> {
             child: SizedBox(),
           );
     });
-  }
-
-  Widget _placeholder({BoxConstraints? constraints, Alignment? alignement}) {
-    return Container(constraints: constraints, alignment: alignement);
   }
 
   void _writePositionDataToSharedPreferences(double lon, double lat, double zoom) async {

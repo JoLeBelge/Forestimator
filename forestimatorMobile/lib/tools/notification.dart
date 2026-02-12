@@ -788,7 +788,7 @@ class _SelectLayerSymbol extends State<SelectLayerSymbol> {
                     onPressed: () {
                       setState(() {
                         _mode = !_mode;
-                        gl.selLay.defaultPointIcon = k;
+                        widget.iconChanged(k);
                         _current = k;
                       });
                     },
@@ -1716,705 +1716,6 @@ class _SelectAttributeSet extends State<SelectAttributeSet> {
   }
 }
 
-/*class PopupDeleteAttribute {
-  PopupDeleteAttribute(
-    BuildContext context,
-    List<String> entries,
-    ValueChanged<List<int>> deleteEntries,
-    VoidCallback onTapOutside,
-  ) {
-    TextEditingController textEditor = TextEditingController(text: "");
-    presentPopup(
-      context: context,
-      dismiss: true,
-      after: () {
-        onTapOutside;
-      },
-      popup: AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadiusGeometry.circular(12.0),
-          side: BorderSide(color: gl.colorAgroBioTech, width: 2.0),
-        ),
-        backgroundColor: gl.backgroundTransparentBlackBox,
-        content: SizedBox(
-          width:
-              gl.display.orientation == Orientation.portrait
-                  ? gl.popupWindowsPortraitWidth * gl.equiPxl
-                  : gl.popupWindowsLandscapeWidth * gl.equiPxl,
-          height:
-              gl.display.orientation == Orientation.portrait
-                  ? gl.popupWindowsPortraitHeight * gl.equiPxl / 2
-                  : gl.popupWindowsLandscapeHeight * gl.equiPxl,
-          child: Column(
-            children: [
-              Text(
-                "Choisissez les lignes à enlever.",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: gl.equiPxl * gl.fontSizeS,
-                ),
-              ),
-              SizedBox(
-                height: 100 * gl.equiPxl,
-                child: DeleteAttribute(
-                  deleteEntries: deleteEntries,
-                  entries: entries,
-                ),
-              ),
-              SizedBox(
-                width: gl.menuBarLength * .5 * gl.equiPxl,
-                child: TextButton(
-                  style: dialogButtonStyle(
-                    height: gl.equiPxl * 12,
-                    width: gl.equiPxl * 10 * "Ok".length,
-                  ),
-                  child: Text("Enlever", style: dialogTextButtonStyle()),
-                  onPressed: () {
-                    if (controlDuplicateAttributeName(textEditor.text)) {
-                      return;
-                    }
-                    dismissPopup();
-                  },
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class DeleteAttribute extends StatefulWidget {
-  final List<String> entries;
-  final ValueChanged<List<int>> deleteEntries;
-  const DeleteAttribute({
-    super.key,
-    required this.deleteEntries,
-    required this.entries,
-  });
-
-  @override
-  State<StatefulWidget> createState() => _DeleteAttribute();
-}
-
-class _DeleteAttribute extends State<DeleteAttribute> {
-  List<int> selected = [];
-
-  @override
-  Widget build(BuildContext context) {
-    return Container();
-  }
-}*/
-
-class PolygonListMenu extends StatefulWidget {
-  final ValueChanged<LatLng> state;
-  final VoidCallback after;
-  final double height;
-
-  const PolygonListMenu({super.key, required this.state, required this.after, required this.height});
-
-  @override
-  State<StatefulWidget> createState() => _PolygonListMenu();
-}
-
-class _PolygonListMenu extends State<PolygonListMenu> {
-  final Color active = Colors.black;
-  final Color inactive = const Color.fromARGB(255, 92, 92, 92);
-  final ScrollController _controller = ScrollController();
-  bool _keyboard = false;
-  bool _doingAnaPt = false;
-
-  void _scrollDown() {
-    _controller.animateTo(
-      _controller.position.maxScrollExtent +
-          (gl.dsp.orientation == Orientation.portrait
-              ? gl.eqPx * gl.polyListSelectedCardHeight
-              : gl.eqPx * gl.polyListCardHeight),
-      duration: Duration(seconds: 1),
-      curve: Curves.fastOutSlowIn,
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      resizeToAvoidBottomInset: false,
-      backgroundColor: Colors.transparent,
-      body: switchRowColWithOrientation(alignment: MainAxisAlignment.spaceEvenly, [
-        Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            SizedBox(
-              height: gl.eqPx * gl.fontSizeXL * 1.2,
-              child: Text(
-                "Liste des polygones",
-                textAlign: TextAlign.justify,
-                style: TextStyle(fontSize: gl.eqPx * gl.fontSizeL, color: Colors.white),
-              ),
-            ),
-            SizedBox(
-              width: gl.eqPx * gl.popupWindowsPortraitWidth,
-              height: gl.eqPx * (widget.height - gl.fontSizeXL * 1.2 - 5),
-              child: ReorderableListView(
-                scrollController: _controller,
-                buildDefaultDragHandles: false,
-                onReorder: (int oldIndex, int newIndex) {
-                  setState(() {
-                    if (oldIndex < newIndex) {
-                      newIndex -= 1;
-                    }
-                    if (gl.selLay.geometries.length < newIndex + 1 || gl.selLay.geometries.length < oldIndex + 1) {
-                      return;
-                    }
-                    gl.refreshMainStack(() {
-                      final Geometry item = gl.selLay.geometries.removeAt(oldIndex);
-                      gl.selLay.geometries.insert(newIndex, item);
-                    });
-                    if (oldIndex == gl.selLay.selectedGeometry) {
-                      gl.selLay.selectedGeometry = newIndex;
-                    } else if (newIndex == gl.selLay.selectedGeometry) {
-                      if (oldIndex > newIndex) {
-                        gl.selLay.selectedGeometry++;
-                      } else {
-                        gl.selLay.selectedGeometry--;
-                      }
-                    } else if (oldIndex < gl.selLay.selectedGeometry && gl.selLay.selectedGeometry < newIndex) {
-                      gl.selLay.selectedGeometry--;
-                    } else if (oldIndex > gl.selLay.selectedGeometry && gl.selLay.selectedGeometry > newIndex) {
-                      gl.selLay.selectedGeometry++;
-                    }
-                  });
-                },
-                children: List<TextButton>.generate(gl.selLay.geometries.length, (int i) {
-                  return TextButton(
-                    style: ButtonStyle(
-                      fixedSize:
-                          i == gl.selLay.selectedGeometry && gl.dsp.orientation == Orientation.portrait
-                              ? WidgetStateProperty<Size>.fromMap(<WidgetStatesConstraint, Size>{
-                                WidgetState.any: Size(
-                                  gl.eqPx * gl.polyListSelectedCardWidth,
-                                  gl.eqPx * gl.polyListSelectedCardHeight,
-                                ),
-                              })
-                              : WidgetStateProperty<Size>.fromMap(<WidgetStatesConstraint, Size>{
-                                WidgetState.any: Size(gl.eqPx * gl.polyListCardWidth, gl.eqPx * gl.polyListCardHeight),
-                              }),
-                      padding: WidgetStateProperty.fromMap(<WidgetStatesConstraint, EdgeInsetsGeometry>{
-                        WidgetState.any: EdgeInsetsGeometry.zero,
-                      }),
-                    ),
-                    key: Key('$i'),
-                    onPressed:
-                        i == gl.selLay.selectedGeometry
-                            ? () {
-                              setState(() {
-                                widget.state(gl.selLay.geometries[i].center);
-                              });
-                              gl.refreshMainStack(() {
-                                gl.modeMapShowPolygons = true;
-                              });
-                            }
-                            : () {
-                              setState(() {
-                                gl.selLay.selectedGeometry = i;
-                                widget.state(gl.selLay.geometries[i].center);
-                              });
-                              gl.refreshMainStack(() {
-                                gl.modeMapShowPolygons = true;
-                              });
-                            },
-                    child: ReorderableDragStartListener(
-                      index: i,
-                      child: SizedBox(
-                        height: gl.polyListSelectedCardHeight * gl.eqPx,
-                        width: gl.polyListSelectedCardWidth * gl.eqPx,
-                        child: Card(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadiusGeometry.circular(12.0),
-                            side:
-                                i == gl.selLay.selectedGeometry
-                                    ? BorderSide(
-                                      color: gl.selLay.geometries[i].colorInside.withAlpha(255),
-                                      width: gl.eqPx * .75,
-                                    )
-                                    : BorderSide(
-                                      color: gl.selLay.geometries[i].colorInside.withAlpha(120),
-                                      width: gl.eqPx * .25,
-                                    ),
-                          ),
-                          surfaceTintColor: Colors.transparent,
-                          shadowColor: Colors.transparent,
-                          color: Colors.black.withAlpha(100),
-                          child:
-                              i != gl.selLay.selectedGeometry || gl.dsp.orientation == Orientation.landscape
-                                  ? Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      IconButton(
-                                        onPressed: () {
-                                          gl.refreshMainStack(() {
-                                            if (!gl.Mode.editPolygon) {
-                                              gl.selLay.geometries[i].visibleOnMap =
-                                                  !gl.selLay.geometries[i].visibleOnMap;
-                                            }
-                                          });
-                                          setState(() {});
-                                        },
-                                        icon:
-                                            gl.selLay.geometries[i].visibleOnMap
-                                                ? FaIcon(
-                                                  FontAwesomeIcons.eyeSlash,
-                                                  size: gl.eqPx * gl.iconSizeS * .9,
-                                                  color: Colors.white,
-                                                )
-                                                : FaIcon(
-                                                  FontAwesomeIcons.eye,
-                                                  size: gl.eqPx * gl.iconSizeS * .9,
-                                                  color: Colors.white,
-                                                ),
-                                      ),
-                                      SizedBox(
-                                        width: gl.eqPx * gl.chosenPolyBarWidth * .5,
-                                        child: Stack(
-                                          children: [
-                                            Row(
-                                              children: [
-                                                Container(
-                                                  alignment: Alignment.topLeft,
-                                                  child:
-                                                      gl.selLay.geometries[i].type.contains("Point")
-                                                          ? Text(
-                                                            "POINT",
-                                                            style: TextStyle(
-                                                              color: Colors.yellow,
-                                                              fontSize: gl.eqPx * gl.fontSizeXS * .9,
-                                                            ),
-                                                          )
-                                                          : gl.selLay.geometries[i].type == "Polygon"
-                                                          ? Text(
-                                                            "POLY",
-                                                            style: TextStyle(
-                                                              color: Colors.green,
-                                                              fontSize: gl.eqPx * gl.fontSizeXS * .9,
-                                                            ),
-                                                          )
-                                                          : Text(
-                                                            "OHA?",
-                                                            style: TextStyle(
-                                                              color: Colors.red,
-                                                              fontSize: gl.eqPx * gl.fontSizeXS * .9,
-                                                            ),
-                                                          ),
-                                                ),
-                                                SizedBox(width: gl.eqPx * 2),
-                                                if (gl.selLay.geometries[i].sentToServer)
-                                                  Container(
-                                                    alignment: Alignment.topLeft,
-                                                    child: Text(
-                                                      "SENT",
-                                                      style: TextStyle(
-                                                        color: Colors.red,
-                                                        fontSize: gl.eqPx * gl.fontSizeXS * .9,
-                                                      ),
-                                                    ),
-                                                  ),
-                                              ],
-                                            ),
-                                            Container(
-                                              alignment: Alignment.center,
-                                              child: SingleChildScrollView(
-                                                scrollDirection: Axis.horizontal,
-                                                child: Text(
-                                                  gl.selLay.geometries[i].name,
-                                                  textAlign: TextAlign.center,
-                                                  style: TextStyle(
-                                                    color: Colors.white,
-                                                    fontSize: gl.eqPx * gl.fontSizeL,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      IconButton(
-                                        onPressed: () {
-                                          PopupColorChooser(
-                                            gl.selLay.geometries[i].colorInside,
-                                            gl.notificationContext!,
-                                            //change color
-                                            (Color col) {
-                                              setState(() {
-                                                gl.selLay.geometries[i].setColorInside(col);
-                                                gl.selLay.geometries[i].setColorLine(
-                                                  Color.fromRGBO(
-                                                    (col.r * 255).round(),
-                                                    (col.g * 255).round(),
-                                                    (col.b * 255).round(),
-                                                    1.0,
-                                                  ),
-                                                );
-                                              });
-                                            },
-                                            () {},
-                                            () {
-                                              gl.selLay.geometries[i].serialize();
-                                            },
-                                          );
-                                        },
-                                        icon: Icon(
-                                          Icons.color_lens,
-                                          color: gl.selLay.geometries[i].colorInside,
-                                          size: gl.eqPx * gl.iconSizeM * .75,
-                                        ),
-                                      ),
-                                    ],
-                                  )
-                                  : Column(
-                                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                    children: [
-                                      Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          IconButton(
-                                            onPressed: () {
-                                              gl.refreshMainStack(() {
-                                                if (!gl.Mode.editPolygon) {
-                                                  gl.selLay.geometries[i].visibleOnMap =
-                                                      !gl.selLay.geometries[i].visibleOnMap;
-                                                }
-                                              });
-                                              setState(() {});
-                                            },
-                                            icon:
-                                                gl.selLay.geometries[i].visibleOnMap
-                                                    ? FaIcon(
-                                                      FontAwesomeIcons.eyeSlash,
-                                                      size: gl.eqPx * gl.iconSizeS * .9,
-                                                      color: Colors.white,
-                                                    )
-                                                    : FaIcon(
-                                                      FontAwesomeIcons.eye,
-                                                      size: gl.eqPx * gl.iconSizeS * .9,
-                                                      color: Colors.white,
-                                                    ),
-                                          ),
-                                          SizedBox(
-                                            width: gl.eqPx * gl.chosenPolyBarWidth * .5,
-                                            child: Stack(
-                                              children: [
-                                                Row(
-                                                  children: [
-                                                    Container(
-                                                      alignment: Alignment.topLeft,
-                                                      child:
-                                                          gl.selLay.geometries[i].type.contains("Point")
-                                                              ? Text(
-                                                                "POINT",
-                                                                style: TextStyle(
-                                                                  color: Colors.yellow,
-                                                                  fontSize: gl.eqPx * gl.fontSizeXS * .9,
-                                                                ),
-                                                              )
-                                                              : gl.selLay.geometries[i].type == "Polygon"
-                                                              ? Text(
-                                                                "POLY",
-                                                                style: TextStyle(
-                                                                  color: Colors.green,
-                                                                  fontSize: gl.eqPx * gl.fontSizeXS * .9,
-                                                                ),
-                                                              )
-                                                              : Text(
-                                                                "OHA?",
-                                                                style: TextStyle(
-                                                                  color: Colors.red,
-                                                                  fontSize: gl.eqPx * gl.fontSizeXS * .9,
-                                                                ),
-                                                              ),
-                                                    ),
-                                                    SizedBox(width: gl.eqPx * 2),
-                                                    if (gl.selLay.geometries[i].sentToServer)
-                                                      Container(
-                                                        alignment: Alignment.bottomLeft,
-                                                        child: Text(
-                                                          "SENT",
-                                                          style: TextStyle(
-                                                            color: Colors.red,
-                                                            fontSize: gl.eqPx * gl.fontSizeXS * .9,
-                                                          ),
-                                                        ),
-                                                      ),
-                                                  ],
-                                                ),
-                                                TextButton(
-                                                  style: ButtonStyle(
-                                                    animationDuration: Duration(seconds: 1),
-                                                    backgroundColor: WidgetStateProperty<Color>.fromMap(
-                                                      <WidgetStatesConstraint, Color>{
-                                                        WidgetState.any: Colors.transparent,
-                                                      },
-                                                    ),
-                                                    padding: WidgetStateProperty<EdgeInsetsGeometry>.fromMap(
-                                                      <WidgetStatesConstraint, EdgeInsetsGeometry>{
-                                                        WidgetState.any: EdgeInsetsGeometry.zero,
-                                                      },
-                                                    ),
-                                                  ),
-                                                  onPressed: () {
-                                                    setState(() {
-                                                      PopupValueChange(
-                                                        "string",
-                                                        gl.selLay.geometries[i].name,
-                                                        (value) {
-                                                          gl.selLay.geometries[i].name = value.toString();
-                                                        },
-                                                        () {},
-                                                        () {
-                                                          gl.selLay.geometries[gl.selLay.selectedGeometry].serialize();
-                                                        },
-                                                      );
-                                                    });
-                                                  },
-                                                  child: Container(
-                                                    alignment: Alignment.center,
-                                                    child: SingleChildScrollView(
-                                                      scrollDirection: Axis.horizontal,
-                                                      child: Text(
-                                                        gl.selLay.geometries[i].name,
-                                                        textAlign: TextAlign.center,
-                                                        style: TextStyle(
-                                                          color: Colors.white,
-                                                          fontSize: gl.eqPx * gl.fontSizeL,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                          IconButton(
-                                            onPressed: () {
-                                              PopupColorChooser(
-                                                gl.selLay.geometries[i].colorInside,
-                                                gl.notificationContext!,
-                                                //change color
-                                                (Color col) {
-                                                  setState(() {
-                                                    gl.selLay.geometries[i].setColorInside(col);
-                                                    gl.selLay.geometries[i].setColorLine(
-                                                      Color.fromRGBO(
-                                                        (col.r * 255).round(),
-                                                        (col.g * 255).round(),
-                                                        (col.b * 255).round(),
-                                                        1.0,
-                                                      ),
-                                                    );
-                                                  });
-                                                },
-                                                () {},
-                                                () {
-                                                  gl.selLay.geometries[i].serialize();
-                                                },
-                                              );
-                                            },
-                                            icon: Icon(
-                                              Icons.color_lens,
-                                              color: gl.selLay.geometries[i].colorInside,
-                                              size: gl.eqPx * gl.iconSizeM * .75,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Row(
-                                            children: [
-                                              if (gl.selLay.geometries[i].containsAttribute("essence") &&
-                                                  gl.selLay.geometries[i].containsAttribute("rmq"))
-                                                IconButton(
-                                                  onPressed: () {
-                                                    if (gl.UserData.forename.isEmpty ||
-                                                        gl.UserData.name.isEmpty ||
-                                                        gl.UserData.mail.isEmpty) {
-                                                      PopupUserData(
-                                                        context,
-                                                        () {},
-                                                        () {
-                                                          PopupDoYouReally(
-                                                            context,
-                                                            () {
-                                                              gl.selLay.geometries[i].sendGeometryToServer();
-                                                            },
-                                                            "Attention !",
-                                                            gl.labelSendCompoFeature,
-                                                            "Envoyer",
-                                                            "Ne pas envoyer",
-                                                          );
-                                                        },
-                                                        oldForename: gl.UserData.forename,
-                                                        oldName: gl.UserData.name,
-                                                        oldMail: gl.UserData.mail,
-                                                      );
-                                                    } else {
-                                                      PopupDoYouReally(
-                                                        context,
-                                                        () {
-                                                          gl.selLay.geometries[i].sendGeometryToServer();
-                                                        },
-                                                        "Attention !",
-                                                        gl.labelSendCompoFeature,
-                                                        "Envoyer",
-                                                        "Ne pas envoyer",
-                                                      );
-                                                    }
-                                                  },
-                                                  icon: Icon(
-                                                    Icons.send_and_archive,
-                                                    color: Colors.white,
-                                                    size: gl.iconSizeS * gl.eqPx,
-                                                  ),
-                                                ),
-                                              if (gl.selLay.geometries[i].type == "Polygon" &&
-                                                  gl.selLay.geometries[i].points.length > 2)
-                                                IconButton(
-                                                  onPressed: () async {
-                                                    if (await gl.selLay.geometries[i].onlineSurfaceAnalysis()) {
-                                                      gl.mainStack.add(
-                                                        popupAnaSurfResultsMenu(
-                                                          gl.notificationContext!,
-                                                          gl.selLay.geometries[gl.selLay.selectedGeometry].decodedJson,
-                                                          () {
-                                                            gl.refreshMainStack(() {});
-                                                          },
-                                                          () {
-                                                            gl.refreshMainStack(() {});
-                                                          },
-                                                        ),
-                                                      );
-                                                      gl.refreshMainStack(() {});
-                                                    }
-                                                  },
-                                                  icon: Icon(
-                                                    Icons.analytics,
-                                                    color: Colors.white,
-                                                    size: gl.eqPx * gl.iconSizeM * .75,
-                                                  ),
-                                                ),
-                                              if (gl.selLay.geometries[i].type.contains("Point") &&
-                                                  gl.selLay.geometries[i].points.isNotEmpty)
-                                                IconButton(
-                                                  onPressed: () async {
-                                                    if (!_doingAnaPt) {
-                                                      _doingAnaPt = true;
-                                                      await gl.selLay.geometries[i].runAnaPt();
-                                                      gl.refreshMainStack(() {
-                                                        PopupAnaResultsMenu(
-                                                          gl.notificationContext!,
-                                                          gl.requestedLayers,
-                                                          () {
-                                                            setState(() {});
-                                                          },
-                                                        );
-                                                      });
-
-                                                      _doingAnaPt = false;
-                                                    }
-                                                  },
-                                                  icon: Icon(
-                                                    Icons.location_pin,
-                                                    color: Colors.white,
-                                                    size: gl.eqPx * gl.iconSizeM * .75,
-                                                  ),
-                                                ),
-                                            ],
-                                          ),
-                                          Container(
-                                            alignment: Alignment.center,
-                                            width: gl.eqPx * gl.iconSizeM * 1.1,
-                                            height: gl.eqPx * gl.iconSizeM * 1.1,
-                                            child: IconButton(
-                                              onPressed: () {
-                                                PopupDoYouReally(
-                                                  gl.notificationContext!,
-                                                  () {
-                                                    setState(() {
-                                                      Geometry.removePolyFromShared(gl.selLay.geometries[i].id);
-                                                      if (i > 0) {
-                                                        gl.selLay.geometries.removeAt(i);
-                                                        gl.selLay.selectedGeometry--;
-                                                      } else if (i == 0 && gl.selLay.geometries.isNotEmpty) {
-                                                        gl.selLay.geometries.removeAt(i);
-                                                      }
-                                                    });
-                                                  },
-                                                  "Message",
-                                                  "\nVoulez vous vraiment supprimer ${gl.selLay.geometries[i].name}?\n",
-                                                );
-                                              },
-                                              icon: Icon(
-                                                Icons.delete_forever,
-                                                color: Colors.white,
-                                                size: gl.eqPx * gl.iconSizeM * .75,
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                        ),
-                      ),
-                    ),
-                  );
-                }),
-              ),
-            ),
-            TextButton(
-              style: ButtonStyle(
-                backgroundColor: WidgetStateProperty.fromMap(<WidgetStatesConstraint, Color>{
-                  WidgetState.any: Colors.white,
-                }),
-                shape: WidgetStateProperty<OutlinedBorder>.fromMap(<WidgetStatesConstraint, OutlinedBorder>{
-                  WidgetState.any: RoundedRectangleBorder(borderRadius: BorderRadiusGeometry.circular(12.0)),
-                }),
-                fixedSize: WidgetStateProperty.fromMap(<WidgetStatesConstraint, Size>{
-                  WidgetState.any: Size(
-                    gl.eqPx * gl.polyListCardWidth * .97,
-                    gl.eqPx * gl.polyNewPolygonButtonHeight * .9,
-                  ),
-                }),
-                padding: WidgetStateProperty.fromMap(<WidgetStatesConstraint, EdgeInsetsGeometry>{
-                  WidgetState.any: EdgeInsetsGeometry.zero,
-                }),
-              ),
-              key: Key('autsch-5-addPoly'),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [Icon(Icons.add, size: (gl.polyNewPolygonButtonHeight - 4) * gl.eqPx, color: Colors.black)],
-              ),
-              onPressed: () {
-                setState(() {
-                  gl.selLay.addGeometry(name: "Nouveau${gl.selLay.geometries.length - 1}");
-                  gl.selLay.selectedGeometry = gl.selLay.geometries.length - 1;
-                });
-
-                gl.refreshMainStack(() {
-                  gl.selLay.selectedGeometry = gl.selLay.geometries.length - 1;
-                });
-                _scrollDown();
-              },
-            ),
-            Row(mainAxisAlignment: MainAxisAlignment.center, children: [_returnButton(context, widget.after)]),
-          ],
-        ),
-      ]),
-    );
-  }
-}
-
 class GeoLayerListMenu extends StatefulWidget {
   final ValueChanged<LatLng> mapmove;
   final VoidCallback after;
@@ -2483,7 +1784,7 @@ class _GeoLayerListMenu extends State<GeoLayerListMenu> {
         side: BorderSide(color: gl.colorAgroBioTech.withAlpha(255), width: 2.0),
       ),
       child: SizedBox(
-        height: gl.eqPx * gl.eqPxH * .9,
+        height: gl.eqPx * gl.eqPxH * .85,
         width: gl.eqPx * gl.eqPxW * .95,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -4167,6 +3468,17 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
                             colorChanged: (Color c) {
                               setState(() {
                                 gl.selLay.defaultColor = c;
+                                PopupDoYouReally(
+                                  context,
+                                  () {
+                                    for (Geometry g in gl.selLay.geometries) {
+                                      g.colorInside = c;
+                                      g.colorLine = c.withAlpha(255);
+                                    }
+                                  },
+                                  "Attention",
+                                  "Voulez vous changer la couleur pour tous les entités de la layer?",
+                                );
                               });
                             },
                             currentColor: gl.selLay.defaultColor,
@@ -4196,6 +3508,18 @@ class _LayerPropertiesPage extends State<LayerPropertiesPage> {
                               setState(() {
                                 gl.selLay.defaultPointIcon = i;
                               });
+                              PopupDoYouReally(
+                                context,
+                                () {
+                                  setState(() {
+                                    for (Geometry g in gl.selLay.geometries) {
+                                      g.selectedPointIcon = i;
+                                    }
+                                  });
+                                },
+                                "Attention",
+                                "Voulez vous changer le symbole pour tous les entités de la layer?",
+                              );
                             },
                             current: gl.selLay.defaultPointIcon,
                           ),
@@ -4998,7 +4322,6 @@ class _SearchResultCard extends State<SearchResultCard> {
                   ? BorderSide(color: widget.boxColor, width: 2.0)
                   : BorderSide(color: widget.boxColor.withAlpha(255), width: 1.0),
         ),
-
         color: selected ? widget.boxColor.withAlpha(255) : widget.boxColor.withAlpha(150),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -5053,13 +4376,33 @@ class SearchMenu extends StatefulWidget {
   State<StatefulWidget> createState() => _SearchMenu();
 }
 
-class _SearchMenu extends State<SearchMenu> {
+class _SearchMenu extends State<SearchMenu> with SingleTickerProviderStateMixin {
+  late AnimationController _animController;
   final Color active = Colors.black;
   final Color inactive = const Color.fromARGB(255, 92, 92, 92);
+  final Duration animationDuration = Duration(seconds: 1);
 
   static String lastSearchKey = "";
   static Map<String, http.Response> searchCache = {};
   static List<SearchResultCard> searchResults = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _animController = AnimationController(vsync: this, duration: animationDuration);
+  }
+
+  @override
+  void didUpdateWidget(SearchMenu oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _animController.duration = animationDuration;
+  }
+
+  @override
+  void dispose() {
+    _animController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -5725,6 +5068,7 @@ class _ForestimatorAdvancedSettings extends State<ForestimatorAdvancedSettings> 
             gl.Mode.essence = it;
           });
           gl.refreshMainStack(() {});
+          gl.Mode.serialize();
         }, false),
         variableBooleanSlider("Petit Label", gl.Mode.smallLabel, (bool it) {
           setState(() {
@@ -5732,6 +5076,7 @@ class _ForestimatorAdvancedSettings extends State<ForestimatorAdvancedSettings> 
             gl.Mode.labelCross = !it;
           });
           gl.refreshMainStack(() {});
+          gl.Mode.serialize();
         }, false),
       ],
     );
@@ -8092,15 +7437,16 @@ class _UpperLayerControl extends State<UpperLayerControl> {
                       }),
                     ),
                     onPressed: () {
-                      gl.mainStack.add(
-                        popupLayerListMenu(
-                          gl.notificationContext!,
-                          gl.selLay.geometries[gl.selLay.selectedGeometry].name,
-                          widget.switchToLocationInSearchMenu,
-                          () {
-                            gl.refreshMainStack(() {});
-                          },
-                        ),
+                      gl.stack.add(
+                        "LayerList",
+                        popupLayerListMenu(gl.notificationContext!, "as", widget.switchToLocationInSearchMenu, () {
+                          gl.refreshMainStack(() {
+                            gl.stack.pop("LayerList");
+                          });
+                        }),
+                        Duration(milliseconds: 400),
+                        gl.Anim.searchAnimOnScreenPos,
+                        Offset(0, -2000),
                       );
                       gl.refreshMainStack(() {});
                     },

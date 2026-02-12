@@ -85,7 +85,6 @@ class GeometricLayer {
     geometries.last.iconSize = defaultIconSize;
     for (Attribute a in defaultAttributes) {
       geometries.last.attributes.add(a.clone);
-      print(geometries.last.attributes.last.value);
     }
     geometries.last.serialize(layerId: id);
   }
