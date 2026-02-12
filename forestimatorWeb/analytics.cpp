@@ -100,20 +100,6 @@ PageAnalytics::PageAnalytics(const Wt::WEnvironment& env, std::string aFileDB) :
     if (globTest){std::cout << " done " << std::endl;}
     typedef dbo::collection< dbo::ptr<Log> > Logs;
 
-    // probablement plus simple de faire une selection sur base de datum (integer) que de date (texte puis date)
-    /*time_t timeLim;
-    struct tm tA, *tptr;
-    time(&timeLim);
-    tptr = localtime(&timeLim);
-    tA = *tptr;
-    tA.tm_mday = dateLim.day();
-    tA.tm_mon = dateLim.month();
-    tA.tm_year = dateLim.year()-1900;// time.h compte les années à partir de 1900.
-    timeLim = mktime(&tA);*/
-
-    //Logs logsGraph = session.find<Log>().where("datum > "+std::to_string(timeLim));
-    //Logs logs = session.find<Log>().orderBy("datum DESC").limit(100);
-    //std::cout << " date limite : " << dateLim.toString() << ", date ajd " << curDate.toString() << " en time_t ça donne " << timeLim << std::endl;
     setTitle("Forestimator - Stats");
 
     root()->setMargin(0);
@@ -149,10 +135,10 @@ PageAnalytics::PageAnalytics(const Wt::WEnvironment& env, std::string aFileDB) :
     mChart->setLegendEnabled(true);
     mChart->setType(Chart::ChartType::Scatter);
     mChart->axis(Chart::Axis::X).setScale(Chart::AxisScale::Date);
+    mChart->axis(Chart::Axis::Y).setMaximum(250);
 
-    //std::cout << "PageAnalytics::setChart " << std::endl;
     Wt::WDate curDate=Wt::WDate::currentDate();
-    Wt::WDate dateLim=curDate.addMonths(-3);
+    Wt::WDate dateLim=curDate.addMonths(-4);
     int nbd=dateLim.daysTo(curDate);
 
     // Configure the header.
@@ -163,7 +149,7 @@ PageAnalytics::PageAnalytics(const Wt::WEnvironment& env, std::string aFileDB) :
     for (int d(0);d<nbd+1;d++){
         Wt::WDate ad=dateLim.addDays(d);
         //int count = session.query<int>("select count(1) from log").where("date = ?").bind(ad).groupBy("ip");
-        int count = session.query<int>("SELECT COUNT(*) AS col0 FROM (SELECT DISTINCT ip, date FROM log)  where (date = '"+ad.toString("yyyy-MM-dd").toUTF8()+"')");
+        int count = session.query<int>("SELECT COUNT(*) AS col0 FROM (SELECT DISTINCT client_id, date FROM log WHERE client_id!=0)  where (date = '"+ad.toString("yyyy-MM-dd").toUTF8()+"')");
         model->setData(row, 0, ad);
         model->setData(row, 1, count);
         row++;
@@ -189,7 +175,6 @@ PageAnalytics::PageAnalytics(const Wt::WEnvironment& env, std::string aFileDB) :
 
     //0 page,extend,danap,anas,dsingle,dmulti,danas,dsingleRW;
     // Sélection par catégorie de log
-    // std::string q="SELECT COUNT(*)as nb, cat FROM log  WHERE ip != '127.0.0.1' AND ip NOT LIKE '%139.165%' GROUP BY cat;";
     for (int cat(1);cat <10;cat++){
         int nb=session.query<int>("SELECT COUNT(*) FROM log  WHERE ip != '127.0.0.1' AND ip NOT LIKE '%139.165.%' AND cat="+std::to_string(cat)+" GROUP BY cat");
         table2->elementAt(cat,0)->addWidget(std::make_unique<Wt::WText>(getCat(cat)));
@@ -227,13 +212,11 @@ PageAnalytics::PageAnalytics(const Wt::WEnvironment& env, std::string aFileDB) :
     table4->elementAt(0, 0)->addNew<Wt::WText>("année et mois");
     table4->elementAt(0, 1)->addNew<Wt::WText>("Nombre d'utilisateur");
 
-    //q="SELECT COUNT(*)as nb FROM (SELECT COUNT(*)as nb FROM log  WHERE ip != '127.0.0.1' AND ip NOT LIKE '%139.165%' AND date LIKE '%2022-02%' GROUP BY ip);";
     row=1;
-    for (int y(2022);y <2026;y++){
+    for (int y(2025);y <2027;y++){
         for (int m(1);m <13;m++){
             std::string month = std::to_string(m);
             if (month.size()==1){month="0"+ month;}
-
             int nb=session.query<int>("SELECT COUNT(*) as nb FROM (SELECT COUNT(*) as nb FROM log  WHERE ip != '127.0.0.1' AND ip NOT LIKE '%139.165%' AND date LIKE '%"+std::to_string(y)+"-"+month+"%' GROUP BY client_id)");
             table4->elementAt(row,0)->addWidget(Wt::cpp14::make_unique<Wt::WText>(month+"-"+std::to_string(y)));
             table4->elementAt(row,0)->setContentAlignment(AlignmentFlag::Right);
