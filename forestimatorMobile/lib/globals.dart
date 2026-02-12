@@ -4,6 +4,7 @@ import 'package:fforestimator/myicons.dart';
 import 'package:fforestimator/tools/customLayer/path_layer.dart';
 import 'package:fforestimator/tools/geometry/geometry.dart' as pol;
 import 'package:fforestimator/tools/geometry_layer.dart';
+import 'package:fforestimator/tools/stack_animated.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geolocator/geolocator.dart';
@@ -22,7 +23,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 // TODO: Add bounding box as properties & map view
 typedef VoidSetter = void Function(void Function());
 
-const String forestimatorMobileVersion = "2.3.0 - build 26"; //02/2026
+const String forestimatorMobileVersion = "3.0.0 - build 30"; //02/2026
 const double globalMinZoom = 4.0;
 const double globalMaxZoom = 13.0;
 const double globalMinOfflineZoom = 8.0;
@@ -98,6 +99,13 @@ class UserData {
   }
 }
 
+class Anim {
+  static Offset searchBoxPos = Offset(dsp.alignX(-eqPxW), dsp.alignY(eqPxH * .5));
+  static Offset get searchAnimOnScreenPos =>
+      Offset(dsp.alignX(-eqPxW * .5 + 0), dsp.alignY(eqPxH * .5 - menuBarThickness));
+  static Offset get searchAnimOffScreenPos => Offset(dsp.alignX(-eqPxW), dsp.alignY(eqPxH * .5 - menuBarThickness));
+}
+
 class Mode {
   static bool userDataFilled = false;
   static bool essence = false;
@@ -146,13 +154,13 @@ class Mode {
   static void serialize() async {
     await shared!.setBool('Modes.essence', essence);
     await shared!.setBool('Modes.userDataFilled', userDataFilled);
-    await shared!.setBool('Modes.userDataFilled', userDataFilled);
+    await shared!.setBool('Modes.labelCross', labelCross);
     await shared!.setBool('Modes.smallLabel', smallLabel);
   }
 
   static void deserialize() {
     essence = shared!.getBool('Modes.essence') ?? false;
-    essence = shared!.getBool('Modes.userDataFilled') ?? false;
+    userDataFilled = shared!.getBool('Modes.userDataFilled') ?? false;
     labelCross = shared!.getBool('Modes.labelCross') ?? false;
     smallLabel = shared!.getBool('Modes.smallLabel') ?? true;
   }
@@ -781,6 +789,8 @@ void mainStackPopLast() {
     print("Error: Stack is empty, cannot pop last element!");
   }
 }
+
+ForestimatorStack stack = ForestimatorStack();
 
 List<IconData> selectableIcons = [
   Icons.square_outlined,
